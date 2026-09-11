@@ -1,0 +1,343 @@
+#+TITLE: Census of derived served values -- "other countries" group
+#+DATE: 2026-09-11
+#+AUTHOR: derivations sweep, group "every country not in the other groups"
+
+Countries covered (24): Togo, Guinea-Bissau, Benin, Panama, Timor-Leste, Iraq,
+Guatemala, Cambodia, Serbia, Serbia and Montenegro, India, Pakistan, Kazakhstan,
+Guyana, EthiopiaRHS, South Africa, Liberia, Kosovo, China, Peru, Nepal,
+Azerbaijan, Afghanistan, Armenia.
+
+Read-only sweep of every =<C>/_/*.py=, =<C>/<wave>/_/*.py=, every
+=data_info.yml= (numeric-valued =mapping:= blocks, function-valued myvars,
+=df_edit= hooks), every =_/Makefile=, and the derivation-relevant parts of each
+=_/CONTENTS.org=.  Nothing was executed.  Three shared library functions that
+country config invokes by name were read as well, because the derivation lives
+there and the country only selects it: =local_tools.age_handler=
+(local_tools.py:2805-2960), =build_transforms.food_acquired_to_canonical=
+(build_transforms.py:34-140) and =df_data_grabber='s mapping rule
+(local_tools.py:1477: =df[col].map(lambda x: f.get(x, x))= -- an unmapped value
+passes through unchanged, which is what makes the sentinel-to-null =mapping:=
+blocks below work as guards).
+
+Convention for the table: "kind" uses the brief's vocabulary (scale /
+annualise / product / ratio / categorical->number / impute / encoding /
+selection / guard), plus =sum-fields= for a sum across DIFFERENT raw fields and
+=dead= for a derivation that exists in a script nothing runs.  "disclosed"
+names where a reader of the served table could learn the rule today: CONTENTS
+(the country's =_/CONTENTS.org=), scheme (a comment in =data_scheme.yml=),
+yml (a comment in =data_info.yml=), docstring (the script), CLAUDE.md, or
+none.  "rows" is only given where a source states it.
+
+* 1. Derivations found, one row each
+
+| # | country | wave(s) | table | served column / index value | raw inputs (file.variable) | rule | kind | where (path:line) | disclosed today? | rows affected |
+|---+---------+---------+-------+-----------------------------+-----------------------------+------+------+-------------------+------------------+---------------|
+| 1 | Togo, Benin, Guinea-Bissau | 2018 / 2018-19 / 2018-19 | food_acquired | Quantity where s='purchased' | s07b_me_*.dta: s07bq03a (total quantity consumed, last 7 days), s07bq04 (of which own-produced) | Quantity_purchased = (s07bq03a.fillna(0) - s07bq04.fillna(0)).clip(lower=0); row kept only if Quantity>0 or Expenditure>0 | difference + guard | lsms_library/build_transforms.py:118-120,131-133; wired by Togo/2018/_/mapping.py:5, Benin/2018-19/_/mapping.py:4, Guinea-Bissau/2018-19/_/mapping.py:5,153-162 | docstring (build_transforms), scheme (Togo/_/data_scheme.yml "reshapes ... on s") ; CONTENTS: none of the three mention s07bq04 | Benin: Produced<=Quantity in 100% of 2,597 rows where both populated (docstring) |
+| 2 | Togo, Benin, Guinea-Bissau | same | food_acquired | Expenditure where s='purchased' | s07bq08 (value of the LAST purchase of the item), while s07bq07a (quantity of that last purchase) and s07bq05 (quantity received as gift) are NOT read | Expenditure := s07bq08 served beside Quantity := 7-day-consumed minus own-produced (row 1); gifts (s07bq05) are not subtracted, so they sit inside 'purchased' | encoding (window/quantity mismatch) + selection | Togo/2018/_/data_info.yml:236-239; Benin/2018-19/_/data_info.yml:203-206; Guinea-Bissau/2018-19/_/data_info.yml:120-123 (the same YAML shape is the template in .claude/skills/add-feature/SKILL.md:385-400) | none for the served table.  VERIFIED against the source: the Stata variable labels of s07b_me_{tgo,ben,gnb}2018.dta (read from the local DVC cache blobs, metadata only) are identical in all three: s07bq03a '7B.03a. Qtite tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours', s07bq04 '7B.04. Qtite autocons', s07bq05 '7B.05. Qtite recue comm cadeaux', s07bq06 '7B.06. Quelle est la derniere fois que le [PRODUIT] a ete achete', s07bq07a '7B.07a. quantite du [PRODUIT] achete la derniere fois', s07bq08 '7B.08. Valeur (en FCFA) du [PRODUIT] achete la derniere fois'; the Togo questionnaire xls sheet header reads 'B Consommation alimentaire des 7 derniers jours et achat des 30 derniers jours'.  In-repo readings disagree: Senegal/2018-19/_/food_acquired.py:18 ('last expenditure') and the dead Togo/2018/_/food_expenditures.py:14-24 agree with the labels; Burkina_Faso/2018-19/_/food_acquired.py:18 and Burkina_Faso/_/CONTENTS.org:480 call it 'total expenses' / 'expenditure', and .claude/skills/add-feature/SKILL.md:400 templates it as Expenditure without comment | all purchased rows of the three countries |
+| 3 | Togo, Benin, Guinea-Bissau | same | household_roster | Age | s01_me_*.dta: s01q04a (reported age), s01q03a/b/c (DOB day/month/year); s00_me_*.dta: s00q23a (interview date) | tools.age_handler: if reported age and DOB-age agree within 1 year serve the DOB-derived FRACTIONAL age, else int(reported); missing day -> 15th; year-only -> interview_year - year; sentinel -1 (Togo/Benin) or 9999 (GB age AND day) -> None; negative result -> NaN (Benin/GB) | selection + impute + guard | lsms_library/local_tools.py:2805-2960; Togo/2018/_/mapping.py:95-121,198-222; Benin/2018-19/_/mapping.py:36-61,135-162; Guinea-Bissau/2018-19/_/mapping.py:177-235 | CLAUDE.md (age_handler gotcha), docstrings; CONTENTS: none | all roster rows |
+| 4 | Togo, Benin, Guinea-Bissau | same | household_roster | MonthsSpent | s01q12 ("lived continuously 6+ months?" Oui/Non; GB also Sim/Nao) | Oui/Sim -> 12, Non/Nao -> 0 | categorical->number | Togo/2018/_/data_info.yml:94-98; Benin/2018-19/_/data_info.yml:91-95; Guinea-Bissau/2018-19/_/data_info.yml:145-152 | CONTENTS (Togo:463-478, Benin:492-507, GB:328-343), CLAUDE.md | all roster rows |
+| 5 | Togo, Benin, Guinea-Bissau | same | subjective_well_being | Own Step | s20_me_*.dta: s20q05 (Tres pauvre / Pauvre / Moyen / Riche; PT: Muito pobre..Rico) | label -> 1..4; Ne sait pas / Refus -> NaN | categorical->number (ordinal) | Togo/2018/_/data_info.yml:136-144; Benin :124-131; Guinea-Bissau :257-268 | scheme (Togo/_/data_scheme.yml, Benin yml comment) | |
+| 6 | Togo, Benin, Guinea-Bissau; Iraq | EHCVM 2018(-19); Iraq 2012 | shocks | AffectedIncome/Assets/Production/Consumption | s14_me_*.dta: s14q04a-d (Diminue / Augmente / Inchange / Non-concerne); Iraq 2012ihses20: q2002_1/2/3/5 (DECREASE / INCREASE / DID NOT CHANGE) | decreased OR increased -> True; unchanged / not concerned -> False (direction of change is discarded) | categorical->bool | Togo/2018/_/data_info.yml:167-194; Benin :283-311; Guinea-Bissau :178-205; Iraq/2012/_/data_info.yml:125-148 | yml comment (Iraq); Togo/Benin/GB: none | |
+| 7 | Togo, Benin, Guinea-Bissau | same | shocks | HowCoped0..2 | s14q05__1..__26 (26 yes/no coping flags) | first three (Benin: first two) flags with value >= 1, in code order, decoded to French labels; remaining flags dropped | selection | Togo/2018/_/mapping.py:124-148; Benin/2018-19/_/mapping.py:193-215; Guinea-Bissau/2018-19/_/mapping.py:306-329 | none | |
+| 8 | Togo, Benin, Guinea-Bissau | same | food_security | FIES_score | s08a_me_*.dta: s08aq01..s08aq08 (8 FIES items, Oui/Non) | sum of the 8 booleans; NaN only when ALL 8 are NaN, so a partially-answered battery counts missing items as 0 | sum-fields | Togo/2018/_/mapping.py:155-169; Benin :170-185; Guinea-Bissau :259-273 | scheme + yml comments | |
+| 9 | Togo, Benin, Guinea-Bissau | same | plot_features | Area, AreaUnit | s16a_me_*.dta: s16aq47 (GPS area, ha), s16aq45 (GPS measured? 1/2), s16aq09a (farmer estimate), s16aq09b (1=ha, 2=m2) | est_ha = s16aq09a, /10000 when s16aq09b==2; Area = s16aq47 where s16aq45==1 and not null, else est_ha; Area outside (0, 1000] -> NA (GH #327); AreaUnit := 'hectares' constant | selection + scale + guard | Togo/_/togo.py:285-307; Benin/_/benin.py:121-142; Guinea-Bissau/_/guinea_bissau.py:127-148 | docstrings; Benin CONTENTS:525 (the m2 conversion only; clamp and GPS-preference undocumented there); Togo/GB CONTENTS: none | GB raw max ~281,000,000 ha before clamp (docstring) |
+| 10 | Togo, Benin, Guinea-Bissau | same | plot_features | Irrigated | s16aq17 (water source code) via harmonize_water | Irrigated = (harmonized water label == 'Irrigated'); NaN label -> NA | categorical->bool | togo.py:316-320; benin.py:145-149; guinea_bissau.py:159-163 | docstring | |
+| 10b | Timor-Leste | 2007-08 | plot_features | AreaUnit, Irrigated | plot.dta q09a04 (area, m2), q09a09 (irrigation source label) | AreaUnit := 'square meters' constant (NA where Area NA); Irrigated = (label != 'Not irrigated') | encoding + categorical->bool | Timor-Leste/2007-08/_/mapping.py:34-59; Timor-Leste/2007-08/_/data_info.yml:70-77 | scheme, yml, docstring | |
+| 11 | Togo, Benin, Guinea-Bissau | same | plot_labor | PersonDays, Wage | s16a: s16aq33b_*/35b_*/37b_* (family member-days by phase); s16aq39a/b/c_k, 41a/b/c_k, 43a/b/c_k (hired: workers, days, cash by gender category and phase) | family PersonDays = sum of member-day cells (fillna 0; NA only if all NA); hired PersonDays = sum over (category, phase) of workers x days; Wage = sum of cash cells | product + sum-fields | Togo/2018/_/plot_labor.py:69-100,124-127; Benin/2018-19/_/plot_labor.py and Guinea-Bissau/2018-19/_/plot_labor.py same | scheme + docstring | |
+| 12 | Togo, Benin, Guinea-Bissau | same | people_last7days | working_age (and the Age used to build it) | s01q04a (reported age), s01q03c (birth year) | Age = s01q04a, else survey_year - s01q03c when 1900 <= year <= survey_year; working_age = Age >= 6 (NA if Age NA) | selection + impute + number->bool | Togo/2018/_/people_last7days.py:68-75; Benin/GB same | docstring; scheme says "roster Age >= 6" | |
+| 13 | Togo | 2018 | nonfood_expenditures | Expenditure, RecallWindow | s09b..s09f_me_tgo2018.dta: s09?q03 (amount spent over the module's window) | NOT annualised: Expenditure served verbatim; RecallWindow column names the window ('7 days','30 days','3 months','6 months','12 months'); the annualising formula is written down but deliberately not applied (GH #817) | none (recorded because the brief asked) | Togo/2018/_/nonfood_expenditures.py:36-52,100-118; Togo/_/data_scheme.yml nonfood_expenditures block | scheme, docstring, CONTENTS "nonfood_expenditures (EHCVM section 9)" | 108,445 rows across 5 windows (docstring table) |
+| 14 | Panama | 1997 / 2003 / 2008 | food_acquired | Quantity, Expenditure (all s) | GAST-A.DTA ga106a, ga106c, ga110a (1997); E03GA10B.DTA gai06a, gai06b1, gai06c, gai10a, gai10b1 (2003); 05alimentos.dta s11a6a, s11a6c, s11a10a (2008) | values >= 9999 -> NaN (1997); >= 99999 -> NaN (2003, 2008) | guard (threshold differs by wave) | Panama/1997/_/food_acquired.py:60-66; 2003:59-62; 2008:56-59 | docstring/comments; CONTENTS:885-900 (sentinel shares per column) | 1997 sentinel share: ga106a 13.6%, ga106c 34.6%, ga110a 82.7% (CONTENTS) |
+| 15 | Panama | 2003 | food_acquired | Quantity | gai06a (number of presentations bought), gai06b1 (size per presentation), gai10a x gai10b1 likewise | Quantity = count x size-per-presentation, in the unit gai06b2 | product | Panama/2003/_/food_acquired.py:116-118 | docstring | |
+| 16 | Panama | 1997 / 2003 / 2008 | food_acquired | Quantity where s in {produced, inkind, other} | ga110a / gai10a x gai10b1 / s11a10a (ONE non-purchased quantity) plus 4 yes/no source flags ga111a-d / gai111-114 / s11a11a-d | the FULL non-purchased quantity is emitted once per flagged source (a row for each flag == yes), so an item with two flags is counted twice | encoding + selection | 1997:126-143; 2003:132-148; 2008:116-132 | docstring ("we emit one canonical row per flagged source") | 1997: ~83% of ga111a-d are sentinel (CONTENTS:893) |
+| 17 | Panama | 1997 / 2003 / 2008 | food_acquired | index value s='produced' | same flags | non-purchased quantity with NO flag set -> s='produced' by default | impute | 1997:145-157; 2003:150-161; 2008:134-145 | docstring ("small residual") | |
+| 18 | Panama | 1997 / 2003 / 2008 | food_acquired | Quantity (all non-purchased rows) | ga110a (15-day) vs ga109a (usual MONTH, unit ga109b); gai10a vs gai09a; s11a10a vs s11a9a | the 15-day recall is served; the usual-month recall of the same quantity is dropped (documented as overlapping ~100%) | selection | docstrings 1997:28-34; 2003:32-35; 2008:27-32 | docstring | |
+| 19 | Panama | 1997 / 2003 / 2008 | food_acquired | Quantity, Expenditure | as above | reported 0 -> NaN | guard | 1997:170-172; 2003:174-176; 2008:157-159 | comment | |
+| 20 | Panama | 1997 / 2003 / 2008 | food_acquired | index value u='Value'; Quantity | Expenditure with no quantity/unit | u := 'Value' and Quantity := Expenditure | encoding | 1997:174-181; 2003:178-184; 2008:161-167 | comment; CONTENTS:908-973 (GH #770: capital 'Value' vs the 1997 survey unit code 'value', 6.7x kg-factor difference) | 46 / 87 / 6,662 rows by wave (CONTENTS:919-921) |
+| 21 | Panama | 1997 / 2003 / 2008 | food_acquired | Price (s='purchased') | Expenditure, Quantity (post rows 15-20) | Price = Expenditure / Quantity; non-finite -> NaN | ratio | 1997:186-191; 2003:189-193; 2008:172-176 | docstring | |
+| 22 | Panama | 1997 / 2003 / 2008 | food_acquired | Price | duplicate (t,i,j,u,s) rows | Quantity/Expenditure summed, Price = MEAN of the duplicates' prices | selection (reducer) | 1997:195-198; 2003:195-198; 2008:178-181 | comment | |
+| 23 | Guatemala | 2000 | food_acquired | Quantity (s='purchased'), index value u='lbs' | ECV13G12.DTA: p12a06a (qty bought, last 15 days, in unit p12a06b), p12a06c (equivalence of p12a06b into the item's reference unit umr), cnlib (umr -> pounds) | Quantity = p12a06a x p12a06c x cnlib; u := 'lbs' for every row (the native unit p12a06b is not served) | product + scale + encoding | Guatemala/2000/_/food_acquired.py:105-118 | scheme, docstring, CONTENTS:565-620 | |
+| 24 | Guatemala | 2000 | food_acquired | Quantity (s in {produced, inkind, other}) | p12a10a (qty obtained, last 15 days, unit code p12a10b), cnlib | Quantity = p12a10a x cnlib with an IMPLICIT equivalence of 1 (no obtained-side multiplier exists; p12a10b == umr on 80.8% of rows, so ~19% are scaled by the wrong unit) | product + impute | :121-141 | docstring, CONTENTS:616-620 | ~19% of obtained rows carry an unverified unit |
+| 25 | Guatemala | 2000 | food_acquired | Price (s='purchased') | p12a06d ("gasto ult 15 dias"), row 23 | Price = p12a06d / Quantity_lbs; inf -> NaN | ratio | :108 | docstring | |
+| 26 | Guatemala | 2000 | food_acquired | all measures | actual 15-day p12a06a/p12a06d/p12a10a vs usual-month p12a05 ("gasto al mes"), p12a09a ("cantidad obtuvo al mes") and months-per-year p12a04/p12a08 | the actual 15-day recall is served; usual-month and months-acquired variables are dropped (maintainer decision on PR #578) | selection | docstring :18-23; Guatemala/_/data_scheme.yml food_acquired block | scheme, docstring, CONTENTS:596-604 | |
+| 27 | Guatemala | 2000 | food_acquired | index value s (obtained rows) | p12a11a-f si/no flags | one row per obtained line with priority produced > inkind (b or c) > other (d, e, f); NO flag -> 'other' | selection + impute | :125-130 | docstring | "a handful" of multi-flag rows |
+| 28 | Guatemala | 2000 | food_acquired | Price | duplicate keys | Quantity/Expenditure sum(min_count=1); Price = MEDIAN (Panama uses mean, Serbia median of daily) | selection (reducer) | :148-155 | comment | |
+| 29 | Guatemala | 2000 | shocks | Experienced; AffectedIncome, AffectedAssets | ECV05H03 p03a01a-m / p03a06a-p (occurrence flags); ECV06H03 perdida (1 income, 2 assets, 3 both, 4 none) | perdida -> (AffectedIncome, AffectedAssets) bool pair; a (hogar,item) present only in the DETALLE file gets Experienced := True | categorical->bool + impute | Guatemala/2000/_/shocks.py:115-121,136-145 | scheme, docstring | ~67 detail-less / 1 extra pair (docstring) |
+| 30 | Guatemala | 2000 | individual_education | Educational Attainment | ECV09P05.DTA p07b27a (nivel), p07b27b (grado) | after harmonize_education maps nivel to a coarse level, grado refines: Primary + grado<6 -> 'Primary incomplete'; Lower secondary + grado==3 -> complete, 4-5 -> Upper secondary, >=6 -> Upper secondary complete; missing/zero grado keeps the coarse label (i.e. 'Primary complete' by default); nivel 9 -> Unknown | categorical rule (selection) | Guatemala/_/guatemala.py:197-245 | yml comment, docstring | |
+| 31 | Cambodia | 2019-20 | food_acquired | Quantity (both s), Expenditure (s='produced') | hh_sec_5.dta: s05q04 (ONE total quantity consumed), s05q05 (value purchased), s05q06 (value obtained without purchase) | share = s05q05/(s05q05+s05q06); Quantity_purchased = s05q04 x share; Quantity_produced = s05q04 x (1-share); if value==0 the whole quantity -> 'produced'; Expenditure_produced := s05q06 (a valuation of own-production + gifts, served in the Expenditure column) | impute (value-share apportionment) + encoding | Cambodia/2019-20/_/food_acquired.py:73-98 | scheme, docstring, CONTENTS:336-337 | all rows |
+| 32 | Cambodia | 2019-20 | household_roster | WeeksAway | hh_sec_2.dta s02q14 (mix of week counts and the label 'Absent less than one week') | label -> 0; numbers pass; the weeks -> months conversion (12 - weeks/(52/12)) happens in the framework's roster_to_characteristics (other agent's scope) | categorical->number | Cambodia/_/cambodia.py:45-64 | docstring (GH #502); CLAUDE.md (WeeksAway) | |
+| 33 | Serbia | 2007 | food_acquired | Quantity, Expenditure | m5_1_diary.dta kol_1..kol_7, din_1..din_7 (7 daily diary triples) | Quantity = sum of the 7 daily kol, Expenditure = sum of the 7 daily din (min_count=1) within (t,i,j,u,s) -- the served number is a 7-day total assembled from daily fields | sum-fields (window construction) | Serbia/2007/_/food_acquired.py:86-100,124-131 | docstring, scheme; CONTENTS:406-441 | |
+| 34 | Serbia | 2007 | food_acquired | index value s | izvor_1..7 (1 shop, 2 own production, 3 gift; NaN on food-away-from-home rows) | 1->purchased, 2->produced, 3->inkind, NaN -> 'purchased' | impute | :102-105 | docstring, scheme | 3,772 'dinar'/away rows (CONTENTS:498) |
+| 35 | Serbia | 2007 | food_acquired | Price | din_k, kol_k | daily_price = din/kol where kol>0; Price = MEDIAN of the daily unit values ("informational") | ratio + selection | :121-131 | docstring; CONTENTS:440-441 | |
+| 36 | Serbia | 2007 | food_acquired | Expenditure (s in {produced, inkind}) | din_k on izvor 2/3 rows | the diary's own imputed dinar value of non-purchased consumption is served as Expenditure (a source-side valuation, carried through) | encoding (source-derived valuation) | :28-30 (docstring) | docstring | |
+| 37 | Serbia | 2007 | sample | panel_weight | domacinstva.dta popweight (= hhweight x hhsize per the DDI, a PERSON weight) | panel_weight := popweight; weight := hhweight -- so the two columns are weights for different units (household vs person), then both mean-normalised at API time | selection (source-derived product served) | Serbia/2007/_/data_info.yml:73-74 | CONTENTS:229 states the popweight formula but not that it is wired as panel_weight | all households |
+| 38 | Timor-Leste | 2001, 2007-08 | months_food_inadequate | MonthsInadequate, AnyInadequate | S13C.DTA s13c13 / hhold.dta q13b13 (months count) | round(); values outside 0..12 -> NA (row dropped); AnyInadequate = Months > 0 | guard + number->bool | Timor-Leste/2001/_/months_food_inadequate.py:28-34; 2007-08:29-33 | docstring | |
+| 39 | Timor-Leste | 2001 | life_satisfaction | Satisfaction, Domain='Overall' | S13A.DTA s13a11 (individual-level, ~2-3 adults per HH); S01A1 s01a03=='head' | the household HEAD's answer is served as the household's Overall satisfaction; other respondents dropped | selection (respondent) | Timor-Leste/2001/_/life_satisfaction.py:45-54 | docstring | 1800 HH |
+| 40 | Timor-Leste | 2001 | interview_date | Int_t | S00.DTA s00_vis1 (DDMMYY integer) | century rule yy <= 30 -> 20yy else 19yy | guard (assumption) | Timor-Leste/2001/_/mapping.py:5-27 | docstring, yml | |
+| 41 | Iraq | 2012 | household_roster | MonthsAway | (none -- the roster has no residence-duration question) | MonthsAway := 0 for every member (constant), chosen over MonthsSpent so the country-concat keeps one residence column (GH #499) | impute (constant) | Iraq/2012/_/2012.py:9-28; Iraq/2012/_/data_info.yml:38-51 | docstring, yml comment; CONTENTS: none | all 2012 roster rows |
+| 42 | Iraq | 2012 (2006-07 not summed) | assets | Quantity, Value, Purchase Price | 2012ihses18_durables.dta q1801, q1805, q1803, one row per durable_serial (physical instance) | SUM over instances per (i, j), min_count=1 -- including Purchase Price, which becomes a total not a price | sum (grain change) | Iraq/2012/_/assets.py:40-48 | scheme comment, docstring | 25,248 instance rows would otherwise be dropped (docstring) |
+| 43 | Iraq | 2012 | life_satisfaction | Satisfaction (11 domains) | 2012ihses23 q2302_1..11 (asked of every member 15+); roster q0105=='Head' | HEAD's row only; 'DO NOT KNOW/NO ANSWER' -> dropped | selection (respondent) | Iraq/2012/_/life_satisfaction.py:73-94 | scheme, docstring | ~176k rows -> 1 per HH |
+| 44 | India | 1997-98 | months_food_inadequate | MonthsInadequate, AnyInadequate | SECT08A.DTA v08a02a..l (12 month flags), v08a01 ("Got 2 square meals" Yes/No) | MonthsInadequate = count of non-null month flags; AnyInadequate = (v08a01=='No') OR (months > 0) | sum-fields + selection | India/1997-98/_/months_food_inadequate.py:20-33 | docstring (notes the 20 'No' HHs with 0 months and 5 'Yes' with >=1) | 25 inconsistent HH |
+| 45 | Kazakhstan | 1996 | assets | Quantity, Value | KZ96HSG_PUF.dta b37_NN_1 (have?), b37_NN_2 (pieces), b37_NN_4 (price per piece) | Quantity = pieces, missing-while-owned -> 1 (modal); Value = pieces x price; Value 0 -> NaN | impute + product + guard | Kazakhstan/1996/_/assets.py:66-87 | scheme, docstring, CONTENTS:318-331 | |
+| 46 | Kazakhstan | 1996 | subjective_well_being | Own Step | KZ96OCC_PUF.dta d_095_ (individual 1-9 ladder, labels 'lowest'..'highest'); KZ96REL relhead==1 | HEAD's step only; 'lowest'->1, 'highest'->9 | selection (respondent) + categorical->number | Kazakhstan/1996/_/subjective_well_being.py:31-73 | docstring, CONTENTS:344-355 | 1983 of 1996 HH |
+| 47 | Guyana | 1992 | assets | Quantity, Value | DRBLS.dta itemNN, valiNN (several per-acquisition rows per (hh, item)) | SUM of the per-acquisition rows; OPEN whether the rows are increments or restated stocks (372 of 658 multi-row blocks carry identical quantities -> summing over-counts those) | sum (grain change, possibly over-counting) | Guyana/_/assets.py:120-158 | docstring, CONTENTS:138-160 | 115 of 1,616 HH (317 rows), ~7% of asset HH |
+| 48 | Guyana; Peru | 1992; 1994 | cluster_features | Region, Rural | COVERN.dta RGN/SECTOR per household; REG01.DTA a01/a06 per household | household-level values reduced to the (t,v) cluster by MODE; a tie -> NA with a warning (Peru: 18 household values overruled in 17 (col,segment) pairs) | selection (reducer) | Guyana/1992/_/mapping.py:103-153; Peru/1994/_/mapping.py:104-216 | docstrings, yml comments, CONTENTS (Guyana:98-118, Peru:715-719) | Guyana 3 of 168 segments; Peru 18 rows |
+| 49 | South Africa | 1993 | household_roster, housing, life_satisfaction | Age, Sex, Relationship, Roof/Walls/Floor/Rooms/Tenure/Water/Toilet, Satisfaction | M8_HROST age/gender_c/rel_head; S4_HSV1/S3_HSV2 codes; S5_PQL satisfie | sentinels -1/-3/-4 -> null via mapping: blocks (unmapped ages pass through); life_satisfaction map() sends -1/-3 to NaN | guard | South Africa/1993/_/data_info.yml:47-57,100-102,157-158,184-189; South Africa/1993/_/life_satisfaction.py:27-40 | yml comments, docstring | |
+| 50 | Liberia | 2018-19 | months_food_inadequate | MonthsInadequate | sect16a_public.dta S16_1 (any shortage? yes/no), S16_2 (months; asked only if yes) | S16_2 NaN -> 0 where S16_1 == 'no' (skip-pattern fill); NaN kept where S16_1 NaN | impute (skip logic) | Liberia/2018-19/_/months_food_inadequate.py:26-31 | scheme, docstring | 11 HH stay NaN |
+| 51 | Liberia | 2018-19 | household_roster | Age | sect2_public.dta S2_5 (mixed numeric / "don't know") | non-numeric -> NaN | guard | Liberia/2018-19/_/mapping.py:6-13 | docstring | |
+| 52 | Kosovo | 2000 | plot_features | Area, AreaUnit, Irrigated | OPLAND.dta s8a_q03a (area), s8a_q03b (1 m2, 2 ha, 3 ares), s8a_q06 / s8a_q07 (irrigated in 1997-98 / 1999-2000) | Area = s8a_q03a x {1: 0.0001, 2: 1, 3: 0.01}; AreaUnit := 'Hectares'; Irrigated = (q06==1) OR (q07==1), None if both NaN | scale + encoding + selection (OR of two periods) | Kosovo/2000/_/plot_features.py:43-69 | scheme, docstring; CONTENTS: none | |
+| 53 | Kosovo | 2000 | interview_date | Int_t | ID.dta s0i_q22a (day), s0i_q22b (month); s0i_q22c is the literal "Year" | year := 2000 (constant); out-of-range day/month -> NaT; implausible-but-valid dates kept | impute (constant year) | Kosovo/2000/_/interview_date.py:13-28 | comment (issue #475) | |
+| 54 | China | 1995-97 | cluster_features, sample | Region (and v) | TOTEXP.DTA hid (5-digit id) | Region = 7 (Hebei) if hid//10000 <= 3 else 8 (Liaoning); v = hid//100 -- an attribute computed from digits of the household id | encoding (id-derived attribute) | China/1995-97/_/mapping.py:33-48 | docstring, CONTENTS:36 | all 787 HH |
+| 55 | China | 1995-97 | plot_features | Area, AreaUnit | S05B.DTA s05b02 (mu; Stata sentinel ~1.75e100 on ~11 rows) | Area outside (0, 1000) -> NA; AreaUnit := 'mu' | guard + encoding | China/1995-97/_/mapping.py:51-64 | yml comment, CONTENTS:414-437 | ~11 sentinel rows |
+| 56 | China | 1995-97 | individual_education | Educational Attainment | S02.DTA s0201 (years of schooling; 99 = missing) | years binned to the canonical ladder by China's 6+3+3+4 cycle (0 none; 1-5 primary incomplete; 6 complete; 7-8 lower sec; 9 complete; 10-11 upper; 12 complete; 13-15 tertiary cert; 16 bachelor; >=17 postgrad); 99/neg -> NA | number->categorical | China/_/china.py:187-246 | docstring, yml comment | |
+| 57 | Peru | 1994 | household_roster | Age, MonthsAway | REG02.DTA b03 (age), b08 (months absent) | 99 -> NA (dictionary declares b03 range 00:99, so this is a READING; 6 people for Age, 3 for MonthsAway) | guard | Peru/1994/_/mapping.py:219-268 | docstring, CONTENTS:816-835 | 6 + 3 rows |
+| 58 | EthiopiaRHS | 1994a, 1994b, 1995, 1997 | anthropometry | Age_months | Anthropometry_R1-R4.tab age1..age4 (years) | Age_months = years x 12 | scale | EthiopiaRHS/_/ethiopiarhs.py:395-397 | yml comments ("raw YEARS; df_edit hook multiplies by 12") | |
+| 59 | EthiopiaRHS | all 8 | sample, cluster_features | weight, panel_weight, strata, Rural | (none) | weight := 1.0, panel_weight := 1.0, strata := v, Rural := 'Rural' -- constants, not survey values (purposive panel, no design weights) | impute (constants) | ethiopiarhs.py:297-301,327 | scheme:215-226, docstring, CONTENTS:494-501 | all HH |
+| 60 | EthiopiaRHS | 1989, 1994a-1997 | food_acquired | Quantity, Expenditure (via the framework's additive sum) | food89 / food1-4 rows identical on (i,j,u,s,Quantity,Expenditure) | exact-duplicate rows dropped BEFORE the core sums duplicates, so they are not double counted (judgment call stated in the docstring) | guard | ethiopiarhs.py:114-147,215,261 | scheme:165-184, docstring | 90 rows, 514.9 qty / 343.1 Birr |
+| 61 | EthiopiaRHS | 1989 | food_acquired | (rows) | food89.dta source (1,2,3 mapped; NaN/5/6/7 unmapped) | rows whose source is not purchased/produced/inkind are DROPPED with a warning (~25% of 1989 rows); whether they should be 'other' is open | selection (guard) | ethiopiarhs.py:186-203; EthiopiaRHS/1989/_/data_info.yml:44-56 | docstring, yml | ~25% of 1989 food rows |
+| 62 | EthiopiaRHS | 1994a-1997, 2004, 2009 | crop_production | index value u='Kg'; Quantity, Area_ha | area_output_*.tab {stub}prd{yy}, {stub}ha{yy} (wide HH x crop, already summed over plots in-file) | u := 'Kg' constant; wide -> long; source-side plot aggregation carried through | encoding (+ source-derived aggregate) | ethiopiarhs.py:456-497 | scheme:115-138 | |
+| 63 | EthiopiaRHS | 1994a, 1994b, 1995, 1997 | community_prices | Price (and which v gets it) | 1994a/Data/price1234_rev.tab p_r1..p_r4 (WOREDA-level price per kg), demo123 q1b->q1c crosswalk | each Woreda price is BROADCAST to every peasant association in the Woreda; when two raw codes map to one Preferred Label at a cluster the prices are averaged | impute (broadcast) + selection (mean) | EthiopiaRHS/_/community_prices.py:48-55,74-77,82-98 | scheme:241-252, docstring | ~11% of R1-R4 rows dropped as unmapped (docstring) |
+| 64 | EthiopiaRHS | 1994a | plot_features | Area | land1all.tab q21_1aha (hectares PRE-COMPUTED in-file by Landconversion.SPS from q21_1b + local-unit factors); area1 (native unit) | Area served from the source's converted column; AreaUnit shows the native unit label, so the served (Area, AreaUnit) pair reads as if Area were in Timad/Gemed/... when it is in hectares | encoding (source-derived conversion; label mismatch) | EthiopiaRHS/1994a/_/data_info.yml:95-102,124-129,153-173 | yml comment | 5,808 rows |
+| 65 | EthiopiaRHS | 1999 (label), 2004, 2009 | livestock, income, consumption, assets (1989) | HerdValue, TLU, TotalIncome.., TotalConsumption, RealConsumptionPC, FoodPriceIndex, Poor, FarmValue.. | pre-aggregated IFPRI scalars (lvsval80 = sum head x village price vector; lsu80 = sum head x TLU factors .83/.20/.20/.50/1/1/1; cons6, rconspc6, fpi6, poor6 ...) | served as reported -- but they are SOURCE-side derivations with their own factors (the library's own _TLU_FACTORS differ: cattle .70, sheep/goats .10, horses .80, no mule/camel -- GH #737); 1999 livestock/income are 1989 data served at t='1999' (KNOWN DEFECT, CONTENTS:185-200) | encoding (source-derived; wave label wrong) | EthiopiaRHS/1999/_/data_info.yml:76-225; 2004:26-56 | scheme, yml, CONTENTS:95-215 | 541 HH (1999 livestock) |
+
+* 2. Notes where one line was not enough
+
+** Rows 1-2: the EHCVM purchased row is a 12B-like pair
+The EHCVM s07b module asks, per item: q03 total quantity consumed in the last
+7 days, q04 the part of it from own production, q05 the part received as a
+gift, q06 when the item was last bought, q07a/b the quantity and unit of THAT
+last purchase, q08 what was paid for it.  The three countries wire Quantity
+= q03, Produced = q04, Expenditure = q08.  =food_acquired_to_canonical= then
+serves, on the same row, =Quantity = q03 - q04= (a 7-day consumption residual
+that also contains gifts, because q05 is never read) beside =Expenditure = q08=
+(the value of one purchase of an unstated size, made at an unstated time).
+=food_prices= = Expenditure / Quantity over that row is therefore the ratio of
+two different quantities.  The raw inputs (q07a, q05, and the un-clipped q03)
+are recoverable only from the source file.  Nothing in the served table, the
+three CONTENTS.org files or the data_scheme comments says so.
+
+Evidence status: CONFIRMED from the source files.  The variable labels of the
+three s07b .dta files (read as metadata from the local DVC cache; no script
+run) say q08 is 'Valeur (en FCFA) du [PRODUIT] achete la derniere fois' and
+q07a 'quantite ... achete la derniere fois', while q03a is the 7-day consumed
+total; the Togo questionnaire sheet is headed 'Consommation alimentaire des 7
+derniers jours et achat des 30 derniers jours'.  So the served row pairs a
+7-DAY quantity with a LAST-PURCHASE (up to 30 days back) value of an
+unrecorded quantity.  In-repo readings of the same field conflict: Senegal's
+script and the retired Togo script read it as the labels do; Burkina Faso's
+scripts and CONTENTS read it as 'total expenses', and the add-feature skill
+template wires it as Expenditure without comment (Togo/_/recall.yml also cites
+the retired Togo script as its questionnaire evidence).  The Burkina Faso
+reading is the one the labels refute.  A second, smaller selection on the same
+row: u is s07bq03b (unit) alone; the size modifier s07bq03c ('Taille', e.g.
+sachet size) is not read, so units of different sizes share one u.  Other EHCVM
+countries (Senegal, Mali, Niger, Burkina Faso, CotedIvoire) are outside this
+group but wire the same YAML.
+
+** Row 3: age_handler is one shared derivation invoked by three countries
+The country only decides the sentinel convention (-1 vs 9999) and supplies the
+DOB components; the selection rule (fractional DOB age when it agrees with the
+report, else integer report; 15th of the month when the day is missing;
+year-arithmetic fallback) is the library's.  The reported age is not
+recoverable from the served Age once the DOB branch fires.  A registry key
+would have to name the branch taken PER ROW (reported / dob-fractional /
+year-math), which is exactly the case the brief flags as not fitting a
+single-key design.
+
+** Row 14: the Panama 1997 threshold is applied to QUANTITIES too.  =>= 9999 ->
+NaN= runs over ga106a and ga110a as well as the money field ga106c, so a genuine
+quantity of 9,999 or more in a small unit (grams, millilitres) is nulled along
+with the 9999.x sentinels.  CONTENTS:885-900 reports sentinel SHARES per
+column, not a check that no real value sits above the threshold; 2003/2008 use
+99999 and are less exposed.
+
+** Rows 16-17 vs 27: Panama and Guatemala resolve the same instrument shape
+in opposite ways.  Both surveys give ONE non-purchased quantity and several
+yes/no source flags.  Panama emits the whole quantity once per flag (so a
+two-flag item is served twice) and defaults an unflagged row to 'produced';
+Guatemala emits it once under a priority order and defaults to 'other'.  A
+=Feature('food_acquired')= over the two therefore pools quantities that are
+double-counted in one country and single-counted in the other, with the
+default source pointing the opposite way.
+
+** Row 31: Cambodia's quantity split is an imputation that manufactures two
+numbers from one.  The survey records one quantity and two values; the
+served purchased/produced quantities are that one quantity times a value
+share.  The raw total is recoverable as the row-sum over s, but the split
+itself is invented, and Expenditure for s='produced' is the survey's valuation
+of own consumption (s05q06), not money spent.
+
+** Rows 33-37: Serbia.  The served Quantity/Expenditure are 7-day sums of
+daily diary entries; Price is a median of daily unit values (an extra reducer
+that the country writes although food_prices is API-derived).  'dinar' rows are
+relabelled u='Value' WITHOUT the Panama/GhanaLSS =Quantity := Expenditure=
+convention (Quantity stays NaN), so the corpus has two shapes under one
+sentinel.  panel_weight is wired to popweight, which the DDI defines as
+hhweight x hhsize, i.e. a person-level weight; after API-time normalisation the
+two weight columns differ by the household-size gradient.
+
+** Row 42 / 47: instance and acquisition sums.  Iraq 2012 sums Purchase Price
+over physical instances, so the column is a household total for the item, not a
+price; 2006-07 assets stay on the YAML path unsummed -- the same column means
+different things in the two waves.  Guyana sums per-acquisition rows whose
+semantics (increment vs restated stock) the source does not settle; 372 of 658
+multi-row blocks carry identical quantities and are over-counted if they are
+restatements.
+
+** Row 48: MODE reducers.  Guyana and Peru project household rows onto the
+cluster by majority (with tie -> NA).  This is a selection rule deciding which
+household's value represents the cluster; it is the only place in the group
+where a reducer other than first/sum is declared, and it is documented in both
+countries.
+
+** Rows 59, 41, 53: constants served as data.  EthiopiaRHS weights = 1,
+Rural = 'Rural', strata = v; Iraq 2012 MonthsAway = 0; Kosovo interview year =
+2000.  Each is a constant chosen by the maintainer rather than a survey value.
+They are honest (all documented in docstrings / scheme) but nothing in the
+served frame distinguishes them from a recorded 1.0 or 0.
+
+** Rows 62-65: EthiopiaRHS serves several SOURCE-side derivations verbatim
+(pre-converted hectares with a native-unit label beside them; crop production
+already summed over plots; herd value and TLU built from head counts with
+IFPRI's factors; consumption aggregates and a poverty flag).  These are not
+library derivations, but a per-row Derivation column would need a way to say
+"derived upstream, factors unknown to the library", and GH #737 shows the
+library's own TLU factors disagree with the source's.
+
+** The Woreda -> PA broadcast (row 63) means a "PA price" can be the same
+number for every PA in a Woreda; a consumer joining community_prices to
+food_acquired on v will see spatial variation only at Woreda level for R1-R4.
+
+* 3. Items checked and deliberately NOT recorded as derivations
+- Id construction: Guatemala composite v (depto-mupio-sector-segmento,
+  guatemala.py:46-66, replacing the float32-corrupt upm); EHCVM grappe+menage;
+  Guyana ED-SN-HH; Peru segmento-vivienda-hogar with zero-padding; Serbia
+  opstina-popkrug-dom; China hid//100 as v (recorded only because Region is
+  also computed from the id, row 54); Peru pid repair by row order
+  (mapping.py:271-360).
+- Cluster-grain collapses that CHECK constancy and dedup (Togo/Benin
+  collapse_to_cluster_grain, Guatemala cluster_features hook, Guinea-Bissau
+  df_geo drop_duplicates, Pakistan cluster_features.py, China/Kazakhstan hooks,
+  EthiopiaRHS sample/cluster dedup).  Lossless by assertion, not derivations.
+- Decodes: every code -> label mapping (Pakistan housing, Guyana housing, South
+  Africa education, Kazakhstan housing/education, Azerbaijan housing, Iraq
+  Rural from the strata label suffix, Timor Rural 1/2 -> Urban/Rural, Kazakhstan
+  'small town' -> Urban).
+- Date assembly from day/month/year parts, including 2-digit-year + 1900
+  (India, Pakistan, Guyana, Azerbaijan, South Africa, Serbia, Timor 2007-08,
+  Cambodia, Iraq): type coercion; only Timor 2001's century rule (row 40) and
+  Kosovo's constant year (row 53) embed an assumption.
+- Reshapes: EHCVM interview_date melt_visit_intervals; ERHS food triplet melt;
+  Kazakhstan/Guyana/Iraq wide->long; Timor/Iraq/SA life_satisfaction melt.
+- Additive de-dup of the same measure at the same grain (Togo livestock sum
+  within (t,i,animal); Guatemala/Panama/Cambodia/Serbia Quantity/Expenditure
+  sums of duplicate keys) -- EXCEPT where the sum changes grain or possibly
+  over-counts (rows 42, 47) or a reducer is chosen for Price (rows 22, 28, 35).
+- EthiopiaRHS "village inference" (CONTENTS:159-184; 1999/_/data_info.yml
+  :123-141): the lvs5/inc5 file prefixes are read as village names.  It is
+  flagged there as an unverified inference and is NOT used to build any served
+  value (the 1999 livestock/income tables carry no v and are in _no_v_join);
+  documentation only.  The load-bearing finding in the same passage is row 65
+  (1989 data served at t='1999').
+- Serbia and Montenegro (2002, 2003): life_satisfaction serves the native
+  ordinal label; the 2003 'Neither bad nor good' -> 'Neither good nor bad'
+  rename is spelling.  No derivation anywhere in the country.
+- Pakistan 1991: none (cluster_features is a codebook decode with invariants;
+  interview year +1900).
+- Azerbaijan 1995, Armenia 1996, Nepal (data_available: false): none.
+- Afghanistan: no =_/data_scheme.yml= at all, so Country('Afghanistan') has no
+  tables; =_/afghanistan.py= (age_sex_composition, ligonlibrary import) and
+  =_/Makefile= (which names panama.py and the retired
+  food_prices_quantities_and_expenditures.py) are dead.
+
+* 4. Dead code that carries derivations (nothing runs it; recorded so a registry does not resurrect it by accident)
+| country | file | derivation it would perform | why dead |
+|---------+------+-----------------------------+----------|
+| Togo | Togo/2018/_/food_expenditures.py:33-73 | expenditure := 7-day consumed quantity x MEDIAN unit value (last-purchase value / last-purchase quantity) by (vague, region, item, unit, unit-size); zeros -> NaN; a valuation of consumption, not spending | reads the retired _forEthan .dta (GH #750), imports cfe.df_utils, not in data_scheme, the generic Makefile rule needs food_items.org + malawi.py that do not exist.  NB Togo/_/recall.yml cites this file as its questionnaire evidence |
+| Togo | Togo/_/togo.py:26-170 | sums purchased+away+produced+given per item; replace(0, NaN); age/sex brackets with log HSize | no callers (grep) |
+| Togo | Togo/_/Makefile:14-15 | rule invoking food_prices_quantities_and_expenditures.py | file does not exist |
+| Panama | Panama/_/units.py | conversion_to_kgs.json with litro = 1 kg (water-equivalent), galon = 3.785 kg, quintal = 100 lb, arroba = 25 lb ... | never generated (CONTENTS:801-823, #117); the framework infers Panama kg factors from price ratios instead |
+| Panama | Panama/_/nutrition.py | nutrients = quantities @ FCT (per-household product) | NOT REACHABLE (docstring :8-22; CONTENTS:546) |
+| Panama, Cambodia, Afghanistan, Guatemala | */_/panama.py:19-63, cambodia.py:9-75, afghanistan.py, guatemala.py:131-194 | age_sex_composition (age-sex brackets, log HSize), harmonized_food_labels | no callers in this group (Burkina Faso has its own copy) |
+| Guatemala | Guatemala/_/fct.py, _/nutrition.py | FCT join (Google Sheet, eep153_tools) and nutrients = q @ fct | Makefile lists them (Guatemala/_/Makefile:14-15,27-31) but nutrition.py reads ../var/food_quantities.parquet which is never materialised and eep153_tools is not a dependency; not in data_scheme |
+| Serbia | Serbia/_/serbia.py:6 | (module is empty apart from a ligonlibrary import that would fail) | Makefile prerequisite only |
+| Guinea-Bissau | Guinea-Bissau/_/guinea-bissau.py (hyphen) | interview_date hook (melt_visit_intervals) | the framework imports modules by =name.lower().replace('-', '_')= (country.py:367), so only guinea_bissau.py loads; the hyphen file's interview_date hook is unreachable.  Aside, not a derivation: the live module has no interview_date hook although data_scheme declares the (t,i,visit) table |
+
+* 5. Closing
+
+** Counts by kind (rows 1-65, each row counted once under its first-named kind)
+| kind | rows | n |
+|------+------+---|
+| selection (which raw candidate / respondent / reducer / window) | 3, 7, 9, 12, 18, 22, 26, 27, 28, 30, 37, 39, 43, 46, 48, 61 | 16 |
+| guard (sentinel / clamp / zero / exact-duplicate drop) | 14, 19, 38, 40, 49, 51, 55, 57, 60 | 9 |
+| impute (default source, constant, broadcast, skip-fill, modal, value-share) | 17, 31, 34, 41, 45, 50, 53, 59, 63 | 9 |
+| encoding (Value/Quantity, u:='lbs'/'Kg'/'hectares'/'mu', id-derived Region, source-derived valuations, window mismatch) | 2, 16, 20, 36, 54, 62, 64, 65 | 8 |
+| categorical->number / bool (and number->categorical) | 4, 5, 6, 10, 29, 32, 56 | 7 |
+| sum across different fields or rows | 8, 33, 42, 44, 47 | 5 |
+| product | 11, 15, 23, 24 | 4 |
+| ratio | 21, 25, 35 | 3 |
+| scale | 52, 58 | 2 |
+| difference | 1 | 1 |
+| none (explicit non-annualisation, recorded on request) | 13 | 1 |
+| annualise | -- | 0 |
+| dead (section 4) | 9 files carrying derivations nothing runs | -- |
+Secondary kinds not counted above: scale+guard inside 9 and 23, impute inside 3, 12, 24, 29, guard inside 45.
+
+** The cases where the served number is furthest from the raw answer
+1. EHCVM food_acquired purchased row (rows 1-2, Togo/Benin/Guinea-Bissau):
+   Quantity is a 7-day consumption residual (total minus own-produced, gifts
+   included, clipped at 0) and Expenditure is the value of one last purchase of
+   an unrecorded size (confirmed from the .dta variable labels).  A price
+   ratio over that row divides two different things.  Undisclosed anywhere a
+   user would look, and read two different ways by two country configs.
+2. Cambodia food_acquired (row 31): purchased and produced quantities are the
+   single reported quantity split by a value share; the produced-row
+   Expenditure is a valuation, not spending.  Disclosed in scheme/docstring.
+3. Panama non-purchased rows (rows 16-17): one quantity served once per source
+   flag (double counting) with an unflagged default to 'produced'; contrasted
+   with Guatemala's priority rule (row 27).  Disclosed in docstrings only.
+4. Guatemala Quantity (rows 23-24): triple product into pounds with u forced
+   to 'lbs', and an assumed equivalence of 1 on obtained rows (~19% of them in
+   the wrong unit).  Disclosed.
+5. household_roster Age via age_handler (row 3): a fractional DOB age silently
+   replaces the reported integer when they agree; which branch fired is not
+   recoverable.  Disclosed only in CLAUDE.md.
+Honourable mentions: Iraq 2012 Purchase Price summed over instances (row 42);
+Guyana assets possibly summing restated stocks (row 47); EthiopiaRHS 1989
+livestock/income served at t='1999' (row 65).
+
+** Same column, derived differently across waves of one country
+- Panama food_acquired sentinel threshold: >= 9999 in 1997 vs >= 99999 in
+  2003/2008 (row 14); 2003 Quantity is count x size, 1997/2008 raw (row 15).
+- Iraq assets: 2012 sums over durable_serial (Quantity, Value, Purchase
+  Price), 2006-07 does not (row 42).
+- Iraq household_roster residence column: 2006-07 MonthsAway = q0113
+  (reported), 2012 MonthsAway = 0 (constant) (row 41).
+- EthiopiaRHS food_acquired: 1989 keeps the raw unit CODE as u and drops
+  NaN/5/6/7 sources; 1994a-1997 use harmonize_unit labels and the wide melt
+  (rows 60-61); crop_production 1994b has no Area_ha (row 62).
+- Timor-Leste life_satisfaction: 2001 has an 'Overall' domain taken from the
+  head; 2007-08 has no Overall (row 39).
+
+** What would not fit a per-row =Derivation= key + registry
+- age_handler (row 3): the branch differs per row and depends on the
+  agreement test; the key would have to carry the branch AND the tolerance.
+- Cambodia's value-share split (row 31): the derivation is a function of two
+  sibling rows (purchased and produced share one raw quantity); a key on one
+  row cannot express that the other row is its complement.
+- Panama's per-flag duplication (row 16): the derivation is "this row is one
+  of k copies"; the multiplicity is a property of the group, not the row.
+- Reducers over duplicates (rows 22, 28, 35, 42, 47, 48): the served value
+  depends on how many source rows collapsed and which reducer ran; a key can
+  name the reducer but not the n, and for Guyana the semantics of the sum is
+  itself unknown.
+- Source-side derivations (rows 62-65): the library cannot name the factors
+  (IFPRI TLU weights, price vectors, Landconversion.SPS) because it never sees
+  them; a registry entry would be "derived upstream, method unknown".
+- Constants served as data (rows 41, 53, 59): representable, but the
+  registry needs a kind for "not a survey value at all", which is not in the
+  brief's list.
+- Row 2 is the pure 12B shape: no arithmetic at all, just two raw fields
+  with different windows on one row.  A Derivation column keyed on
+  Expenditure could name it ("value of last purchase, <=30 days, quantity
+  q07a not served"), which is probably the strongest argument for the column
+  being nullable per CELL rather than per row.

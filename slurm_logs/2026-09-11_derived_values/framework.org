@@ -1,0 +1,575 @@
+#+TITLE: Derived served values -- the FRAMEWORK layer
+#+DATE: 2026-09-11
+#+AUTHOR: census agent (read-only sweep; see BRIEF_derivations.md)
+
+* Scope and method
+
+Group: not a set of countries but the code that runs UNIFORMLY over every
+country, at build time (lands in a parquet) or at read time (recomputed on
+every API call, never cached).  Files read in full or in the relevant
+sections, on branch =development= at 36efe55c:
+
+- =lsms_library/transformations.py= (6779 lines): food derived tables,
+  kg-factor ladders, roster_to_characteristics, legacy shims, the
+  ag/parity transforms.
+- =lsms_library/build_transforms.py= (580): =@build_transform=-tagged
+  build-path helpers.
+- =lsms_library/_build_registry.py= (474): the registry + fingerprint.
+- =lsms_library/local_tools.py=: =age_handler=, =df_data_grabber=,
+  =format_id=, =to_parquet=, =melt_visit_intervals=, =map_index=.
+- =lsms_library/country.py=: =Wave.grab_data=, =Wave.food_acquired=,
+  =Country._finalize_result= and its helpers, =_relabel_j=,
+  =_add_market_index=, =_join_v_from_sample=, =_normalize_dataframe_index=,
+  the derived-table dispatch in =__getattr__=.
+- =lsms_library/feature.py= (=_collapse_duplicate_index=),
+  =conversion.py= (=convert=), =currency.py= (=attach_currency=),
+  =recall.py=, =quantity_audit.py=, =null_read_audit.py=.
+
+Nothing was run.  Line numbers are as of the commit above.
+
+Conventions in the table: country =ALL= means every country that has the
+source table; wave =all= likewise.  BUILD = the value lands in an L2-wave
+or L2-country parquet; READ = recomputed inside =_finalize_result= /
+the derived-table dispatch / an analyst call and never written.
+
+* 1. Census table
+
+| # | country | wave(s) | table | served column / index value | raw inputs | rule | kind | where (path:line) | disclosed today? | rows affected |
+|---+---------+---------+-------+-----------------------------+------------+------+------+-------------------+------------------+---------------|
+| B1 | ALL (YAML path) | all | every YAML-path table | every numeric column | any numeric source column | frame-wide numeric max > 1e99 -> that VALUE replaced by NaN everywhere it occurs in the frame | guard | country.py:1342-1347 (Wave.grab_data.get_data) | UserWarning "Large number used for missing?" only | not counted anywhere |
+| B2 | referenced from 9 data_info.yml (Uganda x7, Ethiopia 2013-14, GhanaSPS 2009-10 -- the last as a comment saying why NOT) and 32 .py build modules in 11 countries (Uganda 8, Nigeria 6, Ethiopia 3, Niger 3, Senegal 3, Benin 2, Burkina_Faso 2, Mali 2, CotedIvoire, Guinea-Bissau, Togo) | all | household_roster | Age | per country: reported age + DOB (y,m,d) + interview date (Uganda h2q8,h2q9a-c; Ethiopia hh_s1q04_a/b/g_1/g_2; ...) | (a) reported age screened to [0,120], date parts to [0,2100); (b) missing/invalid DOB day -> 15th of month; (c) DOB age = round((interview - dob).days/365.25, 2); (d) SELECT: both present and abs(int(reported) - dob_age) <= 1 -> fractional DOB age, else int(reported); (e) neither -> interview_year - birth_year clamped to [0,120] else NaN | guard + impute + ratio(date diff) + selection | local_tools.py:2805-2960 (age_handler); screens :2846-2861; day->15 :2911,2922; diff :2931; select :2942; fallback :2955 | docstring; CLAUDE.md "Gotchas" (fractional years); per-wave YAML comments (Uganda, Ethiopia, GhanaSPS) | Uganda: closes a 6-8% missing-Age gap (GH #177); Ethiopia 2013-14: ~26 rescued, ~720 fractional |
+| B3 | 9 EHCVM countries (food_acquired_to_canonical callers) + Nigeria per-row kg | all canonical waves | food_acquired | Quantity (s=purchased) | Quantity (total acquired), Produced | Quantity_purchased := (Quantity.fillna(0) - Produced.fillna(0)).clip(lower=0) | difference + guard(clip) | build_transforms.py:99-103 | docstring (Benin 2018-19 check: Produced <= Quantity on 2,597 rows) | clip fires on "a few" rows; not counted |
+| B4 | Nigeria (GH #378) and any wave passing kg_factor | all with s10bq2_cvn-type factor | food_acquired | Quantity_kg | Quantity, kg_factor (survey per-row factor) | Quantity_kg := Quantity_s * kg_factor per source row | product | build_transforms.py:108-124 | docstring, comment | all rows with a factor |
+| B5 | Uganda / Tanzania / Malawi (script-path canonical builders) | all | food_acquired | Price (on duplicate canonical keys) | Price on duplicate (t,i,j,u,s) rows | Price := mean over duplicate rows (Quantity, Expenditure summed, min_count=1) | selection/average | build_transforms.py:197-210 (_finalize_canonical_food_acquired) | docstring | "Other (Specify)"-type duplicates |
+| B6 | 9 YAML-path food_acquired countries (Benin, Burkina_Faso, CotedIvoire, EthiopiaRHS, Guinea-Bissau, Mali, Niger, Senegal, Togo) | all YAML waves | food_acquired (wave level) | Expenditure, Quantity, Produced, Price | same columns on duplicate index rows | Expenditure/Quantity/Produced := sum (pandas default min_count=0: an ALL-NaN group becomes 0.0), Price := first.  FIRES ONLY ON A FULLY COLD WAVE: grab_data writes the L2-wave parquet at data_root/{C}/{year}/_/food_acquired.parquet (country.py:1655-1656) and the early-return test at :1737 checks data_root/{C}/{wave_folder}/_/food_acquired.parquet -- the same path whenever year == wave_folder -- so on every later call the aggregation is skipped and the un-aggregated wave frame is served.  What the L2-country parquet holds therefore depends on whether the L2-wave parquet existed at build time. | selection (first) + fabricated zero + cache-order dependence | country.py:1730-1750 (Wave.food_acquired); :1272-1290 and :1648-1660 (grab_data cache read/write); :1230-1245 (_script_parquet_candidates) | only the food_acquired_to_canonical docstring ("may coerce all-NaN sums to 0.0") | not counted |
+| B7 | ALL | all | food_acquired, assets (the _ADDITIVE_MEASURE_COLUMNS tables) | Price (food_acquired) | Expenditure, Quantity after additive collapse | Price := Expenditure / Quantity (NaN where Quantity == 0), OVERWRITING the reported Price after summing duplicates on the declared index | ratio | country.py:5949-5953 (_normalize_dataframe_index) | comment; CLAUDE.md grain section says the SUM is silent | every duplicate group with a Price column |
+| B8 | ALL | all | every table with a non-unique declared index (non-additive) | every column | duplicate rows that DISAGREE | groupby().first(): first NON-NULL per column independently (can synthesize a row that exists nowhere) | selection (destructive) | country.py:5955 (_normalize_dataframe_index); feature.py:472 (_collapse_duplicate_index) | GrainCollapseWarning, stamped in parquet as lsms_grain_audit and replayed; LSMS_GRAIN_STRICT | ~540k destroyed rows corpus-wide (CLAUDE.md); 14 cells / 485k rows deleted on NaN key |
+| B12 | 17 countries that declare i in cluster_features idxvars (Site 2, GH #161) | all such waves | cluster_features | every column (Region, District, Rural, Latitude, Longitude, ...) | household-grain rows of the cover page / geo file | projection onto (t,v) with groupby().first() BEFORE _normalize_dataframe_index runs -- first NON-NULL per column independently, so a disagreeing cluster is served a composite row; Latitude/Longitude used to be .mean()-ed (a centroid) here and are .first()-ed since 2026-07-13 (retired derivation) | selection (destructive) | country.py:5723-5770 (_collapse_to_cluster_grain, called from Wave.cluster_features) | GrainCollapseWarning + lsms_grain_audit stamp, replayed on warm reads; CLAUDE.md "Site 2" | 15 of 30 household-grain cells destructive: 53,199 rows destroyed, 13,704 deleted on a NaN key; Kazakhstan 1996 v=126 (178 Urban, 2 Rural) served Rural |
+| B9 | Uganda | 2009-10 (sample, cluster_features) | sample, cluster_features | v (index value) | Latitude/Longitude (modified GPS) where v is blank | v := '@' + round(lat/0.05)*0.05 + ',' + round(lon/0.05)*0.05 (formatted +.2f); blank v with no GPS -> pd.NA | impute (from a numeric binning rule); borderline: brief excludes id construction | build_transforms.py:217-297 (fill_v_with_coord_bin, via derived: coalesce_coord_bin) | YAML comments; docstring; the only registered derived: transformer | movers/split-offs without a panel EA |
+| B10 | Burkina_Faso (2018-19, 2021-22), GhanaLSS 1988-89 | single-recall waves | food_acquired | visit (index value) | none | visit := 1 stamped so the level aligns with a wave that has 4 passages | encoding (constant index value) | build_transforms.py:546-580 (add_visit_level) | docstring; wave mapping.py comments | all rows of those waves |
+| B11 | Uganda (cluster_features hook; crop_production Unit_sold/Condition_sold), Togo 2018 (cluster_features) | per caller | cluster_features; crop_production | any column of the collapsed frame | duplicate rows on (t,v) or on the sale block | reduce_to_agreed: rows that agree collapse; on_conflict='na' BLANKS disagreeing cells (Uganda), default raises (Togo) | guard (alters to NaN) | build_transforms.py:422-511; callers Uganda/_/uganda.py:226, :1538 | GrainConflictWarning; docstring; Uganda hook docstring | conflicted cells only |
+| R1 | ALL | all | every table with a canonical int column (household_roster.Age is the live case) | Age (Int64) | fractional Age from B2 | Age := to_numeric(...).round().astype('Int64') -- pandas round is half-to-even | guard (rounding) | country.py:5225 (_enforce_canonical_dtypes); :5162 (_enforce_declared_dtypes, same rule for country-declared ints) | CLAUDE.md "Gotchas"; docstring | ~200 boundary cases per country (CLAUDE.md) |
+| R2 | ALL with sample | all | sample | weight, panel_weight | raw weight columns in the parquet | w := w / mean_t(w) over non-null values, per wave, per column; group mean <= 0 or non-finite -> left raw | scale | country.py:5292-5387 (_normalise_sample_weights), division at :5381 | CLAUDE.md "sample() and Cluster Identity"; docstring; WeightNormalisationWarning on refusal only; NO attrs key | 93 weighted cells; 80 were expansion-scaled |
+| R3 | ALL with household_roster | all | household_roster | Generation, Distance, Affinity | Relationship (string) via categorical_mapping/kinship.yml | table lookup -> [Generation int, Distance int, Affinity str]; unknown label -> NA + warning; "other relative" -> [null,null,consanguineal] | categorical->number (a DECODE; recorded because asked, brief-excluded) | country.py:4944-4998 (_expand_kinship) | CLAUDE.md "Kinship decomposition"; warning on unknown labels | all roster rows |
+| R4 | ALL with household_roster | all | household_characteristics | every count column, log HSize | Sex, Age, MonthsSpent / MonthsAway / WeeksAway from household_roster | (a) months_present := MonthsSpent, else clip(12 - MonthsAway, 0), else clip(12 - WeeksAway/(52/12), 0), coalesced PER ROW in that priority; (b) keep row iff months_present > 0 or Age < 1 (fractional, pre-R1); a wave with no usable residence datum keeps everyone; (c) Age -> half-open bucket [0,4),[4,9),...,[51,inf); (d) counts summed per (t,v,i); (e) log HSize := log(sum of counts); (f) NaN v -> 'Mover' sentinel | categorical->number + scale + selection + impute(sentinel) | transformations.py:489-732 (roster_to_characteristics); :600, :602 conversions; :610 filter; :658 buckets; :717 sentinel; :729-730 sums/log | docstring; CLAUDE.md "MonthsSpent / MonthsAway / WeeksAway"; two UserWarnings; NO attrs | Uganda drift 1315 HH -> ~220 residual (CLAUDE.md) |
+| R5 | ALL with food_acquired (20 countries) | all | food_expenditures | Expenditure | food_acquired.Expenditure over every u, visit and any extra level | rows with Expenditure 0/NaN dropped; basis='purchased' (default) keeps s=='purchased'; Expenditure := SUM over (u, visit, ...) to (t,i,j,s) | sum across rows of different recall windows (GhanaLSS: six 5-day asks -> one number) | transformations.py:2379-2532; drop :2514; sum :2530 | docstring; attrs['recall'] = {country: {wave: RecallRecord}} (per WAVE, not per row; NULL where within_wave_variation is set; NOT re-attached by multi-country Feature()) | all rows |
+| R5b | ALL, opt-in valuation= | all | food_expenditures(basis='total', valuation=...) | Expenditure (s != purchased, unvalued rows) | Expenditure, Quantity of the household's own purchases; purchased price pool by (geo,t,j,u) | Expenditure := price * Quantity where price = own_price (sum(v)/sum(q) of same HH, same (t,j,u)) then median_price (median of finest geo cell with >= 10 priced purchases, national unconditional) | impute | transformations.py:2013-2376 (food_acquired_valued); :2234 product; :2281 own price; ladder in median_price_valuation :6133+ | attrs valuation_sources / valuation / valuation_geo_levels; ValuationLadderWarning; docstring (measured +23% purchase-vs-farmgate bias, Uganda) | opt-in only; 0 rows by default |
+| R6 | ALL with food_acquired | all | food_quantities (units='kgs', default) | Quantity; u index VALUE | Quantity, u, Expenditure, Quantity_kg, j, t | Quantity := Quantity * kg_per_unit (R7) where a factor resolves, and u := 'kg' (index value rewritten); unconvertible rows carried native; zeros dropped; then SUM to (t,i,j,u,s) | product + encoding(index value) + sum | transformations.py:2535-2648; :2622 u rewrite; :2637 sum | attrs kg_factor_sources (partition over INPUT rows), kg_factor_wave_spread, kg_factor_baseline_gate; docstring; CLAUDE.md GH #850 section | corpus totals moved -82% (Ethiopia) to +18.6% (GhanaLSS) on the #850 change |
+| R7 | ALL with food_acquired | all | (feeds R6, R8) | kg_per_unit + KgFactorSource | u label; Quantity_kg; Expenditure/Quantity of OTHER rows in (t,j) | ladder: survey_kg (Quantity_kg/Quantity) > metric (KNOWN_METRIC exact label, or regex "50 kg"/"500 ml" parse; 1 L = 1 kg under volume_as_mass) > item_unit (median over waves of [median_(t,j,u)(Exp/Qty) / median_(t,j)(Exp/kg-known)], gates: >=5 reports per wave, baseline >=5 rows, baseline p90/p10 (or max/min if n<10) <= 10) > item_unit_tight (baseline 3-4 rows agreeing within 1.25x) > unit (u-pooled, ungated, pre-#850 factor) > none; zeros treated as missing in the inference frame | impute (price-ratio inference) + categorical->number (label -> kg) | transformations.py:1019-1306 (conversion_to_kgs; :971 zero->NaN, :1175-1182 unit arm, :1199-1274 item arm); :1653-1893 (food_kg_factors; :1831 survey factor; :1834 resolve); :1895-1948 (_apply_kg_conversion) | per-row KgFactorSource + kg_* candidate columns (only when the analyst calls food_kg_factors directly); attrs on R6/R8; long docstrings; CLAUDE.md | 'unit' rung still serves a fifth to a half of inferred rows (Niger 141k of 239k) |
+| R8 | ALL with food_acquired | all | food_prices | Price | Expenditure, Quantity, Price, kg_per_unit (R7) | kgvalue (default): Price := Expenditure / (Quantity * kg_per_unit); unitvalue: Expenditure / Quantity; kgprice: reported Price / kg_per_unit (docstring and CLAUDE.md say "Price x kg_factor" -- dimensionally the division is right, the DISCLOSURE is wrong); unitprice: reported Price; then 0/inf/NaN rows DELETED; then MEDIAN over (visit, duplicates) to (t,i,j,u,s) | ratio + guard(delete) + selection(median) | transformations.py:2650-2871; :2751 kgvalue; :2754 unitvalue; :2770 kgprice; :2805 median; _drop_unpriceable :153-280 (drop at :277) | attrs price_rows_dropped (inf/nan/zero/currency tally); UnpriceableRowsWarning above 5% loss; docstring | Nigeria: ~99% of price rows once vanished silently (GH #591) |
+| R9 | ALL, opt-in labels='Aggregate' (or any food_items column) | all | food_expenditures, food_quantities (reaggregate=True) | every numeric column | rows of DIFFERENT items j mapped to the same aggregate label | numeric columns := groupby(new index).sum(min_count=1) after renaming j | sum across different raw items | country.py:2822-2899 (_relabel_j), sum at :2894 | CLAUDE.md "labels= kwarg"; aggregate-labels skill; attrs labels_unavailable on Feature degrade | opt-in |
+| R10 | ALL, opt-in market= | all | any household table | m (index value); ROW SET | sample.Region (HH-level), cluster_features.Region (cluster-level) | m := sample.<column> fillna cluster_features.<column>; rows with no m are DELETED (dropna(subset=['m'])); v dropped from the index | selection (priority) + guard(delete) | country.py:2428-2545 (_add_market_index); :2486 fillna; :2527 dropna | docstring only; no warning for deleted rows; no attrs | Uganda ~145 HH/wave differ between the two sources |
+| R11 | ALL, opt-in numeraire= | all | every monetary table | every monetary column; currency label | nominal LCU; conversion_factors.org; interview_date (i,t) or wave year | value := nominal / factor, factor = most recent row at or before the household's interview date (merge_asof backward); no interview date -> wave year, 1 January; no factor -> pd.NA | scale + selection (as-of date) + impute (Jan 1 fallback) | conversion.py:143-266; merge_asof :228; division :251; fallback :137-138 | attrs['conversion'] = {to, source}; warning naming rows with no factor; module docstring | opt-in |
+| R12 | ALL | all | every table | ROW SET | all non-index columns NaN | df.dropna(how='all') | guard(delete) | country.py:3066-3075 (_finalize_result) | logger.info only (not a warning) | Guatemala individual_education once lost 30% (GH #645) |
+| R13 | ALL (Feature assembly) | all | food_acquired, assets via Feature() | Price | Expenditure, Quantity after dropping a non-canonical level | Price := Expenditure / Quantity re-derived after the additive sum (same rule as B7, at READ time in Feature) | ratio | feature.py:420-480 (_collapse_duplicate_index), :479 | comment; GrainCollapseWarning for non-reconciled columns | duplicates after level drop |
+| R14 | ALL with crop_production (analyst call) | all | harvest_kg() output Harvest_kg | Quantity, u, KgFactor, condition, shipped table, Expenditure-free inference | Harvest_kg := Quantity * kg_per_unit, ladder reported (screened: kg unit must be 1 +-1%, <= 250, not a calendar year) > shipped > survey_median (median reported KgFactor of same (t,u,condition) with >= 5 reports, then (t,u)) > inferred (R7's metric/unit machinery) > none; zeros dropped; sum over u and season | product + impute + guard(reject) + sum | transformations.py:3538-3992; screen :3078-3126 (:3125); median :3236-3290 (:3289); resolve :3772; product :3972; drop :3977 | attrs kg_factor_sources (with reported_implausible, shipped_implausible, shipped_matched), kg_factor_disagreement; per-row KgFactorSource from harvest_kg_factors; ShippedFactorWarning | Uganda: 86 rows with factor > 200 carried 47M of a 58M kg total before the screen |
+| R15 | analyst call | all | yield_kg() Yield_kg | Harvest_kg (R14), plot_features.Area, plot ids | Yield := sum_parcel(Harvest_kg) / sum_parcel(Area > 0); parcel := plot_id with '{hhid}-' stripped, first '-' token (crop) / part before '_' (features) | ratio + id parsing | transformations.py:4022-4133; :4125 | docstring; PlotGrainMismatchWarning (fertilizer_rate) | Uganda: 0 rows join on 'plot', 509 on 'parcel' |
+| R16 | analyst call | all | nitrogen_kg() Nitrogen_kg; seed_kg() Seed_kg; fertilizer_rate() | plot_inputs.Quantity, u, input label; Area | Nitrogen_kg := sum(Quantity * kg_per_unit * N_share[label]) with nominal class shares (urea .46, DAP .18, NPK .17, 'nitrate fertilizer' .46, 'mixed' .20 ...); unmatched labels contribute 0; Seed_kg := Quantity * kg_per_unit for input=='Seed'; rate := kg / Area | categorical->number + product + ratio | transformations.py:4281-4300 (_NITROGEN_CONTENT); :4409-4515 (:4498); :4518-4581 (:4570); :5719-5889 (:5883) | attrs nitrogen_input_match; NutrientCoverageWarning; docstrings | Malawi: 53,210 rows once silently zeroed by exact-match labels |
+| R17 | Uganda (deprecated locality()); EthiopiaRHS (retired area_output()) | all | locality(), area_output() shims | m; Parish; {Crop}_kg / {Crop}_ha | sample.Region, cluster_features.Region, v; crop_production Quantity, Area_ha | m := sample.Region fillna cluster.Region; Parish := v; pivot_table(aggfunc='first') | selection | transformations.py:2862-2964 (legacy_locality); :2823-2859 (legacy_area_output) | DeprecationWarning; docs/migration/locality.md | deprecated paths |
+| -- | ALL | all | (annualisation) | none | -- | NONE anywhere in the framework: recall.py refuses a period= kwarg by design (elasticity of spend to interval length measured at 0.018 on GhanaLSS 1998-99); data_info.yml declares nonfood Expenditure "Reported, not annualised"; the only rescaling is R11 (currency) | -- | recall.py:59-77; data_info.yml nonfood_expenditures note | recall.py docstring; attrs['recall'] | -- |
+
+Not recorded, per the brief's exclusion list, though each was read: =check_adding_t=
+(t := wave label, country.py:1297), =format_id= on every idxvar (local_tools.py:1501),
+=id_walk= (country.py:2962), =_join_v_from_sample= (country.py:2262-2426),
+=map_index= (level rename / legacy j<->i swap, local_tools.py:2663-2708),
+=melt_visit_intervals= (reshape, drops all-NaT visits), =to_parquet='s
+object->string cast, =_enforce_canonical_spellings=, =_apply_categorical_mappings=,
+=attach_currency= (a label, no arithmetic), =_expand_kinship= is R3 only
+because the prompt named it.
+
+* 2. Per-derivation notes
+
+** B1 -- the >1e99 sentinel
+Fires per source file inside =get_data=: it takes the maximum over every
+non-object/non-datetime/non-category column and, if that single value exceeds
+1e99, does =df.replace(na, np.nan)= over the WHOLE frame.  One value, all
+columns.  The raw value is gone from the wave parquet; nothing counts how
+many cells it touched.  It is a build-path guard that alters values, disclosed
+by one un-typed =UserWarning=.
+
+** B2 -- age_handler: five derivations in one callable
+It is called from the wave formatting layer (=mapping.py= / =<wave>.py=
+functions referenced from =data_info.yml='s =myvars=, or from the wave
+=household_roster.py= scripts; Nigeria/Ethiopia/Uganda wrap it in
+=_age_helpers.py=), so it runs inside =df_data_grabber= and its output is the
+=Age= that lands in the L2-wave parquet.  The raw components are NOT
+recoverable from =household_roster=: the served table carries one =Age= and
+no DOB, no reported-age column, no flag saying which branch fired.  The five
+rules, each of which the brief would count separately:
+- screen: reported age outside [0,120] or a date part outside [0,2100) is
+  treated as absent (this is what retired the per-wave =_clean_age= lambdas);
+- impute: an invalid or missing day of birth becomes the 15th (=_safe_dob=,
+  and the year+month-only branch);
+- ratio: fractional age = days / 365.25, rounded to 2 dp;
+- selection: when both a plausible reported age and a DOB age exist, the DOB
+  age wins if =abs(int(reported) - dob_age) <= 1=, otherwise =int(reported)=
+  (the reported age is TRUNCATED, not rounded, before the comparison);
+- fallback: =interview_year - birth_year= clamped to [0,120] else NaN.
+Two faces at read time: =household_roster()= serves =Age= after R1's
+=.round()= to Int64, while =roster_to_characteristics= (R4) is fed the
+PRE-finalize frame from =_aggregate_wave_data= and therefore sees the
+fractional value -- its infant test =age < 1= depends on that.  The
+per-country Ethiopian-calendar conversion before =age_handler= is a country
+derivation and belongs to that group's census.
+
+** B3/B4/B5/B6 -- the canonical food_acquired reshape
+- B3 is a difference of two raw fields plus a clip.  The total is
+  recoverable by summing the two =s= rows of one (t,i,j,u) EXCEPT where the
+  clip fired (Produced > Quantity), where the served purchased quantity is 0
+  and the negative residual is lost.
+- B6 is the one wave-level aggregation the YAML path performs on
+  food_acquired.  Its =sum= runs with pandas' default =min_count=0=, so a
+  group whose Expenditure (or Produced) is entirely NaN is served as 0.0 --
+  the exact "fabricated zero" =_normalize_dataframe_index= was changed to
+  avoid (=min_count=1=, GH #323).  Reached only for the nine YAML-path
+  food_acquired countries and only when no data_root parquet exists for
+  the wave.
+- B5 and B6 both pick a =Price= for duplicate rows, by different rules
+  (mean vs first); B7/R13 then OVERWRITE it with Expenditure/Quantity after
+  the additive sum.  See section 6.
+
+** B7 -- Price re-derived after the additive collapse
+=data_info.yml= (Columns > food_acquired > Price) says the market price is
+"back-calculated in _finalize_result if not stored".  It is not: nothing in
+=_finalize_result= touches =Price= (grep of =country.py= for ='Price'= finds
+only :1741 and :5925-5953).  The re-derivation happens in
+=_normalize_dataframe_index= (BUILD; the L2-country parquet is written
+post-collapse) and in =Feature._collapse_duplicate_index= (READ), and only
+when a =Price= column is ALREADY present and the group had duplicates.  A
+doc/code mismatch worth fixing when the derivation registry is designed.
+
+** B9 -- coalesce_coord_bin
+The single transformer registered in =_DERIVED_TRANSFORMERS=.  It is an
+imputation of a missing cluster id from a numeric rule (0.05-degree grid
+centre of the modified GPS), applied at build time in Uganda 2009-10 to
+=sample= and =cluster_features= so the two agree by construction.  The
+brief excludes id construction, but this one manufactures the identifier
+from a measurement, which is why it is recorded.  =apply_derived= is the
+closest existing thing to a "named, registered, YAML-dispatched
+derivation": stable string key -> callable, target column from the block
+key, kwargs from YAML.
+
+** B8/B12/B11 -- the collapse families
+=groupby().first()= is a selection that, on disagreeing duplicates, keeps
+the first NON-NULL per column independently and can therefore serve a row
+that exists nowhere in the survey.  It runs at two sites -- Site 1 on any
+non-unique declared index (B8) and Site 2 inside =Wave.cluster_features=,
+which projects a household-grain frame onto =(t, v)= before Site 1 can see
+it (B12).  Both are audited (=_audit_index_collapse=), warned, stamped
+into the parquet and replayed, but the destroyed rows are not recoverable
+from any served table -- only from the source file.  Site 2 is also where
+the framework's last silent AGGREGATION lived: GPS was reduced with
+=.mean()= (a cluster centroid) until 2026-07-13, when it was measured to be
+a no-op in 4 of 5 cells and a 783-km average in the fifth; it is now
+=.first()=-ed like every other column.
+=reduce_to_agreed(on_conflict='na')= is the country-side alternative; it
+blanks the disagreeing cells instead, and Uganda is the only live caller
+that opts into blanking.
+
+** R1 -- rounding
+=_enforce_canonical_dtypes= rounds every canonical =int= column with pandas
+=.round()= (banker's rounding: 2.5 -> 2, 3.5 -> 4) before the Int64 cast.
+Applied on every read; the parquet keeps the fractional value, so the raw
+is recoverable from the L2 parquet but not from the API.
+
+** R2 -- weights
+Scale-preserving for every ratio, scale-destroying for every total.  There
+is no attrs key; the only signal is a warning when a wave's mean is
+non-positive.  Recoverable from the parquet only.  =_join_v_from_sample=
+re-enters =sample()= for every household table, so this runs many times per
+session; idempotence is what makes that safe.
+
+** R4 -- roster_to_characteristics
+Six distinct rules (table row R4).  The MonthsAway -> months-present
+conversion is exactly the brief's "categorical/duration re-expressed" case,
+and the EHCVM binary =s01q12= -> 12/0 that feeds it is a COUNTRY derivation
+upstream (CLAUDE.md).  Nothing on the served frame says which of the three
+residence columns decided a household, or that a wave fell back to
+count-everyone; the two =UserWarning= texts are the only disclosure.  The
+raw roster is fully recoverable from =household_roster()= (modulo R1's
+rounding of Age, which the bucket edges then see differently from the
+fractional value used here).
+
+** R5 -- food_expenditures: the framework's own 12B-class case
+The sum runs over every level not in (t,i,j,s): =u= (fine, currency is
+additive) AND =visit= (GhanaLSS: up to six 5-day asks, Burkina Faso 2014:
+four quarterly passages) AND anything else a country left on the index.  A
+GhanaLSS number is 30 days of coverage next to Ethiopia's 7, and the only
+disclosure is =attrs['recall']=, which is (a) per (country, wave), never per
+row; (b) carries =recall_days=None= wherever =within_wave_variation= is set
+(nine cells in five countries, including GhanaLSS 1991-92 and 2005-06 and
+Nigeria W4 -- exactly the cells that most need it); and (c) is dropped by a
+multi-country =Feature()= call and never re-attached: =recall.merge_attrs=
+exists but has NO caller (=grep merge_attrs lsms_library/*.py= finds only
+the population one at feature.py:715).  The sibling table =food_prices= (R8)
+collapses the same =visit= level with a MEDIAN.  The visit detail itself
+survives in =food_acquired=, so the raw inputs are recoverable from the
+served corpus, just not from the derived table.
+
+** R6/R7 -- kilograms
+Three things a per-row key cannot name on its own: the rung that served the
+row (six values), the group statistic behind it (a (t,j) baseline of >= 5
+rows, a (t,j,u) estimate of >= 5 reports, medianed across waves), and the
+counterfactual tag =baseline_refused_spread=.  The library already answers
+this with a =KgFactorSource= column plus partition counts in attrs -- but
+only when the analyst calls =food_kg_factors= directly; the served
+=food_quantities= is summed over rows and carries the counts only.  The
+index VALUE =u='kg'= is itself a derived label: a row that says =kg= may be
+a survey kilogram, a parsed "50 kg Bag", or a price-ratio inference, and the
+served table does not say which.  =volume_as_mass=True= (1 L = 1 kg) is a
+default assumption baked into the =metric= rung.  Zero quantities and zero
+expenditures are treated as missing throughout (=replace(0, nan)= at
+transformations.py:971, 2514, 2634, 3977) -- a corpus-wide "0 means
+missing" convention nothing discloses per row.
+
+** R8 -- food_prices
+Four modes, four formulas, one column name.  The =kgprice= docstring and
+CLAUDE.md both say "reported Price x kg_factor"; the code divides
+(transformations.py:2770).  Division is right (currency per unit / kg per
+unit = currency per kg); the disclosure is wrong.  =_drop_unpriceable=
+deletes rows and discloses the tally in =attrs['price_rows_dropped']=; the
+warning fires only above a 5% residual loss, with currency-denominated
+(=u='Value'=) rows excluded from both numerator and denominator.
+
+** R10 -- market=
+Two things at once: a priority rule between two Region sources, and a row
+deletion (=dropna(subset=['m'])=) with no warning and no attrs.  A household
+whose region is unknown in both sources disappears from the returned frame
+silently.  The cluster-level fallback itself is a =first= selection:
+=_market_lookup= does =drop_duplicates(subset=['t','v'])= (country.py:2254)
+on the concatenated wave-level =cluster_features=, so where a wave carries
+duplicate =(t, v)= rows with different Region labels the first wins,
+undisclosed.  R17 (=legacy_locality=) inherits the same rule.
+
+** R11 -- numeraire=
+A per-row as-of selection of the factor plus a division, with the wave's
+nominal 1 January as the fallback date for the four countries with no
+=interview_date= and for any household missing one.  =attrs['conversion']=
+records the target and the source table but not which rows used the
+fallback; the warning names only rows with NO factor.
+
+** R14-R16 -- the ag transforms
+Never served by =Country=; the analyst calls them.  They are the most
+thoroughly disclosed derivations in the codebase (per-row =*Source=
+column, partition counts in attrs, a screen that rejects but never clips,
+disagreement audits) and are the pattern the design should copy.  The
+nominal nitrogen shares (R16) are a categorical->number table that would
+become a served derivation the day =Nitrogen_kg= is registered as a table.
+
+* 3. Guards: which alter values and which only report
+
+| guard | site | alters? | disclosure |
+|-------+------+---------+------------|
+| =null_read_audit.check_read= (Site R) | =get_dataframe= | NO -- returns input unchanged by contract | NullReadWarning / LSMS_READ_STRICT; =null_read_reports()= |
+| =null_read_audit.check_declared_columns= (Site B) | =_finalize_result= | NO | same |
+| =quantity_audit.check_quantities= (Site Q) | =_finalize_result= | NO | QuantityImplausibleWarning / LSMS_QUANTITY_STRICT; =quantity_reports()= |
+| =validate_acquisition_source= | =_finalize_result= | NO -- raises on a bad =s= | ValueError |
+| =_assert_built_required_columns= | post-build | NO -- raises | RuntimeError |
+| =_audit_index_collapse= | before B8/B7/R13 | NO itself; the collapse it audits DOES (B8) | GrainCollapseWarning + parquet stamp |
+| =Wave._merge_subframes= cartesian test | grab_data dfs: | NO (warns/raises); the merge itself manufactures rows | warning / LSMS_GRAIN_STRICT |
+| B1 >1e99 sentinel | grab_data | YES -> NaN | one UserWarning |
+| =_screen_reported_factors= | R14 | YES within the transform: rejected factor -> NaN, row falls to next rung; never clipped | =reported_implausible= count, per-row =kg_reported_rejected= |
+| =_valid_factor= | R7/R14 | YES: factor <= 0 or non-finite -> NaN | none per row |
+| =_drop_unpriceable= | R8 | YES: deletes rows | attrs price_rows_dropped; warning > 5% |
+| =dropna(how='all')= | R12 | YES: deletes rows | logger.info |
+| =_add_market_index= dropna | R10 | YES: deletes rows | none |
+| =replace(0, nan)= conventions | R5, R6, R7, R14 | YES: zero read as missing | docstrings only |
+| =_normalise_sample_weights= refusal branch | R2 | leaves raw (a non-alteration where alteration was expected) | WeightNormalisationWarning |
+| =reduce_to_agreed(on_conflict='na')= | B11 | YES -> NaN | GrainConflictWarning |
+
+The three audit modules (=null_read_audit=, =quantity_audit=, the grain audit)
+are in =_build_registry._EXCLUDED_CALLABLES= precisely BECAUSE they alter
+nothing; the excluded-list test
+(=tests/test_build_transform_hash.py::test_excluded_callables_are_write_or_hash_only=)
+pins that.
+
+* 4. The @build_transform registry, precisely
+
+** What it is
+=lsms_library/_build_registry.py= is a leaf module (imports nothing from the
+package).  Its state is one dict:
+
+: _BUILD_TRANSFORMS: dict[str, tuple[Callable, tuple]] = {}
+:    key   = f"{fn.__module__}.{fn.__qualname__}"
+:    value = (fn, tuple(tables or ()))      # () means "every table"
+
+** The decorator
+: def build_transform(*, tables=None):
+:     def deco(fn):
+:         _BUILD_TRANSFORMS[f"{fn.__module__}.{fn.__qualname__}"] = (fn, tuple(tables or ()))
+:         return fn
+:     return deco
+
+It is a TAG, not a wrapper: =fn= is returned unchanged, so binding and call
+semantics are byte-identical (=test_tags_do_not_wrap=).  It records the
+callable's identity and an optional list of OUTPUT TABLE names it is scoped
+to.  It records nothing else: no column, no index level, no raw inputs, no
+docstring, no formula, no disclosure text.
+
+** What is tagged today (9 entry points, pinned by
+=test_entry_point_set_is_pinned=)
+- =build_transforms.food_acquired_to_canonical= (tables=['food_acquired'])
+- =build_transforms._finalize_canonical_food_acquired= (['food_acquired'])
+- =build_transforms.fill_v_with_coord_bin= (all tables)
+- =build_transforms.apply_derived= (all tables)
+- =build_transforms.add_visit_level= (['food_acquired'])
+- =local_tools.df_data_grabber= (all)
+- =country.Wave.grab_data= (all)
+- =country.Country._aggregate_wave_data= (all -- the orchestrator)
+- =country._normalize_dataframe_index= (all; country.py:5782)
+
+=reduce_to_agreed= / =collapse_to_cluster_grain= are deliberately NOT tagged
+(an all-tables tag would fold them into every table's fingerprint); they
+are versioned instead through the import-closure fold below.
+
+** How the fingerprint walks it
+=build_transforms_fingerprint(table)= (lru_cached):
+1. seeds =parts= with =py=<major>.<minor>= (ast.dump format drifts);
+2. for each registered =(fn, tables)= in sorted qualname order, skipping
+   entries whose =tables= is non-empty and does not contain =table=,
+   calls =_closure_parts(fn, seen)=;
+3. =_closure_parts= unwraps (=inspect.unwrap=, so lru_cache wrappers
+   resolve), skips already-seen qualnames, appends
+   =qualname + "=" + _norm(fn)= where =_norm= is =ast.dump= of the
+   dedented source with DOCSTRINGS STRIPPED (comments and docstrings never
+   move the hash; only logic does), then for every name in
+   =_all_co_names(fn.__code__)= (co_names recursed through nested code
+   objects -- comprehensions, lambdas, inner defs):
+   - skips dunders;
+   - resolves via =getattr(module, name)=, else via the AST =ImportFrom=
+     map (=_import_map=, which catches the function-level cycle-dodge
+     imports), else via =_resolve_methods= (a =self.<method>= reference
+     matched against the classes of the module -- properties unwrapped to
+     =fget=);
+   - a resolved callable that is ours, not in =_EXCLUDED_MODULES=
+     ({data_access, paths}) and not in =_EXCLUDED_CALLABLES= is recursed;
+   - a resolved constant of type dict/list/tuple/set/frozenset/str/int/
+     float/bool (and not in =_EXCLUDED_CONSTANTS=, the three runtime
+     ledgers) is serialised by =_ser= -- explicit type dispatch with an
+     else-REJECT (=TypeError=), so no identity =0x= repr can leak; a
+     callable held inside a constant container (e.g. the
+     =_DERIVED_TRANSFORMERS= dict) is replaced by its qualname AND its
+     closure is folded, so a registry dict is versioned by CODE;
+4. sha256 of the sorted, de-duplicated parts joined on \x1f.
+
+=framework_imports_fingerprint(paths)= is the second route: it parses every
+=_/*.py= build module of a wave/country, resolves =from lsms_library.X
+import name= and =import lsms_library.X as Y= + attribute uses, and folds
+those callables' closures.  This is how out-of-process wave scripts (which
+the in-process walk cannot reach) and the untagged grain helpers get
+versioned.
+
+** Where it is folded
+- =Wave._input_hash(table)= (country.py:838-940): =schema=LSMS_CACHE_SCHEMA=
+  (manual lever, =local_tools.py:1840=, currently 5), the wave's
+  data_info.yml hash, the wave/mapping module hashes, wave =*.org= inputs,
+  YAML-path DVC sidecar md5 per declared source (or script text + literal
+  data refs for the script path), every =_/*= file with a
+  =_BUILD_INPUT_SUFFIXES= suffix in wave and country dirs, then
+  =fwimp=<wave closures>:<country closures>= and =btf=<fingerprint(table)>=.
+- =Country._table_cache_hash(table, waves)= (country.py:3195-3268): every
+  wave hash plus =ctbl= / =cmod= / =cmap= / =cscheme= / =cmake= file hashes,
+  country build inputs and =*.org=, then =btf= and =fwimp= for the country
+  =_/*.py= files.  Returns None when nothing is hashable so an
+  unintrospectable table never regresses the fast path.
+
+** What would carry over to a @derivation registry
+- The tag-not-wrapper decorator shape, the module-level dict, the
+  =registered_entry_points()= accessor and the pinned-set drift test.
+- Memoisation on function object (=_source= / =_norm= lru_caches) and
+  =clear_caches()= for tests.
+- The closure walk itself, if the design wants each derivation's CODE
+  versioned (a stored =Derivation= key whose implementation changed should
+  be detectable): =_closure_parts= + =_ser= already produce a
+  deterministic content hash per callable, docstrings excluded.
+- The =_DERIVED_TRANSFORMERS= idiom in =build_transforms.py= is the closer
+  prototype for the KEY: an explicit, stable string
+  (='coalesce_coord_bin'=) mapped to a callable, dispatched from YAML with
+  =target=<column>= and kwargs, and already code-versioned because =_ser=
+  folds callables held in dicts.
+
+** What would NOT carry over
+- The key is =module.qualname=.  For cache invalidation that is right (a
+  rename SHOULD invalidate); for a =Derivation= vocabulary that must stay
+  stable inside stored parquets and documents it is wrong -- a refactor
+  would silently rename every row's label.  The registry needs a declared
+  stable name, with the qualname as an attribute.
+- The registry records identity and table scope ONLY.  The design wants,
+  per derivation: the served column or index value, the raw input fields
+  (file.variable), a formula/description, a kind, and "a callable that
+  retrieves the exact raw inputs".  None of that exists; the only
+  raw-source enumeration in the codebase is
+  =_collect_file_paths_from_block= / =scan_script_data_refs=
+  (local_tools.py:757, :1910), which yield FILE PATHS for hashing, not
+  columns.
+- Scope is by output TABLE; a derivation registry needs at least
+  (table, column-or-level), and R6 shows an index VALUE (=u='kg'=) as the
+  derived thing.
+- Read-path derivations must live in a DIFFERENT dict.  =_finalize_result=
+  is in =_EXCLUDED_CALLABLES=, and
+  =test_no_transformations_symbol_reaches_any_fingerprint= pins that no
+  symbol of =transformations.py= reaches any build fingerprint.  Tagging
+  =conversion_to_kgs= or =roster_to_characteristics= with =@build_transform=
+  would fail that test and cold-rebuild the corpus.  Reuse the MECHANISM
+  (decorator shape, walk, serialiser), not the =_BUILD_TRANSFORMS= dict.
+- BUILD vs READ is the axis the existing registry was built to separate,
+  and it is also what decides whether a per-row =Derivation= column can be
+  stored at all: a column stamped at build time survives in the parquet
+  (and changes the parquet's content, hence its hash, hence one cold
+  rebuild); a read-time derivation must re-attach its label on every read
+  the way =_finalize_result= re-attaches =attrs['population']= /
+  =attrs['recall']=.  Two mechanisms, not one.
+- Docstrings are stripped from the fingerprint on purpose.  A derivation
+  registry that wants the docstring as its disclosure text needs to read
+  it separately from the same function object -- compatible, but a
+  separate concern.
+- The registry has no per-row anything.  The closest existing per-row
+  provenance is the =*Source= column pattern (=KgFactorSource=,
+  =ValuationSource=) plus attrs partition counts -- built by hand inside
+  each transform, not by the registry.
+
+* 5. Disclosure inventory (framework layer)
+
+| attrs key | set by | reaches Country API? | reaches multi-country Feature()? |
+|-----------+--------+----------------------+----------------------------------|
+| kg_factor_sources | R6, R8 (kgvalue/kgprice), R14 | yes | no (concat drops; not re-attached) |
+| kg_factor_wave_spread, kg_factor_baseline_gate | R6, R8 | yes | no |
+| kg_factor_disagreement | R14 | analyst call | -- |
+| price_rows_dropped | R8 | yes | no |
+| valuation_sources, valuation, valuation_geo_levels | R5b | yes (explicitly re-attached after post-steps) | no (docstring says so) |
+| nitrogen_input_match | R16 | analyst call | -- |
+| conversion | R11 | yes | -- |
+| recall | =_finalize_result= (metadata, per wave) | yes | NO: =recall.merge_attrs= has no caller |
+| population, population_resolution | =_finalize_result= | yes | yes (feature.py:715 re-attaches) |
+| labels_unavailable, canonical_alignment | Feature | -- | yes |
+| id_converted, country | =_finalize_result= | yes | -- |
+
+Per-row provenance columns exist only on frames the analyst asks for
+directly: =KgFactorSource= (=food_kg_factors=, =harvest_kg_factors=),
+=ValuationSource= + =valuation_price= (=food_acquired_valued=).  No table
+served by =Country.<table>()= carries a per-row derivation label today.
+
+Warnings that are the ONLY disclosure of a value change: B1 (>1e99),
+R4's two UserWarnings, R2's WeightNormalisationWarning (refusal only),
+R11's no-factor warning.  Value changes with NO runtime disclosure at all:
+B6's fabricated 0.0, B7/R13's Price overwrite, R1's rounding, R10's row
+deletion, R12 (logger.info), the =0 -> missing= conventions.
+
+* 6. Closing
+
+** Counts by kind (table rows; a row with several kinds counted once per kind)
+| kind | rows |
+|------+------|
+| guard (alters values or deletes rows) | B1, B3(clip), B8, B12, B11, R1, R8(drop), R10(drop), R12, R14(screen) = 10 |
+| impute / fallback / default | B2(day->15), B6(fabricated 0.0), B9, R4(sentinel), R5b, R7, R11(Jan 1), R14(survey_median, inferred) = 8 |
+| ratio | B2(date diff), B7, R8, R13, R15, R16(rate) = 6 |
+| product | B4, R6, R14, R16 = 4 |
+| selection (choose among raw candidates) | B2, B5, B6, B8, B12, R8(median), R10 (+ _market_lookup first), R11(as-of), R17 = 9 |
+| categorical -> number | R3 (decode), R4 (months, buckets), R7 (label -> kg), R16 (N shares) = 4 |
+| scale | R1(round), R2, R4(log), R11 = 4 |
+| sum across different raw fields / windows | R5 (visit), R9 (items) = 2 |
+| encoding (index value stands in) | B10 (visit=1), R6 (u='kg') = 2 |
+| annualise | 0 |
+Distinct derivation SITES: 12 BUILD, 17 READ (+ 3 opt-in analyst families).
+
+** The cases furthest in meaning from the raw answer
+1. R5 =food_expenditures= summing =visit= away: GhanaLSS serves 30 days of
+   coverage in the same column as Ethiopia's 7, disclosed only by a
+   per-wave attrs record that is null for the within-wave-varying cells and
+   lost on cross-country assembly.  The exact 12B shape, one layer up.
+2. R6/R7 =food_quantities(units='kgs')=: a =u='kg'= row may be a survey
+   kilogram, a parsed label, or a median-of-medians price ratio pooled
+   across waves -- and before #850 the millilitre weighed 743 g.  The
+   served table says =kg= for all of them.
+3. B12 (Site 2) and B8 (Site 1) =groupby().first()= on disagreeing rows:
+   Kazakhstan 1996 cluster 126 (178 urban, 2 rural) served as Rural by the
+   Site 2 projection; at either site a per-column first-non-null can
+   assemble a row that exists in no source.
+4. B2 =Age=: five rules, one number, no flag; then R1 rounds it half-to-even
+   on the way out while R4 consumed it fractional.
+5. R5b/R14/R16 nominal-table imputations (purchase price for own
+   consumption, class-nominal nitrogen shares): opt-in today, but the
+   moment any is registered as a served table it is a 12B-class value.
+
+** The same column derived differently
+- =food_acquired.Price= on duplicate rows: =first= (B6, YAML-path waves),
+  =mean= (B5, Uganda/Tanzania/Malawi canonical builders), then OVERWRITTEN
+  with Expenditure/Quantity after the additive sum (B7 at build, R13 at
+  Feature time).  Three rules, one column, and the data_info.yml note
+  points at a fourth site (=_finalize_result=) that does nothing.
+- The =visit= level: SUMMED in =food_expenditures= and =food_quantities=,
+  MEDIANED in =food_prices=.
+- =Region= -> =m=: =_add_market_index= (sample first, cluster fallback, rows
+  without m deleted) vs =_market_lookup= / =legacy_locality= (same
+  priority, no deletion in the shim).
+- =Age= consumed fractional (R4) and served rounded (R1) from one build.
+- Zero handling: =min_count=1= keeps an all-NaN group NaN in
+  =_normalize_dataframe_index= and =_finalize_canonical_food_acquired=,
+  while =Wave.food_acquired= (B6) turns the same group into 0.0 -- and B6
+  itself runs only when the wave's L2 parquet did not yet exist, so the
+  same wave can be aggregated on one cold build and not on the next.
+
+** What would not fit a per-row nullable =Derivation= column + registry
+- Row DELETIONS (R8, R10, R12, B8's destroyed rows, groupby's NaN-key
+  drop): there is no output row to carry the label.  Only attrs, warnings,
+  or a stamped audit can disclose an absence.
+- MANY-TO-ONE sums (R5 over u and visit; R6 over u; R14 over u and season;
+  R9 over items): the "exact raw inputs" are a set of rows, so the
+  retrieval callable must return rows, not fields, and one output row can
+  mix rungs (R5b's docstring gives exactly this reason for not carrying
+  =ValuationSource= on the summed frame).
+- CHAINED rules on one value (B2's five, then R1; R7's six-rung ladder):
+  a single key names one rule; the existing answer is a =*Source= column
+  plus partition counts, i.e. a small vocabulary per column rather than a
+  registry key per row.
+- GROUP-PARAMETERISED rules (R2 divides by the wave mean; R7's factor is a
+  (t,j) baseline of >= 5 rows medianed across waves; R5b's price is the
+  finest geo cell with >= 10 purchases): the key names the rule, but the
+  parameter is a statistic of OTHER rows, so "retrieve the raw inputs"
+  means retrieving a cell, and the cell membership changes when a wave is
+  added.
+- INDEX-VALUE derivations (R6 =u='kg'=, B10 =visit=1=, B9 =v='@lat,lon'=):
+  the derived thing is a key, not a column; a per-row column can describe
+  it but the row's identity is what changed.
+- BUILD vs READ: a =Derivation= column written at build time changes the
+  parquet and its hash (one cold rebuild per registration) and cannot
+  describe anything =_finalize_result= does afterwards; a read-time label
+  must be re-attached on every read and survives neither =merge= with a
+  disagreeing frame nor =Feature()='s concat unless explicitly merged --
+  the same trap =attrs['recall']= is in today.
+- A per-row NULLABLE column says "no derivation" for a copied value, but B1
+  and the =0 -> missing= conventions alter values that are then
+  indistinguishable from genuinely missing ones; the label would have to
+  be attached to a NaN.
+
+** Doc/code mismatches found on the way
+- =data_info.yml= Columns > food_acquired > Price: "back-calculated in
+  _finalize_result if not stored" -- false; see B7.
+- =food_prices= docstring and CLAUDE.md: =kgprice= "Price x kg_factor" --
+  code divides (transformations.py:2770), correctly.
+- =recall.merge_attrs= is documented as the load-bearing re-attach for
+  =Feature()= (recall.py:276-290) and is never called.
+- CLAUDE.md derived-tables paragraph says =reaggregate=True= "sums
+  collapsed categories" for =food_expenditures= / =food_quantities=; the
+  code sums EVERY numeric column of the frame (country.py:2892-2894),
+  which is the same thing today but would silently sum a per-unit column
+  if one were ever added to those frames.
+
+* Appendix: opt-in analyst transforms (read time, never cached, never
+  served by Country)
+
+| function | rule in one line | kind |
+|----------+------------------+------|
+| tlu | sum(HeadCount * species factor) (cattle .70, ...) | categorical->number, product |
+| livestock_engaged | any row per (t,i) | encoding |
+| dependency_ratio | dependents / working-age members | ratio |
+| total_/family_/hired_labor_days | sum PersonDays by source | sum |
+| farm_size, nb_plots | sum Area / count rows per household | sum |
+| gross_crop_revenue | sum Value_sold | sum |
+| livestock_sales_value | HeadSold * ValuePerAnimal or reported SalesValue | product / selection |
+| rcsi, rcsi_phase | sum weight[strategy] * Days; cut points 3/18/42 | categorical->number, band |
+| hdds, fcs | count of groups; sum weight[g] * min(days, 7) | categorical->number, guard(cap) |
+| crop_diversity | -sum p ln p | ratio |
+| median_price_valuation | price = median of finest geo cell >= threshold, value = price * quantity; optional weighted median | impute, product |
+| asset_index | first principal component of ownership dummies | scale |
+| anthropometry_zscores | WHO-2006 LMS z-scores with flag bounds | ratio, guard |

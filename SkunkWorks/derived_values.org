@@ -261,12 +261,108 @@ signal there.  Rare enough not to be a firehose; the census will say.
 
 * What the corpus already does (census, 2026-09-11)
 
-Pending: six read-only sweeps (Uganda; Ethiopia+Nigeria;
-Tanzania+Malawi+Niger; Mali..Tajikistan; the remaining 24 countries;
-the framework layer) are cataloguing every served value computed
-rather than copied.  Results go here as counts by kind, the cases
-furthest in meaning from the raw answer, and anything a single row
-key cannot name.
+Six read-only sweeps of every wave script, country module, =mapping.py=
+and =data_info.yml= (reports in =slurm_logs/2026-09-11_derived_values/=,
+one per group, each row with =path:line=, the rule, and how it is
+disclosed today).  Totals, by the primary kind each agent assigned:
+
+| group                              | rows | dominant kinds                                        |
+|------------------------------------+------+-------------------------------------------------------|
+| Uganda                             |   57 | guard 18, selection 12, cross-field sum 10            |
+| Ethiopia + Nigeria                 |   76 | categorical->number 13, sum 12, encoding 11, product 9 |
+| Tanzania + Malawi + Niger          |   84 | guard 16, selection 16, sum 9, encoding 9             |
+| Mali .. Tajikistan (8 countries)   |  102 | selection 21, impute 16, encoding 14, cat->number 14  |
+| the other 24 countries             |   65 | selection 16, guard 9, impute 9, encoding 8           |
+| framework (build 12 / read 17)     |   29 | guard 10, selection 9, impute 8, ratio 6              |
+
+About 410 sites, of which the agents judged roughly a fifth to be
+disclosed nowhere a user looks, and about fifty to be "same column,
+different rule across waves" within one country.  =annualise= is
+almost empty (2 sites): the repo's reported-values rule holds.
+
+** The 12B-shaped cases (served meaning furthest from the answer)
+
+- GhanaLSS 1987-89 :: =VFOODCPD=, value per eating occasion, served as
+  the produced-side recall value (this document's motivating case).
+- EHCVM Togo / Benin / Guinea-Bissau :: =food_acquired.Expenditure= =
+  =s07bq08=, whose label is "Valeur du [produit] achete la derniere
+  fois" -- ONE last purchase -- beside a 7-day =Quantity=; Burkina Faso
+  reads the same field as a total; the add-feature template wires it.
+- Nigeria W4 :: a purchased row is one transaction in a 30-day window
+  under the same key and columns as 7-day consumption rows; W1-W3 give
+  "purchased quantity" three different meanings.
+- Ethiopia food_acquired :: =produced = total - purchased= with the
+  survey's own production and gift questions unread; a NaN total with
+  a positive purchase is served as 0.
+- Niger =people_last7days= :: hours = months x weeks x days x hours / 52,
+  an annual-average week in a last-7-days table; formula differs by wave.
+- Uganda :: =crop_production.intercropped= answers "did NOT use seed";
+  =plot_features.Area= in hectares while =AreaUnit= says 'acres';
+  =earnings= = cash + in-kind over a window stated only in a comment.
+- Niger / Malawi :: =Value_sold= / =Quantity_sold= served beside the
+  harvest unit while the sale unit is dropped (~40x when they differ).
+- Tajikistan 2007 :: =Area= in sotka (100x) under the hectares column;
+  Albania serves hectares and labels them 'sq. meters'.
+- Malawi =Quantity_kg= :: region x fuzzy-matched item (difflib 0.6) x
+  unit factor, mean-collapsed on collisions; the matched row is
+  unrecoverable from the frame.
+- EHCVM =MonthsSpent= :: yes/no -> 12/0 (Burkina 2014: a duration BIN
+  -> 12/0, known false for 943 people) pooled on one axis with waves
+  of continuous month counts.
+
+** What fits the mechanism, restated after the census
+
+The agents' "won't fit a per-row key" lists mostly dissolve once the
+key is read as naming an OPERATION and =derivation_inputs= is defined
+at the INPUT grain (@ligon, 2026-09-11: "a row computed from a groupby
+operation could refer to the groupby operation"):
+
+- reducers (sum / mean / first / median over a group) :: the key names
+  the reduction; the inputs callable returns the group members with the
+  group key, so the suppressed alternatives are exactly what comes back;
+- chained pipelines (Tanzania =Quantity=: hakuna -> 0, fillna, floor,
+  x factor, 0 -> NaN) :: ONE key naming the pipeline, steps listed in
+  order in the entry; inputs = the column before step one;
+- several columns on one row with different rules :: the entry's
+  =columns= field; the row carries =a+b=;
+- index-value derivations (=u := 'Unknown'=, =season := 'annual'=) ::
+  the key sits on the row; the entry names the level;
+- branch selections (=age_handler=, GPS-vs-estimate, weighted-mean-vs-
+  first, "derived by X unless X fails") :: one key PER BRANCH, so the
+  path taken is on the row and countable;
+- served under a name that implies a different window or question
+  (Nigeria W4, the EHCVM last purchase, Uganda intercropped) :: an
+  entry whose =rule= is the identity and whose =assumptions= carry the
+  semantics.  The function is trivial; the registry is the point;
+- many-row inputs (nutrition matrix products, sales summed over
+  species, factors learned from another wave) :: the inputs callable
+  returns a FRAME at whatever grain the inputs have; nothing requires
+  it to return one row per served row.
+
+Two things remain outside the column and live in the registry alone:
+
+- deletions :: a row that was dropped has nowhere to carry a key.
+  Registry entry with =rows: 0=, an inputs callable returning the
+  deleted rows, surfaced through =attrs= / =ll.derivations()= -- the
+  same class as the grain-collapse reports, and reported the same way;
+- build/read composition :: a derivation whose served value depends on
+  cache state (Ethiopia shocks: YAML maps Increase -> True, the legacy
+  script path -> False, and the Makefile still builds the script) is a
+  defect to fix, not a derivation to label.
+
+** Defects surfaced by the census, to file separately
+
+Each of the 12B-shaped cases above is a candidate issue independent of
+this mechanism.  Also found on the way: Malawi grams regex x0.01 (live
+in 2004-05); GhanaSPS 2009-10 =MonthsAway= NaN -> 0 for 47% of persons;
+Ethiopia shocks build-path ambiguity; =Guinea-Bissau/_/guinea-bissau.py=
+unreachable (the live module has no =interview_date= hook); Nigeria
+=nonfood_expenditures= pooling 7/30-day recalls with no window column;
+=data_info.yml= claiming =Price= is back-calculated in
+=_finalize_result= (it is not); =kgprice= docstring says multiply, code
+divides (correctly); =recall.merge_attrs= has no caller, so
+=attrs['recall']= dies at =Feature()= today; CLAUDE.md's DOB-fractional
+=age_handler= branch is unreachable for Uganda as called.
 
 * Alternatives considered
 

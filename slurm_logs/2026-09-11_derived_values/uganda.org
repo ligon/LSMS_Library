@@ -1,0 +1,424 @@
+#+TITLE: Uganda -- census of DERIVED served values (read-only sweep)
+#+DATE: 2026-09-11
+#+AUTHOR: sweep agent (Claude), brief: scratchpad/BRIEF_derivations.md
+
+* Scope and method
+
+Group: Uganda only.  Read as text, nothing run: =_/uganda.py= (3 040
+lines, every =*_for_wave= builder and =CROP/INPUT/LIVESTOCK/ANTHRO/LABOR_COLMAPS=),
+all 24 country-level =_/*.py=, all 126 wave-level =<wave>/_/*.py= (8 waves
+x up to 17 tables), all 7 =<wave>/_/mapping.py=, all 8 =data_info.yml=,
+=_/Makefile=, =_/recall.yml=, =_/conversion_to_kgs.json=, the src blocks in
+=_/nutrition.org= and =_/nonfood_label_make.org=, and the shared framework
+callables Uganda routes through (=build_transforms._finalize_canonical_food_acquired=,
+=build_transforms.fill_v_with_coord_bin=, =local_tools.age_handler=).
+=_/CONTENTS.org= (2 732 lines) was grepped per variable / table name; the
+"disclosed" column below says where a derivation is written down TODAY.
+
+Path shorthand: =UG/= is =lsms_library/countries/Uganda/=.  Line numbers are
+from branch =development= at 36efe55c.
+
+Excluded per brief: id construction (=_format_agsec_hhid=, the 2018-19 /
+2019-20 =DISTRICT/PARISH= composite =v= and its =_V_ALIASES=), code -> label
+decoding (all =harmonize_*= tables, =Rural= 0 -> Rural, =Region= Kampala ->
+Central), canonical spellings, dtype coercion, wave concatenation, =id_walk=,
+=v= join from sample, =people_last7days= member-row selection (a filter, not a
+number), and the framework's own =food_expenditures= / =food_prices= /
+=food_quantities= / =household_characteristics= derivations.
+
+* The six check cases named in the brief
+
+| case                                        | found? | where / what                                                                                                                                                                                                                                       |
+|---------------------------------------------+--------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2015-16 =a5aq8= / =a5bq8= x100 guard (#829) | yes    | =UG/2015-16/_/crop_production.py:80-93=: asserts median of positive raw values < 10 000, then multiplies by 100.  Row D-CP-02.                                                                                                                       |
+| 2009-10 =99999= sentinel (#861)             | yes    | =CROP_COLMAPS['2009-10'][...]['qty_sentinel'] = 99999= (=UG/_/uganda.py:1718,1723=) consumed at =:1360=; exact-value strip on =a5aq6a= / =a5bq6a= only.  Row D-CP-01.                                                                             |
+| 2018-19 season-B kg factor (#842)           | yes    | =a5bq6d= (and =a5aq6d=) carried as =crop_production.KgFactor=, 0 -> NaN (=:1434=); 2018-19 is the ONLY wave wired.  Row D-CP-03.  Not a kg conversion at build time -- the multiplication =Quantity * KgFactor= happens in =transformations.harvest_kg=. |
+| =age_handler= DOB-derived fractional ages   | NO     | Unreachable in Uganda.  =_age_helpers.run_household_roster= passes =interview_year= only, never =interview_date= (=UG/_/_age_helpers.py:132-138=), so =age_handler='s =final_interview_date= is None and the =dob_age= branch (=local_tools.py:2929-2930=) cannot fire.  Served =Age= is =int(h2q8)= if 0..120, else =INTERVIEW_YEAR - h2q9c=, else NaN.  Row D-HR-01.  Inferred from reading the call path, not from running it. |
+| =food_acquired_to_canonical= =u='Value'=    | NO     | Uganda mints no =Value= unit: the =u= table in =_/categorical_mapping.org= has no such Preferred Label and no Uganda script writes the literal.  The Uganda analogue is =u='---'=: a MISSING unit code is filled with the string ='---'= (=UG/_/uganda.py:370=) and a code whose org label is blank is restored to ='---'= (=:310=); the string survives into the served =u= index.  Row D-FA-01. |
+| =crop_production= / plot transforms         | yes    | Rows D-CP-01..09, D-PF-01..08, D-PI-01..06, D-PL-01..03.  Build-time only; =harvest_kg= / =yield_kg= / =nitrogen_kg= etc. are framework transforms and out of scope here.                                                                           |
+
+* Table 1 -- derivations that reach a SERVED table (declared in =_/data_scheme.yml=)
+
+Kind vocabulary from the brief: scale / annualise / product / ratio /
+categorical->number / impute / encoding / selection / guard.  "borderline"
+is appended where the brief's exclusions could be read to cover it.
+
+| id      | wave(s)                        | table                 | served column / index value          | raw inputs (file.variable)                                                                                   | rule                                                                                                                                                       | kind                     | where                                                        | disclosed today?                                          | rows affected (if stated)                                    |
+|---------+--------------------------------+-----------------------+--------------------------------------+--------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------+--------------------------------------------------------------+-----------------------------------------------------------+--------------------------------------------------------------|
+| D-FA-01 | all 8                          | food_acquired         | index =u= = ='---'=                  | GSEC14A.h14aq3 / GSEC15b.untcd / GSEC15B.CEB03C (unit code)                                                  | NaN unit code -> ='---'=; org-table code with blank label -> ='---'=                                                                                       | encoding (index value)   | UG/_/uganda.py:370, :310                                     | docstring of =harmonized_unit_labels= only                | not stated                                                   |
+| D-FA-02 | 2018-19, 2019-20               | food_acquired         | =Price= (s=purchased)                | GSEC15B.CEB14a, CEB14b, CEB14c (market price at home / away / own)                                           | =Price = median(CEB14a, CEB14b, CEB14c)= row-wise; earlier waves carry a single =market= column (h15bq12 / h14aq12) served as-is                          | selection / impute       | UG/_/uganda.py:386-387; :508-509                             | none                                                      | not stated                                                   |
+| D-FA-03 | all 8                          | food_acquired         | =Quantity=, =Expenditure= (s=purchased) | h15bq4 + h15bq6 (qty home + away); h15bq5 + h15bq7 (value home + away)  [2005-06: h14aq4+h14aq6, h14aq5+h14aq7; 2018+: CEB06+CEB08, CEB07+CEB09] | =sum(min_count=1)= across the home / away consumption-location split                                                                                       | sum across raw fields    | UG/_/uganda.py:504-507                                       | docstring + data_scheme.yml comment + DESIGN doc          | not stated                                                   |
+| D-FA-04 | all 8                          | food_acquired         | =Price= (s=produced) / (s=inkind)    | h15bq13 / h14aq13 / CEB15 (farmgate)                                                                         | produced: =Price := farmgate=; inkind: =Price := NaN= (no valuation recorded)                                                                              | encoding                 | UG/_/uganda.py:510-516                                       | docstring                                                 | not stated                                                   |
+| D-FA-05 | all 8                          | food_acquired         | =Quantity=, =Expenditure=, =Price=   | (canonical rows)                                                                                             | keep rows with =Quantity>0 OR Expenditure>0=; duplicate canonical keys: sum Quantity/Expenditure (=min_count=1=), MEAN of Price                            | guard + selection (mean) | lsms_library/build_transforms.py:143-215 (called at UG/_/uganda.py:529) | docstring (GH #246, #251)                                 | not stated                                                   |
+| D-NF-01 | all 8                          | nonfood_expenditures  | =Expenditure=                        | GSEC15C.h15cq5 + h15cq7 + h15cq9 (purchased + own-production + gifts/in-kind)  [2005-06 GSEC14B.h14bq5/7/9; 2018+ GSEC15C.CEC05/07/09] | =sum(min_count=1)= of the three source columns, then sum over rows sharing a Preferred Label, keep => 0= only                                              | sum across raw fields + guard | UG/_/uganda.py:619-627                                       | data_scheme.yml comment; CONTENTS.org:2633-2700 (recall gap) | 76 reported zeros dropped in 2019-20, 0 elsewhere (CONTENTS) |
+| D-CF-01 | all 8                          | cluster_features      | =Region=, =Rural=, =District=, =Latitude=, =Longitude= | GSEC1 cover page (per household) + geovars                                                                   | project household rows to =(t, v)= with =reduce_to_agreed(on_conflict='na')=: agreed -> value; disagreement -> =<NA>= + warning; absence is not a conflict  | selection (borderline)   | UG/_/uganda.py:146-226                                       | docstring; CONTENTS.org:874-966                            | District <NA> 27.8% (2010-11) / 33.0% (2011-12); GPS 41-50%   |
+| D-CF-02 | 2005-06                        | cluster_features      | =Latitude=, =Longitude=              | 2009_UNPS_Geovars_0910.dta.lat_mod / lon_mod (the 2009-10 wave's geovar)                                     | 2005-06 has no GPS; the 2009-10 modified coordinates are joined on the panel HHID and served as the 2005-06 cluster location                                | impute (cross-wave)      | UG/2005-06/_/data_info.yml:105-117                           | YAML comment only; CONTENTS.org TODO at :1763 (phantom rows) | ~83% of 2005-06 HH match (YAML comment); 368 phantom rows (CONTENTS) |
+| D-SM-01 | 2009-10                        | sample, cluster_features | index =v= = ='@+lat,+lon'=          | GSEC1.comm (blank) + UNPS_Geovars_0910.dta.lat_mod / lon_mod                                                  | where =comm= is blank: =v = '@' + round(lat/0.05)*0.05 + ',' + round(lon/0.05)*0.05= (formatted =%+.2f=); neither -> <NA> and the row is dropped            | encoding (index value from GPS binning) | UG/2009-10/_/data_info.yml:93-100, :152-156; lsms_library/build_transforms.py:215-300 | CONTENTS.org:134-208                                       | 541 HH synthetic, 24 HH <NA>, 2 410 real =comm=              |
+| D-HR-01 | 2009-10 .. 2019-20 (7 waves)   | household_roster      | =Age=                                | GSEC2.h2q8 (age), h2q9a/b/c (day / month / year of birth)                                                    | day 99 / month DK,99 / year 9999 -> None; Age = =int(h2q8)= if 0..130 (helper) and 0..120 (age_handler); ELSE =INTERVIEW_YEAR - h2q9c= if 0..120; else NaN.  =INTERVIEW_YEAR= is a per-wave constant (2009, 2010, ...), not the interview date, so the fallback is off by up to a year.  DOB-fractional branch never fires (no interview_date passed). | selection + guard + difference of years | UG/_/_age_helpers.py:44-141; UG/<wave>/_/mapping.py; lsms_library/local_tools.py:2805-2960 | YAML comments ("reconstructing Age from year-of-birth"); NOT in CONTENTS.org | "closes the ~6-8% gap" (2013-14 YAML comment)                |
+| D-HR-02 | 2005-06                        | household_roster      | =Age=                                | GSEC2.h2q9                                                                                                   | scalar, served as-is -- listed only because the other 7 waves derive the same column (cross-wave difference)                                               | (none)                   | UG/2005-06/_/data_info.yml:12                                | n/a                                                       |                                                              |
+| D-PF-01 | all 8                          | plot_features         | =Area=                               | AGSEC2A.a2aq4 (GPS area, acres) else a2aq5 (farmer estimate, acres); 2B: a2bq4 / a2bq5; 2018+: s2aq4 / s2aq5 | prefer GPS, fall back to estimate; then => 2500 acres -> NA=; then =x 0.404686= (acres -> hectares)                                                        | selection + guard + scale | UG/_/uganda.py:910-920                                       | docstring only                                            | "8093 ha observed in 2005-06" (comment)                      |
+| D-PF-02 | all 8                          | plot_features         | =AreaUnit=                           | (none)                                                                                                       | constant ='acres'= wherever Area is non-NA -- BUT =Area= is served in HECTARES (D-PF-01).  Label and number disagree by 2.47x.                             | encoding (mislabel)      | UG/_/uganda.py:922-924                                       | docstring says "AreaUnit (str, always 'acres')" beside "Area (hectares)" -- stated, not reconciled | all rows                                                     |
+| D-PF-03 | all 8                          | plot_features         | =SelfReportedArea=                   | a2aq5 / a2bq5 / s2aq5 / s2aq05                                                                               | => 2500 acres -> NA=; =x 0.404686= (hectares).  No unit column for this one at all.                                                                       | guard + scale            | UG/_/uganda.py:930-935                                       | docstring ("WB: A2aq5 * 0.404686")                        | not stated                                                   |
+| D-PF-04 | 2009-10 .. 2019-20 (2A/2B vary) | plot_features         | =Irrigated=                          | water-source code (a2aq20 / a2bq19 / a2aq18 / a2bq16 ...) via =harmonize_water=                              | =Irrigated = (label == 'Irrigated')=; NA where label NA                                                                                                    | categorical->bool        | UG/_/uganda.py:963-971                                       | docstring                                                 | not stated                                                   |
+| D-PF-05 | 2009-10 .. 2019-20 (2A only)   | plot_features         | =PlotCertificate=                    | a2aq25 / a2aq23 / s2aq23                                                                                     | codes 1,2,3 -> True; 4 -> False; else NA                                                                                                                   | categorical->bool        | UG/_/uganda.py:979-986                                       | docstring ("WB: recode A2aq25")                           | not stated                                                   |
+| D-PF-06 | all 8                          | plot_features         | =PlotOwned=                          | acquire code a2aq8 / a2bq8 / s2aq8 + the source letter + PlotCertificate                                     | 2A: codes {1,2,6,7} -> True, {3,4,8,9} -> False, else NA; 2B: False (NA if no acquire code); THEN certificate==True overrides to True                       | categorical->bool + selection | UG/_/uganda.py:988-1015                                      | docstring ("WB: replace plot_owned = 1 if plot_certificate==1") | not stated                                                   |
+| D-PF-07 | 2011-12 .. 2019-20             | plot_features         | =ErosionProtection=                  | a2aq22a / a2bq20a / s2aq22a (numeric method code)                                                            | code 8 ('None') -> False; any other non-null code -> True                                                                                                  | categorical->bool        | UG/_/uganda.py:1027-1035                                     | docstring                                                 | not stated                                                   |
+| D-PF-08 | 2009-10, 2010-11               | plot_features         | =ErosionProtection=                  | a2aq24 / a2bq23 / a2aq24a / a2bq23a (free-text method-letter string)                                          | placeholder {'', '0', '-', '.', 'none'} -> NA; any other non-empty string -> True (never False)                                                             | categorical->bool        | UG/_/uganda.py:1036-1049                                     | docstring (explicitly diverges from WB encode-recode)     | not stated                                                   |
+| D-CP-01 | 2009-10                        | crop_production       | =Quantity=                           | AGSEC5A.a5aq6a, AGSEC5B.a5bq6a                                                                               | =Quantity == 99999 -> NaN= (exact value); rows left with no measure are then dropped                                                                        | guard                    | UG/_/uganda.py:1359-1360, :1718, :1723                        | code comment; CONTENTS.org:2455-2570 (#861); test          | 3 097 rows (1 400 A + 1 697 B); 3 077 of them dropped        |
+| D-CP-02 | 2015-16                        | crop_production       | =Value_sold=                         | AGSEC5A.a5aq8, AGSEC5B.a5bq8                                                                                 | =x 100=, guarded by =assert median(raw > 0) < 10 000=                                                                                                      | scale + guard            | UG/2015-16/_/crop_production.py:80-93                        | script block; CONTENTS.org:1909-2110 (#829, WAITING)      | 6 906 sale rows (3 898 A + 3 008 B)                          |
+| D-CP-03 | 2018-19 only                   | crop_production       | =KgFactor=                           | AGSEC5A.a5aq6d, AGSEC5B.a5bq6d                                                                               | =0 -> NaN= ("not recorded"); otherwise served raw (years like 2018 and 260 000 on a Kg row are left in; the framework screens them at read time)          | guard                    | UG/_/uganda.py:1431-1434; CROP_COLMAPS :1820, :1826           | data_scheme.yml; CONTENTS.org:1157-1232, :1865-1898         | non-null 7 134/7 153 (A) + 7 037/7 041 (B); 79 later screened |
+| D-CP-04 | 2009-10 .. 2019-20             | crop_production       | =harvest_month=                      | a5aq6e / s5aq06f_1 etc.                                                                                      | outside 1..12 -> NA                                                                                                                                        | guard                    | UG/_/uganda.py:1419-1420                                     | none                                                      | not stated                                                   |
+| D-CP-05 | 2011-12 .. 2019-20             | crop_production       | =intercropped=                       | AGSEC4A.a4aq3 / a4aq16 / s4aq16 (= "did you use any seed/seedlings?", 1 Yes 2 No)                             | =intercropped = (code == 2)=.  KNOWN DEFECT: the column named is the seed-use question, not the crop-stand question; served value means "did NOT use seed" | categorical->bool (mis-wired) | UG/_/uganda.py:1305-1309; :1699-1707                          | code comment; CONTENTS.org:1784-1822 (TODO)                | agrees with true crop-stand on 48.5-52.5% of rows            |
+| D-CP-06 | 2009-10 .. 2019-20             | crop_production       | index =u= = ='Unknown'=              | a5aq6c / a5bq6b / s5aq06b_1 ... (unit code) or no column (2018-19 5A)                                        | NA unit -> ='Unknown'= sentinel so the index level is never null                                                                                           | encoding (index value)   | UG/_/uganda.py:1504                                          | data_scheme.yml; CONTENTS.org:1088-1135                    | 7 153 rows in 2018-19 season A                               |
+| D-CP-07 | 2009-10 .. 2019-20             | crop_production       | index =condition= = ='unknown_condition'= | a5aq6b / a5bq6c / s5aq06c_1 ... (condition code)                                                            | NA or off-scheme condition -> ='unknown_condition'=                                                                                                        | encoding (index value)   | UG/_/uganda.py:1377-1378, :1507-1508                          | data_scheme.yml; CONTENTS.org:967-1135                     | 7 994 of 133 683 rows (6.0%); 23.2% in 2009-10               |
+| D-CP-08 | 2009-10 .. 2019-20             | crop_production       | =Quantity=, =Quantity_sold=, =Value_sold= / =KgFactor=, =harvest_month=, =intercropped= / =Unit_sold=, =Condition_sold= | duplicate index tuples                                                                                     | numerics SUMMED; =KgFactor= / month / flag =first()=; sold labels =reduce_to_agreed= -> NA on disagreement.  Three rules in one row.  Null =plot_id= rows are DELETED by =groupby(dropna=True)= | selection (borderline) + guard | UG/_/uganda.py:1516-1541                                     | code comment; CONTENTS.org:1899-1907, :2369-2410            | 431 null-plot rows / 7.1M native units deleted in 2009-10; 43 in 2011-12; 11 sold-label groups blanked |
+| D-CP-09 | 2019-20 (season A); 2018-19 (5B slot 2 NOT read) | crop_production | (rows)                              | s5aq06a_1 / _2 slots                                                                                          | two parallel condition slots emitted as separate rows; 2019-20 5B slot 2 and the 2019-20 =_11/_21= part-harvest slots are NOT read (coverage, not a value rule -- recorded for completeness) | (selection of inputs)    | UG/_/uganda.py CROP_COLMAPS 2018-19 / 2019-20                 | script docstrings; CONTENTS.org:1843-1863                  | 1 306 non-null conditions not read (2019-20 5B slot 2)       |
+| D-PI-01 | 2009-10 .. 2019-20             | plot_inputs           | (which rows exist)                   | AGSEC3A/3B used-flag (a3aq4 / a3aq14 / a3aq26 ...) or type / qty columns                                     | a block "applies" when used-flag == 1, OR (no used-flag column) when type or qty is non-null                                                                | selection                | UG/_/uganda.py:2027-2037                                     | docstring                                                 | not stated                                                   |
+| D-PI-02 | 2009-10 .. 2019-20             | plot_inputs           | =u= (organic / inorganic rows)       | (none)                                                                                                       | constant ='Kg'= -- the survey records no unit for fertilizer; kg is ASSUMED                                                                                | impute (default unit)    | UG/_/uganda.py:2044-2046                                     | code comment ("implicitly kg")                            | all organic / inorganic rows                                 |
+| D-PI-03 | 2009-10 .. 2019-20             | plot_inputs           | =Purchased=, =Improved=              | a3aq6 / a3aq17 / a3aq29 (1 Yes 2 No); a4aq13 seed type (1 Traditional 2 Improved)                             | 1 -> True, 2 -> False, else NA; seed type 2 -> True, 1 -> False                                                                                            | categorical->bool        | UG/_/uganda.py:1922-1929; :2104-2108                         | docstring                                                 | not stated                                                   |
+| D-PI-04 | 2009-10 .. 2019-20             | plot_inputs           | index =u= = ='Unknown'=, index =j= = ='n/a'= | (none)                                                                                                     | NA unit -> ='Unknown'=; fertilizer / pesticide rows get =j = 'n/a'= (no crop linkage)                                                                     | encoding (index value)   | UG/_/uganda.py:2153, :2160                                   | data_scheme.yml                                           | not stated                                                   |
+| D-PI-05 | 2009-10, 2010-11, 2011-12, 2018-19, 2019-20 | plot_inputs   | =Quantity=, =Quantity_purchased= / =Purchased=, =Improved= / =u= | duplicate index tuples                                                                                | numerics SUMMED; flags =max()=; =u= =first()=; null =plot_id= rows deleted                                                                                 | selection (borderline) + guard | UG/_/uganda.py:2215-2219                                     | long code comment (measured table)                        | 273 rows discarded of 84 489 (135 deleted, 138 merged); 8 groups sum distinct quantities |
+| D-PI-06 | 2009-10 .. 2019-20             | plot_inputs           | =input= (index)                      | inorganic type code 1..4, pesticide type 1..6, 96                                                            | =base + type=, 96 folds to 9 (a code composition, listed for completeness; decoding otherwise)                                                             | encoding (borderline)    | UG/_/uganda.py:1906-1919                                     | docstring                                                 |                                                              |
+| D-LS-01 | 2009-10 .. 2019-20             | livestock             | =HeadCount=, =HeadAcquired=, =HeadSold= | AGSEC6A/B/C per-line head counts (a6aq5 / a6aq3a / s6aq03a ...)                                             | roster lines for exotic / indigenous / male / female / age classes of one species are SUMMED to species                                                     | sum across raw rows      | UG/_/uganda.py:2542-2548                                     | docstring; data_scheme.yml ("sub-species detail recoverable from raw codes") | not stated                                                   |
+| D-LS-02 | 2009-10 .. 2019-20             | livestock             | =ValuePerAnimal=                     | a6aq6 (2009-10, 2010-11: "if you sold one today") / a6aq14b, s6aq14b (2011-12+: "average value of each sold") + HeadCount | HEAD-WEIGHTED MEAN of the per-line values (weights = HeadCount); fallback to plain mean where weights are 0/NaN.  Question CHANGES CONCEPT and coverage at 2011-12. | selection (weighted mean) | UG/_/uganda.py:2542-2555; LIVESTOCK_COLMAPS :2567-2634         | docstring; data_scheme.yml (question switch, non-null 96% -> 21%) | not stated                                                   |
+| D-LS-03 | 2009-10 .. 2019-20             | livestock             | (which rows exist)                   | head columns                                                                                                 | keep a species row only if any head measure > 0 (a reported value with no head is dropped)                                                                 | guard                    | UG/_/uganda.py:2534-2539                                     | docstring                                                 | not stated                                                   |
+| D-AN-01 | 2009-10 .. 2019-20             | anthropometry         | =Weight=, =Height=, =Age_months=     | GSEC6.h6q27 / h6q27a / s6q27a; h6q28a/b, s6q28a2/b2; h6q04 / h6q4                                            | =value <= 0 -> NA= on every measure -- including =Age_months=, so a legitimate 0-month infant becomes NA                                                   | guard                    | UG/_/uganda.py:2636-2652                                     | docstring (weight/height rationale; not the Age_months side effect) | not stated                                                   |
+| D-AN-02 | 2009-10 .. 2019-20             | anthropometry         | =Height=                             | h6q28a (lying length) / h6q28b (standing height)                                                             | =Height = lying if present else standing= -- two instruments folded into one column with no flag of which fired                                            | selection                | UG/_/uganda.py:2708-2711                                     | docstring ("mirroring the WB gen/replace")                | not stated                                                   |
+| D-AN-03 | 2009-10 .. 2019-20             | anthropometry         | (row)                                | duplicate (t, i, pid)                                                                                        | keep the row with the most non-null measures                                                                                                               | selection (borderline)   | UG/_/uganda.py:2733-2740                                     | docstring                                                 | not stated                                                   |
+| D-PL-01 | 2009-10 .. 2019-20             | plot_labor            | =PersonDays= (hired, other)          | a3aq42a/b/c (man / woman / child days) ; 2011-12 A3AQ47/48/49 (other)                                        | row-wise =sum(min_count=1)= of the man / woman / child cells                                                                                               | sum across raw fields    | UG/_/uganda.py:2933-2953                                     | docstring; data_scheme.yml                                | not stated                                                   |
+| D-PL-02 | 2013-14, 2015-16               | plot_labor            | =PersonDays= (family)                | a3aq33a_1 .. a3aq33e_1 (up to 5 per-worker day cells)                                                        | row-wise sum of the 5 cells; 2009-10 / 2010-11 / 2011-12 use ONE cell (a3aq39 / a3aq32); 2018-19 / 2019-20 emit no family rows                            | sum across raw fields    | UG/_/uganda.py:2862-2930 (LABOR_COLMAPS)                       | data_scheme.yml coverage block                            | not stated                                                   |
+| D-PL-03 | 2009-10, 2010-11 (family); all (hired) | plot_labor      | =PersonDays=                         | gate flags a3aq38 (family used, 0 = no) ; a3aq41 / a3aq34 / s3aq34 (hired used, 2 = no)                        | =PersonDays := 0= where the gate says "not used", regardless of the day cells                                                                             | guard (categorical->0)   | UG/_/uganda.py:2950-2953, :2987-2996                          | docstring ("mirroring the WB replace ... = 0 if flag==code") | not stated                                                   |
+| D-PL-04 | 2009-10 .. 2019-20             | plot_labor            | =PersonDays=, =Wage=                 | duplicate (t, i, plot_id, source, season)                                                                    | =max()= per key                                                                                                                                            | selection (borderline)   | UG/_/uganda.py:3036-3039                                     | code comment                                              | not stated                                                   |
+| D-EA-01 | 2009-10 .. 2015-16             | earnings              | =Earnings=                           | GSEC8.h8q31a + h8q31b + h8q45a + h8q45b (first job cash, first job in-kind, second job cash, second job in-kind) | summed over the 4 cells and over PERSONS in the household; window is "last seven days" (script comment only)                                              | sum across raw fields (cash + in-kind, 2 jobs, all members) | UG/<wave>/_/earnings.py:8-13                                 | script comment ("NB: Earnings here are for last seven days"); NOT in data_scheme / CONTENTS | not stated                                                   |
+| D-EA-02 | 2005-06                        | earnings              | =Earnings=                           | GSEC8.h8q8a + h8q8b (first job only)                                                                         | as D-EA-01 but second job "not elicited separately"                                                                                                        | sum across raw fields    | UG/2005-06/_/earnings.py:8-13                                | script comment                                            |                                                              |
+| D-EA-03 | 2018-19, 2019-20               | earnings              | =Earnings=                           | GSEC8.s8q78 + s8q80 (first job, second job)                                                                  | summed over 2 cells and persons; NO cash / in-kind split and NO window stated anywhere                                                                     | sum across raw fields    | UG/2018-19/_/earnings.py:7-12                                | none                                                      |                                                              |
+| D-EI-01 | all 8                          | enterprise_income     | =profits=, =losses=                  | GSEC12.h12q13 (revenue), h12q15 (wagebill), h12q16 (materials), h12q17 (other)  [2005-06 GSEC9.h9q11/13/14/15; 2018+ h12q10/12/13/14] | each column summed over ENTERPRISES per household; =profits = max(revenue - (wagebill+materials+other), 0)=; =losses = -min(same, 0)=                       | sum across rows + difference + clip | UG/<wave>/_/enterprise_income.py:15-21                        | none (data_scheme declares no columns)                    | not stated                                                   |
+| D-IN-01 | all 8                          | income                | =income=                             | var/earnings.Earnings + var/enterprise_income.profits                                                        | =Earnings + profits= with =fill_value=0=; then =0 -> NaN= and dropped (a household with zero total income has no row)                                       | sum across tables + guard | UG/_/income.py:11-35                                         | docstring; CONTENTS.org:1649-1684                           | 14 740 rows (up from 13 931 after #772)                     |
+| D-AS-01 | all 8                          | assets                | =Value=                              | GSEC14.h14q5 / h14q05 / GSEC12A.h12aq5, gated by h14q3 in {yes, yes individually, yes jointly}                | keep owned items; =0 -> NaN= and dropped                                                                                                                   | guard                    | UG/<wave>/_/assets.py:12-19                                  | none; CONTENTS.org:1685-1761 notes the wave path and the country script disagree in shape | not stated                                                   |
+| D-SH-01 | 2009-10, 2010-11, 2011-12      | shocks                | =Year=                               | GSEC16.h16q02a (month name), h16q02b (duration, months); GSEC1 interview year / month                         | shock year INFERRED: duration > 12 -> interview year - duration//12 (+1 if it ended before interview); == 12 -> interview year - 1 or - 2; < 12 -> interview year, or - 1 if shock month > interview month | difference of dates (inferred year) | UG/2009-10/_/shocks.py:29-55 (identical in 2010-11, 2011-12) | none -- not in CONTENTS.org at all                        | not stated                                                   |
+| D-SH-02 | 2009-10 .. 2019-20             | shocks                | =Onset=                              | shock month (+ Year, reported from 2013-14: h16q2y / s16q02y) ; GSEC1 interview year / month                  | =Onset = months between interview date (day forced to 1st) and shock start (day assumed 1st)=                                                              | difference of dates      | UG/<wave>/_/shocks.py (2009-10:56-58; 2013-14:21-26; 2018-19:25-30) | none                                                      | not stated                                                   |
+| D-SH-03 | 2005-06                        | shocks                | =Onset=, =AffectedIncome/Assets/Production/Consumption= | (none)                                                                                                     | constant NaN (question absent); =Year= is the reported h16q5                                                                                               | (cross-wave difference)  | UG/2005-06/_/shocks.py:67-78                                 | none                                                      |                                                              |
+| D-SH-04 | 2018-19                        | shocks                | =Year=                               | GSEC16.s16q02y                                                                                               | =20018 -> 2018=; rows with year == 1 dropped                                                                                                               | guard                    | UG/2018-19/_/shocks.py:15                                    | code comment ("fix erroneous year entries")               | not stated                                                   |
+| D-MF-01 | 2009-10                        | months_food_inadequate | =MonthsInadequate=                  | GSEC17.h17q10 (letter string A..L)                                                                           | count of DISTINCT month letters; forced 0 when h17q09 == No; NaN string -> 0                                                                               | categorical->number      | UG/2009-10/_/months_food_inadequate.py:19-30                 | script docstring; data_scheme.yml                         | not stated                                                   |
+| D-MF-02 | 2011-12, 2013-14, 2015-16      | months_food_inadequate | =MonthsInadequate=                  | GSEC17B / GSEC17_2 long file: h17q10a (Yes/No per month row)                                                 | count of rows flagged Yes per household; households with NO month rows -> 0 (=fillna(0)=); forced 0 when AnyInadequate == False                             | categorical->number + impute | UG/2011-12/_/months_food_inadequate.py:23-32 (same in 2013-14, 2015-16) | script docstring                                          | not stated                                                   |
+| D-MF-03 | 2010-11                        | months_food_inadequate | =MonthsInadequate=                  | (none)                                                                                                       | constant <NA> (no which-months follow-up that wave)                                                                                                        | (cross-wave difference)  | UG/2010-11/_/months_food_inadequate.py:23                    | data_scheme.yml                                           |                                                              |
+| D-ID-01 | 2010-11, 2011-12               | interview_date        | =Int_t=                              | GSEC1.year, month, day                                                                                       | =pd.to_datetime(..., errors='coerce')=: an impossible date (e.g. 31 April) -> NaT, then dropped by the country script's =dropna()=; other waves raise instead | guard (borderline)       | UG/2010-11/_/interview_date.py:20; UG/_/interview_date.py:33   | code comment ("3 instances in April have day as 31")      | 3 rows (2010-11 comment)                                     |
+| D-NU-01 | all 8                          | nutrition             | every nutrient column                | =food_quantities()= rows with =u == 'kg'= x =fct.parquet=                                                     | =n = Q @ FCT^T=: household kg per food (kg rows ONLY; native-unit rows silently excluded) times nutrient-per-kg; NaN -> 0 on both sides before the product  | product (matrix) + impute (NaN -> 0) | UG/_/nutrition.py:49-68                                      | none                                                      | not stated                                                   |
+| D-NU-02 | (country-level)                | fct                   | every nutrient column                | =nutrition.org= =fct= table (per 100 g) ; USDA FDC via =fct_addition= (per 100 g)                             | =x 10= (per 100 g -> per kg); =fillna(0)=; Energy backfilled from "Energy (Atwater General Factors)"                                                        | scale + impute           | UG/_/nutrition.org:2189-2191 (tangled to fct_uganda.csv); UG/_/fct_addition.py:44-78 | code comments                                             | not stated                                                   |
+| D-XX-01 | all (per table)                | food_acquired, crop_production, plot_inputs, livestock | (rows)                        | raw unit / crop / input-type / species codes vs the =u= / =harmonize_crop= / =harmonize_input= / =harmonize_species= org tables | a row whose raw code is ABSENT from the harmonization table is DELETED: food_acquired drops unknown unit codes (with a printed warning); crop_production drops rows with no crop label; plot_inputs drops rows with no input label; livestock drops rows with no species label.  Survey-recorded data vanishes because an org table is incomplete. | guard (deletion)         | UG/_/uganda.py:398-402; :1471; :2145; :2531                    | only the food_acquired site warns; none documented          | not stated                                                   |
+
+* Table 2 -- wave-parquet ONLY (script exists, table NOT declared in =_/data_scheme.yml=)
+
+| id      | wave(s) | parquet             | column            | raw inputs                                                     | rule                                                                                             | kind              | where                                        | disclosed?          |
+|---------+---------+---------------------+-------------------+----------------------------------------------------------------+--------------------------------------------------------------------------------------------------+-------------------+----------------------------------------------+---------------------|
+| O-PT-01 | all 8   | plots.parquet       | =acres=           | AGSEC4A.a4aq3 / a4aq8 / a4aq7 / s4aq07 (plot acres) x a4aq6 / a4aq9 / s4aq09 (% of plot under this crop) | =acres = acres * area_percentage / 100= when the percentage is reported, else the whole plot area | product / scale   | UG/<wave>/_/plots.py:7-11, :25                | none                |
+| O-PT-02 | all 8   | plots.parquet       | =area_units=      | (none)                                                         | constant ='ACRES'=                                                                               | encoding          | UG/<wave>/_/plots.py:20                       | none                |
+| O-ED-01 | all 8   | education_expenses.parquet | every fee column | GSEC4.h4q10a-f / h4q15a-g / h4q15h-k, h4q15g_1                | =0 -> NaN=; rows all-NaN dropped.  Note =Total Education Expenditure= (h4q15g) is served RAW beside its components, not re-summed | guard             | UG/<wave>/_/education_expenses.py:39-45       | none                |
+
+* Table 3 -- computed then discarded, and dead scripts (not counted)
+
+| what                                              | where                                    | status                                                                                                                                               |
+|---------------------------------------------------+------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------|
+| =unitvalue_home/away/own/inkind = value / quantity= | UG/_/uganda.py:390-393                   | computed in =food_acquired=, dropped by =food_acquired_to_canonical= (docstring: "ignored"); never reaches a parquet                                    |
+| =Kgs= (join of =conversion_to_kgs.json= on =u=)  | UG/_/uganda.py:404-410                   | same: dropped before the parquet.  CONTENTS.org:810-830 confirms "dead for the API"                                                                    |
+| =_/kg_per_other_units.py=                         | UG/_/kg_per_other_units.py               | DEAD: reads =var/food_acquired.parquet= columns (=market=, =Kgs=, index =m=) that the canonical parquet no longer carries; not in the Makefile =var= list |
+| =_/unitvalues.py=                                 | UG/_/unitvalues.py                       | DEAD: reads =var/food_quantities.parquet= / =food_expenditures.parquet=, which are runtime-derived and not materialized (Makefile comment lines 11-18) |
+| =_/regions_are_markets.py=                        | UG/_/regions_are_markets.py              | DEAD: reads =var/other_features.parquet= (obsolete per CLAUDE.md)                                                                                      |
+| =_/nonfood_label.py= (tangled from nonfood_label_make.org) | UG/_/nonfood_label.py            | label-table generator; no numeric derivation                                                                                                           |
+
+* Notes per derivation
+
+** D-FA-01 -- =u='---'=
+The brief asked for a =u='Value'= encoding; Uganda has none.  What Uganda does
+have is a sentinel that carries less information than =Value= would: ='---'=
+means "the unit code was missing OR the code exists but the org table gives it
+no label".  The two cases are indistinguishable in the served index.  The raw
+code is recoverable only from the source file.
+
+** D-FA-02 -- purchased Price is a median of three market prices in 2018-19 / 2019-20
+The 2018+ GSEC15B asks the market price separately for food consumed at home,
+away and from own production (CEB14a/b/c).  =food_acquired= collapses them
+with a row-wise median (=df.filter(regex='^market').median(axis=1)=) into one
+=market= column, which becomes the served =Price= on purchased rows.  Earlier
+waves ship one market price.  So =Price= means "the survey's market price" in
+six waves and "the median of up to three market prices" in two; nothing in the
+frame says which.  Raw inputs recoverable only from the source file.
+
+** D-FA-03 -- home + away folded into purchased
+The home / away split is a CONSUMPTION-LOCATION split, folded into one
+acquisition source.  Expenditure-only rows (away-from-home meals with no
+quantity) are kept with NaN Quantity.  Documented in the DESIGN doc and
+data_scheme.yml.
+
+** D-FA-05 -- shared finalizer
+Duplicate canonical keys (e.g. two "Other (Specify)" items under one label)
+are summed; =Price= is averaged.  A row's =Price= may therefore be a mean of
+two survey prices with no flag.
+
+** D-NF-01 -- item-specific recall windows summed
+CONTENTS.org:2672-2700 establishes that the source labels carry a CAPI
+=[RECALL]= fill that VARIES BY ITEM and that no wave ships the window.  The
+served =Expenditure= sums purchased + own-production + gifts over that unknown
+window, per item.  This is the closest Uganda case to the GhanaLSS 12B
+motivation: two households' rows for different items are on different
+windows and nothing in the frame says so.  The gap is recorded as WAITING.
+
+** D-CF-02 -- 2005-06 GPS borrowed from 2009-10
+=2005-06/_/data_info.yml= joins =2009_UNPS_Geovars_0910.dta= (the 2009-10
+geovar) on HHID and serves its =lat_mod= / =lon_mod= as the 2005-06 cluster
+location, on the stated assumption that "cluster location is geographically
+stable".  This is an imputation from a different wave, four years later,
+of jittered coordinates.  Only the YAML comment says so; CONTENTS.org mentions
+2005-06 cluster_features only as a phantom-row TODO (:1763).
+
+** D-SM-01 -- synthetic =v=
+An INDEX VALUE computed from GPS by rounding to a 0.05-degree grid.  The
+=@= prefix is the only disclosure in the served frame.  Recoverable from the
+geovar file, not from the served table (rounding).
+
+** D-HR-01 -- Age, and why the fractional branch cannot fire
+=age_handler(age, d, m, y, interview_year=INTERVIEW_YEAR)= is called with no
+=interview_date=, so =final_interview_date= stays None and =dob_age= is never
+computed (local_tools.py:2871-2930).  The decision tree that remains is:
+plausible reported age -> =int(age)=; else valid year of birth ->
+=INTERVIEW_YEAR - year=; else NaN.  Consequences: (a) the served Age is always
+an integer for Uganda -- CLAUDE.md's "fractional years when DOB is available"
+does not apply here; (b) the day and month of birth are cleaned by
+=_age_helpers= and then unused; (c) the fallback uses the wave's nominal year,
+not the household's interview date, so a person born in December and
+interviewed in the following calendar year gets an age one year too high
+relative to the interview.  A =Derivation= key could name the rule ("reported
+else year-difference") but not which branch fired per row.  This is an
+inference from reading the call path; it was not executed.
+
+** D-PF-01 / D-PF-02 / D-PF-03 -- Area in hectares, AreaUnit says acres
+=Area = area_acres * 0.404686= and =AreaUnit = 'acres'= are written in
+adjacent lines (uganda.py:920-924).  The docstring states both facts
+("Area (hectares, float), AreaUnit (str, always 'acres')") without noticing
+they contradict.  A consumer who trusts =AreaUnit= is off by 2.47x.
+=SelfReportedArea= is also in hectares and has no unit column at all.  Which
+of the two raw candidates (GPS vs estimate) produced =Area= is not flagged.
+The 2 500-acre clamp is a judgement call with one motivating observation.
+
+** D-PF-06 -- PlotOwned is three rules
+Acquire-code buckets differ by wave (the 2018+ merged code list adds 6/7 owned,
+8/9 not), AGSEC2B parcels are False by construction, and a certificate
+overrides everything.  Raw inputs recoverable only from the source.
+
+** D-PF-07 / D-PF-08 -- ErosionProtection derived two ways
+Numeric-code waves: 8 -> False, else True.  String waves (2009-10, 2010-11):
+non-placeholder -> True, placeholder -> NA, never False.  So a "no facility"
+answer is False in 2011+ and NA in 2009-11.  Same column, two meanings.
+
+** D-CP-01 -- 99999
+Exact-value strip, wave-scoped by the colmap.  3 077 of the 3 097 sentinel
+rows carry no other measure and are dropped by the "no measure" filter, so
+the served effect is mostly a row count change.  CONTENTS records the
+before/after.
+
+** D-CP-02 -- 2015-16 x100
+The only SCALE correction in Uganda.  Defensible and measured (three
+independent lines of evidence in the script block), but the correctness
+of the served number depends on a build-time assertion about the raw
+median, i.e. on the file the World Bank happens to ship.  The registry
+design needs a slot for "the rule is conditional on the input's state".
+
+** D-CP-03 -- KgFactor
+Served raw except =0 -> NaN=.  Garbage values (=2018=, 260 000 on a Kg row)
+are left in the served column by design; the framework's
+=_screen_reported_factors= rejects them at read time inside =harvest_kg=
+without altering the served column.  Wired for 2018-19 only, although every
+wave ships the field (CONTENTS.org:1865-1898) -- so =KgFactor= is NaN for
+reasons that differ by wave (not wired vs not reported).
+
+** D-CP-05 -- intercropped
+The served boolean is =seed-use == No=, not intercropping.  CONTENTS records
+48-53% agreement with the true crop-stand question and leaves it as a TODO
+because rewiring moves data.  Of every derivation in this file this is the one
+whose served meaning is furthest from its name.
+
+** D-CP-08 / D-PI-05 -- three reducers in one row
+When duplicate index tuples collapse, one row can carry a summed Quantity, a
+=first()= KgFactor (a RATE, so summing would be wrong) and a
+=reduce_to_agreed= label that was blanked.  The derivation differs PER CELL,
+not per row.  Null =plot_id= rows are deleted outright by the groupby.
+
+** D-PI-02 -- fertilizer unit assumed Kg
+No unit is asked for organic / inorganic fertilizer; the builder stamps
+='Kg'=.  The served =u= is indistinguishable from a reported Kg.
+
+** D-LS-02 -- ValuePerAnimal
+A head-weighted mean across roster lines that map to one species (e.g.
+exotic and indigenous cattle), falling back to a plain mean, of a question
+that changes from "if you sold one today" (2009-11, ~96% non-null) to
+"average value of each sold" (2011+, ~21% non-null).  Neither the
+weighting nor the concept switch is visible in the served frame; the
+data_scheme comment discloses the switch, the docstring the weighting.
+
+** D-AN-01 -- the =<= 0 -> NA= guard reaches Age_months
+=_anthro_num= is applied to =Age_months= too, so a 0-month-old is served NA.
+Not mentioned anywhere.
+
+** D-EA-01..03 -- Earnings
+Cash + in-kind, first + second job, summed over all persons in the household,
+over a 7-day window that is stated only in a script comment, and only for
+2005-06 .. 2015-16.  2018-19 / 2019-20 sum =s8q78 + s8q80= with no comment on
+window or cash/in-kind coverage; whether those fields are the same concept is
+not established anywhere in the repo.  =data_scheme.yml= declares
+=Earnings: float= and nothing else.  Second-strongest 12B analogue after
+D-NF-01: a monetary column whose window is undisclosed at the API and may
+differ by wave.
+
+** D-EI-01 -- profits / losses
+=max(revenue - costs, 0)= and =-min(..., 0)= after summing each component over
+enterprises.  A household with one profitable and one loss-making enterprise
+has the loss netted into the profit before the clip.  =data_scheme.yml=
+declares no columns for this table.
+
+** D-IN-01 -- income
+Sum of two derived tables; zero totals are DELETED (no row), so absence of a
+household means "no income" or "not surveyed" indistinguishably.
+
+** D-SH-01 / D-SH-02 -- shock Year and Onset
+The 2009-10 .. 2011-12 questionnaires record a shock's month and duration but
+no year, so the year is INFERRED by a branchy rule from the interview date and
+the duration; =Onset= (months since the shock started) is then a difference of
+two dates both forced to the 1st of the month.  None of this is documented
+outside the scripts; CONTENTS.org has no shocks entry.  The rule is identical
+across the three waves (copy-pasted), and from 2013-14 the year is reported.
+
+** D-MF-01 / D-MF-02 -- MonthsInadequate
+Two source shapes (letter string vs long Yes/No rows) reduced to one count;
+households absent from the month file get 0, not NA, in 2011+.
+
+** D-NU-01 -- nutrition
+A matrix product over every kg-row of =food_quantities= (native-unit rows are
+dropped without notice) and an FCT whose missing nutrients were set to 0.
+The served nutrient is therefore a lower bound in two independent ways.  The
+raw inputs are the whole food table; no per-row provenance is possible.
+
+* Closing
+
+** Counts by kind (Table 1 only)
+
+A row carrying two kinds is listed under EVERY kind it carries, so the
+buckets sum past the row count (61).  Each line's count equals the ids on it.
+
+| kind                                   | rows | ids                                                                                   |
+|----------------------------------------+------+---------------------------------------------------------------------------------------|
+| sum across raw fields / rows / tables  |   10 | D-FA-03, D-NF-01, D-LS-01, D-PL-01, D-PL-02, D-EA-01, D-EA-02, D-EA-03, D-EI-01, D-IN-01 |
+| guard (sentinel / clip / range / drop) |   18 | D-FA-05, D-NF-01, D-CP-01, D-CP-02, D-CP-03, D-CP-04, D-CP-08, D-PI-05, D-LS-03, D-AN-01, D-AS-01, D-SH-04, D-ID-01, D-PL-03, D-PF-01, D-PF-03, D-IN-01, D-XX-01 |
+| selection (choose among candidates)    |   12 | D-FA-02, D-CF-01, D-HR-01, D-PF-01, D-CP-08, D-PI-01, D-PI-05, D-LS-02, D-AN-02, D-AN-03, D-PL-04, D-PF-06 |
+| categorical -> number / bool           |    9 | D-PF-04, D-PF-05, D-PF-07, D-PF-08, D-CP-05, D-PI-03, D-MF-01, D-MF-02, D-PL-03       |
+| encoding (sentinel index values, labels) |    8 | D-FA-01, D-FA-04, D-PF-02, D-CP-06, D-CP-07, D-PI-04, D-PI-06, D-SM-01                |
+| impute / default / cross-wave borrow   |    6 | D-FA-02, D-CF-02, D-PI-02, D-MF-02, D-NU-01, D-NU-02                                  |
+| scale                                  |    4 | D-CP-02, D-PF-01, D-PF-03, D-NU-02                                                    |
+| difference of dates / years            |    3 | D-SH-01, D-SH-02, D-HR-01                                                             |
+| product                                |    1 | D-NU-01 (plus O-PT-01 in Table 2)                                                     |
+| annualise / ratio                      |    0 | none served.  Ratios (=unitvalue_*=) are computed and discarded (Table 3).            |
+| cross-wave-difference placeholders     |    3 | D-HR-02, D-SH-03, D-MF-03                                                             |
+
+Total Table 1: 61 rows = 57 derivations + 3 cross-wave placeholders
+(D-HR-02, D-SH-03, D-MF-03) + 1 input-coverage note (D-CP-09).  Table 2: 3.
+Table 3: 2 discarded + 3 dead scripts.  Waves: every one of the 8 has at
+least one derivation on a served table.
+
+** The five cases where the served number is furthest from the raw answer
+
+1. =crop_production.intercropped= (D-CP-05) -- served True means "did not use
+   seed", the column name says intercropped; agreement with the real question
+   is a coin flip.  Documented as a TODO, undisclosed in the frame.
+2. =plot_features.Area= / =AreaUnit= (D-PF-01/02) -- the number is hectares,
+   the unit column says acres, on every row of every wave.  Documented in the
+   docstring without noticing the contradiction.
+3. =nonfood_expenditures.Expenditure= (D-NF-01) -- three sources summed over an
+   item-specific recall window that is not in the extract; the true 12B shape.
+   Documented as WAITING.
+4. =earnings.Earnings= (D-EA-01..03) -- cash + in-kind + two jobs + all
+   members over a 7-day window stated only in a script comment, and not at all
+   for 2018-19 / 2019-20 whose source fields may not be the same concept.
+5. =household_roster.Age= (D-HR-01) -- documented as "reconstructed from date
+   of birth via age_handler"; what actually runs is "reported age, else nominal
+   wave year minus birth year".  The documented mechanism (DOB-fractional) is
+   unreachable.  Honourable mention: =livestock.ValuePerAnimal= (D-LS-02), a
+   head-weighted mean of a question whose concept changes at 2011-12; and
+   =shocks.Year= (D-SH-01), inferred by a branchy rule with no documentation.
+
+** Where two waves of Uganda derive the same column differently
+
+| column                              | waves and rules                                                                                                                       |
+|-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------|
+| household_roster.Age                | 2005-06 scalar h2q9; 2009-10+ reported-else-year-difference (D-HR-01/02)                                                              |
+| food_acquired.Price (purchased)     | 2005-06..2015-16 single market price; 2018-19/2019-20 median of three (D-FA-02)                                                       |
+| earnings.Earnings                   | 2005-06 first job only; 2009-10..2015-16 two jobs x (cash + in-kind), 7 days; 2018+ two fields, window unknown (D-EA-01..03)          |
+| livestock.ValuePerAnimal            | 2009-10/2010-11 "sell one today"; 2011-12+ "average value of each sold" (D-LS-02)                                                     |
+| shocks.Year                         | 2005-06 reported h16q5; 2009-10..2011-12 inferred from month+duration+interview; 2013-14+ reported (D-SH-01/03)                        |
+| shocks.Onset                        | 2005-06 NaN; others derived (D-SH-02/03)                                                                                              |
+| months_food_inadequate.MonthsInadequate | 2009-10 count of letters; 2010-11 <NA>; 2011-12+ count of Yes rows with fillna(0) (D-MF-01/02/03)                                 |
+| plot_labor.PersonDays (family)      | 2009-10/2010-11 one cell + used-gate; 2011-12 one cell, no gate; 2013-14/2015-16 sum of 5 cells; 2018+ absent (D-PL-02/03)            |
+| plot_features.ErosionProtection     | 2009-10/2010-11 string rule (True or NA); 2011-12+ code rule (True or False) (D-PF-07/08)                                             |
+| plot_features.PlotOwned             | pre-2018 codes {1,2} owned; 2018+ codes {1,2,6,7} owned (D-PF-06)                                                                     |
+| crop_production.Quantity            | 2009-10 99999 stripped; other waves untouched (D-CP-01)                                                                               |
+| crop_production.Value_sold          | 2015-16 x100; other waves raw (D-CP-02)                                                                                               |
+| crop_production.KgFactor            | 2018-19 wired; other waves all-NaN though the field exists (D-CP-03)                                                                  |
+| crop_production.intercropped        | 2009-10/2010-11 all NaN; 2011-12+ seed-use flag (D-CP-05)                                                                             |
+| interview_date.Int_t                | 2010-11/2011-12 invalid dates coerced to NaT and dropped; other waves would raise (D-ID-01)                                            |
+| cluster_features GPS                | 2005-06 borrowed from the 2009-10 geovar; other waves own geovar; 2019-20 none (D-CF-02)                                              |
+| sample.v / cluster_features.v       | 2009-10 hybrid comm-or-GPS-bin; other waves a single source (D-SM-01)                                                                 |
+
+** What would not fit a per-row =Derivation= column + registry
+
+1. Per-CELL, not per-row, derivations.  A collapsed =crop_production= row
+   carries a summed Quantity, a =first()= KgFactor and a =reduce_to_agreed=
+   Unit_sold at once (D-CP-08); =plot_inputs= sums, maxes and firsts in one
+   row (D-PI-05); =livestock= sums heads and weight-averages the value
+   (D-LS-01/02).  One key per row cannot name three rules.
+2. INDEX VALUES.  =u='---'=, =u='Unknown'=, =condition='unknown_condition'=,
+   =j='n/a'=, =v='@+0.35,+32.60'= are derivations of the KEY, not of a column;
+   a column keyed to the row cannot annotate the row's own address.
+3. Per-row branch selection with no per-row trace.  Age (reported vs
+   year-difference), Area (GPS vs estimate), Height (lying vs standing),
+   ValuePerAnimal (weighted vs plain mean), purchased Price (single vs median
+   of three) -- a registry key names the rule; recovering WHICH candidate fired
+   needs a second per-row field or the raw file.
+4. Inputs that are a SET OF ROWS elsewhere.  =shocks.Onset= needs the
+   household's GSEC1 interview date; =income= needs two other tables;
+   =nutrition= is a matrix product over every food row and an FCT; 2005-06 GPS
+   comes from a different wave's file.  "A callable that retrieves the exact
+   raw inputs" is fine, but the inputs are not a row.
+5. Conditional-on-data rules.  The 2015-16 x100 is applied only if the raw
+   median is under 10 000 (D-CP-02); the recall window of D-NF-01 is unknown
+   per item.  The registry needs to say "conditional" and "unknown" as first-
+   class states, not just name a formula.
+6. Derivations that are DELETIONS.  Zero incomes, zero asset values, null
+   plot_id rows, no-measure rows, rows whose raw code is missing from an org
+   table (D-XX-01): the served frame has no row to hang a
+   =Derivation= on.
+
+** Contradictions with CONTENTS.org / CLAUDE.md found while sweeping
+
+- CONTENTS.org:810 says =conversion_to_kgs.json= is "built dynamically by
+  =_/kg_per_other_units.py=".  The script READS =conversion_to_kgs.json= and
+  WRITES =kgs_per_other_units.json=, from a =var/food_acquired.parquet= whose
+  =market= / =Kgs= / =m= no longer exist.  Both the sentence and the script are
+  stale; the json is a hand-curated answer key (as :823-830 already says).
+- CLAUDE.md "age_handler returns fractional years when DOB is available":
+  true of the function, unreachable for Uganda (D-HR-01), because no Uganda
+  code passes an interview date.  Every Uganda YAML comment describing Age as
+  "reconstructed from year-of-birth" is accurate only for the fallback branch.
+- =plot_features_for_wave= docstring: "Area (hectares)" and "AreaUnit always
+  'acres'" are both true statements of a wrong served pair (D-PF-02).
+
+** Idiosyncrasies discovered that CONTENTS.org does not record (per brief: report, do not edit)
+
+- shocks: the inferred-year rule (D-SH-01) and Onset construction (D-SH-02);
+  no shocks section exists in CONTENTS.org.
+- earnings: the 7-day window and the cash+in-kind, two-job, all-member sum;
+  and the unstated concept for 2018-19 / 2019-20 (D-EA-01..03).
+- enterprise_income: profit/loss netting and clip (D-EI-01).
+- plot_features: AreaUnit / hectares mismatch (D-PF-02); ErosionProtection
+  True-or-NA vs True-or-False across waves (D-PF-07/08).
+- anthropometry: =<= 0 -> NA= applied to Age_months (D-AN-01).
+- food_acquired: median-of-three market price in 2018+ (D-FA-02); ='---'=
+  sentinel semantics (D-FA-01).
+- household_roster: Age fallback uses the nominal wave year (D-HR-01).
