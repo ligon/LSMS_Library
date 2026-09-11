@@ -387,6 +387,36 @@ Two things remain outside the column and live in the registry alone:
   script path -> False, and the Makefile still builds the script) is a
   defect to fix, not a derivation to label.
 
+** Filed / adjudicated 2026-09-11 (one issue per defect, @ligon)
+
+Filed: #871 (collapse reducers' per-column =first= composites a
+conflicting group), #872 (Uganda =crop_production.intercropped= is
+wired to the seed-use question), #873 (=recall.merge_attrs= and
+=derivations.merge_attrs= have no caller, so =Feature()= drops both
+=attrs=), #874 (Ethiopia =produced= is =clip(Q2 - Q3, 0)=, not the
+own-production question), #875 (Ethiopia =shocks=: YAML and script
+map =Increase= oppositely), #876 (all 12 EHCVM waves serve
+=s07bq08= "value of the last purchase" as =Expenditure=), #877 (Niger
+2011-12 labour hours divide a weekly figure as if monthly), #878
+(Malawi grams x0.01 constant -- dead in every wave, a landmine).
+
+NOT filed, and the list above is corrected by this: the
+=Guinea-Bissau/_/guinea-bissau.py= claim is FALSE -- =_slugify=
+(=country.py:366=) has no call site, every loader builds
+=f"{name.lower()}.py"=, the module loads and the =interview_date= hook
+ran (warm =var/interview_date.parquet= is =(t, i, visit)= with start
+and end, 16,053 rows).  GhanaSPS =MonthsAway= NaN -> 0 is a disclosed,
+evidenced decision (=2009-10/_/data_info.yml:63-133=,
+=data_scheme.yml:43-50=); what is stale is =GhanaSPS/_/CONTENTS.org:594-650=,
+which still says wave 1 is "not wired".  Tajikistan =Area= x100 is
+false (nothing multiplies; =AreaUnit='sotka'= is stamped and
+disclosed) -- the real defect is framework-grain: =data_info.yml:313-318=
+declares =Area= "in hectares" while 11 of 22 countries serve another
+unit.  Nigeria W4's 30-day last-purchase pairing is a recorded decision
+(=Nigeria/_/CONTENTS.org:50-63=, "worth revisiting as its own issue").
+Malawi's sale-unit drop was fixed 2026-09-08 (=Malawi/_/CONTENTS.org:139-160=);
+Niger's is #824.
+
 ** Defects surfaced by the census, to file separately
 
 Each of the 12B-shaped cases above is a candidate issue independent of

@@ -262,6 +262,16 @@ food_acquired on v will see spatial variation only at Woreda level for R1-R4.
 | Serbia | Serbia/_/serbia.py:6 | (module is empty apart from a ligonlibrary import that would fail) | Makefile prerequisite only |
 | Guinea-Bissau | Guinea-Bissau/_/guinea-bissau.py (hyphen) | interview_date hook (melt_visit_intervals) | the framework imports modules by =name.lower().replace('-', '_')= (country.py:367), so only guinea_bissau.py loads; the hyphen file's interview_date hook is unreachable.  Aside, not a derivation: the live module has no interview_date hook although data_scheme declares the (t,i,visit) table |
 
+CORRECTION (2026-09-11, verified at development 975f34f23): the
+Guinea-Bissau row above is wrong.  =_slugify= at =country.py:366= has
+no call site; =formatting_functions= (=country.py:1879=), =waves=
+(=:1961=) and the =cmod= cache-hash input (=:3204=) all build
+=f"{self.name.lower()}.py"= = =guinea-bissau.py=, which loads.
+=interview_date= is present in =Country('Guinea-Bissau').formatting_functions=
+and the warm =var/interview_date.parquet= carries the hook's output
+(=(t, i, visit)=, 16,053 rows).  =guinea_bissau.py= (underscore) is the
+=plot_features= helper.
+
 * 5. Closing
 
 ** Counts by kind (rows 1-65, each row counted once under its first-named kind)
