@@ -72,11 +72,19 @@ def _frame(rows, *, with_kgfactor=True):
 
 
 def _legacy_harvest_kg(df):
-    """The pre-change algorithm, spelled out: Quantity x inferred factor."""
+    """The pre-change algorithm, spelled out: Quantity x inferred factor.
+
+    The frames here are keyed with the legacy ``plot`` spelling (Uganda's);
+    ``harvest_kg`` emits the canonical ``plot_id`` whichever it was handed
+    (@ligon, 2026-09-10), so the reference implementation renames to match.
+    That is a level NAME, not a value -- ``assert_frame_equal`` still compares
+    every key and every kilogram.
+    """
     qty = pd.to_numeric(df["Quantity"], errors="coerce")
     kg = qty * _kg_factor_series(df)
     out = pd.DataFrame({"Harvest_kg": kg}).replace(0, np.nan).dropna()
-    return out.groupby(["t", "i", "plot", "j"]).sum()
+    res = out.groupby(["t", "i", "plot", "j"]).sum()
+    return res.rename_axis(index={"plot": "plot_id"})
 
 
 # ---------------------------------------------------------------------------
@@ -523,6 +531,29 @@ def test_uganda_harvest_kg_baseline():
     the frame) and the two screen/join diagnostics ride beside it -- so every
     key is present on every call.  NO NUMBER MOVED; this call passes no
     ``shipped_factors`` table and Uganda has none to pass.
+
+    2026-09-09, GH #850 defect (c) -- NUMBERS MOVED, deliberately, and only
+    on the ``none`` -> ``inferred`` boundary.  Uganda's harvest units include
+    ``Jerrican (5 lts)``, ``Cup/Mug(0.5lt)``, ``Sack (100 kgs)`` and the rest
+    of that family: labels that STATE their kilograms in a spelling
+    ``_parse_explicit_metric``'s word boundary forbade, so ``_kg_factor_series``
+    returned NaN for them and 58,831 rows fell to the ``none`` layer.  Reading
+    the label moves those rows to ``inferred`` (88,352 -> 29,521 none;
+    28,147 -> 86,978 inferred), and ``harvest_rows`` 36,095 -> 78,532 with a
+    total of 10.87e6 -> 28.68e6 kg.
+
+    ``reported`` (14,050) and ``survey_median`` (57) do NOT move: they outrank
+    ``inferred``, so a label the vocabulary newly reads changes nothing on a
+    row whose own enumerator wrote a factor down.  That is also why the move
+    is 58,831 rows and not the 62,321 that carry an affected label.
+
+    A side effect worth naming rather than discovering later: the disagreement
+    audit's ``reported_vs_inferred`` pair count goes 1,896 -> 5,370 and its
+    disagreement share 5.4% -> 34.1%.  The newly-covered labels are VOLUME
+    containers, and ``volume_as_mass=True`` reads a 5-litre jerrican as 5 kg
+    where the enumerator recorded what the grain in it actually weighed.  The
+    audit is doing its job; the gap is the specific-gravity assumption, not
+    the vocabulary.
     """
     import lsms_library as ll
 
@@ -530,9 +561,9 @@ def test_uganda_harvest_kg_baseline():
     assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
     assert len(cp) == 130_606
-    assert len(res) == 36_095
-    assert res["Harvest_kg"].sum() == pytest.approx(10_868_272.24500081, rel=1e-9)
+    assert len(res) == 78_532
+    assert res["Harvest_kg"].sum() == pytest.approx(28_680_848.595393997, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
         "reported": 14_050, "shipped": 0, "survey_median": 57,
-        "inferred": 28_147, "none": 88_352, "reported_implausible": 99,
+        "inferred": 86_978, "none": 29_521, "reported_implausible": 99,
         "shipped_implausible": 0, "shipped_matched": 0}

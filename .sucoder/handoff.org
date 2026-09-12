@@ -1,97 +1,48 @@
-#+TITLE: Handoff -- 2026-09-06
-#+TODO: TODO WAITING | DONE
+#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
-* State
-- Branch :: =development=, HEAD =7b298633=, pushed, nothing local outstanding.
-- CI on development :: =unit-tests= *green*.  =dvc-remote-reachability= *red*,
-  correctly -- see "Decisions waiting on a human" below.
-- Coverage matrix :: 37/37 shards built in
-  =/global/scratch/fsa/fc_jevons/ligon/coverage-refresh/slurm_logs/matrix_full/shards/=.
-  *Not aggregated and not promoted* -- standing instruction is that a full
-  refresh is reviewed before it replaces =.coder/coverage/latest.csv=.
+* State (2026-09-12, evening)
+- =development= published through 0f4eff9a7 on the mirror AND pushed to
+  GitHub; draft release PR development -> master is open (v0.12.0) with
+  the verified Closes list (=docs/releases/v0.12.0-closes.txt=); notes at
+  =docs/releases/v0.12.0.md=.  Merge with a merge commit, then tag v0.12.0
+  on master and =gh release create= (release skill; verify the publish
+  workflow fired).
+- Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
+  #872, #873, #874, #876, #871 (most-complete observed row at all three
+  collapses; reverses the 2026-07-13 completion doctrine), plus the
+  derivations user guide + CLAUDE.md section, the #871 census
+  (=bench/grain_census_871.py=), and the release notes.
+- Filed, open: #879-#884.  Follow-ups from #871: #866 (rule-less var/
+  targets do not rebuild on a hash move) was worked around by evicting
+  the 18 affected parquets and rebuilding; the fix is still open.
+- Caches: the WHOLE corpus was re-warmed after #871 (both tiers, from
+  L1), 36 countries + the two space-named ones + the 18 #866 tables; 0
+  build errors except Peru's known-absent cells.  Logs:
+  =/local/job38714904/tmp/claude-43292/rewarm_all/= (node-local; gone
+  with the job).
+- Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
+  #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
+  see the PR's status.  Recipe: CLAUDE.md addendum 3b.
+- Coverage regrade (=make matrix=) NOT run: it cold-builds and would not
+  fit the job; due before or right after the release.
 
-* Merged today
-=#786= currency docstrings; =#779= community_prices scoping; =#785= GhanaLSS
-label canonicalisation (collision groups 35 -> 0, nutrition FCT 88.26% ->
-94.71%, closing =#782=).
+* Open questions for @ligon
+- All merged refs deleted (mirror and local).  #879-#884 filed for the
+  remaining findings; #871 parked.
+- Coverage regrade is due for: Uganda crop_production (all 7 waves),
+  Ethiopia food_acquired (all 5), the 12 EHCVM food_acquired cells,
+  Niger people_last7days (both waves), Ethiopia shocks.  =make matrix=
+  was not run today.
+- Design follow-ons recorded in =SkunkWorks/derived_values.org=:
+  =Feature()= re-attach of =attrs['derivations']= (with #873), derived
+  table attrs, retrofit of the census sites, NSO request for GLSS
+  visit dates (=slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=).
+- ~350 in-tree workspace copies of DVC-tracked files in the main
+  clone (not the worktrees) -- the library warns; cleanup command in
+  =CLAUDE.md= ("A *.parquet inside countries_root() is never read");
+  not run.
 
-* Open PRs -- all four are STALE-RED, not broken
-Every one failed on three =TestPushToCache= tests, which was my regression
-(=59d3ea99= swapped =subprocess.run= for =_run_dvc=/Popen; the mocks patched
-the old target).  Fixed on development in =05743707=.  Two further
-development-level failures were also fixed: =3f526875= (generated
-=data-methods.md= lagged #786's docstring correction) and =121aa5e8= (the S3
-refresh test inherited its precondition from ambient machine state instead of
-arranging it).
-
-- =#784= :: #770 currency-denominated units.  Adversarial review found the set
-  incomplete; fixed in CONFIG (EthiopiaRHS =Birr=, Serbia =dinar= -> =Value=)
-  rather than by growing a library blocklist.
-- =#789= :: six stranded food vocabularies -> =harmonize_food=.  69/69 cells
-  byte-identical, 443 tests.
-- =#795= :: encoding survey; records Senegal's load-bearing mojibake.
-- =#796= :: GLSS7 population record hardened + =PopulationRecord= in
-  =df.attrs=.  Corrects an =AGENTS.md= claim about =_join_v_from_sample=.
-
-*Next action*: re-run CI on all four against current development, then merge.
-
-* Also open
-- =ligon/LigonLibrary#2= :: =errors="ignore"= in =_coerce_label= silently
-  deleted non-ASCII characters.  Note I got the DIRECTION wrong first and
-  corrected it in-branch; both attempts are documented in the PR.
-
-* Issues filed today
-=#783= food-vocabulary consolidation (six countries); =#787= =labels== map;
-=#790= gitignored-yet-hashed build inputs; =#791= UEMOA PHMECV source;
-=#792= 774 warnings, 746 from one unclosed file; =#794= dta encoding.
-
-* Decisions waiting on a human
-** WAITING The four GhanaSPS Boxcryptor sidecars
-=dvc-remote-reachability= fails on exactly these, and will keep failing:
-4 of 9,980 blobs missing, all in
-=GhanaSPS/2017-18/Data/Crop_encrypted/=.  Established today that the
-ciphertext is absent from S3 *and* local, including =FolderKey.bch=, so there
-is nothing to decrypt.  Either recover the originals from whoever ran the
-=dvc add= (git blame the sidecars) or retire the sidecars.  Until then CI is
-red for a real but known reason.  Note =unitcon_W3nonpii.dta.bc= is a unit
-conversion table, relevant to #770.
-
-** WAITING Promote the coverage-matrix candidate?
-Shards are built; aggregation and promotion both deliberately not done.
-
-** WAITING UEMOA Benin request
-Human-reviewed access; one wave requested, outcome pending.  The
-discriminating test for the per-file-grant hypothesis is recorded in
-=slurm_logs/uemoa/README.org= with today's baseline, so it is one command
-when the grant lands.
-
-* Traps this session kept re-teaching
-Recorded because each cost real time and all are the same species -- an
-operation that fails *quietly*.
-
-- =str.replace= silently no-ops when its anchor has moved.  Assert anchors.
-- =grep -c= exits 1 on zero matches, so =|| echo "absent"= reports a present
-  file as missing.
-- =read().split()= splits the three country names containing spaces
-  (=South Africa=, =Serbia and Montenegro=, =Kyrgyz Republic=).  Use
-  =splitlines()=, or =sed -n "${i}p"=.
-- =pgrep -f= / =pkill -f= match the agent's own shell command line.
-- =python -c= puts *cwd* on =sys.path= ahead of =PYTHONPATH=, so a worktree
-  probe silently imports the main checkout.  The mandated assertion catches it.
-- Running only the new test file proves nothing about the old ones.  That is
-  exactly how =TestPushToCache= broke four PRs.
-- savio3 allocates WHOLE NODES (~32 cores).  Ask for one and saturate
-  =$SLURM_CPUS_ON_NODE=; an array of 35 single-core tasks takes ~1,120 cores
-  for work needing 35.
-- =make <target>= that depends on =setup= runs =poetry install= against the
-  READ-ONLY squashfs venv and hangs.  =api-audit= and =docs-gen= no longer do.
-
-* Shipped today besides the PRs
-=Country.notes()= / =note_topics= (CONTENTS.org through the API); all 38
-=CONTENTS.org= declare =#+TODO= and synonym headlines merged;
-=visualizations.py= with =population_pyramid= and =coordinate_map=;
-=Country.features= / =Wave.features=; =make api-audit= (undocumented kwargs,
-uncalled machinery, unindexed skills, untracked hashed inputs);
-=docs/guide/data-methods.md= generated from live docstrings;
-=lectures/glss7_sample_design.org=; GLSS7 Main Report acquired and
-DVC-tracked, with the sample design verified against the served weights.
+* Next concrete action
+Wire the per-visit dates that 5 of 7 GLSS waves ship into
+=interview_date= (=melt_visit_intervals=), per FINDINGS.org; or the
+=Feature()= re-attach for #873.

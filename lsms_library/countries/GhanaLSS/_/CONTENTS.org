@@ -1237,9 +1237,530 @@ Data on expenditures is somewhat unusual, in two different ways.
 
 First, for waves before 2016--17, the survey instrument elicits the amount spent in purchasing different items, but does /not/ elicit quantities purchased.  (A separate price survey was conducted, and could presumably be used to obtain quantities.)  A separate module elicits quantities of home produced food consumed, as well as the hypothetical price at which home produced goods could be sold.
 
-Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits (about a dozen in all) are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  In =food_acquired= we sum over these visits (but it might be interesting to examine patterns at the visit level).
+Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  The number of visits, their spacing and the recall length each differ by wave -- seven visits five days apart in GLSS4, GLSS6 and GLSS7, eleven in GLSS5 -- so they are tabulated per wave below rather than summarised here.  In =food_acquired= we keep the =visit= level and sum over it in the derived tables (patterns at the visit level are worth examining, and are now sliceable across =s=; see below).
 
-NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
+NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for purchases (12A) "since my last visit" and only once, and ask for own production (12B) over NO recall window at all -- months eaten in the last twelve, times per unit, and the value of one eating occasion, from which the served value is /derived/ (see "12B is a value per eating occasion" below) -- while subsequent rounds elicit both across several visits.  (Until 2026-09-11 this note said both 1980s modules were "since my last visit"; only 12A is.)
+
+*** The repeated-visit design, wave by wave (2026-09-09)
+
+The paragraph above said "about a dozen" visits.  That is right for GLSS3 and
+GLSS5 and wrong for GLSS4, GLSS6 and GLSS7, which field *seven*.  The count,
+the spacing and the recall length all move across waves, so they are set out
+here per wave rather than described once.
+
+Every wave from 1998--99 on carries the mapping in its own Stata variable
+labels, so none of this is inferred.  GLSS3 has no variable labels at all; its
+row below comes from the questionnaire and the interviewer's manual instead,
+corroborated by the visit dates the survey itself recorded (see below):
+
+| wave             | visits | 9B (purchases)   | 8H (own produce) | consumption occasions |
+|------------------+--------+------------------+------------------+-----------------------|
+| 1987-88, 1988-89 | 1      | 12A: 1 recall    | 12B: no recall (derived) | 1               |
+| 1991-92 (GLSS3)  | 8 / 11 | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 7 rural / 10 urban    |
+| 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 10                    |
+| 2012-13 (GLSS6)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2016-17 (GLSS7)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+
+*The source question number is not the visit number*, and the two modules
+number from different origins.  Section 8H opens with two screeners --
+=s8hq1= "HH consume any home produce", =s8hq2= "No. of months eat home
+produce" -- so its per-visit columns start at q3.  Section 9B has no screener
+and starts at q1.  Both are asked at the same visits.  Read straight off the
+labels: GLSS4's =s9bq1= is "2nd visit amount spent" and its =s8hq3= is "2nd
+visit units consumed"; GLSS7's =s8hq3q= is "Quantity of own produced food
+consumed at 2nd visit" and =s8hq8p= is "Selling price for one unit now-7th
+visit".
+
+Until 2026-09-09 all five multi-visit wave scripts wrote *the question
+number* into =visit=.  A purchase and the own-production consumed at the same
+visit therefore sat two apart, =visit= was not sliceable across =s=, and the
+extreme values (1, 2 purchased-only; 7, 8 produced-only) read as structural
+missingness rather than as a labelling offset.  The scripts now emit the
+CALENDAR VISIT, which is what the labels state.  Note there is deliberately
+no row at =visit= 1: the first visit collects the roster and trains the
+diary keeper, not consumption.
+
+*/Corrected 2026-09-11./*  This passage used to read: "GLSS5 is why =visit=
+is the calendar number and not a per-module 1..N ordinal.  There, purchases
+run from the 2nd visit but own production only from the 3rd (=s8hq3= is
+'number of units consumed', a total, not a visit), so counting from 1 within
+each module would leave the two misaligned by one."  The premise was false
+-- see "=s8hq3= is the 2nd visit, and was dropped" below -- and the table
+row above now reads 2..11 for both modules.  The calendar-visit convention
+stands on its other grounds (it is what every wave's labels state, it is
+checkable against the source, and it is the clock =interview_date= uses);
+it no longer has a GLSS5 counter-example to lean on.
+
+**** 12B is a value per eating occasion, not a recall value (fixed 2026-09-11)
+
+GLSS1/GLSS2 =food_acquired= served =Y12B.VFOODCPD= as the produced-side
+=Expenditure=, beside =Y12A.CFOODBLV= ("How much have they spent since my
+visit?") on the purchased side, with the same =visit = 1=, the same
+=u = 'Value'= and nothing in the frame to tell them apart.  Both scripts'
+docstrings called =VFOODCPD= "produced_value per day" -- a claim that entered
+in =c404b7fb2= with no source.  It is neither per day nor per recall.
+Section 12B (questionnaire PDF p.68 / printed 43a; Interviewer Manual printed
+p.71; BID printed p.2: "Section 12B asks the amount consumed and market value
+of foods grown or raised by the household in the last twelve months") has NO
+since-my-last-visit question.  It asks, per food:
+
+| q | variable   | question                                                       |
+|---+------------+----------------------------------------------------------------|
+| 2 | =MFOODCLY= | in how many of the last 12 months was it eaten                 |
+| 3 | =TFOODC=   | how many times per (q4 unit)                                   |
+| 4 | =UTFOODC=  | DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7, YEAR 8         |
+| 5 | =VFOODCPD= | "How much would it cost to buy the amount they ate each time?" |
+
+So the served produced row was ONE MEAL's worth beside ~14 days of purchases:
+the own-production share of food read 17.4% / 18.1% in the two rounds.
+
+*Verified against GSS's own construction, not by elimination.*  The BID
+(printed p.22) defines =EXPEND.HPFOOD= as "the value of home produced food
+consumed in the last year calculated from Section 12B", and summing
+=VFOODCPD x TFOODC x (30.4 / days_per_unit) x MFOODCLY= per household
+reproduces it with median ratio 1.020 (IQR 1.015--1.03) in both rounds
+(n = 2,253 / 2,437 households; =slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=
+section 2.2).  Treating =VFOODCPD= as a per-DAY value gives 2.1--2.5x.
+
+*The construction served since 2026-09-11* (decided with @ligon; design in
+=SkunkWorks/derived_values.org=, "First instance") is the YEAR-AVERAGE
+FORTNIGHT:
+
+#+begin_example
+Expenditure = VFOODCPD x TFOODC x (14 / days_per_unit[UTFOODC]) x MFOODCLY / 12
+            = HPFOOD / 26
+#+end_example
+
+with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=.
+Worked example: eaten in 6 months of the 12, 12 times a month, 10 cedis each
+time -> 120 a month in season, 720 a year (=HPFOOD=), 55.3 for an in-season
+fortnight, and *27.6* for a fortnight drawn at random from the year (the 6/12
+is the chance the interview fortnight lands in season).  Year-average rather
+than in-season because the purchase side is a realised fortnight but 12B does
+not record WHICH months were cited, so the in-season figure is right for some
+households and zero for the rest, unknowably; the year average is unbiased
+over the sample and defers to GSS's own construction.  The 14-day window is
+12A's nominal interval: the 1988-89 Interviewer Manual (printed p.70) says of
+it "in theory this period is two weeks".  Check: sum over items of the served
+function x 26 per household reproduces =HPFOOD= at median 1.018 in both
+rounds (=tests/test_ghanalss_12b.py=).
+
+Mechanics: =_/ghanalss.py:derive_12b_fortnight_value= (no options -- one
+construction per parquet), registered as
+=GhanaLSS::food_acquired::12b-fortnight= in =_/derivations.yml=, stamped in
+the =Derivation= column of every produced row of the two waves (NA on
+purchased rows) and summarised on =df.attrs['derivations']=.  (That summary
+used to survive =Country('GhanaLSS').food_acquired()= and DIE on a
+cross-country =Feature('food_acquired')(['GhanaLSS', ...])= -- =attrs= do not
+survive a =concat= whose inputs disagree, and nothing re-attached it.  Fixed
+2026-09-12, GH #873: =feature._ATTRS_CARRIERS= now re-attaches population,
+recall AND derivations.  The same drop hit =attrs['recall']=, which matters
+most here: GhanaLSS delivers 30 days of coverage where most of the corpus
+delivers 7, so GhanaLSS is exactly the country a pooled frame needs to
+disclose.)  The raw four
+answers come back by their original names from
+=Country('GhanaLSS').derivation_inputs('GhanaLSS::food_acquired::12b-fortnight')=
+(=inputs_12b=), from which the in-season or annual alternatives are one
+line.  Effect: row counts unchanged (71,605 / 72,649; the three 1987-88 rows
+with =MFOODCLY = 0= are served as 0 under the key rather than dropped);
+produced-side sum 3,157,354 -> 9,484,484 (x3.00) in 1987-88 and
+3,677,833 -> 8,334,683 (x2.27) in 1988-89; own-production share of food
+17.4% -> 38.8% and 18.1% -> 33.4%.
+
+*12A's two-week fallback rule* (Interviewer Manual, 1988-89, printed p.70),
+recorded here because it is what makes the 14-day window the right nominal
+one: the "since my last visit" interval is in theory two weeks, and where the
+actual gap between the first and second rounds was under 7 or over 21 days
+the interviewer was to ask instead about "the past two weeks" -- about 300
+households (=FINDINGS.org= 2.2).  So 12A is a fortnight by instruction, not
+only on average.
+
+**** =s8hq3= is the 2nd visit, and was dropped for the life of the wave (fixed 2026-09-11)
+
+=2005-06/_/food_acquired.py= read =s8hq4..s8hq12= and skipped =s8hq3=, whose
+Stata label is "number of units consumed".  The label is misleading.  The
+questionnaire (=2005-06/Documentation/G5QPartB.pdf= p.17, printed 8.11)
+heads columns 3..12 "2nd 3rd ... 11th", each asking "How much of own produced
+... was consumed by the household since my last visit?", exactly as 9B's
+columns 1..10 are headed on p.36 -- the 8H stems start at q3 because q1/q2
+are the screeners, as in every other multi-visit round.  The data agree: a
+total cannot be smaller than the sum of its parts, and =s8hq3 <
+sum(s8hq4..s8hq12)= in 27,314 of 423,490 rows; =s8hq3= is positive in 21,493
+rows against 18,336 for =s8hq4=, the same first-ask excess every other wave
+shows at visit 2.
+
+Cost of the drop, measured on a rebuild in a private =LSMS_DATA_DIR=:
+*21,252 rows* added, all at =(s='produced', visit=2)= (21,493 positive
+source records, collapsed by the j-harmonisation), 4,777 households; 1,959
+(household, item) pairs and 57 households had no own-production row at all.
+Every other row of the wave is byte-identical before and after; the index
+stays unique.  =tests/test_ghanalss_visit_alignment.py= had pinned the wrong
+map (=produced: range(3, 12)=) and excluded 2005-06 from the shared-axis
+check "on purpose" -- both corrected.  =_/recall.yml= / =food_recall.csv= no
+longer carry =within_wave_variation: by-s= for this wave, and its spacing is
+now recorded (3 days, unstratified, from the DDI and measured on
+=partb/secb2.dta= -- see =slurm_logs/2026-09-11_ghanalss_visit_dates/2005-06.org=).
+
+**** GLSS3 is stratified: 8 rural visits, 11 urban -- and two recall windows
+
+The one wave whose recall window is not constant within the wave.
+=1991-92/Documentation/pdf/G3Intman.pdf= section 1.9:
+
+#+begin_quote
+There will be 8 interviewer visits at 2-day intervals to each rural household
+and 11 interviewer visits at 3-day intervals to each urban household in a
+cycle.  Thus a workload for the 16 days in a rural cluster is 10 households,
+while a workload for the 33 days in an urban cluster is 15 households.
+#+end_quote
+
+Both modules are asked at every visit after the first (p.42: "Part H is to be
+administered on every visit except the first"), and p.43 states the count
+directly -- responses are solicited at all visits except the first, "in other
+words for urban it will be 10 times and 7 times for rural areas".  So:
+
+- *urban*: 10 asks x 3 days = *30 days* of coverage;
+- *rural*:  7 asks x 2 days = *14 days*.
+
+The survey's own visit-date page (=S0B.DTA=, =vd/vm/vy 1..11=) corroborates
+both: urban records 11 dates with a median gap of 3.0 days at every step and a
+30-day span; rural records 8, gap 2.0, span 14 days, with visits 9--11 empty.
+=S9B= positive counts follow exactly -- q1..q7 populated for everyone, q8..q10
+urban-only.
+
+*The consequence is a live defect, not a curiosity.*  Summing =visit= away in
+=food_expenditures= returns a 30-day figure for an urban household and a
+14-day figure for a rural one, so an unadjusted urban/rural comparison is off
+by ~2.14x.  GSS itself rescaled by stratum: the median ratio of published
+=POV_GH.expfoodc= to the raw 9B sum is 11.4 urban against 21.7 rural, close to
+the design factors 365/30 = 12.2 and 365/14 = 26.1.  Recorded in GH #851; the
+library does not yet carry the window, so the caller cannot make this
+adjustment from the API.
+
+The diary was *urban only* (p.6): "A dairy of daily consumption and expenditure
+will be used to support the urban interviews."  Rural expenditure in GLSS3 is
+unaided 2-day recall; urban is diary-assisted 3-day.  Elicitation mode differs
+by stratum too.
+
+***** =s9bq1= was never read: 16.2% of GLSS3 food purchases were missing
+
+The wave script took =s9bq2..s9bq10=, starting at the second stem, so the
+FIRST ask -- q1, "How much was spent on ... since my first visit?"
+(=G3QPartB.pdf= p.20) -- was dropped from every GLSS3 number this library has
+served.  It is the largest column in the module: 58,132 positive values,
+C12,428,840, *16.22%* of the C76,609,939 recorded across all ten stems.  Fixed
+2026-09-09; the rebuilt table's Expenditure now totals the full C76,609,939.
+
+***** Produced rows are padded, and a row count there is not an observation count
+
+Pre-existing, NOT fixed: =Price= comes from =s8hq14=, one column per
+=(i, j, u)=, so =wide_to_long= replicates it across all ten visit rows and the
+closing =dropna(how='all')= keeps rows whose only content is that price.
+Measured: 28,678--28,710 produced rows at every visit, but =Quantity= is
+non-null in 13,810 at visit 2 falling to 598 / 519 / 493 at visits 9--11.
+206,498 produced rows carry a price and no quantity, and a rural household
+visited eight times has price rows at visits it was never asked.  Count
+=Quantity.notna()=, not rows.
+
+**** A first-ask effect, now that the levels line up
+
+Delivered row counts per =(visit, s)=, measured 2026-09-09 on a rebuild of
+each wave.  The FIRST ask carries markedly more rows than the ones after it;
+thereafter counts are flat or drift gently down:
+
+| wave    | s         | first ask    | later visits       |
+|---------+-----------+--------------+--------------------|
+| 1998-99 | purchased | 84,253 (v2)  | 73,701 -> 70,124   |
+| 1998-99 | produced  | 20,098 (v2)  | 17,212 -> 14,733   |
+| 2005-06 | purchased | 125,368 (v2) | 98,996 -> 86,462   |
+| 2005-06 | produced  | 21,252 (v2)  | 18,166 -> 15,590   |
+| 2012-13 | purchased | 292,364 (v2) | 246,777 -> 234,035 |
+| 2012-13 | produced  | 39,498 (v2)  | 33,680 -> 30,171   |
+| 2016-17 | purchased | 169,086 (v2) | ~160,000, flat     |
+| 2016-17 | produced  | 39,899 (v2)  | 23,871 -> 21,376   |
+
+Deliberately not adjudicated here.  It is consistent with a longer implicit
+recall at the first ask (the "last visit" it refers back to is the intake
+visit, which need not be five days earlier), with telescoping, or with item
+mentions attriting as the household tires of the module -- and these have
+different implications for whether visit 2 should be weighted like the rest.
+***** The literature: Scott and Amenuvegbe (1990), commissioned FOR the GLSS
+
+There is a controlled experiment on exactly this question, run in Ghana
+*because of* this survey, and it anticipates the mechanism:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1990).  /Effect of Recall Duration on
+Reporting of Household Expenditures: An Experimental Study in Ghana./
+Social Dimensions of Adjustment in Sub-Saharan Africa Working Paper No. 6.
+Washington, D.C.: World Bank.  World Bank report no. 8905.
+http://documents.worldbank.org/curated/en/598051468774854613
+#+end_quote
+
+The same experiment appears again as, almost certainly, its published version:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1991).  "Recall Loss and Recall Duration: An
+Experimental Study in Ghana."  /Inter-Stat/ 4(1): 31--55.
+#+end_quote
+
+/Probable, not verified./  Same authors, same experiment, same headline result;
+the working paper closes by saying "the authors plan a fuller analysis of this
+effect for later publication", and the journal version runs 25 pages against the
+working paper's 19.  The experiment was funded by a UK Overseas Development
+Administration grant and =Inter-Stat= was an ODA-linked statistics bulletin, so
+it is the natural outlet -- but that last link is unconfirmed and a serials
+catalogue would settle it.  *Both are in circulation as the citable form*: the
+UN /Household Sample Surveys/ handbook cites the 1990 working paper, Beegle et
+al. (2012) cite the 1991 /Inter-Stat/ version.
+
+A sample-size difference between the two citations is NOT evidence of revision:
+the working paper reports both numbers -- 144 households selected, 135
+surviving absence and refusal "for analysis".  Beegle quotes the former, the
+executive summary the latter.
+
+(Neither is to be confused with Scott and Amenuvegbe /1991/ in the /Journal of
+Official Statistics/ 7(3): 367--373, the self-weighting sampling paper cited at
+the top of this file.  Three papers, two years, same two authors.)
+
+*Why it exists*, in the authors' words: the GLSS design "called for a 2-week
+recall period for each household, a period chosen essentially for logistic
+motives rather than in response to any evidence of recall efficiency", and the
+Social Dimensions of Adjustment project was about to propagate that design
+across Africa.  It is a standalone experiment -- 135 households, each
+interviewed *11 times* at varying intervals, ODA-funded, sponsored by the Ghana
+Statistical Service -- NOT an experiment embedded in the GLSS itself.
+
+*What they found*, over 13 frequently purchased items:
+
+- reported daily expenditure falls consistently as the recall period lengthens
+  from 1 day to 1 week, then *little or no further fall* from 1 to 2 weeks; a
+  1-year recall was erratic.  The curve is steep early and flat later;
+- after re-weighting away weekly/monthly purchase cycles, with start-up bias
+  eliminated and recall bounded, the loss averages *2.9% for every day added*;
+- the decline is *larger for items purchased more frequently*;
+- so a weekly recall underestimates frequent purchases by *~20%* -- and that is
+  in what they call "an abnormally well controlled field situation".
+
+*Their mechanism, which is the part that matters here.*  They favour the
+reading that the 1-day figure is the most accurate and that this is recall
+lapse rather than a boundary artefact.  Their hypothesis is that beyond a
+threshold recall length respondents *switch from factual to normative
+reporting* -- "what I usually buy" rather than "what I bought" -- and normative
+reporting overlooks exceptional (typically high) purchases, biasing downward.
+
+*This is what our own measurement observes directly.*  On GLSS4, within
+household and across ask number, reported spend is essentially invariant to the
+realised interval: doubling the gap from 5 to 10 days changes reported spend by
++1.2% where proportionality predicts +100% (elasticity 0.018; item counts
+identical at 18.8).  That is normative reporting, measured -- a household
+reporting "what I buy between visits", not "what I bought in N days".  Their
+"larger decline for frequently purchased items" likewise matches the first-ask
+excess being mostly extensive-margin here (1.42x more items, GLSS3 rural).
+
+*The consequence for aggregation.*  If the reported amount does not scale with
+the elapsed interval, then dividing by measured days does not normalise -- it
+injects fieldwork tempo into the estimate.  Bin GLSS4 households by measured
+exposure and total spend is flat while the implied daily rate spans 2.7x,
+entirely from the denominator.  The defensible quantity is the per-ask amount
+at the *nominal protocol* interval, not the realised one.
+
+*The question is not settled in the literature.*  The UN /Household Sample
+Surveys in Developing and Transition Countries/ (ch. 24) cites this study and
+immediately notes the dispute: Mahalanobis and Sen (1954) on the Indian
+National Sample Survey found a one-MONTH reference period less biased than a
+one-week one for certain foods -- the opposite sign -- and Deaton (1997) holds
+that nobody has separated recall decay from boundary telescoping.  Our GLSS3
+contrast is evidence on precisely that open question: at *identical* interval
+lengths the first ask still carries 24-40% more, and the step is 1.84x for the
+unaided rural stratum against 1.17x for the diary-assisted urban one.
+
+/Corrected 2026-09-11./  This paragraph used to single out GLSS5 as "the
+weakest first-ask step (1.02x)" on the belief that its own-production module
+started at the 3rd visit.  It starts at the 2nd (=s8hq3=, above), and with
+that column restored the produced step is *1.17x* (21,252 vs 18,166) -- in
+line with the other waves, and no longer a contrast that separates anything.
+
+GLSS3 supplies one discriminating measurement.  There the first interval is
+the SAME length as every other -- the =S0B.DTA= visit dates give a median gap
+of exactly 3.0 days (urban) / 2.0 days (rural) at every step, including
+visit 1 -> 2 -- and the first ask still carries 24--40% more positive records.
+So for GLSS3 the longer-implicit-recall explanation is excluded, leaving
+telescoping or module fatigue.  One caveat before generalising: the urban
+diary keeper is trained AT visit 1, so the first interval's diary coverage may
+be atypical of the rest.
+
+**** GLSS7's recall period: six five-day recalls, diary-supported
+
+From the GLSS7 Main Report, "Survey Period and Team Composition" /
+"Interviewer Workload" (=2016-17/Documentation/GLSS7 Main Report.pdf=):
+
+#+begin_quote
+An interviewer visited each household in the EA assigned to him/her every
+sixth day i.e. after every five days.  In other words, the interviewer
+visited each of the 15 selected household seven (7) times in order to
+complete the cycle. ...  A cycle in both rural and urban areas lasted 35
+days. ...  A diary of daily consumption and expenditure was used to support
+the interviews.  During the first visit, a literate person already identified
+in each household was trained to record all subsequent expenditures made by
+the household and submit the diary to the interviewer on his next visit for
+entry into the appropriate sections.  Where a household had no literate
+member, the interviewer made daily visits to the household and recorded all
+expenditures in the diary meant for the household.
+#+end_quote
+
+So GLSS7 food acquisition is *six five-day recalls* -- 30 days of coverage
+inside a 35-day cycle -- and the elicitation is diary-assisted, not pure
+recall.  The diary is not a separate dataset: the Report has its contents entered
+"into the appropriate sections", i.e. into 9B/8H, and no separate diary file
+ships in =2016-17/Data/=.
+
+The consequence for =food_expenditures= is worth stating because nothing in
+the schema records it: summing =visit= away yields a *30-day* figure for
+GLSS7, a different window for GLSS5, and a single "since my last visit" for
+the 1980s waves.  There is no recall-period metadata slot for a wave-constant
+window (the canonical =RecallWindow= column, GH #817, is per-row and is used
+only by Togo's =nonfood_expenditures=), so the window is not recoverable from
+the API.  Tracked separately; deliberately not addressed here.
+
+**** =GLSS7 Final Manual.docx= is stale where it describes the visit schedule
+
+Use the Main Report, not the Manual, for the field protocol.  The Manual is
+the ex-ante training document and its schedule was carried over from GLSS5
+without being updated.  It contradicts the Report, the data, and itself:
+
+- 3.7 says "the total interviewing workload will be spread over *eleven*
+  visits to a particular household", and its Table 2 "Days of Visit"
+  schedules eleven visit-days three days apart (batch 1: days 1, 4, 7, ...,
+  31) over a "33-day cycle".
+- 3.6 "Date of Next Visit", in the same document, says the next visit "should
+  be exactly *five (5) days* apart for all households", which Table 2 does not
+  implement.
+- The Manual's own section-by-visit table runs to the *7th* visit only (1st:
+  sections 1, 2, 5, 6A, 7; 2nd: 3, 8H, 9A, 9B; 3rd: 4, 6B, 8H, 9B; 4th: 8A-G,
+  8H, 9B; 5th: 9C, 10, 8H, 9B; 6th: 11, 8H, 9B; 7th: 12, 13, 8H, 9B) -- seven,
+  not eleven, and consistent with the CAPI passage that has sections 1--7
+  submitted at the end of the third visit.
+- The data agree with the Report: GLSS7's visit-bearing columns stop at the
+  7th visit in both modules.
+
+That eleven-visit schedule is inherited boilerplate, and its lineage runs back
+at least to GLSS3: =1991-92/Documentation/pdf/G3Intman.pdf= section 1.9 gives the
+URBAN schedule as "11 interviewer visits at 3-day intervals to each urban
+household", "33 days in an urban cluster", "Batch 1 Days
+1,4,7,10,13,16,19,22,25,28,31" -- word for word the GLSS7 Manual's Table 2.
+GLSS5 also fields eleven visits (its =s9bq10= is labelled "amount spent by
+eleventh visit"), so it may have passed through that round too; what the
+evidence settles is that the text is NOT GLSS7's, not which earlier round it
+came from.  /Corrected 2026-09-09: this passage previously attributed the
+schedule to GLSS5 specifically, which is more than the documents support./
+
+**** =visit= is an INTEGER in all seven waves (fixed 2026-09-09)
+
+The wave-by-wave fix above got the visit NUMBERS right and left the TYPE
+wrong.  Measured on the delivered 5,317,365-row table immediately after it:
+
+| wave    |    rows | Python type | values                |
+|---------+---------+-------------+-----------------------|
+| 1987-88 |  71,605 | =int=       | 1                     |
+| 1988-89 |  72,649 | =str=       | ='since last visit'=  |
+| 1991-92 | 681,645 | =int=       | 2..11                 |
+| 1998-99 | 542,105 | =str=       | ='2'=..='7'=          |
+| 2005-06 | 1,115,396 | =int=     | 2..11                 |
+| 2012-13 | 1,709,094 | =int=     | 2..7                  |
+| 2016-17 | 1,124,871 | =int=     | 2..7                  |
+
+Three different types on one index level.  Sources: 1988-89's script set
+=VISIT = 'since last visit'= (the recall WINDOW written into the level as if
+it were a value), and 1998-99 finished a cast with =.astype(int).astype(str)=.
+
+***** What it cost, measured
+
+#+begin_src python
+fa = Country('GhanaLSS').food_acquired()
+fa.xs(2, level='visit')      # 752,970 rows  <- 1998-99's 104,351 SILENTLY MISSING
+fa.xs('2', level='visit')    # 104,351 rows  <- and now everyone else is missing
+fa.xs(1, level='visit')      #  71,605 rows  <- 1988-89's 72,649 SILENTLY MISSING
+fa.xs('1', level='visit')    # KeyError
+#+end_src
+
+=xs(2)= is a 12.2% undercount of visit-2 rows with no exception and no
+warning; =xs('1')= is a hard failure.  *Whether you got a silent partial
+answer or a crash depended only on how you happened to spell the key* -- and
+neither told you a wave was missing.  A left merge on an =Int64= =visit= key
+left *614,754 rows (11.56% of the table)* unmatched and silently null:
+542,105 from 1998-99 and 72,649 from 1988-89.
+
+***** Why nothing caught it, which is the part worth keeping
+
+Two independent blindnesses, and they compose:
+
+1. *No index level is dtype-policed anywhere.*  =_enforce_canonical_dtypes=
+   iterates =df.columns= only, and =visit= appeared nowhere under =Columns:=
+   in =lsms_library/data_info.yml= -- only in =index_info=.
+2. *The warm cache launders the evidence.*  pyarrow coerces a mixed object
+   level to =str= on write, so the L2-country parquet came back
+   homogeneously stringy.  Swept 2026-09-09: *193 warm L2-country parquets,
+   543 index levels, ZERO mixed* -- while the cold build of one of them was
+   mixed int/str.  Any scan of =var/= is structurally unable to see this
+   class of defect.  Same shape as GH #323 ("the bug hid behind the cache the
+   bug poisoned").
+
+It also means the delivered type *depended on cache warmth*: cold, =visit=
+came back =object= with real ints for five waves; warm, everything was =str=.
+The same call returned differently typed data on the same machine.
+
+***** The fix, and why =1= is safe for the 1980s waves
+
+Both single-recall waves now carry the INTEGER =1= -- the convention
+=build_transforms.add_visit_level= exists to stamp -- and 1998-99 keeps
+=.astype(int)= without the trailing =.astype(str)=.  No wave-2..11 script
+changed.
+
+The =1= is unambiguous, and this was CHECKED rather than reasoned: every
+renumbered wave starts at 2 (visit 1 is intake -- roster and diary training,
+no consumption), so after the fix =visit == 1= occurs in exactly 144,254 rows,
+all of them 1987-88 (71,605) and 1988-89 (72,649), on both =s= sides.
+=tests/test_ghanalss_visit_alignment.py::test_visit_one_means_single_recall=
+pins that, so if a renumbered wave ever grows a visit 1 the convention is
+reconsidered rather than silently kept.
+
+The recall WINDOW 1988-89 used ("since my last visit") is prose about the
+instrument.  It belongs here, and it is here; it was never an index value.
+
+***** Conservation
+
+Row-for-row identical.  Normalising the pre-fix table's =visit= to int
+(='since last visit'= -> 1) the two tables have the SAME index and
+element-wise identical measures: 5,317,365 rows before and after, per-wave
+counts unchanged, ΣQuantity 15,646,965,351.442991, ΣExpenditure
+15,644,337,364.882200, ΣPrice 1,284,034,769.823569, delta exactly 0.0 on all
+three.  Index still unique.  Warm and cold now agree at =int64=.
+
+***** =visit= now has a written contract, but is deliberately NOT coerced
+
+=lsms_library/data_info.yml= gains =Columns > food_acquired > visit= and
+=Columns > interview_date > visit= (=type: int=, not =required=), plus a
+=Single Index= gloss.  This is the same device =crop_production.condition=
+already uses: an index level declared under =Columns:= because that file is
+where a cross-country level contract is written down, even where enforcement
+does not reach index levels.  It is inert today -- nothing reads it but the
+tests -- and it moves no cache hash (the canonical =data_info.yml= is not a
+=_table_cache_hash= input; only per-wave =data_info.yml= are).
+
+Extending =_enforce_canonical_dtypes= to index levels was considered and
+REJECTED.  Its int path is =pd.to_numeric(errors='coerce')=: on an index
+level that turns an unparseable value into =<NA>=, which this file's own
+=u=-sentinel note calls a deferred silent deletion -- served, then dropped by
+the first =groupby=, counted nowhere.  Applied to THIS defect it would have
+deleted all 72,649 of 1988-89's rows in the derived tables (which sum =visit=
+away) and reported nothing.  A silent coercion would have hidden the bug, not
+caught it.  Blast radius was measured anyway and is narrow -- exactly one
+existing (table, index-level) collision corpus-wide, =crop_production.condition=
+for Uganda -- so the objection is the failure MODE, not the width.  If
+index-level enforcement is ever built it must be a loud CHECK on the BUILD
+path (where the wave frames are concatenated), because that is the only place
+the mixed level exists.
 
 *** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
 

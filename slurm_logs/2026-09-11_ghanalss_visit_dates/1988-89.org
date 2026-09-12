@@ -1,0 +1,400 @@
+#+title: GhanaLSS 1988-89 (GLSS2): where the date of each household visit is recorded, and what shipped
+#+date: [2026-09-11 Fri]
+#+author: audit agent (wave 1988-89), for @ligon's GSS data request
+
+All paths are relative to =lsms_library/countries/GhanaLSS/=.  "PDF p." is the
+page of the file; "printed p." is the number on the scanned page.  The
+household questionnaire and the three 1988 manuals are IMAGE-ONLY scans, read
+by eye from PNGs rendered with
+=slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py= (no OCR).  The
+two documents with a text layer are the joint BID
+(=1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf=,
+covers both rounds) and the GLSS2 DDI
+(=1988-89/Documentation/ddi-documentation-english-4.pdf=, whose prose is the
+BID's verbatim).  Data files were read with =get_dataframe= (comma-separated
+=.DAT= with a header row; the =.DCT= carries NAMES ONLY -- no labels exist for
+GLSS1/GLSS2).
+
+Mandatory reading done (dispatcher rule): =_/CONTENTS.org= lines 1-32,
+1235-1660, 2869-2932 and every =1988-89= / =GLSS2= hit;
+=1988-89/_/data_info.yml=; the docstring of =1988-89/_/food_acquired.py=;
+=.coder/ledger/ghanalss-visit-offset.md=.  The idiosyncrasies those record
+that bear on this audit: (i) GLSS1->GLSS2 was a half-retained rotating panel
+(714 linked households, =PANELC.DAT=), so a GLSS2 "household" may have a
+GLSS1 interview 2-23 months earlier (BID Table 3, printed p.20); (ii) the
+1980s waves have ONE consumption ask ("since my last visit") and the library
+writes =visit = 1= for it (CONTENTS.org l.1258, =food_acquired.py= =VISIT =
+1=); (iii) =0B= and =0C= exist only for 1988-89 (BID printed p.2), which is
+why 1987-88 has no =Y00B=; (iv) the questionnaire binder puts Section 1A at
+PDF pp.38-39, after Section 7 and before Section 8's =END OF ROUND ONE=
+(CONTENTS.org l.3163); (v) =Rural= for this wave is the BID Appendix I
+cluster classification with =SU= folded onto Rural (GH #685/#705).
+
+* Visit protocol
+
+*Two interviews ("rounds"), two weeks apart; Sections 12A/12B asked at the
+SECOND; paper; no diary; no CAPI.*
+
+- BID printed p.2 (PDF 4): "The household questionnaire was completed in two
+  interviews two weeks apart: Sections 0-8, 16A, 17A and 17C were conducted
+  in the first interview.  Sections 9-15, 16B and 17B were conducted in the
+  second interview."  Section 12 (FOOD EXPENSES AND HOME PRODUCTION) is
+  listed under "II. SECOND INTERVIEW"; Section 9 is headed "(BEGINNING OF
+  SECOND INTERVIEW)" (printed p.4).
+- BID printed p.15 (PDF 17): "Round 1 covered Sections 0 through 8 and Round
+  2 covered Sections 9-17.  The interview for each of the two rounds ... were
+  expected to take 2-3 hours.  Each team conducted 32 complete interviews in
+  each four week period, 16 for each of the two interviewers.  Round one was
+  conducted in one cluster the first week.  Then the team moved to a second
+  cluster for the second week.  The third week, the team returned to conduct
+  Round Two ... in the first cluster.  The second round was completed in the
+  second cluster in week four."  Data entry "in regional offices in the week
+  between the two rounds"; the supervisor "randomly revisited 25 percent of
+  the households to verify the answers to some key questions".
+- Questionnaire: PDF 40 (block =8=, printed p.29) ends =END OF ROUND ONE=;
+  PDF 41 (printed p.29a) is the =ROUND TWO= divider ("EXPLAIN AGAIN THE
+  OBJECTIVES OF THE SURVEY AND THE CONFIDENTIALITY OF THE DATA.  READ THE
+  LIST OF HOUSEHOLD MEMBERS."); 12A begins at PDF 64 (block =12A1=, printed
+  p.41a); PDF 75 (Section 15C) ends =END OF SECOND ROUND=.
+- Interviewer's manual (=1988-89/Documentation/technical document/
+  GHA_1988_GLSS_Interviewer_EN.pdf=, 75 pp, image-only; PDF = printed + 7 for
+  printed pp.2-12): printed p.5 (PDF 12) "conduct interviews with households
+  at the rate of eight per week ... Interviews may require one or several
+  visits to complete, depending on whether or not all the respondents are
+  available at the time of the first visit"; printed p.7 (PDF 14) "The data
+  entry operator will enter Round One data between Round One and Round Two
+  ... You must reask these questions at the beginning of Round Two"; printed
+  p.12 (PDF 19) "For Round Two you must fill out the box entitled SECOND
+  ROUND OF SURVEY.  The date should be the date you agreed on with the
+  household at the end of the Round One interview."
+- Recall phrase, 12A (PDF 64, printed p.41a), verbatim: col.2 "Have the
+  members of your household bought any ...[...]... since my last visit?"
+  col.3 "How much have they spent since my visit?"  12B (PDF 68, printed
+  p.43a) is a 12-month module: col.3 "During which months in the past 12
+  months (since..) did your household consume the ..[ ].. it produced?",
+  col.4 "How many times during these months did they eat home-produced
+  ...[ ]...?", col.5 "How much would it cost to buy the amount they ate each
+  time?"  -- i.e. 12B has NO "since my last visit" question; its recall is
+  months-in-the-past-12-months x times-per-unit x value.
+- *What "since my last visit" means, per the manual* (Interviewer's
+  manual printed p.70, PDF 67, Section 12 DEFINITIONS), verbatim: "SINCE MY
+  LAST VISIT means since the last visit of the interviewer to the household
+  during Round One.  In theory this period is two weeks; but, as this is
+  not always the case, you must emphasize the time that has elapsed since
+  Round One.  NOTE: If you make several visits or if the time since the
+  last visit is less than one week or greater than 3 weeks, you must ask
+  for information on food expenditure and consumption in the past two
+  weeks."  And on 12A col.3: "Question 3.  This question refers to the
+  total amount spent on a given food item since the Round One visit.  So,
+  if the item has been bought several times in the interval, you must add
+  up the individual amounts."  Respondent: "the person identified in
+  Section 7 of Round One as the one best informed about food
+  expenditures."  So the recall window is the MEASURED round-1 -> round-2
+  interval where that interval is 7-21 days, and a nominal 14 days
+  otherwise.  Printed p.71 (PDF 68) glosses 12B only for the months/times
+  coding; there is no "since my last visit" in 12B.
+- Diary: none (no diary form in the questionnaire; none mentioned in the
+  Section 12 instructions).  Mode: paper, decentralised keying on a PC in
+  the regional office (BID printed p.14; Data-entry manual).
+
+*Contradiction with CONTENTS.org / food_acquired.py -- quote both sides.*
+CONTENTS.org l.1258 tabulates 1988-89 as "visits 1 / single recall / single
+recall / consumption occasions 1", and =food_acquired.py= writes "this 1980s
+wave has a single, degenerate 'since my last visit' recall".  That is right
+about the NUMBER OF CONSUMPTION ASKS (one), and =visit = 1= is a documented
+convention, not a claim about calendar contacts.  But the household was
+contacted TWICE and 12A was asked at the SECOND contact (BID p.2; PDF 41
+divider precedes 12A at PDF 64; =Y00B= section-12 first-visit date equals
+the section-9 date in 3,156 of 3,186 households and the section-1 date +
+~14 days).  So "since my last visit" is a MEASURED per-household window:
+round-1 interview date -> round-2 interview date, median 14 days (see
+below).  Two consequences: (a) =1988-89/_/data_info.yml= wires
+=interview_date: Int_t = DAY1/MO1/YR1=, the ROUND-ONE date -- the date on
+which the food module was actually asked is =DAY2/MO2/YR2= (with the caveat
+in Idiosyncrasies s1); (b) CONTENTS.org's "no recall-period metadata slot"
+caveat does not bind this wave: the window is recoverable per household
+from =Y00A=.  In calendar terms GLSS2's food ask sits at the same position
+(second household contact) that later waves label =visit = 2=; recorded,
+not adjudicated.
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+| document | section / form / page | field(s) as printed | records |
+|---|---|---|---|
+| HH questionnaire =GHA_1988_GLSS_Household_Questionnaire_EN.pdf= | block =0A= SURVEY INFORMATION, PDF 3, printed p.1, box FIRST ROUND OF SURVEY | INTERVIEWER [name] [code box] DATE [d/m/y]; DWELLING FOUND? Y1/N2; IS THE HEAD OF HOUSEHOLD THE SAME? Y1/N2; NAME OF NEW HEAD; RELIGION OF HEAD; PRIMARY LANGUAGE OF HEAD; LANGUAGE USED BY THE RESPONDENT; INTERPRETER? Y1/N2; REMARKS | date yes; interviewer id yes; no time; no duration; result only via DWELLING FOUND |
+| same | =0A=, box VERIFICATION OF THE QUESTIONNAIRE, ROUND ONE | SUPERVISOR [name] [code] DATE; REMARKS; REINTERVIEW BY SUPERVISOR? Y1/N2; THIS HOUSEHOLD REPLACES HOUSEHOLD NO; THIS HOUSEHOLD WILL BE REPLACED BY NO; REASON: DWELLING NOT FOUND/VACANT 1, OCCUPANT NOT AT HOME 2, REFUSAL 3 | supervisor date + id; replacement result code; no time |
+| same | =0A=, box DATA ENTRY, ROUND ONE | OPERATOR [name] [code] DATE; REMARKS | office date + operator id |
+| same | =0A=, box SUPERVISION OF PRINTOUTS, ROUND ONE | SUPERVISOR [name] [code] DATE; REMARKS | office date + supervisor id |
+| same | =0A=, box SECOND ROUND OF SURVEY | PROPOSED DATE [d/m/y]; INTERVIEWER [name] [code] DATE; REMARKS | appointment date AND actual date; interviewer id; no time |
+| same | =0A=, box VERIFICATION OF QUESTIONNAIRE, ROUND TWO | SUPERVISOR [name] [code] DATE; REMARKS; REINTERVIEW BY SUPERVISOR? Y1/N2 | supervisor date + id |
+| same | =0A=, box DATA ENTRY, ROUND TWO | OPERATOR [name] [code] DATE; REMARKS | office date + operator id |
+| same | =0A=, box SUPERVISION OF PRINTOUTS, ROUND TWO | SUPERVISOR [name] [code] DATE; REMARKS | office date + supervisor id |
+| same | block =0B= SUMMARY OF SURVEY RESULTS, PDF 4, printed p.1a -- grid, one row per SECTION 1-8 (FIRST ROUND) and 9-15 (SECOND ROUND) | INTERVIEWER: FIRST VISIT DATE (DAY MONTH YEAR) + RESULT (COMPLETE 1, PARTIAL 2, NOT APPLICABLE 3); CHECK-UP VISIT DATE + RESULT (COMPLETE 1, PARTIAL 2).  SUPERVISOR: INTERVIEWER (SATISFACTORY 1, TO BE COMPLETED 2, TO BE REDONE 3); OPERATOR (SATISFACTORY 1, CORRECTIONS 2); [corrections] CORRECTED IN OFFICE 1, CORRECTED DURING SECOND ROUND 2, CORRECTED DURING CHECK-UP VISIT 3, NOT CORRECTED 4 | per-section visit date x2 with result codes; no time; sections 16-17 NOT in the grid |
+| same | block =0C= OBSERVATIONS AND COMMENTS, PDF 5, printed p.2 | REMARKS BY THE INTERVIEWER ON THE FIRST ROUND / SECOND ROUND; REMARKS BY THE SUPERVISOR ON THE FIRST ROUND / SECOND ROUND | free text only; no dates |
+| same | per-section respondent boxes, e.g. =12A1= PDF 64 printed p.41a (also on 9x, 11D, 14A headers) | SUPERVISOR: RESPONDENT [name] ID CODE [box]; INTERVIEWER: IS THIS THE PERSON ACTUALLY INTERVIEWED? YES 1 NO 2 | respondent identity; no date |
+| same | Section 16 Part A ANTHROPOMETRICS - ROUND ONE, PDF 76 (portrait, rotated); 16B round two (not rendered, same layout per BID p.7) | per person: col.2 DATE OF MEASUREMENT (DAY MONTH YEAR); col.5 REASON NOT MEASURED; footer INTERVIEWER, DATA ENTRY OPERATOR, DATE OF ENTRY | per-person measurement date; data-entry date; no time |
+| same | Section 17A/17B COGNITIVE SKILLS TESTS, PDF 77 (17A) | per person: date of test (=Y17A: DAYT1/MOT1/YRT1=) | per-person test date |
+| Supervisor's manual =GHA_1988_GLSS_Supervisor_EN.pdf= (56 pp, image-only; PDF = printed+3 early, +2 late) | REINTERVIEW FORM, printed pp.34-35 (PDF 37-38), described printed p.33 (PDF 36) | header CLUSTER, HOUSEHOLD NUMBER, INTERVIEWER; per section 1,3,4,5,6,7,8 (round one) and 9,10,11,12,13A,14,15 (round two): questions to reask, RESULT SATISFACTORY/UNSATISFACTORY, COMMENTS; footer SUPERVISOR [name] DATE [d/m/y] | supervisor reinterview date + per-section result; no time |
+| Supervisor's manual | printed p.7 (PDF 10) PREPARATION OF THE QUESTIONNAIRE FOR ROUND ONE | supervisor pre-fills 0A: cluster name/code, serial number of house, household number, name of head, address | (identity only) |
+| Supervisor's manual | printed p.8 (PDF 11) PREPARATION ... FOR ROUND TWO; printed p.44 (PDF 46) COMPLETION OF SECTION 0B | supervisor fills the INTERVIEWER and OPERATOR columns of 0B "after checking the Round One printouts"; code 2 "to be completed" marks questions to reask in Round Two | (result codes only) |
+| Data-entry manual =GHA_1988_GLSS_Dataentry_EN.pdf= (40 pp, image-only; PDF = printed+3) | SECTION 0: CONTROL DATA, printed pp.26-27 (PDF 29-30) | the 0A form reproduced as the entry screen; "you fill in the boxes for 'Data Entry/Round 1' and 'Data Entry/Round 2'.  This is the only section where you are to fill in the boxes ... For Round 1 you enter only the information given (on the questionnaire) and pad the rest of the screen with blanks.  For Round 2 you make the correction for round 1, if any, and the data for Round 2." | keyed = the 0A boxes; no machine timestamp is described |
+
+No field anywhere on the 1988 instrument records TIME OF DAY or interview
+DURATION.  Checked: 0A, 0B, 0C, the section respondent boxes, 16A, 17A, the
+reinterview form, the data-entry screen description.
+
+* What shipped: instrument field -> distributed variable
+
+** Section-0-like files in =1988-89/Data/= (dictionaries, names only)
+
+#+begin_example
+Y00A.DCT  (3,194 rows = 3,194 households, 170 clusters; CID = 11)
+CID CLUST NH HID INTID DAY1 MO1 YR1 LOC HHSAME RELIGION LANGHD LANGR INTRPRET
+SUPERID DAY1S MO1S YR1S REINTER REPLACES REPLACED REPRES
+OPERID DAY3 MO3 YR3
+SUPPRID DAY4 MO4 YR4
+DAY5 MO5 YR5
+INTID2 DAY2 MO2 YR2
+SUPID2 DAY2S MO2S YR2S REINTER2
+OPID2 DAY8 MO8 YR8
+SUPPRID2 DAY9 MO9 YR9
+
+Y00B.DCT  (47,839 rows = 15 sections x 3,193 households, less 6 HH with
+           8 rows and 1 with 1 row; CID = 21)
+CID CLUST NH HID SECTION DAY1 MO1 YR1 RESULT1 DAY2 MO2 YR2 RESULT2
+SUPINTER SUPOPER CHANGES
+
+Y00C.DCT  (3,194 rows; CID = 31)
+CID CLUST NH HID ID1A C1C C9C C9E C9F C9G C9H ID11 P11 C11D ID12 P12 C12B
+ID14A P14A C14A
+
+(no variable labels: GLSS1/GLSS2 .DCT files carry positions and names only)
+#+end_example
+
+The line order of =Y00A.DCT= is the reading order of block =0A= (left
+column top to bottom, then right column), which is how the =DAY3/4/5/8/9=
+slots are identified; the identification is then corroborated by the gaps
+measured below (=DAY5 - DAY1= is exactly 14 days from p25 to p95 (p10 = 13), i.e. the
+PROPOSED date "agreed on ... at the end of the Round One interview";
+=DAY3= sits a median 6 days after =DAY1=, i.e. data entry "in the week
+between the two rounds").
+
+** Field -> variable, block 0A (=Y00A.DAT=)
+
+| 0A box | printed field | variable(s) | non-null / 3,194 | notes |
+|---|---|---|---|---|
+| FIRST ROUND OF SURVEY | INTERVIEWER code | =INTID= | 3,098 | ids 12-81 |
+| | DATE | =DAY1 MO1 YR1= | 3,194 | YR in {88, 89}; all parse |
+| | DWELLING FOUND? | =LOC= | 3,194 | 1: 3,191, 2: 3 |
+| | IS THE HEAD OF HOUSEHOLD THE SAME? | =HHSAME= | 3,191 | 1: 2,839, 2: 352 |
+| | RELIGION / PRIMARY LANGUAGE OF HEAD / LANGUAGE USED / INTERPRETER | =RELIGION LANGHD LANGR INTRPRET= | 3,191 / 3,191 / 3,190 / 2,797 | |
+| | NAME OF NEW HEAD; REMARKS | -- | | NOT shipped (free text) |
+| VERIFICATION, ROUND ONE | SUPERVISOR code / DATE | =SUPERID=; =DAY1S MO1S YR1S= | 3,194 / 3,194 | |
+| | REINTERVIEW BY SUPERVISOR? | =REINTER= | 2,893 | 1 (yes): 615 = 19.3% of all HH; 2: 2,278 |
+| | THIS HOUSEHOLD REPLACES HOUSEHOLD NO / WILL BE REPLACED BY NO / REASON | =REPLACES REPLACED REPRES= | 207 / 18 / 131 | REPRES 1: 29, 2: 92, 3: 10 |
+| DATA ENTRY, ROUND ONE | OPERATOR code / DATE | =OPERID=; =DAY3 MO3 YR3= | 3,194 / 3,194 | |
+| SUPERVISION OF PRINTOUTS, ROUND ONE | SUPERVISOR code / DATE | =SUPPRID=; =DAY4 MO4 YR4= | 3,186 / 3,186 | |
+| SECOND ROUND OF SURVEY | PROPOSED DATE | =DAY5 MO5 YR5= | 3,193 | |
+| | INTERVIEWER code / DATE | =INTID2=; =DAY2 MO2 YR2= | 3,091 / 3,188 | same interviewer as round 1 in 2,982 of 3,075 |
+| VERIFICATION, ROUND TWO | SUPERVISOR code / DATE / REINTERVIEW? | =SUPID2=; =DAY2S MO2S YR2S=; =REINTER2= | 3,188 / 3,187 / 2,867 | REINTER2 = 1: 595 (18.6%) |
+| DATA ENTRY, ROUND TWO | OPERATOR code / DATE | =OPID2=; =DAY8 MO8 YR8= | 3,187 / 3,187 | |
+| SUPERVISION OF PRINTOUTS, ROUND TWO | SUPERVISOR code / DATE | =SUPPRID2=; =DAY9 MO9 YR9= | 3,180 / 3,180 | |
+| (all boxes) | names, REMARKS | -- | | NOT shipped |
+
+Round-1 interview dates run 1988-10 .. 1989-08 (364/391/202 in Oct/Nov/Dec
+1988, 315-321 per month Jan-May 1989, 7 in Jun, 306/331 in Jul/Aug; 6 stray
+dates in Jan/Feb/May 1988 and Sep/Dec 1989 are year-digit typos, see
+Idiosyncrasies).  The BID's ten "practice" clusters (174, 177, 190, 209,
+233, 238, 246, 685, 789, 790 -> 2174 ...) are ABSENT from =Y00A= -- already
+excluded from the distributed file.
+
+** Field -> variable, block 0B (=Y00B.DAT=)
+
+| 0B column | variable | non-null (of 47,839 rows) | vocabulary observed |
+|---|---|---|---|
+| SECTION | =SECTION= | 47,839 | 1..15 (3,192 rows each for 1-8; 3,186-3,187 for 9-15) |
+| FIRST VISIT DATE | =DAY1 MO1 YR1= | 47,839 | |
+| FIRST VISIT RESULT | =RESULT1= | 47,837 | 1 COMPLETE 44,357; 2 PARTIAL 1,113; 3 NOT APPLICABLE 2,367 (of which sec 9: 327, sec 10: 1,190, sec 13: 839 -- module skips, not visit failures) |
+| CHECK-UP VISIT DATE | =DAY2 MO2 YR2= | 1,203 (1,202 parse) | 345 households have at least one check-up row |
+| CHECK-UP VISIT RESULT | =RESULT2= | 1,185 | 1: 1,178; 2: 7 |
+| SUPERVISOR: INTERVIEWER | =SUPINTER= | 46,264 | 1 SATISFACTORY 44,050; 2 TO BE COMPLETED 730; 3 TO BE REDONE 1,484 |
+| SUPERVISOR: OPERATOR | =SUPOPER= | 46,179 | 1: 43,601; 2 CORRECTIONS: 2,578 |
+| [corrections] | =CHANGES= | 10,778 | 1 office 1,172; 2 during second round 1,104; 3 during check-up 209; 4 NOT CORRECTED 8,293 |
+
+Coverage: =Y00B= has 3,193 households; 2 =Y00A= households are missing from
+it and 1 =Y00B= household is missing from =Y00A=.  Within a household the
+eight round-1 sections carry ONE date in 3,164 of 3,192 households and the
+seven round-2 sections one date in 3,142 of 3,186 -- the grid was filled per
+round, not per section, so its information content is the two round dates
+plus the rare check-up visits.
+
+** =Y00C.DAT= is NOT form 0C
+
+BID Appendix B (printed p.29, PDF 31) lists "Y00A  Y00B, Y00C" under
+HOUSEHOLD, which reads as 0A/0B/0C.  Form =0C= is four free-text remark
+boxes and is not distributed.  =Y00C='s columns are the per-section
+respondent boxes ("SUPERVISOR: RESPONDENT / ID CODE"; "INTERVIEWER: IS THIS
+THE PERSON ACTUALLY INTERVIEWED? YES 1 NO 2") -- read off the names:
+=ID1A= (respondent id for 1A), =C1C= (1C check), =C9C C9E C9F C9G C9H=
+(Section 9 parts), =ID11 P11 C11D=, =ID12 P12 C12B=, =ID14A P14A C14A=.  The
+section mapping is inferred from the names and the 12A1 header at PDF 64; I
+did not read every section header.  No dates in this file.
+
+** Other files that carry a contact date
+
+| file | variables | rows / date non-null / HHs | relation to the cover-page date |
+|---|---|---|---|
+| =Y16A.DAT= (anthropometrics, round one) | =INTDA INTMA INTYA= per person, =NOMSRA= reason not measured | 14,496 / 12,826 / 3,188 | HH-min date minus =Y00A= round-1 date: median 0, p10 0, p90 1 |
+| =Y16B.DAT= (round two) | =INTDB INTMB INTYB=, =NOMSRB= | 11,287 / 9,895 / 3,174 | minus round-2 date: median 0, p10 -2, p90 2 |
+| =Y17A.DAT= (tests, round one) | =DAYT1 MOT1 YRT1=, =NOTEST1= | 7,147 / 6,409 / 1,594 | median 0, p90 2 |
+| =Y17B.DAT= (round two) | =DAYT2 MOT2 YRT2=, =NOTEST2= | 1,524 / 1,485 / 909 | median 0, p90 11 |
+| =EXPEND.DAT= (WB constructed) | =MO2 YR2= "month and year of the second interview" (BID printed p.23) | 3,188 | equals month/year of =Y00A: DAY2/MO2/YR2= in 3,188 of 3,188 -- so it inherits the round-2 date defect below |
+| =PRICE.DAT= | =MOINT YRINT= "month and year of the price interview, they may not correspond to the date of the household interview" (BID p.23) | cluster-level | market price survey, not a household visit |
+| =COMM.DAT= | =DAYI MOI YRI= (date of the community interview) | community | supervisor's community questionnaire |
+
+** Gaps between successive dates (days; =Y00A=, all parseable dates)
+
+| gap | n | p5 | p10 | p25 | median | p75 | p90 | p95 |
+|---|---|---|---|---|---|---|---|---|
+| R1 interview -> R1 supervisor verification | 3,194 | 0 | 0 | 0 | 1 | 1 | 2 | 3 |
+| R1 interview -> R1 data entry | 3,194 | 2 | 3 | 4 | 6 | 7 | 9 | 10 |
+| R1 data entry -> R1 printout supervision | 3,186 | 0 | 1 | 2 | 4 | 5 | 7 | 8 |
+| R1 interview -> PROPOSED R2 date | 3,193 | 11 | 13 | 14 | 14 | 14 | 14 | 14 |
+| R1 interview -> R2 interview | 3,188 | 0 | 9 | 13 | 14 | 14 | 15 | 16 |
+| proposed R2 -> actual R2 | 3,188 | -13 | -3 | -1 | 0 | 0 | 1 | 2 |
+| R2 interview -> R2 supervisor verification | 3,187 | 0 | 0 | 0 | 1 | 1 | 3 | 13 |
+| R2 interview -> R2 data entry | 3,187 | 1 | 2 | 3 | 6 | 8 | 14 | 18 |
+| R2 data entry -> R2 printout supervision | 3,179 | 0 | 0 | 1 | 3 | 7 | 13 | 18 |
+
+Proposed = actual round-2 date in 1,883 households; within 2 days in 2,661.
+Round 1 -> round 2 by stratum (=Rural= = BID Appendix I with SU folded
+onto Rural; the helper does not expose the three-way =UrbRur=): Rural
+n=2,124 median 14 (p10 9, p90 15); Urban n=1,070 median 14 (p10 1, p90
+15).  Urban's p10 of 1 is the 269-household defect below (three of its
+twelve clusters are urban), not a design difference.  The distribution of
+R1->R2: 14 days in 1,681 HH, 13 in 314, 15 in 222, 12 in 190, 11 in 148,
+16 in 124, 10 in 67 ...; 0 days in 269; negative in 11; > 60 in 4.
+
+Within a cluster the round-1 dates span a median of 4 days (p90 24, max
+490 -- the max is a typo cluster), consistent with "one cluster per week".
+
+Check-up visits (=Y00B= =DAY2=): median 1 day after the first visit (p10
+1, p75 2, p90 10).  =Y00B= section-9 first-visit date minus section-1 date:
+median 14, p10 11, p25 13, p75 14, p90 15 (n=3,186).
+
+* The NSO request for this wave
+
+*This wave already ships complete visit DATES; there is nothing to ask for
+on dates, and no TIME/DURATION field exists on the instrument to ask for.*
+
+Shipped: round-1 interview date, proposed and actual round-2 interview
+date, supervisor verification date x2, data-entry date x2, printout
+supervision date x2, interviewer/supervisor/operator ID CODES for every
+box (=Y00A=); per-section first-visit and check-up-visit dates with result
+codes and the supervisor's per-section verdicts (=Y00B=); per-person
+anthropometry dates for both rounds (=Y16A/Y16B=); per-person test dates
+(=Y17A/Y17B=).
+
+Exists on paper, NOT distributed -- the only things GSS could add:
+1. The supervisor's REINTERVIEW FORM (Supervisor's manual printed pp.34-35,
+   PDF 37-38): per-section SATISFACTORY/UNSATISFACTORY result, COMMENTS,
+   SUPERVISOR name and DATE of the reinterview.  Only the yes/no flag
+   =REINTER= / =REINTER2= survives in =Y00A= (19.3% / 18.6% yes, against the
+   BID's "randomly revisited 25 percent").  The reinterview date itself is
+   not in any file (=DAY1S/DAY2S= is the date the supervisor verified the
+   questionnaire, median 1 day after the interview, not the reinterview).
+   The form is not part of the questionnaire, the Section 0 data-entry
+   screen (Data-entry manual PDF 29) reproduces block 0A only, and no
+   distributed file carries its fields -- so it was not keyed and may not
+   survive on paper.
+2. Form =0C= free-text remarks (four boxes) and the REMARKS lines of every
+   0A box; NAME OF NEW HEAD.  Free text; never keyed.
+3. Interviewer / supervisor / operator NAMES behind the shipped id codes.
+   Not needed for timing.
+
+Time of day and interview duration: NOT recorded by the 1988 instrument at
+any level (household cover page, section headers, anthropometry sheet,
+reinterview form).  The BID's "expected to take 2-3 hours" per round
+(printed p.15) is the only statement of duration.  If @ligon's request is
+framed as "date and time of each visit", for GLSS2 the honest phrasing is
+"the date of each visit is already in Y00A/Y00B; no time was recorded".
+
+* Idiosyncrasies and contradictions
+
+1. *The cover-page round-2 date is wrong for 12 whole clusters (269
+   households): =Y00A: DAY2/MO2/YR2= equals =DAY1/MO1/YR1=.*  Clusters
+   2557 and 2558 (32 HH each), 2065, 2121, 2358, 2361, 2629, 2638, 2645,
+   2678, 2749 (16 each) and 2774 (15 of 16).  Three independent clocks in
+   the same households say round 2 happened ~14 days later: =Y00B=
+   section-9 first-visit date minus section-1 date (median 12-14 in those
+   clusters; 0 in only 3 rows), =DAY8 - DAY3= (round-2 minus round-1 data
+   entry: cluster medians 7-36), =DAY2S - DAY1S= (supervisor verification:
+   5-17), and =DAY5 - DAY1= (proposed date, cluster medians 4.5-14).  So the cover-page
+   round-2 date, not the fieldwork, is the defect -- the round-1 date was
+   transcribed (or keyed) into the round-2 box for those clusters.
+   *Recommendation*: for this wave take the round-2 interview date from
+   =Y00B= (=SECTION == 9=, =DAY1/MO1/YR1=), which agrees with =Y00A: DAY2=
+   in 2,845 of 3,186 households and is right where =Y00A= is not.
+   =EXPEND: MO2/YR2= ("month and year of the second interview") is derived
+   from the cover page and carries the same 269 errors.
+2. *=interview_date= in =1988-89/_/data_info.yml= wires the ROUND-ONE date*
+   (=DAY1/MO1/YR1=).  For the roster (Section 1, round one) that is the
+   right date; for =food_acquired= (Section 12, round two) the interview
+   date is the round-2 date -- see s1 for which variable to use.  Neither
+   =data_info.yml= nor CONTENTS.org says which round a table's interview
+   date refers to.
+3. *=Y00C= is not block 0C* (see above).  The BID's Appendix B naming is
+   misleading; CONTENTS.org does not mention =Y00B= or =Y00C= at all.
+4. *Year-digit typos*: 11 negative and 4 > 60-day R1->R2 gaps are all
+   88<->89 slips around January (e.g. HID 250105 R1 1988-01-19 vs proposed
+   1989-02-01; 250106 R1 1989-01-19 vs R2 1988-02-01; 240907 R1 1988-05-16
+   vs R2 1989-05-30; 272612 R1 1989-12-14 vs R2 1989-02-28).  =Y00B= HID
+   214222 section 12 has =DAY2=0, MO2=0, YR2=1= (unparseable).  Filter
+   before computing spans.
+5. *0B's per-section dates are per-round dates.*  3,164 of 3,192 households
+   carry one identical date across sections 1-8 and 3,142 of 3,186 across
+   9-15.  The grid does not tell you that Section 12 was asked on a
+   different day from Section 9 -- it tells you both were asked at the
+   round-2 contact.  The "several visits to complete" the manual allows
+   (printed p.5) show up only as the 345 households with a CHECK-UP VISIT
+   date.
+6. *No urban/rural difference in the protocol* (unlike GLSS3): both strata
+   are on the 14-day two-round schedule.  What differs is publicity: rural
+   clusters were announced by letter to the chief and by a courtesy call;
+   urban households got letters delivered by the interviewers 1-2 weeks
+   before Round One (Supervisor's manual printed p.7, PDF 10; BID printed
+   p.14).
+7. *Manual page offsets drift* and the interviewer manual scan is out of
+   order: Interviewer PDF = printed + 7 for printed pp.2-12 (PDF 9-19), but
+   PDF 21 = printed 24 and PDF 24 = printed 27, then PDF 67 = printed 70
+   (offset -3 by the end; printed pp.13-23, including "Summary of sections
+   and respondents" p.17, were not located in a targeted read; an
+   exhaustive sweep was not run).  Supervisor PDF = printed + 3 up to about
+   p.33 (PDF 10 = p.7, PDF 36 = p.33) and + 2 later (PDF 48 = p.46).
+   Data-entry PDF = printed + 3.  Cite both numbers.
+8. *12B has no "since my last visit" question, and the measured window
+   does not always apply to 12A either -- contradiction with CONTENTS.org
+   and food_acquired.py, quoted both ways.*  CONTENTS.org l.1242: "the two
+   rounds in the 1980s ask for expenditures 'since my last visit', but only
+   for one visit"; l.1258 tabulates 1988-89 as "9B (purchases) single
+   recall | 8H (own produce) single recall"; =food_acquired.py= reads
+   VFOODCPD "(produced_value per day)" beside CFOODBLV "amount spent since
+   last visit" under one "single, degenerate 'since my last visit' recall".
+   The instrument (PDF 68, printed p.43a) and the manual (printed p.71, PDF
+   68) say 12B asks months-in-the-past-12 x times-per-period x value each
+   time -- an annual-frequency recall, not a since-last-visit one.  So the
+   measured R1->R2 window applies to 12A PURCHASES only; 12B's "per day"
+   value is a derived rate.  And for 12A the manual's rule (printed p.70,
+   PDF 67) substitutes a nominal "past two weeks" whenever the interval is
+   under 7 or over 21 days or the interviewer made several visits: in
+   =Y00A= that is 293 households with R1->R2 < 7 days (269 of them the
+   same-day defect of s1, for which the true interval is unknown from the
+   cover page), 23 with > 21 days and 11 with a negative (year-typo)
+   interval, plus the 345 check-up-visit
+   households of =Y00B=.  For everyone else (2,861 households in the 7-21
+   day band, less the check-up cases) the
+   window is the per-household measured interval, median 14 days.
+9. *GLSS1 comparison, not verified here*: BID printed p.2 says 0B and 0C
+   "are only available for 1988-89", so 1987-88's =Y00A= should carry the
+   cover-page dates and there should be no =Y00B=; the 1987-88 agent owns
+   that check.

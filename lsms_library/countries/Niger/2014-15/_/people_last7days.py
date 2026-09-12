@@ -23,15 +23,18 @@ Reported fields:
              month*week*day*hour/52 (MS04Q25-28 job1, MS04Q51-53/51B job2),
              allocated farm/SB/wage by occupation code (MS04Q22/MS04Q48),
              summed across jobs, zeroed for non-working-age members.
+             Each input has its declared `Manquant` value-label code NA'd
+             first (GH #877); only MS04Q27 == 9 is present, on 1 row.
 """
 import sys
 
 sys.path.append('../../_/')
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet, format_id
+from lsms_library.local_tools import (get_categorical_mapping, get_dataframe,
+                                      to_parquet, format_id)
 from niger import (i as niger_i, _industry_label, _yn_bool,
-                   _finish_people_last7days)
+                   _finish_people_last7days, _num_no_declared_missing)
 
 
 FARM_CODES = {1101, 1102, 1103, 1104, 1105, 1106, 1107,
@@ -41,6 +44,8 @@ SB_CODES = {6101, 6202, 6203, 6204, 6205, 6206, 6207,
 
 base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
 lab = get_dataframe(base + 'ECVMA2_MS04P1.dta', convert_categoricals=False)
+# Value labels of the labor module, for the declared-missing NA (GH #877).
+VALUE_LABELS = get_categorical_mapping(base + 'ECVMA2_MS04P1.dta')
 ros = get_dataframe(base + 'ECVMA2_MS01P1.dta', convert_categoricals=False)
 
 key = ['GRAPPE', 'MENAGE', 'EXTENSION']
@@ -73,8 +78,17 @@ industry = industry.where(~(self_emp | not_worked).values, pd.NA)
 unemployed = (_num('MS04Q05') == 2) & (_num('MS04Q06') == 2)
 
 
+def _hours_input(col):
+    # NA the variable's OWN declared `Manquant` code before it is multiplied
+    # into the formula (GH #877).  MS04Q25/28/51/52 declare 99, MS04Q27/51B/53
+    # declare 9; MS04Q26 carries no value labels and is returned unmasked.
+    # Only MS04Q27 == 9 is actually present (1 row).
+    return _num_no_declared_missing(src, col, VALUE_LABELS)
+
+
 def _job_hours(month_c, week_c, day_c, hour_c):
-    m, w, d, h = _num(month_c), _num(week_c), _num(day_c), _num(hour_c)
+    m, w, d, h = (_hours_input(month_c), _hours_input(week_c),
+                  _hours_input(day_c), _hours_input(hour_c))
     hrs = (m * w * d * h) / 52
     return hrs.where(~unemployed, 0)
 

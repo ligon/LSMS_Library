@@ -13,7 +13,11 @@ myvars = dict(item='hh_s5aq00',                  # Code label uniquely identifyi
               units = 'hh_s5aq02_b',              # Units for food consumed
               value_purchased  = 'hh_s5aq04',     # Total value of food purchased
               quantity_purchased = 'hh_s5aq03_a', # Quantity of food purchased
-              units_purchased = 'hh_s5aq03_b')
+              units_purchased = 'hh_s5aq03_b',
+              quantity_produced = 'hh_s5aq05_a', # Q5 own production (quantity)
+              units_produced = 'hh_s5aq05_b',     # Q5 own production (unit)
+              quantity_inkind = 'hh_s5aq06_a',    # Q6 gifts / other sources (quantity)
+              units_inkind = 'hh_s5aq06_b')       # Q6 gifts / other sources (unit)
 
 df = food_acquired(fn,myvars)
 

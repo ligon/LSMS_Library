@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Mapping, NamedTuple
 
 
 _UNSET = object()
@@ -27,6 +27,95 @@ from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .errors import LabelUnavailableError
 from . import population as _population
+# NOT `from . import recall` / `from . import derivations`: the package binds
+# PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
+# `recall_table`, `ll.derivations(...)` = `derivations_table`), and
+# `from package import name` prefers the package ATTRIBUTE over the submodule.
+# This module is imported by `__init__` before those rebinds, so the submodule
+# form happens to work today and would silently start importing a FUNCTION if
+# `__init__`'s import order ever changed.  Name the symbols instead.
+from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
+from .recall import merge_attrs as _recall_merge_attrs
+from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
+from .derivations import merge_attrs as _derivations_merge_attrs
+
+
+# ---------------------------------------------------------------------------
+# attrs carriers: metadata that rides on `df.attrs` and dies at the concat
+# ---------------------------------------------------------------------------
+#
+# `attrs` survive an operation only when every input AGREES; any disagreement
+# -- including one side having none -- yields {}.  (Measured on the pinned
+# pandas 3.0.2; all seven cells are pinned by
+# tests/test_population.py::TestAttrsSurvival, and the table is in CLAUDE.md
+# under "Panel ID Transitive Chains and the attrs Flag".)
+#
+# Cross-country assembly is a `pd.concat` over frames whose records DIFFER BY
+# DESIGN -- one per country, which is the entire point of each record -- so it
+# lands in the {} case on every call with more than one country.  The capture
+# below is therefore not belt-and-braces: it is the only thing keeping these
+# records alive.  Do not "simplify" it away after testing concat with matching
+# inputs and watching it preserve.  Same family of hazard as the
+# `id_converted` bug.
+#
+# This used to be hardcoded for `population` alone, and `recall` (GH #851) and
+# `derivations` (SkunkWorks/derived_values.org) each shipped a `merge_attrs`
+# with NO caller -- so both died here silently (GH #873).  A fourth carrier is
+# now one entry in the tuple below.
+
+class _AttrsCarrier(NamedTuple):
+    """One metadata record that must be captured before, and re-attached after,
+    the cross-country ``concat``.
+
+    ``keys``
+        The ``df.attrs`` keys this carrier owns.  Captured verbatim per country.
+    ``attach``
+        ``(result, sources) -> None``.  ``sources`` is the list of captured
+        ``attrs`` sub-mappings for the KEPT countries only, in target order.
+        This is the carrier module's OWN ``merge_attrs`` -- the union rule
+        belongs to the module that defines the record, never here.
+    """
+    name: str
+    keys: tuple[str, ...]
+    attach: Callable[[pd.DataFrame, list[Mapping[str, Any]]], None]
+
+
+def _merge_into(key: str, merge: Callable[[Any], dict]) -> Callable[..., None]:
+    """Adapt a ``merge_attrs(frames) -> dict`` to the ``attach`` protocol.
+
+    ``population.merge_attrs`` already writes onto its target; ``recall`` and
+    ``derivations`` return the union instead.  An empty union is not written,
+    so a table with no such record keeps an absent key rather than an empty
+    dict -- "no record" and "an empty record" must not become the same thing.
+    """
+    def _attach(result: pd.DataFrame, sources: list[Mapping[str, Any]]) -> None:
+        merged = merge(sources)
+        if merged:
+            result.attrs[key] = merged
+    return _attach
+
+
+_ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
+    _AttrsCarrier(
+        "population",
+        (_population.ATTRS_KEY, _population.ATTRS_RESOLUTION_KEY),
+        _population.merge_attrs,
+    ),
+    _AttrsCarrier(
+        "recall",
+        (_RECALL_ATTRS_KEY,),
+        _merge_into(_RECALL_ATTRS_KEY, _recall_merge_attrs),
+    ),
+    _AttrsCarrier(
+        "derivations",
+        (_DERIVATIONS_ATTRS_KEY,),
+        _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
+    ),
+)
+
+#: Every ``attrs`` key any carrier owns -- what the per-country capture keeps.
+_CARRIED_ATTRS_KEYS: tuple[str, ...] = tuple(
+    k for carrier in _ATTRS_CARRIERS for k in carrier.keys)
 
 
 def _load_global_columns() -> dict[str, dict[str, Any]]:
@@ -56,6 +145,15 @@ def _all_known_features() -> set[str]:
     return names
 
 
+def _index_info_section() -> dict[str, Any]:
+    """The global ``Index Info`` block of data_info.yml (``{}`` if absent)."""
+    info_path = files("lsms_library") / "data_info.yml"
+    with open(info_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    section = (data or {}).get("Index Info") or {}
+    return section if isinstance(section, dict) else {}
+
+
 def _canonical_index_levels(table_name: str) -> list[str]:
     """Return the canonical index level names for *table_name*.
 
@@ -63,16 +161,259 @@ def _canonical_index_levels(table_name: str) -> list[str]:
     whose values are tuple strings like ``(t, v, i)``.  Returns ``[]`` when
     the table is not listed (no canonical reshaping is then attempted).
     """
-    info_path = files("lsms_library") / "data_info.yml"
-    with open(info_path, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-    spec = data.get("Index Info", {}).get("index_info", {}).get(table_name)
+    spec = (_index_info_section().get("index_info") or {}).get(table_name)
     if not isinstance(spec, str):
         return []
     cleaned = spec.strip()
     if cleaned.startswith("(") and cleaned.endswith(")"):
         cleaned = cleaned[1:-1]
     return [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+
+
+def _level_aliases(table_name: str) -> dict[str, str]:
+    """``{country's level name: canonical level name}`` for *table_name*.
+
+    Reads ``Index Info: level_aliases`` (GH #569).  A country that names the
+    same axis differently -- Ethiopia's ``plot_id`` for Uganda's ``plot``,
+    Malawi's ``crop`` for Uganda's ``j`` -- would otherwise present a divergent
+    index shape and be excluded from the assembly.  Renaming is declarative on
+    purpose: it is the fact ``transformations._CROP_LEVELS`` / ``_PLOT_LEVELS``
+    already encode for the ``Country()`` path, stated once where the canonical
+    index is stated.
+    """
+    aliases = (_index_info_section().get("level_aliases") or {}).get(table_name)
+    if not isinstance(aliases, dict):
+        return {}
+    return {str(k): str(v) for k, v in aliases.items()}
+
+
+def _missing_level_sentinels(table_name: str) -> dict[str, str]:
+    """``{canonical level: sentinel value}`` for *table_name*.
+
+    Reads ``Index Info: missing_level_sentinels``.  Twin of -- and preferred
+    over -- ``fabricate_missing_levels`` (#506), which fills with ``pd.NA``: a
+    NULL on a declared index level is a DEFERRED SILENT DELETION, because
+    ``groupby(dropna=True)`` removes the row in whichever aggregation runs
+    first (CLAUDE.md "Grain Collapse" 3b; the ``u`` and ``condition`` notes in
+    data_info.yml make the same argument for the same reason).
+
+    Declaring a level here also licenses PROMOTION -- see
+    :func:`_align_to_canonical_levels`.
+    """
+    spec = (_index_info_section().get("missing_level_sentinels") or {}).get(table_name)
+    if not isinstance(spec, dict):
+        return {}
+    return {str(k): v for k, v in spec.items()}
+
+
+def _rename_index_levels(df: pd.DataFrame, aliases: dict[str, str],
+                         country: str, table_name: str) -> pd.DataFrame:
+    """Rename this country's index levels to their canonical names (GH #569).
+
+    A no-op when the frame declares no aliased level.  If BOTH the alias and
+    its canonical target are already present the rename is skipped and warned
+    about -- renaming would produce two levels with one name, and the country
+    means something by the distinction that this table does not know.
+    """
+    if not aliases or df.index.names is None:
+        return df
+    names = list(df.index.names)
+    todo = {src: dst for src, dst in aliases.items() if src in names}
+    if not todo:
+        return df
+    clash = [src for src, dst in todo.items() if dst in names]
+    if clash:
+        warnings.warn(
+            f"{table_name}: {country} carries both an aliased index level and "
+            f"its canonical target {[(c, todo[c]) for c in clash]}; the rename "
+            f"was skipped (it would create duplicate level names). The frame "
+            f"keeps its own index shape."
+        )
+        return df
+    return df.rename_axis(index=todo)
+
+
+def _align_to_canonical_levels(
+    df: pd.DataFrame, canonical_levels: list[str], sentinels: dict[str, Any],
+    country: str, table_name: str, report: dict[str, Any] | None = None,
+) -> pd.DataFrame:
+    """Give *df* every canonical level for which a sentinel is declared.
+
+    Three branches per declared level, in this order:
+
+    1. **already an index level** -- nothing to do;
+    2. **present as a COLUMN** -- promoted into the index, with nulls filled by
+       the sentinel.  Lossless, and strictly better than fabricating a sentinel
+       on top of real values: Mali, Nigeria and Tanzania each report a genuine
+       harvest unit in a ``u`` column rather than in the index, and promoting it
+       is what keeps them in the assembly instead of excluded;
+    3. **absent entirely** -- fabricated as a constant sentinel level.
+
+    Never ``pd.NA``: every value written here is the declared string sentinel,
+    because a null on a declared index level is deleted by the next ``groupby``.
+
+    **Branch 3 cannot make the index non-unique; BRANCH 2 CAN.**  An earlier
+    version of this docstring claimed neither could, and that was wrong in the
+    dangerous direction.  Adding a *constant* level distinguishes nothing, so it
+    refines nothing and collides with nothing -- branch 3 is structurally safe.
+    Promotion is not: a column holding BOTH a null (filled with the sentinel)
+    and the LITERAL sentinel value maps two otherwise-identical rows onto one
+    index tuple.  No corpus country is in that state today -- Mali, Nigeria and
+    Tanzania's ``u`` columns carry 0 literal ``'Unknown'`` values -- but that is
+    a fact about the data, not a property of the code, and it can change with
+    any wave.
+
+    So the collision is GUARDED rather than assumed away: a non-unique index
+    after ``set_index`` is routed through :func:`_collapse_duplicate_index`, the
+    same audited collapse the core uses, which files a grain report and raises
+    ``GrainCollapseError`` under ``LSMS_GRAIN_STRICT`` when the colliding rows
+    disagree.  Never a silent collapse, and never a silent pass-through of a
+    non-unique index into ``pd.concat``.
+
+    Reporting.  With ``report`` supplied, what happened is recorded there and
+    :meth:`Feature.__call__` emits ONE aggregated warning per call and puts the
+    record on ``df.attrs['canonical_alignment']`` -- the same Contract-B shape
+    ``labels=`` degradation uses.  Per-country warnings would fire a dozen
+    times on every ``Feature('crop_production')()`` for behaviour the config
+    explicitly asks for, and a warning nobody reads is how #323 survived its
+    first fix.  With ``report`` omitted (direct callers, tests) it warns
+    per-country instead, so the helper still describes itself.
+    """
+    if not canonical_levels or not sentinels:
+        return df
+    names = list(df.index.names)
+    if any(n is None for n in names):
+        # An unnamed level cannot be round-tripped through reset_index /
+        # set_index, and a frame that reached here unnamed has a bigger problem
+        # than a missing sentinel (the #325 collapse warning covers it).
+        return df
+    todo = [lvl for lvl in canonical_levels
+            if lvl in sentinels and lvl not in names]
+    if not todo:
+        return df
+
+    flat = df.reset_index()
+    promoted, fabricated = [], []
+    for lvl in todo:
+        sentinel = sentinels[lvl]
+        if lvl in flat.columns:
+            col = flat[lvl]
+            if isinstance(col.dtype, pd.CategoricalDtype):
+                col = col.astype(object)
+            filled = col.where(col.notna(), sentinel)
+            n_filled = int(col.isna().sum())
+            flat[lvl] = filled
+            promoted.append((lvl, n_filled))
+        else:
+            flat[lvl] = sentinel
+            fabricated.append(lvl)
+    out = flat.set_index(names + todo)
+    out.attrs = dict(df.attrs)  # single-input ops keep attrs; be explicit anyway
+    if promoted and not out.index.is_unique:
+        # A promoted column held a null AND the literal sentinel on rows that are
+        # otherwise identical -- the one way this function can collide.  Route it
+        # through the SAME audited collapse the core uses so a destructive
+        # collapse is reported (and fatal under LSMS_GRAIN_STRICT) rather than
+        # shipping a silently non-unique Feature index.  `attrs` are re-attached
+        # because `groupby().agg()` is not a single-input op.
+        collapsed = _collapse_duplicate_index(out, table_name, country)
+        collapsed.attrs = dict(out.attrs)
+        n_lost = len(out) - len(collapsed)
+        if report is not None:
+            report.setdefault("promotion_collisions", {})[country] = {
+                lvl: sentinels[lvl] for lvl, _ in promoted}
+        else:
+            warnings.warn(
+                f"{table_name}: promoting {[lvl for lvl, _ in promoted]} for "
+                f"{country} made the index NON-UNIQUE -- the column holds both "
+                f"nulls (filled with the sentinel) and the literal sentinel "
+                f"value, so {n_lost} row(s) collided onto an existing key. "
+                f"Collapsed through the audited core collapse; any destructive "
+                f"loss is reported separately as a GrainCollapseWarning."
+            )
+        out = collapsed
+    if report is not None:
+        if promoted:
+            report.setdefault("promoted", {})[country] = {
+                lvl: n for lvl, n in promoted}
+        if fabricated:
+            report.setdefault("fabricated", {})[country] = {
+                lvl: sentinels[lvl] for lvl in fabricated}
+        return out
+    if promoted:
+        warnings.warn(
+            f"{table_name}: promoted column(s) "
+            f"{[lvl for lvl, _ in promoted]} to index level(s) for {country} "
+            f"(canonical index levels carried as columns); "
+            f"{ {lvl: n for lvl, n in promoted} } null value(s) filled with the "
+            f"declared sentinel."
+        )
+    if fabricated:
+        warnings.warn(
+            f"{table_name}: {country} does not record "
+            f"{fabricated}; added as constant sentinel index level(s) "
+            f"{ {lvl: sentinels[lvl] for lvl in fabricated} } so the frame keeps "
+            f"the canonical shape. No rows were added, removed or collapsed."
+        )
+    return out
+
+
+def _select_kept_shape(
+    frames: list[pd.DataFrame], canonical_levels: list[str],
+) -> tuple[list[pd.DataFrame], list[pd.DataFrame], tuple[Any, ...] | None]:
+    """Choose the single index shape the assembly keeps.
+
+    pandas cannot stack frames whose index DEPTH/NAMES differ into a named
+    MultiIndex -- it falls back to an unnamed object index, collapsing the WHOLE
+    feature (issue #512).  So one shape has to win.  The rule, in order:
+
+    1. the CANONICAL shape (``['country'] + canonical_levels``) if any frame has
+       it -- a country that moves TOWARD the declared index must never be the one
+       excluded, which is exactly the regression this fixes (a Malawi frame that
+       gained the canonical ``condition`` level lost 131,379 rows to the
+       pre-#775 rule);
+    2. otherwise the shape carried by the most frames (the historical "modal"
+       rule, kept for features with no ``index_info`` entry);
+    3. ties broken by total ROWS, then
+    4. by the shape's level names -- the lexicographically smallest tuple.
+
+    Steps 3-4 are what make this independent of the ORDER the caller listed the
+    countries in.  ``Counter.most_common`` breaks a tie by insertion order, so
+    ``Feature(f)(['A','B','C'])`` and ``Feature(f)(['C','B','A'])`` returned
+    different countries for the same data (GH #775).
+
+    Returns ``(kept, dropped, winning_shape)``; ``winning_shape`` is ``None``
+    when every frame already agrees (nothing to choose).
+    """
+    if len(frames) <= 1:
+        return frames, [], None
+    shape_of = lambda f: tuple(f.index.names)
+    shapes = {shape_of(f) for f in frames}
+    if len(shapes) == 1:
+        return frames, [], None
+
+    canonical_shape = tuple(["country"] + list(canonical_levels)) if canonical_levels else None
+    if canonical_shape is not None and canonical_shape in shapes:
+        winner = canonical_shape
+    else:
+        stats: dict[tuple[Any, ...], list[int]] = {}
+        for f in frames:
+            s = shape_of(f)
+            acc = stats.setdefault(s, [0, 0])
+            acc[0] += 1
+            acc[1] += len(f)
+        # Sort key: most frames, then most rows, then the SMALLEST level-name
+        # tuple (negated ranks so a single `min` expresses all three, and so
+        # the third criterion is a genuine lexicographic minimum rather than
+        # whichever way `max` happened to fall).
+        def _rank(s: tuple[Any, ...]) -> tuple[Any, ...]:
+            n_frames, n_rows = stats[s]
+            return (-n_frames, -n_rows,
+                    tuple("" if n is None else str(n) for n in s))
+        winner = min(stats, key=_rank)
+    kept = [f for f in frames if shape_of(f) == winner]
+    dropped = [f for f in frames if shape_of(f) != winner]
+    return kept, dropped, winner
 
 
 def _fabricates_missing_levels(table_name: str) -> bool:
@@ -95,10 +436,10 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 
 # Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
 # When collapsing the duplicate index left after dropping that level, these must
-# be SUMMED (not reduced via first(), which undercounts the cross-country total).
+# be SUMMED (a row SELECTION undercounts the cross-country total).
 # Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
 # (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
-# Keeping first() there silently kept only ~48% of total Quantity.
+# Selecting one visit's row there silently kept only ~48% of total Quantity.
 #
 # This is the ONE reduction policy core keeps (see the NO-AGGREGATION-IN-CORE
 # contract in SkunkWorks/grain_aggregation_policy.org and D1 of
@@ -115,19 +456,20 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 # assets (GH #323): Nigeria W2's `sect5b_plantingw2` is a PER-UNIT ROSTER -- one
 # row per individual unit owned, enumerated by `item_seq` (1..15), each with its
 # own reported Value.  The canonical assets grain is (t, i, j), so those rows
-# arrive as duplicates and first() kept ONE UNIT and discarded the rest:
+# arrive as duplicates and the collapse kept ONE UNIT and discarded the rest:
 # N576,299,043 true -> N429,001,558 kept -> N147,297,485 (25.6%) DESTROYED, in
 # EACH of t=2012Q3 and t=2013Q1.  Summing Value is exactly lossless: the value of
 # a household's holding of item j IS the sum over the units it owns (hh 10001
 # owns 4 beds worth 7000+3000+6000+5000 = 21,000).
-#   * `Quantity` must stay first(): it comes from the SEPARATE, already-clean
+#   * `Quantity` must stay SELECTED: it comes from the SEPARATE, already-clean
 #     sect5a grid (one row per (i, j)) and the wave's `dfs:` merge REPEATS it
 #     across the item_seq rows -- verified, 0 groups where it varies.  Summing it
 #     would multiply the unit count by itself (4 beds -> 16).
-#   * `Age` also stays first().  It is genuinely per-unit (it varies within 7,029
-#     groups), so NO reducer is lossless at (t, i, j) -- the four beds are 10, 6,
-#     10 and 6 years old and that fact cannot be carried by one row.  first()
-#     keeps unit #1's age.  Retaining the detail needs the `item_seq` level to
+#   * `Age` also stays SELECTED.  It is genuinely per-unit (it varies within
+#     7,029 groups), so NO reducer is lossless at (t, i, j) -- the four beds are
+#     10, 6, 10 and 6 years old and that fact cannot be carried by one row.  The
+#     collapse keeps the age of the most complete unit row (GH #871; it used to
+#     be unit #1's, by per-column `first()`).  Retaining the detail needs the `item_seq` level to
 #     survive, which it currently cannot: the extra idxvar is dropped by the
 #     `dfs:` merge in Wave.grab_data (#323 Site 4), and Nigeria's other waves
 #     have no item_seq column to declare.  Tracked as a residual, not fixed here;
@@ -171,18 +513,23 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
 
     For additive-measure tables (GH #501) sum the additive columns and re-derive
     any unit-``Price`` column from the summed totals (price is per-unit, NOT
-    additive).  Otherwise keep the first row per group (the historical default).
+    additive).  Every other column is SELECTED rather than reduced: GH #871
+    serves the MOST COMPLETE OBSERVED ROW of the group (``most_complete_row``),
+    where this used to serve a per-column ``groupby().first()`` composite that
+    existed in no country's data.
 
-    GH #323: this is the SECOND of the two core ``.first()`` collapses named in
+    GH #323: this is the THIRD of the core collapses named in
     SkunkWorks/grain_aggregation_policy.org.  Like the one in
     ``country._normalize_dataframe_index`` it is audited before it destroys
     anything -- a Feature() assembly must not be a place where a country quietly
-    loses rows that ``Country(name).table()`` would have returned.
+    loses rows that ``Country(name).table()`` would have returned -- and it must
+    select by the same rule, so the two access paths agree.
     """
     # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
     # module-level import back would cycle.
     from .country import (_audit_index_collapse, _record_grain_report,
-                          _sum_min_count_1)
+                          most_complete_row)
+    from .derivations import COLUMN as _DERIVATION_COLUMN, union_keys_by_group
 
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
     present = [c for c in (additive or ()) if c in df.columns]
@@ -199,6 +546,11 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
         reconciled = list(present)
         if "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
             reconciled.append("Price")
+        # GH #871: on the additive branch `Derivation` is reconciled as well --
+        # the union of the summed rows' keys keeps every one of them.  Only here;
+        # on the selection branch the served row carries its own key.
+        if _DERIVATION_COLUMN in df.columns:
+            reconciled.append(_DERIVATION_COLUMN)
         residual = _audit_index_collapse(df.drop(columns=reconciled),
                                          list(df.index.names))
         if residual is None:
@@ -215,14 +567,39 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
                       additive=bool(present))
         _record_grain_report(report)
 
-    grouped = df.groupby(level=list(df.index.names), observed=True)
+    levels = list(df.index.names)
+    # GH #871: SELECT one observed row per group for every column core does not
+    # reduce.  The reduced columns are excluded from the completeness score
+    # because their served value does not come from the selected row.
+    reduced = set(present)
+    if _DERIVATION_COLUMN in df.columns:
+        # On BOTH branches: a library-computed provenance flag must not decide
+        # which survey row is served.  Same rule as
+        # country._normalize_dataframe_index (GH #871).
+        reduced.add(_DERIVATION_COLUMN)
+    if present and "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+        # Re-derived from the summed totals below; excluded for the same reason
+        # as the additive measures (@ligon, 2026-09-12).
+        reduced.add("Price")
+    out = most_complete_row(df, levels, exclude=reduced)
     if not present:
-        return grouped.first()
+        return out
     # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
-    # become a fabricated 0.0.  Same reducer as country._normalize_dataframe_index
+    # become a fabricated 0.0.  Same reducers as country._normalize_dataframe_index
     # -- the two sites read one policy dict and must apply it identically (#323).
-    agg = {c: (_sum_min_count_1 if c in present else "first") for c in df.columns}
-    out = grouped.agg(agg)
+    # `sum(min_count=1)` in its cython spelling -- ~400x faster on a large frame
+    # with populated `attrs`, and identical to `_sum_min_count_1` TO WITHIN ONE
+    # ULP (cython sums pairwise; 392 of 161,176 GhanaLSS 1998-99 groups differ at
+    # max rel 4e-16, with totals, NA pattern and dtypes unchanged).  That is a
+    # behaviour change #871 did not ask for; see the full note at
+    # country._normalize_dataframe_index (GH #871).
+    grouped = df.groupby(level=levels, observed=True)
+    sums = grouped[present].sum(min_count=1)
+    overlay = {c: sums[c] for c in present}
+    if _DERIVATION_COLUMN in df.columns:
+        overlay[_DERIVATION_COLUMN] = union_keys_by_group(
+            df[_DERIVATION_COLUMN], levels, out.index)
+    out = out.assign(**overlay)
     if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
         out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
     return out
@@ -231,6 +608,9 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
 def _harmonize_country_frame(
     df: pd.DataFrame, canonical_levels: list[str], country: str, table_name: str,
     fabricate_missing: bool = False,
+    aliases: dict[str, str] | None = None,
+    sentinels: dict[str, Any] | None = None,
+    alignment_report: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Coerce a single country's frame toward the canonical shape before concat.
 
@@ -246,9 +626,27 @@ def _harmonize_country_frame(
     (a per-feature opt-in, #506), any canonical level absent from this country's
     index is added as a ``pd.NA`` level so reduced-index countries share the
     full canonical shape and are KEPT (rather than modal-excluded in __call__).
+
+    ``aliases`` (``Index Info: level_aliases``, GH #569) renames a country's own
+    level names to the canonical ones FIRST -- ``plot_id`` -> ``plot``, ``crop``
+    -> ``j`` -- so alignment can proceed by name.  ``sentinels``
+    (``Index Info: missing_level_sentinels``) then gives the frame any declared
+    canonical level it still lacks, promoting it from a COLUMN where the country
+    has one and otherwise fabricating a constant sentinel.  Both run before the
+    all-NaN column drop and the #498 reorder, so a promoted column is never
+    dropped as "all NaN" and the reorder sees the finished level set.
     """
     if not isinstance(df, pd.DataFrame) or df.empty:
         return df
+
+    # Canonical NAME harmonization (#569), then canonical LEVEL-SET alignment.
+    # Order matters: aliasing first, or `_align_to_canonical_levels` would see
+    # `plot` as missing on a country that spells it `plot_id` and fabricate a
+    # sentinel on top of a level that is right there.
+    df = _rename_index_levels(df, aliases or {}, country, table_name)
+    df = _align_to_canonical_levels(
+        df, canonical_levels, sentinels or {}, country, table_name,
+        report=alignment_report)
 
     # Drop columns that are entirely missing (e.g. a `date`/`v` column left
     # populated only on other countries).  Concat re-introduces them as NaN
@@ -422,42 +820,81 @@ class Feature:
             if isinstance(meta, dict) and meta.get("required", False)
         ]
 
-    def _attach_population(self, result: pd.DataFrame,
-                           captured: dict[str, dict[str, Any]]) -> None:
-        """Re-attach the population record to the assembled frame, and warn if
-        the pool mixes materially different universes (GH #603/#601).
+    def _attach_carried_attrs(self, result: pd.DataFrame,
+                              captured: dict[str, dict[str, Any]]) -> None:
+        """Re-attach every ``attrs`` carrier to the assembled frame (GH #873).
+
+        Population (GH #603/#601), recall (GH #851) and derivations
+        (``SkunkWorks/derived_values.org``) all die at the cross-country
+        ``concat`` -- their records differ by design, so it lands in the ``{}``
+        case -- and each ships its own ``merge_attrs``.  This walks
+        :data:`_ATTRS_CARRIERS` and calls them; a fourth carrier is one entry
+        there and no code here.
 
         Only the countries actually present in *result* contribute: a frame
         dropped by the modal-index-shape filter above is not in the answer, so
         it must not be in the answer's metadata or in the warning.
 
-        The warning is advisory and one-per-call.  It NEVER removes a row --
-        see the note at the call site.
+        Each carrier is attached under its own ``try``, so one broken record
+        cannot suppress the others.  A metadata annotation must never break a
+        data call -- the same rule ``population.attach`` obeys on the Country
+        side -- but the failure is LOUD: a silently absent record is
+        indistinguishable from a homogeneous pool, which is the one thing this
+        must not look like.
+
+        Only population reports at pooling time.  A warning for the other two
+        was considered and declined on 2026-09-11 (``derived_values.org``
+        §"No warning at pooling time"): at that level the ``attrs`` summary is
+        itself the signal, and a warning would repeat it as noise.
         """
         try:
-            try:
-                kept = set(result.index.get_level_values("country").unique())
-            except (KeyError, ValueError):
-                kept = set(captured)
-            _population.merge_attrs(
-                result, [v for k, v in captured.items() if k in kept])
-            report = _population.pool_report(
-                _population.records_from_attrs(result), self.table_name)
+            kept = set(result.index.get_level_values("country").unique())
         except Exception as exc:
-            # A metadata annotation must never break a data call -- the same
-            # rule `population.attach` obeys on the Country side.  Loud, though:
-            # a silently absent record would be indistinguishable from a
-            # homogeneous pool, which is the one thing this must not look like.
+            # Deliberately broader than the (KeyError, ValueError) this used to
+            # catch: that pair sat INSIDE an outer `except Exception` that also
+            # covered this line, and the outer one is now per-carrier.  Never
+            # let working out WHICH countries are kept break a data call --
+            # but say so (the docstring's LOUD rule): falling back to every
+            # captured country can over-report a dropped one.
             warnings.warn(
-                f"{self.table_name}: could not attach the population record "
-                f"({type(exc).__name__}: {exc}). The result is unaffected, but "
-                f"df.attrs['population'] may be incomplete and no comparability "
-                f"warning was computed."
-            )
-            return
-        if report:
-            warnings.warn(report, _population.PopulationHeterogeneityWarning,
-                          stacklevel=3)
+                f"{self.table_name}: could not read the country level to decide "
+                f"which attrs records to re-attach ({type(exc).__name__}: "
+                f"{exc}); re-attaching all {len(captured)} captured records")
+            kept = set(captured)
+        in_answer = [v for k, v in captured.items() if k in kept]
+
+        for carrier in _ATTRS_CARRIERS:
+            sources = [{k: src[k] for k in carrier.keys if k in src}
+                       for src in in_answer]
+            try:
+                carrier.attach(result, sources)
+            except Exception as exc:
+                warnings.warn(
+                    f"{self.table_name}: could not attach the {carrier.name} "
+                    f"record ({type(exc).__name__}: {exc}). The result is "
+                    f"unaffected, but df.attrs[{carrier.name!r}] may be "
+                    f"incomplete"
+                    + (" and no comparability warning was computed."
+                       if carrier.name == "population" else ".")
+                )
+                continue
+            if carrier.name != "population":
+                continue
+            try:
+                report = _population.pool_report(
+                    _population.records_from_attrs(result), self.table_name)
+            except Exception as exc:
+                warnings.warn(
+                    f"{self.table_name}: could not attach the population record "
+                    f"({type(exc).__name__}: {exc}). The result is unaffected, but "
+                    f"df.attrs['population'] may be incomplete and no comparability "
+                    f"warning was computed."
+                )
+                continue
+            if report:
+                warnings.warn(report,
+                              _population.PopulationHeterogeneityWarning,
+                              stacklevel=3)
 
     def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
                  currency: str | None = 'index', numeraire: str | None = None,
@@ -528,6 +965,11 @@ class Feature:
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
         fabricate_missing = _fabricates_missing_levels(self.table_name)  # #506
+        aliases = _level_aliases(self.table_name)                       # #569
+        sentinels = _missing_level_sentinels(self.table_name)           # #569/#775
+        # Structured record of every canonical level PROMOTED from a column or
+        # FABRICATED as a sentinel, aggregated into one warning after the loop.
+        alignment_report: dict[str, Any] = {}
 
         # numeraire supersedes currency; both are no-ops for non-monetary tables.
         # Either way the output carries a `currency` index level (relabelled to
@@ -554,27 +996,14 @@ class Feature:
         # df.attrs marker -- distinct from genuine per-country build failures.
         labels_unavailable: list[str] = []
 
-        # The population record each country's frame arrived with (GH #603).
+        # The metadata records each country's frame arrived with: population
+        # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
+        # above for the rule that makes this capture load-bearing rather than
+        # belt-and-braces, and GH #873 for the two that used to be dropped.
         # Captured HERE, before _harmonize_country_frame / pd.concat, and
         # re-attached after assembly for the KEPT frames only -- so `attrs`
         # describes what the caller actually receives.
-        #
-        # The capture is not belt-and-braces, and the reason is a RULE, not a
-        # per-method quirk.  Measured on the pinned pandas 3.0.2 (all seven
-        # cells are pinned by tests/test_population.py::TestAttrsSurvival):
-        #
-        #     `attrs` survive only when every input AGREES; any disagreement --
-        #     including one side having none -- yields {}.
-        #
-        # So `merge` with matching attrs PRESERVES, and a single-input op like
-        # `set_index` is trivially safe.  What makes the drop certain here is
-        # that the population records DIFFER BY DESIGN -- one per country, which
-        # is the entire point of the record -- so the final `pd.concat` below
-        # lands in the {} case on every call with more than one country.  Do not
-        # "simplify" this away after testing concat with matching inputs and
-        # watching it preserve.  Same family of hazard as the `id_converted` bug
-        # (CLAUDE.md, "Panel ID Transitive Chains and the attrs Flag").
-        captured_population: dict[str, dict[str, Any]] = {}
+        captured_attrs: dict[str, dict[str, Any]] = {}
 
         for name in targets:
             try:
@@ -604,16 +1033,17 @@ class Feature:
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
-                captured_population[name] = {
-                    k: df.attrs[k] for k in
-                    (_population.ATTRS_KEY, _population.ATTRS_RESOLUTION_KEY)
+                captured_attrs[name] = {
+                    k: df.attrs[k] for k in _CARRIED_ATTRS_KEYS
                     if k in df.attrs
                 }
                 # Coerce toward the canonical shape so one country's stray
                 # column / extra index level can't collapse the whole
                 # concatenated index to object tuples (GH #325).
                 df = _harmonize_country_frame(
-                    df, canonical_levels, name, self.table_name, fabricate_missing
+                    df, canonical_levels, name, self.table_name, fabricate_missing,
+                    aliases=aliases, sentinels=sentinels,
+                    alignment_report=alignment_report,
                 )
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
@@ -652,39 +1082,89 @@ class Feature:
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
         # WHOLE feature (issue #512: EthiopiaRHS's documented (t,i) reduced assets
         # stacked with item-level (t,i,j); also surfaces under labels='Aggregate'
-        # when most countries KeyError-drop and a j-less survivor remains).  Keep
-        # the modal index shape and exclude the divergent frame(s) with a loud,
-        # named warning -- the excluded country stays available via
-        # Country(name).<table>().
-        if len(frames) > 1:
-            from collections import Counter
-            shape_of = lambda f: tuple(f.index.names)
-            counts = Counter(shape_of(f) for f in frames)
-            if len(counts) > 1:
-                modal = counts.most_common(1)[0][0]
-                kept = [f for f in frames if shape_of(f) == modal]
-                dropped = [f for f in frames if shape_of(f) != modal]
-                dropped_names = [f.index.get_level_values("country")[0]
-                                 for f in dropped if len(f)]
-                warnings.warn(
-                    f"{self.table_name}: excluded {len(dropped)} country frame(s) "
-                    f"{dropped_names} with a divergent index shape from the "
-                    f"cross-country assembly (kept modal shape {list(modal)}); "
-                    f"stacking heterogeneous index depths would collapse the whole "
-                    f"result to an unnamed index. Access the excluded data via "
-                    f"Country(name).{self.table_name}()."
-                )
-                frames = kept
+        # when most countries KeyError-drop and a j-less survivor remains).  One
+        # shape has to win; the divergent frame(s) are excluded with a loud, named
+        # warning and stay available via Country(name).<table>().
+        #
+        # WHICH shape wins is _select_kept_shape's job: the declared canonical
+        # index when a frame has it, else the historical modal rule with an
+        # order-independent tie-break (GH #775).
+        kept, dropped, winner = _select_kept_shape(frames, canonical_levels)
+        if dropped:
+            dropped_names = [f.index.get_level_values("country")[0]
+                             for f in dropped if len(f)]
+            canonical_shape = (tuple(["country"] + list(canonical_levels))
+                               if canonical_levels else None)
+            why = ("the canonical index declared in data_info.yml"
+                   if winner == canonical_shape else
+                   "the modal index shape among the frames built")
+            warnings.warn(
+                f"{self.table_name}: excluded {len(dropped)} country frame(s) "
+                f"{dropped_names} with a divergent index shape from the "
+                f"cross-country assembly (kept {why}: {list(winner)}); "
+                f"stacking heterogeneous index depths would collapse the whole "
+                f"result to an unnamed index. Access the excluded data via "
+                f"Country(name).{self.table_name}()."
+            )
+        frames = kept
 
         result = pd.concat(frames)
         n_kept = result.index.get_level_values("country").nunique()
+
+        # Canonical-index alignment, reported ONCE (Contract B shape).  Only for
+        # the countries actually KEPT -- a frame excluded above is not in the
+        # answer, so it must not be in the answer's metadata (same rule
+        # `_attach_carried_attrs` obeys).
+        if alignment_report:
+            try:
+                kept_names = set(result.index.get_level_values("country").unique())
+            except (KeyError, ValueError):
+                kept_names = set(targets)
+            record = {
+                kind: {c: v for c, v in per_country.items() if c in kept_names}
+                for kind, per_country in alignment_report.items()
+            }
+            record = {k: v for k, v in record.items() if v}
+            if record:
+                result.attrs['canonical_alignment'] = record
+                promoted = record.get('promoted', {})
+                fabricated = record.get('fabricated', {})
+                bits = []
+                if promoted:
+                    bits.append(
+                        f"promoted a canonical level carried as a COLUMN into "
+                        f"the index for {sorted(promoted)} "
+                        f"(nulls filled with the declared sentinel: {promoted})")
+                if fabricated:
+                    bits.append(
+                        f"added constant sentinel level(s) for countries whose "
+                        f"instrument does not record them: {fabricated}")
+                collisions = record.get('promotion_collisions', {})
+                if collisions:
+                    bits.append(
+                        f"PROMOTION COLLIDED for {sorted(collisions)}: the "
+                        f"promoted column held both nulls and the literal "
+                        f"sentinel {collisions}, so rows collapsed onto an "
+                        f"existing key -- this country contributes FEWER rows "
+                        f"than Country(name).{self.table_name}() returns; the "
+                        f"collapse was audited (see any GrainCollapseWarning)")
+                tail = (". See df.attrs['canonical_alignment']."
+                        if collisions else
+                        ". No rows were added, removed or collapsed; see "
+                        "df.attrs['canonical_alignment'].")
+                warnings.warn(
+                    f"{self.table_name}: aligned country frames to the canonical "
+                    f"index declared in data_info.yml -- " + "; ".join(bits) + tail
+                )
 
         # GH #603/#601 -- SURFACE, then WARN.  Never fence: every country that
         # got this far is in `result`, and the population record is metadata
         # about it, not a filter on it.  #603 proposed excluding `specialized`
         # frames by default and @ligon declined; a default that silently drops
-        # data is the same disease as one that silently pools it.
-        self._attach_population(result, captured_population)
+        # data is the same disease as one that silently pools it.  Since #873
+        # the same hook carries `recall` and `derivations`, which have no
+        # warning of their own by decision.
+        self._attach_carried_attrs(result, captured_attrs)
 
         # GH #326: pd.concat can leave the (structurally-consistent) index
         # levels UNNAMED, forcing callers to index positionally instead of

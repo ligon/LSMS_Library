@@ -46,7 +46,7 @@ s3a['i'] = _hhid(s3a)
 seasonal = pd.DataFrame({
     't': WAVE,
     'i': s3a['i'],
-    'plot': _plot(s3a, 's3aq01', 's3aq02'),
+    'plot_id': _plot(s3a, 's3aq01', 's3aq02'),
     'crop': s3a['s3aq03b'],
     'u': s3a['s3aq08b'],
     'Quantity': s3a['s3aq08a'],
@@ -66,17 +66,17 @@ s1c = get_dataframe('../Data/EACICULTURE_p1.dta').copy()
 s1c['i'] = _hhid(s1c)
 cult = pd.DataFrame({
     'i': s1c['i'],
-    'plot': _plot(s1c, 's1cq01', 's1cq02'),
+    'plot_id': _plot(s1c, 's1cq01', 's1cq02'),
     'crop': s1c['s1cq03'],
     'planting_month': s1c['s1cq11b'],
     'intercropped': s1c['s1cq05'].astype('string').str.strip()
                        .map({'Pure': False, 'Association de cultures': True}),
 })
-cult = cult.dropna(subset=['plot', 'crop'])
-cult = cult.drop_duplicates(subset=['i', 'plot', 'crop'], keep='first')
+cult = cult.dropna(subset=['plot_id', 'crop'])
+cult = cult.drop_duplicates(subset=['i', 'plot_id', 'crop'], keep='first')
 
 seasonal = seasonal.drop(columns=['planting_month', 'intercropped']).merge(
-    cult, on=['i', 'plot', 'crop'], how='left')
+    cult, on=['i', 'plot_id', 'crop'], how='left')
 
 # --- perennial trees (s3b): no field grid -> plot = <NA>, perennial=True ---
 # s3b is a FIXED tree roster: every HH gets a row per possible species, with
@@ -90,7 +90,7 @@ s3b['i'] = _hhid(s3b)
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s3b['i'],
-    'plot': pd.NA,
+    'plot_id': pd.NA,
     'crop': s3b['s3bq01'],
     'u': s3b['s3bq10b'],
     'Quantity': pd.to_numeric(s3b['s3bq09'], errors='coerce'),

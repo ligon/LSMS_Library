@@ -1,0 +1,141 @@
+Burkina_Faso assets                       OK   rows=    112951    13.6s
+Burkina_Faso cluster_features             OK   rows=      2035     1.4s
+Burkina_Faso crop_production              OK   rows=     15587     7.3s
+Burkina_Faso food_acquired                OK   rows=    304503    84.1s
+Burkina_Faso food_coping                  OK   rows=     51099     5.1s
+Burkina_Faso food_expenditures            OK   rows=    244704     1.6s
+Burkina_Faso food_prices                  OK   rows=    243967     4.3s
+Burkina_Faso food_quantities              OK   rows=    303531     4.7s
+Burkina_Faso food_security                OK   rows=     10233     1.7s
+Burkina_Faso household_characteristics    OK   rows=     20959    33.6s
+Burkina_Faso household_roster             OK   rows=    146517     0.8s
+Burkina_Faso housing                      OK   rows=     21036     1.6s
+Burkina_Faso individual_education         OK   rows=    132451     5.0s
+Burkina_Faso interview_date               OK   rows=     30709     1.6s
+Burkina_Faso livestock                    OK   rows=     13961     5.5s
+Burkina_Faso months_food_inadequate       OK   rows=     10220     5.1s
+Burkina_Faso panel_ids                    OK   rows=      3132     0.0s
+Burkina_Faso people_last7days             OK   rows=     45332     6.2s
+Burkina_Faso plot_features                OK   rows=     19784     6.2s
+Burkina_Faso plot_inputs                  OK   rows=     22694     5.5s
+Burkina_Faso plot_labor                   OK   rows=     16987     5.1s
+Burkina_Faso sample                       OK   rows=     20648     0.1s
+Burkina_Faso shocks                       OK   rows=     24837    21.7s
+Burkina_Faso subjective_well_being        OK   rows=     10174     1.7s
+Mali       assets                       OK   rows=     75590    11.7s
+Mali       cluster_features             OK   rows=      3006     3.4s
+Mali       community_prices             OK   rows=     23646     5.2s
+Mali       crop_production              OK   rows=     35060     0.4s
+Mali       food_acquired                OK   rows=    430271   110.0s
+Mali       food_coping                  OK   rows=     18261     4.9s
+Mali       food_expenditures            OK   rows=    333319     2.1s
+Mali       food_prices                  OK   rows=    342194     5.5s
+Mali       food_quantities              OK   rows=    414417     6.1s
+Mali       food_security                OK   rows=     12733     1.6s
+Mali       household_characteristics    OK   rows=     24786    33.2s
+Mali       household_roster             OK   rows=    220732     1.2s
+Mali       housing                      OK   rows=     24939     2.0s
+Mali       individual_education         OK   rows=    117408     7.0s
+Mali       interview_date               OK   rows=     24939     5.3s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Mali       livestock                    OK   rows=     40696    29.5s
+Mali       panel_ids                    OK   rows=      5011     0.0s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Mali       people_last7days             OK   rows=    131246    20.8s
+Mali       plot_features                OK   rows=     13961     5.2s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Mali       plot_inputs                  OK   rows=    113735    16.5s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+Mali       plot_labor                   OK   rows=     52057     8.5s
+Mali       sample                       OK   rows=     24939     0.1s
+Mali       shocks                       OK   rows=     26774    21.0s
+Mali       subjective_well_being        OK   rows=     12689     1.4s
+Senegal    assets                       OK   rows=    108661    11.2s
+Senegal    cluster_features             OK   rows=      1194     1.0s
+Senegal    crop_production              OK   rows=      8416     0.2s
+Senegal    food_acquired                OK   rows=    435713    44.7s
+Senegal    food_expenditures            OK   rows=    388206     2.1s
+Senegal    food_prices                  OK   rows=    387272     5.6s
+Senegal    food_quantities              OK   rows=    434389     6.3s
+Senegal    food_security                OK   rows=     14265     1.7s
+Senegal    household_characteristics    OK   rows=     14264    43.9s
+Senegal    household_roster             OK   rows=    129650     0.6s
+Senegal    housing                      OK   rows=     14276     1.4s
+Senegal    individual_education         OK   rows=    129646     3.9s
+Senegal    interview_date               OK   rows=     42824     1.4s
+Senegal    livestock                    OK   rows=      9404     5.2s
+Senegal    panel_ids                    OK   rows=      6127     0.0s
+Senegal    people_last7days             OK   rows=     65723     9.3s
+Senegal    plot_features                OK   rows=     13824     5.7s
+Senegal    plot_inputs                  OK   rows=      9901     5.3s
+Senegal    plot_labor                   OK   rows=     10447     5.6s
+Senegal    sample                       OK   rows=     14276     0.1s
+Senegal    shocks                       OK   rows=     10313    25.9s
+Senegal    subjective_well_being        OK   rows=     14140     1.2s
+Togo       assets                       OK   rows=     31462     9.8s
+Togo       cluster_features             OK   rows=       540     0.4s
+Togo       crop_production              OK   rows=     11563     0.3s
+Togo       food_acquired                OK   rows=    112557    21.3s
+Togo       food_expenditures            OK   rows=     74668     0.5s
+Togo       food_prices                  OK   rows=     75512     1.3s
+Togo       food_quantities              OK   rows=    110082     1.4s
+Togo       food_security                OK   rows=      6163     0.6s
+Togo       household_characteristics    OK   rows=      6146    16.1s
+Togo       household_roster             OK   rows=     27480     0.2s
+Togo       housing                      OK   rows=      6171     0.6s
+Togo       individual_education         OK   rows=     27481     1.5s
+Togo       interview_date               OK   rows=     18493     0.7s
+Togo       livestock                    OK   rows=      6181     5.8s
+Togo       nonfood_expenditures         OK   rows=    108445    25.9s
+Togo       people_last7days             OK   rows=     25282     7.7s
+Togo       plot_features                OK   rows=      9553     4.9s
+Togo       plot_inputs                  OK   rows=     13730     5.9s
+Togo       plot_labor                   OK   rows=     15052     6.0s
+Togo       sample                       OK   rows=      6171     0.1s
+Togo       shocks                       OK   rows=      7230    17.4s
+Togo       subjective_well_being        OK   rows=      6120     0.5s
+REWARM DONE

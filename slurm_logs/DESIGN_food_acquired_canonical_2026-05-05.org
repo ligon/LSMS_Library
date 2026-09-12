@@ -123,7 +123,7 @@ melts of existing wave-level outputs into long form on =s=.
 | Uganda         | =value_/quantity_/unitvalue_{home,away,own,inkind}= + =market=, =farmgate= | suffix melt + home/away→purchased; preserve =market= price for =s=purchased= and =farmgate= price for =s=produced= |
 | Malawi         | =quantity_{consumed,bought,produced}, expenditure= | drop consumed; melt the rest |
 | Burkina_Faso   | =quantity, total expenses= (purchased) + =quantity obtained, units obtained= (other) | two-row melt: =purchased= + =other= |
-| Ethiopia       | =quantity, value_purchased, quantity_purchased, ...= | derive purchased + produced (=total - purchased=) |
+| Ethiopia       | =quantity_{,purchased,produced,inkind}= + =value_purchased=, each with its own unit | three-row melt: =purchased= (Q3/Q4) + =produced= (Q5) + =inkind= (Q6).  SUPERSEDED 2026-09-12 by GH #874 --- this row used to read "derive purchased + produced (=total - purchased=)"; the ESS asks all three sources directly (SECTION 5A/6A Q3/Q5/Q6) and the residual folded gifts and food aid into own production. |
 | Nigeria        | =m, Quantity, Expenditure, Produced=             | drop =m= column (lives in cluster_features); trivial melt |
 | GhanaLSS       | 14 cols including yearly/daily flow variants     | hardest --- needs per-wave attention |
 

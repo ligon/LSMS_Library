@@ -44,7 +44,7 @@ hmonth = hmonth.where((hmonth >= 1) & (hmonth <= 12))
 
 df = pd.DataFrame({
     'i':             hh.values,
-    'plot':          plot.values,
+    'plot_id':          plot.values,
     'crop':          _crop_labels(srcn['CULTURE'], src['CULTURE'], crop_map).values,
     'u':             _unit_labels(src['AS02EQ07B'], unit_map).values,
     'Quantity':      pd.to_numeric(srcn['AS02EQ07A'], errors='coerce').values,
@@ -65,7 +65,7 @@ sold_df = pd.DataFrame({
 }).dropna(subset=['i', 'crop'])
 sold_one = sold_df.groupby(['i', 'crop'], as_index=False)[['Quantity_sold', 'Value_sold']].sum(min_count=1)
 
-plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot'].nunique()
+plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot_id'].nunique()
 single = plots_per[plots_per == 1].index
 sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)]
 

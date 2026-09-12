@@ -6,6 +6,13 @@ Single Index:
   pid: individual id
   plot_id: plot id
   int_t: interview date
+  # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
+  # observation was collected at, for the surveys that revisit a household
+  # several times within one wave (GhanaLSS food_acquired; EHCVM
+  # interview_date).  A single-recall wave is `visit = 1`.  Type contract and
+  # the reason it is declared but NOT coerced: see `Columns > food_acquired >
+  # visit` below.
+  visit: recall occasion
   # `u` -- unit.  CANONICAL MISSING-UNIT SENTINEL: `Unknown` (GH #842/#847).
   #
   # A survey that records an amount and no unit must put `Unknown` on `u`, NOT
@@ -59,10 +66,15 @@ Index Info:
     # GH #496: register so Feature() assembles a named MultiIndex instead of
     # collapsing to a single object-tuple Index.  livestock is homogeneous
     # across countries; people_last7days is (t,v,i,pid) for all but Uganda
-    # (reduced to (t,v,i) -- handled as a reduced-index country).  The plot-
-    # level ag features (plot_labor/crop_production/plot_inputs) are NOT here:
+    # (reduced to (t,v,i) -- handled as a reduced-index country).  The other
+    # two plot-level ag features (plot_labor/plot_inputs) are still NOT here:
     # their per-country index NAMES diverge (plot vs plot_id, crop vs j) and
-    # need harmonizing before registration -- tracked separately.
+    # need harmonizing before registration -- GH #569.  The plot axis half of
+    # that divergence is settled: `plot_id` is the canonical spelling
+    # EVERYWHERE (@ligon, 2026-09-10) -- it is what all 23 `plot_features`
+    # countries already declare -- and `plot` is the alias.  crop_production is
+    # registered below; the name divergence is now handled DECLARATIVELY by
+    # `level_aliases`, so the same treatment generalises to the other two.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
     # GH #817: `nonfood_expenditures` shipped in two shapes -- Togo long
@@ -72,6 +84,74 @@ Index Info:
     # `_join_v_from_sample` (the table is household-grain and must NOT emit v
     # itself); no `skip_extra` entry is therefore needed below.
     nonfood_expenditures: (t, v, i, j)
+    # GH #569/#775.  The canonical crop grain is the one the `KgFactor` note
+    # under `Columns:` already states -- "(t, i, plot_id, j, u, condition,
+    # season) and are never summed across `u` or `condition`" -- plus `v`, which
+    # every
+    # frame carries because `_join_v_from_sample` adds it at API time (the same
+    # reason food_acquired is registered `(t, v, i, j, u, s)` while every
+    # country declares `(t, i, j, u, s)`).  KEEPING `v` HERE IS LOAD-BEARING:
+    # `country._compute_no_v_join` exempts any table whose canonical index omits
+    # `v`, so registering without it would silently strip `v` from every
+    # `Country(...).crop_production()` frame in the corpus.
+    #
+    # Registration alone would have kept nothing extra: only Uganda declares the
+    # full shape.  What makes it work is `level_aliases` (plot -> plot_id, crop
+    # -> j) and `missing_level_sentinels` below -- see `feature.py`'s
+    # `_align_to_canonical_levels`.
+    #
+    # The plot axis is `plot_id`, not `plot` (@ligon, 2026-09-10).  `plot_id` is
+    # what `plot_features` declares in all 23 countries that have it, and what
+    # Ethiopia / GhanaSPS / Tanzania already declare on crop_production; `plot`
+    # was Uganda's spelling and is now an ALIAS.  See
+    # `.coder/ledger/crop-production-plot-id.md`.
+    crop_production: (t, v, i, plot_id, j, u, condition, season)
+
+  # Per-feature canonical level-name ALIASES: `<the name a country emits>:
+  # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
+  # country's frame BEFORE alignment, so a country that names the same axis
+  # differently stacks instead of being excluded by the kept-shape filter.
+  #
+  # This is the mechanism GH #569 asked for.  It is a RENAME, never a
+  # re-interpretation: only add a pair when the two names denote the SAME axis
+  # with the SAME vocabulary.  crop/j are both the harmonize_crop ->
+  # harmonize_food Preferred Label (the fact `transformations._CROP_LEVELS`
+  # already encodes); plot/plot_id are both the within-household plot key,
+  # `plot_id` being the canonical spelling (see the `crop_production` entry
+  # above).  A rename does NOT make two plot VOCABULARIES joinable: Uganda's
+  # `crop_production` keys plots `{hhid}-{parcel}-{plot}` while its
+  # `plot_features` keys them `{parcel}_{suffix}`, which is exactly what
+  # `transformations._parcel_from_crop_plot` exists for.
+  level_aliases:
+    crop_production:
+      plot: plot_id
+      crop: j
+
+  # Per-feature SENTINEL for a canonical index level a country does not carry.
+  # Distinct from `fabricate_missing_levels` above in the one way that matters:
+  # that fills with `pd.NA`, and a NULL on a declared index level is a DEFERRED
+  # SILENT DELETION (CLAUDE.md "Grain Collapse" 3b -- `groupby(dropna=True)`
+  # deletes the row in whichever aggregation runs first).  A sentinel is a real,
+  # greppable value, so the row survives and the absence is visible.  Prefer
+  # this to `fabricate_missing_levels` for any NEW feature.
+  #
+  # Declaring a level here also licenses PROMOTION: if the country carries that
+  # canonical level as a COLUMN rather than an index level, `feature.py` moves
+  # it into the index (null-filled with this sentinel) instead of fabricating a
+  # sentinel over real values.  That is what keeps Mali / Nigeria / Tanzania --
+  # each of which reports a real `u` in a column -- in the assembly.
+  #
+  # crop_production:
+  #   u        -- `Unknown` is the canonical missing-unit sentinel already in
+  #               force corpus-wide; see the `u:` comment at the top of this file.
+  #   condition-- `unknown_condition` is the value `Columns: crop_production:
+  #               condition` already defines ("a real value, never NA").
+  #   season   -- `unknown_season`, new here, same argument.
+  missing_level_sentinels:
+    crop_production:
+      u: Unknown
+      condition: unknown_condition
+      season: unknown_season
 
   # Features whose reduced-index countries get their MISSING canonical levels
   # FABRICATED as NaN (so all countries share the full canonical shape and are
@@ -312,6 +392,20 @@ Columns:
     # an ordinal `visit` index (local_tools.melt_visit_intervals) into
     # Interview start / Interview end.  None required: a country emits
     # whichever columns its source records (start-only -> Interview start).
+    visit:
+      type: int
+      note: |
+        INDEX level, not a column -- see the identical entry under
+        `food_acquired` for the contract and for why it is declared but
+        deliberately not coerced.  Measured 2026-09-09, all ten countries
+        that carry this level warm (Albania, Benin, Burkina_Faso,
+        CotedIvoire, Guinea-Bissau, Malawi, Niger, Senegal, Togo, and
+        GhanaLSS on `food_acquired`) already ship it as int64, so the
+        declaration is a statement of what is already true.  Note
+        `interview_date` is in `fabricate_missing_levels` above: a
+        single-visit country's rows get `visit = NaN` during Feature()
+        assembly, so anything that ever does enforce this must use the
+        NULLABLE integer type and must not read NaN as a violation.
     Int_t:
       type: datetime
     Interview start:
@@ -515,7 +609,23 @@ Columns:
         asks only a coarse dry/fresh distinction uses the bare family
         tokens; a country asking something Uganda does not should extend
         this list rather than force-fit a foreign category, per the
-        `Tenure` / `TenureSystem` precedent above.  `unknown_condition` is
+        `Tenure` / `TenureSystem` precedent above.
+
+        MALAWI IS THE FIRST EXTENSION, and it extends the FORM axis, not
+        the dryness one (GH #854).  IHS3-IHS5 Module G question 13c asks
+        only "(S/U)" -- shelled, unshelled, or not applicable -- and never
+        asks the dryness at all.  So its values are the BARE FORM tokens
+        `shelled` / `unshelled` / `shell_not_applicable`, added below.
+        They are NOT spelled `dried_grain` / `dried_with_shell`: those
+        assert a dryness family the instrument never recorded, and the
+        whole point of this level is that it says what was actually
+        measured.  `shell_not_applicable` is the survey's OWN answer (code
+        3, "this crop has no shell to speak of"), which is why it is a
+        value and not the missing-data sentinel below.  Read the cross as
+        partial rather than complete: a country may pin the dryness family,
+        the form, or -- as Uganda does -- both.
+
+        `unknown_condition` is
         the sentinel for a record whose condition code is missing or
         outside the source's labelled scheme -- it is a real value, never
         NA, because a null index key is silently dropped by the duplicate
@@ -540,8 +650,36 @@ Columns:
         dried_in_cob: []
         dried_in_pods: []
         dried_grain: []
+        # Bare FORM tokens -- dryness not asked (Malawi IHS3-IHS5 ag_g13c).
+        shelled: []
+        unshelled: []
+        shell_not_applicable: []
         other_condition: []
         unknown_condition: []
+    season:
+      type: str
+      note: |
+        Cropping season the harvest was reported for.  Like `condition` this
+        is an INDEX level, declared here for documentation and so
+        `_enforce_canonical_spellings` can reach it if a spellings map is ever
+        added.
+
+        DELIBERATELY NO `spellings:` BLOCK.  The per-country vocabularies are
+        not yet harmonized -- Uganda reports the UNPS `A` / `B` seasons,
+        GhanaSPS reports `major` / `minor` / `annual` -- and
+        `diagnostics._check_declared_spellings` reads a `spellings` block as a
+        CLOSED vocabulary, so declaring one now would grade `fail` on every
+        real season value.  Same reasoning, verbatim, as the `u:` comment at
+        the top of this file.  Harmonizing the two vocabularies is a follow-up
+        to GH #569; the LEVEL assembles across countries today, the VALUES do
+        not yet compare.
+
+        `unknown_season` is the sentinel for a country whose harvest module
+        records no season at all (every crop_production country except Uganda
+        and GhanaSPS).  It is a real value, never NA, for exactly the reason
+        `condition` above gives: a null index key is silently dropped by the
+        first groupby that touches it.  Applied at cross-country assembly by
+        `Index Info > missing_level_sentinels`, not baked into any parquet.
     KgFactor:
       type: float
       optional: true
@@ -587,7 +725,7 @@ Columns:
         difference of carrier, and the difference is forced by the grain.
         Food rows are SUMMED across units within an acquisition source, so
         food needs the summable product.  Crop rows sit at
-        (t, i, plot, j, u, condition, season) and are never summed across
+        (t, i, plot_id, j, u, condition, season) and are never summed across
         `u` or `condition`, so the factor is the natural carrier: it
         identifies the container (a 100 kg sack is not a 120 kg sack), it
         can be audited against the library's inferred factors for the same
@@ -703,6 +841,54 @@ Columns:
     # not a column.  Canonical values: purchased, produced, inkind,
     # other.  Enforced in code (lsms_library.transformations.S_VALUES);
     # data_info.yml has no schema for index-level value enumerations.
+    visit:
+      type: int
+      note: |
+        INDEX level, not a column -- declared here for the same reason
+        `crop_production.condition` is (see above): this file is where a
+        cross-country level contract is written down, even where the
+        machinery that would enforce it does not yet reach index levels.
+        It is NOT `required`, because only a repeated-recall country has
+        the level at all (GhanaLSS and Nepal today).
+
+        CONTRACT: an INTEGER recall occasion, homogeneous across every
+        wave of a country.  A single-recall wave gets `visit = 1` --
+        the convention `build_transforms.add_visit_level` exists to
+        stamp.  A wave that renumbers onto the survey's own calendar
+        visits starts at 2 where visit 1 is an intake call that collects
+        no consumption (every multi-visit GLSS round), so `visit == 1`
+        reads unambiguously as "asked once".
+
+        WHY THE TYPE IS PART OF THE CONTRACT, not housekeeping.  Until
+        2026-09-09 GhanaLSS shipped this level as int in five waves, the
+        string '2'..'7' in 1998-99, and the English sentence
+        'since last visit' in 1988-89.  The country-level concat produced
+        an object level of mixed int/str, and on it
+        `food_acquired().xs(2, level='visit')` returned 752,970 rows while
+        SILENTLY OMITTING 1998-99's 104,351 -- a 12.2% undercount of
+        visit-2 rows, no exception, no warning.
+
+        NOTHING COULD SEE IT.  `_enforce_canonical_dtypes` iterates
+        `df.columns` only, so no index level is dtype-policed anywhere;
+        and a scan of the warm caches is structurally blind, because
+        pyarrow launders a mixed object level to `str` on write (measured
+        2026-09-09: 193 warm L2-country parquets, 543 index levels, zero
+        mixed -- while the cold build of one of them was mixed int/str).
+        The mixed level exists only on the BUILD path, which is the same
+        cache-hides-the-bug shape as GH #323.  So any future enforcement
+        belongs where the wave frames are concatenated, and must be a
+        loud check.
+
+        DO NOT enforce it by extending `_enforce_canonical_dtypes` to
+        index levels.  Its int path is
+        `pd.to_numeric(errors='coerce').round().astype(Int64)`: applied
+        here it would have turned 'since last visit' into <NA> on a
+        DECLARED INDEX LEVEL -- a deferred silent deletion, exactly as
+        the `u` sentinel note at the top of this file describes -- and
+        the 72,649 rows of that wave would then have been dropped by the
+        first `groupby` (the derived tables, which sum `visit` away)
+        with nothing reported.  A silent coercion would have hidden this
+        defect, not caught it.
     Quantity:
       type: float
       required: true
@@ -723,6 +909,26 @@ Columns:
         in _finalize_result if not stored).  Farmgate price for
         s=produced (survey-reported where available).  Imputed value
         for s=inkind where available.  NaN otherwise.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        The registry key (`country::table::name`) of the derivation that
+        produced this row's served value, where that value is a
+        CONSTRUCTION from raw answers rather than a survey answer; NA on
+        a reported row.  Two derivations on one row are joined with `+`
+        in sorted order.  The key resolves through
+        `Country(c).derivations()` to the rule, the function, the
+        assumptions with their basis, and an `inputs` callable returning
+        the exact raw answers (`Country(c).derivation_inputs(key)`).
+        Optional because a country with no such derivation never emits
+        the column and `Feature()`'s concat fills NA.  First instance:
+        `GhanaLSS::food_acquired::12b-fortnight` (1987-88, 1988-89 own
+        production, whose raw answer is the value of ONE EATING OCCASION).
+        A derivation already visible in the frame -- an index value such as
+        `u = 'Value'`, or a per-row source column of its own such as
+        `KgFactorSource` -- is exempt; the key is for the invisible ones.
+        Design: SkunkWorks/derived_values.org.
   nonfood_expenditures:
     # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
     # row per (wave, household, item) actually reported.  It is

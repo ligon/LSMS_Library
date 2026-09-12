@@ -1,0 +1,708 @@
+#+TITLE: Red-team -- fix/feature-canonical-index-crop-production (75935507)
+#+DATE: 2026-09-10
+#+AUTHOR: red-team agent (read-only)
+
+* Setup, and how the measurements were isolated
+
+- Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-feature-canonical=, HEAD
+  =75935507=, parent =8b03b799=.
+- Every invocation: =PYTHONPATH=<worktree>= plus an in-process
+  =assert 'wt-feature-canonical' in lsms_library.__file__=.  Interpreter
+  =/global/scratch/.../mirrors/LSMS_Library/.venv/bin/python=; pandas 3.0.2.
+- *BASE* is a =git archive 8b03b799= extraction into the scratchpad, NOT the mirror:
+  =development= has moved past the branch point (it merged #824, which adds 101
+  lines to =data_info.yml=), so comparing against the mirror would have confounded
+  the two changes.  The archive's =lsms_library/countries= tree is byte-identical
+  to the worktree's (=diff -rq= clean), so base-vs-branch isolates exactly
+  =feature.py= + the global =data_info.yml=.
+- Data root: =<worktree>/.rt_data=, a *COPY* (=cp -r=, not symlinks) of every
+  ={C}/var= and ={C}/_= directory from the shared cache -- 386 parquets,
+  139,523,629 bytes, byte-total verified equal to source.  Uganda's
+  =crop_production= was seeded from =wt-824-uganda/.data= and then cold-rebuilt
+  in place from source under THIS worktree's config (7 wave parquets, same
+  130,606 rows either way).  The Malawi-7 run used a second copy
+  =.rt_data_m7= of =wt-854-malawi/.data= with =LSMS_COUNTRIES_ROOT= pointed at
+  that worktree's config tree.
+- *The shared cache was not written to -- measured, not asserted.*  My first copy
+  completed at 01:58; =find <shared cache> -newermt '2026-09-10 01:55'
+  \( -name '*.parquet' -o -name '*.dvc' \)= returns *0 files*.  Cold builds did
+  fire (Ethiopia and Uganda =crop_production=, 13 parquets) and stayed inside
+  =.rt_data=.
+- *GH #803 write-side trap checked*: =find <worktree>/lsms_library/countries
+  -name '*.parquet' | wc -l= -> *0*.  Nothing was written in-tree.
+- *One API wrinkle worth stating*: the brief asked for =assume_cache_fresh=True=,
+  but the generated per-country table methods REJECT that kwarg -- =Feature=
+  emits "Benin's method does not accept 'assume_cache_fresh'; ignored for this
+  country" and proceeds.  So every per-country build in this red-team went
+  through the normal content-hash path, and Ethiopia's and Uganda's
+  =crop_production= were genuinely COLD-BUILT from source inside =.rt_data=.
+  That makes the numbers below cold-build-validated rather than
+  warm-cache-trusted; it is also a small pre-existing API inconsistency
+  (=Country()= accepts it, the generated methods do not).
+- GitNexus MCP is =CONNECTION_CLOSED= and this mirror has no =.gitnexus/= index.
+  *Declared substitutes* per CLAUDE.md: =rg=/=grep= call-site sweeps for
+  =_harmonize_country_frame=, =_select_kept_shape=, =_align_to_canonical_levels=,
+  =_rename_index_levels=, =_compute_no_v_join=, =_load_canonical_spellings=,
+  =_check_declared_spellings=; plus direct source reads of =feature.py=,
+  =country.py=, =diagnostics.py=.
+
+* Verdict summary
+
+| # | item                                        | verdict  |
+|---+---------------------------------------------+----------|
+| 1 | three-branch level resolution               | PASS + 2 CONCERNs |
+| 2 | promotion null-fills (Mali/Nigeria/Tanzania)| PASS + 1 CONCERN  |
+| 3 | row-count identity, uniqueness, no collapse | PASS on the data; 2 CONCERNs (unguarded promotion collision; ledger's grain_reports number) |
+| 4 | =v= join and the other registered features  | PASS (21/21 features identical; food_acquired unfinished) |
+| 5 | order-independent tie-break                 | PASS (bug worse than ledger says) |
+| 6 | EthiopiaRHS exclusion                       | PASS on loudness+determinism; CONCERN on message |
+| 7 | flagged-not-fixed items                     | CONCERN x3 (one upgraded) |
+| 8 | tests / fingerprints / ASCII / the 65       | PASS except the 65-parquet claim: CONCERN |
+| 9 | #775 closable, #569 partial                 | CONCERN -- "one entry each" understates #569 |
+
+* Item 1 -- the three-branch level resolution
+
+Config as read by the branch:
+
+: canonical  ['t','v','i','plot','j','u','condition','season']   (+ 'currency' appended when currency='index')
+: aliases    {'plot_id':'plot', 'crop':'j'}
+: sentinels  {'u':'Unknown', 'condition':'unknown_condition', 'season':'unknown_season'}
+
+Synthetic frames through =_harmonize_country_frame= (all results reproduced):
+
+| case                                     | result | warning |
+|------------------------------------------+--------+---------|
+| (a) level already an index level         | untouched, canonical order | none |
+| (b) =u= a COLUMN, 1 of 2 null            | promoted, null -> ='Unknown'= | "promoted column(s) ['u'] ... {'u': 1} null value(s) filled" |
+| (c) =u= absent entirely                  | constant ='Unknown'= level | "does not record ['u',...]; added as constant sentinel" |
+| (d) =u= a COLUMN, *ALL* null             | promoted, both -> ='Unknown'= | promoted, ={'u': 2}= |
+| (k) =u= a *categorical* column with a null| promoted correctly (cast to object first) | as (b) |
+
+*PASS on the three branches.*  Case (d) -- the all-null column -- deserves an
+answer rather than a shrug, and the answer is that it is *observationally
+identical to branch 3*: the resulting level is all-sentinel either way, and no
+information exists to lose.  The counterfactual is worse, not better: had the
+column not been promoted, the =all_nan= column drop three lines later would have
+deleted it, the frame would then lack =u=, its shape would diverge, and the
+country would be *excluded from the assembly entirely*.  So promotion is right.
+
+*CONCERN 1a -- an all-null promotion is filed under =promoted=, not
+=fabricated=.*  The aggregated warning says "promoted a canonical level carried
+as a COLUMN into the index", which reads as "this country reports a real unit",
+when in fact it reported none.  The only tell is that =n_filled == len(df)=,
+which a reader must compute.  One-line fix: in =_align_to_canonical_levels=,
+route =n_filled == len(col)= into =fabricated= instead.  Not blocking.
+
+** Alias collisions
+
+| case                                  | outcome |
+|---------------------------------------+---------|
+| (e) =plot_id= AND =plot= both LEVELS   | rename skipped + warned; then =plot_id= *dropped* by the extra-level drop; frame KEPT |
+| (h) =crop= AND =j= both LEVELS         | same -- =crop= dropped, frame KEPT |
+| (g) =crop= a COLUMN, =j= a LEVEL       | no rename (the check is index-only); =crop= stays a plain data column; no collision |
+| (f) =plot_id= a LEVEL, =plot= a COLUMN | *rename fires*; index level =plot= and data column =plot= coexist with DIFFERENT values, silently |
+| (f') same, and a sentinel level is also missing | =ValueError: cannot insert plot, already exists= |
+
+*CONCERN 1b -- two defects here, neither fatal today.*
+
+1. The collision warning's own last sentence is *false*: "The frame keeps its own
+   index shape."  It does not.  Case (e) shows the rename is skipped, and then the
+   #498 extra-level drop removes =plot_id= anyway, so the country is silently
+   re-shaped to canonical and its aliased level is discarded.  If the aliased
+   level were the finer key, the follow-on =_collapse_duplicate_index= would eat
+   rows -- audited, but the warning has pointed the reader the wrong way.
+2. =_rename_index_levels='s clash test only inspects =df.index.names=.  A frame
+   with the alias as a LEVEL and the canonical name as a COLUMN passes the test,
+   gets renamed, and ends up with the same name in both namespaces.  If any
+   sentinel level is also missing on that frame, =_align_to_canonical_levels='s
+   =reset_index()= then raises =ValueError: cannot insert plot, already exists=,
+   which =Feature.__call__='s broad =except Exception= converts into
+   "Failed to load crop_production for X: ValueError: ..." and *drops the whole
+   country*.  Loud, but the message names neither the alias nor the rename.
+
+   *No country in the corpus is in this state today.*  Direct evidence: all 15
+   stored =crop_production= frames were listed and *none* carries =plot=,
+   =plot_id=, =crop= or =j= as a data COLUMN (only as index levels).  Corroborating
+   inference: every country except Uganda is missing at least one sentinel level,
+   so =reset_index()= runs on 14 of 15 frames -- a =plot=-column country would
+   have crashed, and none did.  The one-line fix is to widen the clash test to
+   =dst in names or dst in df.columns=.
+
+* Item 2 -- what the promoted nulls actually are
+
+Read straight off the stored parquets (=u= is a data COLUMN for all three):
+
+| country  | rows   | =u= null | literal ='Unknown'= already in =u= | null-=u= rows with Quantity NULL or 0 | null-=u= rows with a POSITIVE Quantity |
+|----------+--------+--------+---------------------------------+------------------------------------+-------------------------------------|
+| Mali     | 35,060 |  1,910 | 0 | 1,756 |  154 |
+| Nigeria  | 62,844 | 13,138 | 0 | 13,071 |   67 |
+| Tanzania | 14,126 |  2,395 | 0 | 2,395 (all) |    0 |
+
+Ten rows inspected per country.  The pattern is unambiguous and is the same in
+all three: *these are rows with nothing to denominate.*
+
+- *Tanzania*: 100% of the 2,395 have =Quantity == 0.0= -- e.g.
+  =2019-20 / 02020243050217 / plot 1 / Other Fruits, Quantity 0.0=; Timber,
+  Coffee & Cocoa, Citrus Fruits.  A crop planted on the plot with a zero harvest.
+  No unit is *correct*, and ='Unknown'= is the declared way to say so.
+- *Nigeria*: 13,071 of 13,138 are Quantity NULL or 0 (2011Q1 Cassava--roots,
+  Plantains).  67 rows carry a positive Quantity with no unit -- exactly the case
+  =data_info.yml:5-40= legislates ("an amount and no unit must put =Unknown=").
+- *Mali*: 1,756 of 1,910 are Quantity NULL or 0; 154 carry a positive quantity.
+
+*No sibling unit column is populated on any of these rows* -- none of the three
+countries ships a =Unit_sold=-style column at all (Uganda does, and Uganda's =u=
+is already an index level, so it is not in this branch's promotion set).  So the
+sentinel is not papering over a unit that is recorded elsewhere.  *PASS.*
+
+*Zero literal ='Unknown'= values in any of the three =u= columns* -- this is the
+load-bearing fact for item 3 below, because a pre-existing literal ='Unknown'=
+alongside a null WOULD collide under the sentinel fill (demonstrated
+synthetically: case 1j, two rows distinct only by =u in {'Unknown', null}=
+become one index tuple).  Nobody is in that state.
+
+*CONCERN 2 -- =Feature= and =Country= now disagree about where =u= lives, for
+these three countries.*  =Country('Nigeria').crop_production()= returns
+=(i,t,v,plot,crop)= with a =u= COLUMN holding 13,138 NaNs;
+=Feature('crop_production')(['Nigeria'])= returns the same 62,844 rows with =u=
+as an INDEX LEVEL and those NaNs read ='Unknown'=.  Row counts are identical, no
+row is added or lost, and the ledger discloses this (S6, last bullet) as a
+deliberate assembly-time bridge.  It is still a divergence a user can trip on
+(=df['u']= works on one and raises on the other), and the right end state is
+moving =u= into those three countries' declared indexes -- the #569 follow-up the
+ledger already names.
+
+* Item 3 -- row-count identity, uniqueness, grain
+
+=Feature('crop_production')= over all 15 warm countries, base vs branch, same
+=.rt_data=, run twice on the branch (identical both times):
+
+| |base|branch|
+|---+---+---|
+| countries kept | 8 | *14* |
+| rows | 255,137 | *608,401* |
+| index | =[country,i,t,v,plot,crop,u,currency]= | =[country,t,v,i,plot,j,u,condition,season,currency]= |
+| =index.is_unique= | True | *True* |
+
+Per-country =Feature= rows, and =Country(name).crop_production()= rows,
+*are equal for every one of the 14 kept countries*: Benin 9,056; Burkina_Faso
+15,587; CotedIvoire 22,216; Ethiopia 85,519; GhanaSPS 25,109; Guinea-Bissau
+10,579; Malawi 131,379; Mali 35,060; Niger 46,341; Nigeria 62,844; Senegal
+8,416; Tanzania 14,126; Togo 11,563; Uganda 130,606.  Sum = 608,401.  Every
+number in the ledger's table reproduces exactly.
+
+*The sharper check -- can a sentinel-filled level collide?*  Two ways, and both
+were tested:
+
+1. Adding a CONSTANT level cannot create a duplicate (it refines nothing and
+   distinguishes nothing).  Structural.
+2. PROMOTING a column can, if a null and a literal sentinel value sit on rows
+   that are otherwise identical.  Synthetic case 1j reproduces the collision.
+   *On the real data it cannot happen*: 0 literal ='Unknown'= values in the =u=
+   columns of Mali, Nigeria and Tanzania (item 2).  Empirically, the assembled
+   14-country index is unique, and it stays unique with only Tanzania's 2,395
+   promoted rows present.
+   *CORRECTION to the docstring, and a real gap.*  =_align_to_canonical_levels='s
+   docstring says promotion "can never make the index non-unique and can never
+   reach =_collapse_duplicate_index=".  The first half is false for the promotion
+   branch and the second half is true only because of the first: measured, the
+   synthetic collision returns =index.is_unique == False= with NO collapse and NO
+   grain report.  =_collapse_duplicate_index= is called from exactly one place in
+   =feature.py= (line 540, inside the extra-level-drop branch), and
+   =Feature.__call__= never checks =result.index.is_unique= after the concat.  So
+   a genuine promotion collision would ship a silently non-unique =Feature= index
+   -- the one failure mode with no guard behind it.
+   =test_no_collapse_and_no_row_loss_on_a_duplicate_prone_frame= does not close
+   this: it promotes =u=['Kg','Bag']= -- two NON-null, DISTINCT values -- which is
+   the REFINING case, and asserts =out.index.is_unique=.  The null-collision case
+   is untested.
+   *The invariant therefore rests entirely on the data fact* (0 literal
+   ='Unknown'= in Mali/Nigeria/Tanzania's =u= columns), not on structure.  Guard,
+   three lines, in =_align_to_canonical_levels= after =set_index=:
+   =if not out.index.is_unique: warn (or route through _collapse_duplicate_index)=.
+
+*Malawi-7 (=feat/854=) regression, reproduced on its own data + config* --
+=Feature('crop_production')(['Benin','Uganda','Malawi','Togo','Guinea-Bissau','Nigeria'])=:
+
+| | base | branch |
+|---+---+---|
+| kept | Benin, Guinea-Bissau, Togo | *all 6* |
+| rows | 31,198 | *356,196* |
+| lost | Uganda 130,606 + Malawi 131,548 + Nigeria 62,844 = *325,008 (91.3%)* | 0 |
+
+Malawi's 7-level frame is 131,548 rows under BOTH, and the branch's assembled
+index is unique.  This is the #854 regression the ledger cites, confirmed
+end-to-end.
+
+*CONCERN 3 -- one ledger number does not reproduce.*  The ledger says
+"=grain_reports()= is EMPTY after every assembly (0 before, 0 after)".  It is
+*8*, on base and on branch alike.  All eight are Site-1 country-build reports
+replayed from parquet metadata -- Ethiopia 2013-14/2015-16/2018-19/2021-22
+(2/2/7/17 rows destroyed), Guinea-Bissau 2018-19 (11 destroyed + 1,596 deleted
+on a NaN key), Niger 2011-12/2014-15/2021-22 (19/45/897 destroyed).  They are
+*pre-existing, identical on both sides, and nothing to do with this branch*.
+The substantive claim the ledger meant -- that the Feature-side
+=_collapse_duplicate_index= never fires -- holds: no Feature-side collapse
+warning appears in either run.  The stated one is simply false as written and
+should be corrected, because "grain_reports is empty" is exactly the sentence a
+future agent will quote as evidence the corpus is clean.
+
+* Item 4 -- registration with =v=, and the other features
+
+=_compute_no_v_join= (=country.py:4997=) skips the v-join for a table whose
+=index_info= entry omits =v=, and for anything in =Join v from sample >
+skip_extra=.  Measured, base vs branch:
+
+: base   ['assets','cluster_features','income','livestock','panel_ids','sample','shocks','updated_ids']
+: branch ['assets','cluster_features','income','livestock','panel_ids','sample','shocks','updated_ids']
+
+*Byte-identical, and =crop_production= is in neither.*  Registering it WITH =v=
+is what keeps that true; a =v=-less registration would have added it to the skip
+set and stripped =v= from every =Country().crop_production()= in the corpus.
+Confirmed downstream: every one of the 15 countries' =Country()= frames still
+carries =v= in its index (e.g. Nigeria =(i,t,v,plot,crop)=, Malawi-7
+=(i,t,v,plot,crop,u,condition)=), and the assembled Feature index has =v= in
+canonical position 2.  *PASS.*
+
+** The other registered/derived features: measured, not argued
+
+The canonical-preference in =_select_kept_shape= applies to EVERY feature with an
+=index_info= entry, so it had to be measured.  Base vs branch, same =.rt_data=,
+warm-presence-filtered so nothing outside the copy was asked for:
+
+| feature | rows | countries kept | identical? |
+|---+---+---+---|
+| =household_roster= | 2,732,188 | 32 (+Uganda, see note) | YES |
+| =plot_features= | 463,868 | 22 (+Uganda) | YES |
+| =food_acquired= | *pending* -- see note | | -- |
+| =livestock= | 239,037 | 13 | YES |
+| =nonfood_expenditures= | 573,375 | 2 | YES |
+| =assets= | 3,406,277 | 22 | YES |
+| =shocks= | 330,439 | 16 | YES |
+| =individual_education= | 1,641,738 | 28 | YES |
+| =interview_date= | 494,578 | 26 | YES |
+| =people_last7days= | 1,015,837 | 12 | YES |
+| =cluster_features= | 41,694 | 32 | YES |
+| =household_characteristics= | 469,951 | 32 | YES |
+| =sample= (unregistered) | 534,037 | 34 | YES |
+| =housing= (unregistered) | 407,967 | 27 | YES |
+| =plot_labor= (unregistered) | 335,354 | 10 | YES |
+| =plot_inputs= (unregistered) | 116,078 | 7 | YES |
+| =community_prices= (unregistered) | 323,538 | 7 | YES |
+
+*=food_acquired= did not finish inside this session*: both the base and the
+branch sweep were still building it (20 min and 11 min elapsed; the GhanaLSS
+frame alone is a 5.26M-row / ~167 s warm read and several countries were cold).
+It is the ONE feature in the brief's list I could not compare, and I am not going
+to report a placeholder as a result.  Note it is also the feature the ledger DID
+measure (20 countries / 7,816,788 rows, identical), and it is registered with a
+canonical shape that every country carries, so a flip would be surprising.  *21
+of 21 features that completed are identical.*
+
+"identical" = same kept-country SET, same per-country row count, same
+=index.names=.  =household_roster= and =plot_features= show Uganda present on the
+branch run and absent on the base run; that is an artifact of MY data root
+(Uganda's =var/= was evicted and rebuilt between the two sweeps), not a
+behaviour difference -- with Uganda excluded on both sides the per-country
+dictionaries are equal element-for-element (32 and 22 countries, 2,732,188 and
+463,868 rows), the index names match, and the excluded-country set matches
+(=household_roster= drops Peru under both).  The only visible change is the
+warning's wording: base says "kept modal shape", branch says "kept the canonical
+index declared in data_info.yml" -- same shape, same survivors.
+
+*This extends the ledger's check in the direction it did not go.*  The ledger
+measured 14 registered/derived features; the tie-break change also touches every
+UNREGISTERED feature, and the ledger did not measure any.  *Twelve* unregistered
+features with >= 2 warm frames are identical base-to-branch: =sample= 534,037/34,
+=housing= 407,967/27, =plot_labor= 335,354/10, =plot_inputs= 116,078/7,
+=community_prices= 323,538/7, =food_coping= 660,332/6, =food_security= 132,640/11,
+=subjective_well_being= 139,484/11, =life_satisfaction= 488,952/6,
+=anthropometry= 181,298/5, =months_food_inadequate= 61,390/5, =nutrition=
+59,305/2.  *Zero flips corpus-wide, registered or not.*  *PASS* (with
+=food_acquired= outstanding).
+
+* Item 5 -- order-independence for unregistered features
+
+Synthetic, =_select_kept_shape= vs the base rule replicated verbatim:
+
+| frames                                | base kept | branch kept |
+|---------------------------------------+-----------+-------------|
+| A(10), A(10), B(100), all 6 orders     | {A,A} always | {A,A} always |
+| A(10) vs B(100), 2 orders              | *first-listed wins* -- differs by order | B both orders (more rows) |
+| A(100) vs B(10), 2 orders              | *first-listed wins* | A both orders |
+| A(50) vs B(50), 2 orders               | *first-listed wins* | A both orders (lexicographically smaller name tuple) |
+| canonical=B, A(10),A(10),B(5), 6 orders | n/a | B always -- canonical beats modal |
+
+The tie-break rule is =(-n_frames, -n_rows, name-tuple)=, all three data-derived,
+so the winner is a pure function of the frames.  On a pure tie the *shorter*
+index wins (=('country','t','i')= sorts before =('country','t','i','j')=).  It is
+documented in the =_select_kept_shape= docstring AND in
+=cross-country-features/SKILL.md= ("the canonical shape wins if any frame has it;
+otherwise the most frames, then the most rows, then the lexicographically
+smallest name tuple").  *PASS.*
+
+*On real data the #775 bug is worse than the ledger reports.*  The ledger says
+three orders gave three survivors.  Measured over ALL 24 permutations of
+={Uganda, Ethiopia, Tanzania, Malawi}=:
+
+: base   24 permutations -> *4 distinct outcomes*: whichever country is listed FIRST is the sole survivor.
+:          ['Uganda'] 130,606 (6 orders) | ['Ethiopia'] 85,519 (6) | ['Malawi'] 131,379 (6) | ['Tanzania'] 14,126 (6)
+: branch 24 permutations -> *1 outcome*: all four, 361,630 rows, every time.
+
+(361,630 = 130,606 + 85,519 + 14,126 + 131,379, i.e. the 6-level Malawi; the
+ledger's 361,799 is the same set with the 7-level Malawi.)
+
+* Item 6 -- EthiopiaRHS
+
+Deterministic: EthiopiaRHS's frame is =(t,v,i,j,u,condition,season)= after
+alignment -- =plot= is not in =missing_level_sentinels=, so it is neither
+promoted nor fabricated -- and the canonical shape (which 14 frames have) always
+wins step 1, so the exclusion cannot flip with argument order.  Reproduced: kept
+= 14 countries in every run and in all 24 permutations of the four-country probe.
+
+Loud: exactly one warning, naming the country --
+
+: crop_production: excluded 1 country frame(s) ['EthiopiaRHS'] with a divergent
+: index shape from the cross-country assembly (kept the canonical index declared
+: in data_info.yml: ['country','t','v','i','plot','j','u','condition','season',
+: 'currency']); stacking heterogeneous index depths would collapse the whole
+: result to an unnamed index. Access the excluded data via
+: Country(name).crop_production().
+
+*CONCERN 6 -- the warning names the country and the KEPT shape, but never the
+MISSING level.*  A reader has to diff the kept shape against EthiopiaRHS's own
+index to learn that the answer is "no =plot=" -- and =Country()= is where they
+would have to go to get that index.  The #512 fact ("EthiopiaRHS ships a coarse
+household-grain version; treat it as a separate table") is in the SKILL and in
+the ledger but not in the message the user actually sees.  Adding
+=set(winner) - set(f.index.names)= per dropped frame is a two-line change and
+turns the warning from "your country vanished" into "your country vanished
+because it has no plot".  PASS on the two properties asked for; CONCERN on the
+message.
+
+* Item 7 -- the three flagged-not-fixed items
+
+** 7a. =season= vocabularies -- CONCERN, and I would not block on it
+
+Measured on the assembled frame, the =season= level now carries *three
+incommensurable vocabularies plus a sentinel*, under one name, with no runtime
+warning about the mixing:
+
+| source | values | rows |
+|---+---+---|
+| Uganda | =A=, =B= | 69,141 / 61,465 |
+| GhanaSPS | =annual=, =major=, =minor= | 13,314 / 9,292 / 2,503 |
+| the other 12 countries | =unknown_season= | 452,686 |
+
+=df.groupby('season').sum()= therefore returns six meaningless groups, and
+=df.xs('A', level='season')= silently means "Uganda only".  That IS a silent
+semantic collision.
+
+Two things keep it a CONCERN rather than a FAIL.  First, *precedent*: =u=
+already mixes per-country unit vocabularies under one level with no warning, and
+=data_info.yml= says so explicitly at the top of the file; the branch's =season=
+note makes the identical argument in the identical words, and deliberately omits
+a =spellings:= block because =diagnostics._check_declared_spellings= reads one as
+a CLOSED vocabulary and would grade every real season value =fail=.  That
+reasoning is correct and I verified the mechanism (below).  Second, the change is
+*strictly additive*: before this branch Uganda and GhanaSPS were excluded from
+the assembly outright, so nobody could compare their seasons at all.
+
+What I would ask for, cheaply: the aggregated alignment warning already names the
+countries that got a fabricated =season=; naming the countries that did NOT (i.e.
+the ones whose values are real and mutually incomparable) would make the hazard
+visible at the point of use rather than only in =data_info.yml=.  Same for =u=
+and =condition=, which have the same property.
+
+** 7b. Malawi-854's =condition= tokens -- they pass SILENTLY, and doubly so
+
+Measured.  Malawi-854 =condition= values: =shelled= (68,147), =unknown_condition=
+(26,333), =shell_not_applicable= (19,168), =unshelled= (17,900).  None of
+=shelled= / =unshelled= / =shell_not_applicable= is in the 21-value
+=condition.spellings= vocabulary in =data_info.yml=.
+
+- =_enforce_canonical_spellings= *passes them through silently* -- and for a
+  reason sharper than "it only maps variants".  =_load_canonical_spellings=
+  builds =variant_map= from the =spellings= lists and skips the column entirely
+  when =variant_map= is empty (=country.py=: =if variant_map:=).  Every
+  =condition= canonical value has an EMPTY variant list, so
+  =crop_production= is *not in the returned dict at all*
+  (measured: keys are =['household_roster','sample','cluster_features',
+  'individual_education']=).  The read-path enforcement is a no-op for
+  =condition= and always was.
+- =diagnostics._check_declared_spellings= DOES catch it, because
+  =_DECLARED_VOCABULARIES= is built from the value list rather than the variant
+  map.  Run on the Malawi-854 parquet:
+  =Check(declared_spellings, 'fail', "condition: 105215/131548 value(s) outside
+  declared vocabulary [...]: 'shelled' (68147), 'shell_not_applicable' (19168),
+  'unshelled' (17900)")=.
+
+So the answer to "reject or pass silently" is: *the API passes them silently; the
+sanity grader fails them.*  That is a =feat/854= defect, not this branch's -- but
+it is worth recording that it will surface as a coverage-matrix =fail= on Malawi
+=crop_production= the moment #854 lands, and that the fix is to extend the
+=condition= vocabulary (the =data_info.yml= note explicitly invites this: "a
+country asking something Uganda does not should extend this list").
+
+Note also the asymmetry this branch introduces: 13 countries now get
+=unknown_condition= fabricated, which IS in the declared vocabulary, so the
+grader stays green for them.  Nothing is hidden.
+
+** 7c. =plot_features= on =plot_id= vs =crop_production= on =plot= -- I upgrade this
+
+Measured across the whole corpus:
+
+: plot_features:   23 of 23 countries store the level as `plot_id`; registered `(t, v, i, plot_id)`
+: crop_production: 11 of 15 store `plot`, 4 store `plot_id`; now canonicalised to `plot`
+: plot_labor:      10 of 13 store `plot`, 3 store `plot_id`
+
+*Is it a regression?*  No.  Base's =Feature('crop_production')= kept the modal
+EHCVM shape, whose level is also =plot=, so a =plot=/=plot_id= join already
+failed.  But the *scope* changed: base delivered 8 countries, none of which was
+one of the =plot_id= countries; the branch delivers 14 including Ethiopia,
+GhanaSPS and Tanzania -- countries whose own =crop_production= names the level
+=plot_id=, matching their =plot_features=, and which now come back renamed to
+=plot=.  For those three, a join that would have worked on the =Country()= frames
+now needs a rename on the =Feature()= frames.
+
+*Why I upgrade it from "follow-up" to a decision-now item*: =data_info.yml= now
+*declares* two canonical indexes that name the same axis differently.  That is no
+longer an accident of per-country config, it is a stated contract in the single
+source of truth, and the next feature registered (=plot_labor=, =plot_inputs=)
+will have to pick a side.  The mechanism this branch adds makes the fix a
+one-liner in either direction -- either
+
+: level_aliases: {crop_production: {plot: plot_id, crop: j}}   # canonical = plot_id, matching plot_features and all 23
+: index_info:    crop_production: (t, v, i, plot_id, j, u, condition, season)
+
+or the mirror change on =plot_features=.  =plot_id= is the cheaper side (23/23 of
+=plot_features=, and it is already registered that way), at the cost of renaming
+11 of 15 =crop_production= frames instead of 4.  This is a maintainer call, not a
+bug -- but it should be made in this PR, not deferred, because the branch is what
+makes the two declarations sit next to each other.
+
+* Item 8 -- tests, fingerprints, ASCII, and the 65 parquets
+
+** Tests
+
+: pytest tests/test_feature_canonical_index.py tests/test_feature.py \
+:        tests/test_schema_consistency.py tests/test_no_v_join_declarative.py
+: -> 337 passed, 1 warning in 76.14s
+
+Zero failures.  (I did NOT run the full fast tier under my =LSMS_DATA_DIR=: that
+is precisely the run that cold-built the implementer's 65 parquets, and the point
+of the copy was to not repeat it.  The ledger's "5,400 passed / 13 pre-existing
+failures / 0 new" is therefore taken on report, not reproduced.)
+
+=make api-audit=: "hashed build inputs untracked by git: none"; "1 undocumented
+kwarg(s): valuation" -- the pre-existing #585 kwarg, unchanged.  The branch adds
+no kwarg.  Every skill on disk is listed.
+
+** Fingerprint probe
+
+Reproduced independently, base vs branch, 26 probes:
+=build_transforms_fingerprint= for =crop_production=, =household_roster=,
+=food_acquired=, =plot_features=, =livestock=, =nonfood_expenditures=, =sample=,
+=cluster_features=, =assets= and =None=; plus
+=Country(c)._table_cache_hash(t, c.waves)= for Malawi/Uganda/Ethiopia/Nigeria x
+{=crop_production=, =household_roster=, =food_acquired=, =sample=}.
+
+: 26 probes, *0 moved*, 0 errors.
+
+This is expected and now double-checked: the global =data_info.yml= is not an
+input to =Wave._input_hash= (which hashes the *wave's* file by path) nor to
+=Country._table_cache_hash= (which hashes the *country's* =_/= tree), and
+=feature.py= is read-path.  *PASS.*
+
+** Pandas 3.0 and ASCII
+
+No =inplace==, =np.nan=, =fillna(method==, chained assignment or =.ix= in the
+added code.  =_align_to_canonical_levels= handles categorical =u= by casting to
+object before =.where()= (verified: a =pd.Categorical(['Kg', None])= column
+promotes correctly, which a naive =fillna= on a categorical would have raised on).
+=out.attrs = dict(df.attrs)= after =set_index= is belt-and-braces, consistent
+with the =attrs= rule in CLAUDE.md.
+
+ASCII, added lines only:
+
+| file | non-ASCII added lines |
+|---+---|
+| =lsms_library/feature.py= | *0* |
+| =lsms_library/data_info.yml= | *0* |
+| =tests/test_feature_canonical_index.py= | *0* |
+| =.claude/skills/cross-country-features/SKILL.md= | 8 (em-dash, arrows) |
+| =.coder/ledger/feature-canonical-crop-production.md= | 57 (em-dash, section sign, arrows) |
+
+Code, config and tests are pure ASCII.  The two markdown files match existing
+repo convention (the SKILL already carried 29 non-ASCII characters on
+=development=; every one of the ~30 files in =.coder/ledger/= carries 30-90).
+*PASS.*
+
+** The 65 cold-built parquets -- CONCERN, the disclosure is not fully supported
+
+Reproduced the census exactly: 65 parquets under the shared cache with mtimes in
+=[00:54:02, 00:59:26]= on 2026-09-10, across Ethiopia, Guyana, Malawi, China,
+Togo, Benin, India and Nigeria; tables =sample=, =household_roster=,
+=cluster_features=, =individual_education=, =housing=, =interview_date=,
+=assets=, =plot_features=, =nonfood_expenditures=, =employment=, =food_acquired=.
+
+*No =crop_production= parquet is among the 65.*  Confirmed by name over the full
+list.  Every number in the ledger is therefore unaffected -- that part of the
+disclosure holds.
+
+The claim I could NOT confirm is "They are ordinary rebuilds from *unmodified*
+country configs."  I tested it the only way it is testable: read the embedded
+=lsms_cache_hash= out of each country-level parquet's pyarrow schema metadata and
+compare against =Country(c)._table_cache_hash(t, c.waves)= recomputed live.  25 of
+the 65 are country-level (=var/=) and can be checked this way:
+
+: MATCH 21 | *MISMATCH 4* | no embedded hash 0
+
+The four are =Malawi/household_roster=, =Malawi/food_acquired=,
+=Togo/nonfood_expenditures=, =Benin/cluster_features=.  I then recomputed each
+under =development= (the mirror), under =wt-854-malawi='s countries tree and
+under =wt-824-uganda='s: *none of the four reproduces under any of them.*  So
+those parquets were stamped with a hash that no config on disk generates -- most
+consistent with their having been built inside a pytest fixture that overrode
+=LSMS_COUNTRIES_ROOT= to a temporary, modified config tree (the ledger itself
+lists "a subprocess =countries_root= override" among the pre-existing test
+failures, so such fixtures exist and were running).
+
+Two mechanisms fit and I could separate neither in the time available: (i) a
+build inside a fixture-modified config tree, or (ii) the v0.8.0 trust-once path
+re-stamping a hashless =var/= parquet with a fixture's hash.  My attempt to
+discriminate them by script-path vs YAML-path was inconclusive (the marker grep
+did not discriminate: all nine probed tables read as YAML-path, including the
+four mismatches).  The content looks like a normal build --
+=Malawi/var/food_acquired.parquet= reads back 971,531 rows on
+=(t,i,j,u,s)= with =[Quantity, Expenditure, Quantity_kg]=, exactly the declared
+shape.
+
+*Impact is bounded and not data corruption*: a hash that matches nothing is a
+STALE hash, so the next reader's =cache_freshness= check rebuilds rather than
+serving it.  The cache is wasteful, not wrong, and nothing was deleted.  But the
+sentence in the ledger should be softened to what is actually established: 21 of
+25 checkable rebuilds carry the hash their current config produces; 4 do not and
+will self-invalidate; the 40 wave-level parquets in the set are written hashless
+by design and were not checkable.  The lesson the ledger draws ("a symlink farm
+is not a read-only data root") is right and I second it -- I used copies, and the
+shared cache has zero files with an mtime from my session.
+
+* Item 9 -- is #775 closable, and is #569 really "one entry each"?
+
+** #775 -- yes, closable, with one honest caveat
+
+The issue's ask is "resolve on a declared canonical index from =data_info.yml='s
+=index_info= rather than on whichever shape happens to be modal among the
+arguments", and its concrete symptom is argument-order dependence.  The symptom
+is gone: 24 of 24 permutations return one answer for =crop_production=, and the
+new tie-break is a pure function of the frames for unregistered features too
+(item 5).  Nothing in the corpus regressed (item 4).
+
+*The caveat worth putting in the issue when closing it*: the canonical-preference
+branch of =_select_kept_shape= (step 1) is currently *unexercised on real data*.
+For =crop_production= the alias + sentinel alignment makes 14 of 15 frames share
+one shape, so the canonical shape is also the modal shape and step 1 changes
+nothing; the same held for every other feature measured (17 features, base vs
+branch identical -- item 4).  The fix's measurable *effect* comes entirely from
+=level_aliases= + =missing_level_sentinels=.  Step 1 is insurance for exactly the
+=feat/854= scenario (a country that gains a canonical level becomes a singleton)
+and it is right to have it -- but it is also the sharp edge the SKILL correctly
+flags: "for a registered feature the canonical shape wins even as a minority of
+one ... registering a canonical shape nobody-but-one country emits would exclude
+everybody else."  That is a live foot-gun with no test on real data behind it.
+
+** #569 -- partial, and "one alias + one sentinel entry each" understates it
+
+*=plot_labor= -- 1 alias, but 2 sentinels including a brand-new token, and the
+cost of getting it wrong is 60,607 rows.*  Measured shapes over 13 warm countries:
+
+: (t,i,plot,source)                        x10
+: (t,i,plot_id,source)                     x2   (Ethiopia, Tanzania)
+: (t,i,plot_id,season,stage,source)        x1   (GhanaSPS, 89,887 rows)
+
+The entries would be:
+
+: index_info:               plot_labor: (t, v, i, plot, season, stage, source)
+: level_aliases:            plot_labor: {plot_id: plot}
+: missing_level_sentinels:  plot_labor: {season: unknown_season, stage: unknown_stage}
+
+=stage= is NOT one entry more of the same -- it is a level with *no existing
+sentinel anywhere in the schema* and no =Columns:= entry, and it must be in the
+canonical index.  If it is left out, GhanaSPS's =stage= becomes an undeclared
+extra level, =_harmonize_country_frame= drops it, and the index goes non-unique:
+measured, dropping =season= + =stage= collapses 89,887 GhanaSPS rows to *29,280
+distinct index tuples -- 60,607 rows destroyed (67.4%)*.  Audited, but destroyed.
+
+Note also that GhanaSPS's =plot_labor.season= vocabulary is
+={last, major, minor}= -- *not the same as its own =crop_production.season=*
+(={annual, major, minor}=).  So a shared =unknown_season= token across two
+features would sit over three different vocabularies.  That strengthens 7a.
+
+*=plot_inputs= -- this one cannot be done with sentinels without contradicting
+this branch's own EthiopiaRHS decision.*  Measured shapes over 12 warm countries:
+
+| shape | countries | rows |
+|---+---+---|
+| =(t,i,input,crop,u)= -- *no plot level at all* | Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo | 116,084 |
+| =(t,i,plot,input,crop,u)= | Malawi | 180,184 |
+| =(t,i,plot,input,crop)= + =u= column | Mali, Nigeria | 210,355 |
+| =(t,i,plot_id,input,j)= + =u= column | Ethiopia | 180,900 |
+| =(t,i,plot_id,input,crop)= + =u= column | Tanzania | 9,698 |
+
+Aliases (=plot_id -> plot=, =crop -> j=) and a =u: Unknown= sentinel (Ethiopia,
+Mali, Nigeria and Tanzania all carry =u= as a column, exactly like
+=crop_production=) handle the last four rows of that table -- 581,137 rows that
+are excluded today.  The seven EHCVM countries are the problem: they have *no
+plot axis at all*, and the only sentinel that would keep them is a fabricated
+=plot=.
+
+That is precisely what this branch *refused* to do for EthiopiaRHS
+=crop_production= ("Filling =plot= for EthiopiaRHS was rejected ... it stays
+excluded"), on the #512 ground that a coarse-grain table stamped with a fake
+fine-grain key is a different table wearing the same index.  The same argument
+applies here at 7 countries / 116,084 rows.  So the honest options are
+
+1. register =(t, v, i, plot, input, j, u)=, keep 5 countries / 581,137 rows,
+   and *exclude the 7 EHCVM countries loudly* -- which INVERTS today's outcome
+   (base and branch both keep exactly those 7 and exclude the 5); or
+2. register the plot-less shape =(t, v, i, input, j, u)= and exclude the 5; or
+3. split, as #512 says for EthiopiaRHS.
+
+None of those is "one alias + one sentinel entry".  *The implementer's #569
+assessment is right about =plot_labor='s alias and wrong about the size of the
+job for both tables.*  I would not block this PR on it -- =crop_production= is
+genuinely delivered -- but the issue should carry these numbers so the next agent
+does not start from "two config lines".
+
+* Bottom line
+
+*The change does what it says, and the numbers reproduce.*  =Feature('crop_production')=
+goes from 8 countries / 255,137 rows to 14 / 608,401 with per-country row counts
+equal to =Country()= to the row, a unique named index, no Feature-side collapse,
+no fingerprint movement (0 of 26), 337 targeted tests green, and the #854
+regression (91.3% of rows lost) fixed.  #775's order-dependence is worse than
+reported (4 distinct answers over 24 permutations, not 3) and is fully gone.
+
+*Nothing here blocks a merge.*  The concerns, in the order I would act on them:
+
+1. *7c -- decide =plot= vs =plot_id= now*, in this PR.  Two registered canonical
+   indexes in =data_info.yml= naming the same axis differently is a contract, not
+   an accident, and the branch is what puts them side by side.
+2. *3 -- add the post-promotion uniqueness guard* (three lines) and correct
+   =_align_to_canonical_levels='s docstring: promotion CAN make the index
+   non-unique, nothing downstream checks, and the one test that looks like it
+   covers this tests the refining case instead.  Today it is safe only because
+   no =u= column in Mali/Nigeria/Tanzania holds a literal ='Unknown'=.
+3. *1b -- widen the alias clash test* to =dst in names or dst in df.columns=
+   (one line), and fix the collision warning's false last sentence ("The frame
+   keeps its own index shape" -- it does not; the aliased level is then dropped).
+4. *3 / CONCERN -- correct the ledger's "grain_reports() is EMPTY"*: it is 8,
+   identically on both sides, all pre-existing Site-1 reports.
+5. *8 / CONCERN -- soften the 65-parquet disclosure* to what is provable: 21 of
+   25 checkable rebuilds match their config's hash, 4 match nothing on disk and
+   will self-invalidate.  (No =crop_production= among the 65: confirmed.)
+6. *6 -- name the missing level* in the exclusion warning (two lines).
+7. *1a -- file an all-null promotion as =fabricated=*, not =promoted=.
+8. *7a / 9 -- record the =season= vocabulary spread* (=A/B=, =annual/major/minor=,
+   =last/major/minor=) where a user will see it, not only in =data_info.yml=.

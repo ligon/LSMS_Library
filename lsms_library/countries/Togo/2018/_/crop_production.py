@@ -78,10 +78,10 @@ def _finish_crop_production(df, t):
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
     df = df[df['crop'].notna()]
-    keep = ['t', 'i', 'plot', 'crop', 'u', 'Quantity',
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
             'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
     return df
 
 
@@ -106,7 +106,7 @@ intercropped = src['s16cq07'].astype('string').map(
 
 df = pd.DataFrame({
     'i':             hh.values,
-    'plot':          plot.values,
+    'plot_id':          plot.values,
     'crop':          _label_map(src['s16cq04'], crop_map).values,
     'u':             _label_map(src['s16cq12b'], unit_map).values,
     'Quantity':      src['s16cq12a'].values,

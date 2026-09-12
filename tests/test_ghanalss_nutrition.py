@@ -58,11 +58,17 @@ FCT_COVERAGE_FLOOR_2016_17 = 0.85   # measured 0.9251
 #: diet, it is a currency unit.  Measured max across waves is ~1,001.
 ABSURD_KCAL_CAP_DAY = 10_000
 
-#: Measured 2026-09-04, 2016-17, assuming a 30-day recall.  Deliberately a
-#: WIDE interval around the measurement rather than the physiological band --
+#: Measured 2026-09-04, 2016-17, over the wave's 30-day recall (see DAYS).
+#: Deliberately a WIDE interval around the measurement rather than the
+#: physiological band --
 #: see test_energy_2016_17_measured's docstring.
 KCAL_2016_17 = (600, 2_000)
 
+#: GLSS7's six consumption visits are five days apart and each asks "since my
+#: last visit", so they tile days 1-30 of the 35-day cycle exactly -- no gap,
+#: no overlap.  30 is the recall length, not a round number chosen for
+#: convenience.  (GLSS7 Main Report, "Interviewer Workload"; GhanaLSS/_/
+#: CONTENTS.org, "The repeated-visit design, wave by wave".)
 DAYS = 30.0
 
 
@@ -187,7 +193,6 @@ def test_energy_2016_17_measured(nutrition):
     * 7.5% of its kilograms map to no FCT row, and the three labels missing
       from categorical_mapping.org#harmonize_food alone are worth +27% of
       its Energy;
-    * the 30-day recall is an approximation of ~7 visits over about a month;
     * densities are per edible portion but quantities are as acquired.
 
     Each of those pushes the number down or blurs it.  The test pins that the

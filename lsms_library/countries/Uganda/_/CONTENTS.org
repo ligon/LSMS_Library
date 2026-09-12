@@ -807,11 +807,28 @@ The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
 favour of the org-table single source of truth.
 
-The =_/conversion_to_kgs.json= file is a kg-per-unit factor
-lookup consumed by =food_quantities= derivation -- a separate
-concern from =u= label canonicalisation.  Its keys are the same
-=Preferred Label= strings used above; it is built dynamically by
-=_/kg_per_other_units.py=.
+The =_/conversion_to_kgs.json= file is a kg-per-unit factor lookup
+built dynamically by =_/kg_per_other_units.py=, keyed on the same
+=Preferred Label= strings used above.
+
+*It is NOT consumed by the =food_quantities= derivation*, which is
+what this paragraph said until 2026-09-09.  =uganda.food_acquired=
+joins it on =u= alone into a column named =Kgs=, and
+=uganda.food_acquired_to_canonical= then drops it -- its docstring
+lists =Kgs= among the columns that "are ignored", and the canonical
+frame carries =[Quantity, Expenditure, Price]= only.  Confirmed on a
+warm build: =Country('Uganda').food_acquired()= has neither =Kgs= nor
+=Quantity_kg=, so *100% of Uganda's API kilograms come from
+=transformations._get_kg_factors=* / =food_kg_factors=.  The json is
+live for anyone reading a wave parquet directly and dead for the API.
+
+It is still worth having, as an ANSWER KEY rather than as an input:
+it is hand-curated for exactly the container labels
+(=Sack (50 kgs)=, =Tin (Debe) (20 lts)=, =Cup/Mug(0.5lt)=) whose
+kilograms GH #850 taught =_parse_explicit_metric= to read off the
+label.  =tests/test_food_kg_inference.py= asserts the parser agrees
+with it.  The framework must NOT read it at runtime: a stored
+inferred factor is the anti-pattern GH #850 exists to remove.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
@@ -1764,7 +1781,7 @@ verified -- but that is convergence by hand, one table at a time, and
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:
-** TODO =crop_production.intercropped= is wired to the SEED-USE question
+** DONE =crop_production.intercropped= was wired to the SEED-USE question
 
 Found 2026-07-21 while closing the "silent colmap" gap above, by reading
 the Stata variable labels of every column =CROP_COLMAPS[...]['intercrop']=
@@ -1798,10 +1815,176 @@ The two are near-independent, so the current column is close to noise:
 51.8% / 52.5% of rows (2011-12 … 2019-20) — a coin flip.  The "yes"
 rates differ too (33–42% wired vs 50–58% true crop-stand).
 
-*Any analysis using =crop_production.intercropped= today is using the
-seed-purchase question.*  Rewiring MOVES data (and would newly populate
-2009-10 and 2010-11, which are 100% NaN today), so it is a separate change
-with its own before/after — not folded into a comment-and-tests PR.
+*Any analysis using =crop_production.intercropped= before 2026-09-12 was
+using the seed-purchase question.*  Two things were wrong and both are
+fixed below: the *question* (seed use, not crop stand) and the *season*
+(AGSEC4A's answer served for season-B rows).
+
+*** Fixed 2026-09-12 — GH #872
+
+Every wave's =CROP_COLMAPS[t]['intercrop']['flag']= now points at the
+crop-stand column (=a4aq7= 2009-10/2010-11, =a4aq8= 2011-12…2015-16,
+=s4aq08= 2018-19/2019-20).  The =2 -> True= recode is unchanged and is
+exactly right for {1 Pure Stand, 2 Mixed/Inter cropped}.
+
+Measured on the raw AGSEC4A of all seven waves: the crop-stand column
+takes values in ={1, 2, NA}= *only* — no 0/9/99 sentinel anywhere — so
+=bool(int(c) == 2)= cannot silently turn a "don't know" into "pure
+stand".  The old seed-use column was equally clean; the problem was
+never the codes, it was the question.
+
+Two waves were newly populated.  2010-11's entry named =a4aq3=, a column
+that wave does not ship, so it had been NaN throughout (set to =None= in
+2026-07, then wired here).  2009-10's entry was =None= behind a comment
+claiming AGSEC4A had "no parcel/plot/cropID in the form the join needs";
+*that comment was wrong* — the wave simply uses question-numbered id
+columns (=a4aq2= Parcel ID, =a4aq4= Plot ID, =a4aq6= Crop Code) instead
+of =parcelID=/=plotID=/=cropID=.  Join coverage, measured:
+
+| wave    | AGSEC5A rows hitting an AGSEC4A key | AGSEC5B |
+|---------+-------------------------------------+---------|
+| 2009-10 | 100.00%                             | 74.45%  |
+| 2010-11 | 99.25%                              | 88.15%  |
+
+Served =crop_production= before/after (row count unchanged at 130 606):
+
+| wave    | non-NA before | non-NA after | True before | True after | share True before | share True after | row agreement |
+|---------+---------------+--------------+-------------+------------+-------------------+------------------+---------------|
+| 2009-10 |             0 |       20 271 |           0 |     11 495 | —                 |            0.567 | —             |
+| 2010-11 |             0 |       19 757 |           0 |     11 553 | —                 |            0.585 | —             |
+| 2011-12 |        17 763 |       17 757 |       6 954 |     10 139 |             0.391 |            0.571 |         0.498 |
+| 2013-14 |        15 339 |       15 339 |       6 316 |      8 537 |             0.412 |            0.557 |         0.505 |
+| 2015-16 |        17 367 |       17 367 |       7 224 |      9 428 |             0.416 |            0.543 |         0.520 |
+| 2018-19 |        10 993 |       10 933 |       4 178 |      5 378 |             0.380 |            0.492 |         0.526 |
+| 2019-20 |        14 163 |       14 129 |       5 957 |      7 746 |             0.421 |            0.548 |         0.616 |
+| *total* |        75 625 |      115 553 |      30 629 |     64 276 |                   |                  |         0.531 |
+
+("row agreement" = share of served rows non-NA on both sides where the
+old and new booleans coincide — a coin flip, as the raw-level 48–53%
+predicted.  The 2018-19 / 2019-20 "newly NA" counts, 68 and 34 rows, are
+plots where the seed-use question was answered and the crop-stand one was
+not.)
+
+*** Independent corroboration of the crop-stand reading
+
+Two checks, neither of which uses the variable label:
+
+1. 2009-10 and 2010-11 ship =a4aq9=, "If intercropped what percentage of
+   intercropped area was under this crop".  It is a skip-pattern child of
+   =a4aq7=, so it should be populated iff =a4aq7 == 2=.  Measured: 96.6% /
+   98.8% populated where =a4aq7 == 2=, 0.2% / 1.2% where =a4aq7 == 1=.
+
+2. 2013-14 and 2015-16 ship WB-derived =numcrops= (number of crops on the
+   plot).  =(numcrops == 1)= equals =(a4aq8 == 1)= on *99.61%* / *99.96%*
+   of rows — the World Bank's own derivation agrees that =a4aq8= is the
+   crop-stand question.
+
+The other two WB-derived columns in those files are *not* usable as a
+check and should not be mistaken for one: =intcrp= is 1 on 13 of 10 550
+rows (2013-14) and 4 of 10 823 (2015-16), and =pure= is 1 on 28 rows /
+0 rows.  Both are near-constant, so any "agreement" against them is an
+artefact of the base rate, not evidence.  They are not intercrop flags.
+
+*** The flag is read at PLOT grain from a plot-CROP file — and that is now defensible
+
+=inter_lookup= is keyed =(hh, parcel, plot)= while AGSEC4A is plot-crop
+grain, so duplicate crop rows on one plot are last-write-wins.  Measured
+share of plots whose crop rows *disagree*:
+
+| wave    | crop-stand column (now) | seed-use column (before) |
+|---------+-------------------------+--------------------------|
+| 2009-10 |                   0.17% | —                        |
+| 2010-11 |                   0.31% | —                        |
+| 2011-12 |                   0.17% |                   11.58% |
+| 2013-14 |                   0.07% |                   11.05% |
+| 2015-16 |                   0.00% |                   11.93% |
+| 2018-19 |                   0.02% |                   10.94% |
+| 2019-20 |                   0.00% |                   10.10% |
+
+The crop-stand question genuinely *is* plot-level (the survey asks it once
+per plot and repeats the answer down the crop roster), so reading it at
+plot grain is right and the 0–0.31% residue is enumerator noise.  The
+seed-use question is *crop*-level — "did you use seed for THIS crop" — so
+10–12% of plots gave two different answers and =last-write-wins= was
+picking one at random.  The old wiring was the wrong question AND the
+wrong grain.
+
+*** Each season is read from its OWN roster (the season-B half of #872)
+
+The first version of this fix left the pre-existing join alone: AGSEC4A is
+the FIRST season's plot-crop roster, and its flag was carried onto
+season-B harvest rows too, because the lookup key is =(hh, parcel, plot)=
+with no season level.  That was tolerable while the served value was noise
+and *not* tolerable once it became a real measurement — 47.1% of served
+rows are season B.
+
+AGSEC4B exists in all seven waves, with the analogous column, the same
+value labels and the same id columns as its 4A twin:
+
+| wave              | season A  | season B  | value labels                  |
+|-------------------+-----------+-----------+-------------------------------|
+| 2009-10, 2010-11  | =a4aq7=   | =a4bq7=   | 1 Pure stand, 2 Inter cropped |
+| 2011-12 … 2015-16 | =a4aq8=   | =a4bq8=   | 1 Pure Stand, 2 Mixed Stand   |
+| 2018-19, 2019-20  | =s4aq08=  | =s4bq08=  | 1 Pure Stand, 2 Mixed Stand   |
+
+Like the 4A columns, every 4B column takes values in ={1, 2, NA}= only.
+2009-10's 4B uses the same question-numbered id layout as its 4A
+(=a4bq2=/=a4bq4=/=a4bq6=).
+
+*The two seasons genuinely disagree.*  On plots rostered in both, the crop
+stand differs on:
+
+| wave    | plots in both rosters | disagree |
+|---------+-----------------------+----------|
+| 2009-10 |                 5 810 |    29.5% |
+| 2010-11 |                 5 815 |    26.7% |
+| 2011-12 |                 4 275 |    31.0% |
+| 2013-14 |                 4 614 |    24.8% |
+| 2015-16 |                 4 395 |    26.3% |
+| 2018-19 |                 2 721 |    27.9% |
+| 2019-20 |                 4 684 |    23.3% |
+
+That is a *plot really being planted differently in the second season*, not
+noise — the same plots' within-season crop rows agree to 0.00–0.50%.
+AGSEC4B also covers the AGSEC5B harvest rows far better than AGSEC4A does
+(86.6–99.95% vs 54.8–88.1%), because 4A rosters plots that were cropped in
+season A and 5B records harvests from season B.
+
+Every wave therefore declares =intercrop_B= alongside =intercrop=, and
+=inter_lookup= is keyed by season.  *A season with no roster serves NA and
+never borrows the other season's answer.*
+
+Before/after at the wave level (=crop_production_for_wave= called directly,
+no cache).  "before" reproduces the season-A-carry by feeding AGSEC4A as
+both rosters:
+
+| wave    | season | rows   | non-NA before → after | True before → after | changed / comparable |
+|---------+--------+--------+-----------------------+---------------------+----------------------|
+| 2009-10 | A      | 11 847 |    11 809 →    11 809 |    7 082 →    7 082 |      0 / 11 809 (0%) |
+| 2009-10 | B      | 10 561 |     8 462 →    10 539 |    4 413 →    5 917 |  2 425 / 8 446 (28.7%) |
+| 2010-11 | A      | 11 586 |    11 492 →    11 492 |    7 083 →    7 083 |      0 / 11 492 (0%) |
+| 2010-11 | B      |  9 384 |     8 265 →     9 302 |    4 470 →    5 376 |  2 175 / 8 203 (26.5%) |
+| 2011-12 | A      | 10 833 |    10 812 →    10 812 |    6 474 →    6 474 |      0 / 10 812 (0%) |
+| 2011-12 | B      |  9 319 |     6 945 →     9 298 |    3 665 →    5 244 |  2 154 / 6 935 (31.1%) |
+| 2013-14 | A      |  8 725 |     8 719 →     8 719 |    5 111 →    5 111 |       0 / 8 719 (0%) |
+| 2013-14 | B      |  8 860 |     6 620 →     8 836 |    3 426 →    4 759 |  1 688 / 6 616 (25.5%) |
+| 2015-16 | A      | 10 648 |    10 648 →    10 648 |    5 989 →    5 989 |      0 / 10 648 (0%) |
+| 2015-16 | B      |  8 928 |     6 719 →     8 709 |    3 439 →    5 236 |  1 821 / 6 561 (27.8%) |
+| 2018-19 | A      |  7 153 |     7 073 →     7 073 |    3 739 →    3 739 |       0 / 7 073 (0%) |
+| 2018-19 | B      |  7 041 |     3 860 →     7 033 |    1 639 →    3 556 |  1 174 / 3 855 (30.5%) |
+| 2019-20 | A      |  8 349 |     8 327 →     8 327 |    4 867 →    4 867 |       0 / 8 327 (0%) |
+| 2019-20 | B      |  7 372 |     5 802 →     7 372 |    2 879 →    4 132 |  1 418 / 5 802 (24.4%) |
+
+Totals: *season A is byte-identical* — 68 880 non-NA, 40 345 True, 0 rows
+changed, which is the check that the season key is a pure refactor for A.
+Season B: 46 673 → *61 089* non-NA, 23 931 → *34 220* True, *12 855 of
+46 418 comparable rows corrected (27.7%)*, *14 671 rows newly populated*
+and 255 rows newly NA (rostered in 4A but not 4B).
+
+*What is still true*: =perennial_lookup= / =planting_month= are built from
+season A's roster only.  No Uganda wave populates either today (the columns
+are not emitted), so this costs nothing now; a wave that wires them must
+give them the same per-season treatment.
 
 ** DONE 2010-11 intercrop flag named a column that does not exist
 
@@ -1814,6 +1997,9 @@ the config now states what the build already did and the strict check
 above can be applied uniformly.  Note this wave DOES carry =a4aq7=
 "Cropping system" {1: Pure Stand, 2: Inter cropped}; wiring it belongs
 with the item above.
+
+*Superseded 2026-09-12 by GH #872*: =a4aq7= is now wired, and the wave
+serves 19 757 non-NA =intercropped= rows (58.5% True) where it served 0.
 
 ** DONE 2018-19 AGSEC5B harvest unit is available but not wired (GH #842)
 
@@ -2690,3 +2876,26 @@ Preferred Labels), but the =labels== machinery resolves against
 =nonfood_expenditures(labels='Aggregate')= returns the *identical* 61 =j=
 values as the plain call -- a silent no-op, not an error.  Extending =labels==
 to non-food tables is a core change and was deliberately left out of #817.
+
+* 2026-09-10 -- the plot axis is now spelled =plot_id=, not =plot=
+
+@ligon's decision: =plot_id= is the canonical plot-axis level name EVERYWHERE.
+This country declared =plot= on crop_production, plot_inputs, plot_labor; those =index:= tuples in
+=_/data_scheme.yml=, and the index name the wave script / country module
+writes, are now =plot_id=.  =plot_features= already said =plot_id= and is
+unchanged.
+
+- *Values are untouched.*  This is a level NAME change only: the same plot key
+  strings, the same rows, the same columns.  A warm frame read before and
+  after differs only by =rename_axis({'plot': 'plot_id'})= -- verified by
+  comparing the API frame against the pre-change one.
+- *The caches for this whole country are invalidated.*
+  =Country._table_cache_hash= hashes =_/data_scheme.yml= and the country
+  module as WHOLE FILES, so every table's hash moved, not just the renamed
+  ones.  A re-warm is required; see the bill in
+  =.coder/ledger/crop-production-plot-id.md=.
+- *A shared axis NAME is still not a shared VOCABULARY.*  Uganda's ag modules
+  key plots ={hhid}-{parcel}-{plot}= while =plot_features= keys them
+  ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
+  need =on='parcel'= to bridge them.  Renaming the level changed nothing
+  about that.

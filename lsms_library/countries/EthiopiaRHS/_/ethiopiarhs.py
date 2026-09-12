@@ -44,10 +44,23 @@ waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 # price-ratio kg inference into a per-good factor; that polluted the
 # unit axis with ITEM NAMES (e.g. '0 [Butter]', '5 [Teff]') and is the
 # bug reported in #347.  Removed: ``u`` is now a clean unit token, as
-# in every other country (Uganda/Malawi/EHCVM).  The framework's
+# in every other country (Uganda/Malawi/EHCVM).
+#
+# THE JUSTIFICATION GIVEN HERE WAS FALSE UNTIL 2026-09-09, and is
+# recorded rather than quietly rewritten.  It read: "the framework's
 # price-ratio inference (transformations.conversion_to_kgs) already
-# groups by item ``i`` within each unit, so a single unit label per
-# good still recovers sensible factors with no per-good tagging.
+# groups by item ``i`` within each unit".  It does not, and ``i`` is
+# the HOUSEHOLD id, not the item.  Before GH #850 that function
+# returned ONE factor per unit label for a whole country, with no item
+# axis at any step -- so stripping the food label off the unit token
+# was right for the reason given in the paragraph above (a unit axis
+# must carry units), and wrong for the reason given here.
+#
+# GH #850 made the claim true: the inference now estimates a factor
+# per ``(j, u)`` cell and falls back to the u-pooled factor only where
+# that cell is too thin, with the rung reported per row in
+# ``food_kg_factors``'s ``KgFactorSource``.  So a single clean unit
+# label per good does now recover a per-good factor.
 
 
 def _norm_village(v):

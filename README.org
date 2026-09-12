@@ -110,6 +110,7 @@ Full documentation is available at [[https://ligon.github.io/LSMS_Library][ligon
 - **[[https://ligon.github.io/LSMS_Library/guide/feature/][Feature Guide]]** -- cross-country analysis with =ll.Feature=
 - **[[https://ligon.github.io/LSMS_Library/guide/caching/][Caching]]** -- performance tuning, build backends, cache management
 - **[[https://ligon.github.io/LSMS_Library/guide/panel-data/][Panel Data]]** -- longitudinal analysis and ID harmonization
+- **[[https://ligon.github.io/LSMS_Library/guide/derivations/][Derived Values]]** -- the =Derivation= column: which served numbers are constructions from raw survey answers rather than survey answers, and how to get the raw answers back
 - **[[https://ligon.github.io/LSMS_Library/api/country/][API Reference]]** -- complete class documentation (auto-generated from source)
 
 * Contributing

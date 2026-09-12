@@ -79,11 +79,11 @@ def _intercropped_from_planting(planting_fn):
     inter = inter.where(~(code.between(2, 7)), True)
     key = pd.DataFrame({
         'i': df[hh].apply(format_id).values,
-        'plot': df[plot].apply(format_id).values,
+        'plot_id': df[plot].apply(format_id).values,
         'crop_code': pd.to_numeric(df[cc], errors='coerce').astype('Int64').values,
         'intercropped': inter.values,
     })
-    key = key.dropna(subset=['intercropped']).drop_duplicates(['i', 'plot', 'crop_code'])
+    key = key.dropna(subset=['intercropped']).drop_duplicates(['i', 'plot_id', 'crop_code'])
     return key
 
 
@@ -95,10 +95,10 @@ def _align_intercropped(raw, hhid, plot, cropcol, planting_fn):
         return None
     j = pd.DataFrame({
         'i': raw[hhid].apply(format_id).values,
-        'plot': raw[plot].apply(format_id).values,
+        'plot_id': raw[plot].apply(format_id).values,
         'crop_code': pd.to_numeric(raw[cropcol], errors='coerce').astype('Int64').values,
     }, index=raw.index)
-    merged = j.merge(key, on=['i', 'plot', 'crop_code'], how='left')
+    merged = j.merge(key, on=['i', 'plot_id', 'crop_code'], how='left')
     return pd.Series(merged['intercropped'].values, index=raw.index, dtype='boolean')
 
 

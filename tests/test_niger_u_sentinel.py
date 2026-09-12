@@ -63,13 +63,17 @@ U_TABLES = ("crop_production", "food_acquired", "plot_inputs", "community_prices
 # Cold-rebuild measurements (see the module docstring for provenance).
 EXPECTED_ROWS = {
     "crop_production": 46341,
-    "food_acquired": 239031,
+    # 239,031 before GH #876.  The derived purchase value drops rows whose
+    # purchased quantity is zero and which used to survive on the raw s07bq08
+    # (and the gift subtraction moves more of them to zero); s07bq05 then adds
+    # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
+    "food_acquired": 239882,
     "plot_inputs": 42364,
     "community_prices": 15423,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4920,
-    "food_acquired": 12,
+    "food_acquired": 8,      # 12 before GH #876; one of the 8 is an inkind row
     "plot_inputs": 75,
     "community_prices": 0,
 }
@@ -77,7 +81,7 @@ EXPECTED_SENTINEL = {
 # country total that happens to add up.
 EXPECTED_SENTINEL_BY_WAVE = {
     "crop_production": {"2011-12": 3146, "2014-15": 373, "2018-19": 441, "2021-22": 960},
-    "food_acquired": {"2018-19": 0, "2021-22": 12},
+    "food_acquired": {"2018-19": 0, "2021-22": 8},   # 12 before GH #876
     "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 14},
     "community_prices": {"2011-12": 0, "2014-15": 0},
 }

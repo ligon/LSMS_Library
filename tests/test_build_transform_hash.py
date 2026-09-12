@@ -45,6 +45,9 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms.add_visit_level",
     "lsms_library.country._normalize_dataframe_index",
     "lsms_library.country.Wave.grab_data",
+    # GH #871: SITE 2 (the household -> cluster projection) reached no
+    # fingerprint before this tag; scoped to the one table it builds.
+    "lsms_library.country.Wave.cluster_features",
     "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
 }
@@ -371,3 +374,62 @@ def test_fingerprint_stable_across_pythonhashseed():
         assert r.returncode == 0, r.stderr
         outs.append(r.stdout.strip())
     assert outs[0] == outs[1], f"fingerprint depends on PYTHONHASHSEED: {outs}"
+
+
+# ---------------------------------------------------------------------------
+# GH #850: transformations.py is READ-PATH and must stay out of every
+# fingerprint
+# ---------------------------------------------------------------------------
+
+def test_no_transformations_symbol_reaches_any_fingerprint():
+    """The derived food tables (and ``harvest_kg``) must cost no rebuild.
+
+    ``food_quantities`` / ``food_prices`` are derived at RUNTIME from
+    ``food_acquired`` (``Country._FOOD_DERIVED``) and are never written to a
+    parquet, and ``harvest_kg`` is applied to ``crop_production`` at analysis
+    time rather than stored as a column.  So an edit to the kg inference --
+    ``conversion_to_kgs``, ``_get_kg_factors``, ``food_kg_factors``, or the
+    metric VOCABULARY that seeds them -- changes what a user is served
+    without invalidating anything they have cached.
+
+    That is a load-bearing property, not a happy accident: GH #850 moved the
+    corpus's kilograms substantially and shipped with no re-warm on the
+    strength of it.  This test is the assertion form of
+    ``slurm_logs/gh850_design/probe_hash_reach.py``, so a future refactor
+    that quietly moves a derived transform onto the build path goes red here
+    instead of silently serving stale numbers from every warm parquet in the
+    corpus.
+
+    Scoped to the CLOSURE, which is what the fingerprint hashes -- not to
+    imports: ``transformations`` may be imported by build-path code (it is,
+    for ``validate_acquisition_source``) as long as no kg-inference symbol is
+    reachable from a tagged entry point.
+    """
+    seen = set()
+    for _qn, (fn, _tables) in sorted(R._BUILD_TRANSFORMS.items()):
+        R._closure_parts(fn, seen)
+    kg_symbols = {
+        "lsms_library.transformations.conversion_to_kgs",
+        "lsms_library.transformations._get_kg_factors",
+        "lsms_library.transformations._seeded_kg_factors",
+        "lsms_library.transformations.food_kg_factors",
+        "lsms_library.transformations._apply_kg_conversion",
+        "lsms_library.transformations._parse_explicit_metric",
+        "lsms_library.transformations.food_quantities_from_acquired",
+        "lsms_library.transformations.food_prices_from_acquired",
+        "lsms_library.transformations.harvest_kg",
+        "lsms_library.transformations.harvest_kg_factors",
+        "lsms_library.transformations._kg_factor_series",
+        "lsms_library.transformations.KNOWN_METRIC",
+        "lsms_library.transformations._EXPLICIT_METRIC_PATTERNS",
+        "lsms_library.transformations.FOOD_KG_MIN_BASELINE",
+        "lsms_library.transformations.FOOD_KG_TIGHT_TOLERANCE",
+    }
+    joined = "\x1f".join(_all_parts())
+    reached = sorted(s for s in kg_symbols if s in seen)
+    named = sorted(s for s in kg_symbols if s.rsplit('.', 1)[-1] + "=" in joined)
+    assert not reached, (
+        f"kg-inference symbols reached a build fingerprint: {reached}.  "
+        f"If this is deliberate, the derived food tables are now cached and "
+        f"every kg change needs a corpus re-warm -- say so explicitly.")
+    assert not named, f"kg-inference constants serialised into a fingerprint: {named}"

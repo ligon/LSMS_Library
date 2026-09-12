@@ -1,0 +1,777 @@
+#+title: GhanaLSS 2012-13 (GLSS6): where visit dates are recorded, and what shipped
+#+date: 2026-09-11
+#+author: visit-date audit agent (wave 2012-13)
+
+Scope: a READER's audit of the GLSS6 instruments, manuals, report and the
+Section-0-type data files, for the GSS data request on interviewer-visit
+dates.  No library table was built; no tracked file was edited.  All page
+references give the PDF page of the file named and, where the page carries
+one, the printed page label.
+
+Mandatory reading done first (per the brief): =GhanaLSS/_/CONTENTS.org=
+lines 1-32, 1235-1660 ("The repeated-visit design, wave by wave"), 2869-2932
+(text layers), and every =2012-13= / =GLSS6= hit; =2012-13/_/data_info.yml=
+(=interview_date= wires only =PARTA/SEC0.dta ddate/mdate/ydate=);
+=2012-13/_/food_acquired.py= docstring (=s9bq1..6= -> visits 2..7, =s8hq3..8=
+-> visits 2..7); =.coder/ledger/ghanalss-visit-offset.md=.  Idiosyncrasies
+already recorded there and relied on here: GLSS6 fields seven visits with
+9B at q1..q6 and 8H at q3..q8 (8H has two screeners), the q -> calendar-visit
+map is carried in the Stata labels, =reint= flags 1,476 households, and the
+GLSS7 manual's eleven-visit schedule is inherited boilerplate whose lineage
+could not be pinned to a round.  Two of those are sharpened below
+(=reint=; the manual lineage) and one belief in the brief is overturned:
+*this wave ships complete per-visit dates for all seven visits*.
+
+* Visit protocol
+
+One line: seven paper-questionnaire visits per household at five-day
+intervals inside a 35-day cycle, diary-assisted in all EAs, keyed in
+regional offices on microcomputers (not CAPI).
+
+- *Seven visits, five days apart, 35-day cycle.*
+  =REPORTS/GLSS6_Main Report.pdf= Appendix 1 s2 "Survey Period" (PDF p.222,
+  printed 201): "There were 10 cycles of 35 days each and one travelling
+  day ... A cycle in both rural and urban areas lasted 35 days.  Interviewers
+  in rural and urban areas all used the diary method as far as possible".
+  s4 "Interviewer Workload" (same page): "An interviewer visited each
+  household in the EA assigned to him/her every sixth day i.e. after every
+  five days.  In other words, the interviewer visited each of the 15 selected
+  household seven (7) times in order to complete the cycle."  Tables A1.3
+  "Days of Visit" (Batch 1: DAY1 DAY6 ... DAY31) and A1.4 (PDF p.223, printed
+  202).  =MANUALS/GLSS6 INTERVIEWERS MANUAL.pdf= s1.3 (PDF p.9, printed 4)
+  agrees: "A cycle in both rural and urban areas is to last 35 days ...
+  visit households at five-day intervals."  Fieldwork "took place from 18th
+  October 2012 to 17th October 2013" (Report s1.5, PDF p.24, printed 3).
+  *Measured* (below): median gap 5.0 days at every step 1->2 ... 6->7, p10 =
+  p90 = 5, urban and rural alike; first-to-last span median 30 days.
+
+- *Sections by visit* -- the questionnaire's own grid, "SUMMARY OF SURVEY
+  RESULTS", page A0.3 (=QUESTIONNAIRES/GLSS6 Part A Questionnaire.pdf= PDF
+  p.4; identical on =GLSS6 Part B Questionnaire.pdf= PDF p.4):
+  | visit   | sections          |
+  |---------+-------------------|
+  | FIRST   | 1, 2, 5, 6, 7     |
+  | SECOND  | 3, 8H, 9A, 9B     |
+  | THIRD   | 4, 8H, 9B         |
+  | FOURTH  | 8A-G, 8H, 9B      |
+  | FIFTH   | 8H, 9B, 9C, 10    |
+  | SIXTH   | 8H, 9B, 11        |
+  | SEVENTH | 8H, 9B, 12        |
+  (The manual's own table, PDF p.21, differs in detail -- 1st: 1, 2, 6, 7;
+  5th: 5, 8H, 9A, 9B, 9C -- and runs to eleven visits; see the contradiction
+  note below.)  So Part A (sections 1-7) is finished at the third visit and Part B
+  (8-12) runs from the second to the seventh; 8H and 9B are asked at visits
+  2..7 -- six consumption occasions, as CONTENTS.org's table says.
+
+- *Recall phrase.*  Section 9B (Part B PDF p.35, printed 9.13, header
+  repeated on every page to 9.26): columns headed "2nd 3rd 4th 5th 6th 7th
+  VISIT"; col. 1 "How much was spent on ... since my first visit?", cols.
+  2-6 "How much was spent on ... since my last visit?".  Section 8H (Part B
+  PDF p.16, printed 8.11, repeated to 8.17): q1 "Did the household consume
+  any own produced ... in the past 12 months?", q2 "How many months
+  altogether was own produced ... consumed during the past 12 months?", q3-8
+  "How much of own produced ... was consumed by the household since my last
+  visit?" under the same "2nd ... 7th" heads, q9 unit, q10 "For how much
+  would you sell one unit of ... now?".  Manual: "Part H is to be
+  administered on every visit except the first" (PDF p.75, printed 70).
+
+- *Diary: yes, in all EAs; paper, not CAPI.*  Manual "INSTRUCTION ON USE OF
+  DIARY" (PDF p.76, printed 71): "Diaries will be provided ... At your next
+  visit in five days time, you will record the entries made in the diary
+  into the questionnaire ... Transfer of diary entries to the questionnaire
+  will start from your second visit."  Part B instructions (PDF p.77,
+  printed 72): "In all EAs the diary of household expenditure will be used.
+  You must however, ask for expenditures on your second visit".  The diary is
+  a transfer aid, not a dataset: no diary file ships.  Questionnaires are
+  pencil-and-paper ("Write legibly in pencil without crossing out", Manual
+  "Data Entry", PDF p.26, printed 21) keyed in two stages on regional-office
+  microcomputers by the team's data-capture officer: Part A after the third
+  visit, Part B after the last visit (Manual s2.3, PDF p.14, printed 9;
+  Report Appendix 1 s5, PDF p.224, printed 203, "Microcomputers were
+  installed in all data collection centres ... A data entry application
+  system was designed to check the data automatically").  Team = supervisor,
+  senior interviewer/editor, four interviewers, data-capture staff, driver
+  (Manual s1.7 PDF p.11; Report PDF p.222 -- the Report's s1.5, PDF p.24,
+  says "three interviewers", the appendix says four).
+
+- *Contradiction inside the GLSS6 documents (and with CONTENTS.org's
+  lineage note).*  The interviewer's manual carries, verbatim, the eleven-visit
+  /three-day schedule CONTENTS.org attributes to the GLSS7 manual: s1.8 "a
+  33-day cycle ... every fourth day", Table 2 "Batch 1: 1 4 7 10 13 16 19 22
+  25 28 31" (PDF p.11, printed 6); s3.6 "Date of Next Visit ... exactly
+  three (3) days apart" (PDF p.19, printed 14); s3.7 "spread over eleven
+  visits" with an 11-row visit/section table (PDF p.21); 9B "administered 10
+  times ... since the last 3 days" (PDF p.77, printed 72); "End of Cycle ...
+  the last visit (that is, the 11th visit)" (PDF p.93, printed 88).  The same
+  manual's s1.3 says 35 days and five-day intervals, and its s1.6 opens "The
+  overall management of the conduct of GLSS-5 is under the Government
+  Statistician" (PDF p.10, printed 5).  So the stale schedule demonstrably
+  passed through GLSS6 and was lifted from the GLSS5 manual; CONTENTS.org's
+  "it may have passed through that round too" can be firmed up for GLSS6.
+  The questionnaire grid (A0.3) and the data both say seven visits.
+  A second internal contradiction: the questionnaire's A0.3 schedules 9A
+  (less-frequent purchases) at the SECOND visit; the manual (s3.7 and the 9A
+  instructions, PDF p.77) says 9A is asked "only once during the last
+  visit".  =sec9a.dta= carries no date, so the data cannot adjudicate.
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+| document (=2012-13/Documentation/=)               | section / form / page                                              | field(s) as printed                                                                                                                                                                                                                                     | records                                                                                                        |
+|---------------------------------------------------+--------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------|
+| QUESTIONNAIRES/GLSS6 Part A Questionnaire.pdf     | Survey Information sheet, page A0.1 (PDF p.2), FIRST VISIT block   | INTERVIEWER + code; DATE DD MM YEAR; DWELLING FOUND; IS THE HEAD OF HOUSEHOLD THE SAME; LANGUAGE USED; INTERPRETER USED; HOUSEHOLD ... REPLACES HOUSEHOLD NUMBER + REASONS (1 dwelling not found/vacant, 2 occupant not at home, 3 refusal)              | date yes; time no; duration no; result: replacement reason only; interviewer yes                              |
+| same                                              | A0.1, VERIFICATION OF QUESTIONNAIRE, FIRST VISIT                   | SUPERVISOR; DATE; REMARKS; REINTERVIEW BY SUPERVISOR? YES 1 / NO 2                                                                                                                                                                                      | supervisor date yes; QC re-interview flag                                                                    |
+| same                                              | A0.1 SECOND/THIRD VISIT and A0.2 FOURTH..SEVENTH VISIT (PDF pp.2-3) | per visit: INTERVIEWER; DATE; REMARKS -- and VERIFICATION OF QUESTIONNAIRE, n-th VISIT: SUPERVISOR; DATE; REMARKS; REINTERVIEW BY SUPERVISOR?                                                                                                            | interviewer date + supervisor date per visit 1..7; no time                                                    |
+| same                                              | A0.3 SUMMARY OF SURVEY RESULTS (PDF p.4)                           | rows FIRST..SEVENTH with SECTION list; INTERVIEWER VISITS: DATE DD MM YEAR, RESULTS (COMPLETE 1 / PARTIAL 2 / DISCONTINUED 3), DURATION HR MIN; CHECK-UP VISITS: DATE DD MM YEAR, RESULTS (COMPLETE 1 / PARTIAL 2); INTERVIEWER (SATISFACTORY 1 / TO BE COMPLETED 2 / TO BE REDONE 3); DATA ENTRY OPERATOR (SATISFACTORY 1 / CORRECTION 2) | date yes; DURATION yes (hours+minutes); result code yes; supervisor check-up date + result yes; no clock time |
+| same                                              | A0.4 OBSERVATION AND COMMENTS (PDF p.5)                            | REMARKS BY THE INTERVIEWER / BY THE SUPERVISOR ON THE FIRST ... SEVENTH VISIT                                                                                                                                                                           | free text per visit; no date                                                                                   |
+| same                                              | Section 4A header (PDF p.27) and 4E header (PDF p.39)              | "D D M M Y Y Y Y" beside "over the last 7 days, that is, since ......" / "over the past 12 months, that is, since ......"                                                                                                                              | reference-period anchor date of the visit at which Section 4 was asked (visit 3)                              |
+| QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf     | pages A0.1-A0.4 (PDF pp.2-5)                                       | the identical four cover pages, printed again for the Part B booklet                                                                                                                                                                                    | as above, kept separately for Part B                                                                          |
+| same                                              | Section 8H, every page (PDF pp.16-22, printed 8.11-8.17)           | column heads "2nd 3rd 4th 5th 6th 7th" each over a "dd mm" box                                                                                                                                                                                          | date of each of visits 2..7 as recorded at the 8H page                                                        |
+| same                                              | Section 9A, every page (PDF pp.23-34, printed 9.1-9.12)            | "Date of this visit DD MM Y Y Y Y"                                                                                                                                                                                                                      | date of the 9A visit                                                                                          |
+| same                                              | Section 9B, every page (PDF pp.35-48, printed 9.13-9.26)           | "2nd 3rd 4th 5th 6th 7th VISIT" each over "dd mm"                                                                                                                                                                                                       | date of each of visits 2..7 as recorded at the 9B page                                                        |
+| Diary of Consumptions (Manual PDF p.13 list; p.76) | a separate paper form issued to the household                      | not reproduced in any document in the repo                                                                                                                                                                                                              | unknown whether entries are dated                                                                              |
+| QUESTIONNAIRES/GLSS6 Section 10  Questionnaire.pdf | Survey Information (PDF p.2)                                       | region/EA/household/roster/GPS/head/respondent/contacts -- NO date, interviewer or supervisor field                                                                                                                                                       | none                                                                                                           |
+| QUESTIONNAIRES/GPS Module 13 Questionnaire.pdf    | Survey Information (PDF p.2)                                       | INTERVIEWER; SUPERVISOR; DATE OF INTERVIEW                                                                                                                                                                                                              | date yes; no time                                                                                              |
+| QUESTIONNAIRES/GLSS6 Community Questionnaire.pdf  | cover (PDF p.2)                                                    | DATE D D M M Y Y Y Y; SUPERVISOR CODE; TIME BEGUN; TIME COMPLETED (TIME IN 24 HOURS)                                                                                                                                                                    | date yes; clock time yes (the only instrument with one)                                                        |
+| QUESTIONNAIRES/GLSS6 Prices Questionnaire.pdf     | cover (PDF p.2)                                                    | DATE DAY MONTH YEAR; MARKET READER CODE; SUPERVISOR CODE                                                                                                                                                                                                | date yes                                                                                                       |
+| MANUALS/GLSS6 INTERVIEWERS MANUAL.pdf             | s3.2 "sample household sheet"; s2.2 supervisor checks; s2.3 data-entry "print-outs" of rejected answers | described, not reproduced                                                                                                                                                                                                                               | no form in the repo; the data-entry application's own logs are not documented                                 |
+| MANUALS/GLSS6 CODEBOOK.pdf                        | (whole document)                                                   | NOT a variable codebook: code lists only (ethnic groups, trades, product codes, region/district, historical events, tools, own-produce units)                                                                                                             | says nothing about which cover fields were keyed                                                               |
+
+Manual s3.7 "After the Interview" (PDF p.21): "After each visit to the
+household, you must fill out the 'summary of the survey result' page of the
+questionnaire ... For each visit you should show the date on which you asked
+the questions and outcome ... Do not write in the columns reserved for the
+supervisor and the data entry operator."  s3.6 (PDF p.17-18, printed 12-13):
+on the first visit "Write your name and in the space to the right, your code
+number and the date of interview."
+
+No instrument records a clock TIME for a household visit.  The nearest
+thing is DURATION (HR MIN) on A0.3, which IS keyed and shipped.
+
+* What shipped: instrument field -> distributed variable
+
+** Field-by-field
+
+| instrument field                                             | Data file + variable(s)                                                                                            | shipped?                                                                         |
+|--------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------|
+| A0.1 first visit: interviewer, date, dwelling found, head same, language, interpreter | =PARTA/SEC0.dta=: =intcode=, =ddate/mdate/ydate= (16,757 of 16,772 dated), =dwell=, =hhhead=, =lang=, =interp=      | YES (this is what =data_info.yml interview_date= wires)                          |
+| A0.1 first-visit verification: supervisor, date, reinterview | =SEC0=: =supcode=, =ddatesup/mdatesup/ydatesup= (16,696), =reint= (1,476 Yes / 14,670 No / 626 null)              | YES                                                                              |
+| A0.1 household replacement                                   | =SEC0=: =hhno=, =rhhno=, =reason= (1 dwelling not found/vacant, 2 occupant not at home, 3 refusal)                  | YES                                                                              |
+| A0.1 remarks                                                 | =SEC0.remarks= -- every value is "."                                                                                 | NO (keyed as a placeholder)                                                      |
+| A0.1/A0.2 per-visit interviewer + supervisor dates, Part A booklet | =PARTA/SECA01.dta=: =visitno=, =intcode1=, =dintdate/mintdate/yintdate=, =supcode1=, =dsupdate1/msupdate1/ysupdate1=, =reint1=, =intrem= | YES for visits 1..3 (Part A ends at visit 3); plus one extra row, see below      |
+| A0.3 summary grid, Part A booklet                            | =PARTA/SECA04.dta=: =visit=, =vdd/vmm/vyear=, =vresult=, =intres=, =vhh/vmin=, =cdd/cmm/cyear=, =cresults=, =creson=, =sintt=, =sdeo= | YES for visits 1..3                                                              |
+| Part B cover survey information                              | =PARTB/secb0.dta=: =team=, =rosters=, =intv=, =lang=, =interp=, =superv=, =reinterv=                                | YES, no date on this file                                                        |
+| A0.1/A0.2 per-visit interviewer + supervisor dates, Part B booklet | =PARTB/secb1.dta=: =visitno= (2..7 + 8), =intcd=, =intday/intmon/intyr=, =supercd=, =supday/supmon/supyr=, =reint=  | YES for visits 2..7                                                              |
+| A0.3 summary grid, Part B booklet                            | =PARTB/secb2.dta=: =visitcd= (1..7), =vday/vmon/vyr=, =vres=, =durhr/durmin=, =cday/cmon/cyr=, =cres=, =sinu=, =sentry= | *YES, all seven visits, one clean row per visit per household*                   |
+| A0.4 observation sheet remarks                               | --                                                                                                                 | NO                                                                               |
+| Section 4A / 4E anchor date "since ... D D M M Y Y Y Y"      | =PARTA/SEC4a.dta=, =SEC4e.dta= -- no date variable                                                                 | NO                                                                               |
+| Section 8H per-page visit dates (2nd..7th dd mm)             | =PARTB/sec8h.dta= -- no date variable (15 vars, listed below)                                                       | NO                                                                               |
+| Section 9A "Date of this visit"                              | =PARTB/sec9a.dta= -- no date variable                                                                              | NO                                                                               |
+| Section 9B per-page visit dates (2nd..7th dd mm)             | =PARTB/sec9b.dta= -- no date variable (11 vars, listed below)                                                       | NO                                                                               |
+| Section 10 booklet cover                                     | =SECTION_10/sec10_survinfo.dta= (names only), =sec10_filters.dta=                                                    | n/a -- the instrument has no date field                                          |
+| GPS Module 13 "DATE OF INTERVIEW"                            | =GOVERNANCE/gps-sec0.dta:intdate= -- an integer ddmmyyyy (e.g. 18122013), NOT a Stata date; 4,650 non-null; =month=/=year= all null | YES for the 4,650 module-13 households                                            |
+| Community cover date, time begun/completed                   | =COMMUNITY/sec0.dta=: =day/month/year= (688-689 of 693), =timeb=, =timec= (690 / 688; decimal hh.mm, e.g. 12.15)   | YES                                                                              |
+| Price cover date                                             | =PRICES/price_sec0.dta=: =day/month/year= (1,003-1,004 of 1,019)                                                    | YES                                                                              |
+| (derived) survey month/year                                  | =PARTA/g6loc_edt.dta: month, year= (equal SEC0's month/year for 99.2%); =AGGREGATES/00_GHA_BASICINFO.dta: SURVEMO, SURVEYR= | YES (first-visit month/year only)                                                |
+
+** The per-visit files, measured
+
+Household key: =HID=/=hid= = "clust/nh" (e.g. =60001/01=), 16,772
+households in =g6loc_edt.dta= (=loc2= 1 = urban 7,445; 2 = rural 9,327).
+Dates were assembled from the day/month/year triplets; a triplet that does
+not form a date (e.g. day 31 in a 30-day month) counts as missing.
+
+*** =PARTB/secb2.dta= -- the A0.3 grid for all seven visits (117,402 rows)
+
+| visitcd | rows   | dated  | vres  | duration | median min | check-up date | cres  | sinu   | sentry |
+|---------+--------+--------+-------+----------+------------+---------------+-------+--------+--------|
+|       1 | 16,773 | 16,772 | 16,773 |   16,773 |         74 |         5,362 | 7,431 | 10,716 | 10,066 |
+|       2 | 16,772 | 16,772 | 16,772 |   16,772 |         83 |         5,474 | 7,528 | 10,817 | 10,170 |
+|       3 | 16,772 | 16,769 | 16,769 |   16,769 |         65 |         5,435 | 7,500 | 10,808 | 10,158 |
+|       4 | 16,772 | 16,767 | 16,767 |   16,761 |         60 |         5,436 | 7,502 | 10,800 | 10,156 |
+|       5 | 16,771 | 16,762 | 16,762 |   16,758 |         60 |         5,430 | 7,491 | 10,794 | 10,150 |
+|       6 | 16,772 | 16,760 | 16,760 |   16,757 |         53 |         5,414 | 7,478 | 10,791 | 10,148 |
+|       7 | 16,770 | 16,758 | 16,758 |   16,753 |         50 |         5,414 | 7,478 | 10,785 | 10,145 |
+
+- 16,770 of 16,772 households have exactly one row per =visitcd= 1..7; 16,757
+  have all seven dated.
+- Result vocabulary =vres= (no value labels in the file; the questionnaire
+  gives 1 COMPLETE, 2 PARTIAL, 3 DISCONTINUED): visit 1: 16,635 / 136 / 2;
+  visit 5 (the Section-10 visit): 16,626 / 82 / 54 -- DISCONTINUED is what the
+  manual reserves for "no agricultural activity" (Section 8) and "no non-farm
+  enterprise" (Section 10), PDF p.21.  =cres= labelled 1 complete / 2 partial;
+  =sinu= 1 satisfactory 75,487 / 2 to be completed 23 / 3 to be redone 1;
+  =sentry= 1 satisfactory 69,620 / 2 correction 1,373.
+- Duration (=durhr= x 60 + =durmin=): median 74, 83, 65, 60, 60, 53, 50
+  minutes at visits 1..7; mean 82 -> 59.  Values above 4 hours are rare
+  (0.1%) and include obvious mis-keys (10-23 "hours").
+- *Median gap between successive visits, days, by =loc2=* (count of
+  household-pairs with both dates):
+
+  | step | urban n | urban median | urban p10/p90 | rural n | rural median | rural p10/p90 |
+  |------+---------+--------------+---------------+---------+--------------+---------------|
+  | 1->2 |   7,444 |          5.0 | 5 / 5         |   9,327 |          5.0 | 5 / 5         |
+  | 2->3 |   7,443 |          5.0 | 5 / 5         |   9,326 |          5.0 | 5 / 5         |
+  | 3->4 |   7,441 |          5.0 | 5 / 5         |   9,326 |          5.0 | 5 / 5         |
+  | 4->5 |   7,436 |          5.0 | 5 / 5         |   9,326 |          5.0 | 5 / 5         |
+  | 5->6 |   7,436 |          5.0 | 5 / 5         |   9,324 |          5.0 | 5 / 5         |
+  | 6->7 |   7,434 |          5.0 | 5 / 5         |   9,324 |          5.0 | 5 / 5         |
+
+  Means 4.5-5.3.  Span first->last: median 30 days in both strata (mean 31.6
+  urban, 31.3 rural).  Unlike GLSS3 there is no urban/rural difference in
+  the protocol or in its execution.  Date range 2012-10-01 .. 2013-10-30;
+  the Report's "18th October 2012 to 17th October 2013" is a fortnight
+  narrower on both ends.
+- Check-up (supervisor) dates are keyed for about a third of visit-rows
+  (5,362-5,474 per visit; 5,567 households have at least one); where present
+  the check-up is a median 0 days after the interviewer visit (SECA04:
+  IQR 0-2).
+- Agreement across files: =secb2= visit-1 date == =SEC0= =ddate/mdate/ydate=
+  for 15,945 of 16,757 (95.2%); == =secb1= same-visit date 96.1%; == =SECA04=
+  same-visit date 90.8%.  Disagreements are keying differences, not a
+  different event.
+
+*** =PARTB/secb1.dta= -- the A0.1/A0.2 interviewer/supervisor grid, Part B booklet (117,392 rows)
+
+=visitno= 2..7 correspond to calendar visits 2..7 (dates equal =secb2='s
+96%); every visit has 16,760-16,772 interviewer dates and supervisor dates.
+Supervisor date is a median 1-2 days after the interviewer date.  =reint=
+(Yes = 1) at visits 2..7: 674, 908, 766, 813, 672, 734 -- the supervisor's
+QC re-interview, per visit.  Median gaps by =loc2= are 5.0 at every step
+(p10 = p90 = 5) exactly as in =secb2=.
+
+*** =PARTA/SECA01.dta= and =PARTA/SECA04.dta= -- the same two grids from the Part A booklet
+
+Part A is administered at visits 1-3, and that is what these carry:
+=SECA04.visit= 1: 18,946 rows / 18,940 dated; 2: 15,727 / 15,720; 3: 15,603 /
+15,594; =SECA01.visitno= 1: 18,768 / 18,767; 2: 16,198 / 16,196; 3: 16,108 /
+16,101.  Median gap 5.0 days for 1->2 and 2->3, both strata.  Durations:
+median 80, 80, 65 minutes.  =vresult= 1 Complete / 2 Partial / 3
+Discontinued; =cresults= 1 Complete / 2 Partial; =sintt= 1 Satisfactory / 2
+To be completed / 3 To be redone; =sdeo= 1 Satisfactory / 2 Correction (all
+labelled in the file).  =SECA01.intrem= is mostly "SATISFACTORY"/
+"STATISFACTORY"; =SECA04.intres= is a free-text reason, populated three
+times ("RELOCATED TO ACCRA", "RESPONDENT HAS DIED", "01").
+
+*The visit number is mis-keyed in these two files for roughly 1,000
+households*: 1,055 households have three =SECA04= rows all coded =visit= 1
+(e.g. =60001/10=: 26/11/2012, 11/12/2012 and a =visit= 2 row 01/12/2012 --
+the 11/12 row is visit 3), and 650 households have four =SECA01= rows coded
+=visitno= 1.  =secb2= has no such defect.  Use =secb2= for the seven-visit
+calendar and treat =SECA04=/=SECA01= as its Part A duplicate.
+
+*** An eighth contact that no document describes
+
+Both interviewer/supervisor grids carry ONE MORE row than the section
+schedule needs: =SECA01.visitno= 4 (15,965 rows) after Part A's three
+visits, and =secb1.visitno= 8 (16,770 rows) after Part B's visits 2..7.
+Measured:
+
+- it is dated a median 12 days after the last section visit (SECA01 v4 -
+  visit 3: IQR 9-16; secb1 v8 - visit 7: IQR 8-17), a broad spread, not a
+  scheduled slot;
+- the code in the interviewer slot is NOT the interviewer of record (differs
+  in 98.8% of households in SECA01, 98.9% in secb1) and is never the
+  supervisor's code.  It is the team's FIFTH interviewer code -- 17, 27, 37,
+  47, 57, 87, 107 ... -- which has zero (or one or two) households of record
+  at visit 1 and signs 98-100% of the team's extra rows (per-team count of
+  visit-1 households by =intcode1= against extra rows; 96.1% of all extra
+  rows corpus-wide are by a code with fewer than 30 households of record).
+  That fifth code is the *Senior Interviewer/Editor* of Manual s1.7 (PDF
+  p.11), who "in addition to assisting the Supervisor ... would relieve the
+  regular Interviewers", and whose job the Report names as editing ("The
+  senior interviewer also edited", Appendix 1 s5, PDF p.224).  The same
+  person signs both files' extra row for 97.4% of households;
+- they are TWO separate contacts, not one: the SECA01 row is dated ~12 days
+  after visit 3 and the secb1 row ~12 days after visit 7, and the two dates
+  coincide in only 0.1% of households;
+- the supervisor date equals the interviewer date in about half of these rows
+  (49% / 53%), against 1-2 days later for real visits;
+- it is not the Module 13 (GPS) interview: =gps-sec0.intdate= equals it in
+  0.8% / 0.0% of households; and it coincides with a keyed check-up date in
+  0.4%.
+
+So the extra row is the editor's pass over each booklet, timed like the
+error-resolution step of Manual s2.3 (PDF p.14, printed 9): Part A is keyed
+after the third visit and rejected answers "return[ed] ... to you by the 6th
+or 7th visits"; Part B is keyed at the end of the cycle and the printouts
+"given to you during the 5th visit of the next EA".  Whether the editor
+actually re-visited the household on that date or edited in the office is
+not stated anywhere (the supervisor date equals the editor date in half the
+rows, which reads more like an office step); it is a question for GSS
+below.
+
+** Variable names + labels of every Section-0-type file examined
+
+Dumped with =pyreadstat.read_dta(..., metadataonly=True)=; columns are name,
+label, storage type, Stata format.  =PARTB/sec9b.dta=, =sec8h.dta= and
+=sec9a.dta= are included to show that the per-page dates of 9B / 8H / 9A are
+absent from them.
+
+#+begin_example
+
+#### PARTA/SEC0.dta  rows=16772 cols=21  label=None
+  region         REGION                                                       int8  fmt=%13.0g
+  clust          ENUMERATION AREA                                             int32  fmt=%10.0g
+  nh             HOUSEHOLD NUMBER                                             int8  fmt=%10.0g
+  HID            None                                                         string  fmt=%9s
+  intcode        Interviewer code                                             int16  fmt=%8.0g
+  ddate          Day                                                          int8  fmt=%8.0g
+  mdate          Month                                                        int8  fmt=%8.0g
+  ydate          Year                                                         int16  fmt=%8.0g
+  dwell          Dwelling Found?                                              int8  fmt=%8.0g
+  hhhead         Is the head of household same?                               int8  fmt=%8.0g
+  lang           Language used by respondent                                  int8  fmt=%9.0g
+  interp         Interpreter used?                                            int8  fmt=%8.0g
+  supcode        Supervisor code                                              int16  fmt=%18.0g
+  ddatesup       Day                                                          int8  fmt=%8.0g
+  mdatesup       Month                                                        int8  fmt=%8.0g
+  ydatesup       Year                                                         int16  fmt=%8.0g
+  reint          Reinterview by supervisor                                    int8  fmt=%8.0g
+  hhno           Household Number                                             int8  fmt=%8.0g
+  rhhno          Replaced household number                                    int8  fmt=%8.0g
+  reason         Reason for replacement                                       int8  fmt=%26.0g
+  remarks        Remarks                                                      string  fmt=%50s
+
+#### PARTB/secb0.dta  rows=16772 cols=11  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  team           team                                                         int8  fmt=%8.0g
+  rosters        rosters                                                      int8  fmt=%8.0g
+  intv           interviewer code                                             int16  fmt=%8.0g
+  lang           language used by respondent                                  int8  fmt=%8.0g
+  interp         interpreter used                                             int8  fmt=%8.0g
+  superv         supervisor code                                              int16  fmt=%8.0g
+  reinterv       reinterview by supervisor                                    int8  fmt=%8.0g
+
+#### PARTB/secb1.dta  rows=117392 cols=14  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  visitno        visit number                                                 int8  fmt=%8.0g
+  intcd          interviewer code                                             int16  fmt=%8.0g
+  intday         interviewer day of visit                                     int8  fmt=%8.0g
+  intmon         interviewer month of visit                                   int8  fmt=%8.0g
+  intyr          interviewer year of visit                                    int16  fmt=%8.0g
+  supercd        supervisor code                                              int16  fmt=%8.0g
+  supday         supervisor day of visit                                      int8  fmt=%8.0g
+  supmon         supervisor month of visit                                    int8  fmt=%8.0g
+  supyr          supervisor year of visit                                     int16  fmt=%8.0g
+  reint          reinterview by supervisor                                    int8  fmt=%8.0g
+
+#### PARTB/secb2.dta  rows=117402 cols=17  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  visitcd        visit number                                                 int8  fmt=%8.0g
+  vday           day of visit                                                 int8  fmt=%8.0g
+  vmon           month of visit                                               int8  fmt=%8.0g
+  vyr            year of visit                                                int16  fmt=%8.0g
+  vres           result of visit                                              int8  fmt=%8.0g
+  durhr          duration in hours                                            int8  fmt=%8.0g
+  durmin         duration in minutes                                          int8  fmt=%8.0g
+  cday           day of checkup visit                                         int8  fmt=%8.0g
+  cmon           month of checkup visit                                       int8  fmt=%8.0g
+  cyr            year of checkup visit                                        int16  fmt=%8.0g
+  cres           result of checkup visit                                      int8  fmt=%8.0g
+  sinu           interviewer result                                           int8  fmt=%8.0g
+  sentry         data entry operator                                          int8  fmt=%8.0g
+
+#### SECTION_10/sec10_survinfo.dta  rows=8541 cols=7  label=None
+  region         REGION                                                       int8  fmt=%13.0g
+  clust          None                                                         float  fmt=%9.0g
+  nh             Household Number                                             int8  fmt=%10.0g
+  HID            None                                                         string  fmt=%9s
+  PID            PID                                                          int8  fmt=%8.0g
+  hname          Head of Household                                            string  fmt=%40s
+  respnam        Name of respondent                                           string  fmt=%40s
+
+#### SECTION_10/sec10_filters.dta  rows=8535 cols=14  label=None
+  region         REGION                                                       int8  fmt=%13.0g
+  clust          None                                                         float  fmt=%9.0g
+  nh             Household Number                                             int8  fmt=%10.0g
+  HID            None                                                         string  fmt=%9s
+  PID            PID                                                          int8  fmt=%8.0g
+  s10aq1         Number of Enterprises                                        int8  fmt=%8.0g
+  s10ciq1        Has the enterprise been operating in the last two weeks-c1   int8  fmt=%8.0g
+  s10c2q1        Has the enterprise been operating in the last two weeks-c2   int8  fmt=%8.0g
+  s10d1          Operating periods for first enterprise-d1                    int8  fmt=%8.0g
+  s10d2          Operating periods for second enterprise-d2                   int8  fmt=%8.0g
+  s10e11         Has the first enterprise been operating during the past two weeks-e1 int8  fmt=%8.0g
+  s10e21         Has the second enterprise been operating during the past two weeks-e2 int8  fmt=%8.0g
+  s10f1a         Has the first enterprise been operating during the past two weeks-f1 int8  fmt=%8.0g
+  s10f2a         Has the second enterprise been operating during the past two weeks-f2 int8  fmt=%8.0g
+
+#### PARTA/SECA01.dta  rows=67072 cols=15  label=None
+  region         REGION                                                       int8  fmt=%13.0g
+  clust          ENUMERATION AREA                                             int32  fmt=%10.0g
+  nh             HOUSEHOLD NUMBER                                             int8  fmt=%10.0g
+  HID            Household unique ID                                          string  fmt=%9s
+  intcode1       Interviewer                                                  int16  fmt=%8.0g
+  dintdate       Day of date                                                  int8  fmt=%8.0g
+  mintdate       Month of date                                                int8  fmt=%8.0g
+  yintdate       Year of date                                                 int16  fmt=%8.0g
+  supcode1       Supervisor                                                   int16  fmt=%18.0g
+  dsupdate1      Day of date                                                  int8  fmt=%8.0g
+  msupdate1      Month of date                                                int8  fmt=%8.0g
+  ysupdate1      Year of date                                                 int16  fmt=%8.0g
+  reint1         Reinterviewed by supervisor?                                 int8  fmt=%8.0g
+  visitno        visit number                                                 int8  fmt=%8.0g
+  intrem         Remarks                                                      string  fmt=%40s
+
+#### PARTA/SECA04.dta  rows=50300 cols=19  label=None
+  region         REGION                                                       int8  fmt=%13.0g
+  clust          ENUMERATION AREA                                             int32  fmt=%10.0g
+  nh             HOUSEHOLD NUMBER                                             int8  fmt=%10.0g
+  HID            Household unique ID                                          string  fmt=%9s
+  visit          VISIT                                                        int8  fmt=%8.0g
+  vdd            Interviewer Visit Dates(Day)                                 int8  fmt=%8.0g
+  vmm            Interviewer Visit Dates(Month)                               int8  fmt=%8.0g
+  vyear          Interviewer Visit Dates(Year)                                int16  fmt=%8.0g
+  vresult        Results of Interview                                         int8  fmt=%12.0g
+  intres         Reason                                                       string  fmt=%25s
+  vhh            Number of hours used for interview                           int8  fmt=%8.0g
+  vmin           Number of minutes used for interview                         int8  fmt=%8.0g
+  cdd            Check-up Dates(Day)                                          int8  fmt=%8.0g
+  cmm            Check-up Dates(Month)                                        int8  fmt=%8.0g
+  cyear          Check-up Dates(Year)                                         int16  fmt=%8.0g
+  cresults       Check-up Results                                             int8  fmt=%8.0g
+  creson         Reason                                                       string  fmt=%25s
+  sintt          Supervisor's view on Interviewer's work                      int8  fmt=%15.0g
+  sdeo           Supervisor's view on DEO's work                              int8  fmt=%12.0g
+
+#### PRICES/price_sec0.dta  rows=1019 cols=27  label=None
+  region         region                                                       int8  fmt=%8.0g
+  district       district                                                     int8  fmt=%8.0g
+  clust          ea                                                           int32  fmt=%8.0g
+  market         market number                                                int8  fmt=%8.0g
+  locname        localityname                                                 string  fmt=%39s
+  eainclude      eainclude                                                    int8  fmt=%8.0g
+  day            dd_day                                                       int8  fmt=%8.0g
+  month          mm_month                                                     int8  fmt=%8.0g
+  year           yy_year                                                      int16  fmt=%8.0g
+  hh1            hh1                                                          int8  fmt=%8.0g
+  hh2            hh2                                                          int8  fmt=%8.0g
+  hh3            hh3                                                          int8  fmt=%8.0g
+  hh4            hh4                                                          int8  fmt=%8.0g
+  hh5            hh5                                                          int8  fmt=%8.0g
+  hh6            hh6                                                          int8  fmt=%8.0g
+  hh7            hh7                                                          int8  fmt=%8.0g
+  hh8            hh8                                                          int8  fmt=%8.0g
+  hh9            hh9                                                          int8  fmt=%8.0g
+  hh10           hh10                                                         int8  fmt=%8.0g
+  hh11           hh11                                                         int8  fmt=%8.0g
+  hh12           hh12                                                         int8  fmt=%8.0g
+  hh13           hh13                                                         int8  fmt=%8.0g
+  hh14           hh14                                                         int8  fmt=%8.0g
+  hh15           hh15                                                         int8  fmt=%8.0g
+  mreader        market reader                                                int16  fmt=%8.0g
+  supervisor     supervisor                                                   int16  fmt=%8.0g
+  remarks        remarks                                                      string  fmt=%100s
+
+#### COMMUNITY/sec0.dta  rows=693 cols=27  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster number                                               int32  fmt=%12.0g
+  eatype         eatype                                                       int8  fmt=%8.0g
+  communitynumber communitynumber                                              int8  fmt=%8.0g
+  communityname  communityname                                                string  fmt=%27s
+  eainclude      eainclude                                                    int8  fmt=%8.0g
+  day            day                                                          int8  fmt=%8.0g
+  month          month                                                        int8  fmt=%8.0g
+  year           year                                                         int16  fmt=%8.0g
+  hh1            hh1                                                          int8  fmt=%8.0g
+  hh2            hh2                                                          int8  fmt=%8.0g
+  hh3            hh3                                                          int8  fmt=%8.0g
+  hh4            hh4                                                          int8  fmt=%8.0g
+  hh5            hh5                                                          int8  fmt=%8.0g
+  hh6            hh6                                                          int8  fmt=%8.0g
+  hh7            hh7                                                          int8  fmt=%8.0g
+  hh8            hh8                                                          int8  fmt=%8.0g
+  hh9            hh9                                                          int8  fmt=%8.0g
+  hh10           hh10                                                         int8  fmt=%8.0g
+  hh11           hh11                                                         int8  fmt=%8.0g
+  hh12           hh12                                                         int8  fmt=%8.0g
+  hh13           hh13                                                         int8  fmt=%8.0g
+  hh14           hh14                                                         int8  fmt=%8.0g
+  hh15           hh15                                                         int8  fmt=%8.0g
+  supervisor     supervisor                                                   int16  fmt=%8.0g
+  timeb          time begun                                                   float  fmt=%9.0g
+  timec          time completed                                               float  fmt=%9.0g
+
+#### GOVERNANCE/gps-sec0.dta  rows=16445 cols=22  label=None
+  region         region                                                       int8  fmt=%13.0g
+  district       district                                                     int8  fmt=%8.0g
+  clust          Enumeration Area                                             int32  fmt=%8.0g
+  nh             HOUSEHOLD NUMBER                                             int8  fmt=%8.0g
+  pid            Member Identification                                        int8  fmt=%8.0g
+  sex            sex                                                          int8  fmt=%8.0g
+  age            age                                                          int8  fmt=%8.0g
+  urbrur         URBAN/RURAL                                                  int8  fmt=%8.0g
+  ez             ECOLOGICAL ZONE                                              int8  fmt=%8.0g
+  gps1           gps coordinates                                              float  fmt=%9.0g
+  gps2           gps coordinates                                              float  fmt=%9.0g
+  intcode        interviewer code                                             int16  fmt=%8.0g
+  supcode        supervisor code                                              int16  fmt=%8.0g
+  intdate        date of interview                                            int32  fmt=%12.0g
+  HID            None                                                         string  fmt=%9s
+  hhsize         (sum) s1q24                                                  int8  fmt=%8.0g
+  loc2           URBAN/RURAL                                                  int8  fmt=%8.0g
+  loc5           None                                                         int8  fmt=%14.0g
+  loc7           None                                                         int8  fmt=%14.0g
+  month          None                                                         int8  fmt=%9.0g
+  year           None                                                         int16  fmt=%9.0g
+  weight         RevWt5                                                       float  fmt=%8.0g
+
+#### AGGREGATES/00_GHA_BASICINFO.dta  rows=16772 cols=13  label=None
+  COUNTRY        Country name                                                 string  fmt=%9s
+  REGION         Geographical code                                            float  fmt=%9.0g
+  HID            Household unique ID                                          string  fmt=%9s
+  SURVEMO        Survey month                                                 float  fmt=%9.0g
+  SURVEYR        Survey year                                                  float  fmt=%9.0g
+  RURURB         Area of residence                                            int8  fmt=%9.0g
+  eqsc           Adult equivalent scale                                       double  fmt=%9.0g
+  HHSIZE         Total number of residents excluding household help           double  fmt=%9.0g
+  WTA_S          Weights from sampling, used in weighting statistics calculated from individual l float  fmt=%9.0g
+  WTA_S_HHSIZE   WTA_S multiplied by HHSIZE, normally used in weighting statistics calculated fro float  fmt=%9.0g
+  loc5           None                                                         int8  fmt=%14.0g
+  loc7           None                                                         int8  fmt=%14.0g
+  loc2           URBAN/RURAL                                                  int8  fmt=%8.0g
+
+#### PARTA/g6loc_edt.dta  rows=16772 cols=13  label=None
+  clust          ENUMERATION AREA                                             int32  fmt=%10.0g
+  nh             HOUSEHOLD NUMBER                                             int8  fmt=%10.0g
+  HID            None                                                         string  fmt=%9s
+  hhsize         (sum) s1q24                                                  int8  fmt=%8.0g
+  region         REGION                                                       int8  fmt=%13.0g
+  district       DISTRICT                                                     int8  fmt=%8.0g
+  loc2           URBAN/RURAL                                                  int8  fmt=%8.0g
+  ez             ECOLOGICAL ZONE                                              int8  fmt=%8.0g
+  loc5           None                                                         int8  fmt=%14.0g
+  loc7           None                                                         int8  fmt=%14.0g
+  month          None                                                         int8  fmt=%9.0g
+  year           None                                                         int16  fmt=%9.0g
+  weight         weight                                                       float  fmt=%8.0g
+
+#### PARTB/sec9b.dta  rows=2851237 cols=11  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  freqcd         frequently purchased item                                    int16  fmt=%8.0g
+  s9bq1          amount spent by second visit                                 float  fmt=%9.0g
+  s9bq2          amount spent by third visit                                  float  fmt=%9.0g
+  s9bq3          amount spent by fourth visit                                 float  fmt=%9.0g
+  s9bq4          amount spent by fifth visit                                  float  fmt=%9.0g
+  s9bq5          amount spent by sixth visit                                  float  fmt=%9.0g
+  s9bq6          amount spent by seventh visit                                float  fmt=%9.0g
+
+#### PARTB/sec8h.dta  rows=1056270 cols=15  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  foodcd         food code                                                    int8  fmt=%8.0g
+  s8hq1          household consume any home consumed food                     int8  fmt=%8.0g
+  s8hq2          number of months  consumed                                   int8  fmt=%8.0g
+  s8hq3          quantity of own produced food consumed at 2nd visit          float  fmt=%9.0g
+  s8hq4          quantity of own produced food consumed at 3rd visit          float  fmt=%9.0g
+  s8hq5          quantity of own produced food consumed consumed at 4th visit float  fmt=%9.0g
+  s8hq6          quantity of own produced food consumed consumed at 5th visit float  fmt=%9.0g
+  s8hq7          quantity of own produced food consumed consumed at 6th visit float  fmt=%9.0g
+  s8hq8          quantity of own produced food consumed consumed at 7th visit float  fmt=%9.0g
+  s8hq9          unit of quantity consumed at 2nd to 11th visits              int8  fmt=%8.0g
+  s8hq10         selling price for one unit now                               float  fmt=%9.0g
+
+#### PARTB/sec9a.dta  rows=4209772 cols=10  label=None
+  region         region                                                       int8  fmt=%8.0g
+  clust          cluster                                                      int32  fmt=%12.0g
+  nh             household number                                             int8  fmt=%8.0g
+  hid            household unique id                                          string  fmt=%8s
+  lfreqcd        less frequently purchased item                               int16  fmt=%8.0g
+  s9aq1          was anything spent on less frequently purchased item in the past 12 months? int8  fmt=%8.0g
+  s9aq2          amount spent on less frequently purchased item in last 12 months double  fmt=%10.0g
+  s9aq3a         quantity consumed out of its own output or has received as gift in the past 12 m float  fmt=%9.0g
+  s9aq3b         unit code of quantity                                        int8  fmt=%8.0g
+  s9aq4          amount used or consumed                                      float  fmt=%9.0g
+#+end_example
+
+* The NSO request for this wave
+
+*This wave already ships complete visit DATES for all seven visits*
+(=PARTB/secb2.dta=, one dated row per visit per household for 16,757 of
+16,772 households), together with the interview DURATION in hours and
+minutes, the interviewer's RESULT code, the supervisor's verification date
+per visit (=secb1=), the supervisor's check-up date and result where a
+check-up happened, and the data-entry operator's verdict.  The library does
+not yet expose any of it -- =2012-13/_/data_info.yml interview_date= wires
+only the first-visit date from =SEC0= -- but that is a wiring task, not a
+data request.  (=local_tools.melt_visit_intervals= is the existing helper for
+melting per-visit timestamps onto a =visit= level.)
+
+The instrument records NO clock time for a household visit -- A0.3 has DATE
+and DURATION (HR MIN) only -- so a request for TIME OF DAY cannot be met from
+the paper questionnaire.  Duration is already distributed.
+
+What exists on the instrument and was NOT distributed, named as the
+instrument names them:
+
+1. *Section 9: Household Expenditure, Part B: Food Expenses (Frequently
+   Purchased Items)* -- the "2nd 3rd 4th 5th 6th 7th VISIT / dd mm" date
+   boxes printed at the head of every 9B page (pages 9.13-9.26).  These are
+   the dates the 9B entries were actually made, per page; =sec9b.dta= has
+   none.  Ask whether they were keyed by the data-entry application; if so,
+   request them; if not, they exist only on paper.
+2. *Section 8: Agriculture, Part H: Consumption of Own Produce* -- the same
+   "2nd ... 7th / dd mm" boxes on pages 8.11-8.17.  =sec8h.dta= has none.
+3. *Section 9, Part A: Non-Food Expenses (Less Frequently Purchased
+   Items)* -- "Date of this visit DD MM YYYY" on pages 9.1-9.12.  This is
+   also the only way to settle whether 9A was asked at the second visit
+   (questionnaire A0.3) or the last (manual s3.7).  =sec9a.dta= has none.
+4. *Section 4: Employment and Time Use, Parts A and E* -- the "D D M M Y Y
+   Y Y" anchor date in the header ("over the last 7 days, that is, since
+   ..."), pages of Part A PDF pp.27 and 39.  =SEC4a.dta= / =SEC4e.dta= have
+   none; without it the reference week of the labour-force module is only
+   inferable from the visit-3 date in =secb2=.
+5. *Page A0.4 OBSERVATION AND COMMENTS* -- "REMARKS BY THE INTERVIEWER /
+   SUPERVISOR ON THE n-th VISIT" for visits 1..7, both booklets; and the
+   A0.1/A0.2 per-visit REMARKS lines.  =SEC0.remarks= is a placeholder
+   ("."), =SECA01.intrem= is a one-word verdict; nothing per visit.
+6. *The Diary of Consumptions* -- the form itself (not in any document we
+   hold), and whether its entries are dated.  Even if it was never keyed,
+   the blank form tells us whether a per-day record exists on paper.
+7. *The data-entry application* ("a data entry application system ...
+   designed to check the data automatically", Report Appendix 1 s5) -- its
+   dictionary, so that the keyed cover-page fields can be confirmed rather
+   than inferred from what shipped, and any batch/keying-date log it kept
+   (the manual's two-stage entry -- Part A on day 17, Part B at cycle end --
+   would be recoverable from it; the =s8hq9= "2nd to 11th visits" label
+   suggests the dictionary itself was inherited from GLSS5, which is also
+   where the answer to "which cover fields were keyed" would live).  Note
+   the shipped =GLSS6 CODEBOOK.pdf= is
+   a book of code LISTS (ethnic groups, products, districts, units), not a
+   variable codebook, so it cannot answer this.
+8. *Confirmation of what the extra grid row is* -- =SECA01.visitno= = 4 and
+   =secb1.visitno= = 8, signed by the team's fifth interviewer code: is it
+   the Senior Interviewer/Editor's edit pass, and is the date a household
+   visit or an office step?
+9. Not a date, but in the same breath: the *=visit= codes of =SECA04= /
+   =SECA01=* are mis-keyed for ~1,000 households (multiple rows coded visit
+   1); a corrected Part A grid would be welcome, though =secb2= already
+   carries the same dates cleanly.
+
+Everything else on the cover -- first-visit interviewer and date, dwelling
+found, head the same, language, interpreter, supervisor verification date,
+supervisor re-interview flag, household replacement and reason, per-visit
+interviewer and supervisor dates for visits 1..7, per-visit result,
+duration, check-up date/result, supervisor's and DEO's verdicts -- is
+already distributed and needs no request.
+
+* Idiosyncrasies and contradictions
+
+** Contradictions with, or sharpening of, CONTENTS.org
+
+1. *=reint= is a supervisory QC flag, not a panel re-interview.*
+   CONTENTS.org (line ~1180, in the panel-linkage discussion): "The =reint=
+   variable in GLSS6 flags 1,476 're-interview' households but provides no
+   prior-wave ID for matching."  The count is right and the conclusion (no
+   cross-wave link) is right, but the sentence invites the wrong reading.
+   =SEC0.reint= is labelled "Reinterview by supervisor" and sits in the A0.1
+   block "VERIFICATION OF QUESTIONNAIRE, FIRST VISIT ... REINTERVIEW BY
+   SUPERVISOR? YES 1 / NO 2"; the manual s2.2 (PDF p.14) describes exactly
+   this: the supervisor "will make random visits to some of the households
+   that you have already interviewed".  =secb1.reint= carries the same flag
+   per visit (674-908 Yes per visit).  It has nothing to do with GLSS5.
+2. *The eleven-visit / three-day schedule passed through GLSS6, copied from
+   GLSS5.*  CONTENTS.org ("GLSS7 Final Manual.docx is stale ...") stops at
+   "it may have passed through that round too".  The GLSS6 manual carries
+   the identical passages (s1.8 Table 2, s3.6 "three (3) days", s3.7
+   "eleven visits", End of Cycle "11th visit") AND still says "the conduct
+   of GLSS-5" in s1.6 (PDF p.10, printed 5).  So: GLSS5 manual -> GLSS6
+   manual -> GLSS7 manual, unedited, while the GLSS6 manual's own s1.3 and
+   diary instruction say five days / 35 days.  The stale count reached the
+   DATA DICTIONARY too: =PARTB/sec8h.dta= labels =s8hq9= "unit of quantity
+   consumed at 2nd to 11th visits" on an instrument with six consumption
+   columns (2nd..7th) -- a GLSS5 label on a GLSS6 variable.  The GLSS7 Main Report's
+   fieldwork appendix quoted in CONTENTS.org is itself a near-verbatim copy
+   of GLSS6's Appendix 1 s2-s4 (PDF pp.222-223).
+3. *The brief's premise* ("we hold no visit dates at all") is false for
+   2012-13 in the strongest way: seven dated visits, durations and result
+   codes per household.  CONTENTS.org's protocol row for GLSS6 (7 visits,
+   q1..q6 -> 2..7, q3..q8 -> 2..7, 6 occasions) is confirmed by the
+   questionnaire headers and now also by the dates: the 9B/8H columns
+   "2nd ... 7th" are calendar visits at which =secb2= shows a dated
+   contact 5.0 days apart.
+4. No contradiction on the five-day spacing or the seven-visit count;
+   CONTENTS.org's "seven visits five days apart in GLSS4, GLSS6 and GLSS7"
+   is measured here for GLSS6: 5.0 at every step, both strata.
+
+** Things that will trip the next person
+
+- *Three files carry the first-visit date* and they disagree for ~5% of
+  households: =SEC0= (=ddate/mdate/ydate=), =SECA04= visit 1, =secb2=
+  visitcd 1.  =secb2= is the clean seven-visit calendar; =SEC0= is what the
+  library wires today.
+- *=SECA04.visit= / =SECA01.visitno= are mis-keyed* for ~1,000 households
+  (duplicate visit-1 rows carrying visit-2/3 dates).  Sorting by date within
+  household recovers the order; the code does not.
+- *=SECA01.visitno= 4 and =secb1.visitno= 8 are not visits 4 and 8* of the
+  section schedule; they are a later contact by another team member (see
+  above).  A naive "count rows per household" gives 4 Part A and 7 Part B
+  "visits", neither of which is the number of interviews.
+- *=GOVERNANCE/gps-sec0.dta:intdate= is an integer ddmmyyyy* (18122013 =
+  18 Dec 2013), not a Stata =%td=; =pd.to_datetime(unit='D',
+  origin='1960-01-01')= produces years 4977-21404.  Decoded, Module 13
+  (governance, peace and security) was fielded 2013-10 .. 2013-12 on 4,650
+  households -- a separate return visit AFTER the main fieldwork, so its
+  date is none of the seven visits and it is a median 238 days after visit
+  7.  Its =month=/=year= columns are entirely null.
+- *=sec8h.dta:s8hq9= says "2nd to 11th visits"*; the wave has 2nd..7th.  Do
+  not read a visit count off that label.
+- *=COMMUNITY/sec0.dta timeb/timec= are decimal hh.mm floats* (12.15 =
+  12:15), the only clock times in the wave.
+- *Dates outside the fieldwork window are keying errors*, not early starts:
+  =SECA01= has 90 dates in Jan-Sep 2012 and =SEC0= 13 rows with =ydate= null;
+  =secb2= itself stays within 2012-10-01 .. 2013-10-30.  Gaps of about
+  -360 / +365 days in the per-visit files are year mis-keys.
+- *Part A is keyed before Part B* (after visit 3 vs. after visit 7), which
+  is why the Part A grids stop at three visits and why there are two
+  physical cover sheets per household.
+- *The Section 10 booklet has no date field at all*; =sec10_survinfo.dta=
+  carries names only.  Section 10 is asked at the fifth visit (A0.3), so
+  its date is =secb2= visitcd 5.
+- *The Report's team size differs between its own sections*: s1.5 (printed
+  3) "three interviewers", Appendix 1 s3 (printed 201) "Interviewers ... 4";
+  the manual says four plus a senior interviewer who relieves.
+- =Notes on how glss6 compares with other glss.docx= is a crosswalk of the
+  =POV_GH_2013= aggregate variable names to GLSS3-5 names ("No correction
+  made for GLSS6 based on recall"); nothing on visits.
+- The 2012-13 =food_acquired.py= docstring calls =s8hq10= a "farmgate
+  Price"; the instrument's wording is "For how much would you sell one unit
+  of ... now?", and CONTENTS.org already records (measured on this wave)
+  that respondents answer with the local retail price.  Not a visit-date
+  matter; noted because the docstring and CONTENTS.org disagree.
+
+* Files consulted
+
+Documentation (=lsms_library/countries/GhanaLSS/2012-13/Documentation/=):
+=QUESTIONNAIRES/GLSS6 Part A Questionnaire.pdf= (66 pp), =GLSS6 Part B
+Questionnaire.pdf= (70 pp), =GLSS6 Section 10  Questionnaire.pdf= (22 pp),
+=GPS Module 13 Questionnaire.pdf= (16 pp), =GLSS6 Community
+Questionnaire.pdf= (28 pp), =GLSS6 Prices Questionnaire.pdf= (8 pp);
+=MANUALS/GLSS6 INTERVIEWERS MANUAL.pdf= (93 pp), =GLSS6 CODEBOOK.pdf= (39
+pp); =REPORTS/GLSS6_Main Report.pdf= (244 pp); =Notes on how glss6 compares
+with other glss.docx=.  All have a text layer (pdfplumber).
+
+Data (=.../2012-13/Data/=, metadata for all, values for the visit files):
+=PARTA/SEC0.dta=, =SECA01.dta=, =SECA04.dta=, =g6loc_edt.dta=, =SEC4a.dta=,
+=SEC4e.dta=, =SEC6.dta=, =SEC5a.dta=, =SEC3a.dta=; =PARTB/secb0.dta=,
+=secb1.dta=, =secb2.dta=, =sec8h.dta=, =sec9a.dta=, =sec9b.dta=, =sec8a1.dta=,
+=sec9c.dta=, =sec11a.dta=, =sec12a.dta=; =SECTION_10/sec10_survinfo.dta=,
+=sec10_filters.dta=, =sec10A.dta=; =PRICES/price_sec0.dta=, =price_sec1.dta=;
+=COMMUNITY/sec0.dta=, =sec1.dta=; =GOVERNANCE/gps-sec0.dta=, =gps-sec13a.dta=;
+=AGGREGATES/00_GHA_BASICINFO.dta=.  Read through
+=lsms_library.data_access.get_data_file= + =pyreadstat=; no =dvc= CLI, no
+Country()/Feature() call.

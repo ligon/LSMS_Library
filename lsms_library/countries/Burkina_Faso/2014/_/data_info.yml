@@ -199,6 +199,30 @@ housing:
                 'Autre à préciser': Other
 
 food_acquired:
+    # FOUR PASSAGES, FOUR INDEPENDENT 7-DAY RECALLS.  The EMC is a CONTINUOUS
+    # survey: the same households are revisited in four quarterly passages and
+    # the food module is asked afresh at each one (Report.pdf p. 20 -- quoted in
+    # _/CONTENTS.org "Sub-samples / oversamples").  So a row from p3 is a
+    # DIFFERENT measurement of the same (household, item), not a second
+    # transaction within one recall window.
+    #
+    # THE PASSAGE NUMBER IS IN THE FILENAME AND NOWHERE ELSE.  Measured on all
+    # four files: none carries a passage / vague / round column (p1 has
+    # `hhweight1`/`hhsize1`, p2 `hhweight2`, ... -- suffixes, not a variable).
+    # So `visit` has to be STAMPED per file.  The framework's per-file override
+    # block (the `<file>.dta:` mapping form) can only re-point a key at a
+    # different SOURCE COLUMN; it has no constant primitive except the `t`
+    # special case.  The idiom below is therefore the constant-stamp spelling
+    # available in config: map an always-present column (`zd`, the cluster id
+    # -- present in all four files, so the stamp cannot silently degrade to NaN
+    # the way a missing column would under `missing_ok`) through a wave-module
+    # function that ignores its argument and returns the passage number.
+    # `zd` carries NO information here; `visit_p{n}` is a constant.
+    #
+    # `visit` is a MYVAR, not an idxvar, on purpose: df_data_grabber runs
+    # `format_id` over every idxvar, which would serve the passage number as a
+    # STRING.  `mapping.py::food_acquired` moves it onto the index as an int
+    # via build_transforms.add_visit_level, after the canonical s-axis reshape.
     idxvars:
         v: zd
         i:
@@ -212,8 +236,21 @@ food_acquired:
         Quantity: qachat
         Expenditure: achat
         Produced: qautocons
+        # Passage 1 (the un-overridden default; see the `file:` list below).
+        visit:
+            - zd
+            - mappings: visit_p1
     file:
         - emc2014_p1_conso7jours_16032015.dta
-        - emc2014_p2_conso7jours_16032015.dta
-        - emc2014_p3_conso7jours_16032015.dta
-        - emc2014_p4_conso7jours_16032015.dta
+        - emc2014_p2_conso7jours_16032015.dta:
+            visit:
+                - zd
+                - mappings: visit_p2
+        - emc2014_p3_conso7jours_16032015.dta:
+            visit:
+                - zd
+                - mappings: visit_p3
+        - emc2014_p4_conso7jours_16032015.dta:
+            visit:
+                - zd
+                - mappings: visit_p4

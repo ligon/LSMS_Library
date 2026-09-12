@@ -1,0 +1,8 @@
+Closes #871
+Closes #872
+Closes #873
+Closes #874
+Closes #875
+Closes #876
+Closes #877
+Closes #878

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 """crop_production for Uganda UNPS 2015-16 (GAP 1 item-level build).
 
-Reads AGSEC5A (season 1), AGSEC5B (season 2) and AGSEC4A (intercrop
-flag) via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
+Reads AGSEC5A (season 1), AGSEC5B (season 2) and the two plot-crop
+rosters AGSEC4A / AGSEC4B (the crop-stand flag, ONE PER SEASON -- GH #872;
+season B's flag comes from AGSEC4B and is never borrowed from AGSEC4A)
+via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
 parquet of REPORTED harvest values.  Harvest unit is a5aq6c (the column
 whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
@@ -34,6 +36,7 @@ def _try(path):
 df5a = _try('../Data/AGSEC5A.dta')
 df5b = _try('../Data/AGSEC5B.dta')
 df4a = _try('../Data/AGSEC4A.dta')
+df4b = _try('../Data/AGSEC4B.dta')
 
 # --- GH #829: restore the sale value to shillings -------------------------
 #
@@ -92,7 +95,7 @@ for _df, _col in ((df5a, 'a5aq8'), (df5b, 'a5bq8')):
         )
         _df[_col] = _v * _VALUE_SOLD_SCALE
 
-df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t])
+df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
 assert len(df) > 0, f"crop_production produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique crop_production index for {t}"
 to_parquet(df, 'crop_production.parquet')

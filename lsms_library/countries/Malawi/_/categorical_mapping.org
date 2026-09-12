@@ -641,6 +641,139 @@
 |   12 | Ox-Cart         |
 |   13 | Other (Specify) |
 
+# harmonize_crop_condition: Module G question 13c, "(S/U)" -- the physical
+# state of the crop at the moment the reported harvest quantity was measured.
+# The Stata value labels are identical in every wave that asks it (2010-11,
+# 2013-14, 2016-17, 2019-20, both halves of the two split waves):
+#   1 'S: SHELLED'  2 'U: UNSHELLED'  3 'NOT APPLICABLE'
+# (2013-14 spells 1/2 without the 'S:'/'U:' prefix; the codes are the same.)
+#
+# THIS IS A FORM AXIS WITH NO DRYNESS AXIS.  Uganda's `harvest_conditions`
+# crosses a dryness family (green / fresh / dry-at-harvest / dried) with a
+# form (with shell / in cob / in pods / grain); Malawi asks ONLY the form,
+# and never asks the dryness.  So the Preferred Labels are the BARE FORM
+# tokens `shelled` / `unshelled`, NOT `dried_grain` / `dried_with_shell` --
+# writing those would assert a dryness the instrument never recorded.  See
+# lsms_library/data_info.yml (Columns > crop_production > condition), which
+# declares the cross-country vocabulary and the rule that a country asking
+# something Uganda does not extends the list rather than force-fitting.
+#
+# Code 3 is the survey's own "this crop has no shell to speak of" (maize
+# eaten green, cassava, vegetables), an ANSWER, not a missing value; it is
+# `shell_not_applicable`.  It is deliberately NOT `unknown_condition`, which
+# is the sentinel malawi.py mints for a NULL or off-scheme code (2013-14 has
+# one row coded 5; the 2016-17 panel has 15 / 10 / 4.5) and for the
+# perennial Module P, which asks no condition question at all.
+#+name: harmonize_crop_condition
+| Code | Preferred Label      |
+|------+----------------------|
+|    1 | shelled              |
+|    2 | unshelled            |
+|    3 | shell_not_applicable |
+
+# harmonize_crop_variety: the crop code at its NATIVE, un-collapsed grain --
+# the Module G / Module P value labels for the same codes `harmonize_crop`
+# maps to Preferred Labels.  `harmonize_crop` deliberately collapses varieties
+# (codes 1-4 all -> 'Maize', 11-16 -> 'Groundnut', 17-26 -> 'Rice'); this table
+# keeps them apart.
+#
+# WHY IT EXISTS (GH #854): the two shipped IHS5 conversion tables key their kg
+# factors on the VARIETY -- 'MAIZE HYBRID', 'RICE FAYA', 'GROUNDNUT CG7' -- and
+# the varieties genuinely differ (unshelled paddy in a 50 kg bag: RICE LOCAL
+# 29.04 kg against eight improved varieties at 49.00 in Central, 1.69x).
+# Joining the table on the collapsed `crop` therefore hit 31 ambiguous keys
+# that had to be refused, costing 6,890 served rows on Groundnut, Rice and
+# Citrus.  Keying on the variety resolves ALL 31 and agrees with the collapsed
+# key on every one of the 66,768 rows both can serve.  EPAR reached the same
+# conclusion and says so in capitals: "merge m:1 region crop_code_long unit
+# condition ... //NOTE THAT WE MERGE ON CROP_CODE_LONG INTENTIONALLY"
+# (Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:1327).
+#
+# THE LABEL IS NOT A USABLE KEY; THE CODE IS.  Measured over all four waves'
+# own Stata value labels, 12 of 48 seasonal codes are spelled differently in
+# different waves -- 2016-17 writes 'MAIZE: LOCAL' and 'GROUNDNUT: CG7' with a
+# colon, 2010-11 ships the typo 'RISE LOCAL' for all nine rices plus the
+# truncations 'TOBACCOSDF', 'GROUND BEAN(NZAMA' and 'GROUNDNUT MANIPINTA'.
+# Every one of the 12 is a SPELLING difference; none is a change of meaning,
+# which was checked code by code.  So one canonical label per code is correct,
+# and it is written here from the 2019-20 spelling (the vintage of the
+# conversion files), title-cased.
+#
+# The perennial half is offset +1000 exactly as in `harmonize_crop`, and its
+# labels are stable across every wave (0 of 23 differ).  Codes 1021 / 1100 /
+# 2800 / 2900 / 3000 are deliberately ABSENT: `harmonize_crop` does not carry
+# them either, so those rows never reach this table -- that is GH #869, not
+# this table's business.
+#+name: harmonize_crop_variety
+| Code | Preferred Label        |
+|------+------------------------|
+|    1 | Maize Local            |
+|    2 | Maize Composite/OPV    |
+|    3 | Maize Hybrid           |
+|    4 | Maize Hybrid Recycled  |
+|    5 | Tobacco Burley         |
+|    6 | Tobacco Flue Cured     |
+|    7 | Tobacco NNDF           |
+|    8 | Tobacco SDF            |
+|    9 | Tobacco Oriental       |
+|   10 | Tobacco Other          |
+|   11 | Groundnut Chalimbana   |
+|   12 | Groundnut CG7          |
+|   13 | Groundnut Mani-Pintar  |
+|   14 | Groundnut Mawanga      |
+|   15 | Groundnut JL24         |
+|   16 | Groundnut Other        |
+|   17 | Rice Local             |
+|   18 | Rice Faya              |
+|   19 | Rice Pusa              |
+|   20 | Rice TCG10             |
+|   21 | Rice IET4094 (Senga)   |
+|   22 | Rice Wambone           |
+|   23 | Rice Kilombero         |
+|   24 | Rice ITA               |
+|   25 | Rice Mtupatupa         |
+|   26 | Rice Other             |
+|   27 | Ground Bean (Nzama)    |
+|   28 | Sweet Potato           |
+|   29 | Irish Potato           |
+|   30 | Wheat                  |
+|   31 | Finger Millet (Mawere) |
+|   32 | Sorghum                |
+|   33 | Pearl Millet (Mchewere) |
+|   34 | Beans                  |
+|   35 | Soyabean               |
+|   36 | Pigeon Pea (Nandolo)   |
+|   37 | Cotton                 |
+|   38 | Sunflower              |
+|   39 | Sugar Cane             |
+|   40 | Cabbage                |
+|   41 | Tanaposi               |
+|   42 | Nkhwani                |
+|   43 | Therere/Okra           |
+|   44 | Tomato                 |
+|   45 | Onion                  |
+|   46 | Pea                    |
+|   47 | Paprika                |
+|   48 | Other                  |
+| 1001 | Cassava                |
+| 1002 | Tea                    |
+| 1003 | Coffee                 |
+| 1004 | Mango                  |
+| 1005 | Orange                 |
+| 1006 | Pawpaw/Papaya          |
+| 1007 | Banana                 |
+| 1008 | Avocado                |
+| 1009 | Guava                  |
+| 1010 | Lemon                  |
+| 1011 | Naartje (Tangerine)    |
+| 1012 | Peach                  |
+| 1013 | Custard Apple (Poza)   |
+| 1014 | Mexican Apple (Masuku) |
+| 1015 | Masau                  |
+| 1016 | Pineapple              |
+| 1017 | Macadamia              |
+| 1018 | Other                  |
+
 # harmonize_input: agricultural-input identity for the plot_inputs feature
 # (GAP 2).  Codes 1-6 are the Module D inorganic-fertilizer type codes
 # (ag_d39a / slot-2 type); codes 7-11 are the Module D agrochemical type

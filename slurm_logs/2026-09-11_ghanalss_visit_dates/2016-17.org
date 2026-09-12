@@ -1,0 +1,571 @@
+#+title: GhanaLSS 2016-17 (GLSS7): where interviewer visit dates and times were recorded, and what shipped
+#+date: 2026-09-11
+#+author: audit agent (wave 2016-17), for the GSS special data request
+
+All paths below are relative to =lsms_library/countries/GhanaLSS/2016-17/=.
+The interviewers' manual (=Documentation/GLSS7 Final Manual.docx=) carries no
+page numbers in its XML, so it is cited by section number, as CONTENTS.org
+does.  The Main Report is cited as "PDF p. N (printed p. M)".  The two Word-97
+files (=DIARY.doc=, =Supervisors' manual_GLSS7.doc=) were read with
+=strings -n 6=; both are fully legible that way (the diary form completely,
+the supervisors' manual as running prose with its table bodies lost).
+
+Mandatory reading done first: =_/CONTENTS.org= lines 1-32, 811-848, 1235-1660
+and 2869-2932; =2016-17/_/data_info.yml= (=interview_date= wires
+=g7sec0.dta: ddate/mdate/ydate= into =Int_t=); the docstring of
+=2016-17/_/food_acquired.py=; =.coder/ledger/ghanalss-visit-offset.md=.
+Idiosyncrasies already recorded there and relied on here: seven visits every
+fifth day in a 35-day cycle; 9B q1..q6 and 8H q3..q8 are visits 2..7; the
+diary is entered "into the appropriate sections" and ships as no separate
+file; =GLSS7 Final Manual.docx= is stale on the visit schedule (eleven-visit
+Table 2, 3.7 "eleven visits"); GLSS7 has no DDI universe field.  Where this
+audit refines or contradicts those entries it is quoted side by side in the
+last section.
+
+* Visit protocol
+
+Seven visits per household at five-day intervals (visits on cycle days 1, 6,
+11, 16, 21, 26, 31), 35-day cycle plus one travelling day, ten cycles over the
+survey year (24 Oct 2016 - 17 Oct 2017), 15 households per interviewer per EA,
+interviewed in five batches of three households on cycle days 1..5.  9B
+(frequently purchased items) and 8H (own produce) are asked at visits 2..7,
+i.e. six recalls, with the recall phrase "since my last visit"; the diary is
+used in ALL EAs; the wave is CAPI (CSPro on Windows tablets) with paper
+questionnaires and forms also carried.
+
+- Main Report, PDF p. 305 (printed p. 283), "Interviewer Workload":
+  "An interviewer visited each household in the EA assigned to him/her every
+  sixth day i.e. after every five days. In other words, the interviewer
+  visited each of the 15 selected household seven (7) times in order to
+  complete the cycle."  Same page, "Survey Period and Team Composition":
+  "10 cycles of 35 days each and one travelling day ... Interviewers in rural
+  and urban areas all used the diary method as far as possible".  PDF p. 306
+  (printed p. 284): the diary paragraph CONTENTS.org quotes (literate member
+  trained at the first visit; otherwise daily interviewer visits to fill the
+  diary).
+- Manual, section 1.8 "INTERVIEWER WORKLOAD", Table 3 "SCHEDULE OF VISITS" (docx
+  table 2; pandoc renders it as =[TABLE]=): Day 1 households 1,2,3; Day 2
+  4,5,6; Day 3 7,8,9; Day 4 10,11,12; Day 5 13,14,15; Day 6 households 1,2,3
+  again ... Day 31 = 7th visit of batch 1; Days 34-35 "DEPARTURE".  This is
+  the seven-visit, five-day, three-per-day schedule and it is what the
+  shipped intake dates show (see below).  The stale Table 2 (3-day, 33-day,
+  eleven visit-days) that CONTENTS.org flags sits immediately above it.
+- Manual, section 3.6 "DATE OF NEXT VISIT": "This should be exactly FIVE (5)
+  days apart for all households."  Section 3.7 table: 1st visit sections 1, 2,
+  5, 6A, 7; 2nd: 3, 8H, 9A, 9B; 3rd: 4, 6B, 8H, 9B; 4th: 8A-G, 8H, 9B; 5th: 9C,
+  10, 8H, 9B; 6th: 11, 8H, 9B; 7th: 12, 13, 8H, 9B.  The same seven-row table
+  is printed on the questionnaire cover as page A0.2 (below).
+- Module B questionnaire, Section 8H column heads (docx tables 14-22):
+  "3 How much of own produced ... was consumed by the household since my last
+  visit?" through q8, under a header strip "2nd 3rd 4th 5th 6th 7th / day
+  month".  Section 9B (docx tables 67, 72): "1. How much was spent and what
+  quantity was acquired of ... since my last visit?" through q6, header strip
+  "VISIT day month" x 6.
+- Supervisors' manual (=strings= lines 57, 80, 90, 124): "10 cycles of 35
+  days and one travelling day"; "each interviewer is expected to do three
+  interviews per day. Since an interviewer is to visit each household every
+  fifth day ... 15 households"; "the total interviewing workload will be
+  spread over the seven visits"; diary paragraph identical to the Report's.
+  This manual is NOT stale on the schedule, unlike the interviewers' Manual.
+- CAPI: Manual 1.4 "Data will be collected using CSPro CAPI application
+  installed on Windows Tablets. Each interviewer and the team's supervisor
+  would be assigned a tablet"; 2.3 "The CAPI application will be designed in
+  two parts, A and B. Sections 1-7 in will constitute Part A and Sections 8-12
+  in another are Part B. At the end of the third visit you will have to submit
+  Sections 1-7 to the supervisor for verification and onward submission to the
+  server"; "DATA CAPTURE" (before Section 1): "All information collected from
+  the respondent would be entered directly onto the Tablet by the
+  interviewer."  Report PDF p. 25-26 (printed p. 3-4): "The CAPI system was
+  employed in the collection of data ... The application system for the
+  collection of data was developed in CSPro software. All electronic data
+  files for the GLSS7 were transferred remotely from the field ... to GSS Head
+  Office in Accra."  Paper was carried alongside: Supervisors' manual line 117
+  "copied out onto the tablet and on the paper questionnaire", line 291 "the
+  manuals, code book, paper questionnaires and other forms given to each
+  interviewer".
+
+Contradictions with CONTENTS.org: none on the count, spacing or recall phrase.
+Refinements (quoted in the last section): the Manual's Table 3 is correct and
+unmentioned; "five interviews per day" (Report, Manual prose) vs three
+(Supervisors' manual, Table 3, data); the Manual's 9B prose says "10 times in
+all" and "since the last 3 days".
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+| document | section / form / page | field(s) as printed | records |
+|---|---|---|---|
+| Module A questionnaire (=GLSS7_MODULE A_30_9_16_for print.docx=) and identically Module B (=GLSS7_MODULE B _14_10_16.docx=), page A0.1 "SURVEY INFORMATION" | FIRST VISIT box | =INTERVIEWER: ... DATE: DD MM YEAR=; =DWELLING FOUND? YES 1 / NO 2 (>> SUPERVISOR)=; =IS THE HEAD OF HOUSEHOLD THE SAME? YES 1 / NO 2=; =NAME OF NEW HEAD=; =LANGUAGE USED BY THE RESPONDENT= (8 codes); =INTERPRETER USED? YES 1 NO 2=; =REMARKS= | date (visit 1); interviewer name; two result-type codes; language; interpreter; no time |
+| same, page A0.1 | SECOND ... SEVENTH VISIT boxes (six boxes) | =INTERVIEWER: ... DATE: ... REMARKS:= | date and interviewer for each of visits 2..7; no time, no result code in the box |
+| same, page A0.1 | VERIFICATION OF QUESTIONNAIRE, FIRST ... SEVENTH VISIT (seven boxes) | =SUPERVISOR: ... DATE: ... REMARKS: ... REINTERVIEW BY SUPERVISOR? YES 1 NO 2= | supervisor's verification date per visit; re-interview flag; supervisor name |
+| same, page A0.1, right column | REASONS FOR NOT COMPLETING THE QUESTIONNAIRE | =DWELLING NOT FOUND/VACANT 1 / OCCUPANT NOT AT HOME 2 / REFUSAL 3= | non-response reason (household level) |
+| same, page A0.2 "SUMMARY OF SURVEY RESULTS" (docx table 2; pandoc drops it as =[TABLE]=) | one row per visit FIRST..SEVENTH, sections listed per row | INTERVIEWER VISITS: =DATE DD MM YEAR=; =RESULTS COMPLETE 1 / PARTIAL 2 / DISCONTINUED 3=; =DURATION HR MIN=.  CHECK-UP VISITS: =DATE DD MM YEAR=; =RESULTS COMPLETE 1 / PARTIAL 2=.  =SUPERVISOR SATISFACTORY 1 / TO BE COMPLETED 2 / TO BE REDONE 3= | THE visit record: per-visit date, per-visit result code, per-visit DURATION in hours and minutes, plus a supervisor check-up visit date and result and the supervisor's verdict.  Manual 3.7 "AFTER THE INTERVIEW": "For each visit you should show the date on which you asked the questions and outcome." |
+| same, page A0.3 | REMARKS BY THE INTERVIEWER / SUPERVISOR ON THE FIRST ... SEVENTH VISIT | free text, 14 boxes | narrative per visit |
+| Module A, page A0.5 / 1.1, Section 1 header | =Start Time: ......= | clock time at which the roster interview began (visit 1); the ONLY per-section start-time box in either module (grep of both =.docx= for "Start Time"/"End Time": one hit) |
+| Module B, Section 8H pages 8.10-8.16 | header strip above the per-visit columns | =2nd 3rd 4th 5th 6th 7th / day month= (six day/month cells) | date of each of visits 2..7 as written on the 8H page (Manual, Part H: "The date for each visit must be indicated at the top of the page according to the visit") |
+| Module B, Section 9B pages | header strip =VISIT day month= x 6 (docx tables 58, 61, 64, 67, 69, 72, ...) | six day/month cells | date of each of visits 2..7 as written on the 9B page |
+| Module B, Section 9A pages 8.17, 9.1, 9.2 | =Date of this visit DD MM Y Y Y Y= | one date | date of the 9A visit (2nd visit per A0.2; the Manual's 9A prose says "the last visit") |
+| =DIARY.doc= "DIARY OF CONSUMPTION AND EXPENDITURE" (paper form kept by the household) | header | =CLUSTER NUMBER=, =HOUSEHOLD NUMBER=, =NAME OF HOUSEHOLD HEAD=, =DATE: DAY MTH YEAR= | the date the diary sheet was opened |
+| same | body, one line per entry | columns =Date / Place of Purchase/Own Produce / Description of Item Purchased or Consumed / Qty / Unit / Price / Amount=, then a 25-code unit list (None 00 ... Tubers 26); three identical sheets in the file | EVERY diary line is dated.  The diary is a per-day, per-transaction record with its own date column; it is transcribed into 9B/8H at the next visit (Report PDF p. 306).  Word metadata: title "GLSS-5A", author N. B. Mensah, "FIELD OPERATIONS" -- the form is inherited from GLSS5. |
+| Supervisors' manual, Part 2 (lines 155-156) | "verification (see attached sample) form" | "complete one of these forms after each cycle ... keep the verification forms for each visit until the end of the cycle" | supervisor's per-cycle (and per-visit) verification form; the attachment is not in the =.doc= text |
+| Supervisors' manual, "Observation of Interviews" (lines 259-262) | observation form "provided by the Project Directorate" | "Time spent on the interview ... It may be worth noting the time at which he/she began each section." | section start times, for OBSERVED interviews only (three per interviewer per cycle) |
+| Supervisors' manual, "Supervisor's Report" (lines 313-315) | end-of-cycle EA report | "household numbers and the date of the data collection of the cycle" | cycle dates per EA |
+| Supervisors' manual, "Summary of Survey Results" (line 268) | column SUPERVISION OF THE INTERVIEWER | code 1 satisfactory / 2 or 3 to be clarified | the supervisor column of A0.2 |
+| Community questionnaire (=7GLSS7_Community Quest.docx=, not fetched; fields read off =g7comSEC0.dta=) | Section 0 | =Day/Month/Year of interview=, =Interview start time HH:MM=, =Interview end time HH:MM= | community-level date, start AND end time -- proof that the CAPI application had clock-time fields |
+| CSPro CAPI application (no document describes its screens) | case/section paradata | -- | NO document in =Documentation/= mentions automatic timestamps, case-open/close times, GPS fixes or an interview log.  Every date/time field found above is a questionnaire field.  CSPro CAPI can log field-entry times and keeps per-case modification times, but whether GSS's application did so is an INFERENCE from the platform, not a documented fact; ask, do not assert. |
+
+Not found anywhere: a per-visit END time or a per-section end time on the
+household instrument (DURATION on A0.2 is the only elapsed-time field); a
+"visit number" field on the tablet distinct from the A0.2 row.
+
+* What shipped: instrument field -> distributed variable
+
+| instrument field | shipped as | notes |
+|---|---|---|
+| A0.1 FIRST VISIT date DD/MM/YEAR | =g7sec0.dta: ddate, mdate, ydate= ("Day", "Month", "Year") | 14,008 of 14,009 parse (one bad date); 2016-10-01 .. 2017-10-12.  This IS the first-visit date, proved below.  Duplicated as =g7loc_upd.dta: month, year= and =00_GHA_BASICINFO.dta: survemo, surveyr= (100% agreement with =g7sec0=). |
+| A0.1 DWELLING FOUND? | =g7sec0.dta: dwell= (1 Yes 13,994 / 2 No 10 / NA 5) | |
+| A0.1 IS THE HEAD THE SAME? | =g7sec0.dta: hhhead= (Yes 12,389 / No 1,619 / NA 1) | |
+| A0.1 LANGUAGE / INTERPRETER | =g7sec0.dta: lang, lango, interp= | |
+| A0.1 INTERVIEWER, SUPERVISOR names/codes | NO | no interviewer or supervisor id in any household file; =g7comSEC0.dta= carries =supid=/=supname= for the community questionnaire only |
+| A0.1 SECOND..SEVENTH VISIT dates | NO | |
+| A0.1 VERIFICATION dates, REINTERVIEW flags | NO | |
+| A0.1 REASONS FOR NOT COMPLETING (1/2/3) | NO | 991 selected households not interviewed are absent from the files (Report Table A5b, PDF p. 313 / printed p. 291: 15,000 selected, 14,009 interviewed, 93.4%; urban 91.6%, rural 94.8%) |
+| A0.2 per-visit DATE (7) | NO | |
+| A0.2 per-visit RESULT COMPLETE/PARTIAL/DISCONTINUED (7) | collapsed to =g7sec0.dta: hhstatus= "Household visits status (all 7 visits)": 1 = "All 7 visits completed" 13,791; 0 = "Not all visits completed" 218 (urban 119, rural 99) | the seven result codes and the DISCONTINUED distinction (Section 8 / Section 10 not applicable) are gone |
+| A0.2 per-visit DURATION HR:MIN (7) | NO | |
+| A0.2 CHECK-UP VISIT date + result (7) | NO | |
+| A0.2 SUPERVISOR verdict 1/2/3 (7) | NO | |
+| A0.3 remarks | NO | |
+| Section 1 =Start Time= | NO | =g7sec1.dta= (42 cols) and =g7sec1_5.dta= (707 cols) carry no time, date or visit column (full grep of names + labels; the only "day/month/year" columns are date of birth =s1q4dd/mm/yy=) |
+| 8H header "2nd..7th day month" | NO | =g7sec8h.dta= 28 cols, listed below; the visit is carried only in the column NAME (=s8hq3q= "... at 2nd visit" .. =s8hq8p= "... 7th visit") |
+| 9B header "VISIT day month" x 6 | NO | =g7sec9b_small.dta= 41 cols, listed below; =g7sec9b.dta= (3.2 GB, not fetched) has the same =s9bq{n}a/b/c= stems per its value labels (see =_/food_acquired.py=) |
+| 9A "Date of this visit" | NO | =g7sec9a.dta= 16 cols, listed below |
+| Diary sheets (per-line dates) | NO | no diary file ships; the diary is transcribed into 9B/8H and its dates are not carried |
+| Community Section 0 date + start/end time | =g7comSEC0.dta: day, month, year= (892/892), =intst_hh, intst_mm= (892/892), =intend_hh, intend_mm= (0/892 -- the end-time fields exist and are EMPTY) | community, not household; one date parses to 2016-01-06, before fieldwork |
+| Supervisor verification / observation / cycle-report forms | NO | paper, never keyed |
+| CSPro paradata | NO | nothing in the distribution resembles a case log |
+
+** The one shipped date is the FIRST-visit (intake) date -- measured
+
+=g7sec0.dta= gives one date per household and its label does not say which
+visit.  The within-cluster structure settles it.  For the 15 households of a
+cluster, the Manual's Table 3 puts visit 1 on cycle days 1..5, three
+households per day; visits 2..7 would then span days 6..35.  Measured on the
+14,008 parseable dates:
+
+| statistic | value |
+|---|---|
+| distinct dates per cluster | 5 in 663 of 1,000 clusters (4: 80; 6: 178; 7: 42; 3: 13; 8: 11; 9: 5; 2: 5; 1: 3) |
+| households per (cluster, date) | 3 in 3,312 cells (2: 826; 1: 649; 4: 288; 5: 60; larger: 47) |
+| offset of a household's date from its cluster's earliest date | 0: 2,890; 1: 2,757; 2: 2,625; 3: 2,396; 4: 1,990; 5: 170; 6: 69; ... (>= 9: 8.1% urban, 7.0% rural) |
+| cluster start date, day-within-a-36-day-cycle counted from 24 Oct 2016 | day 0 in 865 of 1,000 clusters; day 35 in 37; the rest scattered |
+| cluster start dates by survey week | spikes at weeks 0, 5, 10, 15, 20, 25, 30, 36, 41, 46 (94, 83, 98, 91, 92, 89, 92, 82, 99, 92 clusters) = ten cycles |
+| day of week | all seven days used (Wed 2,264 ... Sun 1,605) |
+
+A 30-day spread of per-household intake would be impossible if the date were
+the last visit or the interview month; five consecutive days with three
+households each is the intake batch structure of Table 3 exactly.  So
+=interview_date.Int_t= is the date of VISIT 1 (roster, sections 1, 2, 5, 6A, 7
+and diary training) -- NOT the date of any consumption recall.  Under the
+protocol, visit k was nominally =Int_t + 5*(k-1)= days; the survey's own
+non-adherence to that (the >= 5-day offsets above, the 218 non-completers,
+the batches that restarted late) is precisely what the un-shipped A0.2 dates
+would measure.  The median gap between successive visits therefore CANNOT be
+computed for this wave; the nominal protocol gap is 5 days and the measured
+intra-cluster intake spread is 4 days.
+
+** The collapsed result codes leave a partial trace in 9B and 8H
+
+Per household, which of visits 2..7 have any non-null =s9bq{n}a= (9B amount):
+
+| =hhstatus= | 9B visits populated: 1 | 2 | 3 | 4 | 5 | 6 | absent from 9B |
+|---|---|---|---|---|---|---|---|
+| 1 "All 7 visits completed" (13,791) | 0 | 0 | 0 | 0 | 3 | 13,770 | 18 |
+| 0 "Not all visits completed" (218) | 27 | 20 | 10 | 25 | 61 | 8 | 67 |
+
+Populated-visit patterns (v2..v7) among the 218 non-completers: =111110= 34,
+=100000= 27, =111100= 22, =110000= 20, =011111= 12, =111000= 10, =111111= 8,
+=111011= 8, =111101= 3.  Attrition is mostly a truncated tail (household
+dropped after visit k), with a minority of skipped-then-resumed visits and 8
+non-completers with all six 9B visits (so "not all visits completed" is not
+"a 9B visit was missed").  8H is a weaker trace (a household with no own
+produce has no 8H rows at all): among =hhstatus=1= households the count of
+8H visits populated is 0: 5,836; 1: 771; 2: 547; 3: 503; 4: 649; 5: 969; 6:
+4,516.  This is the closest thing to a per-visit result code the
+distribution contains; it is inferred, not recorded.
+
+** Variable dumps of every Section-0-like file (names, types, labels)
+
+=g7sec1_5.dta= is 707 columns; only its date/time-looking columns are listed,
+and none is a visit field.  =g7sec9b_small.dta= carries NO variable labels;
+its =fn1= and =ttl_1= are unlabeled derived group counts (=ttl_1= is constant
+within =(freqcd, loc5)=, i.e. an item-by-locality count; =fn1= varies within
+item), NOT per-visit anything; =freqcd= is the food code (one row per
+household x item); =index= is a row counter from the 3.2 GB file.
+
+#+begin_example
+
+== g7sec0.dta  rows=14009 cols=18  label=None
+  hid                    string   None
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  region                 int8     REGION
+  district               int16    DISTRICT
+  urbrur                 int8     Urban/Rural
+  ddate                  int8     Day
+  mdate                  int8     Month
+  ydate                  int16    Year
+  dwell                  int8     Dwelling Found?
+  hhhead                 int8     Is the head of household same?
+  lang                   int8     Language used by respondent
+  lango                  string   Other language used by respondent
+  interp                 int8     Interpreter used?
+  hhsize                 int8     Household size
+  hhstatus               int8     Household visits status (all 7 visits)
+  loc2                   int8     urbrur
+  WTA_S                  double   weight
+
+== g7sec1_5.dta  rows=59864 cols=707  (date/time-looking columns only; none is a visit field)
+  s1q4dd/s1q4mm/s1q4yy   Day/Month/Year Born;  s1q5y/s1q5m Age in years/months;  s1q22 Number of months away from Household
+  s2aq8h/m, s2aq11h/m, s3aq16h/m, s3aq17h/m ... hours/minutes of travel, homework, facility time (not interview times)
+== g7sec11_12screening.dta  rows=27741 cols=15  label=None
+  hid                    string   household ID
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  s11aq1                 int8     Is there any household member who lives away from here?
+  s11aq2                 int8     Has this household member sent any money/goods in past 12 months?
+  s11aq3                 int8     Is there any non-household member to whom money/goods have been sent in past 12
+  s11bq1                 int8     Household received/collected money/goods from household member during the past 1
+  s11bq2                 int8     Received/collected money/goods from other individual
+  s11cq0                 int8     Is there any household member who received miscellaneous income?
+  s11eaq1a               int8     In last 5yrs any member living outside and has returned
+  s11ebq1a               int8     Is/Are there any former household member(s) who is/are currently living outside
+  s12cq1                 int8     Have savings account/participate in susu
+  region                 int8     REGION
+  loc2                   int8     urbrur
+  WTA_S                  double   weight
+
+== s11cq0.dta  rows=13862 cols=15  label=None
+  hid                    string   household ID
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  s11aq1                 int8     Is there any household member who lives away from here?
+  s11aq2                 int8     Has this household member sent any money/goods in past 12 months?
+  s11aq3                 int8     Is there any non-household member to whom money/goods have been sent in past 12
+  s11bq1                 int8     Household received/collected money/goods from household member during the past 1
+  s11bq2                 int8     Received/collected money/goods from other individual
+  s11cq0                 int8     Is there any household member who received miscellaneous income?
+  s11eaq1a               int8     In last 5yrs any member living outside and has returned
+  s11ebq1a               int8     Is/Are there any former household member(s) who is/are currently living outside
+  s12cq1                 int8     Have savings account/participate in susu
+  region                 int8     REGION
+  loc2                   int8     urbrur
+  WTA_S                  double   weight
+
+== g7comSEC0.dta  rows=892 cols=19  label=None
+  supid                  int16    SUPERVISOR ID
+  clusterno              int16    CLUSTER
+  comname                string   Community Name
+  region                 int8     REGION
+  district               int8     DISTRICT
+  eatype                 int8     EATYPE
+  day                    int8     Day of interview
+  month                  int8     Month of interview
+  year                   int16    Year of interview
+  intst_hh               int8     Interview start time - HH
+  intst_mm               int8     Interview start time - MM
+  intend_hh              int8     Interview end time - HH
+  intend_mm              int8     Interview end time - MM
+  hhsincom               string   Households in this community
+  supname                string   SUPERVISOR NAME
+  comnamf                string   Community Name
+  comnamg                string   Community Name
+  clusternp              int16    CLUSTER
+  clusternq              int16    CLUSTER
+
+== g7comSEC 0 II.dta  rows=10792 cols=10  label=None
+  supid                  int16    SUPERVISOR ID
+  clusterno              int16    CLUSTER
+  comname                string   Community Name
+  partid                 int8     Participant ID
+  name                   string   Name
+  sex                    int8     Sex
+  age                    int8     Age
+  nametitle              string   Title
+  occp                   string   Occupation
+  occupation             int16    OCCUPATION_CODE
+
+== 00_GHA_BASICINFO.dta  rows=14009 cols=15  label=None
+  country                string   Country name
+  region                 int8     Geographical code
+  hid                    string   Household unique ID
+  clust                  int32    Enumeration Area
+  nh                     int8     Household unique identifier
+  loc2                   int8     urbrur
+  loc5                   int8     None
+  loc7                   int8     None
+  survemo                int8     Survey month
+  surveyr                int16    Survey year
+  eqsc                   double   Adult equivalent scale
+  hhsize                 int8     Total number of residents excluding household help
+  WTA_S                  double   Weights from sampling, used in weighting statistics calculated from individual l
+  WTA_S_HHSIZE           float    WTA_S multiplied by HHSIZE, normally used in weighting statistics calculated fro
+  rururb                 int8     RECODE of urbrur (Urban/Rural)
+
+== g7sec9b_small.dta  rows=528660 cols=41  label=None
+  index                  int32    None
+  hid                    string   None
+  clust                  double   None
+  nh                     double   None
+  freqcd                 double   None
+  s9bq1a                 double   None
+  s9bq1b                 double   None
+  s9bq1c                 double   None
+  s9both1                string   None
+  s9bq1coth              string   None
+  loc5                   float    None
+  fn1                    float    None
+  ttl_1                  float    None
+  s9bq2a                 double   None
+  s9bq2b                 double   None
+  s9bq2c                 double   None
+  s9both2                string   None
+  s9bq2coth              string   None
+  s9bq3a                 double   None
+  s9bq3b                 double   None
+  s9bq3c                 double   None
+  s9both3                string   None
+  s9bq3coth              string   None
+  s9bq4a                 double   None
+  s9bq4b                 double   None
+  s9bq4c                 double   None
+  s9both4                string   None
+  s9bq4coth              string   None
+  s9bq5a                 double   None
+  s9bq5b                 double   None
+  s9bq5c                 double   None
+  s9both5                string   None
+  s9bq5coth              string   None
+  s9bq6a                 double   None
+  s9bq6b                 double   None
+  s9bq6c                 double   None
+  s9both6                string   None
+  s9bq6coth              string   None
+  region                 int8     None
+  loc2                   int8     None
+  WTA_S                  double   None
+
+== g7loc_upd.dta  rows=14009 cols=18  label=None
+  hid                    string   None
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  hhsize                 double   (sum) s1q24
+  region                 int8     REGION
+  district               int16    DISTRICT
+  month                  int8     Month
+  year                   int16    Year
+  hhstatus               int8     Household visits status (all 7 visits)
+  loc2                   int8     urbrur
+  ez                     int8     ez with AMA
+  WTA_S                  double   weight
+  loc5                   float    loc5 with AMA
+  loc7                   float    loc7 with AMA
+  WTA_S_HHSIZE           float    None
+  ezG                    int8     ez with GAMA
+  loc5G                  float    loc5 with GAMA
+  loc7G                  float    loc7 with GAMA
+
+== g7sec9a.dta  rows=7077839 cols=16
+  hid                    string   household ID
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  lfreqcd                int16    Item var line
+  s9aname                string   Item Name
+  s9aq1                  int8     Was anything spent by the household on... in the past 12 months?
+  s9aq1aq                float    Quantity purchased
+  s9aq1au                int8     Unit
+  s9aq1auo               string   Other unit
+  s9aq2                  double   Amount spent on less frequently purchased item in last 12 months
+  s9aq3q                 float    Has the household used, consumed out of its own output or has received as gift .
+  s9aq3u                 int8     Has the household used, consumed out of its own output or has received as gift .
+  s9aq4                  double   How much of ... has the household used or consumed out of own production, or has
+  region                 int8     REGION
+  loc2                   int8     urbrur
+  WTA_S                  double   weight
+
+== g7sec8h.dta  rows=934584 cols=28
+  hid                    string   household ID
+  clust                  int32    ENUMERATION AREA
+  nh                     int8     HOUSEHOLD NUMBER
+  foodcd                 int8     Food code
+  foodcg                 int8     Food category
+  s8hq1                  int8     Household consume any home consumed food
+  s8hq2                  int8     Number of months  consumed
+  s8hq3q                 float    Quantity of own produced food consumed at 2nd visit
+  s8hq3u                 int8     Unit in which quantity is reported - 2nd visit
+  s8hq3p                 double   Selling price for one unit now-2nd visit
+  s8hq4q                 float    Quantity of own produced food consumed since last visit
+  s8hq4u                 int8     Unit in which quantity is reported - 3rd visit
+  s8hq4p                 double   Selling price for one unit now-3rd visit
+  s8hq5q                 float    Quantity of own produced food consumed since last visit
+  s8hq5u                 int8     Unit in which quantity is reported-4th visit
+  s8hq5p                 double   Selling price for one unit now-4th visit
+  s8hq6q                 float    Quantity of own produced food consumed since last visit
+  s8hq6u                 int8     Unit in which quantity is reported-5th visit
+  s8hq6p                 double   Selling price for one unit now-5th visit
+  s8hq7q                 float    Quantity of own produced food consumed since last visit
+  s8hq7u                 int8     Unit in which quantity is reported-6th visit
+  s8hq7p                 double   Selling price for one unit now-6th visit
+  s8hq8q                 float    Quantity of own produced food consumed since last visit
+  s8hq8u                 int8     Unit in which quantity is reported-7th visit
+  s8hq8p                 double   Selling price for one unit now-7th visit
+  region                 int8     REGION
+  loc2                   int8     urbrur
+  WTA_S                  double   weight
+
+#+end_example
+
+=g7sec0.dta= value labels: =hhstatus= {0 "Not all visits completed", 1 "All 7
+visits completed"}; =dwell=, =hhhead=, =interp= {1 Yes, 2 No}; =urbrur= {1
+Urban, 2 Rural}; =lang= {1 English .. 8 Other}.  =mdate= has month-name value
+labels, so =get_dataframe= returns it as a string -- parse dates from a
+=convert_categoricals=False= read.
+
+* The NSO request for this wave
+
+The wave ships ONE date per household (visit 1) and NO time of day, duration,
+per-visit result code, interviewer id or supervisor verification.  Ask GSS
+for the following, named as the instrument names them, for all 14,009
+households (=clust=, =nh= / =hid=), and for the 991 selected households that
+were not interviewed:
+
+1. Page A0.2 "SUMMARY OF SURVEY RESULTS" of the household questionnaire
+   (Module A / Module B cover), all seven rows: INTERVIEWER VISITS =DATE
+   (DD MM YEAR)=, =RESULTS (COMPLETE 1 / PARTIAL 2 / DISCONTINUED 3)=,
+   =DURATION (HR MIN)=; CHECK-UP VISITS =DATE=, =RESULTS=; =SUPERVISOR
+   (SATISFACTORY 1 / TO BE COMPLETED 2 / TO BE REDONE 3)=.  This single page
+   holds the visit date, the result and the duration of every visit and is
+   the core of the request.
+2. Page A0.1 "SURVEY INFORMATION": the =DATE= and =INTERVIEWER= of the
+   SECOND .. SEVENTH VISIT boxes; the =SUPERVISOR=, =DATE= and =REINTERVIEW
+   BY SUPERVISOR?= of the seven VERIFICATION OF QUESTIONNAIRE boxes; the
+   interviewer and supervisor code numbers of the first-visit box; and
+   =REASONS FOR NOT COMPLETING THE QUESTIONNAIRE= (1/2/3) for the 991
+   non-interviewed households, which would let the =hhstatus= 0/1 collapse
+   be undone and the Table A5b non-response be decomposed.
+3. The per-visit date strips at the top of Sections 8H ("2nd .. 7th / day
+   month") and 9B ("VISIT day month" x 6), and 9A's "Date of this visit", as
+   entered on the tablet.  If item 1 is supplied these are redundant, but
+   they are the dates physically attached to the consumption recalls and are
+   the check on item 1.
+4. Section 1 =Start Time= (visit 1).
+5. CSPro CAPI paradata, if the application recorded it: case creation and
+   last-modification timestamps, per-section or per-field entry times, the
+   operator (interviewer) id and tablet id per case, and the synchronisation
+   /submission times to the server.  No GLSS7 document describes such a log;
+   the community file proves the application had clock-time fields
+   (=g7comSEC0.dta: intst_hh/mm=, =intend_hh/mm=, the latter empty), so the
+   request is "whether such records exist, and if so a case-level extract",
+   not an assertion that they do.  The Manual's 2.3 (Part A submitted after
+   the third visit, Part B at the end of the EA) means the submission log
+   alone would date visits 3 and 7 for every household.
+6. The household diaries ("DIARY OF CONSUMPTION AND EXPENDITURE", one sheet
+   per household with a header date and a per-line =Date= column), or their
+   keyed form if they were ever keyed.  The Report says diary entries were
+   transferred into 9B/8H at the next visit, so GSS may hold only the paper
+   sheets; if they exist they are the only per-DAY record of expenditure in
+   any GLSS wave and the most valuable single item here.
+7. Supervisors' paper forms: the per-cycle verification form, the interview
+   observation form (which notes "the time at which he/she began each
+   section"), and the end-of-cycle supervisor's report ("household numbers
+   and the date of the data collection of the cycle").  Lower priority; they
+   would give cycle dates per EA and section start times for observed
+   interviews only.
+8. For the community questionnaire, the reason =intend_hh/mm= (end time) is
+   empty in all 892 records.
+
+Explicitly: the wave does NOT ship complete visit dates, so the request is
+for dates (visits 2..7 and the check-up visits) as well as for time of day
+and duration.
+
+* Idiosyncrasies and contradictions
+
+- The shipped date is the intake date, and =data_info.yml= does not say so.
+  =interview_date: Int_t: [ddate, mdate, ydate]= is served as "the" interview
+  date; it is the date of visit 1 (proof above).  The consumption recalls in
+  =food_acquired= (visits 2..7) are dated nominally =Int_t + 5*(visit-1)=,
+  and nothing in the API records that offset.  Worth a comment in the YAML.
+- 8 clusters have intake dates before the Report's fieldwork start.  Report
+  PDF p. 25 (printed p. 3): fieldwork "commencing on 24th October, 2016";
+  Preface (PDF p. 2) and PDF p. 18: "22nd October, 2016".
+  The data: 8 clusters start in the weeks before 24 Oct 2016, the earliest
+  on 1 Oct 2016 (during the 11 Sep - 5 Oct training), and =g7comSEC0=
+  carries one community date of 2016-01-06.  Either pilot EAs kept in the
+  file, or date entry errors.  Not adjudicated.
+- Manual Table 3 is the correct schedule and CONTENTS.org does not say so.
+  CONTENTS.org (lines 1509-1540) records that the Manual's 3.7 says "eleven
+  visits" and its Table 2 schedules eleven visit-days three days apart.
+  Both true.  But the Manual's Table 3 "SCHEDULE OF VISITS", the next table
+  in section 1.8 (pandoc shows it as =[TABLE]=), is the 35-day, five-day,
+  three-households-a-day, seven-visit schedule, and the intake dates in
+  =g7sec0= reproduce it (5 dates per cluster, 3 households each).  The
+  Manual contradicts itself within one page; the data side with Table 3.
+- "Five interviews per day" is wrong by the survey's own numbers.  Report
+  PDF p. 305 (printed p. 283): "Each interviewer conducted five interviews
+  per day"; Manual 1.8: "each interviewer would conduct five interviews per
+  day".  Supervisors' manual line 80: "each interviewer is expected to do
+  three interviews per day", Table 3 and the measured 3 households per
+  (cluster, date) agree with three.  (Five per day x three days would give a
+  2-day intake spread; the data show 4.)
+- The Manual's 9B instructions are stale in the same way as its Table 2.
+  Section 9 Part B: "it will be administered 10 times in all. In your second
+  visit you will ask for how much was spent by the household since the last
+  3 days" -- ten asks and a 3-day first recall are the GLSS3-urban / GLSS5
+  eleven-visit design, beside a questionnaire with six 9B columns headed
+  "since my last visit".  CONTENTS.org records the Table 2 / 3.7 staleness
+  and not this passage; same lineage, one more instance.
+- The Manual's Part A submission timing is written in 3-day arithmetic.
+  Section 1.8: "At the end of the 5th visit (day 15th) the interviewer should
+  have completed Part A ... submitted to the Supervisor on day 17th"; section
+  2.3: "At the end of the third visit you will have to submit Sections 1-7".
+  Visit 5 on day 15 is the 3-day schedule; under the five-day schedule day 15
+  is visit 3 (sections 1-7 complete after visit 3 per the 3.7 table).  The
+  two passages agree only if the interval is 5 days and "5th visit" is stale.
+- The Report is now in the repository; CONTENTS.org line 845-848 says it is
+  not.  The population entry for 2016-17 ("Concrete next step ...: acquire
+  the GLSS7 Main Report ... It is not in this repository's
+  =2016-17/Documentation/= and was not consulted") predates the food_acquired
+  entry at lines 1476-1499, which quotes it.  =Documentation/GLSS7 Main
+  Report.pdf= (8.2 MB, 343 PDF pages, text layer) is present.  The population
+  entry is stale, not wrong when written.
+- The Supervisors' manual is NOT stale on the visit schedule.  It says seven
+  visits, every fifth day, three interviews a day, 35-day cycles, throughout
+  -- so the eleven-visit boilerplate is specific to the interviewers' Manual,
+  and the "GLSS7 Final Manual is stale" note should not be read as "the
+  manuals are stale".
+- The diary form is a GLSS5 form.  =DIARY.doc= Word metadata: title
+  "GLSS-5A", author "N. B. MENSAH", keywords "FIELD OPERATIONS".  The unit
+  code list on it (None 00 .. Tubers 26, 25 codes) is not the 9B unit
+  vocabulary that =_/food_acquired.py= decodes from the tablet file; a
+  diary-to-9B transcription therefore involved a unit re-code by the
+  interviewer.
+- The community CAPI file shows the application's time fields were real and
+  partly unfilled: =g7comSEC0.dta= start time 892/892, end time 0/892.
+  Expect the same pattern (present in the application, not necessarily
+  entered) for any household DURATION field GSS supplies.
+- =g7loc_upd.dta: month= carries month-NAME value labels while =g7sec0.dta:
+  mdate= carries numbers; a naive ===  between them is 0% agreement, the
+  values are identical.  =hhstatus= likewise labelled in one and raw in the
+  other.
+- 85 households in =g7sec0= have no rows in =g7sec9b_small= (67 of them
+  =hhstatus=0=, 18 =hhstatus=1=), and 3 =hhstatus=1= households have visit 2
+  empty in 9B: "All 7 visits completed" is a fieldwork-status code, not a
+  data-presence guarantee.
+- No DDI content: =ddi-documentation-english-97.pdf= has "No content
+  available" under Sampling, Questionnaires, Data Processing and Data
+  Appraisal, and its Data Collection page is blank.  Nothing about dates,
+  visits or CAPI can be cited from the DDI.
+- Word-97 files: =DIARY.doc= is fully recoverable with =strings -n 6=
+  (three identical sheets); =Supervisors' manual_GLSS7.doc= gives the prose
+  but its table bodies (the "Days of Visit" batches, the section-by-visit
+  table, the attached verification form) are lost -- the attached sample
+  forms it refers to could not be read.

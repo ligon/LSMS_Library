@@ -75,7 +75,7 @@ def _assert_decoded(codes, j, column):
 
 
 # ================================ PURCHASES (s9b) ==============================
-# Value-only.  Visits 1..10 each carry a recorded value in s9bq{visit}.
+# Value-only.  s9bq1..s9bq10 carry the values for the 2nd..11th visits.
 df = get_dataframe('../Data/partb/sec9b.dta', convert_categoricals=False)
 
 # i exactly as sample()/roster() build it: mapping.i() over the *pre-composed*
@@ -85,7 +85,10 @@ df['j'] = df['freqcd'].astype('int64').map(labelsd['Code_9b'])
 _assert_decoded(df['freqcd'], df['j'], 'Code_9b')
 df = df[_drop_nonfood(df['j'])]          # drop non-food Section-9B block (j == '')
 
-pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v}' for v in range(1, 11)}
+# Source question numbers are NOT visit numbers.  This wave's own Stata
+# variable labels give the mapping:
+#   s9bq1 'amount spent by second visit' .. s9bq10 '.. by eleventh visit'
+pur_visit_cols = {f's9bq{v}': f'Expenditure_v{v + 1}' for v in range(1, 11)}
 x = df.rename(columns=pur_visit_cols)[['i', 'j'] + list(pur_visit_cols.values())]
 x = x.replace({r'': pd.NA, 0: np.nan})
 # Several distinct freqcd codes harmonize to one j (e.g. 'Other Cereal'); sum
@@ -100,7 +103,8 @@ x['Price'] = np.nan
 x = x.reset_index()
 
 # ================================ PRODUCED (s8h) ==============================
-# Real quantity (visits 4..12) in a native unit (s8hq13), with a farmgate Price
+# Real quantity (s8hq3..s8hq12 = the 2nd..11th visits) in a native unit
+# (s8hq13), with a farmgate Price
 # (s8hq14).  Expenditure left NaN -- no produced value is recorded.
 #
 # The file is read TWICE, and both reads are load-bearing (GH #782).  The
@@ -125,7 +129,17 @@ prod = prod[_drop_nonfood(prod['j'])]
 prod['u'] = prod['s8hq13'].astype(str)
 prod['Price'] = prod['s8hq14']
 
-pro_visit_cols = {f's8hq{v}': f'Quantity_v{v}' for v in range(4, 13)}
+#   s8hq3..s8hq12 -> calendar visits 2..11.  The Stata label on s8hq3 reads
+#   'number of units consumed', which was read as a TOTAL until 2026-09-11
+#   and the column was dropped -- 21,493 positive records, the wave's whole
+#   2nd-visit own-production ask.  It is not a total: the questionnaire
+#   (G5QPartB.pdf p.17, printed 8.11) heads columns 3..12 '2nd 3rd .. 11th',
+#   each asking 'how much of own produced .. was consumed .. since my last
+#   visit?', and in the data s8hq3 < sum(s8hq4..s8hq12) in 27,314 rows, which
+#   no total can be.  Both modules run 2..11 in this wave (the purchases'
+#   s9bq1 label is 'amount spent by second visit'); the 8H stems start at q3
+#   because q1/q2 are screeners, exactly as in 1998-99 / 2012-13 / 2016-17.
+pro_visit_cols = {f's8hq{v}': f'Quantity_v{v - 1}' for v in range(3, 13)}
 keep = ['i', 'j', 'u', 'Price'] + list(pro_visit_cols.values())
 y = prod.rename(columns=pro_visit_cols)[keep]
 y = y.replace({r'': pd.NA, 0: np.nan})

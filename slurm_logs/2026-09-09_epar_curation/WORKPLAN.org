@@ -191,7 +191,7 @@ count + =ShippedFactorWarning= on a zero match; =u= required among keys.
 - Ethiopia re-warm; regrade Ethiopia cells.  Model: Opus, worktree;
   Opus red-team; prior-art ledger.
 
-** WAITING Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
+** DONE Malawi: IHS5 crop-side conversion files                     :code:L1:L9:
 :PROPERTIES:
 :Effort: 5:00
 :END:
@@ -262,6 +262,15 @@ Uganda number.  Reuses =median_price_valuation= with =geo_levels= from
 must say so.
 
 * Phase 3 -- schema: the plot decision-maker grain (#439, #167)
+
+** DONE Feature aligns crop_production to the canonical index (#775; part of #569)
+:PROPERTIES:
+:Effort: 6:00
+:END:
+Not in the original plan; forced by #854's condition level.  Merged
+88175a6d after red-team.  Feature('crop_production') 8 -> 14 countries.
+Open: plot vs plot_id naming (@ligon); plot_labor/plot_inputs registration.
+
 
 ** TODO Schema proposal: =plot_cultivation= with the person/role axis   :design:L4:
 :PROPERTIES:

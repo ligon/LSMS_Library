@@ -1,0 +1,175 @@
+#+TITLE: GhanaLSS: visit dates per wave, and what food_acquired is missing
+#+DATE: 2026-09-11
+#+AUTHOR: Sue (Claude Fable 5.1), scrum master; seven wave agents
+
+Two questions from @ligon, answered from the instruments and the shipped
+files rather than from CONTENTS.org.  Per-wave detail with page and
+variable citations is in the sibling files =<wave>.org= in this directory.
+Nothing in the library was changed; every finding below is a report.
+
+* 1. Where visit dates live, wave by wave
+
+The premise ("we have no data on the date or time of visits") is false for
+five of seven waves.  What is missing everywhere is TIME OF DAY: no GLSS
+household instrument, in any round, has a clock-time field (GLSS5/6/7 have a
+per-visit DURATION field; only the community questionnaire records a time).
+
+|    wave | visits              | per-visit dates shipped?                                | file(s)                       | wired in library? |
+|---------+---------------------+---------------------------------------------------------+-------------------------------+-------------------|
+| 1987-88 | 2 rounds ~14d apart | yes: both rounds + proposed R2 + supervisor/DEO dates   | Y00A (9 date boxes)           | R1 date only      |
+| 1988-89 | 2 rounds ~14d apart | yes: as above, plus per-section first/check-up dates    | Y00A, Y00B                    | R1 date only      |
+| 1991-92 | 8 rural / 11 urban  | yes: 11 slots, date+result+check-up (4,230 of 4,522 HH) | S0B (vd/vm/vy/vr k=1..11)     | first visit only  |
+| 1998-99 | 7                   | yes: visits 1-3 (Part A grid) and 2-7 (Part B grid)     | SEC0C, SEC0B                  | first visit only  |
+| 2005-06 | 11                  | yes: visits 2-11 date, result, DURATION, check-up       | secb1, secb2 (+ secb0)        | first visit only  |
+| 2012-13 | 7                   | yes: all 7, date, result, DURATION, check-up            | PARTB/secb2, secb1, SECA01/04 | first visit only  |
+| 2016-17 | 7 (CAPI)            | NO: intake date + =hhstatus= only                       | g7sec0                        | first visit only  |
+
+Median realised spacing, from the shipped dates: GLSS1/2 14 d; GLSS3 3 d
+urban / 2 d rural (11 loc2-urban clusters ran the rural schedule);
+GLSS4 5 d; GLSS5 3 d (unstratified -- resolves the "spacing unestablished"
+row in =GhanaLSS/_/recall.yml=); GLSS6 5 d; GLSS7 not computable.
+
+** The NSO request, by wave (see each wave file, section "NSO request")
+- 2016-17 :: the whole thing.  Cover-page A0.1 visit 2-7 dates and A0.2
+  "Summary of Survey Results" (per-visit date, result, DURATION hr:min,
+  check-up visit, supervisor verdict); the 8H/9B/9A per-visit date strips;
+  Section 1 start time; the CSPro paradata IF it exists (no document says
+  it does -- ask, do not assert); the household diaries.
+- 1998-99 :: the unkeyed SECOND..SEVENTH VISIT cover boxes and the 8H/9A2/9B
+  header date grids (would fix 627 missing 7th-visit dates and a one-row
+  shift affecting 21% of households in SEC0B).
+- 1991-92 :: the unkeyed Summary page for 292 households (26 whole
+  clusters) and RESULT column for ~1,100; the never-keyed per-visit
+  interviewer+date boxes; urban diary booklets.
+- 2005-06 :: 8H/9B header date slots (to adjudicate secb1/secb2 keying
+  disagreements, 9,767 cells); visit-1 duration/result; the interviewer
+  manual (absent here and from WB catalog 1064); the diary protocol.
+- 2012-13 :: per-page visit-date boxes on 9B/8H/9A; A0.4 remarks; diary form.
+- 1987-88 :: Section 0B per-section date/result grid (printed, ships only
+  for 1988-89 as Y00B).  1988-89: nothing on dates.
+
+** Library follow-ups implied (not done)
+- Wire the per-visit dates into =interview_date= on a =visit= level via
+  =local_tools.melt_visit_intervals= (the EHCVM precedent, GH #506) for
+  1991-92, 1998-99 (after de-shifting SEC0B against SEC0C), 2005-06, 2012-13,
+  and both rounds for 1987-88/1988-89.  =data_info.yml= currently wires the
+  FIRST-visit / ROUND-ONE date in every wave -- which for the 1980s is not
+  even the date the food module was asked (that was Round Two).
+
+* 2. food_acquired: what is missing, and where it is the library's fault
+
+** 2.0 Which modules each wave reads (the "check the yaml" question)
+No wave's =data_info.yml= declares =food_acquired= -- the table is
+script-path (=<wave>/_/food_acquired.py=), and =_/data_scheme.yml= declares
+only its index and columns.  The module list therefore comes from the
+scripts and the shipped files, confirmed here against the column lists:
+
+| wave    | purchases (s=purchased)                 | own production (s=produced)                 |
+|---------+-----------------------------------------+---------------------------------------------|
+| 1987-88 | Y12A.DAT =CFOODBLV= (since last visit)  | Y12B.DAT =VFOODCPD= (see 2.2)               |
+| 1988-89 | Y12A.DAT =CFOODBLV=                     | Y12B.DAT =VFOODCPD= (see 2.2)               |
+| 1991-92 | S9B.DTA =s9bq1..q10= -> visits 2..11    | S8H.DTA =s8hq3..q12= -> 2..11; unit q13, price q14 |
+| 1998-99 | SEC9B.DTA =s9bq1..q6= -> 2..7           | SEC8H.DTA =s8hq3..q8= -> 2..7; unit q9, value q10  |
+| 2005-06 | partb/sec9b.dta =s9bq1..q10= -> 2..11   | partb/sec8h.dta =s8hq4..q12= -> 3..11  *q3 dropped, see 2.1* |
+| 2012-13 | PARTB/sec9b.dta =s9bq1..q6= -> 2..7     | PARTB/sec8h.dta =s8hq3..q8= -> 2..7; unit q9, price q10    |
+| 2016-17 | g7sec9b_small.dta =s9bq{1..6}a/b/c= -> 2..7 (amount, qty, unit) | g7sec8h.dta =s8hq{3..8}q/u/p= -> 2..7 |
+
+The one yaml that DOES record per-wave visit structure is
+=GhanaLSS/_/recall.yml= (generated from =.coder/coverage/food_recall.csv=);
+its 2005-06 row is corrected by 2.1 and part 1.
+
+Checked per wave against the wave scripts, the shipped 9B/8H/12A/12B files
+(names + labels) and the questionnaire pages.  Section 9A ("less
+frequently purchased") is non-food in every wave that ships it (clothing,
+fuel, pet food ...), so nothing food is hiding there.
+
+** 2.1 GLSS5 2005-06: the 2nd-visit own-production quantity is DROPPED  [defect]
+=2005-06/_/food_acquired.py= reads =s8hq4..s8hq12= and skips =s8hq3=, on the
+strength of the Stata label "number of units consumed" and the ledger's
+reading of it as a total (=.coder/ledger/ghanalss-visit-offset.md= s5;
+CONTENTS.org l.1284-1288 "own production only from the 3rd").  Both are
+wrong:
+- The questionnaire (=G5QPartB.pdf= p.17, printed 8.11) heads columns 3..12
+  "2nd 3rd ... 11th" and each asks "How much of own produced ... was
+  consumed by the household since my last visit?".  Column 3 IS the 2nd visit.
+- The data agree: =s8hq3 < sum(s8hq4..s8hq12)= in 27,314 rows -- a total
+  cannot be smaller than the sum of its parts -- and =s8hq3= behaves exactly
+  like =s8hq3= in 1991-92/1998-99/2012-13, where it is labelled the 2nd visit.
+- Loss: 21,493 positive records; 1,959 (household, item) pairs vanish
+  entirely; 57 households lose all own-production; 13.4% of the wave's
+  summed own-production quantity (native units, indicative).
+Consequences: the "10 / 9" consumption-occasions cell for GLSS5 in
+CONTENTS.org l.1261 should read 10 / 10; the "weakest first-ask step
+(1.02x)" remark at l.1467 is an artefact; and GLSS5 is NOT the counter-example
+the ledger used to argue that =visit= must be the calendar number rather
+than a per-module ordinal (the two modules DO share a first occasion).  The
+calendar-number decision still stands on its other merits.
+Third corroboration: =s8hq3= is positive in 21,493 rows against 18,336 for
+=s8hq4= -- the first-ask excess CONTENTS.org documents at visit 2 in every
+other wave, at exactly the column argued here to be visit 2.
+Fix: read =s8hq3= as visit 2 (map q3..q12 -> 2..11), rebuild, re-derive the
+first-ask table.  One-line script change, but three things cascade:
+- =tests/test_ghanalss_visit_alignment.py:73= pins 2005-06 produced at
+  =range(3, 12)= and l.269 excludes 2005-06 from a shared-first-occasion
+  check "on purpose".  The test currently guards the wrong answer and goes
+  red on the fix until corrected.
+- =.coder/coverage/food_recall.csv:22= / =GhanaLSS/_/recall.yml= record
+  2005-06 as =within_wave_variation: by-s= with "10 purchased / 9 produced"
+  asks; both modules are 2..11, so the flag falls (and the spacing is now
+  established at 3 days from =secb2=, see part 1).
+- CONTENTS.org l.1261, l.1284-1288, l.1467 and the ledger s5 need the
+  correction quoted, not silently overwritten.
+
+** 2.2 GLSS1/GLSS2 1987-88, 1988-89: the produced side is a value PER EATING OCCASION, not a recall total  [defect]
+Both wave scripts emit =Y12B.VFOODCPD= as the "per-recall value" of own
+production (docstrings call it "produced_value per day" -- a claim that
+entered in =c404b7fb2= with no source) beside =Y12A.CFOODBLV= ("amount spent
+since my last visit").  Section 12B has no since-last-visit question at all
+(questionnaire PDF p.68 / printed 43a; Interviewer manual printed p.71; BID
+printed p.2: "Section 12B asks the amount consumed and market value of foods
+grown or raised by the household in the last twelve months"): it asks the
+months consumed in the past 12 (=MFOODCLY=), how many times per
+day/week/month/quarter/half-year/year (=TFOODC= with time-unit code
+=UTFOODC= 3..8), and "How much would it cost to buy the amount they ate each
+time?" (=VFOODCPD=).
+
+*Verified against GSS's own construction, not by elimination.*  The BID
+(printed p.22) defines =EXPEND.HPFOOD= as "the value of home produced food
+consumed in the last year calculated from Section 12B".  Summing
+=VFOODCPD x TFOODC x (30.4 / days_per_unit) x MFOODCLY= per household
+reproduces =HPFOOD= with median ratio 1.020 (IQR 1.015-1.03; the residual is
+30.4 vs 30 days per month) in both waves (n = 2,253 / 2,437 households);
+treating =VFOODCPD= as a per-DAY value gives 2.1-2.5x; the raw served value
+is 1.3-1.7% of =HPFOOD=.  So the served produced row is one meal's worth
+while the purchased row is ~14 days' worth.  Scale, summed over the wave: a
+14-day equivalent (=VFOODCPD x TFOODC x 14/unit_days=) is 4.5-5.1x the
+served value inside a consuming month and 2.3-3.0x averaged over the year;
+the served own-production share of food is 17-18% and would be 33-52% on a
+like-for-like window.
+
+Fix: construct the produced value on the purchase window (or annualise
+both sides; =EXPEND.PFOOD=/=HPFOOD= are the GSS annual constructions and are
+shipped) in the two wave scripts; correct CONTENTS.org l.1242 / l.1258
+(both modules are NOT "since my last visit") and the two docstrings.  Also
+record the manual's rule that 12A falls back to "the past two weeks" when
+the R1->R2 gap is <7 or >21 days (~300 households).
+
+** 2.3 Instrument-level gaps (real, not the library's)
+- Purchases carry NO quantity or unit before 2016-17: 12A (1987-89), 9B in
+  GLSS3/4/5/6 ask "how much was spent" only (questionnaire pages quoted in
+  the wave files).  =u='Value'= is the right encoding.  The recovery route is
+  the wave's own price survey (=community_prices=), GH #770 step 2.
+- Own production carries no VALUE before 2016-17 (only quantity, unit and a
+  farmgate unit price); =Expenditure= NaN on produced rows is correct.
+- GLSS3 rural households have 7 asks over 14 days vs urban 10 over 30 days
+  (already in CONTENTS.org); 11 loc2-urban clusters ran the rural schedule,
+  so a =loc2=-based rescale is wrong for them.
+
+** 2.4 Checked and NOT a problem
+- =g7sec9b_small.dta= (2016-17) is the full file with all-missing rows
+  dropped (commit =6abd1ebb=, 2023-11-17); columns are complete.
+- 1991-92 =s9bq1= (16.2% of GLSS3 purchases) -- already fixed on GitHub
+  development, =87c1c252d=.
+- Every other wave reads all its 9B and 8H visit columns (verified against
+  the shipped column lists).
+- Household coverage of 9B/8H vs Section 0 is within 0.1-0.6% per wave.
