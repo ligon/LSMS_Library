@@ -2006,3 +2006,44 @@ is not a unit; exclude it before any per-unit aggregation.
 The old construction was a derivation and was un-registered; the new one is
 a *read*.  =produced= is now the number the household gave to Q5.  There is
 nothing left to register.
+
+** Downstream: =food_quantities(units='kgs')=, and a framework defect this exposed
+
+Kilograms on the =u = 'kg'= rows, before -> after (the whole =food_quantities=
+kg total goes 747,006 -> 1,734,734):
+
+| wave    | s         | kg before | kg after |
+|---------+-----------+-----------+----------|
+| 2011-12 | purchased |    45,961 |  802,677 |
+|         | produced  |    80,271 |  291,163 |
+|         | inkind    |         - |    8,771 |
+| 2013-14 | purchased |    66,826 |   70,904 |
+|         | produced  |    72,153 |   65,230 |
+|         | inkind    |         - |    7,545 |
+| 2015-16 | purchased |    89,099 |   90,251 |
+|         | produced  |    60,044 |   49,853 |
+|         | inkind    |         - |   10,189 |
+| 2018-19 | purchased |   133,825 |  136,248 |
+|         | produced  |    59,079 |   50,024 |
+|         | inkind    |         - |    8,925 |
+| 2021-22 | purchased |   109,641 |  112,427 |
+|         | produced  |    30,107 |   26,126 |
+|         | inkind    |         - |    4,401 |
+
+2013-14 onward move by a few percent in the direction the change predicts
+(gifts leave =produced=, purchases stop being truncated).  *2011-12 does not,
+and should not be read as a correction*: its 17.5x purchased and 3.6x produced
+are the 1000x data-entry slips named above -- rows the old =min(Q2, Q3)=
+happened to suppress because it compared them against a sane Q2.  Nothing in
+this table is clipped; W1's own answer key is its questionnaire, not its
+arithmetic.
+
+*A framework defect fell out of this.*  =transformations.food_kg_factors= did
+not exclude the missing-unit sentinel from its inferred rungs, though the crop
+twin (=harvest_kg_factors=) always has.  So Ethiopia's 22 unit-less W1 rows
+were pooled into one "unit" and served a u-pooled *0.571 kg per unit*,
+delivering *9.88M kg of a 12.47M kg country total*.  Fixed in the same branch
+(a separate commit) by applying =_unit_sentinel_mask= on the food side too;
+measured across all nine warm food countries, *only Ethiopia moves* --
+Malawi (441 sentinel rows), Niger (12) and GhanaLSS (13,380) were already
+getting no inferred factor there.  The numbers above are post-fix.
