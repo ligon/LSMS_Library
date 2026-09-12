@@ -1781,7 +1781,7 @@ verified -- but that is convergence by hand, one table at a time, and
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:
-** TODO =crop_production.intercropped= is wired to the SEED-USE question
+** DONE =crop_production.intercropped= was wired to the SEED-USE question
 
 Found 2026-07-21 while closing the "silent colmap" gap above, by reading
 the Stata variable labels of every column =CROP_COLMAPS[...]['intercrop']=
@@ -1815,10 +1815,87 @@ The two are near-independent, so the current column is close to noise:
 51.8% / 52.5% of rows (2011-12 … 2019-20) — a coin flip.  The "yes"
 rates differ too (33–42% wired vs 50–58% true crop-stand).
 
-*Any analysis using =crop_production.intercropped= today is using the
-seed-purchase question.*  Rewiring MOVES data (and would newly populate
-2009-10 and 2010-11, which are 100% NaN today), so it is a separate change
-with its own before/after — not folded into a comment-and-tests PR.
+*Any analysis using =crop_production.intercropped= before 2026-09-12 was
+using the seed-purchase question.*
+
+*** Fixed 2026-09-12 — GH #872
+
+Every wave's =CROP_COLMAPS[t]['intercrop']['flag']= now points at the
+crop-stand column (=a4aq7= 2009-10/2010-11, =a4aq8= 2011-12…2015-16,
+=s4aq08= 2018-19/2019-20).  The =2 -> True= recode is unchanged and is
+exactly right for {1 Pure Stand, 2 Mixed/Inter cropped}.
+
+Measured on the raw AGSEC4A of all seven waves: the crop-stand column
+takes values in ={1, 2, NA}= *only* — no 0/9/99 sentinel anywhere — so
+=bool(int(c) == 2)= cannot silently turn a "don't know" into "pure
+stand".  The old seed-use column was equally clean; the problem was
+never the codes, it was the question.
+
+Two waves were newly populated.  2010-11's entry named =a4aq3=, a column
+that wave does not ship, so it had been NaN throughout (set to =None= in
+2026-07, then wired here).  2009-10's entry was =None= behind a comment
+claiming AGSEC4A had "no parcel/plot/cropID in the form the join needs";
+*that comment was wrong* — the wave simply uses question-numbered id
+columns (=a4aq2= Parcel ID, =a4aq4= Plot ID, =a4aq6= Crop Code) instead
+of =parcelID=/=plotID=/=cropID=.  Join coverage, measured:
+
+| wave    | AGSEC5A rows hitting an AGSEC4A key | AGSEC5B |
+|---------+-------------------------------------+---------|
+| 2009-10 | 100.00%                             | 74.45%  |
+| 2010-11 | 99.25%                              | 88.15%  |
+
+Served =crop_production= before/after (row count unchanged at 130 606):
+
+| wave    | non-NA before | non-NA after | True before | True after | share True before | share True after | row agreement |
+|---------+---------------+--------------+-------------+------------+-------------------+------------------+---------------|
+| 2009-10 |             0 |       20 271 |           0 |     11 495 | —                 |            0.567 | —             |
+| 2010-11 |             0 |       19 757 |           0 |     11 553 | —                 |            0.585 | —             |
+| 2011-12 |        17 763 |       17 757 |       6 954 |     10 139 |             0.391 |            0.571 |         0.498 |
+| 2013-14 |        15 339 |       15 339 |       6 316 |      8 537 |             0.412 |            0.557 |         0.505 |
+| 2015-16 |        17 367 |       17 367 |       7 224 |      9 428 |             0.416 |            0.543 |         0.520 |
+| 2018-19 |        10 993 |       10 933 |       4 178 |      5 378 |             0.380 |            0.492 |         0.526 |
+| 2019-20 |        14 163 |       14 129 |       5 957 |      7 746 |             0.421 |            0.548 |         0.616 |
+| *total* |        75 625 |      115 553 |      30 629 |     64 276 |                   |                  |         0.531 |
+
+("row agreement" = share of served rows non-NA on both sides where the
+old and new booleans coincide — a coin flip, as the raw-level 48–53%
+predicted.  The 2018-19 / 2019-20 "newly NA" counts, 68 and 34 rows, are
+plots where the seed-use question was answered and the crop-stand one was
+not.)
+
+*** The flag is read at PLOT grain from a plot-CROP file — and that is now defensible
+
+=inter_lookup= is keyed =(hh, parcel, plot)= while AGSEC4A is plot-crop
+grain, so duplicate crop rows on one plot are last-write-wins.  Measured
+share of plots whose crop rows *disagree*:
+
+| wave    | crop-stand column (now) | seed-use column (before) |
+|---------+-------------------------+--------------------------|
+| 2009-10 |                   0.17% | —                        |
+| 2010-11 |                   0.31% | —                        |
+| 2011-12 |                   0.17% |                   11.58% |
+| 2013-14 |                   0.07% |                   11.05% |
+| 2015-16 |                   0.00% |                   11.93% |
+| 2018-19 |                   0.02% |                   10.94% |
+| 2019-20 |                   0.00% |                   10.10% |
+
+The crop-stand question genuinely *is* plot-level (the survey asks it once
+per plot and repeats the answer down the crop roster), so reading it at
+plot grain is right and the 0–0.31% residue is enumerator noise.  The
+seed-use question is *crop*-level — "did you use seed for THIS crop" — so
+10–12% of plots gave two different answers and =last-write-wins= was
+picking one at random.  The old wiring was the wrong question AND the
+wrong grain.
+
+*** Known limitation, unchanged by this fix
+
+AGSEC4A is the FIRST-season (A) plot-crop roster.  Its flag is carried
+onto season-B harvest rows as well, because the join key is
+=(hh, parcel, plot)= with no season level.  A plot's crop stand can differ
+between the two seasons, so season-B =intercropped= is season A's answer.
+This is the pre-existing join (it governs =perennial= and
+=planting_month= too) and was not changed here; it is recorded so nobody
+reads a season-B value as a season-B measurement.
 
 ** DONE 2010-11 intercrop flag named a column that does not exist
 
@@ -1831,6 +1908,9 @@ the config now states what the build already did and the strict check
 above can be applied uniformly.  Note this wave DOES carry =a4aq7=
 "Cropping system" {1: Pure Stand, 2: Inter cropped}; wiring it belongs
 with the item above.
+
+*Superseded 2026-09-12 by GH #872*: =a4aq7= is now wired, and the wave
+serves 19 757 non-NA =intercropped= rows (58.5% True) where it served 0.
 
 ** DONE 2018-19 AGSEC5B harvest unit is available but not wired (GH #842)
 

@@ -225,6 +225,12 @@ Data Scheme:
       type: str
       optional: true
     harvest_month: int
+    # The plot's CROPPING SYSTEM, from AGSEC4A: `a4aq7` "Cropping system"
+    # {1 Pure Stand, 2 Inter cropped} in 2009-10/2010-11, `a4aq8` / `s4aq08`
+    # "What type of crop stand was on the plot?" {1 Pure Stand, 2 Mixed
+    # Stand} from 2011-12 on.  True = mixed/inter-cropped.  Until GH #872
+    # this was wired to the SEED-USE question instead, so True meant "did
+    # NOT use seed"; see uganda.CROP_COLMAPS and CONTENTS.org.
     intercropped: bool
     # SURVEY-REPORTED kilograms per ONE unit of the row's `u` -- UNPS
     # question 6d, "Record the conversion factor into kg", asked beside

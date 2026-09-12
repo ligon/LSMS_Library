@@ -1303,7 +1303,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         w4 = f"{t!r}]['intercrop'"
         if ic.get('flag'):
             flagcode = _to_int_code(_require(df4a, ic['flag'], w4, 'intercrop flag'))
-            # 1 = mono/No, 2 = Yes  (recode mirrors WB: 2 -> True)
+            # {1: Pure Stand, 2: Mixed/Inter cropped} -> 2 is True (GH #872).
             for k, c in zip(key3, flagcode):
                 if pd.notna(c):
                     inter_lookup[k] = bool(int(c) == 2)
@@ -1695,15 +1695,28 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 # that a wave records no such column -- that is a survey fact and is auditable;
 # a name that does not resolve is a config bug and used to be invisible.
 #
-# KNOWN DEFECT, deliberately not fixed here: every `intercrop.flag` below
-# points at the SEED-USE question ("did you use any seed/seedlings?",
-# {1: Yes, 2: No}), not at the cropping-system question (`a4aq7` "Cropping
-# system" {1: Pure Stand, 2: Inter cropped} in 2009-10/2010-11, `a4aq8` /
-# `s4aq08` "What type of crop stand was on the plot?" {1: Pure Stand,
-# 2: Mixed Stand} from 2011-12 on).  So `intercropped` currently means "did
-# NOT use seed", and agrees with the true crop-stand answer on only 48-53%
-# of rows.  Rewiring MOVES data, so it needs its own before/after; see
-# CONTENTS.org "Known Issues".
+# `intercrop.flag` is the CROPPING-SYSTEM question, in every wave -- GH #872.
+# It used to point at the SEED-USE question ("did you use any seed/
+# seedlings?", {1: Yes, 2: No}: `a4aq3` 2011-12, `a4aq16` 2013-14/2015-16,
+# `s4aq16` 2018-19/2019-20), so a served `intercropped=True` meant "did NOT
+# use seed" and agreed with the real crop stand on 48.5/48.8/52.5/51.8/52.5%
+# of rows -- a coin flip.  The right column was in the SAME file all along:
+#   2009-10, 2010-11     `a4aq7`   "Cropping system"  {1 Pure Stand, 2 Inter cropped}
+#   2011-12 .. 2015-16   `a4aq8`   "What type of crop stand was on the plot?"
+#   2018-19, 2019-20     `s4aq08`  same wording       {1 Pure Stand, 2 Mixed Stand}
+# All seven take values in {1, 2, NA} only (measured; no 9/99/0 sentinel),
+# so the `2 -> True` recode is exactly right for them.
+#
+# The flag is keyed (hh, parcel, plot) while AGSEC4A is plot-CROP grain, so
+# duplicate crop rows on one plot are last-write-wins.  For the crop-stand
+# question that is near-harmless -- it is genuinely a plot-level question and
+# 0.00-0.31% of plots disagree across their crop rows (vs 10-12% for the
+# seed-use column it replaces, which was crop-level and so had no business
+# being read at plot grain either).
+#
+# AGSEC4A is the FIRST-season (A) plot-crop roster; its flag is carried onto
+# season-B harvest rows too.  Pre-existing join, unchanged here; see
+# CONTENTS.org.
 CROP_COLMAPS = {
     '2009-10': {
         # `qty_sentinel: 99999` -- GH #861.  a5aq6a/a5bq6a use 99999 as a
@@ -1721,11 +1734,15 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
                               'month': None, 'qty_sentinel': 99999}]},
-        # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
-        # a4aq4, no parcel/plot/cropID in the form the join needs), so the
-        # intercrop flag is not cleanly joinable -> intercropped is NaN
-        # this wave.
-        'intercrop': None,
+        # 2009-10 AGSEC4A is the one wave with question-numbered id columns
+        # (`a4aq2` Parcel ID, `a4aq4` Plot ID, `a4aq6` Crop Code) instead of
+        # parcelID/plotID/cropID.  A comment here used to claim they were
+        # "not in the form the join needs"; measured, they are -- 100.00% of
+        # AGSEC5A and 74.45% of AGSEC5B rows hit an AGSEC4A key (5B is the
+        # SECOND season; AGSEC4A rosters the first, so the shortfall is a
+        # survey fact, not a key mismatch).  GH #872.
+        'intercrop': {'hhid': 'HHID', 'parcel': 'a4aq2', 'plot': 'a4aq4',
+                      'flag': 'a4aq7', 'crop': 'a4aq6'},
     },
     '2010-11': {
         'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
@@ -1738,18 +1755,16 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
                               'month': None}]},
-        # `flag: None` is a MEASUREMENT, not a guess: 2010-11 AGSEC4A ships
-        # ['HHID','prcid','pltid','cropID','a4aq7'..'a4aq14'] and has no
-        # `a4aq3` at all, so the previous 'a4aq3' entry silently resolved to
-        # nothing and `intercropped` was NaN on all 20 970 rows of this wave.
-        # Writing None makes the config say what the build already did (a
-        # provable no-op) instead of naming a column that does not exist.
-        # NOTE the wave DOES carry a cropping-system question — a4aq7,
-        # "Cropping system", value-labelled {1: Pure Stand, 2: Inter cropped}.
-        # Wiring it would ADD data, so it is a separate change with its own
-        # before/after; see CONTENTS.org "Known Issues".
+        # 2010-11 AGSEC4A ships ['HHID','prcid','pltid','cropID',
+        # 'a4aq7'..'a4aq14'] and has NO `a4aq3` -- the seed-use column this
+        # entry named until 2026-07 does not exist here, so the flag silently
+        # resolved to nothing and `intercropped` was NaN on the whole wave.
+        # It was set to None (a provable no-op) pending GH #872; now wired to
+        # `a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, the
+        # question that was there all along.  This ADDS data to the wave.
+        # Join coverage measured: 99.25% of AGSEC5A rows, 88.15% of AGSEC5B.
         'intercrop': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
-                      'flag': None, 'crop': 'cropID'},
+                      'flag': 'a4aq7', 'crop': 'cropID'},
     },
     '2011-12': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1777,7 +1792,7 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq3', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
     },
     '2013-14': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1793,7 +1808,7 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
     },
     '2015-16': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1809,7 +1824,7 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
     },
     '2018-19': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
@@ -1825,7 +1840,7 @@ CROP_COLMAPS = {
                               'value_sold': 's5bq08_1',
                               'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
     },
     '2019-20': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
@@ -1846,7 +1861,7 @@ CROP_COLMAPS = {
                               'value_sold': 's5bq08_1',
                               'month': 's5bq06f_1'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
     },
 }
 
