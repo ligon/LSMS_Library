@@ -904,7 +904,9 @@ class Wave:
         # Two layers (GH #522): (1) file-hash each module's OWN body -- so e.g.
         # _age_helpers.py's _clean_year/apply_age_handler is versioned; (2) fold
         # the lsms_library-import CLOSURES those modules reach (age_handler,
-        # conversion_table_matching_global, ...).  Best-effort; never raises.
+        # conversion_table_matching_global, ...).  Best-effort under the normal
+        # warning policy; callers promoting RuntimeWarning to errors can make
+        # this wave-level gate raise.
         try:
             cdir = self.country.file_path / "_"
             wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
@@ -927,8 +929,13 @@ class Wave:
             fw_c = framework_imports_fingerprint(country_pys)
             if fw_w or fw_c:
                 parts.append(f"fwimp={fw_w}:{fw_c}")
-        except Exception:
-            pass
+        except Exception as exc:
+            warnings.warn(
+                f"Framework import fingerprint unavailable for {self.file_path} "
+                f"table {table!r}; cache invalidation is degraded: "
+                f"{type(exc).__name__}: {exc}",
+                RuntimeWarning, stacklevel=2,
+            )
 
         # Build-path framework transform CODE (GH #522 / cache step 2): version
         # the @build_transform closure relevant to this table, so editing e.g.
@@ -3331,7 +3338,16 @@ class Country:
             try:
                 country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
                 fwimp = framework_imports_fingerprint(country_pys)
-            except Exception:
+            except Exception as exc:
+                # Normally retain the partial hash. If the caller promotes
+                # this warning to an error, the existing outer catch returns
+                # None, as it does for other country-hash failures.
+                warnings.warn(
+                    f"Framework import fingerprint unavailable for {self.file_path} "
+                    f"table {method_name!r}; cache invalidation is degraded: "
+                    f"{type(exc).__name__}: {exc}",
+                    RuntimeWarning, stacklevel=2,
+                )
                 fwimp = ""
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
                        + f"btf={btf}\x1f"

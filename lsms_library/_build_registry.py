@@ -57,6 +57,7 @@ import functools
 import hashlib
 import importlib
 import inspect
+import re
 import sys
 import textwrap
 import types
@@ -300,6 +301,10 @@ def _ser(obj, seen, parts) -> str:
     their source is folded into ``parts`` (so a callable held in a registry dict
     -- e.g. ``_DERIVED_TRANSFORMERS`` -- is versioned by *code*, not address).
     """
+    # GH #780: pattern text (including str/bytes type) and flags determine
+    # matching behavior; reuse the deterministic dispatch (ledger #780, §4).
+    if isinstance(obj, re.Pattern):
+        return f"<re.Pattern {obj.pattern!r} flags={obj.flags}>"
     if isinstance(obj, (str, int, float, bool, type(None))):
         return repr(obj)
     if callable(obj) and _is_ours(obj):
@@ -324,7 +329,7 @@ def _ser(obj, seen, parts) -> str:
 
 
 # Types we know how to fold into the fingerprint as a referenced constant.
-_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool)
+_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern)
 
 
 def _all_co_names(code) -> set:
