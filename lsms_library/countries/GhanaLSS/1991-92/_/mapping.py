@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
-from importlib.resources import files
+from lsms_library.paths import countries_root
 
-path = files('lsms_library')/'countries'/'GhanaLSS'/'1991-92'
+path = countries_root()/'GhanaLSS'/'1991-92'
 
 def _code_label_map(tablename, dirs):
     '''Read a Code -> Label org table into a {int code: label} dict.

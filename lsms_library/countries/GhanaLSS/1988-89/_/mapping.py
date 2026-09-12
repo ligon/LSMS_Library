@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
-from importlib.resources import files
+from lsms_library.paths import countries_root
 
-path = files('lsms_library')/'countries'/'GhanaLSS'/'1988-89'
+path = countries_root()/'GhanaLSS'/'1988-89'
 _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
 
 # A bare tools.get_categorical_mapping(tablename=...) returns an EMPTY dict --
