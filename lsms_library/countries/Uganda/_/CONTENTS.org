@@ -1863,6 +1863,26 @@ predicted.  The 2018-19 / 2019-20 "newly NA" counts, 68 and 34 rows, are
 plots where the seed-use question was answered and the crop-stand one was
 not.)
 
+*** Independent corroboration of the crop-stand reading
+
+Two checks, neither of which uses the variable label:
+
+1. 2009-10 and 2010-11 ship =a4aq9=, "If intercropped what percentage of
+   intercropped area was under this crop".  It is a skip-pattern child of
+   =a4aq7=, so it should be populated iff =a4aq7 == 2=.  Measured: 96.6% /
+   98.8% populated where =a4aq7 == 2=, 0.2% / 1.2% where =a4aq7 == 1=.
+
+2. 2013-14 and 2015-16 ship WB-derived =numcrops= (number of crops on the
+   plot).  =(numcrops == 1)= equals =(a4aq8 == 1)= on *99.61%* / *99.96%*
+   of rows — the World Bank's own derivation agrees that =a4aq8= is the
+   crop-stand question.
+
+The other two WB-derived columns in those files are *not* usable as a
+check and should not be mistaken for one: =intcrp= is 1 on 13 of 10 550
+rows (2013-14) and 4 of 10 823 (2015-16), and =pure= is 1 on 28 rows /
+0 rows.  Both are near-constant, so any "agreement" against them is an
+artefact of the base rate, not evidence.  They are not intercrop flags.
+
 *** The flag is read at PLOT grain from a plot-CROP file — and that is now defensible
 
 =inter_lookup= is keyed =(hh, parcel, plot)= while AGSEC4A is plot-crop

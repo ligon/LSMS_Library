@@ -153,7 +153,11 @@ def test_colmap_never_wires_a_seed_use_column(uganda_module):
 def test_colmap_every_wave_populates_intercropped(uganda_module):
     """All seven waves ship a crop-stand question, so none may serve NA for
     want of a wired column.  2009-10 and 2010-11 were 100% NaN before #872."""
-    assert set(uganda_module.CROP_COLMAPS) == set(CROP_STAND)
+    assert set(uganda_module.CROP_COLMAPS) == set(CROP_STAND), (
+        "a wave was added to or removed from CROP_COLMAPS: decide its intercrop "
+        "wiring (the crop-stand question in its AGSEC4A) and add it to CROP_STAND "
+        "and AGSEC4A here -- GH #872"
+    )
     for wave, colmap in uganda_module.CROP_COLMAPS.items():
         ic = colmap.get("intercrop")
         assert ic and ic.get("flag"), f"{wave}: no intercrop flag wired"
