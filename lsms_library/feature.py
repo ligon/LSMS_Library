@@ -572,7 +572,10 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # reduce.  The reduced columns are excluded from the completeness score
     # because their served value does not come from the selected row.
     reduced = set(present)
-    if present and _DERIVATION_COLUMN in df.columns:
+    if _DERIVATION_COLUMN in df.columns:
+        # On BOTH branches: a library-computed provenance flag must not decide
+        # which survey row is served.  Same rule as
+        # country._normalize_dataframe_index (GH #871).
         reduced.add(_DERIVATION_COLUMN)
     out = most_complete_row(df, levels, exclude=reduced)
     if not present:

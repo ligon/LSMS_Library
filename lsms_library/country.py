@@ -5858,9 +5858,11 @@ def _collapse_to_cluster_grain(
         _record_grain_report(report)
 
     # GH #871: SELECT one of the cluster's households, not a composite of them.
-    # `Derivation` is excluded from the completeness score only where core
-    # reduces it, which it does not here -- so nothing is excluded at this site.
-    return most_complete_row(df, keep_levels)
+    # `Derivation` never votes on which household is served -- it is a
+    # library-computed provenance flag, not survey content.
+    return most_complete_row(df, keep_levels,
+                             exclude={_DERIVATION_COLUMN}
+                             if _DERIVATION_COLUMN in df.columns else ())
 
 
 def _sum_min_count_1(x):
@@ -5890,10 +5892,12 @@ def most_complete_row(df: pd.DataFrame, levels: list[str],
     rather than arbitrary it selects the most complete one:
 
     - completeness = the count of non-NA cells over ``df.columns`` minus
-      ``exclude`` -- the columns that have NO declared reducer.  A column core
-      reduces (``_ADDITIVE_MEASURE_COLUMNS``, summed; ``Derivation``, unioned on
-      that branch) does not get a vote on which row is served, because its
-      served value does not come from that row.
+      ``exclude``.  Callers exclude two things: a column core REDUCES
+      (``_ADDITIVE_MEASURE_COLUMNS``, summed -- its served value does not come
+      from the selected row at all), and ``Derivation``, which is a
+      library-computed provenance flag rather than survey content and must not
+      decide which of two SURVEY rows is served -- on EITHER branch, even where
+      it rides along with the selected row rather than being unioned.
     - ties break on ORIGINAL ORDER, so a group whose rows are equally complete
       is served its first row -- what the old reducer did when nothing was
       missing.
@@ -6108,12 +6112,15 @@ def _normalize_dataframe_index(
                               additive_reconciled=reconciled)
 
         # GH #871: SELECT an observed row for every column core does not reduce.
-        # The reduced columns are excluded from the completeness score because
-        # their served value does not come from the selected row: the additive
-        # measures are summed, `Price` is re-derived from those sums, and
-        # `Derivation` is the union of the group's keys.
+        # The additive measures are excluded from the completeness score because
+        # their served value does not come from the selected row (they are
+        # summed; `Price` is re-derived from those sums).  `Derivation` is
+        # excluded on BOTH branches, deliberately: it is a library-computed
+        # provenance flag rather than survey content, so it must never decide
+        # which of two SURVEY rows is served -- not even on the selection branch,
+        # where it rides along with the row it was written on.
         reduced = set(present_additive)
-        if present_additive and _DERIVATION_COLUMN in df.columns:
+        if _DERIVATION_COLUMN in df.columns:
             reduced.add(_DERIVATION_COLUMN)
         selected = most_complete_row(df, present_levels, exclude=reduced)
 

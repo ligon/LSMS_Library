@@ -165,9 +165,10 @@ they become lossless union+sentinel.
 value of EACH COLUMN INDEPENDENTLY, so a disagreeing group was served a
 per-column COMPOSITE that exists nowhere in the survey.  Core now SELECTS an
 observed row -- =country.most_complete_row(df, levels, exclude=())=, the group's
-most complete row (fewest NA cells over the columns core does NOT reduce; ties on
-original order), narrowed to =levels= and key-sorted so shape and row order do
-not move.  This REVERSES the 2026-07-13 "complementary missingness is COMPLETION"
+most complete row (fewest NA cells over the columns core does NOT reduce -- the
+additive measures, plus =Derivation=, which is a library-computed provenance flag
+and must not decide which SURVEY row is served; ties on original order), narrowed
+to =levels= and key-sorted so shape and row order do not move.  This REVERSES the 2026-07-13 "complementary missingness is COMPLETION"
 doctrine of §3a, which was argued against the wrong alternative
 (=first(skipna=False)=, which blanks a cell even where the group agrees and only
 one row reports).  Completion keeps its legitimate home in

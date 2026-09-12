@@ -16,9 +16,10 @@ doctrine on 2026-09-12.  Core now selects, via ONE named helper
 
 Semantics pinned here:
 
-- completeness = count of non-NA over the columns core does NOT reduce
-  (``_ADDITIVE_MEASURE_COLUMNS`` are summed, ``Derivation`` is unioned on that
-  branch, so neither votes on which row is served);
+- completeness = count of non-NA over the columns core does NOT reduce: the
+  additive measures (``_ADDITIVE_MEASURE_COLUMNS``, summed), plus ``Derivation``
+  on BOTH branches -- a library-computed provenance flag must not decide which
+  SURVEY row is served, even where it rides along with the selected row;
 - argmax with FIRST-OCCURRENCE tie-break;
 - rows come back in group-key order, as ``first()`` returned them;
 - a NaN in a declared index level is still DELETED by groupby's dropna
@@ -205,6 +206,20 @@ def test_rows_come_back_in_group_key_order():
     assert list(out.index) == [("2020", "i1"), ("2020", "i2"), ("2020", "i3")]
 
 
+def test_key_order_matches_first_even_on_a_categorical_level():
+    """``groupby(sort=True)`` orders a categorical level by CATEGORY CODE, not
+    lexically.  ``most_complete_row`` sorts the selected frame instead, so this
+    is the one place the "row order does not move" claim could quietly fail."""
+    t = pd.Categorical(["zulu", "alpha", "zulu", "mike"],
+                       categories=["zulu", "mike", "alpha"], ordered=False)
+    idx = pd.MultiIndex.from_arrays([t, ["i1", "i1", "i1", "i2"]], names=["t", "i"])
+    df = pd.DataFrame({"A": ["a1", "a2", pd.NA, "a4"]}, index=idx)
+    expected = df.groupby(level=["t", "i"], observed=True).first()
+    out = most_complete_row(df, ["t", "i"])
+    assert out.index.equals(expected.index), (
+        f"{list(out.index)} != {list(expected.index)}")
+
+
 def test_a_nan_key_row_is_still_deleted_outright():
     """GH #323 §3b: reported, not fixed.  It must not move as a side effect."""
     rows = [("2020", "i1", pd.NA, "b1"),
@@ -331,8 +346,8 @@ def test_union_keys_splits_existing_multi_values_and_stays_countable():
 
 
 def test_derivation_does_not_vote_on_which_row_is_served():
-    """A reduced column's served value does not come from the selected row, so it
-    must not decide WHICH row that is."""
+    """A reduced column must not decide WHICH row is served: its served value
+    does not come from the selected row at all."""
     key = ("2020", "i1", "Rice", "Kg")
     df = _food([(key, 2.0, 100.0, 50.0, pd.NA, "Testland::food_acquired::a"),
                 (key, 3.0, 200.0, 66.7, "gift", pd.NA)])
@@ -341,6 +356,40 @@ def test_derivation_does_not_vote_on_which_row_is_served():
         "the row with the Derivation key was served on the strength of a column "
         "core reduces")
     assert out.loc[key, DERIVATION] == "Testland::food_acquired::a"
+
+
+@ALL_SITES
+def test_derivation_does_not_vote_on_the_SELECTION_branch_either(site):
+    """Excluded from the score on BOTH branches, which is not symmetry for its
+    own sake: ``Derivation`` is a LIBRARY-COMPUTED provenance flag, not survey
+    content, so a row must not be served because the library happened to stamp
+    it.  Here both rows report exactly one survey value, so the tie breaks on
+    original order and row 0 wins -- even though row 1 carries a key and would
+    score higher if the flag counted."""
+    rows = _rows_for(site, [("a1", pd.NA), ("a2", pd.NA)])
+    cols = _cols_for(site)
+    idx_names = ["t", "v", "i"] if site is _site2 else ["t", "i"]
+    n_key = len(idx_names)
+    idx = pd.MultiIndex.from_tuples([r[:n_key] for r in rows], names=idx_names)
+    df = pd.DataFrame([list(r[n_key:]) for r in rows], index=idx, columns=list(cols))
+    df[DERIVATION] = [pd.NA, "x::t::k"]
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        if site is _site2:
+            out = _collapse_to_cluster_grain(df, ["t", "v"],
+                                             country="Testland", wave="2020")
+        elif site is _site1:
+            out = C._normalize_dataframe_index(
+                df, SITE1_SCHEMA, wave="2020",
+                table_name="household_roster", country="Testland")
+        else:
+            out = F._collapse_duplicate_index(df, "household_roster",
+                                              country="Testland")
+    assert out.iloc[0][cols[0]] == "a1", (
+        "a Derivation key decided which survey row was served")
+    assert pd.isna(out.iloc[0][DERIVATION]), (
+        "and the served flag is the selected row's own -- no union off the "
+        "additive branch")
 
 
 def test_a_purchased_plus_derived_mix_is_not_reported_as_destroyed():
