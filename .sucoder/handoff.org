@@ -1,35 +1,30 @@
 #+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
-* State (2026-09-12)
-- Branch =development=, mirror published through d241d5d52.  Merged today
-  (each reviewed by a separate Opus agent; worktrees and branch refs
-  removed after merge): #878 Malawi grams constant (c04d5feef), #875
-  Ethiopia shocks one builder (668b047f6), #877 Niger 2011-12 hours /12
-  + declared missing codes (e847addfc), #872 Uganda intercropped per
-  season (f9d9489aa), #873 Feature() re-attaches recall + derivations
-  attrs (3f35b73ea), #874 Ethiopia produced/inkind from Q5/Q6 + kg
-  sentinel mask (e7570f6fc), #876 EHCVM purchased Expenditure as a
-  derivation, construction C, inkind rows (76199f590).
-- Yesterday: 8499ffed8 (derived-values mechanism + GhanaLSS 12B),
-  c4cb87162 (RecallRecord dict subclass), ddfe2726c (GLSS5 s8hq3).
-- Filed: #871 (PARKED by @ligon until other work calms), #879 Area/AreaUnit
-  two meanings, #880 GhanaSPS CONTENTS stale, #881 Nigeria W4
-  last-purchase pairing, #882 Niger 2011-12 participation periods, #883
-  __init__ submodule shadowing, #884 Site Q for food_acquired.Quantity.
-- Caches (shared, /global/scratch/.../cache/lsms_library): GhanaLSS,
-  Ethiopia, Niger, Uganda fully re-warmed at the merged hashes; the eight
-  EHCVM countries were being re-warmed at handoff time
-  (=/local/job38714904/tmp/claude-43292/rewarm_ehcvm.log=; if this job
-  died first, the next reader rebuilds on demand -- correct, just slow).
-  Malawi re-warms on next read (#878 moved malawi.py; five wave
-  parquets were rebuilt, the country-level ones by tests).
-- Tests: run the suite as CLAUDE.md addendum 3b says (=-n N
-  --dist=loadfile=, =LSMS_BUILD_WORKERS=1=).  Last full run
-  (pre-#873..#876) 5,666 passed / 17 known-red; the 17 are green since
-  c4cb87162.  A full run on 76199f590+ was pending the EHCVM re-warm.
-  Known pre-existing red: =test_gh842_uganda_harvest_unit::test_wired_unit_agrees_with_the_reported_kg_factor=
-  (74.7% vs 80% floor; reproduced on development before any of today's
-  merges).
+* State (2026-09-12, evening)
+- =development= published through 0f4eff9a7 on the mirror AND pushed to
+  GitHub; draft release PR development -> master is open (v0.12.0) with
+  the verified Closes list (=docs/releases/v0.12.0-closes.txt=); notes at
+  =docs/releases/v0.12.0.md=.  Merge with a merge commit, then tag v0.12.0
+  on master and =gh release create= (release skill; verify the publish
+  workflow fired).
+- Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
+  #872, #873, #874, #876, #871 (most-complete observed row at all three
+  collapses; reverses the 2026-07-13 completion doctrine), plus the
+  derivations user guide + CLAUDE.md section, the #871 census
+  (=bench/grain_census_871.py=), and the release notes.
+- Filed, open: #879-#884.  Follow-ups from #871: #866 (rule-less var/
+  targets do not rebuild on a hash move) was worked around by evicting
+  the 18 affected parquets and rebuilding; the fix is still open.
+- Caches: the WHOLE corpus was re-warmed after #871 (both tiers, from
+  L1), 36 countries + the two space-named ones + the 18 #866 tables; 0
+  build errors except Peru's known-absent cells.  Logs:
+  =/local/job38714904/tmp/claude-43292/rewarm_all/= (node-local; gone
+  with the job).
+- Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
+  #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
+  see the PR's status.  Recipe: CLAUDE.md addendum 3b.
+- Coverage regrade (=make matrix=) NOT run: it cold-builds and would not
+  fit the job; due before or right after the release.
 
 * Open questions for @ligon
 - All merged refs deleted (mirror and local).  #879-#884 filed for the
