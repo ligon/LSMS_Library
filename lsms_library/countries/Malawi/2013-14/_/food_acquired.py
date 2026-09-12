@@ -69,23 +69,18 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     ).rename({'factor': f'cfactor_{src}'}, axis=1)
 df = df.set_index(['j', 'i'])
 
-# Inline "300 grams"-style fallback per source.
-grams = r'(\d+)\s*g(?:\s+|r)'
-kgs = r'(\d+)\s*k(?:g|ilo)'
+# GH #878: an inline "300 grams" regex fallback used to be written into
+# cfactor here as ``x[c] or fallback``.  It never fired (``bool(nan)`` is
+# True, so the expression always returned the merged conversion-table
+# factor), and it is removed rather than repaired -- metric free-text
+# labels are converted at the single choke point in
+# food_acquired_to_canonical by _metric_kg_factor.  See Malawi/_/CONTENTS.org.
 
 for src in ('consumed', 'bought', 'produced', 'gifted'):
     detail_col = f'unitsdetail_{src}'
-    cfactor_col = f'cfactor_{src}'
-    quant_col = f'quantity_{src}'
     u_col = f'u_{src}'
     code_col = f'unitcode_{src}'
 
-    detail_lower = df[detail_col].astype(str).str.lower()
-    fallback = pd.concat([
-        detail_lower.str.extract(grams).astype(float) * 0.01,
-        detail_lower.str.extract(kgs).astype(float),
-    ], axis=0).dropna()
-    df[cfactor_col] = df.apply(lambda x, c=cfactor_col, f=fallback: x[c] or f, axis=1)
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
     df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])

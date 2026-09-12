@@ -3,7 +3,10 @@
 
 The live surface is three functions used by the four IHS3+ wave scripts
 (2010-11, 2013-14, 2016-17, 2019-20) to apply Malawi's region-keyed
-unit-conversion CSV and to handle "300 grams"-style free-text units.
+unit-conversion CSV and to resolve the other-specify free-text unit label.
+"300 grams"-style labels are NOT handled there: they are converted for
+every wave at the single choke point in ``food_acquired_to_canonical``, by
+``_metric_kg_factor`` (GH #878).
 Other helpers (roster decomposition, get_other_features, etc.) were
 removed in 2026-05-05 alongside the shadowed
 food_prices_quantities_and_expenditures.py — see GH #218.
@@ -37,18 +40,35 @@ class SaleAttachmentWarning(UserWarning):
 
 
 def _extract_kg_conversion(series):
-    """Extract kilogram conversion factors from a unit-detail string series.
+    """kg-per-unit factors parsed out of a free-text unit label.
 
-    Parses patterns like '300 grams', '1kg', '2 kilo' and returns
-    a Series of conversion factors in kilograms.
+    Reads a metric magnitude embedded in the label -- '300 grams' -> 0.3,
+    '50kg bag' -> 50 -- and returns a float Series ALIGNED to *series*
+    (NaN where neither pattern matches).
+
+    Two things were wrong here until GH #878 (2026-09-12).  Grams were
+    scaled by 0.01, so '300 grams' came back 3.0 kg instead of 0.3; and the
+    return was a ``concat(...).dropna()``, which only happened to align on
+    assignment because at most one of the two patterns ever matches a given
+    label -- had both matched, the duplicate index labels would have raised.
+    Neither defect ever reached a served number: the sole live caller is
+    the 2004-05 wave script, whose unit column is a closed 22-label set in
+    which nothing matches the grams pattern and only '50kg bag' / '90 kg
+    bag' match the kilogram one.  Grams-style free text in the IHS3+ waves
+    is converted at the single choke point in
+    :func:`food_acquired_to_canonical` by :func:`_metric_kg_factor`, whose
+    table has grams at the correct 0.001.
+
+    A kilogram match wins over a grams match on the same label; no label in
+    the corpus matches both, so that precedence is unexercised.
     """
     grams = r'(\d+)\s*g(?:\s+|r)'
     kgs = r'(\d+)\s*k(?:g|ilo)'
 
-    lower = series.str.lower()
-    conv = pd.concat([lower.str.extract(grams).astype(float) * 0.01,
-                      lower.str.extract(kgs).astype(float)], axis=0).dropna()
-    return conv
+    lower = series.astype(str).str.lower()
+    g = lower.str.extract(grams)[0].astype(float) * 0.001
+    k = lower.str.extract(kgs)[0].astype(float)
+    return k.combine_first(g)
 
 
 def _clean_freetext_unit(value):
@@ -173,15 +193,25 @@ def _titlecase_label(value):
 
 
 def handling_unusual_units(df, suffixes=None):
-    """Convert unusual unit descriptions to kg-based quantities.
+    """Resolve each source's ``u`` label from its other-specify free text.
+
+    For every suffix, the respondent's other-specify string
+    (``unitsdetail_{suffix}``) is tidied (GH #223 Layer 2) and used as the
+    unit label ``u_{suffix}``, falling back to the standard label
+    (``units_{suffix}``) where there is none.  It does NOT touch
+    ``cfactor_{suffix}`` (which comes from the wave's region-keyed
+    conversion table) and does NOT convert quantities: the summable
+    ``Quantity_kg`` is computed per source in
+    :func:`food_acquired_to_canonical` (GH #378), and metric free-text
+    labels are converted there by :func:`_metric_kg_factor` (GH #878).
 
     Parameters
     ----------
     df : DataFrame
     suffixes : list[str], optional
         Column suffixes to process (e.g. ``['consumed', 'bought']``).
-        For each suffix, expects columns ``unitsdetail_{suffix}``,
-        ``cfactor_{suffix}``, ``quantity_{suffix}``, and ``units_{suffix}``.
+        For each suffix, expects columns ``unitsdetail_{suffix}`` and
+        ``units_{suffix}``.
         Defaults to ``['consumed', 'bought']`` for backward compatibility.
     """
     if suffixes is None:
@@ -189,21 +219,29 @@ def handling_unusual_units(df, suffixes=None):
 
     for suffix in suffixes:
         detail_col = f'unitsdetail_{suffix}'
-        cfactor_col = f'cfactor_{suffix}'
-        quantity_col = f'quantity_{suffix}'
         units_col = f'units_{suffix}'
         u_col = f'u_{suffix}'
 
         if detail_col not in df.columns:
             continue
 
-        conv_kg = _extract_kg_conversion(df[detail_col])  # parse "300 grams" first
+        # GH #878: a "300 grams" regex fallback used to be written into
+        # cfactor here as ``x[c] or conv_kg``.  It never fired -- ``x[c]`` is
+        # the merged conversion-table factor, NaN where unmatched, and
+        # ``bool(nan)`` is True, so the expression always returned ``x[c]``
+        # (and the conversion tables hold no zero factor that could make it
+        # falsy: IHS3 min 0.02 over 831 rows, IHS5 min 9.6e-05 over 1,768).
+        # It is removed rather than repaired: the metric free-text labels it
+        # aimed at are converted for every wave at the single choke point in
+        # food_acquired_to_canonical by _metric_kg_factor, and making this
+        # fallback live would set cfactor, hence has_cf, hence SKIP that
+        # choke point -- serving the same kilograms under a different
+        # (u, Quantity) row shape.  See CONTENTS.org 2026-09-12.
 
-        # Tidy the other-specify free text for use as a `u` label (after the
-        # kg parse above): "1 Basket" -> "Basket", "1/4" -> NA (#223 Layer 2).
+        # Tidy the other-specify free text for use as a `u` label:
+        # "1 Basket" -> "Basket", "1/4" -> NA (#223 Layer 2).
         df[detail_col] = df[detail_col].map(_clean_freetext_unit)
 
-        df[cfactor_col] = df.apply(lambda x, c=cfactor_col: x[c] or conv_kg, axis=1)
         # Migration to GH #378's Quantity_kg: keep the NATIVE quantity and the
         # native unit label; do NOT multiply in place or stamp the 'kg'
         # sentinel here.  The summable Quantity_kg = quantity x cfactor is
@@ -476,9 +514,14 @@ def food_acquired_to_canonical(df, wave):
         if ucol in work.columns and qcol in work.columns:
             factor = work[ucol].map(_metric_kg_factor)
             # Skip rows that already have a per-row cfactor: those become an
-            # exact Quantity_kg in _make, and the inline grams/kgs regex
-            # already captured any metric magnitude into cfactor -- converting
-            # again here would double-count (GH #378 / Malawi migration).
+            # exact Quantity_kg in _make, so scaling the quantity here as
+            # well would double-count (GH #378 / Malawi migration).  Where
+            # cfactor comes from is wave-dependent: IHS3+ take it solely
+            # from the region-keyed conversion table, while IHS2 (2004-05)
+            # has no such table and takes it only from a kilogram magnitude
+            # read off the unit label itself ('50kg bag' -> 50), via
+            # _extract_kg_conversion.  In neither case does it carry a
+            # grams magnitude -- that is this loop's job (GH #878).
             has_cf = work[ccol].notna() if ccol in work.columns else False
             mask = factor.notna() & ~has_cf
             if mask.any():
