@@ -1822,6 +1822,34 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                                 uref.reindex(key)['kg_per_unit'])
                             refused = np.isnan(kg_item) & ~np.isnan(would_have)
 
+    # ``u='Unknown'`` / ``'Manquant'`` / a NaN label is the ABSENCE of a unit,
+    # not a unit.  The crop twin has always excluded these rows from the
+    # inferred layers (``harvest_kg_factors`` -> :func:`_unit_sentinel_mask`,
+    # and :func:`_survey_median_factors`'s docstring states the rule: "a
+    # 'group' of such rows pools containers of unrelated sizes ... such a row
+    # therefore gets kilograms from its OWN reported factor or from nothing at
+    # all").  The FOOD ladder did not, and nothing said so.
+    #
+    # Ethiopia 2011-12 (GH #874) made it loud: 22 unit-less rows -- decimal
+    # slips such as a Sorghum quantity of 8,120,000 with no unit code -- were
+    # served a u-pooled 0.571 kg/unit and delivered 9.88M kg of the country's
+    # 12.47M.  Niger and Uganda already write this sentinel into
+    # ``food_acquired``, so they have been receiving fabricated kilograms too;
+    # Ethiopia only made it large enough to notice.
+    #
+    # Sentinel rows keep ``survey_kg`` and ``metric`` -- neither can come from
+    # a pooled group, and no sentinel spelling is a metric label -- and fall
+    # to ``none`` otherwise.  They POLLUTE nothing: every inferred rung groups
+    # on ``u``, so sentinel rows only ever pooled with each other.
+    _sentinel = _unit_sentinel_mask(df)
+    if _sentinel.any():
+        kg_item = np.where(_sentinel, np.nan, kg_item)
+        kg_unit = np.where(_sentinel, np.nan, kg_unit)
+        kg_tight = kg_tight & ~_sentinel
+        kg_waves = np.where(_sentinel, np.nan, kg_waves)
+        kg_wave_spread = np.where(_sentinel, np.nan, kg_wave_spread)
+        refused = refused & ~_sentinel
+
     kg_survey = np.full(len(df), np.nan)
     from_survey = np.zeros(len(df), dtype=bool)
     if 'Quantity_kg' in df.columns:
@@ -3138,12 +3166,19 @@ def _screen_reported_factors(df, reported):
 #: DECLARED HERE BECAUSE NOTHING DECLARES IT MACHINE-READABLY.  Checked at
 #: 28f9243f: ``data_info.yml`` has an ``Unknown`` sentinel, but it belongs to
 #: the EDUCATION vocabulary (``Columns.household_roster.Education``), not to
-#: ``u``; and there is no ``niger.py:U_NA`` in the tree (``rg U_NA`` is
-#: empty).  Niger's missing-unit sentinel is the literal string ``Manquant``
-#: (``niger.py:602``, ``_COMMUNITY_MISSING_UNITS`` at ``:1183``) and has NOT
-#: been relabelled onto ``Unknown``, so it is listed below rather than
-#: assumed away.  When GH #847 lands a single canonical declaration, delete
-#: both of these and read it from there.
+#: ``u``.  Both live spellings are therefore listed below rather than assumed
+#: away.  When GH #847 lands a single canonical declaration, delete both and
+#: read it from there.
+#:
+#: CORRECTED 2026-09-12 (GH #874).  This note used to say "there is no
+#: ``niger.py:U_NA`` in the tree (``rg U_NA`` is empty) [and] Niger's
+#: missing-unit sentinel is the literal string ``Manquant`` ... [which] has
+#: NOT been relabelled onto ``Unknown``".  Both halves are stale since
+#: GH #842: ``niger.py:496`` defines ``U_NA = 'Unknown'`` and ``:488`` states
+#: that "Niger writes ``Unknown`` at build time (as Uganda does)".
+#: ``Manquant`` survives only as a RAW source label that Niger maps away
+#: (``_COMMUNITY_MISSING_UNITS``), and stays in the set below because a
+#: pre-#842 parquet can still carry it.
 U_UNKNOWN = 'Unknown'
 
 #: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
