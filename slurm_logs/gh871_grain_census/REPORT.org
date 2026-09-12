@@ -1,0 +1,282 @@
+#+TITLE: GH #871 pre-landing census -- what row-coherent selection would change
+#+DATE: 2026-09-12
+#+AUTHOR: census run on development @ 86fd0af44 (worktree branch census/871)
+
+* What this is
+
+Section 3 of =PLAN_871.md=.  Measures, per =(country, table, wave)= cell, the
+difference between what core serves *today* -- a per-column
+=groupby(...).first()= composite -- and the proposed row-coherent
+=groupby(...).nth(0).sort_index()= selection, at the two *build*-path collapse
+sites:
+
+- *Site 1* =country._normalize_dataframe_index= (declared-index collapse)
+- *Site 2* =country._collapse_to_cluster_grain= (household -> cluster projection)
+
+*Site 3 (=feature._collapse_duplicate_index=) was NOT run* -- the optional,
+non-blocking item in the plan, skipped for time.  Its groups are cross-wave and
+are formed after =droplevel=, so nothing below sizes it.
+
+Script: =bench/grain_census_871.py= (read-only; no DVC, no network, *no build*).
+Run: =PYTHONPATH=<worktree> LSMS_BUILD_WORKERS=1 python bench/grain_census_871.py=,
+=multiprocessing.Pool(40)= over files, largest-first.  Wall time 5.7 s.
+
+* Method, and what it can and cannot see
+
+The stamped =lsms_grain_audit= (read with =local_tools.read_parquet_grain_audit=
+off ={cache}/{C}/var/{table}.parquet=) carries counts only -- no per-column
+and no per-row detail -- so it can give a cell list, never the diff.  The diff is
+computed on the *pre-collapse* wave parquet
+={cache}/{C}/{wave}/_/{table}.parquet= (written by =Wave.grab_data= on the
+YAML route, by =local_tools.to_parquet= from =_/{table}.py= on the script route;
+both are pre-Site-1 and pre-Site-2).
+
+*A cell with no pre-collapse wave parquet is reported =uncensused=, never
+rebuilt.*
+
+Cells censused: *every cached pre-collapse wave parquet* (915 files), plus every
+=household_roster= and =cluster_features= cell the config declares whether cached
+or not -- that is where the =served_na_new= cost lives.  Sweeping the wave
+parquets rather than the stamps is deliberate: only 388 =var/= parquets exist,
+Uganda's =var/= holds two tables, and a cell whose =(country, table)= has no
+=var/= parquet would otherwise be *invisible* rather than uncensused.  The stamp
+index is still read (55 reports, 51 of them on cells the census
+also diffed) and is used as the *check* described below.
+
+Five deliberate choices in the diff, each of which changes the numbers:
+
+1. *The build's per-wave =t= filter is replayed* (=grab_data= country.py:1646,
+   =build_wave= :3743-3748).  Without it a script-path parquet shared by the
+   quarters of one folder is counted whole, once per quarter.
+2. *Missing-value spelling is normalised before comparing.*  =first()= and
+   =nth(0)= can return the same missing value in different clothes (=None= vs
+   =pd.NA= vs =nan=) on an object column.  A naive =astype(str)= diff -- the
+   audit's own stringify -- then calls every such row "changed": corpus-wide that
+   is *rows_changed_raw = 1,211,233* against a true
+   1,025 (=Burkina_Faso/shocks/2014= alone: 193,115 of
+   194,246 rows, in a cell whose audited destruction is one row).  =isna()= is the
+   ground truth; the census masks on it.  Both numbers are in the CSV
+   (=rows_changed=, =rows_changed_raw=).
+3. *Declared reducer columns are excluded, not counted.*  =_ADDITIVE_MEASURE_COLUMNS=
+   (=food_acquired: Quantity, Expenditure=; =assets: Value=) and a =Price=
+   re-derived from summed totals are summed today and stay summed under the
+   proposal, so they cannot change.
+4. *The build's residual re-audit is mirrored* for those same tables
+   (country.py:5992-6006), so =destroyed= means what the stamp means.
+5. *Site 2 is diffed on the frame with the household level already dropped*, as
+   =_collapse_to_cluster_grain= does -- otherwise every multi-household cluster
+   looks destructive (~100% false positives).
+
+Not reproduced between the wave parquet and Site 1: =id_walk= and
+=_augment_index_from_related_tables= (the latter only fires for a declared =m=).
+=id_walk= re-keys =i=, so a cell where transitive re-keying *creates* duplicates
+would be under-counted here.  The reconciliation below is what bounds that.
+
+** The frame check: census =destroyed= vs the stamp
+
+The stamped =destroyed= is the only instrument for "is the frame I diffed the
+frame the build actually collapsed?".  Compared on every cell that is both
+stamped and diffed:
+
+| cells compared | agreeing | mismatched |
+|-
+| 51 | 51 | 0 |
+
+*51 of 51 agree exactly*, and after fixing (1)
+and (4) above there is no residual mismatch -- so for the stamped cells the
+census frame is the build frame.  Unstamped cells carry no such check; they are
+the ones a reader should discount if =id_walk= is in play.
+
+No record is =unauditable= (0 of 1005).
+
+* Coverage
+
+| | cells |
+|-
+| enumerated | 970 |
+| censused | 915 |
+| ...declared index already unique (no collapse at all) | 838 |
+| ...diffed at >= 1 site | 112 |
+| uncensused (no pre-collapse wave parquet) | 55 |
+
+Records are per cell *per site*: 1005 records over 970 cells (a
+=cluster_features= cell with =i= in its index yields a Site-2 and a Site-1
+record).
+
+What is still *not* covered: a =(country, table)= that has never been built into
+this cache has no wave parquet and no stamp, so outside the two always-tables it
+does not appear at all -- absence of a row here is not evidence of a clean cell.
+Uncensused always-table cells (script-path tables whose wave parquet is absent
+from this cache; =Tanzania/cluster_features/{2010-11,2012-13,2014-15}= are
+stamped cells among them, the multi-round =2008-15/= folder):
+
+| country | table | cells |
+|-
+| Albania | cluster_features | 2 |
+| EthiopiaRHS | cluster_features | 1 |
+| EthiopiaRHS | household_roster | 2 |
+| Guyana | cluster_features | 1 |
+| Guyana | household_roster | 1 |
+| Nepal | cluster_features | 3 |
+| Nepal | household_roster | 3 |
+| Nigeria | cluster_features | 2 |
+| Nigeria | household_roster | 10 |
+| Peru | cluster_features | 3 |
+| Peru | household_roster | 3 |
+| Tanzania | cluster_features | 4 |
+| Tanzania | household_roster | 4 |
+| Uganda | cluster_features | 8 |
+| Uganda | household_roster | 8 |
+
+* Totals
+
+| quantity | value |
+|-
+| rows_changed (served rows whose content differs) | 1,025 |
+| served_na_new (column cells that become NA) | 2,714 |
+| conflicting_groups (index tuples whose rows disagree) | 30,815 |
+| audited =destroyed= rows over the same cells | 105,137 |
+| derivation_conflicts (groups with >1 distinct =Derivation= key) | 0 |
+| rows_changed_raw (unnormalised NA spelling -- artefact, see method 2) | 1,211,233 |
+
+By site: rows_changed Site 1 948 / Site 2 77;
+served_na_new Site 1 2560 / Site 2 154.
+
+*Read the like-for-like ratio.*  30,815 index tuples are
+collapsed from disagreeing rows; in only 1,025 of them
+(3.3%) does the served row
+change.  (=destroyed= counts *dropped input rows*, a different unit -- it is
+105,137 here and is not the denominator for anything below.)  In
+the overwhelming majority of conflicting groups row 0 already carries every
+non-NA value =first()= picks.  The cost is concentrated: the top 7 cells are
+94.4% of all =served_na_new=, and =Kosovo/housing/2000= alone is
+38.6%.
+
+** By table and site
+
+| table | site | rows_changed | served_na_new_total | destroyed | conflicting_groups |
+|-
+| housing | Site1 | 524 | 1048 | 4205 | 632 |
+| shocks | Site1 | 149 | 758 | 372 | 369 |
+| assets | Site1 | 176 | 520 | 24353 | 14551 |
+| household_roster | Site1 | 45 | 180 | 212 | 212 |
+| cluster_features | Site2 | 77 | 154 | 22158 | 1565 |
+| individual_education | Site1 | 36 | 36 | 58 | 58 |
+| plot_inputs | Site1 | 18 | 18 | 322 | 300 |
+| cluster_features | Site1 | 0 | 0 | 1053 | 96 |
+| crop_production | Site1 | 0 | 0 | 1000 | 840 |
+| food_acquired | Site1 | 0 | 0 | 0 | 0 |
+| food_security | Site1 | 0 | 0 | 38 | 38 |
+| interview_date | Site1 | 0 | 0 | 51366 | 12154 |
+| sample | Site1 | 0 | 0 | 0 | 0 |
+
+** Top 15 cells by served_na_new
+
+| country | table | wave | site | rows | destroyed | rows_changed | served_na_new_total | served_na_new_by_col |
+|-
+| Kosovo | housing | 2000 | Site1 | 7047 | 4182 | 524 | 1048 | {"Rooms": 524, "Tenure": 524} |
+| Malawi | shocks | 2004-05 | Site1 | 203044 | 291 | 124 | 616 | {"AffectedAssets": 122, "AffectedIncome": 122, "HowCoped0": 124, "HowCoped1": 124, "HowCoped2": 124} |
+| Niger | assets | 2014-15 | Site1 | 122978 | 481 | 172 | 516 | {"Age": 172, "Purchase Price": 172, "Quantity": 172} |
+| Niger | household_roster | 2014-15 | Site1 | 26579 | 210 | 45 | 180 | {"Age": 45, "MonthsSpent": 45, "Relationship": 45, "Sex": 45} |
+| Niger | shocks | 2014-15 | Site1 | 72340 | 80 | 24 | 137 | {"AffectedAssets": 23, "AffectedConsumption": 23, "AffectedIncome": 23, "AffectedProduction": 23, "HowCoped0": 23, "HowCoped1": 14, "HowCoped2": 8} |
+| Niger | individual_education | 2014-15 | Site1 | 26579 | 58 | 36 | 36 | {"Educational Attainment": 36} |
+| Nigeria | cluster_features | 2012Q3 | Site2 | 4898 | 609 | 14 | 28 | {"Latitude": 14, "Longitude": 14} |
+| Nigeria | cluster_features | 2013Q1 | Site2 | 4898 | 609 | 14 | 28 | {"Latitude": 14, "Longitude": 14} |
+| Ethiopia | cluster_features | 2021-22 | Site2 | 4959 | 1240 | 10 | 20 | {"Latitude": 10, "Longitude": 10} |
+| Nigeria | cluster_features | 2015Q3 | Site2 | 4697 | 618 | 9 | 18 | {"Latitude": 9, "Longitude": 9} |
+| Nigeria | cluster_features | 2016Q1 | Site2 | 4697 | 618 | 9 | 18 | {"Latitude": 9, "Longitude": 9} |
+| Nigeria | cluster_features | 2018Q3 | Site2 | 5263 | 1254 | 8 | 16 | {"Latitude": 8, "Longitude": 8} |
+| Nigeria | cluster_features | 2019Q1 | Site2 | 5263 | 1254 | 8 | 16 | {"Latitude": 8, "Longitude": 8} |
+| Niger | plot_inputs | 2014-15 | Site1 | 8179 | 88 | 11 | 11 | {"Quantity_purchased": 11} |
+| Ethiopia | cluster_features | 2011-12 | Site2 | 3969 | 373 | 3 | 6 | {"Latitude": 3, "Longitude": 3} |
+
+** Top 15 cells by rows_changed
+
+| country | table | wave | site | rows | destroyed | rows_changed | served_na_new_total | cols_involved |
+|-
+| Kosovo | housing | 2000 | Site1 | 7047 | 4182 | 524 | 1048 | Rooms, Tenure |
+| Niger | assets | 2014-15 | Site1 | 122978 | 481 | 172 | 516 | Quantity, Age, Purchase Price |
+| Malawi | shocks | 2004-05 | Site1 | 203044 | 291 | 124 | 616 | AffectedIncome, AffectedAssets, HowCoped0, HowCoped1, HowCoped2 |
+| Niger | household_roster | 2014-15 | Site1 | 26579 | 210 | 45 | 180 | Sex, Age, Relationship, MonthsSpent |
+| Niger | individual_education | 2014-15 | Site1 | 26579 | 58 | 36 | 36 | Educational Attainment |
+| Niger | shocks | 2014-15 | Site1 | 72340 | 80 | 24 | 137 | AffectedIncome, AffectedAssets, AffectedProduction, AffectedConsumption, HowCoped0, HowCoped1, HowCoped2 |
+| Nigeria | cluster_features | 2012Q3 | Site2 | 4898 | 609 | 14 | 28 | Latitude, Longitude |
+| Nigeria | cluster_features | 2013Q1 | Site2 | 4898 | 609 | 14 | 28 | Latitude, Longitude |
+| Niger | plot_inputs | 2014-15 | Site1 | 8179 | 88 | 11 | 11 | Quantity_purchased |
+| Ethiopia | cluster_features | 2021-22 | Site2 | 4959 | 1240 | 10 | 20 | Latitude, Longitude |
+| Nigeria | cluster_features | 2015Q3 | Site2 | 4697 | 618 | 9 | 18 | Latitude, Longitude |
+| Nigeria | cluster_features | 2016Q1 | Site2 | 4697 | 618 | 9 | 18 | Latitude, Longitude |
+| Nigeria | cluster_features | 2018Q3 | Site2 | 5263 | 1254 | 8 | 16 | Latitude, Longitude |
+| Nigeria | cluster_features | 2019Q1 | Site2 | 5263 | 1254 | 8 | 16 | Latitude, Longitude |
+| Burkina_Faso | plot_inputs | 2018-19 | Site1 | 22877 | 163 | 5 | 5 | Quantity_purchased |
+
+*=derivation_conflicts= is 0 in every censused cell.*  No group anywhere carries
+two distinct =Derivation= keys, so the union-vs-selection question on that column
+is unexercised by today's data -- it needs a synthetic test, not a corpus
+measurement.
+
+*Every Site-2 change in the corpus is GPS.*  =cols_involved= over all Site-2
+records is exactly ['Latitude', 'Longitude'] -- no cell changes =Region=,
+=District= or =Rural=.
+
+* Two cells checked by hand
+
+** =Niger/household_roster/2014-15=, Site 1, declared index =(t, i, pid)=
+
+The group =('2014-15', '101008', '1')= -- two rows, one of them entirely blank:
+
+#+begin_example
+--- input rows in that group:
+                         Sex   Age    Relationship  MonthsSpent
+t       i      pid
+2014-15 101008 1        <NA>   NaN            <NA>          NaN
+               1    Masculin  45.0  Chef de menage         12.0
+--- first() serves:
+2014-15 101008 1    Masculin  45.0  Chef de menage         12.0
+--- nth(0) serves:
+2014-15 101008 1        <NA>   NaN            <NA>          NaN
+#+end_example
+
+This is =served_na_new= in the flesh, and it is the worst-looking case for the
+proposal: today the household head's record survives; under =nth(0)= the served
+row is the blank one, and =_finalize_result='s =dropna(how='all')= would then drop
+the person entirely.  45 rows / 180 column cells in this cell.  Note what the
+*pre-collapse* frame says, though: =pid= is not unique within the household, i.e.
+the identifier is broken -- exactly the #323 verdict ("duplicates on a declared
+index mean the IDENTIFIER IS BROKEN").  =first()= is repairing a broken key by
+assembling a person out of two rows.
+
+** =Nigeria/cluster_features/2013Q1=, Site 2, projection onto =(t, v)=
+
+Cluster =13/1310/1300= -- five households, four agreeing on GPS and one with no
+fix at all:
+
+#+begin_example
+--- households in that cluster (i dropped):
+                         Region District  Rural  Latitude  Longitude
+2013Q1 13/1310/1300  SOUTH WEST    Ekiti  Urban       NaN        NaN
+       13/1310/1300  SOUTH WEST    Ekiti  Urban  7.496003   5.225057
+       13/1310/1300  SOUTH WEST    Ekiti  Urban  7.496003   5.225057
+       13/1310/1300  SOUTH WEST    Ekiti  Urban  7.496003   5.225057
+       13/1310/1300  SOUTH WEST    Ekiti  Urban  7.496003   5.225057
+--- first() serves:
+2013Q1 13/1310/1300  SOUTH WEST    Ekiti  Urban  7.496003   5.225057
+--- nth(0) serves:
+2013Q1 13/1310/1300  SOUTH WEST    Ekiti  Urban       NaN        NaN
+#+end_example
+
+Every Site-2 change has this shape: =Latitude= / =Longitude= only, one household
+in the cluster missing its fix and sorting first.  77 rows across the Site-2
+cells -- and note that in this cell the cluster's GPS is not in dispute at all,
+so the row-coherent rule discards a value four of five households agree on, in
+exchange for the guarantee that the served row is an observed one.
+
+* Files
+
+- =census_871.csv= -- one record per (country, table, wave, site); carries
+  =rows_changed=, =rows_changed_raw=, =served_na_new_by_col=, =cols_involved=,
+  =conflicting_groups=, =destroyed=, =nan_key_rows=, =reducer_columns=,
+  =derivation_conflicts=, =status=.
+- =stamps_871.json= -- every =lsms_grain_audit= report read off =var/=, verbatim.
+- =summary_871.json= -- the totals, the stamp reconciliation and the top-15 lists,
+  machine-readable.  (Test-plan item 4 reads the CSV as a fixture.)
