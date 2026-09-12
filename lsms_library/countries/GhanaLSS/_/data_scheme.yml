@@ -116,10 +116,13 @@ Data Scheme:
     #                  the 2007 redenomination, GHS after; currency.py labels
     #                  it; NO conversion).  The 1980s files' PRICEnU / DEFL /
     #                  PRICE are calculated fields (BID §6.2) and are NOT stored.
-    #   NumberOfUnits  the quantity of u that Price refers to: the weighed /
-    #                  measured quantity where the file has one (QUANn,
+    #   NumberOfUnits  the reported quantity where the file has one (QUANn,
     #                  s1stkg, quantity{a,b,c}), else the form's stated basis
     #                  (GLSS3/4 ship only the per-unit value p = PRICE/KG).
+    #                  GLSS7 QTY may report container content weight rather
+    #                  than a count of u. Values are preserved as reported;
+    #                  Price/NumberOfUnits needs an established quantity basis.
+    #                  See CONTENTS.org's GLSS7 price notes and GH #826.
     #   Description    the survey's own free text for the row: the form's
     #                  item label, the 2012-13 non-food basis (s2desc), the
     #                  2016-17 brand line and other-unit text.  Instrument-
@@ -237,4 +240,3 @@ Data Scheme:
   # See nutrition.py's docstring for why it does not call
   # Country.food_quantities(), and slurm_logs/ghana_audit/ISSUE_value_kg_factor.org.
   nutrition: !make
-

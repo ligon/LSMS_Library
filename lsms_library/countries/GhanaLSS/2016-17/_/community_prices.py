@@ -18,7 +18,11 @@ text when the unit code is 99 "Other unit").
 * u  = the observation's unit code -> the file's value label -> the shared
        unit_labels.org Preferred Label; code 99 -> the other-unit text
        mapped the same way (an unmapped spelling stays visible, title-cased).
-* NumberOfUnits = quantity{a,b,c}.
+* NumberOfUnits = quantity{a,b,c}, preserved as reported. QTY is not always
+       a count of u: some container observations report content weight.
+       Price / NumberOfUnits is not a reliable per-unit price without an
+       established quantity basis (CONTENTS.org, GH #826). No automatic
+       reclassification or exclusion is applied here.
 * Description   = 'bname | itname' (the brand line), plus the other-unit
        text where the code was 99.
 """
