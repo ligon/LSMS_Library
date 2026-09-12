@@ -21,9 +21,10 @@ Two tiers, deliberately:
 
 * config / source pins -- no data access, always run.  They are what catch
   a wave script quietly losing a variable.
-* a ``slow`` served-value check -- builds the country table and compares a
-  wave's ``produced`` rows against raw ``hh_s5aq05_a``.  A config pin alone
-  cannot see a regression in the melt itself.
+* a ``slow`` + ``requires_s3`` served-value check -- builds the country table
+  and compares a wave's ``produced`` rows against raw ``s6aq05a``.  A config
+  pin alone cannot see a regression in the melt itself, and this one needs
+  real microdata, so it skips in the data-free unit-tests job.
 """
 from __future__ import annotations
 
@@ -100,6 +101,7 @@ def test_screen_counts_and_does_not_clip():
 
 
 @pytest.mark.slow
+@pytest.mark.requires_s3
 def test_served_produced_is_q5_and_inkind_is_q6():
     """The served numbers are the survey's answers, per wave."""
     import os
