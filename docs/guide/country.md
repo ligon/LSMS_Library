@@ -117,6 +117,15 @@ Some tables are computed automatically from others:
 
 You call them the same way -- the derivation is transparent.
 
+These are derived **tables**, computed at read time from a source table. That
+is a different thing from a derived **value**: a number inside a table that the
+library constructed from raw survey answers rather than reading off one. Those
+are labelled on the row, in a `Derivation` column carrying the key of the
+construction -- see the [Derived Values guide](derivations.md). A derived table
+does not relabel the rows it inherits; it carries only the
+`df.attrs['derivations']` summary, pointing at the table where the derivation
+was made.
+
 ## Supported Countries
 
 Countries are organized under `lsms_library/countries/`. To see what's
