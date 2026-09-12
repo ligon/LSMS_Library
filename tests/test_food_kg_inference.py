@@ -385,6 +385,44 @@ def test_currency_denominated_labels_get_no_factor():
     assert val['kg_per_unit'].isna().all()
 
 
+@pytest.mark.parametrize('sentinel', ['Unknown', 'Manquant', 'unknown'])
+def test_missing_unit_sentinels_get_no_inferred_factor(sentinel):
+    """GH #874: the absence of a unit is not a unit.
+
+    The crop twin has always excluded these rows (``_unit_sentinel_mask``);
+    the food ladder did not, so rows whose unit was never recorded pooled
+    with each other and received a fabricated weight.  Ethiopia 2011-12: 22
+    unit-less rows took a u-pooled 0.571 kg/unit and delivered 9.88M of the
+    country's 12.47M kg.
+
+    Twenty priced rows under one sentinel label is exactly the shape that
+    used to mint a factor, so a pass here is the property, not the absence
+    of data.
+    """
+    rows = kg_rows('A', 20)
+    rows += [('2020', f'g{k}', 'A', sentinel, 2.0, 200.0) for k in range(20)]
+    f = food_kg_factors(frame(rows))
+    lvl = f.index.get_level_values('u')
+    sent = f[lvl == sentinel]
+    assert len(sent) == 20
+    assert set(sent['KgFactorSource']) == {'none'}
+    assert sent['kg_per_unit'].isna().all()
+    # And no real unit is re-weighted by the exclusion: every rung groups on
+    # ``u``, so the sentinel rows only ever pooled with each other.
+    real = f[lvl == 'kg']
+    assert real['kg_per_unit'].eq(1.0).all()
+
+
+def test_a_nan_unit_label_is_a_sentinel_too():
+    """A ``u`` that is NaN records no unit either, and must not receive one."""
+    rows = kg_rows('A', 20)
+    rows += [('2020', f'g{k}', 'A', np.nan, 2.0, 200.0) for k in range(20)]
+    f = food_kg_factors(frame(rows))
+    nan_u = f[pd.isna(f.index.get_level_values('u'))]
+    assert len(nan_u) == 20
+    assert set(nan_u['KgFactorSource']) == {'none'}
+
+
 # ---------------------------------------------------------------------------
 # Uganda's hand-curated answer key (data-gated)
 # ---------------------------------------------------------------------------
