@@ -25,11 +25,28 @@ Data Scheme:
     Longitude: float
 
   shocks:
+    # GH #875: ONE builder.  No `materialize:` here, so the YAML path
+    # (`{wave}/_/data_info.yml`) is what serves every wave, W5 included.  The
+    # four wave scripts and the country concatenator that used to shadow it --
+    # with the OPPOSITE rule (`Increase -> False`), an imputation the YAML does
+    # not make (`fillna(False)`) and the household level named `j` -- are
+    # deleted, as are their Makefile rules.
+    #
+    # The served rule, and the corpus convention (cf. Malawi 2016-17): a shock
+    # that made income/assets/production/consumption/food stock go EITHER WAY
+    # counts as affected; `Did Not Change -> False`; anything else stays NA.
     index: (t, i, Shock)
     AffectedIncome: bool
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    # hh_s8q03_d (W1-W3) / s9q03d (W4-W5).  Asked in all five waves; it was
+    # script-only until #875 and so never reached the API.
+    AffectedFoodStock: bool
+    # hh_s8q05, "how many times in the last 12 months".  W1-W3 ONLY -- the W4/W5
+    # instrument dropped it -- hence `optional`, which is country-grain and so
+    # exempts the two waves that genuinely do not ask it.
+    Occurrence: {type: int, optional: true}
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str

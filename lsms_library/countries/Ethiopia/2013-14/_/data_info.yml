@@ -161,6 +161,19 @@ shocks:
                 Decrease: True
                 Did Not Change: False
                 Increase: True
+        # GH #875: read on the YAML path like every other effect column.
+        # `Increase: True` is the corpus convention -- ANY change counts as
+        # affected (cf. Malawi 2016-17).  An unmapped/missing answer stays NA;
+        # it is NOT imputed False.
+        AffectedFoodStock:
+            - hh_s8q03_d
+            - mapping:
+                Decrease: True
+                Did Not Change: False
+                Increase: True
+        # Times the shock occurred in the last 12 months (W1-W3 only; the W4/W5
+        # instrument dropped the question).  Not imputed to 0.
+        Occurrence: hh_s8q05
         HowCoped0: hh_s8q04_a
         HowCoped1: hh_s8q04_b
         HowCoped2: hh_s8q04_c

@@ -16,7 +16,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # schema and shadowed the runtime derivation with a stale parquet.
 # household_characteristics is auto-derived too (_ROSTER_DERIVED, GH #260).
 var = \
-      $(VAR_DIR)/shocks.parquet $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+      $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
       $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet \
       $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet \
@@ -36,14 +36,12 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 	python food_acquired.py
 
-shocks = $(shell find $(rounds) -name shocks.py)
-shocks_parquet := $(shocks:.py=.parquet)
-
-../%/_/shocks.parquet:
-	(cd $(@D) && python shocks.py)
-
-$(VAR_DIR)/shocks.parquet: shocks.py $(shocks_parquet)
-	python shocks.py
+# shocks is built by the YAML path (GH #875).  `data_scheme.yml` declares
+# no `materialize:` for it, so `Wave.grab_data` reads each wave's
+# `data_info.yml`; the wave scripts and the country concatenator that used
+# to live here were a SECOND builder with a DIFFERENT rule (Increase ->
+# False, fillna(False), index `j`) and have been deleted.  Do not add a
+# make rule back without also removing the YAML blocks.
 
 sample = $(shell find $(rounds) -name sample.py)
 sample_parquet := $(sample:.py=.parquet)
