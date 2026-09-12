@@ -1,7 +1,34 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+# GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
+# ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
+# `Quantity`.  `_food_acquired_ehcvm` derives it instead -- purchased Quantity
+# x (s07bq08 / s07bq07a), NA where the last purchase used a different unit --
+# and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
+# and Mali/_/derivations.yml.
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Mali')
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j).
+
+    A wave-level wrapper rather than a `functools.partial` in the country
+    module, so that binding the country name does not put this code in
+    Mali/_/mali.py -- which is in EVERY Mali table's cache
+    fingerprint.
+    """
+    return _inputs_last_purchase('Mali', wave)
+
+
+def food_acquired(df):
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -78,12 +105,44 @@ _MONTH_MAP = {
 }
 
 
+# Relationship (s01q02) value labels are TRUNCATED IN THE FILE (GH #801).
+# s01_me_mli2018.dta stores ``Chef de m``, ``p``, ``Fr`` and ``Personne
+# non apparent`` -- each label cut at its first non-ASCII character, with
+# zero non-ASCII bytes left in the label set -- so no ``encoding=`` choice
+# can recover them (utf-8, latin-1 and cp1252 all return the same
+# strings; measured 2026-09-07).  It is the same producer-side truncation
+# that puts ``'f'``, ``'Ao'`` and ``'d'`` in ``_MONTH_MAP`` above.  The
+# full labels are fixed by code position in the EHCVM-1 questionnaire and
+# identical in every sibling 2018-19 ``s01_me_*`` file (Benin, Burkina
+# Faso, CotedIvoire, Niger, Senegal, Togo): 1 = Chef de menage, 4 = Pere,
+# Mere, 7 = Frere, soeur, 9 = Personne non apparentee au CM/Conjoint.
+# Keys are the strings as they reach the ``household_roster`` hook (after
+# mali.py's ``Relationship`` formatter has ``.title()``-cased them) plus
+# the raw file spellings, for robustness; values are the title-cased
+# clean labels that Mali 2021-22 and Niger / Senegal 2018-19 already
+# serve, which resolve in ``kinship.yml`` through existing keys.  Before
+# this hook the four artefacts were keys in ``kinship.yml`` (9,890 rows,
+# 21.5% of the wave); they are not any more.
+_RELATIONSHIP_FIX = {
+    'Chef De M': 'Chef De M\u00e9nage',
+    'Chef de m': 'Chef De M\u00e9nage',
+    'P': 'P\u00e8re, M\u00e8re',
+    'p': 'P\u00e8re, M\u00e8re',
+    'Fr': 'Fr\u00e8re, S\u0153ur',
+    'Personne Non Apparent': 'Personne Non Apparent\u00e9e Au Cm/Conjoint',
+    'Personne non apparent': 'Personne Non Apparent\u00e9e Au Cm/Conjoint',
+}
+
+
 def household_roster(df):
     '''
-    Compute Age from DOB components when s01q04a is absent.
+    Compute Age from DOB components when s01q04a is absent, and restore
+    the four Relationship labels the source file ships truncated (see
+    ``_RELATIONSHIP_FIX``; GH #801).
 
     Age list in data_info.yml: [s01q04a, s01q03a(day), s01q03b(month), s01q03c(year)].
-    s01q03b is a French month string (sometimes truncated due to latin-1 encoding);
+    s01q03b is a French month string (sometimes truncated IN THE FILE at its first
+    accented letter, the same defect as ``_RELATIONSHIP_FIX`` -- not a read-encoding issue);
     converted via _MONTH_MAP. 9999 sentinels in numeric DOB columns are passed through
     (age_handler treats values >= 2100 as invalid).
     No negative age sentinel in s01q04a — it is simply NaN when absent.
@@ -114,6 +173,9 @@ def household_roster(df):
 
     df["Age"] = df.apply(_age_from_row, axis=1)
     df = df.drop('interview_date', axis='columns')
+    if 'Relationship' in df.columns:
+        # String-only fix: whole-value replacement, never a substring match.
+        df['Relationship'] = df['Relationship'].replace(_RELATIONSHIP_FIX)
     return df
 
 

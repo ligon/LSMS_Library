@@ -248,10 +248,14 @@ def test_nan_is_absence_not_contradiction(togo):
     and `nunique(dropna=False)` on an all-NaN group is 1; measured cold against
     pristine `origin/development`, the copy's guard flags 0 of 540 grappes.  A
     single upstream edit that made one grappe PARTLY GPS-less would make it
-    live -- and the repo's doctrine, pinned by
+    live -- and NaN is ABSENCE here, which is a statement about THIS HELPER and
+    is unchanged.  What changed on 2026-09-12 (GH #871) is that CORE no longer
+    completes: `country.most_complete_row` serves one OBSERVED row, and
     `tests/test_gh323_grain_contract.py::
-    test_p2_complementary_missingness_is_COMPLETION_not_fabrication`, is that
-    NaN is ABSENCE.
+    test_p2_complementary_missingness_is_NOT_completed_by_core` pins that
+    reversal.  The completion doctrine's legitimate home is exactly a helper
+    like this one -- `build_transforms.reduce_to_agreed`, invoked IN WRITING by
+    a country author at the call site -- not the access path.
 
     Fails on pristine `development` too (no hook).
     """

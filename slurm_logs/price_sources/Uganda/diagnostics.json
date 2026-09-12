@@ -1,0 +1,1212 @@
+{
+ "library": "/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-uganda/lsms_library/__init__.py",
+ "waves": [
+  "2005-06",
+  "2009-10",
+  "2010-11",
+  "2011-12",
+  "2013-14",
+  "2015-16",
+  "2018-19",
+  "2019-20"
+ ],
+ "n_food_labels_native": 130,
+ "n_food_labels_aggregate": 80,
+ "independence": {
+  "purchased": [
+   {
+    "t": "2005-06",
+    "n": 28401,
+    "share_differs": 0.017182493574169923,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2009-10",
+    "n": 25974,
+    "share_differs": 0.05624855624855625,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2010-11",
+    "n": 24697,
+    "share_differs": 0.010892011175446411,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2011-12",
+    "n": 26030,
+    "share_differs": 0.05213215520553208,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2013-14",
+    "n": 34209,
+    "share_differs": 0.015142214037241662,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2015-16",
+    "n": 34057,
+    "share_differs": 0.0006166133247203218,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2018-19",
+    "n": 35982,
+    "share_differs": 0.000805958534822967,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2019-20",
+    "n": 32109,
+    "share_differs": 0.000934317481080071,
+    "median_lr": 0.0
+   }
+  ],
+  "produced": [
+   {
+    "t": "2005-06",
+    "n": 8514,
+    "share_differs": 0.013624618275781066,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2009-10",
+    "n": 9003,
+    "share_differs": 0.026546706653337776,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2010-11",
+    "n": 7950,
+    "share_differs": 0.0349685534591195,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2011-12",
+    "n": 10245,
+    "share_differs": 0.047535383113714004,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2013-14",
+    "n": 12752,
+    "share_differs": 0.010116060225846926,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2015-16",
+    "n": 12233,
+    "share_differs": 0.0008992070628627483,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2018-19",
+    "n": 12379,
+    "share_differs": 8.078196946441554e-05,
+    "median_lr": 0.0
+   },
+   {
+    "t": "2019-20",
+    "n": 11267,
+    "share_differs": 0.0003550190822756723,
+    "median_lr": 0.0
+   }
+  ]
+ },
+ "crop_rows_total": 133683,
+ "crop_rows_with_sale": 45519,
+ "crop_rows_u_unknown": 21353,
+ "crop_sale_rows_u_unknown": 5833,
+ "crop_label_join_before": [
+  {
+   "j": "Maize",
+   "sale_rows": 7358,
+   "joins": true
+  },
+  {
+   "j": "Banana Food",
+   "sale_rows": 6793,
+   "joins": false
+  },
+  {
+   "j": "Beans",
+   "sale_rows": 6726,
+   "joins": true
+  },
+  {
+   "j": "Coffee",
+   "sale_rows": 6447,
+   "joins": true
+  },
+  {
+   "j": "Cassava",
+   "sale_rows": 2498,
+   "joins": true
+  },
+  {
+   "j": "Ground Nuts",
+   "sale_rows": 2229,
+   "joins": true
+  },
+  {
+   "j": "Sweet Potatoes",
+   "sale_rows": 1442,
+   "joins": true
+  },
+  {
+   "j": "Soybean",
+   "sale_rows": 1161,
+   "joins": true
+  },
+  {
+   "j": "Banana Beer",
+   "sale_rows": 1070,
+   "joins": false
+  },
+  {
+   "j": "Sorghum",
+   "sale_rows": 1014,
+   "joins": true
+  },
+  {
+   "j": "Finger Millet",
+   "sale_rows": 1001,
+   "joins": false
+  },
+  {
+   "j": "Irish Potatoes",
+   "sale_rows": 835,
+   "joins": true
+  },
+  {
+   "j": "Sim Sim",
+   "sale_rows": 812,
+   "joins": true
+  },
+  {
+   "j": "Sweet Bananas",
+   "sale_rows": 760,
+   "joins": true
+  },
+  {
+   "j": "Sunflower",
+   "sale_rows": 631,
+   "joins": false
+  },
+  {
+   "j": "Rice",
+   "sale_rows": 615,
+   "joins": true
+  },
+  {
+   "j": "Cotton",
+   "sale_rows": 560,
+   "joins": false
+  },
+  {
+   "j": "Tomatoes",
+   "sale_rows": 475,
+   "joins": true
+  },
+  {
+   "j": "Sugarcane",
+   "sale_rows": 421,
+   "joins": true
+  },
+  {
+   "j": "Other Crop",
+   "sale_rows": 246,
+   "joins": false
+  },
+  {
+   "j": "Cabbages",
+   "sale_rows": 236,
+   "joins": true
+  },
+  {
+   "j": "Tobacco",
+   "sale_rows": 231,
+   "joins": false
+  },
+  {
+   "j": "Onions",
+   "sale_rows": 206,
+   "joins": true
+  },
+  {
+   "j": "Field Peas",
+   "sale_rows": 200,
+   "joins": false
+  },
+  {
+   "j": "Avocado",
+   "sale_rows": 145,
+   "joins": false
+  },
+  {
+   "j": "Cocoa",
+   "sale_rows": 138,
+   "joins": false
+  },
+  {
+   "j": "Yam",
+   "sale_rows": 138,
+   "joins": true
+  },
+  {
+   "j": "Eggplant",
+   "sale_rows": 132,
+   "joins": false
+  },
+  {
+   "j": "Pigeon Peas",
+   "sale_rows": 130,
+   "joins": false
+  },
+  {
+   "j": "Pineapple",
+   "sale_rows": 115,
+   "joins": false
+  },
+  {
+   "j": "Oranges",
+   "sale_rows": 111,
+   "joins": true
+  },
+  {
+   "j": "Cow Peas",
+   "sale_rows": 107,
+   "joins": false
+  },
+  {
+   "j": "Tea",
+   "sale_rows": 82,
+   "joins": true
+  },
+  {
+   "j": "Jackfruit",
+   "sale_rows": 67,
+   "joins": true
+  },
+  {
+   "j": "Passion Fruits",
+   "sale_rows": 60,
+   "joins": true
+  },
+  {
+   "j": "Pumpkins",
+   "sale_rows": 54,
+   "joins": false
+  },
+  {
+   "j": "Mangos",
+   "sale_rows": 54,
+   "joins": true
+  },
+  {
+   "j": "Dodo",
+   "sale_rows": 49,
+   "joins": true
+  },
+  {
+   "j": "Vanilla",
+   "sale_rows": 41,
+   "joins": false
+  },
+  {
+   "j": "Pawpaw",
+   "sale_rows": 27,
+   "joins": false
+  },
+  {
+   "j": "Wheat",
+   "sale_rows": 25,
+   "joins": false
+  },
+  {
+   "j": "Chick Peas",
+   "sale_rows": 23,
+   "joins": false
+  },
+  {
+   "j": "Green Gram",
+   "sale_rows": 21,
+   "joins": false
+  },
+  {
+   "j": "Ginger",
+   "sale_rows": 10,
+   "joins": true
+  },
+  {
+   "j": "Plantation Trees",
+   "sale_rows": 8,
+   "joins": false
+  },
+  {
+   "j": "Carrots",
+   "sale_rows": 5,
+   "joins": false
+  },
+  {
+   "j": "Barley",
+   "sale_rows": 4,
+   "joins": false
+  },
+  {
+   "j": "Other Vegetable",
+   "sale_rows": 4,
+   "joins": false
+  },
+  {
+   "j": "Other Forest",
+   "sale_rows": 1,
+   "joins": false
+  },
+  {
+   "j": "Natural Forest",
+   "sale_rows": 1,
+   "joins": false
+  }
+ ],
+ "crop_label_join_after": [
+  {
+   "j": "Maize",
+   "sale_rows": 7358,
+   "joins": true
+  },
+  {
+   "j": "Matoke",
+   "sale_rows": 6793,
+   "joins": true
+  },
+  {
+   "j": "Beans",
+   "sale_rows": 6726,
+   "joins": true
+  },
+  {
+   "j": "Coffee",
+   "sale_rows": 6447,
+   "joins": true
+  },
+  {
+   "j": "Cassava",
+   "sale_rows": 2498,
+   "joins": true
+  },
+  {
+   "j": "Ground Nuts",
+   "sale_rows": 2229,
+   "joins": true
+  },
+  {
+   "j": "Sweet Potatoes",
+   "sale_rows": 1442,
+   "joins": true
+  },
+  {
+   "j": "Soybean",
+   "sale_rows": 1161,
+   "joins": true
+  },
+  {
+   "j": "Banana Beer",
+   "sale_rows": 1070,
+   "joins": false
+  },
+  {
+   "j": "Sorghum",
+   "sale_rows": 1014,
+   "joins": true
+  },
+  {
+   "j": "Millet",
+   "sale_rows": 1001,
+   "joins": true
+  },
+  {
+   "j": "Irish Potatoes",
+   "sale_rows": 835,
+   "joins": true
+  },
+  {
+   "j": "Sim Sim",
+   "sale_rows": 812,
+   "joins": true
+  },
+  {
+   "j": "Sweet Bananas",
+   "sale_rows": 760,
+   "joins": true
+  },
+  {
+   "j": "Sunflower",
+   "sale_rows": 631,
+   "joins": false
+  },
+  {
+   "j": "Rice",
+   "sale_rows": 615,
+   "joins": true
+  },
+  {
+   "j": "Cotton",
+   "sale_rows": 560,
+   "joins": false
+  },
+  {
+   "j": "Tomatoes",
+   "sale_rows": 475,
+   "joins": true
+  },
+  {
+   "j": "Sugarcane",
+   "sale_rows": 421,
+   "joins": true
+  },
+  {
+   "j": "Other Crop",
+   "sale_rows": 246,
+   "joins": false
+  },
+  {
+   "j": "Cabbages",
+   "sale_rows": 236,
+   "joins": true
+  },
+  {
+   "j": "Tobacco",
+   "sale_rows": 231,
+   "joins": false
+  },
+  {
+   "j": "Onions",
+   "sale_rows": 206,
+   "joins": true
+  },
+  {
+   "j": "Field Peas",
+   "sale_rows": 200,
+   "joins": false
+  },
+  {
+   "j": "Avocado",
+   "sale_rows": 145,
+   "joins": false
+  },
+  {
+   "j": "Yam",
+   "sale_rows": 138,
+   "joins": true
+  },
+  {
+   "j": "Cocoa",
+   "sale_rows": 138,
+   "joins": false
+  },
+  {
+   "j": "Eggplant",
+   "sale_rows": 132,
+   "joins": false
+  },
+  {
+   "j": "Pigeon Peas",
+   "sale_rows": 130,
+   "joins": false
+  },
+  {
+   "j": "Pineapple",
+   "sale_rows": 115,
+   "joins": false
+  },
+  {
+   "j": "Oranges",
+   "sale_rows": 111,
+   "joins": true
+  },
+  {
+   "j": "Cow Peas",
+   "sale_rows": 107,
+   "joins": false
+  },
+  {
+   "j": "Tea",
+   "sale_rows": 82,
+   "joins": true
+  },
+  {
+   "j": "Jackfruit",
+   "sale_rows": 67,
+   "joins": true
+  },
+  {
+   "j": "Passion Fruits",
+   "sale_rows": 60,
+   "joins": true
+  },
+  {
+   "j": "Mangos",
+   "sale_rows": 54,
+   "joins": true
+  },
+  {
+   "j": "Pumpkins",
+   "sale_rows": 54,
+   "joins": false
+  },
+  {
+   "j": "Dodo",
+   "sale_rows": 49,
+   "joins": true
+  },
+  {
+   "j": "Vanilla",
+   "sale_rows": 41,
+   "joins": false
+  },
+  {
+   "j": "Pawpaw",
+   "sale_rows": 27,
+   "joins": false
+  },
+  {
+   "j": "Wheat",
+   "sale_rows": 25,
+   "joins": false
+  },
+  {
+   "j": "Chick Peas",
+   "sale_rows": 23,
+   "joins": false
+  },
+  {
+   "j": "Green Gram",
+   "sale_rows": 21,
+   "joins": false
+  },
+  {
+   "j": "Ginger",
+   "sale_rows": 10,
+   "joins": true
+  },
+  {
+   "j": "Plantation Trees",
+   "sale_rows": 8,
+   "joins": false
+  },
+  {
+   "j": "Carrots",
+   "sale_rows": 5,
+   "joins": false
+  },
+  {
+   "j": "Barley",
+   "sale_rows": 4,
+   "joins": false
+  },
+  {
+   "j": "Other Vegetable",
+   "sale_rows": 4,
+   "joins": false
+  },
+  {
+   "j": "Other Forest",
+   "sale_rows": 1,
+   "joins": false
+  },
+  {
+   "j": "Natural Forest",
+   "sale_rows": 1,
+   "joins": false
+  }
+ ],
+ "crop_sale_rows_joining_before": 33806,
+ "crop_sale_rows_joining_after": 41600,
+ "value_sold_scale": {
+  "crop_sale_price_per_kg_median_by_wave_season": {
+   "A": {
+    "2009-10": 700.0,
+    "2010-11": 700.0,
+    "2011-12": 1000.0,
+    "2013-14": 1000.0,
+    "2015-16": 10.0,
+    "2019-20": 1250.0
+   },
+   "B": {
+    "2009-10": 700.0,
+    "2010-11": 1000.0,
+    "2011-12": 1000.0,
+    "2013-14": 1000.0,
+    "2015-16": 10.0,
+    "2019-20": 1300.0
+   }
+  },
+  "crop_sale_price_per_kg_median_by_crop_wave": {
+   "2009-10": {
+    "Beans": 1000.0,
+    "Cassava": 400.0,
+    "Ground Nuts": 1400.0,
+    "Maize": 400.0,
+    "Rice": 1083.3,
+    "Sorghum": 500.0
+   },
+   "2010-11": {
+    "Beans": 1000.0,
+    "Cassava": 300.0,
+    "Ground Nuts": 1000.0,
+    "Maize": 300.0,
+    "Rice": 900.0,
+    "Sorghum": 500.0
+   },
+   "2011-12": {
+    "Beans": 1000.0,
+    "Cassava": 700.0,
+    "Ground Nuts": 1550.0,
+    "Maize": 500.0,
+    "Rice": 2000.0,
+    "Sorghum": 700.0
+   },
+   "2013-14": {
+    "Beans": 1000.0,
+    "Cassava": 500.0,
+    "Ground Nuts": 1750.0,
+    "Maize": 500.0,
+    "Rice": 1800.0,
+    "Sorghum": 600.0
+   },
+   "2015-16": {
+    "Beans": 12.0,
+    "Cassava": 3.0,
+    "Ground Nuts": 16.5,
+    "Maize": 5.0,
+    "Rice": 14.0,
+    "Sorghum": 6.0
+   },
+   "2019-20": {
+    "Beans": 1500.0,
+    "Cassava": 500.0,
+    "Ground Nuts": 1875.0,
+    "Maize": 600.0,
+    "Rice": 2076.9,
+    "Sorghum": 800.0
+   }
+  },
+  "excluded_waves": [
+   "2015-16"
+  ]
+ },
+ "crop_sale_rows_excluded_2015_16": 6868,
+ "source4_sold_unit_notes": [
+  {
+   "wave": "2009-10",
+   "season": "A",
+   "sale_rows": 3532,
+   "kept_with_sold_unit": 3425,
+   "matched_to_a_cluster": 3390
+  },
+  {
+   "wave": "2009-10",
+   "season": "B",
+   "sale_rows": 3517,
+   "kept_with_sold_unit": 3443,
+   "matched_to_a_cluster": 3370
+  },
+  {
+   "wave": "2010-11",
+   "season": "A",
+   "sale_rows": 3633,
+   "kept_with_sold_unit": 2085,
+   "matched_to_a_cluster": 2085
+  },
+  {
+   "wave": "2010-11",
+   "season": "B",
+   "sale_rows": 3236,
+   "kept_with_sold_unit": 3187,
+   "matched_to_a_cluster": 3187
+  },
+  {
+   "wave": "2011-12",
+   "season": "A",
+   "sale_rows": 3608,
+   "kept_with_sold_unit": 3607,
+   "matched_to_a_cluster": 3511
+  },
+  {
+   "wave": "2011-12",
+   "season": "B",
+   "sale_rows": 3205,
+   "kept_with_sold_unit": 3195,
+   "matched_to_a_cluster": 3129
+  },
+  {
+   "wave": "2013-14",
+   "season": "A",
+   "sale_rows": 3301,
+   "kept_with_sold_unit": 3103,
+   "matched_to_a_cluster": 3103
+  },
+  {
+   "wave": "2013-14",
+   "season": "B",
+   "sale_rows": 3158,
+   "kept_with_sold_unit": 3123,
+   "matched_to_a_cluster": 3123
+  },
+  {
+   "wave": "2015-16",
+   "season": "A",
+   "status": "excluded: Value_sold scale defect"
+  },
+  {
+   "wave": "2015-16",
+   "season": "B",
+   "status": "excluded: Value_sold scale defect"
+  },
+  {
+   "wave": "2018-19",
+   "season": "A",
+   "sale_rows": 2937,
+   "kept_with_sold_unit": 2733,
+   "matched_to_a_cluster": 2694
+  },
+  {
+   "wave": "2018-19",
+   "season": "B",
+   "sale_rows": 2536,
+   "kept_with_sold_unit": 2331,
+   "matched_to_a_cluster": 2328
+  },
+  {
+   "wave": "2019-20",
+   "season": "A",
+   "sale_rows": 2884,
+   "kept_with_sold_unit": 2759,
+   "matched_to_a_cluster": 2757
+  },
+  {
+   "wave": "2019-20",
+   "season": "B",
+   "sale_rows": 2709,
+   "kept_with_sold_unit": 2583,
+   "matched_to_a_cluster": 2583
+  }
+ ],
+ "geo_missing": {
+  "unit_value": {
+   "rows": 242370,
+   "rows_without_cluster_features": 763
+  },
+  "reported_purchase_price": {
+   "rows": 241469,
+   "rows_without_cluster_features": 759
+  },
+  "own_consumption_valuation": {
+   "rows": 84369,
+   "rows_without_cluster_features": 133
+  },
+  "crop_sale_price": {
+   "rows": 38651,
+   "rows_without_cluster_features": 306
+  },
+  "crop_sale_price_soldunit": {
+   "rows": 35260,
+   "rows_without_cluster_features": 66
+  }
+ },
+ "unit_vocab": {
+  "n_food_u": 128,
+  "n_crop_u": 43,
+  "n_intersection": 42,
+  "crop_only": [
+   "Unknown"
+  ]
+ },
+ "geo_levels": [
+  "v",
+  "District",
+  "Region"
+ ],
+ "within_household_margin_by_wave": [
+  {
+   "t": "2005-06",
+   "n": 111,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.05889151782819173,
+   "share_exactly_zero": 0.7207207207207207
+  },
+  {
+   "t": "2009-10",
+   "n": 86,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.0,
+   "share_exactly_zero": 0.627906976744186
+  },
+  {
+   "t": "2010-11",
+   "n": 59,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.601986402162968,
+   "share_exactly_zero": 0.4915254237288136
+  },
+  {
+   "t": "2011-12",
+   "n": 72,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.29987961349413883,
+   "share_exactly_zero": 0.6111111111111112
+  },
+  {
+   "t": "2013-14",
+   "n": 79,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.28768207245178085,
+   "share_exactly_zero": 0.6329113924050633
+  },
+  {
+   "t": "2015-16",
+   "n": 70,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.0,
+   "share_exactly_zero": 0.7142857142857143
+  },
+  {
+   "t": "2018-19",
+   "n": 124,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.13353139262452257,
+   "share_exactly_zero": 0.6129032258064516
+  },
+  {
+   "t": "2019-20",
+   "n": 95,
+   "median": 0.0,
+   "q25": 0.0,
+   "q75": 0.0,
+   "share_exactly_zero": 0.7578947368421053
+  }
+ ],
+ "within_household_margin_by_item": [
+  {
+   "j_agg": "Other Veg.",
+   "n": 95,
+   "median": 0.0,
+   "share_exactly_zero": 0.7684210526315789
+  },
+  {
+   "j_agg": "Matoke",
+   "n": 91,
+   "median": 0.11778303565638346,
+   "share_exactly_zero": 0.4065934065934066
+  },
+  {
+   "j_agg": "Dodo",
+   "n": 61,
+   "median": 0.0,
+   "share_exactly_zero": 0.6065573770491803
+  },
+  {
+   "j_agg": "Other Alcohol",
+   "n": 53,
+   "median": 0.0,
+   "share_exactly_zero": 0.9811320754716981
+  },
+  {
+   "j_agg": "Cassava",
+   "n": 48,
+   "median": 0.0,
+   "share_exactly_zero": 0.6458333333333334
+  },
+  {
+   "j_agg": "Beans",
+   "n": 38,
+   "median": 0.0,
+   "share_exactly_zero": 0.5789473684210527
+  },
+  {
+   "j_agg": "Tomatoes",
+   "n": 33,
+   "median": 0.0,
+   "share_exactly_zero": 0.6060606060606061
+  },
+  {
+   "j_agg": "Mangos",
+   "n": 31,
+   "median": 0.0,
+   "share_exactly_zero": 0.8387096774193549
+  },
+  {
+   "j_agg": "Sweet Potatoes",
+   "n": 30,
+   "median": 0.0,
+   "share_exactly_zero": 0.5666666666666667
+  },
+  {
+   "j_agg": "Maize",
+   "n": 30,
+   "median": 0.0,
+   "share_exactly_zero": 0.4666666666666667
+  },
+  {
+   "j_agg": "Eggs",
+   "n": 25,
+   "median": 0.0,
+   "share_exactly_zero": 0.52
+  },
+  {
+   "j_agg": "Cassava (flour)",
+   "n": 20,
+   "median": 0.0,
+   "share_exactly_zero": 0.65
+  },
+  {
+   "j_agg": "Other Tobacco",
+   "n": 16,
+   "median": 0.0,
+   "share_exactly_zero": 0.9375
+  },
+  {
+   "j_agg": "Milk (fresh)",
+   "n": 15,
+   "median": 0.0,
+   "share_exactly_zero": 0.8
+  },
+  {
+   "j_agg": "Other Fruits",
+   "n": 15,
+   "median": 0.0,
+   "share_exactly_zero": 0.4666666666666667
+  },
+  {
+   "j_agg": "Fish (fresh)",
+   "n": 12,
+   "median": 0.0,
+   "share_exactly_zero": 0.8333333333333334
+  },
+  {
+   "j_agg": "Sorghum",
+   "n": 9,
+   "median": 0.0,
+   "share_exactly_zero": 0.7777777777777778
+  },
+  {
+   "j_agg": "Onions",
+   "n": 7,
+   "median": 0.0,
+   "share_exactly_zero": 0.5714285714285714
+  },
+  {
+   "j_agg": "Chicken",
+   "n": 6,
+   "median": 0.11157177565710488,
+   "share_exactly_zero": 0.16666666666666666
+  },
+  {
+   "j_agg": "Waragi",
+   "n": 6,
+   "median": 0.0,
+   "share_exactly_zero": 0.6666666666666666
+  },
+  {
+   "j_agg": "Sweet Bananas",
+   "n": 5,
+   "median": 0.28768207245178085,
+   "share_exactly_zero": 0.2
+  },
+  {
+   "j_agg": "Ground Nuts",
+   "n": 5,
+   "median": 0.0,
+   "share_exactly_zero": 0.8
+  },
+  {
+   "j_agg": "Rice",
+   "n": 4,
+   "median": 0.0,
+   "share_exactly_zero": 1.0
+  },
+  {
+   "j_agg": "Sim Sim",
+   "n": 4,
+   "median": 0.0,
+   "share_exactly_zero": 1.0
+  },
+  {
+   "j_agg": "Oranges",
+   "n": 3,
+   "median": 0.0,
+   "share_exactly_zero": 0.6666666666666666
+  },
+  {
+   "j_agg": "Irish Potatoes",
+   "n": 3,
+   "median": 0.0,
+   "share_exactly_zero": 0.6666666666666666
+  },
+  {
+   "j_agg": "Jackfruit",
+   "n": 3,
+   "median": 0.0,
+   "share_exactly_zero": 0.3333333333333333
+  },
+  {
+   "j_agg": "Other Drinks",
+   "n": 3,
+   "median": 0.0,
+   "share_exactly_zero": 1.0
+  },
+  {
+   "j_agg": "Cabbages",
+   "n": 3,
+   "median": 0.6931471805599453,
+   "share_exactly_zero": 0.3333333333333333
+  },
+  {
+   "j_agg": "Beer",
+   "n": 3,
+   "median": 0.0,
+   "share_exactly_zero": 1.0
+  }
+ ],
+ "three_way": {
+  "n_cells": 223,
+  "n_items": 14,
+  "waves": [
+   "2009-10",
+   "2010-11",
+   "2011-12",
+   "2013-14",
+   "2019-20"
+  ],
+  "median_gap_1_3": 0.22314355131420882,
+  "median_gap_1_4": 0.4700036292457357,
+  "median_gap_3_4": 0.2106067325381531,
+  "ratio_1_3": 1.249999999999999,
+  "ratio_1_4": 1.6,
+  "ratio_3_4": 1.2344267996967369,
+  "median_position_of_own_consumption": 0.5849625007211564,
+  "share_own_consumption_above_purchase": 0.05829596412556054,
+  "share_own_consumption_below_sale": 0.13901345291479822
+ },
+ "native_1_vs_3_median_gap": 0.0,
+ "native_1_vs_3_n_cells": 1378,
+ "unknown_units": [
+  {
+   "wave": "2005-06",
+   "rows": 40394,
+   "rows_unknown_unit": 0,
+   "share_unknown": 0.0,
+   "codes": [],
+   "lost_purchased": 0,
+   "lost_produced": 0,
+   "lost_inkind": 0
+  },
+  {
+   "wave": "2009-10",
+   "rows": 37890,
+   "rows_unknown_unit": 0,
+   "share_unknown": 0.0,
+   "codes": [],
+   "lost_purchased": 0,
+   "lost_produced": 0,
+   "lost_inkind": 0
+  },
+  {
+   "wave": "2010-11",
+   "rows": 35232,
+   "rows_unknown_unit": 0,
+   "share_unknown": 0.0,
+   "codes": [],
+   "lost_purchased": 0,
+   "lost_produced": 0,
+   "lost_inkind": 0
+  },
+  {
+   "wave": "2011-12",
+   "rows": 38743,
+   "rows_unknown_unit": 6,
+   "share_unknown": 0.00015,
+   "codes": [
+    "0.0",
+    "136.0"
+   ],
+   "lost_purchased": 5,
+   "lost_produced": 0,
+   "lost_inkind": 0
+  },
+  {
+   "wave": "2013-14",
+   "rows": 50422,
+   "rows_unknown_unit": 2,
+   "share_unknown": 4e-05,
+   "codes": [
+    "142092.0"
+   ],
+   "lost_purchased": 0,
+   "lost_produced": 2,
+   "lost_inkind": 0
+  },
+  {
+   "wave": "2015-16",
+   "rows": 49751,
+   "rows_unknown_unit": 11,
+   "share_unknown": 0.00022,
+   "codes": [
+    "123060.0",
+    "139093.0",
+    "142090.0",
+    "156087.0",
+    "156090.0",
+    "156096.0",
+    "181087.0"
+   ],
+   "lost_purchased": 5,
+   "lost_produced": 4,
+   "lost_inkind": 2
+  },
+  {
+   "wave": "2018-19",
+   "rows": 415532,
+   "rows_unknown_unit": 431,
+   "share_unknown": 0.00104,
+   "codes": [
+    "136.0",
+    "996.0",
+    "997.0",
+    "998.0",
+    "999.0"
+   ],
+   "lost_purchased": 119,
+   "lost_produced": 279,
+   "lost_inkind": 36
+  },
+  {
+   "wave": "2019-20",
+   "rows": 385434,
+   "rows_unknown_unit": 836,
+   "share_unknown": 0.00217,
+   "codes": [
+    "136.0",
+    "800.0",
+    "801.0",
+    "802.0",
+    "996.0",
+    "997.0",
+    "998.0",
+    "999.0"
+   ],
+   "lost_purchased": 569,
+   "lost_produced": 229,
+   "lost_inkind": 41
+  }
+ ]
+}

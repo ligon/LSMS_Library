@@ -1,0 +1,264 @@
+Uganda     anthropometry                OK   rows=     29553    19.3s
+Uganda     assets                       OK   rows=    116808    15.8s
+Uganda     cluster_features             OK   rows=      4805     2.9s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2011-12/_/../../_/uganda.py:1538: GrainConflictWarning: grain conflict on ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season']: 1 of 20182 group(s) carry more than one distinct value.  Conflicted groups per column: {'Unit_sold': 1}.  Offending groups e.g. [('2011-12', '1053000802', '1053000802-1-3', 'Sweet Bananas', 'Bunch (Small)', 'fresh', 'A')].  on_conflict='na': blanking those cells rather than picking an arbitrary winner.  Either the payload is genuinely finer-grained than the declared index (it does not belong in this table), the identifier is broken / a level is missing, or the source needs cleaning.  If the loss is understood and accepted, pass on_conflict='na' to blank exactly these cells (and say why at the call site).  GH #323; SkunkWorks/grain_aggregation_policy.org.
+  labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2009-10/_/../../_/uganda.py:1538: GrainConflictWarning: grain conflict on ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season']: 6 of 22748 group(s) carry more than one distinct value.  Conflicted groups per column: {'Unit_sold': 6}.  Offending groups e.g. [('2009-10', '1083003309', '1083003309-1-2', 'Pawpaw', 'Sack (100 kgs)', 'fresh', 'B'), ('2009-10', '2033000804', '2033000804-1-1', 'Maize', 'Sack (100 kgs)', 'dried_grain', 'B'), ('2009-10', '3033003303', '3033003303-2-1', 'Sweet Bananas', 'Bunch (Big)', 'fresh', 'B'), ('2009-10', '4113000903', '4113000903-2-1', 'Matoke', 'Bunch (Small)', 'fresh', 'B'), ('2009-10', '4153000403', '4153000403-2-1', 'Maize', 'Sack (100 kgs)', 'dried_grain', 'B')].  on_conflict='na': blanking those cells rather than picking an arbitrary winner.  Either the payload is genuinely finer-grained than the declared index (it does not belong in this table), the identifier is broken / a level is missing, or the source needs cleaning.  If the loss is understood and accepted, pass on_conflict='na' to blank exactly these cells (and say why at the call site).  GH #323; SkunkWorks/grain_aggregation_policy.org.
+  labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2013-14/_/../../_/uganda.py:1538: GrainConflictWarning: grain conflict on ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season']: 3 of 17585 group(s) carry more than one distinct value.  Conflicted groups per column: {'Unit_sold': 2, 'Condition_sold': 1}.  Offending groups e.g. [('2013-14', 'H06105-04-01', 'H06105-04-01-1-2', 'Cassava', 'Sack (100 kgs)', 'dried', 'A'), ('2013-14', 'H25209-04-01', 'H25209-04-01-1-2', 'Sweet Potatoes', 'Sack (100 kgs)', 'fresh', 'A'), ('2013-14', 'H42603-04-01', 'H42603-04-01-3-4', 'Banana Beer', 'Bunch (Small)', 'fresh', 'A')].  on_conflict='na': blanking those cells rather than picking an arbitrary winner.  Either the payload is genuinely finer-grained than the declared index (it does not belong in this table), the identifier is broken / a level is missing, or the source needs cleaning.  If the loss is understood and accepted, pass on_conflict='na' to blank exactly these cells (and say why at the call site).  GH #323; SkunkWorks/grain_aggregation_policy.org.
+  labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2015-16/_/../../_/uganda.py:1538: GrainConflictWarning: grain conflict on ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season']: 1 of 19576 group(s) carry more than one distinct value.  Conflicted groups per column: {'Condition_sold': 1}.  Offending groups e.g. [('2015-16', 'H3600301', 'H3600301-1-1', 'Maize', 'Plastic Basin (15 lts)', 'green_with_shell', 'A')].  on_conflict='na': blanking those cells rather than picking an arbitrary winner.  Either the payload is genuinely finer-grained than the declared index (it does not belong in this table), the identifier is broken / a level is missing, or the source needs cleaning.  If the loss is understood and accepted, pass on_conflict='na' to blank exactly these cells (and say why at the call site).  GH #323; SkunkWorks/grain_aggregation_policy.org.
+  labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
+Uganda     crop_production              OK   rows=    130606    18.2s
+Uganda     earnings                     OK   rows=     22447    15.6s
+Uganda     enterprise_income            OK   rows=     13935    15.1s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+Uganda     fct                          OK   rows=        15    29.9s
+Uganda     food_acquired                OK   rows=    355571     2.0s
+Uganda     food_expenditures            OK   rows=    247049     2.4s
+Uganda     food_prices                  OK   rows=    349081     5.9s
+Uganda     food_quantities              OK   rows=    349057     6.1s
+Uganda     household_characteristics    OK   rows=     24364     8.1s
+Uganda     household_roster             OK   rows=    144704     1.0s
+Uganda     housing                      OK   rows=     24210     1.9s
+2005-06
+2009-10
+2010-11
+2011-12
+2013-14
+2015-16
+2018-19
+2019-20
+2005-06
+2009-10
+2010-11
+2011-12
+2013-14
+2015-16
+2018-19
+2019-20
+Uganda     income                       OK   rows=     14740    19.9s
+Uganda     individual_education         OK   rows=     46526     3.1s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Uganda     interview_date               OK   rows=     24264    15.6s
+Uganda     livestock                    OK   rows=     27073    15.8s
+Uganda     months_food_inadequate       OK   rows=     14796    10.4s
+Uganda     nonfood_expenditures         OK   rows=    251588    15.8s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2018-19/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{996.0, 997.0, 998.0, 999.0}
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Uganda/2019-20/_/../../_/uganda.py:400: UserWarning: Dropping some unknown unit codes!
+  warnings.warn("Dropping some unknown unit codes!")
+{800.0, 801.0, 802.0, 996.0, 997.0, 998.0, 999.0}
+Uganda     nutrition                    OK   rows=     23801    28.6s
+Uganda     panel_ids                    OK   rows=      9510     0.0s
+Uganda     people_last7days             OK   rows=     15382     1.8s
+Uganda     plot_features                OK   rows=     42841    15.4s
+Uganda     plot_inputs                  OK   rows=     84216    16.8s
+Uganda     plot_labor                   OK   rows=    169877    13.8s
+Uganda     sample                       OK   rows=     24362     0.3s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq1
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: h1bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Uganda     shocks                       OK   rows=     14457    14.1s
+Malawi     anthropometry                OK   rows=     31038    11.3s
+Malawi     assets                       OK   rows=    356297    25.1s
+Malawi     cluster_features             OK   rows=      3235     3.2s
+Malawi     community_prices             OK   rows=     82635     5.7s
+Malawi     crop_production              OK   rows=    131548     1.0s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a37
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a40
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a22
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a23
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a37
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: hh_a40
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Malawi     food_acquired                OK   rows=    971531   195.6s
+Malawi     food_coping                  OK   rows=    200738     9.1s
+Malawi     food_expenditures            OK   rows=    681980     5.3s
+Malawi     food_prices                  OK   rows=    681613    12.0s
+Malawi     food_quantities              OK   rows=    971028    14.4s
+Malawi     food_security                OK   rows=     27878     3.2s
+Malawi     household_characteristics    OK   rows=     56918    10.1s
+Malawi     household_roster             OK   rows=    260612     1.2s
+Malawi     housing                      OK   rows=     57118     2.6s
+Malawi     individual_education         OK   rows=    184667     5.4s
+Malawi     interview_date               OK   rows=     69484    14.5s
+Malawi     livestock                    OK   rows=     39126     9.3s
+Malawi     months_food_inadequate       OK   rows=     40152     8.6s
+Malawi     panel_ids                    OK   rows=      5686     0.0s
+Malawi     people_last7days             OK   rows=    207713    11.0s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_features.py:24: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df_d['hhid'] = df_d['y2_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_features.py:25: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df_d['plotkey'] = df_d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_features.py:28: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df_d['hhid'] = df_d['case_id'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_features.py:29: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df_d['plotkey'] = df_d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_features.py:55: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_xs['hhid'] = d_xs['case_id'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_features.py:56: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_xs['plotkey'] = _plotkey(d_xs)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_features.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['hhid'] = d_pn['y4_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_features.py:68: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['plotkey'] = _plotkey(d_pn)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_features.py:108: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['hhid'] = d_pn['y3_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_features.py:109: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['plotkey'] = _plotkey(d_pn)
+Malawi     plot_features                OK   rows=     68339    88.6s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_inputs.py:31: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['hhid'] = d['y2_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_inputs.py:32: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_inputs.py:35: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['hhid'] = d['case_id'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_inputs.py:36: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_inputs.py:41: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df['hhid'] = hh_of(df)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_inputs.py:42: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = _plotkey(d)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_inputs.py:41: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df['hhid'] = hh_of(df)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_inputs.py:42: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = _plotkey(d)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_inputs.py:77: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  df['hhid'] = hh_of(df)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_inputs.py:78: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = _plotkey(d)
+Malawi     plot_inputs                  OK   rows=    180184    69.0s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_labor.py:26: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['hhid'] = d['y2_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2013-14/_/./plot_labor.py:27: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_labor.py:30: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['hhid'] = d['case_id'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2010-11/_/./plot_labor.py:31: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d['plotkey'] = d['ag_d00'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_labor.py:44: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_xs['hhid'] = d_xs['case_id'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_labor.py:45: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_xs['plotkey'] = _plotkey(d_xs)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_labor.py:51: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['hhid'] = d_pn['y4_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2019-20/_/./plot_labor.py:52: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['plotkey'] = _plotkey(d_pn)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_labor.py:91: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['hhid'] = d_pn['y3_hhid'].apply(format_id)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Malawi/2016-17/_/./plot_labor.py:92: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  d_pn['plotkey'] = _plotkey(d_pn)
+Malawi     plot_labor                   OK   rows=     79997    65.8s
+Malawi     sample                       OK   rows=     57118     0.3s
+Malawi     shocks                       OK   rows=    104691    19.3s
+Malawi     subjective_well_being        OK   rows=     36147     1.9s
+Nigeria    anthropometry                OK   rows=     16389     9.9s
+Nigeria    assets                       OK   rows=    865318    34.0s
+Nigeria    cluster_features             OK   rows=      5248     3.6s
+Nigeria    community_prices             OK   rows=    138055    12.6s
+Nigeria    crop_production              OK   rows=     62844     0.8s
+/global/home/users/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1330: DtypeWarning: Columns (0: s10bq2b_os, 1: s10bq3b_os, 2: s10bq5b_os, 3: s10bq6b_os, 4: s10bq7b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/home/users/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1330: DtypeWarning: Columns (0: s7bq2b_os, 1: s7bq3b_os, 2: s7bq5b_os, 3: s7bq6b_os, 4: s7bq7b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+/global/home/users/ligon/mirrors/LSMS_Library/lsms_library/local_tools.py:1330: DtypeWarning: Columns (0: s10bq2b_os, 1: s10bq9b_os) have mixed types. Specify dtype option on import or set low_memory=False.
+  return pd.read_csv(f,encoding=encoding)
+Nigeria    food_acquired                OK   rows=    595725    47.2s
+Nigeria    food_coping                  OK   rows=    125839     5.9s
+Nigeria    food_expenditures            OK   rows=    482285     3.5s
+Nigeria    food_prices                  OK   rows=    481613     7.2s
+Nigeria    food_quantities              OK   rows=    595053     8.4s
+Nigeria    household_characteristics    OK   rows=     48074    22.2s
+Nigeria    household_roster             OK   rows=    287630     1.5s
+Nigeria    housing                      OK   rows=     24006    10.2s
+Nigeria    individual_education         OK   rows=    113934     4.6s
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq17y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq13y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: saq16y
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: tracked_obs
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: interviewer_id
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: supervisor_id
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Nigeria    interview_date               OK   rows=     19446    10.6s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/livestock.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/livestock.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/livestock.parquet'.  Stop.
+Nigeria    livestock                    OK   rows=     23196     7.4s
+Nigeria    nonfood_expenditures         OK   rows=    464930    13.5s
+Nigeria    panel_ids                    OK   rows=     14251     0.0s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/people_last7days.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/people_last7days.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/people_last7days.parquet'.  Stop.
+Nigeria    people_last7days             OK   rows=    129817     8.1s
+Nigeria    plot_features                OK   rows=     38045    10.6s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/plot_inputs.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/plot_inputs.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/plot_inputs.parquet'.  Stop.
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq13
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq26
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s11eq34
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+Nigeria    plot_inputs                  OK   rows=     96620    71.4s
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nigeria/var/plot_labor.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/var/plot_labor.parquet'.  Stop.
+make: *** No rule to make target '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Nigeria/_/plot_labor.parquet'.  Stop.
+Nigeria    plot_labor                   OK   rows=     59387     7.1s
+Nigeria    sample                       OK   rows=     49770     0.4s
+Nigeria    shocks                       OK   rows=     22550     4.9s
+Niger      assets                       OK   rows=     94281    23.0s
+Niger      cluster_features             OK   rows=      1599     1.5s
+Niger      community_prices             OK   rows=     15423     4.6s
+Niger      crop_production              OK   rows=     46341     0.6s
+Niger      food_acquired                OK   rows=    239031    25.7s
+Niger      food_expenditures            OK   rows=    199131     1.1s
+Niger      food_prices                  OK   rows=    198370     2.9s
+Niger      food_quantities              OK   rows=    238272     3.1s
+Niger      food_security                OK   rows=     16197     1.6s
+Niger      household_characteristics    OK   rows=     20107    26.7s
+Niger      household_roster             OK   rows=    121791     0.7s
+Niger      housing                      OK   rows=     20172     1.8s
+Niger      individual_education         OK   rows=     80432     3.8s
+Niger      interview_date               OK   rows=     37898     1.5s
+Niger      livestock                    OK   rows=     30210     9.9s
+Niger      panel_ids                    OK   rows=      7840     0.0s
+Niger      people_last7days             OK   rows=    125084    15.8s
+Niger      plot_features                OK   rows=     12413     5.7s
+Niger      plot_inputs                  OK   rows=     42364    10.5s
+Niger      plot_labor                   OK   rows=     52909     9.8s
+Niger      sample                       OK   rows=     20172     0.1s
+Niger      shocks                       OK   rows=     17496    22.0s
+Niger      subjective_well_being        OK   rows=     12543     1.5s
+REWARM DONE

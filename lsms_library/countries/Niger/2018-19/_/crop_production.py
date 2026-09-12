@@ -38,7 +38,7 @@ intercropped = src['s16cq07'].map({'Association de cultures': True, 'Pure': Fals
 
 df = pd.DataFrame({
     'i':             hh.values,
-    'plot':          plot.values,
+    'plot_id':          plot.values,
     'crop':          _crop_labels(src_codes['s16cq04'], src['s16cq04'], crop_map).values,
     'u':             _unit_labels(src['s16cq12b'], unit_map).values,
     'Quantity':      src['s16cq12a'].values,

@@ -1,0 +1,37 @@
+countries_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/lsms_library/countries
+data_root: /global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_gsps_plot
+cold? country parquet exists before build: False
+Traceback (most recent call last):
+  File "/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/slurm_logs/ghanasps/plot_features_verify.py", line 135, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/tmp/wt-gsps-plot/slurm_logs/ghanasps/plot_features_verify.py", line 42, in main
+    df = c.plot_features()
+         ^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 4243, in method
+    result = self._aggregate_wave_data(waves, name, currency=currency)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 3752, in _aggregate_wave_data
+    result = self._finalize_result(df, scheme_entry, method_name, currency=currency)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 2703, in _finalize_result
+    df = self._join_v_from_sample(df)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 2083, in _join_v_from_sample
+    s = self.sample()
+        ^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 4243, in method
+    result = self._aggregate_wave_data(waves, name, currency=currency)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 3752, in _aggregate_wave_data
+    result = self._finalize_result(df, scheme_entry, method_name, currency=currency)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/country.py", line 2863, in _finalize_result
+    check_declared_columns(
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py", line 470, in check_declared_columns
+    _record_null_read_report(report)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py", line 375, in _record_null_read_report
+    _emit_null_read_report(report)
+  File "/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/null_read_audit.py", line 382, in _emit_null_read_report
+    raise NullReadError(msg)
+lsms_library.null_read_audit.NullReadError: GhanaSPS/sample: required declared column 'Rural' is 100% NULL in wave(s) [2013-14, 2017-18] while other waves carry it. The column is PRESENT, so the shape guards (Country._assert_built_required_columns, the dfs: sub-df check) all pass; it just holds nothing. Either the wave's data_info.yml does not wire the column (look for a sibling source file that carries it -- that has been the answer more often than 'the survey never asked'), or the source column it names is itself empty. If the data genuinely does not exist for this country, mark the column `optional: true` in GhanaSPS/_/data_scheme.yml -- but note `optional:` is COUNTRY-grain while this finding may be WAVE-grain, so do not reach for it to silence a single wave. Set LSMS_READ_STRICT=1 to make this fatal.

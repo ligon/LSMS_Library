@@ -1,0 +1,543 @@
+#+TITLE: Derived served values: Ethiopia and Nigeria
+#+DATE: 2026-09-11
+#+AUTHOR: census agent (Ethiopia + Nigeria group)
+
+* Scope and method
+
+Read-only census of every SERVED value (a column, or an index value such as
+u) in the Ethiopia and Nigeria tables that is produced by something other
+than a rename / decode / re-index of one raw field.  Inputs read as text:
+all 77 + 68 wave scripts under lsms_library/countries/{Ethiopia,Nigeria},
+the country modules _/ethiopia.py (3000 lines) and _/nigeria.py (2259
+lines), every _/*.py, every mapping.py and data_info.yml, both
+_/data_scheme.yml, both _/Makefile, both _/CONTENTS.org (grep by variable
+name), lsms_library/build_transforms.py and the relevant parts of
+local_tools.py / country.py / transformations.py.  Nothing was executed:
+no Country()/Feature() call, no wave script, no dvc CLI, no edit to a
+tracked file.  GitNexus MCP did not connect; grep/sed were the declared
+substitute.
+
+Framework derived tables (food_expenditures / food_prices /
+food_quantities / household_characteristics, kg inference in
+transformations.conversion_to_kgs, GPS collapse in
+country._collapse_to_cluster_grain, weight normalisation) are another
+agent's and are only mentioned where a country script (a) feeds them a
+country-side input, or (b) computes its own version.
+
+Kinds: the brief's list (scale / annualise / product / ratio /
+categorical->number / impute / encoding / selection / guard) plus two the
+brief has no slot for and which this group needs:
+
+- sum :: a served number that is a sum or a signed difference over several
+  raw fields or several raw ROWS (person-days, PP+PH totals, sub-code
+  folds, residuals).
+- window :: no arithmetic at all; the served number is a raw answer whose
+  RECALL WINDOW or question semantics differ from the column's name or from
+  the same column in a sibling wave.  These are the 12B-shaped rows.
+
+Ids E1..E39 are Ethiopia (E39 is an uncounted pointer row), N1..N38 Nigeria; the notes in section 2 use them.
+"pp"/"ph" = post-planting / post-harvest round.  Line numbers are on the
+development branch at commit 36efe55c.
+
+* 1. Table: one row per derivation
+
+| id | country | wave(s) | table | served column(s) / index value | raw inputs (file.variable) | rule | kind | where (path:line) | disclosed today? | rows affected if stated |
+|----+---------+---------+-------+--------------------------------+----------------------------+------+------+-------------------+------------------+-------------------------|
+| E1 | Ethiopia | W1-W5 | food_acquired | Quantity on s='produced' (via intermediate Produced) | sect5a_hh_w{1,2,3}.dta hh_s5aq02_a (total qty consumed, 7d), hh_s5aq03_a (qty from purchases); sect6a_hh_w{4,5}.dta s6aq02a, s6aq03a | Produced = (Q_total.fillna(0) - Q_purch.fillna(0)).clip(lower=0).  The survey's OWN own-production (hh_s5aq05_a / s6aq05a) and gift (hh_s5aq06_a / s6aq06a) quantities are not read; 'produced' = total - purchased, which includes gifts and other sources | sum (difference) + guard (clip) | Ethiopia/_/ethiopia.py:305-312 (food_acquired, 245-347) | docstring ethiopia.py:261-283; CONTENTS.org:1467-1495 (questionnaire); slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org | docstring: units mismatch in ~0.3% of populated W1 rows |
+| E2 | Ethiopia | W1-W5 | food_acquired | Quantity on s='purchased' | E1 inputs + lsms_library/build_transforms.py food_acquired_to_canonical | purchased = (Quantity - Produced).clip(0) = min(Q_total, Q_purch).  Edge: Q_total NaN and Q_purch > 0 -> Produced 0 (ethiopia.py:312 fills both with 0) and purchased = (Quantity.fillna(0) - Produced.fillna(0)).clip(0) = 0 (build_transforms.py:69-70): a reported purchase served as 0; the row survives only if Expenditure > 0 | sum (difference) + guard | ethiopia.py:312 composed with build_transforms.py:34-139 (69-70) | DESIGN doc; not stated as min() anywhere | none stated |
+| E3 | Ethiopia | W1-W5 | food_acquired | u (index) on the purchased row | hh_s5aq02_b / s6aq02b (unit of TOTAL); hh_s5aq03_b / s6aq03b (unit of purchased) | u := unit of the total-consumed quantity for BOTH the purchased and produced rows; the purchased row's own unit is discarded | encoding | ethiopia.py:305-308 | inline comment ethiopia.py:305-307 | ~0.3% W1 rows where units differ |
+| E4 | Ethiopia | W1-W5 | plot_features | Area, AreaUnit | sect3_pp_w{1,2,3}.dta pp_s3q05_a; sect3_pp_w{4,5}.dta s3q08 (GPS area, sqm) | Area = sqm / 10000, NA where sqm <= 0; AreaUnit = 'hectares' iff GPS present, else native unit label of pp_s3q02_c / s3q02b | scale + guard + encoding | ethiopia.py:962-964, 983-985 | CONTENTS.org:1042-1195; wave-script comments | 9,727 non-GPS fields (comment ethiopia.py:971-975) |
+| E5 | Ethiopia | W1-W4 (not W5) | plot_features | Area on fields with no GPS | pp_s3q02_a / s3q02a (farmer estimate), pp_s3q02_c / s3q02b (unit code), saq01/saq02/saq03 (region/zone/woreda); ET_local_area_unit_conversion.dta SqmPerUnit | Area = est * SqmPerUnit(region, zone, woreda, unit) / 10000; national column as default, region 99 pooled; AreaUnit stays the NATIVE unit name on a converted row; 2021-22 has no shipped table so those fields stay NA (LOCAL_AREA_UNIT_WAVES, ethiopia.py:639) | product (scale by looked-up factor) + selection | ethiopia.py:770-862 (831), 799-801, 986-1000 | CONTENTS.org:1042-1195; docstring (GH #853) | PLOT_AREA_IMPLAUSIBLE_MULTIPLE = 5.0 (ethiopia.py:767) counts, never clips: 33 of 2,273 converted fields > 5x GPS median (converted 2.4x-17.6x) |
+| E6 | Ethiopia | W1-W5 | plot_features | Fallow | pp_s3q03 / s3q03 (field land-status code) | Fallow = (code == 3) | categorical->number | ethiopia.py:1015-1017 | wave-script comment ("code 3 == Fallow") | - |
+| E7 | Ethiopia | W1-W3 vs W4-W5 | plot_features | ErosionProtection (and Irrigated / Certificate yes-no booleans) | pp_s3q32 (W1-3: 2=Yes, 1=No); s3q38 (W4-5: 1=Yes, 2=No) | bool = (code == erosion_yes); the Yes code FLIPS between W3 and W4 and is passed per wave from the wave script | categorical->number | ethiopia.py:1018-1026; 2011-12/_/plot_features.py:40; 2018-19/_/plot_features.py:37 | comment ethiopia.py:1019-1022 | - |
+| E8 | Ethiopia | W1-W5 | crop_production | harvest_month, planting_month (Gregorian ints) | sect9_ph: ph_s9q13_b (W1), ph_s9q07_b (W2-3), s9q08b (W4-5); sect4_pp: pp_s4q12_a (W1-3), s4q13a (W4-5) -- Ethiopian-calendar month codes | _ETH_MONTH_TO_GREG = {1:9, 13:9, 2:10, 3:11, 4:12, 5:1, 6:2, ..., 12:8}: Meskerem->Sep, Pagume (13) also ->Sep | categorical->number (calendar recode) | ethiopia.py:1224-1225 (_greg_month) | comment | - |
+| E9 | Ethiopia | W1-W5 | crop_production | perennial | sect9_ph crop_code (W1-W3) / s9q00b (W4-W5) vs PERENNIAL_CROP_CODES | perennial = crop code in a hard-coded WB list | categorical->number | ethiopia.py:1163-1167, 1602-1604 | comment | - |
+| E10 | Ethiopia | W1 only | crop_production | intercropped | sect3_pp_w1.dta pp_s3q03 (field status) | intercropped = (pp_s3q03 == 2); W2-W5 read the harvest file's own flag (ph_s9q01 / s9q02) | categorical->number + selection | ethiopia.py:1588-1596; 2011-12/_/crop_production.py:36 | docstring (ic_flag 1=No 2=Yes per WB) | - |
+| E11 | Ethiopia | W1 | crop_production | u (index) = 'Kg'; Quantity | sect9_ph_w1.dta ph_s9q12_a (kilos); ph_s9q12_b (grams remainder) NOT read | u := constant 'Kg'; the grams residual is dropped | encoding + guard (drop) | ethiopia.py:1573-1575; 2011-12/_/crop_production.py:32 | wave-script docstring / comment | all W1 rows |
+| E12 | Ethiopia | W1-W2 | crop_production | sale unit for Quantity_sold | sect11_ph_w{1,2}.dta ph_s11q03_a; no sale-unit column read | sale unit := constant 'Kg' (W1-2); W3-5 read ph_s11q03_b / s11q11b labels with .fillna('Kg') | encoding + impute | ethiopia.py:1644-1647 | none | - |
+| E13 | Ethiopia | W1-W5 | crop_production | Quantity_sold, Value_sold | sect11_ph: ph_s11q01 / s11q07 (sold flag), ph_s11q03_a / s11q11a (qty), ph_s11q04(_a) / s11q12 (value) | sold flag == 2 -> Quantity_sold = Value_sold = 0.0 (not NA) | categorical->number (flag -> 0) | ethiopia.py:1655-1658 | comment | - |
+| E14 | Ethiopia | W1-W5 | crop_production | Quantity_sold, Value_sold (plot-crop grain) | as E13; harvest rows keyed (holder, crop, plot) | Section 11 is (holder, crop) grain: Value_sold summed over (holder, crop); Quantity_sold summed WITHIN sale unit; both attached to the harvest row ONLY where (holder, crop) maps to exactly one plot, and Quantity_sold only where sale unit == harvest u; otherwise NA | sum + selection | ethiopia.py:1659-1677 | comment | not stated (multi-plot holder-crops get NA) |
+| E15 | Ethiopia | W1-W5 | crop_production | u (index) | ph_s9q04_b / s9q05b labels | u.fillna('Other (Specify)') where a quantity exists with no recorded unit; rows with neither are dropped | impute (index value) | ethiopia.py:1683-1688 | comment | - |
+| E16 | Ethiopia | W1, W3 (vs W2, W4-5) | plot_inputs | Quantity for seed rows (kg) | W1 sect5_pp_w1.dta pp_s5q19_a (kg) + pp_s5q19_b (g); W3 sect4_pp_w3.dta pp_s4q11b_a + pp_s4q11b_b; W2 pp_s4q11b, W4-5 s4q11a kg only | Quantity = kg + g * 0.001; negative -> NA | sum + scale + guard | ethiopia.py:1849-1858 | docstring | - |
+| E17 | Ethiopia | W1-W5 | plot_inputs | Quantity_purchased (seed) | sect5_pp: pp_s5q03 / s5q02 (purchased flag), pp_s5q05_a + pp_s5q05_b (kg + g; W1-3), s5q04 (W4-5) | purchased kg = a + b * 0.001; then Quantity_purchased = qty.mask(purch == False, 0.0); section-5 is (holder, crop) grain, attached only where the (holder, crop) has a single plot | sum + scale + categorical->number + selection | ethiopia.py:1912-1954 | docstring | - |
+| E18 | Ethiopia | W1-W3 vs W4-W5 | plot_inputs | Improved (seed) | pp_s4q11 (W2-3; yes = (2,)), s4q11 (W4-5; yes = (2,3,4)) | Improved = code in improved_yes; the set of "yes" codes changes at W4 | categorical->number | 2013-14/_/plot_inputs.py:38; 2018-19/_/plot_inputs.py:39; ethiopia.py plot_inputs_for_wave 1776-2081 | wave-script comment | - |
+| E19 | Ethiopia | W4-W5 | plot_inputs | (seed rows dropped) | s4q15 == 1 | seed rows where s4q15 == 1 are dropped before serving | selection (row filter) | ethiopia.py:1841-1843; 2018-19/_/plot_inputs.py:38 | comment | - |
+| E20 | Ethiopia | W1-W5 | plot_inputs | Quantity for fertilizer rows; Used for pesticide | pp_s3q16_c / pp_s3q16_a / pp_s3q16 / s3q21a (urea kg) etc.; pp_s4q04 (pesticide gate) | fertilizer Quantity == 0 -> NA; pesticide gate == 2 -> Used False | guard + categorical->number | ethiopia.py:2003, 2038-2040 | none | - |
+| E21 | Ethiopia | W1-W5 (W3-5 esp.) | livestock | HeadCount, Acquired, Sold, SaleValue at species grain | sect8a_ls_w{1,2}.dta ls_s8aq13a / ls_s8aq44a / ls_s8aq46a / ls_s8aq60 per ls_s8aq00; sect8_1_ls_w{3,4,5} ls_sec_8_1q01 / ls_s8_1q01, sect8_2_ls ls_sec_8_2aq04/13/14 per ls_code, per holder | summed over raw animal sub-codes (W3-5: Bulls, Oxen, Cows, Heifers, Calves -> Cattle) and over holders within household; rows all-zero dropped | sum + selection | ethiopia.py:2190-2195 | wave-script docstrings | - |
+| E22 | Ethiopia | W1-W5 | anthropometry | Height | sect3_hh_w{1,2,3}.dta hh_s3q23; sect3_hh_w{4,5}.dta s3q38 | Height.mask(Height > 200) -> NA (WB "unit error" rule) | guard (sentinel -> NA) | ethiopia.py:2293-2295 | comment | - |
+| E23 | Ethiopia | W1-W5 | anthropometry | Age_months | sect1_hh: hh_s1q04_a / hh_s1q04a / s1q03a (age years), hh_s1q04_b / hh_s1q04b / s1q03b (age months) | Age_months = years * 12, .fillna(months); when years present the months column is ignored (a 2y7m child is 24 months) | scale + impute | ethiopia.py:2324-2326 | comment ("WB: replace cage = <months> if age==.") | - |
+| E24 | Ethiopia | W1-W5 | plot_labor | PersonDays (hired; men/women/children) | sect3_pp pp_s3q28_{a..i} / s3q30{a..i}: n, days, daily wage per group; sect10_ph ph_s10q01_{a..i} / s10q01{a..i} | days_g = d.where(n != 0, 0) * n; PersonDays = sum over groups; pp and ph rounds SUMMED into one wave row | product + sum | ethiopia.py:2497-2544, 2660-2662 | docstring; NOT in CONTENTS.org | - |
+| E25 | Ethiopia | W1-W5 | plot_labor | Wage (hired) | pp_s3q28_c/f/i, s3q30c/f/i, ph_s10q01_c/f/i, s10q01c/f/i (daily wage per group) | Wage = MEAN of the group daily wages where n != 0; pp and ph means averaged again; W5 in-kind wages ignored | ratio (mean) + selection | ethiopia.py:2529-2544, 2660-2662 | docstring | - |
+| E26 | Ethiopia | W1-W5 | plot_labor | PersonDays (family) | sect3_pp family member slots pp_s3q27_* (W1-W3) / s3q29* (W4-W5): did-work flag, weeks, days/week per slot (W1 6 slots, W2 7, W3-W5 4); sect10_ph ph_s10q02_* / s10q02* (W1 8 slots, W3-W5 4) | family days = sum over member slots of weeks * days_per_week where did != 0; pp filter pp_s3q03 in {1,2} (cultivated fields only) | product + sum + selection | ethiopia.py:2563-2595 | docstring (slot counts) | - |
+| E27 | Ethiopia | W1-W3 (vs W4-W5) | people_last7days | farm_work / sb_work / wage_work dummies | sect4_hh_w{1,2,3}.dta hh_s4q04, hh_s4q05, hh_s4q07 (hours) | W1-3: dummy = hours > 0 (no yes/no question read); W4-5: explicit s4q05 / s4q08 / s4q12 | categorical->number (hours -> dummy) | ethiopia.py:2751-2760 | docstring | - |
+| E28 | Ethiopia | W1-W5 | people_last7days | industry | hh_s4q11_b / s4q34d; gate hh_s4q09 (==2 -> no job) | industry blanked to NA where gate == 2 or NaN; working_age marker 'X' (W1-3) vs == 1 (W4-5) | guard + encoding | ethiopia.py:2789-2793 | none | - |
+| E29 | Ethiopia | W1 | community_prices | Price, Quantity | sect10b1_com_w1.dta cs10b1q07_f1 (Birr), cs10b1q07_f2 (cents), cs10b1q07_e1 (qty whole), cs10b1q07_e2 (qty decimal); primary outlet only | Price = whole + cents / 100; Quantity = whole + decimal / 1000 | sum + scale | ethiopia.py:2947-2955; 2011-12/_/community_prices.py:31-32 | docstring | - |
+| E30 | Ethiopia | W4-W5; all | community_prices | (rows kept); Price per (v, j, u) | sect10b_com_w{4,5}.dta cs10bq00 == 'Yes' (item available) | W4-5 rows kept only where available == 'Yes'; all waves: duplicates on (t, v, j, u) keep FIRST | selection | ethiopia.py:2958-2960, 2997-2999 | docstring | - |
+| E31 | Ethiopia | W1-W3 | food_coping | Days | sect7_hh_w{1,2,3}.dta hh_s7q02_{a..h} (days in past 7 days) | Days < 0 or Days > 7 -> NA | guard | ethiopia.py:1115 | comment | - |
+| E32 | Ethiopia | W1-W5 (YAML) vs W1-W4 (legacy script) | shocks | Affected_Income / Affected_Assets / Affected_FoodProduction / Affected_FoodStock / Affected_FoodPurchase (names per YAML) | sect8_hh: hh_s8q03_a..e (W1-3), s9q03a..e (W4-5): Decrease / Increase / Did Not Change | YAML: Decrease -> True, Did Not Change -> False, INCREASE -> True.  Legacy wave scripts + _/shocks.py: Increase -> FALSE, .fillna(False), Occurrence.fillna(0).  Two live rules for the same column; which is served depends on build path / cache state (data_scheme has no materialize for shocks so YAML is authoritative, but the Makefile still builds the script path and a hashless script parquet grades legacy and is trusted once) | categorical->number + impute | 2011-12/_/data_info.yml:103-111 (same block in each wave); 2011-12/_/shocks.py:30; Ethiopia/_/shocks.py:57 | none (neither rule is documented; the conflict is not) | all Affected_* cells |
+| E33 | Ethiopia | W2 (2013-14) vs W1, W3 vs W4-5 | household_roster | Age | W2: sect1_hh_w2.dta hh_s1q04g_1/2/3 (Ethiopian DOB), hh_s1q04h (corrected age), hh_s1q04_a (years), hh_s1q04_b (months); W1/W3: hh_s1q04_a, hh_s1q04_b; W4-5 YAML list | W2: Ethiopian-calendar DOB -> Gregorian (lsms_library.calendars) -> tools.age_handler with a SYNTHETIC interview date '07/01/2013', precedence DOB > corrected > years > months // 12; W1/W3: years else months // 12; _coerce_int clamps years 0-130, months 0-1500 | ratio (date difference) + impute + guard + selection | Ethiopia/2013-14/_/mapping.py:44-87, 124-155; Ethiopia/_/_age_helpers.py:79-88 and _coerce_int; local_tools.age_handler | docstring in mapping.py; CLAUDE.md (age_handler fractional ages) | - |
+| E34 | Ethiopia | W5 (2021-22) | food_security | FIES_score | the 8 FIES item columns listed in FIES_ITEMS (2021-22/_/mapping.py:15) | FIES_score = sum of 8 booleans; NA only if all 8 NA | sum | Ethiopia/2021-22/_/mapping.py food_security() | docstring | - |
+| E35 | Ethiopia | W1-W5 | sample | panel_weight | pw (W1), pw_w2 .. pw_w5 per wave (single cross-sectional weight) | panel_weight := weight (a copy, not a longitudinal weight); strata = saq01 + ' ' + Rural | encoding | Ethiopia/{wave}/_/sample.py (2011-12:44, 2018-19:40) | comment in sample.py; CLAUDE.md says pre-refreshment waves have the same value in both | all rows |
+| E36 | Ethiopia | all | nutrition (!make, country-level) | nutrient columns | food_quantities (kg) x FCT (nutrients per 100 g, scaled *10 to per kg), fillna(0) | n = final_q @ final_fct.T; FCT * 10; missing nutrients -> 0 | product (matrix) + scale + impute | Ethiopia/_/nutrition.py; Ethiopia/_/fct_tools.py:57, 81 | none | - |
+| E37 | Ethiopia | (legacy) | conversion_to_kgs.json | kg factor per unit_cd | Food_CF_Wave{1..4}.dta mean_cf_nat | median across items of mean_cf_nat per unit code, W1-W4 only (W5 never folded in); NO live consumer: transformations.conversion_to_kgs is a price-ratio inference and does not read this file; ethiopia.py:282 docstring still names it | ratio (median) -- dead artifact | Ethiopia/_/CONTENTS.org:145-174; ethiopia.py:281-283 | CONTENTS.org (as legacy) | - |
+| E38 | Ethiopia | W1-W5 | crop_conversion_factors (analyst-callable, never stored) | kg per (crop, unit[, region]) | Crop_CF_Wave{n}.dta (W4/W5 files byte-identical) | duplicate (crop 74, unit 62) resolved by CROP_CF_DUPLICATE_RULE drop_above 5.0 (keep 4.34); national column default; region 99 pooled; Leafy Greens (kale 56 / spinach 69) collisions dropped | selection + guard | ethiopia.py:1296, 1370-1495 (1468-1494) | CONTENTS.org:1523-1680 | - |
+| E39 | Ethiopia | W1-W3 vs W4-W5 | household_roster | MonthsAway (W1-W3) / WeeksAway (W4-W5) | sect1_hh: hh_s1q05 (months away, W1-W3); s1q06 (weeks away, W4-W5) | served RAW under two different column names; the conversion to months present (12 - months; 12 - weeks / (52/12)) happens in transformations.roster_to_characteristics (framework, other agent's row).  Pointer row, not counted: the country-side fact a registry needs is that the SAME quantity changes column name and unit between W3 and W4 | encoding (pointer; conversion is framework) | Ethiopia/{2011-12,2013-14,2015-16}/_/data_info.yml MonthsAway; {2018-19,2021-22}/_/data_info.yml WeeksAway (s1q06); lsms_library/transformations.py:546-588 | CLAUDE.md (MonthsSpent / MonthsAway / WeeksAway section) | all W4-W5 roster rows |
+| N1 | Nigeria | W1 (2010Q3 pp, 2011Q1 ph) | food_acquired | Quantity, u, Expenditure per s | sect7b_plantingw1.csv / sect10b_harvestw1.csv: s10bq3a/b (consumption that came from purchases, 7 d), s10bq5a/b (from own production), s10bq6a/b (from gifts), s10bq4 (amount spent); s7bq* analogues | each source row carries its OWN reported quantity and unit; Expenditure attached to the purchased row only (NaN elsewhere) | selection + encoding | Nigeria/_/nigeria.py:2186-2259 (2247-2248); 2010-11/_/food_acquired.py:36-52 | docstring (GH #591); CONTENTS.org:6-73 | identity q3a+q5a+q6a == q2a holds 92% (ph) / 98% (pp) |
+| N2 | Nigeria | W2, W3 (2012Q3/2013Q1, 2015Q3/2016Q1) | food_acquired | Quantity on s='purchased' | sect10b_harvestw{2,3}.csv s10bq3a/b = QUANTITY PURCHASED (an acquisition); s10bq5a (consumption from purchases) is NOT read; s10bq6a/b produced, s10bq7a/b gifts; s10bq4 | purchased Quantity = quantity purchased in the 7 days (can exceed what was eaten), whereas W1 (and Ethiopia E2) serve consumption-from-purchases under the same (j, s='purchased') key | window (meaning shift, no arithmetic) + selection | nigeria.py:2186-2259; 2012-13/_/food_acquired.py:9-24 | docstring (renumbering); CONTENTS.org:6-73 | identity q5a+q6a+q7a == q2a 99.9% (ph) / 99.2% (pp) |
+| N3 | Nigeria | W4 (2018Q3 pp, 2019Q1 ph) | food_acquired | Quantity, Expenditure on s='purchased' | sect10b_harvestw4.csv s10bq9a / s10bq9b (quantity + unit of the MOST RECENT purchase, within the last 30 days), s10bq10 (amount paid for that purchase); produced / inkind from s10bq6a / s10bq7a with the consumption unit s10bq2b; s7bq* analogues | purchased row = one transaction in a 30-day window; produced / inkind rows = 7-day consumption; the three share a (t, i, j) key and the same column names | window | nigeria.py:2186-2259; 2018-19/_/food_acquired.py:47-69 | data_scheme.yml:~541-546; CONTENTS.org:50-63 | all W4 purchased rows |
+| N4 | Nigeria | W4 only | food_acquired | Quantity_kg | s10bq9_cvn (purchased), s10bq2_cvn (produced/inkind), s7bq9_cvn / s7bq2_cvn | Quantity_kg = Quantity * kg_factor; NaN in W1-W3 and W5 (no *_cvn shipped) | product | nigeria.py:2250-2253 | data_scheme.yml comments; CONTENTS.org (GH #859) | W4 rows with a factor |
+| N5 | Nigeria | W1-W4 | food_acquired | u (index) | s10bq3b / 5b / 6b / 7b / 9b unit codes | u.fillna('None') where a row has a quantity but no unit code | impute (index value) | nigeria.py:2257 | none | - |
+| N6 | Nigeria | W4-W5 (W1-W3 NaN) | crop_production | KgFactor | secta3i_harvestw4.dta sa3iq6_conv, secta3iii_harvestw4.dta sa3iiiq13_conv; W5 sa3iq9_conv, sa3iiiq23_conv | KgFactor = kgf.where(kgf > 0, NaN) -- the survey's 0 sentinel becomes NA; sa3iq6d_conv / sa3iq15_conv / sa3iiq1_conv deliberately not wired | guard (sentinel -> NA) + selection | nigeria.py:390-392; Nigeria/_/crop_production.py:24-40, 140-199 | docstring; CONTENTS.org:1015-1200 | - |
+| N7 | Nigeria | W1-W5 | crop_production, plot_inputs, community_prices | u (index) | sa3q6b / sa3q6a2 / sa3iq6ii / sa3iq9b etc. unit labels | _canon_unit strips size qualifiers ('Large Derica' -> 'Derica', 'Heap Small' -> 'Heap'); food_acquired keeps the size-specific code labels, so the same physical unit spells differently across tables of one country | encoding (lossy) | nigeria.py:230-297 | CONTENTS.org:857-921 (community_prices instance only) | - |
+| N8 | Nigeria | W3-W5 | crop_production | harvest_month, planting_month | sa3iq6c1/sa3iq6c2, sa3iiiq12a/b, sa3iq14a/b, sa3iiiq22a/b (month, year); planting sa3iq4a1/2, sa3iiiq8a/b, sa3iq5a/b, sa3iiiq18a/b | 'YYYY-MM' string composed from month + year; Ethiopia serves a Gregorian month int in the same column | encoding | nigeria.py:300-313 (_month_str) | none | - |
+| N9 | Nigeria | W1-W2 (plot grain); W3-W5 hh-crop grain | crop_production | Quantity_sold, Value_sold | secta3_harvestw{1,2}.dta sa3q11a (qty sold), sa3q12 (value); sa3q11b (sale unit) NOT read | sale quantity served under the HARVEST unit u; the sale unit is assumed equal | encoding (assumption) | nigeria.py:316-448; Nigeria/_/crop_production.py:11-20, 113-132 | CONTENTS.org:959-1013 | - |
+| N10 | Nigeria | W1-W5 | crop_production | intercropped | sect11f_planting: s11fq2 (1 = sole, 2..7 = intercrop / relay / mixed ...) | intercropped = code in 2..7 -> True; 1 -> False | categorical->number | Nigeria/_/crop_production.py:60-88 | docstring | - |
+| N11 | Nigeria | W1-W5 | crop_production | (index) | duplicates on (t, i, plot_id, j, u) | keep FIRST | selection | nigeria.py:441-442 | none | - |
+| N12 | Nigeria | W1-W3 | plot_inputs | Quantity (seed, fertilizer) per (plot, crop, input) | seed channels s11eq6a/b (leftover), s11eq10a/b (free), s11eq17a/b + s11eq28a/b (W1) / s11eq18a/b + s11eq30a/b (W2-3) (commercial); fertilizer s11dq4 / s11dq8 / s11dq15 / s11dq26 | _pick_channel: if all reporting channels share a unit -> SUM; else the LARGEST channel's quantity and unit | sum + selection | nigeria.py:508-555 | docstring | - |
+| N13 | Nigeria | W1-W3 | plot_inputs | Quantity_purchased (seed) | commercial channels above | Purchased = sum of the commercial channels' quantities (same-unit rule as N12) | sum | nigeria.py:558-629 (603-610) | docstring | - |
+| N14 | Nigeria | W1-W2 | plot_inputs | u (index) on fertilizer rows | s11dq4 / s11dq8 / s11dq15 / s11dq26 (quantities with no unit column) | u := 'Kg' when the spec has unit=None | impute (index value) | nigeria.py:632-705 (661-663); Nigeria/_/plot_inputs.py:97-101, 132-136 | wave comment | all W1-W2 fertilizer rows |
+| N15 | Nigeria | W1-W3 | plot_inputs | Quantity, u for animal traction | s11cq20 + s11cq21 | Quantity = s11cq20 + s11cq21; u := 'days' | sum + encoding | nigeria.py:746-800; Nigeria/_/plot_inputs.py:109 | none | - |
+| N16 | Nigeria | W3 vs W4 vs W5 | plot_inputs | Improved (seed) | W3 s11eq3b (1,2 -> True; 3,4 -> False); W4 s11fq3b (1 -> True, 2 -> False) and s11fq3aa == 1 (certified) forces True; W5 s11fq7 / s11fq6 | three different code sets and, in W4, a second question overriding the first | categorical->number + selection | Nigeria/_/plot_inputs.py:153-156, 195-205 | comments | - |
+| N17 | Nigeria | W1-W5 | livestock | (rows); HeadCount | sect11i_planting: s11iq1 (own?), s11iq2 / s11iq2a (count), s11iq10, s11iq16, s11iq3; W5 s11iq17, s11iq23, s11iq7 | keep rows where own == 1 OR any count nonzero; duplicates on the index keep the LARGEST HeadCount | selection | nigeria.py:885-964 (959-961); Nigeria/_/livestock.py:56-69 | docstring | - |
+| N18 | Nigeria | W1-W5 | plot_features | Area | GPS s11aq4d (W1) / s11aq4c (W2-4) / s11mq3 (W5), sqm; estimate s11aq4a (W1-3) / s11aq4aa (W4) / s11aq3_number (W5) with unit s11aq4b / s11aq3_unit | Area = GPS / 10000 where GPS present; else est * _AREA_UNIT_TO_HA {5: 0.404686 (acre), 6: 1.0 (ha), 7: 1e-4 (sqm)}; any other unit code (heaps, ridges, stands, plots) -> NA | scale + selection | nigeria.py:1052-1056, 1196-1209 | CONTENTS.org:738-777; wave comments | - |
+| N19 | Nigeria | W1-W5 | plot_features | Area | as N18 | Area > 1000 ha -> NA | guard (clip to NA) | nigeria.py:1213 | none | - |
+| N20 | Nigeria | W1-W5 | plot_features | AreaUnit | s11aq4b / s11aq3_unit label | AreaUnit = the FARMER's unit label always, even when Area is GPS-derived hectares (Ethiopia E4 writes 'hectares' on GPS rows) | encoding | nigeria.py:1217 | none | - |
+| N21 | Nigeria | W1-W5 | plot_features | Fallow | s11bq17 (W1), s11b1q28 (W2-4), s11b1q44 (W5) main-use code; W1 s11bq16 (cultivated flag) | Fallow = (code == 1); W1: s11bq16 == 1 forces False | categorical->number + selection | nigeria.py:1284-1293; wave scripts | wave comments | - |
+| N22 | Nigeria | W4-W5 | anthropometry | Weight, Height | sect4a_harvestw4.dta s4aq52_1/_2/_3, s4aq53_1/_2/_3; sect4b_harvestw5.dta s4bq8a/b/c, s4bq12a/b/c (three readings) | row MEDIAN of the three readings (W1-W3: the single reading) | ratio (median) | nigeria.py:1400-1480 (1432-1443); Nigeria/_/anthropometry.py:35-39 | docstring | - |
+| N23 | Nigeria | W1-W3 (secta2); W4 (secta2a/b); W5 unwired | plot_labor | PersonDays (family) | secta2_harvestw{1,2,3}.dta member slots sa2q1{let}1 (id), sa2q1{let}2 (n / weeks), sa2q1{let}3 (days); W4 secta2a_harvestw4.dta sa2aq1b | (n * d).where(n.notna(), d) summed over slots; W4 reads a shipped total | product + sum | nigeria.py:1532-1546, 1628-1632, 1640-1695 | docstring (plot_labor.py:9-20) | - |
+| N24 | Nigeria | W1-W4 | plot_labor | PersonDays (hired) | sa2q2/5/8 (n men/women/children), sa2q3/6/9 (days); other block sa2q12a/b/c; W4 sa2bq2/5/8, sa2bq3/6/9, sa2bq14a-c, sa2bq15a-c | PersonDays = sum over groups of n * d (+ other block direct days) | product + sum | nigeria.py:1549-1559, 1630-1632 | docstring | - |
+| N25 | Nigeria | W1-W4 | plot_labor | Wage | sa2q4/7/10 (daily wage per group), n, d as N24; W4 sa2bq4/7/10 | Wage = sum over groups of n * d * w = TOTAL cash paid for hired labour on the plot, NOT a daily wage (Ethiopia E25 serves a MEAN daily wage in the same column) | product + sum | nigeria.py:1574-1588, 1633-1635 | partly (plot_labor.py:19-20 says no hired_labor_value is served, yet Wage is that sum) | - |
+| N26 | Nigeria | W1-W2 (joblogic) | people_last7days | farm_hrs, wage_hrs, SB_hrs | sect3_plantingw1.dta s3q18 + s3q30 (hours job 1 + job 2), s3q5 (farm), s3q4 (wage), s3q6 (self-business); W2 sect3a_plantingw2.dta s3aq18 + s3aq31, s3aq5/4/6 | tot = h1 + h2; farm_hrs = tot if farm else 0; wage_hrs = tot if wage and not farm else 0; SB_hrs = tot if sob and not farm and not wage else 0 -- ALL hours go to one activity by precedence | sum + selection (allocation rule) | nigeria.py:1763-1831 (1792-1798); Nigeria/_/people_last7days.py:46-61 | docstring | - |
+| N27 | Nigeria | W3-W4 (direct) | people_last7days | farm_hrs, wage_hrs, SB_hrs | s3q5b, s3q6b, s3q4b (hours) with dummies s3q5/6/4 | hours zeroed where the matching dummy == 0 | guard | nigeria.py:1789-1791 | docstring | - |
+| N28 | Nigeria | W1-W4 | people_last7days | all dummies and hours | s3q1 / s3aq1 (working-age gate) | non-working-age persons served as ZEROS, not NA | impute | nigeria.py:1805-1810 | none | - |
+| N29 | Nigeria | W1-W4 | people_last7days | industry | s3q14 / s3aq14 numeric industry code | code RANGES -> category labels (_industry_from_s3q14) | encoding (range rule) | nigeria.py:1812-1831 | none | - |
+| N30 | Nigeria | W5 (2024Q1 ph) | people_last7days | farm_work, wage_work, industry | sect4a_harvestw5.dta s4aq10, s4aq11, s4aq40_code, s4aq32 | farm_work = s4aq10 OR s4aq11; wage_work = s4aq40_code > 0, forced 0 where s4aq32 == 2; industry from ISIC code ranges | categorical->number + selection | nigeria.py:1834-1890; Nigeria/_/people_last7days.py:85-95 | docstring | - |
+| N31 | Nigeria | W1-W2 | community_prices | u (index), j | sectc8_harvestw{1,2}.csv (item code, price; NO unit column) | u imputed per item from a hand-typed questionnaire table _W1W2_PRICE_UNIT; item j = code // 10 (_resolve_w1w2_price_item) | impute (index value) + encoding | nigeria.py:1988-2013, 2027-2140 | CONTENTS.org:779-957 | all W1-W2 rows |
+| N32 | Nigeria | W1-W5 | community_prices | Price | sectc8a/b_harvestw3.dta c8q3 (price), c8q2 (unit); W4-5 sectc8_harvestw{4,5}.dta | duplicates on (t, v, j, u) -> .first(); the docstring says MEDIAN | selection | nigeria.py:2121-2122 (docstring 2055-2058) | docstring is WRONG (says median) | - |
+| N33 | Nigeria | W1-W4 | nonfood_expenditures | Expenditure | sect8: s8q2 / s8q4 / s8q6 / s8q8 / s8q10; sect11a s11aq2 (7 days); s11bq4 / s11cq6 / s11dq8 / s11eq10 (past month and longer) | every recall window's amount served as the same column, pooled, with no RecallWindow / annualisation | window | Nigeria/{2010-11,2012-13,2015-16,2018-19}/_/nonfood_expenditures.py | CONTENTS.org:1240-1300 (WAITING at 1275-1290) | all rows |
+| N34 | Nigeria | W1-W5 | household_roster | Age | W1 pp sect1_plantingw1 s1q5_* (DOB), ph sect1_harvestw1 s1q6_*; W2/W3 pp s1q7_*, ph s1q6_*; W4 pp s1q7_year only; W5 s1q10 (month) + s1q11 ("calculated year of birth", no day); reported age s1q4 / s1q6; interview_year constants 2010 / 2012 / 2015 / 2018 / 2023 | tools.age_handler per row: DOB-derived (fractional) age when DOB present and agrees with reported age within 1 y, else reported age; sentinels clamped (years 0-130, months 0-1500, day 1-31, year 1900-2030); W5's DOB year is itself a survey-computed field, so the "DOB precision" there is circular | ratio (date difference) + impute + guard + selection | Nigeria/_/_age_helpers.py (apply_age_handler); Nigeria/{wave}/_/household_roster.py; lsms_library/local_tools.py age_handler | docstrings; CLAUDE.md (age_handler) | - |
+| N35 | Nigeria | W1-W5 | interview_date | int_t | saq13y / saq13m / saq13d (W1-3), InterviewStart (W4) | pd.to_datetime(year, month, day) composed from three raw fields | encoding (compose) | Nigeria/{wave}/_/interview_date.py | none | - |
+| N36 | Nigeria | W1 | sample | panel_weight | wt_wave1 | panel_weight := wt_wave1 = weight (copy) | encoding | Nigeria/2010-11/_/data_info.yml sample block | none | all W1 rows |
+| N37 | Nigeria | (dead: not in data_scheme; Makefile deps missing) | food_expenditures / food_quantities / unit values (country-level, would shadow the framework tables if ever materialised) | unit value; aggregated Quantity | food_acquired purchased value + quantity; food_conv_w2ph / food_conv_w2pp; aggregate_items.json | 2018-19/_/individual_unit_values.py: unit value = purchased value / purchased quantity -> pickle; 2018-19/_/units.py: conv / 1000 from food_conv_w2ph/pp (w3 zone-varying); _/unitvalues.py; _/food_quantities.py: aggregate_items.json rename + .T.groupby('i').sum().T | ratio; scale; sum | Nigeria/_/Makefile (targets var/food_expenditures.parquet, var/food_quantities.parquet via wave food_expenditures.py files that do not exist in any wave dir); the scripts named | none | 0 (unreachable) |
+| N38 | Nigeria | W4 (dead) | plots (not in data_scheme) | area | 2018-19/_/plots.py: area = pct_area * area, pct from s11fq1 code / 100 | crop share of plot area from a percentage code | product + scale | Nigeria/2018-19/_/plots.py | none | 0 (unreachable) |
+
+* 2. Per-derivation notes (baked assumptions; are the raw inputs recoverable from the served table?)
+
+** Ethiopia
+
+- E1 / E2 / E3 (food_acquired residual) :: Assumes total - purchased == own
+  production.  The questionnaire (CONTENTS.org:1467-1495) asks total (Q2),
+  purchased (Q3), own-produced (Q5) and gift (Q6) separately; only Q2 and
+  Q3 are read, so 'produced' absorbs gifts, food aid and any rounding
+  disagreement between Q2 and Q3.  Because the framework helper then
+  recomputes purchased as Q2 - Produced, the served purchased Quantity is
+  min(Q2, Q3): a household reporting Q3 > Q2 (purchased more than it ate)
+  is served Q2 with the Q3 Expenditure riding on it.  A Q2 = NaN, Q3 > 0
+  row is served purchased = 0.  Not recoverable: Q2 can be rebuilt as
+  purchased + produced only where Q3 <= Q2; Q3 itself is gone whenever it
+  exceeded Q2; Q5 and Q6 were never read; the purchased row's own unit
+  (hh_s5aq03_b) is gone.  Disclosed as a design decision in the DESIGN doc
+  and the docstring, but the min() consequence is stated nowhere.  Nigeria
+  N1 shows the alternative (each source's reported quantity) is available
+  in the same survey family.
+
+- E4 / E5 (plot area) :: E4 is a pure scale (sqm -> ha) and is recoverable.
+  E5 bakes in the WB woreda-level conversion table, a national fallback
+  where the woreda row is missing, and a region-99 pooled row; the
+  farmer's numeric estimate (pp_s3q02_a) is NOT served, only its unit name
+  in AreaUnit, so a converted Area cannot be undone.  The 5x plausibility
+  screen counts and names but never alters.  2021-22 non-GPS fields stay
+  NA rather than borrowing a table -- a wave-varying rule for the same
+  column.  AreaUnit means two different things on GPS rows ('hectares')
+  and converted rows (native unit name while Area is in hectares).
+
+- E6 / E7 / E10 (one raw field, three served booleans) :: pp_s3q03 feeds
+  Fallow (== 3, plot_features), intercropped (== 2, W1 crop_production)
+  and the cultivated filter (in {1, 2}, plot_labor).  Not a defect, but a
+  registry keyed on served column must name the same raw field three
+  times with three predicates.  E7's yes-code flip (2 = Yes in W1-W3,
+  1 = Yes in W4-W5) is passed from the wave script, so the rule is
+  correct but lives in two files per wave.
+
+- E8 (Ethiopian -> Gregorian month) :: Pagume (13) mapped to September
+  with Meskerem; the year is not carried, so a harvest reported in
+  Pagume/Meskerem straddling the Gregorian year cannot be re-dated.
+  Recoverable up to that fold.  Nigeria N8 serves 'YYYY-MM' strings in
+  the same column.
+
+- E9 (perennial) :: hard-coded WB crop-code list; recoverable (j is
+  served).
+
+- E11 / E12 / E15 (u constants and fills) :: W1 harvest u := 'Kg' drops
+  the grams remainder (ph_s9q12_b), a sub-kilogram loss on every W1 row.
+  W1-W2 sale unit := 'Kg' is an assumption the W3+ files contradict by
+  shipping a unit column.  'Other (Specify)' is a fill of an INDEX value:
+  a row whose unit was blank is indistinguishable from one whose unit was
+  recorded as Other.  Not recoverable.
+
+- E13 / E14 (sales) :: sold-flag No -> 0.0 conflates "did not sell" with
+  "sold zero"; the single-plot attach rule means a holder growing the
+  same crop on two plots gets NA sales on both, so sales are
+  systematically missing for larger holders.  Value_sold is summed over
+  a (holder, crop) group of source rows: the served number is not any
+  raw row.  Raw sales not recoverable from the served table.
+
+- E16 / E17 (seed kg + g) :: kg + g * 0.001 in W1 and W3 only; W2 and
+  W4-W5 are kg-only, so the sub-kilogram precision differs by wave.
+  Quantity_purchased := 0.0 where the purchase flag is No (same
+  conflation as E13), and the (holder, crop) -> single-plot attach rule
+  as E14.
+
+- E18 / E19 / E20 :: Improved yes-codes widen from (2,) to (2, 3, 4) at
+  W4 (a categorical->number rule that changes meaning between waves);
+  W4-W5 seed rows with s4q15 == 1 are dropped (a row filter that alters
+  which plots appear); fertilizer Quantity == 0 -> NA turns a reported
+  zero into missing.
+
+- E21 (livestock species sums) :: Bulls / Oxen / Cows / Heifers / Calves
+  -> Cattle, summed over holders.  The raw sub-code breakdown is not
+  served; the all-zero drop removes households that reported owning none.
+  Not recoverable.
+
+- E22 / E23 (anthropometry) :: Height > 200 cm -> NA is a WB rule on unit
+  errors; the raw value is gone.  Age_months = years * 12 discards the
+  months remainder whenever years is present (a 2 y 7 m child is served
+  24 months), and falls back to the months column only where years is
+  missing.  Recoverable to the year, not the month.
+
+- E24 / E25 / E26 (plot_labor) :: PersonDays are products summed over
+  3 hired groups x 2 rounds (+ member slots for family), so no served
+  number is a raw answer; the rule d.where(n != 0, 0) * n treats a
+  reported day count with zero workers as zero.  Wage is a MEAN of daily
+  wages across men / women / children where n != 0, then averaged again
+  across pp and ph; it is not weighted by n or d and ignores W5 in-kind
+  wages.  The member-slot count changes by wave (6/8, 7/8, 4/4).  Not
+  recoverable.
+
+- E27 / E28 (people_last7days) :: W1-W3 dummies are hours > 0, so a
+  person who worked with zero recorded hours is served not-working; W4-W5
+  use the survey's yes/no.  Industry is blanked where the employment gate
+  is No or missing.
+
+- E29 / E30 (community prices) :: whole + cents / 100 and whole +
+  decimal / 1000 are exact and recoverable; the W4-W5 availability gate
+  and the keep-first dedup are selections that drop rows silently.
+
+- E31 (food_coping) :: Days outside 0..7 -> NA; the raw value is gone.
+
+- E32 (shocks, two live rules) :: The YAML mapping serves Increase -> True
+  (an INCREASE in income counts as "affected"); the legacy wave scripts
+  and _/shocks.py serve Increase -> False and fill missing with False /
+  Occurrence 0.  data_scheme.yml declares no materialize for shocks, so
+  the YAML path is authoritative on a cold build, but the Makefile still
+  builds the script path, and a hashless script-written L2-wave parquet
+  grades legacy and is trusted once.  Which rule a warm cache is serving
+  cannot be told from the served table.  Neither rule is documented.
+
+- E33 (Age, W2 only) :: Ethiopian-calendar DOB converted to Gregorian,
+  then differenced against a synthetic mid-year interview date
+  ('07/01/2013'); precedence DOB > corrected age > years > months // 12.
+  W1 and W3 never see a DOB.  So the same Age column is DOB-precise
+  (fractional, then rounded by _enforce_canonical_dtypes) in W2 and
+  integer-reported elsewhere.  Not recoverable to the raw fields.
+
+- E34 (FIES_score) :: sum of 8 booleans, NA only if all 8 are NA -- a
+  household answering 3 of 8 gets a score over 3.
+
+- E35 (panel_weight copy) :: served panel_weight is not a longitudinal
+  weight; a user reading the column name is misled in every Ethiopia
+  wave.
+
+- E36 (nutrition) :: a matrix product of framework food_quantities (kg)
+  with an FCT scaled 100 g -> 1 kg, with missing nutrients set to 0.
+  Depends on the framework kg inference (GH #850) and therefore moved
+  with it.  The script also carries a literal API key (not reproduced
+  here).
+
+- E37 / E38 (conversion factors) :: E37 is a dead artifact (no live
+  consumer; the docstring at ethiopia.py:282 still names it).  E38 is a
+  callable the analyst may apply; the duplicate-resolution and
+  Leafy-Greens drops are baked into that callable, not into any served
+  table.
+
+- E39 (MonthsAway / WeeksAway pointer) :: served raw in both column
+  names; the months-present conversion is the framework's.  What is
+  country-side is the split itself: the same residence question is a
+  months column through W3 and a weeks column from W4, so any registry
+  entry for the roster residence variable is (country, wave)-grain.
+
+** Nigeria
+
+- N1 / N2 / N3 (purchased quantity, three meanings) :: W1 serves
+  "consumption that came from purchases" (7 d), W2-W3 serve "quantity
+  purchased" (7 d, an acquisition that can exceed consumption), W4 serves
+  "quantity of the most recent purchase within 30 days" with the amount
+  paid for THAT purchase as Expenditure.  All three sit under the same
+  (t, i, j, s='purchased') key with the same column names, and in W4 the
+  produced / inkind rows of the same household-item are 7-day
+  consumption.  No arithmetic happened; nothing in the served table says
+  which window a row is.  W1 and Ethiopia E2 are comparable; W2-W4 are
+  not, in two different ways.  Disclosed in data_scheme.yml and
+  CONTENTS.org for W4, in the W2 docstring for W2-W3.
+
+- N4 / N5 :: Quantity_kg = Quantity * survey factor is recoverable
+  (both operands served).  u.fillna('None') is an index-value fill:
+  rows whose unit was blank cannot be told from a unit literally coded
+  None.
+
+- N6 (KgFactor sentinel) :: 0 -> NA assumes the survey's zero is
+  "no factor", not "zero kilograms".  Recoverable (NA rows are exactly
+  the zeros), but the unwired sibling factors (sa3iq6d_conv, sa3iq15_conv,
+  sa3iiq1_conv) mean the served factor may not pair with the container
+  the harvest was reported in.
+
+- N7 (_canon_unit) :: size qualifiers stripped from u in three tables but
+  not in food_acquired.  A 'Large Derica' and a 'Small Derica' harvest
+  become one u, and a kg factor keyed on the stripped label is wrong for
+  one of them.  Not recoverable.  CONTENTS.org documents the
+  community_prices instance (the size field is unread) but not the crop
+  and inputs instances.
+
+- N8 / N9 / N10 / N11 :: 'YYYY-MM' strings (recoverable); sale unit
+  assumed equal to harvest unit (sa3q11b unread -- not recoverable);
+  intercropped from a 7-code planting variable collapsed to a boolean
+  (recoverable only as the boolean); keep-first dedup (rows dropped
+  silently).
+
+- N12 / N13 / N14 / N15 / N16 (plot_inputs) :: the sum-or-largest
+  channel rule means the served seed Quantity is either a sum or one of
+  four channels, and the table does not say which.  Purchased is a sum
+  over commercial channels.  Fertilizer u := 'Kg' in W1-W2 is an
+  assumption the questionnaire does not state (the quantity has no unit
+  column).  Animal traction Quantity = two summed fields with u :=
+  'days'.  Improved uses three different code sets across W3 / W4 / W5,
+  and in W4 a certified-seed question overrides the improved question.
+  None recoverable beyond the boolean / the sum.
+
+- N17 (livestock) :: keep-if-own-or-any-nonzero drops households that
+  answered the module with all zeros; keep-largest on duplicates is a
+  reducer applied to a broken key.
+
+- N18 / N19 / N20 / N21 (plot_features) :: acre / ha / sqm are converted,
+  every other farmer unit (heaps, ridges, stands, plots) -> NA -- unlike
+  Ethiopia E5, which converts them with a shipped table.  Area > 1000 ha
+  -> NA discards the raw estimate.  AreaUnit is always the farmer's unit
+  label, so on a GPS row Area is hectares while AreaUnit says (e.g.)
+  'Heaps'; Ethiopia E4 writes 'hectares' on those rows.  Fallow's W1
+  override from a second question is a wave-only rule.
+
+- N22 (median of three readings) :: mirrors the WB; the three raw
+  readings are not served, so the measurement error the median removed
+  cannot be recovered.
+
+- N23 / N24 / N25 (plot_labor) :: family days (n * d).where(n.notna(),
+  d) treats a missing worker count as "the days are the total"; W4 reads
+  a shipped total instead of computing one, so the same column is
+  computed in W1-W3 and copied in W4.  Wage = sum n * d * w is the TOTAL
+  cash paid on the plot, while Ethiopia's Wage in the same column is a
+  MEAN daily wage.  Neither the daily wage nor the components are
+  recoverable.  W5 is unwired (documented partial).
+
+- N26 / N27 / N28 / N29 / N30 (people_last7days) :: the joblogic
+  allocation gives ALL of a person's hours (two jobs summed) to one
+  activity by precedence farm > wage > self-business; a farmer with a
+  wage job is served zero wage hours.  Non-working-age persons are
+  served zeros, not NA, so a mean over the table includes children as
+  zero-hour workers.  W3-W4 read direct hours; W5 reads a different
+  module with different rules (OR of two questions; a code > 0 test).
+  Not recoverable.
+
+- N31 / N32 (community_prices) :: W1-W2 u is imputed from a hand-typed
+  questionnaire table keyed by item, and j = code // 10 -- both are
+  encodings of an assumption about the shipped file's coding.  The
+  dedup is .first() while the docstring promises a median: a disclosure
+  that is wrong.
+
+- N33 (nonfood windows) :: 7-day, 30-day and longer recall amounts are
+  pooled into one Expenditure with no window column; the same 12B shape
+  as N3, on a table the framework does not annualise.  Recorded as
+  WAITING in CONTENTS.org since the fix needs a RecallWindow column.
+
+- N34 (Age) :: DOB availability differs by wave and by round (W4 has
+  year only; W5 has month + a survey-CALCULATED year and no day), so
+  the DOB-vs-reported precedence in age_handler produces a
+  fractional-precision Age in some rounds and an integer one in others,
+  and in W5 the "DOB-derived" value is derived from a field the survey
+  itself derived from reported age.  Sentinel clamps discard the raw
+  value.  Not recoverable.
+
+- N35 / N36 :: date composition (recoverable); panel_weight := weight
+  (same misnomer as E35, W1 only).
+
+- N37 / N38 (dead scripts) :: not in data_scheme, and the Makefile's
+  food_expenditures / food_quantities targets depend on wave scripts that
+  do not exist, so nothing reaches a served table today.  Recorded
+  because each computes its own version of a framework derived table,
+  and the Ethiopia history (CLAUDE.md, the Uganda #245 note) shows a
+  stale country-level parquet of exactly this kind shadowing the runtime
+  derivation.
+
+** Disclosures that are wrong or stale (record, not adjudicate)
+
+- nigeria.py:2055-2058 says community prices are the MEDIAN over
+  duplicates; the code takes .first() (N32).
+- Ethiopia/{all five waves}/_/data_info.yml cluster_features comments say
+  Latitude / Longitude are collapsed with mean(); country.py
+  _collapse_to_cluster_grain (L5723) uses .first() for every column
+  (framework agent's row; noted here because the country config asserts
+  the wrong rule).
+- ethiopia.py:281-283 names conversion_to_kgs.json as a downstream
+  consumer's key source; no live code reads it (E37).
+- Nigeria/_/plot_labor.py:19-20 says no summed hired-labour value is
+  served; Wage is that sum (N25).
+- Ethiopia shocks: YAML and script disagree on Increase (E32); nothing
+  documents either.
+
+* 3. Closing
+
+** Counts by kind (primary kind per row; 38 Ethiopia + 38 Nigeria = 76)
+
+| kind | Ethiopia | Nigeria | total |
+|------+----------+---------+-------|
+| scale | 2 | 1 | 3 |
+| annualise | 0 | 0 | 0 |
+| product | 4 | 5 | 9 |
+| ratio (incl. mean / median / date difference) | 3 | 3 | 6 |
+| categorical->number | 9 | 4 | 13 |
+| impute | 1 | 4 | 5 |
+| encoding | 4 | 7 | 11 |
+| selection | 3 | 4 | 7 |
+| guard | 4 | 3 | 7 |
+| sum (added kind) | 8 | 4 | 12 |
+| window (added kind) | 0 | 3 | 3 |
+| total | 38 | 38 | 76 |
+
+Many rows carry a secondary kind (E1 is sum + guard, N16 is
+categorical->number + selection); the table lists both, the count uses
+the first.  Two rows are dead code (N37, N38) and one is a dead artifact
+(E37); 73 rows reach a served table today.  E39 (MonthsAway / WeeksAway) is a pointer to a framework derivation and is not counted.
+
+** The cases furthest in meaning from the raw answer (12B-like)
+
+1. N3 -- Nigeria W4 food_acquired purchased row: Quantity and Expenditure
+   are one transaction in a 30-day window, served under the same key and
+   column names as the 7-day consumption rows beside it and as the 7-day
+   rows of every other wave.  No arithmetic, so no formula could disclose
+   it; only a window attribute can.  N2 is the same shape one step
+   milder (W2-W3: quantity purchased, not consumed).
+2. E1 / E2 -- Ethiopia food_acquired: 'produced' is total minus purchased
+   (gifts and aid folded in) although the survey asked for own production
+   directly, and 'purchased' is min(total, purchased).  A design decision
+   that is documented as a residual but not as a min(); the raw purchased
+   quantity is unrecoverable wherever it exceeded consumption.
+3. N25 vs E25 -- plot_labor Wage: total cash paid on the plot (Nigeria,
+   sum n*d*w) versus mean daily wage across worker groups (Ethiopia).
+   Same column, same Feature, different units and different grain; a
+   cross-country regression on Wage is meaningless today.
+4. N33 -- Nigeria nonfood_expenditures: 7-day, 30-day and longer recall
+   amounts pooled into one Expenditure with no window column and no
+   annualisation (the WAITING entry in CONTENTS.org).
+5. E32 -- Ethiopia shocks Affected_*: two live rules (Increase -> True in
+   YAML, Increase -> False in the wave scripts and _/shocks.py) and the
+   served value depends on which build path last wrote the cache.  The
+   served number is not merely far from the raw answer; it is not
+   determined by the code alone.
+
+Runner-up: N26 (all of a person's hours assigned to one activity by
+precedence, children served as zero-hour workers).
+
+** Same column, different rule across waves of one country
+
+- Ethiopia plot_features Area: woreda-table conversion of non-GPS fields
+  in W1-W4, NA in W5 (E5).  ErosionProtection: Yes code 2 in W1-W3,
+  1 in W4-W5 (E7).
+- Ethiopia crop_production: intercropped from the plot roster in W1,
+  from the harvest file in W2-W5 (E10); u := 'Kg' constant and grams
+  dropped in W1, unit labels read in W2-W5 (E11); sale unit constant
+  'Kg' in W1-W2, read with fillna('Kg') in W3-W5 (E12).
+- Ethiopia plot_inputs: seed Quantity kg + g in W1 and W3, kg only in W2,
+  W4, W5 (E16); Improved yes-codes (2,) in W1-W3, (2, 3, 4) in W4-W5
+  (E18); seed rows dropped on s4q15 only in W4-W5 (E19).
+- Ethiopia plot_labor: family member slots 6/8 (W1), 7/8 (W2), 4/4
+  (W3-W5); in-kind wages present only in W5 and ignored (E24-E26).
+- Ethiopia people_last7days: work dummies = hours > 0 in W1-W3, explicit
+  yes/no in W4-W5; working-age marker 'X' vs 1 (E27, E28).
+- Ethiopia household_roster Age: DOB-derived with a synthetic interview
+  date in W2 only (E33).
+- Ethiopia household_roster residence: MonthsAway (hh_s1q05) in W1-W3,
+  WeeksAway (s1q06) in W4-W5 (E39).
+- Ethiopia shocks: YAML rule vs script rule is per build path, not per
+  wave, but the script path exists only for W1-W4 (E32).
+- Nigeria food_acquired purchased Quantity: consumption-from-purchases
+  (W1), quantity purchased (W2-W3), most recent purchase in 30 days (W4)
+  (N1-N3); Quantity_kg populated in W4 only (N4).
+- Nigeria crop_production KgFactor: W4-W5 only (N6); sales at plot grain
+  W1-W2, hh-crop grain W3-W5 (N9).
+- Nigeria plot_inputs Improved: three code sets W3 / W4 / W5, with a
+  certified override in W4 only (N16); fertilizer u := 'Kg' in W1-W2,
+  read in W3+ (N14).
+- Nigeria anthropometry: single reading W1-W3, median of three W4-W5
+  (N22).
+- Nigeria plot_labor family PersonDays: computed from slots W1-W3, copied
+  from a shipped total W4, unwired W5 (N23).
+- Nigeria people_last7days: joblogic allocation W1-W2, direct hours
+  W3-W4, a different module and rules W5 (N26, N27, N30).
+- Nigeria community_prices u: imputed from a questionnaire table W1-W2,
+  read W3-W5 (N31).
+- Nigeria household_roster Age: DOB day+month+year (W1-W3), year only
+  (W4), month + survey-calculated year (W5) (N34).
+
+** Same column, different rule between the two countries of this group
+
+Wage (mean daily vs total cash; E25 / N25); AreaUnit ('hectares' on GPS
+rows vs farmer's label always; E4 / N20); Area for non-metric farmer
+units (converted via woreda table vs NA; E5 / N18); harvest_month (int
+Gregorian month vs 'YYYY-MM' string; E8 / N8); food_acquired 'produced'
+(residual incl. gifts vs reported own production; E1 / N1);
+food_acquired purchased Quantity (min(total, purchased) 7-day vs three
+wave-dependent meanings; E2 / N1-N3); work dummies (hours > 0 vs
+reported; E27 / N26); seed Quantity (kg + g vs channel sum-or-largest;
+E16 / N12); community price dedup (first in both, but Nigeria's docstring
+says median; E30 / N32).
+
+** What would not fit a per-row Derivation column + registry
+
+- Many-row inputs.  E14 (sales summed over a (holder, crop) group and
+  attached to one plot), E21 (species sums over sub-codes and holders),
+  E24-E26 / N23-N25 (products summed over groups, slots and rounds), E36
+  (a matrix product), N12 (sum-or-largest over channels): the retrieval
+  callable behind a registry key must return a FRAME of source rows, not
+  a value, and for N12 must also say which branch fired.
+- Derivations on INDEX values.  E3 (u of the total stamped on the
+  purchased row), E11 / E12 / N14 (u := 'Kg'), E15 / N5 ('Other
+  (Specify)' / 'None' fills), N7 (size stripped from u), N31 (u imputed
+  per item).  A column describes a cell; these describe the key.  The
+  registry needs an entry per index LEVEL as well as per column.
+- Build-path ambiguity.  E32: two rules for one column, selected by
+  which path wrote the cache.  A per-row stamp is only truthful if
+  written at build time by the path that actually ran; a registry keyed
+  on (country, table, column) cannot express "depends on cache state".
+- Read-time framework derivations riding on country tables.  E2's
+  min() arises from composing a country script with
+  build_transforms.food_acquired_to_canonical; E36 depends on the GH #850
+  kg inference; a parquet-stamped column cannot carry a rule applied
+  after the parquet is read.  The registry entry must name both layers.
+- Window / meaning attributes with no arithmetic.  N2, N3, N33 (and the
+  cross-country meaning splits above): a Derivation key that names a
+  FUNCTION has nothing to point at.  The design needs a window /
+  question-semantics field (per row in N3, since the three s values of
+  one household-item differ) rather than only a function key.
+- Wave-varying rules for one column.  The list above has 20-odd cases
+  where the rule is (country, wave, column)-grain; a registry keyed on
+  (country, table, column) would have to carry a wave dimension or the
+  per-row stamp would have to name the wave's rule id.
+- One raw field, several predicates.  pp_s3q03 -> Fallow (== 3),
+  intercropped (== 2), cultivated filter (in {1, 2}) (E6 / E10 / E26): a
+  registry keyed on raw field is one-to-many; keyed on served column it
+  repeats the field.  Either is fine, but the design must pick.
+- Row filters and dedups (E19, E30, N11, N17, N21 W1 override, the
+  all-zero drops): they change WHICH rows exist, so there is no row to
+  stamp; only a table-level entry can record them.
+- Dead scripts (N37, N38, E37): a registry built from what is served
+  will not see them, and the shadowing history says they are the ones
+  that bite.

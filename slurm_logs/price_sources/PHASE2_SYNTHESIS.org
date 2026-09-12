@@ -1,0 +1,172 @@
+#+title: Phase 2: pooled synthesis of the five-source price comparison
+#+author: Sue (Claude Fable 5.1), scrum master
+#+date: 2026-09-08 (draft while Phase 1 runs)
+
+Inputs: the eight =slurm_logs/price_sources/<Country>/{cells,gaps,models}.csv=
+and =REPORT.org= files produced under PROTOCOL.org.  Output:
+=slurm_logs/price_sources/SYNTHESIS.org= + =pooled_gaps.csv= +
+=pooled_models.csv= + figures.  One agent (Opus), then an independent
+read-only red-team of the synthesis against this spec and the protocol.
+
+* What pools and what does not
+- *Log gaps pool without conversion*: =gap_log= is unit-free.  Pool
+  =gaps.csv= across countries with =country= as a column; never pool waves
+  within a country into one cell (they stay as separate =t=).
+- *Levels do not pool without a numeraire*: a descriptive table of median
+  prices per kg by (country, wave, item class) in PPP-2017 via
+  =Country.food_prices(units='kgvalue', numeraire='PPP-2017')= is allowed
+  ONCE, labelled as descriptive; no inference on levels across countries.
+- *Native-unit matches first*: use =u_basis == 'native'= rows as primary;
+  the per-kg view is secondary and flagged (kg factors inherit source 1).
+
+* Questions, in order
+1. By pair and country-wave: median gap, IQR, share > log 1.5 -- a table
+   read from =models.csv= rows with =geo_level == 'all'=, and the per-rung
+   rows beside them (does the answer change from =v= to =Region=?).
+2. The claim (30--50% margin = gap in [0.262, 0.405]) for each
+   farmgate-vs-market pair: =community_price_vs_crop_sale_price= (Ethiopia,
+   Malawi, Tanzania), =unit_value_vs_crop_sale_price= (Uganda + the three),
+   =unit_value_vs_own_consumption_valuation= (Uganda, GhanaLSS).  Which
+   countries and which ITEMS sit inside the band?  Use the per-item tables
+   from each REPORT.org; classify items into classes (staple grains and
+   flours / roots and tubers / pulses and oilseeds / fresh produce /
+   animal products / processed and beverages) with one explicit crosswalk
+   table in the synthesis, and report the band test by class.
+3. Constant markup / iceberg vs additive cost: pool =gaps.csv= and fit the
+   protocol's =between= specification with country x wave x geo effects
+   (extend =common.fit_gap_model= by passing a combined geo key
+   =country|t|geo=; do NOT rewrite it) -- pooled, and within each item
+   class.  A negative between-slope that vanishes within class means item
+   heterogeneity, not an additive cost; one that survives within class is
+   the additive signature.  Report both, with HC3 SEs, and say which reading
+   the data support.
+4. Uganda's 3-vs-4: does the household's own-consumption valuation sit at
+   the sale price, the purchase price, or between?  This is the one direct
+   test of what "farmgate" means in a consumption module.
+5. Source 2 (reported purchase price): in how many countries is it a
+   genuine second measurement?  (Expected: Uganda only.)
+6. Data problems: merge the eight "Data problems" tables into one ledger
+   (=DATA_PROBLEMS.csv=: country, id, table, wave, symptom, count, evidence,
+   proposed fix, status), de-duplicate cross-country patterns (unit
+   vocabularies, =crop= vs =j=, missing =u= on crop_production, unwired
+   EHCVM price files), and rank by leverage (how many cells / countries a
+   fix would move).  This ranking is the Phase 3 queue.
+
+* Discipline
+- Every number in SYNTHESIS.org traces to a CSV row or a REPORT.org line;
+  cite the file.
+- Where a country deviated from the protocol (its REPORT.org says so), do
+  not silently pool it: exclude or flag, and say which.
+- No library edits; no new analysis outside the CSVs except the class
+  crosswalk and the PPP-2017 descriptive table.
+- The red-team checks: pooled counts equal the sum of country counts; the
+  band test reproduces from =gaps.csv=; the class crosswalk covers every
+  item in =gaps.csv= (unclassified items listed); the between-slope is
+  reproduced independently on one country.
+
+* Conventions the Phase-1 agents converged on (read before pooling)
+- The protocol left the per-kg view's tagging to =common.py=, whose CELL/GAP
+  schemas carry =u= but no =u_basis=.  Agents therefore tag per-kg rows in
+  =cells.csv= / =gaps.csv= with =u == 'kg'= (lower-case) and native rows with
+  the survey's own unit label (=Kg=, =Kilogramme=, =Piece= ...); =models.csv=
+  carries =u_basis in {native, kg}=.  Nigeria could not construct a per-kg
+  view for community prices and used =u_basis='kg'= for the =u == 'Kg'=
+  subset -- read each REPORT.org's deviations section and treat Nigeria's
+  'kg' rows as native-Kg.
+- Tanzania's source 5 geography comes from the country's own
+  =community_cluster_xwalk= (0% direct overlap of =community_prices.v= with
+  =cluster_features.v=): a data problem AND a pooling caveat -- its =v= rung
+  is a crosswalked cluster, not the household's.
+- Under the =MIN_DOF= guard many =coef_within= rows are NaN by design (80 of
+  97 in Tanzania); pool =between= only, and report how many rows each
+  country contributes to it.
+- Nigeria's by-item tables pool 2011Q1 + 2013Q1 (single-cell rounds); flag
+  when pooling by wave.
+- Nigeria's =models.csv= carries a THIRD =u_basis=, =native_ex_misscaled=
+  (34 rows): native-unit pairs excluding the =g= / =cl= community-price rows
+  its REPORT.org shows to be package prices (defect N-02).  Treat it as the
+  clean native basis for Nigeria and say so; do not average it with =native=.
+- =j= labels contain commas (Tanzania: "Cakes And Biscuits, ..."); read the
+  CSVs with a real parser (=pandas.read_csv=), never =cut -d,=.
+- Mali tags per-kg rows =u == 'per_kg'= (Tanzania: =kg=) and adds a
+  =u_basis='native_sized'= (sized native units only).  Normalise
+  ={kg, per_kg} -> kg= when pooling.  Mali's community price carries a
+  =Poids (KG)= weight, so its per-kg is =Price / Poids=, not =Price /
+  NumberOfUnits=.
+- **Unsized units bias the between slope.**  Mali: unsized-inclusive
+  =between = +0.152 (se 0.047)=, sized-only =-0.062 (se 0.091)= -- a "tas" or
+  "sachet" is not a quantity, and cells keyed on them carry a price-level
+  gradient that is a unit artefact.  Phase 2 pools the =native= basis only
+  on units that name a fixed quantity (Kg, litre, gram, ...); report the
+  unsized-inclusive number once, as the cautionary contrast.
+- Mali 2014-15 has 3.85 households per grappe: no cluster rung is possible;
+  its rows are Region-rung only.  Say so when comparing rungs across
+  countries.
+- **The farmgate-to-market ratio is basis-dependent, and the two bases
+  answer different questions.**  Niger: native basis (same container both
+  sides) 1.06-1.25, per-kg 1.44-1.84; the wedge is bulk-breaking (a 100 kg
+  sack at the farm gate vs a gram at the market).  Report the claim test on
+  BOTH bases side by side, per country; the native basis is the marketing
+  margin proper, the per-kg basis includes the bulk-breaking premium.  The
+  gap also widens up the ladder in Niger (v 1.20 -> national 1.67): report
+  by rung.
+- Niger has NO wave where sources 1 and 5 coexist (EHCVM vs ECVMA); its
+  =unit_value_vs_community_price= is structurally empty, not zero.  Exclude
+  Niger 2014-15 =community_price_vs_crop_sale_price= (n=2, one cell
+  corrupted by a gram-weight defect, D5).  All 25 Niger =models.csv= rows
+  are NaN under MIN_DOF; Niger contributes medians only.
+- Niger's source 4 used =common.cell_medians= on row-level
+  =Value_sold/Quantity_sold= (native units), not =median_price_valuation=
+  (which forces threshold 10 and inferred kg factors); its per-kg view uses
+  definitional factors only.  Fine for pooling; say so.
+- Correction to the ledger and brief: Niger's =crop_production= DOES carry a
+  =u= level (=(t, i, plot, crop, u)=); the "no u" claim was wrong for Niger
+  (right for Nigeria and Mali).
+- GhanaLSS adds a pair no other country has,
+  =community_price_vs_own_consumption_valuation= (market a, farmgate b);
+  it pools with nothing -- report it on its own.  GhanaLSS has NO per-kg
+  view (no kg table; factors would come from 2016-17 alone, GH #770): its
+  native Kg cells are the per-kg view.  Its 2016-17 source-5 rows are
+  screened (u metric OR NumberOfUnits == 1; 5,351 of 220,908 dropped, D1)
+  -- pool the screened CSVs as delivered and say so.
+- GhanaLSS's central result for the valuation problem: 2016-17
+  =unit_value_vs_own_consumption_valuation= median gap 0.0000 on 322 cells,
+  31.7% exact ties -- households answer "what could you sell this for" with
+  the purchase price.  Put beside Uganda's 3-vs-4 (sale price) when it
+  lands: the two together say whether source 3 is a farmgate or a market
+  valuation.
+- GhanaLSS source 1 exists in 2016-17 ONLY (GLSS1-6 elicit purchases by
+  value; 1,054,161 currency-u rows).  Source 3 covers five waves; market /
+  farmgate ratios 1.05 / 2.09 / 0.87 / 1.20 by wave -- no stable margin.
+- Malawi: per-kg basis uses ONE metric-only factor map for all three sources
+  (sources 4/5 carry no Expenditure, so =units='kgvalue'= would put the two
+  sides on different scales); source-4 threshold 5; =u='Other (Specify)'=,
+  Tea, Coffee excluded; all source-4 slopes NaN under MIN_DOF (10-41 cells).
+  Its farmgate numbers are POST-FIX (the sale unit is now read; pre-fix rows
+  carried a factor-of-50 error, GH #824) -- Nigeria's and Niger's are
+  pre-fix and restricted to rows whose sold unit equals the harvest unit.
+- Maize is inside the 30-50% band in Malawi (1.33x, 1.36x on two market
+  sources); rice 2.9-3.1x and groundnut 5.0x are milling/shelling (a
+  processing step between the farmgate and the market good), not margin --
+  the item-class test must separate "same good" pairs from "processed"
+  pairs before reading a margin.
+- Uganda: filter =cells.source.isin(common.SOURCES)= and
+  =~gaps.pair.str.contains('soldunit')= -- the =*_soldunit= rows are a
+  sensitivity build of source 4 on the sold unit.  =reported_purchase_price=
+  rows are RETAINED so the failure is visible, but Uganda has NO source 2:
+  the raw Stata price equals Expenditure/Quantity (and so does every other
+  country's -- source 2 exists nowhere in the corpus).  2015-16 is excluded
+  from source 4 (Value_sold ~100x too small, GH issue filed); source-4
+  threshold 5.
+- Uganda's three-way result is the centrepiece for the valuation question:
+  purchase/sale 1.60x, purchase/own-consumption 1.25x, own-consumption/sale
+  1.23x; the own-consumption valuation sits at 0.585 of the log distance from
+  sale to purchase -- between, nearer the purchase price -- although the UNPS
+  manual instructs a farmgate valuation.  Read with GhanaLSS 2016-17 (own
+  valuation == purchase unit value exactly): households value what they eat
+  at (or near) what they would PAY, not what they would receive.
+- Uganda is the one country whose source-4 =between= slopes are identified
+  and negative (-0.19 to -0.23, R^2 item+geo 0.83-0.93): an additive
+  per-unit component on the farmgate side, against a purely proportional
+  1-vs-3.  Test whether it survives within item class before calling it
+  transport.

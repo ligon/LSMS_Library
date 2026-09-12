@@ -532,11 +532,33 @@ def food_acquired_to_canonical(df):
 
 def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
                          given=None, item='item', HHID='HHID'):
-    """Uganda non-food expenditures from a single .dta file.
+    """Uganda non-food expenditures from a single .dta file, LONG.
 
     Aggregates across three or four source columns (purchased, away,
-    produced, given) at the (HHID, item) level and returns a wide
-    matrix (HHID rows x item columns) of total expenditures.
+    produced, given) at the (household, item) level and returns the
+    canonical long frame: index ``(i, j)`` -- ``i`` the household id,
+    ``j`` the ``nonfood_items.org`` Preferred Label -- and one column
+    ``Expenditure``.  The caller (the wave script) stamps ``t`` and sets
+    the ``(t, i, j)`` index, exactly as the sibling ``food_acquired``
+    path does (``Uganda/2013-14/_/food_acquired.py``).
+
+    SPARSITY (GH #817).  A household that did not report an item has NO
+    ROW.  This used to return a wide HHID x item matrix built with
+    ``groupby().sum().unstack().fillna(0)``, which fabricated a 0 for
+    every (household, item) pair the survey never recorded -- making
+    "not reported" and "reported zero" the same number, against the
+    convention ``transformations.food_expenditures_from_acquired``
+    documents for food.  ``sum(min_count=1)`` keeps the two apart (an
+    all-NaN group stays NaN), and only strictly positive expenditures
+    are kept.  Dropping the non-positive rows costs no money: measured
+    across all eight waves there is not one negative value, and the
+    genuine reported zeros (0 in six waves, 76 in 2019-20) sum to zero.
+
+    NOTE ON THE OLD NAMES.  The wide frame carried ``index.name = 'j'``
+    for the HOUSEHOLD and ``columns.name = 'i'`` for the ITEM -- both
+    backwards.  Downstream code compensated (``id_walk`` fell back to
+    the ``j`` level and renamed it ``i``).  The long frame uses the
+    canonical names, so those compensations are gone.
 
     Replaces the prior lsms.tools.get_food_expenditures-based
     implementation with an inline pandas groupby+sum; the upstream
@@ -589,15 +611,33 @@ def nonfood_expenditures(fn='', purchased=None, away=None, produced=None,
     df = df[df['itmcd'].isin(nonfood_items.values())]
 
     # Sum source columns, groupby HHID+itmcd (now label names).
+    # min_count=1 on BOTH sums: a row whose every source column is NaN
+    # stays NaN, and so does a (household, item) group made only of such
+    # rows.  Without it pandas returns 0.0 for an all-NaN group and the
+    # sparsity distinction is lost before it can be used.
     active_sources = list(source_cols.keys())
     df['total'] = df[active_sources].sum(axis=1, min_count=1)
-    wide = df.groupby(['HHID', 'itmcd'])['total'].sum().unstack('itmcd')
-    wide = wide.fillna(0)
+    long = df.groupby(['HHID', 'itmcd'])['total'].sum(min_count=1)
 
-    # Match the old output's index/column names.
-    wide.index.name = 'j'
-    wide.columns.name = 'i'
-    return wide
+    # Keep reported, positive expenditures only (GH #817).  NaN is "not
+    # reported"; 0 is a reported zero, which carries no expenditure and
+    # would otherwise be indistinguishable from the fabricated zeros this
+    # function used to emit.
+    long = long.dropna()
+    long = long[long > 0]
+
+    out = long.rename('Expenditure').reset_index()
+    out = out.rename(columns={'HHID': 'i', 'itmcd': 'j'})
+    out = out.set_index(['i', 'j'])[['Expenditure']]
+
+    # `j` is an index level, so two items sharing a Preferred Label would be
+    # silently pooled by the framework collapse (GH #323, harmonize_seed_crop).
+    # The groupby above already pools them -- deliberately, it is how the label
+    # map is meant to work -- so what must hold here is that the pooling was
+    # complete: one row per (household, label).
+    assert out.index.is_unique, (
+        f'{fn}: non-unique (i, j) in nonfood_expenditures')
+    return out
 
 
 def id_walk(df, updated_ids, hh_index='i'):
@@ -1151,7 +1191,7 @@ def _to_int_code(series):
     return pd.to_numeric(series, errors='coerce').astype('Int64')
 
 
-def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
+def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
     """Build canonical ``crop_production`` for one Uganda UNPS wave.
 
     Parameters
@@ -1163,9 +1203,15 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         modules, loaded with ``convert_categoricals=False`` so code
         columns carry integer codes.  ``None`` permitted.
     df4a : pd.DataFrame | None
-        Raw AGSEC4A plot-crop roster (for the intercropped flag and,
-        where available, the perennial flag).  ``None`` permitted; when
-        absent the flags are NaN.
+        Raw AGSEC4A plot-crop roster -- the FIRST season's -- for season
+        A's intercropped flag and, where available, the perennial flag.
+        ``None`` permitted; when absent the season-A flags are NaN.
+    df4b : pd.DataFrame | None
+        Raw AGSEC4B plot-crop roster -- the SECOND season's -- for season
+        B's intercropped flag.  ``None`` permitted; when absent season B's
+        flag is NaN.  It is NEVER filled in from ``df4a``: the crop stand
+        is asked separately per season and the two answers differ on
+        23.3-31.2% of plots (GH #872).
     colmap : dict
         Per-(season) column maps keyed by ``'A'`` / ``'B'``.  Each value
         is a dict with keys:
@@ -1177,13 +1223,45 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 condition     — reported harvest CONDITION/state code column
                                 (UNPS q6c; None only if the wave has none)
                 qty_sold      — reported quantity sold column (or None)
-                value_sold    — reported sale value column (or None)
+                unit_sold     -- reported unit OF THE SALE (UNPS q7c, "Unit
+                                Code" on the sale block; or None).  A
+                                SECOND unit, distinct from `unit` above:
+                                UNPS asks question 7 as a compound
+                                question ("how much was sold, in what
+                                condition, and in what unit"), so
+                                `qty_sold` is denominated in q7c and NOT in
+                                the harvest unit q6c.  Emitted as
+                                ``Unit_sold``, mapped through the SAME
+                                `harvest_units` table as `u`.
+                condition_sold -- reported CONDITION of the sold quantity
+                                (UNPS q7b; or None).  Emitted as
+                                ``Condition_sold`` on the same 20-code
+                                `harvest_conditions` vocabulary as the
+                                harvest `condition` index level.
+                value_sold    -- reported sale value column (or None).
+                                NOTE: `Value_sold / Quantity_sold` is a
+                                price per ONE ``Unit_sold`` AS REPORTED.
+                                Where ``Unit_sold`` and ``u`` DISAGREE the
+                                two reports contradict each other and the
+                                row is a data-quality FLAG, not an
+                                identification of which unit is right --
+                                ``Unit_sold`` is the closer denominator on
+                                only ~40-45% of those rows (GH #824
+                                red-team).  See data_info.yml.
                 month         — harvest-end month code column (or None)
-        plus an optional top-level key ``cf`` listing per-condition CF
-        columns (unused for storage; documented for transformations).
-    intercrop_map : (passed via colmap['intercrop']) optional dict
-            file_hhid, file_parcel, file_plot, flag, [perennial]
-        describing how to read the intercropped flag from ``df4a``.
+                kg_factor     — SURVEY-REPORTED kilograms per one unit of
+                                the row's ``u`` (UNPS q6d, "Conversion
+                                factor into kg?"; or None).  Emitted as the
+                                ``KgFactor`` column; a value of 0 is read as
+                                "not recorded" and becomes NaN, because 0 kg
+                                per unit is not a weight.
+    intercrop_map : (passed via ``colmap['intercrop']`` for season A and
+        ``colmap['intercrop_B']`` for season B) optional dicts
+            hhid, parcel, plot, flag, [crop], [perennial], [planting_month]
+        describing how to read the intercropped flag from ``df4a`` /
+        ``df4b`` respectively.  A season whose block is absent (or whose
+        frame is None) serves NA for that season -- never the other
+        season's answer.
 
     Raises
     ------
@@ -1200,42 +1278,67 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     -------
     pd.DataFrame indexed by ``(t, i, plot, j, u, condition, season)`` with columns
         ``Quantity`` (Float64), ``Quantity_sold`` (Float64),
-        ``Value_sold`` (Float64), ``harvest_month`` (Int64 1-12) and
-        ``intercropped`` (boolean).  The ``perennial`` / ``planting_month``
-        lookups are wired but not emitted — no current Uganda wave
-        populates them cleanly (they would be all-null).
+        ``Value_sold`` (Float64), ``Unit_sold`` (string, the unit the SALE
+        was reported in -- GH #824), ``Condition_sold`` (string),
+        ``harvest_month`` (Int64 1-12), ``intercropped`` (boolean) and
+        ``KgFactor`` (Float64, NaN where the wave declares no ``kg_factor``
+        column or the household reported none).
+
+        ``Unit_sold`` / ``Condition_sold`` are NA -- never a sentinel --
+        where the wave records no such column, where the household reported
+        no sale, or where the reported code is outside the labelled scheme.
+        The ``'Unknown'`` / ``'unknown_condition'`` sentinels exist ONLY
+        because ``u`` and ``condition`` are declared INDEX levels and a null
+        index key is silently deleted by ``groupby(dropna=True)``; these two
+        are ordinary columns and carry no such hazard, so NA is both safe
+        and more honest (it distinguishes "no sale on this row" from a
+        value).  The ``perennial`` / ``planting_month`` lookups are wired but
+        not emitted — no current Uganda wave populates them cleanly (they
+        would be all-null).
     """
     crop_map = _crop_label_map()
     unit_map = _harvest_unit_map()
     condition_map = _harvest_condition_map()
 
-    # --- intercropped / perennial / planting from AGSEC4A (plot-crop) ---
-    inter_lookup = {}      # (hh, parcel, plot) -> bool   (plot-level flag)
+    # --- intercropped / perennial / planting from AGSEC4A / AGSEC4B ---
+    # ONE LOOKUP PER SEASON (GH #872 follow-up).  AGSEC4A rosters the FIRST
+    # season's plot-crops and AGSEC4B the SECOND; the crop stand is asked
+    # separately in each.  Reading the 4A answer for season-B harvest rows
+    # -- which is what this did until the season key was added -- contradicts
+    # AGSEC4B on 23.3-31.2% of the rows where both are available, because a
+    # plot really is planted differently in the two seasons.  Measured
+    # plot-level A-vs-B disagreement: 29.5 / 26.7 / 31.0 / 24.8 / 26.3 /
+    # 27.9 / 23.3% by wave.  AGSEC4B also covers the AGSEC5B harvest rows far
+    # better than AGSEC4A does (86.6-99.95% vs 54.8-88.1%).
+    inter_lookup = {'A': {}, 'B': {}}   # season -> (hh, parcel, plot) -> bool
     perennial_lookup = {}  # (hh, parcel, plot, crop) -> bool
     planting_lookup = {}   # (hh, parcel, plot, crop) -> Int month
-    ic = colmap.get('intercrop')
-    if df4a is not None and ic is not None:
-        hh4 = _format_agsec_hhid(df4a[ic['hhid']], t)
-        pa4 = df4a[ic['parcel']].apply(format_id)
-        pl4 = df4a[ic['plot']].apply(format_id)
+    for season4, key4a, df4 in (('A', 'intercrop', df4a),
+                                ('B', 'intercrop_B', df4b)):
+        ic = colmap.get(key4a)
+        if df4 is None or ic is None:
+            continue
+        hh4 = _format_agsec_hhid(df4[ic['hhid']], t)
+        pa4 = df4[ic['parcel']].apply(format_id)
+        pl4 = df4[ic['plot']].apply(format_id)
         key3 = list(zip(hh4, pa4, pl4))
-        w4 = f"{t!r}]['intercrop'"
+        w4 = f"{t!r}][{key4a!r}"
         if ic.get('flag'):
-            flagcode = _to_int_code(_require(df4a, ic['flag'], w4, 'intercrop flag'))
-            # 1 = mono/No, 2 = Yes  (recode mirrors WB: 2 -> True)
+            flagcode = _to_int_code(_require(df4, ic['flag'], w4, 'intercrop flag'))
+            # {1: Pure Stand, 2: Mixed/Inter cropped} -> 2 is True (GH #872).
             for k, c in zip(key3, flagcode):
                 if pd.notna(c):
-                    inter_lookup[k] = bool(int(c) == 2)
+                    inter_lookup[season4][k] = bool(int(c) == 2)
         if ic.get('crop'):
-            crop4 = _to_int_code(_require(df4a, ic['crop'], w4, 'intercrop crop'))
+            crop4 = _to_int_code(_require(df4, ic['crop'], w4, 'intercrop crop'))
             key4 = list(zip(hh4, pa4, pl4, crop4))
             if ic.get('perennial'):
-                per = _to_int_code(_require(df4a, ic['perennial'], w4, 'perennial'))
+                per = _to_int_code(_require(df4, ic['perennial'], w4, 'perennial'))
                 for k, c in zip(key4, per):
                     if pd.notna(c):
                         perennial_lookup[k] = bool(int(c) == 2)
             if ic.get('planting_month'):
-                pm = _to_int_code(_require(df4a, ic['planting_month'], w4,
+                pm = _to_int_code(_require(df4, ic['planting_month'], w4,
                                            'planting month'))
                 for k, m in zip(key4, pm):
                     if pd.notna(m) and 1 <= int(m) <= 12:
@@ -1264,6 +1367,19 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
             if not qcol:
                 continue
             qty = pd.to_numeric(_require(df5, qcol, ws, 'quantity'), errors='coerce')
+            # SURVEY-REPORTED missing-value sentinel on the harvest quantity
+            # (UNPS q6a).  2009-10's a5aq6a/a5bq6a use `99999` for "no
+            # information reported" -- an EXACT-VALUE strip, never a range
+            # (99998 / 100000 are real quantities and must survive).  EPAR's
+            # own pipeline (EPAR_UW_Uganda_UNPS_W1.do:558,
+            # `replace quantity_harv=. if quantity_harv==99999`) applies the
+            # same unconditional rule to the coalesced A/B column; GH #861.
+            # Declared per-condition via `qty_sentinel` in CROP_COLMAPS so it
+            # stays wave-scoped -- only 2009-10 sets it (measured: no other
+            # wave's Quantity carries this value as a sentinel).
+            qty_sentinel = cond.get('qty_sentinel')
+            if qty_sentinel is not None:
+                qty = qty.where(qty != qty_sentinel, np.nan)
 
             # reported native unit
             if cond.get('unit'):
@@ -1290,16 +1406,61 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                                    errors='coerce') if cond.get('value_sold')
                      else pd.Series([pd.NA]*len(df5), index=df5.index))
 
+            # THE SALE HAS ITS OWN UNIT AND ITS OWN CONDITION (GH #824).
+            # UNPS question 7 is compound -- "how much of the harvest was
+            # sold, IN WHAT CONDITION and IN WHAT UNIT" -- so q7c is a
+            # second unit code, on the SAME `harvest_units` scheme as the
+            # harvest unit q6c but not the same answer: they disagree on
+            # 2.0-10.4% of sale rows by wave.  `Value_sold / Quantity_sold`
+            # is a price per ONE q7c unit; stamping it on a row whose `u`
+            # advertises the harvest unit is what this wires away.
+            # Mapped through the identical `unit_map` / `condition_map`, so
+            # the vocabulary is the same one `u` and `condition` use.
+            #
+            # A code the scheme does not know becomes NA and is NOT
+            # sentinel-filled: unlike `u` and `condition` these are plain
+            # COLUMNS, so no `groupby(dropna=True)` can delete their rows,
+            # and NA correctly says "the survey did not record a unit for
+            # this sale" rather than inventing an 'Unknown' category.
+            if cond.get('unit_sold'):
+                uscode = _to_int_code(_require(df5, cond['unit_sold'], ws, 'unit sold'))
+                usold = uscode.map(
+                    lambda c: unit_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
+            else:
+                usold = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='object')
+
+            if cond.get('condition_sold'):
+                cscode = _to_int_code(_require(df5, cond['condition_sold'], ws,
+                                               'condition sold'))
+                csold = cscode.map(
+                    lambda c: condition_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
+            else:
+                csold = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='object')
+
             if cond.get('month'):
                 hm = _to_int_code(_require(df5, cond['month'], ws, 'harvest month'))
                 hm = hm.where((hm >= 1) & (hm <= 12), pd.NA)
             else:
                 hm = pd.Series([pd.NA]*len(df5), index=df5.index, dtype='Int64')
 
+            # SURVEY-REPORTED kg per one native unit (UNPS q6d).  Independent
+            # of the unit LABEL, so it is the only kg basis available for a
+            # wave-season whose unit column the extract dropped (2018-19
+            # season A).  0 means "not recorded", NOT "weighs nothing" —
+            # keeping it would zero out the row's kilograms, so it is NaN'd
+            # here rather than downstream where the intent would be lost.
+            if cond.get('kg_factor'):
+                kgf = pd.to_numeric(
+                    _require(df5, cond['kg_factor'], ws, 'kg conversion factor'),
+                    errors='coerce')
+                kgf = kgf.where(kgf > 0, np.nan)
+            else:
+                kgf = pd.Series([np.nan]*len(df5), index=df5.index, dtype='float64')
+
             piece = pd.DataFrame({
                 't':             t,
                 'i':             hh.values,
-                'plot':          plot_id.values,
+                'plot_id':          plot_id.values,
                 'j':             j.values,
                 'u':             u.values,
                 'condition':     condition.values,
@@ -1307,18 +1468,25 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 'Quantity':      qty.values,
                 'Quantity_sold': qsold.values,
                 'Value_sold':    vsold.values,
+                'Unit_sold':     usold.values,
+                'Condition_sold': csold.values,
                 'harvest_month': hm.values,
+                'KgFactor':      kgf.values,
             })
-            # intercropped flag (plot-level) joined from AGSEC4A.  The
+            # intercropped flag (plot-level) joined from THIS SEASON's crop
+            # roster -- AGSEC4A for season A, AGSEC4B for season B.  A wave
+            # that declares no roster for a season serves NA there; it never
+            # borrows the other season's answer (GH #872).  The
             # perennial_lookup / planting_lookup hooks exist for future
             # waves but no current Uganda wave populates them cleanly, so
             # those columns are not emitted (they would be all-null).
             k3 = list(zip(hh.values, parcel.values, plot.values))
-            piece['intercropped'] = [inter_lookup.get(k, pd.NA) for k in k3]
+            season_inter = inter_lookup[season]
+            piece['intercropped'] = [season_inter.get(k, pd.NA) for k in k3]
             pieces.append(piece)
 
-    cols = ['Quantity', 'Quantity_sold', 'Value_sold', 'harvest_month',
-            'intercropped']
+    cols = ['Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'Condition_sold', 'harvest_month', 'intercropped', 'KgFactor']
     if not pieces:
         return pd.DataFrame(columns=cols)
 
@@ -1328,7 +1496,16 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # rows / land-status placeholders with nothing reported).
     df = df[df['j'].notna()]
     # Keep rows even when Quantity is NaN but a sale was reported; drop
-    # only when ALL reported measures are missing.
+    # only when ALL reported measures are missing.  A 2009-10 qty_sentinel
+    # row that carries no Quantity_sold / Value_sold either (3,077 of
+    # 3,097, measured -- GH #861 red-team) is therefore dropped HERE, by
+    # the same filter and for the same reason as this wave's other 907
+    # genuinely-blank rows: the survey recorded no measure of any kind.
+    # (An earlier version of this fix tracked a pre-mask `_qty_reported`
+    # flag to keep those rows with Quantity NaN.  Dropped: the framework's
+    # `Country._finalize_result` dropna(how='all') deletes them anyway on
+    # every read, so the flag was inert at the delivered table and only
+    # produced a misleading "rows unchanged" claim in CONTENTS.org.)
     measure_cols = ['Quantity', 'Quantity_sold', 'Value_sold']
     df = df[df[measure_cols].notna().any(axis=1)]
 
@@ -1337,6 +1514,13 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     df['Value_sold'] = pd.to_numeric(df['Value_sold'], errors='coerce').astype('Float64')
     df['harvest_month'] = pd.to_numeric(df['harvest_month'], errors='coerce').astype('Int64')
     df['intercropped'] = df['intercropped'].astype('boolean')
+    df['KgFactor'] = pd.to_numeric(df['KgFactor'], errors='coerce').astype('Float64')
+    # `string` (not object): the values are label strings from the same two
+    # org tables `u` and `condition` draw on, and a declared StringDtype
+    # round-trips through `to_parquet` without entering its object-column
+    # coercion branch at all (GH #645).
+    df['Unit_sold'] = df['Unit_sold'].astype('string')
+    df['Condition_sold'] = df['Condition_sold'].astype('string')
 
     # u may be NaN (e.g. 2018-19 harvest side has no unit label); fill
     # with a sentinel so it can be an index level without null-index
@@ -1349,7 +1533,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     df['condition'] = df['condition'].astype('object').where(
         df['condition'].notna(), _CONDITION_UNKNOWN)
 
-    df = df.set_index(['t', 'i', 'plot', 'j', 'u', 'condition', 'season'])
+    df = df.set_index(['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season'])
     # Collapse exact-duplicate index tuples (same plot/crop/unit/condition/
     # season reported twice) by summing the reported quantities — this is NOT
     # an aggregation across distinct items, just de-duplication of repeated
@@ -1357,9 +1541,30 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     # in the index this block also summed FRESH onto DRY weight (GH #323).
     if not df.index.is_unique:
         num = df[['Quantity', 'Quantity_sold', 'Value_sold']].groupby(level=df.index.names).sum(min_count=1)
-        firstcols = df[['harvest_month', 'intercropped']].groupby(level=df.index.names).first()
-        df = num.join(firstcols)
-    return df
+        # KgFactor is a RATE (kg per one unit of `u`), not an extensive
+        # measure: summing it across de-duplicated rows would multiply the
+        # implied weight by the number of duplicates.  first(), like the
+        # other per-row attributes.
+        firstcols = df[['harvest_month', 'intercropped', 'KgFactor']].groupby(level=df.index.names).first()
+        # Unit_sold / Condition_sold are REPORTED LABELS, and the numeric
+        # block above SUMS Quantity_sold across the collapsed rows.  A sum
+        # taken across two DIFFERENT sold units is in NO unit, so `first()`
+        # -- which is what every other per-row attribute here gets -- would
+        # put a label on a number that does not have it.  `reduce_to_agreed`
+        # (lsms_library.build_transforms, the same reducer Uganda's
+        # cluster_features hook uses) is the tested "lossless or loud"
+        # collapse: it keeps the agreed value where the group agrees, sets
+        # the cell NA and warns where it does not, and escalates to a raise
+        # under LSMS_GRAIN_STRICT=1.  Nothing is dropped -- the row and its
+        # summed quantities are served exactly as they were before GH #824;
+        # only the label is withheld where the sources contradict each
+        # other.  Such a group is a PRE-EXISTING defect in the summed
+        # Quantity_sold that this column makes visible for the first time.
+        from lsms_library.build_transforms import reduce_to_agreed
+        labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
+                                     on_conflict='na')
+        df = num.join(firstcols).join(labelcols)
+    return df[cols]
 
 
 # Per-wave column maps for crop_production_for_wave.
@@ -1387,132 +1592,324 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 #                      A5aq6c rename is inverted" comment, which overstated
 #                      the problem: 2013-14 AGSEC5B is labelled correctly.
 #                      Either way the wiring below (6c = unit) is right.
-#   2018-19 AGSEC5A    NO unit column at all (-> u='Unknown').  a5aq6b holds
-#                      the condition (labelled); a5aq6c holds the SAME 20-code
-#                      condition scheme unlabelled and differing on 158/7144
-#                      rows, so a5aq6b (the labelled one) is used.
-#   2018-19 AGSEC5B    a5bq6b = unit (labelled), a5bq6c = condition.  NOTE the
-#                      unit is available and is NOT yet wired (unit: None
-#                      below) — a separate defect, see CONTENTS.org.
+#   2018-19 AGSEC5A    NO unit column at all (-> u='Unknown').  Re-tested by
+#                      VALUE RANGE for GH #842, because the variable labels
+#                      cannot arbitrate here: BOTH a5aq6b and a5aq6c are
+#                      titled "6c. Condition / state", and both carry the
+#                      20-code condition scheme — 20 distinct values each,
+#                      range 11-99, 100% inside `harvest_conditions`, 0%
+#                      matching a unit-only code, same modes (20/45/24/23).
+#                      They differ on 158 of 7 144 rows; a5aq6b is used.
+#                      The 6b UNIT question WAS asked (form p.13) and 6d
+#                      "conversion factor into kg" is populated on 7 123 of
+#                      7 153 rows, so the unit exists in the instrument and
+#                      was lost in the extract — `asked-not-distributed`,
+#                      not `not-asked`.  The factor is carried as KgFactor
+#                      (below), which is why this cell is still usable.
+#   2018-19 AGSEC5B    a5bq6b = unit, a5bq6c = condition, a5bq6d = kg factor.
+#                      Wired for GH #842 (it was `unit: None`, which served
+#                      u='Unknown' on all 7 041 rows).  The decisive evidence
+#                      is 6d, not the label: the MEDIAN reported kg factor
+#                      per a5bq6b code reproduces the weight embedded in that
+#                      code's own label on nine distinct units —
+#                        1 Kg -> 1     10 Sack (100 kgs) -> 100
+#                        9 Sack (120 kgs) -> 120          12 Sack (50 kgs) -> 50
+#                       20 Tin (Debe) (20 lts) -> 20      22 Plastic Basin (15 lts) -> 15
+#                       37 Basket (20 kg) -> 20           38 Basket (10 kg) -> 10
+#                       39 Basket (5 kg) -> 5
+#                      — while a5bq6c matches a unit-only code on 0.0% of
+#                      rows.  Note 5A and 5B disagree about which of 6b / 6c
+#                      is the unit, and the questionnaire disagrees with BOTH
+#                      files (form: 5A p.13 Unit=6b, 5B p.24 Unit=6c).  Only
+#                      the values decide.  See _/CONTENTS.org.
 #   2019-20            WB names throughout: s5{a,b}q06b_{1,2} = unit,
 #                      s5{a,b}q06c_{1,2} = condition, one pair per slot.
+#
+# KG FACTOR (`kg_factor` -> the KgFactor column).  UNPS asks q6d, "Record the
+# conversion factor into kg", beside every harvest record.  It is a
+# SURVEY-REPORTED kilograms-per-unit rate, independent of the unit label, so
+# it is the only kg basis available for 2018-19 season A (no unit column).
+# Wired for 2018-19 only.  EVERY OTHER WAVE ALSO SHIPS IT and is deliberately
+# left unwired here: nothing consumed a per-row factor before GH #842, so
+# wiring a wave whose kilograms already resolve through its unit label would
+# MOVE those kilograms, and that needs its own before/after.  Measured
+# non-null / rows: 2009-10 10 137/15 403 + 9 756/15 273; 2010-11 10 934/13 873
+# + 9 403/9 413; 2011-12 7 963/12 361 + 7 125/10 348; 2013-14 6 603/10 774 +
+# 6 665/10 424; 2015-16 10 675/10 678 + 6 610/8 971; 2019-20 (s5{a,b}q06d_1)
+# 6 977/8 429 + 7 366/9 356.  The factor does NOT let you reconstruct 5A's
+# missing unit: 20 is consistent with Tin (Debe) (20 lts), Basket (20 kg) and
+# "Others specify", 10 with Basket (10 kg) and Jerrican (10 lts), and the
+# within-unit spread on 5B is wide (Sack (100 kgs): 688 rows at 100, 122 at
+# 80, 117 at 120, 80 at 110).
+#
+# THE SALE HAS ITS OWN UNIT AND ITS OWN CONDITION (`unit_sold` /
+# `condition_sold` -> the Unit_sold / Condition_sold columns; GH #824).
+# UNPS question 7 is compound -- "how much of the harvest was SOLD, in what
+# CONDITION and in what UNIT" -- so q7c is a second unit code and q7b a
+# second condition code, asked ON THE SAME SOURCE ROW as the harvest q6a/
+# q6b/q6c.  Uganda therefore needs no merge (contrast Malawi, whose sale
+# lives in a separate module at household-crop grain and had to be joined
+# onto the harvest row by `u`, commit 85947ff5): these are two more columns
+# read off the row that is already there, and the grain does not move.
+#
+# WHICH COLUMN IS WHICH, decided the same way as 6b/6c -- by the VALUE-LABEL
+# vocabulary and the VALUE RANGE, never by the variable label.  Measured
+# 2026-09-09 against `harvest_units` (46 codes) and `harvest_conditions`
+# (20 codes); the discriminating statistics are the unit-only share (35
+# codes) and the condition-only share (9 codes):
+#
+#   wave/file       7b (condition)                7c (unit)
+#   2009-10 5A/5B   98.0/98.3% in-cond, 56.8/58.8% cond-only   69.2/65.3% unit-only
+#   2010-11 5A/5B   98.4/98.8% in-cond, 56.1/55.2% cond-only   78.3/70.1% unit-only
+#   2011-12 5A/5B   NO 7b COLUMN                  79.5/78.0% unit-only
+#   2013-14 5A/5B   100% in-cond, 62.5/64.8% cond-only         76.1/80.5% unit-only
+#   2015-16 5A/5B   100% in-cond, 66.1/67.1% cond-only         82.2/85.2% unit-only
+#   2018-19 5A/5B   100% in-cond, 60.6/58.4% cond-only         84.8/87.0% unit-only
+#   2019-20 5A/5B   100% in-cond, 53.1/55.7% cond-only         84.3/84.6% unit-only
+#
+# 7b = condition and 7c = unit in EVERY wave and EVERY season.  Three
+# consequences worth stating because each is a trap someone has already
+# fallen into:
+#
+#   * 2013-14 AGSEC5A's variable-label SWAP is confined to the HARVEST pair.
+#     6b is titled "Unit of quantity" but carries condition labels and 6c
+#     the reverse; the SOLD pair in the same file is labelled correctly
+#     (a5aq7b titled "Condition/state", 100% inside the condition scheme;
+#     a5aq7c titled "unit", 76.1% unit-only).  Do not generalise the swap.
+#   * 2018-19 AGSEC5A HAS A SOLD UNIT even though it has no harvest unit at
+#     all (GH #842).  `s5aq07c_1` is titled "7c. Unit", carries the full
+#     40-label `harvest_units` value-label set, is 84.8% unit-only and 0.0%
+#     condition-only on 2 734 rows.  The condition-as-unit trap that
+#     EPAR_UW_Uganda_UNPS_W7.do:520-523 falls into on the harvest side (it
+#     assigns the condition column a5aq6c to `unit_code_harv`, and all 20
+#     condition codes also occur as unit codes in EPAR's own conversion
+#     table, so the merge succeeds on a condition code) does NOT recur here:
+#     the questionnaire (p.14/17 for 5A, p.25 for 5B), the Stata variable
+#     labels and the VALUES all three agree that 7b is the condition and 7c
+#     the unit.  Take the column from the survey's own vocabulary anyway.
+#   * 2011-12 ships NO 7b column in either file -- but the questionnaire
+#     asks it (p.13 and p.21 both print "7a Qty | 7b Condition/State Code |
+#     7c Unit Code"), so this is `asked-not-distributed`, not `not-asked`,
+#     and the colmap says so with an explicit None.
+#
+# KNOWN DEFECT, measured and NOT repaired here: 2010-11 AGSEC5A's `a5aq7c`
+# is CAPPED AT CODE 20.  Its 2 115 non-null values span 0-20 with 18
+# distinct codes, against 3 662 non-null for the same file's 7b and 3 266 /
+# 52 distinct for 2010-11 AGSEC5B's `a5bq7c` (range 0-500).  Among the
+# 3 657 rows with a positive sold quantity, P(sold unit null | harvest unit
+# code >= 21) = 0.973 versus P(null | harvest code < 21) = 0.026, and the
+# codes missing entirely are exactly the common high ones -- 22 Plastic
+# Basin (15 lts), 68 Bunch (Medium), 69, 67.  So `Unit_sold` is legitimately
+# NA on most 2010-11 season-A sales, and its non-nullity is NOT random:
+# a consumer must not read a null here as "sold in the harvest unit".
+#
+# THE SOLD KG FACTOR IS STILL UNWIRED.  `a5?q7d` / `A5?Q7D` ("Record
+# conversion factor into KG of quantity/unit sold") is a household-reported
+# kg rate for the SOLD unit and is shipped by 2011-12 onward.  Its natural
+# home is a `KgFactor_sold` column beside `Unit_sold`; wiring it ADDS a
+# column and needs its own before/after, exactly as `kg_factor` did (#849).
+#
+# ALSO UNWIRED, for the same reason the matching harvest slots are: 2018-19
+# AGSEC5B's `_2` sold slot (s5bq07{a,b,c}_2, 574-577 non-null), and 2019-20
+# AGSEC5A's `_11` / `_21` "PART HARVEST" slots -- s5aq07{a,b,c}_{11,21},
+# the sale block belonging to the questionnaire's separate
+# partially-harvested repeat page.  CROP_COLMAPS reads neither, on the
+# harvest side or the sold side, so the two sides stay consistent.
 #
 # A NAMED column that is absent from the source now RAISES (`_require` ->
 # CropColmapError) instead of silently falling back.  Write `None` to declare
 # that a wave records no such column -- that is a survey fact and is auditable;
 # a name that does not resolve is a config bug and used to be invisible.
 #
-# KNOWN DEFECT, deliberately not fixed here: every `intercrop.flag` below
-# points at the SEED-USE question ("did you use any seed/seedlings?",
-# {1: Yes, 2: No}), not at the cropping-system question (`a4aq7` "Cropping
-# system" {1: Pure Stand, 2: Inter cropped} in 2009-10/2010-11, `a4aq8` /
-# `s4aq08` "What type of crop stand was on the plot?" {1: Pure Stand,
-# 2: Mixed Stand} from 2011-12 on).  So `intercropped` currently means "did
-# NOT use seed", and agrees with the true crop-stand answer on only 48-53%
-# of rows.  Rewiring MOVES data, so it needs its own before/after; see
-# CONTENTS.org "Known Issues".
+# `intercrop.flag` is the CROPPING-SYSTEM question, in every wave -- GH #872.
+# It used to point at the SEED-USE question ("did you use any seed/
+# seedlings?", {1: Yes, 2: No}: `a4aq3` 2011-12, `a4aq16` 2013-14/2015-16,
+# `s4aq16` 2018-19/2019-20), so a served `intercropped=True` meant "did NOT
+# use seed" and agreed with the real crop stand on 48.5/48.8/52.5/51.8/52.5%
+# of rows -- a coin flip.  The right column was in the SAME file all along:
+#   2009-10, 2010-11     `a4aq7`   "Cropping system"  {1 Pure Stand, 2 Inter cropped}
+#   2011-12 .. 2015-16   `a4aq8`   "What type of crop stand was on the plot?"
+#   2018-19, 2019-20     `s4aq08`  same wording       {1 Pure Stand, 2 Mixed Stand}
+# All seven take values in {1, 2, NA} only (measured; no 9/99/0 sentinel),
+# so the `2 -> True` recode is exactly right for them.
+#
+# The flag is keyed (hh, parcel, plot) while AGSEC4A is plot-CROP grain, so
+# duplicate crop rows on one plot are last-write-wins.  For the crop-stand
+# question that is near-harmless -- it is genuinely a plot-level question and
+# 0.00-0.31% of plots disagree across their crop rows (vs 10-12% for the
+# seed-use column it replaces, which was crop-level and so had no business
+# being read at plot grain either).
+#
+# ONE ROSTER PER SEASON.  AGSEC4A rosters season A's plot-crops, AGSEC4B
+# season B's, and each asks the crop stand separately -- `a4bq7` (2009-10,
+# 2010-11), `a4bq8` (2011-12..2015-16), `s4bq08` (2018-19, 2019-20), same
+# labels and same id columns as their 4A twins, {1, 2, NA} only.  So every
+# wave declares BOTH `intercrop` and `intercrop_B`, and season B is read
+# from `intercrop_B`.  It used to be read from 4A, which contradicts 4B on
+# 23.3-31.2% of comparable rows; AGSEC4B also covers the AGSEC5B harvest
+# rows at 86.6-99.95% against AGSEC4A's 54.8-88.1%.  A season with no block
+# serves NA; it never borrows the other season's answer.
 CROP_COLMAPS = {
     '2009-10': {
+        # `qty_sentinel: 99999` -- GH #861.  a5aq6a/a5bq6a use 99999 as a
+        # missing-value sentinel for "no information reported on this
+        # harvest row" (measured: 1400 rows season A, 1697 season B, none
+        # of them in Quantity_sold, Value_sold or KgFactor).  Exact-value
+        # strip only; see crop_production_for_wave's qty_sentinel handling.
         'A': {'hhid': 'HHID', 'parcel': 'a5aq1', 'plot': 'a5aq3', 'crop': 'a5aq5',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
-                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
-                              'month': None}]},
+                              'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
+                              'condition_sold': 'a5aq7b', 'value_sold': 'a5aq8',
+                              'month': None, 'qty_sentinel': 99999}]},
         'B': {'hhid': 'HHID', 'parcel': 'a5bq1', 'plot': 'a5bq3', 'crop': 'a5bq5',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
-                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
-                              'month': None}]},
-        # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
-        # a4aq4, no parcel/plot/cropID in the form the join needs), so the
-        # intercrop flag is not cleanly joinable -> intercropped is NaN
-        # this wave.
-        'intercrop': None,
+                              'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
+                              'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
+                              'month': None, 'qty_sentinel': 99999}]},
+        # 2009-10 AGSEC4A is the one wave with question-numbered id columns
+        # (`a4aq2` Parcel ID, `a4aq4` Plot ID, `a4aq6` Crop Code) instead of
+        # parcelID/plotID/cropID.  A comment here used to claim they were
+        # "not in the form the join needs"; measured, they are -- 100.00% of
+        # AGSEC5A and 74.45% of AGSEC5B rows hit an AGSEC4A key (5B is the
+        # SECOND season; AGSEC4A rosters the first, so the shortfall is a
+        # survey fact, not a key mismatch).  GH #872.
+        'intercrop': {'hhid': 'HHID', 'parcel': 'a4aq2', 'plot': 'a4aq4',
+                      'flag': 'a4aq7', 'crop': 'a4aq6'},
+        # AGSEC4B, the SECOND-season roster: same question-numbered id
+        # layout (`a4bq2`/`a4bq4`/`a4bq6`), same `Cropping system` question.
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'a4bq2', 'plot': 'a4bq4',
+                        'flag': 'a4bq7', 'crop': 'a4bq6'},
     },
     '2010-11': {
         'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
-                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
+                              'condition_sold': 'a5aq7b', 'value_sold': 'a5aq8',
                               'month': None}]},
         'B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
-                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
+                              'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
                               'month': None}]},
-        # `flag: None` is a MEASUREMENT, not a guess: 2010-11 AGSEC4A ships
-        # ['HHID','prcid','pltid','cropID','a4aq7'..'a4aq14'] and has no
-        # `a4aq3` at all, so the previous 'a4aq3' entry silently resolved to
-        # nothing and `intercropped` was NaN on all 20 970 rows of this wave.
-        # Writing None makes the config say what the build already did (a
-        # provable no-op) instead of naming a column that does not exist.
-        # NOTE the wave DOES carry a cropping-system question — a4aq7,
-        # "Cropping system", value-labelled {1: Pure Stand, 2: Inter cropped}.
-        # Wiring it would ADD data, so it is a separate change with its own
-        # before/after; see CONTENTS.org "Known Issues".
+        # 2010-11 AGSEC4A ships ['HHID','prcid','pltid','cropID',
+        # 'a4aq7'..'a4aq14'] and has NO `a4aq3` -- the seed-use column this
+        # entry named until 2026-07 does not exist here, so the flag silently
+        # resolved to nothing and `intercropped` was NaN on the whole wave.
+        # It was set to None (a provable no-op) pending GH #872; now wired to
+        # `a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, the
+        # question that was there all along.  This ADDS data to the wave.
+        # Join coverage measured: 99.25% of AGSEC5A rows, 88.15% of AGSEC5B.
         'intercrop': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
-                      'flag': None, 'crop': 'cropID'},
+                      'flag': 'a4aq7', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+                        'flag': 'a4bq7', 'crop': 'cropID'},
     },
     '2011-12': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
-                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
+                              # 2011-12 ships NO 7b column in either file.  The
+                              # SOLD condition WAS asked -- the questionnaire
+                              # prints '7a Qty | 7b Condition/State Code |
+                              # 7c Unit Code' on p.13 (5A) and p.21 (5B) -- so
+                              # this is `asked-not-distributed`, declared with
+                              # an explicit None rather than by omission.
+                              'condition_sold': None,
+                              'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
         'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
-                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
+                              # 2011-12 ships NO 7b column in either file.  The
+                              # SOLD condition WAS asked -- the questionnaire
+                              # prints '7a Qty | 7b Condition/State Code |
+                              # 7c Unit Code' on p.13 (5A) and p.21 (5B) -- so
+                              # this is `asked-not-distributed`, declared with
+                              # an explicit None rather than by omission.
+                              'condition_sold': None,
+                              'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq3', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2013-14': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
-                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
+                              'condition_sold': 'a5aq7b',
+                              'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
         'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
-                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
+                              'condition_sold': 'a5bq7b',
+                              'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2015-16': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5aq6a', 'unit': 'a5aq6c', 'condition': 'a5aq6b',
-                              'qty_sold': 'a5aq7a', 'value_sold': 'a5aq8',
+                              'qty_sold': 'a5aq7a', 'unit_sold': 'a5aq7c',
+                              'condition_sold': 'a5aq7b',
+                              'value_sold': 'a5aq8',
                               'month': 'a5aq6f'}]},
         'B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
               'conditions': [{'qty': 'a5bq6a', 'unit': 'a5bq6c', 'condition': 'a5bq6b',
-                              'qty_sold': 'a5bq7a', 'value_sold': 'a5bq8',
+                              'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
+                              'condition_sold': 'a5bq7b',
+                              'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2018-19': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 's5aq06a_1', 'unit': None, 'condition': 'a5aq6b',
-                              'qty_sold': 's5aq07a_1', 'value_sold': 's5aq08_1',
-                              'month': 's5aq06f_1'}]},
+                              'qty_sold': 's5aq07a_1', 'unit_sold': 's5aq07c_1',
+                              'condition_sold': 's5aq07b_1',
+                              'value_sold': 's5aq08_1',
+                              'month': 's5aq06f_1', 'kg_factor': 'a5aq6d'}]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5bq06a_1', 'unit': None, 'condition': 'a5bq6c',
-                              'qty_sold': 's5bq07a_1', 'value_sold': 's5bq08_1',
-                              'month': 's5bq06f_1'}]},
+              'conditions': [{'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
+                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                              'condition_sold': 's5bq07b_1',
+                              'value_sold': 's5bq08_1',
+                              'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                        'flag': 's4bq08', 'crop': 'cropID'},
     },
     '2019-20': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [
                   {'qty': 's5aq06a_1', 'unit': 's5aq06b_1', 'condition': 's5aq06c_1',
-                   'qty_sold': 's5aq07a_1', 'value_sold': 's5aq08_1',
+                   'qty_sold': 's5aq07a_1', 'unit_sold': 's5aq07c_1',
+                   'condition_sold': 's5aq07b_1', 'value_sold': 's5aq08_1',
                    'month': 's5aq06f_1'},
                   {'qty': 's5aq06a_2', 'unit': 's5aq06b_2', 'condition': 's5aq06c_2',
-                   'qty_sold': 's5aq07a_2', 'value_sold': 's5aq08_2',
+                   'qty_sold': 's5aq07a_2', 'unit_sold': 's5aq07c_2',
+                   'condition_sold': 's5aq07b_2', 'value_sold': 's5aq08_2',
                    'month': 's5aq06f_2'},
               ]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
               'conditions': [{'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
-                              'qty_sold': 's5bq07a_1', 'value_sold': 's5bq08_1',
+                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                              'condition_sold': 's5bq07b_1',
+                              'value_sold': 's5bq08_1',
                               'month': 's5bq06f_1'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                        'flag': 's4bq08', 'crop': 'cropID'},
     },
 }
 
@@ -1727,7 +2124,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
             piece = pd.DataFrame({
                 't': t,
                 'i': hh.values,
-                'plot': plot_id.values,
+                'plot_id': plot_id.values,
                 'input': input_label.values,
                 'season': season,
                 'Quantity': qty.values,
@@ -1785,7 +2182,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         piece = pd.DataFrame({
             't': t,
             'i': hh.values,
-            'plot': plot_id.values,
+            'plot_id': plot_id.values,
             'input': seed_label,
             # AGSEC4A is the FIRST-season plot-crop roster (AGSEC4B, the
             # second-season roster, is not read) -> every seed row is season A.
@@ -1825,7 +2222,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # level non-null so it is a valid index level.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
 
-    df = df.set_index(['t', 'i', 'plot', 'input', 'j', 'season'])
+    df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])
     # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
     # input identity reported twice WITHIN one plot-season (e.g. a seed row
     # repeated in AGSEC4A).  This is de-duplication of the index grain, NOT
@@ -2675,7 +3072,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
             piece = pd.DataFrame({
                 't': t,
                 'i': hh.values,
-                'plot': plot_id.values,
+                'plot_id': plot_id.values,
                 'source': source,
                 'season': season,
                 'PersonDays': days.values,
@@ -2693,7 +3090,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         return pd.DataFrame(
             columns=['PersonDays', 'Wage'],
             index=pd.MultiIndex.from_arrays(
-                [[]] * 5, names=['t', 'i', 'plot', 'source', 'season']))
+                [[]] * 5, names=['t', 'i', 'plot_id', 'source', 'season']))
 
     out = pd.concat(pieces, ignore_index=True)
     out['PersonDays'] = out['PersonDays'].astype('Float64')
@@ -2701,6 +3098,6 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     # Collapse exact-duplicate (plot, source, season) keys that can arise when
     # a wave repeats a plot row; keep the max reported days / wage so the index
     # is unique without summing distinct reported observations.
-    out = (out.groupby(['t', 'i', 'plot', 'source', 'season'], dropna=False)
+    out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season'], dropna=False)
               .agg({'PersonDays': 'max', 'Wage': 'max'}))
     return out

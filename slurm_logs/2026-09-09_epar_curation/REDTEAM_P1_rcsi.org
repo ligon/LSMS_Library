@@ -1,0 +1,303 @@
+#+title: REDTEAM P1 -- rcsi transform (GH #863, feat/rcsi-transform @ efce606d)
+#+date: 2026-09-09
+
+Red-team of =feat/rcsi-transform= at commit =efce606ddfb901ccb04c067645f639bae173741a=,
+worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-rcsi=. Read-only: no edits,
+no commits, no =dvc=. Ran via
+=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python= with
+=PYTHONPATH=<worktree>= and =cwd=<worktree>=, identity asserted
+(=lsms_library.__file__= confirmed to start with the worktree path) before every
+run. Warm reads of the shared cache only; no rebuilds. EPAR paths below are
+relative to
+=/global/scratch/fsa/fc_jevons/ligon/reference/epar/LSMS-Agricultural-Indicators-Code/=.
+
+* Verdict summary
+
+| item | verdict |
+|---+---|
+| 1. Formula / weights / label-keyed mapping | PASS |
+| 2. Missing-row rule (counter-case + Malawi warm reproduction) | PASS -- "40,152 / 40,143 / 9 / 22" fully reconciles |
+| 3. rcsi_phase partition + boundaries + NaN + ordered categorical | PASS |
+| 4. Pandas 3.0 rules | PASS |
+| 5. Placement (after dependency_ratio, before farm_size) | PASS |
+| 6. Tests (test_rcsi.py, test_crop_kg_factor.py pre-existing failure) | PASS |
+| 7. Cache-hash claim (build_transforms_fingerprint unchanged) | PASS |
+| CONCERN | the "not expected to fire" defensive =groupby(level=...).first()= branch DOES fire on warm Malawi (harmless here, comment is wrong) |
+
+* 1. Formula and weights -- PASS
+
+Read directly, not trusted from the issue or ledger:
+
+- =Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4519-4525= (fetched
+  fresh via =sed=): =ren hh_h02a strategy1= .. =strategy5=, each rename's own
+  comment giving severity weight 1/1/1/3/2 for
+  LessPreferred/LimitPortion/ReduceMeals/RestrictAdults/BorrowFood, then
+  =gen rcsi=strategy1 + strategy2 + strategy3 + 3*strategy4 + 2*strategy5=.
+  This is EXACTLY =_RCSI_WFP_WEIGHTS= (=transformations.py:2788-2796=):
+  ~LessPreferred=1, BorrowFood=2, LimitPortion=1, RestrictAdults=3,
+  ReduceMeals=1~ -- matches both the WFP canonical weights given in the task
+  brief and EPAR's Malawi coefficients once the label order is unwound.
+- Cross-checked =data_scheme.yml food_coping:= blocks for all six countries
+  (Ethiopia:257-276, Malawi:156-168, Burkina_Faso:135-153, Nigeria:301-312,
+  Mali:97-109, Tanzania:87-103) plus =Nigeria/_/nigeria.py:954-963=
+  (=FOOD_COPING_ITEMS=) and =Ethiopia/_/ethiopia.py:785-794=
+  (=FOOD_COPING_STRATEGIES=). Every country's label set and canonical-vs-extra
+  split matches the commit's docstring and ledger claims verbatim -- Malawi/
+  Burkina_Faso/Mali exactly 5, Ethiopia/Tanzania 8 (5 canonical +
+  LimitVariety/NoFood/WholeDay(Without)), Nigeria 9 (+ SleepHungry,
+  WholeDayNoFood).
+- Also read =Tanzania NPS/Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:2617=
+  directly: =rcsi=hh_h02a + hh_h02b + hh_h02c + hh_h02d + 3*hh_h02e +
+  hh_h02f*2+hh_h02g*4+hh_h02h*4= -- confirmed an eight-term variant with
+  different weights on the extra items, as claimed.
+- *Label-keyed, not positional*, confirmed by code reading
+  (=transformations.py:2905-2919=): =wide= is unstacked on the =Strategy=
+  index level (columns are Strategy labels), reindexed to =used = list(w)=,
+  and the final step is =complete[used].mul(weight_vec, axis=1)= where
+  =weight_vec= is a =pd.Series= indexed by the same labels -- pandas
+  =.mul(..., axis=1)= aligns by column label, not position. The implementer's
+  own =test_default_weights_reproduce_the_wfp_five_term_formula= is the
+  discriminating check: rows are fed in questionnaire order
+  (LessPreferred=2, LimitPortion=1, ReduceMeals=3, RestrictAdults=1,
+  BorrowFood=4) and the assertion is the label-keyed sum
+  =2 + 1 + 3 + 3*1 + 2*4 = 17=; a positional match against the *dict's*
+  definition order (weights 1,2,1,3,1) would instead give
+  =2*1 + 1*2 + 3*1 + 1*3 + 4*1 = 14=. The test (in the 17/17 passing suite,
+  §6) asserts 17, confirming label-keying, not position.
+
+* 2. Missing-row rule -- PASS (including the specific numbers in the brief)
+
+** Rule, on synthetic counter-cases
+
+Constructed both counter-cases fresh and ran them against the actual
+=rcsi()=:
+
+- A household with stored =Days=0= rows on all five weighted strategies
+  ("hhZero") scored *0* and was *not* dropped.
+- A household missing one weighted strategy's row entirely ("hhMissing",
+  RestrictAdults absent) was *dropped*, not scored on the remaining four.
+
+```
+scored index: [('t1', 'hhZero')]
+PASS: zero-days scored 0, genuinely-missing row dropped
+```
+
+This matches the existing test =test_multiple_households_and_waves= (hh1, all
+=Days=0=, asserts =rCSI == 0=) and =test_missing_strategy_row_is_not_zero_filled=
+(hh2, missing RestrictAdults, asserts it is absent from the output) -- both
+in the 17/17 passing suite (§6). The docstring's three citations for
+"absence means unanswered, not zero" were checked directly against source:
+
+- =Ethiopia/_/ethiopia.py:814-815= docstring: "Rows with a missing Days value
+  are dropped (the strategy was not answered for that household)." -- confirmed
+  verbatim.
+- =Nigeria/_/nigeria.py:985-987=, read directly: "Rows where the day count is
+  missing are dropped; a household with all-missing items contributes no
+  rows." -- confirmed verbatim.
+- =Malawi/_/malawi.py:1204,1212= -- confirmed at the exact cited lines: line
+  1204 is =days = days.where((days >= 0) & (days <= 7))= (out-of-range
+  day-counts, e.g. the lone 20 in the 2019-20 cross-section, become NaN);
+  line 1212 is =out = out.dropna(subset=['Days'])=. Both citations exact.
+
+** Reproducing "40,152 vs 40,143, the 9 match the 22 dropped rows" -- PASS, arithmetic closes exactly
+
+My first pass here only counted =distinct (t, i)= pairs that appear in
+=food_coping= with at least one row (40,149) and concluded the brief's 40,152
+didn't reproduce. That was wrong: a household that has its *entire* battery
+dropped (all 5 rows NaN'd out) never appears in =food_coping= at all, so a
+naive distinct-count of the table silently excludes it -- those households
+are *inferred from arithmetic closure* (Module-H total minus distinct =i=
+present), not directly observed in any table. The correct household universe
+is Malawi's own Module-H count. Read =Malawi/_/CONTENTS.org:30-34= in full
+(not just grepped): the GH #637 audit there reports, for
+=food_coping_for_wave=, row counts 61,355 / 19,994 / 62,232 / 57,157, and, on
+the next line, for =months_food_inadequate_for_wave=, group counts 12,271 /
+4,000 / 12,447 / 11,434 -- with the document stating explicitly that the
+latter is "precisely each wave's Module H household count."
+=months_food_inadequate= is built from the same Module-H source but is not
+subject to =food_coping='s per-strategy row-dropping, so its count is the
+right denominator: total Module-H household-waves, before any
+=food_coping=-specific loss. Comparing the two lines: short by 0 / 6 / 3 / 13
+rows per wave -- exactly the "(6 / 3 / 13 rows)" the commit message cites as
+design evidence.
+
+Summing the household counts: 12,271 + 4,000 + 12,447 + 11,434 = *40,152* --
+the brief's number, sourced from CONTENTS.org, not invented. Re-ran =rcsi()=
+on warm Malawi =food_coping()= (200,738 rows total, matching 61,355+19,994+
+62,232+57,157 exactly) and broke it down per wave:
+
+| wave | Module-H HH (CONTENTS.org) | distinct i in food_coping (>=1 row) | zero-row HH (Module-H - distinct i) | incomplete-but-present HH | rcsi()-scored HH | rows dropped |
+|---+---+---+---+---+---+---|
+| 2010-11 | 12,271 | 12,271 | 0 | 0 | 12,271 | 0 |
+| 2013-14 | 4,000 | 3,999 | 1 | 1 (4/5 strategies) | 3,998 | 6 |
+| 2016-17 | 12,447 | 12,447 | 0 | 2 (one 4/5, one 3/5) | 12,445 | 3 |
+| 2019-20 | 11,434 | 11,432 | 2 | 3 (each 4/5) | 11,429 | 13 |
+| *total* | *40,152* | *40,149* | *3* | *6* | *40,143* | *22* |
+
+Every column closes:
+- Module-H total 40,152, matching the brief exactly.
+- =rcsi()= output row count is 40,143 in every wave (=out.reset_index().groupby('t').size()= = 12271 / 3998 / 12445 / 11429), matching the brief exactly.
+- Households NOT scored = 40,152 - 40,143 = *9*, matching the brief exactly:
+  3 households with a fully-dropped battery (invisible to a =food_coping=-only
+  count -- they never appear in the table) + 6 households with a partial
+  battery (visible, and the ones I found on the first pass).
+- Rows dropped: the 6 partial households drop 7 rows between them (five
+  households missing exactly 1 of 5, one missing 2 of 5: 5x1 + 1x2 = 7 --
+  matches the per-wave breakdown: 2013-14's one incomplete household drops 1
+  row, 2016-17's two drop 1+2=3, 2019-20's three drop 1+1+1=3, total 1+3+3=7);
+  the 3 zero-row households drop 5 rows each = 15. 7 + 15 = *22*, matching
+  "the 22 dropped rows" exactly, and matching the per-wave 6/3/13 split from
+  CONTENTS.org: 2013-14 = 1(zero-row,5) + 1(partial,1) = 6; 2016-17 =
+  0(zero-row) + 3(two partials, 1+2) = 3; 2019-20 = 2(zero-row,5+5=10) +
+  3(three partials, 1+1+1=3) = 13.
+
+So the brief's claim is fully reproducible and internally consistent with
+both CONTENTS.org and the commit message's own "(6 / 3 / 13 rows)" citation.
+My initial FAIL verdict on this sub-item was a measurement gap on my part
+(counting only rows present, not the Module-H universe), not a defect in the
+implementation or the brief.
+
+* 3. rcsi_phase -- PASS
+
+- Every integer 0..100 lands in exactly one phase (extended beyond the
+  library's own 0..60 test): =nan count: 0=, =n rows: 101= (0 through 100
+  inclusive).
+- Boundaries confirmed exactly as documented: 3->Phase 1, 4->Phase 2,
+  18->Phase 2, 19->Phase 3, 42->Phase 3, 43->Phase 4.
+- NaN input handled: =rcsi_phase(pd.Series([0, np.nan, 19, 100]))= returns
+  =[Phase 1, NaN, Phase 3, Phase 4]= -- NaN propagates as NaN rather than
+  raising or silently landing in a phase.
+- Ordered categorical confirmed: =dtype.ordered == True=,
+  categories = ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4'] in that order.
+- Compared against EPAR's own cutoffs and phase labels, read directly at
+  =Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:4529-4536= and reproduced in
+  =Tanzania NPS W5/EPAR_UW_Tanzania_NPS_W5.do:2618-2622=: cutoffs 3/18/42
+  confirmed as EPAR's own, and the =rcsi == 19= gap confirmed real in EPAR's
+  code -- phase2 test is =rcsi <= 18=, phase3 test is =rcsi > 19 & rcsi <=
+  42=, so 19 satisfies neither, while phase3's own *label* one line later
+  claims "(19 - 42)". The implementation's closed-partitioning intervals
+  correctly resolve 19 into Phase 3, matching the label EPAR intended.
+  These cutoffs (3/18/42) also match what the task brief calls the "standard
+  WFP phase convention" -- but the only source I have in hand for that
+  provenance is EPAR's own code, same as the ledger's own hedge (§6): I have
+  not independently verified an underlying WFP manual states 3/18/42 as a
+  corpus-wide standard distinct from EPAR's Malawi/Tanzania instances, so I
+  am not asserting that provenance beyond what EPAR's code shows.
+
+* 4. Pandas 3.0 rules -- PASS
+
+Read the full new code block (=transformations.py:2788-2971=, both functions
+plus the weights dict). No =inplace=True= anywhere. No chained indexing
+(no =df[mask]['col'] = ...= pattern). No deprecated =fillna(method=...)=.
+=pd.to_numeric(..., errors='coerce')= produces =np.nan= on a numeric float
+column (=Days=, =rCSI=), which is the CLAUDE.md-sanctioned use of =np.nan=
+(numeric floats, not string/ID/categorical). =Strategy= itself is never
+NaN-filled -- it stays a string index level throughout. =pd.cut='s
+=bins=[-np.inf, c1, c2, c3, np.inf]= uses =np.inf= as a numeric interval
+boundary, not as a missing-value sentinel, so it is not a violation of the
+=pd.NA=-for-missingness rule. =rcsi()= builds its own weight-keyed
+=pd.Series({...}, dtype=float)= and does label-based =.mul(axis=1)= rather
+than any positional/chained assignment.
+
+* 5. Placement -- PASS
+
+Confirmed by =awk= line numbers in the worktree file directly:
+
+```
+2714: def dependency_ratio(...)
+2788: _RCSI_WFP_WEIGHTS = {...}
+2797: def rcsi(food_coping, *, weights=None):
+2924: def rcsi_phase(rcsi, *, cutoffs=(3, 18, 42)):
+2974: def farm_size(plot_features, *, area_col='Area'):
+```
+
+=git show efce606d -- lsms_library/transformations.py= is a single clean
+insertion hunk (=@@ -2772,6 +2772,205 @@=) immediately after
+=dependency_ratio='s closing =return ratio.to_frame(...)= and before
+=farm_size='s definition -- nothing above or below the insertion point is
+touched, so a three-way merge with another branch that appends elsewhere in
+=transformations.py= (e.g. a =plot_cultivation=/=dm_gender= branch per #862,
+or a =livestock_income= branch per this same #863) should not conflict.
+
+* 6. Tests -- PASS
+
+=tests/test_rcsi.py=: 17/17 pass in the worktree (=PYTHONPATH=<worktree>=,
+identity asserted). The data-gated warm-Malawi test
+(=test_malawi_warm_food_coping_scores_cleanly=) actually *ran* against the
+shared warm cache (not skipped) and passed.
+
+=tests/test_crop_kg_factor.py=: 34 pass, 1 fails
+(=test_uganda_harvest_kg_unchanged_before_the_wiring_lands=), identically, in
+both trees:
+
+- Worktree (=wt-rcsi=, =PYTHONPATH=<worktree>=): same =AssertionError:
+  "Uganda now carries KgFactor -- this baseline is superseded..."=.
+- Main checkout (=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=,
+  branch =development=, =PYTHONPATH= pointed at the main checkout, identity
+  asserted, commit =1c234604=, does *not* contain =efce606d=): byte-identical
+  failure, same assertion message, same column set
+  (=['Quantity', 'Quantity_sold', 'Value_sold', 'harvest_month',
+  'intercropped', 'KgFactor']=).
+
+Confirmed pre-existing on =development=, unrelated to this branch, exactly as
+the commit message and ledger claim (the test's own docstring already says
+it is superseded by the merged =feat/crop-production-kgfactor= work and asks
+to be re-measured in "the wiring PR", which this branch is not).
+
+* 7. Cache-hash claim -- PASS
+
+Re-ran =build_transforms_fingerprint()= myself (not read from the ledger) for
+the same six tables, in both trees:
+
+| table | worktree (efce606d) | development (1c234604, pre-#863) |
+|---+---+---|
+| food_coping | =56e83e2d...cbd90bc= | =56e83e2d...cbd90bc= |
+| crop_production | =56e83e2d...cbd90bc= | =56e83e2d...cbd90bc= |
+| food_acquired | =1759fb8a...b4e2b284= | =1759fb8a...b4e2b284= |
+| household_roster | =56e83e2d...cbd90bc= | =56e83e2d...cbd90bc= |
+| plot_features | =56e83e2d...cbd90bc= | =56e83e2d...cbd90bc= |
+| livestock | =56e83e2d...cbd90bc= | =56e83e2d...cbd90bc= |
+
+All six identical byte-for-byte. Confirms the ledger's claim that
+=rcsi=/=rcsi_phase=/=_RCSI_WFP_WEIGHTS= carry no =@build_transform= tag and are
+unreachable from any build-transform root, so no L2-country cache invalidates
+from this change.
+
+* CONCERN (non-blocking): the "defensive, not expected to fire" branch does fire
+
+=rcsi()='s comment at the =wide.groupby(level=group_by).first()= line
+(=transformations.py=, just after the =unstack('Strategy')=) says: "food_coping's
+canonical grain is exactly (t, i, Strategy), so this branch is not expected
+to fire in practice; kept defensive." That is not true on warm Malawi:
+=ll.Country('Malawi').food_coping()= returns index =['i', 't', 'v',
+'Strategy']= (=v= joined in by =_join_v_from_sample=, per CLAUDE.md "sample()
+and Cluster Identity"), so after =unstack('Strategy')= the remaining index is
+=['i', 't', 'v'] != ['t', 'i']=, and the branch DOES execute on every
+real-country call, not just synthetic frames with an explicit extra level.
+
+It is harmless here, and this time actually measured rather than inferred
+from the §2 reconciliation (which also grouped on =['t','i']= and so would
+agree regardless of whether =v= varies): ran
+=fc.reset_index().groupby(['t','i'])['v'].nunique().max()= directly on warm
+Malawi =food_coping()= and got *1* -- =v= is functionally determined by
+=(t, i)= (one cluster per household-wave) in this table, so =.first()= on the
+=v= dimension is a genuine no-op here. But the comment overstates its own
+rarity, and =groupby().first()= silently skips NA per column (per CLAUDE.md's
+own warning about that method) -- if a future country's =food_coping= ever
+carried an extra index level that is NOT functionally determined by =(t, i)=,
+this branch would collapse it silently rather than raising. Worth updating
+the comment (or adding a `v`-degenerate-check) in a follow-up, but not a
+reason to block this PR.
+
+* Overall
+
+All seven substantive items PASS; one non-blocking CONCERN flagged above. In
+particular, the specific figures quoted in this task's brief ("40,152 vs
+40,143, the 9 match the 22 dropped rows") DO reproduce exactly once the
+correct household universe (Malawi's own Module-H counts per
+=CONTENTS.org=, not merely rows present in =food_coping=) is used -- 40,152
+total households, 40,143 scored, 9 unscored (3 with a fully-dropped battery
+invisible to a food_coping-only count, 6 with a partial battery), accounting
+for exactly 22 dropped =Days= rows, matching the commit message's own
+"(6 / 3 / 13 rows)" per-wave citation. No blocking defect found in the
+branch.

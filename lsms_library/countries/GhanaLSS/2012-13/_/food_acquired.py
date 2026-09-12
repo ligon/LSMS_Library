@@ -8,7 +8,7 @@ Emits index (t, i, j, u, s, visit) with columns [Quantity, Expenditure, Price].
   skill's LCU convention we emit u='Value', Expenditure=value, Quantity=Expenditure.
   No physical quantity is fabricated (Phase-3 price-imputation is out of scope).
 - s='produced' from sec8h (food label = foodcd, decoded via harmonize_food Label_8h).
-  Produced rows carry a real Quantity (sum of the visit columns s8hq3..s8hq8), a
+  Produced rows carry a real Quantity (s8hq3..s8hq8 = the 2nd..7th visits), a
   real unit u (s8hq9), and a farmgate Price (s8hq10).  Expenditure is NaN.
 
 visit is KEPT as its own index level (decision D1 -- do NOT fold into t).  The
@@ -22,7 +22,8 @@ import pandas as pd
 sys.path.append('../../../_/')
 from lsms_library.local_tools import (get_categorical_mapping, df_data_grabber,
                                        format_id, _to_numeric, to_parquet,
-                                       get_dataframe)
+                                       get_dataframe, df_from_orgfile)
+from lsms_library.paths import countries_root
 
 w = '2012-13'
 
@@ -51,7 +52,7 @@ purch_visits = []
 for i in range(1, 7):
     di = x.loc[:, [f"Expenditure_{i}"]].copy()
     di.columns = ['Expenditure']
-    di['visit'] = i
+    di['visit'] = i + 1   # s9bq1 = '2nd visit', .. s9bq6 = '7th visit'
     di = di.reset_index().replace({r'': pd.NA, 0: np.nan})
     purch_visits.append(di)
 
@@ -80,7 +81,11 @@ prod['j'] = prod['foodcd'].map(produced_food)
 prod = prod[(prod['j'] != '') & prod['j'].notna()]
 
 prod = prod.rename(columns={'hid': 'i', 's8hq9': 'u', 's8hq10': 'Price'})
-qty_cols = {f"s8hq{i}": f"Quantity_{i}" for i in range(3, 9)}
+# Source question numbers are NOT visit numbers.  This wave's own Stata
+# variable labels give the mapping:
+#   s8hq3 "..consumed at 2nd visit" .. s8hq8 "..at 7th visit"; s8hq1/s8hq2
+#   are screeners, which is why the visit columns start at q3.
+qty_cols = {f"s8hq{i}": f"Quantity_{i - 1}" for i in range(3, 9)}
 prod = prod.rename(columns=qty_cols)
 
 keep = ['i', 'j', 'u', 'Price'] + list(qty_cols.values())
@@ -113,6 +118,34 @@ fa = fa.reorder_levels(['t', 'i', 'j', 'u', 's', 'visit'])
 
 # Drop all-empty rows.
 fa = fa.replace(0, np.nan).dropna(how='all')
+
+# --- canonical `u`: the country's `_/unit_labels.org` Preferred-Label axis ----
+# RESTORED 2026-09-08.  The country-level `_/food_acquired.py` applied
+# `df1['u'].replace(ulabelsd['u']['Preferred Label'])` until c345d317; GH #109
+# Phase 2 (6de0ce37) rewrote that script without it and only 2016-17's wave
+# script re-implemented it, so this wave has shipped the raw survey spellings
+# ('american tin', 'bowl', 'litre', 'Maxi bag') as `u` ever since -- off the
+# axis `community_prices` and every other consumer of `u` share.
+#
+# Two disciplines this country's CONTENTS.org requires:
+#   * resolve the table through countries_root(), never a package-relative
+#     path, so LSMS_COUNTRIES_ROOT is honoured (Trap 6 / GH #753);
+#   * ASSERT the index stays unique.  `food_acquired` is in
+#     `_ADDITIVE_MEASURE_COLUMNS`, so a duplicate makes core SUM
+#     Quantity/Expenditure and re-derive `Price = Expenditure/Quantity` on the
+#     WHOLE frame -- destroying every recorded farmgate price (Trap 9).
+#     Measured before this landed: 0 rows in duplicate groups on the delivered
+#     5,259,320-row table under this exact map.
+_ul = df_from_orgfile(countries_root() / 'GhanaLSS' / '_' / 'unit_labels.org',
+                      name='unit_label').dropna()
+_umap = dict(zip(_ul['u'].astype(str).str.strip(),
+                 _ul['Preferred Label'].astype(str).str.strip()))
+assert _umap, 'unit_labels.org: unit_label decoded to an EMPTY dict'
+fa = fa.rename(index=lambda x: _umap.get(x, x), level='u')
+assert not fa.index.duplicated().any(), (
+    'unit canonicalisation collided on (t, i, j, u, s, visit) -- two raw unit '
+    'spellings share a Preferred Label for one (household, item, visit); '
+    'resolve it here, not in core (CONTENTS.org Trap 9)')
 
 if __name__ == '__main__':
     to_parquet(fa, 'food_acquired.parquet')

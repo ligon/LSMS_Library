@@ -2,8 +2,64 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+
+# The country module holds the shared `u` sentinel (GH #842).  Wave modules
+# are imported by the framework with the country `_/` on sys.path, so this is
+# the same import shape the wave-level build scripts use.
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.append(str(_Path(__file__).resolve().parents[2] / '_'))
+from niger import fill_missing_u as _fill_missing_u  # noqa: E402
+from lsms_library.transformations import (
+    food_acquired_to_canonical as _food_acquired_canonical)
+
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+# GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
+# ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
+# `Quantity`.  `_food_acquired_ehcvm` derives it instead -- purchased Quantity
+# x (s07bq08 / s07bq07a), NA where the last purchase used a different unit --
+# and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
+# and Niger/_/derivations.yml.
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Niger')
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j).
+
+    A wave-level wrapper rather than a `functools.partial` in the country
+    module, so that binding the country name does not put this code in
+    Niger/_/niger.py -- which is in EVERY Niger table's cache
+    fingerprint.
+    """
+    return _inputs_last_purchase('Niger', wave)
 from collections import defaultdict
+
+
+
+def food_acquired(df):
+    """``food_acquired`` post-processor: canonical reshape + `u` sentinel.
+
+    This wave used to alias ``food_acquired_to_canonical`` directly.  It now
+    wraps it so a missing unit is filled with the ``Unknown`` sentinel.
+
+    The reshape drops every row left with no measurement, so the rows that
+    reach the fill are exactly the rows the table serves; ``fill_missing_u``
+    changes a value, never a row count.  A row that reported an amount with no
+    unit gets the ``Unknown`` sentinel instead of a NaN on the declared ``u``
+    index level, which the next ``groupby`` would delete silently (GH #842 --
+    the rationale is in ``niger.py`` at ``U_NA``).
+
+    THIS is the wave with the defect #842 measured: 12 of 131,092 rows here
+    reported a Quantity with no unit and were served with ``u`` NaN (2018-19
+    has none).
+    """
+    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    return _fill_missing_u(df)
 
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',

@@ -3,33 +3,72 @@
 
 The live surface is three functions used by the four IHS3+ wave scripts
 (2010-11, 2013-14, 2016-17, 2019-20) to apply Malawi's region-keyed
-unit-conversion CSV and to handle "300 grams"-style free-text units.
+unit-conversion CSV and to resolve the other-specify free-text unit label.
+"300 grams"-style labels are NOT handled there: they are converted for
+every wave at the single choke point in ``food_acquired_to_canonical``, by
+``_metric_kg_factor`` (GH #878).
 Other helpers (roster decomposition, get_other_features, etc.) were
 removed in 2026-05-05 alongside the shadowed
 food_prices_quantities_and_expenditures.py — see GH #218.
+
+It has since grown the feature-assembly helpers the wave scripts share
+(plot_features, crop_production, plot_inputs, livestock, plot_labor,
+anthropometry, people_last7days, community_prices) and, as of GH #854,
+``crop_conversion_factors`` / ``with_region`` -- the loader for the two
+SHIPPED IHS5 crop conversion tables, for use as
+``harvest_kg(cp, shipped_factors=...)``.
 """
 
 import pandas as pd
 import numpy as np
 import re
 import sys
+import warnings
 sys.path.append('../../../_/')
 from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
 
 
-def _extract_kg_conversion(series):
-    """Extract kilogram conversion factors from a unit-detail string series.
+class SaleAttachmentWarning(UserWarning):
+    """A reported household-crop sale that could not be placed on a harvest row.
 
-    Parses patterns like '300 grams', '1kg', '2 kilo' and returns
-    a Series of conversion factors in kilograms.
+    Raised by :func:`assemble_crop_production` when a plot-crop is reported in
+    more than one ``condition`` within the same unit: the sale module gives one
+    household-crop-unit total and does not say which state it refers to, so
+    attaching it to both rows would double-count it.  The sale is dropped and
+    the warning names how many and how much -- see GH #854.
+    """
+
+
+def _extract_kg_conversion(series):
+    """kg-per-unit factors parsed out of a free-text unit label.
+
+    Reads a metric magnitude embedded in the label -- '300 grams' -> 0.3,
+    '50kg bag' -> 50 -- and returns a float Series ALIGNED to *series*
+    (NaN where neither pattern matches).
+
+    Two things were wrong here until GH #878 (2026-09-12).  Grams were
+    scaled by 0.01, so '300 grams' came back 3.0 kg instead of 0.3; and the
+    return was a ``concat(...).dropna()``, which only happened to align on
+    assignment because at most one of the two patterns ever matches a given
+    label -- had both matched, the duplicate index labels would have raised.
+    Neither defect ever reached a served number: the sole live caller is
+    the 2004-05 wave script, whose unit column is a closed 22-label set in
+    which nothing matches the grams pattern and only '50kg bag' / '90 kg
+    bag' match the kilogram one.  Grams-style free text in the IHS3+ waves
+    is converted at the single choke point in
+    :func:`food_acquired_to_canonical` by :func:`_metric_kg_factor`, whose
+    table has grams at the correct 0.001.
+
+    A kilogram match wins over a grams match on the same label; no label in
+    the corpus matches both, so that precedence is unexercised.
     """
     grams = r'(\d+)\s*g(?:\s+|r)'
     kgs = r'(\d+)\s*k(?:g|ilo)'
 
-    lower = series.str.lower()
-    conv = pd.concat([lower.str.extract(grams).astype(float) * 0.01,
-                      lower.str.extract(kgs).astype(float)], axis=0).dropna()
-    return conv
+    lower = series.astype(str).str.lower()
+    g = lower.str.extract(grams)[0].astype(float) * 0.001
+    k = lower.str.extract(kgs)[0].astype(float)
+    return k.combine_first(g)
 
 
 def _clean_freetext_unit(value):
@@ -154,15 +193,25 @@ def _titlecase_label(value):
 
 
 def handling_unusual_units(df, suffixes=None):
-    """Convert unusual unit descriptions to kg-based quantities.
+    """Resolve each source's ``u`` label from its other-specify free text.
+
+    For every suffix, the respondent's other-specify string
+    (``unitsdetail_{suffix}``) is tidied (GH #223 Layer 2) and used as the
+    unit label ``u_{suffix}``, falling back to the standard label
+    (``units_{suffix}``) where there is none.  It does NOT touch
+    ``cfactor_{suffix}`` (which comes from the wave's region-keyed
+    conversion table) and does NOT convert quantities: the summable
+    ``Quantity_kg`` is computed per source in
+    :func:`food_acquired_to_canonical` (GH #378), and metric free-text
+    labels are converted there by :func:`_metric_kg_factor` (GH #878).
 
     Parameters
     ----------
     df : DataFrame
     suffixes : list[str], optional
         Column suffixes to process (e.g. ``['consumed', 'bought']``).
-        For each suffix, expects columns ``unitsdetail_{suffix}``,
-        ``cfactor_{suffix}``, ``quantity_{suffix}``, and ``units_{suffix}``.
+        For each suffix, expects columns ``unitsdetail_{suffix}`` and
+        ``units_{suffix}``.
         Defaults to ``['consumed', 'bought']`` for backward compatibility.
     """
     if suffixes is None:
@@ -170,21 +219,29 @@ def handling_unusual_units(df, suffixes=None):
 
     for suffix in suffixes:
         detail_col = f'unitsdetail_{suffix}'
-        cfactor_col = f'cfactor_{suffix}'
-        quantity_col = f'quantity_{suffix}'
         units_col = f'units_{suffix}'
         u_col = f'u_{suffix}'
 
         if detail_col not in df.columns:
             continue
 
-        conv_kg = _extract_kg_conversion(df[detail_col])  # parse "300 grams" first
+        # GH #878: a "300 grams" regex fallback used to be written into
+        # cfactor here as ``x[c] or conv_kg``.  It never fired -- ``x[c]`` is
+        # the merged conversion-table factor, NaN where unmatched, and
+        # ``bool(nan)`` is True, so the expression always returned ``x[c]``
+        # (and the conversion tables hold no zero factor that could make it
+        # falsy: IHS3 min 0.02 over 831 rows, IHS5 min 9.6e-05 over 1,768).
+        # It is removed rather than repaired: the metric free-text labels it
+        # aimed at are converted for every wave at the single choke point in
+        # food_acquired_to_canonical by _metric_kg_factor, and making this
+        # fallback live would set cfactor, hence has_cf, hence SKIP that
+        # choke point -- serving the same kilograms under a different
+        # (u, Quantity) row shape.  See CONTENTS.org 2026-09-12.
 
-        # Tidy the other-specify free text for use as a `u` label (after the
-        # kg parse above): "1 Basket" -> "Basket", "1/4" -> NA (#223 Layer 2).
+        # Tidy the other-specify free text for use as a `u` label:
+        # "1 Basket" -> "Basket", "1/4" -> NA (#223 Layer 2).
         df[detail_col] = df[detail_col].map(_clean_freetext_unit)
 
-        df[cfactor_col] = df.apply(lambda x, c=cfactor_col: x[c] or conv_kg, axis=1)
         # Migration to GH #378's Quantity_kg: keep the NATIVE quantity and the
         # native unit label; do NOT multiply in place or stamp the 'kg'
         # sentinel here.  The summable Quantity_kg = quantity x cfactor is
@@ -457,9 +514,14 @@ def food_acquired_to_canonical(df, wave):
         if ucol in work.columns and qcol in work.columns:
             factor = work[ucol].map(_metric_kg_factor)
             # Skip rows that already have a per-row cfactor: those become an
-            # exact Quantity_kg in _make, and the inline grams/kgs regex
-            # already captured any metric magnitude into cfactor -- converting
-            # again here would double-count (GH #378 / Malawi migration).
+            # exact Quantity_kg in _make, so scaling the quantity here as
+            # well would double-count (GH #378 / Malawi migration).  Where
+            # cfactor comes from is wave-dependent: IHS3+ take it solely
+            # from the region-keyed conversion table, while IHS2 (2004-05)
+            # has no such table and takes it only from a kilogram magnitude
+            # read off the unit label itself ('50kg bag' -> 50), via
+            # _extract_kg_conversion.  In neither case does it carry a
+            # grams magnitude -- that is this loop's job (GH #878).
             has_cf = work[ccol].notna() if ccol in work.columns else False
             mask = factor.notna() & ~has_cf
             if mask.any():
@@ -912,6 +974,46 @@ def _crop_codes(series, perennial=False):
     return out.astype('string').where(out.notna(), pd.NA), codes
 
 
+# Sentinel for a harvest record whose condition code is NULL or outside the
+# instrument's own 1/2/3 scheme, and for the perennial Module P, which asks
+# no condition question at all.  A real value, never NA: a null index key is
+# silently dropped by a duplicate collapse (GH #323 §3b), and `condition` is
+# an index level of crop_production.  Distinct from `shell_not_applicable`,
+# which is the survey's own answer 3 ("this crop has no shell").
+_CONDITION_UNKNOWN = 'unknown_condition'
+
+_CONDITION_TABLE = 'harmonize_crop_condition'
+
+#: Code -> un-collapsed crop VARIETY label; see `categorical_mapping.org`.
+_VARIETY_TABLE = 'harmonize_crop_variety'
+
+
+def _crop_conditions(series):
+    """Map a raw ag_g13c (S/U) code Series to the canonical ``condition``.
+
+    Codes 1/2/3 -> shelled / unshelled / shell_not_applicable, through the
+    ``harmonize_crop_condition`` table in ``categorical_mapping.org``.
+    Everything else -- NULL, and the handful of off-scheme values the source
+    carries (2013-14 has one 5; the 2016-17 panel has 15, 10 and a
+    NON-INTEGRAL 4.5) -- becomes ``unknown_condition``.
+
+    The non-integral value is why this does not go through
+    ``.astype('Int64')`` like the other code maps: pandas 3.0 raises
+    ``TypeError: cannot safely cast non-equivalent float64 to int64`` on
+    4.5 rather than coercing it.
+    """
+    cond_map = _malawi_code_map(_CONDITION_TABLE)
+    raw = pd.to_numeric(series, errors='coerce')
+
+    def _one(x):
+        if pd.isna(x) or not float(x).is_integer():
+            return pd.NA
+        return cond_map.get(int(x), pd.NA)
+
+    out = raw.map(_one)
+    return out.astype('object').where(out.notna(), _CONDITION_UNKNOWN)
+
+
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
                    perennial=False, t=None):
@@ -920,13 +1022,30 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     All keyword args are RAW column names in ``df`` (or None when the
     wave/module lacks that field).  ``df`` must already carry an ``hhid``
     string column.  Returns a long DataFrame with the canonical columns
-    (i, plot, crop, crop_code, Quantity, u, planting_month, harvest_month,
-    intercropped, perennial) -- NO aggregation.
+    (i, plot, crop, crop_code, Quantity, u, condition, planting_month,
+    harvest_month, intercropped, perennial) -- NO aggregation.
+
+    ``condition`` is Module G's ``ag_g13c`` ("(S/U)").  It was accepted and
+    silently DISCARDED from this function's first version until GH #854;
+    every one of the four wave scripts has passed ``condition='ag_g13c'``
+    since GAP 1, so the column was always asserted to exist and never read.
+    It is now an INDEX LEVEL of ``crop_production`` -- see
+    ``_/data_scheme.yml`` and ``lsms_library/data_info.yml``.  Module P
+    (perennial) asks no such question and passes None, which sentinels its
+    rows to ``unknown_condition``.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
     plot = df[plotkey].apply(format_id).astype('string')
+
+    # The crop at its NATIVE grain, un-collapsed (GH #854 red-team item 2).
+    # `harmonize_crop` maps codes 1-4 all to 'Maize' and 17-26 all to 'Rice';
+    # the shipped IHS5 conversion tables key their kg factors on the VARIETY,
+    # and the varieties genuinely differ.  Carried as a COLUMN, never an index
+    # level: it is functionally determined by the crop code, so putting it in
+    # the grain would split no key and only widen the index.
+    crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
 
     u = (pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
          if unit is not None and unit in df.columns
@@ -948,6 +1067,12 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     planting_month = _month(plant_m)
     harvest_month = _month(harv_m)
 
+    if condition is not None and condition in df.columns:
+        crop_condition = _crop_conditions(df[condition])
+    else:
+        crop_condition = pd.Series(_CONDITION_UNKNOWN, index=df.index,
+                                   dtype='object')
+
     # intercropped flag: Module G ag_g01 crop-stand code (1 = pure/sole;
     # >=2 = some form of intercrop/mixed stand).  Perennial rows: NaN.
     if intercrop is not None and intercrop in df.columns:
@@ -960,11 +1085,13 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     out = pd.DataFrame({
         't':              t,
         'i':              df['hhid'].astype('string').values,
-        'plot':           plot.values,
+        'plot_id':           plot.values,
         'crop':           crop_label.values,
         '_crop_code':     crop_code_int.values,
         'Quantity':       quantity.values,
         'u':              u.values,
+        'condition':      crop_condition.values,
+        'crop_variety':   crop_variety.values,
         'planting_month': planting_month.values,
         'harvest_month':  harvest_month.values,
         'intercropped':   intercropped.values,
@@ -978,16 +1105,36 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                perennial=False):
-    """Reshape one sale module (I or Q) to (i, _crop_code) reported sale.
+                unit_sold=None, perennial=False):
+    """Reshape one sale module (I or Q) to (i, _crop_code, u) reported sale.
 
-    Returns a DataFrame with columns [i, _crop_code, Quantity_sold,
-    Value_sold] at the household-crop grain (no plot).  Summed within
-    (i, _crop_code) because a household may report several sale rows for
+    Returns a DataFrame with columns [i, _crop_code, u, Quantity_sold,
+    Value_sold] at the household-crop-unit grain (no plot).  Summed within
+    (i, _crop_code, u) because a household may report several sale rows for
     the same crop -- this is the REPORTED total the household sold of that
-    crop, not a derived aggregate over plots.
+    crop IN THAT UNIT, not a derived aggregate over plots.
+
+    ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
+    Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
+    same code list as the harvest unit (verified from the Stata value
+    labels: ag_i02b / ag_q02b / ag_g13b all carry
+    {1 kilogram, 2 50 KG BAG, 3 90 KG BAG, 4 PAIL (SMALL), ... 13 OTHER}),
+    and it DIFFERS from the harvest unit for 22.2% of 2010-11 sale rows.
+    Carrying it is what lets ``assemble_crop_production`` attach a sale only
+    to the harvest row measured in the SAME unit, so that
+    ``Value_sold / Quantity_sold`` is a price per the row's declared ``u``.
+    Before this was read, a sale in kilogrammes was routinely stamped on a
+    row whose ``u`` said ``50 kg Bag`` -- a silent factor-of-50 error in any
+    per-kg price.
     """
+    unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+
+    if unit_sold is not None and unit_sold in df.columns:
+        u = pd.to_numeric(df[unit_sold], errors='coerce').astype('Int64').map(unit_map)
+        u = u.astype('string').where(u.notna(), pd.NA)
+    else:
+        u = pd.Series(pd.NA, index=df.index, dtype='string')
 
     qs = (pd.to_numeric(df[qty_sold], errors='coerce').astype('Float64')
           if qty_sold is not None and qty_sold in df.columns
@@ -999,11 +1146,13 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     out = pd.DataFrame({
         'i':            df['hhid'].astype('string').values,
         '_crop_code':   crop_code_int.values,
+        'u':            u.values,
         'Quantity_sold': qs.values,
         'Value_sold':   vs.values,
     })
     out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
+    grp = out.groupby(['i', '_crop_code', 'u'], as_index=False,
+                      dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     return grp
 
@@ -1021,20 +1170,32 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
-    Quantity_sold, Value_sold, planting_month, harvest_month,
-    intercropped, perennial.  Item-level reported values only.
+    condition, Quantity_sold, Value_sold, planting_month, harvest_month,
+    intercropped, perennial.  Item-level reported values only.  ``u`` and
+    ``condition`` are declared INDEX LEVELS in ``_/data_scheme.yml`` and are
+    promoted by the framework; they are left as columns here for the same
+    reason ``u`` always was.
     """
     harv = pd.concat(harvest_pieces, ignore_index=True)
 
-    # Collapse exact duplicate (i, plot, crop, u) harvest rows by summing
-    # reported quantity (a plot-crop may be split across several recorded
-    # lines in the same unit); keep the first non-null date/flag.  This is
-    # a reported-line consolidation, NOT a cross-unit aggregation: rows in
-    # different units `u` stay distinct.
+    # Collapse exact duplicate (i, plot, crop, u, condition) harvest rows by
+    # summing reported quantity (a plot-crop may be split across several
+    # recorded lines in the same unit and state); keep the first non-null
+    # date/flag.  This is a reported-line consolidation, NOT a cross-unit or
+    # cross-state aggregation: rows in different units `u` OR different
+    # `condition` stay distinct.  Adding `condition` to this key (GH #854) is
+    # what stops shelled and unshelled kilograms of the same plot-crop from
+    # being added together -- see `data_info.yml`, "Quantities in different
+    # conditions are NOT commensurable".
     harv['u'] = harv['u'].astype('string')
-    harv = harv.groupby(['i', 'plot', 'crop', 'u', '_crop_code'],
+    harv['condition'] = harv['condition'].astype('string')
+    harv = harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
                         as_index=False, dropna=False).agg({
         'Quantity':       'sum',
+        # EXACT, not a reduction: `crop_variety` is a function of
+        # `_crop_code`, which is in the key, so every row in a group carries
+        # the same value.
+        'crop_variety':   'first',
         'planting_month': 'first',
         'harvest_month':  'first',
         'intercropped':   'first',
@@ -1043,23 +1204,98 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
 
     if sale_pieces:
         sale = pd.concat(sale_pieces, ignore_index=True)
-        sale = sale.groupby(['i', '_crop_code'], as_index=False).agg(
+        sale['u'] = sale['u'].astype('string')
+        sale = sale.groupby(['i', '_crop_code', 'u'], as_index=False,
+                            dropna=False).agg(
             {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
         # Attach sale ONLY where the (i, crop) is grown on exactly one
         # plot, so the household-crop reported figure unambiguously
         # belongs to that single plot-crop.  Multi-plot crops keep NaN.
-        nplots = (harv.groupby(['i', '_crop_code'])['plot']
+        # AND only to the harvest row measured in the SAME unit `u` as the
+        # sale: the sale quantity is asked in its own unit (ag_i02b /
+        # ag_q02b) and differs from the harvest unit for 22.2% of 2010-11
+        # sale rows, so the old (i, _crop_code) merge stamped a
+        # kilogramme-basis sale onto a `50 kg Bag` row -- Value_sold /
+        # Quantity_sold then read as a price per 50 kg Bag when it was a
+        # price per kg.  Merging on `u` too makes the ratio a price per the
+        # row's declared unit BY CONSTRUCTION.  It cannot multiply rows:
+        # harv is unique on (i, plot, crop, u) and, under the single-plot
+        # gate, sale is unique on (i, _crop_code, u).  A sale whose unit is
+        # unrecorded matches a harvest row whose unit is likewise
+        # unrecorded (pd.merge matches null keys), which is the honest
+        # pairing.
+        nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
                   .nunique().rename('_nplots').reset_index())
+        # GH #854: the single-plot gate alone stopped being sufficient the
+        # moment `condition` joined the harvest key.  Before it did, a
+        # single-plot (i, crop) had at most ONE harvest row per unit, so the
+        # household-crop sale total landed on exactly one row.  Now the same
+        # plot-crop can carry a shelled AND an unshelled row in the same `u`,
+        # and the m:1 merge would stamp the SAME Quantity_sold / Value_sold on
+        # both -- double-counting the sale and inventing a per-unit price on
+        # whichever row did not produce it.  The sale module records no
+        # condition of its own that we read (ag_i02c is unwired; GH #854
+        # scopes it out), so there is nothing to disambiguate WITH: the honest
+        # answer is to attach nothing and count it.
+        nrows = (harv.groupby(['i', '_crop_code', 'u'], dropna=False)
+                 .size().rename('_nrows').reset_index())
         harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
-        harv = harv.merge(sale, on=['i', '_crop_code'], how='left')
-        single = harv['_nplots'] == 1
+        harv = harv.merge(nrows, on=['i', '_crop_code', 'u'], how='left')
+        harv = harv.merge(sale, on=['i', '_crop_code', 'u'], how='left')
+        single = (harv['_nplots'] == 1) & (harv['_nrows'] == 1)
+
+        # "Attach nothing and COUNT IT" -- and the counting has to be code,
+        # not a number frozen in CONTENTS.org that will not move when the data
+        # does (GH #854 red-team item 6).  What is reported is the sales the
+        # NEW `_nrows` clause suppresses that the old single-plot gate would
+        # have attached: those are exactly the household-crop-unit totals that
+        # a condition-split plot-crop would have DOUBLE-counted.
+        suppressed = (harv['_nplots'] == 1) & (harv['_nrows'] > 1) \
+            & harv['Value_sold'].notna()
+        n_rows = int(suppressed.sum())
+        if n_rows:
+            hit = harv.loc[suppressed]
+            # One sale is stamped on each of the `_nrows` rows, so the sale
+            # COUNT is the number of distinct (i, crop, u) totals, not rows.
+            sales = hit.drop_duplicates(['i', '_crop_code', 'u'])
+            amount = float(pd.to_numeric(sales['Value_sold'],
+                                         errors='coerce').sum())
+            tally = {'wave': t, 'sales': int(len(sales)), 'rows': n_rows,
+                     'value': amount}
+            warnings.warn(
+                f"Malawi/crop_production {t}: {len(sales)} household-crop "
+                f"sale(s) totalling {amount:,.0f} MWK were NOT attached to "
+                f"any harvest row, because the plot-crop is reported in more "
+                f"than one `condition` in the same unit ({n_rows} candidate "
+                f"rows).  The sale module records its own quantity and unit "
+                f"but its shelled/unshelled column (ag_i02c) is unwired, so "
+                f"there is nothing to say which harvest row the total belongs "
+                f"to; attaching it to both would double-count it.  Wiring "
+                f"ag_i02c is what lets these attach again.  GH #854.",
+                SaleAttachmentWarning, stacklevel=2)
+        else:
+            tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+
         harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
         harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
-        harv = harv.drop(columns=['_nplots'])
+        harv = harv.drop(columns=['_nplots', '_nrows'])
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
+        tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
 
+    # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
+    # collapse at the end of this function keys on (t, i, plot, crop) -- u is
+    # a COLUMN here -- so it fires when a plot-crop was harvested in TWO
+    # units, and .first() skips NA per column, so it could take `u` from one
+    # row and `Quantity_sold` from another, re-creating exactly the
+    # mislabelling the (i, _crop_code, u) merge above removes.  (Measured then
+    # on the raw modules: 32 plot-crops of 135,410, 0.024%, carry more than
+    # one harvest unit.)  The collapse below now keys on the FULL declared
+    # grain (t, i, plot, crop, u, condition), so it can no longer mix two
+    # units -- or two states -- into one row.  It survives only as a guard
+    # against a genuinely repeated line at that grain, which the groupby
+    # above has already consolidated.
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 
@@ -1068,13 +1304,16 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # unmapped) are dropped from the index axis but logged by row count.
     harv = harv[harv['crop'].notna()]
 
-    out = harv.set_index(['t', 'i', 'plot', 'crop'])
-    # Defensive: collapse any residual duplicate index tuples (same
-    # plot-crop reported in two units would survive above; sum Quantity).
-    if not out.index.is_unique:
-        num = out.groupby(level=['t', 'i', 'plot', 'crop']).agg({
+    # Defensive de-duplication at the DECLARED grain.  `u` and `condition`
+    # stay COLUMNS (the framework promotes them, exactly as it always has for
+    # `u`), so the check is on columns rather than on index levels; keeping
+    # them out of the index also keeps the ~8.5k rows whose `u` is NULL,
+    # which a set_index + groupby would delete on a NaN key (GH #323 3b).
+    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
+    if harv.duplicated(_grain).any():
+        harv = harv.groupby(_grain, as_index=False, dropna=False).agg({
             'Quantity':       'sum',
-            'u':              'first',
+            'crop_variety':   'first',
             'Quantity_sold':  'first',
             'Value_sold':     'first',
             'planting_month': 'first',
@@ -1082,7 +1321,456 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
             'intercropped':   'first',
             'perennial':      'first',
         })
-        out = num
+
+    out = harv.set_index(['t', 'i', 'plot_id', 'crop'])
+    # Readable by a test without parsing a warning message.  It does NOT
+    # survive to_parquet (attrs are not written), which is why the warning
+    # above exists as well -- the warning is what a build log sees.
+    out.attrs['sale_suppressed'] = tally
+    return out
+
+# --- IHS5 crop-side conversion factor tables (GH #854) -------------------
+#
+# Malawi's IHS5 (2019-20) v04 release supplemented the survey with THREE
+# conversion-factor files.  Only the food-side one was ever read
+# (`2019-20/_/food_acquired.py:17`); the two crop-side ones sat DVC-tracked
+# and unwired until #854:
+#
+#   Data/Cross_Sectional/ihs_seasonalcropconversion_factor_2020.dta  857 x 7
+#   Data/Cross_Sectional/ihs_treeconversion_factor_2020.dta          153 x 6
+#
+# Raw grain, measured 2026-09-09:
+#
+#   seasonal  region x crop_code x unit_code x condition  (+ unit_name,
+#             conversion, collectionround); 3 regions (North / Central /
+#             South), 41 crop_code values, 15 unit_code values, 3 conditions
+#             ('S: Shelled' / 'U: Unshelled' / 'Not Applicable'); zero nulls
+#             in every column; ZERO duplicate rows on that key.
+#   tree      region x crop_code x unit_code (NO condition column: a tree
+#             crop has nothing to shell); 3 regions, 14 crop_code values,
+#             9 unit_code values; zero nulls; ZERO duplicate rows.
+#
+# `collectionround` records whether the factor was measured in 2016, in 2019,
+# or in both -- so the file itself already spans two survey rounds.
+#
+# THREE THINGS ARE NOT WHAT THEY LOOK LIKE.
+#
+# 1. `crop_code` is not a code, it is a VARIETY LABEL, and it is FINER than
+#    our `crop`.  'MAIZE LOCAL' / 'MAIZE COMPOSITE/OPV' / 'MAIZE HYBRID' /
+#    'MAIZE HYBRID RECYCLED' are the Module-G value labels for codes 1-4, and
+#    `harmonize_crop` maps all four to the single Preferred Label 'Maize'.
+#    Ten rice varieties collapse to 'Rice', six groundnuts to 'Groundnut'.
+#    Collapsing them is therefore a REDUCTION, and where the variety rows
+#    disagree there is no honest answer -- see `_collapse_varieties`.
+# 2. `unit_code` is a STRING and its namespace is WIDER than the harvest
+#    module's.  The harvest asks ag_g13b / ag_p09b on codes 1-13; the
+#    conversion files add '14' (PAIL MEDIUM), '31A'/'31B'/'31C' (BUNDLE
+#    small/medium/large), '98' (HEAP) and '8A'/'8B'/'8C' (BUNCH
+#    small/medium/large).  No harvest row can carry those, so their factors
+#    are unusable -- dropped and counted, never folded onto a coarser unit.
+# 3. `region` matters and cannot be collapsed.  259 of 315 seasonal
+#    (crop, unit, condition) triples and 53 of 56 tree (crop, unit) pairs
+#    carry more than one distinct regional factor.  So the table is
+#    region-keyed and the CALLER must resolve `region` onto crop_production;
+#    `with_region` does that.  The file spells the south 'South' and
+#    `cluster_features.Region` spells it 'Southern' (the `region` table in
+#    categorical_mapping.org), so the loader translates -- otherwise the join
+#    matches nothing, silently, for a third of the country.
+
+#: The seasonal file's variety labels -> the Module G `crop_code` value the
+#: wave scripts already read (2019-20 Cross_Sectional/ag_mod_g.dta value
+#: labels for `crop_code`, which are identical to 2010-11's ag_g0d).  Only
+#: the string->code step is new; the code->`crop` step is the SAME
+#: `harmonize_crop` table `_crop_codes` uses, so the two sides cannot drift.
+_IHS5_SEASONAL_CROPS = {
+    'MAIZE LOCAL': 1, 'MAIZE COMPOSITE/OPV': 2, 'MAIZE HYBRID': 3,
+    'MAIZE HYBRID RECYCLED': 4,
+    'TOBACCO BURLEY': 5,
+    'GROUNDNUT CHALIMBANA': 11, 'GROUNDNUT CG7': 12,
+    'GROUNDNUT MANI-PINTAR': 13, 'GROUNDNUT MAWANGA': 14,
+    'GROUNDNUT JL24': 15, 'OTHER GROUNDNUT (SPECIFY)': 16,
+    'RICE LOCAL': 17, 'RICE FAYA': 18, 'RICE PUSA': 19, 'RICE TCG10': 20,
+    'RICE IET4094 (SENGA)': 21, 'RICE WAMBONE': 22, 'RICE KILOMBERO': 23,
+    'RICE ITA': 24, 'RICE MTUPATUPA': 25, 'OTHER RICE (SPECIFY)': 26,
+    'GROUND BEAN(NZAMA)': 27, 'SWEET POTATO': 28,
+    'IRISH [MALAWI] POTATO': 29, 'WHEAT': 30,
+    'FINGER MILLET(MAWERE)': 31, 'SORGHUM': 32,
+    'PEARL MILLET(MCHEWERE)': 33, 'BEANS': 34, 'SOYABEAN': 35,
+    'PIGEONPEA(NANDOLO)': 36, 'COTTON': 37, 'SUNFLOWER': 38,
+    'SUGAR CANE': 39, 'CABBAGE': 40, 'TANAPOSI': 41, 'NKHWANI': 42,
+    'THERERE/OKRA': 43, 'TOMATO': 44, 'ONION': 45,
+    # The file writes the plural; Module G's label for code 46 is 'PEA'.
+    'PEAS': 46,
+}
+
+#: The tree file's labels -> the PERENNIAL crop code in the +1000 namespace
+#: `_crop_codes(perennial=True)` and `harmonize_crop` use (Module P ag_p0c
+#: codes 1-17, offset by 1000).  Note the file spells Masuku
+#: 'MEXICAN APPLE(MASUKU)' where the 2019-20 module writes
+#: 'MEXICAN APPLE [MASUKU]'; both are code 14 -> 1014.
+_IHS5_TREE_CROPS = {
+    'CASSAVA': 1001, 'TEA': 1002, 'MANGO': 1004, 'ORANGE': 1005,
+    'PAWPAW/PAPAYA': 1006, 'BANANA': 1007, 'AVOCADO': 1008, 'GUAVA': 1009,
+    'LEMON': 1010, 'NAARTJE (TANGERINE)': 1011, 'PEACH': 1012,
+    '[CUSTADE APPLE] POZA': 1013, 'MEXICAN APPLE(MASUKU)': 1014,
+    'MASAU': 1015,
+}
+
+#: The seasonal file's `condition` strings -> the canonical `condition`
+#: vocabulary.  Deliberately keyed on the FILE'S OWN values rather than on a
+#: code: the file ships the decoded string, and the three values map 1:1 onto
+#: what `harmonize_crop_condition` gives ag_g13c codes 1/2/3, so the shipped
+#: table and the harvest rows land in the same vocabulary by construction.
+_IHS5_CONDITIONS = {
+    'S: Shelled': 'shelled',
+    'U: Unshelled': 'unshelled',
+    'Not Applicable': 'shell_not_applicable',
+}
+
+#: The file's region spelling -> `cluster_features.Region` / the `region`
+#: table's Preferred Label.  Only 'South' actually moves.
+_IHS5_REGIONS = {'North': 'North', 'Central': 'Central', 'South': 'Southern'}
+
+_IHS5_CF_DIR = '2019-20/Data/Cross_Sectional/'
+
+
+def _ihs5_cf_path(filename):
+    """Resolve an IHS5 conversion file relative to THIS module.
+
+    The wave scripts run with cwd ``Malawi/<wave>/_``, but this loader is
+    called from anywhere (a notebook, a test, another wave's script), so a
+    ``../Data/...`` relative path would resolve differently per caller.  The
+    path is built from this file's own location and handed to
+    ``get_dataframe``, which still does the local -> DVC -> WB NADA fallback.
+    """
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(here, '..', _IHS5_CF_DIR, filename)
+
+
+def _collapse_varieties(df, keys, *, source):
+    """Reduce the file's VARIETY rows to our ``crop`` grain, refusing conflicts.
+
+    The IHS5 files key on a crop VARIETY; ``crop_production.crop`` is the
+    aggregate ``harmonize_crop`` Preferred Label.  Collapsing four maize
+    varieties onto 'Maize' is a reduction, and this is the loader's
+    deliberate act -- ``transformations._shipped_factor_lookup`` refuses an
+    ambiguous table outright and says so ("De-duplicate the table in the
+    LOADER, with a stated rule").
+
+    THE RULE: a key survives only when EVERY variety row under it reports the
+    SAME factor.  Where they disagree the key is DROPPED, not averaged, not
+    modal, not first -- there is no evidence here for choosing among them, and
+    inventing a weight is the failure this whole layer exists to avoid
+    (``CLAUDE.md`` "Grain Collapse", #854 "Never average or silently resolve a
+    table lookup miss; report it").
+
+    Measured 2026-09-09 on the two shipped files: 23 of 314 seasonal keys and
+    8 of 92 tree keys disagree, so ~92% of the table survives.  The dropped
+    keys are recorded on ``attrs['dropped_ambiguous']`` for reporting.
+
+    Comparison is on the float32 value the ``.dta`` carries, exactly; two
+    varieties whose factors differ in the last bit are a disagreement, which
+    is the conservative direction.
+    """
+    # `nunique()` SKIPS NaN, so a key holding one NaN factor and one real one
+    # would read nunique == 1 and `drop_duplicates` could keep the NaN row.
+    # Neither shipped file has a NaN `conversion`, so this cannot fire today
+    # -- it is here so the function stays correct if it is ever pointed at
+    # another table (red-team latent nit, 2026-09-10).
+    df = df.dropna(subset=['KgFactor'])
+    g = df.groupby(keys, dropna=False)['KgFactor']
+    nunique = g.nunique()
+    ok = nunique[nunique == 1].index
+    kept = (df.set_index(keys).loc[ok].reset_index()
+            .drop_duplicates(subset=keys))
+    dropped = nunique[nunique > 1]
+    kept.attrs['dropped_ambiguous'] = [
+        dict(zip(keys, k if isinstance(k, tuple) else (k,)))
+        for k in dropped.index
+    ]
+    kept.attrs['source'] = source
+    return kept
+
+
+def crop_conversion_factors(*, by_variety=True, seasonal=True, tree=True,
+                            waves=None):
+    """Malawi's two SHIPPED IHS5 crop conversion tables, canonicalised.
+
+    VINTAGE: both files are **2019-20 (IHS5) artefacts** -- the v04 release of
+    catalog 3818 supplemented the survey with them, and their own
+    ``collectionround`` column says each factor was measured in 2016, in 2019,
+    or in both.  They are the ONLY crop-side conversion tables Malawi ships;
+    IHS2 / IHS3 / IHPS-2013 / IHS4 ship none.
+
+    NO ``t`` LEVEL BY DEFAULT, so the table applies to every wave.  That is an
+    EXTRAPOLATION and it is stated rather than hidden.  Three things support
+    it and one qualifies it:
+
+    * the units are physical containers -- a 50 kg bag, an ox-cart, a pail --
+      not survey instruments, and the questionnaire's own unit code list is
+      unchanged across IHS3-IHS5;
+    * the file already spans two rounds by its own account
+      (``collectionround``), so it is not a single-year snapshot;
+    * EPAR does the same and says why ("We borrow this survey's conversion
+      factor files for the remaining Waves in the absence of having similar
+      files for earlier versions of the survey" --
+      ``Malawi IHS/Nonstandard Unit Conversion Factors/README.md``);
+    * BUT nothing measured here establishes that a 2019 pail weighed what a
+      2010 pail weighed.  A caller who wants the factors confined to the wave
+      that shipped them passes ``waves=['2019-20']``, which adds a ``t`` level
+      and fences the join to that wave.  Pass a longer list to fence it to a
+      chosen subset.
+
+    KEYED ON THE VARIETY BY DEFAULT (``by_variety=True``).  The files' crop
+    key is a VARIETY -- 'MAIZE HYBRID', 'RICE FAYA', 'GROUNDNUT CG7' -- and
+    ``crop_production.crop`` is the collapsed Preferred Label, so the two
+    grains differ.  Keying on ``crop_variety`` (the un-collapsed column
+    ``_harvest_block`` writes) is both what EPAR does -- "merge m:1 region
+    crop_code_long unit condition ... //NOTE THAT WE MERGE ON CROP_CODE_LONG
+    INTENTIONALLY" -- and measurably better here: it needs no de-duplication
+    at all (813 rows, zero duplicate keys), it serves 6,890 rows the collapsed
+    key had to refuse, and on the 66,768 rows both keys can serve it returns
+    an IDENTICAL factor on every one.
+
+    ``by_variety=False`` returns the collapsed ``crop``-keyed table instead,
+    for a frame built before ``crop_variety` existed.  That path must reduce
+    the varieties, and its rule is agreement-or-drop (see
+    :func:`_collapse_varieties`): 23 seasonal and 8 tree keys are refused,
+    which is 6,890 served rows on Groundnut, Rice and Citrus -- not noise.  It
+    also cannot tell "every variety agrees" from "only one variety is in the
+    file", so it hands Tobacco Burley's factor to flue-cured, NNDF, SDF and
+    oriental tobacco (95 rows); the variety key withdraws those, correctly.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns ``KgFactor`` (kg per ONE unit of the row's ``u``, the same
+        meaning ``crop_production.KgFactor`` carries) and ``Source``
+        (``'IHS5 seasonal'`` or ``'IHS5 tree'``), indexed on
+        ``(crop_variety, u, condition, region)`` -- or on
+        ``(crop, u, condition, region)`` when ``by_variety=False`` -- plus
+        ``t`` when *waves* is given.
+        Every one of those is in
+        :data:`~lsms_library.transformations.SHIPPED_FACTOR_JOIN_LEVELS`, so
+        the frame is ready for
+        ``harvest_kg(cp, shipped_factors=malawi.crop_conversion_factors())``.
+
+        ``crop_production`` must carry ``region`` for the join to key on it;
+        :func:`with_region` resolves it.  Without ``region`` the transform
+        drops that key, the remaining keys go ambiguous, and it REFUSES the
+        table -- loudly, which is the correct outcome, since 259 of 315
+        seasonal triples vary by region.
+
+        Diagnostics ride on ``.attrs['loader']``: per-file row counts, the
+        crop / unit / condition match rates, and the keys dropped for
+        variety disagreement.
+
+    Notes
+    -----
+    The TREE table's ``condition`` is ``'unknown_condition'``, not NA.  A tree
+    crop has nothing to shell and the file has no condition column at all; the
+    perennial Module P likewise asks no condition question, so
+    ``_harvest_block`` sentinels every perennial harvest row to
+    ``unknown_condition``.  Writing NA here instead would normalise to the
+    join's private NA sentinel and match only a NULL condition -- which no
+    ``crop_production`` row has, by construction.  The table would match
+    exactly zero perennial rows, silently but for the
+    ``ShippedFactorWarning``.
+
+    NOT PORTED, deliberately (#854 "What it must NOT do"): EPAR's
+    interpolation ladder -- the shelled/unshelled ratio, the regional and
+    national means, the tuber and cowpea borrows
+    (``EPAR_UW_conversionfactors.do:399-432, 469-487``).  Those are IMPUTED
+    values wearing a ``source`` tag.  Only the two raw IHS5 tables are
+    ``reported``, and they are what this returns.  If we want the ladder it
+    belongs in a transform, layered and counted like ``harvest_kg``'s.
+    """
+    from lsms_library.local_tools import get_dataframe
+
+    cmap = _malawi_code_map('harmonize_crop')
+    vmap = _malawi_code_map(_VARIETY_TABLE)
+    umap = _malawi_code_map('harmonize_crop_unit')
+    diag = {}
+    pieces = []
+    # The crop key this table is built on.  `crop_variety` needs no
+    # de-duplication (the files are unique at that grain); `crop` does, and
+    # `_collapse_varieties` is the stated rule for it.
+    cropkey = 'crop_variety' if by_variety else 'crop'
+
+    def _units(codes):
+        """The file's string unit_code -> our `u` Preferred Label.
+
+        Non-numeric codes ('31A', '8B') and numeric ones outside the harvest
+        module's own 1-13 list ('14' PAIL MEDIUM, '98' HEAP) have no `u` and
+        are dropped by the caller.  Folding '8A'/'8B'/'8C' onto code 8
+        'Bunch' would be exactly the disagreeing collapse this loader refuses
+        elsewhere: three sizes, three different weights, one label.
+        """
+        def _one(x):
+            s = str(x).strip()
+            return umap.get(int(s)) if s.isdigit() else None
+        return codes.map(_one)
+
+    if seasonal:
+        raw = get_dataframe(_ihs5_cf_path(
+            'ihs_seasonalcropconversion_factor_2020.dta'))
+        code = raw['crop_code'].map(_IHS5_SEASONAL_CROPS)
+        d = pd.DataFrame({
+            'crop': code.map(lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop_variety': code.map(
+                lambda c: vmap.get(c) if pd.notna(c) else None),
+            'u': _units(raw['unit_code']),
+            'condition': raw['condition'].map(_IHS5_CONDITIONS),
+            'region': raw['region'].map(_IHS5_REGIONS),
+            'KgFactor': pd.to_numeric(raw['conversion'], errors='coerce'),
+        })
+        diag['seasonal'] = _match_rates(raw, d, 'crop_code', 'unit_code',
+                                        'condition')
+        d = d.dropna(subset=[cropkey, 'u', 'condition', 'region'])
+        keys = [cropkey, 'u', 'condition', 'region']
+        d = _collapse_varieties(d, keys, source='IHS5 seasonal')
+        diag['seasonal']['keys_kept'] = int(len(d))
+        diag['seasonal']['keys_dropped_ambiguous'] = d.attrs['dropped_ambiguous']
+        d['Source'] = 'IHS5 seasonal'
+        pieces.append(d)
+
+    if tree:
+        raw = get_dataframe(_ihs5_cf_path('ihs_treeconversion_factor_2020.dta'))
+        code = raw['crop_code'].map(_IHS5_TREE_CROPS)
+        d = pd.DataFrame({
+            'crop': code.map(lambda c: cmap.get(c) if pd.notna(c) else None),
+            'crop_variety': code.map(
+                lambda c: vmap.get(c) if pd.notna(c) else None),
+            'u': _units(raw['unit_code']),
+            # See Notes: a real value, never NA -- it must meet the
+            # `unknown_condition` every perennial harvest row carries.
+            'condition': _CONDITION_UNKNOWN,
+            'region': raw['region'].map(_IHS5_REGIONS),
+            'KgFactor': pd.to_numeric(raw['conversion'], errors='coerce'),
+        })
+        diag['tree'] = _match_rates(raw, d, 'crop_code', 'unit_code', None)
+        d = d.dropna(subset=[cropkey, 'u', 'region'])
+        keys = [cropkey, 'u', 'condition', 'region']
+        d = _collapse_varieties(d, keys, source='IHS5 tree')
+        diag['tree']['keys_kept'] = int(len(d))
+        diag['tree']['keys_dropped_ambiguous'] = d.attrs['dropped_ambiguous']
+        d['Source'] = 'IHS5 tree'
+        pieces.append(d)
+
+    if not pieces:
+        raise ValueError(
+            "crop_conversion_factors() was asked for neither the seasonal nor "
+            "the tree table (seasonal=False, tree=False); there is nothing to "
+            "return.  Malawi ships exactly these two crop-side files.")
+
+    out = pd.concat(pieces, ignore_index=True)
+
+    # The two files are disjoint by construction -- a seasonal crop is never a
+    # tree crop -- but "by construction" is what the duplicate refusal in
+    # `_shipped_factor_lookup` exists to disbelieve.  Check it here, where the
+    # message can name the file, rather than letting the transform raise about
+    # a table the caller did not build.
+    dup = out.duplicated([cropkey, 'u', 'condition', 'region'], keep=False)
+    if dup.any():
+        raise ValueError(
+            "The IHS5 seasonal and tree conversion tables collide on "
+            f"{int(dup.sum())} ({cropkey}, u, condition, region) key(s): "
+            f"{out.loc[dup, [cropkey, 'u', 'condition', 'region']].head().to_dict('records')}. "
+            "That is new -- the two files were disjoint on the shipped v04 "
+            "release.  Resolve it here, in the loader, with a stated rule; do "
+            "not let harvest_kg pick one.")
+
+    if waves is not None:
+        waves = [waves] if isinstance(waves, str) else list(waves)
+        out = pd.concat([out.assign(t=w) for w in waves], ignore_index=True)
+        idx = ['t', cropkey, 'u', 'condition', 'region']
+    else:
+        idx = [cropkey, 'u', 'condition', 'region']
+
+    out = out.set_index(idx)[['KgFactor', 'Source']]
+    out.attrs['loader'] = diag
+    out.attrs['keyed_on'] = cropkey
+    out.attrs['vintage'] = '2019-20 (IHS5 v04 release, catalog 3818)'
+    return out
+
+
+def _match_rates(raw, mapped, cropcol, unitcol, condcol):
+    """Code -> label match rates for one shipped conversion file."""
+    n = len(raw)
+    out = {'rows': n,
+           'crop_matched': int(mapped['crop'].notna().sum()),
+           'variety_matched': int(mapped['crop_variety'].notna().sum()),
+           'unit_matched': int(mapped['u'].notna().sum()),
+           'region_matched': int(mapped['region'].notna().sum()),
+           'crop_unmatched_labels': sorted(
+               set(raw.loc[mapped['crop'].isna(), cropcol].astype(str))),
+           'unit_unmatched_codes': sorted(
+               set(raw.loc[mapped['u'].isna(), unitcol].astype(str)))}
+    if condcol is not None:
+        out['condition_matched'] = int(mapped['condition'].notna().sum())
+        out['condition_unmatched_labels'] = sorted(
+            set(raw.loc[mapped['condition'].isna(), condcol].astype(str)))
+    return out
+
+
+def with_region(crop_production, cluster_features=None):
+    """Attach the lower-case ``region`` a shipped-factor join needs.
+
+    ``crop_conversion_factors`` is region-keyed because it has to be: 259 of
+    315 seasonal (crop, unit, condition) triples carry more than one distinct
+    regional factor, so there is no honest way to collapse the axis in the
+    loader.  ``crop_production`` carries the cluster ``v`` (the framework
+    joins it from ``sample()``), and ``cluster_features`` carries ``Region``
+    per ``(t, v)`` -- this joins the two and renames to the lower-case
+    ``region`` that :data:`SHIPPED_FACTOR_JOIN_LEVELS` spells.
+
+    The rename is not cosmetic.  ``_shipped_factor_lookup`` matches the key
+    name EXACTLY and deliberately refuses to accept both spellings, because a
+    silently-accepted ``Region`` would hide a mis-keyed join.
+
+    Parameters
+    ----------
+    crop_production : pd.DataFrame
+        ``Country('Malawi').crop_production()``.  Must carry ``v`` and ``t``.
+    cluster_features : pd.DataFrame, optional
+        ``Country('Malawi').cluster_features()``.  Loaded from
+        ``Country('Malawi')`` when omitted -- which is why this lives here and
+        not in ``transformations.py``, whose transforms never re-enter
+        ``Country``.
+
+    Returns
+    -------
+    pd.DataFrame
+        *crop_production* with a ``region`` COLUMN added (never an index
+        level: it is a property of the cluster, not part of the item grain).
+        Rows whose cluster has no ``Region`` keep NA and simply match no
+        shipped factor.
+    """
+    if cluster_features is None:
+        import lsms_library as ll
+        cluster_features = ll.Country('Malawi').cluster_features()
+
+    region = (cluster_features.reset_index()[['t', 'v', 'Region']]
+              .rename(columns={'Region': 'region'})
+              .drop_duplicates(['t', 'v']))
+    region['region'] = region['region'].astype('string')
+
+    flat = crop_production.reset_index()
+    if 'v' not in flat.columns:
+        raise ValueError(
+            "with_region needs the cluster level `v` on crop_production, and "
+            f"this frame carries {list(crop_production.index.names)}.  `v` is "
+            "joined from sample() by the framework at API time; pass the "
+            "frame Country('Malawi').crop_production() returned, not a "
+            "wave-level parquet.")
+    merged = flat.merge(region, on=['t', 'v'], how='left')
+    out = merged.set_index(list(crop_production.index.names))
+    # attrs do NOT survive a merge whose sides disagree, and here the right
+    # side has none at all -- see CLAUDE.md "Panel ID Transitive Chains and
+    # the `attrs` Flag".  The population record and `id_converted` both ride
+    # on attrs, so copy them across explicitly.
+    out.attrs = dict(crop_production.attrs)
     return out
 
 
@@ -1388,7 +2076,7 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot':        df['plotkey'].astype('string').values,
+            'plot_id':        df['plotkey'].astype('string').values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -1397,7 +2085,7 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
         })
         pieces.append(piece[keep.values])
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     return pd.concat(pieces, ignore_index=True)
 
@@ -1407,12 +2095,12 @@ def _organic_block(df, *, hhid, plotkey, flag, t):
     (ag_d36 == 1/Yes).  Presence is the reported item; Quantity / u are NA
     (Module D records no organic-fertilizer quantity)."""
     if flag is None or flag not in df.columns:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     used = _int_codes(df[flag]) == 1
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot':        df['plotkey'].astype('string').values,
+        'plot_id':        df['plotkey'].astype('string').values,
         '_input_code': _MWI_INPUT_ORGANIC,
         'crop':        pd.array([pd.NA] * len(df), dtype='string'),
         'Quantity':    pd.array([pd.NA] * len(df), dtype='Float64'),
@@ -1453,7 +2141,7 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot':        df['plotkey'].astype('string').values,
+            'plot_id':        df['plotkey'].astype('string').values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -1462,7 +2150,7 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
         })
         pieces.append(piece[keep.values])
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', '_input_code', 'crop',
+        return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
                                      'Quantity', 'u', 'Improved'])
     return pd.concat(pieces, ignore_index=True)
 
@@ -1492,7 +2180,7 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         imp = pd.Series(pd.NA, index=df.index, dtype='boolean')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot':        df['plotkey'].astype('string').values,
+        'plot_id':        df['plotkey'].astype('string').values,
         '_input_code': _MWI_INPUT_SEED,
         'crop':        crop_label.values,
         'Quantity':    q.values,
@@ -1588,7 +2276,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
             # Count plots per (i, crop) among seed rows; attach only when a
             # crop's seed is on exactly one plot (unambiguous).
             seed_rows = df[seed]
-            nplots = (seed_rows.groupby(['i', 'crop'])['plot']
+            nplots = (seed_rows.groupby(['i', 'crop'])['plot_id']
                       .nunique().rename('_nplots').reset_index())
             attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
             attach = attach[attach['_nplots'] == 1][
@@ -1618,7 +2306,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # NaN) are not silently dropped.
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
-    grp = df.groupby(['t', 'i', 'plot', 'input', 'crop', 'u'],
+    grp = df.groupby(['t', 'i', 'plot_id', 'input', 'crop', 'u'],
                      as_index=False, dropna=False).agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
@@ -1633,7 +2321,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # index to keep it unique; both are NaN for the inputs that don't carry
     # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
     # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
-    grp = grp.set_index(['t', 'i', 'plot', 'input', 'crop', 'u'])
+    grp = grp.set_index(['t', 'i', 'plot_id', 'input', 'crop', 'u'])
     return grp
 
 
@@ -2069,7 +2757,7 @@ def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
     """
     work = pd.DataFrame({
         'i':    df[hhid].astype('string').values,
-        'plot': df[plotkey].astype('string').values,
+        'plot_id': df[plotkey].astype('string').values,
     }, index=df.index)
 
     rows = []
@@ -2133,12 +2821,12 @@ def assemble_plot_labor(t, pieces):
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat['t'] = t
-    grp = cat.groupby(['t', 'i', 'plot', 'source'], as_index=False,
+    grp = cat.groupby(['t', 'i', 'plot_id', 'source'], as_index=False,
                       dropna=False).agg({
         'PersonDays': 'sum',
         'Wage':       'first',
     })
-    out = grp.set_index(['t', 'i', 'plot', 'source'])
+    out = grp.set_index(['t', 'i', 'plot_id', 'source'])
     assert out.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {t}"
     return out
 

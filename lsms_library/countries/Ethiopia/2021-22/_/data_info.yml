@@ -146,6 +146,15 @@ shocks:
                 1. INCREASED: True
                 2. DECREASED: True
                 3. DID NOT CHANGE: False
+        # GH #875: read on the YAML path like every other effect column.
+        # ANY change counts as affected (corpus convention); an unmapped or
+        # missing answer stays NA and is NOT imputed False.
+        AffectedFoodStock:
+            - s9q03d
+            - mapping:
+                1. INCREASED: True
+                2. DECREASED: True
+                3. DID NOT CHANGE: False
         HowCoped0: s9q04_1
         HowCoped1: s9q04_2
         HowCoped2: s9q04_3

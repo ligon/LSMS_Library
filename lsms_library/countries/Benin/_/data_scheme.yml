@@ -207,7 +207,7 @@ Data Scheme:
     # plot-crop grain (s16cq16a / s16cq17); intercropped from s16cq07.
     # harvest_month is OMITTED-then-filled NaN (Benin's s16c has no harvest-
     # month question) but carried for cross-country schema parity with Niger.
-    index: (t, i, plot, crop, u)
+    index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -228,7 +228,7 @@ Data Scheme:
     # are TRANSFORMATIONS over these rows, never columns.
     #
     # GRAIN NOTE: EHCVM records inputs at the HOUSEHOLD x input grain, NOT
-    # plot x input (the WB plot split is a forbidden fabrication), so `plot`
+    # plot x input (the WB plot split is a forbidden fabrication), so `plot_id`
     # is NOT in the index; the feature keeps the GAP-2 name `plot_inputs`.
     # input -> harmonize_input; u -> the u table; crop -> harmonize_seed_crop
     # on the seed label (the EHCVM s16b roster has no crop column).  Both
@@ -268,7 +268,7 @@ Data Scheme:
     # total_family_labor_days / total_hired_labor_days / hired_labor_value (a
     # median-wage valuation) are TRANSFORMATIONS over these rows, never columns.
     #
-    # GRAIN (t, i, plot, source):
+    # GRAIN (t, i, plot_id, source):
     #   plot   -- "{field_no}_{parcel_no}", aligned with crop_production's plot
     #             key and plot_features' plot_id.
     #   source -- 'family' / 'hired'.  EHCVM s16a records family vs non-family
@@ -283,7 +283,7 @@ Data Scheme:
     #   Wage       -- cash PAID to hired labor (CFA francs); NaN for family.
     # v is NOT baked in (household-linked); the framework joins it from
     # sample().  units: PersonDays in days; Wage in CFA francs.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make

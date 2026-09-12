@@ -1,0 +1,292 @@
+#+title: EPAR x LSMS_Library -- Household-Consumption-Data (value of food consumption by source)
+#+date: 2026-09-09
+
+Scope: =/global/scratch/fsa/fc_jevons/ligon/reference/epar/Household-Consumption-Data/=
+(HEAD =0e9ccf29=, 2026-06-10; NOTES.md). Read in full: =README.md=, =Append all
+surveys_SSA.do= (47 lines). Read closely, section-by-section, with =file:line=
+citations: =UgandaW4_Food Consumption by source.do= (953 lines),
+=NigeriaW4_Food Consumption by source.do= (1036 lines), =SenegalW1_Food
+Consumption by source.do= (626 lines, EHCVM). Swept (grep for the ladder
+threshold, recall multiplier, winsorize, own/away/gift, PPP) across all 41
+remaining =*.do= files. Metadata-only read of one =Final Data/*.dta= (pyreadstat
+=metadataonly=True=, no values touched).
+
+Our side re-read for this pass: =lsms_library/data_info.yml= (=food_acquired=
+schema, =S_VALUES= note at line 42, =Index Info= at line 51);
+=lsms_library/transformations.py:1147-1490= (=food_expenditures_from_acquired=,
+=food_quantities_from_acquired=, =food_prices_from_acquired=) and
+=:2847-3030= (=median_price_valuation=, the GAP-7 WB-ladder reproduction that
+already exists for =crop_production=); =.claude/skills/add-feature/food-acquired/SKILL.md=
+and its =aggregate-labels/SKILL.md= sub-skill; =slurm_logs/price_sources/SYNTHESIS.org=
+§§0,1,5 and =PHASE2_SYNTHESIS.org=.
+
+* Coverage (their waves vs ours; what they build for this scope)
+
+EPAR's =Household-Consumption-Data= ships one =.do= file per country-wave
+(16 country series, several multi-wave) and appends all of them
+(=Append all surveys_SSA.do:18-30=) into one pooled
+=ALL_SURVEYS_food_consumption_value_by_source.dta=. Of the 16, we hold 15 of
+their countries under a different name; Kenya (KIHBS) and Sierra Leone (IHS)
+are genuinely absent from our corpus (matches the BRIEF's list). Their
+"Ghana" is GhanaSPS (2009/10, GhanaW1) -- their table calls it
+=Ghana_SPS_W1=, one wave only; we have more GhanaSPS waves declared for other
+features but this pass did not check =food_acquired= coverage there.
+
+Waves, this repo vs EPAR (food-consumption-by-source only):
+
+| country | EPAR waves | our =food_acquired= waves | note |
+|---|---|---|---|
+| Uganda | W1,W2,W3,W4,W5,W7,W8 (2009/10-2019/20) | 2005-06,2009-10,2010-11,2011-12,2013-14,2015-16,2018-19,2019-20 | EPAR skips W6 (our 2018-19 wave numbering differs; not reconciled here) and has no 2005-06 |
+| Nigeria | W1-W5 (2010/11-2018/19) | 2010Q3/11Q1 ... 2023Q3/24Q1 (PP/PH separate =t=) | EPAR AVERAGES PP+PH into one annual figure (see below); we keep them as distinct =t= |
+| Ethiopia | W3,W4,W5 (2015/16-2021/22) | 2011-12,2013-14,2015-16,2018-19,2021-22 | EPAR omits W1/W2 for this product |
+| Malawi | W1-W4 (2010/11-2019/20) | 2004-05,2010-11,2013-14,2016-17,2019-20 | EPAR omits our earliest (2004-05) |
+| Tanzania | W1-W5 (2008/09-2019/20) | 2008-09,2010-11,2012-13,2014-15,2019-20,2020-21 | roughly matched |
+| Senegal, Mali, Niger, Benin, Burkina, CotedIvoire, Togo, Guinea-Bissau | EHCVM 1-2 waves each (2018/19, 2021/22 for Burkina/Mali/Niger) | we hold =food_acquired= for all of these under =materialize: make= (e.g. =Senegal/_/data_scheme.yml:66=, =Niger/_/data_scheme.yml:41=, =Benin/_/data_scheme.yml:84=) | GH #438 is our parity-stack ticket for these; EPAR's own EHCVM crosswalk (see below) is a candidate crib for it |
+
+What EPAR builds (README.md:1-40, verbatim methodology, five bullets under
+"Consumption"): per-household, per-crop-category annual VALUE of food
+consumed, split into =food_consu_value= / =food_purch_value= /
+=food_prod_value= / =food_gift_value=, each in nominal LCU and 2017 PPP, plus
+a top-1%-winsorized variant of each, at the =(hhid, crop_category1)= grain
+-- confirmed by the metadata-only read below. No item (=j=) grain survives
+into the final product; no unit (=u=) axis; no acquisition-source index
+level -- source is columns, not an index level, and is fixed at 3
+(purchase/production/gift; EPAR's own README omits "other").
+
+Metadata-only read, =Final Data/Uganda_UNPS_W4_food_consumption_value_by_source.dta=
+(pyreadstat, values never touched): 39,032 rows x 41 columns. Grain is
+=(hhid, crop_category1)= -- there is no =item_code= column in the final
+product; it existed at intermediate stages
+(=UgandaW4...do:604-758=) and is aggregated away before the file is written.
+Columns: identity/demographic block (=hhid=, =fhh=, =age_hh=, =hh_members=,
+=adulteq=, =nadultworking*=, =nchildren=, =nelders=), geography
+(=adm1=,=adm2=,=adm3=,=GID_1=), =weight=, =rural=, interview date parts,
+=crop_category1=/=crop_category2=, =conv_lcu_ppp=, then eight value columns
+(=food_{consu,purch,prod,gift}_value_{lcu,ppp}=) and their eight winsorized
+counterparts (=w_food_*=). No standard errors, no per-source unit, no
+provenance flag distinguishing "value came from a median-ladder impute" from
+"value came from the household's own report."
+
+* KNOWN ISSUES register (three-cell table; every row has evidence both sides)
+
+*Scoping finding, stated up front*: unlike the sibling
+=LSMS-Agricultural-Indicators-Code= repo (per-wave =readme.md= with a
+=### SECTION= / =- **KNOWN ISSUES:**= skeleton, which is where the BRIEF's
+Uganda-W5-sold-value cautionary tale comes from), this
+=Household-Consumption-Data= repo carries **no per-wave readme and no KNOWN
+ISSUES section anywhere**. =Final Data/readme.md= is one blank line. A
+case-insensitive sweep for "issue|caveat|missing|not available|no data|
+approximat|assum" across all 41 =.do= files (excluding =gen=/=replace=/
+=label= lines, which false-positive on "assum" inside variable text) returned
+**zero** substantive hits in the three files read closely and at most one
+incidental hit (a variable label containing "assum...") in five others. So
+the three-cell register below is built from *code-reading*, not from any
+EPAR-declared issue -- every row is necessarily either cell 2 or cell 3;
+cell 1 (EPAR-documented AND we documented) cannot occur for this repo because
+EPAR documents nothing here.
+
+| # | finding | cell | evidence (ours) | evidence (EPAR) |
+|---|---|---|---|---|
+| 1 | No reported purchase price independent of Expenditure/Quantity anywhere in the corpus -- EPAR's =price_unit= (=UgandaW4...do:604=, =gen price_unit=food_purch_value/food_purch_qty=) is exactly our =food_prices(units='unitvalue')=, not a distinct elicited price | 3 (we found; EPAR's own README (`"constructed using reported food prices"`) implies otherwise and does not disclose the derivation) | =SYNTHESIS.org:41-45= "Structural fact 1: source 2 does not exist anywhere in the corpus" | README.md:29 says "reported food prices in the surveys"; the =.do= computes a ratio, never reads a native price column |
+| 2 | Own-production/gift valued via a spatial median-price ladder (EA/enum-area -> ... -> country, >10 obs) is an =imputed= construction EPAR performs and we do not | 2 (EPAR does it; we track it as an open enhancement, not yet built for =food_acquired=) | GH #585 "food_expenditures(basis='total'): impute own-production/in-kind value at purchase prices" (open); =median_price_valuation= (=transformations.py:2847-3030=) does the *identical* ladder already, but only for =crop_production= (GAP 7), never wired to =food_acquired= | =UgandaW4...do:618-737=, =NigeriaW4...do:404-493=, =SenegalW1...do:424-465= (5-rung EA->parish->county->district->region->national for Uganda; 4-rung EA->LGA->state->zone->national for Nigeria; 3-rung grappe->department->region->national for EHCVM) |
+| 3 | EPAR values own-production at the *household's own reported purchase price for the same item+unit* BEFORE falling to any spatial median -- a same-household same-item rung the README does not mention at all | 2 (EPAR does it, undocumented even in EPAR's own README; we do neither) | -- (no equivalent in our transforms; our own-production =Expenditure= is either survey-reported or NaN, never imputed from the household's own purchases) | =UgandaW4...do:693= =gen food_`f'_value=food_`f'_qty*price_unit if food_`f'_unit_new==food_purch_unit_new=, executed *before* the EA/parish/... ladder at line 700 |
+| 4 | Winsorization at the top 1% of each value column, per country-wave, applied to a number that later feeds a "master" pooled dataset | 2 (EPAR does it; CLAUDE.md "No winsorization anywhere" is an explicit design rule here) | CLAUDE.md Design Philosophy: "No winsorization anywhere"; =Grain Collapse= section: core never aggregates/clips silently | =UgandaW4...do:797-806=, same pattern in all 41 =.do= files (=** winsorize top 1%= appears in every one swept) |
+| 5 | Post-planting/post-harvest Nigeria rounds are AVERAGED into one annual number per (hhid, crop_category1), discarding the two-round structure | 2 (EPAR does it; we deliberately keep PP/PH as separate =t= -- =.claude/skills/add-feature/pp-ph/SKILL.md=) | our =pp-ph= skill: "the single most common source of duplicate-index bugs" is treating PP/PH as one round; we never average across them | =NigeriaW4...do:886-895= =*Average PP and PH= ... =collapse (mean) food_consu_value ... ,by(hhid ... crop_category1 ...)= |
+| 6 | Food-away-from-home is folded into a single =crop_category1="Meals away from home"= bucket, summed across ALL items per household, losing item identity entirely | 3 (we found; EPAR's README (line 33, "purchases is inclusive of food consumed away from home") states the fold but not the item-identity loss) | our =Uganda/_/uganda.py:391,452-506= keeps =quantity_away=/=value_away= (=h15bq6=/=h15bq7=) folded into =s='purchased'= but PER ITEM (the item identity is retained; only the home/away *location* distinction is dropped, and that is documented in the docstring at =uganda.py:429-469=) | =UgandaW4...do:758-770= second read of =GSEC15B=, =keep if h15bq3a==1=, =collapse (sum) ... ,by(hhid)= (no =item_code= in the =by()=) |
+| 7 | 30-day vs 7-day recall handled by a per-country annualization multiplier (x52 vs x12), silently baked into the value before it ever reaches the pooled file, with no =RecallWindow= column surviving to the final product | 2 (EPAR does it as a fixed constant, undocumented per-row; we have an open issue about the analogous gap) | GH #851 "Nothing records a table's recall window, so summed expenditures mix reference periods across waves, countries and food/non-food" | =Append all surveys_SSA.do:31-35= (=recall_period=7=, ==20= for Sierra Leone,=30= for Ghana SPS) is bolted on AFTER the x52/x12 multiplication already happened per-country (=GhanaW1...do:432= =*12=, =UgandaW4...do:778-781= =*52=) -- the recorded =recall_period= column doesn't actually gate the multiplier, it's just descriptive metadata added post-hoc |
+| 8 | Crop-category aggregation (=crop_category1=, ~80 buckets) is baked into the extraction step itself -- item-level rows never reach the final product, so no later re-aggregation or disaggregation is possible | 3 (we found; not an EPAR-documented issue, but a structural consequence of their design worth contrasting) | our =labels='Aggregate'= is a QUERY-TIME transform (=aggregate-labels/SKILL.md=); =food_acquired= keeps =j= at survey grain always | =UgandaW4...do:200-284= (=crop_category1= assigned at raw-item read time, before any =collapse=); metadata read above confirms no =item_code= column survives |
+
+* Construction decisions by feature area (each tagged reported/imputed/aggregated, with .do:line)
+
+- *Item/source extraction* (=reported=). Uganda: three source blocks
+  (=food_purch_*=, =food_prod_*=, =food_gift_*=) read directly off GSEC15B
+  columns =h15bq4/5=, =h15bq8/9=, =h15bq10/11= (=UgandaW4...do:290-300=).
+  Nigeria (post-harvest visit shown, W4): =s10bq9a/b= purchase,
+  =s10bq6a= production, =s10bq7a= gift (=NigeriaW4...do:676-689=). Senegal
+  EHCVM: =s07bq07a/b= purchase, =s07bq04= production, =s07bq05= gift
+  (=SenegalW1...do:392-399=). All three are one-to-one =rename= from the
+  raw module -- =reported=, matching our =food_acquired= extraction
+  philosophy exactly.
+- *Unit harmonization* (=reported=, with a large hand-built lookup, =imputed=
+  only where the survey's local unit is converted to kg/litre without a
+  reported conversion factor). Uganda's 99-value =unit_new= recode
+  (=UgandaW4...do:315-448=) and volume-to-mass conversions
+  (=UgandaW4...do:590-596=, e.g. =/0.05= for 50ml sachets) are =imputed=
+  conversion FACTORS, analogous to our =conversion_to_kgs=/=_get_kg_factors=
+  but with no disclosed provenance layering (no reported-vs-median-vs-
+  library-inferred distinction the way =harvest_kg= documents at
+  =data_info.yml:560-583=).
+- *Purchase price* (=imputed=, mislabeled as reported by the README). See
+  KNOWN ISSUES #1. =price_unit=food_purch_value/food_purch_qty= at
+  =UgandaW4...do:604=, =NigeriaW4...do: (equivalent block ~line 390s)=,
+  =SenegalW1...do: (equivalent ~line 400s)=.
+- *Own-production / gift valuation ladder* (=imputed=, the marquee
+  construction of this repo). Three rungs before the spatial ladder: (a)
+  household's own price if same item+unit (KNOWN ISSUES #3); (b) the
+  EA->...->national median-of-observed-purchase-price ladder gated at >10
+  obs per cell (KNOWN ISSUES #2); (c) unconditional national median as final
+  fallback (=UgandaW4...do:733-737= mirrors our =median_price_valuation='s
+  national fallback at =transformations.py:2986-2989=).
+- *Food-away-from-home* (=aggregated=, a single crop bucket, KNOWN ISSUES #6).
+- *Annualization* (=aggregated=, a fixed x52/x12 multiplier per country,
+  KNOWN ISSUES #7): =UgandaW4...do:778-781=, =NigeriaW4...do:531-534=,
+  =SenegalW1...do:502-505=, =GhanaW1...do:432= (x12).
+- *PP/PH averaging, Nigeria only* (=aggregated=, KNOWN ISSUES #5):
+  =NigeriaW4...do:886-895=.
+- *Winsorization* (=imputed=, top-1% clip replaced with the p99 value, per
+  country-wave, KNOWN ISSUES #4): =UgandaW4...do:797-806=,
+  =NigeriaW4...do:903-910=, =SenegalW1...do: (equivalent block ~519)=.
+- *Crop-category aggregation, two levels* (=aggregated=): =crop_category1=
+  (raw-item read time, ~80 buckets, e.g. =UgandaW4...do:200-284=) then
+  =crop_category2= (a coarser ~15-bucket fold, =UgandaW4...do:882-908= and
+  identically in =NigeriaW4...do:958-987=). Note the =crop_category2= recode
+  block is *character-for-character identical* between Uganda and Nigeria
+  (same 30+ =replace= lines, same category names) -- a genuine cross-country
+  crosswalk EPAR maintains by hand, not derived from any shared config file.
+- *PPP conversion* (=imputed=, a per-country-wave scalar): =gen conv_lcu_ppp=,
+  a single hardcoded constant per Instrument value
+  (=UgandaW4...do:928-930=: =0.000991261= for W4; =NigeriaW4...do:1004-1006=:
+  =0.007958188=; =SenegalW1...do:604-606=: =0.004172273=), applied to both
+  the raw and winsorized value columns. No PPP handling exists anywhere in
+  =lsms_library= (out of scope for us; noted only as a capability gap, not a
+  bug to fix here).
+
+* Ranked learnings (what we could take, why, what it would touch in our repo, and the risk)
+
+1. *Offer the median-price valuation ladder as an OPT-IN transform for
+   =food_acquired='s own-production/gift rows, reusing =median_price_valuation=
+   verbatim rather than re-deriving it.* We already built this exact ladder
+   for =crop_production= (GAP 7, =transformations.py:2847-3030=) and have an
+   open ticket asking for precisely this on the food side (GH #585, GH #575).
+   EPAR is a second independent implementation of the same idea (EA/grappe->
+   ...->national, >10 obs, median of observed purchase unit-value) --
+   corroborating evidence the design is sound, not proof it should be the
+   default. *Touch*: a new kwarg, e.g.
+   =food_expenditures(basis='total', valuation='median_price')=, threading
+   through =median_price_valuation= with =geo_levels= from =cluster_features=
+   (=v=, =Region=/=District=) the way GAP 7 already does for crop_production.
+   *Risk*: LOW as an opt-in (never the default, never stored -- consistent
+   with "core never aggregates silently"); MEDIUM if anyone is tempted to
+   make it the =basis='total'= default, because =SYNTHESIS.org='s own Uganda
+   evidence (next item) says the analyst-facing "right" valuation is contested
+   even among defensible choices.
+
+2. *Do NOT import the "at or near the market/purchase price" convention as if
+   it settles the farmgate-vs-market question -- our own price-sources study
+   already measured the size of the resulting bias and it's large.* The
+   Uganda UNPS interviewer manual explicitly instructs farmgate valuation for
+   own-consumption (=SYNTHESIS.org:739-742=); the corpus shows households
+   actually answer at-or-near the PURCHASE price (median gap 0.0000, ratio
+   1.000, on 1,666 pooled Uganda+GhanaLSS cells, =SYNTHESIS.org:666-676=), and
+   the three-way Uganda comparison puts own-consumption valuation ~23% above
+   the crop sale price (=SYNTHESIS.org:723-728=, "own-consumption is valued
+   about 23% above what a sale actually fetched"). EPAR's ladder is built
+   ENTIRELY from =food_purch_value/food_purch_qty= (the purchase side) --
+   it never uses a =crop_sale_price= or =community_price= source as an
+   alternative valuation, so EPAR's own-production values are, by
+   construction, on the market/purchase side of the farmgate-market gap our
+   study quantified. *Touch*: if we build learning #1, document explicitly
+   which side of that gap the median-ladder valuation sits on, citing this
+   evidence, rather than presenting it as neutral. *Risk*: reputational/
+   analytical, not code -- the risk is a future user citing our
+   =valuation='median_price'= output as "the" consumption value without
+   knowing it embeds a market-side markup our own corpus shows is real and
+   sizable (Deaton & Zaidi 2002 is cited on both sides, =SYNTHESIS.org:738-746=).
+
+3. *The =crop_category1=/=crop_category2= hand-built crosswalk (identical
+   across Uganda and Nigeria, and reused verbatim for the EHCVM countries'
+   own item lists) is a candidate reference for extending
+   =Aggregate Label= coverage to the EHCVM countries (GH #438-adjacent),
+   NOT a template to copy uncritically.* We already know our own
+   =Aggregate Label= folds sometimes cross a processing boundary that
+   shouldn't be crossed (GH #833: "harmonize_* folds raw and processed into
+   one =j= in 5 countries: Malawi groundnut 5.0x, Uganda maize 3.33x are
+   milling"). EPAR's crosswalk has the identical shape of risk: e.g.
+   Uganda's =crop_category1= folds "Rice" (=item_code==110=, presumably
+   husked/milled) with no raw-paddy distinction, and folds all Oils/Fats
+   (=item_code== 127-129=) into one bucket regardless of processing.
+   *Touch*: when someone works GH #438 for EHCVM =Aggregate Label= columns,
+   diff EPAR's ~80-category scheme against ours item-by-item as one input,
+   but re-run the GH #833 processing-boundary check on every fold before
+   accepting it -- don't inherit the same defect from a second source.
+   *Risk*: LOW to consult, MEDIUM if adopted without the #833 check.
+
+4. *EPAR's food-away-from-home fold is coarser than ours -- confirms our
+   design is already ahead here, not a learning to take, but worth recording
+   so nobody "fixes" our item-level away/home handling into EPAR's shape.*
+   See KNOWN ISSUES #6. Uganda's =GSEC15B= =h15bq6=/=h15bq7= are already
+   folded into =s='purchased'= per-item in
+   =lsms_library/countries/Uganda/_/uganda.py:391,452-506=, keeping the item
+   identity that EPAR discards. *Touch*: none needed; note this so a future
+   "align with EPAR" refactor doesn't regress it. *Risk*: N/A (defensive
+   documentation only).
+
+5. *EPAR's same-household-same-item rung (KNOWN ISSUES #3) is a real, cheap,
+   zero-imputation-risk idea worth separating from the ladder proper: value
+   a household's own production/gift of item X at THAT SAME HOUSEHOLD's own
+   reported purchase price for X, when it purchased X in the same unit that
+   same recall period, before reaching for any spatial median.* This is
+   arguably less objectionable than the EA/parish/... ladder (learning #2's
+   concern) because it uses the respondent's own revealed price rather than
+   a neighbourhood's, and EPAR's own README never discloses it as a distinct
+   step -- we would be doing this MORE transparently than EPAR does.
+   *Touch*: a narrower, separately-flagged sub-case of learning #1's
+   =valuation=' kwarg, e.g. =valuation='own_price'= as a first-choice fill
+   before =valuation='median_price'= falls back. *Risk*: LOW -- it's a
+   same-household join, no cross-household information leakage, and
+   degrades to "no fill" cleanly wherever the household bought nothing in
+   that unit.
+
+* Contradictions with our CONTENTS.org / issues (quote both)
+
+None found in the sense of a factual disagreement about a specific
+country-wave. This scope's contradictions are all at the *design-decision*
+level (winsorization, silent PP/PH averaging, undisclosed valuation rungs)
+rather than a specific empirical claim in a =CONTENTS.org= that EPAR's code
+contradicts or confirms. The one CLAUDE.md claim this pass partially updates
+is the "Senegal/_/CONTENTS.org is a stub" note (CLAUDE.md, Countries Without
+Microdata section context / Known gap): as of this read,
+=Senegal/_/CONTENTS.org= is 531 lines and the country's =data_scheme.yml=
+already declares =food_acquired=, =crop_production=, =plot_inputs=,
+=livestock= with detailed EHCVM-specific commentary
+(=Senegal/_/data_scheme.yml:66-190=) -- this pass did not verify whether the
+"TODO list, not idiosyncrasy docs" characterization of =CONTENTS.org= itself
+still holds; flagging as possibly stale rather than asserting it is (out of
+scope to resolve here; a #438/EHCVM-scoped agent should check directly).
+
+* What I did not read (so the synthesis knows the gaps)
+
+- 38 of the 41 remaining =.do= files were swept only by targeted grep
+  (ladder threshold, recall multiplier, winsorize markers, own/away/gift
+  column renames) per the BRIEF's reading recipe -- NOT read section by
+  section. Ethiopia W3/W4/W5, GhanaW1 (SPS), MaliW1/W2, NigerW3/W4,
+  BeninW1, BurkinaW2, TogoW1, Guinea-BissauW1 were spot-checked for the
+  ladder rung count and threshold only (all confirmed >10, all confirmed
+  x52 except Ghana SPS x12 for its 30-day recall) -- not for unit-conversion
+  detail, not for source-column provenance.
+- Kenya, Sierra Leone, India do-files: not read at all (countries we don't
+  hold; out of scope per the BRIEF's "we don't hold these" framing).
+  Sierra Leone's recall period (=Append all surveys_SSA.do:34=, x20 not x52
+  or x30) was noted only as a curiosity from the append file, not traced to
+  its own =.do=.
+- =EPAR_UW_335_master_list_indicators.xlsx=, =_Summary_statistics/=,
+  =Batching/=, and the entire =LSMS-Agricultural-Indicators-Code= repo
+  (the sibling TR#335 code, and the specific Uganda-W5 sold-value defect
+  the BRIEF cites as a cautionary example) are OUT OF SCOPE for this agent
+  (Household-Consumption-Data only) and were not opened.
+- =358_Estimating-Crop-Yields= and the =LSMS-Data-Dissemination= allowlist
+  files were not fetched or read (not in scope for consumption-by-source).
+- No numeric parity run: per the BRIEF's rule, this pass did not compute or
+  compare actual values against any =Final Data/*.dta= beyond the one
+  metadata-only (schema/grain) read of Uganda W4. Whether our
+  =food_expenditures= for Uganda 2013-14 is numerically close to EPAR's
+  =food_consu_value= for the same wave is untested.
+- GhanaSPS =food_acquired= coverage in our own corpus was not checked in
+  this pass (I confirmed EHCVM-country coverage but not GhanaSPS's).
+- The EHCVM =Append= file's five EHCVM countries beyond Senegal (Benin,
+  Burkina, CotedIvoire, Guinea-Bissau, Togo, Niger, Mali) were read only via
+  the targeted grep sweep, not section by section -- their raw source
+  modules (=s07b=, =s16=, etc. equivalents) were not individually verified
+  against Senegal's, so "EHCVM countries all use the same do-file shape" is
+  an inference from the grep sweep, not a line-by-line confirmation for all
+  seven.

@@ -35,17 +35,32 @@ waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 
 # Unit handling (GH #347).  ``u`` carries the harmonized unit label
 # ALONE -- the ``harmonize_unit`` Preferred Label for the 1994+ waves
-# (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Birr, ...) and the
+# (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Value -- the
+# currency code, canonicalised onto the framework sentinel rather
+# than spelled 'Birr', GH #770 -- ...) and the
 # raw in-data unit *code* for 1989 (an unlabelled scheme; still a unit
 # token, not a food label).  An EARLIER design appended the food label
 # to non-metric units ("Chinet [Butter]") to coax the framework's
 # price-ratio kg inference into a per-good factor; that polluted the
 # unit axis with ITEM NAMES (e.g. '0 [Butter]', '5 [Teff]') and is the
 # bug reported in #347.  Removed: ``u`` is now a clean unit token, as
-# in every other country (Uganda/Malawi/EHCVM).  The framework's
+# in every other country (Uganda/Malawi/EHCVM).
+#
+# THE JUSTIFICATION GIVEN HERE WAS FALSE UNTIL 2026-09-09, and is
+# recorded rather than quietly rewritten.  It read: "the framework's
 # price-ratio inference (transformations.conversion_to_kgs) already
-# groups by item ``i`` within each unit, so a single unit label per
-# good still recovers sensible factors with no per-good tagging.
+# groups by item ``i`` within each unit".  It does not, and ``i`` is
+# the HOUSEHOLD id, not the item.  Before GH #850 that function
+# returned ONE factor per unit label for a whole country, with no item
+# axis at any step -- so stripping the food label off the unit token
+# was right for the reason given in the paragraph above (a unit axis
+# must carry units), and wrong for the reason given here.
+#
+# GH #850 made the claim true: the inference now estimates a factor
+# per ``(j, u)`` cell and falls back to the u-pooled factor only where
+# that cell is too thin, with the rung reported per row in
+# ``food_kg_factors``'s ``KgFactorSource``.  So a single clean unit
+# label per good does now recover a per-good factor.
 
 
 def _norm_village(v):
@@ -224,7 +239,9 @@ def food_acquired(df):
     # key was missing in the source -- see `i` above) and rows with
     # no unit (a unit is required to place the quantity on the u axis).
     # ``u`` is the harmonize_unit Preferred Label (e.g. 'kg', 'Chinet',
-    # 'Birr'); the source missing-unit sentinel 0 maps to '' via
+    # and 'Value' for the currency code 30 -- the canonical
+    # currency-denominated sentinel, NOT the currency's name 'Birr',
+    # GH #770); the source missing-unit sentinel 0 maps to '' via
     # harmonize_unit (#347) and is dropped here.  Each row's ``u`` is a
     # clean unit token -- no food label appended (the framework's
     # price-ratio inference recovers per-good factors on its own).

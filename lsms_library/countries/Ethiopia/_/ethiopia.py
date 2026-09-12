@@ -242,60 +242,121 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-def food_acquired(fn,myvars):
+def food_acquired(fn, myvars):
     """Reshape Ethiopia's food_acquired into the canonical (t, i, j, u, s) form.
 
-    Phase 3 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org.
-    Per the design row for Ethiopia:
-        "derive purchased + produced (= total - purchased)"
+    GH #874.  Every served quantity is a number the ESS actually asked for.
 
-    Ethiopia's source records, per (household, item):
-      - quantity / units              : TOTAL acquired in `units`
-      - value_purchased               : monetary value of the purchased subset
-      - quantity_purchased / units_purchased : amount and unit of the
-        purchased subset
+    ESS Household Questionnaire SECTION 5A / 6A (FOOD LAST 7 DAYS) asks, per
+    (household, item):
 
-    The wave script supplies `myvars` mapping these to the source columns;
-    `t` is appended from the wave folder name (parent of cwd).
+      1. did you consume any [ITEM]?
+      2. how much in TOTAL did your household consume?          (Q2 + unit)
+      3. how much came from PURCHASES?                          (Q3 + unit)
+      4. how much did you SPEND?                                (Q4, birr)
+      5. how much came from OWN PRODUCTION?                     (Q5 + unit)
+      6. how much came from GIFTS AND OTHER SOURCES?            (Q6 + unit)
 
-    Unit handling (decision documented 2026-05-06):
-      In wave 1 (2011-12) only 64/19,231 (0.3%) of rows where both quantity
-      and quantity_purchased are positive have `units != units_purchased`.
-      The asymmetry is rare enough that we treat the row as "single-unit":
-      we use `units` as the canonical `u` axis and silently drop
-      `units_purchased`.  Produced is then derived in the same unit:
-          Produced = (quantity - quantity_purchased).clip(lower=0)
-      For the rare unit-mismatch rows the subtraction is approximate, but
-      preserving the framework helper's one-unit-per-row contract is more
-      important than the ~0.3% accuracy loss.  No kg conversion is done at
-      this layer — that lives downstream in the framework's
-      food_quantities_from_acquired path.
+    so the three acquisition sources are reported directly, each with its
+    own unit code:
+
+      * ``s='purchased'`` : Quantity = Q3, unit = Q3's unit, Expenditure = Q4
+      * ``s='produced'``  : Quantity = Q5, unit = Q5's unit, Expenditure NaN
+      * ``s='inkind'``    : Quantity = Q6, unit = Q6's unit, Expenditure NaN
+
+    Q4 is the only monetary field in the module and it is attached to Q3, so
+    produced and in-kind rows carry no Expenditure -- the survey never values
+    them (``_/CONTENTS.org`` "The ESS asks NO value of own-consumption").
+    Q2 is the sum of the three and is NOT served as a row; it is read only to
+    screen self-contradictory Q5 answers (below).
+
+    What this replaced (GH #874, 2026-09-12).  Until now the wave scripts read
+    only Q2/Q3/Q4 and this function derived
+    ``Produced = (Q2 - Q3).clip(lower=0)``, which
+    ``build_transforms.food_acquired_to_canonical`` then inverted into
+    ``purchased = Q2 - Produced = min(Q2, Q3)``.  So Ethiopia served a
+    residual -- gifts, food aid and any Q2-vs-Q3 disagreement folded into
+    "own production" -- had no ``s='inkind'`` row at all, and silently
+    truncated a purchase that exceeded the week's consumption.  Q5 and Q6
+    were never read.  This function therefore no longer calls
+    ``food_acquired_to_canonical`` (whose contract IS the residual split);
+    it builds the long form per source, like ``nigeria.food_acquired_for_wave``.
+
+    Units.  Each source now keeps its OWN unit code.  The old single-``u``
+    approximation (documented here as a ~0.3% accuracy loss) existed only to
+    satisfy the canonical helper's one-row-one-unit contract and is gone with
+    it.  A unit code is recorded in these files only where the corresponding
+    quantity is > 0, so a row kept for its Expenditure alone (Q3 = 0 but
+    Q4 > 0) can have no unit; those get the ``'Unknown'`` sentinel rather
+    than a NaN index key, which the core grain collapse would DELETE
+    (CLAUDE.md, "Grain Collapse" §3b; the landed Niger/Burkina #842 pattern).
+
+    Screen (GH #874 decision 3).  ``Q5 > Q2`` -- more own production consumed
+    than total consumption -- is self-contradictory, and only the direct
+    question can be at fault (mostly decimal slips).  It is COUNTED and
+    warned about, never clipped, dropped or NaN'd -- and so are the same
+    contradiction on the other two sources (``Q3 > Q2``, ``Q6 > Q2``), which
+    the old residual construction silently truncated away: same
+    contract as ``transformations._screen_reported_factors`` and
+    ``quantity_audit.check_quantities``.  The double-count class
+    ``Q3 = Q5 = Q2 > 0`` (the same quantity entered as both purchased and
+    own-produced) is counted alongside it.  Both counts are measured only on
+    rows whose Q5 unit agrees with the Q2 unit (a zero Q5 is unit-vacuous).
+
+    Parameters
+    ----------
+    fn : str
+        Path to the wave's SECTION 5A / 6A file, read via ``get_dataframe``.
+    myvars : dict
+        Maps the canonical names ``item``, ``HHID``, ``quantity``/``units``
+        (Q2), ``quantity_purchased``/``units_purchased``/``value_purchased``
+        (Q3/Q4), ``quantity_produced``/``units_produced`` (Q5) and
+        ``quantity_inkind``/``units_inkind`` (Q6) to this wave's source
+        columns.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed on ``(t, i, j, u, s)`` with columns ``Quantity``,
+        ``Expenditure``.  ``v`` is intentionally absent -- joined from
+        ``sample()`` at API time.
     """
-    from lsms_library.transformations import food_acquired_to_canonical
+    from lsms_library.transformations import _finalize_canonical_food_acquired
 
-    df = get_dataframe(fn,convert_categoricals=True)
+    df = get_dataframe(fn, convert_categoricals=True)
 
-    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
+    df = df.loc[:, list(myvars.values())].rename(columns={v: k for k, v in myvars.items()})
+
+    _UNIT_COLS = ('units', 'units_purchased', 'units_produced', 'units_inkind')
 
     # Correct unit labels (title-case + a few historical typos).  Preserved
     # from the legacy implementation -- keeps `u` values consistent with the
     # countries/Ethiopia/_/conversion_to_kgs.json keys that downstream code
-    # still references for kg conversion.
-    df['units_purchased'] = df['units_purchased'].str.title()
-    df['units'] = df['units'].str.title()
+    # still references for kg conversion.  Applied to ALL FOUR unit columns
+    # now that each source carries its own (GH #874); it used to run on two.
+    for _col in _UNIT_COLS:
+        df[_col] = df[_col].astype(str).str.title()
     # Strip the survey's "NNN. " code prefix that ESS embeds in the unit
     # value labels (e.g. "1. Kilogram", "171. Sini Small") so `u` carries a
     # clean label, not a code-prefixed string (GH #223 Layer 2).  Applied
     # only to the unit columns -- item names / IDs may legitimately start
     # with a digit.  "1. Kilogram" -> "Kilogram" then resolves via KNOWN_METRIC
     # / the global u.org (-> "Kg"); container labels stay native.
-    for _col in ('units', 'units_purchased'):
+    for _col in _UNIT_COLS:
         df[_col] = (df[_col].str.replace(r'^\s*\d+\.\s*', '', regex=True)
-                            .str.strip())
-    rep = {r'\s+':' ',
+                            .str.strip()
+                            .replace({'Nan': pd.NA, 'None': pd.NA, '': pd.NA,
+                                      # 2011-12 ships a literal '0' as the
+                                      # unit code on 3 rows (2 on Q2, 1 on
+                                      # Q3, Wheat / 5,000).  The prefix strip
+                                      # above needs a '.', so it survives as a
+                                      # junk `u`.  It records no unit, so it
+                                      # takes the same sentinel as the rest.
+                                      '0': pd.NA}))
+    rep = {r'\s+': ' ',
            'Meduim': 'Medium',
-           'Kubaya ':'Kubaya/Cup ',
-           'Milliliter' : 'Mili Liter'}
+           'Kubaya ': 'Kubaya/Cup ',
+           'Milliliter': 'Mili Liter'}
     df = df.replace(rep, regex=True)
 
     # Coerce HHID to canonical integer-string form when it lands as float
@@ -303,14 +364,11 @@ def food_acquired(fn,myvars):
     if df['HHID'].dtype == float:
         df['HHID'] = df['HHID'].astype(str).str.split('.').str[0].replace('nan', pd.NA)
 
-    # Compute Produced = total - purchased, clipped at 0.  In ~0.3% of
-    # populated rows units != units_purchased; we accept the approximate
-    # subtraction and use `units` as the canonical unit u.
-    quantity = pd.to_numeric(df['quantity'], errors='coerce')
-    quantity_purchased = pd.to_numeric(df['quantity_purchased'], errors='coerce')
-    df['Quantity'] = quantity
-    df['Produced'] = (quantity.fillna(0) - quantity_purchased.fillna(0)).clip(lower=0)
-    df['Expenditure'] = pd.to_numeric(df['value_purchased'], errors='coerce')
+    Q2 = pd.to_numeric(df['quantity'], errors='coerce')
+    Q3 = pd.to_numeric(df['quantity_purchased'], errors='coerce')
+    Q5 = pd.to_numeric(df['quantity_produced'], errors='coerce')
+    Q6 = pd.to_numeric(df['quantity_inkind'], errors='coerce')
+    Q4 = pd.to_numeric(df['value_purchased'], errors='coerce')
 
     # Derive `t` from the wave folder name.  Wave scripts cd into
     # countries/Ethiopia/<wave>/_/ before importing this helper, so the
@@ -319,6 +377,44 @@ def food_acquired(fn,myvars):
     import os
     wave = os.path.basename(os.path.dirname(os.getcwd()))
     df['t'] = wave
+
+    # --- Screen: impossible DIRECT answers (GH #874).  Count, warn, serve. --
+    # A zero Q5 is unit-vacuous (no unit is recorded on a zero quantity), so
+    # the comparison is taken where Q5 = 0 or the Q5 unit equals the Q2 unit.
+    def _comparable(q, unit_col):
+        # A zero quantity is unit-vacuous (no unit is recorded on it), so it
+        # is always comparable; otherwise the two labels must agree.  NA on
+        # either side propagates through `==` as NA, which is neither True
+        # nor False -- `fillna(False)` makes "we cannot tell" mean "not
+        # counted", which is the conservative direction for a screen.
+        return ((q.fillna(0) == 0) | (df[unit_col] == df['units'])).fillna(False)
+
+    def _exceeds_total(q, unit_col):
+        return (_comparable(q, unit_col) & Q2.notna() & q.notna() & (q > Q2))
+
+    impossible = _exceeds_total(Q5, 'units_produced')
+    n_exceeds = {'purchased': int(_exceeds_total(Q3, 'units_purchased').sum()),
+                 'produced': int(impossible.sum()),
+                 'inkind': int(_exceeds_total(Q6, 'units_inkind').sum())}
+    double_count = (_comparable(Q5, 'units_produced')
+                    & (Q2 > 0) & (Q3 == Q2) & (Q5 == Q2)).fillna(False)
+    n_impossible, n_double = int(impossible.sum()), int(double_count.sum())
+    # A unit code is recorded only on a positive quantity -- but not always.
+    # Count the positive quantities that arrive with NO unit code: those are
+    # served under the 'Unknown' sentinel below (never NaN, never dropped).
+    n_nounit = {s: int(((q > 0) & u.isna()).sum())
+                for s, (q, u) in {'purchased': (Q3, df['units_purchased']),
+                                  'produced': (Q5, df['units_produced']),
+                                  'inkind': (Q6, df['units_inkind'])}.items()}
+    if n_impossible or n_double or any(n_nounit.values()):
+        warnings.warn(
+            f"Ethiopia {wave} food_acquired (GH #874): rows whose source "
+            f"quantity EXCEEDS total consumption (Q2), by source: {n_exceeds}; "
+            f"{n_double} rows report the same quantity as both purchased and "
+            f"own-produced (Q3 = Q5 = Q2 > 0); positive quantities with no unit "
+            f"code (served as u='Unknown'): {n_nounit}.  All served unchanged -- "
+            f"the survey's answers are not clipped, dropped or NaN'd.",
+            stacklevel=2)
 
     # Resolve raw food strings to canonical Preferred Labels at the WAVE
     # level (Unit #0 / Malawi pattern).  The raw `item` is the Stata value
@@ -333,18 +429,32 @@ def food_acquired(fn,myvars):
     food_map = harmonize_food_union_map(fn='../../_/categorical_mapping.org')
     df['item'] = df['item'].astype(str).str.strip().replace(food_map)
 
-    # Build the wide-form frame the framework helper expects:
-    # index (t, i, j, u), columns (Quantity, Expenditure, Produced).
-    df = (df.rename(columns={'HHID': 'i', 'item': 'j', 'units': 'u'})
-            .set_index(['t', 'i', 'j', 'u'])
-            [['Quantity', 'Expenditure', 'Produced']]
-            .dropna(how='all'))
+    # --- One long-form row per reported source, each in its own unit. -------
+    sources = {'purchased': (Q3, df['units_purchased'], Q4),
+               'produced': (Q5, df['units_produced'], None),
+               'inkind': (Q6, df['units_inkind'], None)}
 
-    # Ditch the now-unused `units_purchased` (already dropped via the
-    # column projection above).  Helper produces (t, i, j, u, s) with
-    # s in {'purchased', 'produced'}.
-    out = food_acquired_to_canonical(df, drop_columns=())
-    return out
+    pieces = []
+    for s, (qty, unit, expenditure) in sources.items():
+        pieces.append(pd.DataFrame({
+            't': df['t'].values,
+            'i': df['HHID'].values,
+            'j': df['item'].values,
+            'u': unit.values,
+            's': s,
+            'Quantity': qty.values,
+            'Expenditure': (expenditure.values if expenditure is not None
+                            else np.full(len(df), np.nan)),
+        }))
+
+    out = pd.concat(pieces, ignore_index=True)
+    # A unit is recorded only on a positive quantity, so an expenditure-only
+    # purchased row has none.  Sentinel, not NaN: a NaN index key is DELETED
+    # by the core grain collapse's groupby (CLAUDE.md "Grain Collapse" §3b).
+    out['u'] = out['u'].fillna('Unknown')
+
+    return _finalize_canonical_food_acquired(out)
+
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')
@@ -618,6 +728,250 @@ def _yesno_bool_col(df, col, yes, no):
     return out
 
 
+# ---------------------------------------------------------------------------
+# WB-shipped local AREA-unit conversion (GH #853)
+# ---------------------------------------------------------------------------
+
+#: The WB local-area-unit conversion file, shipped in four of five wave
+#: directories under this one name.  **2021-22 has no sidecar because the
+#: World Bank shipped no such file for ESPS-5** -- EPAR's do-file says so
+#: outright (`EPAR_UW_Ethiopia_ESS_W5.do:324`: "this file does not exist in
+#: the WB W5 download.  EPAR borrowed the land unit conversion factor file
+#: from previous ESS waves").  **We do NOT borrow.**  Borrowing would mint a
+#: 2021-22 `Area` out of a 2018-19 woreda table with nothing in the returned
+#: data saying so; GH #853 "What it must NOT do" forbids exactly that.  W5's
+#: local-unit plots keep `Area` NaN and `AreaUnit` = the native unit name.
+#:
+#: The four sidecars carry three distinct md5s but the SAME 259 rows: the
+#: differences are Stata storage types (`local_unit`/`conversion` int8+float64
+#: in W1/W2, float32 in W3/W4), not content.  Measured 2026-09-09.
+LOCAL_AREA_UNIT_FILE = 'ET_local_area_unit_conversion.dta'
+LOCAL_AREA_UNIT_WAVES = ('2011-12', '2013-14', '2015-16', '2018-19')
+
+
+def local_area_unit_factors(waves=None):
+    """Square metres per LOCAL AREA UNIT, by woreda (WB shipped table).
+
+    ANALYST-CALLABLE, and also the table
+    :func:`plot_features_for_wave` consumes to fill ``Area`` for a field
+    reported only as a farmer estimate in a local unit.
+
+    Parameters
+    ----------
+    waves : str or iterable of str, optional
+        Default: every wave that SHIPS the file
+        (:data:`LOCAL_AREA_UNIT_WAVES`).  Naming 2021-22 raises -- see
+        :data:`LOCAL_AREA_UNIT_FILE` for why we do not borrow.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed by ``(t, region, zone, woreda, AreaUnit)`` -- the first three
+        being the survey's own numeric ``saq01`` / ``saq02`` / ``saq03``
+        codes -- with columns ``SqmPerUnit`` (float) and ``Source``.
+
+    Notes
+    -----
+    **Join on the raw integer hierarchy, not on EPAR's string keys.**  EPAR
+    pads and concatenates ``region``/``zone``/``woreda`` into hierarchical
+    strings on both sides (`W5.do:325-341` for the conversion file, `:195-225`
+    for everything else) -- and the two paddings DISAGREE: the general helper
+    pads the REGION only (`W5.do:198`) and leaves ``saq02``/``saq03``
+    unpadded, so zone 1 in region 1 becomes ``"011"``; the conversion-file
+    block pads all three (`:330` for zone, `:336` for woreda), giving
+    ``"0101"``.  Both sides are strings, so Stata raises nothing.  Their merge
+    reports ``13,312 not matched`` and ``1,566 matched`` (`:695-696`) and
+    ``// 19 changes`` (`:703`) -- EPAR's verbatim inline counts; the
+    denominator 14,878 is DERIVED (13,312 + 1,566) and happens to equal the
+    row count of ``sect3_pp_w5.dta``, but EPAR never writes it.  The
+    raw ``(region, zone, woreda)`` integer triple is the same hierarchy
+    without the collision risk, and is what this loader and
+    :func:`plot_features_for_wave` use.
+
+    **Coverage is intrinsically partial.**  The table has 259 rows covering
+    206 woredas x 4 local units (Timad 198, Boy 33, Senga 18, Kert 10) in 9
+    regions.  It says nothing about Tilm, Medeb, Rope, Ermija or "Other", and
+    nothing about the woredas it omits.  A field in an uncovered
+    (woreda, unit) cell keeps ``Area`` NaN -- that is the correct answer, not
+    a gap to be filled by a median.  EPAR fills those holes from its own
+    weighted zone / region / national medians of ``GPS area / reported
+    area`` (`W5.do:657-711`); that is imputation from the survey's own data,
+    a different and later layer, and it is deliberately NOT done here.
+    """
+    if waves is None:
+        waves = list(LOCAL_AREA_UNIT_WAVES)
+    elif isinstance(waves, str):
+        waves = [waves]
+    else:
+        waves = list(waves)
+    missing = [w for w in waves if w not in LOCAL_AREA_UNIT_WAVES]
+    if missing:
+        raise ValueError(
+            f"Ethiopia ships no {LOCAL_AREA_UNIT_FILE} for wave(s) {missing}; "
+            f"the file exists only for {list(LOCAL_AREA_UNIT_WAVES)}.  The "
+            "World Bank shipped none for 2021-22 (ESPS-5).  Borrowing an "
+            "earlier wave's woreda table into that wave is a documented "
+            "decision, not a default -- GH #853.")
+
+    unit_map = _harmonize_wave_keyed('harmonize_area_unit')
+    pieces = []
+    for t in waves:
+        raw = get_dataframe(f'Ethiopia/{t}/Data/{LOCAL_AREA_UNIT_FILE}',
+                            convert_categoricals=False)
+        df = pd.DataFrame({
+            't': t,
+            'region': pd.to_numeric(raw['region'], errors='coerce').astype('Int64'),
+            'zone': pd.to_numeric(raw['zone'], errors='coerce').astype('Int64'),
+            'woreda': pd.to_numeric(raw['woreda'], errors='coerce').astype('Int64'),
+            'SqmPerUnit': pd.to_numeric(raw['conversion'], errors='coerce'),
+        })
+        # Decode the local-unit code through the SAME wave-keyed table
+        # plot_features uses for AreaUnit, so the two sides speak one
+        # vocabulary by construction rather than by coincidence.  (The
+        # file's own Stata value labels agree -- Timad / Boy / Senga / Kert
+        # -- but agreeing is not the same as being the same table.)
+        code = pd.to_numeric(raw['local_unit'], errors='coerce').astype('Int64')
+        df['AreaUnit'] = code.map(
+            lambda x: unit_map.get((t, int(x))) if pd.notna(x) else pd.NA
+        ).astype('string').values
+        df['Source'] = f'WB ET_local_area_unit_conversion ({t})'
+        pieces.append(df)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[np.isfinite(out['SqmPerUnit']) & (out['SqmPerUnit'] > 0)]
+    idx = ['t', 'region', 'zone', 'woreda', 'AreaUnit']
+    out = out.dropna(subset=idx)
+    dup = out.duplicated(subset=idx, keep=False)
+    if dup.any():
+        raise ValueError(
+            f"Ethiopia local_area_unit_factors: {int(dup.sum())} row(s) are "
+            f"duplicated on {idx}: e.g. "
+            f"{out[dup].head().to_dict('records')}.  A woreda cannot have two "
+            "sizes for one local unit; resolve it here with a stated rule "
+            "rather than letting a merge fan the plot rows out.")
+    return out.set_index(idx)[['SqmPerUnit', 'Source']].sort_index()
+
+
+#: Implausibility reference for a CONVERTED plot area, and the multiple of it
+#: above which the row is COUNTED (never refused, never clipped).
+#:
+#: The reference is the 99th percentile of GPS-MEASURED field area **within
+#: the row's own region and wave**.  That number is stable across the corpus
+#: -- 0.60 to 3.07 ha over all four convertible waves x nine regions -- so
+#: "flagged" means the same thing in 2011-12 as in 2015-16.
+#:
+#: It replaces an earlier per-wave *maximum* GPS area, which was a screen that
+#: REFUSED (left `Area` NaN).  Two things were wrong with that, and the second
+#: is the house rule.  (a) The max is set by a single GPS outlier and ran
+#: 4.93 / 9.91 / 19.81 / 126.41 / 425.71 ha by wave against a p99 of ~1 ha in
+#: every wave, so the same converted 18 ha field was refused in 2011-12 and
+#: served in 2013-14 -- a 43x swing in what the word meant.  (b) **A refusal
+#: is a clip by another name**: NaN-ing a row on the strength of a screen
+#: deletes the survey's own answer.  `transformations._screen_reported_factors`
+#: counts and serves; so does the `QuantityImplausibleWarning` path
+#: ("NOTHING HAS BEEN CHANGED"); so does this.
+#:
+#: K = 5 measured 2026-09-10: it flags 26 / 3 / 2 / 2 = 33 of 2,273 converted
+#: rows (1.5%), a work queue.  K = 10 flags 3 and says nothing; K = 2 would
+#: flag the ordinary right tail (the converted p90 is ~1.2x the reference).
+PLOT_AREA_IMPLAUSIBLE_MULTIPLE = 5.0
+
+
+def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
+    """Fill ``Area`` from the WB woreda table where no GPS area exists.
+
+    Returns ``(area_ha, n_converted, n_implausible)``.  GPS stays preferred: a
+    row that already carries a GPS-measured area is never touched, per GH
+    #853 ("Never override a GPS-measured Area with a local-unit
+    conversion").
+
+    EVERY row the table can convert IS CONVERTED AND SERVED.  Implausibility
+    is **counted and reported, never acted on** -- no row is refused, no
+    value is clipped -- against
+    :data:`PLOT_AREA_IMPLAUSIBLE_MULTIPLE` x the 99th percentile of
+    GPS-measured field area in the row's own region and wave.  The count goes
+    to the build log; the rows stay in the data, exactly as the survey
+    reported them times the factor the World Bank published.
+
+    CAVEAT ON THE FACTORS THEMSELVES, measured 2026-09-10 and not adjudicated
+    here: converted areas sit systematically ABOVE the GPS distribution even
+    after conditioning on region -- the ratio of the converted median to the
+    GPS median runs 2.4x to 17.6x in every large (wave, region) cell, never
+    below 2.4x.  A selection story is available (a field the enumerator could
+    not walk is a field that is large or remote) and so is a factor-inflation
+    story, and nothing in this repo separates them.  Treat a converted `Area`
+    as a coarser measurement than a GPS one, not as its equal.
+    """
+    c = colmap
+    est_col = c.get('area_est')
+    if not est_col or est_col not in field.columns:
+        return area_ha, 0, 0
+    if t not in LOCAL_AREA_UNIT_WAVES:
+        # 2021-22: the WB shipped no table and we do not borrow one.
+        return area_ha, 0, 0
+
+    geo = {k: c.get(k, d) for k, d in
+           (('region', 'saq01'), ('zone', 'saq02'), ('woreda', 'saq03'))}
+    if any(v not in field.columns for v in geo.values()):
+        return area_ha, 0, 0
+
+    est = pd.to_numeric(field[est_col], errors='coerce')
+    target = area_ha.isna().to_numpy() & (est > 0).fillna(False).to_numpy() \
+        & native_unit.notna().to_numpy()
+    if not target.any():
+        return area_ha, 0, 0
+
+    region = pd.to_numeric(field[geo['region']], errors='coerce').astype('Int64')
+    factors = local_area_unit_factors([t]).reset_index()
+    probe = pd.DataFrame({
+        'region': region,
+        'zone': pd.to_numeric(field[geo['zone']], errors='coerce').astype('Int64'),
+        'woreda': pd.to_numeric(field[geo['woreda']], errors='coerce').astype('Int64'),
+        'AreaUnit': native_unit.astype('string').values,
+        '_est': est.values,
+        '_pos': np.arange(len(field)),
+    })[target]
+    merged = probe.merge(factors[['region', 'zone', 'woreda', 'AreaUnit',
+                                  'SqmPerUnit']],
+                         on=['region', 'zone', 'woreda', 'AreaUnit'],
+                         how='left')
+    assert len(merged) == len(probe), (
+        'local area-unit merge fanned rows out -- the factor table is not '
+        'unique on (region, zone, woreda, AreaUnit)')
+    converted = merged['_est'] * merged['SqmPerUnit'] / 10000.0
+    served = converted.notna()
+
+    out = area_ha.copy()
+    pos = merged.loc[served, '_pos'].to_numpy()
+    out.iloc[pos] = converted[served].to_numpy()
+    n_converted = int(served.sum())
+
+    # The count, taken AFTER serving.  Nothing below changes `out`.
+    gps_ha = pd.to_numeric(field[c['area_gps']], errors='coerce') / 10000.0
+    gps_ha = gps_ha.where(gps_ha > 0)
+    ref = merged['region'].map(gps_ha.groupby(region).quantile(0.99))
+    flagged = (converted > PLOT_AREA_IMPLAUSIBLE_MULTIPLE * ref).fillna(False)
+    n_implausible = int((flagged & served).sum())
+
+    if n_implausible:
+        worst = (converted[flagged & served] / ref[flagged & served]).max()
+        warnings.warn(
+            f"Ethiopia {t} plot_features: {n_implausible} of {n_converted} "
+            "local-unit area conversion(s) exceed "
+            f"{PLOT_AREA_IMPLAUSIBLE_MULTIPLE:g}x the 99th percentile of "
+            "GPS-measured field area in their own region (worst "
+            f"{worst:.1f}x).  NOTHING HAS BEEN CHANGED -- every one of them is "
+            "SERVED exactly as the survey's estimate times the World Bank's "
+            "factor, because refusing a row on the strength of a screen "
+            "deletes the survey's own answer.  Read this as a work queue on "
+            "the farmer-estimate column and the woreda factor (GH #853), and "
+            "note that converted areas run 2.4x-17.6x above the within-region "
+            "GPS median generally -- these are the tail of that, not a "
+            "separate defect.",
+            UserWarning, stacklevel=3)
+    return out, n_converted, n_implausible
+
+
 def plot_features_for_wave(t, sect2, sect3, colmap):
     """Build canonical ``plot_features`` for one Ethiopia ESS wave.
 
@@ -655,6 +1009,15 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
                           for ``erosion`` (default 1 / 2; W1-W3 flip to
                           2 / 1).
 
+        Optional keys for the GH #853 local-area-unit conversion (skipped
+        entirely when ``area_est`` is absent):
+            area_est    — sect3 farmer-estimate AREA VALUE column
+                          (``pp_s3q02_a`` W1-W3, ``s3q02a`` W4-W5), the
+                          quantity whose unit ``area_unit`` names.
+            region / zone / woreda — the geography columns the WB woreda
+                          factor table keys on (default ``saq01`` /
+                          ``saq02`` / ``saq03``).
+
     Returns
     -------
     pd.DataFrame indexed by ``(t, i, plot_id)`` with columns
@@ -665,6 +1028,13 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
         (nullable bool, reported erosion-control structure), ``Certificate``
         (nullable bool, parcel has a land-use certificate).  GPS
         Latitude / Longitude are NOT emitted (source 100% redacted).
+
+    ``Area`` is the GPS-measured field area in hectares wherever the survey
+    measured one -- GPS is ALWAYS preferred.  Where it did not and the
+    farmer's estimate is in a local unit the WB's woreda table covers, the
+    estimate is converted (GH #853; see :func:`_convert_local_area_units`).
+    Where neither is available ``Area`` stays NaN and ``AreaUnit`` carries
+    the native unit name.
     """
     c = colmap
     acquire_map = _harmonize_wave_keyed('harmonize_acquire')
@@ -705,12 +1075,36 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
 
     # AreaUnit: 'hectares' where GPS area is present; otherwise the
     # native farmer-estimate unit name (Area stays NaN there).
-    native_unit = _map_int_codes(field[c['area_unit']], area_unit_map) \
+    # `harmonize_area_unit` is WAVE-KEYED, so `_harmonize_wave_keyed` hands
+    # back {(wave, code): label} -- slice it to THIS wave before mapping bare
+    # codes through it.  Until 2026-09-09 this line passed the tuple-keyed
+    # dict straight to `_map_int_codes`, which maps a bare int, so EVERY
+    # lookup missed and `AreaUnit` was <NA> on 100% of the 9,727 non-GPS
+    # fields -- silently, because the column was still "present".  That
+    # contradicted `Ethiopia/_/CONTENTS.org` ("AreaUnit carries the native
+    # unit name"), which had never actually been true.  Found while wiring
+    # GH #853, whose conversion joins ON this label.  Compare the sibling
+    # `harmonize_acquire` use above, which slices correctly via a lambda.
+    _wave_area_units = {code: lab for (wave, code), lab in area_unit_map.items()
+                        if wave == t}
+    native_unit = _map_int_codes(field[c['area_unit']], _wave_area_units) \
         if c.get('area_unit') and c['area_unit'] in field.columns \
         else pd.Series(pd.NA, index=field.index, dtype='string')
     area_unit = pd.Series(pd.NA, index=field.index, dtype='string')
     area_unit = area_unit.where(area_ha.isna(), PLOT_AREA_UNIT_HA)
     area_unit = area_unit.where(area_ha.notna(), native_unit)
+
+    # GH #853: fill Area for fields with NO GPS measurement whose only area
+    # is a farmer estimate in a local unit, using the WB's shipped
+    # woreda x local-unit table.  Deliberately AFTER `area_unit` is fixed:
+    # `AreaUnit` keeps the NATIVE unit name on a converted row, which is what
+    # the canonical schema asks for ("original survey unit before conversion
+    # to hectares", lsms_library/data_info.yml plot_features.AreaUnit) and
+    # which makes `Area` non-null vs null the record of whether the woreda
+    # table could serve the row.  'hectares' therefore continues to mean
+    # exactly "this area came from the GPS measurement".
+    area_ha, _n_conv, _n_implausible = _convert_local_area_units(
+        t, field, c, area_ha, native_unit)
 
     # Irrigated: 1=Yes, 2=No.
     irr = pd.to_numeric(field[c['irrigated']], errors='coerce').astype('Int64')
@@ -945,6 +1339,271 @@ def _greg_month(series):
     """Recode the ESS local-calendar month code -> Gregorian month (1-12)."""
     n = pd.to_numeric(series, errors='coerce').astype('Int64')
     return n.map(_ETH_MONTH_TO_GREG).astype('Int64')
+
+
+# ---------------------------------------------------------------------------
+# WB-shipped crop conversion factors (GH #852)
+# ---------------------------------------------------------------------------
+#
+# Four ESS waves ship a World Bank crop x unit x region kg-conversion table.
+# It is ANALYST-CALLABLE and is NEVER stored: `crop_production.KgFactor` is
+# reserved for a per-row REPORTED factor (`lsms_library/data_info.yml`,
+# Columns.crop_production.KgFactor), and a table lookup baked into a parquet
+# would hide both the de-duplication rule below and the region decision.
+# Hand the result to `transformations.harvest_kg(cp, shipped_factors=...)`,
+# which serves it as the `shipped` layer (below `reported`, above
+# `survey_median`).
+
+#: The WB crop-conversion file shipped in each wave directory.  2011-12 (W1)
+#: has NO such file and must never be given a fabricated one.
+#:
+#: 2018-19's `Crop_CF_Wave4.dta` and 2021-22's `crop_cf_wave5.dta` are ONE
+#: BYTE-IDENTICAL BLOB under two names (md5 `299c2700...` on both sidecars) --
+#: the World Bank shipped no new factor file for ESPS-5, which is also why
+#: EPAR's W5 do-file reaches for an earlier wave's land-unit file
+#: (`EPAR_UW_Ethiopia_ESS_W5.do:324`).  The loader reads the file that ships
+#: in each wave's own directory, so the same numbers are served under BOTH
+#: `t` values.  That is deliberate: it is the factor table the WB published
+#: WITH that wave, not a borrow we performed.
+CROP_CF_FILES = {
+    '2013-14': 'Crop_CF_Wave2.dta',
+    '2015-16': 'Crop_CF_Wave3.dta',
+    '2018-19': 'Crop_CF_Wave4.dta',
+    '2021-22': 'crop_cf_wave5.dta',
+}
+
+#: The table is WIDE: one factor column per region, plus a NATIONAL column.
+#: Region codes are read off the Stata variable labels, which name them
+#: outright (measured on `Crop_CF_Wave4.dta`):
+#:   mean_cf1 TIGRAY, mean_cf2 AFAR, mean_cf3 AMHARA, mean_cf4 OROMIYA,
+#:   mean_cf6 BENISHANGUL GUMUZ, mean_cf7 SNNP, mean_cf12 GAMBELLA,
+#:   mean_cf99 "SOMALIE, DIRE DAWA, & HARAR".
+#: `99` is a POOLED cell, not a region code in the survey's `saq01` scheme.
+#: EPAR expands it into codes 5 / 13 / 15 (`W5.do:766-773`); we serve it as
+#: shipped and leave the expansion to a caller who wants it, so that what we
+#: return is what the file says.
+CROP_CF_REGION_COLUMNS = {
+    1: 'mean_cf1', 2: 'mean_cf2', 3: 'mean_cf3', 4: 'mean_cf4',
+    6: 'mean_cf6', 7: 'mean_cf7', 12: 'mean_cf12', 99: 'mean_cf99',
+}
+
+#: The national column.  It is the WB's OWN national figure, shipped in the
+#: file -- serving it is transcription, not an aggregate we computed.
+CROP_CF_NATIONAL_COLUMN = 'mean_cf_nat'
+
+#: The ONE duplicated key in the shipped tables, and the rule that resolves
+#: it.  `Crop_CF_Wave4.dta` / `crop_cf_wave5.dta` carry crop_code 74 ("ENSET
+#: ESIR MEDIUM") x unit_cd 62 TWICE, at 4.34 and 6.125.  We keep **4.34** and
+#: drop 6.125, for continuity with Wave 3 -- the same resolution EPAR reaches
+#: (`EPAR_UW_Ethiopia_ESS_W5.do:800-802`, and the commented-out block at
+#: `:345-353` that states the reason: "Based on W3 data, we have chosen to
+#: retain cf=4.34 (and drop cf=6.125) for continuity").
+#:
+#: This MUST be done here.  `transformations._shipped_factor_lookup` REFUSES
+#: an ambiguous table rather than averaging two factors or letting a
+#: `groupby().first()` pick one -- de-duplication is the loader's deliberate
+#: act (GH #852 "What it must NOT do"; `CLAUDE.md` Grain Collapse).
+CROP_CF_DUPLICATE_RULE = {'crop_code': 74, 'unit_cd': 62, 'drop_above': 5.0}
+
+
+def _crop_cf_table(t):
+    """Read ONE wave's WB crop-conversion file, decoded to canonical labels.
+
+    Returns a long frame with columns ``t``, ``j`` (crop Preferred Label),
+    ``u`` (canonical unit label), ``region`` (Int64 code) and ``KgFactor``,
+    plus a ``national`` flag row set.  Codes are decoded through the SAME
+    tables the wave's `crop_production` script uses -- `harmonize_crop` for
+    the crop code (`_eth_crop_label_map`) and `_clean_unit_label` on the
+    file's own Stata value labels for the unit -- so `j` and `u` speak the
+    frame's vocabulary rather than the WB's codes.  A vocabulary mismatch
+    here does not raise; it silently matches nothing (see
+    `transformations._shipped_factor_lookup`), which is why
+    :func:`crop_conversion_factors` reports the match rate.
+    """
+    fn = CROP_CF_FILES[t]
+    path = f'Ethiopia/{t}/Data/{fn}'
+    raw = get_dataframe(path, convert_categoricals=False)
+    lab = get_dataframe(path, convert_categoricals=True)
+
+    df = pd.DataFrame({
+        'crop_code': pd.to_numeric(raw['crop_code'], errors='coerce').astype('Int64'),
+        'unit_cd': pd.to_numeric(raw['unit_cd'], errors='coerce').astype('Int64'),
+    })
+    # The DELIBERATE de-duplication (see CROP_CF_DUPLICATE_RULE).
+    r = CROP_CF_DUPLICATE_RULE
+    nat = pd.to_numeric(raw[CROP_CF_NATIONAL_COLUMN], errors='coerce')
+    drop = ((df['crop_code'] == r['crop_code'])
+            & (df['unit_cd'] == r['unit_cd'])
+            & (nat > r['drop_above'])).fillna(False)
+    keep = ~drop.to_numpy()
+    raw = raw[keep]
+    lab = lab[keep]
+    df = df[keep]
+    # A duplicate the stated rule does NOT cover is a NEW defect, not
+    # something to absorb quietly.
+    still = df.duplicated(subset=['crop_code', 'unit_cd'], keep=False)
+    if still.any():
+        raise ValueError(
+            f"Ethiopia {t} {fn}: {int(still.sum())} row(s) remain duplicated on "
+            f"(crop_code, unit_cd) after the stated de-duplication rule "
+            f"{r}: e.g. {df[still].head().to_dict('records')}.  Resolve the new "
+            "duplicate with a stated rule here -- harvest_kg's shipped layer "
+            "refuses an ambiguous table rather than picking one.")
+
+    df['j'] = df['crop_code'].map(_eth_crop_label_map()).astype('string')
+    df['u'] = _clean_unit_label(lab['unit_cd']).values
+    df['t'] = t
+
+    wave_no = int(''.join(ch for ch in fn if ch.isdigit()))
+    df['Source'] = f'WB Crop_CF Wave {wave_no}'
+
+    pieces = []
+    national = df.copy()
+    national['region'] = pd.NA
+    national['KgFactor'] = pd.to_numeric(
+        raw[CROP_CF_NATIONAL_COLUMN], errors='coerce').values
+    national['_national'] = True
+    pieces.append(national)
+    for code, col in CROP_CF_REGION_COLUMNS.items():
+        if col not in raw.columns:
+            continue
+        piece = df.copy()
+        piece['region'] = code
+        piece['KgFactor'] = pd.to_numeric(raw[col], errors='coerce').values
+        piece['_national'] = False
+        pieces.append(piece)
+    out = pd.concat(pieces, ignore_index=True)
+    out['region'] = out['region'].astype('Int64')
+    return out
+
+
+def crop_conversion_factors(waves=None, region=False):
+    """The WB's shipped crop x unit kg factors, ready for ``harvest_kg``.
+
+    ANALYST-CALLABLE, never stored.  Pass the result straight through::
+
+        import ethiopia
+        from lsms_library.transformations import harvest_kg
+        cp = Country('Ethiopia').crop_production()
+        hk = harvest_kg(cp, shipped_factors=ethiopia.crop_conversion_factors())
+
+    Parameters
+    ----------
+    waves : str or iterable of str, optional
+        Wave ids to load.  Default: every wave that SHIPS a file, i.e.
+        :data:`CROP_CF_FILES` (2013-14, 2015-16, 2018-19, 2021-22).
+        **2011-12 has no such file and never gets one** -- naming it raises,
+        because a factor invented for W1 is exactly the fabrication GH #852
+        forbids.
+    region : bool, default False
+        ``False`` (default) returns the table keyed ``(t, j, u)`` carrying
+        the file's OWN national column (:data:`CROP_CF_NATIONAL_COLUMN`).
+        ``True`` returns it keyed ``(t, j, u, region)`` from the per-region
+        columns (:data:`CROP_CF_REGION_COLUMNS`), for a caller who has
+        resolved a lower-case ``region`` level onto ``crop_production``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed by ``(t, j, u)`` -- plus ``region`` when ``region=True`` --
+        with columns ``KgFactor`` (kg per ONE unit of ``u``, the same meaning
+        the canonical ``crop_production.KgFactor`` carries) and ``Source``.
+        The index is unique, which is what
+        ``transformations._shipped_factor_lookup`` requires.
+
+    Notes
+    -----
+    **Why national is the default.**  The shipped table is WIDE -- one factor
+    column per region PLUS ``mean_cf_nat``, the World Bank's own national
+    figure.  Serving that column is transcription; no aggregate is computed
+    and none would be acceptable (``CLAUDE.md`` -- core never aggregates, and
+    a median over regions would invent a factor the WB did not publish).
+    Region keying is offered but is not the default because
+    ``crop_production`` carries NO region level today: the framework joins
+    only ``v`` (``_join_v_from_sample``), and ``cluster_features.Region`` is
+    an un-harmonised STRING (21 spellings for 11 regions cross-wave; see
+    ``Ethiopia/_/CONTENTS.org``), not the numeric ``saq01`` code this table
+    keys on.  Measured cost of the national default (2026-09-09): of the §9
+    harvest rows the table can serve at all, the share landing on a
+    ``(j, u)`` whose factor actually VARIES by region is 10.2% (2013-14),
+    45.6% (2015-16), 38.3% (2018-19), 28.7% (2021-22) -- material, not
+    negligible.  The clean fix is upstream: ``sect9_ph`` carries ``saq01`` on
+    100% of rows in every wave, so a wave-script change could emit a native
+    ``region`` level.  That is a `crop_production` schema change and is
+    deliberately NOT done here (GH #852 is a read-time layer).
+
+    **NOT EPAR's product.**  EPAR reshapes this file, synthesises unit 52
+    from 51/53, ``fillin``s the crop x unit x region grid and then fills the
+    holes from a per-``(unit, region)`` mean across crops
+    (``EPAR_UW_Ethiopia_ESS_W5.do:776-797``, whose own comment calls that
+    last step "a rough estimate ... when the crop code is unknown").  We read
+    the RAW table rows only.  Everything EPAR adds after ``fillin`` is
+    imputation, and this loader must not launder it into a "shipped" factor.
+    """
+    if waves is None:
+        waves = list(CROP_CF_FILES)
+    elif isinstance(waves, str):
+        waves = [waves]
+    else:
+        waves = list(waves)
+
+    missing = [w for w in waves if w not in CROP_CF_FILES]
+    if missing:
+        raise ValueError(
+            f"Ethiopia ships no WB crop-conversion file for wave(s) {missing}; "
+            f"the file exists only for {sorted(CROP_CF_FILES)}.  2011-12 (ESS1) "
+            "has no Crop_CF sidecar at all and must NOT be given another wave's "
+            "factors -- that wave stays on harvest_kg's other layers (GH #852).")
+
+    frames = [_crop_cf_table(t) for t in waves]
+    out = pd.concat(frames, ignore_index=True)
+
+    out = out[out['_national']] if not region else out[~out['_national']]
+    out = out.drop(columns=['_national', 'crop_code', 'unit_cd'])
+
+    # A factor must be finite and > 0 to be a factor; and a row with no crop
+    # label or no unit label has no key.  Dropping these is not a judgement
+    # call -- an unusable value cannot serve a row either way.
+    out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce')
+    out = out[np.isfinite(out['KgFactor']) & (out['KgFactor'] > 0)]
+    out = out.dropna(subset=['j', 'u'])
+
+    idx = ['t', 'j', 'u'] + (['region'] if region else [])
+    if not region:
+        out = out.drop(columns=['region'])
+    # Two distinct WB codes can decode to the same canonical (j, u) -- an
+    # EXACT repeat is lossless and dropped; a genuine disagreement is a real
+    # ambiguity and is raised, never reduced.
+    out = out.drop_duplicates(subset=idx + ['KgFactor', 'Source'])
+    dup = out.duplicated(subset=idx, keep=False)
+    if dup.any():
+        # A DECODE collision, not a WB defect: two distinct WB crop codes
+        # carry different factors and our own `harmonize_crop` folds them
+        # onto one Preferred Label.  Measured 2026-09-09, the whole set is
+        # KALE (56) and SPINACH (69) -> 'Leafy Greens' on the Esir units:
+        # 2 rows in 2013-14 and 6 in each of 2015-16 / 2018-19 / 2021-22.
+        # We DROP those keys rather than pick or average, and say so.  The
+        # information that would resolve them is destroyed by the same
+        # decode -- a `crop_production` row reading 'Leafy Greens' no longer
+        # records whether it was kale or spinach -- so there is nothing to
+        # choose on.  Averaging would be the grain collapse `CLAUDE.md`
+        # forbids; picking one would be a `groupby().first()` with a nicer
+        # name.  The rows simply fall through to harvest_kg's other layers.
+        lost = out.loc[dup, idx].drop_duplicates()
+        warnings.warn(
+            f"Ethiopia crop_conversion_factors: DROPPED {len(lost)} key(s) "
+            f"({int(dup.sum())} rows of {len(out)}) that DISAGREE on "
+            f"{idx} after decoding -- distinct WB crop codes that "
+            "harmonize_crop folds onto one Preferred Label (KALE 56 and "
+            "SPINACH 69 -> 'Leafy Greens' is the whole known set).  Neither "
+            "factor is served: crop_production no longer records which crop "
+            "the row was, so there is nothing to choose on, and this loader "
+            "never averages two factors.  Keys: "
+            f"{sorted(map(tuple, lost.to_numpy()))[:6]}",
+            UserWarning, stacklevel=2)
+        out = out[~dup]
+    return out.set_index(idx)[['KgFactor', 'Source']].sort_index()
+
 
 
 def crop_production_for_wave(t, harvest, planting, sale, colmap,

@@ -1,0 +1,19 @@
+SOURCE
+
+https://doi.org/10.7910/DVN/ZW1LGR
+
+#+CATALOG_ID: none
+#+CATALOG_TITLE: Kenya Life Panel Survey, Round 1 (KLPS-1)
+#+CATALOG_YEARS: 2003-2005
+#+CATALOG_DOI: https://doi.org/10.7910/DVN/ZW1LGR
+#+CATALOG_URL: https://doi.org/10.7910/DVN/ZW1LGR
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_NOTE: KLPS-1: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.
+
+* Notes (preserved from the original SOURCE.org)
+Kenya Life Panel Survey Round 1 (KLPS-1), Harvard Dataverse dataset doi:10.7910/DVN/ZW1LGR version 2.1, published 2016-01-04.  Retrieved via the Dataverse API.  License as declared in the dataset metadata: CC0 1.0.  Validation: all 10 files md5-match the Dataverse originals (checked 2026-09-02 via the API checksums); on the S3 remote since 2026-04.
+
+FOLDERING: this directory is named for the 2015-12 public RELEASE, but the round's fieldwork was 2003-2005; ../2003-2005/ holds only that round's documentation and no data.  Recorded, not moved (a rename is a cache- and config-visible change).

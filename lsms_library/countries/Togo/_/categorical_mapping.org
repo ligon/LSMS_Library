@@ -477,3 +477,162 @@
 | Téléphone portable                             | Phone (Mobile)  |
 | Ventilateur sur pied                           | Fan             |
 | Voiture personnelle                            | Car             |
+
+# nonfood_expenditures item labels (EHCVM section 9, parts B-F).  s09?q01
+# 'Code Produit/Service' -> canonical `j`.  Referenced from
+# 2018/_/nonfood_expenditures.py via
+# tools.get_categorical_mapping('nonfood_items','Code','Preferred Label').
+#
+# THE CODE RANGE IS THE RECALL WINDOW.  EHCVM numbers the section-9 items
+# so that each sub-module owns a disjoint block, which is why `j` alone
+# determines the recall period and the window does not need to be an index
+# level:
+#
+#   201-217  s09b   last 7 days       17 items
+#   301-322  s09c   last 30 days      22 items
+#   401-418  s09d   last 3 months     18 items
+#   501-512  s09e   last 6 months     12 items
+#   601-653  s09f   last 12 months    53 items
+#
+# The `Preferred Label` is a concise English rendering.  The VERBATIM French
+# is the questionnaire's, not ours: see
+# 2018/Documentation/tgo_ehcvm1_qnr_household_excel_vague1.xls, sheets
+# S9b__Conso_NA .. S9f__Conso_NA (vague1 and vague2 are byte-identical over
+# section 9).  The .dta value labels carry the same text TRUNCATED at ~110
+# characters, so the instrument -- not the .dta -- is the source here.
+#
+# EVERY Preferred Label MUST BE UNIQUE.  `j` is an index level, so two items
+# sharing a label are silently pooled by the framework's collapse -- the
+# harmonize_seed_crop failure (GH #323, see the note above that table).
+# 2018/_/nonfood_expenditures.py asserts injectivity at build time.
+#
+# NOT IN THIS TABLE: s09a (Partie A, 'DEPENSES DES FETES ET CEREMONIES AU
+# COURS DES 12 DERNIERS MOIS').  It is keyed by EVENT, not by product, and
+# two of its five amount columns are food.  See _/CONTENTS.org
+# "nonfood_expenditures (EHCVM section 9)".
+
+#+NAME: nonfood_items
+| Code | Preferred Label                             |
+|------+---------------------------------------------|
+|  201 | Cigarettes and Tobacco                      |
+|  202 | Kerosene                                    |
+|  203 | Charcoal and Coal                           |
+|  204 | Firewood (Purchased)                        |
+|  205 | Firewood (Collected, Imputed)               |
+|  206 | Candles                                     |
+|  207 | Matches                                     |
+|  208 | Vehicle Fuel                                |
+|  209 | Motorcycle Fuel                             |
+|  210 | Urban Transport (Taxi)                      |
+|  211 | Urban Transport (Bus)                       |
+|  212 | Transport (Motorcycle Taxi)                 |
+|  213 | Urban Transport (Train)                     |
+|  214 | Transport (Water)                           |
+|  215 | Transport (Animal Traction)                 |
+|  216 | Newspapers                                  |
+|  217 | Grain Milling Fees                          |
+|  301 | Whisky and Other Spirits                    |
+|  302 | Wine                                        |
+|  303 | Cooking Gas                                 |
+|  304 | Generator Fuel (Domestic)                   |
+|  305 | Batteries (Dry Cells)                       |
+|  306 | Washing Soap and Detergents                 |
+|  307 | Insecticide and Mosquito Coils              |
+|  308 | Domestic Staff Wages                        |
+|  309 | Laundry and Dry Cleaning                    |
+|  310 | Refuse Collection Fees                      |
+|  311 | Vehicle Washing                             |
+|  312 | Parking Fees                                |
+|  313 | Telephone Calls (Public Phone)              |
+|  314 | Lottery and Betting Tickets                 |
+|  315 | Magazines and Periodicals                   |
+|  316 | Barber, Hairdressing and Beauty Services    |
+|  317 | Bathing Soap and Shampoo                    |
+|  318 | Tooth Paste                                 |
+|  319 | Toilet Paper                                |
+|  320 | Sanitary Pads and Nappies                   |
+|  321 | Body Lotion and Cosmetics                   |
+|  322 | Other Toiletries                            |
+|  401 | Shoe Repair and Care                        |
+|  402 | Light Bulbs                                 |
+|  403 | Lubricants                                  |
+|  404 | Vehicle Repair and Servicing                |
+|  405 | Intercity Transport (Car)                   |
+|  406 | Intercity Transport (Animal Traction)       |
+|  407 | Intercity Transport (Water)                 |
+|  408 | Postage and Money Orders                    |
+|  409 | Fax Fees                                    |
+|  410 | Gardening Products (Ornamental)             |
+|  411 | Pet Food and Veterinary Care                |
+|  412 | Sporting Event Admission                    |
+|  413 | Cinema, Concert and Museum Admission        |
+|  414 | Photography and Other Recreational Services |
+|  415 | Perfume                                     |
+|  416 | Tooth Brush                                 |
+|  417 | Contraceptives                              |
+|  418 | Photocopying Fees                           |
+|  501 | Cloth and Fabric                            |
+|  502 | Clothing (Women 15+)                        |
+|  503 | Underwear (Women 15+)                       |
+|  504 | Clothing (Children 0-14)                    |
+|  505 | Clothing (Men 15+)                          |
+|  506 | Underwear (Men 15+)                         |
+|  507 | Tailoring and Repair (Men's Clothing)       |
+|  508 | Tailoring and Repair (Women's Clothing)     |
+|  509 | Tailoring and Repair (Children's Clothing)  |
+|  510 | Footwear (Men)                              |
+|  511 | Footwear (Women)                            |
+|  512 | Footwear (Children)                         |
+|  601 | Dwelling Maintenance Materials              |
+|  602 | Dwelling Maintenance Labour                 |
+|  603 | Masonry Construction Materials              |
+|  604 | Other Construction Materials                |
+|  605 | Construction Labour                         |
+|  606 | Land or Dwelling Purchase                   |
+|  607 | Architect and Survey Fees                   |
+|  608 | Water Subscription Fees                     |
+|  609 | Electricity Subscription Fees               |
+|  610 | Water Connection Fees                       |
+|  611 | Electricity Connection Fees                 |
+|  612 | Living and Dining Room Furniture            |
+|  613 | Bedroom Furniture                           |
+|  614 | Furniture Repair                            |
+|  615 | Household Linen                             |
+|  616 | Household Appliances                        |
+|  617 | Household Appliance Repair                  |
+|  618 | Crockery and Cutlery                        |
+|  619 | Kitchen Utensils                            |
+|  620 | Other Household Utensils                    |
+|  621 | Household and Garden Tools                  |
+|  622 | Lamps and Torches                           |
+|  623 | Car Purchase                                |
+|  624 | Motorcycle or Bicycle Purchase              |
+|  625 | Vehicle Spare Parts                         |
+|  626 | Vehicle and Travel Insurance                |
+|  627 | Vehicle Road Tax                            |
+|  628 | Vehicle Rental                              |
+|  629 | Intercity Transport (Train)                 |
+|  630 | Air Transport                               |
+|  631 | Moving Costs                                |
+|  632 | Visa and Airport Taxes                      |
+|  633 | Mobile Phone Purchase                       |
+|  634 | Audio and Video Equipment                   |
+|  635 | Computers and Printers                      |
+|  636 | Electronics Repair                          |
+|  637 | Small Electronic Media and Supplies         |
+|  638 | Sports Equipment and Toys                   |
+|  639 | Books (Non-School)                          |
+|  640 | Stationery and Art Supplies                 |
+|  641 | Pilgrimage Costs                            |
+|  642 | Vocational Training                         |
+|  643 | Adult Literacy and Tutoring                 |
+|  644 | Accommodation Services                      |
+|  645 | Watches and Clocks                          |
+|  646 | Jewellery                                   |
+|  647 | Other Personal Effects                      |
+|  648 | Property Insurance                          |
+|  649 | Property and Municipal Taxes                |
+|  650 | Life Insurance                              |
+|  651 | Health Insurance                            |
+|  652 | Administrative Document Fees                |
+|  653 | Other Services                              |

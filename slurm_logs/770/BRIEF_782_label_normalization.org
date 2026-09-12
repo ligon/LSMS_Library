@@ -1,0 +1,142 @@
+#+title: BRIEF --- GH #782: canonicalise GhanaLSS's food-item axis
+#+date: [2026-09-05 Sat]
+#+author: Sue (dispatcher)
+
+Three fixes, smallest-risk first, each independently verifiable.  Read GH #782
+and BOTH its comments first --- the diagnosis is already measured there; do not
+re-derive it, but DO re-verify each number you rely on.
+
+* STEP 0 --- environment
+1. Work ONLY in =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices=.
+   Inside it: =git fetch origin development && git checkout -b fix/782-ghanalss-food-labels origin/development=;
+   confirm =git log -1= is a descendant of =30c06c56=.  *Never edit the main
+   checkout* =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=.
+2. *Another agent is working on =lsms_library/transformations.py= right now*
+   (GH #770 Step 1, in a different worktree).  You touch *config only* --
+   =countries/GhanaLSS/**= --- so there is no file overlap.  Do not edit any
+   =lsms_library/*.py=.  Note its change is NOT in your branch, so your
+   =food_prices= numbers will still show the old behaviour; that is expected and
+   irrelevant to =j=.
+3. Python: the main checkout's =.venv/bin/python=.  This is CONFIG work, so
+   : export LSMS_COUNTRIES_ROOT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-glss-prices/lsms_library/countries
+   and assert =countries_root()= points into the worktree in every session.
+   Private =LSMS_DATA_DIR= with only the shared =dvc-cache= symlinked in.
+4. Compute: 4-core shared cgroup, and another agent is running.
+   =export LSMS_MAKE_JOBS=2= (#764); never =pytest -n auto=; no pytest inside
+   the worktree (#734); scope every git command to paths (Lustre).  Never the
+   =dvc= CLI; never =bin/savio_venv.sh mount=.  GhanaLSS =food_acquired= is the
+   corpus's largest table --- a cold rebuild is expensive; burst to Slurm
+   (template =slurm_logs/matrix_full/matrix_shard.sbatch=, co_carleton /
+   savio3 / savio_lowprio, free and pre-emptible) rather than grinding the slice.
+
+* FIX 1 --- 2005-06's produced block does not decode at all (the big one)
+*Measured*: every one of 2005-06's *149,047 produced* rows carries a raw survey
+label as =j=; every one of its 966,373 purchased rows decodes correctly.
+| s         | lower-case j | rows    |
+|-----------+--------------+---------|
+| produced  | True         | 149,047 |
+| purchased | False        | 966,373 |
+61 of the 63 distinct lower-case labels appear verbatim in that wave's
+=harmonize_food= =Label_8h= / =Label_9b= columns; *0* appear as a Preferred
+Label; the table itself contains *no* lower-case Preferred Labels.
+
+*Cause*, at =2005-06/_/food_acquired.py:80=:
+: prod = get_dataframe('../Data/partb/sec8h.dta', convert_categoricals=True)
+: prod['j'] = prod['foodcd'].replace(labelsd['Code_8h'])
+=convert_categoricals=True= returns =foodcd= as a *decoded label* (='beef'=),
+while =labelsd['Code_8h']= is keyed by the *numeric code*.  Nothing matches, and
+=Series.replace()= *passes unmatched values through unchanged* --- the hazard
+=CLAUDE.md= records for =_apply_categorical_mappings=.
+
+*Fix*: decode on the label axis (=Label_8h=) or read the code without
+categorical conversion.  *Verify by CONTENT, not by shape*: confirm =foodcd='s
+dtype and a sample of its values before choosing.  The purchased side works ---
+understand why before touching it, and do not "fix" it.
+
+*Acceptance*: 2005-06 delivers *0* lower-case =j=; all 149,047 produced rows
+carry a Preferred Label; the delivered =j= set for that wave is a subset of its
+=harmonize_food= Preferred Labels; row count unchanged (149,047).
+
+* FIX 2 --- seven cross-wave Preferred Label drifts
+All 7 waves have a =harmonize_food=; union 241 labels; each wave internally
+clean; but 7 labels differ in spelling *between* waves:
+: ['Condiment','Condiments'] ['Egg','Eggs'] ['Other Beverage','Other Beverages']
+: ['Other Flour','Other Flours'] ['Other Grain','Other Grains']
+: ['Other Vegetable','Other Vegetables'] ['Tea bag','Tea bags']
+Invisible to any per-wave check --- it exists only in the assembled frame.
+
+*Authority*: the country-level =GhanaLSS/_/food_items.org= =#+name: food_label=
+already carries a Preferred Label per item *plus a column per wave*.  Use it to
+choose the canonical form (e.g. it gives plain =Tea=, which NEITHER wave emits).
+Where it is silent, choose and *say why in the commit message*.
+
+*This changes delivered data.*  Produce a before/after census: rows per affected
+label per wave, and confirm the total row count is unchanged (a rename must not
+add or drop rows).
+
+* FIX 3 --- one vocabulary, not two
+=harmonize_price_item= carries its OWN =Preferred Label= column, parallel to
+=harmonize_food='s.  They agree today --- every food-flagged price item lands on
+the =harmonize_food= axis, measured --- but *nothing enforces it*: there is no
+test, so an edit to one drifts from the other silently.
+
+EL's direction: /"the food prices in community_prices should be getting
+'Preferred' values from these [the wave-level harmonize_food], and Preferred
+values should be consistent across waves"/ and /"this procedure is really no
+different than it is for food_quantities, let's not reinvent the wheel."/
+
+Prefer *deriving* over duplicating.  If deriving is genuinely impractical
+(price items include ~400 non-foods in 2016-17 that =harmonize_food= must not
+gain), then at minimum add the *enforcing test* --- food-flagged price-item
+Preferred Labels must be a subset of that wave's =harmonize_food= Preferred
+Labels --- and say in the PR why derivation was rejected.
+
+* THE GUARD (do not skip --- this is what stops recurrence)
+Add a *subset assertion on =j== against the country vocabulary, so an unmatched
+decode fails loudly instead of shipping raw labels for years.  The library
+already does exactly this for 8 columns via =spellings= +
+=_enforce_canonical_spellings= (=Sex=, =Tenure=, =Region=, =Affinity=,
+=Distance=, =Rural=, =TenureSystem=); *=j= declares none*.
+=lsms_library/data_info.yml= is on the stop-list, so if the right home is a
+=spellings= block there, *STOP and report* with a concrete proposal rather than
+editing it.  A GhanaLSS-scoped test is acceptable as the first increment.
+
+* Verification you must RUN and paste
+1. Per wave: distinct =j=, rows, and =0= lower-case labels anywhere.
+2. Cross-wave collision census: the 35 groups reported in #782 must fall to *0*;
+   show the before/after count with the same casefold+singularise key.
+3. Total =food_acquired= row count unchanged: *5,259,344* (a relabel moves rows
+   between labels, never creates or destroys them).  If it changes, STOP.
+4. =Country('GhanaLSS').food_acquired()= builds; =food_expenditures= and
+   =food_quantities= build; =Feature('food_acquired')(['GhanaLSS'])= assembles.
+5. The price-item subset assertion passes for all 6 price waves.
+6. From the MAIN checkout root:
+   =.venv/bin/python -m pytest tests/test_schema_consistency.py tests/test_ghanalss_community_prices.py -q -k GhanaLSS=
+   plus your new tests.
+7. *Cache*: editing wave =_/*.org= moves =Wave._input_hash= --- GhanaLSS tables
+   will rebuild.  Expected; say so.  Note #780: GhanaLSS's =fwimp= is silently
+   empty, so do not read a stable hash as proof of anything.
+
+* Ownership / stop-list
+You OWN: =countries/GhanaLSS/{wave}/_/{categorical_mapping.org,food_acquired.py,community_prices.py}=,
+=countries/GhanaLSS/_/{food_items.org,CONTENTS.org}=, new tests under =tests/=,
+=slurm_logs/=.
+OUT OF SCOPE --- STOP and report: any =lsms_library/*.py= (another agent is in
+=transformations.py=), =lsms_library/data_info.yml=, other countries,
+=.coder/coverage/*=, =make matrix=, lockfiles, =.dvc= sidecars, weakening any
+test, any file in the MAIN checkout.
+
+* Commit / PR
+One commit per fix, so they can be reverted independently.  Trailer on every
+commit:
+: Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+: Claude-Session: https://claude.ai/code/session_01L7BubFPG6N3DXJLy3CkYyU
+PR against =development=, body ending with
+"🤖 Generated with [Claude Code](https://claude.com/claude-code)".
+"Closes #782" only if all three fixes AND the guard land.
+
+* Report format
+=SCOPE DEVIATIONS= first.  Then commit SHAs + branch + PR URL; every
+verification number; the before/after collision census; what you chose as
+canonical for each of the 7 drifts and why; whether you derived or tested for
+FIX 3 and why; surprises / contradictions with CONTENTS.org quoted; worktree path.

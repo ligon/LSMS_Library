@@ -1,0 +1,379 @@
+#+title: EPAR x LSMS_Library -- Ethiopia (ESS)
+#+date: 2026-09-09
+
+Sources cited: =LSMS-Agricultural-Indicators-Code= @ =abfbdc9301242527b7543606aad1ad6eed2e6530=
+(EPAR_UW_Ethiopia_ESS_W{1..5}.do, per-wave readme.md/README.md, Panel Key/hhid_panel_key.dta);
+=Household-Consumption-Data= @ =0e9ccf2981e7cb8448605925a5111d2835bf1e31=
+(EthiopiaW{3,4,5}_Food Consumption by source.do); =358_Estimating-Crop-Yields= @
+=bd742b4db82e8c6a021056621708b386f15774c1= (noted, not dived into -- see "What I did
+not read"). All paths below are relative to
+=/global/scratch/fsa/fc_jevons/ligon/reference/epar/= unless marked =lsms_library/=.
+
+* Idiosyncrasies cross-referenced from CONTENTS.org before opening EPAR (per instructions)
+
+Read =lsms_library/countries/Ethiopia/_/CONTENTS.org= in full (1,452 lines), LOGBOOK/
+WAITING/TODO included. Idiosyncrasies carried into this review:
+
+- #820 (open): =crop_production= reads ESS Section 11 (field crops) only; Section 12
+  (tree/fruit/vegetable/root) is unwired and has *more* sale records than §11
+  (CONTENTS.org:1341-1365).
+- W1 (2011-12) universe is rural + small town only; ESS1/ESS2/ESS3 are "Panel I", ESS4/
+  ESS5 are a *new, unlinked* "Panel II" (catalog 3823 =series_info=, CONTENTS.org:797-806).
+- =sample().Rural= is not comparable across waves -- ESS1's "Urban" means small-town
+  only, ESS2+ means any urban area (CONTENTS.org:441-465).
+- GH #323 site 2: the =(t,v)= EA-cluster key is non-unique in four of five Ethiopia waves
+  even after the #628 fix; W1 373/3,969 rows destroyed, W2 454/5,262, W3 732/4,954, W5
+  1,240/4,959 (a quarter of the wave); W4 is the only clean one (CONTENTS.org:1406-1417).
+  This is open issue #837 corpus-wide.
+- Household geovariables use FOUR different column spellings across five waves
+  (=LAT_DD_MOD= / =lat_dd_mod= / =lat_mod=), and W5 drops the EA key entirely
+  (CONTENTS.org:956-1031).
+- W4/W5 sample redesign: ESS4 is a brand-new panel (not a Panel-I follow-up); ESS5
+  (ESPS-5) additionally excludes Tigray from the *represented population*, not just from
+  fieldwork (CONTENTS.org:797-745, 690-745).
+- The household-id VARIABLE changes across waves (=household_id= W1/W4/W5,
+  =household_id2= W2/W3), and =_/food_acquired.py= lacked the =id_walk= that
+  =_/crop_production.py= has until GH #819 landed on =development= 2026-09-08 --
+  W2/W3 =food_acquired= served =v=NaN= on ~67-69% of rows before the fix
+  (CONTENTS.org:1367-1404).
+- Panel-key question: our =panel_ids=/=id_walk= chains =household_id2= (W2/W3) back to
+  the W1 baseline =household_id=; whether EPAR's own =hhid_panel_key.dta= is the same
+  crosswalk is checked below.
+- Livestock =SalesValue= is a sales-transaction total, NOT a herd value and NOT a
+  per-animal price -- ESS asks no herd-value question in any wave (CONTENTS.org:1277-1302).
+- The ESS instrument asks NO value of own-consumption anywhere (household module Q4 is
+  purchase-only; agriculture §11/§12 Q10a ask quantity, not value) -- confirmed
+  deliberate, not a gap (CONTENTS.org:1311-1339).
+- =cluster_features.District= is a bare 1-2 digit code, not usable without namespacing by
+  Region; =cluster_features.Region= carries 21 spellings for 11 regions and is NOT run
+  through =categorical_mapping.org= (unlike =sample().strata=) (CONTENTS.org:1418-1430).
+- Area: GPS m^2/10000 -> hectares where present; where only a local-unit farmer estimate
+  exists, "the local-unit->hectare factors are NOT in the repo -- so Area is NaN"
+  (CONTENTS.org:1033-1040). **This claim is checked and found false as stated -- see
+  Contradictions section.**
+
+* Coverage (their waves vs ours; what they build for this scope)
+
+| Wave (ESS round) | We hold it? | EPAR do-file | EPAR readme |
+|-------------------+-------------+---------------------------------+---------------|
+| 2011-12 (ERSS/W1) | yes         | EPAR_UW_Ethiopia_ESS_W1.do (7,527 ln) | README.md (396 ln) |
+| 2013-14 (W2)      | yes         | EPAR_UW_Ethiopia_ESS_W2.do       | readme.md (366 ln) |
+| 2015-16 (W3)      | yes         | EPAR_UW_Ethiopia_ESS_W3.do       | readme.md (345 ln) |
+| 2018-19 (W4)      | yes         | EPAR_UW_Ethiopia_ESS_W4.do       | readme.md (366 ln) |
+| 2021-22 (W5/ESPS-5) | yes       | EPAR_UW_Ethiopia_ESS_W5.do       | readme.md (372 ln) |
+
+Same five waves both sides -- no coverage gap either direction for ESS proper.
+=EthiopiaRHS= (Ethiopia Rural Household Survey, a separate non-WB series we also carry,
+#468/#458/#737) has no EPAR counterpart at all -- out of scope for EPAR, which only
+covers the WB-catalogued ESS.
+
+EPAR additionally ships Ethiopia in two adjacent projects we should note but did not
+build against: =Household-Consumption-Data/EthiopiaW{3,4,5}_Food Consumption by
+source.do= (own-production/purchase/gift consumption valuation, W1/W2 absent -- see
+below) and =358_Estimating-Crop-Yields= (Ethiopia W2/W3 only, a 2017 sensitivity study on
+crop-yield construction choices -- not opened, see "What I did not read").
+
+** Panel Key (=Panel Key/hhid_panel_key.dta=)
+
+Metadata-only read (pyreadstat, =metadataonly=True=): 2 columns, 3,776 rows, no value
+labels. =household_id= (label "Unique HH ID in wave 1", 14 chars, all rows) ->
+=household_id2= (label "Unique HH ID in wave 2", 18 chars, all rows). This is a
+**W1<->W2 crosswalk only** (exactly the 3,776 panel households out of W2's 5,262 --
+matches "3,776 panel households and 1,486 new households" in ESS2 DDI, quoted at
+CONTENTS.org:786-789). It does *not* chain W3/W4/W5.
+
+Only =EPAR_UW_Ethiopia_ESS_W1.do= reads it, at lines 217, 330, 442, 508 (four
+=merge m:1 household_id using .../hhid_panel_key.dta, keep(1 3) nogen= calls), each with
+the comment "this file does not exist in the WB W1 download. EPAR created it to track
+panel households in the first three waves." So the file's OWN purpose is to attach
+W1 rows with a forward-looking W2 id for users who want to link W1 outputs into
+Panel I -- it does not implement W2->W3 or W1->W3 chaining anywhere in the do-files
+(the other four waves' =hhid_panel= is just =gen hhid_panel = hhid=, i.e. a same-wave
+alias, not a cross-wave key: W1 lines 6006/6120/6359, W2 6244/6341/6574, W3 5705/5810/
+6049, W4 5578/5675/5907, W5 6028/6124/6358).
+
+This is structurally the SAME crosswalk our =panel_ids=/=id_walk= chain relies on
+(=household_id2= (W2/W3) -> W1 baseline =household_id=, CONTENTS.org:391-401,
+926-941). EPAR's key is a strict subset of what we need (W1<->W2 only; we additionally
+carry W3's =household_id2= reuse of the W2 scheme and reconstruct the W4/W5 discontinuity
+as a genuinely new panel). Not a discrepancy -- corroboration that the id discontinuities
+we document are real and EPAR hit the same wall (hence shipping a bespoke key rather than
+trusting the WB files alone).
+
+* KNOWN ISSUES register (three-cell table)
+
+** Cell 1: EPAR found it AND we did
+
+| # | Issue | EPAR evidence | Our evidence |
+|---+-------+----------------+---------------|
+| 1a | Urban households oversampled; must use weights; ~40 households surveyed in PP+Livestock but not PH/Household | W1 readme "Household IDs" Known Issues, README.md:41 (verbatim reused at W4/W5 readme.md:41, unedited) | Open issue #660 "Ethiopia — 120 / 40 households appear in the agriculture files but not the cover page" (open_issues.tsv:82). Same phenomenon (agriculture-only households), though our issue records two counts (120 and 40) across what are presumably different waves/files -- EPAR's number (40) matches only one side of ours. Not independently re-derived here; flagged as corroboration, not full reconciliation. |
+| 1b | Strata/region identifiers are not comparable across waves | W1 readme "Household Size" Known Issues: "Strata ID are not consistent across waves due to sampling... cannot be used to identify the same geographic location across waves" (README.md:65) | CONTENTS.org:1418-1430 "cluster_features District is not a district... Region carries 21 distinct strings for 11 regions"; CONTENTS.org:441-465 "sample().Rural is not comparable across waves" |
+| 1c | The GEA/EA-cluster key collides across households in some waves | Not stated as a *known issue* in any readme (EPAR never merges on a bare EA key for cross-sectional geography the way our old config did), but EPAR's own cover-page-first, hhid-first merge strategy throughout (e.g. Crop Values sub-section, W3 do:1029, merges weights on the full =ea hhid kebele woreda rural zone region= tuple, not =ea= alone, with the comment "hhid is not unique so merged with other variables") is consistent with an EA key that is not reliably unique -- exactly our #323 site-2 finding | CONTENTS.org:1406-1417 (GH #323 site 2 residual, #837); measured DESTROYED rows per wave in "Idiosyncrasies" above |
+
+** Cell 2: EPAR found it (or built past it) AND we did not
+
+| # | Issue | EPAR construction | Status on our side |
+|---+-------+--------------------+---------------------|
+| 2a | Own-production / gift consumption VALUE, which the ESS instrument does not ask | =Household-Consumption-Data/EthiopiaW5_Food Consumption by source.do:334-467=: derives a per-kg =price_unit= from the household's OWN purchase rows (=food_purch_value/food_purch_qty=), then imputes it onto produced/gift rows of the same item+unit via a geography ladder EA -> kebele -> subcity -> woreda -> zone -> region -> country, each level gated at =obs > 10=, most-local-with-enough-obs wins (lines 429-467, one =merge=/=replace= pair per level). This is IMPUTED, tagged accordingly. | We correctly document the instrument asks no such value (CONTENTS.org:1311-1339) and =food_prices(units='unitprice')= returns an empty frame for Ethiopia by design. We do not attempt this imputation anywhere. See Ranked Learning #1. |
+| 2b | Local-unit-to-hectare plot-area conversion, for fields reported in Timad/Kert/Boy/etc. rather than measured by GPS | Two layers: (i) a WB-shipped conversion file =ET_local_area_unit_conversion.dta= keyed on =region zone woreda local_unit= (=EPAR_UW_Ethiopia_ESS_W3.do:892-894=); (ii) where that lookup misses, a GPS-area/local-unit-size MEDIAN RATIO computed from other plots in the same zone/region/country (=EPAR_UW_Ethiopia_ESS_W3.do:846-899=, obs>=10 gate applied at zone then region, unconditional at country, lines 899-901). Both are IMPUTED. | CONTENTS.org:1033-1040 says Area is left NaN for local-unit-only fields "because the local-unit->hectare factors are NOT in the repo." **We hold the same file EPAR reads** (=ET_local_area_unit_conversion.dta.dvc= in 2011-12/2013-14/2015-16/2018-19 -- not 2021-22) but no =.py= under =lsms_library/countries/Ethiopia= reads it (`grep -rl` returns nothing). See Contradictions section -- this is a documentation error in CONTENTS.org, not a data gap. |
+| 2c | Crop-specific, region-specific harvest unit-to-kg conversion factors (=Crop_CF_Wave{N}.dta=, distinct from the food-consumption =Food_CF_Wave{N}.dta=) | Read and merged on =(crop_code, unit, region)= throughout ALL PLOTS / GROSS CROP REVENUE, e.g. =EPAR_UW_Ethiopia_ESS_W3.do:1047,1058,1091,1315=; hand-patched fallbacks for local containers not in the file (=conversion=25/50/100= for small/medium/large madaberias, W3:1094-1096) | =harvest_kg= (=transformations.py=) infers a factor from *reported* KgFactor -> survey-median of reported (u, condition) pairs (N>=5) -> none; it never reads =Crop_CF_Wave*.dta=. We hold the DVC sidecar for W2/W3/W4/W5 (=Crop_CF_Wave{2,3,4}.dta.dvc=, =crop_cf_wave5.dta.dvc=) but no Ethiopia =.py= references "Crop_CF" or "crop_cf" anywhere (`grep -rl` empty). See Ranked Learning #2. |
+| 2d | Household-own reported unit price is preferred over any geography-median price | =EPAR_UW_Ethiopia_ESS_W3.do:1063-1066=: "Household price/unit is preferred" -- =price_unit_hh= (the household's own EA-level-collapsed median, actually the =hhid= group) overrides the geography ladder wherever it exists, and the ladder is the fallback only. | =transformations.py:2885-2891= (=median_price_valuation= docstring) explicitly REJECTS this design: "Why a ladder of medians rather than each household's own price? ... to value all output... at a common local market price... regardless of how much each happened to sell." This is a considered, documented difference in valuation philosophy, not an oversight -- flagged for completeness, not as a defect either way. |
+| 2e | Constructed/imputed livestock herd VALUE (=value_today=), where the survey asks no herd-value question | =EPAR_UW_Ethiopia_ESS_W3.do:2508-2525=: a per-animal median sale price (imputed via the SAME kebele->woreda->zone->region->country, obs>9 ladder used for crops, using =sect8_1/8_2_ls_w3= transaction rows) multiplied by the constructed current stock (=number_today=, itself reconciled from a birth/death/sale inventory identity then overridden by the survey's own "how many owned today" question, =EPAR_UW_Ethiopia_ESS_W3.do:2447=). Both the price and (partially) the stock are IMPUTED / AGGREGATED. | CONTENTS.org:1277-1302 is explicit that Ethiopia's =livestock= carries only =SalesValue= (a transaction total) and deliberately has no =HerdValue= because the instrument never asks a current-value question. We do not synthesize one. |
+| 2f | ESS4 -> ESS5 weight discontinuity flagged by EPAR itself, unresolved by EPAR | W5 readme "Weights" Known Issues: "Note that the household weights differ substantially between wave 4 and wave 5." (readme.md:47) | CONTENTS.org:865-883 raises exactly this as an open question from the OTHER direction: the ESPS-5 catalog record states "separate cross-sectional and longitudinal weights were calculated," but our config reads only =pw_w5= into both =weight= and =panel_weight=; "if a longitudinal weight ships in the 2021-22 data and the config is reading only =pw_w5=, then =panel_weight= for that wave is wrong." EPAR's observed symptom (large W4->W5 weight difference) is consistent with, but does not by itself confirm, our hypothesized mechanism. Neither side has resolved it. Candidate new issue -- see below. |
+
+** Cell 3: We found it AND EPAR did not (or did not say so)
+
+| # | Issue | Our evidence | EPAR's readme says |
+|---+-------+---------------+----------------------|
+| 3a | §12 tree/fruit/root crop sales silently drop out of GROSS CROP REVENUE in W4/W5, after being wired in W1-W3 | CONTENTS.org #820 (open, our discovery, this session's code read below); measured on W3: 57 crop codes in wired §11 vs 59 in unwired... wait, see below -- restated precisely in "Construction decisions" | W1 readme "Gross Crop Revenue" Known Issues: "None" (README.md:114). W2/W3/**W4**/**W5** readme.md: "None" at the identical section (readme.md:114/114/108/113 respectively) in every wave. **This is exactly the brief's cautionary pattern**: EPAR's own do-file code changed (see Construction Decisions #1) between W3 and W4 -- §12 (=sect12_ph_w{1,2,3}.dta=) is APPENDED into the sales-value construction in W1/W2/W3 (=EPAR_UW_Ethiopia_ESS_W{1,2,3}.do=, GROSS CROP REVENUE section) and is ABSENT from the same section in W4/W5 -- with no readme update anywhere marking the change or its consequence. |
+| 3b | =conversion_to_kgs.json= (food unit->kg factors) was built from Food_CF_Wave1-4 only and has never been regenerated to include Wave 5 (2021-22), despite the country now shipping 5 waves | git log on the file shows exactly one commit ("Great rearrangement", 9dddd806); the tangled build script in CONTENTS.org:153-156 lists only =Food_CF_Wave{1,2,3,4}.dta= | Not an EPAR finding -- purely ours. Noted here because it directly contradicts CONTENTS.org's own later claim (line 280-281) that the file is "built from wave-specific Food_CF_Wave{1..5}.dta files (present for all five waves 2011-12 through 2021-22)." See Contradictions. |
+| 3c | =_/food_acquired.py='s missing =id_walk= (fixed #819, 2026-09-08) leaving W2/W3 =v= null on ~67-69% of =food_acquired= rows | CONTENTS.org:1367-1404, fixed the day before this survey | Not mentioned in any EPAR readme -- EPAR does not join a cluster/EA identifier onto its food-consumption-by-source output the way our =v=-join does, so the defect class does not arise for them (they key everything on =hhid= plus the region/zone/woreda/kebele/ea columns carried on the SAME source row, never re-derived from a separate =sample=-like table). |
+
+* Construction decisions by feature area (tagged reported/imputed/aggregated)
+
+** 1. ALL PLOTS / crop values -- price-per-kg methodology, and the §11/§12 split (#820)
+
+*Harvest quantity* (=quant_harv_kg=, feeds =all_fields.dta=): built from §9 post-harvest
+(=sect9_ph_w{N}=, "PLOT AREAS"/"Plot variables" sub-section) ONLY, in every EPAR wave --
+=EPAR_UW_Ethiopia_ESS_W3.do:1073-1078= ("* GENERATE QUANT_HARV_KG, VALUE_HARVEST").
+**Tagged: reported** quantity (=qty_harv = ph_s9q04_a=), with a farmer-estimate
+fallback (=kg_est = ph_s9q05=, line 1078) when the primary field is blank -- **imputed**
+in the narrow sense of substituting one reported field for another.
+=lsms_library/countries/Ethiopia/2015-16/_/crop_production.py:20-38= (this repo) shows the
+identical restriction: only =sect9_ph_w3.dta= is read for harvest; §12 is never touched.
+**So on the HARVEST QUANTITY axis, EPAR has exactly our #820 limitation** -- §12 tree/
+fruit/root crops never enter =all_plots.dta='s =value_harvest= via a harvest quantity at
+all.
+
+*Sale value / crop-value MEDIAN PRICE LADDER* (the "Crop Values" sub-section under ALL
+PLOTS, used to impute =value_harvest= where a household reports no sale):
+=EPAR_UW_Ethiopia_ESS_W3.do:997-1067=. Here EPAR DOES append §12
+(=sect12_ph_w3.dta=, tagged =permcrop=1=) to §11 (=sect11_ph_w3.dta=, =permcrop=0=)
+before computing price medians (lines 999-1023). **Tagged: imputed** -- a ladder of
+medians, EA -> kebele -> woreda -> zone -> region -> country (the =foreach i in region
+zone woreda kebele ea hhid= loop, lines 1039-1046, and the country fallback, lines
+1048-1052), each gated at >9 observations at the *unit* level first (=price_unit=) and
+then again after currency-normalizing to per-kg (=price_kg=, lines 1055-1073); the
+household's own price is preferred over the ladder (Cell 2d above). This ladder
+methodology is architecturally identical to our =median_price_valuation=
+(=transformations.py:2847=), independently converging on the same >=10-observation
+threshold and finest-cell-first cascade -- see Ranked Learning #2/#3.
+
+** 2. GROSS CROP REVENUE -- the W3->W4 regression (Cell 3a, detailed)
+
+W1/W2/W3 (=EPAR_UW_Ethiopia_ESS_W{1,2,3}.do=, "GROSS CROP REVENUE" banner): builds
+=cropsales_value.dta= by taking §11 field-crop sales (=sect11_ph_w{N}=, tagged
+=permcrop=0=) and APPENDING §12 tree/perm-crop sales (=sect12_ph_w{N}=, tagged
+=permcrop=1=) -- W1:1258-1283, W2:1259-1283, W3:1296-1315. Then =value_harvest= (from
+=all_plots.dta=, §9-only) is topped up: "replace value_harvest = sales_value if
+sales_value>value_harvest" (W3:1319) -- so for a §12-only tree crop (never in
+=all_plots.dta= since §9 excludes it), =value_crop_production= for that crop code
+collapses to exactly its SALES value, not a full harvest valuation. **Tagged:
+aggregated + imputed** (the substitution rule is itself an imputation choice).
+
+W4/W5 (=EPAR_UW_Ethiopia_ESS_W{4,5}.do=, same banner): builds =cropsales_value.dta= from
+§11 ONLY -- W4:1019-1035, W5 near-identical (=EPAR_UW_Ethiopia_ESS_W5.do=, "GROSS CROP
+REVENUE" section, no =sect12= reference anywhere in it). No =permcrop= flag, no
+=append=. Every readme (all five waves) reports "None" under this section's Known
+Issues (see Cell 3a table). Confirmed no incidental sect12 use elsewhere in the W4/W5
+revenue path via `grep -n "sect12" EPAR_UW_Ethiopia_ESS_W{4,5}.do`: sect12 appears only
+in unrelated women's-decision-making sections (W4:3689 =SALES DECISION-MAKERS - PERM
+SALES=, itself commented out with "/* no section on perm crops... include in previous
+section */", W4:3705).
+
+** 3. Household food consumption by source -- own-production/gift valuation (2b/2e above)
+
+=Household-Consumption-Data/EthiopiaW5_Food Consumption by source.do= (Ethiopia W3/W4/W5
+only -- no W1/W2 file in this EPAR repo). **Tagged: imputed.** Full ladder at lines
+334-467: self-derived unit price from purchase rows (=price_unit=
+=food_purch_value/food_purch_qty=, line 335) -> EA/kebele/subcity/woreda/zone/region/
+country medians (obs>10 at every level) -> applied to produced (=food_prod_qty=) and
+gift (=food_gift_qty=) rows of the SAME item+unit. The household's own transactions are
+not preferred here (contrast with Cell 2d's crop-value ladder in the SAME author's
+other do-file family) -- worth noting as an internal EPAR inconsistency, not something
+to import either way.
+
+** 4. TLU / livestock (2e above, restated with coefficients)
+
+Coefficients hard-coded at =EPAR_UW_Ethiopia_ESS_W3.do:2422-2428=: 0.5 (livestock codes
+1-6, cattle/large ruminants), 0.1 (7-12, small ruminants), 0.7 (13-15), 0.01 (16-19,
+poultry), 0.5 (20), 0.6 (21), 0.3 (22). **Tagged: reported** headcount (=number_today=
+is overridden by the direct "how many owned today" question =ls_sec_8_1q01= wherever
+matched, line 2447 -- the birth/death/sale inventory identity computed just before it,
+lines 2436-2440, is discarded whenever the direct question answers). We do not carry an
+Ethiopia-specific TLU coefficient table in scope for this pass (out of scope: only
+#737 flags a TLU-scale mismatch, and that is for =EthiopiaRHS=, a different survey, not
+ESS). Not cross-checked against our corpus-wide =_TLU_FACTORS= here -- flagged as an
+un-investigated comparison, see "What I did not read."
+
+** 5. PLOT AREAS -- GPS vs self-report, and the local-unit ladder (2b above, restated)
+
+=EPAR_UW_Ethiopia_ESS_W3.do:836-899=. **Tagged: reported** (GPS area, =pp_s3q05_a=,
+preferred when present and >10 m^2, line 840) with a THREE-LAYER **imputed** fallback for
+local-unit-only fields: (i) direct file lookup =ET_local_area_unit_conversion.dta= keyed
+=(region, zone, woreda, local_unit)= (line 892); (ii) a zone-level GPS/local-unit MEDIAN
+ratio, gated at >=10 obs (line 896); (iii) region-level, then unconditional country-level,
+medians (lines 897-899). This is the SAME cascading-median-with-obs-gate pattern as the
+crop-price and livestock-price ladders (##1, 2e) -- EPAR applies one general technique
+across crops, livestock and area. We hold the WB source file for this
+(=ET_local_area_unit_conversion.dta.dvc=, W1-W4) but wire none of the three layers;
+=Area=/=AreaUnit= is left =NaN=/native-unit for local-unit-only fields by design
+(item-level-reported-only rule, CONTENTS.org:1033-1040).
+
+** 6. CROP EXPENSES / FARM LABOR -- not dived into beyond banners
+
+Banners confirm structure (§3 =pp= hired/family labor, §10 =ph= hired labor, appended by
+=season= tag) but the labor-days and wage constructions were not read line-by-line this
+pass -- see "What I did not read." Winsorization (globals =wins_lower_thres 1= /
+=wins_upper_thres 99=, every wave's "THRESHOLDS FOR WINSORIZATION" banner, e.g.
+=EPAR_UW_Ethiopia_ESS_W3.do:104-106=) is applied broadly across EPAR's household/
+individual/field-level compressed variable files (e.g. "Household Variables" /
+"Rate of Fertilizer Application" readme sections). We do none: "No winsorization
+anywhere" is stated library design (BRIEF.md crib). Flagged as a standing philosophical
+difference, not reconciled here.
+
+** 7. Population re-weighting -- a third weighting philosophy
+
+Every EPAR readme's "Globals" section documents rescaling survey weights to TRUE
+national rural/urban population totals (=Ethiopia_ESS_W{N}_pop_tot/pop_rur/pop_urb=,
+World Bank WDI, e.g. =EthiopiaW5_Food Consumption by source.do:65-68=), producing
+=weight_pop_tot= / =weight_pop_rururb= used as the analytic weight throughout (e.g. the
+crop-price ladder's =[aw=weight_pop_rururb]=, =EPAR_UW_Ethiopia_ESS_W3.do:1040=).
+**Tagged: imputed** (a rescaling, not a survey-reported value). This is a THIRD weighting
+convention distinct from both the raw survey weight and our own within-wave-mean-1
+normalisation (=_normalise_sample_weights=, library design doc). Not reconciled here --
+noted as a difference in what "weight" means when comparing any statistic EPAR publishes
+against ours.
+
+* Ranked learnings (what we could take, why, what it would touch, and the risk)
+
+1. **Apply =median_price_valuation= to Ethiopia =food_acquired= for produced/gift rows,
+   as an opt-in derived call -- do not store it.** EPAR's own-consumption valuation
+   ladder (Construction #3) is architecturally identical to the WB ladder our
+   =median_price_valuation= (=transformations.py:2847=) already implements for crops.
+   Since the ESS instrument asks no own-consumption value (confirmed, CONTENTS.org:1311-
+   1339), any such number is unavoidably imputed -- but a user who wants a WB-style
+   food-consumption-value comparable to EPAR's own output currently has no path to one
+   at all (=food_prices(units='unitprice')= returns empty by design). *What it would
+   touch*: nothing in the data layer -- a new call site in =transformations.py= wiring
+   =food_acquired='s purchased-row implied unit price as the price basis, with
+   =geo_levels= from =cluster_features=. *Risk*: our =cluster_features.Region=/
+   =District= are documented as broken/unharmonized for Ethiopia (CONTENTS.org:1418-
+   1430) -- EPAR's ladder uses kebele/woreda/zone/subcity, finer levels we do not
+   reliably expose. The transform would degrade to a coarser (region/country) ladder
+   than EPAR's, and that degradation should be stated up front, not discovered later.
+
+2. **Wire =Crop_CF_Wave{2,3,4,5}.dta= into =harvest_kg= as an additional layer, ahead of
+   or alongside the survey-median inference.** We hold the DVC sidecar for four of five
+   waves and read none of them (Cell 2c). EPAR's file is crop x unit x region -- exactly
+   the granularity our own median-based inference tries to approximate FROM THE SURVEY
+   DATA ITSELF (same country-wave). A WB-shipped, externally-sourced conversion factor
+   is a genuinely different (and plausibly better-grounded) source than an in-sample
+   median, and =harvest_kg='s layered design (reported -> survey-median -> library-
+   inferred -> none) already has a slot shape for one more layer. *What it would touch*:
+   =transformations.py:harvest_kg= layer order; needs a decision on where the new layer
+   ranks relative to "reported" and "survey_median." *Risk*: W5's own do-file records a
+   DUPLICATE-observation defect in =Crop_CF_Wave5.dta= itself (crop_code=74, unit_cd=62,
+   two conflicting factors 4.34 and 6.125, EPAR picked 4.34 "for continuity" with W3,
+   =EPAR_UW_Ethiopia_ESS_W5.do:349=) -- any wiring must de-duplicate deliberately, not by
+   an unexamined =.median()= (which would average the two into a fabricated ~5.23,
+   different from EITHER historical value).
+
+3. **The finest-cell-first, obs>=10-gated median ladder is validated by independent
+   convergence, worth citing as prior art in our own docstring.** Three separate EPAR
+   constructions (crop sale price, ##1; livestock sale price, #4; food-consumption
+   price, #3) and our own =median_price_valuation= all independently arrived at the
+   same ladder shape and the same ">=10 observations" threshold. That is evidence the
+   threshold is not an arbitrary choice on either side. *What it would touch*: a
+   one-line addition to the =median_price_valuation= docstring noting the convergence
+   (do not import EPAR's household-own-price-preference variant, #2d -- that is a
+   documented, deliberate divergence, not something either side got wrong).
+
+4. **Investigate the ESS4->ESS5 weight discontinuity EPAR flagged (readme.md:47,
+   Cell 2f) against our own open question (CONTENTS.org:865-883).** Neither side has
+   opened the actual =.dta= release to check whether a genuine longitudinal weight
+   column exists in the W5 (2021-22) release under a name our config does not read.
+   *What it would touch*: =Ethiopia/2021-22/_/data_info.yml= (the =sample= wave config),
+   if a real =panel_weight= column exists. *Risk*: low to check (a metadata-only read of
+   =sect_cover_hh_w5.dta=), but changing =panel_weight= for a live wave changes every
+   downstream weighted statistic for 2021-22 -- needs a full before/after comparison, not
+   a silent swap.
+
+5. **Do NOT adopt EPAR's winsorization or population-rescaled weighting.** Both are
+   real, defensible EPAR choices (Construction ##6-7) but contradict explicit library
+   design decisions (no winsorization anywhere; weights normalised to within-wave mean 1,
+   not to external population totals). Recorded here only so a future reader does not
+   rediscover the difference and mistake it for an oversight.
+
+* Contradictions with our CONTENTS.org / issues (quote both)
+
+** CONTENTS.org claims the local-unit area-conversion factors "are NOT in the repo" -- they are
+
+CONTENTS.org:1037-1039 (verbatim): "Where only a farmer estimate in a non-metric local
+unit (Timad, Kert, Boy, Senga, Tilm, Medeb, Rope, Ermija) exists, we cannot convert --
+the local-unit->hectare factors are NOT in the repo -- so =Area= is NaN and =AreaUnit=
+carries the native unit name."
+
+Checked directly: =lsms_library/countries/Ethiopia/{2011-12,2013-14,2015-16,2018-19}/
+Data/ET_local_area_unit_conversion.dta.dvc= all exist (four of five waves; 2021-22 does
+not). =grep -rl "local_area_unit\|ET_local_area" lsms_library/countries/Ethiopia
+--include=*.py= returns nothing. So the precise, checkable fact is: the file IS in the
+repo (DVC-tracked, presumably downloaded at some point since a =.dvc= sidecar exists),
+but no wave or country script reads it. CONTENTS.org's claim is true in effect (Area is
+never converted from it) but false in its stated reason (the file's absence) -- the
+actual reason is that nothing was ever wired to read it. This matters because "not in
+the repo" reads as "would need a new download," while "in the repo, unwired" reads as
+"a config/script fix, no new data acquisition needed" -- a materially easier fix. Per the
+brief's rule, reporting and not silently correcting: this is the finding, not an edit to
+CONTENTS.org.
+
+** CONTENTS.org's own FCT TODO section contradicts its own tangled build script for =conversion_to_kgs.json=
+
+CONTENTS.org:279-281 (verbatim): "=conversion_to_kgs.json= is complete, built from
+wave-specific =Food_CF_Wave{1..5}.dta= files (present for all five waves 2011-12 through
+2021-22)."
+
+But the actual build script tangled earlier in the SAME file, CONTENTS.org:153-156:
+=unitfiles = ['../2011-12/Data/Food_CF_Wave1.dta', '../2013-14/Data/Food_CF_Wave2.dta',
+'../2015-16/Data/Food_CF_Wave3.dta', '../2018-19/Data/Food_CF_Wave4.dta']= -- four
+entries, Wave 5 absent. =git log --oneline -- lsms_library/countries/Ethiopia/_/
+conversion_to_kgs.json= shows exactly one commit (=9dddd806=, "Great rearrangement"),
+i.e. the file has never been regenerated since. We DO hold
+=lsms_library/countries/Ethiopia/2021-22/Data/food_cf_wave5.dta.dvc=. So the "present for
+all five waves" sentence is true of the SOURCE data but false of what the build script
+(in the same file, 127 lines earlier) actually consumed. Any Wave-5-only food unit label
+not already covered by the Wave 1-4 factors would silently miss a kg conversion. Not
+verified whether any such label exists (would require reading =food_cf_wave5.dta=, out of
+scope for this read-only pass) -- flagged as a gap to check, not asserted as a live bug.
+
+* What I did not read (so the synthesis knows the gaps)
+
+- The five ESS do-files line-by-line in full (each ~5,900-7,500 lines; only banners plus
+  the sections listed in Construction Decisions were opened with =sed=).
+- =Resources/= and =Final DTA files/= / =Final DTA Files/= subfolders under each wave --
+  no output =.dta= was opened; this pass is code/doc reading only, per the brief.
+- =358_Estimating-Crop-Yields/EPAR_UW_358_Ethiopia ESS 2013-14/2015-16 LSMS-ISA_W{2,3}.do=
+  -- noted to exist, not opened. This is EPAR's own sensitivity study on crop-yield
+  construction CHOICES (exactly our #820/harvest_kg territory) and is very likely the
+  single highest-value unread source for a follow-up pass.
+- =Household-Consumption-Data/EthiopiaW3_Food Consumption by source.do= and
+  =EthiopiaW4_...=  -- only W5 was read in detail; W3/W4 were not diffed against it (the
+  W3-do-file wave the household-own-price-preference note (#2d) was drawn from is the
+  MAIN LSMS-Agricultural-Indicators-Code repo, a different EPAR project from
+  Household-Consumption-Data -- the two projects were not cross-checked against each
+  other beyond what's recorded here).
+- =_Summary_statistics/EPAR_UW_335_master_list_indicators.xlsx= and
+  =EPAR_UW_335_SUMMARY_STATISTICS.do=, and =Batching/= -- not opened.
+- CROP EXPENSES / FARM LABOR / fertilizer-and-improved-seed sections -- banners located,
+  Known-Issues text skimmed, but the labor-days and input-quantity construction code
+  itself was not read line-by-line.
+- Whether our corpus-wide =_TLU_FACTORS= match or diverge from EPAR's Ethiopia-specific
+  coefficients (Construction #4) -- flagged, not checked, in this pass.
+- =food_cf_wave5.dta= / =crop_cf_wave5.dta= contents -- the DVC sidecars were confirmed to
+  exist; the files themselves were not opened (would require a DVC-cache pull, out of
+  scope for a read-only doc/code survey).
+- =NOTES.md= for the OTHER two EPAR clones (=Household-Consumption-Data=,
+  =358_Estimating-Crop-Yields=) beyond the commit-hash header already quoted above --
+  their LICENSE/CITATION fields were skimmed but not transcribed here.
+- Any numeric parity check against EPAR's =Final DTA files= -- explicitly out of scope
+  per the brief (a later, separate dispatch).

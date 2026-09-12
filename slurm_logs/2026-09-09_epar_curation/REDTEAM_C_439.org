@@ -1,0 +1,807 @@
+#+title: RED TEAM C -- FINDINGS_taxonomy.org, "LSMS+ individual / gender-disaggregation crosswalk (GH #439)"
+#+date: 2026-09-09
+
+Scope: =FINDINGS_taxonomy.org:334-624= (heading "LSMS+ individual /
+gender-disaggregation crosswalk (GH #439)" through the end of its
+"Ranked learnings (this follow-up)" subsection, line 623).  Everything
+above :334= and the second, top-level "Ranked learnings" at :625= is
+another verifier's.
+
+Sources opened line-by-line:
+- =/global/scratch/fsa/fc_jevons/ligon/reference/epar/LSMS-Agricultural-Indicators-Code/=
+  (HEAD =abfbdc9301242527b7543606aad1ad6eed2e6530=, per =reference/epar/NOTES.md=)
+- =/global/scratch/fsa/fc_jevons/ligon/reference/epar/358_Estimating-Crop-Yields/=
+  (HEAD =bd742b4db82e8c6a021056621708b386f15774c1=)
+- repo root =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=
+
+No writes outside this file.  No =dvc=, no downloads, no =Country()=.
+GitNexus MCP did not connect this session; symbol/name sweeps were done
+with =grep -rIn= per the CLAUDE.md substitution table, and the blast
+radius found is reported inline.
+
+* Verdict summary
+
+| # | Claim | Verdict |
+|---+---+---|
+| 1a | Uganda/Tanzania/Ethiopia each SAVE a pre-collapse person-grain intermediate | CONFIRMED |
+| 1b | All three intermediates are =(hhid, plot/parcel, season/holder, role, pid)+Sex= | CORRECTED (Ethiopia's has no =role=) |
+| 1c | Collapse rule = mean-of-female then thresholds; missing -> head's sex | CONFIRMED |
+| 1d | "mean missing (no id matched, *or both ids blank*) -> head fallback" (Uganda) | CORRECTED |
+| 2 | The 2017 =358= study uses a different tie-breaking rule from the =335= pipeline | CORRECTED (rules are provably equivalent; the real divergence is elsewhere) |
+| 3 | 12 raw decision-maker variable names, entirely unwired in our scripts | CONFIRMED (with a completeness note) |
+| 4a | Uganda AGSEC3A/3B already opened | CONFIRMED |
+| 4b | Ethiopia =sect3_pp_w4.dta= already opened at the three cited lines | CONFIRMED |
+| 4c | Tanzania =AG_SEC_3A= "the exact file carrying =ag3a_08_1/_2/_3=" already opened | CORRECTED (wrong wave AND wrong variable name; the substance survives for a different wave) |
+| 4d | Uganda AGSEC2A / AGSEC6A / =gsec14= already opened; AGSEC8*/=gsec12_1= new | CONFIRMED |
+| 4e | Ethiopia =sect8_1_ls_W4=/=sect11_hh_W4=/=sect12b_hh_W4= "remain unchecked" | CORRECTED (upgrade: two of the four are already open) |
+| 5a | Ethiopia W4 women's-asset raw vars / grain | CONFIRMED |
+| 5a' | Ethiopia W4: 4 line cites within 5a (=:3560=, =:3591=, =:3521/3548/3572=, and the stated step order) | CORRECTED |
+| 5a'' | =s2q07= = "who can SELL", =s2q09= = "who can BEQUEATH/COLLATERAL" | UNVERIFIABLE (code groups all four; questionnaire not read) |
+| 5b | Uganda W5 women's-asset raw vars / grain | CONFIRMED (1 line cite off by two; poultry exclusion right for the wrong mechanism) |
+| 5c | "one collapse-step from =individual_assets (t,i,j,pid)=" | OVERSTATED (two steps; item axis already destroyed) |
+| 5d | Crosswalk bullet: "Uganda's raw vars ... show ownership only, no rights question at all" | WRONG (contradicts its own table) |
+| 6a | Recap of the #439 owner-expansion convention + candidate list | CONFIRMED |
+| 6b | "None of the three is currently in #439's candidate list ... not a plot/role dimension" | OVERSTATED |
+| 6c | "This dispatch supplies exactly that audit for three of the five EPAR countries" | OVERSTATED |
+| 7a | Uganda W5 codes CONTROL OVER INCOME / PARTICIPATION / OWNERSHIP sections | CONFIRMED |
+| 7b | "Tanzania W3 ... no 'Women's...' section of any kind exists in its do-file" | *WRONG* |
+
+Counts over the 22 rows above: *CONFIRMED 10, CORRECTED 6, OVERSTATED 3,
+WRONG 2, UNVERIFIABLE 1.*
+
+Plus one *addendum, not a verdict row*: §6d records a reconciliation the
+section omits entirely (=plot_decision_makers= vs. the repo's already
+reserved =plot_cultivation=).  It is not a claim I could grade, but it
+is the single item that most changes the "cheap wiring job" conclusion,
+so it is written up alongside the verdicts rather than buried.
+
+* 1. The saved pre-collapse intermediates
+
+** 1a/1c CONFIRMED -- all three lines are exactly where the findings say
+
+*** Uganda W5 (=Uganda UNPS/Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do=)
+
+Section banner =:392=.  Sources: =AGSEC3A= (:404=) appended with
+=AGSEC3B= (:406=), =season= 1/2 at =:405=/=:407=.
+
+- =:413-416= =ren a3aq3_3 pid1=, then =replace pid1=a3bq3_3=,
+  =a3aq3_4a=, =a3bq3_4a= in that order.  =:417-418= =ren a3aq3_4b pid2=,
+  =replace pid2=a3bq3_4b=.  Two id slots only.  *All four findings
+  variable names and the fallback order are exact.*
+- =:419= =keep hhid parcel_id plot_id season pid*=; =:420= =reshape long
+  pid, i(hhid parcel_id plot_id season) j(id_no)=; =:421= =drop if
+  pid==. | plot_id==.=
+- =:422= merge to a parcel-rights tempfile (=formal_land_rights=, built
+  =:394-401= from =AGSEC2A/2B= =a2aq23=); =:423= merge =m:1 hhid pid= to
+  =Uganda_NPS_W5_person_ids.dta=, =keep(1 3)=, with EPAR's own inline
+  comment =//993 unmatched.=
+- =:424= =save ... Uganda_NPS_W5_dm_ids.dta, replace=
+
+*Exact columns of the saved file* (traced, not guessed).  =person_ids.dta=
+is built at =:266-279= and holds =hhid personid pid female age hh_head=
+(=female= = =h2q3==2= at =:272=; note the =keep if h2q7 <5= filter at
+=:270=).  So =Uganda_NPS_W5_dm_ids.dta= =
+: hhid, parcel_id, plot_id, season, id_no, pid, formal_land_rights, personid, female, age, hh_head
+The findings' shorthand "=(hhid,parcel,plot,season,role,pid)+Sex=" is
+right on the key and understates the payload (it also carries
+=formal_land_rights=, =age=, =hh_head=).
+
+*The collapse and its rule.*  =:432= =gen dm1_gender=female+1 if
+id_no==1=; =:433= =collapse (mean) female (firstnm) dm1_gender,
+by(hhid parcel_id plot_id season)= -- the findings omit the
+=(firstnm) dm1_gender= half.  Then =:435-437=: =dm_gender=3 if
+female!=.= / =1 if female==0= / =2 if female==1=, i.e. male-only,
+female-only, anything fractional -> mixed.  =:438-439= head fallback.
+=:440= backfills =dm1_gender= from =dm_gender= where the latter is
+unmixed.
+
+*** Tanzania W3 (=Tanzania NPS/Tanzania NPS Wave 3/EPAR_UW_Tanzania_NPS_W3.do=)
+
+Banner =:232=.  =AG_SEC_3A= =:235= + =AG_SEC_3B= =:239=.
+=:248-253= three id slots =personid1/2/3= from =ag3a_08_1/_2/_3= with
+=ag3b_08_*= fallbacks.  =:255= reshape long =j(personno)=; =:256= =drop
+if personid==.=; =:257= =ren personid indiv=; =:258= merge =m:1 hhid
+indiv= to =person_ids.dta= =keep(1 3)=; =:259= =gen dm1_gender=female+1
+if personno==1=; =:260-262= =preserve= / =save
+Tanzania_NPS_W3_plot_dm_ids.dta= / =restore=.
+
+=person_ids.dta= built =:156-167= = =hhid indiv female age hh_head=.
+So =Tanzania_NPS_W3_plot_dm_ids.dta= =
+: hhid, plot_id, cultivated, season, personno, indiv, female, age, hh_head, dm1_gender
+(=cultivated= and =dm1_gender= are extra vs. the findings' shorthand.)
+
+Collapse =:263= =collapse (mean) female (firstnm) dm1_gender, by(hhid
+plot_id season cultivated)=; =:264= =gen dm_gender = female + 1=;
+=:265= =replace dm_gender = 3 if !inlist(dm_gender, 1, 2, .)=.
+
+*Precision note.*  The findings say "cast to 3 'mixed' if not exactly 1
+or 2".  The literal code excludes missing as well (=, .=) -- without
+that, every all-unmatched plot would become "mixed" instead of falling
+through to the head-sex rule at =:272-273=.  The exclusion is
+load-bearing; state it.
+
+=fhh= comes from =:270= =merge m:1 hhid using ..._weights.dta, nogen
+keep(3) keepusing(fhh)=; the findings' cite of the =fhh= definition
+(=gen fhh=(relhead==1 & gender==2)=) is at =:177=, collapsed =(max)= at
+=:178= -- their "=:177-180=" spans the two label lines too, fine.
+
+*** Ethiopia W4 (=Ethiopia ESS/Ethiopia ESS Wave 4/EPAR_UW_Ethiopia_ESS_W4.do=)
+
+Banner =:493=.  =sect3_pp_W4.dta= =:496=.
+=:498-501= =personid1 = s3q13=, with =holderid = substr(holder_id,-2,.)=
+substituted where =s3q13= is missing; =:502= =personid2 = s3q15_1=;
+=:503= =personid3 = s3q15_2=.  =:506= =recode personid* (999=.)=.
+=:507= =duplicates drop=, =:508= =drop if plot_id==""=, =:509= =gen dummy
+= _n= (a synthetic row id so the reshape is well-defined).  =:510=
+=reshape long personid, i(parcel_id plot_id hhid holder_id dummy)
+j(pidno)=.  =:511= merge to =gender_merge_both.dta= =keep(1 3)= --
+note the merge here comes *before* the drop, the reverse of the other
+two countries.  =:512= =drop if personid==.=.  =:513-516= preserve /
+=keep hhid holder_id parcel_id plot_id personid female= / =save
+Ethiopia_ESS_W4_dm_ids.dta= / restore.
+
+Collapse =:520= =collapse (mean) female (firstnm) dm1_gender, by(hhid
+parcel_id plot_id holder_id)=; =:522-524= the mixed/male/female cast;
+=:528-530= head fallback (=replace dm1_gender=fhh+1 if dm_gender==.=
+then =replace dm_gender=fhh+1 if dm_gender==.=).  =dm1_gender= is
+generated =:519= (=pidno==1= only) and labelled "Gender of plot holder"
+=:527=.  All as the findings describe.
+
+** 1b CORRECTED -- Ethiopia's saved intermediate has NO role column
+
+=EPAR_UW_Ethiopia_ESS_W4.do:514=:
+: keep hhid holder_id parcel_id plot_id personid female
+
+=pidno= (the reshape's role index) and =dummy= are *dropped one line
+before the save*.  So =Ethiopia_ESS_W4_dm_ids.dta= is
+=(hhid, holder_id, parcel_id, plot_id, personid, female)= -- five keys
+and Sex, *no role*.
+
+This falsifies the findings' table cell ("pre-collapse =dm_ids.dta= is
+=(hhid,parcel,plot,holder,role=pidno,pid=personid)+Sex=",
+=FINDINGS_taxonomy.org:358=) and the crosswalk's
+stronger sentence that all three files "are each =(hhid, plot/parcel,
+season/holder, role, pid) + Sex=".  Two of three carry role
+(Uganda =id_no=, Tanzania =personno=); Ethiopia does not.  It matters
+because the findings' own Learning #1 argues =role= should be an
+explicit column "precisely to preserve" the holder-vs-any-decision-maker
+distinction -- and Ethiopia, the one country where a =holder_id= is a
+first-class survey key, is the one that discards it from the file.
+(Ethiopia does keep the distinction, but as the derived =dm1_gender=
+column, not as a role level.)
+
+** 1d CORRECTED -- Uganda: a plot-season with both ids blank does not reach the fallback
+
+The findings say the head-sex fallback fires when "no id matched, *or
+both ids blank*".  Both-blank rows are deleted at =:421= (=drop if
+pid==. | plot_id==.=) *before* the collapse, so no group for that
+plot-season ever exists in the collapse output; there is nothing for
+=:438-439= to act on.
+
+What the fallback actually covers, precisely:
+
+1. Plot-seasons where every named id survived =:421= but failed the
+   roster merge at =:423= (=keep(1 3)= retains the master row with
+   =female==.=; Stata's =collapse (mean)= then yields =.= for the
+   group).  EPAR's own comment counts 993 such unmatched rows.
+2. A *degenerate second case the findings miss*: the merge at =:434=
+   (=merge m:1 hhid using ..._hhsize.dta, nogen=) has *no =keep()=
+   option*, so every household in =hhsize.dta= with zero surviving
+   decision-maker rows is *added* as a row with missing =parcel_id=,
+   =plot_id= and =season=.  Those rows then take the head's sex at
+   =:438-439=.  They are household-grain rows with a null plot key
+   sitting inside a plot-grain file.
+
+Tanzania and Ethiopia do not have case 2: their equivalent merges are
+=keep(3)= (=:270=) and =keep(1 3)= (=:528=), neither of which adds
+using-only rows.  So the three countries' "missing" handling is *not*
+uniform, and the findings present it as if it were.
+
+The findings' third sub-claim -- "a named id that fails to match the
+roster is silently absorbed into the missing-then-head-fallback path
+(no separate non-household-person flag)" -- is CONFIRMED for all three
+(=:423= Uganda, =:258= Tanzania, =:511= Ethiopia all use =keep(1 3)= or
+its equivalent and no downstream flag is created).
+
+* 2. CORRECTED -- the 358 and 335 tie rules are provably the SAME partition
+
+Both cites are accurate:
+- 358: =358_Estimating-Crop-Yields/EPAR_UW_358_Tanzania TNPS 2012-13 LSMS-ISA_W3.do:133-135=
+  -- three merges (=:103-104=, =:114-115=, =:123-124=) producing
+  =dm1_female/dm2_female/dm3_female=, then an explicit categorical
+  =gen/replace= triple.
+- 335: =EPAR_UW_Tanzania_NPS_W3.do:263-265=,
+  =EPAR_UW_Uganda_UNPS_W5.do:433-439=,
+  =EPAR_UW_Ethiopia_ESS_W4.do:520-530= -- the mean-of-female rule.
+
+But the findings' *reason* is wrong.  They assert the two "partition the
+same raw ids differently whenever a plot has more than 2 named
+decision-makers with an uneven split", while conceding "this pass did
+not construct a minimal disagreeing example".  There is none.
+Enumerating all 27 combinations of {male, female, missing} over three
+slots:
+
+- 358: category 1 iff every non-missing slot is 0 and at least one is
+  non-missing; 2 iff every non-missing slot is 1 and at least one is
+  non-missing; 3 otherwise-with-at-least-one-non-missing; missing iff
+  all three missing.
+- 335: =mean(female over non-missing)= = 0 iff all non-missing are 0;
+  = 1 iff all non-missing are 1; fractional otherwise; missing iff none
+  non-missing.
+
+These are the same predicate written twice.  A 2-male/1-female plot gives
+mean 1/3 -> mixed under 335, and fails both all-male and all-female
+tests -> mixed under 358.  Exhaustive check over the 27 combinations:
+*zero disagreements*.
+
+*The real divergences, which the findings do not name:*
+
+1. *Missing handling.*  335 substitutes the household head's sex when
+   no id resolves (=W3.do:272-273=).  358 has *no fallback at all* --
+   =decision_maker_gender= stays missing, and =:142-144= even guards the
+   dummies with =if decision_maker_gender!=.=.  This is the substantive
+   methodological disagreement between EPAR's two products, and it is
+   the one that changes numbers.
+2. *Season coverage.*  335 appends =AG_SEC_3B= and carries =ag3b_08_*=
+   fallbacks (=W3.do:239, :249, :251, :253=); 358 reads =ag3a_*= only
+   (long rainy season), so its plot universe is narrower.
+3. *Output grain.*  335 collapses by =(hhid, plot_id, season,
+   cultivated)= (=:263=); 358 keeps =(y3_hhid, plotnum)= with
+   =field_cultivated= as a column (=:140=).
+
+So the findings' Learning #4 ("pick and document ours, don't inherit
+either silently") *survives*, but the justification must be replaced:
+the two products disagree on *what to do when nobody is named*, not on
+how to break a mixed tie.  As written, learning #4 would send an
+implementer hunting for a tie rule that is not the difference.
+
+* 3. CONFIRMED -- the raw ids are unwired
+
+=grep -rIni= over the whole of =lsms_library/= (case-insensitive,
+repo-wide, not just the three country trees), one pass per name:
+
+| variable | country tree searched | hits |
+|---+---+---|
+| =a3aq3_3=, =a3aq3_4a=, =a3aq3_4b=, =a3bq3_3=, =a3bq3_4a=, =a3bq3_4b= | =lsms_library/countries/Uganda/= | 0 each |
+| =ag3a_08_1=, =ag3a_08_2=, =ag3a_08_3= | =lsms_library/countries/Tanzania/= | 0 each |
+| =ag3b_08_1=, =ag3b_08_2=, =ag3b_08_3= (EPAR also reads these) | =lsms_library/countries/Tanzania/= | 0 each |
+| =ag3a_08b_1/_2/_3=, =ag3b_08b_1/_2/_3= (the NPS W5/SDD spelling, see §4c) | =lsms_library/= (whole tree) | 0 each |
+| =s3q13=, =s3q15_1=, =s3q15_2= | =lsms_library/countries/Ethiopia/= | 0 each |
+
+Combined alternation grep over =lsms_library/= returns nothing.  The
+corroborating negative -- "only =ag2a_09=, the unrelated GPS-area
+variable, is read" -- is also CONFIRMED at
+=lsms_library/countries/Tanzania/2019-20/_/plot_features.py:23= and
+=lsms_library/countries/Tanzania/2020-21/_/plot_features.py:24=
+(plus documentation hits at =Tanzania/_/CONTENTS.org:1610= and
+=Tanzania/_/tanzania.py:1003=).
+
+*Completeness note.*  "12 raw plot-decision-maker variable names
+(Uganda x6, Tanzania x3, Ethiopia x3)" is internally consistent but
+under-counts EPAR's actual set: Tanzania's =ag3b_08_1/_2/_3= fallbacks
+(=W3.do:249, :251, :253=) are read and were not on the list, and the
+NPS W5/SDD waves use a *different* spelling again (§4c).  The
+zero-hit conclusion is unaffected -- all of them are zero -- but the
+count "12" should be 15 for W3 alone, and 21 across the ISA waves we
+actually hold.
+
+* 4. Which source files our pipeline already opens
+
+** 4a CONFIRMED -- Uganda AGSEC3A/3B
+
+- =lsms_library/countries/Uganda/2015-16/_/plot_labor.py:25-26=
+  (=_try('../Data/AGSEC3A.dta')=, =AGSEC3B.dta=)
+- =lsms_library/countries/Uganda/2015-16/_/plot_inputs.py:22-23=
+- 2018-19 equivalents: =plot_labor.py:25-26=, =plot_inputs.py:22-23=
+- Also 2010-11, 2011-12, 2013-14 (same line numbers -- the scripts are
+  near-clones).
+
+EPAR's Uganda W5 is our =2015-16=, so the wave matches.
+
+** 4b CONFIRMED to the line -- Ethiopia =sect3_pp_w4.dta=
+
+- =lsms_library/countries/Ethiopia/2018-19/_/plot_inputs.py:28=
+- =lsms_library/countries/Ethiopia/2018-19/_/plot_labor.py:21=
+- =lsms_library/countries/Ethiopia/2018-19/_/plot_features.py:20=
+
+Exactly the three cites in the findings.  EPAR's Ethiopia W4 is our
+=2018-19=; wave matches.  Corroboration: =ls
+lsms_library/countries/Ethiopia/2018-19/Data/*.dvc | wc -l= = *68*,
+matching both the findings' "68 section files" and
+=DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org:100-102=
+("ESS Wave 4 (2018-19); we carry that wave (68 source files)").
+
+** 4c CORRECTED -- Tanzania: right file, wrong wave, wrong variable name
+
+The findings write: "=Tanzania/2019-20/_/plot_inputs.py=,
+=plot_labor.py=, and =plot_features.py=, plus =2020-21/_/plot_labor.py=,
+already open =AG_SEC_3A= (*the exact file carrying =ag3a_08_1/_2/_3=*)".
+
+The first half is true:
+- =lsms_library/countries/Tanzania/2019-20/_/plot_inputs.py:21=
+- =lsms_library/countries/Tanzania/2019-20/_/plot_features.py:17=
+- =lsms_library/countries/Tanzania/2019-20/_/plot_labor.py:24=
+- =lsms_library/countries/Tanzania/2020-21/_/plot_inputs.py:17=,
+  =plot_labor.py:21=, =plot_features.py:18= -- and note *all three*, not
+  just =plot_labor= as the findings say.  In 2020-21 the file is spelled
+  *lowercase*, =../Data/ag_sec_3a.dta= (the DVC sidecar is
+  =2020-21/Data/ag_sec_3a.dta.dvc=); the wave script's own docstring
+  says so (=plot_labor.py:9-10=, "File names are lowercase and the id
+  columns differ (y5_hhid / plot_id)").  Same class of gotcha as
+  =ag3a_08b= below: a case-sensitive grep for =AG_SEC_3A= misses this
+  wave entirely.
+
+The parenthetical is false, twice over:
+
+1. *Wrong wave.*  EPAR's Tanzania W3 is *2012-13*.  Our Tanzania tree
+   holds only =_/=, =2008-15/=, =2019-20/=, =2020-21/=, =var/= --
+   2012-13 lives inside the =2008-15/= multi-round folder (CLAUDE.md,
+   "Tanzania =2008-15/= is one folder, four rounds").  And
+   =ls lsms_library/countries/Tanzania/2008-15/Data/= is *42 files, every
+   one of them =upd4_hh_*.dta.dvc=*; there is *no =AG_SEC_*= file of any
+   kind* in that wave's tree, and =2008-15/_/= carries no
+   =plot_features.py= / =plot_inputs.py= / =plot_labor.py= at all.  For
+   the wave the findings are auditing, wiring the decision-maker ids is
+   a *new source-file acquisition*, not a column add.
+2. *Wrong variable name for the waves we do hold.*  In NPS W5 (our
+   2019-20) and NPS SDD (our 2020-21) EPAR reads the ids as
+   =ag3a_08b_1/_2/_3= with =ag3b_08b_*= fallbacks --
+   =Tanzania NPS/Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do:298-303=
+   (from =ag_sec_3a.dta=, =:287=) and
+   =Tanzania NPS/Tanzania NPS SDD/EPAR_UW_Tanzania_NPS_SDD.do:297-302=.
+   Note the =b=.  A wiring task that greps for =ag3a_08_1= in the
+   2019-20 file will find nothing and conclude the column is absent.
+
+*What survives, and it is the better version of the claim*: for
+Tanzania *2019-20 / 2020-21* -- which is exactly what
+=DESIGN_...2026-06-14.org:105= names as the LSMS+ audit target
+("Tanzania :: NPS (2019-20 / 2020-21); audit required") -- the
+decision-maker ids *are* in a file our =plot_features=/=plot_inputs=/
+=plot_labor= scripts already open, under the name =ag3a_08b_*=, and
+they are unwired (0 hits, §3).  So the cheap-wiring conclusion holds
+for the design's target wave; the findings just proved it about the
+wrong one and with an unusable variable name.
+
+** 4d CONFIRMED -- Uganda's asset/income source files
+
+- =AGSEC2A=: =lsms_library/countries/Uganda/2015-16/_/plot_features.py:16=
+- =AGSEC6A=: =lsms_library/countries/Uganda/2015-16/_/livestock.py:33=
+- =gsec14=: =lsms_library/countries/Uganda/2015-16/_/assets.py:6=
+
+And the negative half is CONFIRMED too: =grep -rIn "AGSEC8"
+lsms_library/countries/Uganda/*/_/*.py= returns *nothing*, and
+=gsec12_1= is opened nowhere (only =gsec12_2= is, by
+=Uganda/2015-16/_/enterprise_income.py:6=).  Worth adding: all of them
+*are already tracked in DVC* --
+=Uganda/2015-16/Data/= contains =AGSEC5A/5B=, =AGSEC8A/8B/8C=,
+=gsec12_1=, =gsec12_2= sidecars -- so "new open" here means a new
+=get_dataframe= line, not a new acquisition.
+
+** 4e CORRECTED (upgrade) -- Ethiopia's asset-module files are not "unchecked"
+
+The findings close with "Ethiopia's =sect8_1_ls_W4=/=sect11_hh_W4=/
+=sect12b_hh_W4= ... remain unchecked-or-confirmed-new opens."  Checked:
+
+| EPAR file | in our =2018-19/Data/=? | opened by our scripts? |
+|---+---+---|
+| =sect2_pp_W4= (land rights =s2q07/s2q09=) | yes, =sect2_pp_w4.dta.dvc= | *yes* -- =Ethiopia/2018-19/_/plot_features.py:19= |
+| =sect8_1_ls_W4= (livestock owners =ls_s8_1q04_*=) | yes, =sect8_1_ls_w4.dta.dvc= | *yes* -- =Ethiopia/2018-19/_/livestock.py:26= |
+| =sect11_hh_W4= (asset owners =s11q02_1..12=) | yes, =sect11_hh_w4.dta.dvc= | no |
+| =sect12b_hh_W4= (business income control) | *split in two*: =sect12b1_hh_w4.dta.dvc=, =sect12b2_hh_w4.dta.dvc= | no |
+
+So *three* of Ethiopia's four women's-asset source files are already
+DVC-tracked and *two* are already open in our pipeline -- a stronger
+result than the findings claim, and it should replace the hedge.  The
+=sect12b= name split is a real gotcha for anyone porting EPAR's code
+verbatim.
+
+* 5. The women's asset-ownership constructs
+
+** 5a Ethiopia W4, =:3497-3600= -- variables and grain CONFIRMED; four line cites CORRECTED
+
+Raw variables, verified:
+- Land, =sect2_pp_W4.dta= (=:3500=): =local landowners "s2q07_1 s2q07_2
+  s2q09_1 s2q09_2"= (=:3502=).  Up to 2 named persons per right
+  question -- CONFIRMED.
+  *Caveat*: the findings gloss =s2q07= as "who can SELL" and =s2q09= as
+  "who can BEQUEATH / use as COLLATERAL".  EPAR's own comment on
+  =:3502= applies "sell, collateral, or bequeath" to *all four*
+  variables without splitting them, and the questionnaire was not read
+  this pass.  The per-variable right assignment is *UNVERIFIABLE* from
+  the code; do not carry it forward as established.
+- Livestock, =sect8_1_ls_W4.dta= (=:3526=): =ls_s8_1q04_1/_2= (=:3529=);
+  =drop if inlist(ls_code,10,11,12,.)= (=:3528=) -- poultry excluded,
+  and *also rows with a missing =ls_code=*, which the findings omit.
+- Other assets, =sect11_hh_W4.dta= (=:3553=): =s11q02_1 .. s11q02_12=
+  (=:3556=), 12 owner slots -- CONFIRMED.
+
+Line corrections:
+| findings cite | what is actually there | correct cite |
+|---+---+---|
+| "blankets/mattresses/... excluded, =:3560=" | =:3560= is =preserve= inside the reshape loop | *=:3555=* (=drop if inlist(asset_cd,4,5,...)=) |
+| "appended then =duplicates drop= (=:3591=) THEN =collapse (max)= (=:3586=)" | =:3591= is a =keep= after the roster merge; there is *no* post-append =duplicates drop= | =duplicates drop= is *per domain, before* the append: *=:3521=, =:3548=, =:3575=* |
+| "=Ethiopia_ESS_W4_women_{land,livestock,otherasset}_owner.dta= ... =:3521=/=:3548=/=:3572=" | those are two =duplicates drop= lines and a closing brace | the =save= lines are *=:3523=, =:3550=, =:3578=* |
+
+The stated *sequence* is therefore also wrong.  The real order is:
+per-domain reshape (=:3505-3519=, =:3532-3546=, =:3559-3573=) ->
+per-domain =duplicates drop= (=:3521/:3548/:3575=) -> =gen type_asset=
+(=:3522/:3549/:3576=) -> per-domain save -> append the three
+(=:3581-3583=) -> =gen own_asset=1= (=:3584=) -> =collapse (max)
+own_asset, by(hhid asset_owner)= (=:3586=) -> roster merge (=:3590=) ->
+=gen women_asset= (=:3598=).  =:3586= and =:3598= are correct in the
+findings; the ordering claim around them is not.
+
+** 5b Uganda W5, =:3174-3274= -- CONFIRMED, one cite corrected
+
+- Sources appended =:3177-3182=: =AGSEC2A=, =AGSEC6A=, =AGSEC6B=,
+  =AGSEC6C=, =gsec14=.
+- Land: =a2aq24b= (=:3190-3191=); rights =a2aq27a=/=a2aq27b=
+  (=:3196-3198=, under the comment "append who hss right to sell or
+  use" =:3194=).  The findings cite "=:3189=" -- that is the section
+  comment line, one before the code; harmless.
+- Livestock: =a6aq3b/c= (=:3208-3210=), =a6bq3b/c= (=:3212-3214=).
+- Household assets: =h14q3A=/=h14q3B= with =substr=/=destring=
+  (=:3216-3221=; findings say =:3216-3219=, the block runs to =:3221=).
+- 4 =preserve=/=restore= blocks (=:3195-3204=, =:3225-3231=,
+  =:3233-3239=, =:3241-3247=) -- CONFIRMED as "4".
+- =collapse (max) own_asset, by(hhid pid)= at =:3270= -- CONFIRMED.
+- Poultry exclusion: CONFIRMED *functionally, by a different mechanism
+  than stated*.  =AGSEC6C= *is* appended (=:3180=), but no
+  =replace type_asset= / =replace asset_owner*= statement ever
+  references =a6cq3b/c=, so those rows keep =type_asset=""= and null
+  owners and are removed by the =drop if asset_owner*==.= filters at
+  =:3227/:3235/:3243/:3250=.  Exclusion by omission, not by
+  non-appending.  The contrast with the decision-making section is real:
+  =:3137-3139= *does* map =a6cq3b/c=.
+- Pre-collapse frame at =:3268= is =(hhid, type_asset, asset_owner/pid)=
+  + =own_asset= + roster columns -- CONFIRMED, and the findings are
+  correctly careful not to claim it is saved to disk (it is not; unlike
+  Ethiopia's three files, Uganda's is in-memory only).  Note the
+  =keep(3)= at =:3268= drops any owner id absent from =person_ids.dta=.
+
+** 5c OVERSTATED -- "one collapse-step from =individual_assets (t,i,j,pid)="
+
+The crosswalk says Ethiopia's intermediate "is LITERALLY =(hhid,
+asset_owner, type_asset)= -- our =(t,i,j,pid)= target grain, one row
+short of being it".  Two problems:
+
+1. =type_asset= is a *constant within each file* ("land" =:3522=,
+   "livestock" =:3549=, "otherasset" =:3576=).  It is a 3-value domain
+   tag, not an item-type =j=.  Our =assets= =j= is an item code
+   (=data_info.yml:55=, =assets: (t, i, j)=); a 3-value tag is not the
+   same axis at a coarser resolution, it is a different axis.
+2. *The item axis is destroyed one line EARLIER than the findings
+   think*, and not by the collapse.  =keep hhid `v'= at =:3507=,
+   =:3534= and =:3561= drops =ls_code= (which livestock species) and
+   =asset_cd= (which durable) *inside the per-domain loops*, before
+   anything is saved.  So EPAR's saved intermediates are two structural
+   steps from =(t,i,j,pid)=, not one.  Same for Uganda: =keep hhid
+   type_asset asset_owner*= at =:3223=.
+
+*The correction cuts in our favour and should be stated as the
+learning.*  =sect11_hh_W4.dta= is a =(hhid, asset_cd)= roster carrying
+*twelve owner slots on each item row* (=:3553-3556=).  A reshape long
+over =s11q02_1..12= that simply *does not drop =asset_cd== yields
+=(hhid, asset_cd, owner_pid)= = =(i, j, pid)= directly -- i.e. our
+=individual_assets= target grain at genuine item resolution, *finer
+than anything EPAR built*.  The same holds for livestock via =ls_code=.
+That is a stronger argument for #439's design than "EPAR nearly did
+it", and it does not depend on EPAR's intermediates at all.
+
+** 5d WRONG -- "Uganda's raw vars ... show ownership only, no rights question at all"
+
+The crosswalk bullet says Uganda has "ownership only, no rights question
+at all".  The findings' *own table row* for the same construct lists
+"=a2aq27a/b= (right to sell/use)", and the do-file agrees:
+=EPAR_UW_Uganda_UNPS_W5.do:3194= "* append who hss right to sell or use
+a2aq27a a2aq27b", used at =:3196-3198=.  Uganda asks a
+right-to-sell/use question and EPAR reads it.  Internal contradiction;
+the table is right and the bullet is wrong.
+
+Consequence for #439: Uganda supports at least one of the design's
+=Right{...}= booleans (=data_info.yml=-style, per
+=DESIGN_...org:153-157=), so Uganda is *not* strictly thinner than
+Ethiopia on rights, which is what the bullet was being used to argue.
+
+* 6. Consistency with =DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org=
+
+** 6a CONFIRMED -- the recap is accurate
+
+Quoting the design (=slurm_logs/DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org=):
+
+- =:142-146= "*Grain ~(t, i, j, pid)~* -- one row per (household ~i~,
+  harmonized asset-type ~j~, *owner* ~pid~).  Sole ownership => one row;
+  joint => one row per co-owner."
+- =:147-151= "*Sex is JOINED from ~household_roster~ on ~(t, i, pid)~,
+  never baked in* -- exactly as ~anthropometry~ joins Sex."
+- =:168-171= "*No aggregates stored.*  Gender asset gaps, ownership
+  rates, value/area shares, 'any account' rollups -> ~transformations~,
+  computed at query time over the item rows."
+- Candidate table =:190-193=: =individual_assets (t, i, j, pid)= (starred
+  flagship), =financial_inclusion (t, i, pid)=, =decision_making
+  (t, i, pid, domain)= with "domain in {asset, income, plot,
+  enterprise}", =people_last7days (t, i, pid)= "+ time-use".
+- Deferral =:260-267= "*Audit* Ethiopia ESS4 / Malawi IHPS / Tanzania
+  NPS for embedded person-level asset/decision/financial modules (data
+  access).  Wire only what exists; ~blocked~ otherwise."
+
+Every element of the findings' recap paragraph matches.  The findings'
+claim that Ethiopia's 5-domain =type_decision= is "at FINER domain
+resolution (5 domains) than #439 sketched (4: asset/income/plot/
+enterprise)" is also CONFIRMED against =:192=.
+
+** 6b OVERSTATED -- "not a plot/role dimension" anywhere in #439
+
+The findings justify adding =plot_decision_makers= partly by saying
+"None of the three is currently in #439's candidate list (#439 sketched
+item-type =j= for assets and =domain= for decisions, *not a plot/role
+dimension*)".
+
+The first half is true (the candidate table has no such row).  The
+second is not.  =DESIGN_...org:197-204=:
+
+#+begin_quote
+Open sub-decision for the build: *land and dwelling are specific
+assets* (a parcel / a structure), not just a type.  Two options:
+- (a) add an ~asset_id~ index level to ~individual_assets~ for the
+  multi-instance asset types; or
+- (b) split a separate ~individual_land~ at parcel grain that joins
+  ~plot_features~ on ~(t, i, plot_id)~, leaving ~individual_assets~ for
+  the type-level assets (livestock/durables/financial/mobile).
+#+end_quote
+
+Option (b) *is* a plot/parcel-grain individual feature joining
+=plot_features= on =(t, i, plot_id)= -- structurally the same proposal,
+for ownership rather than decision-making.  A reader of the findings
+would think #439 never considered a plot axis; it did, and left the
+decision open pending the Cambodia land-module grain (=:204=).  The
+honest framing is "extend the design's open sub-decision (b) to cover
+decision-making as well as ownership", which is a *smaller* and more
+defensible ask than "add a fifth candidate #439 never imagined".
+=role= is genuinely absent from the design.
+
+** 6c OVERSTATED -- "supplies exactly that audit for three of the five EPAR countries"
+
+The design's deferred audit names *Ethiopia ESS4 / Malawi IHPS /
+Tanzania NPS (2019-20 / 2020-21)* (=:100-105=, =:263-264=).  This pass:
+- Ethiopia ESS4 (2018-19) -- yes, the right wave.  Genuine audit.
+- Uganda UNPS W5 -- a bonus; Uganda is *not* one of the design's three.
+- Tanzania NPS *W3 (2012-13)* -- the *wrong wave* (§4c), and the one for
+  which we hold no ag modules.
+- Malawi IHPS -- *not audited at all*, though it is one of the three.
+
+So of the design's three targets, one is audited on the right wave, one
+on the wrong wave, one not at all.  "Supplies exactly that audit for
+three of the five EPAR countries" is not sustainable as written.  (The
+fix is cheap: re-run §4c's grep against
+=Tanzania NPS/Tanzania NPS Wave 5/EPAR_UW_Tanzania_NPS_W5.do= and
+=Malawi IHS/.../EPAR_UW_Malawi_IHS_*.do=.)
+
+** 6d ADDENDUM (not a verdict) -- the section never reconciles =plot_decision_makers= with the repo's reserved =plot_cultivation=
+
+Not a claim I can grade -- it is an omission.  It belongs in the red
+team because it materially changes the "cheap wiring job" conclusion.
+
+=lsms_library/data_info.yml:227-231=:
+
+#+begin_quote
+  plot_features:
+    # Lasting plot/parcel characteristics (GH #167).  Per-season detail
+    # (which crop, *who farmed it this season*, season-specific inputs,
+    # crop-share %) belongs in a future plot_cultivation table.  See
+    # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org for the design
+    # rationale; Uganda is the Phase-1 pilot.
+#+end_quote
+
+and =slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org:54-57=:
+
+#+begin_quote
+If someone later wants a per-plot, per-season =plot_cultivation= table
+(one row per =(t, v, i, plot_id, crop_seq)=, recording what was
+planted), that's a separate canonical-schema proposal -- file a new
+issue under #167's umbrella, do not retrofit =plot_features=.
+#+end_quote
+
+"Who farmed it this season" is *exactly* the EPAR construct, and the
+repo has already reserved a name, a grain and a filing procedure for
+it.  The findings propose =plot_decision_makers (t, i, plot, pid, role)=
+without citing either.  Two concrete consequences:
+
+1. *The proposed grain is missing a level.*  Uganda collapses by
+   =(hhid, parcel_id, plot_id, season)= (=:433=) and Tanzania by
+   =(hhid, plot_id, season, cultivated)= (=:263=); =crop_production=
+   already carries =season= as an index level
+   (=data_info.yml:578=, "=(t, i, plot, j, u, condition, season)=").
+   A =(t, i, plot, pid, role)= index would take Uganda's two seasons
+   for the same plot-person-slot and hand them to
+   =_normalize_dataframe_index='s =groupby().first()= -- precisely the
+   CLAUDE.md failure mode ("Duplicates on a declared index mean the
+   IDENTIFIER IS BROKEN or a LEVEL IS MISSING").  The season level is
+   not optional.
+2. Ethiopia's =holder_id= is *not* a missing level, because
+   =Ethiopia/_/ethiopia.py:747= and =:1000= already build
+   =plot_id = format_id(holder_id)_format_id(parcel_id)_format_id(field_id)=
+   (documented at =:524=, =:849=, =:1181=).  So the Ethiopia join key
+   lines up as-is -- worth saying, since it is the one country where a
+   naive reading would predict a mismatch.
+
+* 7. The "which waves carry Women's sections" claim
+
+** 7a CONFIRMED -- Uganda W5
+
+Do-file section banners:
+- =EPAR_UW_Uganda_UNPS_W5.do:2959= "WOMEN'S CONTROL OVER INCOME"
+- =:3085= "WOMEN'S PARTICIPATION IN AGRICULTURAL DECISION MAKING"
+- =:3174= "WOMEN'S OWNERSHIP OF ASSETS"
+- (also =:2859= "WOMEN'S DIET QUALITY")
+and the do-file's own output manifest at =:126-130=.
+
+Readme: =Uganda UNPS/Uganda UNPS Wave 5/readme.md:290-306= carries
+=### WOMEN'S CONTROL OVER INCOME= (:290=), =### WOMEN'S PARTICIPATION IN
+AGRICULTURAL DECISION MAKING= (:296=), =### WOMEN'S OWNERSHIP OF ASSETS=
+(:302=), each =COMPLETE= / "No issues in this section" -- exactly the
+findings' cite.  (Per the BRIEF's standing rule, "No issues in this
+section" is not clearance; see the observations in §8.)
+
+The findings' correction of their own earlier draft ("Uganda W5 is NOT
+thinner than Ethiopia W4 here") is CONFIRMED and was the right call.
+
+The >=2-activity floor is CONFIRMED as a *documented* choice, not an
+artifact: =:3088= "Code as 1 if a woman is listed as one of the
+decision-makers for *at least 2* plots, crops, or livestock activities";
+implemented =:3154-3155= (=bysort hhid decision_maker: egen
+nb_decision_participation=count(decision_maker)= / =drop if
+nb_decision_participation==1=); =:3090= states the downward-bias
+consequence itself.  Collapse at =:3163=.  Domains {planting_input,
+harvest, livestockowners} from =AGSEC3A/3B= (=:3106-3115=),
+=AGSEC5A/5B= (=:3117-3126=), =AGSEC6A/6B/6C= (=:3128-3139=) -- all as
+described.  (Small omission: =a3aq3_4b=/=a3bq3_4b= are also read here,
+at =:3110=/=:3115=, and are not in the findings' variable list.)
+
+** 7b WRONG -- Tanzania W3 has all four Women's sections
+
+The findings state, twice:
+
+#+begin_quote
+Tanzania W3 (2012-13) is the outlier: no "Women's..." section of any
+kind exists in its do-file (confirmed by the absence of any such banner
+in the earlier full-file grep), so Tanzania's ISA panel, AT LEAST AS
+EPAR HAS CODED IT, carries only the plot decision-maker construct and
+nothing on asset ownership, income control, or ag decision-making.
+#+end_quote
+
+and in the crosswalk, "Tanzania (this wave) carries neither."
+
+=EPAR_UW_Tanzania_NPS_W3.do= contains, as plain =*BANNER= comment lines:
+
+| line | banner |
+|---+---|
+| =:2930= | =*WOMEN'S DIET QUALITY= |
+| =:3049= | =*WOMEN'S CONTROL OVER INCOME= |
+| =:3241= | =*WOMEN'S PARTICIPATION IN AGRICULTURAL DECISION MAKIN= (sic) |
+| =:3387= | =*WOMEN'S OWNERSHIP OF ASSETS= |
+
+with the corresponding outputs saved at =:3237=
+(=Tanzania_NPS_W3_control_income.dta=), =:3383=
+(=..._make_ag_decision.dta=) and =:3451= (=..._ownasset.dta=), and all
+three merged into the individual file at =:5101=, =:5144=.  A plain
+=grep -in "women"= over the file returns them; the "earlier full-file
+grep" that the findings rely on must have been the banner-extraction
+recipe from the BRIEF (=grep -n -A1 '^\*\{20,\}'=), which these
+single-star section titles do not match.  (There is also no
+=readme.md= in =Tanzania NPS/Tanzania NPS Wave 3/= at all -- only the
+=.do=, =Final DTA Files=, =Raw DTA Files=, =Resources= -- so the
+readme-based cross-check that caught this for the other two countries
+was unavailable and its absence was not noted.)
+
+Tanzania W3's asset construct, for the record (=:3387-3451=):
+- Sources =AG_SEC_3A= + =AG_SEC_3B= + =LF_SEC_05= (=:3394-3396=)
+- Land owners =ag3a_29_1/_2=, =ag3b_29_1/_2= (=:3402-3407=); rights to
+  sell/use =ag3a_31_1/_2=, =ag3b_31_1/_2= (=:3410-3416=) -- so *Tanzania
+  also asks a rights question*, contra the "Uganda-only" reading in §5d
+- Non-poultry livestock owners =lf05_01_1/_2= (=:3424-3426=)
+- Same 2-slot stack -> =gen own_asset=1= (=:3443=) -> =collapse (max)
+  own_asset, by(hhid asset_owner)= (=:3444=); pre-collapse frame is
+  =(hhid, type_asset, asset_owner)=, the identical near-miss shape as
+  Uganda's and Ethiopia's.
+
+*Downstream damage.*  This falsifies four separate statements in the
+section:
+1. "Tanzania W3 is the outlier: no Women's section of any kind";
+2. "Tanzania's ISA panel ... carries only the plot decision-maker
+   construct";
+3. crosswalk: "and Tanzania (this wave) carries neither";
+4. by extension, the framing that only Ethiopia and Uganda "carry a
+   partial, EPAR-authored proxy for two of the four LSMS+ module
+   families" -- Tanzania carries the same two proxies, plus a rights
+   question, plus a diet-quality section neither Ethiopia (readme
+   =:263-264=, "Incomplete ... Cannot be constructed in Ethiopia W4")
+   nor the findings credit it with.
+
+It also *strengthens* the pass's core argument: the near-#439-grain
+intermediate exists in *three* countries' asset constructs, not two.
+
+** Adjacent claims checked while here
+
+- Ethiopia readme "Women's Diet Quality ... Cannot be constructed in
+  Ethiopia W4": CONFIRMED at
+  =Ethiopia ESS/Ethiopia ESS Wave 4/readme.md:260-264= (=Incomplete=).
+  The findings cite =:260-265=; the =Known Issues= line is =:264=.
+- Ethiopia readme "Individual Variables" =:350-355=: CONFIRMED
+  (=:350-354=).
+- "Merges =control_income.dta=, =make_ag_decision.dta=,
+  =women_asset.dta= 1:1 on =(hhid, personid)= (=:5603-5605=)":
+  lines CONFIRMED, but *incomplete*.  The base is =person_ids.dta=
+  (=:5599=) and the chain continues =:5607= =farmer_input_use=, =:5608=
+  =farmer_improvedseed_use=, =:5609= =farmer_vaccine=, =:5610= =weights=.
+  "the union of three ALREADY-COLLAPSED person-booleans" is six plus
+  weights.
+- "=ls Ethiopia/2018-19/Data/*.dvc= lists all 68 section files":
+  CONFIRMED, exactly 68.
+- =data_info.yml= cites: =plot_features (t, v, i, plot_id)= at =:50=,
+  =assets (t, i, j)= at =:55=, =livestock (t, i, animal)= at =:66=;
+  =plot_features= column block starts =:227= with =Area: required: true=
+  at =:233-235= (findings say =:232-234=, off by one).  The claim that
+  =plot_inputs=/=plot_labor= have no =Columns:= entry is consistent with
+  =:63-65=, which says so explicitly and gives the reason.
+- Ethiopia PLOT MANAGER "drops =plot_id= per role-slot before appending":
+  CONFIRMED at =:552= (=collapse (sum) field_managed, by(hhid
+  plot_manager_`j')=), append =:559-561=, second collapse =:562=.  The
+  findings' self-correction here was right.
+
+* 8. Observations recorded but NOT verified (do not promote to findings)
+
+Three possible EPAR defects surfaced in the lines read.  Each would need
+a run against the data to confirm; static reading only.
+
+1. *Uganda W5 =:3218=/=:3220=*: =gen asset_owner1_1 = substr(h14q3A,-1,1)=
+   takes the *last single character* of the =gsec14= PID string.  A
+   two-digit PID ("10", "12") would collapse to "0"/"2".  Combined with
+   the =keep(3)= roster merge at =:3268=, the =household_assets= domain
+   may contribute mostly-wrong or mostly-dropped rows.  Compare
+   Ethiopia's analogous =substr(holder_id,-2,.)= (=:499=), which takes
+   two.
+2. *Tanzania W3 =:3404= and =:3407=*: =replace asset_owner2=ag3a_29_1 if
+   !inlist(ag3a_29_2, .,0,99)= -- the *test* is on =_2= but the
+   *assignment* is =_1=.  The parallel rights block six lines later
+   (=:3412=, =:3415=) correctly assigns =_2=.  Reads like copy-paste;
+   if real, Tanzania's second land-owner slot silently duplicates the
+   first and second owners are never counted.
+3. *Uganda W5 =:3018-3019=*: the in-code "NEED TO FIX THE ISSUE BETWEEN
+   CONTROL_ANNUALHARVEST AND CONTROL_ANNUAL SALES ..." comment the
+   findings flag.  I read =:3003-3017= and confirm the
+   =preserve=/=tempfile sales=/=restore=/=append using sales= pattern
+   the comment proposes is already present immediately above it.  The
+   findings' verdict -- "may be a live defect or a stale comment,
+   undetermined without running the code" -- is the correct and honest
+   one; I could not resolve it either.  Note this section is
+   =readme.md:294= "No issues in this section", i.e. a BRIEF-rule
+   instance: the readme clears a section whose own code says otherwise.
+
+* 9. One out-of-scope flag for the other verifiers
+
+The 358 comparison table at =FINDINGS_taxonomy.org:328= (above my
+scope boundary) says of GPS-vs-self-report plot area: "no dual-source
+ladder anywhere; the choice is fixed per country".
+=lsms_library/countries/Tanzania/_/CONTENTS.org:1610= says
+"GPS-measured =ag2a_09= (acres).  GPS is preferred where present",
+and =Tanzania/_/tanzania.py:1003= documents =area_gps= alongside a
+reported area.  That looks like a dual-source ladder in at least one
+country.  Flagging for whoever owns =:319-333=; I did not chase it.
+
+* 10. What I did not do
+
+- Did not read any EPAR =Final DTA Files= or run anything against data
+  (BRIEF rule; no parity run this pass).
+- Did not read any questionnaire PDF, so the =s2q07= vs =s2q09= right
+  labels (§5a) and every "the instrument does/doesn't ask X" question
+  remain open -- the findings' own hedging on this is appropriate and I
+  did not improve on it.
+- Did not audit Malawi IHPS or Nigeria GHS for women's sections, though
+  §6c shows Malawi should have been in scope for the design's audit.
+- Did not verify Uganda's WOMEN'S CONTROL OVER INCOME construct
+  (=:2959-3082=) line by line -- only its section boundaries, its
+  =:3066= collapse and the =:3018= comment.
+- Did not check EPAR's Uganda/Ethiopia waves other than W5 / W4, nor
+  Tanzania W1/W2/W4, for whether the same constructs there use the same
+  rules.

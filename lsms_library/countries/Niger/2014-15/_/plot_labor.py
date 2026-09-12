@@ -46,7 +46,7 @@ def _rows(df, source, field_col, parcel_col, day_cols,
     wage = _coerce_wage(df[wage_col]) if wage_col is not None else pd.NA
     return pd.DataFrame({
         'i': hid.values,
-        'plot': plot.values,
+        'plot_id': plot.values,
         'source': source,
         'PersonDays': days.values,
         'Wage': wage.values if wage_col is not None else pd.NA,

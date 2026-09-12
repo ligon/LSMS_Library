@@ -1,0 +1,19 @@
+{
+ "Albania/household_roster": "863eb2d7ea12976a38629e78cf16bdbed2536990ef585c67190b610e3e780138",
+ "Ethiopia/crop_production": "b4a6fec9efba4493bca70ba1f965601614549d34d66a8cddddffab7da239584c",
+ "GhanaLSS/sample": "4278e49d7b24b859771b98d5e5072225ae26285f721d34d620b127cf6275da6e",
+ "Malawi/crop_production": "ca1125911d7020674c25b35cf335f616f305f574195391fbaf6db296114dcec3",
+ "Niger/food_acquired": "59847d35cf2241acb9c365d17b9e412d0e61d2e8287e6d8f03ee258b98c6b715",
+ "Nigeria/crop_production": "3f9e31e712907113b792eff33f7cef0722d1cd53cd7a858439543c98704e1952",
+ "Tanzania/crop_production": "4717f0c0c348f2968892943cc4a258390f933311c3d9fcad43d89435f1d3ebc0",
+ "Tanzania/household_roster": "a88c8200ac2344c5fec880846f331b0fd55a084189f81181c81ff3b77c14e376",
+ "Tanzania/sample": "3b46eff545044abb98ca8c1902539530cb1897439ad88c5a2dab9d21bd3c21a4",
+ "Uganda/crop_production": "50d8699d96ddafc9a309533b076359d797029c02351bebdcb08ac66b16e2aa2c",
+ "Uganda/food_acquired": "17bb246de42f242a62094c7c6925259593940b4dac0d62bd790526014bbaeefd",
+ "Uganda/household_roster": "845fd8de8acdb5ea6b505072f94b72a3e0f0681c693e9999e304422decf6094b",
+ "btf:cluster_features": "56e83e2dbaf0c3bb1ee616d51a2be70bb4ca4eabdbf69a890f61d0155cbd90bc",
+ "btf:crop_production": "56e83e2dbaf0c3bb1ee616d51a2be70bb4ca4eabdbf69a890f61d0155cbd90bc",
+ "btf:food_acquired": "1759fb8a9123974d9f3e7118edb67d483a9abc170a364c4fb7d30c70b4e2b284",
+ "btf:household_roster": "56e83e2dbaf0c3bb1ee616d51a2be70bb4ca4eabdbf69a890f61d0155cbd90bc",
+ "btf:sample": "56e83e2dbaf0c3bb1ee616d51a2be70bb4ca4eabdbf69a890f61d0155cbd90bc"
+}

@@ -1,0 +1,487 @@
+#+TITLE: Derivation census: Mali, GhanaLSS, Albania, Burkina_Faso, Senegal, GhanaSPS, CotedIvoire, Tajikistan
+#+DATE: 2026-09-11
+#+AUTHOR: census agent (group mali_to_tajikistan), for the per-row Derivation column design
+
+* Scope and method
+
+Read-only census of every place a SERVED number (or index value) in these
+eight countries is computed from raw fields rather than copied from one.
+Inputs: every wave script (~135 =_/{table}.py=), every =data_info.yml= (34),
+every wave =mapping.py=, the eight country modules, =data_scheme.yml= and the
+country Makefiles, plus the shared transform they invoke
+(=build_transforms.food_acquired_to_canonical=, imported through
+=transformations=).  Everything was read as text with =grep= / =sed=; nothing
+was executed, no =Country()= / =Feature()= call, no =dvc=.  The GitNexus MCP
+server did not connect (CONNECTION_CLOSED), so call-site sweeps used =rg= /
+=grep= per the CLAUDE.md substitution table.
+
+Paths below are relative to =lsms_library/countries/= unless they start with
+=lsms_library/= or =slurm_logs/=.  Excluded per the brief (renames, label
+decoding, canonical spellings, dtype coercion, id construction, reshapes,
+concatenation, lossless de-dup, non-food drops, v joins) are listed in the
+appendix only where they were easy to mistake for a derivation.  The four
+framework-derived tables (=food_expenditures= / =food_prices= /
+=food_quantities= / =household_characteristics=) belong to the framework
+census; only country-local versions of them are recorded here.
+
+Kind vocabulary is the brief's nine plus one this group needed: =sum= (a
+sum or difference across DIFFERENT raw fields, including counts of Yes over
+several items).  Where one served value is produced by more than one rule
+the =kind= cell lists them =primary+secondary=; the counts in section 3 are
+by primary kind.  An =id= column is prepended to the brief's ten columns so
+the notes can cite rows.
+
+* 1. Derivation table
+
+| id | country | wave(s) | table | served column(s) / index value | raw inputs (file.variable) | rule (formula or one line) | kind | where (path:line) | disclosed today? | rows affected if stated |
+|----+---------+---------+-------+--------------------------------+----------------------------+----------------------------+------+-------------------+------------------+-------------------------|
+| G1 | GhanaLSS | 1987-88, 1988-89 | food_acquired | Expenditure and Quantity, s=produced (u='Value') | Y12B.DAT.VFOODCPD ("how much would it cost to buy the amount they ate EACH TIME"); purchases beside it come from Y12A.DAT.CFOODBLV ("spent since my last visit", ~14 days) | served value := VFOODCPD as if it were a recall-period value; TFOODC/UTFOODC (frequency) and MFOODCLY (months) are read for nothing | encoding (recall-window substitution) | GhanaLSS/1987-88/_/food_acquired.py:9-11,69,88-89; GhanaLSS/1988-89/_/food_acquired.py:27-29,113-117 | docstring (WRONG: calls it "produced_value per day"); CONTENTS none (no VFOODCPD / Y12B anywhere); slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org sect. 2.2 [defect] | n = 2,253 / 2,437 households in the FINDINGS verification (l.141); own-production share served 17-18% vs 33-52% like-for-like |
+| G2 | GhanaLSS | 1987-88, 1988-89, 1991-92, 1998-99, 2005-06, 2012-13; 2016-17 conditional | food_acquired | Quantity, index u='Value' (s=purchased) | expenditure variable of each wave (e.g. Y12A.CFOODBLV, S8H.s8hq..., s9bq..) | Quantity := Expenditure; u := 'Value'; 2016-17 only where Quantity and u are NaN and Expenditure notna | encoding | 1987-88:81-82; 1988-89:108-109; 1991-92:104; 1998-99:84; 2005-06:101; 2012-13:70; 2016-17:218-221 (all GhanaLSS/<wave>/_/food_acquired.py) | docstring; CONTENTS l.1859, l.2747 ("u='Value' makes Quantity == Expenditure and the price is therefore 1.0") | 3,492,915 u='Value' rows corpus-wide (CONTENTS l.1905) |
+| G3 | GhanaLSS | 1987-88, 1988-89 | sample | weight, panel_weight | (none: no weight variable ships) | weight := 1.0; panel_weight := 1.0 (self-weighting design asserted) | impute | GhanaLSS/1987-88/_/mapping.py:222-223; 1988-89 same | docstring; yml comment; CONTENTS l.257-259 | all households of both waves |
+| G4 | GhanaLSS | 1991-92, 1998-99, 2005-06, 2012-13, 2016-17 | sample | panel_weight | the cross-sectional weight variable | panel_weight := weight | encoding | GhanaLSS/<wave>/_/data_info.yml sample blocks | comment (1998-99 yml); CLAUDE.md convention | all |
+| G5 | GhanaLSS | 1987-88, 1988-89, 1991-92, 1998-99 | interview_date | Int_t | 2-digit interview year + month + day fields | year := yy + 1900; date assembled from d/m/y | encoding | GhanaLSS/1987-88/_/mapping.py:146-147; 1991-92/_/mapping.py:132-133; 1998-99/_/mapping.py:96-97 | docstring | all |
+| G6 | GhanaLSS | 1991-92 | food_acquired | Price, s=produced | S8H.DTA.s8hq14 (one farmgate price per (i,j,u)) | Price broadcast to all 10 visit rows of that (i,j,u); price-only rows retained | selection (broadcast) | GhanaLSS/1991-92/_/food_acquired.py:36-45,136-137,152,166 | docstring (GH #851); CONTENTS | 206,498 produced rows carry a price and no quantity |
+| G7 | GhanaLSS | 1991-92, 2016-17 | food_acquired | all amount columns | any numeric field | value > 1e99 -> NaN | guard | 1991-92/_/food_acquired.py:142-146; 2016-17/_/food_acquired.py:225-231 | comment; CONTENTS l.3441-3452 | not stated |
+| G8 | GhanaLSS | 1991-92, 1998-99, 2005-06, 2012-13, 2016-17 | food_acquired | Quantity, Expenditure, Price | amount fields | 0 -> NaN ("treat 0 as missing, legacy convention"); rows with nothing left are dropped | guard | 1991-92:96,151; 1998-99:76,105; 2005-06:93,145; 2012-13:56,93,120; 2016-17:161 | comment only | not stated |
+| G9 | GhanaLSS | 1998-99 | food_acquired | Price, s=produced | duplicate farmgate price records per (i,j,u,visit) | Price := first() of the duplicates | selection | GhanaLSS/1998-99/_/food_acquired.py:107-109 | comment | not stated |
+| G10 | GhanaLSS | 2005-06 | food_acquired | Price, s=produced | Quantity and Price of the merged foodcd records within (i,j,u,visit) | Price := sum(Q*P)/sum(Q); if sum(Q)==0 fall back to the first price | ratio (quantity-weighted mean) + selection | GhanaLSS/2005-06/_/food_acquired.py:153-173 | comment; CONTENTS l.2755 | 24 rows in 12 groups (Goat, Other Meat) |
+| G11 | GhanaLSS | 2012-13 | food_acquired | Price, s=produced | duplicate (i,j,u) price records across visits | Price := unweighted mean over duplicates, then broadcast across visits | ratio (mean) + selection | GhanaLSS/2012-13/_/food_acquired.py:96-99 | comment only | not stated |
+| G12 | GhanaLSS | 2016-17 | food_security | FIES_score | s9cq1..s9cq8 | count of 'Yes' over 8 items; NaN item counts 0; NA only if all 8 NA | sum | GhanaLSS/2016-17/_/mapping.py:50-60; data_info.yml:124-132 | comment (yml); docstring; CONTENTS l.3371 | all |
+| G13 | GhanaLSS | 1987-88, 1988-89 | community_prices | NumberOfUnits | PRICE.DAT.QUANn; Basis (lot size) from _/harmonize_price_item table, default 1 | NumberOfUnits := QUANn x Basis | product | GhanaLSS/_/glss_prices.py:279,285; 1987-88/_/community_prices.py:19-20 | docstring; data_scheme comment | all |
+| G14 | GhanaLSS | 1991-92, 1998-99 | community_prices | NumberOfUnits | (none in file: per-unit value only); Basis constant from form | NumberOfUnits := Basis (form-stated lot size) | impute | GhanaLSS/_/glss_prices.py:311 | docstring; data_scheme l.119-122; CONTENTS l.3544 | all |
+| G15 | GhanaLSS | all | nutrition (!make) | nutrient columns | kg per (i,t,j) from food_quantities(units='kgs') after dropping u in {value, all, none}; FCT per 100 g | nutrient := sum_j kg_j x FCT_j x 10 (per-100g -> per-kg) | product+scale | GhanaLSS/_/nutrition.py:109-110,129,206 | docstring; CONTENTS l.1973-2081 | the 3,492,915 u='Value' rows (about two-thirds of the ~5.26M GhanaLSS food_acquired rows) contribute nothing |
+| G19 | GhanaLSS | 1991-92 | housing | Rooms | rooms field | value > 1e99 -> NA | guard | GhanaLSS/1991-92/_/mapping.py:137-144 | comment | not stated |
+| M1 | Mali | 2017-18, 2018-19 | household_roster | MonthsSpent | 2017-18 s1q13; 2018-19 s01q12 ("lived 6+ months continuously?") | Oui -> 12; Non -> 0 | categorical->number | Mali/2017-18/_/data_info.yml:88-92; Mali/2018-19/_/data_info.yml:163-167 | CLAUDE.md; CONTENTS l.539-559 | all (2021-22 wires no MonthsSpent at all) |
+| M2 | Mali | 2014-15 | household_roster | MonthsSpent | s01q11 (months, with label '36 mois et plus') | '36 mois et plus' -> 12; n -> min(max(n,0),12) | categorical->number+guard | Mali/_/mali.py:48-76 | docstring; CONTENTS l.559 | not stated |
+| M3 | Mali | 2014-15, 2017-18 | household_roster | Age | age field with top-code label '95 ans & plus' | label -> 95 | categorical->number | Mali/_/mali.py:28-37 | none | not stated |
+| M4 | Mali | 2018-19, 2021-22 | household_roster | Age | s01q04a (reported), s01q03a/b/c (DOB), interview date; interview_year constant 2018/2021 | shared age_handler: DOB-derived fractional age if it agrees with reported within 1 yr, else reported; 9999 -> None; negative -> NaN; invalid DOB falls back to year-only | selection (shared: age_handler) | Mali/2018-19/_/mapping.py:110-147; Mali/2021-22/_/mapping.py:95-118 | docstring; CLAUDE.md gotcha | not stated |
+| M5 | Mali | 2018-19, 2021-22 | food_security | FIES_score | 8 FIES items | count True; NaN -> 0 unless all NaN | sum | Mali/2018-19/_/mapping.py:188-203; 2021-22:168-183 | comment (yml); docstring | all |
+| M6 | Mali | 2018-19, 2021-22 | subjective_well_being | Own Step | 4-point ladder label | label -> 1..4 | categorical->number | Mali/2018-19/_/data_info.yml:18-24; 2021-22:16-22 | comment (yml); data_scheme | all |
+| M7 | Mali | 2014-15, 2017-18, 2018-19, 2021-22 | shocks | Affected* | shock effect labels | Diminue/Augmente -> True; Inchange -> False; Manquant (missing) -> False (2014-15); Non-concerne -> False | impute (missing -> False) | Mali/2014-15/_/data_info.yml:161-192 (others analogous) | none | not stated |
+| M8 | Mali | 2018-19; 2021-22 | shocks | HowCoped0..2 | Cope_k columns | 2018-19: first three Cope_k >= 1 in COLUMN (code) order; 2021-22: labels ordered by respondent RANK | selection | Mali/2018-19/_/mapping.py:155-181; 2021-22:122-149 | none | not stated |
+| M9 | Mali | 2014-15, 2017-18 | people_last7days | farm_hrs, SB_hrs, wage_hrs | per-job months, hours/day, days/month (two jobs), occupation code, activity dummies | hrs := months x hours x days / 52 per job, summed over jobs by occupation; := 0 where the activity dummy is False; 99/999/9999 -> NaN | annualise (annual -> weekly)+impute+guard | Mali/2014-15/_/people_last7days.py:104-151; 2017-18:102-149 | docstring; data_scheme l.296-298; CONTENTS none | not stated |
+| M10 | Mali | 2014-15, 2017-18 | people_last7days | Industry | six WB industry-range dummies over s04q22 / s4q13 | first True dummy wins; zeroed for self-employed | selection | Mali/2014-15/_/people_last7days.py:78-101 | comment (data_scheme.yml) | not stated |
+| M11 | Mali | 2014-15, 2017-18 | people_last7days | working_age | age | age >= 6 | categorical->number (threshold) | Mali/2014-15/_/people_last7days.py:73-76 | comment (data_scheme.yml) | all |
+| M12 | Mali | 2014-15, 2017-18 | plot_labor | PersonDays, Wage | {man,woman,child} x {PP,PH} persons and days cells; hired wage cells | PersonDays := sum persons x days; Wage := sum of wage cells; sentinels -> NaN | product+sum+guard | Mali/2014-15/_/plot_labor.py:69-155; 2017-18:72-143; Mali/_/mali.py:642-687 | docstring; data_scheme l.265-269; CONTENTS none | not stated |
+| M13 | Mali | 2014-15, 2017-18 | crop_production | Quantity_sold, Value_sold | s3aq22 / s7gq20 (sold? Oui/Non) and sale amounts | := 0 where 'Non'; 2017-18 sold is HH x crop grain and is attached only to crops on a single plot (else NaN) | impute+selection | Mali/2014-15/_/crop_production.py:60-62; 2017-18:82-96 | docstring; data_scheme; CONTENTS l.825 | not stated |
+| M14 | Mali | 2014-15, 2017-18 | crop_production, plot_inputs, livestock, plot_labor | numeric columns | numeric fields | 99/999/9999... Manquant sentinels -> NaN (WB .do convention) | guard | Mali/_/mali.py:365-366,460-461,566,666 | comment | not stated |
+| M15 | Mali | 2014-15, 2017-18 | plot_inputs | Purchased, Quantity_purchased | s2d / s7b household-grain input purchases | HH purchase stamped onto every plot row of that input type that has a Quantity | impute (broadcast across grain) | Mali/2014-15/_/plot_inputs.py:132-183; 2017-18:131-185 | docstring; data_scheme | not stated |
+| M16 | Mali | 2014-15 | community_prices | Price, Quantity | passage 1 and 2 price grids | Quantity 999/9999 -> NA; one price SELECTED per (t,v,j,u): passage 2 first, then questionnaire order | selection+guard | Mali/_/mali.py:822-852 | docstring; data_scheme; CONTENTS l.735,755 | not stated |
+| M17 | Mali | 2018-19, 2021-22 | plot_features | Area, SelfReportedArea, AreaUnit | s16aq45 (GPS taken?), s16aq47 (GPS m2), s16aq09a/b (estimate, unit) | Area := GPS/10000 if s16aq45==1 and notna, else estimate (/10000 when unit==2); <=0 or >1000 ha -> NA; AreaUnit := 'hectares' | selection+scale+guard | Mali/_/mali.py:207-238 | docstring (GH #327); data_scheme | not stated |
+| M19 | Mali | all four | sample | panel_weight | weight variable | panel_weight := weight | encoding | Mali/<wave>/_/data_info.yml | comment | all |
+| M22 | Mali | 2018-19, 2021-22 | food_acquired | Quantity (s=purchased), Expenditure (s=produced), index s | s07b_me_mli*.dta: s07bq03a (Quantity, total consumed), s07bq04 (Produced), s07bq08 (Expenditure) | shared food_acquired_to_canonical: purchased Quantity := (s07bq03a.fillna(0) - s07bq04.fillna(0)).clip(lower=0); produced Quantity := s07bq04, produced Expenditure := NaN; rows with neither Quantity>0 nor Expenditure>0 dropped | sum (difference)+guard | lsms_library/build_transforms.py:34-139; Mali/2018-19/_/mapping.py:4; 2021-22:6 | docstring (build_transforms); design doc slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org | all food rows |
+| A1 | Albania | 2002, 2005, 2008, 2012 | plot_features | Area, AreaUnit | plot size in square metres | Area := sq m / 10000; AreaUnit := constant 'sq. meters' (the SOURCE unit; value is hectares) | scale | Albania/_/albania.py:263-266 | docstring; data_scheme l.143-145; CONTENTS none | all |
+| A2 | Albania | 2002 | assets | Quantity, Value, Age | per-instance asset rows | Quantity := count of instances per (t,i,j); Value := sum; Age := min; missing j -> 'Other/Unspecified' | sum+selection | Albania/2002/_/assets.py:39-43 | docstring; CONTENTS none | not stated |
+| A3 | Albania | 2004 | cluster_features | Region | 2004 PSU id; 2002 PSU->district anchor learned from unanimous >=2-HH PSUs | Region := district of the same PSU in 2002; ambiguous -> NA; PSUs 995/999 excluded | impute (cross-wave) | Albania/2004/_/cluster_features.py:87-135 | docstring; data_scheme; CONTENTS l.664-672 | not stated |
+| A4 | Albania | 2004 | sample | v | m0_q01 | v := NA where m0_q01 in {995, 999} | guard | Albania/2004/_/sample.py:38-40 | docstring; CONTENTS l.664 | not stated |
+| A5 | Albania | 2002-2005 | cluster_features | all | household-grain attributes | cluster_reduce: a (v, col) with >1 distinct value -> NA + warning | guard | Albania/_/albania.py:315-373 | docstring; data_scheme | not stated |
+| A6 | Albania | 2012 | shocks | Years | M6D_{y} yes/no for 5 years | Years := comma-joined list of years with 'Yes' (string from 5 fields) | encoding | Albania/2012/_/shocks.py:57-68 | docstring; data_scheme | all |
+| A7 | Albania | all | sample | panel_weight | weight | panel_weight := weight | encoding | Albania/<wave>/_/sample.py | comment | all |
+| B1a | Burkina_Faso | 2014 | food_acquired | index visit (1..4) | FILENAME emc2014_p{1..4}_conso7jours_16032015.dta (no passage column); zd passed to visit_p1..p4 which ignore it | visit := constant per source file | encoding (index value from filename) | Burkina_Faso/2014/_/mapping.py:41-58,102-151; 2014/_/data_info.yml food_acquired block (l.215-260) | docstring; data_scheme l.62-75; CONTENTS l.125-135,472,767-790 | 671,978 source rows -> 557,822 canonical |
+| B1b | Burkina_Faso | 2014 | food_acquired | index u | uachat (absent in passages 2-4; blank for 55,205 p1 rows) | u NaN -> 'Unknown' | impute (index) | Burkina_Faso/2014/_/mapping.py:83-99 | docstring; CONTENTS l.795 | 460,438 of 557,822 rows (previously deleted by the NaN-key collapse) |
+| B2 | Burkina_Faso | 2014 | household_roster | MonthsSpent | B3A ('6 mois ou plus' / 'moins de 6 mois', a BINNED DURATION) | '6 mois ou plus' -> 12; 'moins de 6 mois' -> 0 | categorical->number | Burkina_Faso/2014/_/data_info.yml:36-70 | comment (yml, says it is literally false for 943 people, deliberate); CONTENTS l.526-541 | 943 people served a false 0 |
+| B3 | Burkina_Faso | 2018-19, 2021-22 | household_roster | MonthsSpent | s01q12 | Oui -> 12; Non -> 0 | categorical->number | Burkina_Faso/<wave>/_/data_info.yml | CLAUDE.md; CONTENTS l.534 | all |
+| B4 | Burkina_Faso | 2014 | months_food_inadequate | MonthsInadequate, AnyInadequate | SA4 (any month?), SA5A..SA5L (12 months) | MonthsInadequate := count(SA5 == 'Oui') if SA4 == 'Oui'; 0 if SA4 == 'Non'; NA if SA4 NA; AnyInadequate := MonthsInadequate > 0 | sum+impute | Burkina_Faso/2014/_/months_food_inadequate.py:35-53 | docstring; data_scheme l.168-181; CONTENTS none | all |
+| B6 | Burkina_Faso | 2018-19 | people_last7days | age, working_age | s01q04a (reported age), s01q03c (birth year) | age := s01q04a if notna else 2018 - s01q03c (birth year in [1900,2018]); working_age := age >= 6 | selection (date difference fallback) | Burkina_Faso/2018-19/_/people_last7days.py:52-59 | docstring; data_scheme l.290-292 | not stated |
+| B7 | Burkina_Faso | 2018-19 | plot_labor | PersonDays, Wage | s16aq33b_/35b_/37b_ (family days x member x phase); hired workers(a) x days(b) x category x phase; wage cells (c) | PersonDays := sum of days (family) + sum workers x days (hired); Wage := sum of c cells | product+sum | Burkina_Faso/2018-19/_/plot_labor.py:56-95 | docstring; data_scheme l.272-276; CONTENTS none | not stated |
+| B8 | Burkina_Faso | 2018-19, 2021-22 | plot_features | Area, AreaUnit | s16aq45, s16aq47, s16aq09a/b | as M17 (GPS else estimate; /10000; clamp; 'hectares') | selection+scale+guard | Burkina_Faso/_/burkina_faso.py:204-227 | docstring; CONTENTS l.560-562 (GPS-else-estimate, not the clamp) | not stated |
+| B9 | Burkina_Faso | 2018-19, 2021-22 | food_security | FIES_score | 8 FIES items | count True; NaN -> 0 unless all NaN | sum | Burkina_Faso/2018-19/_/mapping.py:112-131; 2021-22:30-49 | comment (data_scheme.yml); docstring | all |
+| B10 | Burkina_Faso | 2018-19, 2021-22 | shocks | HowCoped0..2 | Cope_k columns | first three Cope_k with float(val) >= 1 in code order (both waves); a non-numeric cell is skipped via try/except | selection | Burkina_Faso/2018-19/_/mapping.py:165-188; 2021-22:134-157 | none | not stated |
+| B11 | Burkina_Faso | 2018-19, 2021-22 | household_roster | Age | reported age (<0 -> None), DOB d/m/y (9999/NSP -> None), interview date, interview_year 2018/2021 | shared age_handler; negative -> NaN | selection (shared: age_handler) | Burkina_Faso/2018-19/_/mapping.py:60-105; 2021-22:83-131 | docstring | not stated |
+| B12 | Burkina_Faso | 2018-19 | plot_inputs | index u, index crop | unit / crop fields | missing u -> 'Manquant'; missing crop -> '(not crop-specific)' | impute (index) | Burkina_Faso/2018-19/_/plot_inputs.py:35-38,86-87 | comment (data_scheme.yml l.227-230) | not stated |
+| B13 | Burkina_Faso | 2018-19, 2021-22 | subjective_well_being | Own Step | 4-point ladder label | label -> 1..4 | categorical->number | Burkina_Faso/<wave>/_/data_info.yml; data_scheme l.37-47 | comment (data_scheme.yml) | all |
+| B14a | Burkina_Faso | 2014; 2018-19; 2021-22 | food_acquired (LEGACY script chain, fallback path) | price per unit, t | 2014: total expenses / quantity; 2018-19/2021-22: s07bq08 / s07bq07a (value of last purchase / AMOUNT BOUGHT, not quantity consumed); vague | price := expenditure / amount bought; t := vague -> '2018' / '2019' (wave split by vague); t := '2013_Q4' (2014) | ratio | Burkina_Faso/2014/_/food_acquired.py; 2018-19/_/food_acquired.py; 2021-22/_/food_acquired.py; Burkina_Faso/_/food_acquired.py (0 -> NaN then groupby sum) | comment (data_scheme.yml l.77-85, says unreferenced) | served only if the _FOOD_DERIVED path yields nothing |
+| B14b | Burkina_Faso | all | food_prices, food_quantities (country's OWN version, registered !make in data_scheme l.307-309) | Price, Quantity | legacy per-row price (B14a), Expenditure | food_prices := median price per (t,m,i,u); food_quantities := Expenditure / median price | ratio+selection | Burkina_Faso/_/food_prices_quantities_and_expenditures.py; Burkina_Faso/_/data_scheme.yml:307-309 | none | live FALLBACK only: country.py ~l.4536 tries the food_acquired derivation first and falls back to make only if that yields nothing |
+| B15 | Burkina_Faso | all | sample | panel_weight | weight | panel_weight := weight | encoding | Burkina_Faso/<wave>/_/data_info.yml | comment | all |
+| B16 | Burkina_Faso | 2014; 2018-19; 2021-22 | food_acquired | Quantity (s=purchased), Expenditure (s=produced), index s | 2014: qachat (Quantity), qautocons (Produced), achat (Expenditure), passage 1 only for quantities; 2018-19/2021-22: s07bq03a, s07bq04, s07bq08 | shared food_acquired_to_canonical as M22; 2014 wraps it per passage then adds the visit level | sum (difference)+guard | lsms_library/build_transforms.py:34-139; Burkina_Faso/2014/_/mapping.py:19,149; 2018-19/_/mapping.py:7-15; 2021-22:7-15 | docstring; CONTENTS l.465,777-790,915-923 | passages 2-4: Quantity and Produced NaN, so purchased Quantity := 0 - 0 -> row kept only on Expenditure |
+| S1 | Senegal | 2018-19, 2021-22 | household_roster | MonthsSpent | s01q12 | Oui -> 12; Non -> 0 | categorical->number | Senegal/<wave>/_/data_info.yml | CLAUDE.md; CONTENTS l.17-32 | all |
+| S2 | Senegal | 2018-19, 2021-22 | household_roster | Age | reported age, DOB d/m(French month name -> int)/y, interview date, interview_year 2018/2021 | shared age_handler | selection (shared: age_handler) | Senegal/2018-19/_/mapping.py:183-212; 2021-22:158-197 | docstring | not stated |
+| S3 | Senegal | 2018-19, 2021-22 | food_security | FIES_score | 8 FIES items | sum(True) with min_count=1; NaN if all NaN | sum | Senegal/2018-19/_/mapping.py:170-180; 2021-22:70-80 | docstring | all |
+| S4 | Senegal | 2018-19, 2021-22 | subjective_well_being | Own Step | 4-point ladder label | label -> 1..4 | categorical->number | Senegal/2018-19/_/data_info.yml:226-234; 2021-22:215-223 | comment (yml) | all |
+| S5 | Senegal | 2018-19; 2021-22 | shocks | HowCoped0..2 | Cope_k columns | 2018-19: first three Cope_k >= 1 in code order; 2021-22: labels sorted by respondent rank | selection | Senegal/2018-19/_/mapping.py:139-163; 2021-22:128-155 | none | not stated |
+| S6 | Senegal | 2018-19, 2021-22 | plot_features | Area, AreaUnit | s16aq45, s16aq47, s16aq09a/b | as M17 | selection+scale+guard | Senegal/_/senegal.py:197-221 | docstring; CONTENTS l.405-407 (not the clamp) | not stated |
+| S7 | Senegal | 2018-19 | people_last7days | age, working_age | s01q04a, s01q03c | age := s01q04a else 2018 - s01q03c (1900 <= birth <= 2018); working_age := age >= 6 | selection (date difference fallback) | Senegal/2018-19/_/people_last7days.py:63-71 | docstring; data_scheme | not stated |
+| S8 | Senegal | 2018-19 | plot_labor | PersonDays, Wage | family member-days x 3 phases; hired workers x days; wage cells | PersonDays := sums and products as B7; Wage := sum | product+sum | Senegal/2018-19/_/plot_labor.py:67-99 | docstring; data_scheme l.262-268 | not stated |
+| S9 | Senegal | 2018-19 | plot_inputs | index u, index crop | unit / crop fields | 'Manquant' / '(not crop-specific)' fills | impute (index) | Senegal/2018-19/_/plot_inputs.py:33,103-104 | comment (data_scheme.yml) | not stated |
+| S12 | Senegal | 2018-19, 2021-22 | sample | panel_weight | weight (2018-19 weight is grappe-level, merged on v) | panel_weight := weight | encoding | Senegal/<wave>/_/data_info.yml | comment | all |
+| S14 | Senegal | 2018-19, 2021-22 | food_acquired | Quantity (s=purchased), Expenditure (s=produced), index s | s07b_me_sen*.dta: s07bq03a, s07bq04, s07bq08 | shared food_acquired_to_canonical as M22 | sum (difference)+guard | lsms_library/build_transforms.py:34-139; Senegal/2018-19/_/mapping.py:5; 2021-22:5 | docstring (build_transforms) | all food rows |
+| GS1 | GhanaSPS | 2009-10 | food_acquired | Expenditure (purchased, produced, inkind) | s11a_{c,b,d}ii (cedis), s11a_{c,b,d}iii (pesewas) | Expenditure := cedis.fillna(0) + pesewas.fillna(0)/100 | scale+sum | GhanaSPS/2009-10/_/food_acquired.py:73-84 | docstring; CONTENTS l.1217-1221 | all |
+| GS2 | GhanaSPS | 2009-10 | livestock | HerdValue | s3ai_3i (cedis), s3ai_3ii (pesewas) | HerdValue := cedis + pesewas/100; NaN only if cedis null and pesewas 0 | scale+sum | GhanaSPS/_/ghanasps.py:546-555; 2009-10/_/data_info.yml:383-393 | comment (yml); data_scheme; CONTENTS l.1198-1221 | all |
+| GS3 | GhanaSPS | 2009-10 | crop_production | Value_sold | A83 / A124 cedis and pesewas fields | Value_sold := cedis + pesewas/100 | scale+sum | GhanaSPS/2009-10/_/crop_production.py:150-152 | docstring; data_scheme l.522-524; CONTENTS l.1648 | all |
+| GS4 | GhanaSPS | 2009-10, 2013-14, 2017-18 | plot_features | Area | 2009-10 shipped area_ha; size and AreaUnit in every wave | Area := area_ha where shipped, else size x factor[AreaUnit] with {Acres 0.404694, Poles 0.409551, Ropes 0.236342, Plot 0.102388} REVERSE-ENGINEERED from 2009-10 area_ha/size and applied to 2013-14 / 2017-18 | scale+selection | GhanaSPS/_/ghanasps.py:397-446 | docstring; data_scheme l.261-275; CONTENTS l.1150-1155 | 2013-14: 4,684; 2017-18: ~5,347 derived; 2 plots of 28,669 ha kept |
+| GS5 | GhanaSPS | 2009-10 | household_roster | MonthsAway | s1d_27 | NaN -> 0; clip(upper=12) | impute+guard | GhanaSPS/2009-10/_/mapping.py:48-74; data_info.yml:63-133 | comment (yml); data_scheme; CONTENTS l.594 | 8,933 NaN -> 0 (47.3% of persons); 1 clipped |
+| GS6 | GhanaSPS | all | individual_education | Educational Attainment | highestgrade, highestqual, attended | := highestgrade; else highestqual (unless Unknown / No education) where grade NA or 'Unknown'; else 'No education' where attended == 'No' | selection (fallback chain) | GhanaSPS/_/ghanasps.py:286-352 | docstring; data_scheme l.91-108 | 203 / 501 / 775 qual fallbacks by wave; 12,827 never-attended |
+| GS7 | GhanaSPS | 2013-14, 2017-18 (and 2009-10) | crop_production | index season | (none) / 2009-10: source FILE major vs minor, overriding the .dta labels | season := constant 'annual' (2013-14, 2017-18); 2009-10 season from filename | impute (index) | GhanaSPS/_/ghanasps.py:664,914; 2009-10/_/crop_production.py:10-16 | comment (data_scheme.yml); CONTENTS l.1117-1126,1607-1612 | all |
+| GS8a | GhanaSPS | 2013-14, 2017-18 | crop_production | harvest_month | harvestmonths1..6 | sorted, zero-padded, space-joined token string (e.g. '10 11') | encoding | GhanaSPS/_/ghanasps.py:804-824,896-903 | docstring; data_scheme l.533-539 | all |
+| GS8b | GhanaSPS | 2009-10 | crop_production | harvest_month | S4AIX1.s4aix_289ii / S4AIX5.s4aix_326ii (season END month of the plot's DOMINANT crop) | harvest_month := that month stamped on every harvest record of the plot-season (a proxy for crops that were never asked) | impute (broadcast proxy) | GhanaSPS/2009-10/_/crop_production.py:155-161 | docstring; data_scheme; CONTENTS l.1702 | all 2009-10 harvest rows |
+| GS9 | GhanaSPS | 2017-18 | crop_production | Value_sold, Quantity_sold | 9 buyer channels: <ch>soldquantity, <ch>soldprice, <ch>unit | Value_sold := sum_ch qty x price (NaN if any used channel lacks a price); Quantity_sold := sum_ch qty only if every channel's unit == harvest u, else NaN | product+sum+selection | GhanaSPS/_/ghanasps.py:844-871 | docstring; data_scheme l.516-531; CONTENTS l.1251 | 3,062 qty; 432+7 NaN'd; 12 no-price; one 42.8M GHS sale kept as is |
+| GS10 | GhanaSPS | 2013-14, 2017-18 | crop_production | index u | unit fields, 'Other' + specify text | missing u with a quantity -> 'Unknown'; 'Other'+specify folded on exact vocabulary match | impute (index) | GhanaSPS/_/ghanasps.py:785-795,890-894 | comment (data_scheme.yml) | not stated |
+| GS11 | GhanaSPS | 2009-10 | plot_labor | PersonDays, Hours | men/women/children days(.i), hours(.ii), workers(.iii) | PersonDays := sum_g days x workers; Hours := person-day-weighted mean of hours (groups lacking hours excluded); -10 / -1 -> NaN | product+sum+ratio+guard | GhanaSPS/2009-10/_/plot_labor.py:140-171; GhanaSPS/_/ghanasps.py:1031-1040 | docstring; data_scheme l.689-709; CONTENTS l.1918 | not stated |
+| GS12 | GhanaSPS | 2013-14, 2017-18 | plot_labor | PersonDays, WageRate, index season | women/men workers x days-per-worker (+ personaldays for 'self'); wage rate cells; 2013-14 plot-level rate | PersonDays := sum workers x days; WageRate <= 0 -> NaN; 2013-14 plot-level rate STAMPED on all 7 stage rows; season := 'last' constant; 2017-18 WageUnit code decoded in-code | product+sum+guard+impute | GhanaSPS/_/ghanasps.py:1075-1187 | docstring; data_scheme l.689-746 | 81 / 1,292 / 1,764 rate cells NaN'd (2013-14); 38 / 4 (2017-18) |
+| GS13 | GhanaSPS | 2009-10, 2017-18 | livestock | all measures | duplicate (t,i,animal) rows that are DIFFERENT species ('Other Farm Animals' lines) | duplicates SUMMED into one row after the keep-rule (any measure > 0) | sum | GhanaSPS/_/ghanasps.py:569-581 | comment (data_scheme.yml l.448-456; data_info.yml) | 20 HH x 2-3 lines (2009-10); 1 HH (2017-18) |
+| GS15 | GhanaSPS | 2009-10 | sample | panel_weight | weight | panel_weight := weight (2013-14 / 2017-18 ship no weight at all) | encoding | GhanaSPS/2009-10/_/data_info.yml | comment | all |
+| C1 | CotedIvoire | 2018-19 | household_roster | MonthsSpent | s01q12 | Oui -> 12; Non -> 0 (1985-89 waves record months resident but wire no MonthsSpent) | categorical->number | CotedIvoire/2018-19/_/data_info.yml:94-98 | CLAUDE.md; CONTENTS l.657-676 | all |
+| C2 | CotedIvoire | 2018-19 | household_roster | Age | reported age (<0 -> None), DOB with integer month, interview_year 2018 | shared age_handler; negative -> NaN | selection (shared: age_handler) | CotedIvoire/2018-19/_/mapping.py:150-168 | docstring | not stated |
+| C3 | CotedIvoire | 2018-19 | food_security | FIES_score | 8 FIES items | count True; NaN -> 0 unless all NaN | sum | CotedIvoire/2018-19/_/mapping.py:104-120 | docstring | all |
+| C4 | CotedIvoire | 2018-19 | subjective_well_being | Own Step | 4-point ladder label | label -> 1..4 | categorical->number | CotedIvoire/2018-19/_/data_info.yml:116-134 | comment (yml) | all |
+| C5 | CotedIvoire | 2018-19 | shocks | HowCoped0..2 | Cope_k columns | first three Cope_k >= 1 in code order; HowCoped2 column OMITTED when all null | selection | CotedIvoire/_/cotedivoire.py:46-83 | none | not stated |
+| C6a | CotedIvoire | 2018-19 | plot_features | Area, AreaSelfReported, AreaUnit | s16aq45, s16aq47, s16aq09a/b | as M17 | selection+scale+guard | CotedIvoire/2018-19/_/plot_features.py:80-131 | docstring; data_scheme | not stated |
+| C6b | CotedIvoire | 2018-19 | plot_features | PlotCertificate, SoilFertility | s16aq13 (document type code); soil code | PlotCertificate := True if s16aq13 in {1..5}, False if 7, NA if 6 or NA; SoilFertility := code -> {good, medium, poor} | categorical->number | CotedIvoire/2018-19/_/plot_features.py:80-131 | docstring | not stated |
+| C7 | CotedIvoire | 2018-19 | plot_labor | PersonDays, Wage | family member-days x phases; hired workers x days; wage cells | as B7 | product+sum | CotedIvoire/2018-19/_/plot_labor.py:61-99 | docstring | not stated |
+| C8 | CotedIvoire | 2018-19 | people_last7days | age, working_age | s01q04a, s01q03c | age := s01q04a else 2018 - s01q03c; working_age := age >= 6 | selection (date difference fallback) | CotedIvoire/2018-19/_/people_last7days.py:57-64 | docstring | not stated |
+| C9 | CotedIvoire | 2018-19 | plot_inputs | index u, index crop | unit / crop fields | 'Manquant' / '(not crop-specific)' fills | impute (index) | CotedIvoire/2018-19/_/plot_inputs.py:31,84-85 | comment (data_scheme.yml) | not stated |
+| C10 | CotedIvoire | 1985-86, 1986-87, 1987-88, 1988-89 | sample, cluster_features | Rural | REGION stratum (no urban/rural variable read) | Rural := REGION in {East Forest, West Forest, Savanna}; Urban := {Abidjan, Other cities} | encoding (one column stands in for another) | CotedIvoire/<wave>/_/data_info.yml:15-22,30-37 | CONTENTS l.77 ("Rural from REGION") | all |
+| C13 | CotedIvoire | all | sample | panel_weight | weight (2018-19 grappe-level, merged on v) | panel_weight := weight | encoding | CotedIvoire/<wave>/_/data_info.yml | comment | all |
+| C14 | CotedIvoire | 2018-19 | food_acquired | Quantity (s=purchased), Expenditure (s=produced), index s | Menage/s07b_me_CIV2018.dta: s07bq03a, s07bq04, s07bq08 | shared food_acquired_to_canonical as M22 (wrapped in mapping.food_acquired) | sum (difference)+guard | lsms_library/build_transforms.py:34-139; CotedIvoire/2018-19/_/mapping.py:5,87-95 | docstring | all food rows |
+| T1a | Tajikistan | 2007, 2009 | food_security_hfias | HFIAS1..HFIAS9, HFIAS_score | 9 occurrence (yes/no) and 9 frequency (rarely/sometimes/often) items | item := 0 if occurrence == 'no' else {rarely 1, sometimes 2, often 3}; HFIAS_score := sum of 9 (NA unless all 9 present) | categorical->number+sum | Tajikistan/2007/_/food_security_hfias.py:58-96; 2009:58-98 | docstring (cites Coates et al. 2007); data_scheme l.14-31 (no comment); CONTENTS none | all |
+| T1b | Tajikistan | 2007, 2009 | food_security_hfias | HFIAS_category | the 9 derived items | FANTA four-category rule over item patterns | selection (rule over derived items) | Tajikistan/2007/_/food_security_hfias.py:58-96; 2009:58-98 | docstring | all |
+| T2 | Tajikistan | 1999; 2003; 2007; 2009 | interview_date | Int_t | month and day fields; (no year column; 2009 HH4_Y blank); 1999 date_yr | year := HARDCODED 2003 / 2007 / 2009; 1999: year := date_yr + 1900 | impute (year) | Tajikistan/2003/_/interview_date.py:20-24; 2007:21-25; 2009:22-26; 1999:24-30 | docstring; CONTENTS none | all |
+| T3 | Tajikistan | 2007 | plot_features | AreaUnit, Area | plot area in sotka (1/100 ha) | AreaUnit := constant 'sotka'; Area passed through UNCONVERTED (every other country in this group serves hectares) | impute (unit constant) | Tajikistan/2007/_/plot_features.py:35,47-48 | docstring; data_scheme l.70-75; CONTENTS none | all |
+
+* 2. Per-derivation notes
+
+Each note: what is baked in, and whether the raw inputs can be recovered
+from the served table.
+
+** GhanaLSS
+
+- G1 (the motivating case).  =VFOODCPD= answers "how much would it cost to
+  buy the amount they ate each time" -- a value per EATING OCCASION.  The
+  script writes it into the same =Expenditure= column that, for
+  =s='purchased'=, holds =CFOODBLV= "spent since my last visit" (~14 days),
+  and (via G2) into =Quantity= with =u='Value'=.  The frequency
+  (=TFOODC= with time-unit code =UTFOODC= 3..8, FINDINGS l.132-133) and
+  months (=MFOODCLY=) that would
+  turn it into a recall value are read for nothing.  The docstring's "per
+  day" gloss entered in c404b7fb2 with no source and is wrong.  Verified
+  against GSS's own =EXPEND.HPFOOD= in
+  =slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org= sect. 2.2:
+  =VFOODCPD x TFOODC x (30.4/days_per_unit) x MFOODCLY= reproduces
+  =HPFOOD= (median ratio 1.020); the served value is 1.3-1.7% of it.
+  Served own-production share is 17-18% against 33-52% like-for-like.
+  =CONTENTS.org= l.1256 lists 12B as "single recall", which is the
+  opposite of what the file holds.  NOT recoverable: none of TFOODC,
+  UTFOODC, MFOODCLY reaches the served table.  Taxonomy: nothing in the
+  brief's nine kinds names "a raw value of a different meaning served
+  under a column's name"; =encoding= is the nearest and understates it.
+- G2.  =Quantity := Expenditure= with =u='Value'= is a deliberate
+  convention (price 1.0 by construction) and is the best-disclosed rule in
+  the group.  Recoverable trivially (the two columns are equal).  Its cost
+  is downstream: G15 must drop every such row, and the kg inference
+  (=CONTENTS= l.1905) has no purchase quantities for about two-thirds of
+  GhanaLSS food_acquired (3,492,915 of ~5.26M rows).
+- G3 / G4.  Weight 1.0 is asserted from the self-weighting design; the
+  mirror =panel_weight := weight= is a convention repeated in six of eight
+  countries (G4, M19, A7, B15, S12, GS15, C13).  Recoverable (constant /
+  duplicate).
+- G5.  =+1900= is safe for these waves; recoverable.
+- G6, G9, G10, G11.  Four waves resolve the produced-side =Price= four
+  different ways: broadcast a single farmgate price across 10 visits
+  (1991-92), =first()= of duplicates (1998-99), quantity-weighted mean with
+  a first-price fallback when =sum(Q)==0= (2005-06), unweighted mean then
+  broadcast (2012-13).  None is recoverable from the served table (the
+  duplicates are gone); 2005-06's per-row choice between the two rules
+  depends on data, so a per-row label would have to name which branch
+  fired.
+- G7, G8, G19.  Sentinel and zero guards.  G8 ("0 is missing") is disclosed
+  only by a comment and silently turns "bought nothing" into "not asked".
+- G12.  FIES: a NaN item counts as 0 unless all eight are NaN; the served
+  score cannot tell 3-of-8 from 3-of-5-answered.
+- G13 / G14.  =NumberOfUnits= is the product of a raw count and a lot-size
+  constant from a hand-maintained table, or (1991-92, 1998-99) the constant
+  alone; the raw =QUANn= is recoverable only where Basis == 1.
+- G15.  The x10 per-100g -> per-kg factor and the kg quantities from the
+  framework inference compound; the served nutrient carries neither.
+
+** Mali
+
+- M1 / M2 / (2021-22 none).  Three regimes for one column in one country:
+  a month count clipped to 12 (2014-15), a 6-month binary mapped to 12/0
+  (2017-18, 2018-19), and nothing wired (2021-22), although
+  =roster_to_characteristics= treats the column as a continuous month
+  count.  Raw =Oui/Non= is recoverable from 12/0; the clipped count is not.
+- M3.  Top-code 95 is not recoverable from 95.
+- M4 (shared =age_handler=, also B11, S2, C2).  The branch taken varies per
+  row (DOB-derived fractional age vs reported integer); the served =Age=
+  does not say which.  Record once per country as a shared derivation.
+- M7.  =Manquant -> False= turns "missing" into "not affected"; not
+  recoverable.
+- M8 / S5 / B10 / C5.  HowCoped: 2018-19 waves take the first three
+  strategies in QUESTIONNAIRE order, 2021-22 Mali/Senegal by respondent
+  RANK; Burkina 2021-22 keeps code order and applies =float(val) >= 1= --
+  if its Cope columns are rank STRINGS (as Mali/Senegal 2021-22 found),
+  =float()= raises, the cell is skipped, and every row gets NaN.  Recorded
+  as an assumption (Cope numeric), not verified.
+- M9.  hours per week := months x hours/day x days/month / 52 is an
+  annual->weekly rescale on a table named =people_last7days=; the zeroing
+  by activity dummy and the sentinels are folded in.  Not recoverable.
+- M12 / B7 / S8 / C7.  PersonDays sums products over up to 6 x 3 cells;
+  Wage sums cells.  Not recoverable.
+- M13.  =sold := 0 where 'Non'= is an impute; 2017-18 attaches a HH x crop
+  sale only to single-plot crops, so multi-plot crops read NaN, not
+  "unknown".
+- M15.  A household-grain purchase stamped on every plot row: summing
+  =Purchased= over plots overstates it by the plot count.  The raw HH
+  total is recoverable only by de-duplicating on (i, input).
+- M16.  Passage-2-first selection of one community price discards passage
+  1 where both exist.
+- M17 / B8 / S6 / C6a.  One served =Area= is three rules: branch on
+  =s16aq45=, =/10000= when the estimate unit is m2, clamp to (0, 1000] ha.
+  A per-row label would have to carry which branch AND whether the clamp
+  fired.  The clamp is undisclosed in the CONTENTS of all four countries.
+- M22 / B16 / S14 / C14 (shared =food_acquired_to_canonical=).  Purchased
+  quantity is a DIFFERENCE of two raw fields (=s07bq03a - s07bq04=), clipped
+  at 0, with NaN treated as 0 on both sides; produced =Expenditure= is set
+  to NaN.  Baked-in assumption: =s07bq03a= is a TOTAL of which =s07bq04= is
+  a subset (verified on Benin only, per the docstring).  For Burkina 2014
+  the same function is fed =qachat= ("quantite achat" by name) as the total
+  and =qautocons= as produced; if =qachat= is purchased-only the
+  subtraction double-counts own production out of purchases.  Recorded as
+  an assumption, not asserted as a bug.  Raw =s07bq03a= is recoverable
+  only where the clip did not fire (purchased + produced).
+
+** Albania
+
+- A1.  =Area= is in hectares while the served =AreaUnit= says 'sq. meters'.
+  The number is recoverable (x10000); the label is wrong.
+- A2.  =Quantity= is a count of instance rows, =Value= their sum, =Age= the
+  minimum: three reducers on one grain collapse, not a duplicate de-dup.
+- A3.  2004 =Region= is looked up from the 2002 PSU: a cross-WAVE impute,
+  with 995/999 sentinel PSUs excluded (A4).
+- A6.  =Years= is a string built from five yes/no fields; recoverable by
+  parsing.
+- Own Step (not a derivation in Albania): the native 1-10 ladder is passed
+  through, while EHCVM countries map a 4-point ladder to 1..4 into the
+  same column name.  A cross-country scale mismatch a per-row registry
+  would only see in the EHCVM rows.
+
+** Burkina_Faso
+
+- B1a.  =visit= is manufactured from the FILENAME: the four passage files
+  carry no passage column, so the config maps =zd= through four constants
+  that ignore their argument.  The raw input is the file, not a field;
+  a per-row Derivation keyed to file.variable cannot name it.
+- B1b.  =u := 'Unknown'= for 82.5% of rows is an index-value impute that
+  changed the served row count by 460,438.
+- B2.  A binned duration ('6 mois ou plus' / 'moins de 6 mois') is served
+  as if it were the EHCVM membership binary; the yml says it is literally
+  false for 943 people and that this was chosen deliberately.  Not
+  recoverable.
+- B4.  MonthsInadequate mixes a count over 12 fields with an impute (0 when
+  the screener says Non) and NA propagation.
+- B6 / S7 / C8.  =age := reported else survey year - birth year= is a
+  date-difference fallback; the served table does not say which.
+- B14a / B14b.  The legacy script chain (price := value / amount BOUGHT,
+  wave split by =vague=, median price, quantity := expenditure / median
+  price) is still registered =!make= for the three derived food tables.
+  =country.py= (~l.4536) tries the =food_acquired= derivation first and
+  falls back to =make= only if that yields nothing, so this is a LIVE
+  FALLBACK PATH, not dead code: a future failure of the YAML path would
+  silently serve numbers built on a different definition (amount bought
+  vs consumed; two "waves" per survey).
+- B16.  Passages 2-4 have neither =Quantity= nor =Produced=, so the
+  difference is 0 - 0 and rows survive on =Expenditure= alone; p1's
+  =autocons= / =cadeau= values are not read (=CONTENTS= l.915-923).
+
+** Senegal
+
+- S1-S9, S12, S14 mirror Mali/Burkina; see the shared notes above.  The
+  mojibake re-decode (=_decode_cp1252=) touches Relationship LABELS only
+  and changes no number -- excluded, as instructed.
+- S10 (legacy =food_acquired.py= / =food_prices_quantities_and_expenditures.py=)
+  is unreferenced: Senegal's =food_acquired= is YAML-path and no =!make=
+  registers the chain, so unlike Burkina it is not even a fallback.
+
+** GhanaSPS
+
+- GS1 / GS2 / GS3.  Cedis + pesewas/100 with =fillna(0)= on both parts:
+  a blank cedis cell with 50 pesewas is served as 0.50, a blank pair as
+  0 (GS1) or NaN (GS2's rule differs: NaN only if cedis null AND pesewas 0).
+  Two rules for the same currency split within one wave.
+- GS4.  The four unit factors were reverse-engineered from wave 1's
+  shipped =area_ha / size= and applied to waves 2 and 3 where no hectare
+  field ships.  =Ropes 0.236= and =Plot 0.102= are empirical medians, not
+  official conversions; two plots of 28,669 ha are served as is.  Raw
+  =size= is recoverable by division only if =AreaUnit= is served.
+- GS5.  =MonthsAway NaN -> 0= turns 47.3% of persons from "not asked" into
+  "never away"; disclosed, deliberate, not recoverable.
+- GS6.  A three-level fallback (grade, qualification, attended) into one
+  categorical column; the served value does not say which level fired.
+- GS7 / GS12.  =season := 'annual'= and =season := 'last'= are index
+  values manufactured with no raw input; 2009-10's season comes from the
+  FILE and overrides the .dta labels (the labels lie).
+- GS8b.  2009-10 =harvest_month= is the season END month of the plot's
+  DOMINANT crop stamped on every crop of that plot-season: a proxy
+  broadcast across a different grain, under a column that in 2013-14 /
+  2017-18 holds the crop's own months (GS8a).
+- GS9.  =Value_sold= is a sum of nine channel products, NaN if any used
+  channel lacks a price; =Quantity_sold= is served only when every
+  channel's unit equals the harvest unit -- a per-row rule on the row's
+  own units.  A 42.8M GHS sale is delivered unguarded.
+- GS11 / GS12.  =Hours= is a person-day-weighted mean; the 2013-14
+  plot-level wage rate is stamped on seven stage rows; =WageRate <= 0=
+  is NaN'd (fillers).  Not recoverable.
+- GS13.  Different 'Other Farm Animals' species summed into one row
+  (bounded: 20 households).
+
+** CotedIvoire
+
+- C1.  1985-89 LSMS waves record months resident but wire no MonthsSpent;
+  only 2018-19 (binary) serves it.
+- C5.  =HowCoped2= is dropped when all-null, so the column set varies by
+  data.
+- C6b.  =PlotCertificate= maps six document codes to True/False/NA: a
+  categorical->bool rule where code 6 ("other"?) becomes NA rather than
+  True.
+- C10.  =Rural= for the four 1985-89 waves is inferred from the REGION
+  stratum; no urban/rural variable is read.  Disclosed in CONTENTS l.77.
+- C11.  Legacy =food_expenditures.py= (1985-89: sum across sources,
+  fillna(0)) and 2018-19 =food_expenditures.py= / =nonfood_expenditures.py=
+  (t := vague -> '2018'/'2019'; HHID := grappe*1000+menage; 0 -> NaN) are
+  unreferenced and CONTENTS l.236 says do not extend.  Not served.
+
+** Tajikistan
+
+- T1a / T1b.  HFIAS: nine items are each a categorical->number rule (no ->
+  0, else frequency 1/2/3), the score sums them (NA unless all nine), and
+  the category applies the FANTA pattern rule to the DERIVED items: a
+  derivation over derivations.  Not in CONTENTS.
+- T2.  The interview YEAR is hardcoded per wave because the source ships
+  no year column (2009 =HH4_Y= blank); 1999 adds 1900.  Any fieldwork that
+  crossed a calendar year is mis-dated.
+- T3.  =AreaUnit := 'sotka'= is a constant and =Area= is NOT converted, so
+  the same column that holds hectares in Albania, EHCVM and GhanaSPS holds
+  1/100 ha here.  A =Feature('plot_features')= consumer reading =Area=
+  across countries is off by 100x for Tajikistan unless it reads
+  =AreaUnit=.
+
+* 3. Closing
+
+** Counts by primary kind (102 rows)
+
+| primary kind | rows |
+|--------------+------|
+| selection | 21 |
+| impute | 16 |
+| encoding | 14 |
+| categorical->number | 14 |
+| sum (added kind) | 12 |
+| product | 9 |
+| guard | 6 |
+| scale | 5 |
+| ratio | 4 |
+| annualise | 1 |
+| total | 102 |
+
+Counting every kind a row lists (primary or secondary): guard 16, sum 23,
+selection 26, scale 10.
+
+Compound rows (more than one kind on one served value): 24 of 102.
+Shared derivations recorded once per country: =age_handler= (M4, B11, S2,
+C2), =food_acquired_to_canonical= (M22, B16, S14, C14), the
+=panel_weight := weight= mirror (G4, M19, A7, B15, S12, GS15, C13), the
+EHCVM =Area= rule (M17, B8, S6, C6a), FIES (G12, M5, B9, S3, C3), HowCoped
+(M8, B10, S5, C5), the EHCVM =MonthsSpent= binary (M1, B3, S1, C1).
+
+** The cases where the served number is furthest in meaning from the raw answer
+
+1. G1 GhanaLSS 1987-88 / 1988-89: a value per eating occasion served as
+   a ~14-day recall value beside genuine recall values.  Served figure
+   is 1.3-1.7% of the GSS reconstruction; own-production share 17-18%
+   vs 33-52%.  The docstring says "per day", CONTENTS says "single
+   recall", both wrong; the only correct account is a slurm_logs
+   FINDINGS file dated today.
+2. G2 GhanaLSS six waves: =Quantity := Expenditure= with =u='Value'=.
+   Disclosed and deliberate, but 3.49M rows carry a "quantity" that is
+   money, and every downstream kg / nutrient path must know to drop
+   them (G15 does; a naive =Feature('food_acquired')= consumer does not).
+3. B2 Burkina 2014 =MonthsSpent=: a duration bin mapped as a membership
+   binary, known false for 943 people; and its siblings M1/B3/S1/C1 map a
+   yes/no to 12/0 in a column the framework treats as a month count.
+4. GS5 GhanaSPS 2009-10 =MonthsAway NaN -> 0= (47.3% of persons) and GS8b
+   =harvest_month= := dominant-crop season end stamped on every crop of
+   the plot: "not asked" served as a definite answer.
+5. T3 Tajikistan 2007 =Area= in sotka under the column every other
+   country serves in hectares (100x), with A1 Albania as the mirror
+   image (value in ha, label says 'sq. meters').
+
+** Same column, different derivation across waves of one country
+
+- GhanaLSS produced =Price=: broadcast (1991-92) / first() (1998-99) /
+  quantity-weighted mean with fallback (2005-06) / unweighted mean
+  (2012-13).  GhanaLSS produced =Expenditure=: per-occasion VFOODCPD
+  (1987-89) vs recall values (1991-92 on).
+- Mali =MonthsSpent=: clipped month count (2014-15) / 6-month binary
+  (2017-18, 2018-19) / not wired (2021-22).
+- Mali and Senegal =HowCoped=: questionnaire order (2018-19) vs
+  respondent rank (2021-22); Burkina keeps code order in both waves and
+  assumes numeric Cope cells.
+- GhanaSPS =season=: from file (2009-10) / 'annual' (2013-14, 2017-18)
+  in crop_production, and 'last' in plot_labor.  GhanaSPS
+  =harvest_month=: dominant-crop proxy (2009-10) vs own months
+  (2013-14, 2017-18).  GhanaSPS =Area=: shipped ha (2009-10) vs factors
+  learned from 2009-10 (later waves).
+- GhanaSPS money: GS1 =fillna(0)= on both parts vs GS2 NaN-if-cedis-null.
+- Tajikistan =Int_t= year: hardcoded (2003/2007/2009) vs +1900 (1999).
+
+** What would not fit a per-row Derivation column keyed to a registry
+
+- Derivations of an INDEX VALUE rather than a column: B1a =visit= from a
+  filename, B1b/GS10/B12/S9/C9 =u= / crop fills, G2 =u='Value'=, GS7/GS12
+  =season= constants.  A row's Derivation cell has no index-level slot.
+- Raw inputs that are not fields: B1a (the file), GS7 2009-10 (the file),
+  GS4 (factors learned from another wave's data), A3 (another wave's
+  table), T2 (a hardcoded year).
+- Values borrowed across grain: M15 (HH purchase on plot rows), GS8b
+  (plot-dominant crop on every crop), GS12 (plot rate on 7 stage rows),
+  G6/G11 (one price on 10 visits).  The registry entry is the same on
+  every stamped row, but the fact that N rows share ONE raw observation
+  is what matters and is not per-row.
+- Per-row branch selection inside one rule: M17/B8/S6/C6a (GPS vs
+  estimate, and whether the clamp fired), G10 (weighted mean vs first
+  price), GS6 (grade vs qual vs attended), age_handler (DOB vs reported),
+  B6/S7/C8, GS9 (units agree or not), G2 in 2016-17 (conditional).  A
+  registry name identifies the rule; the row still needs the branch.
+- Nested derivations: T1b category over nine derived items; G15
+  nutrients over framework-inferred kg; B14b median-of-derived-price.
+- Sums whose NaN policy is not recoverable: FIES / HFIAS / B4 (NaN item
+  counts 0 -- the served score does not say how many items were answered).
+- Two taxonomy gaps: no kind for a sum/difference across different
+  fields (used =sum= here, 20+ rows), and none for G1's "different
+  question served under this column's name" (recall-window / meaning
+  substitution), which is the case the design is motivated by.
+- Live but conditional code: B14a/B14b serve only when the primary path
+  fails; a static per-row column cannot express "derived by X unless Y
+  failed, then by Z".
+
+* Appendix: read and excluded (not derivations, or not served)
+
+- GhanaLSS: SU -> Rural fold in 1987-89 cluster_features (categorical
+  fold, G16); 1991-92 visit := question k+1 (index relabel, G17);
+  =ghanalss.py:88-104 yearly_expenditure= (cost x freq x 30/4 x months)
+  has zero callers -- dead code (G18).
+- Mali: 2018-19/2021-22 =Irrigated := label == 'Irrigated'= (decode);
+  2014-15 =visit := rank of Int_t within i= (index from date order);
+  2014-15 mapping.food_acquired keeps rows with Quantity>0 or
+  Expenditure>0 (filter); Mali 2014-15 does NOT use
+  =food_acquired_to_canonical= (its mapping.py maps three explicit
+  streams because =s13q03a= is purchased-only; the grep hit is a comment).
+- Albania: 2005 PSU-level weight broadcast to households (join); 2003/2004
+  drop households with missing weight (filter); =albania_date_ymd=
+  assembly; 2002/2004/2005 =mapping.Int_t= appear unreferenced; Own Step
+  native 1-10 (no derivation; cross-country scale note above); label maps
+  for Tenure / SoilType / Irrigated.
+- Burkina_Faso: 2014 food_coping =Days := round(SA2x)= (coercion).
+- Senegal: =_decode_cp1252= on Relationship labels (S11);
+  'SAINT-LOUIS' -> 'Saint-Louis' (spelling); 2021-22 CAPI preload ghost
+  rows dropped (filter); legacy S10 chain unreferenced.
+- GhanaSPS: =other_expenditures= scripts (cedis + pesewas/100, 0 -> NaN)
+  are in no data_scheme / Makefile (GS14); =v := FPrimary[-6:-3]= (id
+  slice).
+- CotedIvoire: =_decode_mojibake= on food_acquired strings (C12); legacy
+  C11 scripts.
+- Tajikistan: 2007 =plot_id := tenure tag + plotcode= (id); 1999
+  education code 0 -> 'Unknown' and 2003 Relationship mojibake keys
+  (decode); 2007/2009 life_satisfaction drops 'don't know' / 'refuse'
+  (filter); no weight in 1999 and no panel_weight in 2003-2009 (gap, not
+  a derivation).

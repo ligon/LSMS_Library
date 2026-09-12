@@ -327,6 +327,9 @@ def crop_production_for_wave(t, frames, crop_labels):
             dec       : decoded-label DataFrame (for crop/unit label decode)
             hhid, plot, crop                 column names (plot may be None)
             qty, unit                        harvest qty / unit columns
+            kg_factor                        SURVEY-REPORTED "Kg/L conversion
+                                             factor" column asked BESIDE
+                                             `qty`/`unit` (optional; GH #859)
             qty_sold, unit_sold, value_sold  reported sale columns (optional)
             plant_m, plant_y                 planting/harvest-start month/yr
             harv_m, harv_y                   harvest-end month/yr (optional)
@@ -360,7 +363,7 @@ def crop_production_for_wave(t, frames, crop_labels):
 
         piece = pd.DataFrame({
             'i': i.values,
-            'plot': plot.values,
+            'plot_id': plot.values,
             'crop': crop.values,
         }, index=df.index)
 
@@ -370,6 +373,25 @@ def crop_production_for_wave(t, frames, crop_labels):
             piece['u'] = dec[fr['unit']].map(_canon_unit).astype('string').values
         else:
             piece['u'] = pd.Series(pd.NA, index=df.index, dtype='string').values
+
+        # SURVEY-REPORTED kilograms per ONE unit of THIS row's `u` -- the
+        # GHS-Panel "Kg/L conversion factor" column (`*_conv`), asked beside
+        # the harvest quantity and its unit.  A RATE, never a weight; it is
+        # taken positionally off the SAME row as `qty`/`unit`, so no join and
+        # no averaging can enter.  REPORTED, NEVER CONSTRUCTED -- see the
+        # canonical note at lsms_library/data_info.yml `crop_production.
+        # KgFactor`.  Only a `*_conv` asked beside THIS frame's own
+        # quantity/unit pair may be named here (GH #859): the expected-future
+        # harvest blocks carry their own unit columns and their own factor,
+        # and secta3ii's factor is hh-crop grain -- see _/CONTENTS.org.
+        # A non-positive value is read as "not recorded" (0 kg per unit is
+        # not a weight); measured no-op on every Nigeria wave -- all four
+        # wired columns report positive-or-null only.
+        if fr.get('kg_factor') in df.columns:
+            kgf = pd.to_numeric(df[fr['kg_factor']], errors='coerce')
+            piece['KgFactor'] = kgf.where(kgf > 0, np.nan).astype('float64').values
+        else:
+            piece['KgFactor'] = np.nan
 
         # Reported sale at plot-crop grain (W1/W2); hh-crop sales merged
         # separately below.
@@ -402,6 +424,12 @@ def crop_production_for_wave(t, frames, crop_labels):
                 'planting_month', 'harvest_month', 'intercropped', 'perennial']:
         if col not in out.columns:
             out[col] = pd.NA
+    # KgFactor is float, not object: a wave with no `*_conv` column anywhere
+    # must still deliver a FLOAT all-NaN column, or the country-level concat
+    # of (all-NaN waves + float waves) degrades the dtype to object.
+    if 'KgFactor' not in out.columns:
+        out['KgFactor'] = np.nan
+    out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce').astype('float64')
 
     # Drop rows with no crop label resolved (free-text junk codes) and no
     # household.  Keep rows with a crop even if Quantity is NaN (the
@@ -410,12 +438,13 @@ def crop_production_for_wave(t, frames, crop_labels):
 
     # Dedup on the index grain (a handful of duplicate (i,plot,crop) rows
     # exist in W1); keep the first non-null record.
-    out = out.sort_values(['i', 'plot', 'crop'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'crop'], keep='first')
+    out = out.sort_values(['i', 'plot_id', 'crop'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'crop'], keep='first')
 
-    out = out.set_index(['t', 'i', 'plot', 'crop']).sort_index()
+    out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
-               'planting_month', 'harvest_month', 'intercropped', 'perennial']]
+               'planting_month', 'harvest_month', 'intercropped', 'perennial',
+               'KgFactor']]
     return out
 
 
@@ -582,7 +611,7 @@ def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
 
     out = pd.DataFrame({
         'i': i.values,
-        'plot': plot_id.values,
+        'plot_id': plot_id.values,
         'input': INPUT_SEED,
         'crop': crop_lab.values,
         'Quantity': pd.Series(qty.values, dtype='Float64'),
@@ -596,7 +625,7 @@ def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
     else:
         out['Improved'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
     # Keep only rows with a household, a plot, and a resolved crop.
-    out = out[out['i'].notna() & out['plot'].notna() & out['crop'].notna()]
+    out = out[out['i'].notna() & out['plot_id'].notna() & out['crop'].notna()]
     return out
 
 
@@ -618,7 +647,7 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
     """
     i = df[hhid].apply(format_id)
     plot_id = df[plot].apply(format_id)
-    base = pd.DataFrame({'i': i.values, 'plot': plot_id.values},
+    base = pd.DataFrame({'i': i.values, 'plot_id': plot_id.values},
                         index=df.index)
 
     # Build a per-channel long frame, then split by resolved type label.
@@ -633,21 +662,21 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
              if ch.get('unit') and ch['unit'] in dec.columns
              else pd.Series('Kg', index=df.index, dtype='string'))
         chan_frames.append(pd.DataFrame({
-            'i': base['i'].values, 'plot': base['plot'].values,
+            'i': base['i'].values, 'plot_id': base['plot_id'].values,
             'type': typ.values, 'qty': q.values, 'u': u.values,
             'purchased': bool(ch.get('purchased', False)),
         }, index=df.index))
     if not chan_frames:
-        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+        return pd.DataFrame(columns=['i', 'plot_id', 'input', 'crop', 'Quantity',
                                      'u', 'Purchased', 'Quantity_purchased',
                                      'Improved'])
     long = pd.concat(chan_frames, ignore_index=True)
-    long = long[long['type'].notna() & long['i'].notna() & long['plot'].notna()]
+    long = long[long['type'].notna() & long['i'].notna() & long['plot_id'].notna()]
 
     # One row per (i, plot, type): sum same-unit quantities, purchased = any
     # positive purchased-channel quantity.
     recs = []
-    for (i_, p_, typ), g in long.groupby(['i', 'plot', 'type']):
+    for (i_, p_, typ), g in long.groupby(['i', 'plot_id', 'type']):
         gg = g[g['qty'].notna() & (g['qty'] > 0)]
         if len(gg):
             units = gg['u'].dropna().unique()
@@ -663,7 +692,7 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
         pqsum = pq.sum() if len(pq) else pd.NA
         purchased = (pd.NA if (pqsum is pd.NA or pd.isna(pqsum))
                      else (True if pqsum > 0 else False))
-        recs.append({'i': i_, 'plot': p_, 'input': typ, 'crop': NO_CROP,
+        recs.append({'i': i_, 'plot_id': p_, 'input': typ, 'crop': NO_CROP,
                      'Quantity': qty, 'u': uu, 'Purchased': purchased,
                      'Quantity_purchased': pqsum, 'Improved': pd.NA})
     out = pd.DataFrame.from_records(recs)
@@ -696,7 +725,7 @@ def fert_rows_wide_typed(df, dec, hhid, plot, specs):
              if sp.get('unit') and sp['unit'] in dec.columns
              else pd.Series('Kg', index=df.index, dtype='string'))
         piece = pd.DataFrame({
-            'i': i.values, 'plot': plot_id.values, 'input': sp['input'],
+            'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
             'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
@@ -706,11 +735,11 @@ def fert_rows_wide_typed(df, dec, hhid, plot, specs):
         piece = piece[piece['Quantity'].notna()]
         pieces.append(piece)
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+        return pd.DataFrame(columns=['i', 'plot_id', 'input', 'crop', 'Quantity',
                                      'u', 'Purchased', 'Quantity_purchased',
                                      'Improved'])
     out = pd.concat(pieces, ignore_index=True)
-    out = out[out['i'].notna() & out['plot'].notna()]
+    out = out[out['i'].notna() & out['plot_id'].notna()]
     return out
 
 
@@ -754,7 +783,7 @@ def chem_rows(df, dec, hhid, plot, specs):
         # Emit ONLY where a positive reported quantity exists.
         emit = (q.fillna(0) > 0)
         piece = pd.DataFrame({
-            'i': i.values, 'plot': plot_id.values, 'input': sp['input'],
+            'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
             'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
@@ -763,11 +792,11 @@ def chem_rows(df, dec, hhid, plot, specs):
         piece = piece[emit.values]
         pieces.append(piece)
     if not pieces:
-        return pd.DataFrame(columns=['i', 'plot', 'input', 'crop', 'Quantity',
+        return pd.DataFrame(columns=['i', 'plot_id', 'input', 'crop', 'Quantity',
                                      'u', 'Purchased', 'Quantity_purchased',
                                      'Improved'])
     out = pd.concat(pieces, ignore_index=True)
-    out = out[out['i'].notna() & out['plot'].notna()]
+    out = out[out['i'].notna() & out['plot_id'].notna()]
     return out
 
 
@@ -775,11 +804,11 @@ def assemble_plot_inputs(t, parts):
     """Concatenate the per-module row frames for one wave, attach `t`,
     drop empties, set the (t, i, plot, input, crop) index and dedup."""
     parts = [p for p in parts if p is not None and len(p)]
-    cols = ['i', 'plot', 'input', 'crop', 'Quantity', 'u', 'Purchased',
+    cols = ['i', 'plot_id', 'input', 'crop', 'Quantity', 'u', 'Purchased',
             'Quantity_purchased', 'Improved']
     if not parts:
         return pd.DataFrame(columns=cols).set_index(
-            ['i', 'plot', 'input', 'crop'])
+            ['i', 'plot_id', 'input', 'crop'])
     out = pd.concat(parts, ignore_index=True)
     for c in cols:
         if c not in out.columns:
@@ -789,10 +818,10 @@ def assemble_plot_inputs(t, parts):
     out['input'] = out['input'].astype('string')
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
-    out = out.sort_values(['i', 'plot', 'input', 'crop'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'input', 'crop'],
+    out = out.sort_values(['i', 'plot_id', 'input', 'crop'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'input', 'crop'],
                               keep='first')
-    out = out.set_index(['t', 'i', 'plot', 'input', 'crop']).sort_index()
+    out = out.set_index(['t', 'i', 'plot_id', 'input', 'crop']).sort_index()
     return out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
 
 
@@ -1574,7 +1603,7 @@ def _plot_labor_assemble(t, hhid, plot, family, hired, other, wage):
                          (LABOR_OTHER, other)):
         piece = pd.DataFrame({
             'i': i.values,
-            'plot': p.values,
+            'plot_id': p.values,
             'source': source,
             'PersonDays': pd.to_numeric(days, errors='coerce').values,
         })
@@ -1587,10 +1616,10 @@ def _plot_labor_assemble(t, hhid, plot, family, hired, other, wage):
     out['t'] = t
     # Drop rows with no household / plot key or no reported person-days
     # (a source not used on the plot -> no item row).
-    out = out[out['i'].notna() & out['plot'].notna() & out['PersonDays'].notna()]
-    out = out.sort_values(['i', 'plot', 'source'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'source'], keep='first')
-    out = out.set_index(['t', 'i', 'plot', 'source']).sort_index()
+    out = out[out['i'].notna() & out['plot_id'].notna() & out['PersonDays'].notna()]
+    out = out.sort_values(['i', 'plot_id', 'source'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'source'], keep='first')
+    out = out.set_index(['t', 'i', 'plot_id', 'source']).sort_index()
     return out[['PersonDays', 'Wage']]
 
 
@@ -1649,7 +1678,7 @@ def plot_labor_split(t, fam_df, hired_df, fam_days_col='sa2aq1b',
                          (LABOR_OTHER, other)):
         piece = pd.DataFrame({
             'i': hhid.values,
-            'plot': plot.values,
+            'plot_id': plot.values,
             'source': source,
             'PersonDays': pd.to_numeric(days, errors='coerce').values
             if days is not None else np.nan,
@@ -1659,10 +1688,10 @@ def plot_labor_split(t, fam_df, hired_df, fam_days_col='sa2aq1b',
         rows.append(piece)
     out = pd.concat(rows, ignore_index=True)
     out['t'] = t
-    out = out[out['i'].notna() & out['plot'].notna() & out['PersonDays'].notna()]
-    out = out.sort_values(['i', 'plot', 'source'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot', 'source'], keep='first')
-    out = out.set_index(['t', 'i', 'plot', 'source']).sort_index()
+    out = out[out['i'].notna() & out['plot_id'].notna() & out['PersonDays'].notna()]
+    out = out.sort_values(['i', 'plot_id', 'source'])
+    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'source'], keep='first')
+    out = out.set_index(['t', 'i', 'plot_id', 'source']).sort_index()
     return out[['PersonDays', 'Wage']]
 
 

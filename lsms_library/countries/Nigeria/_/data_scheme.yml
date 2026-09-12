@@ -227,7 +227,7 @@ Data Scheme:
 
   crop_production:
     # Item-level reported crop harvest (GAP 1) at natural grain
-    # (t, i, plot, crop).  Source: post-harvest crop module secta3*.
+    # (t, i, plot_id, crop).  Source: post-harvest crop module secta3*.
     # Crop-level harvest is recorded only in the post-harvest round, so
     # each wave maps to a single t = PH quarter (2011Q1 / 2013Q1 /
     # 2016Q1 / 2019Q1 / 2024Q1), distinct from plot_features' PP quarter
@@ -243,7 +243,7 @@ Data Scheme:
     # hh-crop grain (no plot linkage) -> NaN.  intercropped derived from
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
     # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii).
-    index: (t, i, plot, crop)
+    index: (t, i, plot_id, crop)
     Quantity: float
     u: str
     Quantity_sold: float
@@ -252,11 +252,33 @@ Data Scheme:
     harvest_month: str
     intercropped: bool
     perennial: bool
+    # SURVEY-REPORTED kilograms per ONE unit of this row's `u` -- the
+    # GHS-Panel "Kg/L conversion factor" (`*_conv`), asked beside the
+    # harvest quantity and its unit.  A RATE, not a weight: the row's
+    # kilograms are Quantity * KgFactor.  Taken positionally off the same
+    # source row -- no join, no median, no unit-table lookup (REPORTED,
+    # NEVER CONSTRUCTED; see lsms_library/data_info.yml).
+    #
+    # `optional` because only W4 (2019Q1) and W5 (2024Q1) ship the column:
+    # W1/W2 (secta3_harvestw{1,2}) and W3 (secta3i/secta3ii_harvestw3) carry
+    # NO `*_conv` variable in any harvest file, verified from the .dta
+    # metadata, so KgFactor is legitimately all-NaN in those three waves and
+    # the all-null guard must not fire.
+    #
+    # Wired per section to the `*_conv` that pairs with the quantity/unit
+    # this table stores: W4 sa3iq6_conv / sa3iiiq13_conv, W5 sa3iq9_conv /
+    # sa3iiiq23_conv.  The other `*_conv` columns are NOT wired and must not
+    # be: sa3iq6d_conv (W4) / sa3iq15_conv (W5) belong to the "expect to
+    # harvest MORE" block with its own unit columns, and sa3iiq1_conv
+    # (secta3ii) is hh-crop grain with no plot linkage.  See _/CONTENTS.org.
+    KgFactor:
+      type: float
+      optional: true
     materialize: make
 
   plot_inputs:
     # Item-level reported agricultural inputs (GAP 2) at natural grain
-    # (t, i, plot, input, crop).  Source: the post-planting / post-harvest
+    # (t, i, plot_id, input, crop).  Source: the post-planting / post-harvest
     # input modules (seeds sect11e/sect11f, fertilizer sect11d/secta11c2,
     # pesticide sect11c/secta11c2).  Each wave maps to a single t = PP
     # quarter (2010Q3 / 2012Q3 / 2015Q3 / 2018Q3 / 2023Q3), matching
@@ -290,7 +312,7 @@ Data Scheme:
     # at this grain -> NaN).  Improved: seed rows only -- W3 s11eq3b
     # (hybrid/improved), W4/W5 s11fq3b/s11fq7 + certified flag; W1/W2 seed
     # modules have no improved-variety question -> NaN.
-    index: (t, i, plot, input, crop)
+    index: (t, i, plot_id, input, crop)
     Quantity: float
     u: str
     Purchased: bool
@@ -395,7 +417,7 @@ Data Scheme:
 
   plot_labor:
     # Item-level reported plot labor by source (GAP 3, grain 2) at natural
-    # grain (t, i, plot, source), source in {family, hired, other}.
+    # grain (t, i, plot_id, source), source in {family, hired, other}.
     # Source: the post-harvest plot labor roster secta2_harvest{wN} (W1-W3
     # a single wide file with the sa2q* family-slot / hired man-woman-child
     # / other scheme; W4 splits into secta2a family roster + secta2b
@@ -420,13 +442,13 @@ Data Scheme:
     # `source` (index) is a harmonize_labor_source Preferred Label.  `v`
     # auto-joins from sample() at API time (plot_labor is NOT in the
     # framework `_no_v_join` set).  plot (= plotid, format_id) aligns with
-    # crop_production / plot_inputs on (t, i, plot); t = PH_QUARTER[wave]
+    # crop_production / plot_inputs on (t, i, plot_id); t = PH_QUARTER[wave]
     # (post-harvest round).  PP-round plot labor (sect11c1_planting{wN}) is
     # NOT folded in (would require a PP+PH SUM = the forbidden total).
     # Wired W1-W4; W5 secta2 uses a divergent variable scheme (sa2aq1/2/3,
     # sa2bq*_N) that the W4 helper / the W5 .do cannot read faithfully ->
     # documented partial, follow-up.
-    index: (t, i, plot, source)
+    index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float
     materialize: make
@@ -507,4 +529,28 @@ Data Scheme:
     Price: float
     materialize: make
 
-  nonfood_expenditures: !make
+  nonfood_expenditures:
+    # Item-level household non-food expenditure from the post-planting
+    # (sect8a-e) and post-harvest (sect11a-e) modules.  `j` is the per-round
+    # `nonfood_items.json` label; `t` is the ROUND (2010Q3, 2011Q1, ...), never
+    # the wave directory -- Nigeria is post-planting / post-harvest and the two
+    # rounds in a wave dir are distinct observations
+    # (.claude/skills/add-feature/pp-ph/SKILL.md).
+    #
+    # LONG since GH #817.  It used to be declared bare `!make` and delivered a
+    # WIDE 96-column item-by-household matrix with the zone `m` in the index;
+    # with no `index:` and no columns here, `_assert_built_required_columns`,
+    # the `dfs:` guard and the coverage grader had nothing to check.  The
+    # reshape changed the SHAPE, not the arithmetic: every round's total is
+    # unchanged.  `m` is gone -- a region level is added on demand by
+    # `_add_market_index()` when the caller passes `market=`.
+    #
+    # NO RecallWindow, and that is a KNOWN GAP rather than a statement about
+    # the survey: sect8a-e and sect11a-e are different recall windows (the
+    # instrument asks over 7 days for one sub-module and longer for the
+    # others), and this table pools them.  Togo carries `RecallWindow` for
+    # exactly this reason.  Populating it here needs the instrument read
+    # sub-module by sub-module; see GH #817's follow-up note.
+    index: (t, i, j)
+    Expenditure: float
+    materialize: make

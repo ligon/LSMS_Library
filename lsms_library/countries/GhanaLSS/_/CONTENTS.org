@@ -1,8 +1,9 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 The Ghana Living Standards Survey (Ghana LSS) is one of two major surveys we have for Ghana, the other being the Ghana Social Panel Survey (GhanaSPS).
 
-* Survey Program
+* Overview
 
 The GLSS is conducted by the Ghana Statistical Service (GSS).  Seven
 rounds span 1987--2017.  Each round is designed as an independent
@@ -62,12 +63,194 @@ table cell-for-cell.
 
 The stratification scheme evolved across rounds:
 
-| Rounds      | Strata definition                                     | Count |
-|-------------+-------------------------------------------------------+-------|
+| Rounds       | Strata definition                                    | Count |
+|--------------+------------------------------------------------------+-------|
 | GLSS1--GLSS2 | Ecological zone (Coastal, Forest, Savannah)          |     9 |
-|             | x Urban classification (Urban, Semi-urban, Rural)     |       |
-| GLSS3+      | Region-based (10 administrative regions from GLSS3;   | ~10   |
-|             | possibly finer in later rounds)                       |       |
+|              | x Urban classification (Urban, Semi-urban, Rural)    |       |
+| GLSS3--GLSS6 | Region-based (10 administrative regions from GLSS3)  |   ~10 |
+| GLSS7        | 10 administrative regions x urban/rural              |    20 |
+
+*/Corrected 2026-09-06./*  The GLSS7 row previously read "possibly finer
+in later rounds" with a count of =~10=.  That hedge is now resolved
+against the round's own Main Report, which was acquired for this purpose
+(=2016-17/Documentation/GLSS7 Main Report.pdf=, Appendix, "Sample design
+and implementation"):
+
+#+begin_quote
+The GLSS7 was stratified sample selected in two stages from the sampling
+frame.  Stratification was achieved by classifying all the EAs into the ten
+administrative regions (domains) and further stratified each region into
+urban and rural areas; in total, 20 sampling strata were created.
+#+end_quote
+
+*The =strata= column this library serves for GLSS7 carries only the
+region -- 10 values, the region names -- so it is HALF the design
+stratum.*  The other half is the separate =Rural= column, so the design
+stratum is recoverable as =(strata, Rural)= but is not what =strata=
+alone denotes.  Anything computing design-based standard errors from
+=strata= alone is using 10 strata where the design has 20.
+
+*** GLSS7 sample design, from the Main Report
+
+- Two-stage stratified.  First stage: *1,000 EAs* (PSUs) from the 2010
+  PHC frame, allocated to the 10 regions by stratified systematic PPS;
+  *438 urban and 562 rural*.  Second stage: a full household listing in
+  each selected EA, then *15 households per EA* by equal-probability
+  systematic selection -- a target of *15,000 households* (14,009
+  achieved and served here).
+- *Why the weights range eightfold, and why unweighted counts overstate
+  the young.*  The allocation is driven by a PER-DOMAIN precision
+  target, not by population share:
+
+  #+begin_quote
+  The computation yielded an average sample size of 1,500 households as the
+  minimum number of interviews required for each domain in order to measure
+  the proportion of persons under the poverty line accurately at 5%
+  significance level.  For the ten main domains, the total size became 15,000.
+  #+end_quote
+
+  So every region receives ~1,500 households irrespective of its
+  population, and the small northern regions are heavily over-sampled.
+  Measured on the served data: mean weight runs *0.23 (Upper West) to
+  1.84 (Ashanti)*, and the over-sampled strata are precisely the ones
+  with the largest households and the youngest people -- Northern has
+  mean household size 6.2 and 46.1% under 15, against Greater Accra's
+  3.4 and 33.3%.  The sample is *57.0% rural*; weighted it is *44.0%*.
+  An unweighted GLSS7 pyramid therefore overstates children by
+  construction of the design, not by any defect.
+*** GLSS7 weights: the structure, documented AND verified
+
+The Main Report's "Computation of Weights" gives the formula, and it
+names two DIFFERENT household counts per EA:
+
+- =M_hi=  = number of *2010 Population Census* households in EA /i/ of stratum /h/
+- =M_hi*= = number of households *listed* in EA /i/ of stratum /h/ before fieldwork
+
+First stage is PPS on the CENSUS size; the second stage takes =b= = 15
+households from the LISTED households.  So the expansion factor carries
+a =M_hi* / M_hi= term -- six years of differential EA growth between the
+2010 frame and the 2016-17 listing.  The report is explicit that this is
+not a self-weighting design:
+
+#+begin_quote
+The GLSS7 was not a self-weighting sample design because disproportionately
+larger samples from regions with smaller populations were drawn.
+#+end_quote
+
+*Verified against the weights this library serves* (1,000 clusters):
+
+| claim | source | served data |
+|-------+--------+-------------|
+| weight constant within an EA | PPS + fixed take | within-cluster CV = *0.00e+00*, all 1,000 |
+| EAs wholly urban or wholly rural | 20-strata design | *0 of 1,000* clusters mix |
+| =a11= = 41 urban EAs, Western | report, verbatim | *41* |
+| =a12= = 57 rural EAs, Western | report, verbatim | *57* |
+| 438 urban / 562 rural EAs | report /narrative/ (p.285) | 439 / 561 -- matches the report's own *tables* |
+
+*/Corrected 2026-09-06./*  The last row above previously read "439 / 561
+--- *one EA differs*", which put the discrepancy between the report and the
+data.  *It is inside the report.*  The narrative on printed p.285 says the EAs
+"were further divided into 438 urban and 562 rural localities of residence",
+while the same report's Table A1 (printed p.281) and Table A2 (printed p.283)
+both give *439 urban / 561 rural*.  The served data agrees with the tables and
+disagrees only with the prose --- so there is nothing to reconcile on our side.
+
+Sequential variance decomposition of log(cluster weight): region *62.6%*,
++ urban/rural within region *1.6%*, + cluster *35.8%*, + household *0.0%*.
+
+Two things follow that matter for use:
+
+1. *The urban/rural factor is region-specific, not separable.*  The
+   urban-minus-rural log-weight gap runs from *-0.009 (Ashanti)* to
+   *+0.446 (Northern)*; double-centring the 10x2 table leaves an
+   interaction of 11% of its magnitude.  Model it as 20 free cells, not
+   as region x a common urban effect.
+2. *The 36% cluster term is frame drift, not noise.*  Under textbook PPS
+   with a fixed take the weight is constant within stratum; here the
+   within-stratum sd of log weight is *0.483* (up to *54.6x* max/min
+   inside one stratum).  Non-response does not explain it -- the
+   achieved take varies 8-15 (mean 14.01) but correlates with the
+   residual at only *-0.150*, and multiplying weight by the achieved
+   count moves the dispersion 0.4829 -> 0.4764.  What remains implies
+   =M*/M= drift with a log sd of *0.476*: a typical EA's listed
+   household count differs from its 2010 census count by a factor of
+   *~1.61*.  Greater Accra's RURAL stratum is the most dispersed (sd
+   0.836), which is what one expects of EAs that urbanised after 2010.
+
+*** The stale-frame problem, and what it costs (NOT discussed in the report)
+
+=M_hi*= is observed only for EAs that were *selected on =M_hi=*, and
+=M_hi= is the 2010 census count.  An EA that grew faster than its
+stratum since 2010 was therefore selected with too low a probability at
+the first stage.  Three consequences, only the first of which the
+weights repair:
+
+1. *Bias: repaired.*  The =M*/M= term in the expansion factor is exactly
+   the Horvitz-Thompson correction for the realised selection
+   probability, so totals and means stay design-unbiased.
+2. *Efficiency: not repaired, and the cost is large.*  Under-selected
+   fast-growing EAs carry correspondingly large weights, and variable
+   weights cost precision.  Kish =deff_w = 1 + CV^2(w)=, measured:
+
+   | weight variation | deff_w | effective n |
+   |------------------+--------+-------------|
+   | all households (total) |  1.835 | 54% of nominal |
+   | *within stratum only*  | *1.409* | *~71%* |
+
+   The between-stratum part is a deliberate trade -- it buys the
+   per-domain poverty precision the allocation was designed for.  The
+   *within*-stratum part is frame drift and buys nothing: roughly *29%
+   of the effective sample* spent on the frame being six years old.
+   Implied growth ratios run x0.56 (p10) to x1.75 (p90), one EA at
+   *x10.2* of its stratum median; the residual is mildly right-skewed
+   (+0.13).
+3. *Coverage: NOT repairable by weighting.*  An EA created after the
+   2010 PHC has =M_hi = 0=, hence first-stage selection probability
+   zero, and cannot enter the sample at all.  No weight fixes a zero
+   probability.  This falls precisely on the newest peri-urban
+   settlement -- the fastest-growing part of the population -- and is a
+   coverage gap, not an efficiency loss.  Consistent with the measured
+   pattern that *Greater Accra's RURAL stratum is the most dispersed*
+   (within-stratum sd 0.836).
+
+Also note the observed =M*/M= distribution is *not* the population
+distribution of EA growth: EAs enter the sample with probability
+proportional to their *2010* size, so the growth we can see is
+size-biased on the stale measure.  If growth is concentrated in EAs that
+were small in 2010, the 0.483 figure understates true dispersion --
+plausible but *unverified here*, since =M= and =M*= are not in the
+served data (only their ratio, up to a stratum constant, via the
+weight).
+
+*The Main Report does not discuss any of this.*  Its only frame
+"update" is =an update of information on identification of the 216
+administrative districts defined after the 2010 PHC= -- district
+identification, not the EA list.  There is no mention of new EAs, frame
+ageing, or the precision cost.  Treat the above as this repository's
+analysis, not as a claim sourced to GSS.
+
+- *Done 2026-09-06 (GH #603).*  The report's
+  *institutional-population exclusion* is now in the population record.
+  =population.yml= previously carried =exclusions: NOT FOUND= for
+  2016-17; it now carries, verbatim:
+
+  #+begin_quote
+  The institutional population which represents a very small percentage of 2010
+  Population and Housing Census (PHC), was excluded from the frame.
+  #+end_quote
+
+  (Main Report, "Sampling frame", printed p.285 / PDF p.307.)  Confidence
+  moved =medium= -> =high= at the same time; the *tag stayed
+  =national-claimed=*, because the report claims national
+  representativeness and names what is EXCLUDED but never names whom the
+  survey represents.  GLSS6 earned =national-all-households= on one
+  sentence in the otherwise-shared passage --- "However, the unit of
+  measurement was the population living within individual households." ---
+  and *GLSS7's parallel section omits it*; the string "unit of
+  measurement" occurs nowhere in the 344-page report.  =population.yml=
+  is GENERATED --- update
+  =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and re-run
+  =scripts/promote_population_records.py=; do not hand-edit it.
 
 ** Weights
 
@@ -242,6 +425,129 @@ GLSS1/GLSS2 have *no urban/rural variable in the microdata at all* -- see
 /Trap 3/ and /The =SU= -> =Rural= fold/ below.  Their =Rural= comes from BID
 Appendix I at the *cluster* level and is broadcast to the households of each
 cluster.  The Appendix's third value =SU= is folded onto =Rural=.
+
+The *population cutoff* behind every row of the table above is not the same
+from round to round -- see the next subsection before comparing =Rural= across
+waves.
+
+** The urban cutoff MOVES across rounds: 5,000 -> 1,500 -> 5,000 (GH #705, 2026-09-02)
+
+GSS changed the population cutoff that defines an urban locality between
+GLSS rounds, and absorbed the 1,500--5,000 "semi-urban" band differently each
+time.  Recorded here, next to the source table above, because the delivered
+=Rural= column carries no trace of it -- the same defect class as Ethiopia's
+=Urban= (GH #683, PR #688), found in this country by reading documentation
+rather than by noticing an implausible series (GH #705, from the
+settlement-threshold sweep of PR #704).
+
+*The cutoff, per round, from documents this repository ships:*
+
+| Round             | urban cutoff | semi-urban band                | scheme | measured on | source (verbatim quote below or in the /SU -> Rural/ section)                                                        |
+|-------------------+--------------+--------------------------------+--------+-------------+-----------------------------------------------------------------------------------------------------------------------|
+| GLSS1/2 1987-89   | > 5,000      | 1,500--5,000, its own stratum  | 3-way  | 1984 Census | joint BID §3.1, PDF p.13 / printed p.11 -- quoted under /The =SU= -> =Rural= fold/ below                              |
+| GLSS3 1991-92     | >= 5,000     | 1,500--<5,000, reported inside *Rural* | 3-way (2-way in =loc2=) | 1984 Census | =G3report.pdf= note to Table 7.3, PDF p.75 / printed p.57 -- quoted under /Band boundaries/ in the same section |
+| *GLSS4 1998-99*   | *> 1,500*    | *1,501--5,000, folded into URBAN* | 2-way | 1984 Census | =GHA_1998_GLSS_Data_User_Guide_EN.pdf= p.11 -- quoted below                                                          |
+| GLSS5 2005-06     | not stated   | --                             | 2-way  | 2000 PHC frame | searched =ddi-documentation-english-5.pdf= end to end (p.5 says only that EAs "were further sub-divided according to their rural and urban areas of location"); no number anywhere |
+| GLSS6 2012-13     | >= 5,000     | none                           | 2-way  | not stated  | =REPORTS/GLSS6_Labour Force Report.pdf= pp.15-16 -- quoted below.  The Main Report (Appendix 1, p.23) says only "The EAs were further divided into urban and rural localities of residence" |
+| GLSS7 2016-17     | not stated   | --                             | 2-way  | 2010 PHC frame | searched =ddi-documentation-english-97.pdf= end to end; neither a cutoff nor a description of =urbrur= |
+
+"Not stated" is a searched negative for the two named files, not for the
+questionnaires or manuals (GLSS7's =GLSS7 Final Manual.docx= and GLSS5's
+questionnaires were not read for this); a later reader may well find the
+rule in another document type -- the GLSS4 rule is in a *user guide* and the
+GLSS6 rule in a *labour-force report*, which is why single-document negatives
+are worthless here.
+
+GLSS4, =GHA_1998_GLSS_Data_User_Guide_EN.pdf=, §6 definitions, p.11 (plain
+text layer; typography as printed, including the unclosed parenthesis):
+
+#+begin_quote
+Urban EA:  An EA was considered to be urban if it had a population greater than 1,500 people during the 1984 population census.  Thus semi-urban EAs (with population between 1,501 and 5,000 were considered as urban assuming that they might have grown to urban status since the 1984 census.
+Rural EA:  An EA was considered to be rural if it had a population 1,500 or less people during the 1984 population census.
+#+end_quote
+
+GLSS6, =REPORTS/GLSS6_Labour Force Report.pdf=, "Locality", pp.15-16 (the
+sentence breaks across the page):
+
+#+begin_quote
+Two main types of locality are defined by the survey: urban and rural. The classification of localities into 'urban' and 'rural' is based on population size. Localities with 5,000 or more persons are classified as Urban while those with less than 5,000 persons are classified as Rural.
+#+end_quote
+
+*Direction of bias, by construction.*  Under GLSS4's rule every locality the
+1984 Census put at 1,501--5,000 is urban; under GLSS1/2's, GLSS3's and
+GLSS6's rule none of them is.  Holding the frame fixed (GLSS1/2, GLSS3 and
+GLSS4 all sit on the 1984 Census), GLSS4's urban share must therefore be
+*higher* than a 5,000-rule share of the same country, and GLSS4 says so
+itself: the fold was a deliberate *assumption* -- "assuming that they might
+have grown to urban status since the 1984 census" -- not an error.  Any
+GhanaLSS urbanisation series that crosses 1998-99 is measuring that
+definition, not only the country.
+
+*What the delivered column actually shows* (=Country('GhanaLSS').sample()=,
+cold, 2026-09-02; the unweighted share is a *design allocation* -- GSS chose
+how many urban EAs to draw -- and can neither confirm nor refute the
+definitional claim above; weights are the API's within-wave mean-1 values,
+which leave the weighted share unchanged):
+
+| Round   |      n | Urban share, unweighted | Urban share, weighted | note                                                              |
+|---------+--------+-------------------------+-----------------------+-------------------------------------------------------------------|
+| GLSS1   |  3,147 |                   37.6% |               (=)     | self-weighting: one weight value                                  |
+| GLSS2   |  3,194 |                   33.5% |               (=)     | self-weighting                                                    |
+| GLSS3   |  4,523 |                   34.9% |               (=)     | self-weighting                                                    |
+| GLSS4   |  5,998 |                   36.7% |                 36.7% | 298 distinct weights; weighted equals unweighted to 0.1 pt        |
+| GLSS5   |  8,687 |                   41.6% |                 43.2% |                                                                   |
+| GLSS6   | 16,772 |                   44.4% |                 55.4% | 2010 PHC frame; ">= 5,000" rule                                   |
+| GLSS7   | 14,009 |                   43.0% |                 56.0% |                                                                   |
+
+Read honestly: the GLSS3 -> GLSS4 step in the *sample* is +1.8 points -- the
+sign the definition predicts, but small, and the sample share is an
+allocation, not a population estimate.  The large weighted jump is GLSS5 ->
+GLSS6 (43.2% -> 55.4%), which confounds a new frame (2000 -> 2010 PHC), a
+stated rule (none -> ">= 5,000"), and genuine urbanisation (the 2010 PHC
+itself reports 50.9% urban), and this file does not apportion it.
+
+*Consequence after PR #690.*  GLSS1/GLSS2 =Rural= now comes from BID
+Appendix I with the =SU= stratum (52 of 263 clusters, 1,500--5,000) folded
+onto *=Rural=*.  GLSS4 folds the *same* 1,501--5,000 band onto *=Urban=*.
+So a settlement of the same 1984 size is delivered as =Rural= in 1987-89 and
+=Urban= in 1998-99.  Before #690 GLSS1/2 =Rural= was 100% NULL and the
+inconsistency was invisible rather than absent; after it, the column is
+present but not comparable across that boundary, and that is now a
+documented property rather than an unknown.  The #690 decision is not wrong
+on this evidence: GLSS4's fold rests on an explicitly *time-dependent*
+rationale ("might have grown" by 1998) that cannot transfer to a 1987-88
+survey contemporaneous with the very census being used.  GLSS3, per its own
+report's nesting of "Semi-urban" under a *Rural* total (Tables 7.3 and 7.9;
+see the /SU -> Rural/ section), sits with GLSS1/2 on this -- an inference
+from the report's tables, since no =loc2= variable description was found.
+
+*Which variable each wave's =Rural= actually reflects* -- GH #705's caveat
+is that sampling strata are not necessarily the published variable, so this
+was checked per wave before the cutoff table was asserted to apply.  Measured
+2026-09-02: in *every* wave =Rural= takes exactly one value within each
+cluster =v= (0 mixed clusters of 176 / 170 / 365 / 300 / 580 / 1,200 /
+1,000), so all seven are EA-level classifications, not household attributes.
+How firmly each is tied to the *frame's* population rule differs:
+
+| Round | delivered =Rural= reads             | grain            | tie to the frame's size rule                                                                                                        |
+|-------+-------------------------------------+------------------+-------------------------------------------------------------------------------------------------------------------------------------|
+| GLSS1 | BID Appendix I =UrbRur= (U/R/SU)    | cluster, broadcast | *is* the sampling stratum (BID §3.1 defines it by 1984 population).  Documented                                                     |
+| GLSS2 | BID Appendix I =UrbRur=             | cluster, broadcast | same                                                                                                                                |
+| GLSS3 | =POV_GH.DTA:loc2= (1 urban / 2 rural) | EA (0/365 mixed) | *inferred*: the report defines the tiers by 1984 population and nests semi-urban under rural; no variable description found for =loc2= |
+| GLSS4 | =SEC0A.DTA:loc2= "Locality classification of HH" (user guide p.26: 1 Urban, 2 Rural) | EA (0/300 mixed) | documented: p.8 "stratification was done based on the size of the locality into rural or urban", p.11 defines the size (> 1,500)      |
+| GLSS5 | =parta/sec7.dta:loc2=, DDI label *"urban/rural-corr"* (V110, V1279) | EA (0/580 mixed) | *not stated*, and the DDI label says the variable was *corrected* -- do not assert it equals the frame stratum                       |
+| GLSS6 | =PARTA/g6loc_edt.dta:loc2= (Urban/Rural strings) | EA (0/1,200 mixed) | documented by the Labour Force Report's ">= 5,000" rule; the Main Report does not describe =loc2=                                    |
+| GLSS7 | =sample=: =g7sec0.dta:urbrur=; =cluster_features=: =loc2= | EA (0/1,000 mixed) | *not stated*: the DDI describes neither variable and gives no cutoff                                                                |
+
+*Decision: documentation, not an API-time warning.*  A per-wave
+comparability warning on =Rural= was considered and not built.  #683 took
+the documentation route for Ethiopia (PR #688) and consistency argues for the
+same here, even though Ghana now carries *two* discontinuities (GLSS3 ->
+GLSS4 and GLSS4 -> GLSS6); the library's posture is to make the data honest
+and let the analyst decide, not to police pooling.  PR #688 also left a
+one-line pointer on =sample.Rural= in Ethiopia's =data_scheme.yml=; the
+GhanaLSS =data_scheme.yml= was out of scope for the #705 change and carries
+no such pointer yet -- adding one is a one-line follow-up.
 
 ** =sample= feature source variables
 
@@ -894,8 +1200,29 @@ imputation (#562), and the nutrition Food Conversion Table (#563).
 ** DONE ghana_lss.py
 Common code across GLSS rounds (=ghanalss.py=); handles the GLSS1--GLSS2 panel
 linkage via the =Waves= dictionary.
-** DONE food_items.org
-Food labels harmonized across all 7 waves (the "Aggregate Labels").
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+Food labels harmonized across all 7 waves.  The vocabulary (205 rows;
+=Preferred Label=, one column per GLSS round, =FCT Code=) now lives in
+=_/categorical_mapping.org= under =#+name: harmonize_food=, moved
+byte-for-byte; =_/food_items.org= and its stale =_/food_items.csv= twin are
+deleted.  This is the migration Tanzania and Ethiopia already completed as
+"Unit #0" (=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).
+
+The move -- not a rename in place -- was the point:
+=Country.categorical_mapping= opens only the global
+=lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and *never* =food_items.org= under any table
+name.  So =labels== (=Country._relabel_j=) raised =LabelUnavailableError= for
+GhanaLSS however the table inside that file was named.  It now resolves.
+
+The heading formerly read /the "Aggregate Labels"/.  That was a misnomer:
+this table has never had an =Aggregate Label= column and still does not.
+The seven WAVE-level =harmonize_food= tables do, but they cannot simply be
+unioned into one -- 14 Preferred Labels take two different Aggregate values
+across waves, 9 of this table's labels appear in no wave table at all, and
+one wave value carries mojibake.  Adding a country-level Aggregate column is
+curation gated on the CFE beta-spread test, deliberately out of GH #783's
+scope.
 ** DONE conversion_to_kgs.json -- intentionally NOT used
 The canonicalization fills missing quantities via the inverse market-price
 ladder (=transformations.median_price_valuation=) in native units, which
@@ -910,11 +1237,621 @@ Data on expenditures is somewhat unusual, in two different ways.
 
 First, for waves before 2016--17, the survey instrument elicits the amount spent in purchasing different items, but does /not/ elicit quantities purchased.  (A separate price survey was conducted, and could presumably be used to obtain quantities.)  A separate module elicits quantities of home produced food consumed, as well as the hypothetical price at which home produced goods could be sold.
 
-Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits (about a dozen in all) are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  In =food_acquired= we sum over these visits (but it might be interesting to examine patterns at the visit level).
+Second, starting in the 1991--92 wave, rather than eliciting expenditures over a single recall period, repeated visits are made over the course of about a month, with expenditures and consumption from own production collected at every visit.  The number of visits, their spacing and the recall length each differ by wave -- seven visits five days apart in GLSS4, GLSS6 and GLSS7, eleven in GLSS5 -- so they are tabulated per wave below rather than summarised here.  In =food_acquired= we keep the =visit= level and sum over it in the derived tables (patterns at the visit level are worth examining, and are now sliceable across =s=; see below).
 
-NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for expenditures "since my last visit", but only for one visit, while subsequent rounds elicit this information across several visits.
+NB: Differences in elicitation across waves may complicate comparisons across those waves.  In particular, the two rounds in the 1980s ask for purchases (12A) "since my last visit" and only once, and ask for own production (12B) over NO recall window at all -- months eaten in the last twelve, times per unit, and the value of one eating occasion, from which the served value is /derived/ (see "12B is a value per eating occasion" below) -- while subsequent rounds elicit both across several visits.  (Until 2026-09-11 this note said both 1980s modules were "since my last visit"; only 12A is.)
+
+*** The repeated-visit design, wave by wave (2026-09-09)
+
+The paragraph above said "about a dozen" visits.  That is right for GLSS3 and
+GLSS5 and wrong for GLSS4, GLSS6 and GLSS7, which field *seven*.  The count,
+the spacing and the recall length all move across waves, so they are set out
+here per wave rather than described once.
+
+Every wave from 1998--99 on carries the mapping in its own Stata variable
+labels, so none of this is inferred.  GLSS3 has no variable labels at all; its
+row below comes from the questionnaire and the interviewer's manual instead,
+corroborated by the visit dates the survey itself recorded (see below):
+
+| wave             | visits | 9B (purchases)   | 8H (own produce) | consumption occasions |
+|------------------+--------+------------------+------------------+-----------------------|
+| 1987-88, 1988-89 | 1      | 12A: 1 recall    | 12B: no recall (derived) | 1               |
+| 1991-92 (GLSS3)  | 8 / 11 | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 7 rural / 10 urban    |
+| 1998-99 (GLSS4)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2005-06 (GLSS5)  | 11     | q1..q10 -> 2..11 | q3..q12 -> 2..11 | 10                    |
+| 2012-13 (GLSS6)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+| 2016-17 (GLSS7)  | 7      | q1..q6 -> 2..7   | q3..q8 -> 2..7   | 6                     |
+
+*The source question number is not the visit number*, and the two modules
+number from different origins.  Section 8H opens with two screeners --
+=s8hq1= "HH consume any home produce", =s8hq2= "No. of months eat home
+produce" -- so its per-visit columns start at q3.  Section 9B has no screener
+and starts at q1.  Both are asked at the same visits.  Read straight off the
+labels: GLSS4's =s9bq1= is "2nd visit amount spent" and its =s8hq3= is "2nd
+visit units consumed"; GLSS7's =s8hq3q= is "Quantity of own produced food
+consumed at 2nd visit" and =s8hq8p= is "Selling price for one unit now-7th
+visit".
+
+Until 2026-09-09 all five multi-visit wave scripts wrote *the question
+number* into =visit=.  A purchase and the own-production consumed at the same
+visit therefore sat two apart, =visit= was not sliceable across =s=, and the
+extreme values (1, 2 purchased-only; 7, 8 produced-only) read as structural
+missingness rather than as a labelling offset.  The scripts now emit the
+CALENDAR VISIT, which is what the labels state.  Note there is deliberately
+no row at =visit= 1: the first visit collects the roster and trains the
+diary keeper, not consumption.
+
+*/Corrected 2026-09-11./*  This passage used to read: "GLSS5 is why =visit=
+is the calendar number and not a per-module 1..N ordinal.  There, purchases
+run from the 2nd visit but own production only from the 3rd (=s8hq3= is
+'number of units consumed', a total, not a visit), so counting from 1 within
+each module would leave the two misaligned by one."  The premise was false
+-- see "=s8hq3= is the 2nd visit, and was dropped" below -- and the table
+row above now reads 2..11 for both modules.  The calendar-visit convention
+stands on its other grounds (it is what every wave's labels state, it is
+checkable against the source, and it is the clock =interview_date= uses);
+it no longer has a GLSS5 counter-example to lean on.
+
+**** 12B is a value per eating occasion, not a recall value (fixed 2026-09-11)
+
+GLSS1/GLSS2 =food_acquired= served =Y12B.VFOODCPD= as the produced-side
+=Expenditure=, beside =Y12A.CFOODBLV= ("How much have they spent since my
+visit?") on the purchased side, with the same =visit = 1=, the same
+=u = 'Value'= and nothing in the frame to tell them apart.  Both scripts'
+docstrings called =VFOODCPD= "produced_value per day" -- a claim that entered
+in =c404b7fb2= with no source.  It is neither per day nor per recall.
+Section 12B (questionnaire PDF p.68 / printed 43a; Interviewer Manual printed
+p.71; BID printed p.2: "Section 12B asks the amount consumed and market value
+of foods grown or raised by the household in the last twelve months") has NO
+since-my-last-visit question.  It asks, per food:
+
+| q | variable   | question                                                       |
+|---+------------+----------------------------------------------------------------|
+| 2 | =MFOODCLY= | in how many of the last 12 months was it eaten                 |
+| 3 | =TFOODC=   | how many times per (q4 unit)                                   |
+| 4 | =UTFOODC=  | DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7, YEAR 8         |
+| 5 | =VFOODCPD= | "How much would it cost to buy the amount they ate each time?" |
+
+So the served produced row was ONE MEAL's worth beside ~14 days of purchases:
+the own-production share of food read 17.4% / 18.1% in the two rounds.
+
+*Verified against GSS's own construction, not by elimination.*  The BID
+(printed p.22) defines =EXPEND.HPFOOD= as "the value of home produced food
+consumed in the last year calculated from Section 12B", and summing
+=VFOODCPD x TFOODC x (30.4 / days_per_unit) x MFOODCLY= per household
+reproduces it with median ratio 1.020 (IQR 1.015--1.03) in both rounds
+(n = 2,253 / 2,437 households; =slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=
+section 2.2).  Treating =VFOODCPD= as a per-DAY value gives 2.1--2.5x.
+
+*The construction served since 2026-09-11* (decided with @ligon; design in
+=SkunkWorks/derived_values.org=, "First instance") is the YEAR-AVERAGE
+FORTNIGHT:
+
+#+begin_example
+Expenditure = VFOODCPD x TFOODC x (14 / days_per_unit[UTFOODC]) x MFOODCLY / 12
+            = HPFOOD / 26
+#+end_example
+
+with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=.
+Worked example: eaten in 6 months of the 12, 12 times a month, 10 cedis each
+time -> 120 a month in season, 720 a year (=HPFOOD=), 55.3 for an in-season
+fortnight, and *27.6* for a fortnight drawn at random from the year (the 6/12
+is the chance the interview fortnight lands in season).  Year-average rather
+than in-season because the purchase side is a realised fortnight but 12B does
+not record WHICH months were cited, so the in-season figure is right for some
+households and zero for the rest, unknowably; the year average is unbiased
+over the sample and defers to GSS's own construction.  The 14-day window is
+12A's nominal interval: the 1988-89 Interviewer Manual (printed p.70) says of
+it "in theory this period is two weeks".  Check: sum over items of the served
+function x 26 per household reproduces =HPFOOD= at median 1.018 in both
+rounds (=tests/test_ghanalss_12b.py=).
+
+Mechanics: =_/ghanalss.py:derive_12b_fortnight_value= (no options -- one
+construction per parquet), registered as
+=GhanaLSS::food_acquired::12b-fortnight= in =_/derivations.yml=, stamped in
+the =Derivation= column of every produced row of the two waves (NA on
+purchased rows) and summarised on =df.attrs['derivations']=.  (That summary
+used to survive =Country('GhanaLSS').food_acquired()= and DIE on a
+cross-country =Feature('food_acquired')(['GhanaLSS', ...])= -- =attrs= do not
+survive a =concat= whose inputs disagree, and nothing re-attached it.  Fixed
+2026-09-12, GH #873: =feature._ATTRS_CARRIERS= now re-attaches population,
+recall AND derivations.  The same drop hit =attrs['recall']=, which matters
+most here: GhanaLSS delivers 30 days of coverage where most of the corpus
+delivers 7, so GhanaLSS is exactly the country a pooled frame needs to
+disclose.)  The raw four
+answers come back by their original names from
+=Country('GhanaLSS').derivation_inputs('GhanaLSS::food_acquired::12b-fortnight')=
+(=inputs_12b=), from which the in-season or annual alternatives are one
+line.  Effect: row counts unchanged (71,605 / 72,649; the three 1987-88 rows
+with =MFOODCLY = 0= are served as 0 under the key rather than dropped);
+produced-side sum 3,157,354 -> 9,484,484 (x3.00) in 1987-88 and
+3,677,833 -> 8,334,683 (x2.27) in 1988-89; own-production share of food
+17.4% -> 38.8% and 18.1% -> 33.4%.
+
+*12A's two-week fallback rule* (Interviewer Manual, 1988-89, printed p.70),
+recorded here because it is what makes the 14-day window the right nominal
+one: the "since my last visit" interval is in theory two weeks, and where the
+actual gap between the first and second rounds was under 7 or over 21 days
+the interviewer was to ask instead about "the past two weeks" -- about 300
+households (=FINDINGS.org= 2.2).  So 12A is a fortnight by instruction, not
+only on average.
+
+**** =s8hq3= is the 2nd visit, and was dropped for the life of the wave (fixed 2026-09-11)
+
+=2005-06/_/food_acquired.py= read =s8hq4..s8hq12= and skipped =s8hq3=, whose
+Stata label is "number of units consumed".  The label is misleading.  The
+questionnaire (=2005-06/Documentation/G5QPartB.pdf= p.17, printed 8.11)
+heads columns 3..12 "2nd 3rd ... 11th", each asking "How much of own produced
+... was consumed by the household since my last visit?", exactly as 9B's
+columns 1..10 are headed on p.36 -- the 8H stems start at q3 because q1/q2
+are the screeners, as in every other multi-visit round.  The data agree: a
+total cannot be smaller than the sum of its parts, and =s8hq3 <
+sum(s8hq4..s8hq12)= in 27,314 of 423,490 rows; =s8hq3= is positive in 21,493
+rows against 18,336 for =s8hq4=, the same first-ask excess every other wave
+shows at visit 2.
+
+Cost of the drop, measured on a rebuild in a private =LSMS_DATA_DIR=:
+*21,252 rows* added, all at =(s='produced', visit=2)= (21,493 positive
+source records, collapsed by the j-harmonisation), 4,777 households; 1,959
+(household, item) pairs and 57 households had no own-production row at all.
+Every other row of the wave is byte-identical before and after; the index
+stays unique.  =tests/test_ghanalss_visit_alignment.py= had pinned the wrong
+map (=produced: range(3, 12)=) and excluded 2005-06 from the shared-axis
+check "on purpose" -- both corrected.  =_/recall.yml= / =food_recall.csv= no
+longer carry =within_wave_variation: by-s= for this wave, and its spacing is
+now recorded (3 days, unstratified, from the DDI and measured on
+=partb/secb2.dta= -- see =slurm_logs/2026-09-11_ghanalss_visit_dates/2005-06.org=).
+
+**** GLSS3 is stratified: 8 rural visits, 11 urban -- and two recall windows
+
+The one wave whose recall window is not constant within the wave.
+=1991-92/Documentation/pdf/G3Intman.pdf= section 1.9:
+
+#+begin_quote
+There will be 8 interviewer visits at 2-day intervals to each rural household
+and 11 interviewer visits at 3-day intervals to each urban household in a
+cycle.  Thus a workload for the 16 days in a rural cluster is 10 households,
+while a workload for the 33 days in an urban cluster is 15 households.
+#+end_quote
+
+Both modules are asked at every visit after the first (p.42: "Part H is to be
+administered on every visit except the first"), and p.43 states the count
+directly -- responses are solicited at all visits except the first, "in other
+words for urban it will be 10 times and 7 times for rural areas".  So:
+
+- *urban*: 10 asks x 3 days = *30 days* of coverage;
+- *rural*:  7 asks x 2 days = *14 days*.
+
+The survey's own visit-date page (=S0B.DTA=, =vd/vm/vy 1..11=) corroborates
+both: urban records 11 dates with a median gap of 3.0 days at every step and a
+30-day span; rural records 8, gap 2.0, span 14 days, with visits 9--11 empty.
+=S9B= positive counts follow exactly -- q1..q7 populated for everyone, q8..q10
+urban-only.
+
+*The consequence is a live defect, not a curiosity.*  Summing =visit= away in
+=food_expenditures= returns a 30-day figure for an urban household and a
+14-day figure for a rural one, so an unadjusted urban/rural comparison is off
+by ~2.14x.  GSS itself rescaled by stratum: the median ratio of published
+=POV_GH.expfoodc= to the raw 9B sum is 11.4 urban against 21.7 rural, close to
+the design factors 365/30 = 12.2 and 365/14 = 26.1.  Recorded in GH #851; the
+library does not yet carry the window, so the caller cannot make this
+adjustment from the API.
+
+The diary was *urban only* (p.6): "A dairy of daily consumption and expenditure
+will be used to support the urban interviews."  Rural expenditure in GLSS3 is
+unaided 2-day recall; urban is diary-assisted 3-day.  Elicitation mode differs
+by stratum too.
+
+***** =s9bq1= was never read: 16.2% of GLSS3 food purchases were missing
+
+The wave script took =s9bq2..s9bq10=, starting at the second stem, so the
+FIRST ask -- q1, "How much was spent on ... since my first visit?"
+(=G3QPartB.pdf= p.20) -- was dropped from every GLSS3 number this library has
+served.  It is the largest column in the module: 58,132 positive values,
+C12,428,840, *16.22%* of the C76,609,939 recorded across all ten stems.  Fixed
+2026-09-09; the rebuilt table's Expenditure now totals the full C76,609,939.
+
+***** Produced rows are padded, and a row count there is not an observation count
+
+Pre-existing, NOT fixed: =Price= comes from =s8hq14=, one column per
+=(i, j, u)=, so =wide_to_long= replicates it across all ten visit rows and the
+closing =dropna(how='all')= keeps rows whose only content is that price.
+Measured: 28,678--28,710 produced rows at every visit, but =Quantity= is
+non-null in 13,810 at visit 2 falling to 598 / 519 / 493 at visits 9--11.
+206,498 produced rows carry a price and no quantity, and a rural household
+visited eight times has price rows at visits it was never asked.  Count
+=Quantity.notna()=, not rows.
+
+**** A first-ask effect, now that the levels line up
+
+Delivered row counts per =(visit, s)=, measured 2026-09-09 on a rebuild of
+each wave.  The FIRST ask carries markedly more rows than the ones after it;
+thereafter counts are flat or drift gently down:
+
+| wave    | s         | first ask    | later visits       |
+|---------+-----------+--------------+--------------------|
+| 1998-99 | purchased | 84,253 (v2)  | 73,701 -> 70,124   |
+| 1998-99 | produced  | 20,098 (v2)  | 17,212 -> 14,733   |
+| 2005-06 | purchased | 125,368 (v2) | 98,996 -> 86,462   |
+| 2005-06 | produced  | 21,252 (v2)  | 18,166 -> 15,590   |
+| 2012-13 | purchased | 292,364 (v2) | 246,777 -> 234,035 |
+| 2012-13 | produced  | 39,498 (v2)  | 33,680 -> 30,171   |
+| 2016-17 | purchased | 169,086 (v2) | ~160,000, flat     |
+| 2016-17 | produced  | 39,899 (v2)  | 23,871 -> 21,376   |
+
+Deliberately not adjudicated here.  It is consistent with a longer implicit
+recall at the first ask (the "last visit" it refers back to is the intake
+visit, which need not be five days earlier), with telescoping, or with item
+mentions attriting as the household tires of the module -- and these have
+different implications for whether visit 2 should be weighted like the rest.
+***** The literature: Scott and Amenuvegbe (1990), commissioned FOR the GLSS
+
+There is a controlled experiment on exactly this question, run in Ghana
+*because of* this survey, and it anticipates the mechanism:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1990).  /Effect of Recall Duration on
+Reporting of Household Expenditures: An Experimental Study in Ghana./
+Social Dimensions of Adjustment in Sub-Saharan Africa Working Paper No. 6.
+Washington, D.C.: World Bank.  World Bank report no. 8905.
+http://documents.worldbank.org/curated/en/598051468774854613
+#+end_quote
+
+The same experiment appears again as, almost certainly, its published version:
+
+#+begin_quote
+Scott, Chris and Ben Amenuvegbe (1991).  "Recall Loss and Recall Duration: An
+Experimental Study in Ghana."  /Inter-Stat/ 4(1): 31--55.
+#+end_quote
+
+/Probable, not verified./  Same authors, same experiment, same headline result;
+the working paper closes by saying "the authors plan a fuller analysis of this
+effect for later publication", and the journal version runs 25 pages against the
+working paper's 19.  The experiment was funded by a UK Overseas Development
+Administration grant and =Inter-Stat= was an ODA-linked statistics bulletin, so
+it is the natural outlet -- but that last link is unconfirmed and a serials
+catalogue would settle it.  *Both are in circulation as the citable form*: the
+UN /Household Sample Surveys/ handbook cites the 1990 working paper, Beegle et
+al. (2012) cite the 1991 /Inter-Stat/ version.
+
+A sample-size difference between the two citations is NOT evidence of revision:
+the working paper reports both numbers -- 144 households selected, 135
+surviving absence and refusal "for analysis".  Beegle quotes the former, the
+executive summary the latter.
+
+(Neither is to be confused with Scott and Amenuvegbe /1991/ in the /Journal of
+Official Statistics/ 7(3): 367--373, the self-weighting sampling paper cited at
+the top of this file.  Three papers, two years, same two authors.)
+
+*Why it exists*, in the authors' words: the GLSS design "called for a 2-week
+recall period for each household, a period chosen essentially for logistic
+motives rather than in response to any evidence of recall efficiency", and the
+Social Dimensions of Adjustment project was about to propagate that design
+across Africa.  It is a standalone experiment -- 135 households, each
+interviewed *11 times* at varying intervals, ODA-funded, sponsored by the Ghana
+Statistical Service -- NOT an experiment embedded in the GLSS itself.
+
+*What they found*, over 13 frequently purchased items:
+
+- reported daily expenditure falls consistently as the recall period lengthens
+  from 1 day to 1 week, then *little or no further fall* from 1 to 2 weeks; a
+  1-year recall was erratic.  The curve is steep early and flat later;
+- after re-weighting away weekly/monthly purchase cycles, with start-up bias
+  eliminated and recall bounded, the loss averages *2.9% for every day added*;
+- the decline is *larger for items purchased more frequently*;
+- so a weekly recall underestimates frequent purchases by *~20%* -- and that is
+  in what they call "an abnormally well controlled field situation".
+
+*Their mechanism, which is the part that matters here.*  They favour the
+reading that the 1-day figure is the most accurate and that this is recall
+lapse rather than a boundary artefact.  Their hypothesis is that beyond a
+threshold recall length respondents *switch from factual to normative
+reporting* -- "what I usually buy" rather than "what I bought" -- and normative
+reporting overlooks exceptional (typically high) purchases, biasing downward.
+
+*This is what our own measurement observes directly.*  On GLSS4, within
+household and across ask number, reported spend is essentially invariant to the
+realised interval: doubling the gap from 5 to 10 days changes reported spend by
++1.2% where proportionality predicts +100% (elasticity 0.018; item counts
+identical at 18.8).  That is normative reporting, measured -- a household
+reporting "what I buy between visits", not "what I bought in N days".  Their
+"larger decline for frequently purchased items" likewise matches the first-ask
+excess being mostly extensive-margin here (1.42x more items, GLSS3 rural).
+
+*The consequence for aggregation.*  If the reported amount does not scale with
+the elapsed interval, then dividing by measured days does not normalise -- it
+injects fieldwork tempo into the estimate.  Bin GLSS4 households by measured
+exposure and total spend is flat while the implied daily rate spans 2.7x,
+entirely from the denominator.  The defensible quantity is the per-ask amount
+at the *nominal protocol* interval, not the realised one.
+
+*The question is not settled in the literature.*  The UN /Household Sample
+Surveys in Developing and Transition Countries/ (ch. 24) cites this study and
+immediately notes the dispute: Mahalanobis and Sen (1954) on the Indian
+National Sample Survey found a one-MONTH reference period less biased than a
+one-week one for certain foods -- the opposite sign -- and Deaton (1997) holds
+that nobody has separated recall decay from boundary telescoping.  Our GLSS3
+contrast is evidence on precisely that open question: at *identical* interval
+lengths the first ask still carries 24-40% more, and the step is 1.84x for the
+unaided rural stratum against 1.17x for the diary-assisted urban one.
+
+/Corrected 2026-09-11./  This paragraph used to single out GLSS5 as "the
+weakest first-ask step (1.02x)" on the belief that its own-production module
+started at the 3rd visit.  It starts at the 2nd (=s8hq3=, above), and with
+that column restored the produced step is *1.17x* (21,252 vs 18,166) -- in
+line with the other waves, and no longer a contrast that separates anything.
+
+GLSS3 supplies one discriminating measurement.  There the first interval is
+the SAME length as every other -- the =S0B.DTA= visit dates give a median gap
+of exactly 3.0 days (urban) / 2.0 days (rural) at every step, including
+visit 1 -> 2 -- and the first ask still carries 24--40% more positive records.
+So for GLSS3 the longer-implicit-recall explanation is excluded, leaving
+telescoping or module fatigue.  One caveat before generalising: the urban
+diary keeper is trained AT visit 1, so the first interval's diary coverage may
+be atypical of the rest.
+
+**** GLSS7's recall period: six five-day recalls, diary-supported
+
+From the GLSS7 Main Report, "Survey Period and Team Composition" /
+"Interviewer Workload" (=2016-17/Documentation/GLSS7 Main Report.pdf=):
+
+#+begin_quote
+An interviewer visited each household in the EA assigned to him/her every
+sixth day i.e. after every five days.  In other words, the interviewer
+visited each of the 15 selected household seven (7) times in order to
+complete the cycle. ...  A cycle in both rural and urban areas lasted 35
+days. ...  A diary of daily consumption and expenditure was used to support
+the interviews.  During the first visit, a literate person already identified
+in each household was trained to record all subsequent expenditures made by
+the household and submit the diary to the interviewer on his next visit for
+entry into the appropriate sections.  Where a household had no literate
+member, the interviewer made daily visits to the household and recorded all
+expenditures in the diary meant for the household.
+#+end_quote
+
+So GLSS7 food acquisition is *six five-day recalls* -- 30 days of coverage
+inside a 35-day cycle -- and the elicitation is diary-assisted, not pure
+recall.  The diary is not a separate dataset: the Report has its contents entered
+"into the appropriate sections", i.e. into 9B/8H, and no separate diary file
+ships in =2016-17/Data/=.
+
+The consequence for =food_expenditures= is worth stating because nothing in
+the schema records it: summing =visit= away yields a *30-day* figure for
+GLSS7, a different window for GLSS5, and a single "since my last visit" for
+the 1980s waves.  There is no recall-period metadata slot for a wave-constant
+window (the canonical =RecallWindow= column, GH #817, is per-row and is used
+only by Togo's =nonfood_expenditures=), so the window is not recoverable from
+the API.  Tracked separately; deliberately not addressed here.
+
+**** =GLSS7 Final Manual.docx= is stale where it describes the visit schedule
+
+Use the Main Report, not the Manual, for the field protocol.  The Manual is
+the ex-ante training document and its schedule was carried over from GLSS5
+without being updated.  It contradicts the Report, the data, and itself:
+
+- 3.7 says "the total interviewing workload will be spread over *eleven*
+  visits to a particular household", and its Table 2 "Days of Visit"
+  schedules eleven visit-days three days apart (batch 1: days 1, 4, 7, ...,
+  31) over a "33-day cycle".
+- 3.6 "Date of Next Visit", in the same document, says the next visit "should
+  be exactly *five (5) days* apart for all households", which Table 2 does not
+  implement.
+- The Manual's own section-by-visit table runs to the *7th* visit only (1st:
+  sections 1, 2, 5, 6A, 7; 2nd: 3, 8H, 9A, 9B; 3rd: 4, 6B, 8H, 9B; 4th: 8A-G,
+  8H, 9B; 5th: 9C, 10, 8H, 9B; 6th: 11, 8H, 9B; 7th: 12, 13, 8H, 9B) -- seven,
+  not eleven, and consistent with the CAPI passage that has sections 1--7
+  submitted at the end of the third visit.
+- The data agree with the Report: GLSS7's visit-bearing columns stop at the
+  7th visit in both modules.
+
+That eleven-visit schedule is inherited boilerplate, and its lineage runs back
+at least to GLSS3: =1991-92/Documentation/pdf/G3Intman.pdf= section 1.9 gives the
+URBAN schedule as "11 interviewer visits at 3-day intervals to each urban
+household", "33 days in an urban cluster", "Batch 1 Days
+1,4,7,10,13,16,19,22,25,28,31" -- word for word the GLSS7 Manual's Table 2.
+GLSS5 also fields eleven visits (its =s9bq10= is labelled "amount spent by
+eleventh visit"), so it may have passed through that round too; what the
+evidence settles is that the text is NOT GLSS7's, not which earlier round it
+came from.  /Corrected 2026-09-09: this passage previously attributed the
+schedule to GLSS5 specifically, which is more than the documents support./
+
+**** =visit= is an INTEGER in all seven waves (fixed 2026-09-09)
+
+The wave-by-wave fix above got the visit NUMBERS right and left the TYPE
+wrong.  Measured on the delivered 5,317,365-row table immediately after it:
+
+| wave    |    rows | Python type | values                |
+|---------+---------+-------------+-----------------------|
+| 1987-88 |  71,605 | =int=       | 1                     |
+| 1988-89 |  72,649 | =str=       | ='since last visit'=  |
+| 1991-92 | 681,645 | =int=       | 2..11                 |
+| 1998-99 | 542,105 | =str=       | ='2'=..='7'=          |
+| 2005-06 | 1,115,396 | =int=     | 2..11                 |
+| 2012-13 | 1,709,094 | =int=     | 2..7                  |
+| 2016-17 | 1,124,871 | =int=     | 2..7                  |
+
+Three different types on one index level.  Sources: 1988-89's script set
+=VISIT = 'since last visit'= (the recall WINDOW written into the level as if
+it were a value), and 1998-99 finished a cast with =.astype(int).astype(str)=.
+
+***** What it cost, measured
+
+#+begin_src python
+fa = Country('GhanaLSS').food_acquired()
+fa.xs(2, level='visit')      # 752,970 rows  <- 1998-99's 104,351 SILENTLY MISSING
+fa.xs('2', level='visit')    # 104,351 rows  <- and now everyone else is missing
+fa.xs(1, level='visit')      #  71,605 rows  <- 1988-89's 72,649 SILENTLY MISSING
+fa.xs('1', level='visit')    # KeyError
+#+end_src
+
+=xs(2)= is a 12.2% undercount of visit-2 rows with no exception and no
+warning; =xs('1')= is a hard failure.  *Whether you got a silent partial
+answer or a crash depended only on how you happened to spell the key* -- and
+neither told you a wave was missing.  A left merge on an =Int64= =visit= key
+left *614,754 rows (11.56% of the table)* unmatched and silently null:
+542,105 from 1998-99 and 72,649 from 1988-89.
+
+***** Why nothing caught it, which is the part worth keeping
+
+Two independent blindnesses, and they compose:
+
+1. *No index level is dtype-policed anywhere.*  =_enforce_canonical_dtypes=
+   iterates =df.columns= only, and =visit= appeared nowhere under =Columns:=
+   in =lsms_library/data_info.yml= -- only in =index_info=.
+2. *The warm cache launders the evidence.*  pyarrow coerces a mixed object
+   level to =str= on write, so the L2-country parquet came back
+   homogeneously stringy.  Swept 2026-09-09: *193 warm L2-country parquets,
+   543 index levels, ZERO mixed* -- while the cold build of one of them was
+   mixed int/str.  Any scan of =var/= is structurally unable to see this
+   class of defect.  Same shape as GH #323 ("the bug hid behind the cache the
+   bug poisoned").
+
+It also means the delivered type *depended on cache warmth*: cold, =visit=
+came back =object= with real ints for five waves; warm, everything was =str=.
+The same call returned differently typed data on the same machine.
+
+***** The fix, and why =1= is safe for the 1980s waves
+
+Both single-recall waves now carry the INTEGER =1= -- the convention
+=build_transforms.add_visit_level= exists to stamp -- and 1998-99 keeps
+=.astype(int)= without the trailing =.astype(str)=.  No wave-2..11 script
+changed.
+
+The =1= is unambiguous, and this was CHECKED rather than reasoned: every
+renumbered wave starts at 2 (visit 1 is intake -- roster and diary training,
+no consumption), so after the fix =visit == 1= occurs in exactly 144,254 rows,
+all of them 1987-88 (71,605) and 1988-89 (72,649), on both =s= sides.
+=tests/test_ghanalss_visit_alignment.py::test_visit_one_means_single_recall=
+pins that, so if a renumbered wave ever grows a visit 1 the convention is
+reconsidered rather than silently kept.
+
+The recall WINDOW 1988-89 used ("since my last visit") is prose about the
+instrument.  It belongs here, and it is here; it was never an index value.
+
+***** Conservation
+
+Row-for-row identical.  Normalising the pre-fix table's =visit= to int
+(='since last visit'= -> 1) the two tables have the SAME index and
+element-wise identical measures: 5,317,365 rows before and after, per-wave
+counts unchanged, ΣQuantity 15,646,965,351.442991, ΣExpenditure
+15,644,337,364.882200, ΣPrice 1,284,034,769.823569, delta exactly 0.0 on all
+three.  Index still unique.  Warm and cold now agree at =int64=.
+
+***** =visit= now has a written contract, but is deliberately NOT coerced
+
+=lsms_library/data_info.yml= gains =Columns > food_acquired > visit= and
+=Columns > interview_date > visit= (=type: int=, not =required=), plus a
+=Single Index= gloss.  This is the same device =crop_production.condition=
+already uses: an index level declared under =Columns:= because that file is
+where a cross-country level contract is written down, even where enforcement
+does not reach index levels.  It is inert today -- nothing reads it but the
+tests -- and it moves no cache hash (the canonical =data_info.yml= is not a
+=_table_cache_hash= input; only per-wave =data_info.yml= are).
+
+Extending =_enforce_canonical_dtypes= to index levels was considered and
+REJECTED.  Its int path is =pd.to_numeric(errors='coerce')=: on an index
+level that turns an unparseable value into =<NA>=, which this file's own
+=u=-sentinel note calls a deferred silent deletion -- served, then dropped by
+the first =groupby=, counted nowhere.  Applied to THIS defect it would have
+deleted all 72,649 of 1988-89's rows in the derived tables (which sum =visit=
+away) and reported nothing.  A silent coercion would have hidden the bug, not
+caught it.  Blast radius was measured anyway and is narrow -- exactly one
+existing (table, index-level) collision corpus-wide, =crop_production.condition=
+for Uganda -- so the objection is the failure MODE, not the width.  If
+index-level enforcement is ever built it must be a loud CHECK on the BUILD
+path (where the wave frames are concatenated), because that is the only place
+the mixed level exists.
+
+*** RETIRED: the country-level =_/food_acquired.py= concatenator (2026-09-07, GH #808)
+
+=GhanaLSS/_/food_acquired.py= is deleted and =food_acquired= has ONE
+builder: the wave scripts (=<wave>/_/food_acquired.py=, run per wave through
+the Makefile's =../%/_/food_acquired.parquet= pattern rule), concatenated by
+the framework's =load_from_waves=, with the GLSS1<->GLSS2 panel ids applied
+at read time by =_finalize_result= -> =id_walk= from =updated_ids= (built by
+=_/panel_ids.py=, GH #548).
+
+*Why.*  The retired script re-keyed households with =ghanalss.change_id=,
+which suffixes a non-injective PANELC link by =enumerate= -- =101332_0= /
+=101332_1= -- while =panel_ids.py= uses the bare-first convention =101332=
+/ =101332_1= that =tests/test_panel_id_collisions.py= pins and that the
+1987-88 -> 1988-89 link needs.  Two builders, two id conventions for the
+same split household.  The script was reachable only through the Makefile:
+=$(VAR_DIR)/nutrition.parquet= (GH #563) listed
+=$(VAR_DIR)/food_acquired.parquet= as a prerequisite, so
+=Country('GhanaLSS').nutrition()= (=nutrition: !make=) rebuilt
+=var/food_acquired.parquet= through the retired script -- and because that
+parquet was written hashless, the L2 read graded it =legacy=, trusted it,
+re-stamped it with the current hash and served =101332_0= as fresh forever
+(the GH #803 shape, one tier up).  Demonstrated cold on =development= @
+96e051c5: =nutrition()= in an empty =LSMS_DATA_DIR= ran the wave scripts
+(12:57-12:58), wrote =var= at 12:59:10 with =101332_0=, and the API served
+=101332_0= from then on; the shared cache carried the same signature after
+a make-driven rebuild.  =nutrition.py= never read that parquet -- it calls
+=Country('GhanaLSS').food_acquired()= -- so the prerequisite was the whole
+link, and it is removed together with the rule and the =var= list entry.
+
+*The "Unit handling" paragraph below is older still.*  The
+=unit_labels.org= =.replace()= it attributes to the country-level script had
+already moved into the wave scripts (2016-17's reads =../../_/unit_labels.org=
+directly); the script retired here only concatenated and re-keyed ids.
+
+*The GH #479 required-column guard still covers this table.*
+=Country._aggregate_wave_data= used to recognise =food_acquired= as
+script-path only through the presence of the country-level script it has
+just retired; =Country._is_script_path= now also counts a wave-level
+=<wave>/_/<table>.py= (resolved through =wave_folder_map=), so
+=_assert_built_required_columns= keeps firing on a build that lacks
+=Quantity= / =Expenditure= / =Price=.  That edit sits in a fingerprinted
+orchestrator and moves every L2 cache hash once (measured 4/4 -- the same
+one-time rebuild the 0.11.0 =load_from_waves= split already imposes on
+anyone upgrading from 0.10.0; checked against the =v0.10.0= tag).
+
+*Same class, NOT changed here.*  =_/household_roster.py= is a second
+country-level concatenator on =change_id=; =household_roster= is YAML-path
+in every wave, so that script is reachable only via =make all= /
+=$(VAR_DIR)/household_roster.parquet=, never from the API.  GH #808 option
+(3) -- never trust a hashless country-level parquet written by a make recipe
+as =legacy= -- is the structural fix for the class.
 
 *** Unit handling
+
+*/Corrected 2026-09-08 (price-sources sweep)./  Everything below the next
+three paragraphs describes a script that no longer exists, and the GH #808
+note above said the =unit_labels.org= =.replace()= "had already moved into
+the wave scripts".  *That sentence was false for five of the seven waves, and
+it is what hid the defect.*  The replace moved into *2016-17's* wave script
+and NOWHERE ELSE.
+
+*What actually happened.*  The country-level =_/food_acquired.py= applied
+=df1['u'].astype('string').replace(ulabelsd['u']['Preferred Label'])= up to
+=c345d317=.  GH #109 Phase 2 (=6de0ce37=, "wire GhanaLSS food_acquired
+end-to-end") rewrote that script as a concatenator and dropped the line.
+From then until 2026-09-08, =food_acquired.u= shipped the *raw survey
+spellings* in four waves -- =american tin=, =bowl=, =litre=, =Maxi bag=,
+=Fingers=, =Margarine tin= -- off the =_/unit_labels.org= Preferred-Label
+axis that =community_prices=, =unit_labels.org= itself and every consumer of
+=u= share.  Measured on the delivered table: *93,577 rows in 1991-92, 33,153
+in 1998-99, 149,023 in 2005-06 and 197,907 in 2012-13 -- 473,660 in all, and
+100% of the produced rows in the last two.*  1987-88 and 1988-89 are
+=u='Value'= only and unaffected; 2016-17 was always canonical.
+
+*Restored* by =359e52af= (branch =fix/prices-ghanalss=): each of the four
+wave scripts now does what 2016-17's does, resolving =unit_labels.org=
+through =countries_root()= (Trap 6 / GH #753, never a package-relative path)
+and *asserting the index is still unique afterwards*.  The assert is not
+decoration -- see Trap 9: =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=,
+so one collision makes core SUM Quantity/Expenditure and re-derive =Price=
+on the WHOLE frame.  The edit was gated on measuring that first: *0 rows in
+duplicate groups* on =(i, t, j, u, s, visit)= across all 5,259,320 rows under
+this exact map.  Verified cold (private =LSMS_DATA_DIR=): shape and all 14
+=(t, s)= row counts identical, index unique, produced-row =Price= coverage
+unchanged, off-axis labels 9/9/30/41 -> 0.  *The one label that remains
+outside the Preferred-Label set is =Kg=, in every wave including 2016-17*:
+the parquet holds =Kilogram= and the global =categorical_mapping/u.org=
+relabels it at API time (its only scope).
+
+/Historical, and describing a deleted script -- kept for the record:/
 
 The =u= (unit) index level on =food_acquired= is canonical at
 parquet-write time via the country-level
@@ -982,6 +1919,103 @@ print(pd.read_parquet('../var/food_expenditures.parquet').describe())
 #+end_src
 
 
+*** food_prices returns ONE wave, and the other six are CORRECTLY empty (GH #770, 2026-09-05)
+
+*Read this before filing =GhanaLSS/food_prices= as broken.*  After GH #770
+Step 1, =Country('GhanaLSS').food_prices()= returns *407,478 rows in
+2016-17 only*.  1987-88, 1988-89, 1991-92, 1998-99, 2005-06 and 2012-13
+return *nothing*.  That is the intended, correct answer, and it is a
+deliberate replacement for a worse one.
+
+*What it returned before, and why that was worse.*  1,505,751 rows over
+seven waves -- of which 1,066,978 (the six waves above) all carried the
+*same number*, =2.035038=, for every item, household and year.  Within-wave
+=std= was exactly =0.0= in six of seven waves.  =2.035038 = 1/0.49139133=,
+the reciprocal of a fabricated kg-per-cedi factor:
+=transformations.conversion_to_kgs= inferred a factor for =u='Value'= rows
+(where =Quantity= *is* the cedi expenditure), so
+=kgvalue = Expenditure / (Expenditure x f) = 1/f= identically.  It was not a
+price.  @ligon's ruling, recorded: /"empty food prices is better than a made
+up constant."/
+
+*Why SIX waves and not two.*  Two mechanisms compose, and the second is
+already documented in this file:
+1. Before 2016-17 GLSS elicited *purchases by value*: =u='Value'= is 100% of
+   =food_acquired= in 1987-88 / 1988-89, and 54--88% in 1991-92 through
+   2012-13.  Those rows now have no kg factor, so =kgvalue= is NaN and
+   =food_prices_from_acquired= *drops* them (it ends in =_drop_unpriceable=;
+   the rows do not come back as NaN, they cease to exist).
+2. The non-=Value= rows in those waves are almost entirely =s='produced'=
+   -- see idiosyncrasy 2 under =nutrition= below -- and produced rows carry
+   *no Expenditure*, so they price to NaN and drop as well.  What is left is
+   nothing.
+
+GhanaLSS is the worst-hit country in the corpus for a third reason recorded
+above: =conversion_to_kgs.json -- intentionally NOT used=.  This country
+ships *no* kg table at all, so *every* kg factor it has is inferred from
+price ratios, and =Value= was inferred alongside =Heap=, =Bowl= and =Piece=
+for exactly the same reason.
+
+*What did NOT change, and is the provable control.*  The factor map loses
+*exactly* the =value= key -- 57 -> 56 factors, with every remaining key
+byte-identical (measured).  =unitvalue=, =unitprice= and
+=food_quantities(units='units')= are unchanged (delta 0 rows).
+=food_prices(units='kgprice')= is unchanged *here* (136,383 rows both ways)
+only because GhanaLSS's =Value= rows carry a reported =Price= 0.0% of the
+time; Panama's carry one 97.4% of the time and it loses 17,366 rows there.
+
+*Re-derived cold, 2026-09-07* (private =LSMS_DATA_DIR=, no wave parquet
+reused -- GH #803 -- on this branch merged with =development= @ 96e051c5,
+i.e. after GH #785 canonicalised =food_acquired.j=; the cold table is
+5,259,320 rows).  Every figure in this entry reproduces except two: the
+=kgprice= count is *136,383* both ways (was 136,387; #785's relabel
+collapses four more rows on =j=), and the six-wave total above was an
+arithmetic slip -- 1,505,751 - 438,773 = *1,066,978*, not 1,067,978.  The
+all-wave =unitprice= (187,699 -> 187,674) and =food_quantities(units='units')=
+(1,683,305 -> 1,683,280) counts pinned in
+=tests/test_currency_denominated_units.py= moved by -25 each for the same
+reason; this fix still changes neither (delta 0, measured by emptying
+=_CURRENCY_DENOMINATED_UNITS= in-process on the identical frame).
+
+*2016-17 is NOT untouched* -- the intuitive control is false.  It shrinks
+438,773 -> 407,478 (*-7.13%*): that wave has 31,295 grouped =Value= rows of
+its own.  Median =Price= moves 4.899 -> 5.512, =std= 314.86 -> 326.70.
+
+*=_drop_unpriceable= gives currency rows their own bucket, and therefore
+does NOT warn here.*  An earlier revision of this PR let the by-design drops
+into =lost=, which took =lost_fraction= from 0.0097% to *79.84%* and made
+the warning fire on every =food_prices()= call.  That was corrected in
+review, because the number was *99.988% by design*: of the 3,493,339 rows
+dropped, *3,492,915 are =u='Value'=* and *424* are everything else.
+
+The reported figure is now the *residual real loss* -- =424 / 882,361 =
+*0.048%*= -- which is below =PRICE_LOSS_WARN_THRESHOLD= and correctly
+silent.  The currency rows are still COUNTED, in
+=attrs['price_rows_dropped']['currency']=, alongside =expected_gross=; they
+are excluded from the fraction, not hidden.
+
+*Why that mattered enough to change.*  A warning pinned at ~79.8% forever
+cannot report the next defect in its own cell: 10,000 genuinely-broken new
+rows would move it to 80.07% and nobody would look.  That is this repo's own
+GH #323 failure -- /"a warning nobody reads is exactly how #323 survived its
+first fix"/ -- reproduced inside the warning meant to prevent it.  Measured
+corpus-wide, the change takes the warning census from *8 cells back to 7*:
+=GhanaLSS/kgvalue= is the only one that stops firing, and *nothing new
+starts*.
+
+*Coverage regrade: six =GhanaLSS,food_prices= cells go =sane -> dropped=.*
+=dropped= is the tier whose own docstring calls it /"the silent-drop bug
+class"/, and there is no verdict vocabulary able to record *"correctly
+empty"* -- that gap is *GH #781*.  Until #781 gives it a word, this entry is
+the record: the six cells are empty *on purpose*, and re-grading them back
+to =sane= by restoring a constant would be a regression, not a fix.
+
+*NaN is interim, not terminal.*  The kg factor for =u='Value'= exists and
+equals =1/price=; it just varies over =(j, t, m)=, which a per-label
+constant cannot represent.  Recovering it from a price source (=community_prices=
+via a =source== argument) is Step 2 of #770 and is gated on the item-label
+work in #782.  Do not reintroduce a per-label constant in the meantime.
+
 *** DONE food_expenditures
 Now derived canonically by =_FOOD_DERIVED= -- index =(i, t, v, j, s)=.  The old
 non-standard build (missing =(t, m)=, indices borrowed from
@@ -1017,13 +2051,138 @@ r.get_gamma_se()
 r.to_pickle('../var/cfe_demands.rgsn')
 #+end_src
 
-** DEFERRED Food Conversion Table -- tracked in #563
-West Africa FCT -> a =nutrition= feature; split out of #109 as a data-gap so it
-does not block the food harmonization (cf. Cambodia #560).  Sources:
-West Africa Food Conversion Table (Inputs into Ghana Food Expenditure Data):
-https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/edit?usp=sharing
-Ghana Food Expenditure Data with Aggregate Labels and FTC Codes:
-https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/edit?usp=sharing
+** DONE Food Conversion Table -- =nutrition= landed (#563, 2026-09-04)
+The FCT is the *FAO/INFOODS West African Food Composition Table 2019*
+(Vincent, Grande, Compaore et al.), materialised as
+=GhanaLSS/_/fct_west_africa.org= (1,028 foods x 20 nutrients, per 100 g
+edible portion as published) by
+=slurm_logs/ghana_audit/build_fct_west_africa.py=.  The label -> code map is
+the =FCT Code= column of =categorical_mapping.org= =#+name: harmonize_food=
+(GH #783; formerly =food_items.org= =#+name: food_label=), written by
+=slurm_logs/ghana_audit/build_fct_code_column.py=.  See the org file's own
+commentary for the datasheet / energy-unit / edible-portion decisions.
+
+Sources originally listed here:
+- "West Africa Food Conversion Table (Inputs into Ghana Food Expenditure
+  Data)",
+  https://docs.google.com/spreadsheets/d/1Ar88nD6jQl4u8iCIsAIkLxOjHpfvi6ZBVJlwf91HOOQ/
+  -- *NOT PUBLIC*.  An anonymous export returns a Google sign-in page
+  (checked 2026-09-04).  Unused.
+- "Ghana Food Expenditure Data with Aggregate Labels and FTC Codes",
+  https://docs.google.com/spreadsheets/d/1qZhbq5gpAmCsYH1ixUn0Ix_Cb5YKSIpU-Pc2_hh2lhU/
+  -- public; exported to
+  =slurm_logs/ghana_audit/ghana_aggregate_labels_fct_2026-09-04.csv=.
+  **It is keyed to GhanaSPS, not GhanaLSS**: its wave columns are 2009-10 /
+  2013-14 / 2017-2018, and only 39 of GhanaLSS's 195 Preferred Labels appear
+  in it verbatim.  Used as ANCHORS; every departure from it is recorded in
+  =build_fct_code_column.py= (it maps every cooking oil to margarine,
+  sugarcane to cabbage, chocolate and ice cream to honey, "garden eggs" to a
+  chicken egg, and watermelon to avocado).  It is, however, exactly what a
+  GhanaSPS =nutrition= task would want.
+
+*** Idiosyncrasies this work surfaced -- read before touching =nutrition=
+
+1. *=u='Value'= was served as kilograms -- FIXED in the library, GH #770
+   Step 1 (2026-09-05).*  =transformations.conversion_to_kgs= used to infer a
+   kg-per-unit factor of *0.49139* for =u='Value'=, where =Quantity= IS the
+   cedi expenditure, and the conversion then relabelled those rows =u='kg'=.
+   1987-88 had 71,605 =u='Value'= rows and =food_quantities(units='kgs')=
+   emitted exactly 71,605 =u='kg'= rows.  Median household "kg" ran 2,228
+   (1987-88) to 251,592 (2005-06) against 85 for 2016-17 -- it tracked the
+   cedi, not any mass.  This contradicted =food_quantities_from_acquired='s
+   own docstring, which names =u='Value'= as the canonical carry-through
+   case.  *A library defect, not config*: see
+   =slurm_logs/ghana_audit/ISSUE_value_kg_factor.org= and
+   =slurm_logs/770/PLAN_2026-09-05.org=.
+
+   *What the fix does.*  =transformations._CURRENCY_DENOMINATED_UNITS=
+   ={'value'}= is excluded from the price-ratio inference, so no factor is
+   produced and =Quantity_kg= stays NaN; the rows are carried through with
+   their native =u='Value'=, exactly as the docstring always promised.
+   =food_quantities(units='kgs')= now tags 468,105 rows =u='kg'= for this
+   country, not 1,566,368, and =sum(u=='kg')= for 2016-17 falls 1,613,235 ->
+   1,208,306 (-25%) -- the fix working.
+
+   *The name is =currency-denominated=, NOT =non-physical=, and that
+   matters.*  Value = Quantity x Price, so =Value / Price = Quantity=:
+   prices are the units in which value measures quantity, and the kg factor
+   for =Value= *exists* -- it equals =1/price=.  The bug was one of
+   *granularity*: =conversion_to_kgs= returns one factor per unit LABEL and
+   =1/price= varies over =(j, t, m)=.  NaN is the honest interim state, not
+   a verdict that the quantity is unknowable.
+
+   *=nutrition.py='s own filter STAYS.*  It drops =NON_PHYSICAL_UNITS =
+   {'value','all','none'}= BEFORE deriving; it cannot filter afterwards,
+   because the kg relabel destroys the native =u=.  Measured on the filtered
+   frame, the factor map is *byte-identical* before and after #770 (56 keys
+   both ways), so =nutrition= is provably unchanged by the fix.  **Do not
+   "simplify" nutrition.py to call =Country.food_quantities()= like Uganda's
+   and Ethiopia's do** -- and do not remove the filter now that the library
+   is fixed either: it also drops =all= and =none=, which #770 does not
+   touch.
+
+2. *Own production is the only physical-quantity source before 2016-17.*
+   After the filter, the surviving kg rows in 1991-92 / 1998-99 / 2005-06 /
+   2012-13 are *100% =s='produced'=* -- purchases were elicited by value.
+   =nutrition= for those waves describes the own-production basket only: a
+   biased subset (rural, staple-heavy), not scaled-down total intake.
+
+3. *2005-06's own-production module was never harmonised.*  =harmonize_food='s
+   2005-06 column covers 101 of the 102 =s='purchased'= item labels but *0 of
+   the 63 =s='produced'= labels* (=cassava-tubers=, =maize-flour/dough=,
+   =okro=, =pepper=, ...).  Since 2005-06's only physical quantities are own
+   production, the wave maps at 0% and =nutrition= is empty for it.  This
+   CONTRADICTS the "DONE food_items.org / Food labels harmonized across all 7
+   waves" entry above, which is true of the purchase module only.  Left
+   unfixed here (harmonisation is #109's, not #563's); worth ~110,213 kg.
+
+   /Corrected 2026-09-05 (GH #782)./  *Fixed, and the diagnosis above was
+   right about the symptom but wrong about the cause.*  The 63 labels were
+   never a harmonisation gap in =food_label= (since GH #783:
+   =categorical_mapping.org= =#+name: harmonize_food=): they are the *survey's own raw
+   labels*, leaking through =2005-06/_/food_acquired.py='s own-production
+   decode, which matched nothing and passed its input through unchanged (Trap
+   8 below).  =food_label= was not missing them --- they were never supposed
+   to reach it.  With the decode fixed, 2005-06's produced =j= is a Preferred
+   Label like every other wave's, =nutrition= resolves it through the
+   =by_label= fallback, and the wave is no longer empty.  Measured
+   end-to-end, cold, before and after: FCT coverage of GhanaLSS food mass
+   *88.26% -> 94.71%* (1,509,649 -> 1,619,862 kg), i.e. *+110,213 kg* ---
+   which is the "worth ~110,213 kg" this entry predicted, to the kilogram.
+   No change to =nutrition.py= was needed or made.
+
+   Of the unmapped mass that remains, only =Oil (vegetable)= (69,025 kg) and
+   =Sugar Bread= (15,701 kg) are real gaps --- both are item 4 below, still
+   open.  The rest is =Cigarette= / =Tobacco= / =Other Tobacco= / =Chewing
+   Gum=, which are on the food-expenditure axis but have no FCT row, and
+   should not have one.
+
+4. *Three 2016-17 labels are missing from =harmonize_food= entirely*:
+   =Oil (vegetable)= (69,025 kg), =Sugar Bread= (15,701 kg) and =Kola Nut=
+   (2,888 kg) appear as =j= in the data but in no column of the table.  They
+   are worth *+27.4% of 2016-17 Energy* on their own.  Also #109's.
+
+5. *The FCT is per 100 g EDIBLE PORTION; =food_quantities= is quantity
+   ACQUIRED.*  =EDIBLE1= is carried in =fct_west_africa.org= but NOT applied,
+   because both precedents multiply acquired mass by per-EP densities and
+   =Feature('nutrition')= assembles the three countries together.  GhanaLSS
+   therefore overstates in exactly the way Uganda and Ethiopia do.
+
+6. *Vitamin K is absent from the WAFCT* (no phylloquinone component), so
+   GhanaLSS returns 20 of =nutrient_labels.org='s 21 Preferred Labels.  It is
+   omitted, NOT zero-filled -- a zero would assert these foods contain none.
+
+7. *Both food-label artifacts are gone as of GH #783 (2026-09-06), and this
+   entry's account of the reader was WRONG.*  It said GhanaLSS read
+   =food_items.org= /via =ghanalss.py::harmonized_food_labels=/.  Measured
+   with =git grep=, that function and its =harmonized_food_labels2= sibling
+   had *zero callers* anywhere in the repo, and would have raised if called
+   (they parsed the =.org= with =pd.read_csv(delimiter='|')=).  The single
+   live reader was =_/nutrition.py:135=.  Both dead functions are deleted;
+   =nutrition.py= now reads =_/categorical_mapping.org= =#+name:
+   harmonize_food=.  =food_items.csv= was indeed stale and unread -- verified
+   again before deletion -- and was never regenerated with the =FCT Code=
+   column, which is one more reason it is now deleted rather than kept.
 
 * Features NOT available in GhanaLSS
 
@@ -1071,6 +2230,16 @@ rounds.  Source files and label handling:
 | 2005-06 | =parta/sec2a.dta= | s2aq2 | embedded value labels (grade-level scheme)|
 | 2012-13 | =PARTA/SEC2a.dta= | s2aq2 | embedded value labels                     |
 | 2016-17 | =g7sec2.dta=      | s2aq2 | embedded value labels                     |
+
+/Corrected 2026-09-02 (GH #731)./  The paragraph and table above and the
+"Still NOT wired" list below are *stale*: all *seven* waves declare
+=individual_education= today.  1987-88 and 1988-89 read =Y03I.DAT:GRADE= and
+1991-92 reads =S2.DTA:s2q2= (17,168 rows carrying the full letter ladder --
+the cached =S2.DTA= *is* the Section 2 education file, not a cover/control
+file), all three through the country =harmonize_education= table (GH #171);
+GLSS5/6/7 read their own wave-level tables since 2026-09-02.  Kept as written
+for the record of what was thought to block them.  See /Trap 7/ for the letter
+ladder and the =U6= collision.
 
 Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
@@ -1141,9 +2310,11 @@ stringifies the Code index via =format_id= (so keys are ='1'=), while wave
 mapping functions variously look up with =int(value)= or =str(value)=.  Both
 historical bugs were partly key-type mismatches.
 
-** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
-The country-level =relationship= table in =_/categorical_mapping.org= has
+The country-level GLSS1 code table in =_/categorical_mapping.org= (named
+=relationship= until 2026-09-07, =relationship_glss1= since -- see the last
+subsection of this trap) has
 *fourteen* codes and cites *GLSS1*'s data dictionary
 (=catalog/2313/data-dictionary/F184?file_name=y01a=).  It is correct for
 GLSS1 and GLSS2 -- verified against the raw data, where =REL= takes codes 1--14
@@ -1155,15 +2326,182 @@ and code 1 occurs 3,136 / 3,192 times = each wave's household count.
 value labels (=value_labels() == []=), so the GLSS4 list has to come off the
 questionnaire.
 
-1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
-decoded through a table that would silently mis-label it.  A null column is
-honest; a wrong kinship label propagates into
-=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
-add the GLSS4 list, add it as a *wave-level* table in
-=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
-cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
-1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
-9=Upper West, 10=Upper East, the reverse of the country-level table.)
+/Superseded 2026-08 (=f5e6b66c=)./  The paragraph that stood here said 1998-99
+=Relationship= was "deliberately left unmapped".  It is now decoded through a
+*wave-level* nine-code =#+name: relationship= table in
+=1998-99/_/categorical_mapping.org=, transcribed from the questionnaire;
+=mapping.py= searches the wave dir *first*, so it cannot fall through to the
+GLSS1 table.  The rule that paragraph stated still stands and is why the table
+is wave-level: a null column is honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  (The
+same wave-first discipline is why 1991-92 keeps its own =region= table: GLSS3
+orders the two northern regions 9=Upper West, 10=Upper East, the reverse of the
+country-level table.)
+
+*** GLSS3 uses the nine-code scheme too -- and WAS decoded through GLSS1's, for its whole life (fixed 2026-09-07)
+
+Found while running the GH #797 gate; GH #799.  1991-92's =rel= (=S1.DTA=) takes codes
+1--9 only (DDI: range 1--9, 20,403 valid cases; code 1 occurs 4,550 times
+against 4,552 households -- two households carry no code-1 row).  The GLSS3 household questionnaire this repository ships
+(=Documentation/pdf/G3QPartA.pdf=, Section 1 column 3; identical text in
+=Documentation/GHA_1991_GLSS_Household_Questionnaire_EN.pdf=) prints the *same*
+nine-code list as GLSS4, verbatim:
+
+: Head.....................1     Relative of head or head's spouse.........6
+: Wife/husband.............2     Servant and his/her relative..............7
+: Son/daughter.............3     Tenant and his/her relative...............8
+: Grandchild...............4     Other not related to head or head's spouse.9
+: Father/mother............5
+
+=1991-92/_/mapping.py= resolves =relationship= with
+=_code_label_map('relationship', _dirs)=, wave dir first -- and the wave dir
+had no such table, so the lookup fell through to the country-level GLSS1 table.
+Codes 1--5 happen to agree in meaning between the two schemes; 6--9 do not:
+
+| code | GLSS3 form                        | served until 2026-09-07 | tuple served           |     n |
+|------+-----------------------------------+-------------------------+------------------------+-------|
+|    6 | Relative of head or head's spouse | Sibling                 | [0, 1, consanguineal]  | 1,211 |
+|    7 | Servant and his/her relative      | Niece/nephew            | [-1, 1, consanguineal] |    61 |
+|    8 | Tenant and his/her relative       | Son/daughter in-law     | [-1, 0, affinal]       |     8 |
+|    9 | Other not related                 | Brother/sister in-law   | [0, 1, affinal]        |    73 |
+
+1,353 people (6.6% of the wave) carried a wrong =Relationship= *and* a wrong
+kinship tuple.  Nothing was null, so no guard fired and the cell graded =sane=
+in every coverage snapshot -- the =1998-99/_/categorical_mapping.org= header
+had predicted this exact mis-labelling for GLSS4 ("code 6 ... would become
+Sibling"), and nobody checked GLSS3.  =sane= is not =blessed=.
+
+*The fix* is the 1998-99 fix one wave earlier: a =#+name: relationship= table
+in =1991-92/_/categorical_mapping.org= with the *same labels as 1998-99's*, so
+GLSS3 and GLSS4 (one form) speak one vocabulary.  That choice relabels codes
+2/3/5 as well (=Spouse= -> =Wife/husband=, =Child= -> =Son/daughter=, =Parent=
+-> =Father/mother=; 13,265 rows) with *identical* kinship tuples -- a string
+change, stated here so nobody hunts for it.
+
+*Verified cold* (private =LSMS_DATA_DIR=, =LSMS_NO_CACHE=1=; scripts, logs
+and the before/after crosstab are inline in GH #799): =household_roster=
+has 246,594 rows before and after; the six other waves are unchanged on
+=Relationship= (1988-89 compared as a label multiset: 714 of its 3,192
+household ids differ between the wave and country parquets, and those 714 are
+exactly the keys of =updated_ids['1988-89']= -- the GLSS1/GLSS2 panel re-key,
+applied before the country parquet is written); 1991-92
+has 20,403 rows before and after and *exactly 14,618 change* -- 13,265
+string-only (codes 2/3/5) and 1,353 semantic (codes 6--9).  0 NA in
+=Relationship=/=Generation=/=Distance=/=Affinity= in every wave; no "Unknown
+relationship labels" warning.  =Country._table_cache_hash('household_roster')=
+moved (=4f2eddfb...= -> =6a9e8d19...=), so a warm cache rebuilds instead of
+masking the fix.
+
+*** One vocabulary for seven waves: the country =relationship= table now HARMONIZES labels; GLSS1's code table is =relationship_glss1= (2026-09-07, GH #797)
+
+/Landed on =development= on 2026-09-07 (=1de2f0e8=, then =30d7a8f1=, =9ad8e04f=,
+=4c2a466e=); verified cold in two private data dirs, the numbers are on GH #797./
+
+*What it was.*  The GH #797 gate found the seven waves serving FIVE
+relationship vocabularies (32 distinct strings) for the same categories:
+GLSS1/2 =Spouse=, GLSS3/4 =Wife/husband=, GLSS7 =Spouse (Wife/Husband)=;
+GLSS1/2 =Child=, GLSS3/4 =Son/daughter=, GLSS6/7 =Child (Son/Daughter)=; and
+so on.  Every string resolved in =kinship.yml= -- the tuples were right, the
+strings were not -- because the corpus had been coping by adding each
+survey's verbiage to the global ontology (nine =kinship.yml= keys were reached
+by GhanaLSS alone, filed under a section header that credits
+Kazakhstan/Tajikistan/South Africa).
+
+*What changed* (three files, all in this country):
+
+1. =_/categorical_mapping.org=: the GLSS1 fourteen-code =| Code | Label |=
+   table is renamed =relationship_glss1=; =1987-88/_/mapping.py= and
+   =1988-89/_/mapping.py= call =code_label_map('relationship_glss1', _dirs)=.
+   Their dicts are identical before/after (measured), and both waves are
+   served unchanged (0 strings differ).
+2. A NEW country-level =#+name: relationship= table, =| Original Label |
+   Preferred Label | Comparable Label |= -- raw SERVED label FIRST, because
+   =_build_replace_dict= keys on the first column that is neither =Preferred
+   Label= nor the requested variant.  =Preferred= (the default) maps every
+   non-canonical string any wave serves onto ONE vocabulary of 15 labels
+   SHARED WITH GhanaSPS (decided with @ligon 2026-09-07: a Ghana vocabulary,
+   not a corpus one, because surveys elsewhere understand relationships
+   differently): Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law,
+   Grandchild, Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew,
+   Other relative, Non-relative, Servant, Tenant.  The Original Label is the
+   served string, i.e. AFTER the title-casing formatters
+   (=_/ghanalss.py:Relationship= for 2012-13/2016-17, the wave formatter for
+   2005-06), not the =.dta= value label -- which is why GLSS7's =Non-Relative=
+   needs a row of its own.  Identity rows exist only where the two variants
+   differ (Sibling, Niece/nephew, Tenant); =.replace= leaves unmatched values
+   alone, so a label canonical in both variants needs none.
+   =Comparable=, selected with =household_roster(labels={'Relationship':
+   'Comparable'})=, is the eight categories every GLSS form asked (Head,
+   Spouse, Child, Grandchild, Parent, Other relative, Non-relative, Servant)
+   for pooling across waves: GLSS1/2's siblings, nieces and in-laws fold into
+   =Other relative= (where GLSS3+ put them), Tenant into =Non-relative=, the
+   adopted code into =Child=, Parent-in-law into =Parent=; the kinship tuple
+   follows the coarse label.  Residual imbalance no relabelling removes:
+   GLSS3/4's =Parent= excludes parents-in-law (they sit in "relative of head
+   or spouse"); every other wave's includes them.  Measured 2026-09-07:
+   identical row counts under both variants; Generation NA 5.6% (Preferred)
+   vs 6.5% (Comparable).
+
+*How it works, and two things to know.*  =Country._apply_categorical_mappings=
+auto-applies a country table whose name matches a served column
+(case-insensitive), by =.str.strip()= then =.replace()=, on EVERY read --
+warm or cold -- and since =df9baf91= (GH #797) it runs BEFORE
+=_expand_kinship=, so the kinship lookup sees the Preferred Label.  Hence:
+- the served =Relationship= is rewritten at API time for all seven waves
+  (113,871 of 246,594 rows change string; 0 in GLSS1/2); the L2-wave and
+  L2-country parquets keep the RAW strings (=pd.read_parquet= on
+  =var/household_roster.parquet= still shows =Child (Son/Daughter)=);
+- =_/categorical_mapping.org= is a hashed build input for EVERY GhanaLSS
+  table (=Country._table_cache_hash= folds =_/*.org=), and a wave's
+  =mapping.py= for that wave, so =household_roster=, =food_acquired=,
+  =sample= and =cluster_features= ALL moved hash (measured) -- GhanaLSS
+  rebuilds once, for everyone, on the next read.
+
+*Tuple-preserving by construction, with one stated exception.*  Every
+Original Label and its Preferred Label resolve to the SAME kinship tuple under
+=_expand_kinship='s lookup (=.strip().title()= first, then raw), checked on
+all 246,594 rows -- except the adopted row.  =Adopted Child= (GLSS5/6, 963
+people; was [-1,0,consanguineal]) and =Adopted / Foster/ Step Child= (GLSS7,
+501; was [-1,0,step]) are ONE label, =Adopted/foster/stepchild=, whose tuple
+is [-1, 0, null]: a child of the head, but adoptive / foster / step is not
+determined by the instruments and the ontology has no =adoptive= affinity,
+so Affinity is null (the GH #698 shape; GhanaSPS's three spellings of the
+same code carry the same tuple).  =Parent/Parentlaw= (GLSS5/6) and
+=Parent/Parent-In-Law= (GLSS7) are ONE survey code that conflates parent and
+parent-in-law, filed as [1, 0, consanguineal] like =Parent=, so they are
+served as =Parent= (label-only).  *Caveat, the instrument's not ours:* GLSS1-4
+=Parent= means a parent; GLSS5-7 =Parent= means a parent OR a parent-in-law
+(466 / 897 / 1,094 people), exactly as GLSS3+'s =Other relative= absorbs the
+siblings, nieces and in-laws that GLSS1/2 list separately.  GLSS1/2's own
+=Father/mother in-law= is =Parent-in-law=, =Brother/sister in-law= is
+=Sibling-in-law=, =Son/daughter in-law= is =Child-in-law=, =Others not
+related= is =Non-relative=.  =Other= (GLSS6 code 11, 14 people; a code
+DISTINCT from 10 =Non_relative=, dropped in GLSS7) folds into
+=Non-relative= ([0,0,unrelated] either way).  =Other relative= is
+[null, null, consanguineal] since 3069ef80 (its generation and distance are
+not recorded; it used to sit on Head's cell).
+
+*Trap 2's mechanism is closed structurally.*  GLSS3 was mis-decoded for its
+whole life (GH #799) because a wave-first =code_label_map('relationship',
+_dirs)= found no wave table and fell through to the country GLSS1 table.
+That fall-through no longer exists: the country table named =relationship=
+has no =Code= column, so =code_label_map= raises =KeyError= there, moves on,
+and returns ={}= -- measured: =code_label_map('relationship', <1987-88
+_dirs>)= is ={}= after the rename -- and such a wave then ships a 100%-null
+=Relationship=, which Site B's per-wave required-column check
+(=NullReadWarning=; =Generation=/=Distance=/=Affinity= are required columns;
+the same check already fires on this country's =sample.strata=) reports.
+A null column is honest; a wrong kinship label is not.  1991-92 and 1998-99 still resolve their own
+wave tables (dicts identical before/after).
+
+*Verified cold* (two private =LSMS_DATA_DIR=s, one worktree, only the three
+files above differing): 246,594 rows before and after; index identical,
+row-aligned on =(i, t, v, pid)= (1988-89 aligns this time because both
+builds pass through =updated_ids=); 0 NA in all four columns; no "Unknown
+relationship labels" warning; warning sets identical; a second,
+separate-process read of the after dir is a warm read (parquet mtime
+unchanged) and returns the same 17 labels.  Per-wave raw -> harmonized
+crosstabs are in the report.
 
 ** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
 
@@ -1304,6 +2642,280 @@ the worktree); =_/ghanalss.py= already does it right with =countries_root()=
 1991-92 ("worth its own issue").  Not fixed here; the fix is
 =countries_root()/'GhanaLSS'/'<wave>'= in each module.
 
+** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
+
+Found by the GhanaSPS =individual_education= task (PR #728) while reading this
+country's table as precedent; measured and fixed here.
+
+*What it was.*  =_/categorical_mapping.org= =harmonize_education= listed =U6=
+twice: =U6 -> Upper secondary complete= (inside the block of GLSS5/6/7 labels,
+first in file order) and =U6 -> Postgraduate= (in the =U1..U8= ladder, later).
+Nothing raised.  =_row_union_categorical= (=country.py= ~l.305-316)
+concatenates =[country, global]= and runs
+=drop_duplicates(subset=[key], keep='first')=, so the first row won and the
+second was gone before any wave ever saw the table --
+=Wave.categorical_mapping['harmonize_education']= reported =dup_keys=[]= on
+every wave.  A duplicate key is Trap 1's disease in a new coat: not a wrong
+answer that raises, but a plausible one chosen by file order, indistinguishable
+from a correct table.
+
+*Which meaning occurs where* -- measured on the raw source variable of every
+wave (=slurm_logs/ghana_audit/u6_measure_731.py=, output =.out= alongside):
+
+| wave    | variable                | raw label |   n | neighbours in the same ladder                                | meaning (source read)                                                                                                            |
+|---------+-------------------------+-----------+-----+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------|
+| 1987-88 | =Y03I.DAT:GRADE=        | =U6=      |   1 | =S4 S5 / A1 A2 / PS1 PS2 PS3 / T1 T2 T3 T4 / U1 U2 U3 U4 / U5 U6 U7 U8 / K (Koranic)= | university year 6.  Household questionnaire Section 3 block =3i= (printed p.6) col.7 "What was the highest grade he/she completed?", CODES box |
+| 1988-89 | =Y03I.DAT:GRADE=        | =U6=      |   4 | same                                                         | same instrument: the GLSS1 and GLSS2 questionnaire PDFs are one scan (78/78 pages pixel-identical; see below)                   |
+| 1991-92 | =S2.DTA:s2q2=           | =U6=      |   8 | =S1 throu S5 / A1 A2 PS1, PS2, PS3, T1 throu T4 / U1 throu U8 / K (Koranic) / JSS1 throu JSS3= | university year 6.  =pdf/G3QPartA.pdf= p.10, Section 2A Q2 "What was the highest class or form completed?"          |
+| 1998-99 | =SEC2A.DTA:s2aq2=       | --        |   0 | numeric codes: =Sec. (O Level) 08, Sixth Form 09, ... University 16= | no =U6= in this instrument (household questionnaire p.10, Section 2A Q2 "highest level completed")                    |
+| 2005-06 | =parta/sec2a.dta:s2aq2= | =u6=      |  74 | =s5=31, l6=32, u6=33, voc=41 ... polytechnic=51, university=52= | Upper Sixth.  =G5QPartA.pdf= p.11, Section 2A Q2 "What was the highest grade completed?"                                 |
+| 2012-13 | =PARTA/SEC2a.dta:s2aq2= | =U6=      | 131 | =S5=32, L6=33, U6=34, Voc/Tech=41 ... Polytechnic=51, University=52= | Upper Sixth.  GLSS6 Part A questionnaire p.10, Section 2A Q2 "What is the highest grade completed?"                 |
+| 2016-17 | =g7sec2.dta:s2aq2=      | =U6=      |  77 | =S5=32, L6=33, U6=34, Year one=41 .. Year six and above=46=  | Upper Sixth.  GLSS7 Module A (=GLSS7_MODULE A_30_9_16_for print.docx=), Section 2A Q2                                           |
+
+The reading is decided by the *neighbours*, not by the letter.  Where the
+ladder has =A1 A2= for the sixth form and =U1..U8= as a block, =U= is
+university; where it has =L6= then =U6= and university is a separate rung
+(=University=, or =Year one..=), =U6= is Upper Sixth.  Both readings occur in
+the data -- 13 people in the first, 282 in the second -- in *different waves*,
+never in one wave from two variables.  (=U5/U7/U8= occur only in GLSS1/2/3;
+=L6/l6= only in GLSS5/6/7.)
+
+*What was decided (2026-09-02).*  The country table keeps the *letter-ladder*
+reading, =U6 -> Postgraduate=, alongside =U5/U7/U8= in the same ladder --
+because the country table is where GLSS1-era vocabulary lives in this country
+(Traps 2 and 4: the country =relationship= and =region= tables are GLSS1's
+too), and because it is the only table the three letter-ladder waves read.
+The GLSS5/6/7 reading moved to *wave-level* =#+name: harmonize_education=
+tables in =2005-06/_/=, =2012-13/_/= and =2016-17/_/categorical_mapping.org=.
+Two mechanical facts shaped that, both measured:
+
+- A wave table *replaces* the country U global dict for its wave --
+  =Wave.categorical_mapping= (=country.py= ~l.1006) is a plain =dict.update=;
+  the row-union is global/country only.  Verified with a one-row sentinel
+  table appended to =2012-13/_/=: that wave saw *one* row and lost =L6=;
+  1991-92 and 2016-17 were untouched.  So each wave table lists *every* label
+  its source variable emits (32 / 33 / 33 rows), generated from the pre-edit
+  country mapping and asserted equal to it -- which is why the modern waves'
+  delivered counts are byte-identical before and after.
+- The two consumption paths resolve a within-table duplicate in *opposite*
+  directions: first-wins at the global/country union (=keep='first'=),
+  last-wins where a wave table becomes a dict
+  (=cat_table.set_index(k)[v].to_dict()=, =country.py= ~l.938).  Measured on a
+  three-row frame.  A guard against duplicate keys therefore belongs at
+  org-load time, before either path runs -- GH #674's family; proposed in the
+  #731 PR, not built there.
+
+*What moved.*  Exactly the 13 =U6= people: 1987-88 Postgraduate 5 -> 6 and
+Upper secondary complete 235 -> 234; 1988-89 3 -> 7 and 230 -> 226; 1991-92
+12 -> 20 and 453 -> 445.  Every other cell of every wave is unchanged
+(=slurm_logs/ghana_audit/api_before_731.out= vs =api_after_*_731.out=).
+1988-89 moved through the country table alone; its =_/= was not edited.
+
+*Not settled, on purpose.*  =U1..U4 -> Bachelor= (this ladder) versus
+GhanaSPS's =Level 100..300 -> Tertiary certificate/diploma=, =Level 400 ->
+Bachelor= (PR #728).  The instruments *sharpen* this without settling it: the
+letter codes are *years completed*, and the qualification is asked separately
+-- GLSS3 Q3 "What was the highest educational level attained?" (=O'level 5,
+A'Level 6, ... Bachelor 9, Master 10, Doctorate 11=), GLSS1/2 col.10 "What
+was the highest diploma obtained?" (=GCE A LEVEL 7 ... BACHELOR 10, MASTER
+11, DOCTORATE 12=) -- so a completed =U3= is "some university", a rung the
+canonical vocabulary does not have.  Wiring the qualification variable
+(=s2q3=; Y03I's diploma column) instead of, or alongside, the year ladder
+would be the principled fix.  Left as found: changing it is a separate
+decision with its own before/after.
+
+*Two things found on the way.*
+- The GLSS1 and GLSS2 "questionnaire" PDFs
+  (=1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf=
+  and =1988-89/Documentation/questionnaire/GHA_1988_GLSS_Household_Questionnaire_EN.pdf=)
+  differ in md5 (metadata; 18 bytes apart in size) but render to *78 of 78
+  pixel-identical pages*.  One scan, two catalog entries.  PR #751's page
+  index for GLSS2 (=slurm_logs/ghana_audit/glss2_questionnaire/PAGE_INDEX.org=)
+  therefore indexes GLSS1 as well.  Evidence crop for this trap:
+  =slurm_logs/ghana_audit/glss12_education_u6/=.
+- The country table's modern-vocabulary rows are now *inert* -- shadowed for
+  GLSS5/6/7, never emitted by GLSS1/2/3.  They are kept and labelled as
+  documentation; pruning them is a follow-up.  A future wave must bring its
+  own wave table: inheriting the country table would hand it the *university*
+  =U6=.
+
+** Trap 8: =convert_categoricals=True= turns the CODE you decode on into a LABEL (2026-09-05, GH #782)
+
+The most expensive instance of Trap 1's family so far: *149,047 rows shipped
+the survey's own raw labels as =j= for years*, and every guard we own said the
+build succeeded.
+
+=2005-06/_/food_acquired.py= read =sec8h.dta= (own production) with
+=convert_categoricals=True=, which returns =foodcd= as *decoded label text*
+(='beef'=, ='maize-flour/dough'=), then decoded it against
+=labelsd['Code_8h']=, which is keyed by the *numeric code*.  Match rate:
+*0 of 424,052*.  And =Series.replace()= passes an unmatched value through
+*unchanged*, so instead of an error, or even a NaN, every produced row emitted
+the survey's label as though it were a Preferred Label.
+
+The purchase block was fine and *must not be "fixed"*: =sec9b.dta= is read with
+=convert_categoricals=False=, so =freqcd= stays numeric and matches its
+=Code_9b= map 1,436,956/1,436,956 = *100%*.  The two blocks differ only in that
+one flag.
+
+*Why the file must be read TWICE.*  Both reads are load-bearing, and this is
+not gold-plating:
+- =convert_categoricals=True= is *required* for =s8hq1= (the consumed-own-produce
+  filter is ='yes'=/='no'=, not =1=/=2=) and for =s8hq13= (the native unit as
+  text -- 2005-06 has no =units= table, so nothing else decodes it);
+- =j= must come from a =convert_categoricals=False= read, or it is a label.
+The second read costs 0.3 s; the frames are asserted row-aligned.
+
+*Decode on the CODE axis, not the label axis.*  The label axis is the obvious
+fix and is the wrong one.  =harmonize_food='s =Label_8h= column transcribes the
+survey's own text, and for codes 91/92 it had been transcribed with the
+spelling *corrected* -- =alcoholic beverages= / =non-alcoholic beverages=,
+where the =.dta= says =alchoholic beverages= / =non-alchoholic beverages= (sic).
+A =Label_8h= decode therefore covers only *96.8%*, and is one well-meant typo
+fix away from silently matching nothing again.  =Code_8h= agrees with the data's
+codes for all 63 items; =Code_9b= with =freqcd= for all 164.  The =Label_*=
+columns are *documentation of the source spelling* -- =Label_9b= matches its
+source 164/164 -- so the two 8h cells were corrected to the survey's spelling,
+misspelling and all.  *Do not "fix" them again.*
+
+*=.map()= is necessary but NOT sufficient.*  Swapping =.replace()= for =.map()=
+turns an unmatched code into NaN, which =_drop_nonfood= (=isinstance(x, str)=)
+would then discard *silently* -- the same disease with a different face.  The
+script asserts coverage explicitly (=_assert_decoded=).
+
+*What this cost, and why nothing caught it.*  Every guard the library owns
+checks *shape*.  =_assert_built_required_columns= checks =j= is present; the
+grain audit checks the index is unique; the null-read guard checks a column is
+not all-NaN.  =j= was present, unique and fully populated -- with the wrong
+vocabulary.  CLAUDE.md already names the only check that discriminates: /"a
+plausible-looking distribution therefore proves nothing; the discriminating
+check is a subset assertion against the canonical vocabulary."/  There was
+none on =j=.  There is now: =tests/test_ghanalss_food_label_canonical.py=.
+
+Note the =community_prices= section below says, in its own words, that the
+overlap with =food_acquired().j= /"was checked against the =harmonize_food=
+tables, not a built =food_acquired="/.  That is exactly the gap: the config was
+right and the built table did not match it.
+
+** Trap 9: a duplicate index in =food_acquired= silently REWRITES =Price= table-wide (2026-09-05, GH #782/#323)
+
+*This one is armed and waiting.*  It did not fire in the shipped data, but only
+because =2005-06/_/food_acquired.py= now keeps its index unique on purpose.  Any
+future duplicate in GhanaLSS =food_acquired= re-arms it.
+
+=food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so when its index is
+non-unique =Country._normalize_dataframe_index= does *not* collapse with
+=.first()= -- it SUMs =Quantity= / =Expenditure= and then, at
+=country.py:5522=, re-derives
+
+: df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
+
+The grain audit lists =Price= as =reconciled= on the grounds that it is
+"re-derived from the summed totals", finds the residual lossless, and correctly
+emits *no* =GrainCollapseWarning=.  Nothing here is a bug in core --- for a
+survey where =Expenditure = Quantity x Price=, the reconciliation is exactly
+right.
+
+*GhanaLSS is not such a survey.*  =Expenditure= is structurally =NaN= for
+=s='produced'= (the instrument records a farmgate =Price= and a =Quantity=, and
+never a produced value), and the re-derivation is applied to the *whole frame*,
+not merely to the duplicated groups.  Measured on the delivered table:
+
+| rows with a Price     | block does not fire | block fires |
+|-----------------------+---------------------+-------------|
+| =s='produced'=        |   883,789 (95.2%)   |  44,112 (4.8%) |
+| whole table           |   883,789           |   4,375,274 |
+
+So a single duplicate anywhere in the table would *destroy 839,677 recorded
+farmgate prices* and *fabricate* a =Price= on ~4.33M purchased rows, where
+=u='Value'= makes =Quantity == Expenditure= and the "price" is therefore 1.0 ---
+the "Kwacha per Kwacha" quantity =CLAUDE.md= warns about.  Silently, and with the
+audit correctly reporting nothing, because the audit's premise is that the
+re-derivation is information-preserving.
+
+Fixing 2005-06's decode (Trap 8) *created* 24 such duplicates in 12 groups --- two
+farmgate prices for one harmonised commodity, e.g. =mutton= and =goat= both
+becoming =Goat=.  They are resolved in the wave script (=Quantity= sums, =Price=
+becomes the quantity-weighted mean) rather than left to core, which is what
+=CLAUDE.md= prescribes: core does not aggregate, and a reducer applied
+downstream "only puts a signature on the corpse".
+
+*Corrects the commit message of =b93f9c2c=*, which described core's behaviour as
+=groupby().first()= discarding one price.  That was measured to be wrong: the
+mechanism is the additive re-derivation above, and it is considerably worse than
+=.first()= would have been.
+
+** One food vocabulary, not seven: the cross-wave drift (2026-09-05, GH #782)
+
+Each wave's =harmonize_food= carries its *own* =Preferred Label= column and
+nothing reconciled them.  Seven commodities therefore shipped under two
+spellings depending on the wave -- =Egg=/=Eggs=, =Tea bag=/=Tea bags=,
+=Condiment=/=Condiments= and four =Other X=/=Other Xs=.
+
+*This is invisible to any per-wave check.*  All seven waves are internally
+clean (0 collisions each, measured); the defect exists *only in the assembled
+cross-wave frame*.  Any guard that reads one wave at a time will pass forever.
+That is why the guard reads all seven tables at once, and why it is
+config-only: reading org tables costs milliseconds, so it need not be gated on
+a warm cache.
+
+*The country-level =_/categorical_mapping.org= =#+name: harmonize_food= is the
+authority* (it was =_/food_items.org= =#+name: food_label= until GH #783 moved it),
+and not merely by preference: =_/nutrition.py:187= resolves an unmatched =j=
+through a =by_label= fallback keyed on *that* table's Preferred Label, so a
+wave spelling it differently gets no FCT code and drops out of =nutrition=.
+The table already knew about all seven -- it carries one column per wave
+recording each wave's own label -- so every canonical form was read off it.
+
+Two consequences worth stating plainly:
+- =Condiment= and =Egg= follow the country table *against majority wave usage*
+  (five waves said =Eggs=).  Popularity is not authority here; =by_label= is.
+- =Tea= is emitted by *neither* 2012-13 nor 2016-17, but the country table lists
+  =Tea bags= / =Tea bag= in those columns against Preferred =Tea= (FCT 12_008).
+  A recorded decision, not a guess.
+
+The =Aggregate Label= axis had the *same* six drifts and is user-visible
+through =labels='Aggregate'=; it was fixed in the same pass, along with an
+encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
+followed by two mojibake =Ê= characters, a twin of code 254's clean label).
+
+*Why a rename here is provably safe.*  For the six singular/plural pairs, both
+variants share the collision key, so the measured "0 internal collisions per
+wave" is a proof that no wave holds both -- a rename cannot merge two distinct
+foods.  =Tea= needed checking by hand, because its key differs: 2012-13 carries
+only =Tea bags=, 2016-17 only =Tea bag=, neither has a separate =Tea=.
+
+** =harmonize_price_item= and =harmonize_food= are ONE vocabulary (2026-09-05, GH #782)
+
+A price item flagged =Food: yes= asserts it sits on that wave's
+=harmonize_food= axis -- which is the whole reason =community_prices.j= can
+join =food_acquired.j=.  Nothing enforced it, and a one-sided edit drifts
+silently; renaming the food axis above immediately broke four waves' price
+items.
+
+*Derivation was considered and rejected*, with a reason rather than a shrug:
+the price item =Code= (=ln=, 644 values in 2016-17) is a *different code space*
+from =Code_9b=/=Code_8h=, and the survey ships no crosswalk.  The only link IS
+the Preferred Label string, so "deriving" would mean adding a foreign-key
+column -- exactly as much config as the column it replaces, and one more thing
+to drift.  Derivation is also wrong-shaped: *400 of 2016-17's 643 price items
+are non-foods* (charcoal, refuse disposal, public-toilet fees) that
+=harmonize_food= must never gain.  The =Food= column already carries the
+author's signed statement (=yes= on the axis / =own= a food the axis does not
+name / =no= non-food), so the invariant to enforce is a *subset over
+=Food == 'yes'=*, and the guard asserts exactly that.
+
+That check immediately found a *pre-existing* violation unrelated to the
+rename: 2012-13 price item 103 ='cigarette (555)'= was flagged =Food: yes= with
+Preferred Label =Cigarrette= -- a double-r spelling that appears nowhere on
+2012-13's food axis, nor anywhere else in the corpus (the other three price
+waves spell it =Cigarette=).  2012-13's =harmonize_food= has no separate
+cigarette label at all: source code 163 ='cigarrette, cigar'= resolves to
+=Tobacco=.  The price item is now =Tobacco=, which is what that wave's own axis
+calls the commodity.  Re-flagging it =Food: own= was rejected as a *false
+statement*: =own= means the axis does not name the food, and this axis does.
+
+
 ** The =SU= -> =Rural= fold: the decision, and what the survey does and does not say (2026-08-21; evidence verified and corrected 2026-08-22)
 
 Not a trap.  A *decision*, recorded here because the reasoning that was first
@@ -1386,6 +2998,13 @@ ambiguous relative to the survey's definition of urban -- it is, by that
 definition, not urban.  That is an argument about the fold's *direction*, and
 a far better one than the withdrawn =Classification= column.  It is not a
 statement that GSS intended =SU= to be reported as rural.
+
+/Corrected 2026-09-02 (GH #705)./  "The survey's own urban threshold" above
+means *GLSS1/GLSS2's* -- and GLSS3's and GLSS6's -- not the programme's:
+GLSS4 set its urban threshold at *1,500* and folded the same 1,501--5,000
+band onto *urban*.  See /The urban cutoff MOVES across rounds/ under
+/Sampling Design/ for the round-by-round table and what it does to the
+delivered =Rural= column.
 
 Three further pieces of evidence point the same way.  None is a GLSS1/GLSS2
 sentence saying "semi-urban is rural"; take them for exactly what they are.
@@ -1589,6 +3208,14 @@ Worth stating once, because "is this table live?" has no single answer:
 | 1 | =Country._apply_categorical_mappings= (=country.py:2236=) | =Country.categorical_mapping= (=country.py:1637=) = global u country | *NO -- never opens a wave dir* |
 | 2 | =mappings:= / =mapping:= in a wave =data_info.yml= (=country.py:793=, =:809=) | =Wave.categorical_mapping= (=country.py:862=) = country dict =.update(wave)= | yes; *wave wins, unconditionally* |
 | 3 | =code_label_map(name, _dirs)= in a wave =mapping.py= | its own filesystem search, *wave dir first* | yes |
+
+/Corrected 2026-09-02./  Line numbers drift; as of =bed7c99a= they are
+=_apply_categorical_mappings= at =country.py:2403=,
+=Country.categorical_mapping= at =:1781=, =Wave.categorical_mapping= at
+=:1006=, the =mappings:= consumer at =:926-960=, and =_row_union_categorical=
+at =:305-316=.  Path 2's =cat_table.set_index(k)[v].to_dict()= is *last-wins*
+on a duplicate key, while the global/country union is *first-wins*
+(=keep='first'=) -- see /Trap 7/.
 
 So of this country's three =rural= tables, *only one is dead*:
 
@@ -1907,3 +3534,307 @@ survey year.  GLSS1/GLSS2 (=COMM.DAT= etc.) carry *none* of it; GLSS5/6/7 are
 format 113+ and carry none either.
 
 Full audit: =slurm_logs/sentinel_audit/FINDINGS_1.7498e100.org=.
+
+* Community price survey -- =community_prices= (GH #562 phase 3a, 2026-09-02)
+
+Every GLSS round fielded a dedicated market/community PRICE questionnaire,
+separate from the household instrument, and six of the seven waves ship its
+data.  =community_prices= is that survey at its own grain, REPORTED fields
+only (see =_/glss_prices.py= and the =data_scheme.yml= block for the column
+contract).  Phase 3b -- the inverse price->quantity imputation -- is NOT wired
+here; nothing in =transformations.py= was touched.
+
+** Sources, geography and the join to =sample().v=
+
+| Wave    | Price file                          | Form is keyed on                                   | Price clusters | ... in sample().v | sample().v priced |
+|---------+-------------------------------------+----------------------------------------------------+----------------+-------------------+-------------------|
+| 1987-88 | =Data/PRICE.DAT= (+ =PRICE.DCT=)      | LOCALITY / CLUSTER (1987 form, rendered)           |            165 | 163/165           | 163/176           |
+| 1988-89 | =Data/PRICE.DAT=                      | same form (the 1988 PDF is the same blob as 1987's) |            112 | 106/112           | 106/170           |
+| 1991-92 | =Data/Prices/G3PRICE.DTA=             | REGION / DISTRICT / NAME OF LOCALITY / EA          |            256 | 256/256           | 256/365           |
+| 1998-99 | =Data/Prices/G4PRICE.DTA=             | same instrument as GLSS3 (text layer)              |            253 | 251/253           | 251/300           |
+| 2005-06 | NONE distributed                    | REGION / E.A. NUMBER / MARKET NUMBER (=G5QPrice.pdf=) |            -- | --                | --                |
+| 2012-13 | =Data/PRICES/price_sec{0,1,2}.dta=    | REGION / DISTRICT / LOCALITY / EA / MARKET NUMBER  |          1,015 | 1015/1015         | 1015/1200         |
+| 2016-17 | =Data/g7price.dta=                    | REGION / DISTRICT / CLUSTER / MARKET NAME (xlsx + cover docx) |    398 | 398/398           | 398/1000          |
+
+=v= is therefore the survey's own cluster / EA number in every wave -- the
+same =CLUST= / =clust= keyspace =sample= uses (1xxx ... 7xxxx) -- and is
+carried NATIVELY in the index.  No cluster id is fabricated anywhere.
+Corroboration beyond the key match: =loc5= in =G3PRICE.DTA= agrees 100% with
+=POV_GH.DTA='s =loc5= on all 256 clusters; the BID's "165 ... price
+questionnaires" for year one (Table 1a, printed p.13; p.17 "coded for 164 of
+176 first year clusters") is the 165 distinct =CLUST= in the file.  Price
+clusters with no household in the wave's sample: 1987-88 clusters 1020 and
+1167 (85 rows); 1988-89 clusters 2007, 2036, 2177, 2198, 2209 and 2692 (271
+rows -- BID p.17 lists price forms "coded for 107 of the 170 second year
+clusters", and these six are price forms for clusters the household file
+does not carry); 1998-99 two clusters (of 253) are not in =SEC0A.DTA=.
+
+** The grain is (t, v, j, u, obs) -- three vendors per item, in every wave
+
+Every form records up to THREE observations per item: the 1987 form's "1ST /
+2ND / 3RD OBSERVATION" (KG + PRICE), BID §2.3 "Prices from up to three
+vendors are collected", GLSS3/4/5/6 "1ST / 2ND / 3RD OBSERVATION" (KG or
+KG/LITRE + PRICE; DESCRIPTION + 1ST/2ND/3RD PRICE for non-foods), GLSS7's
+a/b/c PRICE / QTY / UOM.  Malawi's and Nigeria's =community_prices= are
+=(t, v, j, u)=; Nigeria =.first()=-s same-cell duplicates.  Here the three
+observations are kept as rows under =obs= (core does not aggregate), so
+GhanaLSS departs from the precedent by one index level.  =obs= 1-3 is the
+form's slot; larger values occur only where the source holds more than one
+record for a (cluster, item, unit) and are enumerated deterministically
+(interview month, then description/brand, then slot).  A fourth cause is the
+=j= axis itself: where several price items fold onto one label (Nescafe tin
++ sachet -> =Coffee=; the five chocolate drinks -> =Chocolate Drink=, 5 x 9
+rows = =obs= 45 in 1998-99) the rows stack under one (v, j, u) and
+=Description= tells the items apart.  Share of rows at =obs= <= 3: 1987-88
+98%, 1988-89 97%, 1991-92 90%, 1998-99 88%, 2012-13 87%, 2016-17 81%.
+
+An observation slot with no reported price is not a row (an empty slot is
+not a reported price).  Slots dropped, per wave: 1987-88 1,262 of 17,844
+(7.1%); 1988-89 2,265 of 14,907 (15.2%); 1991-92 and 1998-99 none (the files
+are already one row per observation); 2012-13 191,223 of 479,466 (39.9% --
+second and third vendors are often blank, and so are non-food items a
+market does not sell); 2016-17 31,458 of 252,366 (12.5%).
+
+- 1988-89: two clusters were priced twice -- 2305 in June AND September
+  1989 (a genuine repeat visit), 2310 twice in one month (25 of its 48 item
+  pairs byte-identical).  Cluster 2726's rows carry =YRINT=88, MOINT=3=: a
+  first-year price carried into the second-year set (BID p.17: "price data
+  are available from the first year for 43 additional clusters" -- only this
+  one materialises in the shipped file).
+- 1991-92 / 1998-99: the files are already long (one row per observation)
+  and carry no slot; typically three rows per (clust, item), but 546 / 744
+  (clust, item) pairs carry six and 8 / 108 carry nine.
+- 2016-17: several brand lines per item and the two mis-keyed clusters below.
+
+** What is and is not in the file, per wave
+
+- *1987-88 / 1988-89.*  =PRICE.DAT= is comma-delimited with a header (Trap
+  above; the reader handles it).  Per (CLUST, ITEMNO): =QUANn=/=PRICEn= for
+  n=1..3, =MOINT=/=YRINT= (the price interview, "may not correspond to the
+  date of the household interview", BID §6.2), and =PRICEnU= (=PRICEn/QUANn),
+  =DEFL= (Appendix E CPI) and =PRICE= (mean of PRICEnU / DEFL) -- CALCULATED
+  fields, verified (99.1% / 99.4% of rows reproduce them) and NOT stored.
+  1987-88 has =TYPRES= (BID's 7-way location type); 1988-89 does not.  BID
+  §2.3: "Weighing scales were used to determine the exact weight of food
+  items", and the file confirms the form's bases item by item: eggs =QUAN=1=
+  (priced each), the evaporated-milk tin =0.17=, the four drugs 3-4 tablets,
+  akpeteshie =0.25= (the "1 quarter" bottle), every DESCRIPTION item =1=.
+  1988-89 carries one extra code 48 (QUAN median 0.5, PRICE1 120) on no form
+  we hold: kept as "Unidentified price item 48".
+- *1991-92 / 1998-99.*  =G3PRICE.DTA= / =G4PRICE.DTA= ship ONLY the per-unit
+  value (=p= / =price= = PRICE/KG -- values like 500/7 = 71.4286 give it
+  away); the weighed KG is not distributed and the files carry no labels
+  (GLSS3/4 Stata 5 files, as noted above).  =NumberOfUnits= is therefore the
+  form's stated basis per item (=Basis= in =harmonize_price_item=).  =time=
+  in G3PRICE is the survey month (251 of 256 clusters have exactly one
+  value), not a visit counter.
+- *2012-13.*  Foods: =s1stkg=/=s1stpx= etc. -- the KG/LITRE figure and the
+  price per observation.  Whether a figure is kg or litres is NOT in the file;
+  the =Unit= column of the 2012-13 table records a per-item judgement
+  (liquids in litres).  Non-foods: the reader's free-text basis =s2desc=
+  (3,437 distinct strings: "20PCS", "20 PIECES", "20 PICES" ...) -> =u= is
+  =Other Unit= and the text goes to =Description=.  The =.dta= value labels
+  (=fcode= 1-102, =nfcode= 103-157) are the coding of the shipped file; the
+  PRINTED GLSS6 form lists 89 + 47 items under a different numbering (its 006
+  is "Bread - sugar bread" where the file's 6 is; its 016 "Chicken" is the
+  file's 16; but 017 "Game birds" is nowhere in the file and the file's 17 is
+  crustaceans).  Decode from the labels, never from the printed form.
+  Prices are stamped per EA but were collected at 41 market numbers (323
+  region/district/market keys for 1,015 EAs; up to 20 EAs share one key, and
+  EAs sharing a key carry identical prices -- =s1stpx= has one distinct value
+  within 18,854 of the 32,000 non-null (key, item) cells).  The cover's
+  =remarks= say why: "KOKOLIGU HAS NO MARKET AND THEY USE THAT OF NANDOM".
+  Kept native; a consumer who wants market-grain prices dedups on
+  (region, district, market).
+- *2016-17.*  =ln= is the item code (644 values), =bname= the item,
+  =itname= the brand line (1,207 values), =price{a,b,c}= / =quantity{a,b,c}= /
+  =unit{a,b,c}= / =unito{a,b,c}=.  The unit codes carry the file's OWN value
+  labels: the =unit_9b= list, except code 72 = "Service" (=unit_9b= says
+  Visit) and an extra 75 = "Visit".  Decode from the price file's labels.
+  *=quantity{a,b,c}= is NOT always a count of =unit{a,b,c}= (2026-09-08).*
+  The form is =PRICE / QTY / UOM= per observation with QTY entered by the
+  enumerator, and for CONTAINER units the enumerator often entered the
+  container's *content weight in grams* instead of a count.  Decisive case:
+  =Millet=, =u='Bowl'=, clusters 70735 / 70789 / 70791 -- =Price = 4.00=,
+  =NumberOfUnits = 4000=, against a =food_acquired= unit value for
+  Millet/Bowl in Northern of *exactly 4.00 GHS*.  =Price= is the price of one
+  bowl; the 4000 is the bowl's weight.  So the column contract's
+  "=NumberOfUnits= = the quantity, in =u=, that =Price= refers to" is *false
+  for these rows*, and =Price / NumberOfUnits= returns ~1/1000 of the true
+  per-unit price (a log gap of +8.3, a ratio of 4,050).  Affects *5,351 of
+  220,908 rows (2.4%)*; top units Yard 1,729, Piece 801, Inches 304, Single
+  294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
+  =community_prices= -- it stores the reported fields, which is its contract
+  -- so the handling belongs in the consumer.  The constant-free screen used
+  by =slurm_logs/price_sources/GhanaLSS/analysis.py= is: keep an observation
+  when =u= is a metric mass/volume unit (QTY is then unambiguously a quantity
+  of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
+  not lossless -- a genuine crate of 24 eggs goes with it -- and recovering
+  those rows by reading =Price= as the per-unit price needs a row-by-row
+  judgement (QTY = 2 on a Bowl is ambiguous).
+  *A weaker form of the same disease affects BOTH instruments in this wave*:
+  metric-prefix miscoding.  Beer at =u='Liter'= priced 0.0080 GHS/L in the
+  price file against 15.15 GHS/L in =food_acquired= (Eastern); Chicken
+  (thigh) at =u='Gram'= carrying a =food_acquired= unit value of 5.00 GHS
+  *per gram* (Ashanti); Oil (palm) at =u='Milliliter'= priced 5.33 GHS per ml
+  in the price file against 0.0125 in =food_acquired= (cluster 70014).  37%
+  of matched 2016-17 unit-value-vs-community-price cells have a log gap above
+  =log 1.5= as a result.  Not fixable in config; it is enumerator error in
+  the source.
+  ALL 398 price =clust= values are in =g7sec0.dta='s 1,000 EAs, but the price
+  file's =region=/=district= contradict the household cover for 11
+  (clust, region) pairs -- clusters 70002 and 70909 hold a second EA's rows
+  under region 5 (cover: 1 and 10), and 70195/70210/70211/70247/70327/
+  70747/70906/70908 are stamped with a wrong region for their single set of
+  rows.  =v= is =clust= regardless (the cover is authoritative for region);
+  the duplicated content shows up as =obs= 4-6.  Phase 3b may want to drop
+  70002 and 70909.
+
+** GLSS3's price form is the GLSS4 form; GLSS3's own code list is reconstructed
+
+All three GLSS3 price-form files (=pdf/G3QPrice.pdf=,
+=GHA_1991_GLSS_Price_Questionnaire_EN.pdf.pdf=, =Glss3 qsts and manuals
+docs/G3QPrice.doc=) carry the 123-item list that
+=GHA_1998_GLSS_Price_Questionnaire_EN.pdf= carries (the text diff is the
+title only), while =G3PRICE.DTA= has codes 1-117.  Aligning per-item median
+prices and observation counts between the two waves shows the offset
+growing from 0 to 6 at identifiable points -- exactly 123 - 117 -- so
+GLSS3's list is the GLSS4 list WITHOUT six items, renumbered:
+
+| G3 codes | G4 codes | offset | item absent from GLSS3          | anchors (G3 median -> G4 median) |
+|----------+----------+--------+---------------------------------+----------------------------------|
+| 1-5      | 1-5      |      0 |                                 | maize 94 -> 480, rice local 250 -> 1333 |
+| 6-33     | 7-34     |      1 | 6 Sorghum (G4 n=68)             | wheat bread 375 -> 2000, MARGARINE 1200 -> 6222 per kg, okro 267 -> 1429 |
+| 34-43    | 36-45    |      2 | 35 Pepper (sweet green) (n=369) | tomato paste 1143 -> 7143, beef 889 -> 5333, bushmeat 1294 -> 13333 |
+| 44-48    | 47-51    |      3 | 46 Live chicken (poultry)       | eggs 50 -> 250, evaporated-milk tin 180 -> 1100, sugar 311 -> 1600, salt 100 -> 506, NESCAFE TIN 13000 -> 60000 |
+| 49       | 53       |      4 | 52 Nescafe (sachet)             | Bournvita tin 1889 -> 12500 |
+| 50       | 55       |      5 | 54 Bournvita (sachet)           | Milo tin 2000 -> 13750 |
+| 51-117   | 57-123   |      6 | 56 Milo (sachet)                | tea 6000 -> 50000, aspirin 50 -> 100, wax print (6 yd) 10000 -> 55000, handkerchiefs (dozen) 1440 -> 9600 |
+
+The tail (G3 51-117 = G4 57-123, 67 items, ratios 3-8 throughout) and the
+anchors are unambiguous.  The weakest links, flagged in the 1991-92 table's
+=Note= column: code 5 is read as "Rice (Imported)" rather than "Sorghum" on
+price level (289 vs rice local 250; sorghum would sit near guinea corn 163)
+despite its low count (n=50), and codes 49-51 are assigned among the
+tin/chocolate-drink set by price level.  A GSS-held GLSS3 price form would
+settle both; until then this is an INFERENCE and is labelled as one.
+
+** =j=, =u= and the shared axes
+
+No wave's price code scheme is its consumption (=Code_9b=) scheme -- 0 of 644
+GLSS7 codes and 5 of 102 GLSS6 codes are label-identical -- so =j= is decoded
+by NAME through a per-wave =harmonize_price_item= table (=Code | Label |
+Preferred Label | Food | Unit | Basis | Note=) appended to each wave's
+=categorical_mapping.org=, onto that wave's =harmonize_food= Preferred Label
+where the axis names the item (=Food=yes=), the later waves' spelling where a
+food is not on the wave's axis (=Food=own=: 1987-88 has no Bread / Pepper /
+Juice / Guinea corn / specific-oil labels; 1998-99 no Cocoyam leaves / Tomato
+paste / Snail), and an own label for non-foods -- made unique per code (=Orange [ln 771]= is
+a toilet roll, =Apple [ln 812]= a wrist watch, =Sony [ln 640]= a corded
+phone, =Sony [ln 669]= a radio) wherever a non-food name is also a food
+label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
+in 2016-17, none elsewhere.  Where the axis folds two
+price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
+Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
+=Description= tells them apart.  The overlap with =food_acquired().j= was
+checked against the =harmonize_food= tables, not a built =food_acquired=
+(the corpus's largest table; not built on this slice).
+
+=u= is the =_/unit_labels.org= Preferred Label.  Labels the price surveys
+need that the axis lacks: =Tablet=, =Capsule=, =Bottle= (the 1980s/1990s
+drug bases) -- reported, not added (=unit_labels.org= is not in this task's
+ownership).  While there: =unit_labels.org= maps "Margarin tin" to
+=Margarin tin= and "margarin tin" to =Margarine Tin= -- two Preferred Labels
+for one spelling pair.
+
+** What =food_acquired.Price= on produced rows MEASURES (2026-09-08)
+
+Section 8H's price column -- =s8hq14= (1991-92, 2005-06), =s8hq10= (1998-99,
+2012-13), =s8hq{i}p= (2016-17), all of which land in
+=food_acquired.Price= on =s='produced'= rows -- is worded identically across
+GLSS3--GLSS7:
+
+#+begin_quote
+For how much could you sell one unit of......now?
+#+end_quote
+(GLSS3, =1991-92/Documentation/pdf/G3QPartB.pdf=, Section 8H col. 14; col. 13
+is =ENTER UNIT THAT THE RESPONDENT CHOOSES / SEE LIST OF UNIT CODES=.)
+
+#+begin_quote
+For how much would you sell one unit of ..............now?
+USE MOST OCCURING UNIT OF MEASURE
+#+end_quote
+(GLSS6, =2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=;
+GLSS7, =2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx=, Section 8H Q9.)
+
+It is therefore a *seller-side* valuation by wording.  *Measured, it is not
+one.*  In 2016-17 -- the only wave where GhanaLSS also has a purchase unit
+value, because every earlier wave elicits purchases by VALUE -- the median
+log gap between the household's purchase unit value and its own-consumption
+valuation, over *322 matched (item, unit, geography) cells*, is *exactly
+0.0000*, and *31.7% of cells agree to the last digit*.  Households answer
+with the local retail price they know.  *Anyone valuing own-consumption in
+GhanaLSS at =food_acquired.Price= and calling it a producer or farmgate price
+is mis-labelling a purchase price.*
+
+Two further properties of that column, both measured on 2012-13
+=s='produced'=, =u='Kg'=: it is *very coarse* -- essentially three values,
+0.5, 1.0 and 2.0 GHS/kg, respondents rounding to coin denominations -- and it
+is *not* on the same lot size as =community_prices=, which weighs a retail
+portion: 0.11 kg for pepper and 2.85 kg for yam, so the surveyed per-kg price
+of a perishable is a small-portion price and a staple's is a bulk price.  The
+market/own-valuation ratio in that wave consequently runs from 0.59 (yam) to
+12.0 (pepper) *by lot size and perishability, not by price level*.
+
+The unit is also the one *the respondent chooses*, which is why the =u= axes
+of the two instruments barely meet before 2016-17: shared units cover 7.0% of
+1991-92's produced rows, 3.5% of 1998-99's and 11.2% of 2012-13's, against
+91.5% in 2016-17.  The price survey weighs (BID §2.3 /"Weighing scales were
+used to determine the exact weight of food items"/; the GLSS3 price form's
+column is =KG=); Section 8H does not.  *That is a property of the two
+instruments, not a mapping defect, and no crosswalk table fixes it.*
+
+Full analysis, with the cell / gap / model CSVs:
+=slurm_logs/price_sources/GhanaLSS/REPORT.org=.
+
+** The price-item =j= axis is CLEAN -- the "166 of 662" is not a defect
+
+Recorded because an external inventory
+(=slurm_logs/price_sources/inventory.json=, and §4 of
+=.coder/ledger/price-sources-comparison.md=) lists GhanaLSS's "166/662" among
+cross-country *label-axis defects*.  Measured per wave against the *BUILT*
+=food_acquired= (Trap 8's lesson -- the config was right there too, and the
+built table was not), restricting the price list by its own =Food= flag:
+*every =Food: yes= price label is in =food_acquired.j=, in every wave* --
+20/20, 20/20, 60/60, 59/59, 82/82, 132/132.  The pooled 166/662 is the union
+of six waves' price lists measured against the union of the food axis, and
+662 includes *400 non-foods in 2016-17 alone* (charcoal, refuse disposal,
+public-toilet fees) which =harmonize_food= must never gain, plus 17
+=Food: own= labels which by definition are not on the wave's axis.  What
+actually limits the item axis is what households PRODUCE: priced-and-produced
+=j= per wave is 19, 19, 28, 30, 39, 44.
+
+** 2005-06: asked, not distributed
+
+GLSS5 fielded the price questionnaire (=Documentation/G5QPrice.pdf=, 9 pp
+with a text layer: EA + MARKET NUMBER, three observations, KG/LITRE + PRICE,
+89 food codes -- the same instrument GLSS6 used), and the GSS NADA DDI
+shipped with the wave names it as one of the five instruments, but the DDI's
+data-file inventory (sec0-sec12c, com-sec0-com-sec52) has no price file,
+nor does the tree (49 parta/partb files, the 14 files in =community.zip=,
+every file in the ten =aggregates/*.zip=).  The WB Microdata Library holds
+no raw GLSS5 entry at all (only the SHIP harmonized extract, id 1064); the
+wave came from GSS NADA catalog/5, unreachable from this node.  Adjudicated
+=asked-not-distributed= (C1;C2;C4) in =.coder/coverage/absent_verdicts.csv=
+-- an acquisition item, not an absence.
+
+** Trap 6, applied
+
+The new scripts resolve every config path through =countries_root()=
+(=_/glss_prices.py=: =wave_dir()=, =price_item_table()=, =unit_label_map()=)
+and assert during verification that it points at the worktree; nothing here
+goes through the wave =mapping.py= modules.  Documentation blobs were fetched
+lock-free through =local_tools._ensure_dvc_pulled= + the sidecar md5
+(=slurm_logs/ghana_audit/community_prices/fetch_docs.py=) because
+=data_access.get_data_file= walks the DVC index through =DVCFS.exists()= and
+hung for more than ten minutes on this Lustre slice.

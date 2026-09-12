@@ -54,6 +54,12 @@ $(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
 ../%/_/people_last7days.parquet: ../%/_/people_last7days.py
 	(cd $(@D) && python people_last7days.py)
 
+# Wave-level nonfood_expenditures (EHCVM section 9, parts B-F).  Same gap as
+# the rules above: the generic %.parquet rule never fires for it (its
+# food_items.org/malawi.py prereqs are absent), so give it its own rule.
+../%/_/nonfood_expenditures.parquet: ../%/_/nonfood_expenditures.py
+	(cd $(@D) && python nonfood_expenditures.py)
+
 %.parquet: %.py food_items.org malawi.py
 	(cd $(@D) && python ./$(<F))
 

@@ -1,0 +1,561 @@
+#+title: Ethiopia -- five sources of food prices, compared
+#+author: price-sources agent (Claude Fable 5.1), cores 6-8
+#+date: 2026-09-08
+
+Protocol: =slurm_logs/price_sources/PROTOCOL.org=.  Ledger:
+=.coder/ledger/price-sources-comparison.md= (§2 machinery, §4 invariants).
+Shared code: =slurm_logs/price_sources/common.py= (self-test re-run, output
+matches its documented synthetic expectations exactly).  Worktree
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-ethiopia= @ =1dced810=.
+
+* 1. Sources present, and the idiosyncrasies that shape them
+
+| # | source                     | Ethiopia | rows used | note                                          |
+|---+----------------------------+----------+-----------+-----------------------------------------------|
+| 1 | =unit_value=               | PRESENT  |   261,697 | =food_prices(units='unitvalue')=, =s='purchased'= |
+| 2 | =reported_purchase_price=  | ABSENT   |         0 | not asked by the instrument (below)           |
+| 3 | =own_consumption_valuation=| ABSENT   |         0 | not asked by the instrument (below)           |
+| 4 | =crop_sale_price=          | PRESENT  |     3,644 | =Value_sold/Quantity_sold=, both > 0          |
+| 5 | =community_price=          | PRESENT  |    44,603 | =Price/Quantity= from ESS §10                 |
+
+=food_prices(units='unitprice')= returns a =(0, 1)= frame.  Row counts are
+after dropping rows whose =u= names no quantity (§6, defect D4).
+
+** Sources 2 and 3 are an INSTRUMENT absence, not an API gap
+
+This is the question the brief asked me to settle, and the questionnaire
+settles it.  ESS3 Household Questionnaire, =SECTION 5A: FOOD LAST 7 DAYS=
+(=ESS3 HH Questionnaire_English.pdf=, the §5A grid; the column stems are
+=hh_s5aq01..06=, wired in =Ethiopia/2015-16/_/food_acquired.py=), asks
+exactly six questions per item, quoted verbatim:
+
+: 1. Over the past one week (7 days), did you or others in your household consume any [ITEM]?
+: 2. How much in total did your household consume in the past week?
+: 3. How much came from purchases?  IF NONE RECORD 0 AND SKIP TO Q5.
+: 4. How much did you spend?
+: 5. How much came from own production?  IF NOT CONSUMED FROM OWN PRODUCTION RECORD 0.
+: 6. How much came from gifts and other sources?  IF NONE RECORD 0.
+
+Q4 is the *only* monetary field and it is attached to Q3, purchases.  Q5
+(own production) and Q6 (gifts) ask a **quantity and unit only**.  So:
+
+- *Source 3 does not exist in Ethiopia at any level.*  The ESS never asks
+  what the own-consumed harvest was worth -- neither "what would you have
+  received" nor "what would it have cost to buy".  Nor does the
+  agricultural questionnaire supply one: the post-harvest §11 Q10a and §12
+  Q10a both ask *"How much of the harvested [CROP] ... was, or will be,
+  used for household consumption?"* with a QTY / UNIT CODE box and no
+  value column, and a text search of the whole post-harvest instrument for
+  "total value ... consum" / "worth" / "what would" returns nothing.
+  **This is a genuine data gap only in the sense that the survey chose not
+  to ask it; there is nothing for the library to carry.**  The question
+  numbers are §5A Q5 (household) and §11 Q10a / §12 Q10a (agriculture).
+- *Source 2 does not exist either.*  Q4 is total spend, not a unit price,
+  so any =Price= for Ethiopia could only ever be =Expenditure/Quantity=
+  back-calculated -- exactly what =country.py:5793= would produce.  That
+  =food_acquired= carries **no** =Price= column is therefore correct
+  config, not an omission.  The protocol's independence test (§2 below) is
+  vacuous here and I did not run it as a statistic.
+
+** Source 5: what the community price is a price OF
+
+ESS3 Community Questionnaire, =SECTION 10: MARKET PRICES=.  The price grid
+has columns =ITEM CODE | ITEM | UNIT | UNIT CODE | QUANTITY | PRICE=, with
+a header block "1. Location of main source: MARKETPLACE / SHOPS/STALLS /
+OTHER, SPECIFY", GPS of the market, and "4. Date of price data
+collection".  So the enumerator records, per (EA, item, unit), *the price
+of a stated quantity* -- and Ethiopia's per-unit price is
+=Price / Quantity=.  There is **no =NumberOfUnits= column**; =Quantity= is
+that basis, and =Ethiopia/_/community_prices.py= says so explicitly ("the
+per-unit price is =Price / Quantity=, a transformation, NEVER baked in").
+It is a retail market price -- the downstream side of every pair.
+
+** Source 4: what =Value_sold / Quantity_sold= is a price OF
+
+ESS3 Post-Harvest =SECTION 11: CROP DISPOSITION=, Q3 *"How much of the
+harvested [CROP] was sold in total?"* (=ph_s11q03_a= + unit =_b=) and Q4
+*"What was the total value of all [CROP] sales?"* (=ph_s11q04=).  A
+**realised transaction** value over a realised quantity, not a
+hypothetical.
+
+Two things make it a valid per-=u= price, and both come from reading
+=ethiopia.py:crop_production_for_wave= rather than assuming:
+
+- The script attaches =Quantity_sold= *only on rows whose harvest =u=
+  equals the single sale unit reported for that (holder, crop)* -- its
+  comment is "Where they differ it stays NaN (no cross-unit fib)".  So the
+  ratio is genuinely a price per native =u= and needs no conversion.
+- The SALES GRAIN CAVEAT: §11 is (household, holder, crop) grain, not
+  (plot, crop), so a holder growing one crop on several plots has the sale
+  attached to **no** plot rather than split across them.
+
+*It is not unambiguously a farmgate price.*  §11 Q8 asks the "main mode of
+transportation associated with all [CROP] sales" (FOOT / BAJAJ / OWN
+BICYCLE-CART / CAR-MINIBUS-BUS-TRUCK / BUYER PICK-UP / PACK ANIMALS) and
+Q9 the "total cost of transportation".  Only =BUYER PICK-UP= is
+unambiguously farmgate; the other five imply the household moved the crop
+toward a market, so the reported sale value is *partly* net of the
+marketing margin the exercise is trying to measure.  Any gap below is
+therefore a **lower bound** on the farm-to-retail margin.
+
+** Idiosyncrasies NAMED from =Ethiopia/_/CONTENTS.org= (1,302 lines, not 602)
+
+The brief said 602 lines; the file is 1,302.  I read all of it.  Six
+idiosyncrasies bear directly on this analysis:
+
+1. *ESS1 (2011-12) is a different universe.*  "The ERSS sample is designed
+   to be representative of rural and small town areas of Ethiopia" (DDI
+   2053, PDF p. 3).  Its =Urban= means *small town only*; from ESS2 it
+   means any urban area including Addis Ababa.  Urban share runs 12.7% ->
+   36.8% -> 34.0% -> 54.0% -> 53.9% while the *rural count is flat*
+   (3,466 -> 3,115): the sample is being extended into urban strata, not
+   shifted.  **I never pool waves** -- every cell, gap and model row is
+   keyed on =t= -- and §3 reads 2011-12 separately.
+2. *Nine zones of Afar and Somali are outside the frame in every Panel I
+   wave*; 2021-22 additionally puts *Tigray outside the represented
+   population* (not merely outside fieldwork -- the ESPS-5 weights
+   "represent the 2021/22 Ethiopia population (excluding Tigray)").
+3. *Panel I (W1-W3) and Panel II (W4-W5) are different panels.*  ESS4 "is
+   not a follow-up of the previous ESS waves".
+4. *Every rural EA is 10/12 agricultural BY DESIGN* (10 drawn from the
+   AgSS list + 2 non-agricultural).  Farm households are structurally
+   oversampled inside every rural EA, in every wave.  Source 4 is drawn
+   from that oversample; source 1 is not.  Unweighted rural means are not
+   rural-population means -- and this is a *composition* difference
+   between the two sides of the headline pair, not a price difference.
+5. *The =(t, v)= cluster key is not unique*, and it bites here.  Building
+   =cluster_features= raises =GrainCollapseWarning= in four of five waves;
+   measured this run: 373 / 3,969 rows destroyed (2011-12, 34 conflicting
+   tuples), 454 / 5,262 (2013-14, 43), 732 / 4,954 (2015-16, 72), **1,240
+   / 4,959 (2021-22, 111 -- 25% of the wave)**.  CONTENTS.org documents
+   the GPS side of this (W2 EA =010103010100106= spans 0.19 deg lat /
+   0.60 deg lon; W5 EA =020103010100203= spans 1.79 deg lon, ~200 km) and
+   calls it UNFIXED.  My run adds that 2011-12 also conflicts (34 tuples)
+   even though CONTENTS.org records *0* EAs with a second distinct
+   coordinate there -- so in 2011-12 the disagreement is in
+   =Region=/=District=/=Rural=, not in GPS.  Consequence for this report:
+   the =v= rung's geography labels are, in those clusters, a composite
+   =first()= row.
+6. *ESS4/ESPS-5 put zero urban households through the agriculture
+   questionnaire* while urban is 54% of the sample.  So in W4/W5 source 4
+   is rural-only by construction while source 1 is half urban.
+
+** The two pre-checks the protocol requires BEFORE any matching
+
+*(i) Unit vocabulary across tables -- Ethiopia PASSES.*  Ethiopia is not
+Malawi: the three tables share one =u= vocabulary because
+=ethiopia._clean_unit_label= resolves harvest units through the *same* =u=
+table the food units use, deliberately ("rather than fragmenting the unit
+axis with a parallel parenthesized scheme").
+
+| table            | distinct =u= | =u= also in =food_acquired= | share of ROWS whose =u= is in =food_acquired= |
+|------------------+--------------+-----------------------------+-----------------------------------------------|
+| =food_acquired=  |           74 | --                          | --                                            |
+| =community_prices= |         60 | 55                          | *0.9717*                                      |
+| =crop_production=  |         80 | 58                          | *0.8822*                                      |
+
+=community_prices \ food_acquired= is only ={Packets, Pieces, Set, Spoon,
+Trip}=.  No mapping fix was needed; two smaller unit defects are in §6.
+
+*(ii) =community_prices.v= inside =cluster_features.v= -- Ethiopia PASSES,
+and the bottom rung is real.*
+
+| wave    | =cp= clusters | in =cluster_features= | in =sample()= | share of =cp= ROWS |
+|---------+---------------+-----------------------+---------------+--------------------|
+| 2011-12 |           318 |                   318 |           318 |             1.0000 |
+| 2013-14 |           361 |                   361 |           361 |             1.0000 |
+| 2015-16 |           331 |                   330 |           330 |             0.9961 |
+| 2018-19 |           525 |                   525 |           525 |             1.0000 |
+| 2021-22 |           432 |                   432 |           432 |             1.0000 |
+
+The =j= axis likewise joins fully -- 47/47 overall, and per wave 23/23,
+23/23, 46/46, 46/46, 47/47.  The brief's "47/47" is confirmed.
+
+*But the household-side sources' =v= is broken, and that is defect D1/D2
+in §6.*  Raw match of =food_acquired.v= against =cluster_features.v= is
+9.1% / 9.4% / 9.9% / 41.3% / 46.3% by wave.  =analysis.py= repairs it by
+discarding the framework's =v= and re-joining =sample()[['v']]= on
+=(i, t)=, which recovers **1.0000** of =unit_value= rows in every wave and
+0.9936 of =crop_sale_price= rows (2018-19 = 0.9772, inside the 4.2% W4
+orphan rate CONTENTS.org already records for the plot/crop family).
+
+** Crop-to-food label crosswalk (the brief asked for it explicitly)
+
+*The brief's premise is wrong here, and =data_scheme.yml= says so.*  The
+brief states "crop labels are not food labels".  Ethiopia's
+=data_scheme.yml= =crop_production= block states the opposite -- "crop
+labels reuse the food Preferred Labels (harmonize_crop table) so
+=crop_production.j= joins =food_acquired.j=" -- and the data agree.  **The
+crosswalk I use is the identity**, via =_/categorical_mapping.org=
+=harmonize_crop=; no table of my own was needed.
+
+Measured: =crop_production= carries 93 distinct =j=, of which **50 are in
+=food_acquired.j=**, and **89.4% of the usable sold rows** (=Value_sold=>0
+and =Quantity_sold=>0) carry a label that joins.  The 43 that do not are
+genuine non-consumption or non-itemised crops:
+
+: Amboshika, Apple, Black Cumin, Black Pepper, Cardamon, Cauliflower, Chilies,
+: Citron, Comtatie, Coriander, Cotton, Cotton Seed, Enset, Fallow Land, Fennel,
+: Forest Land, Gibto, Ginger, Giramta, Gishita, Grazing Land, Guava, Kazmir,
+: Lemon, Lettuce, Mandarin, Mego, Other Cash Crop, Other Land Use, Peach,
+: Pineapple, Pumpkin, Rape Seed, Red Kidney Beans, Rue, Sacred Basil, Soya Beans,
+: Sugar Cane, Timiz Kimem, Tobacco, Turmeric, Watermelon, White Cumin
+
+Three of those (=Fallow Land=, =Forest Land=, =Grazing Land=) are land
+uses, not crops, and should never carry a sale price; they do not, in
+practice, reach the priced set.
+
+* 2. Independence test for source 2
+
+*Not present -- and not merely unpopulated.*  See §1: the ESS asks no unit
+price, so there is no number whose independence could be tested.  The
+protocol's =abs(log(S2/S1)) > 1e-6= share is undefined on an empty frame.
+Recorded as ABSENT, not as "dropped-as-not-independent".
+
+* 3. Levels: median ratio per wave, and the spread
+
+Native-=u= basis (the primary; see §4 for why the per-kg view is the
+*secondary* one here).  =ratio = exp(median gap)=; "in band" is the
+protocol's =[log 1.3, log 1.5] = [0.262, 0.405]=.
+
+| wave    | pair                                 | cells | median gap |  ratio |    IQR | in band |
+|---------+--------------------------------------+-------+------------+--------+--------+---------|
+| 2011-12 | =unit_value_vs_crop_sale_price=      |    31 |      0.196 |  1.217 |  0.385 | no      |
+| 2013-14 |                                      |    16 |      0.177 |  1.193 |  0.356 | no      |
+| 2015-16 |                                      |     8 |      0.431 |  1.539 |  0.203 | no      |
+| 2018-19 |                                      |    21 |      0.377 |  1.458 |  0.865 | *yes*   |
+| 2021-22 |                                      |    27 |      0.438 |  1.549 |  0.595 | no      |
+|---------+--------------------------------------+-------+------------+--------+--------+---------|
+| 2011-12 | =community_price_vs_crop_sale_price= |    26 |      0.115 |  1.122 |  0.300 | no      |
+| 2013-14 |                                      |    15 |      0.182 |  1.200 |  0.211 | no      |
+| 2015-16 |                                      |     8 |      0.288 |  1.333 |  0.392 | *yes*   |
+| 2018-19 |                                      |    19 |      0.262 |  1.300 |  0.584 | *yes*   |
+| 2021-22 |                                      |    24 |      0.345 |  1.412 |  0.605 | *yes*   |
+|---------+--------------------------------------+-------+------------+--------+--------+---------|
+| 2011-12 | =unit_value_vs_community_price=      |   654 |      0.000 |  1.000 |  0.218 | no      |
+| 2013-14 |                                      |  1023 |      0.000 |  1.000 |  0.257 | no      |
+| 2015-16 |                                      |   787 |      0.000 |  1.000 |  0.248 | no      |
+| 2018-19 |                                      |  3113 |      0.000 |  1.000 |  0.324 | no      |
+| 2021-22 |                                      |  2729 |      0.000 |  1.000 |  0.288 | no      |
+
+Pooled over waves (native / per-kg): =unit_value_vs_crop_sale_price=
+1.344 / 1.548; =community_price_vs_crop_sale_price= 1.234 / 1.292;
+=unit_value_vs_community_price= 1.000 / 1.000.
+
+Reading these in words, one sentence each:
+
+- *The two market-side sources agree exactly.*  A median gap of 0.000 in
+  all five waves is not a rounding of something small: **23.1% of the
+  8,306 matched cells have a gap of exactly zero** (24.2% at cluster
+  grain).  The cause is round-number pricing -- a cluster's median
+  household unit value for Banana lands on exp(2.302585) = 10.0 Birr/kg
+  and the enumerator's surveyed market price is also 10.0.  Excluding the
+  exact ties, the residual median gap is +0.04 to +0.11 by wave (~4-11%),
+  i.e. households pay slightly more than the surveyed market price.  This
+  is a *validation* result: two instruments that share no file and no
+  question (§5A household recall vs §10 enumerator market visit) return
+  the same retail price, which is what licenses treating either as "the
+  market side".
+- *The farmgate-to-market gap is real but modest*, 12-55% depending on
+  wave and which market source is used, and it *grows across waves*
+  (1.22 -> 1.19 -> 1.54 -> 1.46 -> 1.55 for source 1 vs 4).
+- *ESS1 sits at the bottom of that range in both pairs* (1.22 and 1.12),
+  the lowest of the five waves.  That is the expected sign for a universe
+  restricted to rural areas and small towns: the "market" a 2011-12
+  household buys in is a small-town market close to the farm, so less
+  marketing margin has been added.  I state it as consistent, not proven
+  -- ESS1 is one wave and its cell counts are small.
+- *The spread is wide relative to the level.*  IQRs of 0.20-0.87 in logs
+  around medians of 0.12-0.44 mean the sign of the gap is not stable
+  cell-to-cell: 47.6% of source-1-vs-4 cells have =|gap| > log 1.5=.
+
+*Where the ladder actually lands, and why the cluster rung is empty for
+the household pair.*  An ESS enumeration area holds 12 rural / 15 urban
+households, so a household-side source structurally cannot reach many
+observations per (cluster, item, unit) cell: measured median =n= per cell
+is **2** for =unit_value= at =v= and **1** for =crop_sale_price= at every
+level.  At the protocol's thin-source floor of 5 per household side (used
+for both 1 and 4; community prices at 1), =unit_value_vs_crop_sale_price=
+therefore has **zero** matched cells at =v= -- its 103 cells are 28
+District, 40 Region, 35 national.  =community_price_vs_crop_sale_price=
+reaches =v= 18 times only because source 5 is usable at =n=1=.  *This is
+a design fact about ESS cluster sizes, not a defect and not a fixable
+one*; a cluster-grain household-to-household price comparison is not
+available in Ethiopia at any honest threshold.
+
+* 4. Logs: the model, read out
+
+=models.csv= has 130 rows: per (wave, pair, u_basis), one pooled row plus
+one per =geo_level=.
+
+*Read this section knowing that most slopes are deliberately NaN.*  As of
+2026-09-08 =common.py= refuses to report a slope for any specification with
+fewer than =MIN_DOF= = 5 residual degrees of freedom (cells minus the rank
+of the effect block minus one), returning NaN instead of a saturated
+"fit".  Of my 130 rows, =coef_between= is identified in **66** and
+=coef_within= in only **32**.  That is the right answer, not a loss: it
+removes exactly the rows I would otherwise have had to tell you to ignore
+(the 2013-14 / 2015-16 crop-sale rows that previously came back with
+=r2_fe= = 1.000000 and =resid_sd= = 0.000).  Where a slope is NaN, read
+the medians in §3 and the per-item table in §5.
+
+=coef_within= is now NaN for **every** crop-sale row: the within spec
+carries item *and* geo effects, and 8-31 cells across 7-20 items cannot
+support them.  This is the formal version of what the protocol already
+said -- within is uninterpretable for a pair whose one side is a
+measurement source -- so nothing is lost.
+
+Native basis, =geo_level='all'=, all identified between-slopes:
+
+| wave    | pair                                 | cells | beta_between |    se |     t |
+|---------+--------------------------------------+-------+--------------+-------+-------|
+| 2011-12 | =unit_value_vs_crop_sale_price=      |    31 |        0.275 | 0.132 |  2.09 |
+| 2013-14 |                                      |    16 |        0.073 | 0.300 |  0.24 |
+| 2015-16 |                                      |     8 |       -0.297 | 0.272 | -1.09 |
+| 2018-19 |                                      |    21 |        0.409 | 0.535 |  0.76 |
+| 2021-22 |                                      |    27 |        0.241 | 0.337 |  0.71 |
+|---------+--------------------------------------+-------+--------------+-------+-------|
+| 2011-12 | =community_price_vs_crop_sale_price= |    26 |        0.178 | 0.120 |  1.48 |
+| 2013-14 |                                      |    15 | (unidentified)|      |       |
+| 2015-16 |                                      |     8 | (unidentified)|      |       |
+| 2018-19 |                                      |    19 |        0.707 | 0.517 |  1.37 |
+| 2021-22 |                                      |    24 |        0.491 | 0.270 |  1.82 |
+|---------+--------------------------------------+-------+--------------+-------+-------|
+| 2011-12 | =unit_value_vs_community_price=      |   654 |        0.037 | 0.032 |  1.17 |
+| 2013-14 |                                      |  1023 |        0.060 | 0.029 |  2.09 |
+| 2015-16 |                                      |   787 |       -0.013 | 0.031 | -0.43 |
+| 2018-19 |                                      |  3113 |        0.026 | 0.035 |  0.74 |
+| 2021-22 |                                      |  2729 |       -0.024 | 0.021 | -1.15 |
+
+What each number means, one sentence each:
+
+- *=beta_between= is the primary test, and it does not merely fail to
+  reject a proportional markup -- it leans the wrong way for the
+  alternative.*  An additive per-unit handling cost predicts a *strongly
+  negative* slope; a constant markup or an iceberg cost predicts 0.  Of
+  the eight identified crop-sale slopes, **seven are positive**, and the
+  only one exceeding two standard errors (2011-12, =unit_value= vs
+  =crop_sale_price=, t = +2.09) is positive -- the opposite sign to the
+  additive-cost prediction.  *The Ethiopian farm-to-market gap behaves
+  like a proportional markup.*
+- *The one genuinely negative result is on the per-kg basis and I do not
+  believe it*: =unit_value_vs_crop_sale_price= 2021-22 gives
+  =beta_between= = -0.486 (se 0.187, t = -2.6).  But the kg view is
+  precisely the one that admits fruit and root items through a crude
+  item-independent piece-to-kg factor (see below), and those are the
+  items with the huge gaps in §5, so a negative between-item slope there
+  is what a *conversion* artifact looks like.  The native basis for the
+  same wave gives +0.241.
+- *=beta_within= survives only for =unit_value_vs_community_price=*, and
+  there it is small and negative (-0.03 to -0.20 native): within an item,
+  the household-paid price exceeds the surveyed market price slightly
+  more at cheap locations than dear ones.  The two sides are comparably
+  noisy there (=sd_log_price= medians 0.154 for =unit_value= vs NaN for
+  =community_price=), which is the condition the Bland-Altman midpoint
+  needs; for the crop-sale pairs it is violated and the estimate is
+  correctly withheld.
+- *Which source is noisier* -- from =sd_log_price= in =cells.csv= at the
+  =v= rung, native basis: =unit_value= median 0.154, =crop_sale_price=
+  median 0.129, and =community_price= is **NaN by construction** (=n= = 1
+  per cluster cell -- it is a measurement, not a sample).
+- *=r2_fe= is reported only where the within spec is identified*, so the
+  saturated 1.000 values that appeared in my first run are gone.  For
+  =unit_value_vs_community_price= it runs 0.52-0.88: item and place alone
+  explain half to seven-eighths of the gap variance, leaving a residual SD
+  of 0.53-0.93 in logs.
+- *Standard errors are HC3 and unclustered.*  It matters here: cells from
+  the same District share households, so the true standard errors are
+  larger than printed -- which only strengthens the "cannot reject 0"
+  reading above.
+
+** Why the per-kg view is the SECONDARY one, and a note in Ethiopia's favour
+
+The protocol flags per-kg comparisons as partly circular because the
+library's kg factors are inferred from =Expenditure/Quantity=.  **That
+caveat is weaker for Ethiopia than the protocol assumes**, and I used the
+better source: =Ethiopia/_/conversion_to_kgs.json= is built from the ESS's
+own =Food_CF_Wave{1..5}.dta= conversion files (=mean_cf_nat=), so its
+factors *never saw a price*.  =analysis.py= applies that single map to all
+three sources identically, so no source is converted on its own terms.  It
+covers 98.4% / 98.4% / 96.5% of source 1 / 4 / 5 rows.
+
+Its real limitation is different and worth stating: the factors are
+*national means per unit and item-independent*, so "Number"/"Piece" units
+convert at one weight for every food.  The per-kg gaps run systematically
+*higher* than the native ones (1.548 vs 1.344 for source 1 vs 4), and the
+per-item table shows why -- the kg view admits fruit and root crops whose
+piece-to-kg factor is a crude national average.  **Native =u= is the
+primary basis and is what §3 and §5 read.**
+
+Conversely the kg view earns its place for one thing: Ethiopian food is
+recorded at both =Gram= and =Kg= for the same item (Salt, Coffee,
+Chat/Kat), so native-unit matching splits those items across two
+incomparable cells; the kg view rejoins them, which is why it has 178 vs
+103 matched cells for the headline pair.
+
+* 5. The claim: is the farmgate-to-market gap 30-50%?
+
+*Which farmgate, which market.*  Ethiopia has no source 3, so the farmgate
+side is source 4 (=crop_sale_price=) only -- and, per §1, it is a *sale*
+price partly net of transport, so it is a lower bound on the true
+farmgate.  The market side is available twice, and §3 showed the two agree
+to a median gap of zero, so the choice between them does not drive the
+answer.
+
+*Headline: pooled over waves, native basis, source 1 vs source 4 gives a
+median ratio of 1.344 -- inside the 30-50% band.  But the pooled number
+is an average over two item classes that behave completely differently,
+and reporting only it would be misleading.*
+
+** Gap BY ITEM (native =u=; full table in =by_item.csv=)
+
+=unit_value_vs_crop_sale_price=, items with >= 3 matched cells:
+
+| item          | cells | median gap | ratio | in 30-50% |
+|---------------+-------+------------+-------+-----------|
+| Teff          |    14 |      0.244 | 1.277 | no        |
+| Chat/Kat      |    12 |      0.112 | 1.118 | no        |
+| Maize         |     6 |      0.112 | 1.118 | no        |
+| Wheat         |     6 |      0.176 | 1.193 | no        |
+| Barley        |     5 |      0.606 | 1.833 | no        |
+| Haricot Beans |     5 |      0.134 | 1.143 | no        |
+| Leafy Greens  |     5 |     -0.916 | 0.400 | no        |
+| Niger Seed    |     5 |      0.357 | 1.429 | *yes*     |
+| Sorghum       |     5 |      0.151 | 1.163 | no        |
+| Millet        |     4 |      0.090 | 1.095 | no        |
+| Lentils       |     4 |      0.724 | 2.063 | no        |
+| Field Pea     |     4 |      0.412 | 1.510 | no        |
+| Horsebeans    |     4 |      0.591 | 1.805 | no        |
+| Coffee        |     4 |      1.139 | 3.123 | no        |
+| Ground nuts   |     3 |      0.528 | 1.696 | no        |
+| Linseed       |     3 |      0.080 | 1.083 | no        |
+| Chick Pea     |     3 |      0.470 | 1.600 | no        |
+
+Only **2 of 25** items land in the band (Niger Seed 1.43, Kariya 1.50);
+for =community_price_vs_crop_sale_price= it is 2 of 20, and on the kg
+basis 4 of 37 and 5 of 27.  *The 30-50% claim is not borne out
+item-by-item in Ethiopia -- it is an artifact of averaging.*
+
+** The pattern that matters: staples are BELOW the band, perishables far ABOVE
+
+- *Cereals, pulses and oilseeds -- the crops §11 actually covers -- carry
+  a 8-30% margin, well below the claim*: Millet 1.10, Linseed 1.08,
+  Maize 1.12, Chat/Kat 1.12, Haricot Beans 1.14, Sorghum 1.16, Wheat
+  1.19, Teff 1.28.  These are also the items with the most cells, so they
+  carry the pooled median.
+- *Fruit, roots and processed items carry 2x-12x*: Papaya 3.99, Avocado
+  5.83, Mango 3.33, Coffee 3.12, and on the kg basis Orange 11.6,
+  Berbere 6.68, Banana 3.56, Potato 3.15, Sweet potato 3.76.
+- *Two items go the wrong way*: Leafy Greens 0.40 (native) and Banana
+  0.045 in the community pair -- the farmgate price *exceeds* the market
+  price by 2.5x and 22x.  A negative marketing margin is not economics; it
+  is a unit mismatch (a bunch or heap sold at farmgate matched against a
+  Kg retail price under the same =u= label).  I did not fix it; it is
+  recorded as D5.
+
+*The honest caveat that undercuts the perishable numbers.*  Every
+fruit/root item above rests on 1-3 cells, and it rests on them
+illegitimately: §11's own header reads =SECTION 11: CROP DISPOSITION
+EXCLUDE TREE/FRUIT/VEGETABLE/ROOT CROPS=.  Those crops have their own
+module, =SECTION 12. TREES/FRUIT/VEGETABLE/ROOT CROPS=, which
+=crop_production= does not read at all (D3).  So a Papaya row in §11 is an
+enumerator exception, not a sample.  **The defensible conclusion is the
+staple one: for the field crops the ESS actually prices, Ethiopia's
+farm-to-retail margin is roughly 10-30%, below the 30-50% claim** -- and
+that is before allowing for §1's point that the §11 sale price is already
+partly post-transport, which biases the measured gap *downward* and so
+does not rescue the claim.
+
+*Sources 3 and 4 cannot be compared to each other* (the Uganda centrepiece
+question -- does a household value its own-consumed harvest at the sale
+price or the purchase price?) because Ethiopia has no source 3.  The
+question is unanswerable for this country with the instrument as fielded.
+
+* 6. Data problems
+
+| id | table                       | wave    | symptom                                                                                                              | count                                                          | evidence                                                                        | proposed fix                                                                | status   |
+|----+-----------------------------+---------+----------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------+---------------------------------------------------------------------------------+-----------------------------------------------------------------------------+----------|
+| D1 | any table joined via =sample= | all     | =v= loses leading zeros: =sample()= '01010101601' arrives on =food_acquired= as '1010101601', so it will not join =cluster_features= | raw match 9.1/9.4/9.9/41.3/46.3% by wave (should be 100%)      | =country.py:2331-2338= =_v_to_str= does =str(int(float(x)))=                     | preserve string ids; only numeric-coerce when the value is not already a str | REPORTED (core, out of scope) |
+| D2 | =food_acquired=             | 2013-14, 2015-16 | 68.5% / 66.6% of rows come back with =v= = NaN; the survivors are the *urban refreshment* cohort, so any cluster-grain use of those waves is urban-only | 30,386 of 44,337 and 44,702 of 67,161 rows                     | =country.py:2891= v-join runs BEFORE =id_walk= (~2910); cached parquet has 18-char =household_id2= while =sample.parquet= is already walked to 14-char | mirror =_/crop_production.py=: call =local_tools.id_walk(p, updated_ids)= in =_/food_acquired.py= | REPORTED (see §7) |
+| D3 | =crop_production=           | all     | the tree/fruit/vegetable/root sale module (§12) is not read at all, so source 4 covers field crops only               | 2015-16: =sect12_ph_w3.dta= holds **2,627** positive sale values vs §11's **1,984** -- the unwired module is 32% LARGER; 25 crop codes appear in §12 and never in §11 | wave scripts read only =sect9=, =sect4=, =sect11= (e.g. =2015-16/_/crop_production.py:22-26=); §12 Q7 = quantity sold, Q8 = "What was the total value of [TREES/FRUIT/ROOT CROP] sold?" | wire §12 into =crop_production_for_wave= as a second sale source | REPORTED (a feature addition, beyond "obvious blocker") |
+| D4 | all three price tables      | all     | =u= = "Other (Specify)" names no quantity, and the spelling is inconsistent across tables ("Other(Specify)" vs "Other (Specify)") | dropped 1,944 + 77 + 654 rows from sources 1 / 4 / 5           | =analysis.py:JUNK_UNITS=                                                        | canonicalise the spacing in the =u= table; treat as non-comparable in analysis | fixed-in-analysis (rows excluded, count reported) |
+| D5 | =crop_production= vs others | all     | a shared =u= label covers different physical quantities on the two sides, producing negative marketing margins        | Leafy Greens ratio 0.40; Banana 0.045 (community pair)         | §5 per-item table; =by_item.csv=                                                 | per-item unit audit; likely a bunch/heap sold at farmgate vs a Kg retail price | REPORTED |
+| D6 | =cluster_features=          | all but 2018-19 | the =(t, v)= key is not unique, so the cluster-grain projection destroys disagreeing rows                             | 373 / 454 / 732 / 1,240 rows (34 / 43 / 72 / 111 conflicting tuples) | =GrainCollapseWarning= raised on every build this run; CONTENTS.org "Household geovariables" records the GPS half | make =v= a composite of district + cluster code                              | REPORTED (GH #323 site 2, already open) |
+| D7 | =common.py=                 | n/a     | =fit_gap_model= ran its FE specs without a rank check: a thin slice raised =LinAlgError= (losing the whole wave/pair), and an under-identified one returned a saturated "fit" (=r2_fe= = 1.000000, =resid_sd= = 0.000) | 1 raise + 4 saturated rows, of 130                             | =common.py= =ols= -> =np.linalg.inv(XX)=; Nigeria's agent hit both modes          | require =MIN_DOF= residual dof, else report NaN                              | *FIXED UPSTREAM* by the coordinator 2026-09-08; my temporary wrapper removed and all outputs regenerated against the new =common.py= (medians and gaps unchanged; 64 slopes correctly became NaN) |
+| D8 | =crop_production=           | all     | mojibake unit labels fragment the =u= axis: "Zorba/Akara Ï¿½ Large" alongside "Zorba/Akara Large"                     | 550 of 85,519 rows; **0 of the 3,721 usable sold rows**        | =ethiopia.py:_clean_unit_label= strips U+FFFD but the stored text is the double-encoded =Ï¿½= | add =Ï¿½= to the mojibake strip                                              | REPORTED (zero impact here, so not worth a rebuild) |
+| D9 | =cluster_features=          | all     | =District= is a bare 1-2 digit code that is not a district identity, and its formatting drifts ('1' in W1-W3, '01' in W4-W5) | **30 of 37** distinct codes occur in more than one =Region= (max 11) | =analysis.py:_prep=                                                              | make District a composite, or namespace it by Region                        | fixed-in-analysis (=Region\vert District= composite; orphan rows nulled so they cannot form a phantom "nan\vert nan" cell -- 53 rows, no effect on any reported number) |
+| D10 | =cluster_features=         | all     | =Region= casing/spelling is not harmonised across waves (21 distinct strings for 11 regions: Tigray/TIGRAY, Somalie/SOMALI, Diredwa/DIRE DAWA, Gambelia/GAMBELA...) | 21 -> 11                                                       | per-wave values are internally consistent, so one-wave-at-a-time analysis is unaffected | add =Region= to =categorical_mapping.org= as the strata labels already are    | REPORTED (harmless here; would bite any cross-wave pooling) |
+
+Counts, not impressions: 10 problems -- 1 fixed upstream during this task
+(D7), 2 handled inside =analysis.py= with the affected row counts printed
+(D4, D9), and 7 reported for the maintainer.
+
+* 7. Fixes attempted, and why none was committed
+
+*No commits on =fix/prices-ethiopia=.*  The one candidate that is both a
+real blocker and inside my scope is D2 -- adding
+=local_tools.id_walk(p, updated_ids)= to
+=Ethiopia/_/food_acquired.py=, exactly as =Ethiopia/_/crop_production.py=
+already does, with that file's own comment giving the rationale ("applies
+the cross-wave =id_walk= so the household index uses the panel canonical
+id scheme ... keeping the =_join_v_from_sample= join aligned").  The
+repo's own precedent sanctions it.
+
+I did not commit it, for a reason that is about the fix's *value*, not its
+difficulty: **it does not make =v= usable.**  D1 (the =str(int(float(x)))=
+zero-stripping in =country.py=) is core and out of scope, and it corrupts
+=v= on the household tables whether or not D2 is fixed.  Fixing D2 alone
+moves =food_acquired.v= from "NaN for 68% of W2/W3 rows" to "present for
+100% of rows but still stripped of its leading zeros and still not
+joinable to =cluster_features=".  That trades a loud failure for a quiet
+one.  D1 and D2 should be fixed together, by the maintainer, in that
+order.
+
+The analysis does not depend on either: =analysis.py= discards the
+framework's =v= entirely and re-derives it from =sample()=, recovering
+1.0000 of =unit_value= rows and 0.9936 of =crop_sale_price= rows, with a
+=V_REPAIR_FLOOR= assertion that fails loudly if that ever stops holding.
+**Every number in this report was produced with the shared warm cache and
+no fix applied.**
+
+* 8. Reproduce
+
+#+begin_src sh
+export WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-ethiopia
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_BUILD_WORKERS=1
+cd /tmp
+taskset -c 6-8 /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/Ethiopia/analysis.py
+#+end_src
+
+Shared-code self-test (reproduces the documented synthetic expectations):
+
+#+begin_src sh
+cd /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources
+PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra taskset -c 6-8 \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python common.py
+#+end_src
+
+Questionnaires (local -> DVC -> World Bank; never the =dvc= CLI):
+
+#+begin_src python
+from lsms_library.data_access import get_data_file
+get_data_file('Ethiopia/2015-16/Documentation/ESS3 HH Questionnaire_English.pdf')
+get_data_file('Ethiopia/2015-16/Documentation/ESS3 Community Questionnaire_English.pdf')
+get_data_file('Ethiopia/2015-16/Documentation/ESS3 Post Harvest Questionnaire_English.pdf')
+#+end_src
+
+All five waves' =Documentation/SOURCE.org= were read: each is a resolved
+World Bank provenance stamp (=PROVENANCE_SOURCE: worldbank=,
+=PROVENANCE_METHOD: source-url=, recorded 2026-07-12) for catalog ids 2053
+/ 2247 / 2783 / 3823 / 6161.  Nothing in them bears on prices; they
+confirm the wave-to-catalog mapping the universe quotes in §1 rely on.
+
+Outputs in this directory: =analysis.py=, =cells.csv= (328,613 rows),
+=gaps.csv= (23,779), =models.csv= (130), =by_item.csv=, =REPORT.org=.
+2021-22 ships no documentation at all (its =Documentation/= holds only
+=LICENSE=, =SOURCE=, =SOURCE.org=), so every questionnaire quote above is
+ESS3 (2015-16), the richest local set; §5A, §10 and §11 are stable in
+wording across waves as far as the wired column stems show, but I did not
+verify the 2021-22 wording because the document does not exist locally.

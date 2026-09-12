@@ -86,6 +86,11 @@ registry.
 WHAT THIS DOES NOT DO.  It does not change returned data -- not one value, not
 one dtype.  It is a reporting layer, which is why its own edits are exempt from
 the build fingerprint (see ``_build_registry._EXCLUDED_CALLABLES``).
+
+It also does not look at whether a populated column's values are POSSIBLE --
+only at whether it holds anything at all.  That is the sibling module
+``lsms_library.quantity_audit`` (Site Q, GH #857), which mirrors this one part
+for part and carries its own lever, ``LSMS_QUANTITY_STRICT``.
 """
 
 from __future__ import annotations

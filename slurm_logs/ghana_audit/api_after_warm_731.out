@@ -1,0 +1,53 @@
+== effective harmonize_education entries for U6/u6/L6/l6, per wave (Wave.categorical_mapping) ==
+1987-88: U6->'Postgraduate'  u6->'Upper secondary complete'  L6->'Upper secondary complete'  rows=138  dup_keys=[]
+1988-89: U6->'Postgraduate'  u6->'Upper secondary complete'  L6->'Upper secondary complete'  rows=138  dup_keys=[]
+1991-92: U6->'Postgraduate'  u6->'Upper secondary complete'  L6->'Upper secondary complete'  rows=138  dup_keys=[]
+1998-99: U6->'Postgraduate'  u6->'Upper secondary complete'  L6->'Upper secondary complete'  rows=138  dup_keys=[]
+2005-06: U6->None  u6->'Upper secondary complete'  L6->None  rows=32  dup_keys=[]
+2012-13: U6->'Upper secondary complete'  u6->None  L6->'Upper secondary complete'  rows=33  dup_keys=[]
+2016-17: U6->'Upper secondary complete'  u6->None  L6->'Upper secondary complete'  rows=33  dup_keys=[]
+
+== individual_education: Educational Attainment value_counts per wave ==
+shape=(159924, 1) index=['i', 't', 'v', 'pid']
+t                             1987-88  1988-89  1991-92  1998-99  2005-06  2012-13  2016-17
+Educational Attainment                                                                     
+Bachelor                           37       30       37       52      206      889      764
+Informal                          101       73       42      142        0        0        0
+Lower secondary                  1167     1108     1357        0     2389     4995     4493
+Lower secondary complete         1910     1776     2903     4614     5073     9614     6816
+No education                      616     2191      625     2226     2471     5506     7924
+Postgraduate                        5        3       12        0        0        0       39
+Pre-primary                         0        0        0     4977     1577     3510     1380
+Primary complete                  510      492      741     3067     1545     3667     1076
+Primary incomplete               2574     2684     4022        0     6969    14940    12517
+Tertiary certificate/diploma      130      111      139      283      498      690     2241
+Unknown                             0        0        0       17       31       15        2
+Upper secondary                   258      244      447        0      738     1597     1577
+Upper secondary complete          235      230      453      888     1386     3875     3311
+Vocational/Technical                0        0        0      316      497     1261        0
+
+nulls per wave: {'1987-88': 0, '1988-89': 0, '1991-92': 0, '1998-99': 0, '2005-06': 0, '2012-13': 0, '2016-17': 0}
+
+== sample(): Rural per wave ==
+shape=(56330, 5) index=['i', 't'] cols=['v', 'Rural', 'weight', 'panel_weight', 'strata']
+Rural    Rural  Urban
+t                    
+1987-88   1965   1182
+1988-89   2124   1070
+1991-92   2945   1578
+1998-99   3799   2199
+2005-06   5069   3618
+2012-13   9327   7445
+2016-17   7991   6018
+urban share % (of non-null): {'1987-88': 37.6, '1988-89': 33.5, '1991-92': 34.9, '1998-99': 36.7, '2005-06': 41.6, '2012-13': 44.4, '2016-17': 43.0}
+
+== Rural constant within cluster v? (n clusters with >1 distinct Rural value, per wave) ==
+         clusters  mixed
+t                       
+1987-88       176      0
+1988-89       170      0
+1991-92       365      0
+1998-99       300      0
+2005-06       580      0
+2012-13      1200      0
+2016-17      1000      0

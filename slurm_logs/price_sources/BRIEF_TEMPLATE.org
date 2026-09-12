@@ -1,0 +1,163 @@
+#+title: Brief template -- five-source food-price comparison, one country
+#+author: Sue (Claude Fable 5.1), scrum master
+#+date: 2026-09-08
+
+This is the text each Phase-1 country agent received (Agent tool, model
+=opus=), with =<Country>= / =<lc>= / =<cores>= / the country block filled in.
+Kept in-tree so the record of what the agents were told survives the agents.
+
+* Common text
+
+You are the analyst for <Country> in a cross-country comparison of five
+sources of food prices.  Follow the protocol EXACTLY so your outputs pool
+with seven other countries' -- where <Country> cannot follow it, say so in
+the report; do not improvise silently.
+
+** Read first, in this order (all mandatory)
+1. /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/PROTOCOL.org
+   -- the spec: sources, grain, statistics, outputs, fixes, report format.
+2. /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.coder/ledger/price-sources-comparison.md
+   -- prior art; cite its section numbers.
+3. /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/common.py
+   -- the shared code you MUST use (cell_medians, match_gaps with per-side
+   thresholds, model_rows, write_outputs).  Run its self-test once.
+4. Your country's =lsms_library/countries/<Country>/_/CONTENTS.org= in full,
+   including LOGBOOK / WAITING / TODO entries.  NAME the idiosyncrasies you
+   found in section 1 of your report -- "I checked" is not an answer.
+5. The original documentation: each wave's =Documentation/SOURCE.org= and the
+   questionnaires (via =lsms_library.data_access.get_data_file(
+   '<Country>/<wave>/Documentation/<file>')=; local -> DVC -> World Bank;
+   NEVER the =dvc= CLI).  Quote the wording of the price questions.
+6. =slurm_logs/price_sources/inventory.json= (entry for <Country>) for what the
+   coordinator already measured; verify, don't trust.
+
+** Where you work
+- Worktree: WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-<lc>, branch
+  =fix/prices-<lc>=, cut from local =development= @ 1dced810.  First:
+  : git -C $WT log -1 --oneline    # must show 1dced810; if not STOP and report
+  (do NOT reset to origin/development -- it is four commits behind).
+- Python: /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+- In EVERY shell and script:
+  : export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+  : export LSMS_BUILD_WORKERS=1
+  (pyextra carries metrics_miscellany + datamat, which common.py needs; the
+  order matters.)  Assert once from a neutral cwd:
+  : cd /tmp && python -c "import lsms_library, metrics_miscellany; assert 'wt-prices-<lc>' in lsms_library.__file__"
+- Pin everything you run: =taskset -c <cores>=.  Eight agents share this
+  node; do not exceed your range, no =pytest -n=.
+- Analysis READS use the shared warm cache (default data root) -- read-only;
+  never LSMS_NO_CACHE, never =lsms-library cache clear=, never =make=, never the
+  =dvc= CLI, never =bin/savio_venv.sh=.
+- Outputs go to /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/<Country>/
+  (in the MAIN checkout; this directory is the ONE place outside $WT you may
+  write).  Files: analysis.py, cells.csv, gaps.csv, models.csv, REPORT.org,
+  plus any figures.  Do not commit them.
+
+** Fixes (protocol section "Fixes")
+Obvious blockers only, config or your country's own module/scripts, on
+=fix/prices-<lc>= in $WT, verified under:
+: export LSMS_COUNTRIES_ROOT=$WT/lsms_library/countries
+: export LSMS_DATA_DIR=/global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_prices_<lc>
+: mkdir -p "$LSMS_DATA_DIR" && ln -sfn /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache "$LSMS_DATA_DIR/dvc-cache"
+(a private data dir with the L1 blob cache shared, so the shared L2 cache
+is never rebuilt under your worktree's hashes).  Commit with the trailer
+lines below; do NOT push.  Out of scope -- STOP on that point and report:
+=lsms_library/*.py= (country.py, transformations.py, local_tools.py,
+feature.py, coverage_matrix.py, visualizations.py ...), =data_info.yml=
+required-column declarations, any file under =tests/=, =pyproject.toml=,
+another country's tree, the main checkout (except your output dir),
+anything named baseline / golden / expected / snapshot / latest.csv /
+blessed.  Never weaken a test.
+
+Commit trailer (both lines, exactly):
+: Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+: Claude-Session: https://claude.ai/code/session_01EVtHa4ZXum7AbKRRSsSNxm
+
+** Report
+The protocol's "Report format" section, under 500 words, SCOPE DEVIATIONS
+first.  The detail lives in REPORT.org.
+
+* Country blocks
+
+** Uganda (cores 0-2)
+Sources 1, 2, 3, 4 (no community prices).  The only four-source country
+and the only one where own-consumption valuation (3) and crop sale price
+(4) can be compared directly: section 5 of your report is the centrepiece.
+- Source 2: =Price= is populated for 97.7% of purchased rows -- prove it is
+  independent of =Exp/Qty= before treating it as a source (protocol table).
+- Source 3: quote the UNPS question for the value of consumption from own
+  production (GSEC15B) -- "what would you have paid" vs "received"?
+- Source 4: =crop_production= has =u= and =condition= levels; =harmonize_crop=
+  reuses the food Aggregate labels, so =food_acquired(labels='Aggregate').j=
+  is the join (CONTENTS.org and the =crop_production= block in
+  data_scheme.yml).  Report which crops join and which do not.
+- Known: =uganda.py:400= drops unknown unit codes (800-802, 996-999) with a
+  warning -- count what that costs each source.  Eight waves; do all.
+
+** GhanaLSS (cores 3-5)
+Sources 1, 3, 5.  =community_prices= is the corpus's largest (660k rows,
+=obs= level = three vendor observations per item) and its label axis is
+the problem: 662 priced labels, 166 on the food axis.  Read
+=.coder/ledger/562-ghanalss-community-prices.md= and CONTENTS.org Traps
+1-7 before anything.  Currency: 2005-06 GHC -> 2016-17 GHS redenomination
+(=currency='column'= gives the code per wave; within-wave comparisons are
+unaffected, say so).  Source 3: =Price= on 95% of produced rows -- quote
+the GLSS question.  =food_acquired= is 5.26M rows: build the source frames
+once, restrict columns early, and do not hold two copies.  2005-06 has no
+price survey (adjudicated =asked-not-distributed=).
+
+** Ethiopia (cores 6-8)
+Sources 1, 4, 5.  =community_prices= joins fully (47/47 labels).  ESS wave
+1 (2011-12) represents rural areas and small towns only -- treat its cells
+as a different universe in the report.  =crop_production= has =j= and =u=
+(=Value_sold= populated 28%).  Read =Ethiopia/_/CONTENTS.org= (602 lines;
+19 script-path tables).  Note whether the ESS instrument asks a value of
+own-consumption that the API does not carry (a data-gap to report).
+
+** Malawi (cores 9-11)
+Sources 1, 4, 5.  =community_prices= label overlap is poor (19/51) and its
+units are native (=Kilogramme=, =Heap=, =No 10 Plate=, =50 kg Bag= ...) --
+the two pre-checks in the protocol are your first deliverable, and the
+unit vocabulary mismatch is the archetypal "obvious blocker" (a mapping,
+not a rename).  =crop_production= names its item level =crop=, not =j=
+(report as a defect; alias in your script).  Region-specific unit factors
+exist in the wave scripts (CLAUDE.md gotchas).  Heavy tables: pin memory
+awareness; 971k food rows.
+
+** Tanzania (cores 12-14)
+Sources 1, 4, 5.  =community_prices= exists for 2019-20 and 2020-21 only;
+=2008-15/= is one folder, four rounds via =wave_folder_map= (read
+=.claude/skills/multi-round-waves.md= and =tanzania-panel-design.md=).
+=crop_production= has NO =u= level -- state the unit assumption (NPS
+reports kg?) with the questionnaire as evidence, or restrict source 4 to
+what can be shown.  Column aliases (=value_purchase= etc.) are handled by
+=_normalize_columns=; say if anything leaks.
+
+** Nigeria (cores 15-17)
+Sources 1, 5; source 4 without a =u= level.  Post-planting/post-harvest:
+every wave dir holds two rounds with distinct =t= (=2010Q3=, =2011Q1= ...),
+and =Country.waves= are the round labels -- never pool rounds.  Read
+=.coder/ledger/591-nigeria-prices.md= first: =u= is stored as raw codes
+and decoded at API time, =food_prices= once dropped 99% of rows, and
+=community_prices= was designed as the independent yardstick.  W1/W2 price
+items are resolved by name onto =harmonize_food=.  =community_prices=
+grades =dropped= in every post-planting round -- find out why (a
+=dropped= cell is "correctly empty or the silent-drop class").
+=crop_production= names its level =crop=.
+
+** Mali (cores 18-20)
+Sources 1, 5; source 4 without a =u= level.  EHCVM: =v: grappe=, each
+grappe visited in one =vague=; =community_prices= joins fully (37/37)
+with native units (=Tas=, =Sac moyen=, =Boîte= ...).  Only 2014-15 has
+community prices; the three later waves are =absent= -- check whether the
+EHCVM 2018-19 / 2021-22 distributions ship a price file the config never
+wired (a =todo= verdict candidate, protocol "Data problems").
+=crop_production= names its level =crop=.
+
+** Niger (cores 21-23)
+Sources 1, 5; source 4 without a =u= level.  EHCVM as Mali.  Community
+prices for 2011-12 and 2014-15 (35/45 labels join); 2018-19 and 2021-22
+=absent= -- same check as Mali.  =Niger/_/CONTENTS.org= records that
+2014-15 ships no geovariables (cluster =Latitude= honestly absent) -- the
+ladder still works on =v= / =Region= from =sample=; say what geography
+you used.  =crop_production= names its level =crop=.

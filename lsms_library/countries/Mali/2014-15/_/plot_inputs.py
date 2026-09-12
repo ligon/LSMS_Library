@@ -71,7 +71,7 @@ improved = improved.mask(improved_raw.str.startswith('Améliorées').fillna(Fals
 seed = pd.DataFrame({
     't': WAVE,
     'i': s1e['i'],
-    'plot': _plot(s1e, 's1eq01', 's1eq02'),
+    'plot_id': _plot(s1e, 's1eq01', 's1eq02'),
     'input': 'seed',
     'crop': s1e['s1eq03b'],
     'u': s1e['s1eq05b'],
@@ -85,7 +85,7 @@ pieces.append(seed)
 # --- plot fertilizer / pesticide (s2c): one row per used input slot ---
 s2c = get_dataframe('../Data/EACIS2C_p2.dta').copy()
 s2c['i'] = _hhid(s2c)
-s2c['plot'] = _plot(s2c, 's2cq01', 's2cq02')
+s2c['plot_id'] = _plot(s2c, 's2cq01', 's2cq02')
 
 
 def _fert_slot(code, qty_col, unit_col, purchased=None):
@@ -93,7 +93,7 @@ def _fert_slot(code, qty_col, unit_col, purchased=None):
     return pd.DataFrame({
         't': WAVE,
         'i': s2c['i'],
-        'plot': s2c['plot'],
+        'plot_id': s2c['plot_id'],
         'input': code,
         'crop': pd.NA,             # fertilizer/pesticide applied at plot grain
         'u': s2c[unit_col] if unit_col else pd.NA,

@@ -1,7 +1,7 @@
 #!/bin/bash
 # savio_venv.sh — manage the single-file (squashfs) node-local venv on Savio.
 #
-# Model (see docs/savio_venv.md):
+# Model (see SkunkWorks/savio_venv.md):
 #   .venv.lustre/   canonical WRITABLE venv on Lustre (master; gitignored)
 #   .venv.sqfs      read-only single-file image built from the master (gitignored,
 #                   ~255 MB, ONE Lustre inode instead of ~33k -> no MDS storm)
@@ -26,7 +26,7 @@ SQUASHFUSE="/usr/libexec/apptainer/bin/squashfuse_ll"   # apptainer-bundled (fus
 die() { echo "savio_venv: $*" >&2; exit 1; }
 
 cmd_update() {
-    [ -d "$MASTER" ] || die "no writable master at $MASTER (build one first; see docs/savio_venv.md)"
+    [ -d "$MASTER" ] || die "no writable master at $MASTER (build one first; see SkunkWorks/savio_venv.md)"
     if [ "$#" -gt 0 ]; then
         echo ">> installing into master: $*"
         "$MASTER/bin/python" -m pip install "$@" || die "pip install into master failed"

@@ -1,0 +1,526 @@
+#+title: GhanaLSS 1998-99 (GLSS4): where visit dates live, and what shipped
+#+date: 2026-09-11
+#+author: audit agent (wave 1998-99), for @ligon's GSS data request
+
+All paths below are relative to =lsms_library/countries/GhanaLSS/1998-99/=.
+"printed p." is the number printed on the page; "PDF p." is the page index
+in the file.  Offsets: interviewer manual printed = PDF - 1; supervisor
+manual printed = PDF - 3; data-entry manual printed = PDF - 2; questionnaire
+Part A printed 01..03 = PDF 2..4, Part B printed 8.01..8.03 = PDF 54..56.
+Every number in this file was computed from the shipped =.DTA= files through
+=get_dataframe()= (pandas recodes the format-105 missing double; see
+CONTENTS.org "GLSS3 and GLSS4 ship at .dta format 105"); scripts are in the
+session scratchpad (=g4/analyse*.py=, =g4/check7.py=, =g4/scan.py=).
+
+Mandatory reading done first, and what it said that matters here:
+- =_/CONTENTS.org= "The repeated-visit design, wave by wave" (l.1244-1660):
+  GLSS4 = 7 visits, 9B q1..q6 -> calendar visits 2..7, 8H q3..q8 -> 2..7, six
+  consumption occasions, visit 1 is intake.  It computes GLSS3 gaps from
+  =S0B.DTA= but never names a GLSS4 date file; l.1436-1450 analyse GLSS4
+  "realised interval"/"measured exposure" without saying which file the
+  intervals came from.
+- =_/CONTENTS.org= l.3386-3410: GLSS4 =.DTA= are Stata format 105 -- missing
+  doubles are 2^333 under =pyreadstat=; only pandas recodes them.  All date
+  arithmetic here went through =get_dataframe()= for that reason.
+- =_/CONTENTS.org= l.3280: GLSS4 files carry variable labels but no value
+  labels -- result-code vocabularies below are decoded from the questionnaire
+  and the User Guide, not from the files.
+- =1998-99/_/data_info.yml= =interview_date=: wires =SEC0A.DTA= =dd/mm/yy=
+  (first visit only) as =Int_t=.  No GhanaLSS wave wires per-visit dates;
+  =melt_visit_intervals= (=local_tools=) is referenced by no =data_info.yml=.
+- =1998-99/_/food_acquired.py= docstring: 9B "s9bq1..s9bq6, visits 1-6" is
+  stale wording (the code and its comment use 2..7); irrelevant to dates.
+- =.coder/ledger/ghanalss-visit-offset.md=: =visit= is the CALENDAR visit;
+  =interview_date='s =visit= (via =melt_visit_intervals=) is meant to be the
+  same clock -- which is exactly what SEC0B/SEC0C can supply.
+
+* Visit protocol
+
+One line: seven interviewer visits per household at exactly five-day
+intervals over a 36-day cycle (35 interviewing days + 1 travel day), paper
+questionnaire in two booklets (Part A sections 1-7, Part B sections 8-12),
+keyed in the field on IMPS 3.1 by a team data-entry operator; 9B / 9A2 / 8H
+asked at visits 2-7; diary urban-only.  CONTENTS.org's row for 1998-99
+(7 visits, q->visit map, 6 occasions) is confirmed; nothing below contradicts
+it, but several things are not in it.
+
+Sources, quoted:
+
+- =Documentation/GHA_1998_GLSS_Interviewer_EN.PDF= printed p.6 (PDF 7):
+  "Each selected workload will be visited a total of 7 times every 5 days.
+  ... The year has been divided into 10 cycles of 36 days each.  Interviews
+  will be conducted on the first 35 days of each cycle while the 36th day is
+  used for travelling by the team to the next set of EAs."
+- ibid. printed p.8 (PDF 9), INTERVIEWER WORKLOAD: "There will be 7
+  interviewer visits to the household at 5-day intervals in a cycle of 36
+  days.  Thus a workload for the 36 days is 20 households.  The workload
+  divides into 5 batches of 4 households ... Batch 1: day 2, 7, 12, 17, 22,
+  27 and 32 ... Batch 5: day 6, 11, 16, 21, 26, 31 and 36."  (Same text in
+  the Supervisor manual printed p.4, PDF 7.)
+- ibid. printed p.15 (PDF 16), DATE OF NEXT VISIT: "This should be exactly 5
+  days apart for all households."  SURVEY SCHEDULE, printed p.14: "there
+  will be 7 repeated visits to the household and that each interview will
+  last no longer than 1 hour."  (The only statement about duration anywhere;
+  nothing is recorded.)
+- ibid. printed p.15, section-by-visit table:
+  | visit | sections (interviewer + supervisor manuals) | sections (questionnaire grid, printed p.03 / 8.03) |
+  |-------+---------------------------------------------+----------------------------------------------------|
+  | 1st   | 1, 2, 5, 6, 7                               | 1, 2, 5, 6, 7                                      |
+  | 2nd   | 3, 8H, 9A2, 9B                              | 3, 8H, 9A2, 9B                                     |
+  | 3rd   | 4, 8H, 9A2, 9B                              | 4, 8H, 9A2, 9B                                     |
+  | 4th   | 8A-G, 8H, 9A2, 9B                           | 8A-G, 8H, 9A2, 9B                                  |
+  | 5th   | 8H, 9A2, 9B, 9C, 10                         | 8H, 9A1, 9A2, 9B, 9C                               |
+  | 6th   | 8H, 9A2, 9B, 11                             | 8H, 9A2, 9B, 10                                    |
+  | 7th   | 8H, 9A2, 9B, 9A1, 12                        | 8H, 9A2, 9B, 11, 12                                |
+  The two manuals agree with each other and disagree with the form printed
+  in the questionnaire on where 9A1, 10 and 11 fall (visits 5-7).  8H, 9A2
+  and 9B are at visits 2-7 in every source.  Not recorded in CONTENTS.org.
+- Recall phrase.  9B (questionnaire printed p.9.11, PDF 85) column 1: "How
+  much was spent on ... since my FIRST visit?"; columns 2-6: "... since my
+  last visit?".  9A2 (printed p.9.6, PDF 80) identical.  8H (printed p.8.11,
+  PDF 68) q3-q8: "How much of home produced ... was consumed by the household
+  since my last visit?" -- all six columns say "last visit" (no "first
+  visit" variant in 8H).  Interviewer manual printed p.50 (PDF 51), PART A2:
+  "In your second visit you will ask for how much was spent by the household
+  since the past 6 days, starting from the day prior to your first visit.  In
+  other words, you will have to capture expenditure for the day you used to
+  travel ... For your next visits, you will ask for how much was spent by the
+  household since your last visit."  PART B: "information will be collected
+  in the same way as ... Part A2".  Supervisor manual printed p.12 (PDF 15):
+  "interviewers should always use the reference period 'since my last
+  visit'."  So by protocol the FIRST ask covers 6 days and the other five
+  cover 5: 31 days of coverage, not 30.  (See Idiosyncrasies for what this
+  does to CONTENTS.org's first-ask discussion.)
+- Diary: URBAN ONLY.  Interviewer manual printed p.8 (PDF 9): "A dairy of
+  daily consumption and expenditure will be used to support the urban
+  interviews.  During the first visit a literate person already identified in
+  each urban household will be trained to record all subsequent expenditures
+  ... Where a household has no literate member the supervisor will make daily
+  visits to the household to record all expenditures in the dairy meant for
+  the household."  printed p.12 (PDF 13): "Daily visits will be required in
+  urban areas if the household is illiterate and cannot keep a diary of
+  expenditures."  printed p.49 (PDF 50), INSTRUCTION ON USE OF DIARY:
+  "Transfer of diary entries to the questionnaire will start from your second
+  visit."  CONTENTS.org records the diary for GLSS3 (urban only) and GLSS7
+  (all) and says nothing for GLSS4; the GLSS4 arrangement is GLSS3's.  Note
+  the consequence: for an illiterate URBAN household the contact count is
+  daily, not seven; none of those daily supervisor visits is recorded in any
+  shipped file.
+- Paper, not CAPI.  Data-entry manual printed p.7 (PDF 9): "The Data Entry
+  System ... was developed on the Integrated Microcomputer Processing Systems
+  (IMPS) Ver. 3.1"; jobs GLSSPTA (Part A, 37 screens), GLSSPTB (Part B, 42
+  screens), GLSSPTC, GLSSPTD.  Batches are per EA and per Part.
+- When each booklet leaves the field (this is what explains SEC0C below).
+  Interviewer manual printed p.10 (PDF 11): "The first stage of data entry
+  will be done at the end of the third visit and the second will be at the
+  end of the cycle ... At the end of the third visit you will have to submit
+  sections 1-7 to the supervisor for verification and onward submission to
+  the Data Entry Operator ... The second part i.e. sections 8-12 will be
+  submitted for data entry at the end of the last visit in the EA."
+  Data-entry manual printed p.6 (PDF 8): "Part A: At the beginning of the 4th
+  visit in an EA, you will receive a set of 20 questionnaires with data
+  covering sections 1-7 ... Part B: ... at the beginning of the first visit in
+  the next EA".  Supervisor manual printed p.6 (PDF 9) item 7 says the same.
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+Both booklets open with the SAME three pages: a two-page SURVEY INFORMATION
+sheet (printed 01-02 in Part A, PDF 2-3; printed 8.01-8.02 in Part B, PDF
+54-55) and a SUMMARY OF SURVEY RESULTS grid (printed 03, PDF 4; printed
+8.03, PDF 56).  The wave-note hypothesis that Part A prints a 3-visit grid
+and Part B a visits-2-7 grid is REFUTED by the printed forms: both grids
+print rows FIRST..SEVENTH and both cover sheets print seven visit boxes.
+What differs is what could be filled in and what was keyed (next section).
+
+| document | section / form / page | field(s) as printed | records |
+|----------+-----------------------+---------------------+---------|
+| HH questionnaire Part A | Survey Information p.01 (PDF 2), top | CLUSTER, HOUSEHOLD ROSTER (no.), HEAD OF HOUSEHOLD, ADDRESS | ids only; no date |
+| same | p.01, VERIFICATION OF THE QUESTIONNAIRE, FIRST VISIT | SUPERVISOR (name + code), DATE (dd mm yy), REMARKS, REINTERVIEW BY SUPERVISOR? 1/2, THIS HOUSEHOLD REPLACES HOUSEHOLD NO, WILL BE REPLACED BY NO, REASON (1 dwelling not found/vacant, 2 occupant not at home, 3 refusal) | date (supervisor verification); result-ish (replacement reason); supervisor id; no time |
+| same | p.01, FIRST VISIT block | INTERVIEWER (name + code), DATE (dd mm yy), DWELLING FOUND 1/2, IS THE HEAD OF HOUSEHOLD THE SAME 1/2, NAME OF NEW HEAD, LANGUAGE USED BY THE RESPONDENT (1-8), INTERPRETER 1/2, REMARKS | date; interviewer; no time, no duration |
+| same | p.01-02, SECOND .. SEVENTH VISIT blocks (6 blocks) | INTERVIEWER (name + code), DATE (dd mm yy), REMARKS | date + interviewer per visit; no time |
+| same | p.01-02, VERIFICATION OF QUESTIONNAIRE, SECOND .. SEVENTH VISIT (6 blocks) | SUPERVISOR (name + code), DATE, REMARKS, REINTERVIEW BY SUPERVISOR? 1/2 | supervisor verification date per visit |
+| same | p.02, DATA ENTRY, END OF CYCLE | OPERATOR (name + code), DATE, REMARKS | keying date |
+| same | p.02, EDITING OF PRINTOUTS, END OF CYCLE | SUPERVISOR (name + code), DATE, REMARKS | editing date |
+| same | p.03 SUMMARY OF SURVEY RESULTS, rows FIRST..SEVENTH with the section list | per row: INTERVIEWER VISITS: DATE (DAY MONTH YEAR), RESULT (1 complete, 2 partial, 3 not applicable); CHECK-UP VISIT: DATE, RESULT (1 complete, 2 partial); SUPERVISOR: INTERVIEWER (1 satisfactory, 2 to be completed, 3 to be redone); DATA ENTRY OPERATOR (1 satisfactory, 2 correction); CORRECTED (1 in office, 2 during next visit, 3 during check-up visit, 4 not corrected) | date + result code per visit, check-up date + result; NO interviewer column, NO time |
+| HH questionnaire Part B | p.8.01-8.03 (PDF 54-56) | identical to the three Part A pages above, field for field | as above |
+| HH questionnaire Part B | Section 8H header, printed p.8.11 (PDF 68) | "2nd 3rd 4th 5th 6th 7th" boxes "dd mm" (date of each visit at which 8H was asked); RESPONDENT ID; PERSON INTERVIEWED ID | per-visit date, day+month only |
+| same | Section 9A1 header, printed p.9.1-9.2 (PDF 75-76) | "Date of This visit dd mm"; RESPONDENT(S) ID; PERSON INTERVIEWED ID | one date (the visit 9A1 was asked) |
+| same | Section 9A2 header, printed p.9.6 (PDF 80) | "2nd 3rd 4th 5th 6th 7th" boxes "dd mm" | per-visit date, day+month |
+| same | Section 9B header, printed p.9.11 (PDF 85) | "2nd 3rd 4th 5th 6th 7th" boxes "dd mm"; PERSON RESPONSIBLE / PERSON INTERVIEWED IDs (4 slots) | per-visit date, day+month |
+| Diary (urban HH) | separate booklet, not reproduced in any document; interviewer manual printed p.49 | daily entries of expenditure per item (implies a date per line) | dates of purchase, not of visits; not shipped |
+| Interviewer manual printed p.15 | OBSERVATION SHEET ("You must also fill out the observation sheet ... willingness to co-operate, problems ... comments for the supervisor") | free text | no date field named; not in the questionnaire PDF (grep finds no such page) |
+| Supervisor manual printed p.14-15 (PDF 17-18) | VERIFICATION OF THE QUESTIONNAIRE form: EA, Household, Interviewers, VISIT RESULTS, section-by-section SATISFACTORY / TO BE REDONE checks, "SUPERVISOR: ... DATE: ..." | one supervisor date per form (one form per cycle per HH, printed p.13: "complete one of these forms after each cycle ... keep the verification forms for each visit") | not shipped |
+| Supervisor manual printed p.22 (PDF 25) | VERIFICATION OF INTERVIEWS: daily random revisit of one household interviewed the previous day; OBSERVATION OF INTERVIEWS: comments "on a form provided by the Project Directorate" | revisit implies a date; form has no printed layout | not shipped |
+| Supervisor manual printed p.28 (PDF 31) | SUPERVISOR'S REPORT per cycle: "household numbers and the date of the data collection of the cycle", replacements and reasons | cycle dates | not shipped |
+| Data-entry manual printed p.9-10 (PDF 11-12) | diskette label: batch name, "Date on which Batch was prepared", DEO id | keying date | not shipped |
+| Data-entry system (IMPS 3.1) | no automatic timestamps are described anywhere in the DEO manual; the manual does NOT enumerate the keyed fields (it gives screen counts: 37 Part A, 42 Part B) | -- | the wave notes expected this manual to say which cover-page fields were keyed; it does not |
+
+Nowhere on the instrument or in the manuals is a TIME OF DAY or an interview
+DURATION recorded.  "Each interview will last no longer than 1 hour" is an
+instruction, not a field.
+
+* What shipped: instrument field -> distributed variable
+
+Section-0-type files in =Data/= (the User Guide, =GHA_1998_GLSS_Data_User_Guide_EN.pdf=
+PDF p.23-31, is the ONLY document describing them; the DDI
+=ddi-documentation-english-14.pdf= documents no SEC0* file at all):
+
+#+begin_example
+==== SEC0A.DTA  rows=5998 cols=25   (household level; User Guide: "Survey information")
+  region     Region
+  district   District
+  eanum      Enumeration area number
+  nh         Household ID
+  intv       Interviewer ID
+  dd         Day of first visit
+  mm         Month of first visit
+  yy         Year of first visit
+  dwell      Dwelling found
+  samehead   Is head of HH same
+  reslan     Language used by respondent
+  inter      Interpretor used
+  suprvisr   Supervisor ID
+  supday     Verification day of supervisor
+  supmonth   Verification month of superviso
+  supyear    Verification year of superviso
+  reintrvw   Reinterview by supervisor
+  hhrplacs   HH replaces HH ID
+  hhrepby    HH replaced by
+  s0reasns   Reasons for replacement
+  clust      Enumeration area number
+  ez         Ecological zone of HH
+  loc2       Locality classification        (1 Urban, 2 Rural)
+  loc5       Locality classification
+  loc3       Locality classification
+==== SEC0B.DTA  rows=35985 cols=26   (long by visitcd 1..7; User Guide: "Survey information for part A and B")
+  region     Region
+  eanum      Enumeration area number
+  district   District
+  nh         Household ID
+  s0interv   Interviewer ID
+  s0day      Day of first visit
+  s0month    Month of first visit
+  s0year     Year of first visit
+  s0superv   Supervisor ID
+  s0day2     Verification day of supervisor
+  s0month2   Verification month of superviso
+  s0year2    Verification year of superviso
+  s0reintv   Reinterview by supervisor
+  visitcd    Visit id
+  s0dy_sum   Day of visit
+  s0mt_sum   Month of visit
+  s0yr_sum   Yearof visit
+  s0result   Result of visit
+  s0dy2_su   Day of checkup visit
+  s0mt2_su   Month of checkup visit
+  s0yr2_su   Year of checkup visit
+  s0rsltck   Result of checkup visit
+  s0su_int   Interviewer                    (= supervisor's rating of the interviewer, NOT an id)
+  s0deo      Data entry operator            (= rating, NOT an id)
+  socorrct   Correction
+  clust      Enumeration area number
+==== SEC0C.DTA  rows=17988 cols=14   (long by visitcd 1..3; User Guide: "Survey Information")
+  nh         Household ID
+  visitcd    Visit id
+  s0vday     Day of visit
+  s0vmonth   Month of visit
+  s0vyear    Yearof visit
+  s0result   Result of visit
+  s0chkday   Day of checkup visit
+  s0chkmnt   Month of checkup visit
+  s0chkyr    Year of checkup visit
+  s0chkrst   Result of checkup visit
+  s0supntv   Interviewer                    (rating)
+  s0deo      Data entry operator            (rating)
+  s0corrtd   Correction
+  clust      Enumeration area number
+==== SEC9B0.DTA  rows=5999 cols=10   (9B header ids; NO dates)
+  nh         Household ID
+  s9b1id1    Respondent id1
+  s9b1id2    Respondent id2
+  s9b1id3    Respondent id3
+  s9b1id4    Respondent id4
+  s9b1int1   Person interviewed id1
+  s9b1int2   Person interviewed id2
+  s9b1int3   Person interviewed id3
+  s9b1int4   Person interviewed id4
+  clust      Enumeration Area number
+==== SEC8HID.DTA  rows=5744 cols=10  (8H header ids; NO dates)
+  region     Region
+  eanum      EA number
+  district   (no label)
+  roster1    First roster            (string)
+  roster2    Second roster           (string)
+  nh         Household ID
+  s8hresp    Respondent
+  s8hintv    Person interviewed
+  clust      Enumeration Area number
+  hhid       Household reference number
+#+end_example
+
+No value labels in any of these (GLSS4 ships none); the codes above are from
+the questionnaire grid (printed p.03) and the User Guide PDF p.28-31.  A
+metadata scan of all 66 =SEC*.DTA= + Community + Prices files for any
+variable named or labelled day/month/year/date/visit/time/hour/duration finds
+no other visit-date field: outside SEC0A/B/C the hits are dates of birth
+(SEC1), "Time Unit" columns (SEC4/SEC7), and the per-visit AMOUNT columns of
+SEC8H/SEC9A2/SEC9B whose labels name the visit ("2nd visit amount spent")
+but carry no date.
+
+** Which printed field each variable carries
+
+| instrument field | Part A booklet | Part B booklet |
+|------------------+----------------+----------------|
+| cover, FIRST VISIT: interviewer code, date | =SEC0A.intv=, =dd/mm/yy= (5,998/5,998) | =SEC0B.s0interv=, =s0day/s0month/s0year= (repeated on every row; 5,987 HH) -- see below: this is the date of the first PART-B visit for 81% of HH |
+| cover, FIRST VISIT: dwelling found, head same, new head name, language, interpreter, remarks | =dwell=, =samehead=, =reslan=, =inter=; NAME and REMARKS not keyed | none of these keyed |
+| cover, VERIFICATION FIRST VISIT: supervisor code, date, reinterview, replaces/replaced-by, reason | =suprvisr=, =supday/supmonth/supyear=, =reintrvw=, =hhrplacs=, =hhrepby=, =s0reasns= (REMARKS not keyed) | =s0superv=, =s0day2/s0month2/s0year2=, =s0reintv= (replacement fields not keyed) |
+| cover, SECOND..SEVENTH VISIT: interviewer, date, remarks | NO | NO |
+| cover, VERIFICATION SECOND..SEVENTH VISIT: supervisor, date, reinterview, remarks | NO | NO |
+| cover, DATA ENTRY END OF CYCLE: operator, date | NO | NO |
+| cover, EDITING OF PRINTOUTS END OF CYCLE: supervisor, date | NO | NO |
+| SUMMARY grid rows: visit date, result | =SEC0C.s0vday/s0vmonth/s0vyear=, =s0result= -- rows 1-3 ONLY | =SEC0B.s0dy_sum/s0mt_sum/s0yr_sum=, =s0result= -- rows 1-7 (row 1 sparse, row 7 partial; see below) |
+| SUMMARY grid rows: check-up date, result | =SEC0C.s0chkday/s0chkmnt/s0chkyr=, =s0chkrst= (257 rows, 228 HH) | =SEC0B.s0dy2_su/s0mt2_su/s0yr2_su=, =s0rsltck= (324 dated rows / 371 result rows, 261 HH) |
+| SUMMARY grid rows: supervisor's rating of interviewer, DEO rating, corrected | =s0supntv=, =s0deo=, =s0corrtd= | =s0su_int=, =s0deo=, =socorrct= |
+| 8H / 9A2 / 9B header per-visit "dd mm" boxes | n/a | NO (SEC8HID / SEC9B0 carry ids only; SEC9A2 has no id file) |
+| 9A1 "Date of This visit" | n/a | NO |
+| diary; observation sheet; supervisor verification form; supervisor's cycle report; diskette label date | NO | NO |
+
+** What SEC0B and SEC0C ARE (the wave-note question)
+
+The User Guide (PDF p.26) calls SEC0B "Survey information for part A and B"
+and SEC0C just "Survey Information" -- quoted, because it is the only
+description in circulation and it is vaguer than the data.  Read against the
+handover schedule and the dates themselves:
+
+- *SEC0C is the Part A summary grid, keyed for rows FIRST..THIRD only.*
+  Exactly 5,996 households x 3 rows = 17,988; no duplicates.  Its row-1 date
+  equals =SEC0A= =dd/mm/yy= for 5,898 of 5,996 households (the other 98 differ
+  by keying slips: -5..-122 days).  Rows 4-7 of the Part A grid could never be
+  filled because the Part A booklet is handed to the DEO "at the beginning of
+  the 4th visit" (DEO manual printed p.6) -- so those rows were not keyed,
+  and the Part A data-entry program presumably had three visit records.
+  (Two households in SEC0A, =4405-2= and =4809-24=, have no SEC0C rows.)
+- *SEC0B is the Part B summary grid, keyed for all seven rows, plus the
+  Part B cover's first-visit and first-verification fields repeated on every
+  row.*  The Part B cover's "FIRST VISIT" date (=s0day/s0month/s0year=) is
+  =SEC0A= first visit + 5 days for 4,827 of 5,987 households and equal to it
+  for 1,029: most interviewers wrote the date of the first visit AT WHICH
+  PART B WAS USED (calendar visit 2) in the Part B cover.  Likewise its
+  supervisor-verification date is SEC0A's + 5 for 2,319 and equal for 1,454.
+  =s0interv= equals =SEC0A.intv= for 5,382 of 5,988 (the rest: relief
+  interviewer or slip).
+
+Why =visitcd= 1 has 1,940 rows and =visitcd= 7 has 4,079 in SEC0B: the
+interviewers used two conventions in the Part B grid.  Per-household
+classification by the median of (SEC0B row k date - SEC0C row k date) over
+k=1..3:
+
+| convention | HH | rows 1..7 present | what row k holds |
+|------------+------+-------------------+------------------|
+| calendar numbering, row 1 blank (no Part B section is asked at visit 1) | 4,074 | 2..7 | calendar visit k |
+| SHIFTED by one row (row 1 = first Part-B visit) | 1,287 | 1..6, row 7 blank (11 exceptions) | calendar visit k+1 |
+| calendar numbering, row 7 blank | 627 | 1..6 | calendar visit k; 7th-visit date NOT RECORDED |
+| calendar numbering, all seven rows | 10 | 1..7 | calendar visit k |
+(12 further households have no SEC0C match and fall into the first bucket
+by default; 8 rows have null =visitcd=.)
+
+Evidence: has-row-1 x has-row-7 is 4,064 / 1,902 / 14 / 18 (neither);
+SEC0B row k minus SEC0A first visit has median 5(k-1) for the calendar group
+and 5k for the shifted group (row 1: 1,246 households at +5, 555 at 0; row 6:
++25 vs +30).  For the 627 "row 7 blank" households the 7th visit DID happen:
+=SEC9B.s9bq6= ("7th visit amount spent") is positive for at least one item
+in 618 of 627 (98.6%; reference group 99.5%) and =SEC8H.s8hq8= in 58.9% (vs
+65.3%).  Only its date is missing.  Nothing in the User Guide or the
+questionnaire says which convention was intended; the printed grid says
+FIRST..SEVENTH, and the interviewer manual (printed p.15) says "for each visit
+you should show the date on which you asked the questions", which favours
+calendar numbering.
+
+Also in SEC0B: 148 households (in 111 clusters) have two rows under the same
+=visitcd= (298 rows) -- typically two consecutive visit dates keyed under one
+code, e.g. =4005-16= row 3 on 20/6/98 and 25/6/98 -- and 8 rows have null
+=visitcd=.  Ten household ids in SEC0B have no SEC0A counterpart and vice
+versa in the same ten clusters (=4102-13= vs =4102-14=, ...): the household
+number was keyed differently in the Part A and Part B batches.
+
+** Per-visit non-null counts (raw, as shipped)
+
+SEC0C (Part A grid):
+| visitcd | rows | visit date | result | check-up date | check-up result | interviewer rating | DEO | corrected |
+|---------+------+------------+--------+---------------+-----------------+--------------------+-----+-----------|
+| 1 | 5,996 | 5,996 | 5,995 | 94 | 93 | 5,996 | 1,068 | 1,209 |
+| 2 | 5,996 | 5,995 | 5,993 | 68 | 68 | 5,996 | 1,070 | 1,150 |
+| 3 | 5,996 | 5,996 | 5,992 | 95 | 93 | 5,996 | 1,072 | 1,186 |
+
+SEC0B (Part B grid):
+| visitcd | rows | visit date | result | check-up date | check-up result | interviewer rating | DEO | corrected |
+|---------+-------+------------+--------+---------------+-----------------+--------------------+-------+-----------|
+| 1 | 1,940 | 1,940 | 1,940 | 20 | 30 | 1,940 | 617 | 637 |
+| 2 | 6,001 | 6,000 | 6,001 | 65 | 70 | 6,001 | 1,204 | 1,264 |
+| 3 | 5,991 | 5,991 | 5,991 | 41 | 46 | 5,991 | 1,191 | 1,219 |
+| 4 | 6,001 | 5,999 | 6,001 | 85 | 89 | 6,001 | 1,203 | 1,248 |
+| 5 | 5,999 | 5,999 | 5,999 | 52 | 62 | 5,999 | 1,196 | 1,250 |
+| 6 | 5,966 | 5,966 | 5,965 | 46 | 59 | 5,965 | 1,183 | 1,204 |
+| 7 | 4,079 | 4,079 | 4,079 | 15 | 15 | 4,079 | 599 | 604 |
+
+Four SEC0B / SEC0C date triplets are unparseable (29/2/99, 30/2/99 x2,
+31/9/98).  Dates outside the DDI fieldwork window 1998-04..1999-03 (DDI PDF
+p.10): SEC0A first visit 0 of 5,998 (range 1998-04-01..1999-02-25, ~600 HH
+starting per month except Sep-Oct 1998 with 362 + 239); SEC0B visit dates
+30 of 35,974 (range 1998-01-03..1999-12-31); SEC0C 4 of 17,987.  Successive
+row-to-row gaps that are negative: SEC0B 187, SEC0C 62; gaps > 30 days: 78 and
+26 -- all keying slips of a month, a year, or a digit (-360, -86, -26, -25
+cluster).  Weekday of visits is uniform (Mon..Sun 5,906-6,024 each): no
+weekend pause.
+
+** Result-code vocabulary (decoded from the grid, printed p.03 / 8.03, and User Guide PDF p.28-31)
+
+- =s0result= RESULT of visit: 1 COMPLETE, 2 PARTIAL, 3 NOT APPLICABLE
+  ("This can happen in only two sections: Section 8 ... and section 10",
+  interviewer manual printed p.15).  SEC0B: 35,699 / 239 / 38 (9 null);
+  SEC0C: 17,712 / 259 / 8, plus ONE row coded 4 (out of vocabulary; 8 null).
+- =s0rsltck= / =s0chkrst= RESULT of check-up visit: 1 COMPLETE, 2 PARTIAL.
+  SEC0B 369 / 2; SEC0C 252 / 2.  Check-up date minus visit date: median 2
+  days in both files.  (Independent of =SEC0A.reintrvw= = 1 for 611 HH,
+  which is the cover-sheet "reinterview by supervisor" flag.)
+- =s0su_int= / =s0supntv= SUPERVISOR's rating of the INTERVIEWER: 1
+  SATISFACTORY, 2 TO BE COMPLETED, 3 TO BE REDONE.  SEC0B 35,623 / 316 / 37;
+  SEC0C 17,527 / 389 / 72.
+- =s0deo= DATA ENTRY OPERATOR: 1 SATISFACTORY, 2 CORRECTION.  SEC0B 7,192 /
+  1; SEC0C 3,208 / 2 (blank on the rest: the supervisor filled it only for
+  keyed-and-checked rows).
+- =socorrct= / =s0corrtd= CORRECTED: 1 IN OFFICE, 2 DURING NEXT VISIT, 3
+  DURING CHECK-UP VISIT, 4 NOT CORRECTED.  SEC0B 5,061 / 51 / 181 / 2,133;
+  SEC0C 1,896 / 73 / 261 / 1,315.
+- User Guide slip (PDF p.30): it labels SEC0C =S0SUPNTV= "Result of check-up
+  visit" with codes Satisfactory / To be completed / To be redone (the
+  interviewer-rating codes) and omits =S0CHKRST= altogether; the file's own
+  labels (=s0chkrst= "Result of checkup visit", =s0supntv= "Interviewer") and
+  the printed grid are right.
+
+** Median gap between successive visits
+
+Raw, per file (all rows, including the shifted households and keying slips):
+every step 1->2 .. 6->7 in SEC0B and 1->2, 2->3 in SEC0C has median 5.0 days,
+urban and rural alike (SEC0B 1->2 n=1,897; 2->3 n=5,930; ... 6->7 n=4,056;
+SEC0C n=5,985 per step).
+
+Composite calendar (SEC0C rows 1-3 as calendar visits 1-3; SEC0B rows de-
+shifted per household as calendar 4-7), gaps restricted to the plausible
+0..30-day range (98.5-99.3% of gaps qualify at every step):
+
+| step | n (0..30) | median | mean | exactly 5 | urban median (mean, n) | rural median (mean, n) |
+|------+-----------+--------+------+-----------+------------------------+------------------------|
+| 1->2 | 5,946 | 5 | 5.03 | 98.9% | 5 (5.00, 2,175) | 5 (5.04, 3,771) |
+| 2->3 | 5,936 | 5 | 5.05 | 98.6% | 5 (5.04, 2,173) | 5 (5.05, 3,763) |
+| 3->4 | 5,893 | 5 | 5.01 | 97.8% | 5 (5.03, 2,156) | 5 (5.00, 3,737) |
+| 4->5 | 5,900 | 5 | 5.04 | 97.5% | 5 (5.03, 2,154) | 5 (5.04, 3,736) |
+| 5->6 | 5,880 | 5 | 5.05 | 96.7% | 5 (5.05, 2,140) | 5 (5.06, 3,731) |
+| 6->7 | 5,234 | 5 | 5.00 | 97.2% | 5 (5.01, 1,877) | 5 (4.99, 3,356) |
+
+Span visit 1 -> visit 7: median 30 days, mean 29.9, 97.3% exactly 30, urban
+= rural = 30.  5,256 households have all seven dates (5,049 of them with
+every gap in 0..30); 5,985 have at least six.  Urban/rural (=SEC0A.loc2=
+1/2; 2,199 / 3,799 HH) differ in NOTHING here: unlike GLSS3, GLSS4 has one
+schedule for both strata.
+
+Alignment of SEC0C row 1 with SEC0A: equal for 5,898 / 5,996 (98.4%); of the
+98 that differ, all are negative (SEC0C earlier by 3..122 days) and look like
+month/year slips in one file or the other.  SEC0B row 1 vs SEC0A: +5 days for
+1,253 / 1,908, 0 for 554 -- the shift again.
+
+* The NSO request for this wave
+
+GLSS4 already ships COMPLETE DATES of the seven interviewer visits, as far as
+the survey itself recorded them: SEC0C rows 1-3 plus SEC0B rows 2-7 (after the
+per-household de-shift above) give all seven dates for 5,256 of 5,998
+households, six for 5,985, and the 7th-visit date is the only systematic gap
+(627 households).  It also ships a result code per visit, check-up (supervisor
+revisit) dates and results, and the supervisor's per-visit ratings.  The
+request for this wave is therefore NOT for visit dates.  Ask GSS for the
+following, named as the instrument names them:
+
+1. TIME OF DAY / DURATION: not on the instrument.  Nothing to request; say
+   so.  The only statement is "each interview will last no longer than 1
+   hour" (Interviewer manual printed p.14).  IMPS 3.1 keying produced no
+   timestamps that any manual describes.
+2. Household Questionnaire Part A and Part B, SURVEY INFORMATION sheet
+   (printed pp.01-02 and 8.01-8.02): the SECOND .. SEVENTH VISIT boxes
+   ("INTERVIEWER" name+code, "DATE", "REMARKS") and the VERIFICATION OF
+   QUESTIONNAIRE, SECOND .. SEVENTH VISIT boxes ("SUPERVISOR", "DATE",
+   "REINTERVIEW BY SUPERVISOR?", "REMARKS"); the "DATA ENTRY, END OF CYCLE"
+   ("OPERATOR", "DATE") and "EDITING OF PRINTOUTS, END OF CYCLE"
+   ("SUPERVISOR", "DATE") boxes.  Only the FIRST VISIT and its verification
+   were keyed.  These would give per-visit INTERVIEWER identity (the summary
+   grid has no interviewer column -- =s0su_int= is a rating) and the
+   supervisor's per-visit verification dates.
+3. Part B, Section 8H (printed p.8.11), 9A2 (p.9.6) and 9B (p.9.11) header
+   boxes "2nd 3rd 4th 5th 6th 7th  dd mm" -- the date of each visit at which
+   the module was asked -- and Section 9A1 (p.9.1-9.2) "Date of This visit
+   dd mm".  Not keyed (SEC8HID / SEC9B0 carry respondent ids only).  These
+   would (a) supply the missing 7th-visit date for the 627 households and
+   (b) resolve the SEC0B row-shift without inference.
+4. The urban DIARY booklets ("A dairy of daily consumption and expenditure",
+   Interviewer manual printed p.8, p.49): daily, item-level purchase dates
+   for urban households; and any record of the SUPERVISOR'S DAILY VISITS to
+   illiterate urban households (printed p.8, p.12), which appear in no file.
+5. Supervisor's VERIFICATION OF THE QUESTIONNAIRE forms (Supervisor manual
+   printed pp.14-15, "SUPERVISOR: ... DATE: ...", one per household per
+   cycle, "sent to Accra with the questionnaires"), the VERIFICATION OF
+   INTERVIEWS / OBSERVATION OF INTERVIEWS forms (printed p.22), the
+   interviewer's OBSERVATION SHEET (Interviewer manual printed p.15) and the
+   per-cycle SUPERVISOR'S REPORT (printed p.28: "household numbers and the
+   date of the data collection of the cycle").
+
+* Idiosyncrasies and contradictions
+
+1. *SEC0B row shift (above).*  1,287 households' Part B grids start at the
+   first Part-B visit, 627 omit the 7th, 4,074 use calendar rows.  Any use
+   of =SEC0B.visitcd= as the calendar visit is wrong for 21% of households
+   until de-shifted against SEC0C / SEC0A.  Not in CONTENTS.org.
+2. *SEC0B's cover "first visit" is calendar visit 2 for 81% of households*
+   (=s0day/s0month/s0year= = SEC0A + 5 for 4,827 / 5,987).  Do not wire it as
+   the interview date; SEC0A's is the first visit.
+3. *CONTENTS.org l.1436-1450 vs this measurement.*  CONTENTS says "Bin GLSS4
+   households by measured exposure and total spend is flat while the implied
+   daily rate spans 2.7x, entirely from the denominator", without naming the
+   file the intervals came from.  Measured here: 97-99% of successive gaps
+   are exactly 5 days; the residual variation in raw SEC0B is dominated by
+   the untreated row shift (a 0- or 10-day step where the two conventions
+   meet) and keying slips (-360, -86, -26).  Quoted side by side, not
+   adjudicated: CONTENTS's input file is not named, and this measurement
+   is of the raw SEC0B / SEC0C files as shipped.
+4. *CONTENTS.org's first-ask discussion* ("the 'last visit' it refers back to
+   is the intake visit, which need not be five days earlier") -- the realised
+   first interval IS five days (98.9% exactly 5), but the PROTOCOL window for
+   the first ask is six: Interviewer manual printed p.50, "since the past 6
+   days, starting from the day prior to your first visit", and the 9A2 / 9B
+   first column prints "since my first visit?".  So a 6/5 = 1.20 window
+   ratio is built in by design (the 1998-99 first-ask row ratio in CONTENTS
+   is 84,253 / 73,701 = 1.14).  Additive evidence, not a contradiction.
+5. *Section-by-visit table*: both manuals put 9A1 at the 7th visit, 10 at
+   the 5th and 11 at the 6th; the printed grid (p.03 / 8.03) puts 9A1 at the
+   5th, 10 at the 6th, 11 at the 7th.  8H / 9A2 / 9B at 2-7 in all.
+6. *Diary is urban-only in GLSS4* (as GLSS3), with daily supervisor visits to
+   illiterate urban households; CONTENTS.org's GLSS4 row does not say so.
+7. *The DDI documents no SEC0* file*; the User Guide's SEC0B / SEC0C entries
+   are the only description, SEC0B's says "part A and B", and its SEC0C entry
+   mislabels =S0SUPNTV= and omits =S0CHKRST= (above).
+8. *The data-entry manual does not enumerate keyed fields* (37 / 42 screens
+   only), contrary to what the wave notes expected of it.  Which cover-page
+   fields were keyed is established here from the files, not from a document.
+9. *Keyed in one booklet, not the other*: the FIRST-VISIT replacement
+   fields (REPLACES / REPLACED BY / REASON) are printed on both covers and
+   keyed only from Part A (=SEC0A.hhrplacs/hhrepby/s0reasns=); the FIRST-VISIT
+   dwelling/head/language/interpreter fields likewise.  Not a request --
+   the information is already shipped.
+10. *Ten household-number mismatches* between the Part A batch (SEC0A / SEC0C)
+   and the Part B batch (SEC0B) in ten clusters; 148 duplicate (household,
+   visitcd) rows in SEC0B; one =s0result= = 4 in SEC0C; four impossible date
+   triplets.
+11. *Wiring suggestion (not done; brief forbids edits)*: =interview_date=
+    could carry all seven dates on a =visit= level via =melt_visit_intervals=
+    from SEC0C (1-3) + de-shifted SEC0B (4-7); no GhanaLSS wave currently
+    does this and the helper is unused corpus-wide.  The de-shift rule
+    (median of SEC0B row k minus SEC0C row k over k=1..3 in 3..7 days =>
+    shifted) is deterministic and would want a test.

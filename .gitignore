@@ -81,7 +81,30 @@ lsms_library/countries/*/var/*
 
 # Ignore particular files involving credentials
 /Uganda/_/compare_unit_labels.py
-/Uganda/_/unitlabels.csv
+# --- config CSVs under a country's _/ : SELECTED un-ignores (GH #790) -----
+# `*.csv` above keeps microdata out of git.  But `.csv` is also in
+# `_BUILD_INPUT_SUFFIXES`, so a CSV in a country's `_/` is a hashed build
+# input -- invisible to git and load-bearing for cache freshness at the same
+# time.  That combination made two clean checkouts of the same commit
+# disagree on all 28 of Uganda's cache hashes, silently, because a generated
+# `fct_usda.csv` existed in one of them and not the other.
+#
+# These are configuration and curated reference tables, not microdata, so
+# un-ignore them BY NAME -- deliberately not a blanket `_/*.csv`, which would
+# re-admit anything anyone drops in that directory.  A generated one then
+# shows up in `git status` instead of shifting hashes unseen.
+#
+# The previous line here was `/Uganda/_/unitlabels.csv`, anchored at the repo
+# root and therefore stale since countries moved under `lsms_library/`; it had
+# stopped matching anything.
+!lsms_library/countries/*/_/fct_*.csv
+!lsms_library/countries/*/_/unitlabels.csv
+!lsms_library/countries/*/_/unit_labels.csv
+!lsms_library/countries/*/_/food_items.csv
+!lsms_library/countries/*/_/central_american_fct*.csv
+!lsms_library/countries/*/*/_/food_label.csv
+!lsms_library/countries/*/*/_/ihs3_conversions.csv
+!lsms_library/countries/Panama/1997/Data/unittable.csv
 
 # Other ignored patterns
 .coder-session/

@@ -1,0 +1,402 @@
+{
+ "generated": "2026-09-12 04:06:48",
+ "elapsed_s": 5.7,
+ "cells_total": 970,
+ "records": 1005,
+ "status_counts": {
+  "unique": 838,
+  "diffed": 112,
+  "uncensused": 55
+ },
+ "cells_uncensused": 55,
+ "rows_changed_total": 1025,
+ "served_na_new_total": 2714,
+ "destroyed_total": 105137,
+ "derivation_conflicts_total": 0,
+ "by_site": {
+  "rows_changed": {
+   "Site1": 948.0,
+   "Site2": 77.0
+  },
+  "served_na_new_total": {
+   "Site1": 2560.0,
+   "Site2": 154.0
+  }
+ },
+ "by_table": {
+  "rows_changed": {
+   "housing": 524.0,
+   "shocks": 149.0,
+   "assets": 176.0,
+   "household_roster": 45.0,
+   "cluster_features": 77.0,
+   "individual_education": 36.0,
+   "plot_inputs": 18.0,
+   "crop_production": 0.0,
+   "food_acquired": 0.0,
+   "food_security": 0.0,
+   "interview_date": 0.0,
+   "sample": 0.0
+  },
+  "served_na_new_total": {
+   "housing": 1048.0,
+   "shocks": 758.0,
+   "assets": 520.0,
+   "household_roster": 180.0,
+   "cluster_features": 154.0,
+   "individual_education": 36.0,
+   "plot_inputs": 18.0,
+   "crop_production": 0.0,
+   "food_acquired": 0.0,
+   "food_security": 0.0,
+   "interview_date": 0.0,
+   "sample": 0.0
+  }
+ },
+ "rows_changed_raw_total": 1211233,
+ "conflicting_groups_total": 30815,
+ "unauditable_records": 0,
+ "site2_cols_involved": [
+  "Latitude",
+  "Longitude"
+ ],
+ "stamp_reconciliation": {
+  "cells_compared": 51,
+  "cells_agreeing": 51,
+  "mismatches": []
+ },
+ "top15_served_na_new": [
+  {
+   "country": "Kosovo",
+   "table": "housing",
+   "wave": "2000",
+   "site": "Site1",
+   "rows": 7047.0,
+   "destroyed": 4182.0,
+   "rows_changed": 524.0,
+   "served_na_new_total": 1048.0,
+   "served_na_new_by_col": "{\"Rooms\": 524, \"Tenure\": 524}"
+  },
+  {
+   "country": "Malawi",
+   "table": "shocks",
+   "wave": "2004-05",
+   "site": "Site1",
+   "rows": 203044.0,
+   "destroyed": 291.0,
+   "rows_changed": 124.0,
+   "served_na_new_total": 616.0,
+   "served_na_new_by_col": "{\"AffectedAssets\": 122, \"AffectedIncome\": 122, \"HowCoped0\": 124, \"HowCoped1\": 124, \"HowCoped2\": 124}"
+  },
+  {
+   "country": "Niger",
+   "table": "assets",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 122978.0,
+   "destroyed": 481.0,
+   "rows_changed": 172.0,
+   "served_na_new_total": 516.0,
+   "served_na_new_by_col": "{\"Age\": 172, \"Purchase Price\": 172, \"Quantity\": 172}"
+  },
+  {
+   "country": "Niger",
+   "table": "household_roster",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 26579.0,
+   "destroyed": 210.0,
+   "rows_changed": 45.0,
+   "served_na_new_total": 180.0,
+   "served_na_new_by_col": "{\"Age\": 45, \"MonthsSpent\": 45, \"Relationship\": 45, \"Sex\": 45}"
+  },
+  {
+   "country": "Niger",
+   "table": "shocks",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 72340.0,
+   "destroyed": 80.0,
+   "rows_changed": 24.0,
+   "served_na_new_total": 137.0,
+   "served_na_new_by_col": "{\"AffectedAssets\": 23, \"AffectedConsumption\": 23, \"AffectedIncome\": 23, \"AffectedProduction\": 23, \"HowCoped0\": 23, \"HowCoped1\": 14, \"HowCoped2\": 8}"
+  },
+  {
+   "country": "Niger",
+   "table": "individual_education",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 26579.0,
+   "destroyed": 58.0,
+   "rows_changed": 36.0,
+   "served_na_new_total": 36.0,
+   "served_na_new_by_col": "{\"Educational Attainment\": 36}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2012Q3",
+   "site": "Site2",
+   "rows": 4898.0,
+   "destroyed": 609.0,
+   "rows_changed": 14.0,
+   "served_na_new_total": 28.0,
+   "served_na_new_by_col": "{\"Latitude\": 14, \"Longitude\": 14}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2013Q1",
+   "site": "Site2",
+   "rows": 4898.0,
+   "destroyed": 609.0,
+   "rows_changed": 14.0,
+   "served_na_new_total": 28.0,
+   "served_na_new_by_col": "{\"Latitude\": 14, \"Longitude\": 14}"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "cluster_features",
+   "wave": "2021-22",
+   "site": "Site2",
+   "rows": 4959.0,
+   "destroyed": 1240.0,
+   "rows_changed": 10.0,
+   "served_na_new_total": 20.0,
+   "served_na_new_by_col": "{\"Latitude\": 10, \"Longitude\": 10}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2015Q3",
+   "site": "Site2",
+   "rows": 4697.0,
+   "destroyed": 618.0,
+   "rows_changed": 9.0,
+   "served_na_new_total": 18.0,
+   "served_na_new_by_col": "{\"Latitude\": 9, \"Longitude\": 9}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2016Q1",
+   "site": "Site2",
+   "rows": 4697.0,
+   "destroyed": 618.0,
+   "rows_changed": 9.0,
+   "served_na_new_total": 18.0,
+   "served_na_new_by_col": "{\"Latitude\": 9, \"Longitude\": 9}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2018Q3",
+   "site": "Site2",
+   "rows": 5263.0,
+   "destroyed": 1254.0,
+   "rows_changed": 8.0,
+   "served_na_new_total": 16.0,
+   "served_na_new_by_col": "{\"Latitude\": 8, \"Longitude\": 8}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2019Q1",
+   "site": "Site2",
+   "rows": 5263.0,
+   "destroyed": 1254.0,
+   "rows_changed": 8.0,
+   "served_na_new_total": 16.0,
+   "served_na_new_by_col": "{\"Latitude\": 8, \"Longitude\": 8}"
+  },
+  {
+   "country": "Niger",
+   "table": "plot_inputs",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 8179.0,
+   "destroyed": 88.0,
+   "rows_changed": 11.0,
+   "served_na_new_total": 11.0,
+   "served_na_new_by_col": "{\"Quantity_purchased\": 11}"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "cluster_features",
+   "wave": "2011-12",
+   "site": "Site2",
+   "rows": 3969.0,
+   "destroyed": 373.0,
+   "rows_changed": 3.0,
+   "served_na_new_total": 6.0,
+   "served_na_new_by_col": "{\"Latitude\": 3, \"Longitude\": 3}"
+  }
+ ],
+ "top15_rows_changed": [
+  {
+   "country": "Kosovo",
+   "table": "housing",
+   "wave": "2000",
+   "site": "Site1",
+   "rows": 7047.0,
+   "destroyed": 4182.0,
+   "rows_changed": 524.0,
+   "served_na_new_total": 1048.0,
+   "cols_involved": "Rooms|Tenure"
+  },
+  {
+   "country": "Niger",
+   "table": "assets",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 122978.0,
+   "destroyed": 481.0,
+   "rows_changed": 172.0,
+   "served_na_new_total": 516.0,
+   "cols_involved": "Quantity|Age|Purchase Price"
+  },
+  {
+   "country": "Malawi",
+   "table": "shocks",
+   "wave": "2004-05",
+   "site": "Site1",
+   "rows": 203044.0,
+   "destroyed": 291.0,
+   "rows_changed": 124.0,
+   "served_na_new_total": 616.0,
+   "cols_involved": "AffectedIncome|AffectedAssets|HowCoped0|HowCoped1|HowCoped2"
+  },
+  {
+   "country": "Niger",
+   "table": "household_roster",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 26579.0,
+   "destroyed": 210.0,
+   "rows_changed": 45.0,
+   "served_na_new_total": 180.0,
+   "cols_involved": "Sex|Age|Relationship|MonthsSpent"
+  },
+  {
+   "country": "Niger",
+   "table": "individual_education",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 26579.0,
+   "destroyed": 58.0,
+   "rows_changed": 36.0,
+   "served_na_new_total": 36.0,
+   "cols_involved": "Educational Attainment"
+  },
+  {
+   "country": "Niger",
+   "table": "shocks",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 72340.0,
+   "destroyed": 80.0,
+   "rows_changed": 24.0,
+   "served_na_new_total": 137.0,
+   "cols_involved": "AffectedIncome|AffectedAssets|AffectedProduction|AffectedConsumption|HowCoped0|HowCoped1|HowCoped2"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2012Q3",
+   "site": "Site2",
+   "rows": 4898.0,
+   "destroyed": 609.0,
+   "rows_changed": 14.0,
+   "served_na_new_total": 28.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2013Q1",
+   "site": "Site2",
+   "rows": 4898.0,
+   "destroyed": 609.0,
+   "rows_changed": 14.0,
+   "served_na_new_total": 28.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Niger",
+   "table": "plot_inputs",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 8179.0,
+   "destroyed": 88.0,
+   "rows_changed": 11.0,
+   "served_na_new_total": 11.0,
+   "cols_involved": "Quantity_purchased"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "cluster_features",
+   "wave": "2021-22",
+   "site": "Site2",
+   "rows": 4959.0,
+   "destroyed": 1240.0,
+   "rows_changed": 10.0,
+   "served_na_new_total": 20.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2015Q3",
+   "site": "Site2",
+   "rows": 4697.0,
+   "destroyed": 618.0,
+   "rows_changed": 9.0,
+   "served_na_new_total": 18.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2016Q1",
+   "site": "Site2",
+   "rows": 4697.0,
+   "destroyed": 618.0,
+   "rows_changed": 9.0,
+   "served_na_new_total": 18.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2018Q3",
+   "site": "Site2",
+   "rows": 5263.0,
+   "destroyed": 1254.0,
+   "rows_changed": 8.0,
+   "served_na_new_total": 16.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Nigeria",
+   "table": "cluster_features",
+   "wave": "2019Q1",
+   "site": "Site2",
+   "rows": 5263.0,
+   "destroyed": 1254.0,
+   "rows_changed": 8.0,
+   "served_na_new_total": 16.0,
+   "cols_involved": "Latitude|Longitude"
+  },
+  {
+   "country": "Burkina_Faso",
+   "table": "plot_inputs",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 22877.0,
+   "destroyed": 163.0,
+   "rows_changed": 5.0,
+   "served_na_new_total": 5.0,
+   "cols_involved": "Quantity_purchased"
+  }
+ ]
+}

@@ -695,13 +695,40 @@
 # Where a crop is also a consumed food the Preferred Label REUSES the
 # harmonize_food *Aggregate Label* string (Maize, Beans, Rice, Sorghum,
 # Cassava, Sweet Potatoes, Ground Nuts, Sim Sim, Coffee, Tea, Onions,
-# Tomatoes, Cabbages, Sugarcane, Mangos, Oranges, Pineapple, Avocado,
-# Pawpaw, Passion Fruits, Soybean, Yam, Jackfruit, Millet) so
+# Tomatoes, Cabbages, Sugarcane, Mangos, Oranges, Passion Fruits, Soybean,
+# Yam, Jackfruit, Matoke, Millet, Dodo, Ginger, Sweet Bananas) so
 # crop_production.j joins food_acquired(labels='Aggregate').j.  Non-food
-# crops (Cotton, Tobacco, Cocoa, Vanilla, Sunflower, Finger Millet, Field
-# / Cow / Pigeon / Chick Peas, Banana Beer, Cocoyam, Green Gram) get new
+# crops (Cotton, Tobacco, Cocoa, Vanilla, Sunflower, Field / Cow / Pigeon
+# / Chick Peas, Banana Beer, Cocoyam, Green Gram, Barley, Wheat) get new
 # labels.  Land-status / non-crop codes (Fallow, Bush, Pastures, Forest,
 # Other) keep their literal label.
+#
+# Corrected 2026-09-08 (price-source comparison).  The list above used to
+# name Pineapple, Avocado and Pawpaw as reused Aggregate Labels -- none of
+# the three IS a harmonize_food Aggregate Label (the food module buckets
+# them into 'Other Fruits'), so the claim was false.  It also named
+# "Millet" in the reuse list while code 141 was labelled 'Finger Millet'
+# AND listed 'Finger Millet' among the crops that "get new labels" -- the
+# comment contradicted itself, and the label did not join.  Two codes
+# actually broke the stated contract and are fixed:
+#
+#   141  'Finger Millet' -> 'Millet'  (harmonize_food Aggregate Label of
+#        codes 115 Millet / 1151 Millet Flour; finger millet is the only
+#        millet the UNPS crop scheme records, so nothing is conflated)
+#   741  'Banana Food'   -> 'Matoke'  (Aggregate Label of codes 100-104,
+#        Matoke bunch/cluster/heap/other; "banana food" is the cooking
+#        banana, i.e. matooke -- code 742 'Banana Beer' is the beer variety
+#        and stays distinct, and 744 'Sweet Bananas' already joined)
+#
+# Measured effect: crop sale rows whose j joins the food Aggregate axis go
+# from 33 806 to 41 600 of 45 519 (74% -> 91%); 'Banana Food' was the
+# SECOND-largest crop by sale rows (6 793) and joined nothing.
+#
+# Deliberately NOT changed: Field / Cow / Pigeon / Chick Peas would all
+# have to fold into the single food label 'Peas', and Avocado / Pineapple /
+# Pawpaw into 'Other Fruits', Eggplant / Pumpkins / Carrots into
+# 'Other Veg.'.  Folding a named crop into a residual bucket is a
+# modelling decision, not a defect, and it is lossy in one direction only.
 #+name: harmonize_crop
 | Code | Preferred Label  |
 |------+------------------|
@@ -709,7 +736,7 @@
 |  112 | Barley           |
 |  120 | Rice             |
 |  130 | Maize            |
-|  141 | Finger Millet    |
+|  141 | Millet           |
 |  150 | Sorghum          |
 |  210 | Beans            |
 |  211 | Beans            |
@@ -741,7 +768,7 @@
 |  700 | Oranges          |
 |  710 | Pawpaw           |
 |  720 | Pineapple        |
-|  741 | Banana Food      |
+|  741 | Matoke           |
 |  742 | Banana Beer      |
 |  744 | Sweet Bananas    |
 |  750 | Mangos           |

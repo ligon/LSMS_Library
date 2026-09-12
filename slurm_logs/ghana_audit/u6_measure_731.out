@@ -1,0 +1,279 @@
+
+===== 1987-88  Y03I.DAT:GRADE =====
+dtype: str  n = 12446  null = 4903
+--- full value_counts (raw, stringified) ---
+GRADE
+NaN     4903
+M4      1910
+P1       627
+NONE     615
+P2       571
+P3       532
+P6       510
+P4       434
+P5       410
+M2       400
+M1       398
+M3       369
+S5       175
+K        101
+S2        76
+T4        74
+S1        72
+S3        63
+A2        51
+S4        47
+PS3       22
+U4        13
+T2         9
+T1         9
+U3         9
+A1         8
+U1         8
+U2         7
+T3         6
+PS1        5
+PS2        5
+U5         2
+U8         2
+B          1
+U6         1
+U7         1
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'T4': 74, 'A2': 51, 'PS3': 22, 'U4': 13, 'T2': 9, 'T1': 9, 'U3': 9, 'A1': 8, 'U1': 8, 'U2': 7, 'T3': 6, 'PS1': 5, 'PS2': 5, 'U5': 2, 'U8': 2, 'U6': 1, 'U7': 1}
+
+===== 1988-89  Y03I.DAT:GRADE =====
+dtype: str  n = 11919  null = 2977
+--- full value_counts (raw, stringified) ---
+GRADE
+NaN     2977
+M4      1776
+B       1385
+NONE     806
+P1       654
+P2       603
+P3       520
+P6       492
+P4       459
+P5       448
+M1       404
+M2       380
+M3       323
+S5       168
+S2        73
+K         73
+T4        70
+S1        64
+S3        63
+A2        50
+S4        44
+PS3       18
+U3        12
+U4         8
+A1         8
+U2         7
+T3         7
+T2         6
+PS2        5
+U6         4
+PS1        3
+U1         3
+U8         2
+T1         2
+U5         1
+JSS2       1
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'T4': 70, 'A2': 50, 'PS3': 18, 'U3': 12, 'U4': 8, 'A1': 8, 'U2': 7, 'T3': 7, 'T2': 6, 'PS2': 5, 'U6': 4, 'PS1': 3, 'U1': 3, 'U8': 2, 'T1': 2, 'U5': 1}
+
+===== 1991-92  S2.DTA:s2q2 =====
+dtype: str  n = 17168  null = 0
+--- full value_counts (raw, stringified) ---
+s2q2
+        6390
+M4      2587
+P1       883
+P2       863
+P3       801
+P5       765
+P6       741
+P4       710
+NONE     625
+S5       367
+JSS1     333
+JSS2     329
+JSS3     316
+M2       267
+M1       222
+M3       206
+S3       128
+S1       123
+S2       115
+T4        82
+S4        81
+A2        66
+K         42
+PS3       26
+U3        13
+A1        12
+U4        11
+U2        11
+PS2       10
+U6         8
+T2         7
+T3         6
+U8         6
+T1         4
+U5         4
+PS1        4
+U7         2
+U1         2
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'T4': 82, 'A2': 66, 'PS3': 26, 'U3': 13, 'A1': 12, 'U4': 11, 'U2': 11, 'PS2': 10, 'U6': 8, 'T2': 7, 'T3': 6, 'U8': 6, 'T1': 4, 'U5': 4, 'PS1': 4, 'U7': 2, 'U1': 2}
+
+===== 1998-99  SEC2A.DTA:s2aq2 =====
+dtype: float64  n = 22211  null = 5629
+--- full value_counts (raw, stringified) ---
+s2aq2
+NaN     5629
+2.0     4977
+3.0     3067
+4.0     2829
+1.0     2226
+5.0     1785
+8.0      386
+6.0      374
+7.0      173
+11.0     143
+17.0     142
+9.0      128
+10.0     119
+12.0      72
+15.0      66
+16.0      52
+96.0      17
+13.0      16
+14.0      10
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+NONE
+
+===== 2005-06  parta/sec2a.dta:s2aq2 =====
+dtype: object  n = 33677  null = 10297
+--- full value_counts (raw, stringified) ---
+s2aq2
+NaN                 10297
+m4                   2559
+jss3                 2514
+none                 2471
+preschool            1577
+p6                   1545
+p3                   1458
+p2                   1448
+p1                   1373
+p5                   1359
+p4                   1331
+sss3                 1046
+jss1                  993
+jss2                  774
+voc                   497
+sss1                  354
+sss2                  307
+m1                    247
+s5                    244
+university            206
+teacher training      203
+m3                    192
+m2                    183
+polytechnic           179
+u6                     74
+other tertiary         67
+nursing                49
+other                  31
+s2                     31
+s3                     22
+l6                     22
+s1                     12
+s4                     12
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'u6': 74, 'l6': 22}
+
+===== 2012-13  PARTA/SEC2a.dta:s2aq2 =====
+dtype: object  n = 66227  null = 15668
+--- full value_counts (raw, stringified) ---
+s2aq2
+NaN               15668
+JSS3/JHS3          5967
+None               5506
+P6                 3667
+M4                 3647
+Pre school         3510
+P3                 3167
+P2                 3043
+P1                 2945
+P5                 2940
+P4                 2845
+SSS3/SHS3          2613
+JSS1/JHS1          2502
+JSS/JHS 2          1797
+University          889
+SS1/SHS1            801
+Voc//Tec            799
+SHS4                796
+SSS2/SHS2           609
+Polytechnic         475
+tech training       462
+M1                  299
+S5                  292
+M2                  228
+M3                  169
+Nursing             140
+U6                  131
+Other tertiary       75
+S4                   59
+S3                   57
+L6                   43
+S2                   43
+S1                   28
+Other                15
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'U6': 131, 'L6': 43}
+
+===== 2016-17  g7sec2.dta:s2aq2 =====
+dtype: object  n = 54516  null = 12376
+--- full value_counts (raw, stringified) ---
+s2aq2
+NaN                   12376
+None                   7924
+JSS3/JHS3              4343
+SSS3/SHS3              2841
+P3                     2626
+P5                     2531
+P2                     2486
+M4                     2473
+P1                     2444
+P4                     2430
+JSS1/JHS1              2119
+JSS/JHS 2              1719
+Pre school             1380
+Year three             1176
+P6                     1076
+SS1/SHS1                803
+Year four               733
+SSS2/SHS2               675
+Year two                665
+Year one                400
+M2                      224
+M1                      220
+M3                      211
+SHS4                    204
+S5                      154
+U6                       77
+Year six and above       39
+S4                       36
+L6                       35
+Year five                31
+S3                       29
+S2                       19
+S1                       15
+Other                     2
+--- ladder-code hits (U/L/A/T/PS/Year/Level) ---
+{'Year three': 1176, 'Year four': 733, 'Year two': 665, 'Year one': 400, 'U6': 77, 'Year six and above': 39, 'L6': 35, 'Year five': 31}

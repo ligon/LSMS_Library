@@ -1,0 +1,189 @@
+#+title: Protocol: five sources of food prices, compared
+#+author: Sue (Claude Fable 5.1), scrum master
+#+date: 2026-09-08
+
+Every country agent follows this protocol so that the per-country outputs
+pool into one cross-country analysis.  Where your country departs from it,
+say so in the report, do not improvise silently.  Shared code:
+=slurm_logs/price_sources/common.py= (use it; if it is wrong, report the
+defect rather than forking it).  Ledger: =.coder/ledger/price-sources-comparison.md=.
+
+* The question
+Food expenditure is quantity times price, but /which/ price?  A household
+that eats its own harvest gave up the farmgate price; a household that
+buys paid a market price; the two differ by a marketing margin that the
+literature puts at 30--50%.  We have up to five price observations for the
+same food, place and time.  Are their /levels/ similar?  In /logs/, is the
+gap between two sources a constant (a proportional markup, or iceberg
+transport cost, both of which are additive in logs and independent of the
+price level) or does it fall with the price level (an additive per-kg
+transport or handling cost)?  And is the 30--50% claim borne out?
+
+* The five sources, in repo terms
+| # | name (use these strings in =source=) | how to build it |
+|---+------------------------------------+-----------------|
+| 1 | =unit_value=                       | =Country.food_prices(units='unitvalue')= restricted to =s == 'purchased'=: =Expenditure / Quantity= per native =u=.  Per-kg view: =units='kgvalue'=. |
+| 2 | =reported_purchase_price=          | =food_prices(units='unitprice')=, =s == 'purchased'=: the survey's own price question.  **Prove independence first**: share of rows with abs(log(S2/S1)) > 1e-6.  If ~0, S2 is =Exp/Qty= back-calculated (=country.py:5793=) and is NOT a source for your country -- say so and drop it. |
+| 3 | =own_consumption_valuation=        | =food_prices(units='unitprice')=, =s == 'produced'=: the household's valuation of food eaten from its own harvest.  **Quote the questionnaire wording** ("what would you have received if sold" is a farmgate valuation; "what would it have cost to buy" is a market valuation) -- the label of this source depends on it. |
+| 4 | =crop_sale_price=                  | =Country.crop_production()=: =Value_sold / Quantity_sold= per row, in the row's native =u= and per kg via =transformations._kg_factor_series=; the geography-ladder local price via =transformations.median_price_valuation(..., value_col='Value_sold', qty_col='Quantity_sold')= (its =_unit_price= column).  Crop labels are NOT food labels: join to food =j= through =food_acquired(labels='Aggregate')= where the country's =harmonize_crop= reuses the food Aggregate labels (Uganda does), else write an explicit crosswalk table in your report (and consider it a fix candidate, see "Fixes"). |
+| 5 | =community_price=                  | =Country.community_prices()=: the surveyed local market price at cluster grain =(t, v, j, u)=.  Where a =NumberOfUnits= column exists the per-unit price is =Price / NumberOfUnits=; say what basis your country's survey states. |
+
+Availability (from =inventory.json=, 2026-09-08): Uganda 1,2,3,4; GhanaLSS
+1,3,5; Ethiopia / Malawi / Tanzania 1,4,5; Nigeria / Mali / Niger 1,5 and
+4 without a =u= level; EthiopiaRHS 1,5 (tiny).  Verify against your own
+data, not this table.
+
+* Grain and geography
+- Cell keys: =(t, j, u, geo_level, geo)=.  Native unit =u= is a key: **match
+  sources within the same native unit first** (Kg where both have it).
+  The per-kg view is a second, flagged view, because the library's kg
+  factors are /inferred from/ =Expenditure/Quantity= ratios
+  (=_get_kg_factors=) -- a per-kg comparison against source 1 partly
+  compares it with itself.
+- Geography ladder (the repo's existing procedure, =median_price_valuation=):
+  cluster =v= first, then =District= (where =cluster_features= has it), then
+  =Region=, then national.  A cell is /usable/ when it has at least the
+  source's threshold of observations -- and the threshold is PER SOURCE,
+  because the sources differ in kind: a household-side source (1, 2, 3, 4)
+  is a sample statistic and needs 10 observations (lowerable to 5 for a thin
+  source; say so); a community price (5) is a /measurement/ -- one surveyed
+  price per cluster and item -- and is usable at 1.  A symmetric 10 would
+  push every community-price pair up to Region and lose the cluster-grain
+  comparison this exercise is about.  =common.match_gaps(threshold_a=,
+  threshold_b=)= records both in =models.csv=; =common.model_rows= writes
+  one pooled row and one row per =geo_level=, because =finest_only= mixes
+  cluster ids, districts and regions in one geography effect and the
+  per-rung rows show whether the answer depends on the rung.
+- **Two checks BEFORE any matching, in section 1 of the report**, because
+  their failure otherwise surfaces as "zero matched cells": (i) the unit
+  vocabulary across tables -- =community_prices= says =Kilogramme= /
+  =Gramme=, does your =food_acquired= say =Kg=?  Tabulate both =u= sets and
+  their intersection; a mismatch is a defect to report and an obvious
+  blocker you may fix (a categorical mapping, not a rename in your script).
+  (ii) the share of =community_prices.v= present in =cluster_features.v=
+  (and in =sample().v=) per wave, so the ladder's bottom rung is real.
+- Geography columns come from =cluster_features= joined on =(t, v)=
+  (=common.attach_geo=).  Households whose =v= is missing from
+  =cluster_features= are counted and reported, never dropped silently.
+- One wave at a time within a country; waves are separate rows, never
+  pooled, because item lists and universes change.
+
+* Statistics (all produced by =common.py=)
+1. Per source and cell: =n=, median log price, its SD (=sd_log_price=), median price, currency
+   (from =food_prices(currency='column')= for the wave).
+2. Per matched pair of sources: =gap_log = median_log_a - median_log_b=,
+   =ratio = exp(gap_log)=.  Orientation: =pair= is "a_vs_b" and a is the
+   /downstream/ price (market side) so a marketing margin is positive:
+   =unit_value_vs_crop_sale_price=, =community_price_vs_crop_sale_price=,
+   =unit_value_vs_own_consumption_valuation=, =unit_value_vs_community_price=,
+   =reported_purchase_price_vs_unit_value=, =own_consumption_valuation_vs_crop_sale_price=.
+3. Per (country, wave, pair, u-basis): median and IQR of =gap_log=; share
+   of cells with abs(gap) > log(1.5); and two Frisch-Waugh-Lovell
+   regressions (the fixed effects partialled out exactly with a dummy
+   matrix, as =Metrics_Miscellany.fwl_regression= does; vendored in
+   =common.py=, numpy only):
+   - =within=: =gap_log ~ item FE + geo FE + beta_w * midpoint=, where the
+     regressor is the Bland-Altman midpoint =(log p_a + log p_b)/2= of the
+     cell -- NOT =log p_b=: noise in b sits in both the gap and =log p_b=,
+     and a pure markup then produces a spurious negative slope (measured
+     on synthetic data: -0.11, se 0.03).
+   - =between=: =gap_log ~ geo FE + beta_b * item_mean_midpoint= -- item
+     effects are dropped because an additive per-unit cost shows up
+     chiefly across items (a big log gap on cheap goods, a small one on
+     dear goods), which item effects would absorb.
+   A constant markup or iceberg transport cost predicts both betas = 0; an
+   additive per-unit cost predicts both < 0, the between one strongly.
+   **=between= is the primary test.**  The midpoint trick cancels shared
+   noise only when the two sources are equally noisy; with unequal noise
+   the =within= slope has the sign of var(noise_a) - var(noise_b) even
+   under a pure markup (synthetic, a slightly noisier: +0.08, se 0.03; a
+   THIN b of two observations per cell: **-1.27, se 0.07**, while =between=
+   stays at -0.002).  So for any pair in which one side is a measurement
+   source matched at cluster grain (source 5 at =v=, source 4 at =v=)
+   =within= is not interpretable: report it, but READ only =between= for
+   those pairs.  =within= is meaningful where both sides are household
+   samples with >= 10 observations per cell (e.g. 1 vs 3 at Region).
+   Say which source is noisier from =sd_log_price= in =cells.csv=.
+   Also reported: the R^2 of item + geo effects alone (how much of the gap
+   is "item and place"), the residual SD (how tight the relation is), HC3
+   standard errors from =metrics_miscellany.estimators.ols= on the
+   residualised regression (unclustered -- say so if it matters; an earlier
+   draft said HC1, corrected 2026-09-08).  =claim_30_50=
+   is whether the median gap lies in [log 1.3, log 1.5] = [0.262, 0.405].
+4. Say what each number means in the report in one sentence each; do not
+   paste tables without reading them.
+
+* Outputs (exact paths and schemas; =common.write_outputs= enforces them)
+- =slurm_logs/price_sources/<Country>/cells.csv= -- =common.CELL_COLS=
+- =slurm_logs/price_sources/<Country>/gaps.csv=  -- =common.GAP_COLS=
+- =slurm_logs/price_sources/<Country>/models.csv= -- =common.MODEL_COLS=
+- =slurm_logs/price_sources/<Country>/REPORT.org= -- sections in this order:
+  1. Sources present, with the idiosyncrasies you NAMED from
+     =CONTENTS.org= and the questionnaire (quote wording; cite file and
+     page or question number).
+  2. Independence test for source 2 (or "not present").
+  3. Levels: for each pair, median ratio per wave and the spread.
+  4. Logs: the model table, read out in words.
+  5. The claim: does the farmgate-vs-market gap sit in 30--50%?  Which
+     farmgate (3 or 4), which market (1 or 5)?  **Report the gap by item**
+     (a table: item, n cells, median gap, ratio) and name which items sit
+     in 30--50% and which do not -- the between-item slope conflates an
+     additive cost with item-heterogeneous margins (perishables carry
+     higher margins than grains at any price), and only the per-item table
+     lets Phase 2 test the slope within item classes.  This is where
+     "critically evaluate" lives.  Where 3 and 4 both exist (Uganda),
+     compare them to each other: does a household value its own-consumed
+     harvest at the sale price, the purchase price, or somewhere between?
+  6. Data problems, as a table (id, table, wave, symptom, count,
+     evidence =path:line= or command, proposed fix, status
+     fixed-in-worktree / reported).  Counts, not impressions.
+  7. Reproduce: the exact commands.
+- =slurm_logs/price_sources/<Country>/analysis.py= -- the script that made
+  the CSVs, =__main__=-guarded, never named =*_test.py=.
+
+* Docs you must consult
+- =lsms_library/countries/<Country>/_/CONTENTS.org= FIRST -- and its
+  LOGBOOK / WAITING / TODO entries.  If a finding contradicts it, that is a
+  result to quote, not a licence to assume the file is stale.  Add any
+  genuine idiosyncrasy you discover that is not recorded.
+- The wave's =Documentation/SOURCE.org= and the questionnaires: fetch with
+  =lsms_library.data_access.get_data_file('<Country>/<wave>/Documentation/<file>')=
+  (local -> DVC -> World Bank; never the =dvc= CLI).  The price questions
+  (own-consumption value; crop sale value/quantity; the community price
+  survey's unit basis) are what you quote in section 1.
+- =slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org= for the four
+  =units= modes; =.coder/ledger/591-nigeria-prices.md= and
+  =.coder/ledger/562-ghanalss-community-prices.md= for what is already known
+  about prices in those two countries.
+
+* Fixes: obvious blockers only, in your worktree
+You MAY fix an obvious blocker that stops a comparison -- a =j= label that
+does not join, a unit code that does not decode, a =NumberOfUnits= basis
+not applied -- when the fix is CONFIG (a country =_/*.org= table,
+=data_info.yml= mapping, a wave script's label map) or a small edit to that
+country's own module/scripts.  Rules:
+- Work on branch =fix/prices-<country>= in your worktree; commit with the
+  standard trailer; do NOT push; list the commits in the report.
+- Verify a fix with =LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries=
+  and a PRIVATE =LSMS_DATA_DIR= (see your brief) so the shared cache is not
+  rebuilt under a hash the main checkout does not have.  Analysis reads
+  before any fix may use the shared cache.
+- NEVER edit =lsms_library/country.py=, =transformations.py=,
+  =local_tools.py=, =feature.py=, =data_info.yml='s required-column
+  declarations, any test, =pyproject.toml=, or another country's files.
+  If the blocker needs that, STOP on that point, record it under Data
+  problems as "reported", and continue the analysis without it.
+- A fix changes what the analysis sees: say which numbers were produced
+  after the fix.
+
+* Report format (the final message)
+1. SCOPE DEVIATIONS (files touched outside your country's tree and your
+   output dir; "None" preferred; stop-list hits prefixed
+   =!!! SCOPE-VIOLATION-CANDIDATE !!!= and left uncommitted).
+2. Commit SHAs on =fix/prices-<country>= (or "no fixes").
+3. One line per source: present / absent / dropped-as-not-independent, n.
+4. The three or four headline numbers (median gaps per pair, beta, R^2).
+5. Data problems count and the two most consequential.
+6. Surprises.
+7. Paths.
+Under 500 words; the detail lives in REPORT.org.

@@ -1,0 +1,423 @@
+#+title: GhanaLSS 1991-92 (GLSS3): where visit dates and times are recorded, and what shipped
+#+date: 2026-09-11
+#+author: audit agent (wave 1991-92), for @ligon's GSS data request
+
+Scope: the household questionnaire's Section 0 / Survey Information pages, the
+per-section date headers on 8H / 9A2 / 9B, the urban diary, the supervisor's and
+data-entry operator's forms, and the two Section-0 data files =S0A.DTA= /
+=S0B.DTA=.  Every claim cites a document (path + PDF page; printed page where the
+two differ) or a data file + variable.  All numbers below were computed on
+2026-09-11 from the DVC-cached =.DTA= files via =get_dataframe= (script and raw
+output: scratchpad =g3/dump.py=, =g3/dump.out=; not committed).
+
+Documents read (all under =lsms_library/countries/GhanaLSS/1991-92/Documentation/=;
+all have a text layer): =pdf/G3QPartA.pdf= (38 pp), =pdf/G3QPartB.pdf= (44 pp),
+=pdf/G3Intman.pdf= (56 pp), =pdf/G3Supman.pdf= (34 pp), =pdf/G3DEOman.pdf= (25 pp),
+=pdf/g3usersg.pdf= (13 pp), =pdf/G3report.pdf= (204 pp), =pdf/oveglss3.pdf=,
+=ddi-documentation-english-12.pdf= (453 pp), =GHA_1991_GLSS_Household_Questionnaire_EN.pdf=
+(82 pp -- it is exactly =G3QPartA= + =G3QPartB= bound together; page 1 and page 39
+are byte-for-byte the same text as PartA p.1 and PartB p.1).  =pictures.pdf=,
+=docmenu.pdf=, =quemenu.pdf=, =data.pdf= are CD-ROM menu pages with no content.
+Of these only PartA/PartB/Intman/Supman/usersg/oveglss3 were on disk at the
+start; DEOman, report, DDI and the EN questionnaire were fetched with
+=data_access.get_data_file= (the wave notes said they were in-tree; only their
+=.dvc= sidecars were).
+
+Mandatory reading done first: =GhanaLSS/_/CONTENTS.org= ll.1-32, 1235-1660,
+3270-3340 and every =1991-92= / =GLSS3= hit; =1991-92/_/data_info.yml=;
+=1991-92/_/food_acquired.py= docstring; =.coder/ledger/ghanalss-visit-offset.md=.
+Idiosyncrasies those record that bear on this task: GLSS3 is the one stratified
+wave (8 rural visits at 2-day intervals / 11 urban at 3-day; recall window 14 vs
+30 days; GH #851); 9B q1 was never read until 2026-09-09; the =.DTA= files carry no
+variable or value labels; =interview_date= is wired to =S0A.DTA= =dd/mm/yy=; the
+=Rural= column comes from =POV_GH.DTA:loc2= via =mapping.py:Rural=.  Where my
+reading extends or contradicts those, it is flagged in the last section.
+
+* Visit protocol
+
+One line: paper questionnaire, 8 visits at 2-day intervals (rural workload) or 11
+at 3-day intervals (urban workload); 8H, 9A2 and 9B asked at every visit except the
+first with the recall "since my last visit" (first ask: "since my first visit");
+urban households keep a daily expenditure diary that the interviewer transcribes
+into 9A2/9B; data keyed in the regional capital in Rode-PC in two rounds.
+CONTENTS.org already records all of this; verified, and extended below.
+
+- Schedule.  =pdf/G3Intman.pdf= s1.9, PDF p.7 (printed 7): "There will be 8
+  interviewer visits at 2-day intervals to each rural household and 11
+  interviewer visits at 3-day intervals to each urban household in a cycle.
+  Thus a workload for the 16 days in a rural cluster is 10 households, while a
+  workload for the 33 days in an urban cluster is 15 households."  Rural
+  workload = 2 batches of 5 households interviewed on alternate days; urban = 3
+  batches of 5 on days 1,4,7,...,31 / 2,5,...,32 / 3,6,...,33.  Same text in
+  =pdf/G3Supman.pdf= s1.9, PDF p.7, and in the DDI "Data collection notes", PDF
+  p.9.  The data show the batching: 236 clusters have exactly 2 distinct
+  visit-1 dates and 94 have 3 (=S0B.DTA= =vd1/vm1/vy1=).
+- Appointment.  =G3Intman.pdf= PDF pp.12-13: "there will be 8 (rural) or 11
+  (urban) repeated visits to the household and ... each interview will last no
+  longer than 1 hour"; "DATE OF NEXT VISIT ... This should be exactly 2 days
+  apart in the case of the rural household and 3 days apart for urban
+  households."  =G3Supman.pdf= s4.3, PDF p.13: on the arrival day interviewers
+  "set the day and time for the interview" -- the time is agreed orally; no
+  instrument field records it (see next section).
+- Which sections at which visit.  =G3Intman.pdf= s3.7, PDF p.13, and the
+  preprinted SECTION column of the Summary of Survey Results page
+  (=G3QPartA.pdf= PDF p.4, printed 04):
+  | visit | rural                | urban              |
+  |-------+----------------------+--------------------|
+  |     1 | 1,2,6,7              | 1,2,6,7            |
+  |     2 | 8H,9A2,9B            | 8H,9A2,9B          |
+  |     3 | 3,8H,9A2,9B          | 3,8H,9A2,9B        |
+  |     4 | 4,8H,9A2,9B          | 4,8H,9A2,9B        |
+  |     5 | 5,10,8H,9A2,9B       | 5,8H,9A2,9B        |
+  |     6 | 8A-G,8H,9A2,9B,9C    | 8A-G,8H,9A2,9B     |
+  |     7 | 8H,9A2,9B,11,12      | 8H,9A2,9B,9C       |
+  |     8 | 8H,9A1,9A2,9B        | 8H,9A2,9B,10       |
+  |     9 |                      | 8H,9A2,9B,11       |
+  |    10 |                      | 8H,9A2,9B,12       |
+  |    11 |                      | 8H,9A1,9A2,9B      |
+  So Section 0 first-visit data (S0A) and the roster are visit 1; the
+  consumption modules run visits 2..8 (rural) / 2..11 (urban); 9A1 (less
+  frequent purchases, 3- and 12-month recall) is the LAST visit only.
+- Recall phrase.  =G3QPartB.pdf= PDF p.20 (9B, Food expenses): q1 "How much was
+  spent on ... since my first visit?", q2..q10 "How much was spent on ... since
+  my last visit?".  8H (PDF pp.9-12): q3 "How much was consumed by the
+  household since my first visit", q4..q12 "... since my last visit".  9A2 (PDF
+  pp.16-19) same pattern, q1..q10.  =G3Intman.pdf= PDF p.42 (printed 42): "Part
+  H is to be administered on every visit except the first"; PDF p.43: 9A2
+  "Responses ... will be solicited during all visits with the exception of the
+  first visit.  In other words for urban it will be 10 times and 7 times for
+  rural areas.  For each visit, you will ask for how much was spent by the
+  household since your last visit."  =G3Supman.pdf= PDF p.16: "interviewers
+  should always use the reference period 'since my last visit'."
+- Reference period, in GSS's own words.  =pdf/G3report.pdf= Appendix 1, PDF
+  p.129 (printed 111): "Since no consumption and expenditure data are collected
+  on the first visit to each household, the reference period for rural areas
+  would therefore be 14 days (ie. 7 x 2), and for urban areas 30 days (ie. 10 x
+  3)."  PDF p.128 (printed 110) gives the reasoning (Scott-Amenuvegbe recall
+  loss; monthly pay-day in towns).
+- Diary: urban only, paper, daily.  =G3Intman.pdf= PDF p.7: "A dairy [sic] of
+  daily consumption and expenditure will be used to support the urban
+  interviews.  During the first visit a literate person already identified in
+  each urban household will be trained to record all subsequent expenditures
+  made by the household and to submit the dairy to the interviewer on his next
+  visit for entry into the appropriate sections.  Where a household has no
+  literate member the supervisor will make daily visits".  =G3Intman.pdf= s13.3
+  PDF p.43: the interviewer sums the diary entries "since your last visit" and
+  writes the total in the visit's column; "Transfer of entries into the
+  questionnaire will start from your second visit."  =G3report.pdf= PDF p.20
+  (printed 2): "All urban households were given a special diary, and requested
+  to record on a separate page each day all the expenses they incurred ... In
+  the case of illiterate households the supervisor or the supplementary
+  interviewer visited them and did the recording."  The DDI (PDF p.10) lists
+  "diaries which respondents had failed to fill in" among the field problems.
+  The diary form itself is reproduced NOWHERE in the shipped documentation
+  (searched all 14 text layers: the only Part-B hit for "diary" is "Other
+  dairy" in 8H's item list).
+- A second, longitudinal diary programme.  =G3Intman.pdf= s1.10, PDF p.7: after
+  the team leaves, a locally trained interviewer keeps daily expenditure
+  diaries for 3 rural households per cluster (rotating 1-3, 4-6, 7-9 by cycle)
+  or all 15 urban households, "until the end of the year", "to capture the
+  monthly variations in the expenditure patterns".  No file in =1991-92/Data/=
+  corresponds to this and no other document mentions it.
+- Paper, not CAPI.  Data entry in Rode-PC on PCs in the eight regional
+  capitals, two rounds: Part A (sections 0-7) keyed after the 5th visit, Part B
+  (sections 8-12) after the last visit (=G3DEOman.pdf= s2, PDF p.6; DDI PDF
+  p.11; =G3Intman.pdf= s2.3, PDF p.9).  There are therefore no automatic
+  timestamps of any kind.
+- Fieldwork window: 30 September 1991 to September 1992 (DDI PDF p.9;
+  =G3report.pdf= PDF p.20).  Visit dates in =S0B= run 1991-02-21 .. 1992-11-08
+  once the obvious typos are excluded (see Idiosyncrasies).
+
+* Where a visit DATE / TIME is recorded on the instrument
+
+| document                    | section / form / page                                         | field(s) as printed                                                                                            | records                                                                                           |
+|-----------------------------+---------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| G3QPartA.pdf PDF p.1 (01)   | SURVEY INFORMATION, top block                                 | CLUSTER; HOUSEHOLD (head's name); ADDRESS; THIS HOUSEHOLD REPLACES HOUSEHOLD NO; THIS HOUSEHOLD WILL BE REPLACED BY NO; REASON (dwelling not found/vacant 1, occupant not at home 2, refusal 3) | replacement record; no date                                                                       |
+| G3QPartA.pdf PDF p.1 (01)   | FIRST VISIT (interviewer block)                               | INTERVIEWER name + code box; DATE dd/mm/yy; DWELLING FOUND? 1/2; IS THE HEAD OF HOUSEHOLD THE SAME? 1/2; NAME OF NEW HEAD; RELIGION OF HEAD 1-6; PRIMARY LANGUAGE OF HEAD 1-8; LANGUAGE USED BY THE RESPONDENT 1-8; INTERPRETER? 1/2; REMARKS | date (visit 1) + interviewer id; no time                                                          |
+| G3QPartA.pdf PDF pp.1-3     | SECOND ... ELEVENTH VISIT (one block per visit)               | INTERVIEWER name + code box; DATE dd/mm/yy; REMARKS                                                            | date + interviewer id per visit 2..11; no time                                                    |
+| G3QPartA.pdf PDF pp.1-3     | VERIFICATION OF QUESTIONNAIRE, FIRST ... ELEVENTH VISIT       | SUPERVISOR name + code; DATE dd/mm/yy; REMARKS; REINTERVIEW BY SUPERVISOR? yes 1 / no 2                        | supervisor verification date + reinterview flag per visit                                         |
+| G3QPartA.pdf PDF p.3 (03)   | DATA ENTRY, END OF CYCLE / EDITING OF PRINTOUTS, END OF CYCLE | OPERATOR code; DATE; REMARKS / SUPERVISOR code; DATE; REMARKS                                                   | keying date, printout-editing date                                                                |
+| G3QPartA.pdf PDF p.4 (04)   | SUMMARY OF SURVEYS RESULTS (URBAN EAS) / (RURAL EAS) -- one row per visit, SECTION column preprinted | INTERVIEWER: VISITS DATE (day month year) + RESULT (complete 1, partial 2, not applic. 3); CHECK-UP VISIT DATE + RESULT (complete 1, partial 2); SUPERVISOR: INTERVIEWER (satisfactory 1, to be completed 2, to be redone 3); DATA ENTRY OPERATOR (satisfactory 1, corrections 2); CORRECTED: in office 1, during next visit 2, during check-up visit 3, not corrected 4 | date + result code per visit; check-up (revisit) date + result; supervision codes.  No time, no duration |
+| G3QPartA.pdf PDF p.5 (05)   | OBSERVATIONS AND COMMENTS                                     | REMARKS BY THE INTERVIEWER / BY THE SUPERVISOR ON THE FIRST ... ELEVENTH VISIT (free text)                      | narrative only                                                                                    |
+| G3QPartB.pdf PDF pp.9-12    | Section 8 Part H (consumption of own produce), page header    | RESPONDENT ID; PERSON INTERVIEWED ID; a row of 11 boxes "1st 2nd ... 11th" each "dd / mm"                       | date (day+month, no year) of each visit, per module page; respondent ids                          |
+| G3QPartB.pdf PDF pp.16-19   | Section 9 Part A2 (frequently purchased non-food), header     | same 11 "dd / mm" boxes                                                                                        | date per visit (day+month)                                                                        |
+| G3QPartB.pdf PDF pp.20-27   | Section 9 Part B (food expenses), header                      | PERSON RESPONSIBLE ID (up to 5); PERSON INTERVIEWED ID; same 11 "dd / mm" boxes                                | date per visit (day+month); respondent ids                                                        |
+| urban expenditure diary     | separate booklet, "a separate page each day" (report PDF p.20) | not reproduced in any shipped document                                                                          | daily expenses by item, by calendar day (so implicitly the dates of every day between visits)     |
+| G3Supman.pdf s6.3, PDF pp.18-19 | VERIFICATION OF THE QUESTIONNAIRE form (one per cycle)     | EA; Household; Interviewers; VISIT RESULTS table (section / question / check / satisfactory / to be redone); SUPERVISOR ... DATE | supervisor's per-cycle check sheet, one date                                                       |
+| G3Supman.pdf s7.2, PDF p.28 | Observation-of-interview form "provided by the Project Directorate" (>= 3 interviews per interviewer per cycle) | comportment, question wording, "Time spent on the interview ... It may be worth noting the time at which he begun each section", impartiality | the ONLY place any time-of-day is ever written, and only for observed interviews; kept "in the team's files" |
+| G3Supman.pdf s11.2, PDF p.34 | Supervisor's end-of-cycle report to the Directorate          | EA name/number; "household numbers and the date of the data collection of the cycle"; replaced households and reasons; comments on staff; expenses | cycle-level dates and replacements, narrative                                                     |
+| G3Supman.pdf s4.3, PDF p.13 | (no form) "set the day and time for the interview"            | --                                                                                                             | appointment time agreed orally, never written                                                     |
+| G3DEOman.pdf s3.3, PDF p.10 | Rode-PC printouts / batch diskettes                            | Workload No., Household No., Household Id, Interviewer No., DEO No., Supervisor No. on the first screen of each round; diskette label "Date on which Production or Backup diskette was prepared" (PDF p.15) | ids only (these are the S0A/S0B header fields); no per-visit timestamp; Rode-PC has no paradata |
+
+Conclusion on TIME: no field on the household questionnaire, the diary, the
+summary page or the data-entry system records a time of day or an interview
+duration.  The manual states an expected duration ("no longer than 1 hour",
+=G3Intman.pdf= PDF p.12) and the supervisor's observation form may note section
+start times for the handful of observed interviews.  A request for time-of-day
+data for GLSS3 has nothing to attach to; the request is for DATES that exist on
+paper but were not keyed, and for the diaries.
+
+* What shipped: instrument field -> distributed variable
+
+Two Section-0 files ship.  The DDI (=ddi-documentation-english-12.pdf=) does NOT
+document either: its file inventory starts at "Household roster -s1" (PDF p.15)
+and no S0A/S0B variable appears in its 453 pages.  The only description is one
+line each in =pdf/g3usersg.pdf= PDF p.8: "S0A: Survey information.  S0B: Survey
+information continued", and the report's Appendix 2 (PDF p.134): "0 Household
+Identification -- Religion of head.  Primary language used by respondent.  Date
+and outcome of interviewer visits."  The Rode-PC format list (=G3DEOman.pdf= s3.2,
+PDF p.8) settles which pages were keyed: Round 1 format 1 = "SEC 0 : ID of HH"
+(page 01a) and Round 2 format 1 = "SURVEY RESULTS" (page 04).  Pages 02, 03 and
+05 have no format, i.e. were never keyed.
+
+** =S0A.DTA= -- page 01, first-visit block (4552 rows = the achieved sample; 14 vars, no labels)
+
+#+begin_example
+clust     cluster (EA) number                              -> i, v
+nh        household number within cluster                  -> i
+intv      interviewer code (page 01 "INTERVIEWER ... code")  values 1..86, 5 NA
+opcode    data entry operator code (page 03 "OPERATOR")     values 1..84, 5 NA
+sup       supervisor code (page 01 "SUPERVISOR")            values 1..12 (+1 stray 72), 5 NA
+dd mm yy  DATE of the FIRST VISIT (interviewer block, page 01); yy in {91, 92}; no NA
+dwell     DWELLING FOUND? 1 yes (4513) / 2 no (14); 25 NA
+samehead  IS THE HEAD OF HOUSEHOLD THE SAME? 1 (3508) / 2 (944); 100 NA
+rel       RELIGION OF HEAD 1 Muslim 2 Catholic 3 Protestant 4 Other Christian 5 Animist/traditional 6 Other
+primlan   PRIMARY LANGUAGE OF HEAD 1 Akan 2 Ewe 3 Ga-Adangbe 4 Dagbani 5 (unused) 6 Hausa 7 Nzema 8 Other
+reslan    LANGUAGE USED BY THE RESPONDENT 1 English 2 Akan 3 Ewe 4 Ga-Adangbe 5 Dagbani 6 Hausa 7 Nzema 8 Other
+inter     INTERPRETER? 1 yes (876) / 2 no (3123); 553 NA
+#+end_example
+Code lists transcribed from =G3QPartA.pdf= PDF p.1.  =interview_date= in
+=1991-92/_/data_info.yml= wires =dd/mm/yy= from this file, so the library's
+=interview_date= for GLSS3 is the first-visit date only.  =POV_GH.DTA:month/year=
+equal =S0A:mm/yy= in 4523 of 4523 households, so GSS's CPI-deflation month (user
+guide PDF p.3 caveat) is likewise the first-visit month.
+
+** =S0B.DTA= -- page 04, Summary of Survey Results (4522 rows; 126 vars, no labels)
+
+Header =clust nh intv opcode sup= (re-keyed in Round 2; they disagree with S0A's
+in 164 / 88 / 51 households -- e.g. cluster 3132 has =intv= 40 in S0A and 38 in
+S0B for every household, consistent with a different interviewer finishing the
+cycle), then for each visit k = 1..11 the eleven stems below, decoded against
+the page-04 column headings (=G3QPartA.pdf= PDF p.4) and the supervisor's
+instructions for the last three columns (=G3Supman.pdf= s8.4, PDF p.30):
+
+#+begin_example
+stem   page-04 column                                    values observed (pooled over k=1..11)
+vd{k}  INTERVIEWER > VISITS > DATE > DAY                  1..31
+vm{k}  INTERVIEWER > VISITS > DATE > MONTH                1..12
+vy{k}  INTERVIEWER > VISITS > DATE > YEAR                 91 (9,476), 92 (28,640), 95 (2: typos)
+vr{k}  INTERVIEWER > VISITS > RESULT                      1 complete 26,061; 2 partial 298; 3 not applicable 1
+cd{k}  INTERVIEWER > CHECK-UP VISIT > DATE > DAY           1..31 (296 filled, visits 1..8 only)
+cm{k}  ... > MONTH                                         1..12
+cy{k}  ... > YEAR                                          91 (109), 92 (187)
+cr{k}  INTERVIEWER > CHECK-UP VISIT > RESULT               1 complete 292; 2 partial 1
+in{k}  SUPERVISOR > INTERVIEWER                            1 satisfactory 25,169; 2 to be completed 224; 3 to be redone 249
+int{k} SUPERVISOR > DATA ENTRY OPERATOR                    1 satisfactory 22,433; 2 corrections 441
+c{k}   CORRECTED                                           1 in office 263; 2 during next visit 129; 3 during check-up visit 144; 4 not corrected 5,348
+#+end_example
+The check-up visit is a REVISIT to the same household, dated separately: its
+date minus the visit date has median 2 days (visits 1-7) and is filled for only
+122/14/36/51/30/23/14/6 households at visits 1..8, never at 9-11.  =in{k}= and
+=int{k}= are supervision verdicts, not interviewer ids; the per-visit
+interviewer code boxes on pages 01-03 were NOT keyed for visits 2..11.
+
+Non-null counts per visit slot (raw =vd{k}=):
+#+begin_example
+visit      1     2     3     4     5     6     7     8     9    10    11
+vd      4230  4230  4230  4228  4228  4210  4206  4204  1451  1451  1450
+vr      3123  3121  3120  3119  3117  3099  3097  3093   490   491   490
+cd       122    14    36    51    30    23    14     6     0     0     0
+in      3046  3045  3045  3042  3042  2993  2991  2977   487   487   487
+int     2710  2708  2709  2706  2706  2645  2643  2628   473   473   473
+c        781   697   733   755   746   740   711   720     0     0     1
+#+end_example
+Dated visit slots per household: 0: 292, 3: 2, 5: 18, 6: 4, 7: 1, 8: 2,660, 10: 1,
+11: 1,450 (raw slots; parsing to calendar dates loses a further 9 impossible
+dates such as 31 June -- 2 at visit 1, 6 at visit 5, 1 at visit 6).
+
+Gaps between successive dated visits, by =POV_GH.DTA:loc2= (1 urban, 2 rural;
+join succeeds for 4,520 of 4,522):
+#+begin_example
+                      step 1->2  2->3  3->4  4->5  5->6  6->7  7->8  8->9  9->10 10->11
+median gap  loc2=1        3.0   3.0   3.0   3.0   3.0   3.0   3.0   3.0   3.0    3.0
+median gap  loc2=2        2.0   2.0   2.0   2.0   2.0   2.0   2.0    --    --     --
+mean gap    loc2=1       2.61  3.09  3.06  2.82  3.03  2.90  2.73  3.16  2.73   3.43
+mean gap    loc2=2       2.57  1.67  2.04  1.93  2.00  2.06  2.55    --    --     --
+#+end_example
+Pooled: loc2=1 median 3 (15,206 gaps; 36 negative, 6 zero); loc2=2 median 2
+(18,654 gaps; 35 negative, 2 zero).  The raw means above are contaminated by a
+handful of year/month typos (gaps of -1,121 to +1,097 days); restricted to gaps
+of 0-14 days (drops 115 of 33,872) the per-step means are flat: 2.94-3.02 for
+loc2=1 and 2.00-2.01 for loc2=2, with 93-94% of urban and 99.7-99.9% of rural
+gaps exactly at the scheduled 3 / 2 days at every step including 1->2.  Cycle span (last minus
+first date): median 30 days for loc2=1, 14 for loc2=2, exactly the report's
+reference periods.  71 households have at least one negative gap (date typos;
+worst span 1,121 days).  Visits fall on all seven weekdays equally (5,402-5,505
+per weekday over 38,118 dated visits): fieldwork ran seven days a week.
+
+=S0A= first-visit date vs =S0B= visit-1 date: equal in 4,118 of the 4,228
+households that have both; S0A earlier in 50, later in 57; S0A equals a later
+visit's date in 10.  The two pages were filled at different moments (page 01 on
+arrival, page 04 "after each visit", =G3Intman.pdf= PDF p.14) and keyed in
+different rounds.
+
+** Other Section-0-like files
+
+- =POV_GH.DTA= (4,523 rows; GSS's constructed welfare file): =month=, =year= =
+  first-visit month/year (see above); =loc2=; no visit-level content.
+- =S6.DTA= (Section 6, respondents for Part B; 4,547 rows): =s6q1..s6q9b3=
+  name the members responsible for farms, purchases, food preparation etc.  No
+  dates.
+- =S8H.DTA= columns: =clust nh homagrcd s8hq1 s8hq2 s8hq13 s8hq14 s8hq3..s8hq12=;
+  =S9A2.DTA=: =clust nh nfdex2cd s9a2q1..q10=; =S9B.DTA=: =clust nh fdexpcd
+  s9bq1..q10=.  The "dd / mm" header boxes and the PERSON INTERVIEWED /
+  PERSON RESPONSIBLE ids on those pages were NOT keyed.
+
+** Instrument field -> variable, row by row
+
+| instrument field                                                  | shipped?                                                              |
+|-------------------------------------------------------------------+-----------------------------------------------------------------------|
+| p.01 cluster / household number                                   | =S0A/S0B: clust, nh=                                                  |
+| p.01 head's name, address                                         | NO                                                                    |
+| p.01 replacement household numbers + reason                       | NO (the 30 households in S0A but not S0B/S9B are the trace)           |
+| p.01 first visit: interviewer code, date, dwelling found, same head, religion, languages, interpreter | =S0A: intv dd mm yy dwell samehead rel primlan reslan inter= |
+| p.01 first visit: name of new head, remarks                       | NO                                                                    |
+| p.01 supervisor code                                              | =S0A: sup=                                                            |
+| pp.01-03 visits 2..11: interviewer code, date, remarks            | NO -- the per-visit date that ships is page 04's, not this one        |
+| pp.01-03 verification of questionnaire, visits 1..11: supervisor, date, remarks, reinterview flag | NO                                                   |
+| p.03 data entry end of cycle: operator code, date                 | code only (=S0A/S0B: opcode=); date NO                                |
+| p.03 editing of printouts: supervisor, date                       | NO                                                                    |
+| p.04 visit date, visit result                                     | =S0B: vd/vm/vy{k}, vr{k}=                                             |
+| p.04 check-up visit date, result                                  | =S0B: cd/cm/cy{k}, cr{k}=                                             |
+| p.04 supervisor verdict on interviewer / DEO; corrected           | =S0B: in{k}, int{k}, c{k}=                                            |
+| p.05 remarks per visit                                            | NO                                                                    |
+| 8H / 9A2 / 9B page headers: dd/mm per visit                       | NO                                                                    |
+| 8H / 9B person interviewed / person responsible ids               | NO                                                                    |
+| urban daily diary                                                 | NO (transcribed as visit totals into 9A2/9B; booklet never keyed)     |
+| longitudinal diaries (s1.10)                                      | NO file at all                                                        |
+| supervisor's verification form, observation form, cycle report   | NO (paper, "kept in the team's files" / sent to Accra)                |
+| time of day, interview duration                                   | not on any instrument                                                 |
+
+* The NSO request for this wave
+
+GLSS3 already ships visit DATES (day/month/year) for every visit of 4,230
+households (4,194 with a full 8- or 11-visit schedule), the visit RESULT code for
+about 3,120 of them (1,108 dated households have no result code at visit 1, and
+about the same number at every later visit), and check-up revisit dates, all from
+the Summary of Survey Results page.  It ships NO time-of-day and NO duration, and none exists on
+paper; do not ask for them.  What to ask GSS for, named as the instrument names
+it:
+
+1. Summary of Survey Results (household questionnaire Part A, page 04) for the
+   292 households whose page was never keyed -- 26 whole clusters plus 6 partial
+   ones, listed under Idiosyncrasies -- if the paper questionnaires survive.
+   This is the one gap in the shipped visit dates.  In the same breath: the
+   RESULT column of that page for the ~1,100 dated households whose =vr{k}= is
+   empty at every visit (the dates were keyed, the outcome was not).
+2. Survey Information pages 01-03: the per-visit INTERVIEWER code and DATE for
+   the SECOND to ELEVENTH VISIT blocks, and the VERIFICATION OF QUESTIONNAIRE
+   blocks (SUPERVISOR code, DATE, REINTERVIEW BY SUPERVISOR yes/no) for all
+   eleven visits; the DATA ENTRY, END OF CYCLE and EDITING OF PRINTOUTS, END OF
+   CYCLE dates on page 03.  These were never keyed (no Rode-PC format covers
+   pages 02-03).  Value: an independent second record of each visit date, the
+   interviewer actually present at each visit (=S0A:intv= vs =S0B:intv= differ
+   for 164 households), and supervisor revisit dates.
+3. The "dd / mm" visit-date header row on Section 8 Part H, Section 9 Part A2
+   and Section 9 Part B, with the PERSON INTERVIEWED / PERSON RESPONSIBLE ids on
+   those pages -- the date on which each consumption column was actually asked,
+   written on the module page itself.
+4. The urban household expenditure DIARY booklets ("a special diary ... on a
+   separate page each day", Main Report p.2), and the blank diary form.  These
+   carry the only within-interval daily dates the survey ever recorded.
+5. The longitudinal diary series described in the Interviewer's Manual s1.10
+   (3 households per rural cluster / 15 per urban cluster, daily, for the rest
+   of the survey year).  Ask whether it was carried out and whether anything was
+   keyed; nothing in the distribution refers to it.
+6. Supervisor's forms: the per-cycle VERIFICATION OF THE QUESTIONNAIRE form
+   (Supervisor's Manual s6.3), the Directorate's observation-of-interview form
+   (s7.2 -- the only place a time of day, "the time at which he begun each
+   section", was ever noted, for >= 3 observed interviews per interviewer per
+   cycle), and the supervisor's end-of-cycle report (s11.2: household numbers,
+   dates of data collection, replacements).  Low priority; narrative paper.
+
+* Idiosyncrasies and contradictions
+
+- *The fieldwork stratum is not =loc2=, and CONTENTS.org's 30-day/14-day rule is
+  stated in terms of the wrong variable.*  CONTENTS.org l.1289ff says "urban:
+  10 asks x 3 days = 30 days; rural: 7 asks x 2 days = 14 days" and GH #851
+  proposes rescaling by stratum.  Measured on =S0B= dates joined to
+  =POV_GH:loc2=: 9 clusters with =loc2= = 1 (urban) were interviewed on the
+  RURAL schedule -- 10 households each, 8 dated visits, median gap 2.0 days:
+  clusters 3012, 3263, 3531, 3540, 3559, 3560, 3612, 3794, 3796 (90
+  households); and 2 further =loc2= = 1 clusters of 10 households have no dates
+  keyed at all (3551, 3554 -- counted here from their rural take of 10, since
+  there are no dates to confirm the schedule).  That is 11 clusters / 110
+  households, which is
+  exactly what the Main Report describes, Appendix 1 PDF p.130 (printed 112):
+  "This shortfall can be approximately made up by counting 11 urban areas as
+  'rural' for fieldwork purposes (ie. 11 x 10 = 110) and then reassigning them
+  back to urban at the analysis stage."  So for those 110 households the
+  recall window is 14 days, the diary was (per the manuals) not used, and a
+  365/30 rescale keyed on =loc2= would understate their annualised food
+  expenditure by 2.14x.  No =loc2= = 2 cluster was interviewed on the urban
+  schedule.  The correct stratum for the recall window is the FIELD stratum,
+  recoverable per household from =S0B= (dated slots 9-11 non-empty, or median
+  gap 3 vs 2), not =loc2=.  A further 16 =loc2= = 1 households have only 5-7
+  dated visits at 3-day gaps (truncated cycles) and 1 has 10.
+- *292 households (6.5%) have no visit dates: 26 whole clusters plus parts of
+  6.*  All 292 have 9B data, so the Summary page was simply not keyed.  Whole
+  clusters: 3331, 3340, 3344, 3347, 3348, 3352, 3354, 3355, 3403, 3464, 3466,
+  3471, 3479, 3551, 3554, 3626, 3627, 3628, 3632, 3634, 3739, 3119, 3330, 3346,
+  3474, 3476 (the last five are 6-9-household clusters, unkeyed in full);
+  partial: 3056 (1 of 10), 3071 (2 of 20), 3332 (10 of 20), 3343 (4 of 10),
+  3707 (1 of 10), 3714 (4 of 20).  All but 3403 (region 6), 3707 (9) and 3714
+  (10) carry =POV_GH:region= = 4, and the supervisor codes are 1, 5 or 11, i.e.
+  this is a team-level omission concentrated in one region, not random.  CONTENTS.org l.1310 ("urban records 11
+  dates ... rural records 8") is true of the households that have any, and
+  silent on these.
+- *30 households are in =S0A= but not in =S0B=; 29 of them are in no other file
+  checked (=S9B=, =POV_GH=).*  Clusters 3743 (10 of them) and 3786 (7) account
+  for most.  =S0A= has 4,552 rows -- the user guide's "actual achieved sample
+  was 4552" -- while =S0B= has 4,522 and =POV_GH= 4,523.  These look like
+  replaced or abandoned households whose page 01 was keyed in Round 1 before
+  the replacement (page 01's "THIS HOUSEHOLD WILL BE REPLACED BY NO" box is not
+  shipped, so it cannot be confirmed).
+- *The ledger is stale on labels.*  =.coder/ledger/ghanalss-visit-offset.md= s6
+  says GLSS3's q-to-visit offset "has none of the evidence the other four waves
+  have" because =S9B.DTA= carries no labels.  The DDI does carry them, PDF
+  pp.68-69: =s9bq1= "How much spent on item since first visit", =s9bq2= "How
+  much spent on sincce third t visit" [sic], =s9bq3= "How much spent on 4th
+  visit" ... =s9bq10= "How much spent on 11th visit"; =s9a2q1= "How much spent
+  on first visit", =s9a2q2= "How much spent on last visit 2" ... =s9a2q10=
+  "... 10".  Read with the questionnaire (q1 = "since my first visit", asked at
+  visit 2) these give q_k -> visit k+1, which is the mapping CONTENTS.org's
+  table already uses (q1..q10 -> 2..11).  The =s9bq2= label's "third" is the
+  DDI's own inconsistency, not evidence of a different offset.
+- *=S0A= and =S0B= header codes disagree.*  =intv= differs in 164 households,
+  =opcode= in 88, =sup= in 51 (of 4,517 with both).  The Round-2 header was
+  keyed from the same page 01 after the cycle; where it differs the S0B value
+  is the later keying.  Not a bug to fix, but do not join the two files on
+  =intv=.
+- *Date typos in =S0B=.*  Two =vy= = 95 (cluster 3343 hh 4 visit 2; cluster 3519
+  hh 12 visit 8); 9 impossible day/month combinations; 71 households with a
+  negative inter-visit gap; visit-1 dates as early as 1991-02-21 against a
+  fieldwork start of 30 Sep 1991.  Any =melt_visit_intervals=-style wiring of
+  =S0B= into =interview_date= should validate against the household's own
+  median gap rather than trust every slot.
+- *=1991-92/_/data_info.yml= declares =sample:= twice* (lines 13 and 71).  The
+  first block carries =cluster_features=-shaped content (=v: clust=, =Region=,
+  =Rural=) under the =sample= key; YAML last-wins so the second, correct block
+  is what loads.  Not edited here (brief forbids); worth a one-line fix.
+- *The CONTENTS.org first-interval claim holds.*  CONTENTS.org l.1467: "the
+  S0B.DTA visit dates give a median gap of exactly 3.0 days (urban) / 2.0 days
+  (rural) at every step, including visit 1 -> 2".  Verified for the median,
+  and -- once the typo gaps are excluded -- for the mean and the modal share
+  too (see the gap table above): the first interval is neither shorter nor
+  more dispersed than the rest.  The raw per-step means (2.61 urban, 2.57
+  rural at step 1) that a naive computation gives are typo artefacts, not a
+  first-visit effect; do not carry them into CONTENTS.org.
+- *Two duplicate GLSS3 documentation trees.*  =Documentation/pdf/= holds PDFs
+  and =Documentation/Glss3 qsts and manuals docs/= holds the same items as Word
+  =.DOC= (G3INTMAN.DOC, G3SUPMAN.DOC, G3DEOMAN.DOC, G3QPartA/B.doc, G3USERSG,
+  G3REPORT, Povprof, Aggregat, overview_glss3).  Only the PDFs were used here;
+  the PDF text layers are complete.

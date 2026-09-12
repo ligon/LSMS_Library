@@ -1,0 +1,493 @@
+#+title: Uganda: food prices from three sources (of a possible five)
+#+author: Claude Fable 5.1, Uganda analyst
+#+date: 2026-09-08
+
+Protocol: =slurm_logs/price_sources/PROTOCOL.org=.  Ledger:
+=.coder/ledger/price-sources-comparison.md=.  All eight waves.  Currency UGX
+throughout; no redenomination in the period, so within-wave levels are
+comparable and log gaps are unit-free.
+
+*Headline.*  Uganda was briefed as the only four-source country.  It is a
+*three-source* country: source 2 fails the protocol's independence test in the
+raw Stata files, not merely after the library touches them.  Sources 1, 3 and
+4 survive, and Uganda remains the only country where an own-consumption
+valuation (3) and an actual crop sale price (4) can be compared directly --
+which is section 5.
+
+* 0. SCOPE DEVIATIONS -- read before pooling these CSVs
+
+1. *Uganda is a THREE-source country, not four.*  Source 2 fails the
+   independence test (§2) and is dropped from every conclusion.
+2. *The CSVs carry two source strings that are NOT in =common.SOURCES=, and
+   two pairs built on them.*  A pooling script that keys on the five protocol
+   strings will either drop them silently or choke.  To get exactly the
+   protocol set:
+   : cells = cells[cells.source.isin(common.SOURCES)]
+   : gaps  = gaps[~gaps.pair.str.contains('soldunit')]
+   - =crop_sale_price_soldunit= (37,047 rows, 32,027 cells) is my sensitivity
+     rebuild of source 4 on the SOLD unit (§6 D2), not a sixth source.
+   - pairs =unit_value_vs_crop_sale_price_soldunit= and
+     =own_consumption_valuation_vs_crop_sale_price_soldunit= likewise.
+3. *=reported_purchase_price= is present in the files but is NOT a source for
+   Uganda.*  Its 206,282 cells and its 4,686 =reported_purchase_price_vs_unit_value=
+   gap rows are retained deliberately, so that the independence failure is
+   visible in the pooled data rather than only in this prose -- every one of
+   those gap rows is 0.000 by construction.  *Do not count Uganda as having
+   source 2.*
+4. *2015-16 is excluded from source 4* (both variants) for a measured ~100x
+   scale defect in =Value_sold= (§6 D1).  No correction factor was invented.
+5. *Source 4 uses threshold 5, not 10* (protocol permits, "say so"): =Value_sold=
+   is populated on 34% of =crop_production= rows.  Sources 1, 2 and 3 use 10.
+6. *No community prices exist for Uganda*, so the protocol's
+   =community_prices.v= pre-check was run on the household-side sources
+   instead (§6).
+7. Files touched outside my output directory: *none*.  The two config edits
+   are in the worktree only, commit =179af546=, unpushed.
+
+* 1. Sources present, and the idiosyncrasies behind them
+
+| # | source string | status | rows priced |
+|---+---------------+--------+-------------|
+| 1 | =unit_value= | present, all 8 waves | 242,370 |
+| 2 | =reported_purchase_price= | *DROPPED* -- not independent (§2) | (241,469) |
+| 3 | =own_consumption_valuation= | present, all 8 waves | 84,369 |
+| 4 | =crop_sale_price= | present, 6 waves (no 2005-06; 2015-16 excluded, §6 D1) | 38,651 |
+| 4b | =crop_sale_price_soldunit= | sensitivity build, 7 wave-halves (§6 D2) | 37,047 |
+| 5 | =community_price= | *ABSENT* -- Uganda declares no =community_prices= | -- |
+
+** The question wording (this is what sources 2 and 3 actually are)
+
+UNPS GSEC15B (2013-14 household questionnaire, "Part B: Food, Beverage, and
+Tobacco (During the Last 7 Days)", PDF p. 7) is one grid per food item.  Its
+columns, verbatim:
+
+: 3C Unit of Qty | Consumption out of Purchases: Household [4 Qty, 5 Value],
+: Away from home [6 Qty, 7 Value] | Consumption out of home produce
+: [8 Qty, 9 Value] | Received in-kind/Free [10 Qty, 11 Value] |
+: 12 Market Price | 13 Farm gate /produ cer price
+
+So =market= (=h15bq12=) and =farmgate= (=h15bq13=) are *columns 12 and 13 of
+the same row*, asked in the same unit as column 3C.  The library maps 12 ->
+=Price= for =s='purchased'= and 13 -> =Price= for =s='produced'=
+(=uganda.food_acquired_to_canonical=).
+
+*The interviewer manual settles what column 9 means* -- and it is the answer
+to section 5's question.  The file is stored at
+=2011-12/Documentation/UNPS.HouseholdAndWomanQx.Manual.pdf=, but the document
+itself is titled /"DRAFT Interviewer Manual for Uganda National Panel Survey
+2010/11"/ -- cite both, since the path and the document disagree.  Section
+T6aeQ5 (the same words recur at T6nfQ5, and in the 2005-06 UNHS Manual of
+Instructions under "Food consumed out of home production"):
+
+#+begin_quote
+Home production refers to items produced or grown by the household which have
+been consumed by the household during the past 7 days. ... Ask the respondent
+to estimate the amount of money that he/she would normally sell the quantity
+reported. *This should be valued at farm gate/producer price. Farm gate price
+refers to the price a farmer receives for his or product at the boundary of
+the farm. This price excludes any cost transport and marketing services.*
+#+end_quote
+
+and, for contrast, the market price the same manual defines at T6aeQ6:
+
+#+begin_quote
+Valuation of the quantity consumed should be based on the market price. The
+market price refers to the price prevailing in the market that *includes cost
+of transport, marketing services and profit margins.*
+#+end_quote
+
+So source 3 is, *by instruction*, "what would you have RECEIVED if sold" --
+a farmgate valuation, and the marketing margin is exactly the object of study.
+Whether households obeyed is section 5.
+
+Crop sales (source 4), 2013-14 agriculture questionnaire, "SECTION 5A CONT'D:
+QUANTIFICATION OF PRODUCTION": /"How much of the [...] you harvested during
+the first season of 2013 was sold and in what condition/state?"/ with *Qty,
+Condition/State Code and Unit Code*, then /"What was the value?"/ in UShs.
+That compound question is the root of defect D2.
+
+** Idiosyncrasies NAMED from =Uganda/_/CONTENTS.org=
+
+1. *=v= is not one thing across waves.*  =comm= (2005-2012), parish code
+   (2013-16), a =DISTRICT/PARISH= composite (2018-20, because =parish_code=
+   carries 19 distinct values for 751 parishes).  2009-10 is a *hybrid*: 2,410
+   households keyed on =comm=, 541 on a synthetic =@lat,lon= 0.05 degree bin,
+   24 dropped.  I used =v= as delivered and report cluster coverage rather
+   than assuming it (§6 note).
+2. *=cluster_features= is a PROJECTION from the household cover page*, and it
+   says what it could not resolve: rebuilding it emitted =GrainConflictWarning=
+   for 122-221 of 706-875 clusters per wave (Rural, Latitude, Longitude),
+   blanked rather than arbitrarily won.  My geography ladder uses only
+   =District= / =Region=, which are not among the blanked columns.
+3. *=condition= is an index level on =crop_production= (GH #323/#637)* and
+   quantities in different conditions are *not commensurable*.  I never sum
+   across it; I report the condition composition of matched source-4 cells
+   (=source4_conditions.csv=), because maize dry grain (median 400 UGX/kg) and
+   maize fresh-in-cob (600) are not one price.
+4. *2009-10 harvest quantities carry an unstripped 99999 sentinel.*  Filtered
+   on every quantity and value divided (=SENTINELS= in =analysis.py=).
+5. *=crop_production= is excluded from =Feature()=* by an explicit decision
+   (index names diverge across countries), so this is necessarily a
+   country-level analysis, not a =Feature()= one.
+6. *2018-19 season A has no harvest unit column at all* -- =u='Unknown'= on
+   every row.  5,833 of Uganda's sale rows carry =u='Unknown'=, unmatchable in
+   the primary source-4 build.  §6 D2 shows they are recoverable.
+
+Contradiction found: none.  Two genuine idiosyncrasies NOT in =CONTENTS.org=
+were added there by commit =179af546= (defects D1 and D2 below).
+
+* 2. Independence test for source 2 -- it fails
+
+Protocol: share of rows with =abs(log(S2/S1)) > 1e-6=; if ~0, source 2 is
+=Exp/Qty= back-calculated and is not a source.
+
+| wave | n both | share differing | median log ratio |
+|------+--------+-----------------+------------------|
+| 2005-06 | 28,401 | 0.0172 | 0.0 |
+| 2009-10 | 25,974 | 0.0562 | 0.0 |
+| 2010-11 | 24,697 | 0.0109 | 0.0 |
+| 2011-12 | 26,030 | 0.0521 | 0.0 |
+| 2013-14 | 34,209 | 0.0151 | 0.0 |
+| 2015-16 | 34,057 | 0.0006 | 0.0 |
+| 2018-19 | 35,982 | 0.0008 | 0.0 |
+| 2019-20 | 32,109 | 0.0009 | 0.0 |
+
+94.4-99.9% of purchased rows have the reported "Market Price" *exactly* equal
+to =Expenditure/Quantity=.  The pooled matched set gives a median gap of 0.000
+with an IQR of 0.000 across 4,686 cells.
+
+*This is not a library artefact.*  I re-ran it on the raw =.dta= before the
+library touches anything, computing =h15bq12= against
+=(h15bq5+h15bq7)/(h15bq4+h15bq6)= directly:
+
+| wave | market vs Exp/Qty | farmgate vs Value_own/Qty_own | market AND farmgate both populated |
+|------+-------------------+-------------------------------+------------------------------------|
+| 2005-06 | 1.72% differ | 1.36% differ | 160 of 28,401 |
+| 2011-12 | 5.21% | 4.75% | 110 of 26,030 |
+| 2013-14 | 1.51% | 1.01% | 124 of 34,211 |
+
+Two conclusions, both consequential:
+
+1. *Source 2 is dropped.*  UBOS's columns 12 and 13 are back-calculated unit
+   values, not independently elicited prices, whatever the questionnaire
+   asks.
+
+   *The residual few percent is NOT the home/away fold, and I checked rather
+   than assumed.*  The obvious explanation is that the library folds the two
+   purchase legs, so a price matching only one leg would differ from the
+   folded ratio.  Measured on the raw file, among rows where the reported
+   price differs: the share with BOTH a home and an away leg populated is
+   0.8% (2005-06), 0.4% (2011-12), 0.2% (2013-14) -- against a baseline of
+   0.15-0.24% among all priced purchased rows, i.e. essentially no
+   enrichment.  The share whose reported price matches ONE leg exactly is
+   0.2-0.8%.  *The fold explains none of it.*  What the residual is remains
+   unexplained -- keying noise, rounding at entry, or a genuinely independent
+   report in a small minority -- and I do not claim to know.
+2. *Columns 12 and 13 are populated DISJOINTLY* (fill 71-75% vs 22-27%,
+   overlapping on ~0.4% of rows).  So UNPS does *not* deliver a
+   within-household market-vs-farmgate price pair, which is what one would
+   have hoped from a questionnaire that prints both columns side by side.
+
+Source 3 survives this: it is =value_own / quantity_own=, which is a real
+quantity (the household's valuation of what it ate from its own harvest).
+What it is *not* is a separately elicited price question.
+
+* 3. Levels
+
+Median ratio =exp(gap_log)= per pair per wave, from =models.csv= (=geo_level=all=).
+2015-16 is absent from every source-4 pair by exclusion D1; 2005-06 has no
+=crop_production=; 2018-19 has no primary source 4 (=u='Unknown'=).
+
+| pair | 2005-06 | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|------+---------+---------+---------+---------+---------+---------+---------+---------|
+| 1 vs 3 (=unit_value_vs_own_consumption_valuation=) | 1.10 | 1.00 | 1.10 | 1.02 | 1.00 | 1.00 | 1.00 | 1.00 |
+| 1 vs 4 (=unit_value_vs_crop_sale_price=) | -- | 1.50 | 1.69 | 1.81 | 2.00 | -- | -- | 1.96 |
+| 1 vs 4b (sold unit) | -- | 1.50 | 1.70 | 1.77 | 2.00 | -- | 1.76 | 1.50 |
+| 3 vs 4 (=own_consumption_valuation_vs_crop_sale_price=) | -- | 1.00 | 1.20 | 1.06 | 1.12 | -- | -- | 1.22 |
+| 3 vs 4b (sold unit) | -- | 1.00 | 1.20 | 1.05 | 1.13 | -- | 1.27 | 1.20 |
+
+2018-19 has a 4b column but no 4 column because its season-A harvest unit does
+not exist (D4); 4b is the only build that reaches that wave.
+
+Spread: the IQR of =gap_log= is 0.18-0.41 for 1 vs 3 and 0.41-0.93 for the
+source-4 pairs -- the crop-sale comparisons are three to five times noisier,
+as expected from a thin source matched at District/Region.
+
+*These three rows are computed on DIFFERENT matched cell sets and must not be
+read as a chain* (1 vs 3 spans all 76 food Aggregate labels; the source-4
+pairs only reach the 14 crops that both join and clear their thresholds).
+Section 5 puts all three on one common set, which is where they become
+mutually consistent.
+
+* 4. Logs: the model, read out
+
+=models.csv=, one pooled row plus one per =geo_level=, per wave and pair.
+Standard errors are HC3 and *unclustered*; with cells nested in districts and
+regions the true SEs on the source-4 pairs are wider than printed, so I read
+only the sign and rough magnitude there.
+
+*The primary test is =between=* (protocol): a constant markup or iceberg
+transport cost predicts beta = 0, an additive per-unit cost predicts beta < 0.
+
+| pair | median =between= over waves | median =within= | median R^2 of item+geo effects |
+|------+-----------------------------+-----------------+--------------------------------|
+| 1 vs 3 | *+0.013* (se ~0.04) | +0.046 | 0.32 |
+| 1 vs 4 | *-0.189* (se ~0.14-0.25) | -0.051 | 0.93 |
+| 1 vs 4b | *-0.224* | -0.197 | 0.90 |
+| 3 vs 4 | *-0.197* | -0.326 | 0.84 |
+| 3 vs 4b | *-0.233* | -0.357 | 0.83 |
+
+In words:
+
+- *1 vs 3 behaves like a pure proportional markup.*  =between= is +0.013 with
+  a standard error three times its size -- indistinguishable from zero -- and
+  =within= likewise.  The gap between what a household pays and what it says
+  its own produce is worth does not shrink as the food gets dearer.  Item and
+  place explain only 32% of that gap's variance, i.e. it is mostly
+  household-level noise, which is what one expects of two self-reported
+  valuations of the same commodity.
+- *Every pair involving the crop sale price has a clearly negative =between=*,
+  -0.19 to -0.23.  A 10% dearer crop carries a ~2% smaller proportional gap:
+  there is a real *additive per-unit* component in the farmgate-to-market
+  wedge, on top of a proportional one.  That is the signature of a per-kg
+  handling or transport cost, and it is the protocol's discriminating result.
+- *R^2 of item + geo effects is 0.83-0.93 on the source-4 pairs* against 0.32
+  on 1 vs 3.  Almost all of the farmgate-to-market gap is "which item, and
+  where" -- it is structural, not household noise.
+- =within= is *not interpretable* for any source-4 pair and I do not read it:
+  source 4 is matched at a threshold of 5 against a household sample of 10, so
+  the two sides have unequal noise, which the protocol shows drives the within
+  slope negative under a pure markup (synthetic: -1.27 with a thin b). The
+  =within= column above is printed for the record only.  For 1 vs 3, where
+  both sides are household samples of >= 10, =within= *is* readable, and it
+  agrees with =between= at ~0.
+- Noise, from =sd_log_price= in =cells.csv=: source 4 is the noisier side of
+  every pair it appears in, which is why =between= is the only slope I trust
+  there.
+
+* 5. The claim: is the farmgate-to-market gap 30-50%?
+
+** The common cell set
+
+The pairwise sets differ, so section 5 restricts to the 223 cells (14 items,
+5 waves) where sources 1, 3 and 4 *all* clear their thresholds on the same
+=(t, j, u, geo_level, geo)=.  =three_way_cells.csv=, =three_way_by_item.csv=.
+
+| comparison | median gap (log) | ratio |
+|------------+------------------+-------|
+| 1 vs 4 -- purchase price over crop sale price | 0.470 | *1.60* |
+| 1 vs 3 -- purchase price over own-consumption valuation | 0.223 | 1.25 |
+| 3 vs 4 -- own-consumption valuation over crop sale price | 0.211 | 1.23 |
+
+*The answer to the headline claim: no, it is higher.*  The farmgate-to-market
+gap in Uganda is *60%*, against the literature's 30-50%.  =claim_30_50= is
+=False= for every pooled (=geo_level='all'=) wave-pair row but one -- 2019-20
+=unit_value_vs_crop_sale_price_soldunit=, whose median gap is 0.405, i.e.
+exactly =log 1.5=, the band's upper edge.  Across all 167 model rows it is
+True in 12, all of them single rungs with 1-15 cells and all sitting at the
+top of the band (0.288-0.405).  So the band is touched from above, never
+occupied.  Taking the market side as source 1 (the
+purchase unit value, which the manual defines as including "transport,
+marketing services and profit margins") and the farmgate side as source 4 (an
+actual sale, not a valuation), the wedge is 1.60x pooled and ranges 1.50-2.00
+across waves with no trend.
+
+** Does a household value its own-consumed harvest at the sale price, the purchase price, or between?
+
+*Between -- and nearer the purchase price.*  On the common cell set the
+own-consumption valuation sits at *0.585* of the log distance from the crop
+sale price to the purchase price (median).  Prices are heavily rounded, so
+exact ties are common and the strict/non-strict choice matters; all three
+categories, strictly:
+
+| own-consumption valuation vs ... | strictly below | exactly equal | strictly above |
+|----------------------------------+----------------+---------------+----------------|
+| the crop sale price (source 4) | 13.9% | 21.5% | 64.6% |
+| the purchase price (source 1) | 94.2% | 20.6% (of =gap_1_3=) | 5.8% |
+
+Read the first row: in two thirds of cells the household values its own
+produce strictly above what a sale actually fetched, and in only one seventh
+below.
+
+*So the valuation does not land where the instruction points.*  The manual is
+explicit that column 9 "should be valued at farm gate/producer price ...
+excludes any cost transport and marketing services".  If it were followed to
+the letter, 3 vs 4 would be ~1.0.  It is 1.23.
+
+Two readings fit that equally, and the data cannot separate them: households
+ignored the instruction and valued at something nearer what they would pay;
+or they followed it, but their *notion* of "the price I would get" is the
+price at the nearest trading centre rather than at the field boundary, which
+already contains part of the margin.  Source 3 is a valuation the *respondent*
+produced (=value_own/quantity_own=), not a price anyone quoted, so the
+behavioural attribution is genuinely open.  *For a consumption aggregate the
+two readings say the same thing* -- roughly 23% of margin is baked in either
+way.  Consequence for anyone
+using =food_acquired.Expenditure= on =s='produced'= rows: own-consumption is
+valued roughly 23% above what the household would actually have received, so
+consumption aggregates built on it carry a partial marketing margin that the
+questionnaire intended to exclude.
+
+*A sharper, cell-free version of the same test, with a caveat that partly
+undoes it.*  For households that both bought and produced the same item, in
+the same unit, in the same 7 days, the log ratio of the purchase unit value to
+the own-consumption unit value has median *exactly 0.000 in all eight waves*
+(n = 59-124 per wave, 696 total): those households value own consumption at
+precisely what they paid.  *But 49-76% of those observations are exact zeros*,
+which is as consistent with the enumerator entering one number in both column
+blocks as with a genuine valuation.  I report it as suggestive, not as
+behaviour, and the cell-based 0.585 is the number I would defend.
+
+** By item -- and why the pooled number hides more than it shows
+
+=three_way_by_item.csv= (n cells, median log gap, ratio).  Items are food
+*Aggregate* labels.
+
+| item | n cells | 1 vs 4 gap | ratio 1v4 | 3 vs 4 ratio | in 30-50%? |
+|------+---------+------------+-----------+--------------+------------|
+| Matoke | 53 | 0.259 | 1.30 | 1.00 | no -- 0.2586 vs =log 1.3= = 0.2624, just below the lower edge |
+| Beans | 39 | 0.511 | 1.67 | 1.25 | no |
+| Maize | 36 | 1.204 | *3.33* | 2.83 | no |
+| Ground Nuts | 17 | 0.827 | 2.29 | 1.94 | no |
+| Cassava | 15 | 0.153 | 1.17 | 1.00 | no |
+| Millet | 15 | 0.693 | 2.00 | 1.48 | no |
+| Sorghum | 13 | 0.470 | 1.60 | 1.58 | no |
+| Sweet Bananas | 11 | -1.007 | *0.37* | 0.75 | no |
+| Rice | 9 | 0.405 | 1.50 | 1.20 | no |
+| Sweet Potatoes | 7 | 0.000 | 1.00 | 0.90 | no |
+| Irish Potatoes | 2 | -0.056 | 0.95 | 1.00 | no |
+| Dodo | 2 | -0.805 | 0.45 | 0.28 | no |
+| Cabbages | 2 | 0.341 | 1.41 | 0.91 | *yes* |
+| Sim Sim | 2 | 0.329 | 1.39 | 1.39 | *yes* |
+
+*Only 2 of 14 items sit in 30-50%, and both have 2 cells.*  The claim does not
+describe any well-measured Ugandan staple: Matoke and Cassava are below it
+(1.30, 1.17), Beans, Millet, Ground Nuts and Maize far above.  A single pooled
+"marketing margin" for Uganda would be a fiction averaging a 17% gap on
+cassava against a 233% gap on maize.
+
+*Two of these numbers are artefacts, and naming them is the point of the
+per-item table.*
+
+- *Maize at 3.33x is mostly milling, not marketing.*  The Aggregate label
+  folds =Maize (grains)=, =Maize (cobs)= and =Maize (flour)= into one "Maize",
+  and flour is a *processed* product: purchased unit values in 2013-14 are
+  1,000 UGX/kg for grain and 1,800 for flour.  The crop side is grain
+  (=dried_grain= on 2,109 of its rows).  So the maize cell compares grain sold
+  to a basket that is largely flour bought.  The same fold hits Millet
+  (=Millet= vs =Millet Flour=, 2,000 vs 3,000 in 2018-19) and Cassava
+  (=Cassava= and =Cassava (flour)= happen to be *separate* Aggregate labels,
+  which is why cassava looks clean at 1.17).  Phase 2 should test the slope
+  within processing state, not across it.
+- *Sweet Bananas at 0.37x is a unit artefact.*  A "bunch" sold at the farm and
+  a "bunch" bought in a market are not the same object, and the negative gap
+  is not a negative margin.
+
+* 6. Data problems
+
+| id | table | wave | symptom | count | evidence | proposed fix | status |
+|----+-------+------+---------+-------+----------+--------------+--------|
+| D1 | =crop_production.Value_sold= | 2015-16 | implied sale price ~100x too small for EVERY crop, BOTH seasons | 6,868 sale rows; all-crop median 10 UGX/kg vs 1,000 (2013-14) and 1,300 (2019-20) | =diagnostics.json= =value_sold_scale=; raw =a5aq8= median 850 vs 80,000 in 2013-14, max 80,000 vs 10,277,500 | establish the cause (UBOS recording in hundreds of shillings? data-prep error?) before any rescale | *reported* + documented in =CONTENTS.org= |
+| D2 | =crop_production= =u= | all | the SOLD unit (=a5?q7c=) and SOLD condition (=a5?q7b=) are never wired, so =Value_sold/Quantity_sold= is denominated in a unit the row does not carry | 2.0-10.4% of sale rows disagree with the harvest unit | =CROP_COLMAPS= in =uganda.py:1414=; 2019-20 =s5aq07c_1= is labelled "7c. Unit of crop sold" with 40 value labels | wire =q7c= as a =Unit_sold= level/column | *reported* (GH #824; also Nigeria, Niger) + =CONTENTS.org= |
+| D3 | =harmonize_crop= | all | =j= labels broke the table's own stated join contract | 7,794 sale rows (17%) could not join the food axis | =categorical_mapping.org= codes 141, 741 | relabel 141 -> =Millet=, 741 -> =Matoke= | *FIXED in worktree*, commit =179af546= |
+| D4 | =crop_production= =u= | 2018-19 | season A has no harvest unit column, =u='Unknown'= on every row, so the whole wave-season drops out of the primary source 4 | 5,833 =u='Unknown'= sale rows corpus-wide, 2,937 of them 2018-19 A | =CROP_COLMAPS['2018-19']['A']['unit'] = None= | none needed for A (no column exists); its SOLD unit is populated on 93.1% of sale rows -- see D2 | *reported*, worked around by build 4b |
+| D5 | =food_acquired.Price= semantics | all | =transformations.py:1368-1372= documents =unitprice= as "the survey's own price question"; for Uganda it is UBOS's back-calculated =Exp/Qty= (§2) | 94.4-99.9% of rows | §2 tables, measured on the raw =.dta= | doc change in library code -- *out of my scope*, not touched | *reported* |
+| D6 | =uganda.py:400= | 2011-20 | unknown unit codes dropped with a warning | see below | =analysis.py::unknown_unit_cost= | none -- the cost is negligible | *reported, no action* |
+| D7 | =cluster_features= | 2013-20 | =GrainConflictWarning= on 122-221 of 706-875 clusters per wave (Rural, Latitude, Longitude blanked) | per wave | build-time warnings | pre-existing, GH #323 | *reported*, does not affect District/Region |
+
+** D6 in detail -- the =uganda.py:400= drop costs almost nothing
+
+The brief asked what the unknown-unit drop costs each source.  Measured
+against the =u= table's own code set:
+
+| wave | source rows | dropped | share | lost purchased | lost produced | lost in-kind |
+|------+-------------+---------+-------+----------------+---------------+--------------|
+| 2005-06 | 40,394 | 0 | 0 | 0 | 0 | 0 |
+| 2009-10 | 37,890 | 0 | 0 | 0 | 0 | 0 |
+| 2010-11 | 35,232 | 0 | 0 | 0 | 0 | 0 |
+| 2011-12 | 38,743 | 6 | 0.015% | 5 | 0 | 0 |
+| 2013-14 | 50,422 | 2 | 0.004% | 0 | 2 | 0 |
+| 2015-16 | 49,751 | 11 | 0.022% | 5 | 4 | 2 |
+| 2018-19 | 415,532 | 431 | 0.104% | 119 | 279 | 36 |
+| 2019-20 | 385,434 | 836 | 0.217% | 569 | 229 | 41 |
+
+Codes seen: 800, 801, 802, 996, 997, 998, 999 (as the brief anticipated),
+plus a handful of impossible values (=123060=, =142090=, =156087=, ...) that
+look like a keying slip.  *The warning is loud and the loss is negligible*:
+at worst 0.22% of a wave's rows, 698 purchased + 514 produced + 79 in-kind
+rows across the whole panel.  No source is materially affected and no fix is
+warranted -- but the warning text ("Dropping some unknown unit codes!") should
+say how many, since as written it cannot be triaged without this table.
+
+** Pre-check results the protocol requires before matching
+
+*(i) Unit vocabulary.*  =crop_production= uses 43 distinct =u= labels of which
+*42 are also food =u= labels* -- the two tables share
+=categorical_mapping.org='s =u= / =harvest_units= vocabularies, so no mapping
+was needed.  The single crop-only label is the =Unknown= sentinel (D4).  Food
+carries 128 labels; the 86 food-only ones are consumption units with no
+harvest analogue (=Bottle(500ml)=, =Fish Whole (Medium)=, ...).  This is the
+one pre-check that came back clean, and it is why Uganda needed no unit fix.
+
+*(ii) Cluster coverage.*  Uganda has no =community_prices=, so the protocol's
+=community_prices.v= check was run instead on the two household-side sources,
+against =cluster_features=:
+
+| source | rows | rows whose =(t,v)= has no =cluster_features= row |
+|--------+------+------------------------------------------------|
+| =unit_value= | 242,370 | 763 (0.31%) |
+| =own_consumption_valuation= | 84,369 | 133 (0.16%) |
+| =crop_sale_price= | 45,519 | 403 (0.89%) |
+| =crop_sale_price_soldunit= | 37,047 | 24,996 -> resolved, see below |
+
+Counted and reported, never dropped silently.  The bottom rung of the ladder
+is real: =v=, =District= and =Region= are all present, with District non-null
+on 67-100% of clusters (67% and 72% in 2011-12 and 2010-11, 100% from 2013-14).
+
+The 4b build initially lost 67% of its rows to a missing cluster because it is
+built from the raw =.dta=, whose =HHID= has not been through =id_walk= and so
+does not match the API's =i=.  Resolved by joining on =plot= instead:
+=crop_production.plot= is =rawhhid-parcel-plot=, so it carries the raw id.
+Match rate is now 95-100% per wave-season.
+
+* 7. Reproduce
+
+#+begin_src sh
+export WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-uganda
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_BUILD_WORKERS=1
+cd /tmp && taskset -c 0-2 \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/Uganda/analysis.py
+#+end_src
+
+Reads the shared warm cache read-only.  Outputs: =cells.csv=, =gaps.csv=,
+=models.csv= (protocol schemas), plus =diagnostics.json=, =gaps_by_item.csv=,
+=three_way_cells.csv=, =three_way_by_item.csv=, =source4_conditions.csv=,
+=native_label_1_vs_3.csv=.
+
+*Which numbers were produced after the fix (protocol requires this).*  All of
+them.  =analysis.py= applies the D3 relabelling (=CROP_LABEL_FIX=) explicitly,
+because the analysis runs on the shared warm cache, which predates commit
+=179af546=.  Equivalence was verified cold:
+
+#+begin_src sh
+export LSMS_COUNTRIES_ROOT=$WT/lsms_library/countries
+export LSMS_DATA_DIR=/global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_prices_uganda
+mkdir -p "$LSMS_DATA_DIR"
+ln -sfn /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache "$LSMS_DATA_DIR/dvc-cache"
+# -> crop_production 133,683 rows (unchanged); 'Banana Food' 0 / 'Matoke' 20,077;
+#    'Finger Millet' 0 / 'Millet' 3,309
+#+end_src
+
+The shared cache was never rebuilt under the worktree's hashes, and no
+=*.parquet= was left inside =lsms_library/countries=.
+
+* Appendix: what a future reader should not repeat
+
+- =food_prices(units='unitprice')= and =units='unitvalue'= return *the same
+  number* for Uganda on 94-99.9% of rows.  Do not treat them as two sources.
+- The three pairwise gap rows in section 3 are on different cell sets.  Use
+  =three_way_cells.csv= for anything that needs them to be consistent.
+- 2015-16 crop sale values are unusable until D1 is explained.  They are
+  excluded here, not corrected.

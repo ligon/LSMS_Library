@@ -42,6 +42,41 @@ change is needed; the work is purely data curation.
    poured cement screed without aggregate.  Surveys often record both
    alongside; preserve the distinction.
 
+   *Compound* ``Cement/Concrete`` (one survey option that names both --
+   GhanaSPS, GhanaLSS, Uganda's ``Concrete/cement``) → ``Concrete``.
+   Ruled UNCHANGED on 2026-09-02 (GH #727): the survey never splits the
+   compound, so no single canonical label can recover the distinction
+   and ``Cement`` would be exactly as arbitrary; ``Concrete`` is the
+   precedent Uganda set and every later country followed.  Consequence
+   to keep in mind: a cross-country "cement floor" query returns Malawi
+   and Nigeria but not Ghana.  No combined ``Cement/Concrete`` label is
+   added.
+
+** Bamboo and Terrazzo are their own labels (2026-09-02, GH #727)
+   Two rulings, both driven by GhanaSPS (PR #726), whose roof question
+   offers *Wood* and *Bamboo* as SEPARATE options (29 / 7 / 8 bamboo
+   roofs by wave) and whose floor question offers *Terrazzo* separately
+   from stone, tiles and cement.  Folding those into ``Wood`` / ``Stone``
+   discarded a distinction the survey drew.
+
+   - ``Bamboo`` is added to the Roof list *and* the Floor list
+     (Timor-Leste has an exact-``Bamboo`` floor option).
+   - ``Terrazzo`` is added to the Floor list.
+   - The rule is *exact match*: a country row whose raw label is exactly
+     ``Bamboo`` / ``bamboo`` / ``Terrazzo`` / ``Terrazo`` (a source
+     misspelling) targets the new label.  *Compound* labels that merely
+     mention bamboo alongside another material -- Ethiopia
+     ``Reed/Bamboo`` (→ Mats / Other), Tanzania ``Grass/Leaves/Bamboo``
+     (→ Thatch), Cambodia ``Bamboo strips`` (→ Wood) -- keep their
+     existing fold, exactly as they are.
+   - Re-pointed: GhanaSPS Roof ``Bamboo`` (was Wood) and Floor
+     ``Terrazo`` / ``Terrazzo`` (was Stone); GhanaLSS Roof ``Bamboo``
+     (was Wood) and Floor ``Terrazzo`` (was Concrete); Timor-Leste Floor
+     ``Bamboo`` / ``bamboo`` (was Wood); Nigeria Floor ``Terrazzo`` (was
+     Tiles).  Three countries had folded terrazzo into *three different*
+     labels (Stone, Concrete, Tiles -- and Cement was argued for), which
+     is itself the case for a label of its own.
+
 ** Earth, Earth-with-Dung, Sand, Smoothed Mud (Floor)
    - ``Earth`` covers raw earth, packed earth, rammed earth.
    - ``Earth with Dung`` is preserved as a *separate* category — the
@@ -81,7 +116,8 @@ change is needed; the work is purely data curation.
 | Asbestos         | Uganda; possibly elsewhere.                                          |
 | Mud              | Includes ``Adobe`` (sun-dried mud brick).                            |
 | Mats             | Woven mats.  Togo: 1 obs.                                            |
-| Wood             | ``Wood, Planks`` / ``wood,planks``.  Includes bamboo planks/strips.  |
+| Wood             | ``Wood, Planks`` / ``wood,planks``.  Exact ``Bamboo`` is its own label (below, #727); only *compound* labels that mention bamboo alongside another material (``Reed/Bamboo``, ``Bamboo strips``) still fold here or to their existing target. |
+| Bamboo           | Bamboo poles / strips as the roofing material itself (#727).  Distinct from ``Wood``; compound labels that merely mention bamboo alongside grass or reed keep their existing fold. |
 | Slate            | Slate / slate-tile roofing.  Tajikistan's dominant roof (#170).      |
 | Other            | ``Other (specify)``, ``OTHER(SPECIFY)``, etc.                        |
 
@@ -97,7 +133,9 @@ change is needed; the work is purely data curation.
 | Tiles             | Includes ``Tile``, ``Mosaic or tiles``.                              |
 | Stone             | Stone floor.  Includes polished stone / marble.                      |
 | Bricks            | Brick floor.                                                         |
-| Wood              | Wood plank / parquet.  Includes bamboo strips.                       |
+| Wood              | Wood plank / parquet.  Exact ``Bamboo`` is its own label (below, #727); only *compound* labels (``Bamboo strips``) still fold here. |
+| Bamboo            | Bamboo floor (#727).  Timor-Leste offers it as its own option.  Distinct from ``Wood``; compounds keep their existing fold. |
+| Terrazzo          | Cement-and-aggregate composite, ground and polished (#727).  Distinct from ``Cement``, ``Concrete``, ``Stone`` and ``Tiles``; countries previously folded it into each of those.  Source misspellings ``Terrazo`` / ``Terazo`` map here. |
 | Vinyl/Linoleum    | Resilient sheet/tile flooring (linoleum, vinyl, vinyl tiles) (#170). |
 | Carpet            | Carpeted floor.  South Africa: ~1.5k obs (#170).                     |
 | Other             | ``Other (specify)``, etc.                                            |

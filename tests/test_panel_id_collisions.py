@@ -193,26 +193,36 @@ needs_data = pytest.mark.skipif(
 
 @needs_data
 def test_ghanalss_split_household_food_not_summed_into_one():
-    """(101332, 1988-89) must be 5,570 -- not 5,570 + 10,280."""
+    """(101332, 1988-89) must be its own total -- not its total plus 101332_1's.
+
+    Pins (re-derived 2026-09-11, feat/derived-values): the PURCHASED component
+    is read straight off 12A and is unchanged at 5,390 / 9,090; the PRODUCED
+    component is the derived 12B fortnight (``GhanaLSS::food_acquired::12b-fortnight``,
+    716.67 / 1,504.74) where the raw VFOODCPD value-per-eating-occasion used
+    to be served as-is (180 / 1,190, giving the former pins 5,570 / 10,280).
+    """
     import lsms_library as ll
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         fa = ll.Country("GhanaLSS").food_acquired()
 
-    def spend(i):
+    def spend(i, s=None):
         try:
-            return float(
-                fa.xs(i, level="i").xs("1988-89", level="t")["Expenditure"].sum()
-            )
+            h = fa.xs(i, level="i").xs("1988-89", level="t")
+            if s is not None:
+                h = h.xs(s, level="s")
+            return float(h["Expenditure"].sum())
         except KeyError:
             return float("nan")
 
-    assert spend("101332") == pytest.approx(5570.0), (
+    assert spend("101332", "purchased") == pytest.approx(5390.0)
+    assert spend("101332") == pytest.approx(5390.0 + 716.667, rel=1e-4), (
         "household 101332's 1988-89 food expenditure is the sum of two "
         "different households (GH #548)"
     )
-    assert spend("101332_1") == pytest.approx(10280.0), (
+    assert spend("101332_1", "purchased") == pytest.approx(9090.0)
+    assert spend("101332_1") == pytest.approx(9090.0 + 1504.737, rel=1e-4), (
         "the split-off household 101332_1 is missing from food_acquired"
     )
 

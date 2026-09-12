@@ -194,9 +194,9 @@ Every judgement made, and its basis:
   =Tiles=/=tiles= to =Clay Tiles=.  Exact precedent.
 - =Mud bricks/earth= -> *Mud*.  Canonical =Mud= is documented as
   "Includes Adobe (sun-dried mud brick)", which is this category.
-- =Bamboo= -> *Wood*.  Canonical =Wood= is documented as "Includes bamboo
-  planks/strips".  BUT SEE THE CAVEAT BELOW -- this is the one mapping that
-  merges two distinct GSPS categories.
+- =Bamboo= -> *Bamboo* (since 2026-09-02, GH #727; was *Wood*).  The canon
+  now carries =Bamboo= as its own roof label, so the one merge this file
+  used to make is gone.  The RESOLVED caveat below keeps the history.
 - =Earth/mud/mud bricks= -> *Earth*.  Canonical, matching Uganda
   (=Rammed earth=) and Malawi (=Smoothed mud=).
 - =Ceramic/marble(/) tiles= -> *Tiles*; =Vinyl tiles= -> *Vinyl/Linoleum*.
@@ -207,8 +207,12 @@ Every judgement made, and its basis:
 - =Burnt bricks= -> *Bricks*.  Canonical floor label.  Note GSPS's
   =Earth/mud/mud bricks= is the UNFIRED brick category and goes to =Earth=,
   so the two brick categories stay apart.
-- =Terrazo=/=Terrazzo= -> *Stone*.  THE WEAKEST CALL IN THIS FILE.  The
-  canon has no terrazzo label, and every available canonical label merges
+- =Terrazo=/=Terrazzo= -> *Terrazzo* (since 2026-09-02, GH #727; was
+  *Stone*).  The canon now carries =Terrazzo= as its own floor label, so
+  GSPS's =Stone= (17-18 rows/wave) and its terrazzo (16-18 rows/wave) no
+  longer merge.  SUPERSEDED reasoning for the old target, kept for the
+  record: it was THE WEAKEST CALL IN THIS FILE.  The canon had no
+  terrazzo label, and every available canonical label merged
   terrazzo with some other GSPS floor category: =Concrete= merges it with
   the 4,673-row =Cement/concrete=, =Tiles= with =Ceramic/marble tiles=,
   =Other= with GSPS's own =Other=.  =Stone= is documented as "Includes
@@ -218,7 +222,14 @@ Every judgement made, and its basis:
   rows/wave).  Recorded as a judgement, not a fact.
 - =Other= / =Other - specify= / =Other (please specify)= -> *Other*.
 
-*** CAVEAT: Bamboo -> Wood is a real merge, and GSPS is why the canon should change
+*** CAVEAT (RESOLVED 2026-09-02, GH #727): Bamboo -> Wood was a real merge, and GSPS is why the canon changed
+
+RESOLVED 2026-09-02: =Bamboo= (roof and floor) and =Terrazzo= (floor) were
+added to =canonical_housing_labels.org= under GH #727, and the =Bamboo=,
+=Terrazo= and =Terrazzo= rows below now target them (29 / 7 / 8 bamboo
+roofs and 0 / 16 / 18 terrazzo floors by wave move out of =Wood= and
+=Stone=; nothing else moves).  The caveat as originally written follows,
+kept as the record of why the canon changed.
 
 GSPS's roof question offers *Wood* (code 2) and *Bamboo* (code 8) as
 SEPARATE options -- 20/10/11 and 29/7/8 observations respectively across
@@ -233,10 +244,10 @@ mapping is applied at API time only, so ~pd.read_parquet~ on the cached
 housing parquet still shows =Bamboo=, and ~s12a_32~ / ~materialroof~ in
 the source are untouched.
 
-RECOMMENDATION for whoever owns GH #170: add *Bamboo* (and possibly
-*Terrazzo*) to the canonical roof/floor lists and re-point the two rows
-below.  GhanaSPS appears to be the first country in the corpus whose roof
-question separates bamboo from wood.
+RECOMMENDATION (DONE under GH #727, 2026-09-02) for whoever owns GH #170:
+add *Bamboo* (and possibly *Terrazzo*) to the canonical roof/floor lists
+and re-point the two rows below.  GhanaSPS appears to be the first country
+in the corpus whose roof question separates bamboo from wood.
 
 *** What is deliberately NOT mapped
 
@@ -273,7 +284,7 @@ canonical set above", never "do the distributions look plausible".
 | Roofing tiles          | Clay Tiles      |
 | Mud bricks /Earth      | Mud             |
 | Mud bricks/earth       | Mud             |
-| Bamboo                 | Wood            |
+| Bamboo                 | Bamboo          |
 | Wood                   | Wood            |
 | Other                  | Other           |
 | Other - specify        | Other           |
@@ -291,10 +302,861 @@ canonical set above", never "do the distributions look plausible".
 | Ceramic/marble tiles   | Tiles           |
 | Vinyl tiles            | Vinyl/Linoleum  |
 | Burnt bricks           | Bricks          |
-| Terrazo                | Stone           |
-| Terrazzo               | Stone           |
+| Terrazo                | Terrazzo        |
+| Terrazzo               | Terrazzo        |
 | Stone                  | Stone           |
 | Wood                   | Wood            |
 | Other                  | Other           |
 | Other - specify        | Other           |
 | Other (please specify) | Other           |
+
+* Plot features: AreaUnit / Tenure (GH #732, #729)
+
+Two tables for =plot_features=.  Unlike =Roof= / =Floor= above, these are
+referenced EXPLICITLY from each wave's =data_info.yml=
+(=mappings: ['Tenure', 'Alternate Spelling', 'Preferred Label']=) and so are
+applied at EXTRACTION time: the cached =plot_features.parquet= already carries
+the canonical values.  That is deliberate -- =tests/test_table_structure.py=
+runs the declared-spellings check on the cached parquet, and =Tenure= has a
+declared vocabulary in =lsms_library/data_info.yml=, so an API-time mapping
+would leave the parquet failing a check the delivered table passes.  Because
+the table names also match the column names,
+~Country._apply_categorical_mappings~ applies them a SECOND time at API time;
+that pass is idempotent (no Preferred Label below is also somebody else's
+Alternate Spelling), and it is what would repair a parquet written before a
+row was added.
+
+** AreaUnit
+
+The native unit as the respondent reported it, folded onto the vocabulary
+GhanaLSS's =plot_features= already emits (=Acres / Poles / Ropes / Plot /
+Other=) so that ~Feature('plot_features')~ agrees across the two Ghanas.
+Three spelling systems for the same four units:
+
+| code | 2009-10 =s4aii_a11= | 2013-14 =plotsizeunit= | 2017-18 =plotunit= |
+|------+---------------------+------------------------+--------------------|
+|    1 | Acre                | Acres                  | Acres              |
+|    2 | Pole                | Poles                  | Poles              |
+|    3 | Rope                | Ropes                  | *Robes*            |
+|    4 | Plot                | Plot                   | Plots              |
+|  oth | Other               | Other - Specify        | (free text)        |
+
+"Robes" is what BOTH the wave-2 and the wave-3 instrument print; wave 2's
+data label was corrected, wave 3's was not.  2017-18's =plotunit= is a
+producer-resolved column that, for its six 'Other (please specify)' plots,
+carries the specify-box free text in place of the closed answer; those six
+strings map to =Other= -- the closed answer the respondent gave -- and are
+listed verbatim so the mapping is checkable (=-999= is the wave-3 "Don't know"
+sentinel typed into the specify box; the =_to_numeric= pass over this table
+leaves it a string because the column is not numeric as a whole).  Only the
+four named units carry a hectare factor (~ghanasps._PLOT_HECTARES_PER_UNIT~);
+=Other= yields a NaN =Area=.
+
+#+name: AreaUnit
+| Alternate Spelling                                                                | Preferred Label |
+|----------------------------------------------------------------------------------+-----------------|
+| Acre                                                                             | Acres           |
+| Acres                                                                            | Acres           |
+| Pole                                                                             | Poles           |
+| Poles                                                                            | Poles           |
+| Rope                                                                             | Ropes           |
+| Ropes                                                                            | Ropes           |
+| Robes                                                                            | Ropes           |
+| Plot                                                                             | Plot            |
+| Plots                                                                            | Plot            |
+| Other                                                                            | Other           |
+| Other - Specify                                                                  | Other           |
+| Other (please specify)                                                           | Other           |
+| 2 miles squared                                                                  | Other           |
+| It has never been measured before. It is a family land that belongs to forsfathers | Other         |
+| -999                                                                             | Other           |
+| Don't know                                                                       | Other           |
+
+** Tenure
+
+Every Preferred Label is drawn from the =Tenure= =spellings= vocabulary in
+=lsms_library/data_info.yml=; no country-local value is coined (the vocabulary
+cannot be extended from a country config, and =_check_declared_spellings=
+would fail one).  The per-label reasoning -- including the two judgement calls,
+=Allocated free of charge= -> =communal= (the waves-2/3 follow-up "What
+qualifies you to be allocated this plot free of charge?" answers Lineage or
+Member-of-the-community for 70% / 74% of such plots) and the merged waves-2/3
+rent-or-sharecrop option -> =rented_in= -- is in the =plot_features= block of
+=_/data_scheme.yml=, next to the column declaration.  Wave 1 is the only wave
+that separates sharecropping from renting, so =sharecropped_in= occurs only in
+2009-10.  =Other= free text (73 / 67 rows) is not decoded.
+
+#+name: Tenure
+| Alternate Spelling                        | Preferred Label |
+|-------------------------------------------+-----------------|
+| Purchase                                  | owned           |
+| Purchased                                 | owned           |
+| Inherit                                   | inherited       |
+| Inherited from deceased family member     | inherited       |
+| Inherited from family member              | inherited       |
+| Rent for cash or kind                     | rented_in       |
+| Rented (for cash or kind), or sharecrop   | rented_in       |
+| Rented (for cash or kind) or sharecropped | rented_in       |
+| Sharecrop                                 | sharecropped_in |
+| Sharecrop with initial payment            | sharecropped_in |
+| Allocated free                            | communal        |
+| Allocated free of charge                  | communal        |
+| Begged                                    | use_right       |
+| Borrowed                                  | use_right       |
+| Other - specify                           | other_tenure    |
+| Other (please specify)                    | other_tenure    |
+
+* Livestock: harmonize_species (GH #729, #736)
+
+The =livestock= table's =animal= index level carries the =Preferred Label=
+from this table.  It is the corpus name (Uganda, Nigeria and Malawi each
+keep a =harmonize_species= table) and it is applied at EXTRACTION -- every
+wave's =data_info.yml= references it with
+=mappings: ['harmonize_species', 'Alternate Spelling', 'Preferred Label']=
+on the =animal= idxvar -- so the cached parquet is already canonical.  The
+lookup is an exact dict lookup on the decoded source label, and an unmatched
+value passes through UNCHANGED (it is not nulled and nothing raises), so the
+discriminating test is "is the delivered per-wave value set a subset of the
+Preferred Labels plus the listed pass-throughs", never "does the
+distribution look plausible".
+
+** Three instruments, three vocabularies
+
+- 2009-10 =S3AI.dta= :: =animal_id= is a labelled categorical with eight
+  values: =Drought Animal= (sic), =Cattle=, =Sheep=, =Goats=, =Pigs=,
+  =Rabbits=, =Chicken/Rosters=, =Other Farm Animals=.  The last is a
+  catch-all the instrument never asks to name, and 20 households list it on
+  two or three lines.
+- 2013-14 =03ai_animalquestions.dta= :: a FIXED seven-species grid asked of
+  every household (lower-case: =draught animals=, =cattle=, =sheep=,
+  =goats=, =pigs=, =rabbits=, =chickens=), plus a 174-row "other" tail whose
+  =animal= is FREE TEXT -- 62 distinct spellings, 26 of them guinea fowl
+  (=GINUEA FOWL=, =GUINNEA FOWL=, =gueni folws=, =GUINE  FOWL= with two
+  internal spaces, ...).
+- 2017-18 =03ai_animalquestions.dta= :: eight clean labels (=Cattle=,
+  =Sheep=, =Goats=, =Pigs=, =Rabbits=, =Chickens/roosters=, =Draught animal
+  (donkey, horse, bullock)=, =Fish=); its =_osp= "other -- specify" sibling
+  carries eleven title-case free-text species.
+
+** The rule: harmonise the SPELLING, never fold a SPECIES
+
+A precedent label wins wherever one exists -- Uganda's species-level
+=Cattle= / =Sheep= / =Goats= / =Pigs= / =Rabbits= / =Chicken= / =Donkeys= /
+=Other Poultry=, and Nigeria's and Malawi's =Guinea Fowl= / =Duck= / =Turkey=
+/ =Fish= / =Dove/Pigeon= / =Other Livestock= -- so that =Feature('livestock')=
+agrees across countries on every label that has one.  That is why the list
+mixes plurals with a singular =Duck= and =Turkey=: cross-country
+coincidence was preferred to internal tidiness.  Where no precedent exists
+the coinage is plural: =Draught Animals=, =Dogs=, =Cats=, =Grasscutters=,
+=Guinea Pigs=, =Peacocks=, =Quails=.
+
+Only a label that names NO species goes to a catch-all: =BIRDS= / =Bird= to
+=Other Poultry=, =Other Farm Animals= to =Other Livestock=.  Ducks, turkeys
+and guinea fowl are NOT folded into =Other Poultry= -- the respondent named
+them, and Nigeria and Malawi keep them distinct.  Dogs and cats are reported
+with sale values in waves 2 and 3 and are kept under their own labels rather
+than hidden inside =Other Livestock=, so an analyst can exclude them from a
+wealth aggregate.
+
+Note the consequence for cross-wave reading: wave 1's =Other Farm Animals=
+catch-all is where its guinea fowl, ducks and turkeys live (the instrument
+offered no other slot), while waves 2 and 3 name them.  =Other Livestock=
+therefore exists only in 2009-10, and a wave-over-wave comparison of =Guinea
+Fowl= or =Other Livestock= is an instrument artefact.  Likewise =Donkeys=
+(named in the free text) overlaps conceptually with =Draught Animals= (the
+grid row that includes donkeys); a household that wrote "donkey" in the
+other slot is delivered as =Donkeys=, as reported.
+
+** Three spellings are left UNMAPPED, deliberately
+
+='50'= (a number typed where a species should be), ='cut'= (cat?) and
+='dake'= (duck?) each occur once in 2013-14.  They are genuinely
+unmappable -- a guess would be a fabrication -- so they are not in the table
+and pass through as their own =animal= values.  ='50'= is also excluded
+because the org parser coerces an all-numeric column cell to a number, so a
+row for it would never match the string anyway.
+
+Every Alternate Spelling appears exactly once: =set_index().to_dict()= keeps
+the LAST row on a duplicate key, so a spelling shared by two waves
+(=Guinea Fowl=, =Turkey=, =Dog=, =Cat=, =Donkey=, =Grasscutter=) has one row.
+
+#+name: harmonize_species
+| Alternate Spelling                        | Preferred Label |
+|-------------------------------------------+-----------------|
+| Drought Animal                            | Draught Animals |
+| draught animals                           | Draught Animals |
+| Draught animal (donkey, horse, bullock)   | Draught Animals |
+| Cattle                                    | Cattle          |
+| cattle                                    | Cattle          |
+| Sheep                                     | Sheep           |
+| sheep                                     | Sheep           |
+| Goats                                     | Goats           |
+| goats                                     | Goats           |
+| Pigs                                      | Pigs            |
+| pigs                                      | Pigs            |
+| Rabbits                                   | Rabbits         |
+| rabbits                                   | Rabbits         |
+| Rabbit                                    | Rabbits         |
+| Chicken/Rosters                           | Chicken         |
+| chickens                                  | Chicken         |
+| Chickens/roosters                         | Chicken         |
+| Chickens                                  | Chicken         |
+| Other Farm Animals                        | Other Livestock |
+| Fish                                      | Fish            |
+| fish                                      | Fish            |
+| GINUEA FOWL                               | Guinea Fowl     |
+| GINUEA FOWLS                              | Guinea Fowl     |
+| GUINE  FOWL                               | Guinea Fowl     |
+| GUINE FOWOLS                              | Guinea Fowl     |
+| GUINEA FOWL                               | Guinea Fowl     |
+| GUINEA FOWLS                              | Guinea Fowl     |
+| GUINEA fowl                               | Guinea Fowl     |
+| GUINNEA FOWL                              | Guinea Fowl     |
+| GUINNEA FOWLS                             | Guinea Fowl     |
+| GUINUE FOWL                               | Guinea Fowl     |
+| GUNEA FOWL                                | Guinea Fowl     |
+| Giunea fowl                               | Guinea Fowl     |
+| Guinea Fowl                               | Guinea Fowl     |
+| Guinea fowl                               | Guinea Fowl     |
+| Guinnea Foul                              | Guinea Fowl     |
+| ginue falws                               | Guinea Fowl     |
+| ginuea falws                              | Guinea Fowl     |
+| ginuea fawls                              | Guinea Fowl     |
+| giunea fowls                              | Guinea Fowl     |
+| gueni folws                               | Guinea Fowl     |
+| guimea fowls                              | Guinea Fowl     |
+| guinea fawl                               | Guinea Fowl     |
+| guinea fowl                               | Guinea Fowl     |
+| guinea fowls                              | Guinea Fowl     |
+| guineea fowls (young ones)                | Guinea Fowl     |
+| guiney fowl                               | Guinea Fowl     |
+| DUCK                                      | Duck            |
+| DUCKS                                     | Duck            |
+| Ducks                                     | Duck            |
+| duck                                      | Duck            |
+| ducks                                     | Duck            |
+| Duck                                      | Duck            |
+| TURKEY                                    | Turkey          |
+| TURKEYS                                   | Turkey          |
+| Turkey                                    | Turkey          |
+| turkey                                    | Turkey          |
+| DOVE                                      | Dove/Pigeon     |
+| dove                                      | Dove/Pigeon     |
+| doves                                     | Dove/Pigeon     |
+| DONKEY                                    | Donkeys         |
+| Donkey                                    | Donkeys         |
+| donkeys                                   | Donkeys         |
+| DOG                                       | Dogs            |
+| DOGS                                      | Dogs            |
+| Dog                                       | Dogs            |
+| Dogs                                      | Dogs            |
+| dog                                       | Dogs            |
+| dogs                                      | Dogs            |
+| CAT                                       | Cats            |
+| CATS                                      | Cats            |
+| Cat                                       | Cats            |
+| Cats                                      | Cats            |
+| cat                                       | Cats            |
+| GRASSCUTTER                               | Grasscutters    |
+| Grasscutter                               | Grasscutters    |
+| grasscutter                               | Grasscutters    |
+| guinea pigs                               | Guinea Pigs     |
+| peacock                                   | Peacocks        |
+| Quails                                    | Quails          |
+| BIRDS                                     | Other Poultry   |
+| Bird                                      | Other Poultry   |
+
+* Crop production: harmonize_crop / harvest_units (GH #729, #140)
+
+Two tables for =crop_production=.  Both are applied at EXTRACTION: the
+2013-14 and 2017-18 =data_info.yml= blocks reference them with
+=mappings: ['harmonize_crop', 'Alternate Spelling', 'Preferred Label']= on
+the =j= idxvar and =mappings: ['harvest_units', ...]= on the =u= idxvar (and
+on the nine 2017-18 sale-channel unit columns), and the 2009-10 wave script
+applies =harmonize_crop= to the decoded crop label itself.  The lookup is an
+exact dict lookup on the DECODED label -- never on the numeric code, because
+the codes are not stable (2017-18 introduces =-666= for "Other", and 2013-14
+ships two rows whose =cropcode= is blank) -- and an unmatched value passes
+through UNCHANGED, so the discriminating test is "is the delivered per-wave
+=j= / =u= set a subset of the Preferred Labels", never "does the top-10 look
+right".  Neither table is named after a column: a table named =u= would be
+auto-dispatched at API time onto EVERY table with a =u= level
+(=food_acquired= included) and row-unioned with the global
+=categorical_mapping/u.org=, which is not wanted here.
+
+** harmonize_crop
+
+The rule, in order: (1) the GhanaSPS =harmonize_food= Preferred Label (in
+this file since GH #783; formerly the standalone =food_items.org=) where
+the harvested crop IS that food item, verbatim (=Maize=, =Cocoyam=,
+=Groundnuts=, =Onions=, =Orange/Tangerine=, =Pepper (fresh or dried)=,
+=Tomatoes (fresh)=, =Palm Nuts= for oil palm, whose harvested part is the
+fruit/nut in 488 of 502 wave-1 records) -- this is Uganda's stated purpose
+for its =harmonize_crop= (a crop =j= joins =food_acquired.j=), and GhanaSPS
+has no coarser Aggregate column to prefer; (2) otherwise Uganda's
+=harmonize_crop= label where the crop exists there (=Beans=, =Cocoa=,
+=Coffee=, =Cotton=, =Rice=, =Other Crop=); (3) otherwise a title-case coinage
+(=Cashew Nuts=, =Kenaf=, =Leafy Vegetables=, =Sheanuts=, =Tiger Nuts=,
+=Potatoes/Sweet Potatoes=, =Other Food Crops=).  Spelling is harmonised; no
+crop is folded into another.  Three instruments, three spelling systems:
+2009-10 title-case value labels (=Groundnut/Peanut=, =Water melon=), 2013-14
+lower-case free-ish text (=groundnut/peanut=, =oranges/ tangerine= AND
+=oranges/tangerine=, =papaya= AND =pawpaw=, =soya bean= AND =soya beans=,
+=pepe= for pepper, =potatoes/sweet potat= truncated), 2017-18 title-case with
+its own typography (=Groundnut/ Pea nut=, =Guinea= truncated from Guinea
+corn/Sorghum, =Garden egg/egg=, =Pawpaw/papaya=, and =Other= for its =-666=
+catch-all).  Every spelling appears exactly once.
+
+2009-10 records the PART harvested (A80.2: "e.g. Cocoa, Cocoa Leaves"); the
+wave script qualifies =j= where the part is a different product from the
+crop's principal one (=Cocoyam Leaves=, an existing =food_items= label; else
+=Crop (part)=).  Those labels exist ONLY in 2009-10 -- see
+=ghanasps.product_label= and the data_scheme.yml block.
+
+#+NAME: harmonize_crop
+| Alternate Spelling      | Preferred Label          |
+|-------------------------+--------------------------|
+| Avocado pear            | Avocado/Pear             |
+| avocado pear            | Avocado/Pear             |
+| Banana                  | Banana                   |
+| banana                  | Banana                   |
+| Beans/Peas              | Beans                    |
+| beans/peas              | Beans                    |
+| Beans/peas              | Beans                    |
+| Cashew nut              | Cashew Nuts              |
+| cashew nut              | Cashew Nuts              |
+| Cassava                 | Cassava                  |
+| cassava                 | Cassava                  |
+| Cocoa                   | Cocoa                    |
+| cocoa                   | Cocoa                    |
+| Coconut                 | Coconut                  |
+| coconut                 | Coconut                  |
+| Cocoyam                 | Cocoyam                  |
+| cocoyam                 | Cocoyam                  |
+| Coffee                  | Coffee                   |
+| Colanut                 | Cola Nuts                |
+| colanut                 | Cola Nuts                |
+| Cotton                  | Cotton                   |
+| cotton                  | Cotton                   |
+| Garden Egg/Egg plant    | Garden Eggs              |
+| garden egg/eggplant     | Garden Eggs              |
+| Garden egg/egg          | Garden Eggs              |
+| Ginger                  | Ginger                   |
+| ginger                  | Ginger                   |
+| Groundnut/Peanut        | Groundnuts               |
+| groundnut/peanut        | Groundnuts               |
+| Groundnut/ Pea nut      | Groundnuts               |
+| Guinea corn/Sorghum     | Sorghum                  |
+| guinea corn/sorghum     | Sorghum                  |
+| Guinea                  | Sorghum                  |
+| Kenef                   | Kenaf                    |
+| Leafy Vegetable         | Leafy Vegetables         |
+| leafy vegetable         | Leafy Vegetables         |
+| Leafy vegetable         | Leafy Vegetables         |
+| Lime/Lemon              | Lime/Lemon               |
+| Maize                   | Maize                    |
+| maize                   | Maize                    |
+| Mango                   | Mango                    |
+| mango                   | Mango                    |
+| Millet                  | Millet                   |
+| millet                  | Millet                   |
+| Oil Palm                | Palm Nuts                |
+| oil palm                | Palm Nuts                |
+| Oil palm                | Palm Nuts                |
+| Okro                    | Okro                     |
+| okro                    | Okro                     |
+| Onion                   | Onions                   |
+| onion                   | Onions                   |
+| Oranges/Tangerine       | Orange/Tangerine         |
+| oranges/ tangerine      | Orange/Tangerine         |
+| oranges/tangerine       | Orange/Tangerine         |
+| Oranges/tangerine       | Orange/Tangerine         |
+| Pawpaw                  | Pawpaw                   |
+| pawpaw                  | Pawpaw                   |
+| papaya                  | Pawpaw                   |
+| Pawpaw/papaya           | Pawpaw                   |
+| Pepper                  | Pepper (fresh or dried)  |
+| pepper                  | Pepper (fresh or dried)  |
+| pepe                    | Pepper (fresh or dried)  |
+| Pineapple               | Pineapple                |
+| pineapple               | Pineapple                |
+| Plantain                | Plantain                 |
+| plantain                | Plantain                 |
+| Potatoes/Sweet potatoes | Potatoes/Sweet Potatoes  |
+| potatoes/sweet potat    | Potatoes/Sweet Potatoes  |
+| Potatoes/sweet potatoes | Potatoes/Sweet Potatoes  |
+| Rice                    | Rice                     |
+| rice                    | Rice                     |
+| Rubber                  | Rubber                   |
+| rubber                  | Rubber                   |
+| Sheanut                 | Sheanuts                 |
+| Sugarcane               | Sugarcane                |
+| sugarcane               | Sugarcane                |
+| Tiger nut               | Tiger Nuts               |
+| tiger nut               | Tiger Nuts               |
+| Tobacco                 | Tobacco                  |
+| tobacco                 | Tobacco                  |
+| Tomatoes                | Tomatoes (fresh)         |
+| tomatoes                | Tomatoes (fresh)         |
+| Water melon             | Watermelon               |
+| watermelon              | Watermelon               |
+| Watermelon              | Watermelon               |
+| Woodlot                 | Woodlot                  |
+| Yam                     | Yam                      |
+| yam                     | Yam                      |
+| soya bean               | Soya Beans               |
+| soya beans              | Soya Beans               |
+| Soya beans              | Soya Beans               |
+| Other food crops        | Other Food Crops         |
+| other food crops        | Other Food Crops         |
+| Other fruits            | Other Fruits             |
+| Other vegetables        | Other Vegetables         |
+| other vegetables        | Other Vegetables         |
+| Other                   | Other Crop               |
+
+** harvest_units
+
+The native harvest unit as the respondent reported it, folded onto the
+Preferred Labels of the =harmonizedunit= table in =_/units.org= -- the
+vocabulary =food_acquired.u= already delivers in all three waves (singular:
+=Maxi bag=, =Tuber=, =Kilogram=, =Single=, =Groups of 100 pieces=) -- so that
+a =crop_production= quantity and a =food_acquired= quantity in this country
+share one unit label.  Nothing is converted to kilograms here.  2009-10
+stores the unit as a numeric CODE with no value labels; the wave script
+decodes it through the same =unit09= -> =harmonizedunit= chain the 2009-10
+=food_acquired= script uses, which is why 2009-10 needs no rows below.
+2013-14 offers a 20-code subset spelled in the lower-case plural
+(=maxi bags=, =single=, =Other - specify=); 2017-18 offers the full list in
+the title-case plural (=Maxi bags=, =Singles=, =Yards/metres=, =Other=).
+Every spelling appears exactly once (=Groups of 100 pieces= is spelled
+identically in both waves).  The =Other= rows' free text is folded by the
+hook ONLY on an exact case-insensitive match to a vocabulary label or its
+plural (=tubers= -> =Tuber=); the rest (=ropes=, =pan=, =bashing rubber=,
+=Motor King= ...) stays =Other=.
+
+#+NAME: harvest_units
+| Alternate Spelling   | Preferred Label      |
+|----------------------+----------------------|
+| american tins        | American tin         |
+| baskets              | Basket               |
+| bowls                | Bowl                 |
+| boxes                | Box                  |
+| buckets              | Bucket               |
+| bunches              | Bunch                |
+| bundles              | Bundle               |
+| calabashes           | Calabash             |
+| crates               | Crate                |
+| fingers              | Finger               |
+| groups of 100 pieces | Groups of 100 pieces |
+| kilograms            | Kilogram             |
+| margarine tins       | Margarine tin        |
+| maxi bags            | Maxi bag             |
+| mini bags            | Mini bag             |
+| sets                 | Set                  |
+| single               | Single               |
+| sticks               | Stick                |
+| tonnes               | Tonne                |
+| Other - specify      | Other                |
+| Other                | Other                |
+| American tins        | American tin         |
+| Balls                | Ball                 |
+| Barrels              | Barrel               |
+| Bars                 | Bar                  |
+| Baskets              | Basket               |
+| Beer bottles         | Beer bottle          |
+| Bowls                | Bowl                 |
+| Boxes                | Box                  |
+| Buckets              | Bucket               |
+| Bunches              | Bunch                |
+| Bundles              | Bundle               |
+| Calabashes           | Calabash             |
+| Crates               | Crate                |
+| Dozens               | Dozen                |
+| Fanta/coke bottles   | Fanta/coke bottle    |
+| Fingers              | Finger               |
+| Fruits               | Fruit                |
+| Gallons              | Gallon               |
+| Groups of 100 pieces | Groups of 100 pieces |
+| Kilograms            | Kilogram             |
+| Litres               | Litre                |
+| Loafs                | Loaf                 |
+| Logs                 | Log                  |
+| Margarine tins       | Margarine tin        |
+| Maxi bags            | Maxi bag             |
+| Milk tins            | Milk tin             |
+| Mini bags            | Mini bag             |
+| Nuts                 | Nut                  |
+| Packets              | Packet               |
+| Pairs                | Pair                 |
+| Pieces               | Piece                |
+| Pots                 | Pot                  |
+| Pounds               | Pound                |
+| Sachets              | Sachet               |
+| Sets                 | Set                  |
+| Sheets               | Sheet                |
+| Singles              | Single               |
+| Sticks               | Stick                |
+| Ties                 | Tie                  |
+| Tins                 | Tin                  |
+| Tonnes               | Tonne                |
+| Trees                | Tree                 |
+| Tubers               | Tuber                |
+| Yards/metres         | Yard/metre           |
+
+* Plot labour: harmonize_stage / harmonize_labor_source / WageUnit (GH #729, #140)
+
+The =plot_labor= index is =(t, i, plot_id, season, stage, source)=.  All three
+waves are wave scripts, so each script emits the Preferred Label directly
+(mirroring =harmonize_species=); these tables are the canonical REGISTRY for
+the three vocabularies, and =WageUnit= additionally auto-dispatches at API time
+onto the column of the same name (idempotent -- every Preferred Label is its
+own Alternate Spelling).
+
+** harmonize_stage -- the =stage= index level
+
+*Nine values, and the reason there are nine rather than four or seven.*  The
+2009-10 instrument asks the labour battery FOUR times per season; 2013-14 and
+2017-18 ask it SEVEN times.  The later seven are not a refinement of the same
+four: 2009-10's blocks are strictly COARSER, and its first block is not a
+subset of anything in the later list.  So neither vocabulary can be dropped
+without inventing data, and folding the later waves onto the earlier four
+would throw away grain the survey collected.  Both are kept, exactly as each
+instrument asked them, and the containment is recorded here so a consumer can
+fold in the one direction that is sound (7 -> 4, by summing =PersonDays=):
+
+| 2009-10 (4, coarse)             | 2013-14 / 2017-18 (7)                             |
+|---------------------------------+---------------------------------------------------|
+| =land_preparation=              | =clearing_and_land_preparation= + =ploughing= + =planting= |
+| =field_management=              | =chemical_application= + =weeding=                |
+| =harvesting=                    | =harvesting=                                      |
+| =post_harvest=                  | =post_harvest=                                    |
+
+The 2009-10 blocks are named ONLY in the questionnaire
+(=2009-10/Documentation/Household_questionnaire_Part_A.pdf=, Section 4
+"IX. LABOR INPUTS"), whose eight section headers read verbatim:
+
+- A290--A298 / A327--A335 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USE ON
+  LAND PREPARATION E.G. CLEARING OR WEEDING BEFORE PLANTING, SEEDING/NURSERY,
+  PLANTING AND TRANSPLANTING DURING THE MAJOR [MINOR] SEASON:"
+- A299--A307 / A336--A344 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  FIELD MANAGEMENT (WEEDING AFTER PLANTING, FERTILIZED AND PESTICIDE
+  APPLICATIONS, IRRIGATION, MANAGEMENT ETC DURING THE MAJOR [MINOR] SEASON:"
+- A308--A316 / A345--A353 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  HARVESTING OF CROPS DURING THE MAJOR [MINOR] SEASON:"
+- A317--A325 / A354--A362 :: "THE FOLLOWING QUESTIONS PERTAIN TO LABOR USED ON
+  POST-HARVEST ACTIVITIES (INCLUDING PRESERVATION FOR STORAGE ETC) OF CROPS
+  DURING THE MAJOR [MINOR] SEASON:"
+
+*=ploughing= is the one placement the 2009-10 header does not settle.*  It
+names clearing, weeding-before-planting, seeding/nursery, planting and
+transplanting, and does not mention ploughing -- but neither does it exclude
+it, whereas 2013-14 and 2017-18 explicitly DO ("Activities such as plowing,
+tilling, or mound-making should NOT be included as land preparation"), which
+is why they need a separate stage for it.  Hoe ploughing therefore has nowhere
+else to go in 2009-10 and the fold above puts it in =land_preparation=; that
+one cell is a reading, not a quotation, and is flagged as such.
+
+2017-18's instrument prints the stage definitions in full ("Ploughing: Hoe
+ploughing only.  This does not include any tractor activities."); the data
+label spells it =Plowing=, 2013-14's spells it =ploughing=.  Both fold to
+=ploughing=.
+
+#+name: harmonize_stage
+| Alternate Spelling            | Preferred Label               |
+|-------------------------------+-------------------------------|
+| clearing and land preparation | clearing_and_land_preparation |
+| Clearing and land preparation | clearing_and_land_preparation |
+| ploughing                     | ploughing                     |
+| Plowing                       | ploughing                     |
+| planting                      | planting                      |
+| Planting                      | planting                      |
+| chemical application          | chemical_application          |
+| Chemical application          | chemical_application          |
+| weeding                       | weeding                       |
+| Weeding                       | weeding                       |
+| harvesting                    | harvesting                    |
+| Harvesting                    | harvesting                    |
+| post-harvest processing       | post_harvest                  |
+| Post-harvest processing       | post_harvest                  |
+| land preparation              | land_preparation              |
+| field management              | field_management              |
+| clearing_and_land_preparation | clearing_and_land_preparation |
+| ploughing                     | ploughing                     |
+| planting                      | planting                      |
+| chemical_application          | chemical_application          |
+| weeding                       | weeding                       |
+| harvesting                    | harvesting                    |
+| post_harvest                  | post_harvest                  |
+| land_preparation              | land_preparation              |
+| field_management              | field_management              |
+
+** harmonize_labor_source -- the =source= index level
+
+Extends Nigeria's =harmonize_labor_source= registry
+(=countries/Nigeria/_/categorical_mapping.org=, family / hired / other) with
+the two labels the later GhanaSPS waves add and the two 2009-10 splits.  The
+same asymmetry as =harmonize_stage=: the survey's own grain is kept and the
+containment is recorded, rather than folded.
+
+| 2009-10 (3)   | 2013-14 / 2017-18 (5)              | why                                                                 |
+|---------------+------------------------------------+---------------------------------------------------------------------|
+| =casual= + =permanent= | =hired=                   | both 2009-10 blocks are non-household paid labour; the later waves ask one "hired laborers (includes payment in kind)" question and do not split by contract length |
+| =family=      | =self= + =family= + =communal=     | 2009-10 has no "yourself" question, so the respondent's own days have nowhere else to go, and A362's own wording is "How much family labor is worked by children? (*including exchanged labor*)" -- exchanged labour is what the later waves call communal |
+| ---           | =other=                            | 2009-10 offers no other-specify labour block                        |
+
+Later-wave source wording, verbatim from Part M ("Who worked on this plot
+during the ... stage?  Select all that apply"): =1 Yourself= / =1 Self=,
+=2 Family, Relatives, or friends=, =3 Communal labor=, =4 Hired labor= (2013-14
+adds "HIRED LABOR INCLUDES PAYMENT IN-KIND (SUCH AS WOMEN WHO HELP WITH
+GROUNDNUT HARVEST)"), =5 Other (SPECIFY)= / =-666 Other (please specify)=.
+2009-10's wording is "How much *casual* labor was provided by men?" (A290),
+"How much *permanent* labor was provided by men?" (A293), "How much *family*
+labor worked by men?" (A296).
+
+#+name: harmonize_labor_source
+| Alternate Spelling      | Preferred Label |
+|-------------------------+-----------------|
+| Yourself                | self            |
+| Self                    | self            |
+| self                    | self            |
+| Family, Relatives, or friends | family    |
+| Family/Relatives/friends | family         |
+| family                  | family          |
+| Communal labor          | communal        |
+| communal                | communal        |
+| Hired labor             | hired           |
+| hired                   | hired           |
+| Other (SPECIFY)         | other           |
+| Other (please specify)  | other           |
+| other                   | other           |
+| casual                  | casual          |
+| permanent               | permanent       |
+
+** WageUnit -- what the hired-labour rate is a rate PER
+
+=hiredpayunit=, asked once per plot in 2013-14 (M194 "Do you pay those amounts
+per day or per acre?") and stored once per stage row in 2017-18 (M196).
+2009-10 asks no payment question at all, so =WageUnit= is null throughout that
+wave.
+
+The four area members deliberately reuse the =AreaUnit= Preferred Labels above
+(=Acres= / =Poles= / =Ropes= / =Plot=), so a per-area rate can be converted
+with =plot_features().Area= without a second spelling system.  The free text
+behind =Other= (=hiredpayunitother=: "the whole farm", "per tank of spraying
+machine", "per 3 hours", "Per bottle", "Per farming season", ...) is NOT
+decoded -- some of it is a period and some an area and some neither.
+
+#+name: WageUnit
+| Alternate Spelling     | Preferred Label |
+|------------------------+-----------------|
+| Per day                | Day             |
+| Per week               | Week            |
+| Per month              | Month           |
+| Per plot               | Plot            |
+| Per acre               | Acres           |
+| Per pole               | Poles           |
+| Per rope               | Ropes           |
+| Other - specify        | Other           |
+| Other Specify          | Other           |
+| Other (specify)        | Other           |
+| Other (please specify) | Other           |
+| Day                    | Day             |
+| Week                   | Week            |
+| Month                  | Month           |
+| Plot                   | Plot            |
+| Acres                  | Acres           |
+| Poles                  | Poles           |
+| Ropes                  | Ropes           |
+| Other                  | Other           |
+
+* Relationship to head (GH #797, 2026-09-07)
+
+Applied AUTOMATICALLY by =Country._apply_categorical_mappings= to the
+=Relationship= column of =household_roster= at API time on EVERY read (the
+cached parquets keep the raw strings); since =df9baf91= the kinship expansion
+runs AFTER it, so =kinship.yml= sees the Preferred Label.  Column order is
+load-bearing (=_build_replace_dict= keys on the FIRST non-Preferred column),
+and the Original Label is the SERVED string.
+
+GSPS's three waves spell the same categories three ways (=Household Head= /
+=Head=; =Adopted/Foster/Stepchild= / =Adopted, foster, or stepchild= /
+=Adopted, foster/stepchild=; =Parent/Parent-in-Law= / =Parent or
+parent-in-law= / =Parent/Parent-in-law=; =Son/Daughter-in-law= / =Son or
+daughter in-law=).  This table maps them onto the ONE vocabulary shared with
+GhanaLSS (decided with @ligon 2026-09-07 -- a Ghana vocabulary, not a corpus
+one): Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law,
+Grandchild, Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew,
+Other relative, Non-relative, Servant, Tenant.  Identity rows (Child, Spouse,
+Grandchild, Other relative, Non-relative, Head in wave 3) are deliberately
+absent: =.replace()= leaves unmatched values alone.
+
+A second variant, =Comparable Label= (=household_roster(labels={'Relationship':
+'Comparable'})=), is the eight-category common denominator shared with
+GhanaLSS for pooling across the two surveys and across GLSS waves: the
+adopted code folds into =Child=, child-in-law into =Other relative=.
+
+Tuples: every row is tuple-preserving except the adopted/foster/step code,
+whose shared label carries [-1, 0, null] (adoptive / foster / step
+undetermined; see =kinship.yml=) -- it was [-1, 0, step] before.  GSPS's
+single parent/parent-in-law code is served as =Parent= (same tuple as
+before) with the conflation recorded in CONTENTS.org.
+
+Prose stays ABOVE the =#+name:= line (the comment-between-name-and-table
+trap documented for the education table above).
+#+name: relationship
+| Original Label                | Preferred Label          | Comparable Label |
+|-------------------------------+--------------------------+------------------|
+| Household Head                | Head                     | Head             |
+| Adopted/Foster/Stepchild      | Adopted/foster/stepchild | Child            |
+| Adopted, foster, or stepchild | Adopted/foster/stepchild | Child            |
+| Adopted, foster/stepchild     | Adopted/foster/stepchild | Child            |
+| Parent/Parent-in-Law          | Parent                   | Parent           |
+| Parent or parent-in-law       | Parent                   | Parent           |
+| Parent/Parent-in-law          | Parent                   | Parent           |
+| Son/Daughter-in-law           | Child-in-law             | Other relative   |
+| Son or daughter in-law        | Child-in-law             | Other relative   |
+| Househelp                     | Servant                  | Servant          |
+
+* harmonize_food (the j axis) -- migrated from food_items.org (GH #783)
+
+Canonical country-level food-item label table for the =j= axis, migrated
+verbatim from the retired standalone =_/food_items.org= by GH #783 --
+the same "Unit #0" migration Tanzania and Ethiopia already completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).
+
+*GhanaSPS started from a strictly worse place than a badly-named table:
+its table had no =#+name:= at all.*  =all_dfs_from_orgfile= returns
+nothing for an unnamed table, so those ~98 labels were unreachable by
+*every* name-keyed mechanism -- =Country.categorical_mapping= (which
+never opens =food_items.org= under any name), the =mappings:= syntax in
+=data_info.yml=, and =labels== alike.  The three wave scripts could only
+get at it by passing =name=None= positionally to =df_from_orgfile=, which
+means "the first table in the file" and works only while the file holds
+exactly one.  Naming the table was a prerequisite for the move, not a
+nicety.
+
+*Columns -- all six carried across unchanged, in their original order:*
+- =2009-10= =2013-14= =2017-18= :: one column per GSPS wave, holding that
+  wave's own raw item text.  These are the join keys each
+  =<wave>/_/food_acquired.py= uses, now read by name from here.
+- =Preferred Label= :: the canonical cross-wave label; the key
+  =_relabel_j= renames FROM.
+- =Food Codes= :: the FCT key (e.g. =12_003=), on the same West African
+  code axis GhanaLSS's =FCT Code= uses.
+- =FCT Label= :: the human-readable name of that FCT entry.
+
+The file's own =encoding='ISO-8859-1'= reads were dropped in the repoint:
+the retired file was measured to be *pure ASCII*, so the argument was a
+no-op, and =categorical_mapping.org= is UTF-8.
+
+No =Aggregate Label= column: GhanaSPS never had one and GH #783 does not
+invent one (that needs the CFE beta-spread test -- see
+=.claude/skills/add-feature/food-acquired/SKILL.md=).  =labels='Aggregate'=
+therefore still raises =LabelUnavailableError=, correctly, while
+=labels='2017-18'=, =labels='Food Codes'= and =labels='FCT Label'= now
+resolve.
+
+No GhanaSPS wave declares its own =harmonize_food=, so nothing shadows
+this table at wave level.
+
+#+name: harmonize_food
+| 2009-10                        | 2013-14                                            | 2017-18                                    | Preferred Label          | Food Codes | FCT Label                                          |
+|--------------------------------+----------------------------------------------------+--------------------------------------------+--------------------------+------------+----------------------------------------------------|
+| ALCHOHOLIC BEVERAGES           | Alcoholic Beverages                                | Alcoholic beverages                        | Alcoholic beverages      | 12_003     | Beer, millet                                       |
+| APPLE                          | Apple                                              | Apple                                      | Apple                    | 05_026     |                                                    |
+| AVOCADO PEAR                   | Avocado/Pear                                       | Avocado/pear                               | Avocado/Pear             | 05_002     |                                                    |
+| BABY FOOD                      | Baby Milk                                          | Baby food                                  | Baby Food                | 10_011     | Infant Formula                                     |
+| BABY MILK                      | Baby food                                          | Baby milk                                  | Baby Milk                | 10_019     |                                                    |
+| BANANA                         | Banana                                             | Banana                                     | Banana                   | 05_003     |                                                    |
+| BEEF                           | Beef                                               | Beef                                       | Beef                     | 07_014     |                                                    |
+| BISCUITS                       | Biscuits                                           | Biscuits                                   | Biscuits                 | 01_188     |                                                    |
+| BLACK PEPPER                   | Black Pepper                                       | Black pepper                               | Black Pepper             | 13_014     |                                                    |
+| BOTTLED WATER, SOFT DRINK & JU | Bottled water, Soft Drinks, and Juices             | Sachet/bottled water                       | Bottled Drink            | 12_012     | Juice, canned or bottled, sweetened                |
+| BREAD                          | Bread                                              | Bread                                      | Bread                    | 01_047     |                                                    |
+| BUSH MEAT/WILD GAME            | Bush Meat/Wild Game                                | Bush meat/wild game                        | Bush Meat                | 07_066     | Springbok meat, raw                                |
+| CABBAGE                        | Cabbage                                            | Cabbage                                    | Cabbage                  | 04_005     |                                                    |
+| CANNED/TIN FISH                | Canned/Tinned Fish                                 | Canned/tinned fish                         | Canned Fish              | 09_109     | Mackerel, jack, canned                             |
+| CARROTS                        | Carrots                                            | Carrots                                    | Carrots                  | 04_006     |                                                    |
+| CASSAVA                        | Cassava                                            | Cassava                                    | Cassava                  | 02_021     |                                                    |
+| CASSAVA DOUGH                  | Cassava Dough                                      | Cassava dough                              | Cassava Dough            | 02_038     | Cassava flour (alibo/elubo/lafun)                  |
+| CHICKEN/GUINEA FOWL            | Chicken/Guinea Fowl                                | Chicken/guinea fowl                        | Chicken/Guinea fowl      | 07_070     |                                                    |
+| CHOCOLATE                      | Chocolate                                          | Chocolate                                  | Chocolate                | 13_021     | Sweets, chocolate, milk                            |
+| COCONUT                        | Coconut                                            | Coconut                                    | Coconut                  | 06_002     |                                                    |
+| COCONUT OIL                    | Coconut Oil                                        | Coconut oil                                | Coconut Oil              | 11_002     |                                                    |
+| COCOYAM                        | Cocoyam                                            | Cocoyam                                    | Cocoyam                  | 02_005     |                                                    |
+| COCOYAM LEAVES                 | Cocoyam Leaves                                     | Cocoyam leaves (Kontomire)                 | Cocoyam Leaves           | 04_009     |                                                    |
+| COFFEE, TEA COCOA, ETC         | Coffea, Tea, Cocoa, etc.                           | Coffee, tea, cocoa, etc.                   | Coffee, Tea, Cocoa, Etc. | 12_009     |                                                    |
+| COLA NUTS                      | Cola nuts                                          | Cola nuts                                  | Cola Nuts                | 06_018     |                                                    |
+| COOKED MEALS $(AS WAGES)       | Cooked Meals                                       | Cooked meals                               | Cooked Meals             | ---        |                                                    |
+| CORNED BEEF                    | Corned Beef                                        | Corned beef                                | Corned Beef              | 07_025     |                                                    |
+| COWPEA BEANS                   | Cowpea beans                                       | Cowpea beans                               | Cowpea Beans             | 03_004     |                                                    |
+|                                | Crab                                               | Crab                                       | Crab                     | 09_055     |                                                    |
+|                                | Dawa dawa                                          | Dawadawa                                   | Dawadawa                 | 03_009     | African locust bean, dry, raw                      |
+| EGGS                           | Eggs                                               | Eggs                                       | Eggs                     | 08_005     |                                                    |
+| FISH                           | Fish                                               | Fish                                       | Fish                     | 09_003     | Mackerel, fillet, raw                              |
+| FLOUR $(WHEAT)                 | Flour                                              | Flour                                      | Flour                    | 01_043     | Wheat flour                                        |
+| GAME BIRDS                     | Game Birds                                         | Game birds                                 | Game Birds               | 07_067     | Ostrich meat, raw                                  |
+| GARDEN EGGS                    | Garden Eggs                                        | Garden Eggs                                | Garden Eggs              | 08_005     |                                                    |
+| GARI                           | Gari                                               | Gari                                       | Gari                     | 02_039     |                                                    |
+| GINGER                         | Ginger                                             | Ginger                                     | Ginger                   | 04_082     |                                                    |
+| GOAT MEAT                      | Goat Meat                                          | Goat meat                                  | Goat Meat                | 07_069     |                                                    |
+| MAIZE GROUND/ CORN DOUGH       | Ground maize/corn dough                            | Ground maize/corn dough                    | Ground Maize             | 01_094     | Maize, white, whole kernel, dry, decorticated, raw |
+| GROUNDNUT OIL                  | Groundnut Oil                                      | Groundnut oil                              | Groundnut Oil            | 11_003     |                                                    |
+| GROUNDNUTS                     | Groundnuts                                         | Groundnuts                                 | Groundnuts               | 06_010     |                                                    |
+| GUINEA CORN/SORGHUM            | Guinea corn/sorghum                                | Guinea corn/sorghum                        | Sorghum                  | 01_039     |                                                    |
+| HONEY                          | Honey                                              | Honey                                      | Honey                    | 13_001     |                                                    |
+| ICE CREAM, ICE LOLLIES         | Ice Cream, Ice Lollies, etc.                       | Ice cream, ice lollies, etc.               | Ice Cream                | 13_021     | Sweets, chocolate, milk                            |
+| RICE-IMPORTED                  | imported rice                                      | Imported rice                              | Imported Rice            | 01_034     |                                                    |
+| KENKEY/BANKU $(WITHOUT SAUCE)  | Kenkey/banku                                       | Kenkey/banku                               | Kenkey                   | 01_099     |                                                    |
+| RICE-LOCAL                     | local rice                                         | Local rice                                 | Local Rice               | 01_065     |                                                    |
+| MAIZE                          | Maize                                              | Maize                                      | Maize                    | 01_060     |                                                    |
+| MANGO                          | Mango                                              | Mango                                      | Mango                    | 05_015     |                                                    |
+| MARGARINE/BUTTER               | Margarine / Butter                                 | Margarine/butter                           | Margarine/Butter         | 11_001     |                                                    |
+| MILK $(FRESH)                  | Milk Fresh                                         | Milk fresh                                 | Milk (Fresh)             | 10_029     |                                                    |
+| MILK $(POWDER)                 | Milk Powder                                        | Milk powder                                | Milk (Powder)            | 10_002     |                                                    |
+| MILLET                         | Millet                                             | Millet                                     | Millet                   | 01_095     |                                                    |
+| MUTTON                         | Mutton                                             | Mutton                                     | Mutton                   | 07_072     |                                                    |
+| OKRO $(FRESH/DRIED)            | Okro                                               | Okro                                       | Okro                     | 04_017     | Okra, fruit, flesh, raw                            |
+| ONIONS $(LARGE/SMALL)          | Onions (large or small)                            | Onions (large or small)                    | Onions                   | 04_018     |                                                    |
+| ORANGE/TANGERINE               | Orange/Tangerine                                   | Orange/tangerine                           | Orange/Tangerine         | 05_016     |                                                    |
+| OTHER BEANS                    | Other beans                                        | Other beans                                | Other Beans              | ---        |                                                    |
+| OTHER BEVERAGES                | Other Beverages                                    | Other beverages                            | Other Beverages          | ---        |                                                    |
+| OTHER CEREALS                  | Other Cereals                                      | Other cereals                              | Other Cereals            | ---        |                                                    |
+| OTHER CONDIMENTS/SPICES        | Other Condiments/Spices                            | Other condiments/spices                    | Other Condiments/Spices  | ---        |                                                    |
+| OTHER CONFECTIONARIES          | Other Confectionaries                              | Other confectioneries                      | Other Confectioneries    | ---        |                                                    |
+|                                | Other eggs/poultry                                 |                                            | Other Eggs/Poultry       | ---        |                                                    |
+|                                | Other fruits                                       |                                            | Other Fruits             | ---        |                                                    |
+|                                | Other meat                                         |                                            | Other Meat               | ---        |                                                    |
+| OTHER MILK PRODUCTS            | Other Milk Products                                | Other milk products                        | Other Diary              | ---        |                                                    |
+| OTHER PULSES AND NUTS          | Other pulses and nuts                              | Other pulses and nuts                      | Other Pulses and Nuts    | ---        |                                                    |
+| OTHER STARCHY STAPLES          | Other Starchy Staples                              | Other starchy staples                      | Other Starchy Staples    | ---        |                                                    |
+| OTHER VEGETABLE OILS           | Other Vegetable Oils                               | Other vegetable oils                       | Other Vegetable Oils     | ---        |                                                    |
+| OTHER VEGETABLES               | Other Vegetables                                   | Other vegetables                           | Other Vegetables         | ---        |                                                    |
+| PALM KERNEL OIL                | Palm Kernel Oil                                    | Palm kernel oil                            | Palm Kernel Oil          | 11_012     |                                                    |
+| PALM NUTS                      | Palm nuts                                          | Palm nuts                                  | Palm Nuts                | 06_029     |                                                    |
+| PALM OIL                       | Palm Oil                                           | Palm oil                                   | Palm Oil                 | 11_004     |                                                    |
+| PAWPAW                         | Pawpaw                                             | Pawpaw                                     | Pawpaw                   | 05-017     | Papaya, fruit, ripe, raw                           |
+| PEPPER $(FRESH OR DRIED)       | Pepper                                             | Pepper (fresh or dried)                    | Pepper (fresh or dried)  | 13_006     |                                                    |
+| PINEAPPLE                      | Pineapple                                          | Pineapple                                  | Pineapple                | 05_018     |                                                    |
+| PLANTAIN                       | Plantain                                           | Plantain                                   | Plantain                 | 02_042     |                                                    |
+| PORK                           | Pork                                               | Pork                                       | Pork                     | 07_005     |                                                    |
+|                                | Prekese                                            | Prekese                                    | Prekese                  | ---        |                                                    |
+| RESTAURANTS, CAFES, CANTEENS,  | Restaurants, Cafes, Canteens, Hotels, Prepared Foo | Restaurants, cafes, canteens, hotels, etc. | Restaurants              | ---        |                                                    |
+| SALT                           | Salt                                               | Salt                                       | Salt                     | 13_015     |                                                    |
+| SHEA BUTTER                    | Shea Butter                                        | Shea butter                                | Shea Butter              | 11_008     |                                                    |
+|                                | Shea nuts                                          |                                            |                          | 06_016     |                                                    |
+|                                | Snails                                             | Snails                                     | Snails                   | 07_083     |                                                    |
+|                                |                                                    | Soft drinks and juices                     | Bottled Drink            | 12_012     | juice, canned or bottled, sweetened                |
+| SOYA BEANS                     | Soya beans                                         | Soya beans                                 | Soya Beans               | 03_008     |                                                    |
+| SUGAR $(CUBE, GRANULATED       | Sugar                                              | Sugar (cube, granulated)                   | Sugar                    | 13_002     |                                                    |
+| SUGARCANE                      | Sugarcane                                          | Sugarcane                                  | Sugarcane                | ---        |                                                    |
+| TINNED MILK                    | Tinned Milk                                        | Tinned milk                                | Tinned milk              | 10_016     | milk, cow, canned, evaporated                      |
+| TOBACCO                        | Tobacco                                            | Tobacco                                    | Tobacco                  | ---        |                                                    |
+| TOMATO PUREE $(CANNED)         |                                                    | Tomato puree (canned)                      | Tomato puree (canned)    | 04_065     |                                                    |
+| TOMATOES $(FRESH)              | Tomatoes                                           | Tomatoes (fresh)                           | Tomatoes (fresh)         | 04_021     |                                                    |
+| WATER MELON                    | Watermelon                                         | Watermelon                                 | Watermelon               | 05_022     |                                                    |
+|                                | Wild mushrooms                                     | Wild Mushrooms                             | Wild Mushrooms           | ---        |                                                    |
+| YAM                            | Yam                                                | Yam                                        | Yam                      | 02_019     |                                                    |
+|                                |                                                    |                                            |                          |            |                                                    |
+|                                |                                                    |                                            |                          |            |                                                    |
+|                                |                                                    |                                            |                          |            |                                                    |

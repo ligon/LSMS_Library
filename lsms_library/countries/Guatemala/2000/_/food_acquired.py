@@ -11,7 +11,8 @@ BRIEF_guatemala_round3.md (supersedes round-1 and round-2).
 Key decisions
 -------------
 * i = ``hogar`` (household), j = ``item`` (food, harmonized to a Preferred
-  Label via food_items.org '2000' column).  This FIXES the legacy i/j swap,
+  Label via the '2000' column of
+  categorical_mapping.org's harmonize_food table).  This FIXES the legacy i/j swap,
   which mapped hogar->j and item->i.
 
 * ACTUAL 15-DAY RECALL on BOTH sides (maintainer decision on PR #578).  The
@@ -77,10 +78,15 @@ t = '2000'
 df = get_dataframe('../Data/ECV13G12.DTA', convert_categoricals=True)
 
 # --- harmonize the food item label (j) ----------------------------------
-# The '2000' column of food_items.org holds the Spanish item text, so key on
+# The '2000' column of harmonize_food holds the Spanish item text, so key on
 # the categorical text (convert_categoricals=True) rather than the raw code.
 # Coverage is 1:1 (99 items, 0 missing).
-food_items = df_from_orgfile('../../_/food_items.org')
+# GH #783: the vocabulary moved out of the standalone food_items.org into
+# the country's categorical_mapping.org as `harmonize_food` -- the only file
+# Country.categorical_mapping opens, so labels= can now see it too.
+# NB: name= is now REQUIRED -- categorical_mapping.org holds several tables,
+# and df_from_orgfile's name=None means 'the first table in the file'.
+food_items = df_from_orgfile('../../_/categorical_mapping.org', name='harmonize_food')
 food_labels = food_items[['Preferred Label', '2000']].copy()
 food_labels['2000'] = food_labels['2000'].str.strip()
 food_labels = food_labels.replace(['', '---'], pd.NA).dropna()

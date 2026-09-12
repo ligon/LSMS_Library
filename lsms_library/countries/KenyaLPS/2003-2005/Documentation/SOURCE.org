@@ -1,12 +1,19 @@
 SOURCE
 
-(source URL not recorded)
+https://doi.org/10.7910/DVN/ZW1LGR
 
 #+CATALOG_ID: none
+#+CATALOG_TITLE: Kenya Life Panel Survey, Round 1 (KLPS-1)
+#+CATALOG_YEARS: 2003-2005
+#+CATALOG_DOI: https://doi.org/10.7910/DVN/ZW1LGR
+#+CATALOG_URL: https://doi.org/10.7910/DVN/ZW1LGR
 #+PROVENANCE_SOURCE: external
-#+PROVENANCE_METHOD: not-a-wb-dataset
-#+PROVENANCE_RECORDED: 2026-07-12
-#+PROVENANCE_NOTE: Kenya Life Panel Survey is not distributed via the World Bank Microdata Library (a KEN/lsms catalog query returns no entries).
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: catalog-only
+#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_NOTE: KLPS-1: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.  This directory holds documentation only -- the round's data files live in ../2015/ (named for the 2015-12 release).
 
 * Notes (preserved from the original SOURCE.org)
 (source URL not recorded)
+
+DOI and licence recorded 2026-09-02 from the legacy SOURCE / LICENSE files beside this one and the Dataverse API.

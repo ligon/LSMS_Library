@@ -109,8 +109,14 @@ def test_strict_mode_raises_so_ci_can_ratchet():
 def test_nan_in_a_declared_index_level_is_deleted_outright_and_reported():
     """A SEPARATE loss riding in the same operation: groupby defaults to
     dropna=True, so a row with NaN in a declared index level is DELETED, not
-    merely merged.  14 cells / 485,231 rows across the corpus; worst is
-    Burkina_Faso/food_acquired/2014 at 460,438 of 557,822 rows (82.5%)."""
+    merely merged.  14 cells / 485,231 rows across the corpus; worst WAS
+    Burkina_Faso/food_acquired/2014 at 460,438 of 557,822 rows (82.5%).
+
+    That cell was fixed 2026-09-09 -- at the COUNTRY level, by giving `u` the
+    `Unknown` sentinel instead of a NaN (GH #842 pattern; see
+    Burkina_Faso/_/CONTENTS.org).  The FRAMEWORK behaviour this test pins is
+    deliberately unchanged (D2): a NaN declared-index key is still deleted and
+    still reported.  The other 13 cells were not re-measured."""
     df = pd.DataFrame(
         {"Age": [40, 9, 7]},
         index=pd.MultiIndex.from_tuples(

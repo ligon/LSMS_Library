@@ -1,0 +1,517 @@
+#+title: Who used the UNPS 2015-16 crop sale values? Downstream exposure to the AGSEC5 x1/100 defect
+#+author: Claude Fable 5.1 (research agent), for Ethan Ligon
+#+date: 2026-09-08
+
+* 0. What is being traced, and the discriminator used
+
+GH #829 establishes that in the *live* World Bank release =UGA_2015_UNPS_v02_M=
+(catalog 3460), =AGSEC5A.a5aq8= / =AGSEC5B.a5bq8= ("What was the value? UShs")
+are *divided by exactly 100*: the sole int32->double storage-type change among
+the 432 variables common to the 2013-14 and 2015-16 AGSEC files; =a5aq8 x 100=
+is an exact integer on 100.00% of 6,906 sale records; median implied price on
+kilogram-sold records is 10 UShs/kg against 1,000 in 2011-12 and 2013-14 and
+1,300 in 2019-20; the questionnaire text is unchanged; and the file we hold is
+byte-identical to the distributed release.
+
+** HEADLINE
+
+*The World Bank's own harmonised product already corrects this, silently.*
+=LSMS-ISA_Ag= -- the WB LSMS team's harmonised panel -- multiplies =a5aq8= by
+100 for the 2015-16 wave and for no other wave, in every released version,
+with no comment and no documentation.  *EPAR's* competing harmonised product,
+which is the more widely used one, does *not* correct, and ships Uganda
+2015-16 crop values ~100x too small in its public estimates.  Details in §1
+and §2.  This turns the upstream report from an assertion into a
+reconciliation: the Bank's own code already agrees with GH #829.
+
+** The discriminator (applied in the "plausible effect" column)
+
+A constant x1/100 confined to one wave does *not* damage every quantity that
+touches it.  Three cases, and each item is placed in one of them from its own
+stated construction:
+
+1. *Cancels.*  Ratios whose numerator and denominator both descend from
+   =a5aq8= -- most importantly the commercialisation share (sales value /
+   production value, where production is valued at a sale-derived median
+   price).  *Confirmed empirically in §2*: EPAR's =proportion_cropvalue_sold=
+   is the one crop-value indicator NOT displaced between W4 and W5.
+2. *Absorbed.*  Log-value specifications with wave (or year) fixed effects: a
+   constant within-wave scalar is swept into the FE.  This holds only if the
+   sample is *pooled with the FE present*; a wave-specific level, a growth
+   rate, or a cross-wave difference is not protected.
+3. *Broken.*  Levels; cross-wave growth or trends; any sum or difference
+   mixing =a5aq8=-derived money with money from another module (the crop-income
+   subtraction is the sharpest instance -- production falls 100x while input
+   costs do not, so net income goes *negative*); income shares; and
+   productivity denominated per hectare or per person-day.
+
+A fourth case appears once in practice and is worth naming because it looks
+like case 2 but is not: a *log of a SUM* of an affected and an unaffected
+component (Morrissey et al.'s =log(crop sales + livestock sales)=).  The
+scalar does not factor out of a sum, so it re-weights the two components
+rather than shifting a constant.
+
+* 1. =LSMS-ISA_Ag= -- the World Bank LSMS harmonised panel: NOT AFFECTED (it corrects)
+
+*Identification.*  Searching the exact string =LSMS-ISA_Ag= (GitHub repository
+search, and web search) returns exactly *one* product, in both cases:
+
+- Repo: https://github.com/lsms-worldbank/LSMS-ISA-harmonised-dataset-on-agricultural-productivity-and-welfare
+  (the official World Bank =lsms-worldbank= GitHub org; 17 stars; described as
+  "a longitudinal cross-country dataset on agricultural productivity and
+  welfare in Sub-Saharan Africa").  GitHub repo search =q=LSMS-ISA_Ag= ->
+  =total_count: 1=, this repo.
+- Paper: Bentze, T. & Wollburg, P. (2025), "A longitudinal cross-country
+  dataset on agricultural productivity and welfare in Sub-Saharan Africa",
+  /Scientific Data/ 12:1843, https://doi.org/10.1038/s41597-025-05639-9
+  (working-paper version: World Bank Policy Research Working Paper *10976*,
+  https://ideas.repec.org/p/wbk/wbrwps/10976.html)
+- Archived data + code: Zenodo https://doi.org/10.5281/ZENODO.14016543
+  (v2.0 record https://zenodo.org/records/15773365)
+- Reproducibility package (v1.1):
+  https://reproducibility.worldbank.org/catalog/269
+- Releases and assets:
+  | release | assets |
+  |---------+--------|
+  | =v.1.0= | =Data.zip= 92,488,611 B; =Reproduction.zip= 405,075 B |
+  | =v1.1=  | =Data.zip= 94,821,477 B; =Reproduction_new.zip= 416,934 B |
+  | =v2.0=  | =Data.zip= 102,109,193 B; =Reproduction_v2.zip= 426,082 B |
+
+*This is the =Reproduction_v2 programs.do= that
+=lsms_library/transformations.py:2385= cites.*  =Code/programs.do= defines
+=valuation_median_crops= -- =crop_price_temp = harvest_sold_value /
+harvest_sold_kg=, then the EA -> admin_4 -> admin_3 -> admin_2 -> admin_1 ->
+national ten-observation median cascade -- exactly as the docstring describes.
+The Uganda wave-5 input is *catalog 3460*, the defective release (Table 1 of
+the paper links =microdata.worldbank.org/index.php/catalog/3460/data-dictionary=).
+
+** The construction code DOES rescale -- line numbers
+
+=Code/Cleaning_code/UGA_UNPS5.do:272= and =UGA_UNPS5_S2.do:280=:
+
+: gen harvest_sold_value = a5aq8 * 100
+: gen harvest_sold_value = a5bq8 * 100
+
+Across all fourteen Uganda wave/season cleaning files (=Reproduction_v2.zip=,
+release v2.0), the line is otherwise unscaled:
+
+| file | the =harvest_sold_value= line |
+|------+-------------------------------|
+| =UGA_UNPS1.do= / =_S2= | =A5aq8 / 100= , =A5bq8 / 100= |
+| =UGA_UNPS2.do= / =_S2= | =a5aq8= , =a5bq8= (unscaled) |
+| =UGA_UNPS3.do= / =_S2= | =a5aq8= , =a5bq8= (unscaled) |
+| =UGA_UNPS4.do= / =_S2= | =a5aq8= , =a5bq8= (unscaled) |
+| *=UGA_UNPS5.do= / =_S2=* | *=a5aq8 * 100=* , *=a5bq8 * 100=* |
+| =UGA_UNPS7.do= / =_S2= | =s5aq08_1= , =s5bq08_1= (unscaled) |
+| =UGA_UNPS8.do= / =_S2= | =rowtotal(s5aq08_1 s5aq08_2)= (unscaled) |
+
+*Present in every released version*, so no vintage of the product is exposed:
+
+| release | =UGA_UNPS5.do= | =UGA_UNPS5_S2.do= |
+|---------+----------------+-------------------|
+| v.1.0 | =a5aq8 * 100= | =a5bq8 * 100= |
+| v1.1  | =a5aq8 * 100= | =a5bq8 * 100= |
+| v2.0  | =a5aq8 * 100= | =a5bq8 * 100= |
+
+*The rescaling is nowhere documented.*  Checked, all four places it could be:
+(i) no comment on or near the line, and the surrounding block is otherwise the
+same shape as wave 4's; (ii) =Reproduction_v2.zip= ships *only* =.do= files --
+no README, no changelog -- and =MASTER.do= mentions no rescaling; (iii) the
+paper's Supplementary Tables 1-5, the "directories of variables" in which the
+paper says "Each correction is noted", contain *0* occurrences of
+=harvest_sold_value=, *0* of "rescal" and *0* of "correct" in 29,856
+characters; (iv) the survey's own Basic Information Document (catalog 3460
+download 46598, 41 pp., 86,942 chars) never mentions "thousand", "shilling" or
+"UShs" at all.  The paper meanwhile states "We have deliberately refrained for
+extensive outlier correction".
+
+The Bank's own LSMS team therefore already treats
+=a5aq8= in the 2015-16 release as too small by exactly 100, in exactly the wave
+GH #829 identifies and in no other -- while the *distributed microdata*
+(catalog 3460) stays uncorrected and the DDI Data Processing section stays
+empty.
+
+** Verified in the released indicators
+
+=Data.zip= v2.0, =Plotcrop_dataset.dta=, 179,496 Uganda rows.  Implied harvest
+value per kg =harvest_value_LCU / harvest_kg=, median over rows with both
+positive:
+
+| wave | year | n | median UGX/kg | maize only |
+|------+------+---+---------------+------------|
+| 1 | 2009-10 | 22,831 | 200.0 | 445.0 |
+| 2 | 2010-11 | 23,642 | 363.6 | 300.0 |
+| 3 | 2011-12 | 21,966 | 500.0 | 500.0 |
+| 4 | 2013-14 | 20,655 | 500.0 | 500.0 |
+| *5* | *2015-16* | *21,495* | *541.7* | *475.0* |
+| 7 | 2018-19 | 17,536 | 600.0 | 400.0 |
+| 8 | 2019-20 | 21,565 | 700.0 | 700.0 |
+
+Wave 5 sits monotonically between waves 4 and 7.  *No ~100x gap: the
+fingerprint is absent.*  A user of =LSMS-ISA_Ag= gets correct Uganda 2015-16
+harvest values, and *no paper using it is affected through this channel*.
+
+** Papers citing =LSMS-ISA_Ag=
+
+The dataset paper is very recent (/Scientific Data/, Nov 2025; WPS 10976,
+2024).  Two records must be queried, because the product predates its journal paper.
+
+*(a) The /Scientific Data/ paper* (=cites:W4416413064=) -> *1* citing work:
+Macheka, G., Chundu, M., Ahmadi, S. & Makochekanwa, A. (2026), "The Impact of
+Off-Grid Solar Energy on Rural Income Inequality: Evidence of Zambia and
+Zimbabwe", preprint, https://doi.org/10.2139/ssrn.7210667 -- *neither country
+is Uganda*.
+
+*(b) The working paper, WPS 10976* (=doi:10.1596/1813-9450-10976= ->
+=W4404631224=, =cites:= ) -> *3* citing works, and these are the prominent
+uses of the dataset:
+
+| citing work                                                                                                                                                                                                                                                                                  | Uganda 2015-16 sale values?                                                                                                                                                             |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Amankwah, A., Ambel, A. A., Gourlay, S., Kilic, T., Markhof, Y. & Wollburg, P. (2025), "Smallholder farming, fertilizer use, and the polycrisis period: Cross-country evidence from longitudinal surveys in Sub-Saharan Africa", /Food Policy/ 133:102885, doi:10.1016/j.foodpol.2025.102885 | *Not exposed* -- it consumes =LSMS-ISA_Ag=, which rescales.  Full text not retrievable (Elsevier 403; Maastricht CRIS 403 with and without referer), so the variable list is unverified |
+| Vashold, L., Pirich, G., Heinze, M. & Kuschnig, N. (2025), "Downstream impacts of mines on agriculture in Africa", /Journal of Development Economics/ 179:103671, doi:10.1016/j.jdeveco.2025.103671                                                                                          | *Not exposed* -- same reason.  Outcomes are remote-sensed vegetation and cereal tonnages, not sale values.  Elsevier 403                                                                |
+| Berha, A. (2025), "Temperature and Farm Labor in Nigeria", /Applied Economic Perspectives and Policy/ 48:518-530, doi:10.1002/aepp.70048                                                                                                                                                     | *Not exposed* -- *Nigeria only*                                                                                                                                                         |
+
+*None of the three is exposed through this defect*, for the same reason: the
+dataset they consume corrects it.  Had =LSMS-ISA_Ag= not rescaled, items (b1)
+and (b2) would have been the highest-reach affected work in this report.
+
+(Incidental, not part of GH #829 and not investigated: wave 1's median
+=harvest_kg= is 8.0 against 110-160 in every other wave, and its
+=harvest_sold_value= carries a =/100= in v2.0 -- while v1.0's
+=UGA_UNPS1_S2.do= has *no* =/100=, so the two seasons disagree across
+versions.  A separate wave-1 question; flagged only so it is not mistaken for
+the 2015-16 defect.)
+
+* 2. EPAR / University of Washington (project 335) -- AFFECTED, and it is the widely used one
+
+*Product*: EPAR (Evans School Policy Analysis & Research Group, Univ. of
+Washington) LSMS-ISA "Agricultural Indicator Curation" (EPAR Technical Report
+335).  Distinct from =LSMS-ISA_Ag=; a GitHub repo search for
+="LSMS-ISA agricultural indicators"= returns EPAR's three repos.
+
+- Code: https://github.com/EvansSchoolPolicyAnalysisAndResearch/LSMS-Agricultural-Indicators-Code
+  (=Uganda UNPS/Uganda UNPS Wave 5/EPAR_UW_Uganda_UNPS_W5.do=, 276,827 B)
+- Constructed data: https://github.com/EvansSchoolPolicyAnalysisAndResearch/LSMS-Data-Dissemination
+  (=Uganda UNPS/Uganda UNPS W5.zip=, 12,049,821 B) -- household, individual,
+  plot and summary Stata files, ready to use, no raw data needed
+- Published estimates: =EPAR_UW_335_AgDev_Indicator_Estimates.xlsx= (7,768,323 B)
+  / =.dta= (35.5 MB) at that repo's root -- 47,927 rows of country x wave x
+  indicator summary statistics, of which *1,487 rows / 120 distinct indicators
+  are Uganda wave 5*
+- Web dissemination: https://www.agquery.org and .../agqueryplus
+
+** The construction code reads the variables raw
+
+=EPAR_UW_Uganda_UNPS_W5.do= -- no =* 100=, no drop, no flag:
+
+: 476: clonevar sold_value= a5aq8
+: 477: replace sold_value=a5bq8 if sold_value==.
+: 500: gen price_unit = sold_value/quant_sold_kg
+: 542: replace price_unit=price_unit_`i' if obs_`i' > 9
+: 547: gen value_harvest=price_unit*quant_harv_kg
+: 661: ren a5aq8 value_sold
+: 691: ren value_sold value_crop_sales
+: 694: ren value_harvest value_crop_production
+: 702: gen proportion_cropvalue_sold = value_crop_sales / value_crop_production
+: 3763: gen crop_income = value_crop_production - crop_production_expenses - crop_value_lost
+
+Wave 4's file is identical in construction (=480: gen sold_value = a5aq8=,
+=759: ren a5aq8 value_sold=), so the waves are treated the same and the raw
+scale difference passes straight through.
+
+*Both* the sales value *and* the production value descend from =a5aq8= -- the
+latter because the harvest is valued at a median price whose numerator is
+=sold_value=.  =crop_income= then subtracts input costs that do not.
+
+** EPAR noticed, in one section only, and the note did not reach the numbers
+
+=Uganda UNPS Wave 5/readme.md=, under =### ALL PLOTS=:
+
+#+begin_quote
+*KNOWN ISSUES:* Sold values are inaccurate in W5, on average much lower than
+they should be for the country.  Because of this, sold values are added to
+empty variables and generated as missing.
+#+end_quote
+
+But the next section, =### GROSS CROP REVENUE= -- where =value_crop_sales=,
+=value_crop_production= and hence =crop_income= are actually built -- is marked
+"*KNOWN ISSUES:* No issues in this section."  No rescaling appears anywhere in
+the do-file.  *The defect is present in the shipped indicators.*
+
+** Measured in the distributed data
+
+=Uganda_NPS_W{4,5}_household_variables.dta= from the W4/W5 dissemination zips;
+W4 n=3,119, W5 n=3,352; UGX; median over positive values:
+
+| variable | W4 (2013-14) | W5 (2015-16) | W4/W5 |
+|----------+--------------+--------------+-------|
+| =value_crop_production= | 656,127 | 6,179 | *106.2* |
+| =value_crop_sales= | 270,000 | 2,960 | *91.2* |
+| =value_crop_sales= (mean) | 445,963 | 4,978 | *89.6* |
+| =proportion_cropvalue_sold= | 0.3535 | 0.4406 | 0.80 (*cancels*) |
+| =crop_income= (*median*, all rows) | +239,400 | *-29,741* | sign flip |
+
+Medians over *all* rows tell the same story more cleanly:
+=value_crop_production= 417,549 -> 3,670 (ratio *113.8*), =value_crop_sales=
+55,000 -> 592, =crop_income= +239,400 -> *-29,741*.
+
+/Footnote, so the crop-income row is not over-read./  W5's
+=cost_expli_hh= is *independently* anomalous -- mean 1,640,851 against W4's
+234,001 (7x), and the published =w_cost_expli_hh_1ppp= mean is 1,041.68
+against 250.26 -- which inflates the *mean* crop-income deficit well beyond
+what the x1/100 alone explains.  That anomaly is *not* this defect and is not
+explained by it (in-kind wages valued at crop prices would move costs *down*,
+not up).  The *median* crop-income sign flip, +239,400 -> -29,741, is the
+robust evidence and is what should be cited.
+
+** Measured in the published estimates spreadsheet
+
+=EPAR_UW_335_AgDev_Indicator_Estimates.xlsx=, sheet "Estimates by Instrument",
+rural households, median (=p50=):
+
+| indicator (=variableName=) | W3 | W4 | *W5* | W7 | W8 | W4/W5 |
+|----------------------------+----+----+------+----+----+-------|
+| Land productivity, 2021 PPP $/ha (=w_land_productivity_1ppp=) | 747.88 | 716.57 | *7.21* | 760.03 | 644.37 | *99.4* |
+| Labor productivity, PPP $/person-day (=w_labor_productivity_1ppp=) | 5.14 | 3.06 | 0.028 | 56.03 | 12.01 | 109.4 (see note) |
+| Net crop income, 2021 PPP $ (=w_crop_income_1ppp=) | 412.64 | 410.80 | *-57.07* | 453.00 | 320.13 | sign flip |
+| Share of income from crops (=w_share_crop=) | 0.459 | 0.353 | *0.000* | 1.000 | 0.261 | collapse |
+| Share of crop value sold (=w_proportion_cropvalue_sold=) | 0.139 | 0.231 | 0.283 | 0.129 | 0.344 | *unaffected* |
+
+*Land productivity: W4/W5 = 99.4.*  That is the number to cite -- a clean
+99.4, against a wave-7 ratio of 105.5 and a wave-8 ratio of 89.4.
+
+Labor productivity moves by a similar 109.4, but do *not* lean on it as an
+independent confirmation: that series is volatile across every wave pair
+(W7/W5 = 2,000, W8/W5 = 429), so its W4/W5 ratio is not evidence of a x100 on
+its own.
+
+The two rows that behave differently are the §0 discriminator showing up in
+published output:
+- =w_proportion_cropvalue_sold= is the *only* crop-value indicator undisturbed,
+  because numerator and denominator both carry the 1/100.
+- =w_crop_income_1ppp= does not merely shrink, it *changes sign*: production
+  falls 100x while =crop_production_expenses= does not, so the median Ugandan
+  farm household is published as *losing* money on crops in 2015-16 alone.  Its
+  knock-on, =w_share_crop=, is published as a median of *exactly zero* for that
+  wave against 0.353 in 2013-14 and 1.000 in 2018-19.
+
+*Reach.*  Any user of AgQuery, of the estimates spreadsheet, or of
+=Uganda UNPS W5.zip= inherits this without touching a raw =.dta=.  These are
+"download and analyse" products; the defect is three layers below where such a
+user would look.
+
+* 3. Table of references and derived products
+
+Ranked by reach: harmonised dataset > journal article > working paper.
+"How checked" says PDF/code fetched vs. abstract only.
+
+| # | reference                                                                                                                                                                                                                                                                        | uses UNPS 2015-16 sale VALUES? | what they compute from them                                                                                                                                                                                 | quote / table reference                                                                                                                                                                                                                                                                                                                                             | plausible effect of x100                                                                                                                                | how checked                                           |
+|---+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------+-------+----------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------|
+| 1 | *EPAR (Evans School, UW), LSMS-ISA Agricultural Indicator Curation, Technical Report 335* -- code repo =LSMS-Agricultural-Indicators-Code=, data repo =LSMS-Data-Dissemination=, estimates =EPAR_UW_335_AgDev_Indicator_Estimates.xlsx=, web tool https://www.agquery.org        | *YES*                          | =value_crop_sales=, =value_crop_production= (harvest valued at a =sold_value=-derived median price), =crop_income=, =land_productivity=, =labor_productivity=, =farm_income=, =total_income=, income shares | =EPAR_UW_Uganda_UNPS_W5.do= L476 =clonevar sold_value= a5aq8=; L500 =gen price_unit = sold_value/quant_sold_kg=; L547 =gen value_harvest=price_unit*quant_harv_kg=; L661 =ren a5aq8 value_sold=. Estimates sheet: =w_land_productivity_1ppp= p50 = 7.21 (W5) vs 716.57 (W4)                                                                                         | *Broken.* Levels ~1/100 (land productivity W4/W5 = 99.4); =crop_income= flips sign; income shares collapse. Commercialisation share cancels and is fine | code + data + estimates fetched and recomputed        |
+| 2 | *World Bank LSMS =LSMS-ISA_Ag= harmonised panel* -- Bentze & Wollburg, /Scientific Data/ 12:1843 (2025), doi:10.1038/s41597-025-05639-9; WPS 10976; Zenodo 10.5281/ZENODO.14016543                                                                                               | *NO -- it rescales*            | =harvest_value_LCU= / =_USD= via =valuation_median_crops=                                                                                                                                                   | =UGA_UNPS5.do:272= =gen harvest_sold_value = a5aq8 * 100= (and =_S2.do:280= for =a5bq8=), in v1.0, v1.1 and v2.0                                                                                                                                                                                                                                                    | *None.* W5 median 541.7 UGX/kg sits between W4 500.0 and W7 600.0                                                                                       | code (3 releases) + =Data.zip= fetched and recomputed |
+| 3 | Morrissey, K. E., Reynolds, T., Tobin, D. & Isbell, C. (2023), "Market engagement, crop diversity, dietary diversity, and food security: evidence from small-scale agricultural households in Uganda", /Food Security/ 16(1):133-147, https://doi.org/10.1007/s12571-023-01411-2 | *YES*                          | "Farm Sales" = *log of the sum of crop sales and livestock sales* (UGX), used as an endogenous market-engagement variable in an SEM predicting HDDS-11 and Food Secure Months                               | "This study draws on the 2015-16 farm household survey data from the Uganda National Panel Survey (UNPS)"; "we measure market engagement as both total farm sales as reported in the UNPS"; "All farm sales data are based on self-reported commercialization of food crops produced based on the UNPS and are reported in Ugandan shillings"; Table 1: "Farm Sales / Log of the sum of crop sales and livestock sales^a / 6.685 / 4.773 / 2,694" (cell separators shown as slashes), footnote "a Reported as Ugandan shillings" | *Case 4 (log of a sum), and it interacts with their identification.* The 1/100 hits only the crop component of =log(crop + livestock sales)=, so it is a -log(100) shift for crop-only sellers, *zero* for livestock-only sellers, and intermediate for mixed households -- i.e. a measurement error *correlated with livestock activity*, and *livestock ownership is the paper's instrument* ("We use Livestock ownership as an instrumental variable, with the assumption that it affects Market Engagement and HDDS but does not affect SDI"). The reported descriptive mean (6.685) is affected. Direction and size of the bias on the SEM paths *cannot* be determined from the published numbers -- *unclear*, not "no effect" | PDF fetched, data + Table 1 read |
+
+No other item was found that both uses UNPS 2015-16 and touches the sale
+values.  §4 lists everything checked and cleared.
+
+* 4. Searched but not affected
+
+Each was checked against two tests: (a) does it use the 2015-16 wave at all,
+and (b) does it use a crop *sale value* (as opposed to quantities, areas, or
+the consumption module)?  Failing either clears it.
+
+| reference                                                                                                                                                                                                                      | uses 2015-16?                  | uses sale values?                                         | why cleared                                                                                                                                                                                                                                                               | how checked                                                 |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+-----------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------|
+| Kirk, A., Kilic, T. & Carletto, C. (2017), "Composition of Household Income and Child Nutrition Outcomes: Evidence from Uganda", /World Development/ 109:452-469, doi:10.1016/j.worlddev.2017.03.023                           | *No*                           | yes (crop income incl. value of home-consumed production) | "we make use of three rounds of the nationally representative Uganda National Panel Survey (UNPS) collected in *2009-10, 2010-11, and 2011-12*" -- W5 predates the paper                                                                                                  | PMC full text read (Elsevier PDF 403)                       |
+| Tumwine, G. N., Lokina, R. & Matovu, J. M. (2019), "The Effect of Climate Change on Agricultural Crop Returns in Uganda", /J. Econ. & Behavioral Studies/ 11(4), doi:10.22610/jebs.v11i4(j).2922                               | *No*                           | yes (net farm revenue, Ricardian)                         | "The study uses Uganda National Panel Survey (UNPS) datasets of *2009/10(wave1), 2010/2011(wave II), 2011/2012(wave III) and 2013/2014(wave IV)*"                                                                                                                         | PDF fetched                                                 |
+| Miller, D. C., Muñoz, J. C., Rasmussen, L. V. & Zezza, A. (2020), "Do Trees on Farms Improve Household Well-Being?", /Frontiers in Forests and Global Change/ 3:101, doi:10.3389/ffgc.2020.00101                               | *No*                           | yes (agricultural income, 12 mentions)                    | "available over five waves in *2005-2006, 2009-2010, 2010-2011, 2011-2012, and 2013-2014*"; uses earliest and most recent = 2005-06 and 2013-14                                                                                                                           | PDF fetched                                                 |
+| Mekonnen, D. A., Soma, K. & Ruben, R. (2020), "The ambivalent links between internal migration and food security in Uganda", /Migration and Development/, doi:10.1080/21632324.2020.1845489                                    | *Yes* (17 mentions of 2015/16) | *No*                                                      | Outcomes are food energy adequacy, Food Consumption Score and food expenditure -- consumption module. Zero occurrences of "crop sales", "crop income", "agricultural income", "farm income", "value of crop", "sold" in the full text                                     | PDF fetched from WUR repository (T&F 403), binary-safe grep |
+| Hübler, M., Ogenrwoth, B., Walusimbi, R. & Ssali, P. (2025), "The impact of weather shocks on food security in Uganda", /Food Security/, doi:10.1007/s12571-025-01542-8                                                        | *Yes*                          | *No*                                                      | "We used the periods *2013/2014, 2015/2016 and 2019/2020*", but the variables are meals per day, food-shortage likelihood, weather shocks and total value of assets. Its two "net revenue" hits are in the literature review, describing Tibesigwa et al. on South Africa | PDF fetched                                                 |
+| Ntakyo, P. R. & van den Berg, M. (2019), "Effect of market production on rural household food consumption: evidence from Uganda", /Food Security/ 11:1051-1070, doi:10.1007/s12571-019-00959-2                                 | *No*                           | yes (commercialisation, crop sales)                       | Not UNPS at all -- "a sample of 1137 households" from the authors' own rice survey in western Uganda, "Agricultural production data were collected for the two full seasons before the survey: March-July and August-January *2013/14*"                                   | PDF fetched                                                 |
+| Kabunga, N., Ghosh, S. & Webb, P. (2017), "Does ownership of improved dairy cow breeds improve child nutrition?", /PLoS ONE/ 12(11):e0187816                                                                                   | *No*                           | *No* (milk sales, livestock module)                       | "The *2009/2010* round was the first wave"; outcomes are milk yield, own-milk intake and milk sales -- livestock, not AGSEC5                                                                                                                                              | PDF fetched                                                 |
+| Veljanoska, S. (2017), "Can Land Fragmentation Reduce the Exposure of Rural Households to Weather Variability?", FAERE Policy Paper 2017-02                                                                                    | *No* (0 mentions)              | agricultural income (6 mentions)                          | 2017 working paper; no 2015-16 reference anywhere in the text                                                                                                                                                                                                             | PDF fetched                                                 |
+| Mayorga, J., Villacis, A. H. & Mishra, A. K. (2025), "Farm-level agricultural productivity and adaptation to extreme heat", /AJAE/, doi:10.1111/ajae.12509                                                                     | *No*                           | yes (agricultural output value)                           | *Nigeria only* -- "data from the Nigeria LSMS-ISA from the years 2010, 2012, and 2015"                                                                                                                                                                                    | abstract only (Wiley PDF 403)                               |
+| Nnaji, A., Alia, D. Y., Raina, A. & Anderson, C. L. (2026), "Harmonized food consumption dataset by food category and acquisition source for Sub-Saharan African countries", /Scientific Data/, doi:10.1038/s41597-026-06548-1 | (16 countries, 2008-2021)      | *No*                                                      | An EPAR-authored harmonised dataset, but built "from *consumption modules* of large-scale, nationally representative household surveys" -- not AGSEC5                                                                                                                     | abstract only                                               |
+| Macheka, G., Chundu, M., Ahmadi, S. & Makochekanwa, A. (2026), "The Impact of Off-Grid Solar Energy on Rural Income Inequality: Evidence of Zambia and Zimbabwe", preprint, doi:10.2139/ssrn.7210667                           | n/a                            | n/a                                                       | The sole work citing the =LSMS-ISA_Ag= /journal paper/; *neither country is Uganda*                                                                                                                                                                                       | OpenAlex metadata                                           |
+| Amankwah, A., Ambel, A. A., Gourlay, S., Kilic, T., Markhof, Y. & Wollburg, P. (2025), /Food Policy/ 133:102885, doi:10.1016/j.foodpol.2025.102885                                                                             | n/a                            | n/a                                                       | Cites =LSMS-ISA_Ag= (WPS 10976) and consumes the *corrected* product; fertilizer-use study. Full text not retrievable (Elsevier 403, CRIS 403), so variable list unverified                                                                                               | OpenAlex metadata; PDF blocked                              |
+| Vashold, L., Pirich, G., Heinze, M. & Kuschnig, N. (2025), /Journal of Development Economics/ 179:103671, doi:10.1016/j.jdeveco.2025.103671                                                                                    | n/a                            | n/a                                                       | Cites =LSMS-ISA_Ag=; outcomes are remote-sensed vegetation and cereal tonnages                                                                                                                                                                                            | abstract only (Elsevier 403)                                |
+| Berha, A. (2025), "Temperature and Farm Labor in Nigeria", /AEPP/ 48:518-530, doi:10.1002/aepp.70048                                                                                                                           | n/a                            | n/a                                                       | Cites =LSMS-ISA_Ag=; *Nigeria only*                                                                                                                                                                                                                                       | abstract only                                               |
+
+** Could not be retrieved (recorded so the search is auditable, not cleared)
+
+These were identified as Uganda/UNPS candidates but the full text could not be
+obtained from this host.  None showed 2015-16 *plus* crop-sale-value use in
+its abstract, but that is weaker evidence than the rows above.
+
+| reference                                                                                                                                                               | blocker                                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------|
+| Agamile, P., Dimova, R. & Golan, J. (2021), "Crop Choice, Drought and Gender", /J. Agricultural Economics/ 72(3):829-856, doi:10.1111/1477-9552.12427                   | Wiley HTTP 403; Manchester repository record has no PDF                                                      |
+| Babyenda, P., Kabubo-Mariara, J. & Odhiambo, S. (2023), "Climate variability and agricultural productivity in Uganda", /AfJARE/ 18(1), doi:10.53936/afjare.2023.18(1).2 | AgEcon Search returns HTTP 202 with 0 bytes (bot challenge) on both the record and the file URL              |
+| Campus, D. (2017), "Gender differentials in agricultural productivity: an empirical evidence from Uganda", doi:10.22004/ag.econ.261259                                  | same AgEcon Search 202/0-byte block. Abstract states it uses "*2009-10; 2010-11*", so almost certainly clear |
+| Gottschalk, C. M. (2020), "Effectiveness of Climate-Smart Agriculture in Uganda", Lund Univ. student paper                                                              | Landing page returns HTML only; abstract indicates crop *yields*, not values                                 |
+| Dolislager, M. /et al./ (2022), /Agricultural Economics/ 53(6), doi:10.1111/agec.12738                                                                                  | Wiley HTTP 403; abstract is explicit that it is a *consumption* study                                        |
+
+** Also checked, no exposure found
+
+- *WB Microdata catalog citations for catalog 3460 -- there is no such list.*
+  Chased to the end rather than left as "unread": (i)
+  =/index.php/catalog/3460/citations= returns HTTP 200 / 437,092 B but the body
+  is the *generic study search* -- its footer reads "Showing 1-15 of 7,098
+  studies" -- so the =/citations= suffix is silently ignored; (ii)
+  =api/catalog/3460= -> HTTP 400 =IDNO-NOT-FOUND=, while the idno form
+  =api/catalog/UGA_2015_UNPS_v02_M= works (HTTP 200, 13,844 B) and its
+  =dataset= object has *no* citations key (=link_study=, =link_indicator=,
+  =link_report=, =metadata= only); appending =/citations= to the idno form
+  changes nothing; =api/citations?sid=3460= -> HTTP 500; (iii)
+  =/citations/index/study/3460= returns the *site-wide* citation library
+  ("showing 1-30 of 30" filtered, 2,631 unfiltered) with the study filter
+  ignored; (iv) the study landing page =/catalog/3460= contains exactly one
+  "Citations" link and it points at the site-wide =/citations= library, i.e.
+  *the study page has no per-study citations tab at all*.  Conclusion: the WB
+  catalog publishes no curated citation list for this study, so this route
+  yields nothing for anyone -- it is not a gap in this search.
+- *The UBOS/WB UNPS 2015/16 report.*  Catalog 3460's Documentation lists four
+  questionnaires and exactly *one* report -- the Basic Information Document
+  (download 46598, 41 pp.).  *There is no UBOS statistical/tabulation report
+  for wave 5 in the catalog*, so there is no published UBOS table of crop sale
+  values at which to check the scale at source; that check, which would have
+  localised the x1/100 to WB v02 processing, *cannot be run from the catalog*.
+  The BID itself never uses the words "thousand", "shilling" or "UShs".
+- =worldbank/LSMS= GitHub repo: an unrelated clustering/visualisation project
+  (Ethiopia 2015, Tanzania 2014, Uganda 2013 CSVs); no Uganda 2015-16 build.
+- =lsms-worldbank/HFPS_harmonization_working=: COVID phone surveys, not AGSEC5.
+- FAO RIGA: no Uganda 2015-16 round is published in the RIGA country list.
+
+* 5. Search log
+
+All queries run from this host on 2026-09-08.  CPU work pinned to =taskset -c 11-13=.
+
+** OpenAlex REST API (=api.openalex.org/works?search=...=, filter =publication_year:>2016=, =per-page=50=)
+
+No key required.  Round 1:
+
+|  hits | query                                                       |
+|-------+-------------------------------------------------------------|
+|    64 | ="Uganda National Panel Survey" crop sales=                 |
+|    40 | ="Uganda National Panel Survey" commercialization=          |
+|    14 | =Uganda UNPS 2015 farm gate price crop=                     |
+|    41 | =Uganda LSMS-ISA marketed surplus crop sales=               |
+| 3,239 | =Uganda panel survey agricultural income crop revenue 2015= |
+|   781 | =Uganda household commercialisation index crop=             |
+| 2,110 | =Uganda smallholder crop sales value panel 2015 2016=       |
+|    20 | =Uganda crop price dispersion farm gate LSMS=               |
+|   118 | ="UNPS" Uganda wave 5 agriculture=                          |
+| 3,289 | =Uganda gross value crop production panel survey=           |
+|    35 | =Uganda harvest value imputed median price LSMS=            |
+|   292 | =Uganda agricultural household income LSMS-ISA panel waves= |
+
+Round 2:
+
+|  hits | query                                                                               |
+|-------+-------------------------------------------------------------------------------------|
+|     8 | =EPAR agricultural indicators LSMS-ISA Uganda=                                      |
+|     0 | =AgQuery Evans School agricultural indicators=                                      |
+|   572 | =Uganda 2015/16 crop income household panel LSMS=                                   |
+| 2,388 | =value of crop production Uganda national panel survey wave 5=                      |
+|   503 | =Uganda crop commercialisation market participation panel data 2015=                |
+| 6,225 | =Uganda agricultural productivity gender gap value of production panel=             |
+| 1,384 | =Uganda maize price farm gate household survey 2015 2016=                           |
+|    25 | =Uganda coffee banana sales value household panel LSMS-ISA=                         |
+|    10 | =crop revenue Uganda climate Ricardian panel LSMS=                                  |
+|   371 | =Uganda farm income diversification LSMS panel 2015=                                |
+|    22 | =Uganda welfare agricultural sales income shocks UNPS 2015/16=                      |
+|    70 | =harmonized LSMS-ISA agricultural indicators Sub-Saharan Africa panel productivity= |
+
+Round 3 (targeted):
+
+| hits | query                                                                                      |
+|------+--------------------------------------------------------------------------------------------|
+|    2 | =EPAR agricultural indicator curation LSMS-ISA estimates Uganda Tanzania Nigeria Ethiopia= |
+|    0 | =AgQuery agricultural indicators Evans School LSMS=                                        |
+|    1 | =Bentze Wollburg harmonised panel LSMS-ISA agricultural productivity welfare=              |
+|    1 | =filter=cites:W4416413064= (works citing the =LSMS-ISA_Ag= paper)                          |
+
+Deduplicated across all rounds: *570 unique works*.  Uganda + crop-value +
+panel filter -> 39 scored candidates -> 7 strict candidates -> 14 selected for
+full-text retrieval.
+
+** GitHub REST API
+
+| result                                  | call                                                                     |
+|-----------------------------------------+--------------------------------------------------------------------------|
+| #ERROR                                  | =search/repositories?q=LSMS-ISA_Ag=                                      |
+| =total_count: 0=                        | =search/repositories?q=LSMS-ISA+Ag+harmonized=                           |
+| =total_count: 3= (the three EPAR repos) | =search/repositories?q=LSMS-ISA+agricultural+indicators=                 |
+| 31 repos listed                         | =orgs/EvansSchoolPolicyAnalysisAndResearch/repos=                        |
+| 2 relevant repos                        | =orgs/lsms-worldbank/repos=                                              |
+| 621 paths                               | =repos/.../LSMS-Agricultural-Indicators-Code/git/trees/HEAD?recursive=1= |
+| 36 paths                                | =repos/.../LSMS-Data-Dissemination/git/trees/HEAD?recursive=1=           |
+| 3 releases                              | =repos/lsms-worldbank/LSMS-ISA-harmonised-.../releases=                  |
+#+TBLFM: $1=total_count: 1= (only =lsms-worldbank/LSMS-ISA-harmonised-...=)
+
+** Web search
+
+- ="LSMS-ISA_Ag" harmonized agricultural dataset World Bank= -> resolves solely
+  to the =lsms-worldbank= repo, its Zenodo record, the /Scientific Data/ paper
+  and =reproducibility.worldbank.org/catalog/269=.
+- =Bentze Wollburg World Bank working paper LSMS-ISA harmonised panel...= ->
+  additionally surfaced WPS *10976* on RePEc.
+
+** WB Microdata catalog API
+
+- =api/catalog/3460= -> HTTP 400 =IDNO-NOT-FOUND= (numeric id not accepted).
+- =api/catalog/search?idno=UGA_2015_UNPS_v02_M= -> HTTP 200 but the =idno=
+  parameter is ignored (returns the unfiltered 7,098-study list).
+- =catalog/3460/citations= -> HTTP 200, 437,092 B, but the body is the generic
+  study search ("Showing 1-15 of 7,098 studies"); the =/citations= suffix is
+  silently ignored.  =api/citations?sid=3460= -> HTTP 500.
+  =/citations/index/study/3460= -> the site-wide citation library with the
+  study filter ignored.  The =/catalog/3460= landing page has *no* per-study
+  citations tab.  *Resolved: no per-study citation list exists* (see §4).
+
+** Artifacts downloaded and inspected
+
+| bytes                       | artifact                                                                             |
+|-----------------------------+--------------------------------------------------------------------------------------|
+| 276,827 / 301,315           | EPAR =EPAR_UW_Uganda_UNPS_W5.do= / =_W4.do=                                          |
+| 31,806                      | EPAR Uganda Wave 5 =readme.md=                                                       |
+| 12,049,821 / 17,682,073     | EPAR =Uganda UNPS W5.zip= / =W4.zip=                                                 |
+| 7,768,323                   | =EPAR_UW_335_AgDev_Indicator_Estimates.xlsx= (47,927 rows)                           |
+| 426,082 / 416,934 / 405,075 | WB =Reproduction_v2.zip= / =Reproduction_new.zip= (v1.1) / =Reproduction.zip= (v1.0) |
+| 102,109,193                 | WB =Data.zip= v2.0 (=Plotcrop_dataset.dta=, 179,496 Uganda rows)                     |
+| 2,054,051                   | Bentze & Wollburg (2025) PDF                                                         |
+| 8 PDFs                      | Morrissey, Ntakyo, Tumwine, Miller, Hübler, Veljanoska, Kabunga, Mekonnen            |
+
+** Semantic Scholar (retried with backoff after an initial HTTP 429)
+
+=api.semanticscholar.org/graph/v1/paper/search=, 5 retries with 6-30 s sleeps:
+
+| hits | query | new candidates |
+|------+-------+----------------|
+| 4 | =Uganda National Panel Survey 2015/16 crop sales value= | none -- returned Morrissey (2023) and Kabunga (2017), both already assessed |
+| 4 | =Uganda UNPS wave 5 commercialization crop income= | none -- all pre-2017 or non-UNPS |
+
+** Declared gaps -- searched indirectly or not at all
+
+Stated rather than silently omitted:
+
+- *RePEc/IDEAS, IFPRI discussion papers and the World Bank Policy Research
+  Working Paper series were not searched through their own interfaces.*
+  OpenAlex indexes all three (RePEc records surfaced in rounds 1-2 -- e.g.
+  Veljanoska, Campus; the WB PRWP series surfaced WPS 10976 and WPS 9556), so
+  coverage is partial but not zero.  A direct sweep of each could add
+  grey-literature items OpenAlex misses.
+- *Google Scholar was not queried* (no API; scraping it from this host was not
+  attempted).
+- *Harvard Dataverse was not searched* for Uganda UNPS-derived replication
+  packages; the brief listed it and it remains open.
+- *The five items in "Could not be retrieved" above are unresolved*, not
+  cleared.
+
+** Sites that blocked retrieval from this host
+
+Wiley (=onlinelibrary.wiley.com=) HTTP 403; Elsevier (=sciencedirect.com=)
+HTTP 403; Taylor & Francis (=tandfonline.com=) HTTP 403; AgEcon Search
+(=ageconsearch.umn.edu=) HTTP 202 with a zero-byte body.  Springer, PLoS,
+Frontiers, Nature, GitHub, Zenodo, WUR and Europe PMC all served normally.

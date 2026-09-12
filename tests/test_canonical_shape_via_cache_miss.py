@@ -10,11 +10,34 @@ spot-checks under cache-read but failed under cache-miss because the
 framework's ``load_from_waves`` aggregates per-wave parquets instead
 of running the country-level normalizer.
 
-This test removes the relevant cache parquet, calls the API, and
+This test calls the API in a PRIVATE, EMPTY ``LSMS_DATA_DIR`` (a per-test
+``tmp_path``; see ``private_data_root``) so every read is a cache miss, and
 asserts the result satisfies the country's declared scheme via
-``validate_feature``.  Where canonical alignment is known to be
-blocked by deferred wave-level work, the test is marked ``xfail`` so
-the failure is tracked rather than silenced.
+``validate_feature``.  Where canonical alignment is known to be blocked by
+deferred wave-level work, the test is marked ``xfail`` so the failure is
+tracked rather than silenced.
+
+Why a private root and not "clear the relevant parquets" (GH #803).  The
+previous version physically cleared the L2-country and L2-wave parquets for
+the target table under WHATEVER ``data_root()`` was and rebuilt in place.
+Run from a checkout whose ``config.yml`` names a shared ``data_dir`` (the
+Savio setup), a full-suite run therefore rewrote the SHARED cache -- and on
+2026-09-07 01:49 it rewrote ``GhanaLSS/var/food_acquired.parquet`` with
+pre-#785 content read from hashless IN-TREE wave parquets, stamped with a
+fresh hash (the #803 mechanism; attribution in
+``slurm_logs/gh797/attribution/REPORT.org``).  A test must not be able to
+write to a cache it does not own.  The private root also makes the
+``extra`` upstream list redundant: nothing is warm, so the rebuild always
+traverses the full source chain.  (The old ``_clear_country_caches`` also
+only looked under ``data_root()`` and so could not see the in-tree
+artefacts; with #803 those are never read, and with a private root there is
+nothing to clear.)
+
+L1 (the DVC blob cache) is deliberately SHARED: the private root gets a
+``dvc-cache`` symlink to the importing process's ``_DVC_CACHE_DIR`` so the
+wave-script subprocesses (which resolve L1 from ``LSMS_DATA_DIR``) do not
+re-pull every ``.dta`` from S3.  L1 is content-addressed and append-only, so
+sharing it is safe; L2 is what must be private.
 """
 
 from __future__ import annotations
@@ -27,6 +50,8 @@ import pandas as pd
 import pytest
 
 import lsms_library as ll
+from lsms_library import config as _config
+from lsms_library import local_tools as _lt
 from lsms_library.country import data_root
 from lsms_library.diagnostics import (
     Check,
@@ -92,13 +117,12 @@ pytestmark = pytest.mark.skipif(
 # --------------------------------------------------------------------------
 # Targets that must remain canonically shaped after a cache-miss rebuild.
 #
-# (country, feature, [extra caches to clear before the rebuild])
+# (country, feature, [upstream tables the feature is derived from])
 #
-# ``extra`` lists caches that the requested feature depends on; clearing
-# them forces the rebuild to traverse the full source-data chain instead
-# of consuming a stale upstream cache.  E.g. ``food_expenditures`` is
-# auto-derived from ``food_acquired`` so the latter must also be cleared
-# before the test.
+# ``extra`` documents which upstream caches the requested feature depends
+# on (e.g. ``food_expenditures`` is auto-derived from ``food_acquired``).
+# It used to be the list of caches to CLEAR; with the private data root
+# (see the module docstring) every table is cold, so it is informational.
 # --------------------------------------------------------------------------
 TARGETS_OK = [
     # PR #230: idxvars repair
@@ -140,47 +164,59 @@ TARGETS_OK = [
 TARGETS_XFAIL = []
 
 
-def _clear_country_caches(country: str, tables: list[str]) -> None:
-    """Physically clear L1 (country) and L2 (per-wave) parquet caches.
+@pytest.fixture
+def private_data_root(tmp_path, monkeypatch):
+    """A per-test, empty ``LSMS_DATA_DIR`` with the L1 blob cache shared.
 
-    Scoped equivalent of ``lsms-library cache clear --country {country}``
-    for the listed tables.  The L2 ``{wave}/_/{table}.parquet`` layer
-    must be cleared too -- clearing only L1 leaves stale wave parquets
-    that the framework happily reads back into a freshly-built L1,
-    silently masking source-data fixes (CLAUDE.md "Cache Behavior").
+    In-process (the ``test_gh323_site4_dfs_merge`` pattern): the env var is
+    set AFTER import and ``data_root``'s lru_cache is cleared, so every
+    ``data_root()`` call in this process -- and every ``LSMS_DATA_DIR`` the
+    library exports to a wave-script subprocess -- resolves to ``tmp_path``.
+    ``local_tools._DVC_CACHE_DIR`` is an import-time snapshot and stays where
+    it was, which is exactly the shared-L1 / private-L2 split wanted here;
+    the symlink gives the subprocesses the same L1.
+
+    Asserts, rather than assumes, that the private root is not the
+    configured ``data_dir``: the shared cache must be unreachable from this
+    test whatever ``~/.config/lsms_library/config.yml`` says (GH #803).
     """
-    country_root = data_root() / country
-    if not country_root.exists():
-        return
-    for table in tables:
-        # L1: country-level cache
-        l1 = country_root / "var" / f"{table}.parquet"
-        if l1.exists():
-            l1.unlink()
-        # L2: every wave's per-wave cache
-        for wave_dir in country_root.iterdir():
-            if not wave_dir.is_dir() or wave_dir.name == "var":
-                continue
-            l2 = wave_dir / "_" / f"{table}.parquet"
-            if l2.exists():
-                l2.unlink()
+    private = tmp_path / "data"
+    private.mkdir()
+    shared_l1 = Path(_lt._DVC_CACHE_DIR)
+    if shared_l1.is_dir():
+        (private / "dvc-cache").symlink_to(shared_l1, target_is_directory=True)
+    monkeypatch.setenv("LSMS_DATA_DIR", str(private))
+    data_root.cache_clear()
+    try:
+        assert data_root() == private, data_root()
+        # The shared roots this test must never touch: the config FILE's
+        # ``data_dir`` (``_config.data_dir()`` would return the env var we
+        # just set) and the XDG default.
+        shared = [Path.home() / ".local" / "share" / "lsms_library"]
+        configured = _config._load_config().get("data_dir")
+        if configured:
+            shared.append(Path(configured).expanduser())
+        assert all(private.resolve() != s.resolve() for s in shared), \
+            f"private data root collides with a shared data root: {shared}"
+        assert not any(private.glob("*/var/*.parquet")), "private data root is not empty"
+        yield private
+    finally:
+        data_root.cache_clear()
 
 
 @pytest.mark.parametrize(
     "country, feature, extra",
     TARGETS_OK + TARGETS_XFAIL,
 )
-def test_canonical_shape_via_cache_miss(country, feature, extra):
+def test_canonical_shape_via_cache_miss(private_data_root, country, feature, extra):
     """Cache-miss → API call should produce canonical-shaped output.
 
-    Both L1 (country-level) and L2 (per-wave) caches are cleared for
-    ``feature`` and any upstream dependencies listed in ``extra``,
-    then the API is invoked.  ``validate_feature`` asserts the result
-    conforms to the country's declared schema and the cross-country
-    reference shape.
+    The private, empty data root makes every tier a miss for ``feature``
+    AND for the upstream tables listed in ``extra`` (and for everything
+    else), so the rebuild traverses the full source chain.
+    ``validate_feature`` asserts the result conforms to the country's
+    declared schema and the cross-country reference shape.
     """
-    _clear_country_caches(country, [feature, *extra])
-
     report = validate_feature(country, feature)
     if not report.ok:
         # Surface the failing checks before assert so pytest output is
@@ -191,26 +227,21 @@ def test_canonical_shape_via_cache_miss(country, feature, extra):
                     f"[{country}/{feature}] {check.name}: {check.message}"
                 )
     assert report.ok, f"validate_feature returned ok=False for {country}/{feature}"
+    # The build must have landed in the private root, not anywhere else.
+    built = private_data_root / country / "var"
+    assert any(built.glob("*.parquet")), f"nothing was written under {built}"
 
 
 # --------------------------------------------------------------------------
 # Panel consistency for GhanaLSS (PR #243 retains the existing GLSS1↔GLSS2
 # panel via the framework's id_walk).  Currently fails on
-# ``panel_ids_targets_exist`` and ``id_walk_idempotent`` -- those are
-# pre-existing diagnostic FAILs against the cached household_roster
-# (related to how the cache stores pre-id_walk values), not a regression
-# introduced by PR #243.  Marked xfail so the suite stays green while the
-# cache/diagnostic interaction is sorted out separately.
+# ``panel_ids_targets_exist`` and ``id_walk_idempotent`` used to FAIL against
+# the cached household_roster (GhanaLSS GLSS1<->GLSS2 panel, tracked under
+# #109) and this test carried an xfail for it.  As of 2026-09-07 (#713 weights,
+# #548 panel ids, #808 one builder for food_acquired) it passes on a cache
+# built through the framework path, so the marker is gone: a regression here
+# should fail loudly again.
 # --------------------------------------------------------------------------
-@pytest.mark.xfail(
-    reason=(
-        "Two pre-existing diagnostic FAILs (panel_ids_targets_exist, "
-        "id_walk_idempotent) on cached household_roster.parquet for "
-        "GhanaLSS GLSS1↔GLSS2 panel; not introduced by PR #243.  Tracked "
-        "separately under #109."
-    ),
-    strict=False,
-)
 def test_ghanalss_panel_consistency():
     report = check_panel_consistency(ll.Country("GhanaLSS"))
     if not report.ok:

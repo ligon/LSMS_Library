@@ -1,0 +1,438 @@
+#+TITLE: Derived served values: Tanzania, Malawi, Niger (read-only census)
+#+DATE: 2026-09-11
+#+AUTHOR: census agent (group: Tanzania, Malawi, Niger)
+
+* Scope and method
+
+Brief: scratchpad BRIEF_derivations.md (per-row nullable =Derivation= column
+plus a registry of named derivation functions; census of what the corpus
+already contains).  Countries: Tanzania (18 script-path tables, 2008-15 is one
+folder holding four NPS rounds via =wave_folder_map=; 2019-20; 2020-21),
+Malawi (11 script-path tables; 2004-05, 2010-11, 2013-14, 2016-17, 2019-20),
+Niger (8 script-path tables plus =panel_ids: !make=; 2011-12, 2014-15,
+2018-19, 2021-22).
+
+Read as text only (grep / sed / Read).  Nothing was executed: no
+=Country()= / =Feature()=, no wave script, no =dvc=.  No tracked file was
+edited; this file is the only output.  GitNexus MCP did not connect this
+session; the call-site sweeps that CLAUDE.md assigns to =gitnexus_impact= /
+=gitnexus_query= were done with =grep -rn= over =countries/{C}/**/_/*.py= and
+=data_info.yml=, as the CLAUDE.md substitute table prescribes.
+
+Path shorthand in the table: =TZ/= means
+=lsms_library/countries/Tanzania/=, =MW/= =Malawi/=, =NE/= =Niger/=.  Line
+numbers are from =cat -n= / Read of the development branch on 2026-09-11.
+Accented labels are transliterated to ASCII in this file (Tres pauvre,
+Diminue, Premiere ...); the source files carry the accents.
+
+Deliberately NOT recorded (per brief): decoding codes to labels (Tanzania
+=hr_03= 'LOSS OF BOTH' -> two booleans, Malawi/Niger shocks Decrease/Increase
+-> True, Niger fertility 1/2/3 -> good/medium/poor, ISIC -> industry bins),
+canonical spelling / mojibake repair (Niger =_decode_mojibake=), date
+composition (Tanzania 2008-15 =interview_date.py=, Malawi =malawi_date_ymd=,
+Niger =melt_visit_intervals=), id construction (Niger =panel_ids=
+=g*100+m=, Malawi =cs-17-= prefixes, Tanzania =id_walk=), wide -> long,
+per-wave concatenation, and the framework derived tables
+(=food_expenditures= / =food_prices= / =food_quantities= /
+=household_characteristics=, GH #850 kg inference, Site Q, Site 2 collapse) --
+except where a country script computes its own version, which is recorded.
+The three country =_/Makefile= files were read: orchestration only (which
+wave dirs to enter, which scripts to run, 2004-05 excluded from Malawi's
+ag targets); no value rule lives in a recipe.
+
+Row ids (D01 ...; D25b was inserted after the numbering) are referenced from the notes section.
+
+* Table: one row per derivation
+
+| id | country | wave(s) | table | served column(s) / index value | raw inputs (file.variable) | rule (formula or one line) | kind | where (path:line) | disclosed today? | rows affected if stated |
+|----+---------+---------+-------+--------------------------------+----------------------------+----------------------------+------+-------------------+------------------+-------------------------|
+| D01 | Tanzania | 2008-15, 2019-20, 2020-21 | food_acquired | Quantity (purchased, produced, gift; consumed dropped) | HH_SEC_K / hh_sec_j quant_purchase, quant_produce, quant_gift + unit_* | fillna(0) then astype(int64) BEFORE multiplying by the unit factor: raw quantity is floored to an integer (0.5 kg -> 0 -> NaN; 1.5 -> 1) | guard | TZ/_/tanzania.py:788-815 (new_harmonize_units); callers TZ/2008-15/_/food_acquired.py:34-38, TZ/2019-20/_/food_acquired.py:241-245, TZ/2020-21/_/food_acquired.py:219-223 | CONTENTS (sec. "new_harmonize_units TRUNCATES every quantity to an integer (2026-09-08)", ~1428) | 2008-15: 4,450 non-integer of 317,331 rows (1.40%), 371 rows q<1 -> NaN, 4,079 inflated; 2019-20: 732 of 12,825, 393 -> NaN, 339 inflated; 2020-21: 251 of 4,699, 88 -> NaN, 163 inflated; median inflation 1.5x, max 1.9x; 852 rows dropped corpus-wide |
+| D02 | Tanzania | 2008-15, 2019-20, 2020-21 | food_acquired | Quantity, index u | same as D01 | unit label -> factor {Kg 1, Gram 0.001, Litre 1, Millilitre 0.001, Piece 'p'} (2020-21 lower-case keys); Quantity := int(q) * factor; served u := 'kg' for every metric label, 'piece' where the factor string contains 'p'.  Litre and Millilitre are served as kg at density 1 and the raw unit is destroyed | scale | TZ/_/tanzania.py:788-815; wave dicts as in D01 | CONTENTS (sec. "collapses every unit to either kg or piece", ~1412; mixed-case u note); the density-1 assumption is not called out | not stated (all rows with a litre / millilitre label) |
+| D03 | Tanzania | 2008-15, 2019-20, 2020-21 | food_acquired | Quantity, Expenditure | same as D01 plus value_* | df.replace(['none','NONE','hakuna'], 0) (Swahili 'none' -> 0) before the numeric pass; then df.replace([inf,-inf,0], nan) after the unit pass, so every genuine zero (and every floored quantity) becomes NaN and the row is later dropped by the canonical keep rule qty>0 or exp>0 | guard | TZ/_/tanzania.py:626, :798, :813-815 | none for hakuna/none -> 0; CONTENTS for the 0 -> NaN consequence (the 852 dropped rows) | see D01 |
+| D04 | Tanzania | 2008-15, 2019-20, 2020-21 | food_acquired (intermediate only) | unitvalue_purchase | value_purchase, quant_purchase | value_purchase / quant_purchase (after D01/D02), inf -> NaN; column is DROPPED before the canonical parquet, so never served | ratio | TZ/_/tanzania.py:631, :812 | none | not served |
+| D05 | Tanzania | 2008-15, 2019-20, 2020-21 | crop_production | Quantity | AG_SEC_4A ag4a_19 (harvested y/n), ag4a_28 (quantity) | Quantity := 0.0 where ag4a_19 == 2 (planted, not harvested), regardless of the quantity field; u asserted 'kg' | impute | TZ/_/tanzania.py:1223 | docstring | not stated |
+| D06 | Tanzania | 2008-15, 2019-20, 2020-21 | crop_production | Quantity_sold, Value_sold | AG_SEC_5A ag5a_02/ag5a_03, AG_SEC_7A, AG_SEC_7B (sales by crop, not plot) | sales summed across the three sale modules per (i, crop) with .sum(min_count=1), then attached to the harvest row only where the household grows that crop on exactly one plot (plot_count == 1); multi-plot crops get NA sales | sum across fields + selection | TZ/_/tanzania.py:1258-1279 | docstring | not stated |
+| D07 | Tanzania | 2008-15, 2019-20, 2020-21 | crop_production | Quantity, harvest_month | duplicate (t,i,plot_id,j,u,...) harvest rows | duplicate rows collapsed with Quantity: sum, harvest_month: max | selection (borderline: additive de-dup of one measure, but the month rule is a choice) | TZ/_/tanzania.py:1295-1300 | comment | not stated |
+| D08 | Tanzania | 2008-15, 2019-20, 2020-21 | crop_production | Quantity | ag4a_28 | NO in-script guard: the 7,500,000 kg coconut row (2020-21) and other sentinels are served as reported; Site Q (quantity_audit.py, GH #857) reports and never clips | (none: absence of a guard, recorded for completeness) | TZ/_/tanzania.py:1163-1302; lsms_library/quantity_audit.py | CLAUDE.md (Site Q), CONTENTS | 151 of 626,687 rows corpus-wide flagged by Site Q |
+| D09 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_features | Area | AG_SEC_3A ag3a_2a (GPS acres) | GPS area outside (0, 2500] acres -> NA (plausibility clamp; a 28,710-acre outlier) | guard | TZ/_/tanzania.py:1050-1051 | CONTENTS (~1621), docstring | 1 named outlier; count not stated |
+| D10 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_features | Area, SelfReportedArea | ag3a_2a (GPS acres), ag3a_02 (farmer estimate, acres) | area_acres := GPS where GPS notna else estimate; Area := area_acres * 0.404686 (ha); SelfReportedArea := estimate * 0.404686 | selection + scale | TZ/_/tanzania.py:1053-1054, :1060 | docstring | not stated |
+| D11 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_features | Tenure, Owned, Certificate, Fallow | ag3a_03 (use), ag3a_24 (acquisition), ag3a_28a / ag3a_28d (title, docs) | Tenure := 'rented_out' where use in (2,3); Owned := acquisition code in (1,2,5,9); Certificate := ag3a_28a in (1,2) True, 3 False, promoted True if ag3a_28d in 1..5, forced False if not Owned; Fallow := use == 4 | categorical->number (code set -> boolean) | TZ/_/tanzania.py:1073, :1089-1090, :1096-1101, :1113 | docstring / comment | not stated |
+| D12 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_inputs | Purchased (seed), Improved | AG_SEC_4A ag4a_10a/ag4a_12 (seed qty purchased, amount paid), ag4a_08 (seed type) | Purchased := (qty_purchased > 0) or (paid > 0); Improved := {1: True, 2: False, 3: True} (code 3 'both' counted as improved) | encoding | TZ/_/tanzania.py:1405, :1407 | comment | not stated |
+| D13 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_inputs | Purchased (inorganic fertiliser, herbicide, pesticide); Quantity | ag3a_49 / ag3a_62 / ag3a_65 value fields; quantity fields | Purchased := value > 0 (a zero-value or missing value reads as not purchased); duplicate (plot, input) rows summed on Quantity | encoding; sum | TZ/_/tanzania.py:1453, :1470, :1484, :1509-1514 | comment | not stated |
+| D14 | Tanzania | 2008-15, 2019-20, 2020-21 | livestock | HeadCount | LF_SEC_02 lf02_04_1, lf02_04_2 (indigenous / improved head) | HeadCount := lf02_04_1 + lf02_04_2 (sum(axis=1, min_count=1)) | sum across fields | TZ/_/tanzania.py:1628-1631 | docstring | not stated |
+| D15 | Tanzania | 2008-15, 2019-20, 2020-21 | livestock | HeadSold, HeadAcquired, ... (flow counts) | lf02_* flow fields | negative or > 50,000 (_LIVESTOCK_FLOW_CEILING) -> NA | guard | TZ/_/tanzania.py:1547-1558 | comment (names the two corrupt rows) | 2 rows named: 2019-20 HH 0525-001-001 'bought 324000'; 2020-21 HH 3722-001-01 'sold 100000' |
+| D16 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_labor | PersonDays (hired), Wage | AG_SEC_3A ag3a_74_{1,2,3}{a,b,c} (9 day cells: men/women/children x 3 activities), ag3a_74_{1,2,3}d (3 wage cells) | PersonDays := sum of the 9 day cells; Wage := sum of the 3 wage cells (the docstring and data_scheme.yml label them 'cash paid to hired labor [TSH]', i.e. a TOTAL paid, not a rate) | sum across fields | TZ/_/tanzania.py:1705-1706, :1739-1743; TZ/_/data_scheme.yml:247 | docstring, data_scheme.yml | not stated |
+| D17 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_labor | PersonDays (hired) | ag3a_73 (hired anyone y/n) | hired days := 0 where hire_yn == 2 (No), overriding any cell values | impute | TZ/_/tanzania.py:1749-1750 | comment | not stated |
+| D18 | Tanzania | 2008-15, 2019-20, 2020-21 | plot_labor | PersonDays | all day sums | days > 730 (_PLOT_LABOR_DAY_CEILING) -> NA | guard | TZ/_/tanzania.py:1687-1694 | data_scheme.yml comment | not stated |
+| D19 | Tanzania | 2020-21 only | plot_labor | PersonDays (family) | ag3a_72c/g/k_* (per-member days by activity) | family PersonDays := sum of per-member day cells; 2019-20 and 2008-15 emit NO family rows (only worker ids exist there) | sum across fields (cross-wave difference) | TZ/_/tanzania.py:1761-1775 | docstring | not stated |
+| D20 | Tanzania | 2008-15, 2019-20, 2020-21 | people_last7days | farm_hrs, sb_hrs, wage_hrs (hours), dummies, Industry | HH_SEC_E hours and yes/no fields, age | hours := 0 where the matching yes/no dummy is False; below working age: all dummies False, all hours 0, Industry NA | impute | TZ/_/tanzania.py:1859-1863, :1885-1890 | docstring | not stated |
+| D21 | Tanzania | 2019-20, 2020-21 | community_prices | Price | COM_SEC_CF cm_f063 (price paid), cm_f062 (quantity of the unit priced) | Price := cm_f063 / cm_f062 (currency per one unit of u); rows with price <= 0 or qty <= 0 dropped first | ratio; guard | TZ/_/tanzania.py:2017-2018, :2023 | docstring, data_scheme.yml | not stated |
+| D22 | Tanzania | 2019-20, 2020-21 | community_prices | Price (index t,v,j,u) | several source item codes that decode to one label | groupby(['t','v','j','u']).first(): where two source codes share a label and disagree on price, the first row wins and the other is discarded | selection | TZ/_/tanzania.py:2054-2055 | docstring (with counts) | 243 of 261 groups (2019-20) and 1,149 of 1,281 groups (2020-21) hold > 1 distinct price; example cluster 01-06-47-85 Millet & Sorghum 2,000 vs 16,000 TSh |
+| D23 | Tanzania | 2019-20, 2020-21 | cluster_features (community link) | community -> cluster key | community and household interview dates | community record matched to a cluster within a date window (_XWALK_WINDOW_DAYS 14 / 7 days) | selection (id-level, borderline) | TZ/_/tanzania.py:2098-2252 | docstring | not stated |
+| D24 | Tanzania | 2008-15 | sample | panel_weight, weight | HH_SEC_A weight, round, ha_07_1 | panel_weight := weight, then NA where round == 4 and ha_07_1 == 'NO' (refresh households) | impute / guard | TZ/2008-15/_/sample.py:27-30 | comment, tanzania-panel-design skill | not stated |
+| D25 | Tanzania | 2008-15 | sample | v | cluster codes of a household's rounds | v := NA where a household's cluster is ambiguous within a round (GH #323) | guard | TZ/2008-15/_/sample.py:94-104 | comment, CONTENTS | 59 (i,t) pairs |
+| D25b | Tanzania | 2008-15 | cluster_features | (rows) | HH_SEC_A geocodes, Region / District of each round | keep_cluster_residents: households whose cover-page Region / District do not match their cluster's are dropped from the cluster table (GH #323; movers tracked into another region) | selection (row filter, borderline) | TZ/_/tanzania.py:289-366; TZ/2008-15/_/cluster_features.py:90 | CONTENTS, docstring | not stated |
+| D26 | Tanzania | 2008-15 | cluster_features | Rural | HH_SEC_A urb_rur | Rural := 'Rural' for any value that is not 'urban' (case-insensitive) -- blanks and unexpected codes read as Rural; blank_to_na applied elsewhere | impute | TZ/2008-15/_/cluster_features.py:47 | none | not stated |
+| D27 | Tanzania | 2008-15, 2019-20, 2020-21 | life_satisfaction | every column (household grain) | hh_sec_b hb_05 / hh_b05 == 'HEAD' + the individual-level module | a household-level table is served from the HEAD's individual answers only; other respondents discarded | selection | TZ/2008-15/_/life_satisfaction.py:70-86; TZ/2019-20/_/life_satisfaction.py:301-309; TZ/2020-21/_/life_satisfaction.py:51,77 | docstring | not stated |
+| D28 | Tanzania | 2008-15, 2019-20, 2020-21 | food_coping | Days | hh_sec_h coping-day fields | Days := round() then Int64 (non-integer answers rounded) | guard | TZ/2008-15/_/food_coping.py:68; TZ/2019-20/_/food_coping.py:53; TZ/2020-21/_/food_coping.py:53 | none | not stated |
+| D29 | Tanzania | 2019-20, 2020-21 | cluster_features | which households are kept | hh_tracking_status / split-off flags | split-off households dropped and tracking_class booster applied in the mapping hook; 2020-21 upper-cases Region / District | selection (row filter, borderline) | TZ/2019-20/_/mapping.py:23 (cluster_features); TZ/2020-21/_/mapping.py:24 (cluster_features) | docstring | not stated |
+| D30 | Tanzania | 2008-15, 2019-20, 2020-21 | shocks | AffectedIncome, AffectedAssets | hr_03 / hh_r03 | 'LOSS OF BOTH' -> (True, True); 'INCOME LOSS' -> (True, False); 'ASSET LOSS' -> (False, True); 'NEITHER' -> (False, False): one categorical fanned into two booleans | encoding (borderline: a decode into two columns) | TZ/2008-15/_/shocks.py:50-78; TZ/2019-20/_/data_info.yml, TZ/2020-21/_/data_info.yml shocks blocks | comment | not stated |
+| D31 | Tanzania | country level | food_expenditures (own version) | Expenditure ('consumed value') | food_acquired price and quantity columns per (t,i,u) | pbar := median unit value per (t, i, u); Expenditure := sum over sources of pbar * q per (j, t, i); 0 -> NaN.  Registered =!make= in data_scheme.yml:119-121 but country.py tries _FOOD_DERIVED (from food_acquired) first, and the script reads columns absent from the canonical parquet: FALLBACK / effectively dead | product (own version of a framework table) | TZ/_/food_prices_quantities_and_expenditures.py:44-55; TZ/_/data_scheme.yml:119-121; lsms_library/country.py:4365, ~4534-4560 | CONTENTS (conversion_to_kgs.json noted as dead) | not stated |
+| D32 | Tanzania | country level | food_quantities, food_prices (own versions) | Quantity (kg), Price | conversion_to_kgs.json, per-round parquets that do not exist | Quantity := q * factor, Price := value / (q * factor); scripts reference per-round parquets that are not produced: DEAD | scale / ratio (dead) | TZ/_/food_quantities.py; TZ/_/food_unitvalues.py; TZ/_/food_expenditures.py (p*q) | CONTENTS (dead code note) | not served |
+| D33 | Tanzania | 2019-20, 2020-21 | finances (not registered) | income columns | 'none' | 'none' -> 0; table is not in data_scheme.yml: DEAD | impute (dead) | TZ/2019-20/_/finances.py:52; TZ/2020-21/_/finances.py:53 | none | not served |
+| D34 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | food_acquired | Quantity_kg (per source) | hh_mod_g1 quantities and unit codes; ihs3_conversions.csv (item_name, unit_code, region, factor) for 2010-11 / 2013-14; ihs_foodconversion_factor_2020.dta for 2016-17 / 2019-20; region | Quantity_kg := Quantity * factor where factor is looked up by (region, item, unit code); the item key is FUZZY: difflib.get_close_matches(label.capitalize(), table_items, n=3, cutoff=0.6), unmatched labels map to themselves (no factor); the factor is region-specific (e.g. 'Maize ufa mgaiwa' unit 4A: North 1.93, 4B 13.72, 4C 15.19) | product + categorical->number (code -> kg factor, region-keyed) | MW/2010-11/_/food_acquired.py:85-90; MW/2013-14/_/food_acquired.py:72-99; MW/2016-17/_/food_acquired.py:66-68; MW/2019-20/_/food_acquired.py:57; lsms_library/local_tools.py:2524 (conversion_table_matching_global); MW/_/malawi.py:468-499, :515-520 | CONTENTS (1074 area; TODO #116); CLAUDE.md names 'Malawi's region-specific unit factors' | not stated |
+| D35 | Malawi | 2016-17, 2019-20 | food_acquired | Quantity_kg | as D34 | where the fuzzy match is non-injective (several table items map to one label) the factors are COLLAPSED with groupby(['region','item_name','unit_code'])['factor'].mean() (2016-17) / .agg({'factor':'mean'}) (2019-20): the served kg is a mean of the candidate items' factors | selection (mean of candidates) | MW/2016-17/_/food_acquired.py:66-68; MW/2019-20/_/food_acquired.py:57 | comment | not stated |
+| D36 | Malawi | 2010-11 (2013-14 via the same CSV) | food_acquired | region (join key for D34) | hh_mod_a case_id first character | region := {'1': North, '2': Central, '3': Southern}[case_id[0]]; drives which factor a row receives | selection (key derivation feeding D34) | MW/2010-11/_/food_acquired.py:37-43 | comment | not stated |
+| D37 | Malawi | 2004-05 (live); 2010-11, 2013-14, 2016-17, 2019-20 (as written, dead) | food_acquired | Quantity_kg | free-text / decoded unit label containing '<n> g' or '<n> kg' | grams regex (digits, optional space, 'g' followed by a space or 'r') -> n * 0.01 (AS WRITTEN: 300 grams -> 3.0 kg; a correct factor is 0.001, so 10x); kg regex -> n * 1.  In 2004-05 the result is assigned directly (df[cfactor_col] = fallback).  In the four IHS3+ waves it is assigned via df.apply(lambda x: x[c] or f, axis=1) where f is a whole DataFrame and bool(nan) is True in Python, so the fallback can only fire on an exact 0.0 factor -- effectively never | scale (bug as written) | MW/_/malawi.py:39-51 (_extract_kg_conversion), :175-216 (handling_unusual_units, line 206 'or f'); MW/2004-05/_/food_acquired.py:36-47; MW/2010-11/_/food_acquired.py:93-112; MW/2013-14/_/food_acquired.py:72-88 | none (CONTENTS 1074 says such units 'were scaled by the conversion factor given' only) | not stated; conditional on any 2004-05 label matching the regex |
+| D38 | Malawi | all five | food_acquired | Quantity, index u | unit code / label | metric labels (_METRIC_KG: kilogram 1, gram 0.001, litre 1, millilitre 0.001; container labels via _metric_kg_factor) -> Quantity := q * factor and u := 'kg' where no table factor exists; litres served as kg at density 1 | scale | MW/_/malawi.py:86-141, :468-499 | comment | not stated |
+| D39 | Malawi | 2016-17, 2019-20 | food_acquired | u (free-text units) | unit detail free text | _clean_freetext_unit: leading '1 ' stripped, a bare number -> NA | guard | MW/_/malawi.py:54-83 | comment | not stated |
+| D40 | Malawi | 2004-05, 2010-11, 2013-14, 2016-17, 2019-20 | food_acquired | Expenditure | hh_mod_g1 purchase value | Expenditure populated only for s = purchased; other sources carry NaN (an explicit 'no valuation' encoding) | encoding (borderline) | MW/_/malawi.py:515-520 | comment | not stated |
+| D41 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_features | Area | ag_mod_c ag_c04c (GPS acres) | GPS area > 2500 acres -> NA | guard | MW/_/malawi.py:748 | CONTENTS (~724-727) | not stated |
+| D42 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_features | Area, SelfReportedArea | ag_c04a (estimate), ag_c04b (unit code), ag_c04c (GPS) | estimate unit 1 -> * 0.404686, 2 -> as is (ha), 3 -> / 10000 (m2), 4 -> NA; est > 1000 ha -> NA; Area := GPS (ha) where notna else estimate | scale + guard + selection | MW/_/malawi.py:764-770 | CONTENTS, docstring | not stated |
+| D43 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_features | Irrigated, TenureSystem, PlotOwned, Fallow, ErosionProtection | ag_c water code, acquisition code, use code, erosion code | Irrigated := water code != 7 (rain-fed); TenureSystem := 'leasehold' where acquisition == 6; PlotOwned := 1 <= acquisition <= 5; Fallow := use == 4; ErosionProtection := erosion code != 1 | categorical->number (code -> boolean) | MW/_/malawi.py:790, :807, :813, :825, :837 | docstring | not stated |
+| D44 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_features | (rows) | plot_id | 468 stub rows with no plot_id dropped | guard (row filter) | MW/_/malawi.py:890 | comment | 468 rows |
+| D45 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | crop_production | harvest_month, Intercropped, index condition | ag_mod_g harvest month, stand code, condition code | month outside 1..12 -> NA; Intercropped := stand >= 2; unknown condition -> index value 'unknown_condition' | guard; categorical->number; impute (index value) | MW/_/malawi.py:1022, :1037, :940-971 | docstring | not stated |
+| D46 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | crop_production | Quantity_sold, Value_sold | ag_mod_i sale rows (per crop, sold unit) | sales summed within (i, crop, u); attached to the harvest row only where the crop is on ONE plot and ONE harvest row (_nplots == 1 and _nrows == 1), else NA; SaleAttachmentWarning tallies the rest.  Where the sold unit differs from the harvest unit the join is by crop only | sum across fields + selection | MW/_/malawi.py:1111-1113, :1202, :1236-1237 | CONTENTS (220-640; sale-unit mismatch 'silent factor-of-50 error' ~146) | 22.2% of 2010-11 sale rows differ in unit from the harvest row |
+| D47 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | crop_production | Quantity | duplicate harvest rows | duplicates summed on Quantity at (t,i,plot_id,crop,u,condition) | selection (borderline additive de-dup) | MW/_/malawi.py:1149-1160, :1269-1280 | docstring | not stated |
+| D48 | Malawi | 2019-20 (loader) | crop_production (not applied) | KgFactor via transformations.harvest_kg(shipped_factors=...) | shipped IHS5 seasonal / tree conversion tables keyed by crop VARIETY and region | crop_conversion_factors(): region 'South' -> 'Southern', varieties collapsed with _collapse_varieties (agreement-or-drop); a loader for the framework, NOT applied at build (GH #854) | categorical->number (kg factor), not served | MW/_/malawi.py:1453-1652, :1674-1731 | CONTENTS 220-640 | not served |
+| D49 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | food_coping | Days | hh_mod_h coping-day cells | days outside [0, 7] -> NA; then round() | guard | MW/_/malawi.py:1801 | docstring | not stated |
+| D50 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | months_food_inadequate | Months, AnyInadequate | hh_mod_h hh_h04 (any month inadequate y/n), hh_h05a..x (one 'X' cell per month, 25-cell template) | Months := number of 'X' cells, forced 0 where hh_h04 != 1, clipped at 12; AnyInadequate := hh_h04 == 1 | categorical->number (count of marks) + impute + guard | MW/_/malawi.py:1877-1884 | docstring (25-X template artifact) | not stated |
+| D51 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_inputs | Quantity (seed purchased), Purchased, Improved | ag_mod_d seed qty / value from two sources, seed type code | seed qty := NA where its value is NA or 0; then summed across the two purchase sources; Purchased := True where Quantity_purchased notna else NA; Improved := seed code == 2; fractional codes rounded by _int_codes; duplicate rows summed | encoding; sum across fields; guard | MW/_/malawi.py:2169, :2175, :2252-2253, :2134, :1994-1995, :2266-2272 | comment | not stated |
+| D52 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_inputs | u (fertiliser / seed unit labels) | ag_mod_d unit codes | codes -> labels that carry a kg size ('2 kg Bag', '50 kg Bag', seed 5 -> '3.7 kg Bag'); no conversion in-script, but the label is the ONLY carrier of the kg content for the framework's metric parser | (decode; recorded because the label encodes a number) | MW/_/malawi.py:1956 (_MWI_FERT_UNIT_LABELS), :1970 (_MWI_SEED_UNIT_LABELS) | comment | not stated |
+| D53 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | livestock | (rows), HeadCount, ValuePerAnimal | ag_mod_r owns flag, counts, ag_r04 | rows kept only where owns or any count > 0; duplicate collapse sums counts and keeps the first ValuePerAnimal | guard (row filter); selection | MW/_/malawi.py:2378-2382 | docstring | not stated |
+| D54 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | anthropometry | AgeMonths | hh_mod_v age in years, infant age in months | AgeMonths := years * 12.0 where years present else infant months | scale + selection | MW/_/malawi.py:2464-2475 | comment | not stated |
+| D55 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_labor | PersonDays (family) | ag_mod_d per-member days x count cells (legacy and modern layouts differ) | PersonDays := sum over members of days * number of people (_sum_products) | product + sum across fields | MW/_/malawi.py:2630-2660, layouts :2608-2618 | docstring | not stated |
+| D56 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | plot_labor | Wage (hired) | ag_mod_d man / woman / child daily-wage cells | Wage := MEAN of the man, woman and child daily wages that are present (_mean_cols); PersonDays := sum of the hired day cells; rows kept where PersonDays > 0 or Wage notna | ratio (mean) + sum across fields | MW/_/malawi.py:2662-2670, :2765-2766 | docstring | not stated |
+| D57 | Malawi | 2004-05, 2010-11 (legacy) vs 2013-14, 2016-17, 2019-20 (modern) | people_last7days | farm_hrs, sb_hrs, wage_hrs, dummies | hh_mod_e hh_e07 (legacy) vs hh_e07a + hh_e07b + hh_e07c (modern); hh_e08 (+ hh_e09); hh_e11 + hh_e10 | farm_hrs := hh_e07 (legacy) or hh_e07a + hh_e07b + hh_e07c (modern); sb_hrs := hh_e08 + hh_e09; wage_hrs := hh_e11 (wage) + hh_e10 (ganyu); dummies := hours > 0 (0 -> False, NA -> NA) | sum across fields + encoding (cross-wave difference) | MW/_/malawi.py:2830-2972, :2908 | docstring | not stated |
+| D58 | Malawi | legacy vs modern waves | people_last7days | working_age | hh_e02 (legacy) vs roster age (modern) | working_age := hh_e02 != 'X' (legacy) vs age >= 5 (modern) | encoding (cross-wave difference) | MW/_/malawi.py:2932-2944 | docstring | not stated |
+| D59 | Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | community_prices | Price, NumberOfUnits, Available | com_mod prices, unit counts, availability code | Price served as reported (no division by NumberOfUnits); Available := code == 1; duplicate (t,v,j,u) rows -> first | encoding; selection | MW/_/malawi.py:3008-3110 | docstring | not stated |
+| D60 | Malawi | 2013-14, 2016-17, 2019-20 | food_security | FIES_score | hh_mod_t 8 FIES yes/no items | FIES_score := count of True over the 8 items; NA only if all 8 are NA (a partially answered household scores its Yes answers as if the missing ones were No) | categorical->number | MW/2013-14/_/mapping.py:37-42; MW/2016-17/_/mapping.py:31-41; MW/2019-20/_/mapping.py:31-41 | docstring | not stated |
+| D61 | Malawi | 2013-14 vs 2016-17, 2019-20 | food_security | HealthyDiet, RanOut (and siblings) | hh_t14, hh_t15 | 2013-14 maps items by CONCEPT (HealthyDiet from hh_t15, RanOut from hh_t14); 2016-17 / 2019-20 use the FAO item order, so the same served column is fed by a different source item across waves | selection (cross-wave difference) | MW/2013-14/_/data_info.yml (food_security block); MW/2016-17/_/data_info.yml:158-182 | comment | not stated |
+| D62 | Malawi | 2013-14 | cluster_features | Latitude, Longitude | householdgeovariables LAT_DD_MOD / LON_DD_MOD merged per household (i) | a household-grain GPS frame (EA-level displaced fix of the CURRENT location) is projected onto (t, v) by the framework's Site 2 .first(); formerly .mean() (a centroid of points a median 145-148 km and up to 775-783 km apart) | selection (framework collapse over a script-supplied frame) | MW/2013-14/_/data_info.yml (df_geo block); lsms_library/country.py Site 2 | CONTENTS 1262-1280, CLAUDE.md | 188 of 204 EAs disagree; median 145 km, max 775 km |
+| D63 | Malawi | 2004-05 | interview_date | int_t | a14c / a14b / a14a | date composed by malawi_date_ymd (recorded, not counted: coercion) | (skip) | MW/2004-05/_/data_info.yml; MW/_/malawi.py:226-249 | comment | - |
+| D64 | Malawi | country level | food_acquired (var-level concatenator) | quantity_consumed, expenditure, quantity_bought, 'price per unit' | wave parquets | groupby(['j','t','i','units']).agg(sum, sum, sum, first) then replace(inf, 0).replace(0, nan); references columns that the canonical wave parquets no longer carry: STALE / likely broken | selection (first price) + guard (dead) | MW/_/food_acquired.py:13-35; MW/_/Makefile target $(VAR_DIR)/food_acquired.parquet | none | not served as written |
+| D65 | Niger | 2018-19, 2021-22 | household_roster | MonthsSpent | s01.dta s01q12 ('lived here continuously 6+ months?') | Oui -> 12, Non -> 0 (a binary served on a 0..12 month scale) | categorical->number | NE/2018-19/_/data_info.yml:95-98; NE/2021-22/_/data_info.yml (same block) | CONTENTS (Household Presence / MonthsSpent, 407-425), CLAUDE.md | all roster rows in both waves |
+| D66 | Niger | 2011-12, 2014-15 | household_roster | MonthsSpent | ms01q19 (months present, continuous) | served directly -- recorded only because the SAME column is binary in D65 | (none; cross-wave difference) | NE/2011-12/_/data_info.yml:32 | CONTENTS | - |
+| D67 | Niger | 2018-19, 2021-22 | household_roster | Age | s01q04a (reported age), s01q03a/b/c (DOB day / month / year, French month names), s00q23a (interview date) | Age := tools.age_handler(age, d, m, y, interview_date, interview_year): precise (DOB) estimate preferred, mid-month when the day is unknown, DOB-derived FRACTIONAL age when reported age and DOB agree within 1 year, else reported age; 9999 components rejected by is_valid (< 2100); negative results -> NaN; 2021-22 also coerces '.' sentinels | selection + date difference + guard | NE/2018-19/_/mapping.py:300-367 (Age, household_roster); NE/2021-22/_/mapping.py:99-227; lsms_library/local_tools.py:2805 (age_handler) | CLAUDE.md ('age_handler returns fractional years'), docstring | not stated (CLAUDE.md: ~200 boundary-shift cases per country) |
+| D68 | Niger | 2018-19, 2021-22 | subjective_well_being | OwnStep | s13 welfare ladder item | {Tres pauvre: 1, Pauvre: 2, Moyen: 3, Riche: 4} | categorical->number | NE/2018-19/_/data_info.yml:57-73; NE/2021-22/_/data_info.yml (same) | YAML comment | not stated |
+| D69 | Niger | 2011-12, 2014-15, 2018-19, 2021-22 | food_acquired, crop_production, community_prices | index u | unit code fields (s07bq03b etc.) | NULL unit -> u := 'Unknown' (U_NA) so the row survives the framework's dropna on index keys (GH #842) | impute (index value) | NE/_/niger.py:496-519 (fill_missing_u); NE/2018-19/_/mapping.py:151-173; NE/2021-22/_/mapping.py:19-37 | CONTENTS 506-560, docstring | 5,663 NaN-u rows in wave parquets (2011-12 3,150; 2014-15 1,079; 2018-19 443; 2021-22 991); crop_production Unknown 3,146 / 373 / 441 / 960; 4,920 of 5,697 served; food_acquired 2021-22: 12 of 131,092 |
+| D70 | Niger | all four | crop_production, plot_inputs | index crop / j | crop code | missing crop -> '(not crop-specific)' (CROP_NA) | impute (index value) | NE/_/niger.py:652 | docstring | not stated |
+| D71 | Niger | all four | plot_features | Area, SelfReportedArea | as1 / s16 estimate, estimate unit, GPS area, gps flag | est_ha := raw / 10000 where unit != 2 (m2 -> ha); Area := GPS where gps_flag == 1 and GPS notna else estimate; area outside (0, 1000] ha -> NA | scale + selection + guard | NE/_/niger.py:316, :318-320, :329, :355 | docstring | not stated |
+| D72 | Niger | all four | plot_features | PlotCertificate | certificate code | code in 1..5 -> True, 7 -> False, else NA | categorical->number | NE/_/niger.py:367-374 | docstring | not stated |
+| D73 | Niger | 2014-15, 2021-22 | crop_production | Quantity_sold, Value_sold | AS02E / s16d sale rows (per crop) | sales summed per (i, crop) with .sum(min_count=1), attached only where the crop is grown on exactly ONE plot (plots_per == 1); 2018-19 sales are at plot-crop grain and need no rule | sum across fields + selection (cross-wave difference) | NE/2014-15/_/crop_production.py:66-69; NE/2021-22/_/crop_production.py:67-71 | docstring | not stated |
+| D74 | Niger | all four | crop_production | index u vs Value_sold / Quantity_sold | harvest unit vs sold unit (as02eq12b, AS02EQ12B, s16cq16b, s16dq05b) | u is the HARVEST unit; the sold-unit column is dropped, so Value_sold / Quantity_sold is served beside a u it may not be measured in | encoding (unit of a served value not the unit in the index) | NE/_/niger.py:532-566 (_finish_crop_production); NE/_/CONTENTS.org:755-770 | CONTENTS | sold unit == harvest unit on 98.8% (2011-12), 89.4% (2014-15), 93.1% (2018-19), 63.0% (2021-22) of priced rows; 'a Sac de 100 kg sale price landing in a Tiya row is a ~40x error' |
+| D75 | Niger | 2014-15 | crop_production | harvest_month | AS02EQ06A | month outside 1..12 -> NA | guard | NE/2014-15/_/crop_production.py:42-43 | comment | not stated |
+| D76 | Niger | all four | livestock | HeadCount, HeadSold, ... per animal | as4a / s17 sub-type lines (e.g. boeuf, vache, taureau -> Cattle) | groupby(['t','i','animal']).sum(min_count=1): several instrument sub-types summed into one species row; rows kept only where owns == 1 | sum across fields (not duplicates: distinct sub-types) | NE/_/niger.py:767-799 (_finish_livestock); wave livestock.py keep rules | docstring | not stated |
+| D77 | Niger | 2018-19, 2021-22 | plot_labor | PersonDays (hired), Wage | s16 hired workers (count) x days per phase, wage cells | PersonDays := sum over phases of workers * days; Wage := sum of the phase wage cells | product + sum across fields | NE/_/niger.py:884-946 (plot_labor_ehcvm), :949-977 | docstring | not stated |
+| D78 | Niger | 2011-12, 2014-15 | plot_labor | PersonDays | as day cells, gate (hired anyone y/n) | days := sum of the cells; := 0 where gate != 2 is False (gate == No -> 0, not NA) | sum across fields + impute | NE/2011-12/_/plot_labor.py:39-51; NE/2014-15/_/plot_labor.py:33-45 | comment | not stated |
+| D79 | Niger | all four | plot_labor | PersonDays, Wage | day and wage cells | days 99 / 999 -> NA; wage 999999 -> NA | guard | NE/_/niger.py:868-874 (_coerce_days), :877-881 (_coerce_wage) | docstring | not stated |
+| D80 | Niger | 2011-12 | people_last7days | farm_hrs, sb_hrs, wage_hrs | ms04q29 (months/yr), ms04q31 (days/month), ms04q30 (hours/day) job 1; ms04q55 / q57 / q56 job 2; occupation code; ms01q06a age | hrs := (months * days * hours) / 52 per job (an ANNUAL-AVERAGE weekly hours), := 0 where unemployed; allocated to farm / self-employed / wage by occupation code sets (FARM_CODES, SB_CODES); summed across the two jobs; := 0 below working age (age >= 6); Industry NA where self-employed or not worked | annualise + product + selection + impute | NE/2011-12/_/people_last7days.py:37-39, :55, :71-101 | docstring (states the formula) | not stated |
+| D81 | Niger | 2014-15 | people_last7days | farm_hrs, sb_hrs, wage_hrs | MS04Q25 (months), Q26 (weeks/month), Q27 (days/week), Q28 (hours/day); job 2 Q51 / Q51B / Q53 / Q52 | hrs := (months * weeks * days * hours) / 52 -- a different formula from 2011-12 (weeks term added); same allocation and zero rules | annualise + product (cross-wave difference) | NE/2014-15/_/people_last7days.py:37-39, :62, :76-105 | docstring | not stated |
+| D82 | Niger | 2018-19, 2021-22 | people_last7days | Age (internal), working_age, hours | s01q04a age, s01q03c birth year, survey year | age := reported age else survey_year - birth_year (birth year in [1900, survey_year]); working_age := age >= 6; hours columns NA (not asked at 7-day grain) | date difference + selection + impute | NE/_/niger.py:1063-1117 (people_last7days_ehcvm) | docstring | not stated |
+| D83 | Niger | all four | community_prices | Price, Quantity | community price module price, quantity, unit; passage (visit) | quantity <= 0 or in (9999, 99999) -> NA; price <= 0 or sentinel -> row dropped; u == 'Unknown' rows dropped; Price served as reported (NOT divided by Quantity) | guard; encoding | NE/_/niger.py:1277-1315 (_community_price_triples) | docstring | 795 observations dropped for unknown u in 2011-12 |
+| D84 | Niger | 2011-12, 2014-15 (two passages) | community_prices | Price (index t,v,j,u) | passage 1 / passage 2 prices | rows sorted so passage 2 (post-harvest) comes first (_porder {2: 0, 1: 1}), stable sort, drop_duplicates(['t','v','j','u'], keep='first'): the post-harvest price is served, the other discarded | selection | NE/_/niger.py:1318-1371 (_finish_community_prices) | docstring | not stated |
+| D85 | Niger | 2018-19 vs 2021-22 | shocks | HowCoped1..3 | Cope1..Cope26 columns (2018-19) / strategy-rank labels (2021-22) | 2018-19: the first three Cope columns with value >= 1, in COLUMN order; 2021-22: ranked by _STRATEGY_RANK {'Premiere strategie': 1, 'Deuxieme strategie': 2, 'Troisieme strategie': 3} -- same served columns, different rule | selection (cross-wave difference) | NE/2018-19/_/mapping.py:236-299; NE/2021-22/_/mapping.py:155-190 | docstring | not stated |
+| D86 | Niger | 2014-15, 2018-19, 2021-22 | food_security | FIES_score | 8 FIES Oui / Non items | count of True across the 8 items; NA only where all 8 are NA | categorical->number | NE/2014-15/_/mapping.py:18-29; NE/2018-19/_/mapping.py:189-202; NE/2021-22/_/mapping.py:54-65 | docstring | not stated |
+| D87 | Niger | 2011-12, 2014-15, 2018-19, 2021-22 | shocks | AffectedIncome etc. | shock effect codes | 2011-12 {drop, Increase: True; Unchanged, 9.0: False}; 2014-15 {Dimunie, Diminue, Augmente: True; Inchange, Manquant: False}; 2018-19 / 2021-22 {Diminue, Augmente: True; Inchange, Non-concerne: False}: 'missing' / 'not concerned' codes read as False | encoding (borderline: a decode where the missing code is folded into False) | NE/2011-12/_/data_info.yml:129-151; NE/2014-15/_/data_info.yml shocks block; NE/2018-19/_/data_info.yml:161-184 | none | not stated |
+| D88 | Niger | all four | plot_inputs | Purchased, (rows) | applied y/n, purchased y/n | rows kept only where applied == 1; Purchased := {1: True, 2: False} / {Oui: True, Non: False}; EHCVM seed crop via harmonize_seed_crop | (decode + row filter; recorded for completeness) | NE/_/niger.py:655-689 (_finish_plot_inputs); wave plot_inputs.py | docstring | not stated |
+
+* Per-derivation notes
+
+** Tanzania
+
+- D01-D03 (one chained rule on one value).  The served purchased / produced /
+  gift quantity is the result of an ORDERED chain: 'none' / 'hakuna' -> 0;
+  fillna(0); astype(int64) floor; * unit factor; 0 -> NaN; canonical keep
+  rule (qty > 0 or exp > 0).  Baked assumptions: quantities are integers in
+  the unit reported (false for 1.4% of rows), a litre of anything weighs a
+  kilogram, and a zero is missing.  The raw quantity and the raw unit label
+  are NOT recoverable from the served table: u is always 'kg' or 'piece',
+  and the integer floor is lossy.  Recoverable only from the source .dta.
+  The 'consumed' quantity (quant_ttl_consume) is truncated the same way and
+  then dropped by food_acquired_to_canonical (tanzania.py:699-785).
+  CONTENTS discloses the floor and the unit collapse with counts; it does not
+  disclose hakuna -> 0 or the density-1 assumption as such.
+- D04 unitvalue_purchase is computed on the truncated quantity (so it is
+  overstated by the same 1.5x median on the affected rows) but is dropped
+  before the canonical parquet; the framework's food_prices recomputes
+  Expenditure / Quantity from the served (truncated) columns, so the
+  overstatement re-enters there.  Out of this census's scope, noted for the
+  other agent.
+- D05 Quantity := 0 where 'not harvested'.  A zero harvest is served where
+  the instrument recorded a reason, not a quantity; the reason code is not
+  served.
+- D06 sale attachment.  Sales are asked per crop; harvests per plot-crop.
+  The single-plot gate makes the served Value_sold depend on OTHER rows of
+  the same household (how many plots grow the crop).  Multi-plot crops are
+  served with NA sales although the household reported them.  Raw sales are
+  recoverable only from AG_SEC_5A/7A/7B.
+- D08 recorded as an absence: the crop Quantity carries no guard at all,
+  and CLAUDE.md's Site Q reports without altering.  The design question is
+  whether 'reported, flagged, not altered' wants a Derivation key.
+- D09-D11 plot_features.  Area is a two-candidate selection (GPS preferred)
+  after a one-sided clamp on the GPS candidate only, then a unit change; the
+  served Area does not say which candidate it came from (SelfReportedArea
+  beside it lets a reader infer it when the two differ).  Owned / Certificate
+  / Fallow fold several codes into booleans; the Certificate rule composes
+  three raw fields and an ownership override.
+- D14-D19 livestock and labor.  HeadCount and hired PersonDays / Wage are
+  sums across DIFFERENT instrument cells (breed types; men / women / children
+  x activities).  Wage is a total paid, not a daily rate -- the same column
+  name is a mean daily rate in Malawi (D56) and a phase total in Niger (D77).
+  Family PersonDays exists only for 2020-21: two waves of one country serve
+  the same column with different content (present vs absent).
+- D20 zeros are imputed from dummies: an hours cell left blank by a person
+  who said 'no' is served as 0, and every person below working age is served
+  with 0 hours and False dummies whether or not the module was asked.
+- D21-D22 community_prices.  Price is a RATIO (price paid / quantity of the
+  unit priced) -- the only one of the three countries that divides.  The
+  .first() over label-lumped codes discards a majority of the alternative
+  prices (93% of 2019-20 groups, 90% of 2020-21 groups hold more than one
+  distinct price); the discarded prices are not recoverable from the served
+  table.
+- D24-D26 sample / cluster_features.  Rural := 'Rural' unless 'urban' means a
+  blank urb_rur is served as Rural, not NA.  Undisclosed.
+- D27 life_satisfaction: a household-grain table built from one person's
+  answers; the selection rule (the HEAD) is in the docstring.  Other
+  members' answers are recoverable only from the source .dta.
+- D30 recorded as borderline: one categorical into two booleans is a decode,
+  but the 'NEITHER' -> (False, False) branch is an encoding choice.
+- D31-D33 dead / fallback.  data_scheme.yml registers food_expenditures /
+  food_quantities / food_prices as !make, but Country._FOOD_DERIVED derives
+  them from food_acquired first (country.py ~4534-4560: 'try deriving from
+  food_acquired first before falling back'), and the scripts read columns
+  (quant_*, value_*, unitvalue_purchase) that the canonical parquet does not
+  carry.  The median-price 'consumed value' (D31) is the country's own
+  version of food_expenditures and is what the brief asked to record; if it
+  ever ran it would serve a valuation, not an expenditure.  finances.py is
+  not registered at all.
+
+** Malawi
+
+- D34-D37 kilograms.  The served Quantity_kg is q * f(region, item, unit)
+  where (a) region comes from the first character of case_id (D36) in
+  2010-11 / 2013-14, (b) item is matched by difflib at cutoff 0.6 (a
+  non-injective, per-label fuzzy match; unmatched labels get no factor),
+  (c) duplicate matches are averaged (D35) in 2016-17 / 2019-20, and (d) the
+  conversion source differs by wave (ihs3_conversions.csv vs
+  ihs_foodconversion_factor_2020.dta).  The factor a row received is NOT
+  recoverable from the served table; the raw quantity and unit code are
+  (Quantity and u are served beside Quantity_kg), so the factor can be
+  back-computed as Quantity_kg / Quantity, but not which table item it was
+  matched to.  This is the case the dispatcher named (GH #854).
+- D37 is a claim read from source, not a run: the grams regex multiplies by
+  0.01 where 0.001 is the kg factor.  A maintainer can check with
+  =grep -n "0.01" Malawi/_/malawi.py Malawi/*/_/food_acquired.py= and a
+  one-line test of =_extract_kg_conversion(pd.Series(['300 grams']))=.  In
+  the four IHS3+ waves the value is routed through =x[c] or f= (malawi.py:206
+  and the two inline copies), where =f= is a DataFrame; the expression never
+  yields the fallback for a NaN factor because NaN is truthy, so as written
+  the bug is dead there.  In 2004-05 (=df[cfactor_col] = fallback=) it is live
+  IF any decoded unit label matches =\d+\s*g=; that census could not be run.
+- D38 metric labels served as kg at density 1 (litre -> kg) with u
+  overwritten: same lossy shape as Tanzania D02.
+- D41-D44 plot_features: same GPS-preferred selection as Tanzania with two
+  clamps (2500 acres on GPS, 1000 ha on the estimate) and a unit-code switch
+  on the estimate.  The estimate's code 4 ('other') -> NA silently.
+- D46 sale attachment is the Tanzania D06 rule with a second gate (one
+  harvest ROW as well as one plot), and CONTENTS documents that the sold unit
+  differs from the harvest unit on 22.2% of 2010-11 sale rows; a served
+  Value_sold beside a u it is not measured in is the same defect as Niger
+  D74.
+- D50 months_food_inadequate: the served Months is a COUNT of marked cells
+  in a 25-cell template (up to 25 marks possible, clipped to 12), forced to 0
+  when the gate question is No.  The rule is documented; the individual
+  month marks are not served.
+- D56 Wage = mean of man / woman / child daily wages: a served 'Wage' that is
+  the unweighted mean of up to three rates, not a rate anyone was paid.
+  Documented in the docstring.  Not recoverable (the three cells are not
+  served).
+- D57-D58 people_last7days: farm hours are one cell in legacy waves and a
+  sum of three cells in modern waves; wage hours are wage + ganyu (casual
+  labour) summed in all waves; working_age is a template mark ('X') in
+  legacy waves and an age threshold (5) in modern waves.  Two waves of one
+  country derive the same column from different rules.
+- D60-D61 FIES: the score counts Yes answers and treats a missing item as
+  No unless all eight are missing; 2013-14 assigns items to concepts by
+  content (hh_t15 -> HealthyDiet) whereas later waves use FAO order -- a
+  documented cross-wave source difference on the same column.
+- D62 2013-14 GPS: what the wave supplies is a per-household frame of
+  EA-displaced coordinates of the CURRENT dwelling (tracked movers included);
+  the derivation is the framework's collapse to cluster grain (.first() now;
+  .mean() before 2026-07-13, which produced centroids of points up to 783 km
+  apart).  Recorded here because the wave config is what puts a
+  household-grain frame into a cluster table; the rule is framework-level.
+- D64 the var-level concatenator keys on columns (quantity_consumed,
+  'price per unit') absent from the canonical wave parquets; as written it
+  cannot produce what the Makefile target promises.  Dead until rewritten.
+
+** Niger
+
+- D65-D66 MonthsSpent: a yes/no on 'lived here 6+ months' is served as 12
+  or 0 months in the EHCVM waves while the two earlier waves serve the
+  continuous months present.  A reader summing MonthsSpent across waves
+  mixes a binary scaled to 12 with a count.  Disclosed in CONTENTS and
+  CLAUDE.md.  The raw yes/no is recoverable (12 -> Oui, 0 -> Non) but not
+  distinguishable from a genuine 12 or 0 in the earlier waves.
+- D67 Age: a selection among (reported age, DOB-derived fractional age)
+  made per row by age_handler, plus a date difference.  Which branch fired
+  is not served; the reported age and the DOB components are recoverable
+  only from s01.dta.  The 2011-12 / 2014-15 waves serve the reported age
+  directly (YAML Age: ms01q06a / MS01Q06A), so Age is derived differently
+  across waves of one country.
+- D69-D70 index-value defaults ('Unknown', '(not crop-specific)'): the
+  derived thing is a KEY, not a column.  Disclosed with counts in CONTENTS.
+  The 4,920 served crop_production rows with u = 'Unknown' carry a Quantity
+  whose unit is unknowable from the served table.
+- D73-D74 crop sales: 2014-15 and 2021-22 sum crop-level sales and attach
+  them on a single-plot gate (Tanzania D06 shape), 2018-19 needs no gate;
+  in all four waves the served u is the harvest unit while Value_sold and
+  Quantity_sold were asked in a sold unit that is dropped.  CONTENTS
+  quantifies the agreement (63.0% in 2021-22) and the size of the error when
+  they disagree (~40x).  This is a served number in a unit the frame does
+  not carry -- the closest thing in this group to the GhanaLSS 12B case.
+- D76 livestock: instrument sub-types (several bovine lines) summed into one
+  species row -- a sum across DIFFERENT fields, not a de-dup, so inside the
+  brief's scope; the sub-type detail is not served.
+- D77-D79 plot_labor: EHCVM PersonDays is a product (workers * days) summed
+  over phases; sentinels 99 / 999 / 999999 are converted to NA before the
+  sums (min_count=1, so an all-sentinel row is NA rather than 0); the
+  pre-EHCVM waves zero the days when the gate is No.
+- D80-D82 people_last7days: the strongest 12B-like case in the group.  The
+  table is named for the LAST 7 DAYS, but Niger 2011-12 serves
+  months * days * hours / 52 and 2014-15 serves months * weeks * days * hours
+  / 52 -- annual hours divided by 52, i.e. an average week, allocated to
+  farm / self-employed / wage by occupation-code SETS defined in the script,
+  summed across two jobs, zeroed below age 6 -- while Tanzania and Malawi
+  serve the hours actually reported for the last week and the EHCVM waves
+  serve NA.  Nothing in the frame says which.  The formula also differs
+  between the two Niger waves.  Raw month / week / day / hour cells are not
+  served.
+- D83-D84 community_prices: the served Price is a reported price (not
+  divided by Quantity, unlike Tanzania D21); for the two-passage waves the
+  post-harvest passage is chosen and the other passage's price discarded
+  (not recoverable from the served table).
+- D85 HowCoped: the same three served columns are 'the first three coded
+  strategies in column order' in 2018-19 and 'the strategies the respondent
+  ranked first / second / third' in 2021-22.
+- D87 shocks: 'Manquant' / 'Non-concerne' / 9.0 folded into False is a
+  decode with an encoding choice inside it; borderline, recorded.
+
+* Closing section
+
+** Counts by kind (primary kind of each row)
+
+Computed with awk over the table (first kind named in the kind column;
+D32 'scale / ratio' counted as scale, D24 'impute / guard' as impute).
+Five rows are recorded for completeness and not counted: D08 (absence of a
+guard), D52 and D88 (decodes), D63 (date composition, skipped), D66 (raw
+served, listed only as the cross-wave twin of D65).
+
+| kind | rows |
+|------+------|
+| guard | 16 |
+| selection | 16 |
+| sum across fields | 9 |
+| encoding | 9 |
+| categorical->number | 9 |
+| impute | 8 |
+| scale | 7 |
+| product | 4 |
+| ratio | 3 |
+| annualise | 2 |
+| date difference | 1 |
+| counted | 84 |
+| not counted | 5 |
+| table rows | 89 |
+
+By country: Tanzania 34 rows (D01-D33 plus D25b; 4 dead / fallback), Malawi 31 rows
+(D34-D64; 1 stale, 1 loader-only), Niger 24 rows (D65-D88).  Cross-wave
+same-column-different-rule cases: 11 (listed below).  Undisclosed
+('none' in the disclosure column): D03 (hakuna -> 0), D04 (dropped ratio), D26 (blank -> Rural),
+D28 (Days rounded), D33 (dead), D37 (grams * 0.01), D64 (stale), D87
+(missing -> False); every other served row is disclosed in a docstring, comment,
+CONTENTS.org or CLAUDE.md.
+
+** The 3-5 cases furthest in meaning from the raw answer (12B-like)
+
+1. Niger people_last7days hours (D80, D81): a table named for the last seven
+   days serves an annual-average week (months * [weeks] * days * hours / 52)
+   allocated by occupation-code sets, with a formula that differs between
+   the two waves that serve it, NA in the two EHCVM waves, and actual
+   last-week hours in the other two countries of this group.  Nothing in the
+   frame distinguishes the four.
+2. Niger crop_production Value_sold beside a harvest-unit u (D74), and the
+   same defect in Malawi (D46): a served money amount for a quantity the
+   frame reports in a different unit; CONTENTS quantifies a ~40x error where
+   they disagree and 37% disagreement in Niger 2021-22.
+3. Tanzania food_acquired Quantity (D01-D03): an integer floor of a
+   real-valued answer, then a unit collapse that serves litres as kilograms
+   and destroys the raw unit, then zeros to NaN.  1.4% of purchased rows
+   carry a ~50% overstated quantity (and unit value) and 852 rows vanish.
+   Disclosed, but the served row cannot be undone.
+4. Malawi food_acquired Quantity_kg (D34-D35): a kilogram built from a
+   region-keyed factor found by a fuzzy string match at cutoff 0.6 and, on
+   collisions, averaged over whichever table items happened to match.  The
+   factor is per row and per wave-source; no single key names it.
+5. Niger MonthsSpent (D65): a yes/no served as 12 or 0 on the same axis on
+   which two earlier waves serve a count.  Disclosed everywhere, but a user
+   pooling waves gets a mixed scale.
+
+Runners-up: Tanzania community_prices .first() over disagreeing prices
+(D22: 90-93% of groups lose an alternative price; the example is 2,000 vs
+16,000 TSh); Malawi plot_labor Wage = mean of three daily rates (D56);
+Malawi months_food_inadequate = clipped count of template marks gated on a
+yes/no (D50).
+
+** Two waves of one country deriving the same column differently
+
+| country | table.column | wave A rule | wave B rule | rows |
+|---------+--------------+-------------+-------------+------|
+| Niger | people_last7days.*_hrs | 2011-12: m*d*h/52 | 2014-15: m*w*d*h/52; 2018-19, 2021-22: NA | D80, D81, D82 |
+| Niger | household_roster.MonthsSpent | 2011-12, 2014-15: months present | 2018-19, 2021-22: Oui->12 / Non->0 | D65, D66 |
+| Niger | household_roster.Age | 2011-12, 2014-15: reported age (YAML) | 2018-19, 2021-22: age_handler selection over reported age and DOB | D67 |
+| Niger | shocks.HowCoped1..3 | 2018-19: first three coded in column order | 2021-22: ranked Premiere / Deuxieme / Troisieme | D85 |
+| Niger | crop_production.Value_sold | 2018-19: plot-crop grain, no gate | 2014-15, 2021-22: crop-level sum attached where plots_per == 1 | D73 |
+| Niger | shocks.Affected* | 2011-12: 9.0 -> False | 2014-15: Manquant -> False; EHCVM: Non-concerne -> False | D87 |
+| Malawi | people_last7days.farm_hrs | legacy: hh_e07 | modern: hh_e07a + hh_e07b + hh_e07c | D57 |
+| Malawi | people_last7days.working_age | legacy: hh_e02 != 'X' | modern: age >= 5 | D58 |
+| Malawi | food_acquired.Quantity_kg | 2010-11, 2013-14: ihs3_conversions.csv, region from case_id | 2016-17, 2019-20: IHS5 .dta, duplicates averaged | D34, D35, D36 |
+| Malawi | food_security.HealthyDiet / RanOut | 2013-14: mapped by concept (hh_t15 / hh_t14) | 2016-17, 2019-20: FAO item order | D61 |
+| Tanzania | plot_labor.PersonDays (family) | 2008-15, 2019-20: no family rows | 2020-21: sum of per-member day cells | D19 |
+
+Cross-TABLE, same column name, three bases (not a wave difference but the
+same hazard for a registry): community_prices.Price is price / quantity in
+Tanzania (D21), a reported price with Quantity beside it in Niger (D83), and
+a reported price with NumberOfUnits beside it in Malawi (D59); plot_labor.Wage
+is a summed total in Tanzania (D16), a mean daily rate in Malawi (D56) and a
+summed phase total in Niger (D77).
+
+** What would not fit a per-row nullable Derivation column + registry
+
+- Several derived columns per row with different rules (plot_features:
+  Area / Owned / Certificate / Fallow; people_last7days: three hours columns
+  plus dummies; plot_labor: PersonDays and Wage).  One key per ROW cannot
+  name per-column derivations; the column would need to be per (row, column)
+  or the key would have to name a bundle.
+- Ordered chains on one value (Tanzania Quantity: hakuna -> 0, fillna(0),
+  floor, * factor, 0 -> NaN, keep rule).  A single key can name the chain
+  as a whole, but the registry entry is then a pipeline, not a function of
+  raw inputs, and the intermediate states are what a reader needs.
+- Row-external selection (single-plot sale gate D06 / D46 / D73; HEAD
+  reduction D27; .first() over label collisions D22; post-harvest passage
+  D84; age_handler branch D67).  The served value depends on OTHER rows or
+  on a per-row branch; a key names the rule but not the suppressed
+  alternative, which is exactly what the 12B case needs recoverable.
+- Per-row parameters from an external table (Malawi factor = f(region,
+  fuzzy item, unit, wave source, mean-collapse)): the key would have to
+  carry the matched table row, i.e. a payload, not a name.
+- Index-value derivations (u := 'kg' D02 / D38; u := 'Unknown' D69; crop :=
+  '(not crop-specific)' D70; condition := 'unknown_condition' D45): the
+  derived thing is a KEY of the frame; a column keyed by that row describes
+  the row's own index.
+- A served value in a unit the frame does not carry (D74, D46 sale unit):
+  the derivation is 'none' -- the number is raw -- and what is missing is a
+  second unit column, not a derivation key.
+- Dead / fallback code paths (D31-D33, D64): the registry should probably
+  not name what is not served, but the data_scheme.yml registration says it
+  is.

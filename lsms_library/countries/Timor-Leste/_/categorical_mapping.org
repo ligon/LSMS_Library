@@ -7,6 +7,11 @@ vocabulary (=lsms_library/categorical_mapping/canonical_housing_labels.org=).
 Both case variants of each value are listed so the exact-match mapping
 also collapses the case-variance.  Auto-applied by column name.
 
+Floor =Bamboo= / =bamboo= -> *Bamboo* since 2026-09-02 (GH #727; was
+*Wood*): the canon now carries =Bamboo= as its own floor label, and this
+is the one country whose floor question offers it as its own option
+(55 households in 2001, spelt lower-case; 78 in 2007-08, title-case).
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
@@ -36,8 +41,8 @@ also collapses the case-variance.  Auto-applied by column name.
 | Floor tille/cement | Tiles           |
 | Marble/ceramic     | Tiles           |
 | marble/ceramic     | Tiles           |
-| Bamboo             | Wood            |
-| bamboo             | Wood            |
+| Bamboo             | Bamboo          |
+| bamboo             | Bamboo          |
 | Wood               | Wood            |
 | wood               | Wood            |
 | Other              | Other           |

@@ -1,0 +1,35 @@
+path	md5	in_remote	action	bytes
+lsms_library/countries/2009-10/Data/AGSEC6A.dta	5efdb6ec527d12e1e2431c642e600d36	True	deleted	871947
+lsms_library/countries/2009-10/Data/AGSEC6B.dta	e7e21ca4df10241f4b1373490435fbd5	True	deleted	1516463
+lsms_library/countries/2009-10/Data/AGSEC6C.dta	c98d47d3707d1c57f8c0ada5bdaa917a	True	deleted	2201560
+lsms_library/countries/2010-11/Data/AGSEC6A.dta	fbbf510d967eb5f2713a62e765ff2926	True	deleted	160551
+lsms_library/countries/2010-11/Data/AGSEC6B.dta	ca16da4916f0461e5a823215fb975c32	True	deleted	546873
+lsms_library/countries/2010-11/Data/AGSEC6C.dta	588e9bd99a1bd7eb544eb1ac6ce348f7	True	deleted	732860
+lsms_library/countries/2010-11/Data/Post Planting Wave 1/Agriculture/sect11a1_plantingw1.dta	086c0ab37a94911504729ef3f9941268	True	deleted	277929
+lsms_library/countries/2010-11/Data/Post Planting Wave 1/Agriculture/sect11b_plantingw1.dta	e700eea22160f792ffddc05a731c9fcf	True	deleted	526941
+lsms_library/countries/2011-12/Data/AGSEC6A.dta	8eb22ce065001ee683a011451ce86fe2	True	deleted	2196299
+lsms_library/countries/2011-12/Data/AGSEC6B.dta	8ed685d4b9f3513fa70440863d17b3df	True	deleted	1070368
+lsms_library/countries/2011-12/Data/AGSEC6C.dta	1d0d72196d05070596e51414c393cefc	True	deleted	657503
+lsms_library/countries/2012-13/Data/Post Planting Wave 2/Agriculture/sect11a1_plantingw2.dta	7ff2cf995eeb0662eba440bdae25e90b	True	deleted	228744
+lsms_library/countries/2012-13/Data/Post Planting Wave 2/Agriculture/sect11b1_plantingw2.dta	586d81e10e2853401ce46c5d1d0ba157	True	deleted	1077696
+lsms_library/countries/2013-14/Data/AGSEC6A.dta	ac8a310ecfe288cb5cdb3a43afbb412e	True	deleted	667261
+lsms_library/countries/2013-14/Data/AGSEC6B.dta	aae0fea3c7a8ca5bd44dc19bfb4306b9	True	deleted	1021421
+lsms_library/countries/2013-14/Data/AGSEC6C.dta	5617bae30ffcc6a345f434abcbfeb6a5	True	deleted	554110
+lsms_library/countries/2015-16/Data/AGSEC6A.dta	00d6de36d8a3139976fbc2b9c7602356	True	deleted	2362351
+lsms_library/countries/2015-16/Data/AGSEC6B.dta	5642d3d61b4f744a7584eb858bfc8ac8	True	deleted	1969614
+lsms_library/countries/2015-16/Data/AGSEC6C.dta	0eb7eb4c0cc2d2f0588ba54d181a5ad9	True	deleted	1054876
+lsms_library/countries/2015-16/Data/sect11a1_plantingw3.dta	0cccfc6fdb2cbae8f53e2a2db7a81f67	True	deleted	458557
+lsms_library/countries/2015-16/Data/sect11b1_plantingw3.dta	5f934c01a99b10d7f1b23326201a9764	True	deleted	1448442
+lsms_library/countries/2018-19/Data/AGSEC6A.dta	1bb76f843e99c4c353676ef30a6f8ddb	True	deleted	156313
+lsms_library/countries/2018-19/Data/AGSEC6B.dta	b8f59274375fa52f73454eeb92565632	True	deleted	224041
+lsms_library/countries/2018-19/Data/AGSEC6C.dta	433b132bf4dbc3bf7648ed22637bf8f1	True	deleted	146690
+lsms_library/countries/2018-19/Data/sect11a1_plantingw4.dta	2394a65945be27d47c2cf84a7432fd6a	True	deleted	3600252
+lsms_library/countries/2018-19/Data/sect11b1_plantingw4.dta	7f4957dbe9efbc6dcb8f7ce82bf99b9c	True	deleted	10501316
+lsms_library/countries/2019-20/Data/HH_SEC_H.dta	da488f6c3a38280233ce2e903eeea163	True	deleted	328235
+lsms_library/countries/2019-20/Data1/Agric/agsec6a.dta	0be855d1ba1e6bf188e132c18464376a	True	deleted	149698
+lsms_library/countries/2019-20/Data1/Agric/agsec6b.dta	55f00621309989241b2ad718010c6dde	True	deleted	195396
+lsms_library/countries/2019-20/Data1/Agric/agsec6c.dta	f677967d26cc0d1d6e145f02449025ff	True	deleted	154049
+lsms_library/countries/2020-21/Data/hh_sec_h.dta	b9514efbee5c7478f5e0b4473edc9335	True	deleted	430897
+lsms_library/countries/2023-24/Data/Post Planting Wave 5/Agriculture/sect11a1_plantingw5.dta	f329c0ff7ca84e096b232073c1b4bb49	True	deleted	3647286
+lsms_library/countries/2023-24/Data/Post Planting Wave 5/Agriculture/sect11b1_plantingw5.dta	2da708a8fac76e5012d0447b851fef20	True	deleted	7380231
+lsms_library/countries/Panama/1997/Data/unittable.csv	7967f501c34479ce4b71e2951b4a6df9	False	KEPT	2453

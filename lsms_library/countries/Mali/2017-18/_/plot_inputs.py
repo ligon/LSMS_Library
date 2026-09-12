@@ -71,7 +71,7 @@ paid = _yes(s11c['s11cq12'])
 seed = pd.DataFrame({
     't': WAVE,
     'i': s11c['i'],
-    'plot': _plot(s11c, 's11cq01', 's11cq02'),
+    'plot_id': _plot(s11c, 's11cq01', 's11cq02'),
     'input': 'seed',
     'crop': s11c['s11cq03'],
     'u': s11c['s11cq11b'],
@@ -88,14 +88,14 @@ pieces.append(seed)
 # --- plot fertilizer / pesticide (s7d): one row per used input slot ---
 s7d = get_dataframe('../Data/eaci17_s07dp2.dta').copy()
 s7d['i'] = _hhid(s7d)
-s7d['plot'] = _plot(s7d, 's7dq01', 's7dq02')
+s7d['plot_id'] = _plot(s7d, 's7dq01', 's7dq02')
 
 
 def _fert_slot(code, qty_col, unit_col, purchased=None):
     return pd.DataFrame({
         't': WAVE,
         'i': s7d['i'],
-        'plot': s7d['plot'],
+        'plot_id': s7d['plot_id'],
         'input': code,
         'crop': pd.NA,
         'u': s7d[unit_col] if unit_col else pd.NA,

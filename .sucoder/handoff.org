@@ -1,75 +1,48 @@
-#+title: Handoff -- v0.10.0 / v0.10.1 releases
-#+date: 2026-09-02
-#+author: Sue (Claude Opus 5, 1M context)
+#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
-* State -- BOTH RELEASES SHIPPED (2026-09-02)
-- *v0.10.0* on PyPI: =lsms_library-0.10.0-py3-none-any.whl= (7,630,071 B) + sdist.
-  Tag =v0.10.0= = =c0300a4a=.  Gate: burst 38419369, 4648 passed / 0 failed.
-- *v0.10.1* on PyPI: =lsms_library-0.10.1-py3-none-any.whl= (7,632,248 B) + sdist.
-  Tag =v0.10.1= = =ad20f6e8=.  Gate: burst 38420184, 4666 passed / 0 failed.
-  Published wheel verified to contain =s3_reader_creds.enc= and declare
-  =cryptography=; =Version: 0.10.1= in METADATA.
-- =master= = =ad20f6e8=; =development= in sync.  Nothing in flight.
+* State (2026-09-12, evening)
+- =development= published through 0f4eff9a7 on the mirror AND pushed to
+  GitHub; draft release PR development -> master is open (v0.12.0) with
+  the verified Closes list (=docs/releases/v0.12.0-closes.txt=); notes at
+  =docs/releases/v0.12.0.md=.  Merge with a merge commit, then tag v0.12.0
+  on master and =gh release create= (release skill; verify the publish
+  workflow fired).
+- Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
+  #872, #873, #874, #876, #871 (most-complete observed row at all three
+  collapses; reverses the 2026-07-13 completion doctrine), plus the
+  derivations user guide + CLAUDE.md section, the #871 census
+  (=bench/grain_census_871.py=), and the release notes.
+- Filed, open: #879-#884.  Follow-ups from #871: #866 (rule-less var/
+  targets do not rebuild on a hash move) was worked around by evicting
+  the 18 affected parquets and rebuilding; the fix is still open.
+- Caches: the WHOLE corpus was re-warmed after #871 (both tiers, from
+  L1), 36 countries + the two space-named ones + the 18 #866 tables; 0
+  build errors except Peru's known-absent cells.  Logs:
+  =/local/job38714904/tmp/claude-43292/rewarm_all/= (node-local; gone
+  with the job).
+- Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
+  #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
+  see the PR's status.  Recipe: CLAUDE.md addendum 3b.
+- Coverage regrade (=make matrix=) NOT run: it cold-builds and would not
+  fit the job; due before or right after the release.
+
+* Open questions for @ligon
+- All merged refs deleted (mirror and local).  #879-#884 filed for the
+  remaining findings; #871 parked.
+- Coverage regrade is due for: Uganda crop_production (all 7 waves),
+  Ethiopia food_acquired (all 5), the 12 EHCVM food_acquired cells,
+  Niger people_last7days (both waves), Ethiopia shocks.  =make matrix=
+  was not run today.
+- Design follow-ons recorded in =SkunkWorks/derived_values.org=:
+  =Feature()= re-attach of =attrs['derivations']= (with #873), derived
+  table attrs, retrofit of the census sites, NSO request for GLSS
+  visit dates (=slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=).
+- ~350 in-tree workspace copies of DVC-tracked files in the main
+  clone (not the worktrees) -- the library warns; cleanup command in
+  =CLAUDE.md= ("A *.parquet inside countries_root() is never read");
+  not run.
 
 * Next concrete action
-None -- both releases are out.  Open follow-ups are below.
-
-* THE LESSON FROM v0.10.1 (read this before the next release)
-=poetry-dynamic-versioning= REWRITES =pyproject.toml= to build and restores it
-after.  A killed build never restores, and it changes *three coupled things*:
-
-: dynamic = ["version"]  ->  dynamic = []
-: version = "0.0.0"      ->  version = "<computed>"   (moved into [project])
-: enable = true          ->  enable = false
-
-v0.10.1 took three attempts because I reverted only the middle one and wrote a
-guard that checked only the middle one -- so the guard passed on a broken file
-and certified it clean.  =publish.yml= then failed with "Building 0.0.0 from
-v0.10.1".  Nothing reached PyPI (build failed, publish skipped).
-
-=tests/test_version_placeholder.py= now asserts all three, verified against the
-actual broken file.  *A guard covering one of three coupled invariants is worse
-than none.*
-
-Practical rule: *do not run =poetry build= on the condo slice.*  It gets killed
-(exit 144) partway and leaves the mutation.  =poetry run= and =poetry version=
-are fine, though they too can be killed under load -- an EMPTY =poetry version
--s= means "killed", not "version is wrong"; re-run with a longer timeout.  CI
-builds the wheel from the tag anyway.  To inspect wheel contents locally, drive
-=poetry.core.masonry.api.build_wheel= directly (no venv creation, no mutation).
-
-* Decisions taken (with @ligon)
-- Version *v0.10.0* (not 1.0.0 -- 55 issues open, #323 umbrella live,
-  =LSMS_GRAIN_STRICT= not yet on in CI).
-- Coverage matrix snapshot shipped as-is (one PR stale; regenerable).
-- =Closes:= list deliberately *empty* -- see PR #739 body and
-  =slurm_logs/RELEASE_v0.10.0_closes.org=.
-
-* Open questions / follow-ups (none blocking)
-1. *GH #740* filed: =test_extraction_is_cluster_grain= fails on any
-   data-credentialed machine.  Now =xfail(strict=False)= so =make release= is
-   not blocked -- without that, step 3 above would have failed on this very
-   box.  The open question is substantive: =data_scheme.yml= claims the wave
-   script is what keeps =groupby().first()= from firing on Pakistan, and that
-   script does not appear to run.  Delivered data is correct; "right output"
-   and "the guard is live" are different facts and only the first is verified.
-2. CLAUDE.md says 28 =national-claimed= population waves; the shipped config has
-   *29*.  One-line doc fix.
-3. DONE -- superseded parquets removed (@ligon, 2026-09-02) after confirming all
-   three live equivalents had rebuilt.  Nothing outstanding.
-4. *CORRECTION (Sue, 2026-09-02).*  An earlier version of this note, of the
-   =bc8aa2df= commit message, and of PR #739's body claimed =v0.9.1= was "an
-   orphan tag two commits past =master=, never merged back".  *That is false.*
-   I checked =merge-base= against a *stale local* =master= (last updated
-   2026-07-22) instead of =origin/master=.  =v0.9.1= (=72004880=) *is*
-   =origin/master=: its two commits -- Zenodo/CFF metadata and the release
-   notes -- were made directly on =master= after the v0.9.0 merge and tagged
-   there, which is the correct workflow.  Nothing was orphaned and nothing
-   needed avoiding.
-   The *advice* in step 2 survives the correction on its own merits: =make
-   release= tags the current HEAD, so you do need =master= checked out.  But it
-   is ordinary care, not a fix for a past mistake.
-
-* Environment note
-=.venv= was a stale symlink to a dead job's =/local=.  Restored with
-=bash bin/savio_venv.sh mount=.  Do that first on any new allocation.
+Wire the per-visit dates that 5 of 7 GLSS waves ship into
+=interview_date= (=melt_visit_intervals=), per FINDINGS.org; or the
+=Feature()= re-attach for #873.

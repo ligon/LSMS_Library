@@ -1,0 +1,262 @@
+#+title: Design: visualizations.lorenz_curve
+#+author: Sue (Claude Fable 5.1)
+#+date: 2026-09-08
+
+Ledger: =.coder/ledger/viz-lorenz-curve.md= (cite its section numbers).
+Module: =lsms_library/visualizations.py= -- read its module docstring and
+both existing functions first; this function is the third member of one
+family and must read as such.
+
+Decisions taken with @ligon (2026-09-08): default =basis= follows
+=food_expenditures()= (='purchased'=) but alternatives must be easy to
+specify; households with no expenditure row are *omitted and counted*
+by default; multi-wave overlays are in scope.
+
+* What the chart is
+The Lorenz curve of household food spending for one survey wave: the
+cumulative share of spending held by the poorest fraction of the
+population, on the unit square, against the equality diagonal.  The
+Gini coefficient is twice the area between them and is reported on the
+chart.  It is scale-free, so it needs no deflator or numeraire -- and
+that is exactly why every /other/ choice that moves it has to be said
+out loud: whose spending (cash only, or all recorded acquisition
+value), per person or per household, weighted or not, and what
+happened to households with nothing recorded.
+
+* Signature
+#+begin_src python
+lorenz_curve(data, wave=None, *, value=None, per='person', weights=True,
+             basis=None, by=None, zeros=None, size=None,
+             ax=None, title=None, colors=None) -> matplotlib.axes.Axes
+#+end_src
+
+- =data= :: a =Country=, its name, or a DataFrame.  A frame is either an
+  expenditure-shaped table (has a =j= index level and an =Expenditure=
+  column; summed over every level but =(i, t)= to household grain) or a
+  household-grain frame whose welfare column is named by =value=.
+- =value= :: *the alternatives lever.*  On the Country path, =None= means
+  =food_expenditures=; a string names another table of the country,
+  which must carry an =Expenditure= column and is summed over every
+  index level but =(i, t)= to household grain (the long shape Togo's
+  =nonfood_expenditures= has: =(t, i, j) x Expenditure=).  A table with
+  **no** =Expenditure= column raises =ValueError= naming the table, its
+  columns' count, and GH #817 -- Uganda's and Nigeria's
+  =nonfood_expenditures= are wide item-by-household matrices (=(i, t, v)
+  x 41= and =(i, t, v, m) x 96=), which @ligon has ruled a *bug in those
+  tables* (2026-09-08), not a shape for the viz to accommodate.  Summing
+  a wide frame here would hide the defect behind a correct-looking
+  curve.  A =pandas.Series= indexed by =(i, t)= (any order, extra levels
+  summed away) is a user-computed measure -- so "food plus non-food" is
+  two API calls and an add, not a kwarg.  On the frame path, a string
+  names the welfare column; with =None= the frame must carry
+  =Expenditure= or the call raises asking for =value=.  The y-axis label
+  and subtitle name the measure ("share of food spending" / "share of
+  nonfood_expenditures" / the Series' name).
+- =wave= :: one wave (default: the most recent wave *the measure itself
+  holds*, with the module's usual warning when several are held -- as
+  =_resolve_roster= reads the roster's own =t= values, not
+  =Country.waves=: Nigeria's =country.waves= ends in =2024Q1=, which has
+  no expenditure data yet, and the default must not land there) **or a
+  list of waves**, drawn as separate labelled curves (see "Colour").
+  An explicit =wave= still passes =waves=[...]= to the API (0.3 s vs
+  13 s on a warm Uganda cache); only the default needs the full read.  A list together with =by=
+  is a =ValueError=: colour has one job.  More than five waves is a
+  =ValueError= naming the limit.
+- =per= :: ='person'= (default) -- spending divided by household size,
+  each household weighted by =size * weight=; the literature's standard.
+  ='household'= -- household totals, each household weighted by
+  =weight=.  Size comes from =household_characteristics()['log HSize']=
+  for a Country, or the =size= column for a frame; a frame with no
+  =size= and =per='person'= raises with a one-line explanation.
+- =weights= :: =True= (survey weights from =sample()=, falling back to
+  unweighted with a warning), =False=, or a column name.  Same contract
+  as =population_pyramid=.
+- =basis= :: =None= follows =food_expenditures()='s default
+  (='purchased'=); ='total'= passes through.  Only meaningful when the
+  measure is =food_expenditures=; anywhere else an explicit value is a
+  =TypeError= saying so (the pattern =data-methods.md= uses: raise, never
+  ignore).
+- =by= :: split into curves on a column of the frame or of =sample()=
+  (=Rural=, =strata=, =Region= ...), same lookup as the pyramid.  Colour
+  encodes it.  **Two groups at most, and a column with more than two
+  values raises** naming the values it holds -- do *not* copy the
+  pyramid's =groups[:2]=, which silently discards the rest (Uganda
+  =Region= has four).  Accept =by= as a =(column, [value, value])= tuple
+  to pick two of many.
+- =zeros= :: households present in the wave's =sample()= but absent
+  from the measure (ledger §4: they are *absent*, not zero, because the
+  transform drops zero rows; on Uganda 2013-14 they are true cash
+  zeros).  =None= resolves to ='drop'= on the Country path: omit them
+  and say how many.  ='include'= draws them at zero.  Either way the
+  count is in the subtitle.  An explicit value on the frame path is a
+  =TypeError= (there is no sample frame to compare against).
+
+Returns the Axes, like the other two.
+
+* Computation (new; ledger §5)
+Per series: household values =x_h >= 0=, weights =w_h > 0=.  Sort by
+=x_h= ascending; =F_k = cumsum(w)/sum(w)=, =L_k = cumsum(x w)/sum(x w)=,
+both prefixed with 0.  Draw the polyline =(F, L)=.  Gini =
+=1 - sum((F_k - F_{k-1}) (L_k + L_{k-1}))= -- the trapezoid rule, exact
+for the polygon drawn, so the printed number and the picture agree by
+construction.  One private helper =_lorenz(x, w) -> (F, L, gini)= with
+a docstring and direct unit tests.  Negative values raise: they have no
+place on a Lorenz curve and a negative expenditure is a data defect
+worth seeing.  =sum(x w) == 0= (everyone at zero) raises too.
+
+* Assembly (Country path)
+1. Measure: =country.food_expenditures(waves=[...], basis=...)= (or the
+   table =value= names, or the Series); sum =Expenditure= over every
+   index level except =(i, t)=.
+2. Size (per-person only): =household_characteristics(waves=[...])=,
+   =size = exp(log HSize)= rounded to int.  Join on =(i, t)=.  A
+   household with spending but no size row, **or size <= 0** (=log
+   HSize= is =-inf= when every member fails the residence filter),
+   cannot be placed per person: count, drop, disclose ("N without a
+   usable roster, not drawn").
+3. Interviewed households and weights from =sample()= at =(i, t)=:
+   supplies =weight=, the =by= column, and the household set that
+   defines =zeros=.  Reuse =_attach='s join; **generalise its two
+   error strings** (they say "roster" and "population_pyramid()") so a
+   Lorenz error does not talk about a roster -- pass the caller's name
+   and the frame's noun in, or factor the join into a household-grain
+   sibling.  Same for =_MISSING_MPL=.
+4. In-kind check for the subtitle: under =basis='total'=, if the
+   returned =food_expenditures= frame's =s= level holds only
+   ='purchased'=, the country recorded no in-kind value and 'total' did
+   nothing -- say "no in-kind value recorded".  Read the =s= level;
+   do not call the API twice.
+5. Series: one per wave in the list, or one per =by= group, or one.
+   =_lorenz= each.
+
+* Design (the frontend-design pass)
+** Tokens -- inherited, deliberately
+The module already has a design system: =PALETTE= (ink =#23313A=, rule
+=#CFD6DA=, bar =#3D6B7D=, alt =#B08A3E=), =_FONT_STACK=, left-aligned
+semibold title at 12.5, a subtitle line above the axes in 75%-alpha
+ink, the universe caption at the figure's bottom-left.  Consistency
+with the other two charts is the choice here; do not invent a palette.
+(For the record: the dataviz palette validator passes the pair on CVD
+separation, dE 17.8, and flags =#3D6B7D= as low-chroma.  That is what
+a slate teal is; noted, not changed.)
+
+** What the generic default would be, and what we do instead
+The default Lorenz chart anyone would draw: a blue curve, a black
+dashed 45-degree line, a legend saying "Lorenz curve" / "line of
+equality", "Gini = 0.50" in the title, a 6.4x4.8 rectangle.  Each of
+those is replaced by a choice:
+- *Square axes.*  The Lorenz curve lives on the unit square; a
+  rectangle distorts the one geometric fact the chart is about.
+  =figsize=(5.8, 5.8)=, =set_aspect('equal')=, limits exactly 0..1.
+- *The diagonal is a solid hairline in =rule=,* unlabelled.  Dashing
+  reads as a projection or a threshold; a legend entry for a reference
+  line names nothing the reader does not know.
+- *Single series: the gap is shaded,* a light fill of the series colour
+  (alpha about 0.12) between diagonal and curve.  The shaded area /is/
+  half the Gini, so the number printed and the shape seen are the same
+  fact.  Two or more series: no fill -- overlapping translucent fills
+  make a third colour the reader must decode (the module's own
+  reasoning for the pyramid's =ghost= outline).
+- *One selective direct label,* single series only: a small dot at
+  =(0.5, L(0.5))= and the text "the poorest half: 17% of spending"
+  (the noun is "people" or "households" per =per=).  That is the
+  sentence a reader takes away.  No number on every point.
+- *Gini is a fact about a series, so it sits with the series:* in the
+  legend entry ("2013-14, Gini 0.50") when there is a legend, in the
+  subtitle when there is one curve and no legend.  Two decimals.
+- *Colour has one job.*  =by= groups take =bar= / =alt= exactly as the
+  pyramid does.  A list of waves is an *ordered* series, so it takes an
+  ordered ramp of the =bar= hue: the most recent wave in the full ink,
+  earlier waves lightened toward the surface in equal steps, **capped
+  at about 55% white at the far end** so the lightest of five still
+  clears contrast on a white surface.  Validate the generated steps:
+  =node <dataviz>/scripts/validate_palette.js "<hex,...>" --ordinal
+  --mode light= (path in the brief) and paste the result in the
+  report; adjust the cap if it fails.  Not two categorical hues: waves
+  are not categories.
+- *Axes labels say what the axes are,* in the module's plain register:
+  x "share of people, poorest first" (or "share of households, poorest
+  first"), y "share of food spending" (or "share of {value}" for another
+  measure).  Ticks at 0, 25, 50, 75, 100 as percentages.  Left and
+  bottom spines in =rule=; top and right hidden; no grid.
+- *Title and subtitle follow the module.*  Title = "{Country} {wave}"
+  (or "{Country}" for a list) left-aligned.  Subtitle bits,
+  comma-joined, in this order (as implemented and accepted at review,
+  2026-09-08): "Gini {g:.2f}" when there is one curve and so no legend
+  to carry it; "{n_hh:,} households"; "{n_people:,} people" (per-person
+  only; the *weighted* person total is not the headcount -- report the
+  headcount =sum(size)= and the weighting basis separately, never the
+  weighted total as if it were a count); the measure and basis ("food
+  purchases per person" / "all recorded food acquisition per person" /
+  "{value} per household"); the weighting basis text from the join;
+  then the disclosures, each only when its count is non-zero: "{k} with
+  no recorded purchase, not drawn" (or "... drawn at zero"); "{m}
+  without a usable roster, not drawn"; "{n} with no usable value, not
+  drawn"; "{p} not in sample(), not drawn"; "{q} without a sampling
+  weight, not drawn"; "{r} outside the two {by} values picked, not
+  drawn"; "{s} with no {by} value, not drawn"; and "no in-kind value
+  recorded" when step 4 says so.  Legend upper-left.  On the frame path
+  the y-label is "share of spending" when the column is =Expenditure=,
+  else "share of {value}".
+- *The universe caption* via =_universe=, once per distinct
+  =(country, wave)= tag; several waves with identical tags collapse to
+  one line, differing tags get one line each.
+
+** Remove one accessory
+No label on the diagonal, no legend for a single series, no gridlines,
+no "Lorenz curve" in the title (the axes say what it is), no marker
+on every vertex.
+
+** Render and look
+Save PNGs to =slurm_logs/viz_lorenz/= from the warm shared cache:
+=uganda_2013-14.png= (defaults), =uganda_2013-14_rural.png=
+(=by='Rural'=), =uganda_waves.png= (=wave=['2009-10','2013-14','2019-20']=),
+=uganda_2013-14_total.png= (=basis='total'=).  The coordinator reads the
+images before landing; the implementer looks at them too and fixes
+label collisions, clipped text or an unreadable ramp before reporting.
+
+* Tests (=tests/test_visualizations.py=, synthetic first)
+- =_lorenz=: Gini 0 on equal values, curve on the diagonal; one
+  household with everything gives Gini =1 - w_that/sum(w)=; duplicating
+  a row vs doubling its weight gives identical =(F, L)=; negative value
+  raises; all-zero raises.
+- Household frame path (=value=, =size=, =weights= columns): returns an
+  Axes; one =Line2D= for the curve plus the diagonal; a =PolyCollection=
+  fill present for one series and absent for two.
+- =per='person'= vs ='household'= differ when sizes vary; equal when all
+  sizes are 1.  =per='person'= without =size= on a frame raises.
+- An expenditure-shaped frame (=j= level) is summed to household grain
+  and gives the same curve as the pre-summed frame.
+- =by= draws two curves in =bar= and =alt=; legend titled only when the
+  column name is not itself a value (pyramid rule); Gini in each entry;
+  a column with three values raises naming them; the tuple form picks
+  two.
+- =wave=[...]= draws n curves with monotonically darker colour in wave
+  order; =wave= list + =by= raises; six waves raises.
+- Frame path: explicit =zeros= or =basis= raises =TypeError=.
+- Subtitle names the basis and the weighting; the 0.5 annotation text
+  matches =L(0.5)= to the percent.
+- One data-gated test (=@pytest.mark.slow=, skip if Uganda is
+  unavailable, like the pyramid's), Uganda 2013-14 defaults: **recompute
+  independently** in the test from =food_expenditures=,
+  =household_characteristics= and =sample= on that wave -- the Gini and
+  the count of sample households with no expenditure row -- and assert
+  the chart's printed Gini (to 0.01) and the subtitle's count match.
+  Pinned numbers would test the cache, not the wiring.  Keep
+  "Represents:" in the figure texts as the one fixed expectation.
+- =tests/test_visualizations_export.py=: =ll.lorenz_curve is
+  ll.visualizations.lorenz_curve=.
+
+* Docs
+- =lsms_library/__init__.py=: import and export =lorenz_curve= beside the
+  other two (line 150).
+- =docs/api/visualizations.md=: "Three plotting helpers", an example
+  line, and =lorenz_curve= in the mkdocstrings =members= list.
+- Module docstring: one new paragraph in the same voice, on the
+  scale-invariance point and why the basis therefore has to be stated
+  (with the Uganda 0.50 vs 0.34 measurement, ledger §4).
+
+* Out of scope (v1)
+Cross-country overlays via =Feature('food_expenditures')= (needs
+per-country size/weight joins); adult-equivalence scales; confidence
+bands.  Each is a follow-up, not a kwarg to squeeze in.

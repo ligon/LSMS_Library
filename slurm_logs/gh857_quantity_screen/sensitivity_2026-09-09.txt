@@ -1,0 +1,71 @@
+lsms_library: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen/lsms_library/__init__.py
+data_root: /global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen/.qsnap
+15 warm countries: ['Benin', 'Burkina_Faso', 'CotedIvoire', 'Ethiopia', 'EthiopiaRHS', 'GhanaSPS', 'Guinea-Bissau', 'Malawi', 'Mali', 'Niger', 'Nigeria', 'Senegal', 'Tanzania', 'Togo', 'Uganda']
+
+shipped rule: quantile=0.9 floor=1.0 min_cell=30 K=100.0
+
+quantile=0.9 floor=0.0 min_cell=30 -> K=10:1356 K=30:421 K=50:267 K=100:155 K=150:94 K=200:67 K=300:50 K=500:38
+quantile=0.9 floor=1.0 min_cell=30 -> K=10:1352 K=30:417 K=50:261 K=100:151 K=150:90 K=200:65 K=300:49 K=500:38
+
+quantile=0.95 floor=0.0 min_cell=30 -> K=10:740 K=30:253 K=50:155 K=100:83 K=150:62 K=200:52 K=300:44 K=500:27
+quantile=0.95 floor=1.0 min_cell=30 -> K=10:738 K=30:252 K=50:155 K=100:82 K=150:61 K=200:52 K=300:44 K=500:27
+
+quantile=0.99 floor=0.0 min_cell=30 -> K=10:181 K=30:60 K=50:45 K=100:33 K=150:25 K=200:22 K=300:17 K=500:17
+quantile=0.99 floor=1.0 min_cell=30 -> K=10:181 K=30:60 K=50:45 K=100:33 K=150:25 K=200:22 K=300:17 K=500:17
+
+
+SHIPPED rule fires on 151 of 626,687 rows (0.0241%)
+    country       t              i                   j             u   Quantity    ref  rung        ratio
+      Niger 2011-12          13317                 Mil       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317 Niébé/Haricots secs       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317 Niébé/Haricots secs       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317              Sorgho       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317              Sorgho       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          20607           Riz Paddy       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          20607           Riz Paddy       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317                 Mil       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317                 Mil       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317              Sorgho       Unknown   999999.0   70.0     t 14285.700000
+      Niger 2011-12          13317 Niébé/Haricots secs       Unknown   999999.0   70.0     t 14285.700000
+   Tanzania 2020-21    9640-001-99            Coconuts            kg  7500000.0  680.0 t,u,j 11029.411765
+     Malawi 2019-20   104071840057               Beans  Pail (Large)    48000.0    6.0 t,u,j  8000.000000
+     Malawi 2019-20   209104470060               Maize     50 kg Bag    56000.0   15.0 t,u,j  3733.333333
+     Malawi 2019-20   210664640215               Maize     50 kg Bag    50000.0   15.0 t,u,j  3333.333333
+   Tanzania 2020-21    9640-001-99        Other Fruits            kg  2400000.0  752.5 t,u,j  3189.368771
+     Uganda 2018-19     1083000903           Sugarcane       Unknown   360000.0  120.0   t,u  3000.000000
+     Malawi 2019-20 203030650050_1           Groundnut     50 kg Bag    42000.0   15.0 t,u,j  2800.000000
+     Malawi 2019-20   301054940005               Maize     50 kg Bag    27000.0   15.0 t,u,j  1800.000000
+      Benin 2018-19         220065               Coton            Kg 12500000.0 7000.0 t,u,j  1785.714286
+       Mali 2017-18         370004               Coton         Autre    16000.0   10.0 t,u,j  1600.000000
+   Tanzania 2020-21    9169-001-99              Pulses            kg   640000.0  400.0 t,u,j  1600.000000
+    Nigeria  2011Q1          80138               Maize           nan     1800.0    1.2 t,u,j  1500.000000
+       Mali 2017-18         370006               Coton         Autre    13500.0   10.0 t,u,j  1350.000000
+   Tanzania 2020-21       2677-001        Ripe Bananas            kg  1505400.0 1500.0 t,u,j  1003.600000
+   Tanzania 2019-20 01020030030174        Leafy Greens            kg   800000.0  847.0   t,u   944.510035
+     Malawi 2019-20   202042710069                Rice     50 kg Bag    15000.0   16.0 t,u,j   937.500000
+     Malawi 2019-20 207053720025_1           Groundnut  Pail (Large)    48000.0   60.0 t,u,j   800.000000
+   Tanzania 2020-21       3740-001        Other Fruits            kg   591300.0  752.5 t,u,j   785.780731
+CotedIvoire 2018-19         600009               Cocoa    Kilogramme  1500000.0 2000.0 t,u,j   750.000000
+   Tanzania 2020-21       3740-001        Other Fruits            kg   525600.0  752.5 t,u,j   698.471761
+     Malawi 2019-20   303026010024               Maize     50 kg Bag    10000.0   15.0 t,u,j   666.666667
+     Uganda 2013-14   H42707-04-01                 Tea            Kg   180000.0  300.0   t,u   600.000000
+    Nigeria  2016Q1         120100      Cassava--roots         Stalk    60000.0  100.0   t,u   600.000000
+       Mali 2017-18         359002               Coton         Autre     6000.0   10.0 t,u,j   600.000000
+CotedIvoire 2018-19         520007              Cashew        Autres     3100.0    5.6 t,u,j   553.571429
+   Tanzania 2020-21       3740-001       Cassava Fresh            kg   475000.0  885.0 t,u,j   536.723164
+     Uganda 2013-14     4013000509              Onions Heap (Medium)    50007.0  100.0   t,u   500.070000
+CotedIvoire 2018-19         922001          Autre crop    Kilogramme   500000.0 1000.0 t,u,j   500.000000
+CotedIvoire 2018-19         173004              Cashew    Kilogramme  1500000.0 3000.0 t,u,j   500.000000
+
+595,811 rows have a reference; 30,876 do not (thin cell, or a NaN quantity)
+ratio quantiles -- look for a gap; there is none:
+count     595811.000000
+mean           0.895957
+std           64.926278
+min            0.000000
+90%            1.000000
+99%            3.636364
+99.9%         21.000000
+99.99%       233.746047
+max        14285.700000
+Name: ratio, dtype: float64

@@ -67,7 +67,7 @@ def plot_labor_ehcvm(src, t):
     fam_any = pd.concat([_num(c).notna() for c in fam_cols], axis=1).any(axis=1)
     fam_days = fam_days.where(fam_any.values, pd.NA)
     fam = pd.DataFrame({
-        'i': hh.values, 'plot': plot.values,
+        'i': hh.values, 'plot_id': plot.values,
         'source': LABOR_SOURCE_FAMILY,
         'PersonDays': fam_days.values, 'Wage': pd.NA,
     })
@@ -92,7 +92,7 @@ def plot_labor_ehcvm(src, t):
     hired_days = hired_days.where(any_days.values, pd.NA)
     hired_wage = hired_wage.where(any_wage.values, pd.NA)
     hired = pd.DataFrame({
-        'i': hh.values, 'plot': plot.values,
+        'i': hh.values, 'plot_id': plot.values,
         'source': LABOR_SOURCE_HIRED,
         'PersonDays': hired_days.values, 'Wage': hired_wage.values,
     })
@@ -106,18 +106,18 @@ def _finish_plot_labor(df, t):
     df = df.copy()
     df['t'] = t
     df['source'] = df['source'].astype('string')
-    df['plot'] = df['plot'].astype('string')
+    df['plot_id'] = df['plot_id'].astype('string')
     df['PersonDays'] = pd.to_numeric(df.get('PersonDays'), errors='coerce').astype('Float64')
     if 'Wage' not in df.columns:
         df['Wage'] = pd.NA
     df['Wage'] = pd.to_numeric(df['Wage'], errors='coerce').astype('Float64')
-    df = df[df['i'].notna() & df['plot'].notna() & df['source'].notna()]
-    df = (df.groupby(['t', 'i', 'plot', 'source'], dropna=False)[['PersonDays', 'Wage']]
+    df = df[df['i'].notna() & df['plot_id'].notna() & df['source'].notna()]
+    df = (df.groupby(['t', 'i', 'plot_id', 'source'], dropna=False)[['PersonDays', 'Wage']]
             .sum(min_count=1)
             .reset_index())
     # Drop (plot, source) rows with no reported labor at all.
     df = df[df['PersonDays'].notna() | df['Wage'].notna()]
-    df = df.set_index(['t', 'i', 'plot', 'source'])
+    df = df.set_index(['t', 'i', 'plot_id', 'source'])
     return df
 
 

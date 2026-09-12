@@ -4,7 +4,8 @@
 Source: 2017-18/Data/11a_foodconsumption_prod_purch.dta, one row per
 (household, food item):
   - FPrimary   -> i  (household)
-  - foodname   -> j  (food item text; harmonized via food_items.org '2017-18')
+  - foodname   -> j  (food item text; harmonized via
+                     categorical_mapping.org harmonize_food, '2017-18')
   - unitname   -> u  (clean text unit; harmonized via units.org
                       'harmonizedunit' '2017-18' col)
 
@@ -35,8 +36,14 @@ df['i'] = df['i'].astype(str)
 df['j'] = df['j'].astype(str).str.strip()
 df['u'] = df['u'].astype(str).str.strip().replace({'': pd.NA, 'nan': pd.NA})
 
-# Harmonize food item text -> Preferred Label via food_items.org '2017-18' col.
-food_items = df_from_orgfile('../../_/food_items.org', name=None, to_numeric=False, encoding='ISO-8859-1')
+# Harmonize food item text -> Preferred Label via the '2017-18' column of
+# categorical_mapping.org's harmonize_food table.  GH #783 moved that
+# vocabulary out of the standalone food_items.org, where it was an
+# UNNAMED table reachable only by name=None ('the first table in the
+# file') and therefore invisible to Country.categorical_mapping and to
+# labels=.  The old encoding='ISO-8859-1' is gone: that file was pure
+# ASCII, so it was a no-op, and the new one is UTF-8.
+food_items = df_from_orgfile('../../_/categorical_mapping.org', name='harmonize_food', to_numeric=False)
 food_items = food_items[['2017-18', 'Preferred Label']].apply(lambda s: s.astype(str).str.strip())
 food_items = food_items[~food_items['2017-18'].isin(['', '---', 'nan'])]
 food_items = food_items[~food_items['Preferred Label'].isin(['', '---', 'nan'])]

@@ -21,6 +21,23 @@ Per-wave source structure (post-harvest round):
               secta3iii_harvestw5.dta   perennial/tree plot-crop harvest.
               (Post Harvest Wave 5/Agriculture)
 
+KgFactor (GH #859): the survey's own "Kg/L conversion factor" (`*_conv`),
+asked BESIDE the harvest quantity and unit, carried per row.  Only W4 and W5
+ship one at all; W1/W2/W3 have no `*_conv` column in any harvest file, so
+KgFactor is legitimately all-NaN there (hence `optional: true`).  Wired, per
+section, to the `*_conv` that pairs with the quantity/unit this build stores:
+
+  W4 secta3i    sa3iq6_conv     (pairs with sa3iq6i  / sa3iq6ii)
+  W4 secta3iii  sa3iiiq13_conv  (pairs with sa3iiiq13a / sa3iiiq13c)
+  W5 secta3i    sa3iq9_conv     (pairs with sa3iq9a  / sa3iq9b)
+  W5 secta3iii  sa3iiiq23_conv  (pairs with sa3iiiq23a / sa3iiiq23b)
+
+Deliberately NOT wired: sa3iq6d_conv (W4) and sa3iq15_conv (W5) belong to the
+"How much MORE [CROP] does HH expect to harvest" block, which has its OWN
+unit/size/condition columns this build never reads -- their factor describes a
+different container; and sa3iiq1_conv (secta3ii, W4/W5) is at hh-crop grain
+with no plot linkage, the same reason W3-W5 sales are left NaN here.
+
 crop labels (j): cropcode -> Preferred Label via harmonize_food (shared
 with food_acquired; reused food labels where the crop is a consumed food).
 units (u): native production-unit label normalized to a base Preferred
@@ -62,11 +79,11 @@ def _intercropped_from_planting(planting_fn):
     inter = inter.where(~(code.between(2, 7)), True)
     key = pd.DataFrame({
         'i': df[hh].apply(format_id).values,
-        'plot': df[plot].apply(format_id).values,
+        'plot_id': df[plot].apply(format_id).values,
         'crop_code': pd.to_numeric(df[cc], errors='coerce').astype('Int64').values,
         'intercropped': inter.values,
     })
-    key = key.dropna(subset=['intercropped']).drop_duplicates(['i', 'plot', 'crop_code'])
+    key = key.dropna(subset=['intercropped']).drop_duplicates(['i', 'plot_id', 'crop_code'])
     return key
 
 
@@ -78,10 +95,10 @@ def _align_intercropped(raw, hhid, plot, cropcol, planting_fn):
         return None
     j = pd.DataFrame({
         'i': raw[hhid].apply(format_id).values,
-        'plot': raw[plot].apply(format_id).values,
+        'plot_id': raw[plot].apply(format_id).values,
         'crop_code': pd.to_numeric(raw[cropcol], errors='coerce').astype('Int64').values,
     }, index=raw.index)
-    merged = j.merge(key, on=['i', 'plot', 'crop_code'], how='left')
+    merged = j.merge(key, on=['i', 'plot_id', 'crop_code'], how='left')
     return pd.Series(merged['intercropped'].values, index=raw.index, dtype='boolean')
 
 
@@ -143,7 +160,7 @@ inter_a = _align_intercropped(
     '../2018-19/Data/sect11f_plantingw4.dta')
 frames.append(dict(
     df=raw_a, dec=dec_a, hhid='hhid', plot='plotid', crop='cropcode',
-    qty='sa3iq6i', unit='sa3iq6ii',
+    qty='sa3iq6i', unit='sa3iq6ii', kg_factor='sa3iq6_conv',
     plant_m='sa3iq4a1', plant_y='sa3iq4a2',
     harv_m='sa3iq6c1', harv_y='sa3iq6c2',
     intercropped=inter_a, perennial=False))
@@ -152,7 +169,7 @@ raw_p = get_dataframe(fp, convert_categoricals=False)
 dec_p = get_dataframe(fp, convert_categoricals=True)
 frames.append(dict(
     df=raw_p, dec=dec_p, hhid='hhid', plot='plotid', crop='cropcode',
-    qty='sa3iiiq13a', unit='sa3iiiq13c',
+    qty='sa3iiiq13a', unit='sa3iiiq13c', kg_factor='sa3iiiq13_conv',
     plant_m='sa3iiiq8a', plant_y='sa3iiiq8b',
     harv_m='sa3iiiq12a', harv_y='sa3iiiq12b',
     perennial=True))
@@ -166,7 +183,7 @@ raw_a = get_dataframe(fa, convert_categoricals=False)
 dec_a = get_dataframe(fa, convert_categoricals=True)
 frames.append(dict(
     df=raw_a, dec=dec_a, hhid='hhid', plot='plotid', crop='cropcode',
-    qty='sa3iq9a', unit='sa3iq9b',
+    qty='sa3iq9a', unit='sa3iq9b', kg_factor='sa3iq9_conv',
     plant_m='sa3iq5a', plant_y='sa3iq5b',
     harv_m='sa3iq14a', harv_y='sa3iq14b',
     perennial=False))
@@ -175,7 +192,7 @@ raw_p = get_dataframe(fp, convert_categoricals=False)
 dec_p = get_dataframe(fp, convert_categoricals=True)
 frames.append(dict(
     df=raw_p, dec=dec_p, hhid='hhid', plot='plotid', crop='cropcode',
-    qty='sa3iiiq23a', unit='sa3iiiq23b',
+    qty='sa3iiiq23a', unit='sa3iiiq23b', kg_factor='sa3iiiq23_conv',
     plant_m='sa3iiiq18a', plant_y='sa3iiiq18b',
     harv_m='sa3iiiq22a', harv_y='sa3iiiq22b',
     perennial=True))
@@ -184,5 +201,8 @@ pieces.append(crop_production_for_wave(t, frames, crop_labels))
 # ----------------------------- combine -------------------------------
 df = pd.concat(pieces, axis=0)
 df = df.sort_index()
+# Concatenating all-NaN waves (W1-W3, no `*_conv` anywhere) with float waves
+# can degrade the dtype; pin it so the parquet stores a float column.
+df['KgFactor'] = pd.to_numeric(df['KgFactor'], errors='coerce').astype('float64')
 
 to_parquet(df, '../var/crop_production.parquet')

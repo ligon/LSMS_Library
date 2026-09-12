@@ -1,0 +1,17 @@
+SOURCE
+
+https://doi.org/10.7910/DVN/PXVFJD
+
+#+CATALOG_ID: none
+#+CATALOG_TITLE: Kenya Life Panel Survey, Round 3 (KLPS-3)
+#+CATALOG_YEARS: 2011-2014
+#+CATALOG_DOI: https://doi.org/10.7910/DVN/PXVFJD
+#+CATALOG_URL: https://doi.org/10.7910/DVN/PXVFJD
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_NOTE: KLPS-3: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.
+
+* Notes (preserved from the original SOURCE.org)
+Kenya Life Panel Survey Round 3 (KLPS-3), Harvard Dataverse dataset doi:10.7910/DVN/PXVFJD version 2.0, published 2021-12-30.  Retrieved via the Dataverse API.  License as declared in the dataset metadata: CC0 1.0.  Validation: all 4 sidecar md5s match the Dataverse originals (API checksums, 2026-09-02); downloads are guestbook-gated.

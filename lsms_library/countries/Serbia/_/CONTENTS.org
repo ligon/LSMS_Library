@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 Serbia LSMS survey coverage and status.
 
@@ -292,10 +293,12 @@ survey results."
 
 The build fails for two reasons:
 
-1. The Makefile's generic =%.parquet= rule (line 45) depends on
-   =food_items.org= and =panama.py=, neither of which exists.  The
-   =panama.py= reference is a copy-paste error from Panama.  This rule
-   governs any parquet target that does not match a more specific rule.
+1. *SUPERSEDED (see "Known issues" below).*  The Makefile's generic
+   =%.parquet= rule used to depend on =food_items.org= and =panama.py=.
+   The =panama.py= copy-paste was fixed 2026-06-08; the rule now reads
+   =%.parquet: %.py serbia.py= and names no food-label file at all, which
+   is why GH #783's retirement of =food_items.org= needed no Makefile
+   edit here.
 
 2. The country-level =food_acquired.py= depends on
    =var/other_features.parquet= and wave-level =food_acquired.parquet=.
@@ -306,20 +309,22 @@ The DVC-managed =household_roster= pipeline (=dvc.yaml=) may work
 independently since it uses the CLI materializer, but the legacy
 Makefile pipeline for food and other features is non-functional.
 
-* Known issues
+* Known data issues
 - Makefile :: FIXED (2026-06-08).  The generic rule's =panama.py=
   prerequisite (copy-paste error from Panama) now reads =serbia.py=, and
   =food_items.org= now exists.
 - =serbia.py= :: Nearly empty---imports deprecated =ligonlibrary= and
   =lsms.tools= but defines no functions.  Contrast with =cambodia.py=
   which at least defines =age_sex_composition()=.
-- No =categorical_mapping.org= :: No label harmonization for any
-  variables.
+- STALE, was "No =categorical_mapping.org=" :: *False when GH #783 read
+  it; quoted rather than deleted so the correction is on the record.*
+  =_/categorical_mapping.org= exists (=harmonize_education=) and, since
+  GH #783, also carries =harmonize_food=.
 - Anti-pattern usage :: =other_features.py= / =household_characteristics.py=
   still use =dvc.api.open()= and =from ligonlibrary.dataframes import
   from_dta=.  =food_acquired.py= already uses =get_dataframe()=; its
   stray =import pyreadstat= was removed (2026-06-08) when wiring
-  =food_items.org=.
+  the food-label table (now =harmonize_food=).
 
 * Files in Serbia/_/
 ** DONE data_scheme.yml
@@ -327,7 +332,29 @@ Declares =household_roster= with index =(t, v, i, pid)= and columns
 =Sex=, =Age=, =Generation=, =Distance=, =Affinity=.  Does not declare
 =food_acquired=, =household_characteristics=, or =other_features=.
 
-** DONE food_items.org (2026-06-08; FCT column scaffolded)
+** DONE food_items.org -- RETIRED, migrated to categorical_mapping.org (GH #783)
+The vocabulary now lives in =_/categorical_mapping.org= under =#+name:
+harmonize_food=, moved byte-for-byte; =_/food_items.org= is deleted.  Same
+"Unit #0" migration Tanzania and Ethiopia completed
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).  It had to
+be a MOVE, not a rename in place: =Country.categorical_mapping= opens only
+the global =lsms_library/categorical_mapping/*.org= and the country's own
+=categorical_mapping.org=, and never =food_items.org= under any table name,
+so =labels== (=Country._relabel_j=) raised =LabelUnavailableError= here.
+
+*The idiosyncrasy that shapes this table, carried across with it*: the
+join key is the numeric =proizvod=, NOT the product text =nsifra=,
+because =nsifra= is stored in a legacy YUSCII transliteration in which
+the pipe character ='|'= encodes the letter "đ" -- and a literal ='|'=
+cannot survive an org-mode pipe-delimited table at all.
+
+One behaviour change worth knowing, in the NEW capability only:
+=Country.categorical_mapping= parses with =to_numeric=True=, so
+=labels='proizvod'= yields =101=, not the zero-padded =0101=.  The wave
+script reads through =df_from_orgfile(..., to_numeric=False)= and is
+unaffected.
+
+The historical description follows.
 Harmonizes the 100 food items of the 2007 diary (=m5_1_diary.dta=) into
 preferred labels.  Columns: =Preferred Label | proizvod | Serbian Label
 | FCT ID=.  =2007/_/food_acquired.py= keys on the numeric =proizvod=
@@ -343,13 +370,14 @@ Not yet wired.  No freely-downloadable, machine-readable Serbian FCT was
 obtained.  Candidate = Serbian Food and Nutrition Database (IMR
 Belgrade, EuroFIR-harmonized); access requires EuroFIR registration, no
 bulk download.  Fallback = EuroFIR Balkan regional FCT.  See the
-=food_items.org= "Food Conversion Table" section for source URLs and the
+=categorical_mapping.org= =harmonize_food= "Food Conversion Table"
+section for source URLs and the
 remaining steps (obtain FCT CSV -> fill =FCT ID= column -> add
 =nutrition.py= cf. Panama/Guatemala).
 
 ** TODO nutrition.py
-Not yet implemented.  Blocked by the missing FCT (above);
-=food_items.org= is now present.
+Not yet implemented.  Blocked by the missing FCT (above); the label
+table is present, in =categorical_mapping.org= as =harmonize_food=.
 
 ** DONE Makefile (2026-06-08)
 The generic =%.parquet= rule's =panama.py= prerequisite (copy-paste from
@@ -442,3 +470,61 @@ is an ISA/EHCVM-specific module.  Serbia LSMS 2007 carries no such roster.  Veri
 this round by full variable-label inspection of the source =.dta= files:
 full inspection of all 445 household + 346 individual variables; the lone damage field (=mp20=) sits in the Kosovo-IDP module, not a shocks roster.  Not implementable from current data; revisit only if a coping roster
 is later identified.  Tracked in GitHub issue #352.
+
+
+* =mera == 'dinar'= is CURRENCY, and it is emitted as =Value= (GH #770)
+
+The 7-day diary's =mera= ("measure") column is not purely a measure.  Four of
+its five values are units -- =kg=, =gr=, =litar=, =komad= -- and the fifth,
+*=dinar=*, is the marker for a pure cash outlay.  It is used by the prefix-11
+"food/drink away from home" items (restaurant / work / school), which the
+=food_acquired.py= docstring already described as /"pure cash outlays with no
+physical quantity and no source flag"/.
+
+=2007/_/food_acquired.py= now emits those rows as the framework's canonical
+currency-denominated sentinel *=u='Value'=*, not as the currency's name.
+
+** Why the name of a currency must not be a =u= label
+Amounts are already in local currency units by default, and =currency==
+(=lsms_library/currency.py=) is the lever for currency *representation*, so
+the currency's name is redundant with the country and the wave.  The framework
+recognises exactly one canonical label for this
+(=country._RESERVED_U_SENTINELS=, =transformations._CURRENCY_DENOMINATED_UNITS=).
+Spelled =dinar=, the label was invisible to both, and
+=transformations.conversion_to_kgs= inferred a *kg-per-dinar factor of
+4.209166724149965* -- the #770 defect, live in Serbia.
+
+** What it actually cost, stated precisely and NOT overstated
+Of the 3,772 =dinar= rows, *3,767 carry =Quantity= NaN* (the cash amount is in
+=Expenditure=); only *5* carry a non-null =Quantity=, and those 5 are stray
+=kol= punches on "Food Away (work/school)" lines.  So:
+
+- =food_quantities(units='kgs')=: the 3,767 gave =NaN x 4.209 = NaN= and were
+  already dropped.  Only the *5* were actually served as mass.  Post-fix they
+  carry through natively as =u='Value'=.
+- =food_prices(units='kgvalue')= *and* =(units='kgprice')=: the same *5*
+  rows disappear from each (196,279 -> 196,274; a =Value= row has no kg
+  factor, so =Price= is NaN and =_drop_unpriceable= drops it).  The =unit*=
+  modes are unchanged (delta 0) -- they never used a kg factor.
+- =_drop_unpriceable='s =lost_fraction= goes 1.88% -> *0.0%*: all 3,772
+  rows move into the by-design =currency= bucket, where they are still
+  counted (=attrs['price_rows_dropped']=) but excluded from the loss
+  fraction.  Serbia was below the warning threshold before and is still
+  below it; nothing starts or stops warning here.
+- The factor map loses exactly one key (='dinar'=); every other key is
+  byte-identical.
+
+*Five rows is not why this was worth fixing.*  It was worth fixing because the
+mechanism is identical to GhanaLSS's 3.49M-row instance, and because a
+=u= label the framework cannot recognise defeats every guard built around the
+sentinel.
+
+** Serbia does NOT follow the value-only =Quantity == Expenditure= convention
+GhanaLSS and Panama write =u='Value'= rows with =Quantity= set equal to
+=Expenditure= (the "value-only convention" of the food-acquired skill).
+Serbia's do not: =Quantity= is NaN and the money is in =Expenditure= alone.
+*Both shapes now exist in the corpus under the same label.*  The label means
+"denominated in local currency", not "Quantity is the expenditure" -- and no
+quantity is synthesised here, because that would be a data change rather than
+a relabel.  Anyone building Step 2 of #770 (recovering the =1/price= factor
+from a price source) must handle both shapes.

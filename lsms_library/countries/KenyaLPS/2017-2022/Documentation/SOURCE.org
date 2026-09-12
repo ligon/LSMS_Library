@@ -1,0 +1,17 @@
+SOURCE
+
+https://doi.org/10.7910/DVN/O0BBKI
+
+#+CATALOG_ID: none
+#+CATALOG_TITLE: Kenya Life Panel Survey, Round 4 (KLPS-4)
+#+CATALOG_YEARS: 2017-2022
+#+CATALOG_DOI: https://doi.org/10.7910/DVN/O0BBKI
+#+CATALOG_URL: https://doi.org/10.7910/DVN/O0BBKI
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: manual-override
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-09-02
+#+PROVENANCE_NOTE: KLPS-4: Harvard Dataverse, not a World Bank dataset (CATALOG_ID 'none'); CC0 1.0.
+
+* Notes (preserved from the original SOURCE.org)
+Kenya Life Panel Survey Round 4 (KLPS-4), Harvard Dataverse dataset doi:10.7910/DVN/O0BBKI version 4.0, published 2023-09-08.  Retrieved via the Dataverse API.  License as declared in the dataset metadata: CC0 1.0.  Validation: all 4 files md5-match the Dataverse originals; re-downloaded 2026-09-02 and pushed to the S3 remote (GH #750).

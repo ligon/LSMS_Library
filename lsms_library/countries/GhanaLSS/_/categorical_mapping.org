@@ -18,8 +18,35 @@
 |    . | None            |
 
 * Relation to head
-See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
-#+name: relationship
+
+** GLSS1 fourteen-code list (=relationship_glss1=)
+
+GLSS1's (1987-88) relationship-to-head code list, from that wave's own data
+dictionary: https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?file_name=y01a
+Verified against the raw data for GLSS1 and GLSS2 (=REL= takes codes 1-14;
+code 1 occurs 3,136 / 3,192 times = each wave's household count).  Read by
+=1987-88/_/mapping.py= and =1988-89/_/mapping.py= via
+=code_label_map('relationship_glss1', _dirs)=.  GLSS3 and GLSS4 use a
+different NINE-code list and carry their own wave-level =relationship=
+tables (CONTENTS.org Trap 2).
+
+Renamed from =relationship= on 2026-09-07 (GH #797), for two reasons:
+1. The framework auto-applies any country table named after a served column
+   (=Relationship=), and =relationship= is now the name of the LABEL
+   harmonization table below.  A =| Code | Label |= table under that name was
+   never a mapping (=_build_replace_dict= needs a =Preferred Label= column),
+   but the two would collide by name.
+2. Trap 2's mechanism.  GLSS3 was decoded through this table for its whole
+   life (GH #799) because a wave-first =code_label_map= search found no wave
+   table and fell through to here.  With this table no longer answering to
+   =relationship=, a wave that lacks its own =relationship= CODE table gets
+   ={}= from =code_label_map= (the harmonization table below has no =Code=
+   column, so the lookup raises =KeyError= there and moves on) and ships a
+   100%-null =Relationship= that the Site B null-read guard reports loudly --
+   instead of a silently mis-decoded one.  A fallback that has never been
+   exercised has never been checked (Trap 4); this one can no longer be
+   exercised at all.
+#+name: relationship_glss1
 | Code | Label                 |
 |------+-----------------------|
 |    1 | Head                  |
@@ -36,6 +63,128 @@ See https://microdata.worldbank.org/index.php/catalog/2313/data-dictionary/F184?
 |   12 | Servant               |
 |   13 | Tenant                |
 |   14 | Others not related    |
+
+** Label harmonization (=relationship=): one vocabulary for seven waves
+
+Applied AUTOMATICALLY by =Country._apply_categorical_mappings= to the
+=Relationship= column of any table that carries one (here =household_roster=),
+at API time on EVERY read, warm or cold: the column is =.str.strip()=-ed and
+=.replace()=-d through =Original Label -> Preferred Label=.  The cached
+parquets (L2-wave and L2-country) keep the RAW strings.  Since =df9baf91=
+(GH #797) the kinship expansion (=Generation= / =Distance= / =Affinity=)
+runs AFTER this mapping, so it sees the Preferred Label.  The seven waves
+used to serve five vocabularies (32 distinct strings); they now serve one
+(17 labels).
+
+Column order is load-bearing: =_build_replace_dict= keys on the FIRST column
+that is not =Preferred Label=, so the raw label comes first.  The Original
+Label is the SERVED string -- after the wave/country formatter: the country
+formatter =_/ghanalss.py:Relationship= title-cases 2012-13 and 2016-17, and
+2005-06's wave formatter title-cases too -- NOT the =.dta= value label
+(=Child (Son/daughter)= in the file is =Child (Son/Daughter)= here).
+
+Two label variants, one key column.  =Preferred Label= is the default: the
+15-label Ghana vocabulary.  =Comparable Label= is selected with
+=household_roster(labels={'Relationship': 'Comparable'})= (GH #682's
+mechanism): the COMMON DENOMINATOR every GLSS form asked -- Head, Spouse,
+Child, Grandchild, Parent, Other relative, Non-relative, Servant -- for
+pooling across waves.  GLSS1/2's Sibling / Niece/nephew / Sibling-in-law /
+Child-in-law fold into =Other relative= (where GLSS3+ already put them),
+Tenant into =Non-relative= (GLSS5+ has no tenant code), the adopted code
+into =Child= (GLSS1-4 has no adopted code), Parent-in-law into =Parent=
+(GLSS5-7's parent code includes them).  Residual imbalance the coarse view
+cannot remove: GLSS3/4 put parents-in-law under "relative of head or
+spouse", so their =Parent= excludes in-laws while every other wave's
+includes them (14 / 16 people in GLSS1/2; unknowable in GLSS3/4).  Under
+the Comparable variant the kinship tuple follows the coarse label (a GLSS1
+sibling becomes =Other relative=, generation and distance null) -- which is
+the balanced reading, since GLSS3+ never distinguished them.
+
+Identity rows (Original == Preferred) exist ONLY where the Comparable
+column differs (Sibling, Niece/nephew, Tenant): =.replace()= leaves
+unmatched values alone, so a label that is canonical in BOTH variants
+(Head, Spouse, Child, Grandchild, Parent, Other relative, Servant) needs no
+row.  Do not add them.
+
+The vocabulary is ONE list shared with GhanaSPS (its country table maps onto
+the same labels; decided with @ligon 2026-09-07 -- a Ghana vocabulary, not a
+corpus one, because surveys elsewhere understand relationships differently):
+Head, Spouse, Child, Adopted/foster/stepchild, Child-in-law, Grandchild,
+Parent, Parent-in-law, Sibling, Sibling-in-law, Niece/nephew, Other relative,
+Non-relative, Servant, Tenant.  Every one is a =kinship.yml= key (the lookup
+tries =.title()= first: =Parent-in-law= -> =Parent-In-Law=).
+
+Tuple-preserving BY CONSTRUCTION, with ONE stated exception: every Original
+Label and its Preferred Label resolve to the same kinship tuple under
+=_expand_kinship='s lookup, checked on all 246,594 rows -- except the adopted
+row.  =Adopted Child= (GLSS5/6, 963 people; was [-1,0,consanguineal]) and
+=Adopted / Foster/ Step Child= (GLSS7, 501; was [-1,0,step]) are one label,
+=Adopted/foster/stepchild=, whose tuple is [-1, 0, null]: a child of the
+head, but whether by adoption, fostering or a step relation the instruments
+do not agree and the ontology has no =adoptive= affinity, so Affinity is
+null (the GH #698 shape, same as =Other relative='s Generation/Distance).
+Other decisions the table encodes:
+- =Parent/Parentlaw= (GLSS5/6) and =Parent/Parent-In-Law= (GLSS7) are ONE
+  survey code conflating parent and parent-in-law; served as =Parent= (tuple
+  unchanged); the conflation is recorded in CONTENTS.org like GLSS3+'s =Other
+  relative= absorbing siblings.  GLSS1/2's separate =Father/mother in-law= is
+  =Parent-in-law=.
+- =Other= (GLSS6 code 11, 14 people; distinct from code 10 =Non_relative=)
+  folds into =Non-relative=: tuple [0,0,unrelated] either way.
+- GLSS7's served =Non-Relative= (the country formatter title-cases the raw
+  =Non-relative=) needs its own row: =.replace()= is exact, and a capital R
+  is a different string.
+- =Househelp (Other relative)= (GLSS7 code 9) and =House help (Non-relative)=
+  (code 10) both carry [0,0,servant]; the annotation is not preserved.
+
+=Others not related= (GLSS1's wording) is =Non-relative= as of 2026-09-07;
+GLSS1/2's decode table (=relationship_glss1=) keeps the questionnaire wording
+and this table harmonizes it, so the decode stays verbatim.
+
+Raw code lists, for provenance (value labels read from the .dta, 2026-09-07):
+- GLSS5 (2005-06 =parta/sec1.dta:s1q3=): 1 head, 2 spouse, 3 child,
+  4 grandchild, 5 parent/parentlaw, 6 son/daughterlaw, 7 other relative,
+  8 adopted child, 9 househelp, 10 non_relative
+- GLSS6 (2012-13 =PARTA/SEC1.dta:s1q3=): 1 Head, 2 Spouse,
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/parentlaw,
+  6 Son/daughterlaw, 7 Other relative, 8 Adopted child, 9 Househelp,
+  10 Non_relative, 11 Other
+- GLSS7 (2016-17 =g7sec1.dta:s1q3=): 1 Head, 2 Spouse (Wife/Husband),
+  3 Child (Son/daughter), 4 Grandchild, 5 Parent/Parent-in-law,
+  6 Son/Daughter-in-law, 7 Other relative, 8 Adopted / Foster/ Step child,
+  9 Househelp (Other relative), 10 House help (Non-relative), 11 Non-relative
+- GLSS1/2: the fourteen-code table above; GLSS3/4: the nine-code wave tables.
+
+Prose stays ABOVE the =#+name:= line (Trap 4: a comment between the name and
+the table steals the name and the build reports success).
+#+name: relationship
+| Original Label               | Preferred Label          | Comparable Label |
+|------------------------------+--------------------------+------------------|
+| Wife/husband                 | Spouse                   | Spouse           |
+| Spouse (Wife/Husband)        | Spouse                   | Spouse           |
+| Son/daughter                 | Child                    | Child            |
+| Child (Son/Daughter)         | Child                    | Child            |
+| Adopted Child                | Adopted/foster/stepchild | Child            |
+| Adopted / Foster/ Step Child | Adopted/foster/stepchild | Child            |
+| Son/daughter in-law          | Child-in-law             | Other relative   |
+| Son/Daughterlaw              | Child-in-law             | Other relative   |
+| Son/Daughter-In-Law          | Child-in-law             | Other relative   |
+| Father/mother                | Parent                   | Parent           |
+| Parent/Parentlaw             | Parent                   | Parent           |
+| Parent/Parent-In-Law         | Parent                   | Parent           |
+| Father/mother in-law         | Parent-in-law            | Parent           |
+| Brother/sister in-law        | Sibling-in-law           | Other relative   |
+| Sibling                      | Sibling                  | Other relative   |
+| Niece/nephew                 | Niece/nephew             | Other relative   |
+| Other Relative               | Other relative           | Other relative   |
+| Others not related           | Non-relative             | Non-relative     |
+| Non-Relative                 | Non-relative             | Non-relative     |
+| Non_Relative                 | Non-relative             | Non-relative     |
+| Other                        | Non-relative             | Non-relative     |
+| Tenant                       | Tenant                   | Non-relative     |
+| Househelp                    | Servant                  | Servant          |
+| House Help (Non-Relative)    | Servant                  | Servant          |
+| Househelp (Other Relative)   | Servant                  | Servant          |
 
 * Units (Section 9B, GLSS7 / 2016-17)
 Stata value labels for the =s9bq*c= unit columns, lifted once from the full
@@ -122,13 +271,60 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 |   74 | Gram                          |
 |   99 | Other unit                    |
 
-# harmonize_education (GH #171): GhanaLSS attainment labels onto the canonical
-# ordinal levels.  Ghana ran TWO school systems: OLD (Primary P1-6, Middle M1-4,
-# Secondary S1-5/O-Level, Sixth Form L6/U6/A-Level) and NEW post-1987 (Primary,
-# JSS/JHS, SSS/SHS).  Basic-cycle completions (M4/Middle, JSS3) -> Lower secondary
-# complete; any senior-secondary completion (S5/O-Level, A-Level/Sixth Form,
-# SSS3/SHS) -> Upper secondary complete; 2016-17 'Year one..six' = tertiary years
-# (1-3 diploma, 4-5 Bachelor, 6+ Postgraduate).  Case-duplicated across waves.
+# harmonize_education (GH #171, #731): GhanaLSS attainment labels onto the
+# canonical ordinal levels.  Ghana ran TWO school systems: OLD (Primary P1-6,
+# Middle M1-4, Secondary S1-5/O-Level, Sixth Form/A-Level) and NEW post-1987
+# (Primary, JSS/JHS, SSS/SHS).  Basic-cycle completions (M4/Middle, JSS3) ->
+# Lower secondary complete; any senior-secondary completion (S5/O-Level,
+# A-Level/Sixth Form, SSS3/SHS) -> Upper secondary complete.
+#
+# WHO READS THIS TABLE (2026-09-02, GH #731).  Only the three LETTER-LADDER
+# waves resolve through it: 1987-88 and 1988-89 (Y03I.DAT:GRADE) and 1991-92
+# (S2.DTA:s2q2), via `mappings: [harmonize_education, ...]` in their
+# data_info.yml.  1998-99 maps its numeric s2aq2 codes inline in data_info.yml
+# and never touches this table.  2005-06, 2012-13 and 2016-17 each carry their
+# OWN `#+name: harmonize_education` in <wave>/_/categorical_mapping.org, which
+# SHADOWS this table wholesale for that wave: Wave.categorical_mapping
+# (country.py ~l.1006) is a plain dict.update over the country dict -- there is
+# no row-union at the country/wave boundary (the row-union in
+# _row_union_categorical, ~l.312, is global/country only).  A future wave must
+# therefore add its OWN wave table rather than lean on this one.
+#
+# WHY (GH #731): the label `U6` means two different things in the two
+# instruments.  GLSS1/2/3 ask "What was the highest class or form completed?"
+# and print the ladder  NONE / P1-P6 / M1-M4 / S1-S5 / A1 A2 / PS1-PS3 /
+# T1-T4 / U1-U8 / K (Koranic)  [+ JSS1-JSS3 in GLSS3] -- the sixth form is
+# A1/A2 and U1..U8 are YEARS OF UNIVERSITY, so U6 is the sixth university year
+# (GLSS1/GLSS2 household questionnaire, Section 3 block 3i printed p.6 col.7;
+# GLSS3 G3QPartA.pdf p.10, Section 2A Q2).  GLSS5/6/7 ask "What was the highest
+# grade completed?" and print  ... S5 / L6 / U6 / Voc-Tech / Teacher Training /
+# Nursing / Polytechnic / University [GLSS7: Year one .. Year six and above]
+# -- there U6 follows L6 and is UPPER SIXTH, a secondary rung (G5QPartA.pdf
+# p.11 codes 32/33; GLSS6 Part A questionnaire p.10 codes 33/34; GLSS7 Module A
+# codes 33/34).  This table used to list U6 TWICE (-> Upper secondary complete
+# at the top of the modern block, -> Postgraduate in the U1..U8 ladder);
+# _row_union_categorical's drop_duplicates(keep='first') silently kept the
+# first, so the 13 GLSS1/2/3 people with U6 (1 / 4 / 8) were delivered as
+# Upper secondary complete.  Now: U6 -> Postgraduate here, alongside U5/U7/U8;
+# the modern waves' U6 -> Upper secondary complete lives in their wave tables.
+# Measured 2026-09-02: slurm_logs/ghana_audit/u6_measure_731.out (raw labels
+# per wave) and api_{before,after}_731.out (delivered counts).
+#
+# NOT settled here, deliberately: U1..U4 -> Bachelor.  The letter codes are
+# YEARS COMPLETED, and the same instruments ask the qualification separately
+# (GLSS3 Q3 "highest educational level attained": Bachelor=9, Master=10,
+# Doctorate=11; GLSS2 col.10 "highest diploma obtained": BACHELOR=10,
+# MASTER=11, DOCTORATE=12), so a completed U1..U3 is "some university" with no
+# canonical rung of its own.  GhanaSPS reads its Level 100..300 as Tertiary
+# certificate/diploma (PR #728).  Left as found; see CONTENTS.org Trap 7.
+#
+# ROW LAYOUT.  The rows the letter ladder needs are: NONE / None / none, B
+# (GLSS1/2 never-attended skip code), K, P1-P6, M1-M4, S1-S5, A1, A2, PS1-PS3,
+# T1-T4, U1-U8, JSS1-JSS3.  Every other row (lowercase GLSS5 labels,
+# 'JSS3/JHS3', 'SSS3/SHS3', 'Year one..', 'L6', 'u6', 'Sixth Form', ...) is
+# GLSS5/6/7 vocabulary that is INERT since 2026-09-02 -- shadowed by the wave
+# tables and never emitted by GLSS1/2/3.  They are kept as documentation of the
+# modern vocabulary only; pruning them is a follow-up, not done in GH #731.
 #+name: harmonize_education
 | Original Label          | Preferred Label              |
 |-------------------------+------------------------------|
@@ -204,7 +400,6 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | tech training           | Vocational/Technical         |
 | Technical               | Vocational/Technical         |
 | u6                      | Upper secondary complete     |
-| U6                      | Upper secondary complete     |
 | university              | Bachelor                     |
 | University              | Bachelor                     |
 | voc                     | Vocational/Technical         |
@@ -216,6 +411,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Year six and above      | Postgraduate                 |
 | Year three              | Tertiary certificate/diploma |
 | Year two                | Tertiary certificate/diploma |
+| NONE                    | No education                 |
 | K                       | Informal                     |
 | A1                      | Upper secondary complete     |
 | A2                      | Upper secondary complete     |
@@ -241,6 +437,17 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 
 * Housing (Roof / Floor) -- canonical harmonization (GH #170)
 
+The wave-level =mapping:= blocks in each =data_info.yml= normalise the
+GLSS value labels to one spelling per category; these two tables then
+fold that spelling onto =canonical_housing_labels.org=.  Since 2026-09-02
+(GH #727) the canon carries =Bamboo= and =Terrazzo= as labels of their
+own, so =Bamboo= (roof; was *Wood*) and =Terrazzo= (floor; was
+*Concrete*) target them -- 60 / 110 / 42 bamboo roofs and 74 / 154 / 155
+terrazzo floors in 2005-06 / 2012-13 / 2016-17 (the GLSS3-4 label sets
+carry neither).  Compound =Cement/Concrete= stays *Concrete* (ruling
+restated under #727).  Prose stays ABOVE the =#+name:= lines: the org
+parser attaches a name to the next table and skips nothing in between.
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
@@ -249,7 +456,7 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Cement/Concrete    | Concrete        |
 | Roofing Tiles      | Clay Tiles      |
 | Thatch             | Thatch          |
-| Bamboo             | Wood            |
+| Bamboo             | Bamboo          |
 | Mud/Earth          | Mud             |
 | Wood               | Wood            |
 | Other              | Other           |
@@ -261,10 +468,276 @@ the full file.  Code -> native label; canonicalized to Preferred Label through
 | Earth/Mud            | Earth           |
 | Ceramic/Marble Tiles | Tiles           |
 | Vinyl Tiles          | Vinyl/Linoleum  |
-| Terrazzo             | Concrete        |
+| Terrazzo             | Terrazzo        |
 | Burnt Bricks         | Bricks          |
 | Stone                | Stone           |
 | Stone/Brick          | Stone           |
 | Wood                 | Wood            |
 | Fibre-glass          | Other           |
 | Other                | Other           |
+
+* harmonize_food (the j axis) -- migrated from food_items.org (GH #783)
+
+Canonical country-level food-item label table for the =j= axis, migrated
+verbatim from the retired standalone =_/food_items.org= (=#+name:
+food_label=) by GH #783.  Same migration Tanzania and Ethiopia already
+completed as "Unit #0"
+(=slurm_logs/2026-06-13_wb_incidence_map/PARITY_LOOP_DESIGN.md=).
+
+*Why it had to move rather than be renamed in place.*
+=Country.categorical_mapping= reads the global
+=lsms_library/categorical_mapping/*.org= and this file, and *never opens
+=food_items.org= under any table name*.  So 205 curated labels -- more
+than Uganda's 175 or Malawi's 147 -- were invisible to every name-keyed
+mechanism, and =labels== (=Country._relabel_j=, which resolves a table
+called =food_items= or =harmonize_food= from =Country.categorical_mapping=)
+raised =LabelUnavailableError= for GhanaLSS.
+
+*Columns -- all eight carried across unchanged:*
+- =Preferred Label= :: the canonical cross-wave label; the key
+  =_relabel_j= renames FROM, and the key =nutrition= joins on.
+- =1987-88= =1988-89= =1991-92= =1998-99= =2005-06= =2012-13= =2016-17= ::
+  one column per GLSS round, holding that round's own raw item label.
+- =FCT Code= :: the FAO/INFOODS West African Food Composition Table key
+  (=_/fct_west_africa.org=), written by
+  =slurm_logs/ghana_audit/build_fct_code_column.py= and consumed by
+  =_/nutrition.py::_load_food_codes= -- the single live reader, repointed
+  here.  It is the only unique contribution the standalone file made.
+
+Dropped in the move: only the retired file's trailing =#+begin_src python=
+block, which tangled =unitlabels.py= from a table named =unitlabels= that
+does not exist anywhere in that file (it evaluated to =#+results: : None=).
+
+*No =Aggregate Label= column, deliberately.*  The seven WAVE-level
+=harmonize_food= tables do carry one, but they cannot simply be unioned:
+measured, 14 Preferred Labels take two different Aggregate values across
+waves (=Palm Nut= -> {=Palm Nut=, =Pulses, Nuts=}; =Snail= -> {=Fish=,
+=Snail=}; =Beef (corned)= -> {=Beef=, =Corned Beef=}; ...), 9 of this
+table's 195 distinct Preferred Labels appear in no wave table at all, and
+one wave value carries mojibake (=Cooked Rice and Stew Ê Ê=).  Choosing
+among those is curation requiring the CFE beta-spread test
+(=max(beta) - min(beta) < 1.348 * sigma_min=), not a mechanical move; see
+=.claude/skills/add-feature/food-acquired/SKILL.md=.  So =labels='Aggregate'=
+still raises here, correctly, while every other column now resolves.
+
+*Wave-level shadowing, on the record (GH #783 scope item 3).*
+=Wave.categorical_mapping= is =dict(country)= then =.update(wave)=, so in
+each of the seven waves that declare their own =harmonize_food= the WAVE
+table replaces this one WHOLE-TABLE at wave level -- not a row union (that
+is =_ADDITIVE_CATEGORICAL_TABLES=, which applies only to the global ->
+country merge).  That is the intended semantics -- country level unless
+overridden by wave -- and is left unchanged.  It cannot affect =labels==:
+=_relabel_j= resolves from =Country.categorical_mapping=, which never opens
+a wave directory.  The two consumers therefore want different columns from
+one name and each gets them from the level it asks at: =nutrition= and
+=labels== read =FCT Code= / the per-round columns here, while each wave's
+=food_acquired.py= reads its own =Code_9b= / =Label_9b= there.
+
+#+name: harmonize_food
+| Preferred Label                      | 1987-88                        | 1988-89                        | 1991-92                        | 1998-99                        | 2005-06                      | 2012-13                      | 2016-17                       | FCT Code |
+|--------------------------------------+--------------------------------+--------------------------------+--------------------------------+--------------------------------+------------------------------+------------------------------+-------------------------------+----------|
+| Agushie Seed                         |                                |                                |                                |                                |                              |                              | Agushie Seed                  | 06_009   |
+| Akpeteshie                           |                                |                                | Akpeteshie                     | Akpeteshie                     | Akpeteshie                   | Akpeteshie                   | Akpeteshie                    | 12_006   |
+| Animals Fat                          |                                |                                | Animals Fat                    | Animals Fat                    |                              |                              |                               | 11_011   |
+| Apple                                |                                |                                |                                |                                |                              |                              | Apple                         | 05_026   |
+| Avocado                              | Avocado                        | Avocado                        | Avocado                        | Avocado                        | Avocado                      | Avocado                      | Avocado                       | 05_002   |
+| Baby Milk                            |                                |                                | Baby Milk                      | Baby Milk                      |                              |                              |                               | 10_011   |
+| Bambara Bean                         |                                |                                | Bambara Bean                   | Bambara Bean                   | Bambara Bean                 | Bambara Bean                 | Bambara Bean                  | 03_001   |
+| Banana                               | Banana                         | Banana                         | Banana                         | Banana                         | Banana                       | Banana                       | Banana                        | 05_003   |
+| Banku                                |                                |                                | Banku                          | Banku                          |                              |                              |                               | 01_099   |
+| Bean                                 |                                |                                |                                |                                | Bean                         | Bean                         |                               | 03_004   |
+| Beef                                 | Beef                           | Beef                           | Beef                           | Beef                           | Beef                         | Beef                         | Beef                          | 07_014   |
+| Beef (corned)                        |                                |                                | Beef (corned)                  |                                | Beef (corned)                | Beef (corned)                | Beef (corned)                 | 07_025   |
+| Beef (face)                          |                                |                                |                                |                                |                              |                              | Beef (face)                   | 07_014   |
+| Beef (leg)                           |                                |                                |                                |                                |                              |                              | Beef (leg)                    | 07_016   |
+| Beef (offal)                         |                                |                                |                                |                                |                              |                              | Beef (offal)                  | 07_021   |
+| Beef (steak)                         |                                |                                |                                |                                |                              |                              | Beef (steak)                  | 07_016   |
+| Beer                                 |                                |                                | Beer                           | Beer                           | Beer                         | Beer                         | Beer                          | 12_001   |
+| Biscuit                              | Biscuit                        | Biscuit                        | Biscuit                        | Biscuit                        | Biscuit                      | Biscuit                      | Biscuit                       | 01_188   |
+| Bitters                              |                                |                                |                                |                                |                              |                              | Bitters                       | 12_006   |
+| Bread                                |                                |                                | Bread                          | Bread                          | Bread                        | Bread                        | Bread                         | 01_046   |
+| Broad Bean                           |                                |                                | Broad Bean                     | Broad Bean                     |                              |                              |                               | 03_024   |
+| Cabbage                              | Cabbage                        | Cabbage                        | Cabbage                        | Cabbage                        | Cabbage                      | Cabbage                      | Cabbage                       | 04_005   |
+| Canned Fruits                        |                                |                                | Canned Fruits                  | Canned Fruits                  | Canned Fruits                | Canned Fruits                | Canned Fruits                 | 05_017   |
+| Carrot                               |                                |                                |                                | Carrot                         | Carrot                       | Carrot                       | Carrot                        | 04_006   |
+| Cashew                               |                                |                                |                                |                                |                              |                              | Cashew                        | 06_001   |
+| Cassava                              |                                |                                | Cassava                        | Cassava                        |                              |                              |                               | 02_001   |
+| Cassava (dough)                      | Cassava (dough)                | Cassava (dough)                | Cassava (dough)                | Cassava (dough)                | Cassava (dough)              | Cassava (dough)              | Cassava (dough)               | 02_041   |
+| Cassava (dried)                      |                                |                                |                                |                                |                              |                              | Cassava (dried)               | 02_002   |
+| Cassava (flour)                      | Cassava (flour)                | Cassava (flour)                | Cassava (flour)                | Cassava (flour)                | Cassava (flour)              | Cassava (flour)              |                               | 02_004   |
+| Cassava                              | Cassava (fresh)                | Cassava (fresh)                |                                |                                | Cassava (fresh)              | Cassava (fresh)              | Cassava (fresh)               | 02_001   |
+| Cassava (flour)                      |                                |                                |                                |                                |                              |                              | Cassava (white, flour)        | 02_004   |
+| Cassava (flour)                      |                                |                                |                                |                                |                              |                              | Cassava (yellow, flour)       | 02_004   |
+| Cerelac (Baby food)                  |                                |                                |                                |                                | Cerelac (Baby food)          | Cerelac (Baby food)          | Cerelac (Baby food)           | 10_011   |
+| Chewing Gum                          |                                |                                |                                |                                |                              |                              | Chewing Gum                   |          |
+| Chicken (breast)                     |                                |                                |                                |                                |                              |                              | Chicken (breast)              | 07_031   |
+| Chicken                              | Chicken                        | Chicken                        | Chicken                        | Chicken                        | Chicken (live)               | Chicken (live)               | Chicken (broiler)             | 07_030   |
+| Chicken (frozen)                     |                                |                                |                                |                                |                              |                              | Chicken (frozen)              | 07_030   |
+| Chicken (gizzard)                    |                                |                                |                                |                                |                              |                              | Chicken (gizzard)             | 07_039   |
+| Chicken (live)                       |                                |                                |                                |                                |                              |                              | Chicken (live)                | 07_030   |
+| Chicken (thigh)                      |                                |                                |                                |                                |                              |                              | Chicken (thigh)               | 07_030   |
+| Chicken (wing)                       |                                |                                |                                |                                |                              |                              | Chicken (wing)                | 07_030   |
+| Chilli Powder (black pepper)         |                                |                                |                                |                                | Chilli Powder (black pepper) | Chilli Powder (black pepper) | Chilli Powder (black pepper)  | 13_006   |
+| Chocolate                            |                                |                                | Chocolate Drink                | Chocolate Drink                | Chocolate                    | Chocolate                    | Chocolate                     | 13_021   |
+| Cigarette                            |                                |                                | Cigarette                      | Cigarette                      | Cigarrette                   |                              | Cigarette                     |          |
+| Cocoa Powder                         |                                |                                |                                |                                |                              |                              | Cocoa (milk powder beverages) | 13_028   |
+| Cocoa Powder                         |                                |                                |                                |                                | Cocoa Powder                 | Cocoa Powder                 | Cocoa Powder                  | 13_028   |
+| Coconut (dried)                      |                                |                                |                                |                                |                              |                              | Coconut (dried)               | 06_005   |
+| Coconut (fresh)                      | Coconut                        | Coconut                        | Coconut                        | Coconut                        | Coconut (fresh)              | Coconut (fresh)              | Coconut (fresh)               | 06_002   |
+| Cocoyam                              | Cocoyam                        | Cocoyam                        | Cocoyam                        | Cocoyam                        | Cocoyam                      | Cocoyam                      | Cocoyam                       | 02_005   |
+| Cocoyam Leaves                       |                                |                                | Cocoyam Leaves                 | Coffee                         | Cocoyam Leaves               | Cocoyam Leaves               | Cocoyam Leaves                | 04_009   |
+| Coffee                               |                                |                                | Coffee                         |                                | Coffee                       | Coffee                       | Coffee                        | 12_009   |
+| Cola Nut                             |                                |                                |                                |                                | Cola Nut                     | Cola Nut                     |                               | 06_019   |
+| Condiment                            | Condiment                      | Condiment                      |                                |                                | Condiment                    | Condiment                    | Condiment                     | 13_008   |
+| Confectionary (not frozen)           |                                |                                | Confectionary (not frozen)     | Confectionary (not frozen)     |                              |                              |                               |          |
+| Cooked Rice and Stew                 |                                |                                | Cooked Rice and Stew           | Cooked Rice and Stew           | Cooked Rice and Stew         | Cooked Rice and Stew         |                               |          |
+| Corflake                             |                                |                                |                                |                                |                              |                              | Corflake                      | 01_182   |
+| Couscous                             |                                |                                |                                |                                |                              |                              | Couscous                      | 01_043   |
+| Cowpea                               |                                |                                | Cowpea                         | Cowpea                         | Cowpea                       | Cowpea                       | Cowpea                        | 03_004   |
+| Crab                                 |                                |                                |                                |                                |                              |                              | Crab                          | 09_055   |
+| Curry Power                          |                                |                                |                                |                                |                              |                              | Curry Power                   | 13_022   |
+| Crustacean                           |                                |                                | Crustaceans                    | Crustaceans                    | Crustaceans                  | Crustaceans                  |                               |          |
+| Dawadawa                             |                                |                                | Dawadawa                       | Dawadawa                       |                              | Dawadawa                     | Dawadawa                      | 03_009   |
+| Dove/Pigeon                          | Dove/pigeon                    | Dove/pigeon                    |                                |                                |                              |                              |                               |          |
+| Duck                                 | Duck                           | Duck                           | Duck                           | Duck                           |                              |                              |                               |          |
+| Egg                                  | Egg                            | Egg                            | Egg                            | Egg                            | Egg                          | Egg                          | Egg                           | 08_001   |
+| Eggplant                             | Eggplant                       | Eggplant                       | Eggplant/Cucumber              | Eggplant/Cucumber              | Eggplant                     | Eggplant                     | Eggplant                      | 04_074   |
+| Eggplant Leaf                        |                                |                                |                                |                                |                              |                              | Eggplant Leaf                 | 04_013   |
+| Emotuo                               | Emotuo                         | Emotuo                         |                                |                                |                              |                              |                               |          |
+| Fast Food                            |                                |                                |                                |                                | Fast Food                    | Fast Food                    |                               |          |
+| Fish (fresh and frozen)              | Fish                           | Fish                           |                                |                                |                              |                              |                               | 09_003   |
+| Fish (canned)                        |                                |                                | Fish (canned)                  | Fish (canned)                  | Fish (canned)                | Fish (canned)                | Fish (canned)                 | 09_110   |
+| Fish (dried)                         |                                |                                | Fish (dried)                   | Fish (dried)                   | Fish (dried)                 | Fish (dried)                 | Fish (dried)                  | 09_053   |
+| Fish (fresh and frozen)              |                                |                                | Fish (fresh and frozen)        | Fish (fresh and frozen)        | Fish (fresh and frozen)      | Fish (fresh and frozen)      |                               | 09_003   |
+| Fish (fried)                         |                                |                                | Fish (fried)                   | Fish (fried)                   | Fish (fried)                 | Fish (fried)                 | Fish (fried)                  | 09_003   |
+| Fish (salted)                        |                                |                                |                                |                                | Fish (salted)                | Fish (salted)                | Fish (salted)                 | 09_053   |
+| Fish (smoked)                        |                                |                                | Fish (smoked)                  | Fish (smoked)                  | Fish (smoked)                | Fish (smoked)                | Fish (smoked, river)          | 09_053   |
+| Fish (smoked)                        |                                |                                |                                |                                |                              |                              | Fish (smoked, sea)            | 09_053   |
+| Garlic                               |                                |                                |                                |                                |                              |                              | Garlic                        | 04_015   |
+| Gin                                  |                                |                                | Gin                            | Gin                            |                              |                              | Gin                           | 12_006   |
+| Ginger                               |                                |                                |                                |                                | Ginger                       | Ginger                       | Ginger                        | 04_082   |
+| Goat                                 | Mutton                         | Mutton                         | Goat                           | Goat                           | Goat                         | Goat                         | Goat                          | 07_069   |
+| Grape                                |                                |                                |                                |                                |                              |                              | Grape                         | 05_051   |
+| Groundnut                            | Groundnut                      | Groundnut                      | Groundnut                      | Groundnut                      | Groundnut                    | Groundnut                    | Groundnut                     | 06_010   |
+| Guinea Corn                          |                                |                                | Guinea Corn                    | Guinea Corn                    |                              |                              |                               | 01_039   |
+| Guinea Fowl                          |                                |                                | Guinea Fowl                    | Guinea Fowl                    |                              |                              | Guineafowl                    | 07_070   |
+| Guinea Corn/Sorghum                  |                                |                                | Guinea corn/sorghum            | Guinea corn/sorghum            | Guinea corn/sorghum          | Guinea corn/sorghum          | Guinea corn/sorghum           | 01_039   |
+| Herring (smoked)                     |                                |                                |                                |                                |                              |                              | Herring (smoked)              | 09_053   |
+| Honey                                |                                |                                | Honey                          | Honey                          | Honey                        | Honey                        | Honey                         | 13_001   |
+| Ice Cream                            |                                |                                | Ice Cream                      | Ice Cream                      | Ice Cream                    | Ice Cream                    | Ice Cream                     | 13_021   |
+| Instant Noodle                       |                                |                                |                                |                                |                              |                              | Instant Noodle                | 01_077   |
+| Jam                                  |                                |                                | Jam                            | Jam                            |                              |                              |                               | 13_023   |
+| Juice                                |                                |                                | Juice                          | Juice                          | Juice                        | Juice                        | Juice                         | 12_012   |
+| Jute Leaf                            |                                |                                |                                |                                |                              |                              | Jute Leaf                     | 04_038   |
+| Kapla                                |                                |                                |                                |                                |                              |                              | Kapla                         | 01_099   |
+| Kenkey/Banku                         | Kenkey                         | Kenkey                         | Kenkey                         | Kenkey                         | Kenkey/Banku                 | Kenkey/Banku                 |                               |          |
+| Koko                                 |                                |                                | Koko                           | Koko                           |                              |                              |                               |          |
+| Kola Nut                             |                                |                                | Kola Nut                       | Kola Nut                       |                              |                              |                               | 06_019   |
+| Konkonte                             |                                |                                | Konkonte                       | Konkonte                       |                              |                              |                               |          |
+| Lime                                 |                                |                                |                                |                                |                              |                              | Lime                          | 05_014   |
+| Macaroni/Spaghetti                   | Macaroni/Spaghetti             | Macaroni/Spaghetti             |                                |                                |                              |                              | Macaroni                      | 01_052   |
+| Mackerel (processed)                 |                                |                                |                                |                                |                              |                              | Mackerel (processed)          | 09_109   |
+| Maize                                | Maize                          | Maize                          | Maize                          | Maize                          |                              |                              |                               | 01_014   |
+| Maize (cob)                          |                                |                                | Maize (cob)                    | Maize (cob)                    | Maize (cob)                  | Maize (cob)                  | Maize (cob)                   | 04_076   |
+| Maize (flour/dough)                  |                                |                                | Maize (flour/dough)            | Maize (flour/dough)            | Maize (flour/dough)          | Maize (flour/dough)          | Maize (flour/dough)           | 01_081   |
+| Maize (grain)                        |                                |                                |                                |                                |                              |                              | Maize (grain)                 | 01_057   |
+| Maizena                              |                                |                                |                                |                                |                              |                              | Maizena                       | 01_081   |
+| Malt Drinks (bottle)                 |                                |                                |                                |                                | Malt Drinks (bottle)         | Malt Drinks (bottle)         | Malt Drinks (bottle)          | 12_024   |
+| Malt Drinks (canned)                 |                                |                                |                                |                                |                              |                              | Malt Drinks (canned)          | 12_024   |
+| Mango                                | Mango                          | Mango                          | Mango                          | Mango                          | Mango                        | Mango                        | Mango                         | 05_015   |
+| Margarine                            | Margarine                      | Margarine                      | Margarine                      | Margarine                      | Margarine                    | Margarine                    | Margarine                     | 11_006   |
+| Milk (evaporated)                    | Milk (evaporated)              |                                |                                |                                | Milk (evaporated)            | Milk (evaporated)            | Milk (evaporated)             | 10_016   |
+| Milk (fresh)                         | Milk                           | Milk                           | Milk (fresh)                   | Milk (fresh)                   | Milk (fresh)                 | Milk (fresh)                 | Milk (fresh)                  | 10_029   |
+| Milk (powder)                        |                                |                                | Milk (powder)                  | Milk (powder)                  | Milk (powdered)              | Milk (powdered)              | Milk (powdered)               | 10_002   |
+| Milk (tinned, condensed/unsweetened) |                                |                                | Milk (tinned, unsweetened)     | Milk (tinned, unsweetened)     | Milk (tinned, condensed)     | Milk (tinned, condensed)     | Milk (tinned, condensed)      | 10_016   |
+| Millet                               | Millet                         | Millet                         | Millet                         | Millet                         | Millet                       | Millet                       | Millet                        | 01_095   |
+| Millet (flour)                       |                                |                                | Millet (flour)                 | Millet (flour)                 | Millet (flour)               | Millet (flour)               | Millet (flour)                | 01_063   |
+| Oil (coconut)                        |                                |                                | Oil (coconut)                  | Oil (coconut)                  | Oil (coconut)                | Oil (coconut)                | Oil (coconut)                 | 11_002   |
+| Oil (groundnut)                      |                                |                                | Oil (groundnut)                | Oil (groundnut)                | Oil (groundnut)              | Oil (groundnut)              | Oil (groundnut)               | 11_003   |
+| Oil (palm kernel)                    |                                |                                | Oil (palm kernel)              | Oil (palm kernel)              | Oil (palm kernel)            | Oil (palm kernel)            | Oil (palm kernel)             | 11_012   |
+| Oil (palm)                           | Oil (palm)                     | Oil (palm)                     | Oil (red palm)                 | Oil (red palm)                 | Oil (palm)                   | Oil (palm)                   | Oil (palm)                    | 11_004   |
+| Okra                                 | Okra                           | Okra                           | Okra                           | Okra                           | Okra                         | Okra                         | Okra                          | 04_017   |
+| Onion                                | Onion                          | Onion                          | Onion                          | Onion                          | Onion                        | Onion                        | Onion                         | 04_018   |
+| Orange                               | Orange                         | Orange                         | Orange                         | Orange                         | Orange                       | Orange                       | Orange                        | 05_016   |
+| Other Alcoholic Beverages            | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages      | Other Alcoholic Beverages    | Other Alcoholic Beverages    | Other Alcoholic Beverages     | 12_006   |
+| Other Beverages                      | Other Beverages                | Other Beverages                | Other Beverages                | Other Beverages                | Other Beverages              | Other Beverages              | Other Beverages               | 12_024   |
+| Other Canned Vegetables              |                                |                                | Other Canned Vegetables        |                                |                              |                              |                               |          |
+| Other Cereal                         |                                |                                |                                |                                | Other Cereal                 | Other Cereal                 | Other Cereal                  | 01_182   |
+| Other Condiments & Spices            |                                |                                | Other Condiments & Spices      | Other Condiments & Spices      |                              |                              |                               |          |
+| Other Confectioneries                |                                |                                |                                |                                | Other Confectioneries        | Other Confectioneries        |                               |          |
+| Other Domestic Poultry               |                                |                                |                                |                                | Other Domestic Poultry       | Other Domestic Poultry       | Other Domestic Poultry        | 07_030   |
+| Other Drinks                         |                                |                                | Other Drink                    | Other Drink                    |                              |                              |                               |          |
+| Other Eggs                           |                                |                                | Other Eggs                     | Other Eggs                     |                              |                              |                               |          |
+| Other Fish                           |                                |                                | Other Fish                     | Other Fish                     | Other Fish                   | Other Fish                   | Other Fish                    | 09_003   |
+| Other Flours                         |                                |                                | Other Flours                   | Other Flours                   | Other Flours                 | Other Flours                 | Other Flours                  | 01_043   |
+| Other Fruits                         | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                   | Other Fruits                 | Other Fruits                 | Other Fruits                  | 05_017   |
+| Other Grains                         |                                |                                |                                | Other Grains                   | Other Grains                 | Other Grains                 | Other Grains                  | 01_039   |
+| Other Leafy Vegetables               | Other Leafy Vegetable          | Other Leafy Vegetable          |                                |                                | Other Leafy Vegetable        | Other Leafy Vegetable        | Other Leafy Vegetable         | 04_131   |
+| Other Meat                           | Other Meat                     | Other Meat                     | Other Meat                     | Other Meat                     | Other Meat                   | Other Meat                   | Other Meat                    | 07_069   |
+| Other Milk Products                  | Milk product                   | Milk product                   | Other Milk Products            | Other Milk Products            | Other Milk Products          | Other Milk Products          | Other Milk Products           | 10_028   |
+| Other Miscellaneous Food Items       | Other Miscellaneous Food Items | Other Miscellaneous Food Items | Other Miscellaneous Food Items | Other Miscellaneous Food Items |                              |                              |                               |          |
+| Other Nuts/Seeds                     |                                |                                |                                |                                |                              | Other Nut/Seed               | Other Nut/Seed                | 06_010   |
+| Other Oil Seeds                      |                                |                                | Other Oil Seeds                | Other Oil Seeds                |                              |                              |                               | 06_009   |
+| Other Oils                           | Other Oils                     | Other Oils                     | Other Oils                     | Other Oils                     | Other Oils                   | Other Oils                   | Other Oils                    | 11_009   |
+| Other Poultry                        | Other Poultry                  | Other Poultry                  | Other Poultry                  | Other Poultry                  |                              |                              |                               | 07_030   |
+| Other Prepared Meals                 | Other Prepared Meals           | Other Prepared Meals           | Other Prepared Meals           | Other Prepared Meals           | Other Prepared Meals         | Other Prepared Meals         |                               |          |
+| Other Pulses                         | Other Pulses                   | Other Pulses                   | Other Pulses                   | Other Pulses                   | Other Pulses                 | Other Pulses                 | Other Pulses                  | 03_004   |
+| Other Spices                         |                                |                                |                                |                                |                              |                              | Other Spices                  | 13_016   |
+| Other Spirits                        |                                |                                |                                |                                | Other Spirits                | Other Spirits                | Other Spirits                 | 12_006   |
+| Other Starchy Products               |                                |                                | Other Starchy Products         | Other Starchy Products         |                              |                              |                               |          |
+| Other Tobacco                        |                                |                                | Other Tobacco                  | Other Tobacco                  | Other Tobacco                | Other Tobacco                | Other Tobacco                 |          |
+| Other Tubers                         |                                |                                | Other Tubers                   | Other Tubers                   | Other Tubers                 | Other Tubers                 | Other Tubers                  | 02_015   |
+| Other Vegetables                     | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables               | Other Vegetables             | Other Vegetables             | Other Vegetables              | 04_005   |
+| Palm Nut                             | Palm Nut                       | Palm Nut                       | Palm Nut                       | Palm Nut                       | Palm Nut                     | Palm Nut                     | Palm Nut                      | 06_029   |
+| Pawpaw                               | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                         | Pawpaw                       | Pawpaw                       | Pawpaw                        | 05_017   |
+| Pepper                               |                                |                                | Pepper                         | Pepper                         | Pepper                       | Pepper                       | Pepper (fresh)                | 04_046   |
+| Pepper (dried)                       |                                |                                | Pepper (dry)                   | Pepper (dry)                   |                              |                              | Pepper (dried, red)           | 13_006   |
+| Pepper (powder)                      |                                |                                |                                |                                |                              |                              | Pepper (powder)               | 13_006   |
+| Pineapple                            | Pineapple                      | Pineapple                      | Pineapple                      | Pineapple                      | Pineapple                    | Pineapple                    | Pineapple                     | 05_018   |
+| Plantain                             | Plantain                       | Plantain                       | Plantain                       | Plantain                       | Plantain                     | Plantain                     | Plantain                      | 02_042   |
+| Pork                                 | Pork                           | Pork                           | Pork                           | Pork                           | Pork                         | Pork                         | Pork                          | 07_006   |
+| Pork (feet)                          |                                |                                |                                |                                |                              |                              | Pork (feet)                   | 07_005   |
+| Pork (fillet)                        |                                |                                |                                |                                |                              |                              | Pork (fillet)                 | 07_071   |
+| Pork (rib)                           |                                |                                |                                |                                |                              |                              | Pork (rib)                    | 07_005   |
+| Pork (shoulder)                      |                                |                                |                                |                                |                              |                              | Pork (shoulder)               | 07_006   |
+| Potato/Sweet Potato                  | Potato/Sweet Potato            | Potato/Sweet Potato            |                                |                                |                              |                              | Potato                        | 02_009   |
+| Rice                                 | Rice                           | Rice                           | Rice                           | Rice                           | Rice (imported)              | Rice (imported)              | Rice (imported)               | 01_037   |
+| Rice                                 |                                |                                |                                |                                | Rice (local)                 | Rice (local)                 | Rice (local)                  | 01_037   |
+| Salmon (smoked)                      |                                |                                |                                |                                |                              |                              | Salmon (smoked)               | 09_053   |
+| Salt                                 | Salt                           | Salt                           | Salt                           | Salt                           | Salt                         | Salt                         | Salt                          | 13_015   |
+| Sausage (beef)                       |                                |                                |                                |                                |                              |                              | Sausage (beef)                | 07_063   |
+| Sausage (chicken)                    |                                |                                |                                |                                |                              |                              | Sausage (chicken)             | 07_063   |
+| Sausage (pork)                       |                                |                                |                                |                                |                              |                              | Sausage (pork)                | 07_063   |
+| Schnapps                             |                                |                                |                                |                                | Schnapps                     | Schnapps                     | Schnapps                      | 12_006   |
+| Shallot                              |                                |                                |                                |                                |                              |                              | Shallot                       | 04_018   |
+| Shea Butter                          |                                |                                | Shea Butter                    | Shea Butter                    | Shea Butter                  | Shea Butter                  | Shea Butter                   | 11_008   |
+| Shrimp                               |                                |                                |                                |                                |                              |                              | Shrimp                        | 09_059   |
+| Small Bean                           |                                |                                | Small Bean                     | Small Bean                     |                              |                              |                               |          |
+| Snail                                |                                |                                | Snail                          |                                | Snail                        | Snail                        | Snail                         | 07_083   |
+| Soft Drinks                          |                                |                                | Soft Drinks                    | Soft Drinks                    | Soft Drinks                  | Soft Drinks                  | Soft Drinks                   | 12_024   |
+| Sorghum                              |                                |                                | Sorghum                        | Sorghum                        |                              |                              |                               | 01_039   |
+| Soup                                 | Soup                           | Soup                           | Soup                           | Soup                           | Soup                         | Soup                         |                               |          |
+| Soybean                              |                                |                                |                                |                                | Soybean                      | Soybean                      | Soybean                       | 03_008   |
+| Macaroni/Spaghetti                   |                                |                                |                                |                                |                              |                              | Spaghetti                     | 01_052   |
+| Spinach                              | Spinach                        | Spinach                        | Spinach                        | Spinach                        | Spinach                      | Spinach                      | Spinach                       | 04_057   |
+| Sugar                                | Sugar                          | Sugar                          | Sugar                          | Sugar                          | Sugar                        | Sugar                        | Sugar (cubed)                 | 13_002   |
+| Sugar                                |                                |                                |                                |                                |                              |                              | Sugar (granulated)            | 13_002   |
+| Sweet Pepper                         |                                |                                |                                |                                |                              |                              | Sweet Pepper                  | 04_047   |
+| Potato/Sweet Potato                  |                                |                                | Sweet Potato                   | Sweet Potato                   | Sweet Potato                 | Sweet Potato                 | Sweet Potato                  | 02_009   |
+| Taro                                 |                                |                                |                                |                                |                              |                              | Taro                          | 02_015   |
+| Tea                                  |                                |                                | Tea                            | Tea                            | Tea                          | Tea                          | Tea                           | 12_008   |
+| Tilapia                              |                                |                                |                                |                                |                              |                              | Tilapia                       | 09_041   |
+| Tobacco                              |                                |                                | Tobacco                        | Tobacco                        | Tobacco                      | Tobacco                      | Tobacco                       |          |
+| Tomato (fresh)                       | Tomato (fresh)                 | Tomato (fresh)                 | Tomato                         | Tomato                         | Tomato (fresh)               | Tomato (fresh)               | Tomato (fresh)                | 04_021   |
+| Tomato (paste)                       | Tomato (paste)                 | Tomato (paste)                 | Tomato Puree                   |                                | Tomato (paste)               | Tomato (paste)               | Tomato (paste)                | 04_066   |
+| Tuna (processed)                     |                                |                                |                                |                                |                              |                              | Tuna (processed)              | 09_111   |
+| Vinegar                              |                                |                                |                                |                                |                              |                              | Vinegar                       | 13_003   |
+| Water                                |                                |                                |                                |                                | Water                        | Water                        | Water                         | 12_019   |
+| Water Yam                            |                                |                                |                                |                                |                              |                              | Water Yam                     | 02_017   |
+| Watermelon                           |                                |                                | Watermelon                     | Watermelon                     | Watermelon                   | Watermelon                   | Watermelon                    | 05_022   |
+| Wheat Flour                          | Wheat Flour                    | Wheat Flour                    |                                |                                | Wheat Flour                  | Wheat Flour                  | Wheat Flour                   | 01_043   |
+| Whisky                               |                                |                                |                                |                                | Whisky                       | Whisky                       | Whisky                        | 12_006   |
+| White Oat                            |                                |                                |                                |                                |                              |                              | White Oats                    | 01_133   |
+| Wine                                 |                                |                                | Wine                           | Wine                           | Wine                         | Wine                         | Wine                          | 12_006   |
+| Yam                                  | Yam                            | Yam                            | Yam                            | Yam                            | Yam                          | Yam                          | Yam                           | 02_019   |
+| Yoghurt                              |                                |                                |                                |                                |                              |                              | Yoghurt                       | 10_005   |

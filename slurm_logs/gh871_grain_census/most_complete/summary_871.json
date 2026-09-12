@@ -1,0 +1,401 @@
+{
+ "generated": "2026-09-12 04:46:50",
+ "elapsed_s": 20.3,
+ "cells_total": 954,
+ "records": 989,
+ "status_counts": {
+  "unique": 822,
+  "diffed": 112,
+  "uncensused": 55
+ },
+ "cells_uncensused": 55,
+ "rows_changed_total": 544,
+ "served_na_new_total": 0,
+ "destroyed_total": 105137,
+ "derivation_conflicts_total": 0,
+ "by_site": {
+  "rows_changed": {
+   "Site1": 543.0,
+   "Site2": 1.0
+  },
+  "served_na_new_total": {
+   "Site1": 0.0,
+   "Site2": 0.0
+  }
+ },
+ "by_table": {
+  "rows_changed": {
+   "assets": 0.0,
+   "cluster_features": 1.0,
+   "crop_production": 0.0,
+   "food_acquired": 0.0,
+   "food_security": 0.0,
+   "household_roster": 0.0,
+   "housing": 524.0,
+   "individual_education": 0.0,
+   "interview_date": 0.0,
+   "plot_inputs": 18.0,
+   "sample": 0.0,
+   "shocks": 1.0
+  },
+  "served_na_new_total": {
+   "assets": 0.0,
+   "cluster_features": 0.0,
+   "crop_production": 0.0,
+   "food_acquired": 0.0,
+   "food_security": 0.0,
+   "household_roster": 0.0,
+   "housing": 0.0,
+   "individual_education": 0.0,
+   "interview_date": 0.0,
+   "plot_inputs": 0.0,
+   "sample": 0.0,
+   "shocks": 0.0
+  }
+ },
+ "rows_changed_raw_total": 1210771,
+ "conflicting_groups_total": 30815,
+ "unauditable_records": 0,
+ "site2_cols_involved": [
+  "Rural"
+ ],
+ "stamp_reconciliation": {
+  "cells_compared": 51,
+  "cells_agreeing": 51,
+  "mismatches": []
+ },
+ "top15_served_na_new": [
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 156676.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Senegal",
+   "table": "food_acquired",
+   "wave": "2021-22",
+   "site": "Site1",
+   "rows": 221124.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Benin",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 189216.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Burkina_Faso",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 138575.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 162033.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Togo",
+   "table": "food_acquired",
+   "wave": "2018",
+   "site": "Site1",
+   "rows": 112997.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2021-22",
+   "site": "Site1",
+   "rows": 147697.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "assets",
+   "wave": "2012Q3",
+   "site": "Site1",
+   "rows": 175857.0,
+   "destroyed": 11936.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "assets",
+   "wave": "2013Q1",
+   "site": "Site1",
+   "rows": 175857.0,
+   "destroyed": 11936.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "crop_production",
+   "wave": "2013-14",
+   "site": "Site1",
+   "rows": 26765.0,
+   "destroyed": 2.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "crop_production",
+   "wave": "2015-16",
+   "site": "Site1",
+   "rows": 25924.0,
+   "destroyed": 2.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Burkina_Faso",
+   "table": "food_acquired",
+   "wave": "2021-22",
+   "site": "Site1",
+   "rows": 69867.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Malawi",
+   "table": "shocks",
+   "wave": "2004-05",
+   "site": "Site1",
+   "rows": 203044.0,
+   "destroyed": 291.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Ethiopia",
+   "table": "crop_production",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 14102.0,
+   "destroyed": 7.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  },
+  {
+   "country": "Nigeria",
+   "table": "interview_date",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 10288.0,
+   "destroyed": 10286.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "served_na_new_by_col": "{}"
+  }
+ ],
+ "top15_rows_changed": [
+  {
+   "country": "Kosovo",
+   "table": "housing",
+   "wave": "2000",
+   "site": "Site1",
+   "rows": 7047.0,
+   "destroyed": 4182.0,
+   "rows_changed": 524.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "Type|Electricity"
+  },
+  {
+   "country": "Niger",
+   "table": "plot_inputs",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 8179.0,
+   "destroyed": 88.0,
+   "rows_changed": 11.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "Quantity|Purchased"
+  },
+  {
+   "country": "Burkina_Faso",
+   "table": "plot_inputs",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 22877.0,
+   "destroyed": 163.0,
+   "rows_changed": 5.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "Quantity|Purchased"
+  },
+  {
+   "country": "Niger",
+   "table": "plot_inputs",
+   "wave": "2011-12",
+   "site": "Site1",
+   "rows": 8538.0,
+   "destroyed": 51.0,
+   "rows_changed": 2.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "Quantity|Purchased"
+  },
+  {
+   "country": "Malawi",
+   "table": "cluster_features",
+   "wave": "2016-17",
+   "site": "Site2",
+   "rows": 14955.0,
+   "destroyed": 1994.0,
+   "rows_changed": 1.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "Rural"
+  },
+  {
+   "country": "Niger",
+   "table": "shocks",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 72340.0,
+   "destroyed": 80.0,
+   "rows_changed": 1.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": "AffectedIncome|AffectedAssets|AffectedProduction|AffectedConsumption|HowCoped1"
+  },
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2014-15",
+   "site": "Site1",
+   "rows": 156676.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Senegal",
+   "table": "food_acquired",
+   "wave": "2021-22",
+   "site": "Site1",
+   "rows": 221124.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Benin",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 189216.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Burkina_Faso",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 138575.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2018-19",
+   "site": "Site1",
+   "rows": 162033.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Togo",
+   "table": "food_acquired",
+   "wave": "2018",
+   "site": "Site1",
+   "rows": 112997.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Mali",
+   "table": "food_acquired",
+   "wave": "2021-22",
+   "site": "Site1",
+   "rows": 147697.0,
+   "destroyed": 0.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Nigeria",
+   "table": "assets",
+   "wave": "2012Q3",
+   "site": "Site1",
+   "rows": 175857.0,
+   "destroyed": 11936.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  },
+  {
+   "country": "Nigeria",
+   "table": "assets",
+   "wave": "2013Q1",
+   "site": "Site1",
+   "rows": 175857.0,
+   "destroyed": 11936.0,
+   "rows_changed": 0.0,
+   "served_na_new_total": 0.0,
+   "cols_involved": ""
+  }
+ ]
+}

@@ -96,10 +96,37 @@ def test_conversion_to_kgs_unchanged_without_quantity_kg():
 
 
 def test_malawi_food_quantities_kg_total_preserved():
-    """Malawi migration acceptance pin (GH #378): the kg total is preserved to
-    ~0.001% after moving Malawi off build-time conversion onto Quantity_kg.
-    Baseline 8.796e6 kg captured 2026-06-07 (pre-migration).  Skips when the
-    Malawi food data isn't available."""
+    """Malawi's kg total, re-pinned deliberately.
+
+    The original pin (8.796e6 kg, captured 2026-06-07) was the GH #378
+    migration acceptance test: the total must not move when Malawi came off
+    build-time conversion onto ``Quantity_kg``.  That property is not what
+    this number pins any more.
+
+    2026-09-09, GH #850 defect (c): 2.907e6.  Malawi mints 16,912 rows of
+    ``Millilitre`` and 1,217 of ``Grams``, neither spelling was in
+    ``KNOWN_METRIC``, and the price-ratio inference was serving them at 0.743
+    kg and 0.706 kg against a true 0.001.  Reading the label instead removes
+    ~5.9e6 fictitious kilograms.  The move is a REPAIR, and the size of it is
+    the argument for the repair.
+
+    2026-09-09, GH #850 (a) + (b): 2.555e6.  Dividing by ``Quantity`` at step
+    2 (the per-unit price the docstring always promised) and estimating a
+    factor per ``(item, unit)`` rather than per unit label.  Malawi's
+    ``Piece`` was one number for 133 food items.
+
+    2026-09-10, GH #850 red team: 2.585e6.  ``min_reports`` now gates the
+    PER-WAVE ``(t, j, u)`` estimate rather than the support summed over waves,
+    so a wave that cannot support an estimate contributes none instead of
+    lending its row count to waves that can.  Malawi +1.2%; Nigeria -3.1% and
+    EthiopiaRHS -2.7% move the other way; the rest are under 0.5%.
+
+    2026-09-10, @ligon arms the baseline dispersion gate at
+    ``FOOD_KG_BASELINE_MAX_SPREAD = 10``: 2.583e6.  Malawi barely moves
+    (-0.11%) because its refused cells are small ones; Niger +14.8% and Mali
+    -11.5% are where the gate bites.
+
+    Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
     try:
@@ -110,4 +137,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 8.7968e6) / 8.7968e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 2.5827e6) / 2.5827e6 < 0.005, f"kg total drifted: {total}"

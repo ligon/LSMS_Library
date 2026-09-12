@@ -1,0 +1,466 @@
+#+title: Red team -- feat/crop-quantity-screen (d27b7f89), GH #857 Site Q
+#+date: 2026-09-09
+#+author: red-team agent (read-only)
+
+* Setup and provenance of every number below
+
+Worktree =/global/scratch/fsa/fc_jevons/ligon/tmp/wt-quantity-screen= at
+=d27b7f89=.  Python =mirrors/LSMS_Library/.venv/bin/python=.  Every run
+asserted =lsms_library.__file__= under the worktree (or under an extracted
+copy, below) before doing anything.  Warm reads only; nothing written to
+=data_root()= (=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=); no
+=dvc= invoked; no file in the worktree modified.
+
+=git merge-base development HEAD= is =1c234604=, NOT the current development
+tip =2558b36a= -- development has since gained the two transformations.py
+merges (rcsi =bcc86c7f=, weight_col =2558b36a=).  So that the cache probe
+compared like with like, the merge-base tree was extracted read-only with
+=git archive 1c234604 lsms_library | tar -x -C <scratch>/base= and the branch
+tree likewise to =<scratch>/head=; both were run from =/tmp= so the two sides
+share a filesystem.  The =lsms_library/countries= file list is identical at
+both revisions (verified), so the config half of every hash is unchanged by
+construction.
+
+GitNexus MCP did not connect (CONNECTION_CLOSED), as CLAUDE.md anticipates.
+Declared substitutes used: =rg=/=grep= for call sites, =git= for history,
+plus direct in-process instrumentation.
+
+* Verdict summary
+
+| # | item                                   | verdict |
+|---+----------------------------------------+---------|
+| 1 | hook in =Country._finalize_result=     | PASS    |
+| 2 | the rule, the ladder, the firing count | CONCERN |
+| 3 | strictness lever and accessor          | PASS    |
+| 4 | idempotence and cost                   | PASS *  |
+| 5 | cache: exclusions, probe, structural test | CONCERN |
+| 6 | interaction with today's merges + #861 | CONCERN |
+| 7 | the AGENTS.md section                  | CONCERN |
+| 8 | tests                                  | PASS    |
+| 9 | pandas 3.0 / ASCII / em dashes         | PASS    |
+
+No FAIL.  =*= item 4 passes but one published number is understated; see there.
+
+* 1. The hook -- PASS
+
+** Scope
+
+=country.py:3095= sits inside =if isinstance(df, pd.DataFrame):= (the
+=_finalize_result= branch that also hosts Site B), so a dict-returning table
+never reaches it.  =check_quantities= then does
+=_SCREENED_COLUMNS.get(str(table), ())= -- =crop_production= is the only key,
+so every other table costs one dict lookup and returns.  Confirmed by
+instrumenting the call: a warm =Country('Uganda').crop_production()= makes
+exactly two calls, =sample= (0 ms, no-op) and =crop_production=.
+
+** Adversarial frames -- the hunt for an escaping exception
+
+Twenty-one synthetic frames plus fifteen real warm parquets.  In EVERY case
+=check_quantities= returned the identical object (=out is df=) and raised
+nothing.
+
+| probe                                        | outcome                       |
+|----------------------------------------------+-------------------------------|
+| other table (=household_roster=) w/ outlier  | silent no-op                  |
+| =crop_production= with no =Quantity= column  | silent no-op                  |
+| empty frame with columns / bare =DataFrame()=| silent no-op                  |
+| index lacks =t=/=u=/=j= (only =i=)           | whole-frame rung; fires       |
+| Ethiopia shape =(t,i,plot_id,j,u)=           | fires, wave named             |
+| Tanzania shape =(t,i,plot_id,j)=, =u= a col  | fires, =u= read as column     |
+| =Quantity= object dtype (numeric objects)    | fires                         |
+| =Quantity= object dtype (pure strings)       | fires (=to_numeric= coerces)  |
+| =Quantity= object dtype (mixed =n/a=/=None=) | fires                         |
+| =Quantity= all NaN                           | silent                        |
+| =Quantity= =Int64= masked with =pd.NA=       | no raise, no false fire       |
+| =Quantity= =Float64= masked                  | fires                         |
+| =Quantity= containing =+inf=                 | fires (inf formats cleanly)   |
+| categorical =j=/=u= w/ 500 unobserved cats   | fires; no cross-product blowup|
+| DUPLICATE =Quantity= column                  | degrade warning, frame intact |
+| =t= as a column rather than an index level   | fires, wave named             |
+| =df= is a dict / =None=                      | silent no-op                  |
+| every cell < 30 rows (small country)         | silent                        |
+| cell whose p90 == 0                          | silent                        |
+
+The duplicate-column case is the only one that reaches the =except Exception=
+arm: =TypeError: arg must be a list, tuple, 1-d array...= -> the "audit could
+not run ... quantities are NOT known to be plausible" warning, frame returned
+unchanged.  That is the designed degrade and it works.
+
+Real corpus: all fifteen warm =crop_production= parquets were run through
+=audit_quantities= (three distinct index shapes, =j= vs =crop=, =plot= vs
+=plot_id=, =u= as level vs column); none raised.
+
+** Residual note (not a failure)
+
+=_record_quantity_report= / =_emit_quantity_report= are called OUTSIDE the
+=try=, which is correct for strict mode (the =QuantityImplausibleError= must
+escape) but means a hypothetical formatting bug would escape too.  Probed the
+formatting path with inf, NaN, =None= rung and non-string =t=; nothing raises.
+Also: the =except QuantityImplausibleError: raise= arm inside the =try= is
+dead code -- =audit_quantities= never emits.
+
+* 2. The rule, the ladder and the firing count -- CONCERN
+
+** Reproduced exactly
+
+The five-country reading in the ledger, the docstring and AGENTS.md
+reproduces to the row:
+
+: Tanzania 14,126 -> 14 | Uganda 133,683 -> 36 | Malawi 131,379 -> 16
+: Nigeria  62,844 ->  9 | Ethiopia 85,519 -> 10
+: TOTAL rows=427,551 fired=85 (0.0199%)
+
+All four #857 rows are named, with the households the issue names: Coconuts
+7,500,000 (=9640-001-99=, x11,029.4), Timber 4,000,000 (=2010-001=, x173.3),
+Other Fruits 2,400,000, Ripe Bananas 1,505,400.
+
+Threshold evidence re-derived independently and matching to the last digit:
+Tanzania =(2020-21, kg, Timber)= n=37, p99=2,632,000, p95=70,800, p90=23,088;
+four-country ratio distribution over n=277,277 rows with a reference:
+p90=1.0, p99=3.7, p99.9=20.0, p99.99=173.7, max=11,029; sensitivity
+K=50 -> 94, K=100 -> 49, K=150 -> 34, K=300 -> 21.  Every published number in
+=slurm_logs/gh857_quantity_screen/= is re-checkable and correct.
+
+** The ladder never pools across =t= -- PASS
+
+Structural, not sampled: =_cell_reference= sets =base = ['t'] if 't' in keys=
+and every one of the three rungs is =base + ...=, so =t= is in every group
+key.  The coarsest rung is =t= alone.  Observed rungs in the corpus include
+=t,u,j=, =t,u= and =t= -- never a =t=-free rung when =t= exists.
+
+** CONCERN A: the corpus is fifteen warm countries, not five
+
+=slurm_logs/gh857_quantity_screen/README.org= says the scripts "take every
+country from its warm L2-country =crop_production= parquet under
+=data_root()=, name and skip any country whose parquet is absent".
+=measure_firing.py= does not: it iterates a hardcoded five-name list.  The
+module docstring's heading -- "WHAT IT FIRES ON TODAY -- every country whose
+=crop_production= was warm" -- is therefore false as shipped.
+
+Measured over all fifteen warm parquets:
+
+| country       |    rows | fired |
+|---------------+---------+-------|
+| Benin         |   9,056 |     2 |
+| Burkina_Faso  |  15,593 |     1 |
+| CotedIvoire   |  22,223 |    16 |
+| Ethiopia      |  85,519 |    10 |
+| EthiopiaRHS   |  17,523 |     2 |
+| GhanaSPS      |  25,109 |     7 |
+| Guinea-Bissau |  10,579 |     1 |
+| Malawi        | 131,379 |    16 |
+| Mali          |  35,060 |    18 |
+| Niger         |  47,077 |    28 |
+| Nigeria       |  62,844 |     9 |
+| Senegal       |   8,428 |     1 |
+| Tanzania      |  14,126 |    14 |
+| Togo          |  11,565 |     1 |
+| Uganda        | 133,683 |    36 |
+|---------------+---------+-------|
+| TOTAL         | 629,764 |   162 |
+
+162 of 629,764 = 0.0257%.  Still a work queue, not a firehose -- the design
+conclusion survives -- but the published 85 / 427,551 / 0.02% is a
+five-country subset presented as the corpus.  Two rows the screen finds and
+nobody has mentioned are larger than the headline case: **Benin 2018-19 Coton
+12,500,000 kg** (=i=220065=, x1,785.7) and **CotedIvoire 2018-19 Cocoa
+1,500,000 kg** (=i=600009=, x750.0).  Niger's 28 include eleven
+=Mil 999,999 u=Unknown= rows in 2011-12 (x14,285.7, rung =t=) -- a second,
+undocumented sentinel family in a second country.
+
+Fix is one line in =measure_firing.py= (glob instead of a list) plus updating
+three numbers in the docstring, the ledger and AGENTS.md.
+
+** CONCERN B: eight firings have a reference below one unit
+
+The ledger argues the =reference > 0= condition exists to stop "a 2 kg cassava
+row named as implausible, which is exactly the false positive that discredits
+a guard".  A p90 of 0.6 clears that condition.  Measured: 8 of the 162
+firings (all Uganda 2010-11, rung =t,u=, =u='Others specify'=, p90 = 0.6):
+
+: Rice 300 (x500) | Ground Nuts 150 | Sugarcane 150 | Pumpkins 105
+: Maize 99 | Cassava 90 | Sugarcane 80 | Sugarcane 66
+
+These are ordinary harvests.  The =(t,u)= rung pools every crop sharing a
+junk unit label, so the reference measures nothing.  22% of Uganda's firings
+and 5% of the corpus's are this class.  A =reference >= 1= floor, or excluding
+the =U_UNKNOWN=/"Others specify" family from the =(t,u)= rung, would remove
+them; either is a judgement call for the author.  Stated precisely: the MECHANISM
+(strict positivity) does deliver what it was written for -- it kills the
+ratio-=inf= firings the ledger measured -- but the PURPOSE the ledger gives it
+("not naming a 2 kg cassava row") is not achieved, because a junk-unit =(t,u)=
+cell has a small POSITIVE p90 and sails through.
+
+** CONCERN C: the unjudged rows are silent AND uncounted
+
+Verified by construction: a frame in which no rung reaches 30 rows is silent
+(probe 1t), and a cell whose p90 is 0 is silent even with a 1e9 row present
+(probe 1u).  Both are the documented design ("silence, not a guess").  But
+nothing anywhere reports HOW MANY rows were unjudged.  In the corpus this is
+not hypothetical: Nigeria has 12,891 of 62,844 rows (20.5%) with no reference
+and Ethiopia 3,700 of 85,519.  A one-line =n_unjudged= in each report would
+make "we looked at this table" mean something; today a country whose crop
+table is entirely thin reports exactly like a clean one.
+
+* 3. Strictness lever and accessor -- PASS
+
+- Own env var =LSMS_QUANTITY_STRICT=, not folded into =LSMS_READ_STRICT=.
+  Spelling verified identical across all three levers:
+  : quantity_audit.py:224  os.environ.get(_QUANTITY_STRICT_ENV,"").lower() in {"1","true","yes"}
+  : null_read_audit.py:154 os.environ.get(_READ_STRICT_ENV,"").lower()     in {"1","true","yes"}
+  : country.py:5330        os.environ.get("LSMS_GRAIN_STRICT","").lower()  in {"1","true","yes"}
+- End-to-end on a warm =Country('Tanzania').crop_production()=:
+  =LSMS_QUANTITY_STRICT=1= -> =QuantityImplausibleError=; =LSMS_READ_STRICT=1=
+  -> read OK; =LSMS_GRAIN_STRICT=1= -> read OK.  The three ratchet separately,
+  which is exactly what CLAUDE.md demands.
+- The reasoning is defensible on CLAUDE.md's own terms.  "A destroyed row and
+  an empty column are different concerns and must ratchet separately"; a
+  present-but-impossible value is a third.  The stronger argument, which the
+  ledger makes and I endorse, is the CI one: =LSMS_READ_STRICT= adoption is
+  already gated on the Niger wave-vs-country =optional:= granularity, and
+  folding Site Q in would add every Malawi bag-of-maize outlier to that gate.
+  Given CONCERN 2B (eight known false positives) this is not a theoretical
+  worry -- folding the levers would have been wrong.
+- =quantity_reports(country=None, table=None) -> list[dict]= is signature- and
+  behaviour-identical to =null_read_reports=; verified draining 7 reports / 36
+  offenders after a real Uganda call.
+- =QuantityImplausibleWarning(RuntimeWarning)= and
+  =QuantityImplausibleError(RuntimeError)= are their own classes.
+- No allowlist: =grep -rniE "allowlist|whitelist|_KNOWN_|exclude.*hhid"= over
+  the new module and its tests returns only the four lines that ARGUE against
+  one.  =_SCREENED_COLUMNS= is a registry of what is looked at, not of cells
+  excused -- the distinction holds.
+
+* 4. Idempotence and cost -- PASS, with one number corrected
+
+** Fires once, not twice
+
+Instrumented =check_quantities= (in-process spy) over three consecutive warm
+=Country('Uganda').crop_production()= calls:
+
+: run0: 2 calls -- Uganda/sample (0 ms, no-op) + Uganda/crop_production (220 ms)
+: run1: 1 call  -- Uganda/crop_production (228 ms)
+: run2: 1 call  -- Uganda/crop_production (217 ms)
+
+The =sample= call is the =_join_v_from_sample= re-entry and costs one dict
+lookup.  Seven reports (one per wave), 36 offenders, stable across calls; the
+ledger's =if report not in existing= dedups, so a repeated read does not
+inflate =quantity_reports()=.  Note the warning IS re-emitted on every read
+(the ledger dedups, the emission does not) -- correct, since Python's own
+warning registry handles repeat suppression, but worth knowing.
+
+** Cost
+
+Best-of-7 warm reads, both trees extracted to =/tmp=, warnings suppressed:
+
+| table                       | merge-base | branch | delta   |
+|-----------------------------+------------+--------+---------|
+| Tanzania crop_production    |     128 ms | 147 ms |  +19 ms |
+| Uganda   crop_production    |     730 ms |1141 ms | +411 ms |
+
+Direct measurement of the audit alone on the delivered frame: Tanzania 31 ms,
+Uganda 184-228 ms, Malawi 182 ms.  The implementer's "43 ms / 257 ms" is the
+audit in isolation and reproduces.  What is NOT stated is the delivered
+read-path cost: on Uganda that is +280 ms (spy run) to +411 ms (best-of-7),
+i.e. a **1.4x-1.6x slowdown of a warm =crop_production= read**, against a
+quoted figure of 257 ms.  Same order, but the ledger's "cost, stated plainly"
+paragraph should quote the end-to-end delta, not the isolated call.
+
+* 5. Cache -- CONCERN (numbers PASS, one test is vacuous)
+
+** The probe reproduces exactly
+
+Ran the committed =hash_probe.py= three ways:
+
+| tree                             | result                                    |
+|----------------------------------+-------------------------------------------|
+| merge-base =1c234604= (extracted)| baseline                                  |
+| branch =d27b7f89=                | byte-identical to baseline                |
+| development tip =2558b36a=       | byte-identical to both                    |
+
+12 =Country._table_cache_hash= values + 5 =build_transforms_fingerprint=
+values, all unmoved.  Checked that this is not hollow: =hash_probe.py= stores
+=ERR ...= text on a failed call, and identical errors would diff clean -- all
+seventeen entries are real 64-hex digests, =grep -c ERR= is 0 on all three
+runs.  My branch run also diffs clean against the committed
+=hash_after.json=, and the committed =hash_before.json= / =hash_after.json=
+are identical to each other.  **Site Q costs no cache invalidation --
+confirmed independently, not taken on trust.**  (The third row also shows
+today's transformations.py merges moved none of these twelve.)
+
+=_build_registry.py= changes read correctly:
+=lsms_library.quantity_audit.check_quantities= and =.audit_quantities= added
+to =_EXCLUDED_CALLABLES=, =_QUANTITY_LEDGER= added to =_EXCLUDED_CONSTANTS=.
+
+** The structural test does not test what its failure message says
+
+=test_the_audit_module_is_not_folded_into_any_build_fingerprint= walks
+=R._BUILD_TRANSFORMS= collecting =_closure_parts= and asserts no part mentions
+=quantity_audit=.  I mutated =R._EXCLUDED_CALLABLES= in-process to REMOVE both
+=quantity_audit= entries and re-ran the same walk:
+
+: as-shipped:          leaked=[] n_parts=90
+: exclusions REMOVED:  leaked=[] n_parts=90
+
+Identical.  The walk stops at =Country._finalize_result=, which is itself
+excluded, so it never reaches =quantity_audit= whether or not the entries are
+present.  The test therefore passes vacuously, and its failure message --
+"Add the callable to =_build_registry._EXCLUDED_CALLABLES= or every table in
+every country rebuilds" -- describes a repair the test can never demand.  The
+=_build_registry= comment is honest about this ("measurement showed no hash
+moves either way -- the entries are here so that a FUTURE call site ... cannot
+silently cold-rebuild"); the test docstring is not, and a future reader will
+believe the test is a guard when it is a tautology.
+
+The sibling =test_site_q_host_is_excluded_so_site_q_costs_no_invalidation= IS
+meaningful and is the one actually carrying the load.  Suggested repair: make
+the vacuous test assert what is true and load-bearing -- that the two names
+are in =_EXCLUDED_CALLABLES= AND that the walk does not reach the module --
+or add a case that tags a dummy build callable referencing =check_quantities=
+and shows the exclusion suppressing it.
+
+* 6. Interaction with today's merges and with #861 -- CONCERN
+
+** rcsi (=efce606d=/=bcc86c7f=) and weight_col (=c5f1f3ba=/=2558b36a=)
+
+Both touch =lsms_library/transformations.py= and their own tests only; the
+branch touches =country.py=, =_build_registry.py=, =null_read_audit.py=,
+=quantity_audit.py=, =AGENTS.md=, tests.  No file overlap, no symbol overlap
+(=rg= for =rcsi=, =weight_col=, =median_price_valuation= in the branch diff:
+zero hits).  The hash probe above shows the development tip and the branch
+agree on all seventeen values, so nothing in either merge disturbs Site Q's
+"zero invalidation" claim.  Merge should be textually clean.
+
+** fix/uganda-2009-10-99999 (=2f2dbff3=, GH #861)
+
+Nothing in the branch hardcodes the sentinel (=grep 99999= over the module and
+tests: only docstring prose and an unrelated test fixture id =hh9999=).  The
+screen is purely distributional, so the #861 fix cannot break it.
+
+Simulated the fix in memory (set =Quantity= to NaN where ==99999=; all 3,097
+such rows are in 2009-10, so wave-scoped and global nulling are the same):
+
+: before: Uganda fired=36 -- 2009-10:9 2010-11:8 2011-12:3 2013-14:5 2015-16:3 2018-19:4 2019-20:4
+: after : Uganda fired=29 -- 2009-10:2 2010-11:8 2011-12:3 2013-14:5 2015-16:3 2018-19:4 2019-20:4
+
+So Uganda drops by 7, and the corpus total by 7 (162 -> 155; five-country
+85 -> 78).
+
+*** The published "nine" is wrong, and so is its explanation
+
+Both =quantity_audit.py= ("**Nine** of them fire here ... the nine that fire
+are the ones that leaked into a cell they do not dominate (2009-10 Millet,
+=u='Unknown'=, whose p90 is 2.8)") and the AGENTS.md section ("Uganda holds
+3,097 rows of =Quantity == 99999= and only **9** fire") state nine.  The nine
+firings in 2009-10 are:
+
+| j         | u                      |   value | p90  | rung  |
+|-----------+------------------------+---------+------+-------|
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Millet    | Unknown                |  99,999 |  2.8 | t,u,j |
+| Sorghum   | Plastic Basin (15 lts) |  99,999 | 12.0 | t,u,j |
+| Sugarcane | Kg                     |  50,000 |  350 | t,u   |
+| Sugarcane | Kg                     |  36,000 |  350 | t,u   |
+
+**Seven** carry the sentinel value, not nine; the last two are genuine
+Sugarcane rows that have nothing to do with #861.  And the sentinel leaks into
+**two** cells, not one -- Millet/Unknown (p90 2.8) and Sorghum/Plastic Basin
+(p90 12.0).  The argument being made is unaffected (a repeated sentinel is
+invisible to a distributional screen, and that is correct behaviour), but the
+count and the "one cell" story are both wrong and are repeated in three places
+(module docstring, AGENTS.md, ledger §6).  Correct to "seven of them fire, in
+two cells" and "expect Uganda 36 -> 29 when #861 lands".
+
+* 7. The AGENTS.md section -- CONCERN
+
+- *Register*: matches the house style of the surrounding file (bold claims,
+  em dashes, measured numbers, a named counter-example).  Placed correctly
+  after the null-read section and before Coverage Matrix.  =CLAUDE.md= is a
+  symlink to =AGENTS.md= in this repo, so there is no second file left stale.
+- *Accuracy*: every threshold number re-derived independently and exact --
+  7,500,000 kg coconuts; K=100; p90; >= 30 rows; Timber n=37 p99=2,632,000
+  p95=70,800 p90=23,088; ratio p90=1.0 p99=3.7 p99.9=20 p99.99=174 max=11,029
+  over 277k rows; K=50 -> 94, K=100 -> 49, K=300 -> 21; 43 ms / 257 ms /
+  196 ms; 85 of 427,551.  **Two claims are wrong**: "only **9** fire" (it is
+  seven -- item 6) and the firing table read as the corpus (it is five of
+  fifteen warm countries; the corpus is 162 of 629,764 -- item 2A).
+- *Length*: the brief asked for one paragraph.  Delivered: 14 added lines (7 content + 7 blank),
+  1 heading + **6 paragraphs, 570 words**.  What can go without losing a checkable fact:
+  paragraphs 3 and 4 (the p90-vs-p99 derivation and the K rationale, ~230
+  words) are a near-verbatim condensation of the module docstring, which is
+  itself 120 lines and is cited two sentences earlier; and the closing "What
+  it does not see" paragraph (~80 words) duplicates ledger §6.  Cutting to
+  paragraphs 1, 2 and 5 (~270 words, two paragraphs) keeps every number that
+  is not recoverable from =quantity_audit.py= in ten seconds -- the corpus
+  firing count, the cost, the lever name, the accessor, the no-allowlist rule
+  -- and points at the module for the derivation.  Recommend that cut, with
+  the two corrections above folded in.
+
+* 8. Tests -- PASS
+
+: tests/test_quantity_screen.py + test_null_read_guard.py + test_crop_kg_factor.py
+: 1 failed, 102 passed in 23.22s   (branch d27b7f89)
+
+The single failure is
+=tests/test_crop_kg_factor.py::test_uganda_harvest_kg_unchanged_before_the_wiring_lands=,
+exactly as the implementer states.  Confirmed pre-existing: on development
+(=2558b36a=, main mirror) =tests/test_crop_kg_factor.py= alone gives
+=1 failed, 34 passed= with the same test.  Site Q is not implicated.
+
+=tests/test_quantity_screen.py= is 33 tests and the coverage is genuinely
+adversarial (thin cell, zero-scale cell, masked dtypes, NaN/inf, ladder
+fallback, wave separation, strict spellings, other levers not arming it,
+broken-audit degrade, real Tanzania parquet with a skip rather than a silent
+pass).  The one weak test is item 5's.  The real-parquet test pins
+=n_implausible == 13= and =rows == 11_125= -- good, and it does run here (the
+wave parquet exists at =data_root()=).
+
+* 9. Pandas 3.0, ASCII, em dashes -- PASS
+
+- No =inplace=True=, no =fillna(method=...)=, no =.ix=, no chained
+  =df[mask]['col'] = ...=, no positional =series[0]= anywhere in the diff.
+- =np.nan= appears six times, all as a float fill or =na_value= in a
+  =to_numpy(dtype="float64")= -- the allowed numeric-float case.  The module
+  is explicit and correct about masked dtypes: =_numeric= does
+  =pd.to_numeric(...).to_numpy(dtype="float64", na_value=np.nan)=, which is
+  what makes probes 1l/1m pass where a bare =>= would raise.
+- =observed=/=dropna= concern handled a different way than the ledger's text
+  suggests: there is no =groupby(observed=True)=; instead =_axis= casts to
+  object and =_codes= factorizes with =use_na_sentinel=False=.  Same two
+  properties (no unobserved cross-product, NA gets its own group), verified
+  with a 500-unobserved-category probe.  The ledger §4 wording should say
+  "factorize", not "observed=True", but the behaviour is right.
+- ASCII: exactly one non-ASCII character in all added Python -- =§= in
+  =quantity_audit.py:276= (a =CLAUDE.md §Gotchas= citation).  **No em or en
+  dashes in any new Python file**; the module uses =--= throughout.
+  AGENTS.md prose uses em dashes, =x=, =>== and arrows, consistent with the
+  rest of that file.
+
+* Recommended before merge
+
+1. =measure_firing.py=: glob =data_root()/*/var/crop_production.parquet=
+   instead of the five-name list; update 85 / 427,551 to 162 / 629,764 in the
+   module docstring, AGENTS.md and ledger Phase 3.  Mention Benin's
+   12,500,000 kg Coton and Niger's 999,999 sentinel family.
+2. Correct "nine fire" to "seven fire, in two cells", and state the post-#861
+   number (Uganda 36 -> 29).
+3. Decide on the =reference < 1= family (8 firings, all Uganda 2010-11
+   =u='Others specify'=): either raise the floor or say in the docstring that
+   the =reference > 0= condition does not cover it.
+4. Make the fingerprint test non-vacuous, or reword its docstring and failure
+   message to say what it actually proves.
+5. Quote the end-to-end read delta (+280 to +411 ms on Uganda, 1.4x-1.6x)
+   alongside the isolated 257 ms.
+6. Cut AGENTS.md from 6 paragraphs / 584 words to 2 / ~270.
+7. Optional but cheap: add =n_unjudged= to each report so "no reference at any
+   rung" is counted rather than merely silent (Nigeria 20.5% of rows).
+
+None of these is a correctness defect in the shipped guard.  The mechanism is
+sound, the frames are safe, the cache claim is true, the levers are right, and
+the threshold evidence is fully re-checkable.  The findings are scope
+(five countries presented as the corpus), two wrong counts, one vacuous test,
+one understated cost, and one false-positive family.

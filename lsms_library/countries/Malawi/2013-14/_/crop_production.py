@@ -43,14 +43,23 @@ harvest = [
 
 sale = [
     _sale_block(i_mod, hhid='hhid', cropcode='ag_i0b', sold_flag='ag_i01',
-                qty_sold='ag_i02a', value_sold='ag_i03', perennial=False),
+                qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+                perennial=False),
     _sale_block(q, hhid='hhid', cropcode='ag_q0b', sold_flag='ag_q01',
-                qty_sold='ag_q02a', value_sold='ag_q03', perennial=True),
+                qty_sold='ag_q02a', value_sold='ag_q03', unit_sold='ag_q02b',
+                perennial=True),
 ]
 
 df = assemble_crop_production(WAVE, harvest, sale)
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,crop) in crop_production {WAVE}"
+# GH #854: `u` and `condition` are declared index levels that ride as
+# COLUMNS out of assemble_crop_production (the framework promotes them), so
+# the uniqueness that matters is on the full declared grain, not on the
+# 4-level index.  (t, i, plot, crop) is legitimately non-unique now: one
+# plot-crop can be reported shelled AND unshelled.
+_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
+assert not df.reset_index().duplicated(_GRAIN).any(), \
+    f"Non-unique (t,i,plot,crop,u,condition) in crop_production {WAVE}"
 assert len(df) > 0, f"crop_production {WAVE} produced no rows"
 
 to_parquet(df, 'crop_production.parquet')

@@ -1,0 +1,264 @@
+j,condition,rows
+Avocado,fresh,123
+Avocado,unknown_condition,1
+Banana Beer,fresh,991
+Banana Beer,unknown_condition,9
+Barley,dried_grain,2
+Beans,dried,3
+Beans,dried_grain,4658
+Beans,dried_in_cob,3
+Beans,dried_in_pods,16
+Beans,dried_with_shell,2
+Beans,dry_at_harvest_grain,585
+Beans,dry_at_harvest_in_cob,1
+Beans,dry_at_harvest_with_shell,2
+Beans,dry_at_harvest_with_shell_and_stalk,4
+Beans,fresh,10
+Beans,fresh_in_cob,1
+Beans,fresh_in_pods,173
+Beans,fresh_with_shell,7
+Beans,fresh_with_shell_and_stalk,2
+Beans,green_in_pods,22
+Beans,other_condition,3
+Beans,unknown_condition,26
+Cabbages,fresh,197
+Cabbages,fresh_in_cob,1
+Cabbages,other_condition,1
+Cabbages,unknown_condition,2
+Carrots,fresh,4
+Cassava,dried,745
+Cassava,dried_grain,10
+Cassava,dried_with_shell,6
+Cassava,fresh,1399
+Cassava,fresh_in_pods,1
+Cassava,fresh_with_shell,1
+Cassava,green_in_cob,1
+Cassava,other_condition,8
+Cassava,unknown_condition,7
+Chick Peas,dried,7
+Chick Peas,dried_grain,10
+Chick Peas,dried_in_pods,1
+Chick Peas,dry_at_harvest_grain,1
+Cocoa,dried,1
+Cocoa,dried_grain,91
+Cocoa,dried_in_pods,5
+Cocoa,dry_at_harvest_grain,1
+Cocoa,fresh,9
+Cocoa,fresh_in_pods,22
+Coffee,dried,10
+Coffee,dried_grain,882
+Coffee,dried_in_cob,9
+Coffee,dried_in_pods,1538
+Coffee,dried_with_shell,48
+Coffee,dried_with_shell_and_stalk,4
+Coffee,dry_at_harvest_grain,91
+Coffee,dry_at_harvest_with_shell,4
+Coffee,fresh,140
+Coffee,fresh_in_cob,13
+Coffee,fresh_in_pods,2669
+Coffee,fresh_with_shell,12
+Coffee,fresh_with_shell_and_stalk,10
+Coffee,green_in_pods,73
+Coffee,unknown_condition,60
+Cotton,dried,415
+Cotton,dried_grain,15
+Cotton,dried_in_pods,1
+Cotton,dried_with_shell,4
+Cotton,fresh,14
+Cotton,fresh_in_pods,2
+Cotton,other_condition,54
+Cotton,unknown_condition,6
+Cow Peas,dried,1
+Cow Peas,dried_grain,51
+Cow Peas,dry_at_harvest_grain,1
+Cow Peas,dry_at_harvest_with_shell,1
+Cow Peas,fresh,2
+Cow Peas,fresh_in_pods,17
+Cow Peas,fresh_with_shell,2
+Cow Peas,green_in_pods,13
+Cow Peas,unknown_condition,1
+Dodo,fresh,41
+Dodo,other_condition,3
+Eggplant,fresh,106
+Eggplant,unknown_condition,1
+Field Peas,dried,2
+Field Peas,dried_grain,142
+Field Peas,dried_in_pods,1
+Field Peas,dry_at_harvest_grain,3
+Field Peas,dry_at_harvest_in_cob,1
+Field Peas,dry_at_harvest_with_shell,1
+Field Peas,fresh,4
+Field Peas,fresh_in_pods,11
+Field Peas,green_in_pods,5
+Ginger,fresh,7
+Green Gram,dried_grain,19
+Green Gram,green_in_pods,2
+Ground Nuts,dried,10
+Ground Nuts,dried_grain,303
+Ground Nuts,dried_in_cob,20
+Ground Nuts,dried_in_pods,226
+Ground Nuts,dried_with_shell,1006
+Ground Nuts,dried_with_shell_and_stalk,8
+Ground Nuts,dry_at_harvest_grain,8
+Ground Nuts,dry_at_harvest_in_cob,2
+Ground Nuts,dry_at_harvest_with_shell,170
+Ground Nuts,dry_at_harvest_with_shell_and_stalk,2
+Ground Nuts,fresh,3
+Ground Nuts,fresh_in_cob,2
+Ground Nuts,fresh_in_pods,22
+Ground Nuts,fresh_with_shell,92
+Ground Nuts,fresh_with_shell_and_stalk,1
+Ground Nuts,unknown_condition,6
+Irish Potatoes,dried,1
+Irish Potatoes,dried_grain,1
+Irish Potatoes,fresh,634
+Jackfruit,fresh,50
+Maize,dried,17
+Maize,dried_grain,4856
+Maize,dried_in_cob,124
+Maize,dried_in_pods,3
+Maize,dried_with_shell,1
+Maize,dry_at_harvest_grain,225
+Maize,dry_at_harvest_in_cob,157
+Maize,dry_at_harvest_with_shell,82
+Maize,dry_at_harvest_with_shell_and_stalk,116
+Maize,fresh,20
+Maize,fresh_in_cob,155
+Maize,fresh_in_pods,11
+Maize,fresh_with_shell,171
+Maize,fresh_with_shell_and_stalk,16
+Maize,green_in_cob,49
+Maize,green_with_shell,44
+Maize,green_with_shell_and_stalk,13
+Maize,other_condition,1
+Maize,unknown_condition,10
+Mangos,fresh,46
+Mangos,unknown_condition,1
+Matoke,dried,4
+Matoke,dried_in_cob,1
+Matoke,fresh,5877
+Matoke,fresh_in_cob,3
+Matoke,other_condition,14
+Matoke,unknown_condition,52
+Millet,dried,3
+Millet,dried_grain,666
+Millet,dried_in_cob,6
+Millet,dried_in_pods,8
+Millet,dried_with_shell,81
+Millet,dried_with_shell_and_stalk,28
+Millet,dry_at_harvest_grain,17
+Millet,dry_at_harvest_with_shell,14
+Millet,dry_at_harvest_with_shell_and_stalk,10
+Millet,fresh_with_shell,14
+Millet,fresh_with_shell_and_stalk,4
+Millet,unknown_condition,2
+Natural Forest,fresh,1
+Onions,dried,1
+Onions,dried_in_pods,1
+Onions,fresh,157
+Onions,fresh_with_shell_and_stalk,1
+Onions,unknown_condition,3
+Oranges,fresh,92
+Oranges,fresh_in_cob,1
+Oranges,other_condition,3
+Other Crop,dried,7
+Other Crop,dried_grain,19
+Other Crop,dried_with_shell,1
+Other Crop,dry_at_harvest_grain,2
+Other Crop,fresh,108
+Other Crop,fresh_in_pods,1
+Other Crop,other_condition,76
+Other Crop,unknown_condition,2
+Other Forest,fresh,1
+Passion Fruits,fresh,50
+Pawpaw,fresh,23
+Pawpaw,fresh_in_pods,1
+Pawpaw,unknown_condition,1
+Pigeon Peas,dried,2
+Pigeon Peas,dried_grain,90
+Pigeon Peas,dry_at_harvest_grain,2
+Pigeon Peas,fresh_in_pods,2
+Pigeon Peas,green_in_pods,1
+Pigeon Peas,other_condition,2
+Pineapple,fresh,103
+Plantation Trees,fresh,6
+Plantation Trees,unknown_condition,2
+Pumpkins,fresh,50
+Rice,dried_grain,272
+Rice,dried_in_pods,61
+Rice,dried_with_shell,145
+Rice,dry_at_harvest_grain,10
+Rice,dry_at_harvest_with_shell,25
+Rice,unknown_condition,4
+Sim Sim,dried,5
+Sim Sim,dried_grain,587
+Sim Sim,dried_in_pods,1
+Sim Sim,dried_with_shell,1
+Sim Sim,dry_at_harvest_grain,39
+Sim Sim,dry_at_harvest_in_cob,1
+Sorghum,dried,4
+Sorghum,dried_grain,809
+Sorghum,dried_in_cob,2
+Sorghum,dried_in_pods,3
+Sorghum,dried_with_shell,27
+Sorghum,dried_with_shell_and_stalk,6
+Sorghum,dry_at_harvest_grain,28
+Sorghum,dry_at_harvest_in_cob,1
+Sorghum,dry_at_harvest_with_shell,11
+Sorghum,dry_at_harvest_with_shell_and_stalk,5
+Sorghum,fresh,1
+Sorghum,fresh_with_shell,5
+Sorghum,fresh_with_shell_and_stalk,1
+Sorghum,unknown_condition,2
+Soybean,dried,45
+Soybean,dried_grain,822
+Soybean,dried_in_pods,44
+Soybean,dry_at_harvest_grain,54
+Soybean,fresh,1
+Soybean,fresh_in_pods,6
+Soybean,other_condition,1
+Sugarcane,fresh,351
+Sugarcane,fresh_with_shell_and_stalk,3
+Sugarcane,other_condition,2
+Sugarcane,unknown_condition,7
+Sunflower,dried,19
+Sunflower,dried_grain,425
+Sunflower,dried_in_pods,3
+Sunflower,dried_with_shell,22
+Sunflower,dry_at_harvest_grain,34
+Sunflower,dry_at_harvest_with_shell,2
+Sunflower,unknown_condition,1
+Sweet Bananas,fresh,632
+Sweet Bananas,other_condition,2
+Sweet Potatoes,dried,15
+Sweet Potatoes,dried_grain,2
+Sweet Potatoes,fresh,1241
+Sweet Potatoes,fresh_in_pods,2
+Sweet Potatoes,fresh_with_shell,3
+Sweet Potatoes,other_condition,3
+Sweet Potatoes,unknown_condition,4
+Tea,fresh,76
+Tea,unknown_condition,2
+Tobacco,dried,196
+Tobacco,dried_grain,1
+Tobacco,fresh,4
+Tobacco,unknown_condition,2
+Tomatoes,dried_with_shell,1
+Tomatoes,fresh,388
+Tomatoes,other_condition,1
+Tomatoes,unknown_condition,3
+Vanilla,dried,1
+Vanilla,dried_grain,2
+Vanilla,dried_in_pods,1
+Vanilla,dry_at_harvest_with_shell,1
+Vanilla,fresh,17
+Vanilla,fresh_in_pods,10
+Vanilla,fresh_with_shell,1
+Vanilla,green_in_pods,2
+Vanilla,other_condition,1
+Vanilla,unknown_condition,1
+Wheat,dried_grain,18
+Wheat,dried_with_shell,1
+Yam,fresh,129
+Yam,other_condition,1
+Yam,unknown_condition,1

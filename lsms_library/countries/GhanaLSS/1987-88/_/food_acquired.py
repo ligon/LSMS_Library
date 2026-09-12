@@ -7,18 +7,37 @@ So every row uses the LCU convention (food-acquired SKILL.md "LCU-only goods:
 u='Value'"):  u='Value', Quantity == Expenditure == the recorded value.
 
 Sources:
-  Y12A.DAT -- purchases   (food codes in Code_12A; per-recall value CFOODBLV)
-  Y12B.DAT -- own production (food codes in Code_12B; per-recall value VFOODCPD)
+  Y12A.DAT -- purchases   (food codes in Code_12A; CFOODBLV = amount spent
+              "since my last visit", the single ~fortnight recall)
+  Y12B.DAT -- own production (food codes in Code_12B).  Section 12B asks NO
+              recall question: VFOODCPD is "How much would it cost to buy the
+              amount they ate each time?" -- the value of ONE EATING OCCASION
+              -- beside MFOODCLY (months eaten of the last 12), TFOODC (times
+              per unit) and UTFOODC (unit code).  Serving VFOODCPD as the
+              produced Expenditure (as this script did until 2026-09-11) put
+              one meal beside a fortnight: the own-production share of food
+              read 17% where a like-for-like window gives ~39%.
+
+              The served produced value is therefore DERIVED --
+              ghanalss.derive_12b_fortnight_value(): the year-average
+              fortnight, VFOODCPD x TFOODC x (14 / days_per_unit) x
+              MFOODCLY / 12 = GSS's own annual EXPEND.HPFOOD / 26 -- and every
+              produced row carries the registry key in the `Derivation`
+              column (see _/derivations.yml, SkunkWorks/derived_values.org).
+              The raw answers come back by name from
+              Country('GhanaLSS').derivation_inputs(DERIVATION_12B).
 
 Output (canonical, with a country-local degenerate `visit` level -- D1):
   index  : (t, i, j, u, s, visit)        NO v (joined from sample() at API time)
-  columns: [Quantity, Expenditure]
+  columns: [Quantity, Expenditure, Derivation]
   i = household id (canonical format via this wave's i() helper)
   j = harmonized food item (Preferred Label)
   u = 'Value' (synthetic LCU unit -- no physical units this wave)
   s in {purchased, produced}  as an INDEX level
   t = '1987-88'
-  visit = 1  (single "since my last visit" recall -- degenerate but present, D1)
+  visit = 1  (a single ask -- degenerate but present, D1)
+  Derivation = 'GhanaLSS::food_acquired::12b-fortnight' on produced rows, NA
+               on purchased rows
 """
 import sys
 sys.path.append('../../_')
@@ -26,11 +45,14 @@ from mapping import i as i_helper
 import numpy as np
 import pandas as pd
 sys.path.append('../../../_/')
+from ghanalss import derive_12b_fortnight_value
 from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
                                       to_parquet)
 
 t = '1987-88'
-VISIT = 1  # single "since my last visit" recall (D1: degenerate but kept)
+VISIT = 1  # a single ask per module (D1: degenerate but kept)
+# The registry key stamped on every produced row (_/derivations.yml).
+DERIVATION_12B = 'GhanaLSS::food_acquired::12b-fortnight'
 
 # Harmonized food labels: Code_12A (purchases) / Code_12B (production) -> Preferred Label
 labels = df_from_orgfile('./categorical_mapping.org', name='harmonize_food',
@@ -41,12 +63,16 @@ for column in ['Code_12A', 'Code_12B']:
     labelsd[column] = labels[['Preferred Label', column]].set_index(column).to_dict('dict')
 
 
-def _value_only_side(fn, code_col, value_col, s):
+def _value_only_side(fn, code_col, value_col, s, derive=None):
     """Build canonical long rows for one acquisition source (money-only).
 
     Returns a DataFrame indexed by (t, i, j, u, s, visit) with columns
-    [Quantity, Expenditure], where Quantity == Expenditure == recorded value
-    and u == 'Value'.
+    [Quantity, Expenditure], where Quantity == Expenditure and u == 'Value'.
+    The value is the recorded `value_col`, or -- when `derive` is given -- a
+    function of the source frame (12B: the derived fortnight value).  Rows
+    are kept or dropped on the RECORDED value either way, so a derivation
+    that evaluates to 0 (MFOODCLY == 0, three rows here) is served as 0
+    under its key rather than silently removed.
     """
     df = get_dataframe(fn)
 
@@ -65,12 +91,13 @@ def _value_only_side(fn, code_col, value_col, s):
     df['j'] = (df['FOODCD'].apply(format_id).astype('string')
                            .replace(labelsd[code_col]['Preferred Label']))
 
-    # per-recall-period value (NOT the pre-annualized *_yearly column)
-    df['value'] = pd.to_numeric(df[value_col].replace({'.': np.nan}), errors='coerce')
+    # the recorded value (NOT the pre-annualized *_yearly column)
+    recorded = pd.to_numeric(df[value_col].replace({'.': np.nan}), errors='coerce')
+    df['value'] = derive(df) if derive is not None else recorded
 
     out = df[['i', 'j', 'value']].copy()
-    # drop rows with no recorded value (missing '.' or zero) and unmapped/blank j
-    out = out[out['value'].notna() & (out['value'] != 0)]
+    # drop rows with no RECORDED value (missing '.' or zero) and unmapped/blank j
+    out = out[recorded.notna() & (recorded != 0)]
     out = out[out['j'].notna() & (out['j'].astype(str).str.strip() != '')]
 
     out['t'] = t
@@ -86,7 +113,16 @@ def _value_only_side(fn, code_col, value_col, s):
 
 
 purchased = _value_only_side('../Data/Y12A.DAT', 'Code_12A', 'CFOODBLV', 'purchased')
-produced = _value_only_side('../Data/Y12B.DAT', 'Code_12B', 'VFOODCPD', 'produced')
+
+
+def _fortnight_12b(df):
+    """Year-average fortnight value from the four 12B answers (see module doc)."""
+    return derive_12b_fortnight_value(df['MFOODCLY'], df['TFOODC'],
+                                      df['UTFOODC'], df['VFOODCPD'])
+
+
+produced = _value_only_side('../Data/Y12B.DAT', 'Code_12B', 'VFOODCPD', 'produced',
+                            derive=_fortnight_12b)
 
 f = pd.concat([purchased, produced])
 
@@ -96,5 +132,12 @@ f = pd.concat([purchased, produced])
 # index unique -- otherwise the API-layer canonical-shape guard would collapse
 # them via groupby().first() and silently drop rows.
 f = f.groupby(level=f.index.names).sum(min_count=1)
+assert f.index.is_unique, 'non-unique (t, i, j, u, s, visit) after the collapse'
+
+# Row label AFTER the collapse (a string must never reach the .sum()): every
+# produced row is the derived value, every purchased row is a recorded answer.
+produced_mask = f.index.get_level_values('s') == 'produced'
+f['Derivation'] = pd.Series(np.where(produced_mask, DERIVATION_12B, None),
+                            index=f.index, dtype='string')
 
 to_parquet(f, 'food_acquired.parquet')

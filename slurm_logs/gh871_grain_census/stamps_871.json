@@ -1,0 +1,927 @@
+[
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 10800,
+  "dropped": 9900,
+  "destroyed": 1034,
+  "conflicting_groups": 94,
+  "nan_key_rows": 0,
+  "country": "Burkina_Faso",
+  "table": "cluster_features",
+  "wave": "2014",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 22877,
+  "dropped": 183,
+  "destroyed": 163,
+  "conflicting_groups": 150,
+  "nan_key_rows": 0,
+  "country": "Burkina_Faso",
+  "table": "plot_inputs",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "Shock"
+  ],
+  "rows": 194246,
+  "dropped": 38,
+  "destroyed": 1,
+  "conflicting_groups": 1,
+  "nan_key_rows": 9,
+  "country": "Burkina_Faso",
+  "table": "shocks",
+  "wave": "2014",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 12992,
+  "dropped": 11908,
+  "destroyed": 11,
+  "conflicting_groups": 1,
+  "nan_key_rows": 0,
+  "country": "CotedIvoire",
+  "table": "cluster_features",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "pid"
+  ],
+  "rows": 10563,
+  "dropped": 2,
+  "destroyed": 2,
+  "conflicting_groups": 2,
+  "nan_key_rows": 0,
+  "country": "CotedIvoire",
+  "table": "household_roster",
+  "wave": "1988-89",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "pid"
+  ],
+  "rows": 8302,
+  "dropped": 2,
+  "destroyed": 0,
+  "conflicting_groups": 0,
+  "nan_key_rows": 1,
+  "country": "CotedIvoire",
+  "table": "individual_education",
+  "wave": "1988-89",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 11259,
+  "dropped": 9,
+  "destroyed": 1,
+  "conflicting_groups": 1,
+  "nan_key_rows": 0,
+  "country": "CotedIvoire",
+  "table": "plot_inputs",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 3969,
+  "dropped": 3636,
+  "destroyed": 373,
+  "conflicting_groups": 34,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "cluster_features",
+  "wave": "2011-12",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 5262,
+  "dropped": 4829,
+  "destroyed": 454,
+  "conflicting_groups": 43,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "cluster_features",
+  "wave": "2013-14",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4954,
+  "dropped": 4522,
+  "destroyed": 732,
+  "conflicting_groups": 72,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "cluster_features",
+  "wave": "2015-16",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4959,
+  "dropped": 4524,
+  "destroyed": 1240,
+  "conflicting_groups": 111,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "cluster_features",
+  "wave": "2021-22",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "j",
+   "u"
+  ],
+  "rows": 26765,
+  "dropped": 606,
+  "destroyed": 2,
+  "conflicting_groups": 1,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "crop_production",
+  "wave": "2013-14",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "j",
+   "u"
+  ],
+  "rows": 25924,
+  "dropped": 4,
+  "destroyed": 2,
+  "conflicting_groups": 2,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "crop_production",
+  "wave": "2015-16",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "j",
+   "u"
+  ],
+  "rows": 14102,
+  "dropped": 10,
+  "destroyed": 7,
+  "conflicting_groups": 7,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "crop_production",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "j",
+   "u"
+  ],
+  "rows": 11623,
+  "dropped": 19,
+  "destroyed": 17,
+  "conflicting_groups": 15,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "crop_production",
+  "wave": "2021-22",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i"
+  ],
+  "rows": 1596,
+  "dropped": 15,
+  "destroyed": 10,
+  "conflicting_groups": 10,
+  "nan_key_rows": 0,
+  "country": "Ethiopia",
+  "table": "interview_date",
+  "wave": "2021-22",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 12188,
+  "dropped": 15,
+  "destroyed": 11,
+  "conflicting_groups": 11,
+  "nan_key_rows": 1596,
+  "country": "Guinea-Bissau",
+  "table": "crop_production",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 25146,
+  "dropped": 22318,
+  "destroyed": 8,
+  "conflicting_groups": 1,
+  "nan_key_rows": 0,
+  "country": "Iraq",
+  "table": "cluster_features",
+  "wave": "2012",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 7224,
+  "dropped": 7089,
+  "destroyed": 209,
+  "conflicting_groups": 2,
+  "nan_key_rows": 0,
+  "country": "Kazakhstan",
+  "table": "cluster_features",
+  "wave": "1996",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "i"
+  ],
+  "rows": 7047,
+  "dropped": 4182,
+  "destroyed": 4182,
+  "conflicting_groups": 609,
+  "nan_key_rows": 0,
+  "country": "Kosovo",
+  "table": "housing",
+  "wave": "2000",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 2986,
+  "dropped": 2954,
+  "destroyed": 2779,
+  "conflicting_groups": 17,
+  "nan_key_rows": 0,
+  "country": "Liberia",
+  "table": "cluster_features",
+  "wave": "2018-19",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4000,
+  "dropped": 3796,
+  "destroyed": 3540,
+  "conflicting_groups": 188,
+  "nan_key_rows": 0,
+  "country": "Malawi",
+  "table": "cluster_features",
+  "wave": "2013-14",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 14955,
+  "dropped": 14075,
+  "destroyed": 1994,
+  "conflicting_groups": 85,
+  "nan_key_rows": 0,
+  "country": "Malawi",
+  "table": "cluster_features",
+  "wave": "2016-17",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 14612,
+  "dropped": 13793,
+  "destroyed": 3146,
+  "conflicting_groups": 108,
+  "nan_key_rows": 0,
+  "country": "Malawi",
+  "table": "cluster_features",
+  "wave": "2019-20",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "Shock"
+  ],
+  "rows": 203044,
+  "dropped": 11077,
+  "destroyed": 291,
+  "conflicting_groups": 288,
+  "nan_key_rows": 3,
+  "country": "Malawi",
+  "table": "shocks",
+  "wave": "2004-05",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v",
+   "i"
+  ],
+  "rows": 7608,
+  "dropped": 3804,
+  "destroyed": 3746,
+  "conflicting_groups": 3746,
+  "nan_key_rows": 0,
+  "country": "Mali",
+  "table": "interview_date",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v",
+   "i"
+  ],
+  "rows": 16780,
+  "dropped": 8390,
+  "destroyed": 8390,
+  "conflicting_groups": 8390,
+  "nan_key_rows": 0,
+  "country": "Mali",
+  "table": "interview_date",
+  "wave": "2017-18",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "j"
+  ],
+  "rows": 122978,
+  "dropped": 2006,
+  "destroyed": 481,
+  "conflicting_groups": 481,
+  "nan_key_rows": 0,
+  "additive_reconciled": [
+   "Value"
+  ],
+  "country": "Niger",
+  "table": "assets",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": true
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 3617,
+  "dropped": 3347,
+  "destroyed": 42,
+  "conflicting_groups": 4,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "cluster_features",
+  "wave": "2014-15",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 11983,
+  "dropped": 30,
+  "destroyed": 19,
+  "conflicting_groups": 19,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "crop_production",
+  "wave": "2011-12",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 9528,
+  "dropped": 46,
+  "destroyed": 45,
+  "conflicting_groups": 45,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "crop_production",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 12933,
+  "dropped": 1010,
+  "destroyed": 897,
+  "conflicting_groups": 740,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "crop_production",
+  "wave": "2021-22",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i"
+  ],
+  "rows": 3617,
+  "dropped": 59,
+  "destroyed": 38,
+  "conflicting_groups": 38,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "food_security",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "pid"
+  ],
+  "rows": 26579,
+  "dropped": 210,
+  "destroyed": 210,
+  "conflicting_groups": 210,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "household_roster",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i"
+  ],
+  "rows": 3617,
+  "dropped": 59,
+  "destroyed": 23,
+  "conflicting_groups": 23,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "housing",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "pid"
+  ],
+  "rows": 26579,
+  "dropped": 210,
+  "destroyed": 58,
+  "conflicting_groups": 58,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "individual_education",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 8538,
+  "dropped": 73,
+  "destroyed": 51,
+  "conflicting_groups": 48,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "plot_inputs",
+  "wave": "2011-12",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 8179,
+  "dropped": 108,
+  "destroyed": 88,
+  "conflicting_groups": 82,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "plot_inputs",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 13401,
+  "dropped": 6,
+  "destroyed": 6,
+  "conflicting_groups": 6,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "plot_inputs",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 12439,
+  "dropped": 3,
+  "destroyed": 3,
+  "conflicting_groups": 3,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "plot_inputs",
+  "wave": "2021-22",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "Shock"
+  ],
+  "rows": 72340,
+  "dropped": 1180,
+  "destroyed": 80,
+  "conflicting_groups": 80,
+  "nan_key_rows": 0,
+  "country": "Niger",
+  "table": "shocks",
+  "wave": "2014-15",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "j"
+  ],
+  "rows": 175857,
+  "dropped": 14493,
+  "destroyed": 11936,
+  "conflicting_groups": 7035,
+  "nan_key_rows": 0,
+  "additive_reconciled": [
+   "Value"
+  ],
+  "country": "Nigeria",
+  "table": "assets",
+  "wave": "2012Q3",
+  "missing_levels": null,
+  "additive": true
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "j"
+  ],
+  "rows": 175857,
+  "dropped": 14493,
+  "destroyed": 11936,
+  "conflicting_groups": 7035,
+  "nan_key_rows": 0,
+  "additive_reconciled": [
+   "Value"
+  ],
+  "country": "Nigeria",
+  "table": "assets",
+  "wave": "2013Q1",
+  "missing_levels": null,
+  "additive": true
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4898,
+  "dropped": 4250,
+  "destroyed": 609,
+  "conflicting_groups": 70,
+  "nan_key_rows": 39,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2012Q3",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4898,
+  "dropped": 4250,
+  "destroyed": 609,
+  "conflicting_groups": 70,
+  "nan_key_rows": 39,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2013Q1",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4697,
+  "dropped": 3904,
+  "destroyed": 618,
+  "conflicting_groups": 78,
+  "nan_key_rows": 1,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2015Q3",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4697,
+  "dropped": 3904,
+  "destroyed": 618,
+  "conflicting_groups": 78,
+  "nan_key_rows": 1,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2016Q1",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 5263,
+  "dropped": 4578,
+  "destroyed": 1254,
+  "conflicting_groups": 129,
+  "nan_key_rows": 0,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2018Q3",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 5263,
+  "dropped": 4578,
+  "destroyed": 1254,
+  "conflicting_groups": 129,
+  "nan_key_rows": 0,
+  "country": "Nigeria",
+  "table": "cluster_features",
+  "wave": "2019Q1",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "i",
+   "input",
+   "crop",
+   "u"
+  ],
+  "rows": 9916,
+  "dropped": 15,
+  "destroyed": 10,
+  "conflicting_groups": 10,
+  "nan_key_rows": 0,
+  "country": "Senegal",
+  "table": "plot_inputs",
+  "wave": "2018-19",
+  "missing_levels": null,
+  "additive": false
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 3465,
+  "dropped": 3056,
+  "destroyed": 605,
+  "conflicting_groups": 78,
+  "nan_key_rows": 0,
+  "country": "Tanzania",
+  "table": "cluster_features",
+  "wave": "2010-11",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4023,
+  "dropped": 3614,
+  "destroyed": 1304,
+  "conflicting_groups": 138,
+  "nan_key_rows": 0,
+  "country": "Tanzania",
+  "table": "cluster_features",
+  "wave": "2012-13",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 4129,
+  "dropped": 3631,
+  "destroyed": 404,
+  "conflicting_groups": 37,
+  "nan_key_rows": 0,
+  "country": "Tanzania",
+  "table": "cluster_features",
+  "wave": "2014-15",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 679,
+  "dropped": 532,
+  "destroyed": 197,
+  "conflicting_groups": 52,
+  "nan_key_rows": 0,
+  "country": "Tanzania",
+  "table": "cluster_features",
+  "wave": "2019-20",
+  "site": "Wave.cluster_features"
+ },
+ {
+  "levels": [
+   "t",
+   "v"
+  ],
+  "rows": 2863,
+  "dropped": 2348,
+  "destroyed": 177,
+  "conflicting_groups": 42,
+  "nan_key_rows": 0,
+  "country": "Tanzania",
+  "table": "cluster_features",
+  "wave": "2020-21",
+  "site": "Wave.cluster_features"
+ }
+]

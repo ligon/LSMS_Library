@@ -596,6 +596,15 @@
 | Zamfara                                  | Zamfara                                  |
 | zamfara                                  | Zamfara                                  |
 
+Housing (Roof / Floor): canonical harmonization per
+=lsms_library/categorical_mapping/canonical_housing_labels.org= (GH #170),
+auto-applied by column name at API time.  The wave scripts
+(={wave}/_/housing.py=) normalise source spellings first (=Terrazo= in
+2018-19, =Terazo= in 2023-24 -> =Terrazzo=); these two tables then fold
+that spelling onto the canon.  =Terrazzo= -> *Terrazzo* since 2026-09-02
+(GH #727; was *Tiles*): 16 floors in 2018Q3 and 13 in 2024Q1 move out of
+=Tiles=.  Prose stays ABOVE the =#+NAME:= lines.
+
 #+NAME: Roof
 | Alternate Spelling           | Preferred Label  |
 |------------------------------+------------------|
@@ -619,7 +628,7 @@
 | Sand/Dirt/Straw      | Earth           |
 | Tile                 | Tiles           |
 | Wood                 | Wood            |
-| Terrazzo             | Tiles           |
+| Terrazzo             | Terrazzo        |
 | Marble               | Tiles           |
 
 * plot_features harmonization tables (GH #167)

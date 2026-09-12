@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -337,7 +338,7 @@ individual_education, food_acquired, assets, housing,
 interview_date, shocks, food_expenditures, food_prices,
 food_quantities.)
 
-* Data Quality Notes
+* Known data issues
 
 ** Grain: the three ways Benin's declared indexes go non-unique (GH #323)
 
@@ -425,7 +426,10 @@ SUMMED, not =first()=-ed, which is why the audit is silent.  Colliding
 rows necessarily share =u= *and* =s= (both are in the index), so the
 sums are commensurable by construction.  Verified: wave-frame and API
 totals agree exactly — Quantity 576,293.81, Expenditure 87,287,926.96
-— across the 190,618 → 189,236 row reduction.
+— across the 190,618 → 189,236 row reduction.  (That Expenditure total is
+the PRE-#876 one, i.e. the raw =s07bq08= sum; since 2026-09-12 the served
+purchased total is 73,221,529.68 — see "one row, two windows" below.  The
+conservation property this section is about is unchanged.)
 
 *** No =aggregation:= keys, deliberately
 
@@ -462,6 +466,31 @@ History: prior to the 2026-04-12 cleanup (commit =9d677f25=),
 but every row was =NaN=, breaking the cross-country
 =test_no_fully_null_columns[Benin/shocks]= sanity test.  The fix
 removed the column from both the scheme and the extractor.
+
+** household_roster 2018-19: =Frere, soeur= read with a C1 control byte (GH #801)
+
+=s01_me_ben2018.dta= is Stata format 115 with no declared encoding, and its
+value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
+=Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
+reads the file through pandas =StataReader=, which decodes every pre-118
+file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
+served =Frere, s<U+009C>ur= (895 rows).  pyreadstat's default, or
+=encoding='cp1252'=, reads the same file correctly -- the defect is the
+reader's Latin-1 fallback, not the file (bytes and decoder matrix in
+=slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
+as cp1252; the =household_roster= hook applies it to =Relationship=
+only.  Served label is now =Frere, soeur= with the ligature restored,
+the file's own casing (Benin runs no =Relationship= formatter), as CotedIvoire / Burkina Faso 2018-19 serve it; kinship tuple [0, 1, consanguineal] unchanged; 895 rows changed,
+nothing else.  The C1-control spellings were deleted from
+=lsms_library/categorical_mapping/kinship.yml= at the same time, so that
+file no longer carries the artefact and a regression would surface as an
+=Unknown relationship labels= warning instead of resolving silently.
+
+Same defect and same fix in Niger 2018-19, Senegal 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
+roster files).  See GH #801 and the #797 vocabulary sweep
+(=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
 
 * Household Presence / MonthsSpent
 
@@ -507,3 +536,113 @@ mirroring =Mali/_/mali.py=.
   number) are dropped.  =v= is joined from =sample()= at API time
   (not baked in).  Latitude / Longitude deferred — EHCVM s16a has no
   decimal-degree parcel GPS.
+
+* 2026-09-10 -- the plot axis is now spelled =plot_id=, not =plot=
+
+@ligon's decision: =plot_id= is the canonical plot-axis level name EVERYWHERE.
+This country declared =plot= on crop_production, plot_labor; those =index:= tuples in
+=_/data_scheme.yml=, and the index name the wave script / country module
+writes, are now =plot_id=.  =plot_features= already said =plot_id= and is
+unchanged.
+
+- *Values are untouched.*  This is a level NAME change only: the same plot key
+  strings, the same rows, the same columns.  A warm frame read before and
+  after differs only by =rename_axis({'plot': 'plot_id'})= -- verified by
+  comparing the API frame against the pre-change one.
+- *The caches for this whole country are invalidated.*
+  =Country._table_cache_hash= hashes =_/data_scheme.yml= and the country
+  module as WHOLE FILES, so every table's hash moved, not just the renamed
+  ones.  A re-warm is required; see the bill in
+  =.coder/ledger/crop-production-plot-id.md=.
+- *A shared axis NAME is still not a shared VOCABULARY.*  Uganda's ag modules
+  key plots ={hhid}-{parcel}-{plot}= while =plot_features= keys them
+  ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
+  need =on='parcel'= to bridge them.  Renaming the level changed nothing
+  about that.
+
+* 2026-09-12 -- =food_acquired=: one row, two windows (GH #876)
+
+=food_acquired.Expenditure= used to be wired straight to =s07bq08=, whose
+Stata label is "7B.08. Valeur (en FCFA) du [PRODUIT] achete la derniere
+fois" -- the value of *one* purchase, which =s07bq06= places up to 30 days
+back -- sitting on the same row as =Quantity=, a *7-day* consumption figure.
+Section 7B is headed "Consommation alimentaire des 7 derniers jours et achat
+des 30 derniers jours"; the row carried both clocks and nothing in the frame
+said so.  =s07bq05=, the quantity received as a GIFT, was never read at all.
+
+The served =Expenditure= is now DERIVED, on the survey's own accounting
+identity (construction "C", @ligon 2026-09-12):
+
+  : Quantity     = (s07bq03a - s07bq04 - s07bq05).clip(0)
+  : Expenditure  = Quantity * (s07bq08 / s07bq07a)
+
+-- the 7-day consumption net of own production AND of gifts, times the unit
+value of the last purchase -- so =Expenditure / Quantity= is exactly that
+unit value and the two numbers on the row refer to the same thing.  =NA=,
+never a guess, where =s07bq07a= is not positive or where the purchase was
+made in a different unit (or a different SIZE of the same unit) from the
+consumption: no EHCVM wave ships a unit-conversion table, so there is no
+exact conversion to apply.
+
+And the gift quantity is now SERVED, on its own =s = 'inkind'= rows in the
+consumption unit =s07bq03b=, with =Expenditure= *NA*.  EHCVM asks no value
+for a gift; UEMOA's =depan(Don)= is that quantity priced at the same
+last-purchase unit value -- verified below, and therefore an imputation, not
+an answer -- so the library checks it and does not serve it.  Own production
+is unchanged: =s = 'produced'= from =s07bq04=, =Expenditure= NA, which was
+already the rule.
+
+One function for all eight EHCVM countries (=lsms_library/ehcvm.py=,
+=derive_ehcvm_purchase_value=), registered once per country in
+=_/derivations.yml= and stamped on every purchased row in the =Derivation=
+column:
+
+  : Benin::food_acquired::7day-purchase-at-last-purchase-unit-value
+
+Raw answers come back by their original names from
+=Country('Benin').derivation_inputs(key, wave=...)=.
+
+** What moved
+
+| wave | purchased rows | Expenditure sum | inkind rows (qty) | Expenditure NA, share of SERVED purchased rows: no last purchase / different unit code / same code, different size |
+|------+---+---+---+---|
+| 2018-19 | 167,087 -> 147,149 | 87,287,927 -> 68,929,997 (-21.0%) | 0 -> 18,632 (53,318) | 14,334 (9.7%): 6,451 / 4,143 / 3,740 |
+
+Purchased row counts fall for two reasons: a row whose purchased quantity is
+zero used to survive on the raw =s07bq08= being positive, and the gift
+subtraction moves more rows to zero.  Those quantities are not lost -- they
+are in the new inkind rows.  The NA column is on the SERVED denominator --
+purchased rows of the delivered table, after the canonical reshape and the
+=(t, v, i, j, u, s)= collapse -- because that is what a user sees.  An earlier
+version of this section quoted the smaller SOURCE-row counts on the
+=s07bq07a > 0= subset, and so understated the NA share.
+
+The three candidate quantities, and why C:
+
+- 2018-19: A (gross =s07bq03a=) 75,023,618, B (net of own production) 73,221,530, *C (served)* 68,929,997 FCFA; raw =s07bq08= was 87,287,927.
+
+The three are within 1-9% of each other and all far below the raw total, so
+the large move is the #876 fix itself, not the choice among them.  The choice
+is settled by =ehcvm_conso=, not by the size of the number.
+
+  The product-level check against =ehcvm_conso= does not run for this wave --
+  its conso =codpr= does not share a keyspace with =s07bq01=, and CotedIvoire
+  2018-19 ships no conso file at all.  The construction is validated on Togo
+  2018 and Guinea-Bissau 2018-19, where the join works: the served rule
+  reproduces =depan(Achat)= within 1% for 99.5% / 100% of the discriminating
+  rows, against 13.1% / 48.6% for B and 0.0% / 0.0% for A; =s07bq05 * uv=
+  reproduces =depan(Don)= for 99.7% / 100%, which is why the gift rows carry
+  =Expenditure= NA rather than that imputation.  The instrument is the same in
+  all twelve waves (identical =s07bq0*= Stata labels), so the reading carries
+  by inference, not by measurement here.
+
+** What this does NOT fix
+
+- The served =u= index still carries only =s07bq03b=, not the unit SIZE
+  =s07bq03c=, so two rows differing only in container size collapse onto one
+  =u=.  The derivation does distinguish them; the index does not.
+- The price still comes from a purchase up to 30 days old.  That is what the
+  instrument asked; the assumption is recorded rather than hidden.
+- =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
+  served as rows of their own; they are inputs to the unit value, retrievable
+  through =derivation_inputs=.

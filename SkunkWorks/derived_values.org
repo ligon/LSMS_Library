@@ -1,0 +1,515 @@
+#+TITLE: Derived Values: served numbers that are not survey answers (Design, DRAFT)
+#+DATE: 2026-09-11
+#+AUTHOR: Sue (with E. Ligon)
+
+* Status
+
+First instance IMPLEMENTED on =feat/derived-values= (2026-09-11): =lsms_library/derivations.py=, the GhanaLSS 12B entry, =tests/test_derivations.py= and =tests/test_ghanalss_12b.py=.  Decided with @ligon on 2026-09-11:
+the shape (registry + row label + raw-input retrieval); the rule that
+a derivation function has ONE construction, no options; that a key
+names an OPERATION and =derivation_inputs= returns the INPUT grain; and
+the key format =country::table::name= with empty slots meaning "all"
+and the wave scope inside the entry (below).  Open points are listed
+at the end.  The census of existing derivations
+(section "What the corpus already does") is being filled by a sweep
+of every wave script; the design is to be checked against it before
+the first instance lands.
+
+* Context: one meal beside a fortnight
+
+GhanaLSS 1987-88 and 1988-89 =food_acquired= serve, on the
+=s='produced'= side, =Y12B.VFOODCPD= -- the answer to 12B q5, "How
+much would it cost to buy the amount they ate each time?" -- as the
+row's =Expenditure=.  The =s='purchased'= side serves =Y12A.CFOODBLV=,
+"How much have they spent since my visit?", a bounded recall of about
+a fortnight.  Nothing in the frame distinguishes the two: same table,
+same columns, same =visit = 1=, same =u = 'Value'=.  A user pooling the
+two sides, or pooling these waves with 2016-17's six five-day recalls,
+is comparing one eating occasion with thirty days and cannot know it.
+
+The instrument never asked a "since my last visit" question in 12B.
+It asked the number of months in the past twelve the item was eaten
+(=MFOODCLY=), how many times per day/week/month/quarter/half-year/year
+(=TFOODC=, =UTFOODC=), and the value of one occasion (=VFOODCPD=).  GSS
+itself annualised those into =EXPEND.HPFOOD=; the product
+=VFOODCPD x TFOODC x (30.4 / days_per_unit) x MFOODCLY= reproduces
+=HPFOOD= with median ratio 1.02 in both rounds.  Any commensurable
+number the library serves for these rows is therefore a
+/construction/ from four raw answers under a stated assumption, not a
+survey answer.
+
+That is the general shape, and it is not rare.  Known instances before
+the census (each with its disclosure today):
+
+| derivation                                                    | disclosed by                          |
+|---------------------------------------------------------------+---------------------------------------|
+| food kg factors by price-ratio inference (GH #850)            | per-row =KgFactorSource= + =attrs=    |
+| EHCVM =MonthsSpent=: binary =s01q12= Oui -> 12, Non -> 0      | CLAUDE.md prose                       |
+| GhanaLSS 2005-06 merged-=j= farmgate =Price= = qty-weighted mean | script comment                     |
+| Uganda 2015-16 =a5aq8= / 100 guard (GH #829)                  | script + CONTENTS.org                 |
+| =age_handler= DOB-derived fractional =Age=                    | CLAUDE.md gotcha                      |
+| =u = 'Value'=: =Quantity := Expenditure=                      | an index convention (visible)         |
+| GhanaLSS 1987-89 =VFOODCPD= as a recall value                 | nothing (defect, 2026-09-11)          |
+
+Only the first is discoverable from the frame; the sixth is
+discoverable because it changed the vocabulary; the rest are knowable
+only by reading prose.
+
+* The precept, and the two ways of failing it
+
+The project's precept is to respect the information in the original
+survey.  Two obvious responses both fail it:
+
+- Serve the raw answer and document the window in prose :: the
+  documentation-only option.  The frame still says =Expenditure=; the
+  prose is read by nobody at the moment of pooling.  This is the #323
+  failure mode -- "a warning nobody reads" -- in a different costume,
+  and it is the state the 1980s waves have been in.
+- Serve the constructed number silently :: what the kg inference did
+  before #850.  Commensurable, and indistinguishable from a survey
+  answer.
+
+The precept is satisfied only if all of the following hold:
+
+1. the raw answers are retrievable exactly, by their original names,
+   at the served grain;
+2. the served row is labelled derived, in a way that survives
+   concatenation, caching and =Feature()=;
+3. the derivation is a named, tested, reproducible function whose
+   assumptions are stated with their evidence, not arithmetic buried in
+   a wave script;
+4. there is exactly ONE construction per parquet.  A derivation
+   function takes no options: the cache is content-addressed and a
+   cached parquet must be one identifiable construction, not one of
+   several (decided 2026-09-11).  A user who wants the value under a
+   different assumption re-derives it from the raw inputs (1), which
+   is what (1) is for.
+
+* Mechanism
+
+Three carriers, because no single one does all three jobs.
+
+** Which derivations get a key
+
+The column is a signal only if it is rare.  Rule: a derivation that
+is ALREADY visible in the frame is exempt -- an index value
+(=u = 'Value'=, which says in the vocabulary that =Quantity= is a
+currency amount) or a per-row source column of its own
+(=KgFactorSource= on the kg factors).  The key is for derivations that
+are otherwise invisible: a served column whose number is a
+construction the frame does not announce.  Whether the kg inference
+should migrate onto the mechanism or keep its own column is deferred
+to the census; the two must not both fire on one row.
+
+** The =Derivation= column (row-level prominence)
+
+A nullable string column on the served table.  =NA= on a reported
+row; on a derived row, the registry key of the derivation
+(=GhanaLSS::food_acquired::12b-fortnight=).  Where two derivations touch one row the
+keys are joined with =+= in sorted order.
+
+- Why a column and not =attrs= :: =attrs= survive an operation only
+  when every input agrees, so =Feature()='s concat drops them (see
+  CLAUDE.md, "attrs survive ... only when every input agrees").  A
+  column rides through concat, groupby, cache and parquet.
+- Why a column and not an index value :: =u = 'Value'= shows an index
+  value is the MOST prominent carrier, because it changes the
+  vocabulary.  But =s= means source-of-acquisition and =u= means unit;
+  an =s = 'produced-derived'= would silently drop those rows from
+  every =s == 'produced'= selection, which is the mirror image of the
+  trap being fixed.  The grain is the grain.
+- Declared =optional: true= under =Columns= in the canonical
+  =data_info.yml= for each table that can carry it, with one shared
+  note.  A country with no derivations never emits it and
+  =Feature()='s concat fills =NA=.
+- Cost :: one nullable string column, =NA= on the vast majority of
+  rows; pyarrow stores it as a dictionary.  Adding it to a wave's
+  parquet moves that wave's cache hash -- the same waves whose script
+  changes to stamp it.
+- Trap :: =_SCHEME_NON_COLUMN_KEYS= (=country.py=) is
+  ={index, materialize, backend, aggregation}=, so a =derivation:= key
+  in a =data_scheme.yml= table entry would be read as a required
+  column.  The registry lives in its own file (next), never in the
+  scheme.
+
+** The registry (the derivation as a named, evidenced object)
+
+=countries/<C>/_/derivations.yml=, a sibling of =population.yml= and
+=recall.yml= (a new =.yml= sibling moves no cache hash; a block in
+=data_scheme.yml= would cold-rebuild the corpus).  One entry per key:
+
+#+begin_example
+GhanaLSS::food_acquired::12b-fortnight:
+  waves: ['1987-88', '1988-89']
+  columns: [Expenditure, Quantity]
+  rows: {s: produced}                       # which rows carry the key
+  rule: >-
+    Expenditure = VFOODCPD * TFOODC * (14 / days_per_unit[UTFOODC]) * MFOODCLY / 12;
+    Quantity = Expenditure (u = 'Value')
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_12b_fortnight_value
+  inputs:   lsms_library.countries.GhanaLSS._.ghanalss:inputs_12b
+  raw_variables: [Y12B.MFOODCLY, Y12B.TFOODC, Y12B.UTFOODC, Y12B.VFOODCPD]
+  assumptions:
+    - text: the window is the nominal fortnight of 12A ("in theory this period is two weeks")
+      basis: questionnaire
+      evidence: 1988-89 Interviewer manual printed p.70
+    - text: the interview fortnight is a random draw from the year (factor MFOODCLY/12)
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org, "First instance"
+  validated_against: EXPEND.HPFOOD (GSS annual construction), median ratio 1.02
+  contents: GhanaLSS/_/CONTENTS.org, "12B is a value per eating occasion"
+  since: 2026-09-11
+#+end_example
+
+- Key format (decided 2026-09-11) :: =country::table::name=, three
+  slots, an empty slot meaning "all".  The WAVE is not in the key: every
+  served row already carries =t=, so it would repeat the index, and a
+  rule spanning two rounds (12B) would need two identical entries.
+  Scope lives in the entry: =waves:= is a list or =all=.  Where a rule
+  genuinely differs by wave it is a different derivation with a
+  different NAME, each scoped to its waves (Nigeria:
+  =Nigeria::food_acquired::purchase-30d-transaction= for W4 beside
+  =...::consumption-from-purchases= for W1), which is more informative
+  than a wave number and lets =ll.derivations()= filter by wave from
+  the entries.  An empty country slot is a FRAMEWORK-level derivation
+  (=::household_roster::age-dob=), recorded in a =derivations.yml=
+  beside the package's canonical =data_info.yml= rather than under a
+  country; an empty table slot would be a country-wide rule (no case
+  in the census yet).  A row's =Derivation= value is the literal key;
+  empty slots resolve from the row's own country and =t=.
+- The =basis= vocabulary is =derivations.yml='s OWN, defined in its
+  own loader: the recall ladder's values (=questionnaire= >
+  =variable-label= > =config-comment= > =filename=) plus
+  =modelling-choice=, for an assumption no document can supply.
+  =recall.py='s loader rejects any basis outside =BASIS_LADDER= and
+  is not touched; do not reuse it.  A modelling choice is not
+  evidence and must not be laundered into one; naming it is the
+  point.
+- The loader refuses an entry missing =rule=, =function=, =inputs=,
+  =raw_variables= or =assumptions= (each with a =basis=) -- the
+  =PopulationRecord= discipline: a record that cannot say what it did
+  and why is not a record.
+- Why YAML + dotted callables rather than a decorator :: a decorator
+  (cf. =_build_registry.build_transform=) registers only when the
+  country module is imported, so a corpus-wide listing would have to
+  import every country module.  The YAML is readable without importing
+  anything, packages into a wheel, and the cache fingerprint already
+  covers the country module's source.  A drift test checks both
+  directions: every =function= / =inputs= path resolves, and every
+  function named =derive_*= in a country module is registered.
+- API :: =ll.derivations()= -- the corpus table (the coverage-matrix
+  shape; an unregistered derivation found by the census is then a
+  visible gap).  =Country(c).derivations(table=None)= -- the
+  country's entries.  =df.attrs['derivations']= --
+  ={country: {key: {rows: n, columns, waves}}}=, attached in
+  =_finalize_result= (in =_EXCLUDED_CALLABLES=, so it moves no cache
+  hash) and re-merged by =Feature()= the way =recall.merge_attrs=
+  does.  =Country.notes()= already surfaces CONTENTS.org; the
+  =contents= field is a pointer into it.
+
+** Raw-input retrieval (the exact survey answers, by name)
+
+=Country(c).derivation_inputs(key)= calls the registry's =inputs=
+callable, which re-reads the source through =get_dataframe= and
+returns a frame at the served grain (=t, i, j= for 12B) whose columns
+are the ORIGINAL variable names (=MFOODCLY, TFOODC, UTFOODC,
+VFOODCPD=), so it joins to the served table and reads against the
+questionnaire.  "Joins to the served table" is a promise the framework
+has to keep, not the inputs callable: =Country.derivation_inputs=
+re-keys =i= through =updated_ids= exactly as =_finalize_result= does
+for every served table (found 2026-09-11: GhanaLSS 1988-89 serves
+=101332= / =101332_1= -- a panel re-key plus a split-household suffix
+-- where =Y12B.DAT= says =200103=, so an un-walked raw frame had no
+row for the served household).  Slow and exact; nothing is stored.  A cached companion
+parquet is a possible later tier if the call is used enough to want
+one -- the registry key is what such a cache would be named by.
+
+** One level up: derived tables and =Feature()= (decided 2026-09-11: follow-on, and a different carrier)
+
+=food_expenditures= / =food_quantities= / =food_prices= are computed
+at read time from =food_acquired=, and =Feature()= concatenates across
+countries.  An earlier draft of this note proposed carrying the row
+label through both by set-union of keys within each group.  @ligon's
+call: that is a follow-on, and at that level the mechanism is NOT a
+per-row column but an ATTRIBUTE -- a summary saying that at the lower
+level there is something to explore.  A derived table did not derive
+those rows; it should point at the table that did, not relabel them.
+
+So: =df.attrs['derivations']= on a derived table (and on a =Feature()=
+result, per country) lists the keys present in its inputs with their
+row counts and the input table's name -- ={'GhanaLSS':
+{'GhanaLSS::food_acquired::12b-fortnight': {'rows': 44149, 'in':
+'food_acquired'}}}=.  The row label stops at the table where the
+derivation was made.  Two known constraints on the follow-on:
+=attrs= die at =Feature()='s concat, so the re-merge must be explicit
+(=recall.merge_attrs= is the intended precedent and has NO caller
+today -- the census found =attrs['recall']= already dies there); and
+the derived tables' groupby must not be asked to reduce the string
+column, which the first instance avoids by leaving it to fall away at
+the sum.
+
+*** DONE 2026-09-12 (GH #873): both re-merges are wired
+
+The follow-on landed.  =Feature.__call__= no longer hardcodes the
+population record: =feature._ATTRS_CARRIERS= is a registry of
+=(name, keys, attach)= triples -- population, recall, derivations --
+captured per country before =_harmonize_country_frame= / =pd.concat=
+and re-attached afterwards for the KEPT countries only, each through
+its own module's =merge_attrs=.  A fourth carrier is one entry there.
+
+So the parenthesis above ("=recall.merge_attrs= ... has NO caller
+today") is TRUE AS OF 2026-09-11 AND FALSE NOW; it is left standing
+because it is the finding that motivated the issue.  Both
+=recall.merge_attrs= and =derivations.merge_attrs= now accept either a
+frame or the bare =attrs= mapping, because =Feature= captures the
+mapping (the frame itself is reshaped on the way to the concat).
+
+Measured, =Feature('food_acquired')(['Guatemala','Panama'])=:
+=attrs['recall']= was =None= before and is ={'Guatemala','Panama'}=
+after; the 787,336 rows are unchanged.  And on the pair the issue
+names, =Feature('food_acquired')(['GhanaLSS','Guatemala'])= (1,919,331
+rows, a 1,511 s warm read): =population= ={GhanaLSS, Guatemala}=,
+=recall= ={GhanaLSS, Guatemala}= (GhanaLSS's per-wave windows are
+14/14/None/5/3/5/5 days against Guatemala's 15 -- exactly the mixed
+pool the record exists to disclose), =derivations= ={GhanaLSS}=
+(the only country with a =_/derivations.yml=).  All three were
+=None= except =population= before.  No cache hash moves -- 207
+=Country._table_cache_hash= values across 10 countries plus 4
+=build_transforms_fingerprint= values, all byte-identical
+(=feature.py= is read-path and is not in any build fingerprint).
+
+=No warning at pooling time= (next section) is honoured: only
+population reports, and that report is unchanged.
+
+** Site 1: the declared-index collapse
+
+=_normalize_dataframe_index= (=country.py=) reduces a non-unique
+declared index, and =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=,
+so measures SUM there while a string column gets =first()= -- which
+would silently keep one of two keys.  The set-union rule applies at
+Site 1 as well, and the wave-script uniqueness assert (Trap 9 in
+GhanaLSS's CONTENTS.org) remains the first guard: a derived row
+should never reach Site 1 non-unique.  Both, not either.
+
+** No warning at pooling time (decided 2026-09-11)
+
+A =PopulationHeterogeneityWarning=-style warning at =Feature()= was
+considered and declined: at that level the mechanism is the =attrs=
+summary (previous section), which says what is below and where to
+look; a warning would repeat it as noise.  =Country(...)= calls have
+the column itself.
+
+* First instance: GhanaLSS 1987-88 / 1988-89 own production
+
+- Function :: =ghanalss.derive_12b_fortnight_value(months, times, unit_code, value_each_time)= (the =derive_= prefix is what the drift test keys on)
+  with =days_per_unit = {3: 1, 4: 7, 5: 30.4, 6: 91.3, 7: 182.6, 8: 365}=
+  (the 12B legend: DAY 3, WEEK 4, MONTH 5, QUARTER 6, HALF YEAR 7,
+  YEAR 8) and =window_days = 14= as a module constant, not an argument.
+- Construction (decided 2026-09-11) :: the YEAR-AVERAGE fortnight,
+  =value_each_time * times * (14 / days_per_unit) * months / 12=, i.e.
+  GSS's own annual construction =HPFOOD= divided by 26.  Worked
+  example agreed with @ligon: 6 months of the 12, 12 times a month,
+  10 cedis each time -> 120 a month in season, 720 a year (=HPFOOD=),
+  55.3 for an in-season fortnight, and 27.6 for a fortnight drawn at
+  random from the year (the 6/12 is the chance the fortnight lands in
+  season).  Chosen because it is unbiased over the sample -- the
+  purchase side is a realised fortnight but the form does not record
+  WHICH months were cited, so the in-season figure is right for some
+  households and zero is right for the rest, unknowably -- and because
+  it defers to the construction the people who collected the data
+  used.  The in-season alternative (no =months / 12=) and GSS's annual
+  are described in the docstring and computable from
+  =derivation_inputs=; the served value is this one.
+- Test :: the annualising core of the function applied to =Y12B= and
+  summed per household must reproduce =EXPEND.HPFOOD= to within 3% at
+  the median (measured 1.020 / 1.020 for both rounds); a static test
+  that the wave scripts stamp =Derivation= on every produced row and
+  on no purchased row.
+- Effect :: 44,112 served produced rows (20,808 + 23,374 source rows before the =j= collapse) relabelled and rescaled; row counts unchanged.
+- CONTENTS.org :: correct l.1242 / l.1258 (12B is not "since my last
+  visit"); record the manual's two-week fallback rule for 12A.
+
+* What the corpus already does (census, 2026-09-11)
+
+Six read-only sweeps of every wave script, country module, =mapping.py=
+and =data_info.yml= (reports in =slurm_logs/2026-09-11_derived_values/=,
+one per group, each row with =path:line=, the rule, and how it is
+disclosed today).  Totals, by the primary kind each agent assigned:
+
+| group                              | rows | dominant kinds                                        |
+|------------------------------------+------+-------------------------------------------------------|
+| Uganda                             |   57 | guard 18, selection 12, cross-field sum 10            |
+| Ethiopia + Nigeria                 |   76 | categorical->number 13, sum 12, encoding 11, product 9 |
+| Tanzania + Malawi + Niger          |   84 | guard 16, selection 16, sum 9, encoding 9             |
+| Mali .. Tajikistan (8 countries)   |  102 | selection 21, impute 16, encoding 14, cat->number 14  |
+| the other 24 countries             |   65 | selection 16, guard 9, impute 9, encoding 8           |
+| framework (build 12 / read 17)     |   29 | guard 10, selection 9, impute 8, ratio 6              |
+
+About 410 sites, of which the agents judged roughly a fifth to be
+disclosed nowhere a user looks, and about fifty to be "same column,
+different rule across waves" within one country.  =annualise= is
+almost empty (2 sites): the repo's reported-values rule holds.
+
+** The 12B-shaped cases (served meaning furthest from the answer)
+
+- GhanaLSS 1987-89 :: =VFOODCPD=, value per eating occasion, served as
+  the produced-side recall value (this document's motivating case).
+- EHCVM Togo / Benin / Guinea-Bissau :: =food_acquired.Expenditure= =
+  =s07bq08=, whose label is "Valeur du [produit] achete la derniere
+  fois" -- ONE last purchase -- beside a 7-day =Quantity=; Burkina Faso
+  reads the same field as a total; the add-feature template wires it.
+- Nigeria W4 :: a purchased row is one transaction in a 30-day window
+  under the same key and columns as 7-day consumption rows; W1-W3 give
+  "purchased quantity" three different meanings.
+- Ethiopia food_acquired :: =produced = total - purchased= with the
+  survey's own production and gift questions unread; a NaN total with
+  a positive purchase is served as 0.
+- Niger =people_last7days= :: hours = months x weeks x days x hours / 52,
+  an annual-average week in a last-7-days table; formula differs by wave.
+- Uganda :: =crop_production.intercropped= answers "did NOT use seed";
+  =plot_features.Area= in hectares while =AreaUnit= says 'acres';
+  =earnings= = cash + in-kind over a window stated only in a comment.
+- Niger / Malawi :: =Value_sold= / =Quantity_sold= served beside the
+  harvest unit while the sale unit is dropped (~40x when they differ).
+- Tajikistan 2007 :: =Area= in sotka (100x) under the hectares column;
+  Albania serves hectares and labels them 'sq. meters'.
+- Malawi =Quantity_kg= :: region x fuzzy-matched item (difflib 0.6) x
+  unit factor, mean-collapsed on collisions; the matched row is
+  unrecoverable from the frame.
+- EHCVM =MonthsSpent= :: yes/no -> 12/0 (Burkina 2014: a duration BIN
+  -> 12/0, known false for 943 people) pooled on one axis with waves
+  of continuous month counts.
+
+** What fits the mechanism, restated after the census
+
+The agents' "won't fit a per-row key" lists mostly dissolve once the
+key is read as naming an OPERATION and =derivation_inputs= is defined
+at the INPUT grain (@ligon, 2026-09-11: "a row computed from a groupby
+operation could refer to the groupby operation"):
+
+- reducers (sum / mean / first / median over a group) :: the key names
+  the reduction; the inputs callable returns the group members with the
+  group key, so the suppressed alternatives are exactly what comes back;
+- chained pipelines (Tanzania =Quantity=: hakuna -> 0, fillna, floor,
+  x factor, 0 -> NaN) :: ONE key naming the pipeline, steps listed in
+  order in the entry; inputs = the column before step one;
+- several columns on one row with different rules :: the entry's
+  =columns= field; the row carries =a+b=;
+- index-value derivations (=u := 'Unknown'=, =season := 'annual'=) ::
+  the key sits on the row; the entry names the level;
+- branch selections (=age_handler=, GPS-vs-estimate, weighted-mean-vs-
+  first, "derived by X unless X fails") :: one key PER BRANCH, so the
+  path taken is on the row and countable;
+- served under a name that implies a different window or question
+  (Nigeria W4, the EHCVM last purchase, Uganda intercropped) :: an
+  entry whose =rule= is the identity and whose =assumptions= carry the
+  semantics.  The function is trivial; the registry is the point;
+- many-row inputs (nutrition matrix products, sales summed over
+  species, factors learned from another wave) :: the inputs callable
+  returns a FRAME at whatever grain the inputs have; nothing requires
+  it to return one row per served row.
+
+Two things remain outside the column and live in the registry alone:
+
+- deletions :: a row that was dropped has nowhere to carry a key.
+  Registry entry with =rows: 0=, an inputs callable returning the
+  deleted rows, surfaced through =attrs= / =ll.derivations()= -- the
+  same class as the grain-collapse reports, and reported the same way;
+- build/read composition :: a derivation whose served value depends on
+  cache state (Ethiopia shocks: YAML maps Increase -> True, the legacy
+  script path -> False, and the Makefile still builds the script) is a
+  defect to fix, not a derivation to label.
+
+** Filed / adjudicated 2026-09-11 (one issue per defect, @ligon)
+
+Filed: #871 (collapse reducers' per-column =first= composites a
+conflicting group), #872 (Uganda =crop_production.intercropped= is
+wired to the seed-use question), #873 (=recall.merge_attrs= and
+=derivations.merge_attrs= have no caller, so =Feature()= drops both
+=attrs=), #874 (Ethiopia =produced= is =clip(Q2 - Q3, 0)=, not the
+own-production question), #875 (Ethiopia =shocks=: YAML and script
+map =Increase= oppositely), #876 (all 12 EHCVM waves serve
+=s07bq08= "value of the last purchase" as =Expenditure=), #877 (Niger
+2011-12 labour hours divide a weekly figure as if monthly), #878
+(Malawi grams x0.01 constant -- dead in every wave, a landmine).
+
+NOT filed, and the list above is corrected by this: the
+=Guinea-Bissau/_/guinea-bissau.py= claim is FALSE -- =_slugify=
+(=country.py:366=) has no call site, every loader builds
+=f"{name.lower()}.py"=, the module loads and the =interview_date= hook
+ran (warm =var/interview_date.parquet= is =(t, i, visit)= with start
+and end, 16,053 rows).  GhanaSPS =MonthsAway= NaN -> 0 is a disclosed,
+evidenced decision (=2009-10/_/data_info.yml:63-133=,
+=data_scheme.yml:43-50=); what is stale is =GhanaSPS/_/CONTENTS.org:594-650=,
+which still says wave 1 is "not wired".  Tajikistan =Area= x100 is
+false (nothing multiplies; =AreaUnit='sotka'= is stamped and
+disclosed) -- the real defect is framework-grain: =data_info.yml:313-318=
+declares =Area= "in hectares" while six of 23 countries serve a
+native unit (Tajikistan sotka, China mu, Timor-Leste sq m, Cambodia,
+Liberia, GhanaLSS) -- CORRECTED 2026-09-12 from an earlier "11 of
+22": Albania, Malawi, Tanzania, Nigeria, GhanaSPS and EthiopiaRHS
+convert to hectares and stamp =AreaUnit= as provenance, so the same
+string =Acres= means hectares in Malawi and acres in GhanaLSS.  Filed
+as #879 (with #880 GhanaSPS CONTENTS, #881 Nigeria W4).  Nigeria W4's 30-day last-purchase pairing is a recorded decision
+(=Nigeria/_/CONTENTS.org:50-63=, "worth revisiting as its own issue").
+Malawi's sale-unit drop was fixed 2026-09-08 (=Malawi/_/CONTENTS.org:139-160=);
+Niger's is #824.
+
+** Defects surfaced by the census, to file separately
+
+Each of the 12B-shaped cases above is a candidate issue independent of
+this mechanism.  Also found on the way: Malawi grams regex x0.01 (live
+in 2004-05); GhanaSPS 2009-10 =MonthsAway= NaN -> 0 for 47% of persons;
+Ethiopia shocks build-path ambiguity; =Guinea-Bissau/_/guinea-bissau.py=
+unreachable (the live module has no =interview_date= hook); Nigeria
+=nonfood_expenditures= pooling 7/30-day recalls with no window column;
+=data_info.yml= claiming =Price= is back-calculated in
+=_finalize_result= (it is not); =kgprice= docstring says multiply, code
+divides (correctly); =recall.merge_attrs= has no caller, so
+=attrs['recall']= dies at =Feature()= today; CLAUDE.md's DOB-fractional
+=age_handler= branch is unreachable for Uganda as called.
+
+* Alternatives considered
+
+- Options on the derivation function :: rejected (2026-09-11).  A
+  cached parquet must be one construction; options would need a
+  registry of parquets in the cache.
+- Documentation only :: rejected; a trap for downstream users.
+- An index value :: rejected for the vocabulary reason above; noted
+  because it is the one carrier that is more prominent than a column.
+- =attrs= only :: rejected; dies at =Feature()= concat.
+- Decorator registry :: rejected in favour of YAML + dotted callables
+  (importability); the drift test keeps them honest.
+- Raw inputs as extra served columns :: rejected for the canonical
+  tables (per-wave columns break the cross-country interface); this
+  is what =derivation_inputs= is for.
+
+* Costs
+
+- Cache :: measured on the first instance (2026-09-11): the mechanism
+  alone (loader, attach in =_finalize_result=, the =.yml= siblings, the
+  =data_info.yml= declaration) moved 0 of 14 probed hashes; the
+  instance moved every GhanaLSS table and nothing else -- 5 of 14 --
+  because the derivation function lives in the country module
+  ={country}.py=, which is in EVERY table's input hash.  So the cost of
+  a new instance is one country re-warm, not one wave; an earlier
+  draft of this line said "only the waves whose scripts stamp the
+  column" and was wrong.
+- Discipline :: once the mechanism exists an unregistered derivation
+  is a defect.  =make api-audit= should grow a check that greps wave
+  scripts for arithmetic on served columns and asks for a key.
+- Retrofit :: the known instances above become issues, one each, after
+  the first instance lands; the census sizes that queue.
+
+* Open questions for @ligon
+
+0. The 12B construction -- DECIDED 2026-09-11: year-average
+   fortnight (=HPFOOD / 26=).  See "First instance".
+1. Key format -- DECIDED 2026-09-11: =country::table::name=, empties
+   mean "all", wave scope in the entry.  See "The registry".
+2. Derived tables / =Feature()= -- DECIDED 2026-09-11: follow-on; at
+   that level an =attrs= summary pointing downward, not a row label.
+3. Warning at =Feature()= pooling -- DECIDED 2026-09-11: none; the
+   =attrs= summary is the signal at that level.
+4. =Derivation= dtype: plain nullable string, or pandas categorical
+   (smaller parquet, but categories must be unioned at concat)?

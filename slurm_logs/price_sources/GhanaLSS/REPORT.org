@@ -1,0 +1,583 @@
+#+title: GhanaLSS -- five sources of food prices, compared
+#+author: Claude Fable 5.1 (country agent, GhanaLSS)
+#+date: 2026-09-08
+
+Protocol: =slurm_logs/price_sources/PROTOCOL.org=.  Shared code:
+=slurm_logs/price_sources/common.py= (self-test run; it reproduces the
+documented synthetic numbers).  Ledgers: =.coder/ledger/price-sources-comparison.md=
+and =.coder/ledger/562-ghanalss-community-prices.md=.  Worktree
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-ghanalss= @ =1dced810=,
+branch =fix/prices-ghanalss=.
+
+* 1. Sources present, the idiosyncrasies, and the two pre-checks
+
+** 1.1 What GhanaLSS can and cannot compare
+
+| # | source | present? | rows | waves |
+|---+--------+----------+------+-------|
+| 1 | =unit_value= | *2016-17 only* | 407,479 | 2016-17 |
+| 2 | =reported_purchase_price= | *ABSENT* | 0 | -- |
+| 3 | =own_consumption_valuation= | yes | 187,674 | 1991-92, 1998-99, 2005-06, 2012-13, 2016-17 |
+| 4 | =crop_sale_price= | not declared (no =crop_production= for GhanaLSS) | -- | -- |
+| 5 | =community_price= | yes | 556,141 priced | 1987-88, 1988-89, 1991-92, 1998-99, 2012-13, 2016-17 |
+
+*Source 1 exists in one wave because of the instrument, not a defect.*
+=CONTENTS.org= "=food_acquired.py= (canonical, #109)": /"for waves before
+2016--17, the survey instrument elicits the amount spent in purchasing
+different items, but does not elicit quantities purchased."/  Measured: the
+=u= level of =s='purchased'= rows takes exactly ONE value (=Value=) in
+1987-88 ... 2012-13, and 49 values in 2016-17.  =food_prices(units='unitvalue')=
+therefore returns =Expenditure / Quantity = 1= identically for
+1,054,161 purchased rows -- the "Kwacha per Kwacha" quantity =CLAUDE.md=
+warns about -- which the script drops through
+=transformations._is_currency_denominated= (not a hardcoded ='Value'=).
+This is the same mechanism =CONTENTS.org= §"food_prices returns ONE wave,
+and the other six are CORRECTLY empty (GH #770)" records for =kgvalue=.
+
+*Source 2 is absent, and the protocol's independence test is vacuous.*
+=food_acquired.Price= is populated on *0.0000%* of =s='purchased'= rows in
+*all seven waves* (n = 4,331,168).  There is nothing to test for
+independence and nothing to drop.  Contrast =s='produced'=: 0.0% in
+1987-88/1988-89 and 99.93--100% in the other five.
+
+*Source 3's question wording, quoted, decides what the pair means.*  GLSS
+Section 8H, column 14 (GLSS3, =1991-92/Documentation/pdf/G3QPartB.pdf=,
+Section 8H block; column 13 is =ENTER UNIT THAT THE RESPONDENT CHOOSES / SEE
+LIST OF UNIT CODES=):
+
+#+begin_quote
+For how much could you sell one unit of......now?
+#+end_quote
+
+GLSS6 (=2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=)
+and GLSS7 (=2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx=, Section 8H
+Q9) both read:
+
+#+begin_quote
+For how much would you sell one unit of ..............now?
+USE MOST OCCURING UNIT OF MEASURE
+#+end_quote
+
+So source 3 is a *farmgate / seller-side valuation* ("would you sell"), not
+"what would it cost to buy".  The pair =community_price vs
+own_consumption_valuation= is therefore a genuine marketing-margin test.
+*The same sentence also explains pre-check (i)*: the unit is the one the
+RESPONDENT chooses, while the price survey weighs the item.
+
+*Source 5's basis, quoted.*  The GLSS3 price questionnaire
+(=1991-92/Documentation/pdf/G3QPrice.pdf=, section =I. FOOD PRICES=) is
+=CODE | ITEM | 1ST OBSERVATION (KG, PRICE) | 2ND ... | 3RD ...=; GLSS7's
+(=GLSS7_price questionnaire.xlsx=) is =PRICE | QTY | UOM= per observation.
+So the reported price refers to a stated quantity, and the per-unit price is
+=Price / NumberOfUnits=.  Verified across waves on maize at =u='Kg'=:
+1987-88 71.4, 1988-89 62.2, 1991-92 100, 1998-99 534 (GHC/kg); 2012-13 0.909,
+2016-17 1.32 (GHS/kg) -- a consistent series through the 2007
+redenomination.  This settles the =CONTENTS.org= note that GLSS3/GLSS4
+distribute only =p = PRICE/KG=: their =NumberOfUnits= is the form's stated
+basis (1.0 for weighed foods, 0.17 for the evaporated-milk tin, 9.0 for
+firewood), so dividing does not double-count.
+
+*Currency.*  =currency='column'= gives GHC for 1987-88 ... 2005-06 and GHS for
+2012-13 and 2016-17 (the 2007 redenomination, 1 GHS = 10,000 GHC).  *Every
+comparison in this report is WITHIN a wave, so the redenomination is
+irrelevant to every gap reported here* -- a log gap is unit-free, and no cell
+pools two waves.  The =currency= column in =cells.csv= carries the code so a
+cross-wave levels table stays possible.
+
+** 1.2 Idiosyncrasies NAMED from =CONTENTS.org= (3,185 lines, Traps 1-9)
+
+1. *Trap 6 / GH #753 -- verification hazard.*  The wave =mapping.py= modules
+   build their search path from =files('lsms_library')=, the IMPORTED
+   package, so =LSMS_COUNTRIES_ROOT= alone silently decodes against the main
+   checkout.  Handled: every run here sets =PYTHONPATH= to the worktree from
+   a neutral cwd and asserts ='wt-prices-ghanalss' in lsms_library.__file__=.
+   The fix below is verified the same way.
+2. *Trap 9 -- a duplicate index in =food_acquired= silently REWRITES =Price=
+   table-wide.*  =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so a
+   non-unique index makes core SUM Quantity/Expenditure and re-derive
+   =Price = Expenditure/Quantity= *on the whole frame* -- destroying 839,677
+   recorded farmgate prices and fabricating a price on ~4.33M purchased rows,
+   with the grain audit correctly silent.  This is why the unit fix below was
+   *measured for duplicates before being made* (0 rows in duplicate groups).
+3. *Trap 8 / GH #782* -- 2005-06's =j= shipped the survey's own labels for
+   years because =convert_categoricals=True= turned the code into a label and
+   =.replace()= passes an unmatched value through.  The lesson used here: the
+   =j= and =u= axis checks in section 1.3/1.4 are run against the *BUILT*
+   table, never against the config.
+4. *=harmonize_price_item= and =harmonize_food= are ONE vocabulary* -- a
+   price item flagged =Food: yes= is asserted to sit on the wave's
+   =harmonize_food= axis.  That is why the "166 of 662" label gap is not what
+   it looks like (section 1.4).
+5. *2005-06 is =asked-not-distributed=* for the price survey (=G5QPrice.pdf=
+   exists, 9 pp; no price file in the DDI inventory or the tree).  It is the
+   one wave with source 3 and no source 5.
+6. *GhanaLSS ships NO kg conversion table* (=conversion_to_kgs.json --
+   intentionally NOT used=), so every kg factor it has is *inferred from
+   =Expenditure/Quantity== -- which exists only in 2016-17.  See "Scope
+   deviations" for what that costs.
+7. *2012-13 prices are stamped per EA but collected per market*: 1,015 EAs,
+   323 =(region, district, market)= keys, ~41 markets; EAs sharing a key carry
+   identical prices.  So =n_geos= at the =v= rung overstates the number of
+   independent price measurements in that wave, and the unclustered HC3
+   standard errors on its rows are optimistic.
+8. *=obs= is a fourth index level* -- three vendor observations per item, in
+   every wave.  Source 5's =n= per cell is a count of vendor observations,
+   not of households; that is exactly why its threshold is 1 and not 10.
+
+** 1.3 Pre-check (i): the unit vocabulary -- THE binding constraint
+
+Native =u= is a matching key.  Per wave, the =u= sets of =community_prices=
+and of =food_acquired= =s='produced'= (source 3's rows):
+
+| wave | CP =u= | FA produced =u= | shared | produced rows on a shared =u= |
+|------+--------+-----------------+--------+-------------------------------|
+| 1987-88 | 10 | 1 (=Value=) | 0 | 0 / 20,775 |
+| 1988-89 | 10 | 1 (=Value=) | 0 | 0 / 23,337 |
+| 1991-92 | 21 | 22 | 3 (Beer Bottle, Kg, Stick) | 20,057 / 286,922 = *7.0%* |
+| 1998-99 | 21 | 24 | 4 (+ Box) | 3,489 / 98,473 = *3.5%* |
+| 2005-06 | -- | 30 | -- | no price survey |
+| 2012-13 | 3 (Kg, Liter, Other Unit) | 41 | 1 (Kg) | 22,128 / 197,907 = *11.2%* |
+| 2016-17 | 140 | 30 | 29 | 138,757 / 151,715 = *91.5%* |
+
+*This is not a spelling defect and a mapping table will not fix it.*  The
+price survey WEIGHS the item (BID §2.3 /"Weighing scales were used to
+determine the exact weight of food items"/; the GLSS3 form's column is =KG=),
+while Section 8H records the unit /the respondent chooses/ -- Bowl, Basket,
+American tin, Heap, Margarine tin.  In 1991-92 through 2012-13 the two
+instruments simply do not measure in the same units, and only the =Kg=
+minority of own-production rows is comparable at all.  2016-17 is the
+exception because GLSS7's price form records a per-observation UOM drawn from
+the same code list the household module uses.
+
+There *is* a real spelling defect on top of it, and it is a regression -- see
+Data problem D3.  Canonicalising =u= through =_/unit_labels.org= adds
+=Maxi Bag= + =Mini Bag= in 1991-92 (+200 produced rows) and 1998-99 (+540),
+and =Liter= in 2012-13 (+813): real, and *0.1--0.5 percentage points*.  It
+does not change the picture above.
+
+** 1.4 Pre-check (i-b): the =j= axis -- the "166 of 662" is NOT a defect
+
+The coordinator's =inventory.json= records 662 priced labels of which 166 are
+in =food_acquired.j=.  Measured *per wave, against the BUILT
+=food_acquired=* (Trap 8's lesson), restricting the price list by its own
+=Food= flag:
+
+| wave | price codes | =Food=yes= labels | of which in built =food_acquired.j= | =Food=own= | =Food=no= |
+|------+-------------+-------------------+-------------------------------------+------------+-----------|
+| 1987-88 |  47 |  20 | *20 (100%)* | 7 | 19 |
+| 1988-89 |  48 |  20 | *20 (100%)* | 7 | 20 |
+| 1991-92 | 117 |  60 | *60 (100%)* | 0 | 49 |
+| 1998-99 | 123 |  59 | *59 (100%)* | 3 | 49 |
+| 2012-13 | 157 |  82 | *82 (100%)* | 0 | 54 |
+| 2016-17 | 643 | 132 | *132 (100%)* | 0 | *400* |
+
+*This CONTRADICTS the shared ledger*, whose §4 lists GhanaLSS's "166/662"
+among "label-axis *defects*, not analysis choices"
+(=.coder/ledger/price-sources-comparison.md=).  On the evidence above that
+line is wrong for GhanaLSS and should be corrected by whoever owns the ledger
+(this agent may not write outside its output directory).
+
+*Every food price item joins, in every wave.*  The pooled 166/662 is the
+union of six waves' price lists (which include 400 non-foods in 2016-17
+alone -- charcoal, refuse disposal, public-toilet fees) measured against the
+union of the food axis.  =CONTENTS.org= §"=harmonize_price_item= and
+=harmonize_food= are ONE vocabulary" says so in its own words: the invariant
+enforced is a subset over =Food == 'yes'=, and adding the non-foods to
+=harmonize_food= would be wrong.  *There is no label-axis blocker in
+GhanaLSS, and no mapping table was written.*  What limits the item axis is
+the intersection with what households actually PRODUCE: priced-and-produced
+=j= per wave is 19, 19, 28, 30, 39, 44.
+
+** 1.5 Pre-check (ii): is the ladder's bottom rung real?
+
+=cluster_features= for GhanaLSS carries =Region=, =Rural=, =Ecological_zone=
+and *no =District== -- so the ladder is *=v= -> =Region= -> national*, three
+rungs, not four.  =Region= is 100% populated with 10 values in every wave.
+
+| wave | CP clusters | in =cluster_features.v= | in =sample().v= | share of sample clusters priced |
+|------+-------------+-------------------------+-----------------+---------------------------------|
+| 1987-88 | 165 | 163 (98.8%) | 163 | 163/176 = 92.6% |
+| 1988-89 | 112 | 106 (94.6%) | 106 | 106/170 = 62.4% |
+| 1991-92 | 256 | 256 (100%)  | 256 | 256/365 = 70.1% |
+| 1998-99 | 253 | 251 (99.2%) | 251 | 251/300 = 83.7% |
+| 2012-13 | 1,015 | 1,015 (100%) | 1,015 | 1,015/1,200 = 84.6% |
+| 2016-17 | 398 | 398 (100%)  | 398 | 398/1,000 = *39.8%* |
+
+Reproduces =CONTENTS.org= §"Sources, geography and the join to =sample().v="
+exactly.  1,478 community-price rows (1987-88 250, 1988-89 705, 1998-99 523)
+have a =(t, v)= with no =cluster_features= row -- the price clusters outside
+the household sample that =CONTENTS.org= names one by one.  They are counted
+and reported here, and their non-national cells (186) are dropped because
+they have no geography key; nothing is dropped silently.  *The bottom rung is
+real*, but in 2016-17 only 40% of sampled clusters carry a price, which is
+why most 2016-17 matched cells land on =Region=.
+
+* 2. Independence test for source 2
+
+Not applicable: source 2 is absent.  =food_acquired.Price= is non-null on
+0.0000% of the 4,331,168 =s='purchased'= rows, in every one of the seven
+waves.  The protocol's test (share of rows with =abs(log(S2/S1)) > 1e-6=)
+requires an S2 to exist.  *Consequence for the corpus*: GhanaLSS cannot
+speak to whether a stored purchase price differs from =Exp/Qty=; Uganda is
+the country that can.
+
+* 3. Levels: median ratio per pair and wave
+
+=gaps.csv=; primary thresholds (household sources 10 observations per cell,
+community price 1, per the protocol's per-side rule), =finest_only=True=.
+
+| pair | wave | cells | median ratio | IQR of =gap_log= | share =abs(gap) > log 1.5= |
+|------+------+-------+--------------+------------------+----------------------------|
+| =community_price_vs_own_consumption_valuation= | 1991-92 |  31 | *1.048* | 0.399 | 0.258 |
+| | 1998-99 |  22 | *2.087* | 0.779 | 0.682 |
+| | 2012-13 | 133 | *0.870* | 1.609 | 0.722 |
+| | 2016-17 |  61 | *1.200* | 0.619 | 0.475 |
+| =unit_value_vs_own_consumption_valuation= | 2016-17 | 322 | *1.000* | 0.567 | 0.388 |
+| =unit_value_vs_community_price= | 2016-17 | 516 | *1.000* | 0.507 | 0.370 |
+
+Read in words:
+
+- *The market price of a food is, at the median, the same number the
+  household gives when asked what it could sell its own produce for* --
+  =unit_value_vs_own_consumption_valuation= has a median gap of exactly
+  0.0000 over 322 cells (31.7% of cells have a gap of exactly zero).
+- *The community price survey and household unit values agree at the median*
+  in 2016-17 (median gap exactly 0.0000 over 516 cells, 22.7% exactly zero).
+  That is a real validation of =community_prices= against an independent
+  instrument, and it is the first time the two have been compared.
+- *The farmgate-vs-market ratio is unstable across waves*: 1.05, 2.09, 0.87,
+  1.20.  Two of the four are BELOW one -- the surveyed market price is lower
+  than the household's own valuation -- which no marketing-margin story
+  predicts.
+- *The spreads are large and they are mostly unit-coding noise, not price
+  dispersion* (section 6, D1/D2).  An IQR of 0.5--1.6 in logs is a factor of
+  1.7--4.9 between the quartiles of a gap that should be a markup.
+
+The exactly-zero gaps are not an artefact of the pipeline: they are focal
+prices.  Egg, =u='Single'=, cluster 70099: household unit value 0.60 GHS
+(11 households), community price 0.60 GHS (3 vendors).  Beef, =u='Pound'=,
+cluster 70646: 10.00 GHS both sides.  Ghanaian retail prices concentrate on
+round figures and both instruments record them.
+
+* 4. Logs: the model table, read out
+
+=models.csv= (pooled row plus one per =geo_level=; also a sensitivity row at
+household threshold 5).  *Run against the corrected =common.py= of
+2026-09-08*, whose =_fwl_slope= reports NaN rather than a number when the
+effects leave fewer than =MIN_DOF = 5= residual degrees of freedom.  *14 of
+the 48 rows come back NaN, and every one of them is a row this report would
+otherwise have had to disown by hand* -- the guard is doing exactly the job
+section 4 of the first draft was doing manually.  Pooled, primary thresholds:
+
+| wave | pair | cells | items | geos | =coef_within= (se) | =coef_between= (se) | =r2_fe= | =resid_sd= |
+|------+------+-------+-------+------+--------------------+---------------------+---------+------------|
+| 1991-92 | 5 vs 3 |  31 |  16 | 19 | *NaN* | -0.385 (0.233) | NaN | NaN |
+| 1998-99 | 5 vs 3 |  22 |   5 | 21 | *NaN* | *NaN* | NaN | NaN |
+| 2012-13 | 5 vs 3 | 133 |  27 | 47 | +0.524 (0.301) | +0.435 (0.232) | 0.781 | 0.924 |
+| 2016-17 | 5 vs 3 |  61 |  29 | 12 | +0.127 (0.086) | +0.082 (0.051) | 0.924 | 0.365 |
+| 2016-17 | 1 vs 3 | 322 |  45 | 70 | +0.322 (0.073) | -0.092 (0.052) | 0.427 | 0.635 |
+| 2016-17 | 1 vs 5 | 516 | 105 | 94 | -0.203 (0.038) | *-0.167 (0.045)* | 0.571 | 1.056 |
+
+What each number means:
+
+- =coef_between= is the *primary* test: the slope of the log gap on the
+  item's mean Bland--Altman midpoint after geography effects.  Zero means a
+  proportional markup or an iceberg cost; negative means an additive
+  per-unit cost (a fixed handling charge is a big log gap on a cheap good).
+- =coef_within= adds item effects and uses the cell midpoint.  *It is not
+  interpretable for any pair with source 5 on one side*, because a community
+  price is 1--3 vendor observations and the protocol measured (on synthetic
+  data) that a thin side drives the within slope to -1.27 under a pure
+  markup.  The first draft of this report had to say that of 1991-92's
+  =coef_within = -2.33=; under the corrected =common.py= that row is NaN
+  because 31 cells cannot support 16 item plus 19 geography effects at all.
+- =r2_fe= is the share of gap variance item and geography effects explain
+  alone; =resid_sd= the residual SD of the within specification.
+- Standard errors are HC3 on the residualised regression, *unclustered*.  For
+  2012-13 that matters: its =v=-rung cells reuse ~41 markets' prices across
+  1,015 EAs (idiosyncrasy 7), so the effective number of independent price
+  measurements is far below =n_geos=.
+
+*Where the slopes are NaN, read the medians and the by-item table* (sections
+3 and 5), as the protocol says.  1998-99 has 22 cells against 5 items and 21
+geographies and now reports NaN throughout; before the guard it "fitted"
+=coef_between = -13.66= with =se = 1.8e-14= and =r2_fe = 1.000000= -- a
+rank-deficient design, not a slope.  The same is true of the per-rung rows
+1991-92 =v= (12 cells / 11 geos), 2016-17 5v3 =v= (1 cell) and every
+=national= row with fewer than 20 items.
+
+*The one well-identified row is 2016-17 =unit_value_vs_community_price=*:
+516 cells, 105 items, 94 geographies, =coef_between = -0.167 (se 0.045)= --
+significantly negative, and it stays negative at every rung except =v=
+(Region -0.230 (0.051), national -0.131 (0.048), =v= +0.039 (0.048)), and at
+the looser threshold (808 cells, -0.205 (0.039)).  Taken at face value this
+says the gap between a household's purchase unit value and the surveyed
+market price *falls with the price level*, i.e. an additive per-unit
+component.  But both sides are market prices whose median gap is exactly
+zero, so what the slope is more likely picking up is the unit-coding noise of
+D2, which is mechanically larger in log terms on cheap, small-unit goods (a
+"1 gram" or "1 ml" miscode).  *We do not claim an additive transport cost
+from this number*; we report it and name the confound.  The sign also
+reverses at the finest rung, which a real additive cost would not do.
+
+For 2016-17 =unit_value_vs_own_consumption_valuation= -- the only pair where
+BOTH sides are household samples with >= 10 observations per cell, so
+=within= IS readable -- =coef_within = +0.322 (0.073)= and
+=coef_between = -0.092 (0.052)=.  Positive within with a flat between is the
+signature the protocol names for *unequal noise*, =a= noisier than =b=; and
+=cells.csv= agrees, though barely (median =sd_log_price= at n >= 10:
+unit_value 0.310, own_consumption_valuation 0.292, community_price 0.298).
+The honest reading of this pair is =between=: *no detectable relation between
+the gap and the price level*, on a median gap of zero.
+
+The only pair-wave with a =claim_30_50 = True= anywhere in =models.csv= is
+2012-13 5v3 at the =Region= rung alone (15 cells, median gap 0.406) -- one
+rung of one wave, against =False= at that wave's pooled, =v= and national
+rows.  It is not evidence for the 30--50% claim; see section 5.
+
+* 5. The claim: is the farmgate-vs-market gap 30--50%?
+
+*No, not in GhanaLSS, in any wave, on any pairing.*  =claim_30_50= is
+=False= on every one of the 24 model rows: the median gap never lands in
+[log 1.3, log 1.5] = [0.262, 0.405].
+
+Which farmgate, which market?  GhanaLSS has *no source 4* (no
+=crop_production=), so the farmgate side is source 3 -- the household's own
+"for how much could you sell one unit" -- and the market side is source 5
+(the surveyed vendor price) or source 1 (what households actually paid).
+
+| pairing | waves | median ratio | verdict |
+|---------+-------+--------------+---------|
+| market survey / own-consumption valuation (5 vs 3) | 1991-92, 1998-99, 2012-13, 2016-17 | 1.05, 2.09, 0.87, 1.20 | no stable margin; two waves below 1 |
+| household purchase price / own-consumption valuation (1 vs 3) | 2016-17 | 1.000 | *no margin at all* |
+
+The 1-vs-3 result is the sharpest and it is not noise: 322 cells, and the
+median household values a unit of its own produce at *exactly* what its
+neighbours paid for the same item in the same unit in the same cluster.  Ask
+a Ghanaian household what it could sell a bowl of maize for and it answers
+with the price of a bowl of maize.  Whatever the true farmgate--retail wedge
+is, *this instrument does not measure it*: it measures the respondent's
+knowledge of the local retail price.  That is a caution for anyone valuing
+own-consumption in GhanaLSS at =food_acquired.Price= and calling it a
+producer price.
+
+** By item (protocol section 5's requirement)
+
+Full table: =gaps_by_item.csv= (=pair, t, j, n_cells, median_gap, ratio,
+in_30_50=).  Share of items whose median gap lands in the 30--50% band:
+
+| pair | wave | items | in band |
+|------+------+-------+---------|
+| 5 vs 3 | 1991-92 | 16 | 1 (Okra) |
+| 5 vs 3 | 1998-99 |  5 | 0 |
+| 5 vs 3 | 2012-13 | 27 | 0 |
+| 5 vs 3 | 2016-17 | 29 | 3 (Cassava (yellow, flour), Goat is 1.54, Groundnut) |
+| 1 vs 3 | 2016-17 | 45 | 2 (Avocado 1.44, Coconut (fresh) 1.50) |
+| 1 vs 5 | 2016-17 | 105 | 4 (Instant Noodle, Kapla, Oil (groundnut), Rice (imported), Sugar (granulated)) |
+
+The best-populated items in 5 vs 3, and they do not support the claim:
+
+| wave | item | cells | ratio |
+|------+------+-------+-------|
+| 2012-13 | Cassava (fresh) | 27 | 0.377 |
+| 2012-13 | Plantain | 22 | 0.606 |
+| 2012-13 | Yam | 12 | 0.368 |
+| 2012-13 | Pepper | 12 | 5.774 |
+| 2012-13 | Maize (flour/dough) | 11 | 0.870 |
+| 1998-99 | Chicken | 10 | 2.394 |
+| 2016-17 | Egg | 8 | 0.845 |
+| 2016-17 | Chicken (live) | 8 | 1.200 |
+| 1991-92 | Oil (palm kernel) | 7 | 1.000 |
+| 2012-13 | Palm Nut | 7 | 0.909 |
+
+The pattern in 2012-13 is systematic, and it is *measured, not
+hypothesised*.  The bulky roots and tubers price BELOW the household's own
+valuation (cassava 0.38, yam 0.37, cocoyam 0.40, plantain 0.61) while the
+perishable vegetables price far above (okra 18.6, pepper 5.8, eggplant 2.9,
+tomato 2.0) -- a spread of 50x within one wave and one unit (=Kg=).  A 50x
+spread is the D2 signature, so it was checked directly on the raw numbers of
+both instruments, 2012-13, =s='produced'=, =u='Kg'=:
+
+| item | HH n | HH valuation, GHS/kg | price-survey lot, kg | market GHS/kg | ratio |
+|------+------+----------------------+----------------------+---------------+-------|
+| Pepper          | 2,211 | 0.5 | *0.11* | 6.00 | 12.0 |
+| Okra            |   897 | 0.5 | *0.20* | 2.78 | 5.6 |
+| Tomato (fresh)  |   679 | 0.5 | *0.35* | 2.50 | 5.0 |
+| Eggplant        |   646 | 0.5 | *0.39* | 1.82 | 3.6 |
+| Cocoyam         |   943 | 1.0 | 1.00 | 2.00 | 2.0 |
+| Plantain        | 3,246 | 1.0 | 1.00 | 1.43 | 1.4 |
+| Maize (fl/dough)| 1,885 | 1.0 | 0.65 | 1.00 | 1.0 |
+| Cassava (fresh) | 3,675 | 1.0 | *2.40* | 0.73 | 0.73 |
+| Yam             | 1,246 | 2.0 | *2.85* | 1.18 | 0.59 |
+
+*Both sides are sane and the spread is real.*  It is not a units mis-code:
+the mechanism is the *size of the lot the price survey weighed*.  The
+enumerator buys a retail portion, and a retail portion of pepper is 110
+grams while a retail portion of yam is 2.85 kg.  The per-kg price falls with
+the lot -- an ordinary quantity discount -- so the market/farmgate ratio
+orders itself by *perishability and lot size*, not by price level.  That is
+precisely the item heterogeneity the protocol warns will be confounded with
+an additive per-unit cost by a between-item slope, and it is why 2012-13's
+=coef_between = +0.435 (0.232)= should not be read as economics.
+
+The second column is worth its own sentence: *the household's own-consumption
+valuation in 2012-13 takes essentially three values -- 0.5, 1.0 and 2.0
+GHS/kg.*  Respondents round to coin denominations.  Source 3 is a coarse
+instrument, and no amount of geography or item detail recovers resolution the
+answer never had.
+
+*Where 3 and 4 both exist (Uganda), that country's report is the place to
+settle whether a household values own produce at the sale price or the
+purchase price.  In GhanaLSS 3 and 1 both exist in 2016-17 and the answer is
+unambiguous: the purchase price, exactly, at the median.*
+
+* 6. Data problems
+
+Counts, not impressions.
+
+| id | table | wave | symptom | count | evidence | proposed fix | status |
+|----+-------+------+---------+-------+----------+--------------+--------|
+| D1 | =community_prices= | 2016-17 | The GLSS7 form's per-observation =QTY= holds the container's CONTENT WEIGHT IN GRAMS, not a count of the recorded =UOM=.  =Price/NumberOfUnits= is then ~1/1000 of the true per-unit price. | 5,351 of 220,908 rows (2.4%) | Millet, =u='Bowl'=, clusters 70735/70789/70791: =Price=4.00=, =NumberOfUnits=4000=; the household unit value for Millet/Bowl in Northern is *exactly 4.00 GHS*.  Produced a =gap_log= of +8.31 (ratio 4,050) before the screen. | Either read =Price= as the per-unit price where =u= is a container unit and QTY is implausible as a count, or add a =NumberOfUnits_basis= flag to the wave script.  Both need a row-by-row judgement (QTY=2 on a Bowl is ambiguous), so neither is an "obvious blocker" fix. | *reported*; excluded from the analysis by a constant-free screen (=u= metric OR =NumberOfUnits==1=, 2016-17 only), counted in =analysis.log=.  *The screen is constant-free, not lossless*: its 5,351 rows are Yard 1,729, Piece 801, Inches 304, Single 294, Watts 262, Feet 254, Capsule 240, Kilometre 143 and a tail.  Yard / Inches / Feet / Watts / Kilometre are non-food (cloth, screens, transport, electricity) and irrelevant here; =Piece= and =Single= (1,095 rows) can be a GENUINE count -- a crate of 24 eggs -- and are dropped conservatively rather than kept on a judgement. |
+| D2 | =community_prices= + =food_acquired= | 2016-17 | Metric-prefix miscoding on BOTH instruments: a price recorded against =u='Liter'= when the quantity is in ml, or =u='Gram'= when the quantity is a piece. | 37.0% of the 516 matched 1v5 cells have =abs(gap) > log 1.5= | Beer/=Liter=/Eastern: community 0.0080 GHS/L vs household 15.15 GHS/L.  Chicken (thigh)/=Gram=/Ashanti: household 5.00 GHS *per gram*.  Oil (palm)/=Milliliter=/cluster 70014: community 5.33 GHS per ml vs household 0.0125. | Not fixable in config -- it is enumerator error in the source.  A per-=(j,u)= plausibility screen against the wave's own median is the analysis-side answer; it is a modelling decision, not a data fix. | *reported* |
+| D3 | =food_acquired= | 1991-92, 1998-99, 2005-06, 2012-13 | =u= is NOT on the =_/unit_labels.org= Preferred-Label axis: raw survey spellings (=american tin=, =bowl=, =litre=, =Maxi bag=, =Fingers=) ship as =u=.  A *regression*: the country-level =_/food_acquired.py= applied =unit_labels.org= at =c345d317=; commit =6de0ce37= ("wire GhanaLSS food_acquired end-to-end (Phase 2)") dropped it, and only 2016-17's wave script re-implemented it. | 93,577 + 33,153 + 149,023 + 197,907 = *473,660 produced rows* (100% of produced rows in 2005-06 and 2012-13) | =git show c345d317:...food_acquired.py= line 52 =df1['u'] = df1['u'].astype('string').replace(ulabelsd['u']['Preferred Label'])=; absent from =6de0ce37= onward.  =_/unit_labels.org= already contains every one of the mappings (8/9, 8/9, 29/30, 40/41 of the off-axis labels). | Apply the =unit_labels.org= Preferred-Label map in each of the four wave scripts, as 2016-17 already does. | see section 7 |
+| D4 | =_/unit_labels.org= | all | =Margarin tin= -> =Margarin tin= and =margarin tin= -> =Margarine Tin=: two Preferred Labels for one spelling pair. | 2 rows | Already recorded in =CONTENTS.org= §"=j=, =u= and the shared axes".  Within-wave comparisons are unaffected; a cross-wave =u= pool is not. | Pick one Preferred Label.  Not done here: it changes 2016-17's delivered =u=, which is outside this task's evidence. | *reported* |
+| D5 | =common.py= (shared analysis code) | -- | =fit_gap_model= guarded =n < 8= and =j.nunique() < 2= but not the rank of the effects block.  The =between= specification is =gap_log ~ geo FE + beta*item_mid=; with one geography the FE block is a constant and =metrics_miscellany.estimators.ols= raised =LinAlgError: Singular matrix= -- and an under-identified design "fitted" with =r2_fe = 1.000000= and =se = 1.8e-14=.  =model_rows= writes exactly such a row for =geo_level='national'= (geo == 'all' by construction), *for every country*. | 2 failure modes; both hit here on the first pair attempted | Traceback at =common.py:254= via =_fwl_slope=; and the pre-guard 1998-99 pooled row, =coef_between = -13.655230=, =se_between = 1.84e-14=, =r2_fe = 1.000000=, =resid_sd = 2.76e-15= on 22 cells / 5 items / 21 geos. | Guard on the rank of the effects block, not just on =n=. | *FIXED by the coordinator in the shared =common.py= (=MIN_DOF = 5= residual degrees of freedom, plus a =LinAlgError= catch), 2026-09-08.*  This report's numbers are the re-run against it; the local wrapper written before the fix has been removed and =common.model_rows= is called directly. |
+| D6 | =community_prices= | 2012-13 | =NumberOfUnits= is null for the entire non-food block (=u='Other Unit'=, free-text basis in =Description=), so those rows have no per-unit price. | 98,341 of 288,243 rows (34.1%) | By design (=CONTENTS.org=: the reader's free-text basis =s2desc= has 3,437 distinct strings).  Foods are unaffected: Kg 8.0% null, Liter 0.4%. | None needed for foods; a non-food price analysis would need the free text parsed. | *reported* (excluded, counted) |
+| D7 | =community_prices= | 1987-88, 1988-89, 1998-99 | 1,478 rows whose =(t, v)= has no =cluster_features= row -- price forms for clusters the household file does not carry. | 250 + 705 + 523 | =CONTENTS.org= names them individually (1987-88 clusters 1020, 1167; 1988-89 2007, 2036, 2177, 2198, 2209, 2692; 1998-99 two of 253).  Matches. | None -- correct behaviour of the survey. | *reported*; their 186 non-national cells are dropped for want of a geography key, counted in =analysis.log= |
+| D8 | coverage | 2005-06 | The one wave with source 3 and no source 5. | 1 wave | =.coder/coverage/absent_verdicts.csv=, verdict =asked-not-distributed= (C1;C2;C4).  Confirmed: 28,379 own-consumption price rows, no community prices. | Acquisition, not config. | *reported* (already adjudicated) |
+
+* 7. The fix on =fix/prices-ghanalss=
+
+*Two commits, neither pushed.*
+
+- =359e52af= /fix(GhanaLSS): restore the unit_labels.org canonicalisation of
+  food_acquired.u/ -- four files, all GhanaLSS's own wave scripts:
+  =1991-92=, =1998-99=, =2005-06=, =2012-13= =/_/food_acquired.py=.
+- =0331a5e9= /docs(GhanaLSS): record what Section 8H's Price measures, the
+  GLSS7 QTY trap, and the u regression/ -- =_/CONTENTS.org=, +134 lines.  It
+  corrects the "Unit handling" subsection in place (GH #808's note that the
+  =unit_labels.org= replace "had already moved into the wave scripts" is
+  false for five of seven waves, and is what hid D3), documents D1 and D2
+  under 2016-17 in the community-price section, adds a section on what
+  =food_acquired.Price= on produced rows actually measures (section 5 here),
+  and records that the price-item =j= axis is clean (section 1.4 here).
+
+*Why it is a fix and not a preference.*  D3 above: the map was applied by the
+country-level =_/food_acquired.py= until =c345d317= and dropped by =6de0ce37=
+("wire GhanaLSS food_acquired end-to-end, Phase 2").  Only 2016-17's wave
+script re-implemented it.  =_/unit_labels.org= already contains every mapping
+these four waves need (8 of 9, 8 of 9, 29 of 30, 40 of 41 of their off-axis
+labels); nothing was added to it.
+
+*It was gated on a measurement, because =CONTENTS.org= Trap 9 makes a
+careless =u= merge catastrophic.*  =food_acquired= is in
+=_ADDITIVE_MEASURE_COLUMNS=, so one duplicate index entry makes core SUM
+Quantity/Expenditure and re-derive =Price = Expenditure/Quantity= *on the
+whole frame* -- destroying 839,677 recorded farmgate prices and fabricating a
+price on ~4.33M purchased rows, with the grain audit correctly silent.
+Measured BEFORE the edit, on the delivered 5,259,320-row table under this
+exact map: *0 rows in duplicate groups* on =(i, t, j, u, s, visit)=.  Each
+patched script now asserts index uniqueness after the rename, so a future
+wave cannot re-arm the trap silently.
+
+*Verified cold* -- private =LSMS_DATA_DIR=
+(=/global/scratch/fsa/fc_jevons/ligon/tmp/lsms_data_prices_ghanalss=, with
+only =dvc-cache= symlinked to the shared L1 blobs), =LSMS_COUNTRIES_ROOT= AND
+=PYTHONPATH= at the worktree, both asserted in-process along with
+=data_root()= (Trap 6: =LSMS_COUNTRIES_ROOT= alone would have decoded against
+the main checkout):
+
+| check | result |
+|-------+--------|
+| =food_acquired= shape | 5,259,320 x 3, unchanged |
+| row counts in all 14 =(t, s)= cells | identical to pre-fix, cell for cell |
+| index unique | =True= |
+| =Price= populated on produced rows | 0.999505 / 0.999289 / 1.0 / 0.999995 / 0.99975 -- unchanged |
+| off-axis =u= labels, the four waves | 9 / 9 / 30 / 41 -> *0 / 0 / 0 / 0* |
+| off-axis =u= rows | 93,577 / 33,153 / 149,023 / 197,907 -> *0* |
+
+The one label outside the =unit_labels.org= Preferred-Label set afterwards is
+=Kg=, in *every* wave including the untouched 2016-17: the parquet holds
+=Kilogram= and the global =categorical_mapping/u.org= relabels it at API time
+(its only scope).  All seven waves now agree on that, which they did not
+before.
+
+*The delivered =cells.csv= / =gaps.csv= / =models.csv= / =gaps_by_item.csv=
+are POST-fix*, re-run end to end in that private data dir.  Measured delta
+against the pre-fix run (both are on disk; the comparison is in
+=analysis.log='s companion run):
+
+- own-production rows on a =u= that =community_prices= also uses:
+  20,057 -> 20,257 (1991-92, gains =Maxi Bag= and =Mini Bag*), 3,489 -> 4,029
+  (1998-99, same), 22,128 -> 22,941 (2012-13, gains =Liter=), 138,757
+  unchanged (2016-17, already canonical);
+- =cells.csv= 355,690 -> 355,688 rows (two pairs of case-variant cells merge);
+  =gaps.csv= 1,083 -> 1,085;
+- *4 of the 48 model rows move, all of them 2012-13 =5 vs 3=*: the pooled row
+  gains 2 cells (131 -> 133) and =coef_between= moves 0.426 -> 0.435; the
+  =v= rung gains 2 (111 -> 113); the two threshold-5 sensitivity rows gain 10
+  each.  *No median gap in section 3 changes at the primary threshold*, no
+  =claim_30_50= flips, and no conclusion in sections 3-5 depends on it.
+
+That the fix is worth 0.1-0.5 percentage points of matched rows and still
+worth making is the point of D3: the defect is 473,660 rows of a canonical
+axis, and its effect on *this* analysis is small only because the binding
+constraint is the instrument, not the spelling (section 1.3).
+
+* 8. Scope deviations
+
+1. *A pair the protocol does not list.*
+   =community_price_vs_own_consumption_valuation= (a = community price, the
+   market side; b = own-consumption valuation).  GhanaLSS's source 1 exists
+   in one wave and it has no source 4, so without this pair the country
+   contributes no farmgate-vs-market comparison at all.  Orientation follows
+   the protocol's own rule.  *No other country in the sweep has both 3 and 5*
+   (Uganda has 3 without 5; Ethiopia / Malawi / Tanzania / Nigeria / Mali /
+   Niger have 5 without 3), so these rows pool with nothing and should be
+   read as GhanaLSS-only.
+2. *No per-kg view.*  The protocol asks for a flagged per-kg second view.
+   GhanaLSS ships no kg conversion table and =_get_kg_factors= infers factors
+   from =Expenditure/Quantity=, which exists only in 2016-17 (GH #770; six of
+   seven waves' =food_prices(units='kgvalue')= are correctly EMPTY).  A per-kg
+   view would therefore exist for one wave and would be doubly circular
+   there.  Native-unit matching is the whole analysis; where both sides carry
+   =Kg= (which is 100% of the 2012-13 matched cells and 77% of 1991-92's) the
+   native view already IS the per-kg view.
+3. *A screen on source 5 in 2016-17* (D1): keep an observation when =u= is a
+   metric mass/volume unit or =NumberOfUnits == 1=.  Constant-free,
+   wave-scoped, and counted (5,351 of 220,908 rows).  Without it a single
+   content-weight row moves a cell's log gap by 8.  *Constant-free is not
+   lossless*: ~1,095 =Piece= / =Single= rows whose count is probably genuine
+   (a crate of 24 eggs) are dropped with it, conservatively.  The rest are
+   non-food.
+4. *No local statistics.*  The =common.py= defect this country hit (D5)
+   was reported, briefly worked around, and then FIXED in the shared module
+   by the coordinator; the wrapper has been removed and every number in
+   sections 3--5 comes from =common.cell_medians= / =common.match_gaps= /
+   =common.model_rows= unmodified.
+5. =cells.csv= is 39 MB (355,688 cells, dominated by 189,215 community-price
+   cells at three ladder rungs).  That is the honest inventory at the
+   protocol's schema; say so if the pooling step needs it trimmed.
+
+* 9. Reproduce
+
+#+begin_src sh
+WT=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-prices-ghanalss
+export PYTHONPATH=/global/scratch/fsa/fc_jevons/ligon/tmp/pyextra:$WT
+export LSMS_BUILD_WORKERS=1
+PY=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/.venv/bin/python
+O=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/GhanaLSS
+
+cd /tmp && $PY -c "import lsms_library, metrics_miscellany; \
+  assert 'wt-prices-ghanalss' in lsms_library.__file__"
+cd /tmp && taskset -c 3-5 $PY \
+  /global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/slurm_logs/price_sources/common.py
+cd /tmp && taskset -c 3-5 $PY $O/analysis.py $O          # ~25 min warm
+#+end_src
+
+Outputs: =cells.csv=, =gaps.csv=, =models.csv=, =gaps_by_item.csv=,
+=analysis.log=, =REPORT.org=, =analysis.py=.  Documentation blobs were
+fetched lock-free with the =_ensure_dvc_pulled= + sidecar-md5 pattern of
+=slurm_logs/ghana_audit/community_prices/fetch_docs.py= (=get_data_file=
+walks the DVC index through =DVCFS.exists()= and hangs on this Lustre slice
+-- =CONTENTS.org= §"Trap 6, applied").  The =dvc= CLI was never invoked.

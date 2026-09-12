@@ -1,4 +1,5 @@
 #+title: Contents
+#+TODO: TODO WAITING | DONE
 
 * Overview
 
@@ -403,6 +404,34 @@ The largest single loss is =cluster_features/2014-15=, which projects a
 household-grain frame onto =(t, v)= and destroys 42 of 3,617 rows
 across 4 conflicting clusters.
 
+** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12)
+
+The idiosyncrasy behind that =household_roster= entry, recorded because
+GH #871's corpus census had to look at it by hand: in 2014-15 the
+declared index =(t, i, pid)= is NOT unique -- 210 rows sit on a
+duplicated tuple, and the shape is a *blank line sharing a member
+number with a real one*.  Group =('2014-15','101008','1')= is two rows:
+=(<NA>, NaN, <NA>, NaN)= and =(Masculin, 45.0, Chef de menage, 12.0)=.
+That is the #323 verdict verbatim -- the identifier is broken, not the
+reducer -- and it is NOT fixed here.
+
+What changed is what core serves.  Until #871 the collapse was
+=groupby().first()=, a per-column first-non-null that happened to
+reassemble the head out of the two rows; the plan's =nth(0)= would have
+served the BLANK row and =_finalize_result='s =dropna(how='all')= would
+then have dropped the head entirely (45 rows / 180 column cells in this
+cell).  Core now serves the *most complete* observed row, so the head's
+row survives and is a row the survey actually recorded.  Same delivered
+values as before, for a defensible reason rather than by luck.
+
+Niger's other #871-visible cells are =assets/2014-15= (172 rows changed
+under =nth(0)=, 0 under the landed rule), =shocks/2014-15=,
+=individual_education/2014-15= and =plot_inputs/{2011-12,2014-15}=; the
+last two are the only ones where the landed rule still changes a served
+row (11 + 2 rows on =Quantity=/=Purchased=, no new missings).  See
+=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  Fixing the
+=pid= key remains open under GH #614 / #637.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
@@ -434,12 +463,20 @@ The pre-EHCVM waves DO have a continuous months-of-presence variable:
 The =u= (unit) index level on =food_acquired= carries clean canonical
 French unit names (=Kg=, =Litre=, =Unité=, =Boîte=, =Cuillère=,
 =Tas=, =Tongolo=, =Pot-tarzan=, =Tiya=, =Waygouizé=, ...) across the
-EHCVM waves -- 44 distinct in 2018-19, 34 distinct in 2021-22.  No
-=u= table is wired into =_/categorical_mapping.org=; auto-discovery
-would be a no-op for the canonical names, and the few local-language
-unit terms (=Tongolo=, =Pot-tarzan=, =Tiya=, =Waygouizé=) are
-preserved as-is per the project preference for keeping all distinct
-labels.
+EHCVM waves -- 44 distinct in 2018-19, 34 distinct in 2021-22.  The
+few local-language unit terms (=Tongolo=, =Pot-tarzan=, =Tiya=,
+=Waygouizé=) are preserved as-is per the project preference for
+keeping all distinct labels.
+
+CORRECTION (2026-09-09, GH #842): the sentence that stood here --
+"No =u= table is wired into =_/categorical_mapping.org=" -- has been
+FALSE since the 2026-06-14 Unit #0 / crop-harvest work.  There is a
+=#+name: u= table (it is the first table in the file) and it is
+auto-applied to the =u= index level by
+=Country._apply_categorical_mappings=.  It is also the mechanism the
+missing-unit sentinel below runs through, so this is not a cosmetic
+staleness: a reader who believed the old sentence would look for the
+relabel in the wrong place.
 
 The 2018-19 wave required a per-wave mojibake fix in
 =2018-19/_/mapping.py=; the 2021-22 wave does not (its .dta value
@@ -479,6 +516,12 @@ alias.
 Cache caveat: anyone with cached parquets predating this commit must
 run =lsms-library cache clear --country Niger= to pick up the fix on
 2018-19; the staleness check does not see =mapping.py= edits.
+(Correction 2026-09-07, GH #801: that last clause predates v0.8.0.  The
+content-hash staleness check DOES hash each wave's =mapping.py=
+(=Wave._input_hash=, CLAUDE.md "Cache Behavior"); measured, editing
+=2018-19/_/mapping.py= moved that wave's input hash and the country's
+=household_roster= cache hash and no other wave's, so warm caches
+rebuild on their own.  The manual clear is no longer needed.)
 
 For the cross-country canonical-=u= roadmap, see GH #223.  Niger
 was originally classified Tier 3 (needing a new =u= table built) in
@@ -487,6 +530,201 @@ the mojibake fix landed -- the underlying labels are canonical
 French names (with a handful of preserved local-language entries for
 which a follow-up =u= table could be added if the harmonization plan
 requires it).
+
+* The =u= sentinel: a quantity recorded with no unit (GH #842 / #847)
+
+Niger's enumerators sometimes recorded an amount and left the unit
+blank.  =u= is a DECLARED index level in four Niger tables, so a null
+there is not a harmless gap -- it is a *deferred silent deletion*.
+
+** Why a NaN =u= is worse than a wrong =u=
+
+The row is served, so no build-time guard fires: the null-read audit
+watches for an all-null declared COLUMN, and the grain audit watches a
+collapse that has already happened.  Neither looks at a partly-null
+declared INDEX LEVEL.  The row then vanishes in whichever =groupby=
+runs first -- =_finalize_result='s canonical de-dup, =Feature()=
+assembly, or the consumer's own aggregation -- because pandas
+=groupby(dropna=True)= drops NaN keys.  Nothing counts the loss, and
+it is attributed to the consumer's code.  That is #847's framework
+half; this section is Niger's country half.
+
+*THE COUNTS ARE NOT WHAT THE ISSUE SAID, AND THE REASON IS WORTH
+KNOWING.*  #842 measured 441 NaN-=u= rows in =crop_production= by
+reading the delivered table.  That is only the rows that SURVIVED.
+Measured in the wave parquets instead, 5,663 rows carried a NaN =u=
+(2011-12 3,150; 2014-15 1,079; 2018-19 443; 2021-22 991 -- a further
+34 already carried the =Manquant= label, 11 + 23 in the two ECVMA
+waves); the difference is whether the wave's index happens to be
+unique.
+2018-19's =(t, i, plot, crop, u)= index IS unique, so no collapse runs
+and its 441 nulls were served.  The other three waves' indexes are
+non-unique -- deliberately so, one (plot, crop) can carry several
+reported harvest lines -- so the collapse ran and DELETED every
+NaN-keyed row before anyone saw it.  Whether a defect is visible was
+decided by an accident of index uniqueness.
+
+** The sentinel
+
+Every missing unit is now filled with =Unknown= at build time, by one
+helper (=niger.py=, =fill_missing_u= / =U_NA=) shared by all four
+tables.  =Unknown= is the CORPUS-canonical spelling, not a Niger
+invention: =lsms_library/data_info.yml= defines it as the non-ordinal
+sentinel for don't-know / refused / unmappable, and Uganda's
+=crop_production= already writes it onto this same =u= level.  Niger
+used to write the French =Manquant=; that spelling is retired.
+
+The relabel runs through =_/categorical_mapping.org='s =#+name: u=
+table, which maps =Manquant= / =manquant= / =produit absent= /
+=Produit absent= onto =Unknown=.  That table is read on BOTH paths --
+at build time by =local_tools.get_categorical_mapping= and at read
+time by =Country._apply_categorical_mappings= -- so Niger emits
+=Unknown= directly AND a pre-#842 parquet still holding =Manquant= is
+relabelled on the way out.  The two alternatives were measured and
+both fail: a =spellings:= block on =u= in the canonical
+=data_info.yml= is read as a CLOSED vocabulary by
+=diagnostics._check_declared_spellings= and would fail every real unit
+corpus-wide, and a row in the global =categorical_mapping/u.org=
+cannot win because =_row_union_categorical= keeps the COUNTRY row on a
+key collision.
+
+** What changed, measured (cold rebuild, 2026-09-09)
+
+| table            | rows before | rows after | u NaN before | u=Unknown after |
+|------------------+-------------+------------+--------------+-----------------|
+| crop_production  |      41,896 |     46,341 |          441 |           4,920 |
+| food_acquired    |     239,031 |    239,031 |           12 |              12 |
+| plot_inputs      |      42,364 |     42,364 |            0 |              75 |
+| community_prices |      15,423 |     15,423 |            0 |               0 |
+
+=Unknown= by wave: =crop_production= 3,146 / 373 / 441 / 960;
+=plot_inputs= 44 / 15 / 2 / 14; =food_acquired= 0 (2018-19) and 12
+(2021-22).  =plot_inputs='s 75 and =crop_production='s 34 pre-existing
+=Manquant= rows are the SAME rows under the new spelling, not new
+ones.
+
+*=crop_production= GAINS 4,445 rows, and that is the fix, not a side
+effect.*  Every added row was already written to a wave parquet and
+was being deleted by the NaN-key collapse: 2011-12 +3,135, 2014-15
++350, 2021-22 +960, 2018-19 +0 (unique index, nothing was being
+deleted).  3,485 of the recovered rows carry a REPORTED harvest
+Quantity -- 3,156 of them in 2011-12 alone.  The remainder are
+plot-crop lines that report only =intercropped= (planted and recorded,
+no harvest measured); they are filled too, because 2018-19 was already
+serving 379 of exactly that kind and the table's contents should not
+depend on which wave's index happens to be unique.
+
+** The fill does NOT trade a deletion for a =.first()= destruction
+
+The obvious worry about filling a NaN index key is that the rows stop
+being deleted and start COLLIDING, so =groupby().first()= destroys
+them instead -- the same loss with a different name.  *Measured, that
+does not happen here.*  Running each wave script with the fill
+neutralised and auditing the identical collapse
+(=country._audit_index_collapse=) gives, before and after:
+
+| wave    | dropped | destroyed | conflicting groups | nan_key_rows before | after |
+|---------+---------+-----------+--------------------+---------------------+-------|
+| 2011-12 |      30 |        19 |                 19 |               3,150 |     0 |
+| 2014-15 |      46 |        45 |                 45 |               1,079 |     0 |
+| 2018-19 |       0 |         0 |                  0 |                 443 |     0 |
+| 2021-22 |   1,010 |       897 |                740 |                 991 |     0 |
+
+=dropped= / =destroyed= / =conflicting groups= are BYTE-IDENTICAL
+before and after; only =nan_key_rows= moves, 5,663 -> 0.  A
+(plot, crop) never had two no-unit lines, so the sentinel introduces no
+new collision.  The 897 destroyed rows in 2021-22 are a PRE-EXISTING
+grain defect on that wave's =(t, i, plot, crop, u)= key, unrelated to
+#842 and still open under =LSMS_GRAIN_STRICT=1= (see the grain-conflicts
+section above).
+
+Where the other 777 filled rows go: of the 5,697 sentinel rows in the
+wave parquets, 4,920 are served.  The difference is =_finalize_result='s
+=dropna(how='all')= removing rows that carry NO measurement at all --
+729 of them in 2014-15, where a plot-crop line with no quantity also has
+no =harvest_month= and no =intercropped=.  That is correct: an entirely
+empty row is not a harvest record.
+
+** =community_prices= is the one table that still DROPS instead of filling
+
+Measured on the raw CS07 grids: 795 price-bearing observations in
+2011-12 (218 in passage 1, 577 in passage 2) and 0 in 2014-15 carry a
+usable price with no unit value at all -- and *0 of the 795 carry a
+usable =Quantity= either*, so there is no weight to fall back on.
+=community_prices.Price= is
+defined as the price for =Quantity= units of =u=, so such a row has no
+basis to be a price OF anything -- unlike a crop line, where the
+reported harvest Quantity is still a fact worth serving with an
+=Unknown= unit.  =_finish_community_prices= therefore keeps dropping
+them, and the drop is now COUNTED in the code comment rather than
+being invisible.  Revisiting it is a data decision about what a
+community price is, not a sentinel decision.
+
+The asymmetry with =crop_production= is therefore not arbitrary: a
+crop line keeps a REPORTED harvest quantity that stays meaningful with
+an unknown unit, while these 795 rows have neither a unit nor a
+weight.
+
+One conflation is recorded here because it is real and lives only in
+this table: in the CS07 unit list the missing-unit marker and the
+product-absent marker are the same kind of answer (=manquant= /
+=produit absent=), and both now resolve to =Unknown=.  Everywhere else
+in Niger =Unknown= means only "amount reported, unit not recorded".
+=niger.py='s =_COMMUNITY_MISSING_UNITS= keys on that label and MUST
+move with it -- leaving it spelled =Manquant= would have silently
+stopped dropping the product-absent rows.
+
+** Consumer rule
+
+=u == 'Unknown'= is NOT a unit.  Exclude it before any per-unit price,
+quantity or conversion, and REPORT how many rows you excluded.
+Keeping it silently yields a price per nothing; dropping it silently
+is the bug the sentinel exists to make visible.  Note this interacts
+with the harvest-unit / sold-unit mismatch recorded under "Prices"
+below: a =crop_production= row whose harvest unit is =Unknown= can
+never be matched to its sold unit, so it drops out of any
+=Value_sold / Quantity_sold= analysis on that ground too.
+
+** Cache
+
+Filling the sentinel touches =niger.py= and =_/categorical_mapping.org=,
+both of which are country-level =_/= build inputs hashed for EVERY
+Niger table, so all 18 Niger tables re-hash and rebuild on first read.
+Only the four =u= tables change data.  No other country's cache hash
+moves (measured across Uganda / Ethiopia / GhanaLSS =food_acquired=,
+=crop_production=, =plot_inputs=: 9 of 9 unchanged).
+
+* household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
+
+=s01_me_ner2018.dta= is Stata format 115 with no declared encoding, and its
+value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
+=Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
+reads the file through pandas =StataReader=, which decodes every pre-118
+file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
+served =Frere, S<U+009C>Ur= (318 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
+=encoding='cp1252'=, reads the same file correctly -- the defect is the
+reader's Latin-1 fallback, not the file (bytes and decoder matrix in
+=slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
+
+Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
+as cp1252, and =_fix_relationship= re-title-cases the result; the =household_roster= hook applies it to =Relationship=
+only.  Served label is now =Frere, Soeur= with the ligature restored,
+identical to what the 2021-22 wave serves; kinship tuple [0, 1, consanguineal] unchanged; 318 rows changed,
+nothing else.  The C1-control spellings were deleted from
+=lsms_library/categorical_mapping/kinship.yml= at the same time, so that
+file no longer carries the artefact and a regression would surface as an
+=Unknown relationship labels= warning instead of resolving silently.
+
+Two different encoding defects in this one wave, needing two different
+repairs: the =s07b= food file stores raw UTF-8 bytes that get read as
+Latin-1 (double-decoded; =_decode_mojibake= does a latin-1 -> utf-8 round
+trip, see "Unit handling" above), while the =s01= roster file stores
+cp1252 bytes that get read as Latin-1 (=_decode_cp1252= does a latin-1 ->
+cp1252 round trip).  Neither helper repairs the other's file.
+
+Same defect and same fix in Senegal 2018-19, Benin 2018-19 and Togo 2018 (all format-115 cp1252 EHCVM-1
+roster files).  See GH #801 and the #797 vocabulary sweep
+(=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).
 
 * plot_features (GH #167)
 
@@ -513,3 +751,327 @@ Co-propriétaire (co-ownership), mapped to =owned=; 2018-19 has codes
 EHCVM s16a records no decimal-degree parcel GPS.  Pre-EHCVM ECVMA waves
 (2011-12, 2014-15) use a different agriculture instrument and are out of
 scope for this recipe.
+
+* Prices: what Niger can and cannot compare (2026-09-08)
+
+Written while running the cross-country five-source food-price comparison
+(=slurm_logs/price_sources/PROTOCOL.org=; Niger outputs in
+=slurm_logs/price_sources/Niger/=).  Four facts that cost real time to
+establish and are not recorded anywhere else.
+
+** The two household-side price sources do not exist
+
+=food_acquired= has NO =Price= column in any Niger wave (columns are
+=Quantity=, =Expenditure= only), so =food_prices(units='unitprice')=
+returns an EMPTY frame -- it does not raise.  There is therefore no
+reported purchase price and no own-consumption valuation, even though
+18,177 =s='produced'= rows exist across the two EHCVM waves.  Do not
+read the empty return as a bug.
+
+** The market-price and consumption sources NEVER share a wave
+
+| wave    | food_acquired | community_prices | crop_production |
+|---------+---------------+------------------+-----------------|
+| 2011-12 | --            | 8,923 rows       | 8,813 rows      |
+| 2014-15 | --            | 6,500            | 8,403           |
+| 2018-19 | 107,939       | --               | 13,717          |
+| 2021-22 | 131,092       | --               | 10,963          |
+
+=food_acquired= is EHCVM-only and =community_prices= is ECVMA-only, so a
+household unit value can never be compared with a surveyed community
+price in Niger.  =crop_production= is the only feature present in all
+four waves and is the sole bridge between the two eras.
+
+** =crop_production.u= is the HARVEST unit; the SOLD unit is not carried
+
+The declared index is =(t, i, plot, crop, u)= where =u= comes from the
+harvest question (=as02eq07b= / =AS02EQ07B= / =s16cq12b= / =s16cq16b=).
+But =Value_sold / Quantity_sold= is a price per SOLD unit, and every
+wave records the sold unit in its OWN column that the feature drops:
+=as02eq12b= (2011-12), =AS02EQ12B= (2014-15 AS2E2), =s16cq16b= (2018-19),
+=s16dq05b= (2021-22 s16d).  Measured share of priced rows whose sold
+unit equals the row's harvest unit: 2011-12 98.8%, 2014-15 89.4%,
+2018-19 93.1%, 2021-22 63.0%.  A =Sac de 100 kg= sale price landing in a
+=Tiya= row is a ~40x error, so any per-unit use of =Value_sold /
+Quantity_sold= must first restrict to rows where the two agree (recipe in
+=slurm_logs/price_sources/Niger/analysis.py::_sold_unit_map=).  NOTE that
+rebuilding that key needs =id_walk=: the API's =i= is the panel-walked id,
+so a raw-side join misses (2014-15: 38 of 434 households matched before
+walking, 100% after).
+
+** 2018-19 DOES ship a cluster-grain community price file, unwired
+
+=_/data_scheme.yml= and =_/community_prices.py= both state that the EHCVM
+waves "ship no cluster-level community price questionnaire" and that
+2018-19 "ships no community price file at all".  *That is false for
+2018-19.*  =2018-19/Data/s05_co_ner2018.dta= is section 5 of the EHCVM
+community questionnaire -- 42,247 rows x 7 columns at (grappe, vague)
+grain:
+
+- =Existe=   "[PRODUIT] existe dans ce marche ?"  (constant 1: pre-filtered)
+- =s05q01=   "5.01.Code produit"  -- 55 codes, value label set =produitID=,
+  *the same label set as the household food module* =s07b_me_ner2018.s07bq01=
+- =s05q02=   "5.02.Selectionner les unites tailles ..." -- 74 codes,
+  label set =releveID= (=Kg=, =Litre=, =Tas, petit/moyen/grand=, =Tiya=, ...)
+- =s05q03= / =s05q04=  "Releve 1 / Releve 2 - Prix (en FCFA)"
+
+504 grappes, i.e. every 2018-19 cluster.  Wiring it would give Niger the
+ONLY wave in which a household unit value and a surveyed community price
+coexist.  Filed as a =todo= verdict candidate (data present, config
+missing), NOT wired here -- =releveID= is size-qualified (=Tas, petit=)
+where =food_acquired.u= is not (=Tas=), so a unit crosswalk is needed
+first.  The claim IS correct for 2021-22: its community questionnaire
+stops at =s04_co=, and =ehcvm_prix_ner2021.dta= is region x milieu x
+=point_de_vente= with no =grappe=.
+
+** CS07's =Quantity= is a WEIGHT, and sometimes in the wrong unit
+
+=community_prices.Price= is the price for =Quantity= units of =u=; the raw
+column label is "poids du produit du Nieme releve" and the section header
+is "SECTION 7. CONSUMER PRICES" (=ECVMA_Quest_COM_P2_V10_ENG.pdf= p. 2),
+so the per-unit price is =Price / Quantity= and the source is a CONSUMER
+(market-side) price, not a farmgate one.  But the enumerator sometimes
+entered a gram weight against a container unit code: 111 of 15,423 rows
+(0.72%) carry =Quantity > 100= on a non-metric unit (=Tiya= 23, =Unite= 68,
+=Tas= 10, =Sachet= 4, =Tongolo= 3, =Autre= 3).  One such row drives the
+whole 2014-15 =Dogondoutchi / Niebe / Tiya= cell to 0.22 FCFA per bowl
+(=Price=600, Quantity=2687=, i.e. 2.687 kg = one tia).
+
+* 2026-09-10 -- the plot axis is now spelled =plot_id=, not =plot=
+
+@ligon's decision: =plot_id= is the canonical plot-axis level name EVERYWHERE.
+This country declared =plot= on crop_production, plot_labor; those =index:= tuples in
+=_/data_scheme.yml=, and the index name the wave script / country module
+writes, are now =plot_id=.  =plot_features= already said =plot_id= and is
+unchanged.
+
+- *Values are untouched.*  This is a level NAME change only: the same plot key
+  strings, the same rows, the same columns.  A warm frame read before and
+  after differs only by =rename_axis({'plot': 'plot_id'})= -- verified by
+  comparing the API frame against the pre-change one.
+- *The caches for this whole country are invalidated.*
+  =Country._table_cache_hash= hashes =_/data_scheme.yml= and the country
+  module as WHOLE FILES, so every table's hash moved, not just the renamed
+  ones.  A re-warm is required; see the bill in
+  =.coder/ledger/crop-production-plot-id.md=.
+- *A shared axis NAME is still not a shared VOCABULARY.*  Uganda's ag modules
+  key plots ={hhid}-{parcel}-{plot}= while =plot_features= keys them
+  ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
+  need =on='parcel'= to bridge them.  Renaming the level changed nothing
+  about that.
+
+* people_last7days: the hours columns are NOT last-7-day hours, and 2011-12's formula was dimensionally wrong (GH #877, 2026-09-12)
+
+First =CONTENTS.org= entry for this table.  Two separate findings; only the
+first is fixed here.
+
+** FIXED: the 2011-12 hours formula divided by 52 where it should divide by 12
+
+=Niger/2011-12/_/people_last7days.py= built =farm_hrs= / =SB_hrs= /
+=wage_hrs= as =(month * day * hour) / 52= per job.  The three inputs, read
+from the Stata variable labels of =ecvmaind_p1p2.dta= in *both* the French
+and the English-labelled copy (=ecvmaind_p1p2_en.dta=) and confirmed against
+questionnaire =ECVMA_Quest_MEN_P1_V10_ENG.pdf= section 4 part B, are:
+
+| var                | question | meaning                                        |
+|--------------------+----------+------------------------------------------------|
+| =ms04q29= / =q55=  | 4.29     | months this job was done in the last 12 months |
+| =ms04q30= / =q56=  | 4.30     | hours per *day* usually devoted to this job    |
+| =ms04q31= / =q57=  | 4.31     | days per *WEEK* usually devoted to this job    |
+
+So =d * h= is *already* usual hours per week.  Dividing =m * d * h= by 52
+treats =d= as days per MONTH and delivers =(months/52) x usual weekly hours=
+-- 0.23x the intended figure for a full-year job.  The correct annual-average
+week imputes the exact calendar 52/12 weeks per month (2011-12 does not ask
+weeks-per-month; 2014-15's =MS04Q26= does):
+
+: annual hours = m * (52/12) * d * h  ->  weekly average = / 52  ==  (m*d*h)/12
+
+*This is a deliberate departure from World Bank parity.*  =NER_ECVMA1.do:1413=
+has =gen av_hours1 = (month_job1 * hour_job1 * day_job1) / 52 // (week average
+of hours)= -- the same error, with a comment asserting the dimension it does
+not have.  =NER_ECVMA2.do:1454= (2014-15) is =(month * week * hour * day)/52=
+and is coherent.  Parity with the WB panel is not the same as being right.
+
+** FIXED, same issue: the declared =manquant= codes were being multiplied
+
+Every one of the six 2011-12 time-use inputs declares a MISSING code in the
+file's own Stata value labels -- =ms04q29/q30/q55/q56= -> ={99: 'manquant'}=,
+=ms04q31/q57= -> ={9: 'manquant'}= -- and the script read the frame with
+=convert_categoricals=False=, so those codes arrived as quantities: 99 hours a
+day, 9 days in a week.  Present in 2011-12: =q31=9= (5 rows), =q57=9= (5),
+=q55=99= (2), =q56=99= (6).  2014-15 declares the same codes and has one
+present (=MS04Q27=9=, 1 row); =MS04Q26= carries no value labels at all.
+
+They are now NA'd *per variable*, looked up at build time from the value
+labels via =local_tools.get_categorical_mapping= (helper
+=niger._num_no_declared_missing=).  *Per variable, never blanket*: 610 people
+genuinely report =ms04q30 = 9= hours a day, and that variable's missing code
+is 99, not 9.
+
+*Measured, warm wave parquets + =Country('Niger').people_last7days()=:*
+
+| wave                     |  sum hours | rows >0 | mean h/worker |   max |
+|--------------------------+------------+---------+---------------+-------|
+| 2011-12 before #877      |   79,691.9 |  11,353 |         7.019 | 1,710.2 |
+| 2011-12 after            |  328,476.7 |  11,350 |        28.941 | 238.0 |
+| 2014-15 before #877      |  221,526.4 |  10,103 |        21.927 | 148.6 |
+| 2014-15 after            |  221,516.7 |  10,102 |        21.928 | 148.6 |
+
+Participation dummies, =Industry=, =working_age= and total row counts are
+untouched.  *Rows with any hours drop by 3 in 2011-12 and 1 in 2014-15* --
+those are people whose only reported schedule was the missing code, and they
+now carry NA-driven 0 rather than an invented number.  The 2014-15 / 2011-12
+per-worker ratio goes from *3.124 -> 0.758*.  Rows above 168 h/week:
+2011-12 8 -> *3* (max 7,410.7 -> 238.0); 2014-15 0 -> 0.  The three survivors
+were inspected (raw =q29,q30,q31 / q55,q56,q57=): =12,10,7 / 12,18,7= (196),
+=12,24,7 / 12,10,7= (238), =12,14,7 / 12,14,7= (196).  They are *two-job
+sums*, not sentinels -- no value-labelled code is involved, and the one
+implausible cell (24 hours a day, 7 days a week, on the 238 row) is a bare
+over-report: 24 carries no value label and 6 people report it on =ms04q30=.
+Left alone.
+
+*Residual, stated because it is not zero.*  2014-15's reported weeks-per-month
+=MS04Q26= is 4 for 86% of jobs (mean 3.78), not the calendar 4.333, so that
+wave's own annual-average week is ~13% below the calendar-exact one; the rest
+of the remaining 1.39x gap is composition (2011-12's median reported days/week
+is 7).  Dividing 2011-12 by 13 instead of 12, to match a reported =w=4=, was
+considered and rejected: 52/12 is exact, and 4 weeks/month is a respondent
+approximation belonging to the other wave.
+
+*Still above a plausible ceiling, and left alone.*  3 rows of 2011-12 exceed
+168 h/week and 50 exceed 112 (2014-15: 0 and 10).  None involves a declared
+missing code (verified row by row, values quoted above); they are two-job
+sums, one of which contains a bare 24-hours-a-day over-report.  A
+plausibility screen on reported schedules is a separate decision from
+honouring the survey's own missing codes, and is not taken here.
+
+** REPORTED, NOT FIXED: 2011-12 asks no 7-day participation question at all
+
+The script docstring called =ms04q03= / =ms04q05= / =ms04q02= "last 7 days"
+dummies.  The labels and the questionnaire say otherwise:
+
+| var       | q    | reference period | yes count |
+|-----------+------+------------------+-----------|
+| =ms04q01= | 4.01 | last 30 days -- wage/enterprise/employer | 1,174 |
+| =ms04q02= | 4.02 | last 12 MONTHS -- same activity          |   269 |
+| =ms04q03= | 4.03 | last 30 DAYS -- own field/garden/livestock | 8,446 |
+| =ms04q05= | 4.05 | last 30 DAYS -- own/household business     | 3,473 |
+
+2014-15's =MS04Q01-03= *are* 7-day ("Au cours des 7 derniers jours"), as are
+the two EHCVM waves.  So =people_last7days.farm_work= / =SOB_work= /
+=wage_work= mix a 30-day, a 12-month and a 7-day reference period across
+Niger's own four waves, and 2011-12 has no 7-day question to re-point to.
+Additionally =wage_work= is the only one of the 2011-12 triple taken from a
+12-month question, so the triple is not even internally consistent -- but
+=NER_ECVMA1.do:1378= uses =ms04q02= too, so switching to =ms04q01= (30-day,
+269 -> 1,174 yes) would be a second parity departure.
+
+Options left open on #877: (a) keep as served and document (what is done
+here); (b) re-point =wage_work= to =ms04q01= so the 2011-12 triple is
+uniformly 30-day; (c) serve NA for 2011-12's dummies.  *Served values are
+unchanged.*
+
+** Also open on #877, and wider than Niger
+
+The hours columns are an annual-average week under a table named for the last
+seven days, sitting in =Feature('people_last7days')= beside Tanzania's and
+Malawi's genuinely-reported last-7-day hours.  Nothing in the frame
+distinguishes them.  Renaming (=usual_weekly_hrs=) or registering the
+construction as a declared derivation is a cross-country schema decision and
+was not taken here.
+
+** Cache
+
+Editing the wave script and =_/data_scheme.yml= moves every Niger table's
+=Country._table_cache_hash= (=data_scheme.yml= is hashed as a whole file), so
+the whole country re-warms.
+
+* 2026-09-12 -- =food_acquired=: one row, two windows (GH #876)
+
+=food_acquired.Expenditure= used to be wired straight to =s07bq08=, whose
+Stata label is "7B.08. Valeur (en FCFA) du [PRODUIT] achete la derniere
+fois" -- the value of *one* purchase, which =s07bq06= places up to 30 days
+back -- sitting on the same row as =Quantity=, a *7-day* consumption figure.
+Section 7B is headed "Consommation alimentaire des 7 derniers jours et achat
+des 30 derniers jours"; the row carried both clocks and nothing in the frame
+said so.  =s07bq05=, the quantity received as a GIFT, was never read at all.
+
+The served =Expenditure= is now DERIVED, on the survey's own accounting
+identity (construction "C", @ligon 2026-09-12):
+
+  : Quantity     = (s07bq03a - s07bq04 - s07bq05).clip(0)
+  : Expenditure  = Quantity * (s07bq08 / s07bq07a)
+
+-- the 7-day consumption net of own production AND of gifts, times the unit
+value of the last purchase -- so =Expenditure / Quantity= is exactly that
+unit value and the two numbers on the row refer to the same thing.  =NA=,
+never a guess, where =s07bq07a= is not positive or where the purchase was
+made in a different unit (or a different SIZE of the same unit) from the
+consumption: no EHCVM wave ships a unit-conversion table, so there is no
+exact conversion to apply.
+
+And the gift quantity is now SERVED, on its own =s = 'inkind'= rows in the
+consumption unit =s07bq03b=, with =Expenditure= *NA*.  EHCVM asks no value
+for a gift; UEMOA's =depan(Don)= is that quantity priced at the same
+last-purchase unit value -- verified below, and therefore an imputation, not
+an answer -- so the library checks it and does not serve it.  Own production
+is unchanged: =s = 'produced'= from =s07bq04=, =Expenditure= NA, which was
+already the rule.
+
+One function for all eight EHCVM countries (=lsms_library/ehcvm.py=,
+=derive_ehcvm_purchase_value=), registered once per country in
+=_/derivations.yml= and stamped on every purchased row in the =Derivation=
+column:
+
+  : Niger::food_acquired::7day-purchase-at-last-purchase-unit-value
+
+Raw answers come back by their original names from
+=Country('Niger').derivation_inputs(key, wave=...)=.
+
+** What moved
+
+| wave | purchased rows | Expenditure sum | inkind rows (qty) | Expenditure NA, share of SERVED purchased rows: no last purchase / different unit code / same code, different size |
+|------+---+---+---+---|
+| 2018-19 | 97,566 -> 89,819 | 84,069,922 -> 53,351,991 (-36.5%) | 0 -> 8,141 (26,531) | 23,036 (25.6%): 5,070 / 6,463 / 11,503 |
+| 2021-22 | 123,288 -> 116,633 | 99,448,402 -> 67,358,383 (-32.3%) | 0 -> 7,112 (21,111) | 18,384 (15.8%): 4,714 / 5,975 / 7,695 |
+
+Purchased row counts fall for two reasons: a row whose purchased quantity is
+zero used to survive on the raw =s07bq08= being positive, and the gift
+subtraction moves more rows to zero.  Those quantities are not lost -- they
+are in the new inkind rows.  The NA column is on the SERVED denominator --
+purchased rows of the delivered table, after the canonical reshape and the
+=(t, v, i, j, u, s)= collapse -- because that is what a user sees.  An earlier
+version of this section quoted the smaller SOURCE-row counts on the
+=s07bq07a > 0= subset, and so understated the NA share.
+
+The three candidate quantities, and why C:
+
+- 2018-19: A (gross =s07bq03a=) 55,185,511, B (net of own production) 54,463,268, *C (served)* 53,351,991 FCFA; raw =s07bq08= was 84,069,922.
+- 2021-22: A (gross =s07bq03a=) 68,483,668, B (net of own production) 68,004,724, *C (served)* 67,358,383 FCFA; raw =s07bq08= was 99,448,402.
+
+The three are within 1-9% of each other and all far below the raw total, so
+the large move is the #876 fix itself, not the choice among them.  The choice
+is settled by =ehcvm_conso=, not by the size of the number.
+
+  The product-level check against =ehcvm_conso= does not run for this wave --
+  its conso =codpr= does not share a keyspace with =s07bq01=, and CotedIvoire
+  2018-19 ships no conso file at all.  The construction is validated on Togo
+  2018 and Guinea-Bissau 2018-19, where the join works: the served rule
+  reproduces =depan(Achat)= within 1% for 99.5% / 100% of the discriminating
+  rows, against 13.1% / 48.6% for B and 0.0% / 0.0% for A; =s07bq05 * uv=
+  reproduces =depan(Don)= for 99.7% / 100%, which is why the gift rows carry
+  =Expenditure= NA rather than that imputation.  The instrument is the same in
+  all twelve waves (identical =s07bq0*= Stata labels), so the reading carries
+  by inference, not by measurement here.
+
+** What this does NOT fix
+
+- The served =u= index still carries only =s07bq03b=, not the unit SIZE
+  =s07bq03c=, so two rows differing only in container size collapse onto one
+  =u=.  The derivation does distinguish them; the index does not.
+- The price still comes from a purchase up to 30 days old.  That is what the
+  instrument asked; the assumption is recorded rather than hidden.
+- =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
+  served as rows of their own; they are inputs to the unit value, retrievable
+  through =derivation_inputs=.

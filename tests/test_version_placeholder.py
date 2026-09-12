@@ -65,6 +65,29 @@ def test_version_is_declared_dynamic(text):
     )
 
 
+def _section(text, header):
+    """Body of a top-level TOML table up to the next ``[...]`` header."""
+    parts = text.split(f"\n{header}\n", 1)
+    if len(parts) < 2:
+        return ""
+    body = parts[1]
+    nxt = re.search(r"^\[", body, re.M)
+    return body[: nxt.start()] if nxt else body
+
+
+def test_placeholder_lives_under_tool_poetry_not_project(text):
+    """poetry-dynamic-versioning (PEP 621 mode) substitutes ``[tool.poetry]
+    version`` and requires ``[project]`` to carry NO static version -- only
+    ``dynamic = ["version"]``.  v0.11.0's first publish run resolved 0.0.0
+    because a restoration put the placeholder under ``[project]``; the line
+    existed, the section was wrong, and the older checks here passed."""
+    assert re.search(r'^version\s*=\s*"0\.0\.0"', _section(text, "[tool.poetry]"), re.M), (
+        "no `version = \"0.0.0\"` under [tool.poetry]" + _HINT)
+    assert not re.search(r"^version\s*=", _section(text, "[project]"), re.M), (
+        "[project] carries a static `version =`; with dynamic = [\"version\"] the "
+        "plugin then resolves 0.0.0 (publish run 34193399219, 2026-09-08)" + _HINT)
+
+
 def test_static_version_is_the_placeholder(text):
     m = re.search(r'^version\s*=\s*"([^"]*)"', text, re.M)
     assert m, "no top-level `version =` line found" + _HINT

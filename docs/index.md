@@ -38,7 +38,7 @@ harmonized DataFrame across every country that provides a given table:
 
 ```python
 roster = ll.Feature('household_roster')
-roster.countries   # ['Burkina_Faso', 'Ethiopia', 'Mali', 'Uganda', ...]
+roster.countries   # ['Albania', 'Armenia', 'Azerbaijan', 'Benin', ...]
 df = roster()      # Load all countries into one DataFrame
 ```
 

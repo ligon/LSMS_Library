@@ -1,0 +1,794 @@
+{
+ "Ethiopia": {
+  "fa_shape": [
+   325920,
+   2
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure"
+  ],
+  "fa_n_j": 76,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Kg",
+   "Gram",
+   "Litres",
+   "Piece/Number Medium",
+   "Medeb Small",
+   "Medeb Medium",
+   "Liter",
+   "Piece/Number Small",
+   "Sini Small",
+   "Sini Large",
+   "Medeb Large",
+   "Tasa/Tanika/Shember/Selemon Medium"
+  ],
+  "cp_shape": [
+   45257,
+   2
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price",
+   "Quantity"
+  ],
+  "cp_n_j": 47,
+  "cp_j_in_fa": 47,
+  "cp_j_examples_not_in_fa": [],
+  "cp_u_top": [
+   "Kg",
+   "Gram",
+   "Mili Liter",
+   "Litres",
+   "Pieces",
+   "Piece/Number Medium",
+   "Other(Specify)",
+   "Medeb Medium",
+   "Liter",
+   "Medeb Small",
+   "Tasa/Tanika/Shember/Selemon Medium",
+   "Piece/Number Small"
+  ],
+  "cp_waves": [
+   "2011-12",
+   "2013-14",
+   "2015-16",
+   "2018-19",
+   "2021-22"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "EthiopiaRHS": {
+  "fa_shape": [
+   54693,
+   2
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure"
+  ],
+  "fa_n_j": 140,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Kg",
+   "Sini",
+   "Medeb",
+   "Birchiko",
+   "Tassa",
+   "Esir",
+   "Kunna",
+   "Guchiye",
+   "litre",
+   "Kubaya",
+   "Melekia",
+   "Bobo"
+  ],
+  "cp_shape": [
+   2691,
+   1
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price"
+  ],
+  "cp_n_j": 43,
+  "cp_j_in_fa": 32,
+  "cp_j_examples_not_in_fa": [
+   "Bread (Dabo)",
+   "Chili Pepper (Karia)",
+   "Fenugreek",
+   "Gesho",
+   "Haricot Beans (Fasolia)",
+   "Lettuce (Salata)",
+   "Noug",
+   "Onions",
+   "Potatoes",
+   "Tomatoes"
+  ],
+  "cp_u_top": [
+   "Kg"
+  ],
+  "cp_waves": [
+   "1994a",
+   "1994b",
+   "1995",
+   "1997",
+   "2004",
+   "2009"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "GhanaLSS": {
+  "fa_shape": [
+   5259320,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s",
+   "visit"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Price"
+  ],
+  "fa_n_j": 233,
+  "price_by_s": {
+   "produced": {
+    "n": 928152,
+    "price": 0.952,
+    "qty": 0.764,
+    "exp": 0.048
+   },
+   "purchased": {
+    "n": 4331168,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 1.0
+   }
+  },
+  "fa_u_top": [
+   "Value",
+   "Heap",
+   "Single",
+   "Bowl",
+   "bowl",
+   "All",
+   "Satchet",
+   "Margarin tin",
+   "Piece",
+   "Loaf",
+   "Basket",
+   "all"
+  ],
+  "cp_shape": [
+   660168,
+   3
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u",
+   "obs"
+  ],
+  "cp_cols": [
+   "Price",
+   "NumberOfUnits",
+   "Description"
+  ],
+  "cp_n_j": 662,
+  "cp_j_in_fa": 166,
+  "cp_j_examples_not_in_fa": [
+   "26 inches lcd television - med",
+   "2b",
+   "6-string basic acoustic guitar",
+   "Aa alkaline batteries",
+   "Abgeve syrup",
+   "Adinkra cloth",
+   "Adom tablets",
+   "Air conditioner - split chassi",
+   "Aluminium cooking utensils (lo",
+   "Aluminum sheets"
+  ],
+  "cp_u_top": [
+   "Kg",
+   "Gram",
+   "Other Unit",
+   "Liter",
+   "Piece",
+   "Single",
+   "Milliliter",
+   "Packet",
+   "Beer Bottle",
+   "Pair",
+   "Tablet",
+   "Stick"
+  ],
+  "cp_waves": [
+   "1987-88",
+   "1988-89",
+   "1991-92",
+   "1998-99",
+   "2012-13",
+   "2016-17"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "Guatemala": {
+  "fa_shape": [
+   215982,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Price"
+  ],
+  "fa_n_j": 96,
+  "price_by_s": {
+   "inkind": {
+    "n": 5668,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 0.0
+   },
+   "other": {
+    "n": 3630,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 0.0
+   },
+   "produced": {
+    "n": 14894,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 0.0
+   },
+   "purchased": {
+    "n": 191790,
+    "price": 1.0,
+    "qty": 1.0,
+    "exp": 1.0
+   }
+  },
+  "fa_u_top": [
+   "lbs"
+  ]
+ },
+ "Malawi": {
+  "fa_shape": [
+   971531,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Quantity_kg"
+  ],
+  "fa_n_j": 146,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Piece",
+   "Heap",
+   "Kilogramme",
+   "Litre",
+   "Gram",
+   "Kg",
+   "Tina",
+   "Pail",
+   "Bunch",
+   "Satchet/Tube",
+   "Heap (Medium)",
+   "Millilitre"
+  ],
+  "cp_shape": [
+   82635,
+   3
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price",
+   "NumberOfUnits",
+   "Available"
+  ],
+  "cp_n_j": 51,
+  "cp_j_in_fa": 19,
+  "cp_j_examples_not_in_fa": [
+   "Aspirin Or Panadol",
+   "Axe",
+   "Bar Soap",
+   "Battery (Dry Cell)",
+   "Beans",
+   "Bicycle",
+   "Charcoal",
+   "Chemical Fertilizer",
+   "Chitenje Cloth",
+   "Cigarettes"
+  ],
+  "cp_u_top": [
+   "Piece",
+   "Kilogramme",
+   "Gram",
+   "Heap",
+   "Other (Specify)",
+   "Millilitre",
+   "50 kg Bag",
+   "Litre",
+   "Satchet/Tube",
+   "No 12 Plate",
+   "No 10 Plate",
+   "Bunch"
+  ],
+  "cp_waves": [
+   "2010-11",
+   "2013-14",
+   "2019-20"
+  ],
+  "cp_price_nonnull": 0.799
+ },
+ "Mali": {
+  "fa_shape": [
+   430271,
+   2
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure"
+  ],
+  "fa_n_j": 244,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Kg",
+   "Tas",
+   "Sachet",
+   "Unit\u00e9",
+   "Litre",
+   "Paquet",
+   "Boite",
+   "Autre",
+   "Boule",
+   "Paani",
+   "Bo\u00eete",
+   "Verre"
+  ],
+  "cp_shape": [
+   23646,
+   2
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price",
+   "Quantity"
+  ],
+  "cp_n_j": 37,
+  "cp_j_in_fa": 37,
+  "cp_j_examples_not_in_fa": [],
+  "cp_u_top": [
+   "Kg",
+   "Tas",
+   "Unit\u00e9",
+   "Sac large",
+   "Sac moyen",
+   "Bo\u00eete",
+   "Litre",
+   "Sachet",
+   "Paquet",
+   "Gramme",
+   "Centilitre",
+   "Verre"
+  ],
+  "cp_waves": [
+   "2014-15"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "Nepal": {
+  "fa_error": "RuntimeError: Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Nepal/var/food_acquired.parquet.\n\nCom"
+ },
+ "Niger": {
+  "fa_shape": [
+   239031,
+   2
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure"
+  ],
+  "fa_n_j": 178,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Sachet",
+   "Tiya",
+   "Unit\u00e9",
+   "Tas",
+   "Kg",
+   "Paquet",
+   "Litre",
+   "Morceau",
+   "Bouteille",
+   "Bo\u00eete",
+   "Pot-tarzan",
+   "Calebasse"
+  ],
+  "cp_shape": [
+   15423,
+   2
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price",
+   "Quantity"
+  ],
+  "cp_n_j": 45,
+  "cp_j_in_fa": 35,
+  "cp_j_examples_not_in_fa": [
+   "Allumettes",
+   "Bois de chauffe",
+   "Essence ordinaire",
+   "Produits pharmaceutiques",
+   "P\u00e9trole lampant",
+   "Savon de m\u00e9nage",
+   "Tourteaux d'arachide",
+   "Transport urbain",
+   "Yodo (Foye youto)",
+   "\u00c9lectricit\u00e9"
+  ],
+  "cp_u_top": [
+   "Gramme",
+   "Kg",
+   "Unit\u00e9",
+   "Tia",
+   "Sac de 100 kg",
+   "Sac de 50 kg",
+   "Sachet",
+   "Autre",
+   "Tas",
+   "Gros sac",
+   "Sac Moyen",
+   "Tongolo"
+  ],
+  "cp_waves": [
+   "2011-12",
+   "2014-15"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "Nigeria": {
+  "fa_shape": [
+   595725,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Quantity_kg"
+  ],
+  "fa_n_j": 118,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Kg",
+   "g",
+   "small heap",
+   "small piece",
+   "milk cup",
+   "cl",
+   "l",
+   "mudu",
+   "small mudu",
+   "small packet/sachet",
+   "medium piece",
+   "olodo"
+  ],
+  "cp_shape": [
+   138055,
+   1
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price"
+  ],
+  "cp_n_j": 139,
+  "cp_j_in_fa": 118,
+  "cp_j_examples_not_in_fa": [
+   "Akara (bean cake)",
+   "Amala and soup",
+   "Bambara nut",
+   "Cabbage",
+   "Cooked rice and stew",
+   "Cucumber",
+   "Fufu and soup",
+   "Fufu/Cassava dough (akpu)",
+   "Gari and soup",
+   "Ice cream"
+  ],
+  "cp_u_top": [
+   "Piece",
+   "Kg",
+   "Heap",
+   "Packet/Sachet",
+   "Bunch",
+   "cl",
+   "g",
+   "Mudu",
+   "Milk cup",
+   "l",
+   "Bottle/Can",
+   "Derica"
+  ],
+  "cp_waves": [
+   "2011Q1",
+   "2013Q1",
+   "2016Q1",
+   "2019Q1",
+   "2024Q1"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "Panama": {
+  "fa_shape": [
+   571354,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Price"
+  ],
+  "fa_n_j": 81,
+  "price_by_s": {
+   "inkind": {
+    "n": 25993,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 1.0
+   },
+   "other": {
+    "n": 5680,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 1.0
+   },
+   "produced": {
+    "n": 34821,
+    "price": 0.0,
+    "qty": 1.0,
+    "exp": 1.0
+   },
+   "purchased": {
+    "n": 504860,
+    "price": 0.993,
+    "qty": 1.0,
+    "exp": 1.0
+   }
+  },
+  "fa_u_top": [
+   "pound",
+   "gram",
+   "unit",
+   "ounce",
+   "liter",
+   "milliliter",
+   "value",
+   "small can",
+   "Value",
+   "gallon",
+   "slice or tea bag???",
+   "envelope"
+  ]
+ },
+ "Tanzania": {
+  "fa_shape": [
+   251613,
+   2
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure"
+  ],
+  "fa_n_j": 60,
+  "price_by_s": "no Price column",
+  "fa_u_top": [
+   "Kg",
+   "piece"
+  ],
+  "cp_shape": [
+   15831,
+   1
+  ],
+  "cp_index": [
+   "t",
+   "v",
+   "j",
+   "u"
+  ],
+  "cp_cols": [
+   "Price"
+  ],
+  "cp_n_j": 42,
+  "cp_j_in_fa": 35,
+  "cp_j_examples_not_in_fa": [
+   "Batteries",
+   "Charcoal",
+   "Cigarettes",
+   "Firewood",
+   "Kerosene",
+   "Maize Grinding",
+   "Matches"
+  ],
+  "cp_u_top": [
+   "Gram",
+   "Kg",
+   "Piece",
+   "Litre",
+   "Millilitre"
+  ],
+  "cp_waves": [
+   "2019-20",
+   "2020-21"
+  ],
+  "cp_price_nonnull": 1.0
+ },
+ "Uganda": {
+  "fa_shape": [
+   355571,
+   3
+  ],
+  "fa_index": [
+   "i",
+   "t",
+   "v",
+   "j",
+   "u",
+   "s"
+  ],
+  "fa_cols": [
+   "Quantity",
+   "Expenditure",
+   "Price"
+  ],
+  "fa_n_j": 130,
+  "price_by_s": {
+   "inkind": {
+    "n": 23107,
+    "price": 0.0,
+    "qty": 0.935,
+    "exp": 1.0
+   },
+   "produced": {
+    "n": 85345,
+    "price": 0.989,
+    "qty": 0.997,
+    "exp": 1.0
+   },
+   "purchased": {
+    "n": 247119,
+    "price": 0.977,
+    "qty": 0.981,
+    "exp": 1.0
+   }
+  },
+  "fa_u_top": [
+   "Kg",
+   "Cup/Mug(0.5lt)",
+   "Heap (Small)",
+   "Heap (Medium)",
+   "Heap (unspecified)",
+   "Piece (Medium)",
+   "Packet (500 g)",
+   "Piece (Small)",
+   "Number of Units (General)",
+   "Heap (Big)",
+   "---",
+   "Piece (Big)"
+  ]
+ }
+}

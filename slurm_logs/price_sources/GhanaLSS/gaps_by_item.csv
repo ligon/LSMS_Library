@@ -1,0 +1,228 @@
+pair,t,j,n_cells,median_gap,ratio,in_30_50
+community_price_vs_own_consumption_valuation,1991-92,Cassava,2,-0.12732110918679007,0.8804509063256241,False
+community_price_vs_own_consumption_valuation,1991-92,Chicken,5,-0.12565721414045328,0.8819171036881966,False
+community_price_vs_own_consumption_valuation,1991-92,Cocoyam,3,-0.13976194237515926,0.8695652173913039,False
+community_price_vs_own_consumption_valuation,1991-92,Eggplant/Cucumber,1,1.3862943611198904,3.999999999999999,False
+community_price_vs_own_consumption_valuation,1991-92,Fish (fresh and frozen),1,0.9162907318741551,2.5,False
+community_price_vs_own_consumption_valuation,1991-92,Goat,2,-0.9253254935281237,0.3964023716675736,False
+community_price_vs_own_consumption_valuation,1991-92,Maize (flour/dough),1,0.2231435513142097,1.25,False
+community_price_vs_own_consumption_valuation,1991-92,Oil (palm kernel),7,0.0,1.0,False
+community_price_vs_own_consumption_valuation,1991-92,Okra,1,0.2876820724517808,1.3333333333333333,True
+community_price_vs_own_consumption_valuation,1991-92,Onion,1,1.1717035437571504,3.227486121839514,False
+community_price_vs_own_consumption_valuation,1991-92,Other Meat,1,0.04715533973562103,1.0482848367219186,False
+community_price_vs_own_consumption_valuation,1991-92,Palm Nut,2,0.5877761151247176,1.7999810105008451,False
+community_price_vs_own_consumption_valuation,1991-92,Plantain,1,1.1086626245216111,3.0303030303030303,False
+community_price_vs_own_consumption_valuation,1991-92,Pork,1,-1.09861228866811,0.3333333333333332,False
+community_price_vs_own_consumption_valuation,1991-92,Tomato,1,2.0794415416798357,7.999999999999998,False
+community_price_vs_own_consumption_valuation,1991-92,Yam,1,-0.35899611027852973,0.6983770678385655,False
+community_price_vs_own_consumption_valuation,1998-99,Chicken,10,0.8731637480377481,2.3944743963164132,False
+community_price_vs_own_consumption_valuation,1998-99,Goat,1,0.7843079589569228,2.1908902300206647,False
+community_price_vs_own_consumption_valuation,1998-99,Oil (palm kernel),6,0.18864711557073388,1.2076147288491197,False
+community_price_vs_own_consumption_valuation,1998-99,Other Meat,4,1.3438367545094518,3.8337243832101002,False
+community_price_vs_own_consumption_valuation,1998-99,Pork,1,0.939939089225688,2.5598254926276827,False
+community_price_vs_own_consumption_valuation,2012-13,Avocado,1,0.22314353641304863,1.2499999813735487,False
+community_price_vs_own_consumption_valuation,2012-13,Banana,2,1.131682180941478,3.100868336887812,False
+community_price_vs_own_consumption_valuation,2012-13,Cassava (dough),3,0.5108255840295617,1.6666666004392863,False
+community_price_vs_own_consumption_valuation,2012-13,Cassava (flour),1,-0.37495272150758396,0.687321773560073,False
+community_price_vs_own_consumption_valuation,2012-13,Cassava (fresh),27,-0.9745596759858401,0.3773584769857703,False
+community_price_vs_own_consumption_valuation,2012-13,Chicken (live),5,-0.1115717756571053,0.8944271909999155,False
+community_price_vs_own_consumption_valuation,2012-13,Coconut (fresh),1,0.1823215965303837,1.2000000476837158,False
+community_price_vs_own_consumption_valuation,2012-13,Cocoyam,4,-0.9057810490412628,0.40422604141227075,False
+community_price_vs_own_consumption_valuation,2012-13,Egg,2,0.8243293127936907,2.2803508501982757,False
+community_price_vs_own_consumption_valuation,2012-13,Eggplant,3,1.0498221415285762,2.8571429057997104,False
+community_price_vs_own_consumption_valuation,2012-13,Goat,1,0.09531017980432477,1.0999999999999999,False
+community_price_vs_own_consumption_valuation,2012-13,Maize (cob),1,-1.4816045625986314,0.22727272234672372,False
+community_price_vs_own_consumption_valuation,2012-13,Maize (flour/dough),11,-0.13976192164310808,0.8695652354191746,False
+community_price_vs_own_consumption_valuation,2012-13,Mango,1,1.1631508098056809,3.2,False
+community_price_vs_own_consumption_valuation,2012-13,Oil (palm),2,0.6994727167484571,2.012691169285326,False
+community_price_vs_own_consumption_valuation,2012-13,Okra,4,2.924982507318303,18.633900090165003,False
+community_price_vs_own_consumption_valuation,2012-13,Onion,1,1.791759469228055,6.0,False
+community_price_vs_own_consumption_valuation,2012-13,Orange,2,1.3603545604753595,3.897574982874667,False
+community_price_vs_own_consumption_valuation,2012-13,Other Meat,1,1.3470736330654485,3.8461537888416895,False
+community_price_vs_own_consumption_valuation,2012-13,Palm Nut,7,-0.09531020147874092,0.9090908893868948,False
+community_price_vs_own_consumption_valuation,2012-13,Pepper,12,1.7532789213411957,5.773502534171122,False
+community_price_vs_own_consumption_valuation,2012-13,Pineapple,1,0.10536054214877982,1.1111111405455043,False
+community_price_vs_own_consumption_valuation,2012-13,Plantain,22,-0.501491041034188,0.6056269714960388,False
+community_price_vs_own_consumption_valuation,2012-13,Rice (local),2,-0.3792333155232912,0.6843859161790015,False
+community_price_vs_own_consumption_valuation,2012-13,Shea Butter,1,2.4079455291790137,11.111110228079388,False
+community_price_vs_own_consumption_valuation,2012-13,Tomato (fresh),3,0.6931471805599453,2.0,False
+community_price_vs_own_consumption_valuation,2012-13,Yam,12,-0.9984374179448505,0.3684547323374459,False
+community_price_vs_own_consumption_valuation,2016-17,Avocado,1,0.6931471805599453,2.0,False
+community_price_vs_own_consumption_valuation,2016-17,Cassava (dough),1,-0.6931471805599453,0.5,False
+community_price_vs_own_consumption_valuation,2016-17,Cassava (fresh),1,0.9808292530117262,2.6666666666666665,False
+community_price_vs_own_consumption_valuation,2016-17,"Cassava (yellow, flour)",3,0.33647223662121295,1.4,True
+community_price_vs_own_consumption_valuation,2016-17,Chicken (live),8,0.1823215567939549,1.2000000000000004,False
+community_price_vs_own_consumption_valuation,2016-17,Coconut (fresh),2,0.8958797346140275,2.449489742783178,False
+community_price_vs_own_consumption_valuation,2016-17,Cowpea,2,0.38107002602344847,1.4638501094227998,True
+community_price_vs_own_consumption_valuation,2016-17,Egg,8,-0.16823611831060642,0.8451542547285166,False
+community_price_vs_own_consumption_valuation,2016-17,Goat,6,0.4336502638470261,1.5428791731200517,False
+community_price_vs_own_consumption_valuation,2016-17,Groundnut,2,0.6050920321626074,1.8314207507423534,False
+community_price_vs_own_consumption_valuation,2016-17,Guinea corn/sorghum,1,-1.6094379124341003,0.2,False
+community_price_vs_own_consumption_valuation,2016-17,Guineafowl,2,0.09116077839697745,1.0954451150103324,False
+community_price_vs_own_consumption_valuation,2016-17,Maize (flour/dough),2,0.189421425424379,1.208550158942707,False
+community_price_vs_own_consumption_valuation,2016-17,Milk (fresh),1,1.041453874828161,2.833333333333333,False
+community_price_vs_own_consumption_valuation,2016-17,Millet,1,0.6931471805599452,1.9999999999999998,False
+community_price_vs_own_consumption_valuation,2016-17,Oil (coconut),1,0.4054651081081644,1.5,True
+community_price_vs_own_consumption_valuation,2016-17,Oil (groundnut),1,-0.7135581778200728,0.48989794855663565,False
+community_price_vs_own_consumption_valuation,2016-17,Oil (palm kernel),1,-0.2231435513142097,0.8,False
+community_price_vs_own_consumption_valuation,2016-17,Oil (palm),5,0.0,1.0,False
+community_price_vs_own_consumption_valuation,2016-17,Orange,1,-1.4901160971803051e-08,0.9999999850988391,False
+community_price_vs_own_consumption_valuation,2016-17,Other Beverages,1,2.4849066497880004,12.0,False
+community_price_vs_own_consumption_valuation,2016-17,Other Fish,1,0.9162907318741551,2.5,False
+community_price_vs_own_consumption_valuation,2016-17,Other Meat,2,1.4403097332267432,4.222003309207491,False
+community_price_vs_own_consumption_valuation,2016-17,Palm Nut,1,-0.3101549283038395,0.7333333333333333,False
+community_price_vs_own_consumption_valuation,2016-17,Pineapple,1,-0.6931471805599453,0.5,False
+community_price_vs_own_consumption_valuation,2016-17,Pork,1,-0.8958797346140273,0.40824829046386313,False
+community_price_vs_own_consumption_valuation,2016-17,Rice (local),2,0.4529905441363936,1.5730093122823423,False
+community_price_vs_own_consumption_valuation,2016-17,Shea Butter,1,-3.2188758248682006,0.04000000000000001,False
+community_price_vs_own_consumption_valuation,2016-17,Watermelon,1,0.2231435513142097,1.25,False
+unit_value_vs_community_price,2016-17,Akpeteshie,11,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Apple,2,0.14384103622589045,1.1547005383792515,False
+unit_value_vs_community_price,2016-17,Avocado,1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Beef,9,-0.29941825054435167,0.7412493166611014,False
+unit_value_vs_community_price,2016-17,Beef (leg),5,-0.40546510810816416,0.6666666666666669,False
+unit_value_vs_community_price,2016-17,Beer,15,0.02597548640326064,1.0263157894736843,False
+unit_value_vs_community_price,2016-17,Biscuit,4,-0.1377077395949225,0.8713533166088808,False
+unit_value_vs_community_price,2016-17,Bitters,6,-0.36581385056400484,0.6936319083813028,False
+unit_value_vs_community_price,2016-17,Bread,10,-0.3465735902799727,0.7071067811865475,False
+unit_value_vs_community_price,2016-17,Carrot,1,4.650780697240143,104.6666666666666,False
+unit_value_vs_community_price,2016-17,Cassava (dough),1,-0.08701137698962981,0.9166666666666666,False
+unit_value_vs_community_price,2016-17,Cassava (dried),3,-0.16271120021731397,0.8498365855987975,False
+unit_value_vs_community_price,2016-17,Cassava (fresh),2,-0.9551331529316716,0.3847609090989397,False
+unit_value_vs_community_price,2016-17,"Cassava (yellow, flour)",4,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Cerelac (Baby food),8,0.14384103622589045,1.1547005383792515,False
+unit_value_vs_community_price,2016-17,Chewing Gum,21,-1.0986122886681096,0.33333333333333337,False
+unit_value_vs_community_price,2016-17,Chicken (broiler),9,-0.9808292530117262,0.375,False
+unit_value_vs_community_price,2016-17,Chicken (live),3,-0.23500181462286784,0.7905694150420948,False
+unit_value_vs_community_price,2016-17,Chicken (thigh),6,-0.10103075847154441,0.9039052297149878,False
+unit_value_vs_community_price,2016-17,Chicken (wing),7,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Chocolate,1,-0.09531017980432499,0.909090909090909,False
+unit_value_vs_community_price,2016-17,Cigarette,10,-0.916290731874155,0.4,False
+unit_value_vs_community_price,2016-17,Cocoa (milk powder beverages),10,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Cocoa Powder,1,0.03774032798284699,1.0384615384615383,False
+unit_value_vs_community_price,2016-17,Coconut (fresh),6,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Cocoyam,1,-0.735708307268363,0.4791659420284375,False
+unit_value_vs_community_price,2016-17,Cocoyam Leaves,1,0.6931471805599453,2.0,False
+unit_value_vs_community_price,2016-17,Coffee,1,0.14310084364067333,1.1538461538461537,False
+unit_value_vs_community_price,2016-17,Condiment,14,-0.04350568849481484,0.9574271077563381,False
+unit_value_vs_community_price,2016-17,Corflake,1,-1.0986122886681098,0.3333333333333333,False
+unit_value_vs_community_price,2016-17,Cowpea,3,-0.11244058560637527,0.8936504412303007,False
+unit_value_vs_community_price,2016-17,Egg,35,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Eggplant,2,-0.006659943746079755,0.9933621845276662,False
+unit_value_vs_community_price,2016-17,Fish (canned),5,-0.06899287148695166,0.9333333333333331,False
+unit_value_vs_community_price,2016-17,Fish (dried),1,4.382026634673881,79.99999999999997,False
+unit_value_vs_community_price,2016-17,Fish (salted),3,0.6931471805599453,2.0,False
+unit_value_vs_community_price,2016-17,"Fish (smoked, river)",2,5.19180591259599,179.79295028062165,False
+unit_value_vs_community_price,2016-17,Garlic,3,-0.6931471805599453,0.5,False
+unit_value_vs_community_price,2016-17,Gin,5,-0.33647223662121284,0.7142857142857143,False
+unit_value_vs_community_price,2016-17,Goat,14,-0.420486150805212,0.6567274736060397,False
+unit_value_vs_community_price,2016-17,Groundnut,6,0.6263814842476845,1.8708286933869716,False
+unit_value_vs_community_price,2016-17,Guinea corn/sorghum,1,1.7005986908310775,5.47722557505166,False
+unit_value_vs_community_price,2016-17,Guineafowl,2,-0.2027325540540823,0.8164965809277259,False
+unit_value_vs_community_price,2016-17,Herring (smoked),2,3.9601313724331892,52.46421784834046,False
+unit_value_vs_community_price,2016-17,Honey,3,-0.5108256237659909,0.5999999999999999,False
+unit_value_vs_community_price,2016-17,Ice Cream,8,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Instant Noodle,2,0.4054651081081644,1.5,True
+unit_value_vs_community_price,2016-17,Juice,7,0.2227352213609317,1.2494896917525644,False
+unit_value_vs_community_price,2016-17,Kapla,7,0.22314355131421015,1.2500000000000004,False
+unit_value_vs_community_price,2016-17,Kola Nut,1,0.2231435513142097,1.25,False
+unit_value_vs_community_price,2016-17,Macaroni,2,-0.09116077839697723,0.9128709291752769,False
+unit_value_vs_community_price,2016-17,Mackerel (processed),5,0.03922071315328157,1.0400000000000003,False
+unit_value_vs_community_price,2016-17,Maize (flour/dough),1,-0.5493061443340548,0.5773502691896258,False
+unit_value_vs_community_price,2016-17,Maize (grain),2,0.2676103529253534,1.3068378352572798,True
+unit_value_vs_community_price,2016-17,Malt Drinks (bottle),4,0.09116077839697723,1.0954451150103321,False
+unit_value_vs_community_price,2016-17,Malt Drinks (canned),7,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Mango,1,-2.1972245773362196,0.11111111111111109,False
+unit_value_vs_community_price,2016-17,Margarine,3,0.15415067982725805,1.1666666666666663,False
+unit_value_vs_community_price,2016-17,Milk (evaporated),2,0.08125946474888718,1.0846522890932806,False
+unit_value_vs_community_price,2016-17,Milk (fresh),1,-1.7346010553881064,0.17647058823529413,False
+unit_value_vs_community_price,2016-17,Milk (powdered),8,0.0,1.0,False
+unit_value_vs_community_price,2016-17,"Milk (tinned, condensed)",1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Millet,1,-0.2876820724517808,0.7500000000000001,False
+unit_value_vs_community_price,2016-17,Oil (coconut),4,0.08212601674300912,1.0855926040543844,False
+unit_value_vs_community_price,2016-17,Oil (groundnut),4,0.3851112602367871,1.4697778401749313,True
+unit_value_vs_community_price,2016-17,Oil (palm kernel),2,-0.026340128914456695,0.9740037464252966,False
+unit_value_vs_community_price,2016-17,Oil (palm),15,-0.48550781578170077,0.6153846153846154,False
+unit_value_vs_community_price,2016-17,Oil (vegetable),25,-0.1418840865653226,0.8677218312746244,False
+unit_value_vs_community_price,2016-17,Okra,1,-0.248790198507985,0.7797435475847171,False
+unit_value_vs_community_price,2016-17,Onion,2,2.254858896105435,9.533947938045735,False
+unit_value_vs_community_price,2016-17,Orange,2,0.25541281188299525,1.2909944487358056,False
+unit_value_vs_community_price,2016-17,Other Fish,1,-0.693147180559945,0.5000000000000002,False
+unit_value_vs_community_price,2016-17,Other Meat,2,-1.1218467875829272,0.3256777812163152,False
+unit_value_vs_community_price,2016-17,Other Milk Products,9,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Palm Nut,1,0.3101549283038395,1.3636363636363635,True
+unit_value_vs_community_price,2016-17,Pawpaw,1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,"Pepper (dried, red)",2,-0.6608779199911596,0.5163977794943223,False
+unit_value_vs_community_price,2016-17,Pepper (fresh),2,-1.292027952723274,0.27471311261135295,False
+unit_value_vs_community_price,2016-17,Pepper (powder),6,-0.05578588782855243,0.9457416090031758,False
+unit_value_vs_community_price,2016-17,Pineapple,1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Plantain,1,-0.3396773675701613,0.712,False
+unit_value_vs_community_price,2016-17,Pork,2,0.11874779268919355,1.1260858753806426,False
+unit_value_vs_community_price,2016-17,Pork (feet),1,-1.700598690831078,0.18257418583505533,False
+unit_value_vs_community_price,2016-17,Rice (imported),10,0.12423067964924972,1.1322770341445956,False
+unit_value_vs_community_price,2016-17,Rice (local),4,-0.047655089902162495,0.9534625892455922,False
+unit_value_vs_community_price,2016-17,Salt,6,0.11157177565710485,1.118033988749895,False
+unit_value_vs_community_price,2016-17,Sausage (beef),2,-0.2086616857084112,0.8116697886877473,False
+unit_value_vs_community_price,2016-17,Shea Butter,3,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Soft Drinks,8,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Spaghetti,2,-0.12343003896576282,0.8838834764831844,False
+unit_value_vs_community_price,2016-17,Sugar (cubed),1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Sugar (granulated),3,0.10536051565782623,1.111111111111111,False
+unit_value_vs_community_price,2016-17,Sugar Bread,2,-0.23500181462286773,0.7905694150420949,False
+unit_value_vs_community_price,2016-17,Tea,16,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Tomato (fresh),3,0.2593410900218851,1.2960758079680372,False
+unit_value_vs_community_price,2016-17,Tomato (paste),13,-0.13596685774182138,0.8728715609439691,False
+unit_value_vs_community_price,2016-17,Tuna (processed),1,-0.09903495688104669,0.9057110466368401,False
+unit_value_vs_community_price,2016-17,Water,15,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Watermelon,2,-0.5493061443340548,0.5773502691896258,False
+unit_value_vs_community_price,2016-17,Wheat Flour,1,0.0,1.0,False
+unit_value_vs_community_price,2016-17,Whisky,1,-0.6931471805599453,0.5,False
+unit_value_vs_community_price,2016-17,White Oats,1,0.5389965007326869,1.7142857142857142,False
+unit_value_vs_community_price,2016-17,Wine,3,-0.980829253011726,0.3750000000000001,False
+unit_value_vs_community_price,2016-17,Yam,1,0.4565202789084486,1.5785714285714287,False
+unit_value_vs_community_price,2016-17,Yoghurt,10,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Avocado,6,0.3678630423650493,1.444644170375461,True
+unit_value_vs_own_consumption_valuation,2016-17,Banana,10,-0.6019864021629678,0.5477225575051662,False
+unit_value_vs_own_consumption_valuation,2016-17,Cassava (dough),12,-0.5493061443340549,0.5773502691896257,False
+unit_value_vs_own_consumption_valuation,2016-17,Cassava (fresh),12,-0.332531022413209,0.7171064221471714,False
+unit_value_vs_own_consumption_valuation,2016-17,"Cassava (yellow, flour)",7,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Chicken (live),1,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Coconut (fresh),4,0.40235947810852507,1.4953487812212205,True
+unit_value_vs_own_consumption_valuation,2016-17,Cocoyam,7,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Cowpea,12,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Dawadawa,4,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Egg,2,0.2191274654655775,1.244989959798873,False
+unit_value_vs_own_consumption_valuation,2016-17,Eggplant,2,-0.5493061443340549,0.5773502691896257,False
+unit_value_vs_own_consumption_valuation,2016-17,Goat,4,-0.02041099726012785,0.979795897113271,False
+unit_value_vs_own_consumption_valuation,2016-17,Groundnut,7,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Guinea corn/sorghum,2,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Guineafowl,3,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Maize (flour/dough),9,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Mango,7,0.2027325540540822,1.224744871391589,False
+unit_value_vs_own_consumption_valuation,2016-17,Milk (fresh),2,-0.6931471805599454,0.49999999999999994,False
+unit_value_vs_own_consumption_valuation,2016-17,Millet,3,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Millet (flour),4,-0.11157177565710485,0.8944271909999159,False
+unit_value_vs_own_consumption_valuation,2016-17,Oil (coconut),2,0.45814536593707755,1.5811388300841898,False
+unit_value_vs_own_consumption_valuation,2016-17,Oil (groundnut),2,-0.3143043297111871,0.7302967433402214,False
+unit_value_vs_own_consumption_valuation,2016-17,Oil (palm kernel),2,5.551115123125783e-17,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Oil (palm),13,0.2231435513142097,1.25,False
+unit_value_vs_own_consumption_valuation,2016-17,Okra,29,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Onion,7,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Orange,7,-1.4901160971803051e-08,0.9999999850988391,False
+unit_value_vs_own_consumption_valuation,2016-17,Other Fish,14,-0.1783374719693661,0.8366600265340756,False
+unit_value_vs_own_consumption_valuation,2016-17,Other Fruits,2,-0.14384103622589045,0.8660254037844387,False
+unit_value_vs_own_consumption_valuation,2016-17,Other Meat,7,-0.33647223662121295,0.7142857142857143,False
+unit_value_vs_own_consumption_valuation,2016-17,Other Oils,1,-0.6059704869875564,0.545544725589981,False
+unit_value_vs_own_consumption_valuation,2016-17,Other Vegetables,13,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Palm Nut,17,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Pawpaw,6,0.6931471805599453,2.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Pepper (fresh),21,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Pineapple,5,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Plantain,12,-0.28058220382135635,0.7553438493391921,False
+unit_value_vs_own_consumption_valuation,2016-17,Pork,2,-2.1885599119748598,0.11207803469202407,False
+unit_value_vs_own_consumption_valuation,2016-17,Rice (local),17,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Shea Butter,9,0.0,1.0,False
+unit_value_vs_own_consumption_valuation,2016-17,Snail,3,-0.8109302162163288,0.4444444444444444,False
+unit_value_vs_own_consumption_valuation,2016-17,Tomato (fresh),9,-0.09116077839697723,0.9128709291752769,False
+unit_value_vs_own_consumption_valuation,2016-17,Watermelon,1,0.1177830356563836,1.1250000000000002,False
+unit_value_vs_own_consumption_valuation,2016-17,Yam,1,0.0,1.0,False

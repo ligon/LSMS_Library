@@ -59,7 +59,14 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .quantity_audit import check_quantities
+from . import _parallel_waves
 from .population import attach as attach_population, population_records
+from .recall import attach as attach_recall, recall_records
+from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
+                          call_inputs as _call_derivation_inputs,
+                          COLUMN as _DERIVATION_COLUMN,
+                          union_keys_by_group as _union_derivation_keys_by_group)
 import importlib.util
 import hashlib
 import logging
@@ -481,7 +488,9 @@ def _make_jobs_flag() -> str | None:
     Determine an appropriate make -j flag based on environment or CPU count.
     Returns the flag string (e.g. '-j4') or None if no parallelism is desired.
 
-    ``LSMS_MAKE_JOBS`` overrides the default (``cpu_count // 2``).  A
+    ``LSMS_MAKE_JOBS`` overrides the default (``visible_cpus() // 2`` -- the
+    cgroup-visible count, GH #764; a parallel wave build sets it per worker,
+    see ``_parallel_waves.worker_make_jobs``).  A
     country-level build fans out to one ``python <table>.py`` per wave, so
     ``-jN`` runs N wave builds -- and thus N concurrent large-blob S3 fetches --
     in parallel.  On a host where concurrent multipart S3 reads occasionally
@@ -495,8 +504,11 @@ def _make_jobs_flag() -> str | None:
         except ValueError:
             jobs = None
     else:
-        cpu_count = os.cpu_count() or 2
-        jobs = max(1, cpu_count // 2)
+        # GH #764: ``os.cpu_count()`` is the physical node (56 on savio4_htc),
+        # not the cgroup the job was given -- a 4-core slice ran ``-j28``.
+        # ``visible_cpus`` is the affinity count, capped by Slurm's own
+        # allocation when set.
+        jobs = max(1, _parallel_waves.visible_cpus() // 2)
 
     if jobs and jobs > 1:
         return f"-j{jobs}"
@@ -572,6 +584,46 @@ def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
         f"  - DVC credentials are missing or misconfigured;\n"
         f"  - the raw .dta source files have not been dvc-pulled.\n\n"
         f"See README.org for supported install and data-access patterns."
+    )
+
+
+class InTreeParquetWarning(UserWarning):
+    """A ``*.parquet`` was found inside the config tree (``countries_root()``).
+
+    GH #803.  The library reads harmonized parquets from ``data_root()`` only;
+    a parquet sitting next to a wave script is an artefact of running that
+    script from a checkout that is not the imported package (``to_parquet``
+    -> ``_resolve_data_path`` redirects only when the *caller's file* is under
+    ``countries_root()``; otherwise the literal relative path is written --
+    the write-side ``.pth`` trap, see CLAUDE.md "Data Access").  Before #803
+    such a file was *preferred* to running the wave script, and being
+    hashless it graded ``legacy`` at the v0.8.0 gate, so the stale frame was
+    concatenated and stamped with a fresh hash.  It is now ignored and
+    reported once per path.
+    """
+
+
+_INTREE_ARTEFACTS_WARNED: set[Path] = set()
+
+
+def _warn_intree_parquet_artefact(path: Path, owner: str, table: str) -> None:
+    """Report -- once per path -- a parquet artefact inside the config tree.
+
+    Pure reporting: it never reads the file and never changes what any
+    build writes (it is in ``_build_registry._EXCLUDED_CALLABLES`` for that
+    reason).  Callers have already established ``path.exists()``.
+    """
+    if path in _INTREE_ARTEFACTS_WARNED:
+        return
+    _INTREE_ARTEFACTS_WARNED.add(path)
+    warnings.warn(
+        f"{owner}/{table}: ignoring in-tree parquet {path} (GH #803). "
+        f"Parquets inside the config tree are never read; this one was "
+        f"written by a script run from a checkout that is not the imported "
+        f"package (the write-side .pth trap -- CLAUDE.md 'Data Access'). "
+        f"Delete it, e.g. `find {countries_root()} -name '*.parquet' -delete`.",
+        InTreeParquetWarning,
+        stacklevel=3,
     )
 
 
@@ -714,6 +766,29 @@ class Wave:
             return {}
         with open(info_path, 'r') as file:
             return load_yaml(file)
+
+    @property
+    def features(self) -> list[str]:
+        """The tables this wave provides -- a synonym for :attr:`data_scheme`.
+
+        Same synonym as :attr:`Country.features`, for the same reason: the
+        library says *feature* nearly everywhere, while the attribute was
+        named after the ``data_scheme.yml`` file it reads.
+
+        The wave-level list is the wave's OWN declarations and need not match
+        its country's -- a table wired for some waves and not others is the
+        normal case, and comparing ``country.features`` with
+        ``wave.features`` is how you see which.
+
+        **A wave does not list the runtime-derived tables, and that is
+        correct.**  ``food_expenditures``, ``food_prices``,
+        ``food_quantities`` and ``household_characteristics`` are built in
+        ``Country.__getattr__`` from ``_aggregate_wave_data(waves, ...)`` --
+        a concatenation ACROSS waves -- so they are country-level by
+        construction rather than something a wave failed to declare.  Uganda:
+        country 28, wave 23, the difference being exactly those.
+        """
+        return self.data_scheme
 
     @property
     def data_scheme(self) -> list[str]:
@@ -1104,7 +1179,7 @@ class Wave:
         HOUSEHOLD-grain frames joined on the CLUSTER key ``v`` -- the merge is
         many-to-many and yields a cartesian product *within each key group*.
         ``_normalize_dataframe_index`` then quietly mopped the explosion up
-        with ``groupby().first()``, so the table looked clean while most of its
+        with its duplicate collapse, so the table looked clean while most of its
         rows were phantoms.  This site does not lose data; it INVENTS it, and
         every other #323 site is downstream janitor to the mess.
 
@@ -1155,6 +1230,23 @@ class Wave:
                 raise ValueError(msg)
             warnings.warn(msg)
         return pd.merge(left, right, on=merge_on, how=how)
+
+    def _script_parquet_candidates(self, request: str) -> list[Path]:
+        """Where a script-path wave parquet may be READ from: under
+        ``data_root()`` only.
+
+        GH #803: the in-tree ``{wave}/_/{table}.parquet`` is deliberately NOT
+        a candidate.  It is only the *name* of the Makefile target (the
+        ``../%/_/<table>.parquet`` pattern rules are written with in-tree
+        names); the script that rule runs writes through ``to_parquet`` ->
+        ``_resolve_data_path`` and lands under ``data_root()``.  A hashless
+        parquet under ``data_root()`` still grades ``legacy`` and is trusted
+        once -- that is the v0.8.0 upgrade path and is unchanged.  Nothing
+        inside ``countries_root()`` is an input.
+        """
+        return [
+            data_root(self.country.name) / self.wave_folder / "_" / f"{request}.parquet",
+        ]
 
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
@@ -1460,19 +1552,31 @@ class Wave:
             logger.info("Attempting to generate using Makefile...")
             #cluster features in the old makefile is called 'other_features'
             # if request =='cluster_features': request = 'other_features'
-            # Use in-tree path for Make target, but look for output at data_root too
-            intree_parquet = self.file_path / "_" / f"{request}.parquet"
-            country_name = self.country.name
-            external_parquet = data_root(country_name) / self.wave_folder / "_" / f"{request}.parquet"
+            # GH #803: ``make_target_intree`` is the Makefile target NAME
+            # (the ``../%/_/<table>.parquet`` pattern rules use in-tree
+            # names) -- it is never read.  The only read location is under
+            # data_root() (see _script_parquet_candidates).  A file that
+            # actually exists at the in-tree name is an artefact of the
+            # write-side .pth trap: it is reported, and it makes Make's own
+            # timestamp check lie (the target looks up to date), so Make is
+            # then forced with -B.
+            make_target_intree = self.file_path / "_" / f"{request}.parquet"
+            candidates = self._script_parquet_candidates(request)
+            intree_artefact = make_target_intree.exists()
+            if intree_artefact:
+                _warn_intree_parquet_artefact(make_target_intree, self.name, request)
 
             # Check if the parquet already exists before invoking Make.
             # v0.8.0: skip a candidate whose embedded hash is STALE so a
             # script/source edit forces Make to rebuild it (closes the
             # "stale L2-wave parquet shadows a source-script fix" gap
-            # documented in CLAUDE.md "Cache Behavior").
+            # documented in CLAUDE.md "Cache Behavior").  A hashless
+            # candidate grades ``legacy`` and is trusted: that is the v0.8.0
+            # upgrade path for parquets UNDER data_root, and it is exactly
+            # why an in-tree file must never be a candidate (GH #803).
             expected_wave_hash = self._input_hash(request)
             parquet_fn = None
-            for candidate in [external_parquet, intree_parquet]:
+            for candidate in candidates:
                 if candidate.exists():
                     if cache_freshness(candidate, expected_wave_hash) == "stale":
                         logger.debug(
@@ -1490,7 +1594,7 @@ class Wave:
                     return pd.DataFrame()
 
                 cwd_path = self.file_path.parent / "_"
-                relative_parquet_path = intree_parquet.relative_to(cwd_path.parent)
+                relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
                 env = os.environ.copy()
                 env["LSMS_DATA_DIR"] = str(data_root())
                 bin_dir = os.path.dirname(sys.executable)
@@ -1504,6 +1608,11 @@ class Wave:
                 # (e.g. Uganda's food_expenditures, which routes here per
                 # wave for food_acquired).
                 make_cmd = ["make", "-s"]
+                if intree_artefact:
+                    # GH #803: Make stats the target by its in-tree name; an
+                    # artefact newer than the script makes it "up to date" and
+                    # nothing runs.  Force the recipe.
+                    make_cmd.append("-B")
                 jobs_flag = _make_jobs_flag()
                 if jobs_flag:
                     make_cmd.append(jobs_flag)
@@ -1511,7 +1620,7 @@ class Wave:
                 subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
-                for candidate in [external_parquet, intree_parquet]:
+                for candidate in candidates:
                     if candidate.exists():
                         parquet_fn = candidate
                         break
@@ -1562,6 +1671,14 @@ class Wave:
         return df
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
+    # GH #871: tagged so SITE 2 is in a fingerprint.  Measured before this tag:
+    # `_collapse_to_cluster_grain` appeared in NO table's
+    # build_transforms_fingerprint, so a Site-2-only edit would have served stale
+    # composites out of the warm L2 parquets indefinitely (and a revert-check
+    # could not have worked).  Scoped to `cluster_features`, the only table this
+    # method builds, so the coupling is explicit rather than incidental to
+    # Site 1's all-tables tag.
+    @build_transform(tables=['cluster_features'])
     def cluster_features(self) -> pd.DataFrame:
         df = self.grab_data('cluster_features')
         # Some countries declare ``i: <HHID>`` in cluster_features
@@ -1576,7 +1693,7 @@ class Wave:
         # a cluster by construction of the LSMS-ISA sampling design" --
         # and prose is not enforcement.  The claim is FALSE wherever a
         # cluster code is unique only *within* a district: two real
-        # clusters then merge, and ``.first()`` keeps one district's
+        # clusters then merge, and the collapse keeps one district's
         # Region and silently discards the other's.  That is WRONG data,
         # not merely lost data.  The invariant is now CHECKED rather than
         # asserted -- see ``_collapse_to_cluster_grain``.
@@ -1603,8 +1720,8 @@ class Wave:
         # all of it reported by #614, none of it by the audit above).
         #
         # It is deliberately NOT rerouted through ``_collapse_to_cluster_grain``
-        # here, because it does not need to be: Site 1 reduces these frames with the
-        # same ``.first()`` and audits them with the same instrument, so the loss is
+        # here, because it does not need to be: Site 1 collapses these frames with
+        # the same selector and audits them with the same instrument, so the loss is
         # reported either way.  (Before the GPS ``.mean()`` was retired this
         # asymmetry also silently decided whether a country's cluster coordinates
         # came out a CENTROID or ONE HOUSEHOLD'S FIX -- on nothing more principled
@@ -1627,10 +1744,10 @@ class Wave:
         if df.empty:
             return df
         # if food_acquired data is loaded from a parquet file, we assume its unit and food label are already mapped.
-        # Check both in-tree and data_root locations (wave scripts write to data_root).
-        intree_parquet = self.file_path / "_" / "food_acquired.parquet"
-        external_parquet = data_root(self.country.name) / self.wave_folder / "_" / "food_acquired.parquet"
-        if intree_parquet.exists() or external_parquet.exists():
+        # GH #803: only a data_root parquet counts.  An in-tree file is not
+        # an input -- not even as an existence test that steers behaviour.
+        external_parquet = self._script_parquet_candidates('food_acquired')[0]
+        if external_parquet.exists():
             return df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
@@ -1878,6 +1995,74 @@ class Country:
         return sorted(waves)
 
     @property
+    def notes_path(self) -> Path:
+        """Path to this country's ``_/CONTENTS.org``."""
+        return self.file_path / "_" / "CONTENTS.org"
+
+    def notes(self, topic: str | None = None,
+              state: str | None = None) -> str:
+        """This country's ``CONTENTS.org`` -- its recorded idiosyncrasies.
+
+        ``CONTENTS.org`` is where the repository records what is odd about a
+        survey: identifier conventions, design quirks, known defects, and
+        decisions already taken with their reasons.  It was previously
+        reachable only by navigating the filesystem, which meant anyone
+        working through the API could not find it.
+
+        Parameters
+        ----------
+        topic : str, optional
+            Case-insensitive substring matched against headline **text**
+            (body text is not searched).  Returns each matching headline with
+            its whole subtree, since the useful detail is nested -- a
+            country's ``Weights`` and ``Strata`` live under its ``Sampling
+            Design``.  When a parent and a descendant both match, only the
+            parent is returned; it already contains the descendant.
+        state : str, optional
+            TODO keyword to filter on, e.g. ``'WAITING'``.  A closed GitHub
+            issue can still leave a live caveat parked here, so
+            ``notes(state='WAITING')`` is the quick answer to "what is still
+            open for this country?".
+
+        Returns
+        -------
+        str
+            The matching text, or ``''`` when nothing matches.  A country
+            with no ``CONTENTS.org`` warns and returns ``''``, following
+            :meth:`Wave.license`.
+
+        See Also
+        --------
+        note_topics : the headlines available to pass as ``topic``.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return ""
+        return _notes.extract(path.read_text(), topic=topic, state=state)
+
+    @property
+    def note_topics(self) -> list[tuple[int, str | None, str]]:
+        """``(level, TODO keyword, headline)`` for every heading in the notes.
+
+        The discovery half of :meth:`notes`, and the load-bearing half: the
+        headline vocabulary is largely ad hoc -- counts range from 11 headings
+        to 124 -- so nobody guesses ``'Household Presence / MonthsSpent'``.
+        This is to :meth:`notes` what :attr:`data_scheme` is to the table
+        methods.
+        """
+        from . import notes as _notes
+
+        path = self.notes_path
+        if not path.exists():
+            warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
+            return []
+        return [(h.level, h.keyword, h.text)
+                for h in _notes.parse(path.read_text())]
+
+    @property
     def population(self) -> dict[str, "PopulationRecord"]:
         """``{wave: PopulationRecord}`` -- what each wave's sample REPRESENTS.
 
@@ -1894,6 +2079,60 @@ class Country:
         Empty for a country the 2026-07-21 sweep did not reach.
         """
         return population_records(self.name)
+
+    def derivations(self, table: str | None = None) -> dict:
+        """``{key: DerivationRecord}`` -- served numbers that are NOT survey answers.
+
+        Every entry names a construction the library performs on this
+        country's data (a wave script, or a framework-level rule with an
+        empty country slot): the ``rule``, the ``function`` that implements
+        it, the ``inputs`` callable that returns the raw answers by their
+        original names, and the ``assumptions`` with their ``basis``.  Rows
+        carrying a derivation are labelled in the served table's
+        ``Derivation`` column with the same key.  Read from
+        ``{country}/_/derivations.yml`` and ``lsms_library/derivations.yml``;
+        see :mod:`lsms_library.derivations` and
+        ``SkunkWorks/derived_values.org``.
+
+        Parameters
+        ----------
+        table : str, optional
+            Restrict to entries for this table (an entry with an empty table
+            slot applies to every table).
+        """
+        return _derivation_records_for(self.name, table)
+
+    def derivation_inputs(self, key: str, wave: str | None = None) -> pd.DataFrame:
+        """The exact raw survey answers a derivation was computed from.
+
+        Resolves the entry's ``inputs`` callable and returns its frame: the
+        ORIGINAL variable names, at the input grain, re-read from the source
+        through ``get_dataframe``.  Slow and exact; nothing is cached.  A user
+        who wants the value under a different assumption re-derives it from
+        this -- the derivation function itself takes no options.
+
+        The household level ``i`` is re-keyed through ``updated_ids`` exactly
+        as ``_finalize_result`` re-keys every served table, so the frame joins
+        to the served rows by ``(t, i, ...)``.  Without this the raw frame
+        carries the survey's own household id -- GhanaLSS 1988-89 serves
+        ``'101332'`` / ``'101332_1'`` (a panel re-key plus a split-household
+        suffix, GH #548) where ``Y12B.DAT`` says ``'200103'`` -- and "the exact
+        inputs of this row" would not be findable from the row.
+        """
+        records = self.derivations()
+        if key not in records:
+            raise KeyError(
+                f"{self.name} has no derivation {key!r}; registered: "
+                f"{sorted(records)}")
+        frame = _call_derivation_inputs(records[key], wave=wave)
+        if (
+            isinstance(frame.index, pd.MultiIndex)
+            and {'t', 'i'} <= set(frame.index.names)   # id_walk needs both
+            and not frame.attrs.get('id_converted')
+            and self.updated_ids is not None
+        ):
+            frame = id_walk(frame, self.updated_ids)
+        return frame
 
     def provenance(self) -> pd.DataFrame:
         """Tabular survey of source + license per wave.
@@ -1939,6 +2178,23 @@ class Country:
                 columns=['source', 'license', 'documentation_path']
             ).rename_axis('t')
         return pd.DataFrame(rows).set_index('t')
+
+    @property
+    def features(self) -> list[str]:
+        """The tables this country provides -- a synonym for :attr:`data_scheme`.
+
+        The library talks about *features* nearly everywhere: :class:`Feature`
+        assembles one across countries, the coverage matrix grades
+        ``(country, feature, wave)`` cells, and the guides are written in those
+        terms.  The attribute that lists them was named instead after the
+        ``data_scheme.yml`` file it happens to read.  Both names now work, so
+        the vocabulary a reader arrives with is the one that answers.
+
+        Deliberately a synonym and not a rename with a deprecation:
+        ``data_scheme`` is used throughout the countries' own scripts and in
+        published notebooks, and the file it is named for is not going away.
+        """
+        return self.data_scheme
 
     @property
     def data_scheme(self) -> list[str]:
@@ -2141,15 +2397,26 @@ class Country:
         # when the caller does df.to_parquet().  Enforce a uniform string dtype
         # here so Feature('housing')([...]) concatenation is always clean.
         # Fixes GH #142.
+        # The coercion is `format_id` -- the SAME rule `df_data_grabber`
+        # applies to every `idxvars` entry, and therefore to
+        # `cluster_features.v`, which is the column this joined `v` has to
+        # compare equal to.  `sample` declares `v` as a *column*, so
+        # `format_id` never ran on it at grab time (CLAUDE.md "Gotchas with
+        # Teeth": auto-applied to idxvars, NOT to myvars) and this is the only
+        # place the two sides are reconciled.
+        #
+        # It replaces `str(int(float(x)))`, which normalised a float but also
+        # rewrote a string id that was already canonical: Ethiopia's
+        # zero-padded 15-digit EA id '010101088801601' came back
+        # '10101088801601' and matched no cluster (GH #819; raw match against
+        # cluster_features was 9-46% by wave).  `format_id` strips a trailing
+        # decimal only when the whole string is numeric ('1013.0' -> '1013')
+        # and preserves leading zeros -- see its docstring and GH #222.
+        # Behaviour change worth naming: it does not catch OverflowError, so a
+        # non-finite v now raises instead of passing through as 'inf'.
+        # NaN / '' / '.' return None, which `astype(StringDtype)` renders pd.NA.
         if 'v' in flat.columns:
-            def _v_to_str(x):
-                if pd.isna(x) or x == '':
-                    return pd.NA
-                try:
-                    return str(int(float(x)))
-                except (ValueError, OverflowError):
-                    return str(x).strip()
-            flat['v'] = flat['v'].map(_v_to_str).astype(pd.StringDtype())
+            flat['v'] = flat['v'].map(format_id).astype(pd.StringDtype())
 
         # Insert v after t in the index
         new_idx = []
@@ -2171,6 +2438,58 @@ class Country:
         # bug, before id_walk itself was made safe.
         result.attrs = dict(df.attrs)
         return result
+
+    def _valuation_geo(self, waves=None):
+        """Coarser geographic rungs for ``food_expenditures(valuation=...)``.
+
+        The finest rung, ``v``, rides on ``food_acquired``'s own index and
+        needs no lookup.  This assembles whatever coarser rungs of
+        :data:`~lsms_library.transformations.VALUATION_GEO_LEVELS` this
+        country's ``cluster_features`` actually carries, ordered finest ->
+        coarsest, indexed on ``(t, v)``.
+
+        **Degrade loudly.**  A country with no ``District`` column gets a
+        shorter ladder, which is not an error -- the national fallback in
+        ``median_price_valuation`` is unconditional, so every row is still
+        priced -- but it means the imputed price comes from a coarser market
+        than the caller may assume.  Ethiopia is the case in point: it degrades
+        to fewer rungs than EPAR's own admin cascade.  So the rungs available
+        and the rungs missing are BOTH named in a
+        :class:`~lsms_library.transformations.ValuationLadderWarning`, rather
+        than left to be inferred from silence.
+        """
+        from .transformations import (VALUATION_GEO_LEVELS,
+                                      ValuationLadderWarning)
+        coarse = [c for c in VALUATION_GEO_LEVELS if c != 'v']
+        geo = None
+        have, missing = [], list(coarse)
+        try:
+            cf = self.cluster_features(waves=waves)
+        except Exception as exc:                      # noqa: BLE001
+            warnings.warn(
+                f"{self.name}/food_expenditures(valuation=...): "
+                f"cluster_features is unavailable ({exc!r}), so the price "
+                f"ladder runs on 'v' and the national rung only; "
+                f"{coarse} are not available.",
+                ValuationLadderWarning, stacklevel=2)
+            return None
+        if isinstance(cf, pd.DataFrame) and not cf.empty:
+            have = [c for c in coarse if c in cf.columns]
+            missing = [c for c in coarse if c not in cf.columns]
+            if have:
+                geo = cf[have]
+        if missing:
+            warnings.warn(
+                f"{self.name}/food_expenditures(valuation=...): geographic "
+                f"price ladder degraded.  Rungs available: "
+                f"{['v'] + have + ['national']}; not available in "
+                f"cluster_features: {missing}.  Every row is still priced "
+                f"(the national rung is an unconditional fallback), but the "
+                f"imputed price is drawn from a coarser market than the full "
+                f"{list(VALUATION_GEO_LEVELS) + ['national']} ladder would "
+                f"give.",
+                ValuationLadderWarning, stacklevel=2)
+        return geo
 
     def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
         """Join a market identifier ``m`` onto *df*, preferring the HH-level
@@ -2683,6 +3002,31 @@ class Country:
             df = _normalize_dataframe_index(df, scheme_entry, None, method_name,
                                             country=self.name)
 
+            # Re-key `i` through `updated_ids` BEFORE the v-join below.
+            # `sample()` is finalised through this same method, so the `i` it
+            # returns is already walked; joining a pre-walk `i` against it
+            # matches only the households `updated_ids` never re-keyed.  For
+            # Ethiopia ESS that is precisely the urban refreshment cohort, so
+            # 2013-14 / 2015-16 came back 68.5% / 66.6% `v = NaN` and the
+            # survivors were silently urban-only (GH #819).  Nothing else in
+            # the pipeline reads `i` between here and the old position, and
+            # `id_walk` is index-level-order agnostic, so this is a pure move.
+            #
+            # The flag is still set exactly once -- by `id_walk` itself, after
+            # its per-wave concat -- and `_join_v_from_sample` carries it over
+            # its merge with the explicit `result.attrs = dict(df.attrs)`,
+            # which that merge needs because it *disagrees* on `attrs`
+            # (tests/test_population.py::TestVJoinIsADisagreeingMerge).
+            # The `reorder_levels` block stays after the v-join: it is the join
+            # that adds the `v` level it has to place.
+            if (
+                'i' in df.index.names
+                and not df.attrs.get('id_converted')
+                and method_name not in ['panel_ids', 'updated_ids']
+                and self._updated_ids_cache is not None
+            ):
+                df = id_walk(df, self.updated_ids)
+
             # Join v from sample() for household-level tables that lack it.
             # Skip if v is already in the index OR already present as a
             # column (a legacy script may have written v alongside other
@@ -2715,21 +3059,9 @@ class Country:
                             f"Could not reorder index levels for {method_name}: {exc}"
                         )
 
-            if (
-                'i' in df.index.names
-                and not df.attrs.get('id_converted')
-                and method_name not in ['panel_ids', 'updated_ids']
-                and self._updated_ids_cache is not None
-            ):
-                df = id_walk(df, self.updated_ids)
-
             # Normalise "Relation" -> "Relationship" so kinship expansion fires
             if "Relation" in df.columns and "Relationship" not in df.columns:
                 df = df.rename(columns={"Relation": "Relationship"})
-
-            # Expand Relationship -> Generation, Distance, Affinity
-            if "Relationship" in df.columns:
-                df = _expand_kinship(df)
 
             # Auto-apply categorical mappings where table name matches
             # a column or index name (issue #49).  For derived food tables,
@@ -2740,6 +3072,10 @@ class Country:
                 protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
                 labels=labels,
             )
+
+            # Expand Relationship -> Generation, Distance, Affinity
+            if "Relationship" in df.columns:
+                df = _expand_kinship(df)
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,
@@ -2845,6 +3181,33 @@ class Country:
             # here costs no cache invalidation.  MEASURED, not assumed.
             attach_population(df, self.name)
 
+            # Attach what reference period the food numbers COVER, per wave
+            # (GH #851).  Same placement and the same two reasons as the
+            # population record above: `_finalize_result` re-runs on every read,
+            # and it is in `_build_registry._EXCLUDED_CALLABLES`, so this costs
+            # no cache invalidation.  Metadata only -- it adds `attrs`, never a
+            # row, a column or a value.
+            #
+            # A config read, deliberately NOT a join against `interview_date`:
+            # that table is itself finalized (so the join re-enters this
+            # function unboundedly), and four food countries -- Guatemala,
+            # Panama, GhanaSPS, EthiopiaRHS -- do not have it at all, which
+            # would turn a metadata annotation into an AttributeError on a data
+            # call.  Both measured before this landed.
+            attach_recall(df, self.name)
+
+            # Attach the DERIVATIONS summary -- which served rows are
+            # constructions rather than survey answers, per registry key
+            # (SkunkWorks/derived_values.org).  Counted from the frame's own
+            # `Derivation` column, so a wave slice reports what it carries.
+            # Same placement and the same two reasons as the two records
+            # above: `_finalize_result` re-runs on every read, and it is in
+            # `_build_registry._EXCLUDED_CALLABLES`, so this costs no cache
+            # invalidation.  Metadata only -- it adds `attrs`, never a row, a
+            # column or a value.  The row label itself is written by the wave
+            # script that made the derivation, never here.
+            attach_derivations(df, self.name, method_name)
+
             # SITE B of the null-content audit.  Every other guard on this
             # table checks that a required declared column is PRESENT; this one
             # checks it holds something.  Niger 2014-15's `Latitude` is present,
@@ -2863,6 +3226,23 @@ class Country:
             check_declared_columns(
                 df, _required_scheme_columns(scheme_entry),
                 country=self.name, table=str(method_name or "?"))
+
+            # SITE Q of the content audit (GH #857).  Site B asks whether a
+            # declared column holds ANYTHING; this asks whether what it holds
+            # is POSSIBLE.  Tanzania 2020-21 reports 7,500,000 kg of coconuts
+            # from one plot: present, non-null, correctly typed, uniquely
+            # indexed, and graded `sane`.  It COUNTS AND NAMES the rows and
+            # changes not one value -- see lsms_library/quantity_audit.py for
+            # the rule and for why clipping is the wrong repair.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read, warm cache included, so the finding needs no
+            # stamp-and-replay (unlike GH #323, the evidence is IN the
+            # parquet); and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  MEASURED, not assumed: 0 of 12
+            # probed table hashes and 0 of 5 build fingerprints moved.
+            check_quantities(
+                df, country=self.name, table=str(method_name or "?"))
 
         return df
 
@@ -3041,6 +3421,32 @@ class Country:
                 f"{self.name}/_/data_scheme.yml."
             )
 
+    def _is_script_path(self, method_name: str, materialize_backend: str | None,
+                        waves: list[str]) -> bool:
+        """Is ``method_name`` built by a script rather than the YAML path?
+
+        True when the table declares ``materialize: make``, has a country-level
+        ``_/{table}.py`` concatenator, or has a wave-level ``{wave}/_/{table}.py``
+        script in any of ``waves`` (run through run_make_target's wave-script
+        fallback -- GhanaLSS ``food_acquired`` since GH #808 is exactly this:
+        seven wave scripts, no make flag, no country script).  Wave folders are
+        resolved through ``wave_folder_map`` (Tanzania ``2008-15``, Nigeria
+        round dirs), the same way ``run_make_target`` resolves them, so a
+        mapped label is found where ``file_path / label`` would miss it.
+        Deliberately a pure path probe: it does NOT build ``Wave`` objects
+        (``self[wave]``) -- the cache-hit paths this feeds must not touch a
+        wave, and ``tests/test_dvc_caching.py`` pins that with a
+        ``__getitem__`` that raises.  Consumed by
+        ``_assert_built_required_columns``.
+        """
+        if materialize_backend == "make":
+            return True
+        if (self.file_path / "_" / f"{method_name}.py").exists():
+            return True
+        folder_map = getattr(self, "wave_folder_map", None) or {}
+        return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
+                   for w in waves)
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -3144,14 +3550,24 @@ class Country:
                     output_candidates.append(base_path / "_" / f"{method_name}.json")
                 output_candidates.append(self.file_path / "_" / f"{method_name}.json")
             else:
-                # Check data_root (external) first, then in-tree as fallback
+                # GH #803: outputs are READ from data_root() only.  The in-tree
+                # names in ``try_make`` below are Make *targets* for the
+                # ``../%/_/<table>.parquet`` pattern rules; a correctly
+                # redirected script (to_parquet -> _resolve_data_path) never
+                # writes there, so a parquet found in-tree is an artefact of
+                # the write-side .pth trap: reported, never read.
                 if wave is not None:
                     output_candidates.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "var" / f"{method_name}.parquet")
-                    output_candidates.append(base_path / "_" / f"{method_name}.parquet")
                 output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "var" / f"{method_name}.parquet")
-                output_candidates.append(self.file_path / "_" / f"{method_name}.parquet")
+                intree_names = [
+                    self.file_path / "var" / f"{method_name}.parquet",
+                    self.file_path / "_" / f"{method_name}.parquet",
+                ]
+                if wave is not None:
+                    intree_names = [base_path / "_" / f"{method_name}.parquet"] + intree_names
+                for artefact in intree_names:
+                    if artefact.exists():
+                        _warn_intree_parquet_artefact(artefact, f"{self.name}/{wave or '_'}", method_name)
 
             # deduplicate while preserving order
             unique_candidates: list[Path] = []
@@ -3193,8 +3609,10 @@ class Country:
                 makefile = make_dir / "Makefile"
                 # Build Make targets using data_root() paths (primary) since
                 # Makefiles now default VAR_DIR to data_root().  Fall back to
-                # in-tree paths only if needed.  Use absolute paths directly
-                # as Make handles them fine.
+                # in-tree target NAMES only if needed (the ``../%/_/`` pattern
+                # rules are written with them); the OUTPUT is still looked for
+                # under data_root() only (GH #803).  Use absolute paths
+                # directly as Make handles them fine.
                 make_targets = []
                 if method_name in JSON_CACHE_METHODS:
                     make_targets.append(self.file_path / "_" / f"{method_name}.json")
@@ -3221,7 +3639,7 @@ class Country:
                     except (subprocess.CalledProcessError, FileNotFoundError) as error:
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
-                    # Check all candidate locations (data_root + in-tree)
+                    # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
                             return candidate
@@ -3296,8 +3714,13 @@ class Country:
             # parquets; stamped YAML waves self-invalidate per-wave); never runs
             # on a warm hit (the cache read returns before any rebuild descent).
             self._evict_hashless_wave_caches(method_name)
-            results = {}
-            for w in waves:
+
+            def build_wave(w):
+                """Stage 1 -- the expensive, wave-independent part of the
+                walk: the YAML extraction or the ``make``/script run for ONE
+                wave.  Everything content-determining about a wave's build
+                lives here; ``_parallel_waves`` only decides which process
+                runs it (GH #797)."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
@@ -3333,6 +3756,40 @@ class Country:
                         wave_result = wave_result[
                             wave_result.index.get_level_values('t') == w
                         ]
+                return wave_has_table, wave_result
+
+            # GH #797: fan stage 1 out over a fork pool, one worker per
+            # distinct make target (waves sharing a folder build serially in
+            # ONE worker -- see ``_parallel_waves.group_waves_by_target``).
+            # ``None`` means "stay serial" (LSMS_BUILD_WORKERS=1, one target,
+            # one visible CPU, or already inside a worker): the loop below
+            # then calls ``build_wave`` inline, in wave order, which is the
+            # pre-#797 code path unchanged.  Either way stage 2 (id_walk,
+            # index augmentation, the grain-audited normalisation, concat)
+            # runs HERE, in the parent, in wave order.
+            # The folder map is resolved through ``self[w]`` (the same lookup
+            # ``grab_data`` uses for its make target), not read off
+            # ``self.wave_folder_map`` -- that attribute is populated as a side
+            # effect of the ``waves`` property and is still ``{}`` when a
+            # caller passed ``waves`` explicitly.  ``getattr`` with the wave
+            # itself as fallback: tests stub ``__getitem__`` with bare
+            # namespaces that carry no ``wave_folder``.
+            prebuilt = _parallel_waves.prebuild(
+                build_wave, waves,
+                {w: getattr(self[w], 'wave_folder', w) for w in waves},
+                country=self.name, table=method_name,
+            )
+            results = {}
+            for w in waves:
+                if prebuilt is not None:
+                    # Replays this wave's captured warnings and ledger entries
+                    # before its post stage, so the parent-side order of
+                    # side effects matches a serial build; re-raises the
+                    # wave's exception (original type) if it failed.
+                    wave_has_table, wave_result = _parallel_waves.relay(
+                        prebuilt[w], country=self.name, table=method_name)
+                else:
+                    wave_has_table, wave_result = build_wave(w)
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
@@ -3754,14 +4211,15 @@ class Country:
         # wave parquets can shadow a wave-script fix), fail with an actionable
         # message if a required declared column is missing post-finalize, rather
         # than silently returning wrong data.  ``materialize_backend`` is an
-        # unreliable signal -- GhanaLSS food_acquired is script-built via the
-        # wave-script fallback + a ``_/food_acquired.py`` concatenator yet
-        # declares no ``materialize: make`` -- so we also treat the presence of
-        # a country-level ``_/{table}.py`` concatenator as script-path.
-        is_script_path = (
-            materialize_backend == "make"
-            or (self.file_path / "_" / f"{method_name}.py").exists()
-        )
+        # unreliable signal -- a table can be script-built without declaring
+        # ``materialize: make``: GhanaLSS ``food_acquired`` is built by per-wave
+        # ``{wave}/_/food_acquired.py`` scripts through run_make_target's
+        # wave-script fallback, and since GH #808 has NO country-level
+        # concatenator -- so a country-level ``_/{table}.py`` OR any wave-level
+        # ``{wave}/_/{table}.py`` counts as script-path.  Wave folders are
+        # resolved through wave_folder_map (Tanzania ``2008-15``, Nigeria
+        # round dirs), without constructing a Wave.
+        is_script_path = self._is_script_path(method_name, materialize_backend, waves)
         self._assert_built_required_columns(result, method_name, scheme_entry,
                                             is_script_path)
         return result
@@ -4065,7 +4523,7 @@ class Country:
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
                        units=None, volume_as_mass=True, currency=None, numeraire=None,
-                       basis=None):
+                       basis=None, valuation=None):
                 # `labels` has two faces; see _split_labels_arg.  `j_labels` is
                 # the historical scalar (food's fine->coarse rename of the `j`
                 # level); `map_labels` is the {target: variant} selection
@@ -4095,6 +4553,25 @@ class Country:
                         raise ValueError(
                             f"food_expenditures() basis= must be 'purchased' or "
                             f"'total'; got {basis!r}"
+                        )
+                if valuation is not None:
+                    if name != 'food_expenditures':
+                        raise TypeError(
+                            f"{name}() got an unexpected keyword argument "
+                            "'valuation'; only 'food_expenditures' accepts it."
+                        )
+                    # Validated EARLY for the same reason basis= is: the
+                    # derive path's broad except would otherwise swallow the
+                    # transform's ValueError and surface a confusing "could
+                    # not materialize" (#575).
+                    from .transformations import _normalize_valuation_arg
+                    _normalize_valuation_arg(valuation)
+                    if basis != 'total':
+                        raise ValueError(
+                            f"food_expenditures() valuation={valuation!r} "
+                            "requires an explicit basis='total'; the default "
+                            "basis='purchased' drops the very rows valuation= "
+                            "exists to value, so it would silently do nothing."
                         )
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
@@ -4151,6 +4628,9 @@ class Country:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
+                    if name == 'food_expenditures' and valuation is not None:
+                        transform_kwargs['valuation'] = valuation
+                        transform_kwargs['geo'] = self._valuation_geo(waves)
                     derived = None
                     try:
                         fa = self._aggregate_wave_data(waves, 'food_acquired')
@@ -4161,14 +4641,18 @@ class Country:
                                                             currency=currency,
                                                             labels=map_labels)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels:
+                        if units is not None or map_labels or valuation is not None:
                             # Caller explicitly asked for canonical units= /
-                            # labels= behaviour; the legacy fall-through path
-                            # can't honour either, so surface the failure rather
-                            # than silently returning un-units-aware or
-                            # un-relabelled data.  (Without this, a bad labels=
-                            # dict raised by _apply_categorical_mappings would be
-                            # swallowed here and degrade to the legacy path.)
+                            # labels= / valuation= behaviour; the legacy
+                            # fall-through path can't honour any of them, so
+                            # surface the failure rather than silently returning
+                            # un-units-aware, un-relabelled or UNVALUED data.
+                            # (Without this, a bad labels= dict raised by
+                            # _apply_categorical_mappings would be swallowed
+                            # here and degrade to the legacy path -- and a
+                            # valuation= that could not run would come back
+                            # looking exactly like one that ran and changed
+                            # nothing, which is the worse failure of the two.)
                             raise
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
@@ -4180,6 +4664,24 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
+                        # BELT-AND-BRACES, and the reason matters because a
+                        # wrong one is exactly the failure CLAUDE.md corrects
+                        # for _join_v_from_sample.  Measured 2026-09-09: the
+                        # post-steps below already re-attach `attrs`
+                        # themselves (_add_market_index at country.py:2547,
+                        # _relabel_j at :2899, and `convert` likewise), and on
+                        # THIS path `v` is already an index level so
+                        # _join_v_from_sample skips rather than merging -- so
+                        # nothing in the current pipeline would drop the
+                        # tallies without this line.  It is kept anyway: the
+                        # governing rule is that `attrs` survive only when
+                        # every input AGREES (CLAUDE.md, "Panel ID Transitive
+                        # Chains"), so a future post-step that grows a second,
+                        # disagreeing input would drop them SILENTLY.  Do not
+                        # read this as "the merges below drop attrs"; they do
+                        # not, today.
+                        _val_attrs = {k: v for k, v in derived.attrs.items()
+                                      if k.startswith('valuation')}
                         reagg = name in {'food_expenditures', 'food_quantities'}
                         derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
                         if market is not None:
@@ -4187,6 +4689,8 @@ class Country:
                         if numeraire is not None:
                             from .conversion import convert as _convert
                             derived = _convert(derived, to=numeraire, country=self.name)
+                        if _val_attrs:
+                            derived.attrs.update(_val_attrs)
                         return derived
 
                 # Derive household_characteristics from household_roster
@@ -4353,7 +4857,9 @@ class Country:
                     "    target column of ``conversion_factors.org`` (e.g.\n"
                     "    ``'PPP-2017'``, ``'FX'``, ``'USD-real-2017'``).  Mutually\n"
                     "    exclusive with ``currency``.  Pre-reform redenomination\n"
-                    "    waves and missing factors yield ``NaN``.  See\n"
+                    "    waves convert on contemporaneous old-currency rows; a\n"
+                    "    country or date absent from the factor table, or a\n"
+                    "    blank cell, yields ``NA`` with a warning.  See\n"
                     "    :func:`lsms_library.conversion.convert`.\n"
                 )
             method.__doc__ = "".join(doc_parts)
@@ -4963,10 +5469,12 @@ def _normalise_sample_weights(df: pd.DataFrame,
 # ---------------------------------------------------------------------------
 # GH #323 -- the grain-collapse audit.
 #
-# THE CLASS OF BUG.  `_normalize_dataframe_index` reduces a non-unique DECLARED
-# index with `groupby(...).first()`.  Where the duplicate rows DISAGREE, the rows
-# it drops are real data (distinct people, distinct shocks) and they vanished with
-# no signal.  #323 was closed once on a warning that could not fire (below); #500,
+# THE CLASS OF BUG.  `_normalize_dataframe_index` collapses a non-unique DECLARED
+# index.  Where the duplicate rows DISAGREE, the rows it drops are real data
+# (distinct people, distinct shocks) and they vanished with no signal.  (It used
+# to do so with `groupby(...).first()`; since GH #871 it SELECTS the group's most
+# complete observed row -- which changes WHICH row survives, not the fact that
+# the others do not.)  #323 was closed once on a warning that could not fire (below); #500,
 # #501 and #514 were each closed on a single INSTANCE while the class survived.
 #
 # WHY THE OLD WARNING COULD NOT FIRE.  It was gated on `not df.index.is_unique`,
@@ -4981,9 +5489,9 @@ def _normalise_sample_weights(df: pd.DataFrame,
 # index almost never mean "reduce me" -- they mean the IDENTIFIER IS BROKEN or a
 # LEVEL IS MISSING.  Mali's `household_roster` declares `(t, i, pid)`, but `pid` is
 # a *household* id stamped onto every member (5,149 distinct values across 37,175
-# rows), so `first()` keeps ONE PERSON PER HOUSEHOLD and 32,026 people disappear.
-# No reducer is correct there: `first` keeps one person, `sum` is meaningless on
-# `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
+# rows), so the collapse keeps ONE PERSON PER HOUSEHOLD and 32,026 people
+# disappear.  No reducer is correct there: a selection keeps one person, `sum` is
+# meaningless on `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
 # corpse.  So the core does NOT aggregate -- consistent with the NO-AGGREGATION-IN-
 # CORE contract in SkunkWorks/grain_aggregation_policy.org -- it reports, and (in
 # strict mode) refuses.  The one genuine reduction policy we have,
@@ -5040,9 +5548,13 @@ def _audit_index_collapse(
 
     Missing values count as values: two rows that differ only in *whether* a field
     is recorded are different rows.  That is deliberately conservative -- it
-    over-reports rather than under-reports, and it is what catches
-    ``Burkina_Faso/shocks``, where ``first()`` keeps an all-``<NA>`` row and throws
-    away the row that has the real answers.
+    over-reports rather than under-reports, and it is what caught
+    ``Burkina_Faso/shocks``, where ``first()`` used to keep an all-``<NA>`` row
+    and throw away the row with the real answers.  (Since GH #871 the collapse
+    serves the MOST COMPLETE row, so that particular row is now the one that
+    survives -- the audit is unchanged and still reports the group, because the
+    other rows are still gone.  The audit reports LOSS; which row is served is a
+    separate question, and the two ratchet separately.)
 
     ``nan_key_rows`` is a SEPARATE loss riding along in the same operation:
     ``groupby()`` defaults to ``dropna=True``, so a row with NaN in a declared
@@ -5125,12 +5637,12 @@ def _format_grain_report(report: dict[str, Any]) -> str:
         bits.append(
             f"The collapse COULD NOT BE AUDITED ({report['unauditable']}), so it is "
             f"NOT known to be safe: {report.get('dropped', 0):,} row(s) were dropped "
-            f"by groupby().first() and may carry data. Treat as data loss until shown "
+            f"by the collapse and may carry data. Treat as data loss until shown "
             f"otherwise."
         )
     if report.get("destroyed"):
         bits.append(
-            f"Collapsing it with groupby().first() DESTROYED {report['destroyed']:,} "
+            f"Collapsing it DESTROYED {report['destroyed']:,} "
             f"of {report['rows']:,} rows whose values DISAGREE "
             f"({report['conflicting_groups']:,} conflicting index tuples). "
             f"These rows are gone from the returned data."
@@ -5148,9 +5660,11 @@ def _format_grain_report(report: dict[str, Any]) -> str:
         )
     if site == 'Wave.cluster_features':
         bits.append(
-            "cluster_features is reduced with groupby().first(), which skips NA "
-            "per column -- so a conflicting cluster does not even yield one of its "
-            "households' rows, it yields a COMPOSITE. The comment that used to "
+            "cluster_features is collapsed by SELECTING one household's row -- the "
+            "most complete one (GH #871; it used to be a per-column "
+            "groupby().first() COMPOSITE that existed in no household). The row "
+            "served is an observed one, but the other households' rows are gone. "
+            "The comment that used to "
             "license this ('Region/Rural/District are invariant within a cluster by "
             "construction of the LSMS-ISA sampling design') is false here: this "
             "cluster id is NOT unique at the grain it is being used at. Fix the "
@@ -5249,7 +5763,7 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
 #
 # Prose is not enforcement.  The claim fails exactly where a cluster code is
 # unique only WITHIN a district (or a region, or an enumeration area): two
-# genuinely different clusters collide on one ``v``, and ``.first()`` then keeps
+# genuinely different clusters collide on one ``v``, and the collapse then keeps
 # one of their Regions and throws the other away.  The output is not a lossy
 # summary of the input -- it is a WRONG ROW, attributing one cluster's district to
 # another's households.  Under Design B (SkunkWorks/grain_aggregation_policy.org:
@@ -5303,14 +5817,19 @@ def _collapse_to_cluster_grain(
     Audits the projection BEFORE performing it -- one line later the evidence is
     gone, and the parquet that gets cached is written from the collapsed frame,
     which is why no downstream instrument (Site 1's audit included) can see this
-    loss.  Every column is treated alike: audited for destruction, then reduced
-    with ``.first()``.  Core does not aggregate -- not even GPS (see above).
+    loss.  Every column is treated alike: audited for destruction, then one
+    household's row is SELECTED (``most_complete_row``).  Core does not aggregate
+    -- not even GPS (see above).
 
-    ``.first()`` here is worse than it looks, and worth naming: pandas'
-    ``groupby().first()`` skips NA *per column*, so where households in a cluster
-    disagree it does not even return one of the source rows -- it assembles a row
-    out of the first non-null value of each column INDEPENDENTLY.  The result can
-    be a household composite that exists nowhere in the survey.  Hence: audit.
+    GH #871: this used to reduce with ``groupby().first()``, which skips NA *per
+    column*, so where households in a cluster disagreed it did not even return
+    one of the source rows -- it assembled a row out of the first non-null value
+    of each column INDEPENDENTLY, a household composite existing nowhere in the
+    survey.  That was named here as the reason to audit, and the audit stays; the
+    projection now serves an OBSERVED household row.  Measured corpus cost of the
+    flip at this site: 77 served rows change, all of them
+    ``Latitude``/``Longitude``, in clusters where one household has no GPS fix
+    (``slurm_logs/gh871_grain_census/``).
     """
     if not keep_levels:
         return df
@@ -5338,7 +5857,12 @@ def _collapse_to_cluster_grain(
                       site='Wave.cluster_features')
         _record_grain_report(report)
 
-    return df.groupby(level=keep_levels, observed=True).first()
+    # GH #871: SELECT one of the cluster's households, not a composite of them.
+    # `Derivation` never votes on which household is served -- it is a
+    # library-computed provenance flag, not survey content.
+    return most_complete_row(df, keep_levels,
+                             exclude={_DERIVATION_COLUMN}
+                             if _DERIVATION_COLUMN in df.columns else ())
 
 
 def _sum_min_count_1(x):
@@ -5349,6 +5873,81 @@ def _sum_min_count_1(x):
     hard zero where the survey recorded nothing.  GH #323.
     """
     return x.sum(min_count=1)
+
+
+def most_complete_row(df: pd.DataFrame, levels: list[str],
+                      exclude: Iterable[str] = ()) -> pd.DataFrame:
+    """Select the MOST COMPLETE row of each group -- core's one row selector.
+
+    GH #871.  Core's three index collapses used to reduce their reducer-free
+    columns with ``groupby().first()``, and ``first()`` is not "the first row":
+    it returns the first non-null value of EACH COLUMN INDEPENDENTLY.  A group
+    whose rows disagree was therefore served a per-column COMPOSITE -- a record
+    that exists nowhere in the survey -- and a reader had no way to tell that
+    from a group whose rows agreed.  (The 2026-07-13 doctrine called the
+    composite "completion"; @ligon reversed it on 2026-09-12.  The argument is
+    recorded in ``tests/test_gh323_grain_contract.py``'s module docstring.)
+
+    Core now SELECTS AN OBSERVED ROW, and to keep that selection informative
+    rather than arbitrary it selects the most complete one:
+
+    - completeness = the count of non-NA cells over ``df.columns`` minus
+      ``exclude``.  Callers exclude three things, and the rule behind all three
+      is that the served value does not come from the selected row, so the
+      column has no standing to choose it:
+        * the additive measures (``_ADDITIVE_MEASURE_COLUMNS``), summed;
+        * ``Price`` wherever it is RE-DERIVED from those sums (``Expenditure``
+          and ``Quantity`` both present) -- @ligon, 2026-09-12, for consistency
+          with the measures it is computed from;
+        * ``Derivation``, on EITHER branch -- it is a LIBRARY-COMPUTED provenance
+          flag rather than survey content, so it must never break a tie between
+          two SURVEY rows, not even on the selection branch where it rides along
+          with the row it was written on (@ligon, 2026-09-12).
+    - ties break on ORIGINAL ORDER, so a group whose rows are equally complete
+      is served its first row -- what the old reducer did when nothing was
+      missing.
+    - a row carrying NaN in a declared index level is STILL DELETED OUTRIGHT, by
+      the ``dropna=True`` default of the groupby that forms the groups
+      (GH #323 §3b -- reported, not fixed; this must not change it silently).
+
+    Returns the selected rows narrowed to the ``levels`` index and sorted by
+    key, so the shape and row order are exactly what
+    ``groupby(level=levels).first()`` returned before #871.
+
+    Called INLINE at each of the three sites -- never through a wrapper -- so
+    that the selection and ``_audit_index_collapse`` stay in the same function,
+    which is what ``tests/test_gh323_explicit_reducers.py`` proves statically.
+    That test knows this function BY NAME: a selector core can reach is exactly
+    as dangerous as a raw ``groupby().first()`` and is guarded identically.
+    """
+    cols = [c for c in df.columns if c not in set(exclude)]
+    score = df[cols].notna().sum(axis=1)
+    keys = pd.DataFrame({"_pos": np.arange(len(df)), "_score": score.to_numpy()},
+                        index=df.index)
+    grouped = keys.groupby(level=list(levels), observed=True, sort=False)
+    # ``transform('max')`` rather than a reducer, for two reasons.  It keeps this
+    # helper free of the groupby reducers the AST guard hunts for (the guard's
+    # subject is the SITES, which must audit; this helper is the mechanism).  And
+    # -- load-bearing -- it yields NaN for a row whose key is NaN (groupby
+    # dropna=True), so the ``eq`` below is False there and such a row can never
+    # be selected: NaN-key rows keep being deleted, per GH #323 §3b.  Verified on
+    # pandas 3.0.2.
+    best = grouped["_score"].transform("max")
+    candidates = keys[keys["_score"].eq(best)]
+    key_index = candidates.index
+    surplus = [lvl for lvl in key_index.names if lvl not in levels]
+    if surplus and len(key_index.names) > len(surplus):
+        key_index = key_index.droplevel(surplus)
+    # First surviving candidate per key == highest score, earliest row.
+    positions = candidates.loc[~key_index.duplicated(keep="first"), "_pos"].to_numpy()
+
+    out = df.iloc[positions]
+    surplus = [lvl for lvl in out.index.names if lvl not in levels]
+    if surplus and len(out.index.names) > len(surplus):
+        out = out.droplevel(surplus)
+    if isinstance(out.index, pd.MultiIndex) and list(out.index.names) != list(levels):
+        out = out.reorder_levels(list(levels))
+    return out.sort_index()
 
 
 @build_transform()
@@ -5366,8 +5965,13 @@ def _normalize_dataframe_index(
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
     - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), re-derives a
+      per-unit ``Price`` from those sums, unions ``Derivation`` there, and
+      SELECTS one observed row of the group for every other column --
+      ``most_complete_row``, the group's most complete row (GH #871).  It used
+      to keep "the first row per group", which was never what it did: pandas'
+      ``groupby().first()`` is a per-column first-non-null and returned a
+      COMPOSITE of several rows.
     - GH #323: AUDITS that collapse first, while the pre-collapse frame still
       exists, and reports any destroyed rows loudly (or fatally, under
       ``LSMS_GRAIN_STRICT``).  ``country`` is carried only so the report can name
@@ -5460,11 +6064,13 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
-        # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
+        # GH #514/#323: collapsing a non-unique canonical index silently
+        # DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
         # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
         # re-derive any per-unit Price from the summed totals -- no data lost.
+        # Every other column is SELECTED, not reduced: `most_complete_row` serves
+        # one observed row of the group (GH #871).
         # Single source of truth for the additive column map lives in feature.py
         # (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
@@ -5496,6 +6102,13 @@ def _normalize_dataframe_index(
             reconciled = list(present_additive)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 reconciled.append('Price')
+            # GH #871: on THIS branch `Derivation` is reconciled too -- the union
+            # of the summed rows' keys carries every one of them, so a
+            # purchased+derived mix is lossless rather than destroyed.  Only on
+            # this branch: on the selection branch the served row carries its own
+            # key and a two-key group IS a disagreement the audit must report.
+            if _DERIVATION_COLUMN in df.columns:
+                reconciled.append(_DERIVATION_COLUMN)
             residual = _audit_index_collapse(
                 df.drop(columns=reconciled), present_levels)
             if residual is None:
@@ -5508,6 +6121,25 @@ def _normalize_dataframe_index(
                               conflicting_groups=residual["conflicting_groups"],
                               additive_reconciled=reconciled)
 
+        # GH #871: SELECT an observed row for every column core does not reduce.
+        # The additive measures are excluded from the completeness score because
+        # their served value does not come from the selected row (they are
+        # summed; `Price` is re-derived from those sums).  `Derivation` is
+        # excluded on BOTH branches, deliberately: it is a library-computed
+        # provenance flag rather than survey content, so it must never decide
+        # which of two SURVEY rows is served -- not even on the selection branch,
+        # where it rides along with the row it was written on.
+        reduced = set(present_additive)
+        if _DERIVATION_COLUMN in df.columns:
+            reduced.add(_DERIVATION_COLUMN)
+        if present_additive and 'Price' in df.columns and {
+                'Expenditure', 'Quantity'} <= set(df.columns):
+            # Re-derived from the summed totals a few lines below, so its served
+            # value does not come from the selected row either -- the same reason
+            # the additive measures are excluded (@ligon, 2026-09-12).
+            reduced.add('Price')
+        selected = most_complete_row(df, present_levels, exclude=reduced)
+
         if present_additive:
             # GH #323: `sum` defaults to min_count=0, so a group in which EVERY
             # value is NA sums to 0.0 -- fabricating a hard zero where the truth is
@@ -5518,13 +6150,36 @@ def _normalize_dataframe_index(
             # and 478 in Nigeria, restores both to baseline row counts, and leaves the
             # recovered Value sums and every food_acquired total byte-identical.
             # (country.py:2089 already uses min_count=1 for exactly this reason.)
-            agg = {c: (_sum_min_count_1 if c in present_additive else 'first')
-                   for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
+            #
+            # GH #871: `grouped[...].sum(min_count=1)` is the CYTHON spelling of
+            # `_sum_min_count_1` (kept, documented and directly tested in
+            # tests/test_assets_additive.py).  0.12 s against 51.8 s on a
+            # 400k-row / 200k-group frame, because a Python groupby callable
+            # makes pandas `deepcopy` `df.attrs` once PER GROUP.  Not a
+            # micro-optimisation: with `Derivation` added as a third such column
+            # it was the difference between GhanaLSS `food_acquired` collapsing
+            # and a 20-minute test timeout.
+            #
+            # It is IDENTICAL TO WITHIN ONE ULP, not byte-identical, and that is
+            # a BEHAVIOUR CHANGE #871 did not ask for -- state it rather than
+            # round it away.  Cython sums PAIRWISE where `Series.sum` accumulates
+            # in order, so a group of 3+ floats can land on a neighbouring
+            # double: measured on GhanaLSS 1998-99 `food_acquired`, 392 of
+            # 161,176 groups differ, at a maximum relative difference of 4e-16.
+            # Column totals, the NA pattern and every dtype are unchanged.
+            grouped = df.groupby(level=present_levels, observed=True)
+            sums = grouped[present_additive].sum(min_count=1)
+            overlay = {c: sums[c] for c in present_additive}
+            if _DERIVATION_COLUMN in df.columns:
+                # A sum of N rows is derived if ANY input row was: the served
+                # provenance is the UNION of the inputs' keys, not one of them.
+                overlay[_DERIVATION_COLUMN] = _union_derivation_keys_by_group(
+                    df[_DERIVATION_COLUMN], present_levels, selected.index)
+            df = selected.assign(**overlay)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
-            df = df.groupby(level=present_levels, observed=True).first()
+            df = selected
 
         if report is not None:
             report.update(country=country, table=table_name, wave=wave,

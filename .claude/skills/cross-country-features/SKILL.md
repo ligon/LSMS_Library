@@ -36,18 +36,53 @@ then fail (GH #325/#326).
 
 **Registration alone is not enough** — it needs the per-country level *names* to be
 consistent. Heterogeneity blocks it (and naive registration can make it worse):
-- Different names for the same level (`crop`↔`j`, `plot`↔`plot_id`) → harmonize the
-  per-country index names first.
+- Different names for the same level (`crop`→`j`, `plot`→`plot_id`) → **declare them in
+  `Index Info › level_aliases`** (GH #569, landed for `crop_production`). This used to
+  say "harmonize the per-country index names first", i.e. curate ~14 country configs;
+  it is now a two-line config entry applied at assembly by `_rename_index_levels`.
+  The `Country()` path keeps its native names, which is why
+  `transformations._CROP_LEVELS` / `_PLOT_LEVELS` still exist.
+  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling all 23
+  `plot_features` countries already declare — so `crop_production` is registered
+  `(t, v, i, plot_id, j, u, condition, season)` and `plot` is the alias, not the
+  target. Every `transformations.py` plot-grain transform (`harvest_kg`,
+  `nitrogen_kg`, `seed_kg`, `yield_kg`, `fertilizer_rate`) EMITS `plot_id`
+  whichever spelling it was handed. A shared axis NAME is not a shared
+  VOCABULARY: `crop_production` keys Uganda's plots `{hhid}-{parcel}-{plot}`
+  while `plot_features` keys them `{parcel}_{suffix}` — see
+  `transformations._parcel_from_crop_plot` and the `on=` kwarg.
+- A level only *some* countries carry (`condition`, `season`) → **declare a sentinel in
+  `Index Info › missing_level_sentinels`**. `_align_to_canonical_levels` then, per
+  country, promotes the level from a COLUMN if one exists (null-filled with the
+  sentinel — Mali/Nigeria/Tanzania's `u`) and otherwise adds it as a constant sentinel.
+  **Never `pd.NA`** — that is what `fabricate_missing_levels` (#506) does, and a null on
+  a declared index level is a deferred silent deletion. Prefer the sentinel for anything
+  new.
 - Different granularity (one country `(i,t,v)`, another `(i,t,v,pid)`) → registration
   `groupby().first()`-drops the extra level and can INTRODUCE silent data loss
   (people_last7days: registering `(t,v,i)` would drop 87% of Malawi's varying per-`pid`
   counts). Check before registering.
+- **Keep `v` in the registered index** unless the table genuinely has none:
+  `country._compute_no_v_join` exempts any table whose `index_info` omits `v` from the
+  API-time v-join, so a `v`-less registration silently strips `v` from every
+  `Country()` frame of that table.
 - **EthiopiaRHS** ships COARSE household-level versions of item-level tables (assets,
-  livestock); its divergent index breaks the concat — treat it as a separate table.
+  livestock, crop_production); its divergent index breaks the concat — treat it as a
+  separate table. It is still excluded from `crop_production` (no `plot_id`), by design.
 
 `_harmonize_country_frame` reorders each country's index to canonical order by NAME
 (GH #498) — even with no extra level to drop — so positionally-mislabelled indices
 (correctly named `[i,t,v]` but order-scrambled under `[t,v,i]`) come out aligned.
+
+**Which shape survives is `_select_kept_shape`, and it is stated, not modal** (GH #775).
+The canonical shape wins if any frame has it; otherwise the most frames, then the most
+rows, then the lexicographically smallest name tuple. The last three exist because
+`Counter.most_common` broke ties by insertion order, so the same countries in a
+different ARGUMENT ORDER returned different survivors. Consequence worth knowing: for a
+registered feature the canonical shape wins **even as a minority of one** — which is the
+point (a country that moves toward the canonical index must not be the one excluded),
+but it means registering a canonical shape nobody-but-one country emits would exclude
+everybody else. Measure before registering.
 
 ## 3. The collapse is `groupby().first()` — check losslessness
 When an extra index level is dropped and the index is then non-unique, the frame

@@ -130,7 +130,7 @@ Data Scheme:
     # (season 1) + AGSEC5B (season 2) of the UNPS post-harvest
     # questionnaire, joined to AGSEC4A for the intercropped flag.
     #
-    # Grain (t, i, plot, j, u, condition, season):
+    # Grain (t, i, plot_id, j, u, condition, season):
     #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id;
     #            its parcel component is the parcel plot_features keys on.
     #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
@@ -138,8 +138,13 @@ Data Scheme:
     #            for food crops (Maize, Beans, Rice, ...) so a crop j
     #            joins food_acquired(labels='Aggregate').j.
     #   u      — reported native harvest unit ('harvest_units' table);
-    #            'Unknown' where a wave records no harvest unit label
-    #            (e.g. 2018-19 harvest side).
+    #            'Unknown' where a wave-season records no harvest unit
+    #            column.  Since GH #842 that is 2018-19 season A ONLY
+    #            (7 153 rows): AGSEC5A ships two columns both titled
+    #            "6c. Condition / state" and no unit at all, while season
+    #            B's unit (a5bq6b) IS wired and serves 30 distinct labels.
+    #            Season A's kilograms are still recoverable through
+    #            KgFactor below.
     #   condition — physical state of the crop when the Quantity was
     #            measured ('harvest_conditions' table): green / fresh /
     #            dry-at-harvest / dried, crossed with the form (on the
@@ -167,12 +172,95 @@ Data Scheme:
     # wave -> NaN.  2005-06 is excluded: its AGSEC5A is a crop-area
     # allocation matrix with no crop-level harvest quantities, and the
     # WB LSMS-ISA panel itself starts at wave 1 (2009-10).
-    index: (t, i, plot, j, u, condition, season)
+    index: (t, i, plot_id, j, u, condition, season)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT AND ITS OWN CONDITION (GH #824).  UNPS
+    # question 7 is compound -- "how much of the harvest was SOLD, in what
+    # CONDITION and in what UNIT" -- so Quantity_sold is denominated in
+    # `Unit_sold` (q7c) and NOT in the row's `u`, which is the HARVEST unit
+    # (q6c).  Measured on the built table (2026-09-10, isolated
+    # LSMS_DATA_DIR): they disagree on 3.9% of the 40 083 rows with a
+    # positive Quantity_sold that know both units -- 2.0-8.0% by wave-season.
+    #
+    # WHERE THEY DISAGREE THE ROW IS A FLAG, NOT AN IDENTIFICATION, and this
+    # is the part that bites.  Unit_sold is the honest label for
+    # Quantity_sold AS REPORTED, but a row whose two unit reports contradict
+    # each other does not tell you which report is sound: Unit_sold is the
+    # CLOSER denominator on only 40.5% of the disagreeing priced rows under a
+    # price test (n=1 021) and 42.7% under the household's own reported
+    # sold-kg factor q7d (n=468) -- so `u` is closer MORE often.  The largest
+    # cell is u='Sack (100 kgs)' with Unit_sold='Kg' (162 priced rows), whose
+    # median Value_sold/Quantity_sold is 34 167 UShs -- a SACK price; read as
+    # a kilogram price it overstates maize by ~70x, an error in the OPPOSITE
+    # direction from the one this column exists to prevent.  A consumer
+    # forming a per-unit or per-kg price must treat these rows as AMBIGUOUS
+    # (exclude them, or resolve them with a reported per-row sold kg factor)
+    # and report how many were excluded.
+    #
+    # Not carrying the column was still worse: it stamped the harvest unit on
+    # a sale reported in something else with no signal at all.  On the 565
+    # disagreeing priced rows whose two labels both name a weight in
+    # kilograms, the two readings differ by a median factor of 50 and by
+    # >= 100x on 47.4% of them.  Same 'harvest_units' vocabulary as `u`; same
+    # 'harvest_conditions' vocabulary as the `condition` index level.
+    #
+    # NA-bearing, never sentinel-filled -- unlike `u` and `condition`, which
+    # are INDEX levels and must carry 'Unknown' / 'unknown_condition'
+    # because a null index key is deleted outright by groupby(dropna=True).
+    # These are plain columns, so NA is safe AND more informative: it says
+    # "no sold unit recorded on this row", which is a different fact from
+    # any unit.
+    #
+    # `optional` for both, for two independent reasons: 2011-12 ships no 7b
+    # column at all (asked on the questionnaire, dropped from the extract),
+    # so Condition_sold is legitimately 100% null in that wave; and a row
+    # with no sale has no sold unit, so neither column is ever fully
+    # populated.  The null-content guard must not fire on either.
+    Unit_sold:
+      type: str
+      optional: true
+    Condition_sold:
+      type: str
+      optional: true
     harvest_month: int
+    # The plot's CROPPING SYSTEM in THIS ROW'S SEASON.  Read from that
+    # season's own plot-crop roster -- AGSEC4A for season A, AGSEC4B for
+    # season B: `a4aq7`/`a4bq7` "Cropping system" {1 Pure Stand, 2 Inter
+    # cropped} in 2009-10/2010-11, `a4aq8`/`a4bq8` and `s4aq08`/`s4bq08`
+    # "What type of crop stand was on the plot?" {1 Pure Stand, 2 Mixed
+    # Stand} thereafter.  True = mixed/inter-cropped.
+    #
+    # Until GH #872 this was wired to the SEED-USE question, so True meant
+    # "did NOT use seed"; and season-B rows were served season A's answer,
+    # which the season-B roster contradicts on 27.7% of comparable rows.
+    # Both are fixed.  A season whose roster is missing serves NA -- it
+    # never borrows the other season's answer.  See uganda.CROP_COLMAPS
+    # and CONTENTS.org.
     intercropped: bool
+    # SURVEY-REPORTED kilograms per ONE unit of the row's `u` -- UNPS
+    # question 6d, "Record the conversion factor into kg", asked beside
+    # every harvest record.  A RATE, not a weight: the row's kilograms are
+    # Quantity * KgFactor.  Reported 0 is read as "not recorded" and stored
+    # NaN (0 kg per unit is not a weight).
+    #
+    # Why it earns a column when the library can already infer kg from the
+    # unit label: it is INDEPENDENT of that label, so it survives a wave
+    # whose unit column the extract dropped.  2018-19 season A is exactly
+    # that wave -- no unit code at all, u='Unknown' on all 7 153 rows (GH
+    # #842) -- and 6d is populated on 7 123 of them, which is the only kg
+    # basis that cell has.  It is also non-circular, unlike the
+    # Expenditure/Quantity ratio inference in `_get_kg_factors`.
+    #
+    # `optional` because it is wired for 2018-19 ONLY.  The other six waves
+    # ship a 6d column too, but their kilograms already resolve through the
+    # unit label, so wiring them MOVES numbers and needs its own
+    # before/after; until then KgFactor is legitimately all-NaN in those
+    # waves and the all-null sanity check must not fire.
+    KgFactor:
+      type: float
+      optional: true
     materialize: make
   plot_inputs:
     # Item-level agricultural-input module (GAP 2 parity build).  One row
@@ -180,9 +268,9 @@ Data Scheme:
     # AGSEC3B (season 2) plot-input modules for the fertilizer / pesticide
     # blocks, and AGSEC4A (plot-crop roster) for the seed block.
     #
-    # Grain (t, i, plot, input, j, season):
+    # Grain (t, i, plot_id, input, j, season):
     #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
-    #            the crop_production plot key (join on (t, i, plot)); its
+    #            the crop_production plot key (join on (t, i, plot_id)); its
     #            parcel component is the parcel plot_features keys on.
     #   input  — the input identity on the shared 'harmonize_input'
     #            Preferred Labels: Seed; Organic Fertilizer; Inorganic
@@ -222,7 +310,7 @@ Data Scheme:
     # This grain is still NOT complete, and saying so here is the point of the
     # comment.  With `season` the builder returns 84,216 of the 84,489 rows it
     # constructs; the other 273 are still discarded by its de-dup step — 135
-    # DELETED outright by `groupby(dropna=True)` because `plot` is NaN (130 in
+    # DELETED outright by `groupby(dropna=True)` because `plot_id` is NaN (130 in
     # 2009-10, 5 in 2011-12), and 138 merged away by collapsing 135 duplicate
     # groups.  Every one of those 135 groups is `input='Seed'`: two AGSEC4A
     # plot-crop rows for the same (plot, crop), i.e. a missing "which AGSEC4A
@@ -235,7 +323,7 @@ Data Scheme:
     # wave -> NaN.  Improved is non-null only on seed rows (1=Improved seed
     # type, 0=Traditional).  Quantity is NaN on 2009-10/2010-11 seed rows
     # (those waves record no seed quantity, only purchased y/n + seed type).
-    index: (t, i, plot, input, j, season)
+    index: (t, i, plot_id, input, j, season)
     Quantity: float
     u: str
     Purchased: bool
@@ -344,10 +432,10 @@ Data Scheme:
     # construct, and those sums / the wage valuation are TRANSFORMATIONS,
     # never stored here.
     #
-    # Grain (t, i, plot, source, season):
+    # Grain (t, i, plot_id, source, season):
     #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
     #            the crop_production / plot_inputs / plot_features plot key
-    #            (join on (t, i, plot)); its parcel component is the parcel
+    #            (join on (t, i, plot_id)); its parcel component is the parcel
     #            plot_features keys on.
     #   source — the labor identity, a tiny controlled vocabulary emitted
     #            directly by the builder (uganda.LABOR_SOURCES): 'family'
@@ -389,8 +477,34 @@ Data Scheme:
     # No v level baked in: v auto-joins from sample() at API time (plot_labor
     # is NOT in the framework _no_v_join set).  2005-06 is excluded (no
     # plot-input/labor module; the UNPS panel starts at 2009-10).
-    index: (t, i, plot, source, season)
+    index: (t, i, plot_id, source, season)
     PersonDays: float
     Wage: float
     materialize: make
-  nonfood_expenditures: !make
+  nonfood_expenditures:
+    # Item-level household non-food expenditure, GSEC14B (2005-06) / GSEC15C
+    # (all later waves).  `j` is the `nonfood_items.org` Preferred Label.
+    #
+    # LONG since GH #817.  It used to be declared bare `!make` and delivered a
+    # WIDE item-by-household matrix with `m = 'Uganda'` in the index; with no
+    # `index:` and no columns here, `_assert_built_required_columns`, the
+    # `dfs:` guard and the coverage grader had nothing to check, so every cell
+    # graded `sane` while the table could not be stacked with Togo's.
+    #
+    # Expenditure sums the survey's separate purchased / produced / given
+    # (in-kind) columns, which is what the pre-#817 code did too -- the reshape
+    # changed the SHAPE, not the arithmetic, and every wave's total is
+    # unchanged.  Rows exist only where a household reported the item
+    # (sparsity convention); the old `fillna(0)` is gone.
+    #
+    # NO RecallWindow, and that is a KNOWN GAP rather than a statement about
+    # the survey.  The .dta's own variable labels carry a CAPI fill: "How much
+    # came from purchases in the past [RECALL]? VALUE" (h15cq5, 2013-14 and
+    # 2011-12), so the recall period VARIES BY ITEM, exactly as in Togo's
+    # section 9 -- and this table sums across it.  No wave ships a recall
+    # variable and nonfood_items.org has no recall column, so populating it
+    # needs the questionnaire read per wave.  See _/CONTENTS.org
+    # "nonfood_expenditures".  Do not read the missing column as "one window".
+    index: (t, i, j)
+    Expenditure: float
+    materialize: make

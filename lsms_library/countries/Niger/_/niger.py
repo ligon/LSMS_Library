@@ -449,6 +449,76 @@ def _unit_labels(unit_series, unit_map):
     return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+# ---------------------------------------------------------------------------
+# The `u` (unit) sentinel — GH #842 / #847
+# ---------------------------------------------------------------------------
+#
+# `Unknown` is the sentinel every Niger table puts on the `u` index level when
+# the enumerator recorded an amount and NO unit.  It is the CORPUS-canonical
+# spelling, not a Niger invention: `data_info.yml` already defines `Unknown` as
+# "the non-ordinal sentinel for don't-know / refused / unmappable"
+# (individual_education), and Uganda's crop_production already writes it onto
+# this very index level (uganda.py, `df['u'].where(df['u'].notna(), 'Unknown')`).
+#
+# WHY A SENTINEL AND NOT NaN — the same argument as CROP_NA below, and it is
+# the whole of GH #842.  `u` is a DECLARED index level in four Niger tables
+# (food_acquired, crop_production, plot_inputs, community_prices).  A NaN there
+# is a DEFERRED silent deletion: the row is served, so no build-time guard
+# fires, and it then vanishes in whichever `groupby` runs first — the
+# framework's canonical de-dup (`_finalize_result`), `Feature()` assembly, or
+# the user's own aggregation — because pandas `groupby(dropna=True)` drops NaN
+# keys.  The loss is attributed to the consumer's code and counted nowhere.
+# `Unknown` survives all three and says, in the table, that the unit is
+# missing.
+#
+# WHY THE FRENCH `Manquant` WAS RETIRED.  Niger used to write the survey's own
+# missing-marker label; the `u` table mapped `Manquant`/`manquant`/`produit
+# absent` onto a `Manquant` Preferred Label.  That table is read on BOTH paths
+# — at build time by `local_tools.get_categorical_mapping` (country file only)
+# and at read time by `Country._apply_categorical_mappings` (global + country)
+# — so it cannot yield `Manquant` in the parquet and `Unknown` at the API.  The
+# two candidate read-path relabels were measured and both fail:
+#   * a `spellings:` block on `u` in the canonical `data_info.yml` is read by
+#     `diagnostics._check_declared_spellings` as a CLOSED vocabulary, and the
+#     `u` vocabulary is deliberately open (GH #223) — every real unit in every
+#     food/crop country would grade `fail`;
+#   * a row in the global `categorical_mapping/u.org` cannot win, because
+#     `_row_union_categorical` keeps the COUNTRY row on a key collision.
+# So the country `u` table now maps every missing-marker spelling straight onto
+# `Unknown`, Niger writes `Unknown` at build time (as Uganda does), and a
+# pre-#842 parquet still holding `Manquant` is relabelled on read by the same
+# table.  ONE spelling, both paths, no second source of truth.
+#
+# CONSUMER RULE: `u == 'Unknown'` is not a unit.  Exclude it before any
+# per-unit comparison, aggregation or unit conversion — and report how many
+# rows you excluded.  Silently keeping it makes a price per nothing; silently
+# dropping it is the bug this sentinel exists to make visible.
+U_NA = 'Unknown'
+
+
+def fill_missing_u(df):
+    """Return *df* with every missing ``u`` replaced by the :data:`U_NA`
+    sentinel, whether ``u`` is a column or an index level.
+
+    One helper for all four Niger tables that declare ``u`` in their index, so
+    the sentinel cannot drift between them (it already had: `crop_production`
+    left the unit NaN while `plot_inputs` filled it).  Rows are never added or
+    removed — only the value of an already-present ``u`` changes.
+    """
+    if 'u' in getattr(df, 'columns', ()):
+        df = df.copy()
+        df['u'] = df['u'].astype('string').fillna(U_NA)
+        return df
+    names = list(df.index.names or [])
+    if 'u' in names:
+        flat = df.reset_index()
+        flat['u'] = flat['u'].astype('string').fillna(U_NA)
+        out = flat.set_index(names)
+        out.attrs = dict(df.attrs)
+        return out
+    return df
+
+
 def _crop_maps():
     crop_map = tools.get_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
@@ -480,10 +550,19 @@ def _finish_crop_production(df, t):
     # crop grown / reported on the line).  These carry no harvest data
     # (crop, Quantity, unit all NA) and are not item-level harvest records.
     df = df[df['crop'].notna()]
-    keep = ['t', 'i', 'plot', 'crop', 'u', 'Quantity',
+    # A KEPT plot-crop line whose harvest unit was never recorded gets the
+    # `Unknown` sentinel rather than a NaN index key (GH #842 -- see U_NA).
+    # 2018-19 is the wave that has them: 441 rows of 13,717, of which 64
+    # report a Quantity with no unit and 377 are plot-crop lines carrying only
+    # `intercropped` (planted and reported, no harvest measured).  The fill
+    # runs AFTER the no-crop drop, so it never resurrects a dropped row; every
+    # row it touches was already being served, with a NaN key that the next
+    # groupby would have deleted.
+    df = fill_missing_u(df)
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
             'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
     return df
 
 
@@ -597,9 +676,11 @@ def _finish_plot_inputs(df, t):
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
     # A reported input may lack a recorded unit (e.g. a count of bags); fill
-    # with the existing 'Manquant' (=missing) `u` Preferred Label so the `u`
-    # index level is non-null and survives the canonical de-dup collapse.
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    # with the `Unknown` sentinel so the `u` index level is non-null and
+    # survives the canonical de-dup collapse.  This is the fill the other
+    # three `u` tables now share (GH #842); it used to write the French
+    # `Manquant`, which is the spelling that was retired -- see U_NA.
+    df = fill_missing_u(df)
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased']
@@ -832,7 +913,7 @@ def plot_labor_ehcvm(src, t):
     fam_any = pd.concat([_num(c).notna() for c in fam_cols], axis=1).any(axis=1)
     fam_days = fam_days.where(fam_any.values, pd.NA)
     fam = pd.DataFrame({
-        'i': hh.values, 'plot': plot.values,
+        'i': hh.values, 'plot_id': plot.values,
         'source': LABOR_SOURCE_FAMILY,
         'PersonDays': fam_days.values, 'Wage': pd.NA,
     })
@@ -857,7 +938,7 @@ def plot_labor_ehcvm(src, t):
     hired_days = hired_days.where(any_days.values, pd.NA)
     hired_wage = hired_wage.where(any_wage.values, pd.NA)
     hired = pd.DataFrame({
-        'i': hh.values, 'plot': plot.values,
+        'i': hh.values, 'plot_id': plot.values,
         'source': LABOR_SOURCE_HIRED,
         'PersonDays': hired_days.values, 'Wage': hired_wage.values,
     })
@@ -880,19 +961,19 @@ def _finish_plot_labor(df, t):
     df = df.copy()
     df['t'] = t
     df['source'] = df['source'].astype('string')
-    df['plot'] = df['plot'].astype('string')
+    df['plot_id'] = df['plot_id'].astype('string')
     df['PersonDays'] = pd.to_numeric(df.get('PersonDays'), errors='coerce').astype('Float64')
     if 'Wage' not in df.columns:
         df['Wage'] = pd.NA
     df['Wage'] = pd.to_numeric(df['Wage'], errors='coerce').astype('Float64')
-    df = df[df['i'].notna() & df['plot'].notna() & df['source'].notna()]
-    df = (df.groupby(['t', 'i', 'plot', 'source'], dropna=False)[['PersonDays', 'Wage']]
+    df = df[df['i'].notna() & df['plot_id'].notna() & df['source'].notna()]
+    df = (df.groupby(['t', 'i', 'plot_id', 'source'], dropna=False)[['PersonDays', 'Wage']]
             .sum(min_count=1)
             .reset_index())
     # Drop (plot, source) rows that carry no reported labor at all (both
     # PersonDays and Wage NA) — a survey skip, not a reported labor item.
     df = df[df['PersonDays'].notna() | df['Wage'].notna()]
-    df = df.set_index(['t', 'i', 'plot', 'source'])
+    df = df.set_index(['t', 'i', 'plot_id', 'source'])
     return df
 
 
@@ -906,12 +987,19 @@ def _finish_plot_labor(df, t):
 # `people_last7days` is a legacy HH-level Men/Women/Boys/Girls count and is a
 # DIFFERENT, older construct — this is the (t, i, pid) individual feature the
 # 6 new countries are meant to gain).  COLUMNS, reported per-individual:
-#   farm_work  — worked on own farm/garden/livestock in the last 7 days (bool)
-#   SOB_work   — worked in own business / commerce in the last 7 days (bool)
-#   wage_work  — worked for a wage / employer in the last 7 days (bool)
-#   farm_hrs   — usual weekly hours on farm work (float; ECVMA only)
-#   SB_hrs     — usual weekly hours in own business (float; ECVMA only)
-#   wage_hrs   — usual weekly hours in wage work (float; ECVMA only)
+#   farm_work  — worked on own farm/garden/livestock (bool)
+#   SOB_work   — worked in own business / commerce (bool)
+#   wage_work  — worked for a wage / employer (bool)
+#              REFERENCE PERIOD VARIES BY WAVE (GH #877): 7 days in 2014-15
+#              and the EHCVM waves; 2011-12 asks no 7-day question -- its
+#              farm_work/SOB_work are 30-day and wage_work is 12-month.
+#   farm_hrs   — annual-average weekly hours on farm work (float; ECVMA only)
+#   SB_hrs     — annual-average weekly hours in own business (float; ECVMA)
+#   wage_hrs   — annual-average weekly hours in wage work (float; ECVMA)
+#              NOT hours in the last 7 days.  Per-job formula differs by wave
+#              (2014-15 m*w*d*h/52; 2011-12 m*(52/12)*d*h/52 == m*d*h/12,
+#              which DIVERGES from NER_ECVMA1.do:1413 -- see GH #877 and
+#              Niger/_/CONTENTS.org).
 #   Industry   — broad industry of the (main) job: Agriculture / Fishing /
 #                Mining / Manufacturing / Construction / Services (str;
 #                ECVMA only — derived from the WB code's section-code ranges)
@@ -1034,6 +1122,45 @@ def people_last7days_ehcvm(s04, s01, t, pid_col='s01q00a', age_col='s01q04a',
         'working_age': working_age.values,
     })
     return df
+
+
+# Value labels that declare a code to be MISSING rather than a quantity.
+# ECVMA spells it "manquant" (2011-12, lower case) / "Manquant" (2014-15).
+# Kept deliberately TIGHT: this list must only ever hold labels that mean
+# "no answer", never a substantive category.  GH #877.
+_MISSING_VALUE_LABELS = {'manquant', 'missing'}
+
+
+def _num_no_declared_missing(src, col, value_labels):
+    """`src[col]` as a number, with the survey's OWN declared missing code NA.
+
+    The ms04 time-use variables are read with ``convert_categoricals=False``
+    (the rest of the module needs numbers), which hands back the raw code --
+    so ``ms04q31 == 9`` arrives as nine days per week and ``ms04q56 == 99`` as
+    ninety-nine hours per day.  Both are the ``manquant`` code declared in the
+    file's own value labels, and multiplying them into an hours formula is how
+    2011-12 came to serve 7,410 hours in a week (GH #877).
+
+    The code is looked up PER VARIABLE from the value labels, never masked
+    blanket: 610 people genuinely report ``ms04q30 == 9`` hours a day, and
+    that variable's missing code is 99, not 9.  Pass ``value_labels`` from
+    ``local_tools.get_categorical_mapping(<the same .dta>)``; a variable with
+    no value labels (2014-15 ``MS04Q26``) is returned unmasked.
+    """
+    s = pd.to_numeric(src[col], errors='coerce')
+    labels = None
+    try:
+        if col in value_labels:
+            labels = dict(value_labels[col])
+    except (TypeError, KeyError):
+        labels = None
+    if not labels:
+        return s
+    codes = [float(k) for k, lab in labels.items()
+             if str(lab).strip().lower() in _MISSING_VALUE_LABELS]
+    if not codes:
+        return s
+    return s.mask(s.isin(codes))
 
 
 def _finish_people_last7days(df, t):
@@ -1180,7 +1307,17 @@ def _item_labels(item_series, item_map):
 _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
 # Unit Preferred Labels that mark the product as absent / missing in the
 # cluster — these rows carry no surveyed price and are dropped.
-_COMMUNITY_MISSING_UNITS = {'Manquant'}
+#
+# This set keys on the Preferred Label the `u` table produces, so it MOVED with
+# the `Manquant` -> `Unknown` retirement (GH #842): leaving it spelled
+# `Manquant` would have silently stopped dropping CS07's 'produit absent' rows.
+#
+# NOTE, recorded because the two meanings are genuinely conflated HERE and only
+# here: in the CS07 unit list the missing-unit marker and the product-absent
+# marker are the same kind of answer ('manquant' / 'produit absent'), and both
+# now resolve to `Unknown`.  Everywhere else in Niger `Unknown` means only
+# "amount reported, unit not recorded".  See CONTENTS.org "The `u` sentinel".
+_COMMUNITY_MISSING_UNITS = {U_NA}
 
 
 def _community_price_triples(df, item_map, unit_map, triples, passage=1):
@@ -1251,6 +1388,17 @@ def _finish_community_prices(df, t):
     if 'passage' not in df.columns:
         df['passage'] = 1
     # Every index level must be non-null (the framework drops NaN-key rows).
+    #
+    # DELIBERATELY A DROP, NOT A `fill_missing_u` (GH #842).  Measured on the
+    # raw CS07 grids: 795 price-bearing observations in 2011-12 (218 in
+    # passage 1, 577 in passage 2) and 0 in 2014-15 carry a usable price with
+    # NO unit column value at all.  `community_prices.Price` is defined as the
+    # price for `Quantity` units of `u`, so such a row has no basis to be a
+    # price OF anything -- unlike a crop line, where the reported harvest
+    # Quantity is still a fact worth serving with an `Unknown` unit.  The
+    # served row count is therefore unchanged by #842 (15,423), and the drop
+    # is now counted here instead of being invisible.  Revisiting it is a
+    # data decision, not a sentinel decision.
     df = df[df['v'].notna() & df['j'].notna() & df['u'].notna()]
     # Select one observation per (t, v, j, u): post-harvest (passage 2) before
     # post-planting (passage 1), then questionnaire order (stable sort).

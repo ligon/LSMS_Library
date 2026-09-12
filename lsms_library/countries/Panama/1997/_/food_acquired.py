@@ -83,7 +83,12 @@ df['u_bought'] = df['ga106b'].apply(decode_unit)
 df['u_obtained'] = df['ga110b'].apply(decode_unit)
 
 # --- harmonize food item j -------------------------------------------------
-food_items = df_from_orgfile('../../_/food_items.org')
+# GH #783: the vocabulary moved out of the standalone food_items.org into
+# _/categorical_mapping.org as `harmonize_food` -- the only file
+# Country.categorical_mapping opens, so labels= can now see it too.
+# name= is REQUIRED: that file holds several tables and df_from_orgfile's
+# name=None means 'the first table in the file'.
+food_items = df_from_orgfile('../../_/categorical_mapping.org', name='harmonize_food')
 food_items = food_items.loc[:, ['Preferred Label', t]]
 food_items[t] = food_items[t].astype(str).str.strip()
 food_items = food_items.replace(['', '---', 'nan'], pd.NA).dropna()
