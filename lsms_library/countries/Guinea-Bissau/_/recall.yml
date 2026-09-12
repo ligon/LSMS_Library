@@ -22,3 +22,4 @@ Recall:
   '2018-19':
     basis: not-recorded
     ask_count_basis: unknown
+    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks. It is now derived onto the row''s own 7-day purchased quantity (Quantity x s07bq08/s07bq07a, NA where the last-purchase unit differs), so both numbers sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'

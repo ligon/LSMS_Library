@@ -1,0 +1,77 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
+  waves: ['2018']
+  columns: [Expenditure]
+  rows: {s: purchased}
+  rule: >-
+    Expenditure = Quantity * (s07bq08 / s07bq07a), where Quantity is the row's
+    own served purchased quantity, (s07bq03a - s07bq04).clip(lower=0) -- the
+    7-day consumption net of own production -- and s07bq08 / s07bq07a is the
+    unit value of the household's LAST PURCHASE of the item.  NaN where
+    s07bq07a is missing or not positive, and NaN where the last purchase was
+    made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
+    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
+    is no exact conversion and NA is the honest answer.  Units are compared on
+    the EHCVM numeric code where the label carries one, else on the label with
+    case, accents, padding and punctuation folded -- the two variables carry
+    DIFFERENT value-label sets inside the same .dta.  Before GH #876 the
+    served Expenditure was s07bq08 itself: the value of one purchase of
+    unrecorded size made up to 30 days earlier, beside a 7-day quantity.
+  function: lsms_library.ehcvm:derive_ehcvm_purchase_value
+  inputs: lsms_library.countries.Togo.2018._.mapping:inputs_food_acquired
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq07a, s07bq07b,
+                  s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        the unit value of the last purchase is the price the household paid
+        over the 7-day consumption window.  Section 7B is headed
+        "B Consommation alimentaire des 7 derniers jours et achat des 30
+        derniers jours", so the purchase it prices may be up to 30 days old
+        (s07bq06: Hier / 7 derniers jours / 30 derniers jours / ...).
+      basis: questionnaire
+      evidence: >-
+        2018/Documentation/tgo_ehcvm1_qnr_household_excel_vague1.xls, sheet
+        S7b header; Stata label of s07bq08, "7B.08. Valeur (en FCFA) du
+        [PRODUIT] achete la derniere fois"
+    - text: >-
+        a last purchase reported in a different unit from the consumption is
+        NOT converted -- the row is served with Expenditure NA.  7,448 of
+        76,662 purchase rows (9.7%): 3,758 differ in the unit code and 3,690
+        in the unit SIZE only (Petit / Moyen / Grand / Taille unique), which is
+        a different container and therefore a different price per unit.
+      basis: questionnaire
+      evidence: >-
+        no EHCVM wave distributes a unit-conversion table;
+        lsms_library/categorical_mapping/ehcvm_units.org is a code->label
+        codebook with no factors
+    - text: >-
+        gifts received (s07bq05) are NOT subtracted from the purchased
+        quantity, so the served purchased row still values gifts at the
+        purchase unit value.  UEMOA's own aggregate does subtract them; not
+        doing so here keeps the served Quantity unchanged, which is a separate
+        defect with a wider blast radius (the library has never read s07bq05).
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org; GH #876
+  validated_against: >-
+    ehcvm_conso_tgo2018.dta (the UEMOA consumption aggregate, one row per
+    household x product x modep with an annual value depan).  On the 434
+    unique (household, product) rows where an Achat row exists, the units
+    match, and the candidate constructions differ (s07bq04 or s07bq05
+    positive), (s07bq03a - s07bq04 - s07bq05) * s07bq08/s07bq07a * 365/7
+    reproduces depan(Achat) within 1% for 99.5% of rows, against 13.1% for the
+    own-production-only residual this entry serves and 0.0% for the gross
+    7-day quantity; s07bq04 * uv reproduces depan(Autoconso) and s07bq05 * uv
+    depan(Don), both at median ratio 0.99931 = (365/7)/(365.25/7).  So the
+    unit value of the last purchase IS the survey's own unit of account for
+    every acquisition mode, and the 365/7 shows UEMOA reads the 7-day
+    consumption as the week; the residual difference from depan(Achat) is the
+    gift term named in the assumptions.
+  contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
+  since: '2026-09-12'

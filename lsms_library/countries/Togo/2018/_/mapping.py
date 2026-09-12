@@ -2,7 +2,33 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
-from lsms_library.transformations import food_acquired_to_canonical as food_acquired
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+# GH #876.  `food_acquired` is no longer the bare canonical reshape: the wide
+# frame's `Expenditure` used to be `s07bq08`, the value of ONE purchase made up
+# to 30 days ago, sitting beside a 7-day consumption `Quantity`.  The hook
+# derives it instead -- purchased Quantity x (s07bq08 / s07bq07a), NA where the
+# last purchase used a different unit -- and stamps the registry key on every
+# purchased row.  See lsms_library/ehcvm.py and Togo/_/derivations.yml.
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Togo')
+
+
+def food_acquired(df):
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j).
+
+    A wave-level wrapper rather than a `functools.partial` in the country
+    module, so that binding the country name does not put this code in
+    `Togo/_/togo.py` -- which is in EVERY Togo table's cache fingerprint.
+    """
+    return _inputs_last_purchase('Togo', wave)
 
 # ---------------------------------------------------------------------------
 # cluster_features -- reduce the household-level EHCVM cover page to CLUSTER

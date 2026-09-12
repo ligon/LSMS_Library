@@ -63,13 +63,15 @@ U_TABLES = ("crop_production", "food_acquired", "plot_inputs", "community_prices
 # Cold-rebuild measurements (see the module docstring for provenance).
 EXPECTED_ROWS = {
     "crop_production": 46341,
-    "food_acquired": 239031,
+    # 239,031 before GH #876; the derived purchase value drops 759 rows whose
+    # purchased quantity is zero and which used to survive on the raw s07bq08.
+    "food_acquired": 238272,
     "plot_inputs": 42364,
     "community_prices": 15423,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4920,
-    "food_acquired": 12,
+    "food_acquired": 7,      # 12 before GH #876 (5 of them were zero-quantity)
     "plot_inputs": 75,
     "community_prices": 0,
 }
@@ -77,7 +79,7 @@ EXPECTED_SENTINEL = {
 # country total that happens to add up.
 EXPECTED_SENTINEL_BY_WAVE = {
     "crop_production": {"2011-12": 3146, "2014-15": 373, "2018-19": 441, "2021-22": 960},
-    "food_acquired": {"2018-19": 0, "2021-22": 12},
+    "food_acquired": {"2018-19": 0, "2021-22": 7},   # 12 before GH #876
     "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 14},
     "community_prices": {"2011-12": 0, "2014-15": 0},
 }

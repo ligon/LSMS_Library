@@ -4,6 +4,31 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
 
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+# GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
+# ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
+# `Quantity`.  `_food_acquired_ehcvm` derives it instead -- purchased Quantity
+# x (s07bq08 / s07bq07a), NA where the last purchase used a different unit --
+# and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
+# and Guinea-Bissau/_/derivations.yml.
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Guinea-Bissau')
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j).
+
+    A wave-level wrapper rather than a `functools.partial` in the country
+    module, so that binding the country name does not put this code in
+    Guinea-Bissau/_/guinea-bissau.py -- which is in EVERY Guinea-Bissau table's cache
+    fingerprint.
+    """
+    return _inputs_last_purchase('Guinea-Bissau', wave)
+
 
 def df_geo(df):
     """``cluster_features.df_geo`` sub-frame hook — GH #323 site 4 / GH #627.
@@ -157,7 +182,7 @@ def food_acquired(df):
     column / index level.  See ``_decode_mojibake`` for the encoding
     rationale.
     """
-    df = _food_acquired_canonical(df)
+    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
     df = _decode_mojibake_in_df(df)
     return df
 

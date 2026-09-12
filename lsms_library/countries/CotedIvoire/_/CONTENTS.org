@@ -737,3 +737,66 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* 2026-09-12 -- =food_acquired=: one row, two windows (GH #876)
+
+=food_acquired.Expenditure= used to be wired straight to =s07bq08=, whose
+Stata label is "7B.08. Valeur (en FCFA) du [PRODUIT] achete la derniere
+fois" -- the value of *one* purchase, which =s07bq06= places up to 30 days
+back -- sitting on the same row as =Quantity=, the *7-day* consumption
+=s07bq03a= net of own production.  Section 7B is headed "Consommation
+alimentaire des 7 derniers jours et achat des 30 derniers jours"; the row
+carried both clocks and nothing in the frame said so.
+
+The served =Expenditure= is now DERIVED:
+
+  : Expenditure = Quantity * (s07bq08 / s07bq07a)
+
+-- the row's own purchased quantity times the unit value of that last
+purchase -- so =Expenditure / Quantity= is exactly that unit value and the
+two numbers on the row finally refer to the same thing.  =NA=, never a
+guess, where =s07bq07a= is not positive or where the purchase was made in a
+different unit (or a different SIZE of the same unit) from the consumption:
+no EHCVM wave ships a unit-conversion table, so there is no exact
+conversion to apply.
+
+One function for all eight EHCVM countries (=lsms_library/ehcvm.py=,
+=derive_ehcvm_purchase_value=), registered once per country in
+=_/derivations.yml= and stamped on every purchased row in the =Derivation=
+column:
+
+  : CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value
+
+Raw answers come back by their original names from
+=Country('CotedIvoire').derivation_inputs(key, wave=...)=.
+
+** What moved
+
+| wave | purchased rows before -> after | Expenditure sum before -> after | NA: unit code / unit size / no s07bq07a |
+|------+--------------------------------+---------------------------------+-----------------------------------------|
+| 2018-19 | 252,809 -> 251,061 | 119,107,505 -> 108,747,218 (-8.7%) | 13,116 / 12,612 / 0 |
+
+Row counts fall slightly because a row whose purchased quantity is zero used
+to survive on the raw =s07bq08= being positive; it now has no value of its
+own.  Counts in the NA columns are at SOURCE-row grain (before the canonical
+reshape and the (t, v, i, j, u, s) collapse).
+
+  The product-level check against =ehcvm_conso= does not run for this wave --
+  its conso =codpr= does not share a keyspace with =s07bq01= (CotedIvoire
+  2018-19 ships no conso file at all).  The construction is validated on Togo
+  2018 and Guinea-Bissau 2018-19, where the join works; the instrument is the
+  same in all twelve waves (identical =s07bq0*= Stata labels), so the reading
+  carries by inference, not by measurement here.
+
+** What this does NOT fix
+
+- Gifts (=s07bq05=) are still not read, so the purchased quantity -- and
+  therefore its value -- includes food received as a gift.  UEMOA's own
+  aggregate subtracts them; changing =Quantity= is a separate defect with a
+  wider blast radius.  It is named in the registry entry's =assumptions= with
+  basis =modelling-choice=.
+- The served =u= index still carries only =s07bq03b=, not the unit SIZE
+  =s07bq03c=, so two rows differing only in container size collapse onto one
+  =u=.  The derivation does distinguish them; the index does not.
+- The price still comes from a purchase up to 30 days old.  That is what the
+  instrument asked; the assumption is recorded rather than hidden.

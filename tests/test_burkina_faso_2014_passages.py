@@ -241,10 +241,16 @@ def test_the_ehcvm_waves_ask_once_and_carry_visit_one(delivered):
     for t in ('2018-19', '2021-22'):
         wave = delivered.xs(t, level='t')
         assert wave.index.get_level_values('visit').unique().tolist() == [1]
+    # Re-pinned 2026-09-12 (GH #876).  These two totals used to be the raw
+    # `s07bq08` sums -- 65,315,307.5 and 39,905,158.0, the value of ONE purchase
+    # per row, up to 30 days old.  The served Expenditure is now the row's own
+    # 7-day purchased quantity times that purchase's unit value, NA where the
+    # units differ.  What this test is about -- that `add_visit_level` reduces
+    # nothing -- is unchanged; only the level the numbers sit at moved.
     assert delivered.xs('2018-19', level='t')['Expenditure'].sum() == \
-        pytest.approx(65_315_307.5, rel=1e-9)
+        pytest.approx(53_497_881.41, rel=1e-6)
     assert delivered.xs('2021-22', level='t')['Expenditure'].sum() == \
-        pytest.approx(39_905_158.0, rel=1e-9)
+        pytest.approx(29_220_369.49, rel=1e-6)
 
 
 def test_the_grain_collapse_no_longer_destroys_or_deletes(burkina):

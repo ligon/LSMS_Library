@@ -227,8 +227,26 @@ food_acquired:
             - mappings: ['ehcvm_units', 'Code', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
-        Expenditure: s07bq08
         Produced: s07bq04
+        # GH #876.  `Expenditure` is NOT a myvar here: it used to be wired
+        # straight to `s07bq08`, "Valeur (en FCFA) du [PRODUIT] achete la
+        # derniere fois" -- the value of ONE purchase up to 30 days old --
+        # beside a 7-day consumption `Quantity`.  The served `Expenditure` is
+        # now DERIVED by 2018-19/_/mapping.py's food_acquired hook
+        # (lsms_library.ehcvm.derive_ehcvm_purchase_value) as
+        #     purchased Quantity x s07bq08 / s07bq07a,
+        # NA where the last purchase used a different unit or `s07bq07a` is
+        # not positive.  Registered as
+        # `Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value`
+        # in Burkina_Faso/_/derivations.yml; every purchased row carries that key
+        # in its `Derivation` column.  The six raw inputs below are read only
+        # to feed that hook and are dropped by the canonical reshape.
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
 
 housing:
     file: s11_me_bfa2018.dta
