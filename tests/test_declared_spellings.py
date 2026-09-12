@@ -265,9 +265,10 @@ class TestCountryRegressions:
         `development` in an isolated LSMS_DATA_DIR does ship 'Semi-urban'.  Do
         not re-downgrade it to a doc-only fix.  (The original mis-grading came
         from a verification run whose LSMS_COUNTRIES_ROOT override was silently
-        ignored -- GhanaLSS/1991-92/_/mapping.py:8 hardcodes
-        files('lsms_library')/'countries', bypassing the override.  That is a
-        separate CLAUDE.md anti-pattern worth its own issue.)"""
+        ignored -- GhanaLSS/1991-92/_/mapping.py then hardcoded
+        files('lsms_library')/'countries', bypassing the override.  GH #753
+        fixed the config-root lookup separately; its sentinel regressions
+        live in test_countries_root_override.py.)"""
         import importlib.util
         import sys
 

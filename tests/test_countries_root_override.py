@@ -22,6 +22,8 @@ import sys
 import textwrap
 from pathlib import Path
 
+import pytest
+
 import lsms_library.paths as paths
 from lsms_library.paths import countries_root
 
@@ -96,3 +98,62 @@ def test_subprocess_default_unchanged(tmp_path):
     )
     assert r.returncode == 0, f"stderr:\n{r.stderr}"
     assert "DEFAULT_OK" in r.stdout
+
+
+@pytest.mark.parametrize("wave", ["1987-88", "1988-89", "1991-92", "1998-99"])
+@pytest.mark.parametrize("region_level", ["wave", "country"])
+def test_ghanalss_mapping_uses_override_labels(tmp_path, wave, region_level):
+    """GH #753: decode from the override, retaining wave-first fallback.
+
+    Load the installed code independently of the temporary config tree.  No
+    microdata or derived caches are involved, so stale data cannot conceal a
+    lookup from the wrong checkout.  The early rounds' relationship table has
+    a distinct name; GLSS4 requires its relationship table at wave level.
+    """
+    ov = tmp_path / "countries"
+    wave_dir = ov / "GhanaLSS" / wave / "_"
+    country_dir = ov / "GhanaLSS" / "_"
+    wave_dir.mkdir(parents=True)
+    country_dir.mkdir()
+
+    def table(name, label):
+        return (
+            f"#+name: {name}\n"
+            "| Code | Label |\n"
+            "|------+-------|\n"
+            f"| 1 | {label} |\n\n"
+        )
+
+    relationship = "relationship_glss1" if wave in ("1987-88", "1988-89") else "relationship"
+    country_tables = table("region", "Country sentinel")
+    country_tables += table(relationship, "Country relationship sentinel")
+    country_tables += table("rural", "Country rural sentinel")
+    (country_dir / "categorical_mapping.org").write_text(country_tables)
+    wave_tables = table(relationship, "Wave relationship sentinel")
+    if region_level == "wave":
+        wave_tables += table("region", "Wave sentinel")
+    (wave_dir / "categorical_mapping.org").write_text(wave_tables)
+
+    module_path = Path(paths.__file__).resolve().parent / "countries" / "GhanaLSS" / wave / "_" / "mapping.py"
+    expected_region = "Wave sentinel" if region_level == "wave" else "Country sentinel"
+    script = textwrap.dedent(
+        f"""
+        import importlib.util
+        from pathlib import Path
+        from lsms_library.paths import countries_root
+        assert countries_root() == Path({str(ov)!r})
+        spec = importlib.util.spec_from_file_location("_gh753_mapping", {str(module_path)!r})
+        mapping = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mapping)
+        assert mapping.Birthplace(1) == {expected_region!r}, mapping.region_dict
+        assert mapping.Region(1) == {expected_region!r}, mapping.region_dict
+        assert mapping.Relationship(1) == "Wave relationship sentinel"
+        if hasattr(mapping, "rural_dict"):
+            assert mapping.rural_dict[1] == "Country rural sentinel"
+        """
+    )
+    env = dict(os.environ, LSMS_COUNTRIES_ROOT=str(ov))
+    result = subprocess.run(
+        [sys.executable, "-c", script], env=env, capture_output=True, text=True
+    )
+    assert result.returncode == 0, f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"

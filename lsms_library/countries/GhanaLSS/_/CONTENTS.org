@@ -2642,6 +2642,13 @@ the worktree); =_/ghanalss.py= already does it right with =countries_root()=
 1991-92 ("worth its own issue").  Not fixed here; the fix is
 =countries_root()/'GhanaLSS'/'<wave>'= in each module.
 
+/Resolved 2026-09-12 (GH #753)./  All four modules now build =path= from
+=countries_root()=, preserving their existing table names and search order.
+Subprocess sentinel tests cover every wave with an alternate config tree,
+including wave-table precedence and country-table fallback.  All eight
+cases failed against the package-relative paths before the fix.  No survey
+code or label has changed; the override now selects the intended tables.
+
 ** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
 
 Found by the GhanaSPS =individual_education= task (PR #728) while reading this
