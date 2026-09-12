@@ -1,12 +1,13 @@
 #+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
 * State (2026-09-12, evening)
-- =development= published through 0f4eff9a7 on the mirror AND pushed to
-  GitHub; draft release PR development -> master is open (v0.12.0) with
-  the verified Closes list (=docs/releases/v0.12.0-closes.txt=); notes at
-  =docs/releases/v0.12.0.md=.  Merge with a merge commit, then tag v0.12.0
-  on master and =gh release create= (release skill; verify the publish
-  workflow fired).
+- *v0.12.0 RELEASED* (2026-09-12): PR #885 merged into master with a merge
+  commit (2cbcbb046), tag =v0.12.0= on it (GitHub + mirror), GitHub
+  release created from =docs/releases/v0.12.0.md=, #871-#878 auto-closed,
+  =development= fast-forwarded to the same commit on both remotes.
+  Verify PyPI shows 0.12.0 (=gh run list --workflow=publish.yml=); if the
+  release event did not fire, =gh workflow run publish.yml --ref master
+  -f tag=v0.12.0= (release skill).
 - Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
   #872, #873, #874, #876, #871 (most-complete observed row at all three
   collapses; reverses the 2026-07-13 completion doctrine), plus the
@@ -23,8 +24,9 @@
 - Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
   #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
   see the PR's status.  Recipe: CLAUDE.md addendum 3b.
-- Coverage regrade (=make matrix=) NOT run: it cold-builds and would not
-  fit the job; due before or right after the release.
+- Coverage regrade done per country on the warm corpus (3304cf289): no
+  tier moved.  Quirk: a single-country =make matrix= run does not apply
+  the curated =blocked= verdicts (Nepal graded 'broken'); rows restored.
 
 * Open questions for @ligon
 - All merged refs deleted (mirror and local).  #879-#884 filed for the
