@@ -491,16 +491,24 @@ def attach(df: pd.DataFrame, country: str, table: str | None) -> None:
                       f"summary ({type(exc).__name__}: {exc}); the data are unaffected.")
 
 
-def merge_attrs(frames: Iterable[pd.DataFrame]) -> dict[str, dict[str, Any]]:
+def merge_attrs(frames: Iterable[Any]) -> dict[str, dict[str, Any]]:
     """Union the ``derivations`` attrs of several frames, for ``Feature()`` assembly.
 
     ``attrs`` survive an operation only when every input agrees, so a
     cross-country ``concat`` always lands in the ``{}`` case; a re-attach is
     therefore load-bearing (``CLAUDE.md``, "Panel ID Transitive Chains").
+    Wired from ``Feature.__call__`` since GH #873 -- the follow-on named in
+    ``SkunkWorks/derived_values.org`` §"One level up", where the summary at
+    the ``Feature()`` level is an ``attrs`` pointer downward.
+
+    Each element may be a **frame** or the bare ``attrs`` **mapping** captured
+    from one.  ``Feature`` captures the mapping before assembly (the frame
+    itself is reshaped by ``_harmonize_country_frame`` on the way), so both
+    shapes have to work.
     """
     out: dict[str, dict[str, Any]] = {}
     for f in frames:
-        got = getattr(f, "attrs", {}).get(ATTRS_KEY)
+        got = (getattr(f, "attrs", f) or {}).get(ATTRS_KEY)
         if isinstance(got, dict):
             for c, summ in got.items():
                 out.setdefault(c, {}).update(summ)

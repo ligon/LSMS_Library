@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Mapping, NamedTuple
 
 
 _UNSET = object()
@@ -27,6 +27,95 @@ from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .errors import LabelUnavailableError
 from . import population as _population
+# NOT `from . import recall` / `from . import derivations`: the package binds
+# PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
+# `recall_table`, `ll.derivations(...)` = `derivations_table`), and
+# `from package import name` prefers the package ATTRIBUTE over the submodule.
+# This module is imported by `__init__` before those rebinds, so the submodule
+# form happens to work today and would silently start importing a FUNCTION if
+# `__init__`'s import order ever changed.  Name the symbols instead.
+from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
+from .recall import merge_attrs as _recall_merge_attrs
+from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
+from .derivations import merge_attrs as _derivations_merge_attrs
+
+
+# ---------------------------------------------------------------------------
+# attrs carriers: metadata that rides on `df.attrs` and dies at the concat
+# ---------------------------------------------------------------------------
+#
+# `attrs` survive an operation only when every input AGREES; any disagreement
+# -- including one side having none -- yields {}.  (Measured on the pinned
+# pandas 3.0.2; all seven cells are pinned by
+# tests/test_population.py::TestAttrsSurvival, and the table is in CLAUDE.md
+# under "Panel ID Transitive Chains and the attrs Flag".)
+#
+# Cross-country assembly is a `pd.concat` over frames whose records DIFFER BY
+# DESIGN -- one per country, which is the entire point of each record -- so it
+# lands in the {} case on every call with more than one country.  The capture
+# below is therefore not belt-and-braces: it is the only thing keeping these
+# records alive.  Do not "simplify" it away after testing concat with matching
+# inputs and watching it preserve.  Same family of hazard as the
+# `id_converted` bug.
+#
+# This used to be hardcoded for `population` alone, and `recall` (GH #851) and
+# `derivations` (SkunkWorks/derived_values.org) each shipped a `merge_attrs`
+# with NO caller -- so both died here silently (GH #873).  A fourth carrier is
+# now one entry in the tuple below.
+
+class _AttrsCarrier(NamedTuple):
+    """One metadata record that must be captured before, and re-attached after,
+    the cross-country ``concat``.
+
+    ``keys``
+        The ``df.attrs`` keys this carrier owns.  Captured verbatim per country.
+    ``attach``
+        ``(result, sources) -> None``.  ``sources`` is the list of captured
+        ``attrs`` sub-mappings for the KEPT countries only, in target order.
+        This is the carrier module's OWN ``merge_attrs`` -- the union rule
+        belongs to the module that defines the record, never here.
+    """
+    name: str
+    keys: tuple[str, ...]
+    attach: Callable[[pd.DataFrame, list[Mapping[str, Any]]], None]
+
+
+def _merge_into(key: str, merge: Callable[[Any], dict]) -> Callable[..., None]:
+    """Adapt a ``merge_attrs(frames) -> dict`` to the ``attach`` protocol.
+
+    ``population.merge_attrs`` already writes onto its target; ``recall`` and
+    ``derivations`` return the union instead.  An empty union is not written,
+    so a table with no such record keeps an absent key rather than an empty
+    dict -- "no record" and "an empty record" must not become the same thing.
+    """
+    def _attach(result: pd.DataFrame, sources: list[Mapping[str, Any]]) -> None:
+        merged = merge(sources)
+        if merged:
+            result.attrs[key] = merged
+    return _attach
+
+
+_ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
+    _AttrsCarrier(
+        "population",
+        (_population.ATTRS_KEY, _population.ATTRS_RESOLUTION_KEY),
+        _population.merge_attrs,
+    ),
+    _AttrsCarrier(
+        "recall",
+        (_RECALL_ATTRS_KEY,),
+        _merge_into(_RECALL_ATTRS_KEY, _recall_merge_attrs),
+    ),
+    _AttrsCarrier(
+        "derivations",
+        (_DERIVATIONS_ATTRS_KEY,),
+        _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
+    ),
+)
+
+#: Every ``attrs`` key any carrier owns -- what the per-country capture keeps.
+_CARRIED_ATTRS_KEYS: tuple[str, ...] = tuple(
+    k for carrier in _ATTRS_CARRIERS for k in carrier.keys)
 
 
 def _load_global_columns() -> dict[str, dict[str, Any]]:
@@ -695,42 +784,81 @@ class Feature:
             if isinstance(meta, dict) and meta.get("required", False)
         ]
 
-    def _attach_population(self, result: pd.DataFrame,
-                           captured: dict[str, dict[str, Any]]) -> None:
-        """Re-attach the population record to the assembled frame, and warn if
-        the pool mixes materially different universes (GH #603/#601).
+    def _attach_carried_attrs(self, result: pd.DataFrame,
+                              captured: dict[str, dict[str, Any]]) -> None:
+        """Re-attach every ``attrs`` carrier to the assembled frame (GH #873).
+
+        Population (GH #603/#601), recall (GH #851) and derivations
+        (``SkunkWorks/derived_values.org``) all die at the cross-country
+        ``concat`` -- their records differ by design, so it lands in the ``{}``
+        case -- and each ships its own ``merge_attrs``.  This walks
+        :data:`_ATTRS_CARRIERS` and calls them; a fourth carrier is one entry
+        there and no code here.
 
         Only the countries actually present in *result* contribute: a frame
         dropped by the modal-index-shape filter above is not in the answer, so
         it must not be in the answer's metadata or in the warning.
 
-        The warning is advisory and one-per-call.  It NEVER removes a row --
-        see the note at the call site.
+        Each carrier is attached under its own ``try``, so one broken record
+        cannot suppress the others.  A metadata annotation must never break a
+        data call -- the same rule ``population.attach`` obeys on the Country
+        side -- but the failure is LOUD: a silently absent record is
+        indistinguishable from a homogeneous pool, which is the one thing this
+        must not look like.
+
+        Only population reports at pooling time.  A warning for the other two
+        was considered and declined on 2026-09-11 (``derived_values.org``
+        §"No warning at pooling time"): at that level the ``attrs`` summary is
+        itself the signal, and a warning would repeat it as noise.
         """
         try:
-            try:
-                kept = set(result.index.get_level_values("country").unique())
-            except (KeyError, ValueError):
-                kept = set(captured)
-            _population.merge_attrs(
-                result, [v for k, v in captured.items() if k in kept])
-            report = _population.pool_report(
-                _population.records_from_attrs(result), self.table_name)
+            kept = set(result.index.get_level_values("country").unique())
         except Exception as exc:
-            # A metadata annotation must never break a data call -- the same
-            # rule `population.attach` obeys on the Country side.  Loud, though:
-            # a silently absent record would be indistinguishable from a
-            # homogeneous pool, which is the one thing this must not look like.
+            # Deliberately broader than the (KeyError, ValueError) this used to
+            # catch: that pair sat INSIDE an outer `except Exception` that also
+            # covered this line, and the outer one is now per-carrier.  Never
+            # let working out WHICH countries are kept break a data call --
+            # but say so (the docstring's LOUD rule): falling back to every
+            # captured country can over-report a dropped one.
             warnings.warn(
-                f"{self.table_name}: could not attach the population record "
-                f"({type(exc).__name__}: {exc}). The result is unaffected, but "
-                f"df.attrs['population'] may be incomplete and no comparability "
-                f"warning was computed."
-            )
-            return
-        if report:
-            warnings.warn(report, _population.PopulationHeterogeneityWarning,
-                          stacklevel=3)
+                f"{self.table_name}: could not read the country level to decide "
+                f"which attrs records to re-attach ({type(exc).__name__}: "
+                f"{exc}); re-attaching all {len(captured)} captured records")
+            kept = set(captured)
+        in_answer = [v for k, v in captured.items() if k in kept]
+
+        for carrier in _ATTRS_CARRIERS:
+            sources = [{k: src[k] for k in carrier.keys if k in src}
+                       for src in in_answer]
+            try:
+                carrier.attach(result, sources)
+            except Exception as exc:
+                warnings.warn(
+                    f"{self.table_name}: could not attach the {carrier.name} "
+                    f"record ({type(exc).__name__}: {exc}). The result is "
+                    f"unaffected, but df.attrs[{carrier.name!r}] may be "
+                    f"incomplete"
+                    + (" and no comparability warning was computed."
+                       if carrier.name == "population" else ".")
+                )
+                continue
+            if carrier.name != "population":
+                continue
+            try:
+                report = _population.pool_report(
+                    _population.records_from_attrs(result), self.table_name)
+            except Exception as exc:
+                warnings.warn(
+                    f"{self.table_name}: could not attach the population record "
+                    f"({type(exc).__name__}: {exc}). The result is unaffected, but "
+                    f"df.attrs['population'] may be incomplete and no comparability "
+                    f"warning was computed."
+                )
+                continue
+            if report:
+                warnings.warn(report,
+                              _population.PopulationHeterogeneityWarning,
+                              stacklevel=3)
 
     def __call__(self, countries: list[str] | None = None, trust_cache: bool | None = None,
                  currency: str | None = 'index', numeraire: str | None = None,
@@ -832,27 +960,14 @@ class Feature:
         # df.attrs marker -- distinct from genuine per-country build failures.
         labels_unavailable: list[str] = []
 
-        # The population record each country's frame arrived with (GH #603).
+        # The metadata records each country's frame arrived with: population
+        # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
+        # above for the rule that makes this capture load-bearing rather than
+        # belt-and-braces, and GH #873 for the two that used to be dropped.
         # Captured HERE, before _harmonize_country_frame / pd.concat, and
         # re-attached after assembly for the KEPT frames only -- so `attrs`
         # describes what the caller actually receives.
-        #
-        # The capture is not belt-and-braces, and the reason is a RULE, not a
-        # per-method quirk.  Measured on the pinned pandas 3.0.2 (all seven
-        # cells are pinned by tests/test_population.py::TestAttrsSurvival):
-        #
-        #     `attrs` survive only when every input AGREES; any disagreement --
-        #     including one side having none -- yields {}.
-        #
-        # So `merge` with matching attrs PRESERVES, and a single-input op like
-        # `set_index` is trivially safe.  What makes the drop certain here is
-        # that the population records DIFFER BY DESIGN -- one per country, which
-        # is the entire point of the record -- so the final `pd.concat` below
-        # lands in the {} case on every call with more than one country.  Do not
-        # "simplify" this away after testing concat with matching inputs and
-        # watching it preserve.  Same family of hazard as the `id_converted` bug
-        # (CLAUDE.md, "Panel ID Transitive Chains and the attrs Flag").
-        captured_population: dict[str, dict[str, Any]] = {}
+        captured_attrs: dict[str, dict[str, Any]] = {}
 
         for name in targets:
             try:
@@ -882,9 +997,8 @@ class Feature:
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
-                captured_population[name] = {
-                    k: df.attrs[k] for k in
-                    (_population.ATTRS_KEY, _population.ATTRS_RESOLUTION_KEY)
+                captured_attrs[name] = {
+                    k: df.attrs[k] for k in _CARRIED_ATTRS_KEYS
                     if k in df.attrs
                 }
                 # Coerce toward the canonical shape so one country's stray
@@ -964,7 +1078,7 @@ class Feature:
         # Canonical-index alignment, reported ONCE (Contract B shape).  Only for
         # the countries actually KEPT -- a frame excluded above is not in the
         # answer, so it must not be in the answer's metadata (same rule
-        # `_attach_population` obeys).
+        # `_attach_carried_attrs` obeys).
         if alignment_report:
             try:
                 kept_names = set(result.index.get_level_values("country").unique())
@@ -1011,8 +1125,10 @@ class Feature:
         # got this far is in `result`, and the population record is metadata
         # about it, not a filter on it.  #603 proposed excluding `specialized`
         # frames by default and @ligon declined; a default that silently drops
-        # data is the same disease as one that silently pools it.
-        self._attach_population(result, captured_population)
+        # data is the same disease as one that silently pools it.  Since #873
+        # the same hook carries `recall` and `derivations`, which have no
+        # warning of their own by decision.
+        self._attach_carried_attrs(result, captured_attrs)
 
         # GH #326: pd.concat can leave the (structurally-consistent) index
         # levels UNNAMED, forcing callers to index positionally instead of
