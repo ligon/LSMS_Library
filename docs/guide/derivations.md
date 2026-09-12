@@ -22,8 +22,14 @@ Two obvious responses both fail the precept:
 
 - **Serve the raw answer and document the window in prose.** The frame still
   says `Expenditure`; the prose is read by nobody at the moment of pooling.
-  This was the state of the 1980s waves for years, and
-  `GhanaLSS/_/CONTENTS.org` described it correctly the whole time.
+  The 1980s waves were in a worse state than that: the design note's
+  disclosure table records the 12B case as disclosed by **"nothing (defect,
+  2026-09-11)"**. What prose there was said the opposite of the truth —
+  `GhanaLSS/_/CONTENTS.org:1242` now records that "until 2026-09-11 this note
+  said both 1980s modules were 'since my last visit'; only 12A is", and both
+  wave scripts' docstrings called `VFOODCPD` "produced_value per day", a claim
+  that entered in commit `c404b7fb2` with no source (`CONTENTS.org`, "12B is a
+  value per eating occasion, not a recall value").
 - **Serve the constructed number silently.** Commensurable, and
   indistinguishable from a survey answer — what the food kg inference did
   before GH #850.
@@ -311,7 +317,8 @@ files key products in a different code space, and CotedIvoire ships none
 (commit `6e39518b6`). The instrument is identical in all twelve — the same
 `s07bq0*` variables with the same labels — which is the basis for applying the
 rule there, and the other six countries' entries cite the Togo and
-Guinea-Bissau numbers rather than claiming their own.
+Guinea-Bissau figures explicitly, saying that "the reading carries by
+inference, not by measurement here".
 
 One more result from the same check, and it is why the gift rows carry no
 value: `s07bq05 × unit_value` reproduces `depan(Don)` within 1% for 99.7% of
