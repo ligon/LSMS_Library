@@ -88,8 +88,8 @@ Armenia,crop_production,,undeclared,absent,,not declared by this country for any
 Armenia,food_acquired,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_coping,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_security,,undeclared,absent,,not declared by this country for any wave
-Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
-Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_characteristics,1996,broken,declared,,PathMissingError: The path '/local/job38714904/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/local/job38714904/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
+Armenia,household_roster,1996,broken,declared,,PathMissingError: The path '/local/job38714904/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' does not exist in the target repository '/local/job38714904/mirrors/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta' neither as a DVC output nor as a Git-tracked file.
 Armenia,housing,,undeclared,absent,,not declared by this country for any wave
 Armenia,individual_education,,undeclared,absent,,not declared by this country for any wave
 Armenia,interview_date,,undeclared,absent,,not declared by this country for any wave
@@ -135,11 +135,11 @@ Benin,assets,2018-19,sane,declared,38191,all checks pass
 Benin,cluster_features,2018-19,sane,declared,670,warn: has_household_index
 Benin,community_prices,,undeclared,absent,,not declared by this country for any wave
 Benin,crop_production,2018-19,sane,declared,9056,"warn: index_levels_match_scheme,no_null_index_levels,no_constant_columns"
-Benin,food_acquired,2018-19,sane,declared,189236,all checks pass
+Benin,food_acquired,2018-19,sane,declared,187930,warn: no_constant_columns
 Benin,food_coping,,undeclared,absent,,not declared by this country for any wave
-Benin,food_expenditures,2018-19,sane,declared,150779,all checks pass
-Benin,food_prices,2018-19,sane,declared,149062,all checks pass
-Benin,food_quantities,2018-19,sane,declared,186362,all checks pass
+Benin,food_expenditures,2018-19,sane,declared,132341,all checks pass
+Benin,food_prices,2018-19,sane,declared,132811,all checks pass
+Benin,food_quantities,2018-19,sane,declared,187338,all checks pass
 Benin,food_security,2018-19,sane,declared,8011,warn: index_levels_match_scheme
 Benin,household_characteristics,2018-19,sane,declared,7991,all checks pass
 Benin,household_roster,2018-19,sane,declared,42343,warn: index_levels_match_scheme
@@ -169,21 +169,21 @@ Burkina_Faso,community_prices,,undeclared,absent,,not declared by this country f
 Burkina_Faso,crop_production,2014,absent,absent,,source not declared for wave
 Burkina_Faso,crop_production,2018-19,sane,declared,15587,"warn: index_levels_match_scheme,no_constant_columns"
 Burkina_Faso,crop_production,2021-22,absent,absent,,source not declared for wave
-Burkina_Faso,food_acquired,2014,sane,declared,557692,all checks pass
-Burkina_Faso,food_acquired,2018-19,sane,declared,137934,all checks pass
-Burkina_Faso,food_acquired,2021-22,sane,declared,69208,all checks pass
+Burkina_Faso,food_acquired,2014,sane,declared,557692,warn: no_constant_columns
+Burkina_Faso,food_acquired,2018-19,sane,declared,138416,warn: no_constant_columns
+Burkina_Faso,food_acquired,2021-22,sane,declared,69708,warn: no_constant_columns
 Burkina_Faso,food_coping,2014,sane,declared,51099,warn: index_levels_match_scheme
 Burkina_Faso,food_coping,2018-19,absent,absent,,source not declared for wave
 Burkina_Faso,food_coping,2021-22,absent,absent,,source not declared for wave
 Burkina_Faso,food_expenditures,2014,sane,declared,239916,all checks pass
-Burkina_Faso,food_expenditures,2018-19,sane,declared,97802,all checks pass
-Burkina_Faso,food_expenditures,2021-22,sane,declared,50109,all checks pass
-Burkina_Faso,food_prices,2014,sane,declared,96760,all checks pass
-Burkina_Faso,food_prices,2018-19,sane,declared,97385,all checks pass
-Burkina_Faso,food_prices,2021-22,sane,declared,50000,all checks pass
+Burkina_Faso,food_expenditures,2018-19,sane,declared,91919,all checks pass
+Burkina_Faso,food_expenditures,2021-22,sane,declared,45728,all checks pass
+Burkina_Faso,food_prices,2014,sane,declared,96582,all checks pass
+Burkina_Faso,food_prices,2018-19,sane,declared,91945,all checks pass
+Burkina_Faso,food_prices,2021-22,sane,declared,45755,all checks pass
 Burkina_Faso,food_quantities,2014,sane,declared,108396,all checks pass
-Burkina_Faso,food_quantities,2018-19,sane,declared,137452,all checks pass
-Burkina_Faso,food_quantities,2021-22,sane,declared,69017,all checks pass
+Burkina_Faso,food_quantities,2018-19,sane,declared,138383,all checks pass
+Burkina_Faso,food_quantities,2021-22,sane,declared,69662,all checks pass
 Burkina_Faso,food_security,2014,absent,absent,,source not declared for wave
 Burkina_Faso,food_security,2018-19,sane,declared,7009,warn: index_levels_match_scheme
 Burkina_Faso,food_security,2021-22,sane,declared,3224,warn: index_levels_match_scheme
@@ -308,23 +308,23 @@ CotedIvoire,food_acquired,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,food_acquired,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,food_acquired,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,food_acquired,1988-89,absent,absent,,source not declared for wave
-CotedIvoire,food_acquired,2018-19,sane,declared,296241,all checks pass
+CotedIvoire,food_acquired,2018-19,sane,declared,296945,warn: no_constant_columns
 CotedIvoire,food_coping,,undeclared,absent,,not declared by this country for any wave
 CotedIvoire,food_expenditures,1985-86,dropped,declared,,declared for wave but absent from built t-index
 CotedIvoire,food_expenditures,1986-87,dropped,declared,,declared for wave but absent from built t-index
 CotedIvoire,food_expenditures,1987-88,dropped,declared,,declared for wave but absent from built t-index
 CotedIvoire,food_expenditures,1988-89,dropped,declared,,declared for wave but absent from built t-index
-CotedIvoire,food_expenditures,2018-19,sane,declared,215620,all checks pass
+CotedIvoire,food_expenditures,2018-19,sane,declared,182891,all checks pass
 CotedIvoire,food_prices,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,food_prices,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,food_prices,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,food_prices,1988-89,absent,absent,,source not declared for wave
-CotedIvoire,food_prices,2018-19,sane,declared,213872,all checks pass
+CotedIvoire,food_prices,2018-19,sane,declared,182891,all checks pass
 CotedIvoire,food_quantities,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,food_quantities,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,food_quantities,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,food_quantities,1988-89,absent,absent,,source not declared for wave
-CotedIvoire,food_quantities,2018-19,sane,declared,294493,all checks pass
+CotedIvoire,food_quantities,2018-19,sane,declared,296945,all checks pass
 CotedIvoire,food_security,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,food_security,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,food_security,1987-88,absent,absent,,source not declared for wave
@@ -424,11 +424,11 @@ Ethiopia,crop_production,2013-14,sane,declared,26159,warn: index_levels_match_sc
 Ethiopia,crop_production,2015-16,sane,declared,25920,warn: index_levels_match_scheme
 Ethiopia,crop_production,2018-19,sane,declared,14092,warn: index_levels_match_scheme
 Ethiopia,crop_production,2021-22,sane,declared,11604,warn: index_levels_match_scheme
-Ethiopia,food_acquired,2011-12,sane,declared,31084,warn: index_levels_match_scheme
-Ethiopia,food_acquired,2013-14,sane,declared,44337,warn: index_levels_match_scheme
-Ethiopia,food_acquired,2015-16,sane,declared,67161,warn: index_levels_match_scheme
-Ethiopia,food_acquired,2018-19,sane,declared,98800,warn: index_levels_match_scheme
-Ethiopia,food_acquired,2021-22,sane,declared,84538,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2011-12,sane,declared,30815,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2013-14,sane,declared,44304,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2015-16,sane,declared,67209,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2018-19,sane,declared,99541,warn: index_levels_match_scheme
+Ethiopia,food_acquired,2021-22,sane,declared,84587,warn: index_levels_match_scheme
 Ethiopia,food_coping,2011-12,sane,declared,29523,warn: index_levels_match_scheme
 Ethiopia,food_coping,2013-14,sane,declared,41926,warn: index_levels_match_scheme
 Ethiopia,food_coping,2015-16,sane,declared,39631,warn: index_levels_match_scheme
@@ -439,16 +439,16 @@ Ethiopia,food_expenditures,2013-14,sane,declared,32484,all checks pass
 Ethiopia,food_expenditures,2015-16,sane,declared,52852,all checks pass
 Ethiopia,food_expenditures,2018-19,sane,declared,84871,all checks pass
 Ethiopia,food_expenditures,2021-22,sane,declared,74718,all checks pass
-Ethiopia,food_prices,2011-12,sane,declared,18905,all checks pass
-Ethiopia,food_prices,2013-14,sane,declared,32298,all checks pass
+Ethiopia,food_prices,2011-12,sane,declared,18941,all checks pass
+Ethiopia,food_prices,2013-14,sane,declared,32248,all checks pass
 Ethiopia,food_prices,2015-16,sane,declared,52849,all checks pass
 Ethiopia,food_prices,2018-19,sane,declared,84871,all checks pass
 Ethiopia,food_prices,2021-22,sane,declared,74718,all checks pass
-Ethiopia,food_quantities,2011-12,sane,declared,30812,all checks pass
-Ethiopia,food_quantities,2013-14,sane,declared,44127,all checks pass
-Ethiopia,food_quantities,2015-16,sane,declared,67158,all checks pass
-Ethiopia,food_quantities,2018-19,sane,declared,98800,all checks pass
-Ethiopia,food_quantities,2021-22,sane,declared,84538,all checks pass
+Ethiopia,food_quantities,2011-12,sane,declared,30593,all checks pass
+Ethiopia,food_quantities,2013-14,sane,declared,44152,all checks pass
+Ethiopia,food_quantities,2015-16,sane,declared,67209,all checks pass
+Ethiopia,food_quantities,2018-19,sane,declared,99541,all checks pass
+Ethiopia,food_quantities,2021-22,sane,declared,84587,all checks pass
 Ethiopia,food_security,2011-12,absent,absent,,source not declared for wave
 Ethiopia,food_security,2013-14,absent,absent,,source not declared for wave
 Ethiopia,food_security,2015-16,absent,absent,,source not declared for wave
@@ -488,10 +488,10 @@ Ethiopia,livestock,2021-22,sane,declared,4907,all checks pass
 Ethiopia,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
 Ethiopia,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
 Ethiopia,nutrition,2011-12,sane,declared,3899,warn: no_constant_columns
-Ethiopia,nutrition,2013-14,sane,declared,5200,warn: no_constant_columns
+Ethiopia,nutrition,2013-14,sane,declared,5198,warn: no_constant_columns
 Ethiopia,nutrition,2015-16,sane,declared,4912,all checks pass
 Ethiopia,nutrition,2018-19,sane,declared,6694,all checks pass
-Ethiopia,nutrition,2021-22,sane,declared,4942,all checks pass
+Ethiopia,nutrition,2021-22,sane,declared,4941,all checks pass
 Ethiopia,panel_ids,,sane,declared,4954,4954 entries
 Ethiopia,people_last7days,2011-12,sane,declared,18864,warn: index_levels_match_scheme
 Ethiopia,people_last7days,2013-14,sane,declared,23785,warn: index_levels_match_scheme
@@ -518,11 +518,11 @@ Ethiopia,sample,2013-14,sane,declared,5262,all checks pass
 Ethiopia,sample,2015-16,sane,declared,4954,all checks pass
 Ethiopia,sample,2018-19,sane,declared,6770,all checks pass
 Ethiopia,sample,2021-22,sane,declared,4959,all checks pass
-Ethiopia,shocks,2011-12,sane,declared,3552,all checks pass
-Ethiopia,shocks,2013-14,sane,declared,3127,all checks pass
-Ethiopia,shocks,2015-16,sane,declared,5540,all checks pass
-Ethiopia,shocks,2018-19,sane,declared,3736,all checks pass
-Ethiopia,shocks,2021-22,sane,declared,5823,all checks pass
+Ethiopia,shocks,2011-12,sane,declared,3553,all checks pass
+Ethiopia,shocks,2013-14,sane,declared,3128,all checks pass
+Ethiopia,shocks,2015-16,sane,declared,5541,all checks pass
+Ethiopia,shocks,2018-19,sane,declared,3736,warn: no_constant_columns
+Ethiopia,shocks,2021-22,sane,declared,5823,warn: no_constant_columns
 Ethiopia,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Ethiopia,updated_ids,,sane,declared,2,2 entries
 EthiopiaRHS,anthropometry,1989,absent,absent,,source not declared for wave
@@ -696,15 +696,15 @@ GhanaLSS,community_prices,2016-17,sane,declared,220908,warn: has_household_index
 GhanaLSS,crop_production,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,food_acquired,1987-88,sane,declared,71605,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,food_acquired,1988-89,sane,declared,72649,"warn: index_levels_match_scheme,no_constant_columns"
-GhanaLSS,food_acquired,1991-92,sane,declared,623600,warn: index_levels_match_scheme
-GhanaLSS,food_acquired,1998-99,sane,declared,542105,warn: index_levels_match_scheme
-GhanaLSS,food_acquired,2005-06,sane,declared,1115396,warn: index_levels_match_scheme
-GhanaLSS,food_acquired,2012-13,sane,declared,1709094,warn: index_levels_match_scheme
-GhanaLSS,food_acquired,2016-17,sane,declared,1124871,warn: index_levels_match_scheme
+GhanaLSS,food_acquired,1991-92,sane,declared,681645,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,1998-99,sane,declared,542105,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,2005-06,sane,declared,1136648,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,2012-13,sane,declared,1709094,"warn: index_levels_match_scheme,no_constant_columns"
+GhanaLSS,food_acquired,2016-17,sane,declared,1124871,"warn: index_levels_match_scheme,no_constant_columns"
 GhanaLSS,food_coping,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,food_expenditures,1987-88,sane,declared,50830,all checks pass
 GhanaLSS,food_expenditures,1988-89,sane,declared,49312,all checks pass
-GhanaLSS,food_expenditures,1991-92,sane,declared,95672,all checks pass
+GhanaLSS,food_expenditures,1991-92,sane,declared,103692,all checks pass
 GhanaLSS,food_expenditures,1998-99,sane,declared,134627,all checks pass
 GhanaLSS,food_expenditures,2005-06,sane,declared,230823,all checks pass
 GhanaLSS,food_expenditures,2012-13,sane,declared,461602,all checks pass
@@ -716,11 +716,11 @@ GhanaLSS,food_prices,1998-99,dropped,declared,,declared for wave but absent from
 GhanaLSS,food_prices,2005-06,dropped,declared,,declared for wave but absent from built t-index
 GhanaLSS,food_prices,2012-13,dropped,declared,,declared for wave but absent from built t-index
 GhanaLSS,food_prices,2016-17,sane,declared,407478,all checks pass
-GhanaLSS,food_quantities,1987-88,sane,declared,71605,all checks pass
+GhanaLSS,food_quantities,1987-88,sane,declared,71602,all checks pass
 GhanaLSS,food_quantities,1988-89,sane,declared,72649,all checks pass
-GhanaLSS,food_quantities,1991-92,sane,declared,114141,all checks pass
+GhanaLSS,food_quantities,1991-92,sane,declared,122161,all checks pass
 GhanaLSS,food_quantities,1998-99,sane,declared,161176,all checks pass
-GhanaLSS,food_quantities,2005-06,sane,declared,259202,all checks pass
+GhanaLSS,food_quantities,2005-06,sane,declared,261079,all checks pass
 GhanaLSS,food_quantities,2012-13,sane,declared,511717,all checks pass
 GhanaLSS,food_quantities,2016-17,sane,declared,420539,all checks pass
 GhanaLSS,food_security,1987-88,absent,absent,,"unsure: C1 could not run: GLSS1 ships fixed-format .DAT with .DCT dictionaries that carry variable NAMES only (no variable labels, no value labels) -- 77/93 dictionaries swept, none food-adequacy shaped. C4 could not run: 1987-88/Documentation/questionnaire/GHA_1987_GLSS_Questionnaire_EN.pdf is 78 CCITT-fax page scans with ZERO embedded font objects (pdfminer extracts 0 non-whitespace chars), and no OCR is available here, so the form cannot be searched for a stray food-adequacy item. What IS established: the joint LSMS Basic Information Document 1987-88/Documentation/technical document/GHA_1987_GLSS_Basicinfo_EN.pdf (covers both rounds, full text layer) enumerates every module of the household questionnaire in 2.1 -- sections 0,1A-C,2A-B,3I-II,4,5A-H,6,7,8,9A-K,10A-D,11A-D,12A-B,13A-B,14A-B,15A-C,16A-B,17A-C -- and names no food-security or food-adequacy module; section 12 is 'FOOD EXPENSES AND HOME PRODUCTION' (item-code loops, Y12A/Y12B). Not closed: a single item inside a section cannot be excluded without reading or OCRing the 78-page scan."
@@ -771,10 +771,10 @@ GhanaLSS,months_food_inadequate,,undeclared,absent,,not declared by this country
 GhanaLSS,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
 GhanaLSS,nutrition,1987-88,absent,absent,,source not declared for wave
 GhanaLSS,nutrition,1988-89,absent,absent,,source not declared for wave
-GhanaLSS,nutrition,1991-92,sane,declared,2532,all checks pass
-GhanaLSS,nutrition,1998-99,sane,declared,3745,all checks pass
-GhanaLSS,nutrition,2005-06,sane,declared,4563,all checks pass
-GhanaLSS,nutrition,2012-13,sane,declared,8908,all checks pass
+GhanaLSS,nutrition,1991-92,sane,declared,2642,all checks pass
+GhanaLSS,nutrition,1998-99,sane,declared,3781,all checks pass
+GhanaLSS,nutrition,2005-06,sane,declared,4868,all checks pass
+GhanaLSS,nutrition,2012-13,sane,declared,9372,all checks pass
 GhanaLSS,nutrition,2016-17,sane,declared,13910,all checks pass
 GhanaLSS,panel_ids,,sane,declared,714,714 entries
 GhanaLSS,people_last7days,,undeclared,absent,,not declared by this country for any wave
@@ -884,11 +884,11 @@ Guinea-Bissau,assets,2018-19,sane,declared,30125,all checks pass
 Guinea-Bissau,cluster_features,2018-19,sane,declared,450,warn: has_household_index
 Guinea-Bissau,community_prices,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,crop_production,2018-19,sane,declared,10579,"warn: index_levels_match_scheme,no_constant_columns"
-Guinea-Bissau,food_acquired,2018-19,sane,declared,127219,all checks pass
+Guinea-Bissau,food_acquired,2018-19,sane,declared,126925,warn: no_constant_columns
 Guinea-Bissau,food_coping,,undeclared,absent,,not declared by this country for any wave
-Guinea-Bissau,food_expenditures,2018-19,sane,declared,90795,all checks pass
-Guinea-Bissau,food_prices,2018-19,sane,declared,89773,all checks pass
-Guinea-Bissau,food_quantities,2018-19,sane,declared,126197,all checks pass
+Guinea-Bissau,food_expenditures,2018-19,sane,declared,77155,all checks pass
+Guinea-Bissau,food_prices,2018-19,sane,declared,77155,all checks pass
+Guinea-Bissau,food_quantities,2018-19,sane,declared,126925,all checks pass
 Guinea-Bissau,food_security,2018-19,sane,declared,5350,warn: index_levels_match_scheme
 Guinea-Bissau,household_characteristics,2018-19,sane,declared,5348,all checks pass
 Guinea-Bissau,household_roster,2018-19,sane,declared,42839,warn: index_levels_match_scheme
@@ -1213,26 +1213,26 @@ Mali,crop_production,2014-15,sane,declared,10341,warn: index_levels_match_scheme
 Mali,crop_production,2017-18,sane,declared,24719,"warn: index_levels_match_scheme,no_constant_columns"
 Mali,crop_production,2018-19,absent,absent,,source not declared for wave
 Mali,crop_production,2021-22,absent,absent,,source not declared for wave
-Mali,food_acquired,2014-15,sane,declared,122085,all checks pass
+Mali,food_acquired,2014-15,sane,declared,122085,warn: no_constant_columns
 Mali,food_acquired,2017-18,absent,absent,,source not declared for wave
-Mali,food_acquired,2018-19,sane,declared,161564,all checks pass
-Mali,food_acquired,2021-22,sane,declared,146622,all checks pass
+Mali,food_acquired,2018-19,sane,declared,162032,warn: no_constant_columns
+Mali,food_acquired,2021-22,sane,declared,146929,warn: no_constant_columns
 Mali,food_coping,2014-15,sane,declared,18261,warn: index_levels_match_scheme
 Mali,food_coping,2017-18,absent,absent,,source not declared for wave
 Mali,food_coping,2018-19,absent,absent,,source not declared for wave
 Mali,food_coping,2021-22,absent,absent,,source not declared for wave
 Mali,food_expenditures,2014-15,sane,declared,90925,all checks pass
 Mali,food_expenditures,2017-18,absent,absent,,source not declared for wave
-Mali,food_expenditures,2018-19,sane,declared,126586,all checks pass
-Mali,food_expenditures,2021-22,sane,declared,115808,all checks pass
+Mali,food_expenditures,2018-19,sane,declared,103931,all checks pass
+Mali,food_expenditures,2021-22,sane,declared,103411,all checks pass
 Mali,food_prices,2014-15,sane,declared,99954,all checks pass
 Mali,food_prices,2017-18,absent,absent,,source not declared for wave
-Mali,food_prices,2018-19,sane,declared,125873,all checks pass
-Mali,food_prices,2021-22,sane,declared,116367,all checks pass
+Mali,food_prices,2018-19,sane,declared,103931,all checks pass
+Mali,food_prices,2021-22,sane,declared,104249,all checks pass
 Mali,food_quantities,2014-15,sane,declared,108711,all checks pass
 Mali,food_quantities,2017-18,absent,absent,,source not declared for wave
-Mali,food_quantities,2018-19,sane,declared,160851,all checks pass
-Mali,food_quantities,2021-22,sane,declared,144855,all checks pass
+Mali,food_quantities,2018-19,sane,declared,162032,all checks pass
+Mali,food_quantities,2021-22,sane,declared,145653,all checks pass
 Mali,food_security,2014-15,absent,absent,,source not declared for wave
 Mali,food_security,2017-18,absent,absent,,source not declared for wave
 Mali,food_security,2018-19,sane,declared,6596,warn: index_levels_match_scheme
@@ -1364,21 +1364,21 @@ Niger,crop_production,2018-19,sane,declared,13717,"warn: index_levels_match_sche
 Niger,crop_production,2021-22,sane,declared,11923,"warn: index_levels_match_scheme,no_constant_columns"
 Niger,food_acquired,2011-12,absent,absent,,source not declared for wave
 Niger,food_acquired,2014-15,absent,absent,,source not declared for wave
-Niger,food_acquired,2018-19,sane,declared,107939,all checks pass
-Niger,food_acquired,2021-22,sane,declared,131092,all checks pass
+Niger,food_acquired,2018-19,sane,declared,108333,warn: no_constant_columns
+Niger,food_acquired,2021-22,sane,declared,131549,warn: no_constant_columns
 Niger,food_coping,,undeclared,absent,,not declared by this country for any wave
 Niger,food_expenditures,2011-12,absent,absent,,source not declared for wave
 Niger,food_expenditures,2014-15,absent,absent,,source not declared for wave
-Niger,food_expenditures,2018-19,sane,declared,86199,all checks pass
-Niger,food_expenditures,2021-22,sane,declared,112932,all checks pass
+Niger,food_expenditures,2018-19,sane,declared,66783,all checks pass
+Niger,food_expenditures,2021-22,sane,declared,98249,all checks pass
 Niger,food_prices,2011-12,absent,absent,,source not declared for wave
 Niger,food_prices,2014-15,absent,absent,,source not declared for wave
-Niger,food_prices,2018-19,sane,declared,85741,all checks pass
-Niger,food_prices,2021-22,sane,declared,112629,all checks pass
+Niger,food_prices,2018-19,sane,declared,66783,all checks pass
+Niger,food_prices,2021-22,sane,declared,98247,all checks pass
 Niger,food_quantities,2011-12,absent,absent,,source not declared for wave
 Niger,food_quantities,2014-15,absent,absent,,source not declared for wave
-Niger,food_quantities,2018-19,sane,declared,107481,all checks pass
-Niger,food_quantities,2021-22,sane,declared,130791,all checks pass
+Niger,food_quantities,2018-19,sane,declared,108333,all checks pass
+Niger,food_quantities,2021-22,sane,declared,131549,all checks pass
 Niger,food_security,2011-12,absent,absent,,source not declared for wave
 Niger,food_security,2014-15,sane,declared,3557,warn: index_levels_match_scheme
 Niger,food_security,2018-19,sane,declared,6021,warn: index_levels_match_scheme
@@ -1801,15 +1801,15 @@ Senegal,cluster_features,2021-22,sane,declared,596,warn: has_household_index
 Senegal,community_prices,,undeclared,absent,,not declared by this country for any wave
 Senegal,crop_production,2018-19,sane,declared,8416,"warn: index_levels_match_scheme,no_constant_columns"
 Senegal,crop_production,2021-22,absent,absent,,source not declared for wave
-Senegal,food_acquired,2018-19,sane,declared,215266,all checks pass
-Senegal,food_acquired,2021-22,sane,declared,220447,all checks pass
+Senegal,food_acquired,2018-19,sane,declared,215660,warn: no_constant_columns
+Senegal,food_acquired,2021-22,sane,declared,220916,warn: no_constant_columns
 Senegal,food_coping,,undeclared,absent,,not declared by this country for any wave
-Senegal,food_expenditures,2018-19,sane,declared,190819,all checks pass
-Senegal,food_expenditures,2021-22,sane,declared,197387,all checks pass
-Senegal,food_prices,2018-19,sane,declared,190304,all checks pass
-Senegal,food_prices,2021-22,sane,declared,196968,all checks pass
-Senegal,food_quantities,2018-19,sane,declared,214745,all checks pass
-Senegal,food_quantities,2021-22,sane,declared,219644,all checks pass
+Senegal,food_expenditures,2018-19,sane,declared,149434,all checks pass
+Senegal,food_expenditures,2021-22,sane,declared,170204,all checks pass
+Senegal,food_prices,2018-19,sane,declared,149434,all checks pass
+Senegal,food_prices,2021-22,sane,declared,170296,all checks pass
+Senegal,food_quantities,2018-19,sane,declared,215639,all checks pass
+Senegal,food_quantities,2021-22,sane,declared,220709,all checks pass
 Senegal,food_security,2018-19,sane,declared,7156,warn: index_levels_match_scheme
 Senegal,food_security,2021-22,sane,declared,7109,warn: index_levels_match_scheme
 Senegal,household_characteristics,2018-19,sane,declared,7150,all checks pass
@@ -2173,11 +2173,11 @@ Togo,assets,2018,sane,declared,31462,all checks pass
 Togo,cluster_features,2018,sane,declared,540,warn: has_household_index
 Togo,community_prices,,undeclared,absent,,not declared by this country for any wave
 Togo,crop_production,2018,sane,declared,11563,"warn: index_levels_match_scheme,no_constant_columns"
-Togo,food_acquired,2018,sane,declared,112557,all checks pass
+Togo,food_acquired,2018,sane,declared,112445,warn: no_constant_columns
 Togo,food_coping,,undeclared,absent,,not declared by this country for any wave
-Togo,food_expenditures,2018,sane,declared,74668,all checks pass
-Togo,food_prices,2018,sane,declared,75512,all checks pass
-Togo,food_quantities,2018,sane,declared,110082,all checks pass
+Togo,food_expenditures,2018,sane,declared,66043,all checks pass
+Togo,food_prices,2018,sane,declared,67343,all checks pass
+Togo,food_quantities,2018,sane,declared,110742,all checks pass
 Togo,food_security,2018,sane,declared,6163,warn: index_levels_match_scheme
 Togo,household_characteristics,2018,sane,declared,6146,all checks pass
 Togo,household_roster,2018,sane,declared,27480,warn: index_levels_match_scheme
