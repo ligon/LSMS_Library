@@ -93,11 +93,17 @@ Data Scheme:
     Int_t: datetime
 
   food_acquired:
-    # Canonical post-2026-05-05 (GH #169): s ∈ {purchased, produced}.
-    # Wave scripts call ethiopia.food_acquired which derives Produced
-    # from (quantity - quantity_purchased) and applies the framework
-    # canonical-melt helper.  See
-    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org.
+    # Canonical post-2026-05-05 (GH #169); s in {purchased, produced,
+    # inkind} since GH #874 (2026-09-12).  ESS SECTION 5A / 6A asks each
+    # acquisition source DIRECTLY, with its own unit code: Q3/Q4 purchases
+    # and spend, Q5 own production, Q6 gifts and other sources.  Wave
+    # scripts call ethiopia.food_acquired, which reads all three and melts
+    # them; NOTHING here is derived.  Before #874 the wave scripts read only
+    # Q2/Q3/Q4 and `produced` was the residual (Q2 - Q3).clip(0), which
+    # folded gifts and food aid into own production and left Ethiopia with
+    # no `inkind` row at all.  See
+    # slurm_logs/DESIGN_food_acquired_canonical_2026-05-05.org and
+    # CONTENTS.org "food_acquired now reads Q3/Q5/Q6 directly".
     index: (t, i, j, u, s)
     Quantity: float
     Expenditure: float

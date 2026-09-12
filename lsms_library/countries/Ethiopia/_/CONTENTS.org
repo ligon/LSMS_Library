@@ -1869,3 +1869,140 @@ only rule that CAN serve.
    UNREST/VIOLENCE" -- the 2021-22 =data_info.yml= mapping keys differ from
    the data by a trailing space.  Cosmetic in isolation, but it splits
    those shock types in any cross-wave count.
+
+* food_acquired reads Q3/Q5/Q6 directly; =produced= is no longer a residual (GH #874, 2026-09-12)
+
+** What was served before, and why it was wrong
+
+The wave scripts read only Q2 (total consumed), Q3 (purchased) and Q4
+(spend).  =ethiopia.food_acquired= then derived
+=Produced = (Q2 - Q3).clip(lower=0)= and handed that to
+=build_transforms.food_acquired_to_canonical=, whose contract inverts it:
+=purchased = Quantity - Produced=.  So the table served
+
+: produced  = clip(Q2 - Q3, 0)      -- a RESIDUAL, never an answer
+: purchased = min(Q2, Q3)           -- not Q3
+
+even though SECTION 5A / 6A asks each source directly (see "Food prices:
+what the ESS asks" above for the verbatim six questions).  Consequences:
+gifts and food aid (Q6) were served as *own production*; Ethiopia had no
+=s='inkind'= row at all, in any wave; a household that bought more than it
+ate that week had its purchase truncated to Q2 while keeping the full Q4
+spend; and Q5/Q6 -- populated on essentially every consumed row -- were
+never read.  Cross-country this meant =Feature('food_acquired')= mixed
+Nigeria's reported own production with Ethiopia's residual under one
+=s='produced'= label.
+
+** What is served now
+
+One long-form row per REPORTED source, each carrying *its own unit code*
+(=hh_s5aq0{3,5,6}_b= / =s6aq0{3,5,6}b=); nothing is derived, nothing is
+clipped, nothing is min'd:
+
+| s         | Quantity | unit | Expenditure |
+|-----------+----------+------+-------------|
+| purchased | Q3       | Q3's | Q4          |
+| produced  | Q5       | Q5's | NaN         |
+| inkind    | Q6       | Q6's | NaN         |
+
+Q2 is read but NOT served as a row -- it is the sum of the three, and it is
+used only to screen self-contradictory answers.  Expenditure stays NaN on
+=produced= / =inkind= because *the ESS asks no value of own consumption*
+(documented above); Q4 is the module's only monetary field.
+
+The old single-=u= approximation is gone with the helper that required it.
+It was disclosed in the docstring as a ~0.3% accuracy loss, and *in 2011-12
+that understated it by orders of magnitude*: 99 of 19,266 positive Q3 rows
+and 69 of 10,226 positive Q5 rows disagree with the Q2 unit, and they carry
+17.0M and 40.4M of those columns' raw totals respectively -- they are
+1000x data-entry slips ("Onion, Q2 = 1,400 Gram, Q3 = 1,400,000 Tuba";
+"Sorghum, Q2 = 10,000, Q5 = 10,600,000").  =min(Q2, Q3)= was accidentally
+suppressing them.  They are now served as the survey recorded them.
+
+** Identity closure, measured on the served construction
+
+=Q2 = Q3 + Q5 + Q6=, restricted to rows where every populated source's unit
+agrees with Q2's (a zero quantity carries no unit and is vacuous):
+
+| wave    | testable rows | identity holds |      % |
+|---------+---------------+----------------+--------|
+| 2011-12 |         30361 |          29642 |  97.63 |
+| 2013-14 |         43430 |          42430 |  97.70 |
+| 2015-16 |         66948 |          66948 | 100.00 |
+| 2018-19 |         95954 |          95885 |  99.93 |
+| 2021-22 |         83459 |          83365 |  99.89 |
+
+The old construction closed by *construction*, not by evidence: it served
+=min(Q2,Q3) + clip(Q2-Q3,0) = Q2= for free.  A 97.6% closure on the
+survey's own four numbers is a measurement; 100% on two of them was not.
+
+** Rows by =s= and raw Quantity, before -> after (country API)
+
+| wave    | s         | rows before | rows after | Quantity before | Quantity after |
+|---------+-----------+-------------+------------+-----------------+----------------|
+| 2011-12 | purchased |       19484 |      19488 |       8,814,926 |     25,818,156 |
+|         | produced  |       11600 |      10226 |      11,731,933 |     50,898,830 |
+|         | inkind    |           - |       1101 |               - |      3,240,370 |
+| 2013-14 | purchased |       32808 |      32808 |       6,023,928 |      6,070,606 |
+|         | produced  |       11529 |       9855 |       2,753,343 |      2,299,881 |
+|         | inkind    |           - |       1641 |               - |        363,035 |
+| 2015-16 | purchased |       52997 |      52997 |       3,614,328 |      3,614,660 |
+|         | produced  |       14164 |      11457 |         662,437 |        554,083 |
+|         | inkind    |           - |       2755 |               - |        109,021 |
+| 2018-19 | purchased |       84922 |      84922 |       3,954,043 |      3,954,043 |
+|         | produced  |       13878 |      10750 |         426,138 |        302,495 |
+|         | inkind    |           - |       3869 |               - |        108,891 |
+| 2021-22 | purchased |       74755 |      74755 |       4,307,450 |      4,309,453 |
+|         | produced  |        7682 |       7682 |         165,554 |         94,440 |
+|         | inkind    |           - |       2150 |               - |         69,832 |
+
+*These Quantity columns sum across incompatible units and are diagnostics,
+not quantities.*  2011-12's apparent 3-6x rise is entirely the unit-mismatch
+rows above: restricted to rows whose source unit agrees with Q2's, W1's Q3
+sums 8.81M (not 25.8M) and its Q5 sums 10.49M (not 50.9M).  The =produced=
+row count falls in every wave because gifts moved out of it into =inkind=.
+
+Two smaller classes moved too:
+
+- *The residual-only class disappears from =produced=.*  Rows with
+  =Q5 = Q6 = 0= but =Q2 > Q3= -- the household reported no own production
+  and no gifts, yet the residual manufactured some -- were 409 rows /
+  177,955 units in 2011-12, 398 / 107,580 in 2013-14, 0 / 8 / 17 rows
+  afterwards.  They are now simply absent, which is what the household said.
+- *2011-12's 34 rows with Q2 missing and Q3 > 0* were served
+  =purchased = 0= (both sides were =fillna(0)=) and survived only on their
+  Q4 spend.  They now carry Q3 (9,162,250 raw units, again mostly gram
+  slips).  Only 4 of the 34 are NEW rows; the other 30 were already present
+  with Quantity 0.
+
+** The screen: counted, warned, never clipped
+
+An answer can contradict itself, and Site Q's contract (CLAUDE.md) is to
+COUNT and NAME, never to clip, drop or NaN.  =ethiopia.food_acquired= warns
+at build time with, per wave: rows whose source quantity exceeds Q2 (per
+source); rows reporting =Q3 = Q5 = Q2 > 0= (the same quantity entered as
+both purchased and own-produced); and positive quantities that arrive with
+no unit code.  Measured (comparison restricted to unit-agreeing rows):
+
+| wave    | Q3 > Q2 | Q5 > Q2 | Q6 > Q2 | Q3 = Q5 = Q2 > 0 | no unit code (p/pr/ik) |
+|---------+---------+---------+---------+------------------+------------------------|
+| 2011-12 |       3 |      17 |       0 |               48 | 9 / 18 / 4             |
+| 2013-14 |       0 |      53 |       0 |               96 | 128 / 39 / 33          |
+| 2015-16 |       0 |       0 |       0 |                0 | 3 / 6 / 3              |
+| 2018-19 |       0 |       4 |       0 |                0 | 0 / 0 / 0              |
+| 2021-22 |       0 |      14 |       0 |                0 | 0 / 0 / 0              |
+
+(These are the cold-BUILD counts.  The warning fires in the wave script's
+process, so a warm reader never sees it -- this table is the only durable
+record.  Re-derive with =LSMS_NO_CACHE=1=.)
+
+A positive quantity with no unit code gets =u = 'Unknown'=, the sentinel,
+*not* NaN: a NaN index key is DELETED outright by the core grain collapse's
+=groupby(dropna=True)= (CLAUDE.md, "Grain Collapse" 3b).  =u == 'Unknown'=
+is not a unit; exclude it before any per-unit aggregation.
+
+** Why this is NOT registered as a derivation
+
+The old construction was a derivation and was un-registered; the new one is
+a *read*.  =produced= is now the number the household gave to Q5.  There is
+nothing left to register.

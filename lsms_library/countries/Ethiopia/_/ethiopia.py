@@ -242,60 +242,114 @@ def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market'
 
     return prices
 
-def food_acquired(fn,myvars):
+def food_acquired(fn, myvars):
     """Reshape Ethiopia's food_acquired into the canonical (t, i, j, u, s) form.
 
-    Phase 3 of GH #169 / DESIGN_food_acquired_canonical_2026-05-05.org.
-    Per the design row for Ethiopia:
-        "derive purchased + produced (= total - purchased)"
+    GH #874.  Every served quantity is a number the ESS actually asked for.
 
-    Ethiopia's source records, per (household, item):
-      - quantity / units              : TOTAL acquired in `units`
-      - value_purchased               : monetary value of the purchased subset
-      - quantity_purchased / units_purchased : amount and unit of the
-        purchased subset
+    ESS Household Questionnaire SECTION 5A / 6A (FOOD LAST 7 DAYS) asks, per
+    (household, item):
 
-    The wave script supplies `myvars` mapping these to the source columns;
-    `t` is appended from the wave folder name (parent of cwd).
+      1. did you consume any [ITEM]?
+      2. how much in TOTAL did your household consume?          (Q2 + unit)
+      3. how much came from PURCHASES?                          (Q3 + unit)
+      4. how much did you SPEND?                                (Q4, birr)
+      5. how much came from OWN PRODUCTION?                     (Q5 + unit)
+      6. how much came from GIFTS AND OTHER SOURCES?            (Q6 + unit)
 
-    Unit handling (decision documented 2026-05-06):
-      In wave 1 (2011-12) only 64/19,231 (0.3%) of rows where both quantity
-      and quantity_purchased are positive have `units != units_purchased`.
-      The asymmetry is rare enough that we treat the row as "single-unit":
-      we use `units` as the canonical `u` axis and silently drop
-      `units_purchased`.  Produced is then derived in the same unit:
-          Produced = (quantity - quantity_purchased).clip(lower=0)
-      For the rare unit-mismatch rows the subtraction is approximate, but
-      preserving the framework helper's one-unit-per-row contract is more
-      important than the ~0.3% accuracy loss.  No kg conversion is done at
-      this layer — that lives downstream in the framework's
-      food_quantities_from_acquired path.
+    so the three acquisition sources are reported directly, each with its
+    own unit code:
+
+      * ``s='purchased'`` : Quantity = Q3, unit = Q3's unit, Expenditure = Q4
+      * ``s='produced'``  : Quantity = Q5, unit = Q5's unit, Expenditure NaN
+      * ``s='inkind'``    : Quantity = Q6, unit = Q6's unit, Expenditure NaN
+
+    Q4 is the only monetary field in the module and it is attached to Q3, so
+    produced and in-kind rows carry no Expenditure -- the survey never values
+    them (``_/CONTENTS.org`` "The ESS asks NO value of own-consumption").
+    Q2 is the sum of the three and is NOT served as a row; it is read only to
+    screen self-contradictory Q5 answers (below).
+
+    What this replaced (GH #874, 2026-09-12).  Until now the wave scripts read
+    only Q2/Q3/Q4 and this function derived
+    ``Produced = (Q2 - Q3).clip(lower=0)``, which
+    ``build_transforms.food_acquired_to_canonical`` then inverted into
+    ``purchased = Q2 - Produced = min(Q2, Q3)``.  So Ethiopia served a
+    residual -- gifts, food aid and any Q2-vs-Q3 disagreement folded into
+    "own production" -- had no ``s='inkind'`` row at all, and silently
+    truncated a purchase that exceeded the week's consumption.  Q5 and Q6
+    were never read.  This function therefore no longer calls
+    ``food_acquired_to_canonical`` (whose contract IS the residual split);
+    it builds the long form per source, like ``nigeria.food_acquired_for_wave``.
+
+    Units.  Each source now keeps its OWN unit code.  The old single-``u``
+    approximation (documented here as a ~0.3% accuracy loss) existed only to
+    satisfy the canonical helper's one-row-one-unit contract and is gone with
+    it.  A unit code is recorded in these files only where the corresponding
+    quantity is > 0, so a row kept for its Expenditure alone (Q3 = 0 but
+    Q4 > 0) can have no unit; those get the ``'Unknown'`` sentinel rather
+    than a NaN index key, which the core grain collapse would DELETE
+    (CLAUDE.md, "Grain Collapse" §3b; the landed Niger/Burkina #842 pattern).
+
+    Screen (GH #874 decision 3).  ``Q5 > Q2`` -- more own production consumed
+    than total consumption -- is self-contradictory, and only the direct
+    question can be at fault (mostly decimal slips).  It is COUNTED and
+    warned about, never clipped, dropped or NaN'd -- and so are the same
+    contradiction on the other two sources (``Q3 > Q2``, ``Q6 > Q2``), which
+    the old residual construction silently truncated away: same
+    contract as ``transformations._screen_reported_factors`` and
+    ``quantity_audit.check_quantities``.  The double-count class
+    ``Q3 = Q5 = Q2 > 0`` (the same quantity entered as both purchased and
+    own-produced) is counted alongside it.  Both counts are measured only on
+    rows whose Q5 unit agrees with the Q2 unit (a zero Q5 is unit-vacuous).
+
+    Parameters
+    ----------
+    fn : str
+        Path to the wave's SECTION 5A / 6A file, read via ``get_dataframe``.
+    myvars : dict
+        Maps the canonical names ``item``, ``HHID``, ``quantity``/``units``
+        (Q2), ``quantity_purchased``/``units_purchased``/``value_purchased``
+        (Q3/Q4), ``quantity_produced``/``units_produced`` (Q5) and
+        ``quantity_inkind``/``units_inkind`` (Q6) to this wave's source
+        columns.
+
+    Returns
+    -------
+    pd.DataFrame
+        Indexed on ``(t, i, j, u, s)`` with columns ``Quantity``,
+        ``Expenditure``.  ``v`` is intentionally absent -- joined from
+        ``sample()`` at API time.
     """
-    from lsms_library.transformations import food_acquired_to_canonical
+    from lsms_library.transformations import _finalize_canonical_food_acquired
 
-    df = get_dataframe(fn,convert_categoricals=True)
+    df = get_dataframe(fn, convert_categoricals=True)
 
-    df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
+    df = df.loc[:, list(myvars.values())].rename(columns={v: k for k, v in myvars.items()})
+
+    _UNIT_COLS = ('units', 'units_purchased', 'units_produced', 'units_inkind')
 
     # Correct unit labels (title-case + a few historical typos).  Preserved
     # from the legacy implementation -- keeps `u` values consistent with the
     # countries/Ethiopia/_/conversion_to_kgs.json keys that downstream code
-    # still references for kg conversion.
-    df['units_purchased'] = df['units_purchased'].str.title()
-    df['units'] = df['units'].str.title()
+    # still references for kg conversion.  Applied to ALL FOUR unit columns
+    # now that each source carries its own (GH #874); it used to run on two.
+    for _col in _UNIT_COLS:
+        df[_col] = df[_col].astype(str).str.title()
     # Strip the survey's "NNN. " code prefix that ESS embeds in the unit
     # value labels (e.g. "1. Kilogram", "171. Sini Small") so `u` carries a
     # clean label, not a code-prefixed string (GH #223 Layer 2).  Applied
     # only to the unit columns -- item names / IDs may legitimately start
     # with a digit.  "1. Kilogram" -> "Kilogram" then resolves via KNOWN_METRIC
     # / the global u.org (-> "Kg"); container labels stay native.
-    for _col in ('units', 'units_purchased'):
+    for _col in _UNIT_COLS:
         df[_col] = (df[_col].str.replace(r'^\s*\d+\.\s*', '', regex=True)
-                            .str.strip())
-    rep = {r'\s+':' ',
+                            .str.strip()
+                            .replace({'Nan': pd.NA, 'None': pd.NA, '': pd.NA}))
+    rep = {r'\s+': ' ',
            'Meduim': 'Medium',
-           'Kubaya ':'Kubaya/Cup ',
-           'Milliliter' : 'Mili Liter'}
+           'Kubaya ': 'Kubaya/Cup ',
+           'Milliliter': 'Mili Liter'}
     df = df.replace(rep, regex=True)
 
     # Coerce HHID to canonical integer-string form when it lands as float
@@ -303,14 +357,11 @@ def food_acquired(fn,myvars):
     if df['HHID'].dtype == float:
         df['HHID'] = df['HHID'].astype(str).str.split('.').str[0].replace('nan', pd.NA)
 
-    # Compute Produced = total - purchased, clipped at 0.  In ~0.3% of
-    # populated rows units != units_purchased; we accept the approximate
-    # subtraction and use `units` as the canonical unit u.
-    quantity = pd.to_numeric(df['quantity'], errors='coerce')
-    quantity_purchased = pd.to_numeric(df['quantity_purchased'], errors='coerce')
-    df['Quantity'] = quantity
-    df['Produced'] = (quantity.fillna(0) - quantity_purchased.fillna(0)).clip(lower=0)
-    df['Expenditure'] = pd.to_numeric(df['value_purchased'], errors='coerce')
+    Q2 = pd.to_numeric(df['quantity'], errors='coerce')
+    Q3 = pd.to_numeric(df['quantity_purchased'], errors='coerce')
+    Q5 = pd.to_numeric(df['quantity_produced'], errors='coerce')
+    Q6 = pd.to_numeric(df['quantity_inkind'], errors='coerce')
+    Q4 = pd.to_numeric(df['value_purchased'], errors='coerce')
 
     # Derive `t` from the wave folder name.  Wave scripts cd into
     # countries/Ethiopia/<wave>/_/ before importing this helper, so the
@@ -319,6 +370,44 @@ def food_acquired(fn,myvars):
     import os
     wave = os.path.basename(os.path.dirname(os.getcwd()))
     df['t'] = wave
+
+    # --- Screen: impossible DIRECT answers (GH #874).  Count, warn, serve. --
+    # A zero Q5 is unit-vacuous (no unit is recorded on a zero quantity), so
+    # the comparison is taken where Q5 = 0 or the Q5 unit equals the Q2 unit.
+    def _comparable(q, unit_col):
+        # A zero quantity is unit-vacuous (no unit is recorded on it), so it
+        # is always comparable; otherwise the two labels must agree.  NA on
+        # either side propagates through `==` as NA, which is neither True
+        # nor False -- `fillna(False)` makes "we cannot tell" mean "not
+        # counted", which is the conservative direction for a screen.
+        return ((q.fillna(0) == 0) | (df[unit_col] == df['units'])).fillna(False)
+
+    def _exceeds_total(q, unit_col):
+        return (_comparable(q, unit_col) & Q2.notna() & q.notna() & (q > Q2))
+
+    impossible = _exceeds_total(Q5, 'units_produced')
+    n_exceeds = {'purchased': int(_exceeds_total(Q3, 'units_purchased').sum()),
+                 'produced': int(impossible.sum()),
+                 'inkind': int(_exceeds_total(Q6, 'units_inkind').sum())}
+    double_count = (_comparable(Q5, 'units_produced')
+                    & (Q2 > 0) & (Q3 == Q2) & (Q5 == Q2)).fillna(False)
+    n_impossible, n_double = int(impossible.sum()), int(double_count.sum())
+    # A unit code is recorded only on a positive quantity -- but not always.
+    # Count the positive quantities that arrive with NO unit code: those are
+    # served under the 'Unknown' sentinel below (never NaN, never dropped).
+    n_nounit = {s: int(((q > 0) & u.isna()).sum())
+                for s, (q, u) in {'purchased': (Q3, df['units_purchased']),
+                                  'produced': (Q5, df['units_produced']),
+                                  'inkind': (Q6, df['units_inkind'])}.items()}
+    if n_impossible or n_double or any(n_nounit.values()):
+        warnings.warn(
+            f"Ethiopia {wave} food_acquired (GH #874): rows whose source "
+            f"quantity EXCEEDS total consumption (Q2), by source: {n_exceeds}; "
+            f"{n_double} rows report the same quantity as both purchased and "
+            f"own-produced (Q3 = Q5 = Q2 > 0); positive quantities with no unit "
+            f"code (served as u='Unknown'): {n_nounit}.  All served unchanged -- "
+            f"the survey's answers are not clipped, dropped or NaN'd.",
+            stacklevel=2)
 
     # Resolve raw food strings to canonical Preferred Labels at the WAVE
     # level (Unit #0 / Malawi pattern).  The raw `item` is the Stata value
@@ -333,18 +422,32 @@ def food_acquired(fn,myvars):
     food_map = harmonize_food_union_map(fn='../../_/categorical_mapping.org')
     df['item'] = df['item'].astype(str).str.strip().replace(food_map)
 
-    # Build the wide-form frame the framework helper expects:
-    # index (t, i, j, u), columns (Quantity, Expenditure, Produced).
-    df = (df.rename(columns={'HHID': 'i', 'item': 'j', 'units': 'u'})
-            .set_index(['t', 'i', 'j', 'u'])
-            [['Quantity', 'Expenditure', 'Produced']]
-            .dropna(how='all'))
+    # --- One long-form row per reported source, each in its own unit. -------
+    sources = {'purchased': (Q3, df['units_purchased'], Q4),
+               'produced': (Q5, df['units_produced'], None),
+               'inkind': (Q6, df['units_inkind'], None)}
 
-    # Ditch the now-unused `units_purchased` (already dropped via the
-    # column projection above).  Helper produces (t, i, j, u, s) with
-    # s in {'purchased', 'produced'}.
-    out = food_acquired_to_canonical(df, drop_columns=())
-    return out
+    pieces = []
+    for s, (qty, unit, expenditure) in sources.items():
+        pieces.append(pd.DataFrame({
+            't': df['t'].values,
+            'i': df['HHID'].values,
+            'j': df['item'].values,
+            'u': unit.values,
+            's': s,
+            'Quantity': qty.values,
+            'Expenditure': (expenditure.values if expenditure is not None
+                            else np.full(len(df), np.nan)),
+        }))
+
+    out = pd.concat(pieces, ignore_index=True)
+    # A unit is recorded only on a positive quantity, so an expenditure-only
+    # purchased row has none.  Sentinel, not NaN: a NaN index key is DELETED
+    # by the core grain collapse's groupby (CLAUDE.md "Grain Collapse" §3b).
+    out['u'] = out['u'].fillna('Unknown')
+
+    return _finalize_canonical_food_acquired(out)
+
 
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')

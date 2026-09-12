@@ -13,7 +13,11 @@ myvars = dict(item='item_cd',
               units = 's6aq02b',
               value_purchased  = 's6aq04',
               quantity_purchased = 's6aq03a',
-              units_purchased = 's6aq03b')
+              units_purchased = 's6aq03b',
+              quantity_produced = 's6aq05a',  # Q5 own production (quantity)
+              units_produced = 's6aq05b',     # Q5 own production (unit)
+              quantity_inkind = 's6aq06a',    # Q6 gifts / other sources (quantity)
+              units_inkind = 's6aq06b')       # Q6 gifts / other sources (unit)
 
 df = food_acquired(fn,myvars)
 

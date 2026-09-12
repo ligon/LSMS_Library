@@ -2,11 +2,15 @@
 
 Wave-level scripts (each ``Ethiopia/<wave>/_/food_acquired.py``) call
 ``ethiopia.food_acquired()``, which delegates to
-``food_acquired_to_canonical()`` and produces canonical-form parquets
-with index ``[t, i, j, u, s]`` (``s in {'purchased', 'produced'}``) and
-columns ``[Quantity, Expenditure]`` (Phase 3 of GH #169).  This script
-just concatenates them across waves and applies cross-wave id_walk and
-the food-label rename.
+produces canonical-form parquets with index ``[t, i, j, u, s]``
+(``s in {'purchased', 'produced', 'inkind'}``) and columns
+``[Quantity, Expenditure]`` (Phase 3 of GH #169; the third source and the
+direct reads landed with GH #874, 2026-09-12 -- before that the wave
+scripts read only Q2/Q3/Q4 and delegated to
+``build_transforms.food_acquired_to_canonical``, whose contract is the
+``purchased = Quantity - Produced`` residual split).  This script just
+concatenates them across waves and applies cross-wave id_walk and the
+food-label rename.
 
 The pre-Phase-3 implementation expected wide-form wave parquets with
 ``units`` / ``units_purchased`` columns and did
