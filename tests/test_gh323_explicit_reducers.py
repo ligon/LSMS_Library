@@ -311,6 +311,45 @@ def test_core_never_reduces_grain_without_auditing_it():
     )
 
 
+def test_the_guard_actually_CATCHES_an_unaudited_core_selector():
+    """Positive control for the test above, which is otherwise unfalsifiable.
+
+    All three core sites audit, so the guard passing proves nothing about
+    whether it can SEE ``most_complete_row`` -- a misspelled ``_CORE_SELECTORS``
+    entry would pass identically.  So feed it a core module that reduces with
+    the selector and does NOT audit, and require it to fail.  GH #871.
+    """
+    import ast
+
+    offender = ("def collapse(df, levels):\n"
+                "    return most_complete_row(df, levels)\n")
+    clean = ("def collapse(df, levels):\n"
+             "    report = _audit_index_collapse(df, levels)\n"
+             "    return most_complete_row(df, levels)\n")
+
+    def _offends(src):
+        # the same predicate the real guard uses, over a fake core module
+        tree = ast.parse(src)
+        found = []
+        for fn in [n for n in ast.walk(tree)
+                   if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            reducers = [n.lineno for n in ast.walk(fn)
+                        if isinstance(n, ast.Call)
+                        and isinstance(n.func, ast.Name)
+                        and n.func.id in _CORE_SELECTORS]
+            audits = [n for n in ast.walk(fn)
+                      if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                      and 'audit' in n.func.id]
+            if reducers and not audits:
+                found.append(fn.name)
+        return found
+
+    assert _offends(offender) == ['collapse'], (
+        'the guard cannot see a call to core\'s row selector -- is '
+        '_CORE_SELECTORS misspelled? (GH #871)')
+    assert _offends(clean) == []
+
+
 def test_core_does_not_read_an_aggregation_key():
     """The actual Design-A wiring: core dispatching a reducer named by config.
 

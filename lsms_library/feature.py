@@ -587,7 +587,8 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # `_sum_min_count_1` and ~400x faster on a large frame with populated
     # `attrs`; see the note at country._normalize_dataframe_index (GH #871).
     grouped = df.groupby(level=levels, observed=True)
-    overlay = {c: grouped[present].sum(min_count=1)[c] for c in present}
+    sums = grouped[present].sum(min_count=1)
+    overlay = {c: sums[c] for c in present}
     if _DERIVATION_COLUMN in df.columns:
         overlay[_DERIVATION_COLUMN] = union_keys_by_group(
             df[_DERIVATION_COLUMN], levels, out.index)

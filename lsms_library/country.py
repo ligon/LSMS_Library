@@ -6145,8 +6145,8 @@ def _normalize_dataframe_index(
             # it was the difference between GhanaLSS `food_acquired` collapsing
             # and a 20-minute test timeout.
             grouped = df.groupby(level=present_levels, observed=True)
-            overlay = {c: grouped[present_additive].sum(min_count=1)[c]
-                       for c in present_additive}
+            sums = grouped[present_additive].sum(min_count=1)
+            overlay = {c: sums[c] for c in present_additive}
             if _DERIVATION_COLUMN in df.columns:
                 # A sum of N rows is derived if ANY input row was: the served
                 # provenance is the UNION of the inputs' keys, not one of them.
