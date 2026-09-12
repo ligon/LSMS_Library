@@ -13,21 +13,47 @@ properties of what core returns.  The contract is NOT "core never reduces rows"
 -- Site 2's household->cluster projection legitimately reduces.  It is:
 
     P1  CONSERVATION    every row that leaves is accounted for.
-    P2  NO INVENTION    every cell holds an OBSERVED value, or NA.
+    P2  NO INVENTION    the served row is a SUBSET OF AN OBSERVED ROW on every
+                        column core does not reduce -- and every cell holds an
+                        observed value, or NA.
     P3  ASYMMETRY       destructive collapse is loud; lossless collapse is silent.
     P4  ACCURACY        the number it reports is the number it destroyed.
 
-P2 is deliberately weaker than the "output rows are a subset of input rows" form
-this file was first written with.  That stronger version is WRONG here, and the
-mistake is worth recording because it is an attractive one: ``groupby().first()``
-skips NA per column, so complementary rows yield a combination that appears
-nowhere in the source -- which LOOKS like fabrication and is in fact the
-intended COMPLETION.  ``NaN`` is absence, not contradiction; ``reduce_to_agreed``
-returns the very same composite on purpose.  Chasing the stronger property leads
-straight to ``.first(skipna=False)``, which returns ``<NA>`` for values the
-survey actually recorded -- a regression dressed as a fix.
+**P2 was deliberately WEAKER than this until 2026-09-12, and the reversal is the
+part worth reading.**  The weaker form ("every cell holds an observed value or
+NA") was chosen on 2026-07-13 because ``groupby().first()`` skips NA per column,
+so complementary rows yielded a combination appearing nowhere in the source --
+argued then to be not fabrication but intended COMPLETION: ``NaN`` is absence,
+not contradiction, and ``reduce_to_agreed`` returns the very same composite on
+purpose.
 
-The composite is wrong only when the rows describe DIFFERENT REAL ENTITIES, i.e.
+That doctrine was formulated against the WRONG ALTERNATIVE.  The alternative on
+the table was ``first(skipna=False)``, which returns ``<NA>`` even for a group
+that AGREES and where only one row reports -- a regression dressed as a fix, and
+rightly rejected.  Row-coherent SELECTION is not that: it returns a whole
+OBSERVED row (``country.most_complete_row`` -- the group's most complete row,
+ties on original order).  @ligon reversed the doctrine on that basis, and two
+independent reasons make it coherent rather than merely requested:
+
+(a) **Core already calls these groups destroyed.**  ``_audit_index_collapse``'s
+    own docstring: "Missing values count as values: two rows that differ only in
+    whether a field is recorded are different rows."  Core used to REPORT the
+    group as destructive and then SERVE the completion -- the instrument and the
+    reducer contradicting each other.  Selection makes them agree.
+
+(b) **Completion has a legitimate home, and it is not core.**
+    ``build_transforms.reduce_to_agreed`` (``na_is_conflict=False``) is the
+    country-facing helper a maintainer invokes IN WRITING at the call site,
+    exactly as Benin/Togo do.  Per "NO AGGREGATION IN CORE", completing across
+    rows is the author's call, not the access path's.
+
+So completion stays in ``reduce_to_agreed``, and core selects.  The stronger P2
+-- served row is a subset of an observed row on every reducer-free column -- was
+right for the selection branch after all.  It is still not free: it fails for any
+reducer that computes a new value (a mean, a midpoint) OR assembles one
+per-column.  GH #871.
+
+A selection is still wrong when the rows describe DIFFERENT REAL ENTITIES, i.e.
 when the key is unique only within some coarser unit and two real clusters have
 been merged.  That is a broken IDENTIFIER, and D1 says fix the identifier.  It
 is not something a reducer can detect, which is why no property here tries to.
@@ -134,12 +160,10 @@ def test_p2_lossless_collapse_returns_a_real_row():
 def test_p2_every_output_cell_is_an_observed_value_or_na():
     """No cell may hold a value that was never observed in its group.
 
-    This is the correct form of "no fabrication".  An earlier draft of this file
-    asserted the stronger `output rows subset of input rows`, and that was WRONG
-    -- see the completion test below for why.  This weaker property is the one
-    that actually encodes the contract, and it is still not free: it fails for
-    any reducer that computes a new value (a mean, a midpoint) rather than
-    selecting an observed one.
+    The weak half of "no fabrication": necessary, and not free (it fails for any
+    reducer that computes a new value -- a mean, a midpoint -- rather than
+    selecting an observed one), but NOT sufficient.  A per-column composite
+    passes it.  The strong half is the next test.
     """
     df = _frame([('2018', 'h1', 'a1', 'b1'),
                  ('2018', 'h1', 'a2', 'b2')])
@@ -151,34 +175,70 @@ def test_p2_every_output_cell_is_an_observed_value_or_na():
                 f'{col}={val!r} was never observed in the input')
 
 
-def test_p2_complementary_missingness_is_COMPLETION_not_fabrication():
-    """(a1, <NA>) + (<NA>, b2) -> (a1, b2) is CORRECT, and must stay that way.
+def test_p2_complementary_missingness_is_NOT_completed_by_core():
+    """(a1, <NA>) + (<NA>, b2) -> (a1, <NA>).  The 2026-09-12 reversal, pinned.
 
-    This pins a doctrine that is easy to "fix" into a regression.  ``NaN`` is
-    ABSENCE, not contradiction: if one row reports Region and the other reports
-    Rural, the cluster has both, and keeping both discards no observed value.
-    The repo's own reducer implements exactly this -- see
-    ``test_nan_is_absence_not_contradiction`` in
-    ``tests/test_gh323_explicit_reducers.py`` -- and ``reduce_to_agreed``
-    returns the SAME composite that ``groupby().first()`` does here.
+    Core SELECTS an observed row; it does not assemble one.  Both rows here are
+    equally complete (one non-NA cell each), so the tie breaks on original order
+    and row 0 is served -- ``B`` stays NA, which is what row 0 said.
+    ``groupby().first()`` used to serve ``(a1, b2)``: a record neither row
+    reported.
 
-    So the composite is not the bug, and the tempting one-word "fix"
-    (``.first(skipna=False)``) is a REGRESSION: it would return ``<NA>`` for a
-    value the survey actually recorded.  Verified on pandas 3.0.2.
+    Completion across rows is still available, and still correct where a
+    maintainer signs for it: ``build_transforms.reduce_to_agreed``
+    (``na_is_conflict=False``), invoked in writing at the call site, as
+    Benin/Togo do (``tests/test_gh323_explicit_reducers.py``
+    ``test_nan_is_absence_not_contradiction``).  What changed is that the ACCESS
+    PATH no longer does it behind the caller.
 
-    Where a composite IS wrong is when the rows describe DIFFERENT REAL
-    ENTITIES -- two clusters merged by a key that is unique only within a
-    district.  That is a broken identifier, and the fix is the identifier
-    (GH #323 D1), not the reducer.
+    Note what this is NOT: ``.first(skipna=False)``, which would return ``<NA>``
+    even for a group that agrees and where only one row reports.  Core returns a
+    whole observed row.  GH #871.
     """
     df = _frame([('2018', 'h1', 'a1', pd.NA),
                  ('2018', 'h1', pd.NA, 'b2')])
     out, _ = _collapse(df)
     assert len(out) == 1
     assert out['A'].iloc[0] == 'a1'
-    assert out['B'].iloc[0] == 'b2', (
-        'core dropped an observed value instead of completing from it -- has '
-        'someone set skipna=False?')
+    assert pd.isna(out['B'].iloc[0]), (
+        'core completed a row from two different rows -- is the per-column '
+        'first() composite back? (GH #871)')
+
+
+def test_p2_the_served_row_is_a_subset_of_an_observed_row():
+    """The STRONG half of no-fabrication: row coherence, not just cell coherence.
+
+    Every column core does not reduce must come from ONE row of the group.  A
+    per-column composite satisfies "every cell was observed" and fails this.
+    """
+    df = _frame([('2018', 'h1', 'a1', pd.NA),
+                 ('2018', 'h1', pd.NA, 'b2'),
+                 ('2018', 'h2', 'a3', 'b3')])
+    out, _ = _collapse(df)
+
+    def _norm(row):
+        return tuple(None if pd.isna(v) else v for v in row)
+    inputs = {_norm(row) for row in df.itertuples(index=False)}
+    for _key, row in out.iterrows():
+        assert _norm(row[c] for c in out.columns) in inputs, (
+            f'served {tuple(row)!r} is no observed row of the group')
+
+
+def test_p2_selection_prefers_the_MOST_COMPLETE_observed_row():
+    """Row coherence alone would permit serving the emptiest row.  It does not.
+
+    This is the difference between the plan's ``nth(0)`` and what landed: given a
+    blank row and a populated one on the same broken key -- Niger 2014-15
+    ``household_roster`` ``('2014-15', '101008', '1')``, whose ``pid`` is a
+    household id stamped on every member -- the served row is the POPULATED one,
+    and it is an observed row rather than a composite.  GH #871.
+    """
+    df = _frame([('2018', 'h1', pd.NA, pd.NA),
+                 ('2018', 'h1', 'a2', 'b2')])
+    out, _ = _collapse(df)
+    assert len(out) == 1
+    assert (out['A'].iloc[0], out['B'].iloc[0]) == ('a2', 'b2'), (
+        'core served the blank row over a strictly more complete one')
 
 
 # ---------------------------------------------------------------------------

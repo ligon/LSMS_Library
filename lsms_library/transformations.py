@@ -2826,7 +2826,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
     # it here avoids silently discarding HH whose cluster ID is
     # unrecoverable.  Without this, ``visit`` leaked to
     # ``Feature.food_prices`` where ``_collapse_duplicate_index`` kept one
-    # arbitrary visit's price via ``groupby().first()`` (GH #517).
+    # arbitrary visit's price -- via ``groupby().first()`` then, via the
+    # most-complete-row selection since GH #871; arbitrary either way (GH #517).
     group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in v.index.names]
     if group_by:
         tally = v.attrs.get('price_rows_dropped')

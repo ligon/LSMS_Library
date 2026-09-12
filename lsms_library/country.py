@@ -64,7 +64,9 @@ from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .recall import attach as attach_recall, recall_records
 from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
-                          call_inputs as _call_derivation_inputs)
+                          call_inputs as _call_derivation_inputs,
+                          COLUMN as _DERIVATION_COLUMN,
+                          union_keys_by_group as _union_derivation_keys_by_group)
 import importlib.util
 import hashlib
 import logging
@@ -1177,7 +1179,7 @@ class Wave:
         HOUSEHOLD-grain frames joined on the CLUSTER key ``v`` -- the merge is
         many-to-many and yields a cartesian product *within each key group*.
         ``_normalize_dataframe_index`` then quietly mopped the explosion up
-        with ``groupby().first()``, so the table looked clean while most of its
+        with its duplicate collapse, so the table looked clean while most of its
         rows were phantoms.  This site does not lose data; it INVENTS it, and
         every other #323 site is downstream janitor to the mess.
 
@@ -1669,6 +1671,14 @@ class Wave:
         return df
 
     # This cluster_features method is explicitly defined because additional processing is required after calling grab_data.
+    # GH #871: tagged so SITE 2 is in a fingerprint.  Measured before this tag:
+    # `_collapse_to_cluster_grain` appeared in NO table's
+    # build_transforms_fingerprint, so a Site-2-only edit would have served stale
+    # composites out of the warm L2 parquets indefinitely (and a revert-check
+    # could not have worked).  Scoped to `cluster_features`, the only table this
+    # method builds, so the coupling is explicit rather than incidental to
+    # Site 1's all-tables tag.
+    @build_transform(tables=['cluster_features'])
     def cluster_features(self) -> pd.DataFrame:
         df = self.grab_data('cluster_features')
         # Some countries declare ``i: <HHID>`` in cluster_features
@@ -1683,7 +1693,7 @@ class Wave:
         # a cluster by construction of the LSMS-ISA sampling design" --
         # and prose is not enforcement.  The claim is FALSE wherever a
         # cluster code is unique only *within* a district: two real
-        # clusters then merge, and ``.first()`` keeps one district's
+        # clusters then merge, and the collapse keeps one district's
         # Region and silently discards the other's.  That is WRONG data,
         # not merely lost data.  The invariant is now CHECKED rather than
         # asserted -- see ``_collapse_to_cluster_grain``.
@@ -1710,8 +1720,8 @@ class Wave:
         # all of it reported by #614, none of it by the audit above).
         #
         # It is deliberately NOT rerouted through ``_collapse_to_cluster_grain``
-        # here, because it does not need to be: Site 1 reduces these frames with the
-        # same ``.first()`` and audits them with the same instrument, so the loss is
+        # here, because it does not need to be: Site 1 collapses these frames with
+        # the same selector and audits them with the same instrument, so the loss is
         # reported either way.  (Before the GPS ``.mean()`` was retired this
         # asymmetry also silently decided whether a country's cluster coordinates
         # came out a CENTROID or ONE HOUSEHOLD'S FIX -- on nothing more principled
@@ -5459,10 +5469,12 @@ def _normalise_sample_weights(df: pd.DataFrame,
 # ---------------------------------------------------------------------------
 # GH #323 -- the grain-collapse audit.
 #
-# THE CLASS OF BUG.  `_normalize_dataframe_index` reduces a non-unique DECLARED
-# index with `groupby(...).first()`.  Where the duplicate rows DISAGREE, the rows
-# it drops are real data (distinct people, distinct shocks) and they vanished with
-# no signal.  #323 was closed once on a warning that could not fire (below); #500,
+# THE CLASS OF BUG.  `_normalize_dataframe_index` collapses a non-unique DECLARED
+# index.  Where the duplicate rows DISAGREE, the rows it drops are real data
+# (distinct people, distinct shocks) and they vanished with no signal.  (It used
+# to do so with `groupby(...).first()`; since GH #871 it SELECTS the group's most
+# complete observed row -- which changes WHICH row survives, not the fact that
+# the others do not.)  #323 was closed once on a warning that could not fire (below); #500,
 # #501 and #514 were each closed on a single INSTANCE while the class survived.
 #
 # WHY THE OLD WARNING COULD NOT FIRE.  It was gated on `not df.index.is_unique`,
@@ -5477,9 +5489,9 @@ def _normalise_sample_weights(df: pd.DataFrame,
 # index almost never mean "reduce me" -- they mean the IDENTIFIER IS BROKEN or a
 # LEVEL IS MISSING.  Mali's `household_roster` declares `(t, i, pid)`, but `pid` is
 # a *household* id stamped onto every member (5,149 distinct values across 37,175
-# rows), so `first()` keeps ONE PERSON PER HOUSEHOLD and 32,026 people disappear.
-# No reducer is correct there: `first` keeps one person, `sum` is meaningless on
-# `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
+# rows), so the collapse keeps ONE PERSON PER HOUSEHOLD and 32,026 people
+# disappear.  No reducer is correct there: a selection keeps one person, `sum` is
+# meaningless on `Sex`.  Declaring `aggregation: {pid: first}` would only put a signature on the
 # corpse.  So the core does NOT aggregate -- consistent with the NO-AGGREGATION-IN-
 # CORE contract in SkunkWorks/grain_aggregation_policy.org -- it reports, and (in
 # strict mode) refuses.  The one genuine reduction policy we have,
@@ -5536,9 +5548,13 @@ def _audit_index_collapse(
 
     Missing values count as values: two rows that differ only in *whether* a field
     is recorded are different rows.  That is deliberately conservative -- it
-    over-reports rather than under-reports, and it is what catches
-    ``Burkina_Faso/shocks``, where ``first()`` keeps an all-``<NA>`` row and throws
-    away the row that has the real answers.
+    over-reports rather than under-reports, and it is what caught
+    ``Burkina_Faso/shocks``, where ``first()`` used to keep an all-``<NA>`` row
+    and throw away the row with the real answers.  (Since GH #871 the collapse
+    serves the MOST COMPLETE row, so that particular row is now the one that
+    survives -- the audit is unchanged and still reports the group, because the
+    other rows are still gone.  The audit reports LOSS; which row is served is a
+    separate question, and the two ratchet separately.)
 
     ``nan_key_rows`` is a SEPARATE loss riding along in the same operation:
     ``groupby()`` defaults to ``dropna=True``, so a row with NaN in a declared
@@ -5621,12 +5637,12 @@ def _format_grain_report(report: dict[str, Any]) -> str:
         bits.append(
             f"The collapse COULD NOT BE AUDITED ({report['unauditable']}), so it is "
             f"NOT known to be safe: {report.get('dropped', 0):,} row(s) were dropped "
-            f"by groupby().first() and may carry data. Treat as data loss until shown "
+            f"by the collapse and may carry data. Treat as data loss until shown "
             f"otherwise."
         )
     if report.get("destroyed"):
         bits.append(
-            f"Collapsing it with groupby().first() DESTROYED {report['destroyed']:,} "
+            f"Collapsing it DESTROYED {report['destroyed']:,} "
             f"of {report['rows']:,} rows whose values DISAGREE "
             f"({report['conflicting_groups']:,} conflicting index tuples). "
             f"These rows are gone from the returned data."
@@ -5644,9 +5660,11 @@ def _format_grain_report(report: dict[str, Any]) -> str:
         )
     if site == 'Wave.cluster_features':
         bits.append(
-            "cluster_features is reduced with groupby().first(), which skips NA "
-            "per column -- so a conflicting cluster does not even yield one of its "
-            "households' rows, it yields a COMPOSITE. The comment that used to "
+            "cluster_features is collapsed by SELECTING one household's row -- the "
+            "most complete one (GH #871; it used to be a per-column "
+            "groupby().first() COMPOSITE that existed in no household). The row "
+            "served is an observed one, but the other households' rows are gone. "
+            "The comment that used to "
             "license this ('Region/Rural/District are invariant within a cluster by "
             "construction of the LSMS-ISA sampling design') is false here: this "
             "cluster id is NOT unique at the grain it is being used at. Fix the "
@@ -5745,7 +5763,7 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
 #
 # Prose is not enforcement.  The claim fails exactly where a cluster code is
 # unique only WITHIN a district (or a region, or an enumeration area): two
-# genuinely different clusters collide on one ``v``, and ``.first()`` then keeps
+# genuinely different clusters collide on one ``v``, and the collapse then keeps
 # one of their Regions and throws the other away.  The output is not a lossy
 # summary of the input -- it is a WRONG ROW, attributing one cluster's district to
 # another's households.  Under Design B (SkunkWorks/grain_aggregation_policy.org:
@@ -5799,14 +5817,19 @@ def _collapse_to_cluster_grain(
     Audits the projection BEFORE performing it -- one line later the evidence is
     gone, and the parquet that gets cached is written from the collapsed frame,
     which is why no downstream instrument (Site 1's audit included) can see this
-    loss.  Every column is treated alike: audited for destruction, then reduced
-    with ``.first()``.  Core does not aggregate -- not even GPS (see above).
+    loss.  Every column is treated alike: audited for destruction, then one
+    household's row is SELECTED (``most_complete_row``).  Core does not aggregate
+    -- not even GPS (see above).
 
-    ``.first()`` here is worse than it looks, and worth naming: pandas'
-    ``groupby().first()`` skips NA *per column*, so where households in a cluster
-    disagree it does not even return one of the source rows -- it assembles a row
-    out of the first non-null value of each column INDEPENDENTLY.  The result can
-    be a household composite that exists nowhere in the survey.  Hence: audit.
+    GH #871: this used to reduce with ``groupby().first()``, which skips NA *per
+    column*, so where households in a cluster disagreed it did not even return
+    one of the source rows -- it assembled a row out of the first non-null value
+    of each column INDEPENDENTLY, a household composite existing nowhere in the
+    survey.  That was named here as the reason to audit, and the audit stays; the
+    projection now serves an OBSERVED household row.  Measured corpus cost of the
+    flip at this site: 77 served rows change, all of them
+    ``Latitude``/``Longitude``, in clusters where one household has no GPS fix
+    (``slurm_logs/gh871_grain_census/``).
     """
     if not keep_levels:
         return df
@@ -5834,7 +5857,12 @@ def _collapse_to_cluster_grain(
                       site='Wave.cluster_features')
         _record_grain_report(report)
 
-    return df.groupby(level=keep_levels, observed=True).first()
+    # GH #871: SELECT one of the cluster's households, not a composite of them.
+    # `Derivation` never votes on which household is served -- it is a
+    # library-computed provenance flag, not survey content.
+    return most_complete_row(df, keep_levels,
+                             exclude={_DERIVATION_COLUMN}
+                             if _DERIVATION_COLUMN in df.columns else ())
 
 
 def _sum_min_count_1(x):
@@ -5845,6 +5873,81 @@ def _sum_min_count_1(x):
     hard zero where the survey recorded nothing.  GH #323.
     """
     return x.sum(min_count=1)
+
+
+def most_complete_row(df: pd.DataFrame, levels: list[str],
+                      exclude: Iterable[str] = ()) -> pd.DataFrame:
+    """Select the MOST COMPLETE row of each group -- core's one row selector.
+
+    GH #871.  Core's three index collapses used to reduce their reducer-free
+    columns with ``groupby().first()``, and ``first()`` is not "the first row":
+    it returns the first non-null value of EACH COLUMN INDEPENDENTLY.  A group
+    whose rows disagree was therefore served a per-column COMPOSITE -- a record
+    that exists nowhere in the survey -- and a reader had no way to tell that
+    from a group whose rows agreed.  (The 2026-07-13 doctrine called the
+    composite "completion"; @ligon reversed it on 2026-09-12.  The argument is
+    recorded in ``tests/test_gh323_grain_contract.py``'s module docstring.)
+
+    Core now SELECTS AN OBSERVED ROW, and to keep that selection informative
+    rather than arbitrary it selects the most complete one:
+
+    - completeness = the count of non-NA cells over ``df.columns`` minus
+      ``exclude``.  Callers exclude three things, and the rule behind all three
+      is that the served value does not come from the selected row, so the
+      column has no standing to choose it:
+        * the additive measures (``_ADDITIVE_MEASURE_COLUMNS``), summed;
+        * ``Price`` wherever it is RE-DERIVED from those sums (``Expenditure``
+          and ``Quantity`` both present) -- @ligon, 2026-09-12, for consistency
+          with the measures it is computed from;
+        * ``Derivation``, on EITHER branch -- it is a LIBRARY-COMPUTED provenance
+          flag rather than survey content, so it must never break a tie between
+          two SURVEY rows, not even on the selection branch where it rides along
+          with the row it was written on (@ligon, 2026-09-12).
+    - ties break on ORIGINAL ORDER, so a group whose rows are equally complete
+      is served its first row -- what the old reducer did when nothing was
+      missing.
+    - a row carrying NaN in a declared index level is STILL DELETED OUTRIGHT, by
+      the ``dropna=True`` default of the groupby that forms the groups
+      (GH #323 §3b -- reported, not fixed; this must not change it silently).
+
+    Returns the selected rows narrowed to the ``levels`` index and sorted by
+    key, so the shape and row order are exactly what
+    ``groupby(level=levels).first()`` returned before #871.
+
+    Called INLINE at each of the three sites -- never through a wrapper -- so
+    that the selection and ``_audit_index_collapse`` stay in the same function,
+    which is what ``tests/test_gh323_explicit_reducers.py`` proves statically.
+    That test knows this function BY NAME: a selector core can reach is exactly
+    as dangerous as a raw ``groupby().first()`` and is guarded identically.
+    """
+    cols = [c for c in df.columns if c not in set(exclude)]
+    score = df[cols].notna().sum(axis=1)
+    keys = pd.DataFrame({"_pos": np.arange(len(df)), "_score": score.to_numpy()},
+                        index=df.index)
+    grouped = keys.groupby(level=list(levels), observed=True, sort=False)
+    # ``transform('max')`` rather than a reducer, for two reasons.  It keeps this
+    # helper free of the groupby reducers the AST guard hunts for (the guard's
+    # subject is the SITES, which must audit; this helper is the mechanism).  And
+    # -- load-bearing -- it yields NaN for a row whose key is NaN (groupby
+    # dropna=True), so the ``eq`` below is False there and such a row can never
+    # be selected: NaN-key rows keep being deleted, per GH #323 §3b.  Verified on
+    # pandas 3.0.2.
+    best = grouped["_score"].transform("max")
+    candidates = keys[keys["_score"].eq(best)]
+    key_index = candidates.index
+    surplus = [lvl for lvl in key_index.names if lvl not in levels]
+    if surplus and len(key_index.names) > len(surplus):
+        key_index = key_index.droplevel(surplus)
+    # First surviving candidate per key == highest score, earliest row.
+    positions = candidates.loc[~key_index.duplicated(keep="first"), "_pos"].to_numpy()
+
+    out = df.iloc[positions]
+    surplus = [lvl for lvl in out.index.names if lvl not in levels]
+    if surplus and len(out.index.names) > len(surplus):
+        out = out.droplevel(surplus)
+    if isinstance(out.index, pd.MultiIndex) and list(out.index.names) != list(levels):
+        out = out.reorder_levels(list(levels))
+    return out.sort_index()
 
 
 @build_transform()
@@ -5862,8 +5965,13 @@ def _normalize_dataframe_index(
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
     - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), re-derives a
+      per-unit ``Price`` from those sums, unions ``Derivation`` there, and
+      SELECTS one observed row of the group for every other column --
+      ``most_complete_row``, the group's most complete row (GH #871).  It used
+      to keep "the first row per group", which was never what it did: pandas'
+      ``groupby().first()`` is a per-column first-non-null and returned a
+      COMPOSITE of several rows.
     - GH #323: AUDITS that collapse first, while the pre-collapse frame still
       exists, and reports any destroyed rows loudly (or fatally, under
       ``LSMS_GRAIN_STRICT``).  ``country`` is carried only so the report can name
@@ -5956,11 +6064,13 @@ def _normalize_dataframe_index(
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
                 df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
-        # GH #514/#323: collapsing a non-unique canonical index with .first()
-        # silently DISCARDS the dropped rows.  For additive-measure tables
+        # GH #514/#323: collapsing a non-unique canonical index silently
+        # DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
         # several transactions per (t,v,i,j,u,s)) SUM the additive columns and
         # re-derive any per-unit Price from the summed totals -- no data lost.
+        # Every other column is SELECTED, not reduced: `most_complete_row` serves
+        # one observed row of the group (GH #871).
         # Single source of truth for the additive column map lives in feature.py
         # (imported lazily to avoid an import cycle).
         from .feature import _ADDITIVE_MEASURE_COLUMNS
@@ -5992,6 +6102,13 @@ def _normalize_dataframe_index(
             reconciled = list(present_additive)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 reconciled.append('Price')
+            # GH #871: on THIS branch `Derivation` is reconciled too -- the union
+            # of the summed rows' keys carries every one of them, so a
+            # purchased+derived mix is lossless rather than destroyed.  Only on
+            # this branch: on the selection branch the served row carries its own
+            # key and a two-key group IS a disagreement the audit must report.
+            if _DERIVATION_COLUMN in df.columns:
+                reconciled.append(_DERIVATION_COLUMN)
             residual = _audit_index_collapse(
                 df.drop(columns=reconciled), present_levels)
             if residual is None:
@@ -6004,6 +6121,25 @@ def _normalize_dataframe_index(
                               conflicting_groups=residual["conflicting_groups"],
                               additive_reconciled=reconciled)
 
+        # GH #871: SELECT an observed row for every column core does not reduce.
+        # The additive measures are excluded from the completeness score because
+        # their served value does not come from the selected row (they are
+        # summed; `Price` is re-derived from those sums).  `Derivation` is
+        # excluded on BOTH branches, deliberately: it is a library-computed
+        # provenance flag rather than survey content, so it must never decide
+        # which of two SURVEY rows is served -- not even on the selection branch,
+        # where it rides along with the row it was written on.
+        reduced = set(present_additive)
+        if _DERIVATION_COLUMN in df.columns:
+            reduced.add(_DERIVATION_COLUMN)
+        if present_additive and 'Price' in df.columns and {
+                'Expenditure', 'Quantity'} <= set(df.columns):
+            # Re-derived from the summed totals a few lines below, so its served
+            # value does not come from the selected row either -- the same reason
+            # the additive measures are excluded (@ligon, 2026-09-12).
+            reduced.add('Price')
+        selected = most_complete_row(df, present_levels, exclude=reduced)
+
         if present_additive:
             # GH #323: `sum` defaults to min_count=0, so a group in which EVERY
             # value is NA sums to 0.0 -- fabricating a hard zero where the truth is
@@ -6014,13 +6150,36 @@ def _normalize_dataframe_index(
             # and 478 in Nigeria, restores both to baseline row counts, and leaves the
             # recovered Value sums and every food_acquired total byte-identical.
             # (country.py:2089 already uses min_count=1 for exactly this reason.)
-            agg = {c: (_sum_min_count_1 if c in present_additive else 'first')
-                   for c in df.columns}
-            df = df.groupby(level=present_levels, observed=True).agg(agg)
+            #
+            # GH #871: `grouped[...].sum(min_count=1)` is the CYTHON spelling of
+            # `_sum_min_count_1` (kept, documented and directly tested in
+            # tests/test_assets_additive.py).  0.12 s against 51.8 s on a
+            # 400k-row / 200k-group frame, because a Python groupby callable
+            # makes pandas `deepcopy` `df.attrs` once PER GROUP.  Not a
+            # micro-optimisation: with `Derivation` added as a third such column
+            # it was the difference between GhanaLSS `food_acquired` collapsing
+            # and a 20-minute test timeout.
+            #
+            # It is IDENTICAL TO WITHIN ONE ULP, not byte-identical, and that is
+            # a BEHAVIOUR CHANGE #871 did not ask for -- state it rather than
+            # round it away.  Cython sums PAIRWISE where `Series.sum` accumulates
+            # in order, so a group of 3+ floats can land on a neighbouring
+            # double: measured on GhanaLSS 1998-99 `food_acquired`, 392 of
+            # 161,176 groups differ, at a maximum relative difference of 4e-16.
+            # Column totals, the NA pattern and every dtype are unchanged.
+            grouped = df.groupby(level=present_levels, observed=True)
+            sums = grouped[present_additive].sum(min_count=1)
+            overlay = {c: sums[c] for c in present_additive}
+            if _DERIVATION_COLUMN in df.columns:
+                # A sum of N rows is derived if ANY input row was: the served
+                # provenance is the UNION of the inputs' keys, not one of them.
+                overlay[_DERIVATION_COLUMN] = _union_derivation_keys_by_group(
+                    df[_DERIVATION_COLUMN], present_levels, selected.index)
+            df = selected.assign(**overlay)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)
         else:
-            df = df.groupby(level=present_levels, observed=True).first()
+            df = selected
 
         if report is not None:
             report.update(country=country, table=table_name, wave=wave,

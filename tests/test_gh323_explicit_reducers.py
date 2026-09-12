@@ -210,10 +210,50 @@ def test_add_visit_level_refuses_to_stamp_over_an_existing_visit():
 # The policy itself: core must not be able to reach these behind the caller
 # --------------------------------------------------------------------------
 
+import ast  # noqa: E402  (module-scope, for the AST guard below)
+
 _COUNTRY_FACING_REDUCERS = (
     'reduce_to_agreed', 'collapse_to_cluster_grain', 'add_visit_level',
 )
 _CORE_MODULES = ('country.py', 'feature.py', 'local_tools.py')
+# Core's OWN grain-reducing helpers, which the AST guard below treats exactly
+# like a raw ``groupby().first()``: a call to one is a grain reduction and must
+# be audited in the same function.  GH #871.
+_CORE_SELECTORS = ('most_complete_row',)
+
+
+def _is_grain_reducer(node):
+    """A pandas call -- or core's own selector -- that drops rows within groups."""
+    if not isinstance(node, ast.Call):
+        return False
+    # GH #871: core's row selector counts, BY NAME.  Without this the guard
+    # would be vacuous after #871: the three sites no longer contain a raw
+    # groupby reducer at all, so "reduces without auditing" would be
+    # unprovable exactly where it matters -- which is the hazard this file's
+    # own docstring names ("a locally-defined helper with any name at all
+    # could reduce grain silently and pass it").  `most_complete_row` selects
+    # one of several disagreeing observed rows; that is as consequential as
+    # `.first()` and is guarded identically.
+    if isinstance(node.func, ast.Name) and node.func.id in _CORE_SELECTORS:
+        return True
+    if not isinstance(node.func, ast.Attribute):
+        return False
+    attr = node.func.attr
+    if attr in ('agg', 'aggregate') and node.args:
+        a = node.args[0]
+        return isinstance(a, ast.Constant) and a.value in ('first', 'last')
+    if attr not in ('first', 'last', 'nth'):
+        return False
+    # only when the receiver is a groupby/resample chain
+    chain, cur = [], node.func.value
+    while isinstance(cur, (ast.Call, ast.Attribute, ast.Subscript)):
+        if isinstance(cur, ast.Call) and isinstance(cur.func, ast.Attribute):
+            chain.append(cur.func.attr); cur = cur.func.value
+        elif isinstance(cur, ast.Attribute):
+            chain.append(cur.attr); cur = cur.value
+        elif isinstance(cur, ast.Subscript):
+            cur = cur.value
+    return any(c in ('groupby', 'resample') for c in chain)
 
 
 def _core_sources():
@@ -250,29 +290,6 @@ def test_core_never_reduces_grain_without_auditing_it():
     reduction is semantically right.  Behaviour is pinned in
     ``tests/test_gh323_grain_contract.py``.
     """
-    import ast
-
-    def _is_grain_reducer(node):
-        """A pandas call that drops rows by selecting within groups."""
-        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
-            return False
-        attr = node.func.attr
-        if attr in ('agg', 'aggregate') and node.args:
-            a = node.args[0]
-            return isinstance(a, ast.Constant) and a.value in ('first', 'last')
-        if attr not in ('first', 'last', 'nth'):
-            return False
-        # only when the receiver is a groupby/resample chain
-        chain, cur = [], node.func.value
-        while isinstance(cur, (ast.Call, ast.Attribute, ast.Subscript)):
-            if isinstance(cur, ast.Call) and isinstance(cur.func, ast.Attribute):
-                chain.append(cur.func.attr); cur = cur.func.value
-            elif isinstance(cur, ast.Attribute):
-                chain.append(cur.attr); cur = cur.value
-            elif isinstance(cur, ast.Subscript):
-                cur = cur.value
-        return any(c in ('groupby', 'resample') for c in chain)
-
     offenders = []
     for mod, src in _core_sources():
         tree = ast.parse(src)
@@ -293,6 +310,46 @@ def test_core_never_reduces_grain_without_auditing_it():
         ' -- core may reduce only if it audits the reduction first, or uses a '
         'fail-loud reducer instead (GH #323 D1)'
     )
+
+
+def test_the_guard_actually_CATCHES_an_unaudited_core_selector():
+    """Positive control for the test above, which is otherwise unfalsifiable.
+
+    All three core sites audit, so the guard passing proves nothing about
+    whether it can SEE ``most_complete_row`` -- a misspelled ``_CORE_SELECTORS``
+    entry would pass identically.  So feed THE REAL PREDICATE (hoisted to module
+    scope for exactly this reason -- a re-implementation here would test a copy,
+    not the guard) a core module that reduces with the selector and does not
+    audit, and require it to be flagged.  GH #871.
+    """
+    offender = ("def collapse(df, levels):\n"
+                "    return most_complete_row(df, levels)\n")
+    clean = ("def collapse(df, levels):\n"
+             "    report = _audit_index_collapse(df, levels)\n"
+             "    return most_complete_row(df, levels)\n")
+
+    def _unaudited(src):
+        found = []
+        for fn in [n for n in ast.walk(ast.parse(src))
+                   if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            reducers = [n for n in ast.walk(fn) if _is_grain_reducer(n)]
+            audits = [n for n in ast.walk(fn)
+                      if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                      and 'audit' in n.func.id]
+            if reducers and not audits:
+                found.append(fn.name)
+        return found
+
+    assert _unaudited(offender) == ['collapse'], (
+        "the guard cannot see a call to core's row selector -- is "
+        "_CORE_SELECTORS misspelled? (GH #871)")
+    assert _unaudited(clean) == []
+
+    # and the pandas reducers it has always guarded still register
+    assert _is_grain_reducer(
+        ast.parse("df.groupby(level=['t']).first()").body[0].value)
+    assert not _is_grain_reducer(
+        ast.parse("df.groupby(level=['t']).transform('max')").body[0].value)
 
 
 def test_core_does_not_read_an_aggregation_key():

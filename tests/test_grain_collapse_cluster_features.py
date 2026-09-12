@@ -4,8 +4,8 @@ A SECOND grain collapse, hardcoded, and entirely separate from the declared-inde
 one that ``tests/test_grain_collapse.py`` covers.  Seventeen countries declare
 ``i: <HHID>`` in their ``cluster_features`` idxvars (so the YAML can merge a
 household-level GPS frame), which hands ``Wave.cluster_features`` a HOUSEHOLD-grain
-table; it reduces that to the ``(t, v)`` cluster grain with ``.first()`` --
-*before* ``_normalize_dataframe_index`` ever runs.  Site 1's audit therefore cannot
+table; it collapses that to the ``(t, v)`` cluster grain -- *before*
+``_normalize_dataframe_index`` ever runs.  Site 1's audit therefore cannot
 see this loss: by the time it fires, the rows are already gone.
 
 The reduction was licensed by a comment and by nothing else --
@@ -15,8 +15,15 @@ The reduction was licensed by a comment and by nothing else --
 
 -- and prose is not enforcement.  Measured against the real corpus the claim is
 false: in Uganda 2019-20 alone, 11 clusters disagree on ``Region``, 23 on
-``District`` and 125 on ``Rural``.  ``.first()`` keeps one at random.  That is not
+``District`` and 125 on ``Rural``.  The collapse keeps one of them.  That is not
 a lossy summary, it is a WRONG ROW.
+
+GH #871 (@ligon, 2026-09-12) changed WHICH row that is, and nothing else here:
+the projection used to reduce with ``groupby().first()``, a per-column
+first-non-null that returned a household COMPOSITE existing nowhere in the
+survey; it now SELECTS the cluster's most complete household row
+(``country.most_complete_row``).  The audit is untouched -- see
+``tests/test_gh871_most_complete_row.py``.
 
 Three properties, each of which FAILS on pre-fix code:
 
@@ -32,7 +39,7 @@ used to average Latitude/Longitude into a cluster centroid is **gone**.  It was 
 last aggregation core performed at this site, and the corpus showed it earned its
 keep nowhere -- a provable no-op in 4 of the 5 cells where it could fire, and in the
 5th it was averaging points up to 783 km apart, i.e. smearing a broken cluster key
-rather than summarising a cluster.  GPS is now audited and reduced exactly like
+rather than summarising a cluster.  GPS is now audited and collapsed exactly like
 every other column, and NO-AGGREGATION-IN-CORE has no exception left in it.
 """
 from __future__ import annotations
@@ -146,13 +153,21 @@ def test_strict_mode_raises_so_ci_can_ratchet():
             Wave.cluster_features(_fake_wave(_conflicting()))
 
 
-def test_the_row_first_returns_can_exist_in_no_household(recwarn):
-    """Why this is worse than 'lossy': ``first()`` skips NA PER COLUMN.
+def test_the_served_row_is_a_household_not_a_composite(recwarn):
+    """The argument this test used to make, with its conclusion inverted (GH #871).
 
-    So a conflicting cluster does not even collapse to one of its households -- it
-    collapses to a COMPOSITE assembled from the first non-null value of each column
-    independently, a household that the survey never interviewed.  Pinned here
-    because it is the strongest argument for auditing rather than tolerating.
+    ``groupby().first()`` skips NA PER COLUMN, so a conflicting cluster did not
+    even collapse to one of its households -- it collapsed to a COMPOSITE
+    assembled from the first non-null value of each column independently: a
+    household the survey never interviewed.  That was pinned here as the
+    strongest argument for auditing rather than tolerating, and the argument
+    stands.  What changed on 2026-09-12 (@ligon) is the CONCLUSION: core now
+    serves an OBSERVED row, so the composite is gone and the audit stays.
+
+    Two households, each reporting one attribute and missing the other, are
+    equally complete -- so the tie breaks on original order and h1 is served,
+    ``Region`` and all.  ``first()`` would have filled ``Region`` from h2; that
+    filled cell is precisely what no household said.
     """
     df = _hh_grain(
         [("2020", "v1", "h1", None, "Rural"),
@@ -160,9 +175,20 @@ def test_the_row_first_returns_can_exist_in_no_household(recwarn):
         ["Region", "Rural"],
     )
     out = Wave.cluster_features(_fake_wave(df))
-    assert out.loc[("2020", "v1")].to_dict() == {"Region": "South", "Rural": "Rural"}
+    served = out.loc[("2020", "v1")].to_dict()
+    assert served["Rural"] == "Rural"
+    assert pd.isna(served["Region"]), (
+        "core served a value no household reported in that row -- is the "
+        "per-column first() composite back? (GH #871)"
+    )
+    # ... and the served row IS one of the input rows, on every column.
+    def _norm(row):
+        return tuple(None if pd.isna(v) else v for v in row)
+    inputs = {_norm(row) for row in df.itertuples(index=False)}
+    assert _norm(served[c] for c in df.columns) in inputs
     assert [w for w in recwarn if issubclass(w.category, GrainCollapseWarning)], (
-        "a composite row is a destroyed row and must be reported"
+        "a cluster whose households disagree is still a destroyed row and must "
+        "be reported -- the reducer change must not silence the audit"
     )
 
 

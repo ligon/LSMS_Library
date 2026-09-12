@@ -150,14 +150,36 @@ transforms.
 
 Grain reduction already happens in three places with INCONSISTENT
 policies; the contract removes the two in core:
-| site                                            | today                  | under contract |
-|-------------------------------------------------+------------------------+----------------|
-| =country._normalize_dataframe_index= (~3817)    | =groupby().first()=    | union+sentinel (no agg) |
-| =feature._harmonize_country_frame= (88-91)      | =droplevel+.first()=   | union+sentinel (no agg) |
-| =transformations.py= (food/roster derived)      | sum / median (correct) | stays; gains =collapse()= |
+| site                                            | today                     | under contract |
+|-------------------------------------------------+---------------------------+----------------|
+| =country._normalize_dataframe_index= (~3817)    | =most_complete_row=       | union+sentinel (no agg) |
+| =country._collapse_to_cluster_grain= (Site 2)   | =most_complete_row=       | union+sentinel (no agg) |
+| =feature._collapse_duplicate_index= (Site 3)    | =droplevel+most_complete_row= | union+sentinel (no agg) |
+| =transformations.py= (food/roster derived)      | sum / median (correct)    | stays; gains =collapse()= |
 
-Both core =.first()= collapses are the GH #323 / #325 silent-data-loss
-footguns; they become lossless union+sentinel.
+All three core collapses are the GH #323 / #325 silent-data-loss footguns;
+they become lossless union+sentinel.
+
+*GH #871 (@ligon, 2026-09-12) -- what "today" is now.*  All three used
+=groupby().first()=, which is not "the first row": it returns the first non-null
+value of EACH COLUMN INDEPENDENTLY, so a disagreeing group was served a
+per-column COMPOSITE that exists nowhere in the survey.  Core now SELECTS an
+observed row -- =country.most_complete_row(df, levels, exclude=())=, the group's
+most complete row (fewest NA cells over the columns core does NOT reduce -- the
+additive measures, plus =Derivation=, which is a library-computed provenance flag
+and must not decide which SURVEY row is served; ties on original order), narrowed
+to =levels= and key-sorted so shape and row order do not move.  This REVERSES the 2026-07-13 "complementary missingness is COMPLETION"
+doctrine of §3a, which was argued against the wrong alternative
+(=first(skipna=False)=, which blanks a cell even where the group agrees and only
+one row reports).  Completion keeps its legitimate home in
+=build_transforms.reduce_to_agreed= (=na_is_conflict=False=), invoked in writing
+by a country author at the call site.  *Still NO AGGREGATION IN CORE*: a
+selection computes nothing.  The exception list stays empty; =Derivation= joins
+=_ADDITIVE_MEASURE_COLUMNS= as a DECLARED reducer on the additive branch only
+(the union of the summed rows' keys, which is lossless by construction).  Census:
+=slurm_logs/gh871_grain_census/= -- 544 served rows change corpus-wide (Site 1
+543, Site 2 1) and *zero* column cells become NA, against 1,025 / 2,714 for the
+=nth(0)= rule originally planned.
 
 * Taxonomy of grain differences
 
@@ -191,10 +213,12 @@ footguns; they become lossless union+sentinel.
 
 ** 3a. What the #323 framework fix actually landed (and what it did NOT)
 
-*LANDED.*  Both =.first()= collapses are now AUDITED BEFORE THEY DESTROY
+*LANDED.*  All core collapses are now AUDITED BEFORE THEY DESTROY
 ANYTHING, and a destructive collapse is LOUD (=GrainCollapseWarning=) or FATAL
 (=LSMS_GRAIN_STRICT=1= -> =GrainCollapseError=).  =country._audit_index_collapse=
 is the single instrument; =feature._collapse_duplicate_index= uses it too.
+Since GH #871 they also SELECT an observed row rather than composing one
+per-column (see the note under "three reduction sites" above).
 
 *NOT LANDED: union + sentinel-fill.*  The collapses still HAPPEN; they are merely
 no longer silent.  Step 3 in its full form (return the maximal grain, never
@@ -211,7 +235,7 @@ most of the census.  Of 142 duplicate-index cells across 31 countries:
 - ~540k rows are the real loss, and almost none of them want a reducer.  They are
   BROKEN IDENTIFIERS (Mali =household_roster= declares =(t, i, pid)= but =pid= is
   a *household* id stamped on every member -- 5,149 distinct values over 37,175
-  rows, so =first()= keeps ONE PERSON PER HOUSEHOLD) or MISSING LEVELS
+  rows, so the collapse keeps ONE PERSON PER HOUSEHOLD) or MISSING LEVELS
   (Tanzania =interview_date= declares =(t, i)=; canonical is =(t, v, i, visit)=).
   The fix for both is to FIX THE INDEX, not to reduce over it -- which is exactly
   the precedent of the only landed step: *PR #471 fixed crop_production by ADDING

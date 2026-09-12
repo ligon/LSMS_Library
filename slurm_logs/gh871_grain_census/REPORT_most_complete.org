@@ -1,0 +1,109 @@
+#+TITLE: GH #871 as LANDED -- what the MOST COMPLETE ROW rule changes
+#+DATE: 2026-09-12
+#+AUTHOR: run on branch fix/871-most-complete-row
+
+* What this is
+
+=REPORT.org= (2026-09-12) measured the rule the plan proposed:
+=groupby(...).nth(0).sort_index()= -- row 0 of each group.  @ligon then fixed the
+semantics differently: core selects *the MOST COMPLETE row* of the group -- the
+count of non-NA cells over the columns core does NOT reduce, ties broken by
+original order.  =bench/grain_census_871.py= grew a =--reducer= option so both
+rules are measurable from the same script and the same warm cache:
+
+#+begin_src sh
+PYTHONPATH=<worktree> LSMS_BUILD_WORKERS=1 \
+  python bench/grain_census_871.py --reducer nth0          # the plan
+PYTHONPATH=<worktree> LSMS_BUILD_WORKERS=1 \
+  python bench/grain_census_871.py --reducer most-complete # what landed
+#+end_src
+
+Method, coverage and caveats are unchanged from =REPORT.org= -- read it first.
+Both runs below are the same enumeration (954 cells, 989 records, 112 diffed,
+55 uncensused, 822 already-unique), the same 51/51 stamp reconciliation, and the
+same 30,815 conflicting index tuples / 105,137 audited =destroyed= rows.  Elapsed
+26 s each.
+
+*The =nth0= run reproduces =REPORT.org='s headline numbers exactly* (1,025 /
+2,714), which is what makes the comparison apples-to-apples even though this
+enumeration counts 954 cells where =REPORT.org= counted 970 (the shared cache has
+moved since; the diffed-cell set has not).
+
+* The comparison
+
+| rule                        | rows_changed | ...Site 1 | ...Site 2 | served_na_new |
+|-----------------------------+--------------+-----------+-----------+---------------|
+| =nth0= (the plan)           |         1025 |       948 |        77 |          2714 |
+| *=most-complete= (landed)*  |      *  544* |   *  543* |     *  1* |          *0* |
+
+=served_na_new= -- the number of column cells that come back NA where =first()=
+found a value somewhere in the same group -- is *zero corpus-wide*.  That is the
+whole difference between the two rules, and it is what the two hand-checked
+groups in =REPORT.org= were warning about:
+
+- =Niger/household_roster/2014-15=, group =('2014-15','101008','1')=: two rows,
+  one entirely blank, sharing a =pid= that is a HOUSEHOLD id stamped on every
+  member (a broken identifier -- the #323 verdict).  =nth0= served the blank row,
+  and =_finalize_result='s =dropna(how='all')= would then have dropped the
+  household head entirely.  *Under the landed rule the head's row is served*
+  (=Masculin, 45.0, Chef de menage, 12.0=) -- and unlike =first()=, that is a row
+  the survey recorded rather than a coincidence of per-column first-non-null.
+  The cell's 45 changed rows / 180 NA cells are *gone*: it now reports
+  rows_changed 0.
+- =Nigeria/cluster_features/2013Q1=, cluster =13/1310/1300=: five households,
+  four agreeing on a GPS fix and one with none, the GPS-less one sorting first.
+  =nth0= discarded the fix; *the landed rule serves it*.  Every Site-2 change in
+  the =nth0= census was of exactly this shape (=cols_involved= over all Site-2
+  records was exactly =['Latitude','Longitude']=), which is why Site 2 falls from
+  77 changed rows to *1*.
+
+* What still changes, and where
+
+The residual 544 rows are groups where the most complete row is *not* the one
+=first()= happened to compose from.  No cell becomes more missing.  And it is
+NOT a wash: 96% of the residual is one cell the rule plainly *corrects* --
+see below.
+
+| country      | table                | wave    | site  | rows_changed | cols_involved |
+|--------------+----------------------+---------+-------+--------------+---------------|
+| Kosovo       | housing              | 2000    | Site1 |          524 | Type, Electricity |
+| Niger        | plot_inputs          | 2014-15 | Site1 |           11 | Quantity, Purchased |
+| Burkina_Faso | plot_inputs          | 2018-19 | Site1 |            5 | Quantity, Purchased |
+| Niger        | plot_inputs          | 2011-12 | Site1 |            2 | Quantity, Purchased |
+| Malawi       | cluster_features     | 2016-17 | Site2 |            1 | Rural |
+| Niger        | shocks               | 2014-15 | Site1 |            1 | AffectedIncome, AffectedAssets, AffectedProduction, AffectedConsumption, HowCoped1 |
+
+Kosovo =housing= 2000 is 96% of the residual and was the worst cell under =nth0=
+too (524 rows), but on *different columns*: =Rooms=/=Tenure= then,
+=Type=/=Electricity= now, with 1,048 NA cells then and none now.  Read on disk,
+it is the clearest case in the corpus for the rule: =DWELLING.dta= gives 593
+households *eight rows each -- one per dwelling-TYPE option*, only one answered
+(and only that one carrying =Electricity=/=Rooms=/=Tenure=).  =first()= served
+=Type= off whichever option sorted first and the rest off the answered row --
+"Prefab/Container, 4 rooms, built personally" -- and over the 524 changed
+households its =Type= was spread near-uniformly across the menu (Barracks 87,
+Tent 77, Intact apartment 75, Damaged apartment 70, Prefab/Container 68).  Every
+one of those groups has EXACTLY ONE strictly-most-complete row, so the landed
+rule serves the answered option unaided: Intact house 280, Damaged house 141,
+Intact apartment 68, Damaged apartment 18, Tent 7.  Full write-up, with the
+household-10501 example: =Kosovo/_/CONTENTS.org=.
+
+The single Site-2 change is Malawi 2016-17 on =Rural= -- a cluster whose
+households disagree about urban/rural, i.e. the Kazakhstan-1996 shape the Site-2
+docstring names.  It was already warning; the collapse now serves a household's
+own =Rural= rather than one assembled beside another household's =Region=.
+
+=derivation_conflicts= is *0* in every censused cell under both rules: no group
+anywhere carries two distinct =Derivation= keys, so the union-vs-selection rule
+on that column is exercised only by
+=tests/test_gh871_most_complete_row.py=, not by today's data.
+
+* Files
+
+- =most_complete/census_871.csv=, =most_complete/summary_871.json=,
+  =most_complete/stamps_871.json= -- the landed rule's run, same schema as the
+  =nth0= run in this directory's top level.
+- Site 3 (=feature._collapse_duplicate_index=) was NOT censused, as in
+  =REPORT.org=: its groups are cross-wave and form after =droplevel=.  It is
+  covered by the synthetic tests, which drive all three sites through the same
+  rule.

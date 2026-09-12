@@ -267,7 +267,7 @@ def _align_to_canonical_levels(
     after ``set_index`` is routed through :func:`_collapse_duplicate_index`, the
     same audited collapse the core uses, which files a grain report and raises
     ``GrainCollapseError`` under ``LSMS_GRAIN_STRICT`` when the colliding rows
-    disagree.  Never a silent ``first()``, and never a silent pass-through of a
+    disagree.  Never a silent collapse, and never a silent pass-through of a
     non-unique index into ``pd.concat``.
 
     Reporting.  With ``report`` supplied, what happened is recorded there and
@@ -436,10 +436,10 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 
 # Tables whose measure columns are ADDITIVE across a dropped recall/visit level.
 # When collapsing the duplicate index left after dropping that level, these must
-# be SUMMED (not reduced via first(), which undercounts the cross-country total).
+# be SUMMED (a row SELECTION undercounts the cross-country total).
 # Motivating case (GH #501): GhanaLSS food_acquired carries a per-visit level
 # (~12 repeated visits over a month); CONTENTS.org states the visits are summed.
-# Keeping first() there silently kept only ~48% of total Quantity.
+# Selecting one visit's row there silently kept only ~48% of total Quantity.
 #
 # This is the ONE reduction policy core keeps (see the NO-AGGREGATION-IN-CORE
 # contract in SkunkWorks/grain_aggregation_policy.org and D1 of
@@ -456,19 +456,20 @@ def _fabricates_missing_levels(table_name: str) -> bool:
 # assets (GH #323): Nigeria W2's `sect5b_plantingw2` is a PER-UNIT ROSTER -- one
 # row per individual unit owned, enumerated by `item_seq` (1..15), each with its
 # own reported Value.  The canonical assets grain is (t, i, j), so those rows
-# arrive as duplicates and first() kept ONE UNIT and discarded the rest:
+# arrive as duplicates and the collapse kept ONE UNIT and discarded the rest:
 # N576,299,043 true -> N429,001,558 kept -> N147,297,485 (25.6%) DESTROYED, in
 # EACH of t=2012Q3 and t=2013Q1.  Summing Value is exactly lossless: the value of
 # a household's holding of item j IS the sum over the units it owns (hh 10001
 # owns 4 beds worth 7000+3000+6000+5000 = 21,000).
-#   * `Quantity` must stay first(): it comes from the SEPARATE, already-clean
+#   * `Quantity` must stay SELECTED: it comes from the SEPARATE, already-clean
 #     sect5a grid (one row per (i, j)) and the wave's `dfs:` merge REPEATS it
 #     across the item_seq rows -- verified, 0 groups where it varies.  Summing it
 #     would multiply the unit count by itself (4 beds -> 16).
-#   * `Age` also stays first().  It is genuinely per-unit (it varies within 7,029
-#     groups), so NO reducer is lossless at (t, i, j) -- the four beds are 10, 6,
-#     10 and 6 years old and that fact cannot be carried by one row.  first()
-#     keeps unit #1's age.  Retaining the detail needs the `item_seq` level to
+#   * `Age` also stays SELECTED.  It is genuinely per-unit (it varies within
+#     7,029 groups), so NO reducer is lossless at (t, i, j) -- the four beds are
+#     10, 6, 10 and 6 years old and that fact cannot be carried by one row.  The
+#     collapse keeps the age of the most complete unit row (GH #871; it used to
+#     be unit #1's, by per-column `first()`).  Retaining the detail needs the `item_seq` level to
 #     survive, which it currently cannot: the extra idxvar is dropped by the
 #     `dfs:` merge in Wave.grab_data (#323 Site 4), and Nigeria's other waves
 #     have no item_seq column to declare.  Tracked as a residual, not fixed here;
@@ -512,18 +513,23 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
 
     For additive-measure tables (GH #501) sum the additive columns and re-derive
     any unit-``Price`` column from the summed totals (price is per-unit, NOT
-    additive).  Otherwise keep the first row per group (the historical default).
+    additive).  Every other column is SELECTED rather than reduced: GH #871
+    serves the MOST COMPLETE OBSERVED ROW of the group (``most_complete_row``),
+    where this used to serve a per-column ``groupby().first()`` composite that
+    existed in no country's data.
 
-    GH #323: this is the SECOND of the two core ``.first()`` collapses named in
+    GH #323: this is the THIRD of the core collapses named in
     SkunkWorks/grain_aggregation_policy.org.  Like the one in
     ``country._normalize_dataframe_index`` it is audited before it destroys
     anything -- a Feature() assembly must not be a place where a country quietly
-    loses rows that ``Country(name).table()`` would have returned.
+    loses rows that ``Country(name).table()`` would have returned -- and it must
+    select by the same rule, so the two access paths agree.
     """
     # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
     # module-level import back would cycle.
     from .country import (_audit_index_collapse, _record_grain_report,
-                          _sum_min_count_1)
+                          most_complete_row)
+    from .derivations import COLUMN as _DERIVATION_COLUMN, union_keys_by_group
 
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
     present = [c for c in (additive or ()) if c in df.columns]
@@ -540,6 +546,11 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
         reconciled = list(present)
         if "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
             reconciled.append("Price")
+        # GH #871: on the additive branch `Derivation` is reconciled as well --
+        # the union of the summed rows' keys keeps every one of them.  Only here;
+        # on the selection branch the served row carries its own key.
+        if _DERIVATION_COLUMN in df.columns:
+            reconciled.append(_DERIVATION_COLUMN)
         residual = _audit_index_collapse(df.drop(columns=reconciled),
                                          list(df.index.names))
         if residual is None:
@@ -556,14 +567,39 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
                       additive=bool(present))
         _record_grain_report(report)
 
-    grouped = df.groupby(level=list(df.index.names), observed=True)
+    levels = list(df.index.names)
+    # GH #871: SELECT one observed row per group for every column core does not
+    # reduce.  The reduced columns are excluded from the completeness score
+    # because their served value does not come from the selected row.
+    reduced = set(present)
+    if _DERIVATION_COLUMN in df.columns:
+        # On BOTH branches: a library-computed provenance flag must not decide
+        # which survey row is served.  Same rule as
+        # country._normalize_dataframe_index (GH #871).
+        reduced.add(_DERIVATION_COLUMN)
+    if present and "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+        # Re-derived from the summed totals below; excluded for the same reason
+        # as the additive measures (@ligon, 2026-09-12).
+        reduced.add("Price")
+    out = most_complete_row(df, levels, exclude=reduced)
     if not present:
-        return grouped.first()
+        return out
     # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
-    # become a fabricated 0.0.  Same reducer as country._normalize_dataframe_index
+    # become a fabricated 0.0.  Same reducers as country._normalize_dataframe_index
     # -- the two sites read one policy dict and must apply it identically (#323).
-    agg = {c: (_sum_min_count_1 if c in present else "first") for c in df.columns}
-    out = grouped.agg(agg)
+    # `sum(min_count=1)` in its cython spelling -- ~400x faster on a large frame
+    # with populated `attrs`, and identical to `_sum_min_count_1` TO WITHIN ONE
+    # ULP (cython sums pairwise; 392 of 161,176 GhanaLSS 1998-99 groups differ at
+    # max rel 4e-16, with totals, NA pattern and dtypes unchanged).  That is a
+    # behaviour change #871 did not ask for; see the full note at
+    # country._normalize_dataframe_index (GH #871).
+    grouped = df.groupby(level=levels, observed=True)
+    sums = grouped[present].sum(min_count=1)
+    overlay = {c: sums[c] for c in present}
+    if _DERIVATION_COLUMN in df.columns:
+        overlay[_DERIVATION_COLUMN] = union_keys_by_group(
+            df[_DERIVATION_COLUMN], levels, out.index)
+    out = out.assign(**overlay)
     if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
         out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)
     return out

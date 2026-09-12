@@ -2,9 +2,11 @@
 """GH #871 pre-landing census: what would row-coherent selection change?
 
 READ-ONLY.  Measures, per ``(country, table, wave)`` cell, the difference
-between today's per-column ``groupby(...).first()`` composite and the proposed
-row-coherent ``groupby(...).nth(0).sort_index()`` selection at the two core
-*build*-path collapse sites:
+between today's per-column ``groupby(...).first()`` composite and a row-coherent
+SELECTION at the two core *build*-path collapse sites.  ``--reducer`` picks the
+candidate: ``nth0`` (row 0 of the group -- the original proposal, and what the
+2026-09-12 REPORT.org measured) or ``most-complete`` (the most complete observed
+row, which is what GH #871 landed).  Sites:
 
   Site 1  ``country._normalize_dataframe_index``   (declared-index collapse)
   Site 2  ``country._collapse_to_cluster_grain``   (household -> cluster projection)
@@ -131,8 +133,15 @@ def _derivation_conflicts(df, levels):
     return int((n > 1).sum())
 
 
+#: Which candidate reducer the diff measures against today's ``first()``.
+#: ``nth0`` is the original proposal (row 0 of the group); ``most-complete`` is
+#: what landed for GH #871 (the most complete observed row).  Set from
+#: ``--reducer`` in ``main()`` BEFORE the pool forks, so workers inherit it.
+REDUCER = "nth0"
+
+
 def _diff_at(df, levels, site, country, table, wave):
-    """Compare first() against nth(0).sort_index() on *df* grouped by *levels*.
+    """Compare first() against the candidate reducer on *df* grouped by *levels*.
 
     Returns (record, collapsed_first_frame).  ``collapsed_first_frame`` is what
     today's code serves onward (so the Site-1 pass after a Site-2 projection
@@ -190,16 +199,31 @@ def _diff_at(df, levels, site, country, table, wave):
 
     g = df.groupby(level=levels, observed=True)
     f = g.first()
-    r = g.nth(0)
-    # nth(0) keeps the ORIGINAL index (all levels, original row order).  Reduce
-    # it to the group key so it aligns with first(), then sort as the proposal
-    # does.
-    extra = [n for n in (r.index.names or []) if n not in levels]
-    if extra and len(r.index.names) > len(extra):
-        r = r.droplevel(extra)
-    if isinstance(r.index, pd.MultiIndex) and list(r.index.names) != list(levels):
-        r = r.reorder_levels(list(levels))
-    r = r.sort_index()
+    if REDUCER == "most-complete":
+        # GH #871 as LANDED (@ligon, 2026-09-12): select the MOST COMPLETE row of
+        # the group -- fewest NA cells over the columns core does not reduce,
+        # ties on original order.  The exclude set is the library's: the additive
+        # measures, a RE-DERIVED ``Price``, and ``Derivation`` on both branches
+        # (see country.most_complete_row for why each one has no vote).
+        from lsms_library.country import most_complete_row
+        from lsms_library.derivations import COLUMN as _DERIV
+        exclude = set(additive)
+        if _DERIV in df.columns:
+            exclude.add(_DERIV)
+        if additive and "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+            exclude.add("Price")
+        r = most_complete_row(df, levels, exclude=exclude)
+    else:
+        r = g.nth(0)
+        # nth(0) keeps the ORIGINAL index (all levels, original row order).
+        # Reduce it to the group key so it aligns with first(), then sort as the
+        # proposal does.
+        extra = [n for n in (r.index.names or []) if n not in levels]
+        if extra and len(r.index.names) > len(extra):
+            r = r.droplevel(extra)
+        if isinstance(r.index, pd.MultiIndex) and list(r.index.names) != list(levels):
+            r = r.reorder_levels(list(levels))
+        r = r.sort_index()
     r = r.reindex(f.index)
     r = r[f.columns]
 
@@ -425,7 +449,15 @@ def main():
     ap.add_argument("--procs", type=int, default=40)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--only", default="", help="substring filter on country")
+    ap.add_argument("--reducer", default="nth0",
+                    choices=("nth0", "most-complete"),
+                    help="candidate reducer to diff against first() "
+                         "(most-complete is what GH #871 landed)")
     args = ap.parse_args()
+
+    global REDUCER
+    REDUCER = args.reducer
+    print(f"reducer under test: {REDUCER}", file=sys.stderr)
 
     os.environ.setdefault("LSMS_BUILD_WORKERS", "1")
     import lsms_library
