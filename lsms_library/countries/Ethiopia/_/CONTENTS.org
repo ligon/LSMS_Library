@@ -1769,3 +1769,103 @@ Two small blemishes, neither worth a rebuild on its own:
   space, and =crop_production= uses the spaced form while
   =community_prices= and =food_acquired= use both.  Any analysis must drop
   these rows anyway -- a price "per Other (Specify)" is not a price.
+
+* shocks: one builder, and what "affected" means (GH #875, 2026-09-12)
+
+Until now Ethiopia =shocks= had *two builders for the same columns, with
+different rules*, and which one you got depended on the build path and on
+the cache state rather than on the code:
+
+- *YAML path* (what =data_scheme.yml= actually declares -- no
+  =materialize:=, so =Wave.grab_data= reads each wave's =data_info.yml=):
+  =Decrease -> True=, =Increase -> True=, =Did Not Change -> False=,
+  anything else NA.  This is the corpus convention (cf. Malawi 2016-17
+  =data_info.yml=) and is what the served table has in fact carried.
+- *Script path* (=2011-12,2013-14,2015-16,2018-19/_/shocks.py= plus the
+  country concatenator =_/shocks.py=, wired into =_/Makefile=):
+  =Increase -> *False*=, =.fillna(False)= (an imputation the YAML does not
+  make, turning "not asked / no shock" into a definite "no"), the household
+  level named =j= against the declared =(t, i, Shock)=, and
+  =Occurrence.fillna(0)=.  =make build country=Ethiopia= could not even
+  finish it: there is no 2021-22 wave script, so the concatenator read the
+  YAML-written W5 parquet and =change_id= raised =KeyError: 'j'=.
+
+The script path was nevertheless live in three ways: it is what =make=
+runs; its hashless wave parquets are graded =legacy= by =Wave.grab_data=,
+read, and *re-stamped* with the wave hash, after which
+=_evict_hashless_wave_caches= no longer removes them; and =build_wave='s
+=run_make_target= fallback would pull it into a country build if the YAML
+extraction ever raised.
+
+*Resolved by deleting the script path.*  The five scripts and the Makefile
+rules are gone; the YAML path serves all five waves.  *The rule, recorded:
+a shock that moved income / assets / production / consumption / food stock
+in EITHER direction counts as affected; =Did Not Change= is False;
+everything else stays NA and is never imputed.*
+
+Two script-only columns would otherwise have been lost, so they were moved
+onto the sanctioned path instead (=data_scheme.yml= + each wave's
+=data_info.yml=):
+
+- =AffectedFoodStock= (=hh_s8q03_d= W1-W3, =s9q03d= W4-W5) -- asked in all
+  five waves, declared =bool=, same mapping as its four siblings.
+- =Occurrence= (=hh_s8q05=, "how many times in the last 12 months") --
+  *W1-W3 only*, and NOT filled to 0.  Verified against the raw files: the
+  W4/W5 instrument has *no occurrence variable at all* -- =sect9_hh_w4.dta=
+  and =sect9_hh_w5.dta= ship =s9q01=, =s9q03a..e= and =s9q04_1..3= and
+  nothing else in that battery (the only remaining "05" column is the
+  survey-admin =saq05=).  The question was dropped, not renamed.
+
+  It is nevertheless declared *required* (=Occurrence: int=, 3,440 / 3,058
+  / 5,520 values in W1/W2/W3 and 0 in W4/W5).  =optional: true= would have
+  silenced the two waves that do not ask it, but =optional:= is
+  *country*-grain while this absence is *wave*-grain, so it would equally
+  disarm the three waves that DO -- and it is what gates turning
+  =LSMS_READ_STRICT=1= on in CI.  CLAUDE.md's null-read section says so
+  outright ("Do not reach for =optional: true= to silence one wave").  So
+  Site B's report is ACCEPTED as correct output:
+
+  : NullReadWarning  Ethiopia/shocks: required declared column 'Occurrence'
+  : is 100% NULL in wave(s) [2018-19, 2021-22] while other waves carry it.
+
+  Same shape as Niger 2014-15 =Latitude= (CLAUDE.md, "Known granularity
+  mismatch, not fixed here"): the guard is reporting a real instrument
+  change, and the granularity to record that judgement does not exist yet.
+
+Nothing in the tree consumed either column (grep over =*.py/*.yml/*.org=
+outside the deleted scripts: zero hits).
+
+Measured, =Country('Ethiopia').shocks()=, warm before vs. cold-rebuilt
+after:
+
+| | before | after |
+|-------------------+--------+--------|
+| rows              | 21,778 | 21,781 |
+| columns           |      7 |      9 |
+
+The three extra rows are rows whose only survey answer was
+=AffectedFoodStock= / =Occurrence=; they had been dropped by
+=dropna(how='all')=.  *The four pre-existing =Affected*= columns are
+unchanged in every wave* (=AffectedIncome= True: 3,066 / 2,641 / 4,571 /
+2,957 / 4,897 for W1-W5; False 398 / 475 / 954 / 779 / 926), which is the
+point: the YAML rule was already what served, and this change makes it the
+only rule that CAN serve.
+
+** Two things found while doing this, NOT fixed here
+
+1. The =Shock= index is *not harmonized across waves*.  W1-W3 carry the
+   raw sentence-case ESS labels ("Death of Household Member", "Increase in
+   Price of Inputs"), W4/W5 carry title-case ones mapped in the wave YAML
+   ("Death Of Hh Member (Main Bread Earner)", "Price Raise Of Inputs"), so
+   a panel on =Shock= does not line up.  The deleted country script had a
+   =harmonize_shocks= + =category_labels= pass that did this; it died with
+   the rest of the dead path, and it was not reaching the API anyway.  The
+   right home is a =harmonize_shocks= table in =categorical_mapping.org=
+   (the mechanism the shocks skill documents), which Ethiopia does not yet
+   have.
+2. Three 2021-22 =Shock= labels come through *unmapped*, still bearing
+   their numeric prefixes: "11. UNUSUAL PRICE FALL  OF FOOD ITEMS
+   AGRICULTURE PRODUCES", "12. UNUSUAL PRICE RISE ...", "18. LOCAL
+   UNREST/VIOLENCE" -- the 2021-22 =data_info.yml= mapping keys differ from
+   the data by a trailing space.  Cosmetic in isolation, but it splits
+   those shock types in any cross-wave count.
