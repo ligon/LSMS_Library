@@ -388,6 +388,23 @@ def test_union_keys_by_group_spells_a_missing_group_as_pd_NA():
     assert got.loc[("2020", "i2")] == "x::t::a"
 
 
+def test_a_re_derived_price_does_not_vote_on_which_row_is_served():
+    """@ligon, 2026-09-12: for consistency with the measures it is computed
+    from, ``Price`` is excluded from the completeness score wherever it is
+    RE-DERIVED (``Expenditure`` and ``Quantity`` both present on an additive
+    table).  Row 1 here has a ``Price`` and no ``Source``; row 0 the reverse.
+    With ``Price`` scoring, row 1 would win on a column whose served value is
+    overwritten a line later."""
+    key = ("2020", "i1", "Rice", "Kg")
+    df = _food([(key, 2.0, 100.0, np.nan, "gift", pd.NA),
+                (key, 3.0, 200.0, 66.7, pd.NA, pd.NA)])
+    out, _ = _collapse_food(df, "site1")
+    assert out.loc[key, "Source"] == "gift", (
+        "a re-derived Price decided which survey row was served")
+    # ... and Price is the re-derivation, not either row's reported value
+    assert out.loc[key, "Price"] == pytest.approx(60.0)
+
+
 def test_derivation_does_not_vote_on_which_row_is_served():
     """A reduced column must not decide WHICH row is served: its served value
     does not come from the selected row at all."""

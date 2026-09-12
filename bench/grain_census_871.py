@@ -203,13 +203,15 @@ def _diff_at(df, levels, site, country, table, wave):
         # GH #871 as LANDED (@ligon, 2026-09-12): select the MOST COMPLETE row of
         # the group -- fewest NA cells over the columns core does not reduce,
         # ties on original order.  The exclude set is the library's: the additive
-        # measures, plus ``Derivation`` on BOTH branches (but NOT ``Price``,
-        # which the library leaves in the score; see country.most_complete_row).
+        # measures, a RE-DERIVED ``Price``, and ``Derivation`` on both branches
+        # (see country.most_complete_row for why each one has no vote).
         from lsms_library.country import most_complete_row
         from lsms_library.derivations import COLUMN as _DERIV
         exclude = set(additive)
         if _DERIV in df.columns:
             exclude.add(_DERIV)
+        if additive and "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+            exclude.add("Price")
         r = most_complete_row(df, levels, exclude=exclude)
     else:
         r = g.nth(0)

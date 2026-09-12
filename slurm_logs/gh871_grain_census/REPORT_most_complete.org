@@ -60,8 +60,9 @@ groups in =REPORT.org= were warning about:
 * What still changes, and where
 
 The residual 544 rows are groups where the most complete row is *not* the one
-=first()= happened to compose from -- equal completeness, different values.  No
-cell becomes more missing; a different observed row is served.
+=first()= happened to compose from.  No cell becomes more missing.  And it is
+NOT a wash: 96% of the residual is one cell the rule plainly *corrects* --
+see below.
 
 | country      | table                | wave    | site  | rows_changed | cols_involved |
 |--------------+----------------------+---------+-------+--------------+---------------|
@@ -74,7 +75,18 @@ cell becomes more missing; a different observed row is served.
 
 Kosovo =housing= 2000 is 96% of the residual and was the worst cell under =nth0=
 too (524 rows), but on *different columns*: =Rooms=/=Tenure= then,
-=Type=/=Electricity= now, with 1,048 NA cells then and none now.
+=Type=/=Electricity= now, with 1,048 NA cells then and none now.  Read on disk,
+it is the clearest case in the corpus for the rule: =DWELLING.dta= gives 593
+households *eight rows each -- one per dwelling-TYPE option*, only one answered
+(and only that one carrying =Electricity=/=Rooms=/=Tenure=).  =first()= served
+=Type= off whichever option sorted first and the rest off the answered row --
+"Prefab/Container, 4 rooms, built personally" -- and over the 524 changed
+households its =Type= was spread near-uniformly across the menu (Barracks 87,
+Tent 77, Intact apartment 75, Damaged apartment 70, Prefab/Container 68).  Every
+one of those groups has EXACTLY ONE strictly-most-complete row, so the landed
+rule serves the answered option unaided: Intact house 280, Damaged house 141,
+Intact apartment 68, Damaged apartment 18, Tent 7.  Full write-up, with the
+household-10501 example: =Kosovo/_/CONTENTS.org=.
 
 The single Site-2 change is Malawi 2016-17 on =Rural= -- a cluster whose
 households disagree about urban/rural, i.e. the Kazakhstan-1996 shape the Site-2

@@ -5892,12 +5892,17 @@ def most_complete_row(df: pd.DataFrame, levels: list[str],
     rather than arbitrary it selects the most complete one:
 
     - completeness = the count of non-NA cells over ``df.columns`` minus
-      ``exclude``.  Callers exclude two things: a column core REDUCES
-      (``_ADDITIVE_MEASURE_COLUMNS``, summed -- its served value does not come
-      from the selected row at all), and ``Derivation``, which is a
-      library-computed provenance flag rather than survey content and must not
-      decide which of two SURVEY rows is served -- on EITHER branch, even where
-      it rides along with the selected row rather than being unioned.
+      ``exclude``.  Callers exclude three things, and the rule behind all three
+      is that the served value does not come from the selected row, so the
+      column has no standing to choose it:
+        * the additive measures (``_ADDITIVE_MEASURE_COLUMNS``), summed;
+        * ``Price`` wherever it is RE-DERIVED from those sums (``Expenditure``
+          and ``Quantity`` both present) -- @ligon, 2026-09-12, for consistency
+          with the measures it is computed from;
+        * ``Derivation``, on EITHER branch -- it is a LIBRARY-COMPUTED provenance
+          flag rather than survey content, so it must never break a tie between
+          two SURVEY rows, not even on the selection branch where it rides along
+          with the row it was written on (@ligon, 2026-09-12).
     - ties break on ORIGINAL ORDER, so a group whose rows are equally complete
       is served its first row -- what the old reducer did when nothing was
       missing.
@@ -5960,8 +5965,13 @@ def _normalize_dataframe_index(
     - Drops unexpected index levels.
     - Synthesizes missing 't' levels for wave-specific tables.
     - Collapses duplicate entries: SUMs the additive measure columns for
-      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), else keeps the
-      first row per group (the historical default).
+      tables in ``_ADDITIVE_MEASURE_COLUMNS`` (``table_name``), re-derives a
+      per-unit ``Price`` from those sums, unions ``Derivation`` there, and
+      SELECTS one observed row of the group for every other column --
+      ``most_complete_row``, the group's most complete row (GH #871).  It used
+      to keep "the first row per group", which was never what it did: pandas'
+      ``groupby().first()`` is a per-column first-non-null and returned a
+      COMPOSITE of several rows.
     - GH #323: AUDITS that collapse first, while the pre-collapse frame still
       exists, and reports any destroyed rows loudly (or fatally, under
       ``LSMS_GRAIN_STRICT``).  ``country`` is carried only so the report can name
@@ -6122,6 +6132,12 @@ def _normalize_dataframe_index(
         reduced = set(present_additive)
         if _DERIVATION_COLUMN in df.columns:
             reduced.add(_DERIVATION_COLUMN)
+        if present_additive and 'Price' in df.columns and {
+                'Expenditure', 'Quantity'} <= set(df.columns):
+            # Re-derived from the summed totals a few lines below, so its served
+            # value does not come from the selected row either -- the same reason
+            # the additive measures are excluded (@ligon, 2026-09-12).
+            reduced.add('Price')
         selected = most_complete_row(df, present_levels, exclude=reduced)
 
         if present_additive:
@@ -6135,15 +6151,22 @@ def _normalize_dataframe_index(
             # recovered Value sums and every food_acquired total byte-identical.
             # (country.py:2089 already uses min_count=1 for exactly this reason.)
             #
-            # GH #871: `grouped[c].sum(min_count=1)` is the CYTHON spelling of
+            # GH #871: `grouped[...].sum(min_count=1)` is the CYTHON spelling of
             # `_sum_min_count_1` (kept, documented and directly tested in
-            # tests/test_assets_additive.py) -- measured byte-identical, dtypes
-            # and all-NA-group-stays-NA included, and 0.12 s against 51.8 s on a
+            # tests/test_assets_additive.py).  0.12 s against 51.8 s on a
             # 400k-row / 200k-group frame, because a Python groupby callable
             # makes pandas `deepcopy` `df.attrs` once PER GROUP.  Not a
             # micro-optimisation: with `Derivation` added as a third such column
             # it was the difference between GhanaLSS `food_acquired` collapsing
             # and a 20-minute test timeout.
+            #
+            # It is IDENTICAL TO WITHIN ONE ULP, not byte-identical, and that is
+            # a BEHAVIOUR CHANGE #871 did not ask for -- state it rather than
+            # round it away.  Cython sums PAIRWISE where `Series.sum` accumulates
+            # in order, so a group of 3+ floats can land on a neighbouring
+            # double: measured on GhanaLSS 1998-99 `food_acquired`, 392 of
+            # 161,176 groups differ, at a maximum relative difference of 4e-16.
+            # Column totals, the NA pattern and every dtype are unchanged.
             grouped = df.groupby(level=present_levels, observed=True)
             sums = grouped[present_additive].sum(min_count=1)
             overlay = {c: sums[c] for c in present_additive}

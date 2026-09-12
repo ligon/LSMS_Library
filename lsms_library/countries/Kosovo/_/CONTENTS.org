@@ -250,6 +250,70 @@ which is what corroborates the BID as the catalog's own account.
   survey *claims* to cover and what the data happen to look like are kept apart
   deliberately.
 
+* housing 2000: DWELLING.dta is a DWELLING-TYPE MENU, one row per option (GH #871, 2026-09-12)
+
+The single largest cell in the GH #871 corpus census, and the reason to read
+this entry rather than the summary: Kosovo =housing= 2000 is *96% of the
+residual* -- 524 of the 544 served rows that change corpus-wide -- and what
+changes is not a coin-flip between equivalent rows.  It is a correction.
+
+*The idiosyncrasy.*  =housing= declares =(t, i)=, and that index is NOT unique:
+7,047 rows over 4,867 households.  593 households carry *eight* rows each, and
+the eight are the eight dwelling-TYPE options of the DWELLING module --
+=Tent=, =Barracks=, =Prefab/Container=, =Damaged house=, =Intact house=,
+=Damaged apartment=, =Intact apartment=, =Others= -- with only ONE of them
+being the household's actual dwelling.  That row is the one that also carries
+=Electricity=, =Rooms= and =Tenure=; the other seven are blank on all three.
+(Distribution of rows per household: 2,256 x 1, 593 x 8, 11 x 2, 2 x 3, 2 x 7,
+1 x 5.)  The audit has always reported this correctly -- 4,182 of 7,047 rows
+destroyed across 609 conflicting groups -- and the *identifier is not broken*
+here: the missing index level is the dwelling-type option itself.
+
+*What was served until #871.*  =groupby().first()= is a per-column
+first-non-null, so it composed a household out of the menu:
+
+#+begin_example
+household 10501, the eight input rows:
+                         Type Electricity  Rooms            Tenure
+2000 10501   Prefab/Container          No    NaN               NaN
+     10501  Damaged apartment          No    NaN               NaN
+     10501       Intact house          No    NaN               NaN
+     10501           Barracks          No    NaN               NaN
+     10501   Intact apartment          No    NaN               NaN
+     10501      Damaged house         Yes    4.0  Built personally   <- the answer
+     10501             Others          No    NaN               NaN
+     10501               Tent          No    NaN               NaN
+
+first()  served:  Prefab/Container | No  | 4.0 | Built personally
+#871     serves:  Damaged house    | Yes | 4.0 | Built personally
+#+end_example
+
+A prefabricated container with four rooms that the household built itself: a
+dwelling that exists nowhere in the survey, assembled from =Type= off one row
+and =Rooms=/=Tenure= off another.  And it was not a rare edge: over the 524
+changed households the =Type= =first()= served is spread almost uniformly over
+the menu -- Barracks 87, Tent 77, Intact apartment 75, Damaged apartment 70,
+Prefab/Container 68 -- because it simply took whichever option happened to sort
+first.  The rule that landed serves Intact house 280, Damaged house 141, Intact
+apartment 68, Damaged apartment 18, Tent 7: a housing distribution that reads
+like post-conflict Kosovo instead of like a questionnaire's answer list.
+
+*Why the rule picks it without being told.*  In every one of the 524 groups
+there is EXACTLY ONE strictly-most-complete row (four non-NA cells against
+two), so =country.most_complete_row= selects the answered option with no
+Kosovo-specific configuration and no tie to break.  =served_na_new= for this
+cell is 0 -- nothing becomes more missing.
+
+*Still open, and NOT fixed here.*  The eight rows are eight real records of one
+questionnaire grid, and 4,182 of them are still discarded by the collapse.  The
+honest fix is the #323 one: declare the level the survey varies over (the
+dwelling-type option) so the grid survives, or reduce the grid to one row per
+household in a wave script with the selection written down.  Until then the
+cell warns on every read, and what it serves is now an observed dwelling rather
+than a composite of eight.
+
+Census: =slurm_logs/gh871_grain_census/REPORT_most_complete.org=.
+
 * shocks — not available (2026-06-07, verified)
 
 =shocks= (a household adverse-events-and-coping roster, index =(t, i, Shock)=)

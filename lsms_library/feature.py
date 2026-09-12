@@ -577,15 +577,22 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
         # which survey row is served.  Same rule as
         # country._normalize_dataframe_index (GH #871).
         reduced.add(_DERIVATION_COLUMN)
+    if present and "Price" in df.columns and {"Expenditure", "Quantity"} <= set(df.columns):
+        # Re-derived from the summed totals below; excluded for the same reason
+        # as the additive measures (@ligon, 2026-09-12).
+        reduced.add("Price")
     out = most_complete_row(df, levels, exclude=reduced)
     if not present:
         return out
     # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
     # become a fabricated 0.0.  Same reducers as country._normalize_dataframe_index
     # -- the two sites read one policy dict and must apply it identically (#323).
-    # `sum(min_count=1)` in its cython spelling -- identical to
-    # `_sum_min_count_1` and ~400x faster on a large frame with populated
-    # `attrs`; see the note at country._normalize_dataframe_index (GH #871).
+    # `sum(min_count=1)` in its cython spelling -- ~400x faster on a large frame
+    # with populated `attrs`, and identical to `_sum_min_count_1` TO WITHIN ONE
+    # ULP (cython sums pairwise; 392 of 161,176 GhanaLSS 1998-99 groups differ at
+    # max rel 4e-16, with totals, NA pattern and dtypes unchanged).  That is a
+    # behaviour change #871 did not ask for; see the full note at
+    # country._normalize_dataframe_index (GH #871).
     grouped = df.groupby(level=levels, observed=True)
     sums = grouped[present].sum(min_count=1)
     overlay = {c: sums[c] for c in present}
