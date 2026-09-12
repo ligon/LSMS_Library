@@ -359,6 +359,12 @@ Data Scheme:
     #                  treats the days variable (ms04q31, labelled and asked
     #                  as days per WEEK) as days per month -- 4.33x too low.
     #                  Fixed 2026-09-12, GH #877.
+    #       In BOTH waves each input has its own declared `manquant` value-
+    #       label code NA'd before the multiplication (2011-12 ms04q29/30/
+    #       55/56 -> 99, ms04q31/57 -> 9; 2014-15 likewise, MS04Q27 == 9 the
+    #       only one present).  Read per variable from the .dta value labels
+    #       (niger._num_no_declared_missing), never masked blanket: 610
+    #       people genuinely report ms04q30 == 9 hours a day.
     #   Industry -- broad industry of the job (Agriculture / Fishing / Mining
     #       / Manufacturing / Construction / Services) from the WB activity-
     #       section-code ranges (NER_ECVMA1.do:1386-1391).  ONE harmonized

@@ -1124,6 +1124,45 @@ def people_last7days_ehcvm(s04, s01, t, pid_col='s01q00a', age_col='s01q04a',
     return df
 
 
+# Value labels that declare a code to be MISSING rather than a quantity.
+# ECVMA spells it "manquant" (2011-12, lower case) / "Manquant" (2014-15).
+# Kept deliberately TIGHT: this list must only ever hold labels that mean
+# "no answer", never a substantive category.  GH #877.
+_MISSING_VALUE_LABELS = {'manquant', 'missing'}
+
+
+def _num_no_declared_missing(src, col, value_labels):
+    """`src[col]` as a number, with the survey's OWN declared missing code NA.
+
+    The ms04 time-use variables are read with ``convert_categoricals=False``
+    (the rest of the module needs numbers), which hands back the raw code --
+    so ``ms04q31 == 9`` arrives as nine days per week and ``ms04q56 == 99`` as
+    ninety-nine hours per day.  Both are the ``manquant`` code declared in the
+    file's own value labels, and multiplying them into an hours formula is how
+    2011-12 came to serve 7,410 hours in a week (GH #877).
+
+    The code is looked up PER VARIABLE from the value labels, never masked
+    blanket: 610 people genuinely report ``ms04q30 == 9`` hours a day, and
+    that variable's missing code is 99, not 9.  Pass ``value_labels`` from
+    ``local_tools.get_categorical_mapping(<the same .dta>)``; a variable with
+    no value labels (2014-15 ``MS04Q26``) is returned unmasked.
+    """
+    s = pd.to_numeric(src[col], errors='coerce')
+    labels = None
+    try:
+        if col in value_labels:
+            labels = dict(value_labels[col])
+    except (TypeError, KeyError):
+        labels = None
+    if not labels:
+        return s
+    codes = [float(k) for k, lab in labels.items()
+             if str(lab).strip().lower() in _MISSING_VALUE_LABELS]
+    if not codes:
+        return s
+    return s.mask(s.isin(codes))
+
+
 def _finish_people_last7days(df, t):
     """Common tail for the wave-level people_last7days scripts: coerce dtypes,
     guarantee the full schema column set (NA where a wave lacks a field),

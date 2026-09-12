@@ -56,15 +56,24 @@ not 52/12 = 4.33, so the same schedule still comes out ~1.15x higher here
 than there.  The alternative (divide by 13, matching a reported w=4) was
 considered and rejected: 52/12 is exact, and 4 weeks/month is a respondent
 approximation in the other wave, not a property of this one.
+
+DECLARED MISSING CODES (same issue).  All six inputs declare a `manquant`
+code in the file's own value labels -- ms04q29/q30/q55/q56 -> 99,
+ms04q31/q57 -> 9 -- and `convert_categoricals=False` hands those back as
+quantities (99 hours a day, 9 days in a week).  They are NA'd per variable
+via `niger._num_no_declared_missing`, reading the labels at build time.  Per
+variable, NEVER blanket: 610 people genuinely report ms04q30 == 9 hours a
+day, and that variable's missing code is 99.
 """
 import sys
 
 sys.path.append('../../_/')
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet, format_id
+from lsms_library.local_tools import (get_categorical_mapping, get_dataframe,
+                                      to_parquet, format_id)
 from niger import (i as niger_i, _industry_label, _yn_bool,
-                   _finish_people_last7days)
+                   _finish_people_last7days, _num_no_declared_missing)
 
 
 # Occupation-code sets the WB uses to classify a job as farm vs own-business
@@ -75,8 +84,11 @@ SB_CODES = {6101, 6202, 6203, 6204, 6205, 6206, 6207,
             6209, 6210, 6211, 6212}
 
 
-src = get_dataframe('../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2.dta',
-                    convert_categoricals=False)
+SRC = '../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2.dta'
+src = get_dataframe(SRC, convert_categoricals=False)
+# The file's own value labels, so the declared `manquant` code of each time-use
+# variable can be NA'd per variable rather than guessed (GH #877).
+VALUE_LABELS = get_categorical_mapping(SRC)
 
 
 def _num(col):
@@ -108,10 +120,17 @@ unemployed = (_num('ms04q11') == 2) & (_num('ms04q12') == 2)
 WEEKS_PER_MONTH = 52 / 12
 
 
+def _hours_input(col):
+    # NA the variable's OWN declared `manquant` code before it is multiplied
+    # into the formula: ms04q29/30/55/56 declare 99, ms04q31/57 declare 9.
+    return _num_no_declared_missing(src, col, VALUE_LABELS)
+
+
 def _job_hours(month_c, day_c, hour_c):
     # m = months/year, d = days/WEEK, h = hours/day  (labels + questionnaire).
     # annual hours / 52 == (m * WEEKS_PER_MONTH * d * h) / 52 == (m*d*h)/12.
-    m, d, h = _num(month_c), _num(day_c), _num(hour_c)
+    m, d, h = (_hours_input(month_c), _hours_input(day_c),
+               _hours_input(hour_c))
     hrs = (m * WEEKS_PER_MONTH * d * h) / 52
     return hrs.where(~unemployed, 0)
 
