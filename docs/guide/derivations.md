@@ -70,6 +70,12 @@ The column is declared `optional: true` in the canonical
 with no registered derivation never emits it and `Feature()`'s concat fills
 `NA`.
 
+A derived field can also be an **index level**. For GhanaLSS interviewer
+dates, a record with `columns: [visit]` identifies an inferred calendar-visit
+assignment. `Int_t` remains the reported date; the row's key does not claim
+that the date itself was estimated. Directly reported visit assignments have
+no key. The same optional `Derivation` column is declared for `interview_date`.
+
 ### `df.attrs['derivations']`
 
 A per-frame summary: `{country: {key: {'rows': n, 'columns': [...], 'in':
@@ -122,7 +128,8 @@ ll.Country('Togo').derivations('food_acquired')   # ... for one table
 `ll.derivations()` (`derivations.derivations_table`) returns one row per key,
 indexed by the key, with columns `country, table, name, waves, columns, rows,
 bases, n_assumptions, validated_against, since, function, inputs`. As of
-2026-09-12 it has **9 rows**: GhanaLSS's 12B entry plus one per EHCVM country
+2026-09-12 it has **11 rows**: GhanaLSS's 12B entry, two GhanaLSS visit-assignment entries,
+plus one per EHCVM country
 (Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Mali, Niger, Senegal, Togo).
 It is assembled from the packaged YAML without importing any country module, so
 it works from an installed wheel.
@@ -167,6 +174,17 @@ Three things to know about that frame:
   `validate='1:1'`.
 - **Nothing is cached.** It is slow and exact, every time.
 
+For an index-valued derivation, household rekeying alone does not identify
+the contributing source records. GhanaLSS visit-date inputs retain their
+original variable names and `(source, source_record)` identity, and add a
+nullable `assigned_visit` annotation. Join resolved inputs to served rows on
+`(t, i, assigned_visit)` versus `(t, i, visit)`; multiple source records may
+support one assignment. The original source visit code is never overwritten.
+Unresolved and invalid-date records remain retrievable with an `assignment_reason` even
+when they produce no served row. Use the registry and `derivation_inputs`
+directly for those records: `Feature()` excludes empty country frames and
+therefore cannot carry their zero-row summaries.
+
 Two other pointers on the same subject: `Country(c).notes()` surfaces the
 country's `CONTENTS.org`, which each entry's `contents` field points into;
 `Country(c).population` and `df.attrs['recall']` are the sibling records for
@@ -190,7 +208,7 @@ entry per key:
 | `contents` | a pointer into the country's `CONTENTS.org` |
 | `since` | the date the entry landed |
 | `waves` | a list, or `all` — the wave scope |
-| `columns` | which served columns the derivation produces |
+| `columns` | which served fields the derivation produces: data columns or named index levels |
 | `rows` | a selector saying which rows carry the key, e.g. `{s: produced}` |
 
 The loader (`derivations.DerivationRecord.from_config`) **refuses** an entry
@@ -361,7 +379,7 @@ Two carriers must never both fire on one row
 script, country module, `mapping.py` and `data_info.yml` (2026-09-11) found
 about **410** sites where the library constructs a served value, of which the
 sweep judged roughly a fifth to be disclosed nowhere a user looks and about
-fifty to be "same column, different rule across waves" within one country. Nine
+fifty to be "same column, different rule across waves" within one country. Eleven
 are registered today. The census — per-group reports with `path:line`, the rule
 and how it is disclosed today — is in
 `slurm_logs/2026-09-11_derived_values/`, summarised in

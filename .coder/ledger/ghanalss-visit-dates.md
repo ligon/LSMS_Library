@@ -77,7 +77,89 @@ CONTENTS.org documentation and commits.
 
 ## Verification
 
-Pending implementation. Expected GLSS3 source-preserving date count: 38,430
-(S0A valid intake 4,549 plus S0B valid visits 2-11). Early-wave calendar-valid
-counts: 1987-88 3,147 + 3,134; 1988-89 3,194 + 3,188. These preserve parseable
-out-of-survey years rather than applying historical audit filtering.
+Unambiguous first stage complete; parent coordinates approved GLSS4 Part B
+extension and independent review. No source repair or competing first-date
+fallback was added.
+
+- Shared country hook: OK (sections 2-5), delegates directly to the established
+  melt_visit_intervals helper. No duplicate date parsing/reshape machinery.
+- Four wave YAML mappings and GLSS4 secondary hook: OK (sections 3-5), existing
+  intake sources/parsers retained; SEC0C unstack refuses duplicate keys.
+- Synthetic source tests: 15 failed before implementation (4.99 seconds),
+  15 passed afterward (4.09 seconds), executing Wave.interview_date with actual
+  YAML/formatters and private temporary L2. Covers source precedence, intake-only
+  households, missing-middle ordinals, invalid-date omission, anomalous parsed
+  dates, and all seven waves' explicit visit 1.
+- Private-L2/shared-L1 raw verification: every served visit-1 date equals its
+  original first-source/parser extraction exactly; all seven indexes unique.
+  Date rows by wave: 6281, 6382, 38430, 17989, 8687, 16757, 14008.
+  Existing intake NaT rows omitted: GLSS3 3, GLSS6 15, GLSS7 1; all others 0.
+  These omissions are the documented shared-helper contract, not date repairs.
+- Reproduction: /tmp/ghana_visit_dates_real.py and
+  /tmp/ghana_visit_dates_real.json; private L2 /tmp/ghana-visits-l2-l65uzms_;
+  shared dvc-cache is symlinked only into that private data root. No shared L2
+  cache was cleared, read as derived input, or overwritten.
+- Targeted command: LSMS_BUILD_WORKERS=1 PYTHONPATH=<worktree>
+  LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries taskset -c 0-15
+  <main-repo>/.venv/bin/python -m pytest tests/test_ghanalss_interview_date.py
+  --no-purge -q. No food or sample builds were performed.
+
+## Authorized inference extension (2026-09-12)
+
+The user now authorizes chronology-only GLSS4/GLSS5 assignment under explicitly
+registered modelling assumptions, superseding the first-stage exclusions above.
+Dates remain reported; the constructed value is the calendar visit index.
+Distinct valid dates are assumed to represent distinct scheduled contacts.
+Enumerate monotone injections into 1..7 (GLSS4) or 1..11 (GLSS5), allowing holes;
+serve an inferred date only when all nonempty candidates assign the same visit.
+No offset fallback, gap-length rule, date repair, or synthetic date. Concordant
+GLSS4 SEC0C anchors supplement existing intake; contradictory anchors prevent
+inference. GLSS5 Part B intake disagreement likewise prevents inference.
+Reported intake/Part A anchors remain served with their original precedence.
+All original A/B/C or sec0/secb0/secb1/secb2 rows and fields are recoverable at
+input grain through derivation_inputs, with source/source_record identity and
+nullable assigned_visit/reason annotations. Exact date ties coalesce only in the
+event model, never in raw inputs. Accepted but mistyped dates remain a stated
+limitation of the model rather than a silently corrected or rejected value.
+
+Reuse decisions: existing wave Int_t parsing semantics and sanctioned
+get_dataframe; existing derivations registry/column/input-callable contract
+(derivations.py and docs/guide/derivations.md). New visit_dates.py is warranted
+because melt_visit_intervals reshapes known ordinals and cannot infer them from
+multiple conflicting long-form source pages. Dedicated synthetic tests verify
+candidate uniqueness, source preservation, and inference rather than reshape.
+
+Raw-field preservation correction during verification: GLSS5 sec0 already has
+an original numeric variable named reason. Diagnostic annotations therefore use
+assignment_reason (not reason); the original reason values/dtype remain intact.
+A targeted collision regression pins this, alongside full-source field equality.
+
+### Inference verification (price_diagnosis)
+
+- OK (authorized extension): fixed functions enumerate all monotone injections
+  and serve only consensus assignments. No offset fallback or spacing rule.
+  Inputs retain every record and original variable; assignment_reason avoids
+  collision with GLSS5's original numeric reason field.
+- OK (reuse): _load_raw memoizes each wave's existing Int_t parser by triplet;
+  no replacement date parser. Inference annotations accumulate outside pandas
+  extension arrays to avoid repeated full Arrow-column copies.
+- 12 focused synthetic tests passed in 3.37 seconds, including duplicate-code
+  examples, exact duplicates, missing slots/partial identification, invalid and
+  unmatched records, contradictory anchors/excess dates, source-order invariance,
+  raw replay, original-reason preservation, and the disclosed accepted-typo case.
+- Real source checks through get_dataframe: GLSS4 59,971 input records -> 37,702
+  date rows, 19,713 inferred; GLSS5 189,805 input records -> 69,127 date rows,
+  60,440 inferred. All original input columns, values AND dtypes retained.
+- Every original parseable intake date remains exact: 5,998 / 8,687 rows.
+  Every inferred output joins a raw input on household, date and assigned_visit:
+  19,726 / 120,244 links (more links than output rows because raw duplicates
+  and overlapping pages remain intact). No served date is absent from inputs.
+- One GLSS4 visit-2 date is recovered from a reported B date when C's visit-2
+  triplet is impossible, via unique anchored ordering. This is a derived visit
+  assignment, not a correction of the impossible C date.
+- Timing: GLSS4 31.48 s; GLSS5 30.94 s (source loading 0.37 / 0.62 s).
+  No L2 writes/builds in this check; only /tmp verification artefacts.
+- Reproduce: /tmp/verify_glss_visit_inference.py (currently GLSS5 selected);
+  /tmp/verify_glss_visit_inference.log and /tmp/verify_glss5_visit_inference.log;
+  /tmp/glss_visit_inference_{1998-99,2005-06}.json. Run with worktree PYTHONPATH
+  and LSMS_COUNTRIES_ROOT, LSMS_BUILD_WORKERS=1, main venv Python, taskset16-23.

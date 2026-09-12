@@ -143,7 +143,8 @@ Data Scheme:
     Rural: str
 
   interview_date:
-    index: (t, i)
+    # Calendar contacts; undated/invalid slots are omitted, never imputed.
+    index: (t, i, visit)
     Int_t: datetime
 
   food_security:
