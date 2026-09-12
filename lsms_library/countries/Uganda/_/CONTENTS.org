@@ -1816,7 +1816,9 @@ The two are near-independent, so the current column is close to noise:
 rates differ too (33–42% wired vs 50–58% true crop-stand).
 
 *Any analysis using =crop_production.intercropped= before 2026-09-12 was
-using the seed-purchase question.*
+using the seed-purchase question.*  Two things were wrong and both are
+fixed below: the *question* (seed use, not crop stand) and the *season*
+(AGSEC4A's answer served for season-B rows).
 
 *** Fixed 2026-09-12 — GH #872
 
@@ -1907,15 +1909,82 @@ seed-use question is *crop*-level — "did you use seed for THIS crop" — so
 picking one at random.  The old wiring was the wrong question AND the
 wrong grain.
 
-*** Known limitation, unchanged by this fix
+*** Each season is read from its OWN roster (the season-B half of #872)
 
-AGSEC4A is the FIRST-season (A) plot-crop roster.  Its flag is carried
-onto season-B harvest rows as well, because the join key is
-=(hh, parcel, plot)= with no season level.  A plot's crop stand can differ
-between the two seasons, so season-B =intercropped= is season A's answer.
-This is the pre-existing join (it governs =perennial= and
-=planting_month= too) and was not changed here; it is recorded so nobody
-reads a season-B value as a season-B measurement.
+The first version of this fix left the pre-existing join alone: AGSEC4A is
+the FIRST season's plot-crop roster, and its flag was carried onto
+season-B harvest rows too, because the lookup key is =(hh, parcel, plot)=
+with no season level.  That was tolerable while the served value was noise
+and *not* tolerable once it became a real measurement — 47.1% of served
+rows are season B.
+
+AGSEC4B exists in all seven waves, with the analogous column, the same
+value labels and the same id columns as its 4A twin:
+
+| wave              | season A  | season B  | value labels                  |
+|-------------------+-----------+-----------+-------------------------------|
+| 2009-10, 2010-11  | =a4aq7=   | =a4bq7=   | 1 Pure stand, 2 Inter cropped |
+| 2011-12 … 2015-16 | =a4aq8=   | =a4bq8=   | 1 Pure Stand, 2 Mixed Stand   |
+| 2018-19, 2019-20  | =s4aq08=  | =s4bq08=  | 1 Pure Stand, 2 Mixed Stand   |
+
+Like the 4A columns, every 4B column takes values in ={1, 2, NA}= only.
+2009-10's 4B uses the same question-numbered id layout as its 4A
+(=a4bq2=/=a4bq4=/=a4bq6=).
+
+*The two seasons genuinely disagree.*  On plots rostered in both, the crop
+stand differs on:
+
+| wave    | plots in both rosters | disagree |
+|---------+-----------------------+----------|
+| 2009-10 |                 5 810 |    29.5% |
+| 2010-11 |                 5 815 |    26.7% |
+| 2011-12 |                 4 275 |    31.0% |
+| 2013-14 |                 4 614 |    24.8% |
+| 2015-16 |                 4 395 |    26.3% |
+| 2018-19 |                 2 721 |    27.9% |
+| 2019-20 |                 4 684 |    23.3% |
+
+That is a *plot really being planted differently in the second season*, not
+noise — the same plots' within-season crop rows agree to 0.00–0.50%.
+AGSEC4B also covers the AGSEC5B harvest rows far better than AGSEC4A does
+(86.6–99.95% vs 54.8–88.1%), because 4A rosters plots that were cropped in
+season A and 5B records harvests from season B.
+
+Every wave therefore declares =intercrop_B= alongside =intercrop=, and
+=inter_lookup= is keyed by season.  *A season with no roster serves NA and
+never borrows the other season's answer.*
+
+Before/after at the wave level (=crop_production_for_wave= called directly,
+no cache).  "before" reproduces the season-A-carry by feeding AGSEC4A as
+both rosters:
+
+| wave    | season | rows   | non-NA before → after | True before → after | changed / comparable |
+|---------+--------+--------+-----------------------+---------------------+----------------------|
+| 2009-10 | A      | 11 847 |    11 809 →    11 809 |    7 082 →    7 082 |      0 / 11 809 (0%) |
+| 2009-10 | B      | 10 561 |     8 462 →    10 539 |    4 413 →    5 917 |  2 425 / 8 446 (28.7%) |
+| 2010-11 | A      | 11 586 |    11 492 →    11 492 |    7 083 →    7 083 |      0 / 11 492 (0%) |
+| 2010-11 | B      |  9 384 |     8 265 →     9 302 |    4 470 →    5 376 |  2 175 / 8 203 (26.5%) |
+| 2011-12 | A      | 10 833 |    10 812 →    10 812 |    6 474 →    6 474 |      0 / 10 812 (0%) |
+| 2011-12 | B      |  9 319 |     6 945 →     9 298 |    3 665 →    5 244 |  2 154 / 6 935 (31.1%) |
+| 2013-14 | A      |  8 725 |     8 719 →     8 719 |    5 111 →    5 111 |       0 / 8 719 (0%) |
+| 2013-14 | B      |  8 860 |     6 620 →     8 836 |    3 426 →    4 759 |  1 688 / 6 616 (25.5%) |
+| 2015-16 | A      | 10 648 |    10 648 →    10 648 |    5 989 →    5 989 |      0 / 10 648 (0%) |
+| 2015-16 | B      |  8 928 |     6 719 →     8 709 |    3 439 →    5 236 |  1 821 / 6 561 (27.8%) |
+| 2018-19 | A      |  7 153 |     7 073 →     7 073 |    3 739 →    3 739 |       0 / 7 073 (0%) |
+| 2018-19 | B      |  7 041 |     3 860 →     7 033 |    1 639 →    3 556 |  1 174 / 3 855 (30.5%) |
+| 2019-20 | A      |  8 349 |     8 327 →     8 327 |    4 867 →    4 867 |       0 / 8 327 (0%) |
+| 2019-20 | B      |  7 372 |     5 802 →     7 372 |    2 879 →    4 132 |  1 418 / 5 802 (24.4%) |
+
+Totals: *season A is byte-identical* — 68 880 non-NA, 40 345 True, 0 rows
+changed, which is the check that the season key is a pure refactor for A.
+Season B: 46 673 → *61 089* non-NA, 23 931 → *34 220* True, *12 855 of
+46 418 comparable rows corrected (27.7%)*, *14 671 rows newly populated*
+and 255 rows newly NA (rostered in 4A but not 4B).
+
+*What is still true*: =perennial_lookup= / =planting_month= are built from
+season A's roster only.  No Uganda wave populates either today (the columns
+are not emitted), so this costs nothing now; a wave that wires them must
+give them the same per-season treatment.
 
 ** DONE 2010-11 intercrop flag named a column that does not exist
 
