@@ -67,10 +67,13 @@ def test_assets_age_is_not_summed():
     assert out["Age"].iloc[0] == 10.0
 
 
-def test_table_without_additive_policy_still_uses_first():
-    """The additive policy is per-table: a table with no entry is unchanged."""
+def test_table_without_additive_policy_is_pure_selection():
+    """The additive policy is per-table: a table with no entry is unchanged --
+    every column comes from the selected row.  (Since GH #871 that row is the
+    group's most complete one; these four roster rows are equally complete, so
+    the tie breaks on original order and it is still row 0.)"""
     out = _collapse_duplicate_index(_roster_frame(), "shocks")
-    assert out["Value"].iloc[0] == 7000.0   # historical .first()
+    assert out["Value"].iloc[0] == 7000.0   # row 0's Value
 
 
 def test_assets_collapse_is_a_no_op_on_a_unique_index():
