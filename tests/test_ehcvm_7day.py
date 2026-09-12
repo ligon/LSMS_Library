@@ -334,22 +334,32 @@ class TestDelivered:
         assert produced['Expenditure'].isna().all()
         assert produced['Derivation'].isna().all()
 
-    def test_inputs_join_to_the_served_rows(self, built):
+    @pytest.mark.parametrize('country,wave', CELLS)
+    def test_inputs_join_to_the_served_rows(self, built, country, wave):
         """Every served purchased row has its raw 7B answers under the same
-        (t, i, j); `derivation_inputs` re-keys `i` as the served table is."""
+        (t, i, j).  All twelve cells, not just Togo: `derivation_inputs`
+        re-keys `i` through `updated_ids`, and `inputs_last_purchase` has to
+        reproduce the served path's INDEX rewrites as well -- three waves sweep
+        value-label mojibake out of `j` after the reshape, and skipping that
+        left 80,563 of CotedIvoire's 218,224 keys (37%) and 164 of
+        Guinea-Bissau's unjoinable.  A wave that adds a fourth kind of index
+        rewrite must fail here, not unjoin quietly."""
         import lsms_library as ll
-        c = ll.Country('Togo')
-        key = derivation_key('Togo')
+        c = ll.Country(country)
+        key = derivation_key(country)
         try:
-            raw = c.derivation_inputs(key, wave='2018')
+            raw = c.derivation_inputs(key, wave=wave)
         except Exception as e:                # pragma: no cover - no microdata
-            pytest.skip(f'Togo sources not available here: {e}')
+            pytest.skip(f'{country} {wave} sources not available here: {e}')
         assert list(raw.columns) == RAW_VARIABLES
         assert list(raw.index.names) == ['t', 'i', 'j']
-        served = built('Togo')
+        served = built(country).xs(wave, level='t', drop_level=False)
         served = served[served['Derivation'].notna()]
         served_k = set(served.reset_index().set_index(['t', 'i', 'j']).index)
-        assert not (served_k - set(raw.index)), 'served rows with no raw answers'
+        missing = served_k - set(raw.index)
+        assert not missing, (
+            f'{len(missing)} of {len(served_k)} served purchased keys have no '
+            f'raw answers: {sorted(missing)[:3]}')
 
     def test_attrs_summary_counts_the_labelled_rows(self, built):
         fa = built('Togo')

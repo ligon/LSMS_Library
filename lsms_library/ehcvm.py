@@ -388,10 +388,24 @@ def inputs_last_purchase(country: str, wave: str) -> pd.DataFrame:
     ``s07bq07b``, ``s07bq07c``, ``s07bq08``.
 
     Every source row is returned, unfiltered and at the INPUT grain: the
-    served table splits one row into up to two (``s``) and keys it by unit, so
-    ``(t, i, j)`` is not unique here.  Nothing is cached.  ``Country.
+    served table splits one row into up to three (``s``) and keys it by unit,
+    so ``(t, i, j)`` is not unique here.  Nothing is cached.  ``Country.
     derivation_inputs`` re-keys ``i`` through ``updated_ids`` afterwards, as
     it does for every entry.
+
+    "Joins to the served table" is a PROMISE, and keeping it takes more than
+    reusing the YAML's ``idxvars``.  Three waves' ``mapping.py`` post-process
+    the reshaped frame's INDEX -- Guinea-Bissau, Niger 2018-19 and CotedIvoire
+    2018-19 sweep value-label mojibake out of every string level
+    (``_decode_mojibake_in_df``) -- so the served ``j`` is ``'Arachide
+    grillee'`` with a real accent where an unswept extraction says ``'Arachide
+    grillÃ©e'``.  Skipping that step cost 80,563 of CotedIvoire's 218,224
+    purchased keys (37%) and 164 of Guinea-Bissau's before it was measured.
+    Those normalisers are applied here too, to the INDEX ONLY: the raw columns
+    keep the bytes the file holds, because they are the point of this frame.
+    ``tests/test_ehcvm_7day.py::test_inputs_join_to_the_served_rows`` runs over
+    all twelve cells, so a wave that adds a fourth kind of index rewrite fails
+    rather than silently unjoins.
     """
     from .country import Country
     from .local_tools import df_data_grabber
@@ -404,6 +418,8 @@ def inputs_last_purchase(country: str, wave: str) -> pd.DataFrame:
     spec["idxvars"] = {k: v for k, v in spec["idxvars"].items() if k in ("i", "j")}
     spec["myvars"] = {name: name for name in RAW_VARIABLES}
     mapping = wave_obj.column_mapping("food_acquired", spec)
+    # The table's own `df_edit` is `food_acquired_ehcvm` -- the whole reshape --
+    # so it cannot run here; its index normalisers are applied below instead.
     mapping.pop("df_edit", None)
     (filename, cols), = mapping.items()
 
@@ -411,4 +427,25 @@ def inputs_last_purchase(country: str, wave: str) -> pd.DataFrame:
                           cols["idxvars"], **cols["myvars"])
     out = out.reset_index()
     out["t"] = wave
-    return out.set_index(["t", "i", "j"])[RAW_VARIABLES]
+    out = out.set_index(["t", "i", "j"])[RAW_VARIABLES]
+    return _normalise_index_as_served(out, wave_obj)
+
+
+#: Module-level callables in a wave's ``mapping.py`` that rewrite the reshaped
+#: frame's INDEX on the served path, and must therefore be applied to the
+#: raw-input frame's index too or it will not join.  Named rather than
+#: discovered, so adding one is a deliberate act; the twelve-cell join test is
+#: what catches an unnamed one.
+_SERVED_INDEX_NORMALISERS = ("_decode_mojibake_in_df",)
+
+
+def _normalise_index_as_served(frame: pd.DataFrame, wave_obj) -> pd.DataFrame:
+    """Apply the wave's served-path index rewrites to ``frame``'s index only."""
+    fns = wave_obj.formatting_functions or {}
+    for name in _SERVED_INDEX_NORMALISERS:
+        fn = fns.get(name)
+        if fn is None:
+            continue
+        # An index-only frame, so the normaliser cannot touch a raw column.
+        frame.index = fn(pd.DataFrame(index=frame.index)).index
+    return frame

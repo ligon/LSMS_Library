@@ -402,8 +402,11 @@ food_acquired:
         # du [PRODUIT] achete la derniere fois" -- the value of ONE purchase,
         # which `s07bq06` places up to 30 days back -- while `Quantity` is the
         # 7-day consumption.  Wiring it as `Expenditure` puts two clocks on one
-        # row.  Read the six raw inputs below instead and let the wave's
-        # `mapping.py` hook derive `Expenditure`.
+        # row.  Read the seven raw inputs below instead and let the wave's
+        # `mapping.py` hook derive `Expenditure`.  All seven are REQUIRED --
+        # `food_acquired_ehcvm` raises KeyError on a missing one (see
+        # `lsms_library.ehcvm.MYVARS`, which is the single list).
+        GiftQuantity: s07bq05
         ConsumptionUnitCode: s07bq03b
         ConsumptionUnitSize: s07bq03c
         LastPurchaseQuantity: s07bq07a

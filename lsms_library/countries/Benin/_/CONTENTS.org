@@ -604,15 +604,18 @@ Raw answers come back by their original names from
 
 ** What moved
 
-| wave | purchased rows | Expenditure sum | inkind rows (qty) | NA: unit code / size / no s07bq07a |
-|------+----------------+-----------------+-------------------+------------------------------------|
-| 2018-19 | 167,087 -> 147,149 | 87,287,927 -> 68,929,997 (-21.0%) | 0 -> 18,632 (53,318) | 4,547 / 4,131 / 0 |
+| wave | purchased rows | Expenditure sum | inkind rows (qty) | Expenditure NA, share of SERVED purchased rows: no last purchase / different unit code / same code, different size |
+|------+---+---+---+---|
+| 2018-19 | 167,087 -> 147,149 | 87,287,927 -> 68,929,997 (-21.0%) | 0 -> 18,632 (53,318) | 14,334 (9.7%): 6,451 / 4,143 / 3,740 |
 
 Purchased row counts fall for two reasons: a row whose purchased quantity is
 zero used to survive on the raw =s07bq08= being positive, and the gift
 subtraction moves more rows to zero.  Those quantities are not lost -- they
-are in the new inkind rows.  The NA columns are at SOURCE-row grain (before
-the canonical reshape and the =(t, v, i, j, u, s)= collapse).
+are in the new inkind rows.  The NA column is on the SERVED denominator --
+purchased rows of the delivered table, after the canonical reshape and the
+=(t, v, i, j, u, s)= collapse -- because that is what a user sees.  An earlier
+version of this section quoted the smaller SOURCE-row counts on the
+=s07bq07a > 0= subset, and so understated the NA share.
 
 The three candidate quantities, and why C:
 

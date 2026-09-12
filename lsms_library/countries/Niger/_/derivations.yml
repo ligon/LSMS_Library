@@ -43,15 +43,23 @@ Niger::food_acquired::7day-purchase-at-last-purchase-unit-value:
         Quelle est la quantite du [PRODUIT] achete la derniere fois?"
     - text: >-
         a last purchase reported in a different unit from the consumption is
-        NOT converted -- the row is served with Expenditure NA.
-        2018-19: 18,389 of 86,199 purchase rows (21.3%) -- 6,627 a different
-        unit code, 11,760 the same code in a different SIZE (Petit / Moyen /
+        NOT converted, and a row with no last purchase has no unit value to
+        apply: the row is served with Expenditure NA. Counts are on the SERVED
+        denominator -- purchased rows of the delivered table, after the
+        canonical reshape and the (t, v, i, j, u, s) collapse -- because that
+        is the number a user sees; the source-row counts are smaller and were
+        what an earlier version of this entry quoted. 2018-19: 23,036 of the
+        89,819 SERVED purchased rows (25.6%) -- 5,070 because no last purchase
+        was reported at all (s07bq08 or s07bq07a missing / not positive),
+        6,463 because the last purchase used a different unit CODE, 11,503
+        because it used the same code in a different SIZE (Petit / Moyen /
         Grand / Taille unique), which is a different container and so a
-        different price per unit, and 2 no positive s07bq07a. 2021-22: 13,847
-        of 112,932 purchase rows (12.3%) -- 6,063 a different unit code, 7,775
-        the same code in a different SIZE (Petit / Moyen / Grand / Taille
-        unique), which is a different container and so a different price per
-        unit, and 9 no positive s07bq07a.
+        different price per unit. 2021-22: 18,384 of the 116,633 SERVED
+        purchased rows (15.8%) -- 4,714 because no last purchase was reported
+        at all (s07bq08 or s07bq07a missing / not positive), 5,975 because the
+        last purchase used a different unit CODE, 7,695 because it used the
+        same code in a different SIZE (Petit / Moyen / Grand / Taille unique),
+        which is a different container and so a different price per unit.
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;

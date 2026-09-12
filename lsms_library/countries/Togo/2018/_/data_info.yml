@@ -248,7 +248,7 @@ food_acquired:
         # not positive.  Registered as
         # `Togo::food_acquired::7day-purchase-at-last-purchase-unit-value`
         # in Togo/_/derivations.yml; every purchased row carries that key in
-        # its `Derivation` column.  The six raw inputs below are read only to
+        # its `Derivation` column.  The seven raw inputs below are read only to
         # feed that hook and are dropped by the canonical reshape.
         # s07bq05, the quantity received as a GIFT, is subtracted from the
         # purchased quantity (the survey's own identity, @ligon 2026-09-12)

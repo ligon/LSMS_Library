@@ -240,8 +240,10 @@ food_acquired:
         # not positive.  Registered as
         # `Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value`
         # in Burkina_Faso/_/derivations.yml; every purchased row carries that key
-        # in its `Derivation` column.  The six raw inputs below are read only
-        # to feed that hook and are dropped by the canonical reshape.
+        # in its `Derivation` column.  The seven raw inputs below are read only
+        # to feed that hook (all seven REQUIRED -- `food_acquired_ehcvm` raises
+        # KeyError on a missing one) and are dropped by the canonical reshape;
+        # `GiftQuantity` is also served on its own `s = 'inkind'` rows.
         # s07bq05, the quantity received as a GIFT, is subtracted from the
         # purchased quantity (the survey's own identity, @ligon 2026-09-12)
         # and served on its own `s = 'inkind'` rows with Expenditure NaN --
