@@ -1,26 +1,61 @@
 """Build people_last7days for Niger ECVMA 2011-12 (GAP 3, item-level).
 
 Single source file: ecvmaind_p1p2.dta (the individual roster, which carries
-the ms04 employment / time-use module).  Mirrors the WB .do individual-labor
-recipe (NER_ECVMA1.do:1372-1449) exactly, but keeps the REPORTED
-per-individual values — no nb_members_working_age rollup.
+the ms04 employment / time-use module).  Follows the WB .do individual-labor
+recipe (NER_ECVMA1.do:1372-1449) except for the hours formula (see UNITS
+below, GH #877), and keeps the REPORTED per-individual values -- no
+nb_members_working_age rollup.
 
 ID / grain: i = str(int(hid)) (2011-12 hid = grappe*100+menage); pid =
 format_id(ms01q00), matching household_roster's pid.  Grain (t, i, pid).
 
 Reported fields:
-  farm_work  ms04q03 (1=Oui worked on own farm last 7 days)
-  SOB_work   ms04q05 (1=Oui worked in own business last 7 days)
-  wage_work  ms04q02 (1=Oui worked for a wage last 7 days)
+  farm_work  ms04q03 -- worked >=1h on own field/garden or raised livestock
+             in the last 30 DAYS (questionnaire 4.03), NOT the last 7 days.
+  SOB_work   ms04q05 -- worked >=1h in own/household business in the last
+             30 DAYS (questionnaire 4.05).
+  wage_work  ms04q02 -- worked >=1h for an enterprise / the state / an
+             employer in the last 12 MONTHS (questionnaire 4.02).  The
+             30-day analogue is ms04q01 (4.01); the WB uses q02 and so do
+             we, for parity.  2011-12 asks NO 7-day participation question
+             at all (2014-15's MS04Q01-03 do use 7 days).  Reference periods
+             confirmed from the Stata labels + questionnaire, GH #877; the
+             choice of what to serve is left open there.
   working_age ms01q06a (age) >= 6  (the survey's working-age threshold)
   Industry   ms04q24 activity-section code -> broad industry label
              (Agriculture/Fishing/Mining/Manufacturing/Construction/Services)
-  farm_hrs / SB_hrs / wage_hrs : usual weekly hours, computed as the WB does
-             — av weekly hours per job = month*day*hour/52 (ms04q29-31 job1,
-             ms04q55-57 job2), allocated to farm / own-business (SB) / wage
-             by the job's occupation code (ms04q23 / ms04q51), then summed
-             across the two jobs.  Set to 0 for non-working-age members
-             (matching the WB code).
+  farm_hrs / SB_hrs / wage_hrs : annual-average weekly hours per job,
+             allocated to farm / own-business (SB) / wage by the job's
+             occupation code (ms04q23 / ms04q51), then summed across the two
+             jobs.  Set to 0 for non-working-age members (matching the WB
+             code).  See the UNITS note below: this wave DIVERGES from
+             NER_ECVMA1.do:1413, which is dimensionally wrong (GH #877).
+
+UNITS (GH #877, 2026-09-12 -- confirmed from the Stata variable labels in
+BOTH the French and the English-labelled source, and from questionnaire
+ECVMA_Quest_MEN_P1_V10_ENG.pdf section 4 part B):
+  ms04q29 / ms04q55  months this job was done in the last 12   (months/year)
+  ms04q30 / ms04q56  hours per DAY usually devoted to this job (hours/day)
+  ms04q31 / ms04q57  days per WEEK usually devoted to this job (days/WEEK)
+                     -- questionnaire 4.31: "How many days per week does
+                     [NAME] usually devote to this work?"
+`d * h` is therefore ALREADY usual hours per week.  The WB's
+`(month * hour * day) / 52` (NER_ECVMA1.do:1413, commented "week average of
+hours") treats `d` as days per MONTH, so it delivers (months/52) x usual
+weekly hours -- 0.23x the intended figure for a 12-month job, and ~4.3x
+below the 2014-15 wave's dimensionally coherent
+`(month * week * day * hour) / 52`.  We divide by 12 instead, i.e. impute
+the exact 52/12 weeks per month that 2011-12 does not ask for:
+
+    annual hours = m * (52/12) * d * h     ;  weekly average = that / 52
+                                           ;  == (m * d * h) / 12
+
+This is a DELIBERATE departure from WB parity.  Residual vs 2014-15: that
+wave's reported weeks-per-month (MS04Q26) is 4 for 86% of jobs (mean 3.78),
+not 52/12 = 4.33, so the same schedule still comes out ~1.15x higher here
+than there.  The alternative (divide by 13, matching a reported w=4) was
+considered and rejected: 52/12 is exact, and 4 weeks/month is a respondent
+approximation in the other wave, not a property of this one.
 """
 import sys
 
@@ -68,9 +103,16 @@ industry = industry.where(~(self_emp | not_worked).values, pd.NA)
 unemployed = (_num('ms04q11') == 2) & (_num('ms04q12') == 2)
 
 
+# Months -> weeks.  2011-12 does not ask weeks-per-month (2014-15's MS04Q26
+# does), so we impute the exact calendar value.  See the UNITS note above.
+WEEKS_PER_MONTH = 52 / 12
+
+
 def _job_hours(month_c, day_c, hour_c):
+    # m = months/year, d = days/WEEK, h = hours/day  (labels + questionnaire).
+    # annual hours / 52 == (m * WEEKS_PER_MONTH * d * h) / 52 == (m*d*h)/12.
     m, d, h = _num(month_c), _num(day_c), _num(hour_c)
-    hrs = (m * d * h) / 52
+    hrs = (m * WEEKS_PER_MONTH * d * h) / 52
     return hrs.where(~unemployed, 0)
 
 

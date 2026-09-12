@@ -987,12 +987,19 @@ def _finish_plot_labor(df, t):
 # `people_last7days` is a legacy HH-level Men/Women/Boys/Girls count and is a
 # DIFFERENT, older construct — this is the (t, i, pid) individual feature the
 # 6 new countries are meant to gain).  COLUMNS, reported per-individual:
-#   farm_work  — worked on own farm/garden/livestock in the last 7 days (bool)
-#   SOB_work   — worked in own business / commerce in the last 7 days (bool)
-#   wage_work  — worked for a wage / employer in the last 7 days (bool)
-#   farm_hrs   — usual weekly hours on farm work (float; ECVMA only)
-#   SB_hrs     — usual weekly hours in own business (float; ECVMA only)
-#   wage_hrs   — usual weekly hours in wage work (float; ECVMA only)
+#   farm_work  — worked on own farm/garden/livestock (bool)
+#   SOB_work   — worked in own business / commerce (bool)
+#   wage_work  — worked for a wage / employer (bool)
+#              REFERENCE PERIOD VARIES BY WAVE (GH #877): 7 days in 2014-15
+#              and the EHCVM waves; 2011-12 asks no 7-day question -- its
+#              farm_work/SOB_work are 30-day and wage_work is 12-month.
+#   farm_hrs   — annual-average weekly hours on farm work (float; ECVMA only)
+#   SB_hrs     — annual-average weekly hours in own business (float; ECVMA)
+#   wage_hrs   — annual-average weekly hours in wage work (float; ECVMA)
+#              NOT hours in the last 7 days.  Per-job formula differs by wave
+#              (2014-15 m*w*d*h/52; 2011-12 m*(52/12)*d*h/52 == m*d*h/12,
+#              which DIVERGES from NER_ECVMA1.do:1413 -- see GH #877 and
+#              Niger/_/CONTENTS.org).
 #   Industry   — broad industry of the (main) job: Agriculture / Fishing /
 #                Mining / Manufacturing / Construction / Services (str;
 #                ECVMA only — derived from the WB code's section-code ranges)

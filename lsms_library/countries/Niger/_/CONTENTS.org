@@ -831,3 +831,104 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* people_last7days: the hours columns are NOT last-7-day hours, and 2011-12's formula was dimensionally wrong (GH #877, 2026-09-12)
+
+First =CONTENTS.org= entry for this table.  Two separate findings; only the
+first is fixed here.
+
+** FIXED: the 2011-12 hours formula divided by 52 where it should divide by 12
+
+=Niger/2011-12/_/people_last7days.py= built =farm_hrs= / =SB_hrs= /
+=wage_hrs= as =(month * day * hour) / 52= per job.  The three inputs, read
+from the Stata variable labels of =ecvmaind_p1p2.dta= in *both* the French
+and the English-labelled copy (=ecvmaind_p1p2_en.dta=) and confirmed against
+questionnaire =ECVMA_Quest_MEN_P1_V10_ENG.pdf= section 4 part B, are:
+
+| var                | question | meaning                                        |
+|--------------------+----------+------------------------------------------------|
+| =ms04q29= / =q55=  | 4.29     | months this job was done in the last 12 months |
+| =ms04q30= / =q56=  | 4.30     | hours per *day* usually devoted to this job    |
+| =ms04q31= / =q57=  | 4.31     | days per *WEEK* usually devoted to this job    |
+
+So =d * h= is *already* usual hours per week.  Dividing =m * d * h= by 52
+treats =d= as days per MONTH and delivers =(months/52) x usual weekly hours=
+-- 0.23x the intended figure for a full-year job.  The correct annual-average
+week imputes the exact calendar 52/12 weeks per month (2011-12 does not ask
+weeks-per-month; 2014-15's =MS04Q26= does):
+
+: annual hours = m * (52/12) * d * h  ->  weekly average = / 52  ==  (m*d*h)/12
+
+*This is a deliberate departure from World Bank parity.*  =NER_ECVMA1.do:1413=
+has =gen av_hours1 = (month_job1 * hour_job1 * day_job1) / 52 // (week average
+of hours)= -- the same error, with a comment asserting the dimension it does
+not have.  =NER_ECVMA2.do:1454= (2014-15) is =(month * week * hour * day)/52=
+and is coherent.  Parity with the WB panel is not the same as being right.
+
+*Measured, warm wave parquets + =Country('Niger').people_last7days()=:*
+
+| wave    | sum hours   | rows >0 | mean hours per worker |
+|---------+-------------+---------+-----------------------|
+| 2011-12 before | 79,691.9    | 11,353  | 7.02                  |
+| 2011-12 after  | 345,331.4   | 11,353  | 30.42                 |
+| 2014-15 (unchanged) | 221,526.4 | 10,103 | 21.93               |
+
+Row counts, participation dummies, =Industry= and =working_age= are
+untouched; only the three hours columns move, and only in 2011-12 (x4.3333
+exactly, every row).  The 2014-15 / 2011-12 per-worker ratio goes from *3.12
+-> 0.72*.
+
+*Residual, stated because it is not zero.*  2014-15's reported weeks-per-month
+=MS04Q26= is 4 for 86% of jobs (mean 3.78), not the calendar 4.333, so that
+wave's own annual-average week is ~13% below the calendar-exact one; the rest
+of the remaining 1.39x gap is composition (2011-12's median reported days/week
+is 7).  Dividing 2011-12 by 13 instead of 12, to match a reported =w=4=, was
+considered and rejected: 52/12 is exact, and 4 weeks/month is a respondent
+approximation belonging to the other wave.
+
+*Sentinels, pre-existing and now amplified -- NOT fixed here.*  =ms04q55=
+(2 rows) and =ms04q56= (6 rows) carry the value 99, and =ms04q31= / =ms04q57=
+carry 9 days per week (5 rows each).  They were already wrong; multiplying by
+4.33 makes 8 rows of 2011-12 exceed 168 hours per week (max 7,410.7).  55 rows
+exceed 112 h/wk (2014-15: 10).  A screen for these is a separate decision.
+
+** REPORTED, NOT FIXED: 2011-12 asks no 7-day participation question at all
+
+The script docstring called =ms04q03= / =ms04q05= / =ms04q02= "last 7 days"
+dummies.  The labels and the questionnaire say otherwise:
+
+| var       | q    | reference period | yes count |
+|-----------+------+------------------+-----------|
+| =ms04q01= | 4.01 | last 30 days -- wage/enterprise/employer | 1,174 |
+| =ms04q02= | 4.02 | last 12 MONTHS -- same activity          |   269 |
+| =ms04q03= | 4.03 | last 30 DAYS -- own field/garden/livestock | 8,446 |
+| =ms04q05= | 4.05 | last 30 DAYS -- own/household business     | 3,473 |
+
+2014-15's =MS04Q01-03= *are* 7-day ("Au cours des 7 derniers jours"), as are
+the two EHCVM waves.  So =people_last7days.farm_work= / =SOB_work= /
+=wage_work= mix a 30-day, a 12-month and a 7-day reference period across
+Niger's own four waves, and 2011-12 has no 7-day question to re-point to.
+Additionally =wage_work= is the only one of the 2011-12 triple taken from a
+12-month question, so the triple is not even internally consistent -- but
+=NER_ECVMA1.do:1378= uses =ms04q02= too, so switching to =ms04q01= (30-day,
+269 -> 1,174 yes) would be a second parity departure.
+
+Options left open on #877: (a) keep as served and document (what is done
+here); (b) re-point =wage_work= to =ms04q01= so the 2011-12 triple is
+uniformly 30-day; (c) serve NA for 2011-12's dummies.  *Served values are
+unchanged.*
+
+** Also open on #877, and wider than Niger
+
+The hours columns are an annual-average week under a table named for the last
+seven days, sitting in =Feature('people_last7days')= beside Tanzania's and
+Malawi's genuinely-reported last-7-day hours.  Nothing in the frame
+distinguishes them.  Renaming (=usual_weekly_hrs=) or registering the
+construction as a declared derivation is a cross-country schema decision and
+was not taken here.
+
+** Cache
+
+Editing the wave script and =_/data_scheme.yml= moves every Niger table's
+=Country._table_cache_hash= (=data_scheme.yml= is hashed as a whole file), so
+the whole country re-warms.
