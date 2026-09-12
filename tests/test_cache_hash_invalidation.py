@@ -406,3 +406,120 @@ def test_assume_cache_fresh_skips_hash_and_serves_stale(temp_data_dir, monkeypat
     df = c.housing()
     # The escape hatch returns the (stale) cached parquet verbatim.
     assert SENTINEL in set(df["Roof"].astype(str))
+
+
+def _categorical_hash_sandbox(tmp_path, monkeypatch):
+    """Private metadata tree using the real Country/Wave mapping readers."""
+    import lsms_library.country as cm
+    root = tmp_path / 'countries'
+    package = tmp_path / 'package'
+    (package / 'categorical_mapping').mkdir(parents=True)
+    monkeypatch.setattr(cm, 'countries_root', lambda: root)
+    monkeypatch.setattr(cm, 'files', lambda package_name: package)
+    for name in ('GhanaLSS', 'Control'):
+        (root / name / '_').mkdir(parents=True)
+        wave = root / name / '1987-88' / '_'
+        wave.mkdir(parents=True)
+        (wave / 'data_info.yml').write_text(
+            "individual_education:\n  file: education.csv\n"
+            "  idxvars: {i: id}\n  myvars:\n    Education:\n"
+            "      - grade\n      - mappings: [education, Code, Label]\n")
+    return root, package
+
+
+def _hash_country(name):
+    import lsms_library.country as cm
+    # Avoid unrelated discovery/population loading; all properties used below
+    # remain the production implementations, including mapping inheritance.
+    country = object.__new__(cm.Country)
+    country.name = name
+    return country
+
+
+def _write_education_mapping(path, label):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        '#+name: education\n| Code | Label |\n|------+-------|\n'
+        f'| U6 | {label} |\n')
+
+
+def test_wave_hash_inherited_org_inputs(tmp_path, monkeypatch):
+    root, package = _categorical_hash_sandbox(tmp_path, monkeypatch)
+    import lsms_library.country as cm
+    c = _hash_country('GhanaLSS')
+    control = _hash_country('Control')
+    wave = cm.Wave('1987-88', '1987-88', c)
+    other = cm.Wave('1987-88', '1987-88', control)
+    mapping = root / 'GhanaLSS' / '_' / 'categorical_mapping.org'
+    _write_education_mapping(mapping, 'Old')
+    before = wave._input_hash('individual_education')
+    other_before = other._input_hash('individual_education')
+    _write_education_mapping(mapping, 'New')
+    after = wave._input_hash('individual_education')
+    assert after != before
+    assert after == wave._input_hash('individual_education')
+    assert other_before == other._input_hash('individual_education')
+
+    # Build Org inputs beyond categorical_mapping.org are used by scripts.
+    (mapping.parent / 'food_items.org').write_text('build input')
+    build_hash = wave._input_hash('individual_education')
+    assert build_hash != after
+    for directory in (mapping.parent, package / 'categorical_mapping'):
+        (directory / 'CONTENTS.org').write_text('documentation only')
+    assert wave._input_hash('individual_education') == build_hash
+    assert other._input_hash('individual_education') == other_before
+
+    global_mapping = package / 'categorical_mapping' / 'education.org'
+    _write_education_mapping(global_mapping, 'Global')
+    assert wave._input_hash('individual_education') != build_hash
+    assert other._input_hash('individual_education') != other_before
+    global_before = other._input_hash('individual_education')
+    _write_education_mapping(global_mapping, 'Changed global')
+    assert other._input_hash('individual_education') != global_before
+
+
+def test_wave_hash_parent_mapping_only_when_used(tmp_path, monkeypatch):
+    root, _ = _categorical_hash_sandbox(tmp_path, monkeypatch)
+    import lsms_library.country as cm
+    c = _hash_country('GhanaLSS')
+    wave = cm.Wave('1987-88', '1987-88', c)
+    parent = root / '_' / 'categorical_mapping.org'
+    _write_education_mapping(parent, 'Old fallback')
+    before = wave._input_hash('individual_education')
+    _write_education_mapping(parent, 'New fallback')
+    assert wave._input_hash('individual_education') != before
+    _write_education_mapping(root / 'GhanaLSS' / '_' / 'categorical_mapping.org', 'Own')
+    own = wave._input_hash('individual_education')
+    _write_education_mapping(parent, 'Unused fallback')
+    assert wave._input_hash('individual_education') == own
+
+
+def test_inherited_mapping_edit_rebuilds_wave_cache(tmp_path, monkeypatch):
+    root, _ = _categorical_hash_sandbox(tmp_path, monkeypatch)
+    import lsms_library.country as cm
+    monkeypatch.delenv('LSMS_NO_CACHE', raising=False)
+    cache = tmp_path / 'cache'
+    monkeypatch.setattr(cm, 'data_root', lambda name=None: cache / name if name else cache)
+    mapping = root / 'GhanaLSS' / '_' / 'categorical_mapping.org'
+    _write_education_mapping(mapping, 'Old')
+    source = root / 'GhanaLSS' / '1987-88' / 'Data' / 'education.csv'
+    source.parent.mkdir(parents=True)
+    source.write_text('id,grade\n1,U6\n')
+
+    def new_wave():
+        return cm.Wave('1987-88', '1987-88', _hash_country('GhanaLSS'))
+
+    wave = new_wave()
+    first = wave.grab_data('individual_education')
+    assert first['Education'].tolist() == ['Old']
+    path = cache / 'GhanaLSS' / '1987-88' / '_' / 'individual_education.parquet'
+    old_hash = lt.read_parquet_cache_hash(path)
+    assert old_hash == wave._input_hash('individual_education')
+    _write_education_mapping(mapping, 'New')
+    wave = new_wave()  # Country mapping dictionaries are instance-memoized.
+    assert lt.cache_freshness(path, wave._input_hash('individual_education')) == 'stale'
+    rebuilt = wave.grab_data('individual_education')
+    assert rebuilt['Education'].tolist() == ['New']
+    assert lt.read_parquet_cache_hash(path) != old_hash
+    assert lt.cache_freshness(path, wave._input_hash('individual_education')) == 'fresh'
+    pd.testing.assert_frame_equal(wave.grab_data('individual_education'), rebuilt)
