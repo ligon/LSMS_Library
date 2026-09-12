@@ -43,10 +43,20 @@ Data Scheme:
     # hh_s8q03_d (W1-W3) / s9q03d (W4-W5).  Asked in all five waves; it was
     # script-only until #875 and so never reached the API.
     AffectedFoodStock: bool
-    # hh_s8q05, "how many times in the last 12 months".  W1-W3 ONLY -- the W4/W5
-    # instrument dropped it -- hence `optional`, which is country-grain and so
-    # exempts the two waves that genuinely do not ask it.
-    Occurrence: {type: int, optional: true}
+    # hh_s8q05, "how many times in the last 12 months".  W1-W3 ONLY: the W4/W5
+    # instrument has no occurrence variable at all (sect9_hh_w4/w5 ship
+    # s9q01..s9q04_3 and nothing else in that battery).
+    #
+    # DECLARED REQUIRED ON PURPOSE.  `optional: true` is COUNTRY-grain while
+    # this absence is WAVE-grain, and CLAUDE.md's null-read-audit section
+    # forbids using it to silence one wave -- it would also disarm the column
+    # for W1-W3, where the question IS asked, and it is what gates turning
+    # LSMS_READ_STRICT=1 on in CI.  So Site B's per-wave report for 2018-19 and
+    # 2021-22 is ACCEPTED as the honest signal: the library is saying the
+    # instrument stopped asking, which is exactly right.  (Niger 2014-15
+    # `Latitude` is the same shape -- see CLAUDE.md, "Known granularity
+    # mismatch, not fixed here".)
+    Occurrence: int
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str

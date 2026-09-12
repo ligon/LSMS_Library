@@ -64,16 +64,27 @@ def test_data_scheme_declares_no_materialize_for_shocks():
     assert scheme["index"] == "(t, i, Shock)"
     for col in EFFECT_COLUMNS:
         assert scheme[col] == "bool", col
-    # W1-W3 only, hence optional (data_scheme is country-grain).
-    assert scheme["Occurrence"] == {"type": "int", "optional": True}
+    # W1-W3 only, and declared REQUIRED anyway: `optional:` is country-grain
+    # while the absence is wave-grain, so silencing it there would also disarm
+    # the three waves that DO ask the question.  Site B's per-wave report for
+    # 2018-19/2021-22 is the accepted, honest signal.
+    assert scheme["Occurrence"] == "int"
 
 
 @pytest.mark.parametrize("wave", WAVES)
 def test_any_change_counts_as_affected(wave):
     """The corpus convention: Increase -> True, Did Not Change -> False.
 
-    `Increase -> False` is the rule the deleted scripts used; it must never
-    come back, in any wave, for any effect column.
+    Two distinct things are pinned here, and it matters which is which:
+
+    1. the RULE -- `Increase -> False`, the deleted scripts' rule, must never
+       come back, in any wave, for any effect column; and
+    2. the COVERAGE -- `AffectedFoodStock` is one of the effect columns, so
+       this test also fails on a tree where that column is not read at all.
+
+    On `development` before this branch it is (2) that fails, not (1): the
+    YAML path there already said `Increase: True` for the four columns it
+    read, and simply never read `hh_s8q03_d` / `s9q03d`.
     """
     myvars = _shocks_myvars(wave)
     for col in EFFECT_COLUMNS:

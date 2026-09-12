@@ -1810,15 +1810,27 @@ onto the sanctioned path instead (=data_scheme.yml= + each wave's
 - =AffectedFoodStock= (=hh_s8q03_d= W1-W3, =s9q03d= W4-W5) -- asked in all
   five waves, declared =bool=, same mapping as its four siblings.
 - =Occurrence= (=hh_s8q05=, "how many times in the last 12 months") --
-  *W1-W3 only*; the W4/W5 instrument dropped the question, so it is
-  declared =optional: true=.  NOT filled to 0.  It is declared =int= but
-  *serves =float64== : =_enforce_declared_dtypes= only reads a *string*
-  type declaration, so the dict form =\{type: int, optional: true\}= skips
-  dtype coercion entirely.  A pre-existing framework gap, shared by
-  CotedIvoire's =farm_hrs= / =SB_hrs= / =wage_hrs= and Kazakhstan's
-  optional columns; deliberately not fixed here, because
-  =_enforce_declared_dtypes= is read-path and a fix would shift served
-  dtypes in other countries.
+  *W1-W3 only*, and NOT filled to 0.  Verified against the raw files: the
+  W4/W5 instrument has *no occurrence variable at all* -- =sect9_hh_w4.dta=
+  and =sect9_hh_w5.dta= ship =s9q01=, =s9q03a..e= and =s9q04_1..3= and
+  nothing else in that battery (the only remaining "05" column is the
+  survey-admin =saq05=).  The question was dropped, not renamed.
+
+  It is nevertheless declared *required* (=Occurrence: int=, 3,440 / 3,058
+  / 5,520 values in W1/W2/W3 and 0 in W4/W5).  =optional: true= would have
+  silenced the two waves that do not ask it, but =optional:= is
+  *country*-grain while this absence is *wave*-grain, so it would equally
+  disarm the three waves that DO -- and it is what gates turning
+  =LSMS_READ_STRICT=1= on in CI.  CLAUDE.md's null-read section says so
+  outright ("Do not reach for =optional: true= to silence one wave").  So
+  Site B's report is ACCEPTED as correct output:
+
+  : NullReadWarning  Ethiopia/shocks: required declared column 'Occurrence'
+  : is 100% NULL in wave(s) [2018-19, 2021-22] while other waves carry it.
+
+  Same shape as Niger 2014-15 =Latitude= (CLAUDE.md, "Known granularity
+  mismatch, not fixed here"): the guard is reporting a real instrument
+  change, and the granularity to record that judgement does not exist yet.
 
 Nothing in the tree consumed either column (grep over =*.py/*.yml/*.org=
 outside the deleted scripts: zero hits).
