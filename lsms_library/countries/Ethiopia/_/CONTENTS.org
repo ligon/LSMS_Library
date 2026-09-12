@@ -1811,7 +1811,14 @@ onto the sanctioned path instead (=data_scheme.yml= + each wave's
   five waves, declared =bool=, same mapping as its four siblings.
 - =Occurrence= (=hh_s8q05=, "how many times in the last 12 months") --
   *W1-W3 only*; the W4/W5 instrument dropped the question, so it is
-  declared =optional: true=.  NOT filled to 0.
+  declared =optional: true=.  NOT filled to 0.  It is declared =int= but
+  *serves =float64== : =_enforce_declared_dtypes= only reads a *string*
+  type declaration, so the dict form =\{type: int, optional: true\}= skips
+  dtype coercion entirely.  A pre-existing framework gap, shared by
+  CotedIvoire's =farm_hrs= / =SB_hrs= / =wage_hrs= and Kazakhstan's
+  optional columns; deliberately not fixed here, because
+  =_enforce_declared_dtypes= is read-path and a fix would shift served
+  dtypes in other countries.
 
 Nothing in the tree consumed either column (grep over =*.py/*.yml/*.org=
 outside the deleted scripts: zero hits).
