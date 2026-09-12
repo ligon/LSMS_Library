@@ -18,6 +18,10 @@ is deliberately left to a separate change; see Uganda/_/CONTENTS.org.
 
 Crop module lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
 
+The crop-stand flag `intercropped` is read from agsec4a for season A and
+agsec4b for season B -- one roster per season, never borrowed across them
+(GH #872).
+
 The SOLD unit (s5?q07c_1/_2) and SOLD condition (s5?q07b_1/_2) are carried
 as Unit_sold / Condition_sold (GH #824), one pair per wired slot.  Season A's
 _11 / _21 'part harvest' slots are NOT read, on the sold side or the harvest
@@ -39,8 +43,9 @@ def _try(path):
 df5a = _try('../Data/Agric/agsec5a.dta')
 df5b = _try('../Data/Agric/agsec5b.dta')
 df4a = _try('../Data/Agric/agsec4a.dta')
+df4b = _try('../Data/Agric/agsec4b.dta')
 
-df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t])
+df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
 assert len(df) > 0, "crop_production produced no rows for 2019-20"
 assert df.index.is_unique, "Non-unique crop_production index for 2019-20"
 to_parquet(df, 'crop_production.parquet')

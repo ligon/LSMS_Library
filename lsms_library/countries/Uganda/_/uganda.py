@@ -1191,7 +1191,7 @@ def _to_int_code(series):
     return pd.to_numeric(series, errors='coerce').astype('Int64')
 
 
-def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
+def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
     """Build canonical ``crop_production`` for one Uganda UNPS wave.
 
     Parameters
@@ -1203,9 +1203,15 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
         modules, loaded with ``convert_categoricals=False`` so code
         columns carry integer codes.  ``None`` permitted.
     df4a : pd.DataFrame | None
-        Raw AGSEC4A plot-crop roster (for the intercropped flag and,
-        where available, the perennial flag).  ``None`` permitted; when
-        absent the flags are NaN.
+        Raw AGSEC4A plot-crop roster -- the FIRST season's -- for season
+        A's intercropped flag and, where available, the perennial flag.
+        ``None`` permitted; when absent the season-A flags are NaN.
+    df4b : pd.DataFrame | None
+        Raw AGSEC4B plot-crop roster -- the SECOND season's -- for season
+        B's intercropped flag.  ``None`` permitted; when absent season B's
+        flag is NaN.  It is NEVER filled in from ``df4a``: the crop stand
+        is asked separately per season and the two answers differ on
+        23.3-31.2% of plots (GH #872).
     colmap : dict
         Per-(season) column maps keyed by ``'A'`` / ``'B'``.  Each value
         is a dict with keys:
@@ -1249,9 +1255,13 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                                 ``KgFactor`` column; a value of 0 is read as
                                 "not recorded" and becomes NaN, because 0 kg
                                 per unit is not a weight.
-    intercrop_map : (passed via colmap['intercrop']) optional dict
-            file_hhid, file_parcel, file_plot, flag, [perennial]
-        describing how to read the intercropped flag from ``df4a``.
+    intercrop_map : (passed via ``colmap['intercrop']`` for season A and
+        ``colmap['intercrop_B']`` for season B) optional dicts
+            hhid, parcel, plot, flag, [crop], [perennial], [planting_month]
+        describing how to read the intercropped flag from ``df4a`` /
+        ``df4b`` respectively.  A season whose block is absent (or whose
+        frame is None) serves NA for that season -- never the other
+        season's answer.
 
     Raises
     ------
@@ -1290,33 +1300,45 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
     unit_map = _harvest_unit_map()
     condition_map = _harvest_condition_map()
 
-    # --- intercropped / perennial / planting from AGSEC4A (plot-crop) ---
-    inter_lookup = {}      # (hh, parcel, plot) -> bool   (plot-level flag)
+    # --- intercropped / perennial / planting from AGSEC4A / AGSEC4B ---
+    # ONE LOOKUP PER SEASON (GH #872 follow-up).  AGSEC4A rosters the FIRST
+    # season's plot-crops and AGSEC4B the SECOND; the crop stand is asked
+    # separately in each.  Reading the 4A answer for season-B harvest rows
+    # -- which is what this did until the season key was added -- contradicts
+    # AGSEC4B on 23.3-31.2% of the rows where both are available, because a
+    # plot really is planted differently in the two seasons.  Measured
+    # plot-level A-vs-B disagreement: 29.5 / 26.7 / 31.0 / 24.8 / 26.3 /
+    # 27.9 / 23.3% by wave.  AGSEC4B also covers the AGSEC5B harvest rows far
+    # better than AGSEC4A does (86.6-99.95% vs 54.8-88.1%).
+    inter_lookup = {'A': {}, 'B': {}}   # season -> (hh, parcel, plot) -> bool
     perennial_lookup = {}  # (hh, parcel, plot, crop) -> bool
     planting_lookup = {}   # (hh, parcel, plot, crop) -> Int month
-    ic = colmap.get('intercrop')
-    if df4a is not None and ic is not None:
-        hh4 = _format_agsec_hhid(df4a[ic['hhid']], t)
-        pa4 = df4a[ic['parcel']].apply(format_id)
-        pl4 = df4a[ic['plot']].apply(format_id)
+    for season4, key4a, df4 in (('A', 'intercrop', df4a),
+                                ('B', 'intercrop_B', df4b)):
+        ic = colmap.get(key4a)
+        if df4 is None or ic is None:
+            continue
+        hh4 = _format_agsec_hhid(df4[ic['hhid']], t)
+        pa4 = df4[ic['parcel']].apply(format_id)
+        pl4 = df4[ic['plot']].apply(format_id)
         key3 = list(zip(hh4, pa4, pl4))
-        w4 = f"{t!r}]['intercrop'"
+        w4 = f"{t!r}][{key4a!r}"
         if ic.get('flag'):
-            flagcode = _to_int_code(_require(df4a, ic['flag'], w4, 'intercrop flag'))
-            # 1 = mono/No, 2 = Yes  (recode mirrors WB: 2 -> True)
+            flagcode = _to_int_code(_require(df4, ic['flag'], w4, 'intercrop flag'))
+            # {1: Pure Stand, 2: Mixed/Inter cropped} -> 2 is True (GH #872).
             for k, c in zip(key3, flagcode):
                 if pd.notna(c):
-                    inter_lookup[k] = bool(int(c) == 2)
+                    inter_lookup[season4][k] = bool(int(c) == 2)
         if ic.get('crop'):
-            crop4 = _to_int_code(_require(df4a, ic['crop'], w4, 'intercrop crop'))
+            crop4 = _to_int_code(_require(df4, ic['crop'], w4, 'intercrop crop'))
             key4 = list(zip(hh4, pa4, pl4, crop4))
             if ic.get('perennial'):
-                per = _to_int_code(_require(df4a, ic['perennial'], w4, 'perennial'))
+                per = _to_int_code(_require(df4, ic['perennial'], w4, 'perennial'))
                 for k, c in zip(key4, per):
                     if pd.notna(c):
                         perennial_lookup[k] = bool(int(c) == 2)
             if ic.get('planting_month'):
-                pm = _to_int_code(_require(df4a, ic['planting_month'], w4,
+                pm = _to_int_code(_require(df4, ic['planting_month'], w4,
                                            'planting month'))
                 for k, m in zip(key4, pm):
                     if pd.notna(m) and 1 <= int(m) <= 12:
@@ -1451,12 +1473,16 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
                 'harvest_month': hm.values,
                 'KgFactor':      kgf.values,
             })
-            # intercropped flag (plot-level) joined from AGSEC4A.  The
+            # intercropped flag (plot-level) joined from THIS SEASON's crop
+            # roster -- AGSEC4A for season A, AGSEC4B for season B.  A wave
+            # that declares no roster for a season serves NA there; it never
+            # borrows the other season's answer (GH #872).  The
             # perennial_lookup / planting_lookup hooks exist for future
             # waves but no current Uganda wave populates them cleanly, so
             # those columns are not emitted (they would be all-null).
             k3 = list(zip(hh.values, parcel.values, plot.values))
-            piece['intercropped'] = [inter_lookup.get(k, pd.NA) for k in k3]
+            season_inter = inter_lookup[season]
+            piece['intercropped'] = [season_inter.get(k, pd.NA) for k in k3]
             pieces.append(piece)
 
     cols = ['Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
@@ -1695,15 +1721,34 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap):
 # that a wave records no such column -- that is a survey fact and is auditable;
 # a name that does not resolve is a config bug and used to be invisible.
 #
-# KNOWN DEFECT, deliberately not fixed here: every `intercrop.flag` below
-# points at the SEED-USE question ("did you use any seed/seedlings?",
-# {1: Yes, 2: No}), not at the cropping-system question (`a4aq7` "Cropping
-# system" {1: Pure Stand, 2: Inter cropped} in 2009-10/2010-11, `a4aq8` /
-# `s4aq08` "What type of crop stand was on the plot?" {1: Pure Stand,
-# 2: Mixed Stand} from 2011-12 on).  So `intercropped` currently means "did
-# NOT use seed", and agrees with the true crop-stand answer on only 48-53%
-# of rows.  Rewiring MOVES data, so it needs its own before/after; see
-# CONTENTS.org "Known Issues".
+# `intercrop.flag` is the CROPPING-SYSTEM question, in every wave -- GH #872.
+# It used to point at the SEED-USE question ("did you use any seed/
+# seedlings?", {1: Yes, 2: No}: `a4aq3` 2011-12, `a4aq16` 2013-14/2015-16,
+# `s4aq16` 2018-19/2019-20), so a served `intercropped=True` meant "did NOT
+# use seed" and agreed with the real crop stand on 48.5/48.8/52.5/51.8/52.5%
+# of rows -- a coin flip.  The right column was in the SAME file all along:
+#   2009-10, 2010-11     `a4aq7`   "Cropping system"  {1 Pure Stand, 2 Inter cropped}
+#   2011-12 .. 2015-16   `a4aq8`   "What type of crop stand was on the plot?"
+#   2018-19, 2019-20     `s4aq08`  same wording       {1 Pure Stand, 2 Mixed Stand}
+# All seven take values in {1, 2, NA} only (measured; no 9/99/0 sentinel),
+# so the `2 -> True` recode is exactly right for them.
+#
+# The flag is keyed (hh, parcel, plot) while AGSEC4A is plot-CROP grain, so
+# duplicate crop rows on one plot are last-write-wins.  For the crop-stand
+# question that is near-harmless -- it is genuinely a plot-level question and
+# 0.00-0.31% of plots disagree across their crop rows (vs 10-12% for the
+# seed-use column it replaces, which was crop-level and so had no business
+# being read at plot grain either).
+#
+# ONE ROSTER PER SEASON.  AGSEC4A rosters season A's plot-crops, AGSEC4B
+# season B's, and each asks the crop stand separately -- `a4bq7` (2009-10,
+# 2010-11), `a4bq8` (2011-12..2015-16), `s4bq08` (2018-19, 2019-20), same
+# labels and same id columns as their 4A twins, {1, 2, NA} only.  So every
+# wave declares BOTH `intercrop` and `intercrop_B`, and season B is read
+# from `intercrop_B`.  It used to be read from 4A, which contradicts 4B on
+# 23.3-31.2% of comparable rows; AGSEC4B also covers the AGSEC5B harvest
+# rows at 86.6-99.95% against AGSEC4A's 54.8-88.1%.  A season with no block
+# serves NA; it never borrows the other season's answer.
 CROP_COLMAPS = {
     '2009-10': {
         # `qty_sentinel: 99999` -- GH #861.  a5aq6a/a5bq6a use 99999 as a
@@ -1721,11 +1766,19 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
                               'month': None, 'qty_sentinel': 99999}]},
-        # 2009-10 AGSEC4A uses a non-standard column layout (a4aq1/a4aq2/
-        # a4aq4, no parcel/plot/cropID in the form the join needs), so the
-        # intercrop flag is not cleanly joinable -> intercropped is NaN
-        # this wave.
-        'intercrop': None,
+        # 2009-10 AGSEC4A is the one wave with question-numbered id columns
+        # (`a4aq2` Parcel ID, `a4aq4` Plot ID, `a4aq6` Crop Code) instead of
+        # parcelID/plotID/cropID.  A comment here used to claim they were
+        # "not in the form the join needs"; measured, they are -- 100.00% of
+        # AGSEC5A and 74.45% of AGSEC5B rows hit an AGSEC4A key (5B is the
+        # SECOND season; AGSEC4A rosters the first, so the shortfall is a
+        # survey fact, not a key mismatch).  GH #872.
+        'intercrop': {'hhid': 'HHID', 'parcel': 'a4aq2', 'plot': 'a4aq4',
+                      'flag': 'a4aq7', 'crop': 'a4aq6'},
+        # AGSEC4B, the SECOND-season roster: same question-numbered id
+        # layout (`a4bq2`/`a4bq4`/`a4bq6`), same `Cropping system` question.
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'a4bq2', 'plot': 'a4bq4',
+                        'flag': 'a4bq7', 'crop': 'a4bq6'},
     },
     '2010-11': {
         'A': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid', 'crop': 'cropID',
@@ -1738,18 +1791,18 @@ CROP_COLMAPS = {
                               'qty_sold': 'a5bq7a', 'unit_sold': 'a5bq7c',
                               'condition_sold': 'a5bq7b', 'value_sold': 'a5bq8',
                               'month': None}]},
-        # `flag: None` is a MEASUREMENT, not a guess: 2010-11 AGSEC4A ships
-        # ['HHID','prcid','pltid','cropID','a4aq7'..'a4aq14'] and has no
-        # `a4aq3` at all, so the previous 'a4aq3' entry silently resolved to
-        # nothing and `intercropped` was NaN on all 20 970 rows of this wave.
-        # Writing None makes the config say what the build already did (a
-        # provable no-op) instead of naming a column that does not exist.
-        # NOTE the wave DOES carry a cropping-system question — a4aq7,
-        # "Cropping system", value-labelled {1: Pure Stand, 2: Inter cropped}.
-        # Wiring it would ADD data, so it is a separate change with its own
-        # before/after; see CONTENTS.org "Known Issues".
+        # 2010-11 AGSEC4A ships ['HHID','prcid','pltid','cropID',
+        # 'a4aq7'..'a4aq14'] and has NO `a4aq3` -- the seed-use column this
+        # entry named until 2026-07 does not exist here, so the flag silently
+        # resolved to nothing and `intercropped` was NaN on the whole wave.
+        # It was set to None (a provable no-op) pending GH #872; now wired to
+        # `a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, the
+        # question that was there all along.  This ADDS data to the wave.
+        # Join coverage measured: 99.25% of AGSEC5A rows, 88.15% of AGSEC5B.
         'intercrop': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
-                      'flag': None, 'crop': 'cropID'},
+                      'flag': 'a4aq7', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'prcid', 'plot': 'pltid',
+                        'flag': 'a4bq7', 'crop': 'cropID'},
     },
     '2011-12': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1777,7 +1830,9 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq3', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2013-14': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1793,7 +1848,9 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2015-16': {
         'A': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID', 'crop': 'cropID',
@@ -1809,7 +1866,9 @@ CROP_COLMAPS = {
                               'value_sold': 'a5bq8',
                               'month': 'a5bq6f'}]},
         'intercrop': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
-                      'flag': 'a4aq16', 'crop': 'cropID'},
+                      'flag': 'a4aq8', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'HHID', 'parcel': 'parcelID', 'plot': 'plotID',
+                        'flag': 'a4bq8', 'crop': 'cropID'},
     },
     '2018-19': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
@@ -1825,7 +1884,9 @@ CROP_COLMAPS = {
                               'value_sold': 's5bq08_1',
                               'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                        'flag': 's4bq08', 'crop': 'cropID'},
     },
     '2019-20': {
         'A': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
@@ -1846,7 +1907,9 @@ CROP_COLMAPS = {
                               'value_sold': 's5bq08_1',
                               'month': 's5bq06f_1'}]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
-                      'flag': 's4aq16', 'crop': 'cropID'},
+                      'flag': 's4aq08', 'crop': 'cropID'},
+        'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
+                        'flag': 's4bq08', 'crop': 'cropID'},
     },
 }
 

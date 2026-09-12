@@ -251,6 +251,12 @@ question (`a4aq7` "Cropping system" {1: Pure Stand, 2: Inter cropped}, or
 question is 48.5–52.5% — a coin flip.  Rewiring moves data, so it is filed as
 a Known Issue in `Uganda/_/CONTENTS.org`, not fixed here.
 
+**Closed 2026-09-12 by GH #872.**  Every wave now wires the crop-stand
+column (`a4aq7` / `a4aq8` / `s4aq08`); 2009-10 and 2010-11, which served
+100% NaN, are newly populated.  Served non-NA rows 75,625 -> 115,553;
+True 30,629 -> 64,276.  See `Uganda/_/CONTENTS.org` and
+`tests/test_uganda_intercropped.py`.
+
 ### Prior art missed on the first pass (coordinator correction, 2026-07-21)
 
 I applied F1–F3 without reading `Uganda/_/CONTENTS.org` end to end — only the
