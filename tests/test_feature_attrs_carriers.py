@@ -297,8 +297,15 @@ class TestEveryCarrierSurvivesAssembly:
 # the assembly the issue names
 # ---------------------------------------------------------------------------
 
+@pytest.mark.slow
 class TestDelivered:
-    """End-to-end, on real data.  Skipped when the cache is cold."""
+    """End-to-end, on real data.  Skipped when the cache is cold.
+
+    Marked slow: GhanaLSS `food_acquired` is the corpus's largest built table
+    (5.26M rows, a ~3-minute warm read), and GhanaLSS is not optional here --
+    it is the only country with a `_/derivations.yml`, so it is the only pair
+    that can exercise the derivations carrier on real data at all.
+    """
 
     PAIR = ["GhanaLSS", "Guatemala"]
 
