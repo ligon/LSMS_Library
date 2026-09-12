@@ -439,7 +439,7 @@ versioned.
 | valuation_sources, valuation, valuation_geo_levels | R5b | yes (explicitly re-attached after post-steps) | no (docstring says so) |
 | nitrogen_input_match | R16 | analyst call | -- |
 | conversion | R11 | yes | -- |
-| recall | =_finalize_result= (metadata, per wave) | yes | NO: =recall.merge_attrs= has no caller |
+| recall | =_finalize_result= (metadata, per wave) | yes | NO: =recall.merge_attrs= has no caller [fixed 2026-09-12, GH #873] |
 | population, population_resolution | =_finalize_result= | yes | yes (feature.py:715 re-attaches) |
 | labels_unavailable, canonical_alignment | Feature | -- | yes |
 | id_converted, country | =_finalize_result= | yes | -- |

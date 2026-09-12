@@ -248,6 +248,32 @@ the derived tables' groupby must not be asked to reduce the string
 column, which the first instance avoids by leaving it to fall away at
 the sum.
 
+*** DONE 2026-09-12 (GH #873): both re-merges are wired
+
+The follow-on landed.  =Feature.__call__= no longer hardcodes the
+population record: =feature._ATTRS_CARRIERS= is a registry of
+=(name, keys, attach)= triples -- population, recall, derivations --
+captured per country before =_harmonize_country_frame= / =pd.concat=
+and re-attached afterwards for the KEPT countries only, each through
+its own module's =merge_attrs=.  A fourth carrier is one entry there.
+
+So the parenthesis above ("=recall.merge_attrs= ... has NO caller
+today") is TRUE AS OF 2026-09-11 AND FALSE NOW; it is left standing
+because it is the finding that motivated the issue.  Both
+=recall.merge_attrs= and =derivations.merge_attrs= now accept either a
+frame or the bare =attrs= mapping, because =Feature= captures the
+mapping (the frame itself is reshaped on the way to the concat).
+
+Measured, =Feature('food_acquired')(['Guatemala','Panama'])=:
+=attrs['recall']= was =None= before and is ={'Guatemala','Panama'}=
+after; the 787,336 rows are unchanged.  No cache hash moves -- 207
+=Country._table_cache_hash= values across 10 countries plus 4
+=build_transforms_fingerprint= values, all byte-identical
+(=feature.py= is read-path and is not in any build fingerprint).
+
+=No warning at pooling time= (next section) is honoured: only
+population reports, and that report is unchanged.
+
 ** Site 1: the declared-index collapse
 
 =_normalize_dataframe_index= (=country.py=) reduces a non-unique

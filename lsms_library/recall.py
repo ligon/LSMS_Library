@@ -85,9 +85,14 @@ from .paths import countries_root
 from .yaml_utils import load_yaml
 
 __all__ = [
+    "ATTRS_KEY",
     "RecallRecord", "recall_records", "records_for_frame", "attach",
+    "merge_attrs",
     "BASIS_LADDER", "VARIATION_AXES", "ASK_COUNT_BASES",
 ]
+
+#: ``df.attrs`` key holding ``{country: {wave: RecallRecord}}``.
+ATTRS_KEY = "recall"
 
 #: Evidence rungs, strongest first.  Mirrors :mod:`lsms_library.capability`.
 BASIS_LADDER = (
@@ -380,10 +385,10 @@ def attach(df, country: str) -> None:
         records = records_for_frame(df, country)
         if not records:
             return
-        existing = df.attrs.get("recall")
+        existing = df.attrs.get(ATTRS_KEY)
         merged = dict(existing) if isinstance(existing, dict) else {}
         merged[country] = records
-        df.attrs["recall"] = merged
+        df.attrs[ATTRS_KEY] = merged
     except Exception:                       # pragma: no cover - never fatal
         pass
 
@@ -395,10 +400,17 @@ def merge_attrs(frames) -> dict[str, dict[str, RecallRecord]]:
     cross-country ``concat`` -- whose inputs differ *by design*, one record per
     country -- always lands in the ``{}`` case.  The re-attach is therefore
     load-bearing, not decorative (``CLAUDE.md`` §"Panel ID Transitive Chains").
+    Wired from ``Feature.__call__`` since GH #873; before that this function
+    had no caller and ``attrs['recall']`` died at every multi-country call.
+
+    Each element may be a **frame** or the bare ``attrs`` **mapping** captured
+    from one.  ``Feature`` captures the mapping before assembly (the frame
+    itself is reshaped by ``_harmonize_country_frame`` on the way), so both
+    shapes have to work.
     """
     out: dict[str, dict[str, RecallRecord]] = {}
     for f in frames:
-        got = getattr(f, "attrs", {}).get("recall")
+        got = (getattr(f, "attrs", f) or {}).get(ATTRS_KEY)
         if isinstance(got, dict):
             for c, recs in got.items():
                 out.setdefault(c, {}).update(recs)

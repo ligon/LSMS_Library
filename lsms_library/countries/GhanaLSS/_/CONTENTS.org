@@ -1350,7 +1350,15 @@ Mechanics: =_/ghanalss.py:derive_12b_fortnight_value= (no options -- one
 construction per parquet), registered as
 =GhanaLSS::food_acquired::12b-fortnight= in =_/derivations.yml=, stamped in
 the =Derivation= column of every produced row of the two waves (NA on
-purchased rows) and summarised on =df.attrs['derivations']=.  The raw four
+purchased rows) and summarised on =df.attrs['derivations']=.  (That summary
+used to survive =Country('GhanaLSS').food_acquired()= and DIE on a
+cross-country =Feature('food_acquired')(['GhanaLSS', ...])= -- =attrs= do not
+survive a =concat= whose inputs disagree, and nothing re-attached it.  Fixed
+2026-09-12, GH #873: =feature._ATTRS_CARRIERS= now re-attaches population,
+recall AND derivations.  The same drop hit =attrs['recall']=, which matters
+most here: GhanaLSS delivers 30 days of coverage where most of the corpus
+delivers 7, so GhanaLSS is exactly the country a pooled frame needs to
+disclose.)  The raw four
 answers come back by their original names from
 =Country('GhanaLSS').derivation_inputs('GhanaLSS::food_acquired::12b-fortnight')=
 (=inputs_12b=), from which the in-season or annual alternatives are one
