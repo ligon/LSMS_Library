@@ -59,6 +59,21 @@ class TestTheRegistry:
         assert [c.name for c in F._ATTRS_CARRIERS] == \
             ["population", "recall", "derivations"]
 
+    def test_feature_did_not_import_the_SHADOWING_callables(self):
+        """`lsms_library` binds public callables over two of its own submodule
+        names (`ll.recall`, `ll.derivations`), and `from package import name`
+        prefers the package attribute.  `feature.py` must name the symbols it
+        wants, or a reordering of `__init__` would silently hand it a
+        function -- which is exactly what this test file's `sys.modules`
+        lookup at the top exists to dodge."""
+        import lsms_library as ll
+        assert callable(ll.recall) and not hasattr(ll.recall, "merge_attrs")
+        assert callable(ll.derivations)
+        for carrier in F._ATTRS_CARRIERS[1:]:
+            assert callable(carrier.attach)
+        assert F._ATTRS_CARRIERS[1].keys == (R.ATTRS_KEY,)
+        assert F._ATTRS_CARRIERS[2].keys == (D.ATTRS_KEY,)
+
     def test_the_captured_keys_are_exactly_the_carriers_keys(self):
         """The capture at the top of the country loop and the re-attach after
         the concat must read the SAME key list, or a record is captured and
@@ -242,7 +257,7 @@ class TestEveryCarrierSurvivesAssembly:
                             lambda name, **kw: _FakeCountry(name))
         f = F.Feature("household_roster")
         object.__setattr__(f, "_countries", ["Liberia", "Benin", "Togo"])
-        captured = {n: {k: {n: {"x": 1}} for k in F._CARRIED_ATTRS_KEYS}
+        captured = {n: {k: {n: {"x": 1}} for k in (R.ATTRS_KEY, D.ATTRS_KEY)}
                     for n in ("Liberia", "Benin", "Togo")}
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")

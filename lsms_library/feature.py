@@ -27,8 +27,17 @@ from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .errors import LabelUnavailableError
 from . import population as _population
-from . import recall as _recall
-from . import derivations as _derivations
+# NOT `from . import recall` / `from . import derivations`: the package binds
+# PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
+# `recall_table`, `ll.derivations(...)` = `derivations_table`), and
+# `from package import name` prefers the package ATTRIBUTE over the submodule.
+# This module is imported by `__init__` before those rebinds, so the submodule
+# form happens to work today and would silently start importing a FUNCTION if
+# `__init__`'s import order ever changed.  Name the symbols instead.
+from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
+from .recall import merge_attrs as _recall_merge_attrs
+from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
+from .derivations import merge_attrs as _derivations_merge_attrs
 
 
 # ---------------------------------------------------------------------------
@@ -94,13 +103,13 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
     ),
     _AttrsCarrier(
         "recall",
-        (_recall.ATTRS_KEY,),
-        _merge_into(_recall.ATTRS_KEY, _recall.merge_attrs),
+        (_RECALL_ATTRS_KEY,),
+        _merge_into(_RECALL_ATTRS_KEY, _recall_merge_attrs),
     ),
     _AttrsCarrier(
         "derivations",
-        (_derivations.ATTRS_KEY,),
-        _merge_into(_derivations.ATTRS_KEY, _derivations.merge_attrs),
+        (_DERIVATIONS_ATTRS_KEY,),
+        _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
     ),
 )
 
