@@ -32,12 +32,16 @@ from lsms_library.country import _normalize_dataframe_index
 
 # --- Unit test: no real data needed.  Pins the reducer's fabrication directly. --
 
-def test_skipna_first_fabricates_cross_row_values_when_act_is_dropped():
+def test_person_level_collapse_destroys_jobs_when_act_is_dropped():
     """The mechanism, in miniature: hhcode=1011 idcode=1 from the real source.
 
     Row A carries the wage (15.0) but no workplace; rows B..F carry a workplace
-    but a 0.0 wage.  Collapsing to (t, i, pid) yields (15.0, 'Rural') -- a pair
-    that exists in NO source row.  Declaring `act` must prevent that.
+    but a 0.0 wage.  Collapsing to (t, i, pid) used to yield (15.0, 'Rural') --
+    a pair that exists in NO source row (the per-column ``first()`` composite).
+    Since GH #871 (2026-09-12) core selects the MOST COMPLETE observed row, so
+    the person-level collapse serves row B (0.0, 'Rural') -- an observed row,
+    but still the wrong grain: five jobs and the only wage are destroyed and the
+    audit warns.  Declaring `act` is the fix either way.
     """
     rows = [  # (act, Cash_per_day, Rural)  -- verbatim from SECT02AD.DTA
         ('A', 15.0, None), ('B', 0.0, 'Rural'), ('C', 0.0, 'Rural'),
@@ -57,10 +61,10 @@ def test_skipna_first_fabricates_cross_row_values_when_act_is_dropped():
     with pytest.warns(RuntimeWarning, match='GH #323'):
         bad = _normalize_dataframe_index(df, {'index': '(t, i, pid)'}, None)
     assert len(bad) == 1
-    # The fabrication: wage from row A, workplace from row B.
-    assert bad['Cash_per_day'].iloc[0] == 15.0
-    assert bad['Rural'].iloc[0] == 'Rural'   # <- present in no source row
-    assert bad['Cash_per_day'].sum() == 15.0  # 4 further wage rows destroyed
+    # An OBSERVED row (B: the first of the most-complete ones), not a composite.
+    assert bad['Cash_per_day'].iloc[0] == 0.0
+    assert bad['Rural'].iloc[0] == 'Rural'
+    assert bad['Cash_per_day'].sum() == 0.0   # the wage (row A) is destroyed
 
     # ACTIVITY-level index (the fix): all six jobs survive, unfabricated.
     out = _normalize_dataframe_index(df, {'index': '(t, i, pid, act)'}, None)
