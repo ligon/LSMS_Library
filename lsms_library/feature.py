@@ -813,7 +813,11 @@ class Feature:
         """
         try:
             kept = set(result.index.get_level_values("country").unique())
-        except (KeyError, ValueError):
+        except Exception:
+            # Deliberately broader than the (KeyError, ValueError) this used to
+            # catch: that pair sat INSIDE an outer `except Exception` that also
+            # covered this line, and the outer one is now per-carrier.  Never
+            # let working out WHICH countries are kept break a data call.
             kept = set(captured)
         in_answer = [v for k, v in captured.items() if k in kept]
 
