@@ -200,7 +200,14 @@ class TestServedHours:
         assert 20.0 < per_worker_mean["2011-12"] < 45.0
 
     def test_no_row_carries_a_declared_missing_code_as_hours(self):
-        """The 7,410 h/week row is gone; the survivors are two-job sums."""
+        """The 7,410 h/week row is gone.
+
+        The 3 rows still over 168 h/week were inspected row by row and carry
+        no value-labelled code: they are two-job sums (raw q29,q30,q31 /
+        q55,q56,q57 = 12,10,7 / 12,18,7; 12,24,7 / 12,10,7; 12,14,7 /
+        12,14,7), one containing a bare 24-hours-a-day over-report.  A
+        plausibility screen on reported schedules is a separate decision.
+        """
         import lsms_library as ll
 
         df = ll.Country(COUNTRY).people_last7days().reset_index()

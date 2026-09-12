@@ -896,8 +896,12 @@ those are people whose only reported schedule was the missing code, and they
 now carry NA-driven 0 rather than an invented number.  The 2014-15 / 2011-12
 per-worker ratio goes from *3.124 -> 0.758*.  Rows above 168 h/week:
 2011-12 8 -> *3* (max 7,410.7 -> 238.0); 2014-15 0 -> 0.  The three survivors
-are two-job sums of individually-plausible schedules, not sentinels, and are
-left alone.
+were inspected (raw =q29,q30,q31 / q55,q56,q57=): =12,10,7 / 12,18,7= (196),
+=12,24,7 / 12,10,7= (238), =12,14,7 / 12,14,7= (196).  They are *two-job
+sums*, not sentinels -- no value-labelled code is involved, and the one
+implausible cell (24 hours a day, 7 days a week, on the 238 row) is a bare
+over-report: 24 carries no value label and 6 people report it on =ms04q30=.
+Left alone.
 
 *Residual, stated because it is not zero.*  2014-15's reported weeks-per-month
 =MS04Q26= is 4 for 86% of jobs (mean 3.78), not the calendar 4.333, so that
@@ -908,10 +912,11 @@ considered and rejected: 52/12 is exact, and 4 weeks/month is a respondent
 approximation belonging to the other wave.
 
 *Still above a plausible ceiling, and left alone.*  3 rows of 2011-12 exceed
-168 h/week and 50 exceed 112 (2014-15: 0 and 10).  These are not declared
-missing codes -- they are sums over two jobs each of whose reported schedule is
-individually possible.  A plausibility screen on reported schedules is a
-separate decision.
+168 h/week and 50 exceed 112 (2014-15: 0 and 10).  None involves a declared
+missing code (verified row by row, values quoted above); they are two-job
+sums, one of which contains a bare 24-hours-a-day over-report.  A
+plausibility screen on reported schedules is a separate decision from
+honouring the survey's own missing codes, and is not taken here.
 
 ** REPORTED, NOT FIXED: 2011-12 asks no 7-day participation question at all
 
