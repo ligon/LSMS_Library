@@ -345,7 +345,14 @@ def food_acquired(fn, myvars):
     for _col in _UNIT_COLS:
         df[_col] = (df[_col].str.replace(r'^\s*\d+\.\s*', '', regex=True)
                             .str.strip()
-                            .replace({'Nan': pd.NA, 'None': pd.NA, '': pd.NA}))
+                            .replace({'Nan': pd.NA, 'None': pd.NA, '': pd.NA,
+                                      # 2011-12 ships a literal '0' as the
+                                      # unit code on 3 rows (2 on Q2, 1 on
+                                      # Q3, Wheat / 5,000).  The prefix strip
+                                      # above needs a '.', so it survives as a
+                                      # junk `u`.  It records no unit, so it
+                                      # takes the same sentinel as the rest.
+                                      '0': pd.NA}))
     rep = {r'\s+': ' ',
            'Meduim': 'Medium',
            'Kubaya ': 'Kubaya/Cup ',

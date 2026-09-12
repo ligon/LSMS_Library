@@ -1953,7 +1953,7 @@ survey's own four numbers is a measurement; 100% on two of them was not.
 |         | produced  |       13878 |      10750 |         426,138 |        302,495 |
 |         | inkind    |           - |       3869 |               - |        108,891 |
 | 2021-22 | purchased |       74755 |      74755 |       4,307,450 |      4,309,453 |
-|         | produced  |        7682 |       7682 |         165,554 |         94,440 |
+|         | produced  |        9783 |       7682 |         165,554 |         94,440 |
 |         | inkind    |           - |       2150 |               - |         69,832 |
 
 *These Quantity columns sum across incompatible units and are diagnostics,
@@ -1968,7 +1968,13 @@ Two smaller classes moved too:
   =Q5 = Q6 = 0= but =Q2 > Q3= -- the household reported no own production
   and no gifts, yet the residual manufactured some -- were 409 rows /
   177,955 units in 2011-12, 398 / 107,580 in 2013-14, 0 / 8 / 17 rows
-  afterwards.  They are now simply absent, which is what the household said.
+  afterwards.  *Those counts carry a filter*: they keep only rows where every
+  populated source's CLEANED unit label agrees with Q2's, the same restriction
+  as the closure table.  Drop the filter and the same class is 412 / 432 / 0 /
+  15 / 20.  (The GH #874 issue body quotes 393 / 424 for 2011-12 / 2013-14; it
+  compared RAW Stata unit codes rather than the cleaned labels the build uses,
+  which is a third filter again.  All three describe the same rows; none is
+  wrong, and a bare count here is meaningless without saying which.)  They are now simply absent, which is what the household said.
 - *2011-12's 34 rows with Q2 missing and Q3 > 0* were served
   =purchased = 0= (both sides were =fillna(0)=) and survived only on their
   Q4 spend.  They now carry Q3 (9,162,250 raw units, again mostly gram
@@ -1986,11 +1992,19 @@ no unit code.  Measured (comparison restricted to unit-agreeing rows):
 
 | wave    | Q3 > Q2 | Q5 > Q2 | Q6 > Q2 | Q3 = Q5 = Q2 > 0 | no unit code (p/pr/ik) |
 |---------+---------+---------+---------+------------------+------------------------|
-| 2011-12 |       3 |      17 |       0 |               48 | 9 / 18 / 4             |
-| 2013-14 |       0 |      53 |       0 |               96 | 128 / 39 / 33          |
-| 2015-16 |       0 |       0 |       0 |                0 | 3 / 6 / 3              |
+| 2011-12 |     131 |      17 |       0 |               48 | 9 / 18 / 4             |
+| 2013-14 |     235 |      53 |      33 |               96 | 128 / 39 / 33          |
+| 2015-16 |       1 |       0 |       0 |                0 | 3 / 6 / 3              |
 | 2018-19 |       0 |       4 |       0 |                0 | 0 / 0 / 0              |
-| 2021-22 |       0 |      14 |       0 |                0 | 0 / 0 / 0              |
+| 2021-22 |      56 |      14 |       0 |                0 | 0 / 0 / 0              |
+
+(Corrected 2026-09-12 after review: the =Q3 > Q2= and =Q6 > Q2= columns first
+published here read 3/0/0/0/0 and 0/0/0/0/0.  Those came from a separate probe
+script with a looser unit filter, not from the screen the build actually runs;
+re-running =ethiopia.food_acquired='s own predicate cold gives the numbers
+above.  The other three columns were right.  *Q3 > Q2 is the biggest class in
+this table* -- a household that bought more than it ate that week -- and it is
+exactly what the old =min(Q2, Q3)= silently truncated.)
 
 (These are the cold-BUILD counts.  The warning fires in the wave script's
 process, so a warm reader never sees it -- this table is the only durable
@@ -2044,6 +2058,9 @@ twin (=harvest_kg_factors=) always has.  So Ethiopia's 22 unit-less W1 rows
 were pooled into one "unit" and served a u-pooled *0.571 kg per unit*,
 delivering *9.88M kg of a 12.47M kg country total*.  Fixed in the same branch
 (a separate commit) by applying =_unit_sentinel_mask= on the food side too;
-measured across all nine warm food countries, *only Ethiopia moves* --
-Malawi (441 sentinel rows), Niger (12) and GhanaLSS (13,380) were already
-getting no inferred factor there.  The numbers above are post-fix.
+measured across nine food countries, *only Ethiopia moves* -- Malawi (441
+sentinel rows), Niger (12) and GhanaLSS (13,380) were already getting no
+inferred factor there.  *Six of the nine have been reproduced independently*
+(Ethiopia, Malawi, EthiopiaRHS, Nigeria, Tanzania, GhanaLSS -- all 0.0% bar
+Ethiopia); Niger and Mali were on a stale hash and Uganda was cold at the
+reviewer's second reading, so those three rest on this branch's run alone.  The numbers above are post-fix.
