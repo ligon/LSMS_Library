@@ -397,9 +397,46 @@ food_acquired:
             - mappings: ['unit', 'Original Label', 'Preferred Label']
     myvars:
         Quantity: s07bq03a
-        Expenditure: s07bq08
         Produced: s07bq04
+        # NOT `Expenditure: s07bq08` (GH #876).  `s07bq08` is "Valeur (en FCFA)
+        # du [PRODUIT] achete la derniere fois" -- the value of ONE purchase,
+        # which `s07bq06` places up to 30 days back -- while `Quantity` is the
+        # 7-day consumption.  Wiring it as `Expenditure` puts two clocks on one
+        # row.  Read the six raw inputs below instead and let the wave's
+        # `mapping.py` hook derive `Expenditure`.
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
 ```
+
+The wave's `_/mapping.py` then binds the SHARED EHCVM hook -- one function for
+all eight countries, in `lsms_library/ehcvm.py`; do not copy it:
+
+```python
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+FOOD_ACQUIRED_DERIVATION = _derivation_key('{Country}')
+
+
+def food_acquired(df):
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+
+
+def inputs_food_acquired(wave):
+    return _inputs_last_purchase('{Country}', wave)
+```
+
+and the country gets a `_/derivations.yml` entry registering
+`{Country}::food_acquired::7day-purchase-at-last-purchase-unit-value` (copy a
+sibling's; `lsms_library/derivations.py` documents the fields).  Every served
+purchased row then carries that key in its `Derivation` column.
 
 The corresponding `data_scheme.yml` entry:
 ```yaml

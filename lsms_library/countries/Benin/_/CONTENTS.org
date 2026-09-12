@@ -426,7 +426,10 @@ SUMMED, not =first()=-ed, which is why the audit is silent.  Colliding
 rows necessarily share =u= *and* =s= (both are in the index), so the
 sums are commensurable by construction.  Verified: wave-frame and API
 totals agree exactly — Quantity 576,293.81, Expenditure 87,287,926.96
-— across the 190,618 → 189,236 row reduction.
+— across the 190,618 → 189,236 row reduction.  (That Expenditure total is
+the PRE-#876 one, i.e. the raw =s07bq08= sum; since 2026-09-12 the served
+purchased total is 73,221,529.68 — see "one row, two windows" below.  The
+conservation property this section is about is unchanged.)
 
 *** No =aggregation:= keys, deliberately
 

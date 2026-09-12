@@ -60,6 +60,18 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         defect with a wider blast radius (the library has never read s07bq05).
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876
+    - text: >-
+        the quantity multiplied is the row's OWN purchased quantity, s07bq03a
+        - s07bq04, NOT the gross 7-day consumption s07bq03a.  Multiplying the
+        gross quantity would put the value of own-produced food into
+        Expenditure and re-open the very mismatch this fixes, since the served
+        Quantity is the net figure.  The three candidates are within 1-9% of
+        each other and all far below the pre-#876 raw s07bq08 total.  2018-19:
+        gross 75,023,618, served 73,221,530, gifts-out 68,929,997 FCFA; 2,312
+        rows have a recorded purchase value but a zero purchased quantity and
+        are therefore no longer served.
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
     the same product-level check against ehcvm_conso could NOT be run for this
     wave: its conso file's `codpr` does not share a keyspace with `s07bq01`

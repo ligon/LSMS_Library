@@ -785,7 +785,11 @@ unsized units instead turns the cross-item slope from -0.06 (se 0.09, zero) into
 
 ** The library's inferred kg factors contradict the survey's own unit labels
 
-=_get_kg_factors= infers factors from Expenditure/Quantity ratios.  For Mali
+=_get_kg_factors= infers factors from Expenditure/Quantity ratios.  (Since
+2026-09-12, GH #876, that ratio in the two EHCVM waves IS the unit value of
+the household's last purchase rather than a last-purchase value over a 7-day
+quantity, so every inferred factor for 2018-19 / 2021-22 moved; the #850
+kg totals quoted anywhere for this country predate it.)  For Mali
 2014-15 it returns Sac moyen -> 26.2 kg, Sac petit -> 5.3 kg, Sac large -> 33.0
 kg and Gramme -> 0.708 kg, where the questionnaire's own unit list states
 "9 = Sac large (100kg), 10 = Sac moyen (50kg), 11 = Sac petit (25kg)" and a
