@@ -1,34 +1,43 @@
-#+title: Handoff -- 2026-09-11 (Sue / Claude Fable 5.1), Savio job 38714904
+#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
-* State
-- Branch =development=, mirror published through 568993554.  Merges today:
-  8499ffed8 (feat/derived-values: the derived-values mechanism + GhanaLSS
-  12B served as a labelled derived fortnight) and c4cb87162
-  (fix/recall-record-dict: =RecallRecord= is a dict subclass; the 17
-  housing =to_parquet= failures are green).  Earlier today: ddfe2726c
-  (GLSS5 s8hq3 drop fixed), 6d891861c (GLSS visit-date audits).
-- Tests: not-slow suite on the merged tree 5,666 passed / 17 failed
-  BEFORE the recall merge; those 17 are green after it (159 targeted
-  tests pass on 568993554).  Run the suite as =CLAUDE.md= addendum 3b
-  says: =-n N --dist=loadfile= with =LSMS_BUILD_WORKERS=1=.
-- Shared cache: all 11 GhanaLSS L2 tables re-warmed at the merged hash
-  (see the re-warm logs in the session scratchpad; =nutrition= was last).
-- Issues filed today: #871-#878 (see =SkunkWorks/derived_values.org=
-  "Filed / adjudicated 2026-09-11" for what was filed, what was not,
-  and why).
+* State (2026-09-12)
+- Branch =development=, mirror published through d241d5d52.  Merged today
+  (each reviewed by a separate Opus agent; worktrees and branch refs
+  removed after merge): #878 Malawi grams constant (c04d5feef), #875
+  Ethiopia shocks one builder (668b047f6), #877 Niger 2011-12 hours /12
+  + declared missing codes (e847addfc), #872 Uganda intercropped per
+  season (f9d9489aa), #873 Feature() re-attaches recall + derivations
+  attrs (3f35b73ea), #874 Ethiopia produced/inkind from Q5/Q6 + kg
+  sentinel mask (e7570f6fc), #876 EHCVM purchased Expenditure as a
+  derivation, construction C, inkind rows (76199f590).
+- Yesterday: 8499ffed8 (derived-values mechanism + GhanaLSS 12B),
+  c4cb87162 (RecallRecord dict subclass), ddfe2726c (GLSS5 s8hq3).
+- Filed: #871 (PARKED by @ligon until other work calms), #879 Area/AreaUnit
+  two meanings, #880 GhanaSPS CONTENTS stale, #881 Nigeria W4
+  last-purchase pairing, #882 Niger 2011-12 participation periods, #883
+  __init__ submodule shadowing, #884 Site Q for food_acquired.Quantity.
+- Caches (shared, /global/scratch/.../cache/lsms_library): GhanaLSS,
+  Ethiopia, Niger, Uganda fully re-warmed at the merged hashes; the eight
+  EHCVM countries were being re-warmed at handoff time
+  (=/local/job38714904/tmp/claude-43292/rewarm_ehcvm.log=; if this job
+  died first, the next reader rebuilds on demand -- correct, just slow).
+  Malawi re-warms on next read (#878 moved malawi.py; five wave
+  parquets were rebuilt, the country-level ones by tests).
+- Tests: run the suite as CLAUDE.md addendum 3b says (=-n N
+  --dist=loadfile=, =LSMS_BUILD_WORKERS=1=).  Last full run
+  (pre-#873..#876) 5,666 passed / 17 known-red; the 17 are green since
+  c4cb87162.  A full run on 76199f590+ was pending the EHCVM re-warm.
+  Known pre-existing red: =test_gh842_uganda_harvest_unit::test_wired_unit_agrees_with_the_reported_kg_factor=
+  (74.7% vs 80% floor; reproduced on development before any of today's
+  merges).
 
 * Open questions for @ligon
-- Two dead refs on the mirror to delete: =feat/derived-values=
-  (e4c521281, pre-rebase history) and =feat/derived-values-rebased=
-  (56188dd26, merged).  Also =fix/recall-record-dict= (48c97caaf,
-  merged).  Never force-pushed; deletion is yours.
-- Framework-grain defect not yet filed: =data_info.yml:313-318=
-  declares plot =Area= "in hectares" while 11 of 22 countries serve
-  another =AreaUnit= (Tajikistan sotka, Albania sq m, ...).  File?
-- GhanaSPS =MonthsAway= NaN->0: disclosed decision, but
-  =GhanaSPS/_/CONTENTS.org:594-650= still says wave 1 is "not wired";
-  and Nigeria W4's last-purchase pairing (=Nigeria/_/CONTENTS.org:50-63=)
-  says "worth revisiting as its own issue".  Neither filed.
+- All merged refs deleted (mirror and local).  #879-#884 filed for the
+  remaining findings; #871 parked.
+- Coverage regrade is due for: Uganda crop_production (all 7 waves),
+  Ethiopia food_acquired (all 5), the 12 EHCVM food_acquired cells,
+  Niger people_last7days (both waves), Ethiopia shocks.  =make matrix=
+  was not run today.
 - Design follow-ons recorded in =SkunkWorks/derived_values.org=:
   =Feature()= re-attach of =attrs['derivations']= (with #873), derived
   table attrs, retrofit of the census sites, NSO request for GLSS
