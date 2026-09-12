@@ -12,8 +12,9 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
   rows: {s: purchased}
   rule: >-
     Expenditure = Quantity * (s07bq08 / s07bq07a), where Quantity is the row's
-    own served purchased quantity, (s07bq03a - s07bq04).clip(lower=0) -- the
-    7-day consumption net of own production -- and s07bq08 / s07bq07a is the
+    own served purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(lower=0)
+    -- the 7-day consumption net of own production AND of gifts received, which
+    is the survey's own accounting identity -- and s07bq08 / s07bq07a is the
     unit value of the household's LAST PURCHASE of the item.  NaN where
     s07bq07a is missing or not positive, and NaN where the last purchase was
     made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
@@ -21,13 +22,13 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
     is no exact conversion and NA is the honest answer.  Units are compared on
     the EHCVM numeric code where the label carries one, else on the label with
     case, accents, padding and punctuation folded -- the two variables carry
-    DIFFERENT value-label sets inside the same .dta.  Before GH #876 the
-    served Expenditure was s07bq08 itself: the value of one purchase of
-    unrecorded size made up to 30 days earlier, beside a 7-day quantity.
+    DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
+    Expenditure was s07bq08 itself: the value of one purchase of unrecorded
+    size made up to 30 days earlier, beside a 7-day quantity.
   function: lsms_library.ehcvm:derive_ehcvm_purchase_value
   inputs: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:inputs_food_acquired
-  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq07a, s07bq07b,
-                  s07bq07c, s07bq08]
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,
+                  s07bq07b, s07bq07c, s07bq08]
   assumptions:
     - text: >-
         the unit value of the last purchase is the price the household paid
@@ -43,7 +44,7 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
     - text: >-
         a last purchase reported in a different unit from the consumption is
         NOT converted -- the row is served with Expenditure NA.
-          2018-19: 10,489 of 90,795 purchase rows (11.6%) -- 6,486 a different
+        2018-19: 10,489 of 90,795 purchase rows (11.6%) -- 6,486 a different
         unit code, 3,985 the same code in a different SIZE (Petit / Moyen /
         Grand / Taille unique), which is a different container and so a
         different price per unit, and 18 no positive s07bq07a.
@@ -53,36 +54,34 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
         lsms_library/categorical_mapping/ehcvm_units.org is a code->label
         codebook with no factors
     - text: >-
-        gifts received (s07bq05) are NOT subtracted from the purchased
-        quantity, so the served purchased row still values gifts at the
-        purchase unit value.  UEMOA's own aggregate does subtract them; not
-        doing so here keeps the served Quantity unchanged, which is a separate
-        defect with a wider blast radius (the library has never read s07bq05).
+        the quantity multiplied is the SURVEY'S OWN accounting identity,
+        (s07bq03a - s07bq04 - s07bq05).clip(0) -- construction "C", chosen by
+        @ligon on 2026-09-12 because it is the only one of the three candidates
+        ehcvm_conso reproduces.  The alternatives, measured, are A = the gross
+        7-day consumption s07bq03a (which would put the value of own-produced
+        and gifted food into Expenditure) and B = net of own production only.
+        2018-19: A 60,051,736, B 59,225,643, C (served) 57,552,943 FCFA, against a raw s07bq08 total of 91,353,380.
       basis: modelling-choice
-      evidence: SkunkWorks/derived_values.org; GH #876
+      evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
-        the quantity multiplied is the row's OWN purchased quantity, s07bq03a
-        - s07bq04, NOT the gross 7-day consumption s07bq03a.  Multiplying the
-        gross quantity would put the value of own-produced food into
-        Expenditure and re-open the very mismatch this fixes, since the served
-        Quantity is the net figure.  The three candidates are within 1-9% of
-        each other and all far below the pre-#876 raw s07bq08 total.  2018-19:
-        gross 60,051,736, served 59,225,643, gifts-out 57,552,943 FCFA; 1,022
-        rows have a recorded purchase value but a zero purchased quantity and
-        are therefore no longer served.
+        the gift quantity s07bq05 is served as its own s = 'inkind' row, in the
+        consumption unit s07bq03b, with Expenditure NA.  EHCVM asks no value for
+        a gift.  UEMOA's depan(Don) is s07bq05 priced at this same last-purchase
+        unit value -- verified, and therefore demonstrably an imputation by the
+        people who built the aggregate rather than an answer anybody gave -- so
+        it is checked and not served.  Own production keeps the identical
+        treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
+        2018-19: 13,818 inkind rows carrying 55,995 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
-    ehcvm_conso_gnb2018.dta (the UEMOA consumption aggregate, one row per
-    household x product x modep with an annual value depan).  On the 35 unique
-    (household, product) rows where an Achat row exists, the units match, and
-    the candidate constructions differ (s07bq04 or s07bq05 positive),
-    (s07bq03a - s07bq04 - s07bq05) * s07bq08/s07bq07a * 365/7 reproduces
-    depan(Achat) within 1% for 100% of rows, against 48.6% for the
-    own-production-only residual served here and 0.0% for the gross 7-day
-    quantity.  So the unit value of the last purchase IS the survey's own unit
-    of account; the residual difference is the gift term named in the
-    assumptions.  (Measured on Togo 2018 the same way: 99.5% / 13.1% / 0.0%
-    over 434 rows.)
+    ehcvm_conso_gnb2018.dta, the survey's OWN aggregate (UEMOA).  On the 35
+    unique (household, product) rows where an Achat row exists, the units match
+    and the candidates differ, this rule x 365/7 reproduces depan(Achat) within
+    1% for 100% of rows, against 48.6% for the own-production-only residual and
+    0.0% for the gross 7-day quantity.  s07bq05 * uv reproduces depan(Don)
+    within 1% for 100% of 149 rows -- an imputation at the same unit value,
+    checked and deliberately not served.  (Togo 2018, the same way: 99.5% /
+    13.1% / 0.0%, Don 99.7% of 1,255.)
   contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'

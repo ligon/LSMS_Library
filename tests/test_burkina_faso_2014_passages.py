@@ -244,13 +244,14 @@ def test_the_ehcvm_waves_ask_once_and_carry_visit_one(delivered):
     # Re-pinned 2026-09-12 (GH #876).  These two totals used to be the raw
     # `s07bq08` sums -- 65,315,307.5 and 39,905,158.0, the value of ONE purchase
     # per row, up to 30 days old.  The served Expenditure is now the row's own
-    # 7-day purchased quantity times that purchase's unit value, NA where the
-    # units differ.  What this test is about -- that `add_visit_level` reduces
-    # nothing -- is unchanged; only the level the numbers sit at moved.
+    # 7-day purchased quantity -- (s07bq03a - s07bq04 - s07bq05).clip(0), the
+    # survey's own accounting identity -- times that purchase's unit value, NA
+    # where the units differ.  What this test is about -- that `add_visit_level`
+    # reduces nothing -- is unchanged; only the level the numbers sit at moved.
     assert delivered.xs('2018-19', level='t')['Expenditure'].sum() == \
-        pytest.approx(53_497_881.41, rel=1e-6)
+        pytest.approx(52_466_280.38, rel=1e-6)
     assert delivered.xs('2021-22', level='t')['Expenditure'].sum() == \
-        pytest.approx(29_220_369.49, rel=1e-6)
+        pytest.approx(27_888_221.36, rel=1e-6)
 
 
 def test_the_grain_collapse_no_longer_destroys_or_deletes(burkina):

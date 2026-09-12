@@ -6,9 +6,14 @@ waves of eight countries used to wire ``Expenditure: s07bq08``, "Valeur (en
 FCFA) du [PRODUIT] achete la derniere fois" -- the value of ONE purchase of an
 unrecorded size -- beside a 7-day consumption ``Quantity``.  The served value
 is now DERIVED (:func:`lsms_library.ehcvm.derive_ehcvm_purchase_value`: the
-row's own purchased quantity times the unit value of that last purchase, NA
-where the units differ), registered once per country and stamped on every
-purchased row.  ``SkunkWorks/derived_values.org``; each country's
+row's own purchased quantity -- the survey's accounting identity
+``(s07bq03a - s07bq04 - s07bq05).clip(0)`` -- times the unit value of that last
+purchase, NA where the units differ), registered once per country and stamped
+on every purchased row.  The gift quantity ``s07bq05`` it subtracts is served
+as ``s = 'inkind'`` rows with ``Expenditure`` NA: the survey asks no value for
+a gift, and UEMOA's ``depan(Don)`` is an imputation at this same unit value
+(measured: it is reproduced within 1% for 99.7% / 100% of rows), so it is
+checked and deliberately not served.  ``SkunkWorks/derived_values.org``; each country's
 ``_/CONTENTS.org``, "food_acquired: one row, two windows (GH #876)".
 
 Two tiers, following ``tests/test_ghanalss_12b.py``:
@@ -52,7 +57,7 @@ FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
 
 #: Served purchased-side ``Expenditure`` sum BEFORE this landed -- i.e. the raw
 #: ``s07bq08`` total -- measured warm on development, 2026-09-12.  Kept as the
-#: scale the change is against, not as an assertion about the new numbers.
+#: scale the change is against.
 BEFORE_SUM = {
     ('Togo', '2018'): 44_452_024.0,
     ('Benin', '2018-19'): 87_287_926.96,
@@ -66,6 +71,25 @@ BEFORE_SUM = {
     ('Burkina_Faso', '2018-19'): 65_315_307.5,
     ('Burkina_Faso', '2021-22'): 39_905_158.0,
     ('CotedIvoire', '2018-19'): 119_107_505.0,
+}
+
+#: Served purchased-side ``Expenditure`` AFTER, under construction C, and the
+#: number of ``s='inkind'`` rows ``s07bq05`` now supplies.  Measured warm in the
+#: worktree, 2026-09-12.  The three candidate quantities per wave are in each
+#: country's ``_/derivations.yml`` and ``_/CONTENTS.org``.
+AFTER = {
+    ('Togo', '2018'): (31_676_794.87, 10_212),
+    ('Benin', '2018-19'): (68_929_996.70, 18_632),
+    ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
+    ('Senegal', '2018-19'): (147_345_570.63, 10_802),
+    ('Senegal', '2021-22'): (182_628_314.17, 10_917),
+    ('Mali', '2018-19'): (89_614_678.64, 16_459),
+    ('Mali', '2021-22'): (97_178_691.52, 16_869),
+    ('Niger', '2018-19'): (53_351_991.10, 8_141),
+    ('Niger', '2021-22'): (67_358_383.42, 7_112),
+    ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
+    ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
+    ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
 }
 
 #: Waves of these countries that are NOT EHCVM 2018+ and must carry no key.
@@ -89,7 +113,7 @@ def _mapping(country, wave):
 
 class TestFunction:
     def test_worked_example(self):
-        """2 kg consumed, 5 kg bought last time for 1000 -> 2 * 200 = 400."""
+        """2 kg purchased, 5 kg bought last time for 1000 -> 2 * 200 = 400."""
         assert derive_ehcvm_purchase_value(2, 'Kg', 'Taille unique',
                                            5, 'Kg', 'Taille unique',
                                            1000) == pytest.approx(400.0)
@@ -280,8 +304,35 @@ class TestDelivered:
         x = built(country).xs(wave, level='t', drop_level=False)
         total = float(x.xs('purchased', level='s')['Expenditure'].sum())
         before = BEFORE_SUM[(country, wave)]
+        after, _ = AFTER[(country, wave)]
         assert total != pytest.approx(before, rel=1e-4)
         assert 0.4 * before < total < before      # a strict subset, revalued
+        assert total == pytest.approx(after, rel=1e-6)
+
+    @pytest.mark.parametrize('country,wave', CELLS)
+    def test_gifts_are_served_as_inkind_rows_with_no_value(self, built, country, wave):
+        """`s07bq05` used to be read nowhere.  It is now its own `s` row, in the
+        consumption unit, and it carries NO Expenditure: the survey asks no
+        value for a gift, and UEMOA's depan(Don) is an imputation at the
+        purchase unit value (reproduced within 1% for 99.7% of 1,255 Togo rows
+        and 100% of 149 Guinea-Bissau rows), which we check and do not serve."""
+        x = built(country).xs(wave, level='t', drop_level=False)
+        inkind = x.xs('inkind', level='s')
+        _, n = AFTER[(country, wave)]
+        assert len(inkind) == n
+        assert inkind['Expenditure'].isna().all()
+        assert (inkind['Quantity'] > 0).all()
+        assert inkind['Derivation'].isna().all()   # a reported quantity, not a derivation
+
+    @pytest.mark.parametrize('country,wave', CELLS)
+    def test_own_production_is_untouched_and_valueless(self, built, country, wave):
+        """`s='produced'` already carried s07bq04 with no Expenditure; the gift
+        rows get the identical treatment, and this side must not have moved."""
+        produced = built(country).xs(wave, level='t', drop_level=False) \
+                                 .xs('produced', level='s')
+        assert len(produced) > 0
+        assert produced['Expenditure'].isna().all()
+        assert produced['Derivation'].isna().all()
 
     def test_inputs_join_to_the_served_rows(self, built):
         """Every served purchased row has its raw 7B answers under the same

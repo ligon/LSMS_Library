@@ -64,16 +64,28 @@ What this module serves
 
     (7-day quantity purchased) x (``s07bq08`` / ``s07bq07a``)
 
-where the 7-day purchased quantity is the row's OWN served ``Quantity`` --
-``(s07bq03a - s07bq04).clip(lower=0)``, what
-:func:`build_transforms.food_acquired_to_canonical` puts on the row -- so that
+where the 7-day purchased quantity is the row's OWN served ``Quantity``, and
+that quantity is now the survey's own accounting identity
+
+    ``(s07bq03a - s07bq04 - s07bq05).clip(lower=0)``
+
+-- 7-day consumption net of own production AND of gifts received -- so that
 ``Expenditure / Quantity`` is exactly the unit value and the two numbers on the
-row finally refer to the same thing.  ``s07bq05`` (gifts) is NOT subtracted:
-that would change the served ``Quantity`` in every EHCVM wave, which is a
-separate defect with its own blast radius (the library has never read
-``s07bq05``).  The consequence is stated rather than hidden: the purchased
-row's quantity, and therefore its value, still includes gifts, so this runs
-about 1-3% above UEMOA's ``Achat``.
+row refer to the same thing.  Decided by @ligon, 2026-09-12 (construction "C"),
+on the evidence above: it is the only one of the three candidates the survey's
+own file reproduces.  Between 2026-09-12's first landing and this one the
+served quantity was ``(s07bq03a - s07bq04)`` ("B"), which left gifts inside the
+purchased row; before GH #876 it was that same B quantity beside a raw
+``s07bq08``.
+
+``s07bq05`` is no longer dropped on the floor: the gift quantity is served as
+its own ``s = 'inkind'`` row, in the consumption unit ``s07bq03b``, with
+``Expenditure`` **NaN**.  The survey asks no value for a gift.  UEMOA's
+``depan(Don)`` is ``s07bq05`` priced at the last purchase's unit value -- an
+IMPUTATION by the people who built the aggregate, not an answer anybody gave --
+so the library does not serve it.  Own production keeps the treatment it
+already had: ``s = 'produced'`` rows carrying ``s07bq04`` with ``Expenditure``
+NaN, which is the same rule.
 
 NaN, never a guess, in two cases:
 
@@ -121,7 +133,7 @@ EHCVM_COUNTRIES = ("Benin", "Burkina_Faso", "CotedIvoire", "Guinea-Bissau",
 DERIVATION_NAME = "7day-purchase-at-last-purchase-unit-value"
 
 #: The raw section-7B variables the derivation reads, in questionnaire order.
-RAW_VARIABLES = ["s07bq03a", "s07bq03b", "s07bq03c", "s07bq04",
+RAW_VARIABLES = ["s07bq03a", "s07bq03b", "s07bq03c", "s07bq04", "s07bq05",
                  "s07bq07a", "s07bq07b", "s07bq07c", "s07bq08"]
 
 #: ``myvars`` names the twelve ``data_info.yml`` blocks bind the raw
@@ -130,6 +142,7 @@ RAW_VARIABLES = ["s07bq03a", "s07bq03b", "s07bq03c", "s07bq04",
 #: exactly these column names off the extracted frame.
 MYVARS = {
     "ConsumptionUnitCode": "s07bq03b",
+    "GiftQuantity": "s07bq05",
     "ConsumptionUnitSize": "s07bq03c",
     "LastPurchaseQuantity": "s07bq07a",
     "LastPurchaseUnitCode": "s07bq07b",
@@ -228,9 +241,9 @@ def derive_ehcvm_purchase_value(quantity, quantity_unit, quantity_size,
     """7-day value of the purchased food: quantity x last-purchase unit value.
 
     ``quantity`` is the row's served purchased quantity -- EHCVM's 7-day
-    consumption ``s07bq03a`` net of own production ``s07bq04``, clipped at
-    zero, exactly as :func:`build_transforms.food_acquired_to_canonical`
-    computes it -- in unit ``(quantity_unit, quantity_size)``
+    consumption ``s07bq03a`` net of own production ``s07bq04`` AND of gifts
+    received ``s07bq05``, clipped at zero (the survey's own accounting
+    identity; @ligon, 2026-09-12) -- in unit ``(quantity_unit, quantity_size)``
     (``s07bq03b``/``s07bq03c``).  The unit value is ``last_value /
     last_quantity`` (``s07bq08 / s07bq07a``), in unit ``(last_unit,
     last_size)`` (``s07bq07b``/``s07bq07c``).
@@ -243,9 +256,8 @@ def derive_ehcvm_purchase_value(quantity, quantity_unit, quantity_size,
     No options, by design (``SkunkWorks/derived_values.org``): a cached
     parquet must be one identifiable construction.  A user who wants the raw
     answers back calls ``Country(c).derivation_inputs(key)``; the alternatives
-    are computable from them -- UEMOA's own annual ``Achat`` figure is
-    ``(s07bq03a - s07bq04 - s07bq05) * uv * 365/7``, and the pre-#876 served
-    value was ``s07bq08`` itself.
+    are computable from them -- UEMOA's own annual ``Achat`` figure is this
+    times ``365/7``, and the pre-#876 served value was ``s07bq08`` itself.
 
     Vectorised; accepts scalars, arrays or Series (elementwise, positional).
     Returns a float ndarray, or a float for all-scalar input.
@@ -301,8 +313,10 @@ def food_acquired_ehcvm(df: pd.DataFrame, key: str,
             f"food_acquired_ehcvm: the wave's data_info.yml must bind "
             f"{missing} (see lsms_library.ehcvm.MYVARS); got {list(df.columns)}")
 
+    gifts = df["GiftQuantity"].fillna(0)
     purchased_qty = (df["Quantity"].fillna(0)
-                     - df["Produced"].fillna(0)).clip(lower=0)
+                     - df["Produced"].fillna(0)
+                     - gifts).clip(lower=0)
     expenditure = derive_ehcvm_purchase_value(
         purchased_qty,
         df["ConsumptionUnitCode"], df["ConsumptionUnitSize"],
@@ -311,13 +325,52 @@ def food_acquired_ehcvm(df: pd.DataFrame, key: str,
         df["LastPurchaseValue"])
 
     work = df.drop(columns=list(MYVARS))
-    work = work.assign(Expenditure=expenditure)
 
-    out = food_acquired_to_canonical(work, drop_columns=drop_columns)
+    # `food_acquired_to_canonical` computes the purchased side as
+    # (Quantity - Produced).clip(0) and the produced side as Produced.  Handing
+    # it the GIFT-NET total makes its purchased side exactly `purchased_qty`
+    # above -- the survey's own identity -- and leaves its produced side, which
+    # reads `Produced` directly, untouched.  Doing it this way rather than
+    # subtracting gifts inside the shipped reshape is deliberate: that function
+    # is every country's, and this identity is EHCVM's.
+    net_total = work["Quantity"] - gifts
+    out = food_acquired_to_canonical(
+        work.assign(Quantity=net_total, Expenditure=expenditure),
+        drop_columns=drop_columns)
+
+    inkind = _inkind_rows(work, gifts, drop_columns)
+    if len(inkind):
+        out = pd.concat([out, inkind])
+
     is_purchased = out.index.get_level_values("s").to_numpy() == "purchased"
     out[DERIVATION_COLUMN] = pd.Series(
         np.where(is_purchased, key, None), index=out.index, dtype="string")
     return out
+
+
+def _inkind_rows(work: pd.DataFrame, gifts: pd.Series, drop_columns) -> pd.DataFrame:
+    """``s = 'inkind'`` rows carrying ``s07bq05`` at the consumption unit.
+
+    Built by running the SHIPPED reshape a second time with ``Quantity`` and
+    ``Produced`` both set to the gift quantity -- its purchased side is then
+    identically zero with a NaN value and is filtered out, and its produced
+    side is the gift quantity under the same index construction as every other
+    row -- and relabelling that side ``inkind``.  Reusing the reshape rather
+    than assembling the index by hand is what keeps the two sets of rows on the
+    same key for certain.
+
+    ``Expenditure`` is NaN by construction: EHCVM asks no value for a gift.
+    """
+    gift_frame = work.assign(Quantity=gifts, Produced=gifts,
+                             Expenditure=np.nan)
+    got = food_acquired_to_canonical(gift_frame, drop_columns=drop_columns)
+    got = got[got.index.get_level_values("s").to_numpy() == "produced"]
+    if not len(got):
+        return got
+    levels = list(got.index.names)
+    flat = got.reset_index()
+    flat["s"] = "inkind"
+    return flat.set_index(levels)
 
 
 # ---------------------------------------------------------------------------

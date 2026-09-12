@@ -300,12 +300,19 @@ food_acquired:
         # now DERIVED by 2018-19/_/mapping.py's food_acquired hook
         # (lsms_library.ehcvm.derive_ehcvm_purchase_value) as
         #     purchased Quantity x s07bq08 / s07bq07a,
+        # where purchased Quantity = (s07bq03a - s07bq04 - s07bq05).clip(0),
         # NA where the last purchase used a different unit or `s07bq07a` is
         # not positive.  Registered as
         # `CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value`
         # in CotedIvoire/_/derivations.yml; every purchased row carries that key
         # in its `Derivation` column.  The six raw inputs below are read only
         # to feed that hook and are dropped by the canonical reshape.
+        # s07bq05, the quantity received as a GIFT, is subtracted from the
+        # purchased quantity (the survey's own identity, @ligon 2026-09-12)
+        # and served on its own `s = 'inkind'` rows with Expenditure NaN --
+        # EHCVM asks no value for a gift, and UEMOA's depan(Don) is an
+        # imputation, not an answer.
+        GiftQuantity: s07bq05
         ConsumptionUnitCode: s07bq03b
         ConsumptionUnitSize: s07bq03c
         LastPurchaseQuantity: s07bq07a
