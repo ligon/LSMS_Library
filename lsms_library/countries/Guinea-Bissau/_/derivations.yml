@@ -1,0 +1,94 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
+  waves: ['2018-19']
+  columns: [Expenditure]
+  rows: {s: purchased}
+  rule: >-
+    Expenditure = Quantity * (s07bq08 / s07bq07a), where Quantity is the row's
+    own served purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(lower=0)
+    -- the 7-day consumption net of own production AND of gifts received, which
+    is the survey's own accounting identity -- and s07bq08 / s07bq07a is the
+    unit value of the household's LAST PURCHASE of the item.  NaN where
+    s07bq07a is missing or not positive, and NaN where the last purchase was
+    made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
+    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
+    is no exact conversion and NA is the honest answer.  Units are compared on
+    the EHCVM numeric code where the label carries one, else on the label with
+    case, accents, padding and punctuation folded -- the two variables carry
+    DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
+    Expenditure was s07bq08 itself: the value of one purchase of unrecorded
+    size made up to 30 days earlier, beside a 7-day quantity.
+  function: lsms_library.ehcvm:derive_ehcvm_purchase_value
+  inputs: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:inputs_food_acquired
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,
+                  s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        the unit value of the last purchase is the price the household paid
+        over the 7-day consumption window.  s07bq08 is the value of ONE
+        purchase, which s07bq06 places up to 30 days back, while s07bq03a is
+        the quantity consumed over 7 days -- one row, two clocks.
+      basis: variable-label
+      evidence: >-
+        Stata labels in s07b_me_gnb2018.dta: s07bq08 "7B.08. Valeur (en FCFA) du [PRODUIT]
+        achete la derniere fois"; s07bq03a "7B.03a. Qtite tot du [PRODUIT]
+        conso par le MEN au cours des 7 derniers jours"; s07bq07a "7B.07a.
+        Quelle est la quantite du [PRODUIT] achete la derniere fois?"
+    - text: >-
+        a last purchase reported in a different unit from the consumption is
+        NOT converted, and a row with no last purchase has no unit value to
+        apply: the row is served with Expenditure NA. Counts are on the SERVED
+        denominator -- purchased rows of the delivered table, after the
+        canonical reshape and the (t, v, i, j, u, s) collapse -- because that
+        is the number a user sees; the source-row counts are smaller and were
+        what an earlier version of this entry quoted. 2018-19: 13,226 of the
+        90,381 SERVED purchased rows (14.6%) -- 3,314 because no last purchase
+        was reported at all (s07bq08 or s07bq07a missing / not positive),
+        6,218 because the last purchase used a different unit CODE, 3,694
+        because it used the same code in a different SIZE (Petit / Moyen /
+        Grand / Taille unique), which is a different container and so a
+        different price per unit.
+      basis: variable-label
+      evidence: >-
+        no EHCVM wave distributes a unit-conversion table;
+        lsms_library/categorical_mapping/ehcvm_units.org is a code->label
+        codebook with no factors
+    - text: >-
+        the quantity multiplied is the SURVEY'S OWN accounting identity,
+        (s07bq03a - s07bq04 - s07bq05).clip(0) -- construction "C", chosen by
+        @ligon on 2026-09-12 because it is the only one of the three candidates
+        ehcvm_conso reproduces.  The alternatives, measured, are A = the gross
+        7-day consumption s07bq03a (which would put the value of own-produced
+        and gifted food into Expenditure) and B = net of own production only.
+        2018-19: A 60,051,736, B 59,225,643, C (served) 57,552,943 FCFA, against a raw s07bq08 total of 91,353,380.
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
+    - text: >-
+        the gift quantity s07bq05 is served as its own s = 'inkind' row, in the
+        consumption unit s07bq03b, with Expenditure NA.  EHCVM asks no value for
+        a gift.  UEMOA's depan(Don) is s07bq05 priced at this same last-purchase
+        unit value -- verified, and therefore demonstrably an imputation by the
+        people who built the aggregate rather than an answer anybody gave -- so
+        it is checked and not served.  Own production keeps the identical
+        treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
+        2018-19: 13,818 inkind rows carrying 55,995 units, 0 with an Expenditure.
+      basis: modelling-choice
+      evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
+  validated_against: >-
+    ehcvm_conso_gnb2018.dta, the survey's OWN aggregate (UEMOA).  On the 35
+    unique (household, product) rows where an Achat row exists, the units match
+    and the candidates differ, this rule x 365/7 reproduces depan(Achat) within
+    1% for 100% of rows, against 48.6% for the own-production-only residual and
+    0.0% for the gross 7-day quantity.  s07bq05 * uv reproduces depan(Don)
+    within 1% for 100% of 149 rows -- an imputation at the same unit value,
+    checked and deliberately not served.  (Togo 2018, the same way: 99.5% /
+    13.1% / 0.0%, Don 99.7% of 1,255.)
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
+  since: '2026-09-12'

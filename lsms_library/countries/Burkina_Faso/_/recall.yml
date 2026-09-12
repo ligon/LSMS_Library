@@ -31,12 +31,11 @@ Recall:
   '2018-19':
     basis: not-recorded
     ask_count_basis: unknown
+    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
     n_items_delivered: 130
   '2021-22':
-    basis: config-comment
-    ask_count_basis: unknown
-    within_wave_variation: two-periods
-    recall_verbatim: 'seven days before the survey and thirty days before the survey'
-    evidence: 'lsms_library/countries/Burkina_Faso/2021-22/_/food_acquired.py:10'
-    notes: 'Quantity and Expenditure may sit on different windows; unconfirmed'
+    basis: not-recorded
+    ask_count_basis: declared
+    n_asks: 1
+    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.  The ''two-periods'' within_wave_variation flag recorded exactly this Quantity/Expenditure mismatch as ''unconfirmed''; it is now CONFIRMED (the variable labels say so) and FIXED, so the flag is cleared.  recall_days stays blank because nobody has read this wave''s questionnaire -- blank beats plausible.'
     n_items_delivered: 152

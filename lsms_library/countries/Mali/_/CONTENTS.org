@@ -785,7 +785,11 @@ unsized units instead turns the cross-item slope from -0.06 (se 0.09, zero) into
 
 ** The library's inferred kg factors contradict the survey's own unit labels
 
-=_get_kg_factors= infers factors from Expenditure/Quantity ratios.  For Mali
+=_get_kg_factors= infers factors from Expenditure/Quantity ratios.  (Since
+2026-09-12, GH #876, that ratio in the two EHCVM waves IS the unit value of
+the household's last purchase rather than a last-purchase value over a 7-day
+quantity, so every inferred factor for 2018-19 / 2021-22 moved; the #850
+kg totals quoted anywhere for this country predate it.)  For Mali
 2014-15 it returns Sac moyen -> 26.2 kg, Sac petit -> 5.3 kg, Sac large -> 33.0
 kg and Gramme -> 0.708 kg, where the questionnaire's own unit list states
 "9 = Sac large (100kg), 10 = Sac moyen (50kg), 11 = Sac petit (25kg)" and a
@@ -925,3 +929,92 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* 2026-09-12 -- =food_acquired=: one row, two windows (GH #876)
+
+=food_acquired.Expenditure= used to be wired straight to =s07bq08=, whose
+Stata label is "7B.08. Valeur (en FCFA) du [PRODUIT] achete la derniere
+fois" -- the value of *one* purchase, which =s07bq06= places up to 30 days
+back -- sitting on the same row as =Quantity=, a *7-day* consumption figure.
+Section 7B is headed "Consommation alimentaire des 7 derniers jours et achat
+des 30 derniers jours"; the row carried both clocks and nothing in the frame
+said so.  =s07bq05=, the quantity received as a GIFT, was never read at all.
+
+The served =Expenditure= is now DERIVED, on the survey's own accounting
+identity (construction "C", @ligon 2026-09-12):
+
+  : Quantity     = (s07bq03a - s07bq04 - s07bq05).clip(0)
+  : Expenditure  = Quantity * (s07bq08 / s07bq07a)
+
+-- the 7-day consumption net of own production AND of gifts, times the unit
+value of the last purchase -- so =Expenditure / Quantity= is exactly that
+unit value and the two numbers on the row refer to the same thing.  =NA=,
+never a guess, where =s07bq07a= is not positive or where the purchase was
+made in a different unit (or a different SIZE of the same unit) from the
+consumption: no EHCVM wave ships a unit-conversion table, so there is no
+exact conversion to apply.
+
+And the gift quantity is now SERVED, on its own =s = 'inkind'= rows in the
+consumption unit =s07bq03b=, with =Expenditure= *NA*.  EHCVM asks no value
+for a gift; UEMOA's =depan(Don)= is that quantity priced at the same
+last-purchase unit value -- verified below, and therefore an imputation, not
+an answer -- so the library checks it and does not serve it.  Own production
+is unchanged: =s = 'produced'= from =s07bq04=, =Expenditure= NA, which was
+already the rule.
+
+One function for all eight EHCVM countries (=lsms_library/ehcvm.py=,
+=derive_ehcvm_purchase_value=), registered once per country in
+=_/derivations.yml= and stamped on every purchased row in the =Derivation=
+column:
+
+  : Mali::food_acquired::7day-purchase-at-last-purchase-unit-value
+
+Raw answers come back by their original names from
+=Country('Mali').derivation_inputs(key, wave=...)=.
+
+** What moved
+
+| wave | purchased rows | Expenditure sum | inkind rows (qty) | Expenditure NA, share of SERVED purchased rows: no last purchase / different unit code / same code, different size |
+|------+---+---+---+---|
+| 2018-19 | 145,589 -> 129,598 | 134,798,354 -> 89,614,679 (-33.5%) | 0 -> 16,459 (58,639) | 25,667 (19.8%): 10,771 / 6,731 / 8,165 |
+| 2021-22 | 134,055 -> 117,493 | 134,405,775 -> 97,178,692 (-27.7%) | 0 -> 16,869 (59,567) | 13,243 (11.3%): 9,100 / 2,983 / 1,160 |
+
+Purchased row counts fall for two reasons: a row whose purchased quantity is
+zero used to survive on the raw =s07bq08= being positive, and the gift
+subtraction moves more rows to zero.  Those quantities are not lost -- they
+are in the new inkind rows.  The NA column is on the SERVED denominator --
+purchased rows of the delivered table, after the canonical reshape and the
+=(t, v, i, j, u, s)= collapse -- because that is what a user sees.  An earlier
+version of this section quoted the smaller SOURCE-row counts on the
+=s07bq07a > 0= subset, and so understated the NA share.
+
+The three candidate quantities, and why C:
+
+- 2018-19: A (gross =s07bq03a=) 95,505,280, B (net of own production) 94,226,529, *C (served)* 89,614,679 FCFA; raw =s07bq08= was 134,798,354.
+- 2021-22: A (gross =s07bq03a=) 104,253,106, B (net of own production) 103,414,014, *C (served)* 97,178,692 FCFA; raw =s07bq08= was 134,405,775.
+
+The three are within 1-9% of each other and all far below the raw total, so
+the large move is the #876 fix itself, not the choice among them.  The choice
+is settled by =ehcvm_conso=, not by the size of the number.
+
+  The product-level check against =ehcvm_conso= does not run for this wave --
+  its conso =codpr= does not share a keyspace with =s07bq01=, and CotedIvoire
+  2018-19 ships no conso file at all.  The construction is validated on Togo
+  2018 and Guinea-Bissau 2018-19, where the join works: the served rule
+  reproduces =depan(Achat)= within 1% for 99.5% / 100% of the discriminating
+  rows, against 13.1% / 48.6% for B and 0.0% / 0.0% for A; =s07bq05 * uv=
+  reproduces =depan(Don)= for 99.7% / 100%, which is why the gift rows carry
+  =Expenditure= NA rather than that imputation.  The instrument is the same in
+  all twelve waves (identical =s07bq0*= Stata labels), so the reading carries
+  by inference, not by measurement here.
+
+** What this does NOT fix
+
+- The served =u= index still carries only =s07bq03b=, not the unit SIZE
+  =s07bq03c=, so two rows differing only in container size collapse onto one
+  =u=.  The derivation does distinguish them; the index does not.
+- The price still comes from a purchase up to 30 days old.  That is what the
+  instrument asked; the assumption is recorded rather than hidden.
+- =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
+  served as rows of their own; they are inputs to the unit value, retrievable
+  through =derivation_inputs=.
