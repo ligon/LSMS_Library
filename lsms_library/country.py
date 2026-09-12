@@ -66,7 +66,7 @@ from .recall import attach as attach_recall, recall_records
 from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
                           call_inputs as _call_derivation_inputs,
                           COLUMN as _DERIVATION_COLUMN,
-                          union_keys as _union_derivation_keys)
+                          union_keys_by_group as _union_derivation_keys_by_group)
 import importlib.util
 import hashlib
 import logging
@@ -6134,13 +6134,24 @@ def _normalize_dataframe_index(
             # and 478 in Nigeria, restores both to baseline row counts, and leaves the
             # recovered Value sums and every food_acquired total byte-identical.
             # (country.py:2089 already uses min_count=1 for exactly this reason.)
+            #
+            # GH #871: `grouped[c].sum(min_count=1)` is the CYTHON spelling of
+            # `_sum_min_count_1` (kept, documented and directly tested in
+            # tests/test_assets_additive.py) -- measured byte-identical, dtypes
+            # and all-NA-group-stays-NA included, and 0.12 s against 51.8 s on a
+            # 400k-row / 200k-group frame, because a Python groupby callable
+            # makes pandas `deepcopy` `df.attrs` once PER GROUP.  Not a
+            # micro-optimisation: with `Derivation` added as a third such column
+            # it was the difference between GhanaLSS `food_acquired` collapsing
+            # and a 20-minute test timeout.
             grouped = df.groupby(level=present_levels, observed=True)
-            overlay = {c: grouped[c].agg(_sum_min_count_1) for c in present_additive}
+            overlay = {c: grouped[present_additive].sum(min_count=1)[c]
+                       for c in present_additive}
             if _DERIVATION_COLUMN in df.columns:
                 # A sum of N rows is derived if ANY input row was: the served
                 # provenance is the UNION of the inputs' keys, not one of them.
-                overlay[_DERIVATION_COLUMN] = grouped[_DERIVATION_COLUMN].agg(
-                    _union_derivation_keys)
+                overlay[_DERIVATION_COLUMN] = _union_derivation_keys_by_group(
+                    df[_DERIVATION_COLUMN], present_levels, selected.index)
             df = selected.assign(**overlay)
             if 'Price' in df.columns and {'Expenditure', 'Quantity'} <= set(df.columns):
                 df['Price'] = df['Expenditure'] / df['Quantity'].where(df['Quantity'] != 0)

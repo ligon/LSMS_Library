@@ -528,8 +528,8 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # Lazy import: country.py imports _ADDITIVE_MEASURE_COLUMNS from here, so a
     # module-level import back would cycle.
     from .country import (_audit_index_collapse, _record_grain_report,
-                          _sum_min_count_1, most_complete_row)
-    from .derivations import COLUMN as _DERIVATION_COLUMN, union_keys
+                          most_complete_row)
+    from .derivations import COLUMN as _DERIVATION_COLUMN, union_keys_by_group
 
     additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name)
     present = [c for c in (additive or ()) if c in df.columns]
@@ -583,10 +583,14 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # `min_count=1`, not a bare `sum`: an all-NA group must stay NA rather than
     # become a fabricated 0.0.  Same reducers as country._normalize_dataframe_index
     # -- the two sites read one policy dict and must apply it identically (#323).
+    # `sum(min_count=1)` in its cython spelling -- identical to
+    # `_sum_min_count_1` and ~400x faster on a large frame with populated
+    # `attrs`; see the note at country._normalize_dataframe_index (GH #871).
     grouped = df.groupby(level=levels, observed=True)
-    overlay = {c: grouped[c].agg(_sum_min_count_1) for c in present}
+    overlay = {c: grouped[present].sum(min_count=1)[c] for c in present}
     if _DERIVATION_COLUMN in df.columns:
-        overlay[_DERIVATION_COLUMN] = grouped[_DERIVATION_COLUMN].agg(union_keys)
+        overlay[_DERIVATION_COLUMN] = union_keys_by_group(
+            df[_DERIVATION_COLUMN], levels, out.index)
     out = out.assign(**overlay)
     if "Price" in out.columns and {"Expenditure", "Quantity"} <= set(out.columns):
         out["Price"] = out["Expenditure"] / out["Quantity"].where(out["Quantity"] != 0)

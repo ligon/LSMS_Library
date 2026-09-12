@@ -190,6 +190,60 @@ def union_keys(values) -> Any:
     return MULTI_SEP.join(sorted(parts))
 
 
+def union_keys_by_group(values: "pd.Series", levels, out_index) -> "pd.Series":
+    """:func:`union_keys` per group, without a Python call per group.
+
+    The straightforward ``grouped[COLUMN].agg(union_keys)`` is a pure-Python
+    groupby aggregation, and pandas ``deepcopy``s ``df.attrs`` once per group
+    inside it (``core/generic.py:__finalize__``) -- measured on a 400k-row /
+    200k-group frame with a populated ``attrs``: *12.4 s* for this one column
+    even restricted to the non-null rows, and enough to push GhanaLSS
+    ``food_acquired`` (5.26M rows, the corpus's largest built table) past a
+    20-minute test timeout.
+
+    Two observations make it nearly free instead:
+
+    - ``Derivation`` is SPARSE -- null on every row no derivation touched -- so
+      only the non-null rows can contribute to any union;
+    - corpus-wide, no group carries two distinct keys
+      (``slurm_logs/gh871_grain_census/``: ``derivation_conflicts`` is 0 in every
+      censused cell).  Where that holds -- checked with a cython ``nunique`` and
+      a vectorised ``str.contains`` -- the union of a group IS its single key, so
+      it can be gathered with a hash-based first-occurrence mask.
+
+    The Python path is kept for the case the check refuses, and is the same
+    :func:`union_keys`; it just runs on the non-null subset.  Measured on the
+    same frame: fast path *0.25 s*, and the two agree exactly.
+    """
+    if values.empty:
+        return pd.Series(pd.NA, index=out_index, dtype=object)
+    levels = list(levels)
+    nn = values[values.notna()]
+    surplus = [lvl for lvl in (nn.index.names or []) if lvl not in levels]
+    if surplus and len(nn.index.names) > len(surplus):
+        nn = nn.droplevel(surplus)
+    if nn.empty:
+        return pd.Series(pd.NA, index=out_index, dtype=object)
+
+    as_str = nn.astype(str)
+    one_key_per_group = (
+        not bool(as_str.str.contains(MULTI_SEP, regex=False).any())
+        and bool((nn.groupby(level=levels, observed=True).nunique() <= 1).all())
+    )
+    if one_key_per_group:
+        key = nn.index
+        first = ~key.duplicated(keep="first")
+        result = pd.Series(pd.array(as_str.to_numpy()[first], dtype=object),
+                           index=key[first])
+    else:
+        result = nn.groupby(level=levels, observed=True).agg(union_keys)
+
+    result = result.reindex(out_index).astype(object)
+    # ``reindex`` fills with ``nan``; ``union_keys`` returns ``pd.NA``.  Spell the
+    # missing value one way so a caller cannot tell the two paths apart.
+    return result.where(result.notna(), pd.NA)
+
+
 # ---------------------------------------------------------------------------
 # the record
 # ---------------------------------------------------------------------------

@@ -345,6 +345,49 @@ def test_union_keys_splits_existing_multi_values_and_stays_countable():
     assert union_keys(["x::t::b", "x::t::a"]) == union_keys(["x::t::a", "x::t::b"])
 
 
+@pytest.mark.parametrize("values,expect", [
+    # one key per group, the fast path
+    ([pd.NA, "x::t::a"], "x::t::a"),
+    (["x::t::a", "x::t::a"], "x::t::a"),
+    ([pd.NA, pd.NA], None),
+    # two distinct keys -> the Python fallback
+    (["x::t::a", "x::t::b"], "x::t::a+x::t::b"),
+    # a pre-existing 'a+b' also refuses the fast path, and must not double-count
+    (["x::t::a+x::t::b", "x::t::a"], "x::t::a+x::t::b"),
+])
+def test_union_keys_by_group_agrees_with_union_keys_on_both_paths(values, expect):
+    """The grouped form exists only for SPEED (a Python groupby callable makes
+    pandas deepcopy ``attrs`` once per group -- 12.4 s on a 400k-row frame, and
+    a 20-minute timeout on GhanaLSS ``food_acquired``).  It must therefore be
+    indistinguishable from ``union_keys`` applied per group, on BOTH its paths:
+    the vectorised one-key-per-group gather and the Python fallback."""
+    from lsms_library.derivations import union_keys_by_group
+    idx = pd.MultiIndex.from_tuples([("2020", "i1")] * len(values) + [("2020", "i2")],
+                                    names=["t", "i"])
+    s = pd.Series(list(values) + ["x::t::z"], index=idx, dtype=object)
+    out_index = s.groupby(level=["t", "i"], observed=True).size().index
+    got = union_keys_by_group(s, ["t", "i"], out_index)
+    naive = s.groupby(level=["t", "i"], observed=True).agg(union_keys)
+    assert got.loc[("2020", "i2")] == "x::t::z"
+    if expect is None:
+        assert pd.isna(got.loc[("2020", "i1")])
+        assert pd.isna(naive.loc[("2020", "i1")])
+    else:
+        assert got.loc[("2020", "i1")] == expect
+        assert got.loc[("2020", "i1")] == naive.loc[("2020", "i1")]
+
+
+def test_union_keys_by_group_spells_a_missing_group_as_pd_NA():
+    """``reindex`` fills with ``nan`` and ``union_keys`` returns ``pd.NA``; the
+    two paths must not be distinguishable by which missing value they use."""
+    from lsms_library.derivations import union_keys_by_group
+    idx = pd.MultiIndex.from_tuples([("2020", "i1"), ("2020", "i2")], names=["t", "i"])
+    s = pd.Series([pd.NA, "x::t::a"], index=idx, dtype=object)
+    got = union_keys_by_group(s, ["t", "i"], idx)
+    assert got.loc[("2020", "i1")] is pd.NA
+    assert got.loc[("2020", "i2")] == "x::t::a"
+
+
 def test_derivation_does_not_vote_on_which_row_is_served():
     """A reduced column must not decide WHICH row is served: its served value
     does not come from the selected row at all."""
