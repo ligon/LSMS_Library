@@ -338,10 +338,33 @@ Data Scheme:
     #
     # COLUMNS (reported, per-individual):
     #   farm_work / SOB_work / wage_work -- worked >=1h on own farm /
-    #       own business / for a wage in the last 7 days (nullable bool).
-    #   farm_hrs / SB_hrs / wage_hrs     -- usual weekly hours in each
-    #       activity (av per job = month*[week]*day*hour/52, allocated by the
-    #       job's occupation code, summed across jobs; ECVMA waves only).
+    #       own business / for a wage (nullable bool).  REFERENCE PERIOD IS
+    #       NOT UNIFORM ACROSS WAVES (GH #877, confirmed from the Stata
+    #       labels + questionnaires): 2014-15 (MS04Q01-03) and the EHCVM
+    #       waves ask about the last 7 DAYS; 2011-12 asks no 7-day question
+    #       at all -- farm_work (ms04q03) and SOB_work (ms04q05) are the
+    #       last 30 DAYS, wage_work (ms04q02) the last 12 MONTHS.  Whether
+    #       to re-point 2011-12 or serve NA is open on #877; the values
+    #       served today are unchanged and match the WB do-file.
+    #   farm_hrs / SB_hrs / wage_hrs     -- ANNUAL-AVERAGE weekly hours in
+    #       each activity (allocated by the job's occupation code, summed
+    #       across jobs; ECVMA waves only).  NOT hours in the last 7 days,
+    #       despite the table name -- Tanzania and Malawi serve reported
+    #       last-7-day hours in the same columns (GH #877, open).  Per job:
+    #         2014-15  (month * week * day * hour) / 52   MS04Q25-28 / 51-53
+    #         2011-12  (month * (52/12) * day * hour) / 52 == (m*d*h)/12
+    #                  ms04q29-31 / 55-57.  2011-12 asks no weeks-per-month,
+    #                  so the exact calendar 52/12 is imputed.  This DIVERGES
+    #                  from NER_ECVMA1.do:1413, which uses /52 and thereby
+    #                  treats the days variable (ms04q31, labelled and asked
+    #                  as days per WEEK) as days per month -- 4.33x too low.
+    #                  Fixed 2026-09-12, GH #877.
+    #       In BOTH waves each input has its own declared `manquant` value-
+    #       label code NA'd before the multiplication (2011-12 ms04q29/30/
+    #       55/56 -> 99, ms04q31/57 -> 9; 2014-15 likewise, MS04Q27 == 9 the
+    #       only one present).  Read per variable from the .dta value labels
+    #       (niger._num_no_declared_missing), never masked blanket: 610
+    #       people genuinely report ms04q30 == 9 hours a day.
     #   Industry -- broad industry of the job (Agriculture / Fishing / Mining
     #       / Manufacturing / Construction / Services) from the WB activity-
     #       section-code ranges (NER_ECVMA1.do:1386-1391).  ONE harmonized
