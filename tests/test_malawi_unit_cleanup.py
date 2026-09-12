@@ -121,3 +121,44 @@ def test_metric_factor_rejects_glued_nonmetric_words():
     # but a real glued metric token still works
     assert abs(mf("3Grams") - 0.003) < 1e-9
     assert mf("10Kg") == 10.0
+
+
+def test_extract_kg_conversion_grams_are_thousandths():
+    """GH #878: '300 grams' is 0.3 kg, not 3.0.
+
+    The factor was 0.01 from the function's introduction until 2026-09-12.
+    It never reached a served number -- the only wave that applies this
+    function's output (2004-05) has a closed unit-label set in which nothing
+    matches the grams pattern -- but the constant is the landmine under the
+    correct path: anyone who made the fallback live would have served every
+    '<n> grams' row 10x heavy.  Pinned beside ``_metric_kg_factor``, which is
+    the live converter for those labels, so the two cannot drift.
+    """
+    ek = _load_mod()._extract_kg_conversion
+    out = ek(pd.Series(['300 grams']))
+    assert abs(float(out.iloc[0]) - 0.3) < 1e-12
+    # the live path for the same label agrees
+    assert abs(_load_mod()._metric_kg_factor('300 grams') - 0.3) < 1e-12
+
+
+def test_extract_kg_conversion_is_aligned_to_its_input():
+    """It must return a Series aligned to the input, NaN where no match.
+
+    Until #878 it returned ``concat(...).dropna()``, which only aligned on
+    assignment because at most one of the two patterns ever matches a label;
+    had both matched, the duplicate index labels would have raised.
+    """
+    ek = _load_mod()._extract_kg_conversion
+    s = pd.Series(['300 grams', '50kg bag', '90 kg bag', 'Basket', None],
+                  index=list('abcde'))
+    out = ek(s)
+    assert list(out.index) == list(s.index)
+    assert len(out) == len(s)
+    assert abs(float(out['a']) - 0.3) < 1e-12
+    assert float(out['b']) == 50.0        # the only live use, 2004-05 IHS2
+    assert float(out['c']) == 90.0
+    assert pd.isna(out['d']) and pd.isna(out['e'])
+    # a label carrying both magnitudes resolves to the kilogram one rather
+    # than raising (unexercised on the corpus; pinned so it stays defined).
+    both = ek(pd.Series(['2 kg 300 gr']))
+    assert float(both.iloc[0]) == 2.0

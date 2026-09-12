@@ -7,7 +7,8 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import food_acquired_to_canonical, normalize_food_label
+from malawi import (food_acquired_to_canonical, normalize_food_label,
+                    _extract_kg_conversion)
 
 wave = "2004-05"
 
@@ -32,19 +33,14 @@ df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
 
 df = df.set_index(['j', 'i']).replace(r'^\s*$', pd.NA, regex=True)
 
-#custom convert some units in formats such as "300 grams" into kg, typically handled by handling_unusual_units in malawi.py for data with conversion tables
-grams = r'(\d+)\s*g(?:\s+|r)'
-kgs   = r'(\d+)\s*k(?:g|ilo)'
+# IHS2 ships NO unit-conversion table (see Malawi/_/CONTENTS.org), so the only
+# per-row kg factor available is a magnitude carried in the unit label itself.
+# The label set here is closed and 22 values wide: '50kg bag' -> 50 and
+# '90 kg bag' -> 90 are the only two that carry one.  Shared with the other
+# waves' helper module rather than copied inline (GH #878, which also fixed
+# that regex's grams factor: 0.01 -> 0.001).
 for src in ('consumed', 'bought', 'produced', 'gifted'):
-    u_col = f'u_{src}'
-    quant_col = f'quantity_{src}'
-    cfactor_col = f'cfactor_{src}'
-    lower = df[u_col].astype(str).str.lower()
-    fallback = pd.concat([
-        lower.str.extract(grams).astype(float) * 0.01,
-        lower.str.extract(kgs).astype(float),
-    ], axis=0).dropna()
-    df[cfactor_col] = fallback
+    df[f'cfactor_{src}'] = _extract_kg_conversion(df[f'u_{src}'])
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
 

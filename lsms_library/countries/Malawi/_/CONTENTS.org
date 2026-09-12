@@ -1071,7 +1071,20 @@ Missing dependencies for OracleDemands.
 ** TODO conversion_to_kgs.json -- GitHub Issue #116
 IHS3-IHS5 have conversion tables provided to convert various item units into kilograms. Values for conversion factors were broken down by region and source type, and there is a unique table for ISH3 and ISH5. Documentation indicates that similar methods were used for ISH4, so unit conversions were taken from ISH3--the factors can be found in the csv file /2013/_. Please see IHS3’s document entitled “Malawi_IHS3_Food_Item_Conversion_Factors.pdf” for more information on how this was conducted. For the intents of conversion to kg for ISH5 as it contains several conservation factors for each food/unit/region combination, the mean of conversion factors was taken to populate the factors column. There are some minor issues where item naming does not match up perfectly between the conversion table and the food acquired ones. Names from the conversion table were slightly cleaned, but using a similar method as the one for constructing food_items.org may be better. ISH2 does not have any information on food conversion.
 
-Some items have additionally specified unit names found under “unitsdetail_” because they were not among the standard units. Some of these have names such as ‘200 GRAMS’ that indicate the units in a manner that can be converted easily to kg. Conversion factors were additionally updated with information from these columns. Only consumption and expenditure quantities were converted for now.
+Some items have additionally specified unit names found under “unitsdetail_” because they were not among the standard units. Some of these have names such as ‘200 GRAMS’ that indicate the units in a manner that can be converted easily to kg.
+
+*CORRECTED 2026-09-12 (GH #878).*  The sentence that used to stand here --
+"Conversion factors were additionally updated with information from these
+columns" -- was false for every wave.  The regex that was supposed to do it
+never reached =cfactor= in any of IHS3-IHS5 (it was applied as =x[c] or f=,
+and =bool(nan)= is =True=), and its grams factor was 0.01 rather than 0.001.
+Both are gone.  =cfactor= comes from the region-keyed conversion table and
+from nothing else in IHS3+; IHS2 (2004-05) has no such table and takes
+=cfactor= only from a kilogram magnitude in the label itself ('50kg bag' ->
+50, '90 kg bag' -> 90).  Metric free-text labels such as '200 GRAMS' ARE
+converted, for every wave, but at the single choke point in
+=food_acquired_to_canonical= by =_metric_kg_factor= -- which scales the
+quantity and stamps =u = 'kg'= instead of writing a =cfactor=.
 For items that have such unit conversions already done, they were scaled by the conversion factor given or otherwise specified.
 
 *** Known gaps and issues
@@ -2026,3 +2039,55 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* 2026-09-12 -- the "300 grams" fallback was dead in every wave, and wrong by 10x (GH #878)
+
+=_extract_kg_conversion= in =malawi.py=, plus three inline copies of the same
+regex in the 2004-05 / 2010-11 / 2013-14 wave scripts, scaled a grams
+magnitude by *0.01*: '300 grams' came back 3.0 kg instead of 0.3.  The
+library's own metric table (=_METRIC_KG=) has had grams at the correct 0.001
+all along.
+
+*No served number was ever wrong, and none changes now.*  Verified by
+rebuilding all five wave =food_acquired.parquet= before and after:
+=assert_frame_equal= passes on every wave (176,193 / 198,354 / 81,680 /
+245,459 / 269,845 rows).  The reason is that the fallback never reached
+=cfactor=:
+
+| wave | how it was applied | why it was dead |
+|------+--------------------+-----------------|
+| 2004-05 | =df[cfactor] = fallback= | LIVE, but only its kilogram arm: =u= here is a closed 22-label set from =sec_i.dta='s value labels, of which only '50kg bag' / '90 kg bag' carry a magnitude.  Nothing matches the grams pattern (0 of 176,193 rows). |
+| 2010-11, 2013-14 | =x[c] or f= inline | =x[c]= is the merged conversion-table factor, NaN where unmatched, and =bool(nan)= is =True= -- so the expression always returned =x[c]=.  =f= was a whole DataFrame anyway. |
+| 2016-17, 2019-20 | =x[c] or conv_kg= in =handling_unusual_units= | same |
+
+The only way =x[c] or f= could have fired is a =cfactor= of exactly 0.0, which
+is falsy.  Neither conversion source has one: IHS3 =ihs3_conversions.csv= min
+0.02 over 831 rows, IHS5 =ihs_foodconversion_factor_2020.dta= min 9.6e-05 over
+1,768.
+
+** Removed, not repaired -- and the reason is the choke point
+
+Making the fallback live *with the right constant* would still have been a
+change to served rows, not a fix.  Metric free-text labels are already
+converted for every wave by =_metric_kg_factor= inside
+=food_acquired_to_canonical=, which *scales the quantity and stamps =u =
+'kg'=*.  That conversion is skipped for any row that already has a =cfactor=
+(=mask = factor.notna() & ~has_cf=).  So a live fallback would set =cfactor=
+for a '300 grams' row, suppress the choke point, and serve the same kilograms
+as ='300 Grams'= x 0.3 rather than ='kg'= x (q x 0.3) -- the same
+=food_quantities(units='kgs')= total under a different =food_acquired= shape.
+The wrong constant was a landmine *under the correct path*, which is why the
+fix is deletion.
+
+What survives: =_extract_kg_conversion=, with grams at 0.001, a return Series
+aligned to its input (it used to be a =concat(...).dropna()= that aligned only
+because no label matches both patterns), and exactly one caller -- 2004-05,
+where it is the country's only source of a per-row =cfactor=.  Pinned by
+=tests/test_malawi_unit_cleanup.py::test_extract_kg_conversion_grams_are_thousandths=.
+
+** Idiosyncrasy worth keeping in view
+
+IHS2 (2004-05) ships *no* unit-conversion table at all, so its =cfactor= is
+whatever the unit label itself says and nothing more; IHS3+ take =cfactor=
+*solely* from the region-keyed conversion table.  The two waves' =cfactor=
+columns mean different things and are produced by different code.

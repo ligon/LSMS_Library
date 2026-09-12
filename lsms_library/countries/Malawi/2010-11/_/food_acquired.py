@@ -90,28 +90,20 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     ).rename({'factor': f'cfactor_{src}'}, axis=1)
 df = df.set_index(['j', 'i'])
 
-# Inline "300 grams"-style fallback per source.  Same regex as 2004-05.
-grams_re = r'(\d+)\s*g(?:\s+|r)'
-kgs_re = r'(\d+)\s*k(?:g|ilo)'
+# GH #878: an inline "300 grams" regex fallback used to be written into
+# cfactor here as ``x[c] or fallback``.  It never fired (``bool(nan)`` is
+# True, so the expression always returned the merged conversion-table
+# factor), and it is removed rather than repaired -- metric free-text
+# labels are converted at the single choke point in
+# food_acquired_to_canonical by _metric_kg_factor.  See Malawi/_/CONTENTS.org.
 
 for src in ('consumed', 'bought', 'produced', 'gifted'):
     detail_col = f'unitsdetail_{src}'
-    cfactor_col = f'cfactor_{src}'
-    quant_col = f'quantity_{src}'
     u_col = f'u_{src}'
     code_col = f'unitcode_{src}'
 
-    detail_lower = df[detail_col].astype(str).str.lower()
-    fallback = pd.concat([
-        detail_lower.str.extract(grams_re).astype(float) * 0.01,
-        detail_lower.str.extract(kgs_re).astype(float),
-    ], axis=0).dropna()
-
-    # Fill missing cfactor from inline regex extraction.
-    df[cfactor_col] = df.apply(lambda x, c=cfactor_col, f=fallback:
-                               x[c] or f, axis=1)
-    # Tidy the other-specify free text for use as a `u` label (after the
-    # grams/kg parse above): "1 Basket" -> "Basket" (GH #223 Layer 2).
+    # Tidy the other-specify free text for use as a `u` label:
+    # "1 Basket" -> "Basket" (GH #223 Layer 2).
     df[detail_col] = df[detail_col].map(_clean_freetext_unit)
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
