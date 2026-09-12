@@ -45,6 +45,9 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.build_transforms.add_visit_level",
     "lsms_library.country._normalize_dataframe_index",
     "lsms_library.country.Wave.grab_data",
+    # GH #871: SITE 2 (the household -> cluster projection) reached no
+    # fingerprint before this tag; scoped to the one table it builds.
+    "lsms_library.country.Wave.cluster_features",
     "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
 }

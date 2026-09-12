@@ -214,6 +214,10 @@ _COUNTRY_FACING_REDUCERS = (
     'reduce_to_agreed', 'collapse_to_cluster_grain', 'add_visit_level',
 )
 _CORE_MODULES = ('country.py', 'feature.py', 'local_tools.py')
+# Core's OWN grain-reducing helpers, which the AST guard below treats exactly
+# like a raw ``groupby().first()``: a call to one is a grain reduction and must
+# be audited in the same function.  GH #871.
+_CORE_SELECTORS = ('most_complete_row',)
 
 
 def _core_sources():
@@ -253,8 +257,20 @@ def test_core_never_reduces_grain_without_auditing_it():
     import ast
 
     def _is_grain_reducer(node):
-        """A pandas call that drops rows by selecting within groups."""
-        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+        """A pandas call -- or core's own selector -- that drops rows within groups."""
+        if not isinstance(node, ast.Call):
+            return False
+        # GH #871: core's row selector counts, BY NAME.  Without this the guard
+        # would be vacuous after #871: the three sites no longer contain a raw
+        # groupby reducer at all, so "reduces without auditing" would be
+        # unprovable exactly where it matters -- which is the hazard this file's
+        # own docstring names ("a locally-defined helper with any name at all
+        # could reduce grain silently and pass it").  `most_complete_row` selects
+        # one of several disagreeing observed rows; that is as consequential as
+        # `.first()` and is guarded identically.
+        if isinstance(node.func, ast.Name) and node.func.id in _CORE_SELECTORS:
+            return True
+        if not isinstance(node.func, ast.Attribute):
             return False
         attr = node.func.attr
         if attr in ('agg', 'aggregate') and node.args:

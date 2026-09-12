@@ -404,6 +404,34 @@ The largest single loss is =cluster_features/2014-15=, which projects a
 household-grain frame onto =(t, v)= and destroys 42 of 3,617 rows
 across 4 conflicting clusters.
 
+** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12)
+
+The idiosyncrasy behind that =household_roster= entry, recorded because
+GH #871's corpus census had to look at it by hand: in 2014-15 the
+declared index =(t, i, pid)= is NOT unique -- 210 rows sit on a
+duplicated tuple, and the shape is a *blank line sharing a member
+number with a real one*.  Group =('2014-15','101008','1')= is two rows:
+=(<NA>, NaN, <NA>, NaN)= and =(Masculin, 45.0, Chef de menage, 12.0)=.
+That is the #323 verdict verbatim -- the identifier is broken, not the
+reducer -- and it is NOT fixed here.
+
+What changed is what core serves.  Until #871 the collapse was
+=groupby().first()=, a per-column first-non-null that happened to
+reassemble the head out of the two rows; the plan's =nth(0)= would have
+served the BLANK row and =_finalize_result='s =dropna(how='all')= would
+then have dropped the head entirely (45 rows / 180 column cells in this
+cell).  Core now serves the *most complete* observed row, so the head's
+row survives and is a row the survey actually recorded.  Same delivered
+values as before, for a defensible reason rather than by luck.
+
+Niger's other #871-visible cells are =assets/2014-15= (172 rows changed
+under =nth(0)=, 0 under the landed rule), =shocks/2014-15=,
+=individual_education/2014-15= and =plot_inputs/{2011-12,2014-15}=; the
+last two are the only ones where the landed rule still changes a served
+row (11 + 2 rows on =Quantity=/=Purchased=, no new missings).  See
+=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  Fixing the
+=pid= key remains open under GH #614 / #637.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does

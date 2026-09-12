@@ -158,6 +158,38 @@ def format_key(country: str, table: str, name: str) -> str:
     return KEY_SEP.join((country or "", table or "", name))
 
 
+def union_keys(values) -> Any:
+    """Union the derivation keys of several rows into one ``'a+b'`` value.
+
+    The reducer for :data:`COLUMN` on the ADDITIVE branch of a core grain
+    collapse (GH #871).  When the served measures are a SUM of N input rows,
+    the served row's provenance is the union of those rows' provenances: a
+    single key would under-claim, and picking one of two distinct keys would be
+    a silent choice.  ``MULTI_SEP`` is first-class for exactly this --
+    :func:`parse_key` FORBIDS it inside a key so that it can separate two keys
+    on one row, and :func:`_key_counts` already splits on it.
+
+    Existing ``'a+b'`` values are split BEFORE the union, or ``'a+b'`` u ``'a'``
+    would give ``'a+a+b'`` and ``_key_counts`` would double-count ``a``.  Parts
+    are sorted so the value is deterministic, and an all-NA group yields
+    ``pd.NA`` (an empty string would be a key nothing can parse).
+
+    NOT used on the pure-SELECTION branch: there the served row is one observed
+    row and must carry that row's own key (GH #871).
+    """
+    parts: set[str] = set()
+    for value in values:
+        if value is None or (not isinstance(value, str) and pd.isna(value)):
+            continue
+        for part in str(value).split(MULTI_SEP):
+            part = part.strip()
+            if part:
+                parts.add(part)
+    if not parts:
+        return pd.NA
+    return MULTI_SEP.join(sorted(parts))
+
+
 # ---------------------------------------------------------------------------
 # the record
 # ---------------------------------------------------------------------------
