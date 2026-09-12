@@ -266,7 +266,14 @@ mapping (the frame itself is reshaped on the way to the concat).
 
 Measured, =Feature('food_acquired')(['Guatemala','Panama'])=:
 =attrs['recall']= was =None= before and is ={'Guatemala','Panama'}=
-after; the 787,336 rows are unchanged.  No cache hash moves -- 207
+after; the 787,336 rows are unchanged.  And on the pair the issue
+names, =Feature('food_acquired')(['GhanaLSS','Guatemala'])= (1,919,331
+rows, a 1,511 s warm read): =population= ={GhanaLSS, Guatemala}=,
+=recall= ={GhanaLSS, Guatemala}= (GhanaLSS's per-wave windows are
+14/14/None/5/3/5/5 days against Guatemala's 15 -- exactly the mixed
+pool the record exists to disclose), =derivations= ={GhanaLSS}=
+(the only country with a =_/derivations.yml=).  All three were
+=None= except =population= before.  No cache hash moves -- 207
 =Country._table_cache_hash= values across 10 countries plus 4
 =build_transforms_fingerprint= values, all byte-identical
 (=feature.py= is read-path and is not in any build fingerprint).
