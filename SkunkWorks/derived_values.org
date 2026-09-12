@@ -411,8 +411,13 @@ evidenced decision (=2009-10/_/data_info.yml:63-133=,
 which still says wave 1 is "not wired".  Tajikistan =Area= x100 is
 false (nothing multiplies; =AreaUnit='sotka'= is stamped and
 disclosed) -- the real defect is framework-grain: =data_info.yml:313-318=
-declares =Area= "in hectares" while 11 of 22 countries serve another
-unit.  Nigeria W4's 30-day last-purchase pairing is a recorded decision
+declares =Area= "in hectares" while six of 23 countries serve a
+native unit (Tajikistan sotka, China mu, Timor-Leste sq m, Cambodia,
+Liberia, GhanaLSS) -- CORRECTED 2026-09-12 from an earlier "11 of
+22": Albania, Malawi, Tanzania, Nigeria, GhanaSPS and EthiopiaRHS
+convert to hectares and stamp =AreaUnit= as provenance, so the same
+string =Acres= means hectares in Malawi and acres in GhanaLSS.  Filed
+as #879 (with #880 GhanaSPS CONTENTS, #881 Nigeria W4).  Nigeria W4's 30-day last-purchase pairing is a recorded decision
 (=Nigeria/_/CONTENTS.org:50-63=, "worth revisiting as its own issue").
 Malawi's sale-unit drop was fixed 2026-09-08 (=Malawi/_/CONTENTS.org:139-160=);
 Niger's is #824.
