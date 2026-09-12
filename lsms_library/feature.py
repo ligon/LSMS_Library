@@ -813,11 +813,17 @@ class Feature:
         """
         try:
             kept = set(result.index.get_level_values("country").unique())
-        except Exception:
+        except Exception as exc:
             # Deliberately broader than the (KeyError, ValueError) this used to
             # catch: that pair sat INSIDE an outer `except Exception` that also
             # covered this line, and the outer one is now per-carrier.  Never
-            # let working out WHICH countries are kept break a data call.
+            # let working out WHICH countries are kept break a data call --
+            # but say so (the docstring's LOUD rule): falling back to every
+            # captured country can over-report a dropped one.
+            warnings.warn(
+                f"{self.table_name}: could not read the country level to decide "
+                f"which attrs records to re-attach ({type(exc).__name__}: "
+                f"{exc}); re-attaching all {len(captured)} captured records")
             kept = set(captured)
         in_answer = [v for k, v in captured.items() if k in kept]
 
