@@ -3656,22 +3656,32 @@ market does not sell); 2016-17 31,458 of 252,366 (12.5%).
   enumerator, and for CONTAINER units the enumerator often entered the
   container's *content weight in grams* instead of a count.  Decisive case:
   =Millet=, =u='Bowl'=, clusters 70735 / 70789 / 70791 -- =Price = 4.00=,
-  =NumberOfUnits = 4000=, against a =food_acquired= unit value for
+  =NumberOfUnits = 4000= in 70735 and =4100= in 70789 / 70791, against a =food_acquired= unit value for
   Millet/Bowl in Northern of *exactly 4.00 GHS*.  =Price= is the price of one
   bowl; the 4000 is the bowl's weight.  So the column contract's
   "=NumberOfUnits= = the quantity, in =u=, that =Price= refers to" is *false
-  for these rows*, and =Price / NumberOfUnits= returns ~1/1000 of the true
-  per-unit price (a log gap of +8.3, a ratio of 4,050).  Affects *5,351 of
-  220,908 rows (2.4%)*; top units Yard 1,729, Piece 801, Inches 304, Single
-  294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
+  for these rows*, and =Price / NumberOfUnits= returns ~1/4000 of the true
+  per-unit price (a log gap of +8.3, a ratio of 4,050).  The conservative
+  screen described below excludes *5,351 of 220,908 rows (2.4%)*; this is
+  *not a count of confirmed gram entries*.  It also excludes legitimate
+  counts and non-food dimensions.  Top excluded units: Yard 1,729, Piece
+  801, Inches 304, Single 294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
   =community_prices= -- it stores the reported fields, which is its contract
   -- so the handling belongs in the consumer.  The constant-free screen used
   by =slurm_logs/price_sources/GhanaLSS/analysis.py= is: keep an observation
-  when =u= is a metric mass/volume unit (QTY is then unambiguously a quantity
-  of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
+  when =u= is a metric mass/volume unit (provisionally treating QTY as a
+  quantity of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
   not lossless -- a genuine crate of 24 eggs goes with it -- and recovering
   those rows by reading =Price= as the per-unit price needs a row-by-row
   judgement (QTY = 2 on a Bowl is ambiguous).
+  /Clarified 2026-09-12 (GH #826, @ligon's decision):/ preserve reported
+  fields and qualify =NumberOfUnits= in the schema and script documentation.
+  The counts and Millet values above were rechecked against the cached
+  table through =get_dataframe()=, treating its =Kilogram= label as the
+  API's =Kg= when applying the screen; no source quantities were changed.
+  This documents the limitation; consumer screening and quantity-basis
+  metadata remain open.  The screen is not proof that a retained row has
+  the correct basis, including metric-prefix cases below.
   *A weaker form of the same disease affects BOTH instruments in this wave*:
   metric-prefix miscoding.  Beer at =u='Liter'= priced 0.0080 GHS/L in the
   price file against 15.15 GHS/L in =food_acquired= (Eastern); Chicken
