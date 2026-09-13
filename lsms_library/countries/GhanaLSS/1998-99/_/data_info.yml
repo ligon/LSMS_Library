@@ -99,6 +99,7 @@ sample:
         - t
 
 interview_date:
+    # The shared hook reconciles all records; no preliminary merge/reshape.
     file: SEC0A.DTA
     idxvars:
         i:
@@ -109,6 +110,13 @@ interview_date:
             - dd
             - mm
             - yy
+    # Dependency-only declaration consumed by the recursive cache collector.
+    # These sources are read by visit_dates.build_visit_dates, not YAML extraction.
+    inference_sources:
+        file:
+            - SEC0B.DTA
+            - SEC0C.DTA
+
 
 household_roster:
     file: SEC1.DTA

@@ -61,6 +61,13 @@ interview_date:
             - ddate
             - mdate
             - ydate
+    # Dependency-only declaration for the shared visit_dates builder.
+    inference_sources:
+        file:
+            - partb/secb0.dta
+            - partb/secb1.dta
+            - partb/secb2.dta
+
 
 household_roster:
     file: parta/sec1.dta

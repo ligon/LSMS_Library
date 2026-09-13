@@ -4237,3 +4237,63 @@ lock-free through =local_tools._ensure_dvc_pulled= + the sidecar md5
 (=slurm_logs/ghana_audit/community_prices/fetch_docs.py=) because
 =data_access.get_data_file= walks the DVC index through =DVCFS.exists()= and
 hung for more than ten minutes on this Lustre slice.
+
+* Interviewer visit dates
+
+Implemented 2026-09-12. The =interview_date= table uses calendar =visit=
+with reported =Int_t= dates. GLSS1/2 add the second Y00A contact; GLSS3
+retains S0A intake and adds S0B visits 2--11. GLSS6/7 remain intake-only.
+The existing parsers preserve parseable anomalous years and dates; the
+visit-melt helper omits undated slots, including 3 GLSS3, 15 GLSS6, and
+1 GLSS7 invalid intake dates. This does not establish that those contacts
+did not occur. Food consumption-occasion numbering is unchanged.
+
+GLSS4/5 use the registered =anchored-chronology-glss4= and
+=anchored-chronology-glss5= derivations in =_/derivations.yml=. The derived
+quantity is the =visit= index, not the reported date. Existing Part A
+intake dates take precedence; GLSS4 also retains unambiguous SEC0C visits
+2/3. Distinct valid dates across the source pages are assumed to represent
+distinct scheduled contacts; equal-date reports represent one model event.
+Every original report remains available separately. This is an explicit
+modeling choice: a parseable typo or shifted transcription can produce an
+incorrect assignment even when the chronological numbering is unique.
+
+The fixed rule enumerates increasing assignments into seven GLSS4 or eleven
+GLSS5 visits, honoring intake and Part A anchors and allowing missing visit
+numbers. A date receives an inferred number only if all admissible assignments
+agree on that number. Conflicting anchors, excess dates, and an empty candidate
+set produce no further inferred rows. There is no fixed-spacing assumption,
+offset fallback, or date correction. Every inference-produced assignment
+carries =Derivation=, including assignments equal to the original visit code.
+
+=Country('GhanaLSS').derivation_inputs(key, wave=...)= returns original
+variables and records, with source identity, =assigned_visit= and
+=assignment_reason=. It includes conflicting, invalid, and unresolved inputs;
+the original GLSS5 =reason= variable is preserved. Use keys
+=GhanaLSS::interview_date::anchored-chronology-glss4= and
+=GhanaLSS::interview_date::anchored-chronology-glss5=. The canonical table has
+no =obs= axis. Unresolved records are discoverable through the registry and
+inputs API even when they yield no served row; an empty country's metadata
+is not retained by Feature assembly.
+
+Source-backed checks give 37,702 GLSS4 date rows (19,713 inferred assignments)
+and 69,127 GLSS5 rows (60,440 inferred assignments). All 5,998 and 8,687
+existing intake dates respectively remain exact. All 59,971 and 189,805 raw
+source records retain their original fields, values, and dtypes. These counts
+validate the implementation against the shipped inputs, not the historical
+accuracy of inferred contacts.
+
+The September 11 visit-date report remains an investigation, not a cleaning
+rule. Its GLSS4 median-offset classification depends on selecting the first
+duplicate record; this implementation does not use it. Its GLSS5 description
+of disagreements as mainly month/year slips is contradicted by the source
+comparison: among 9,675 differing unique valid source pairs, 5,957 differ by
+exactly three days. Earlier economic interpretations of interval variation
+in this file are not re-adjudicated by the wiring change.
+
+Regression coverage lives in =tests/test_ghanalss_interview_date.py=,
+=tests/test_ghanalss_visit_inference.py=, and
+=tests/test_ghanalss_visit_derivations.py=. Tests cover source dependencies,
+actual Wave duplicate-anchor handling, raw-input linkage, and provenance
+through parquet and Feature. See =.coder/ledger/ghanalss-visit-dates.md= for
+the implementation decisions and verification record.
