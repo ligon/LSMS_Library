@@ -24,7 +24,6 @@ from lsms_library.local_tools import (
     read_parquet_cache_waves,
     read_parquet_cache_hash,
 )
-from tests.conftest import requires_s3
 
 
 COUNTRY = 'Albania'   # 6 waves, no script-path complications
@@ -200,7 +199,7 @@ class TestMigrationOfUnstampedParquets:
             assert c._cache_covers_waves(fn, c.waves, freshness) == [c.waves[0]]
 
 
-@requires_s3
+@pytest.mark.requires_s3
 class TestEndToEnd:
     """The regression scenario the issue asks for, in-process against one cache."""
 
