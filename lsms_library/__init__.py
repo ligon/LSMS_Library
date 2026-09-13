@@ -145,6 +145,34 @@ from .conversion import convert
 from . import local_tools as tools
 from . import population
 from .population import PopulationRecord, population_records
+# *** THESE TWO LINES SHADOW A SUBMODULE NAME.  GH #883. ***
+#
+# `ll.recall` and `ll.derivations` are the public TABLE FUNCTIONS, chosen
+# deliberately -- but `lsms_library.recall` and `lsms_library.derivations` are
+# also submodules.  Once the callable is bound here, the package ATTRIBUTE wins
+# over the submodule for `from <package> import <name>`, which prefers an
+# existing attribute.  So:
+#
+#     from lsms_library import recall          # -> the FUNCTION, not the module
+#     from lsms_library import recall as r; r.recall_records
+#                                             # -> AttributeError
+#
+# and that bites CALLERS OUTSIDE THE PACKAGE too, not only modules inside it --
+# it is how the trap was hit a second time, from a one-off script.  The forms
+# that always give you the module:
+#
+#     from lsms_library.recall import recall_records, BASIS_LADDER   # by name
+#     importlib.import_module("lsms_library.recall")                 # the module
+#
+# `sys.modules["lsms_library.recall"]` is still the module either way; only the
+# attribute is rebound.  INSIDE this package, never write
+# `from . import recall` / `from . import derivations` -- import the symbols by
+# name instead (`feature.py` does, and survived only because it is imported
+# above this line).  tests/test_module_shadowing.py pins all of it: the set of
+# shadowed names, the in-package ban, and the escape hatches.
+#
+# Renaming either the public callables or the submodules would remove the trap;
+# both were declined -- the public names are the documented API.
 from . import recall as _recall_mod
 from .recall import RecallRecord, recall_records
 from .recall_table import recall
