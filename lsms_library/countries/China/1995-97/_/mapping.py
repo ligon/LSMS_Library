@@ -49,17 +49,28 @@ def Region(value):
 
 
 def PlotArea(x):
-    """Clean S05B plot area (question 2, reported in mu).
+    """Clean S05B plot area (question 2) and convert to HECTARES.
+
+    The canonical schema (``lsms_library/data_info.yml``, GH #879)
+    declares ``plot_features.Area`` in hectares, with ``AreaUnit`` the
+    provenance label of the original unit.  S05B reports area in mu
+    (the standard Chinese land unit: 15 mu = 1 ha, 1 mu = 666.67 m^2),
+    so divide by 15.
 
     A handful of rows carry the Stata sentinel ~1.75e+100 (extreme
-    encoding for a missing/refused value); coerce anything outside a
-    plausible plot range to NA.
+    encoding for a missing/refused value); the plausibility filter below
+    coerces anything outside a plausible plot range (0, 1000) mu to NA
+    BEFORE the conversion.
     """
     import pandas as pd
     s = pd.to_numeric(x, errors='coerce')
-    return s.where((s > 0) & (s < 1000))
+    return s.where((s > 0) & (s < 1000)) / 15.0
 
 
 def AreaUnit(x):
-    """S05B plot areas are reported in mu (the Chinese land unit)."""
+    """S05B plot areas are reported in mu (the Chinese land unit).
+
+    A PROVENANCE label (GH #879): since ``PlotArea`` converts the served
+    ``Area`` to hectares, 'mu' names the native unit, not the served one.
+    """
     return 'mu'

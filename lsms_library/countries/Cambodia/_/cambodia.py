@@ -73,3 +73,37 @@ def age_sex_composition(df):
     testdf['log HSize'] = np.log(testdf[['girls', 'boys', 'men', 'women']].sum(axis=1))
     testdf.index.name = 'j'
     return testdf
+
+
+# Hectares per native plot-area unit (GH #879).  The canonical schema
+# (lsms_library/data_info.yml) declares plot_features.Area in HECTARES,
+# with AreaUnit the provenance label of the original unit.  Cambodia
+# 2019-20 (hh_sec_8.dta, s08q10a/s08q10b) records area in mixed units.
+# SQUARE METERS / HECTARES / ACRE convert exactly (1 ha = 10,000 m^2;
+# 1 acre = 0.404686 ha, the Nigeria/_/nigeria.py constant).  RAI and KONG
+# have NO in-repo conversion factor and none is asserted here -- a rai is
+# a THAI unit (0.16 ha) whose use in Cambodian data is undocumented, and
+# 'kong' could not be identified at all.  Those rows keep Area = NaN with
+# the native unit still recorded in AreaUnit (honest, not fabricated).
+_PLOT_AREA_HECTARES_PER_UNIT = {
+    'SQUARE METERS': 1.0 / 10000.0,
+    'HECTARES': 1.0,
+    'ACRE': 0.404686,
+}
+
+
+def plot_features(df):
+    """df_edit hook: convert ``Area`` to hectares per-row on ``AreaUnit``.
+
+    Rows whose native unit has no factor in
+    :data:`_PLOT_AREA_HECTARES_PER_UNIT` (RAI, KONG, missing) get a NaN
+    Area -- the schema's required column is in hectares and a guessed
+    factor is worse than an honest gap (GH #879).  ``AreaUnit`` is left
+    untouched: it is the provenance label of the unit the SURVEY
+    recorded, not of the unit served.
+    """
+    df = df.copy()
+    area = pd.to_numeric(df['Area'], errors='coerce')
+    factor = df['AreaUnit'].astype(object).map(_PLOT_AREA_HECTARES_PER_UNIT)
+    df['Area'] = area * pd.to_numeric(factor, errors='coerce')
+    return df
