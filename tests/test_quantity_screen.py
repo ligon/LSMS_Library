@@ -170,11 +170,14 @@ def test_an_unscreened_table_is_not_audited():
     """``_SCREENED_COLUMNS`` is a registry of what is LOOKED AT, and a table
     that is not in it costs one dictionary lookup.  (``food_acquired`` USED to
     be the stand-in for an unscreened table here; GH #884 screened it, so the
-    stand-in is now a table the registry genuinely does not name.)"""
+    stand-in is now a NAME NO REAL TABLE CAN CARRY -- a screened-in-future
+    real table such as ``livestock`` would break this test for an unrelated
+    reason, which is exactly what happened to ``food_acquired``.)"""
     df = _cell(extras=[_outlier(9e9)])
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        assert check_quantities(df, country="T", table="livestock") is df
+        assert check_quantities(df, country="T",
+                                table="not_a_screened_table") is df
     assert not [w for w in caught
                 if issubclass(w.category, QuantityImplausibleWarning)]
 
@@ -198,7 +201,9 @@ def test_food_acquired_quantity_is_screened_and_never_altered():
     assert out is df
     assert np.array_equal(
         before, df["Quantity"].to_numpy(dtype="float64", na_value=np.nan))
-    report = quantity_reports(country="Ethiopia", table="food_acquired")[0]
+    reports = quantity_reports(country="Ethiopia", table="food_acquired")
+    assert reports, "food_acquired must be in _SCREENED_COLUMNS (GH #884)"
+    report = reports[0]
     assert report["wave"] == "2011-12"
     offender = report["offenders"][0]
     assert offender["i"] == "hh-slip" and offender["u"] == "Tuba"

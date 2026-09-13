@@ -150,8 +150,12 @@ Togo               112,445       1       51 ms
 **total**     **11,569,712** **2,005**
 =============  ===========  ======  ==========
 
-2,005 of 11.57M rows (0.017%).  Three features of the census a reader should
-know before treating any of these counts as calibration:
+2,005 of 11.57M rows (0.017%).  The headline is dominated by two known
+artifact families itemised below -- Mali's single repeated-sentinel family
+(1,105) and sentinel-unit rows (96) -- so the DISPERSED residual is ~804
+findings; read the rate as a work-queue size, not a calibration.  Three
+features of the census a reader should know before treating any of these
+counts as calibration:
 
 * **Ethiopia's 132 (65/25/32/8/2 by wave)** is the reviewer's own figure,
   reproduced exactly -- the cell the issue was written around.
@@ -285,7 +289,8 @@ QUANTITY_REFERENCE_FLOOR = 1.0
 #: no-allowlist rule turns on, and the same kind of mapping as
 #: ``country._ADDITIVE_MEASURE_COLUMNS``.  ``food_acquired.Quantity`` was the
 #: stated extension (#884) and is measured in the module docstring's second
-#: census: 2,005 of 11.57M rows (0.017%), 51 ms on a 5.34M-row GhanaLSS read.
+#: census: 2,005 of 11.57M rows (0.017%), 3,030 ms on a 5.34M-row GhanaLSS
+#: read (3.5% of the 85 s warm read -- the docstring's census table).
 _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
     "crop_production": ("Quantity",),
     "food_acquired": ("Quantity",),
@@ -674,6 +679,13 @@ def quantity_reports(country: str | None = None,
     for an analyst who wants the offending rows as data rather than as prose.
     Each report carries an ``offenders`` list naming every flagged row, even
     though the warning text shows only the first few.
+
+    Findings are filed against the SOURCE table, not the one that triggered
+    the read: a warning surfaced by ``Country.food_quantities()`` or
+    ``Country.food_prices()`` -- both derived from ``food_acquired`` -- is
+    filed under ``table='food_acquired'``, and
+    ``quantity_reports(table='food_quantities')`` is therefore empty even
+    when that call warned.
     """
     out: list[dict[str, Any]] = []
     for (c, t), reports in _QUANTITY_LEDGER.items():
@@ -697,6 +709,14 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
     Returns *df* unchanged -- always, and by contract.  Call it for its effect,
     not its value.  Tables not named in :data:`_SCREENED_COLUMNS` cost one
     dictionary lookup.
+
+    The framework calls this keyed on the framework's own method name, so a
+    table DERIVED from a screened one (``food_quantities`` and
+    ``food_prices``, both derived from ``food_acquired``) emits the source
+    table's warnings and files its findings under the SOURCE table's name --
+    a finding reached through ``Country.food_quantities()`` is reported under
+    ``table='food_acquired'``, which is also where
+    :func:`quantity_reports(table=...)` must look for it.
     """
     columns = _SCREENED_COLUMNS.get(str(table), ())
     if not columns:
