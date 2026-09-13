@@ -31,6 +31,11 @@ food_acquired = $(shell find $(rounds) -name food_acquired.py)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
+nonfood_expenditures = $(shell find $(rounds) -name nonfood_expenditures.py)
+
+../%/_/nonfood_expenditures.parquet: $(nonfood_expenditures)
+	(cd $(@D) && python nonfood_expenditures.py)
+
 community_prices = $(shell find $(rounds) -name community_prices.py)
 community_prices_parquet := $(community_prices:.py=.parquet)
 

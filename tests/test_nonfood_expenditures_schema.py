@@ -176,6 +176,7 @@ def _frame(built, country):
 
 
 @pytest.mark.parametrize('country', sorted(DECLARERS))
+@pytest.mark.requires_s3
 def test_delivered_shape_is_long(built, country):
     df = _frame(built, country)
     assert 'j' in (df.index.names or []), (
@@ -195,6 +196,7 @@ def test_delivered_shape_is_long(built, country):
 
 
 @pytest.mark.parametrize('country', sorted(DECLARERS))
+@pytest.mark.requires_s3
 def test_no_fabricated_zeros(built, country):
     """Sparsity: an unreported item has no row, not an Expenditure of 0.
 
@@ -225,6 +227,7 @@ def test_no_fabricated_zeros(built, country):
 
 
 @pytest.mark.parametrize('country', sorted(DECLARERS))
+@pytest.mark.requires_s3
 def test_reshaping_moved_no_money(built, country):
     """Per-wave totals, measured identical before and after the #817 reshape."""
     df = _frame(built, country)
@@ -241,6 +244,7 @@ def test_reshaping_moved_no_money(built, country):
             f'expected {want:.2f}.  A reshape must not move money.')
 
 
+@pytest.mark.requires_s3
 def test_feature_assembles_across_declarers():
     """The point of the whole exercise: one table, three countries, one column."""
     import lsms_library as ll

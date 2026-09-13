@@ -1,0 +1,760 @@
+#+TITLE: Elicitation language: food, non-food, durables and housing costs
+#+SUBTITLE: GhanaLSS GLSS7 (2016-17) and Uganda UNPS wave 8 (2019-20)
+#+DATE: 2026-09-12
+#+AUTHOR: extracted from the wave questionnaires and interviewer manuals
+#+OPTIONS: toc:2 num:nil
+
+* Scope and method
+
+Four categories, two waves, verbatim wording from the *instruments*, not from
+the data dictionaries:
+
+1. food expenditures, 2. non-food (non-durable) expenditures,
+3. consumer durable assets, 4. rent / housing costs.
+
+** Sources actually read
+
+| wave | document | how read |
+|------+----------+----------|
+| GLSS7 | =GLSS7_MODULE A_30_9_16_for print.docx= (sections 1-7) | docx XML, table cells |
+| GLSS7 | =GLSS7_MODULE B _14_10_16.docx= (sections 8-13) | docx XML, table cells |
+| GLSS7 | =GLSS7 Final Manual.docx= (interviewer manual) | docx XML |
+| GLSS7 | =DIARY.doc= (household consumption diary) | =strings= on the OLE stream |
+| GLSS7 | =GLSS7 Main Report.pdf= | pdfplumber |
+| UNPS8 | =Uganda 2019-20 Questionnaire.pdf= (57 pp, household) | pdfplumber =find_tables()= |
+
+All fetched through =lsms_library.data_access.get_data_file()=; none of these
+are in the working tree by default.
+
+** Two caveats on "verbatim"
+
+1. *Uganda's questionnaire is a printed grid with very narrow columns, so
+   header text wraps mid-word.*  Quotes below are reflowed: a line break is
+   closed up only when the trailing fragment is not itself a word and the
+   concatenation is one (=househol= + =d= -> =household=), otherwise a space is
+   inserted.  Every quote used here was checked against the raw line list and
+   against the shipped Stata variable label.  Where the printed cell is
+   genuinely garbled the garble is reproduced and flagged.
+2. *GLSS7's Section 7 Parts A-C are auto-numbered in Word*, so the printed
+   question numbers are not in the extracted text.  Numbering below comes from
+   the shipped variable names (=s7cq1a=, =s7cq2=, ...) corroborated by the
+   questionnaire's own cross-reference "( >> PART C Q7)".
+
+* Summary: the four categories side by side
+
+| category | GLSS7 2016-17 | UNPS 2019-20 |
+|----------+---------------+--------------|
+| food | S9 Part B, *6 asks* "since my last visit" (~5 d each), diary-assisted; own produce in S8 Part H on the same visit grid | S15 Part B, *1 ask*, "During the Last 7 Days"; four acquisition channels in one grid |
+| non-food non-durable | S9 Part A, *past 12 months*, asked once; frequently-purchased non-food rides inside Part B | S15 Part C, *last 30 days*; S15 Part D, *last 365 days* |
+| durables | S12 Part B: ownership + age + purchase price + resale value | S14: ownership + number + total estimated value |
+| rent / housing | S7 Part C: *cash rent actually paid* + time unit; no imputed rent anywhere | S15 Part C items 301/302/303, *last 30 days*, incl. imputed rent -- elicited through the generic own-production prompt |
+
+* 1. GhanaLSS 2016-17 (GLSS7)
+
+The organising split in GLSS7 is *frequency of purchase, not food vs non-food*.
+Section 9 is titled =HOUSEHOLD EXPENDITURE (FOOD AND NON-FOOD EXPENSES)= and the
+manual states it plainly:
+
+#+begin_quote
+Section 9 is segmented into Part A (Less Frequently Purchased Items and Part B
+(Frequently Purchased Items)
+
+Please note that questions on frequently purchased items will be asked per
+visit while questions on less frequently purchased items will be asked once.
+The two categories have been clearly marked in the questionnaire.
+#+end_quote
+-- /GLSS7 Final Manual, Section 9/
+
+** 1.1 Food expenditures
+
+*** Purchases -- Section 9 Part B, =EXPENSES (FREQUENTLY PURCHASED ITEMS)=
+
+One question, repeated across six visit columns headed =2nd 3rd 4th 5th 6th
+7th= (each with a =day month= date box):
+
+#+begin_quote
+1. How much was spent and what quantity was acquired of ………... since my last visit?
+#+end_quote
+
+Response columns per visit: =AMT (GH¢)= | =QTY= | =UNIT=.
+Respondent block at the top of every page: =PERSON RESPONSIBLE / COPY FROM
+SECTION 6 Q.8=, i.e. the household members identified as mainly responsible for
+purchases.
+
+Manual, Part B:
+
+#+begin_quote
+Questions 1-6: Solicit expenditure on food and non-food items which are
+purchased more frequently.  Responses for this part will be solicited during
+all visits with the exception of the first visit (Question).  In other words,
+it will be administered 10 times in all.  In your second visit you will ask for
+how much was spent by the household since the last 3 days, starting from the
+day of your first visit.
+
+For your next visits (Question 2-6), you will ask for how much was spent by the
+household since your last visit.  In all EAs the diary of household expenditure
+will be used.  You must however, ask for expenditures on your second visit in
+order to capture the three days prior to your second visit.  If the household
+did not spend anything on the particular item, skip to the next item.
+#+end_quote
+
+*That manual paragraph is stale -- see [[*4. Findings worth acting on][Finding 3]].*  The printed form has six
+visit columns, not ten, and the Main Report's field design is five-day spacing,
+not three.  The correct design, and why the Manual must not be used for it, is
+already written up in =GhanaLSS/_/CONTENTS.org=: "GLSS7's recall period: six
+five-day recalls, diary-supported" and "=GLSS7 Final Manual.docx= is stale
+where it describes the visit schedule".
+
+*** Own production -- Section 8 Part H, =CONSUMPTION OF OWN PRODUCE=
+
+Same visit grid, asked of the holder identified in Section 6 Q.7:
+
+#+begin_quote
+1. Did the household consume any own produced ……….. in the past 12 months?
+   Yes… .1  No……2  Next Item
+
+2. How many months altogether was own produced ……….. consumed during the past
+   12 months?
+
+3.-8. How much of own produced ……. was consumed by the household since my last visit?
+
+9. For how much would you sell one unit of ………….. now?
+   USE MOST OCCURING UNIT OF MEASURE
+#+end_quote
+
+Q1/Q2 are screeners; Q3-Q8 are the six visits; Q9 is the farmgate valuation
+price.  Note that the value of own produce is *not* asked -- only a quantity
+per visit and a current selling price per unit.
+
+*** The diary
+
+=DIARY OF CONSUMPTION AND EXPENDITURE=, left with the household, header
+=CLUSTER NUMBER / HOUSEHOLD NUMBER / NAME OF HOUSEHOLD HEAD / DATE=:
+
+#+begin_quote
+INSTRUCTION: RECORD ALL PAYMENTS MADE AND ESTIMATE ALL OWN PRODUCED GOODS CONSUMED.
+#+end_quote
+
+Columns: =Date= | =Place of Purchase/Own Produce= | =Description of Item
+Purchased or Consumed= | =Qty= | =Unit= | =Price= | =Amount=.
+
+The diary is an *aid to the visit questions*, not a separate instrument: the
+manual says "In all EAs the diary of household expenditure will be used", and
+nothing in the shipped extract is keyed to a diary line.
+
+*** Served by the library
+
+=g7sec9b_small.dta= =s9bq{1..6}a/b/c= (amount / quantity / unit code) ->
+=food_acquired= =s='purchased'=; =g7sec8h.dta= =s8hq{3..8}q/u/p= ->
+=s='produced'=.  Both carry =visit= as a country-local index level holding the
+*calendar* visit 2..7.
+
+** 1.2 Non-food (non-durable) expenditures -- Section 9 Part A
+
+=PART A: NON-FOOD EXPENSES (LESS FREQUENTLY PURCHASED ITEMS)=.  Header block:
+=RESPONDENTS ARE THE PERSONS MAINLY RESPONSIBLE FOR HOUSEHOLD PURCHASES COPY
+FROM SECTION 6 Q.8=, plus a =Date of this visit= box.
+
+#+begin_quote
+1.  Was anything spent by the household on …… in the past 12 months?
+    Yes…1  No….2  (>> 3)
+
+1a. Quantity                                  [QTY | UNIT]
+
+2.  How much was spent on …………… in the past 12 months altogether?
+                                              [AMOUNT (GH¢)]
+
+3.  Has the household used, consumed out of its own output or has received as
+    gift …... in the past 12 months?
+    IF NONE PUT '00' & >> NEXT ITEM            [QUANTITY | UNIT]
+
+4.  How much of …………….. has the household used or consumed out of own
+    production, or has received as gift in the past 12 months
+                                              [VALUE (GH¢)]
+#+end_quote
+
+Manual, Part A:
+
+#+begin_quote
+Responses for these items will be solicited only once during the last visit to
+the household (see COMPLETING THE QUESTIONNAIRE).  Since expenditure on these
+items do not take place frequently, the reference period for the amount spent
+on any of these items will be "... in the last 12 months".
+
+Question 2: Is aimed at identifying the total amount of money spent on the item
+in the last 12 months (including carriage costs).  Record the total amount in
+Ghana Cedi, if not state the unit in the corresponding space provided.
+
+Question 4: Is aimed at identifying the total estimated value of less
+frequently purchased item that the household has consumed out of its own
+output, gift received or philanthropic consumption.
+#+end_quote
+
+Shipped as =g7sec9a.dta=: =s9aq1=, =s9aq1aq/s9aq1au=, =s9aq2=, =s9aq3q/s9aq3u=,
+=s9aq4=.  *Not wired into any library table* -- GhanaLSS has no
+=nonfood_expenditures=.
+
+*The frequently-purchased non-food basket is inside Part B*, not Part A: the
+printed Part B item list runs the whole COICOP basket (stationery, tinned pet
+food, prepared meals, hotel bed occupancy, haircuts, toothpaste, hair
+extensions, razors, sanitary products, money-transfer fees...), organised under
+the twelve COICOP divisions which the manual reproduces in full.  The library
+recovers only the food subset, by looking each =freqcd= up in
+=harmonize_food='s= =Code_9b= column and dropping the rows that do not
+harmonise.
+
+** 1.3 Consumer durable assets -- Section 12 Part B
+
+=SECTION 12: CREDIT, ASSETS AND SAVINGS / PART B: ASSETS AND DURABLE CONSUMER
+GOODS=.  Respondent: the head of household.
+
+#+begin_quote
+1.  Does any member of the household own ………………?
+    Yes, working…1   Yes, not Working……2   No…………….3  (>> Next Item)
+
+1a. Who owns it?  ID
+
+2.  How long ago was …………… obtained?   LESS THAN ONE YEAR: CODE 00   [YEARS]
+
+3.  What was its purchase price?  (IF GIFT PUT ZERO)   C = CURRENCY CODE
+    Cedi…1  Naira…2  CFA…3  Pound…4  US Dollar…5  Euro…6  Yen…7  Other (specify)…8
+
+4.  How much could you sell it now in Ghana cedis?      [VALUE (GH¢)]
+#+end_quote
+
+Questions 1a-4 are repeated for up to *three* items of the same type, columns
+=ITEM - A=, =ITEM - B=, =ITEM - C=.  Manual:
+
+#+begin_quote
+A list of items, durable consumer goods, is provided in column 1 with their
+corresponding codes in column 2.  The respondent is expected to answer question
+1 for each item listed and questions 2-4 if the response to question 1 is YES.
+
+Question 1: Is about the household's ownership of any of the items listed.
+List the three most recently obtained items.
+
+Question 2: Deals with the exact point in time that the item was acquired.  The
+price of the item is covered in question 3 (Put zero if item is a gift).
+
+Question 4: Requires the estimated current value of the items owned by the
+household.
+#+end_quote
+
+Item list is codes 301+ (=Furniture (stuffed)= 301 ... =Television= 324,
+=Bicycle= 327, =Motor cycle= 328, ...).
+Shipped as =g7sec12b.dta=: =s12bq1a/b/c=, =s12bq1a_a/b/c=, =s12bq2a/b/c=,
+=s12bq3a1/b1/c1= (+ currency =*2=), =s12bq4a/b/c=.
+
+** 1.4 Rent / housing costs -- Section 7
+
+Respondent: =THE HEAD OF THE HOUSEHOLD=.  Opening: "Now, I would like to ask
+you about your dwelling".
+
+*** Part A -- type of dwelling
+
+#+begin_quote
+1. In what type of dwelling does the household live?  (OBSERVE DWELLING)
+   Separate house (Bungalow)…01 … Uncompleted building…10  Other (specify)…11
+
+2. How many rooms does this household occupy?
+   (COUNT LIVING ROOMS, DINING ROOMS, BED ROOMS BUT NOT BATHROOMS, TOILET & KITCHEN)
+
+3. How many of the rooms are used for sleeping?   IF MORE THAN 1, GO TO PART B
+
+4. Do other households share this room with you?  Yes…1  No…2 (>> PART B)
+
+5. How many households, including your household, share this sleeping room?
+#+end_quote
+
+*** Part B -- occupancy status
+
+#+begin_quote
+1. What is the present holding/tenancy arrangement of the dwelling?
+   Owning……1 ( >> PART C Q7)   Renting……2   Rent-free……3
+   Perching……4   Squatting……5
+
+2. Who owns this dwelling?
+   Being purchased (e.g. Mortgage)…1   Relative not household member…2
+   Other private individual…3   Private employer…4   Other private agency…5
+   Public/Government ownership…6   Other (specify)…7
+#+end_quote
+
+*** Part C -- =HOUSING EXPENSES=
+
+#+begin_quote
+1. How much does the household pay in cash towards the rent?
+   (IF FREE, PUT ZERO FOR AMOUNT AND THE TIME UNIT)
+   AMOUNT                        TIME UNIT
+   Time Unit: Daily…1  Weekly…2  Monthly…3  Quarterly…4
+              Half Yearly…5  Yearly…6  N/A…0
+
+2. Does your household supply goods or services in exchange or use of this
+   dwelling?
+   Yes……1     No……2  (>> 4)
+
+3. What is the approximate value of these goods and services provided by your
+   household?
+   VALUE                         TIME UNIT
+
+4. Is part or all of the rent paid by someone who is not a member of your
+   household?
+   Yes, All……1   Yes, Part……2   No……3 (>> 7)
+
+5. Who pays for the rent?
+   Relative…1  Private individual…2  Government…3  Private employer…4
+   Other (specify)…5
+
+6. How much is paid?
+   AMOUNT                        TIME UNIT
+
+7. How much did your household spend for construction or repair cost and
+   painting in the past 12 months on this dwelling?
+
+8. In the past 12 months have you built or made improvements or additions to
+   your dwelling or any other dwelling?
+   Yes, my dwelling…1  Yes, other dwelling…2  Yes, both…3  No…4  (>> PART D)
+
+9. What additions or improvements were made:  (MULTIPLE RESPONSE - PLEASE TICK)
+   Probe for additions made to respondents dwelling over the past 12 months.
+   Additional rooms? / Built fences/fence walls? / … / Painted? / Other (specify)
+
+10. What was the TOTAL cost of the construction, improvements or additions made
+    to your dwelling or any other dwelling in the past 12 months?  IN GHANA CEDIS:
+#+end_quote
+
+All of Part C above is the printed text.  Parts A-C are one merged Word
+table cell, so only the question NUMBERS are reconstructed -- from the shipped
+variable names (=s7cq1a= … =s7cq7=), corroborated by the form's own
+"( >> PART C Q7)" and by the printed skips "(>> 4)" and "(>> 7)", which line up
+with that numbering exactly.
+
+*Owner-occupiers skip the whole rent block* -- Part B Q1 "Owning" routes
+straight to Part C Q7.
+
+*** Rent paid on OTHER dwellings -- Section 9 Part A item 168
+
+Under the COICOP heading =Housing, water, electricity, gas and other fuels
+(excluding payments captured in Section 7)=:
+
+#+begin_quote
+Payment of rent (Excluding payment in sec7 for household) | 168
+#+end_quote
+
+so the 12-month non-food module deliberately de-duplicates against Section 7.
+
+*** No imputed rent
+
+*GLSS7 asks no hypothetical or imputed rent question for owner-occupiers.*
+The rent block's only monetary variables in =g7sec7.dta= are =s7cq1a/1b=
+(cash paid), =s7cq3a/3b= (value of goods and services given in exchange) and
+=s7cq6a/6b= (paid by a non-member); the section's other money questions are
+construction and repair (=s7cq7=, =s7cq10=) and the Part D utility bills
+(water, refuse, toilet).  Nothing asks an owner what the dwelling is worth to
+live in.  The Main Report's repeated
+"(actual and imputed)" refers to *own-produced food and other own-produced
+goods* (S8H and S9A Q3/Q4) -- its housing tables report only occupancy status
+and who pays the rent.  Any imputed rent in a GLSS7 welfare aggregate is a
+statistical construction downstream of the instrument, not something a
+respondent was asked.
+
+* 2. Uganda 2019-20 (UNPS wave 8)
+
+Section 15 =Household Consumption Expenditure= is one section in four recall
+tiers: Part A (household size over the reference week), Part B food/7 days,
+Part C non-durables/30 days, Part D semi-durables and durables/365 days,
+Part E non-consumption/365 days.  Household questionnaire cover:
+=[TO BE ANSWERED BY HEAD OF HOUSEHOLD AND IN HIS/HER ABSENCE, BY AN ADULT
+MEMBER OF THE HOUSEHOLD]=.
+
+** 2.0 Part A -- the denominator
+
+#+begin_quote
+CEA01: On average, how many people were present in the last 7 days?
+       (In this section children are defined as less than 18 years).
+#+end_quote
+
+Eight cells: =Household Members= and =Visitors=, each x =Male adults / Female
+adults / Male children / Female children=.  Served as =people_last7days=.
+
+** 2.1 Food expenditures -- Section 15 Part B (7 days)
+
+=Part B: Food and Beverage (During the Last 7 Days)=.  One grid, four
+acquisition channels side by side.  Screeners and unit:
+
+#+begin_quote
+CEB03  Did your HH consume [ITEM]   1= Yes   2=No >> NEXT ITEM
+CEB04  How many days was [ITEM] consumed out of the last 7 days?
+CEB03C In what unit can you best quantify/describe the amount of [ITEM]
+       consumed?  CODES
+#+end_quote
+
+*At Home* (purchases consumed at home):
+
+#+begin_quote
+CEB06  How many [CEB03C] of [ITEM] did your household consume out of purchases
+       at home during the last 7 days?
+CEB14A Market price for purchasing [ITEM] for consumption at home per [CEB03C]
+       of [ITEM]   UGX
+CEB07  How much did the household spend in total on these [CEB04] [CEB03C] of
+       [ITEM] during the last 7 days for consumption at home?   UGX
+#+end_quote
+
+*Away from home*:
+
+#+begin_quote
+CEB08  How many [CEB03C] of [ITEM] did your household consume out of purchases
+       away from home during the last 7 days?
+CEB14B Market price for purchasing [ITEM] for consumption Away from home per
+       [CEB03C] of [ITEM]   UGX
+CEB09  How much did the household spend in total on these [CEB06] [CEB03C] of
+       [ITEM] during the last 7 days? for consumption away from home   UGX
+#+end_quote
+
+*Out of home production / household enterprise stock*:
+
+#+begin_quote
+CEB10  How many [CEB03C] of [ITEM] did your household consumed out of home
+       production during the last 7 days?
+CEB14C Price of [ITEM] if you were to sell it in the market per [CEB03C] of
+       [ITEM]   UGX
+CEB11  What would be the total value of these [CE08] [CEB03C] of [ITEM] if you
+       were to sell them at the farm gate   UGX
+#+end_quote
+
+*Received in-kind / free*:
+
+#+begin_quote
+CEB12  How many [CEB03C] of [ITEM] did your household received in-kind/free for
+       consumption during the last 7 days?
+CEB13  What would be the total value of these CEB10] [CEB03C] of [ITEM] if you
+       were to sell them in the market?   UGX
+#+end_quote
+
+and one price outside the channel blocks:
+
+#+begin_quote
+CEB15  Farm gate /producer price per [CEB03C] of [ITEM]
+#+end_quote
+
+followed by CEB16-CEB19, a consumer-protection battery ("Was [ITEM/PRODUCT]
+consumed substandard? … On a scale of 1 to 5 where (5 is Most and 1 least)
+please rate the following parameters: Quality / Safety / Identity") that the
+library does not read.
+
+The cross-references printed inside the prompts are *wrong in the form itself*:
+CEB07 says "these [CEB04]" where CEB04 is the number of days and CEB06 is the
+quantity; CEB09 says "these [CEB06]" for the away-from-home quantity CEB08;
+CEB11 says "[CE08]" and CEB13 "CEB10]" (the opening bracket is missing on
+the printed form).  Reproduced as printed.
+
+Shipped as =gsec15b.dta=, and the shipped names differ from the printed ones:
+in-kind is =CEB012= / =CEB013= (extra zero), prices are lower-case =CEB14a/b/c=,
+and there is no =CEB02= (the printed item-code column is the file's =CEB01=).
+
+** 2.2 Non-food non-durable -- Section 15 Part C (30 days)
+
+=Part C: Non-Durable Goods and Frequently Purchased Services (During the last
+30 days)=.  Same four-channel shape, one unit, no per-channel market price:
+
+#+begin_quote
+CECO 2.1  Did the HH consume [ITEM]   1=Yes  2=No >> NEXT ITEM
+CECO 3    In what unit can you best quantify/describe the amount of [ITEM]
+          consumed?  CODES
+
+CECO 4    How many [CECO 3] of [ITEM] did your household purchased during the
+          last 30 days?
+CECO 5    How much did the household spent in total on these [Q4] [CECO 3] of
+          [ITEM] during the last 30 days?   UGX
+
+CECO 6    How many [CECO 3] of [ITEM] did your household consumed out of home
+          production during the last 30 days?
+CECO 7    What would be the total value of these [Q8] CECO 3] of [ITEM] if you
+          were to sell them at the farm gate UGX during the last 30 days?  UGX
+
+CECO 8    How many [CECO 3] of [ITEM] did your household received in kind or
+          for free during the last 30 days?
+CECO 9    What would be the total value of these [CECO 8] [CECO 3] of [ITEM]
+          received in kind or for free if you were to sell them in the market?
+          UGX
+
+CECO 10   Unit Price / Value per [CECO 3] of [ITEM]
+#+end_quote
+
+CECO 11-14 repeat the consumer-protection battery.  Shipped as =gsec15c.dta=
+with the letter O replaced by a zero throughout (=CEC02=, =CEC02_1=, =CEC03= …
+=CEC14=); the library reads =CEC02=, =CEC05=, =CEC07=, =CEC09= as
+=nonfood_expenditures=.
+
+** 2.3 Semi-durables and durables -- Section 15 Part D (365 days)
+
+=Part D: Semi-Durable Goods and Durable Goods and Service (During the last 365
+days)=.  *Values only -- no unit, no quantity, no price.*
+
+#+begin_quote
+CED02.1  Did the HH consume [ITEM]   1=Yes  2=No >> NEXT ITEM
+
+CED03    How much did the household spent in total on the [ITEM] during the
+         last 365 days?   UGX                                       [Value]
+
+CED04    How much did the household spent in total on these [Q4] [CECO3] of
+         [ITEM] during the last 365 days?  UGX
+         Consumption out of household /enterprise stock             [Value]
+
+CED05    What would be the total value of these of [ITEM] received in kind or
+         for free if you were to sell them in the market?   UGX     [Value]
+#+end_quote
+
+CED04's prompt is a copy-paste from Part C -- it still carries the =[CECO3]=
+unit tag although Part D has no unit column, and its sub-head
+"Consumption out of household /enterprise stock" is what actually defines it.
+Item list, in printed order (pp. 23-25): =Clothing and Footwear= (=Men's
+clothing- new= 201_1 … =Other Footwear and repairs= 209); =Furniture, Carpet,
+Furnishing etc= (301-306); =Household Appliances and Equipment= (=Appliances:
+Electric iron, / Kettles, Refrigerator etc= 401, =Electronic Equipment (TV,
+radio cassette, car radios, head…)= 403, =Bicycles= 404, =Motors, Pick-ups,
+etc= 406, =Motor cycles= 407, =Computers for household use (desktops, laptops,
+notebooks,…)= 408, =Phone Handsets fixed/mobile= 409_1 / 409-2, =Jewelry,
+Watches, clocks etc= 411); =Glass/ Table were, Utensils, etc= (501-506);
+=Education= (=School fees= 601_1 … =Total education expenses= 606); =Services
+Not elsewhere Specified= (701); =Insurance Premiums= (702_1-702_4); =Other
+services N.E.S.= 703.
+
+*This is the household's flow of durable-goods EXPENDITURE.*  It is distinct
+from Section 14, which is the stock.
+
+** 2.4 Non-consumption expenditure -- Section 15 Part E (365 days)
+
+#+begin_quote
+CEE02.1  Did the HH consume [ITEM]   1=Yes  2=No >> NEXT ITEM
+CEE03    How much did the household spent in total on these of [ITEM] during
+         the last 365days?   Value (During the last 365 days)
+#+end_quote
+
+Items: =Income tax= 801, =Property rates (taxes)= 802, =User fees and charges=
+803, =Other financial services fees= 803_1, =Local Service tax= 804,
+=Pension and social security payments= 805, =Remittances, gifts, and other
+transfers= 806, =Funerals and other social functions= 807, =Interest on loans=
+808, =Others= 809.
+
+** 2.5 Consumer durable assets -- Section 14 =Household Assets=
+
+#+begin_quote
+3.  Does any member of your household own [ASSET] at present?
+    1=Yes, individually
+    4=Yes, jointly with hh members
+    5=Yes, jointly with non hh member
+    2=No (>> NEXT ASSET)
+
+3A/3B  Who owns [ASSET]?  List up to two ID codes
+
+4.  How many […] do your household own at present?          [Number]
+
+5.  [Total estimated value (in Shs)]
+
+6.  Why do you have less [...] than last year?
+    If= 1 -5 >> Next section    If =6 >> Next item
+
+7.  Why do you have more [...] than last year?
+
+8.  What should have been the number last time?
+#+end_quote
+
+Q5's prompt is printed only as the column head =Total estimated value (in Shs)=
+under a =4.= / =5.= code row; the shipped label supplies the sentence:
+=5. What is the Total estimated value of the [ASSET] owned at present?=
+
+Item list begins =Household Assets=: =Owner Occupied House= 01,
+=Other Buildings= 02, =Non-Agricultural Land= 03, =Furniture/Furnishings= 04,
+=Household Appliances e.g. Kettle, Flat iron, Blender, Toaster etc.= 05,
+=Cooker= 23, =Refrigerator= …
+
+Note that the *dwelling itself is an asset line* (code 01), so the
+owner-occupied house is valued twice in UNPS -- as a stock in S14 Q5 and as an
+imputed rent flow in S15C item 302.
+
+Served as =assets=: =gsec14.dta=, filtered to =h14q03 in {yes, yes individually,
+yes jointly}=, value =h14q05=.  =h14q04= (number) is deliberately not carried.
+
+** 2.6 Rent / housing costs
+
+*** Section 9 has the dwelling, not its cost
+
+=Section 9: Housing Conditions, Water and Sanitation=.  Preamble:
+
+#+begin_quote
+Now we would like to ask you about your housing conditions: all the rooms and
+all separate building used by your household members.
+#+end_quote
+
+#+begin_quote
+1. What type of dwelling is it?
+   10 = Detached house … 16 = Hut … 96 = Other, (specify)
+   INTERVIEWER PLEASE USE OBSERVATION
+
+2. What is its tenure status?
+   10= Owner Occupied   11=Free Public   12 = Free Private
+   13 = Subsidized public   14 = Subsidized private
+   15= Rented public   16= Rented private   96= Other (specify)
+#+end_quote
+
+Everything from Q24a to Q32c is gated =IF OWNER OCCUPIED (CODE 10 IN Q.2)= and
+concerns the *parcel*: area, acquisition, tenure type, formal documents,
+disputes, and
+
+#+begin_quote
+38. What is the current value of this parcel?   UGX
+#+end_quote
+
+Q3-Q6 are the dwelling characteristics the library reads (=h9q04= roof,
+=h9q06= floor), Q7-Q17 water, Q22-Q23 toilet.  The only monetary flow in the
+whole section is
+
+#+begin_quote
+14. How much money, on average, does the household pay per month for the water?
+#+end_quote
+
+*There is no rent question in Section 9.*
+
+*** Rent lives in Section 15 Part C, as three consumption items
+
+| code | printed label | channel that actually carries the value | HHs | median UGX/30 d |
+|------+---------------+------------------------------------------+-----+-----------------|
+|  301 | Rent of rented house | =CEC05= purchased value | 321 | 50,000 |
+|  302 | Imputed rent of owned house | =CEC07= home-produced value | 2,570 | 30,000 |
+|  303 | Imputed rent of free house | =CEC09= in-kind value | 186 | 30,000 |
+
+(measured on =gsec15c.dta=, 3,066 households; =CEC04/06/08= quantities and
+=CEC10= unit price are empty for all three items.)
+
+So *Uganda does elicit imputed rent, but has no dedicated prompt for it.*  The
+owner-occupier is asked CECO 7 -- "What would be the total value of these [Q8]
+CECO 3] of [ITEM] if you were to sell them at the farm gate ... during the last
+30 days?" -- with =[ITEM]= filled as "Imputed rent of owned house".  The
+rent-free occupier gets CECO 9, "…if you were to sell them in the market".  The
+elicitation language is the generic own-production / in-kind valuation prompt,
+verbatim, applied to housing.
+
+* 3. Recall windows, stated precisely
+
+| | GLSS7 2016-17 | UNPS 2019-20 |
+|-+---------------+--------------|
+| food purchases | 6 asks x "since my last visit"; Main Report: "every sixth day i.e. after every five days … seven (7) times" -> ~5 d/ask, 30 d covered in a 35-d cycle | 1 ask, 7 days |
+| food own-produce | same 6 visits (S8H q3-q8), plus a 12-month screener and months-consumed | same 7 days, same grid |
+| non-food frequently purchased | inside the same 6 visits | -- |
+| non-food less frequently purchased | 12 months, asked once at the last visit | 30 days (Part C) |
+| semi-durables / durables (flow) | inside S9A's 12 months -- verified: 9A's item list carries =Air conditioners and air coolers=, =Computer (new)= / =(second hand)=, =Fan (Desk Fan)=, furniture and =Bicycles= | 365 days (Part D) |
+| non-consumption (taxes, transfers) | no Part-E analogue; nearest is S11 Part A =TRANSFER PAYMENTS MADE BY HOUSEHOLD (INTERNAL REMITTANCES)=, 12 months.  Direct taxes were not located in GLSS7; this cell is *not* an exhaustive audit | 365 days (Part E) |
+| durable stock | S12B, no window (age + purchase price + resale value) | S14, no window (number + current value) |
+| rent | a *rate*: amount + time unit (daily…yearly) | 30 days |
+
+Note the categories are not commensurable: GLSS7's rent is an amount *per a
+time unit the respondent chooses*, so it is not a recall window at all, while
+Uganda's is a 30-day flow like any other consumption item.
+
+* 4. Findings worth acting on
+
+Each is a statement about this repository, not about the surveys.
+
+1. *Uganda's =recall.yml= says =basis: not-recorded= for all eight waves*, with
+   the note "CONTENTS [RECALL] discussion is GSEC15C non-food, not the GSEC15B
+   food module".  For 2019-20 the food module's window is now
+   questionnaire-grade and unambiguous: the Part B banner reads
+   "Part B: Food and Beverage (During the Last 7 Days)" on every page of the
+   grid, and every quantity/value prompt repeats "during the last 7 days".
+   That is =recall_days: 7=, =n_asks: 1=, =basis: questionnaire=,
+   =recall_verbatim: 'During the Last 7 Days'=.  *Not changed here* --
+   =recall.yml= is generated from =.coder/coverage/food_recall.csv=.
+
+2. *Uganda's =CONTENTS.org= warning about the =[RECALL]= CAPI fill is about
+   Part C and remains correct*, and 2019-20's labels confirm its last sentence:
+   the placeholder is gone and the labels say only "CEC05. Value purchased".
+   But the *printed* Part C questionnaire supplies what the extract dropped --
+   every Part C prompt says "during the last 30 days", and the Part D prompts
+   say "during the last 365 days".  The item-specific window the CONTENTS note
+   describes is not visible in the 2019-20 printed form; if it still varies by
+   item it does so inside CAPI, below the printed instrument.  Worth a
+   re-check before anyone fills =RecallWindow= for this wave.
+
+3. *A third stale passage in the GLSS7 manual -- a new instance of a recorded
+   problem, not a new problem.*  =GhanaLSS/_/CONTENTS.org= already has a
+   section "=GLSS7 Final Manual.docx= is stale where it describes the visit
+   schedule", cataloguing §3.7 ("eleven visits", Table 2 at three-day spacing,
+   "33-day cycle") against §3.6 ("exactly five (5) days apart"), the Manual's
+   own seven-visit section table, the Main Report and the data, and tracing
+   the eleven-visit text verbatim to GLSS3's =G3Intman.pdf= §1.9.
+   *The Manual's Section 9 Part B paragraph quoted above belongs on that list
+   and is not on it*: "it will be administered 10 times in all" and "since the
+   last 3 days" are the same inherited eleven-visit / three-day schedule,
+   surviving in a third place inside the same document.  Conclusion unchanged
+   -- use the Main Report; =recall.yml= 2016-17 already does
+   (=recall_days: 5=, =n_asks: 6=, =basis: questionnaire=).
+
+4. *GLSS7 Section 9 Part B is not a food module, and the size of the gap is
+   measurable.*  It is the frequently-purchased basket across all twelve
+   COICOP divisions.  Measured on =g7sec9b_small.dta= against this wave's own
+   =harmonize_food= table: *484 distinct =freqcd= item codes, of which 320
+   carry a food Preferred Label and 164 do not* and are discarded by
+   =food_acquired.py='s "Drop rows whose food code did not harmonize" step.
+   So a third of the module is non-food, and the =Code_9b= column is the only
+   thing separating the two -- an item added there by mistake pulls a haircut
+   into =food_expenditures=.  =CONTENTS.org= already treats that column as
+   load-bearing (Trap 8: "=.map()= is necessary but NOT sufficient …  The
+   script asserts coverage explicitly"); what is written down nowhere is *how
+   much* of 9B the column is holding back.
+
+   /Answered 2026-09-12./  *1.931e6 cedi over the 30-day exposure, which is
+   44.0% of 30-day non-food spending* (9A contributes 2.457e6 on the same
+   basis; 2012-13 gives 38.7%).  Annualised, 9A + 9B-non-food is 71% of GSS's
+   own =TOTNFD=, the remaining 29% being rent, utilities, education and health
+   from other sections -- so the partition closes.  The exact counts:
+   =harmonize_food= declares *485* =Code_9b= entries, *320* with a food
+   Preferred Label and *165* blank; *164* of the 165 actually occur in
+   =g7sec9b_small.dta= (one is declared but unused), which is the 164 above.
+   The held-back vocabulary is now written down -- =nonfood_items_9b= in
+   =GhanaLSS/_/categorical_mapping.org=, 204 harmonised items across the three
+   waves with per-wave codes and verbatim labels.  It is not wired to any
+   feature; serving 9B needs a =visit=-grain decision.
+
+5. *Uganda Part D (=gsec15d=) and Part E (=gsec15e=) are read nowhere in the
+   repo* -- =grep -rn 'gsec15d\|gsec15e'= over =lsms_library/= returns nothing.
+   Uganda's =nonfood_expenditures= is Part C alone, i.e. the 30-day non-durable
+   tier only; the 365-day semi-durable/durable flow and the non-consumption
+   tier are unwired.  For a country whose =assets= table carries only a stock
+   value, the missing Part D is the durables *flow*.
+
+6. *Neither instrument asks an owner-occupier what their dwelling would rent
+   for.*  Uganda reaches imputed rent by re-using the own-production valuation
+   prompt on a housing item; GLSS7 does not reach it at all.  Anyone comparing
+   a housing share across these two waves is comparing a number with a number
+   that is not there.
+
+7. *Printed-vs-shipped variable-name drift in UNPS8*, all verified against the
+   shipped labels: =CECO*= -> =CEC*= (letter O to zero); =CEB12/CEB13= ->
+   =CEB012/CEB013=; =CEB14A/B/C= -> =CEB14a/b/c=; printed =CEB02= absent from
+   the file.  Anyone reading the questionnaire to wire a new Uganda wave should
+   expect to translate.
+
+* 5. Reproducing this                                              :noexport:
+
+#+begin_src sh
+# fetch the instruments (none are in the tree by default)
+python -c "
+from lsms_library.data_access import get_data_file
+for p in ['countries/Uganda/2019-20/Documentation/Uganda 2019-20 Questionnaire.pdf',
+          'countries/GhanaLSS/2016-17/Documentation/GLSS7_MODULE A_30_9_16_for print.docx',
+          'countries/GhanaLSS/2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx',
+          'countries/GhanaLSS/2016-17/Documentation/GLSS7 Final Manual.docx',
+          'countries/GhanaLSS/2016-17/Documentation/DIARY.doc']:
+    print(get_data_file(p))
+"
+#+end_src
+
+- The Uganda PDF has a real text layer; =pdfplumber='s =find_tables()= +
+  =extract()= recovers the header cells one question per cell, which
+  =extract_text(layout=True)= does not (narrow columns interleave).
+  =pdfplumber= is not in the venv; =pip install --target= a scratch dir.
+- The GLSS7 =.docx= files are read straight out of =word/document.xml= with
+  =zipfile= + =ElementTree=; walk =w:tbl= -> =w:tr= -> =w:tc= to keep one
+  question per cell.  Word auto-numbering is *not* in the XML text, so Section
+  7's question numbers have to come from the shipped variable names.
+- =DIARY.doc= is OLE; =strings= recovers it adequately.
