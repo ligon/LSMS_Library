@@ -97,6 +97,59 @@ JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 # food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
 # ``#+name: u`` categorical table must not remap these on *derived* food
 # tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+#: Directory that must be on a build subprocess's ``PYTHONPATH`` for
+#: ``import lsms_library`` to resolve to *this* package rather than whichever
+#: checkout the interpreter's ``.pth`` files happen to pin.  Derived from this
+#: module's own location, so it is correct for a git clone, a worktree and a
+#: pip install alike, and -- unlike ``countries_root()`` -- it is unaffected by
+#: the ``LSMS_COUNTRIES_ROOT`` override (GH #436), which may point at a config
+#: tree in a different checkout entirely.
+_PACKAGE_PARENT = Path(__file__).resolve().parent.parent
+
+
+def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
+    """Environment for a Make/wave-script subprocess on the build path.
+
+    Every build that shells out must hand the child the SAME library it is
+    itself running, or the child silently builds against another checkout.
+    That is the write side of the ``.pth`` trap (GH #803): ``to_parquet`` ->
+    ``_resolve_data_path`` only redirects a script's output under
+    :func:`data_root` when the script's file lies under the *imported*
+    package's ``countries_root()``, so a child that imports a different
+    checkout writes its parquet in-tree, where nothing will ever read it.
+
+    Both shell-out sites now build their environment here, because they did
+    not agree and the disagreement was invisible:
+
+    * ``Wave.grab_data``'s legacy wave-level fallback set ``PATH`` and
+      ``LSMS_DATA_DIR`` but no ``PYTHONPATH`` at all;
+    * ``Country.run_make_target``'s ``build_env`` set ``PYTHONPATH`` to
+      ``countries_root()`` -- which is NOT importable as ``lsms_library`` and
+      therefore, measured, leaves the child importing exactly what it would
+      have imported with no ``PYTHONPATH`` set.  It looked like a guard and
+      was not one.
+
+    ``_PACKAGE_PARENT`` is prepended so it wins over any inherited entry;
+    anything already on ``PYTHONPATH`` is preserved after it, as are any
+    *extra_pythonpath* entries a caller needs (``run_make_target`` passes
+    ``countries_root()``, which it has always put there).
+    """
+    env = os.environ.copy()
+    bin_dir = os.path.dirname(sys.executable)
+    env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+
+    parts = [str(_PACKAGE_PARENT), *(str(p) for p in extra_pythonpath)]
+    inherited = env.get("PYTHONPATH", "")
+    for entry in inherited.split(os.pathsep):
+        if entry and entry not in parts:
+            parts.append(entry)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+
+    env.setdefault("PYTHON", sys.executable)
+    env["LSMS_DATA_DIR"] = str(data_root())
+    return env
+
+
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
@@ -1621,10 +1674,9 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                env = os.environ.copy()
-                env["LSMS_DATA_DIR"] = str(data_root())
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                # GH #803 write side: the child must import THIS package, or
+                # to_parquet's redirect misses and the parquet lands in-tree.
+                env = _script_subprocess_env()
                 # Mirror ``run_make_target`` (country.py ~line 1856): include
                 # ``_make_jobs_flag()`` so this wave-level legacy fallback can
                 # exploit the cores it was given.  Without this, every
@@ -3749,17 +3801,12 @@ class Country:
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             def build_env() -> dict[str, str]:
-                env = os.environ.copy()
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-                pythonpath = env.get("PYTHONPATH", "")
-                if str(repo_root) not in pythonpath.split(os.pathsep):
-                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
-                env["PYTHONPATH"] = pythonpath
-                env.setdefault("PYTHON", sys.executable)
-                # Ensure subprocess scripts also redirect data paths
-                env["LSMS_DATA_DIR"] = str(data_root())
-                return env
+                # `repo_root` is countries_root(), which is NOT importable as
+                # `lsms_library`; passing it alone left the child importing
+                # whatever the interpreter's .pth pinned.  Keep it (callers
+                # have always had it on the path) but lead with the package
+                # parent, which is what actually fixes import identity.
+                return _script_subprocess_env(repo_root)
 
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
