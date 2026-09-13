@@ -119,6 +119,69 @@ up in countries nobody had looked at: **Benin 2018-19 Coton 12,500,000 kg**
 (``i=220065``, plot 1_2, x1,785.7) and **CotedIvoire 2018-19 Cocoa 1,500,000**
 (``i=600009``, x750).
 
+THE SECOND TABLE -- ``food_acquired.Quantity`` (GH #884), added once the #874
+Ethiopia per-source read un-suppressed 1000x data-entry unit slips that only a
+warm-time screen can name (2011-12 Onion ``Q2 = 1,400 Gram`` beside
+``Q3 = 1,400,000 Tuba``).  Same rule, same constants, measured the same way on
+every country holding a warm L2-country ``food_acquired`` parquet:
+
+=============  ===========  ======  ==========
+country               rows   fired   audit cost
+=============  ===========  ======  ==========
+Benin              187,930       0      123 ms
+Burkina_Faso       765,816      19      385 ms
+Cambodia            38,201       0       17 ms
+CotedIvoire        296,945       0      143 ms
+Ethiopia           326,456     132      151 ms
+EthiopiaRHS         54,693       0       25 ms
+GhanaLSS         5,338,617     294    3,030 ms
+GhanaSPS           407,929      18      209 ms
+Guatemala          215,982      35       69 ms
+Guinea-Bissau      126,925       0       50 ms
+Malawi             971,531     216      551 ms
+Mali               431,046   1,105      214 ms
+Niger              239,882       0       96 ms
+Nigeria            595,725      82      292 ms
+Panama             571,354      33      292 ms
+Senegal            436,576       0      227 ms
+Serbia             200,046       0       75 ms
+Tanzania           251,613      70       74 ms
+Togo               112,445       1       51 ms
+**total**     **11,569,712** **2,005**
+=============  ===========  ======  ==========
+
+2,005 of 11.57M rows (0.017%).  Three features of the census a reader should
+know before treating any of these counts as calibration:
+
+* **Ethiopia's 132 (65/25/32/8/2 by wave)** is the reviewer's own figure,
+  reproduced exactly -- the cell the issue was written around.
+* **Mali's 1,105 is 1,104 rows of a single wave** (2014-15), and the wave is a
+  REPEATED SENTINEL, not 1,104 outliers: 1,149 rows of that wave are keyed at
+  or above 9,000 -- ``9999``, ``9999.9``, ``10000``, ``10001``, ... -- an
+  unstripped missing-value code of exactly the kind this docstring's sentinel
+  section describes for Uganda's ``99999`` and Niger's ``999999``.  At ~0.9%
+  of the wave the sentinel cannot saturate its cells, so the screen sees it;
+  that is the stated accident of keying frequency, and stripping it is a
+  separate job (the Burkina Faso ``u='Unknown'`` passage-2..4 fix of #842 is
+  the pattern).
+* **Sentinel-unit rows are judged, deliberately.**  ``u='Unknown'`` /
+  ``u='Value'`` rows contribute 96 of the 2,005 (18 Unknown -- twelve of them
+  Burkina Faso 2014 rows escaping a zero-scale ``(t,u,j)`` cell onto the
+  pooled ``t`` rung; 77 Value, all GhanaLSS, mostly 1998-99/2005-06
+  pre-redenomination currency slips like Sugar 1,350,000,000 at x270,000; one
+  Panama ``7777.7`` sentinel).  A sentinel unit has no scale, so a ratio to a
+  p90 is meaningless as a MAGNITUDE -- but the value in the ``Quantity``
+  column of such a row is not a quantity at all, and the ratio is a
+  serviceable detector of a value that was keyed with the wrong number of
+  zeros.  Excluding them would silence exactly the GhanaLSS 2005-06 currency
+  slips.  They stay in; the recommendation for anyone *acting* on the list is
+  to read a sentinel-unit firing as "wrong zeros or unstripped sentinel", not
+  "harvest too large".
+
+COST on this table, same spy method: 151 ms inside the Ethiopia warm read
+(4% of 3.9 s), 3,013 ms inside the 85 s GhanaLSS read of the corpus's largest
+frame (3.5%).
+
 COST, measured INSIDE the read rather than by differencing two timed reads on
 a loaded machine (a spy on the hook, best of five, warm cache): Uganda 83 ms of
 a 2,157 ms warm ``crop_production`` read (4%), Malawi 65 ms of 1,391 ms (5%),
@@ -220,11 +283,12 @@ QUANTITY_REFERENCE_FLOOR = 1.0
 #: WHICH columns of WHICH tables are screened.  A registry of *what is looked
 #: at*, NOT an allowlist of cells excused from looking -- the distinction the
 #: no-allowlist rule turns on, and the same kind of mapping as
-#: ``country._ADDITIVE_MEASURE_COLUMNS``.  ``food_acquired.Quantity`` is the
-#: obvious extension and is deliberately absent: it is unmeasured, and it is
-#: 5.26M rows on GhanaLSS alone.
+#: ``country._ADDITIVE_MEASURE_COLUMNS``.  ``food_acquired.Quantity`` was the
+#: stated extension (#884) and is measured in the module docstring's second
+#: census: 2,005 of 11.57M rows (0.017%), 51 ms on a 5.34M-row GhanaLSS read.
 _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
     "crop_production": ("Quantity",),
+    "food_acquired": ("Quantity",),
 }
 
 #: Alternate spellings of the identifying axes, in preference order.  All of

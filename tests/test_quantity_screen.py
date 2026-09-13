@@ -168,13 +168,41 @@ def test_a_frame_without_the_column_is_not_this_guards_business():
 
 def test_an_unscreened_table_is_not_audited():
     """``_SCREENED_COLUMNS`` is a registry of what is LOOKED AT, and a table
-    that is not in it costs one dictionary lookup."""
+    that is not in it costs one dictionary lookup.  (``food_acquired`` USED to
+    be the stand-in for an unscreened table here; GH #884 screened it, so the
+    stand-in is now a table the registry genuinely does not name.)"""
     df = _cell(extras=[_outlier(9e9)])
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        assert check_quantities(df, country="T", table="food_acquired") is df
+        assert check_quantities(df, country="T", table="livestock") is df
     assert not [w for w in caught
                 if issubclass(w.category, QuantityImplausibleWarning)]
+
+
+def test_food_acquired_quantity_is_screened_and_never_altered():
+    """GH #884: the extension the registry comment had promised.  A
+    ``food_acquired``-shaped frame -- index ``(t, i, j, u, s)``, the shape the
+    corpus actually ships -- fires on the #874 Ethiopia signature (a 1,400,000
+    Tuba row beside a 1,400 Gram row), files under ``table='food_acquired'``,
+    and returns the input object with every value intact."""
+    rows = [{"t": "2011-12", "i": f"hh{k:04d}", "j": "Onion", "u": "Gram",
+             "s": "purchased", "Quantity": 100.0 * (1 + k % 10)}
+            for k in range(60)]
+    rows.append({"t": "2011-12", "i": "hh-slip", "j": "Onion", "u": "Tuba",
+                 "s": "purchased", "Quantity": 1_400_000.0})
+    df = pd.DataFrame(rows).set_index(["t", "i", "j", "u", "s"])
+    before = df["Quantity"].to_numpy(dtype="float64", na_value=np.nan).copy()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = check_quantities(df, country="Ethiopia", table="food_acquired")
+    assert out is df
+    assert np.array_equal(
+        before, df["Quantity"].to_numpy(dtype="float64", na_value=np.nan))
+    report = quantity_reports(country="Ethiopia", table="food_acquired")[0]
+    assert report["wave"] == "2011-12"
+    offender = report["offenders"][0]
+    assert offender["i"] == "hh-slip" and offender["u"] == "Tuba"
+    assert offender["value"] == 1_400_000.0
 
 
 # ---------------------------------------------------------------------------
