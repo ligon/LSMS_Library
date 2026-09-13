@@ -1,0 +1,24 @@
+#+TITLE: GhanaLSS nonfood_expenditures — how the item vocabulary was generated
+#+DATE: 2026-09-12
+
+The =nonfood_items= table in =GhanaLSS/_/categorical_mapping.org= is GENERATED.
+Regenerate it with:
+
+#+begin_src sh
+REPO=<repo> PYTHONPATH=<repo>:. python gen_nonfood_items.py   # -> .org fragment
+#+end_src
+
+=nf_labels.py= collects each wave's code -> label from that wave's OWN source
+and nothing else: GLSS5 / GLSS6 from the Stata value labels on =lfreqcd=
+(250 / 251 codes), GLSS7 from the =s9aname= column, which that wave ships
+INSTEAD of value labels.
+
+=gen_nonfood_items.py= rank-disambiguates labels shared by more than one code
+inside a wave (GLSS7 code 28 is literally "men", a label nine codes share), so
+=j= stays injective, and emits one =Code_<wave>= column per wave — never a
+shared one, because GLSS6 shifts every GLSS5 code from 4 onward.
+
+Measured output: 687 rows; all 250 GLSS5 codes share a row with GLSS6; 71 rows
+carry all three waves; 436 are GLSS7-only.  Design, decisions and the
+verification run: =.coder/ledger/ghanalss-nonfood-expenditures.md= and
+=GhanaLSS/_/CONTENTS.org=, "nonfood_expenditures — Section 9A only".

@@ -37,7 +37,7 @@ COUNTRIES = REPO / "lsms_library" / "countries"
 
 sys.path.insert(0, str(REPO))
 from lsms_library.recall import (  # noqa: E402
-    ASK_COUNT_BASES, BASIS_LADDER, VARIATION_AXES,
+    ASK_COUNT_BASES, BASIS_LADDER, VARIATION_AXES, WEAK_BASES,
 )
 
 HEADER = """\
@@ -49,7 +49,7 @@ HEADER = """\
 #
 #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
 #
-# Only 8 of the corpus's 34 stated windows are questionnaire-grade.  A
+# Only {questionnaire} of the corpus's {stated} stated windows are questionnaire-grade.  A
 # `config-comment` rung means a maintainer asserted the number, not that an
 # instrument states it -- consumers are entitled to discount it, and a
 # `not-recorded` rung means nobody has looked, which is NOT the same as "no
@@ -63,6 +63,20 @@ HEADER = """\
 
 Recall:
 """
+
+
+def basis_counts(rows: list[dict]) -> tuple[int, int]:
+    """``(questionnaire-grade, stated)`` over the whole CSV.
+
+    COUNTED, never asserted.  This sentence is regenerated into every
+    ``recall.yml``, and the pair was hardcoded: it read "8 of 34" while the CSV
+    said 11 of 34, because rung corrections land in the CSV and nothing made
+    the prose follow.  `stated` is "not on a rung that fails to establish a
+    window", i.e. :data:`WEAK_BASES`, so the two readings cannot drift apart.
+    """
+    bases = [_clean(r.get("basis")) or "not-recorded" for r in rows]
+    return (sum(b == "questionnaire" for b in bases),
+            sum(b not in WEAK_BASES for b in bases))
 
 
 def _clean(v: str | None) -> str:
@@ -120,8 +134,8 @@ def ask_count_basis(country: str, record_has_visit_level: bool, asks) -> str:
     return "declared"
 
 
-def render(country: str, rows: list[dict], has_visit: bool) -> str:
-    out = [HEADER]
+def render(country: str, rows: list[dict], has_visit: bool, header: str) -> str:
+    out = [header]
     for r in sorted(rows, key=lambda x: x["wave"]):
         wave = r["wave"]
         var = _clean(r.get("within_wave_variation")) or None
@@ -172,6 +186,9 @@ def main() -> int:
             print("  " + e)
         return 1
 
+    q, stated = basis_counts(rows)
+    header = HEADER.format(questionnaire=q, stated=stated)
+
     by_country: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
         by_country[r["country"]].append(r)
@@ -184,7 +201,7 @@ def main() -> int:
             continue
         has_visit = any(_num(_clean(r.get("n_visits")), int) or 0 > 1
                         for r in crows) or country in _VISIT_LEVEL_COUNTRIES
-        text = render(country, crows, has_visit)
+        text = render(country, crows, has_visit, header)
         if not args.check:
             (cdir / "recall.yml").write_text(text)
         written += 1
