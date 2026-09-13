@@ -396,6 +396,18 @@ Every guard above stops one question short. The shape guards ask whether a decla
 | accessor | `quantity_reports(country=, table=)`, twin of `null_read_reports()`; each report carries every offender, not just the dozen the warning prints |
 | scope | `crop_production.Quantity` only (`_SCREENED_COLUMNS` is the extension point); 30,876 rows corpus-wide get no reference at all and are never judged |
 
+## Site I: a NaN on a DECLARED INDEX LEVEL (`null_index_audit.py`, GH #847)
+
+Every guard above stops one question short of the index itself. Site B asks whether a declared column holds anything; `_audit_index_collapse` asks whether the index is unique (and counts the NaN-keyed rows its own collapse deletes, GH #323 §3b); Site Q asks whether a value is possible. None looks at a **partly-null declared index level on the read path** — where a wave's index happens to be unique no collapse runs, the rows are served intact, and nothing anywhere counts them. The row then vanishes in the first `groupby` anything reaches (pandas' `groupby` defaults to `dropna=True`), and the loss is attributed to the consumer's code. **Site I** (in `Country._finalize_result`, beside Sites B and Q) counts NaN keys per level, per wave `t`, over the union of the country's own `data_scheme.yml` declaration and the canonical `data_info.yml` Index Info (plus `level_aliases`, so Uganda's `plot` spelling is still checked) — then **warns and names**. It never fills and never drops: the country-level fix (a sentinel like Niger's `'Unknown'` at GH #842, or an explicit drop-with-count) is a separate country decision; this issue is only the report. Same warn-by-default, **same `LSMS_READ_STRICT` lever as `null_read_audit`** (a NaN key is the null-content class sitting on the index axis, not a fourth concern), own `NullIndexKeyWarning` class, `null_index_reports(country=, table=)` accessor, deliberately no allowlist.
+
+| | measured |
+|---|---|
+| trigger | any NaN on a level named by the table's declared index (scheme ∪ canonical Index Info ∪ aliases), counted per wave `t` |
+| corpus firing | **19 cells of 384 warm L2 tables** (`bench/null_index_census.py`, 2026-09-13): GhanaLSS `food_acquired` u=13,380 (2016-17), GhanaLSS `plot_features` plot_id=13,944, CotedIvoire `crop_production` u=6,365, Malawi `crop_production` u=8,535 + plot_id=40, GhanaSPS `food_acquired` u=13,903, Niger `crop_production` v=2 (2011-12), plus a 1–1,000-row tail. No threshold, no exclusion — 19 cells is a work queue, not a firehose |
+| cost | integer-code arithmetic per declared level; ~0.03–0.07 ms on Niger's 46k-row read, ~0.4 ms on the corpus's largest frame (GhanaLSS `food_acquired`, 5.34M rows); zero I/O |
+| lever | `LSMS_READ_STRICT=1` → `NullIndexKeyError` (shared with `null_read_audit`, deliberately — not a fourth lever) |
+| cache | pure reporting, input returned unchanged; `check_index_levels` / `audit_index_levels` in `_EXCLUDED_CALLABLES`, `_NULL_INDEX_LEDGER` in `_EXCLUDED_CONSTANTS`. Stash-probe: **0 of 10** probed `_table_cache_hash` values and **0 of 3** `build_transforms_fingerprint` values moved |
+
 ## Coverage Matrix (v0.9.0+)
 
 `make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
