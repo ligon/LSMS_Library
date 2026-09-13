@@ -157,6 +157,11 @@ _EXCLUDED_CALLABLES = frozenset({
     # cannot silently cold-rebuild the corpus by re-wording a warning.
     "lsms_library.quantity_audit.check_quantities",
     "lsms_library.quantity_audit.audit_quantities",
+    # The null-index-key audit (null_index_audit, GH #847): the same argument,
+    # one of the four guards up.  Counts NaN keys on declared index levels and
+    # warns; provably returns its input unchanged.
+    "lsms_library.null_index_audit.check_index_levels",
+    "lsms_library.null_index_audit.audit_index_levels",
     # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
     # file, never changes what a build writes; reached from grab_data and
     # run_make_target, so without this exclusion re-wording the warning would
@@ -200,7 +205,8 @@ _EXCLUDED_CALLABLES = frozenset({
 # referencing function's module, so ``from .country import _GRAIN_LEDGER`` in
 # some other tagged module would otherwise fold it under that module's prefix.
 _EXCLUDED_CONSTANTS = frozenset(
-    {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER"})
+    {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
+     "_NULL_INDEX_LEDGER"})
 
 
 def _is_build_callable(obj) -> bool:

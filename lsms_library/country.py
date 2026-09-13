@@ -60,6 +60,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
@@ -97,6 +98,59 @@ JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 # food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
 # ``#+name: u`` categorical table must not remap these on *derived* food
 # tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+#: Directory that must be on a build subprocess's ``PYTHONPATH`` for
+#: ``import lsms_library`` to resolve to *this* package rather than whichever
+#: checkout the interpreter's ``.pth`` files happen to pin.  Derived from this
+#: module's own location, so it is correct for a git clone, a worktree and a
+#: pip install alike, and -- unlike ``countries_root()`` -- it is unaffected by
+#: the ``LSMS_COUNTRIES_ROOT`` override (GH #436), which may point at a config
+#: tree in a different checkout entirely.
+_PACKAGE_PARENT = Path(__file__).resolve().parent.parent
+
+
+def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
+    """Environment for a Make/wave-script subprocess on the build path.
+
+    Every build that shells out must hand the child the SAME library it is
+    itself running, or the child silently builds against another checkout.
+    That is the write side of the ``.pth`` trap (GH #803): ``to_parquet`` ->
+    ``_resolve_data_path`` only redirects a script's output under
+    :func:`data_root` when the script's file lies under the *imported*
+    package's ``countries_root()``, so a child that imports a different
+    checkout writes its parquet in-tree, where nothing will ever read it.
+
+    Both shell-out sites now build their environment here, because they did
+    not agree and the disagreement was invisible:
+
+    * ``Wave.grab_data``'s legacy wave-level fallback set ``PATH`` and
+      ``LSMS_DATA_DIR`` but no ``PYTHONPATH`` at all;
+    * ``Country.run_make_target``'s ``build_env`` set ``PYTHONPATH`` to
+      ``countries_root()`` -- which is NOT importable as ``lsms_library`` and
+      therefore, measured, leaves the child importing exactly what it would
+      have imported with no ``PYTHONPATH`` set.  It looked like a guard and
+      was not one.
+
+    ``_PACKAGE_PARENT`` is prepended so it wins over any inherited entry;
+    anything already on ``PYTHONPATH`` is preserved after it, as are any
+    *extra_pythonpath* entries a caller needs (``run_make_target`` passes
+    ``countries_root()``, which it has always put there).
+    """
+    env = os.environ.copy()
+    bin_dir = os.path.dirname(sys.executable)
+    env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+
+    parts = [str(_PACKAGE_PARENT), *(str(p) for p in extra_pythonpath)]
+    inherited = env.get("PYTHONPATH", "")
+    for entry in inherited.split(os.pathsep):
+        if entry and entry not in parts:
+            parts.append(entry)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+
+    env.setdefault("PYTHON", sys.executable)
+    env["LSMS_DATA_DIR"] = str(data_root())
+    return env
+
+
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
@@ -1621,10 +1675,9 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                env = os.environ.copy()
-                env["LSMS_DATA_DIR"] = str(data_root())
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                # GH #803 write side: the child must import THIS package, or
+                # to_parquet's redirect misses and the parquet lands in-tree.
+                env = _script_subprocess_env()
                 # Mirror ``run_make_target`` (country.py ~line 1856): include
                 # ``_make_jobs_flag()`` so this wave-level legacy fallback can
                 # exploit the cores it was given.  Without this, every
@@ -3270,6 +3323,46 @@ class Country:
             check_quantities(
                 df, country=self.name, table=str(method_name or "?"))
 
+            # SITE I (GH #847): a NaN on a DECLARED INDEX LEVEL.  Site B asks
+            # whether a declared column holds anything; this asks the same of
+            # the declared levels themselves.  The row is SERVED, so no
+            # build-path guard fires; it vanishes in the first groupby
+            # (`groupby` defaults to dropna=True), counted at the collapse by
+            # GH #323 and otherwise never counted.  Warns-and-names, same
+            # ledger pattern as the other two guards; the country-level fix
+            # (sentinel / explicit drop) is deliberately not a framework
+            # function.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read (warm cache included), so no stamp-and-replay is
+            # needed; and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  Measured (stash-probe,
+            # 2026-09-13): 0 of 10 probed table hashes and 0 of 3 build
+            # fingerprints moved.
+            #
+            # The level list is the union of the country's OWN declaration
+            # (`data_scheme.yml`, under whatever spelling it uses) and the
+            # canonical one (`data_info.yml`'s Index Info, plus the table's
+            # `level_aliases` spellings -- e.g. Niger declares no `v` but the
+            # v-join adds one, and Uganda spells the plot axis `plot` where
+            # the canonical name is `plot_id`).  A frame whose index matches
+            # either list still names the NaN-keyed level; both lists are
+            # cheap to build and the audit only ever inspects levels the
+            # frame actually carries.
+            _index_levels = list(_declared_index_levels(scheme_entry))
+            _canonical = _canonical_index_levels().get(str(method_name or ""), ())
+            _aliases = _canonical_index_level_aliases().get(str(method_name or ""), {})
+            for lvl in _canonical:
+                if lvl not in _index_levels:
+                    _index_levels.append(lvl)
+                alias_of = {a for a, c in _aliases.items() if c == lvl}
+                for a in alias_of:
+                    if a not in _index_levels:
+                        _index_levels.append(a)
+            check_index_levels(
+                df, _index_levels,
+                country=self.name, table=str(method_name or "?"))
+
         return df
 
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
@@ -3749,17 +3842,12 @@ class Country:
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             def build_env() -> dict[str, str]:
-                env = os.environ.copy()
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-                pythonpath = env.get("PYTHONPATH", "")
-                if str(repo_root) not in pythonpath.split(os.pathsep):
-                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
-                env["PYTHONPATH"] = pythonpath
-                env.setdefault("PYTHON", sys.executable)
-                # Ensure subprocess scripts also redirect data paths
-                env["LSMS_DATA_DIR"] = str(data_root())
-                return env
+                # `repo_root` is countries_root(), which is NOT importable as
+                # `lsms_library`; passing it alone left the child importing
+                # whatever the interpreter's .pth pinned.  Keep it (callers
+                # have always had it on the path) but lead with the package
+                # parent, which is what actually fixes import identity.
+                return _script_subprocess_env(repo_root)
 
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
@@ -5353,6 +5441,72 @@ def _no_v_join_tables() -> frozenset[str]:
         return _compute_no_v_join(data)
     except Exception:
         return _NO_V_JOIN_FALLBACK
+
+
+def _parse_index_info(data: dict) -> dict[str, list[str]]:
+    """``Index Info > index_info`` as ``{table: [level, ...]}``.
+
+    Pure parsing -- the same paren/comma shape :func:`_compute_no_v_join`
+    reads, factored so the Site-I audit (GH #847) and the v-join set never
+    disagree on what the canonical index of a table *is*.  Tables without a
+    string entry are skipped.
+    """
+    out: dict[str, list[str]] = {}
+    if not isinstance(data, dict):
+        return out
+    specs = (data.get("Index Info", {}) or {}).get("index_info", {}) or {}
+    for table, spec in specs.items():
+        if not isinstance(spec, str):
+            continue
+        cleaned = spec.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        levels = [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+        if levels:
+            out[str(table)] = levels
+    return out
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_level_aliases() -> dict[str, dict[str, str]]:
+    """Per-table ``level_aliases`` from ``data_info.yml``: ``{table: {alias: canonical}}``.
+
+    Read once with the canonical levels so a country that spells an axis by
+    its alias (Uganda's ``plot`` for the canonical ``plot_id``, or ``crop``
+    for ``j``) is still checked under the name its frame carries.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        aliases = ((data.get("Index Info", {}) or {}).get("level_aliases")
+                   or {})
+        return {str(t): {str(a): str(c) for a, c in m.items()}
+                for t, m in aliases.items() if isinstance(m, dict)}
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_levels() -> dict[str, list[str]]:
+    """The canonical per-table index from ``data_info.yml`` (Index Info).
+
+    Deliberately separate from the country's ``data_scheme.yml``: the scheme
+    declares what the country EMITS (Uganda's ``crop_production`` spells the
+    plot axis ``plot``, no ``v``), while the served frame carries the v-joined,
+    aliased canonical index.  The null-index audit (GH #847) reads both --
+    the scheme's own list plus the canonical one -- so a level that exists
+    under either spelling is still named on the frame it reaches.  Returns
+    ``{}`` when the file is unreadable, matching the v-join fallback's
+    "never invent a declaration" posture.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return _parse_index_info(data)
+    except Exception:
+        return {}
 
 
 @lru_cache(maxsize=1)

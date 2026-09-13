@@ -35,6 +35,11 @@ def test_known_metric_unchanged():
     spellings below are labels the corpus actually mints and the library was
     inferring a weight for.  ``Millilitre`` was served at 0.743 kg in Malawi,
     ``Grams`` at 0.706, Mali's ``Gramme`` at 0.708 -- against a true 0.001.
+
+    Updated 2026-09-13 for GH #838: ``milligramme(s)`` (GhanaLSS),
+    ``centilitre(s)`` (Mali, Ethiopia), ``quintal(s)`` (Ethiopia; the metric
+    centner, 100 kg) and ``tonne(s)`` (Mali, Niger, GhanaSPS) are labels the
+    corpus mints that still fell through to the inference.
     """
     expected = {
         'kg': 1, 'kilogram': 1, 'kilogramme': 1,
@@ -42,11 +47,14 @@ def test_known_metric_unchanged():
         'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
         'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
         'gm': 1/1000, 'gms': 1/1000,
-        'milligram': 1e-6,
+        'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
+        'quintal': 100, 'quintals': 100,
+        'tonne': 1000, 'tonnes': 1000,
         'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
         'ml': 1/1000, 'cl': 1/100,
         'millilitre': 1/1000, 'milliliter': 1/1000,
         'millilitres': 1/1000, 'milliliters': 1/1000, 'mili liter': 1/1000,
+        'centilitre': 1/100, 'centilitres': 1/100,
         'pound': 0.453592, 'lbs': 0.453592,
     }
     assert KNOWN_METRIC == expected

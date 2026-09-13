@@ -1154,6 +1154,28 @@ written into that code's own =harvest_units= label — across nine distinct unit
 1 674 of the 1 706 =Kg= rows report a factor of exactly 1.  A column that
 happens to be mislabelled cannot do this; a column that IS the unit must.
 
+**** GH #850 widened which units resolve, and with them the test's basis
+
+Until [[https://github.com/ligon/LSMS_Library/issues/850][#850]] (=60f98ab1d=) =_parse_explicit_metric= matched
+=(?:kg|kilogram|kilogramme)\b=, and the =\b= after =kg= *rejects the plural*
+— so =Sack (50 kgs)= and =Tin (Debe) (20 lts)= never parsed their own stated
+weight and fell through to the price-ratio inference.  Six container units
+began resolving afterwards: Sack 100 (1 449 rows), Basin 15 lts (1 194),
+Sack 120 (316), Sack 50 (242), Tin 20 lts (232), Tin 5 lts (32) = *3 465*.
+
+The consequence for anyone reading the agreement statistic: the rows carrying
+BOTH a reported =a5bq6d= and a label-derived weight went *1 922 -> 5 410*
+(5 410 - 3 465 = 1 945, i.e. the whole original population plus the
+containers).  The containers are precisely where one farmer's "100 kg sack" is
+another's 80, so the *pooled* share agreeing within +/-20% fell 95.0% -> 74.7%
+while the *median* stayed 1.000 and every per-unit median above held.
+
+That dispersion is a property of the survey, not a signal about the wiring:
+=tests/test_gh842_uganda_harvest_unit.py= therefore asserts the *per-unit*
+median (9 of 10 units EXACTLY 1.000, =Sack (120 kgs)= 0.833 per the table
+above), not the pooled share.  Do not re-tighten the pooled threshold — it
+measures how many containers resolve, which is a library fact, not a Uganda one.
+
 *** =KgFactor=: the reported kg rate is now carried
 
 =a5aq6d= / =a5bq6d= ("6d. Record the conversion factor into kg") are carried

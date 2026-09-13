@@ -32,7 +32,31 @@ jobs:
       - name: Run tests
         env:
           LSMS_SKIP_AUTH: "1"
-        run: poetry run pytest
+          # One BLAS thread per worker.  OpenBLAS sizes its pool from `nproc`,
+          # NOT from the xdist worker count, so `-n auto` x default threads
+          # oversubscribes the runner and dies in `blas_thread_init:
+          # pthread_create failed` -- which does not look like a test failure.
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          # One wave build at a time, per the Makefile recipe (AGENTS.md 3b).
+          LSMS_BUILD_WORKERS: "1"
+        # `--dist=loadfile` keeps one file's tests on one worker: the default
+        # `--dist=load` scatters them, so several workers build the same table
+        # at once (AGENTS.md, scrum-master addendum 3b).
+        #
+        # `--timeout` is the point of the pytest-timeout dependency, which was
+        # declared and then never configured -- so a test that blocked on the
+        # network ran to the 6-hour job limit and was indistinguishable from a
+        # slow suite.  600 s is well above the slowest legitimate test and well
+        # below anything anyone wants to wait for.
+        #
+        # `--durations` because this job took 1 h 58 m on 2026-09-13 and
+        # nothing in its output said where the time went.
+        run: >-
+          poetry run pytest -n auto --dist=loadfile
+          --timeout=600 --timeout-method=thread
+          --durations=25
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
