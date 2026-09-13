@@ -176,8 +176,9 @@ with np.errstate(divide='ignore', invalid='ignore'):
 out.loc[~np.isfinite(out['Price']), 'Price'] = np.nan
 
 idx = ['t', 'i', 'j', 'u', 's']
-agg = {'Quantity': 'sum', 'Expenditure': 'sum', 'Price': 'mean'}
-out = out.groupby(idx, dropna=False).agg(agg)
+out = out.groupby(idx, dropna=False).agg(Quantity=('Quantity', lambda s: s.sum(min_count=1)),
+                                          Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
+                                          Price=('Price', 'mean'))
 out = out.dropna(how='all')
 
 if __name__ == '__main__':
