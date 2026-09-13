@@ -166,6 +166,7 @@ def delivered(country):
     return fa
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     @pytest.mark.parametrize('wave', WAVES)

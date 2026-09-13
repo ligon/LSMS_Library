@@ -741,3 +741,1000 @@ one name and each gets them from the level it asks at: =nutrition= and
 | Wine                                 |                                |                                | Wine                           | Wine                           | Wine                         | Wine                         | Wine                          | 12_006   |
 | Yam                                  | Yam                            | Yam                            | Yam                            | Yam                            | Yam                          | Yam                          | Yam                           | 02_019   |
 | Yoghurt                              |                                |                                |                                |                                |                              |                              | Yoghurt                       | 10_005   |
+
+
+* Non-food items (Section 9A)
+
+Section 9A, "NON-FOOD EXPENSES (LESS FREQUENTLY PURCHASED ITEMS)", 12-month
+recall.  GENERATED -- regenerate with the script recorded in
+=.coder/ledger/ghanalss-nonfood-expenditures.md=; each wave's labels come from
+that wave's OWN source, never from a sibling:
+
+- =2005-06= / =2012-13=: the Stata value labels on =lfreqcd= (250 / 251 codes).
+- =2016-17=: the =s9aname= column, which GLSS7 ships INSTEAD of value labels
+  (=lfreqcd= has none).  Populated on 275,282 of 275,293 reported rows.
+
+*THE CODES ARE NOT COMPARABLE ACROSS WAVES.*  GLSS6 inserts =imported (china)=
+at code 4 and shifts every later code by one, so GLSS5 =5= ("kente men") is
+GLSS6 =6=, and GLSS5 =100= ("shovels,rakes,wheelbarrows") is GLSS6 =101=.  Of
+the 250 codes the two waves share, *only 4 carry the same label*.  Hence one
+=Code_<wave>= column per wave and never a shared one.
+
+*THE LABELS ARE NOT SELF-IDENTIFYING.*  The printed form groups items under
+headings (=Garments= -> =Kente (Men)=, =Suit=, =Men=, =women=), and only the
+leaf text reaches the =.dta=: GLSS7 code 28 is literally "men", and that label
+is shared by nine codes.  A label used by more than one code IN ITS OWN WAVE is
+therefore disambiguated by its RANK in code order -- "Men (1)" ... "Men (9)" --
+which keeps =j= injective (GH #323 / #783) and is stable across GLSS5/GLSS6
+because the shift preserves the ordering.  The raw text is kept verbatim in
+=Label_<wave>= as documentation of the source spelling; do not "fix" it.
+
+*GLSS5 and GLSS6 share one vocabulary; GLSS7 has its own.*  All 250 GLSS5
+codes land on a row GLSS6 also occupies.  GLSS7 restructured the basket
+(250 -> 508 items, CPI-aligned): only *71* rows carry all three waves, and 436
+rows are GLSS7-only.  A GLSS6 -> GLSS7 crosswalk would have to be hand-curated
+against the two questionnaires and is NOT attempted here -- fuzzy-matching
+"air conditioners and air coolers" onto "air conditioner - split chassis
+(cool)" would pool two different items, which is the failure =j= injectivity
+exists to prevent.  Consequence, stated plainly: *comparing a GLSS7 =j= with a
+GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
+
+#+name: nonfood_items
+| Preferred Label | Code_2005-06 | Code_2012-13 | Code_2016-17 | Label_2005-06 | Label_2012-13 | Label_2016-17 |
+|-----------------|--------------|--------------|--------------|---------------|---------------|---------------|
+| 6-string basic acoustic guitar for beginner |  |  | 504 |  |  | 6-string basic acoustic guitar for beginner |
+| Aa alkaline batteries |  |  | 334 |  |  | aa alkaline batteries |
+| Agent fees (house agents) |  |  | 638 |  |  | agent fees (house agents) |
+| Agents fees (house agents) | 247 | 248 |  | agents fees (house agents) | agents fees (house agents) |  |
+| Air conditioner - split chassis (cool) |  |  | 278 |  |  | air conditioner - split chassis (cool) |
+| Air conditioner repair |  |  | 305 |  |  | air conditioner repair |
+| Air conditioners and air coolers | 81 | 82 |  | air conditioners and air coolers | air conditioners and air coolers |  |
+| Aluminium cooking utensils (lmported) |  |  | 312 |  |  | aluminium cooking utensils (lmported) |
+| Aluminium cooking utensils (local) | 94 | 95 | 311 | aluminium cooking utensils (local) | aluminium cooking utensils (local) | aluminium cooking utensils (local) |
+| Aluminum sheets |  |  | 176 |  |  | aluminum sheets |
+| Analogue travel alarm, quartz |  |  | 604 |  |  | analogue travel alarm, quartz |
+| Animal drawn cart |  |  | 398 |  |  | animal drawn cart |
+| Antivirus software (specify) |  |  | 619 |  |  | antivirus software (specify) |
+| Apple iphone |  |  | 445 |  |  | apple iphone |
+| Apprenticeship fees (eg, seamstress, carpentry, hairdresser) |  |  | 584 |  |  | apprenticeship fees (eg, seamstress, carpentry, hairdresser) |
+| Asbestos sheets |  |  | 178 |  |  | asbestos sheets |
+| Automatic blood pressure monitor - upper arm |  |  | 352 |  |  | automatic blood pressure monitor - upper arm |
+| Automobile radio with cd player, mp3 playback |  |  | 459 |  |  | automobile radio with cd player, mp3 playback |
+| Azargloss emulsion |  |  | 191 |  |  | azargloss emulsion |
+| Azargloss oil |  |  | 192 |  |  | azargloss oil |
+| Babies bodysuit |  |  | 56 |  |  | babies bodysuit |
+| Baby sitters,day care attendants, nannies etc |  |  | 344 |  |  | baby sitters,day care attendants, nannies etc |
+| Baby sitters,day care attendants,nannies etc | 114 | 115 |  | baby sitters,day care attendants,nannies etc | baby sitters,day care attendants,nannies etc |  |
+| Barbie baby doll for girls |  |  | 509 |  |  | barbie baby doll for girls |
+| Beaches | 197 | 198 |  | beaches | beaches |  |
+| Bed sheet (cotton) double bed |  |  | 258 |  |  | bed sheet (cotton) double bed |
+| Bed sheet (cotton) single bed |  |  | 259 |  |  | bed sheet (cotton) single bed |
+| Bedsheets and blankets | 77 | 78 |  | bedsheets and blankets | bedsheets and blankets |  |
+| Bedsteads | 68 | 69 |  | bedsteads | bedsteads |  |
+| Blanket, polyester - double |  |  | 261 |  |  | blanket, polyester - double |
+| Blanket, polyester - single |  |  | 260 |  |  | blanket, polyester - single |
+| Blenders | 87 | 88 | 298 | blenders | blenders | blenders |
+| Boubou |  |  | 44 |  |  | boubou |
+| Boy's jogging suit |  |  | 52 |  |  | boy's jogging suit |
+| Boy's shirt, long sleeves |  |  | 51 |  |  | boy's shirt, long sleeves |
+| Boy's shirt, short sleeves |  |  | 50 |  |  | boy's shirt, short sleeves |
+| Boy's two piece dress |  |  | 48 |  |  | boy's two piece dress |
+| Boy's underpants |  |  | 53 |  |  | boy's underpants |
+| Boy's undershirt (singlet) |  |  | 49 |  |  | boy's undershirt (singlet) |
+| Brake repair |  |  | 422 |  |  | brake repair |
+| Branded t-shirt |  |  | 65 |  |  | branded t-shirt |
+| Bricks |  |  | 180 |  |  | bricks |
+| Bricks and cement blocks | 51 | 52 |  | bricks and cement blocks | bricks and cement blocks |  |
+| Brokerage charges | 244 | 245 | 635 | brokerage charges | brokerage charges | brokerage charges |
+| Brooms | 106 | 107 | 338 | brooms | brooms | brooms |
+| Bucket |  |  | 316 |  |  | bucket |
+| Buckets | 97 | 98 |  | buckets | buckets |  |
+| Budget hotel, capital city  no star bed only |  |  | 593 |  |  | budget hotel, capital city  no star bed only |
+| Calanders | 202 | 203 |  | calanders | calanders |  |
+| Calculator (scientific) |  |  | 493 |  |  | calculator (scientific) |
+| Calculators/organizers | 166 | 167 |  | calculators/organizers | calculators/organizers |  |
+| Calendars |  |  | 562 |  |  | calendars |
+| Cambridge |  |  | 554 |  |  | cambridge |
+| Car battery - boliden |  |  | 406 |  |  | car battery - boliden |
+| Car battery - bosch |  |  | 405 |  |  | car battery - bosch |
+| Car battery - ganiva |  |  | 407 |  |  | car battery - ganiva |
+| Car battery - other |  |  | 409 |  |  | car battery - other |
+| Car battery - visca |  |  | 408 |  |  | car battery - visca |
+| Car hire, hertz/avis |  |  | 425 |  |  | car hire, hertz/avis |
+| Car hire, well-known |  |  | 426 |  |  | car hire, well-known |
+| Carpentary services |  |  | 218 |  |  | carpentary services |
+| Cd/dvd |  |  | 497 |  |  | cd/dvd |
+| Cement(minor repairs) | 49 | 50 | 170 | cement(minor repairs) | cement(minor repairs) | cement(minor repairs) |
+| Charcoal  maxibag |  |  | 230 |  |  | charcoal  maxibag |
+| Charcoal  minibag |  |  | 231 |  |  | charcoal  minibag |
+| Charges for money orders, bankers drafts |  |  | 634 |  |  | charges for money orders, bankers drafts |
+| Charges for money orders/bankers draft/charges for bank sevi | 245 | 246 |  | charges for money orders/bankers draft/charges for bank sevi | charges for money orders/bankers draft/charges for bank sevi |  |
+| Chest of drawers (3 pull out drawers) |  |  | 244 |  |  | chest of drawers (3 pull out drawers) |
+| Children (1) | 36 | 37 | 77 | children | children | children |
+| Children (2) | 39 | 40 | 81 | children | children | children |
+| Children (3) | 46 | 47 | 85 | children | children | children |
+| Children (4) |  |  | 89 |  |  | children |
+| Children (5) |  |  | 134 |  |  | children |
+| Children (6) |  |  | 156 |  |  | children |
+| Children clothing | 31 | 32 |  | children clothing | children clothing |  |
+| Children footwear | 42 | 43 |  | children footwear | children footwear |  |
+| Childrens dress shoes |  |  | 151 |  |  | childrens dress shoes |
+| Childrens long boots |  |  | 152 |  |  | childrens long boots |
+| Cinema/theatre/video houses |  |  | 539 |  |  | cinema/theatre/video houses |
+| Cinemas (visiting) | 193 | 194 |  | cinemas (visiting) | cinemas (visiting) |  |
+| Clothing materials for children | 9 | 10 |  | clothing materials for children | clothing materials for children |  |
+| Clothing materials for men | 7 | 8 |  | clothing materials for men | clothing materials for men |  |
+| Clothing materials for women | 8 | 9 |  | clothing materials for women | clothing materials for women |  |
+| Cloths: local (super and ordinary | 1 | 1 |  | cloths: local (super and ordinary | cloths: local (super and ordinary |  |
+| Clutch repair |  |  | 421 |  |  | clutch repair |
+| Coalpots |  |  | 282 |  |  | coalpots |
+| Color passport pictures set |  |  | 544 |  |  | color passport pictures set |
+| Combs,shavers,etc | 232 | 233 |  | combs,shavers,etc | combs,shavers,etc |  |
+| Compaq (1) |  |  | 475 |  |  | compaq |
+| Compaq (2) |  |  | 480 |  |  | compaq |
+| Compost for gardening | 184 | 185 | 519 | compost for gardening | compost for gardening | compost for gardening |
+| Concert and music attendance | 200 | 201 |  | concert and music attendance | concert and music attendance |  |
+| Concert/club and music attendance |  |  | 546 |  |  | concert/club and music attendance |
+| Consultation with a pediatrician medical practitioner |  |  | 361 |  |  | consultation with a pediatrician medical practitioner |
+| Coral emulsion |  |  | 196 |  |  | coral emulsion |
+| Corded (specify) |  |  | 438 |  |  | corded (specify) |
+| Cordless (specify) |  |  | 439 |  |  | cordless (specify) |
+| Corrective eye-glasses & contact lenses | 117 | 118 | 356 | corrective eye-glasses & contact lenses | corrective eye-glasses & contact lenses | corrective eye-glasses & contact lenses |
+| Cost of bed occupancy per day (health facilities) |  |  | 588 |  |  | cost of bed occupancy per day (health facilities) |
+| Cost of private dental services | 123 | 124 | 367 | cost of private dental services | cost of private dental services | cost of private dental services |
+| Cost of public dental services | 122 | 123 |  | cost of public dental services | cost of public dental services |  |
+| Cost of travel by air | 250 | 251 |  | cost of travel by air | cost of travel by air |  |
+| Cost of veterinary products | 188 | 189 | 527 | cost of veterinary products | cost of veterinary products | cost of veterinary products |
+| Cotton blouse |  |  | 43 |  |  | cotton blouse |
+| Covering the seat of padded chair |  |  | 254 |  |  | covering the seat of padded chair |
+| Cultural festivals donations |  |  | 549 |  |  | cultural festivals donations |
+| Cultural festivals(donations) (hommowo odwira, etc) | 199 | 200 |  | cultural festivals(donations) (hommowo odwira, etc) | cultural festivals(donations) (hommowo odwira, etc) |  |
+| Cups |  |  | 307 |  |  | cups |
+| Cups and plates | 91 | 92 |  | cups and plates | cups and plates |  |
+| Curtain material |  |  | 264 |  |  | curtain material |
+| Cutlasses | 99 | 100 | 324 | cutlasses | cutlasses | cutlasses |
+| Cutleries | 93 | 94 | 310 | cutleries | cutleries | cutleries |
+| Dell (1) |  |  | 473 |  |  | dell |
+| Dell (2) |  |  | 478 |  |  | dell |
+| Dell (3) |  |  | 483 |  |  | dell |
+| Dell (4) |  |  | 489 |  |  | dell |
+| Dentist | 120 | 121 |  | dentist | dentist |  |
+| Dentist: extraction of a tooth |  |  | 365 |  |  | dentist: extraction of a tooth |
+| Dentist: filling |  |  | 366 |  |  | dentist: filling |
+| Diaries |  |  | 563 |  |  | diaries |
+| Digital photo camera (specify) |  |  | 467 |  |  | digital photo camera (specify) |
+| Digital prints |  |  | 540 |  |  | digital prints |
+| Digital therapeutical thermometer |  |  | 349 |  |  | digital therapeutical thermometer |
+| Dining pots/utensils | 92 | 93 | 309 | dining pots/utensils | dining pots/utensils | dining pots/utensils |
+| Dishwasher |  |  | 275 |  |  | dishwasher |
+| Diskettes and cd/dvd-roms | 170 | 171 |  | diskettes and cd/dvd-roms | diskettes and cd/dvd-roms |  |
+| Doctors consulting fee: private hospital | 119 | 120 | 362 | doctors consulting fee: private hospital | doctors consulting fee: private hospital | doctors consulting fee: private hospital |
+| Doctors consulting fee:public hospital | 118 | 119 | 358 | doctors consulting fee:public hospital | doctors consulting fee:public hospital | doctors consulting fee:public hospital |
+| Dress coat |  |  | 63 |  |  | dress coat |
+| Dress material (local - super & ordinary) (1) |  |  | 7 |  |  | dress material (local - super & ordinary) |
+| Dress material (local - super & ordinary) (2) |  |  | 13 |  |  | dress material (local - super & ordinary) |
+| Dress material, (local - super & ordinary) |  |  | 19 |  |  | dress material, (local - super & ordinary) |
+| Dress material, imported (china) (1) |  |  | 10 |  |  | dress material, imported (china) |
+| Dress material, imported (china) (2) |  |  | 16 |  |  | dress material, imported (china) |
+| Dress material, imported (china) (3) |  |  | 22 |  |  | dress material, imported (china) |
+| Dress material, imported (elsewhere) (1) |  |  | 11 |  |  | dress material, imported (elsewhere) |
+| Dress material, imported (elsewhere) (2) |  |  | 17 |  |  | dress material, imported (elsewhere) |
+| Dress material, imported (elsewhere) (3) |  |  | 23 |  |  | dress material, imported (elsewhere) |
+| Dress material, imported (holland) (1) |  |  | 9 |  |  | dress material, imported (holland) |
+| Dress material, imported (holland) (2) |  |  | 15 |  |  | dress material, imported (holland) |
+| Dress material, imported (holland) (3) |  |  | 21 |  |  | dress material, imported (holland) |
+| Dress material, imported (west africa) (1) |  |  | 8 |  |  | dress material, imported (west africa) |
+| Dress material, imported (west africa) (2) |  |  | 14 |  |  | dress material, imported (west africa) |
+| Dress material, imported (west africa) (3) |  |  | 20 |  |  | dress material, imported (west africa) |
+| Drivers licence fees and other fees (road worthy) | 149 | 150 |  | drivers licence fees and other fees (road worthy) | drivers licence fees and other fees (road worthy) |  |
+| Drivers license fees |  |  | 427 |  |  | drivers license fees |
+| Dry cleaning - cloth |  |  | 126 |  |  | dry cleaning - cloth |
+| Dry cleaning - dress |  |  | 128 |  |  | dry cleaning - dress |
+| Dry cleaning - ladies set of two pieces |  |  | 129 |  |  | dry cleaning - ladies set of two pieces |
+| Dry cleaning - other material |  |  | 130 |  |  | dry cleaning - other material |
+| Dry cleaning - trousers |  |  | 127 |  |  | dry cleaning - trousers |
+| Dust/quarry dust hullow -6 inches |  |  | 183 |  |  | dust/quarry dust hullow -6 inches |
+| Dust/quarry dust hullow  5 inches |  |  | 185 |  |  | dust/quarry dust hullow  5 inches |
+| Dvd-player (specify) |  |  | 458 |  |  | dvd-player (specify) |
+| Electric fans | 86 | 87 |  | electric fans | electric fans |  |
+| Electric iron- dry |  |  | 293 |  |  | electric iron- dry |
+| Electric irons | 85 | 86 |  | electric irons | electric irons |  |
+| Electric kettle |  |  | 290 |  |  | electric kettle |
+| Electric sewing machine |  |  | 288 |  |  | electric sewing machine |
+| Electric shaving machine |  |  | 598 |  |  | electric shaving machine |
+| Electricals services |  |  | 217 |  |  | electricals services |
+| Electricity | 64 | 65 |  | electricity | electricity |  |
+| Electricity (excluding bill in sec7) |  |  | 225 |  |  | electricity (excluding bill in sec7) |
+| Electronic guitar(specify) |  |  | 508 |  |  | electronic guitar(specify) |
+| Electronic pianos (specify) |  |  | 507 |  |  | electronic pianos (specify) |
+| Energy saving light bulb |  |  | 330 |  |  | energy saving light bulb |
+| Engagement ring |  |  | 606 |  |  | engagement ring |
+| Engine oil | 145 | 146 |  | engine oil | engine oil |  |
+| Engine oils |  |  | 415 |  |  | engine oils |
+| English textbook(jss) |  |  | 556 |  |  | english textbook(jss) |
+| English textbook(shs) |  |  | 558 |  |  | english textbook(shs) |
+| Examination fees |  |  | 581 |  |  | examination fees |
+| Examination fees (adult literacy courses) |  |  | 585 |  |  | examination fees (adult literacy courses) |
+| Excercise books mathematical sets,etc | 207 | 208 |  | excercise books mathematical sets,etc | excercise books mathematical sets,etc |  |
+| Excursion/pilgrimage abroad |  |  | 571 |  |  | excursion/pilgrimage abroad |
+| Excursions & pilgrimages (abroad) | 212 | 213 |  | excursions & pilgrimages (abroad) | excursions & pilgrimages (abroad) |  |
+| Excursions local | 210 | 211 | 569 | excursions local | excursions local | excursions local |
+| Exercise book (20 sheets) |  |  | 565 |  |  | exercise book (20 sheets) |
+| Expenditure on hospital accomodation | 227 | 228 |  | expenditure on hospital accomodation | expenditure on hospital accomodation |  |
+| Expenditure on hotels accomodation | 225 | 226 |  | expenditure on hotels accomodation | expenditure on hotels accomodation |  |
+| Expenditure on school,colleges & universities accomodation | 226 | 227 |  | expenditure on school,colleges & universities accomodation | expenditure on school,colleges & universities accomodation |  |
+| Eye specialist (ophthalmologist): sight test examination |  |  | 355 |  |  | eye specialist (ophthalmologist): sight test examination |
+| Fair and amusement parks (trade fair, children parks) |  |  | 531 |  |  | fair and amusement parks (trade fair, children parks) |
+| Fair and amusement parks(trade fairs,children fairs) | 192 | 193 |  | fair and amusement parks(trade fairs,children fairs) | fair and amusement parks(trade fairs,children fairs) |  |
+| Fees for gown(graduation) |  |  | 580 |  |  | fees for gown(graduation) |
+| Fertilizers for gardening | 183 | 184 | 518 | fertilizers for gardening | fertilizers for gardening | fertilizers for gardening |
+| Film processing and photo printing  normal service, 36 prints |  |  | 541 |  |  | film processing and photo printing  normal service, 36 prints |
+| Firewood |  |  | 232 |  |  | firewood |
+| Fitness centres(use of) | 190 | 191 |  | fitness centres(use of) | fitness centres(use of) |  |
+| Floor mat (tiles) | 72 | 73 | 248 | floor mat (tiles) | floor mat (tiles) | floor mat (tiles) |
+| Flower pot - terracotta for potting plants in the house |  |  | 514 |  |  | flower pot - terracotta for potting plants in the house |
+| Flower,(natural/artificial) |  |  | 517 |  |  | flower,(natural/artificial) |
+| Fluorescent bulbs | 108 | 109 | 331 | fluorescent bulbs | fluorescent bulbs | fluorescent bulbs |
+| Foam mattress 20 cm-thick for double bed |  |  | 238 |  |  | foam mattress 20 cm-thick for double bed |
+| Foldable umbrella |  |  | 611 |  |  | foldable umbrella |
+| Football betting eg safaribet |  |  | 551 |  |  | football betting eg safaribet |
+| Football game (popular stand) |  |  | 530 |  |  | football game (popular stand) |
+| Football,volley ball,etc | 179 | 180 |  | football,volley ball,etc | football,volley ball,etc |  |
+| Footwear men | 37 | 38 |  | footwear men | footwear men |  |
+| Fuel filter |  |  | 412 |  |  | fuel filter |
+| Funeral |  |  | 547 |  |  | funeral |
+| Funeral ,other expenses | 201 | 202 |  | funeral ,other expenses | funeral ,other expenses |  |
+| Furniture material |  |  | 265 |  |  | furniture material |
+| Galvanized sheets |  |  | 177 |  |  | galvanized sheets |
+| Game cards(chess,ludo,etc) | 177 | 178 |  | game cards(chess,ludo,etc) | game cards(chess,ludo,etc) |  |
+| Gas cookers,stoves and coalpots | 82 | 83 |  | gas cookers,stoves and coalpots | gas cookers,stoves and coalpots |  |
+| Gas for household use | 65 | 66 |  | gas for household use | gas for household use |  |
+| Gas for household use  14.5kg |  |  | 226 |  |  | gas for household use  14.5kg |
+| Gas for household use  5kg |  |  | 227 |  |  | gas for household use  5kg |
+| Gas stove, 2 burners |  |  | 281 |  |  | gas stove, 2 burners |
+| Gas stove, with oven |  |  | 280 |  |  | gas stove, with oven |
+| Generators (household use) | 104 | 105 | 285 | generators (household use) | generators (household use) | generators (household use) |
+| Gifts and tips | 235 | 236 | 622 | gifts and tips | gifts and tips | gifts and tips |
+| Girl's dress |  |  | 55 |  |  | girl's dress |
+| Girls underpants |  |  | 54 |  |  | girls underpants |
+| Graduation fees |  |  | 579 |  |  | graduation fees |
+| Graduation fees excluding gown |  |  | 582 |  |  | graduation fees excluding gown |
+| Greeting cards |  |  | 561 |  |  | greeting cards |
+| Gyms and health clubs | 131 | 132 |  | gyms and health clubs | gyms and health clubs |  |
+| Gynecologist: consultation |  |  | 360 |  |  | gynecologist: consultation |
+| Hand drier |  |  | 341 |  |  | hand drier |
+| Hand mixer |  |  | 300 |  |  | hand mixer |
+| Handkerchief (men) | 27 | 28 | 96 | handkerchief (men) | handkerchief (men) | handkerchief (men) |
+| Handkerchief (women) | 26 | 27 | 94 | handkerchief (women) | handkerchief (women) | handkerchief (women) |
+| High heel shoes |  |  | 146 |  |  | high heel shoes |
+| Hiring of spinners |  |  | 543 |  |  | hiring of spinners |
+| Hisense |  |  | 463 |  |  | hisense |
+| Horse racing | 189 | 190 | 537 | horse racing | horse racing | horse racing |
+| Hostel dormitory |  |  | 595 |  |  | hostel dormitory |
+| Hostels private |  |  | 589 |  |  | hostels private |
+| Hostels public |  |  | 590 |  |  | hostels public |
+| Hotel, capital city  2 star bed and breakfast |  |  | 592 |  |  | hotel, capital city  2 star bed and breakfast |
+| Hotel, capital city  3 star bed and breakfast |  |  | 591 |  |  | hotel, capital city  3 star bed and breakfast |
+| House boys/house maids | 112 | 113 | 342 | house boys/house maids | house boys/house maids | house boys/house maids |
+| House keepers/caretakers | 113 | 114 |  | house keepers/caretakers | house keepers/caretakers |  |
+| Housekeepers/caretakers |  |  | 343 |  |  | housekeepers/caretakers |
+| Hp (1) |  |  | 474 |  |  | hp |
+| Hp (2) |  |  | 479 |  |  | hp |
+| Hp (3) |  |  | 484 |  |  | hp |
+| Hp (4) |  |  | 490 |  |  | hp |
+| Htc |  |  | 451 |  |  | htc |
+| Huawei |  |  | 449 |  |  | huawei |
+| Ice block (household cooling and refrigeration only) |  |  | 219 |  |  | ice block (household cooling and refrigeration only) |
+| Imported | 95 | 96 |  | imported | imported |  |
+| Imported (china) |  | 4 | 4 |  | imported (china) | imported (china) |
+| Imported (elsewhere) | 4 | 5 | 5 | imported (elsewhere) | imported (elsewhere) | imported (elsewhere) |
+| Imported (europe) | 3 | 3 |  | imported (europe) | imported (europe) |  |
+| Imported (hollande) |  |  | 3 |  |  | imported (hollande) |
+| Imported (west africa) | 2 | 2 | 2 | imported (west africa) | imported (west africa) | imported (west africa) |
+| Incandescent light bulb |  |  | 329 |  |  | incandescent light bulb |
+| Infinix |  |  | 441 |  |  | infinix |
+| International flight one way |  |  | 431 |  |  | international flight one way |
+| International flight two way |  |  | 432 |  |  | international flight two way |
+| Iron rods (1/4) diameter |  |  | 171 |  |  | iron rods (1/4) diameter |
+| Iron rods (3/4) diameter |  |  | 174 |  |  | iron rods (3/4) diameter |
+| Iron rods (5/8) diameter |  |  | 175 |  |  | iron rods (5/8) diameter |
+| Iron rods and roofing sheets | 50 | 51 |  | iron rods and roofing sheets | iron rods and roofing sheets |  |
+| Iron rods(1/2) diameter |  |  | 173 |  |  | iron rods(1/2) diameter |
+| Iron rods(3/8) diameter |  |  | 172 |  |  | iron rods(3/8) diameter |
+| Jeans ( women) |  |  | 74 |  |  | jeans ( women) |
+| Jeans (men) | 20 | 21 | 73 | jeans (men) | jeans (men) | jeans (men) |
+| Jeans (women) | 19 | 20 |  | jeans (women) | jeans (women) |  |
+| Jeans jacket |  |  | 62 |  |  | jeans jacket |
+| Jewellery, clocks and watches |  |  | 599 |  |  | jewellery, clocks and watches |
+| Jhs expenses (public & private) |  |  | 576 |  |  | jhs expenses (public & private) |
+| Jug |  |  | 318 |  |  | jug |
+| Kente (men) |  |  | 25 |  |  | kente (men) |
+| Kente (women) |  |  | 26 |  |  | kente (women) |
+| Kente men | 5 | 6 |  | kente men | kente men |  |
+| Kente women | 6 | 7 |  | kente women | kente women |  |
+| Kerosene | 66 | 67 | 228 | kerosene | kerosene | kerosene |
+| Kitchen chair |  |  | 243 |  |  | kitchen chair |
+| Kitchen table |  |  | 242 |  |  | kitchen table |
+| Laboratory test | 124 | 125 |  | laboratory test | laboratory test |  |
+| Labour | 55 | 56 | 213 | labour | labour | labour |
+| Ladies' straight trousers |  |  | 41 |  |  | ladies' straight trousers |
+| Lanterns, gas lights |  |  | 299 |  |  | lanterns, gas lights |
+| Lanterns,gas lights | 88 | 89 |  | lanterns,gas lights | lanterns,gas lights |  |
+| Laundry charges | 33 | 34 |  | laundry charges | laundry charges |  |
+| Lawn boys/gardeners | 62 | 63 | 345 | lawn boys/gardeners | lawn boys/gardeners | lawn boys/gardeners |
+| Lcd television |  |  | 460 |  |  | lcd television |
+| Leather football |  |  | 513 |  |  | leather football |
+| Leather wallet |  |  | 616 |  |  | leather wallet |
+| Legal fees/consultancy fees | 246 | 247 |  | legal fees/consultancy fees | legal fees/consultancy fees |  |
+| Legal service,( will fees) |  |  | 637 |  |  | legal service,( will fees) |
+| Lenovo |  |  | 486 |  |  | lenovo |
+| Leyland emulsion |  |  | 189 |  |  | leyland emulsion |
+| Leyland oil |  |  | 190 |  |  | leyland oil |
+| Lg (1) |  |  | 446 |  |  | lg |
+| Lg (2) |  |  | 461 |  |  | lg |
+| Light bulbs | 107 | 108 |  | light bulbs | light bulbs |  |
+| Linoleum | 73 | 74 | 249 | linoleum | linoleum | linoleum |
+| Loans expenses | 243 | 244 |  | loans expenses | loans expenses |  |
+| Local (super and ordinary) |  |  | 1 |  |  | local (super and ordinary) |
+| Local street sandals (1) |  |  | 137 |  |  | local street sandals |
+| Local street sandals (2) |  |  | 149 |  |  | local street sandals |
+| Local street sandals (slippers) |  |  | 143 |  |  | local street sandals (slippers) |
+| Longman |  |  | 553 |  |  | longman |
+| Lubricants | 146 | 147 | 416 | lubricants | lubricants | lubricants |
+| Mahogany |  |  | 201 |  |  | mahogany |
+| Maintenance such as (plumbing,electricals,&carpentary servic | 57 | 58 |  | maintenance such as (plumbing,electricals,&carpentary servic | maintenance such as (plumbing,electricals,&carpentary servic |  |
+| Maintenance, repair and other service charges | 148 | 149 |  | maintenance, repair and other service charges | maintenance, repair and other service charges |  |
+| Mammogram |  |  | 373 |  |  | mammogram |
+| Mathematics textbook(jss) |  |  | 557 |  |  | mathematics textbook(jss) |
+| Mathematics textbook(shs) |  |  | 559 |  |  | mathematics textbook(shs) |
+| Mattresses | 69 | 70 |  | mattresses | mattresses |  |
+| Memory chips/sd cards |  |  | 498 |  |  | memory chips/sd cards |
+| Men (1) |  |  | 28 |  |  | men |
+| Men (2) |  |  | 68 |  |  | men |
+| Men (3) |  |  | 71 |  |  | men |
+| Men (4) |  |  | 76 |  |  | men |
+| Men (5) |  |  | 79 |  |  | men |
+| Men (6) |  |  | 83 |  |  | men |
+| Men (7) |  |  | 87 |  |  | men |
+| Men (8) |  |  | 132 |  |  | men |
+| Men (9) |  |  | 154 |  |  | men |
+| Men clothing | 30 | 31 |  | men clothing | men clothing |  |
+| Men footwear | 41 | 42 |  | men footwear | men footwear |  |
+| Men's dress shoes |  |  | 139 |  |  | men's dress shoes |
+| Men's shirt - open front (long sleeves or short sleeves) |  |  | 61 |  |  | men's shirt - open front (long sleeves or short sleeves) |
+| Men's socks |  |  | 98 |  |  | men's socks |
+| Men's t-shirt |  |  | 60 |  |  | men's t-shirt |
+| Mens' long boots |  |  | 140 |  |  | mens' long boots |
+| Mens belt (leather or synthetic) |  |  | 97 |  |  | mens belt (leather or synthetic) |
+| Metal |  |  | 210 |  |  | metal |
+| Microsoft (nokia) |  |  | 450 |  |  | microsoft (nokia) |
+| Microwave oven |  |  | 284 |  |  | microwave oven |
+| Mobile phones | 151 | 152 |  | mobile phones | mobile phones |  |
+| Money transfer (to parents/guardians/children) | 234 | 235 |  | money transfer (to parents/guardians/children) | money transfer (to parents/guardians/children) |  |
+| Money withdrawal charges | 242 | 243 |  | money withdrawal charges | money withdrawal charges |  |
+| Mop, with handle |  |  | 339 |  |  | mop, with handle |
+| Motor driven lawn mower | 101 | 102 | 320 | motor driven lawn mower | motor driven lawn mower | motor driven lawn mower |
+| Motor vehicle insurance (third party)private saloon car |  |  | 631 |  |  | motor vehicle insurance (third party)private saloon car |
+| Ms office home or student version software (specify) |  |  | 618 |  |  | ms office home or student version software (specify) |
+| Musical instruments | 174 | 175 |  | musical instruments | musical instruments |  |
+| National parks and zoos |  |  | 532 |  |  | national parks and zoos |
+| National parks and zoos & botanical gardens | 198 | 199 |  | national parks and zoos & botanical gardens | national parks and zoos & botanical gardens |  |
+| Natural and artificial flowers and plants & their pots | 182 | 183 |  | natural and artificial flowers and plants & their pots | natural and artificial flowers and plants & their pots |  |
+| Necklace (chain),gold |  |  | 607 |  |  | necklace (chain),gold |
+| Newspaper advertisement, (funeral) |  |  | 640 |  |  | newspaper advertisement, (funeral) |
+| Nokia |  |  | 443 |  |  | nokia |
+| Non-stick frying pan |  |  | 315 |  |  | non-stick frying pan |
+| Note book (hard cover) |  |  | 566 |  |  | note book (hard cover) |
+| Odum |  |  | 204 |  |  | odum |
+| Office glue and adhesives,staplers and staples,paper clips a | 206 | 207 |  | office glue and adhesives,staplers and staples,paper clips a | office glue and adhesives,staplers and staples,paper clips a |  |
+| Ofram |  |  | 203 |  |  | ofram |
+| Oil filter |  |  | 411 |  |  | oil filter |
+| Operations in private hospitals | 128 | 129 |  | operations in private hospitals | operations in private hospitals |  |
+| Operations in public hospitals | 129 | 130 |  | operations in public hospitals | operations in public hospitals |  |
+| Other (specify) (1) |  |  | 209 |  |  | other (specify) |
+| Other (specify) (2) |  |  | 286 |  |  | other (specify) |
+| Other (specify) (3) |  |  | 340 |  |  | other (specify) |
+| Other (specify) (4) |  |  | 620 |  |  | other (specify) |
+| Other accessories (specify) |  |  | 608 |  |  | other accessories (specify) |
+| Other articles of clothing and clothing accessories | 28 | 29 | 93 | other articles of clothing and clothing accessories | other articles of clothing and clothing accessories | other articles of clothing and clothing accessories |
+| Other clothing materials | 10 | 11 |  | other clothing materials | other clothing materials |  |
+| Other communication charges | 156 | 157 | 435 | other communication charges | other communication charges | other communication charges |
+| Other cooking pots /utensils | 96 | 97 | 313 | other cooking pots /utensils | other cooking pots /utensils | other cooking pots /utensils |
+| Other cost of accomodation incurred | 228 | 229 |  | other cost of accomodation incurred | other cost of accomodation incurred |  |
+| Other data processing equipment | 167 | 168 |  | other data processing equipment | other data processing equipment |  |
+| Other desktop computer (specify) |  |  | 476 |  |  | other desktop computer (specify) |
+| Other desktop computer(specify) |  |  | 481 |  |  | other desktop computer(specify) |
+| Other education and training services | 224 | 225 |  | other education and training services | other education and training services |  |
+| Other equipment for sport, camping and open-air recreation | 181 | 182 |  | other equipment for sport, camping and open-air recreation | other equipment for sport, camping and open-air recreation |  |
+| Other fuel and power | 67 | 68 | 229 | other fuel and power | other fuel and power | other fuel and power |
+| Other furniture and furnishings itiems | 71 | 72 |  | other furniture and furnishings itiems | other furniture and furnishings itiems |  |
+| Other garments | 25 | 26 |  | other garments | other garments |  |
+| Other glassware, tableware and utensils |  |  | 314 |  |  | other glassware, tableware and utensils |
+| Other glassware,tableware and utensils | 98 | 99 |  | other glassware,tableware and utensils | other glassware,tableware and utensils |  |
+| Other household textile | 79 | 80 |  | other household textile | other household textile |  |
+| Other in patient hospital services |  |  | 382 |  |  | other in patient hospital services |
+| Other in-patients hospital services | 132 | 133 |  | other in-patients hospital services | other in-patients hospital services |  |
+| Other insurance | 241 | 242 |  | other insurance | other insurance |  |
+| Other laptop(specify) (1) |  |  | 487 |  |  | other laptop(specify) |
+| Other laptop(specify) (2) |  |  | 492 |  |  | other laptop(specify) |
+| Other lcd television (specify) |  |  | 464 |  |  | other lcd television (specify) |
+| Other lighting prooducts | 109 | 110 |  | other lighting prooducts | other lighting prooducts |  |
+| Other major durables for recreation |  |  | 515 |  |  | other major durables for recreation |
+| Other major durables for recreation and culture | 175 | 176 |  | other major durables for recreation and culture | other major durables for recreation and culture |  |
+| Other major household appliances | 84 | 85 |  | other major household appliances | other major household appliances |  |
+| Other materials | 54 | 55 |  | other materials | other materials |  |
+| Other materials (specify) |  |  | 212 |  |  | other materials (specify) |
+| Other minor repairs to the dwelling | 56 | 57 | 214 | other minor repairs to the dwelling | other minor repairs to the dwelling | other minor repairs to the dwelling |
+| Other mobile phone |  |  | 452 |  |  | other mobile phone |
+| Other packaged holidays | 213 | 214 | 572 | other packaged holidays | other packaged holidays | other packaged holidays |
+| Other paint (specify) |  |  | 197 |  |  | other paint (specify) |
+| Other payments on social protection services | 237 | 238 |  | other payments on social protection services | other payments on social protection services |  |
+| Other personal effects | 233 | 234 |  | other personal effects | other personal effects |  |
+| Other photographic and cinematographic equipment and optical | 164 | 165 |  | other photographic and cinematographic equipment and optical | other photographic and cinematographic equipment and optical |  |
+| Other photographic equipment |  |  | 470 |  |  | other photographic equipment |
+| Other purchase | 144 | 145 |  | other purchase | other purchase |  |
+| Other recording media for pictures and sound | 171 | 172 |  | other recording media for pictures and sound | other recording media for pictures and sound |  |
+| Other repairs of furniture furnishing and floor coverings | 76 | 77 | 256 | other repairs of furniture furnishing and floor coverings | other repairs of furniture furnishing and floor coverings | other repairs of furniture furnishing and floor coverings |
+| Other services | 249 | 250 |  | other services | other services |  |
+| Other small electric household appliances | 89 | 90 |  | other small electric household appliances | other small electric household appliances |  |
+| Other small tools and miscellaneous accessories | 111 | 112 |  | other small tools and miscellaneous accessories | other small tools and miscellaneous accessories |  |
+| Other spare parts (specify) |  |  | 413 |  |  | other spare parts (specify) |
+| Other stationery and drawing materials | 209 | 210 |  | other stationery and drawing materials | other stationery and drawing materials |  |
+| Other stationery and drawing materials (specify) |  |  | 567 |  |  | other stationery and drawing materials (specify) |
+| Other tailoring charges | 32 | 33 |  | other tailoring charges | other tailoring charges |  |
+| Other tools and equipment for ouse and garden | 105 | 106 |  | other tools and equipment for ouse and garden | other tools and equipment for ouse and garden |  |
+| Other tyre rim |  |  | 403 |  |  | other tyre rim |
+| Other video/audio equipment | 161 | 162 |  | other video/audio equipment | other video/audio equipment |  |
+| Other water | 61 | 62 | 220 | other water | other water | other water |
+| Others (1) | 115 | 116 |  | others | others |  |
+| Others (2) | 204 | 205 |  | others | others |  |
+| Owner occuppy housing rent (estimate) | 48 | 49 |  | owner occuppy housing rent (estimate) | owner occuppy housing rent (estimate) |  |
+| Pack of 52 playing card game |  |  | 512 |  |  | pack of 52 playing card game |
+| Padlock |  |  | 336 |  |  | padlock |
+| Paints including quicklime | 52 | 53 |  | paints including quicklime | paints including quicklime |  |
+| Panel |  |  | 206 |  |  | panel |
+| Parabolic/satelite receivers | 160 | 161 | 465 | parabolic/satelite receivers | parabolic/satelite receivers | parabolic/satelite receivers |
+| Payment at churches and social clubs |  |  | 623 |  |  | payment at churches and social clubs |
+| Payment for rent | 47 | 48 |  | payment for rent | payment for rent |  |
+| Payment for services of private tvs (dstv, gotv etc) |  |  | 534 |  |  | payment for services of private tvs (dstv, gotv etc) |
+| Payment for services of private tvs (m-net and others) | 196 | 197 |  | payment for services of private tvs (m-net and others) | payment for services of private tvs (m-net and others) |  |
+| Payment of rent (excluding payment in sec7 for household) |  |  | 168 |  |  | payment of rent (excluding payment in sec7 for household) |
+| Payments in churches and social clubs | 236 | 237 |  | payments in churches and social clubs | payments in churches and social clubs |  |
+| Pedestal fan |  |  | 295 |  |  | pedestal fan |
+| Pen drive/external hard drives |  |  | 496 |  |  | pen drive/external hard drives |
+| Pen drives | 169 | 170 |  | pen drives | pen drives |  |
+| Personal computer technician services |  |  | 500 |  |  | personal computer technician services |
+| Personal computers and printers | 165 | 166 |  | personal computers and printers | personal computers and printers |  |
+| Pets | 185 | 186 | 521 | pets | pets | pets |
+| Pets food | 186 | 187 |  | pets food | pets food |  |
+| Photocopies,birth/death/marriage certificate charges | 248 | 249 |  | photocopies,birth/death/marriage certificate charges | photocopies,birth/death/marriage certificate charges |  |
+| Photocopy charge per a4 sheet (black and white) |  |  | 639 |  |  | photocopy charge per a4 sheet (black and white) |
+| Physiotherapist: complete treatment sessions |  |  | 377 |  |  | physiotherapist: complete treatment sessions |
+| Physiotherapy/massaging | 130 | 131 |  | physiotherapy/massaging | physiotherapy/massaging |  |
+| Piano lession |  |  | 536 |  |  | piano lession |
+| Pilgrimage local |  |  | 570 |  |  | pilgrimage local |
+| Pilgrimages local | 211 | 212 |  | pilgrimages local | pilgrimages local |  |
+| Plain |  |  | 207 |  |  | plain |
+| Plastic chair |  |  | 247 |  |  | plastic chair |
+| Plastic street sandals |  |  | 144 |  |  | plastic street sandals |
+| Plastic table |  |  | 246 |  |  | plastic table |
+| Plates |  |  | 308 |  |  | plates |
+| Playstation 3 game |  |  | 494 |  |  | playstation 3 game |
+| Plumbing services |  |  | 216 |  |  | plumbing services |
+| Polyester tie |  |  | 99 |  |  | polyester tie |
+| Polypropylene carpet |  |  | 252 |  |  | polypropylene carpet |
+| Portable electronic keyboard (organ) |  |  | 505 |  |  | portable electronic keyboard (organ) |
+| Portable radio (specify) |  |  | 457 |  |  | portable radio (specify) |
+| Post cards and greeting cards | 203 | 204 |  | post cards and greeting cards | post cards and greeting cards |  |
+| Post-secondary,technical & vocational (private) | 220 | 221 |  | post-secondary,technical & vocational (private) | post-secondary,technical & vocational (private) |  |
+| Post-secondary,technical & vocational (public) | 219 | 220 |  | post-secondary,technical & vocational (public) | post-secondary,technical & vocational (public) |  |
+| Postal services | 154 | 155 | 434 | postal services | postal services | postal services |
+| Pre-primary expenses (public & private) |  |  | 574 |  |  | pre-primary expenses (public & private) |
+| Pre-school (public)excl.transport,health & stationery expens | 214 | 215 |  | pre-school (public)excl.transport,health & stationery expens | pre-school (public)excl.transport,health & stationery expens |  |
+| Pre-school(private)excl.transport,health and stationery expe | 215 | 216 |  | pre-school(private)excl.transport,health and stationery expe | pre-school(private)excl.transport,health and stationery expe |  |
+| Premium for health insurance |  |  | 629 |  |  | premium for health insurance |
+| Premium for life insurance |  |  | 625 |  |  | premium for life insurance |
+| Premium on building |  |  | 627 |  |  | premium on building |
+| Premiums for health insurance | 240 | 241 |  | premiums for health insurance | premiums for health insurance |  |
+| Premiums for life assurance, etc | 238 | 239 |  | premiums for life assurance, etc | premiums for life assurance, etc |  |
+| Premiums for motor vehicle insurance | 239 | 240 |  | premiums for motor vehicle insurance | premiums for motor vehicle insurance |  |
+| Primary (private) excl.transport,health & stationery expense | 217 | 218 |  | primary (private) excl.transport,health & stationery expense | primary (private) excl.transport,health & stationery expense |  |
+| Primary (public) excl.transport,health & stationery expenses | 216 | 217 |  | primary (public) excl.transport,health & stationery expenses | primary (public) excl.transport,health & stationery expenses |  |
+| Primary expenses (public & private) |  |  | 575 |  |  | primary expenses (public & private) |
+| Purchase of car tyre | 141 | 142 |  | purchase of car tyre | purchase of car tyre |  |
+| Purchase of decond-hand bicycle | 140 | 141 |  | purchase of decond-hand bicycle | purchase of decond-hand bicycle |  |
+| Purchase of dvd/vcd movies |  |  | 545 |  |  | purchase of dvd/vcd movies |
+| Purchase of new bicycles | 139 | 140 | 395 | purchase of new bicycles | purchase of new bicycles | purchase of new bicycles |
+| Purchase of new cars | 133 | 134 |  | purchase of new cars | purchase of new cars |  |
+| Purchase of new cars (specify) |  |  | 384 |  |  | purchase of new cars (specify) |
+| Purchase of new motor cycles | 137 | 138 |  | purchase of new motor cycles | purchase of new motor cycles |  |
+| Purchase of new motorcycles (specify) |  |  | 389 |  |  | purchase of new motorcycles (specify) |
+| Purchase of new tricycles |  |  | 392 |  |  | purchase of new tricycles |
+| Purchase of new truck |  |  | 385 |  |  | purchase of new truck |
+| Purchase of new trucks | 135 | 136 |  | purchase of new trucks | purchase of new trucks |  |
+| Purchase of other tyres | 142 | 143 |  | purchase of other tyres | purchase of other tyres |  |
+| Purchase of second hand cars | 134 | 135 |  | purchase of second hand cars | purchase of second hand cars |  |
+| Purchase of second hand cars (specify) |  |  | 386 |  |  | purchase of second hand cars (specify) |
+| Purchase of second hand truck |  |  | 387 |  |  | purchase of second hand truck |
+| Purchase of second hand trucks | 136 | 137 |  | purchase of second hand trucks | purchase of second hand trucks |  |
+| Purchase of second- hand motor cycles | 138 | 139 |  | purchase of second- hand motor cycles | purchase of second- hand motor cycles |  |
+| Purchase of second-hand bicycle |  |  | 396 |  |  | purchase of second-hand bicycle |
+| Purchase of second-hand motorcycle (specify) |  |  | 390 |  |  | purchase of second-hand motorcycle (specify) |
+| Purchase of second-hand tricycle |  |  | 393 |  |  | purchase of second-hand tricycle |
+| Purchase of spark plugs batteries, oil filters etc | 143 | 144 |  | purchase of spark plugs batteries, oil filters etc | purchase of spark plugs batteries, oil filters etc |  |
+| Quicklime |  |  | 193 |  |  | quicklime |
+| Radio, cassette/cd players | 157 | 158 |  | radio, cassette/cd players | radio, cassette/cd players |  |
+| Raincoat |  |  | 42 |  |  | raincoat |
+| Rakes |  |  | 326 |  |  | rakes |
+| Ready made clothing for children | 14 | 15 |  | ready made clothing for children | ready made clothing for children |  |
+| Ready made clothing for women | 13 | 14 |  | ready made clothing for women | ready made clothing for women |  |
+| Recording audio and video cassettes | 168 | 169 |  | recording audio and video cassettes | recording audio and video cassettes |  |
+| Refregerators and freezers | 80 | 81 |  | refregerators and freezers | refregerators and freezers |  |
+| Refrigerator with freezer compartment |  |  | 271 |  |  | refrigerator with freezer compartment |
+| Refrigerator-freezer, 210-245 liters |  |  | 269 |  |  | refrigerator-freezer, 210-245 liters |
+| Refrigerator-freezer, low, 165-190 liters |  |  | 270 |  |  | refrigerator-freezer, low, 165-190 liters |
+| Refuse disposal |  |  | 221 |  |  | refuse disposal |
+| Reinforcement sole |  |  | 162 |  |  | reinforcement sole |
+| Repair of handset, mobile phones and fax machines | 153 | 154 | 454 | repair of handset, mobile phones and fax machines | repair of handset, mobile phones and fax machines | repair of handset, mobile phones and fax machines |
+| Repair of photographic and optical and data processing equi | 173 | 174 |  | repair of photographic and optical and data processing equi | repair of photographic and optical and data processing equi |  |
+| Repair of washing machine |  |  | 304 |  |  | repair of washing machine |
+| Repair sandal |  |  | 161 |  |  | repair sandal |
+| Repairs of audio visual equipment | 172 | 173 |  | repairs of audio visual equipment | repairs of audio visual equipment |  |
+| Repairs of durables for recreation and culture | 176 | 177 |  | repairs of durables for recreation and culture | repairs of durables for recreation and culture |  |
+| Repairs of jewellery, clocks and watches |  |  | 609 |  |  | repairs of jewellery, clocks and watches |
+| Repairs of jewellery,clocks and watches | 229 | 230 |  | repairs of jewellery,clocks and watches | repairs of jewellery,clocks and watches |  |
+| Repairs of other equipment for data processing |  |  | 502 |  |  | repairs of other equipment for data processing |
+| Repairs of tables and chairs | 75 | 76 | 255 | repairs of tables and chairs | repairs of tables and chairs | repairs of tables and chairs |
+| Repairs to household appliances | 90 | 91 | 303 | repairs to household appliances | repairs to household appliances | repairs to household appliances |
+| Repairs to women footwear | 40 | 41 |  | repairs to women footwear | repairs to women footwear |  |
+| Replacement of heel for men |  |  | 163 |  |  | replacement of heel for men |
+| Replacement of heel for women |  |  | 164 |  |  | replacement of heel for women |
+| Road worthy fees |  |  | 428 |  |  | road worthy fees |
+| Rolling pin |  |  | 317 |  |  | rolling pin |
+| Room furniture | 70 | 71 | 240 | room furniture | room furniture | room furniture |
+| Rubber street sandals (1) |  |  | 138 |  |  | rubber street sandals |
+| Rubber street sandals (2) |  |  | 150 |  |  | rubber street sandals |
+| Samsung (1) |  |  | 444 |  |  | samsung |
+| Samsung (2) |  |  | 462 |  |  | samsung |
+| Sapele |  |  | 200 |  |  | sapele |
+| Savannah emulsion |  |  | 194 |  |  | savannah emulsion |
+| Scarf (women) |  |  | 95 |  |  | scarf (women) |
+| School uniforms & sports clothes | 208 | 209 |  | school uniforms & sports clothes | school uniforms & sports clothes |  |
+| Seamstress,fitting,plumbing,hairdressing,etc | 223 | 224 |  | seamstress,fitting,plumbing,hairdressing,etc | seamstress,fitting,plumbing,hairdressing,etc |  |
+| Second hand clothing men | 34 | 35 |  | second hand clothing men | second hand clothing men |  |
+| Second hand footwear men | 44 | 45 |  | second hand footwear men | second hand footwear men |  |
+| Secondary education (public) | 218 | 219 |  | secondary education (public) | secondary education (public) |  |
+| Security guards | 63 | 64 | 346 | security guards | security guards | security guards |
+| Services of midwives, nurses, etc |  |  | 375 |  |  | services of midwives, nurses, etc |
+| Services of midwives,nurses,etc | 126 | 127 |  | services of midwives,nurses,etc | services of midwives,nurses,etc |  |
+| Services of tv technician |  |  | 501 |  |  | services of tv technician |
+| Services, garage (mechanic) |  |  | 419 |  |  | services, garage (mechanic) |
+| Sewage removal | 58 | 59 | 222 | sewage removal | sewage removal | sewage removal |
+| Shirt short sleeves |  |  | 64 |  |  | shirt short sleeves |
+| Shirts | 16 | 17 | 59 | shirts | shirts | shirts |
+| Shoe repair  childrens classic shoes |  |  | 160 |  |  | shoe repair  childrens classic shoes |
+| Shoe repair  mens classic shoes |  |  | 159 |  |  | shoe repair  mens classic shoes |
+| Shoe repair  womens street shoes |  |  | 158 |  |  | shoe repair  womens street shoes |
+| Shoe shine service charges | 43 | 44 | 165 | shoe shine service charges | shoe shine service charges | shoe shine service charges |
+| Shorts | 17 | 18 |  | shorts | shorts |  |
+| Shovels |  |  | 325 |  |  | shovels |
+| Shovels,rakes,wheelbarrows,etc | 100 | 101 |  | shovels,rakes,wheelbarrows,etc | shovels,rakes,wheelbarrows,etc |  |
+| Shs and post-secondary (public & private) |  |  | 577 |  |  | shs and post-secondary (public & private) |
+| Simple double bed |  |  | 235 |  |  | simple double bed |
+| Simple single bed |  |  | 236 |  |  | simple single bed |
+| Simple traditional hotel |  |  | 594 |  |  | simple traditional hotel |
+| Skirt |  |  | 46 |  |  | skirt |
+| Sliding door |  |  | 208 |  |  | sliding door |
+| Smock | 12 | 13 |  | smock | smock |  |
+| Soft contact lenses |  |  | 350 |  |  | soft contact lenses |
+| Solid  5 inches |  |  | 184 |  |  | solid  5 inches |
+| Solid- 4 inches |  |  | 186 |  |  | solid- 4 inches |
+| Solid- 6 inches |  |  | 182 |  |  | solid- 6 inches |
+| Sony experia |  |  | 448 |  |  | sony experia |
+| Spark plug |  |  | 410 |  |  | spark plug |
+| Sport shoes - brand imitations |  |  | 136 |  |  | sport shoes - brand imitations |
+| Sport shoes  brand imitations (1) |  |  | 142 |  |  | sport shoes  brand imitations |
+| Sport shoes  brand imitations (2) |  |  | 148 |  |  | sport shoes  brand imitations |
+| Sports shirt | 18 | 19 |  | sports shirt | sports shirt |  |
+| Sports stadium (watching football & others) | 191 | 192 |  | sports stadium (watching football & others) | sports stadium (watching football & others) |  |
+| Spring mattress (single) |  |  | 239 |  |  | spring mattress (single) |
+| Standard blood test (private) |  |  | 371 |  |  | standard blood test (private) |
+| Steam iron |  |  | 292 |  |  | steam iron |
+| Stg |  |  | 447 |  |  | stg |
+| Still cameras | 163 | 164 | 469 | still cameras | still cameras | still cameras |
+| Suit | 11 | 12 |  | suit | suit |  |
+| Suitcase, with trolley system |  |  | 612 |  |  | suitcase, with trolley system |
+| Surgery in private hospitals |  |  | 381 |  |  | surgery in private hospitals |
+| Surgery in public hospitals |  |  | 380 |  |  | surgery in public hospitals |
+| Suvinil emulsion |  |  | 195 |  |  | suvinil emulsion |
+| Swimming admission/ beaches |  |  | 535 |  |  | swimming admission/ beaches |
+| Synthetic racksack (carrier bag) |  |  | 613 |  |  | synthetic racksack (carrier bag) |
+| Table cloth material |  |  | 266 |  |  | table cloth material |
+| Table fan (desk fan) |  |  | 296 |  |  | table fan (desk fan) |
+| Tablecloth |  |  | 267 |  |  | tablecloth |
+| Tablet computer |  |  | 617 |  |  | tablet computer |
+| Tailoring charges - african dress  (slit & kaba) |  |  | 104 |  |  | tailoring charges - african dress  (slit & kaba) |
+| Tailoring charges - african type suit (1) |  |  | 102 |  |  | tailoring charges - african type suit |
+| Tailoring charges - african type suit (2) |  |  | 108 |  |  | tailoring charges - african type suit |
+| Tailoring charges - african type suit (3) |  |  | 113 |  |  | tailoring charges - african type suit |
+| Tailoring charges - african type suit (4) |  |  | 119 |  |  | tailoring charges - african type suit |
+| Tailoring charges - european style suit (1) |  |  | 103 |  |  | tailoring charges - european style suit |
+| Tailoring charges - european style suit (2) |  |  | 109 |  |  | tailoring charges - european style suit |
+| Tailoring charges - european style suit (3) |  |  | 114 |  |  | tailoring charges - european style suit |
+| Tailoring charges - european style suit (4) |  |  | 120 |  |  | tailoring charges - european style suit |
+| Tailoring charges - lady's african dress - two piece (1) |  |  | 115 |  |  | tailoring charges - lady's african dress - two piece |
+| Tailoring charges - lady's african dress - two piece (2) |  |  | 122 |  |  | tailoring charges - lady's african dress - two piece |
+| Tailoring charges - lady's sleeveless dress (1) |  |  | 116 |  |  | tailoring charges - lady's sleeveless dress |
+| Tailoring charges - lady's sleeveless dress (2) |  |  | 123 |  |  | tailoring charges - lady's sleeveless dress |
+| Tailoring charges - local wear (1) |  |  | 106 |  |  | tailoring charges - local wear |
+| Tailoring charges - local wear (2) |  |  | 111 |  |  | tailoring charges - local wear |
+| Tailoring charges - local wear (3) |  |  | 117 |  |  | tailoring charges - local wear |
+| Tailoring charges - local wear (4) |  |  | 124 |  |  | tailoring charges - local wear |
+| Tailoring charges - simple trousers (1) |  |  | 110 |  |  | tailoring charges - simple trousers |
+| Tailoring charges - simple trousers (2) |  |  | 121 |  |  | tailoring charges - simple trousers |
+| Tailoring charges - sleeveless dress |  |  | 105 |  |  | tailoring charges - sleeveless dress |
+| Tecno |  |  | 442 |  |  | tecno |
+| Telefax machines | 152 | 153 |  | telefax machines | telefax machines |  |
+| Telefax machines(specify) |  |  | 453 |  |  | telefax machines(specify) |
+| Telephone, telegram and fax charges | 155 | 156 |  | telephone, telegram and fax charges | telephone, telegram and fax charges |  |
+| Telephones handset | 150 | 151 | 437 | telephones handset | telephones handset | telephones handset |
+| Television sets | 159 | 160 |  | television sets | television sets |  |
+| Tertiary expenses (public & private) |  |  | 578 |  |  | tertiary expenses (public & private) |
+| Therapeutic appliances & equiipment | 116 | 117 |  | therapeutic appliances & equiipment | therapeutic appliances & equiipment |  |
+| Therapeutic appliances & equipment |  |  | 354 |  |  | therapeutic appliances & equipment |
+| Tinned cat food |  |  | 523 |  |  | tinned cat food |
+| Tinned dog food |  |  | 522 |  |  | tinned dog food |
+| Toaster |  |  | 301 |  |  | toaster |
+| Toilet |  |  | 223 |  |  | toilet |
+| Torches | 110 | 111 | 333 | torches | torches | torches |
+| Toshiba (1) |  |  | 485 |  |  | toshiba |
+| Toshiba (2) |  |  | 491 |  |  | toshiba |
+| Towels | 78 | 79 | 262 | towels | towels | towels |
+| Toys | 178 | 179 |  | toys | toys |  |
+| Track suit |  |  | 39 |  |  | track suit |
+| Traditional birth attendant (tba) services |  |  | 376 |  |  | traditional birth attendant (tba) services |
+| Traditional birth attendant(tba)services | 127 | 128 |  | traditional birth attendant(tba)services | traditional birth attendant(tba)services |  |
+| Traditional healer | 121 | 122 | 369 | traditional healer | traditional healer | traditional healer |
+| Travelling bags and suitcases | 231 | 232 |  | travelling bags and suitcases | travelling bags and suitcases |  |
+| Trousers | 15 | 16 | 58 | trousers | trousers | trousers |
+| Tv license fees | 195 | 196 | 533 | tv license fees | tv license fees | tv license fees |
+| Two doors wardrobe |  |  | 245 |  |  | two doors wardrobe |
+| Two pieces dress |  |  | 45 |  |  | two pieces dress |
+| Tyre r14 |  |  | 401 |  |  | tyre r14 |
+| Tyre r15 |  |  | 402 |  |  | tyre r15 |
+| Tyre repair |  |  | 420 |  |  | tyre repair |
+| Umbrellas | 230 | 231 |  | umbrellas | umbrellas |  |
+| Underwear children | 23 | 24 |  | underwear children | underwear children |  |
+| Underwear men | 22 | 23 |  | underwear men | underwear men |  |
+| Underwear women | 21 | 22 |  | underwear women | underwear women |  |
+| Uniform excluding school uniform | 24 | 25 |  | uniform excluding school uniform | uniform excluding school uniform |  |
+| University and other tertiary education (private) (1) | 221 | 222 |  | university and other tertiary education (private) | university and other tertiary education (private) |  |
+| University and other tertiary education (private) (2) | 222 | 223 |  | university and other tertiary education (private) | university and other tertiary education (private) |  |
+| Upholstery of sofa |  |  | 253 |  |  | upholstery of sofa |
+| Urine test |  |  | 372 |  |  | urine test |
+| Urologist: consultation |  |  | 359 |  |  | urologist: consultation |
+| Use of gym facilities |  |  | 529 |  |  | use of gym facilities |
+| Vaccination of dog against rabies |  |  | 525 |  |  | vaccination of dog against rabies |
+| Vacuum cleaner |  |  | 276 |  |  | vacuum cleaner |
+| Vcr/vcd/dvd players | 158 | 159 |  | vcr/vcd/dvd players | vcr/vcd/dvd players |  |
+| Vehicle registration |  |  | 429 |  |  | vehicle registration |
+| Veterinary service, castration of a cat |  |  | 526 |  |  | veterinary service, castration of a cat |
+| Veterinary services and charges | 187 | 188 |  | veterinary services and charges | veterinary services and charges |  |
+| Video cameras |  |  | 468 |  |  | video cameras |
+| Video cameras and camcoders | 162 | 163 |  | video cameras and camcoders | video cameras and camcoders |  |
+| Video game equipment and softwares | 180 | 181 |  | video game equipment and softwares | video game equipment and softwares |  |
+| Video game equipment and toys |  |  | 510 |  |  | video game equipment and toys |
+| Video houses & hiring of video cassettes | 194 | 195 |  | video houses & hiring of video cassettes | video houses & hiring of video cassettes |  |
+| Vinyl floor covering |  |  | 251 |  |  | vinyl floor covering |
+| Walking stick |  |  | 351 |  |  | walking stick |
+| Walking-stick synthetic umbrella with plastic handle |  |  | 615 |  |  | walking-stick synthetic umbrella with plastic handle |
+| Wall clock (specify) |  |  | 603 |  |  | wall clock (specify) |
+| Washing machine (front loader) |  |  | 273 |  |  | washing machine (front loader) |
+| Washing machine (top loader) |  |  | 274 |  |  | washing machine (top loader) |
+| Washing machines and driers | 83 | 84 |  | washing machines and driers | washing machines and driers |  |
+| Water cans | 102 | 103 | 321 | water cans | water cans | water cans |
+| Water pumps | 103 | 104 | 322 | water pumps | water pumps | water pumps |
+| Water(pipe-borne,metered) | 59 | 60 |  | water(pipe-borne,metered) | water(pipe-borne,metered) |  |
+| Water(pipe-borne,tanker ser vices) | 60 | 61 |  | water(pipe-borne,tanker ser vices) | water(pipe-borne,tanker ser vices) |  |
+| Wawa |  |  | 202 |  |  | wawa |
+| Wax design shirt |  |  | 66 |  |  | wax design shirt |
+| Wedding type ring |  |  | 605 |  |  | wedding type ring |
+| Weddings/outdooring |  |  | 548 |  |  | weddings/outdooring |
+| Wheel alignment | 147 | 148 | 418 | wheel alignment | wheel alignment | wheel alignment |
+| Wheelbarrow |  |  | 327 |  |  | wheelbarrow |
+| Windows |  |  | 211 |  |  | windows |
+| Wollen carpets | 74 | 75 | 250 | wollen carpets | wollen carpets | wollen carpets |
+| Women (1) | 35 | 36 | 29 | women | women | women |
+| Women (2) | 38 | 39 | 69 | women | women | women |
+| Women (3) | 45 | 46 | 72 | women | women | women |
+| Women (4) |  |  | 75 |  |  | women |
+| Women (5) |  |  | 80 |  |  | women |
+| Women (6) |  |  | 84 |  |  | women |
+| Women (7) |  |  | 88 |  |  | women |
+| Women (8) |  |  | 133 |  |  | women |
+| Women (9) |  |  | 155 |  |  | women |
+| Women clothing | 29 | 30 |  | women clothing | women clothing |  |
+| Women's bathrobe |  |  | 37 |  |  | women's bathrobe |
+| Women's blouse |  |  | 31 |  |  | women's blouse |
+| Women's denim skirt(jeans) |  |  | 35 |  |  | women's denim skirt(jeans) |
+| Women's jacket/blazer |  |  | 33 |  |  | women's jacket/blazer |
+| Women's nightgown |  |  | 36 |  |  | women's nightgown |
+| Women's pullover |  |  | 40 |  |  | women's pullover |
+| Women's summer pants(trousers) |  |  | 32 |  |  | women's summer pants(trousers) |
+| Womens dress shoes |  |  | 145 |  |  | womens dress shoes |
+| Womens polyester skirt |  |  | 34 |  |  | womens polyester skirt |
+| Wood,doors and windows | 53 | 54 |  | wood,doors and windows | wood,doors and windows |  |
+| Wrist watch (battery) (specify) |  |  | 601 |  |  | wrist watch (battery) (specify) |
+| Wrist watch (digital watch) (specify) |  |  | 602 |  |  | wrist watch (digital watch) (specify) |
+| Wrist watch (engine watch) specify |  |  | 600 |  |  | wrist watch (engine watch) specify |
+| Writing pads & envelopes,pens,pencils,erasers | 205 | 206 |  | writing pads & envelopes,pens,pencils,erasers | writing pads & envelopes,pens,pencils,erasers |  |
+| X-rays | 125 | 126 | 374 | x-rays | x-rays | x-rays |
+
+* Non-food items (Section 9B -- the FREQUENTLY purchased basket)
+
+The Section 9B vocabulary, restricted to the items that are *not food*.
+
+*This table is not wired to any served feature.*  =nonfood_expenditures= is
+Section *9A* only (see =_/CONTENTS.org=).  9B is the frequently-purchased
+basket and is elicited on the *per-visit grid* -- six asks in GLSS6/GLSS7, ten
+in GLSS5 -- so serving it needs a grain decision the canonical =(t, i, j)=
+shape does not cover.  This table exists so that the omitted basket can be
+*named and measured* rather than merely asserted, and so whoever wires 9B does
+not have to rebuild the vocabulary first.
+
+*Why the items are missing from =harmonize_food=.*  Each wave's
+=_/categorical_mapping.org= carries a =harmonize_food= table whose =Code_9b=
+column lists *every* 9B code -- food or not -- and marks the non-food ones by
+leaving =Preferred Label= *blank*.  =get_categorical_mapping= maps a blank to
+NA and =food_acquired= drops the row, which is correct for a food table and is
+why these items have no label anywhere in the repo.  They are recovered here
+from the Stata value-label layer on =freqcd=.
+
+| wave    | 9B codes | food | *non-food* |
+|---------+----------+------+------------|
+| 2005-06 |      167 |  118 |         49 |
+| 2012-13 |      170 |  120 |         50 |
+| 2016-17 |      485 |  320 |        165 |
+
+*GLSS7 rewrote the list, so the crosswalk is thin and says so.*  Of 204
+harmonised items only *14* appear in all three waves and *158* in one wave
+only.  That is not a defect in the matching: GLSS5/GLSS6 list *categories*
+("bathing /toilet soaps (liquid or solids)") where GLSS7 lists *brands* ("Lux",
+"Rexona", "Medisoft", then "Other bathing soap").  Rows are joined by *exact*
+normalised label match -- casefold, collapsed whitespace, stripped trailing
+punctuation -- and *nothing fuzzier*.  A fuzzy join would pool distinct items,
+which is the same reason a GLSS6->GLSS7 crosswalk was refused for 9A.
+
+*Three GLSS7 brand names occur TWICE*, in two different product blocks, and
+pooling them would merge two distinct instrument items (GH #323).  Each block
+is terminated by an "Other <category>" row, and that is what names them --
+read off the neighbouring codes, not guessed:
+
+| code | printed label | block terminator     | Preferred Label         |
+|------+---------------+----------------------+-------------------------|
+|  667 | Yazz          | 670 Other washing powder | Yazz (washing powder) |
+|  986 | Yazz          | 987 Other sanitary pad   | Yazz (sanitary pad)   |
+|  688 | Rexona        | 691 Other bathing soap   | Rexona (bathing soap) |
+|  962 | Rexona        | 964 Other deodorant      | Rexona (deodorant)    |
+|  897 | Bic           | 900 Other pen            | Bic (pen)             |
+|  968 | Bic           | 971 Other erazor         | Bic (razor)           |
+
+=Preferred Label= is otherwise the *most recent* wave's verbatim spelling, and
+=Label_<wave>= keeps each wave's own string unchanged.  The generator asserts
+that every source code is carried exactly once and that =Preferred Label= is
+injective; regenerate with
+=slurm_logs/2026-09-12_ghanalss_nonfood/gen_9b_table.py=.
+
+/Known gap:/ GLSS7's labels are brand names with no category column, so
+"Allwrite" and "2B" are opaque without the block heading.  Deriving a
+=Category= column from each block's "Other ..." terminator is mechanical and is
+the obvious next improvement; it is deliberately NOT done here, because an
+unvalidated derived column in a shipped vocabulary is worse than none.
+
+#+name: nonfood_items_9b
+| Preferred Label                                              | Code_2005-06 | Code_2012-13 | Code_2016-17 | Label_2005-06                                               | Label_2012-13                                                | Label_2016-17                                        |
+|--------------------------------------------------------------+--------------+--------------+--------------+-------------------------------------------------------------+--------------------------------------------------------------+------------------------------------------------------|
+| 2B                                                           |              |              | 895          |                                                             |                                                              | 2B                                                   |
+| Abgeve syrup                                                 |              |              | 802          |                                                             |                                                              | Abgeve syrup                                         |
+| Absorbent cotton wool                                        |              |              | 722          |                                                             |                                                              | Absorbent cotton wool                                |
+| Adhesive strips                                              |              |              | 807          |                                                             |                                                              | Adhesive strips                                      |
+| Adom tablets                                                 |              |              | 801          |                                                             |                                                              | Adom tablets                                         |
+| Allwrite                                                     |              |              | 898          |                                                             |                                                              | Allwrite                                             |
+| Always                                                       |              |              | 985          |                                                             |                                                              | Always                                               |
+| Ameen soap                                                   |              |              | 677          |                                                             |                                                              | Ameen soap                                           |
+| anti malaria medicines                                       | 195          | 195          |              | anti malaria medicines                                      | anti malaria medicines                                       |                                                      |
+| Antibiotics                                                  | 194          | 194          | 711          | antibiotics                                                 | antibiotics                                                  | Antibiotics                                          |
+| Ariel                                                        |              |              | 666          |                                                             |                                                              | Ariel                                                |
+| Artemether + Lumefantrine                                    |              |              | 712          |                                                             |                                                              | Artemether + Lumefantrine                            |
+| Artesunate ammodiaquin                                       |              |              | 713          |                                                             |                                                              | Artesunate ammodiaquin                               |
+| Auntie lizy                                                  |              |              | 936          |                                                             |                                                              | Auntie lizy                                          |
+| Azura                                                        |              |              | 980          |                                                             |                                                              | Azura                                                |
+| bathing /toilet soaps (liquid or solids)                     | 181          | 181          |              | bathing /toilet soaps (liquid or solids)                    | bathing /toilet soaps (liquid or solids)                     |                                                      |
+| BF                                                           |              |              | 679          |                                                             |                                                              | BF                                                   |
+| Bic (pen)                                                    |              |              | 897          |                                                             |                                                              | Bic                                                  |
+| Bic (razor)                                                  |              |              | 968          |                                                             |                                                              | Bic                                                  |
+| Bleaches                                                     | 182          | 182          | 692          | bleaches                                                    | bleaches                                                     | Bleaches                                             |
+| Blue ice                                                     |              |              | 960          |                                                             |                                                              | Blue ice                                             |
+| Braiding                                                     |              |              | 927          |                                                             |                                                              | Braiding                                             |
+| Brooms                                                       |              |              | 699          |                                                             |                                                              | Brooms                                               |
+| bus fares (stc,metro mass transport,neoplan,etc)             | 215          | 215          |              | bus fares (stc,metro mass transport,neoplan,etc)            | bus fares (stc,metro mass transport,neoplan,etc)             |                                                      |
+| candles                                                      | 187          | 187          |              | candles                                                     | candles                                                      |                                                      |
+| Car Washing                                                  |              |              | 825          |                                                             |                                                              | Car Washing                                          |
+| Charcoal                                                     | 174          | 174          | 660          | charcoal                                                    | charcoal                                                     | Charcoal                                             |
+| Cinema/theatre/Video houses                                  |              |              | 873          |                                                             |                                                              | Cinema/theatre/Video houses                          |
+| Close up                                                     |              |              | 950          |                                                             |                                                              | Close up                                             |
+| Colgate                                                      |              |              | 951          |                                                             |                                                              | Colgate                                              |
+| condoms                                                      | 196          | 196          |              | condoms                                                     | condoms                                                      |                                                      |
+| Contraceptive pills                                          |              |              | 808          |                                                             |                                                              | Contraceptive pills                                  |
+| Cost of bed occupancy in hotel/hostel                        |              |              | 923          |                                                             |                                                              | Cost of bed occupancy in hotel/hostel                |
+| cost of luggage and itiems transported unaccompanied         | 225          | 225          |              | cost of luggage and itiems transported unaccompanied        | cost of luggage and itiems transported unaccompanied         |                                                      |
+| cost of travel by ferries and canoes                         | 220          | 220          |              | cost of travel by ferries and canoes                        | cost of travel by ferries and canoes                         |                                                      |
+| Cost of travel by rail                                       | 211          | 211          | 827          | cost of travel by rail                                      | cost of travel by rail                                       | Cost of travel by rail                               |
+| Crusading Guide                                              |              |              | 880          |                                                             |                                                              | Crusading Guide                                      |
+| Darling                                                      |              |              | 935          |                                                             |                                                              | Darling                                              |
+| Diapers                                                      |              |              | 809          |                                                             |                                                              | Diapers                                              |
+| Diesel                                                       | 203          | 203          | 821          | diesel                                                      | diesel                                                       | Diesel                                               |
+| Disinfectants and cleaners                                   | 183          | 183          | 693          | disinfectants and cleaners                                  | disinfectants and cleaners                                   | Disinfectants and cleaners                           |
+| Disposable syringe for intramuscular injection               |              |              | 723          |                                                             |                                                              | Disposable syringe for intramuscular injection       |
+| Domestic flight one way                                      |              |              | 847          |                                                             |                                                              | Domestic flight one way                              |
+| Domestic flight two way                                      |              |              | 846          |                                                             |                                                              | Domestic flight two way                              |
+| Duck soap                                                    |              |              | 678          |                                                             |                                                              | Duck soap                                            |
+| Dustin powder                                                |              |              | 981          |                                                             |                                                              | Dustin powder                                        |
+| Eraser                                                       |              |              | 901          |                                                             |                                                              | Eraser                                               |
+| excercise books & writing pads                               | 242          | 242          |              | excercise books & writing pads                              | excercise books & writing pads                               |                                                      |
+| Exercise book                                                |              |              | 891          |                                                             |                                                              | Exercise book                                        |
+| Expenditure on Public toilet                                 |              |              | 653          |                                                             |                                                              | Expenditure on Public toilet                         |
+| expenditure on public toilets (wc and others)                | 170          | 170          |              | expenditure on public toilets (wc and others)               | expenditure on public toilets (wc and others)                |                                                      |
+| Fa                                                           |              |              | 963          |                                                             |                                                              | Fa                                                   |
+| Fee for money transfer                                       |              |              | 990          |                                                             |                                                              | Fee for money transfer                               |
+| Firewood                                                     |              |              | 661          |                                                             |                                                              | Firewood                                             |
+| firewood and other solid fuels                               | 175          | 175          |              | firewood and other solid fuels                              | firewood and other solid fuels                               |                                                      |
+| Fixed line                                                   |              |              | 855          |                                                             |                                                              | Fixed line                                           |
+| Football game                                                |              |              | 872          |                                                             |                                                              | Football game                                        |
+| Gas                                                          |              |              | 822          |                                                             |                                                              | Gas                                                  |
+| Gas for household use not for car                            |              |              | 655          |                                                             |                                                              | Gas for household use not for car                    |
+| Geshia                                                       |              |              | 690          |                                                             |                                                              | Geshia                                               |
+| Gillette                                                     |              |              | 970          |                                                             |                                                              | Gillette                                             |
+| goods for personal care(toothpaste,razor blades,combs,scent  | 276          |              |              | goods for personal care(toothpaste,razor blades,combs,scent |                                                              |                                                      |
+| goods for personal care(toothpaste,razor blades,combs,scentÊ |              | 276          |              |                                                             | goods for personal care(toothpaste,razor blades,combs,scentÊ |                                                      |
+| graphic and times                                            | 247          | 247          |              | graphic and times                                           | graphic and times                                            |                                                      |
+| Graphic Sports                                               |              |              | 889          |                                                             |                                                              | Graphic Sports                                       |
+| Guardian                                                     |              |              | 680          |                                                             |                                                              | Guardian                                             |
+| Hair wash & styling                                          |              |              | 926          |                                                             |                                                              | Hair wash & styling                                  |
+| HB                                                           |              |              | 896          |                                                             |                                                              | HB                                                   |
+| Household candles                                            |              |              | 698          |                                                             |                                                              | Household candles                                    |
+| Ibuprofen                                                    |              |              | 716          |                                                             |                                                              | Ibuprofen                                            |
+| Ice block (household cooling and refrigeration only)         | 179          | 179          | 663          | ice block (household cooling and refrigeration only)        | ice block (household cooling and refrigeration only)         | Ice block (household cooling and refrigeration only) |
+| Insecticides-coils                                           |              |              | 695          |                                                             |                                                              | Insecticides-coils                                   |
+| insecticides-coils and sprays                                | 184          | 184          |              | insecticides-coils and sprays                               | insecticides-coils and sprays                                |                                                      |
+| Insecticides-sprays                                          |              |              | 696          |                                                             |                                                              | Insecticides-sprays                                  |
+| Insight News paper                                           |              |              | 881          |                                                             |                                                              | Insight News paper                                   |
+| International Weekly Newspaper                               |              |              | 890          |                                                             |                                                              | International Weekly Newspaper                       |
+| Internet Services at Cyber Cafe                              |              |              | 854          |                                                             |                                                              | Internet Services at Cyber Cafe                      |
+| internet/e-mail                                              | 232          | 232          |              | internet/e-mail                                             | internet/e-mail                                              |                                                      |
+| Kerosene                                                     | 188          | 188          | 657          | kerosene                                                    | kerosene                                                     | Kerosene                                             |
+| Key soap                                                     |              |              | 676          |                                                             |                                                              | Key soap                                             |
+| Kingdom Kookoo Capsules                                      |              |              | 800          |                                                             |                                                              | Kingdom Kookoo Capsules                              |
+| Kiss condom                                                  |              |              | 724          |                                                             |                                                              | Kiss condom                                          |
+| Kitchen paper roll                                           |              |              | 704          |                                                             |                                                              | Kitchen paper roll                                   |
+| Kleesoft                                                     |              |              | 668          |                                                             |                                                              | Kleesoft                                             |
+| Laundry services                                             |              |              | 708          |                                                             |                                                              | Laundry services                                     |
+| Lord                                                         |              |              | 969          |                                                             |                                                              | Lord                                                 |
+| Lux                                                          |              |              | 687          |                                                             |                                                              | Lux                                                  |
+| Magazine                                                     |              |              | 888          |                                                             |                                                              | Magazine                                             |
+| magazines                                                    | 249          | 249          |              | magazines                                                   | magazines                                                    |                                                      |
+| Manicure & pedicure                                          |              |              | 928          |                                                             |                                                              | Manicure & pedicure                                  |
+| Mass transport                                               |              |              | 832          |                                                             |                                                              | Mass transport                                       |
+| Mass transport (Intra-city)                                  |              |              | 836          |                                                             |                                                              | Mass transport (Intra-city)                          |
+| Matches                                                      | 185          | 185          | 697          | matches                                                     | matches                                                      | Matches                                              |
+| Medisoft                                                     |              |              | 689          |                                                             |                                                              | Medisoft                                             |
+| Men's haircut                                                |              |              | 925          |                                                             |                                                              | Men's haircut                                        |
+| mesh/wigs (natural/artificial)                               | 271          | 271          |              | mesh/wigs (natural/artificial)                              | mesh/wigs (natural/artificial)                               |                                                      |
+| Metronidazole (Generic)                                      |              |              | 718          |                                                             |                                                              | Metronidazole (Generic)                              |
+| Metronidazole (Original)                                     |              |              | 717          |                                                             |                                                              | Metronidazole (Original)                             |
+| Mini bus                                                     |              |              | 833          |                                                             |                                                              | Mini bus                                             |
+| Mobile                                                       |              |              | 866          |                                                             |                                                              | Mobile                                               |
+| National Daily Newspaper (Graphic)                           |              |              | 885          |                                                             |                                                              | National Daily Newspaper (Graphic)                   |
+| National Daily Newspaper (Times)                             |              |              | 886          |                                                             |                                                              | National Daily Newspaper (Times)                     |
+| National lotteries                                           | 237          | 237          | 876          | national lotteries                                          | national lotteries                                           | National lotteries                                   |
+| Omo                                                          |              |              | 665          |                                                             |                                                              | Omo                                                  |
+| One way public transport trip                                |              |              | 842          |                                                             |                                                              | One way public transport trip                        |
+| Oral rehydration salts                                       |              |              | 719          |                                                             |                                                              | Oral rehydration salts                               |
+| Orange                                                       |              |              | 941          |                                                             |                                                              | Orange                                               |
+| Other                                                        |              |              | 977          |                                                             |                                                              | Other                                                |
+| Other anti-malaria medicine                                  |              |              | 714          |                                                             |                                                              | Other anti-malaria medicine                          |
+| other articles and products                                  | 277          | 277          |              | other articles and products                                 | other articles and products                                  |                                                      |
+| Other bathing soap                                           |              |              | 691          |                                                             |                                                              | Other bathing soap                                   |
+| Other condoms                                                |              |              | 725          |                                                             |                                                              | Other condoms                                        |
+| Other deodorant                                              |              |              | 964          |                                                             |                                                              | Other deodorant                                      |
+| Other erazor                                                 |              |              | 971          |                                                             |                                                              | Other erazor                                         |
+| Other expenditure on education not Sec2A                     |              |              | 894          |                                                             |                                                              | Other expenditure on education not Sec2A             |
+| Other fuel and power                                         |              |              | 658          |                                                             |                                                              | Other fuel and power                                 |
+| Other hair                                                   |              |              | 938          |                                                             |                                                              | Other hair                                           |
+| Other lotteries                                              | 238          | 238          | 877          | other lotteries                                             | other lotteries                                              | Other lotteries                                      |
+| Other lubricants                                             |              |              | 823          |                                                             |                                                              | Other lubricants                                     |
+| other medical and pharmaceutical drugs                       | 198          | 198          |              | other medical and pharmaceutical drugs                      | other medical and pharmaceutical drugs                       |                                                      |
+| Other Medical Products                                       |              |              | 810          |                                                             |                                                              | Other Medical Products                               |
+| Other newspaper                                              |              |              | 887          |                                                             |                                                              | Other newspaper                                      |
+| other newspapers & periodicals                               | 250          | 250          |              | other newspapers & periodicals                              | other newspapers & periodicals                               |                                                      |
+| other non-durable goods                                      | 189          | 189          |              | other non-durable goods                                     | other non-durable goods                                      |                                                      |
+| Other pen                                                    |              |              | 900          |                                                             |                                                              | Other pen                                            |
+| Other personal grooming services                             | 272          | 272          | 929          | other personal grooming services                            | other personal grooming services                             | Other personal grooming services                     |
+| other postal services                                        | 233          | 233          |              | other postal services                                       | other postal services                                        |                                                      |
+| Other postal services (e.g. DHL)                             |              |              | 851          |                                                             |                                                              | Other postal services (e.g. DHL)                     |
+| Other private paper                                          |              |              | 882          |                                                             |                                                              | Other private paper                                  |
+| Other purchased transport services                           |              |              | 848          |                                                             |                                                              | Other purchased transport services                   |
+| Other sanitary pad                                           |              |              | 987          |                                                             |                                                              | Other sanitary pad                                   |
+| Other skin powder                                            |              |              | 983          |                                                             |                                                              | Other skin powder                                    |
+| Other solid fuel                                             |              |              | 662          |                                                             |                                                              | Other solid fuel                                     |
+| Other stationery                                             |              |              | 903          |                                                             |                                                              | Other stationery                                     |
+| Other textbook, story books                                  |              |              | 893          |                                                             |                                                              | Other textbook, story books                          |
+| other tobacco products                                       |              | 165          |              |                                                             | other tobacco products                                       |                                                      |
+| Other toilet roll                                            |              |              | 944          |                                                             |                                                              | Other toilet roll                                    |
+| Other toothpaste                                             |              |              | 952          |                                                             |                                                              | Other toothpaste                                     |
+| Other traditional drugs                                      |              |              | 803          |                                                             |                                                              | Other traditional drugs                              |
+| Other transport                                              |              |              | 838          |                                                             |                                                              | Other transport                                      |
+| Other washing powder                                         |              |              | 670          |                                                             |                                                              | Other washing powder                                 |
+| Other washing soap                                           |              |              | 681          |                                                             |                                                              | Other washing soap                                   |
+| Pain killers (paracetamol, APC, etc.)                        |              |              | 710          |                                                             |                                                              | Pain killers (paracetamol, APC, etc.)                |
+| pain killers (paracetamol, apc,etc)                          |              | 193          |              |                                                             | pain killers (paracetamol, apc,etc)                          |                                                      |
+| pain killers (paracetamol,apc,etc)                           | 193          |              |              | pain killers (paracetamol,apc,etc)                          |                                                              |                                                      |
+| Paper napkins (tissue)                                       |              |              | 703          |                                                             |                                                              | Paper napkins (tissue)                               |
+| Pelikan                                                      |              |              | 899          |                                                             |                                                              | Pelikan                                              |
+| Pepsodent                                                    |              |              | 949          |                                                             |                                                              | Pepsodent                                            |
+| Petrol                                                       | 202          | 202          | 820          | petrol                                                      | petrol                                                       | Petrol                                               |
+| Photocopying                                                 |              |              | 870          |                                                             |                                                              | Photocopying                                         |
+| Porters (kayaye, male porters, etc.).                        |              |              | 849          |                                                             |                                                              | Porters (kayaye, male porters, etc.).                |
+| porters (kayaye,male porters,etc).                           | 224          | 224          |              | porters (kayaye,male porters,etc).                          | porters (kayaye,male porters,etc).                           |                                                      |
+| Postage                                                      |              |              | 850          |                                                             |                                                              | Postage                                              |
+| postage (outside)                                            | 230          | 230          |              | postage (outside)                                           | postage (outside)                                            |                                                      |
+| postage (within ghana)                                       | 229          | 229          |              | postage (within ghana)                                      | postage (within ghana)                                       |                                                      |
+| Prepaid Phone Card                                           |              |              | 853          |                                                             |                                                              | Prepaid Phone Card                                   |
+| Printing (1 Page)                                            |              |              | 869          |                                                             |                                                              | Printing (1 Page)                                    |
+| private newspapers                                           | 248          | 248          |              | private newspapers                                          | private newspapers                                           |                                                      |
+| Queen Elizabeth                                              |              |              | 975          |                                                             |                                                              | Queen Elizabeth                                      |
+| Refuse collection                                            |              |              | 651          |                                                             |                                                              | Refuse collection                                    |
+| Refuse disposal                                              | 169          | 169          | 652          | refuse disposal                                             | refuse disposal                                              | Refuse disposal                                      |
+| Rental of DVD Movie                                          |              |              | 874          |                                                             |                                                              | Rental of DVD Movie                                  |
+| Rexona (bathing soap)                                        |              |              | 688          |                                                             |                                                              | Rexona                                               |
+| Rexona (deodorant)                                           |              |              | 962          |                                                             |                                                              | Rexona                                               |
+| River crossing (Big ferry)                                   |              |              | 844          |                                                             |                                                              | River crossing (Big ferry)                           |
+| River crossing (Canoe)                                       |              |              | 845          |                                                             |                                                              | River crossing (Canoe)                               |
+| Rose                                                         |              |              | 943          |                                                             |                                                              | Rose                                                 |
+| Safaribet                                                    |              |              | 875          |                                                             |                                                              | Safaribet                                            |
+| Scanning (1 Page)                                            |              |              | 868          |                                                             |                                                              | Scanning (1 Page)                                    |
+| services of barbers,beauty shops (women) including manicure  | 270          |              |              | services of barbers,beauty shops (women) including manicure |                                                              |                                                      |
+| services of barbers,beauty shops (women) including manicureÊ |              | 270          |              |                                                             | services of barbers,beauty shops (women) including manicureÊ |                                                      |
+| services of barbers,beauty shops,etc (men)                   | 269          | 269          |              | services of barbers,beauty shops,etc (men)                  | services of barbers,beauty shops,etc (men)                   |                                                      |
+| Sharpener                                                    |              |              | 902          |                                                             |                                                              | Sharpener                                            |
+| Shoe polish and brush                                        |              |              | 706          |                                                             |                                                              | Shoe polish and brush                                |
+| Stay powder                                                  |              |              | 982          |                                                             |                                                              | Stay powder                                          |
+| STC                                                          |              |              | 829          |                                                             |                                                              | STC                                                  |
+| Street parking/parking spaces services                       |              |              | 826          |                                                             |                                                              | Street parking/parking spaces services               |
+| Sulpha doxine                                                |              |              | 715          |                                                             |                                                              | Sulpha doxine                                        |
+| Sunlight powder                                              |              |              | 669          |                                                             |                                                              | Sunlight powder                                      |
+| Sunlight soap                                                |              |              | 675          |                                                             |                                                              | Sunlight soap                                        |
+| Sure                                                         |              |              | 961          |                                                             |                                                              | Sure                                                 |
+| Tampons                                                      |              |              | 984          |                                                             |                                                              | Tampons                                              |
+| Tango                                                        |              |              | 942          |                                                             |                                                              | Tango                                                |
+| Taxi (intra-city)                                            |              |              | 837          |                                                             |                                                              | Taxi (intra-city)                                    |
+| telephone calls                                              | 231          | 231          |              | telephone calls                                             | telephone calls                                              |                                                      |
+| text books,story books,pamphlets/dictionaries,etc            | 243          | 243          |              | text books,story books,pamphlets/dictionaries,etc           | text books,story books,pamphlets/dictionaries,etc            |                                                      |
+| Tinned Cat Food                                              |              |              | 906          |                                                             |                                                              | Tinned Cat Food                                      |
+| Tinned Dog Food                                              |              |              | 905          |                                                             |                                                              | Tinned Dog Food                                      |
+| Toilet bowl cleaner                                          |              |              | 705          |                                                             |                                                              | Toilet bowl cleaner                                  |
+| toilet papers                                                | 186          | 186          |              | toilet papers                                               | toilet papers                                                |                                                      |
+| traditional ghanaian drugs(tablets or syrup)                 | 197          | 197          |              | traditional ghanaian drugs(tablets or syrup)                | traditional ghanaian drugs(tablets or syrup)                 |                                                      |
+| Trotro (Intra-city)                                          |              |              | 835          |                                                             |                                                              | Trotro (Intra-city)                                  |
+| trotro,taxi & other transport                                | 216          | 216          |              | trotro,taxi & other transport                               | trotro,taxi & other transport                                |                                                      |
+| Ultra                                                        |              |              | 937          |                                                             |                                                              | Ultra                                                |
+| Use of Gym facilities                                        |              |              | 871          |                                                             |                                                              | Use of Gym facilities                                |
+| Vasline                                                      |              |              | 976          |                                                             |                                                              | Vasline                                              |
+| VIP                                                          |              |              | 830          |                                                             |                                                              | VIP                                                  |
+| VVIP                                                         |              |              | 831          |                                                             |                                                              | VVIP                                                 |
+| washing soaps and powder                                     | 180          | 180          |              | washing soaps and powder                                    | washing soaps and powder                                     |                                                      |
+| washing/parking spaces services                              | 207          | 207          |              | washing/parking spaces services                             | washing/parking spaces services                              |                                                      |
+| Wigs                                                         |              |              | 939          |                                                             |                                                              | Wigs                                                 |
+| Writing pads                                                 |              |              | 892          |                                                             |                                                              | Writing pads                                         |
+| Yazz (sanitary pad)                                          |              |              | 986          |                                                             |                                                              | Yazz                                                 |
+| Yazz (washing powder)                                        |              |              | 667          |                                                             |                                                              | Yazz                                                 |

@@ -50,12 +50,22 @@ weak source must not be laundered into a fact.
 | =filename=       | inferred from a source filename (=conso7jours=) -- a GUESS      |
 | =not-recorded=   | nobody has looked                                              |
 
-Current distribution: *not-recorded 33 · config-comment 23 · questionnaire 8 ·
-variable-label 3 · filename 0.*
+Current distribution: *not-recorded 32 · config-comment 21 · questionnaire 12 ·
+variable-label 2 · filename 0.*
 
-Only 8 of 34 stated windows are questionnaire-grade.  Twenty-three are a
+Only 12 of 35 stated windows are questionnaire-grade.  Twenty-one are a
 maintainer's assertion -- including GhanaLSS 1998-99 and 2012-13, whose "five
 days apart" is an analogy to GLSS7 rather than a sourced quote.
+
+/Corrected 2026-09-12./  Those two paragraphs read *not-recorded 33 ·
+config-comment 23 · questionnaire 8 · variable-label 3* and "8 of 34", and had
+been wrong for some time: the CSV already said 11 of 34 before this date's
+edit, so rung corrections had been landing in the CSV with nothing making the
+prose follow.  The same stale pair was *hardcoded in the generated header* of
+every =_/recall.yml=; =promote_recall_records.basis_counts()= now computes it
+from the CSV at promotion time, so the sentence cannot drift again.  This
+paragraph still can -- it is hand-maintained; re-derive it with
+=Counter(r['basis'] for r in csv.DictReader(open(CSV)))= before trusting it.
 
 *Rung corrections applied 2026-09-09*, recorded in =notes=: Guatemala 2000 from
 =questionnaire= to =variable-label= (its verbatim is a Stata label, not an
@@ -135,10 +145,19 @@ no carrier keyed on =(wave, table)= alone can express this file.
 
 * The work queue
 
-33 of 67 cells (49.3%) are =not-recorded=, covering ~3.1M of 11.4M rows:
-Uganda 8, EthiopiaRHS 5, Malawi 5, GhanaSPS 3, Mali/Niger/Senegal 2 each, and
+32 of 67 cells (47.8%) are =not-recorded=, covering ~3.05M of 11.4M rows:
+Uganda 7, EthiopiaRHS 5, Malawi 5, GhanaSPS 3, Mali/Niger/Senegal 2 each, and
 one each for Benin, Burkina Faso, Cambodia, CotedIvoire, Guinea-Bissau, and
 GhanaLSS 2005-06.
+
+*Uganda 2019-20 left this queue on 2026-09-12* (48,144 rows), promoted to
+=questionnaire= off the wave's own household questionnaire: Section 15 Part B
+is headed "Food and Beverage (During the Last 7 Days)" on every page of the
+grid and each of =CEB06= / =CEB07= / =CEB10= / =CEB012= ends "during the last 7
+days" -- =recall_days: 7=, =n_asks: 1=.  *Uganda's other seven waves stay
+=not-recorded=*: their instruments have not been read, and the 2019-20 form is
+not evidence for them.  This is the "one RA, one questionnaire" step below,
+done for one wave -- the remaining seven are the same bounded step.
 
 Per =capability.py='s logic this is a *bounded human step per series* -- one RA,
 one questionnaire -- not a per-cell research project.  Filling it is what would
