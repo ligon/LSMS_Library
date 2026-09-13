@@ -456,6 +456,15 @@ def test_kg_factor_is_carried_for_2018_19(crop_production):
     )
 
 
+#: Per-unit floor for the kg-factor agreement check.  30 is
+#: ``quantity_audit``'s cell floor (CLAUDE.md, "Site Q"), reused rather than
+#: invented; all ten 2018-19 season-B units clear it (smallest is 32).
+MIN_ROWS_PER_UNIT = 30
+
+#: The agreement band, unchanged from the pooled form this replaced.
+KG_RATIO_LO, KG_RATIO_HI = 0.8, 1.25
+
+
 @pytest.mark.slow
 def test_wired_unit_agrees_with_the_reported_kg_factor(crop_production):
     """The two kg routes are independent, so agreement validates the wiring.
@@ -463,22 +472,51 @@ def test_wired_unit_agrees_with_the_reported_kg_factor(crop_production):
     One route is a number the household reported (`KgFactor`); the other is a
     weight parsed out of the wired unit's own `harvest_units` label by
     ``transformations._kg_factor_series``.  Had `a5bq6b` been the wrong column
-    they could not agree.  Measured 2026-09-09 on the 1 922 season-B rows where
-    both exist: median ratio 1.000, p25 = p75 = 1.000, 95.0% within +/-20%.
+    they could not agree.
+
+    **This asserts PER UNIT, not on the pooled rows, and that is a correction
+    (2026-09-13).**  The original form required 95% of pooled rows within
+    +/-20%, measured on 2026-09-09 over 1 922 rows.  GH #850 (``60f98ab1d``)
+    then widened the population to 5 410: ``_parse_explicit_metric``'s regex
+    was ``(?:kg|kilogram|kilogramme)\b``, and the ``\b`` after ``kg``
+    **rejects the plural**, so ``Sack (50 kgs)`` and ``Tin (Debe) (20 lts)``
+    had been falling through to the inference and arriving NaN.  Six container
+    units began resolving -- Sack 100 (1 449 rows), Basin 15 lts (1 194),
+    Sack 120 (316), Sack 50 (242), Tin 20 lts (232), Tin 5 lts (32) = 3 465;
+    5 410 - 3 465 = 1 945, i.e. essentially the whole original population.
+
+    Those containers are exactly where a household's own reported weight
+    legitimately varies -- one farmer's "100 kg sack" is another's 80 -- so
+    the pooled within-+/-20% share fell to **74.7%** while the pooled median
+    stayed **1.000**.  The dispersion is a property of the survey, not evidence
+    about wiring, and the old threshold had become a measure of how many
+    containers resolve rather than of whether the column is right.
+
+    The per-unit median is the statistic the docstring always claimed to be
+    testing, and it is strictly stronger: 9 of the 10 units with >= 30 rows
+    have median ratio EXACTLY 1.000, and the tenth is ``Sack (120 kgs)`` at
+    0.833 -- households report 100 kg at the median for a sack the label calls
+    120 (recorded in ``Uganda/_/CONTENTS.org``).  Mutation-proved: permuting
+    ``u`` within the 2018-19/B slice drives 9 of the 10 units out of band
+    (ratios 0.125 to 15.0), while the unmutated frame has zero offenders.
     """
     from lsms_library.transformations import _kg_factor_series
 
     label_factor = _kg_factor_series(crop_production)
     r = crop_production.reset_index()
     mask = ((r["t"] == WAVE) & (r["season"] == "B")).to_numpy()
-    reported = pd.to_numeric(r["KgFactor"], errors="coerce").to_numpy()[mask]
-    from_label = pd.Series(label_factor.to_numpy()[mask])
-    both = pd.DataFrame({"rep": reported, "lab": from_label}).dropna()
+    both = pd.DataFrame({
+        "u": r["u"].to_numpy()[mask],
+        "rep": pd.to_numeric(r["KgFactor"], errors="coerce").to_numpy()[mask],
+        "lab": label_factor.to_numpy()[mask],
+    }).dropna()
     both = both[both["lab"] > 0]
     assert len(both) > 500, (
         f"only {len(both)} season-B rows have both a reported and a "
-        f"label-derived kg factor; 1 922 were measured -- the harness broke"
+        f"label-derived kg factor; 5 410 were measured post-#850 (1 922 "
+        f"before it) -- the harness broke"
     )
+
     ratio = both["rep"] / both["lab"]
     assert 0.9 < float(ratio.median()) < 1.1, (
         f"reported kg factor and the wired unit's label-implied factor "
@@ -486,8 +524,25 @@ def test_wired_unit_agrees_with_the_reported_kg_factor(crop_production):
         f"rows. These are INDEPENDENT sources; a systematic gap means the "
         f"`unit` column in CROP_COLMAPS['{WAVE}']['B'] is the wrong column."
     )
-    close = float(((ratio > 0.8) & (ratio < 1.25)).mean())
-    assert close > 0.8, (
-        f"only {close:.1%} of rows agree within +/-20% (95.0% measured); the "
-        f"unit wiring or the factor column has changed"
+
+    both = both.assign(ratio=ratio)
+    per_unit = both.groupby("u")["ratio"].agg(["size", "median"])
+    per_unit = per_unit[per_unit["size"] >= MIN_ROWS_PER_UNIT]
+    assert len(per_unit) >= 8, (
+        f"only {len(per_unit)} unit(s) reach {MIN_ROWS_PER_UNIT} rows; 10 were "
+        f"measured. Fewer units means containers stopped resolving -- check "
+        f"`_parse_explicit_metric` before touching this number."
+    )
+    offenders = {
+        u: round(float(m), 3)
+        for u, m in per_unit["median"].items()
+        if not (KG_RATIO_LO < float(m) < KG_RATIO_HI)
+    }
+    assert not offenders, (
+        f"unit(s) whose median reported kg factor disagrees with the weight in "
+        f"their own label: {offenders}. Each unit is a separate, independent "
+        f"comparison, so a single offender means either that unit's label is "
+        f"wrong or `CROP_COLMAPS['{WAVE}']['B']` names the wrong column. "
+        f"9 of 10 units measured EXACTLY 1.000 on 2026-09-13; the tenth, "
+        f"`Sack (120 kgs)`, measured 0.833."
     )

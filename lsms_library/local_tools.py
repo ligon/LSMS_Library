@@ -1859,6 +1859,26 @@ _CACHE_HASH_KEY = b"lsms_cache_hash"
 # is what makes the signal outlive the destruction it describes.
 _GRAIN_AUDIT_KEY = b"lsms_grain_audit"
 
+# GH #891.  Schema-metadata key under which the L2-country parquet records the
+# wave set it was BUILT from, alongside the content hash and the grain audit,
+# and by the same argument (rotates atomically with the data; cannot desync;
+# removed by ``cache clear``).
+#
+# WHY THIS EXISTS -- single-wave and all-wave requests share one cache path
+# (``var/{table}.parquet``) while ``Country._table_cache_hash`` used to fold the
+# REQUESTED wave set into the hash, so alternating requests each graded the
+# other's cache stale and rebuilt it.  The wave set could not simply be dropped
+# from the hash: the parquet holds only the waves that were built, and nothing
+# on the read path filters by wave, so a wave-independent hash with no coverage
+# record would serve a one-wave parquet to an all-wave request.  This key is
+# that coverage record, which is what lets the hash become wave-independent.
+#
+# It stores the waves BUILT, not the waves with rows.  A wave can legitimately
+# contribute zero rows and be dropped during aggregation; deriving coverage from
+# the frame's own ``t`` values would make such a wave permanently unsatisfiable
+# and reintroduce the rebuild loop in a narrower case.
+_CACHE_WAVES_KEY = b"lsms_cache_waves"
+
 # Extensions treated as survey source data when scanning script-path
 # tables for literal file references.
 _DATA_SUFFIXES = (".dta", ".csv", ".tab", ".dat", ".sav", ".txt", ".xlsx",
@@ -2016,6 +2036,40 @@ def read_parquet_grain_audit(path: str | Path) -> list[dict] | None:
     return reports if isinstance(reports, list) else None
 
 
+def read_parquet_cache_waves(path: str | Path) -> list[str] | None:
+    """Return the wave-coverage manifest embedded in an L2-country parquet
+    (GH #891), or ``None`` when the parquet carries no stamp (written by a
+    pre-#891 build).
+
+    The list is the waves the parquet was BUILT from -- see ``_CACHE_WAVES_KEY``
+    for why that is not the same as the waves present in its ``t`` level.
+
+    Reads only the footer (``read_schema``), so cost is ~1 ms regardless of row
+    count -- safe on the L2 warm-read hot path.
+    """
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except (OSError, ArrowInvalid):
+        return None
+    except Exception:
+        return None
+    if not md:
+        return None
+    raw = md.get(_CACHE_WAVES_KEY)
+    if raw is None:
+        return None
+    if isinstance(raw, (bytes, bytearray)):
+        raw = raw.decode()
+    try:
+        waves = json.loads(raw)
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(waves, list):
+        return None
+    return [str(w) for w in waves]
+
+
 def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     """Classify an L2 parquet against the expected content hash.
 
@@ -2071,7 +2125,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -2100,6 +2154,12 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         (GH #323) so a warm read can re-emit a warning about rows destroyed
         during the cold build that produced this parquet.  See
         :func:`read_parquet_grain_audit`.
+    cache_waves : list[str] | None, default None
+        If given, embed this wave-coverage manifest under
+        ``lsms_cache_waves`` (GH #891) -- the waves this parquet was BUILT
+        from, which is what lets a later request for a subset of them be
+        served from this file instead of rebuilding.  See
+        :func:`read_parquet_cache_waves`.
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -2149,7 +2209,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit:
+    if cache_hash is not None or grain_audit or cache_waves:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -2160,6 +2220,10 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # so the warm read can re-emit it (the pre-collapse frame that
             # proved the loss is long gone by then).
             md[_GRAIN_AUDIT_KEY] = json.dumps(grain_audit).encode()
+        if cache_waves:
+            # GH #891: carry the wave coverage with the data, so a request for
+            # a subset of these waves is a hit rather than a rebuild.
+            md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, fn)
     else:
@@ -2363,18 +2427,18 @@ def panel_ids(Waves: dict[str, Any] | pd.DataFrame) -> tuple[RecursiveDict, dict
             else:
                 columns = [wave_info[1], wave_info[2]]
 
-            df = get_dataframe(file_path)[columns]
+            df = get_dataframe(file_path)[columns].copy()
 
             # Process mapping when recent_id is a list (list-based mapping)
             if isinstance(wave_info[1], list): #tanzania
                 df = wave_info[2](df, wave_info[1])
             else:
-                df.loc[:,wave_info[1]] = df[wave_info[1]].apply(format_id)
-                df.loc[:,wave_info[2]] = df[wave_info[2]].apply(format_id)
+                df[wave_info[1]] = df[wave_info[1]].apply(format_id)
+                df[wave_info[2]] = df[wave_info[2]].apply(format_id)
                 # If a transformation function is provided (tuple length 4), apply it to the old_id column
                 if len(wave_info) == 4:
-                    df.loc[:,wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
-                df.loc[:,'t'] = wave_year
+                    df[wave_info[2]] = df[wave_info[2]].apply(wave_info[3])
+                df['t'] = wave_year
                 df = df.rename(columns={wave_info[1]: 'i', wave_info[2]: 'previous_i'})
                 df = df.set_index(['t', 'i'])[['previous_i']]
             dfs.append(df)

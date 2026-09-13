@@ -99,6 +99,7 @@ sample:
         - t
 
 interview_date:
+    # The shared hook reconciles all records; no preliminary merge/reshape.
     file: SEC0A.DTA
     idxvars:
         i:
@@ -109,6 +110,13 @@ interview_date:
             - dd
             - mm
             - yy
+    # Dependency-only declaration consumed by the recursive cache collector.
+    # These sources are read by visit_dates.build_visit_dates, not YAML extraction.
+    inference_sources:
+        file:
+            - SEC0B.DTA
+            - SEC0C.DTA
+
 
 household_roster:
     file: SEC1.DTA
@@ -170,6 +178,9 @@ plot_features:
     # .dta carries no value labels, so AreaUnit is decoded with the GLSS
     # area-unit codes (1=Acres,2=Poles,3=Ropes,4=Hectare; verified against
     # the GLSS7 g7sec8b value labels and the code-frequency distribution).
+    # Area is converted per-row to HECTARES on AreaUnit by the
+    # ghanalss.plot_features df_edit hook (canonical schema, GH #879; the
+    # GSS producer factors recovered from GhanaSPS 2009-10's area_ha).
     # s8bq8 ("how land was obtained") is 4 bare codes whose GLSS4 mapping is
     # not recoverable from the available materials, so Tenure is omitted
     # here rather than fabricated.  Section 10 is non-farm ENTERPRISES.

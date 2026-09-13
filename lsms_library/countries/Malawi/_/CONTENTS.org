@@ -217,6 +217,49 @@ Measured cost: *one* suppressed sale (2010-11 =303041430013=, Maize, 50 kg
 Bag: 1.5 bags / 2,500 MWK).  Wiring =ag_i02c= would let those attach again,
 correctly, and is the natural follow-up.
 
+* crop_production: the IHS4/IHS5 perennial crop-code RECODE (GH #869, fixed 2026-09-13)
+
+Between IHPS (2013-14) and IHS4 (2016-17) the survey RECODED four groups
+of Module P (perennial/tree harvest) codes, verified against each wave's
+own Stata value labels:
+
+| code, IHS3/IHPS | code, IHS4/IHS5 | label                    |
+|-----------------+-----------------+--------------------------|
+|               1 |             100 | cassava                  |
+|              18 |              21 | OTHER (SPECIFY)          |
+|        (absent) |            1800 | FODDER TREES             |
+|        (absent) |            1900 | FERTILISER TREES         |
+|        (absent) |            2000 | FUEL WOOD TREES          |
+
+Everything else (tea 2, coffee 3, mango 4, ..., macadamia 17) is
+unchanged.  EPAR documents the same recode in =LSMS-Agricultural-
+Indicators-Code/Malawi IHS/Nonstandard Unit Conversion Factors/README.md=.
+
+The cost of missing it: =_crop_codes(perennial=True)= adds the +1000
+offset, so IHS4/IHS5 cassava arrived as =1100=, which =harmonize_crop=
+never carried -- every cassava row in 2016-17 and 2019-20 (2,990 raw
+module rows), plus "other" (385) and the three tree classes (206), was
+silently dropped by the =harv[harv['crop'].notna()]= filter in
+=assemble_crop_production=.
+
+The fix lives in code, not in the table: =malawi._PERENNIAL_RECODE=
+folds the post-offset =1100 -> 1001= and =1021 -> 1018= before
+=harmonize_crop= is consulted, and the tree classes (no pre-recode
+identity) are carried as =2800/2900/3000= in =harmonize_crop= and
+=harmonize_crop_variety= themselves.  Code rather than per-wave tables
+because (a) the recode is value-identical to the offset for every
+pre-IHS4 code, so old waves need no special-casing, and (b) the
+2016-17/2019-20 SALE module (Module Q =crop_code=) was NOT recoded -- it
+still codes cassava =1= and other =18= -- so a table that mapped =1100=
+would have mislabelled Q's cassava sales as "other".  Q's recode-era
+rows therefore still carry =1001= / =1018= and join correctly; a Q sale
+whose crop has no harvest row is dropped downstream exactly as before.
+
+The same fix made the silent drop LOUD: the =crop.notna()= filter in
+=assemble_crop_production= now warns with the offending codes and row
+counts (the comment above it had long claimed a log that never existed,
+#856).
+
 * crop_production: the harvest CONDITION, and the two SHIPPED IHS5 conversion tables (GH #854, 2026-09-09)
 
 Two things that read as separate items are one: Malawi's IHS5 v04 release

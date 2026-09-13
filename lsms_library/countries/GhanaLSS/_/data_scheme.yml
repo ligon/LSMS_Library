@@ -59,7 +59,11 @@ Data Scheme:
     #
     # AreaUnit/Tenure decoded from
     # the GLSS7 value labels; 1=Acres,2=Poles,3=Ropes,4=Hectare in the
-    # older 4-code waves (no Plot/Other categories).
+    # older 4-code waves (no Plot/Other categories).  Area is converted
+    # per-row to HECTARES on AreaUnit by the ghanalss.plot_features
+    # df_edit hook (canonical schema, GH #879; the factors are the GSS's
+    # own, recovered from GhanaSPS 2009-10's shipped area_ha), so AreaUnit
+    # is the PROVENANCE label of the native unit.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
@@ -69,6 +73,90 @@ Data Scheme:
     Expenditure: float
     Quantity: float
     Price: float
+
+  nonfood_expenditures:
+    # GLSS Section 9 Part A, "NON-FOOD EXPENSES (LESS FREQUENTLY PURCHASED
+    # ITEMS)" -- item-level, long, one row per (wave, household, item) the
+    # household actually reported.  Canonical shape (lsms_library/data_info.yml,
+    # `Columns > nonfood_expenditures`): `(t, v, i, j)` with `v` joined from
+    # sample() at API time, so this declares `(t, i, j)`.
+    #
+    # THE INSTRUMENT, quoted (2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx
+    # and GLSS7 Final Manual.docx, Section 9):
+    #   "SECTION 9: HOUSEHOLD EXPENDITURE (FOOD AND NON-FOOD EXPENSES)"
+    #   "PART A:  NON-FOOD EXPENSES (LESS FREQUENTLY PURCHASED ITEMS)"
+    #   "Responses for these items will be solicited only once during the last
+    #    visit to the household ... the reference period for the amount spent on
+    #    any of these items will be '... in the last 12 months'."
+    # Hence RecallWindow == '12 months' on every row.  It is declared even so,
+    # because the GLSS3/GLSS4 form of this module carries a 3-month amount
+    # BESIDE the 12-month one (see the scope note below) and those waves will
+    # need the column the day they are wired.
+    #
+    # `Expenditure` = s9aq2 (spent in the past 12 months) + s9aq4 (value used or
+    # consumed out of own production, or received as gift), summed with
+    # min_count=1.  That is `uganda.nonfood_expenditures`'s composition
+    # (purchased + away + produced + given), which Nigeria follows, so the three
+    # countries Feature() pools are commensurable.  NOT annualised, NOT rescaled
+    # -- and NOT deflated: 2005-06 is in OLD cedi (GHC) and the later waves in
+    # GHS, 1 GHS = 10,000 GHC, which is why its median row is 60,000 against 23
+    # and 35.  The redenomination is already in this repo's currency config
+    # (lsms_library/data_info.yml, Currency); pass currency='index' to see it.
+    #
+    # SCOPE, and it is an UNDERCOUNT that must not be discovered by surprise:
+    # this is the LESS-frequently-purchased module ONLY.  GLSS splits Section 9
+    # by purchase FREQUENCY, not by food, so the frequently-purchased non-food --
+    # toiletries, transport, prepared meals, haircuts, stationery -- sits inside
+    # Section 9B on the per-visit grid, mixed with food, and is NOT here.
+    # THE OMITTED BASKET IS ~44% OF NON-FOOD.  Re-measured 2026-09-12 on the
+    # 30-day exposure (6 asks x 5 days): 9B non-food 1.931e6 against 9A's
+    # 2.457e6 = 44.0%; 2012-13 gives 38.7%.  This comment said "about 7%" until
+    # then, dividing by a sentinel-inflated denominator (see above).  The
+    # vocabulary of the omitted items is `nonfood_items_9b` in
+    # categorical_mapping.org.  Including it would force a grain decision the
+    # canonical shape does not cover (9B is visit-grain: 6 visits in GLSS7, 10
+    # in GLSS3) and is deliberately deferred -- see _/CONTENTS.org,
+    # "nonfood_expenditures is Section 9A only".
+    #
+    # MISSING-VALUE SENTINELS ARE PER WAVE, AND THEY ARE MEASURED.  2016-17
+    # carries a repdigit-9 family in s9aq2/s9aq4 -- 999999, 9999999, 9999996,
+    # 99999999 -- each spread across many DISTINCT items, which is what marks
+    # them as a field-width missing code rather than a price.  They are masked
+    # to NA.  2005-06 and 2012-13 contain NO member of that family at any
+    # width, so their sentinel set is EMPTY, and each wave script re-checks
+    # that on every build (an unlisted repdigit fails the build).
+    #
+    # DO NOT REPLACE THIS WITH A THRESHOLD.  This table first shipped with a
+    # `>= 99999999` rule and it was wrong in BOTH directions: it still served
+    # 2016-17 at 4.51e8 instead of 2.99e7 (93% of the total was the narrower
+    # 9999999 tier), and in 2005-06 -- which is in OLD cedi, where 1e8 is an
+    # ordinary large purchase -- it DELETED 28 genuine rows carrying 4.17e10,
+    # 43% of that wave.  A threshold cannot be right for both denominations.
+    #
+    # VALIDATED against GSS's own aggregate for 2016-17
+    # (Data/15_GHA_2017_E_final.dta, `TOTNFD` = total annual non-food): 9A is
+    # 39.7% of it, median 1,011 against a GSS non-food median of 3,437 and a
+    # household total of 7,863 -- the right share for a less-frequently-
+    # purchased module, which is one component of GSS non-food beside housing,
+    # utilities, education, health and transport drawn from other sections.
+    #
+    # THE TAIL IS SERVED, NOT CLIPPED -- count and name, the `quantity_audit`
+    # rule.  Post-sentinel, the ten largest 2005-06 rows still carry 38.9% of
+    # that wave, topped by 8,000,008,000 old cedi (~US$890k) for a single item;
+    # 2016-17's 9A exceeds GSS's whole non-food total for 645 households
+    # (4.7%).  These are almost certainly data-entry errors and they are in the
+    # table anyway.  Screen them in analysis; see _/CONTENTS.org.
+    #
+    # WAVES: 2005-06, 2012-13, 2016-17.  The other four are absent, not broken:
+    # GLSS3/GLSS4 ship the module (S9A12/SEC9A12 + S9A2/SEC9A2) but carry NO
+    # label layer at all on `nfdex1cd`/`nfdex2cd` -- 0 Stata value labels -- so
+    # their item axis needs the questionnaire; GLSS1/GLSS2 put household
+    # expenditure in Sections 11+12 (CONTENTS.org:3519), and Section 11 is four
+    # heterogeneous .DAT files with no .DCT label layer.
+    index: (t, i, j)
+    Expenditure: float
+    RecallWindow: str
+    materialize: make
 
   community_prices:
     # Item-level REPORTED market prices from each wave's OWN price survey
@@ -116,10 +204,13 @@ Data Scheme:
     #                  the 2007 redenomination, GHS after; currency.py labels
     #                  it; NO conversion).  The 1980s files' PRICEnU / DEFL /
     #                  PRICE are calculated fields (BID §6.2) and are NOT stored.
-    #   NumberOfUnits  the quantity of u that Price refers to: the weighed /
-    #                  measured quantity where the file has one (QUANn,
+    #   NumberOfUnits  the reported quantity where the file has one (QUANn,
     #                  s1stkg, quantity{a,b,c}), else the form's stated basis
     #                  (GLSS3/4 ship only the per-unit value p = PRICE/KG).
+    #                  GLSS7 QTY may report container content weight rather
+    #                  than a count of u. Values are preserved as reported;
+    #                  Price/NumberOfUnits needs an established quantity basis.
+    #                  See CONTENTS.org's GLSS7 price notes and GH #826.
     #   Description    the survey's own free text for the row: the form's
     #                  item label, the 2012-13 non-food basis (s2desc), the
     #                  2016-17 brand line and other-unit text.  Instrument-
@@ -143,7 +234,8 @@ Data Scheme:
     Rural: str
 
   interview_date:
-    index: (t, i)
+    # Calendar contacts; undated/invalid slots are omitted, never imputed.
+    index: (t, i, visit)
     Int_t: datetime
 
   food_security:
@@ -237,4 +329,3 @@ Data Scheme:
   # See nutrition.py's docstring for why it does not call
   # Country.food_quantities(), and slurm_logs/ghana_audit/ISSUE_value_kg_factor.org.
   nutrition: !make
-

@@ -1623,6 +1623,51 @@ window (the canonical =RecallWindow= column, GH #817, is per-row and is used
 only by Togo's =nonfood_expenditures=), so the window is not recoverable from
 the API.  Tracked separately; deliberately not addressed here.
 
+**** Section 9B is the whole frequently-purchased basket, not a food module: 484 codes, 320 food, 164 dropped by =Code_9b= (2026-09-12)
+
+Section 9 is titled =HOUSEHOLD EXPENDITURE (FOOD AND NON-FOOD EXPENSES)= and
+its two parts split on *frequency of purchase, not on food*.  The Manual is
+explicit:
+
+#+begin_quote
+Section 9 is segmented into Part A (Less Frequently Purchased Items and Part B
+(Frequently Purchased Items) ...  Questions 1-6: Solicit expenditure on food
+and non-food items which are purchased more frequently.
+#+end_quote
+
+and the printed Part B item list bears it out -- it runs the twelve COICOP
+divisions the Manual reproduces, so stationery, tinned pet food, prepared
+meals, hotel bed occupancy, haircuts, toothpaste, hair extensions, razors,
+sanitary products and money-transfer fees sit in the same grid as rice.
+
+Measured 2026-09-12 on =g7sec9b_small.dta= against this wave's own
+=harmonize_food=:
+
+| distinct =freqcd= item codes present in 9B      | 484 |
+| resolving to a food =Preferred Label= via =Code_9b= | 320 |
+| resolving to none -- dropped by =food_acquired.py=  | 164 |
+
+*A third of the module is non-food, and =Code_9b= is the only thing separating
+the two.*  =_/food_acquired.py='s "Drop rows whose food code did not harmonize
+(no '' / NA j leakage; D6)" step is what makes 9B a food table; it is not
+tidy-up.  An item added to =Code_9b= in error does not merely mislabel a row --
+it pulls a haircut into =food_expenditures=.  Trap 8 above already treats that
+column as load-bearing for *decoding*; this entry records *how much of the
+module it is holding back*.
+
+Part A (=g7sec9a.dta=; 12-month recall, asked once at the last visit -- "Was
+anything spent by the household on ...... in the past 12 months?") is the
+less-frequently-purchased non-food module, and is *not wired*: GhanaLSS has no
+=nonfood_expenditures=.  It carries the durable-goods *flow* (air conditioners,
+computers, fans, furniture, bicycles) and, at item 168, "Payment of rent
+(Excluding payment in sec7 for household)" under a COICOP heading reading
+"(excluding payments captured in Section 7)" -- the instrument de-duplicates
+rent against Section 7 itself.
+
+*GLSS7 asks an owner-occupier no imputed-rent question at all* -- see the
+=housing= section of this file for Section 7 Part C's three monetary variables
+and what the Main Report's "(actual and imputed)" actually refers to.
+
 **** =GLSS7 Final Manual.docx= is stale where it describes the visit schedule
 
 Use the Main Report, not the Manual, for the field protocol.  The Manual is
@@ -1636,6 +1681,11 @@ without being updated.  It contradicts the Report, the data, and itself:
 - 3.6 "Date of Next Visit", in the same document, says the next visit "should
   be exactly *five (5) days* apart for all households", which Table 2 does not
   implement.
+- Section 9 Part B, in the same document, says "it will be administered 10
+  times in all", and that at the second visit you ask "how much was spent by
+  the household since the last 3 days" -- the same inherited schedule surviving
+  in a *third* place.  The printed Part B grid has *six* visit columns, headed
+  =2nd 3rd 4th 5th 6th 7th=.  (Added 2026-09-12.)
 - The Manual's own section-by-visit table runs to the *7th* visit only (1st:
   sections 1, 2, 5, 6A, 7; 2nd: 3, 8H, 9A, 9B; 3rd: 4, 6B, 8H, 9B; 4th: 8A-G,
   8H, 9B; 5th: 9C, 10, 8H, 9B; 6th: 11, 8H, 9B; 7th: 12, 13, 8H, 9B) -- seven,
@@ -2217,6 +2267,338 @@ Contrary to an earlier triage (GH #350), GLSS DOES field a dwelling module:
 present in-repo but no =housing= feature is wired.  A future =housing=
 extractor is feasible — this is a feature gap, not an absence.
 
+** GLSS7 asks an owner-occupier no imputed-rent question at all (2026-09-12)
+
+Section 7 Part C ("HOUSING EXPENSES") has exactly three monetary variables in
+its rent block: =s7cq1a/1b= ("How much does the household pay in cash towards
+the rent?" + time unit, "IF FREE, PUT ZERO FOR AMOUNT AND THE TIME UNIT"),
+=s7cq3a/3b= ("What is the approximate value of these goods and services
+provided by your household?") and =s7cq6a/6b= (rent paid by a non-member).
+Part B Q1 "Owning" skips the entire block -- "( >> PART C Q7)", construction
+and repair.  Nothing asks an owner what the dwelling would let for.
+
+The Main Report's repeated "(actual and imputed)" is *own-produced food and
+goods* (8H, and 9A Q3/Q4), not housing; its housing tables report occupancy
+status and who pays the rent, nothing more.  Any imputed rent in a GLSS7
+welfare aggregate is a statistical construction downstream of the instrument,
+not an answer a respondent gave.
+
+Contrast Uganda, which *does* serve imputed rent -- through the own-production
+prompt, as 23.4% of its =nonfood_expenditures= total; see
+=Uganda/_/CONTENTS.org=, "Rent -- including IMPUTED rent -- is a Section 15C
+consumption item".  Both instruments' elicitation language side by side:
+=slurm_logs/2026-09-12_elicitation_language.org=.
+
+* nonfood_expenditures — Section 9A only (2026-09-12)
+
+Item-level household non-food expenditure from GLSS Section 9 *Part A*,
+"NON-FOOD EXPENSES (LESS FREQUENTLY PURCHASED ITEMS)", 12-month recall.  Wired
+for *three* of the seven waves; canonical long shape =(t, i, j)= with =v=
+joined from =sample()= at API time.  Ledger:
+=.coder/ledger/ghanalss-nonfood-expenditures.md=.  Both instruments' elicitation
+language: =slurm_logs/2026-09-12_elicitation_language.org=.
+
+** The split is by FREQUENCY, so this table is an UNDERCOUNT and says so
+
+GLSS Section 9 divides household expenditure by *how often an item is bought*,
+not by food vs non-food.  Part A is the less-frequently-purchased module and is
+what this table serves.  The *frequently*-purchased non-food -- toiletries,
+transport, prepared meals, haircuts, stationery, money-transfer fees -- is in
+Section 9B, on the per-visit grid, interleaved with food.
+
+*** The omission is ~44% of non-food, not ~7% (re-measured 2026-09-12)
+
+Both on the 30-day exposure (6 asks x 5 days):
+
+| wave    | 9B non-food (30d) | 9A (30d) | *omitted share* | exposure basis  |
+|---------+-------------------+----------+-----------------+-----------------|
+| 2016-17 |          1.931e6  |  2.457e6 |         *44.0%* | =questionnaire= |
+| 2012-13 |          1.839e6  |  2.917e6 |          38.7%  | =config-comment= |
+
+*2016-17 is the load-bearing figure.*  2012-13's rests on a weaker footing and
+is shown with it: =.coder/coverage/food_recall.org= records that this wave's
+"five days apart" is *an analogy to GLSS7, not a sourced quote*, so its 30-day
+exposure is =config-comment= grade.  Only the *9A rescaling* depends on that
+spacing -- the 9B numerator is a straight sum over the wave's own asks -- so the
+number is reported rather than withheld.  *2005-06 gets no share at all*: its
+visit spacing is unestablished (=food_recall.org= rule 1, "blank beats
+plausible"), and it fields ten asks rather than six.
+
+This section read "*1.93e6 of 2.68e7 cedi, about 7%*" until 2026-09-12.  *The
+9B numerator was always right; the denominator was not* -- it was 9A before the
+sentinel fix, and roughly 90% of that total was missing-value sentinel.  A
+ratio is only as good as the total under it.
+
+*The annualised partition corroborates both numbers.*  9A (2.99e7) plus 9B
+non-food annualised (2.35e7) is *71%* of GSS's own =TOTNFD= aggregate; the
+remaining 29% is rent, utilities, education, health and transport, which GLSS
+collects in *other sections entirely* (7, 9A is not their home).  A 7% omission
+would have left that partition impossible to close.
+
+*The scope decision was re-put at the corrected figure and re-affirmed.*  "9A
+only, document the gap" was first chosen when the gap was believed to be ~7%.
+It was put back to @ligon once the gap was measured at ~44% -- explicitly, with
+the two alternatives costed (9B summed over visits under a =RecallWindow= of
+"30 days", which fits the canonical shape; or a =(t, visit, i, j)= grain, which
+would need a change to the canonical =index_info=) -- and *9A-only was
+re-affirmed* (@ligon, 2026-09-12).  So the omission is a *standing decision
+taken in full knowledge of its size*, not an artefact of the bad number.
+
+*The omitted vocabulary is now recorded*: =nonfood_items_9b= in
+=_/categorical_mapping.org= -- 204 items, per-wave codes and verbatim labels,
+recovered from the Stata value-label layer because =harmonize_food= marks
+non-food 9B codes with a blank =Preferred Label= and drops them.  It is *not*
+wired to any feature.
+
+It is excluded because including it forces a grain decision the canonical shape
+does not cover: 9B is *visit*-grain (six visits in GLSS7, ten in GLSS3) and
+=nonfood_expenditures= has no =visit= level, so it would mean either summing
+visits -- a reducer, and core does not aggregate, so a wave script would have
+to own it in writing as Togo's per-window =Expenditure= does -- or adding a
+=visit= level, which =nonfood_expenditures= is not registered for in
+=lsms_library/data_info.yml= and which would therefore change the canonical
+shape for every country that declares the table.  *Follow-up, named and
+costed but deliberately NOT taken* (@ligon, 2026-09-12, re-affirmed at the
+corrected 44% figure).  The vocabulary it would need already exists:
+=nonfood_items_9b=.
+
+** DO NOT gate on s9aq1 — it would delete 7.6% of the module
+
+=s9aq1= is "Was anything *spent* ... in the past 12 months?", and its =No=
+branch skips to *Q3*, so own-production and gift consumption are recorded for
+households that spent nothing.  The obvious Togo-style gate (=q02 == 1=) is
+therefore *wrong here*: measured on 2016-17 it drops *14,703 rows carrying
+2.274e6 cedi -- 7.6% of the wave's non-food total* (2.99e7).  The gate is on the
+VALUE instead, which is what the canonical sparsity rule actually asks for.
+
+/Re-measured 2026-09-12./  This read "1.163e8 cedi ... 28%" until the sentinel
+fix below.  The ROW count was always right; the share was not, because the old
+denominator still contained the 9999999 sentinel tier.  A ratio is only as good
+as the total under it -- which is the same lesson the sentinel section teaches.
+
+=Expenditure= = =s9aq2= (spent) + =s9aq4= (value used out of own output or
+received as gift), =sum(min_count=1)=.  That is =uganda.nonfood_expenditures='s
+composition and Nigeria's, so the countries =Feature()= pools are
+commensurable; Togo is not a counter-example, because EHCVM =s09= records only
+a /montant depense/ and has nothing to sum.
+
+** The missing-value sentinels are a repdigit FAMILY, are per-wave, and a THRESHOLD is wrong in both directions (2026-09-12)
+
+2016-17 carries a field-width missing code in =s9aq2= / =s9aq4=, and it is not
+one value but four:
+
+| value    | s9aq2 rows | s9aq4 rows | distinct items it sits on |
+|----------+------------+------------+---------------------------|
+| 999999   |          6 |          5 | 6                         |
+| 9999996  |          0 |          1 | 1                         |
+| 9999999  |         27 |         13 | 26                        |
+| 99999999 |         43 |         20 | 30                        |
+
+*The item spread is the identification.*  A genuine large amount sits on ONE
+item -- the real non-repdigit maxima are 725,700 (item 548), 300,200 (623),
+285,000 (387) -- whereas 99999999 is scattered over 30 different items and
+9999999 over 26.  Six households do not independently report exactly 999,999
+GHS against a median of 35.
+
+*** This shipped wrong once, as a =>= 99999999= threshold.  Do not restore it.
+
+The threshold was calibrated on 2016-17 and applied to all three waves, and it
+failed in *both* directions:
+
+- *2016-17: still 15x too big.*  It caught only the widest tier, leaving the
+  9999999 rows in place -- 40 of them carrying 4.0e8 of a served 4.509e8.
+  *93% of the delivered total was sentinel.*  The measured total is *2.99e7*.
+- *2005-06: it DELETED REAL DATA.*  GLSS5 is in OLD cedi (100:1 redenomination,
+  July 2007), so 1e8 GHC is an ordinary large purchase, not an error code.  The
+  threshold masked *28 genuine rows carrying 4.17e10 cedi -- 43% of the wave*,
+  and reported 5.43e10 where the truth is 9.60e10.
+
+No threshold can be right for both denominations, which is why the sentinel set
+is now *measured per wave and written literally* in each wave script:
+2016-17 =frozenset({999999, 9999999, 9999996, 99999999})=, and 2005-06 and
+2012-13 *=frozenset()=* -- neither contains a single member of the repdigit-9
+family at any field width.
+
+Each script re-checks that on every build: =_amount()= intersects the column
+against the whole repdigit family (widths 6-10, last digit 6-9) and *asserts*
+on anything not in its declared set.  A re-release that adds a width, or a wave
+that acquires the convention, fails the build instead of being served as a
+purchase.  A false alarm costs one re-measurement; the miss cost 15x.
+
+If you wire GLSS3/GLSS4, re-measure rather than assume: those waves ship at
+=.dta= format 105 and have their own missing-double convention (see "GLSS3 and
+GLSS4 ship at =.dta= format 105" above).
+
+*** Validated against GSS's own aggregate
+
+=2016-17/Data/15_GHA_2017_E_final.dta= carries =TOTNFD=, "Total annual
+expenditure on non-food items", keyed on the same =hid=.  Post-fix, over the
+13,764 households that match:
+
+| quantity            |    value |
+|---------------------+----------|
+| our 9A total        |  2.99e7  |
+| GSS =TOTNFD=        |  7.53e7  |
+| 9A as a share       |  *39.7%* |
+| median 9A           |    1,011 |
+| median =TOTNFD=     |    3,437 |
+| median =HHEXP_N=    |    7,863 |
+
+39.7% is the right order for a less-frequently-purchased module: GSS non-food
+also draws housing, utilities, education, health, transport and communications
+from other sections.  The pre-fix number was 4.51e8 -- *six times GSS's entire
+non-food aggregate*, which is how obvious this was once anyone looked.
+
+2012-13 checks out the same way against =Data/AGGREGATES/GHA_2013_E.dta= (9A is
+*53.9%* of =TOTNFD=, median 1,119 against 2,474, over 16,646 matched
+households).  Its sentinel set is empty and its numbers did not move in this
+fix, so that is an independent confirmation of the *method*, not of the fix.
+
+*Do this for any new expenditure table here.*  GLSS ships a GSS-built
+expenditure aggregate for every round from GLSS5 on (=*_E*.dta= /
+=AGGREGATES/=), keyed on the same household id.  It is the only external answer
+key this country has, and it costs one merge.
+
+*** The remaining tail is SERVED, not clipped -- count and name
+
+After the sentinels there is still an implausible tail, and the library's rule
+(=quantity_audit.py=, "count and NAME, never drop") is to deliver it and say so:
+
+- *2005-06*: the ten largest rows carry *38.9%* of the wave, topped by
+  8,000,008,000 and 8,000,006,000 old cedi (~US$890k) *for a single item*.
+- *2016-17*: 9A exceeds GSS's entire household non-food total for *645
+  households (4.7%)*; the worst is =70650/10= at 740,413 GHS against a GSS
+  non-food total of 16,951.
+- *2012-13* is the clean one: top 0.1% of rows carry 14.9%, an ordinary heavy
+  tail, and its maximum is 1.08e6 GHS.
+
+These are almost certainly data-entry errors.  They are in the table anyway --
+*screen them in analysis*.  Extending =quantity_audit.py='s screen to
+=nonfood_expenditures.Expenditure= would catch them automatically and is the
+obvious follow-up; =_SCREENED_COLUMNS= is the extension point.
+
+*** No, the 9B material does not belong in =assets= -- and what does is 12B (2026-09-12)
+
+Asked directly, and worth recording because the answer also names a real gap.
+
+*9B is the fastest-turning CONSUMPTION in the instrument, not stock.*  Read in
+code order, the 165 GLSS7 non-food items are: waste and sanitation services
+(651-653), fuel (655-663, 820-823: kerosene, charcoal, firewood, petrol),
+cleaning products (665-706: Omo, Ariel, the soaps, bleach, disinfectant),
+pharmaceuticals (710-810: paracetamol, antibiotics, anti-malarials, ORS,
+condoms, contraceptives), *transport fares* (825-849: trotro, taxi, STC,
+VIP/VVIP intercity coaches, ferry, domestic flights, porters),
+communications (850-866), recreation *services* (871-877: gym, football
+match, cinema, lotteries), newspapers and stationery (880-903), pet food,
+hotel bed occupancy, grooming *services* (925-929: haircut, braiding,
+manicure), and toiletries (935-987: toothpaste, deodorant, razors, toilet
+roll, sanitary pads).  *Not one is a durable a household would be said to
+own.*  "VIP"/"VVIP" sit beside STC and are coach classes, not goods.
+
+=assets= is an *ownership roster* -- item-level stock with quantity and value,
+no aggregation (=.claude/skills/add-feature/assets/=).  9B is its opposite
+pole.  Putting it there would file a bus fare as a durable good.
+
+*The gap the question points at is real, though: GhanaLSS declares NO =assets=
+table, and GLSS7 ships a textbook source for one.*  =g7sec12b.dta= (719,441
+rows) is exactly the right shape:
+
+| column          | meaning                                    |
+|-----------------+--------------------------------------------|
+| =assetcd=/=astnm= | the durable item -> =j=                  |
+| =s12bq1a/b/c=   | first/second/third item owned -> quantity  |
+| =s12bq2a/b/c=   | how long ago obtained -> age               |
+| =s12bq3a1/b1/c1= | purchase price (+ unit in =*2=/=*3=)      |
+| =s12bq4a/b/c=   | amount the item could be sold for          |
+
+Whoever wires it should read the sentinel warning below *first*: all three
+price columns carry the repdigit family, =s12bq3a1= including =99999996=, a
+field width Section 9A does not contain.
+
+*And note where the durable-ish SPENDING already is.*  9A (this table) is the
+less-frequently-purchased module and does contain durable goods -- furniture,
+a guitar, appliances -- but as *expenditure over the last 12 months*, a flow.
+That is why it is =nonfood_expenditures= and not =assets=; the two tables would
+describe the same goods under different verbs, and both are wanted.
+
+*** WARNING: the repdigit convention is GLSS7-wide, not a Section 9A quirk
+
+Swept across the GLSS7 sources this repo can read (2026-09-12), the same family
+appears outside Section 9A:
+
+| file           | column     | rows | values seen                                    | what it is                |
+|----------------+------------+------+------------------------------------------------+---------------------------|
+| =g7sec12b.dta= | =s12bq3a1= |  358 | 999999, 9999996, 9999999, *99999996*, 99999999 | Price of first item       |
+| =g7sec12b.dta= | =s12bq3b1= |   39 | 999999, 9999999, 99999999                      | Price of second item      |
+| =g7sec12b.dta= | =s12bq3c1= |   12 | 999999, 9999999, 99999999                      | Price of third item       |
+| =g7sec11b.dta= | =s11bq12=  |    8 | 9999999, 99999999                              | Value of food received    |
+| =g7sec11b.dta= | =s11bq13=  |    8 | 9999999, 99999999                              | Value of other goods      |
+| =g7sec8b.dta=  | =s8bq7=    |    7 | 999999, 9999999, 99999999                      | Value of farm if sold now |
+| =g7sec7.dta=   | =s7cq10=   |    3 | 999999                                         | Total cost of construction|
+| =g7sec9b.dta=  | --         |    0 | *none at any width*                            | the 9B basket (clean)     |
+
+*Nothing currently shipped is affected -- checked column by column, not
+assumed.*  Every carrying column is one we do NOT serve:
+
+- =g7sec12b.dta= (durables) is read by *nothing*; GhanaLSS declares no =assets=
+  table, and the =12b-fortnight= entry in =derivations.yml= is a *different*
+  12B (=Y12B=, an older wave's food module).
+- =g7sec8b.dta= *is* read, by =plot_features=, but only =s8bq3=, =s8bq4a=,
+  =s8bq4b= and =s8bq8= -- not =s8bq7=.
+- =g7sec7.dta= *is* read, by =housing=, but only =s7fq1/2/3=, =s7dq1a1=,
+  =s7dq26a=, =s7dq11a=, =s7aq2= and =s7bq1= -- not =s7cq10=.
+- =g7sec11b.dta= is read by nothing.
+- =g7sec9b.dta= -- which *does* feed =food_acquired= -- carries *no* repdigit in
+  any column, so that =sane= table is clean.
+
+So this is a trap for whoever next wires GLSS7 durables, transfers, farm value
+or construction cost -- *not a live defect*.
+
+Note =99999996= in =s12bq3a1=: a field width Section 9A does NOT contain.  Do
+not copy 9A's literal set -- *measure the columns you are about to serve*.
+=g7sec8a.dta= and =g7sec11a1.dta= could not be read by the sweep (=TypeError=
+from =pyreadstat=), so they are *unchecked*, not clean.
+
+** The item codes are NOT comparable across waves, and the labels are not self-identifying
+
+Both traps are documented at the =nonfood_items= table in
+=_/categorical_mapping.org=; in one line each:
+
+- GLSS6 inserts =imported (china)= at code 4 and shifts every later code by
+  one, so of the 250 codes GLSS5 and GLSS6 share, *only 4 carry the same
+  label*.  One =Code_<wave>= column per wave, never a shared one.
+- The printed form groups items under headings and only the leaf reaches the
+  =.dta=: GLSS7 code 28 is literally "men", a label nine codes share.  Labels
+  shared inside a wave are rank-disambiguated ("Men (1)" ... "Men (9)"), which
+  keeps =j= injective and is stable across GLSS5/GLSS6 because the shift
+  preserves ordering.
+
+*GLSS5 and GLSS6 share one vocabulary (all 250 GLSS5 codes land on a row GLSS6
+also occupies); GLSS7 has its own.*  GLSS7 restructured the basket from 250 to
+508 items: *71* rows carry all three waves and 436 are GLSS7-only.  A
+GLSS6 -> GLSS7 crosswalk is *not* attempted -- fuzzy-matching "air conditioners
+and air coolers" onto "air conditioner - split chassis (cool)" would pool two
+different items.  *Comparing a GLSS7 =j= with a GLSS5/GLSS6 =j= is valid only
+for the 71 shared rows.*
+
+** 2005-06 is in OLD cedi, and the served numbers look 1000x wrong until you look
+
+Median row: 2005-06 *60,000*, 2012-13 *23*, 2016-17 *35*.  That is the July
+2007 redenomination (1 GHS = 10,000 GHC), already configured in
+=lsms_library/data_info.yml= (Currency), and =nonfood_expenditures(currency=
+'index')= labels the waves =GHC / GHS / GHS=.  =Expenditure= is nominal local
+currency by contract -- not deflated, not converted.
+
+** The four unwired waves are absent, not broken
+
+| wave | module | why not wired |
+|------+--------+---------------|
+| 1987-88, 1988-89 | Sections 11 + 12 (=Y11A..Y11D.DAT=) | Section 11 is four heterogeneous files -- 11A/11B amounts, 11C durable acquisitions, 11D transfers to persons -- and the =.DCT= label layer does not exist for GLSS1/GLSS2 (see the adjudication section above).  An acquisition-and-decode project |
+| 1991-92, 1998-99 | =S9A12= / =SEC9A12= (12-month *and* 3-month) + =S9A2= / =SEC9A2= (per-visit) | the data is there, but =nfdex1cd= / =nfdex2cd= carry *zero* Stata value labels, so the item axis needs the questionnaire.  Note these waves put a 3-month amount BESIDE the 12-month one -- two windows, so they will emit two rows per item and are the reason =RecallWindow= is declared for a country whose wired waves are all "12 months" |
+
+Recorded as =todo= in =.coder/coverage/absent_verdicts.csv= (the data is
+present; the config is not) -- *not* =unsure=, and certainly not =not-asked=.
+
 * individual_education — wave coverage (2026-06-08, GH #109)
 
 =individual_education= (Educational Attainment from each round's Section 2A)
@@ -2641,6 +3023,13 @@ the worktree); =_/ghanalss.py= already does it right with =countries_root()=
 (GH #436).  =tests/test_declared_spellings.py= records the same trap for
 1991-92 ("worth its own issue").  Not fixed here; the fix is
 =countries_root()/'GhanaLSS'/'<wave>'= in each module.
+
+/Resolved 2026-09-12 (GH #753)./  All four modules now build =path= from
+=countries_root()=, preserving their existing table names and search order.
+Subprocess sentinel tests cover every wave with an alternate config tree,
+including wave-table precedence and country-table fallback.  All eight
+cases failed against the package-relative paths before the fix.  No survey
+code or label has changed; the override now selects the intended tables.
 
 ** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
 
@@ -3656,22 +4045,32 @@ market does not sell); 2016-17 31,458 of 252,366 (12.5%).
   enumerator, and for CONTAINER units the enumerator often entered the
   container's *content weight in grams* instead of a count.  Decisive case:
   =Millet=, =u='Bowl'=, clusters 70735 / 70789 / 70791 -- =Price = 4.00=,
-  =NumberOfUnits = 4000=, against a =food_acquired= unit value for
+  =NumberOfUnits = 4000= in 70735 and =4100= in 70789 / 70791, against a =food_acquired= unit value for
   Millet/Bowl in Northern of *exactly 4.00 GHS*.  =Price= is the price of one
   bowl; the 4000 is the bowl's weight.  So the column contract's
   "=NumberOfUnits= = the quantity, in =u=, that =Price= refers to" is *false
-  for these rows*, and =Price / NumberOfUnits= returns ~1/1000 of the true
-  per-unit price (a log gap of +8.3, a ratio of 4,050).  Affects *5,351 of
-  220,908 rows (2.4%)*; top units Yard 1,729, Piece 801, Inches 304, Single
-  294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
+  for these rows*, and =Price / NumberOfUnits= returns ~1/4000 of the true
+  per-unit price (a log gap of +8.3, a ratio of 4,050).  The conservative
+  screen described below excludes *5,351 of 220,908 rows (2.4%)*; this is
+  *not a count of confirmed gram entries*.  It also excludes legitimate
+  counts and non-food dimensions.  Top excluded units: Yard 1,729, Piece
+  801, Inches 304, Single 294, Watts 262, Feet 254, Capsule 240.  Nothing is wrong in
   =community_prices= -- it stores the reported fields, which is its contract
   -- so the handling belongs in the consumer.  The constant-free screen used
   by =slurm_logs/price_sources/GhanaLSS/analysis.py= is: keep an observation
-  when =u= is a metric mass/volume unit (QTY is then unambiguously a quantity
-  of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
+  when =u= is a metric mass/volume unit (provisionally treating QTY as a
+  quantity of =u=) or when =NumberOfUnits == 1= (the two readings coincide).  It is
   not lossless -- a genuine crate of 24 eggs goes with it -- and recovering
   those rows by reading =Price= as the per-unit price needs a row-by-row
   judgement (QTY = 2 on a Bowl is ambiguous).
+  /Clarified 2026-09-12 (GH #826, @ligon's decision):/ preserve reported
+  fields and qualify =NumberOfUnits= in the schema and script documentation.
+  The counts and Millet values above were rechecked against the cached
+  table through =get_dataframe()=, treating its =Kilogram= label as the
+  API's =Kg= when applying the screen; no source quantities were changed.
+  This documents the limitation; consumer screening and quantity-basis
+  metadata remain open.  The screen is not proof that a retained row has
+  the correct basis, including metric-prefix cases below.
   *A weaker form of the same disease affects BOTH instruments in this wave*:
   metric-prefix miscoding.  Beer at =u='Liter'= priced 0.0080 GHS/L in the
   price file against 15.15 GHS/L in =food_acquired= (Eastern); Chicken
@@ -3838,3 +4237,63 @@ lock-free through =local_tools._ensure_dvc_pulled= + the sidecar md5
 (=slurm_logs/ghana_audit/community_prices/fetch_docs.py=) because
 =data_access.get_data_file= walks the DVC index through =DVCFS.exists()= and
 hung for more than ten minutes on this Lustre slice.
+
+* Interviewer visit dates
+
+Implemented 2026-09-12. The =interview_date= table uses calendar =visit=
+with reported =Int_t= dates. GLSS1/2 add the second Y00A contact; GLSS3
+retains S0A intake and adds S0B visits 2--11. GLSS6/7 remain intake-only.
+The existing parsers preserve parseable anomalous years and dates; the
+visit-melt helper omits undated slots, including 3 GLSS3, 15 GLSS6, and
+1 GLSS7 invalid intake dates. This does not establish that those contacts
+did not occur. Food consumption-occasion numbering is unchanged.
+
+GLSS4/5 use the registered =anchored-chronology-glss4= and
+=anchored-chronology-glss5= derivations in =_/derivations.yml=. The derived
+quantity is the =visit= index, not the reported date. Existing Part A
+intake dates take precedence; GLSS4 also retains unambiguous SEC0C visits
+2/3. Distinct valid dates across the source pages are assumed to represent
+distinct scheduled contacts; equal-date reports represent one model event.
+Every original report remains available separately. This is an explicit
+modeling choice: a parseable typo or shifted transcription can produce an
+incorrect assignment even when the chronological numbering is unique.
+
+The fixed rule enumerates increasing assignments into seven GLSS4 or eleven
+GLSS5 visits, honoring intake and Part A anchors and allowing missing visit
+numbers. A date receives an inferred number only if all admissible assignments
+agree on that number. Conflicting anchors, excess dates, and an empty candidate
+set produce no further inferred rows. There is no fixed-spacing assumption,
+offset fallback, or date correction. Every inference-produced assignment
+carries =Derivation=, including assignments equal to the original visit code.
+
+=Country('GhanaLSS').derivation_inputs(key, wave=...)= returns original
+variables and records, with source identity, =assigned_visit= and
+=assignment_reason=. It includes conflicting, invalid, and unresolved inputs;
+the original GLSS5 =reason= variable is preserved. Use keys
+=GhanaLSS::interview_date::anchored-chronology-glss4= and
+=GhanaLSS::interview_date::anchored-chronology-glss5=. The canonical table has
+no =obs= axis. Unresolved records are discoverable through the registry and
+inputs API even when they yield no served row; an empty country's metadata
+is not retained by Feature assembly.
+
+Source-backed checks give 37,702 GLSS4 date rows (19,713 inferred assignments)
+and 69,127 GLSS5 rows (60,440 inferred assignments). All 5,998 and 8,687
+existing intake dates respectively remain exact. All 59,971 and 189,805 raw
+source records retain their original fields, values, and dtypes. These counts
+validate the implementation against the shipped inputs, not the historical
+accuracy of inferred contacts.
+
+The September 11 visit-date report remains an investigation, not a cleaning
+rule. Its GLSS4 median-offset classification depends on selecting the first
+duplicate record; this implementation does not use it. Its GLSS5 description
+of disagreements as mainly month/year slips is contradicted by the source
+comparison: among 9,675 differing unique valid source pairs, 5,957 differ by
+exactly three days. Earlier economic interpretations of interval variation
+in this file are not re-adjudicated by the wiring change.
+
+Regression coverage lives in =tests/test_ghanalss_interview_date.py=,
+=tests/test_ghanalss_visit_inference.py=, and
+=tests/test_ghanalss_visit_derivations.py=. Tests cover source dependencies,
+actual Wave duplicate-anchor handling, raw-input linkage, and provenance
+through parquet and Feature. See =.coder/ledger/ghanalss-visit-dates.md= for
+the implementation decisions and verification record.

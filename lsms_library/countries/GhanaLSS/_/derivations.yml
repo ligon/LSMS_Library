@@ -50,3 +50,109 @@ GhanaLSS::food_acquired::12b-fortnight:
     with median ratio 1.018 in both rounds (n = 2,253 / 2,437 households).
   contents: GhanaLSS/_/CONTENTS.org, "12B is a value per eating occasion"
   since: '2026-09-11'
+
+GhanaLSS::interview_date::anchored-chronology-glss4:
+  waves: ['1998-99']
+  columns: [visit]
+  rule: >-
+    Retain SEC0A's intake at visit 1 and SEC0C's reported visits 2 and 3.
+    Treat distinct parseable dates across SEC0A/B/C as distinct scheduled
+    contacts, collapsing equal-date reports into one model event while
+    preserving every raw report. Enumerate all strictly chronological
+    injections into visits 1..7 consistent with those anchors; missing
+    ordinals are allowed. Serve a further assignment only when every
+    nonempty candidate solution gives that date the same visit. Conflicting
+    anchors, excess dates, or no candidate solution add no inferred rows.
+    Int_t is unchanged; only the calendar-visit assignment is constructed.
+  function: lsms_library.countries.GhanaLSS._.visit_dates:derive_glss4_visit_assignments
+  inputs: lsms_library.countries.GhanaLSS._.visit_dates:inputs_glss4
+  raw_variables:
+    - SEC0A.clust
+    - SEC0A.nh
+    - SEC0A.dd
+    - SEC0A.mm
+    - SEC0A.yy
+    - SEC0C.visitcd
+    - SEC0C.s0vday
+    - SEC0C.s0vmonth
+    - SEC0C.s0vyear
+    - SEC0B.visitcd
+    - SEC0B.s0dy_sum
+    - SEC0B.s0mt_sum
+    - SEC0B.s0yr_sum
+  assumptions:
+    - text: The survey schedules seven interviewer contacts.
+      basis: questionnaire
+      evidence: slurm_logs/2026-09-11_ghanalss_visit_dates/1998-99.org, Visit protocol
+    - text: >-
+        Distinct valid calendar dates denote distinct scheduled contacts;
+        equal-date reports denote one model event, not distinct same-day
+        scheduled contacts. A unique chronological assignment is accepted
+        without an independent corroboration gate. A parseable typo can
+        therefore receive an inferred visit; uniqueness does not prove accuracy.
+      basis: modelling-choice
+      evidence: Explicit user decision, 2026-09-12; CONTENTS.org visit-date notes
+    - text: >-
+        SEC0A intake and SEC0C visits 2/3 take precedence; a conflicting
+        alternative intake blocks further inference and is retained in inputs.
+      basis: modelling-choice
+      evidence: Preserve existing intake and established Part A assignments, 2026-09-12
+  validated_against: >-
+    Synthetic chronology, ambiguity, conflict, source-order, and raw-linkage
+    regression tests. This checks the fixed model, not external truth of each date.
+  contents: GhanaLSS/_/CONTENTS.org, interviewer visit dates
+  since: '2026-09-12'
+
+GhanaLSS::interview_date::anchored-chronology-glss5:
+  waves: ['2005-06']
+  columns: [visit]
+  rule: >-
+    Retain parta/sec0's intake as visit 1. Treat distinct parseable dates
+    across parta/sec0 and partb/secb0, secb1, secb2 as distinct scheduled
+    contacts; equal-date reports form one model event but remain separate
+    raw inputs. Enumerate all strictly chronological injections into visits
+    1..11 consistent with intake, allowing missing ordinals. Serve a further
+    assignment only when every nonempty candidate solution agrees. A
+    conflicting Part B intake, excess dates, or no candidate solution adds
+    no inferred rows. No offset fallback or date repair is applied.
+    Int_t is unchanged; only the calendar-visit assignment is constructed.
+  function: lsms_library.countries.GhanaLSS._.visit_dates:derive_glss5_visit_assignments
+  inputs: lsms_library.countries.GhanaLSS._.visit_dates:inputs_glss5
+  raw_variables:
+    - parta/sec0.hhid
+    - parta/sec0.ddate
+    - parta/sec0.mdate
+    - parta/sec0.ydate
+    - partb/secb0.day
+    - partb/secb0.month
+    - partb/secb0.year
+    - partb/secb1.visitno
+    - partb/secb1.intday
+    - partb/secb1.intmon
+    - partb/secb1.intyr
+    - partb/secb2.visitcd
+    - partb/secb2.vday
+    - partb/secb2.vmon
+    - partb/secb2.vyr
+  assumptions:
+    - text: The survey schedules eleven interviewer contacts.
+      basis: questionnaire
+      evidence: slurm_logs/2026-09-11_ghanalss_visit_dates/2005-06.org, Visit protocol
+    - text: >-
+        Distinct valid calendar dates denote distinct scheduled contacts;
+        equal-date reports denote one model event. Unique chronological
+        assignments are accepted without independent corroboration. Missing
+        visits are allowed; a parseable typo or shifted transcription can
+        still produce an inferred visit under this model.
+      basis: modelling-choice
+      evidence: Explicit user decision, 2026-09-12; CONTENTS.org visit-date notes
+    - text: >-
+        Part A intake takes precedence. A differing Part B intake prevents
+        further inference rather than replacing intake or licensing an offset.
+      basis: modelling-choice
+      evidence: Preserve existing intake; no offset fallback, 2026-09-12
+  validated_against: >-
+    Synthetic chronology, ambiguity, conflict, source-order, and raw-linkage
+    regression tests. This checks the fixed model, not external truth of each date.
+  contents: GhanaLSS/_/CONTENTS.org, interviewer visit dates
+  since: '2026-09-12'

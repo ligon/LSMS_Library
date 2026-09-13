@@ -1154,6 +1154,28 @@ written into that code's own =harvest_units= label — across nine distinct unit
 1 674 of the 1 706 =Kg= rows report a factor of exactly 1.  A column that
 happens to be mislabelled cannot do this; a column that IS the unit must.
 
+**** GH #850 widened which units resolve, and with them the test's basis
+
+Until [[https://github.com/ligon/LSMS_Library/issues/850][#850]] (=60f98ab1d=) =_parse_explicit_metric= matched
+=(?:kg|kilogram|kilogramme)\b=, and the =\b= after =kg= *rejects the plural*
+— so =Sack (50 kgs)= and =Tin (Debe) (20 lts)= never parsed their own stated
+weight and fell through to the price-ratio inference.  Six container units
+began resolving afterwards: Sack 100 (1 449 rows), Basin 15 lts (1 194),
+Sack 120 (316), Sack 50 (242), Tin 20 lts (232), Tin 5 lts (32) = *3 465*.
+
+The consequence for anyone reading the agreement statistic: the rows carrying
+BOTH a reported =a5bq6d= and a label-derived weight went *1 922 -> 5 410*
+(5 410 - 3 465 = 1 945, i.e. the whole original population plus the
+containers).  The containers are precisely where one farmer's "100 kg sack" is
+another's 80, so the *pooled* share agreeing within +/-20% fell 95.0% -> 74.7%
+while the *median* stayed 1.000 and every per-unit median above held.
+
+That dispersion is a property of the survey, not a signal about the wiring:
+=tests/test_gh842_uganda_harvest_unit.py= therefore asserts the *per-unit*
+median (9 of 10 units EXACTLY 1.000, =Sack (120 kgs)= 0.833 per the table
+above), not the pooled share.  Do not re-tighten the pooled threshold — it
+measures how many containers resolve, which is a library fact, not a Uganda one.
+
 *** =KgFactor=: the reported kg rate is now carried
 
 =a5aq6d= / =a5bq6d= ("6d. Record the conversion factor into kg") are carried
@@ -2799,6 +2821,35 @@ These are genuinely different stratification schemes.  For
 pooled analysis across waves, analysts may need to aggregate
 the finer sub-regions back to the 4-region level.
 
+** TODO Section 15 Part D (=gsec15d=, the 365-day durables flow) and Part E (=gsec15e=) are unwired
+
+/Recorded 2026-09-12./
+
+=nonfood_expenditures= reads =GSEC15C= only -- Section 15 *Part C*, the 30-day
+non-durable tier.  The household questionnaire fields two further consumption
+tiers that ship as their own files and that nothing in this repository reads
+(=grep -rn 'gsec15d\|gsec15e' lsms_library/= returns nothing):
+
+- *Part D*, =gsec15d.dta=, "Semi-Durable Goods and Durable Goods and Service
+  (During the last 365 days)": =CED03= purchases value, =CED04= consumption out
+  of household / enterprise stock, =CED05= received in-kind or free.  *Values
+  only* -- no unit, no quantity, no price column exists.  Items are clothing
+  and footwear (201-209), furniture and furnishings (301-306), household
+  appliances and equipment (401-411: TV, refrigerator, computers, bicycles,
+  motors, motorcycles, phone handsets, jewellery), glass/tableware/utensils
+  (501-506), education (601-606), services N.E.S. (701) and insurance premiums
+  (702_1-702_4).
+- *Part E*, =gsec15e.dta=, "Non-consumption Expenditure": =CEE03=, one value
+  per item over the last 365 days -- income tax, property rates, user fees,
+  other financial-service fees, local service tax, pension and social security
+  payments, remittances and transfers, funerals, interest on loans.
+
+Part D is the durable-goods *flow*, and this country's =assets= table serves
+only a *stock* value (=gsec14.dta= =h14q05=, "What is the Total estimated value
+of the [ASSET] owned at present?"), so the flow is not recoverable from
+anything currently served.  Part E is *not consumption* and must not be folded
+into an expenditure total if it is ever wired.
+
 * nonfood_expenditures (GSEC14B / GSEC15C) -- long since GH #817
 
 Item-level household non-food expenditure: =GSEC14B.dta= in 2005-06,
@@ -2806,6 +2857,55 @@ Item-level household non-food expenditure: =GSEC14B.dta= in 2005-06,
 the survey's separate /purchased/, /produced/ and /given/ (in-kind) columns;
 =j= is the =nonfood_items.org= *Preferred Label*.  There is no =away= column
 in any Uganda wave, so the helper's =away== argument is always =None=.
+
+** Rent -- including IMPUTED rent -- is a Section 15C consumption item, not a housing question, and uses the own-production prompt
+
+/Recorded 2026-09-12, from =2019-20/Documentation/Uganda 2019-20 Questionnaire.pdf= pp. 20--22, 33--34./
+
+*Uganda asks no rent question in its housing section.*  =GSEC9= (Section 9,
+"Housing Conditions, Water and Sanitation") asks tenure status -- =10= Owner
+Occupied, =15/16= Rented public/private, =11/12= Free public/private -- and,
+for owner-occupiers only, the parcel's capital value (Q38, "What is the current
+value of this parcel?").  The one monetary flow in the whole section is the
+water bill (Q14).  Housing cost is elicited *in Section 15 Part C instead*, as
+three ordinary consumption items on the 30-day non-food grid:
+
+| code | printed label               | column carrying the value   | 2019-20 rows served | median UGX/30 d |
+|------+-----------------------------+-----------------------------+---------------------+-----------------|
+|  301 | Rent of rented house        | =CEC05= purchased value     |                 321 |          50,000 |
+|  302 | Imputed rent of owned house | =CEC07= home-produced value |               2,567 |          30,000 |
+|  303 | Imputed rent of free house  | =CEC09= in-kind value       |                 183 |          30,000 |
+
+(=CEC04/06/08= quantities and =CEC10= unit price are empty for all three.)
+
+*There is no dedicated imputed-rent prompt.*  The owner-occupier is read Part
+C's generic own-production valuation question with =[ITEM]= filled as "Imputed
+rent of owned house":
+
+#+begin_quote
+CECO 7  What would be the total value of these [Q8] CECO 3] of [ITEM] if you
+        were to sell them at the farm gate UGX during the last 30 days?  UGX
+#+end_quote
+
+and the rent-free occupier gets its in-kind twin, CECO 9, "... if you were to
+sell them in the market?".  Quoted as printed: the form's own cross-references
+are broken (=[Q8]=, an unclosed bracket), and =CECO*= is spelled =CEC*= in the
+shipped =.dta=.
+
+*What this costs anyone summing the table.*  All three codes carry a Preferred
+Label in =nonfood_items.org= (Aggregate Label =Rent=), so they are served like
+any other item.  Measured on the warm 2019-20 frame, =Imputed Rent of Owned
+House= alone is *177.1 m of the wave's 757.0 m UGX total -- 23.4% of
+=nonfood_expenditures=*, over 2,567 households.  Nothing in the served table
+marks it as imputed rather than transacted.  So a housing share computed from
+this table is already inside it, and a non-food aggregate meant to exclude
+housing must drop =j in {Rent of Rented House, Imputed Rent of Owned House,
+Imputed Rent of Free House}= explicitly.
+
+GhanaLSS asks an owner-occupier nothing of the kind -- see
+=GhanaLSS/_/CONTENTS.org=, "Section 9B is the whole frequently-purchased
+basket".  Both instruments' elicitation language side by side:
+=slurm_logs/2026-09-12_elicitation_language.org=.
 
 ** It used to ship WIDE, and the pivot was ours, not the survey's
 
@@ -2867,6 +2967,34 @@ recall column to =nonfood_items.org=.  =RecallWindow= is declared
 =optional: true= in =lsms_library/data_info.yml= precisely so that can be done
 later without a migration.  *Out of scope for GH #817, which was about shape.*
 Same gap, same class, as Nigeria's =sect8= / =sect11= pooling.
+
+*** The 2019-20 PRINTED form states one window for all of Part C -- evidence, not a verdict (2026-09-12)
+
+The paragraph above rests on the =[RECALL]= CAPI fill in the 2011-12 /
+2013-14 variable labels.  The 2019-20 household questionnaire
+(=2019-20/Documentation/Uganda 2019-20 Questionnaire.pdf=, pp. 20--22) prints a
+*single* window, on the banner of every Part C page and inside every Part C
+prompt:
+
+#+begin_quote
+Part C: Non-Durable Goods and Frequently Purchased Services (During the last 30 days)
+#+end_quote
+
+#+begin_quote
+CECO 4  How many [CECO 3] of [ITEM] did your household purchased during the
+        last 30 days?
+#+end_quote
+
+with Part D printing "(During the last 365 days)" the same way.
+
+*This does not settle the question, and does not retire the entry above.*  Two
+readings survive it: the item-specific fill was replaced by a fixed 30-day
+window by 2019-20, or the printed paper form is the *un-substituted template*
+and CAPI still varied the window per item -- which is exactly what made
+=[RECALL]= a placeholder in the first place.  What would settle it is the
+2019-20 CAPI instrument (the item roster with its per-item recall attribute),
+which is not among the shipped documentation.  Until then the window for this
+table stays *recorded as unknown, with this evidence attached*.
 
 ** =labels='Aggregate'= silently does nothing on this table
 

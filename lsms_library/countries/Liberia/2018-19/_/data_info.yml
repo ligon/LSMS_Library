@@ -95,10 +95,12 @@ plot_features:
     # clean LONG: one row per (hhid, parcel_id), no duplicates.  parcel_id
     # is the per-household parcel identifier (float in source -> format_id
     # makes it a clean string '1','2',...).  Area=S10_4 ("total area of
-    # parcel - respondent's estimate", native unit) with AreaUnit=S10_4B
-    # (acres / lot(s) / hectares / other -- units are NOT homogeneous, so
-    # Area is left in its native unit and the unit is carried alongside,
-    # following the Uganda/Tanzania pattern).  Tenure=S10_5 (ownership
+    # parcel - respondent's estimate") converted per-row to HECTARES on
+    # the native unit S10_4B (acres / lot(s) / hectares / other) by the
+    # mapping.py plot_features df_edit hook -- canonical schema, GH #879.
+    # 'lot(s)' is not a defined unit in any shipped document and 'other'
+    # names nothing, so those rows serve NaN Area with the native unit
+    # still recorded in AreaUnit (honest, not fabricated).  Tenure=S10_5 (ownership
     # status) mapped to the canonical Tenure vocabulary.  S10_6A/S10_6B are
     # use-payment amount / period (NOT GPS, despite the triage note) and
     # are ~98% NaN, so they are omitted.  No SoilType / Irrigated /

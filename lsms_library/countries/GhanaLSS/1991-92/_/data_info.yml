@@ -111,16 +111,85 @@ sample:
         Rural: loc2
 
 interview_date:
-    file: S0A.DTA
-    idxvars:
-        i:
-            - clust
-            - nh
-    myvars:
-        Int_t:
-            - dd
-            - mm
-            - yy
+    # Keep the original intake page, even when the summary page disagrees.
+    dfs:
+        - intake_date
+        - later_interview_dates
+    intake_date:
+        file: S0A.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            Int_t:
+                - dd
+                - mm
+                - yy
+    later_interview_dates:
+        file: S0B.DTA
+        idxvars:
+            i:
+                - clust
+                - nh
+        myvars:
+            Int_t_v2:
+                - vd2
+                - vm2
+                - vy2
+                - mapping: Int_t
+            Int_t_v3:
+                - vd3
+                - vm3
+                - vy3
+                - mapping: Int_t
+            Int_t_v4:
+                - vd4
+                - vm4
+                - vy4
+                - mapping: Int_t
+            Int_t_v5:
+                - vd5
+                - vm5
+                - vy5
+                - mapping: Int_t
+            Int_t_v6:
+                - vd6
+                - vm6
+                - vy6
+                - mapping: Int_t
+            Int_t_v7:
+                - vd7
+                - vm7
+                - vy7
+                - mapping: Int_t
+            Int_t_v8:
+                - vd8
+                - vm8
+                - vy8
+                - mapping: Int_t
+            Int_t_v9:
+                - vd9
+                - vm9
+                - vy9
+                - mapping: Int_t
+            Int_t_v10:
+                - vd10
+                - vm10
+                - vy10
+                - mapping: Int_t
+            Int_t_v11:
+                - vd11
+                - vm11
+                - vy11
+                - mapping: Int_t
+    merge_on:
+        - i
+    merge_how: outer
+    final_index:
+        - t
+        - i
+
 
 household_roster:
     file: S1.DTA
@@ -143,7 +212,10 @@ plot_features:
     # matching household_roster's i.  This wave has no variable/value labels:
     # s8bq4 = farm size, s8bq4c = unit code (decoded with the GLSS area-unit
     # codes 1=Acres,2=Poles,3=Ropes,4=Hectare; verified against the GLSS7
-    # value labels and the code-frequency distribution).  s8bq8 in this wave
+    # value labels and the code-frequency distribution).  Area is converted
+    # per-row to HECTARES on AreaUnit by the ghanalss.plot_features df_edit
+    # hook (canonical schema, GH #879; the GSS producer factors recovered
+    # from GhanaSPS 2009-10's shipped area_ha).  s8bq8 in this wave
     # is a value field (not a tenure code), and the GLSS3 tenure code is not
     # recoverable, so Tenure is omitted.  Section 10 is non-farm ENTERPRISES.
     file: S8B.DTA

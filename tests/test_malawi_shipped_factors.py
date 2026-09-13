@@ -181,6 +181,7 @@ class TestConditionVocabulary:
 # The loader
 # --------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 class TestLoaderShape:
     def test_every_key_is_joinable(self, shipped):
         """A key outside SHIPPED_FACTOR_JOIN_LEVELS is silently dropped."""
@@ -225,6 +226,7 @@ class TestLoaderShape:
             malawi_mod.crop_conversion_factors(seasonal=False, tree=False)
 
 
+@pytest.mark.requires_s3
 class TestMatchRates:
     """Pinned by exact number: a silent drop here is the whole failure mode."""
 
@@ -265,6 +267,7 @@ class TestMatchRates:
             'North', 'Central', 'Southern'}
 
 
+@pytest.mark.requires_s3
 class TestVarietyKey:
     """The file's crop key is FINER than ours -- so we key on the variety.
 
@@ -364,6 +367,7 @@ class TestVarietyKey:
         assert 'Rice' not in set(out['crop'])
 
 
+@pytest.mark.requires_s3
 class TestTreeConditionIsTheSentinelNotNA:
     def test_tree_rows_carry_unknown_condition(self, shipped):
         """NA would normalise to the join's private NA sentinel and match
@@ -381,6 +385,7 @@ class TestTreeConditionIsTheSentinelNotNA:
 # End to end, on the built table
 # --------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 class TestAgainstCropProduction:
     def test_condition_is_served_and_never_null(self, cp):
         assert 'condition' in cp.index.names

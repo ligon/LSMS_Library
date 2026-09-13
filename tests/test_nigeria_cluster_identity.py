@@ -312,3 +312,82 @@ def test_community_prices_joins_the_household_keyspace(nigeria, sample):
             f'{t}: only {rate:.1%} of community_prices clusters join sample.v; '
             f'the two sides are not in the same keyspace'
         )
+
+
+# --------------------------------------------------------------------------
+# GH #834 -- the C8 SIZE field (W3-W5): metric package sizes are divided
+# through to per-unit prices; an unrecorded package size is dropped, never
+# served mis-scaled under `g`/`cl`.
+# --------------------------------------------------------------------------
+
+def test_community_prices_metric_sizes_are_per_unit(nigeria):
+    """W4/W5 coded metric sizes (c8q2c / c8aq2_c: '34. 250 GRAMS', '24. 75 CL')
+    mean the reported price is of that PACKAGE.  The build divides it by the
+    decoded quantity and re-units the row to 'g'/'cl', stamping the Derivation
+    key.  Measured pre-fix: median community/household ratio 1/189 on `g` and
+    1/42 on `cl`; post-fix ~1.0 where a household unit value exists."""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+    assert 'Derivation' in cp.columns
+    key = 'Nigeria::community_prices::c8-metric-size'
+    r = cp.reset_index()
+    derived = r[r['Derivation'].eq(key)]
+    assert len(derived) > 10000
+    assert set(derived['u']) <= {'g', 'cl'}, derived['u'].unique()
+    # Every derived row sits in a W4/W5 quarter (W3 contributes one row).
+    assert set(derived['t']) <= {'2016Q1', '2019Q1', '2024Q1'}
+    # A per-unit price in Naira per gram / centilitre is a small number;
+    # the pre-fix package prices were tens-to-hundreds of Naira per "g".
+    for t in ('2019Q1', '2024Q1'):
+        d = derived[derived['t'].eq(t)]
+        assert d['Price'].median() < 50, (t, d['Price'].median())
+
+
+def test_community_prices_unrecorded_package_sizes_dropped(nigeria):
+    """W3's c8q2b is blank on 13,767 of 13,768 metric-unit rows and W4's
+    'Grams(g)' rows carry no c8q2c code: a price of an unrecorded package
+    cannot be normalised, so those rows are dropped rather than served ~190x
+    off as `g`/`cl`.  Post-fix 2016Q1 serves exactly ONE cl row (the single
+    '50cl' free-text row) and no g rows; 2019Q1's `g` rows are exactly the
+    coded-metric-size derivation."""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+    r = cp.reset_index()
+    w3 = r[r['t'].eq('2016Q1')]
+    assert int((w3['u'] == 'g').sum()) == 0
+    assert int((w3['u'] == 'cl').sum()) == 1
+    key = 'Nigeria::community_prices::c8-metric-size'
+    w4 = r[r['t'].eq('2019Q1')]
+    assert int((w4['u'] == 'g').sum()) > 1000
+    assert w4.loc[w4['u'].isin(['g', 'cl']), 'Derivation'].eq(key).all()
+
+
+def test_community_prices_g_cl_match_the_household_unit_value(nigeria):
+    """The end-to-end check the fix is judged by: on 2019Q1 (the one quarter
+    where the household side records cl-labelled purchases), the median
+    community/household price ratio on matched (v, j, u) cells is ~1.0 on
+    both metric units -- the same agreement Kg and l always showed."""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+        fa = nigeria.food_acquired()
+    f = fa.reset_index()
+    f = f[f['s'].eq('purchased')][['t', 'v', 'j', 'u', 'Quantity',
+                                   'Expenditure']].dropna()
+    f = f[(f['Quantity'] > 0) & (f['Expenditure'] > 0)]
+    f['uv'] = f['Expenditure'] / f['Quantity']
+    fmed = f.groupby(['t', 'v', 'j', 'u'])['uv'].median()
+    d = cp.reset_index()[['t', 'v', 'j', 'u', 'Price']].dropna()
+    d = d[d['Price'] > 0]
+    cmed = d.groupby(['t', 'v', 'j', 'u'])['Price'].median()
+    cells = pd.concat([cmed.rename('community'), fmed.rename('household')],
+                      axis=1).dropna()
+    cells = cells[cells.index.get_level_values('t') == '2019Q1']
+    cells['ratio'] = cells['community'] / cells['household']
+    for u, n_min in (('g', 100), ('cl', 100)):
+        sub = cells[cells.index.get_level_values('u') == u]
+        assert len(sub) >= n_min, (u, len(sub))
+        med = sub['ratio'].median()
+        assert 0.8 < med < 1.25, (u, med)

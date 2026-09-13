@@ -116,6 +116,7 @@ class TestDefaultPathUnchanged:
         out = food_expenditures_from_acquired(_corpus(), basis='total')
         assert not any(k.startswith('valuation') for k in out.attrs)
 
+    @pytest.mark.requires_s3
     @pytest.mark.slow
     @pytest.mark.parametrize('basis', ['purchased', 'total'])
     def test_warm_uganda_identical(self, basis):
@@ -467,6 +468,7 @@ class TestDegradedLadder:
             assert _Stub()._valuation_geo() is None
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestCountryApi:
     def test_uganda_default_unchanged_and_attrs_ride_through(self):

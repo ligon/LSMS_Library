@@ -47,6 +47,13 @@ interview_date:
             - DAY1
             - MO1
             - YR1
+        # Round Two is a second contact, not food's single-occasion visit=1.
+        Int_t_v2:
+            - DAY2
+            - MO2
+            - YR2
+            - mapping: Int_t
+
 
 household_roster:
     file: Y01A.DAT

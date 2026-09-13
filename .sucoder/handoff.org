@@ -1,12 +1,102 @@
 #+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
+* GhanaLSS backlog session (2026-09-12, Sue / GPT-6, job 38734650)
+
+This section supersedes the older next-action suggestions below. The working
+clone is =/local/job38734650/mirrors/LSMS_Library=, branch =development=;
+=origin= is the durable shared mirror. No PR was auto-merged.
+
+** Changes prepared for human merge
+
+| issue | PR | branch | code commit | result |
+|-------+----+--------+-------------+--------|
+| #753 | [[https://github.com/ligon/LSMS_Library/pull/886][#886]] | fix/753-ghanalss-config-root | 19b94acca | Four early-wave label maps honor countries_root |
+| #826 | [[https://github.com/ligon/LSMS_Library/pull/887][#887]] | docs/826-ghanalss-price-quantity | 4bb08cf6c | Qualify reported QTY; preserve raw fields |
+| #757 | [[https://github.com/ligon/LSMS_Library/pull/888][#888]] | fix/757-country-wave-inputs | 27ab8b285 | Inherited country/global Org edits invalidate wave caches |
+| #780 | [[https://github.com/ligon/LSMS_Library/pull/889][#889]] | fix/780-ghanalss-fingerprint | ee8a63e05 | Fingerprint compiled patterns; warn on degraded fingerprints |
+
+All branch commits were published to origin by the post-commit hook and
+pushed to GitHub. Each fix has isolated worktree verification and independent
+review. Per-task ledgers for #757/#780 were committed separately.
+
+The user explicitly chose documentation-only handling for #826. The 5,351
+screened-out GLSS7 observations are not all confirmed gram entries. Millet
+quantity is 4000 at cluster 70735 and 4100 at 70789/70791; the raw-cache
+=Kilogram= label must count as the API's =Kg= when reproducing the screen.
+No automatic unit correction, filtering, or imputation was introduced.
+
+** Verification and cache implications
+
+- #753: eight new sentinel cases fail on original code; override suite 12
+  passed plus one existing rural regression. Scoped Feature audit retained
+  identical roster/sample/cluster cached DataFrames and substantive findings.
+- #757: 22 tests passed in worker and independent review. Restoring the old
+  hash method makes the synthetic Old -> mapping edit -> stale -> New cache
+  regression fail. Country-only edits remain country-scoped; global edits
+  invalidate broadly. Initial sampled hashes changed 46/46 by design.
+- #780: 35 tests passed, including all country import closures and Ghana
+  cross-process determinism. Standalone pattern coverage also picks up the
+  shared DCT parser's previously omitted pattern: all five control hashes
+  change; removing only standalone recognition restores their old hashes.
+  Normal warnings retain best-effort loading. Under caller-selected
+  warnings-as-errors the wave warning raises and the country outer catch
+  returns None; this is explicitly tested.
+- Combined targeted suite: 69 passed, 16 existing warnings, using
+  =-n 32 --dist=loadfile=, =LSMS_BUILD_WORKERS=1= and =--no-purge=.
+- Both cache fixes deliberately cause initial broad invalidation. No shared
+  cache was purged; data verification uses private L2 copies and shared L1.
+  Even #826 documentation edits can move Ghana hashes because source files
+  and data_scheme.yml are hashed whole.
+- Combined GhanaLSS/Albania Feature audit: all eight default API frames
+  identical before/after under symmetric parquet roundtrip, including values,
+  labels, indexes and dtypes. All 34 baseline substantive findings remain.
+  Ten additional rebuild warnings concern Albania's Makefile, absent in both
+  checkouts; no new schema/assembly/data findings. Source stderr about 711
+  null-PSU person rows and 83 sentinel-coded households matches Albania's
+  CONTENTS.org. Existing unclosed-file ResourceWarnings decreased 522 -> 48.
+  GitHub CI was still pending at handoff.
+
+Reproduce targeted tests with the checkout as cwd, =PYTHONPATH= pointing to
+it, and the main clone's =.venv/bin/python -m pytest= on
+=tests/test_countries_root_override.py=,
+=tests/test_cache_hash_invalidation.py=, and
+=tests/test_build_transform_hash.py=. Feature audit scope:
+=--features household_roster sample cluster_features individual_education
+--countries GhanaLSS Albania --phases 1=. GitNexus tools were unavailable;
+review used ripgrep call-site analysis, diffs, and executable regressions.
+
+** Reconciliation and remaining decisions
+
+- Closed #563: nutrition already implemented in PR #769; 10 current tests pass.
+- Closed #770: currency-as-mass defect already fixed in PR #784; 16 current
+  non-slow regression tests pass.
+- #797 Ghana relationship harmonization already implemented; global kinship
+  variant cleanup remains human-owned. #873 derivation attrs also already
+  fixed, despite the older handoff suggestion below.
+- #783 vocabulary migration landed in #789, but Ghana's Aggregate column
+  remains intentionally absent pending the documented CFE curation decision.
+- #832 Ghana unit spellings already fixed; other countries remain in scope.
+- #709 pandas >=3.0 floor already landed; ancillary requests remain.
+- #562 phase 3a community prices exists for six waves. Phase 3b inverse
+  imputation remains a design task; GLSS5 prices are asked-not-distributed.
+- #826 remains open for consumer quantity-basis handling. Visit-date wiring,
+  recall normalization (#851), and broad cache issues #778/#809 remain separate.
+
+Next action: review/merge the four PRs after CI, then choose the next Ghana
+data-design task. Keep the source-field preservation decision above intact.
+The node has 32 CPUs / 93 GiB RAM; FCA usage at setup was 42,593.38 of
+1,500,000 SUs. The prepared venv image is mounted node-locally; the empty
+bootstrap venv was preserved as =.venv.bootstrap=. Release the billed node
+with =sucoder release= when finished.
+
 * State (2026-09-12, evening)
-- =development= published through 0f4eff9a7 on the mirror AND pushed to
-  GitHub; draft release PR development -> master is open (v0.12.0) with
-  the verified Closes list (=docs/releases/v0.12.0-closes.txt=); notes at
-  =docs/releases/v0.12.0.md=.  Merge with a merge commit, then tag v0.12.0
-  on master and =gh release create= (release skill; verify the publish
-  workflow fired).
+- *v0.12.0 RELEASED* (2026-09-12): PR #885 merged into master with a merge
+  commit (2cbcbb046), tag =v0.12.0= on it (GitHub + mirror), GitHub
+  release created from =docs/releases/v0.12.0.md=, #871-#878 auto-closed,
+  =development= fast-forwarded to the same commit on both remotes.
+  Verify PyPI shows 0.12.0 (=gh run list --workflow=publish.yml=); if the
+  release event did not fire, =gh workflow run publish.yml --ref master
+  -f tag=v0.12.0= (release skill).
 - Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
   #872, #873, #874, #876, #871 (most-complete observed row at all three
   collapses; reverses the 2026-07-13 completion doctrine), plus the
@@ -23,8 +113,9 @@
 - Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
   #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
   see the PR's status.  Recipe: CLAUDE.md addendum 3b.
-- Coverage regrade (=make matrix=) NOT run: it cold-builds and would not
-  fit the job; due before or right after the release.
+- Coverage regrade done per country on the warm corpus (3304cf289): no
+  tier moved.  Quirk: a single-country =make matrix= run does not apply
+  the curated =blocked= verdicts (Nepal graded 'broken'); rows restored.
 
 * Open questions for @ligon
 - All merged refs deleted (mirror and local).  #879-#884 filed for the

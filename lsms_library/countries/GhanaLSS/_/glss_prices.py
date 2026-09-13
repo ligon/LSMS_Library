@@ -45,8 +45,7 @@ Reported columns ONLY:
                      conversion, no deflation (the 1980s files' ``PRICEnU`` and
                      ``PRICE`` are CALCULATED fields -- BID §6.2 -- and are not
                      stored).
-* ``NumberOfUnits``  the quantity, in ``u``, that ``Price`` refers to: the
-                     weighed/measured quantity where the file carries one
+* ``NumberOfUnits``  the reported quantity where the file carries one
                      (1987-88/1988-89 ``QUANn``, 2012-13 ``s1stkg`` etc.,
                      2016-17 ``quantity{a,b,c}``), otherwise the form's stated
                      basis for the item (``Basis`` column of
@@ -54,7 +53,12 @@ Reported columns ONLY:
                      tablets", 6 for "6 yards", 0.170 for the evaporated-milk
                      tin).  GLSS3/GLSS4 distribute only the per-unit value
                      ``p`` = PRICE/KG (the weighed KG is not shipped), so
-                     ``NumberOfUnits`` there is the form's basis.
+                     ``NumberOfUnits`` there is the form's basis. GLSS7's
+                     reported QTY is not always a count of ``u``: container
+                     observations can report content weight instead. Preserve
+                     it as reported; ``Price / NumberOfUnits`` is a per-unit
+                     price only where the quantity basis is established.
+                     See CONTENTS.org, GLSS7 price survey, and GH #826.
 * ``Description``    the free text the survey attaches to the row beyond
                      ``j``/``u``: the form's own item label (so two items the
                      ``harmonize_food`` axis folds together -- "Goat (fresh)"

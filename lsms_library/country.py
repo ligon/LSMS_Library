@@ -45,6 +45,7 @@ from .local_tools import (
     cache_freshness,
     stamp_parquet_hash,
     read_parquet_grain_audit,
+    read_parquet_cache_waves,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -59,6 +60,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
@@ -96,6 +98,59 @@ JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 # food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
 # ``#+name: u`` categorical table must not remap these on *derived* food
 # tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+#: Directory that must be on a build subprocess's ``PYTHONPATH`` for
+#: ``import lsms_library`` to resolve to *this* package rather than whichever
+#: checkout the interpreter's ``.pth`` files happen to pin.  Derived from this
+#: module's own location, so it is correct for a git clone, a worktree and a
+#: pip install alike, and -- unlike ``countries_root()`` -- it is unaffected by
+#: the ``LSMS_COUNTRIES_ROOT`` override (GH #436), which may point at a config
+#: tree in a different checkout entirely.
+_PACKAGE_PARENT = Path(__file__).resolve().parent.parent
+
+
+def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
+    """Environment for a Make/wave-script subprocess on the build path.
+
+    Every build that shells out must hand the child the SAME library it is
+    itself running, or the child silently builds against another checkout.
+    That is the write side of the ``.pth`` trap (GH #803): ``to_parquet`` ->
+    ``_resolve_data_path`` only redirects a script's output under
+    :func:`data_root` when the script's file lies under the *imported*
+    package's ``countries_root()``, so a child that imports a different
+    checkout writes its parquet in-tree, where nothing will ever read it.
+
+    Both shell-out sites now build their environment here, because they did
+    not agree and the disagreement was invisible:
+
+    * ``Wave.grab_data``'s legacy wave-level fallback set ``PATH`` and
+      ``LSMS_DATA_DIR`` but no ``PYTHONPATH`` at all;
+    * ``Country.run_make_target``'s ``build_env`` set ``PYTHONPATH`` to
+      ``countries_root()`` -- which is NOT importable as ``lsms_library`` and
+      therefore, measured, leaves the child importing exactly what it would
+      have imported with no ``PYTHONPATH`` set.  It looked like a guard and
+      was not one.
+
+    ``_PACKAGE_PARENT`` is prepended so it wins over any inherited entry;
+    anything already on ``PYTHONPATH`` is preserved after it, as are any
+    *extra_pythonpath* entries a caller needs (``run_make_target`` passes
+    ``countries_root()``, which it has always put there).
+    """
+    env = os.environ.copy()
+    bin_dir = os.path.dirname(sys.executable)
+    env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+
+    parts = [str(_PACKAGE_PARENT), *(str(p) for p in extra_pythonpath)]
+    inherited = env.get("PYTHONPATH", "")
+    for entry in inherited.split(os.pathsep):
+        if entry and entry not in parts:
+            parts.append(entry)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+
+    env.setdefault("PYTHON", sys.executable)
+    env["LSMS_DATA_DIR"] = str(data_root())
+    return env
+
+
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
@@ -850,13 +905,15 @@ class Wave:
         - the wave's ``data_info.yml`` (column maps / merges / derived);
         - the wave-module formatting functions
           (``{wave_folder}.py``, ``mapping.py``);
+        - wave/country build Org inputs and inherited global categorical tables;
         - YAML-path: the DVC fingerprint of each declared source file;
         - script-path: the ``_/{table}.py`` text plus the fingerprints of
           any data files it references as string literals.
 
         Deliberately excluded: post-read transforms (kinship, spellings,
-        categorical mappings, ``_join_v_from_sample``) -- they re-run on
-        every read and never touch the cached parquet.
+        post-read categorical application, ``_join_v_from_sample``) -- they
+        re-run on every read. Mapping tables consumed during extraction ARE
+        build inputs and must invalidate the wave parquet.
         """
         wave_dir = self.file_path / "_"
         if not wave_dir.is_dir():
@@ -877,6 +934,22 @@ class Wave:
             if org.name in _ORG_HASH_SKIP:
                 continue
             parts.append(f"org:{org.name}=" + (cached_file_hash(org) or "none"))
+
+        # Inherited mappings can be baked into YAML extraction or scripts
+        # (GH #757; .coder/ledger/757-wave-categorical-inputs.md sections 2-5).
+        # Match Country.categorical_mapping's roots, conservatively hashing
+        # whole files just as the wave/country build-input loops already do.
+        cdir = self.country.file_path / "_"
+        global_cm_dir = Path(str(files("lsms_library") / "categorical_mapping"))
+        for prefix, directory in (("corg", cdir), ("gorg", global_cm_dir)):
+            for org in sorted(directory.glob("*.org")):
+                if org.name not in _ORG_HASH_SKIP:
+                    parts.append(f"{prefix}:{org.name}=" + (cached_file_hash(org) or "none"))
+        if not (cdir / "categorical_mapping.org").exists():
+            # The parent is a fallback for this one file, not a second
+            # country build directory. An unused fallback must not invalidate.
+            fallback = self.country.file_path.parent / "_" / "categorical_mapping.org"
+            parts.append("parent_cmap=" + (cached_file_hash(fallback) or "none"))
 
         data_info = _parse_data_info_cached(wave_dir / "data_info.yml", di_hash)
         block = data_info.get(table) if isinstance(data_info, dict) else None
@@ -904,7 +977,9 @@ class Wave:
         # Two layers (GH #522): (1) file-hash each module's OWN body -- so e.g.
         # _age_helpers.py's _clean_year/apply_age_handler is versioned; (2) fold
         # the lsms_library-import CLOSURES those modules reach (age_handler,
-        # conversion_table_matching_global, ...).  Best-effort; never raises.
+        # conversion_table_matching_global, ...).  Best-effort under the normal
+        # warning policy; callers promoting RuntimeWarning to errors can make
+        # this wave-level gate raise.
         try:
             cdir = self.country.file_path / "_"
             wave_pys = tuple(sorted(str(p) for p in wave_dir.glob("*.py"))) if wave_dir.is_dir() else ()
@@ -927,8 +1002,13 @@ class Wave:
             fw_c = framework_imports_fingerprint(country_pys)
             if fw_w or fw_c:
                 parts.append(f"fwimp={fw_w}:{fw_c}")
-        except Exception:
-            pass
+        except Exception as exc:
+            warnings.warn(
+                f"Framework import fingerprint unavailable for {self.file_path} "
+                f"table {table!r}; cache invalidation is degraded: "
+                f"{type(exc).__name__}: {exc}",
+                RuntimeWarning, stacklevel=2,
+            )
 
         # Build-path framework transform CODE (GH #522 / cache step 2): version
         # the @build_transform closure relevant to this table, so editing e.g.
@@ -1595,10 +1675,9 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                env = os.environ.copy()
-                env["LSMS_DATA_DIR"] = str(data_root())
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                # GH #803 write side: the child must import THIS package, or
+                # to_parquet's redirect misses and the parquet lands in-tree.
+                env = _script_subprocess_env()
                 # Mirror ``run_make_target`` (country.py ~line 1856): include
                 # ``_make_jobs_flag()`` so this wave-level legacy fallback can
                 # exploit the cores it was given.  Without this, every
@@ -3244,6 +3323,46 @@ class Country:
             check_quantities(
                 df, country=self.name, table=str(method_name or "?"))
 
+            # SITE I (GH #847): a NaN on a DECLARED INDEX LEVEL.  Site B asks
+            # whether a declared column holds anything; this asks the same of
+            # the declared levels themselves.  The row is SERVED, so no
+            # build-path guard fires; it vanishes in the first groupby
+            # (`groupby` defaults to dropna=True), counted at the collapse by
+            # GH #323 and otherwise never counted.  Warns-and-names, same
+            # ledger pattern as the other two guards; the country-level fix
+            # (sentinel / explicit drop) is deliberately not a framework
+            # function.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read (warm cache included), so no stamp-and-replay is
+            # needed; and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  Measured (stash-probe,
+            # 2026-09-13): 0 of 10 probed table hashes and 0 of 3 build
+            # fingerprints moved.
+            #
+            # The level list is the union of the country's OWN declaration
+            # (`data_scheme.yml`, under whatever spelling it uses) and the
+            # canonical one (`data_info.yml`'s Index Info, plus the table's
+            # `level_aliases` spellings -- e.g. Niger declares no `v` but the
+            # v-join adds one, and Uganda spells the plot axis `plot` where
+            # the canonical name is `plot_id`).  A frame whose index matches
+            # either list still names the NaN-keyed level; both lists are
+            # cheap to build and the audit only ever inspects levels the
+            # frame actually carries.
+            _index_levels = list(_declared_index_levels(scheme_entry))
+            _canonical = _canonical_index_levels().get(str(method_name or ""), ())
+            _aliases = _canonical_index_level_aliases().get(str(method_name or ""), {})
+            for lvl in _canonical:
+                if lvl not in _index_levels:
+                    _index_levels.append(lvl)
+                alias_of = {a for a, c in _aliases.items() if c == lvl}
+                for a in alias_of:
+                    if a not in _index_levels:
+                        _index_levels.append(a)
+            check_index_levels(
+                df, _index_levels,
+                country=self.name, table=str(method_name or "?"))
+
         return df
 
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
@@ -3256,11 +3375,32 @@ class Country:
         parquet.  Returns ``None`` (``unverifiable`` -> read-if-present)
         when no wave can produce an input hash, so tables the scheme
         can't introspect never regress the v0.7.0 fast path.
+
+        **The hash is wave-set-INDEPENDENT (GH #891).**  It folds
+        ``set(waves) | set(self.waves)``, not the requested set, because
+        every request for this table -- all waves or one -- shares the single
+        cache path ``var/{table}.parquet``.  Folding the *requested* set made
+        ``sample(waves=['2016-17'])`` and ``sample()`` grade each other's cache
+        stale and rebuild it on every alternation, which is what #891 reports.
+
+        Taking the union rather than simply ``self.waves`` keeps an exotic
+        caller (a wave not in ``self.waves``) covered instead of silently
+        unhashed.  For every ordinary call the union equals ``self.waves``, so
+        an all-waves request hashes **byte-identically to the pre-#891
+        payload** and no warm all-wave parquet is invalidated by this change.
+
+        Coverage is no longer carried by the hash, so it has to be carried
+        somewhere: the parquet records the waves it was built from under
+        ``lsms_cache_waves`` (see :func:`local_tools.read_parquet_cache_waves`)
+        and the read path serves it only to a request it actually covers.
+        Dropping the wave set from the hash *without* that manifest would serve
+        a one-wave parquet to an all-wave request -- see GH #892 for the same
+        failure in the ``assume_cache_fresh`` branch.
         """
         try:
             wave_hashes: list[str] = []
             any_hash = False
-            for w in sorted(waves):
+            for w in sorted(set(waves) | set(self.waves)):
                 try:
                     wh = self[w]._input_hash(method_name)
                 except (KeyError, AttributeError, OSError):
@@ -3331,7 +3471,16 @@ class Country:
             try:
                 country_pys = tuple(sorted(str(p) for p in cdir.glob("*.py"))) if cdir.is_dir() else ()
                 fwimp = framework_imports_fingerprint(country_pys)
-            except Exception:
+            except Exception as exc:
+                # Normally retain the partial hash. If the caller promotes
+                # this warning to an error, the existing outer catch returns
+                # None, as it does for other country-hash failures.
+                warnings.warn(
+                    f"Framework import fingerprint unavailable for {self.file_path} "
+                    f"table {method_name!r}; cache invalidation is degraded: "
+                    f"{type(exc).__name__}: {exc}",
+                    RuntimeWarning, stacklevel=2,
+                )
                 fwimp = ""
             payload = (f"schema={LSMS_CACHE_SCHEMA}\x1ftable={method_name}\x1f"
                        + f"btf={btf}\x1f"
@@ -3341,6 +3490,83 @@ class Country:
             return hashlib.sha256(payload.encode()).hexdigest()
         except Exception:
             return None
+
+    def _cache_covers_waves(self, cache_path, waves: list[str], freshness: str) -> list[str] | None:
+        """Wave coverage of the L2-country parquet at *cache_path*, or ``None``
+        when it cannot be established (GH #891).
+
+        A cached parquet may be served to a request only when it was built from
+        a superset of the requested waves.  Coverage comes from the
+        ``lsms_cache_waves`` manifest; the frame's own ``t`` values are NOT a
+        substitute, because a wave that contributed zero rows is dropped during
+        aggregation and would then be permanently unsatisfiable.
+
+        Migration (parquets written before #891 carry no manifest):
+
+        - *freshness* ``fresh`` -- the stored hash equals the current
+          wave-independent expectation.  Under the pre-#891 scheme that hash was
+          computed from the REQUESTED waves, so a parquet whose stored hash
+          matches the all-waves expectation can only have been stamped by an
+          all-waves request.  Coverage is therefore ``self.waves``.  (A parquet
+          built from a subset was stamped with that subset's hash, which cannot
+          equal the all-waves expectation, so it grades ``stale`` and rebuilds.)
+        - ``legacy`` / ``unverifiable`` -- no hash at all, or none computable, so
+          nothing corroborates coverage.  Return ``None``: the caller serves it
+          only to a full-``self.waves`` request and otherwise rebuilds once,
+          which writes a manifest and ends the ambiguity for that cell.
+        """
+        stamped = read_parquet_cache_waves(cache_path)
+        if stamped is not None:
+            return stamped
+        if freshness == "fresh":
+            return list(self.waves)
+        return None
+
+    def _union_waves(self, *wave_lists) -> list[str]:
+        """Union of *wave_lists*, ordered by ``self.waves`` (GH #891).
+
+        Cross-wave concat order follows the country's declared wave order, so
+        the union is emitted in that order rather than in request or set order;
+        any wave not declared by the country (an exotic explicit request) is
+        appended, sorted, so the result is deterministic.
+        """
+        seen: set[str] = set()
+        for wl in wave_lists:
+            seen.update(str(w) for w in (wl or []))
+        ordered = [w for w in self.waves if str(w) in seen]
+        extra = sorted(seen - {str(w) for w in self.waves})
+        return ordered + extra
+
+    def _restrict_to_waves(self, df, waves: list[str]):
+        """Restrict *df* to *waves* on its ``t`` index level (GH #891).
+
+        Row selection only -- never a groupby or a reducer, so it cannot
+        collapse grain (cf. the #323 invariant that core aggregates nothing).
+        Returns *df* unchanged when it carries no ``t`` level or already holds
+        exactly the requested waves.
+
+        **A request covering the whole country is a pass-through**, not a
+        filter that happens to match everything.  Two reasons, and the second
+        is not cosmetic: it keeps the ordinary ``Country.table()`` call byte-
+        identical to its pre-#891 behaviour, and a row whose ``t`` is NULL
+        stringifies to ``'nan'``, matches no requested wave, and would be
+        silently DELETED by the filter on every serve -- turning a read-path
+        restriction into data loss.  Deleting a null-keyed row is exactly the
+        open complaint against ``groupby(dropna=True)`` at the grain collapse
+        (``SkunkWorks/grain_aggregation_policy.org`` Section 3b); this code must
+        not add a second instance of it.
+        """
+        if not isinstance(df, pd.DataFrame) or 't' not in (df.index.names or []):
+            return df
+        if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+            return df
+        want = {str(w) for w in waves}
+        have = df.index.get_level_values('t').astype(str)
+        if set(have.unique()) <= want:
+            return df
+        out = df[have.isin(want)]
+        out.attrs = dict(df.attrs)
+        return out
 
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded
@@ -3477,9 +3703,34 @@ class Country:
         if prefer_parquet_cache:
             parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             if parquet_path.exists():
-                df_cached = get_dataframe(parquet_path)
-                df_cached = map_index(df_cached)
-                return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                # GH #892: this branch used to return the parquet whole,
+                # ignoring `waves` entirely -- a one-wave request was served
+                # every wave in the cache, silently.  Nothing downstream
+                # filters, so the restriction has to happen here.
+                #
+                # It went unnoticed because on the ORDINARY path the pre-#891
+                # hash folded in the requested wave set, so a subset request
+                # graded `stale` and rebuilt; the #891 defect was what masked
+                # this one.  Making the hash wave-independent removes that
+                # accidental guard, so the two must be fixed together.
+                #
+                # `assume_cache_fresh` skips the hash check by contract, so
+                # coverage rests on the manifest alone: absent it (a pre-#891
+                # parquet), fall through to the normal path rather than guess.
+                covered = read_parquet_cache_waves(parquet_path)
+                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    df_cached = self._restrict_to_waves(df_cached, waves)
+                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                if covered is None and set(waves) == set(self.waves):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                logger.debug(
+                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
+                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
+                )
 
         if (
             not self._panel_ids_attempted
@@ -3591,17 +3842,12 @@ class Country:
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             def build_env() -> dict[str, str]:
-                env = os.environ.copy()
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-                pythonpath = env.get("PYTHONPATH", "")
-                if str(repo_root) not in pythonpath.split(os.pathsep):
-                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
-                env["PYTHONPATH"] = pythonpath
-                env.setdefault("PYTHON", sys.executable)
-                # Ensure subprocess scripts also redirect data paths
-                env["LSMS_DATA_DIR"] = str(data_root())
-                return env
+                # `repo_root` is countries_root(), which is NOT importable as
+                # `lsms_library`; passing it alone left the child importing
+                # whatever the interpreter's .pth pinned.  Keep it (callers
+                # have always had it on the path) but lead with the package
+                # parent, which is what actually fixes import identity.
+                return _script_subprocess_env(repo_root)
 
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
@@ -3906,6 +4152,24 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
+            # GH #891: single-wave and all-wave requests share this one path, so
+            # the cache carries a manifest of the waves it was BUILT from and is
+            # served only to a request it covers.  On a miss we rebuild the
+            # UNION of what was asked for and what the cache already had --
+            # coverage then only ever grows (bounded by self.waves), so each
+            # wave is built at most once and alternating subsets converge.
+            # Rebuilding just the requested waves would shrink coverage to each
+            # request in turn and reproduce the reported thrash for alternating
+            # DISTINCT subsets.
+            #
+            # Under LSMS_NO_CACHE the manifest is not consulted and this stays
+            # the requested set: that lever means "rebuild what I asked for",
+            # and silently building the country's other waves would be a
+            # surprising cost on a debugging path.  It can shrink a warm
+            # parquet's coverage, which the next ordinary request then rebuilds
+            # once -- accepted, and bounded to that one rebuild.
+            build_waves = list(waves)
+
             # GH #323: start this table's grain ledger clean.  It is repopulated
             # either by the cold build (the collapse audit) or by replaying the
             # stamp on a warm read -- so `grain_reports()` describes THIS load, and
@@ -3948,10 +4212,27 @@ class Country:
             if cache_exists and not no_cache:
                 cache_expected_hash = self._table_cache_hash(method_name, waves)
                 freshness = cache_freshness(cache_path, cache_expected_hash)
-                if freshness == "stale":
+                # GH #891: a non-stale parquet is still only usable if it was
+                # built from a superset of the requested waves.  Unknown
+                # coverage (a pre-#891 parquet with no hash to corroborate it)
+                # is treated as "covers a full-waves request only".
+                covered = self._cache_covers_waves(cache_path, waves, freshness)
+                if covered is None:
+                    coverage_ok = {str(w) for w in waves} == {str(w) for w in self.waves}
+                else:
+                    coverage_ok = {str(w) for w in waves} <= {str(w) for w in covered}
+                    # Union even when the parquet is STALE: its data is out of
+                    # date but its COVERAGE is still the right thing to rebuild,
+                    # or a one-wave request against a stale all-waves cache
+                    # would shrink coverage and make the next all-waves request
+                    # rebuild again -- the thrash, one step removed.
+                    build_waves = self._union_waves(waves, covered)
+                if freshness == "stale" or not coverage_ok:
+                    reason = "STALE" if freshness == "stale" else "coverage"
                     logger.debug(
-                        f"v0.8.0 cache STALE: {method_name} at {cache_path}; "
-                        f"rebuilding from source"
+                        f"v0.8.0 cache MISS ({reason}): {method_name} at {cache_path}; "
+                        f"covers {covered}, request needs {sorted(waves)}; "
+                        f"rebuilding {sorted(build_waves)}"
                     )
                     # Eviction of hashless (script-written) wave parquets now
                     # happens once, just before the rebuild descent below, so
@@ -3981,7 +4262,10 @@ class Country:
                             f"v0.8.0 cache read ({freshness}): {method_name} "
                             f"from {cache_path}"
                         )
-                        return cached_df
+                        # GH #891/#892: the parquet may cover MORE waves than
+                        # were asked for.  Requested-wave semantics are enforced
+                        # here, on the serve path -- nothing downstream filters.
+                        return self._restrict_to_waves(cached_df, waves)
                     except (OSError, ArrowInvalid) as cache_read_error:
                         # Stale / corrupted cache parquet -> rebuild from source.
                         # Surface to the user (not just debug log) so a silent
@@ -4001,16 +4285,20 @@ class Country:
                 with _working_directory(dvc_root):
                     repo = Repo(str(dvc_root))
 
-                    stage_infos = self._resolve_materialize_stages(method_name, waves)
+                    stage_infos = self._resolve_materialize_stages(method_name, build_waves)
                     if not stage_infos:
-                        df = load_from_waves(waves)
+                        # GH #891: build the union, cache the union (stamped with
+                        # its coverage), return only what was asked for.
+                        df = load_from_waves(build_waves)
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path,
-                                       cache_hash=self._table_cache_hash(method_name, waves),
-                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
+                                       cache_hash=self._table_cache_hash(method_name, build_waves),
+                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
+                                       cache_waves=build_waves)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
+                            df = self._restrict_to_waves(df, waves)
                         return df
 
                     deduped_infos: list[StageInfo] = []
@@ -4054,10 +4342,12 @@ class Country:
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path,
-                                   cache_hash=self._table_cache_hash(method_name, waves),
-                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
+                                   cache_hash=self._table_cache_hash(method_name, build_waves),
+                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
+                                   cache_waves=build_waves)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
-                        return combined_df
+                        # GH #891: cache the union, serve the request.
+                        return self._restrict_to_waves(combined_df, waves)
 
                     def _load_stage(stage_ref: str):
                         file_part, stage_name = stage_ref.split(":", 1)
@@ -4110,7 +4400,20 @@ class Country:
                                 method_name,
                                 country=self.name,
                             )
-                            return cached_df
+                            # GH #891: this reads the SAME shared cache_path as
+                            # the v0.8.0 fast path above, so it needs the same
+                            # coverage discipline.  Unlike that path it is not
+                            # hash-gated (DVC stage status decided freshness), so
+                            # serve it only when the manifest proves coverage.
+                            _cov = read_parquet_cache_waves(cache_path)
+                            if _cov is None or not set(map(str, waves)) <= set(map(str, _cov)):
+                                logger.debug(
+                                    f"stage-cache read SKIPPED (coverage): {method_name} "
+                                    f"covers {_cov}; request needs {sorted(waves)}"
+                                )
+                                dirty = True
+                            else:
+                                return self._restrict_to_waves(cached_df, waves)
                         except (FileNotFoundError, PathMissingError):
                             dirty = True  # fall through to repro if cache missing unexpectedly
 
@@ -4144,7 +4447,10 @@ class Country:
                         and stage_infos[0].output_path == cache_path
                     )
                     if single_stage:
-                        return next(iter(stage_outputs.values()))
+                        # GH #891: a single stage whose output IS cache_path --
+                        # restrict to the request like every other serve path.
+                        return self._restrict_to_waves(
+                            next(iter(stage_outputs.values())), waves)
 
                     combined_outputs = consolidate_stage_outputs(stage_outputs)
                     if combined_outputs is None:
@@ -4159,15 +4465,17 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(waves)
+                df = load_from_waves(build_waves)
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
                     to_parquet(df, cache_path,
-                               cache_hash=self._table_cache_hash(method_name, waves))
+                               cache_hash=self._table_cache_hash(method_name, build_waves),
+                               cache_waves=build_waves)
                     logger.debug(
                         f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
                     )
+                    df = self._restrict_to_waves(df, waves)
                 return df
             finally:
                 if repo is not None:
@@ -5133,6 +5441,72 @@ def _no_v_join_tables() -> frozenset[str]:
         return _compute_no_v_join(data)
     except Exception:
         return _NO_V_JOIN_FALLBACK
+
+
+def _parse_index_info(data: dict) -> dict[str, list[str]]:
+    """``Index Info > index_info`` as ``{table: [level, ...]}``.
+
+    Pure parsing -- the same paren/comma shape :func:`_compute_no_v_join`
+    reads, factored so the Site-I audit (GH #847) and the v-join set never
+    disagree on what the canonical index of a table *is*.  Tables without a
+    string entry are skipped.
+    """
+    out: dict[str, list[str]] = {}
+    if not isinstance(data, dict):
+        return out
+    specs = (data.get("Index Info", {}) or {}).get("index_info", {}) or {}
+    for table, spec in specs.items():
+        if not isinstance(spec, str):
+            continue
+        cleaned = spec.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        levels = [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+        if levels:
+            out[str(table)] = levels
+    return out
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_level_aliases() -> dict[str, dict[str, str]]:
+    """Per-table ``level_aliases`` from ``data_info.yml``: ``{table: {alias: canonical}}``.
+
+    Read once with the canonical levels so a country that spells an axis by
+    its alias (Uganda's ``plot`` for the canonical ``plot_id``, or ``crop``
+    for ``j``) is still checked under the name its frame carries.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        aliases = ((data.get("Index Info", {}) or {}).get("level_aliases")
+                   or {})
+        return {str(t): {str(a): str(c) for a, c in m.items()}
+                for t, m in aliases.items() if isinstance(m, dict)}
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_levels() -> dict[str, list[str]]:
+    """The canonical per-table index from ``data_info.yml`` (Index Info).
+
+    Deliberately separate from the country's ``data_scheme.yml``: the scheme
+    declares what the country EMITS (Uganda's ``crop_production`` spells the
+    plot axis ``plot``, no ``v``), while the served frame carries the v-joined,
+    aliased canonical index.  The null-index audit (GH #847) reads both --
+    the scheme's own list plus the canonical one -- so a level that exists
+    under either spelling is still named on the frame it reaches.  Returns
+    ``{}`` when the file is unreadable, matching the v-join fallback's
+    "never invent a declaration" posture.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return _parse_index_info(data)
+    except Exception:
+        return {}
 
 
 @lru_cache(maxsize=1)

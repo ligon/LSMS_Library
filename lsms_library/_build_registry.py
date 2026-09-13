@@ -57,6 +57,7 @@ import functools
 import hashlib
 import importlib
 import inspect
+import re
 import sys
 import textwrap
 import types
@@ -156,6 +157,11 @@ _EXCLUDED_CALLABLES = frozenset({
     # cannot silently cold-rebuild the corpus by re-wording a warning.
     "lsms_library.quantity_audit.check_quantities",
     "lsms_library.quantity_audit.audit_quantities",
+    # The null-index-key audit (null_index_audit, GH #847): the same argument,
+    # one of the four guards up.  Counts NaN keys on declared index levels and
+    # warns; provably returns its input unchanged.
+    "lsms_library.null_index_audit.check_index_levels",
+    "lsms_library.null_index_audit.audit_index_levels",
     # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
     # file, never changes what a build writes; reached from grab_data and
     # run_make_target, so without this exclusion re-wording the warning would
@@ -199,7 +205,8 @@ _EXCLUDED_CALLABLES = frozenset({
 # referencing function's module, so ``from .country import _GRAIN_LEDGER`` in
 # some other tagged module would otherwise fold it under that module's prefix.
 _EXCLUDED_CONSTANTS = frozenset(
-    {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER"})
+    {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
+     "_NULL_INDEX_LEDGER"})
 
 
 def _is_build_callable(obj) -> bool:
@@ -300,6 +307,10 @@ def _ser(obj, seen, parts) -> str:
     their source is folded into ``parts`` (so a callable held in a registry dict
     -- e.g. ``_DERIVED_TRANSFORMERS`` -- is versioned by *code*, not address).
     """
+    # GH #780: pattern text (including str/bytes type) and flags determine
+    # matching behavior; reuse the deterministic dispatch (ledger #780, §4).
+    if isinstance(obj, re.Pattern):
+        return f"<re.Pattern {obj.pattern!r} flags={obj.flags}>"
     if isinstance(obj, (str, int, float, bool, type(None))):
         return repr(obj)
     if callable(obj) and _is_ours(obj):
@@ -324,7 +335,7 @@ def _ser(obj, seen, parts) -> str:
 
 
 # Types we know how to fold into the fingerprint as a referenced constant.
-_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool)
+_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern)
 
 
 def _all_co_names(code) -> set:

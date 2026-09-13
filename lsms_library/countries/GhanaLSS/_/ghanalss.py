@@ -10,6 +10,29 @@ import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
 
+
+def interview_date(df):
+    """Expose reported dates with calendar-visit assignments.
+
+    Existing intake sources and parsers are retained. GLSS4/GLSS5 also use
+    the registered, fixed anchored-chronology construction: only the visit
+    assignment is derived, and those rows carry its Derivation key.
+    Undated slots are omitted; all raw inference inputs remain retrievable
+    through Country.derivation_inputs, including unresolved/invalid records.
+    Early food visit=1 denotes a consumption occasion at the second contact,
+    so its visit number is not a date-table join key (task ledger, sections 3/4).
+    """
+    waves = df.index.get_level_values('t').unique()
+    if len(waves) == 1 and str(waves[0]) in ('1998-99', '2005-06'):
+        from lsms_library.derivations import resolve_callable
+        build = resolve_callable(
+            'lsms_library.countries.GhanaLSS._.visit_dates:build_visit_dates')
+        # The builder attaches row provenance after reshaping; the generic
+        # melt intentionally retains date columns only.
+        return build(str(waves[0]))
+    return tools.melt_visit_intervals(df, start_base='Int_t', out_start='Int_t')
+
+
 def i(value):
     '''
     Formatting household id as "clust/nh".
@@ -600,3 +623,44 @@ def inputs_12b(wave):
         'UTFOODC': df['UTFOODC'], 'VFOODCPD': df['VFOODCPD'],
     })
     return out.set_index(['t', 'i', 'j'])
+
+
+# Hectares per native plot-area unit (GH #879).  The canonical schema
+# (lsms_library/data_info.yml) declares plot_features.Area in HECTARES,
+# with AreaUnit the provenance label of the original unit.  GLSS Section
+# 8B reports farm size (s8bq4a/s8bq4) with a unit code decoded to
+# Acres/Poles/Ropes/Hectare (older waves) or the GLSS7 labels (Acres /
+# Poles / Ropes / Plot / Hectare / Other).
+#
+# The factors are the Ghana STATISTICAL SERVICE's own: GhanaSPS 2009-10
+# ships a producer-computed area_ha alongside the native size, and
+# dividing the two recovers these factors to float precision (measured
+# there; see GhanaSPS/_/ghanasps.py::_PLOT_HECTARES_PER_UNIT, from which
+# they are copied verbatim).  The acre factor is the GSS's 0.404694, not
+# the standard 0.404686 -- applying the producer's own number keeps
+# GhanaLSS consistent with the same service's published hectares.
+# 'Other' names nothing -> NaN Area with the native unit still recorded
+# in AreaUnit (honest, not fabricated); a null unit likewise.
+_PLOT_HECTARES_PER_UNIT = {
+    'Acres': 0.404694,
+    'Poles': 0.409551,
+    'Ropes': 0.236342,
+    'Plot': 0.102388,
+    'Hectare': 1.0,
+}
+
+
+def plot_features(df):
+    """df_edit hook: convert ``Area`` to hectares per-row on ``AreaUnit``.
+
+    Rows whose unit has no factor in :data:`_PLOT_HECTARES_PER_UNIT`
+    ('Other', missing) get a NaN Area -- the schema's required column is
+    in hectares and a guessed factor is worse than an honest gap
+    (GH #879).  ``AreaUnit`` is left untouched: it is the provenance
+    label of the unit the SURVEY recorded, not of the unit served.
+    """
+    df = df.copy()
+    area = pd.to_numeric(df['Area'], errors='coerce')
+    factor = df['AreaUnit'].astype(object).map(_PLOT_HECTARES_PER_UNIT)
+    df['Area'] = area * pd.to_numeric(factor, errors='coerce')
+    return df

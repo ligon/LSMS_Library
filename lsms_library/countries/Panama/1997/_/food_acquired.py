@@ -194,8 +194,9 @@ idx = ['t', 'i', 'j', 'u', 's']
 
 # Collapse duplicate (t,i,j,u,s) keys (same item/unit/source reported twice);
 # sum the quantities/expenditures, mean the per-unit price.
-agg = {'Quantity': 'sum', 'Expenditure': 'sum', 'Price': 'mean'}
-out = out.groupby(idx, dropna=False).agg(agg)
+out = out.groupby(idx, dropna=False).agg(Quantity=('Quantity', lambda s: s.sum(min_count=1)),
+                                          Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
+                                          Price=('Price', 'mean'))
 out = out.dropna(how='all')
 
 if __name__ == '__main__':

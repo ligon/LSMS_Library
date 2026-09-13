@@ -406,6 +406,13 @@ Columns:
         single-visit country's rows get `visit = NaN` during Feature()
         assembly, so anything that ever does enforce this must use the
         NULLABLE integer type and must not read NaN as a violation.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        Registry key for a constructed field, including the visit INDEX.
+        A visit-assignment derivation leaves the reported Int_t unchanged;
+        consult the record's columns list to identify the derived field.
     Int_t:
       type: datetime
     Interview start:
@@ -929,6 +936,36 @@ Columns:
         `u = 'Value'`, or a per-row source column of its own such as
         `KgFactorSource` -- is exempt; the key is for the invisible ones.
         Design: SkunkWorks/derived_values.org.
+  community_prices:
+    # Item-level REPORTED community prices at (t, v, j, u) -- one surveyed
+    # price per cluster/item/unit, no household i.  Country-specific unit
+    # axes are the norm (Tanzania's per-item fixed units, Nigeria's per-row
+    # unit + size); see each country's data_scheme.yml.
+    Price:
+      type: float
+      required: true
+      monetary: true
+      note: |
+        The surveyed prevailing price of one unit `u` of item `j` in
+        cluster `v`.  Where the survey prices a PACKAGE whose size is
+        recorded beside the unit (Nigeria C8, GH #834), the served value
+        is divided by the package quantity and the row re-united to the
+        metric base unit, so "price of one unit u" holds; that division
+        is a derivation and the row carries its registry key.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`.  First instance here:
+        `Nigeria::community_prices::c8-metric-size` (GH #834) -- the C8
+        module's SIZE field (W4 c8q2c / W5 c8aq2_c coded, W3 c8q2b free
+        text) records a metric package quantity beside the unit, so the
+        reported price is of that package; the served Price is divided
+        by it and `u` becomes 'g'/'cl'.  Nigeria metric-unit rows with an
+        unrecorded package size are dropped, not served mis-scaled --
+        registered as the deletion entry
+        `Nigeria::community_prices::c8-unrecorded-size-drop` (rows: 0;
+        `derivation_inputs` returns the dropped source rows).
   nonfood_expenditures:
     # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
     # row per (wave, household, item) actually reported.  It is
