@@ -850,13 +850,15 @@ class Wave:
         - the wave's ``data_info.yml`` (column maps / merges / derived);
         - the wave-module formatting functions
           (``{wave_folder}.py``, ``mapping.py``);
+        - wave/country build Org inputs and inherited global categorical tables;
         - YAML-path: the DVC fingerprint of each declared source file;
         - script-path: the ``_/{table}.py`` text plus the fingerprints of
           any data files it references as string literals.
 
         Deliberately excluded: post-read transforms (kinship, spellings,
-        categorical mappings, ``_join_v_from_sample``) -- they re-run on
-        every read and never touch the cached parquet.
+        post-read categorical application, ``_join_v_from_sample``) -- they
+        re-run on every read. Mapping tables consumed during extraction ARE
+        build inputs and must invalidate the wave parquet.
         """
         wave_dir = self.file_path / "_"
         if not wave_dir.is_dir():
@@ -877,6 +879,22 @@ class Wave:
             if org.name in _ORG_HASH_SKIP:
                 continue
             parts.append(f"org:{org.name}=" + (cached_file_hash(org) or "none"))
+
+        # Inherited mappings can be baked into YAML extraction or scripts
+        # (GH #757; .coder/ledger/757-wave-categorical-inputs.md sections 2-5).
+        # Match Country.categorical_mapping's roots, conservatively hashing
+        # whole files just as the wave/country build-input loops already do.
+        cdir = self.country.file_path / "_"
+        global_cm_dir = Path(str(files("lsms_library") / "categorical_mapping"))
+        for prefix, directory in (("corg", cdir), ("gorg", global_cm_dir)):
+            for org in sorted(directory.glob("*.org")):
+                if org.name not in _ORG_HASH_SKIP:
+                    parts.append(f"{prefix}:{org.name}=" + (cached_file_hash(org) or "none"))
+        if not (cdir / "categorical_mapping.org").exists():
+            # The parent is a fallback for this one file, not a second
+            # country build directory. An unused fallback must not invalidate.
+            fallback = self.country.file_path.parent / "_" / "categorical_mapping.org"
+            parts.append("parent_cmap=" + (cached_file_hash(fallback) or "none"))
 
         data_info = _parse_data_info_cached(wave_dir / "data_info.yml", di_hash)
         block = data_info.get(table) if isinstance(data_info, dict) else None
