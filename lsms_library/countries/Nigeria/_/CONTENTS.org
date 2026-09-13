@@ -901,9 +901,21 @@ registry entry cites them):
    price is divided by it, and the row's =u= becomes the metric base unit,
    with the derivation key in the =Derivation= column (5,393 rows 2019Q1,
    5,339 2024Q1, 1 2016Q1).  A metric-*unit* row whose package size is
-   UNRECORDED -- all of W3's 13,768 g/cl rows bar one (c8q2b blank), and
-   W4's 1,191 'Grams(g)' rows (c8q2c blank) -- is DROPPED: its price is of
-   an unrecorded package and cannot be normalised.  The '99. ONE SIZE
+   UNRECORDED -- all of W3's 13,768 g/cl rows bar one (c8q2b blank) PLUS
+   all 3,433 of W3's Kg/l rows (the same blank free text; the
+   deletion-entry sweep found these -- the pre-#834 prose dropped them
+   without ever counting them), and W5's 133 rows on '2. GRAMS (G)'
+   (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded package
+   and cannot be normalised.  The drop is registered as the deletion entry
+   =Nigeria::community_prices::c8-unrecorded-size-drop= (rows: 0 -- a
+   dropped row has nowhere to carry a key; =derivation_inputs= returns the
+   14,603 / 0 / 133 dropped source rows per wave).  *W4 drops NOTHING
+   under this rule.*  The pre-#834 prose (here and in the registry)
+   described W4's 1,191 rows on raw unit code 1 as a dropped 'Grams(g)'
+   unit with c8q2c blank -- but =sectc8_harvestw4.dta= decodes that unit
+   label as '1. KILOGRAMS (KG)', a blank size beside KILOGRAMS reads as
+   one kilogram, and the rows are SERVED under =Kg= (W4 =Kg= count 1,191,
+   none derived).  The '99. ONE SIZE
    ONLY' code is the questionnaire's own statement that the price IS of
    one unit and is the single exemption.  W1/W2's fixed per-item units are
    unchanged (their =cl= sachet/bottle-water rows were already of a fixed

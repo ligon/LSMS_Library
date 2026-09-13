@@ -7,8 +7,11 @@ sectc8_harvestw4.dta).  CLUSTER-level (no household i); v = cluster_id(state, lg
 W4 item_cd is the consumption-module scheme already in harmonize_food
 (resolved via Code); c8q2 is the per-row unit label, c8q3 the reported price,
 c8q2c the coded SIZE (GH #834: a metric size like '34. 250 GRAMS' means the
-price is of that package -- divided through to per-g / per-cl; a metric-unit
-row with no recorded size is dropped, not served mis-scaled).
+price is of that package -- divided through to per-g / per-cl).  W4 drops
+nothing for an unrecorded size: its 1,191 rows on raw unit code 1 read
+'KILOGRAMS (KG)' (a blank size beside KILOGRAMS is one kilogram -- served
+under `Kg`; pre-#834 prose describing them as a dropped 'Grams(g)' unit does
+not match this read of the .dta).
 t = 2019Q1 (post-harvest quarter).
 """
 import sys

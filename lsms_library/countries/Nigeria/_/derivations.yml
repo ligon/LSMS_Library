@@ -21,15 +21,16 @@ Nigeria::community_prices::c8-metric-size:
     '20. 33 CL' ... '26. 1.5 LITRE'); W5's c8aq2_a (quantity) and c8aq2_cvn
     (kg/l conversion factor) agree with the coded quantity and are a
     cross-check, not a second source.  W3's c8q2b is free text and blank on
-    13,767 of the 13,768 metric-unit rows; the handful stating a quantity
+    the whole metric-unit block; the handful stating a quantity
     ('300gram', 'one 75cl bottle', 'one 450g tin') are parsed and divided,
     the rest are DROPPED (not derivable -- a price of an unrecorded package
-    is not a per-unit price).  W4's 1,191 rows under the 'Grams(g)' unit all
-    carry no c8q2c code and are likewise dropped.  Ordinal sizes (SMALL /
-    MEDIUM / LARGE / VERY LARGE, '99. ONE SIZE ONLY') carry no metric
-    content: those rows stay under the base unit and are NOT derived.
-  function: lsms_library.countries.Nigeria._.nigeria:derive_c8_metric_package_unit_price
-  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_community_prices
+    is not a per-unit price; the drop is registered separately as
+    Nigeria::community_prices::c8-unrecorded-size-drop).  Ordinal sizes
+    (SMALL / MEDIUM / LARGE / VERY LARGE, '99. ONE SIZE ONLY') carry no
+    metric content: those rows stay under the base unit and are NOT
+    derived.
+  function: lsms_library.countries.Nigeria.2018-19._.mapping:derive_c8_metric_package_unit_price
+  inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_community_prices
   raw_variables: [c8q2, c8q2b, c8q2c, c8q3, c8aq2_a, c8aq2_b, c8aq2_c,
                   c8aq2_cvn, c8aq3, item_cd, state, lga, ea]
   assumptions:
@@ -51,10 +52,14 @@ Nigeria::community_prices::c8-metric-size:
         (slurm_logs/price_sources/Nigeria/REPORT.org N-02).
     - text: >-
         a metric-unit row with an UNRECORDED size (all of W3's g/cl rows
-        except one; W4's 1,191 'Grams(g)' rows) cannot be normalised and is
-        dropped rather than served mis-scaled.  '99. ONE SIZE ONLY' is the
-        questionnaire's own statement that the price IS of one unit and is
-        the single exemption.
+        except one; all of W3's Kg/l rows; W5's 133 'GRAMS (G)' rows)
+        cannot be normalised and is dropped rather than served mis-scaled
+        -- registered separately as
+        Nigeria::community_prices::c8-unrecorded-size-drop.  '99. ONE SIZE
+        ONLY' is the questionnaire's own statement that the price IS of one
+        unit and is the single exemption; a blank size beside KILOGRAMS or
+        LITRES in W4/W5 reads as one kilogram / one litre and is served,
+        not dropped.
       basis: modelling-choice
       evidence: >-
         GH #834; Nigeria/_/CONTENTS.org "The C8 SIZE field is recorded by
@@ -64,5 +69,59 @@ Nigeria::community_prices::c8-metric-size:
     (t, j, u, cluster-geography) cells: post-fix the community/household
     median ratio is ~1.0 on the metric units where the two sources overlap,
     the same agreement the unambiguous Kg and l units showed pre-fix.
+  contents: Nigeria/_/CONTENTS.org, "The C8 SIZE field" (GH #834)
+  since: '2026-09-13'
+
+# A DELETION: a metric-unit C8 row whose package size is unrecorded is DROPPED
+# by the build (a price of an unrecorded package is not a per-unit price;
+# serving it as g/cl would misprice by the package size, ~189x/~42x
+# measured).  A dropped row has nowhere to carry a Derivation key, so this
+# entry is the only place the drop is disclosed: `rows: 0` and the attrs
+# summary lists the key at 0, while `derivation_inputs` returns the dropped
+# source rows themselves.
+Nigeria::community_prices::c8-unrecorded-size-drop:
+  waves: ['2015-16', '2018-19', '2023-24']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    Rows whose unit is metric (g / cl, and in W3 also Kg / l) but whose
+    package SIZE is unrecorded are dropped from community_prices rather than
+    served as a per-unit price: with no size, the recorded Naira figure is
+    the price of a package of unknown quantity, and no division can recover
+    a per-unit price.  The set is all of W3's 13,767 g/cl rows whose
+    free-text c8q2b is blank (the 13,768th parses '50cl' and is derived,
+    not dropped) plus all 3,433 of W3's Kg/l rows (the same blank free
+    text), and W5's 133 rows on '2. GRAMS (G)' whose coded size c8aq2_c is
+    blank.  W4 drops NOTHING under this rule: its 1,191 rows on raw unit
+    code 1 read '1. KILOGRAMS (KG)' in sectc8_harvestw4.dta (pre-#834 prose
+    described them as a dropped 'Grams(g)' unit -- that spelling is not
+    what the file decodes to), a blank size beside KILOGRAMS reads as one
+    kilogram, and those rows are served.  W4/W5 rows carrying the
+    questionnaire's own '99. ONE SIZE ONLY' code are EXEMPT -- that code is
+    the survey's statement that the item is priced in one size only, so the
+    price IS of one unit.
+  function: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_c8_unrecorded_size_drop
+  inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_c8_unrecorded_size_drop
+  raw_variables: [c8q2, c8q2b, c8q2c, c8q3, c8aq2_b, c8aq2_c, c8aq3,
+                  item_cd, state, lga, ea]
+  assumptions:
+    - text: >-
+        a price recorded beside a metric unit with no recoverable size
+        cannot be normalised to a per-unit price, so dropping the row is
+        honest where serving it would be wrong; the alternative -- serving
+        the package price under `g`/`cl` -- measured 1/189 and 1/42 of the
+        household unit value pre-fix, i.e. wrong by the package size.
+      basis: modelling-choice
+      evidence: >-
+        GH #834; Nigeria/_/CONTENTS.org "The C8 SIZE field"; the derivation
+        Nigeria::community_prices::c8-metric-size, whose second assumption
+        records the same drop from the serving side.
+  validated_against: >-
+    the build's own drop predicate: `derivation_inputs` returns exactly the
+    source rows the wave scripts remove -- 14,603 rows for 2015-16 (13,767
+    g/cl + 2,597 Kg + 836 l), 0 for 2018-19, 133 for 2023-24 -- and every
+    served row of community_prices under a metric unit either carries the
+    c8-metric-size key or sits on a base unit whose blank size reads as one
+    unit.
   contents: Nigeria/_/CONTENTS.org, "The C8 SIZE field" (GH #834)
   since: '2026-09-13'

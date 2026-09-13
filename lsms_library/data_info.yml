@@ -962,7 +962,10 @@ Columns:
         text) records a metric package quantity beside the unit, so the
         reported price is of that package; the served Price is divided
         by it and `u` becomes 'g'/'cl'.  Nigeria metric-unit rows with an
-        unrecorded package size are dropped, not served mis-scaled.
+        unrecorded package size are dropped, not served mis-scaled --
+        registered as the deletion entry
+        `Nigeria::community_prices::c8-unrecorded-size-drop` (rows: 0;
+        `derivation_inputs` returns the dropped source rows).
   nonfood_expenditures:
     # GH #817.  The canonical shape is Togo's (PR #773): item-level, long, one
     # row per (wave, household, item) actually reported.  It is

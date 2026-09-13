@@ -7,9 +7,9 @@ splits the module across sectc8a_harvestw3.dta and sectc8b_harvestw3.dta
 (different item ranges).  CLUSTER-level (no household i); v = cluster_id(state, lga, ea).
 W3 item_cd is the consumption-module scheme already in harmonize_food
 (resolved via Code); c8q2 is the per-row unit label, c8q3 the reported price,
-c8q2b the free-text SIZE (GH #834: blank on 13,767 of the 13,768 metric-unit
-rows -- those package prices are dropped; the handful stating '300gram' /
-'one 75cl bottle' are normalised to per-g / per-cl).
+c8q2b the free-text SIZE (GH #834: blank on 13,767 of the 13,768 g/cl rows
+AND on all 3,433 Kg/l rows -- those package prices are dropped; the handful
+stating '300gram' / 'one 75cl bottle' are normalised to per-g / per-cl).
 t = 2016Q1 (post-harvest quarter).
 """
 import sys

@@ -9,7 +9,8 @@ already in harmonize_food (resolved via Code); the per-row unit label is
 c8aq2_b, the reported price c8aq3, the coded SIZE c8aq2_c (with c8aq2_a the
 quantity and c8aq2_cvn the kg/l factor agreeing with the code; GH #834:
 metric sizes are divided through to per-g / per-cl, and a metric-unit row
-with no recorded size is dropped, not served mis-scaled).
+with no recorded size -- the 133 rows on '2. GRAMS (G)' -- is dropped, not
+served mis-scaled).
 t = 2024Q1 (post-harvest quarter).
 """
 import sys

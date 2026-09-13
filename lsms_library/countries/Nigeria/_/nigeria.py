@@ -260,12 +260,13 @@ def _c8_size_metric_grams(label):
 def _c8_w3_size_text(text, unit_label):
     """Parse W3's free-text size column (c8q2b) -- 'one 75cl bottle',
     '300gram', 'one 450g tin' -- for the rows whose UNIT is already metric
-    (Grams(g) / Centilitres(cl)).  Returns the quantity in that unit, or
-    None.  Rows whose size text is blank ('', '.') -- 13,768 of the 13,768
-    W3 metric-unit rows carry no recoverable size (measured: blank on
-    9,427/9,427 g rows and 4,340/4,341 cl rows) -- return None and are
-    DROPPED downstream: their Price is the price of an unrecorded package
-    size, not of one unit."""
+    (Grams(g) / Centilitres(cl); since the c8-unrecorded-size-drop deletion
+    entry also the base-metric Kilograms(Kg) / Litres(l) rows, which the
+    same blank field governs).  Returns the quantity in that unit, or None.
+    Rows whose size text is blank ('', '.') -- measured blank on 9,427 of
+    9,427 g rows, 4,340 of 4,341 cl rows, and all 3,433 Kg/l rows -- return
+    None and are DROPPED downstream: their Price is the price of an
+    unrecorded package size, not of one unit."""
     if text is None:
         return None
     s = str(text).strip().lower()
@@ -2110,12 +2111,22 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     row's unit becomes the metric base unit -- 'g' or 'cl' -- making the
     served number the per-unit price data_scheme.yml documents.  Such rows
     carry the `Derivation` key `Nigeria::community_prices::c8-metric-size`.
-    A metric-unit row ('Grams(g)' / 'Centilitres(cl)') whose package size is
-    UNRECORDED -- all of W3's 13,768 g/cl rows (c8q2b blank on 13,767, free
-    text otherwise) and W4's 1,191 g rows (c8q2c blank) -- is DROPPED: its
-    price is of an unrecorded package and per-unit normalization is
-    impossible; serving it under `g`/`cl` would misprice by the package
-    size (~189x/~42x measured).  Ordinal sizes (SMALL/MEDIUM/LARGE, '99.
+    A metric-unit row whose package size is UNRECORDED -- all of W3's
+    13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
+    3,433 of W3's Kg/l rows (the same blank free text, caught only when the
+    deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
+    (G)' (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded
+    package and per-unit normalization is impossible; serving it under the
+    base unit would misprice by the package size (~189x/~42x measured).
+    The drop is registered as the deletion entry
+    `Nigeria::community_prices::c8-unrecorded-size-drop` (rows: 0 -- a
+    dropped row has nowhere to carry a key; `derivation_inputs` returns the
+    dropped source rows).  W4 drops NOTHING under this rule: the 1,191 rows
+    on raw unit code 1 ('KILOGRAMS (KG)') carry a blank c8q2c, but a blank
+    size beside KILOGRAMS is the unremarkable "one kilogram" reading --
+    pre-#834 prose that described those rows as a dropped 'Grams(g)' unit
+    does not match this read of sectc8_harvestw4.dta.  Ordinal sizes
+    (SMALL/MEDIUM/LARGE, '99.
     ONE SIZE ONLY') carry no metric content: those rows stay under the base
     unit (the size axis remains lost there -- the reported size-specific
     frame is the fix sketched in CONTENTS.org, not adopted).  W1/W2 print
@@ -2202,9 +2213,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             piece.loc[take, 'Price'] = piece.loc[take, 'Price'] / qty[take]
             piece.loc[take, 'u'] = metric_u[take]
             piece.loc[take, 'Derivation'] = DERIVATION_KEY
-            # A metric-UNIT row with an UNRECORDED size: the price is of an
-            # unrecorded package -- drop it (u -> NA, filtered below).
-            # Exempt the questionnaire's own '99. ONE SIZE ONLY' code.
+            # A row whose coded unit is metric AND whose size code states a
+            # metric quantity has just been re-united to g/cl and divided;
+            # it never matches here (its size is recorded).  What remains
+            # on g/cl with no size: nothing in W4 (its g/cl unit labels
+            # carry a coded size on every row or none -- see
+            # _/derivations.yml, c8-unrecorded-size-drop), and in W5 the
+            # 133 rows on '2. GRAMS (G)' with a BLANK c8aq2_c.  Exempt the
+            # questionnaire's own '99. ONE SIZE ONLY' code.
             one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
                                           na=False)
             unrecorded = (piece['u'].isin(['g', 'cl'])
@@ -2213,8 +2229,11 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 
         size_text_col = fr.get('size_text')
         if size_text_col and size_text_col in df.columns:
-            # W3: c8q2b is free text, blank on 13,767 of the 13,768
-            # metric-unit rows; parse the handful that state a quantity.
+            # W3: c8q2b is free text and blank on the whole metric-unit
+            # block -- 13,767 of the 13,768 g/cl rows (the 13,768th parses
+            # '50cl') and every Kg/l row (2,597 + 836).  Parse the handful
+            # that state a quantity ('300gram', 'one 75cl bottle'); the
+            # blank remainder is dropped just below.
             txt = df[size_text_col]
             qty = pd.Series(
                 [_c8_w3_size_text(x, uu) for x, uu in zip(txt, piece['u'])],
@@ -2223,7 +2242,8 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
                     & piece['Price'].notna() & (qty > 0))
             piece.loc[take, 'Price'] = piece.loc[take, 'Price'] / qty[take]
             piece.loc[take, 'Derivation'] = DERIVATION_KEY
-            unrecorded = piece['u'].isin(['g', 'cl']) & qty.isna()
+            unrecorded = (piece['u'].isin(['g', 'cl', 'Kg', 'l'])
+                          & qty.isna())
             piece.loc[unrecorded, 'u'] = pd.NA
 
         pieces.append(piece)
@@ -2390,82 +2410,80 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
 
 
 # ---------------------------------------------------------------------
-# community_prices derivation (GH #834) -- C8 metric package size
+# community_prices derivations (GH #834) -- C8 metric package size
 # ---------------------------------------------------------------------
 #
 # NOTE: this block sits after food_acquired only because that is where the
-# fix landed; the registry key, function and inputs callable all belong to
-# community_prices (the block immediately above food_acquired_for_wave's
+# fix landed; the registry keys, functions and inputs callables all belong
+# to community_prices (the block immediately above food_acquired_for_wave's
 # header documents the same fix from the wave-script side).
 #
-# Registered as `Nigeria::community_prices::c8-metric-size` in
-# _/derivations.yml.  community_prices_for_wave applies the function and
-# stamps the key on the rows it produces (after the (t,v,j,u) collapse, so
-# the stamp cannot ride a row the collapse discards -- it is set pre-collapse
-# but survives only on the KEPT first row; the derived rows are a subset the
-# collapse never mixes with reported rows of a different provenance, because
-# the re-unit to `g`/`cl` happens BEFORE the groupby).
+# Registered as `Nigeria::community_prices::c8-metric-size` and
+# `Nigeria::community_prices::c8-unrecorded-size-drop` in _/derivations.yml.
+# community_prices_for_wave applies the division and stamps the first key on
+# the rows it produces (after the (t,v,j,u) collapse, so the stamp cannot
+# ride a row the collapse discards -- it is set pre-collapse but survives
+# only on the KEPT first row; the derived rows are a subset the collapse
+# never mixes with reported rows of a different provenance, because the
+# re-unit to `g`/`cl` happens BEFORE the groupby).  The second key names a
+# DELETION (rows: 0 in the registry): a dropped row has nowhere to carry a
+# key, so it is reported at 0 by the attrs summary and its dropped rows are
+# retrievable through derivation_inputs.
+#
+# The registry's `function` / `inputs` entries resolve to thin wrappers in
+# each wave's `_/mapping.py` (`lsms_library.countries.Nigeria.<wave>._.mapping`),
+# NOT to names here: this module is in EVERY Nigeria table's cache hash, so
+# a registered derivation living here would re-warm all 24 Nigeria tables
+# when the derivation is edited; a wave mapping.py is hashed only into the
+# tables that wave builds (for `community_prices` only, here).  The wave
+# scripts themselves import this module regardless, so the shared logic
+# below stays here and the wrappers only bind the wave.
 
 _C8_DERIVATION_KEY = 'Nigeria::community_prices::c8-metric-size'
+_C8_DROP_DERIVATION_KEY = 'Nigeria::community_prices::c8-unrecorded-size-drop'
+
+# The C8 source per wave folder, exactly as the wave's `community_prices.py`
+# reads it.  Shared by the derivation and deletion `inputs` callables.
+_C8_SOURCE = {
+    '2015-16': [dict(fn=f'Data/sectc8{ab}_harvestw3.dta', item='item_cd',
+                     unit='c8q2', size=None, size_text='c8q2b', price='c8q3')
+                for ab in ('a', 'b')],
+    '2018-19': [dict(fn='Data/sectc8_harvestw4.dta', item='item_cd',
+                     unit='c8q2', size='c8q2c', size_text=None,
+                     price='c8q3')],
+    '2023-24': [dict(fn='Data/Post Harvest Wave 5/Community/sectc8_harvestw5.dta',
+                     item='item_cd', unit='c8aq2_b', size='c8aq2_c',
+                     size_text=None, price='c8aq3')],
+}
+# Round-label spellings -> their wave folder (callers reasoning in rounds
+# pass the PH quarter; the registry stores folders).
+_C8_FOLDER = {'2016Q1': '2015-16', '2019Q1': '2018-19', '2024Q1': '2023-24'}
 
 
-def derive_c8_metric_package_unit_price(price, size_quantity):
-    """Per-unit price of a C8 row whose recorded price is of a PACKAGE.
+def _c8_raw_inputs(folder, keep):
+    """Raw surveyed C8 fields for one wave folder, at the source-row grain.
 
-    Section C8 prices "a quantity of ONE (1) [ITEM]" in a stated unit and
-    size; where the size states a metric quantity (W4 c8q2c '34. 250
-    GRAMS', W5 c8aq2_c '24. 75 CL', W5's c8aq2_a + c8aq2_cvn agreeing), the
-    reported Naira figure is the price of that package, so the per-unit
-    price is ``price / size_quantity`` with ``size_quantity`` in the base
-    metric unit (g or cl).  Vectorised; NaN where the size quantity is
-    missing or not positive (those rows are dropped by the caller, never
-    served).
-    """
-    p = pd.to_numeric(pd.Series(price), errors='coerce')
-    q = pd.to_numeric(pd.Series(size_quantity), errors='coerce')
-    out = p / q.where(q > 0)
-    return out.to_numpy()
-
-
-def inputs_community_prices(wave):
-    """The registry `inputs` callable: raw C8 rows for the derived cells.
-
-    Returns the raw surveyed fields -- cluster id, item, unit label, size
-    label/quantity, reported price -- at the source row grain, one row per
-    C8 record whose size coded a metric quantity (exactly the rows whose
-    served Price this derivation divides).
+    ``keep`` selects the rows returned: ``'derived'`` keeps the records
+    whose size codes a metric quantity (exactly the rows whose served Price
+    the c8-metric-size derivation divides); ``'dropped'`` keeps the
+    metric-unit records with an UNRECORDED size (exactly the rows the build
+    drops, named by the c8-unrecorded-size-drop deletion entry).  Columns:
+    t, v, item_cd, unit_label, size_label, size_quantity_g_or_cl,
+    reported_price.
     """
     from lsms_library.paths import countries_root
     from lsms_library.local_tools import get_dataframe
-    # Accept either spelling: the registry stores WAVE FOLDERS (2018-19),
-    # `derivations.call_inputs` passes them through verbatim; callers
-    # reasoning in rounds pass the PH quarter (2019Q1).
-    folder = wave if wave in Waves else wave_folder_map[wave]
     root = countries_root() / 'Nigeria'
-    specs = {
-        '2015-16': None,   # W3: free-text size; the handful of parsed rows
-        # come from c8q2b verbatim -- included below via its own frame
-        '2018-19': [dict(fn='Data/sectc8_harvestw4.dta', item='item_cd',
-                         unit='c8q2', size='c8q2c', size_text=None,
-                         price='c8q3')],
-        '2023-24': [dict(fn='Data/Post Harvest Wave 5/Community/sectc8_harvestw5.dta',
-                         item='item_cd', unit='c8aq2_b', size='c8aq2_c',
-                         size_text=None, price='c8aq3')],
-    }
-    if wave in ('2015-16', '2016Q1'):
-        specs['2015-16'] = [dict(fn=f'Data/sectc8{ab}_harvestw3.dta',
-                                 item='item_cd', unit='c8q2', size=None,
-                                 size_text='c8q2b', price='c8q3')
-                            for ab in ('a', 'b')]
-    # Quarter spellings resolve to their folder's entry.
-    alias = {'2016Q1': '2015-16', '2019Q1': '2018-19', '2024Q1': '2023-24'}
+    cols = ['t', 'v', 'item_cd', 'unit_label', 'size_label',
+            'size_quantity_g_or_cl', 'reported_price']
     frames = []
-    for sp in specs.get(alias.get(wave, wave), []):
-        fn = str(root / folder / sp["fn"])
+    for sp in _C8_SOURCE.get(folder, []):
+        fn = str(root / folder / sp['fn'])
         raw = get_dataframe(fn, convert_categoricals=False)
         dec = get_dataframe(fn, convert_categoricals=True)
         v = raw.apply(lambda r: cluster_id(r.get('state'), r.get('lga'),
                                            r['ea']), axis=1)
+        unit_lab = dec[sp['unit']].astype('string')
         if sp['size'] is not None:
             size_lab = dec[sp['size']].astype('string')
             qty = size_lab.map(_c8_size_metric_grams).astype('Float64')
@@ -2473,18 +2491,36 @@ def inputs_community_prices(wave):
             size_lab = raw[sp['size_text']].astype('string')
             qty = pd.Series([_c8_w3_size_text(x, None) for x in size_lab],
                             index=raw.index, dtype='Float64')
-        mask = qty.notna()
+        if keep == 'derived':
+            mask = qty.notna()
+        else:
+            # dropped: a metric-unit row with no recoverable size, matching
+            # the build's drop predicate branch-for-branch.  The coded-size
+            # waves (W4 c8q2c / W5 c8aq2_c) drop only a g/cl row with a
+            # blank, non-'99. ONE SIZE ONLY' size -- a blank size beside
+            # KILOGRAMS / LITRES there reads as one kilogram / one litre
+            # and is SERVED, not dropped (W4 drops 0; W5 drops the 133
+            # 'GRAMS (G)' rows).  The free-text wave (W3) drops its WHOLE
+            # metric block -- g, cl AND the base Kg/l -- because c8q2b is
+            # blank on all of them (14,603 rows: 13,767 g/cl + 2,597 Kg +
+            # 836 l, the Kg/l share previously uncounted anywhere).
+            if sp['size'] is not None:
+                one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
+                                              na=False)
+                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl'])
+                        & qty.isna() & ~one_size)
+            else:
+                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl', 'Kg', 'l'])
+                        & qty.isna())
         frames.append(pd.DataFrame({
             't': PH_QUARTER[folder], 'v': v[mask].values,
             'item_cd': pd.to_numeric(raw[sp['item']], errors='coerce')[mask].values,
-            'unit_label': dec[sp['unit']].astype('string')[mask].values,
+            'unit_label': unit_lab[mask].values,
             'size_label': size_lab[mask].values,
             'size_quantity_g_or_cl': qty[mask].values,
             'reported_price': pd.to_numeric(raw[sp['price']],
                                             errors='coerce')[mask].values,
         }))
     if not frames:
-        return pd.DataFrame(columns=['t', 'v', 'item_cd', 'unit_label',
-                                     'size_label', 'size_quantity_g_or_cl',
-                                     'reported_price'])
+        return pd.DataFrame(columns=cols)
     return pd.concat(frames, ignore_index=True)
