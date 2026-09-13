@@ -297,6 +297,7 @@ class TestEveryCarrierSurvivesAssembly:
 # the assembly the issue names
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     """End-to-end, on real data.  Skipped when the cache is cold.
