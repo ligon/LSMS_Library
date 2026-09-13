@@ -59,7 +59,11 @@ Data Scheme:
     #
     # AreaUnit/Tenure decoded from
     # the GLSS7 value labels; 1=Acres,2=Poles,3=Ropes,4=Hectare in the
-    # older 4-code waves (no Plot/Other categories).
+    # older 4-code waves (no Plot/Other categories).  Area is converted
+    # per-row to HECTARES on AreaUnit by the ghanalss.plot_features
+    # df_edit hook (canonical schema, GH #879; the factors are the GSS's
+    # own, recovered from GhanaSPS 2009-10's shipped area_ha), so AreaUnit
+    # is the PROVENANCE label of the native unit.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str

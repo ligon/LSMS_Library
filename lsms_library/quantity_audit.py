@@ -294,6 +294,22 @@ QUANTITY_REFERENCE_FLOOR = 1.0
 _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
     "crop_production": ("Quantity",),
     "food_acquired": ("Quantity",),
+    # GH #879: the canonical schema declares plot_features.Area in
+    # HECTARES with AreaUnit a PROVENANCE label, but six countries served
+    # the native unit instead, and no framework code reads AreaUnit, so
+    # the violation was invisible to every shape/null/duplicate guard.
+    # Screening Area here is what catches a recurrence: a country serving
+    # e.g. square metres (Timor-Leste) or sotka (Tajikistan) as "Area"
+    # lands orders of magnitude above the per-wave hectare cell and is
+    # NAMED.  The ladder degenerates to the `(t)` rung because
+    # plot_features has no `u`/`j` axis -- that rung is exactly the right
+    # comparison (plot size against its own wave).  Warn-only, never
+    # drops: measured on the 17 correct countries pre-fix, the rule flags
+    # 317 of 397,182 rows (0.08%), overwhelmingly genuinely-large hectare
+    # self-reports (Togo 2018: 244 rows of 200-1000 ha labelled
+    # 'hectares'), which is the same order of false-positive Site Q
+    # already accepts for crop_production.
+    "plot_features": ("Area",),
 }
 
 #: Alternate spellings of the identifying axes, in preference order.  All of

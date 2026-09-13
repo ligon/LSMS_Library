@@ -57,7 +57,10 @@ plot_features:
     # duplicates.  Variable labels confirmed via pyreadstat metadata:
     #   q09a04 "Plot area (m2)"; q09a06 "Tenure status of the plot";
     #   q09a09 "Irrigation of the plot".
-    # AreaUnit is the constant 'square meters' (mapping.py AreaUnit()).
+    # Area is served in HECTARES (canonical unit; GH #879): q09a04 is
+    # recorded in square metres and mapping.py Area() divides by 10,000.
+    # AreaUnit is the constant 'square meters' (mapping.py AreaUnit()) --
+    # a PROVENANCE label for the native unit, not the served unit.
     # Irrigated: 'Not irrigated' -> False, any irrigation method -> True.
     # SoilType / TenureSystem absent in the source (q09a05 is land-use,
     # q09a08 is slope -- neither a soil class).
@@ -67,7 +70,9 @@ plot_features:
         i: hh_id
         plot_id: pcode
     myvars:
-        Area: q09a04
+        Area:
+            - q09a04
+            - mapping: Area
         AreaUnit:
             - q09a04
             - mapping: AreaUnit
