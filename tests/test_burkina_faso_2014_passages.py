@@ -181,6 +181,10 @@ def delivered(burkina):
                     f'{type(exc).__name__}: {exc}')
 
 
+_data = pytest.mark.requires_s3
+
+
+@_data
 def test_wave_frame_carries_visit_one_through_four(wave_frame):
     assert 'visit' in wave_frame.index.names
     visit = wave_frame.index.get_level_values('visit')
@@ -189,6 +193,7 @@ def test_wave_frame_carries_visit_one_through_four(wave_frame):
     assert wave_frame.groupby(level='visit').size().to_dict() == PASSAGE_ROWS
 
 
+@_data
 def test_no_row_carries_a_null_unit(wave_frame):
     """The ``Unknown`` sentinel (GH #842).  A NaN on the declared ``u`` level is a
     DEFERRED SILENT DELETION -- the row is served, then vanishes in whichever
@@ -199,6 +204,7 @@ def test_no_row_carries_a_null_unit(wave_frame):
     assert (u.astype(str) == 'Unknown').sum() > 400_000
 
 
+@_data
 def test_delivered_table_keeps_the_passage_level(delivered):
     assert 'visit' in delivered.index.names
     wave = delivered.xs('2014', level='t', drop_level=False)
@@ -207,6 +213,7 @@ def test_delivered_table_keeps_the_passage_level(delivered):
     assert pd.api.types.is_integer_dtype(visit.dtype), visit.dtype
 
 
+@_data
 def test_per_passage_expenditure_is_recoverable(delivered):
     """The point of the level.  Each passage's own 7-day total must be readable
     off the delivered table -- not merged into an unmarked 28-day figure."""
@@ -218,6 +225,7 @@ def test_per_passage_expenditure_is_recoverable(delivered):
     assert per_passage.sum() == pytest.approx(WAVE_EXPENDITURE, rel=1e-9)
 
 
+@_data
 def test_nothing_is_lost_and_nothing_is_manufactured(wave_frame, delivered):
     """Conservation between the extracted frame and the served table.
 
@@ -234,6 +242,7 @@ def test_nothing_is_lost_and_nothing_is_manufactured(wave_frame, delivered):
         assert wave[col].sum() == pytest.approx(total, rel=1e-9)
 
 
+@_data
 def test_the_ehcvm_waves_ask_once_and_carry_visit_one(delivered):
     """``add_visit_level``'s own use case: the single-recall waves get the
     constant 1 so every wave shares one index shape.  Their NUMBERS must be
@@ -254,6 +263,7 @@ def test_the_ehcvm_waves_ask_once_and_carry_visit_one(delivered):
         pytest.approx(27_888_221.36, rel=1e-6)
 
 
+@_data
 def test_the_grain_collapse_no_longer_destroys_or_deletes(burkina):
     """The GrainCollapseWarning this cell used to raise on every cold build --
     "460,438 row(s) ... DELETED OUTRIGHT" -- must be gone, and gone because the
@@ -268,6 +278,7 @@ def test_the_grain_collapse_no_longer_destroys_or_deletes(burkina):
     assert not grain, [str(w.message)[:200] for w in grain]
 
 
+@_data
 def test_feature_still_sums_the_passages_for_cross_country_work(burkina):
     """The cross-country contract is UNCHANGED: ``Feature`` drops the
     non-canonical ``visit`` level and SUMS the additive columns, exactly as it
