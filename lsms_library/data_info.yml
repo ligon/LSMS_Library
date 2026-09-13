@@ -406,6 +406,13 @@ Columns:
         single-visit country's rows get `visit = NaN` during Feature()
         assembly, so anything that ever does enforce this must use the
         NULLABLE integer type and must not read NaN as a violation.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        Registry key for a constructed field, including the visit INDEX.
+        A visit-assignment derivation leaves the reported Int_t unchanged;
+        consult the record's columns list to identify the derived field.
     Int_t:
       type: datetime
     Interview start:

@@ -10,6 +10,29 @@ import numpy as np
 import lsms_library.local_tools as tools
 from collections import defaultdict
 
+
+def interview_date(df):
+    """Expose reported dates with calendar-visit assignments.
+
+    Existing intake sources and parsers are retained. GLSS4/GLSS5 also use
+    the registered, fixed anchored-chronology construction: only the visit
+    assignment is derived, and those rows carry its Derivation key.
+    Undated slots are omitted; all raw inference inputs remain retrievable
+    through Country.derivation_inputs, including unresolved/invalid records.
+    Early food visit=1 denotes a consumption occasion at the second contact,
+    so its visit number is not a date-table join key (task ledger, sections 3/4).
+    """
+    waves = df.index.get_level_values('t').unique()
+    if len(waves) == 1 and str(waves[0]) in ('1998-99', '2005-06'):
+        from lsms_library.derivations import resolve_callable
+        build = resolve_callable(
+            'lsms_library.countries.GhanaLSS._.visit_dates:build_visit_dates')
+        # The builder attaches row provenance after reshaping; the generic
+        # melt intentionally retains date columns only.
+        return build(str(waves[0]))
+    return tools.melt_visit_intervals(df, start_base='Int_t', out_start='Int_t')
+
+
 def i(value):
     '''
     Formatting household id as "clust/nh".

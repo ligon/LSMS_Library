@@ -433,3 +433,101 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
         f"If this is deliberate, the derived food tables are now cached and "
         f"every kg change needs a corpus re-warm -- say so explicitly.")
     assert not named, f"kg-inference constants serialised into a fingerprint: {named}"
+
+
+@pytest.mark.parametrize('pattern', [r'kg\b', rb'kg\b'])
+def test_pattern_serialization_is_stable_and_sensitive(pattern):
+    """GH #780: matching text, flags and str/bytes identity are build inputs."""
+    plain = R._ser(re.compile(pattern), set(), [])
+    re.purge()
+    assert R._ser(re.compile(pattern), set(), []) == plain
+    assert R._ser(re.compile(pattern, re.I), set(), []) != plain
+    other = pattern.replace(b'kg', b'lb') if isinstance(pattern, bytes) else pattern.replace('kg', 'lb')
+    assert R._ser(re.compile(other), set(), []) != plain
+    # ASCII avoids the default UNICODE flag obscuring this type distinction.
+    assert R._ser(re.compile('kg', re.A), set(), []) != R._ser(re.compile(b'kg', re.A), set(), [])
+    assert ' at 0x' not in plain
+    assert plain in R._ser({'nested': [re.compile(pattern)]}, set(), [])
+
+
+def test_standalone_pattern_is_in_closure(monkeypatch):
+    """Serialization alone misses patterns not nested inside a container."""
+    import sys
+    module = sys.modules[__name__]
+    monkeypatch.setattr(module, '_GH780_PATTERN', re.compile('kg'), raising=False)
+
+    def uses_pattern(value):
+        return _GH780_PATTERN.search(value)
+
+    before = R._closure_parts(uses_pattern, set())
+    assert any('._GH780_PATTERN=' in part for part in before)
+    monkeypatch.setattr(module, '_GH780_PATTERN', re.compile('kg', re.I))
+    assert R._closure_parts(uses_pattern, set()) != before
+
+
+def test_country_framework_closures_are_serializable():
+    """The real Ghana nutrition closure failed on its metric pattern tuple."""
+    from lsms_library.paths import countries_root
+    checked = {}
+    for root in sorted(countries_root().iterdir()):
+        if not (root / '_' / 'data_scheme.yml').exists():
+            continue
+        paths = tuple(sorted(str(p) for p in (root / '_').glob('*.py')))
+        checked[root.name] = R.framework_imports_fingerprint(paths)
+    assert checked['GhanaLSS'], 'Ghana nutrition must contribute a framework fingerprint'
+
+
+@pytest.mark.parametrize('gate', ['wave', 'country'])
+def test_framework_fingerprint_failure_warns_and_degrades(monkeypatch, gate):
+    """Both existing best-effort gates retain a hash and expose lost protection."""
+    c = lsms_library.country.Country('GhanaLSS')
+    w = c[c.waves[0]]
+
+    def fail(paths):
+        raise TypeError('GH780 unsupported build constant')
+
+    monkeypatch.setattr(lsms_library.country, 'framework_imports_fingerprint', fail)
+    with pytest.warns(RuntimeWarning, match='Framework import fingerprint unavailable.*GhanaLSS.*cache invalidation is degraded.*GH780'):
+        result = (w._input_hash('household_roster') if gate == 'wave' else
+                  c._table_cache_hash('household_roster', c.waves))
+    assert isinstance(result, str) and len(result) == 64
+
+
+def test_ghana_framework_fingerprint_stable_across_pythonhashseed():
+    """The repaired real closure, including its pattern tuple, is reproducible."""
+    import subprocess
+    import sys
+    code = (
+        "from lsms_library import _build_registry as R;"
+        "from lsms_library.paths import countries_root;"
+        "p=countries_root()/'GhanaLSS'/'_';"
+        "print(R.framework_imports_fingerprint(tuple(sorted(str(f) for f in p.glob('*.py')))))"
+    )
+    outputs = []
+    for seed in ('0', '1'):
+        result = subprocess.run([sys.executable, '-c', code], capture_output=True,
+                                text=True, env=dict(os.environ, PYTHONHASHSEED=seed))
+        assert result.returncode == 0, result.stderr
+        outputs.append(result.stdout.strip())
+    assert len(outputs[0]) == 64 and outputs[0] == outputs[1]
+
+
+@pytest.mark.parametrize('gate', ['wave', 'country'])
+def test_framework_fingerprint_failure_respects_strict_warnings(monkeypatch, gate):
+    """Caller-selected warnings-as-errors overrides the normal partial hash."""
+    import warnings
+    c = lsms_library.country.Country('GhanaLSS')
+    w = c[c.waves[0]]
+
+    def fail(paths):
+        raise TypeError('GH780 unsupported build constant')
+
+    monkeypatch.setattr(lsms_library.country, 'framework_imports_fingerprint', fail)
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', RuntimeWarning)
+        if gate == 'wave':
+            with pytest.raises(RuntimeWarning, match='Framework import fingerprint unavailable'):
+                w._input_hash('household_roster')
+        else:
+            # Country hashing already catches all errors and returns None.
+            assert c._table_cache_hash('household_roster', c.waves) is None
