@@ -1,0 +1,68 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Nigeria::community_prices::c8-metric-size:
+  waves: ['2015-16', '2018-19', '2023-24']
+  columns: [Price]
+  rows: {u: [g, cl]}
+  rule: >-
+    Price = reported_price / size_quantity, with size_quantity decoded from
+    the C8 SIZE field into grams or centilitres and the row's unit `u` set to
+    the metric base unit.  The C8 form prices "a quantity of ONE (1) [ITEM]"
+    in a stated UNIT and SIZE; where the size states a metric quantity the
+    reported Naira figure is the price of THAT PACKAGE, not of one gram or
+    one centilitre.  W4 (c8q2c) and W5 (c8aq2_c) share one coded size list
+    ('30. 20 GRAMS' ... '38. 1 KG', '50. 100 GRAMS (25 CUBES)' ...,
+    '20. 33 CL' ... '26. 1.5 LITRE'); W5's c8aq2_a (quantity) and c8aq2_cvn
+    (kg/l conversion factor) agree with the coded quantity and are a
+    cross-check, not a second source.  W3's c8q2b is free text and blank on
+    13,767 of the 13,768 metric-unit rows; the handful stating a quantity
+    ('300gram', 'one 75cl bottle', 'one 450g tin') are parsed and divided,
+    the rest are DROPPED (not derivable -- a price of an unrecorded package
+    is not a per-unit price).  W4's 1,191 rows under the 'Grams(g)' unit all
+    carry no c8q2c code and are likewise dropped.  Ordinal sizes (SMALL /
+    MEDIUM / LARGE / VERY LARGE, '99. ONE SIZE ONLY') carry no metric
+    content: those rows stay under the base unit and are NOT derived.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_c8_metric_package_unit_price
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_community_prices
+  raw_variables: [c8q2, c8q2b, c8q2c, c8q3, c8aq2_a, c8aq2_b, c8aq2_c,
+                  c8aq2_cvn, c8aq3, item_cd, state, lga, ea]
+  assumptions:
+    - text: >-
+        the price recorded beside a coded metric size is the price of one
+        package of that size, so dividing by the size quantity gives the
+        price of one base unit.  The W4 questionnaire prints "2. PLEASE USE
+        A QUANTITY OF ONE (1) FOR [ITEM] AND THE UNIT OF MEASURE YOU ARE
+        USING" over sub-columns headed UNIT OF MEASURE and SIZE, then "3.
+        What is the price for the item?" in NAIRA -- one package of the
+        stated size, one price.
+      basis: questionnaire
+      evidence: >-
+        ph_w4_community_quest.pdf, section C8 p.13; measured against
+        the household unit value on matched (t, j, u, geography) cells
+        pre-fix the median community/household ratio was 1.000 on Kg (596
+        cells) and l (124), but 1/189 on g (130) and 1/42 on cl (125) -- the
+        g/cl ratios ARE the package sizes (20-500 g; 33-75 cl)
+        (slurm_logs/price_sources/Nigeria/REPORT.org N-02).
+    - text: >-
+        a metric-unit row with an UNRECORDED size (all of W3's g/cl rows
+        except one; W4's 1,191 'Grams(g)' rows) cannot be normalised and is
+        dropped rather than served mis-scaled.  '99. ONE SIZE ONLY' is the
+        questionnaire's own statement that the price IS of one unit and is
+        the single exemption.
+      basis: modelling-choice
+      evidence: >-
+        GH #834; Nigeria/_/CONTENTS.org "The C8 SIZE field is recorded by
+        the survey and NOT read by the build"
+  validated_against: >-
+    the household unit value (food_acquired Expenditure/Quantity) on matched
+    (t, j, u, cluster-geography) cells: post-fix the community/household
+    median ratio is ~1.0 on the metric units where the two sources overlap,
+    the same agreement the unambiguous Kg and l units showed pre-fix.
+  contents: Nigeria/_/CONTENTS.org, "The C8 SIZE field" (GH #834)
+  since: '2026-09-13'

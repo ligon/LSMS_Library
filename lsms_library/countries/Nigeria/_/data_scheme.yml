@@ -525,6 +525,16 @@ Data Scheme:
     #        is the questionnaire's per-item fixed unit (_W1W2_PRICE_UNIT).
     # t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
     # matching crop_production / anthropometry).
+    #
+    # GH #834 (C8 SIZE field, W3-W5): where the coded size states a metric
+    # quantity (W4 c8q2c / W5 c8aq2_c; W3's c8q2b is free text and blank on
+    # all but a handful of the metric-unit rows), the reported price is of
+    # that PACKAGE -- the build divides it by the decoded quantity and
+    # re-units the row to 'g'/'cl', stamping `Derivation =
+    # Nigeria::community_prices::c8-metric-size` (see _/derivations.yml).
+    # A metric-unit row with an UNRECORDED package size (all of W3's g/cl
+    # rows but one; W4's 1,191 'Grams(g)' rows) is DROPPED, not served
+    # mis-scaled by ~189x/~42x.
     index: (t, v, j, u)
     Price: float
     materialize: make
