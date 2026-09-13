@@ -45,6 +45,7 @@ from .local_tools import (
     cache_freshness,
     stamp_parquet_hash,
     read_parquet_grain_audit,
+    read_parquet_cache_waves,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -3281,11 +3282,32 @@ class Country:
         parquet.  Returns ``None`` (``unverifiable`` -> read-if-present)
         when no wave can produce an input hash, so tables the scheme
         can't introspect never regress the v0.7.0 fast path.
+
+        **The hash is wave-set-INDEPENDENT (GH #891).**  It folds
+        ``set(waves) | set(self.waves)``, not the requested set, because
+        every request for this table -- all waves or one -- shares the single
+        cache path ``var/{table}.parquet``.  Folding the *requested* set made
+        ``sample(waves=['2016-17'])`` and ``sample()`` grade each other's cache
+        stale and rebuild it on every alternation, which is what #891 reports.
+
+        Taking the union rather than simply ``self.waves`` keeps an exotic
+        caller (a wave not in ``self.waves``) covered instead of silently
+        unhashed.  For every ordinary call the union equals ``self.waves``, so
+        an all-waves request hashes **byte-identically to the pre-#891
+        payload** and no warm all-wave parquet is invalidated by this change.
+
+        Coverage is no longer carried by the hash, so it has to be carried
+        somewhere: the parquet records the waves it was built from under
+        ``lsms_cache_waves`` (see :func:`local_tools.read_parquet_cache_waves`)
+        and the read path serves it only to a request it actually covers.
+        Dropping the wave set from the hash *without* that manifest would serve
+        a one-wave parquet to an all-wave request -- see GH #892 for the same
+        failure in the ``assume_cache_fresh`` branch.
         """
         try:
             wave_hashes: list[str] = []
             any_hash = False
-            for w in sorted(waves):
+            for w in sorted(set(waves) | set(self.waves)):
                 try:
                     wh = self[w]._input_hash(method_name)
                 except (KeyError, AttributeError, OSError):
@@ -3375,6 +3397,83 @@ class Country:
             return hashlib.sha256(payload.encode()).hexdigest()
         except Exception:
             return None
+
+    def _cache_covers_waves(self, cache_path, waves: list[str], freshness: str) -> list[str] | None:
+        """Wave coverage of the L2-country parquet at *cache_path*, or ``None``
+        when it cannot be established (GH #891).
+
+        A cached parquet may be served to a request only when it was built from
+        a superset of the requested waves.  Coverage comes from the
+        ``lsms_cache_waves`` manifest; the frame's own ``t`` values are NOT a
+        substitute, because a wave that contributed zero rows is dropped during
+        aggregation and would then be permanently unsatisfiable.
+
+        Migration (parquets written before #891 carry no manifest):
+
+        - *freshness* ``fresh`` -- the stored hash equals the current
+          wave-independent expectation.  Under the pre-#891 scheme that hash was
+          computed from the REQUESTED waves, so a parquet whose stored hash
+          matches the all-waves expectation can only have been stamped by an
+          all-waves request.  Coverage is therefore ``self.waves``.  (A parquet
+          built from a subset was stamped with that subset's hash, which cannot
+          equal the all-waves expectation, so it grades ``stale`` and rebuilds.)
+        - ``legacy`` / ``unverifiable`` -- no hash at all, or none computable, so
+          nothing corroborates coverage.  Return ``None``: the caller serves it
+          only to a full-``self.waves`` request and otherwise rebuilds once,
+          which writes a manifest and ends the ambiguity for that cell.
+        """
+        stamped = read_parquet_cache_waves(cache_path)
+        if stamped is not None:
+            return stamped
+        if freshness == "fresh":
+            return list(self.waves)
+        return None
+
+    def _union_waves(self, *wave_lists) -> list[str]:
+        """Union of *wave_lists*, ordered by ``self.waves`` (GH #891).
+
+        Cross-wave concat order follows the country's declared wave order, so
+        the union is emitted in that order rather than in request or set order;
+        any wave not declared by the country (an exotic explicit request) is
+        appended, sorted, so the result is deterministic.
+        """
+        seen: set[str] = set()
+        for wl in wave_lists:
+            seen.update(str(w) for w in (wl or []))
+        ordered = [w for w in self.waves if str(w) in seen]
+        extra = sorted(seen - {str(w) for w in self.waves})
+        return ordered + extra
+
+    def _restrict_to_waves(self, df, waves: list[str]):
+        """Restrict *df* to *waves* on its ``t`` index level (GH #891).
+
+        Row selection only -- never a groupby or a reducer, so it cannot
+        collapse grain (cf. the #323 invariant that core aggregates nothing).
+        Returns *df* unchanged when it carries no ``t`` level or already holds
+        exactly the requested waves.
+
+        **A request covering the whole country is a pass-through**, not a
+        filter that happens to match everything.  Two reasons, and the second
+        is not cosmetic: it keeps the ordinary ``Country.table()`` call byte-
+        identical to its pre-#891 behaviour, and a row whose ``t`` is NULL
+        stringifies to ``'nan'``, matches no requested wave, and would be
+        silently DELETED by the filter on every serve -- turning a read-path
+        restriction into data loss.  Deleting a null-keyed row is exactly the
+        open complaint against ``groupby(dropna=True)`` at the grain collapse
+        (``SkunkWorks/grain_aggregation_policy.org`` Section 3b); this code must
+        not add a second instance of it.
+        """
+        if not isinstance(df, pd.DataFrame) or 't' not in (df.index.names or []):
+            return df
+        if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+            return df
+        want = {str(w) for w in waves}
+        have = df.index.get_level_values('t').astype(str)
+        if set(have.unique()) <= want:
+            return df
+        out = df[have.isin(want)]
+        out.attrs = dict(df.attrs)
+        return out
 
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded
@@ -3511,9 +3610,34 @@ class Country:
         if prefer_parquet_cache:
             parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             if parquet_path.exists():
-                df_cached = get_dataframe(parquet_path)
-                df_cached = map_index(df_cached)
-                return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                # GH #892: this branch used to return the parquet whole,
+                # ignoring `waves` entirely -- a one-wave request was served
+                # every wave in the cache, silently.  Nothing downstream
+                # filters, so the restriction has to happen here.
+                #
+                # It went unnoticed because on the ORDINARY path the pre-#891
+                # hash folded in the requested wave set, so a subset request
+                # graded `stale` and rebuilt; the #891 defect was what masked
+                # this one.  Making the hash wave-independent removes that
+                # accidental guard, so the two must be fixed together.
+                #
+                # `assume_cache_fresh` skips the hash check by contract, so
+                # coverage rests on the manifest alone: absent it (a pre-#891
+                # parquet), fall through to the normal path rather than guess.
+                covered = read_parquet_cache_waves(parquet_path)
+                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    df_cached = self._restrict_to_waves(df_cached, waves)
+                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                if covered is None and set(waves) == set(self.waves):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
+                logger.debug(
+                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
+                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
+                )
 
         if (
             not self._panel_ids_attempted
@@ -3940,6 +4064,24 @@ class Country:
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
             cache_exists = cache_path.exists()
 
+            # GH #891: single-wave and all-wave requests share this one path, so
+            # the cache carries a manifest of the waves it was BUILT from and is
+            # served only to a request it covers.  On a miss we rebuild the
+            # UNION of what was asked for and what the cache already had --
+            # coverage then only ever grows (bounded by self.waves), so each
+            # wave is built at most once and alternating subsets converge.
+            # Rebuilding just the requested waves would shrink coverage to each
+            # request in turn and reproduce the reported thrash for alternating
+            # DISTINCT subsets.
+            #
+            # Under LSMS_NO_CACHE the manifest is not consulted and this stays
+            # the requested set: that lever means "rebuild what I asked for",
+            # and silently building the country's other waves would be a
+            # surprising cost on a debugging path.  It can shrink a warm
+            # parquet's coverage, which the next ordinary request then rebuilds
+            # once -- accepted, and bounded to that one rebuild.
+            build_waves = list(waves)
+
             # GH #323: start this table's grain ledger clean.  It is repopulated
             # either by the cold build (the collapse audit) or by replaying the
             # stamp on a warm read -- so `grain_reports()` describes THIS load, and
@@ -3982,10 +4124,27 @@ class Country:
             if cache_exists and not no_cache:
                 cache_expected_hash = self._table_cache_hash(method_name, waves)
                 freshness = cache_freshness(cache_path, cache_expected_hash)
-                if freshness == "stale":
+                # GH #891: a non-stale parquet is still only usable if it was
+                # built from a superset of the requested waves.  Unknown
+                # coverage (a pre-#891 parquet with no hash to corroborate it)
+                # is treated as "covers a full-waves request only".
+                covered = self._cache_covers_waves(cache_path, waves, freshness)
+                if covered is None:
+                    coverage_ok = {str(w) for w in waves} == {str(w) for w in self.waves}
+                else:
+                    coverage_ok = {str(w) for w in waves} <= {str(w) for w in covered}
+                    # Union even when the parquet is STALE: its data is out of
+                    # date but its COVERAGE is still the right thing to rebuild,
+                    # or a one-wave request against a stale all-waves cache
+                    # would shrink coverage and make the next all-waves request
+                    # rebuild again -- the thrash, one step removed.
+                    build_waves = self._union_waves(waves, covered)
+                if freshness == "stale" or not coverage_ok:
+                    reason = "STALE" if freshness == "stale" else "coverage"
                     logger.debug(
-                        f"v0.8.0 cache STALE: {method_name} at {cache_path}; "
-                        f"rebuilding from source"
+                        f"v0.8.0 cache MISS ({reason}): {method_name} at {cache_path}; "
+                        f"covers {covered}, request needs {sorted(waves)}; "
+                        f"rebuilding {sorted(build_waves)}"
                     )
                     # Eviction of hashless (script-written) wave parquets now
                     # happens once, just before the rebuild descent below, so
@@ -4015,7 +4174,10 @@ class Country:
                             f"v0.8.0 cache read ({freshness}): {method_name} "
                             f"from {cache_path}"
                         )
-                        return cached_df
+                        # GH #891/#892: the parquet may cover MORE waves than
+                        # were asked for.  Requested-wave semantics are enforced
+                        # here, on the serve path -- nothing downstream filters.
+                        return self._restrict_to_waves(cached_df, waves)
                     except (OSError, ArrowInvalid) as cache_read_error:
                         # Stale / corrupted cache parquet -> rebuild from source.
                         # Surface to the user (not just debug log) so a silent
@@ -4035,16 +4197,20 @@ class Country:
                 with _working_directory(dvc_root):
                     repo = Repo(str(dvc_root))
 
-                    stage_infos = self._resolve_materialize_stages(method_name, waves)
+                    stage_infos = self._resolve_materialize_stages(method_name, build_waves)
                     if not stage_infos:
-                        df = load_from_waves(waves)
+                        # GH #891: build the union, cache the union (stamped with
+                        # its coverage), return only what was asked for.
+                        df = load_from_waves(build_waves)
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             to_parquet(df, cache_path,
-                                       cache_hash=self._table_cache_hash(method_name, waves),
-                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
+                                       cache_hash=self._table_cache_hash(method_name, build_waves),
+                                       grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
+                                       cache_waves=build_waves)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
+                            df = self._restrict_to_waves(df, waves)
                         return df
 
                     deduped_infos: list[StageInfo] = []
@@ -4088,10 +4254,12 @@ class Country:
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         to_parquet(combined_df, cache_path,
-                                   cache_hash=self._table_cache_hash(method_name, waves),
-                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)))
+                                   cache_hash=self._table_cache_hash(method_name, build_waves),
+                                   grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
+                                   cache_waves=build_waves)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
-                        return combined_df
+                        # GH #891: cache the union, serve the request.
+                        return self._restrict_to_waves(combined_df, waves)
 
                     def _load_stage(stage_ref: str):
                         file_part, stage_name = stage_ref.split(":", 1)
@@ -4144,7 +4312,20 @@ class Country:
                                 method_name,
                                 country=self.name,
                             )
-                            return cached_df
+                            # GH #891: this reads the SAME shared cache_path as
+                            # the v0.8.0 fast path above, so it needs the same
+                            # coverage discipline.  Unlike that path it is not
+                            # hash-gated (DVC stage status decided freshness), so
+                            # serve it only when the manifest proves coverage.
+                            _cov = read_parquet_cache_waves(cache_path)
+                            if _cov is None or not set(map(str, waves)) <= set(map(str, _cov)):
+                                logger.debug(
+                                    f"stage-cache read SKIPPED (coverage): {method_name} "
+                                    f"covers {_cov}; request needs {sorted(waves)}"
+                                )
+                                dirty = True
+                            else:
+                                return self._restrict_to_waves(cached_df, waves)
                         except (FileNotFoundError, PathMissingError):
                             dirty = True  # fall through to repro if cache missing unexpectedly
 
@@ -4178,7 +4359,10 @@ class Country:
                         and stage_infos[0].output_path == cache_path
                     )
                     if single_stage:
-                        return next(iter(stage_outputs.values()))
+                        # GH #891: a single stage whose output IS cache_path --
+                        # restrict to the request like every other serve path.
+                        return self._restrict_to_waves(
+                            next(iter(stage_outputs.values())), waves)
 
                     combined_outputs = consolidate_stage_outputs(stage_outputs)
                     if combined_outputs is None:
@@ -4193,15 +4377,17 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(waves)
+                df = load_from_waves(build_waves)
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
                     to_parquet(df, cache_path,
-                               cache_hash=self._table_cache_hash(method_name, waves))
+                               cache_hash=self._table_cache_hash(method_name, build_waves),
+                               cache_waves=build_waves)
                     logger.debug(
                         f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
                     )
+                    df = self._restrict_to_waves(df, waves)
                 return df
             finally:
                 if repo is not None:
