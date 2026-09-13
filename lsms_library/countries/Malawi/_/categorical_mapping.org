@@ -534,7 +534,20 @@
 # numeric codes are stable across all four buildable waves (2010-11,
 # 2013-14, 2016-17, 2019-20); only the decoded label spelling drifts, so
 # we key on the integer code (convert_categoricals=False) rather than the
-# label string.  Preferred Labels REUSE the consumed-food labels from the
+# label string.
+#
+# WITH ONE EXCEPTION (GH #869): IHS4/IHS5 RECODED four groups of perennial
+# codes in Module P -- cassava 1 -> 100, "OTHER (SPECIFY)" 18 -> 21, and
+# the (pre-IHS4 absent) FODDER / FERTILISER / FUEL WOOD tree classes as
+# 1800 / 1900 / 2000.  `_PERENNIAL_RECODE` in `malawi.py` maps the post-
+# offset codes 1100 -> 1001 and 1021 -> 1018, so those rows resolve to the
+# 1001 / 1018 rows below; the tree classes have no pre-recode identity, so
+# the table itself carries 2800 / 2900 / 3000 for them.  The 2016-17 and
+# 2019-20 SALE module (Q) was NOT recoded -- it still codes cassava 1 and
+# other 18 -- so its post-offset codes (1001 / 1018) still hit the same
+# two rows; the recode lives in code, not here, precisely so this one
+# table stays correct for both module behaviours.  Codes 2800-3000 appear
+# only in IHS4/IHS5; nothing pre-IHS4 maps to them.  Preferred Labels REUSE the consumed-food labels from the
 # harmonize_food table above wherever the crop is also a food (Rice,
 # Sorghum, Pigeon Pea (Nandolo), Ground Bean, Groundnut, Tomato, Onion,
 # Cabbage, Sugar Cane, Banana, Mango, Papaya, Pineapple, Avocado, Guava,
@@ -613,6 +626,9 @@
 | 1016 | Pineapple            |
 | 1017 | Macadamia            |
 | 1018 | Other                |
+| 2800 | Fodder Trees         |
+| 2900 | Fertiliser Trees     |
+| 3000 | Fuel Wood Trees      |
 
 # crop_production harvest/sale UNIT codes (Module G/I/P/Q non-standard
 # unit list, codes 1-13).  This is a DIFFERENT code space from the
@@ -700,10 +716,11 @@
 # conversion files), title-cased.
 #
 # The perennial half is offset +1000 exactly as in `harmonize_crop`, and its
-# labels are stable across every wave (0 of 23 differ).  Codes 1021 / 1100 /
-# 2800 / 2900 / 3000 are deliberately ABSENT: `harmonize_crop` does not carry
-# them either, so those rows never reach this table -- that is GH #869, not
-# this table's business.
+# labels are stable across every wave (0 of 23 differ).  The recoded IHS4/IHS5
+# codes are handled in code, not here: `malawi._PERENNIAL_RECODE` (GH #869)
+# folds the post-offset 1100 -> 1001 (cassava) and 1021 -> 1018 (other) before
+# either table is consulted, and the recode-only 2800 / 2900 / 3000 (fodder /
+# fertiliser / fuel-wood trees) are carried by both tables directly.
 #+name: harmonize_crop_variety
 | Code | Preferred Label        |
 |------+------------------------|
@@ -773,6 +790,9 @@
 | 1016 | Pineapple              |
 | 1017 | Macadamia              |
 | 1018 | Other                  |
+| 2800 | Fodder Trees           |
+| 2900 | Fertiliser Trees       |
+| 3000 | Fuel Wood Trees        |
 
 # harmonize_input: agricultural-input identity for the plot_inputs feature
 # (GAP 2).  Codes 1-6 are the Module D inorganic-fertilizer type codes

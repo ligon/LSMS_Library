@@ -961,14 +961,33 @@ def plot_features_for_wave(t, df_c, df_d, colmap):
 # the 1-12 month codes are the standard Stata month value labels.
 _MONTH_CODES = {i: i for i in range(1, 13)}  # months stored as 1-12 ints
 
+#: IHS4/IHS5 perennial (Module P) RECODE, GH #869.  The instrument renamed
+#: four groups of its perennial crop codes between IHPS (2013-14) and IHS4
+#: (2016-17): cassava 1 -> 100, "OTHER (SPECIFY)" 18 -> 21, and the tree
+#: classes FODDER/FERTILISER/FUEL WOOD (absent pre-IHS4) entered as
+#: 1800/1900/2000 -- verified against each wave's own Stata value labels
+#: (2016-17 ag_mod_p.dta `ag_p0c` 100='cassava'; 2010-11 ag_p0d 1='cassava'
+#: / 18='OTHER (SPECIFY)'; 2019-20 identical to 2016-17, panel halves too).
+#: EPAR records the same recode (Malawi IHS/Nonstandard Unit Conversion
+#: Factors/README.md).  Keyed on the code AFTER the +1000 offset
+#: `_crop_codes(perennial=True)` applies, so 1100 -> 1001 ('Cassava'), and
+#: value-identical to the offset alone for every IHS3/IHPS code, which is
+#: why it needs no wave conditioning.  The 2016-17/2019-20 SALE module
+#: (Module Q `crop_code`) did NOT take the recode -- it still codes cassava
+#: 1 and other 18 in those waves (its rows are dropped downstream when no
+#: harvest row carries their code, i.e. "planted but no harvest reported").
+_PERENNIAL_RECODE = {1100: 1001, 1021: 1018, 2800: 2800, 2900: 2900,
+                     3000: 3000}
+
 
 def _crop_codes(series, perennial=False):
     """Map a numeric crop-code Series through harmonize_crop, applying
-    the +1000 perennial offset first when ``perennial`` is True.  Source
+    the +1000 perennial offset first when ``perennial`` is True, then the
+    IHS4/IHS5 Module P recode of ``_PERENNIAL_RECODE`` (GH #869).  Source
     must be loaded convert_categoricals=False (numeric codes)."""
     codes = pd.to_numeric(series, errors='coerce').astype('Int64')
     if perennial:
-        codes = codes + 1000
+        codes = (codes + 1000).replace(_PERENNIAL_RECODE)
     cmap = _malawi_code_map('harmonize_crop')
     out = codes.map(cmap)
     return out.astype('string').where(out.notna(), pd.NA), codes
@@ -1296,13 +1315,27 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # units -- or two states -- into one row.  It survives only as a guard
     # against a genuinely repeated line at that grain, which the groupby
     # above has already consolidated.
+    # crop must be non-null for the index; rows where the code did not map
+    # to a Preferred Label are dropped from the index axis.  No crop code
+    # in harmonize_crop maps to a null Preferred Label, so this fires only
+    # on a code the table does not carry at all -- which is exactly how the
+    # IHS4/IHS5 Module P recode (cassava 100, GH #869) silently vanished
+    # before `_PERENNIAL_RECODE` was added.  Report it LOUDLY.
+    unmapped = harv[harv['crop'].isna()]
+    if len(unmapped):
+        n_qty = int(unmapped['Quantity'].notna().sum())
+        warnings.warn(
+            f"Malawi/crop_production {t}: {len(unmapped)} harvest row(s) "
+            f"({n_qty} with a reported Quantity) carry a crop code absent "
+            f"from harmonize_crop and are being DROPPED: "
+            f"{dict(unmapped['_crop_code'].value_counts().sort_index())}. "
+            f"If this is a survey recode, extend harmonize_crop (or "
+            f"_PERENNIAL_RECODE) rather than accepting the loss.  GH #869.",
+            stacklevel=2)
+    harv = harv[harv['crop'].notna()]
+
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
-
-    # crop must be non-null for the index; rows where the code did not map
-    # to a Preferred Label (only code 48/1018 "Other (Specify)" and any
-    # unmapped) are dropped from the index axis but logged by row count.
-    harv = harv[harv['crop'].notna()]
 
     # Defensive de-duplication at the DECLARED grain.  `u` and `condition`
     # stay COLUMNS (the framework promotes them, exactly as it always has for
