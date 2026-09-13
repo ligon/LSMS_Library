@@ -1400,6 +1400,14 @@ KNOWN_METRIC = {
     'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
     'gm': 1/1000, 'gms': 1/1000,
     'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
+    # `quintal` is the METRIC centner (100 kg), correct for Ethiopia.  It is
+    # country-qualified, not universal: the SPANISH quintal is 100 lb
+    # (45.36 kg) -- see Panama/_units.py's STANDARD_POUNDS, which corrects it.
+    # No country currently serves a literal Spanish `quintal` label into this
+    # lookup (Panama's wave scripts mint `centner` from the Translation column,
+    # which is not a KNOWN_METRIC key), so the 100 kg value never misfires
+    # today -- but a future country serving Spanish `quintal` would get 100 kg
+    # silently.  A country-qualified seed is a design decision (GH #898 review).
     'quintal': 100, 'quintals': 100,
     'tonne': 1000, 'tonnes': 1000,
     'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
