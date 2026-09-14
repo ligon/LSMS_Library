@@ -230,6 +230,47 @@ override.
 
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. **A `*.parquet` inside `countries_root()` is never read (GH #803)** -- before that fix `Wave.grab_data` and `run_make_target` *preferred* an in-tree `{wave}/_/{table}.parquet` to running the wave script, and because such files are hashless they graded `legacy` at the v0.8.0 gate and were stamped into the L2-country parquet with a fresh hash (109 files, 14 countries, on the main checkout). They get written when a script runs from a checkout that is not the imported package: `_resolve_data_path` redirects only when the *caller's file* is under the package's `countries_root()`, otherwise the literal relative path lands next to the script (the write-side `.pth` trap, scrum-master addendum 3). The library now warns (`InTreeParquetWarning`) and ignores them; delete them (`find lsms_library/countries -name '*.parquet' -delete` -- none are tracked).
 
+### `countries_root()` is READ-ONLY at runtime — one invariant, three issues
+
+The config tree holds *reviewed sources*: YAML, wave scripts, the committed
+panel crosswalk. **Everything the library produces goes under `data_root()`.**
+Three bugs are the same bug wearing different hats, and stating them together
+is the point — each was found separately and fixed separately:
+
+| | what wrote into the tree | symptom |
+|---|---|---|
+| **#803** (fixed) | a wave script run from the wrong checkout wrote its parquet in-tree | the reader *preferred* it to re-running the script; hashless, so it graded `legacy` and was re-stamped fresh |
+| **#914** (fixed) | a Make rule regenerated the committed `panel_ids.json` | `PermissionError` on any shared install, from three layers inside a `make` subprocess |
+| **#831** (read path fixed) | `get_data_file` materialised **every** fetched raw file there — the DVC branch wrote the blob to `_COUNTRIES_DIR / path`, the WB branch extracted zips there | 433 stray copies / 1.31 GB; 33 with no `.dvc` sidecar **silently shadow the DVC blob**, since the read chain is local → DVC → WB and the stray wins at step one |
+
+They share one user-visible symptom, which is why fixing them one at a time
+kept feeling like whack-a-mole: **on a shared install the package directory is
+not writable by the user running the code**, so a call that was only trying to
+*read* data dies with `PermissionError`. A teaching hub gets twenty
+simultaneous hard failures, not twenty slow cells.
+
+**The one sanctioned exception is acquisition.** `add_wave()` and
+`populate_and_push()` pass `populate_cache=True` and extract into the config
+tree on purpose, because the next step is `dvc add` on what landed. That branch
+is the *only* place a runtime write into `countries_root()` is correct, it is
+reached from nowhere else, and `data_access._fetch_destination` is the single
+function that decides — route any new fetch through it rather than composing
+`_COUNTRIES_DIR / path` yourself.
+
+Cache cost of the #831 fix: **none**. No `data_access` symbol reaches any
+build fingerprint (measured with a no-op probe inside `get_data_file`: all
+three probed `build_transforms_fingerprint` values byte-identical). Contrast
+`get_dataframe`, where any edit moves 37/37.
+
+**Still live, and a *different* invariant — don't conflate them.** #809: a
+hashless `var/<table>.parquet` written by a `make` recipe grades `legacy` at
+the v0.8.0 gate, is trusted once, and is re-stamped with the current hash — so
+a script that disagrees with the framework becomes the served truth with no
+signal. That is about *trust in an artefact's provenance*, not about *where it
+was written*, and it needs its own measurement (the fix changes which caches
+rebuild). Related: #808 (an instance, fixed by removing the path), #479
+(hashless wave parquets evicted before every rebuild descent).
+
 **Anti-patterns — do not use:**
 
 | Anti-pattern                                             | Why                                              |
