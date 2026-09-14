@@ -1,0 +1,99 @@
+#+title: =_relabel_j= renamed unlabelled foods to nothing, and summed them together
+#+date: [2026-09-14 Mon]
+
+GH #925 (the defect and its fix).  A second finding from the same audit, the
+cp1252 C1 controls committed into GhanaLSS's curated =Preferred Label= cells,
+is GH #926 and is unrelated to =_relabel_j=.
+
+Two re-runnable checks from one audit of
+=lsms_library/countries/GhanaLSS/_/categorical_mapping.org=.  Both are
+config-only by default and need no microdata; =reproduce.py --delivered= adds
+an end-to-end measurement that needs a warm GhanaLSS cache.
+
+Run both with the repo as cwd:
+
+#+begin_src sh
+  PYTHONPATH=$PWD .venv/bin/python slurm_logs/relabel_j_empty_string/reproduce.py
+  PYTHONPATH=$PWD .venv/bin/python slurm_logs/relabel_j_empty_string/reproduce.py --delivered
+  PYTHONPATH=$PWD .venv/bin/python slurm_logs/relabel_j_empty_string/verify_ghanalss_aggregate_prose.py
+#+end_src
+
+* =reproduce.py= --- the defect, and the fix's witness
+
+=Country._relabel_j= built its rename dict with
+
+#+begin_example
+  rdict = table[['Preferred Label', target]].dropna().set_index(...)[target].to_dict()
+#+end_example
+
+The =.dropna()= is there so a food the requested column does not label keeps
+its Preferred Label.  It only catches =NaN=.  =all_dfs_from_orgfile= returns
+*empty strings* for blank org cells, so in a table whose blanks parse that way
+every unlabelled food was renamed to the empty string, and because =food_expenditures= /
+=food_quantities= call =_relabel_j= with =reaggregate=True=, they were all
+*summed into one unnamed =j= bucket*.
+
+Measured on =Country('GhanaLSS').food_expenditures()=, warm, before the fix:
+
+| =labels== | rows      | Expenditure | blank =j= rows | foods merged |
+|-----------+-----------+-------------+----------------+--------------|
+| (none)    | 1,404,564 | 15,637,502,178 | ---         | ---          |
+| =1987-88= |   896,764 | conserved   |         55,314 | *146 -> 1*   |
+| =1991-92= | 1,166,544 | conserved   |         54,758 | 90 -> 1      |
+| =2016-17= | 1,298,082 | conserved   |         48,264 | 37 -> 1      |
+| =FCT Code= | 1,268,800 | conserved  |         46,092 | 24 -> 1      |
+
+*Expenditure is conserved in every case*, which is precisely why the defect was
+silent: nothing was lost, it was merged, and a conservation check --- the
+obvious test --- passes either way.  Row identity is what witnesses it, which
+is why =tests/test_food_labels.py= asserts on the surviving row values and not
+on the total.
+
+Corpus-wide, 17 =(country, column)= pairs merge at least one food: GhanaLSS all
+eight columns (worst 143 of 205), GhanaSPS five (=FCT Label= 78 of 98), Mali
+three, Panama one.  It bit exactly where =.dropna()= had nothing to catch:
+GhanaLSS's wave columns carry 0 NaN and 146 empty strings, while Mali's carry
+127 real NaN and were always handled.
+
+*Not yet pinned*: why blanks parse as =NaN= in some tables and as empty strings in others.
+Both files are uniformly padded, so raggedness is not the explanation.  The fix
+does not depend on the answer --- blank is treated as absent either way --- but
+the question is open.
+
+*Relation to GH #787.*  That issue's finding 2 is the neighbouring case, a =j=
+value *absent* from the rename dict passing through unrenamed.  This is a =j=
+value *present* in it and mapped to nothing.  #787 could not have seen it: its
+table A puts GhanaLSS and GhanaSPS in the "no food label table, every =labels==
+raises" bucket, which was true when it was written.  GH #783 / #789 then
+migrated six stranded vocabularies *into* =categorical_mapping.org=, making
+=labels== reachable for those countries for the first time --- so the two
+countries with the worst blank counts are exactly the two that migration newly
+enabled.
+
+* =verify_ghanalss_aggregate_prose.py= --- the six claims in the file's own prose
+
+Checks every measured claim in the "No =Aggregate Label= column, deliberately"
+passage of =GhanaLSS/_/categorical_mapping.org=.  Four were exact; two had gone
+stale and are corrected in the same commit as this directory:
+
+| claim                                  | when written | now  |
+|----------------------------------------+--------------+------|
+| no =Aggregate Label= on country table  | true         | true |
+| seven wave tables carry one            | 7            | 7    |
+| 195 distinct Preferred Labels          | 195          | 195  |
+| 9 appear in no wave table              | 9            | 9    |
+| =labels='Aggregate'= raises            | true         | true |
+| *N take two Aggregate values*          | *14*         | *13* |
+| *a wave value carries mojibake*        | *yes*        | *no* |
+
+The two are one event.  At the prose's own commit (=98a0b7a21=) the count was
+14 and *the fourteenth was the mojibake row* --- 2012-13 code 262's Aggregate
+read =Cooked Rice and Stew= followed by two mojibake characters, against code
+254's clean twin, so the label carried two Aggregate values.  =5dd3720fe=
+repaired it on a *parallel branch* (earlier in wall-clock time, not an
+ancestor), which merged in afterwards.  The prose was never revisited;
+=CONTENTS.org= records the repair, so the two files had been contradicting each
+other since.
+
+The passage's conclusion --- withhold the column --- survives unchanged.  13
+conflicts and 9 orphans is ample.  Only the evidence drifted.
