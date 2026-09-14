@@ -300,7 +300,25 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     Measured 2026-09-09 on a cold isolated build.  Update these numbers in the
     same PR as any deliberate change; do not loosen the assertions.
 
-    2026-09-10, GH #850 defect (c): the ``before`` split moves by ONE row,
+    2026-09-14, GH #919: the ``before`` split moves by ONE row AGAIN,
+    26,547 -> 26,548 ``inferred`` and 58,972 -> 58,971 ``none`` -- the same
+    mechanism as the #850 note below, for the same reason.  ``f7c1eb380``
+    seeded ``centilitre`` into ``KNOWN_METRIC``, and Ethiopia's
+    ``crop_production`` carries exactly one ``Centilitres`` row, which stopped
+    falling through to ``none``.  That half of ``f7c1eb380`` is correct and
+    kept: a centilitre is a centilitre everywhere.
+
+    The OTHER half of that commit seeded ``quintal``, which is NOT universal --
+    the metric centner (100 kg) in Ethiopia, 100 *pounds* (45.36 kg) in Central
+    America -- and it moved 13,977 rows off the ``shipped`` rung onto
+    ``metric``, taking with them the one non-tautological external check this
+    file has (see ``test_quintal_is_exactly_100kg_on_every_newly_served_row``
+    and ``Ethiopia/_/CONTENTS.org``).  ``quintal`` now lives in
+    ``categorical_mapping/u.org``'s ``u_kg`` table, where a country can
+    override it; Ethiopia inherits 100 kg from the global default, the shipped
+    rung reclaims its rows, and the newly-served count returns to 43,384.
+
+    2026-09-10, GH #850 defect (c): the ``before`` split moved by ONE row,
     26,546 -> 26,547 ``inferred`` and 58,973 -> 58,972 ``none``.  That branch
     taught ``_parse_explicit_metric`` the plural / abbreviated metric
     spellings (``50 kgs``, ``20 lts``), which ``_kg_factor_series`` reads, so
@@ -323,9 +341,9 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     after = harvest_kg(cp, shipped_factors=_load(ethiopia))
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["inferred"] == 26_547 and b["none"] == 58_972
+    assert b["inferred"] == 26_548 and b["none"] == 58_971
     assert a["shipped"] == 62_164 and a["shipped_matched"] == 62_164
-    assert a["inferred"] == 7_767 and a["none"] == 15_588
+    assert a["inferred"] == 7_768 and a["none"] == 15_587
     assert a["shipped_implausible"] == 0
     assert sum(a[k] for k in ("reported", "shipped", "survey_median",
                               "inferred", "none")) == len(cp)
