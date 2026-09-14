@@ -1292,6 +1292,59 @@ stands on its other grounds (it is what every wave's labels state, it is
 checkable against the source, and it is the clock =interview_date= uses);
 it no longer has a GLSS5 counter-example to lean on.
 
+**** Section 8H own production is valued at the farmgate price (2026-09-13)
+
+GLSS4--GLSS7 (=1998-99=, =2005-06=, =2012-13=, =2016-17=) record, for each
+home-produced food consumed, a real =Quantity= in a native unit =u= and the
+household's own reported farmgate =Price= of one such unit -- but *never a
+total*.  Until 2026-09-13 the wave scripts therefore left =Expenditure= NaN
+and said so ("no produced value is recorded"), which is a true statement about
+the *survey* and was never a claim that the value could not be constructed.
+=food_expenditures()= consequently returned =<NA>= for own production in every
+wave but the two 1980s ones.
+
+It is now *derived*: =Expenditure = Quantity * Price=, registry key
+=GhanaLSS::food_acquired::8h-farmgate= (see =_/derivations.yml= and
+=.coder/ledger/ghanalss-produced-qp.md=).  This is a **policy change**, made
+policy by the derived-values machinery (@ligon, 2026-09-13): the library now
+has somewhere honest to put a construction, so it is served with the key on
+the row rather than withheld.  The 2005-06 script had already been multiplying
+the same two columns internally (=y['_qp']=) to resolve households reporting
+two farmgate prices for one commodity.
+
+*Not comparable with the 12B figure.*  Section 8H asks a *producer* price;
+12B's =VFOODCPD= asks what it would *cost to buy*.  A farmgate valuation should
+sit below a consumer-price one, and does.  Own-production share of food value:
+
+| wave    | share | basis           |
+|---------+-------+-----------------|
+| 1987-88 | 39.4% | derived, 12B    |
+| 1988-89 | 33.4% | derived, 12B    |
+| 1991-92 |  --   | *not wired*     |
+| 1998-99 | 30.5% | Q x P, 8H       |
+| 2005-06 | 17.1% | Q x P, 8H       |
+| 2012-13 | 27.8% | Q x P, 8H       |
+| 2016-17 | 28.8% | Q x P, 8H       |
+
+2005-06's 17.1% is *not* explained here; it is recorded, not editorialised.
+
+*=1991-92= is deliberately NOT wired.*  Only 80,282 of its 286,922 produced
+rows (28%) carry both factors, and its dominant unit is =All= (93,349 rows),
+which reads as "the whole harvest" rather than a countable quantity.  Serving
+it would look complete and would not be.  It remains =<NA>=, which is the
+honest answer until someone reads the GLSS3 form.
+
+*Stamped only where computed.*  A produced row missing either factor (8.5% of
+2016-17) keeps =Expenditure= NaN and carries *no* key, so the labelled rows are
+exactly the computed ones -- 605,333 of them.  Verified on rebuild: the served
+=Price= is byte-identical before and after in every wave (Trap 9 / GH #871
+re-derives =Price = Expenditure/Quantity= once both are present, which is
+algebraically a no-op here -- measured, not assumed), and
+=max |Expenditure - Quantity*Price| = 0=.
+
+*Knock-on:* =food_prices(units='kgvalue')= (= =Expenditure / Quantity_kg=) now
+returns values on produced rows in these four waves where it returned NaN.
+
 **** 12B is a value per eating occasion, not a recall value (fixed 2026-09-11)
 
 GLSS1/GLSS2 =food_acquired= served =Y12B.VFOODCPD= as the produced-side

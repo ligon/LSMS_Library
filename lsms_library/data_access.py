@@ -63,7 +63,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import config
-from .paths import countries_root
+from .paths import countries_root, data_root
 from .provenance import (
     SOURCE_WORLDBANK,
     WaveProvenance,
@@ -78,6 +78,37 @@ logger = logging.getLogger(__name__)
 # *before* import (the worktree model); it does NOT track a later override +
 # ``countries_root.cache_clear()`` within the same process.
 _COUNTRIES_DIR = countries_root()
+
+
+def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
+    """Where a raw file fetched at READ time is written.
+
+    ``countries_root()`` is the *config* tree: reviewed YAML, scripts and
+    committed crosswalks.  The runtime must never write into it (GH #803 for
+    parquets, GH #914 for the panel crosswalk, GH #831 for this).  Two reasons,
+    one fatal and one merely expensive:
+
+    * On a shared install -- a JupyterHub, a system Python, anything installed
+      as root -- the package directory is not writable by the user running the
+      code, so a fetch raises ``PermissionError`` from inside whatever call
+      needed the file.
+    * Even where it succeeds it litters: two sweeps found 433 workspace copies
+      of source files under ``countries_root()`` (1.31 GB), and a copy without
+      a ``.dvc`` sidecar *shadows the DVC blob silently*, because the reader's
+      chain is local file -> DVC -> WB and the stray wins at step one.
+
+    So a read-path fetch lands under ``data_root()``, mirroring the config
+    tree's layout (``{data_root}/{Country}/{wave}/Data/...``) beside the rest
+    of the cache, and the resolved path is what gets returned to the reader.
+
+    ``populate_cache=True`` is the ACQUISITION path (``add_wave`` /
+    ``populate_and_push``), run by a maintainer in a writable checkout that
+    then ``dvc add``s what was extracted.  Landing in the config tree is the
+    entire point there, so that branch is unchanged.
+    """
+    if populate_cache:
+        return _COUNTRIES_DIR / path
+    return data_root() / path
 
 # ---------------------------------------------------------------------------
 # Country -> WB catalog registry
@@ -1499,6 +1530,9 @@ def populate_and_push(country: str, wave: str,
     dummy = f"{country}/{wave}/Data/_probe_.dta"
     get_data_file(dummy, populate_cache=True)
 
+    # Acquisition only: extract into the config tree so the caller can
+    # `dvc add` what landed.  The read path never reaches this (see
+    # _fetch_destination).
     data_dir = _COUNTRIES_DIR / country / wave / "Data"
     if not data_dir.exists():
         logger.warning("No Data directory after download: %s", data_dir)
@@ -2060,7 +2094,12 @@ def get_data_file(path: str | Path,
         unavailable.
     """
     path = _as_countries_relative(Path(path))
-    abs_path = _COUNTRIES_DIR / path
+    # Read from the config tree if the file is already there (a maintainer
+    # checkout with real data in it is a normal working state, and every
+    # pre-#831 fetch landed there), but WRITE to data_root().  See
+    # _fetch_destination.
+    intree_path = _COUNTRIES_DIR / path
+    abs_path = _fetch_destination(path, populate_cache)
     target_filename = path.name
 
     # Parse country/wave from the path
@@ -2072,10 +2111,13 @@ def get_data_file(path: str | Path,
     country = parts[0]
     wave = parts[1]
 
-    # 1. Local file already exists
-    if abs_path.exists():
-        logger.debug("Local hit: %s", abs_path)
-        return abs_path
+    # 1. Local file already exists -- in the cache, or in the config tree
+    #    (where every pre-#831 fetch put it, and where a maintainer's checkout
+    #    legitimately holds data).
+    for candidate in (abs_path, intree_path):
+        if candidate.exists():
+            logger.debug("Local hit: %s", candidate)
+            return candidate
 
     perms = permissions(path)
     logger.debug("Permissions: %s", perms)
