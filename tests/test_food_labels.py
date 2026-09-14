@@ -206,6 +206,38 @@ def test_relabel_j_unlabelled_foods_are_not_merged_into_one_bucket(blank):
     assert out.loc[("T1", "V1", "H2", "Matoke (cluster)"), "Expenditure"] == 3.0
 
 
+def test_relabel_j_duplicate_label_prefers_the_real_row():
+    """A duplicated Preferred Label labelled in one row and blank in another
+    now serves the REAL label, not ''.
+
+    This is a third behaviour, not a restatement of the other two, and it is
+    deliberate.  `to_dict()` was last-wins over *all* rows including blanks;
+    filtering before the dict makes it last-wins over the *surviving* pairs.
+    It follows the `.dropna()` principle -- a real-then-NaN duplicate always
+    served the real one -- but "keeps its Preferred Label" does not describe
+    it, so it gets its own test.  GhanaLSS ships 10 duplicated Preferred
+    Labels; 6 served foods move under `labels='1987-88'`.
+    """
+    table = pd.DataFrame(
+        {
+            "Preferred Label": ["Rice", "Rice", "Sugar", "Sugar"],
+            "Wave1": ["Riz", "", "", "Sucre"],   # real-then-blank, blank-then-real
+        }
+    )
+    fake = _fake_country({"food_items": table})
+    idx = pd.MultiIndex.from_tuples(
+        [("T1", "V1", "H1", "Rice"), ("T1", "V1", "H1", "Sugar")],
+        names=["t", "v", "i", "j"],
+    )
+    df = pd.DataFrame({"Expenditure": [10.0, 5.0]}, index=idx)
+    out = fake._relabel_j(df, "Wave1", reaggregate=True)
+
+    j = set(map(str, out.index.get_level_values("j")))
+    assert "" not in j
+    # Order within the duplicate group must not decide whether a label survives.
+    assert j == {"Riz", "Sucre"}
+
+
 def test_relabel_j_blank_preferred_label_is_not_a_rename_key():
     """A blank key is no more a food to rename FROM than a blank value is one
     to rename TO.  Two shipped countries carry blank Preferred Labels

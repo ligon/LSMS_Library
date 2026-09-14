@@ -530,11 +530,14 @@ opposite treatment.  The table cannot tell you which; the questionnaire can.
 So =labels='Aggregate'= still raises here, correctly.  Every other column
 *resolves without raising*, which is not the same as resolving usefully: a
 column labels only the items its own round carried, so =labels='1987-88'= today
-leaves 142 of these 205 foods unlabelled.  Since GH #925 they keep their
+leaves 142 of this table's 195 distinct Preferred Labels unlabelled (146 blank
+rows).  Since GH #925 they keep their
 Preferred Label; before it they were renamed to the empty string and, under
 =food_expenditures='s =reaggregate=True=, summed into a single unnamed =j=
-bucket (146 foods, 55,314 rows, Expenditure conserved --- so nothing warned).
-See =slurm_logs/relabel_j_empty_string/=.
+bucket --- *129 served foods* over 55,314 rows, Expenditure conserved, so
+nothing warned.  (129, not 146: blank rows, distinct Preferred Labels and foods
+that actually reach the served frame are three different counts.)  See
+=slurm_logs/relabel_j_empty_string/=.
 
 *The count was 14 until 2026-09-12, and the fourteenth is instructive.*
 2012-13 code 262's Aggregate carried a mojibake twin of code 254's clean
