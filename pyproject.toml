@@ -40,7 +40,6 @@ lsms-library = "lsms_library.cli:main"
 repository = "https://github.com/ligon/LSMS_Library"
 
 [tool.poetry]
-version = "0.0.0"
 include = [
     "lsms_library/countries/.dvc/config",
     "lsms_library/countries/.dvc/s3_config",
@@ -49,6 +48,7 @@ include = [
     "lsms_library/countries/.dvc/s3_reader_creds.gpg",
     "lsms_library/countries/.dvc/s3_reader_creds.enc",
 ]
+version = "0.0.0"
 
 [tool.poetry.requires-plugins]
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
