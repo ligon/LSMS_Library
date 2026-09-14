@@ -221,6 +221,63 @@ def _all_records():
         yield None, key, r
 
 
+class TestResolve:
+    """``rec.resolve()`` hands back the callable the record NAMES.
+
+    The record stores the name, not the function, and the two tests at the
+    bottom pin why: a callable in the record would break ``df.to_parquet()``
+    on any API frame (``pandas.io.parquet`` serialises ``attrs`` with a bare
+    ``json.dumps``) and would break ``attrs`` propagation (pandas propagates
+    only when inputs compare EQUAL, and callables compare by identity).
+    Added 2026-09-14 at @ligon's request -- the convenience without the cost.
+    """
+
+    def _rec(self):
+        from lsms_library.derivations import DerivationRecord
+        return DerivationRecord({
+            'key': 'X::t::n', 'country': 'X', 'table': 't', 'name': 'n',
+            'rule': 'r',
+            'function': 'lsms_library.derivations:resolve_callable',
+            'inputs': 'lsms_library.derivations:resolve_callable',
+            'raw_variables': ['a'],
+            'assumptions': [{'text': 'x', 'basis': 'modelling-choice'}],
+        })
+
+    def test_resolve_returns_the_callable(self):
+        from lsms_library.derivations import resolve_callable
+        assert self._rec().resolve() is resolve_callable
+
+    def test_resolve_inputs(self):
+        from lsms_library.derivations import resolve_callable
+        assert self._rec().resolve('inputs') is resolve_callable
+
+    def test_a_non_callable_field_is_refused(self):
+        with pytest.raises(KeyError, match='does not name a callable'):
+            self._rec().resolve('rule')
+
+    def test_an_absent_field_is_refused(self):
+        from lsms_library.derivations import DerivationRecord
+        rec = DerivationRecord({'key': 'X::t::n', 'rule': 'r'})
+        with pytest.raises(KeyError):
+            rec.resolve()
+
+    def test_storage_stays_a_string(self):
+        """If this ever returns a callable, the two invariants below break."""
+        assert isinstance(self._rec()['function'], str)
+
+    def test_the_record_stays_json_serialisable(self):
+        """Why `function` is not the callable: attrs -> to_parquet uses json.dumps."""
+        import json
+        assert json.dumps(dict(self._rec()))
+        with pytest.raises(TypeError):
+            json.dumps({'function': (lambda: None)})
+
+    def test_the_record_still_compares_by_value(self):
+        """Why `function` is not the callable: attrs propagate only on equality."""
+        rec = self._rec()
+        assert rec == dict(rec)
+
+
 class TestRegistry:
     def test_the_framework_file_loads(self):
         assert isinstance(framework_records(), dict)
