@@ -50,6 +50,7 @@ import logging
 import os
 import random
 import re
+import shutil
 import signal
 import subprocess
 import tempfile
@@ -2130,13 +2131,42 @@ def get_data_file(path: str | Path,
         if resource != "wb_api"
     )
     if dvc_readable:
+        # GH #763: take the SAME lock-free pair ``get_dataframe`` takes --
+        # ``_ensure_dvc_pulled`` (parse the sidecar for its md5, then a direct
+        # S3 GET of that blob) followed by ``_dvc_cache_path`` (locate the L1
+        # blob on disk).  The DVCFileSystem route below does the same job by
+        # walking DVC's index over ~10k sidecars on Lustre, which costs ~93 s
+        # per call *regardless of file size* and is paid even when the blob is
+        # already cached, because ``fs.exists`` walks it too.  The CLAUDE.md
+        # access table already describes both readers as sharing one lock-free
+        # path; before this they did not.
+        #
+        # The sidecar lives beside the file in the CONFIG tree (it is reviewed,
+        # tracked metadata), so resolution is against ``intree_path`` even
+        # though the materialised copy lands under ``data_root()``.
         try:
-            # Reuse the module-level DVCFS singleton from local_tools
-            # rather than constructing a fresh DVCFileSystem here.
-            # Same root, same config; the singleton avoids paying the
-            # ~0.5-2s DVC handle construction cost on every WB-API
-            # fallback fetch.  See slurm_logs/DESIGN_dvc_layer1_caching.md
-            # ("Hot spot 2") for the full rationale.
+            from .local_tools import _dvc_cache_path, _ensure_dvc_pulled
+            _ensure_dvc_pulled(intree_path)
+            blob = _dvc_cache_path(intree_path)
+            if blob is not None:
+                abs_path.parent.mkdir(parents=True, exist_ok=True)
+                # Copy rather than return the blob path directly: the blob is
+                # named by its md5 and carries no suffix, and callers (and
+                # ``get_dataframe``'s own parser dispatch) key off the
+                # extension.  One local copy against ~93 s of index walk.
+                shutil.copyfile(blob, abs_path)
+                logger.info("Fetched from DVC (sidecar fast path): %s", path)
+                return abs_path
+        except (OSError, ValueError, KeyError, ImportError) as e:
+            logger.debug("DVC sidecar fast path failed: %s", e)
+
+        try:
+            # Fallback for a tracked path with no usable sidecar.  Reuse the
+            # module-level DVCFS singleton from local_tools rather than
+            # constructing a fresh DVCFileSystem here.  Same root, same
+            # config; the singleton avoids paying the ~0.5-2s DVC handle
+            # construction cost.  See
+            # slurm_logs/DESIGN_dvc_layer1_caching.md ("Hot spot 2").
             from .local_tools import DVCFS as fs
             dvc_path = str(path)
             if fs.exists(dvc_path):
