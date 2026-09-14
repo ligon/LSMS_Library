@@ -307,6 +307,9 @@ class TestDelivered:
         summ = fa.attrs["derivations"]["GhanaLSS"]
         key = "GhanaLSS::food_acquired::12b-fortnight"
         assert summ[key]["in"] == "food_acquired"
-        assert summ[key]["rows"] == int(fa["Derivation"].notna().sum()) > 0
+        # Per-KEY count: food_acquired carries more than one derivation since
+        # 2026-09-13 (the section-8H farmgate valuation), so `notna()` over the
+        # whole column is no longer this key's row count.
+        assert summ[key]["rows"] == int((fa["Derivation"] == key).sum()) > 0
         assert summ[key]["columns"] == ["Expenditure", "Quantity"]
         assert str(fa["Derivation"].dtype) == "string"      # the canonical `str` cast
