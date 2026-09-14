@@ -151,6 +151,85 @@ def test_relabel_j_uses_harmonize_food_fallback():
 
 
 # ---------------------------------------------------------------------------
+# An UNLABELLED food keeps its Preferred Label -- blank is absent, on both
+# sides, whether it parses as NaN or as an empty string.
+#
+# `all_dfs_from_orgfile` returns EMPTY STRINGS for blank org cells, so the
+# historical `.dropna()` guarded only the tables whose blanks happened to parse
+# as NaN.  Where they parsed as '' every unlabelled food was renamed to '' and,
+# under reaggregate=True, summed into ONE unnamed bucket: GhanaLSS
+# labels='1987-88' merged 146 distinct foods over 55,314 rows.  17 (country,
+# column) pairs corpus-wide.
+# ---------------------------------------------------------------------------
+
+
+def _partially_labelled_table(blank):
+    """Food table whose ``Wave1`` column labels only two of four foods."""
+    return pd.DataFrame(
+        {
+            "Preferred Label": ["Beans (fresh)", "Beans (dry)",
+                                "Matoke (bunch)", "Matoke (cluster)"],
+            "Wave1": ["Haricot", blank, "Igname", blank],
+        }
+    )
+
+
+@pytest.mark.parametrize("blank", ["", "   ", None])
+def test_relabel_j_unlabelled_food_keeps_its_preferred_label(blank):
+    """Blank target cell -> not renamed.  Never renamed to nothing."""
+    fake = _fake_country({"food_items": _partially_labelled_table(blank)})
+    df = _sample_expenditure_df()
+    out = fake._relabel_j(df, "Wave1", reaggregate=True)
+
+    j = set(map(str, out.index.get_level_values("j")))
+    assert "" not in j, f"a food was renamed to the empty string: {j}"
+    # The two labelled foods are renamed; the two unlabelled keep their own.
+    assert j == {"Haricot", "Igname", "Beans (dry)", "Matoke (cluster)"}
+    assert out["Expenditure"].sum() == pytest.approx(df["Expenditure"].sum())
+
+
+@pytest.mark.parametrize("blank", ["", "   ", None])
+def test_relabel_j_unlabelled_foods_are_not_merged_into_one_bucket(blank):
+    """The reaggregate=True consequence: distinct foods must stay distinct.
+
+    Expenditure is conserved either way -- that is exactly why the defect was
+    silent -- so conservation alone does NOT witness it.  Row identity does.
+    """
+    fake = _fake_country({"food_items": _partially_labelled_table(blank)})
+    df = _sample_expenditure_df()
+    out = fake._relabel_j(df, "Wave1", reaggregate=True)
+
+    # 'Beans (dry)' (5.0) and 'Matoke (cluster)' (3.0) are both unlabelled and
+    # sit in DIFFERENT households, so a merge would be invisible in the total.
+    assert len(out) == len(df)
+    assert out.loc[("T1", "V1", "H1", "Beans (dry)"), "Expenditure"] == 5.0
+    assert out.loc[("T1", "V1", "H2", "Matoke (cluster)"), "Expenditure"] == 3.0
+
+
+def test_relabel_j_blank_preferred_label_is_not_a_rename_key():
+    """A blank key is no more a food to rename FROM than a blank value is one
+    to rename TO.  Two shipped countries carry blank Preferred Labels
+    (GhanaSPS 4, Mali 2)."""
+    table = pd.DataFrame(
+        {
+            "Preferred Label": ["Beans (fresh)", ""],
+            "Wave1": ["Haricot", "Phantom"],
+        }
+    )
+    fake = _fake_country({"food_items": table})
+    idx = pd.MultiIndex.from_tuples(
+        [("T1", "V1", "H1", "Beans (fresh)"), ("T1", "V1", "H1", "")],
+        names=["t", "v", "i", "j"],
+    )
+    df = pd.DataFrame({"Expenditure": [10.0, 5.0]}, index=idx)
+    out = fake._relabel_j(df, "Wave1", reaggregate=True)
+
+    j = set(map(str, out.index.get_level_values("j")))
+    assert "Phantom" not in j, "a blank j was given a label it was never assigned"
+    assert j == {"Haricot", ""}
+
+
+# ---------------------------------------------------------------------------
 # Uganda end-to-end tests (require food_acquired cache)
 # ---------------------------------------------------------------------------
 

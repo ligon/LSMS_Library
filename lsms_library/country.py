@@ -3028,10 +3028,31 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
-        rdict = (table[['Preferred Label', target]]
-                 .dropna()
-                 .set_index('Preferred Label')[target]
-                 .to_dict())
+        # A food the requested column does not label must keep its Preferred
+        # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
+        # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
+        # STRINGS for blank org cells, not NaN, so in a table whose blanks parse
+        # that way every unlabelled food was renamed to `''` -- and because
+        # food_expenditures / food_quantities call this with `reaggregate=True`,
+        # they were then SUMMED into a single unnamed `j` bucket.  Measured on
+        # GhanaLSS `labels='1987-88'`: 146 distinct foods collapsed into one
+        # `''` bucket over 55,314 rows (6.2%), with Expenditure conserved -- so
+        # nothing was lost, it was silently merged, which is worse than an
+        # error and indistinguishable from a real category in the result.
+        #
+        # 17 (country, column) pairs corpus-wide, worst GhanaLSS 143/205 and
+        # GhanaSPS `FCT Label` 78/98.  It bit exactly where `.dropna()` had
+        # nothing to catch: GhanaLSS's wave columns carry 0 NaN and 146 empty
+        # strings, while Mali's carry 127 real NaN and were always handled.
+        #
+        # Blank is treated as absent on BOTH sides: a blank key is not a food
+        # label to rename FROM, any more than a blank value is one to rename TO.
+        # GH #787 covers the neighbouring case (a `j` absent from the dict
+        # passing through unrenamed); this is a `j` PRESENT in it and mapped to
+        # nothing.  Reproducer: slurm_logs/relabel_j_empty_string/.
+        pairs = table[['Preferred Label', target]].dropna()
+        rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
+                 if str(k).strip() != '' and str(v).strip() != ''}
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
