@@ -555,6 +555,36 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
 
+**The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
+Nine countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Mali, Niger,
+Senegal, Tanzania, Uganda) ship git-tracked `_/panel_ids.json` +
+`_/updated_ids.json`; Malawi and Nigeria derive theirs from per-wave
+`data_info.yml` into a cache parquet only. **Design A is the convention** — a
+panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
+to recompute, identical for every user, and the input to every longitudinal
+result), so it belongs where a change shows up as a reviewable diff.
+Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
+diff; converting Malawi/Nigeria to A is #894's remaining work, and they are
+named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a twelfth
+country cannot pick a design by accident.
+
+> **Never give the JSON a Make rule.** The nine Makefiles used to carry
+> `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,
+> which regenerates whenever the script is the newer file — and **on a pip
+> install which of the two is newer is decided by the millisecond the wheel was
+> unpacked**: the zip stores `.json` before `.py` alphabetically, and measured
+> on the real 0.13.0 wheel 5 of the 9 straddled a filesystem tick and landed
+> with the script ~1 ms ahead. The recipe then ran with cwd inside
+> `site-packages` and the script wrote a bare relative path, so every non-root
+> user on a shared install got `PermissionError` raised three layers inside a
+> `make` subprocess. The blast radius was **every table**, not just
+> `panel_ids`: `_finalize_result` calls `id_walk(df, self.updated_ids)` on every
+> read (`country.py:3107`). Keeping the JSON as a *prerequisite* is fine and
+> correct; putting it on a rule's left-hand side is not, `make clean` must not
+> delete it, and `panel_ids.py` must write relative to `Path(__file__).parent`.
+> Pinned by `tests/test_panel_ids_persistence.py`, which reproduces the trigger
+> (script made newer than the JSON) rather than the spelling.
+
 ## Panel ID Transitive Chains and the `attrs` Flag
 
 `_finalize_result()` runs `id_walk()` and sets `df.attrs['id_converted'] = True` to prevent double-application. **`merge()` and `set_index()` drop `attrs` in pandas 2.x** — both appear in `_join_v_from_sample()`. When `attrs` is lost, `_finalize_result` runs `id_walk` a second time on already-converted data, and for countries with transitive chains (A→B→C, where B is itself a mapping key) this produces household-level ID collisions and duplicate index entries. Burkina Faso 2021-22 had 392 duplicate tuples before this landed in commit `4db41a27`.
