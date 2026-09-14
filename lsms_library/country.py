@@ -4212,6 +4212,42 @@ class Country:
             if cache_exists and not no_cache:
                 cache_expected_hash = self._table_cache_hash(method_name, waves)
                 freshness = cache_freshness(cache_path, cache_expected_hash)
+                # GH #809: at the COUNTRY tier, no hash means no evidence --
+                # rebuild rather than trust-once-and-stamp.
+                #
+                # `legacy` was built for the v0.8.0 migration: a parquet that
+                # PREDATES stamping is trusted once and re-stamped so the next
+                # read is guarded.  A country-level `var/<table>.parquet` that a
+                # `make` recipe wrote moments ago is not a legacy artefact -- it
+                # is a build output that skipped the stamp, because a country
+                # script's `to_parquet('../var/x.parquet')` passes no
+                # `cache_hash=`.  Grading it `legacy` let a script that
+                # disagrees with the framework become the served truth and then
+                # made that permanent: the re-stamp writes the CURRENT expected
+                # hash onto unverified content, so every later read grades
+                # `fresh` and the evidence that anything was ever wrong is gone.
+                # That is #808's instance (GhanaLSS `change_id`'s `_0` panel-id
+                # convention beating `updated_ids`) and the reason a census of
+                # hashless parquets finds nothing: laundering is indistinguishable
+                # from a legitimate build after the fact.
+                #
+                # Scoped to THIS call site deliberately.  The two wave-tier
+                # calls (`Wave.grab_data`, `run_make_target`) must keep their
+                # `legacy` grade: script-path L2-wave parquets are written
+                # hashless BY DESIGN, so grading them stale would rebuild on
+                # every read forever.  Those are handled by
+                # `_evict_hashless_wave_caches` before each rebuild descent
+                # (GH #479) -- a different mechanism for a different tier.
+                #
+                # Measured before landing: 0 of 376 warm country-level
+                # parquets are hashless, so the immediate re-warm is nil; and a
+                # deliberately de-stamped parquet rebuilds ONCE and then serves
+                # from a stamped cache -- verified on a YAML-path table (China
+                # `cluster_features`: 0.4s then 0.0s) and on the make-path class
+                # the issue names (Cambodia `food_acquired`: 6.7s then 0.3s,
+                # 0.2s), content identical to the pre-strip frame in both.
+                if freshness == "legacy":
+                    freshness = "stale"
                 # GH #891: a non-stale parquet is still only usable if it was
                 # built from a superset of the requested waves.  Unknown
                 # coverage (a pre-#891 parquet with no hash to corroborate it)
@@ -4252,12 +4288,15 @@ class Country:
                             read_parquet_grain_audit(cache_path),
                             self.name, method_name,
                         )
-                        if freshness == "legacy" and cache_expected_hash is not None:
-                            # Trust-once-then-stamp: parquet predates
-                            # hashing; assume it matches current sources
-                            # (same assumption v0.7.0 already made) and
-                            # stamp it so the next read is guarded.
-                            stamp_parquet_hash(cache_path, cache_expected_hash)
+                        # GH #809: there is deliberately NO trust-once-and-stamp
+                        # here any more.  A hashless country parquet is graded
+                        # `stale` above and never reaches this branch, so the
+                        # only parquets served from here are ones whose stored
+                        # hash we checked (`fresh`) or whose inputs we could not
+                        # enumerate (`unverifiable`, which stamps nothing
+                        # precisely because it has nothing to assert).  Stamping
+                        # the current expected hash onto unverified content is
+                        # what made the defect permanent rather than transient.
                         logger.debug(
                             f"v0.8.0 cache read ({freshness}): {method_name} "
                             f"from {cache_path}"
