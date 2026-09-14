@@ -1400,15 +1400,13 @@ KNOWN_METRIC = {
     'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
     'gm': 1/1000, 'gms': 1/1000,
     'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
-    # `quintal` is the METRIC centner (100 kg), correct for Ethiopia.  It is
-    # country-qualified, not universal: the SPANISH quintal is 100 lb
-    # (45.36 kg) -- see Panama/_units.py's STANDARD_POUNDS, which corrects it.
-    # No country currently serves a literal Spanish `quintal` label into this
-    # lookup (Panama's wave scripts mint `centner` from the Translation column,
-    # which is not a KNOWN_METRIC key), so the 100 kg value never misfires
-    # today -- but a future country serving Spanish `quintal` would get 100 kg
-    # silently.  A country-qualified seed is a design decision (GH #898 review).
-    'quintal': 100, 'quintals': 100,
+    # `quintal` USED TO BE HERE at 100 (the metric centner) and was removed in
+    # GH #919: it is country-qualified, not universal -- the Spanish quintal is
+    # 100 lb (45.36 kg), and the pound is itself regional.  It now lives in
+    # `categorical_mapping/u.org`'s `u_kg` table, where a country can override
+    # it; see that file for the full reasoning.  Nothing in KNOWN_METRIC may be
+    # country-qualified, because `_seeded_kg_factors` lets an entry here beat
+    # every country-level factor unconditionally.
     'tonne': 1000, 'tonnes': 1000,
     'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
     'ml': 1/1000, 'cl': 1/100,
@@ -1465,8 +1463,6 @@ _EXPLICIT_METRIC_PATTERNS = (
                 re.IGNORECASE), 1/1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*quintals?\b',
-                re.IGNORECASE), 100, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
@@ -1540,7 +1536,7 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     return None
 
 
-def _seeded_kg_factors(df, *, volume_as_mass=True):
+def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """The kg factors that are READ rather than inferred.
 
     :data:`KNOWN_METRIC` plus whatever :func:`_parse_explicit_metric` can
@@ -1558,6 +1554,19 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
         for u in _FLUID_UNITS:
             factors.pop(u, None)
 
+    # GH #919: DECLARED factors outrank KNOWN_METRIC, and are the only layer a
+    # country can override.  `unit_kg` arrives already keyed on the RAW `u`
+    # label, composed by `Country._unit_kg_factors` from the country's merged
+    # `u` (raw -> Preferred Label) and `u_kg` (Preferred Label -> kg) tables.
+    # It is composed THERE rather than here because the kg factor is computed
+    # before the categorical mapping is applied -- `conversion_to_kgs` sees the
+    # raw `u` (GH #770) -- so this function must never assume harmonisation has
+    # run.  A `volume_as_mass=False` caller still drops the fluid spellings
+    # above; a declared row for a fluid unit is the country's own statement and
+    # is left alone.
+    for key, kg in (unit_kg or {}).items():
+        factors[str(key).lower()] = kg
+
     if 'u' in (df.index.names or []):
         labels = df.index.get_level_values('u').dropna().unique()
     elif 'u' in df.columns:
@@ -1574,7 +1583,7 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
     return factors
 
 
-def _get_kg_factors(df, *, volume_as_mass=True):
+def _get_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """Build a combined kg-per-unit mapping from known metric units,
     explicit-metric label parsing, and price-ratio inference on the data.
 
@@ -1594,7 +1603,7 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         recovers the actual specific gravity per (item, region, time)
         when enough kg-reporting households share the cell.
     """
-    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Infer additional factors from price ratios where possible
     if 'Expenditure' in df.columns and 'Quantity' in df.columns:
@@ -1733,7 +1742,7 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
-def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
+def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
@@ -1805,7 +1814,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     otherwise lose a row it can serve.
     """
     idx_names = list(df.index.names or [])
-    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     if 'u' in idx_names:
         units = df.index.get_level_values('u').astype(str).str.lower()
@@ -2700,7 +2709,7 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -2775,7 +2784,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -2815,7 +2824,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -2913,7 +2922,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
 
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -2929,7 +2938,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):

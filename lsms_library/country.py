@@ -347,7 +347,7 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
-_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'harmonize_assets', 'harmonize_education'})
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
 def _categorical_key_column(table: "pd.DataFrame") -> str | None:
@@ -2009,6 +2009,70 @@ class Country:
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
                 global_maps, country_maps)
         return self.__dict__['_categorical_mapping_cache']
+
+    def _unit_kg_factors(self) -> dict[str, float]:
+        """Raw ``u`` label -> kilograms, from this country's own tables (GH #919).
+
+        Composes the two categorical tables that already carry global defaults
+        with per-country override (``_ADDITIVE_CATEGORICAL_TABLES``):
+
+        * ``u``     -- raw label -> ``Preferred Label`` (however the country
+          keys it: ``Code`` for Malawi/Mali/Uganda, ``Original Label`` for the
+          rest; ``_categorical_key_column`` resolves either);
+        * ``u_kg``  -- ``Preferred Label`` -> kilograms.
+
+        Keying the MASS on the canonical unit rather than the spelling is what
+        makes one row serve every variant, and what lets a country override a
+        regional unit: the global table says a ``Quintal`` is 100 kg (the metric
+        centner, Ethiopia), and a Central American country redeclares it as
+        45.36 kg (100 lb) in its own ``u_kg``.
+
+        **Why the composition happens HERE and not in ``transformations``.**
+        The kg factor is computed BEFORE the categorical mapping is applied --
+        the derived-food dispatch is ``_aggregate_wave_data`` -> ``transform_fn``
+        -> ``_finalize_result``, so ``conversion_to_kgs`` sees the RAW ``u``
+        (GH #770 rejected a fix that assumed otherwise).  Returning a
+        raw-label-keyed dict means nothing downstream has to know about label
+        harmonisation or about ordering.
+
+        The canonical name is emitted as a key in its own right, so a country
+        whose raw labels are already canonical (Ethiopia serves ``Quintal``)
+        resolves without needing a ``u`` row for it.
+        """
+        maps = self.categorical_mapping
+        table = maps.get('u_kg')
+        if table is None or not hasattr(table, 'columns'):
+            return {}
+        if 'Unit' not in table.columns or 'Kg' not in table.columns:
+            warnings.warn(
+                f"{self.name}: a `u_kg` categorical table must have `Unit` and "
+                f"`Kg` columns; got {list(table.columns)}.  Ignoring it."
+            )
+            return {}
+
+        canonical: dict[str, float] = {}
+        for unit, kg in zip(table['Unit'], table['Kg']):
+            try:
+                value = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if not np.isfinite(value) or value <= 0:
+                continue
+            canonical[str(unit).strip().lower()] = value
+        if not canonical:
+            return {}
+
+        factors = dict(canonical)
+        u_table = maps.get('u')
+        if u_table is not None and hasattr(u_table, 'columns') \
+                and 'Preferred Label' in u_table.columns:
+            source = _categorical_key_column(u_table)
+            if source is not None:
+                for raw, preferred in zip(u_table[source], u_table['Preferred Label']):
+                    key = str(preferred).strip().lower()
+                    if key in canonical:
+                        factors[str(raw).strip().lower()] = canonical[key]
+        return factors
 
     @property
     def mapping(self) -> dict[str, Any]:
@@ -4973,6 +5037,10 @@ class Country:
                         transform_kwargs['units'] = units
                     if name in {'food_prices', 'food_quantities'}:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
+                        # GH #919: the country's own declared unit masses, keyed
+                        # on the RAW label so the transform needs no knowledge of
+                        # label harmonisation or of dispatch order.
+                        transform_kwargs['unit_kg'] = self._unit_kg_factors()
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
                     if name == 'food_expenditures' and valuation is not None:
