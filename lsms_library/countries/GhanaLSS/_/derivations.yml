@@ -156,3 +156,56 @@ GhanaLSS::interview_date::anchored-chronology-glss5:
     regression tests. This checks the fixed model, not external truth of each date.
   contents: GhanaLSS/_/CONTENTS.org, interviewer visit dates
   since: '2026-09-12'
+
+GhanaLSS::food_acquired::8h-farmgate:
+  waves: ['1998-99', '2005-06', '2012-13', '2016-17']
+  columns: [Expenditure]
+  rows: {s: produced}
+  rule: >-
+    Expenditure = Quantity * Price, where Quantity is the amount of the
+    home-produced food consumed in the recall window (section 8H's per-visit
+    quantity questions, in the native unit u) and Price is the farmgate price
+    of one such unit that the household itself reports.  Section 8H never asks
+    the total value, so the product is a CONSTRUCTION, not an answer.  Computed
+    only where BOTH factors are present; a row missing either is served with
+    Expenditure NaN and carries no key, so the labelled rows are exactly the
+    computed ones.  This valuation is at the PRODUCER price and is therefore
+    not comparable with the 12b-fortnight key, which values own consumption at
+    what it would cost to BUY.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_produced_farmgate_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_produced_farmgate
+  raw_variables:
+    - SEC8H.s8hq10          # 1998-99 farmgate price
+    - sec8h.s8hq14          # 2005-06 farmgate price
+    - sec8h.s8hq10          # 2012-13 farmgate price
+    - g7sec8h.s8hq{v}p      # 2016-17 farmgate price, asked once per visit
+  assumptions:
+    - text: >-
+        the section-8H price variable is the farmgate (producer) price of one
+        native unit of the home-produced item, not a market or purchase price
+      basis: config-comment
+      evidence: >-
+        stated by the wave scripts themselves -- GhanaLSS/2005-06/_/food_acquired.py
+        ("a farmgate Price (s8hq14)") and GhanaLSS/2012-13/_/food_acquired.py
+        ("a farmgate Price (s8hq10)").  NOT read off the questionnaire or the
+        Stata variable label in this session, which is why the basis is
+        config-comment and not questionnaire/variable-label: upgrading it is a
+        bounded one-RA, one-PDF step.
+    - text: >-
+        own consumption is valued at the household's OWN reported farmgate
+        price rather than at a market price, a wave median, or the purchase
+        price of the same item elsewhere in the wave
+      basis: modelling-choice
+      evidence: >-
+        @ligon, 2026-09-13 ("this is a policy change made policy by our new
+        derived_values machinery").  No document supplies the choice; section
+        8H reports a price per household and the library uses it as reported.
+        The alternatives are computable from Country.derivation_inputs.
+    - text: >-
+        1991-92 is excluded: 80,282 of its 286,922 produced rows (28%) carry
+        both factors and its dominant unit is 'All' (93,349 rows), which reads
+        as "the whole harvest" rather than a countable quantity
+      basis: config-comment
+      evidence: >-
+        measured 2026-09-13 on the warm corpus; .coder/ledger/ghanalss-produced-qp.md
+        section 7.  Serving a 28%-covered wave would look complete and would not be.
