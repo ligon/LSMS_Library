@@ -17,7 +17,14 @@ _dirs = [f'{path}/_/', f'{path}/../_', f'{path}/../../_']
 # tools.code_label_map passes Label='Label' and keys the result by BOTH the
 # string and the int form of each code.  See GH #372/#377/#348.
 region_dict = tools.code_label_map('region', _dirs)
-relationship_dict = tools.code_label_map('relationship', _dirs)
+# GLSS1's fourteen-code relationship list is the country-level table
+# `relationship_glss1` (renamed from `relationship` on 2026-09-07, GH #797:
+# `relationship` is now the LABEL-harmonization table the framework applies to
+# the served column at API time, and it has no Code column).  Consequence: a
+# wave without its own `relationship` CODE table can no longer fall through to
+# GLSS1's list -- code_label_map returns {} and the column ships 100% null,
+# loudly (Site B NullReadWarning), instead of silently mis-decoded (Trap 2).
+relationship_dict = tools.code_label_map('relationship_glss1', _dirs)
 
 def i(value):
     '''
@@ -60,8 +67,8 @@ def Relationship(value):
     '''
     Formatting relationship variable
     '''
-    # GLSS1 uses the 14-code scheme the country-level `relationship` table
-    # documents (it cites this wave's own data dictionary: catalog 2313,
+    # GLSS1 uses the 14-code scheme the country-level `relationship_glss1`
+    # table documents (it cites this wave's own data dictionary: catalog 2313,
     # y01a).  Verified against the raw data: REL takes codes 1..14, and code 1
     # occurs 3136 times = the household count.
     return relationship_dict.get(value, pd.NA)

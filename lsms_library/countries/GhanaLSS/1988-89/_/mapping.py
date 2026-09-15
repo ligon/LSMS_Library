@@ -19,7 +19,14 @@ _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
 region_dict = tools.code_label_map('region', _dirs)
 # GLSS2 uses the same 14-code relationship scheme as GLSS1 (verified:
 # REL takes codes 1..14 and code 1 occurs 3192 times = the household count).
-relationship_dict = tools.code_label_map('relationship', _dirs)
+# That list is the country-level table `relationship_glss1` (renamed from
+# `relationship` on 2026-09-07, GH #797: `relationship` is now the
+# LABEL-harmonization table the framework applies to the served column at API
+# time, and it has no Code column).  A wave without its own `relationship`
+# CODE table can no longer fall through to GLSS1's list -- code_label_map
+# returns {} and the column ships 100% null, loudly, instead of silently
+# mis-decoded (Trap 2).
+relationship_dict = tools.code_label_map('relationship_glss1', _dirs)
 
 def i(value):
     '''
