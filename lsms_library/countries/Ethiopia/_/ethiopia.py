@@ -513,6 +513,51 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',months_spent='
     return df
 
 
+def cluster_features(df):
+    """Project the household-grain cover-page + geovariable merge onto the (t, v) EA grain.
+
+    Every ESS wave builds ``cluster_features`` from the household cover page
+    (``sect_cover_hh_w*.dta``) merged on the household id with the household
+    geovariables file, so the extraction is one row per HOUSEHOLD while the
+    table is declared at ``(t, v)``.  Core then projects it
+    (``country._collapse_to_cluster_grain``, GH #161) and audits the
+    projection -- but the audit counts a missing GPS fix beside a recorded one
+    as a *disagreement* (it compares whole rows, NA-aware), so this extraction
+    reports hundreds of "destroyed" rows in every wave even where not a single
+    value actually conflicts (GH #837; measured: 2011-12's 373 reported
+    destructions are 100% NA-vs-value, 0 value-vs-value).
+
+    This hook does the projection first, with the completion semantics the
+    frame actually needs (``build_transforms.reduce_to_agreed``, the signed
+    exception to core's no-aggregation rule):
+
+    * ``i`` (the household level) and any residual ``t`` are dropped first --
+      they identify the ROW, not the cluster, and leaving them in makes every
+      multi-household EA look conflicted.
+    * ``na_is_conflict=False``: an absent fix beside a recorded one is ABSENCE,
+      not contradiction, so the EA's one real fix is served rather than
+      blanked.  Measured: this recovers 34 EAs' coordinates in 2011-12 (333 of
+      333 EAs with Latitude, was 299) and 39 in 2021-22 (435 of 435, was 396).
+    * GENUINE disagreement still blanks (``on_conflict='na'``) with a
+      ``GrainConflictWarning`` naming the clusters -- 38 EAs in 2013-14 and 72
+      each in 2015-16 / 2021-22 carry more than one distinct household
+      coordinate (median spread 0.09-0.15 deg, up to 6.4 deg), which is real
+      sub-EA GPS dispersion the WB ships, not a broken key: the EAs agree on
+      Region / District / Rural in EVERY wave.  Those coordinates are honestly
+      unservable at the EA grain; picking one household's fix is the bug this
+      replaces.  2018-19 is fully agreed and warns not at all.
+
+    See ``Ethiopia/_/CONTENTS.org`` ("cluster_features: NA-vs-value GPS reads
+    as destruction") and GH #837.
+    """
+    from lsms_library.build_transforms import reduce_to_agreed
+
+    flat = df.reset_index()
+    flat = flat.drop(columns=[c for c in ('i', 't') if c in flat.columns])
+    return reduce_to_agreed(flat.set_index('v'), on_conflict='na',
+                            na_is_conflict=False)
+
+
 def other_features(fn,urban=None,region=None,HHID='HHID',urban_converter=None):
 
     df = _household_identification_from_file(fn, HHID=HHID, urban=urban, region=region,

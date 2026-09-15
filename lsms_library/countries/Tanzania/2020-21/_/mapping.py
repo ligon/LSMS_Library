@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 from lsms_library.local_tools import format_id
+from lsms_library.build_transforms import reduce_to_agreed
 
 # `mapping.py` is loaded by importlib from an absolute path, so a RELATIVE
 # sys.path entry does not find the country module.  Resolve it from __file__,
@@ -51,6 +52,16 @@ def cluster_features(df):
             lambda x: pd.NA if pd.isna(x) else str(x).strip().upper())
     if not bool(resident.any()):           # pragma: no cover - defensive
         return out
-    return tanzania.keep_cluster_residents(out, region='Region', scheme='y5',
-                                           extra_mask=resident.to_numpy(),
-                                           label='2020-21')
+    out = tanzania.keep_cluster_residents(out, region='Region', scheme='y5',
+                                          extra_mask=resident.to_numpy(),
+                                          label='2020-21')
+    # GH #837: finish the projection here, at cluster grain.  The residual
+    # disagreements the residency filter cannot remove (district RENAMINGS and
+    # mid-panel SPLITS; EAs straddling a town boundary on urban/rural -- see
+    # Tanzania/_/CONTENTS.org "The residue, honestly") are properties of the
+    # survey, not of the key: `y5_cluster` is the survey's own cluster id and
+    # is unique.  Blank the contested cells loudly rather than let core's
+    # collapse serve one household's answer as the cluster's.
+    flat = out.reset_index()
+    flat = flat.drop(columns=[c for c in ('i', 't') if c in flat.columns])
+    return reduce_to_agreed(flat.set_index('v'), on_conflict='na')
