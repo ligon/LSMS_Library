@@ -89,6 +89,36 @@ crop-side price-ratio inference serves neither country a single row.
   override is right and the source compiler mistook a Spanish measure for a
   universal one.  Recorded in =Panama/_/CONTENTS.org=.
 
+** Verified test state (added after the note below was first written)
+
+- *#930 full suite: 6,013 passed, 178 skipped, 8 xfailed, 1 xpassed, 0 failed*
+  on =8d9df49d7=, with =git rev-parse HEAD= captured before AND after the run
+  and asserted equal.  Targeted: 145 passed across the five files that touch
+  the kg ladder.
+- Run under the recipe =CLAUDE.md= addendum 3b now specifies:
+  =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+  LSMS_BUILD_WORKERS=1=, =-n 16 --dist=loadfile=, with =-n= budgeted against
+  =uptime='s load average rather than =nproc=.  Zero =blas_thread_init=
+  errors in any run this session, including the three that predate the rule.
+
+** THIS CLONE REVERTS ITS BRANCH UNDER RUNNING JOBS -- three times on
+2026-09-15
+
+Each time, =HEAD= returned to =a8bed38e4= (=docs/correct-derivation-placement-corollary=)
+while the working tree kept some edited files.  Consequences observed:
+
+1. An edit was made on the wrong branch and tested against unmodified code;
+   the tell was assertions failing REVERSED (=assert 'inferred' == 'metric'=).
+2. A full suite was invalidated by a mid-run switch.
+3. A second full suite reported =6,011 passed, 0 failed= that could not be
+   attributed to anything and was DISCARDED, not quoted.
+
+*Nothing was ever lost* -- every commit publishes to the shared mirror the
+moment it exists, and all of them were on origin and GitHub throughout.  But
+before trusting any long-running result in this clone, capture
+=git rev-parse HEAD= on both sides of the job and assert they match.  That
+guard is what made the final number usable.
+
 ** Session hygiene note
 
 Three separate measurements in this session were wrong on first run (a broken
