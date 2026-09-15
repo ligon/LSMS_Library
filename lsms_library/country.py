@@ -3092,10 +3092,60 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
-        rdict = (table[['Preferred Label', target]]
-                 .dropna()
-                 .set_index('Preferred Label')[target]
-                 .to_dict())
+        # A food the requested column does not label must keep its Preferred
+        # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
+        # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
+        # STRINGS for blank org cells, not NaN, so in a table whose blanks parse
+        # that way every unlabelled food was renamed to `''` -- and because
+        # food_expenditures / food_quantities call this with `reaggregate=True`,
+        # they were then SUMMED into a single unnamed `j` bucket.  Measured on
+        # GhanaLSS `labels='1987-88'`: 129 SERVED foods collapsed into one `''`
+        # bucket over 55,314 rows (6.2%), with Expenditure conserved -- so
+        # nothing was lost, it was silently merged, which is worse than an
+        # error and indistinguishable from a real category in the result.
+        #
+        # Three counts differ and only the third is "foods merged": 146 blank
+        # crosswalk ROWS -> 142 distinct Preferred Labels mapped to `''` -> 129
+        # of those that actually appear in the served frame.  An earlier version
+        # of this comment quoted the row count as the food count.
+        #
+        # 13 (country, column) pairs corpus-wide -- GhanaLSS all 8, GhanaSPS 4,
+        # Panama 1; worst GhanaLSS `1988-89` 143 and GhanaSPS `FCT Label` 77.
+        # Mali is NOT among them: its blanks are real NaN that `.dropna()`
+        # always caught, and the one row per column that looked affected was a
+        # blank-Preferred-Label row keying `'' -> ''`.  It bit exactly where
+        # `.dropna()` had nothing to catch: GhanaLSS's wave columns carry 0 NaN
+        # and 146 empty strings, Mali's carry 127 real NaN.
+        #
+        # Blank is treated as absent on BOTH sides: a blank key is not a food
+        # label to rename FROM, any more than a blank value is one to rename TO.
+        # (Those blank-key rows are themselves a parse artefact -- Mali's `| #
+        # ...` comment rows and GhanaSPS's trailing padding rows are read as
+        # data by `all_dfs_from_orgfile`.)
+        #
+        # THIRD BEHAVIOUR, deliberate: `to_dict()` was last-wins over all rows
+        # including blank ones, so a Preferred Label duplicated with a real
+        # label early and a blank later served `''`.  Filtering before the dict
+        # makes the real label from the sibling row win -- 6 served foods under
+        # `1987-88` (`Rice`, `Sugar`, `Cassava (flour)`, ...).  That follows the
+        # `.dropna()` principle (a real-then-NaN duplicate always served the
+        # real one) but it is NOT "keeps its Preferred Label", so it is stated
+        # here and pinned by test_relabel_j_duplicate_label_prefers_the_real_row.
+        #
+        # This costs NO cache invalidation -- measured, 0 of 119 country table
+        # hashes.  NOT because `_finalize_result` is in `_EXCLUDED_CALLABLES`:
+        # `_relabel_j` is not reached from there at all, but from the generated
+        # accessor in `Country.__getattr__` (:5015, :5083), AFTER
+        # `_aggregate_wave_data` has returned.  It is free because no
+        # `@build_transform`-tagged callable references it.  Moving this call
+        # INTO `_finalize_result` would change that.
+        #
+        # GH #787 covers the neighbouring case (a `j` absent from the dict
+        # passing through unrenamed); this is a `j` PRESENT in it and mapped to
+        # nothing.  Reproducer: slurm_logs/relabel_j_empty_string/.
+        pairs = table[['Preferred Label', target]].dropna()
+        rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
+                 if str(k).strip() != '' and str(v).strip() != ''}
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
