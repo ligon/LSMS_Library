@@ -225,6 +225,20 @@ def cache_clear(
     if not any_output:
         print("No cached files matched the provided filters.")
 
+    # GH #803: parquets inside the config tree are never read (and cache
+    # clear cannot remove what it does not own), but they are the signature
+    # of a wave script run from a checkout that is not the imported package
+    # (the write-side .pth trap).  Say so, so they get deleted.
+    stray = sorted(
+        p for name in target_countries
+        for p in (_countries_root() / name).rglob("*.parquet")
+    )
+    if stray:
+        print(f"WARNING: {len(stray)} in-tree parquet(s) under {_countries_root()} "
+              f"-- never read (GH #803); delete them:")
+        for p in stray:
+            print(f"  {p}")
+
 
 def _slug(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")

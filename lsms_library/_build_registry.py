@@ -139,6 +139,11 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.null_read_audit.check_declared_columns",
     "lsms_library.null_read_audit.audit_read",
     "lsms_library.null_read_audit.audit_declared_columns",
+    # GH #803: pure reporting of an in-tree parquet artefact.  Never reads the
+    # file, never changes what a build writes; reached from grab_data and
+    # run_make_target, so without this exclusion re-wording the warning would
+    # move every table's fingerprint.
+    "lsms_library.country._warn_intree_parquet_artefact",
 })
 
 
