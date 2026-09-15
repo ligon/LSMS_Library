@@ -46,8 +46,10 @@ def _code_label_map(tablename, dirs):
 # GLSS3 (1991-92) region codes live in the *wave-level* categorical_mapping.org
 # (1991-92/_/), because GLSS3 orders the two northern regions 9=Upper West,
 # 10=Upper East -- the reverse of the country-level table.  Searching the wave
-# dir first picks up the GLSS3-correct list; rural/relationship fall through to
-# whichever file defines them.
+# dir first picks up the GLSS3-correct list; rural falls through to whichever
+# file defines it.  relationship is ALSO wave-level since 2026-09-07: GLSS3 uses
+# GLSS4's nine-code scheme, not GLSS1's fourteen, and falling through to the
+# country table mis-labelled codes 6-9 for 1,353 people (CONTENTS.org Trap 2).
 _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
 region_dict = _code_label_map('region', _dirs)
 rural_dict = _code_label_map('rural', _dirs)

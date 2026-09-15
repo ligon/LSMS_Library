@@ -27,6 +27,47 @@ strata (codes 1-10) both use this list.
 |   10 | Upper East      |
 |   11 | Foreign Country |
 
+* S1 relationship codes (=rel=, Section 1 column 3)
+
+GLSS3's =rel= (=S1.DTA=) uses the NINE-code list below, transcribed from the
+GLSS3 household questionnaire (=Documentation/pdf/G3QPartA.pdf=, Section 1
+column 3; identical text in
+=Documentation/GHA_1991_GLSS_Household_Questionnaire_EN.pdf=) and confirmed by
+the DDI (=rel=: range 1-9, 20,403 valid cases; code 1 occurs 4,550 times
+against 4,552 households).  It is the SAME list GLSS4 (1998-99) uses, and NOT GLSS1's
+fourteen-code list in the country-level table -- see CONTENTS.org "Trap 2".
+
+Until 2026-09-07 this wave had no table here, so =mapping.py='s wave-first
+=_code_label_map('relationship', _dirs)= fell through to the country table and
+codes 6-9 were served as Sibling / Niece/nephew / Son/daughter in-law /
+Brother/sister in-law: 1,353 people (6.6% of the wave) with a wrong
+Relationship AND a wrong kinship tuple, no nulls, graded =sane=.  Found while
+gating GH #797; fixed under GH #799.
+
+Labels are the library's canonical forms, identical to 1998-99's table, so
+GLSS3 and GLSS4 (one form) speak one vocabulary.  Verbatim source wording:
+#   1 Head                                        -> Head
+#   2 Wife/husband                                -> Wife/husband
+#   3 Son/daughter                                -> Son/daughter
+#   4 Grandchild                                  -> Grandchild
+#   5 Father/mother                               -> Father/mother
+#   6 Relative of head or head's spouse           -> Other relative
+#   7 Servant and his/her relative                -> Servant
+#   8 Tenant and his/her relative                 -> Tenant
+#   9 Other not related to head or head's spouse  -> Others not related
+#+name: relationship
+| Code | Label              |
+|------+--------------------|
+|    1 | Head               |
+|    2 | Wife/husband       |
+|    3 | Son/daughter       |
+|    4 | Grandchild         |
+|    5 | Father/mother      |
+|    6 | Other relative     |
+|    7 | Servant            |
+|    8 | Tenant             |
+|    9 | Others not related |
+
 * POV_GH
 
 # `loc2` is the standard GLSS 2-way locality split, identical in meaning to

@@ -149,12 +149,14 @@ household_roster:
     #
     # They are decoded HERE, at grab time, and NOT left to the by-name
     # auto-dispatch that labels cluster_features' Region/Rural at API time.
-    # That is not a style choice: `_finalize_result` runs `_expand_kinship`
-    # BEFORE `_apply_categorical_mappings`, so an API-time Relationship decode
-    # arrives too late -- kinship sees the raw codes '0'..'9', matches none of
-    # them, and Generation / Distance / Affinity come back 100% null with a
-    # warning.  (Measured, before this was moved.)  Decoding at grab time also
-    # keeps the cached parquet readable instead of storing bare numbers.
+    # Historical reason (GH #797): until 2026-09-07 `_finalize_result` ran
+    # `_expand_kinship` BEFORE `_apply_categorical_mappings`, so an API-time
+    # Relationship decode arrived too late -- kinship saw the raw codes
+    # '0'..'9', matched none of them, and Generation / Distance / Affinity
+    # came back 100% null with a warning (measured, before this was moved).
+    # #797 reversed that order, so an API-time decode would now work too.  The
+    # grab-time decode stays: it keeps the cached parquet readable instead of
+    # storing bare numbers, and it is what was verified against the data.
     #
     # The `household_roster()` df_edit hook in `_/mapping.py` repairs the one
     # duplicated person id in the file and maps the 99 non-response sentinels

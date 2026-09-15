@@ -2835,10 +2835,6 @@ class Country:
             if "Relation" in df.columns and "Relationship" not in df.columns:
                 df = df.rename(columns={"Relation": "Relationship"})
 
-            # Expand Relationship -> Generation, Distance, Affinity
-            if "Relationship" in df.columns:
-                df = _expand_kinship(df)
-
             # Auto-apply categorical mappings where table name matches
             # a column or index name (issue #49).  For derived food tables,
             # protect the reserved 'kg'/'Value' u-sentinels from a country's
@@ -2848,6 +2844,10 @@ class Country:
                 protect_u_sentinels=method_name in _U_SENTINEL_PROTECTED_METHODS,
                 labels=labels,
             )
+
+            # Expand Relationship -> Generation, Distance, Affinity
+            if "Relationship" in df.columns:
+                df = _expand_kinship(df)
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,

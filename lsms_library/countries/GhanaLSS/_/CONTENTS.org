@@ -1524,7 +1524,7 @@ stringifies the Code index via =format_id= (so keys are ='1'=), while wave
 mapping functions variously look up with =int(value)= or =str(value)=.  Both
 historical bugs were partly key-type mismatches.
 
-** Trap 2: GLSS4's relationship scheme is NOT GLSS1's
+** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
 The country-level =relationship= table in =_/categorical_mapping.org= has
 *fourteen* codes and cites *GLSS1*'s data dictionary
@@ -1538,15 +1538,71 @@ and code 1 occurs 3,136 / 3,192 times = each wave's household count.
 value labels (=value_labels() == []=), so the GLSS4 list has to come off the
 questionnaire.
 
-1998-99 =Relationship= is therefore *deliberately left unmapped* rather than
-decoded through a table that would silently mis-label it.  A null column is
-honest; a wrong kinship label propagates into
-=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  If you
-add the GLSS4 list, add it as a *wave-level* table in
-=1998-99/_/categorical_mapping.org= and search the wave dir *first*, so it
-cannot fall through to the GLSS1 table.  (The same wave-first discipline is why
-1991-92 keeps its own =region= table: GLSS3 orders the two northern regions
-9=Upper West, 10=Upper East, the reverse of the country-level table.)
+/Superseded 2026-08 (=f5e6b66c=)./  The paragraph that stood here said 1998-99
+=Relationship= was "deliberately left unmapped".  It is now decoded through a
+*wave-level* nine-code =#+name: relationship= table in
+=1998-99/_/categorical_mapping.org=, transcribed from the questionnaire;
+=mapping.py= searches the wave dir *first*, so it cannot fall through to the
+GLSS1 table.  The rule that paragraph stated still stands and is why the table
+is wave-level: a null column is honest; a wrong kinship label propagates into
+=Generation=/=Distance=/=Affinity= and cannot be recovered downstream.  (The
+same wave-first discipline is why 1991-92 keeps its own =region= table: GLSS3
+orders the two northern regions 9=Upper West, 10=Upper East, the reverse of the
+country-level table.)
+
+*** GLSS3 uses the nine-code scheme too -- and WAS decoded through GLSS1's, for its whole life (fixed 2026-09-07)
+
+Found while running the GH #797 gate; GH #799.  1991-92's =rel= (=S1.DTA=) takes codes
+1--9 only (DDI: range 1--9, 20,403 valid cases; code 1 occurs 4,550 times
+against 4,552 households -- two households carry no code-1 row).  The GLSS3 household questionnaire this repository ships
+(=Documentation/pdf/G3QPartA.pdf=, Section 1 column 3; identical text in
+=Documentation/GHA_1991_GLSS_Household_Questionnaire_EN.pdf=) prints the *same*
+nine-code list as GLSS4, verbatim:
+
+: Head.....................1     Relative of head or head's spouse.........6
+: Wife/husband.............2     Servant and his/her relative..............7
+: Son/daughter.............3     Tenant and his/her relative...............8
+: Grandchild...............4     Other not related to head or head's spouse.9
+: Father/mother............5
+
+=1991-92/_/mapping.py= resolves =relationship= with
+=_code_label_map('relationship', _dirs)=, wave dir first -- and the wave dir
+had no such table, so the lookup fell through to the country-level GLSS1 table.
+Codes 1--5 happen to agree in meaning between the two schemes; 6--9 do not:
+
+| code | GLSS3 form                        | served until 2026-09-07 | tuple served           |     n |
+|------+-----------------------------------+-------------------------+------------------------+-------|
+|    6 | Relative of head or head's spouse | Sibling                 | [0, 1, consanguineal]  | 1,211 |
+|    7 | Servant and his/her relative      | Niece/nephew            | [-1, 1, consanguineal] |    61 |
+|    8 | Tenant and his/her relative       | Son/daughter in-law     | [-1, 0, affinal]       |     8 |
+|    9 | Other not related                 | Brother/sister in-law   | [0, 1, affinal]        |    73 |
+
+1,353 people (6.6% of the wave) carried a wrong =Relationship= *and* a wrong
+kinship tuple.  Nothing was null, so no guard fired and the cell graded =sane=
+in every coverage snapshot -- the =1998-99/_/categorical_mapping.org= header
+had predicted this exact mis-labelling for GLSS4 ("code 6 ... would become
+Sibling"), and nobody checked GLSS3.  =sane= is not =blessed=.
+
+*The fix* is the 1998-99 fix one wave earlier: a =#+name: relationship= table
+in =1991-92/_/categorical_mapping.org= with the *same labels as 1998-99's*, so
+GLSS3 and GLSS4 (one form) speak one vocabulary.  That choice relabels codes
+2/3/5 as well (=Spouse= -> =Wife/husband=, =Child= -> =Son/daughter=, =Parent=
+-> =Father/mother=; 13,265 rows) with *identical* kinship tuples -- a string
+change, stated here so nobody hunts for it.
+
+*Verified cold* (private =LSMS_DATA_DIR=, =LSMS_NO_CACHE=1=; scripts, logs
+and the before/after crosstab are inline in GH #799): =household_roster=
+has 246,594 rows before and after; the six other waves are unchanged on
+=Relationship= (1988-89 compared as a label multiset: 714 of its 3,192
+household ids differ between the wave and country parquets, and those 714 are
+exactly the keys of =updated_ids['1988-89']= -- the GLSS1/GLSS2 panel re-key,
+applied before the country parquet is written); 1991-92
+has 20,403 rows before and after and *exactly 14,618 change* -- 13,265
+string-only (codes 2/3/5) and 1,353 semantic (codes 6--9).  0 NA in
+=Relationship=/=Generation=/=Distance=/=Affinity= in every wave; no "Unknown
+relationship labels" warning.  =Country._table_cache_hash('household_roster')=
+moved (=4f2eddfb...= -> =6a9e8d19...=), so a warm cache rebuilds instead of
+masking the fix.
 
 ** Trap 3 (RESOLVED 2026-08-21): GLSS1/GLSS2 cluster region is now MEASURED
 
