@@ -312,3 +312,94 @@ Parallel to the established =Value_sold=:
 =LossCause= is free information (insects / rodents / fire / rotting / other)
 and worth keeping.  The one thing the names do not convey is the valuation
 asymmetry above, which therefore belongs in the column notes.
+
+* =Value_sold= is a DERIVATION, and here is the evidence for its rule
+
+@ligon, 2026-09-16: compute =Value_sold= per GH #824, and register it through
+the derived-value machinery.
+
+** #824 is a RELATED but DIFFERENT problem -- do not conflate them
+
+#824 is about the *unit*: =Value_sold= is a recorded total, =Quantity_sold= is
+in the SOLD unit, and the table carries only the HARVEST unit =u=, so
+=Value_sold / Quantity_sold= is a price per the wrong unit.  Its fix is to
+carry =Unit_sold=.
+
+GhanaLSS has a *stronger* problem: =Value_sold= is *not recorded at all*.  Q6's
+=AMOUNT= is denominated by its own =UNIT= box (=CROPSPU=), so most rows carry a
+*price per unit*, not a total.  #824's remedy (carry =Unit_sold=) is necessary
+here but not sufficient -- the total has to be constructed, which is why this
+is a derivation and not a column mapping.
+
+** The evidence
+
+The form (p.44, block =9B1=, col 6) reads "How much was the harvest of [...]
+sold for?" over two boxes, =AMOUNT= and =UNIT=.  That is ambiguous on its own.
+The data resolves it -- =CROPSPU= is essentially bimodal:
+
+| relation of =CROPSPU= to =CROPSU= | 1987-88 | 1988-89 |
+|-----------------------------------+---------+---------|
+| equal (amount is per that unit)   |  91.3%  |  85.8%  |
+| = 22, i.e. ALL                    |   9.6%  |  15.9%  |
+| neither                           |   2.0%  |   0.95% |
+
+A form whose =UNIT= box merely restated a total would not need the box, and
+would not offer =ALL= as a distinct code.  Magnitudes agree: for maize, taking
+=CROPSP x CROPS= on same-unit rows gives a median 11,100 against 10,000 on the
+rows that report =ALL= (where =CROPSP= is unambiguously the total), whereas
+=CROPSP= alone gives 3,550 -- three times too small.  Cassava and cocoa behave
+the same way.
+
+*Caveat, recorded rather than smoothed over*: yam and plantains *overshoot*
+under the same rule (yam =CROPSP x CROPS= median 100,000 vs 8,000 on ALL rows).
+The =ALL= and same-unit groups are different households selling different
+amounts, so the comparison is confounded by transaction size and is
+*suggestive, not conclusive*, for those two crops.  This is the thing to check
+first if the derived values look wrong.
+
+** Proposed rule
+
+: Value_sold = CROPSP                  where CROPSPU == 22 (ALL)
+:            = CROPSP * CROPS          where CROPSPU == CROPSU
+:            = NaN                     otherwise (2.0% / 0.95% of sale rows)
+
+Leaving the residual NaN rather than converting it is a deliberate choice: the
+conversion would need a factor between two different container units that the
+survey does not supply for that row.
+
+** Proposed registry entry
+
+Key =GhanaLSS::crop_production::9b-sale-amount-per-unit=, in
+=GhanaLSS/_/derivations.yml= (a sibling of =population.yml=; a =.yml= there
+moves no cache hash).  Fields per =lsms_library/derivations.py=; allowed
+=basis= values are =config-comment=, =filename=, =modelling-choice=,
+=questionnaire=, =variable-label=.
+
+- waves :: =['1987-88', '1988-89']=
+- columns :: =[Value_sold]=
+- raw_variables :: =[Y09B.CROPS, Y09B.CROPSU, Y09B.CROPSP, Y09B.CROPSPU]=
+- assumptions ::
+  - Q6's =AMOUNT= is denominated by its own =UNIT= box -- =basis: questionnaire=,
+    evidence 1988-89 household questionnaire PDF p.44, form block =9B1= col 6.
+  - unit code 22 = =ALL=, so the amount is the whole sale -- =basis: questionnaire=,
+    evidence the unit-code legend at the foot of the same page.
+  - rows whose =CROPSPU= is neither =CROPSU= nor =ALL= are left NaN rather than
+    converted -- =basis: modelling-choice=.
+- validated_against :: *not yet done.*  The natural external check is
+  =PRICE.DAT= / =community_prices= (wired for this country; see
+  =.coder/ledger/562-ghanalss-community-prices.md=): the implied farmgate price,
+  =Value_sold / Quantity_sold= converted to kg through =CROPSUK=, should sit
+  below the community market price for the same crop and round.  Run it before
+  the entry claims validation -- and it is the check that would settle the yam
+  and plantain caveat above.
+
+** Two mechanical points
+
+- =Derivation= is not in the canonical =Columns: crop_production= block, so it
+  must be added there as =optional: true=.  =data_info.yml= is in no cache
+  fingerprint, so that costs nothing.
+- The stamp must go on AFTER any collapse.  Here there is none to worry about:
+  =(HID, CROP)= is *unique* in both waves (16,938 and 20,342 rows, zero
+  duplicates), so the declared =(t, i, j)= index is unique and
+  =_normalize_dataframe_index= has nothing to reduce.  That also independently
+  vindicates dropping =u= from the index.
