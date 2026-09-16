@@ -30,6 +30,7 @@ do not equate item-level density with household fitting or scoring coverage.
 | `lsms_library.demands.main` | `lsms_library/demands.py:31` | one Country API fit | Leave unchanged; lacks partitions, held-out scoring, common normalization, or validation loss. |
 | `Country.sample`, `Country.food_expenditures` | `lsms_library/country.py`; `countries/Uganda/_/CONTENTS.org:209`, `_/recall.yml` | sample universe, household Region, cross-sectional weights, and declared expenditure basis; existing sample and food transformation tests | Reuse for survey masks. Keep zero-food sample households in coverage denominators. |
 | `harmonize_food` | `countries/Uganda/_/categorical_mapping.org` | existing Preferred/Aggregate labels; API contract in aggregate-labels skill | Trial grouping only. Conflicting Preferred-to-Aggregate assignments remain singleton foods, explicitly reported. |
+| historical `prepare_data` | `../CFEDemands/Empirics/regression.org` at `e4fc38f` | original recursive selector; its covariance helper is unchanged on the feature branch | Reuse the exact function from local git for the historical coverage column; never swap the production implementation. |
 
 The API audit passes (15 skills); no existing partition evaluator or grouped
 validation split was found. Native DGP indices reverse the modern household
@@ -109,10 +110,12 @@ inside the declared questionnaire universe. Sum amounts before logging.
 
 ## §6 Remaining choices
 
-Empirical country/wave population weights, a defensible anchor or anchor basket,
-an approximation tolerance, and the cost of leaving welfare unscored remain
-research choices. They do not block a configurable evaluator or known-truth
-checks. No automatic search or empirically optimal Uganda grouping is claimed.
+The empirical-mask experiment uses Uganda 2019-20 cross-sectional sample
+weights, Region markets, Salt as the singleton anchor, and Salt-observed cells
+as its fixed error population. These are explicit experiment choices, not
+universal defaults. Choosing a reference for other countries, an approximation
+tolerance, and the cost of leaving welfare unscored remain research choices.
+No automatic search or empirically optimal Uganda grouping is claimed.
 
 ### Verification
 
@@ -139,5 +142,29 @@ checks. No automatic search or empirically optimal Uganda grouping is claimed.
 - Org lint and ASCII checks pass. Full LSMS country tests were not run: this
   isolated analysis does not change library or extraction code, and its test
   command bypasses country-cache purge hooks.
+- `template_from_frames` / `load_uganda` (`survey_simulation.py:54,117`) --
+  **OK (anchored on §2--§4)**: uses Country, keeps zero-food sample rows and
+  complete joint masks, reports metadata exclusions and delivered-item scope.
+  Rechecking 2019-20 raw food through `get_dataframe(convert_categoricals=False)`
+  finds 126 codes per responding household and 124 mapped Preferred labels;
+  116 labels appear in the delivered total table, two of them tobacco.
+- `curated_membership` / `survey_inputs` (same file:34,141) --
+  **OK (anchored on §2--§5)**: unresolved Cassava (flour) assignments remain
+  singleton; existing DGP supplies independent synthetic welfare, one complete
+  numeric control and fine-good log shocks. Whole masks, markets, weights and
+  global random state are preserved. The substitution allocation term and its
+  effect on fine-good error assumptions are disclosed.
+- `load_legacy_preparation` / `run_template` (same file:206,225) --
+  **OK (anchored on §2, §4, §5)**: calls the actual historical selector for a
+  coverage check, while every fitted model uses the revised estimator. Original
+  fitting, revised fitting and revised frozen scoring use the same training
+  population; held-out MSE uses the declared common population.
+- Empirical extension: **34 isolated tests passed**, including whole-mask and
+  zero-food preservation, conflicting mappings, declared universe, exclusion
+  counts, amount-mechanism identities, reproducibility and end-to-end fitting.
+  **36 empirical-mask candidate fits** (three seeds, two bases, three amount
+  mechanisms, two partitions) completed; all fixed comparison sets were scored.
+  Profiles cover 2010-11, 2018-19 and 2019-20; only the last wave is simulated.
+  An independent read-only review verified the invariants and found no defect.
 
 --Sue, 2026-09-16
