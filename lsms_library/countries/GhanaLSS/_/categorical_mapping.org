@@ -1862,3 +1862,35 @@ code 7 is "Rabbits or guinea pigs", served as =Rabbits=.
 |    6 | Other Poultry |
 |    7 | Rabbits       |
 |    8 | Other         |
+
+* GLSS1 / GLSS2 Section 5 (Employment)
+
+The TIME UNIT legend printed at the foot of every Section 5 grid (PDF pp.19,
+26, ...).  It qualifies the earnings AMOUNT in Part B Q10, Part C, Part E Q10
+and Part G: "How much money?  How often?".
+
+#+name: time_unit
+| Code | Label     |
+|------+-----------|
+|    1 | Minute    |
+|    2 | Hour      |
+|    3 | Day       |
+|    4 | Week      |
+|    5 | Month     |
+|    6 | Quarter   |
+|    7 | Half Year |
+|    8 | Year      |
+
+Part E Q3, "Is this work the same as your main or secondary job during the past
+7 days?".  Code 1 or 2 SKIPS the rest of Part E to Part F, which is why Part
+E's weeks / days / hours / earnings / own-farm columns are populated only where
+this reads =Different work= (1,701 of 8,182 rows in 1987-88; 1,986 of 7,806 in
+1988-89).  It is the link that lets a consumer avoid double-counting a
+12-month job already described in Part B or Part C.
+
+#+name: same_as_7day_job
+| Code | Label                    |
+|------+--------------------------|
+|    1 | Same as main 7-day job   |
+|    2 | Same as secondary 7-day job |
+|    3 | Different work           |

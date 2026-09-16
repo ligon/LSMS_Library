@@ -306,3 +306,47 @@ GhanaLSS::livestock::9f-herd-value-from-unit-price:
     and hence that this product is the herd value.
   contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part F records a price per head"
   since: '2026-09-16'
+
+GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours:
+  waves: ['1987-88', '1988-89']
+  columns: [HoursPerWeek]
+  rule: >-
+    HoursPerWeek = DaysPerWeek * HoursPerDay (Y05E1.OCCMYD * Y05E1.OCCMYH for
+    the main 12-month job, Y05G1.OCCSYD * Y05G1.OCCSYH for the secondary),
+    NaN where either factor is missing.  Section 5's two module families ask
+    the same annual quantity in different shapes: Parts B and C ask usual
+    HOURS PER WEEK during the past 12 months directly (Q7), while Parts E and
+    G decompose it into DAYS A WEEK (Q6) and HOURS A DAY (Q7).  Constructing
+    it here makes the single expression WeeksPerYear x HoursPerWeek valid on
+    every row of `labor`.  Reported on the B/C rows, which carry NA here.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_5eg_hours_per_week
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_5eg
+  raw_variables: [Y05E1.OCCMYD, Y05E1.OCCMYH, Y05G1.OCCSYD, Y05G1.OCCSYH]
+  assumptions:
+    - text: >-
+        the two factors describe the same weeks, so their product carries no
+        averaging assumption of its own -- Part E Q6 is asked as "During these
+        weeks, how many days a week did you work?", referring to the weeks
+        counted in Q5
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.26, form block 5E1 columns 5-7
+        (image-only CCITT scan, rendered with
+        slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py)
+    - text: >-
+        a missing factor means the grid was skipped rather than a zero worked
+        -- Part E Q3 routes a 12-month job that repeats the 7-day job straight
+        to Part F -- so the product is left NaN, not 0
+      basis: questionnaire
+      evidence: >-
+        same page, column 3; measured, the detail columns are populated on
+        1,701 of 8,182 rows (1987-88) and 1,986 of 7,806 (1988-89), exactly
+        the rows answering "Different work"
+  validated_against: >-
+    NOT checked against an external series.  Internal cross-check: on the
+    Parts B/C rows, where HoursPerWeek is REPORTED rather than constructed,
+    WeeksPerYear x HoursPerWeek gives a median 1,050 annual hours (p10 200,
+    p90 2,400) -- p90 being about 48 weeks x 50 hours -- so the scale the
+    construction has to match is established independently of it.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 5 carries the ANNUAL labour measure"
+  since: '2026-09-16'

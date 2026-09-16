@@ -455,3 +455,59 @@ Data Scheme:
       optional: true
     Cost: float
     materialize: make
+
+  # GLSS1/GLSS2 Section 5 (Employment) -- ANNUAL labour supply, per person per
+  # job slot.  1987-88 and 1988-89 only.  materialize: make -- four source
+  # files, one per job slot, each contributing a constant `job` label.
+  #
+  # NOT `people_last7days`, which is the corpus's 7-DAY table (canonical,
+  # 13 countries).  This is a 12-month measure on the same window as Section
+  # 9's agriculture, which is what makes the two joinable.
+  #
+  # The "past 7 days" Parts B/C are the PRIMARY annual source, despite their
+  # title: their Q6 asks weeks worked during the past 12 MONTHS and their Q7
+  # usual hours per week during the past 12 MONTHS.  Parts E/G are a
+  # SUPPLEMENT -- their Q3 skips the grid when the 12-month job repeats the
+  # 7-day one, so their detail is present on only ~20% of rows.
+  # `SameAs7DayJob` carries that answer so the pointer rows can be dropped
+  # rather than double-counted.  See the wave scripts' docstring.
+  #
+  # `HoursPerWeek` is REPORTED on the B/C rows and DERIVED on the E/G rows as
+  # DaysPerWeek x HoursPerDay (registry key
+  # GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours), so that
+  # WeeksPerYear x HoursPerWeek is valid on every row.  Both factors are
+  # served raw beside it.
+  #
+  # Own-family farm labour = OwnFarmOrBusiness AND an agricultural Industry.
+  # Occupation / Industry are RAW CODES: no code list ships with the data here
+  # and none has been verified, so nothing is decoded.  A decode table is a
+  # documented gap -- see _/CONTENTS.org.
+  labor:
+    index: (t, i, pid, job)
+    Occupation:
+      type: float
+      optional: true
+    Industry:
+      type: float
+      optional: true
+    WeeksPerYear: float
+    HoursPerWeek: float
+    DaysPerWeek:
+      type: float
+      optional: true
+    HoursPerDay:
+      type: float
+      optional: true
+    Earnings:
+      type: float
+      optional: true
+    EarningsUnit:
+      type: str
+      optional: true
+    OwnFarmOrBusiness:
+      type: bool
+      optional: true
+    SameAs7DayJob:
+      type: str
+      optional: true
+    materialize: make

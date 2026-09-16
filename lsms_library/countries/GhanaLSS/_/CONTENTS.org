@@ -4507,3 +4507,70 @@ It cannot be one: =Y09A= has exactly one row per household (2,644 / 2,938).
 =IDFARM= also appears in =Y07.DCT= alongside =FARMSE= and =BUSSE=, which is
 where Section 7 records *who answers* the agriculture module.  =plot_features=
 for these two waves carries a C4-validated =not-asked= verdict.
+
+** Section 5 carries the ANNUAL labour measure, and the 7-day parts are where it lives
+
+=labor= is wired from Section 5 for both panel waves, at =(t, i, pid, job)=
+with four job slots.  It is deliberately NOT =people_last7days=, the corpus's
+canonical 7-DAY table (13 countries): this is a 12-month measure, on the same
+window as Section 9's agriculture, which is what makes the two joinable.
+
+*** The "past 7 days" Parts B and C are the PRIMARY annual source
+
+Their TITLE names the reference period used to IDENTIFY the job.  Two of their
+questions are about the past twelve months (p.19, form block =5B1=):
+
+- Q6 :: "For how many *weeks* during the past *12 months* did you do this
+  work?"  (=OCCMW=, median 42)
+- Q7 :: "For how many *hours per week* did you usually do this work *during the
+  past 12 months*?"  (=OCCMHU=, median 28)
+
+So =WeeksPerYear x HoursPerWeek= is annual, for every person who worked in the
+reference week -- 6,705 rows in 1987-88 and 6,206 in 1988-89, median 1,050
+annual hours (p10 200, p90 2,400).
+
+*** Parts E and G are a SUPPLEMENT, and their detail is mostly absent
+
+Part E Q3 asks whether the 12-month main job is the same as the 7-day main or
+secondary job, and *skips the rest of the grid to Part F when it is*.  So Part
+E's weeks / days / hours / earnings / own-farm columns are populated only where
+the answer is "Different work": *1,701 of 8,182 rows in 1987-88 and 1,986 of
+7,806 in 1988-89*, about a fifth.
+
+Building annual labour from Parts E/G alone would therefore miss roughly 78%
+of workers.  =SameAs7DayJob= carries that answer so a consumer can drop the
+pointer rows instead of double-counting a job already described in Part B.
+
+*** =HoursPerWeek= is part reported, part derived
+
+The two families ask the same quantity in different shapes -- B/C give hours
+per week directly, E/G give days a week x hours a day.  =HoursPerWeek= is read
+on the B/C rows and constructed on the E/G rows
+(=GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours=), so that
+=WeeksPerYear x HoursPerWeek= is valid on every row.  =DaysPerWeek= and
+=HoursPerDay= are served raw beside it.
+
+The genuinely 7-day quantities -- Part B Q4 (days worked in the past 7 days)
+and Q5 (hours per day during those days) -- are NOT carried (@ligon,
+2026-09-16); they describe the reference week, not the year.
+
+*** Own-family farm labour
+
+=OwnFarmOrBusiness= is Part B Q11 / Part E Q11: "In this work, were you
+self-employed on a farm or in a business belonging to your household?".
+Combined with an agricultural =Industry= it gives the family-labour input that
+Section 9 Part D does not record -- Part D has only *paid* labour (Q42,
+amounts) and *unpaid exchange received* (Q46, man-days).
+
+Delivered: 13,031 person-job rows are own-farm and agricultural, giving *4,808
+household-years with a median 1,600 annual own-farm hours* (p90 4,929).
+
+*** =Occupation= and =Industry= are RAW CODES -- a decode table is a gap
+
+No code list ships with the data in this repo and none has been verified, so
+nothing is decoded and no standard is asserted here.  What the data shows:
+=Industry= 111 is overwhelmingly dominant (4,374 of 6,705 in 1987-88) and
+co-occurs with =Occupation= 61, the modal code among people whose main job is
+farming; 112 and 130 also appear, and the 1xx block is agriculture / forestry /
+fishing on any reading.  Filter on the codes; do not assume a published
+correspondence until one is found and recorded.

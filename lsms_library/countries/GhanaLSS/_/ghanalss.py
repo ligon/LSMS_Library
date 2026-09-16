@@ -1051,3 +1051,72 @@ def inputs_9f(wave):
         'LIVSTN': df['LIVSTN'], 'LIVSTNV': df['LIVSTNV'],
     })
     return out.set_index(['t', 'i', 'animal'])
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 5 Parts E and G -- usual hours per week, DERIVED
+# (2026-09-16).  Registry: _/derivations.yml.
+# ---------------------------------------------------------------------------
+
+#: Registry key stamped on every row `derive_5eg_hours_per_week` served.
+HOURS_PER_WEEK_DERIVATION = 'GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours'
+
+
+def derive_5eg_hours_per_week(days_per_week, hours_per_day):
+    """Usual hours per week on a 12-month job, ``DaysPerWeek x HoursPerDay``.
+
+    Section 5's two module families ask the same annual quantity in different
+    shapes.  Parts B and C (PDF p.19, block 5B1) ask it directly --
+
+        Q6  "For how many WEEKS during the past 12 MONTHS did you do this work?"
+        Q7  "For how many HOURS PER WEEK did you usually do this work DURING
+             THE PAST 12 MONTHS?"
+
+    -- while Parts E and G (p.26, block 5E1) decompose it:
+
+        Q5  weeks during the past 12 months
+        Q6  "During these weeks, how many DAYS A WEEK did you work?"
+        Q7  "How many HOURS A DAY did you work?"
+
+    So ``HoursPerWeek`` is REPORTED on a B/C row and CONSTRUCTED here on an
+    E/G row, which makes the single expression ``WeeksPerYear x HoursPerWeek``
+    valid on every row of ``labor``.  Both factors are served raw beside it.
+
+    This is a product of two answers about the SAME weeks -- Q6 is explicitly
+    "during these weeks" -- so it carries no averaging assumption beyond the
+    respondent's own "did you work" and "how many hours a day".  NaN where
+    either factor is missing, which on these parts means the grid was skipped
+    (Q3 routes a 12-month job that repeats the 7-day job straight to Part F).
+
+    Vectorised and elementwise; returns a float ndarray.
+    """
+    return _as_float(days_per_week) * _as_float(hours_per_day)
+
+
+def inputs_5eg(wave):
+    """The raw Section 5 Part E / Part G answers behind the derived hours.
+
+    Indexed ``(t, i, pid, job)`` to match the served rows, with ``job`` the
+    same ``main_12m`` / ``secondary_12m`` labels the wave script writes.
+    Columns are the ORIGINAL variable names.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 5 exists only in 1987-88 and 1988-89 here, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_5eg_{wave}')
+    out = []
+    for fn, job, d_col, h_col in (('Y05E1.DAT', 'main_12m', 'OCCMYD', 'OCCMYH'),
+                                  ('Y05G1.DAT', 'secondary_12m', 'OCCSYD', 'OCCSYH')):
+        df = get_dataframe(str(root / 'Data' / fn))
+        out.append(pd.DataFrame({
+            't': wave,
+            'i': df['HID'].apply(mapping.i),
+            'pid': df['PID'].apply(format_id),
+            'job': job,
+            d_col: df[d_col],
+            h_col: df[h_col],
+        }))
+    return pd.concat(out, ignore_index=True).set_index(['t', 'i', 'pid', 'job'])
