@@ -13,6 +13,9 @@ households. Report coverage separately from error on a fixed comparison
 population. Establish the comparison using known-welfare simulations before
 adding an automatic partition search. Work is an isolated SkunkWorks analysis;
 country extraction and production estimation remain in their existing packages.
+Extend the first toy experiment with complete household observation patterns
+from Uganda food expenditures. Measure the actual sparsity before simulation;
+do not equate item-level density with household fitting or scoring coverage.
 
 ## §2 Existing machinery
 
@@ -25,6 +28,8 @@ country extraction and production estimation remain in their existing packages.
 | `Regression.w_cov` | same file:1494 | fitted conditional covariance under its stated homoskedastic model; `test_w_var.py` | Reuse for raw fitting diagnostics only, not validation MSE or post-selection coverage. |
 | `dgp.expenditures` | `../CFEDemands/Empirics/cfe_estimation.org:2434` | known lambdas, prices, characteristics and measurement error; `test_dgp.py` | Reuse with index-name adapter and additional zero-pattern regimes. |
 | `lsms_library.demands.main` | `lsms_library/demands.py:31` | one Country API fit | Leave unchanged; lacks partitions, held-out scoring, common normalization, or validation loss. |
+| `Country.sample`, `Country.food_expenditures` | `lsms_library/country.py`; `countries/Uganda/_/CONTENTS.org:209`, `_/recall.yml` | sample universe, household Region, cross-sectional weights, and declared expenditure basis; existing sample and food transformation tests | Reuse for survey masks. Keep zero-food sample households in coverage denominators. |
+| `harmonize_food` | `countries/Uganda/_/categorical_mapping.org` | existing Preferred/Aggregate labels; API contract in aggregate-labels skill | Trial grouping only. Conflicting Preferred-to-Aggregate assignments remain singleton foods, explicitly reported. |
 
 The API audit passes (15 skills); no existing partition evaluator or grouped
 validation split was found. Native DGP indices reverse the modern household
@@ -69,6 +74,23 @@ inside the declared questionnaire universe. Sum amounts before logging.
 - Candidate maps are supplied, not learned using held-out data. Evaluating a
   collection does not provide unbiased performance for an adaptively selected
   winner. Search and a final untouched test sample remain subsequent work.
+- An empirical template preserves entire household masks, markets and survey
+  weights. Synthetic welfare and errors are generated independently of those
+  masks. This does not identify why the survey reports zeros. Report purchased
+  and total recorded acquisition separately; do not impute own-production values.
+- Use the observed, wave-specific Preferred universe, excluding Cigarettes and
+  Other Tobacco. Reindex food observations to sample households before counting.
+  Distinguish absent food records and unknown Region from preparation exclusions.
+  The 2019-20 API currently has three missing Regions despite the older blanket
+  completeness statement in CONTENTS; exclude them explicitly from simulations.
+- Empirical masks and identifiers remain local, never committed. Reproduction
+  reloads through Country. Only aggregate coverage and simulation summaries are
+  tracked. Preserve fine-good pair counts, not just marginal observation rates.
+- Equal-within-group loadings and homoskedastic fine-good log errors do not
+  ensure homoskedastic grouped errors: the number of positive components varies
+  across households. Keep this effect in the primary masked-DGP experiment;
+  a substitution experiment may hold the group's baseline amount fixed by
+  dividing by the number of positive members, with that assumption disclosed.
 
 ## §5 Reuse decisions
 
@@ -81,6 +103,9 @@ inside the declared questionnaire universe. Sum amounts before logging.
 - **Extend** the tested DGP externally with complete, substitutable-input, and
   unreported-positive regimes. The two latter mechanisms share the observed
   zero convention but have different latent interpretations.
+- **Extend** the same DGP and evaluator with survey masks, known welfare, and
+  existing curated groups. Reuse `prepare_data` diagnostics to separate fitting
+  recovery from subsequent frozen scoring, rather than duplicating selection.
 
 ## §6 Remaining choices
 
