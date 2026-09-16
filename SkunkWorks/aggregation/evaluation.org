@@ -1,0 +1,130 @@
+#+title: Evaluating supplied food aggregations
+#+author: Sue
+#+date: 2026-09-16
+
+* What is implemented
+
+We can now compare supplied food partitions through the revised CFE fitting
+and scoring pipeline. The [[file:evaluation.py][evaluator]] records fitting coverage, scoring
+coverage, paired support, residual variances, loadings, and error when true
+welfare is supplied. Semantic curation can provide candidate maps as it
+develops. It needn't precede these statistical checks.
+
+This is an experimental interface in =SkunkWorks=. It depends on CFEDemands
+with =Regression.score_w=, implemented on =feature/prepare-data-scoring=
+at commit =3cdfae9=. It reuses that estimator and the tested CFE data
+generator; the [[file:../../.coder/ledger/cfe-aggregation-evaluation.md][ledger]] records the remaining assumptions.
+
+* The comparison
+
+The caller declares the fine expenditure universe, an exhaustive membership
+map for each candidate, population weights, training and evaluation
+households, and two reference sets. All observations of a household stay
+on the same side of the split. Amounts are nonnegative; zeros and unreported
+entries contribute zero to group totals within the declared questionnaire
+universe. Summation precedes logging.
+
+One reference set fixes the origin using training households. An unmerged
+good anchors the units. For declared anchor loading \(b_a>0\), report
+\[
+  \widetilde w_{A,c}=
+  \frac{\widehat\beta_{A,a}}{b_a}
+  \left(\widehat w_{A,c}-\overline{\widehat w}_{A,R}\right),
+\]
+where the bar uses the declared population weights on the same training
+reference cells \(R\) for every candidate. This fixes a convention; it
+doesn't eliminate uncertainty in the fitted anchor loading. Held-out
+outcomes and simulation truth never choose the transformation.
+
+The second set fixes the evaluation population for comparable MSE. A
+candidate that cannot score every positive-weight cell in that set gets
+no comparable MSE. The evaluator doesn't silently take the intersection
+of survivors. Coverage uses the entire declared evaluation population;
+error outside the comparison set describes each candidate's own scored
+subset and therefore has a different interpretation.
+
+Identification is checked market by market using =Regression.w_cov().V22=.
+A market containing only single-good fitting households cannot separate
+its intercept from their welfare, even when loadings are well determined
+elsewhere. Such scores are unavailable. They cannot contribute to the
+normalization reference either.
+
+Returned conditional fitting variances remain in the model's raw units.
+They omit loading and partition-selection uncertainty and are not intervals
+for the normalized held-out scores. The point-error experiment includes
+parameter-estimation error by refitting each simulated sample.
+
+* First reproducible experiment
+
+[[file:simulation.py][The simulation]] uses =cfe.dgp.expenditures= with 240 households, two periods,
+one market, one characteristic, and ten foods. Six foods have a common
+loading of 1.2 in the baseline; four other loadings are 0.6, 0.4, 1.1, and
+2.0. Log measurement errors have standard deviation 0.2. Sixty percent
+of households form the training sample. The first good anchors the scale
+at its true loading of 0.6.
+Fitting uses =min_obs=30=, =min_prop_items=0.1=, and =alltm=True=.
+
+In the sparse cases, one quarter of households report only foods from the
+six-item pool. The common comparison and normalization sets are declared
+using the other households. With =substitutes=, each cell reports exactly
+one randomly chosen pool member. The =unequal= case changes those six
+loadings to span 0.2--3.0. With =unreported=, initially positive pool
+expenditures are independently unreported with probabilities depending on
+true welfare, independently of expenditure errors conditional on welfare.
+The =complete= case has no zeros.
+
+The table gives means across seeds 11, 12, and 13. Each run fits the fine
+partition, the six-food pool, and a broader pool that also absorbs the two
+high-loading common foods. Every candidate scores the common comparison
+set in these runs. Full results, including the broader pools, are in
+[[file:example_results.csv][example_results.csv]].
+
+#+name: tab:initial-partition-comparison
+#+caption: Mean coverage and common-population MSE across three seeds.
+| Mechanism    | Fine coverage | Pool coverage | Fine common MSE | Pool common MSE |
+|--------------+---------------+---------------+-----------------+-----------------|
+| Complete     |         1.000 |         1.000 |         0.00586 |         0.00737 |
+| Substitutes  |         0.750 |         1.000 |         0.00941 |         0.00817 |
+| Unequal beta |         0.750 |         1.000 |         0.01041 |         0.01166 |
+| Unreported   |         0.764 |         0.918 |         0.00936 |         0.01440 |
+
+These are checks of the comparison, not a precision study. Three seeds
+don't establish a ranking. They do show that the implementation can expose
+both coverage gains and error costs: rescuing sparse foods helps in the
+equal-loading substitution example, while gains in coverage coexist with
+greater common-population error under unequal loadings or underreporting.
+The simulation gives no empirical recommendation for Uganda.
+
+* Reproduction and checks
+
+Run from the LSMS checkout. This uses the neighboring CFE environment and
+branch without modifying either package's installed dependencies.
+
+#+begin_src sh :eval never
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  PYTHONPATH="../CFEDemands:$PWD" \
+  ../CFEDemands/.venv/bin/python -m SkunkWorks.aggregation.simulation \
+  --seeds 11 12 13 --output SkunkWorks/aggregation/example_results.csv
+
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  PYTHONPATH="../CFEDemands:$PWD" \
+  ../CFEDemands/.venv/bin/python -m pytest \
+  --confcutdir=SkunkWorks/aggregation SkunkWorks/aggregation/test_evaluation.py -q
+#+end_src
+
+The isolated test command avoids LSMS's country-cache hooks; these tests
+use only synthetic data. Checks cover exhaustive level summation, panel
+splits, weighted coverage and error, frozen normalization, truth and
+held-out-data independence, fixed comparison populations, absent anchors,
+unidentified markets, input order, and reproducible random state.
+
+* Next statistical work
+
+Use more replications and broader variations in beta dispersion, expenditure
+shares, and survey-like dependence to study the coverage/error frontier.
+Empirical validation needs a declared country sample and reserved outcomes;
+true-welfare MSE is unavailable there. Candidate selection belongs inside
+training data, with a further untouched sample for assessing the selected
+procedure. An anchor basket, alternative preparation policies, and a loss
+for unscored households remain explicit choices. None prevents using this
+evaluator now.
