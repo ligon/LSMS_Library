@@ -201,3 +201,114 @@ by haste.
 - =crop_production= and =livestock= would be GhanaLSS's first agricultural
   tables, so =Feature('crop_production')= gains a country -- worth a
   cross-country check once built.
+
+* Decisions taken (@ligon, 2026-09-16)
+
+Index =(t, i, j)=, no =u=.  Input-spend column named =Cost=.  =plot_labor=
+deferred.  =Quantity= included -- see the caveat under "Dispositions" below.
+
+* Dispositions: what the four of them mean
+
+Part B does not ask a harvest quantity.  What it asks is *where the harvest
+went*, use by use, and what each part was worth.  Four uses are asked here and
+a fifth is asked elsewhere:
+
+| use            | asked | flag      | value     | question                                       |
+|----------------+-------+-----------+-----------+------------------------------------------------|
+| sold           | Q4/Q6 | --        | =CROPSP=  | "How much was the harvest of [...] sold for?"  |
+| kept for seed  | Q7/Q8 | =CROPK=   | =CROPKV=  | "How much would the same quantity of seed cost in the market?" |
+| given away     | Q9/Q10| =CROPP=   | =CROPPV=  | "Did you give part of the harvest to laborers, or to a land owner, or as a gift, or for ceremonies and fetishes?" |
+| lost           |Q11/Q12| =CROPL=   | =CROPLV=  | "Have you lost any part of the harvested crop to insects, rodents, fire, rotting etc.?" |
+| *eaten*        | *not in Section 9* | | | Section 12B, already wired as =derive_12b_fortnight_value= |
+
+=CROPL= is not a yes/no but a *cause* code, verified against the form:
+1 INSECTS, 2 RODENTS, 3 FIRE, 4 ROTTING, 5 OTHER/COMBINATION, 6 NO.  (A first
+pass over the fax misread 4 as "NOTHING"; it is ROTTING.)
+
+The flags and the values agree exactly -- GLSS1 =CROPK= YES = 6,152 and
+=CROPKV= non-null = 6,152; =CROPP= YES = 6,803 against 6,804 -- so there are no
+orphan values to reconcile.
+
+** The valuation basis is NOT the same across the four
+
+This is the part that matters economically and is invisible in the variable
+names:
+
+- =CROPSP= (sold) is what the household *received*.
+- =CROPKV=, =CROPPV=, =CROPLV= each answer "how much would the same quantity
+  *cost in the market*" -- an imputed *replacement* price, i.e. the buyer's
+  side of the farmgate/market gap, normally above what the household would get.
+
+So adding the four gives a total in *mixed prices*.  The repo already takes
+this distinction seriously: =.coder/ledger/585-own-production-valuation.md=
+requires a valuation's docstring to "state which side of the farmgate/market
+gap it lands on", and =GhanaLSS/_/CONTENTS.org= records the same contrast
+between Section 8H (farmgate) and Section 12B's =VFOODCPD= ("what it would cost
+to buy").  Carrying the four separately, which is what the canonical wide shape
+does anyway, keeps the choice with the analyst.
+
+** What each disposition IS, economically
+
+- *Seed* is an intermediate input, not final output: this season's harvest
+  retained as next season's input.
+- *Given* is a MIXED category and cannot be split.  Grain to labourers is a
+  wage in kind and grain to a land owner is rent in kind -- both factor
+  payments -- while gifts and ceremonies are transfers.  Counting the category
+  as output without also counting the factor-payment part as a cost overstates
+  profit.
+- *Lost* is realized output that perished.  For a production function
+  (technology) it belongs in output; for a revenue or profit function it does
+  not.
+- *Sold* is the only one measured at a transaction price.
+
+** Practical hazard: =CROPSP= is a PRICE PER UNIT, not a total
+
+=CROPSP= is denominated by =CROPSPU=, which draws on the same unit-code list as
+=CROPSU= (1 pound, 2 kilogram, 3 ton, 4 minibag, 5 maxibag, ..., 22 ALL).  The
+medians form a clean price ladder by unit size, which is what a per-unit price
+looks like and not what a total looks like:
+
+| =CROPSPU=       | median =CROPSP= (1987-88) |
+|-----------------+---------------------------|
+| 1 pound         |                        50 |
+| 2 kilogram      |                        75 |
+| 4 minibag       |                     1,600 |
+| 5 maxibag       |                     4,400 |
+| 3 ton           |                     7,500 |
+
+So =Value_sold= is *not* =CROPSP=.  It is =CROPSP= when =CROPSPU= = 22 (ALL),
+and =CROPSP= x (quantity expressed in =CROPSPU= units) otherwise -- and
+=CROPS= is denominated in =CROPSU=, which is not always the same unit, so the
+conversion has to go through =CROPSUK= (kg per sold unit) where it exists.
+
+This is GH *#824* ("crop_production: sale value is per SOLD unit but the table
+carries only the HARVEST unit =u=") appearing in a new country.  Read that
+issue before wiring =Value_sold=.
+
+Coverage note: =CROPSP= is populated on ~38% of rows (6,445 / 16,938 in GLSS1),
+consistent with most crop rows recording no sale at all; =CROPS= is non-null
+almost everywhere but is zero where nothing was sold.
+
+** Consequence for =Quantity=
+
+@ligon asked for =Quantity= to be included.  It has to be declared
+=optional: true= and will be *entirely NaN*: Part B asks quantity SOLD
+(=CROPS=) and never quantity harvested, and the other three dispositions are
+asked as values, not quantities, so no harvest quantity can be reconstructed.
+=optional: true= is also what keeps Site B of the null-read guard from raising
+=NullReadError= on a required all-null column.
+
+** Proposed names
+
+Parallel to the established =Value_sold=:
+
+| column        | source    |
+|---------------+-----------|
+| =Value_seed=  | =CROPKV=  |
+| =Value_given= | =CROPPV=  |
+| =Value_lost=  | =CROPLV=  |
+| =LossCause=   | =CROPL=   |
+
+=LossCause= is free information (insects / rodents / fire / rotting / other)
+and worth keeping.  The one thing the names do not convey is the valuation
+asymmetry above, which therefore belongs in the column notes.
