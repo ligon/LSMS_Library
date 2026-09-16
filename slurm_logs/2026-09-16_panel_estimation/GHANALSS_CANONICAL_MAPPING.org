@@ -616,3 +616,88 @@ The tempting fix for those rows is acreage x an assumed yield.  For a
 regressed on land, manufacturing the land coefficient.  Whatever is done with
 those rows, it must not be that.  Leaving them missing is honest; the 12B proxy
 is defensible if labelled; imputing from the regressor is not.
+
+* FINAL DESIGN (all decisions taken, 2026-09-16)
+
+@ligon: "We should not make up values for those missing rows.  Dealing with
+that missingness is a job for the downstream analysis.  If we need prices for
+some derived_value and don't have it directly we should use the median price
+ladder."
+
+** The two instructions turn out to be one
+
+=median_price_valuation= *values a quantity*: its step 3 is
+=out_col = imputed_price x quantity_col=.  The subsistence rows have no
+quantity, so the ladder is *structurally unable* to value them -- there is
+nothing to multiply.  "Do not make up values" and "use the ladder where a
+price is needed" therefore never conflict here.  Rows the instrument left
+empty stay =NaN=; downstream decides.
+
+** Where the ladder DOES apply: the =Value_sold= residual, and it is small
+
+Rung 3 below is its only use, and it governs *130 rows in 1987-88 and 69 in
+1988-89* -- 2.0% and 0.95% of sale rows, 0.5% of the table.  That is a fact
+worth putting in front of a reader before building the machinery: leaving those
+rows =NaN= is also defensible, and costs 199 rows out of 37,280.
+
+*Recommendation*: leave them NaN in the first pass, and record the rung as the
+sanctioned extension if a user ever needs them.  Building a geography-median
+ladder for 0.5% of rows is machinery ahead of demand -- and it is not
+"missingness" in the sense above, it is a unit mismatch, so the ladder would be
+a genuine derivation rather than fabrication if it is ever wanted.
+
+** =Value_sold=: the rule, as layers
+
+: rung 1  CROPSPU == 22 (ALL)    -> Value_sold = CROPSP              (test FIRST)
+: rung 2  CROPSPU == CROPSU      -> Value_sold = CROPSP * CROPS
+: rung 3  otherwise, kg known    -> median_price_valuation           [NOT BUILT]
+: rung 4  otherwise              -> NaN
+
+Rung 1 must be tested before rung 2: =CROPSU= is itself 22 on many rows, so the
+two masks overlap and a same-unit-first test misroutes them (this is what
+produced the spurious yam "overshoot").
+
+If rung 3 is ever built it needs a =Value_soldSource= column naming the rung,
+following =KgFactorSource= / =FOOD_KG_FACTOR_LAYERS=; and note its geography
+must come from =Y09B.CLUST= directly, because the derivation runs in the wave
+script *before* =_join_v_from_sample= puts =v= on the frame.
+
+** The tables, final
+
+*** =crop_production=, index =(t, i, j)=
+
+| column          | source                     | note |
+|-----------------+----------------------------+------|
+| =Quantity=      | --                         | =optional: true=, entirely NaN; never asked |
+| =Quantity_sold= | =CROPS=                    | denominated in =Unit_sold=, NOT kg |
+| =Unit_sold=     | =CROPSU=                   | canonical optional |
+| =KgFactor=      | =CROPSUK=                  | kg per =Unit_sold= (see the naming caveat above) |
+| =Value_sold=    | derived, rungs 1-2         | =Derivation= stamped |
+| =Value_seed=    | =CROPKV=                   | market replacement value |
+| =Value_given=   | =CROPPV=                   | market replacement value |
+| =Value_lost=    | =CROPLV=                   | market replacement value |
+| =LossCause=     | =CROPL=                    | insects/rodents/fire/rotting/other |
+| =Area_ha=       | =CROPH= / 2.47105          | EthiopiaRHS precedent |
+| =intercropped=  | =CROPD=                    | |
+| =Derivation=    | --                         | =optional: true=; add to canonical =Columns= |
+
+*** =plot_inputs=, index =(t, i, input, crop)=
+
+=u: str=, =Quantity: float=, =Cost: float=, =Purchased: bool= -- all *columns*,
+=u= deliberately not an index level (four of seven inputs are amount-only).
+
+*** =livestock=, index =(t, i, animal)=
+
+=HeadCount=, =HeadSold=, =HeadAcquired=, =HerdValue=, =SalesValue= map
+directly; =ValuePerAnimal= is a derivation (=HerdValue / HeadCount=, Q5 being
+explicitly "altogether").  Q12-Q14 (born/received, *eaten*, lost/stolen/died)
+have no canonical home and are worth carrying.
+
+*** =plot_labor= -- deferred.
+
+** Out of scope, by decision
+
+No 12B splice into =crop_production=; no acreage-based imputation; no
+value fabricated anywhere.  Section 12B own-consumption remains available to
+the analyst through =food_acquired(s='produced')=, which is already derived for
+both waves -- as a *consumption* proxy for production, which is what it is.
