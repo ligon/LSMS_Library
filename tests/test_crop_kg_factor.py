@@ -45,8 +45,10 @@ _DATA_INFO = Path(__file__).resolve().parent.parent / "lsms_library" / "data_inf
 KNOWN_UNIT = "kg"
 UNKNOWN_UNITS = ("sack", "basket", "drum")
 # 'pound' is in KNOWN_METRIC (0.453592) and is NOT the kilogram unit, so the
-# reported and inferred layers can both have a value on the same row without
-# tripping the "a Kg row must weigh 1" rule.
+# reported and metric layers can both have a value on the same row without
+# tripping the "a Kg row must weigh 1" rule.  (It was the `inferred` layer
+# until GH #929 split the READ half of it out; every resolvable unit in this
+# file's fixtures is metric, so none of them exercises price-ratio inference.)
 POUND, POUND_KG = "pound", 0.453592
 
 
@@ -112,12 +114,19 @@ def test_all_nan_kgfactor_column_changes_nothing():
     assert_frame_equal(without, with_col)
 
 
-def test_only_the_inferred_layer_acts_without_reports():
+def test_only_the_bottom_layers_act_without_reports():
+    """No report -> the ladder falls through to the unit-derived layers.
+
+    Named for the layers rather than for `inferred` since GH #929: BASE_ROWS'
+    resolvable unit is `kg`, which is READ from KNOWN_METRIC, so it lands in
+    `metric`.  `inferred` (price-ratio) is asserted to be 0 here, which is the
+    substantive claim -- nothing in this fixture is guessed.
+    """
     f = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False))
     assert f.attrs["kg_factor_sources"] == {
-        "reported": 0, "shipped": 0, "survey_median": 0, "inferred": 2,
-        "none": 2, "reported_implausible": 0, "shipped_implausible": 0,
-        "shipped_matched": 0}
+        "reported": 0, "shipped": 0, "survey_median": 0, "metric": 2,
+        "inferred": 0, "none": 2, "reported_implausible": 0,
+        "shipped_implausible": 0, "shipped_matched": 0}
 
 
 def test_returned_frame_carries_only_harvest_kg():
@@ -142,12 +151,12 @@ def test_reported_factor_wins_and_converts_an_unknown_unit():
         # Not the KILOGRAM unit -- a Kg row reporting 3.0 is a mis-key and the
         # plausibility screen rejects it (see the screen tests below).
         ("2019-20", "h1", "h1-1-1", "Beans", POUND, "dried", "A", 5.0, 0.5),
-        # No report -> the inferred layer.
+        # No report -> the metric layer (KNOWN_UNIT is 'kg', which is READ).
         ("2019-20", "h2", "h2-1-1", "Maize", KNOWN_UNIT, "dried", "A", 7.0, np.nan),
     ]
     df = _frame(rows)
     f = harvest_kg_factors(df)
-    assert list(f["KgFactorSource"]) == ["reported", "reported", "inferred"]
+    assert list(f["KgFactorSource"]) == ["reported", "reported", "metric"]
     assert list(f["kg_per_unit"]) == [100.0, 0.5, 1.0]
 
     res = harvest_kg(df)
@@ -164,7 +173,7 @@ def test_unusable_reported_factor_falls_through(bad):
         ("2019-20", "h2", "h2-1-1", "Beans", "sack", "dried", "A", 4.0, bad),
     ]
     f = harvest_kg_factors(_frame(rows))
-    assert list(f["KgFactorSource"]) == ["inferred", "none"]
+    assert list(f["KgFactorSource"]) == ["metric", "none"]
     assert f["kg_per_unit"].iloc[0] == 1.0
     assert pd.isna(f["kg_per_unit"].iloc[1])
     assert f.attrs["kg_factor_sources"]["reported"] == 0
@@ -261,7 +270,7 @@ def test_kilogram_unit_must_weigh_one():
          2.0, 1.005),
     ]
     f = harvest_kg_factors(_frame(rows))
-    assert list(f["KgFactorSource"]) == ["inferred", "reported"]
+    assert list(f["KgFactorSource"]) == ["metric", "reported"]
     assert list(f["kg_reported_rejected"]) == [True, False]
     assert f["kg_per_unit"].iloc[0] == 1.0          # NOT clipped, NOT rescaled
     assert f["kg_per_unit"].iloc[1] == 1.005
@@ -316,7 +325,8 @@ def test_the_screen_count_rides_beside_a_partition_that_still_sums():
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # ... and the rejected row is served by one of them, not lost
     assert counts == {"reported": 1, "shipped": 0, "survey_median": 0,
-                      "inferred": 1, "none": 2, "reported_implausible": 1,
+                      "metric": 1, "inferred": 0, "none": 2,
+                      "reported_implausible": 1,
                       "shipped_implausible": 0, "shipped_matched": 0}
 
 
@@ -414,7 +424,8 @@ def test_provenance_counts_sum_to_the_input_row_count():
                                                    "shipped_matched"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     assert counts == {"reported": 2, "shipped": 0, "survey_median": 0,
-                      "inferred": 1, "none": 1, "reported_implausible": 0,
+                      "metric": 1, "inferred": 0, "none": 1,
+                      "reported_implausible": 0,
                       "shipped_implausible": 0, "shipped_matched": 0}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # Two rows survive the sum: the zero-Quantity row drops despite being
@@ -477,7 +488,7 @@ def test_companion_exposes_every_layer_for_auditing():
     assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_reported",
                                "kg_reported_rejected", "kg_shipped",
                                "kg_shipped_rejected", "kg_shipped_source",
-                               "kg_survey_median", "kg_inferred"]
+                               "kg_metric", "kg_survey_median", "kg_inferred"]
     by_unit = f.groupby(f.index.get_level_values("u"))[
         ["kg_reported", "kg_inferred"]].median()
     assert by_unit.loc[POUND, "kg_reported"] == 2.0
@@ -565,5 +576,10 @@ def test_uganda_harvest_kg_baseline():
     assert res["Harvest_kg"].sum() == pytest.approx(28_680_848.595393997, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
         "reported": 14_050, "shipped": 0, "survey_median": 57,
-        "inferred": 86_978, "none": 29_521, "reported_implausible": 99,
-        "shipped_implausible": 0, "shipped_matched": 0}
+        "metric": 86_978, "inferred": 0, "none": 29_521,
+        "reported_implausible": 99, "shipped_implausible": 0,
+        "shipped_matched": 0}
+    # GH #929: all 86,978 moved from `inferred` to `metric` and NOTHING else
+    # changed -- same Harvest_kg sum, same row counts.  Uganda's crop factors,
+    # like Ethiopia's, are entirely READ; the price-ratio inference serves this
+    # country nothing.
