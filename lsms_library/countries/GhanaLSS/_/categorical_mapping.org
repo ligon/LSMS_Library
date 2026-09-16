@@ -510,15 +510,44 @@ does not exist anywhere in that file (it evaluated to =#+results: : None=).
 
 *No =Aggregate Label= column, deliberately.*  The seven WAVE-level
 =harmonize_food= tables do carry one, but they cannot simply be unioned:
-measured, 14 Preferred Labels take two different Aggregate values across
-waves (=Palm Nut= -> {=Palm Nut=, =Pulses, Nuts=}; =Snail= -> {=Fish=,
-=Snail=}; =Beef (corned)= -> {=Beef=, =Corned Beef=}; ...), 9 of this
-table's 195 distinct Preferred Labels appear in no wave table at all, and
-one wave value carries mojibake (=Cooked Rice and Stew Ê Ê=).  Choosing
-among those is curation requiring the CFE beta-spread test
-(=max(beta) - min(beta) < 1.348 * sigma_min=), not a mechanical move; see
-=.claude/skills/add-feature/food-acquired/SKILL.md=.  So =labels='Aggregate'=
-still raises here, correctly, while every other column now resolves.
+measured, *13* Preferred Labels take two different Aggregate values across
+waves, and 9 of this table's 195 distinct Preferred Labels appear in no wave
+table at all.  Choosing among those is curation requiring the CFE beta-spread
+test (=max(beta) - min(beta) < 1.348 * sigma_min=), not a mechanical move; see
+=.claude/skills/add-feature/food-acquired/SKILL.md=.
+
+*Read the shape of the 13, not just the count.*  In *12* of them one wave's
+Aggregate simply *is* the Preferred Label, against a coarser bucket in another
+wave: =Coconut= -> =Coconut= (GLSS1, GLSS2) vs. =Pulses, Nuts= (GLSS3, GLSS4);
+=Snail= -> =Snail= (three waves) vs. =Fish= (GLSS7); =Groundnut= -> =Groundnut=
+vs. =Pulses, Nuts=.  Note that =Pulses, Nuts= is ONE label containing a comma,
+not two.  Only *=Beef (corned)=* is bucket-against-bucket (=Beef= in GLSS3 vs.
+=Corned Beef= in GLSS5-7).  That asymmetry matters to whoever curates this:
+an identity Aggregate is ambiguous from the table alone --- it can mean "this
+item is its own category" or "nobody filled the cell in" --- and the two want
+opposite treatment.  The table cannot tell you which; the questionnaire can.
+
+So =labels='Aggregate'= still raises here, correctly.  Every other column
+*resolves without raising*, which is not the same as resolving usefully: a
+column labels only the items its own round carried, so =labels='1987-88'= today
+leaves 142 of this table's 195 distinct Preferred Labels unlabelled (146 blank
+rows).  Since GH #925 they keep their
+Preferred Label; before it they were renamed to the empty string and, under
+=food_expenditures='s =reaggregate=True=, summed into a single unnamed =j=
+bucket --- *129 served foods* over 55,314 rows, Expenditure conserved, so
+nothing warned.  (129, not 146: blank rows, distinct Preferred Labels and foods
+that actually reach the served frame are three different counts.)  See
+=slurm_logs/relabel_j_empty_string/=.
+
+*The count was 14 until 2026-09-12, and the fourteenth is instructive.*
+2012-13 code 262's Aggregate carried a mojibake twin of code 254's clean
+=Cooked Rice and Stew=, so that label held two Aggregate values for no
+curatorial reason at all.  =5dd3720fe= repaired it on a parallel branch that
+merged in afterwards, and this passage was not revisited --- see
+=CONTENTS.org=, which has recorded the repair since.  Re-check every number
+above with
+=slurm_logs/relabel_j_empty_string/verify_ghanalss_aggregate_prose.py=
+rather than trusting this paragraph.
 
 *Wave-level shadowing, on the record (GH #783 scope item 3).*
 =Wave.categorical_mapping= is =dict(country)= then =.update(wave)=, so in
