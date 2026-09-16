@@ -167,3 +167,56 @@ all), so true output is higher and the true ratio lower.
    not one person working 371 days.  Do not read it as a person-equivalent.
 4. The person-day share and any value share are not independent evidence: one
    wage converts both sides.
+
+* Adding family and hired labour into one input
+
+@ligon, 2026-09-16: "if we can get hired labor into person-days or household
+labor into costs we can *add* the two (yes, there are issues) and avoid the
+log(0) problem for all well-measured cases."
+
+Done in PERSON-DAYS, the corpus unit: =family_days= = annual hours / 5,
+=hired_days= = hired cost / the day wage, =exchange_days= as recorded.
+
+| wave    | family | hired | exchange | TOTAL |
+|---------+--------+-------+----------+-------|
+| 1987-88 |  371.2 |  14.0 |     12.0 | 390.2 |
+| 1988-89 |  284.2 |  16.0 |     15.0 | 305.0 |
+
+** The log(0) problem for labour is GONE
+
+*Zero of 4,842 household-years have =labor_days= == 0.*  Family labour is
+positive almost everywhere, so the sum always is.
+
+** But the core sample barely moves, and the gain is elsewhere
+
+| specification                                   | households, both waves |
+|-------------------------------------------------+------------------------|
+| OLD core:  output, land, FAMILY labour           |                    504 |
+| NEW  core: output, land, TOTAL labour-days       |                *506* |
+| OLD full:  + hired cost + input cost, SEPARATE   |                    232 |
+| NEW  full: + input cost (labour aggregated)      |                *333* |
+
+The core gains 2 households, because family labour was already positive nearly
+everywhere -- the aggregation PROTECTS against zeros rather than recovering a
+loss.  The real gain is the full specification: *232 -> 333, +44%*, because it
+no longer conditions on hired spend being positive.
+
+Identification does not suffer: the within-household share of log variance is
+0.195 for =labor_days= against 0.202 for =family_days=.
+
+** What still binds: input cost
+
+=input_cost= is zero or missing in about a quarter of household-years, which is
+what takes 506 down to 333.  The same trick does not apply -- fertilizer cannot
+be added to labour-days -- so that regressor needs its own treatment (a use
+indicator plus an intensity term, or a levels specification), not a silent
+listwise drop.
+
+The log(0) problem is now ONE regressor rather than two.
+
+** An extensive/intensive distinction worth keeping straight
+
+Hired labour is *used by 52.3% of household-years* but is only about *5% of
+labour days*.  Widespread and small.  Exchange labour is used by 23.9%.  A
+statement like "hired labour is 5% of farm labour" is about the intensive
+margin and should not be read as "few farms hire".
