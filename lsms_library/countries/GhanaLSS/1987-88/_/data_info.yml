@@ -127,3 +127,31 @@ crop_production:
         SoldUnitRaw:
             - CROPSU
             - mappings: ['agric_unit', 'Code', 'Label']
+
+livestock:
+    # Section 9 Part F, PDF p.53 block 9F.  See `_/data_scheme.yml` for why
+    # ValuePerAnimal is read and HerdValue derived, and not the reverse.
+    file: Y09F.DAT
+    idxvars:
+        i: HID
+        animal:
+            - LIVSTCD
+            - mappings: ['agric_animal', 'Code', 'Label']
+    myvars:
+        # Q4 "How many of all ages are owned by your household at present?"
+        HeadCount: LIVSTN
+        # Q5, per head -- NOT the herd (measured; see data_scheme.yml).
+        ValuePerAnimal: LIVSTNV
+        # Q7 / Q8 "How many have they sold?" / "How much altogether have they
+        # received from sales ... during the past 12 months?" -- a TOTAL.
+        HeadSold: LIVSTSN
+        SalesValue: LIVSTSV
+        # Q10 / Q11 "How many did they buy?" / "How much did they pay
+        # altogether for all the ... they bought?" -- also a total.
+        HeadAcquired: LIVSTBN
+        PurchaseValue: LIVSTBV
+        # Q12 born or received as gifts; Q13 eaten by the household;
+        # Q14 lost, stolen, given as gifts, sacrificed or died.
+        HeadBornOrReceived: LIVSTAD
+        HeadEaten: LIVSTE
+        HeadLostOrDied: LIVSTDI

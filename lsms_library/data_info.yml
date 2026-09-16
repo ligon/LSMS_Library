@@ -471,6 +471,15 @@ Columns:
     # Three distinct quantities were all spelled `Value`.  They share a dtype,
     # a grain and a currency, so nothing in the library could tell them apart
     # and all three graded `sane`.  Summing the wrong one is silent.  The
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of the
+        construction behind a served value, NA on a reported row.  First
+        instance here: `GhanaLSS::livestock::9f-herd-value-from-unit-price`,
+        where Section 9 Part F records a price PER HEAD, so `HerdValue` is
+        constructed as HeadCount x ValuePerAnimal rather than read.
     # split is by WHAT ARITHMETIC IS LEGAL:
     #
     #   ValuePerAnimal  price per head          -- NOT additive

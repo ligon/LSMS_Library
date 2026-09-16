@@ -964,3 +964,90 @@ def inputs_9b(wave):
         'CROPSP': df['CROPSP'], 'CROPSPU': df['CROPSPU'],
     })
     return out.set_index(['t', 'i', 'j'])
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 9 Part F -- herd value, DERIVED (2026-09-16)
+#
+# Registry: _/derivations.yml, key GhanaLSS::livestock::9f-herd-value-from-unit-price.
+# ---------------------------------------------------------------------------
+
+#: Registry key stamped on every row `derive_9f_herd_value` served.
+HERD_VALUE_DERIVATION = 'GhanaLSS::livestock::9f-herd-value-from-unit-price'
+
+
+def derive_9f_herd_value(head_count, value_per_animal):
+    """Total value of the household's herd of one animal, ``HeadCount x ValuePerAnimal``.
+
+    Section 9 Part F Q5 asks "If they wanted to sell one of these [...] today,
+    how much money would they receive altogether?".  The wording is ambiguous
+    between a price per head and a value for the whole herd, so which one it
+    is was MEASURED rather than read:
+
+    * ``corr(log HeadCount, log LIVSTNV)`` is -0.16..+0.08 across every animal
+      type -- no relation at all between herd size and the reported value;
+    * chickens report a median 400 at both 4 head and 20 head, cattle 20,000
+      at both 2 head and 15;
+    * Q8's SALE value, by contrast, does move with the number sold
+      (corr 0.65-0.80), and ``SalesValue / HeadSold`` recovers this same
+      number almost exactly -- chickens 400, cattle 20,000.
+
+    It is therefore a PRICE PER HEAD, and the additive herd value the
+    canonical schema documents (``HerdValue``: "ADDITIVE ... at (t, i,
+    animal)") has to be constructed.  That is the reverse of most countries,
+    where the herd value is recorded and the unit price is not.
+
+    NaN where either factor is missing -- a household not currently raising
+    the animal answers neither (Q3 routes past both), so the product is
+    correctly absent rather than zero.
+
+    Vectorised and elementwise; returns a float ndarray.
+    """
+    return _as_float(head_count) * _as_float(value_per_animal)
+
+
+def livestock_from_9f(df):
+    """Shared ``df_edit`` body for the GLSS1/GLSS2 ``livestock`` table.
+
+    Adds the derived ``HerdValue`` and stamps the registry key on the rows it
+    served.  Everything else in the table is a recorded answer and carries NA
+    in ``Derivation``.
+    """
+    df = df.copy()
+    value = derive_9f_herd_value(df['HeadCount'], df['ValuePerAnimal'])
+    df['HerdValue'] = value
+    df['Derivation'] = pd.Series(
+        np.where(pd.notna(value), HERD_VALUE_DERIVATION, pd.NA),
+        index=df.index, dtype='string')
+    return df
+
+
+def inputs_9f(wave):
+    """The raw Section 9F answers behind the derived ``HerdValue`` rows.
+
+    Indexed ``(t, i, animal)`` -- ``i`` via the wave's own ``mapping.i()``,
+    ``animal`` via the same ``agric_animal`` decode the YAML uses.
+    ``(HID, LIVSTCD)`` is unique in both waves (3,060 and 3,347 rows, zero
+    duplicates), so this joins one-to-one to the served rows.  Nothing is
+    cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile, format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 9 agro-pastoral exists only in 1987-88 and 1988-89, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / 'Data' / 'Y09F.DAT'))
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_9f_{wave}')
+    labels = df_from_orgfile(str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+                             name='agric_animal', encoding='ISO-8859-1')
+    lab = (labels.assign(Code=labels['Code'].astype('Int64').astype('string'))
+                 .set_index('Code')['Label'].to_dict())
+    out = pd.DataFrame({
+        't': wave,
+        'i': df['HID'].apply(mapping.i),
+        'animal': df['LIVSTCD'].apply(format_id).astype('string').replace(lab),
+        'LIVSTCD': df['LIVSTCD'],
+        'LIVSTN': df['LIVSTN'], 'LIVSTNV': df['LIVSTNV'],
+    })
+    return out.set_index(['t', 'i', 'animal'])

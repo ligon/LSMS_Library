@@ -384,3 +384,40 @@ Data Scheme:
     # a key starting with "derivation" in a data_scheme.yml is banned outright
     # by tests/test_derivations.py::test_nothing_in_a_data_scheme_names_a_derivation,
     # because `_SCHEME_NON_COLUMN_KEYS` would read it as a required column.
+
+  # GLSS1/GLSS2 Section 9 Part F (Livestock).  1987-88 and 1988-89 only.
+  # One row per (household, animal); (HID, LIVSTCD) is unique in both waves.
+  #
+  # `ValuePerAnimal` is the RECORDED value and `HerdValue` the DERIVED one --
+  # the opposite way round from most countries, and measured rather than read
+  # off Q5's wording ("if they wanted to sell one of these today, how much
+  # would they receive altogether?", which is ambiguous).  Within every animal
+  # type the reported value does NOT move with herd size: corr(log HeadCount,
+  # log LIVSTNV) runs -0.16..+0.08, chickens report 400 at both 4 head and 20,
+  # cattle 20,000 at both 2 head and 15.  Q8's SALE value does move with the
+  # number sold (corr 0.65-0.80) and is a total, and dividing it by HeadSold
+  # recovers ValuePerAnimal almost exactly (chickens 400, cattle 20,000).
+  #
+  # The last four columns have no canonical counterpart and are carried
+  # because the survey asked them; `HeadEaten` in particular is livestock
+  # own-consumption, the exact parallel of the crop own-consumption gap.
+  livestock:
+    index: (t, i, animal)
+    HeadCount: float
+    ValuePerAnimal: float
+    HerdValue: float
+    HeadSold: float
+    SalesValue: float
+    HeadAcquired: float
+    PurchaseValue:
+      type: float
+      optional: true
+    HeadBornOrReceived:
+      type: float
+      optional: true
+    HeadEaten:
+      type: float
+      optional: true
+    HeadLostOrDied:
+      type: float
+      optional: true

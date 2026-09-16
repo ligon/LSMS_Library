@@ -243,3 +243,19 @@ def crop_production(df):
     _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
     _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
     return _c.crop_production_from_9b(df)
+
+
+def livestock(df):
+    """df_edit hook: Section 9 Part F -> the canonical ``livestock``.
+
+    Thin wave-level wrapper; the body is shared by both panel waves and lives
+    in the country module as ``livestock_from_9f``.  It adds the derived
+    ``HerdValue`` (Q5 records a price per head, not a herd value -- measured,
+    see that docstring) and stamps the derivation key.
+    """
+    import importlib.util as _ilu
+    from lsms_library.paths import countries_root
+    _p = countries_root()/'GhanaLSS'/'_'/'ghanalss.py'
+    _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
+    _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
+    return _c.livestock_from_9f(df)

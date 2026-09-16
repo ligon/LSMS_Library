@@ -263,3 +263,46 @@ GhanaLSS::crop_production::9b-sale-amount-per-unit:
     should sit below the cluster market price for the same crop and round.
   contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part B records a sale PRICE, not a sale value"
   since: '2026-09-16'
+
+GhanaLSS::livestock::9f-herd-value-from-unit-price:
+  waves: ['1987-88', '1988-89']
+  columns: [HerdValue]
+  rule: >-
+    HerdValue = HeadCount * ValuePerAnimal (Y09F.LIVSTN * Y09F.LIVSTNV), NaN
+    where either factor is missing.  Section 9 Part F Q5 -- "If they wanted to
+    sell one of these [...] today, how much money would they receive
+    altogether?" -- records a price PER HEAD, not the value of the herd, so the
+    additive HerdValue the canonical schema documents has to be constructed.
+    That is the reverse of most countries, where the herd value is recorded.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_9f_herd_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_9f
+  raw_variables: [Y09F.LIVSTN, Y09F.LIVSTNV]
+  assumptions:
+    - text: >-
+        Q5 records a price per head rather than a value for the whole herd.
+        The form's wording is ambiguous ("sell ONE of these ... receive
+        ALTOGETHER"), so this was measured, not read: corr(log HeadCount,
+        log LIVSTNV) is -0.16..+0.08 across every animal type, chickens report
+        a median 400 at both 4 head and 20 head, and cattle 20,000 at both 2
+        head and 15 -- a herd value would scale with the herd and does not
+      basis: modelling-choice
+      evidence: >-
+        slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org;
+        the cross-check is that Q8's sale value DOES move with the number sold
+        (corr 0.65-0.80) and SalesValue / HeadSold recovers the same per-head
+        figure (chickens 400, cattle 20,000)
+    - text: >-
+        a household not currently raising the animal answers neither factor
+        (Q3 routes past both), so the product is left NaN rather than zero
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.53, form block 9F column 3
+        skip instruction
+  validated_against: >-
+    Internally cross-checked, not against an external series: Q8's sale value
+    divided by HeadSold recovers ValuePerAnimal to within rounding on the two
+    animals with enough sale rows to compare (chickens 400 vs 400, cattle
+    20,000 vs 20,000), which is what establishes that Q5 is a per-head price
+    and hence that this product is the herd value.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part F records a price per head"
+  since: '2026-09-16'

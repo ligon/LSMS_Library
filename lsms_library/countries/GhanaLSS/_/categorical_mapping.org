@@ -1838,3 +1838,27 @@ label is =No Loss=, not =None=, which would read as a missing value.
 |    4 | Rotting           |
 |    5 | Other/Combination |
 |    6 | No Loss           |
+
+Section 9 Part F (Livestock), PDF p.53, form block =9F=.  Labels are the
+corpus's existing =animal= vocabulary (Benin, Burkina Faso, Cote d'Ivoire and
+Ethiopia all serve =Cattle= / =Chicken= / =Goats= / =Sheep= / =Pigs= /
+=Rabbits= / =Other Poultry=), not the form's own wording, so
+=Feature('livestock')= lines up across countries.
+
+Two codes are BROADER than the label they take, and the form's wording is
+recorded here because the label loses it: code 6 is "Ducks, turkeys, guinea
+fowl, doves or other poultry" -- so =Other Poultry= here INCLUDES guinea fowl,
+which Benin and Burkina Faso report as a separate =Guinea Fowl= category -- and
+code 7 is "Rabbits or guinea pigs", served as =Rabbits=.
+
+#+name: agric_animal
+| Code | Label         |
+|------+---------------|
+|    1 | Cattle        |
+|    2 | Sheep         |
+|    3 | Goats         |
+|    4 | Chicken       |
+|    5 | Pigs          |
+|    6 | Other Poultry |
+|    7 | Rabbits       |
+|    8 | Other         |
