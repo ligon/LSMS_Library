@@ -93,57 +93,77 @@ comparison needs a wage.  One is recoverable from =labor= itself: rows that are
 agricultural and NOT own-farm are agricultural WAGE workers, and they carry
 =Earnings= with an =EarningsUnit=.
 
-** The wage
+** The wage: use the DAY rate
 
-| wave    | n usable | median cedis/hour | p25   | p75   |
-|---------+----------+-------------------+-------+-------|
-| 1987-88 |      200 |             40.65 | 23.91 | 55.06 |
-| 1988-89 |      241 |             41.19 | 25.00 | 75.00 |
+*CORRECTED 2026-09-16.*  A first pass put the Month / Week / Year-paid workers
+on an hourly basis and DROPPED the 208 =Day=-paid observations, because Parts
+B/C carry usual hours per week but no days per week.  That was backwards.
+Agricultural labour is paid *per day* unless a document says otherwise
+(@ligon), so the dropped observations were the representative ones and the
+retained ones are largely salaried positions -- a different labour market.
 
-Converted to an hourly rate only where the unit needs no extra assumption:
-=Hour= directly, =Week= / =HoursPerWeek=, =Month= / (=HoursPerWeek= x 4.333),
-=Year= / (=WeeksPerYear= x =HoursPerWeek=).
+The day rate needs no conversion at all:
 
-** What it shows
+| wave    |   n | median cedis/day | p25 | p75 |
+|---------+-----+------------------+-----+-----|
+| 1987-88 |  83 |              250 | 200 | 400 |
+| 1988-89 | 125 |              300 | 200 | 400 |
 
-Medians per household-year:
+*+20% nominal between the rounds*, which is what a high-inflation period should
+show.  The first pass gave 40.65 -> 41.19, a flat +1.3%, and that anomaly was
+flagged at the time without its cause being found: it was the wrong
+subsample, not a data defect.
 
-| wave    | family hours | hired hour-equiv | exchange days | family value | hired cost |
-|---------+--------------+------------------+---------------+--------------+------------|
-| 1987-88 |        1,856 |               86 |            12 |       75,450 |      3,500 |
-| 1988-89 |        1,421 |              117 |            15 |       58,531 |      4,800 |
+Median hours per day on agricultural work is *5.0* (n = 3,849), from the Parts
+E/G rows -- the only ones that ask.  So:
 
-Among the 3,230 household-years reporting BOTH, the median family share of
-labour value is *0.939* (p25 0.850, p75 0.974).  In aggregate, family labour
-valued at the wage is 241.5M / 197.8M cedis against 11.1M / 16.6M hired --
-*hired labour is about 6% of farm labour*.
+| route                                    | 1987-88 | 1988-89 |
+|------------------------------------------+---------+---------|
+| A  day rate / hours per day (AG LABOUR)   |   50.00 |   60.00 |
+| B  salaried workers, hourly (first pass)  |   40.65 |   41.11 |
+| ratio B/A                                 |    0.81 |    0.69 |
 
-** The sanity check that makes the wage credible, and its caveat
+The salaried route understates the agricultural wage by 19% and 31%.
 
-Family labour valued at the market wage comes to *1.02x and 0.96x total Section
-9B output value* (237.3M / 206.6M).  That is not obviously wrong -- it is the
-familiar smallholder result that valuing family time at the market wage
-exhausts farm output, i.e. the shadow wage lies below the market wage.
+** What it shows, in PERSON-DAYS
 
-It is also an UPPER bound, because the output measure is partial: Section 9
-never asks own consumption, and ~19% of cropped rows carry no Section 9 value
-at all.  True output is higher, so the true ratio is lower and leaves a
-positive residual for land and capital.
+Person-days is the corpus's own unit for =plot_labor=, so the comparison is
+reported there.  Family days = annual hours / 5; hired days = cost / day rate.
 
-** Four caveats
+| wave    | family days | hired days |
+|---------+-------------+------------|
+| 1987-88 |       371.2 |       14.0 |
+| 1988-89 |       284.2 |       16.0 |
 
-1. *208 Day-paid observations were dropped* -- 31% of the wage sample -- because
-   the Parts B/C rows carry usual hours per week but no days per week, so a
-   daily rate cannot be put on an hourly basis without an assumption.  If
-   day-paid work pays differently, the wage is biased.
-2. *The wage is thin*: only 716 of 23,585 agricultural person-job rows are
-   non-own-farm (3%), and 661 of those report earnings.
-3. *The nominal wage is flat across the waves* (40.65 -> 41.19, +1.3%) in a
-   period of substantial Ghanaian inflation.  Suspicious; check against a
-   deflator before using the two waves' wages interchangeably.
-4. *The hours-share equals the value-share by construction* when a single wage
-   both values family hours and deflates hired cost.  Reporting both as if they
-   corroborated each other would be circular.
+Among the 3,230 household-years reporting both, the median family share of
+person-days is *0.954* -- hired labour is about 5% of farm labour.  That share
+is robust to the wage choice in direction though not in level: a higher wage
+raises it, because family labour scales with the wage and hired cost does not.
 
-Exchange labour is left in person-days: converting it needs an hours-per-day
-assumption the survey does not supply.
+** Family labour valued at the wage now EXCEEDS output
+
+| wave    | family value | Section 9B output | ratio | (first pass) |
+|---------+--------------+-------------------+-------+--------------|
+| 1987-88 |  296,984,150 |       237,335,873 |  1.25 |         1.02 |
+| 1988-89 |  288,163,080 |       206,631,067 |  1.39 |         0.96 |
+
+Valuing family time at the market wage more than exhausts measured farm output.
+That is the familiar smallholder result -- the shadow wage lies below the market
+wage -- and the correction makes it stronger, not weaker.
+
+It remains an UPPER bound on the ratio: the output measure is partial (Section 9
+never asks own consumption; ~19% of cropped rows carry no Section 9 value at
+all), so true output is higher and the true ratio lower.
+
+** Residual caveats
+
+1. *The day-wage sample is small*: 83 and 125 observations.  Only 716 of 23,585
+   agricultural person-job rows are non-own-farm (3%).
+2. *Hours per day comes from a different population* than the wage -- the Parts
+   E/G rows, i.e. people whose 12-month job differed from their 7-day job.  It
+   is used to convert between days and hours in both directions, so an error in
+   it moves the hourly wage and the family-day count together.
+3. *Family days of 371 per household-year* is several members working part-time,
+   not one person working 371 days.  Do not read it as a person-equivalent.
+4. The person-day share and any value share are not independent evidence: one
+   wage converts both sides.
