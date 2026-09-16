@@ -1,0 +1,203 @@
+#+TITLE: GhanaLSS GLSS1/GLSS2 Section 9 -> canonical tables
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+
+Companion to =GHANALSS_SECTION9.org=, which inventories the source.  This note
+answers: which *canonical* tables can Section 9 populate, on what precedent,
+and where the canonical vocabulary has no slot for what the instrument asks.
+
+Scope, per @ligon 2026-09-16: *the two panel waves only* (1987-88, 1988-89).
+Later GLSS rounds do not extend the panel.
+
+* Where the canonical descriptions live
+
+- Index shapes :: =lsms_library/data_info.yml=, =Index Info > index_info=.
+- Column notes, spellings, required/optional :: same file, =Columns=.
+- Per-country declaration :: =countries/{C}/_/data_scheme.yml=.
+
+Two things worth knowing before reading the table below, because they change
+what "canonical" even constrains here:
+
+1. =crop_production=, =plot_features= and =livestock= are registered in
+   =index_info=.  *=plot_inputs= and =plot_labor= are NOT* -- that is open
+   issue *#569*.  They are governed entirely by per-country =data_scheme.yml=,
+   so their "canonical" shape is really the corpus convention.
+2. The =Columns= block is *not* an exhaustive column list.  It carries only
+   columns needing a note or a =spellings= block.  =crop_production.Quantity=,
+   for instance, appears in no =Columns= entry but is declared by every
+   country.  The operative vocabulary is what the countries agree on.
+
+* Land: yes, the canonical tables answer it -- but not via =plot_features=
+
+Canonically =Area= lives on *=plot_features=* (=(t, v, i, plot_id)=), as
+hectares, beside =AreaUnit= for the original survey unit.  That table is
+C4-validated *=not-asked=* for both panel waves: Section 9 has no farm-number
+column and no per-farm roster part.  So the canonical home for area is a table
+that legitimately does not exist here, and a synthetic =plot_id= is ruled out.
+
+*The precedent that resolves it is EthiopiaRHS* -- the corpus's other
+plot-less country (GH #512):
+
+: crop_production:
+:   index: (t, i, j, u)
+:   Quantity: float        # production, kg harvested
+:   Area_ha: float         # area planted, hectares
+
+It carries *area on the crop row*, not on a plot table.  GLSS1/GLSS2 Part B
+Q2 asks "how many *acres* of [crop] were harvested", i.e. exactly that shape --
+area per household-crop.  So =crop_production.Area_ha= (acres / 2.47105) is
+the conventional answer, with EthiopiaRHS as the named precedent.
+
+=Y09A.ACRFRM= (household total acres farmed) is a *second*, coarser land
+measure with no canonical home.  It should roughly equal the sum of =CROPH=
+over crops; the two disagreeing would be a useful check.  Recommend not
+wiring it initially.
+
+* The mapping, table by table
+
+** =crop_production= -- good fit, with one honest hole
+
+Index: =(t, i, j, u)= on the EthiopiaRHS precedent.
+
+| canonical column | GLSS1/2 | form | confidence |
+|------------------+---------+------+------------|
+| =Quantity=       | *none*  | never asked | *certain -- see below* |
+| =Quantity_sold=  | =CROPS=   | Q4 quantity | high |
+| =Unit_sold=      | =CROPSU=  | Q4 unit     | high |
+| =KgFactor=       | =CROPSUK= | Q5 "how many kilograms per [UNIT]" | high |
+| =Value_sold=     | =CROPSP=  | Q6 amount   | high |
+| =Area_ha=        | =CROPH=/2.47105 | Q2 acres harvested | high |
+| =intercropped=   | =CROPD=   | Q13         | high |
+
+=Unit_sold= and =KgFactor= are canonical *optional* columns (Uganda declares
+both).  =KgFactor='s canonical note -- "Kilograms per ONE unit of this row's
+=u=, AS THE INSTRUMENT REPORTS IT" -- describes =CROPSUK= exactly.
+
+*** =Quantity= is not asked, and must not be declared required
+
+Every other country declares =crop_production.Quantity= (harvest, in unit
+=u=).  Part B never asks it; it asks quantity *sold* only.  Declaring it
+required and all-null would trip *Site B* of the null-read guard ("required
+declared column 100% null in every wave") and raise =NullReadError= under
+=LSMS_READ_STRICT=1=.  So: declare it =optional: true=, or omit it.  Either is
+an honest statement that this instrument does not ask it; guessing a value
+from the sold quantity would not be.
+
+*** Open: what is =u=?
+
+Canonically =u= is the unit the *harvest* was measured in.  With no harvest
+quantity there is no such unit.  Two options, both defensible:
+
+- =(t, i, j, u)= with =u= = the sold unit (=CROPSU=).  Keeps the canonical
+  shape, but =u= then means something different than it does elsewhere --
+  and =Unit_sold= already holds that value, so it is duplicated.
+- =(t, i, j)=, no =u=.  Honest, and nothing forces =u=; but it departs from
+  the shape EthiopiaRHS kept deliberately ("degenerate here, but the canonical
+  shape carries =u= in the index uniformly").
+
+*I lean to the second* -- a duplicated level that means two things in two
+countries is worse than an absent one -- but it is your call.
+
+*** No canonical home: the disposition values
+
+=CROPKV= (value of crop kept for *seed*), =CROPPV= (value *given* to
+labourers/landowner/gifts), =CROPLV= (value *lost* to insects/rodents/fire/rot)
+are asked per crop and have *no counterpart anywhere in the corpus*.  They are
+new columns whatever we do.  They are also what makes a value-based output
+measure possible at all, so they are worth carrying.
+
+** =plot_inputs= -- excellent structural fit, no slot for spend
+
+Index: =(t, i, input, crop, u)= -- the *EHCVM precedent* (Benin, Togo, Burkina
+Faso, Cote d'Ivoire, Guinea-Bissau, Niger, Senegal all declare exactly this),
+which has *no plot level*.  GLSS1/2's input module is input x crop with no
+plot, so the shape matches without any adaptation.
+
+| canonical column | GLSS1/2 |
+|------------------+---------|
+| =Quantity=       | =FERTQNT=, =MANUQNT=, =INSCQNT= (fertilizer, manure, chemicals only) |
+| =u=              | =FERTQNTU=, =MANUQNTU=, =INSCQNTU= |
+| =Purchased=      | derivable -- the module asks whether the input was bought, and on credit |
+
+*** The gap: input SPEND has no canonical column, anywhere
+
+Swept every =data_scheme.yml=: the only value-bearing columns in any
+agricultural table are =crop_production.Value_sold= and livestock's
+=ValuePerAnimal= / =HerdValue= / =SalesValue=.  *No country's =plot_inputs=
+carries a cost, value or expenditure column.*  The corpus records input
+*quantities*.
+
+GLSS1/2 records input *spend*, and for four of the seven inputs it records
+*nothing else*:
+
+| input                | quantity? | spend        |
+|----------------------+-----------+--------------|
+| fertilizer           | yes       | =FERTAMT=    |
+| manure               | yes       | =MANUAMT=    |
+| chemicals            | yes       | =INSCAMT=    |
+| seeds / young plants | *no*      | =SEEDAMT=    |
+| transport            | *no*      | =TRANAMT=    |
+| containers           | *no*      | =CONTAMT=    |
+| storage              | *no*      | =STORAMT=    |
+
+Since "farm-level expenses" is the point of the exercise, dropping spend is not
+an option.  Because =plot_inputs= has no =index_info= or =Columns= entry
+(#569), adding a column is a *per-country declaration*, not a canonical schema
+change -- the same latitude by which Malawi declares =Improved= and Ethiopia
+declares =Applied=.  So this is cheap to do; what it needs is a *name we are
+willing to see other countries adopt*.
+
+*Open question*: the name.  =Value= is the least surprising given
+=Value_sold=; =Cost= says more clearly that it is an outlay.  Your call, and
+worth choosing as if it were canonical, because the next country that records
+input spend should reuse it.
+
+** =livestock= -- good fit
+
+Index: =(t, i, animal)=, the shape every country uses.  =Y09F= carries an
+animal code with owned / sold / bought counts and values, which lines up with
+=HeadCount= / =HeadSold= / =HeadAcquired= / =HerdValue= / =SalesValue=.
+
+*Confidence: medium.*  The mapping is inferred from variable names
+(=LIVSTN/SN/BN= counts, =LIVSTNV/SV/BV= values); the Part F form (p.53) has
+*not* been read yet.  Read it before wiring.
+
+** =plot_labor= -- poor fit, needs a decision
+
+Corpus convention is =(t, i, plot_id, source)= with =PersonDays= and =Wage=,
+and *every* country that declares it carries =plot_id= -- including the EHCVM
+countries that drop the plot level from =plot_inputs=.  There is no
+plot-less precedent for this table.
+
+GLSS1/2's labour (=Y09D3B=) is *household-level*: =CREXLAB= (hired-labour
+spend) plus a male/female/child x 4-period worker-count grid.  So it has
+neither a plot level nor person-days directly, and its headline number is
+again a *spend*.
+
+Options: a =(t, i, source)= variant (departs from a convention nothing else
+departs from), fold hired-labour spend into =plot_inputs= as another input row
+(structurally tidy, semantically a stretch), or leave labour unwired in the
+first pass and add it once the shape question is settled.  *Recommend the
+third* -- output, land, inputs and livestock are enough for a first Mundlak
+specification, and labour deserves its own decision rather than being decided
+by haste.
+
+* Summary of what needs your decision
+
+1. =crop_production= index: =(t, i, j, u)= with =u= = sold unit, or =(t, i, j)=?
+2. Names for the three disposition-value columns (seed / given / lost).
+3. Name for the input-spend column -- =Value=, =Cost=, or something else --
+   chosen as if canonical, since it would be the corpus's first.
+4. =plot_labor=: defer, or pick a shape now?
+5. =Quantity= on =crop_production=: declare =optional: true=, or omit entirely?
+
+* Not blocking, but worth knowing
+
+- Each input's crop list is capped at *four* lines in the form, so a household
+  cultivating more than four crops has its input spend truncated invisibly.
+- Wiring anything moves *every* GhanaLSS cache hash (the country
+  =data_scheme.yml= is hashed whole), so the bill is a whole-country cold
+  re-warm including the 5.26M-row =food_acquired=.
+- =crop_production= and =livestock= would be GhanaLSS's first agricultural
+  tables, so =Feature('crop_production')= gains a country -- worth a
+  cross-country check once built.
