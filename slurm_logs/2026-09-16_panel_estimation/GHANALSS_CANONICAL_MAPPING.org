@@ -403,3 +403,78 @@ moves no cache hash).  Fields per =lsms_library/derivations.py=; allowed
   duplicates), so the declared =(t, i, j)= index is unique and
   =_normalize_dataframe_index= has nothing to reduce.  That also independently
   vindicates dropping =u= from the index.
+
+* Settled after the validation pass (Sue, 2026-09-16)
+
+** The yam and plantain "overshoot" was an artefact.  The rule stands.
+
+Both apparent failures dissolve on inspection, and neither is a data problem:
+
+- *Yam*: =CROPSU= is itself 22 (ALL) on 116 of the 214 rows my diagnostic
+  counted as "same-unit", because =CROPSU == CROPSPU == 22= satisfies both
+  masks.  Those rows belong in the ALL branch.  The diagnostic tested
+  same-unit first; the *rule* tests ALL first, so the rule was never affected.
+- *Cocoa* (62.5x): the same-unit rows sell in maxibags at a median 8,750 per
+  maxibag, the ALL rows in kilograms at an implied 140 per kg.  8,750 / 140 is
+  about 62 -- that ratio *is* the maxibag-to-kilogram conversion.  The two
+  groups agree; they simply sell in different units.
+
+Plantains, cassava and maize sit within ~1-3x with matching unit composition.
+The per-unit reading of =CROPSP= is confirmed.  *Test ALL before same-unit.*
+
+** =Quantity_sold= is in =Unit_sold=, NOT in kilograms
+
+Worth stating in the column notes, because the analyst's first instinct is
+=Value_sold / Quantity_sold= and that is a price per whatever container the
+household sold in -- which varies row by row.  The kilogram conversion is
+=Quantity_sold x KgFactor= for the unstarred (container) units and the metric
+factor for the starred ones.
+
+*And the canonical kg machinery does not reach this country.*
+=harvest_kg_factors= keys the reported factor to =(u, condition)= and needs
+=Quantity=; GhanaLSS has neither.  So =CROPSUK= is carried for the analyst's
+use, not for =harvest_kg=.
+
+*Small open point*: canonically =KgFactor= is "kilograms per ONE unit of this
+row's =u=".  Ours is kilograms per =Unit_sold=.  With no =u= in the table
+there is nothing else it could mean, so carrying it as =KgFactor= with a note
+is defensible -- but if you would rather it not borrow a name whose canonical
+definition points at a level this table does not have, say so.
+
+** =plot_inputs=: =u= is a COLUMN here, not an index level
+
+Both patterns exist in the corpus: Malawi and the EHCVM countries put =u= in
+the index; *Uganda, Ethiopia and Nigeria declare it as a column* (=u: str=)
+beside =Quantity=.
+
+GhanaLSS must follow the second.  Four of the seven inputs -- seed, transport,
+containers, storage -- are amount-only, so those rows have no quantity and no
+unit.  A NaN on a declared index level is Site I territory, and the first
+=groupby= deletes the row.  So: =index: (t, i, input, crop)= with =u: str= and
+=Cost: float= as columns.
+
+** =livestock= is in scope, and the mapping is now form-verified
+
+Part F (p.53) is one row per animal -- cattle, sheep, goats, chickens, pigs,
+other poultry, rabbits/guinea pigs, other -- with:
+
+| Q  | question                                           | variable   | canonical column |
+|----+----------------------------------------------------+------------+------------------|
+|  4 | how many of all ages owned at present              | =LIVSTN=   | =HeadCount=      |
+|  5 | if they sold one today, how much would they receive *altogether* | =LIVSTNV= | =HerdValue= |
+|  7 | how many have they sold                            | =LIVSTSN=  | =HeadSold=       |
+|  8 | how much received from sales in past 12 months     | =LIVSTSV=  | =SalesValue=     |
+| 10 | how many did they buy                              | =LIVSTBN=  | =HeadAcquired=   |
+| 11 | how much paid for all they bought                  | =LIVSTBV=  | (no canonical column) |
+| 12 | how many born or received as gifts                 | =LIVSTAD=  | (none)           |
+| 13 | how many *eaten* by the household                  | =LIVSTE=   | (none)           |
+| 14 | how many lost, stolen, given, sacrificed or died   | =LIVSTDI=  | (none)           |
+
+Five canonical columns map *directly*.  =ValuePerAnimal= is derivable as
+=HerdValue / HeadCount= (Q5 is explicitly "altogether"), which makes it a
+derivation, not a mapping.  =TLU= is a transform output and is declared by only
+one country (EthiopiaRHS); per-country subsets are normal -- Benin and Togo
+declare three columns.
+
+Q13 is *livestock own-consumption*, the exact parallel of the crop
+own-consumption gap, and has no canonical home.  Worth carrying.
