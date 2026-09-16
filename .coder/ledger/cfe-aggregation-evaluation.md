@@ -51,6 +51,11 @@ inside the declared questionnaire universe. Sum amounts before logging.
   Subtract the weighted mean on the same declared training reference cells for
   every candidate. Neither held-out truth nor held-out expenditures chooses
   this normalization. This is a unit convention, not known loading inference.
+- Check identification separately for each fitted market using the existing
+  `Regression.w_cov(min_goods=1).V22` rank signal. A market with only single-good
+  households does not identify its intercept even when loadings vary globally.
+  Exclude its scores from coverage/error and fail any reference that relies on
+  it. The scorer alone does not impose this additional validation check.
 - All positive-weight comparison cells must be scored to report comparable
   MSE. Never silently intersect survivor sets or average validation error over
   a candidate-specific population. Coverage uses the entire declared evaluation
@@ -86,4 +91,28 @@ checks. No automatic search or empirically optimal Uganda grouping is claimed.
 
 ### Verification
 
-Pending implementation and tests. --Sue, 2026-09-16
+- `aggregate_expenditures` (`SkunkWorks/aggregation/evaluation.py:72`) --
+  **OK (anchored on §2, §3, §5)**: exhaustive maps, nonnegative level sums,
+  union of positive support, and shared zero/unreported convention; no Country
+  API or extraction changes.
+- `evaluate_partitions` (same file:101) -- **OK (anchored on §2, §4, §5)**:
+  reuses fitting, frozen scoring, and the per-market covariance rank signal;
+  separates coverage from fixed-population MSE; holds normalization to training
+  data; retains failures. No pre-existing evaluator was found on re-search.
+- `simulation_inputs` (`SkunkWorks/aggregation/simulation.py:20`) --
+  **OK (anchored on §2, §4, §5)**: reuses `dgp.expenditures`, adapts old index
+  names, and restores NumPy global random state. Truth only enters reports.
+- Tests: **22 passed**, including identified versus unidentified markets,
+  household splits, truth/held-out-data independence, weighted normalization,
+  and missing comparison/reference scores. Reviewer reproduced the market
+  defect before the fix and found no remaining defects after the fix.
+- Experiment: 36 fits (seeds 11, 12, 13; four zero/loading regimes; three
+  supplied partitions), all processed successfully. No country-data access or
+  empirical optimality claim. Commands and results are recorded in
+  `SkunkWorks/aggregation/evaluation.org`; checks used the CFE checkout at
+  `be42621` / code commit `3cdfae9`. Import provenance was asserted.
+- Org lint and ASCII checks pass. Full LSMS country tests were not run: this
+  isolated analysis does not change library or extraction code, and its test
+  command bypasses country-cache purge hooks.
+
+--Sue, 2026-09-16
