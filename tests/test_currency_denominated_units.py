@@ -425,8 +425,20 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: derived tables drop them by their own ``replace(0, NaN)`` rule.  Measured
 #: row-for-row: the count on the frame minus those three rows is identical.
 #: ``unitprice`` (189,551) and ``kgvalue`` unchanged.
-GHANALSS_FOOD_PRICES_ROWS = 407_478
-GHANALSS_FOOD_PRICES_WAVES = ['2016-17']
+#: RE-DERIVED 2026-09-14 (PR #916, ``GhanaLSS::food_acquired::8h-farmgate``):
+#: section-8H own production is now valued at the reported farmgate price
+#: (``Quantity x Price``), so ``produced`` rows in the four farmgate waves have
+#: an ``Expenditure`` where they had none -- which is the defect GH #913 was
+#: filed about.  ``kgvalue`` 407,478 -> 568,346 and its wave set goes from one
+#: wave to four; ``unitvalue`` 1,513,769 -> 1,674,641 (+160,872).
+#: ``unitprice`` (189,551) and ``units`` (1,693,174) are UNCHANGED, as they must
+#: be: the derivation adds a valuation, not a price and not a quantity.
+#:
+#: This is the fix working, not a regression.  Bisected: clean at 7b7d330fd
+#: (20 passed), failing the moment #916 lands.  See CLAUDE.md, "A derived value
+#: is a FIRST-CLASS value".
+GHANALSS_FOOD_PRICES_ROWS = 568_346
+GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
 
@@ -461,12 +473,32 @@ def test_ghanalss_factor_map_loses_exactly_the_currency_key():
 
 
 @pytest.mark.slow
-def test_ghanalss_food_prices_is_one_wave_and_not_constant():
-    """Six of seven waves return EMPTY, and that is the intended outcome.
+def test_ghanalss_food_prices_are_not_a_made_up_constant():
+    """The invariant is that no price is FABRICATED -- not that waves are empty.
 
-    EL's ruling, recorded: "empty food prices is better than a made up
-    constant."  Before this fix the six empty waves returned 1,066,978 rows
-    all carrying the single value 2.035038.
+    Renamed 2026-09-14 (was ``..._is_one_wave_and_not_constant``) because the
+    two claims came apart and only one of them was ever a policy.
+
+    EL's ruling stands and is unchanged: "empty food prices is better than a
+    made up constant."  Before that fix six waves returned 1,066,978 rows all
+    carrying the single value 2.035038 -- a constant with no survey behind it.
+    The assertion that guards it is the within-wave standard deviation, and it
+    is untouched here.
+
+    What was NEVER a policy is the wave COUNT.  Six waves were empty because
+    GhanaLSS ``produced`` rows carried a ``Price`` and a ``Quantity`` but no
+    ``Expenditure`` (GH #913) -- an absence, not a decision.  PR #916 values
+    them at the reported farmgate price, so four of those waves now price, and
+    the count moved from one wave to four.
+
+    A REGISTERED DERIVATION IS NOT A FABRICATION, and that is the whole
+    distinction (@ligon, 2026-09-14; CLAUDE.md "A derived value is a
+    FIRST-CLASS value").  A made-up constant is unregistered, unlabelled and
+    unrecoverable; ``GhanaLSS::food_acquired::8h-farmgate`` names its function,
+    cites its ``raw_variables``, records its ``assumptions``, stamps
+    ``Derivation`` on every row it values, and hands the untouched inputs back
+    through ``derivation_inputs``.  Do not "restore" the old counts by
+    excluding derived valuations from ``food_prices``.
     """
     c, _ = _country('GhanaLSS')
     p = c.food_prices()
@@ -479,11 +511,24 @@ def test_ghanalss_food_prices_is_one_wave_and_not_constant():
 
 @pytest.mark.slow
 def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
-    """Only the kg-denominated modes touch the factor map."""
+    """Only the kg-denominated modes touch the factor map.
+
+    That premise is intact -- the kg factor map still does not reach these
+    modes.  ``unitvalue`` moved for an unrelated reason: it is
+    ``Expenditure / Quantity``, and PR #916 gave the four farmgate waves'
+    ``produced`` rows an ``Expenditure`` they did not have (1,513,769 ->
+    1,674,641).
+
+    ``unitprice`` and ``units`` are asserted UNCHANGED on purpose, and that is
+    the sharper check: the derivation adds a VALUATION, so it must move the
+    value-denominated mode and must not move the reported-price mode or the
+    quantity mode.  A change in either of those would mean the derivation had
+    overwritten survey data rather than filled a gap.
+    """
     c, _ = _country('GhanaLSS')
-    assert len(c.food_prices(units='unitvalue')) == 1_513_769
-    assert len(c.food_prices(units='unitprice')) == 189_551
-    assert len(c.food_quantities(units='units')) == 1_693_174
+    assert len(c.food_prices(units='unitvalue')) == 1_674_641
+    assert len(c.food_prices(units='unitprice')) == 189_551      # unchanged
+    assert len(c.food_quantities(units='units')) == 1_693_174    # unchanged
 
 
 @pytest.mark.slow
