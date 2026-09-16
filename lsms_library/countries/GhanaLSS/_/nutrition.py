@@ -95,6 +95,8 @@ No FoodData Central fallback is used: the WAFCT covers the GhanaLSS basket
 (measured coverage is reported by ``--report``).  No API key is read, and
 none is embedded -- the precedents' literal key is not copied.
 """
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -141,7 +143,10 @@ def _load_food_codes(root):
                           name='harmonize_food')
     lab['Preferred Label'] = lab['Preferred Label'].astype(str).str.strip()
     lab['FCT Code'] = lab['FCT Code'].astype(str).str.strip()
-    waves = [c for c in lab.columns if c not in ('Preferred Label', 'FCT Code')]
+    # Label variants (Aggregate Label, display labels, etc.) are not survey
+    # rounds. Ghana's wave columns use YYYY-YY; keep this crosswalk separate
+    # from the expenditure grouping carried by the same country table.
+    waves = [c for c in lab.columns if re.fullmatch(r'[0-9]{4}-[0-9]{2}', c)]
 
     rows = []
     for w in waves:

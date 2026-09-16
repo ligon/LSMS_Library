@@ -3322,8 +3322,8 @@ encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
 followed by two mojibake =Ê= characters, a twin of code 254's clean label).
 
 /Correction, 2026-09-16./ The wave Aggregate columns described above are
-not read by =Country._relabel_j=. That method uses the country table, which
-currently has no =Aggregate Label= column. The wave builders use Preferred
+not read by =Country._relabel_j=. That method uses the country table. The
+wave builders use Preferred
 labels; the wave Aggregate spelling checks remain configuration checks.
 Their historical assignments are not live aggregation rules.
 
@@ -3332,14 +3332,29 @@ Preferred labels across all seven waves, of which 47 are absent from the
 country table's 195 distinct Preferred labels. Every delivered label has
 wave-table provenance. The country wave columns include documentary
 crosswalks to broader items; applying them all as spelling corrections
-would change the item partition. A future Aggregate column must cover the
-delivered axis explicitly while preserving the nutritional crosswalk.
+would change the item partition.
+
+The country =Aggregate Label= column was added on 2026-09-16 after the
+[[file:../../../../SkunkWorks/aggregation/ghanalss/validation.org][CFE validation]]. Four selected groups combine cubed/granulated sugar,
+macaroni/spaghetti, bottled/canned malt drinks, and Kapla/Tilapia (fresh or
+frozen). The 233 delivered labels map to 228 groups. Other foods, including
+rice origins and white/yellow gari, retain their separate names. The
+country table now has 252 rows and 242 distinct Preferred labels: its
+original 205 rows plus 47 exact delivered labels previously absent.
+Existing wave and FCT cells are unchanged; the appended rows have blank
+crosswalk cells and introduce no nutrient matches. Some are spelling
+aliases of historical country labels, which remain for nutritional lookup.
+=nutrition.py= recognizes wave columns explicitly so Aggregate/display
+columns cannot be interpreted as additional survey rounds.
 
 One semantic trap is =Sugar=: the early source combines sugar, candy,
 honey and sugarcane. It cannot be folded into a country-wide pure-sugar
 group merely because later sources use the same label more narrowly.
-The draft keeps generic Sugar separate from the modern cubed/granulated
-pair. All proposed merges remain experimental pending statistical checks.
+The published partition keeps generic Sugar separate from the modern
+cubed/granulated pair. Validation does not establish a gain in precision
+of true welfare: the revised preparation already scores almost all
+households in the 2016-17 wave-total data. See the report for uncertainty,
+the alternatives retained as singletons, and the reproduction commands.
 
 *Why a rename here is provably safe.*  For the six singular/plural pairs, both
 variants share the collision key, so the measured "0 internal collisions per

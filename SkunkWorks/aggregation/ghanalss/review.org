@@ -4,11 +4,17 @@
 
 * Result
 
+This records the inventory and first draft. The subsequent
+[[file:validation.org][validation and publication report]] selects four groups and describes the
+live country Aggregate column; the five-group draft below is retained as
+an evaluated alternative.
+
 GhanaLSS delivers 233 distinct Preferred labels across its seven waves.
 The [[file:draft_partition.yml][draft partition]] maps these to 225 groups: five proposed merges
 cover 13 labels, and the other 220 labels remain singletons. Four tobacco
 labels are retained in the inventory but excluded from food support
-calculations. No live =Aggregate Label= column has been added.
+calculations. At this inventory stage no live =Aggregate Label= column
+had been added.
 
 The country =harmonize_food= table has 195 distinct Preferred labels, but
 47 delivered labels are absent from that axis. Nine country Preferred

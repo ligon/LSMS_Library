@@ -28,7 +28,7 @@ rows. `Price` is never summed. `labels=None`/`'Preferred'` is a no-op.
 
 ## The contract when a country lacks the column
 
-Only **4 of 16** food countries curate an Aggregate column. A country that
+Only **5 of 16** food countries curate an Aggregate column. A country that
 didn't **cannot honour the request** — and the behavior is deliberately
 different at the two API levels (Contract B, "loud structured degrade";
 settled 2026-06, PR #550):
@@ -62,10 +62,17 @@ degrade over a real bug.
 
 | group | countries | what they have |
 |-------|-----------|----------------|
-| ✅ have it | EthiopiaRHS, Malawi, Nigeria, Uganda | `Aggregate` / `Aggregate Label` |
+| ✅ have it | EthiopiaRHS, GhanaLSS, Malawi, Nigeria, Uganda | `Aggregate` / `Aggregate Label` |
 | ✗ EHCVM (7) | Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo | only `Original Label` |
 | ✗ wave-coded (3) | Ethiopia, Mali, Tanzania | wave columns + codes, no Aggregate |
-| ✗ no label table (2) | GhanaLSS, Nepal | none |
+| ✗ no label table (1) | Nepal | none |
+
+GhanaLSS gained its country column on 2026-09-16: four narrowly scoped
+groups, with the remaining delivered items kept as named singletons. Its
+wave-level Aggregate columns are not live inputs to this API. See
+`SkunkWorks/aggregation/ghanalss/validation.org` for scope, uncertainty and
+the measured tradeoffs; curation does not itself establish a welfare
+precision gain. The original nutritional crosswalk is preserved.
 
 Regenerate this if unsure:
 
@@ -124,8 +131,8 @@ breaks.
 
 So, when adding the column to a batch of countries:
 
-- Diff your proposed group names against the four that already have it
-  (EthiopiaRHS/Malawi/Nigeria/Uganda) and **reuse their names** wherever the
+- Diff your proposed group names against the countries that already have it
+  (EthiopiaRHS/GhanaLSS/Malawi/Nigeria/Uganda) and **reuse their names** wherever the
   concept matches (`Maize`, `Rice`, `Beans`, `Cooking Oil`, …) rather than
   inventing a parallel label.
 - Read `SkunkWorks/cross_country_label_harmonization.org` first — the shared

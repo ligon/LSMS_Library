@@ -190,9 +190,9 @@ def test_energy_2016_17_measured(nutrition):
 
     * ~15% of 2016-17 expenditure is on u='Value' rows (restaurants, cooked
       meals) that carry real intake and are necessarily dropped;
-    * 7.5% of its kilograms map to no FCT row, and the three labels missing
-      from categorical_mapping.org#harmonize_food alone are worth +27% of
-      its Energy;
+    * 7.5% of its kilograms map to no FCT row, and three labels lacking FCT
+      assignments in categorical_mapping.org#harmonize_food alone are
+      worth +27% of its Energy;
     * densities are per edible portion but quantities are as acquired.
 
     Each of those pushes the number down or blurs it.  The test pins that the
@@ -275,3 +275,24 @@ def test_food_labels_carry_fct_codes():
     # The point of the move: the API can now see it.
     import lsms_library as ll
     assert 'harmonize_food' in (ll.Country('GhanaLSS').categorical_mapping or {})
+
+
+def test_food_code_crosswalk_ignores_aggregate_and_display_columns(tmp_path):
+    """Adding a label variant must not create a fictitious nutrition wave."""
+    import importlib.util
+
+    path = countries_root() / 'GhanaLSS' / '_' / 'nutrition.py'
+    spec = importlib.util.spec_from_file_location('ghana_nutrition_labels_test', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    folder = tmp_path / 'GhanaLSS' / '_'
+    folder.mkdir(parents=True)
+    (folder / 'categorical_mapping.org').write_text(
+        '#+name: harmonize_food\n'
+        '| Preferred Label | 2016-17 | FCT Code | Aggregate Label | Aggregate (short) |\n'
+        '|-----------------+---------+----------+-----------------+-------------------|\n'
+        '| Rice | Rice (local) | 01_037 | Unprepared rice | Rice |\n')
+    by_wave, by_label = module._load_food_codes(tmp_path)
+    assert by_wave[['t', 'j', 'FCT Code']].to_dict('records') == [
+        {'t': '2016-17', 'j': 'Rice (local)', 'FCT Code': '01_037'}]
+    assert by_label == {'Rice': '01_037'}

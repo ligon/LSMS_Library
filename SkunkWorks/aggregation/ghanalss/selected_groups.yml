@@ -1,0 +1,49 @@
+schema_version: 1
+country: GhanaLSS
+status: selected
+author: Sue
+date: '2026-09-16'
+default: Every other exact Preferred label remains a named singleton.
+selection: Semantic scope, joint loading uncertainty and validation diagnostics; see
+  validation.org. Final test not used for selection.
+groups:
+- id: sugar_refined
+  label: Sugar (cubed/granulated)
+  members:
+  - Sugar (cubed)
+  - Sugar (granulated)
+  reason: 'Two physical forms of refined sugar. Generic Sugar remains separate: its
+    early-wave source includes candy, honey and sugarcane.'
+  evidence:
+  - 'proposed_groups.yml: group sugar_refined; source-row evidence and scope.'
+- id: malt_packaging
+  label: Malt Drinks
+  members:
+  - Malt Drinks (bottle)
+  - Malt Drinks (canned)
+  reason: In 2016-17 packaging distinguishes the labels and several brands occur in
+    both. Earlier source rows say malta and malt drinks without naming packaging.
+    Packaging may proxy quality, serving size or household type.
+  evidence:
+  - 'proposed_groups.yml: group malt_packaging; source-row evidence and scope.'
+- id: pasta
+  label: Pasta (macaroni/spaghetti)
+  members:
+  - Macaroni/Spaghetti
+  - Macaroni
+  - Spaghetti
+  reason: Earlier instruments combine macaroni and spaghetti; the modern one separates
+    them. Excludes instant noodles, couscous and Other Cereal.
+  evidence:
+  - 'proposed_groups.yml: group pasta; source-row evidence and scope.'
+- id: fish_fresh_frozen_named
+  label: Fish (kapla/tilapia, fresh or frozen)
+  members:
+  - Kapla
+  - Tilapia
+  reason: Both purchase labels explicitly identify fresh/frozen fish, distinguished
+    here by species. This extends the search beyond the existing smoked-fish candidate
+    while retaining the preservation boundary.
+  evidence:
+  - 'additional_candidates.yml: group fish_fresh_frozen_named; source-row evidence
+    and scope.'

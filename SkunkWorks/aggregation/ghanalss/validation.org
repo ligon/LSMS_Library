@@ -1,0 +1,320 @@
+#+TITLE: GhanaLSS Aggregate: selection and validation
+#+AUTHOR: Sue
+#+DATE: 2026-09-16
+
+* Published partition
+
+The country =Aggregate Label= column combines four narrowly defined food
+groups. The 233 labels delivered across seven waves map to 228 groups;
+the 179 labels delivered in 2016-17 map to 175. Tobacco labels remain
+singletons and are excluded from the CFE experiments. Every unselected
+food retains its exact Preferred name. This is a conservative first
+partition, not an estimate of an optimal aggregation.
+
+#+name: tab:ghanalss-selected-groups
+#+caption: The complete set of selected groups. Other labels remain singletons.
+| Aggregate                           | Exact Preferred members                       |
+|-------------------------------------+-----------------------------------------------|
+| Sugar (cubed/granulated)             | Sugar (cubed); Sugar (granulated)              |
+| Malt Drinks                         | Malt Drinks (bottle); Malt Drinks (canned)     |
+| Pasta (macaroni/spaghetti)           | Macaroni/Spaghetti; Macaroni; Spaghetti         |
+| Fish (kapla/tilapia, fresh or frozen) | Kapla; Tilapia                                |
+
+[[file:selected_groups.yml][Selected groups]] records the scope; [[file:selected_partition.yml][the exhaustive map]] also covers the
+existing country-table names. Source evidence is in [[file:proposed_groups.yml][the original proposals]]
+and [[file:additional_candidates.yml][the additional semantic review]]. Generic =Sugar= remains separate
+because its early source includes candy, honey and sugarcane. Pasta excludes
+instant noodles and couscous; fish excludes other species, preservation
+methods and historical broad fish categories. These names describe Ghana
+groups and do not assert equivalence to another country's aggregates.
+
+All four merges combine distinct delivered items only in 2016-17. Earlier
+waves contain at most one member of each selected group, so the map only
+renames those categories. The old wave-level Aggregate columns are not
+used by =Country._relabel_j= and did not constrain the selection.
+
+* Evaluation design
+
+The main experiment uses 2016-17 purchased amounts summed over the six
+five-day recalls, Region markets, and the existing fourteen sex-age counts
+plus log household size. The 14,009 sampled households include nineteen
+with missing characteristics. They remain in the coverage denominator.
+All have known Region and positive sample weights. Zero and unavailable
+amounts both supply no positive log-expenditure observation. Level amounts
+are summed before taking logs; no new own-production valuation is used.
+
+A fixed household split within Region by Rural strata assigns 8,397
+households to training, 2,793 to validation and 2,819 to the final test
+(seed 20260916). Every candidate uses the same split. The production CFE
+branch =feature/prepare-data-scoring= supplies preparation, beta estimation,
+and frozen scoring, with =min_obs=30=, =min_prop_items=0.1= and =alltm=False=.
+No alternate estimator or selector is introduced.
+Survey weights enter coverage, normalization and prediction diagnostics;
+the CFE point estimator retains its existing unweighted fit.
+
+Salt stays a singleton and fixes the loading scale at one. The score
+origin is the survey-weighted mean among complete-control, Salt-observed
+training households. The fixed comparison population consists of
+complete-control, Salt-observed evaluation households. Score coverage uses
+the entire evaluation sample, including households outside that population.
+
+Onion and Egg are reserved prediction targets, excluded from every fit
+and scoring vector. Weighted regressions of their positive log amounts on
+the controls, market indicators and frozen scores use training households
+only. Validation uses the same positive-target population for each map;
+missing or unidentified predictions invalidate a complete-population
+comparison. Thus these errors concern positive-food prediction, not error
+against an observed true welfare measure.
+
+For uncertainty in loadings, sixty joint draws resample training PSUs
+within Region by Rural strata, repeating preparation and beta estimation.
+There is no nested beta bootstrap. Cubed sugar, macaroni and yellow gari
+are not identified in the full fine fit because of the all-pairs covariance
+requirement. Separate diagnostic fits place each of these and its candidate
+partner beside the same nine dense reference foods, including Salt. Those
+fits use the existing estimator and the same joint resampling draws.
+Their comparability relies on a common factor across the shared foods;
+the smaller fits are a diagnostic, not a replacement production estimator.
+
+The paired prediction intervals resample all 949 validation PSUs, including
+PSUs with no positive target observations, within strata (1,000 draws,
+seed 20260918). They condition on the fitted training models. They do not
+include training-fit uncertainty, selection uncertainty or household
+dependence across training and validation within a PSU. They should not
+be read as unconditional confidence intervals for the chosen partition.
+
+* Selection evidence
+
+The fine model's central ninety percent training score interval is
+[-0.45368, 0.36268] in Salt units; its origin is zero. For a deterministic
+sum of log-linear demands, the tangent approximation error over this
+interval is at most \((\max_j\beta_j-\min_j\beta_j)^2 R^2/8\), with
+\(R=0.45368\). The table plugs
+the empirical 95th percentile of each joint bootstrap span into this
+formula. It is a curvature diagnostic conditional on the model and fixed
+range, not a bound on estimation error in welfare or a simultaneous
+confidence statement. It does not bound distortions due to reporting,
+composition or unequal aggregate error variances.
+
+#+name: tab:ghanalss-loading-diagnostics
+#+caption: Purchased-basis loading diagnostics, normalized by the Salt loading. Complete draws are out of sixty; probe fits use the common reference basket.
+| Group       | Estimation source | Complete draws | 95th percentile span | Curvature diagnostic |
+|-------------+-------------------+----------------+----------------------+----------------------|
+| Sugar       | Reference probes  |             60 |                0.934 |                0.0224 |
+| Malt drinks | Full fine fit     |             60 |                0.599 |                0.0092 |
+| Pasta       | Reference probes  |             60 |                0.510 |                0.0067 |
+| Named fish  | Full fine fit     |             59 |                0.571 |                0.0084 |
+
+The initial analysis tolerance was 0.10 log expenditure, recorded before
+fitting in the [[file:../../../.coder/ledger/ghanalss-aggregate-validation.md][ledger]]. Passing that loose screen is not sufficient for
+inclusion. These four groups also have narrow semantic scope and no
+material deterioration in the reserved-food validation. One fish draw
+does not retain both members; its uncertainty summary uses the other
+59 draws and does not treat the missing coefficient as zero.
+
+The point probe loadings for cubed and granulated sugar are 1.983 and
+2.043; those for macaroni and spaghetti are 0.859 and 0.798. The full fine
+loadings for bottled and canned malt drinks are 1.470 and 1.728, and for
+Kapla and Tilapia 1.217 and 1.566. Similarity is a practical judgment with
+sampling uncertainty, not a conclusion from failing to reject equality.
+
+Several plausible alternatives are retained as singletons:
+
+- Imported/local rice and white/yellow gari have appreciably different
+  point loadings. Rice improves Onion prediction slightly but worsens Egg
+  prediction; neither group increases scoring coverage.
+- Bread types show a similar prediction tradeoff and wider loading spans.
+- Broad smoked fish reduces fitting coverage. Chicken cuts have an
+  unsupported breast coefficient and substantial differences between the
+  identified cuts.
+- Pork cuts, sausages and named spirits remain unsupported even when
+  pooled, so their near-identical scores are not evidence of equivalence.
+- Crab/shrimp, tinned milk forms, coconut forms and processed fish have
+  incomplete constituent loading evidence. Their small prediction changes
+  do not identify the missing loadings. They remain candidates for further
+  work, not accepted merges.
+- Onion/shallot touches a reserved target and was not tested in this
+  experiment. Powdered pepper lacks sufficient semantic documentation.
+
+* Real-data results
+
+In the =validation_selected_*= and =test_selected= CSVs, the evaluator's
+=draft= row denotes the fixed four-group selection above. The =draft= row
+in the earlier =validation_purchased= directory denotes the original
+five-group proposal; those are different experiments.
+
+The combined map retains 86 fitted goods in the purchased experiment,
+including its four new aggregates. It also admits Pawpaw and Cerelac,
+which fail the full fine preparation: changing the covariance support
+can affect goods outside the proposed groups. Both fits use 7,713
+training households, with a negligible change in their weighted coverage.
+Both score 2,769 validation households: weighted coverage is 99.271%.
+
+#+name: tab:ghanalss-validation-prediction
+#+caption: Validation mean squared error for positive reserved-food log amounts. Delta is selected minus fine; intervals condition on the training fits.
+| Basis     | Target | Fine MSE | Selected MSE | Delta     | Paired 2.5--97.5 percentiles |
+|-----------+--------+----------+--------------+-----------+-----------------------------|
+| Purchased | Onion  |  0.41295 |      0.41265 | -0.00030  | [-0.00120,  0.00063]        |
+| Purchased | Egg    |  0.72014 |      0.71874 | -0.00140  | [-0.00389,  0.00118]        |
+| Total     | Onion  |  0.42563 |      0.42504 | -0.00059  | [-0.00161,  0.00041]        |
+| Total     | Egg    |  0.77648 |      0.77340 | -0.00308  | [-0.00626, -0.00016]        |
+
+On total recorded acquisition both maps retain 88 fitted goods and score
+2,771 validation households (99.302% weighted coverage). Fitting coverage
+falls from 95.947% to 95.933%, or two training households. That small loss
+is reported rather than hidden by comparing only common survivors.
+
+The group support gains from the inventory do not translate into large
+gains in scored-household coverage. Frozen scoring already reaches almost
+all households here. Nor are fitted aggregate betas mechanically averages
+of the estimated fine betas: changing positive reporting patterns,
+composition, covariance support and the normalization fit can move them
+outside the fine estimates' range. For example, the combined fit gives
+malt drinks a loading of 1.870. The share-weighted derivative identity
+does not assert an identity between these separately fitted estimators.
+
+The four group memberships were frozen before examining the final test.
+Both maps score 2,802 of its 2,819 households (99.473% weighted coverage).
+Onion MSE rises from 0.345748 to 0.346913, a change of 0.001166 or 0.34%;
+the conditional paired interval is [0.000223, 0.001975]. Egg MSE falls
+from 0.741421 to 0.740324, a change of -0.001097 or -0.15%, with interval
+[-0.003885, 0.001835]. There are 1,631 and 631 positive target observations,
+respectively, on the fixed comparison population; resampling covers all
+960 test PSUs. The small Onion deterioration is not hidden by the favorable
+validation results. These checks support a limited practical partition,
+not a claim that it improves welfare precision. The fine Preferred output
+remains available and is still the default.
+
+* Empirical-mask sensitivity
+
+The simulation adapter retains all 14,009 Ghana household positivity masks
+and their survey weights and markets, replacing identifiers with row numbers.
+It reuses =survey_simulation.survey_inputs= and the CFE data-generating
+process, with seeds 11, 12 and 13, a Salt loading of 0.6 and fine-good log
+error standard deviation 0.2. Synthetic welfare and a complete numeric
+control are independent of the masks. Thus the nineteen households with
+missing real controls are present with synthetic controls; this is a
+conditional sensitivity experiment, not a simulation of that missingness.
+
+The =masked= regime combines homoskedastic fine-good errors with the actual
+reporting pattern. The =substitutes= regime divides each member amount by
+the number of positive members in its group, holding the no-error total
+fixed when constituent loadings agree. The =unequal= regime uses that same
+substitution mechanism with constituent loadings spanning 0.5--1.5 times
+their group loading. Each replicate refits preparation, beta and welfare
+for both maps, on a common anchor-observed comparison population.
+
+The saved [[file:simulation_selected/simulation.csv][simulation results]] contain known-welfare errors and scoring
+coverage for each mechanism and seed. These runs cannot establish how
+survey reporting depends on true welfare or how instrument errors behave.
+
+All eighteen fits succeed. Weighted scoring coverage is identical between
+maps in every replicate, averaging 99.331%. In the masked regime the
+selected map's core MSE rises by 0.23--2.15% across the three seeds. In the
+substitutes regime it changes by -1.64% to +0.53%, and with unequal
+constituent loadings by -1.56% to +0.19%. These are small sensitivity runs,
+not precise Monte Carlo estimates. Even equal constituent loadings do not
+guarantee a precision gain when reporting counts and error variances change.
+
+* Publication and verification
+
+The country table preserves all 205 original rows and their wave/FCT
+cells, and appends 47 exact delivered labels with blank crosswalk cells.
+Its 252 rows contain 242 distinct Preferred labels and 237 Aggregate
+labels; nine Preferred names are historical country entries absent from
+the delivered universe. Duplicate Preferred rows agree on Aggregate.
+No new FCT assignment is inferred from a documentary crosswalk.
+
+The nutrition reader now recognizes survey wave columns explicitly and
+ignores Aggregate/display columns. Some appended exact names are spelling
+aliases of the historical nutritional vocabulary. The spelling test still
+checks the historical crosswalk; separate tests check the delivered axis
+and the complete, unambiguous Aggregate assignment.
+
+API verification checks =food_acquired= as a row-preserving rename and
+=food_expenditures= as a sum of levels, on both purchased and total bases
+for all seven waves, retaining missing cluster keys in the comparison.
+Default/Preferred output is checked separately. No household records,
+scores, identifiers, masks or fitted models are committed.
+
+All 164 targeted tests pass: 61 isolated aggregation tests, 90 existing
+configuration/label tests and 13 consolidated Ghana Aggregate tests. The
+latter make nine public API calls and check every wave within each result;
+there are no skips or errors. A separate comparison with the prepublication
+inventory confirms identical Preferred vocabularies in every wave and all
+752 item-by-wave expenditure totals on each basis. Maximum relative-scaled
+differences are 2.54e-16 for purchases and 2.77e-16 for total recorded value.
+All 739 nutritional wave rows and 195 existing Preferred-to-FCT lookups
+match the prepublication table exactly. The API and skill-catalog audit
+also passes.
+
+The thirteen API tests emit 64 existing audit warnings, including missing
+early Price/strata, quantity extremes, missing modern units and early
+cluster keys. These data qualifications are retained; the checks do not
+repair or suppress them. Missing cluster keys survive expenditure sums.
+
+* Reproduction
+
+Use the LSMS branch =feature/ghanalss-aggregate-curation= with the sibling
+CFE branch =feature/prepare-data-scoring=. From the LSMS root:
+
+#+begin_example
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 PYTHONPATH="$PWD/../CFEDemands:$PWD"
+
+# Original candidates and the combined first draft.
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+  --output SkunkWorks/aggregation/ghanalss/validation_purchased
+
+# Additional candidates; Onion is reserved, so its group is excluded.
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+  --additional SkunkWorks/aggregation/ghanalss/additional_candidates.yml \
+  --names fine fish_fresh_frozen_named crab_shrimp bread_types named_spirits \
+    tinned_milk_forms coconut_forms named_processed_fish \
+  --output SkunkWorks/aggregation/ghanalss/validation_additional
+
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+  --bootstrap-only 60 \
+  --output SkunkWorks/aggregation/ghanalss/bootstrap_purchased
+
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+  --probe-members 'Sugar (cubed)' 'Sugar (granulated)' Macaroni Spaghetti \
+    'Cassava (white, flour)' 'Cassava (yellow, flour)' --probe-draws 60 \
+  --output SkunkWorks/aggregation/ghanalss/probes_purchased
+
+for basis in purchased total; do
+  .venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+    --basis "$basis" --names fine draft \
+    --specification SkunkWorks/aggregation/ghanalss/selected_groups.yml \
+    --output "SkunkWorks/aggregation/ghanalss/validation_selected_$basis"
+done
+
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation \
+  --names fine draft --evaluation test \
+  --specification SkunkWorks/aggregation/ghanalss/selected_groups.yml \
+  --output SkunkWorks/aggregation/ghanalss/test_selected
+
+.venv/bin/python -m SkunkWorks.aggregation.ghana_validation --simulate \
+  --specification SkunkWorks/aggregation/ghanalss/selected_groups.yml \
+  --output SkunkWorks/aggregation/ghanalss/simulation_selected
+
+# Idempotent publication: preserves the original crosswalk cells.
+.venv/bin/python -m SkunkWorks.aggregation.publish_ghana
+
+.venv/bin/python -m pytest --confcutdir=SkunkWorks/aggregation \
+  SkunkWorks/aggregation -q
+.venv/bin/python -m pytest --no-purge -q \
+  tests/test_ghanalss_aggregate.py tests/test_ghanalss_food_label_canonical.py \
+  tests/test_ghanalss_nutrition.py
+#+end_example
+
+The saved CSVs report all attempted candidates and missing constituent
+coefficients. The first candidate run predates the paired-difference
+reporting and reference-quantile fields; its point predictions use full-rank
+calibrations and are unaffected by the later identification guard.
+The later combined and final-test runs use those guards and the complete
+PSU resampling population. The scripts reuse existing Country extraction,
+CFE fitting/scoring, and Org editing machinery; implementation choices and
+verification are recorded in the ledger.
+
+--Sue

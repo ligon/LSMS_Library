@@ -132,13 +132,21 @@ class TestVocabulary:
             f'Either put the label on the food axis, or flag the item Food=own/no.')
 
     def test_country_table_is_a_usable_authority(self):
-        """The country crosswalk must not itself carry two spellings of one food."""
+        """Historical crosswalk rows retain one spelling of each food.
+
+        Exact delivered names added for Aggregate coverage have blank wave
+        and FCT cells. They can be aliases of the historical vocabulary;
+        rewriting that vocabulary would alter nutrition lookup fallbacks.
+        The delivered axis remains collision-free in the other tests here.
+        """
         # GH #783 moved the country vocabulary out of the standalone
         # _/food_items.org (`food_label`) into _/categorical_mapping.org as
         # `harmonize_food` -- the one file Country.categorical_mapping opens.
         t = df_from_orgfile(countries_root() / COUNTRY / '_' / 'categorical_mapping.org',
                             name='harmonize_food')
-        bad = _collisions(_values(t, 'Preferred Label'))
+        crosswalk_columns = [c for c in t if c in WAVES or c == 'FCT Code']
+        crosswalk = t.loc[t[crosswalk_columns].fillna('').ne('').any(axis=1)]
+        bad = _collisions(_values(crosswalk, 'Preferred Label'))
         assert not bad, f'{COUNTRY} _/categorical_mapping.org harmonize_food: {bad}'
 
 
