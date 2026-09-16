@@ -116,9 +116,18 @@ right invariant on =Lw=; it could never have caught this.
    stays 2016-17-only (484 rows), which is the genuine Irish-potato item.
    Country Preferred Labels 215 -> 214; bijection, 0 off-axis, 0 duplicates and
    Expenditure per wave all still hold; 32 tests pass.
-3. =557 'Country milk'= left under =Cocoa (milk powder beverages)=: n=52, unit
-   =Single=, median 5.50 against =Other milk= 3.00 -- suggestive of milk but
-   not decisive.  Documented unsure rather than moved.
+3. *RESOLVED (@ligon, 2026-09-16): =557 'Country milk'= -> =Milk (fresh)=.*
+   Ghana's "Country milk" (branded Countre Dairy) is a bottled, shelf-stable
+   UHT milk drink imported from Belgium -- so it is liquid milk, not a cocoa
+   beverage.  =Milk (fresh)= is the liquid-milk label on the 2016-17 axis and
+   carries FCT *10_029* ("Milk, cow, whole, raw, 4.5% fat"), which is what UHT
+   milk is nutritionally.  Note =Other Milk Products= would have been wrong:
+   its FCT is 10_028, *cheese*.  Delivered: =Milk (fresh)= now 7,270 rows
+   including 746 in 2016-17.
+
+   This is the fact the price probe could not supply -- n=52 at unit =Single=
+   was suggestive of milk but never decisive, and it was correctly left
+   =unsure= rather than guessed.
 4. *RESOLVED (@ligon, 2026-09-16): =Margarine/Butter= where the instrument
    conflates them, =Margarine= where it does not.*  Unlike potato and millet
    this is *non-monotonic* -- the instrument went back and forth, so no
@@ -163,16 +172,61 @@ right invariant on =Lw=; it could never have caught this.
    =test_price_items_share_the_food_vocabulary= guard has caught a rename
    before it shipped*; it is the most valuable test in this file.
 
-5. *NEW: in 91/98 ONLY, purchased and produced sorghum sit under DIFFERENT
-   labels.*  =Guinea corn/sorghum= is =Code_9b=1= (purchase side, =Code_8h=
+5. *RESOLVED (@ligon, 2026-09-16): guinea corn + sorghum reconciled with a
+   named reducer.*  In 91/98 ONLY, purchased and produced sorghum sat under
+   DIFFERENT labels.  =Guinea corn/sorghum= is =Code_9b=1= (purchase side, =Code_8h=
    empty), while =Sorghum= (=Code_8h=4=) and =Guinea Corn= (=Code_8h=7=) are
    own-production.  From GLSS5 on the instrument puts =9b=1= and =8h=4= on ONE
    row, so the later waves already do it right.  Since guinea corn IS sorghum,
    those two waves serve one crop under three labels, split by module:
    purchased 765 rows, produced 5,948 + 207.
 
-   *Not a free rename.*  Merging the three would create *115 colliding keys*
-   (80 in 1991-92, 35 in 1998-99) -- households that filed both own-production
-   lines -- so it needs a named reducer in the wave script (the =Goat=
-   precedent, =CONTENTS.org:3280=: Quantity sums, Price becomes the
-   quantity-weighted mean), not a bare rename.  Left for decision.
+   *Not a free rename*: 115 colliding keys (80 in 1991-92, 35 in 1998-99) --
+   households that filed both own-production lines -- 58 of them disagreeing on
+   Price.  Resolved with =ghanalss.reduce_duplicate_food_rows= (Quantity SUMS,
+   Price becomes the QUANTITY-WEIGHTED MEAN, the =Goat= precedent at
+   =CONTENTS.org:3280=), called through =reconcile_after_crosswalk=.
+
+   *WHERE the reduction happens was the whole design question, and the first
+   answer was wrong.*  The merge was first done by renaming the two 8h
+   Preferred Labels in the WAVE tables, which forced =Price= into the
+   pre-unstack groupby key so two farmgate prices would not be summed -- and
+   that restructure perturbed 1991-92's row count by *+637 for reasons having
+   nothing to do with sorghum* (it also silently resurrected 262 rows with a NA
+   =u= that the old =dropna=True= had dropped).  Backed out.
+
+   The merge now happens at *Lcp*: the wave tables keep =Sorghum= and
+   =Guinea Corn= as their own labels -- those really are two lines on that
+   questionnaire and rewriting a round's vocabulary is not ours to do -- and
+   the country table's per-wave columns map both onto Preferred Label
+   =Guinea Corn/Sorghum=, which is exactly what those columns are for.  The
+   reducer then runs once, after the crosswalk, on the canonical grain.  The
+   wave pipeline is untouched.
+
+   Measured against a rebuild of the TRUE prior state (not an assumed
+   baseline): 1991-92 *682,627 -> 682,547*, exactly *-80*, matching the 80
+   collisions measured in that wave; corpus *-100* rows total; Expenditure
+   identical per wave in all seven, which is what the quantity-weighted mean
+   guarantees (Q*P = sum(q*p)).
+
+   A =min_count=1= bug in the first version of the reducer turned all-NA groups
+   into recorded zeros and added *+32,040 phantom rows*; caught before commit
+   by the row count, not by a test.
+
+* Remaining =.first()= reducers in GhanaLSS wave scripts (2026-09-16)
+
+@ligon asked whether these had all been dealt with.  *GH #871 fixed CORE* --
+=most_complete_row= replaced =groupby().first()= at all three core collapse
+sites -- and closed 2026-09-12.  It did not touch country wave scripts, and
+=CLAUDE.md='s own rule is that a reducer belongs in the wave script, so a
+script-level =.first()= was never in its scope.  What remains here:
+
+- =1998-99/_/food_acquired.py:110= -- =Price=('Price','first')= on
+  =(i, j, u, visit)=.  A latent hazard only: it fires when that groupby sees a
+  duplicate, and with the sorghum merge now happening AFTER Lcp it sees none.
+  Not changed, so this commit does only what it claims.
+- =2005-06/_/food_acquired.py:172= -- =_pf=('Price','first')= is the deliberate
+  divide-by-zero fallback INSIDE that wave's own weighted-mean reducer, i.e.
+  the correct pattern, not a defect.
+
+The mirror is up to date: =origin/development= is =6666e0fea=, 0 commits behind.

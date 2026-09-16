@@ -274,7 +274,7 @@
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     554 | Bournvita                                            |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     555 | Cow bell (coffee, choco etc.)                        |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     556 | This way chocolate drink                             |         |                                |
-| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     557 | Country milk                                         |         |                                |
+| Milk (fresh)                  | Milk (fresh)                  |     557 | Country milk                                         |         |                                |
 | Milk (evaporated)             | Milk (evaporated)             |     558 | Ideal                                                |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     559 | Milo                                                 |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     560 | Richoco                                              |         |                                |

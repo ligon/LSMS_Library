@@ -858,3 +858,84 @@ def to_country_food_labels(df, wave, level='j'):
     out = df.copy()
     out[level] = out[level].map(lambda v: m.get(str(v), v))
     return out
+
+
+_ADDITIVE_MEASURES = ('Expenditure',)
+
+
+def reduce_duplicate_food_rows(df, keys, quantity='Quantity', price='Price'):
+    """Collapse rows sharing ``keys``: ``quantity`` SUMS, ``price`` becomes the
+    QUANTITY-WEIGHTED MEAN.
+
+    The named reducer this country's CONTENTS.org requires wherever several
+    survey lines harmonise onto one ``j``.  It exists because the alternatives
+    are both wrong:
+
+    * leaving the duplicate for the framework -- ``food_acquired`` is in
+      ``_ADDITIVE_MEASURE_COLUMNS``, so core SUMs Quantity/Expenditure and then
+      re-derives ``Price = Expenditure / Quantity`` across the WHOLE frame,
+      destroying every recorded farmgate price (CONTENTS.org Trap 9);
+    * ``groupby().first()`` -- keeps one price and silently discards the other,
+      which is GH #323's hazard.
+
+    The weighted mean is the price OF THE HARMONISED COMMODITY, and it is the
+    choice that makes ``Quantity * Price`` add up across the merge: with
+    ``Q = sum(q)`` and ``P = sum(q*p)/sum(q)``, ``Q*P == sum(q*p)``, so a wave
+    that derives Expenditure from Quantity x Price (1998-99) conserves it
+    exactly.  Where the summed quantity is 0 or missing the first price is kept
+    rather than dividing by zero.
+
+    Same rule as the inline reduction in ``2005-06/_/food_acquired.py`` (the
+    mutton+goat merge); that one predates this helper and is left as it is.
+    """
+    d = df.copy()
+    d['_qp'] = (pd.to_numeric(d[quantity], errors='coerce')
+                * pd.to_numeric(d[price], errors='coerce'))
+    # min_count=1 throughout: a plain 'sum' returns 0.0 for an ALL-NA group,
+    # which would turn "this visit recorded nothing" into a recorded zero and
+    # smuggle the row past the caller's dropna(how='all').  Measured when this
+    # was wrong: +32,040 phantom rows on the delivered table.
+    _sum = lambda s: s.sum(min_count=1)
+    spec = {quantity: (quantity, _sum), '_qp': ('_qp', _sum), '_pf': (price, 'first')}
+    # Every OTHER column is carried, not dropped: the additive measures SUM
+    # (they are `_ADDITIVE_MEASURE_COLUMNS` and a sum of all-NA stays NA), and
+    # anything else -- `s`, a wave tag -- is constant within a key by
+    # construction, so `first` is exact rather than a choice.
+    carried = [c for c in d.columns if c not in keys and c not in (quantity, price, '_qp')]
+    for c in carried:
+        spec[c] = (c, _sum) if c in _ADDITIVE_MEASURES else (c, 'first')
+    out = d.groupby(keys, sort=False, dropna=False).agg(**spec).reset_index()
+    q = pd.to_numeric(out[quantity], errors='coerce')
+    out[price] = (out['_qp'] / q).where(q.notna() & (q != 0), out['_pf'])
+    return out.drop(columns=['_qp', '_pf'])
+
+
+def reconcile_after_crosswalk(df):
+    """Reduce the duplicates that ``to_country_food_labels`` can create.
+
+    The crosswalk is many-to-one by design: 1991-92 and 1998-99 field guinea
+    corn and sorghum as two separate own-production lines (``Code_8h`` 4 and 7)
+    and they are the same crop, so both map to ``Guinea Corn/Sorghum``.  A
+    household that filed both then holds two rows on one
+    ``(t, i, j, u, s, visit)``.
+
+    Reducing HERE -- after Lcp, on the canonical grain -- is the point.  Doing
+    it earlier would mean rewriting the wave's own vocabulary, which is not
+    ours to rewrite: those really are two lines on that questionnaire, and the
+    per-wave columns exist precisely so the harmonisation can happen at the
+    country level instead.  Doing it later means core does it, and core SUMs
+    the additive measures and then re-derives ``Price`` across the whole frame
+    (CONTENTS.org Trap 9).
+
+    No-op where the crosswalk introduced no duplicate, and asserts it left the
+    index unique.
+    """
+    names = list(df.index.names)
+    cols = list(df.columns)
+    if not df.index.duplicated().any():
+        return df
+    out = reduce_duplicate_food_rows(df.reset_index(), names)
+    out = out.set_index(names)[cols]
+    assert not out.index.duplicated().any(), (
+        'reconcile_after_crosswalk left duplicates on ' + repr(names))
+    return out

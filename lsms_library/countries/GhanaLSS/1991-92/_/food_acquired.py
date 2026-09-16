@@ -202,6 +202,9 @@ assert not fa.index.duplicated().any(), (
 if __name__=='__main__':
     # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
     # Pure rename; an unmapped label raises rather than passing through.
-    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
+    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels, reconcile_after_crosswalk
     fa = to_country_food_labels(fa, '1991-92')
+    # guinea corn + sorghum are one crop on two 8h lines -> one j; reduce
+    # here, on the canonical grain, not in core (Trap 9).
+    fa = reconcile_after_crosswalk(fa)
     to_parquet(fa,'food_acquired.parquet')
