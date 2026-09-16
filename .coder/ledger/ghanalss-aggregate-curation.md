@@ -45,8 +45,12 @@ distinction between a semantic proposal and statistical certification.
 - `visit` is a calendar contact for GLSS3--7. GLSS1/2's food `visit=1` is a
   consumption occasion recorded at contact 2; do not join them mechanically.
 - Total expenditure includes existing derived own-production values. Modern
-  8H uses quantity times farmgate price; the early 12B construction differs;
-  GLSS3 own-production expenditure is not wired. Keep sources/bases distinct.
+  8H uses quantity times a reported unit value; the early 12B construction
+  differs; GLSS3 own-production expenditure is not wired. Keep sources/bases
+  distinct. The later CONTENTS section "What food_acquired.Price on produced
+  rows MEASURES" reports agreement with purchase unit values: hypothetical
+  selling-price wording and the `8h-farmgate` registry key do not establish
+  that the amount reflects a farmgate economic price.
 
 ## §4 Invariants and assumptions
 
@@ -90,6 +94,43 @@ do not block a complete, conservative draft or support measurements now.
 
 ## Verification
 
-Pending implementation and review against the invariants above.
+- The all-wave API run completed for all seven waves. It delivered 233
+  distinct labels; the complete draft has 225 groups (five merges covering
+  13 labels). Four tobacco labels remain inventoried singletons, excluded
+  from food profiles. No proposed member is absent from the delivered data.
+- `SkunkWorks/aggregation/ghanalss/item_review.csv` records raw-code/label
+  evidence for every delivered item. There are 47 delivered names absent
+  from the country Preferred axis and nine country names not delivered.
+  No historical Aggregate field was used to assign membership.
+- `profiles.csv` keeps the full sample denominator. Two positive food
+  households outside sample in each of 1987-88 and 1988-89 are accounted
+  for separately; no such cases occur in the other five waves. The early
+  discrepancies remain unresolved and are not used to redefine the sample.
+- `wave_inventory` verifies expenditure conservation for every household
+  and basis, with `rtol=1e-12`, `atol=1e-8`. It rejects negative/infinite
+  amounts and missing household/wave/item keys. Tests cover zero/unavailable
+  equivalence, price-only rows, repeated visits, invalid weights, exact
+  label identity, outside-sample accounting, and ambiguous/overlapping maps.
+- Independent semantic review found the five memberships consistent with
+  source labels. Its corrections were applied: preserve UTF-8 evidence,
+  carry singleton cautions into review rows, and qualify malt packaging
+  evidence as modern-wave evidence. Generic Sugar remains separate because
+  its early source includes candy, honey and sugarcane. Older Cassava
+  (flour) source labels explicitly identify gari.
+- All 51 isolated aggregation tests passed. Run from the mirror root with
+  `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1`
+  `LSMS_BUILD_WORKERS=1`
+  `PYTHONPATH="$PWD/../CFEDemands:$PWD" .venv/bin/python -m pytest`
+  `--confcutdir=SkunkWorks/aggregation SkunkWorks/aggregation -q`.
+  This avoids the production suite's cache-clearing conftest. The inventory
+  command is in `SkunkWorks/aggregation/ghanalss/review.org`.
+- Artifact checks confirm exhaustive membership, the reported support
+  gains, corrected evidence, and summary-only output columns. No household
+  records, production estimator changes, or live Aggregate column added.
+  CFEDemands remains clean on `feature/prepare-data-scoring`.
+
+The real-data increase in group support is not a measured improvement in
+preparation retention or MUE accuracy. Those statistical comparisons and
+publication remain the next stage, as specified in section 6.
 
 --Sue, 2026-09-16
