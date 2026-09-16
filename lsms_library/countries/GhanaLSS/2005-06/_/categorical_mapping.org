@@ -24,7 +24,7 @@
 | Pork                         | Pork                         |      19 | pork                                                        |      65 | pork                       |
 | Beef                         | Beef                         |      20 | beef                                                        |      63 | beef                       |
 | Goat                         | Goat                         |      21 | goat meat                                                   |      66 | goat                       |
-| Goat                         | Goat                         |      22 | mutton                                                      |      64 | mutton                     |
+| Mutton                       | Mutton                       |      22 | mutton                                                      |      64 | mutton                     |
 | Other Meat                   | Other Meat                   |      23 | bushmeat/wild game                                          |      68 | wild game                  |
 | Other Meat                   | Other Meat                   |      24 | other meat (dog, cat,etc.)                                  |      67 | other domestic meat        |
 | Chicken (live)               | Chicken                      |      27 | chicken                                                     |      60 | chicken                    |
@@ -101,7 +101,7 @@
 | Other Pulses                 | Pulses, Nuts                 |     119 | other pulses and nuts                                       |      24 | other legumes/pulses       |
 | Other Pulses                 | Pulses, Nuts                 |         |                                                             |      27 | other nuts/seeds           |
 | Cassava (dough)              | Cassava                      |     123 | cassava-dough                                               |      12 | cassava(other forms)       |
-| Cassava (flour)              | Cassava                      |     124 | gari                                                        |      11 | cassava-gari               |
+| Gari                         | Gari                         |     124 | gari                                                        |      11 | cassava-gari               |
 | Other Flours                 | Other Flours                 |     125 | other processed starchy staples                             |       9 | other flours               |
 | Coffee                       | Coffee                       |     129 | coffee                                                      |         |                            |
 | Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)             |         |                            |
@@ -116,7 +116,7 @@
 | Akpeteshie                   | Spirits                      |     145 | akpeteshie                                                  |         |                            |
 | Other Spirits                | Spirits                      |     146 | other spirits                                               |         |                            |
 | Wine                         | Wine                         |     150 | palm wine/raffia palm wine etc                              |         |                            |
-| Wine                         | Wine                         |     151 | pito/brukutu,etc                                            |         |                            |
+| Pito                         | Pito                         |     151 | pito/brukutu,etc                                            |         |                            |
 | Wine                         | Wine                         |     152 | other local wine                                            |         |                            |
 | Wine                         | Wine                         |     153 | other imported wine                                         |         |                            |
 | Beer                         | Beer                         |     157 | beer (local)                                                |         |                            |

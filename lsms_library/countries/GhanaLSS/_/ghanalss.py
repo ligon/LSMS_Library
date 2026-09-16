@@ -798,3 +798,63 @@ def inputs_produced_farmgate(wave):
     out.insert(1, 'i', _farmgate_hhid(wave, df))
     out.attrs['price_variable'] = price_var
     return out.set_index(['t', 'i'])
+
+
+def to_country_food_labels(df, wave, level='j'):
+    """Map a wave's own ``harmonize_food`` label onto the COUNTRY one (Lcp).
+
+    Each GLSS round names foods in its own vocabulary; the country-level
+    ``_/categorical_mapping.org`` ``harmonize_food`` table records exactly that
+    round's spelling in its ``<wave>`` column, against the canonical
+    ``Preferred Label``.  That crosswalk is what makes ``j`` comparable across
+    rounds -- and until 2026-09-16 *nothing applied it*, so the served ``j`` was
+    the wave vocabulary and 45 of 225 labels never reached the country axis
+    (``slurm_logs/ghanalss_aggregate_labels/FINDINGS.org``).  This function is
+    that step.
+
+    It is a **pure rename**: nothing is summed, dropped or reindexed.  The
+    country table is a bijection onto each wave's column (0 ambiguous cells in
+    all seven waves, asserted here), so two wave labels cannot collide on one
+    country label within a wave, and the index stays as unique as it was.
+
+    An unmapped label is a **hard error**, not a pass-through: a silent
+    pass-through is exactly the defect this replaces, and ``pandas.rename``
+    would do it by default.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile
+
+    tbl = df_from_orgfile(
+        str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+        name='harmonize_food')
+    tbl.columns = [str(c).strip() for c in tbl.columns]
+    if wave not in tbl.columns:
+        raise KeyError(f'harmonize_food has no column for wave {wave!r}')
+    native = tbl[wave].astype(str).str.strip()
+    canon = tbl['Preferred Label'].astype(str).str.strip()
+    pairs = [(n, c) for n, c in zip(native, canon) if n and n != 'nan']
+    dup = {n for n, _ in pairs if sum(1 for m, _ in pairs if m == n) > 1}
+    if dup:
+        raise ValueError(
+            f'harmonize_food column {wave!r} is not injective -- {sorted(dup)} '
+            f'each name more than one Preferred Label; the crosswalk is ambiguous')
+    m = dict(pairs)
+
+    if level in (df.index.names or []):
+        seen = set(df.index.get_level_values(level).dropna().astype(str))
+    else:
+        seen = set(df[level].dropna().astype(str))
+    missing = sorted(seen - set(m))
+    if missing:
+        raise KeyError(
+            f'GhanaLSS {wave}: {len(missing)} label(s) on {level!r} are absent from the '
+            f'{wave!r} column of the country harmonize_food, so they cannot be mapped '
+            f'onto the country axis: {missing[:12]}.  Add them to '
+            f'countries/GhanaLSS/_/categorical_mapping.org rather than letting them '
+            f'pass through -- a pass-through is GH #782/#925 all over again.')
+
+    if level in (df.index.names or []):
+        return df.rename(index=m, level=level)
+    out = df.copy()
+    out[level] = out[level].map(lambda v: m.get(str(v), v))
+    return out

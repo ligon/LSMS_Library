@@ -256,7 +256,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Millet                         | Millet                         |      303 | Millet, guinea corn or sorghua (grain or flour)                     |      303 | Millet, guinea corn or sorghua (grain or flour)                     |
 | Wheat Flour                    | Wheat Flour                    |      304 | Bread or wheat flour                                                |      304 | Bread or wheat flour                                                |
 | Cassava (fresh)                | Cassava                        |      305 | Raw cassava                                                         |      305 | Raw cassava                                                         |
-| Cassava (flour)                | Cassava                        |      306 | Garri                                                               |      306 | Garri                                                               |
+| Gari                           | Gari                           |      306 | Garri                                                               |      306 | Garri                                                               |
 | Cassava (dough)                | Cassava                        |      307 | Cassava in a form other than garri (achiekie, tapioca, dough, etc.) |      307 | Cassava in a form other than garri (achiekie, tapioca, dough, etc.) |
 | Macaroni/Spaghetti             | Other Cereal                   |      308 | Macaroni and Spaghetti                                              |      308 | Macaroni and Spaghetti                                              |
 | Biscuit                        | Biscuit                        |      309 | Biscuits and cakes                                                  |      309 | Biscuits and cakes                                                  |
@@ -345,7 +345,7 @@ price carried into the second-year set, BID p.17).
 | 3    | Guinea Corn                        | Guinea corn/sorghum           | own  | Kilogram    |       | no guinea corn label on the 1987-88 axis                         |
 | 4    | Millet                             | Millet                        | yes  | Kilogram    |       |                                                                  |
 | 5    | Wheat bread                        | Bread                         | own  | Kilogram    |       | axis has Wheat Flour / Biscuit, no Bread                         |
-| 6    | Garri                              | Cassava (flour)               | yes  | Kilogram    |       | gari = cassava flour, as the axis codes it                       |
+| 6    | Garri                              | Gari                          | yes  | Kilogram    |       | gari = cassava flour, as the axis codes it                       |
 | 7    | Yam                                | Yam                           | yes  | Kilogram    |       |                                                                  |
 | 8    | Cocoyam                            | Cocoyam                       | yes  | Kilogram    |       |                                                                  |
 | 9    | Plantain                           | Plantain                      | yes  | Kilogram    |       |                                                                  |

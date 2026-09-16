@@ -74,8 +74,43 @@ def food_axis():
     return out
 
 
+def _country_table():
+    path = countries_root() / COUNTRY / '_' / 'categorical_mapping.org'
+    return df_from_orgfile(path, name='harmonize_food', encoding=ENC)
+
+
 class TestVocabulary:
     """Config-only. Runs everywhere, needs no data."""
+
+    @pytest.mark.parametrize('wave', WAVES)
+    def test_country_column_is_a_bijection_onto_the_wave_axis(self, food_axis, wave):
+        """The Lc invariant: country <wave> column <-> that wave's Preferred Labels.
+
+        This is what makes ``to_country_food_labels`` a total, unambiguous
+        rename, and it is the config-only half of the delivered assertion in
+        ``TestDelivered``.  Three ways it can break, all of them real:
+
+        * a wave label absent from the column -- the crosswalk cannot map it,
+          and before 2026-09-16 it silently passed through (45 labels, 14% of
+          rows);
+        * a column entry no wave row produces -- a dead reference (1987-88
+          carried ``Milk (evaporated)``);
+        * one name in the column twice -- an ambiguous crosswalk, which would
+          make the rename order-dependent.
+        """
+        t = _country_table()
+        t.columns = [str(c).strip() for c in t.columns]
+        col = [str(v).strip() for v in t[wave].fillna('')]
+        col = [v for v in col if v and v != 'nan']
+        wave_pl = food_axis[wave]['Preferred Label']
+        missing = sorted(wave_pl - set(col))
+        dead = sorted(set(col) - wave_pl)
+        dup = sorted({v for v in col if col.count(v) > 1})
+        assert not (missing or dead or dup), (
+            f'{COUNTRY} harmonize_food column {wave!r} is not a bijection onto that '
+            f"wave's Preferred Labels -- missing={missing[:10]} dead={dead[:10]} "
+            f'ambiguous={dup[:10]}.  The country table is the authority; every wave '
+            f'label needs exactly one row naming it in this column.')
 
     @pytest.mark.parametrize('axis', ['Preferred Label', 'Aggregate Label'])
     def test_no_cross_wave_spelling_drift(self, food_axis, axis):
@@ -159,25 +194,35 @@ def delivered():
 class TestDelivered:
     """End-to-end. Skipped when the GhanaLSS cache is cold."""
 
-    def test_delivered_j_is_on_the_wave_food_axis(self, delivered, food_axis):
-        """THE subset assertion -- the check whose absence let #782 ship.
+    def test_delivered_j_is_on_the_country_food_axis(self, delivered):
+        """THE subset assertion, one rung up from #782 (2026-09-16).
 
-        Every delivered j must be a Preferred Label of the wave that produced
-        it.  2005-06 failed this for 149,047 rows across 63 raw survey labels
-        ('beef', 'maize-flour/dough', 'okro') because its own-production decode
-        matched nothing and passed the source label through.
+        Until the Lcp step landed, the wave scripts emitted the WAVE
+        vocabulary and this assertion was made against the wave's own
+        ``harmonize_food``.  That was the right invariant on ``Lw`` -- the
+        input to the crosswalk -- but it let 45 of 225 served labels sit off
+        the COUNTRY axis entirely, unmapped and unnoticed, because nothing
+        tested the join between the two tables
+        (``slurm_logs/ghanalss_aggregate_labels/FINDINGS.org``).
+
+        ``ghanalss.to_country_food_labels`` now applies the crosswalk in every
+        wave script, so the delivered ``j`` must be a COUNTRY Preferred Label.
+        The wave-side invariant did not disappear: it moved into
+        ``TestVocabulary.test_country_column_is_a_bijection_onto_the_wave_axis``
+        below, where it is config-only and therefore always runs.
         """
+        country = _values(_country_table(), 'Preferred Label')
         offenders = {}
         for wave, g in delivered.groupby('t'):
-            off = sorted(set(g['j']) - food_axis[wave]['Preferred Label'])
+            off = sorted(set(g['j']) - country)
             if off:
                 offenders[wave] = (len(off), off[:15],
                                    int(g['j'].isin(off).sum()))
         assert not offenders, (
-            f'{COUNTRY} food_acquired: delivered j is not a subset of the wave\'s '
+            f'{COUNTRY} food_acquired: delivered j is not a subset of the COUNTRY '
             f'harmonize_food Preferred Labels -- {{wave: (n_labels, sample, rows)}} '
-            f'{offenders}.  An unmatched decode is passing raw source labels '
-            f'through; fix the decode, do not add the raw label to the axis.')
+            f'{offenders}.  Either a wave label is missing from that wave\'s column '
+            f'of the country table, or a decode is passing a raw label through.')
 
     def test_no_cross_wave_collisions_in_delivered_j(self, delivered):
         """The census #782 published: 35 groups over 27.9% of rows -> 0."""

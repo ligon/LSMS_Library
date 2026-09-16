@@ -1,0 +1,266 @@
+#+title: GhanaLSS food-label tables: audit before designing =Aggregate Label=
+#+date: [2026-09-16]
+
+Mechanical audit of the country =harmonize_food= and all seven wave
+=harmonize_food= tables, run before designing the =Aggregate Label= column.
+Scripts: =audit.py=, =audit2.py= (see =README.md=).  Companion: =FINDINGS.org=.
+
+* What is CLEAN -- stated so nobody re-checks it
+
+- No blank =Preferred Label= rows in the country table (0 of 205).
+- No leading/trailing whitespace, doubled spaces or non-ASCII in any country
+  =Preferred Label=.
+- Every country =FCT Code= resolves in =fct_west_africa.org= (0 invalid).
+- *No within-wave code collisions*: in all seven waves, no =Code_9b= / =Code_8h=
+  / =Code_12A= / =Code_12B= maps to two different =Preferred Label= values.
+- No dead country rows: every one of the 205 rows has at least one wave cell.
+- *Every one of the 195 Preferred Labels has an =Aggregate= value in at least one
+  wave*, so the harvest for a country-level column is complete -- 0% of
+  delivered expenditure in any wave sits on a PL with no Aggregate candidate.
+- =Fish (dried)= vs =Fish (fried)= is *not* a typo: distinct FCT codes
+  (09_053 dried, 09_003 fried), both present in five waves.
+
+* Issue 1 -- premature aggregation in =Preferred Label= (7 rows)
+
+The country table collapses goods the survey itself distinguishes *within a
+single wave*.  Splitting these is what @ligon asked for on rice; the same
+argument applies to six more.  Delivered row counts:
+
+#+name: tab:premature
+| collapsed PL          | constituents (wave)                                  |     rows | split in   |
+|-----------------------+------------------------------------------------------+----------+------------|
+| Rice                  | Rice (imported) / Rice (local)                        |  69,260 / 46,985 | 05, 12, 16 |
+| Fish (smoked)         | Fish (smoked, river) / Fish (smoked, sea)             |  13,627 / 11,921 | 16         |
+| Sugar                 | Sugar (granulated) / Sugar (cubed)                    |  19,559 / 332 | 16         |
+| Cassava (flour)       | Cassava (white, flour) / Cassava (yellow, flour)      |  7,582 / 1,261 | 16       |
+| Cocoa Powder          | Cocoa Powder / Cocoa (milk powder beverages)          |  28,535 / 11,224 | 16         |
+| Macaroni/Spaghetti    | Macaroni / Spaghetti                                  |  463 / 794 | 16         |
+| Potato/Sweet Potato   | Potato / Sweet Potato                                 |  484 / 1,759 | 16        |
+
+*Splitting creates a three-way structure, not a two-way one.*  The earlier waves
+carry an UNDIFFERENTIATED label that is neither constituent -- GLSS1-4 ask only
+"Rice" (34,707 rows), GLSS1-6 only "Sugar" (91,088).  So each becomes three
+Preferred Labels, and the coarse one remains a legitimate observation of a
+coarser question.  *This is precisely what makes =Aggregate Label= necessary
+rather than cosmetic*: after the split, cross-wave comparability is only
+recoverable through the Aggregate axis.
+
+** These two are NOT premature aggregation -- leave them
+
+=Cassava= (=Cassava= 91/98 vs =Cassava (fresh)= 87/88/05/12/16) and
+=Fish (fresh and frozen)= (=Fish= 87/88 vs the long name 91-12) occupy
+*disjoint* wave sets.  No wave distinguishes them, so the two rows record a
+cross-wave *spelling* change, which is exactly what the per-wave columns are
+for.  Corroborated independently: these are the only two multi-row PLs that
+produced *zero* duplicate index tuples when =Lcp= was applied.
+
+** The produced side is CLEAN -- the split has no fourth state
+
+Checked because =food_acquired= builds =s='purchased'= from =Code_9b= and
+=s='produced'= from =Label_8h=, on a much smaller axis (63-67 rows vs 180-502),
+so a split constituent might exist on one side only.  It does, and correctly:
+the 8h axis carries =Rice (local)= and *no* =Rice (imported)= -- you do not grow
+imported rice.  Delivered, =Rice (imported)= is 69,260 rows *all purchased*;
+=Rice (local)= is 35,468 purchased + 11,517 produced.  So produced rice lands on
+the right constituent and the three-way split needs no =s=-specific handling.
+
+* Issue 2 -- the collapse propagates WRONG NUTRITION via =FCT Code=
+
+Not just a demand-estimation concern.  All rows of a collapsed PL inherit one
+FCT code:
+
+- =Potato/Sweet Potato= -> *02_009 "Potato, raw"*.  So 1,759 rows of sweet
+  potato across five waves are served white-potato nutrition.  The two differ
+  substantially (vitamin A above all).  *Clearest case for the split, and the
+  fix is available*: WAFCT carries *17* sweet-potato rows (02_011 deep yellow
+  raw, 02_022 pale flesh raw, 02_049 orange flesh raw, ...), so the split row
+  can take a correct code rather than inheriting white potato's.
+- =Cocoa Powder= -> *13_028 "Ovaltine powder, fortified"* is given both to
+  =Pure Cocoa Powder (eg. Brown gold)= (code 551) and to the malted-drink group.
+
+* Issue 3 -- a WAVE-level mis-grouping inside the cocoa cluster (2016-17)
+
+Independent of the collapse, and a defect at =Lw=.  2016-17's
+=Cocoa (milk powder beverages)= covers =Code_9b= 556-560:
+
+: 556 This way chocolate drink | 557 Country milk | 558 Ideal | 559 Milo | 560 Richoco
+
+=Milo=, =Richoco= and =Bournvita= are malted chocolate drinks and fit the
+Ovaltine FCT code.  *=Ideal= and =Country milk= are milk products.*
+
+*The wave table convicts itself*: =Ideal= appears under THREE different
+Preferred Labels in the same wave --
+
+: code 202 'Ideal (sachet)' -> Milk (powdered)
+: code 301 'Ideal'          -> Milk (evaporated)
+: code 558 'Ideal'          -> Cocoa (milk powder beverages)
+
+Two of the three are right.  Code 558 was filed by *product block* (it sits in
+the beverage block) rather than by food, and =Country milk= rode along with it.
+Fix in =2016-17/_/categorical_mapping.org=.
+
+* Issue 3b -- =mutton mixed cut= is served as =Goat= (species error)
+
+2016-17 =Code_9b= 115, raw label =mutton mixed cut=, maps to Preferred Label
+=Goat=.  *There is no =Mutton= or sheep Preferred Label anywhere in the 2016-17
+table* -- sheep meat has nowhere else to go.  The same wave separately carries
+=Goat , live= and =Goat meat= under the same PL.
+
+This retro-explains the GLSS1/2 =Goat -> Mutton= Aggregate flagged in
+=FINDINGS.org=: the conflation is not a wave-level slip but a standing one, and
+the two curators disagreed only about which animal's name to print.  *The PL
+=Goat= currently covers sheep*, which is worse than premature aggregation
+because the label is affirmatively wrong for part of the data.  Either give
+code 115 its own =Mutton= PL (2016-17 has distinct goat codes, so nothing is
+lost), or rename the conflated PL =Goat/Mutton= so it is at least honest.
+
+* Issue 3c -- =pito= is a BEER in 2016-17 and a WINE in 2005-06/2012-13
+
+GLSS5 and GLSS6 map =pito/brukutu,etc= into Preferred Label =Wine=, alongside
+=palm wine/raffia palm wine= and =other imported wine=.  GLSS7 maps
+=Traditional beer (Pito)= into =Beer=.  Pito is a sorghum beer; GLSS7 is right
+and the earlier waves are wrong, and the disagreement is a cross-wave
+comparability defect on two PLs at once.  Note also that =Wine= in GLSS5/6 mixes
+palm wine with imported grape wine -- wave-level premature aggregation of the
+same kind as Issue 1, at =Lw= rather than =Lc=.
+
+* Issue 4 -- gaps in the country table (=Lc= totality)
+
+*(a) Six labels absent from the country table entirely.*  They reach =j= and
+resolve by no route:
+
+: Sugar Bread (2005-06, 2012-13, 2016-17) | Oil (vegetable) | Pizza | Khebabs | Tuo Zaafi | Fried Plantian and Beans
+
+=Sugar Bread= is the material one -- it is also named at =CONTENTS.org:2263=
+(GH #109) as one of three labels "missing from =harmonize_food= entirely ...
+worth *+27.4% of 2016-17 Energy*".  =Fried Plantian and Beans= carries a typo
+for "Plantain" in the 2016-17 wave table.
+
+*(b) Seven blank wave cells for labels that ARE country Preferred Labels* --
+the row exists, the cell is empty:
+
+: 2016-17: Cooked Rice and Stew, Kenkey/Banku, Kola Nut, Other Prepared Meals, Soup
+: 1991-92: Carrot, Other Grains
+
+*(c) One dead reference*: the country table's 1987-88 cell =Milk (evaporated)=
+is produced by no 1987-88 wave-table row (1 of 59).
+
+* Issue 5 -- defects in the wave =Aggregate= columns (affect the harvest)
+
+- *=Cocoyam Leaves= -> =Coffee=* in 1998-99.  A mis-keyed row, not a bucketing
+  choice.  Fix in the wave table.
+- 22 Preferred Labels take two different Aggregate values across waves; about
+  half are spelling, ~12 are genuine coarse-vs-fine curator differences, and the
+  coarse value is the majority-wave value in only 6 of those 12.  Detail and
+  per-wave attribution in =FINDINGS.org= and =conflicts.json=.
+- =Snail -> Fish= (2016-17) additionally fails FCT type-coherence.
+- *NOT a defect*: =Goat -> Mutton= in GLSS1/2.  That wave's raw survey label at
+  code 324 is literally =Mutton=.
+
+* Issue 7 -- CORRECTION: =Cocoyam Leaves= -> =Coffee= is in the COUNTRY file, and it is a LIVE NUTRITION BUG
+
+=FINDINGS.org= attributed this to =1998-99/_/categorical_mapping.org=.  *That was
+wrong.*  The bad cell is =_/categorical_mapping.org:588=: the =Cocoyam Leaves=
+row carries *=Coffee=* in its *1998-99* column, while the =Coffee= row at =:589=
+has that cell *blank*.  A transposition in the country table.  GLSS4's own axis
+has a clean =Coffee | Coffee | 82= row (=1998-99/_/categorical_mapping.org:367=)
+and no cocoyam-leaf label at all.
+
+*It is not just an Aggregate-axis nuisance.*  =_/nutrition.py:189= merges
+=by_wave= on =(t, j)= FIRST and only falls back to =by_label=, so every 1998-99
+row with =j='Coffee'= resolves to FCT *04_009 (Cocoyam Leaves)* instead of
+*12_009 (Coffee)*.  Measured: *8,935 rows*.
+
+Two consequences: fix it in the COUNTRY file, and the genuine Aggregate conflict
+count is *21, not 22* -- this entry was a data error masquerading as a curator
+disagreement.
+
+* Issue 8 -- =Cola Nut= and =Kola Nut= are one food under two Preferred Labels
+
+Disjoint waves, so nothing ever collides and no guard fires:
+
+: Cola Nut  10,417 rows  [2005-06, 2012-13]
+: Kola Nut   8,659 rows  [1991-92, 1998-99, 2016-17]
+
+*19,076 rows of one food split across two country Preferred Labels* -- exactly
+the cross-wave drift class GH #782 swept (=Egg=/=Eggs=, =Tea bag=/=Tea bags=).
+It was missed because #782's collision key casefolds and singularises but does
+not forgive a *one-letter* difference, and =Cola=/=Kola= differ by a letter.
+Sweeping country PLs at a looser similarity threshold and flagging DISJOINT wave
+sets finds exactly two candidates: this one, and =Maize=/=Maizena=, which is a
+genuine distinction (Maizena is cornstarch, 4 rows).  *So this is the only
+instance, and the sweep is worth adding to the #782 guard.*
+
+* Issue 9 -- GH #925 constrains how the Aggregate column must be BUILT
+
+Blank cells in a =labels== column do not degrade -- they become *one unnamed
+bucket*.  =_relabel_j= builds its rename dict with =.dropna()=, which removes
+NaN but *not empty strings*, so every blank-celled label maps to =''=.
+Demonstrated live:
+
+: Country('GhanaLSS').food_expenditures(labels='1987-88')
+:   -> 91 distinct j; 55,314 rows land on the empty label ''
+: (the 1987-88 column has 0 NaN and 146 empty strings; 142 labels map to '')
+
+Expenditure is conserved, so nothing warns.  *Therefore the =Aggregate Label=
+column must be populated for all 195 Preferred Labels* -- a partial column is
+not a partial feature, it is a silent merge.  This is open GH #925, on which
+GhanaLSS is the worst-hit country (8 of 8 columns affected).
+
+* Issue 10 -- =Gari= is folded into =Cassava (flour)= (1991-92)
+
+=1991-92/_/categorical_mapping.org:321=: raw code 15 =Gari= -> PL
+=Cassava (flour)= -> Aggregate =Cassava=.  =Gari= is not a country Preferred
+Label anywhere.  Gari is fermented, roasted cassava granules -- a distinct
+processed food, not a flour.  This is the raw/processed folding pattern of open
+GH #833, which does not name GhanaLSS but is present here.
+
+* Issue 6 -- 24 country rows carry no =FCT Code=
+
+Nutrition-side, not =j=-axis.  Some are *correctly* blank -- =CONTENTS.org:2260=
+records =Chewing Gum= and =Cigarette= as "on the food-expenditure axis but have
+no FCT row, and should not have one".  The rest (=Emotuo=, =Konkonte=, =Koko=,
+=Kenkey/Banku=, =Fast Food=, =Cooked Rice and Stew=, =Crustacean=, =Duck=,
+=Dove/Pigeon=, ...) are composite/local dishes with no WAFCT row.  Listed for
+completeness; *does not block the Aggregate work*.
+
+* Suggested order
+
+1. *Apply =Lcp= and split the 7 premature collapses IN ONE EDIT.*  They are not
+   sequential: the split changes which country row a raw label resolves to, so
+   doing them separately means writing the same mapping twice.
+
+   *And the split DISSOLVES the Trap 9 problem entirely.*  The six PLs that
+   collide under =Lcp= are exactly six of the seven premature collapses -- the
+   collisions were *caused* by the collapse, not by =Lcp=.  Measured on
+   =food_acquired= (5,338,617 rows):
+
+   | mapping                        | duplicate index tuples | distinct =j= |
+   |--------------------------------+------------------------+--------------|
+   | current collapsing =Lcp=       |                  2,324 |          201 |
+   | =Lcp= after the 7 splits       |                  *0*   |          214 |
+
+   So with the splits in place =Lcp= is a *pure rename* -- no reducer, no
+   quantity-weighted price re-derivation, Trap 9 never armed.  Doing the split
+   first is not merely tidier; it removes the only hard part of applying =Lcp=.
+3. *Fill the gaps* (Issue 4) -- 6 new rows, 7 blank cells, 1 dead ref.
+4. *Fix the label defects*: Issue 3 (Ideal/Country milk), 3b (mutton), 3c
+   (pito), 10 (Gari) at the WAVE level; Issue 7 (Cocoyam/Coffee) and Issue 8
+   (Cola/Kola Nut) at the COUNTRY level.  Independent of everything above --
+   they can go first, and Issue 7 should, because it is serving wrong nutrition
+   today.
+
+5. *Build the Aggregate column COMPLETE* -- all 195 Preferred Labels, no blank
+   cells (Issue 9 / GH #925).
+
+** Open issues to read first
+
+#925 (blank =labels== cell -> one unnamed bucket), #787 (=labels== honoured on 4
+of 22 food countries), #226 (the principled auto-aggregation script -- the
+beta-spread criterion =cat_map.org:511= gates this column on), #833 (raw vs
+processed folded into one =j=), #928 (proposed ignorance vocabulary for
+=categorical_mapping.org=).  Note GH *#109 is CLOSED* but its =Sugar Bread= /
+=Oil (vegetable)= gaps (Issue 4a) are still open -- an orphaned defect.
+=lsms_library/countries/GhanaLSS/TODO= is a stale plain-text second source of
+truth ("Partially registered") that contradicts =CONTENTS.org=; ignore it.
+6. *Then* design =Aggregate Label=.
