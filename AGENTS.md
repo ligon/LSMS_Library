@@ -130,7 +130,7 @@ The library has three cache tiers (see `docs/guide/caching.md` for the full pict
 
 Override the data root with `data_dir` in `~/.config/lsms_library/config.yml` or the `LSMS_DATA_DIR` env var (env var wins). All three tiers move together.
 
-- **Automatic content-hash staleness (v0.8.0).** Each cached parquet embeds a content hash (pyarrow schema metadata key `lsms_cache_hash`) covering its pre-finalize inputs: `LSMS_CACHE_SCHEMA` (a manual library-version lever in `local_tools.py`), the wave's `data_info.yml`, the wave + country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any wave/country `_/{table}.py` script, the country `_/data_scheme.yml` (table registry + `materialize` flags), the country `_/Makefile` (defines every `!make` build), the build-time `*.org` inputs in `_/` (`food_items.org`, `categorical_mapping.org`, … — `CONTENTS.org` excluded as docs), and the **DVC sidecar md5** of each declared source (`.dta` never hashed/downloaded). On read: match → serve; mismatch → rebuild; **no embedded hash** (pre-v0.8.0 parquet) → trust-once + re-stamp (no rebuild-all on upgrade). Implemented in `Wave._input_hash()` / `Country._table_cache_hash()` with read gates at the L2-country read and both L2-wave reads (`local_tools.cache_freshness` / `stamp_parquet_hash`). Recompute is ~1–4 ms (config/sidecar reads only — no `.dta` hash, no S3, no tree walk), so the v0.7.0 fast path is preserved. *Excluded by design* (they re-run post-read, never touching the parquet): `_finalize_result`, kinship, spellings, categorical mappings, `_join_v_from_sample`. *Limitations*: (a) script-path sources referenced via **dynamically-built paths** (not string literals) are covered only by the script-text hash — an out-of-band edit to such a source still needs a manual clear; (b) script-path L2-wave parquets are written hashless by their scripts, so they can't self-invalidate — `Country._evict_hashless_wave_caches` evicts them before **every** rebuild descent (stale L2-country hash, **absent** L2-country parquet, or `LSMS_NO_CACHE`) so the rebuild re-runs the script (**GH #479** — this closes former *residual F1*: eviction previously fired only in the *stale-hash* branch, so a partial cache (waves present, country table never materialized), or an `LSMS_NO_CACHE` run for which script-path waves are "soft", silently reused stale hashless wave data; the deferred *stamp-after-Make* alternative was rejected as unsafe because `make` can mtime-skip a "fresh" output). Belt-and-suspenders: `Country._assert_built_required_columns` (post-`_finalize_result`, script-path tables only) raises an actionable error if a build is missing a required declared column — the stale-wave-parquet symptom — instead of silently returning wrong data; (c) `assume_cache_fresh=True` skips the hash check entirely. Manual overrides remain (in increasing aggression):
+- **Automatic content-hash staleness (v0.8.0).** Each cached parquet embeds a content hash (pyarrow schema metadata key `lsms_cache_hash`) covering its pre-finalize inputs: `LSMS_CACHE_SCHEMA` (a manual library-version lever in `local_tools.py`), the wave's `data_info.yml`, the wave + country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any wave/country `_/{table}.py` script, the country `_/data_scheme.yml` (table registry + `materialize` flags), the country `_/Makefile` (defines every `!make` build), the build-time `*.org` inputs in `_/` (`food_items.org`, `categorical_mapping.org`, … — `CONTENTS.org` excluded as docs), and the **DVC sidecar md5** of each declared source (`.dta` never hashed/downloaded). On read: match → serve; mismatch → rebuild; **no embedded hash** → depends on the TIER, and the split is GH #809. At the **L2-wave** read it still grades `legacy` → trust-once + re-stamp, because script-path wave parquets are written hashless *by design* and grading them stale would rebuild them on every read forever (they are handled instead by `_evict_hashless_wave_caches`, below). At the **L2-country** read it grades **`stale` → rebuild**: there, "hashless" does not mean "old" — a country script's `to_parquet('../var/x.parquet')` passes no `cache_hash=`, so a `var/<table>.parquet` a `make` recipe wrote *moments ago* was graded identically to a pre-v0.8.0 artefact. **The re-stamp was what made that permanent**: writing the current expected hash onto unverified content means every later read grades `fresh`, so a script that disagrees with the framework becomes the served truth indefinitely and the evidence is destroyed — which is why a census finds nothing (0 of 376 warm country parquets are hashless) and why #808 was caught only through its symptom in the served data. The country tier therefore no longer stamps a parquet it did not verify. Cost of the reversal: a genuine pre-v0.8.0 country parquet rebuilds instead of migrating — nil in practice, and v0.8.0 is five minor versions back. Implemented in `Wave._input_hash()` / `Country._table_cache_hash()` with read gates at the L2-country read and both L2-wave reads (`local_tools.cache_freshness` / `stamp_parquet_hash`). Recompute is ~1–4 ms (config/sidecar reads only — no `.dta` hash, no S3, no tree walk), so the v0.7.0 fast path is preserved. *Excluded by design* (they re-run post-read, never touching the parquet): `_finalize_result`, kinship, spellings, categorical mappings, `_join_v_from_sample`. *Limitations*: (a) script-path sources referenced via **dynamically-built paths** (not string literals) are covered only by the script-text hash — an out-of-band edit to such a source still needs a manual clear; (b) script-path L2-wave parquets are written hashless by their scripts, so they can't self-invalidate — `Country._evict_hashless_wave_caches` evicts them before **every** rebuild descent (stale L2-country hash, **absent** L2-country parquet, or `LSMS_NO_CACHE`) so the rebuild re-runs the script (**GH #479** — this closes former *residual F1*: eviction previously fired only in the *stale-hash* branch, so a partial cache (waves present, country table never materialized), or an `LSMS_NO_CACHE` run for which script-path waves are "soft", silently reused stale hashless wave data; the deferred *stamp-after-Make* alternative was rejected as unsafe because `make` can mtime-skip a "fresh" output). Belt-and-suspenders: `Country._assert_built_required_columns` (post-`_finalize_result`, script-path tables only) raises an actionable error if a build is missing a required declared column — the stale-wave-parquet symptom — instead of silently returning wrong data; (c) `assume_cache_fresh=True` skips the hash check entirely. Manual overrides remain (in increasing aggression):
     1. `LSMS_NO_CACHE=1` in the session — bypasses L2-country reads and L2-wave reads on the YAML path. *Soft*: script-path L2-wave parquets (Nigeria PP/PH, Tanzania multi-round) are still read by `run_make_target` without consulting the env var, so a stale L2-wave parquet can shadow a source-script fix.
     2. `lsms-library cache clear --country {Country}` — physically removes L2-country (`var/`), the country-level companion (`_/`), AND every L2-wave parquet (`{wave}/_/{table}.parquet`) for that country. As of 2026-04-25 this also enumerates round-name wave dirs (Nigeria's `2012Q3/`, `2013Q1/`) that don't match `Country.waves`.
     3. `pytest --rebuild-caches` (or `make test-full`) — same as the CLI above for *every* country under `data_root()`, run before the test session, then sets `LSMS_NO_CACHE=1`. Use when verifying a wave-script fix in CI; previously a stale L2-wave parquet could pass a test the source-only fix would have failed (Nigeria/Senegal age sentinels, 2026-04-25).
@@ -229,6 +229,47 @@ override.
 > **Never `rm` a DVC lock file.** A lock that looks stale may belong to a live sibling process; deleting it corrupts that writer rather than unblocking you. If a write is genuinely stuck, let the backoff run, then investigate.
 
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. **A `*.parquet` inside `countries_root()` is never read (GH #803)** -- before that fix `Wave.grab_data` and `run_make_target` *preferred* an in-tree `{wave}/_/{table}.parquet` to running the wave script, and because such files are hashless they graded `legacy` at the v0.8.0 gate and were stamped into the L2-country parquet with a fresh hash (109 files, 14 countries, on the main checkout). They get written when a script runs from a checkout that is not the imported package: `_resolve_data_path` redirects only when the *caller's file* is under the package's `countries_root()`, otherwise the literal relative path lands next to the script (the write-side `.pth` trap, scrum-master addendum 3). The library now warns (`InTreeParquetWarning`) and ignores them; delete them (`find lsms_library/countries -name '*.parquet' -delete` -- none are tracked).
+
+### `countries_root()` is READ-ONLY at runtime — one invariant, three issues
+
+The config tree holds *reviewed sources*: YAML, wave scripts, the committed
+panel crosswalk. **Everything the library produces goes under `data_root()`.**
+Three bugs are the same bug wearing different hats, and stating them together
+is the point — each was found separately and fixed separately:
+
+| | what wrote into the tree | symptom |
+|---|---|---|
+| **#803** (fixed) | a wave script run from the wrong checkout wrote its parquet in-tree | the reader *preferred* it to re-running the script; hashless, so it graded `legacy` and was re-stamped fresh |
+| **#914** (fixed) | a Make rule regenerated the committed `panel_ids.json` | `PermissionError` on any shared install, from three layers inside a `make` subprocess |
+| **#831** (read path fixed) | `get_data_file` materialised **every** fetched raw file there — the DVC branch wrote the blob to `_COUNTRIES_DIR / path`, the WB branch extracted zips there | 433 stray copies / 1.31 GB; 33 with no `.dvc` sidecar **silently shadow the DVC blob**, since the read chain is local → DVC → WB and the stray wins at step one |
+
+They share one user-visible symptom, which is why fixing them one at a time
+kept feeling like whack-a-mole: **on a shared install the package directory is
+not writable by the user running the code**, so a call that was only trying to
+*read* data dies with `PermissionError`. A teaching hub gets twenty
+simultaneous hard failures, not twenty slow cells.
+
+**The one sanctioned exception is acquisition.** `add_wave()` and
+`populate_and_push()` pass `populate_cache=True` and extract into the config
+tree on purpose, because the next step is `dvc add` on what landed. That branch
+is the *only* place a runtime write into `countries_root()` is correct, it is
+reached from nowhere else, and `data_access._fetch_destination` is the single
+function that decides — route any new fetch through it rather than composing
+`_COUNTRIES_DIR / path` yourself.
+
+Cache cost of the #831 fix: **none**. No `data_access` symbol reaches any
+build fingerprint (measured with a no-op probe inside `get_data_file`: all
+three probed `build_transforms_fingerprint` values byte-identical). Contrast
+`get_dataframe`, where any edit moves 37/37.
+
+**Still live, and a *different* invariant — don't conflate them.** #809: a
+hashless `var/<table>.parquet` written by a `make` recipe grades `legacy` at
+the v0.8.0 gate, is trusted once, and is re-stamped with the current hash — so
+a script that disagrees with the framework becomes the served truth with no
+signal. That is about *trust in an artefact's provenance*, not about *where it
+was written*, and it needs its own measurement (the fix changes which caches
+rebuild). Related: #808 (an instance, fixed by removing the path), #479
+(hashless wave parquets evicted before every rebuild descent).
 
 **Anti-patterns — do not use:**
 
@@ -554,6 +595,36 @@ Rules:
 Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_logs/PLAN_sample_v_migration.org`, `slurm_logs/DESIGN_sample_as_v_source.org`.
 
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
+
+**The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
+Nine countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Mali, Niger,
+Senegal, Tanzania, Uganda) ship git-tracked `_/panel_ids.json` +
+`_/updated_ids.json`; Malawi and Nigeria derive theirs from per-wave
+`data_info.yml` into a cache parquet only. **Design A is the convention** — a
+panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
+to recompute, identical for every user, and the input to every longitudinal
+result), so it belongs where a change shows up as a reviewable diff.
+Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
+diff; converting Malawi/Nigeria to A is #894's remaining work, and they are
+named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a twelfth
+country cannot pick a design by accident.
+
+> **Never give the JSON a Make rule.** The nine Makefiles used to carry
+> `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,
+> which regenerates whenever the script is the newer file — and **on a pip
+> install which of the two is newer is decided by the millisecond the wheel was
+> unpacked**: the zip stores `.json` before `.py` alphabetically, and measured
+> on the real 0.13.0 wheel 5 of the 9 straddled a filesystem tick and landed
+> with the script ~1 ms ahead. The recipe then ran with cwd inside
+> `site-packages` and the script wrote a bare relative path, so every non-root
+> user on a shared install got `PermissionError` raised three layers inside a
+> `make` subprocess. The blast radius was **every table**, not just
+> `panel_ids`: `_finalize_result` calls `id_walk(df, self.updated_ids)` on every
+> read (`country.py:3107`). Keeping the JSON as a *prerequisite* is fine and
+> correct; putting it on a rule's left-hand side is not, `make clean` must not
+> delete it, and `panel_ids.py` must write relative to `Path(__file__).parent`.
+> Pinned by `tests/test_panel_ids_persistence.py`, which reproduces the trigger
+> (script made newer than the JSON) rather than the spelling.
 
 ## Panel ID Transitive Chains and the `attrs` Flag
 

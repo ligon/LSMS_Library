@@ -664,3 +664,137 @@ def plot_features(df):
     factor = df['AreaUnit'].astype(object).map(_PLOT_HECTARES_PER_UNIT)
     df['Area'] = area * pd.to_numeric(factor, errors='coerce')
     return df
+
+
+# ---------------------------------------------------------------------------
+# GLSS4 / GLSS5 / GLSS6 / GLSS7 section 8H -- own-production value, DERIVED
+# (2026-09-13)
+#
+# Registry: _/derivations.yml, key GhanaLSS::food_acquired::8h-farmgate.
+# Ledger:   .coder/ledger/ghanalss-produced-qp.md
+# ---------------------------------------------------------------------------
+
+#: Waves whose section-8H produced rows carry BOTH a native-unit quantity and a
+#: reported farmgate price.  1991-92 is deliberately absent: only 80,282 of its
+#: 286,922 produced rows (28%) carry both, and its dominant unit is ``All``
+#: (93,349 rows), which reads as "the whole harvest" rather than a countable
+#: quantity.  See the ledger, and `_/CONTENTS.org`.
+FARMGATE_WAVES = ('1998-99', '2005-06', '2012-13', '2016-17')
+
+#: The section-8H price variable, per wave.  2016-17 asks it once per VISIT
+#: (``s8hq{v}p``), the others once per (household, item, unit).
+FARMGATE_PRICE_VARIABLE = {
+    '1998-99': 's8hq10',
+    '2005-06': 's8hq14',
+    '2012-13': 's8hq10',
+    '2016-17': 's8hq{v}p',
+}
+
+
+def derive_produced_farmgate_value(quantity, price):
+    """Value of own-produced food at the household's own reported farmgate price.
+
+    Section 8H of GLSS4-GLSS7 asks, for each home-produced food the household
+    consumed, *how much* was consumed in the recall window (a real quantity in
+    a native unit ``u``) and *what it would fetch* -- the farmgate price of one
+    such unit.  It never asks what the food was worth in total, so the served
+    ``Expenditure`` on a produced row is a CONSTRUCTION, not an answer::
+
+        Expenditure = Quantity * Price
+
+    **This reverses a prior decision, deliberately.** Each wave script used to
+    say "Expenditure is left NaN -- no produced value is recorded", and that
+    sentence is true about the *survey*; it was never a statement that the
+    value could not be constructed.  The 2005-06 script already multiplies the
+    same two columns internally (``y['_qp']``) to resolve households that
+    report two farmgate prices for one commodity.  What changed is that the
+    library now has somewhere honest to put a construction: it is served with
+    the registry key on the row, so a reader can tell it from an answer and can
+    recover the factors through ``Country.derivation_inputs``.
+
+    The valuation is at the **producer** price, which is what section 8H asks.
+    It is therefore NOT comparable with the GLSS1/GLSS2 ``12b-fortnight``
+    figure, which values own consumption at what it would **cost to buy**
+    (``VFOODCPD``); a farmgate valuation should sit below a consumer-price one,
+    and does.  An analyst who wants own production at consumer prices should
+    re-value it from ``food_prices()``; the factors are in the table.
+
+    No options, by design: a cached parquet must be one identifiable
+    construction.  Vectorised; accepts scalars, arrays or Series (elementwise,
+    positional).  Returns a float ndarray, NaN wherever either factor is
+    missing -- such a row is served with ``Expenditure`` NaN and carries **no**
+    registry key, so the coverage this derivation claims is exactly the set of
+    rows it actually computed.
+    """
+    q = _as_float(quantity)
+    p = _as_float(price)
+    return q * p
+
+
+def _farmgate_hhid(wave, df):
+    """Rebuild a wave's household id EXACTLY as its own ``food_acquired.py`` does.
+
+    Each of the four waves composes ``i`` differently, and a generic guess at
+    the id column does not join (``CLAUDE.md`` §"Derived Values", step 4:
+    reusing the YAML's ``idxvars`` is not enough where ``mapping.py``
+    post-processes the index).  Verified against the served rows by
+    ``tests/test_ghanalss_8h_farmgate.py``.
+    """
+    from lsms_library.local_tools import format_id
+
+    if wave == '1998-99':          # format_id(clust) + format_id(nh, pad 2), no sep
+        return df.apply(
+            lambda r: (format_id(r['clust'], zeropadding=0) or '')
+            + (format_id(r['nh'], zeropadding=2) or ''), axis=1)
+    if wave == '2005-06':          # mapping.i() over the pre-composed 'hhid'
+        from lsms_library.paths import countries_root
+        mapping = _load_module_by_path(
+            countries_root() / 'GhanaLSS' / wave / '_' / 'mapping.py',
+            f'_ghanalss_mapping_{wave}')
+        return df['hhid'].apply(mapping.i)
+    if wave == '2012-13':          # pre-composed 'hid', carried through as-is
+        return df['hid']
+    if wave == '2016-17':          # format_id(clust) + '/' + format_id(nh, pad 2)
+        def _one(c, n):
+            c, n = format_id(c), format_id(n, zeropadding=2)
+            return pd.NA if (c is None or n is None) else f'{c}/{n}'
+        return pd.Series([_one(c, n) for c, n in zip(df['clust'], df['nh'])],
+                         index=df.index)
+    raise ValueError(f'no household-id construction recorded for {wave!r}')
+
+
+def inputs_produced_farmgate(wave):
+    """The raw section-8H answers behind the derived produced rows of one wave.
+
+    Returns a frame at the INPUT grain -- one row per source record, before the
+    wave script's visit melt and unit canonicalisation -- indexed ``(t, i)``
+    with the ORIGINAL variable names kept, so a row can be read against the
+    questionnaire.  ``i`` goes through the wave's own ``mapping.i`` so the frame
+    joins to the served rows (``CLAUDE.md`` §"Derived Values", step 4: reusing
+    the YAML's ``idxvars`` is not enough where ``mapping.py`` rewrites the
+    index).  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+
+    if wave not in FARMGATE_WAVES:
+        raise ValueError(
+            f'section 8H farmgate valuation covers {FARMGATE_WAVES}, not {wave!r} '
+            f'(1991-92 is excluded by coverage -- see _/CONTENTS.org)')
+
+    sources = {
+        '1998-99': 'Data/SEC8H.DTA',
+        '2005-06': 'Data/partb/sec8h.dta',
+        '2012-13': 'Data/PARTB/sec8h.dta',
+        '2016-17': 'Data/g7sec8h.dta',
+    }
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / sources[wave]), convert_categoricals=False)
+
+    price_var = FARMGATE_PRICE_VARIABLE[wave]
+    keep = [c for c in df.columns
+            if c.lower().startswith('s8hq') or c.lower() in {'homagrcd', 'itemcd'}]
+    out = df[keep].copy()
+    out.insert(0, 't', wave)
+    out.insert(1, 'i', _farmgate_hhid(wave, df))
+    out.attrs['price_variable'] = price_var
+    return out.set_index(['t', 'i'])

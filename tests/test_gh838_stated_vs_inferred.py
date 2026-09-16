@@ -64,8 +64,11 @@ def test_known_metric_new_spellings():
         assert KNOWN_METRIC[u] == pytest.approx(1e-6)
     for u in ('centilitre', 'centilitres'):
         assert KNOWN_METRIC[u] == pytest.approx(1 / 100)
+    # GH #919: `quintal` was here and is now in `categorical_mapping/u.org`'s
+    # `u_kg` table instead -- it is country-qualified (100 kg in Ethiopia,
+    # 100 lb in Central America) and a KNOWN_METRIC entry is unoverridable.
     for u in ('quintal', 'quintals'):
-        assert KNOWN_METRIC[u] == 100
+        assert u not in KNOWN_METRIC
     for u in ('tonne', 'tonnes'):
         assert KNOWN_METRIC[u] == 1000
     # The GH #838 audit behind the issue: gramme/grammes were already in.
@@ -77,7 +80,10 @@ def test_parse_explicit_metric_new_spellings():
     assert _parse_explicit_metric('Boite (500 milligrammes)') == pytest.approx(0.5e-3)
     assert _parse_explicit_metric('Bouteille (75 centilitres)') == pytest.approx(0.75)
     assert _parse_explicit_metric('2 quintaux') is None  # not a corpus label
-    assert _parse_explicit_metric('1 quintal') == 100.0
+    # GH #919: the parser is a SECOND, independent seed of the same factor, so
+    # it had to lose `quintal` too -- otherwise a label like '1 quintal' would
+    # re-introduce the unoverridable 100 kg the dict entry was removed for.
+    assert _parse_explicit_metric('1 quintal') is None
     assert _parse_explicit_metric('0.5 tonne') == 500.0
     # Volumes stay gated.
     assert _parse_explicit_metric('Bouteille (75 centilitres)',
