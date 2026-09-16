@@ -798,3 +798,169 @@ def inputs_produced_farmgate(wave):
     out.insert(1, 'i', _farmgate_hhid(wave, df))
     out.attrs['price_variable'] = price_var
     return out.set_index(['t', 'i'])
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 9 Part B -- crop sale value, DERIVED (2026-09-16)
+#
+# Registry: _/derivations.yml, key GhanaLSS::crop_production::9b-sale-amount-per-unit.
+# Design:   slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org
+# ---------------------------------------------------------------------------
+
+#: Acres -> hectares.  The Ghana Statistical Service's own factor, not the
+#: standard 0.404686; see `_PLOT_HECTARES_PER_UNIT` above for the provenance.
+ACRES_TO_HECTARES = _PLOT_HECTARES_PER_UNIT['Acres']
+
+#: The Section 9 unit legend's code 22, decoded by `agric_unit` to 'All'.
+#: Against the Q6 AMOUNT box it does not name a container -- it means the
+#: amount is for the whole lot.
+AGRIC_UNIT_ALL = 'All'
+
+#: Registry key stamped on every row `derive_9b_sale_value` served.
+CROP_SALE_DERIVATION = 'GhanaLSS::crop_production::9b-sale-amount-per-unit'
+
+
+def derive_9b_sale_value(sold_quantity, amount, amount_unit, sold_unit):
+    """Total value of the crop sold, from Section 9B's PER-UNIT sale amount.
+
+    Part B column 6 asks "How much was the harvest of [...] sold for?" over
+    *two* boxes, ``AMOUNT`` (``CROPSP``) and ``UNIT`` (``CROPSPU``).  The
+    amount is therefore denominated by its own unit box and is **not**, in
+    general, a total -- which is why the served ``Value_sold`` is a
+    CONSTRUCTION here and a recorded answer in every other country that
+    declares the column.
+
+    The unit box is essentially bimodal.  Measured over sale rows:
+
+    =========================================  =========  =========
+    relation of ``CROPSPU`` to ``CROPSU``        1987-88    1988-89
+    =========================================  =========  =========
+    equal -- the amount is per that unit           91.3%      85.8%
+    ``All`` -- the amount is the whole lot           9.6%      15.9%
+    neither                                         2.0%      0.95%
+    =========================================  =========  =========
+
+    So::
+
+        rung 1  amount_unit == 'All'      -> amount                (tested FIRST)
+        rung 2  amount_unit == sold_unit  -> amount * sold_quantity
+        rung 3  otherwise                 -> NaN
+
+    **Rung 1 must be tested before rung 2.**  ``CROPSU`` is *itself* ``All``
+    on many rows, so the two masks overlap; testing same-unit first misroutes
+    those rows and multiplies a whole-lot total by a quantity.  That error is
+    what produced a spurious 12x "overshoot" for yam during design, and it is
+    the one way to get this function subtly and silently wrong.
+
+    Rung 3 is left NaN rather than converted: the row prices a container the
+    survey did not relate to the container the quantity is in, and no
+    per-row factor bridges them.  It is 130 rows in 1987-88 and 69 in
+    1988-89 (0.5% of the table).  The sanctioned extension, if a user ever
+    needs them, is ``transformations.median_price_valuation`` -- taking its
+    geography from ``Y09B.CLUST``, because this runs in the wave build
+    before ``_join_v_from_sample`` puts ``v`` on the frame.
+
+    NOT a valuation of the whole harvest.  Section 9B never asks a harvest
+    quantity, only the quantity *sold*; the parts kept for seed, given away
+    and lost are recorded as their own market-replacement VALUES
+    (``Value_seed`` / ``Value_given`` / ``Value_lost``), and the part eaten
+    is not in Section 9 at all.  Summing them mixes a received price with
+    replacement prices; that is the analyst's call, not this function's.
+
+    Vectorised and elementwise; ``amount_unit`` and ``sold_unit`` are the
+    DECODED labels (via ``categorical_mapping.org#agric_unit``), not codes.
+    Returns a float ndarray.
+    """
+    qty = _as_float(sold_quantity)
+    amt = _as_float(amount)
+    au = pd.Series(np.ravel(amount_unit)).astype('string')
+    su = pd.Series(np.ravel(sold_unit)).astype('string')
+
+    # Comparisons on a `string` dtype yield pd.NA, not False, wherever either
+    # side is missing; fill before going to numpy or the `&` raises on NAType.
+    out = np.full(amt.shape, np.nan, dtype=float)
+    is_all = au.eq(AGRIC_UNIT_ALL).fillna(False).to_numpy(dtype=bool)
+    same = (~is_all) & au.eq(su).fillna(False).to_numpy(dtype=bool)
+    out[is_all] = amt[is_all]                      # rung 1, FIRST
+    out[same] = amt[same] * qty[same]              # rung 2
+    return out                                     # rung 3: left NaN
+
+
+def crop_production_from_9b(df):
+    """Shared ``df_edit`` body for the GLSS1/GLSS2 ``crop_production`` table.
+
+    Both waves' ``_/mapping.py`` delegate here; the wave-level function is a
+    thin wrapper so the hook is discoverable where the framework looks for it.
+
+    Turns the three helper columns the YAML extracts for the derivation
+    (``SaleAmount``, ``SaleAmountUnit``, ``SoldUnitRaw``) into ``Value_sold``,
+    stamps the registry key on the rows the derivation produced, converts
+    acres to hectares, and drops the helpers.  ``Derivation`` is NA on a row
+    the derivation did not serve -- which, per the field contract, is what
+    distinguishes a constructed number from a reported one.
+    """
+    df = df.copy()
+    # Unit code 0 means "sold nothing" and is absent from `agric_unit`, so it
+    # survives the decode as the STRING '0.0'.  Every real label is alphabetic,
+    # so anything still numeric is an unmapped code -> NA.  Done before the
+    # derivation, or two unmapped '0.0's would compare equal and route a
+    # non-sale row down rung 2.
+    for _c in ('Unit_sold', 'SaleAmountUnit', 'SoldUnitRaw'):
+        _s = df[_c].astype('string')
+        df[_c] = _s.mask(pd.to_numeric(_s, errors='coerce').notna(), pd.NA)
+
+    value = derive_9b_sale_value(df['Quantity_sold'], df['SaleAmount'],
+                                 df['SaleAmountUnit'], df['SoldUnitRaw'])
+    df['Value_sold'] = value
+    df['Derivation'] = pd.Series(
+        np.where(pd.notna(value), CROP_SALE_DERIVATION, pd.NA),
+        index=df.index, dtype='string')
+    # Q2 is acres harvested; the canonical column is hectares.
+    df['Area_ha'] = pd.to_numeric(df['Area_ha'], errors='coerce') * ACRES_TO_HECTARES
+    # Q13 is the form's 1=YES / 2=NO; the schema declares a bool.  Anything
+    # else (including the screener never being reached) stays NA.
+    _ic = pd.to_numeric(df['intercropped'], errors='coerce')
+    df['intercropped'] = _ic.map({1.0: True, 2.0: False}).astype('boolean')
+    # `Quantity` -- the HARVEST quantity every other country declares -- is
+    # materialised all-NaN, by decision (@ligon, 2026-09-16), so the
+    # cross-country shape stays recognisable.  Section 9 Part B asks only the
+    # quantity SOLD (Q4); it never asks how much was harvested, and the other
+    # three dispositions are recorded as values, not quantities, so nothing
+    # reconstructs it.  Declared `optional: true`, which is what exempts it
+    # from Site B of the null-read guard.  NOTHING is imputed into it.
+    df['Quantity'] = pd.Series(pd.NA, index=df.index, dtype='Float64')
+    return df.drop(columns=['SaleAmount', 'SaleAmountUnit', 'SoldUnitRaw'])
+
+
+def inputs_9b(wave):
+    """The raw Section 9B answers behind the derived ``Value_sold`` rows.
+
+    Re-reads ``Y09B.DAT`` through ``get_dataframe`` and returns a frame
+    indexed ``(t, i, j)`` -- ``i`` via the wave's own ``mapping.i()``, ``j``
+    via the same ``agric_crop`` decode the YAML uses -- whose columns are the
+    ORIGINAL variable names.  ``(HID, CROP)`` is unique in both waves
+    (16,938 and 20,342 rows, zero duplicates), so this index is unique and
+    joins one-to-one to the served rows.  Every source row is returned,
+    unfiltered.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile, format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 9 agro-pastoral exists only in 1987-88 and 1988-89, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / 'Data' / 'Y09B.DAT'))
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_9b_{wave}')
+    labels = df_from_orgfile(str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+                             name='agric_crop', encoding='ISO-8859-1')
+    lab = (labels.assign(Code=labels['Code'].astype('Int64').astype('string'))
+                 .set_index('Code')['Label'].to_dict())
+    out = pd.DataFrame({
+        't': wave,
+        'i': df['HID'].apply(mapping.i),
+        'j': df['CROP'].apply(format_id).astype('string').replace(lab),
+        'CROP': df['CROP'],
+        'CROPS': df['CROPS'], 'CROPSU': df['CROPSU'],
+        'CROPSP': df['CROPSP'], 'CROPSPU': df['CROPSPU'],
+    })
+    return out.set_index(['t', 'i', 'j'])

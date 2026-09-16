@@ -222,3 +222,24 @@ def sample(df):
     out['weight'] = 1.0
     out['panel_weight'] = 1.0
     return out
+
+
+def crop_production(df):
+    """df_edit hook: Section 9 Part B -> the canonical ``crop_production``.
+
+    Thin wave-level wrapper; the body is shared by both panel waves and lives
+    in the country module as ``crop_production_from_9b``.  It builds
+    ``Value_sold`` from the per-unit sale AMOUNT (Q6 is denominated by its own
+    UNIT box, so it is not a total), stamps the derivation key on the rows it
+    served, converts Q2's acres to hectares, and drops the three helper
+    columns the YAML extracted to feed it.
+    """
+    # Load the country module BY PATH: `countries/GhanaLSS/_/` is not an
+    # importable package, and a path built from countries_root() honours
+    # LSMS_COUNTRIES_ROOT.
+    import importlib.util as _ilu
+    from lsms_library.paths import countries_root
+    _p = countries_root()/'GhanaLSS'/'_'/'ghanalss.py'
+    _spec = _ilu.spec_from_file_location('_ghanalss_country', _p)
+    _c = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_c)
+    return _c.crop_production_from_9b(df)

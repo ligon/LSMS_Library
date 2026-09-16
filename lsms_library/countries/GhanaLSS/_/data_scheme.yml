@@ -329,3 +329,58 @@ Data Scheme:
   # See nutrition.py's docstring for why it does not call
   # Country.food_quantities(), and slurm_logs/ghana_audit/ISSUE_value_kg_factor.org.
   nutrition: !make
+
+  # GLSS1/GLSS2 Section 9 Part B (Agro-Pastoral Activities -> CROPS).
+  # 1987-88 and 1988-89 ONLY: agriculture is Section 9 in GLSS1/GLSS2 and
+  # Section 8 from GLSS3 on, and only these two waves form a panel (712
+  # households, the GLSS1->GLSS2 rotating half).
+  #
+  # Index (t, i, j) -- household-crop, no plot and no `u`:
+  #   * no plot level exists.  `plot_features` carries a C4-validated
+  #     `not-asked` verdict for both waves; Section 9 has no farm-number
+  #     column and no per-farm roster part.  (`Y09A:IDFARM` is NOT a plot id
+  #     -- see `_/CONTENTS.org`.)  EthiopiaRHS (GH #512) is the precedent for
+  #     a plot-less crop_production.
+  #   * no `u` level because the form asks NO HARVEST QUANTITY -- only the
+  #     quantity SOLD, whose unit is carried as the `Unit_sold` column.  A `u`
+  #     would be NaN on 62-64% of rows (Site I; groupby deletes them) or a
+  #     sentinel that says "not applicable" on two thirds of the table.
+  #     Mali, Nigeria and Tanzania also declare crop_production without `u`.
+  #
+  # `Quantity` is declared and is ENTIRELY NaN, by decision (@ligon,
+  # 2026-09-16): the canonical column is kept so the cross-country shape is
+  # recognisable, and `optional: true` is what stops Site B of the null-read
+  # guard raising NullReadError on a required all-null column.  Nothing is
+  # imputed into it -- the instrument does not ask it.
+  #
+  # `Value_sold` is DERIVED (registry key
+  # GhanaLSS::crop_production::9b-sale-amount-per-unit); Section 9B records a
+  # per-unit sale AMOUNT, not a total.  See _/derivations.yml.
+  crop_production:
+    index: (t, i, j)
+    Quantity:
+      type: float
+      optional: true
+    Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
+    KgFactor:
+      type: float
+      optional: true
+    Value_sold: float
+    Value_seed: float
+    Value_given: float
+    Value_lost: float
+    LossCause:
+      type: str
+      optional: true
+    Area_ha: float
+    intercropped:
+      type: bool
+      optional: true
+    # `Derivation` is deliberately NOT declared here.  It is declared in the
+    # CANONICAL schema (lsms_library/data_info.yml, Columns > crop_production);
+    # a key starting with "derivation" in a data_scheme.yml is banned outright
+    # by tests/test_derivations.py::test_nothing_in_a_data_scheme_names_a_derivation,
+    # because `_SCHEME_NON_COLUMN_KEYS` would read it as a required column.

@@ -687,6 +687,15 @@ Columns:
         `condition` above gives: a null index key is silently dropped by the
         first groupby that touches it.  Applied at cross-country assembly by
         `Index Info > missing_level_sentinels`, not baked into any parquet.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of the
+        construction behind a served value, NA on a reported row.  First
+        instance here: `GhanaLSS::crop_production::9b-sale-amount-per-unit`,
+        where Section 9 Part B records a per-unit sale AMOUNT rather than a
+        sale total, so `Value_sold` is constructed rather than read.
     KgFactor:
       type: float
       optional: true

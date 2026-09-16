@@ -209,3 +209,57 @@ GhanaLSS::food_acquired::8h-farmgate:
       evidence: >-
         measured 2026-09-13 on the warm corpus; .coder/ledger/ghanalss-produced-qp.md
         section 7.  Serving a 28%-covered wave would look complete and would not be.
+
+GhanaLSS::crop_production::9b-sale-amount-per-unit:
+  waves: ['1987-88', '1988-89']
+  columns: [Value_sold]
+  rule: >-
+    Value_sold = CROPSP                  where CROPSPU decodes to 'All'
+               = CROPSP * CROPS          where CROPSPU == CROPSU
+               = NaN                     otherwise.
+    Section 9 Part B column 6 ("How much was the harvest of [...] sold for?")
+    has TWO boxes, AMOUNT (CROPSP) and UNIT (CROPSPU), so the amount is
+    denominated by its own unit box and is not in general a total.  The 'All'
+    branch MUST be tested first: CROPSU is itself 'All' on many rows, so the
+    two masks overlap and a same-unit-first test multiplies a whole-lot total
+    by a quantity (a 12x error on yam, caught in design).  Measured over sale
+    rows: 'All' 9.6% / 16.0%, same-unit 88.0% / 82.8%, neither 2.4% / 1.2%
+    (1987-88 / 1988-89).
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_9b_sale_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_9b
+  raw_variables: [Y09B.CROPS, Y09B.CROPSU, Y09B.CROPSP, Y09B.CROPSPU]
+  assumptions:
+    - text: >-
+        the AMOUNT in Q6 is denominated by the UNIT box beside it, rather than
+        being a total with a redundant unit -- the box also offers code 22
+        'All', which a total would not need
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.44, form block 9B1 column 6
+        (image-only CCITT scan; rendered with
+        slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py)
+    - text: >-
+        unit code 22 decodes to 'All', meaning the amount covers the whole
+        quantity sold rather than one container
+      basis: questionnaire
+      evidence: the unit-code legend printed at the foot of the same page
+    - text: >-
+        a row whose amount unit is neither the sold unit nor 'All' is left NaN
+        rather than converted; the survey relates no factor between the two
+        containers on that row (130 rows in 1987-88, 69 in 1988-89)
+      basis: modelling-choice
+      evidence: >-
+        slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org,
+        "Value_sold is a DERIVATION"
+  validated_against: >-
+    NOT yet checked against an external series.  What IS established: the rung
+    shares above, and a magnitude check against the rows that report 'All'
+    (where CROPSP is unambiguously a total) -- on maize, CROPSP * CROPS gives a
+    median 11,100 against 10,000 on the 'All' rows, while CROPSP alone gives
+    3,550.  Cocoa's apparent 62x gap between the two groups is the
+    maxibag-to-kilogram ratio, the groups selling in different units.  The
+    check still owed is community_prices (sane in both waves): the implied
+    farmgate price, Value_sold / Quantity_sold converted through KgFactor,
+    should sit below the cluster market price for the same crop and round.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part B records a sale PRICE, not a sale value"
+  since: '2026-09-16'
