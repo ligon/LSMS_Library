@@ -4574,3 +4574,72 @@ co-occurs with =Occupation= 61, the modal code among people whose main job is
 farming; 112 and 130 also appear, and the 1xx block is agriculture / forestry /
 fishing on any reading.  Filter on the codes; do not assume a published
 correspondence until one is found and recorded.
+
+** =plot_labor=: hired and exchange labour, without a plot level
+
+Wired from Section 9 Part D for both panel waves at
+=(t, i, stage, source, worker)=.  Deliberately NOT a new table: every country
+in the corpus already holds hired labour in =plot_labor= under
+=source='hired'=, and GhanaSPS already declares a SIX-level =plot_labor=
+=(t, i, plot_id, season, stage, source)= whose =stage= vocabulary is reused
+here.  =plot_labor= has no canonical =index_info= or =Columns= entry (GH #569),
+so the corpus shape is convention -- and it already runs from four levels to
+six.
+
+Two sources, both household-grain and both 12-month recall:
+
+| form   | what it asks                                  | served as |
+|--------+-----------------------------------------------+-----------|
+| Q41-42 | how much was SPENT on PAID labour, over a grid of CLEARING LAND / PLANTING / HARVESTING / OTHER x MALE / FEMALE / CHILD | =source='hired'=, =Cost= |
+| Q45-46 | MAN DAYS of unpaid labour EXCHANGE RECEIVED, one household total | =source='exchange'=, =PersonDays= |
+
+*** Why =Cost= and not the corpus's =PersonDays= / =Wage=
+
+Q42's cells are AMOUNTS.  The form asks how much was *spent*, never how many
+days were worked, so the pair every other country serves cannot be filled.
+=PersonDays= carries the Q46 exchange total, which is the only person-days
+figure anywhere in Section 9.
+
+Delivered: *11,131,768 cedis (1987-88) and 16,577,382 (1988-89)* of hired
+labour -- more than every =plot_inputs= category combined -- and 17,309 /
+15,952 exchange man-days.  Three quarters of the spend is one cell,
+=clearing_and_land_preparation= x =male= (8,362,690 in 1987-88).
+
+*** The sentinels on Q46 are sentinels, not measurements
+
+Q46 has neither a stage nor a worker type, but both are DECLARED INDEX LEVELS,
+and a NaN on one is deleted by the first =groupby= (Site I).  Those rows
+therefore carry =stage='unspecified'= and =worker='all'= -- the landed Niger
+='Unknown'= pattern (GH #842).  The survey did not ask; nothing is imputed.
+
+*** =source='exchange'= is not asserted to equal GhanaSPS's ='communal'=
+
+The form's own words are "exchange of unpaid labor".  GhanaSPS's =plot_labor=
+carries a ='communal'= source which MAY be the same institution (nnoboa), but
+that has not been checked here and the two are deliberately not merged.
+
+*** =worker= is a mixed sex/age classification
+
+=male= / =female= / =child=, as the form asks it.  GhanaSPS splits the same way
+but as =WageRateMen= / =WageRateWomen= / =WageRateChildren= COLUMNS; an index
+level is used here because the corpus models categorical dimensions that way
+everywhere else (=source=, =input=, =stage=), and GhanaSPS's are rates attached
+to a labour record rather than a dimension of one.
+
+*** Zero cells are dropped, with a count
+
+The Q42 grid instructs "IF NOTHING SPENT, WRITE ZERO", so a zero is a real
+answer -- but twelve cells per household is mostly zeros, and carrying them
+would let one country's zeros dominate a cross-country =Feature('plot_labor')=.
+Dropped 24,446 of 27,443 candidate cells in 1987-88 and 26,933 of 29,978 in
+1988-89.  The wave script prints the count; GhanaSPS's scripts drop zero
+person-days the same way.
+
+*** STILL UNWIRED: Part D Q43-44
+
+Other production expenses -- renting animals, renting equipment or machinery,
+maintenance and repair of buildings and machines, irrigation charges, fuel oil
+and electricity, other -- *2,477,260 cedis (1987-88) and 2,803,632 (1988-89)*,
+over 312 / 407 households.  Household-grain with NO crop, so it fits neither
+=plot_inputs= (keyed on =j=) nor =plot_labor= (not labour).  A real gap, and
+the last unwired money in Section 9.

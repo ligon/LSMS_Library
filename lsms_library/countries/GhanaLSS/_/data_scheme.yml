@@ -511,3 +511,47 @@ Data Scheme:
       type: str
       optional: true
     materialize: make
+
+  # GLSS1/GLSS2 Section 9 Part D -- hired and exchange labour.  1987-88 and
+  # 1988-89 only.  materialize: make.
+  #
+  # NOT a new table and NOT bespoke.  Every country in the corpus already
+  # holds hired labour in plot_labor under source='hired', and GhanaSPS
+  # already declares a SIX-level plot_labor (t, i, plot_id, season, stage,
+  # source) whose `stage` vocabulary is reused here.  plot_labor has no
+  # canonical index_info or Columns entry (GH #569), so the corpus shape is
+  # convention -- and that convention already runs from four levels to six.
+  #
+  # No plot level: Section 9 has no farm or plot roster, and plot_features is
+  # a C4-validated not-asked for both waves.  Dropping it has precedent in the
+  # EHCVM plot_inputs and EthiopiaRHS crop_production.
+  #
+  # `Cost`, not the corpus's usual PersonDays/Wage, for the hired rows: Q42
+  # asks how much was SPENT on paid labour, not how many days were worked.
+  # PersonDays carries the Q46 exchange-labour total, which is the only
+  # person-days figure in Section 9.
+  #
+  # `worker` is a mixed sex/age classification (male / female / child), as the
+  # form asks it.  GhanaSPS splits the same way but as WageRateMen /
+  # WageRateWomen / WageRateChildren COLUMNS; an index level is used here
+  # because the corpus models categorical dimensions that way everywhere else
+  # (source, input, stage), and GhanaSPS's are rates attached to a record.
+  #
+  # Q46 has neither a stage nor a worker type, so those rows carry the
+  # sentinels stage='unspecified' and worker='all' (the landed Niger 'Unknown'
+  # pattern, GH #842).  A NaN on a declared index level would be deleted by the
+  # first groupby (Site I).  They are sentinels, not measurements.
+  #
+  # STILL UNWIRED from Part D: Q43-44, other production expenses (renting
+  # animals, renting equipment or machinery, maintenance and repair,
+  # irrigation charges, fuel) -- 2.5M / 2.8M cedis.  Household-grain with no
+  # crop, so it fits neither plot_inputs (which is keyed on j) nor this table.
+  plot_labor:
+    index: (t, i, stage, source, worker)
+    Cost:
+      type: float
+      optional: true
+    PersonDays:
+      type: float
+      optional: true
+    materialize: make
