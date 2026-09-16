@@ -1781,3 +1781,159 @@ unvalidated derived column in a shipped vocabulary is worse than none.
 | Writing pads                                                 |              |              | 892          |                                                             |                                                              | Writing pads                                         |
 | Yazz (sanitary pad)                                          |              |              | 986          |                                                             |                                                              | Yazz                                                 |
 | Yazz (washing powder)                                        |              |              | 667          |                                                             |                                                              | Yazz                                                 |
+
+* GLSS1 / GLSS2 Section 9 (Agro-Pastoral Activities)
+
+Agriculture is *Section 9* in GLSS1/GLSS2 and *Section 8* from GLSS3 on, so
+these three tables are NOT related to =unit_9b= / =nonfood_items_9b= above,
+which decode the GLSS3+ *household-expenditure* Section 9 Part B.  Different
+module, different code space: =unit_9b= code 1 is "American Tin (Olonka)",
+=agric_unit= code 1 is "Pounds".  Read =_/CONTENTS.org=, "Section numbers moved
+between GLSS2 and GLSS3", before reusing either.
+
+Source: the household questionnaire itself, which is an image-only CCITT-fax
+scan with no text layer -- rendered with
+=slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py= and read from the
+page.  Crop and unit legends are printed at the foot of PDF p.44 (form block
+=9B1=, printed 31a) and repeated in the Part D boxes on p.47; the loss-cause
+list is column 11 of the same p.44 block.
+
+#+name: agric_crop
+| Code | Label                |
+|------+----------------------|
+|    1 | Cocoa                |
+|    2 | Coffee               |
+|    3 | Rubber               |
+|    4 | Coconut Palm         |
+|    5 | Oil Palm             |
+|    6 | Plantains            |
+|    7 | Bananas              |
+|    8 | Oranges              |
+|    9 | Other Fruit Trees    |
+|   10 | Wood (Timber)        |
+|   11 | Cola Nut             |
+|   12 | Kenef                |
+|   13 | Cotton               |
+|   14 | Groundnut/Peanut     |
+|   15 | Tobacco              |
+|   16 | Pineapple            |
+|   17 | Sugar Cane           |
+|   18 | Cassava              |
+|   19 | Yam                  |
+|   20 | Cocoyam              |
+|   21 | Sweet Potato/Potato  |
+|   22 | Maize                |
+|   23 | Rice                 |
+|   24 | Sorghum/Millet/Guinea Corn |
+|   25 | Tomato               |
+|   26 | Okro                 |
+|   27 | Garden Egg/Plant     |
+|   28 | Beans and Peas       |
+|   29 | Pepper               |
+|   30 | Leafy Vegetables     |
+|   31 | Other Vegetables     |
+|   32 | Other Crops          |
+
+A starred code on the form ("TRY TO USE UNIT CODE MARKED (*) WHENEVER
+POSSIBLE") is one the enumerator was to prefer; the star is a fieldwork
+instruction, not part of the label, and is not carried.  Code 22 =All= is not a
+container at all -- against the Q6 AMOUNT box it means "for the whole lot", and
+=derive_9b_sale_value= keys on it.
+
+#+name: agric_unit
+| Code | Label        |
+|------+--------------|
+|    1 | Pounds       |
+|    2 | Kilogram     |
+|    3 | Ton          |
+|    4 | Mini Bag     |
+|    5 | Maxi Bag     |
+|    6 | Sheet        |
+|    7 | Basket       |
+|    8 | Bowl         |
+|    9 | American Tin |
+|   10 | Tree         |
+|   11 | Stick        |
+|   12 | Bundle       |
+|   13 | Barrel       |
+|   14 | Litre        |
+|   15 | Gallon       |
+|   16 | Beer Bottle  |
+|   17 | Bunch        |
+|   18 | Nut          |
+|   19 | Fruit        |
+|   20 | Log          |
+|   21 | Box          |
+|   22 | All          |
+
+Q11, "Have you lost any part of the harvested crop to insects, rodents, fire,
+rotting etc.?".  Code 6 is the screener's "no"; it is decoded to =None= rather
+than dropped, so a row that was asked and answered "nothing was lost" is
+distinguishable from a row where the question was never reached.  The
+label is =No Loss=, not =None=, which would read as a missing value.
+
+#+name: agric_loss_cause
+| Code | Label             |
+|------+-------------------|
+|    1 | Insects           |
+|    2 | Rodents           |
+|    3 | Fire              |
+|    4 | Rotting           |
+|    5 | Other/Combination |
+|    6 | No Loss           |
+
+Section 9 Part F (Livestock), PDF p.53, form block =9F=.  Labels are the
+corpus's existing =animal= vocabulary (Benin, Burkina Faso, Cote d'Ivoire and
+Ethiopia all serve =Cattle= / =Chicken= / =Goats= / =Sheep= / =Pigs= /
+=Rabbits= / =Other Poultry=), not the form's own wording, so
+=Feature('livestock')= lines up across countries.
+
+Two codes are BROADER than the label they take, and the form's wording is
+recorded here because the label loses it: code 6 is "Ducks, turkeys, guinea
+fowl, doves or other poultry" -- so =Other Poultry= here INCLUDES guinea fowl,
+which Benin and Burkina Faso report as a separate =Guinea Fowl= category -- and
+code 7 is "Rabbits or guinea pigs", served as =Rabbits=.
+
+#+name: agric_animal
+| Code | Label         |
+|------+---------------|
+|    1 | Cattle        |
+|    2 | Sheep         |
+|    3 | Goats         |
+|    4 | Chicken       |
+|    5 | Pigs          |
+|    6 | Other Poultry |
+|    7 | Rabbits       |
+|    8 | Other         |
+
+* GLSS1 / GLSS2 Section 5 (Employment)
+
+The TIME UNIT legend printed at the foot of every Section 5 grid (PDF pp.19,
+26, ...).  It qualifies the earnings AMOUNT in Part B Q10, Part C, Part E Q10
+and Part G: "How much money?  How often?".
+
+#+name: time_unit
+| Code | Label     |
+|------+-----------|
+|    1 | Minute    |
+|    2 | Hour      |
+|    3 | Day       |
+|    4 | Week      |
+|    5 | Month     |
+|    6 | Quarter   |
+|    7 | Half Year |
+|    8 | Year      |
+
+Part E Q3, "Is this work the same as your main or secondary job during the past
+7 days?".  Code 1 or 2 SKIPS the rest of Part E to Part F, which is why Part
+E's weeks / days / hours / earnings / own-farm columns are populated only where
+this reads =Different work= (1,701 of 8,182 rows in 1987-88; 1,986 of 7,806 in
+1988-89).  It is the link that lets a consumer avoid double-counting a
+12-month job already described in Part B or Part C.
+
+#+name: same_as_7day_job
+| Code | Label                    |
+|------+--------------------------|
+|    1 | Same as main 7-day job   |
+|    2 | Same as secondary 7-day job |
+|    3 | Different work           |
