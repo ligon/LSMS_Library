@@ -88,8 +88,83 @@ Use the Org column writer for the final country map after handling its
 incomplete Preferred axis explicitly. Add contract tests and a dated
 results/decision note with reproduction commands.
 
+Implementation details recorded during the task:
+
+- `ghana_validation.py` reuses `evaluate_partitions`, `Regression`, and
+  `survey_simulation.run_template`. Prediction calibration checks whether
+  evaluation designs are in the training row space, allowing estimable
+  collinear designs but rejecting empty or unsupported calibration.
+- Paired prediction resampling includes every evaluation PSU, including
+  zero-target PSUs, and is explicitly conditional on fitted training models.
+  Smaller common-reference CFE fits diagnose coefficients excluded by the
+  full all-pairs covariance requirement; joint PSU draws preserve their
+  common-reference calibration. Missing coefficients never imply agreement.
+- Four narrowly scoped groups are selected. Their individual curvature
+  diagnostics are below 0.023 at the 95th empirical span percentile; this
+  is not a bound on welfare error. All actual within-wave coarsening is in
+  2016-17, so earlier-wave statistical refits would only test renamings.
+- `publish_ghana.py` adds 47 exact delivered labels with blank wave/FCT
+  cells, preserves all 205 existing rows, and uses `orgtbl.add_or_update_column`.
+  It validates the edited scratch table before writing the destination and
+  is idempotent. Country Aggregate remains opt-in.
+- The nutrition reader previously interpreted every non-FCT column as a
+  wave. It now recognizes Ghana's YYYY-YY columns explicitly. All 739
+  nutritional wave rows and 195 existing Preferred-to-FCT lookups compare
+  exactly equal to the prepublication revision; the 47 additions have empty
+  FCT fallbacks. Seven spelling aliases coexist with historical crosswalk
+  labels intentionally; canonical-spelling checks still cover the original
+  nonblank crosswalk, and new tests cover the exact delivered Aggregate axis.
+- Independent review confirmed the prediction guards and proposed
+  crosswalk-preserving publication; the actual written artifact is checked
+  separately. API tests retain missing cluster keys and outside-sample
+  expenditure households rather than silently losing them during grouping.
+
 ## 6. Verification
 
-Pending empirical results, selection, publication, and end-to-end API tests.
+Completed: all-candidate validation, 60 full-fine PSU bootstrap draws,
+60 joint common-reference probe draws, selected-map purchased and total
+validation, and the reserved purchased test. In the test, both maps score
+2,802 households (99.473% weighted), Onion MSE rises 0.34% and Egg MSE falls
+0.15%. These results do not establish a welfare precision gain.
+
+Implementation and results: `8c1e0519e` on
+`feature/ghanalss-aggregate-curation`.
+
+All 164 targeted tests pass: 61 isolated aggregation, 90 configuration/label,
+and 13 consolidated Ghana Aggregate checks. The latter cover all seven
+waves with nine public API calls (673.67 seconds, no skips/errors). Their
+64 existing data-audit warnings are recorded in the validation report.
+`make api-audit` passes, including the updated Aggregate-contract country
+list. No in-tree Ghana parquet was created.
+
+Publication and exact nutrition-crosswalk parity pass. Every delivered
+Preferred vocabulary matches the prepublication inventory. All 752
+item-by-wave expenditure totals on each basis match, with maximum
+relative-scaled differences of 2.54e-16 purchased and 2.77e-16 total.
+All 18 known-welfare sensitivity fits (three seeds, three mechanisms,
+fine/selected) succeed. Scoring coverage is unchanged; masked core MSE
+rises 0.23--2.15%, while the two substitution mechanisms have small changes
+of either sign. The requested Aggregate column is implemented and verified.
+
+## 7. Handoff: repository index maintenance
+
+The GitNexus refresh was attempted with `--skip-agents-md --skip-skills
+--embeddings`. It failed while copying graph nodes because its 286 MiB
+LadybugDB buffer pool was exhausted. A retry with
+`GITNEXUS_LBUG_BUFFER_POOL_SIZE=1073741824` exited 1 after dirty-recovery
+messages, without a further exception. Logs are local at
+`/tmp/ghana-gitnexus-refresh.log` and `/tmp/ghana-gitnexus-refresh-1gb.log`.
+The index remains dirty at `phase=load-graph`; its last successful metadata
+is 2026-09-13.
+
+Read-only inspection of installed GitNexus 1.6.11 found a likely recovery
+gap: `dist/core/lbug/sidecar-recovery.js:375` parks WAL/shadow sidecars but
+leaves `lbug.wal.checkpoint`, then `dist/core/run-analyze.js:1359` opens the
+old database to preserve embeddings. The silent exit does not establish
+that this checkpoint caused the failure. A supported follow-up is to
+preserve the current index and regenerate embeddings using
+`--drop-embeddings --embeddings` with the larger buffer and both skip
+flags. That broader index recovery was not performed. Source/configuration
+validation above is complete; index freshness remains a maintenance item.
 
 --Sue, 2026-09-16
