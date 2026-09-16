@@ -1,0 +1,19 @@
+#+TITLE: Re-running the panel/ag-production candidate scan
+#+DATE: <2026-09-16 Wed>
+
+All measurements in =CANDIDATES.org= come from these scripts, run against the
+warm L2 caches from a worktree.  Set =PYTHONPATH= to the worktree and invoke
+the venv interpreter directly (=CLAUDE.md=, scrum-master addendum 3):
+
+#+begin_src sh
+cd <worktree>
+PYTHONPATH=$PWD .venv/bin/python warm.py                         # warm-cache + wave manifests
+PYTHONPATH=$PWD .venv/bin/python agjoin2.py Ethiopia Nigeria     # join rates + ag panel depth
+PYTHONPATH=$PWD .venv/bin/python verify.py                       # Nigeria pp/ph rounds, Tanzania overlap
+PYTHONPATH=$PWD .venv/bin/python within.py                       # within-household variance shares
+PYTHONPATH=$PWD .venv/bin/python eth_panel.py                    # Ethiopia wave-patterns + universes
+#+end_src
+
+Redirect to a file rather than piping through =| tail=: the pipe buffers and
+you see nothing until the run ends (=CLAUDE.md= makes the same point about
+pytest output).

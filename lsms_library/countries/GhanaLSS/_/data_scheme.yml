@@ -329,3 +329,235 @@ Data Scheme:
   # See nutrition.py's docstring for why it does not call
   # Country.food_quantities(), and slurm_logs/ghana_audit/ISSUE_value_kg_factor.org.
   nutrition: !make
+
+  # GLSS1/GLSS2 Section 9 Part B (Agro-Pastoral Activities -> CROPS).
+  # 1987-88 and 1988-89 ONLY: agriculture is Section 9 in GLSS1/GLSS2 and
+  # Section 8 from GLSS3 on, and only these two waves form a panel (712
+  # households, the GLSS1->GLSS2 rotating half).
+  #
+  # Index (t, i, j) -- household-crop, no plot and no `u`:
+  #   * `plot_id` is 'Farm-level' throughout.  Section 9 has no farm-number
+  #     column and no per-farm roster part, and `plot_features` carries a
+  #     C4-validated `not-asked` verdict for both waves (`Y09A:IDFARM` is NOT
+  #     a plot id -- see `_/CONTENTS.org`).  The LEVEL IS KEPT and marked
+  #     rather than dropped: surveys resolve farm quantities at farm / crop /
+  #     plot / plot-x-crop grain, none better or worse in general, and marking
+  #     the unresolved axis makes the grain readable off the data instead of
+  #     inferrable from which levels exist (@ligon, 2026-09-16).  EthiopiaRHS
+  #     (GH #512) drops the level instead; that predates this convention.
+  #   * no `u` level because the form asks NO HARVEST QUANTITY -- only the
+  #     quantity SOLD, whose unit is carried as the `Unit_sold` column.  A `u`
+  #     would be NaN on 62-64% of rows (Site I; groupby deletes them) or a
+  #     sentinel that says "not applicable" on two thirds of the table.
+  #     Mali, Nigeria and Tanzania also declare crop_production without `u`.
+  #
+  # `Quantity` is declared and is ENTIRELY NaN, by decision (@ligon,
+  # 2026-09-16): the canonical column is kept so the cross-country shape is
+  # recognisable, and `optional: true` is what stops Site B of the null-read
+  # guard raising NullReadError on a required all-null column.  Nothing is
+  # imputed into it -- the instrument does not ask it.
+  #
+  # `Value_sold` is DERIVED (registry key
+  # GhanaLSS::crop_production::9b-sale-amount-per-unit); Section 9B records a
+  # per-unit sale AMOUNT, not a total.  See _/derivations.yml.
+  crop_production:
+    index: (t, i, plot_id, j)
+    Quantity:
+      type: float
+      optional: true
+    Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
+    KgFactor:
+      type: float
+      optional: true
+    Value_sold: float
+    Value_seed: float
+    Value_given: float
+    Value_lost: float
+    LossCause:
+      type: str
+      optional: true
+    Area_ha: float
+    intercropped:
+      type: bool
+      optional: true
+    # `Derivation` is deliberately NOT declared here.  It is declared in the
+    # CANONICAL schema (lsms_library/data_info.yml, Columns > crop_production);
+    # a key starting with "derivation" in a data_scheme.yml is banned outright
+    # by tests/test_derivations.py::test_nothing_in_a_data_scheme_names_a_derivation,
+    # because `_SCHEME_NON_COLUMN_KEYS` would read it as a required column.
+
+  # GLSS1/GLSS2 Section 9 Part F (Livestock).  1987-88 and 1988-89 only.
+  # One row per (household, animal); (HID, LIVSTCD) is unique in both waves.
+  #
+  # `ValuePerAnimal` is the RECORDED value and `HerdValue` the DERIVED one --
+  # the opposite way round from most countries, and measured rather than read
+  # off Q5's wording ("if they wanted to sell one of these today, how much
+  # would they receive altogether?", which is ambiguous).  Within every animal
+  # type the reported value does NOT move with herd size: corr(log HeadCount,
+  # log LIVSTNV) runs -0.16..+0.08, chickens report 400 at both 4 head and 20,
+  # cattle 20,000 at both 2 head and 15.  Q8's SALE value does move with the
+  # number sold (corr 0.65-0.80) and is a total, and dividing it by HeadSold
+  # recovers ValuePerAnimal almost exactly (chickens 400, cattle 20,000).
+  #
+  # The last four columns have no canonical counterpart and are carried
+  # because the survey asked them; `HeadEaten` in particular is livestock
+  # own-consumption, the exact parallel of the crop own-consumption gap.
+  livestock:
+    index: (t, i, animal)
+    HeadCount: float
+    ValuePerAnimal: float
+    HerdValue: float
+    HeadSold: float
+    SalesValue: float
+    HeadAcquired: float
+    PurchaseValue:
+      type: float
+      optional: true
+    HeadBornOrReceived:
+      type: float
+      optional: true
+    HeadEaten:
+      type: float
+      optional: true
+    HeadLostOrDied:
+      type: float
+      optional: true
+
+  # GLSS1/GLSS2 Section 9 Part D (FARM INPUTS).  1987-88 and 1988-89 only.
+  # materialize: make -- seven source files, one per expense block, melted
+  # into one long table with a constant `input` label each.  YAML cannot
+  # express that; see the wave scripts' docstring for the block-by-block map
+  # and for the two things a reader must not misread.  Briefly: Transport /
+  # Containers / Storage are the COST OF SELLING the output rather than
+  # applied inputs -- they belong here (@ligon, 2026-09-16) but are a quarter
+  # of the spend and are not production technology; and the `input` labels are
+  # CATEGORIES, not the product names every other country serves.
+  #
+  # `u` is a COLUMN, not an index level (Uganda / Ethiopia / Nigeria do the
+  # same): four of the seven blocks record no quantity and hence no unit, and
+  # a NaN on a declared index level is deleted by the first groupby (Site I).
+  #
+  # `Cost` is the corpus's FIRST input-spend column (@ligon, 2026-09-16).
+  # Local currency, per (household, input, crop), 12-month recall.  No country
+  # records input spend today -- the canonical vocabulary is Quantity /
+  # Purchased / Quantity_purchased -- and four of GLSS's seven blocks record
+  # spend and NOTHING else, so dropping it would drop the module.
+  #
+  # `Purchased` is deliberately NOT declared: the form asks a source code and
+  # a credit flag, neither of which is the canonical boolean, and a spend > 0
+  # is a different question (Q10 says "IF NOTHING, WRITE ZERO").
+  plot_inputs:
+    index: (t, i, plot_id, input, j)
+    Quantity:
+      type: float
+      optional: true
+    u:
+      type: str
+      optional: true
+    Cost: float
+    materialize: make
+
+  # GLSS1/GLSS2 Section 5 (Employment) -- ANNUAL labour supply, per person per
+  # job slot.  1987-88 and 1988-89 only.  materialize: make -- four source
+  # files, one per job slot, each contributing a constant `job` label.
+  #
+  # NOT `people_last7days`, which is the corpus's 7-DAY table (canonical,
+  # 13 countries).  This is a 12-month measure on the same window as Section
+  # 9's agriculture, which is what makes the two joinable.
+  #
+  # The "past 7 days" Parts B/C are the PRIMARY annual source, despite their
+  # title: their Q6 asks weeks worked during the past 12 MONTHS and their Q7
+  # usual hours per week during the past 12 MONTHS.  Parts E/G are a
+  # SUPPLEMENT -- their Q3 skips the grid when the 12-month job repeats the
+  # 7-day one, so their detail is present on only ~20% of rows.
+  # `SameAs7DayJob` carries that answer so the pointer rows can be dropped
+  # rather than double-counted.  See the wave scripts' docstring.
+  #
+  # `HoursPerWeek` is REPORTED on the B/C rows and DERIVED on the E/G rows as
+  # DaysPerWeek x HoursPerDay (registry key
+  # GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours), so that
+  # WeeksPerYear x HoursPerWeek is valid on every row.  Both factors are
+  # served raw beside it.
+  #
+  # Own-family farm labour = OwnFarmOrBusiness AND an agricultural Industry.
+  # Occupation / Industry are RAW CODES: no code list ships with the data here
+  # and none has been verified, so nothing is decoded.  A decode table is a
+  # documented gap -- see _/CONTENTS.org.
+  labor:
+    index: (t, i, pid, job)
+    Occupation:
+      type: float
+      optional: true
+    Industry:
+      type: float
+      optional: true
+    WeeksPerYear: float
+    HoursPerWeek: float
+    DaysPerWeek:
+      type: float
+      optional: true
+    HoursPerDay:
+      type: float
+      optional: true
+    Earnings:
+      type: float
+      optional: true
+    EarningsUnit:
+      type: str
+      optional: true
+    OwnFarmOrBusiness:
+      type: bool
+      optional: true
+    SameAs7DayJob:
+      type: str
+      optional: true
+    materialize: make
+
+  # GLSS1/GLSS2 Section 9 Part D -- hired and exchange labour.  1987-88 and
+  # 1988-89 only.  materialize: make.
+  #
+  # NOT a new table and NOT bespoke.  Every country in the corpus already
+  # holds hired labour in plot_labor under source='hired', and GhanaSPS
+  # already declares a SIX-level plot_labor (t, i, plot_id, season, stage,
+  # source) whose `stage` vocabulary is reused here.  plot_labor has no
+  # canonical index_info or Columns entry (GH #569), so the corpus shape is
+  # convention -- and that convention already runs from four levels to six.
+  #
+  # `plot_id` is 'Farm-level' throughout: Section 9 has no farm or plot
+  # roster, and plot_features is a C4-validated not-asked for both waves.  The
+  # level is KEPT and marked rather than dropped -- see the crop_production
+  # note above for the convention.  The EHCVM plot_inputs and EthiopiaRHS
+  # crop_production drop it instead; they predate this.
+  #
+  # `Cost`, not the corpus's usual PersonDays/Wage, for the hired rows: Q42
+  # asks how much was SPENT on paid labour, not how many days were worked.
+  # PersonDays carries the Q46 exchange-labour total, which is the only
+  # person-days figure in Section 9.
+  #
+  # `worker` is a mixed sex/age classification (male / female / child), as the
+  # form asks it.  GhanaSPS splits the same way but as WageRateMen /
+  # WageRateWomen / WageRateChildren COLUMNS; an index level is used here
+  # because the corpus models categorical dimensions that way everywhere else
+  # (source, input, stage), and GhanaSPS's are rates attached to a record.
+  #
+  # Q46 has neither a stage nor a worker type, so those rows carry the
+  # sentinels stage='unspecified' and worker='all' (the landed Niger 'Unknown'
+  # pattern, GH #842).  A NaN on a declared index level would be deleted by the
+  # first groupby (Site I).  They are sentinels, not measurements.
+  #
+  # STILL UNWIRED from Part D: Q43-44, other production expenses (renting
+  # animals, renting equipment or machinery, maintenance and repair,
+  # irrigation charges, fuel) -- 2.5M / 2.8M cedis.  Household-grain with no
+  # crop, so it fits neither plot_inputs (which is keyed on j) nor this table.
+  plot_labor:
+    index: (t, i, plot_id, stage, source, worker)
+    Cost:
+      type: float
+      optional: true
+    PersonDays:
+      type: float
+      optional: true
+    materialize: make
