@@ -1,0 +1,173 @@
+#+TITLE: GhanaLSS food aggregation: inventory and first draft
+#+AUTHOR: Sue
+#+DATE: 2026-09-16
+
+* Result
+
+GhanaLSS delivers 233 distinct Preferred labels across its seven waves.
+The [[file:draft_partition.yml][draft partition]] maps these to 225 groups: five proposed merges
+cover 13 labels, and the other 220 labels remain singletons. Four tobacco
+labels are retained in the inventory but excluded from food support
+calculations. No live =Aggregate Label= column has been added.
+
+The country =harmonize_food= table has 195 distinct Preferred labels, but
+47 delivered labels are absent from that axis. Nine country Preferred
+labels are not delivered. The country table's wave columns sometimes
+record broader crosswalks; they cannot be applied as spelling corrections.
+The [[file:item_review.csv][item review]] preserves the exact delivered identities, their raw-code
+and raw-label evidence, documentary crosswalk targets, draft assignments,
+and reasons. Every delivered label has a corresponding wave Preferred
+label. Historical wave Aggregate assignments impose no constraint on this
+draft: the API reads a country-level column when =labels='Aggregate'= is
+requested.
+
+* Observed support
+
+Counts use positive monetary amounts. Zero and unavailable amounts both
+contribute zero; a price-only row does not establish positive expenditure.
+The denominator is the entire API =sample= for the wave, including households
+with no food records. Tobacco is excluded. The two bases are purchased
+expenditure and total recorded acquisition value, using the library's
+existing monetary derivation without additional valuation.
+
+#+name: tab:ghanalss-food-support
+#+caption: Distinct positive foods per household, summed over visits within each wave. Density is the fraction of positive household-item cells.
+| Wave    | Sample HH | Food labels | Median purchased | Median total | Purchased density | Total density |
+|---------+-----------+-------------+------------------+--------------+-------------------+---------------|
+| 1987-88 |      3147 |          58 |               15 |           21 |             0.278 |         0.367 |
+| 1988-89 |      3194 |          58 |               14 |           21 |             0.266 |         0.365 |
+| 1991-92 |      4523 |         114 |               21 |           21 |             0.199 |         0.199 |
+| 1998-99 |      5998 |         109 |               21 |           26 |             0.205 |         0.239 |
+| 2005-06 |      8687 |         111 |               25 |           28 |             0.239 |         0.263 |
+| 2012-13 |     16772 |         112 |               26 |           29 |             0.245 |         0.266 |
+| 2016-17 |     14009 |         176 |               25 |           28 |             0.151 |         0.166 |
+
+Summing visits substantially increases apparent coverage. In 2016-17 the
+median purchased-food count among households reporting positive purchases
+is 11 at visit 2 and 10 at each of visits 3--7. On the total basis the
+corresponding medians are 13 and 12. These visit-level medians condition on
+positive reporting; they are not the full-sample medians in the table.
+The [[file:visit_support.csv][visit report]] gives counts without assuming that every non-reporting
+household completed every visit.
+
+Pair support is also limited. Across the 176 food labels in 2016-17, the
+median number of households reporting both members of an unordered pair is
+36 for purchases and 56 for total recorded value, even after pooling visits.
+Only 52.6% and 59.3% of pairs, respectively, have at least 30 such households.
+These are wave-wide counts, before any market/time conditioning or training
+split; 30 is a descriptive threshold, not a certification rule. Full counts
+and weighted prevalence are in [[file:profiles.csv][profiles.csv]] and [[file:item_support.csv][item_support.csv]].
+
+* Five candidate groups
+
+The [[file:proposed_groups.yml][specification]] records exact members and source-table evidence. These
+are semantic candidates; similar loadings or error variances have not been
+established.
+
+- Rice: generic, imported, and local unprepared rice. Excludes prepared
+  dishes. Origin may still distinguish quality and household selection.
+- Sugar: cubed and granulated sugar only. Generic =Sugar= remains separate:
+  the 1987-88 source combines "Sugar, candy, honey and sugarcane". A single
+  country-wide assignment cannot treat that label as pure refined sugar
+  just because later instruments use it more narrowly.
+- Malt drinks: bottled and canned forms in 2016-17, with overlapping
+  brands. Earlier source rows say "malta and malt drinks" without naming
+  packaging. Packaging can still distinguish serving size and purchasers.
+- Pasta: macaroni, spaghetti, and the earlier combined label. Excludes
+  instant noodles, couscous, and other cereals.
+- Gari: =Cassava (flour)= and its white/yellow variants. The consumption
+  source labels explicitly say Gari/Garri. Excludes fresh cassava, dough,
+  and dried cassava/Kokonte.
+
+#+name: tab:ghanalss-draft-group-support
+#+caption: Positive support in 2016-17 on the total recorded-value basis. Gain compares the union with its best-supported single member; it is not a count of households rescued for CFE estimation.
+| Candidate                   | Largest member HH | Union HH | Gain HH | HH reporting both |
+|-----------------------------+-------------------+----------+---------+-------------------|
+| Rice (unprepared)           |              7054 |    11089 |    4035 |              1687 |
+| Malt Drinks                |              2363 |     3356 |     993 |               552 |
+| Gari                        |              3999 |     4532 |     533 |               192 |
+| Pasta (macaroni/spaghetti)  |               543 |      832 |     289 |                45 |
+| Sugar (cubed/granulated)    |              7971 |     8096 |     125 |               175 |
+
+Each candidate has two delivered members in 2016-17. The purchased-basis
+gains are 3279 for rice and 313 for gari; the other three are unchanged.
+Rice also combines distinct labels in 2005-06 and 2012-13. Earlier generic
+rice, pasta and gari labels are renamed by the all-wave draft, but this
+does not combine distinct items within those earlier waves. See
+[[file:group_support.csv][group_support.csv]] for all comparisons.
+
+Rice and malt drinks supply the largest increases in group support. Pasta
+has only 45 households reporting both members over the whole wave, so a
+loading-comparison rule must distinguish weak evidence from similarity.
+The already well-supported granulated sugar dominates its candidate's
+coverage; a plausible semantic merge need not offer much statistical gain.
+
+The specification also records four deferred alternatives: chicken cuts,
+pork cuts, smoked fish, and sausages. They are not applied to the draft.
+Cuts, species, processing, and formulations may matter. Other broad source
+bundles remain separate: modern =Beef= includes other cow products, =Goat=
+includes mutton, and =Chicken (frozen)= is sourced from "Other chicken
+product". Delivered Preferred labels are already a coarsening; this step
+cannot recover their components.
+
+* Survey qualifications
+
+The [[file:../../../lsms_library/countries/GhanaLSS/_/CONTENTS.org][country notes]] document different recall designs. GLSS7 has six
+five-day food recalls; GLSS3 uses seven rural and ten urban asks with
+different recall lengths and imperfect agreement between field schedules
+and the analysis Rural flag. The table above is an inventory of observed
+support, not evidence that all waves measure a common consumption period.
+The CFE evaluation must specify its household/time cell before fitting.
+
+Total recorded value includes the API's existing own-production amounts.
+Modern Section 8H derives amounts from quantity times a reported unit
+value. Its hypothetical selling-price wording and its internal
+=8h-farmgate= derivation key do not establish a farmgate economic price:
+the later country note, "What food_acquired.Price on produced rows
+MEASURES", reports strong agreement with purchase unit values. GLSS1/2
+use a different construction. GLSS3 own-production expenditure is not
+wired, so the two reported bases coincide there.
+
+Two households with positive food amounts lie outside =sample= in each
+of 1987-88 and 1988-89. Their labels and expenditure totals are retained
+in the inventory, with separate counts and amounts in the reports. They
+are excluded from sample prevalence calculations; the discrepancy remains
+to be resolved before using those waves for estimation. There are no such
+households in the other five waves. Every sampled household has a positive
+finite weight in this run.
+
+* Reproduction and next evaluation
+
+From the LSMS_Library root:
+
+#+begin_example
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+LSMS_BUILD_WORKERS=1 PYTHONPATH="$PWD" \
+.venv/bin/python -m SkunkWorks.aggregation.ghana_inventory
+
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+PYTHONPATH="$PWD/../CFEDemands:$PWD" \
+.venv/bin/python -m pytest --confcutdir=SkunkWorks/aggregation \
+  SkunkWorks/aggregation -q
+#+end_example
+
+The driver uses the Country API and its normal caches. Saved experiment
+outputs contain only item, group, wave, and visit summaries; they contain
+no household identifiers. [[file:inventory.yml][inventory.yml]] records label discrepancies,
+nonfoods, the extraction/configuration revision, and API warning counts.
+The [[file:../../../.coder/ledger/ghanalss-aggregate-curation.md][ledger]] records reuse decisions and checks.
+
+The next experiment should start with 2016-17 and compare the fine map,
+each merge separately, and the combined draft using the existing
+[[file:../evaluation.org][partition evaluator]]. Fix expenditure basis, time cells, training and
+validation households, normalization, and evaluation population in advance.
+Report changes in preparation retention and held-out score coverage, then
+evaluate the approximation and measurement-error costs. Real-data stability
+or prediction checks cannot establish MSE for unobserved true \(w\);
+simulations using Ghana's observed masks can examine specified mechanisms.
+
+Only after that comparison should accepted groups become a country-level
+=Aggregate Label= column. Publication must first cover the actual delivered
+axis, including the 47 labels absent from the current country Preferred
+column, and preserve the separate nutritional crosswalk. Agreement among
+the unused wave Aggregate columns is not a prerequisite.

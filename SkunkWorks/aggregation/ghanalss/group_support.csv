@@ -1,0 +1,15 @@
+wave,basis,aggregate,members,n_members,n_positive_sample,largest_member_support,additional_hh_vs_best_member,mean_members_when_positive,n_hh_multiple_members,weighted_prevalence
+2005-06,purchased,Rice (unprepared),Rice (imported); Rice (local),2,6597,5012,1585,1.0929210247082006,613,0.7846185431427091
+2005-06,total,Rice (unprepared),Rice (imported); Rice (local),2,6830,5012,1818,1.0920937042459737,629,0.8020747319961058
+2012-13,purchased,Rice (unprepared),Rice (imported); Rice (local),2,12595,8661,3934,1.1069472012703454,1347,0.7718747995101616
+2012-13,total,Rice (unprepared),Rice (imported); Rice (local),2,13365,8661,4704,1.10662177328844,1425,0.7992987719085509
+2016-17,purchased,Gari,"Cassava (white, flour); Cassava (yellow, flour)",2,4312,3999,313,1.0282931354359925,122,0.3269519625006879
+2016-17,purchased,Pasta (macaroni/spaghetti),Macaroni; Spaghetti,2,832,543,289,1.0540865384615385,45,0.06601934149584866
+2016-17,purchased,Malt Drinks,Malt Drinks (bottle); Malt Drinks (canned),2,3356,2363,993,1.164481525625745,552,0.2751496520373067
+2016-17,purchased,Rice (unprepared),Rice (imported); Rice (local),2,10333,7054,3279,1.1570695828897706,1623,0.7623410185620797
+2016-17,purchased,Sugar (cubed/granulated),Sugar (cubed); Sugar (granulated),2,8096,7971,125,1.0216156126482214,175,0.5438093108470602
+2016-17,total,Gari,"Cassava (white, flour); Cassava (yellow, flour)",2,4532,3999,533,1.0423654015887025,192,0.34176809340132785
+2016-17,total,Pasta (macaroni/spaghetti),Macaroni; Spaghetti,2,832,543,289,1.0540865384615385,45,0.06601934149584866
+2016-17,total,Malt Drinks,Malt Drinks (bottle); Malt Drinks (canned),2,3356,2363,993,1.164481525625745,552,0.2751496520373067
+2016-17,total,Rice (unprepared),Rice (imported); Rice (local),2,11089,7054,4035,1.1521327441608802,1687,0.7838211986365963
+2016-17,total,Sugar (cubed/granulated),Sugar (cubed); Sugar (granulated),2,8096,7971,125,1.0216156126482214,175,0.5438093108470602

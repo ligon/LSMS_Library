@@ -3321,6 +3321,26 @@ through =labels='Aggregate'=; it was fixed in the same pass, along with an
 encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
 followed by two mojibake =Ê= characters, a twin of code 254's clean label).
 
+/Correction, 2026-09-16./ The wave Aggregate columns described above are
+not read by =Country._relabel_j=. That method uses the country table, which
+currently has no =Aggregate Label= column. The wave builders use Preferred
+labels; the wave Aggregate spelling checks remain configuration checks.
+Their historical assignments are not live aggregation rules.
+
+The [[file:../../../../SkunkWorks/aggregation/ghanalss/review.org][GhanaLSS aggregation inventory]] measured 233 distinct API-delivered
+Preferred labels across all seven waves, of which 47 are absent from the
+country table's 195 distinct Preferred labels. Every delivered label has
+wave-table provenance. The country wave columns include documentary
+crosswalks to broader items; applying them all as spelling corrections
+would change the item partition. A future Aggregate column must cover the
+delivered axis explicitly while preserving the nutritional crosswalk.
+
+One semantic trap is =Sugar=: the early source combines sugar, candy,
+honey and sugarcane. It cannot be folded into a country-wide pure-sugar
+group merely because later sources use the same label more narrowly.
+The draft keeps generic Sugar separate from the modern cubed/granulated
+pair. All proposed merges remain experimental pending statistical checks.
+
 *Why a rename here is provably safe.*  For the six singular/plural pairs, both
 variants share the collision key, so the measured "0 internal collisions per
 wave" is a proof that no wave holds both -- a rename cannot merge two distinct

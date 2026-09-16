@@ -1,0 +1,98 @@
+schema_version: 1
+country: GhanaLSS
+status: draft
+author: Sue
+date: '2026-09-16'
+scope: Delivered Preferred labels; proposed merges require statistical evaluation.
+source_revision: 6ae626d38
+default: Keep every item not named below as its own singleton.
+groups:
+  - id: rice_unprepared
+    label: Rice (unprepared)
+    members: [Rice, 'Rice (imported)', 'Rice (local)']
+    reason: >-
+      Unprepared rice, distinguished by origin in modern instruments. Quality,
+      prices and household selection can still differ; this is a candidate.
+    evidence:
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org:137, harmonize_food'
+      - 'GhanaLSS/1991-92/_/categorical_mapping.org:308, harmonize_food'
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:7,13, harmonize_food'
+  - id: sugar_refined
+    label: Sugar (cubed/granulated)
+    members: ['Sugar (cubed)', 'Sugar (granulated)']
+    reason: >-
+      Two physical forms of refined sugar. Generic Sugar remains separate:
+      its early-wave source includes candy, honey and sugarcane.
+    evidence:
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:244, harmonize_food'
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org:175, broad Sugar source'
+  - id: malt_packaging
+    label: Malt Drinks
+    members: ['Malt Drinks (bottle)', 'Malt Drinks (canned)']
+    reason: >-
+      In 2016-17 packaging distinguishes the labels and several brands occur
+      in both. Earlier source rows say malta and malt drinks without naming
+      packaging. Packaging may proxy quality, serving size or household type.
+    evidence:
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:288-304, harmonize_food'
+      - 'GhanaLSS/2005-06/_/categorical_mapping.org:111, generic malt source'
+  - id: pasta
+    label: Pasta (macaroni/spaghetti)
+    members: ['Macaroni/Spaghetti', Macaroni, Spaghetti]
+    reason: >-
+      Earlier instruments combine macaroni and spaghetti; the modern one
+      separates them. Excludes instant noodles, couscous and Other Cereal.
+    evidence:
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org:144, harmonize_food'
+      - 'GhanaLSS/1988-89/_/categorical_mapping.org:261, harmonize_food'
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:73-74, harmonize_food'
+  - id: gari
+    label: Gari
+    members: ['Cassava (flour)', 'Cassava (white, flour)', 'Cassava (yellow, flour)']
+    reason: >-
+      The source labels identify Gari/Garri, including white and yellow gari.
+      Excludes fresh cassava, dough and dried cassava/Kokonte. Formulation and
+      color may still be associated with different loadings or survey errors.
+    evidence:
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org:142, harmonize_food'
+      - 'GhanaLSS/1991-92/_/categorical_mapping.org:321, harmonize_food'
+      - 'GhanaLSS/1998-99/_/categorical_mapping.org:297, harmonize_food'
+      - 'GhanaLSS/2005-06/_/categorical_mapping.org:104, harmonize_food'
+      - 'GhanaLSS/2012-13/_/categorical_mapping.org:107, harmonize_food'
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:52-53, harmonize_food'
+deferred_alternatives:
+  - id: chicken_cuts
+    label: Chicken cuts
+    members: ['Chicken (breast)', 'Chicken (thigh)', 'Chicken (wing)']
+    reason: >-
+      Common meat but different cuts, bone/skin content and prices. Keep live,
+      broiler, gizzard and frozen/Other chicken product outside this proposal.
+    evidence: ['GhanaLSS/2016-17/_/categorical_mapping.org:97-102']
+  - id: pork_cuts
+    label: Pork cuts
+    members: ['Pork (rib)', 'Pork (shoulder)', 'Pork (fillet)']
+    reason: >-
+      Sparse named meat cuts. Generic Pork includes Other pork meat and is
+      excluded, as are feet. Check whether even the combined support is useful.
+    evidence: ['GhanaLSS/2016-17/_/categorical_mapping.org:86-88']
+  - id: smoked_fish
+    label: Smoked fish
+    members: ['Fish (smoked)', 'Fish (smoked, river)', 'Fish (smoked, sea)',
+              'Herring (smoked)', 'Salmon (smoked)']
+    reason: >-
+      A common recorded preservation method, with species/origin variation.
+      Excludes dried, salted, fried, canned and unspecified fish.
+    evidence: ['GhanaLSS/2016-17/_/categorical_mapping.org:120-123']
+  - id: sausage
+    label: Sausage
+    members: ['Sausage (beef)', 'Sausage (pork)', 'Sausage (chicken)']
+    reason: >-
+      A processed product family with different meat content and formulations;
+      neither similar loadings nor error variances have been established.
+    evidence: ['GhanaLSS/2016-17/_/categorical_mapping.org:109-111']
+singleton_cautions:
+  Sugar: Early waves also include candy, honey and sugarcane.
+  Beef: Includes Other cow/beef product in 2016-17; retain existing fine identity.
+  Goat: Includes mutton and live goat in 2016-17; cannot separate from delivered data.
+  'Chicken (frozen)': Source says Other chicken product; do not infer a pure frozen-food category.
+  'Other ...': Retain each existing named category separately; do not create a residual pool.

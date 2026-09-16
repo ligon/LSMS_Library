@@ -1,0 +1,81 @@
+country: GhanaLSS
+waves:
+- 1987-88
+- 1988-89
+- 1991-92
+- 1998-99
+- 2005-06
+- 2012-13
+- 2016-17
+n_delivered_labels: 233
+n_country_preferred_labels: 195
+source_revision: 6ae626d38
+nonfood_labels:
+- Cigarette
+- Cigarrette
+- Other Tobacco
+- Tobacco
+n_draft_groups: 225
+delivered_labels_absent_from_country:
+- Cassava (fresh)
+- Cassava (white, flour)
+- Cassava (yellow, flour)
+- Chicken (broiler)
+- Chocolate Drink
+- Cigarrette
+- Cocoa (milk powder beverages)
+- Coconut
+- Crustaceans
+- Dove/pigeon
+- Eggplant/Cucumber
+- Fish
+- Fish (smoked, river)
+- Fish (smoked, sea)
+- Fried Plantian and Beans
+- Guinea corn/sorghum
+- Guineafowl
+- Kenkey
+- Khebabs
+- Macaroni
+- Milk
+- Milk (powdered)
+- Milk (tinned, condensed)
+- Milk (tinned, unsweetened)
+- Milk product
+- Mutton
+- Oil (red palm)
+- Oil (vegetable)
+- Other Drink
+- Other Leafy Vegetable
+- Other Nut/Seed
+- Pepper (dried, red)
+- Pepper (dry)
+- Pepper (fresh)
+- Pizza
+- Potato
+- Rice (imported)
+- Rice (local)
+- Spaghetti
+- Sugar (cubed)
+- Sugar (granulated)
+- Sugar Bread
+- Sweet Potato
+- Tomato
+- Tomato Puree
+- Tuo Zaafi
+- White Oats
+country_labels_not_delivered:
+- Crustacean
+- Dove/Pigeon
+- Guinea Corn/Sorghum
+- Milk (tinned, condensed/unsweetened)
+- Other Drinks
+- Other Leafy Vegetables
+- Other Nuts/Seeds
+- Pepper (dried)
+- White Oat
+proposed_members_not_delivered: []
+api_warning_counts:
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 5
+  NullIndexKeyWarning: 1
