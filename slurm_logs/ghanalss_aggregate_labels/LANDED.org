@@ -46,7 +46,7 @@ pass-through is the defect being replaced.
 | =Mutton= split out of =Goat= | the survey lists mutton and goat *separately* in 91/98/05/12/16 and the harmonization merged them; 87/88 have only =Mutton= and were being served as =Goat= |
 | =Pito= given its own PL (@ligon: keep distinct from beer) | pito was =Beer= in 91/98/16 and =Wine= in 05/12 -- inconsistent three ways |
 | 2016-17 code 558 =Ideal= -> =Milk (evaporated)= | in Tins its median unit price is *3.00*, identical to code 301 =Ideal= evaporated, against Milo 12.00 and cocoa powder 13.50; in Satchets 1.00, identical to code 202 =Ideal (sachet)= |
-| =Sweet Potato= given FCT *02_022* | was inheriting =Potato, raw= (02_009) from the collapse |
+| =Sweet Potato= given FCT *02_022*, and GLSS1/2's =Potato or sweet potato= folded into it | was inheriting =Potato, raw= (02_009) from the collapse; see "Still open" item 2, resolved |
 | =Milk (evaporated)= 1987-88 dead reference removed | no 1987-88 row produces it |
 
 ** Gaps filled
@@ -73,13 +73,28 @@ right invariant on =Lw=; it could never have caught this.
    has separate =Guinea Corn= and =Sorghum= rows, neither of which is ever
    reached.  A compound name (=Millet/Guinea Corn/Sorghum=) would be honest;
    =Millet= alone is not.
-2. *=Potato/Sweet Potato= is the INSTRUMENT's conflation, not ours* (@ligon
-   noticed it survived).  GLSS1/2 ask one question, =Potato or sweet potato=;
-   =Macaroni and Spaghetti= is the same shape.  Keeping the compound label is
-   faithful, and the three-way split is what an unbalanced panel looks like.
-   Its FCT is still 02_009 (=Potato, raw=) for an item that is largely sweet
-   potato in Ghana -- arguably should be blank, since the instrument does not
-   say which.
+2. *RESOLVED (@ligon, 2026-09-16): =Potato/Sweet Potato= folded into
+   =Sweet Potato=.*  GLSS1/2 ask one question, =Potato or sweet potato=, so the
+   compound label was the INSTRUMENT's conflation faithfully recorded, not ours
+   (=Macaroni and Spaghetti= is the same shape and is untouched).  But a
+   randomly drawn Ghanaian potato is far more likely to be a sweet potato than
+   an Irish one, so the honest reading of that item is sweet potato: the ruling
+   is a judgement about Ghana, not about the instrument, and it is recorded
+   here as such rather than inferred from the label.
+
+   Done at the COUNTRY level, which is what the crosswalk is for -- the 87/88
+   wave tables still say =Potato/Sweet Potato=, and the country table's 1987-88
+   and 1988-89 cells carry that spelling against Preferred Label
+   =Sweet Potato=.  FCT follows the label: *02_022* (sweet potato, pale flesh)
+   rather than 02_009 (=Potato, raw=).
+
+   Measured: =Sweet Potato= 1,759 -> *2,202* rows (= 1,759 + the 443 formerly
+   under =Potato/Sweet Potato=), now spanning *all seven waves*, and it gains a
+   purchase series it did not have -- 91-16 are entirely own-production
+   (1,982), the 87/88 rows are purchased (220).  =Potato= keeps 02_009 and
+   stays 2016-17-only (484 rows), which is the genuine Irish-potato item.
+   Country Preferred Labels 215 -> 214; bijection, 0 off-axis, 0 duplicates and
+   Expenditure per wave all still hold; 32 tests pass.
 3. =557 'Country milk'= left under =Cocoa (milk powder beverages)=: n=52, unit
    =Single=, median 5.50 against =Other milk= 3.00 -- suggestive of milk but
    not decisive.  Documented unsure rather than moved.
