@@ -4643,3 +4643,63 @@ and electricity, other -- *2,477,260 cedis (1987-88) and 2,803,632 (1988-89)*,
 over 312 / 407 households.  Household-grain with NO crop, so it fits neither
 =plot_inputs= (keyed on =j=) nor =plot_labor= (not labour).  A real gap, and
 the last unwired money in Section 9.
+
+** The =Farm-level= convention: mark the axis a survey does not resolve
+
+Established here (@ligon, 2026-09-16) and expected to recur: surveys record
+farm quantities at four different grains, and *none is better or worse in
+general* -- which you want depends on the application.
+
+| survey resolves  | =plot_id=     | =j=           |
+|------------------+---------------+---------------|
+| farm level only  | =Farm-level=  | =Farm-level=  |
+| crop level       | =Farm-level=  | the crop      |
+| plot level       | the plot      | =Farm-level=  |
+| plot x crop      | the plot      | the crop      |
+
+Both axes are KEPT in the index and the unresolved one is MARKED, rather than
+the level being dropped.  The gain is not that finer data is better; it is that
+an absent level is silent about why it is absent, whereas =Farm-level= states
+the grain positively -- so a country's grain is readable off the data instead
+of inferrable from which index levels happen to exist, and
+=Feature('plot_inputs')= keeps one index shape across countries.
+
+*=Farm-level= is STRUCTURAL, not epistemic.*  The quantity is not missing and
+not unknowable: it genuinely is not attributable to that axis.  Contrast
+Niger's =u='Unknown'= (GH #842), which marks a unit that exists but was not
+fielded.  The two must not be merged.
+
+GLSS1/GLSS2 Section 9 has no farm or plot roster anywhere, so all three tables
+carry =plot_id='Farm-level'= throughout; Part B resolves the CROP axis, Part D
+Q43-44 resolves neither.  =plot_labor= uses the same value on =stage= and
+=worker= for the Q46 exchange total.
+
+Two earlier tables in the corpus express the same fact by DROPPING the level --
+the EHCVM =plot_inputs= and EthiopiaRHS =crop_production= (GH #512).  They
+predate this convention; aligning them is a separate question, not a defect
+fixed here.
+
+*** =_relabel_j= passes an unmapped =j= through unchanged -- and that is pinned
+
+=labels== does not disturb =Farm-level= rows.  =_relabel_j= renames with
+=df.rename(index=rdict, level='j')=, which leaves keys absent from the label
+table ALONE.  The same protection covers the non-food crops this country
+serves on =crop_production= (Cocoa, Rubber, Cotton, Wood (Timber), Tobacco,
+Kenef -- five of 31 distinct =j=).
+
+The behaviour is a property of =rename=, not of the design, so it is pinned by
+=tests/test_label_selection.py::test_an_unmapped_j_value_survives_relabelling_unchanged=
+and two siblings.  The refactor they guard against is the one-line
+"simplification" to =index.map(rdict)=, which maps unmapped keys to *NaN* --
+putting NaN on a declared index level, which the first =groupby= then deletes
+(Site I).  That would silently drop every non-food crop in the corpus.
+
+*** Part D Q43-44 is now wired
+
+Other production expenses -- renting animals, renting equipment or machinery,
+maintenance and repair, irrigation charges, fuel and electricity, other -- as
+six =input= values with =j='Farm-level'=: *322 rows / 2,477,260 cedis in
+1987-88 and 437 / 2,803,632 in 1988-89*.  Zero cells are dropped here (Q44 is a
+FIXED six-row list, so a zero means the household spent nothing on that
+category) but NOT in the per-crop blocks above, where a crop is listed only
+when it had an expense.

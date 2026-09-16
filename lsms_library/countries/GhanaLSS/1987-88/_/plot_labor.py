@@ -31,12 +31,17 @@ TWO SOURCES, both household-grain and both 12-month recall:
           with no stage and no worker type.  -> source='exchange',
           ``PersonDays``.
 
-SENTINELS, and why they are here rather than a NaN.  Q46 has neither a stage
-nor a worker type, but both are DECLARED INDEX LEVELS -- and a NaN on a
-declared index level is deleted by the first ``groupby`` (CLAUDE.md, "Site I").
-So those rows carry ``stage='unspecified'`` and ``worker='all'``, the landed
-Niger ``'Unknown'`` pattern from GH #842.  They are sentinels, not measurements:
-the survey did not ask, and nothing is imputed.
+THE ``Farm-level`` VOCABULARY.  Q46 has neither a stage nor a worker type, but
+both are DECLARED INDEX LEVELS -- and a NaN on a declared index level is
+deleted by the first ``groupby`` (CLAUDE.md, "Site I").  Those rows therefore
+carry ``stage='Farm-level'`` and ``worker='Farm-level'``.
+
+``Farm-level`` is NOT ``Unknown`` and the difference is deliberate (@ligon,
+2026-09-16): the quantity is not missing and not unknowable, it is *recorded at
+farm grain because it is not attributable to this level*.  Exchange labour
+arrives at the household, not at a stage or a worker type.  Niger's
+``u='Unknown'`` (GH #842) is the other, EPISTEMIC case -- a unit that exists
+but was not fielded -- and the two must not be merged.
 
 ``source='exchange'`` is the form's own word ("exchange of unpaid labor").
 GhanaSPS's ``plot_labor`` carries a ``'communal'`` source which MAY be the same
@@ -64,6 +69,24 @@ t = '1987-88'
 STAGE = {1: 'clearing_and_land_preparation', 2: 'planting',
          3: 'harvesting', 4: 'other'}
 
+#: Corpus convention (@ligon, 2026-09-16).  A level value meaning "this survey
+#: does not resolve the quantity on this axis".  Surveys report farm inputs at
+#: four different grains -- farm, crop, plot, or plot x crop -- and none is
+#: better or worse in general; which you want depends on the application.
+#: Keeping BOTH axes present and marking the unresolved one makes each
+#: country's grain readable off the data, rather than inferrable from which
+#: index levels happen to exist:
+#:
+#:     farm level only   plot_id='Farm-level'  j='Farm-level'
+#:     crop level        plot_id='Farm-level'  j=<crop>
+#:     plot level        plot_id=<plot>        j='Farm-level'
+#:     plot x crop       plot_id=<plot>        j=<crop>
+#:
+#: GLSS1/GLSS2 Section 9 has no farm or plot roster at all, so `plot_id` is
+#: 'Farm-level' throughout.  STRUCTURAL, not epistemic: contrast Niger's
+#: u='Unknown' (GH #842), a unit that exists but was not fielded.
+FARM_LEVEL = 'Farm-level'
+
 #: Q42 grid columns.  A mixed sex/age classification, as the form asks it.
 WORKER = {'M': 'male', 'F': 'female', 'C': 'child'}
 
@@ -76,6 +99,7 @@ for code, stage in STAGE.items():
         rows.append(pd.DataFrame({
             't': t,
             'i': df['HID'].apply(i_helper),
+            'plot_id': FARM_LEVEL,
             'stage': stage,
             'source': 'hired',
             'worker': worker,
@@ -87,9 +111,10 @@ for code, stage in STAGE.items():
 rows.append(pd.DataFrame({
     't': t,
     'i': df['HID'].apply(i_helper),
-    'stage': 'unspecified',
+    'plot_id': FARM_LEVEL,
+    'stage': FARM_LEVEL,
     'source': 'exchange',
-    'worker': 'all',
+    'worker': FARM_LEVEL,
     'Cost': np.nan,
     'PersonDays': num('CREXLABD'),
 }))
@@ -103,9 +128,9 @@ print(f'{t}: {_before} candidate (stage, source, worker) cells -> {len(f)} kept;
       f'dropped {int(_zero.sum())} with neither a cost nor person-days '
       f'(the Q42 grid says "IF NOTHING SPENT, WRITE ZERO", so most are real zeros)')
 
-f = f.set_index(['t', 'i', 'stage', 'source', 'worker']).sort_index()
+f = f.set_index(['t', 'i', 'plot_id', 'stage', 'source', 'worker']).sort_index()
 assert f.index.is_unique, (
-    't, i, stage, source, worker is not unique: '
+    't, i, plot_id, stage, source, worker is not unique: '
     f'{f.index[f.index.duplicated()].tolist()[:5]}')
 
 to_parquet(f[['Cost', 'PersonDays']], 'plot_labor.parquet')

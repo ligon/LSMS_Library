@@ -336,11 +336,15 @@ Data Scheme:
   # households, the GLSS1->GLSS2 rotating half).
   #
   # Index (t, i, j) -- household-crop, no plot and no `u`:
-  #   * no plot level exists.  `plot_features` carries a C4-validated
-  #     `not-asked` verdict for both waves; Section 9 has no farm-number
-  #     column and no per-farm roster part.  (`Y09A:IDFARM` is NOT a plot id
-  #     -- see `_/CONTENTS.org`.)  EthiopiaRHS (GH #512) is the precedent for
-  #     a plot-less crop_production.
+  #   * `plot_id` is 'Farm-level' throughout.  Section 9 has no farm-number
+  #     column and no per-farm roster part, and `plot_features` carries a
+  #     C4-validated `not-asked` verdict for both waves (`Y09A:IDFARM` is NOT
+  #     a plot id -- see `_/CONTENTS.org`).  The LEVEL IS KEPT and marked
+  #     rather than dropped: surveys resolve farm quantities at farm / crop /
+  #     plot / plot-x-crop grain, none better or worse in general, and marking
+  #     the unresolved axis makes the grain readable off the data instead of
+  #     inferrable from which levels exist (@ligon, 2026-09-16).  EthiopiaRHS
+  #     (GH #512) drops the level instead; that predates this convention.
   #   * no `u` level because the form asks NO HARVEST QUANTITY -- only the
   #     quantity SOLD, whose unit is carried as the `Unit_sold` column.  A `u`
   #     would be NaN on 62-64% of rows (Site I; groupby deletes them) or a
@@ -357,7 +361,7 @@ Data Scheme:
   # GhanaLSS::crop_production::9b-sale-amount-per-unit); Section 9B records a
   # per-unit sale AMOUNT, not a total.  See _/derivations.yml.
   crop_production:
-    index: (t, i, j)
+    index: (t, i, plot_id, j)
     Quantity:
       type: float
       optional: true
@@ -446,7 +450,7 @@ Data Scheme:
   # a credit flag, neither of which is the canonical boolean, and a spend > 0
   # is a different question (Q10 says "IF NOTHING, WRITE ZERO").
   plot_inputs:
-    index: (t, i, input, j)
+    index: (t, i, plot_id, input, j)
     Quantity:
       type: float
       optional: true
@@ -522,9 +526,11 @@ Data Scheme:
   # canonical index_info or Columns entry (GH #569), so the corpus shape is
   # convention -- and that convention already runs from four levels to six.
   #
-  # No plot level: Section 9 has no farm or plot roster, and plot_features is
-  # a C4-validated not-asked for both waves.  Dropping it has precedent in the
-  # EHCVM plot_inputs and EthiopiaRHS crop_production.
+  # `plot_id` is 'Farm-level' throughout: Section 9 has no farm or plot
+  # roster, and plot_features is a C4-validated not-asked for both waves.  The
+  # level is KEPT and marked rather than dropped -- see the crop_production
+  # note above for the convention.  The EHCVM plot_inputs and EthiopiaRHS
+  # crop_production drop it instead; they predate this.
   #
   # `Cost`, not the corpus's usual PersonDays/Wage, for the hired rows: Q42
   # asks how much was SPENT on paid labour, not how many days were worked.
@@ -547,7 +553,7 @@ Data Scheme:
   # irrigation charges, fuel) -- 2.5M / 2.8M cedis.  Household-grain with no
   # crop, so it fits neither plot_inputs (which is keyed on j) nor this table.
   plot_labor:
-    index: (t, i, stage, source, worker)
+    index: (t, i, plot_id, stage, source, worker)
     Cost:
       type: float
       optional: true

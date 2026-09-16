@@ -66,6 +66,24 @@ from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
 
 t = '1987-88'
 
+#: Corpus convention (@ligon, 2026-09-16).  A level value meaning "this survey
+#: does not resolve the quantity on this axis".  Surveys report farm inputs at
+#: four different grains -- farm, crop, plot, or plot x crop -- and none is
+#: better or worse in general; which you want depends on the application.
+#: Keeping BOTH axes present and marking the unresolved one makes each
+#: country's grain readable off the data, rather than inferrable from which
+#: index levels happen to exist:
+#:
+#:     farm level only   plot_id='Farm-level'  j='Farm-level'
+#:     crop level        plot_id='Farm-level'  j=<crop>
+#:     plot level        plot_id=<plot>        j='Farm-level'
+#:     plot x crop       plot_id=<plot>        j=<crop>
+#:
+#: GLSS1/GLSS2 Section 9 has no farm or plot roster at all, so `plot_id` is
+#: 'Farm-level' throughout.  STRUCTURAL, not epistemic: contrast Niger's
+#: u='Unknown' (GH #842), a unit that exists but was not fielded.
+FARM_LEVEL = 'Farm-level'
+
 #: (file, input label, crop column, quantity column, unit column, spend column)
 BLOCKS = [
     ('Y09D1A.DAT', 'Seed',                   'SEEDCR', None,      None,       'SEEDAMT'),
@@ -96,6 +114,7 @@ for fn, label, crop_col, qty_col, unit_col, amt_col in BLOCKS:
     out = pd.DataFrame({
         't': t,
         'i': df['HID'].apply(i_helper),
+        'plot_id': FARM_LEVEL,
         'input': label,
         'j': _decode(df[crop_col], CROP),
         'Cost': pd.to_numeric(df[amt_col], errors='coerce'),
@@ -110,6 +129,57 @@ for fn, label, crop_col, qty_col, unit_col, amt_col in BLOCKS:
     else:
         out['u'] = pd.Series(pd.NA, index=out.index, dtype='string')
     frames.append(out)
+
+
+# ---------------------------------------------------------------------------
+# Section 9 Part D Q43-44 -- production expenses NOT attributable to a crop.
+#
+# "Has your household had other production expenses ... such as for renting
+# animals, equipment or machinery, for maintenance and repair of buildings or
+# machines, irrigation charges, fuel oil, electricity, other fuel?" (Q43), then
+# an amount for each of six categories (Q44).  Household-grain: the form asks
+# no crop, because these expenses are not attributable to one.
+#
+# They carry `j = 'Farm-level'`, the corpus convention for a row recorded at
+# farm grain (@ligon, 2026-09-16).  That is STRUCTURAL, not epistemic: the
+# expense genuinely is not a crop's.  It is deliberately NOT `Unknown`, which
+# is Niger's case (GH #842) -- a unit that exists but was not fielded.  A NaN
+# would be worse than either: `j` is a declared index level, so the first
+# groupby would delete the rows (Site I).
+#
+# `_relabel_j` passes an unmapped `j` through unchanged -- it renames with
+# `df.rename(index=..., level='j')`, which leaves unmapped keys alone -- so
+# `labels=` does not disturb these rows.  Pinned by
+# tests/test_label_selection.py::test_an_unmapped_j_value_survives_relabelling_unchanged.
+# ---------------------------------------------------------------------------
+
+FARM_LEVEL_EXPENSES = {
+    1: 'Animal rental',
+    2: 'Equipment rental',
+    3: 'Maintenance and repair',
+    4: 'Irrigation',
+    5: 'Fuel and electricity',
+    6: 'Other production expense',
+}
+
+_d3b = get_dataframe('../Data/Y09D3B.DAT')
+for _code, _label in FARM_LEVEL_EXPENSES.items():
+    _cost = pd.to_numeric(_d3b[f'CRLABOT{_code}'], errors='coerce')
+    # Q44 is a FIXED six-row list, so a zero is "this household spent nothing
+    # on this category" rather than a row the form never reached.  The
+    # per-crop blocks above are different -- there a crop is listed only when
+    # it had an expense -- so the zeros are dropped only here.
+    _keep = _cost.fillna(0) > 0
+    frames.append(pd.DataFrame({
+        't': t,
+        'i': _d3b.loc[_keep, 'HID'].apply(i_helper),
+        'plot_id': FARM_LEVEL,
+        'input': _label,
+        'j': FARM_LEVEL,
+        'Cost': _cost[_keep],
+        'Quantity': np.nan,
+        'u': pd.Series(pd.NA, index=_d3b.index, dtype='string')[_keep],
+    }))
 
 f = pd.concat(frames, ignore_index=True)
 
@@ -128,7 +198,7 @@ f = f[f['j'].notna() & (f['j'].astype('string') != '<NA>')]
 # groups do.  Where the units disagree the quantity is NOT commensurable, so
 # it is dropped to NA with its unit rather than summed into a number that
 # means nothing; the spend, which is in one currency, survives either way.
-key = ['t', 'i', 'input', 'j']
+key = ['t', 'i', 'plot_id', 'input', 'j']
 _before = len(f)
 _g = f.groupby(key, dropna=False)
 out = pd.DataFrame({
@@ -140,7 +210,7 @@ _mixed = (_g['u'].nunique(dropna=True) > 1).reindex(out.index, fill_value=False)
 out.loc[_mixed, 'Quantity'] = np.nan
 out.loc[_mixed, 'u'] = pd.NA
 if _before != len(out):
-    print(f'{t}: collapsed {_before - len(out)} duplicate (t, i, input, j) '
+    print(f'{t}: collapsed {_before - len(out)} duplicate (t, i, plot_id, input, j) '
           f'line(s); {int(_mixed.sum())} of them had disagreeing units, so '
           f'their Quantity is served NA (Cost is summed regardless)')
 

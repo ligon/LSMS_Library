@@ -819,6 +819,11 @@ AGRIC_UNIT_ALL = 'All'
 #: Registry key stamped on every row `derive_9b_sale_value` served.
 CROP_SALE_DERIVATION = 'GhanaLSS::crop_production::9b-sale-amount-per-unit'
 
+#: See the wave scripts' FARM_LEVEL docstring: surveys resolve farm inputs at
+#: farm / crop / plot / plot-x-crop grain, and the unresolved axis is marked
+#: rather than dropped.  GLSS Part B resolves the CROP axis and not the plot.
+CROP_PLOT_LEVEL = 'Farm-level'
+
 
 def derive_9b_sale_value(sold_quantity, amount, amount_unit, sold_unit):
     """Total value of the crop sold, from Section 9B's PER-UNIT sale amount.
@@ -929,6 +934,13 @@ def crop_production_from_9b(df):
     # reconstructs it.  Declared `optional: true`, which is what exempts it
     # from Site B of the null-read guard.  NOTHING is imputed into it.
     df['Quantity'] = pd.Series(pd.NA, index=df.index, dtype='Float64')
+    # Section 9 Part B asks a CROP but no plot -- there is no farm or plot
+    # roster anywhere in the section.  `plot_id` is therefore 'Farm-level',
+    # the corpus convention for an axis a survey does not resolve; keeping the
+    # level present and marked makes the grain readable off the data instead
+    # of inferrable from which levels exist.  `_normalize_dataframe_index`
+    # promotes it from a column because `data_scheme.yml` declares it.
+    df['plot_id'] = CROP_PLOT_LEVEL
     return df.drop(columns=['SaleAmount', 'SaleAmountUnit', 'SoldUnitRaw'])
 
 
