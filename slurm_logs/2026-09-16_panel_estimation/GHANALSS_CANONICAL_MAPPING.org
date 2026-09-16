@@ -478,3 +478,72 @@ declare three columns.
 
 Q13 is *livestock own-consumption*, the exact parallel of the crop
 own-consumption gap, and has no canonical home.  Worth carrying.
+
+* "We are going to want to value those subsistence harvests" (@ligon, 2026-09-16)
+
+Correct, and it is the right question to press on -- but it does not run
+through =crop_production.u=, and measuring it turns up something more important
+than the index decision.
+
+** Section 9 already values three of the four dispositions, in cedis
+
+The form does not ask a quantity for seed, gifts or losses; it asks *"how much
+would the same quantity cost in the market"* and records an amount.  So those
+parts arrive pre-valued and need no unit and no price.
+
+** There is no quantity on a non-sale row for a unit to describe
+
+Measured on the non-sale rows (10,517 / 13,048):
+
+| field                | 1987-88 non-null | >0 |
+|----------------------+------------------+----|
+| =CROPS= (quantity)   |           10,505 |  *0* |
+| =CROPSUK= (kg/unit)  |                7 |  3 |
+| =CROPH= (acres)      |           10,517 | 8,068 |
+| =CROPKV= (seed val)  |            3,305 | 3,304 |
+| =CROPPV= (given val) |            3,173 | 3,170 |
+| =CROPLV= (lost val)  |            2,465 | 2,464 |
+
+=CROPS= is non-null but *literally zero* on every non-sale row -- the form's
+"IF NOTHING, WRITE ZERO AND ->7".  So =u= would have nothing to describe on
+precisely the 62-64% of rows it was being considered for.  The concern, followed
+through, *strengthens* the case for omitting it.
+
+** The real finding: ~19% of cropped rows are invisible to Section 9 entirely
+
+Of rows with harvested acreage > 0:
+
+|                                      | 1987-88 | 1988-89 |
+|--------------------------------------+---------+---------|
+| rows with acreage > 0                |  14,337 |  17,714 |
+| ...sold something                     | 43.7%   | 40.7%   |
+| ...carry SOME Section 9 value         | 81.1%   | 80.5%   |
+| *...carry NO Section 9 value at all*  | *18.9%* | *19.5%* |
+| households with >=1 such row          | 1,127 / 2,178 | 1,408 / 2,393 |
+| share of harvested ACRES in those rows| 13.9%   | 14.4%   |
+
+Those are crops grown and wholly consumed: acreage recorded, output valued
+nowhere in Section 9.  They have no quantity either, so *no index choice
+recovers them*.
+
+*** Consequence: the Section 12B splice is LOAD-BEARING, not optional
+
+An earlier section listed "splice 12B own-consumption, or use Section 9
+dispositions alone and state the omission" as an open question.  This
+measurement answers it.  Section 9 alone would serve *zero output* for ~19% of
+cropped rows covering ~14% of harvested acres and touching *half the farming
+households* (1,127 of 2,178; 1,408 of 2,393) -- and it would do so
+*non-randomly*, concentrated in exactly the subsistence-oriented households a
+production function is most likely to be about.  Regressing a value of output
+that is structurally zero for the most subsistence-oriented half of the sample
+would not be a noisy measure; it would be a selected one.
+
+So own-consumption from =food_acquired= (=s='produced'=, already derived for
+both waves by =12b-fortnight=) is required, not a refinement.  Its unit lives
+in =food_acquired='s own index =(t, i, j, u, s, visit)=; =crop_production= does
+not need one to make the join.
+
+*What the splice costs*, stated so it is chosen and not discovered: it crosses
+a recall window (Section 9 annual vs 12B fortnight annualised) and needs a
+crop-code to food-item mapping, since the two modules use different =j=
+vocabularies.  Both are real work and neither is affected by the index choice.
