@@ -373,6 +373,19 @@ of reserved goods should exclude those goods from the household's factor
 score. Resampling intended to capture partition selection uncertainty must
 repeat selection and fitting.
 
+The [[file:aggregation/evaluation.org::*Uganda observation patterns][Uganda observation-pattern experiment]] now uses complete household food
+masks from the delivered 2019-20 data, preserving sparse goods and their
+joint support. Median households report ten positive purchased foods, or
+fifteen with total recorded acquisition, against 114 delivered food labels.
+The revised preparation and frozen scoring recover most of the household
+coverage lost by the original selector in this experiment. Existing curated
+groups add little further scoring coverage, although they improve known-welfare
+precision under a substitution mechanism. They worsen it when variable
+numbers of independently positive components are simply summed. Both cases
+use equal within-group betas; the interpretation of zeros and amounts still
+matters. These are conditional simulation results, not an empirical ranking
+of Uganda partitions.
+
 Adding nonfood expenditures to the estimation sample is not presumed to
 improve precision. In prior Uganda fits, their inclusion produced highly
 implausible estimates. A working explanation is that different survey

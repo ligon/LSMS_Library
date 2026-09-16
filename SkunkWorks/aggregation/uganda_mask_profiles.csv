@@ -1,0 +1,7 @@
+wave,basis,n_sample,n_delivered_labels,n_food_goods,n_positive_goods,n_food_households,median_positive_goods,p10_positive_goods,p90_positive_goods,entry_density,full_sample_median_pair_count,full_sample_fraction_pairs_ge30,n_missing_region,n_invalid_weight,n_food_households_outside_sample,n_simulation_households,n_groups,ambiguous_labels,api_warnings
+2010-11,purchased,2716,70,68,68,2602,8.0,2.0,17.0,0.13522806029628345,19.0,0.4117647058823529,0,1,0,2715,48,,
+2010-11,total,2716,70,68,68,2657,13.0,5.0,21.0,0.18883197608940483,47.0,0.6040386303775241,0,1,0,2715,48,,
+2018-19,purchased,3176,117,115,115,3128,10.0,4.0,20.0,0.09932099441463148,6.0,0.23615560640732267,0,0,0,3176,72,Cassava (flour),QuantityImplausibleWarning:2
+2018-19,total,3176,117,115,115,3172,16.0,7.0,26.0,0.1436863432263717,12.0,0.36094584286803966,0,0,0,3176,72,Cassava (flour),QuantityImplausibleWarning:1
+2019-20,purchased,3098,116,114,112,3014,10.0,3.0,19.0,0.09204863352700667,5.0,0.2167365315944729,3,0,0,3095,72,Cassava (flour),NullIndexKeyWarning:2; QuantityImplausibleWarning:2
+2019-20,total,3098,116,114,114,3057,15.0,6.0,24.0,0.13441042891282434,10.0,0.3289861822698339,3,0,0,3095,72,Cassava (flour),NullIndexKeyWarning:1; QuantityImplausibleWarning:1

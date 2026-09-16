@@ -118,10 +118,202 @@ splits, weighted coverage and error, frozen normalization, truth and
 held-out-data independence, fixed comparison populations, absent anchors,
 unidentified markets, input order, and reproducible random state.
 
+* Uganda observation patterns
+
+The ten-food experiment understates the sparsity of Uganda food data. The
+new [[file:survey_simulation.py][survey simulation]] keeps complete observed household masks, including
+which foods occur together, and generates amounts with known welfare on
+that support. It also shows that sparse item coverage needn't imply equally
+low household scoring coverage after the preparation changes.
+
+** What is observed
+
+These profiles use =Country('Uganda').food_expenditures= with Preferred
+labels. The denominator includes every household in =sample()=, including
+households absent from the food table. Purchases and total recorded
+acquisition are separate expenditure bases; the latter adds recorded values
+of own production and in-kind receipts without imputing additional values.
+Two tobacco labels are excluded. Full profiles are in
+[[file:uganda_mask_profiles.csv][uganda_mask_profiles.csv]].
+
+#+name: tab:uganda-observed-support
+#+caption: Positive expenditures in delivered food data; unweighted sample profiles.
+| Wave    | Basis     | Households | Food labels | Median positive foods | Positive entries (%) |
+|---------+-----------+------------+-------------+-----------------------+----------------------|
+| 2010-11 | Purchased |       2716 |          68 |                     8 |                 13.5 |
+| 2010-11 | Total     |       2716 |          68 |                    13 |                 18.9 |
+| 2018-19 | Purchased |       3176 |         115 |                    10 |                  9.9 |
+| 2018-19 | Total     |       3176 |         115 |                    16 |                 14.4 |
+| 2019-20 | Purchased |       3098 |         114 |                    10 |                  9.2 |
+| 2019-20 | Total     |       3098 |         114 |                    15 |                 13.4 |
+
+Joint support is still thinner. In 2019-20 the median distinct food pair
+is jointly positive for only five households with purchases, or ten with
+total acquisition, across the /full/ sample. Only 21.7% and 32.9% of
+pairs respectively reach thirty observations even before the training split.
+Marginal coverage alone misses that constraint on covariance estimation.
+
+The counts depend on the universe being counted. The 2019-20 raw module
+has 126 item codes per household, mapping to 124 distinct Preferred labels.
+Of these, 116 appear in the delivered total-expenditure table, including
+the two tobacco labels. We use its remaining 114 foods for both bases;
+112 have any positive purchases. The 2010-11 delivered table has 70 labels
+before removing tobacco. Thus the recollection of roughly 70 or 126 items
+is consistent with the changing survey instrument, but questionnaire codes,
+Preferred labels, and delivered positive foods are different counts.
+
+The template is the library's delivered observation pattern. It inherits
+the existing extraction rules, including Uganda's removal of records with
+unknown unit codes; it isn't a reconstruction of every raw questionnaire
+response. Zero and unavailable expenditures have the same treatment here.
+The profile records API audit warning classes without household identifiers.
+
+** Simulation and normalization
+
+We use 2019-20, whose food module has a documented seven-day recall window.
+Markets come from household =sample()['Region']=, avoiding the known loss
+of movers through cluster joins. Three of its 3,098 sample households have
+missing Region, contrary to an older completeness statement in
+=Uganda/_/CONTENTS.org=. They are reported and excluded before simulation;
+all 3,095 remaining households have positive cross-sectional weights. The
+41 households without positive total food expenditure, or 84 without
+positive purchases, remain in the original profile denominators.
+
+Each replicate preserves every usable household's complete Boolean mask,
+Region, and survey weight. We generate one synthetic welfare draw and one
+complete numeric characteristic per row using =cfe.dgp.expenditures=, with
+unit prices and independent log expenditure shocks of standard deviation
+0.2. These draws are independent of the observed mask. Neither actual
+expenditure amounts nor observed household characteristics enter the
+simulation. Consequently it doesn't reproduce losses from missing controls
+or possible dependence between welfare and observation in the real survey.
+
+The supplied partition uses existing Aggregate labels, except that
+=Cassava (flour)= remains a singleton because two codes assign its Preferred
+label to different groups. This leaves 72 groups from 114 foods. The map
+is a trial input, not a certification of economically admissible composites.
+Group loadings are a fixed permutation of 72 evenly spaced values from
+0.4 to 2; Salt remains a singleton with loading 0.6. This construction
+doesn't use estimated loadings or evaluation outcomes to choose groups.
+
+Sixty percent of households train the model. The reference and common
+comparison populations are declared before fitting: households reporting
+Salt, on the training and evaluation sides respectively. The same weighted
+reference and Salt loading fix the origin and scale for both partitions.
+The common comparison covers, on average, 86.8% of evaluation weight for
+purchases and 89.5% for total acquisition. Error there says nothing directly
+about the remaining households. Scoring coverage includes them all.
+
+The three amount mechanisms share exactly the same masks and random draws:
+
+- Masked :: Each positive fine amount follows the original CFE DGP, with
+  equal loadings inside each curated group and homoskedastic fine-good log
+  errors. Summing introduces variation from the number of positive members.
+- Substitutes :: Divide each positive amount by the number of positive
+  members of its group in that household. With equal loadings and no
+  expenditure noise, this holds the group total fixed whenever at least one
+  member is present. It adds an allocation term to fine-good log expenditure;
+  those fine-good regression errors needn't remain homoskedastic or independent.
+- Unequal :: Keep that substitution mechanism, but spread loadings within
+  each multi-food group from 0.5 to 1.5 times its group loading. Singleton
+  loadings stay unchanged.
+
+These mechanisms express different assumptions about amounts behind the
+same observation pattern. The mask alone can't choose among them.
+
+** Coverage and error
+
+We ran seeds 11, 12, and 13 with =min_obs=30=, =min_prop_items=0.1=, and
+=alltm=True=. All 36 candidate fits completed and scored their fixed common
+comparison populations. The [[file:uganda_mask_results.csv][replicate results]] retain counts, warnings,
+coverage, and errors. The table below compares coverage on the /same training
+population/: the original preparation function at CFEDemands =e4fc38f=,
+the revised fitting selector, and frozen scoring of all training households
+using the revised fit. We execute the historical function from git rather
+than recreate its algorithm. Only that first column uses the old selector.
+
+#+name: tab:uganda-preparation-coverage
+#+caption: Mean survey-weighted training coverage (%); three household splits.
+| Basis     | Partition | Original fit | Revised fit | Revised frozen scoring |
+|-----------+-----------+--------------+-------------+------------------------|
+| Purchased | Fine      |         63.8 |        88.2 |                   96.6 |
+| Purchased | Curated   |         77.6 |        89.2 |                   96.7 |
+| Total     | Fine      |         82.0 |        92.0 |                   97.7 |
+| Total     | Curated   |         88.0 |        92.8 |                   97.7 |
+
+Coverage is identical across the three amount mechanisms because their
+supports agree. The original purchases fit loses many households before
+the sparse goods are removed. Reconsidering them against the smaller
+retained universe recovers much of that loss. After the revisions,
+aggregation adds about one percentage point of fitting coverage and almost
+no scoring coverage with this particular grouping. Held-out scoring
+coverage averages 96.0% for fine purchases and 96.1% for curated purchases;
+both total-acquisition partitions score 97.5%. These are conditional on the
+declared known-Region, positive-weight population and complete synthetic
+controls, not estimates of real-world welfare accuracy or complete-data
+coverage for every downstream fit.
+
+#+name: tab:uganda-mask-error
+#+caption: Mean squared error on the fixed Salt-observed evaluation population; three seeds.
+| Basis     | Amount mechanism | Fine MSE | Curated MSE |
+|-----------+------------------+----------+-------------|
+| Purchased | Masked           |  0.00598 |     0.00665 |
+| Purchased | Substitutes      |  0.00713 |     0.00547 |
+| Purchased | Unequal          |  0.00849 |     0.00811 |
+| Total     | Masked           |  0.00231 |     0.00348 |
+| Total     | Substitutes      |  0.00449 |     0.00207 |
+| Total     | Unequal          |  0.00552 |     0.00401 |
+
+Under equal-loading substitution, the curated partition reduces common
+MSE by about 23% for purchases and 54% for total acquisition. In the masked
+experiment it raises MSE by about 11% and 51%. Equal betas alone don't make
+the two experiments equivalent: variable numbers of positive components
+change group totals and their errors. Nor does moderate loading dispersion
+necessarily eliminate an aggregation benefit, as the unequal case shows.
+Three seeds establish neither a reliable ranking nor an optimal partition.
+
+** Reproducing the empirical-mask experiment
+
+Run from LSMS with access to the Uganda microdata. The LSMS environment
+supplies the Country dependencies; =PYTHONPATH= selects the sibling CFE
+feature branch. Experiment outputs contain only aggregate support profiles
+and simulation summaries. Country may populate its normal local data cache;
+no household-level experiment outputs are committed.
+
+#+begin_src sh :eval never
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  LSMS_BUILD_WORKERS=1 PYTHONPATH="../CFEDemands:$PWD" \
+  .venv/bin/python -m SkunkWorks.aggregation.survey_simulation \
+  --waves 2019-20 --bases purchased total --seeds 11 12 13 \
+  --regimes masked substitutes unequal --legacy-revision e4fc38f \
+  --output SkunkWorks/aggregation/uganda_mask_results.csv \
+  --profile-output SkunkWorks/aggregation/uganda_mask_profiles.csv
+
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  LSMS_BUILD_WORKERS=1 PYTHONPATH="../CFEDemands:$PWD" \
+  .venv/bin/python -m SkunkWorks.aggregation.survey_simulation \
+  --waves 2010-11 2018-19 2019-20 --profile-only \
+  --output /tmp/unused-uganda-results.csv \
+  --profile-output SkunkWorks/aggregation/uganda_mask_profiles.csv
+
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  PYTHONPATH="../CFEDemands:$PWD" .venv/bin/python -m pytest \
+  --confcutdir=SkunkWorks/aggregation SkunkWorks/aggregation -q
+#+end_src
+
+The raw item count can be checked through =get_dataframe= on
+=Uganda/2019-20/Data/HH/gsec15b.dta= with =convert_categoricals=False=:
+=CEB01= has 126 distinct codes, each of 3,059 responding households has
+126 rows, and mapping those codes through =harmonize_food= yields 124
+Preferred labels. The raw respondent count is separate from the 3,098-row
+sample denominator.
+
 * Next statistical work
 
 Use more replications and broader variations in beta dispersion, expenditure
-shares, and survey-like dependence to study the coverage/error frontier.
+shares, and dependence between observation and welfare to study the
+coverage/error frontier. The observed-mask experiment now supplies realistic
+support; its synthetic controls and amount mechanisms remain assumptions.
 Empirical validation needs a declared country sample and reserved outcomes;
 true-welfare MSE is unavailable there. Candidate selection belongs inside
 training data, with a further untouched sample for assessing the selected
