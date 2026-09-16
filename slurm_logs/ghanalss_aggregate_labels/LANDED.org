@@ -67,12 +67,33 @@ right invariant on =Lw=; it could never have caught this.
 
 * Still open, for decision
 
-1. *=Millet= absorbs guinea corn and sorghum in GLSS1/2.*  The raw label is
-   =Millet, guinea corn or sorghua (grain or flour)= but the Preferred Label
-   says only =Millet= -- the =Goat=/mutton pattern again.  The country table
-   has separate =Guinea Corn= and =Sorghum= rows, neither of which is ever
-   reached.  A compound name (=Millet/Guinea Corn/Sorghum=) would be honest;
-   =Millet= alone is not.
+1. *RESOLVED (@ligon, 2026-09-16): GLSS1/2's conflated cereal is
+   =Millet/Sorghum=.*  The raw label is =Millet, guinea corn or sorghua (grain
+   or flour)= and the Preferred Label said only =Millet= -- the =Goat=/mutton
+   pattern.  Confirmed it is an EARLY-ROUNDS-ONLY item: from GLSS3 the
+   instrument asks =Millet=, =Millet flour= and =Guinea corn/sorghum=
+   separately, so =Millet= silently changed meaning at GLSS3 for anyone using
+   it as a panel.
+
+   Named =Millet/Sorghum= rather than a three-way compound because *guinea corn
+   and sorghum are the same crop* (@ligon), and millet is a close consumption
+   substitute the questionnaire designers evidently grouped with it.  Done at
+   the WAVE level (@ligon) -- both 87/88 tables now say =Millet/Sorghum= -- with
+   a matching country row.
+
+   Measured: =Millet/Sorghum= *884 rows* (453 + 431), 87/88 only, 721 produced
+   + 163 purchased; =Millet= is now *13,094 rows over 91-16 only* and means
+   millet in every wave it appears.  FCT kept at =01_095= (pearl millet):
+   sorghum is =01_039= and the two are close (370 vs 345 kcal, 8.3 vs 11.5 g
+   protein), so carrying millet's values for the mixture beats blanking it and
+   dropping 884 rows out of =nutrition= entirely.
+
+   *The GLSS1/2 PRICE survey is finer than its expenditure module* and prices
+   millet separately (item 4).  Since the 87/88 food axis no longer names plain
+   millet, that item is re-flagged =Food: own= -- which per =CONTENTS.org:3357=
+   means exactly "the axis does not name this food", and is now a true
+   statement -- mirroring item 3 (=Guinea Corn=), which the original curator had
+   already flagged =own= for the same reason.
 2. *RESOLVED (@ligon, 2026-09-16): =Potato/Sweet Potato= folded into
    =Sweet Potato=.*  GLSS1/2 ask one question, =Potato or sweet potato=, so the
    compound label was the INSTRUMENT's conflation faithfully recorded, not ours
@@ -100,3 +121,17 @@ right invariant on =Lw=; it could never have caught this.
    not decisive.  Documented unsure rather than moved.
 4. =Margarine= absorbs =Butter, margarine= / =margarine/butter= in several
    waves -- butter and margarine conflated.  Not touched.
+
+5. *NEW: in 91/98 ONLY, purchased and produced sorghum sit under DIFFERENT
+   labels.*  =Guinea corn/sorghum= is =Code_9b=1= (purchase side, =Code_8h=
+   empty), while =Sorghum= (=Code_8h=4=) and =Guinea Corn= (=Code_8h=7=) are
+   own-production.  From GLSS5 on the instrument puts =9b=1= and =8h=4= on ONE
+   row, so the later waves already do it right.  Since guinea corn IS sorghum,
+   those two waves serve one crop under three labels, split by module:
+   purchased 765 rows, produced 5,948 + 207.
+
+   *Not a free rename.*  Merging the three would create *115 colliding keys*
+   (80 in 1991-92, 35 in 1998-99) -- households that filed both own-production
+   lines -- so it needs a named reducer in the wave script (the =Goat=
+   precedent, =CONTENTS.org:3280=: Quantity sums, Price becomes the
+   quantity-weighted mean), not a bare rename.  Left for decision.
