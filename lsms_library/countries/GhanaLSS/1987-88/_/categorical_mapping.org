@@ -162,9 +162,9 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Other Meat                     | Other Meat                     |      326 | Other domesticated meat                                             |      326 | Other domesticated meat                                             |
 | Other Meat                     | Other Meat                     |      327 | Bushmeat and game birds                                             |      327 | Bushmeat and game birds                                             |
 | Egg                            | Egg                            |      328 | Eggs (from all birds)                                               |      328 | Eggs (from all birds)                                               |
-| Oil (palm)                     | Oil (palm)                     |      329 | Palm oil and shea butter                                            |      329 | Palm oil and shea butter                                            |
+| Oil (palm)/Shea Butter         | Oil (palm)/Shea Butter         |      329 | Palm oil and shea butter                                            |      329 | Palm oil and shea butter                                            |
 | Other Oils                     | Other Oils                     |      330 | Refined oil (groundnut oil, coconut oil, etc.)                      |      330 | Refined oil (groundnut oil, coconut oil, etc.)                      |
-| Margarine                      | Margarine                      |      331 | Butter, margarine                                                   |          |                                                                     |
+| Margarine/Butter               | Margarine/Butter               |      331 | Butter, margarine                                                   |          |                                                                     |
 | Orange                         | Orange                         |      332 | Oranges, tangerines                                                 |      332 | Oranges, tangerines                                                 |
 | Mango                          | Mango                          |      333 | Mangoes                                                             |      333 | Mangoes                                                             |
 | Pawpaw                         | Pawpaw                         |      334 | Pawpaws                                                             |      334 | Pawpaws                                                             |
@@ -293,7 +293,7 @@ are =_/unit_labels.org= Preferred Labels; Tablet / Bottle are new.
 | 19   | Smoked fish (Herring)              | Fish                          | yes  | Kilogram    |       | the 1987-88 axis has a single Fish label                         |
 | 20   | Dried fish (Tilapia)               | Fish                          | yes  | Kilogram    |       |                                                                  |
 | 21   | Beef, with bones                   | Beef                          | yes  | Kilogram    |       |                                                                  |
-| 22   | Palm oil                           | Oil (palm)                    | yes  | Kilogram    |       | weighed (QUAN median 0.79 kg)                                    |
+| 22   | Palm oil                           | Oil (palm)                    | own  | Kilogram    |       | axis conflates palm oil with shea butter                         |
 | 23   | Palm kernel oil                    | Oil (palm kernel)             | own  | Kilogram    |       | axis has only Other Oils                                         |
 | 24   | Groundnut oil                      | Oil (groundnut)               | own  | Kilogram    |       | axis has only Other Oils                                         |
 | 25   | Groundnuts (shelled)               | Groundnut                     | yes  | Kilogram    |       |                                                                  |

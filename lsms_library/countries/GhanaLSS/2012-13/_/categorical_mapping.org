@@ -54,7 +54,7 @@
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                              |      29 | palm kernel oil            |
 | Oil (palm)                   | Oils, Fats                   |      61 | palm oil                                                     |      28 | palm oil                   |
 | Shea Butter                  | Oils, Fats                   |      62 | shea butter                                                  |      32 | shea butter                |
-| Margarine                    | Oils, Fats                   |      63 | margarine/butter                                             |         |                            |
+| Margarine/Butter             | Margarine/Butter             |      63 | margarine/butter                                             |         |                            |
 | Other Oils                   | Oils, Fats                   |      64 | other vegetable oils including animal fats                   |      33 | other oil                  |
 | Coconut (fresh)              | Coconut                      |      68 | coconut                                                      |      26 | coconut                    |
 | Banana                       | Banana                       |      69 | banana                                                       |      40 | bananas                    |
@@ -300,7 +300,7 @@ market carry identical prices) -- kept native.
 | 33   | vegetable oil (frytol, obaapa)                                      | Other Oils                                                          | yes  | Liter      |       |                                              |
 | 34   | palm oil                                                            | Oil (palm)                                                          | yes  | Liter      |       |                                              |
 | 35   | shea butter                                                         | Shea Butter                                                         | yes  | Kilogram   |       |                                              |
-| 36   | margarine (canned, sachet)                                          | Margarine                                                           | yes  | Kilogram   |       |                                              |
+| 36   | margarine (canned, sachet)                                          | Margarine                                                           | own  | Kilogram   |       | axis conflates margarine with butter         |
 | 37   | kolanut                                                             | Cola Nut                                                            | yes  | Kilogram   |       |                                              |
 | 38   | coconut (fresh)                                                     | Coconut (fresh)                                                     | yes  | Kilogram   |       |                                              |
 | 39   | banana                                                              | Banana                                                              | yes  | Kilogram   |       |                                              |

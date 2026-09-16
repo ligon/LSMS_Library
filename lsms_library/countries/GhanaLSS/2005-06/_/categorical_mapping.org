@@ -52,7 +52,7 @@
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                             |      29 | palm kernel oil            |
 | Oil (palm)                   | Oils, Fats                   |      61 | palm oil                                                    |      28 | palm oil                   |
 | Shea Butter                  | Oils, Fats                   |      62 | shea butter                                                 |      32 | shea butter                |
-| Margarine                    | Oils, Fats                   |      63 | margarine/butter                                            |         |                            |
+| Margarine/Butter             | Margarine/Butter             |      63 | margarine/butter                                            |         |                            |
 | Other Oils                   | Oils, Fats                   |      64 | other vegetable oils including animal fats                  |      33 | other oil                  |
 | Coconut (fresh)              | Coconut                      |      68 | coconut                                                     |      26 | coconut                    |
 | Banana                       | Banana                       |      69 | banana                                                      |      40 | bananas                    |

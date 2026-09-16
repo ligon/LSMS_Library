@@ -119,8 +119,49 @@ right invariant on =Lw=; it could never have caught this.
 3. =557 'Country milk'= left under =Cocoa (milk powder beverages)=: n=52, unit
    =Single=, median 5.50 against =Other milk= 3.00 -- suggestive of milk but
    not decisive.  Documented unsure rather than moved.
-4. =Margarine= absorbs =Butter, margarine= / =margarine/butter= in several
-   waves -- butter and margarine conflated.  Not touched.
+4. *RESOLVED (@ligon, 2026-09-16): =Margarine/Butter= where the instrument
+   conflates them, =Margarine= where it does not.*  Unlike potato and millet
+   this is *non-monotonic* -- the instrument went back and forth, so no
+   "early rounds are coarser" rule works and it had to be settled per wave:
+
+   | wave | raw label | margarine alone? | rows |
+   |------+-----------+------------------+------|
+   | 87-88, 88-89 | =Butter, margarine= | no | 275, 217 |
+   | 91-92, 98-99 | =Margarine= | *yes* | 577, 835 |
+   | 05-06, 12-13 | =margarine/butter= | no | 1,114, 1,887 |
+   | 16-17 | =Margarine= | *yes* | 353 |
+
+   91/98 corroborate themselves: those waves put dairy butter explicitly
+   elsewhere, in =Other milk products (Including butter & cheese)= (code 70),
+   so code 33 =Margarine= is not quietly carrying it.  Delivered:
+   =Margarine= *1,765* rows (91/98/16), =Margarine/Butter= *3,493*
+   (87/88/05/12).  FCT stays *11_006*: margarine 728 kcal / 937 ug vitamin A
+   against butter 739 / 838, close on everything.
+
+6. *NEW, found while checking margarine: GLSS1/2 also fold SHEA BUTTER into
+   PALM OIL.*  Code 329 is =Palm oil and shea butter= -> =Oil (palm)=; from
+   GLSS3 =Shea Butter= is its own item and a large one (*36,058* rows against
+   =Oil (palm)='s 88,800).  Same meaning-shift, bigger item, and north/south
+   consumption differs sharply.  Split as =Oil (palm)/Shea Butter= (87/88,
+   *4,239* rows); =Oil (palm)= is now clean over 91-16 (*88,800*).
+
+   *Its FCT is deliberately BLANK, unlike the other composites.*  Energy would
+   have justified keeping palm oil's 11_004 (898 vs shea butter's 900 kcal),
+   but *vitamin A is 5,720 ug against 0* -- and vitamin A is precisely what
+   this food group is read for in Ghana.  Carrying 11_004 would assert 5,720
+   for a mixture roughly a quarter of which has none, invisibly; the repo's
+   own rule for Vitamin K applies ("omitted, NOT zero-filled -- a zero would
+   assert these foods contain none").  Cost: those 4,239 rows drop out of
+   =nutrition=.  Reversible if someone would rather have approximate energy
+   than no row.
+
+7. *The GLSS1/2 and GLSS5/6 price surveys are again FINER than their
+   expenditure modules*, as with millet.  Price items =Palm oil= (87/88,
+   weighed, median 0.79 kg) and =margarine (canned, sachet)= (12-13) name the
+   specific good, so they are re-flagged =Food: own= with a note -- true, since
+   those axes no longer name it.  *Three separate times now the
+   =test_price_items_share_the_food_vocabulary= guard has caught a rename
+   before it shipped*; it is the most valuable test in this file.
 
 5. *NEW: in 91/98 ONLY, purchased and produced sorghum sit under DIFFERENT
    labels.*  =Guinea corn/sorghum= is =Code_9b=1= (purchase side, =Code_8h=
