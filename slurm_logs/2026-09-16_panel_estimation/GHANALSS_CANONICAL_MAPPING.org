@@ -547,3 +547,72 @@ not need one to make the join.
 a recall window (Section 9 annual vs 12B fortnight annualised) and needs a
 crop-code to food-item mapping, since the two modules use different =j=
 vocabularies.  Both are real work and neither is affected by the index choice.
+
+* Price sources, and a correction (@ligon, 2026-09-16)
+
+@ligon: "You're proposing to use the produced values in food_acquired to get
+prices to value the stock of harvest?  Because if so there are other possible
+sources of prices."
+
+*Correction first.*  What was proposed was using the 12B *values* directly as
+the own-consumption component of output -- not deriving prices from them.  But
+the question exposes that the proposal does more work than was admitted:
+*Section 12B measures CONSUMPTION, not production.*  Substituting it is not a
+recall-window splice, it is substituting a different concept.  Home-produced
+food eaten in a year differs from the year's harvest by stocks carried, gifts
+received, and every non-food crop.  It is a proxy, and must be labelled one.
+
+** What there is to value, and what there is not
+
+Section 9 records exactly one quantity: the quantity *sold*.  Seed, gifts and
+losses arrive as values with *no quantity behind them*, and the ~19% of cropped
+rows with no Section 9 value at all have neither.  So a better price source
+does not rescue those rows -- but it does enable the *inverse* operation,
+backing an implied quantity out of a recorded value.
+
+** The four sources
+
+| source | grain | coverage in the panel waves | what it is |
+|--------+-------+------------------------------+------------|
+| household's own sale price, =CROPSP= per =CROPSPU= | crop row | ~40% of crop rows (sale rows only) | farmgate, *received* |
+| =community_prices= (=PRICE.DAT=) | =(t, v, j, u, obs)= | *sane* in both waves; 29,224 rows, 47 items | cluster market price |
+| =food_acquired= / =food_prices()= | =(t, i, j, u, s)= | *sane* in both waves | household unit values |
+| =median_price_valuation= ladder | geography median | existing machinery, ledger =585-own-production-valuation.md= | built for exactly this |
+
+*** =community_prices= and the crop list are COMPLEMENTARY, not overlapping
+
+Its 47 items are a consumer basket (it also carries aspirin, kerosene and
+buckets).  *Only 13 of the 30 crop-form items are findable in it* -- Plantain,
+Orange, Groundnut, Sugar, Cassava, Yam, Cocoyam, Maize, Rice, Millet, Sorghum,
+Tomato, Pepper.  There is *no cocoa, coffee, rubber, timber, cotton, kola,
+tobacco or pineapple*.
+
+That gap is less damaging than it looks, because it falls the convenient way:
+the missing items are the *cash* crops, which are the ones households *sell*
+and therefore the ones that carry their own sale price; the items
+=community_prices= does cover are the food staples that get eaten and carry no
+sale price.  The two sources cover complementary halves of the problem.
+
+** What prices can and cannot do here
+
+Can:
+1. *Invert values into quantities* -- =quantity_seed = CROPKV / price= -- giving
+   physical output components where today there are only cedis.
+2. *Re-value on ONE basis.*  Section 9 mixes a received price (sales) with a
+   market replacement price (seed, gifts, losses).  Valuing every component at a
+   single source removes an asymmetry the instrument built in.
+3. *Cross-check =Value_sold=* -- the implied farmgate price against the
+   community price for the same crop, cluster and round.  This is the
+   =validated_against= this note already owed.
+
+Cannot:
+- Recover the ~19% of cropped rows that carry neither a quantity nor a value.
+  Those have acreage and nothing else.
+
+** The trap: do NOT impute output from acreage
+
+The tempting fix for those rows is acreage x an assumed yield.  For a
+*production function* that is circular -- output imputed from land, then
+regressed on land, manufacturing the land coefficient.  Whatever is done with
+those rows, it must not be that.  Leaving them missing is honest; the 12B proxy
+is defensible if labelled; imputing from the regressor is not.
