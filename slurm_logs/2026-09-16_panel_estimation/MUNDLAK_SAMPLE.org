@@ -1,0 +1,86 @@
+#+TITLE: Is the GLSS1/GLSS2 panel sufficient for Mundlak (1961)?
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+
+Measured after wiring =crop_production=, =plot_inputs=, =livestock=, =labor=
+and =plot_labor= (PR #934).  All figures from the built tables, not the raw
+files.  Re-runnable: =within2.py= in this directory.
+
+* The estimable sample
+
+Household-year aggregates: output = the four Section 9B disposition values
+(sold + seed + given + lost); land = sum of =crop_production.Area_ha=; family
+labour = =WeeksPerYear x HoursPerWeek= on =labor= rows that are own-farm AND
+agricultural; hired labour = =plot_labor.Cost= where =source='hired'=; input
+cost = =plot_inputs.Cost=.
+
+| specification                                   | households | hh-years |
+|-------------------------------------------------+------------+----------|
+| CORE: output, land, family labour               |        504 |    1,008 |
+| FULL: + hired labour + purchased inputs         |        232 |      464 |
+
+Both are balanced two-wave panels, so the within estimator is exactly first
+differences and Mundlak's group means are =(x_i1 + x_i2)/2=.
+
+Within-household share of log variance (=SSW/SST=), on the panel sample:
+
+| variable      | CORE  | FULL  |
+|---------------+-------+-------|
+| output        | 0.228 | 0.208 |
+| area_ha       | 0.531 | 0.533 |
+| family_hours  | 0.202 | 0.186 |
+| hired_cost    |   --  | 0.280 |
+| input_cost    |   --  | 0.269 |
+
+There is identifying variation in every regressor.
+
+* Three caveats, in order of how much they should worry you
+
+** 1. Output is PARTIAL, and missing non-randomly
+
+The four dispositions do NOT include what the household ate.  Section 9 never
+asks it; it is Section 12B, already derived as
+=GhanaLSS::food_acquired::12b-fortnight=, but joining it needs a crop <-> food
+item mapping and crosses a recall window (annual vs annualised fortnight).
+
+Measured earlier: *about 19% of cropped rows carry no Section 9 value at all*
+-- crops grown and wholly consumed -- covering ~14% of harvested acres and
+touching roughly half the farming households.  So the output measure is
+systematically thinner for subsistence-oriented farms.  That is a *selected*
+measure, not merely a noisy one, and it biases anything that correlates with
+market orientation.
+
+** 2. The FULL spec is a selected subsample
+
+The drop from 504 to 232 households is not attrition, it is the log.  Of the
+CORE household-years, *29.8% report no hired labour and 24.7% no purchased
+input spend* -- true zeros, not gaps.  Requiring positive values to take logs
+therefore conditions on being a commercially-input-using farm.
+
+The honest fixes are to keep the zeros (levels, or a use-indicator plus an
+intensity term) rather than to drop them.  Do not read the FULL spec as the
+same population as the CORE one.
+
+** 3. The land variable moves implausibly, and should be checked FIRST
+
+=area_ha= has a within-household standard deviation of *1.12 in logs* -- a
+typical household's reported cultivated area changes by a factor of about
+three between the two waves.  Land holdings do not.
+
+The likely mechanism is definitional rather than real: Q2 asks acres harvested
+*per crop*, and the household total is a sum over the crops reported that year,
+so a household reporting three crops in one round and five in the next shows a
+large "area" change that is partly a change in what was enumerated.  A within
+estimator is precisely what this contaminates, and land is the regressor whose
+coefficient the exercise is most likely to be about.
+
+*Check this before trusting any land elasticity.*  Cheap diagnostics: the
+distribution of crops-reported-per-household across the two waves, and the
+area change restricted to households reporting the SAME crop set.
+
+* Verdict
+
+Yes for the CORE specification: 504 households, two waves, identifying
+variation in all three regressors, all from canonical tables.  Treat the FULL
+specification as a different population, and settle caveat 3 before reading the
+land coefficient.
