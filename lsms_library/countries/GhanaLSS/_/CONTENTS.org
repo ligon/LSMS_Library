@@ -4447,11 +4447,29 @@ most countries in the corpus.
 =plot_inputs= carries seven blocks.  Two cautions, both in the wave scripts'
 docstring as well:
 
-1. =Transport=, =Containers= and =Storage= are farm OPERATING expenses, not
-   inputs applied to a crop.  They are carried because the survey asks them per
-   crop and because summing =Cost= over =input= is the farm-expense aggregate
-   the table exists to support, but they carry no =Quantity= and are not
-   comparable to the agronomic rows.
+1. =Transport=, =Containers= and =Storage= are the COST OF SELLING the output
+   -- marketing costs -- rather than inputs applied to a crop.  They belong in
+   this table (@ligon, 2026-09-16: "conceptually these are part of the cost of
+   selling one's output, and they belong in the same table").
+
+   They are a QUARTER of the recorded spend, which is the part worth knowing
+   before aggregating:
+
+   | input                  | 1987-88 | 1988-89 |
+   |------------------------+---------+---------|
+   | Seed                   |   42.9% |   40.5% |
+   | Fertilizer             |   18.2% |   22.4% |
+   | Pesticide or Herbicide |   12.9% |   12.4% |
+   | Manure                 |    0.2% |    0.2% |
+   | Transport              |   12.0% |   11.7% |
+   | Containers             |   10.5% |    9.2% |
+   | Storage                |    3.3% |    3.6% |
+   | /cost of selling/      | /25.8%/ | /24.5%/ |
+
+   They are not part of the production technology: a PRODUCTION function should
+   exclude them, or net them against revenue; a PROFIT function should not.
+   =input= is an index level, so either is one filter away, and they carry no
+   =Quantity=, so no physical aggregate is affected.
 2. The labels are CATEGORIES, not products.  Every other country names the
    chemical (=Urea=, =NPK=, =DAP=, =Pesticide=, =Herbicide=); GLSS1/GLSS2 asks
    only "fertilizer" and "insecticides *or* herbicides".  =Fertilizer= here is

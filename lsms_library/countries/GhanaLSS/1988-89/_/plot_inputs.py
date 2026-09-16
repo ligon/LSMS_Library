@@ -28,11 +28,19 @@ rendered with slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py):
 
 TWO THINGS A READER MUST NOT MISREAD.
 
-1.  `Transport`, `Containers` and `Storage` are farm OPERATING expenses, not
-    inputs applied to a crop.  They are carried here because the survey asks
-    them per crop and because summing `Cost` over `input` is exactly the
-    farm-expense aggregate this table exists to support -- but they are not
-    comparable to the agronomic rows, and they carry no `Quantity`.
+1.  `Transport`, `Containers` and `Storage` are the COST OF SELLING the
+    output -- marketing costs -- rather than inputs applied to a crop
+    (@ligon, 2026-09-16: "conceptually these are part of the cost of selling
+    one's output, and they belong in the same table").  They are carried here
+    deliberately, and the survey asks them per crop exactly as it asks the
+    agronomic blocks.
+
+    But they are a QUARTER of the recorded spend -- 25.8% in 1987-88 and 24.5%
+    in 1988-89 (Transport 12.0/11.7, Containers 10.5/9.2, Storage 3.3/3.6) --
+    and they are not part of the production technology.  A PRODUCTION function
+    should exclude them, or net them against revenue; a PROFIT function should
+    not.  `input` is an index level, so either is one filter away, and they
+    carry no `Quantity`, so no physical aggregate is affected either way.
 
 2.  The `input` labels are CATEGORIES, not products.  Every other country in
     the corpus names the chemical (`Urea`, `NPK`, `DAP`, `Pesticide`,

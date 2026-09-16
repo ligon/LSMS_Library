@@ -426,9 +426,11 @@ Data Scheme:
   # materialize: make -- seven source files, one per expense block, melted
   # into one long table with a constant `input` label each.  YAML cannot
   # express that; see the wave scripts' docstring for the block-by-block map
-  # and for the two things a reader must not misread (Transport / Containers
-  # / Storage are operating expenses, not applied inputs; and the `input`
-  # labels are CATEGORIES, not the product names every other country serves).
+  # and for the two things a reader must not misread.  Briefly: Transport /
+  # Containers / Storage are the COST OF SELLING the output rather than
+  # applied inputs -- they belong here (@ligon, 2026-09-16) but are a quarter
+  # of the spend and are not production technology; and the `input` labels are
+  # CATEGORIES, not the product names every other country serves.
   #
   # `u` is a COLUMN, not an index level (Uganda / Ethiopia / Nigeria do the
   # same): four of the seven blocks record no quantity and hence no unit, and
