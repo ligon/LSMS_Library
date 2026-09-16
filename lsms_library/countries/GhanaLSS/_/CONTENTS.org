@@ -4350,3 +4350,142 @@ Regression coverage lives in =tests/test_ghanalss_interview_date.py=,
 actual Wave duplicate-anchor handling, raw-input linkage, and provenance
 through parquet and Feature. See =.coder/ledger/ghanalss-visit-dates.md= for
 the implementation decisions and verification record.
+
+* Section 9 (Agro-Pastoral Activities) -- wired for GLSS1/GLSS2 only (2026-09-16)
+
+Agriculture is *Section 9* in GLSS1/GLSS2 and *Section 8* from GLSS3 on (see
+"Section numbers moved between GLSS2 and GLSS3" above).  Both panel waves ship
+the complete suite -- =Y09A= .. =Y09K=, 22 files each -- and until now none of
+it was declared.  Three tables are wired, for *1987-88 and 1988-89 only*,
+because those two rounds are the only panel GhanaLSS has (the 712-household
+GLSS1 -> GLSS2 rotating half):
+
+- =crop_production= :: =(t, i, j)=, from Part B.
+- =plot_inputs= :: =(t, i, input, j)=, from Part D blocks D1A-D3A.
+- =livestock= :: =(t, i, animal)=, from Part F.
+
+=plot_labor= is deliberately NOT wired -- see below.  The questionnaire is an
+image-only CCITT-fax scan; every reading below was taken off the rendered page
+with =slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py=, whose
+=PAGE_INDEX.org= puts Section 9 at PDF pp.42-55.
+
+** Section 9 Part B records a sale PRICE, not a sale value
+
+Part B column 6 -- "How much was the harvest of [...] sold for?" -- has *two*
+boxes, =AMOUNT= (=CROPSP=) and =UNIT= (=CROPSPU=).  The amount is denominated
+by its own unit box, so on most rows it is a price per container and *not* a
+total.  =CROPSPU= is essentially bimodal over sale rows: equal to =CROPSU=
+(91.3% / 85.8%), or code 22 =All=, meaning the whole lot (9.6% / 15.9%), with
+a 2.4% / 1.2% residual.
+
+=Value_sold= is therefore DERIVED, registered as
+=GhanaLSS::crop_production::9b-sale-amount-per-unit=.  *The =All= branch must
+be tested before the same-unit branch*: =CROPSU= is itself =All= on many rows,
+so the masks overlap, and testing same-unit first multiplies a whole-lot total
+by a quantity.  That mistake inflated yam's median sale value twelvefold
+during design and is the single way to get this subtly and silently wrong.
+
+*** There is no harvest quantity anywhere in Part B
+
+The form asks the quantity *sold* (Q4) and never the quantity *harvested*.
+=Quantity= is declared and served ENTIRELY NaN so the cross-country shape stays
+recognisable; nothing is imputed into it, and =transformations.harvest_kg=
+cannot reach this country at all (it keys the reported =KgFactor= to =u= and
+needs =Quantity=, and there is neither).  =CROPSUK= is carried as =KgFactor=
+for the analyst's own use; note that canonically that column is defined against
+=u=, a level this table does not have.
+
+*** The four dispositions are NOT on one valuation basis
+
+Part B asks where the harvest went: sold (Q4/Q6), kept for seed (Q7/Q8), given
+to labourers / a landowner / as gifts or for ceremonies (Q9/Q10), and lost to
+insects, rodents, fire or rotting (Q11/Q12).  A fifth use -- what the household
+*ate* -- is not in Section 9 at all; it is Section 12B, already derived as
+=GhanaLSS::food_acquired::12b-fortnight=.
+
+=CROPSP= is what the household *received*.  The other three each ask "how much
+would the same quantity *cost in the market*" -- an imputed replacement price,
+the buyer's side of the farmgate/market gap.  *Adding the four gives a total in
+mixed prices.*  They are carried as four separate columns so the choice stays
+with the analyst.
+
+*** About a fifth of cropped rows carry no Section 9 value at all
+
+Of rows with harvested acreage > 0, 18.9% (1987-88) and 19.5% (1988-89) record
+no sale, no seed, no gift and no loss value -- crops grown and wholly consumed,
+covering ~14% of harvested acres and touching about half the farming households
+(1,127 of 2,178; 1,408 of 2,393).  They carry acreage and nothing else, and
+they have no quantity either, so no price source recovers them.
+
+Nothing is fabricated for them (@ligon, 2026-09-16: "We should not make up
+values for those missing rows.  Dealing with that missingness is a job for the
+downstream analysis.").  Anyone building a value of output from this table
+should know that it is structurally zero for the most subsistence-oriented part
+of the sample, and *non-randomly so* -- a selected measure, not merely a noisy
+one.  Do NOT impute it from acreage: for a production function that is
+circular, since acreage is a regressor.
+
+** Section 9 Part F records a price per head
+
+Part F Q5 -- "If they wanted to sell one of these [...] today, how much money
+would they receive altogether?" -- is ambiguous between a price per head and a
+value for the whole herd.  It is a *price per head*, measured rather than read:
+=corr(log HeadCount, log LIVSTNV)= runs -0.16..+0.08 across every animal type,
+chickens report a median 400 at both 4 head and 20, and cattle 20,000 at both 2
+head and 15.  A herd value would scale with the herd; this does not.
+
+Q8's SALE value does move with the number sold (corr 0.65-0.80), is a total,
+and dividing it by =HeadSold= recovers the same per-head figure (chickens 400,
+cattle 20,000) -- the cross-check that settles it.
+
+So =ValuePerAnimal= is the RECORDED column and =HerdValue= the DERIVED one
+(=GhanaLSS::livestock::9f-herd-value-from-unit-price=), which is the reverse of
+most countries in the corpus.
+
+** Part D: the input labels are categories, and three blocks are not inputs
+
+=plot_inputs= carries seven blocks.  Two cautions, both in the wave scripts'
+docstring as well:
+
+1. =Transport=, =Containers= and =Storage= are farm OPERATING expenses, not
+   inputs applied to a crop.  They are carried because the survey asks them per
+   crop and because summing =Cost= over =input= is the farm-expense aggregate
+   the table exists to support, but they carry no =Quantity= and are not
+   comparable to the agronomic rows.
+2. The labels are CATEGORIES, not products.  Every other country names the
+   chemical (=Urea=, =NPK=, =DAP=, =Pesticide=, =Herbicide=); GLSS1/GLSS2 asks
+   only "fertilizer" and "insecticides *or* herbicides".  =Fertilizer= here is
+   a SUPERSET of the corpus's product labels and must not be pooled with them,
+   and =Pesticide or Herbicide= is deliberately not called =Pesticide=.
+
+=Cost= is the corpus's first input-spend column.  No other country records
+input spend -- the canonical vocabulary is =Quantity= / =Purchased= /
+=Quantity_purchased= -- and four of GLSS's seven blocks record spend and
+nothing else, so omitting it would omit the module.
+
+** =plot_labor= is NOT wired, and the reason is a misreading worth recording
+
+Q41-42 look like a labour roster and are not one.  Q42 asks "How much was
+*spent* for the following kinds of *paid* labor" over a grid of
+CLEARING LAND / PLANTING / HARVESTING / OTHER x MALE / FEMALE / CHILD, and the
+cells are *AMOUNTS*, not person-days.  (=CRLABM1..M4=, =CRLABF1..F4=,
+=CRLABC1..C4= are that grid.)  The corpus's =plot_labor= is
+=(t, i, plot_id, source)= with =PersonDays= and =Wage=, and *every* country
+that declares it carries =plot_id= -- including the EHCVM countries that drop
+the plot level from =plot_inputs=.  GLSS1/GLSS2 has neither a plot level nor
+person-days for paid labour.
+
+The only person-days in Section 9 are Q46, "How many man days of labor has the
+household received" through *unpaid* labour exchange -- a single household
+total, not a per-plot or per-source figure.
+
+Deferred rather than forced into a shape it does not have.  Q43-44 (renting
+animals, equipment, maintenance, irrigation charges, fuel) is a further
+expense block, also unwired.
+
+*** Do not read =Y09A:IDFARM= as a plot identifier
+
+It cannot be one: =Y09A= has exactly one row per household (2,644 / 2,938).
+=IDFARM= also appears in =Y07.DCT= alongside =FARMSE= and =BUSSE=, which is
+where Section 7 records *who answers* the agriculture module.  =plot_features=
+for these two waves carries a C4-validated =not-asked= verdict.

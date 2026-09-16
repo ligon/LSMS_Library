@@ -421,3 +421,35 @@ Data Scheme:
     HeadLostOrDied:
       type: float
       optional: true
+
+  # GLSS1/GLSS2 Section 9 Part D (FARM INPUTS).  1987-88 and 1988-89 only.
+  # materialize: make -- seven source files, one per expense block, melted
+  # into one long table with a constant `input` label each.  YAML cannot
+  # express that; see the wave scripts' docstring for the block-by-block map
+  # and for the two things a reader must not misread (Transport / Containers
+  # / Storage are operating expenses, not applied inputs; and the `input`
+  # labels are CATEGORIES, not the product names every other country serves).
+  #
+  # `u` is a COLUMN, not an index level (Uganda / Ethiopia / Nigeria do the
+  # same): four of the seven blocks record no quantity and hence no unit, and
+  # a NaN on a declared index level is deleted by the first groupby (Site I).
+  #
+  # `Cost` is the corpus's FIRST input-spend column (@ligon, 2026-09-16).
+  # Local currency, per (household, input, crop), 12-month recall.  No country
+  # records input spend today -- the canonical vocabulary is Quantity /
+  # Purchased / Quantity_purchased -- and four of GLSS's seven blocks record
+  # spend and NOTHING else, so dropping it would drop the module.
+  #
+  # `Purchased` is deliberately NOT declared: the form asks a source code and
+  # a credit flag, neither of which is the canonical boolean, and a spend > 0
+  # is a different question (Q10 says "IF NOTHING, WRITE ZERO").
+  plot_inputs:
+    index: (t, i, input, j)
+    Quantity:
+      type: float
+      optional: true
+    u:
+      type: str
+      optional: true
+    Cost: float
+    materialize: make
