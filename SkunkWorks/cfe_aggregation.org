@@ -411,4 +411,3 @@ Choices still to settle include the reference population and its weights,
 the common factor normalization, an acceptable approximation tolerance,
 and the treatment of unscored households. These determine the statistical
 objective before a particular clustering algorithm can be preferred.
-
