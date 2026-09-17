@@ -1,5 +1,91 @@
 #+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
 
+
+* GhanaLSS food-label crosswalk session (2026-09-16, PR #935)
+
+Merged from =fix/ghanalss-label-crosswalk='s own handoff note when the branch was
+brought up to date with =development= (2026-09-16); headings demoted one level,
+text otherwise verbatim.
+
+** State
+
+- Branch =fix/ghanalss-label-crosswalk=, *5 commits*, 5 ahead of
+  =development=, 0 behind.  Working tree clean.  Published to the shared
+  mirror and (as of this note) pushed to GitHub with a PR open.
+- Last commit: =684120114= "reconcile guinea corn + sorghum at Lcp with a
+  named reducer".
+- Full record: =slurm_logs/ghanalss_aggregate_labels/= -- =FINDINGS.org= (the
+  ladder + the original diagnosis), =TABLE_AUDIT.org= (every defect found),
+  =LANDED.org= (what shipped, with the decisions and who made them), plus 12
+  re-runnable scripts and =README.md= saying how to run them.
+
+** What the task was, and what it turned into
+
+Asked: find =Aggregate= labels for GhanaLSS =food_expenditures=.
+Found: =labels='Aggregate'= raises, and the two places that record this as
+deliberate name three blockers of which *two were stale*.  The one that binds
+was unrecorded: the country =harmonize_food= table carries a per-wave
+crosswalk (=Lc . Lcp= in @ligon's ladder) that *was never applied*, so the
+served =j= was the WAVE vocabulary and 45 of 225 labels sat off the country
+axis -- 14% of rows, ~36% of GLSS2 expenditure, silently.
+
+So steps 1-4 fixed the =j= axis.  *Step 5 -- designing the =Aggregate Label=
+column -- is NOT started*, by agreement: @ligon wanted to discuss principles
+of aggregation first.  That is the next conversation.
+
+** Invariants now holding at HEAD
+
+| check                                | value                 |
+|--------------------------------------+-----------------------|
+| served =j= off the country axis      | *0* (was 45 of 225)   |
+| duplicate index tuples               | *0*                   |
+| distinct =j= vs country labels       | *215 = 215* bijection |
+| Expenditure per wave, before/after   | identical, all seven  |
+| =test_ghanalss_food_label_canonical= | *32 passed*           |
+
+Two new guards: =TestDelivered= now asserts =j= is on the COUNTRY axis (it
+asserted the WAVE axis, which was right for =Lw= and could never have caught
+this), and a config-only per-wave bijection test.
+
+** Next steps, in order
+
+1. *Design =Aggregate Label=* (step 5).  Read =FINDINGS.org= "The framing
+   number" first: a mechanical reconciliation of the wave columns yields
+   195 -> 134 buckets with *91 singletons*, against Malawi 147 -> 65 and Uganda
+   175 -> 80.  The wave-level Aggregate columns were a spelling layer, not a
+   demand-estimation bucketing.  GH *#226* is the principled auto-aggregation
+   script this probably belongs in; GH *#925* constrains it -- a blank cell
+   becomes one unnamed bucket, so the column must be complete for all 215
+   labels.
+2. *Rebuild and inspect =nutrition=.*  NOT done.  It will change: the
+   Cocoyam/Coffee fix (8,935 rows), gari 02_004 -> 02_039, sweet potato
+   02_022, and the deliberately-blank =Oil (palm)/Shea Butter= composite
+   (4,239 rows drop out).  Do this before anyone quotes a GhanaLSS nutrient
+   number.
+3. *The latent =.first()=* at =1998-99/_/food_acquired.py:110= -- filed as its
+   own issue; does not fire today.
+
+** Traps worth knowing (all cost time this session)
+
+- =.pth= points at =/global/scratch/.../mirrors/LSMS_Library=, a THIRD
+  checkout.  Always run wave scripts with both
+  =PYTHONPATH=<clone>= and =LSMS_COUNTRIES_ROOT=<clone>/lsms_library/countries=,
+  and assert =/local/job*/ in lsms_library.__file__=.
+- =2005-06/_/categorical_mapping.org= has *mixed CRLF/LF* line endings.  A
+  naive read/write normalises the whole file and buries the real edit in a
+  372-line diff.  Preserve per-line terminators.
+- Org tables *right-align numeric columns*.  Regenerating a wave table with a
+  left-justifying writer rewrites every row.  Edit the changed LINES in place.
+- =groupby().agg('sum')= returns *0.0 for an all-NA group*.  Use
+  =min_count=1=, or phantom rows sail past a later =dropna(how='all')=
+  (+32,040 of them here).
+- Do not compute an "expected" row count from an assumed baseline.  Rebuild
+  the true prior state and measure; that is what finally resolved a +637 that
+  three rounds of reasoning had not.
+- The shared mirror's =.venv= symlink points at whichever job last ran
+  =bin/savio_venv.sh mount=.  Two agents on different nodes will ping-pong it.
+  A clone's own =.venv= should point straight at its mount.
+
 * Mirror cleanup and the #930 rebase (2026-09-15 afternoon, job 38854624)
 
 Supersedes the next-action suggestions below.  Worked *directly in the shared

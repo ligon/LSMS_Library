@@ -264,4 +264,8 @@ assert df.loc[~_both, 'Derivation'].isna().all(), (
     'a row with no computed value carries the 8h-farmgate key')
 
 if __name__ == '__main__':
+    # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+    # Pure rename; an unmapped label raises rather than passing through.
+    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
+    df = to_country_food_labels(df, '2016-17')
     to_parquet(df, 'food_acquired.parquet')

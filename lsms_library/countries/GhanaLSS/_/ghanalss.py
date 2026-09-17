@@ -800,6 +800,145 @@ def inputs_produced_farmgate(wave):
     return out.set_index(['t', 'i'])
 
 
+def to_country_food_labels(df, wave, level='j'):
+    """Map a wave's own ``harmonize_food`` label onto the COUNTRY one (Lcp).
+
+    Each GLSS round names foods in its own vocabulary; the country-level
+    ``_/categorical_mapping.org`` ``harmonize_food`` table records exactly that
+    round's spelling in its ``<wave>`` column, against the canonical
+    ``Preferred Label``.  That crosswalk is what makes ``j`` comparable across
+    rounds -- and until 2026-09-16 *nothing applied it*, so the served ``j`` was
+    the wave vocabulary and 45 of 225 labels never reached the country axis
+    (``slurm_logs/ghanalss_aggregate_labels/FINDINGS.org``).  This function is
+    that step.
+
+    It is a **pure rename**: nothing is summed, dropped or reindexed.  The
+    country table is a bijection onto each wave's column (0 ambiguous cells in
+    all seven waves, asserted here), so two wave labels cannot collide on one
+    country label within a wave, and the index stays as unique as it was.
+
+    An unmapped label is a **hard error**, not a pass-through: a silent
+    pass-through is exactly the defect this replaces, and ``pandas.rename``
+    would do it by default.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile
+
+    tbl = df_from_orgfile(
+        str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+        name='harmonize_food')
+    tbl.columns = [str(c).strip() for c in tbl.columns]
+    if wave not in tbl.columns:
+        raise KeyError(f'harmonize_food has no column for wave {wave!r}')
+    native = tbl[wave].astype(str).str.strip()
+    canon = tbl['Preferred Label'].astype(str).str.strip()
+    pairs = [(n, c) for n, c in zip(native, canon) if n and n != 'nan']
+    dup = {n for n, _ in pairs if sum(1 for m, _ in pairs if m == n) > 1}
+    if dup:
+        raise ValueError(
+            f'harmonize_food column {wave!r} is not injective -- {sorted(dup)} '
+            f'each name more than one Preferred Label; the crosswalk is ambiguous')
+    m = dict(pairs)
+
+    if level in (df.index.names or []):
+        seen = set(df.index.get_level_values(level).dropna().astype(str))
+    else:
+        seen = set(df[level].dropna().astype(str))
+    missing = sorted(seen - set(m))
+    if missing:
+        raise KeyError(
+            f'GhanaLSS {wave}: {len(missing)} label(s) on {level!r} are absent from the '
+            f'{wave!r} column of the country harmonize_food, so they cannot be mapped '
+            f'onto the country axis: {missing[:12]}.  Add them to '
+            f'countries/GhanaLSS/_/categorical_mapping.org rather than letting them '
+            f'pass through -- a pass-through is GH #782/#925 all over again.')
+
+    if level in (df.index.names or []):
+        return df.rename(index=m, level=level)
+    out = df.copy()
+    out[level] = out[level].map(lambda v: m.get(str(v), v))
+    return out
+
+
+_ADDITIVE_MEASURES = ('Expenditure',)
+
+
+def reduce_duplicate_food_rows(df, keys, quantity='Quantity', price='Price'):
+    """Collapse rows sharing ``keys``: ``quantity`` SUMS, ``price`` becomes the
+    QUANTITY-WEIGHTED MEAN.
+
+    The named reducer this country's CONTENTS.org requires wherever several
+    survey lines harmonise onto one ``j``.  It exists because the alternatives
+    are both wrong:
+
+    * leaving the duplicate for the framework -- ``food_acquired`` is in
+      ``_ADDITIVE_MEASURE_COLUMNS``, so core SUMs Quantity/Expenditure and then
+      re-derives ``Price = Expenditure / Quantity`` across the WHOLE frame,
+      destroying every recorded farmgate price (CONTENTS.org Trap 9);
+    * ``groupby().first()`` -- keeps one price and silently discards the other,
+      which is GH #323's hazard.
+
+    The weighted mean is the price OF THE HARMONISED COMMODITY, and it is the
+    choice that makes ``Quantity * Price`` add up across the merge: with
+    ``Q = sum(q)`` and ``P = sum(q*p)/sum(q)``, ``Q*P == sum(q*p)``, so a wave
+    that derives Expenditure from Quantity x Price (1998-99) conserves it
+    exactly.  Where the summed quantity is 0 or missing the first price is kept
+    rather than dividing by zero.
+
+    Same rule as the inline reduction in ``2005-06/_/food_acquired.py`` (the
+    mutton+goat merge); that one predates this helper and is left as it is.
+    """
+    d = df.copy()
+    d['_qp'] = (pd.to_numeric(d[quantity], errors='coerce')
+                * pd.to_numeric(d[price], errors='coerce'))
+    # min_count=1 throughout: a plain 'sum' returns 0.0 for an ALL-NA group,
+    # which would turn "this visit recorded nothing" into a recorded zero and
+    # smuggle the row past the caller's dropna(how='all').  Measured when this
+    # was wrong: +32,040 phantom rows on the delivered table.
+    _sum = lambda s: s.sum(min_count=1)
+    spec = {quantity: (quantity, _sum), '_qp': ('_qp', _sum), '_pf': (price, 'first')}
+    # Every OTHER column is carried, not dropped: the additive measures SUM
+    # (they are `_ADDITIVE_MEASURE_COLUMNS` and a sum of all-NA stays NA), and
+    # anything else -- `s`, a wave tag -- is constant within a key by
+    # construction, so `first` is exact rather than a choice.
+    carried = [c for c in d.columns if c not in keys and c not in (quantity, price, '_qp')]
+    for c in carried:
+        spec[c] = (c, _sum) if c in _ADDITIVE_MEASURES else (c, 'first')
+    out = d.groupby(keys, sort=False, dropna=False).agg(**spec).reset_index()
+    q = pd.to_numeric(out[quantity], errors='coerce')
+    out[price] = (out['_qp'] / q).where(q.notna() & (q != 0), out['_pf'])
+    return out.drop(columns=['_qp', '_pf'])
+
+
+def reconcile_after_crosswalk(df):
+    """Reduce the duplicates that ``to_country_food_labels`` can create.
+
+    The crosswalk is many-to-one by design: 1991-92 and 1998-99 field guinea
+    corn and sorghum as two separate own-production lines (``Code_8h`` 4 and 7)
+    and they are the same crop, so both map to ``Guinea Corn/Sorghum``.  A
+    household that filed both then holds two rows on one
+    ``(t, i, j, u, s, visit)``.
+
+    Reducing HERE -- after Lcp, on the canonical grain -- is the point.  Doing
+    it earlier would mean rewriting the wave's own vocabulary, which is not
+    ours to rewrite: those really are two lines on that questionnaire, and the
+    per-wave columns exist precisely so the harmonisation can happen at the
+    country level instead.  Doing it later means core does it, and core SUMs
+    the additive measures and then re-derives ``Price`` across the whole frame
+    (CONTENTS.org Trap 9).
+
+    No-op where the crosswalk introduced no duplicate, and asserts it left the
+    index unique.
+    """
+    names = list(df.index.names)
+    cols = list(df.columns)
+    if not df.index.duplicated().any():
+        return df
+    out = reduce_duplicate_food_rows(df.reset_index(), names)
+    out = out.set_index(names)[cols]
+    assert not out.index.duplicated().any(), (
+        'reconcile_after_crosswalk left duplicates on ' + repr(names))
+    return out
 # ---------------------------------------------------------------------------
 # GLSS1 / GLSS2 Section 9 Part B -- crop sale value, DERIVED (2026-09-16)
 #

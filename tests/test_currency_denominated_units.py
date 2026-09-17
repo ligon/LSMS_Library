@@ -437,7 +437,13 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: This is the fix working, not a regression.  Bisected: clean at 7b7d330fd
 #: (20 passed), failing the moment #916 lands.  See CLAUDE.md, "A derived value
 #: is a FIRST-CLASS value".
-GHANALSS_FOOD_PRICES_ROWS = 568_346
+#: Moved again 2026-09-16 by the wave->country food-label crosswalk (#935):
+#: 568,346 -> 568,624.  Seven labels that two wave vocabularies had collapsed
+#: onto one country label (Rice / Rice (imported) / Rice (local), smoked fish,
+#: sugar, cocoa powder, macaroni, potato, gari) are distinct rows again, so
+#: every mode gains the rows the collapse had merged -- Expenditure per wave is
+#: unchanged (asserted in tests/test_ghanalss_food_label_canonical.py).
+GHANALSS_FOOD_PRICES_ROWS = 568_624
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
@@ -526,9 +532,15 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     overwritten survey data rather than filled a gap.
     """
     c, _ = _country('GhanaLSS')
-    assert len(c.food_prices(units='unitvalue')) == 1_674_641
-    assert len(c.food_prices(units='unitprice')) == 189_551      # unchanged
-    assert len(c.food_quantities(units='units')) == 1_693_174    # unchanged
+    # #935 (2026-09-16) moves all three by the row split described at
+    # GHANALSS_FOOD_PRICES_ROWS: 1,674,641 -> 1,676,093; 189,551 -> 189,656;
+    # 1,693,174 -> 1,694,623.  The "unchanged" claim below is about #916's
+    # derivation, and still holds: a valuation adds no reported-price or
+    # quantity row.  A label split adds rows to EVERY mode, which is the
+    # signature that distinguishes it from a derivation overwriting data.
+    assert len(c.food_prices(units='unitvalue')) == 1_676_093
+    assert len(c.food_prices(units='unitprice')) == 189_656
+    assert len(c.food_quantities(units='units')) == 1_694_623
 
 
 @pytest.mark.slow
