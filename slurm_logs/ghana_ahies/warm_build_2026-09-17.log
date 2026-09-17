@@ -1,0 +1,272 @@
+waves ['2022Q1', '2022Q2', '2022Q3', '2022Q4', '2023Q1', '2023Q2', '2023Q3', '2023Q4', '2024Q1', '2024Q2', '2024Q3', '2024Q4']
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2022/_/sample.py:47: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/null_read_audit.py:380: NullReadWarning: GhanaAHIES/2022: read of ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta returned 209,943 row(s) x 838 column(s) but 319 of those columns (38%) are 100% NULL: ['s1aq2x', 's1aq5x', 's2aq2', 's2aq10_22', 's4aq6o', 's4bq16d', 's4bq16e', 's4hq1aa', 's4hq1ab', 's4hq1ac', 's4hq1ad', 's4hq1ae'] (+307 more). A frame of the right SHAPE with no CONTENT is the signature of a reader that misread the file rather than of empty data -- a fixed-width parse of a delimited file, or an XPORT reader mis-striding the field table. Nothing raised, so this would otherwise be served silently. Check which branch of local_tools.read_file claimed this file and whether it is the right one. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2023/_/sample.py:54: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2023 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+sample 2023: raw hh_weight mean / sum per quarter (household grain): {'2023Q1': {'mean': 868.6, 'sum': 8800194.9}, '2023Q2': {'mean': 874.2, 'sum': 8840924.6}, '2023Q3': {'mean': 433.9, 'sum': 4375806.5}, '2023Q4': {'mean': 882.7, 'sum': 8760326.7}}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/sample.py:40: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+sample: 121671 rows in 169 s; per t: {'2022Q1': 10761, '2022Q2': 10628, '2022Q3': 10422, '2022Q4': 10309, '2023Q1': 10131, '2023Q2': 10113, '2023Q3': 10085, '2023Q4': 9924, '2024Q1': 9890, '2024Q2': 9875, '2024Q3': 9834, '2024Q4': 9699}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/cluster_features.py:72: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+cluster_features 2024: {'2024Q1': 600, '2024Q2': 600, '2024Q3': 600, '2024Q4': 600} | districts 247 | regions 16
+cluster_features: 2400 rows in 35 s; per t: {'2024Q1': 600, '2024Q2': 600, '2024Q3': 600, '2024Q4': 600}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2022/_/household_roster.py:54: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/null_read_audit.py:380: NullReadWarning: GhanaAHIES/2022: read of ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta returned 209,943 row(s) x 838 column(s) but 319 of those columns (38%) are 100% NULL: ['s1aq2x', 's1aq5x', 's2aq2', 's2aq10_22', 's4aq6o', 's4bq16d', 's4bq16e', 's4hq1aa', 's4hq1ab', 's4hq1ac', 's4hq1ad', 's4hq1ae'] (+307 more). A frame of the right SHAPE with no CONTENT is the signature of a reader that misread the file rather than of empty data -- a fixed-width parse of a delimited file, or an XPORT reader mis-striding the field table. Nothing raised, so this would otherwise be served silently. Check which branch of local_tools.read_file claimed this file and whether it is the right one. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+household_roster 2022: dropping 0 "Not member anymore" rows ({})
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2023/_/household_roster.py:85: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2023 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+household_roster 2023: dropping 1410 "Not member anymore" rows ({'2023Q2': 17, '2023Q3': 11, '2023Q4': 1382})
+household_roster 2023: heads per household-quarter by quarter: {'2023Q1': {0: 216, 1: 9915}, '2023Q2': {0: 69, 1: 10044}, '2023Q3': {0: 61, 1: 10024}, '2023Q4': {0: 99, 1: 9825}}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/household_roster.py:47: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+household_roster 2024: dropping 52 "Not member anymore" rows ({'2024Q1': 52})
+household_roster: 593934 rows in 110 s; per t: {'2022Q1': 52914, '2022Q2': 53617, '2022Q3': 53130, '2022Q4': 50282, '2023Q1': 50039, '2023Q2': 47696, '2023Q3': 48449, '2023Q4': 49359, '2024Q1': 47911, '2024Q2': 47238, '2024Q3': 46384, '2024Q4': 46915}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2022/_/individual_education.py:43: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/null_read_audit.py:380: NullReadWarning: GhanaAHIES/2022: read of ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta returned 209,943 row(s) x 838 column(s) but 319 of those columns (38%) are 100% NULL: ['s1aq2x', 's1aq5x', 's2aq2', 's2aq10_22', 's4aq6o', 's4bq16d', 's4bq16e', 's4hq1aa', 's4hq1ab', 's4hq1ac', 's4hq1ad', 's4hq1ae'] (+307 more). A frame of the right SHAPE with no CONTENT is the signature of a reader that misread the file rather than of empty data -- a fixed-width parse of a delimited file, or an XPORT reader mis-striding the field table. Nothing raised, so this would otherwise be served silently. Check which branch of local_tools.read_file claimed this file and whether it is the right one. Set LSMS_READ_STRICT=1 to make this fatal.
+  _emit_null_read_report(report)
+individual_education 2022: {'Primary incomplete': 53237, 'No education': 33399, 'Lower secondary complete': 30672, nan: 15932, 'Lower secondary': 15923, 'Pre-primary': 14893, 'Upper secondary': 11987, 'Upper secondary complete': 11482, 'Primary complete': 10296, 'Bachelor': 5416, 'Tertiary certificate/diploma': 3032, 'Postgraduate': 1903, 'Vocational/Technical': 1548, 'Unknown': 161, 'Doctorate': 62}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2023/_/individual_education.py:53: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2023 AHIES Q1-Q4_Rev_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+individual_education 2023: dropped 1410 "Not member anymore" rows; {'Primary incomplete': 53313, 'No education': 26380, 'Lower secondary complete': 23145, 'Lower secondary': 18251, 'Pre-primary': 17340, nan: 12632, 'Upper secondary complete': 12107, 'Upper secondary': 10833, 'Primary complete': 9556, 'Bachelor': 5500, 'Tertiary certificate/diploma': 2769, 'Postgraduate': 1658, 'Vocational/Technical': 1385, 'Unknown': 625, 'Doctorate': 49}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/individual_education.py:37: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+individual_education 2024: {'Primary incomplete': 53181, 'No education': 25573, 'Lower secondary complete': 23977, 'Lower secondary': 17026, 'Pre-primary': 15229, 'Upper secondary complete': 11723, 'Upper secondary': 11326, nan: 10482, 'Primary complete': 7324, 'Bachelor': 5664, 'Tertiary certificate/diploma': 2778, 'Postgraduate': 1654, 'Vocational/Technical': 1350, 'Unknown': 1110, 'Doctorate': 51}
+individual_education: 554888 rows in 105 s; per t: {'2022Q1': 48788, '2022Q2': 49241, '2022Q3': 49231, '2022Q4': 46751, '2023Q1': 46379, '2023Q2': 44949, '2023Q3': 45330, '2023Q4': 46253, '2024Q1': 44830, '2024Q2': 44354, '2024Q3': 43821, '2024Q4': 44961}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2022/_/food_security.py:53: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2022 AHIES Q1-Q4_SEC567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+food_security 2022: dropping 201 rows with null HholdID (no Section 5-7 content; {'2022Q1': 1, '2022Q2': 2, '2022Q3': 1, '2022Q4': 197})
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2023/_/food_security.py:43: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2023 AHIES Q1-Q4_SEC567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+food_security 2023: dropping 0 rows with null HholdID (2024 had 332 such non-response shells; 2023 is expected to have 0)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/food_security.py:39: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_SEC01567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+food_security 2024: dropping 332 rows with null HholdID (no Section 5-7 content; {'2024Q1': 81, '2024Q2': 94, '2024Q3': 95, '2024Q4': 62})
+food_security: 120215 rows in 30 s; per t: {'2022Q1': 10760, '2022Q2': 10349, '2022Q3': 10421, '2022Q4': 10088, '2023Q1': 9915, '2023Q2': 9862, '2023Q3': 10027, '2023Q4': 9827, '2024Q1': 9809, '2024Q2': 9781, '2024Q3': 9739, '2024Q4': 9637}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2022/_/housing.py:105: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2022 AHIES Q1-Q4_SEC567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+housing 2022: dropping 201 rows with null HholdID (no Section 5-7 content; {'2022Q1': 1, '2022Q2': 2, '2022Q3': 1, '2022Q4': 197})
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2023/_/housing.py:108: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2023 AHIES Q1-Q4_SEC567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+housing 2023: dropping 0 rows with null HholdID (2024 had 332; 2023 expected 0)
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/housing.py:95: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_SEC01567_edt.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(HH_FILE)
+housing 2024: dropping 332 rows with null HholdID (no Section 5-7 content)
+housing: 120515 rows in 21 s; per t: {'2022Q1': 10760, '2022Q2': 10626, '2022Q3': 10420, '2022Q4': 10112, '2023Q1': 9915, '2023Q2': 9862, '2023Q3': 10027, '2023Q4': 9827, '2024Q1': 9809, '2024Q2': 9781, '2024Q3': 9739, '2024Q4': 9637}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/people_last7days.py:146: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+people_last7days 2024: s4aq9a-g: 3 daily entries above 24 h (max 66.0), served as recorded
+people_last7days 2024: s4aq13a-g: 4 daily entries above 24 h (max 70.0), served as recorded
+people_last7days 2024: dropping 52 "Not member anymore" rows (45 with a Section 4A answer)
+people_last7days 2024: answered / yes / NA per column {'wage_work': (166870, 14722, 21578), 'farm_work': (150849, 27660, 37599), 'SOB_work': (123189, 16471, 65259)}
+people_last7days 2024: Industry present on 78602 rows, 19755 of them with no served 7-day activity
+people_last7days 2024: {'2024Q1': 47911, '2024Q2': 47238, '2024Q3': 46384, '2024Q4': 46915}
+people_last7days: 188448 rows in 343 s; per t: {'2024Q1': 47911, '2024Q2': 47238, '2024Q3': 46384, '2024Q4': 46915}
+/local/job39002769/mirrors/LSMS_Library/lsms_library/countries/GhanaAHIES/2024/_/anthropometry.py:104: UserWarning: Refusing workspace copy of DVC-tracked file ../Data/2024 AHIES Q1-Q4_20250827.dta (sister .dvc sidecar exists). The package tree must not contain DVC-tracked data; falling through to the DVC cache path. Clean up with: find lsms_library/countries -type f -name '*.dta' -execdir test -e '{}.dvc' \; -print -delete
+  df = get_dataframe(PERSON_FILE)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:412: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df = reader.read(convert_dates=True, convert_categoricals=False)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:416: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  values = reader.value_labels()
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq3
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+/local/job39002769/mirrors/LSMS_Library/.venv/lib/python3.11/site-packages/ligonlibrary/dataframes.py:435: RuntimeWarning: Issue with categorical mapping: s3bq4
+  warnings.warn(f"Issue with categorical mapping: {var}", RuntimeWarning)
+anthropometry 2024: Weight: 2873 negative values -> NA {-99.94: 2298, -30.87: 1, -28.395: 1, -25.845: 2, -23.12: 334, -21.27: 235, -19.97: 2}
+anthropometry 2024: Height: 13001 negative values -> NA {-99.0: 13001}
+anthropometry 2024: dropping 48 measured "Not member anymore" rows and 2208 rows with neither Weight nor Height ({'2024Q1': 2208})
+anthropometry 2024: Weight n=185571 min=2.0 p1=6.7 p99=99.0 max=170.0
+anthropometry 2024: Height n=175466 min=2.0 p1=65.0 p99=254.0 max=308.8999938964844
+anthropometry 2024: {'2024Q1': 45703, '2024Q2': 47238, '2024Q3': 46384, '2024Q4': 46915}
+anthropometry: 186240 rows in 40 s; per t: {'2024Q1': 45703, '2024Q2': 47238, '2024Q3': 46384, '2024Q4': 46915}
+household_characteristics: 121671 rows in 14 s; per t: {'2022Q1': 10761, '2022Q2': 10628, '2022Q3': 10422, '2022Q4': 10309, '2023Q1': 10131, '2023Q2': 10113, '2023Q3': 10085, '2023Q4': 9924, '2024Q1': 9890, '2024Q2': 9875, '2024Q3': 9834, '2024Q4': 9699}
+ALL DONE

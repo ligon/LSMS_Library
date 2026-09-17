@@ -168,3 +168,13 @@ was checked and is Togo (Savanes / Tandjoare, Novissi =nov_*= columns,
 - Request Sections 8-13 from GSS.
 - WB catalog check for an AHIES mirror once a WB key is available.
 - 2023Q3 weight scale.
+
+* Warm build, 2026-09-17 (=warm_build_2026-09-17.log=)
+Cold build of every wired table for all twelve quarters into the shared
+cache (=~/.local/share/lsms_library=), one table at a time on the 4-core
+slice; no GrainCollapseWarning, NullIndexKeyWarning, NullReadWarning or
+unknown-kinship warning fired.  Rows per table: sample 121,671;
+household_roster 593,934; individual_education 554,888; food_security
+120,215; housing 120,515; household_characteristics 121,671 (all twelve
+quarters); cluster_features 2,400; people_last7days 188,448;
+anthropometry 186,240 (2024 only).  Per-quarter counts are in the log.

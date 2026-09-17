@@ -19,15 +19,24 @@ idiosyncrasies =lsms_library/countries/GhanaAHIES/_/CONTENTS.org=.
   =feat/ghanaahies-2024-features= (cluster_features, people_last7days,
   anthropometry for 2024)
 Private data roots under =/local/job39002769/data/= (gone with the job).
-Next action: review each branch's diff and report, merge into
-=development= in the order 2024-features, 2022, 2023 (CONTENTS.org and
-data_scheme.yml/Makefile will need a hand-merge for the features
-branch), rebuild in the shared cache, run =make matrix= for the country.
+All three branches reviewed and merged (=a45fe175a=, =616742f0b=,
+=181dfb210=; CONTENTS.org hand-merged twice); worktrees removed.  The
+features merge's publish hit a hook race (two publishes overlapping left
+the mirror's index dirty at =246341baf=): resolved by stashing the
+mirror's staged copy, re-pushing, and dropping the stash -- avoid
+committing again while a previous hook is still publishing.
+Next action: the full cold build into the shared cache
+(=$TMPDIR/warm_ghanaahies.py=, log =warm_ghanaahies.log=), then
+=make matrix= for GhanaAHIES, then the =absent_verdicts.csv= rows for the
+undistributed consumption features.
 
 ** Open for @ligon
 - =~/.config/lsms_library/config.yml= was overwritten at 12:41 (only
   =statsghana_api_key= remains; =microdata_api_key=, =data_dir=,
   =phmecv_api_key= are gone).  Restore.
+- Decide the 2023Q3 =hh_weight= factor of two (uniform x0.4986 on that
+  column alone; see CONTENTS.org "The 2023 folder"): double in the wave
+  script, or serve as shipped.
 - Ask GSS for Sections 8-13 (consumption/expenditure/income/assets/NFE):
   in no distributed file; the questionnaire is the C4 evidence for
   =asked-not-distributed= verdicts on food_acquired etc. (add rows to
