@@ -69,7 +69,8 @@ wave:
 | IFPRI / AAU / CSAE via Harvard Dataverse            | EthiopiaRHS x8 | =EthiopiaRHS/1989/Documentation/SOURCE.org:8-10=    |
 | KLPS (Miguel, Kremer et al.) via Dataverse, CC0     | KenyaLPS x5    | =KenyaLPS/2007-2009/Documentation/LICENSE.org:3-12= |
 | Ghana Statistical Service NADA                      | GhanaLSS x6    | =GhanaLSS/1987-88/Documentation/SOURCE.org:6-10=    |
-| EGC-ISSER, Yale                                     | GhanaSPS x2    | =GhanaSPS/2013-14/Documentation/SOURCE.org:6-9=     |
+| EGC-ISSER, Yale                                     | GhanaSPS 2013-14 | =GhanaSPS/2013-14/Documentation/SOURCE.org:6-9=   |
+| *unrecorded* (100 non-Dataverse files)              | GhanaSPS 2017-18 | =GhanaSPS/2017-18/Documentation/LICENSE.org:34-56= |
 | NISR Rwanda NADA                                    | Rwanda x2      | =Rwanda/2005-06/Documentation/SOURCE.org:3-10=      |
 | Dataverse =DVN/E5QP0F= v1.2, CC0 (10 of 110 files)  | GhanaSPS 2017-18 | =GhanaSPS/2017-18/Documentation/SOURCE.org:16-24= |
 
@@ -338,11 +339,19 @@ as today (=config.py:134,160=).
   removed.
 - =__init__.py:285-293= -- the import-time unlock goes; import gets faster
   still.
+- The =except -> authenticate()= branch beside it (=__init__.py:296-312=,
+  =dvc_permissions.py:49-141=) goes too.  It prompts for the shared
+  passphrase and writes =s3_creds= with no evidence of any entitlement;
+  =CONTRIBUTING.org:141-155= documents it as the path "for contributors who
+  cannot register for a WB API key", which under this design is exactly the
+  user the gate must refuse.  A keyless contributor gets a warm cache from an
+  entitled operator (D3), not a passphrase.  =ll.authenticate()= stays as a
+  name that raises =AccessError= with the =wb-nada= protocol text.
 - Stale claims to correct in the same PR: =CLAUDE.md= three-tier table (row 1
   "data-access calls raise =RuntimeError=" -- =data_access.py= has one
-  =raise=, a subprocess timeout at :450), =CONTRIBUTING.org:63-65=,
-  =scripts/reencrypt_s3_creds.py='s docstring, =_derive_fernet_key='s
-  docstring.  =902da8352='s message is history and stays wrong.
+  =raise=, a subprocess timeout at :450), =CONTRIBUTING.org:63-65= and
+  =:141-155=, =scripts/reencrypt_s3_creds.py='s docstring,
+  =_derive_fernet_key='s docstring.  =902da8352='s message is history and stays wrong.
 
 * Phasing
 1. *The gate that should have existed* -- =wb-nada= only.  Registry with one
