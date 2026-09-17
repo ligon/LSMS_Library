@@ -75,7 +75,7 @@ provenance is `external` (GSS NADA; no WB id).
   2024 (pandas path), `pyreadstat` needs `encoding='latin1'`.
 - 2023Q3 `hh_weight` is at half scale (mean 402 vs 720-854); record in
   `CONTENTS.org`, do not "fix" in config.
-- 2022 `SEC567` carries `WTPP*`/`WTHH_*` columns; 2023's carries no weight;
+- 2022 `SEC567` carries `WTPP*`/`WTHH_*` columns (2022Q4 only; `WTHH_2` == `hh_weight`) and 16 Section 10/11B columns (`s10q*`, `s10bq*`, `s11bq*`, 2022Q1-Q3 only -- NOT `s1*`, corrected 2026-09-17); 2023's carries no weight;
   weights for `sample` come from the **person** file (`hh_weight`, constant
   within household-quarter), not `SEC567`.
 - IO sanctioned-only; never the `dvc` CLI (STANDING.md §4). `push_to_cache_batch`

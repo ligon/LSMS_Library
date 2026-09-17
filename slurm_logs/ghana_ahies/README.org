@@ -113,9 +113,13 @@ The =.dta= files carry value labels that are not valid UTF-8;
 - SEC567 files: Section 5 (FAO FIES, 8 items, 12-month recall),
   Section 6 (respondent identification), Section 7 (housing: dwelling,
   tenure, rent, utilities, dwelling characteristics).  2022's carries
-  extra =WTPP*= / =WTHH_*= weight columns and 16 =s1*= columns; 2023's
-  carries no weight at all; 2024's carries =hhwt_q9=, =wtpp_q10=,
-  =hhwt_q10=.
+  extra =WTPP*= / =WTHH_*= weight columns (2022Q4 only; =WTHH_2= equals
+  the person file's =hh_weight=) and 16 Section 10/11B columns
+  (=s10q1-3=, =s10bq1-2= transfer screens, =s11bq1-11= miscellaneous
+  income amounts) populated 2022Q1-Q3 only -- the one sliver of
+  Sections 8-13 that IS shipped, corrected 2026-09-17 from an earlier
+  "16 =s1*= columns" misreading; 2023's carries no weight at all;
+  2024's carries =hhwt_q9=, =wtpp_q10=, =hhwt_q10=.
 - Keys.  =(cluster, HholdID)= is the stable panel household id (600
   clusters x 1-18); =hhid= is quarter-scoped (=qtr= + 3-digit cluster +
   2-digit household; 6 digits for qtr 1-9, 7 for 10-12).  =qtr= runs
