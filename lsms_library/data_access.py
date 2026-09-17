@@ -286,6 +286,21 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
                "University study distributed via Harvard Dataverse "
                "(doi:10.7910/DVN/T8G8IV), not the World Bank Microdata "
                "Library.  There is nothing to discover in the WB catalog."),
+    # GhanaAHIES: the Annual Household Income and Expenditure Survey is
+    # published on the Ghana Statistical Service NADA
+    # (microdata.statsghana.gov.gh, entries 119 and 128), the host that also
+    # supplied GLSS6/7.  Its downloads are anonymous but the host refuses
+    # ``api/resources`` even to a keyed user, so neither ``discover_waves``
+    # nor ``add_wave`` can drive it.  Whether the WB Microdata Library
+    # mirrors it is UNCHECKED (2026-09-17); flip this to a GHA spec with an
+    # ``_AHIES`` idno pin if it does.  See slurm_logs/ghana_ahies/README.org.
+    "GhanaAHIES": CountryCatalog(
+        None, discoverable=False,
+        reason="Ghana AHIES is distributed by the Ghana Statistical Service "
+               "NADA (microdata.statsghana.gov.gh), not the World Bank "
+               "Microdata Library; the GSS host's resources API refuses "
+               "unauthenticated and keyed callers alike, so discovery is "
+               "manual.  See slurm_logs/ghana_ahies/README.org."),
     "KenyaLPS": CountryCatalog(
         None, discoverable=False,
         reason="Kenya Life Panel Survey is not distributed via the World "
@@ -302,16 +317,30 @@ _COUNTRY_CODES: dict[str, str] = {
 }
 
 
-def _dvc_cmd() -> str:
-    """Return path to the ``dvc`` executable in the current venv.
+def _dvc_cmd() -> list[str]:
+    """Return the argv prefix that runs ``dvc`` for the current interpreter.
 
-    Falls back to bare ``"dvc"`` if no venv-local binary is found.
+    Prefers ``[sys.executable, "-m", "dvc"]`` whenever the ``dvc`` package is
+    importable: that is exactly the venv the library itself is running in, and
+    it does not depend on a console-script shebang.  Shebangs are what broke
+    on Savio (2026-09-17): the squashfs venv image (``bin/savio_venv.sh``)
+    ships ``.venv/bin/dvc`` with ``#!/global/scratch/.../.venv/bin/python`` --
+    a path that no longer exists -- so ``exec`` failed with ``ENOENT`` and
+    ``push_to_cache_batch`` pushed 0 of 6 files.  ``SkunkWorks/savio_venv.md``
+    already says "always invoke as ``.venv/bin/python -m <module>``"; this
+    makes the library obey it.
+
+    Falls back to the venv-local ``dvc`` script, then bare ``"dvc"``, when the
+    package is not importable from this interpreter.
     """
+    import importlib.util
     import sys
+    if importlib.util.find_spec("dvc") is not None:
+        return [sys.executable, "-m", "dvc"]
     venv_dvc = Path(sys.executable).parent / "dvc"
     if venv_dvc.exists():
-        return str(venv_dvc)
-    return "dvc"
+        return [str(venv_dvc)]
+    return ["dvc"]
 
 
 # DVC serializes every repo operation on ``.dvc/tmp/lock``.  Concurrent
@@ -1278,7 +1307,7 @@ def _s3_writer_credentialpath(remote: str | None, dvc_dir: Path):
     prior = config_local.read_text(encoding="utf-8") if had_local else None
     try:
         _run_dvc_with_lock_retry(
-            [_dvc_cmd(), "remote", "modify", "--local",
+            [*_dvc_cmd(), "remote", "modify", "--local",
              target, "credentialpath", str(write_path)],
             cwd=str(dvc_dir.parent), timeout=60,
         )
@@ -1336,7 +1365,7 @@ def push_to_cache(path: str | Path,
     try:
         if dvc_add:
             result = _run_dvc_with_lock_retry(
-                [_dvc_cmd(), "add", str(abs_path)],
+                [*_dvc_cmd(), "add", str(abs_path)],
                 cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
             if result.returncode != 0:
@@ -1344,7 +1373,7 @@ def push_to_cache(path: str | Path,
                 return False
             logger.info("dvc add: %s", abs_path)
 
-        push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
+        push_cmd = [*_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
         with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
@@ -1414,7 +1443,7 @@ def push_to_cache_batch(paths: list[str | Path],
     try:
         # --- Batched dvc add -----------------------------------------------
         if dvc_add:
-            add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
+            add_cmd = [*_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
             logger.info("dvc add: %d files ...", len(abs_paths))
             result = _run_dvc_with_lock_retry(
                 add_cmd,
@@ -1429,7 +1458,7 @@ def push_to_cache_batch(paths: list[str | Path],
 
         # --- Batched dvc push ----------------------------------------------
         dvc_files = [str(p) + ".dvc" for p in abs_paths]
-        push_cmd = [_dvc_cmd(), "push"] + dvc_files
+        push_cmd = [*_dvc_cmd(), "push"] + dvc_files
         if remote:
             push_cmd.extend(["-r", remote])
         logger.info("dvc push: %d files ...", len(abs_paths))
@@ -1478,7 +1507,7 @@ def unpushed_blobs(remote: str | None = None,
         Sorted paths that are out of sync with the remote (need a push).
         Empty when everything tracked is already on the remote.
     """
-    cmd = [_dvc_cmd(), "status", "--cloud", "--json"]
+    cmd = [*_dvc_cmd(), "status", "--cloud", "--json"]
     if remote:
         cmd += ["-r", remote]
     if targets:

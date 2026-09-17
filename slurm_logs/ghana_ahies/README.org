@@ -60,6 +60,15 @@ the six the v2.1 study documentation lists under "Files Description"
 (3 x =AHIES Q1-Q4_Rev_20250827= person files, 3 x =SEC567_edt= household
 files), so the scan recovered the documented dataset, not stray copies.
 
+Resolved the same day: EL's *logged-in* view of entry 128's "Get
+Microdata" tab lists 21 data-file entries -- the six datasets in each of
+STATA / SPSS / CSV, plus the 2022 person file twice under STATA (rid 512
+as a zip, rid 508 as the bare =.dta=, identical size) -- i.e. rids 505-514
+and 545-556 exactly as the scan found them.  The 2024 STATA file (513) is
+the odd one out: GSS filed it under "Other Materials", which is why it was
+the only data file visible without login.  Nothing was hidden; the web
+listing is login-gated while the download endpoint is not.
+
 EL (2026-09-17): GSS supplied the questionnaire and field manual
 directly by email *because they asked for the data to be set up in
 lsms_library*; the instruments' absence from the website is an

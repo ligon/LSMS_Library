@@ -226,6 +226,43 @@ _SERIES_CAPABILITY: dict[tuple[str, str], SeriesCapability] = {
         recorded="2026-07-12",
     ),
 
+    # GhanaAHIES: the instrument is in hand (GSS emailed the questionnaire and
+    # field manual, 2026-09-17; lsms_library/countries/GhanaAHIES/_/
+    # AHIES_INSTRUMENTS.zip), so this record is questionnaire-validated.  The
+    # idno (DDI-GHA-GSS-AHIES-2022-2024-v1.1) is a GSS NADA id, not a WB one,
+    # so `series_of` does not parse it; look the record up by name.
+    ("GhanaAHIES", "AHIES"): SeriesCapability(
+        country="GhanaAHIES", series="AHIES",
+        provides=("household_roster", "household_characteristics",
+                  "individual_education", "food_security", "housing",
+                  "people_last7days"),
+        lacks=("crop_production", "plot_features", "plot_inputs",
+               "plot_labor", "livestock", "shocks"),
+        validation=QUESTIONNAIRE_VALIDATED,
+        evidence=(
+            "AHIES questionnaire (Final, 22-11-2021), 13 sections: 1 "
+            "demographics & migration, 2 education, 3 health, 4 economic "
+            "activity, 5 household food insecurity (FIES), 6 respondent "
+            "identification, 7 housing, 8 consumption of own produce, 9 "
+            "household expenditure, 10 transfers, 11 miscellaneous income "
+            "and expenditure, 12 assets and durable goods, 13 non-farm "
+            "household enterprises.  No agricultural production, plot, "
+            "livestock or shocks module: the text contains 0 occurrences of "
+            "'shock', 'livestock', 'harvest' or 'plot'; 'crop' occurs only "
+            "in Section 8 (own-produce consumption) and Section 4 "
+            "occupation codes.  See slurm_logs/ghana_ahies/README.org."),
+        recorded="2026-09-17",
+        note=(
+            "Sections 8-13 (own-produce consumption, expenditure, transfers, "
+            "income, assets, non-farm enterprises) ARE asked but are in no "
+            "file GSS has distributed (the public release stops at Section "
+            "7), so food_acquired / nonfood_expenditures / assets / income "
+            "are asked-not-distributed, not not-asked, and are deliberately "
+            "NOT in `lacks`.  Record them in absent_verdicts.csv as "
+            "asked-not-distributed once the country is in the matrix; "
+            "remove that verdict when GSS supplies the sections."),
+    ),
+
     ("Armenia", "ILCS"): SeriesCapability(
         country="Armenia", series="ILCS",
         provides=("household_roster", "food_acquired", "nonfood_expenditures",
