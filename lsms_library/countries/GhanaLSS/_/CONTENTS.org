@@ -1215,14 +1215,14 @@ The move -- not a rename in place -- was the point:
 name.  So =labels== (=Country._relabel_j=) raised =LabelUnavailableError= for
 GhanaLSS however the table inside that file was named.  It now resolves.
 
-The heading formerly read /the "Aggregate Labels"/.  That was a misnomer:
-this table has never had an =Aggregate Label= column and still does not.
-The seven WAVE-level =harmonize_food= tables do, but they cannot simply be
-unioned into one -- 14 Preferred Labels take two different Aggregate values
-across waves, 9 of this table's labels appear in no wave table at all, and
-one wave value carries mojibake.  Adding a country-level Aggregate column is
-curation gated on the CFE beta-spread test, deliberately out of GH #783's
-scope.
+The heading formerly read /the "Aggregate Labels"/.  That was a misnomer
+when GH #783 moved the table: it had no =Aggregate Label= column then, and
+the seven WAVE-level =harmonize_food= tables' columns could not simply be
+unioned (they disagreed on 13 labels, and the "9 orphans" recorded at the
+time were a join artefact -- see =slurm_logs/ghanalss_aggregate_labels/FINDINGS.org=).
+*It has one since 2026-09-17*, curated through the CFE beta-spread gate on
+the served (country) axis that GH #935 established -- see /The country
+=Aggregate Label= column/ under /One food vocabulary, not seven/ below.
 ** DONE conversion_to_kgs.json -- intentionally NOT used
 The canonicalization fills missing quantities via the inverse market-price
 ladder (=transformations.median_price_valuation=) in native units, which
@@ -3320,6 +3320,94 @@ The =Aggregate Label= axis had the *same* six drifts and is user-visible
 through =labels='Aggregate'=; it was fixed in the same pass, along with an
 encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
 followed by two mojibake =Ê= characters, a twin of code 254's clean label).
+
+/Correction, 2026-09-16./  "User-visible through =labels='Aggregate'="
+above overstated it: =Country._relabel_j= reads the COUNTRY table only, and
+the wave =Aggregate Label= columns are never consumed by the API.  They are
+configuration checked for spelling drift, not live aggregation rules.
+
+*** The country =Aggregate Label= column (2026-09-17, supersedes PR #937)
+
+=_/categorical_mapping.org= =harmonize_food= now carries an =Aggregate
+Label= for every one of its 215 Preferred Labels, so
+=Country('GhanaLSS').food_expenditures(labels='Aggregate')= resolves
+(215 -> 209 groups) and =Feature('food_expenditures')(['GhanaLSS'],
+labels='Aggregate')= no longer drops the country.  A blank cell would be a
+silent merge, not a partial feature (GH #925), which is why the column is
+complete and a singleton carries its own name.
+
+*Why this had to be done twice.*  PR #937 (2026-09-16) published the same
+column keyed on the =j= the API served that day -- the WAVE vocabulary,
+because the wave->country crosswalk (=ghanalss.to_country_food_labels=,
+GH #935) was not yet applied.  Its 47 appended "API-delivered" rows
+(=Cassava (fresh)=, =Guinea corn/sorghum=, =Mutton=, =Rice (imported)=,
+...) were exactly the leaked labels, and its partition named =Cassava
+(flour)= where the country table now says =Gari=.  After #935 the served
+axis is a bijection onto the country table (=inventory.yml=: 215 delivered
+= 215 declared, nothing appended), and the selection was re-made on it.
+
+*The gate.*  =SkunkWorks/aggregation/ghana_gate.py= applies the parent
+skill's rule verbatim -- =max(beta) - min(beta) < 1.348 * sigma_min= over a
+group's members, beta and sigma from ONE CFE fit containing every member
+(CFE's beta is a rank-1 factor identified up to a per-fit scale; sigma is
+CFEDemands' resampling bootstrap).  Primary population: the 2016-17
+purchased fine fit / member probe on PR #937's seed-20260916 training
+split; the full 2016-17 wave where the split cannot jointly identify a pair
+(=prepare_data= keeps a pair only if >= 30 households report BOTH --
+=Macaroni= x =Spaghetti= is 45 in the whole wave).  A group must also pass
+in every other wave where two or more of its members are delivered
+(2012-13, 2005-06, 1998-99 on the full wave; 1991-92 is not gated because
+its 14-day rural / 30-day urban windows are not absorbed by a Region
+market).  Every renamed or split #935 label was given a candidate so the
+decision is made, not inherited:
+
+| group                      | members                                              | primary ratio | other waves            |
+|----------------------------+------------------------------------------------------+---------------+------------------------|
+| =Sugar (cubed/granulated)= | Sugar (cubed), Sugar (granulated)                    | 0.96          | merges only in 2016-17 |
+| =Malt Drinks=              | Malt Drinks (bottle), Malt Drinks (canned)           | 0.80          | merges only in 2016-17 |
+| =Macaroni/Spaghetti=       | Macaroni/Spaghetti, Macaroni, Spaghetti              | 0.27 (full wave) | merges only in 2016-17 |
+| =Millet/Sorghum=           | Millet/Sorghum, Millet, Guinea Corn/Sorghum          | 0.62          | 0.12 / 0.96 / 0.12     |
+
+Generic =Sugar= (1987-88..2012-13) is deliberately outside the sugar group
+(its GLSS1 source label is "Sugar, candy, honey and sugarcane"), so the
+sugar series is NOT continuous across the 2016-17 split; the pasta and
+millet groups take the GLSS1/2 coarse label's name so theirs are.  =Millet
+(flour)= is not in the millet group: the four-member group fails on it
+(ratio 3.45), so the GLSS1/2 label, whose question covered flour, joins a
+group slightly narrower than it.
+
+*What was rejected, and why it matters for the #935 splits.*  =Rice=
+(imported/local; 3.7, and 3.2 / 1.0 in 2012-13 / 2005-06), =Gari=
+(white/yellow; 3.1), =Fish (smoked)= (river/sea; 2.0), =Oil (palm)/Shea
+Butter= (3.6 in 2016-17 and >2.8 in every earlier wave -- the north/south
+difference #935 noted), =Cocoa Powder= with the malted drinks (2.5),
+=Bread=/=Sugar Bread= (3.5) all fail: the fine labels #935 created carry
+different loadings and stay distinct on the Aggregate axis too.
+=Goat=/=Mutton= passes every 2016-17 run but fails 2012-13 (1.08), and
+=Beer=/=Pito= fails 2012-13, 2005-06 and 1998-99 -- both stay split, which
+is also what @ligon ruled on the fine axis.  PR #937's =Fish
+(kapla/tilapia)= fails the primary (1.17) and is dropped.  =Margarine= /
+=Margarine/Butter= never co-occur (no =Butter= label exists to test
+against), =Potato= / =Sweet Potato= have no purchased co-occurrence, and
+=Gin=/=Whisky=/=Schnapps=, =Coconut (fresh)=/=(dried)=, the pork cuts and
+sausages never share 30 households in 2016-17 on any population: all are
+singletons by default, recorded in =selected_groups.yml= =rejected:= with
+the numbers.  =Crab=/=Shrimp= is the one case where the populations
+disagree (primary 1.21 fails; full wave 0.31 passes) -- the primary decides
+and it is flagged for a human.
+
+*Held-out check* (=validation.org=): the selected map is refitted and
+scored on PR #937's design (Salt anchor, Onion/Egg reserved, =min_goods=1=
+explicitly -- whether the ranking is stable in =min_goods= is GH #939).  As
+with #937, this is a conservative semantic partition with its statistics
+disclosed, not a claim of improved welfare precision.
+
+*Cache.*  =_/categorical_mapping.org= is in every GhanaLSS table's input
+hash, and so is =_/nutrition.py= (its =_load_food_codes= now recognises
+=YYYY-YY= wave columns explicitly so the new column is not read as a wave):
+the whole country re-warmed once.  The default =j= does not read the
+column, so the four =food_prices= / =food_quantities= pins in
+=tests/test_currency_denominated_units.py= are unchanged.
 
 *Why a rename here is provably safe.*  For the six singular/plural pairs, both
 variants share the collision key, so the measured "0 internal collisions per

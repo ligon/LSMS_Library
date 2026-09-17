@@ -1,0 +1,85 @@
+wave,basis,aggregate,members,n_members,n_positive_sample,largest_member_support,additional_hh_vs_best_member,mean_members_when_positive,n_hh_multiple_members,weighted_prevalence
+1991-92,purchased,Beer/Pito,Beer; Pito,2,888,504,384,1.0686936936936937,61,0.1963298695556047
+1991-92,purchased,Goat/Mutton,Goat; Mutton,2,550,350,200,1.1236363636363635,68,0.12160070749502543
+1991-92,purchased,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,302,200,102,1.3112582781456954,94,0.06676984302454124
+1991-92,purchased,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,3350,2602,748,1.211641791044776,709,0.7406588547424275
+1991-92,total,Beer/Pito,Beer; Pito,2,888,504,384,1.0686936936936937,61,0.1963298695556047
+1991-92,total,Goat/Mutton,Goat; Mutton,2,550,350,200,1.1236363636363635,68,0.12160070749502543
+1991-92,total,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,302,200,102,1.3112582781456954,94,0.06676984302454124
+1991-92,total,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,3350,2602,748,1.211641791044776,709,0.7406588547424275
+1998-99,purchased,Beer/Pito,Beer; Pito,2,2138,1926,212,1.047708138447147,102,0.3803578739889148
+1998-99,purchased,Goat/Mutton,Goat; Mutton,2,0,0,0,,0,0.0
+1998-99,purchased,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,314,210,104,1.2261146496815287,71,0.06224052046665432
+1998-99,purchased,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,4887,4112,775,1.2529158993247391,1236,0.8053852317571586
+1998-99,total,Beer/Pito,Beer; Pito,2,2138,1926,212,1.047708138447147,102,0.3803578739889148
+1998-99,total,Goat/Mutton,Goat; Mutton,2,83,68,15,1.0240963855421688,2,0.013782617772436383
+1998-99,total,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,650,434,216,1.54,286,0.11805180957537156
+1998-99,total,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,4929,4112,817,1.2509636843173058,1237,0.8162573962173922
+2005-06,purchased,Beer/Pito,Beer; Pito,2,1839,1121,718,1.068515497553018,126,0.1751022670645353
+2005-06,purchased,Bread (including sugar bread),Bread; Sugar Bread,2,7129,5627,1502,1.292607658858185,2086,0.8597095979208906
+2005-06,purchased,Goat/Mutton,Goat; Mutton,2,1847,1437,410,1.1689225771521385,312,0.21479712401042564
+2005-06,purchased,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,720,465,255,1.211111111111111,152,0.0534939855876534
+2005-06,purchased,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,3108,2984,124,1.0176962676962678,55,0.3844633069240808
+2005-06,purchased,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,6425,5430,995,1.1514396887159533,973,0.7451852841878669
+2005-06,purchased,Rice,Rice (imported); Rice (local),2,6597,5012,1585,1.0929210247082006,613,0.7846185431427091
+2005-06,purchased,Spirits (gin/whisky/schnapps),Schnapps; Whisky,2,352,272,80,1.0625,22,0.044571702468682944
+2005-06,total,Beer/Pito,Beer; Pito,2,1839,1121,718,1.068515497553018,126,0.1751022670645353
+2005-06,total,Bread (including sugar bread),Bread; Sugar Bread,2,7129,5627,1502,1.292607658858185,2086,0.8597095979208906
+2005-06,total,Goat/Mutton,Goat; Mutton,2,1914,1496,418,1.1687565308254964,323,0.22133173861602998
+2005-06,total,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,1314,834,480,1.386605783866058,431,0.10002706311169102
+2005-06,total,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,3108,2984,124,1.0176962676962678,55,0.3844633069240808
+2005-06,total,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,6848,5767,1081,1.155519859813084,1065,0.7862770244065149
+2005-06,total,Rice,Rice (imported); Rice (local),2,6830,5012,1818,1.0920937042459737,629,0.8020747319961058
+2005-06,total,Spirits (gin/whisky/schnapps),Schnapps; Whisky,2,352,272,80,1.0625,22,0.044571702468682944
+2012-13,purchased,Beer/Pito,Beer; Pito,2,3256,2190,1066,1.145884520884521,475,0.14146124412905212
+2012-13,purchased,Bread (including sugar bread),Bread; Sugar Bread,2,14054,10303,3751,1.2686779564536788,3776,0.8825492210341402
+2012-13,purchased,Goat/Mutton,Goat; Mutton,2,3671,2870,801,1.1269408880414056,466,0.22618926175211437
+2012-13,purchased,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,1185,872,313,1.1789029535864979,212,0.037179876603563214
+2012-13,purchased,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,5643,5380,263,1.023037391458444,130,0.37840924783486074
+2012-13,purchased,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,10565,8601,1964,1.1419782300047325,1500,0.6141353186563635
+2012-13,purchased,Rice,Rice (imported); Rice (local),2,12595,8661,3934,1.1069472012703454,1347,0.7718747995101616
+2012-13,purchased,Spirits (gin/whisky/schnapps),Schnapps; Whisky,2,803,662,141,1.0672478206724783,54,0.04320056009780268
+2012-13,total,Beer/Pito,Beer; Pito,2,3256,2190,1066,1.145884520884521,475,0.14146124412905212
+2012-13,total,Bread (including sugar bread),Bread; Sugar Bread,2,14054,10303,3751,1.2686779564536788,3776,0.8825492210341402
+2012-13,total,Goat/Mutton,Goat; Mutton,2,3824,3005,819,1.1297071129707112,496,0.23291614785706163
+2012-13,total,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,2356,1384,972,1.3790322580645162,824,0.06715179610638447
+2012-13,total,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,5643,5380,263,1.023037391458444,130,0.37840924783486074
+2012-13,total,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,11326,9166,2160,1.1432103125551827,1622,0.6516674575436464
+2012-13,total,Rice,Rice (imported); Rice (local),2,13365,8661,4704,1.10662177328844,1425,0.7992987719085509
+2012-13,total,Spirits (gin/whisky/schnapps),Schnapps; Whisky,2,803,662,141,1.0672478206724783,54,0.04320056009780268
+2016-17,purchased,Beer/Pito,Beer; Pito,2,1627,903,724,1.1044867854947757,170,0.08741216778517376
+2016-17,purchased,Bread (including sugar bread),Bread; Sugar Bread,2,11318,8786,2532,1.4337338752429758,4909,0.8771382950775809
+2016-17,purchased,Cocoa Powder,Cocoa (milk powder beverages); Cocoa Powder,2,5118,5058,60,1.006252442360297,32,0.42430808363922123
+2016-17,purchased,Coconut (fresh/dried),Coconut (dried); Coconut (fresh),2,1425,1395,30,1.0105263157894737,15,0.14162630993262929
+2016-17,purchased,Crab and shrimp,Crab; Shrimp,2,709,555,154,1.0902679830747533,64,0.06643575370692403
+2016-17,purchased,Fish (canned or in oil/sauce),Fish (canned); Mackerel (processed); Tuna (processed),3,3898,2397,1501,1.25782452539764,948,0.35259200558253423
+2016-17,purchased,Fish (smoked),"Fish (smoked, river); Fish (smoked, sea)",2,7722,5238,2484,1.257187257187257,1986,0.6353419063777092
+2016-17,purchased,Gari,Gari (white); Gari (yellow),2,4312,3999,313,1.0282931354359925,122,0.3269519625006879
+2016-17,purchased,Spirits (gin/whisky/schnapps),Gin; Schnapps; Whisky,3,234,179,55,1.0555555555555556,13,0.012563554333814488
+2016-17,purchased,Goat/Mutton,Goat; Mutton,2,1269,1142,127,1.0969267139479906,123,0.09854249051251252
+2016-17,purchased,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,777,433,344,1.2252252252252251,159,0.02825354772393343
+2016-17,purchased,"Fish (kapla/tilapia, fresh or frozen)",Kapla; Tilapia,2,3583,3018,565,1.0747976555958694,268,0.30454834401563285
+2016-17,purchased,Macaroni/Spaghetti,Macaroni; Spaghetti,2,832,543,289,1.0540865384615385,45,0.06601934149584866
+2016-17,purchased,Malt Drinks,Malt Drinks (bottle); Malt Drinks (canned),2,3356,2363,993,1.164481525625745,552,0.2751496520373067
+2016-17,purchased,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,3390,3353,37,1.0053097345132744,18,0.29602789458986645
+2016-17,purchased,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,6862,5497,1365,1.039055668901195,268,0.4882269755041595
+2016-17,purchased,Rice,Rice (imported); Rice (local),2,10333,7054,3279,1.1570695828897706,1623,0.7623410185620797
+2016-17,purchased,Sugar (cubed/granulated),Sugar (cubed); Sugar (granulated),2,8096,7971,125,1.0216156126482214,175,0.5438093108470602
+2016-17,total,Beer/Pito,Beer; Pito,2,1627,903,724,1.1044867854947757,170,0.08741216778517376
+2016-17,total,Bread (including sugar bread),Bread; Sugar Bread,2,11318,8786,2532,1.4337338752429758,4909,0.8771382950775809
+2016-17,total,Cocoa Powder,Cocoa (milk powder beverages); Cocoa Powder,2,5118,5058,60,1.006252442360297,32,0.42430808363922123
+2016-17,total,Coconut (fresh/dried),Coconut (dried); Coconut (fresh),2,1673,1643,30,1.0089659294680215,15,0.15727481012107328
+2016-17,total,Crab and shrimp,Crab; Shrimp,2,709,555,154,1.0902679830747533,64,0.06643575370692403
+2016-17,total,Fish (canned or in oil/sauce),Fish (canned); Mackerel (processed); Tuna (processed),3,3898,2397,1501,1.25782452539764,948,0.35259200558253423
+2016-17,total,Fish (smoked),"Fish (smoked, river); Fish (smoked, sea)",2,7722,5238,2484,1.257187257187257,1986,0.6353419063777092
+2016-17,total,Gari,Gari (white); Gari (yellow),2,4532,3999,533,1.0423654015887025,192,0.34176809340132785
+2016-17,total,Spirits (gin/whisky/schnapps),Gin; Schnapps; Whisky,3,234,179,55,1.0555555555555556,13,0.012563554333814488
+2016-17,total,Goat/Mutton,Goat; Mutton,2,1381,1232,149,1.0984793627805938,136,0.10286456534313122
+2016-17,total,Millet/Sorghum,Guinea Corn/Sorghum; Millet; Millet (flour),3,2176,1230,946,1.5284926470588236,923,0.06272456051583439
+2016-17,total,"Fish (kapla/tilapia, fresh or frozen)",Kapla; Tilapia,2,3583,3018,565,1.0747976555958694,268,0.30454834401563285
+2016-17,total,Macaroni/Spaghetti,Macaroni; Spaghetti,2,832,543,289,1.0540865384615385,45,0.06601934149584866
+2016-17,total,Malt Drinks,Malt Drinks (bottle); Malt Drinks (canned),2,3356,2363,993,1.164481525625745,552,0.2751496520373067
+2016-17,total,Milk (evaporated/condensed),"Milk (evaporated); Milk (tinned, condensed/unsweetened)",2,3390,3353,37,1.0053097345132744,18,0.29602789458986645
+2016-17,total,Oil (palm)/Shea Butter,Oil (palm); Shea Butter,2,7522,5896,1626,1.039351236373305,296,0.5167512829489571
+2016-17,total,Rice,Rice (imported); Rice (local),2,11089,7054,4035,1.1521327441608802,1687,0.7838211986365963
+2016-17,total,Sugar (cubed/granulated),Sugar (cubed); Sugar (granulated),2,8096,7971,125,1.0216156126482214,175,0.5438093108470602

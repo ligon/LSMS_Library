@@ -1,0 +1,340 @@
+#+title: Semantic constraints for country-specific food aggregation
+#+author: Sue
+#+date: 2026-09-16
+#+options: toc:2
+
+* Proposed first version
+
+Store a small, reviewed specification of which foods may be grouped within
+each country. Its central object is a /semantic pool/: a set of fine items
+whose joint interpretation a curator is willing to defend. Statistical
+search may split a pool arbitrarily. Combining pools requires an explicit
+exception for the entire proposed group.
+
+This implements the semantic part of the [[file:cfe_aggregation.org::*Practical semantic constraints in LSMS Library][aggregation notes]]. Permission to
+consider a group says nothing about its beta dispersion, precision, or
+effect on household coverage. Those belong to the statistical evaluator.
+In particular, a sparse item with no estimated beta has not passed a beta
+test merely because a curator has assigned it to a pool.
+
+Start with Uganda's existing food labels and a few defensible pools. Keep
+the remaining items as named singletons pending review. This produces a
+usable constraint set without requiring complete curation of every food,
+an embedding service, or a taxonomy shared across countries.
+
+* Existing machinery and its limits
+
+Use =Country.categorical_mapping= to obtain =food_items=, falling back to
+=harmonize_food=, as [[file:../lsms_library/country.py::3031][Country._relabel_j]] already does. Exact =Preferred
+Label= strings identify the fine items. Raw codes can repeat a Preferred
+Label; preserve their provenance, but curate that label once. If rows with
+the same Preferred Label supply conflicting proposed assignments, report
+the conflict before constructing a dictionary.
+
+Existing =Aggregate Label= or =Aggregate= columns supply seed pools.
+Questionnaire categories and other columns can supply further evidence.
+Keep that evidence distinct from a reviewed semantic decision. The
+[[file:../.claude/skills/add-feature/food-acquired/SKILL.md::419][existing 50-percent beta-spread rule]] is prior practice, but the
+[[file:cfe_aggregation_review.org::*Merge proposals should respect approximation error and uncertainty][review]] explains why it doesn't establish economically small approximation
+error. This proposal therefore does not treat an existing Aggregate group
+as certified by that rule.
+
+The [[file:../.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md][Aggregate-label contract]] and [[file:../docs/guide/label-selection.md::66][labels interface]] remain the integration
+points for publishing a chosen partition. A scalar =labels== selects a
+stored column; a dictionary names target columns and their variants. A
+dictionary of food-to-group assignments is a different object and should
+not be passed as =labels==.
+
+The [[file:cross_country_label_harmonization.org][cross-country harmonization sketch]] is explicitly unimplemented.
+Reuse familiar display names when their meanings match, but do not make
+two countries' groups equivalent merely by giving them the same name.
+Country-specific meaning is sufficient for this first implementation.
+
+* Minimal record
+
+Add one optional =food_semantics.yml= beside a country's
+=categorical_mapping.org=. It records semantic decisions; it is not
+another copy of the questionnaire label table. Resolve it through the
+country's configured path, following [[file:../lsms_library/recall.py::334][recall.yml]] and the
+[[file:../.coder/ledger/STANDING.md][standing ledger's]] path and runtime-read-only conventions.
+
+The required fields are:
+
+- Header :: Schema version, country, covered waves, and the food-label
+  table used. Record the source revision and a digest of its relevant
+  rows when generating the draft.
+- Pools :: An identifier, display name, and a short definition explaining
+  which preparation, preservation, or purchasing distinctions matter.
+  Pool membership is defined by accepted item assignments below. Review
+  status, reviewer, date, reviewed wave scope, and digests of the approved
+  membership and supporting source rows make approval of the whole pool
+  checkable. The approval also records the definition it covers.
+- Items :: One record per Preferred Label, with proposed pool, status
+  (=draft=, =accepted=, or =unresolved=), reason, and evidence references.
+  Accepted records also name their reviewer and review date. A missing
+  pool is allowed for unresolved items.
+- Separate items :: An explicit list of goods required to remain
+  singletons, with reasons. These restrictions apply even to exceptions.
+- Exceptions :: Exact sets of fine items allowed to cross pool boundaries,
+  with a display name, rationale, evidence, and the same approval fields
+  as pools, including membership/source digests and reviewed wave scope.
+  Empty in the initial version unless a concrete application needs one.
+
+For example, the following is a /draft fragment/, not an accepted Uganda
+map. The cited labels occur in the country's [[file:../lsms_library/countries/Uganda/_/categorical_mapping.org::19][harmonize_food table]]. A
+complete file would enumerate the rest of its inventory too.
+
+#+begin_example
+schema_version: 1
+country: Uganda
+waves: ['2019-20']
+label_table: harmonize_food
+source_revision: 71f1f7c55
+pools:
+  matoke:
+    label: Matoke
+    definition: Matoke distinguished by purchase unit, not preparation.
+    status: draft
+  fish_fresh:
+    label: Fish (fresh)
+    definition: Fish explicitly identified as fresh in the source label.
+    status: draft
+items:
+  'Matoke (bunch)':
+    pool: matoke
+    status: draft
+    reason: Existing Matoke aggregate; label distinguishes purchase unit.
+    evidence: ['categorical_mapping.org::harmonize_food, Code 101']
+  'Matoke (cluster)':
+    pool: matoke
+    status: draft
+    reason: Existing Matoke aggregate; label distinguishes purchase unit.
+    evidence: ['categorical_mapping.org::harmonize_food, Code 102']
+  'Mukene':
+    pool: fish_fresh
+    status: unresolved
+    reason: Existing aggregate says fresh; Preferred Label gives no form.
+    evidence: ['categorical_mapping.org::harmonize_food, Code 1237']
+separate_items: []
+exceptions: []
+#+end_example
+
+The header's covered waves are a review claim, not an inference from a
+country-wide table. An assignment must make sense in every requested wave.
+If its meaning differs across waves, use a narrower policy scope initially;
+do not silently let the same fine label change its group within a fit.
+The example's 2019-20 scope still requires checking item availability and
+meaning for that wave before acceptance.
+
+Store the loaded policy's content digest with each evaluated partition.
+Also record the expenditure basis and selected waves in the evaluation
+record. Recall evidence remains in the existing recall records; a semantic
+label does not certify common measurement errors or commensurable windows.
+
+* Whole-group decision rule
+
+Expose a small pure interface in a new =food_semantics= module. The names
+below are proposed, not existing API:
+
+#+begin_src python :tangle no :eval never
+policy = load_food_semantics(country, waves=waves, items=fine_items)
+decision = policy.check_group({'Matoke (bunch)', 'Matoke (cluster)'})
+report = policy.check_partition(groups)
+#+end_src
+
+=fine_items= is the fixed item universe supplied to the evaluator before
+sample filtering. Resolve item identities against the source mapping,
+then attach the semantic records. Items absent from either the source
+mapping or the semantic record receive an unresolved status and appear
+in the review report; they remain available as singletons. Names outside
+=fine_items= in a proposed group, duplicate membership, an empty group,
+or a malformed policy are input errors.
+
+Each decision returns =allowed=, =blocked=, or =needs_review=, together
+with the fine members, the rule invoked, and the reason. Apply these rules
+in order:
+
+1. A singleton is allowed, including an unresolved item. This keeps the
+   original observation available without claiming to understand a merge.
+2. A group of two or more containing a separate item is blocked.
+3. A requested wave outside the reviewed scope, or any draft or unresolved
+   constituent, makes a merge =needs_review=.
+4. A group contained in one accepted pool is allowed only if every
+   constituent's assignment is accepted, the stored membership and source
+   digests match the current complete pool membership and supporting rows,
+   its definition is unchanged, and its approved wave scope covers every
+   requested wave. A stale approval cannot satisfy this rule.
+5. A group equal to an accepted exception's entire member set is allowed
+   only if its membership and source digests are current, its approved
+   rationale is unchanged, and its reviewed wave scope covers every
+   requested wave. These freshness checks are the same as for pools.
+   Exceptions do not authorize their union with another exception or pool.
+6. If neither permission rule succeeds, an otherwise matching pool or
+   exact exception whose approval is absent, stale, or outside its reviewed
+   wave scope yields =needs_review=. Any remaining group is blocked, with
+   the incompatible pools named.
+
+Pools are disjoint because an item has one assignment. A curator accepts
+the definition /and the complete membership/ together; additions reopen
+that pool for review rather than inheriting its approval. Thus a pool is a
+claim about all its members, not a chain of separately approved pairs.
+A proposed pool on a draft or unresolved item does not yet confer
+membership, so that outstanding question needn't suspend accepted foods.
+If an application needs to allow ={a,b}= and ={b,c}= while forbidding
+={a,b,c}=, keep the ordinary pools separate and record the two exact
+exceptions. Checking a union always expands back to fine members.
+Candidate generation should offer a complete exception directly; an
+agglomerative search cannot assume its intermediate pairs are permitted.
+
+A partition must cover each input item exactly once. Unresolved items
+are emitted individually, never combined under =Unknown= or =Other=.
+Statistical exclusion is recorded separately. The report distinguishes
+semantic coverage from estimation support: it can count reviewed items,
+permitted groups, blocked groups, and outstanding questions without
+looking at beta estimates or household expenditures.
+
+Keep a group's member set as its identity and its display name separately.
+Two different subsets of =Fish (fresh)= must not acquire the same output
+label and then collapse accidentally. When exporting a partition, require
+unique labels for distinct groups; singletons retain their Preferred Label.
+
+* Seed cases worth reviewing
+
+Uganda's existing table provides several useful first decisions. These
+are proposals based on recorded labels, not questionnaire adjudications:
+
+- Matoke :: =Matoke (bunch)=, =(cluster)=, =(heap)=, =(sack)=, and
+  =(piece)= are plausible members of one pool. Review =(??)= and
+  =(other)= explicitly before including them. Unit words should not be
+  stripped automatically from arbitrary labels.
+- Fish :: The current map already separates fresh and dried fish.
+  =Tilapia (fresh)= and =Perch (fresh)= are clear seed candidates for
+  a fresh-fish pool; their dried counterparts seed another. =Mukene=
+  is currently assigned to =Fish (fresh)=, but its label alone doesn't
+  identify preservation. Keep that assignment unresolved until its
+  documentation is checked. This is uncertainty about the seed, not a
+  finding that the existing assignment is wrong.
+- Sweet potatoes :: One current aggregate contains fresh, dry, flour,
+  and white/orange variants. Start with separate pools by form and
+  consider relaxing that restriction explicitly. A broad existing
+  aggregate does not settle the preservation question.
+- Food away from home :: =Restaurant (soda)= currently joins =Soda=.
+  Keep that as a review question about context and elicitation rather
+  than inferring equivalence from the shared drink name.
+- Residual labels :: =Other Foods= remains its own item. It is not a
+  destination for every food the curator cannot classify. Broad original
+  items such as =Other Fish (fresh)= can be reviewed for a defined fish
+  pool, but cannot be split into unobserved species.
+
+The table also contains =Cigarettes= and =Other Tobacco=. The evaluator
+must declare its item universe explicitly; neither a food-module location
+nor a semantic map is authority to include or silently delete such items.
+
+Country documentation matters even in this small exercise. Uganda's
+[[file:../lsms_library/countries/Uganda/_/CONTENTS.org::787][unit-handling section]] says unit labels are canonicalized separately from
+food labels and retain wave-specific provenance. Its [[file:../lsms_library/countries/Uganda/_/CONTENTS.org::2941][open nonfood recall
+entry]] explicitly preserves conflicting evidence about recall. That entry
+does not establish the food window: [[file:../lsms_library/countries/Uganda/_/recall.yml][the food recall record]] identifies
+2019-20 as one seven-day food instrument and leaves earlier food waves
+=not-recorded=. None of these gaps should be filled by a language model's
+guess. The proposal makes no new claim contradicting =CONTENTS.org=.
+
+* Drafting, review, and integration
+
+A deterministic draft command can read the existing labels, copy seed
+Aggregate assignments, and list ambiguous forms or conflicting rows.
+It should produce a proposed YAML file and a short Org review table.
+Its first useful output is the small queue of decisions a curator needs
+to make, not a similarity score for every possible pair of foods.
+
+A language model can optionally draft definitions and assignments from
+those labels and supplied documentation excerpts. Save the model/version,
+date, prompt or prompt digest, source paths and revisions, and the draft
+response with the proposal. Each suggested assignment must cite its
+evidence and state what remains uncertain. A numerical confidence supplied
+by the model is not a calibrated probability; =unresolved= is more useful
+when a local name or composite food lacks supporting documentation.
+The ordinary loader neither calls a model nor depends on one.
+
+Review pool membership in a table, with proposed members, existing
+Aggregate labels, source evidence, and unresolved questions visible
+together. Record accepted decisions and their reasons in version control.
+When labels or pool definitions change, show the affected memberships and
+require renewed acceptance of the affected pools. Keep other pools usable.
+For each fit, preserve the exact policy digest and the selected partition
+alongside the statistical results.
+
+Separate strict singletons from the existing [[file:../.claude/skills/add-feature/food-acquired/SKILL.md::447][carve-out convention]]. That
+convention can preserve an anchor's label while allowing other foods to
+join it. =separate_items= means exactly one member; it is appropriate for
+an untouched normalization anchor or a reserved validation good. Treating
+these two restrictions as synonyms would change the proposed experiment.
+
+The semantic module returns decisions and membership maps. It does not
+alter survey data or choose the partition. The statistical evaluator must
+apply an accepted partition to expenditure levels before taking logs,
+using the existing relabel-and-sum machinery's treatment of missing index
+keys and acquisition sources. Its fitting and scoring sample rules remain
+separate inputs.
+
+Once a partition is adopted for ordinary Country calls, the existing
+[[file:../lsms_library/util/orgtbl.py::65][add_or_update_column]] tool can write its /complete/ map to a deliberately
+named label column. Require zero unmapped items before publication: the
+tool's default =???= marker would otherwise combine unrelated unresolved
+foods. Export the selected partition, not the permissive pools, and do
+not overwrite =Aggregate Label= merely because a candidate fit ran.
+=food_expenditures(labels=...)= then uses the existing derived-table
+aggregation behavior; =reaggregate= is an internal flag, not a user kwarg.
+A stored label column applies across waves. Publish through that route
+only after reviewing the partition across the column's full wave scope;
+otherwise keep the narrower partition local to the evaluator. Complete
+export also means retaining identity mappings for out-of-scope items.
+
+* Implementation sequence and acceptance checks
+
+1. Add the metadata loader and pure group/partition validator, with no
+   CFE dependency. Seed Uganda from its existing table and keep unresolved
+   items as singletons. Use the existing Org reader and YAML utilities.
+2. Add the draft/review command, initially deterministic. Accept a few
+   Uganda pools after documentation review; optional model assistance can
+   be added without changing the file format or decision rule.
+3. Give the statistical evaluator the frozen policy and complete proposed
+   membership map. Add column export only when there is a chosen partition
+   to publish. A later search can use permitted pools to generate candidates.
+
+Meaningful tests for that implementation are:
+
+- Whole-group closure :: ={a,b}= and ={b,c}= exceptions must not permit
+  ={a,b,c}=; input order and the sequence of previous merges must not
+  change a decision.
+- Preservation and protection :: Fresh/dried pools remain distinct;
+  strict singletons block all multi-item groups, including exceptions.
+  Splitting a permitted pool is allowed.
+- Uncertainty and coverage :: A new source label remains an unresolved
+  singleton and is reported. No unknown label disappears, joins an
+  =Other= bucket, or inherits a seed's acceptance. Accepted exceptions
+  cannot override unresolved members or unreviewed wave scope.
+- Inventory integrity :: Repeated codes for one Preferred Label produce
+  one semantic item; contradictory assignments fail. Partitions with
+  omissions, duplicate membership, or duplicate output labels fail.
+- Reproducibility :: Source changes identify affected pools for review;
+  a saved policy and partition reproduce the same decisions. Loading is
+  read-only and requires neither microdata nor model access.
+- Approval freshness :: For a group still matching a pool, keep the status
+  =accepted= but change the pool's membership, supporting rows, or
+  definition without renewing approval. Also test requested waves beyond
+  the reviewed scope. None may permit an early =allowed= result. Repeat
+  these checks for exact exceptions and their rationales; absent another
+  current permission, each case returns =needs_review=.
+- Integration :: On a synthetic expenditure frame, exporting an accepted
+  partition preserves amounts and rows with missing ancillary index keys,
+  keeps distinct split groups separate, and reproduces the existing
+  [[file:../tests/test_food_labels.py::78][label-aggregation contract]]. Test incomplete export before it can write
+  a =???= group.
+
+This note is a proposal only. It uses git and ripgrep for repository
+exploration, the standing ledger for reuse conventions, and country
+documentation and stored labels for the examples. No survey build,
+microdata download, model call, or statistical comparison was performed.
+
+Signed: Sue.
