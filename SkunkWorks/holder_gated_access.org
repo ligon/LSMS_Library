@@ -183,7 +183,7 @@ classes with one mechanism.
 | =attestation=    | =entitlements.<class>.attested: <date>=  | plaintext             | serve if present, else refuse naming =protocol=       |
 | =api-key=        | =entitlements.<class>.api_key=           | plaintext             | validate once per process against =validate.nada_host=; refuse naming =protocol= |
 | =gpg-recipients= | a private key (optionally =key_id=)      | *ciphertext*, encrypted to every authorized user's public key | fetch ciphertext to L1, =gpg --decrypt=; refuse naming =protocol= if no key matches |
-| =unrecorded=     | --                                       | plaintext             | see Q2                                                |
+| =unrecorded=     | --                                       | plaintext             | see D5                                                |
 
 The "room for stricter" EL asked for on 2026-09-17 is the fourth row.  Under
 the accidental-violation threat model the first three are library-side
