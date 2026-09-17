@@ -470,12 +470,15 @@ Columns:
     #
     # Three distinct quantities were all spelled `Value`.  They share a dtype,
     # a grain and a currency, so nothing in the library could tell them apart
-    # and all three graded `sane`.  Summing the wrong one is silent.  The
-    # split is by WHAT ARITHMETIC IS LEGAL:
+    # and all three graded `sane`.  Summing the wrong one is silent.  (A
+    # FOURTH, `PurchaseValue`, was added 2026-09-16; it was never spelled
+    # `Value`, so it is an addition to the vocabulary, not one of the three.)
+    # The split is by WHAT ARITHMETIC IS LEGAL:
     #
     #   ValuePerAnimal  price per head          -- NOT additive
     #   HerdValue       stock total             -- additive over `animal`
     #   SalesValue      transaction-flow total  -- additive over `animal`
+    #   PurchaseValue   transaction-flow total  -- additive over `animal`
     #
     # Which one a country has is settled on the QUESTIONNAIRE WORDING (quoted
     # per column below), corroborated by a conditional test.  Correlation with
@@ -497,6 +500,15 @@ Columns:
     # sale happened is sale-linked -- but that alone does NOT prove it is a
     # total: Uganda 2011-12+ is also 0.0 and is still PER HEAD ("the value of
     # each sold").  Only the wording settles it, which is why it is quoted.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of the
+        construction behind a served value, NA on a reported row.  First
+        instance here: `GhanaLSS::livestock::9f-herd-value-from-unit-price`,
+        where Section 9 Part F records a price PER HEAD, so `HerdValue` is
+        constructed as HeadCount x ValuePerAnimal rather than read.
     HeadCount:
       type: float
       note: |
@@ -567,6 +579,23 @@ Columns:
         herd value, which is why neither country has a HerdValue -- an
         earlier reading that mapped these onto ValuePerAnimal would have
         relabelled an additive total as a unit price.
+    PurchaseValue:
+      type: float
+      monetary: true
+      note: |
+        Gross amount PAID for the animals BOUGHT during the recall window, in
+        local currency.  The purchase-side twin of `SalesValue`, and additive
+        over `animal` and over households for the same reason: it is a
+        transaction-flow total, not a rate.  `HeadAcquired` is its
+        denominator, exactly as `HeadSold` is `SalesValue`'s.
+
+        A FOURTH canonical value column, added deliberately (the vocabulary is
+        pinned by tests/test_currency_livestock_registry.py, whose docstring
+        asks for exactly that deliberation).  First declared by GhanaLSS, from
+        Section 9 Part F Q11 -- "How much did they pay altogether for all the
+        [ANIMAL] they bought during the past 12 months?" -- beside Q10, which
+        is `HeadAcquired`.  Nothing spelled it `Value`, so it is new rather
+        than a rename of one of the three.
     TLU:
       type: float
       note: |
@@ -687,6 +716,15 @@ Columns:
         `condition` above gives: a null index key is silently dropped by the
         first groupby that touches it.  Applied at cross-country assembly by
         `Index Info > missing_level_sentinels`, not baked into any parquet.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of the
+        construction behind a served value, NA on a reported row.  First
+        instance here: `GhanaLSS::crop_production::9b-sale-amount-per-unit`,
+        where Section 9 Part B records a per-unit sale AMOUNT rather than a
+        sale total, so `Value_sold` is constructed rather than read.
     KgFactor:
       type: float
       optional: true

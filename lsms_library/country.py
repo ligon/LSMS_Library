@@ -3092,10 +3092,60 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
-        rdict = (table[['Preferred Label', target]]
-                 .dropna()
-                 .set_index('Preferred Label')[target]
-                 .to_dict())
+        # A food the requested column does not label must keep its Preferred
+        # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
+        # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
+        # STRINGS for blank org cells, not NaN, so in a table whose blanks parse
+        # that way every unlabelled food was renamed to `''` -- and because
+        # food_expenditures / food_quantities call this with `reaggregate=True`,
+        # they were then SUMMED into a single unnamed `j` bucket.  Measured on
+        # GhanaLSS `labels='1987-88'`: 129 SERVED foods collapsed into one `''`
+        # bucket over 55,314 rows (6.2%), with Expenditure conserved -- so
+        # nothing was lost, it was silently merged, which is worse than an
+        # error and indistinguishable from a real category in the result.
+        #
+        # Three counts differ and only the third is "foods merged": 146 blank
+        # crosswalk ROWS -> 142 distinct Preferred Labels mapped to `''` -> 129
+        # of those that actually appear in the served frame.  An earlier version
+        # of this comment quoted the row count as the food count.
+        #
+        # 13 (country, column) pairs corpus-wide -- GhanaLSS all 8, GhanaSPS 4,
+        # Panama 1; worst GhanaLSS `1988-89` 143 and GhanaSPS `FCT Label` 77.
+        # Mali is NOT among them: its blanks are real NaN that `.dropna()`
+        # always caught, and the one row per column that looked affected was a
+        # blank-Preferred-Label row keying `'' -> ''`.  It bit exactly where
+        # `.dropna()` had nothing to catch: GhanaLSS's wave columns carry 0 NaN
+        # and 146 empty strings, Mali's carry 127 real NaN.
+        #
+        # Blank is treated as absent on BOTH sides: a blank key is not a food
+        # label to rename FROM, any more than a blank value is one to rename TO.
+        # (Those blank-key rows are themselves a parse artefact -- Mali's `| #
+        # ...` comment rows and GhanaSPS's trailing padding rows are read as
+        # data by `all_dfs_from_orgfile`.)
+        #
+        # THIRD BEHAVIOUR, deliberate: `to_dict()` was last-wins over all rows
+        # including blank ones, so a Preferred Label duplicated with a real
+        # label early and a blank later served `''`.  Filtering before the dict
+        # makes the real label from the sibling row win -- 6 served foods under
+        # `1987-88` (`Rice`, `Sugar`, `Cassava (flour)`, ...).  That follows the
+        # `.dropna()` principle (a real-then-NaN duplicate always served the
+        # real one) but it is NOT "keeps its Preferred Label", so it is stated
+        # here and pinned by test_relabel_j_duplicate_label_prefers_the_real_row.
+        #
+        # This costs NO cache invalidation -- measured, 0 of 119 country table
+        # hashes.  NOT because `_finalize_result` is in `_EXCLUDED_CALLABLES`:
+        # `_relabel_j` is not reached from there at all, but from the generated
+        # accessor in `Country.__getattr__` (:5015, :5083), AFTER
+        # `_aggregate_wave_data` has returned.  It is free because no
+        # `@build_transform`-tagged callable references it.  Moving this call
+        # INTO `_finalize_result` would change that.
+        #
+        # GH #787 covers the neighbouring case (a `j` absent from the dict
+        # passing through unrenamed); this is a `j` PRESENT in it and mapped to
+        # nothing.  Reproducer: slurm_logs/relabel_j_empty_string/.
+        pairs = table[['Preferred Label', target]].dropna()
+        rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
+                 if str(k).strip() != '' and str(v).strip() != ''}
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
@@ -3661,6 +3711,85 @@ class Country:
             except OSError:
                 pass
 
+    def _evict_stale_country_cache(self, method_name: str) -> None:
+        """Delete the L2-country parquet before the COUNTRY-level fallback runs.
+
+        The country tier's twin of :meth:`_evict_hashless_wave_caches`, and it
+        exists for the same reason one tier down: ``make`` is not a reliable
+        judge of whether its own output is current, so the only way to stop it
+        handing back an artefact it did not build is to remove the artefact.
+
+        **GH #866.**  ``run_make_target(method_name, wave=None)`` runs
+        ``make -s <data_root>/<C>/var/<table>.parquet`` and then returns the
+        first candidate path that ``exists()``.  With the target already on
+        disk, make has two ways to do nothing and exit 0 -- and both were
+        being read as success:
+
+        - **no rule for the target** -> ``... is up to date``, exit 0.  Five
+          cells: Nigeria ``crop_production``, ``livestock``,
+          ``people_last7days``, ``plot_inputs``, ``plot_labor``.
+        - **a rule, but mtime-skipped** -> a `data_scheme.yml` / country-module
+          edit moves the content hash without touching any prerequisite, so
+          make judges the target current.  Four cells: Ethiopia ``nutrition``,
+          EthiopiaRHS ``community_prices``, GhanaLSS ``nutrition``, Nigeria
+          ``anthropometry``.
+
+        Either way ``try_script`` -- the ONLY caller of a country's
+        ``_/<table>.py`` -- is never reached, the stale frame is served, and
+        the descent then writes it back stamped with the CURRENT expected hash.
+        That last step is what makes the defect permanent and invisible: every
+        later read grades ``fresh``, so a census of the corpus finds nothing.
+        Nigeria ``livestock`` was reproduced going 23,196 rows -> 5 rows served
+        and re-stamped with the correct hash.
+
+        Removing the file closes both forms **by construction** -- neither "up
+        to date" nor an mtime skip is reachable for a target that does not
+        exist -- where detecting one of them would not close the other.
+
+        Called from exactly one place: immediately before the country fallback
+        in ``load_from_waves``, and only when the caller passed
+        ``evict_country_cache=True``.  That placement is load-bearing, not
+        tidiness.  **13 Make rules across 12 countries consume a
+        library-managed ``var/*.parquet`` as a PREREQUISITE**, so deleting one
+        is not a local operation: ``Tanzania/_/Makefile:43`` needs
+        ``$(VAR_DIR)/cluster_features.parquet``, which is itself rule-less, so
+        deleting *that* and failing the rebuild would leave Tanzania's whole
+        food chain's make target hard-failing with ``No rule to make target``.
+        The country fallback is reached only when NO wave produced rows, so a
+        wave-produced table like ``cluster_features`` can never be deleted here
+        and that hazard is unreachable.  Evicting at the read gate instead --
+        i.e. for any stale country parquet -- would have walked straight into
+        it.
+        """
+        if method_name in JSON_CACHE_METHODS:
+            # Belt and braces.  No JSON-tier caller passes the flag, and
+            # `load_with_dvc_cache` routes these to `load_json_cache` before
+            # `load_dataframe_with_dvc` runs -- but `panel_ids.json` is a
+            # committed SOURCE (GH #914), and reasoning about reachability is
+            # how that got broken once already.  Assert "never deletes", not
+            # "never reached".
+            return
+        cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+        try:
+            cache_path.unlink(missing_ok=True)
+        except OSError as error:
+            # Not silent.  If the removal fails we are about to hand `make` the
+            # very file the gate refused, i.e. the defect is live again for this
+            # read -- and the descent will then re-stamp it.  "The fix did not
+            # apply" and "the fix applied" must not look the same.
+            warnings.warn(
+                f"GH #866: could not evict the stale country cache at "
+                f"{cache_path} ({error!r}); the {self.name}/{method_name} "
+                f"build may serve and re-stamp stale data",
+                category=UserWarning,
+                stacklevel=2,
+            )
+            return
+        logger.debug(
+            f"GH #866 evicted stale country cache before make/script fallback: "
+            f"{cache_path}"
+        )
+
     def _assert_built_required_columns(self, df: Any, method_name: str,
                                        scheme_entry: Any,
                                        is_script_path: bool) -> None:
@@ -4007,7 +4136,7 @@ class Country:
             df_local = map_index(df_local)
             return df_local
 
-        def load_from_waves(waves):
+        def load_from_waves(waves, *, evict_country_cache=False):
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -4143,6 +4272,17 @@ class Country:
                 if len(non_empty_df) > 1:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
+
+            # GH #866: no wave produced rows, so the country-level
+            # make/script fallback is about to run -- and `try_make` would
+            # otherwise be handed the very parquet the read gate refused, call
+            # it a successful build, and re-stamp it as fresh.  Remove it
+            # first, so make either has no rule (exit 2 -> `try_script` runs
+            # the country script) or has one and must actually run the recipe.
+            # Gated by the caller: see `evict_country_cache` in
+            # `load_dataframe_with_dvc`.
+            if evict_country_cache:
+                self._evict_stale_country_cache(method_name)
 
             country_fallback = run_make_target(method_name, wave=None)
             if isinstance(country_fallback, dict):
@@ -4381,6 +4521,29 @@ class Country:
                             stacklevel=2,
                         )
 
+            # GH #866: everything below is the rebuild descent, so we have
+            # already decided not to serve `cache_path` -- it graded STALE, or
+            # fresh-but-coverage-short, or LSMS_NO_CACHE skipped the gate
+            # entirely, or it is absent, or it would not read.  In all of those
+            # the country-level make/script fallback must not be handed it back.
+            #
+            # The one case where it must NOT be deleted is a request this
+            # descent is not going to replace.  `build_waves` is the UNION of
+            # the request and the cache's own coverage (GH #891), so a stale or
+            # coverage-short descent normally rebuilds everything the parquet
+            # covered and the test passes.  What it excludes is
+            # `LSMS_NO_CACHE=1` with a strict subset of waves -- there the gate
+            # never ran, so no union was taken and `build_waves` is just the
+            # request.  If that subset happens to be barren, `load_from_waves`
+            # returns empty and reaches the country fallback holding a
+            # perfectly FRESH all-waves parquet; today's behaviour there is
+            # accidentally correct (the whole frame comes back and
+            # `_restrict_to_waves` filters it to the right empty frame), and
+            # deleting it would turn a correct answer into a hard failure.
+            evict_country_cache = (
+                {str(w) for w in build_waves} >= {str(w) for w in self.waves}
+            )
+
             dvc_root = self.file_path.parent
 
             repo: Repo | None = None
@@ -4392,7 +4555,7 @@ class Country:
                     if not stage_infos:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
-                        df = load_from_waves(build_waves)
+                        df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -4538,7 +4701,7 @@ class Country:
                                     combined_outputs = consolidate_stage_outputs(stage_outputs)
                                     if combined_outputs is not None:
                                         return combined_outputs
-                                    return load_from_waves(waves)
+                                    return load_from_waves(waves, evict_country_cache=evict_country_cache)
 
                         stage_outputs = collect_stage_outputs(stage_infos)
                         if not stage_outputs:
@@ -4568,7 +4731,7 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(build_waves)
+                df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)

@@ -140,4 +140,8 @@ produced_mask = f.index.get_level_values('s') == 'produced'
 f['Derivation'] = pd.Series(np.where(produced_mask, DERIVATION_12B, None),
                             index=f.index, dtype='string')
 
+# Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+# Pure rename; an unmapped label raises rather than passing through.
+from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
+f = to_country_food_labels(f, '1987-88')
 to_parquet(f, 'food_acquired.parquet')

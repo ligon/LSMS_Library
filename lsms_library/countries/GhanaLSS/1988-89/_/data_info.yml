@@ -80,3 +80,78 @@ individual_education:
         Educational Attainment:
             - GRADE
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
+crop_production:
+    # GLSS1/GLSS2 Section 9 Part B "CROPS" -- household-crop grain, no plot
+    # roster anywhere in Section 9 (plot_features is a C4-validated `not-asked`
+    # for these two waves).  Index (t, i, j) on the EthiopiaRHS precedent, the
+    # corpus's other plot-less country; `u` is deliberately ABSENT because the
+    # form asks no harvest quantity for a unit to describe -- see
+    # `_/CONTENTS.org` and slurm_logs/2026-09-16_panel_estimation/.
+    file: Y09B.DAT
+    idxvars:
+        i: HID
+        j:
+            - CROP
+            - mappings: ['agric_crop', 'Code', 'Label']
+    myvars:
+        # Q4: quantity SOLD, in `Unit_sold` -- NOT kilograms, and NOT the
+        # harvest.  The form never asks how much was harvested.
+        Quantity_sold: CROPS
+        Unit_sold:
+            - CROPSU
+            - mappings: ['agric_unit', 'Code', 'Label']
+        # Q5, asked only for unstarred (container) units: kilograms per ONE
+        # `Unit_sold`.  Carried for the analyst; `harvest_kg` cannot reach it,
+        # since that keys the factor to `u` and needs `Quantity`.
+        KgFactor: CROPSUK
+        # Q8 / Q10 / Q12: the market REPLACEMENT value of the part kept for
+        # seed, given to labourers / landowner / as gifts, and lost.  A
+        # different valuation basis from Value_sold, which is what the
+        # household RECEIVED.
+        Value_seed: CROPKV
+        Value_given: CROPPV
+        Value_lost: CROPLV
+        LossCause:
+            - CROPL
+            - mappings: ['agric_loss_cause', 'Code', 'Label']
+        # Q2: acres harvested.  Converted to hectares by the df_edit hook.
+        Area_ha: CROPH
+        intercropped: CROPD
+        # Helpers for the `crop_production` df_edit hook, which builds
+        # Value_sold from them and drops all three.
+        SaleAmount: CROPSP
+        SaleAmountUnit:
+            - CROPSPU
+            - mappings: ['agric_unit', 'Code', 'Label']
+        SoldUnitRaw:
+            - CROPSU
+            - mappings: ['agric_unit', 'Code', 'Label']
+
+livestock:
+    # Section 9 Part F, PDF p.53 block 9F.  See `_/data_scheme.yml` for why
+    # ValuePerAnimal is read and HerdValue derived, and not the reverse.
+    file: Y09F.DAT
+    idxvars:
+        i: HID
+        animal:
+            - LIVSTCD
+            - mappings: ['agric_animal', 'Code', 'Label']
+    myvars:
+        # Q4 "How many of all ages are owned by your household at present?"
+        HeadCount: LIVSTN
+        # Q5, per head -- NOT the herd (measured; see data_scheme.yml).
+        ValuePerAnimal: LIVSTNV
+        # Q7 / Q8 "How many have they sold?" / "How much altogether have they
+        # received from sales ... during the past 12 months?" -- a TOTAL.
+        HeadSold: LIVSTSN
+        SalesValue: LIVSTSV
+        # Q10 / Q11 "How many did they buy?" / "How much did they pay
+        # altogether for all the ... they bought?" -- also a total.
+        HeadAcquired: LIVSTBN
+        PurchaseValue: LIVSTBV
+        # Q12 born or received as gifts; Q13 eaten by the household;
+        # Q14 lost, stolen, given as gifts, sacrificed or died.
+        HeadBornOrReceived: LIVSTAD
+        HeadEaten: LIVSTE
+        HeadLostOrDied: LIVSTDI

@@ -318,6 +318,22 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     override it; Ethiopia inherits 100 kg from the global default, the shipped
     rung reclaims its rows, and the newly-served count returns to 43,384.
 
+    2026-09-15, GH #929 split the crop ladder's ``metric`` layer out of
+    ``inferred``, mirroring the food ladder since GH #850.  The counts below
+    move from ``inferred`` to ``metric`` WITHOUT changing: measured across
+    both splits, 0 of 85,519 ``kg_per_unit`` values differ, the NaN pattern is
+    identical, and ``Harvest_kg`` sums to the same 12,680,617.283538.  The
+    seeds were always inside the inference with precedence; only the label
+    they are counted under is new.  ``inferred`` is 0 in BOTH splits -- the
+    price-ratio inference contributes nothing to this country at all, which
+    was invisible while the two layers shared a bucket.
+
+    That this reads 26,548 rather than the 40,525 an earlier draft of #929
+    measured is GH #919: that draft was written on a base without it, while
+    ``quintal`` was still seeded into ``KNOWN_METRIC``.  The ratio assertion
+    below is left at ``> 6 *`` for the same reason -- #919 returned the
+    un-shipped total to 1,905,712 (ratio 6.654), so it holds as written.
+
     2026-09-10, GH #850 defect (c): the ``before`` split moved by ONE row,
     26,546 -> 26,547 ``inferred`` and 58,973 -> 58,972 ``none``.  That branch
     taught ``_parse_explicit_metric`` the plural / abbreviated metric
@@ -341,12 +357,17 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     after = harvest_kg(cp, shipped_factors=_load(ethiopia))
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["inferred"] == 26_548 and b["none"] == 58_971
+    assert b["metric"] == 26_548 and b["none"] == 58_971
     assert a["shipped"] == 62_164 and a["shipped_matched"] == 62_164
-    assert a["inferred"] == 7_768 and a["none"] == 15_587
+    assert a["metric"] == 7_768 and a["none"] == 15_587
+    # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
+    # as its own assertion rather than folded into the counts above: if the
+    # price-ratio inference ever starts serving this country, that is a fact
+    # about Ethiopia worth failing over, not a number to re-baseline.
+    assert b["inferred"] == 0 and a["inferred"] == 0
     assert a["shipped_implausible"] == 0
     assert sum(a[k] for k in ("reported", "shipped", "survey_median",
-                              "inferred", "none")) == len(cp)
+                              "metric", "inferred", "none")) == len(cp)
     # 2011-12 ships no factor file and must be UNTOUCHED.
     bt = before.groupby(level="t")["Harvest_kg"].sum()
     at = after.groupby(level="t")["Harvest_kg"].sum()

@@ -1,0 +1,249 @@
+schema_version: 2
+country: GhanaLSS
+status: draft
+author: Sue
+date: '2026-09-17'
+scope: >-
+  Delivered COUNTRY Preferred labels (the 215 labels PR #935 delivers through
+  ghanalss.to_country_food_labels); proposed merges require the beta-spread
+  gate. This supersedes the 2026-09-16 draft (PR #937), which was keyed on the
+  wave vocabulary that leaked before the crosswalk was applied -- its members
+  'Cassava (flour)', 'Cassava (white, flour)', 'Cassava (yellow, flour)' and
+  'Milk (tinned, condensed)' no longer exist on the served axis.
+source_revision: ff4c00f2b
+default: Keep every item not named below as its own singleton.
+gate: >-
+  max(beta) - min(beta) < 1.348 * sigma_min over the members, beta and sigma
+  from ONE fit containing every member (the 2016-17 purchased fine fit where
+  every member is identified there, else a probe fit of the members beside the
+  same dense reference foods). See ghana_gate.py. A member delivered in no
+  wave together with another member (a cross-wave coarse label such as Rice,
+  Gari, Fish (smoked), Millet/Sorghum) joins only if its within-wave
+  constituents pass -- the PR #937 precedent for Macaroni/Spaghetti.
+groups:
+  # --- PR #937's four selected groups, re-keyed where #935 renamed a member --
+  - id: sugar_refined
+    label: Sugar (cubed/granulated)
+    members: ['Sugar (cubed)', 'Sugar (granulated)']
+    reason: >-
+      Two physical forms of refined sugar (2016-17 only). Generic Sugar
+      (1987-88..2012-13) remains separate: its early-wave source label is
+      "Sugar, candy, honey and sugarcane", so it is not a pure-sugar item.
+    evidence:
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org: harmonize_food, Sugar (cubed)/(granulated)'
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org: broad Sugar source label'
+      - 'PR #937 selected_groups.yml: sugar_refined (same members, unchanged by #935)'
+  - id: malt_packaging
+    label: Malt Drinks
+    members: ['Malt Drinks (bottle)', 'Malt Drinks (canned)']
+    reason: >-
+      In 2016-17 packaging distinguishes the labels and several brands occur
+      in both; earlier waves carry only the bottle label. Packaging may proxy
+      serving size or household type.
+    evidence:
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org: harmonize_food, malt drink rows'
+      - 'PR #937 selected_groups.yml: malt_packaging (unchanged by #935)'
+  - id: pasta
+    label: Macaroni/Spaghetti
+    members: ['Macaroni/Spaghetti', 'Macaroni', 'Spaghetti']
+    reason: >-
+      GLSS1/2 ask one question ("Macaroni and Spaghetti"); 2016-17 separates
+      them. The coarse label names the group so the series is continuous
+      across waves. Excludes instant noodles, couscous and Other Cereal.
+    evidence:
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org: harmonize_food, code 305'
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org: harmonize_food, macaroni/spaghetti rows'
+      - 'PR #937 selected_groups.yml: pasta (same members; label changed to the coarse member)'
+  - id: fish_fresh_frozen_named
+    label: Fish (kapla/tilapia, fresh or frozen)
+    members: [Kapla, Tilapia]
+    reason: >-
+      Both 2016-17 purchase labels explicitly identify fresh/frozen fish,
+      distinguished by species. Keeps the preservation boundary; excludes
+      the historical broad Fish (fresh and frozen) label.
+    evidence:
+      - 'PR #937 additional_candidates.yml: fish_fresh_frozen_named (unchanged by #935)'
+  # --- labels PR #935 renamed or split: each needs its own decision ---------
+  - id: rice_unprepared
+    label: Rice
+    members: [Rice, 'Rice (imported)', 'Rice (local)']
+    reason: >-
+      Unprepared rice, distinguished by origin from 2005-06 on; GLSS1-4 ask
+      only "Rice". #935 split the country Preferred Label so the fine axis
+      keeps origin; whether the Aggregate axis re-joins it is this gate.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/TABLE_AUDIT.org: Issue 1, Rice'
+      - 'PR #937 validation.org: retained as singletons on appreciably different point loadings'
+  - id: gari
+    label: Gari
+    members: [Gari, 'Gari (white)', 'Gari (yellow)']
+    reason: >-
+      The raw labels are Garri/Gari in every wave (#935 renamed the former
+      "Cassava (flour)"); 2016-17 separates white and yellow gari. Excludes
+      fresh cassava, dough and Cassava (dried).
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Cassava (flour) renamed Gari; 2016-17 split'
+      - 'PR #937 validation.org: white/yellow retained as singletons'
+  - id: smoked_fish_origin
+    label: Fish (smoked)
+    members: ['Fish (smoked)', 'Fish (smoked, river)', 'Fish (smoked, sea)']
+    reason: >-
+      2016-17 separates river- and sea-smoked fish; 1991-92..2012-13 ask one
+      "smoked fish" question. Excludes Herring (smoked) and Salmon (smoked),
+      which are named species on every axis that carries them.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/TABLE_AUDIT.org: Issue 1, Fish (smoked)'
+  - id: millet_sorghum
+    label: Millet/Sorghum
+    members: ['Millet/Sorghum', Millet, 'Millet (flour)', 'Guinea Corn/Sorghum']
+    reason: >-
+      GLSS1/2 code 303 is "Millet, guinea corn or sorghua (grain or flour)":
+      one question over millet grain, millet flour and sorghum (= guinea
+      corn). From GLSS3 the instrument asks the three separately (#935
+      ruling, @ligon 2026-09-16). The 2016-17 constituents are the gate.
+    evidence:
+      - 'GhanaLSS/1987-88/_/categorical_mapping.org:139 (code 303)'
+      - 'GhanaLSS/2016-17/_/categorical_mapping.org:27-33 (codes 27, 30, 31)'
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Still open item 1 and item 5'
+  - id: palm_shea
+    label: Oil (palm)/Shea Butter
+    members: ['Oil (palm)/Shea Butter', 'Oil (palm)', 'Shea Butter']
+    reason: >-
+      GLSS1/2 code 329 is "Palm oil and shea butter"; from GLSS3 Shea Butter
+      is its own (large, northern) item. #935 notes north/south consumption
+      differs sharply, which is what the gate tests.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Still open item 6'
+  - id: cocoa_forms
+    label: Cocoa Powder
+    members: ['Cocoa Powder', 'Cocoa (milk powder beverages)']
+    reason: >-
+      #935 split the malted-drink group (Milo, Richoco, This Way; 2016-17
+      codes 556-560 less the two milk products moved out) from pure cocoa
+      powder. Same FCT family (13_028 Ovaltine) before the split.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/TABLE_AUDIT.org: Issue 1 and Issue 3'
+  - id: goat_mutton
+    label: Goat/Mutton
+    members: [Goat, Mutton]
+    reason: >-
+      #935 split Mutton out of Goat because the instrument lists them
+      separately in 1991-92..2016-17 (GLSS1/2 have only mutton). Two species;
+      the candidate exists so the split is a decision, not an omission.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Mutton split out of Goat'
+  - id: beer_pito
+    label: Beer/Pito
+    members: [Beer, Pito]
+    reason: >-
+      #935 gave Pito (sorghum beer) its own label (@ligon: keep distinct from
+      beer); it was Beer in 91/98/16 and Wine in 05/12. The candidate tests
+      whether the Aggregate axis should re-join them.
+    evidence:
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Pito given its own PL'
+  # --- PR #937's additional semantic candidates, on the corrected spellings ---
+  - id: crab_shrimp
+    label: Crab and shrimp
+    members: [Crab, Shrimp]
+    reason: Named 2016-17 crustaceans; the historical broad Crustacean label stays separate.
+    evidence:
+      - 'PR #937 additional_candidates.yml: crab_shrimp (unchanged by #935)'
+  - id: bread_types
+    label: Bread (including sugar bread)
+    members: [Bread, 'Sugar Bread']
+    reason: Sugar bread is a bread type; #935 added Sugar Bread to the country table (it was off-axis).
+    evidence:
+      - 'PR #937 additional_candidates.yml: bread_types'
+      - 'slurm_logs/ghanalss_aggregate_labels/LANDED.org: Gaps filled, Sugar Bread'
+  - id: named_spirits
+    label: Spirits (gin/whisky/schnapps)
+    members: [Gin, Whisky, Schnapps]
+    reason: Named spirits; Akpeteshie, Bitters and Other Spirits stay separate.
+    evidence:
+      - 'PR #937 additional_candidates.yml: named_spirits (unchanged by #935)'
+  - id: tinned_milk_forms
+    label: Milk (evaporated/condensed)
+    members: ['Milk (evaporated)', 'Milk (tinned, condensed/unsweetened)']
+    reason: >-
+      Tinned milk forms. The second member is the country Preferred Label
+      (#937 wrote the leaked wave spelling "Milk (tinned, condensed)").
+    evidence:
+      - 'PR #937 additional_candidates.yml: tinned_milk_forms (member re-keyed)'
+  - id: coconut_forms
+    label: Coconut (fresh/dried)
+    members: ['Coconut (fresh)', 'Coconut (dried)']
+    reason: Two forms of one food; dried coconut is a 2016-17-only, very sparse label.
+    evidence:
+      - 'PR #937 additional_candidates.yml: coconut_forms (unchanged by #935)'
+  - id: named_processed_fish
+    label: Fish (canned or in oil/sauce)
+    members: ['Fish (canned)', 'Tuna (processed)', 'Mackerel (processed)']
+    reason: Canned/processed fish forms named in 2016-17 beside the historical Fish (canned).
+    evidence:
+      - 'PR #937 additional_candidates.yml: named_processed_fish (unchanged by #935)'
+deferred_alternatives:
+  - id: chicken_cuts
+    label: Chicken cuts
+    members: ['Chicken (breast)', 'Chicken (thigh)', 'Chicken (wing)']
+    reason: Different cuts, bone/skin content and prices; live, broiler, gizzard and frozen stay outside.
+    evidence: ['PR #937 proposed_groups.yml: chicken_cuts']
+  - id: pork_cuts
+    label: Pork cuts
+    members: ['Pork (rib)', 'Pork (shoulder)', 'Pork (fillet)']
+    reason: Sparse named cuts (4-9 rows each); generic Pork and feet excluded.
+    evidence: ['PR #937 proposed_groups.yml: pork_cuts']
+  - id: smoked_fish_broad
+    label: Smoked fish (all species)
+    members: ['Fish (smoked)', 'Fish (smoked, river)', 'Fish (smoked, sea)', 'Herring (smoked)', 'Salmon (smoked)']
+    reason: The broad preservation-method group; overlaps smoked_fish_origin and is evaluated only as an alternative.
+    evidence: ['PR #937 proposed_groups.yml: smoked_fish']
+  - id: sausage
+    label: Sausage
+    members: ['Sausage (beef)', 'Sausage (pork)', 'Sausage (chicken)']
+    reason: A processed product family with different meat content; 10-118 rows each.
+    evidence: ['PR #937 proposed_groups.yml: sausage']
+  - id: dried_pepper_forms
+    label: Pepper (dried/powder)
+    members: ['Pepper (dried)', 'Pepper (powder)']
+    reason: >-
+      Dried and powdered pepper in 2016-17 (#937 wrote the wave spelling
+      "Pepper (dried, red)"; the country label is Pepper (dried)).
+    evidence: ['PR #937 additional_candidates.yml: dried_pepper_forms']
+  - id: millet_sorghum_grain
+    label: Millet/Sorghum (grain)
+    members: ['Millet/Sorghum', Millet, 'Guinea Corn/Sorghum']
+    reason: >-
+      The #935 ruling's own wording -- guinea corn IS sorghum, millet is a
+      close consumption substitute -- names the grains and not the flour.
+      Added after the first gate runs showed the four-member group failing
+      on Millet (flour); tested only on the full-wave population, where the
+      pairs are jointly identifiable.
+    evidence: ['slurm_logs/ghanalss_aggregate_labels/LANDED.org: Still open item 1']
+not_gateable:
+  - id: margarine_butter
+    label: Margarine/Butter
+    members: [Margarine, 'Margarine/Butter']
+    reason: >-
+      The two labels never co-occur in a wave (Margarine 91/98/16;
+      Margarine/Butter 87/88/05/12 -- the instrument conflates butter with
+      margarine in those rounds, #935 ruling) and 2016-17 has no separate
+      Butter label to test against. No within-wave constituent pair exists,
+      so the gate cannot be run. Default: singletons; a human decision.
+  - id: potato_sweet_potato
+    label: Potato/Sweet Potato
+    members: [Potato, 'Sweet Potato']
+    reason: >-
+      #935 folded GLSS1/2's "Potato or sweet potato" into Sweet Potato on a
+      judgement about Ghana; Potato (Irish) is 2016-17-only and Sweet Potato
+      in 2016-17 is own-production only, so the purchased-basis gate has no
+      co-occurrence. Default: singletons, honouring the #935 ruling.
+  - id: onion_shallot
+    label: Onion and shallot
+    members: [Onion, Shallot]
+    reason: Onion is a reserved prediction target of the validation design; not gated (PR #937 handling).
+singleton_cautions:
+  Sugar: Early waves also include candy, honey and sugarcane.
+  Beef: Includes Other cow/beef product in 2016-17; retain existing fine identity.
+  Goat: Since #935 excludes mutton; still includes live goat in 2016-17.
+  'Chicken (frozen)': Source says Other chicken product; do not infer a pure frozen-food category.
+  'Other ...': Retain each existing named category separately; do not create a residual pool.
