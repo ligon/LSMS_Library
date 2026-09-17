@@ -1,61 +1,413 @@
-#+title: Cfe Aggregation
+#+title: CFE Aggregation
 
 * Notes on CFE Aggregation of Foods
-** Some notation.  
-Let \(X_0\) be a \(J_0\times N_0\) data matrix, with \( J_0\) the number of distinct food items observed in the data, and \(N_0\) the number of households for which at least some food expenditures are observed. 
 
-Let \(A\) be a \(J\times J_0 \)matrix of ones and zeros, with \(J\leq J_0\), and let \(X_A := AX_0 \).
-Thus \(A\) /aggregates/ expenditures for each household.
+We want to aggregate goods within a country to improve estimates of
+\(w=-\log\lambda\), where \(\lambda\) is marginal utility of expenditure.
+Summing goods with similar Frisch elasticities can preserve their relation
+to welfare while rescuing sparse goods and the households that depend on
+them. Choosing an aggregation requires assessing both approximation error
+and statistical precision, together with household coverage.
 
-Let \(M_A = \one(X_A=0)\), and let \(D_{\underline{J}}\) be a linear operator such that \(D_{\underline{J}}X_A\) drops all columns of \(X_A\) for which the column sum of \(M_A\) is less than \(\underline{J}\). 
-** CFE Demands
-Let \(Y_A := \log X_A\).  Residualize \(Y_A\) by projecting on a set of household-time characteristics \(z\) and a complete set of good-time fixed effects, obtaining residuals \(R\).  Extract a single factor from the matrix \(R = \beta_Aw_A^\T + \varepsilon\) via SVD or principal components (see algorithm in =CFEDemands=); the vector \(\beta_A\) are the \(J_A\) Frisch elasticities associated with the different goods.  The sign of \(w\) is chosen such that the elements of (\beta_A\) are mostly positive, and we normalize using something like \(\var(w) = 1\).
+** Notation and support
+
+Let \(X_0\in\mathbb{R}_{\geq0}^{J_0\times N_0}\) contain expenditures
+on \(J_0\) distinct foods. Columns index household-period observations
+\(c=(i,t,m)\), with \(m\) denoting a market; for a single cross-section,
+\(N_0\) is simply the number of households. Every element is nonnegative.
+Within the survey's expenditure module, adopt the convention that
+unreported item expenditures are zero. Such entries can conceal missing
+responses or underreporting; the data need not identify these separately.
+The expenditure basis, recall treatment, and coverage of the questionnaire
+are fixed before choosing an aggregation.
+
+Let \(A\in\{0,1\}^{J\times J_0}\), with \(J\leq J_0\), assign each
+food to exactly one nonempty group:
+\[
+  \sum_{g=1}^J A_{gj}=1,\qquad \sum_{j=1}^{J_0} A_{gj}\geq1.
+\]
+Then \(X_A=AX_0\) aggregates expenditures. Excluding a good from estimation
+is a separate selection decision, not an unrecorded deletion from \(A\).
+
+Define the zero mask \(M_A=\mathbf{1}\{X_A=0\}\) and the positive mask
+\(O_A=1-M_A\). Nonnegativity implies that a group's positive support is
+exactly the union of its constituents' supports:
+\[
+  O_{A,gc}=\mathbf{1}\{\exists j:A_{gj}=1,\ X_{0,jc}>0\}.
+\]
+Thus a group can have adequate support even though its individual foods
+would be discarded. This can keep households in estimation. Aggregation
+does not increase a household's number of positive entries; its benefit
+comes from retaining usable groups and improving their joint support.
+
+A rule requiring at least \(\underline J\) positive groups retains columns
+for which
+\[
+  \sum_g O_{A,gc}\geq\underline J,
+  \qquad\text{equivalently}\qquad
+  \sum_g M_{A,gc}\leq J-\underline J.
+\]
+Once chosen, the retained columns can be selected by right multiplication
+\(X_A S_A\), where \(S_A\) is an \(N_0\times N_A\) selection matrix.
+The data-dependent rule choosing \(S_A\) is not itself a fixed linear
+operator. The current =prepare_data= instead uses a threshold expressed
+as a fraction of the number of goods, together with other filters.
+
+For the selected households, the matrix of paired positive-observation
+counts is
+\[
+  C_A=(O_A S_A)(O_A S_A)^\top.
+\]
+It has dimension \(J\times J\). Estimation through the current complete
+covariance matrix requires every retained pair to meet a minimum count
+\(C_{A,gh}\geq\underline c\), with a configurable threshold such as 30.
+A large number of supported pairs alone does not ensure this. Counts are
+necessary numerical safeguards, not guarantees of identification or
+precision.
+
+** CFE demands and aggregation
+
+Take logarithms only of positive expenditures. After accounting for
+household characteristics and good-market-period effects, the CFE model
+has a single-factor representation
+\[
+  R_{A,gc}\simeq\beta_{A,g}w_c+\varepsilon_{A,gc}.
+\]
+Whether this remains an adequate approximation after aggregation is part
+of the question. The target \(w\) is common to the candidate partitions;
+their estimates \(\hat w_A\) can differ. The \(\beta\)'s are Frisch
+elasticities. Choose the factor's sign so that most loadings are positive,
+and impose a common scale before comparing estimates across partitions.
+For example, common goods kept as singletons could anchor that scale.
+Normalizing each fitted factor on its own retained sample is insufficient
+to define a common latent target.
+
+*** Zeros and incomplete log data
+
+A zero in the expenditure matrix supplies no finite log observation.
+Thus the zero mask also describes unavailable entries in the log data,
+without identifying why each entry is unavailable. The
+[[file:/home/ligon/Projects/CovariateRiskSharing/Text/risk-sharing.org::2349][risk-sharing application]] likewise includes zeros for unreported food
+items. Aggregation should not require a classification of these entries
+into true zeros and missing responses that the survey cannot supply.
+
+There is also an economic reason for zeros. The
+[[file:/home/ligon/Research/VESDemand/Text/estimating_imue.org::451][household-production argument in estimating_imue.org]], also used in
+[[file:/home/ligon/Projects/CovariateRiskSharing/Text/risk-sharing.org::298][the risk-sharing paper]], permits corner solutions for purchased inputs
+while preserving CFE demands. If food inputs \(j\) produce a composite
+\(r\), input expenditures take the form
+\[
+  x_{rj}=\eta_{rj}(p)x_r,\qquad
+  x_r=b_r(p,z)\exp(\beta_r w),\qquad \eta_{rj}(p)\geq0.
+\]
+An unused input has \(\eta_{rj}=0\). Summing a fixed subset \(G\) gives
+\[
+  \sum_{j\in G}x_{rj}
+  =b_r(p,z)\left(\sum_{j\in G}\eta_{rj}(p)\right)\exp(\beta_r w).
+\]
+Whenever this sum is positive, its elasticity is exactly \(\beta_r\),
+including when some constituent expenditures are zero. Substitutable
+inputs to the same composite therefore supply a structural case for
+aggregation with complementary supports.
+
+For estimation, the manuscript treats unavailable expenditure observations
+as [[file:/home/ligon/Research/VESDemand/Text/estimating_imue.org::151][missing at random conditional on shadow prices, observed characteristics,
+and welfare]]. This permits zero patterns to vary with welfare. It is a
+restriction on the observation process, not a claim that every reported
+zero is a verified nonpurchase. Aggregate estimation still needs suitable
+conditional error moments; increased positive support alone does not
+establish them. Unreported positive amounts belong in sensitivity analysis
+of measurement and selection, without requiring an observable second mask.
+
+*** Summing averages the elasticities
+
+Hold prices, demographics, and item disturbances fixed and write
+\(x_j(w)=a_j\exp(\beta_j w)\), allowing \(a_j\geq0\). For a group
+\(G\) with positive total expenditure, define
+\(h_G(w)=\log\sum_{j\in G}x_j(w)\) and within-group expenditure shares
+\(s_j(w)=x_j(w)/\sum_{k\in G}x_k(w)\). Then
+\[
+  h_G'(w)=\sum_{j\in G}s_j(w)\beta_j,\qquad
+  h_G''(w)=\sum_{j\in G}s_j(w)(\beta_j-h_G'(w))^2.
+\]
+The aggregate loading is an expenditure-share-weighted mean of the
+constituent elasticities; its curvature is their weighted variance.
+If all constituents have elasticity \(\beta_G\), then
+\(h_G(w)=\beta_Gw+\log\sum_j a_j\) exactly. Similar elasticities give
+small curvature, supporting aggregation as an approximation.
+
+More precisely, let \(\Delta_G=\max_{j\in G}\beta_j-\min_{j\in G}\beta_j\).
+The deviation from the tangent at \(w_0\) satisfies
+\[
+  0\leq h_G(w)-h_G(w_0)-h_G'(w_0)(w-w_0)
+  \leq \Delta_G^2(w-w_0)^2/8.
+\]
+This suggests specifying a tolerable error in log expenditure over a
+commonly normalized welfare range. It does not directly bound the error
+of the estimated \(w\). Shares generally vary with welfare, demographics,
+and prices, so one fitted aggregate coefficient need not equal a simple
+average of the fitted constituent coefficients.
+
+The identities include zero-share constituents when the coefficients
+\(a_j\) are fixed, as in the household-production argument. They do not
+cover arbitrary reporting or participation changes with \(w\) that alter
+those coefficients. Even equal elasticities do not ensure that demographic
+controls retain their original form:
+\(\log\sum_j\exp(\alpha_{jtm}+\gamma_j'z_c)\) need not be linear in
+\(z_c\). These are qualifications to the fitted aggregate specification.
+
+*** Noise and precision
+
+The starting assumption for estimating the fine-good elasticities is
+\(\operatorname{Cov}(\varepsilon_c)=\sigma_0^2 I\), conditional on
+welfare and controls. Under this assumption, a first-order expansion of
+the aggregate's log error gives
+\[
+  e_{Gc}\simeq\sum_{j\in G}s^0_{jc}\varepsilon_{jc},\qquad
+  \operatorname{Var}(e_{Gc})\simeq\sigma_0^2\sum_{j\in G}(s^0_{jc})^2,
+\]
+where \(s^0\) denotes shares at the systematic expenditures about which
+the expansion is taken. Aggregation can therefore induce unequal error
+variances across groups and households even when fine-good errors are
+homoskedastic. Retaining homoskedasticity after aggregation is a further
+restriction to assess.
+
+For example, two equal-share goods with the same elasticity provide the
+same first-order information about \(w\) when summed as when used
+separately, conditional on known loadings and nuisance terms: the sum
+retains the elasticity and halves the error variance. With very unequal
+shares, the sum instead places most weight on one noisy observation and
+can lose substantial precision even with identical elasticities.
+
+For a conditional benchmark, suppose the nuisance terms and loadings are
+known, and let \(\mathcal J_c\) be the observed groups for household-period
+\(c\). With diagonal error covariance, GLS gives
+\[
+  \hat w_{A,c}=
+  \left(\sum_{g\in\mathcal J_c}\frac{\beta_{A,g}^2}{\sigma_{A,gc}^2}\right)^{-1}
+  \sum_{g\in\mathcal J_c}\frac{\beta_{A,g}R_{A,gc}}{\sigma_{A,gc}^2},
+  \qquad
+  V_{A,c}=\left(\sum_{g\in\mathcal J_c}
+    \frac{\beta_{A,g}^2}{\sigma_{A,gc}^2}\right)^{-1}.
+\]
+Under common variance within that partition this reduces to
+\(V_{A,c}=\sigma_A^2/\sum_{g\in\mathcal J_c}\beta_{A,g}^2\).
+The noise variance cannot be canceled when comparing partitions. With a
+general covariance \(\Sigma_{A,c}\), conditional GLS information is
+\(\beta_{A,\mathcal J_c}'\Sigma_{A,c}^{-1}\beta_{A,\mathcal J_c}\).
+
+This benchmark is not the complete uncertainty calculation for
+=Regression.get_w=, which uses a joint, unweighted least-squares fit with
+market-period intercepts. Existing =w_var= and =w_cov= provide conditional
+diagnostics under their stated assumptions. Uncertainty in loadings,
+controls, and partition selection also matters. Similarity within groups
+should preserve sufficient variation between groups to distinguish
+welfare from the market intercept in the current estimator.
 
 ** Criteria for choosing \(A\)
-These notes concern the optimal choice of \(A\).
 
-There are several criteria we might want ot consider in choosing \(A\), alone or together.
-- Missingness  of Households :: Other things equal, we would prefer that \(A\) be chosen so that  \(D_{\underline{J}}X_A\) has as many columns as possible (we don't want to drop households without a good reason). 
-- Missingness of Cross-Products :: Let \(c_A\) be the number of elements in \(M_A^\T M_A\) that take values greater than some \(\underline{c}\) (say 30, for heuristic reasons, but this should be a dial).  We'd like this number to be larger rather than smaller, other things equal.  This criterion comes from a need to estimate second moments of \(X_A\) while also preserving a finer aggregation of goods.
-- Semantic similarity :: Loosely defined (but see https://github.com/ligon/LSMS_Library/issues/226 for some ideas).  If \(A\) aggregates two goods it's desirable for the labels to be semantically similar, so that the aggregated good is readily interpretable as a familiar type of food.  So don't aggregate milk and fish, for example; do aggregate grouper and talapia.  Consider computing semantic similarity scores via =gensim= or =word2vec= (or training these models on our corpus of food labels).
-- \(\beta\)-similarity :: In the CFE demand system, it only makes sense to aggregate two goods if their income elasticities are similar.  Within the CFE system, this means that we should only consider aggregating good \(i\) and \(j\) if the estimated Frisch elasticities \(\beta_i\) and \(\beta_j\) are "close" using some statistical measure of distance.
-- Precise estimates of \(w\) :: Our ultimate goal is really to obtain the best estimates of the vector \(w\).  What the best statistical criterion is an open question.
+We want accurate welfare estimates for a declared population. A useful
+conceptual loss on a fixed evaluation set \(\mathcal H\), with a common
+factor normalization and fixed population weights \(\omega_c\), is
+\[
+  \mathcal R(A;\mathcal H)=
+  \frac{\sum_{c\in\mathcal H}\omega_c
+    \operatorname{E}[(\hat w_{A,c}-w_c)^2]}
+       {\sum_{c\in\mathcal H}\omega_c}.
+\]
+The evaluation set must be scoreable for all compared candidates; report
+coverage and performance outside it separately. The \(\omega_c\)'s are
+population weights, distinct from both welfare \(w_c\) and expenditure
+shares. Observed data do not reveal true \(w\), so the loss needs simulation
+and empirical validation. Fitted standard errors alone omit approximation
+bias and uncertainty from choosing the partition.
 
-** Proposed Approach
-To formalize the choice of the aggregation matrix \(A\), the problem can be framed as constrained hierarchical clustering over the \(J_0\) goods, evaluated against a clear statistical criterion for \(\hat{w}\).
+Alongside error, report coverage over the original population:
+\[
+  q(A)=\frac{\sum_{c=1}^{N_0}\omega_c
+    \mathbf{1}\{\hat w_{A,c}\text{ is available}\}}
+    {\sum_{c=1}^{N_0}\omega_c}.
+\]
+A scalar objective combining accuracy and coverage needs an explicit
+cost for failing to estimate a household's welfare. Until that choice is
+made, report a frontier of coverage and validated error. Averaging only
+over each partition's surviving households can reward exclusion.
 
-**Statistical Precision of \(w\) as the Primary Objective**
+Admissible partitions should also satisfy the following conditions.
 
-In the single-factor model \(R_A = \beta_A w_A^\top + \varepsilon\), household \(i\)'s latent factor \(w_i\) is estimated by projecting its observed residual vector \(R_{i, A}\) onto \(\beta_A\). If household \(i\) consumes a subset of goods \(\mathcal{J}_i \subseteq \{1, \dots, J\}\), generalized least squares yields:
+- Economic approximation :: Limit within-group beta dispersion on an
+  economically meaningful scale, allowing for estimation uncertainty.
+  Failure to reject equality is not evidence of equivalence. For estimates
+  from a joint fit, use
+  \(\operatorname{Var}(\hat\beta_j-\hat\beta_k)=V_{jj}+V_{kk}-2V_{jk}\).
+  A sparse item with unidentified beta cannot pass this test by default;
+  its assignment requires a disclosed assumption and validation.
+- Interpretability :: Use food categories and curator restrictions to
+  define coherent groups. Grouper and tilapia are plausible candidates;
+  milk and fish are not. Embeddings can suggest merges, but their proximity
+  does not establish demand similarity. Apply constraints to whole groups
+  so successive pairwise merges do not produce an incoherent result.
+- Estimability :: Check paired support after sample selection, market
+  coverage, and variation in the fitted loadings. Unexpected negative
+  loadings deserve diagnosis; positive Frisch elasticities do not by
+  themselves distinguish luxuries from necessities.
 
-\[\hat{w}_i = \left(\sum_{j \in \mathcal{J}_i} \frac{\beta_{j, A}^2}{\sigma_{j, A}^2}\right)^{-1} \sum_{j \in \mathcal{J}_i} \frac{\beta_{j, A}}{\sigma_{j, A}^2} R_{ij, A}\]
+Complementary purchase patterns can improve support. Jaccard distance is
+large for complementary supports and small for overlapping supports, so
+minimizing it would favor the latter. Evaluate the actual improvement in
+usable support and household retention when proposing a merge. Geographic
+or questionnaire differences can also create complementary patterns.
+[[https://github.com/ligon/LSMS_Library/issues/226][Issue 226]] records earlier proposals for semantics and beta similarity;
+its non-rejection heuristic remains a proposal to assess.
 
-Assuming roughly homoskedastic residual variances \(\sigma_j^2 \approx \sigma^2\), the estimation variance is:
+** The related preparation question
 
-\[\text{Var}(\hat{w}_i \mid \mathcal{J}_i) \approx \frac{\sigma^2}{\sum_{j \in \mathcal{J}_i} \beta_{j, A}^2}\]
+Aggregation and sample preparation interact. The reviewed =prepare_data=
+first removes households below a fraction-of-goods threshold, then removes
+goods with insufficient covariance support, and repeats on the surviving
+data. Its intended early marginal-support filter has no assignment, and
+deleted households cannot return when the number of retained goods falls.
+In a reproduced example, this retains 40 households and four goods;
+removing unsupported goods first retains 60 households with those same
+four goods. These preparation defects are now repaired on CFEDemands'
+=feature/prepare-data-scoring= branch, which also provides =score_w= and
+exclusion diagnostics. The two filters use the same inclusive count boundary.
 
-This exposes the fundamental trade-off of aggregation:
+The covariance-support helper also uses a greedy deletion rule whose
+ties depend on column order. A reproduced example retains two goods even
+though a valid three-good set exists; reversing column order finds the
+three-good set. Neither retained-good count nor the current heuristic
+alone defines the best welfare-estimation sample. The
+[[file:cfe_aggregation_review.org::*The related preparation problem][review's preparation section]] gives the examples and runnable checks.
 
-- The Benefit ::  Aggregating goods converts zero expenditures to non-zeros, expanding the active index set \(\mathcal{J}_i\) and reducing households dropped by \(D_{\underline{J}}\).
-- The Cost :: Combining distinct goods averages out their Frisch elasticities. Since \(\left(\sum_{k} \beta_k\right)^2 \leq K \sum_k \beta_k^2\) by Jensen's inequality, aggregating goods with disparate \(\beta\) compresses the denominator \(\sum_{j \in \mathcal{J}_i} \beta_j^2\), degrading factor precision.
+We should distinguish observations needed to estimate common parameters
+from observations sufficient to estimate a household's welfare given
+those parameters. Once loadings and relevant nuisance terms are fitted,
+some households excluded from parameter estimation may still support
+useful scores. Under the maintained homoskedastic model, their conditional
+information depends on \(\sum_{g\in\mathcal J_c}\beta_g^2/\sigma^2\),
+not simply the fraction of all goods observed. Scoring additional households
+requires the estimated controls and market effects as well as beta.
 
-A natural target criterion to minimize over valid matrices \(A\) is the mean asymptotic variance:
-\[\mathcal{L}(A) = \frac{1}{N_A} \sum_{i=1}^{N_A} \left(\sum_{j \in \mathcal{J}_i} \beta_{j, A}^2\right)^{-1}\]
+A separate scoring step would keep these quantities fixed. Passing the
+broader sample through =Regression= again instead refits them. Improvements
+to preparation should therefore be evaluated at a fixed partition before
+crediting aggregation with all gains in household coverage.
 
-*** Formulating the Agglomerative Distance Metric**
+** Proposed approach and remaining choices
 
-Direct combinatorial search over binary partition matrices \(A \in \{0, 1\}^{J \times J_0}\) is NP-hard. An effective alternative is constrained agglomerative clustering using a composite pairwise distance between food items \(j\) and \(k\):
+Implementation divides into three parts. Their interfaces can be specified
+before settling the statistical objective.
 
-\[d(j, k) = \lambda_1 d_{\text{sem}}(j, k) + \lambda_2 \frac{\vert{}\hat{\beta}_j - \hat{\beta}_k\vert{}}{\text{SE}(\hat{\beta}_j - \hat{\beta}_k)} + \lambda_3 d_{\text{missing}}(j, k)\]
+*** Preparation and scoring in CFEDemands
 
-- \(d_{\text{sem}}(j, k)\) :: Cosine distance (\(1 - \cos(\mathbf{v}_j, \mathbf{v}_k)\)) computed from food label embeddings (Word2Vec, fastText, or a sentence-transformer fine-tuned on agricultural/food dictionaries).
-- \(\beta\)-Distance :: Studentized distance between provisional elasticities. Set \(d(j, k) = \infty\) if \(\text{sign}(\hat{\beta}_j) \neq \text{sign}(\hat{\beta}_k)\) to avoid combining inferior goods with luxuries.
-- \(d_{\text{missing}}(j, k)\) :: Sparsity complementarity, measured via Jaccard distance on consumption indicator vectors \(\mathbf{m}_j, \mathbf{m}_k \in \{0, 1\}^{N_0}\):
-\[d_{\text{missing}}(j, k) = 1 - \frac{\vert{}\text{supp}(\mathbf{m}_j) \cap \text{supp}(\mathbf{m}_k)\vert{}}{\vert{}\text{supp}(\mathbf{m}_j) \cup \text{supp}(\mathbf{m}_k)\vert{}}\]
+Repair the ineffective support filter and reconsider household eligibility
+against the retained goods. Preserve the original observations and report
+the reason for each exclusion. Make the selection policy explicit so that
+alternative policies can be compared at a fixed aggregation.
 
-This prioritizes merging items with complementary zero patterns to quickly expand household coverage.
+Add an interface for estimating \(w\) on additional households using an
+existing fit. It must retain the fitted good set, demographic specification
+and coefficients, centering transformations, market-period effects, beta,
+and normalization. Recomputing centering on the new sample would change
+the comparison even if beta were fixed. Initially, score observations
+only where the required fitted goods, controls, and market-period effects
+are available; return reasons when they are not. New markets or periods
+require a separate treatment of their nuisance parameters.
 
-*** Operational Algorithm
-- Step 1 (Pilot Estimation) :: Estimate preliminary \(\hat{\beta}^{(0)}\) on the subset of high-frequency items or broad baseline groups.
-- Step 2 (Constrained Agglomeration) :: Apply hierarchical clustering with hard constraints (e.g., \(d_{\text{sem}} \leq \tau_{\text{sem}}\), ensuring grouper and tilapia can merge, but fish and milk cannot).
-- Step 3 (Stopping Rule) :: Evaluate the agglomeration tree sequentially. Halt merges at the dimension \(J^*\) that minimizes \(\mathcal{L}(A)\) while satisfying the second-moment support threshold \(c_A \geq \underline{c}\).
+Checks should establish that scoring the fitting sample reproduces its
+point estimates, that new households leave fitted parameters unchanged,
+and that scoring a household alone or alongside other new households gives
+the same result. Conditional uncertainty should use the existing variance
+machinery where applicable, with its conditioning assumptions explicit.
+This interface serves both household recovery and validation.
+
+*** Practical semantic constraints in LSMS Library
+
+Start with a country-specific table assigning fine items to interpretable
+food families, with explicit exceptions for incompatible preparation or
+preservation forms and goods required to remain separate. Existing curated
+Aggregate labels and questionnaire categories can seed this table where
+available. They are proposals for admissibility, not evidence that their
+members have equal elasticities or that the existing partition is optimal.
+
+Where the table is incomplete, a language model can draft assignments from
+labels and survey documentation, recording the reason and uncertainty for
+each proposal. Review ambiguous local names and composite foods, then store
+the accepted map as a versioned input. Unresolved items should remain
+explicit rather than being merged into a catch-all category. No embedding
+model needs to be trained on the country's food labels to begin this work.
+
+The output is a rule for whether a proposed /whole group/ is admissible,
+plus interpretable labels. The statistical search can split a food family;
+cross-family merges require an explicit exception. This avoids a chain of
+pairwise similarities gradually combining incompatible foods. Alternative
+semantic maps can later be compared as sensitivity exercises.
+
+*** Statistical evaluation and search
+
+An evaluator of supplied partitions would establish what a search should
+optimize. It should compare fine labels and existing curated groups under
+explicit preparation rules, then report retention, paired support,
+residual variances, conditional uncertainty, and validation results on a
+common factor scale. Use the scoring interface to distinguish fitting
+coverage from the population for which welfare can be estimated.
+
+Constrained agglomeration is a practical candidate-generation method.
+Estimate pilot loadings on adequately supported goods, propose economically
+coherent merges, then refit and evaluate candidate partitions. The pilot
+does not identify the loadings of excluded sparse goods, and broad-group
+loadings do not identify their constituents. Score cuts along the tree;
+there is no reason to assume that error changes monotonically or that the
+first worsening identifies the best cut. A single greedy tree explores
+only part of the partition space.
+
+Validation should include simulations with known welfare, varying beta
+dispersion, expenditure shares, noise, and zero patterns. Include both
+substitution among inputs to a common composite and unreported positive
+expenditures, respecting the maintained conditional observation assumptions
+in the baseline and varying them in sensitivity exercises. On real data,
+select partitions on training households and evaluate on held-out
+households, keeping a household's panel observations together. Prediction
+of reserved goods should exclude those goods from the household's factor
+score. Resampling intended to capture partition selection uncertainty must
+repeat selection and fitting.
+
+The [[file:aggregation/evaluation.org::*Uganda observation patterns][Uganda observation-pattern experiment]] now uses complete household food
+masks from the delivered 2019-20 data, preserving sparse goods and their
+joint support. Median households report ten positive purchased foods, or
+fifteen with total recorded acquisition, against 114 delivered food labels.
+The revised preparation and frozen scoring recover most of the household
+coverage lost by the original selector in this experiment. Existing curated
+groups add little further scoring coverage, although they improve known-welfare
+precision under a substitution mechanism. They worsen it when variable
+numbers of independently positive components are simply summed. Both cases
+use equal within-group betas; the interpretation of zeros and amounts still
+matters. These are conditional simulation results, not an empirical ranking
+of Uganda partitions.
+
+Adding nonfood expenditures to the estimation sample is not presumed to
+improve precision. In prior Uganda fits, their inclusion produced highly
+implausible estimates. A working explanation is that different survey
+instruments generate markedly different expenditure-error variances,
+violating the maintained homoskedasticity assumption. These reported
+results have not been reproduced in this review. Keep food aggregation
+as the initial scope. Predicting held-out nonfood expenditures with a
+food-based factor is a separate diagnostic, whose value depends on the
+measurement process and relation to welfare. Better prediction alone does
+not establish more accurate MUEs.
+
+*** Dependencies and remaining choices
+
+Preparation fixes and the scoring interface now support the
+[[file:aggregation/evaluation.org][supplied-partition evaluator and initial simulation checks]]. Semantic curation
+can proceed independently and supply additional admissible groups. It does
+not block statistical work on supplied partitions. Choosing an optimal
+fitting sample is itself a statistical problem; exposing selection policies
+in =prepare_data= does not settle it. Evaluate supplied partitions before
+adding a search over them.
+
+Choices still to settle include the reference population and its weights,
+the common factor normalization, an acceptable approximation tolerance,
+and the treatment of unscored households. These determine the statistical
+objective before a particular clustering algorithm can be preferred.

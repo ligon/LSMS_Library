@@ -239,5 +239,33 @@ df = df.groupby(idx, dropna=False)[value_cols].sum(min_count=1)
 
 df = df.dropna(how='all')
 
+# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
+# Section 8H reports a quantity and a farmgate price but never a total, so the
+# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
+# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
+#
+# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
+# SUMs the additive measures and re-derives Price, so a string must not reach
+# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
+# either keeps Expenditure NaN and carries NO key, so the labelled rows are
+# exactly the computed ones.
+from lsms_library.countries.GhanaLSS._.ghanalss import derive_produced_farmgate_value
+DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
+_prod = (df.index.get_level_values('s') == 'produced')
+_both = (_prod
+         & pd.to_numeric(df['Quantity'], errors='coerce').notna().to_numpy()
+         & pd.to_numeric(df['Price'], errors='coerce').notna().to_numpy())
+_kept = pd.to_numeric(df['Expenditure'], errors='coerce').to_numpy(dtype=float)
+_qp = derive_produced_farmgate_value(df['Quantity'], df['Price'])
+df['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+df['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                index=df.index, dtype='string')
+assert df.loc[~_both, 'Derivation'].isna().all(), (
+    'a row with no computed value carries the 8h-farmgate key')
+
 if __name__ == '__main__':
+    # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+    # Pure rename; an unmapped label raises rather than passing through.
+    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
+    df = to_country_food_labels(df, '2016-17')
     to_parquet(df, 'food_acquired.parquet')

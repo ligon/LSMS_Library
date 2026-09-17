@@ -235,6 +235,13 @@ Continue to use =cluster_features()[['Region']]= when you want the
 cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
 when you want every surveyed household covered.
 
+Audit caveat (2026-09-16): =sample(waves=['2019-20'])= returns 3,098
+households, of which three have missing =Region=. Thus the blanket
+completeness statement above does not hold for every source record, even
+when the household-level join avoids the known mover problem. The
+[[file:../../../../SkunkWorks/aggregation/evaluation.org::*Uganda observation patterns][food aggregation simulation]] reports these three explicitly and uses the
+remaining 3,095 households; it doesn't infer their Region from a cluster.
+
 ** Rotating panel and refreshment sample
 
 Beginning in 2013-14, one-third of the original sample is refreshed

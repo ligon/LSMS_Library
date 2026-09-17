@@ -1,0 +1,298 @@
+#+TITLE: Estimating a Mundlak (1961) production function on the GLSS1--GLSS2 panel
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+#+OPTIONS: ^:{} toc:2
+
+* The short version
+
+You can do it, on 506 households observed twice, and the binding constraints
+aren't the ones you'd guess.  Output is the weak variable, not labour: Section
+9 never asks how much was harvested, only how much was sold, so the dependent
+variable has to be assembled from four disposition /values/ and is missing
+entirely for about a fifth of cropped rows.  Labour is in good shape once
+family and hired are added together.  Land is the regressor the exercise is
+most likely to be about, and it's the one carrying a measurement problem large
+enough to change the answer.
+
+What follows is the recipe, then the diagnostics you should run before
+believing any of it.
+
+* What Mundlak's device actually is
+
+Mundlak's 1961 paper asks how to estimate a production function when the firm
+knows something the econometrician doesn't.  Write output for farm \(i\) in
+period \(t\) as
+
+\[ \ln Y_{it} = \alpha + \beta' \ln X_{it} + \mu_i + \varepsilon_{it}, \]
+
+where \(X_{it}\) collects the measured inputs and \(\mu_i\) is management
+ability: fixed for the farm, unobserved, and---this is the whole problem---
+correlated with how much of everything the farmer chooses to apply.  Pooled OLS
+on that equation gives you \(\beta\) contaminated by \(\mathrm{Cov}(\ln X,
+\mu)\), which is exactly the "management bias" of the title.  Good managers
+apply more inputs and get more output; the input coefficients absorb the
+manager.
+
+Mundlak's answer is to difference the manager away.  With panel data you can
+estimate
+
+\[ \ln Y_{it} - \overline{\ln Y_i} = \beta'(\ln X_{it} - \overline{\ln X_i}) + (\varepsilon_{it} - \bar{\varepsilon}_i), \]
+
+which is the within estimator, and \(\mu_i\) is gone because it doesn't vary
+over \(t\).  The later and now more familiar formulation (Mundlak 1978) keeps
+the levels and adds the farm means as regressors,
+
+\[ \ln Y_{it} = \alpha + \beta' \ln X_{it} + \gamma' \overline{\ln X_i} + v_{it}, \]
+
+which recovers the same \(\beta\) while letting time-invariant covariates
+survive.  The two are algebraically equivalent for \(\beta\); the
+correlated-random-effects form is more convenient when you want to test
+\(\gamma = 0\), which is a test of whether the management bias was there at all.
+
+Two things follow for our data, and both are unforgiving.  With \(T = 2\) the
+within estimator /is/ first differences, so the whole exercise reduces to a
+cross-section of 506 differenced observations.  And identification comes
+entirely from within-farm movement, which means any measurement error that
+moves across the two rounds goes straight into \(\beta\).
+
+* The tables you need
+
+All five were wired on 2026-09-16 (PR #934) and cover 1987-88 and 1988-89 only.
+Agriculture is Section 9 in GLSS1/GLSS2 and Section 8 from GLSS3 on, and those
+two rounds are the only panel GhanaLSS has: the GLSS1 \to GLSS2 rotating half,
+712 households.
+
+| table             | index                                       | what you take from it            |
+|-------------------+---------------------------------------------+----------------------------------|
+| =crop_production= | =(t, i, plot_id, j)=                        | output values, =Area_ha=         |
+| =plot_inputs=     | =(t, i, plot_id, input, j)=                 | =Cost= of purchased inputs       |
+| =plot_labor=      | =(t, i, plot_id, stage, source, worker)=    | hired =Cost=, exchange =PersonDays= |
+| =labor=           | =(t, i, pid, job)=                          | family hours, and the wage       |
+| =livestock=       | =(t, i, animal)=                            | herd stock and flows             |
+
+- =plot_id= :: is ='Farm-level'= everywhere in this country.  Section 9 has no
+  farm or plot roster at all, so the axis is kept and marked rather than
+  dropped; see =GhanaLSS/_/CONTENTS.org=, "The =Farm-level= convention".
+- =j= :: is a real crop on the per-crop rows and ='Farm-level'= on the
+  expenses that aren't attributable to one.
+
+* Building the household-year panel
+
+Everything below aggregates to \((t, i)\).  The code is the working version;
+it's deliberately explicit rather than clever, because every one of these
+choices is a decision someone will want to revisit.
+
+#+name: panel-construction
+#+begin_src python :eval no :tangle no :exports code
+  import numpy as np, pandas as pd, lsms_library as ll
+
+  C = ll.Country('GhanaLSS')
+
+  def hh(s, name):
+      """Sum a served column to the household-year grain."""
+      return s.groupby(level=['t', 'i']).sum(min_count=1).rename(name)
+
+  # ---- output: the four Section 9B dispositions --------------------------
+  cp = C.crop_production()
+  out = hh(cp[['Value_sold', 'Value_seed', 'Value_given', 'Value_lost']]
+           .sum(axis=1, min_count=1), 'output')
+  area = hh(cp['Area_ha'], 'area_ha')
+
+  # ---- the agricultural wage: a DAY rate, taken directly ------------------
+  lab = C.labor()
+  agri = lab['Industry'].between(100, 199)
+  wage_rows = lab[agri & (lab['OwnFarmOrBusiness'] == False)
+                  & (lab['Earnings'].fillna(0) > 0)]
+  day_wage = (wage_rows[wage_rows['EarningsUnit'].astype(str) == 'Day']
+              ['Earnings'].groupby(level='t').median())
+  hours_per_day = lab.loc[agri, 'HoursPerDay'].dropna().median()   # 5.0
+
+  # ---- labour, all three kinds, in person-days ---------------------------
+  annual_hours = lab['WeeksPerYear'] * lab['HoursPerWeek']
+  own = lab['OwnFarmOrBusiness'].fillna(False).astype(bool) & agri
+  family_days = hh(annual_hours.where(own), 'family_hours') / hours_per_day
+
+  pl = C.plot_labor()
+  source = pl.index.get_level_values('source')
+  hired_cost = hh(pl['Cost'].where(source == 'hired'), 'hired_cost')
+  exchange_days = hh(pl['PersonDays'].where(source == 'exchange'), 'exchange_days')
+
+  d = pd.concat([out, area, family_days.rename('family_days'),
+                 hired_cost, exchange_days], axis=1)
+  d['hired_days'] = d['hired_cost'] / d.index.get_level_values('t').map(day_wage)
+
+  # Sum the three.  A household with no hired labour still has family labour,
+  # so the total is positive and log() survives -- this is what keeps the
+  # sample from collapsing.
+  parts = ['family_days', 'hired_days', 'exchange_days']
+  observed = d[parts].notna().any(axis=1)
+  d['labor_days'] = d[parts].fillna(0).sum(axis=1).where(observed)
+
+  # ---- purchased inputs --------------------------------------------------
+  d['input_cost'] = hh(C.plot_inputs()['Cost'], 'input_cost')
+#+end_src
+
+* Estimation
+
+With two rounds, the within transformation and first differencing coincide, so
+the simplest correct thing is to difference.  We write both forms because the
+correlated-random-effects version gives you the specification test for free.
+
+#+name: mundlak-estimation
+#+begin_src python :eval no :tangle no :exports code
+  cols = ['output', 'area_ha', 'labor_days']       # add 'input_cost' with care
+  panel = d[cols].dropna()
+  panel = panel[(panel > 0).all(axis=1)]
+  keep = panel.groupby(level='i').size().ge(2)
+  panel = panel[panel.index.get_level_values('i').isin(keep[keep].index)]
+  lg = np.log(panel)
+
+  # --- within / first differences: Mundlak's 1961 estimator ---------------
+  within = lg - lg.groupby(level='i').transform('mean')
+  y, X = within['output'], within[['area_ha', 'labor_days']]
+  beta = np.linalg.lstsq(X.values, y.values, rcond=None)[0]
+
+  # --- correlated random effects: levels plus farm means (Mundlak 1978) ---
+  means = lg.groupby(level='i').transform('mean')
+  design = pd.concat([lg[['area_ha', 'labor_days']],
+                      means[['area_ha', 'labor_days']].add_suffix('_mean')],
+                     axis=1)
+  design.insert(0, 'const', 1.0)
+  gamma = np.linalg.lstsq(design.values, lg['output'].values, rcond=None)[0]
+#+end_src
+
+The coefficients on the two =_mean= terms are Mundlak's \(\gamma\).  Testing
+them jointly zero is a test of whether management bias was present; if you
+can't reject, pooled OLS would have been fine and the panel bought you nothing.
+Report that test.  It's the part of the exercise that says whether the exercise
+was needed.
+
+Standard errors want clustering at the farm, and with \(T = 2\) and 506 farms
+the asymptotics are thin enough that you should say so rather than lean on
+them.
+
+* The sample you actually get
+
+| specification                                  | households | household-years |
+|------------------------------------------------+------------+-----------------|
+| output, land, total labour                     |        506 |           4,389 |
+| the same, plus purchased input cost            |        333 |           3,307 |
+
+Within-household share of the log variance, which is what identifies \(\beta\):
+
+| variable     | share |
+|--------------+-------|
+| =output=     | 0.229 |
+| =area_ha=    | 0.529 |
+| =labor_days= | 0.195 |
+| =input_cost= | 0.239 |
+
+Adding family and hired labour into one input is what makes the first row
+possible.  Zero of 4,842 household-years have =labor_days= equal to zero,
+because family labour is positive almost everywhere.  Keeping hired labour as
+its own regressor instead costs 274 households, since a quarter of farms hire
+nobody and \(\ln 0\) isn't defined.
+
+* Before you believe any of it
+
+** Land is the problem
+
+=area_ha= has a within-household standard deviation of 1.12 in logs.  A typical
+farm's reported cultivated area changes by a factor of about three between the
+two rounds.  Land holdings don't do that.
+
+The likely mechanism is definitional rather than real.  Section 9 Part B Q2
+asks acres harvested /per crop/, and the household total is a sum over the
+crops reported that year, so a farm reporting three crops in one round and five
+in the next shows a large "area" change that's partly a change in what got
+enumerated.  A within estimator is precisely what this contaminates, and land
+is the coefficient you're most likely to care about.
+
+Two cheap diagnostics, both worth running first:
+
+- the distribution of crops-reported-per-household across the two rounds; and
+- the area change restricted to farms reporting the /same crop set/ in both.
+
+If the second is much smaller than 1.12, you have your answer, and the fix is
+to estimate on the stable-crop-set subsample or to build area from a
+consistent crop basket.
+
+** Output is partial, and missing in a way that correlates with the thing you're studying
+
+The four dispositions are sold, kept for seed, given away, and lost.  They do
+not include what the household ate.  Section 9 never asks it; Section 12B does,
+and the value is already derived
+(=GhanaLSS::food_acquired::12b-fortnight=), but joining the two needs a crop
+\to food-item mapping and crosses a recall window.
+
+Measured: about 19% of cropped rows carry no Section 9 value at all, covering
+roughly 14% of harvested acres and touching about half the farming households.
+Those are crops grown and wholly consumed.  So the dependent variable is
+systematically thinner for subsistence-oriented farms, which makes it a
+/selected/ measure rather than a noisy one, and the selection runs along
+exactly the market-orientation margin that a production function's error term
+would like to be independent of.
+
+Do not patch this by imputing output from acreage.  That's circular: acreage is
+a regressor, and you'd be manufacturing the coefficient you're trying to
+estimate.
+
+** Purchased inputs still carry a zero problem
+
+=input_cost= is zero or missing for about a quarter of household-years, and
+that's what takes 506 farms down to 333.  Adding it to labour isn't available
+to you---fertilizer and person-days don't add---so it needs its own treatment:
+a use indicator plus an intensity term, or a levels specification.  A silent
+listwise drop changes the population under study, and the FULL row of the table
+above should be read as a different sample rather than a smaller one.
+
+** The wage is thin, and it is a day rate
+
+Family labour arrives as hours and hired labour as cedis, so combining them
+needs a wage.  Take the /day/ rate, directly: median 250 cedis in 1987-88 and
+300 in 1988-89, from 83 and 125 observations of agricultural workers who are
+not working on their own farm.  Converting the month- and year-paid workers to
+an hourly basis instead pulls in salaried positions from a different labour
+market, understates the wage by 19--31%, and produces a suspiciously flat
+nominal series across two rounds of substantial inflation.
+
+Note what this implies.  Family labour valued at that wage comes to 1.25 and
+1.39 times measured Section 9B output.  That's the familiar smallholder
+result---the shadow wage sits below the market wage---and it's an upper bound,
+since output is partial.  It also means any profit-function variant of this
+exercise will show negative profits, and you should decide in advance whether
+that's a finding or a symptom.
+
+* What this design can't do
+
+- Plot-level anything :: Section 9 has no farm or plot roster.  =plot_id= is
+  ='Farm-level'= throughout, which is a statement about the instrument, not a
+  gap in the wiring.
+- Separating family from hired labour in the production function :: you can
+  keep them separate, but you'll pay 274 households for it and you'll be
+  estimating on farms that hire.  Hired labour is /used by/ 52.3% of
+  household-years and is about 5% of labour days: widespread and small.
+- More than two rounds :: GLSS3 onward are independent cross-sections.  There
+  is no third wave of these households.
+- Currency comparisons across the two rounds without care :: GLSS1/GLSS2 are
+  pre-2007 cedis.  The library's currency layer handles the declared monetary
+  columns; check =lsms_library/currency.py= before assuming a column is
+  converted.
+
+* References
+
+Mundlak, Y. (1961).  "Empirical Production Function Free of Management Bias."
+/Journal of Farm Economics/ 43(1), 44--56.
+
+Mundlak, Y. (1978).  "On the Pooling of Time Series and Cross Section Data."
+/Econometrica/ 46(1), 69--85.
+
+* Provenance
+
+Every figure above is measured on the built tables, not the raw files.  The
+scripts are in this directory: =total.py= (sample and within shares),
+=daywage2.py= (the wage), =within2.py= (variance decomposition).  Sample
+construction and the caveats are recorded at more length in
+=MUNDLAK_SAMPLE.org=; the instrument's idiosyncrasies are in
+=GhanaLSS/_/CONTENTS.org=, which is the file to read before trusting any
+column.

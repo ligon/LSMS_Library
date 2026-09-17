@@ -1,3 +1,294 @@
+#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
+
+
+* GhanaLSS food-label crosswalk session (2026-09-16, PR #935)
+
+Merged from =fix/ghanalss-label-crosswalk='s own handoff note when the branch was
+brought up to date with =development= (2026-09-16); headings demoted one level,
+text otherwise verbatim.
+
+** State
+
+- Branch =fix/ghanalss-label-crosswalk=, *5 commits*, 5 ahead of
+  =development=, 0 behind.  Working tree clean.  Published to the shared
+  mirror and (as of this note) pushed to GitHub with a PR open.
+- Last commit: =684120114= "reconcile guinea corn + sorghum at Lcp with a
+  named reducer".
+- Full record: =slurm_logs/ghanalss_aggregate_labels/= -- =FINDINGS.org= (the
+  ladder + the original diagnosis), =TABLE_AUDIT.org= (every defect found),
+  =LANDED.org= (what shipped, with the decisions and who made them), plus 12
+  re-runnable scripts and =README.md= saying how to run them.
+
+** What the task was, and what it turned into
+
+Asked: find =Aggregate= labels for GhanaLSS =food_expenditures=.
+Found: =labels='Aggregate'= raises, and the two places that record this as
+deliberate name three blockers of which *two were stale*.  The one that binds
+was unrecorded: the country =harmonize_food= table carries a per-wave
+crosswalk (=Lc . Lcp= in @ligon's ladder) that *was never applied*, so the
+served =j= was the WAVE vocabulary and 45 of 225 labels sat off the country
+axis -- 14% of rows, ~36% of GLSS2 expenditure, silently.
+
+So steps 1-4 fixed the =j= axis.  *Step 5 -- designing the =Aggregate Label=
+column -- is NOT started*, by agreement: @ligon wanted to discuss principles
+of aggregation first.  That is the next conversation.
+
+** Invariants now holding at HEAD
+
+| check                                | value                 |
+|--------------------------------------+-----------------------|
+| served =j= off the country axis      | *0* (was 45 of 225)   |
+| duplicate index tuples               | *0*                   |
+| distinct =j= vs country labels       | *215 = 215* bijection |
+| Expenditure per wave, before/after   | identical, all seven  |
+| =test_ghanalss_food_label_canonical= | *32 passed*           |
+
+Two new guards: =TestDelivered= now asserts =j= is on the COUNTRY axis (it
+asserted the WAVE axis, which was right for =Lw= and could never have caught
+this), and a config-only per-wave bijection test.
+
+** Next steps, in order
+
+1. *Design =Aggregate Label=* (step 5).  Read =FINDINGS.org= "The framing
+   number" first: a mechanical reconciliation of the wave columns yields
+   195 -> 134 buckets with *91 singletons*, against Malawi 147 -> 65 and Uganda
+   175 -> 80.  The wave-level Aggregate columns were a spelling layer, not a
+   demand-estimation bucketing.  GH *#226* is the principled auto-aggregation
+   script this probably belongs in; GH *#925* constrains it -- a blank cell
+   becomes one unnamed bucket, so the column must be complete for all 215
+   labels.
+2. *Rebuild and inspect =nutrition=.*  NOT done.  It will change: the
+   Cocoyam/Coffee fix (8,935 rows), gari 02_004 -> 02_039, sweet potato
+   02_022, and the deliberately-blank =Oil (palm)/Shea Butter= composite
+   (4,239 rows drop out).  Do this before anyone quotes a GhanaLSS nutrient
+   number.
+3. *The latent =.first()=* at =1998-99/_/food_acquired.py:110= -- filed as its
+   own issue; does not fire today.
+
+** Traps worth knowing (all cost time this session)
+
+- =.pth= points at =/global/scratch/.../mirrors/LSMS_Library=, a THIRD
+  checkout.  Always run wave scripts with both
+  =PYTHONPATH=<clone>= and =LSMS_COUNTRIES_ROOT=<clone>/lsms_library/countries=,
+  and assert =/local/job*/ in lsms_library.__file__=.
+- =2005-06/_/categorical_mapping.org= has *mixed CRLF/LF* line endings.  A
+  naive read/write normalises the whole file and buries the real edit in a
+  372-line diff.  Preserve per-line terminators.
+- Org tables *right-align numeric columns*.  Regenerating a wave table with a
+  left-justifying writer rewrites every row.  Edit the changed LINES in place.
+- =groupby().agg('sum')= returns *0.0 for an all-NA group*.  Use
+  =min_count=1=, or phantom rows sail past a later =dropna(how='all')=
+  (+32,040 of them here).
+- Do not compute an "expected" row count from an assumed baseline.  Rebuild
+  the true prior state and measure; that is what finally resolved a +637 that
+  three rounds of reasoning had not.
+- The shared mirror's =.venv= symlink points at whichever job last ran
+  =bin/savio_venv.sh mount=.  Two agents on different nodes will ping-pong it.
+  A clone's own =.venv= should point straight at its mount.
+
+* Mirror cleanup and the #930 rebase (2026-09-15 afternoon, job 38854624)
+
+Supersedes the next-action suggestions below.  Worked *directly in the shared
+mirror* (=~/mirrors/LSMS_Library=, which resolves to
+=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=) on =development=,
+at @ligon's direction -- not in a node-local clone.  Note that the WIP-snapshot
+safety net watches the clone, not the mirror, so work here is durable only once
+committed.
+
+** Two corrections to the 08:49 section below, which is left verbatim
+
+1. *=development= was never red.*  That section says "development red until
+   #930"; #930's own commit message said the Ethiopia tests "have been failing
+   on development since #898".  Both were measured against the shared mirror's
+   =development=, which was *15 commits behind GitHub*.  #919 (=7bb2d9955=,
+   merged 2026-09-14) had already fixed the same root cause by the opposite
+   route: it REMOVED the =quintal=100= seed from =KNOWN_METRIC= instead of
+   working around it.  Verified against GitHub's =development= (=6666e0fea=):
+   both named tests PASS, and 93 passed across the three files #930 touches.
+   =git merge-base --is-ancestor 7bb2d9955 3d5915cb8= is *false* -- that is the
+   one-line proof #930 was built without #919.
+2. *#930's head had already moved* past the =3d5915cb8= recorded below
+   (=8d9df49d7=, 12:54 that day), and has since been rebased to =ffcae2797=.
+
+*The general lesson, which cost this session an hour to unpick*: a claim about
+=development= measured in the mirror is not a claim about =development=.  Check
+=git rev-list --left-right --count development...origin/development= after a
+=fetch= before believing one.
+
+** What landed
+
+- *Mirror =development= fast-forwarded* =7b7d330fd= -> =6666e0fea=, clean
+  (0 divergent).  It had been 15 behind; its =origin/development= tracking ref
+  was staler still (=3b6a0fda9=), which is why it read "ahead 25".
+- *PR #930 rebased* onto =6666e0fea= and force-pushed (=--force-with-lease=
+  pinned to =8d9df49d7=) -> =ffcae2797=.  Now MERGEABLE.  Retitled and its body
+  rewritten; the old title claimed it restored an external check that #919 had
+  already restored.  *Layer split only*: the =test_quintal_...= re-expression
+  and the pinned-totals swap were DROPPED, because taking them would have
+  downgraded the check #919 repaired.
+- *Filed [[https://github.com/ligon/LSMS_Library/issues/931][#931]]* -- =harvest_kg_factors= never receives #919's =unit_kg=, so the
+  crop ladder is blind to declared =u_kg= rows.  That blindness is LOAD-BEARING
+  (it is what keeps Ethiopia's external check non-tautological) and is
+  undocumented; fixing it silently would re-break the check.
+- *Filed [[https://github.com/ligon/LSMS_Library/issues/932][#932]]* -- 247 =requires_s3= tests of 6,482 skip on every PR and on
+  =development=, so a red suite reports green.  This is thread 1 of the 08:49
+  section, now filed.  It is *why* the stale-base claim above travelled through
+  a commit message, a PR body and a handoff note unchallenged.  Confirmed live:
+  #930's own check run shows =data-tests: skipping=.
+- *Mirror worktree/branch cleanup*: 95 worktrees -> 8, 132 branches -> 39.
+
+** Measured, so it need not be re-derived
+
+#930 re-measured on the correct base (=measure_930.py= in the record dir):
+
+| quantity | value |
+|----------+-------|
+| =kg_per_unit= differing, either split | *0 of 85,519*, NaN pattern identical |
+| =Harvest_kg= total | 12,680,617.283538, identical both trees |
+| before | =inferred= 26,548 -> =metric= 26,548; =none= 58,971 unchanged |
+| after | =inferred= 7,768 -> =metric= 7,768; =none= 15,587 unchanged |
+| ratio =at/bt= | 6.654, so the original =assert > 6 *= holds |
+| verification | 148 passed, 0 failed, across six test files |
+
+=inferred= is *0 in both splits* -- the price-ratio inference serves Ethiopia
+not one crop row.  That corpus fact survives #919 and is now pinned.
+
+Every number in #930's ORIGINAL message (=at.sum()= 12,691,567, =bt.sum()=
+8,799,669, ratio 1.44) was an artifact of the missing base.  Do not quote them.
+
+** Mirror hygiene
+
+- Kept deliberately: =master=, =development=, the 4 open-PR branches, 15
+  mirror-only unmerged branches (incl. 8 =fix/prices-*=), 4 where the mirror is
+  AHEAD of GitHub (=chore/feature-vocabulary-nutrition-nonfood= by 25 commits),
+  and 7 worktrees with uncommitted tracked edits plus the 7 branches they pin.
+- *Those 7 dirty worktrees are the remaining tidy-up*: resolve the edits, then
+  their branches are deletable.  =wt-801-mojibake= has 13 modified files.
+- 9 untracked =slurm_logs/= files were tarballed before their worktrees were
+  removed (4 Lorenz PNGs, =REVIEW_784.org=, 3 GLSS probe logs).
+- 50 untracked files remain under =slurm_logs/= in the mirror's own tree --
+  briefs, matrix runs, 6 =HANDOFF_*.org=.  Either commit or clear them; today
+  they are neither.
+
+** Record
+
+Everything above is reproducible from
+=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-cleanup-2026-09-15/= (durable
+scratch, NOT node-local): =CLEANUP_RECORD.org=,
+=FINDING_930_superseded.org=, =measure_930.py= with its JSON/npy outputs, and
+the removal/deletion logs.
+
+** Next concrete action
+
+Merge #930 once CI is green (=unit-tests= was in flight at handoff).  Then
+either #932 (the CI gap -- it is the one that lets this class of error repeat)
+or #928's P1/P2, which still needs its cache-invalidation measurement first.
+
+#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
+
+* Categorical-mapping session (2026-09-14/15, job 38854624)
+
+Supersedes the next-action suggestions below.  Working clone
+=/local/job38854624/mirrors/LSMS_Library=; =origin= is the shared mirror.
+Nothing was merged.  Two PRs are open for human review.
+
+** Open for merge
+
+| PR | issue | branch | head | re-warm cost |
+|----+-------+--------+------+--------------|
+| [[https://github.com/ligon/LSMS_Library/pull/927][#927]] | #925 | =fix/relabel-j-empty-string= | =156279ef8= | *GhanaLSS, 17 of 119 table hashes* |
+| [[https://github.com/ligon/LSMS_Library/pull/930][#930]] | #929 | =fix/838-ethiopia-pinned-numbers= | =3d5915cb8= | none (0 of 119) |
+
+*#930 un-reds =development=.*  Two assertions in
+=tests/test_ethiopia_shipped_factors.py= have been failing since #898 merged.
+
+** Issues filed
+
+- #925 :: =labels=<col>= renamed an unlabelled food to the empty string and
+  =reaggregate=True= summed 129 served foods into one unnamed =j= bucket
+  (GhanaLSS =1987-88=, 55,314 rows, Expenditure conserved).  Fixed by #927.
+- #926 :: GhanaLSS =nonfood_expenditures= serves 25,585 rows with cp1252 C1
+  controls in =j=.  The bad code points are committed in curated config
+  (=ebd38d393=), so the #805 reader fix will NOT clear them.  *Unfixed.*
+- #928 :: proposal, *awaiting review* -- name the categorical key column
+  (=#+key:= / =idxvars=) and the ignorance vocabulary (=Status= / =Notes=,
+  =FIXME= / =UNDECODABLE=).  Refers to #813.  Survey committed at
+  =slurm_logs/categorical_key_vocabulary/= (config-only, seconds to run).
+- #929 :: crop kg ladder had no =metric= layer.  Fixed by #930.
+
+** What #930 actually fixes, because the framing matters
+
+#838 is CORRECT (a quintal is the metric centner; 13,978 Ethiopian rows that
+converted to nothing now convert).  What it also did was turn the WB shipped
+table's only EXTERNAL check into a tautology -- the same failure the test's own
+docstring disowns for =Kg=/=Gram=.  Re-baselining =13,924 -> 0= would have
+passed CI and retired the check silently.  Instead the crop ladder gained the
+=metric= layer the food ladder has had since #850.  Relabelling only: 0 of
+85,519 =kg_per_unit= values differ, Harvest_kg totals identical, 0 cache
+hashes moved.
+
+Fell out of it: *=inferred= is now 0 for BOTH Ethiopia and Uganda* -- the
+crop-side price-ratio inference serves neither country a single row.
+
+** Open threads, in the order I would take them
+
+1. *CI gating -- not filed, and it is why development can sit red.*  The
+   credentialed =data-tests= job runs only on pushes to =master= /
+   =separate_data=, so all *247 =requires_s3= tests of 6,482* skip on every PR
+   and on =development=.  #930 fixes the current redness; the gap remains.
+   Options discussed, none chosen: run data-tests on PRs to development; run
+   only the pinned-number subset; a scheduled nightly; or decide it is
+   deliberate.
+2. *#928 review.*  P1/P2 (=#+key:=, consolidating the four positional
+   key-column sites) are library-side and free -- but MEASURE first:
+   =all_dfs_from_orgfile= is reached from the =@build_transform=-tagged
+   =df_data_grabber=, so it may invalidate corpus-wide.  P3/P4 are per-country
+   and must be batched (any =categorical_mapping.org= edit costs that country
+   a re-warm).
+3. *Malawi's four kilograms* (#832).  Malawi serves =Kg= / =kg= / =Kilogram= /
+   =Kilogramme= over 146,284 rows while Uganda, Nigeria, Niger, Benin and Togo
+   serve one.  =categorical_mapping/u.org= holds the unifying rows and cannot
+   reach Malawi: =_row_union_categorical= falls back silently when key columns
+   disagree (=u= aligns for 9 countries, falls back for 4).
+4. *"Site M"* -- discussed, not decided.  #693, #694, #674, #925 and the merge
+   fallback are one failure class: the loader returns something that LOOKS
+   like a valid answer.  Every other layer in this library has a named audit
+   site; the categorical-mapping layer has none.  The open question is the
+   TRIGGER, not the site -- per the null-read guard's own history, a per-column
+   form fired 887 times and the frame-fraction form 0.
+5. *#926* -- the C1 controls need a config repair, independent of #805.
+
+** Measured facts worth not re-deriving
+
+- =---= parses to NaN, a blank cell to the empty string.  So *NaN means
+  somebody wrote the sentinel; empty string means somebody left it blank.*
+- =Country.data_scheme= is a LIST of table names, not a dict; and
+  =data_scheme.yml= nests tables under =Data Scheme:= behind =!make= tags.
+  Both produced confident wrong answers during this session.
+- =Country._table_cache_hash= takes =(table, waves)=.  Calling it with one
+  argument and catching the TypeError compares error strings, not hashes --
+  that is how "0 of 12 moved" got into a commit message wrongly.
+- =CONTENTS.org= is the one =.org= the cache hasher skips
+  (=_ORG_HASH_SKIP=), so prose there is free.
+- Panama's quintal: =units.json= says 220.462 lb = 100.000 kg; =units.py=
+  overrides to 100 lb and wins.  @ligon adjudicated 2026-09-15 that the
+  override is right and the source compiler mistook a Spanish measure for a
+  universal one.  Recorded in =Panama/_/CONTENTS.org=.
+
+** Session hygiene note
+
+Three separate measurements in this session were wrong on first run (a broken
+cache probe, a cross-branch hash comparison, and two bad =data_scheme= reads).
+Each was caught before or shortly after reporting, and =45fb9fa8c= exists
+solely to correct five numbers and one mechanism an independent red-team found
+in my own earlier commits.  Treat any figure here without a committed
+reproducer as needing one.
+
+* Next concrete action
+
+Merge #930 to un-red =development=, then decide #928's P1/P2 or file the CI
+gating gap.
+
 #+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
 * GhanaLSS backlog session (2026-09-12, Sue / GPT-6, job 38734650)

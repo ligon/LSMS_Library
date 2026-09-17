@@ -1400,15 +1400,13 @@ KNOWN_METRIC = {
     'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
     'gm': 1/1000, 'gms': 1/1000,
     'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
-    # `quintal` is the METRIC centner (100 kg), correct for Ethiopia.  It is
-    # country-qualified, not universal: the SPANISH quintal is 100 lb
-    # (45.36 kg) -- see Panama/_units.py's STANDARD_POUNDS, which corrects it.
-    # No country currently serves a literal Spanish `quintal` label into this
-    # lookup (Panama's wave scripts mint `centner` from the Translation column,
-    # which is not a KNOWN_METRIC key), so the 100 kg value never misfires
-    # today -- but a future country serving Spanish `quintal` would get 100 kg
-    # silently.  A country-qualified seed is a design decision (GH #898 review).
-    'quintal': 100, 'quintals': 100,
+    # `quintal` USED TO BE HERE at 100 (the metric centner) and was removed in
+    # GH #919: it is country-qualified, not universal -- the Spanish quintal is
+    # 100 lb (45.36 kg), and the pound is itself regional.  It now lives in
+    # `categorical_mapping/u.org`'s `u_kg` table, where a country can override
+    # it; see that file for the full reasoning.  Nothing in KNOWN_METRIC may be
+    # country-qualified, because `_seeded_kg_factors` lets an entry here beat
+    # every country-level factor unconditionally.
     'tonne': 1000, 'tonnes': 1000,
     'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
     'ml': 1/1000, 'cl': 1/100,
@@ -1465,8 +1463,6 @@ _EXPLICIT_METRIC_PATTERNS = (
                 re.IGNORECASE), 1/1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*quintals?\b',
-                re.IGNORECASE), 100, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
     (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
@@ -1540,7 +1536,7 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     return None
 
 
-def _seeded_kg_factors(df, *, volume_as_mass=True):
+def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """The kg factors that are READ rather than inferred.
 
     :data:`KNOWN_METRIC` plus whatever :func:`_parse_explicit_metric` can
@@ -1558,6 +1554,19 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
         for u in _FLUID_UNITS:
             factors.pop(u, None)
 
+    # GH #919: DECLARED factors outrank KNOWN_METRIC, and are the only layer a
+    # country can override.  `unit_kg` arrives already keyed on the RAW `u`
+    # label, composed by `Country._unit_kg_factors` from the country's merged
+    # `u` (raw -> Preferred Label) and `u_kg` (Preferred Label -> kg) tables.
+    # It is composed THERE rather than here because the kg factor is computed
+    # before the categorical mapping is applied -- `conversion_to_kgs` sees the
+    # raw `u` (GH #770) -- so this function must never assume harmonisation has
+    # run.  A `volume_as_mass=False` caller still drops the fluid spellings
+    # above; a declared row for a fluid unit is the country's own statement and
+    # is left alone.
+    for key, kg in (unit_kg or {}).items():
+        factors[str(key).lower()] = kg
+
     if 'u' in (df.index.names or []):
         labels = df.index.get_level_values('u').dropna().unique()
     elif 'u' in df.columns:
@@ -1574,7 +1583,7 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
     return factors
 
 
-def _get_kg_factors(df, *, volume_as_mass=True):
+def _get_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """Build a combined kg-per-unit mapping from known metric units,
     explicit-metric label parsing, and price-ratio inference on the data.
 
@@ -1594,7 +1603,7 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         recovers the actual specific gravity per (item, region, time)
         when enough kg-reporting households share the cell.
     """
-    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Infer additional factors from price ratios where possible
     if 'Expenditure' in df.columns and 'Quantity' in df.columns:
@@ -1733,7 +1742,7 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
-def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
+def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
@@ -1805,7 +1814,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     otherwise lose a row it can serve.
     """
     idx_names = list(df.index.names or [])
-    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     if 'u' in idx_names:
         units = df.index.get_level_values('u').astype(str).str.lower()
@@ -2700,7 +2709,7 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -2775,7 +2784,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -2815,7 +2824,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -2913,7 +2922,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
 
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -2929,7 +2938,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
@@ -3378,8 +3387,14 @@ KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
 #: The counts over these layers PARTITION the frame and sum to ``len(df)``, so
 #: every key is present on every call -- ``shipped: 0`` when no table is
 #: passed.
-KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'inferred',
-                    'none')
+#: ``metric`` (GH #929) is the READ half of what used to be counted as
+#: ``inferred``: a unit whose own label names its metric content (``Quintal``
+#: = 100 kg, ``50 kg bag``).  It sits directly above ``inferred`` and below
+#: everything that already outranked it, so separating it moves no
+#: ``kg_per_unit`` value -- it makes a DEFINITIONAL factor countable apart
+#: from a price-ratio guess, which the food ladder has done since GH #850.
+KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'metric',
+                    'inferred', 'none')
 
 
 def _level_or_column(df, name):
@@ -3901,6 +3916,34 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     inferred = _kg_factor_series(df, volume_as_mass=volume_as_mass)
     inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
 
+    # The READ half of `inferred`, separated out (GH #929).  `_kg_factor_series`
+    # returns one number per unit whether the unit NAMED its own metric content
+    # (`Quintal` is 100 kg by definition) or the price-ratio inference guessed
+    # it, and the crop ladder counted both as `inferred` -- the food ladder has
+    # had a `metric` layer since GH #850.  The asymmetry is not cosmetic: it
+    # cost Ethiopia's shipped table its only EXTERNAL check.  That check is
+    # "rows the WB table serves where the library has no independent opinion",
+    # and it was expressed as `kg_shipped.notna() & kg_inferred.isna()`.  When
+    # GH #838 seeded `quintal=100`, 13,924 quintal rows acquired an `inferred`
+    # value that is the SAME DEFINITION the WB table quotes, so they left the
+    # "no opinion" set and the check silently became the tautology its own
+    # docstring disowns for `Kg`/`Gram` ("both sides are quoting the definition
+    # of a kilogram ... a `j` mis-key would leave it at 1.0000 too").
+    #
+    # `_seeded_kg_factors` is KNOWN_METRIC plus the explicit-metric label
+    # parser -- read, never inferred -- and `_get_kg_factors` gives those seeds
+    # precedence over the inference, so wherever `metric` is present it holds
+    # the value `inferred` already carried.  `metric` therefore sits directly
+    # ABOVE `inferred` and below every layer that outranked it before, which
+    # makes this a RELABELLING: `kg_per_unit` is unchanged on every row, and
+    # `test_metric_layer_changes_no_kg_value` pins that.
+    _mwork, _mpromoted = _with_u_in_index(df)
+    _munits = _mwork.index.get_level_values('u').astype(str).str.lower()
+    metric = _valid_factor(
+        pd.Series(np.asarray(_munits)).map(
+            _seeded_kg_factors(df, volume_as_mass=volume_as_mass)))
+    metric = np.asarray(metric, dtype='float64')
+
     if 'KgFactor' in df.columns:
         reported, rejected = _screen_reported_factors(df, df['KgFactor'])
     else:
@@ -3943,8 +3986,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     rep_ok = ~np.isnan(reported)
     shp_ok = ~np.isnan(shipped)
     med_ok = ~np.isnan(survey_median)
+    met_ok = ~np.isnan(metric)
     inf_ok = ~np.isnan(inferred_arr)
 
+    # `resolved` is deliberately NOT re-expressed over `metric`: the seeds are
+    # already inside `inferred_arr` with precedence, so splitting the label
+    # cannot move a number.  Written this way so the relabelling stays
+    # provably value-preserving rather than approximately so.
     resolved = np.where(
         rep_ok, reported,
         np.where(shp_ok, shipped,
@@ -3953,7 +4001,8 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         rep_ok, 'reported',
         np.where(shp_ok, 'shipped',
                  np.where(med_ok, 'survey_median',
-                          np.where(inf_ok, 'inferred', 'none'))))
+                          np.where(met_ok, 'metric',
+                                   np.where(inf_ok, 'inferred', 'none')))))
 
     out = pd.DataFrame(
         {'kg_per_unit': resolved,
@@ -3963,6 +4012,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
          'kg_shipped': shipped,
          'kg_shipped_rejected': shipped_rejected,
          'kg_shipped_source': shipped_source,
+         'kg_metric': metric,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)

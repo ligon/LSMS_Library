@@ -221,7 +221,11 @@ class TestDelivered:
         t = fa.index.get_level_values('t').astype(str)
         s = fa.index.get_level_values('s').astype(str)
         expected = pd.Series(np.isin(t, WAVES) & (s == 'produced'), index=fa.index)
-        got = fa['Derivation'].notna()
+        # Scope to THIS key.  `Derivation.notna()` was an adequate proxy while
+        # 12B was the only derivation in this table; since 2026-09-13 the
+        # section-8H farmgate valuation shares the column on the LATER waves'
+        # produced rows, so the loose form would now assert something false.
+        got = fa['Derivation'] == KEY
         assert (got == expected).all()
         assert set(fa.loc[got, 'Derivation'].unique()) == {KEY}
 
@@ -240,7 +244,7 @@ class TestDelivered:
     def test_attrs_summary_counts_the_labelled_rows(self, delivered):
         summ = delivered.attrs['derivations'][COUNTRY][KEY]
         assert summ['in'] == 'food_acquired'
-        assert summ['rows'] == int(delivered['Derivation'].notna().sum())
+        assert summ['rows'] == int((delivered['Derivation'] == KEY).sum())
         assert summ['columns'] == ['Expenditure', 'Quantity']
 
     def test_derived_tables_survive_the_string_column(self, country):

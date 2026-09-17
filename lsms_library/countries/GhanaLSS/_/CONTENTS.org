@@ -1215,14 +1215,14 @@ The move -- not a rename in place -- was the point:
 name.  So =labels== (=Country._relabel_j=) raised =LabelUnavailableError= for
 GhanaLSS however the table inside that file was named.  It now resolves.
 
-The heading formerly read /the "Aggregate Labels"/.  That was a misnomer:
-this table has never had an =Aggregate Label= column and still does not.
-The seven WAVE-level =harmonize_food= tables do, but they cannot simply be
-unioned into one -- 14 Preferred Labels take two different Aggregate values
-across waves, 9 of this table's labels appear in no wave table at all, and
-one wave value carries mojibake.  Adding a country-level Aggregate column is
-curation gated on the CFE beta-spread test, deliberately out of GH #783's
-scope.
+The heading formerly read /the "Aggregate Labels"/.  That was a misnomer
+when GH #783 moved the table: it had no =Aggregate Label= column then, and
+the seven WAVE-level =harmonize_food= tables' columns could not simply be
+unioned (they disagreed on 13 labels, and the "9 orphans" recorded at the
+time were a join artefact -- see =slurm_logs/ghanalss_aggregate_labels/FINDINGS.org=).
+*It has one since 2026-09-17*, curated through the CFE beta-spread gate on
+the served (country) axis that GH #935 established -- see /The country
+=Aggregate Label= column/ under /One food vocabulary, not seven/ below.
 ** DONE conversion_to_kgs.json -- intentionally NOT used
 The canonicalization fills missing quantities via the inverse market-price
 ladder (=transformations.median_price_valuation=) in native units, which
@@ -1291,6 +1291,59 @@ row above now reads 2..11 for both modules.  The calendar-visit convention
 stands on its other grounds (it is what every wave's labels state, it is
 checkable against the source, and it is the clock =interview_date= uses);
 it no longer has a GLSS5 counter-example to lean on.
+
+**** Section 8H own production is valued at the farmgate price (2026-09-13)
+
+GLSS4--GLSS7 (=1998-99=, =2005-06=, =2012-13=, =2016-17=) record, for each
+home-produced food consumed, a real =Quantity= in a native unit =u= and the
+household's own reported farmgate =Price= of one such unit -- but *never a
+total*.  Until 2026-09-13 the wave scripts therefore left =Expenditure= NaN
+and said so ("no produced value is recorded"), which is a true statement about
+the *survey* and was never a claim that the value could not be constructed.
+=food_expenditures()= consequently returned =<NA>= for own production in every
+wave but the two 1980s ones.
+
+It is now *derived*: =Expenditure = Quantity * Price=, registry key
+=GhanaLSS::food_acquired::8h-farmgate= (see =_/derivations.yml= and
+=.coder/ledger/ghanalss-produced-qp.md=).  This is a **policy change**, made
+policy by the derived-values machinery (@ligon, 2026-09-13): the library now
+has somewhere honest to put a construction, so it is served with the key on
+the row rather than withheld.  The 2005-06 script had already been multiplying
+the same two columns internally (=y['_qp']=) to resolve households reporting
+two farmgate prices for one commodity.
+
+*Not comparable with the 12B figure.*  Section 8H asks a *producer* price;
+12B's =VFOODCPD= asks what it would *cost to buy*.  A farmgate valuation should
+sit below a consumer-price one, and does.  Own-production share of food value:
+
+| wave    | share | basis           |
+|---------+-------+-----------------|
+| 1987-88 | 39.4% | derived, 12B    |
+| 1988-89 | 33.4% | derived, 12B    |
+| 1991-92 |  --   | *not wired*     |
+| 1998-99 | 30.5% | Q x P, 8H       |
+| 2005-06 | 17.1% | Q x P, 8H       |
+| 2012-13 | 27.8% | Q x P, 8H       |
+| 2016-17 | 28.8% | Q x P, 8H       |
+
+2005-06's 17.1% is *not* explained here; it is recorded, not editorialised.
+
+*=1991-92= is deliberately NOT wired.*  Only 80,282 of its 286,922 produced
+rows (28%) carry both factors, and its dominant unit is =All= (93,349 rows),
+which reads as "the whole harvest" rather than a countable quantity.  Serving
+it would look complete and would not be.  It remains =<NA>=, which is the
+honest answer until someone reads the GLSS3 form.
+
+*Stamped only where computed.*  A produced row missing either factor (8.5% of
+2016-17) keeps =Expenditure= NaN and carries *no* key, so the labelled rows are
+exactly the computed ones -- 605,333 of them.  Verified on rebuild: the served
+=Price= is byte-identical before and after in every wave (Trap 9 / GH #871
+re-derives =Price = Expenditure/Quantity= once both are present, which is
+algebraically a no-op here -- measured, not assumed), and
+=max |Expenditure - Quantity*Price| = 0=.
+
+*Knock-on:* =food_prices(units='kgvalue')= (= =Expenditure / Quantity_kg=) now
+returns values on produced rows in these four waves where it returned NaN.
 
 **** 12B is a value per eating occasion, not a recall value (fixed 2026-09-11)
 
@@ -3268,6 +3321,94 @@ through =labels='Aggregate'=; it was fixed in the same pass, along with an
 encoding artefact (2012-13 code 262's Aggregate read =Cooked Rice and Stew=
 followed by two mojibake =Ê= characters, a twin of code 254's clean label).
 
+/Correction, 2026-09-16./  "User-visible through =labels='Aggregate'="
+above overstated it: =Country._relabel_j= reads the COUNTRY table only, and
+the wave =Aggregate Label= columns are never consumed by the API.  They are
+configuration checked for spelling drift, not live aggregation rules.
+
+*** The country =Aggregate Label= column (2026-09-17, supersedes PR #937)
+
+=_/categorical_mapping.org= =harmonize_food= now carries an =Aggregate
+Label= for every one of its 215 Preferred Labels, so
+=Country('GhanaLSS').food_expenditures(labels='Aggregate')= resolves
+(215 -> 209 groups) and =Feature('food_expenditures')(['GhanaLSS'],
+labels='Aggregate')= no longer drops the country.  A blank cell would be a
+silent merge, not a partial feature (GH #925), which is why the column is
+complete and a singleton carries its own name.
+
+*Why this had to be done twice.*  PR #937 (2026-09-16) published the same
+column keyed on the =j= the API served that day -- the WAVE vocabulary,
+because the wave->country crosswalk (=ghanalss.to_country_food_labels=,
+GH #935) was not yet applied.  Its 47 appended "API-delivered" rows
+(=Cassava (fresh)=, =Guinea corn/sorghum=, =Mutton=, =Rice (imported)=,
+...) were exactly the leaked labels, and its partition named =Cassava
+(flour)= where the country table now says =Gari=.  After #935 the served
+axis is a bijection onto the country table (=inventory.yml=: 215 delivered
+= 215 declared, nothing appended), and the selection was re-made on it.
+
+*The gate.*  =SkunkWorks/aggregation/ghana_gate.py= applies the parent
+skill's rule verbatim -- =max(beta) - min(beta) < 1.348 * sigma_min= over a
+group's members, beta and sigma from ONE CFE fit containing every member
+(CFE's beta is a rank-1 factor identified up to a per-fit scale; sigma is
+CFEDemands' resampling bootstrap).  Primary population: the 2016-17
+purchased fine fit / member probe on PR #937's seed-20260916 training
+split; the full 2016-17 wave where the split cannot jointly identify a pair
+(=prepare_data= keeps a pair only if >= 30 households report BOTH --
+=Macaroni= x =Spaghetti= is 45 in the whole wave).  A group must also pass
+in every other wave where two or more of its members are delivered
+(2012-13, 2005-06, 1998-99 on the full wave; 1991-92 is not gated because
+its 14-day rural / 30-day urban windows are not absorbed by a Region
+market).  Every renamed or split #935 label was given a candidate so the
+decision is made, not inherited:
+
+| group                      | members                                              | primary ratio | other waves            |
+|----------------------------+------------------------------------------------------+---------------+------------------------|
+| =Sugar (cubed/granulated)= | Sugar (cubed), Sugar (granulated)                    | 0.96          | merges only in 2016-17 |
+| =Malt Drinks=              | Malt Drinks (bottle), Malt Drinks (canned)           | 0.80          | merges only in 2016-17 |
+| =Macaroni/Spaghetti=       | Macaroni/Spaghetti, Macaroni, Spaghetti              | 0.27 (full wave) | merges only in 2016-17 |
+| =Millet/Sorghum=           | Millet/Sorghum, Millet, Guinea Corn/Sorghum          | 0.62          | 0.12 / 0.96 / 0.12     |
+
+Generic =Sugar= (1987-88..2012-13) is deliberately outside the sugar group
+(its GLSS1 source label is "Sugar, candy, honey and sugarcane"), so the
+sugar series is NOT continuous across the 2016-17 split; the pasta and
+millet groups take the GLSS1/2 coarse label's name so theirs are.  =Millet
+(flour)= is not in the millet group: the four-member group fails on it
+(ratio 3.45), so the GLSS1/2 label, whose question covered flour, joins a
+group slightly narrower than it.
+
+*What was rejected, and why it matters for the #935 splits.*  =Rice=
+(imported/local; 3.7, and 3.2 / 1.0 in 2012-13 / 2005-06), =Gari=
+(white/yellow; 3.1), =Fish (smoked)= (river/sea; 2.0), =Oil (palm)/Shea
+Butter= (3.6 in 2016-17 and >2.8 in every earlier wave -- the north/south
+difference #935 noted), =Cocoa Powder= with the malted drinks (2.5),
+=Bread=/=Sugar Bread= (3.5) all fail: the fine labels #935 created carry
+different loadings and stay distinct on the Aggregate axis too.
+=Goat=/=Mutton= passes every 2016-17 run but fails 2012-13 (1.08), and
+=Beer=/=Pito= fails 2012-13, 2005-06 and 1998-99 -- both stay split, which
+is also what @ligon ruled on the fine axis.  PR #937's =Fish
+(kapla/tilapia)= fails the primary (1.17) and is dropped.  =Margarine= /
+=Margarine/Butter= never co-occur (no =Butter= label exists to test
+against), =Potato= / =Sweet Potato= have no purchased co-occurrence, and
+=Gin=/=Whisky=/=Schnapps=, =Coconut (fresh)=/=(dried)=, the pork cuts and
+sausages never share 30 households in 2016-17 on any population: all are
+singletons by default, recorded in =selected_groups.yml= =rejected:= with
+the numbers.  =Crab=/=Shrimp= is the one case where the populations
+disagree (primary 1.21 fails; full wave 0.31 passes) -- the primary decides
+and it is flagged for a human.
+
+*Held-out check* (=validation.org=): the selected map is refitted and
+scored on PR #937's design (Salt anchor, Onion/Egg reserved, =min_goods=1=
+explicitly -- whether the ranking is stable in =min_goods= is GH #939).  As
+with #937, this is a conservative semantic partition with its statistics
+disclosed, not a claim of improved welfare precision.
+
+*Cache.*  =_/categorical_mapping.org= is in every GhanaLSS table's input
+hash, and so is =_/nutrition.py= (its =_load_food_codes= now recognises
+=YYYY-YY= wave columns explicitly so the new column is not read as a wave):
+the whole country re-warmed once.  The default =j= does not read the
+column, so the four =food_prices= / =food_quantities= pins in
+=tests/test_currency_denominated_units.py= are unchanged.
+
 *Why a rename here is provably safe.*  For the six singular/plural pairs, both
 variants share the collision key, so the measured "0 internal collisions per
 wave" is a proof that no wave holds both -- a rename cannot merge two distinct
@@ -4297,3 +4438,356 @@ Regression coverage lives in =tests/test_ghanalss_interview_date.py=,
 actual Wave duplicate-anchor handling, raw-input linkage, and provenance
 through parquet and Feature. See =.coder/ledger/ghanalss-visit-dates.md= for
 the implementation decisions and verification record.
+
+* Section 9 (Agro-Pastoral Activities) -- wired for GLSS1/GLSS2 only (2026-09-16)
+
+Agriculture is *Section 9* in GLSS1/GLSS2 and *Section 8* from GLSS3 on (see
+"Section numbers moved between GLSS2 and GLSS3" above).  Both panel waves ship
+the complete suite -- =Y09A= .. =Y09K=, 22 files each -- and until now none of
+it was declared.  Three tables are wired, for *1987-88 and 1988-89 only*,
+because those two rounds are the only panel GhanaLSS has (the 712-household
+GLSS1 -> GLSS2 rotating half):
+
+- =crop_production= :: =(t, i, j)=, from Part B.
+- =plot_inputs= :: =(t, i, input, j)=, from Part D blocks D1A-D3A.
+- =livestock= :: =(t, i, animal)=, from Part F.
+
+=plot_labor= is deliberately NOT wired -- see below.  The questionnaire is an
+image-only CCITT-fax scan; every reading below was taken off the rendered page
+with =slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py=, whose
+=PAGE_INDEX.org= puts Section 9 at PDF pp.42-55.
+
+** Section 9 Part B records a sale PRICE, not a sale value
+
+Part B column 6 -- "How much was the harvest of [...] sold for?" -- has *two*
+boxes, =AMOUNT= (=CROPSP=) and =UNIT= (=CROPSPU=).  The amount is denominated
+by its own unit box, so on most rows it is a price per container and *not* a
+total.  =CROPSPU= is essentially bimodal over sale rows: equal to =CROPSU=
+(91.3% / 85.8%), or code 22 =All=, meaning the whole lot (9.6% / 15.9%), with
+a 2.4% / 1.2% residual.
+
+=Value_sold= is therefore DERIVED, registered as
+=GhanaLSS::crop_production::9b-sale-amount-per-unit=.  *The =All= branch must
+be tested before the same-unit branch*: =CROPSU= is itself =All= on many rows,
+so the masks overlap, and testing same-unit first multiplies a whole-lot total
+by a quantity.  That mistake inflated yam's median sale value twelvefold
+during design and is the single way to get this subtly and silently wrong.
+
+*** There is no harvest quantity anywhere in Part B
+
+The form asks the quantity *sold* (Q4) and never the quantity *harvested*.
+=Quantity= is declared and served ENTIRELY NaN so the cross-country shape stays
+recognisable; nothing is imputed into it, and =transformations.harvest_kg=
+cannot reach this country at all (it keys the reported =KgFactor= to =u= and
+needs =Quantity=, and there is neither).  =CROPSUK= is carried as =KgFactor=
+for the analyst's own use; note that canonically that column is defined against
+=u=, a level this table does not have.
+
+*** The four dispositions are NOT on one valuation basis
+
+Part B asks where the harvest went: sold (Q4/Q6), kept for seed (Q7/Q8), given
+to labourers / a landowner / as gifts or for ceremonies (Q9/Q10), and lost to
+insects, rodents, fire or rotting (Q11/Q12).  A fifth use -- what the household
+*ate* -- is not in Section 9 at all; it is Section 12B, already derived as
+=GhanaLSS::food_acquired::12b-fortnight=.
+
+=CROPSP= is what the household *received*.  The other three each ask "how much
+would the same quantity *cost in the market*" -- an imputed replacement price,
+the buyer's side of the farmgate/market gap.  *Adding the four gives a total in
+mixed prices.*  They are carried as four separate columns so the choice stays
+with the analyst.
+
+*** About a fifth of cropped rows carry no Section 9 value at all
+
+Of rows with harvested acreage > 0, 18.9% (1987-88) and 19.5% (1988-89) record
+no sale, no seed, no gift and no loss value -- crops grown and wholly consumed,
+covering ~14% of harvested acres and touching about half the farming households
+(1,127 of 2,178; 1,408 of 2,393).  They carry acreage and nothing else, and
+they have no quantity either, so no price source recovers them.
+
+Nothing is fabricated for them (@ligon, 2026-09-16: "We should not make up
+values for those missing rows.  Dealing with that missingness is a job for the
+downstream analysis.").  Anyone building a value of output from this table
+should know that it is structurally zero for the most subsistence-oriented part
+of the sample, and *non-randomly so* -- a selected measure, not merely a noisy
+one.  Do NOT impute it from acreage: for a production function that is
+circular, since acreage is a regressor.
+
+** Section 9 Part F records a price per head
+
+Part F Q5 -- "If they wanted to sell one of these [...] today, how much money
+would they receive altogether?" -- is ambiguous between a price per head and a
+value for the whole herd.  It is a *price per head*, measured rather than read:
+=corr(log HeadCount, log LIVSTNV)= runs -0.16..+0.08 across every animal type,
+chickens report a median 400 at both 4 head and 20, and cattle 20,000 at both 2
+head and 15.  A herd value would scale with the herd; this does not.
+
+Q8's SALE value does move with the number sold (corr 0.65-0.80), is a total,
+and dividing it by =HeadSold= recovers the same per-head figure (chickens 400,
+cattle 20,000) -- the cross-check that settles it.
+
+So =ValuePerAnimal= is the RECORDED column and =HerdValue= the DERIVED one
+(=GhanaLSS::livestock::9f-herd-value-from-unit-price=), which is the reverse of
+most countries in the corpus.
+
+** Part D: the input labels are categories, and three blocks are not inputs
+
+=plot_inputs= carries seven blocks.  Two cautions, both in the wave scripts'
+docstring as well:
+
+1. =Transport=, =Containers= and =Storage= are the COST OF SELLING the output
+   -- marketing costs -- rather than inputs applied to a crop.  They belong in
+   this table (@ligon, 2026-09-16: "conceptually these are part of the cost of
+   selling one's output, and they belong in the same table").
+
+   They are a QUARTER of the recorded spend, which is the part worth knowing
+   before aggregating:
+
+   | input                  | 1987-88 | 1988-89 |
+   |------------------------+---------+---------|
+   | Seed                   |   42.9% |   40.5% |
+   | Fertilizer             |   18.2% |   22.4% |
+   | Pesticide or Herbicide |   12.9% |   12.4% |
+   | Manure                 |    0.2% |    0.2% |
+   | Transport              |   12.0% |   11.7% |
+   | Containers             |   10.5% |    9.2% |
+   | Storage                |    3.3% |    3.6% |
+   | /cost of selling/      | /25.8%/ | /24.5%/ |
+
+   They are not part of the production technology: a PRODUCTION function should
+   exclude them, or net them against revenue; a PROFIT function should not.
+   =input= is an index level, so either is one filter away, and they carry no
+   =Quantity=, so no physical aggregate is affected.
+2. The labels are CATEGORIES, not products.  Every other country names the
+   chemical (=Urea=, =NPK=, =DAP=, =Pesticide=, =Herbicide=); GLSS1/GLSS2 asks
+   only "fertilizer" and "insecticides *or* herbicides".  =Fertilizer= here is
+   a SUPERSET of the corpus's product labels and must not be pooled with them,
+   and =Pesticide or Herbicide= is deliberately not called =Pesticide=.
+
+=Cost= is the corpus's first input-spend column.  No other country records
+input spend -- the canonical vocabulary is =Quantity= / =Purchased= /
+=Quantity_purchased= -- and four of GLSS's seven blocks record spend and
+nothing else, so omitting it would omit the module.
+
+** =plot_labor= is NOT wired, and the reason is a misreading worth recording
+
+Q41-42 look like a labour roster and are not one.  Q42 asks "How much was
+*spent* for the following kinds of *paid* labor" over a grid of
+CLEARING LAND / PLANTING / HARVESTING / OTHER x MALE / FEMALE / CHILD, and the
+cells are *AMOUNTS*, not person-days.  (=CRLABM1..M4=, =CRLABF1..F4=,
+=CRLABC1..C4= are that grid.)  The corpus's =plot_labor= is
+=(t, i, plot_id, source)= with =PersonDays= and =Wage=, and *every* country
+that declares it carries =plot_id= -- including the EHCVM countries that drop
+the plot level from =plot_inputs=.  GLSS1/GLSS2 has neither a plot level nor
+person-days for paid labour.
+
+The only person-days in Section 9 are Q46, "How many man days of labor has the
+household received" through *unpaid* labour exchange -- a single household
+total, not a per-plot or per-source figure.
+
+Deferred rather than forced into a shape it does not have.  Q43-44 (renting
+animals, equipment, maintenance, irrigation charges, fuel) is a further
+expense block, also unwired.
+
+*** Do not read =Y09A:IDFARM= as a plot identifier
+
+It cannot be one: =Y09A= has exactly one row per household (2,644 / 2,938).
+=IDFARM= also appears in =Y07.DCT= alongside =FARMSE= and =BUSSE=, which is
+where Section 7 records *who answers* the agriculture module.  =plot_features=
+for these two waves carries a C4-validated =not-asked= verdict.
+
+** Section 5 carries the ANNUAL labour measure, and the 7-day parts are where it lives
+
+=labor= is wired from Section 5 for both panel waves, at =(t, i, pid, job)=
+with four job slots.  It is deliberately NOT =people_last7days=, the corpus's
+canonical 7-DAY table (13 countries): this is a 12-month measure, on the same
+window as Section 9's agriculture, which is what makes the two joinable.
+
+*** The "past 7 days" Parts B and C are the PRIMARY annual source
+
+Their TITLE names the reference period used to IDENTIFY the job.  Two of their
+questions are about the past twelve months (p.19, form block =5B1=):
+
+- Q6 :: "For how many *weeks* during the past *12 months* did you do this
+  work?"  (=OCCMW=, median 42)
+- Q7 :: "For how many *hours per week* did you usually do this work *during the
+  past 12 months*?"  (=OCCMHU=, median 28)
+
+So =WeeksPerYear x HoursPerWeek= is annual, for every person who worked in the
+reference week -- 6,705 rows in 1987-88 and 6,206 in 1988-89, median 1,050
+annual hours (p10 200, p90 2,400).
+
+*** Parts E and G are a SUPPLEMENT, and their detail is mostly absent
+
+Part E Q3 asks whether the 12-month main job is the same as the 7-day main or
+secondary job, and *skips the rest of the grid to Part F when it is*.  So Part
+E's weeks / days / hours / earnings / own-farm columns are populated only where
+the answer is "Different work": *1,701 of 8,182 rows in 1987-88 and 1,986 of
+7,806 in 1988-89*, about a fifth.
+
+Building annual labour from Parts E/G alone would therefore miss roughly 78%
+of workers.  =SameAs7DayJob= carries that answer so a consumer can drop the
+pointer rows instead of double-counting a job already described in Part B.
+
+*** =HoursPerWeek= is part reported, part derived
+
+The two families ask the same quantity in different shapes -- B/C give hours
+per week directly, E/G give days a week x hours a day.  =HoursPerWeek= is read
+on the B/C rows and constructed on the E/G rows
+(=GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours=), so that
+=WeeksPerYear x HoursPerWeek= is valid on every row.  =DaysPerWeek= and
+=HoursPerDay= are served raw beside it.
+
+The genuinely 7-day quantities -- Part B Q4 (days worked in the past 7 days)
+and Q5 (hours per day during those days) -- are NOT carried (@ligon,
+2026-09-16); they describe the reference week, not the year.
+
+*** Own-family farm labour
+
+=OwnFarmOrBusiness= is Part B Q11 / Part E Q11: "In this work, were you
+self-employed on a farm or in a business belonging to your household?".
+Combined with an agricultural =Industry= it gives the family-labour input that
+Section 9 Part D does not record -- Part D has only *paid* labour (Q42,
+amounts) and *unpaid exchange received* (Q46, man-days).
+
+Delivered: 13,031 person-job rows are own-farm and agricultural, giving *4,808
+household-years with a median 1,600 annual own-farm hours* (p90 4,929).
+
+*** =Occupation= and =Industry= are RAW CODES -- a decode table is a gap
+
+No code list ships with the data in this repo and none has been verified, so
+nothing is decoded and no standard is asserted here.  What the data shows:
+=Industry= 111 is overwhelmingly dominant (4,374 of 6,705 in 1987-88) and
+co-occurs with =Occupation= 61, the modal code among people whose main job is
+farming; 112 and 130 also appear, and the 1xx block is agriculture / forestry /
+fishing on any reading.  Filter on the codes; do not assume a published
+correspondence until one is found and recorded.
+
+** =plot_labor=: hired and exchange labour, without a plot level
+
+Wired from Section 9 Part D for both panel waves at
+=(t, i, stage, source, worker)=.  Deliberately NOT a new table: every country
+in the corpus already holds hired labour in =plot_labor= under
+=source='hired'=, and GhanaSPS already declares a SIX-level =plot_labor=
+=(t, i, plot_id, season, stage, source)= whose =stage= vocabulary is reused
+here.  =plot_labor= has no canonical =index_info= or =Columns= entry (GH #569),
+so the corpus shape is convention -- and it already runs from four levels to
+six.
+
+Two sources, both household-grain and both 12-month recall:
+
+| form   | what it asks                                  | served as |
+|--------+-----------------------------------------------+-----------|
+| Q41-42 | how much was SPENT on PAID labour, over a grid of CLEARING LAND / PLANTING / HARVESTING / OTHER x MALE / FEMALE / CHILD | =source='hired'=, =Cost= |
+| Q45-46 | MAN DAYS of unpaid labour EXCHANGE RECEIVED, one household total | =source='exchange'=, =PersonDays= |
+
+*** Why =Cost= and not the corpus's =PersonDays= / =Wage=
+
+Q42's cells are AMOUNTS.  The form asks how much was *spent*, never how many
+days were worked, so the pair every other country serves cannot be filled.
+=PersonDays= carries the Q46 exchange total, which is the only person-days
+figure anywhere in Section 9.
+
+Delivered: *11,131,768 cedis (1987-88) and 16,577,382 (1988-89)* of hired
+labour -- more than every =plot_inputs= category combined -- and 17,309 /
+15,952 exchange man-days.  Three quarters of the spend is one cell,
+=clearing_and_land_preparation= x =male= (8,362,690 in 1987-88).
+
+*** The sentinels on Q46 are sentinels, not measurements
+
+Q46 has neither a stage nor a worker type, but both are DECLARED INDEX LEVELS,
+and a NaN on one is deleted by the first =groupby= (Site I).  Those rows
+therefore carry =stage='unspecified'= and =worker='all'= -- the landed Niger
+='Unknown'= pattern (GH #842).  The survey did not ask; nothing is imputed.
+
+*** =source='exchange'= is not asserted to equal GhanaSPS's ='communal'=
+
+The form's own words are "exchange of unpaid labor".  GhanaSPS's =plot_labor=
+carries a ='communal'= source which MAY be the same institution (nnoboa), but
+that has not been checked here and the two are deliberately not merged.
+
+*** =worker= is a mixed sex/age classification
+
+=male= / =female= / =child=, as the form asks it.  GhanaSPS splits the same way
+but as =WageRateMen= / =WageRateWomen= / =WageRateChildren= COLUMNS; an index
+level is used here because the corpus models categorical dimensions that way
+everywhere else (=source=, =input=, =stage=), and GhanaSPS's are rates attached
+to a labour record rather than a dimension of one.
+
+*** Zero cells are dropped, with a count
+
+The Q42 grid instructs "IF NOTHING SPENT, WRITE ZERO", so a zero is a real
+answer -- but twelve cells per household is mostly zeros, and carrying them
+would let one country's zeros dominate a cross-country =Feature('plot_labor')=.
+Dropped 24,446 of 27,443 candidate cells in 1987-88 and 26,933 of 29,978 in
+1988-89.  The wave script prints the count; GhanaSPS's scripts drop zero
+person-days the same way.
+
+*** STILL UNWIRED: Part D Q43-44
+
+Other production expenses -- renting animals, renting equipment or machinery,
+maintenance and repair of buildings and machines, irrigation charges, fuel oil
+and electricity, other -- *2,477,260 cedis (1987-88) and 2,803,632 (1988-89)*,
+over 312 / 407 households.  Household-grain with NO crop, so it fits neither
+=plot_inputs= (keyed on =j=) nor =plot_labor= (not labour).  A real gap, and
+the last unwired money in Section 9.
+
+** The =Farm-level= convention: mark the axis a survey does not resolve
+
+Established here (@ligon, 2026-09-16) and expected to recur: surveys record
+farm quantities at four different grains, and *none is better or worse in
+general* -- which you want depends on the application.
+
+| survey resolves  | =plot_id=     | =j=           |
+|------------------+---------------+---------------|
+| farm level only  | =Farm-level=  | =Farm-level=  |
+| crop level       | =Farm-level=  | the crop      |
+| plot level       | the plot      | =Farm-level=  |
+| plot x crop      | the plot      | the crop      |
+
+Both axes are KEPT in the index and the unresolved one is MARKED, rather than
+the level being dropped.  The gain is not that finer data is better; it is that
+an absent level is silent about why it is absent, whereas =Farm-level= states
+the grain positively -- so a country's grain is readable off the data instead
+of inferrable from which index levels happen to exist, and
+=Feature('plot_inputs')= keeps one index shape across countries.
+
+*=Farm-level= is STRUCTURAL, not epistemic.*  The quantity is not missing and
+not unknowable: it genuinely is not attributable to that axis.  Contrast
+Niger's =u='Unknown'= (GH #842), which marks a unit that exists but was not
+fielded.  The two must not be merged.
+
+GLSS1/GLSS2 Section 9 has no farm or plot roster anywhere, so all three tables
+carry =plot_id='Farm-level'= throughout; Part B resolves the CROP axis, Part D
+Q43-44 resolves neither.  =plot_labor= uses the same value on =stage= and
+=worker= for the Q46 exchange total.
+
+Two earlier tables in the corpus express the same fact by DROPPING the level --
+the EHCVM =plot_inputs= and EthiopiaRHS =crop_production= (GH #512).  They
+predate this convention; aligning them is a separate question, not a defect
+fixed here.
+
+*** =_relabel_j= passes an unmapped =j= through unchanged -- and that is pinned
+
+=labels== does not disturb =Farm-level= rows.  =_relabel_j= renames with
+=df.rename(index=rdict, level='j')=, which leaves keys absent from the label
+table ALONE.  The same protection covers the non-food crops this country
+serves on =crop_production= (Cocoa, Rubber, Cotton, Wood (Timber), Tobacco,
+Kenef -- five of 31 distinct =j=).
+
+The behaviour is a property of =rename=, not of the design, so it is pinned by
+=tests/test_label_selection.py::test_an_unmapped_j_value_survives_relabelling_unchanged=
+and two siblings.  The refactor they guard against is the one-line
+"simplification" to =index.map(rdict)=, which maps unmapped keys to *NaN* --
+putting NaN on a declared index level, which the first =groupby= then deletes
+(Site I).  That would silently drop every non-food crop in the corpus.
+
+*** Part D Q43-44 is now wired
+
+Other production expenses -- renting animals, renting equipment or machinery,
+maintenance and repair, irrigation charges, fuel and electricity, other -- as
+six =input= values with =j='Farm-level'=: *322 rows / 2,477,260 cedis in
+1987-88 and 437 / 2,803,632 in 1988-89*.  Zero cells are dropped here (Q44 is a
+FIXED six-row list, so a zero means the household spent nothing on that
+category) but NOT in the per-crop blocks above, where a crop is listed only
+when it had an expense.

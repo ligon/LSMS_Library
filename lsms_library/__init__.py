@@ -139,6 +139,60 @@ from . import country
 from .country import Country, Wave
 from .feature import Feature
 from .catalog import countries, features
+# *** `countries` IS THE THIRD SHADOW, AND IT POINTS THE OTHER WAY.  GH #883. ***
+#
+# `recall` and `derivations` (documented at the rebind site below) are shadows
+# the package WINS: both submodules are imported eagerly during `__init__`, so
+# the callable is bound last and stays bound.  `countries` is the inverse and
+# is strictly worse, because nothing here can lose a race it does not run in:
+# `lsms_library/countries/` is a namespace package imported LAZILY, so the
+# import system rebinds this attribute LONG AFTER `__init__` has finished --
+#
+#     import lsms_library as ll
+#     ll.countries          # -> the function
+#     from lsms_library.countries.GhanaLSS._.ghanalss import derive_...
+#     ll.countries          # -> the MODULE.  TypeError on the next call.
+#
+# That is reachable from ordinary use, not just from inside the package:
+# `DerivationRecord.resolve()` imports whatever module the registry names, and
+# most registered derivations live in `lsms_library.countries.*`, so resolving
+# one silently breaks `ll.countries()` for the rest of the session.  It is also
+# invisible to `tests/test_module_shadowing.py::discover_shadowed`, which reads
+# the attribute at test time -- before any such import has happened -- and so
+# reports a clean bill right up until something triggers it.
+#
+# A `property` is a DATA descriptor, and a data descriptor on the type beats an
+# entry in the instance `__dict__`.  Binding one on this module's own class
+# therefore makes the import system's `setattr(lsms_library, "countries", mod)`
+# a no-op, and the public callable wins permanently -- the same outcome #883
+# chose for `recall`/`derivations`, reached the only way available when the
+# competing binding happens after we have stopped running.
+#
+# `sys.modules["lsms_library.countries"]` is untouched, so every import form
+# still resolves: `import lsms_library.countries`,
+# `from lsms_library.countries.X.Y import Z`, `importlib.import_module(...)`.
+# Only the ATTRIBUTE is pinned.
+def _pin_countries_callable() -> None:
+    import sys as _sys
+    _module = _sys.modules[__name__]
+    _callable = countries
+
+    class _Package(type(_module)):
+        @property
+        def countries(self):
+            return _callable
+
+        @countries.setter
+        def countries(self, _value):
+            # The import system binds the submodule here on first import of
+            # `lsms_library.countries`.  Swallow it: `sys.modules` already
+            # holds the module, which is what every import form actually reads.
+            pass
+
+    _module.__class__ = _Package
+
+
+_pin_countries_callable()
 from .coverage_matrix import coverage
 from .currency import currency_for
 from .conversion import convert

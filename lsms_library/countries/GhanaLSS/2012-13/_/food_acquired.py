@@ -9,7 +9,8 @@ Emits index (t, i, j, u, s, visit) with columns [Quantity, Expenditure, Price].
   No physical quantity is fabricated (Phase-3 price-imputation is out of scope).
 - s='produced' from sec8h (food label = foodcd, decoded via harmonize_food Label_8h).
   Produced rows carry a real Quantity (s8hq3..s8hq8 = the 2nd..7th visits), a
-  real unit u (s8hq9), and a farmgate Price (s8hq10).  Expenditure is NaN.
+  real unit u (s8hq9), and a farmgate Price (s8hq10).  Expenditure is
+  DERIVED as Quantity * Price (key 8h-farmgate) -- no total is recorded.
 
 visit is KEPT as its own index level (decision D1 -- do NOT fold into t).  The
 derived tables sum it out at API time.
@@ -147,5 +148,33 @@ assert not fa.index.duplicated().any(), (
     'spellings share a Preferred Label for one (household, item, visit); '
     'resolve it here, not in core (CONTENTS.org Trap 9)')
 
+# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
+# Section 8H reports a quantity and a farmgate price but never a total, so the
+# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
+# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
+#
+# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
+# SUMs the additive measures and re-derives Price, so a string must not reach
+# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
+# either keeps Expenditure NaN and carries NO key, so the labelled rows are
+# exactly the computed ones.
+from lsms_library.countries.GhanaLSS._.ghanalss import derive_produced_farmgate_value
+DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
+_prod = (fa.index.get_level_values('s') == 'produced')
+_both = (_prod
+         & pd.to_numeric(fa['Quantity'], errors='coerce').notna().to_numpy()
+         & pd.to_numeric(fa['Price'], errors='coerce').notna().to_numpy())
+_kept = pd.to_numeric(fa['Expenditure'], errors='coerce').to_numpy(dtype=float)
+_qp = derive_produced_farmgate_value(fa['Quantity'], fa['Price'])
+fa['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+fa['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                index=fa.index, dtype='string')
+assert fa.loc[~_both, 'Derivation'].isna().all(), (
+    'a row with no computed value carries the 8h-farmgate key')
+
 if __name__ == '__main__':
+    # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+    # Pure rename; an unmapped label raises rather than passing through.
+    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
+    fa = to_country_food_labels(fa, '2012-13')
     to_parquet(fa, 'food_acquired.parquet')
