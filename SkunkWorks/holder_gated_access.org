@@ -275,16 +275,42 @@ nothing; a cold build pays it once.
 the existing =config.get()= order (env -> file -> None):
 
 : microdata_api_key: ...                      # kept; alias for entitlements.wb-nada.api_key
-: entitlements:
+: entitlements:                               # SECRETS: what the library presents to a holder
 :   wb-nada:          {api_key: ...}
 :   gha-gss-nada:     {api_key: ...}
+:   rwa-nisr-nada:    {api_key: ...}
 :   ifpri-dataverse:  {attested: 2026-09-17}
-:   wb-gps-unjittered: {key_id: 0xABCD1234}   # optional; gpg picks by default
+: gpg_fingerprint: 1234ABCD...                # IDENTITY: which key the maintainer encrypted to
 
 Env form: =LSMS_ENTITLEMENT_<CLASS>_<FIELD>= (e.g.
-=LSMS_ENTITLEMENT_GHA_GSS_NADA_API_KEY=), so CI secrets and course-server
-provisioning need no config file.  The two credential *paths* stay env-only
-as today (=config.py:134,160=).
+=LSMS_ENTITLEMENT_GHA_GSS_NADA_API_KEY=) and =LSMS_GPG_FINGERPRINT=, so CI
+secrets and course-server provisioning need no config file.  The two
+credential *paths* stay env-only as today (=config.py:134,160=).
+
+** Two kinds of entry, and where the public key is NOT (EL, 2026-09-17)
+EL asked whether the config should hold "API keys from different places,
+along with a public GPG key".  API keys, yes: each is a secret the library
+sends to a holder.  The GPG entry is different in kind, and it is a
+*fingerprint*, not the public key:
+
+- Decryption uses the *private* key, which lives in the gpg keyring and is
+  found by the key id inside the ciphertext packet -- gpg needs no hint.  So
+  no config entry is required for =gpg-recipients= to work at all; the
+  evidence is that decryption succeeds.
+- What a fingerprint buys is precision.  It selects among several keys, and
+  it makes the refusal exact: "encrypted to A, B, C; your configured key D is
+  not a recipient; send D's public key to <maintainer>" instead of gpg's
+  "decryption failed: No secret key".  =lsms-library access request <class>=
+  can export the public key for that fingerprint and print the protocol.
+- One fingerprint serves every encrypted class -- it is the user's identity,
+  not a per-holder credential -- which is why it is top-level, not inside
+  =entitlements=.
+- The *public key block* is not in the user's config because the user never
+  reads it; the **maintainer** does, when encrypting.  Its home is the
+  committed per-wave recipient list (=Documentation/RECIPIENTS=, armored
+  keys or fingerprints resolvable from a repo keyring), so that adding or
+  revoking a recipient is a reviewable diff -- the same argument that made
+  =panel_ids.json= a committed source rather than a build product (GH #914).
 
 * Preconditions to verify before building
 - NADA validators. :: "Reverse the proxy" is cheap only because NADA
