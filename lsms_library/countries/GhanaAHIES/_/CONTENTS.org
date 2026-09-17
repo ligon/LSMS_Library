@@ -230,8 +230,11 @@ silently.  Per-quarter counts (person file / households / SEC567 rows):
 10,027; 50,741 / 9,924 / 9,827.  600 clusters in every quarter; 0 nulls,
 0 duplicates on =(cluster, HholdID, quarter, new_pid)=; region, urbrur and
 =hh_weight= constant within a household-quarter (0 disagreements).
-Variable dumps: =ahies2023_person_vars.tsv= / =ahies2023_sec567_vars.tsv=
-(worker scratch; promote to =slurm_logs/ghana_ahies/= with the 2024 ones).
+Variable dumps (name, Stata type, label; =pyreadstat= metadata-only read
+with =encoding='latin1'=): =2023/Documentation/ahies2023_person_vars.tsv=
+and =ahies2023_sec567_vars.tsv=, the 2023 twins of
+=slurm_logs/ghana_ahies/ahies2024_*_vars.tsv= (kept out of =2023/_/= because
+=.tsv= is a build-input suffix and would enter every table's hash).
 
 ** SEC567 column differences from 2024
 The 2023 file lacks 15 of 2024's 147 columns and has none of its own:
