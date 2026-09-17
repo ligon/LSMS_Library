@@ -1,6 +1,71 @@
 #+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
 
 
+* v0.14.0 release session (2026-09-16 evening, Sue / Claude Fable 5.1, Savio job 38975827)
+
+Written for @ligon to read on waking; every claim has a path or a PR number.
+
+** What shipped
+
+- Tag =v0.14.0= = =1528fa937= on =master= (release PR #938, merged with a merge
+  commit); GitHub Release published, =publish.yml= fired on the release event.
+  Notes: =docs/releases/v0.14.0.md=; closes list =docs/releases/v0.14.0-closes.txt=
+  (#746 #763 #809 #866 #914 #919 #925 #929).
+- PRs landed on =development= tonight, in order: #933, #924, #927, #930,
+  #923, #934 (after fixing its CI failure: =PurchaseValue=/=Cost= missing
+  from =currency._DEFAULT_MONETARY=, =0b8a1b532=), #935 (stacked on #934;
+  four GhanaLSS pins moved at =8766f882c= for the label split), #940 (the
+  re-curation of #937 on #935 -- the GhanaLSS =Aggregate Label= column).
+- #937 is superseded by #940 and was closed by that merge's "Supersedes"
+  reference or should be closed by hand if not.
+
+** Decisions taken on your behalf (all reversible, all recorded)
+
+- Two borderline Aggregate groupings, Goat/Mutton and Crab/Shrimp (gate
+  ratio 1.21 primary vs 0.31 full wave), ship as SINGLETONS. Reasoning and
+  numbers: =.coder/ledger/ghanalss-aggregate-recuration.md=. Regroup them in
+  0.14.1 if you disagree.
+- #937's Kapla/Tilapia group was dropped (fails the primary-wave gate, 1.17).
+- The four =test_currency_denominated_units.py= GhanaLSS pins were MOVED for
+  #935 rather than treating the failure as a defect: the crosswalk's split of
+  seven collapsed labels returns rows every mode had merged; Expenditure per
+  wave is unchanged. Commit message of =8766f882c= has the four deltas.
+- =min_goods=1= scoring of the partition ranking is disclosed in the notes
+  and left open as #939; no sweep was run.
+
+** What CI cannot see (stated in the notes; worth knowing before class)
+
+- The green =unit-tests= check skips ~1,550 data tests. The full suite was run
+  locally on the release-candidate tree (development + #935): 6,484 passed,
+  2 failed = the two pins above, then fixed. #940's data tests ran locally on
+  the re-warmed cache: 452 passed, 4 skipped; pins held (3 passed).
+- =SkunkWorks/aggregation/= tests never run in CI; 62 passed by hand with
+  CFEDemands 0.10.0 shadowed on =PYTHONPATH=.
+
+** Still open / not done
+
+- The main checkout =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=
+  is on =development= at =6666e0fea=, now far behind origin. I did not
+  fast-forward it (other jobs import from it). =git pull --ff-only= there is
+  clean.
+- The shared =.venv= has CFEDemands 0.8.2; the library does not import it, but
+  the aggregation pipeline needs >=0.10.0 (=pip install -U CFEDemands= into
+  the venv image via =bin/savio_venv.sh update= when convenient).
+- #939 (min_goods sensitivity), #831 (two remaining bullets), #894 item 2
+  (Malawi/Nigeria panel_ids to design A) stay open.
+- Worktrees left in place: =worktrees/panel-estimation= (branch merged),
+  =worktrees/stack-935= (branch =docs/v0.14.0-notes-940=, merged). Both are
+  safe to =git worktree remove=.
+
+** Verify from a fresh venv
+
+#+begin_src sh
+pip install -U LSMS_Library==0.14.0
+python -c "import lsms_library as ll; print(ll.__version__)"
+python -c "import lsms_library as ll; print(ll.Country('GhanaLSS').food_expenditures(labels='Aggregate').shape)"
+#+end_src
+
+
 * GhanaLSS food-label crosswalk session (2026-09-16, PR #935)
 
 Merged from =fix/ghanalss-label-crosswalk='s own handoff note when the branch was
