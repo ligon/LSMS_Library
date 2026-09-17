@@ -275,3 +275,30 @@ def test_food_labels_carry_fct_codes():
     # The point of the move: the API can now see it.
     import lsms_library as ll
     assert 'harmonize_food' in (ll.Country('GhanaLSS').categorical_mapping or {})
+
+
+def test_food_code_crosswalk_ignores_aggregate_and_display_columns(tmp_path):
+    """Adding a label variant must not create a fictitious nutrition wave.
+
+    ``_load_food_codes`` used to read every column that was not
+    ``Preferred Label`` / ``FCT Code`` as a survey round; the country
+    ``Aggregate Label`` column (PR #937 / re-curated on #935) would then have
+    been joined as a wave called ``Aggregate Label``.
+    """
+    import importlib.util
+
+    path = countries_root() / 'GhanaLSS' / '_' / 'nutrition.py'
+    spec = importlib.util.spec_from_file_location('ghana_nutrition_labels_test', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    folder = tmp_path / 'GhanaLSS' / '_'
+    folder.mkdir(parents=True)
+    (folder / 'categorical_mapping.org').write_text(
+        '#+name: harmonize_food\n'
+        '| Preferred Label | 2016-17 | FCT Code | Aggregate Label | Aggregate (short) |\n'
+        '|-----------------+---------+----------+-----------------+-------------------|\n'
+        '| Rice | Rice (local) | 01_037 | Unprepared rice | Rice |\n')
+    by_wave, by_label = module._load_food_codes(tmp_path)
+    assert by_wave[['t', 'j', 'FCT Code']].to_dict('records') == [
+        {'t': '2016-17', 'j': 'Rice (local)', 'FCT Code': '01_037'}]
+    assert by_label == {'Rice': '01_037'}

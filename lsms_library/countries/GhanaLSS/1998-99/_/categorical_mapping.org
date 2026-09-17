@@ -294,7 +294,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Sweet Potato                   | Sweet Potato                   |         |                                                 |      16 | Sweet potatoes                 |
 | Other Tubers                   | Other Tubers                   |      13 | Other starchy roots and tubers                  |      17 | Other roots & tubers           |
 | Konkonte                       | Konkonte                       |      14 | Konkonte                                        |         |                                |
-| Cassava (flour)                | Cassava                        |      15 | Gari                                            |      11 | Cassava –gari                  |
+| Gari                           | Gari                           |      15 | Gari                                            |      11 | Cassava –gari                  |
 | Cassava (dough)                | Cassava                        |      16 | Cassava dough                                   |      12 | Cassava (other forms)          |
 | Other Starchy Products         | Other Starchy Products         |      17 | Other starchy products                          |         |                                |
 | Cowpea                         | Pulses, Nuts                   |         |                                                 |      22 | Cowpeas                        |
@@ -343,7 +343,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Egg                            | Egg                            |      64 | Chicken eggs                                    |      70 | Eggs                           |
 | Other Eggs                     | Other Eggs                     |      65 | Other eggs (not chicken)                        |         |                                |
 | Beef                           | Beef                           |         |                                                 |      63 | Beef                           |
-| Goat                           | Goat                           |         |                                                 |      64 | Mutton                         |
+| Mutton                         | Mutton                         |         |                                                 |      64 | Mutton                         |
 | Pork                           | Pork                           |         |                                                 |      65 | Pork                           |
 | Goat                           | Goat                           |         |                                                 |      66 | Goat                           |
 | Other Meat                     | Other Meat                     |         |                                                 |      67 | Other Domestic meat            |
@@ -384,7 +384,7 @@ The following tables are mapping of numerical codes to categorical labels for 19
 | Soft Drinks                    | Soft Drinks                    |      98 | Soft Drinks and Minerals                        |         |                                |
 | Beer                           | Beer                           |      99 | Local and Imported Beer and Guinness            |         |                                |
 | Wine                           | Wine                           |     100 | Palm Wine                                       |         |                                |
-| Beer                           | Beer                           |     101 | Pito                                            |         |                                |
+| Pito                           | Pito                           |     101 | Pito                                            |         |                                |
 | Akpeteshie                     | Spirits                        |     102 | Akpeteshie and Other Local Spirits              |         |                                |
 | Gin                            | Spirits                        |     103 | Gin                                             |         |                                |
 | Other Alcoholic Beverages      | Other Alcoholic Beverages      |     104 | Other Alcoholic Beverages                       |      90 | Alcoholic beverages            |
@@ -436,7 +436,7 @@ not on this wave's axis and keep their own label (=Food=own=).
 | 11   | Yam                                                             | Yam                              | yes  | Kilogram     | 1     |                                                               |
 | 12   | Plantain                                                        | Plantain                         | yes  | Kilogram     | 1     |                                                               |
 | 13   | Cassava (fresh)                                                 | Cassava                          | yes  | Kilogram     | 1     |                                                               |
-| 14   | Gari                                                            | Cassava (flour)                  | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it                    |
+| 14   | Gari                                                            | Gari                             | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it                    |
 | 15   | Cassava dough                                                   | Cassava (dough)                  | yes  | Kilogram     | 1     |                                                               |
 | 16   | Konkonte (flour)                                                | Konkonte                         | yes  | Kilogram     | 1     |                                                               |
 | 17   | Cowpeas (small beans)                                           | Small Bean                       | yes  | Kilogram     | 1     | the 9b consumption label is Small beans                       |

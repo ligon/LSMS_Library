@@ -40,3 +40,56 @@ tables by =protect_u_sentinels= (GH #361), so this table cannot disturb
 | Kilogramme     | Kg              |
 | kilogramme     | Kg              |
 | KILOGRAMME     | Kg              |
+
+* Unit -> kilograms
+
+#+name: u_kg
+| Unit    |     Kg |
+|---------+--------|
+| Quintal | 100.00 |
+
+The cross-country DEFAULT mass of a canonical unit, in kilograms.  A country
+overrides a row by redeclaring it in its own =#+name: u_kg= table; =u_kg= is in
+=_ADDITIVE_CATEGORICAL_TABLES=, so the two are row-unioned and the country row
+wins (=_row_union_categorical=).
+
+*Why this table exists, and why it is keyed on the CANONICAL unit.*
+=transformations.KNOWN_METRIC= is a Python dict keyed on the *raw, lower-cased*
+=u= label, so it has two defects this table fixes:
+
+1. *It cannot be overridden.*  =_seeded_kg_factors= does =dict(KNOWN_METRIC)=
+   and only infers for units NOT already in it, so a framework entry beats
+   every country-level factor unconditionally.  That is wrong for any unit
+   whose size is regional: =quintal= is the metric centner (100 kg) in
+   Ethiopia but 100 *pounds* (45.36 kg) in Central America, and the pound is
+   itself regional.  GH #919.
+2. *It is keyed on the spelling, so it must enumerate them* --- =kg=,
+   =kilogram=, =kilogramme=, =kgs=, =gram=, =gramme=, =grams=, =gm=, =gms=...
+   The =#+name:u= table above already collapses those to one =Preferred Label=,
+   so keying the MASS on the canonical name means one row per unit rather than
+   one per variant, and a new survey spelling becomes a country-config edit
+   instead of a framework edit.
+
+*The key column is deliberately not called =Preferred Label=.*
+=country._categorical_key_column= takes the first non-=Preferred Label= column
+as a table's key, so a table keyed literally on =Preferred Label= would be
+keyed on =Kg= instead.  Naming it =Unit= (whose VALUES are Preferred Labels)
+makes the existing row-union work untouched, and keeps the table inert to the
+label auto-apply in =country.py=, which only fires on a =Preferred Label=
+column.
+
+*Composition happens in =Country=, not in =transformations=.*  The kg factor is
+computed BEFORE the categorical mapping is applied --- the derived-food dispatch
+is =_aggregate_wave_data= -> =transform_fn= -> =_finalize_result=, so
+=conversion_to_kgs= sees the RAW =u= (see the comment above
+=_CURRENCY_DENOMINATED_UNITS= in =transformations.py=, and GH #770, where a fix
+that assumed otherwise was rejected for exactly this reason).  So
+=Country._unit_kg_factors= composes =u= (raw -> Preferred Label) with =u_kg=
+(Preferred Label -> kg) into a raw-label-keyed dict and passes it down; nothing
+in =transformations= has to know about label harmonisation or about ordering.
+
+*Scope.*  Seeded with the units that are genuinely country-qualified and were
+previously wrong in =KNOWN_METRIC=.  Universal metric spellings (=kg=, =gram=,
+=tonne=, =litre=, ...) stay in =KNOWN_METRIC= for now; migrating them is
+mechanical but re-derives every kg factor in the corpus, so it is deliberately
+a separate change.

@@ -40,6 +40,15 @@ def test_known_metric_unchanged():
     ``centilitre(s)`` (Mali, Ethiopia), ``quintal(s)`` (Ethiopia; the metric
     centner, 100 kg) and ``tonne(s)`` (Mali, Niger, GhanaSPS) are labels the
     corpus mints that still fell through to the inference.
+
+    Updated 2026-09-14 for GH #919: ``quintal(s)`` was REMOVED again.  It is
+    country-qualified -- the metric centner (100 kg) in Ethiopia, 100 *pounds*
+    (45.36 kg) in Central America, where the pound is itself regional -- and a
+    ``KNOWN_METRIC`` entry cannot be overridden by a country, because
+    ``_seeded_kg_factors`` does ``dict(KNOWN_METRIC)`` and only infers for units
+    NOT already in it.  It now lives in ``categorical_mapping/u.org``'s ``u_kg``
+    table, keyed on the canonical unit, where the global row is a DEFAULT a
+    country may redeclare.  Nothing country-qualified may be added here.
     """
     expected = {
         'kg': 1, 'kilogram': 1, 'kilogramme': 1,
@@ -48,7 +57,6 @@ def test_known_metric_unchanged():
         'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
         'gm': 1/1000, 'gms': 1/1000,
         'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
-        'quintal': 100, 'quintals': 100,
         'tonne': 1000, 'tonnes': 1000,
         'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
         'ml': 1/1000, 'cl': 1/100,

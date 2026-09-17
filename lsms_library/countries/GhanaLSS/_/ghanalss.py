@@ -664,3 +664,610 @@ def plot_features(df):
     factor = df['AreaUnit'].astype(object).map(_PLOT_HECTARES_PER_UNIT)
     df['Area'] = area * pd.to_numeric(factor, errors='coerce')
     return df
+
+
+# ---------------------------------------------------------------------------
+# GLSS4 / GLSS5 / GLSS6 / GLSS7 section 8H -- own-production value, DERIVED
+# (2026-09-13)
+#
+# Registry: _/derivations.yml, key GhanaLSS::food_acquired::8h-farmgate.
+# Ledger:   .coder/ledger/ghanalss-produced-qp.md
+# ---------------------------------------------------------------------------
+
+#: Waves whose section-8H produced rows carry BOTH a native-unit quantity and a
+#: reported farmgate price.  1991-92 is deliberately absent: only 80,282 of its
+#: 286,922 produced rows (28%) carry both, and its dominant unit is ``All``
+#: (93,349 rows), which reads as "the whole harvest" rather than a countable
+#: quantity.  See the ledger, and `_/CONTENTS.org`.
+FARMGATE_WAVES = ('1998-99', '2005-06', '2012-13', '2016-17')
+
+#: The section-8H price variable, per wave.  2016-17 asks it once per VISIT
+#: (``s8hq{v}p``), the others once per (household, item, unit).
+FARMGATE_PRICE_VARIABLE = {
+    '1998-99': 's8hq10',
+    '2005-06': 's8hq14',
+    '2012-13': 's8hq10',
+    '2016-17': 's8hq{v}p',
+}
+
+
+def derive_produced_farmgate_value(quantity, price):
+    """Value of own-produced food at the household's own reported farmgate price.
+
+    Section 8H of GLSS4-GLSS7 asks, for each home-produced food the household
+    consumed, *how much* was consumed in the recall window (a real quantity in
+    a native unit ``u``) and *what it would fetch* -- the farmgate price of one
+    such unit.  It never asks what the food was worth in total, so the served
+    ``Expenditure`` on a produced row is a CONSTRUCTION, not an answer::
+
+        Expenditure = Quantity * Price
+
+    **This reverses a prior decision, deliberately.** Each wave script used to
+    say "Expenditure is left NaN -- no produced value is recorded", and that
+    sentence is true about the *survey*; it was never a statement that the
+    value could not be constructed.  The 2005-06 script already multiplies the
+    same two columns internally (``y['_qp']``) to resolve households that
+    report two farmgate prices for one commodity.  What changed is that the
+    library now has somewhere honest to put a construction: it is served with
+    the registry key on the row, so a reader can tell it from an answer and can
+    recover the factors through ``Country.derivation_inputs``.
+
+    The valuation is at the **producer** price, which is what section 8H asks.
+    It is therefore NOT comparable with the GLSS1/GLSS2 ``12b-fortnight``
+    figure, which values own consumption at what it would **cost to buy**
+    (``VFOODCPD``); a farmgate valuation should sit below a consumer-price one,
+    and does.  An analyst who wants own production at consumer prices should
+    re-value it from ``food_prices()``; the factors are in the table.
+
+    No options, by design: a cached parquet must be one identifiable
+    construction.  Vectorised; accepts scalars, arrays or Series (elementwise,
+    positional).  Returns a float ndarray, NaN wherever either factor is
+    missing -- such a row is served with ``Expenditure`` NaN and carries **no**
+    registry key, so the coverage this derivation claims is exactly the set of
+    rows it actually computed.
+    """
+    q = _as_float(quantity)
+    p = _as_float(price)
+    return q * p
+
+
+def _farmgate_hhid(wave, df):
+    """Rebuild a wave's household id EXACTLY as its own ``food_acquired.py`` does.
+
+    Each of the four waves composes ``i`` differently, and a generic guess at
+    the id column does not join (``CLAUDE.md`` §"Derived Values", step 4:
+    reusing the YAML's ``idxvars`` is not enough where ``mapping.py``
+    post-processes the index).  Verified against the served rows by
+    ``tests/test_ghanalss_8h_farmgate.py``.
+    """
+    from lsms_library.local_tools import format_id
+
+    if wave == '1998-99':          # format_id(clust) + format_id(nh, pad 2), no sep
+        return df.apply(
+            lambda r: (format_id(r['clust'], zeropadding=0) or '')
+            + (format_id(r['nh'], zeropadding=2) or ''), axis=1)
+    if wave == '2005-06':          # mapping.i() over the pre-composed 'hhid'
+        from lsms_library.paths import countries_root
+        mapping = _load_module_by_path(
+            countries_root() / 'GhanaLSS' / wave / '_' / 'mapping.py',
+            f'_ghanalss_mapping_{wave}')
+        return df['hhid'].apply(mapping.i)
+    if wave == '2012-13':          # pre-composed 'hid', carried through as-is
+        return df['hid']
+    if wave == '2016-17':          # format_id(clust) + '/' + format_id(nh, pad 2)
+        def _one(c, n):
+            c, n = format_id(c), format_id(n, zeropadding=2)
+            return pd.NA if (c is None or n is None) else f'{c}/{n}'
+        return pd.Series([_one(c, n) for c, n in zip(df['clust'], df['nh'])],
+                         index=df.index)
+    raise ValueError(f'no household-id construction recorded for {wave!r}')
+
+
+def inputs_produced_farmgate(wave):
+    """The raw section-8H answers behind the derived produced rows of one wave.
+
+    Returns a frame at the INPUT grain -- one row per source record, before the
+    wave script's visit melt and unit canonicalisation -- indexed ``(t, i)``
+    with the ORIGINAL variable names kept, so a row can be read against the
+    questionnaire.  ``i`` goes through the wave's own ``mapping.i`` so the frame
+    joins to the served rows (``CLAUDE.md`` §"Derived Values", step 4: reusing
+    the YAML's ``idxvars`` is not enough where ``mapping.py`` rewrites the
+    index).  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+
+    if wave not in FARMGATE_WAVES:
+        raise ValueError(
+            f'section 8H farmgate valuation covers {FARMGATE_WAVES}, not {wave!r} '
+            f'(1991-92 is excluded by coverage -- see _/CONTENTS.org)')
+
+    sources = {
+        '1998-99': 'Data/SEC8H.DTA',
+        '2005-06': 'Data/partb/sec8h.dta',
+        '2012-13': 'Data/PARTB/sec8h.dta',
+        '2016-17': 'Data/g7sec8h.dta',
+    }
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / sources[wave]), convert_categoricals=False)
+
+    price_var = FARMGATE_PRICE_VARIABLE[wave]
+    keep = [c for c in df.columns
+            if c.lower().startswith('s8hq') or c.lower() in {'homagrcd', 'itemcd'}]
+    out = df[keep].copy()
+    out.insert(0, 't', wave)
+    out.insert(1, 'i', _farmgate_hhid(wave, df))
+    out.attrs['price_variable'] = price_var
+    return out.set_index(['t', 'i'])
+
+
+def to_country_food_labels(df, wave, level='j'):
+    """Map a wave's own ``harmonize_food`` label onto the COUNTRY one (Lcp).
+
+    Each GLSS round names foods in its own vocabulary; the country-level
+    ``_/categorical_mapping.org`` ``harmonize_food`` table records exactly that
+    round's spelling in its ``<wave>`` column, against the canonical
+    ``Preferred Label``.  That crosswalk is what makes ``j`` comparable across
+    rounds -- and until 2026-09-16 *nothing applied it*, so the served ``j`` was
+    the wave vocabulary and 45 of 225 labels never reached the country axis
+    (``slurm_logs/ghanalss_aggregate_labels/FINDINGS.org``).  This function is
+    that step.
+
+    It is a **pure rename**: nothing is summed, dropped or reindexed.  The
+    country table is a bijection onto each wave's column (0 ambiguous cells in
+    all seven waves, asserted here), so two wave labels cannot collide on one
+    country label within a wave, and the index stays as unique as it was.
+
+    An unmapped label is a **hard error**, not a pass-through: a silent
+    pass-through is exactly the defect this replaces, and ``pandas.rename``
+    would do it by default.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile
+
+    tbl = df_from_orgfile(
+        str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+        name='harmonize_food')
+    tbl.columns = [str(c).strip() for c in tbl.columns]
+    if wave not in tbl.columns:
+        raise KeyError(f'harmonize_food has no column for wave {wave!r}')
+    native = tbl[wave].astype(str).str.strip()
+    canon = tbl['Preferred Label'].astype(str).str.strip()
+    pairs = [(n, c) for n, c in zip(native, canon) if n and n != 'nan']
+    dup = {n for n, _ in pairs if sum(1 for m, _ in pairs if m == n) > 1}
+    if dup:
+        raise ValueError(
+            f'harmonize_food column {wave!r} is not injective -- {sorted(dup)} '
+            f'each name more than one Preferred Label; the crosswalk is ambiguous')
+    m = dict(pairs)
+
+    if level in (df.index.names or []):
+        seen = set(df.index.get_level_values(level).dropna().astype(str))
+    else:
+        seen = set(df[level].dropna().astype(str))
+    missing = sorted(seen - set(m))
+    if missing:
+        raise KeyError(
+            f'GhanaLSS {wave}: {len(missing)} label(s) on {level!r} are absent from the '
+            f'{wave!r} column of the country harmonize_food, so they cannot be mapped '
+            f'onto the country axis: {missing[:12]}.  Add them to '
+            f'countries/GhanaLSS/_/categorical_mapping.org rather than letting them '
+            f'pass through -- a pass-through is GH #782/#925 all over again.')
+
+    if level in (df.index.names or []):
+        return df.rename(index=m, level=level)
+    out = df.copy()
+    out[level] = out[level].map(lambda v: m.get(str(v), v))
+    return out
+
+
+_ADDITIVE_MEASURES = ('Expenditure',)
+
+
+def reduce_duplicate_food_rows(df, keys, quantity='Quantity', price='Price'):
+    """Collapse rows sharing ``keys``: ``quantity`` SUMS, ``price`` becomes the
+    QUANTITY-WEIGHTED MEAN.
+
+    The named reducer this country's CONTENTS.org requires wherever several
+    survey lines harmonise onto one ``j``.  It exists because the alternatives
+    are both wrong:
+
+    * leaving the duplicate for the framework -- ``food_acquired`` is in
+      ``_ADDITIVE_MEASURE_COLUMNS``, so core SUMs Quantity/Expenditure and then
+      re-derives ``Price = Expenditure / Quantity`` across the WHOLE frame,
+      destroying every recorded farmgate price (CONTENTS.org Trap 9);
+    * ``groupby().first()`` -- keeps one price and silently discards the other,
+      which is GH #323's hazard.
+
+    The weighted mean is the price OF THE HARMONISED COMMODITY, and it is the
+    choice that makes ``Quantity * Price`` add up across the merge: with
+    ``Q = sum(q)`` and ``P = sum(q*p)/sum(q)``, ``Q*P == sum(q*p)``, so a wave
+    that derives Expenditure from Quantity x Price (1998-99) conserves it
+    exactly.  Where the summed quantity is 0 or missing the first price is kept
+    rather than dividing by zero.
+
+    Same rule as the inline reduction in ``2005-06/_/food_acquired.py`` (the
+    mutton+goat merge); that one predates this helper and is left as it is.
+    """
+    d = df.copy()
+    d['_qp'] = (pd.to_numeric(d[quantity], errors='coerce')
+                * pd.to_numeric(d[price], errors='coerce'))
+    # min_count=1 throughout: a plain 'sum' returns 0.0 for an ALL-NA group,
+    # which would turn "this visit recorded nothing" into a recorded zero and
+    # smuggle the row past the caller's dropna(how='all').  Measured when this
+    # was wrong: +32,040 phantom rows on the delivered table.
+    _sum = lambda s: s.sum(min_count=1)
+    spec = {quantity: (quantity, _sum), '_qp': ('_qp', _sum), '_pf': (price, 'first')}
+    # Every OTHER column is carried, not dropped: the additive measures SUM
+    # (they are `_ADDITIVE_MEASURE_COLUMNS` and a sum of all-NA stays NA), and
+    # anything else -- `s`, a wave tag -- is constant within a key by
+    # construction, so `first` is exact rather than a choice.
+    carried = [c for c in d.columns if c not in keys and c not in (quantity, price, '_qp')]
+    for c in carried:
+        spec[c] = (c, _sum) if c in _ADDITIVE_MEASURES else (c, 'first')
+    out = d.groupby(keys, sort=False, dropna=False).agg(**spec).reset_index()
+    q = pd.to_numeric(out[quantity], errors='coerce')
+    out[price] = (out['_qp'] / q).where(q.notna() & (q != 0), out['_pf'])
+    return out.drop(columns=['_qp', '_pf'])
+
+
+def reconcile_after_crosswalk(df):
+    """Reduce the duplicates that ``to_country_food_labels`` can create.
+
+    The crosswalk is many-to-one by design: 1991-92 and 1998-99 field guinea
+    corn and sorghum as two separate own-production lines (``Code_8h`` 4 and 7)
+    and they are the same crop, so both map to ``Guinea Corn/Sorghum``.  A
+    household that filed both then holds two rows on one
+    ``(t, i, j, u, s, visit)``.
+
+    Reducing HERE -- after Lcp, on the canonical grain -- is the point.  Doing
+    it earlier would mean rewriting the wave's own vocabulary, which is not
+    ours to rewrite: those really are two lines on that questionnaire, and the
+    per-wave columns exist precisely so the harmonisation can happen at the
+    country level instead.  Doing it later means core does it, and core SUMs
+    the additive measures and then re-derives ``Price`` across the whole frame
+    (CONTENTS.org Trap 9).
+
+    No-op where the crosswalk introduced no duplicate, and asserts it left the
+    index unique.
+    """
+    names = list(df.index.names)
+    cols = list(df.columns)
+    if not df.index.duplicated().any():
+        return df
+    out = reduce_duplicate_food_rows(df.reset_index(), names)
+    out = out.set_index(names)[cols]
+    assert not out.index.duplicated().any(), (
+        'reconcile_after_crosswalk left duplicates on ' + repr(names))
+    return out
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 9 Part B -- crop sale value, DERIVED (2026-09-16)
+#
+# Registry: _/derivations.yml, key GhanaLSS::crop_production::9b-sale-amount-per-unit.
+# Design:   slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org
+# ---------------------------------------------------------------------------
+
+#: Acres -> hectares.  The Ghana Statistical Service's own factor, not the
+#: standard 0.404686; see `_PLOT_HECTARES_PER_UNIT` above for the provenance.
+ACRES_TO_HECTARES = _PLOT_HECTARES_PER_UNIT['Acres']
+
+#: The Section 9 unit legend's code 22, decoded by `agric_unit` to 'All'.
+#: Against the Q6 AMOUNT box it does not name a container -- it means the
+#: amount is for the whole lot.
+AGRIC_UNIT_ALL = 'All'
+
+#: Registry key stamped on every row `derive_9b_sale_value` served.
+CROP_SALE_DERIVATION = 'GhanaLSS::crop_production::9b-sale-amount-per-unit'
+
+#: See the wave scripts' FARM_LEVEL docstring: surveys resolve farm inputs at
+#: farm / crop / plot / plot-x-crop grain, and the unresolved axis is marked
+#: rather than dropped.  GLSS Part B resolves the CROP axis and not the plot.
+CROP_PLOT_LEVEL = 'Farm-level'
+
+
+def derive_9b_sale_value(sold_quantity, amount, amount_unit, sold_unit):
+    """Total value of the crop sold, from Section 9B's PER-UNIT sale amount.
+
+    Part B column 6 asks "How much was the harvest of [...] sold for?" over
+    *two* boxes, ``AMOUNT`` (``CROPSP``) and ``UNIT`` (``CROPSPU``).  The
+    amount is therefore denominated by its own unit box and is **not**, in
+    general, a total -- which is why the served ``Value_sold`` is a
+    CONSTRUCTION here and a recorded answer in every other country that
+    declares the column.
+
+    The unit box is essentially bimodal.  Measured over sale rows:
+
+    =========================================  =========  =========
+    relation of ``CROPSPU`` to ``CROPSU``        1987-88    1988-89
+    =========================================  =========  =========
+    equal -- the amount is per that unit           91.3%      85.8%
+    ``All`` -- the amount is the whole lot           9.6%      15.9%
+    neither                                         2.0%      0.95%
+    =========================================  =========  =========
+
+    So::
+
+        rung 1  amount_unit == 'All'      -> amount                (tested FIRST)
+        rung 2  amount_unit == sold_unit  -> amount * sold_quantity
+        rung 3  otherwise                 -> NaN
+
+    **Rung 1 must be tested before rung 2.**  ``CROPSU`` is *itself* ``All``
+    on many rows, so the two masks overlap; testing same-unit first misroutes
+    those rows and multiplies a whole-lot total by a quantity.  That error is
+    what produced a spurious 12x "overshoot" for yam during design, and it is
+    the one way to get this function subtly and silently wrong.
+
+    Rung 3 is left NaN rather than converted: the row prices a container the
+    survey did not relate to the container the quantity is in, and no
+    per-row factor bridges them.  It is 130 rows in 1987-88 and 69 in
+    1988-89 (0.5% of the table).  The sanctioned extension, if a user ever
+    needs them, is ``transformations.median_price_valuation`` -- taking its
+    geography from ``Y09B.CLUST``, because this runs in the wave build
+    before ``_join_v_from_sample`` puts ``v`` on the frame.
+
+    NOT a valuation of the whole harvest.  Section 9B never asks a harvest
+    quantity, only the quantity *sold*; the parts kept for seed, given away
+    and lost are recorded as their own market-replacement VALUES
+    (``Value_seed`` / ``Value_given`` / ``Value_lost``), and the part eaten
+    is not in Section 9 at all.  Summing them mixes a received price with
+    replacement prices; that is the analyst's call, not this function's.
+
+    Vectorised and elementwise; ``amount_unit`` and ``sold_unit`` are the
+    DECODED labels (via ``categorical_mapping.org#agric_unit``), not codes.
+    Returns a float ndarray.
+    """
+    qty = _as_float(sold_quantity)
+    amt = _as_float(amount)
+    au = pd.Series(np.ravel(amount_unit)).astype('string')
+    su = pd.Series(np.ravel(sold_unit)).astype('string')
+
+    # Comparisons on a `string` dtype yield pd.NA, not False, wherever either
+    # side is missing; fill before going to numpy or the `&` raises on NAType.
+    out = np.full(amt.shape, np.nan, dtype=float)
+    is_all = au.eq(AGRIC_UNIT_ALL).fillna(False).to_numpy(dtype=bool)
+    same = (~is_all) & au.eq(su).fillna(False).to_numpy(dtype=bool)
+    out[is_all] = amt[is_all]                      # rung 1, FIRST
+    out[same] = amt[same] * qty[same]              # rung 2
+    return out                                     # rung 3: left NaN
+
+
+def crop_production_from_9b(df):
+    """Shared ``df_edit`` body for the GLSS1/GLSS2 ``crop_production`` table.
+
+    Both waves' ``_/mapping.py`` delegate here; the wave-level function is a
+    thin wrapper so the hook is discoverable where the framework looks for it.
+
+    Turns the three helper columns the YAML extracts for the derivation
+    (``SaleAmount``, ``SaleAmountUnit``, ``SoldUnitRaw``) into ``Value_sold``,
+    stamps the registry key on the rows the derivation produced, converts
+    acres to hectares, and drops the helpers.  ``Derivation`` is NA on a row
+    the derivation did not serve -- which, per the field contract, is what
+    distinguishes a constructed number from a reported one.
+    """
+    df = df.copy()
+    # Unit code 0 means "sold nothing" and is absent from `agric_unit`, so it
+    # survives the decode as the STRING '0.0'.  Every real label is alphabetic,
+    # so anything still numeric is an unmapped code -> NA.  Done before the
+    # derivation, or two unmapped '0.0's would compare equal and route a
+    # non-sale row down rung 2.
+    for _c in ('Unit_sold', 'SaleAmountUnit', 'SoldUnitRaw'):
+        _s = df[_c].astype('string')
+        df[_c] = _s.mask(pd.to_numeric(_s, errors='coerce').notna(), pd.NA)
+
+    value = derive_9b_sale_value(df['Quantity_sold'], df['SaleAmount'],
+                                 df['SaleAmountUnit'], df['SoldUnitRaw'])
+    df['Value_sold'] = value
+    df['Derivation'] = pd.Series(
+        np.where(pd.notna(value), CROP_SALE_DERIVATION, pd.NA),
+        index=df.index, dtype='string')
+    # Q2 is acres harvested; the canonical column is hectares.
+    df['Area_ha'] = pd.to_numeric(df['Area_ha'], errors='coerce') * ACRES_TO_HECTARES
+    # Q13 is the form's 1=YES / 2=NO; the schema declares a bool.  Anything
+    # else (including the screener never being reached) stays NA.
+    _ic = pd.to_numeric(df['intercropped'], errors='coerce')
+    df['intercropped'] = _ic.map({1.0: True, 2.0: False}).astype('boolean')
+    # `Quantity` -- the HARVEST quantity every other country declares -- is
+    # materialised all-NaN, by decision (@ligon, 2026-09-16), so the
+    # cross-country shape stays recognisable.  Section 9 Part B asks only the
+    # quantity SOLD (Q4); it never asks how much was harvested, and the other
+    # three dispositions are recorded as values, not quantities, so nothing
+    # reconstructs it.  Declared `optional: true`, which is what exempts it
+    # from Site B of the null-read guard.  NOTHING is imputed into it.
+    df['Quantity'] = pd.Series(pd.NA, index=df.index, dtype='Float64')
+    # Section 9 Part B asks a CROP but no plot -- there is no farm or plot
+    # roster anywhere in the section.  `plot_id` is therefore 'Farm-level',
+    # the corpus convention for an axis a survey does not resolve; keeping the
+    # level present and marked makes the grain readable off the data instead
+    # of inferrable from which levels exist.  `_normalize_dataframe_index`
+    # promotes it from a column because `data_scheme.yml` declares it.
+    df['plot_id'] = CROP_PLOT_LEVEL
+    return df.drop(columns=['SaleAmount', 'SaleAmountUnit', 'SoldUnitRaw'])
+
+
+def inputs_9b(wave):
+    """The raw Section 9B answers behind the derived ``Value_sold`` rows.
+
+    Re-reads ``Y09B.DAT`` through ``get_dataframe`` and returns a frame
+    indexed ``(t, i, j)`` -- ``i`` via the wave's own ``mapping.i()``, ``j``
+    via the same ``agric_crop`` decode the YAML uses -- whose columns are the
+    ORIGINAL variable names.  ``(HID, CROP)`` is unique in both waves
+    (16,938 and 20,342 rows, zero duplicates), so this index is unique and
+    joins one-to-one to the served rows.  Every source row is returned,
+    unfiltered.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile, format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 9 agro-pastoral exists only in 1987-88 and 1988-89, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / 'Data' / 'Y09B.DAT'))
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_9b_{wave}')
+    labels = df_from_orgfile(str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+                             name='agric_crop', encoding='ISO-8859-1')
+    lab = (labels.assign(Code=labels['Code'].astype('Int64').astype('string'))
+                 .set_index('Code')['Label'].to_dict())
+    out = pd.DataFrame({
+        't': wave,
+        'i': df['HID'].apply(mapping.i),
+        'j': df['CROP'].apply(format_id).astype('string').replace(lab),
+        'CROP': df['CROP'],
+        'CROPS': df['CROPS'], 'CROPSU': df['CROPSU'],
+        'CROPSP': df['CROPSP'], 'CROPSPU': df['CROPSPU'],
+    })
+    return out.set_index(['t', 'i', 'j'])
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 9 Part F -- herd value, DERIVED (2026-09-16)
+#
+# Registry: _/derivations.yml, key GhanaLSS::livestock::9f-herd-value-from-unit-price.
+# ---------------------------------------------------------------------------
+
+#: Registry key stamped on every row `derive_9f_herd_value` served.
+HERD_VALUE_DERIVATION = 'GhanaLSS::livestock::9f-herd-value-from-unit-price'
+
+
+def derive_9f_herd_value(head_count, value_per_animal):
+    """Total value of the household's herd of one animal, ``HeadCount x ValuePerAnimal``.
+
+    Section 9 Part F Q5 asks "If they wanted to sell one of these [...] today,
+    how much money would they receive altogether?".  The wording is ambiguous
+    between a price per head and a value for the whole herd, so which one it
+    is was MEASURED rather than read:
+
+    * ``corr(log HeadCount, log LIVSTNV)`` is -0.16..+0.08 across every animal
+      type -- no relation at all between herd size and the reported value;
+    * chickens report a median 400 at both 4 head and 20 head, cattle 20,000
+      at both 2 head and 15;
+    * Q8's SALE value, by contrast, does move with the number sold
+      (corr 0.65-0.80), and ``SalesValue / HeadSold`` recovers this same
+      number almost exactly -- chickens 400, cattle 20,000.
+
+    It is therefore a PRICE PER HEAD, and the additive herd value the
+    canonical schema documents (``HerdValue``: "ADDITIVE ... at (t, i,
+    animal)") has to be constructed.  That is the reverse of most countries,
+    where the herd value is recorded and the unit price is not.
+
+    NaN where either factor is missing -- a household not currently raising
+    the animal answers neither (Q3 routes past both), so the product is
+    correctly absent rather than zero.
+
+    Vectorised and elementwise; returns a float ndarray.
+    """
+    return _as_float(head_count) * _as_float(value_per_animal)
+
+
+def livestock_from_9f(df):
+    """Shared ``df_edit`` body for the GLSS1/GLSS2 ``livestock`` table.
+
+    Adds the derived ``HerdValue`` and stamps the registry key on the rows it
+    served.  Everything else in the table is a recorded answer and carries NA
+    in ``Derivation``.
+    """
+    df = df.copy()
+    value = derive_9f_herd_value(df['HeadCount'], df['ValuePerAnimal'])
+    df['HerdValue'] = value
+    df['Derivation'] = pd.Series(
+        np.where(pd.notna(value), HERD_VALUE_DERIVATION, pd.NA),
+        index=df.index, dtype='string')
+    return df
+
+
+def inputs_9f(wave):
+    """The raw Section 9F answers behind the derived ``HerdValue`` rows.
+
+    Indexed ``(t, i, animal)`` -- ``i`` via the wave's own ``mapping.i()``,
+    ``animal`` via the same ``agric_animal`` decode the YAML uses.
+    ``(HID, LIVSTCD)`` is unique in both waves (3,060 and 3,347 rows, zero
+    duplicates), so this joins one-to-one to the served rows.  Nothing is
+    cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import df_from_orgfile, format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 9 agro-pastoral exists only in 1987-88 and 1988-89, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    df = get_dataframe(str(root / 'Data' / 'Y09F.DAT'))
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_9f_{wave}')
+    labels = df_from_orgfile(str(countries_root() / 'GhanaLSS' / '_' / 'categorical_mapping.org'),
+                             name='agric_animal', encoding='ISO-8859-1')
+    lab = (labels.assign(Code=labels['Code'].astype('Int64').astype('string'))
+                 .set_index('Code')['Label'].to_dict())
+    out = pd.DataFrame({
+        't': wave,
+        'i': df['HID'].apply(mapping.i),
+        'animal': df['LIVSTCD'].apply(format_id).astype('string').replace(lab),
+        'LIVSTCD': df['LIVSTCD'],
+        'LIVSTN': df['LIVSTN'], 'LIVSTNV': df['LIVSTNV'],
+    })
+    return out.set_index(['t', 'i', 'animal'])
+
+
+# ---------------------------------------------------------------------------
+# GLSS1 / GLSS2 Section 5 Parts E and G -- usual hours per week, DERIVED
+# (2026-09-16).  Registry: _/derivations.yml.
+# ---------------------------------------------------------------------------
+
+#: Registry key stamped on every row `derive_5eg_hours_per_week` served.
+HOURS_PER_WEEK_DERIVATION = 'GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours'
+
+
+def derive_5eg_hours_per_week(days_per_week, hours_per_day):
+    """Usual hours per week on a 12-month job, ``DaysPerWeek x HoursPerDay``.
+
+    Section 5's two module families ask the same annual quantity in different
+    shapes.  Parts B and C (PDF p.19, block 5B1) ask it directly --
+
+        Q6  "For how many WEEKS during the past 12 MONTHS did you do this work?"
+        Q7  "For how many HOURS PER WEEK did you usually do this work DURING
+             THE PAST 12 MONTHS?"
+
+    -- while Parts E and G (p.26, block 5E1) decompose it:
+
+        Q5  weeks during the past 12 months
+        Q6  "During these weeks, how many DAYS A WEEK did you work?"
+        Q7  "How many HOURS A DAY did you work?"
+
+    So ``HoursPerWeek`` is REPORTED on a B/C row and CONSTRUCTED here on an
+    E/G row, which makes the single expression ``WeeksPerYear x HoursPerWeek``
+    valid on every row of ``labor``.  Both factors are served raw beside it.
+
+    This is a product of two answers about the SAME weeks -- Q6 is explicitly
+    "during these weeks" -- so it carries no averaging assumption beyond the
+    respondent's own "did you work" and "how many hours a day".  NaN where
+    either factor is missing, which on these parts means the grid was skipped
+    (Q3 routes a 12-month job that repeats the 7-day job straight to Part F).
+
+    Vectorised and elementwise; returns a float ndarray.
+    """
+    return _as_float(days_per_week) * _as_float(hours_per_day)
+
+
+def inputs_5eg(wave):
+    """The raw Section 5 Part E / Part G answers behind the derived hours.
+
+    Indexed ``(t, i, pid, job)`` to match the served rows, with ``job`` the
+    same ``main_12m`` / ``secondary_12m`` labels the wave script writes.
+    Columns are the ORIGINAL variable names.  Nothing is cached.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import format_id
+    if wave not in ('1987-88', '1988-89'):
+        raise ValueError(
+            f'Section 5 exists only in 1987-88 and 1988-89 here, not {wave!r}')
+    root = countries_root() / 'GhanaLSS' / wave
+    mapping = _load_module_by_path(root / '_' / 'mapping.py', f'_ghanalss_mapping_5eg_{wave}')
+    out = []
+    for fn, job, d_col, h_col in (('Y05E1.DAT', 'main_12m', 'OCCMYD', 'OCCMYH'),
+                                  ('Y05G1.DAT', 'secondary_12m', 'OCCSYD', 'OCCSYH')):
+        df = get_dataframe(str(root / 'Data' / fn))
+        out.append(pd.DataFrame({
+            't': wave,
+            'i': df['HID'].apply(mapping.i),
+            'pid': df['PID'].apply(format_id),
+            'job': job,
+            d_col: df[d_col],
+            h_col: df[h_col],
+        }))
+    return pd.concat(out, ignore_index=True).set_index(['t', 'i', 'pid', 'job'])

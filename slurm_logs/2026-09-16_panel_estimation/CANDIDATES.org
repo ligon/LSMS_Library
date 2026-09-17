@@ -1,0 +1,266 @@
+#+TITLE: Which panels can carry a Mundlak-style ag production regression?
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+
+* Question
+
+Which countries in the library have (a) a *functioning household panel* and
+(b) the *agricultural production data* -- output, land, labour, inputs --
+needed to estimate a Mundlak-style fixed-effects / correlated-random-effects
+production function?  Pedagogical use, so some looseness is affordable.
+
+* Answer in one line
+
+*Ethiopia (ESS) is the only country that has all four pieces, joined, warm and
+moving within household.*  Malawi and Nigeria are the next two, each with one
+structural chore -- Malawi's input tables are unverified, Nigeria needs a
+post-planting -> post-harvest year join and an area-unit decision.  GhanaSPS is
+a genuine designed panel with a perfect plot join but *no convertible output
+measure*.
+
+* Method
+
+Measured on branch =analysis/panel-estimation= in a worktree, against the warm
+L2 caches, using the repo venv.  Three things were measured rather than
+assumed:
+
+- Panel depth :: households sharing an =i= across =t= *in the ag table
+  itself* (not in =household_roster=), since the ag sub-sample is not the
+  full sample.
+- Join rate :: fraction of =crop_production= =(i, t, plot_id)= keys that match
+  =plot_features= / =plot_inputs= / =plot_labor=.  A table that exists but
+  does not join is not an input.
+- Within-household variation :: share of the total variance of the logged
+  regressor that is *within* household, over households with >= 2
+  observations.  A panel whose regressors do not move identifies nothing under
+  FE, and the Mundlak group means absorb the coefficient.
+
+* The table
+
+| country   | ag waves | ag hh >=2w | >=3w | maxT | join pf | join inputs | join labor | output in kg? |
+|-----------+----------+------------+------+------+---------+-------------+------------+---------------|
+| Ethiopia  |        5 |      4,192 | 1733 |    3 | 99.7%   | 94.9%       | 99.6%      | yes           |
+| Nigeria   |        5 |   5,282(e) | 2606 |    5 | 0% (a)  | 0% (a)      | 76.9%      | yes, caveats  |
+| Malawi    |        4 |   3,154(f) | 1432 |    4 | 79.9%   | cold (g)    | cold (g)   | yes           |
+| GhanaSPS  |        3 |      2,301 | 1097 |    3 | 100%    | none (b)    | 98.1%      | *no* (c)      |
+| Tanzania  |        2 |          0 |    0 |    1 | 100%    | 76.0%       | 78.6%      | n/a           |
+| GhanaLSS  |        0 |        712 |    0 |    2 | n/a     | n/a         | n/a        | n/a (d)       |
+
+- (a) :: NOT a defect.  Nigeria is post-planting/post-harvest: =crop_production=
+  and =plot_labor= sit on the Q1 (post-harvest) rounds, =plot_features= and
+  =plot_inputs= on the Q3 (post-planting) rounds.  The =t= values differ *by
+  design*, so a naive =(i, t, plot_id)= join returns nothing.  Join Q3 -> the
+  following Q1 as one agricultural year.
+- (b) :: =plot_inputs= is *undeclared*, not absent -- see below.
+- (c) :: =harvest_kg= converts 191 of 24,872 rows (0.8%).
+- (d) :: =GhanaLSS= declares no =crop_production= at all.
+- (e) :: two cohorts plus a continuing core; only 659 households appear in all
+  five rounds.  See the Nigeria section.
+- (f) :: the IHPS panel nested inside the much larger IHS cross-sections --
+  3,154 of 31,087 ag households (10%).  A small share, but it is a *design*,
+  not attrition.
+- (g) :: declared for all four waves but not warm; not measured here.
+
+* Per-country verdict
+
+** Ethiopia -- recommended
+
+All four tables share =(i, t, v, plot_id)= and join cleanly.  =Area= is
+overwhelmingly already in hectares (122,967 rows; the local =Timad= / =Boy=
+units are a small tail).  Within-household variance shares:
+
+| regressor      | within share | n (hh-years) | hh with >=2 |
+|----------------+--------------+--------------+-------------|
+| log(output_kg) |        0.879 |        4,273 |       1,906 |
+| log(area)      |        0.277 |       13,041 |       5,139 |
+| log(labour)    |        0.475 |       11,577 |       4,496 |
+
+Land is the stickiest regressor, as expected, but 0.277 is ample for teaching.
+
+*** The estimation sample is ~1,906 households, not 4,192
+
+The output column is far thinner than the panel.  =crop_production= has 11,515
+household-years; only *6,342 (55%) retain any kg output* after =harvest_kg=,
+and requiring two positive observations leaves 1,906 households.  The reason is
+the unit vocabulary: =Kg= (26,437 rows) and =Quintal= (13,977) convert, but the
+rest is a long tail of local containers -- =Madaberia/Nuse/Shera/Cheret= in
+three sizes, =Kunna=, =Esir=, =Chinet=, =Tasa/Tanika= -- with no metric anchor,
+plus 5,498 =Other (Specify)=.  This is *not* #820 (that is a missing module,
+not dropped rows); it is the kg ladder, and #919 bears directly on it since
+=Quintal= is the second-largest unit here.
+
+A reader who takes 4,192 from the headline and gets 1,906 in a regression will
+think they have made a mistake.  They have not.
+
+*** It is TWO panels, not one five-wave panel
+
+The =maxT=3= across five waves is not attrition.  The household wave-patterns
+partition almost perfectly into two disjoint panels:
+
+| pattern                       | households |
+|-------------------------------+------------|
+| 2011-12 + 2013-14 + 2015-16   |      1,733 |
+| 2018-19 + 2021-22             |      1,322 |
+| 2013-14 + 2015-16             |      1,039 |
+
+*No household spans the 2015-16 -> 2018-19 boundary*: ESS4 re-drew the sample.
+Treat ESS1-3 and ESS4-5 as separate panels, or pool with a panel indicator.
+
+*** The universes differ across those waves
+
+From =population.yml=: 2011-12 =rural-and-small-town=; 2013-14 and 2015-16
+=region-excluded=; 2018-19 =national-all-households=; 2021-22 =region-excluded=.
+So the universe moves *within* the ESS1-3 panel as well as across the break.
+For a production function on farming households this is tolerable, but it
+should be stated rather than discovered.
+
+** Nigeria -- strong second, two structural chores
+
+All four tables present, and the panel is deep -- but *read the composition
+before quoting the headline*.  5,282 households appear in more than one round,
+yet the five-round core is only 659:
+
+| pattern                                  | households |
+|------------------------------------------+------------|
+| 2019Q1 + 2024Q1                          |      2,125 |
+| 2011Q1 + 2013Q1 + 2016Q1                 |      1,685 |
+| 2011Q1 + 2013Q1 + 2016Q1 + 2019Q1+2024Q1 |        659 |
+
+So GHS-Panel behaves like ESS: a W1-W3 cohort and a W4-W5 cohort, with a
+genuine continuing core.  Unlike Ethiopia the break is *not* clean -- 828
+households span 2016Q1 -> 2019Q1 -- so Nigeria can be run as one unbalanced
+panel, but "maxT 5" describes 659 households, not 5,282.
+
+Two costs of entry, not one:
+
+1. The PP -> PH year mapping above.
+2. =Area= units.  86.7% of =plot_features.Area= is non-null, but the unit is
+   heterogeneous and mostly *local*: ridges 7,692, heaps 6,659, stands 2,908
+   (45% of rows between them) against hectares 2,128 and acres 8,941.  Putting
+   Nigeria's plots on a common area basis requires a conversion decision that
+   the library does not currently make (#860, where EPAR's two candidate grids
+   disagree by a median of 4.9x).
+
+** Malawi -- the quiet third option, and the only uniform area unit
+
+Not measured in the first pass; added after a cold rebuild of
+=crop_production= (its warm parquet graded stale).
+
+| waves                                  | 2010-11, 2013-14, 2016-17, 2019-20 |
+| ag households                          | 31,087                             |
+| in >= 2 waves / >= 3 waves / maxT      | 3,154 / 1,432 / 4                  |
+| join to =plot_features=                | 79.9%                              |
+| =harvest_kg= coverage                  | 62,327 of 135,078 rows (46%)       |
+
+Two things recommend it over Nigeria for teaching:
+
+1. *=AreaUnit= is =acres= and nothing else* (68,212 of 68,339 rows).  There is
+   no conversion decision to make and no unit-mixing hazard -- the one place
+   Nigeria is worst, Malawi is best.
+2. No post-planting/post-harvest split, so =t= means a wave and the join is
+   the ordinary one.
+
+Against it: the panel is 10% of the ag sample (the IHPS panel sits inside the
+IHS cross-sections -- a design, not attrition, but it means the cross-section
+row count badly overstates the estimation sample), the plot join is 79.9%
+rather than Ethiopia's 99.7%, and *=plot_inputs= and =plot_labor= were not
+measured* -- both are declared for all four waves but neither is warm, so the
+input side is unverified.  Verify those two before committing to Malawi.
+
+** GhanaSPS -- designed panel, perfect join, no output measure
+
+Genuinely a panel by design -- =GhanaSPS/_/CONTENTS.org= states waves 2 and 3
+are follow-ups of wave 1, and that only wave 1 has a documented probability
+sample.  The plot join is the cleanest in the corpus (100% to =plot_features=,
+98.1% to =plot_labor=), and within-household variation is the *best* of any
+candidate (log area 0.536, log labour 0.763).
+
+What stops it: =crop_production.Quantity= is recorded entirely in local
+containers -- =Maxi bag= (11,996), =Mini bag= (2,770), =Basket= (2,547),
+=Bunch=, =Bowl=, =Tuber= -- with *no metric unit anywhere*, so the kg ladder
+has no anchor and =harvest_kg= returns 191 rows.  Usable only with an
+adaptation: restrict to one crop in one container unit and regress in native
+units, or use =Value_sold= (11,012 rows, but sold-portion only and selected).
+
+=plot_inputs= is =todo=, not =not-asked= -- the verdict in
+=.coder/coverage/absent_verdicts.csv= records chemical and seed data present in
+every wave, with a known blocker (2013-14 carries an unresolved template
+string ='%pplotnamearray[k]'= for the plot split).  Wiring it is a bounded
+=add-feature= job that would make GhanaSPS the best pedagogical case.
+
+** GhanaLSS -- panel is wired; ag data is not there
+
+The GLSS1 -> GLSS2 rotating panel *is* wired: 712 households appear in
+1987-88 and 1988-89 and in no other wave, against the 714 that
+=GhanaLSS/_/CONTENTS.org= derives from =PANELC.DAT=.  (The 2-household gap is
+unexplained and is probably worth a look if the panel is ever used.)
+
+But the country declares *only* =plot_features= -- no =crop_production=, so
+there is no output variable.  Not usable for a production function without new
+config work.
+
+** Tanzania -- out
+
+=crop_production= is =absent= for 2008-09, 2010-11, 2012-13 and 2014-15, i.e.
+the whole classic NPS ag panel, and =sane= only for 2019-20 and 2020-21.  Those
+two waves share *zero* households (706 and 2,708).  The best-known LSMS-ISA ag
+panel is not available here.
+
+** Uganda -- richest data, not currently usable
+
+Most ag waves in the corpus (7 =crop_production=, 8 =plot_features=), but
+nothing is warm -- a cold build -- and =CLAUDE.md= records that its
+=crop_production= and =plot_features= do not join on the plot axis (0 rows on
+=plot=, 509 on =parcel=).  Worth the build only if the plot-key question is
+settled first.
+
+** EHCVM countries -- structurally unsuitable
+
+Benin, Burkina Faso, Cote d'Ivoire, Guinea-Bissau, Mali, Niger, Senegal and
+Togo declare =plot_inputs= as =(t, i, input, crop, u)= -- *no plot level at
+all* -- so inputs cannot be attached to a plot.  Most also have only one or two
+ag waves.
+
+* Open issues that bear on the numbers above
+
+- #820 :: Ethiopia =crop_production= reads ESS section 11 (field crops) only;
+  the section 12 tree/fruit/root module is unwired.  Output is *partial*.
+- #867 :: =_NITROGEN_CONTENT= has no entry for NPS or D Compound, so those
+  fertilizer rows contribute 0 kg N silently.  Ethiopia uses NPS/DAP heavily
+  -- prefer raw =plot_inputs= quantity over =nitrogen_kg= here.
+- #919, #929, #931 :: kg-ladder defects; #919 specifically disarmed Ethiopia's
+  only external kg check.
+- #860 :: Nigeria plots in heaps/ridges/stands have no area factors, so =Area=
+  is NaN for them; EPAR's two grids disagree by a median of 4.9x.
+- #607 :: Nigeria unit decode is wave-blind; 19.1% of rows mislabelled
+  including a hard 10x error.
+- #837 :: the =(t, v)= cluster key is still non-unique in Ethiopia, Tanzania
+  and Uganda.
+- #660 :: Ethiopia, 120/40 households appear in the agriculture files but not
+  the cover page.
+
+* Hazards to respect when the estimation starts
+
+- Units before logs :: convert with =transformations.harvest_kg=; do not
+  reinvent the ladder.  =CLAUDE.md= records 1000x data-entry slips in Ethiopia
+  2011-12 that are now served as recorded.  Run
+  =quantity_reports(country='Ethiopia')= once -- a single such slip wrecks a
+  within estimator.
+- No panel package is installed :: neither =linearmodels= nor =statsmodels= is
+  in the venv.  For teaching Mundlak this is arguably a feature -- the within
+  transformation and the group-mean regressors are a few lines of pandas -- but
+  it is a choice to make deliberately, not to discover.
+- =Country.panel_ids= / =updated_ids= are properties, not methods.
+
+* Unrelated infrastructure finding
+
+=bin/savio_venv.sh mount= ends with an unconditional =ln -sfn= on the *shared*
+repo-root =.venv= symlink.  That pointer is shared by every concurrent session
+on every node -- there were four jobs running on three nodes today -- and only
+one target can be valid at a time, so any session running =mount= silently
+dangles the venv for all the others.  =SkunkWorks/savio_venv.md:70= says the
+mount paths "never collide", which is true, and is silent on the symlink.
+
+Suggested fix: give =mount= a =--link= flag (default off), or have it refuse
+when the current target names a job still in =squeue=.  Worktrees should carry
+their own =.venv= symlink, which is what this branch does.
