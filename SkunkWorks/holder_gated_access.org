@@ -1,0 +1,362 @@
+#+title: Holder-gated access: one gate per access class, none of them on the warm path
+#+date: [2026-09-17 Wed]
+#+author: Sue, from a design discussion with EL
+#+filetags: skunkworks data_access dvc lsms_library
+
+* Status / mandate
+Design for implementation.  *Nothing implemented.*  Builds on
+[[file:data_access_restrictions.org][data_access_restrictions.org]] (2026-09-04), which is EL's shape and
+whose decisions this note inherits by id.  What is new here is (i) a measured
+fact the 09-04 note was built on and which turns out to be false -- the World
+Bank API-key gate it says discharges self-service data does not fire on any
+read path; (ii) one step of the 09-04 design that EL reversed on 2026-09-17;
+and (iii) an encryption mechanism EL named on 2026-09-17 that changes the
+answer to the 09-04 note's one open question.
+
+** Inherited from 09-04, unchanged
+- D1 :: A push is never blocked.  An =encrypted= class is encrypted /before/
+  push -- a transformation, not a prohibition.  A second remote or bucket was
+  considered on 2026-09-17 and is unnecessary under D1: the one bucket stays
+  open, content-addressing still works, the only governance surface is key
+  distribution.
+- D2 :: Split (A) do-not-leak from (B) share-under-a-protocol; build (A).
+- D3 :: The software is not a security boundary; enforcement lives in the
+  user's legal relationship with the holder.  Cache audience matches grant
+  audience, and only the operator knows the tenancy (=data_dir=).
+- Terms and the /method of obtaining permission/ live in the data record
+  (=SOURCE.org=); /evidence of permission/ for a user lives in that user's
+  config.
+- Shared-compute is first-class: a pre-warmed shared cache must keep serving
+  with no user credentials at all.
+
+** Reversed by EL, 2026-09-17
+- The NADA proxy step. :: 09-04 records EL correcting Sue that a WB key
+  discharges GSS and NISR data, because those NADA instances use the same
+  self-service registration.  EL now wants the opposite: *each holder's
+  self-service registration is its own entitlement*.  A WB key proves WB
+  terms were accepted and nothing else.  So the class vocabulary carries the
+  /authority/ as well as the /mechanism/ -- see [[*The class vocabulary]].
+
+** Corrected facts (measured 2026-09-17; sweep in =.coder/ledger/holder-gated-access.md=)
+- The gate 09-04 relies on does not exist.  See [[*The problem, as measured]].
+- 127 =SOURCE.org= files, not 123 (=CLAUDE.md= "all 123 shipped ... 0
+  unknown"); 8 wave dirs have none at all and resolve to =unknown= at read
+  time (=provenance.py:296-299=).
+- EthiopiaRHS terms are now recorded (=EthiopiaRHS/_/CONTENTS.org:41-53=,
+  =EthiopiaRHS/1989/Documentation/LICENSE.org=): IFPRI Dataverse, not
+  DUA-gated, non-commercial.  The 09-04 "no clear term found" row is closed.
+- KenyaLPS is x5, not x4 (2003-2005 has a bare =LICENSE=, which =Wave.license=
+  cannot see -- =country.py:1183= looks for =LICENSE.org= exactly).
+- "Nothing currently in the bucket needs unwinding" is wrong.
+  =GhanaSPS/2017-18/Documentation/LICENSE.org:34-56= (dated 2026-08-19, before
+  09-04) records *30 files carrying pre-anonymization columns* -- free-text
+  "other" responses, sub-district geography, consent flags the producers
+  stripped from the published release -- in the open bucket, terms
+  unrecorded.  D2's "build before exposure, the easy direction" is already
+  violated for the first real customer.  See [[*Open questions]] Q3.
+
+* The problem, as measured
+Two facts, and the design fixes the second as a consequence of doing the first
+properly.
+
+** One key, six holders
+127 waves carry a =#+PROVENANCE_SOURCE:= line: 104 =worldbank=, 23 =external=.
+The 23 resolve, from free text only, to five holders plus a sixth inside one
+wave:
+
+| holder (as the files name it)                       | waves         | evidence                                            |
+|-----------------------------------------------------+---------------+-----------------------------------------------------|
+| IFPRI / AAU / CSAE via Harvard Dataverse            | EthiopiaRHS x8 | =EthiopiaRHS/1989/Documentation/SOURCE.org:8-10=    |
+| KLPS (Miguel, Kremer et al.) via Dataverse, CC0     | KenyaLPS x5    | =KenyaLPS/2007-2009/Documentation/LICENSE.org:3-12= |
+| Ghana Statistical Service NADA                      | GhanaLSS x6    | =GhanaLSS/1987-88/Documentation/SOURCE.org:6-10=    |
+| EGC-ISSER, Yale                                     | GhanaSPS x2    | =GhanaSPS/2013-14/Documentation/SOURCE.org:6-9=     |
+| NISR Rwanda NADA                                    | Rwanda x2      | =Rwanda/2005-06/Documentation/SOURCE.org:3-10=      |
+| Dataverse =DVN/E5QP0F= v1.2, CC0 (10 of 110 files)  | GhanaSPS 2017-18 | =GhanaSPS/2017-18/Documentation/SOURCE.org:16-24= |
+
+Holder is a *wave* property, not a country one: GhanaLSS 1991-92 and GhanaSPS
+2009-10 are =worldbank=; their siblings are not.  And in GhanaSPS 2017-18 it is
+a *file* property.  =PROVENANCE_SOURCE= cannot carry any of this -- =external=
+is the else-branch of a two-host test (=provenance.py:169-182=).
+
+** The WB key gates nothing on the read path
+=CLAUDE.md= ("Three-tier credential model"), =902da8352='s commit message,
+=CONTRIBUTING.org:63-65= and the 09-04 note all say the WB API key is the
+authoritative gate.  Measured:
+
+- =__init__.py:285-293= calls =_auto_unlock_s3()= at import with no key check;
+  =_auto_unlock_s3= (=data_access.py:816=) never reads
+  =config.microdata_api_key()=.  Both credential blobs ship in the wheel
+  (=pyproject.toml:49-50=) beside the base64 passphrase (=data_access.py:532=).
+  So =pip install= + =import lsms_library= writes usable S3 creds to
+  =~/.config/lsms_library/s3_creds=, offline, with no key.
+- =permissions()= -- the only function that calls =_validate_wb_api_key= --
+  has four call sites in the package.  Two are the unused =can_read= /
+  =can_write= bodies, one is =_check_write_access= (pushes), one is
+  =get_data_file= (=data_access.py:2123=), where the DVC branch is gated on
+  =any(... if resource != "wb_api")= -- the key is *excluded* -- and
+  ="wb_api" not in perms= gates only the direct-WB-download fallback at :2183,
+  which WB authenticates itself.
+- =local_tools.py=, which holds =get_dataframe= (the sanctioned reader) and
+  =_ensure_dvc_pulled= (the S3 fetch), contains zero references to
+  =permissions=, =microdata_api_key= or =can_read=.
+- =tests/test_s3_unlock.py::test_unlock_succeeds_with_gpg_unavailable= pins
+  the gate-less behaviour: no key, =_auto_unlock_s3(DVC_DIR)= returns =True=.
+
+It entered via =902da8352= ("perf: defer WB API validation to first data
+access"), which moved the validation off import for a 15 s network
+round-trip and asserted it would fire at first data access.  It never did.
+Not a secrets issue -- the passphrase is documented as cosmetic and =CLAUDE.md=
+says not to "fix" it -- but a terms-of-use exposure: a WB key was the proxy
+for "accepted the terms", and it is never checked.
+
+* The class vocabulary
+Refines 09-04's four =#+ACCESS_*= keywords.  09-04 put mechanism, class,
+protocol and evidence-shape on every wave; that repeats the WB protocol text
+104 times and drifts.  Here a wave carries *one* keyword, and a framework
+registry carries the rest.
+
+** Per wave: one keyword in =SOURCE.org=
+: #+ACCESS_CLASS: wb-nada
+
+=parse_source_org= (=provenance.py:185-238=) already lands unknown =#+KEY:=
+lines in =extra=; promote =ACCESS_CLASS= to a field on =WaveProvenance= and
+have =render_source_org= write it.  Editing =Documentation/SOURCE.org= moves no
+cache hash: =Wave._input_hash= globs =wave_dir= and =_/= non-recursively
+(=country.py:933,945,996=), so =Documentation/= is never hashed.  This is the
+one cost in the design that is genuinely zero.
+
+** Per file, for GhanaSPS-style mixes: =Documentation/ACCESS.yml=
+: # glob relative to Data/, first match wins, default is the wave's ACCESS_CLASS
+: - {glob: "dataverse_v1.2/*", class: klps-dataverse-cc0}
+: - {glob: "*.dta",            class: unrecorded}
+
+Why not =LICENSE.org=: it is verbatim holder prose (112 files, zero
+machine-readable fields, 09-04 measured) and must stay that way so it can be
+quoted.  The 10-file CC0 list in GhanaSPS 2017-18's =LICENSE.org= is the
+override this file encodes.
+
+** The registry: =lsms_library/access_classes.yml=
+Framework-level, a sibling of =derivations.yml=; a new =.yml= moves no cache
+hash (=_BUILD_INPUT_SUFFIXES=, =country.py:706=).  One entry per class:
+
+: wb-nada:
+:   mechanism: api-key
+:   authority: World Bank Microdata Library
+:   validate:  {nada_host: microdata.worldbank.org}
+:   protocol:  Register at https://microdata.worldbank.org, generate an API key,
+:              put it in config.yml as entitlements.wb-nada.api_key
+:   evidence:  api_key
+: gha-gss-nada:
+:   mechanism: api-key
+:   authority: Ghana Statistical Service
+:   validate:  {nada_host: microdata.statsghana.gov.gh}
+:   protocol:  ...
+:   evidence:  api_key
+: ifpri-dataverse:
+:   mechanism: attestation
+:   authority: IFPRI / AAU / CSAE
+:   protocol:  Read the IFPRI Dataverse Terms of Use at <doi>; non-commercial;
+:              then record entitlements.ifpri-dataverse.attested: <date>
+:   evidence:  attested
+: klps-dataverse-cc0:
+:   mechanism: open
+: wb-gps-unjittered:
+:   mechanism: gpg-recipients
+:   authority: World Bank (bespoke permission)
+:   protocol:  Obtain written WB permission for the survey; send your public key
+:              to <maintainer>; you are added to the recipient set.
+:   evidence:  a private key in your keyring that decrypts the blob
+: unrecorded:
+:   mechanism: unrecorded
+
+*The mechanism is what the gate dispatches on; the authority is what the
+evidence must name.* 09-04 said "mechanism, not authority" because one
+self-service key was to serve every NADA holder; with that reversed the
+authority is part of the class, and =wb-nada= and =gha-gss-nada= are two
+classes with one mechanism.
+
+** Four mechanisms, and what each means for the blob
+| mechanism        | evidence in user config                  | blob in S3            | gate on a fetch miss                                  |
+|------------------+------------------------------------------+-----------------------+-------------------------------------------------------|
+| =open=           | none                                     | plaintext             | serve                                                 |
+| =attestation=    | =entitlements.<class>.attested: <date>=  | plaintext             | serve if present, else refuse naming =protocol=       |
+| =api-key=        | =entitlements.<class>.api_key=           | plaintext             | validate once per process against =validate.nada_host=; refuse naming =protocol= |
+| =gpg-recipients= | a private key (optionally =key_id=)      | *ciphertext*, encrypted to every authorized user's public key | fetch ciphertext to L1, =gpg --decrypt=; refuse naming =protocol= if no key matches |
+| =unrecorded=     | --                                       | plaintext             | see Q2                                                |
+
+The "room for stricter" EL asked for on 2026-09-17 is the fourth row.  Under
+the accidental-violation threat model the first three are library-side
+if-statements, and D3 says that is all they should be.  The fourth is not:
+without a matching private key the bytes are useless, which is enforcement
+without a second bucket, an IAM policy, or the library pretending to be a
+security boundary.
+
+* =gpg-recipients=: three consequences
+EL, 2026-09-17: "secret files gpg encrypted with creds of all authorized
+users."  Read as =gpg --encrypt --recipient <pubkey>= for each authorized
+user.  No such encryption exists in the tree today -- the two =.gpg= files are
+symmetric (=symkey enc packet=; =s3_reader_creds.gpg=, and the unread
+=gdrive_data_store.json.gpg= from =4a30e15af=) -- so this is the target, and
+Q1 asks whether it is the intended reading.
+
+- It answers 09-04's Q1 the other way. :: 09-04 proposed a derived nonce so
+  re-encryption reproduces the ciphertext (its option (a)).  Asymmetric gpg is
+  randomised by construction, and re-encrypting to a *changed recipient set
+  should* mint a new blob: the sidecar then pins "the ciphertext readable by
+  this authorized set", and revoking a user is a new sidecar plus a commit.
+  That is 09-04's option (b), and under recipients it is the mechanism rather
+  than a cost.  The cost it does carry: the sidecar md5 is of the ciphertext
+  and is folded into every dependent table's build hash, so a recipient-set
+  change rebuilds that wave's tables.  Bespoke and rare; acceptable.
+- It reintroduces the =gpg= binary that GH #741 removed. :: #741 was a real
+  failure (Windows and macOS ship no =gpg=; users saw =NoCredentialsError=
+  three layers down).  *Decision proposed: accept it for this class only.*  It
+  is bespoke by construction, its users are few and named, and D2 defers
+  governance anyway.  The alternative, if EL objects, is a hybrid --
+  =cryptography= Fernet data key, wrapped per recipient -- which
+  =cryptography= can do without a binary; named here, not designed.
+- Decryption needs a private key, and a course server has dozens of students. ::
+  D3 handles it: one entitled person decrypts into the shared =data_dir=, the
+  plaintext lands beside the ciphertext in L1 (=<md5>.plain=, keyed by the
+  ciphertext's md5 so staleness hashing is unchanged), and every later read is
+  a warm read.  Which is why the gate goes where it goes:
+
+* Gate placement, and what it costs
+** Where
+On the *S3-fetch miss branch* of =_ensure_dvc_pulled=, just before the
+=get_remote= at =local_tools.py:449=, and at the second =get_remote= site at
+=:721=.  Never on =get_dataframe='s warm path, and never at import.  The hot
+path stays "two =os.path.exists= calls and a tiny YAML parse" (its own
+docstring); the credential-free warm read 09-04 measured (GhanaLSS
+=food_acquired=, 5,259,344 rows, no config, no key) is preserved by
+construction.  =get_data_file='s DVC branch calls =_ensure_dvc_pulled= since
+GH #763, so it inherits the gate; its =permissions(path)= call and the
+inverted =resource != "wb_api"= test are removed.
+
+Resolution on a miss: =fn= -> =(country, wave)= (the path parse
+=get_data_file= already does at =data_access.py:2110-2113=) -> =ACCESS.yml=
+file override, else the wave's =ACCESS_CLASS= -> registry entry -> evidence
+in config -> validator (memoised per process per class, as
+=_wb_key_validated= already is) -> serve, decrypt, or raise =AccessError=
+whose message *is the registry's =protocol= text*.  Never a =403=, never a
+=None= (09-04).
+
+The import-time =_auto_unlock_s3()= call goes.  The shared reader blob is
+unlocked lazily, on the first miss whose class is not =gpg-recipients=, after
+the gate passes.  =LSMS_SKIP_AUTH=1= keeps its meaning -- skip everything, the
+operator guarantees =s3_creds= -- which is what the data-free CI job relies
+on (=tests/conftest.py:5=).
+
+** Cache-hash cost
+GH #763's "no =data_access= symbol reaches any build fingerprint" does not
+cover =local_tools._ensure_dvc_pulled=, which is reached from =get_dataframe=
+and is *not* in =_build_registry._EXCLUDED_CALLABLES=.  So:
+- the gate callable itself (=access.check_fetch= or similar) is excluded on
+  the =_assert_built_required_columns= argument: it raises or returns =None=
+  and changes no byte of any parquet.  Precedent: the null-read audit's four
+  callables, excluded for exactly this reason and pinned by
+  =test_the_audit_module_is_not_folded_into_any_build_fingerprint=;
+- the one-line call-site edit inside =_ensure_dvc_pulled= is expected to move
+  every table's hash once (=CLAUDE.md= Site R: any edit to =get_dataframe='s
+  reach moves 37/37).  One corpus re-warm, one time.  *Not measured here* --
+  this node has no venv -- measure with the stash-probe before landing.
+- Everything else is free: =access_classes.yml= is a new =.yml=,
+  =SOURCE.org= is under =Documentation/=, =config.py= is read-path.
+
+** Network cost
+=_validate_wb_api_key= is the ~15 s round-trip =902da8352= moved off import.
+Under this design it runs at most once per process per class, only on a fetch
+miss, only for =api-key= classes.  A user reading from a warm cache pays
+nothing; a cold build pays it once.
+
+** Config
+=~/.config/lsms_library/config.yml= grows an =entitlements:= map, read through
+the existing =config.get()= order (env -> file -> None):
+
+: microdata_api_key: ...                      # kept; alias for entitlements.wb-nada.api_key
+: entitlements:
+:   wb-nada:          {api_key: ...}
+:   gha-gss-nada:     {api_key: ...}
+:   ifpri-dataverse:  {attested: 2026-09-17}
+:   wb-gps-unjittered: {key_id: 0xABCD1234}   # optional; gpg picks by default
+
+Env form: =LSMS_ENTITLEMENT_<CLASS>_<FIELD>= (e.g.
+=LSMS_ENTITLEMENT_GHA_GSS_NADA_API_KEY=), so CI secrets and course-server
+provisioning need no config file.  The two credential *paths* stay env-only
+as today (=config.py:134,160=).
+
+* Preconditions to verify before building
+- NADA validators. :: "Reverse the proxy" is cheap only because NADA
+  instances share software: one validator parameterised by host covers WB,
+  GSS and NISR.  But that GSS and NISR issue API keys, and that
+  =/index.php/api/catalog/search= with =X-API-KEY= is the check on those
+  hosts, is *asserted* in 09-04, not measured.  One =curl= per host.
+- Backfill before landing. :: 8 wave dirs have no =SOURCE.org= (Afghanistan
+  x2, Brazil, Bulgaria x5) and 23 have no licence file.  Every one of 135
+  waves gets an =ACCESS_CLASS= before the gate ships, so that absence is a
+  regression the way =PROVENANCE_SOURCE: unknown= = 0 is today.  No
+  fail-open default for a missing keyword.
+- =Wave.license= reads bare =LICENSE=. :: Two waves have one; fix the reader
+  (=country.py:1183=, =:2312=), not the files.
+
+* Open questions
+- Q1. Does "creds of all authorized users" mean =--recipient <each pubkey>=? ::
+  Recommendation: yes.  Revocation is re-encrypt-without-that-key; there is no
+  passphrase to leak or rotate; the keyring is the ACL.  The alternative
+  reading -- one symmetric passphrase handed to each authorized user, which is
+  what =CONTRIBUTING.org:141-155= does for the reader blob today -- has no
+  revocation short of rotating everyone.
+- Q2. What does the gate do with =unrecorded=? ::  GhanaSPS 2013-14 (no
+  licence file, GH #140's vintage question) and the 100 pre-existing GhanaSPS
+  2017-18 files are read today.  09-04's "raise an error that names the
+  protocol" applied literally breaks them.  Recommendation: warn-and-serve,
+  naming the wave and the gap, with =LSMS_ACCESS_STRICT=1= refusing -- the
+  same warn/strict shape as =LSMS_GRAIN_STRICT= and =LSMS_READ_STRICT=, and
+  the only place in this design a strict lever appears.  The other four
+  mechanisms refuse by default, because refusing *was always the stated
+  design* for =api-key=, and the whole point for =attestation=.
+- Q3. The 30 pre-anonymization files in GhanaSPS 2017-18. ::  They are in the
+  open bucket now with terms unrecorded (=LICENSE.org:41-56=).  This design
+  can only *add* a =gpg-recipients= ciphertext beside them; D1 means nothing
+  is deleted from the bucket.  Whether the plaintext sidecars are retired --
+  and whether the terms are resolved first -- is a decision about an existing
+  exposure, not about this mechanism.  Recommendation: resolve the terms
+  (the LICENSE.org already asks for exactly that), then decide.
+- Q4. Refuse or warn for =attestation= during migration? ::  Under the
+  reversed proxy, a WB-keyed user reading GhanaLSS from a *cold* cache now
+  needs a GSS key.  The course scenario is unaffected (warm cache), and a
+  refusal that says "register at =microdata.statsghana.gov.gh=" is the
+  accidental-violation prevention EL asked for.  Recommendation: refuse.
+
+* What flips
+- =tests/test_s3_unlock.py::TestAutoUnlockWithoutGpg= -- asserts unlock with
+  no key.  Becomes: unlock is refused with no evidence, succeeds with a
+  validated =wb-nada= key (mocked validator).
+- =data_access.permissions()= is globally memoised (=_cached_permissions=)
+  and cannot vary by path; the per-fetch check is a *new* function, and
+  =permissions(path)='s reserved-unused =path= argument is finally used or
+  removed.
+- =__init__.py:285-293= -- the import-time unlock goes; import gets faster
+  still.
+- Stale claims to correct in the same PR: =CLAUDE.md= three-tier table (row 1
+  "data-access calls raise =RuntimeError=" -- =data_access.py= has one
+  =raise=, a subprocess timeout at :450), =CONTRIBUTING.org:63-65=,
+  =scripts/reencrypt_s3_creds.py='s docstring, =_derive_fernet_key='s
+  docstring.  =902da8352='s message is history and stays wrong.
+
+* Phasing
+1. *The gate that should have existed* -- =wb-nada= only.  Registry with one
+   entry, =ACCESS_CLASS= backfilled to all 135 waves (104 =wb-nada=, 23 by the
+   holder table above, 8 after reading their =Documentation/=), gate on the
+   miss branch, import-time unlock removed, =entitlements.wb-nada= aliasing
+   =microdata_api_key=.  Fixes the measured bug; changes nothing for a keyed
+   user; refuses an unkeyed cold fetch with the WB protocol text.
+2. *The other self-service holders* -- =gha-gss-nada=, =rwa-nisr-nada=, after
+   the validator precondition is measured; =ifpri-dataverse= attestation;
+   =klps-dataverse-cc0= open; =unrecorded= per Q2.
+3. *=gpg-recipients=* -- for the first customer that is not yet in the bucket
+   (09-04: Togo/Novissi 2021, the West African un-displaced GPS).  Encrypt
+   tool (=scripts/encrypt_to_recipients.py=: recipient list from a committed
+   =Documentation/RECIPIENTS= per wave, =gpg --encrypt=, =push_to_cache=),
+   decrypt-on-miss in the gate, =ACCESS.yml= for per-file scope.
+4. GhanaSPS 2017-18's 30 files, once Q3 is decided.
