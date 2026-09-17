@@ -19,7 +19,12 @@ six-digit `hhid` (qtr + 3-digit cluster + 2-digit household, verified on all
 the 201 household-quarters present in the person file but absent from the
 keyed part of this file; with nothing to serve they are dropped here with a
 count, as 2024's 332 shells are.  After the drop the key is unique (0
-duplicates) and the table has 10,760 / 10,626 / 10,421 / 10,112 rows.
+duplicates) and the parquet has 10,760 / 10,626 / 10,421 / 10,112 rows.
+A further 301 keyed rows (277 in 2022Q2, 24 in 2022Q4) answer NONE of the
+eight items (household-quarters interviewed for Section 7 but not Section
+5; 2024 has none): they are written here with all-NA items and NA
+FIES_score and the framework's dropna(how='all') removes them at read, so
+the API serves 10,760 / 10,349 / 10,421 / 10,088.
 
 What differs from 2024: the file name (`SEC567_edt`, 167 columns: it also
 carries Q4-only weight columns, Q1-only `hhsize`, and Section 10/11B
