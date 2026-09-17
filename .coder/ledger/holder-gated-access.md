@@ -38,7 +38,8 @@ Design only; nothing implemented.
 | `Wave.license` / `Country.provenance` | `country.py:1177-1187`, `:2312-2316` | read `LICENSE.org` exactly; miss bare `LICENSE` (2 waves) | partial | fix the reader |
 | `_build_registry._EXCLUDED_CALLABLES` | `_build_registry.py:116-` | read-path / guard callables kept out of build fingerprints | `tests/test_null_read_guard.py` | extend: add the gate callable |
 | `push_to_cache` / `push_to_cache_batch` | `data_access.py` (§"Push to cache") | lock-retrying writer | yes | reuse unchanged (D1: pushes never blocked) |
-| `scripts/reencrypt_s3_creds.py` | whole file | generator for the symmetric `.enc` | `test_key_derivation_matches_the_generator` | sibling pattern for `scripts/encrypt_to_recipients.py` (new) |
+| `scripts/reencrypt_s3_creds.py` | whole file | generator for the symmetric `.enc` | `test_key_derivation_matches_the_generator` | sibling pattern for `scripts/encrypt_class.py` (new), which derives its recipient set from the grant store |
+| (none) — grant store | `lsms_library/countries/.access/{keys/<FPR>.asc, grants.yml}` (new) | public keys keyed by fingerprint, each with the classes it grants and `authorized_by`; loader refuses a grant without it | -- | new; `load_verdicts()` is the refusal precedent, `blessed.csv` the accretion precedent |
 | `capability.SeriesCapability` | `capability.py:112-143` | what a series measures; `validation` ladder; no holder field; WB idno grammar only | `tests/test_capability.py` | not reused: wrong axis (instrument, not terms) |
 | `coverage_matrix.BLOCKER_KINDS["licensed"]` | `coverage_matrix.py:333` | declared, undocumented, consumer file absent | no | not reused; out of scope |
 
