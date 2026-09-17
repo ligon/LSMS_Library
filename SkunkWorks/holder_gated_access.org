@@ -307,10 +307,66 @@ sends to a holder.  The GPG entry is different in kind, and it is a
   =entitlements=.
 - The *public key block* is not in the user's config because the user never
   reads it; the **maintainer** does, when encrypting.  Its home is the
-  committed per-wave recipient list (=Documentation/RECIPIENTS=, armored
-  keys or fingerprints resolvable from a repo keyring), so that adding or
-  revoking a recipient is a reviewable diff -- the same argument that made
-  =panel_ids.json= a committed source rather than a build product (GH #914).
+  committed grant store below, so that adding or revoking a recipient is a
+  reviewable diff -- the same argument that made =panel_ids.json= a committed
+  source rather than a build product (GH #914).
+
+* The grant store: public keys, each with what it grants (EL, 2026-09-17)
+EL: "there has to be a store of public GPG keys, associated with a list of
+files they grant access to."  Yes, and *that* is the primary index -- a first
+draft of this note had a per-wave recipient list (=Documentation/RECIPIENTS=)
+instead, which is the wrong way round.  Encryption needs class -> keys, but
+that is a derived view; the *edits* are per person ("add A to the un-jittered
+GPS", "revoke B") and the audit question is "what can A read?".  Both are one
+entry here and N edits across waves the other way.
+
+** Shape
+Committed under the config tree, shipped in the wheel (public keys are
+public):
+
+: lsms_library/countries/.access/
+:   keys/<FINGERPRINT>.asc        # one armored public key per file; diff-friendly
+:   grants.yml
+
+: # grants.yml -- fingerprint -> what it grants, and why
+: 1234ABCD...:
+:   name: A. Researcher <a@example.edu>
+:   grants:
+:     - class: wb-gps-unjittered
+:       authorized_by: World Bank permission ref. 2026-0123, 2026-09-01
+:       expires: 2028-09-01            # optional
+:     - class: novissi-2021
+:       files: ["Data/phone_*.dta"]    # optional narrowing; default is every file in the class
+:       authorized_by: Togo/Novissi DUA countersigned 2026-08-15
+
+Two rules.  *The unit of a grant is an access class* -- a class already names
+its files through =ACCESS_CLASS= and =ACCESS.yml=, so a grant to it covers
+them without a list, and =files:= exists for the special-occasion narrowing
+EL asked for on 2026-09-17.  *Every grant carries the permission that
+authorises it* -- under D3 that permission, not the key, is the enforcement,
+and a grant with no =authorized_by= is refused by the loader, exactly as
+=load_verdicts()= refuses a closing verdict without evidence.
+
+** What reads it
+- =scripts/encrypt_class.py <class>= (maintainer): derives the recipient set
+  for the class from =grants.yml= (every fingerprint with a live grant whose
+  =files:= matches), =gpg --encrypt --recipient ...= each source file,
+  =push_to_cache_batch=, rewrite the sidecars.  Editing =grants.yml= and
+  re-running it *is* the add/revoke operation; the new sidecars are the
+  commit that lands it (D4: a changed recipient set is a new blob).
+- The runtime gate (user): only for the refusal message.  The ciphertext
+  packet already names its key ids; the store maps them to names so the
+  refusal reads "encrypted to A, B; your key D is not a recipient" and the
+  registry's =protocol= says what to do.  Nothing at runtime *depends* on the
+  store -- a user with the right private key decrypts with or without it.
+- =lsms-library access list= (anyone): what each key can read; =access
+  request <class>= exports the caller's public key for the maintainer to add.
+
+** What it does not do
+It does not decide anything.  A grant is a record of a permission the holder
+gave; the maintainer who writes it is asserting they saw that permission, in
+the way a =blessed.csv= row asserts a human read the numbers.  Blessings
+accrete and are never bulk-seeded; the same for grants.
 
 * Preconditions to verify before building
 - NADA validators. :: "Reverse the proxy" is cheap only because NADA
@@ -452,8 +508,8 @@ bypass, which is the point of having a strict class.
    =klps-dataverse-cc0= open; =unrecorded= warn-and-serve (D5).
 3. *=gpg-recipients=* (D4) -- for the first customer that is not yet in the
    bucket (09-04: Togo/Novissi 2021, the West African un-displaced GPS).
-   Encrypt tool (=scripts/encrypt_to_recipients.py=: recipient list from a
-   committed =Documentation/RECIPIENTS= per wave, =gpg --encrypt --recipient=,
+   Encrypt tool (=scripts/encrypt_class.py=: recipient set derived from
+   =.access/grants.yml= (the grant store), =gpg --encrypt --recipient=,
    =push_to_cache=), decrypt-on-miss in the gate, =ACCESS.yml= for per-file
    scope.
 4. GhanaSPS 2017-18: replace the six wired pre-anonymization files with the
