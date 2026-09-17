@@ -1,0 +1,157 @@
+#+TITLE: Ghana AHIES (GSS NADA) -- access findings and file inventory
+#+DATE: 2026-09-17
+
+* What this is
+Evidence gathered before adding the Annual Household Income and
+Expenditure Survey (AHIES, Ghana Statistical Service, 2022-2024) as the
+country =GhanaAHIES=.  Everything below was measured on 2026-09-17 from
+Savio job 39002769; no credential is recorded here.  Companion ledger:
+=.coder/ledger/ghana-ahies.md=.
+
+* Where it lives
+GSS runs its own NADA instance, https://microdata.statsghana.gov.gh/
+(the same host that supplied GLSS6 and GLSS7; see
+=GhanaLSS/_/CONTENTS.org=).  Two catalog entries match =AHIES=:
+
+| id  | idno                                   | title                  | repository | changed    |
+|-----+----------------------------------------+------------------------+------------+------------|
+| 119 | =DDI-GHA-GSS-AHIES-2022Q1-2023Q3-v1.0= | AHIES - 2023           | ECO        | 2024-03-06 |
+| 128 | =DDI-GHA-GSS-AHIES-2022-2024-v1.1=     | AHIES 2022-2024        | central    | 2026-06-24 |
+
+Both report =data_access_type: public=.  Entry 128's study documentation
+(resource 544, DDI =...-2022Q1-2024Q4-v2.1=, dated 2026-06-22) is the
+current description of the dataset and names exactly six data files
+(below).  Entry 119 is the earlier release (Q1 2022 - Q3 2023) and is
+superseded by 128 for everything we use.
+
+The World Bank Microdata Library was NOT checked (the session's WB key
+was unavailable); the study docs credit WB technical assistance, so a
+WB mirror is possible.  =discover_waves('GhanaAHIES')= is therefore
+declared non-discoverable for now; revisit when a WB key is to hand.
+
+* Access, measured
+A =statsghana_api_key= in =~/.config/lsms_library/config.yml= was
+tested against the NADA API with the =X-API-KEY= header:
+
+| endpoint                                    | anon               | real key            | bogus key       |
+|---------------------------------------------+--------------------+---------------------+-----------------|
+| =api/catalog/search?sk=AHIES=               | 200, 2 rows        | 200, 2 rows         | 200, 2 rows     |
+| =api/catalog/{idno}=                        | 200                | 200                 | 200             |
+| =api/catalog/{idno}/data_files=             | 200                | 200 (128: 3 files)  | 200             |
+| =api/datasets/{id}=                         | 400 ACCESS-DENIED  | 400 IDNO-NOT-FOUND  | 400 ACCESS-DENIED |
+| =api/resources/{idno}=                      | 400 ACCESS-DENIED  | 400 ACCESS-DENIED   | 400 ACCESS-DENIED |
+| =catalog/{id}/download/{rid}= (web)         | 200, file          | 200, file           | --              |
+
+So: the key is *validated* (a real key gets a different refusal from a
+bogus one), but it gates only metadata; =api/resources= is refused even
+to a keyed user, so =data_access._find_stata_zip_url= cannot be used on
+this host; and every *download* is anonymous.  Nothing in the library
+consumes the key today, and nothing should until the access-class
+design (=SkunkWorks/holder_gated_access.org=, design only) lands.
+
+* The unlisted files, and why they are legitimate
+The catalog pages link only two AHIES resources on entry 128 (513, the
+2024 Stata zip; 544, the study documentation PDF) and one on 119 (465).
+The download endpoint =catalog/{id}/download/{rid}= is not scoped to
+the catalog id: a scan of rids 440-599 served 114 files, most from
+unrelated GSS studies (2021 PHC, MICS, DHS, IBES, tourism surveys), and
+among them the remaining AHIES files.  The six files used are exactly
+the six the v2.1 study documentation lists under "Files Description"
+(3 x =AHIES Q1-Q4_Rev_20250827= person files, 3 x =SEC567_edt= household
+files), so the scan recovered the documented dataset, not stray copies.
+
+EL (2026-09-17): GSS supplied the questionnaire and field manual
+directly by email *because they asked for the data to be set up in
+lsms_library*; the instruments' absence from the website is an
+oversight on their side.  Provenance is recorded as =external= with
+this retrieval path in each wave's =SOURCE.org=.
+
+Older resources on the host that are superseded and NOT used: 491
+(=STATA_AHIES 2022_QTR1-4.zip=), 494 (=AHIES2022Q1_2023Q3_SEC01234_202402=).
+
+* File inventory (md5 in =MD5SUMS.txt=; copies at
+  =/global/scratch/fsa/fc_jevons/ligon/ahies_gss_2026-09-17/=)
+
+| rid | file                                      | bytes         | rows x cols  | grain               |
+|-----+-------------------------------------------+---------------+--------------+---------------------|
+| 512 | =2022 AHIES Q1-Q4_Rev_20250827.dta= (zip) | 2,693,411,124 | 209,943 x 838 | person x quarter    |
+| 514 | =2023 AHIES Q1-Q4_Rev_20250827.dta= (zip) | 2,526,801,384 | 196,953 x 838 | person x quarter    |
+| 513 | =2024 AHIES Q1-Q4_20250827.dta= (zip)     | 2,418,383,206 | 188,500 x 838 | person x quarter    |
+| 548 | =2022 AHIES Q1-Q4_SEC567_edt.dta=         |    16,135,157 |  42,120 x 167 | household x quarter |
+| 547 | =2023 AHIES Q1-Q4_SEC567_edt.dta=         |     9,855,939 |  39,631 x 132 | household x quarter |
+| 551 | =2024 AHIES Q1-Q4_SEC01567_edt.dta=       |    11,318,925 |  39,298 x 147 | household x quarter |
+| 544 | =2022-2024_AHIES_Q1-Q4_Sec1-7.pdf=        |     7,212,463 | study doc v2.1 (variable lists) |
+| 465 | =AHIES2022_Documentationq1q2q3_20230504.pdf= | 2,390,227  | 2022 study doc (sample design, dates) |
+
+Emailed by GSS (not on the host): =AHIES_questionnaire_Final_22-11-2021.docx=,
+=AHEIS MANUAL_Final_22-11-2021.docx= (in =AHIES_INSTRUMENTS.zip= at the
+scratch path above).  These are the instrument (13 sections) and the
+field officers' manual (18 chapters).
+
+The =.dta= files carry value labels that are not valid UTF-8;
+=pyreadstat= needs =encoding='latin1'=.
+
+* Survey design (from the study docs and the files)
+- 10,800 households in 600 EAs (18 per EA; 304 urban / 296 rural EAs)
+  drawn from the 2021 PHC frame; quarterly panel, Jan 2022 - Dec 2024;
+  CAPI; 16 regions.
+- Person files: Sections 1-4 (demographics + migration, education,
+  health, economic activity) plus derived labour-status dummies, =BMI=,
+  =region=, =urbrur=, =regdist=, and per-quarter =hh_weight= /
+  =pop_weight=.  Column prefixes: s1a 19, s1b 11, s2a 101, s2b 5, s3a 32,
+  s3b 7, s3c 6, s4a 130, s4b 41, s4c 15, s4d 14, s4e 24, s4f 10, s4g 272,
+  s4h 107 (2024; the three years share the 838-column layout).
+- SEC567 files: Section 5 (FAO FIES, 8 items, 12-month recall),
+  Section 6 (respondent identification), Section 7 (housing: dwelling,
+  tenure, rent, utilities, dwelling characteristics).  2022's carries
+  extra =WTPP*= / =WTHH_*= weight columns and 16 =s1*= columns; 2023's
+  carries no weight at all; 2024's carries =hhwt_q9=, =wtpp_q10=,
+  =hhwt_q10=.
+- Keys.  =(cluster, HholdID)= is the stable panel household id (600
+  clusters x 1-18); =hhid= is quarter-scoped (=qtr= + 3-digit cluster +
+  2-digit household; 6 digits for qtr 1-9, 7 for 10-12).  =qtr= runs
+  1-12 over the panel (2022Q1 = 1 ... 2024Q4 = 12); =quarter= is the
+  string =YYYYQn=.  =new_pid= is the person id (=personid= agrees 99.8%);
+  0 duplicates and 0 nulls on =(cluster, HholdID, quarter, new_pid)= in
+  all three files.  Q1 x Q2 2024 join on =(cluster, HholdID, new_pid)=:
+  45,890 matched of 47,963; sex agrees 100%, age within 1 year 99.8%.
+- Panel retention (quarters observed per =(cluster, HholdID)=): 2022
+  {4: 10,042; 3: 534; 2: 154; 1: 42}; 2023 {4: 9,782; 3: 288; 2: 90;
+  1: 81}; 2024 {4: 9,637; 3: 222; 2: 28; 1: 28}.
+- Weights.  =hh_weight= is constant within household-quarter and sums
+  to ~8.2M households per quarter (2021 PHC: 8.35M); =pop_weight= sums
+  to ~32M.  *Anomaly:* 2023Q3 =hh_weight= mean is 402.3 against 720-854
+  in every other quarter -- half scale.  Recorded, not corrected; the
+  library's within-wave mean-1 normalisation would hide it, so check
+  the raw parquet, not the API.
+- =s1aq2= relationship-to-head has 17 codes including =Househelp= (16)
+  and =Not member anymore= (17); =s1aq2x= is a corrected duplicate.
+
+* What is NOT distributed
+Sections 8-13 of the instrument -- own-produce consumption (8),
+household expenditure, less-/frequently purchased items (9), transfers
+(10), miscellaneous income and expenditure (11), assets and durables
+(12), non-farm enterprises (13) -- appear in no published file.  The
+survey's namesake content is absent.  The questionnaire in hand is the
+C4 evidence for an =asked-not-distributed= verdict on =food_acquired=
+and the other consumption features; EL is asking GSS for these
+sections.
+
+A candidate "AHIES consumption" file (=231030impact_consumptiondata.zip=)
+was checked and is Togo (Savanes / Tandjoare, Novissi =nov_*= columns,
+9,511 respondents), not Ghana.  Not used.
+
+* Decisions taken (EL, 2026-09-17)
+- Country name =GhanaAHIES= (sibling of =GhanaLSS=, =GhanaSPS=).
+- Grain: =t= is the quarter, =YYYYQn= (12 values); wave folders per
+  calendar year (=2022/=, =2023/=, =2024/=) each holding four rounds
+  via =wave_folder_map= (the Tanzania =2008-15= / Nigeria pp-ph
+  pattern; script path).  Forced by =sample=: one =weight= per
+  =(i, t)=, and =hh_weight= differs by quarter, so a year-grained =t=
+  would collapse four weights to one.
+- =i= = ={cluster}-{HholdID}= (stable across quarters); =pid= = =new_pid=.
+
+* Open
+- Request Sections 8-13 from GSS.
+- WB catalog check for an AHIES mirror once a WB key is available.
+- 2023Q3 weight scale.
