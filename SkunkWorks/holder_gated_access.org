@@ -53,7 +53,7 @@ answer to the 09-04 note's one open question.
   "other" responses, sub-district geography, consent flags the producers
   stripped from the published release -- in the open bucket, terms
   unrecorded.  D2's "build before exposure, the easy direction" is already
-  violated for the first real customer.  See [[*Open questions]] Q3.
+  violated for the first real customer.  See D6.
 
 * The problem, as measured
 Two facts, and the design fixes the second as a consequence of doing the first
@@ -198,7 +198,7 @@ users."  Read as =gpg --encrypt --recipient <pubkey>= for each authorized
 user.  No such encryption exists in the tree today -- the two =.gpg= files are
 symmetric (=symkey enc packet=; =s3_reader_creds.gpg=, and the unread
 =gdrive_data_store.json.gpg= from =4a30e15af=) -- so this is the target, and
-Q1 asks whether it is the intended reading.
+D4 confirms it is the intended reading.
 
 - It answers 09-04's Q1 the other way. :: 09-04 proposed a derived nonce so
   re-encryption reproduces the ciphertext (its option (a)).  Asymmetric gpg is
@@ -300,34 +300,94 @@ as today (=config.py:134,160=).
 - =Wave.license= reads bare =LICENSE=. :: Two waves have one; fix the reader
   (=country.py:1183=, =:2312=), not the files.
 
-* Open questions
-- Q1. Does "creds of all authorized users" mean =--recipient <each pubkey>=? ::
-  Recommendation: yes.  Revocation is re-encrypt-without-that-key; there is no
-  passphrase to leak or rotate; the keyring is the ACL.  The alternative
-  reading -- one symmetric passphrase handed to each authorized user, which is
-  what =CONTRIBUTING.org:141-155= does for the reader blob today -- has no
-  revocation short of rotating everyone.
-- Q2. What does the gate do with =unrecorded=? ::  GhanaSPS 2013-14 (no
+* Decisions taken (EL, 2026-09-17)
+The four questions the first draft left open, resolved the same day.
+- D4. =gpg-recipients= means =gpg --encrypt --recipient <each pubkey>=. ::
+  Revocation is re-encrypt-without-that-key; there is no passphrase to leak
+  or rotate; the keyring is the ACL.  The alternative reading -- one symmetric
+  passphrase handed to each authorized user, which is what
+  =CONTRIBUTING.org:141-155= does for the reader blob today -- has no
+  revocation short of rotating everyone, and is not what is meant.
+- D5. =unrecorded= is served, with a warning. ::  GhanaSPS 2013-14 (no
   licence file, GH #140's vintage question) and the 100 pre-existing GhanaSPS
-  2017-18 files are read today.  09-04's "raise an error that names the
-  protocol" applied literally breaks them.  Recommendation: warn-and-serve,
-  naming the wave and the gap, with =LSMS_ACCESS_STRICT=1= refusing -- the
-  same warn/strict shape as =LSMS_GRAIN_STRICT= and =LSMS_READ_STRICT=, and
-  the only place in this design a strict lever appears.  The other four
-  mechanisms refuse by default, because refusing *was always the stated
-  design* for =api-key=, and the whole point for =attestation=.
-- Q3. The 30 pre-anonymization files in GhanaSPS 2017-18. ::  They are in the
-  open bucket now with terms unrecorded (=LICENSE.org:41-56=).  This design
-  can only *add* a =gpg-recipients= ciphertext beside them; D1 means nothing
-  is deleted from the bucket.  Whether the plaintext sidecars are retired --
-  and whether the terms are resolved first -- is a decision about an existing
-  exposure, not about this mechanism.  Recommendation: resolve the terms
-  (the LICENSE.org already asks for exactly that), then decide.
-- Q4. Refuse or warn for =attestation= during migration? ::  Under the
-  reversed proxy, a WB-keyed user reading GhanaLSS from a *cold* cache now
-  needs a GSS key.  The course scenario is unaffected (warm cache), and a
-  refusal that says "register at =microdata.statsghana.gov.gh=" is the
-  accidental-violation prevention EL asked for.  Recommendation: refuse.
+  2017-18 files are read today, and 09-04's "raise an error that names the
+  protocol" applied literally would break them.  The gate warns, naming the
+  wave and the gap; =LSMS_ACCESS_STRICT=1= refuses -- the same warn/strict
+  shape as =LSMS_GRAIN_STRICT= and =LSMS_READ_STRICT=, and the only place in
+  this design a strict lever appears.
+- D6. The GhanaSPS 2017-18 pre-anonymization files: establish supersession
+  first. ::  Done the same day, without a venv, from the Dataverse DDI:
+  =slurm_logs/ghana_audit/SUPERSESSION_ghanasps_w3_2026-09-17.org=.  Six of
+  the nine YAML-wired files are pre-anonymization copies; *every variable the
+  YAML names in all six is present in the public release*.  So they are
+  superseded for everything currently wired, and replacing them with the
+  public files changes no served column.  The one thing that is not
+  superseded is the sub-district geography stripped from =00_hh_info=, which
+  nothing reads yet and GH #579 wants for =sample= -- if that is kept, it is
+  the first =gpg-recipients= customer already in the bucket.  The terms of
+  the 100 files remain unrecorded either way.  (Side finding: the 08-19
+  findings doc lists =01fi_employmentmain= as absent from the public release;
+  Dataverse v1.2 has it.)
+- D7. =attestation= and =api-key= refuse by default. ::  Under the reversed
+  proxy a WB-keyed user cold-fetching GhanaLSS needs a GSS key.  The course
+  scenario is unaffected -- warm cache, and D8 below -- and a refusal that
+  says "register at =microdata.statsghana.gov.gh=" is the accidental-violation
+  prevention the design is for.  Refusing was always the stated design for
+  =api-key=; it is the whole point for =attestation=.
+- D8. A site entitlement layer, not a bypass, for classes. ::  See the next
+  section.  EL asked for "a backdoor of sorts to cover things like classes";
+  the answer is a place for the operator to state the tenancy that D3 says
+  only the operator knows.
+
+* Site entitlements: the class-server case (D8)
+The scenario 09-04 made first-class: one instructor, dozens of students on a
+shared server, all covered by the instructor's registrations.  The warm cache
+handles the common case with no credentials at all (09-04's measurement).
+The cold edge -- a student triggers the first fetch of a table -- is where
+D7's refusal would bite someone the instructor has in fact covered.
+
+** The mechanism: a third config layer
+=config.get()= reads env -> user config -> default (=config.py:83-88=).  Add a
+*site* layer between user config and default:
+
+: LSMS_SITE_CONFIG=/shared/course/lsms_site.yml      # or the platformdirs site_config_path default
+
+The site file has the same schema as =config.yml=; its =entitlements:= are
+*unioned* with the user's (a user can add, never remove).  The instructor
+writes their =wb-nada= and =gha-gss-nada= keys and their =ifpri-dataverse=
+attestation there once; the JupyterHub spawner or module file sets the env
+var; every student process resolves the gate through the merged view.
+Refusal messages are unchanged.  The gate logs which layer supplied the
+evidence (=entitlement gha-gss-nada: site=), so the arrangement is visible in
+any run's log rather than silent.
+
+** Why this and not a flag
+- =LSMS_ACCESS_TRUST_OPERATOR=1= (serve everything) was considered and
+  rejected.  It is a gate with no evidence behind it, which is the pattern
+  that just failed silently for two years; and it loses the *naming* of which
+  entitlement covers whom.  The site layer keeps the evidence and the
+  protocol text; it only moves who supplies them.
+- =LSMS_CONFIG_DIR= pointed at a shared directory works today but *replaces*
+  the user's config rather than layering it, so a student cannot hold a
+  personal entitlement alongside the class's.
+- It is D3, made concrete: the instructor's API key is readable by the class
+  (file permissions are the operator's call), and the instructor's DUA with
+  each holder is what covers the students -- the library records the
+  arrangement, it does not adjudicate it.
+
+** What it does not cover, by construction
+=gpg-recipients= does not layer: a private key is not a config value, and a
+class is not a recipient.  For an encrypted wave a class needs, the
+instructor decrypts into the shared =data_dir= once (above, "three
+consequences"), and the students read warm.  The strict class has no site
+bypass, which is the point of having a strict class.
+
+* Open question
+- Q1. Terms of the 100 GhanaSPS 2017-18 non-Dataverse files. ::  Still
+  unrecorded; =LICENSE.org:34-56= asks for exactly this.  D6 settles that
+  replacing the six wired ones with the public copies costs nothing at the
+  API; it does not settle whether the geography in =00_hh_info= is kept, or
+  under what terms.  Blocks Phase 4 only.
 
 * What flips
 - =tests/test_s3_unlock.py::TestAutoUnlockWithoutGpg= -- asserts unlock with
@@ -357,15 +417,19 @@ as today (=config.py:134,160=).
 1. *The gate that should have existed* -- =wb-nada= only.  Registry with one
    entry, =ACCESS_CLASS= backfilled to all 135 waves (104 =wb-nada=, 23 by the
    holder table above, 8 after reading their =Documentation/=), gate on the
-   miss branch, import-time unlock removed, =entitlements.wb-nada= aliasing
-   =microdata_api_key=.  Fixes the measured bug; changes nothing for a keyed
-   user; refuses an unkeyed cold fetch with the WB protocol text.
+   miss branch, import-time unlock and =authenticate()= fallback removed,
+   =entitlements.wb-nada= aliasing =microdata_api_key=, the site layer (D8).
+   Fixes the measured bug; changes nothing for a keyed user; refuses an
+   unkeyed cold fetch with the WB protocol text.
 2. *The other self-service holders* -- =gha-gss-nada=, =rwa-nisr-nada=, after
    the validator precondition is measured; =ifpri-dataverse= attestation;
-   =klps-dataverse-cc0= open; =unrecorded= per Q2.
-3. *=gpg-recipients=* -- for the first customer that is not yet in the bucket
-   (09-04: Togo/Novissi 2021, the West African un-displaced GPS).  Encrypt
-   tool (=scripts/encrypt_to_recipients.py=: recipient list from a committed
-   =Documentation/RECIPIENTS= per wave, =gpg --encrypt=, =push_to_cache=),
-   decrypt-on-miss in the gate, =ACCESS.yml= for per-file scope.
-4. GhanaSPS 2017-18's 30 files, once Q3 is decided.
+   =klps-dataverse-cc0= open; =unrecorded= warn-and-serve (D5).
+3. *=gpg-recipients=* (D4) -- for the first customer that is not yet in the
+   bucket (09-04: Togo/Novissi 2021, the West African un-displaced GPS).
+   Encrypt tool (=scripts/encrypt_to_recipients.py=: recipient list from a
+   committed =Documentation/RECIPIENTS= per wave, =gpg --encrypt --recipient=,
+   =push_to_cache=), decrypt-on-miss in the gate, =ACCESS.yml= for per-file
+   scope.
+4. GhanaSPS 2017-18: replace the six wired pre-anonymization files with the
+   Dataverse copies and add the 11 missing public files (D6 says this is free
+   at the API); decide the =00_hh_info= geography under Q1.
