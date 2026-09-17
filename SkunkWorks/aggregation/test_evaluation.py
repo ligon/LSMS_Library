@@ -111,12 +111,34 @@ def test_common_error_and_weighted_coverage_are_literal_population_means(inputs)
     assert np.isclose(market.scored_weight.sum()/market.weight.sum(), expected_coverage)
 
 
+def test_scoring_cutoff_is_declared_and_propagates(inputs):
+    # Regression guard.  Every rescoring path must use the cutoff declared in
+    # the argument builder, never score_w's own default.  Since CFEDemands
+    # 0.10 that default is the fit's floor(min_prop_items*J)+1, so an omitted
+    # argument quietly changes the scored population with the number of goods:
+    # 1 for the small J used here, but 9 on the Ghana fits (J in the eighties).
+    # An omitted argument is therefore invisible in a small-J fixture, which is
+    # exactly how this went unnoticed.
+    assert inputs['min_goods'] == 1
+    baseline = evaluate_partitions(**inputs).candidates['fine']
+    args = copy.deepcopy(inputs)
+    args['min_goods'] = 4
+    raised = evaluate_partitions(**args).candidates['fine']
+    # Raising the cutoff may only remove scores, never add or alter them.
+    assert raised.scores.notna().sum() < baseline.scores.notna().sum()
+    kept = raised.scores.notna()
+    assert_series_equal(raised.scores[kept], baseline.scores[kept])
+    assert (raised.scoring.status == 'too_few_goods').any()
+    assert (raised.scoring.loc[raised.scoring.status == 'too_few_goods', 'n_goods'] < 4).all()
+
+
 def test_reference_center_and_anchor_units_are_fixed_from_training(inputs, result):
     for name, candidate in result.candidates.items():
         amounts = aggregate_expenditures(inputs['x'], candidate.membership)
         logs = np.log(amounts.where(amounts > 0))
         cells = inputs['reference_cells']
-        raw = candidate.model.score_w(logs.loc[cells], inputs['d'].loc[cells])
+        raw = candidate.model.score_w(logs.loc[cells], inputs['d'].loc[cells],
+                                      min_goods=inputs['min_goods'])
         row = result.summary.loc[name]
         centered = row.scale*(raw-row.origin)
         assert abs(np.average(centered, weights=inputs['weights'].loc[cells])) < 1e-12

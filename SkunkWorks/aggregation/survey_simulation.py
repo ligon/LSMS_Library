@@ -139,7 +139,7 @@ def load_uganda(wave='2019-20', basis='total'):
 
 
 def survey_inputs(template, seed=11, regime='masked', sigma_eps=.2, anchor='Salt',
-                  min_obs=30, min_prop_items=.1):
+                  min_obs=30, min_prop_items=.1, min_goods=1):
     """Reuse the CFE DGP; impose exactly the observed joint mask (ledger 5).
 
     Welfare and one complete numeric control are synthetic and independent of
@@ -200,6 +200,7 @@ def survey_inputs(template, seed=11, regime='masked', sigma_eps=.2, anchor='Salt
                 train_households=train, evaluation_households=evaluation,
                 reference_cells=reference, comparison_cells=comparison,
                 weights=template.weights, anchor=anchor, anchor_loading=.6, truth=truth,
+                min_goods=min_goods,
                 fit_options={'min_obs': min_obs, 'min_prop_items': min_prop_items, 'alltm': True})
 
 
@@ -244,7 +245,8 @@ def run_template(template, seeds=(11, 12, 13), regimes=REGIMES, legacy_prepare=N
                 frame.loc[name, 'n_scored'] = candidate.scores.notna().sum()
                 frame.loc[name, 'n_warnings'] = len(candidate.warnings)
                 if frame.loc[name, 'status'] == 'ok':
-                    scores = candidate.model.score_w(logs.loc[train], args['d'].loc[train])
+                    scores = candidate.model.score_w(logs.loc[train], args['d'].loc[train],
+                                                     min_goods=args['min_goods'])
                     bad = candidate.market_identified.index[~candidate.market_identified]
                     available = np.isfinite(scores) & ~scores.index.droplevel('i').isin(bad)
                     frame.loc[name, 'train_score_coverage'] = weight.loc[train][available].sum()/weight.loc[train].sum()

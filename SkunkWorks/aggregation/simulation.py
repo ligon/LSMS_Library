@@ -17,7 +17,7 @@ from .evaluation import evaluate_partitions
 REGIMES = ('complete', 'substitutes', 'unequal', 'unreported')
 
 
-def simulation_inputs(seed=11, households=240, regime='substitutes'):
+def simulation_inputs(seed=11, households=240, regime='substitutes', min_goods=1):
     """Adapt the tested CFE DGP, adding disclosed zero-pattern regimes.
 
     The DGP uses the old household j / good i names. Only those names change
@@ -81,7 +81,7 @@ def simulation_inputs(seed=11, households=240, regime='substitutes'):
     return dict(x=x, d=d, partitions={'fine': fine, 'rare_pool': rare, 'broad_pool': broad},
                 train_households=train_households, evaluation_households=evaluation_households,
                 reference_cells=reference, comparison_cells=comparison, weights=weights,
-                anchor='g0', anchor_loading=beta[0], truth=truth,
+                anchor='g0', anchor_loading=beta[0], truth=truth, min_goods=min_goods,
                 fit_options={'min_obs': 30, 'min_prop_items': .1, 'alltm': True})
 
 

@@ -123,7 +123,7 @@ def evaluate_partitions(x, d, partitions, *, train_households,
     from cfe.regression import Regression
 
     if not hasattr(Regression, 'score_w'):
-        raise RuntimeError('Use CFEDemands with Regression.score_w (feature/prepare-data-scoring).')
+        raise RuntimeError('Regression.score_w requires CFEDemands>=0.10.0.')
     x = _expenditures(x)
     if not isinstance(d, pd.DataFrame):
         raise ValueError('d must be a DataFrame of numeric characteristics.')

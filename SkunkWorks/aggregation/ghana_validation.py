@@ -133,7 +133,7 @@ def candidate_maps(goods, specification, reserved=()):
 
 
 def evaluation_arguments(data, split, *, evaluation='validation', reserved=('Onion', 'Egg'),
-                         anchor='Salt', min_obs=30, min_prop_items=.1):
+                         anchor='Salt', min_obs=30, min_prop_items=.1, min_goods=1):
     if evaluation not in ('validation', 'test'):
         raise ValueError('Use a declared validation or test split.')
     if anchor in reserved or anchor not in data.x:
@@ -147,7 +147,7 @@ def evaluation_arguments(data, split, *, evaluation='validation', reserved=('Oni
                 train_households=data.x.index.get_level_values('i')[split == 'train'],
                 evaluation_households=data.x.index.get_level_values('i')[split == evaluation],
                 reference_cells=reference, comparison_cells=comparison,
-                weights=data.weights, anchor=anchor,
+                weights=data.weights, anchor=anchor, min_goods=min_goods,
                 fit_options=dict(min_obs=min_obs, min_prop_items=min_prop_items, alltm=False))
 
 
@@ -170,7 +170,13 @@ def prediction_diagnostics(data, args, candidate, reserved, *, return_errors=Fal
     amounts = aggregate_expenditures(args['x'], candidate.membership)
     logs = np.log(amounts.where(amounts > 0))
     train = data.x.index[data.x.index.get_level_values('i').isin(args['train_households'])]
-    train_scores = candidate.model.score_w(logs.loc[train], data.d.loc[train])
+    # Score with the declared cutoff, never score_w's default: since
+    # CFEDemands 0.10 that default is the fit's own floor(min_prop_items*J)+1,
+    # which on these fits (J in the eighties) is 9 rather than 1.  Centering
+    # on a different subsample from the one evaluate_partitions scored would
+    # silently move the origin.
+    train_scores = candidate.model.score_w(logs.loc[train], data.d.loc[train],
+                                           min_goods=args['min_goods'])
     bad_markets = candidate.market_identified.index[~candidate.market_identified]
     train_scores = train_scores.where(~train_scores.index.droplevel('i').isin(bad_markets))
     # Put training scores in the same anchor units and origin as evaluation
@@ -276,7 +282,7 @@ def run_comparison(data, specification, *, names=None, seed=20260916,
             ref = candidate.model.score_w(
                 np.log(aggregate_expenditures(args['x'].loc[args['reference_cells']],
                                               membership).replace(0, np.nan)),
-                data.d.loc[args['reference_cells']])
+                data.d.loc[args['reference_cells']], min_goods=args['min_goods'])
             ref = summary.loc[name, 'scale']*(ref-summary.loc[name, 'origin'])
             summary['reference_q05'] = ref.quantile(.05)
             summary['reference_q95'] = ref.quantile(.95)

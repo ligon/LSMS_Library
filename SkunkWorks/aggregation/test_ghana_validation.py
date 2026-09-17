@@ -140,8 +140,11 @@ def test_prediction_calibration_uses_only_training_targets_and_fixed_population(
     class FrozenModel:
         beta = pd.Series({'Salt': 1.})
 
-        def score_w(self, logs, controls):
+        scored_with = []
+
+        def score_w(self, logs, controls, min_goods=None):
             assert not set(logs.columns).intersection({'Onion', 'Egg'})
+            type(self).scored_with.append(min_goods)
             return w.reindex(logs.index)
 
     candidate = SimpleNamespace(model=FrozenModel(),
@@ -150,6 +153,11 @@ def test_prediction_calibration_uses_only_training_targets_and_fixed_population(
             [('wave', 'market')], names=['t', 'm'])),
         scores=w.loc[evaluation]-origin)
     first = prediction_diagnostics(data, args, candidate, ['Onion', 'Egg'])
+    # The diagnostics center on their own rescoring of the training cells, so
+    # they must use the declared cutoff rather than score_w's default; the
+    # two differ once J reaches ten, and these are fitted on far more.
+    assert FrozenModel.scored_with == [args['min_goods']]*len(FrozenModel.scored_with)
+    assert FrozenModel.scored_with
     assert first.complete.all() and (first.mse < 1e-20).all()
     data.x.loc[evaluation, ['Onion', 'Egg']] *= np.e
     changed = prediction_diagnostics(data, args, candidate, ['Onion', 'Egg'])

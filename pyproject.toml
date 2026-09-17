@@ -8,7 +8,9 @@ license = {text = "CC-BY-4.0"}
 readme = "README.org"
 requires-python = ">=3.11, <4.0"
 dependencies = ["pandas >=3.0",
-             "CFEDemands>=0.8.2",
+             # score_w and the restored prepare_data sample land in 0.10.0;
+             # earlier versions have no scorer at all (CFEDemands GH #10).
+             "CFEDemands>=0.10.0",
              "PyYAML >=6.0,<7.0",
              "python-gnupg >=0.5,<1.0",
              # Explicit, though dvc[s3]/botocore pull it in anyway: this is the
