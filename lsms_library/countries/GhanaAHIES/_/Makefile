@@ -23,7 +23,8 @@ COUNTRY := $(shell basename "$$(cd .. && pwd)")
 LSMS_DATA_ROOT ?= $(if $(LSMS_DATA_DIR),$(LSMS_DATA_DIR),$(if $(XDG_DATA_HOME),$(XDG_DATA_HOME),$(HOME)/.local/share)/lsms_library)
 VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 
-TABLES := sample household_roster individual_education food_security housing
+TABLES := sample household_roster individual_education food_security housing \
+          cluster_features people_last7days anthropometry
 
 all:
 	@echo "Targets: ../<year>/_/<table>.parquet for table in $(TABLES)"
