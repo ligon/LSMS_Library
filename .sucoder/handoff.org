@@ -44,6 +44,16 @@ Written for @ligon to read on waking; every claim has a path or a PR number.
 
 ** Still open / not done
 
+- =master='s =data-tests= job (the only CI job that runs data tests; it runs
+  only on =master= pushes) is RED: 52 failures, all
+  =tests/test_ehcvm_7day.py::TestDelivered= -- EHCVM =food_acquired= served
+  without =Derivation= and without the inkind rows in the sequential cold
+  session. It was also red on the v0.13.0 push. Reproduced NOT cold locally,
+  and NOT under CI's exact pandas/numpy/pyarrow; hypothesis is test-order
+  cache poisoning (=derivations.yml= is outside the cache hash by design).
+  Filed as #941 with the evidence and a four-file bisection recipe. No
+  evidence pip users are affected; not a hotfix unless the bisection says so.
+
 - The main checkout =/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=
   is on =development= at =6666e0fea=, now far behind origin. I did not
   fast-forward it (other jobs import from it). =git pull --ff-only= there is
