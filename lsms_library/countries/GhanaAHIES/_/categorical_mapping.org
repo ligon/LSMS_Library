@@ -1,0 +1,115 @@
+#+title: GhanaAHIES categorical mappings
+
+Country-level label harmonisation for the Ghana AHIES (GSS, 2022-2024).
+Tables named after a served column (=Roof=, =Floor=) are applied
+automatically at API time; =harmonize_education= is applied by the wave
+scripts through =ghanaahies.harmonize_education_labels=.
+
+* harmonize_education
+
+Maps the composite "<level> <grade completed>" label the wave script builds
+from =s2aq3= (highest level attended) and =s2aq4= (highest grade COMPLETED at
+that level; 0 = none) onto the canonical ordinal vocabulary in
+=lsms_library/categorical_mapping/canonical_education_labels.org=.  The
+grade ladders are the field manual's Appendix 5: Primary 1-6 (6 completes the
+cycle), Middle Form 1-4 (4 completes), JSS/JHS 1-3 (3 completes), Secondary
+(O/A level) Form 1-5 (5 = O-level complete) and Lower/Upper 6 = 6-7 (A-level
+complete), SSS/SHS 1-3 (3 completes; 4 completes for the 2007-10 four-year
+SHS cohort).  A bare graded level (grade missing) is mapped conservatively to
+the "some" rung.  =s2aq1= 'Never attended' rows are labelled 'Never attended'
+here (-> 'No education').  Tertiary levels map from the level alone, as the
+GhanaLSS sibling does (the survey asks the level attended, not completed).
+
+#+name: harmonize_education
+| Original Label                                 | Preferred Label              |
+|------------------------------------------------+------------------------------|
+| Never attended                                 | No education                 |
+| Nursery                                        | Pre-primary                  |
+| Kindergarten                                   | Pre-primary                  |
+| Primary                                        | Primary incomplete           |
+| Primary 0                                      | Primary incomplete           |
+| Primary 1                                      | Primary incomplete           |
+| Primary 2                                      | Primary incomplete           |
+| Primary 3                                      | Primary incomplete           |
+| Primary 4                                      | Primary incomplete           |
+| Primary 5                                      | Primary incomplete           |
+| Primary 6                                      | Primary complete             |
+| Primary 7                                      | Primary complete             |
+| Middle                                         | Lower secondary              |
+| Middle 0                                       | Primary complete             |
+| Middle 1                                       | Lower secondary              |
+| Middle 2                                       | Lower secondary              |
+| Middle 3                                       | Lower secondary              |
+| Middle 4                                       | Lower secondary complete     |
+| Middle 5                                       | Lower secondary complete     |
+| Middle 6                                       | Lower secondary complete     |
+| Middle 7                                       | Lower secondary complete     |
+| JSS/JHS                                        | Lower secondary              |
+| JSS/JHS 0                                      | Primary complete             |
+| JSS/JHS 1                                      | Lower secondary              |
+| JSS/JHS 2                                      | Lower secondary              |
+| JSS/JHS 3                                      | Lower secondary complete     |
+| JSS/JHS 4                                      | Lower secondary complete     |
+| JSS/JHS 5                                      | Lower secondary complete     |
+| JSS/JHS 6                                      | Lower secondary complete     |
+| JSS/JHS 7                                      | Lower secondary complete     |
+| SSS/SHS                                        | Upper secondary              |
+| SSS/SHS 0                                      | Lower secondary complete     |
+| SSS/SHS 1                                      | Upper secondary              |
+| SSS/SHS 2                                      | Upper secondary              |
+| SSS/SHS 3                                      | Upper secondary complete     |
+| SSS/SHS 4                                      | Upper secondary complete     |
+| SSS/SHS 5                                      | Upper secondary complete     |
+| SSS/SHS 6                                      | Upper secondary complete     |
+| SSS/SHS 7                                      | Upper secondary complete     |
+| Secondary                                      | Upper secondary              |
+| Secondary 0                                    | Lower secondary complete     |
+| Secondary 1                                    | Upper secondary              |
+| Secondary 2                                    | Upper secondary              |
+| Secondary 3                                    | Upper secondary              |
+| Secondary 4                                    | Upper secondary              |
+| Secondary 5                                    | Upper secondary complete     |
+| Secondary 6                                    | Upper secondary complete     |
+| Secondary 7                                    | Upper secondary complete     |
+| Voc/Tech/Commercial                            | Vocational/Technical         |
+| Postmiddle/secondary certificate               | Tertiary certificate/diploma |
+| Postmiddle/secondary diploma                   | Tertiary certificate/diploma |
+| Tertiary - HND                                 | Tertiary certificate/diploma |
+| Tertiary - Bachelor's Degree                   | Bachelor                     |
+| Tertiary - Post graduate certificate / diploma | Postgraduate                 |
+| Tertiary - Master's Degree                     | Postgraduate                 |
+| Tertiary - PhD                                 | Doctorate                    |
+| Other specify                                  | Unknown                      |
+
+* Roof / Floor
+
+Identical to the GhanaLSS tables so the two Ghana series agree.  The housing
+wave script first normalises the AHIES =s7eq3= / =s7eq2= labels to the GLSS7
+intermediate spellings (=Metal Sheet=, =Cement/Concrete=, ...); these tables
+take them to the canonical cross-country vocabulary at API time.
+
+#+name: Roof
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| Metal Sheet        | Iron Sheets     |
+| Slate/Asbestos     | Asbestos        |
+| Cement/Concrete    | Concrete        |
+| Roofing Tiles      | Clay Tiles      |
+| Thatch             | Thatch          |
+| Bamboo             | Bamboo          |
+| Mud/Earth          | Mud             |
+| Wood               | Wood            |
+| Other              | Other           |
+
+#+name: Floor
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Cement/Concrete      | Concrete        |
+| Earth/Mud            | Earth           |
+| Ceramic/Marble Tiles | Tiles           |
+| Vinyl Tiles          | Vinyl/Linoleum  |
+| Terrazzo             | Terrazzo        |
+| Burnt Bricks         | Bricks          |
+| Stone                | Stone           |
+| Wood                 | Wood            |
+| Other                | Other           |

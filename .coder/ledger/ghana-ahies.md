@@ -108,5 +108,31 @@ provenance is `external` (GSS NADA; no WB id).
   re-promote, or leave `unrecorded` for the pilot?
 
 ---
-### Phase 3 — verification (fill at task end)
-- (pending)
+### Phase 3 — verification (2024 folder, five tables; worker agent 2026-09-17)
+
+Files: `countries/GhanaAHIES/_/{data_scheme.yml, Makefile, categorical_mapping.org,
+CONTENTS.org, ghanaahies.py}` (helpers added to the country module, not a wave
+`mapping.py`, because `Wave.data_scheme` treats every wave `_/*.py` stem as a
+table); `2024/_/{sample, household_roster, individual_education, food_security,
+housing}.py`; five labels appended to `lsms_library/categorical_mapping/kinship.yml`.
+
+Cold builds through `Country('GhanaAHIES')`, `LSMS_BUILD_WORKERS=1`, package
+identity asserted, blobs read through `get_dataframe` from the L1 cache (the
+workspace copies were refused once the `.dvc` sidecars landed mid-task):
+
+| table | rows per t (2024Q1..Q4) | notes |
+|---|---|---|
+| `sample` | 9,890 / 9,875 / 9,834 / 9,699 | = README targets; 600 `v` per quarter; API weight mean 1.0 per t; raw parquet mean 901 / 904 / 918 / 928 at HOUSEHOLD grain (README's 833-854 is the PERSON-grain mean of the same column -- both right); 32 strata, 0 nulls. First build 1,094 s, of which ~1,000 s was the 2.4 GB S3 pull. |
+| `household_roster` | 47,911 / 47,238 / 46,384 / 46,915 | person-file counts 47,963 / ... : the 52 'Not member anymore' rows (all 2024Q1) are dropped by decision (§4 below); Sex in {M, F}; Age 0 nulls; Head/Spouse/Child fully expanded ([0,0,cons], [0,0,aff], [-1,0,cons]); Generation/Distance null only on 'Other relative' (5,706) + 2 null codes; no GrainCollapseWarning, no NullIndexKeyWarning, no unknown-kinship warning. 33 s. |
+| `household_characteristics` | 9,890 / 9,875 / 9,834 / 9,699 | derives; (t, v, i), 15 columns. |
+| `individual_education` | 44,830 / 44,354 / 43,821 / 44,961 | 177,966 rows (members 3+ with a Section 2 answer; the 10,482 under-threes are NA and dropped by `dropna(how='all')`); 14 canonical labels, 0 nulls, 1,110 'Unknown'; `is_this_feature_sane` ok (16 pass, 1 warn = the framework-joined `v`). 33 s. |
+| `food_security` | 9,809 / 9,781 / 9,739 / 9,637 | 38,966 rows after dropping the 332 null-`HholdID` shells; only `RanOut` has NA (639 "Don't Know"); FIES_score 0-8, 0 nulls; sane ok. 12 s. |
+| `housing` | 9,809 / 9,781 / 9,739 / 9,637 | 9 declared columns present; Roof/Floor arrive canonical via the org tables (Iron Sheets 34,664 ...); NA only where the source is NA (3 rows; Water 196); sane ok. 12 s. |
+
+Deviations from the brief, on evidence: Relationship is `s1aq2x` (corrected code:
+exactly one head per household-quarter) not `s1aq2` (31 double-headed, 1,423
+headless); code 17 rows dropped, counted, not put in `kinship.yml`; the 332
+null-`HholdID` SEC01567 rows (no Section 5-7 content, = the 332 household-quarters
+absent from that file) dropped with a count.  `tests/test_schema_consistency.py -k
+GhanaAHIES`: 5 passed.  `find lsms_library/countries -name '*.parquet'`: empty.
+
