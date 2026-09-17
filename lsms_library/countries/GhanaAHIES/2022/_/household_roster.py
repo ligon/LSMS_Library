@@ -33,9 +33,10 @@ Columns:
 Departed members: code 17 'Not member anymore' (a CAPI code absent from the
 paper questionnaire) marks a panel line whose person has left the
 household; such rows are dropped and counted, as in 2024.  In 2022 there
-are NONE (0 rows on s1aq2 in every quarter -- the code first appears in
-2024Q1), so the served roster equals the person file: the filter is kept
-for parity and prints its count.  See CONTENTS.org s"2022 folder".
+are NONE (0 rows on s1aq2 and on s1aq2x in every quarter; 2024 has 52, all
+in 2024Q1; 2023 not yet measured), so the served roster equals the person
+file: the filter is kept for parity and prints its count.  See CONTENTS.org
+s"2022 folder".
 """
 import sys
 from pathlib import Path

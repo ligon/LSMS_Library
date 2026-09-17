@@ -29,8 +29,9 @@ those known defects repaired before mapping.  Unmapped Roof/Floor/Walls
 labels fall to 'Other' (only 'Other (specify)' does so in 2024).
 
 Keys and the 201 null-HholdID non-response shells (1 / 2 / 1 / 197 per
-quarter): as food_security.py.  Served rows 10,760 / 10,626 / 10,421 /
-10,112.
+quarter): as food_security.py.  Parquet rows 10,760 / 10,626 / 10,421 /
+10,112; the framework's dropna(how='all') removes one all-null row at read
+(2022Q3, i='192-15'), so the API serves 10,420 in Q3.
 
 What differs from 2024: the file name (`SEC567_edt`, 167 columns) and the
 shell count only.  The 2022 value-label sets of s7aq1 / s7bq1 / s7eq1-3 /

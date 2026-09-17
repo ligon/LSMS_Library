@@ -260,15 +260,23 @@ fires the library's Site R guard verbatim:
 
 This is a property of the file, not a mis-parse: every column the three
 person-file scripts read is populated and the counts match the inventory
-exactly.  The warning is expected on every 2022 build (three times per cold
-build) and is deliberately not silenced.
+exactly.  The warning is expected on every read of the 2022 person file
+(four in the verification run below: =sample= twice -- once for the 2022-
+restricted call, once when the v-join's unrestricted =sample()= rebuilt the
+all-wave union -- then =household_roster= and =individual_education=) and
+is deliberately not silenced.  Two other warnings accompany every read of a
+person file, 2022 and 2024 alike, from the reader in =ligonlibrary=:
+=RuntimeWarning: Issue with categorical mapping: s3bq3= and the same for
+=s3bq4= (two Section 3B columns whose value labels do not apply cleanly;
+neither is read by any script), and the =UnicodeWarning= latin-1 fallback
+noted under s"Household roster".
 
 *Consequence -- Relationship is the raw =s1aq2= in 2022.*  With =s1aq2x=
 empty, 2022 reads =s1aq2=, and measured on 2022 the raw code is already
 clean: 0 null codes, exactly one 'Head' in 41,922 of 42,120 household-
 quarters, 198 headless, 0 double-headed, and *no code 17 at all* (0 rows in
-every quarter on both columns -- 'Not member anymore' first appears in
-2024Q1, after the panel had run for two years).  So the served roster
+every quarter on both columns; 2024 has 52, all in 2024Q1; 2023 has not
+been measured).  So the served roster
 equals the person file, row for row; the code-17 filter is kept and prints
 0.  The 2022 scripts =assert df['s1aq2x'].isna().all()= so that a GSS
 re-release which populates the corrected column fails loudly rather than
@@ -306,9 +314,9 @@ person file on =(cluster, HholdID, quarter)=:
 | =WTHH_1=          | 0.885 / 0.976 / 1.046                                 | an earlier household-weight calibration |
 | =WTPP1..4_Q4_*=   | 0.061 / 0.73-0.78 / 2.9                               | four dated (20 Mar - 18 May 2023) iterations of a Q4 weight, ~0.77x of the final |
 
-So the Q4 weight in the person file is =WTHH_2=, the last of a series of
-re-weightings GSS ran in spring 2023 and left in the household file; the
-earlier drafts are working columns, not alternative designs.  Not used:
+So the Q4 weight in the person file is =WTHH_2=; the dated column names
+indicate four Q4 iterations between 20 Mar and 18 May 2023, all left in
+the household file, and =WTHH_1= a further intermediate.  Not used:
 they cover one quarter, and the final one is already what =sample= serves.
 Also 2022-only in this file: =hhsize= (populated for 2022Q1 only, 10,760
 rows, equal to the person-file member count on 10,759 of them) and
@@ -342,8 +350,9 @@ identity asserted, every call =waves=['2022Q1'..'2022Q4']=:
 | =food_security=             | 10,760 / 10,349 / 10,421 / 10,088    | wave parquet 10,760 / 10,626 / 10,421 / 10,112; the framework's =dropna(how='all')= then removes 301 keyed rows (277 in Q2, 24 in Q4) whose eight FIES items are ALL null -- household-quarters interviewed for Section 7 but not Section 5 (2024 has none).  RanOut NA 620; FIES_score 0-8, 0 nulls.  6 s |
 | =housing=                   | 10,760 / 10,626 / 10,420 / 10,112    | one all-null row (=2022Q3=, =i='192-15'=) dropped the same way; Roof/Floor canonical (Iron Sheets 36,712, Concrete 34,596); NA only where the source is NA (Rooms 376, Water 410, Toilet 408).  6 s |
 
-Warnings during the run: the =NullReadWarning= quoted above, once per
-person-file build (three times), and nothing else -- no
+Warnings during the run: the =NullReadWarning= quoted above (four
+times, see there), the =s3bq3= / =s3bq4= =RuntimeWarning= and the
+=UnicodeWarning= on each person-file read, and nothing else -- no
 =GrainCollapseWarning=, no =NullIndexKeyWarning=, no unknown-kinship
 warning.  (=ResourceWarning: unclosed file= from =_build_registry.py:460=
 appears under =simplefilter('always')=; a library matter, not this
