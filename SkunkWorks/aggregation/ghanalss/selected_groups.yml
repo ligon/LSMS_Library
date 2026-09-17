@@ -1,0 +1,109 @@
+schema_version: 2
+country: GhanaLSS
+status: selected
+author: Sue
+date: '2026-09-17'
+source_revision: ff4c00f2b
+supersedes: PR #937 selected_groups.yml (2026-09-16), keyed on the pre-#935 wave vocabulary
+default: Every other country Preferred Label remains a named singleton.
+selection: >-
+  The CFE beta-spread gate, max(beta) - min(beta) < 1.348 * sigma_min
+  (ghana_gate.py), with beta and sigma from ONE fit per group. Primary:
+  the 2016-17 purchased fine fit / member probe on the seed-20260916
+  training split of PR #937's validation design; where that split cannot
+  jointly identify the members (fewer than min_obs=30 households report
+  both), the full 2016-17 wave. A group must ALSO pass in every other wave
+  where two or more of its members are delivered (2012-13, 2005-06 and
+  1998-99 were gated on the full wave; 1991-92 is not gated because its
+  urban/rural recall windows differ). The second split seed, the total
+  basis and the full 2016-17 wave are sensitivity runs, recorded in
+  gate_*/gate.csv and validation.org; they inform the notes, not the
+  verdict. Scoring in the validation runs uses min_goods=1 explicitly; the
+  ranking's stability in min_goods is GH #939 and is not resolved here.
+groups:
+- id: sugar_refined
+  label: Sugar (cubed/granulated)
+  members:
+  - Sugar (cubed)
+  - Sugar (granulated)
+  reason: >-
+    Two physical forms of refined sugar, 2016-17 only. Generic Sugar
+    (1987-88..2012-13) stays separate: its early-wave source label is
+    "Sugar, candy, honey and sugarcane".
+  evidence:
+  - 'gate_2016-17_purchased/gate.csv: probe, ratio 0.96 (marginal); seed 20260917 0.26; full wave 0.75; total basis 1.87 (fails)'
+  - 'proposed_groups.yml: group sugar_refined'
+- id: malt_packaging
+  label: Malt Drinks
+  members:
+  - Malt Drinks (bottle)
+  - Malt Drinks (canned)
+  reason: >-
+    Packaging distinguishes the two 2016-17 labels; earlier waves carry only
+    the bottle label, which the group renames.
+  evidence:
+  - 'gate_2016-17_purchased/gate.csv: fine fit, ratio 0.80; seed 20260917 0.48; total basis 0.80; full wave 1.13 (marginal fail)'
+  - 'proposed_groups.yml: group malt_packaging'
+- id: pasta
+  label: Macaroni/Spaghetti
+  members:
+  - Macaroni/Spaghetti
+  - Macaroni
+  - Spaghetti
+  reason: >-
+    GLSS1/2 ask one question; 2016-17 separates macaroni and spaghetti. The
+    pair is reported by 45 households in all of 2016-17, so it is jointly
+    identifiable only on the full wave, where it passes; the coarse GLSS1/2
+    label joins because its constituents pass (the PR #937 precedent).
+  evidence:
+  - 'gate_2016-17_purchased_all/gate.csv: probe on the full wave, ratio 0.27'
+  - 'proposed_groups.yml: group pasta'
+- id: millet_sorghum_grain
+  label: Millet/Sorghum
+  members:
+  - Millet/Sorghum
+  - Millet
+  - Guinea Corn/Sorghum
+  reason: >-
+    GLSS1/2 code 303 asks one question over millet and guinea corn/sorghum
+    (grain or flour); from GLSS3 the instrument separates them (#935 ruling:
+    guinea corn IS sorghum, millet a close consumption substitute). The
+    grain pair passes in every wave where both are delivered. Millet (flour)
+    is NOT a member -- the four-member group fails on it (ratio 3.45 on the
+    full 2016-17 wave) -- so the GLSS1/2 coarse label, which covered flour,
+    joins a group that is slightly narrower than the question it came from.
+  evidence:
+  - 'gate_2016-17_purchased/gate.csv: probe, ratio 0.62; seed 20260917 0.34; total basis 0.31; full wave 0.77'
+  - 'gate_2012-13_purchased_all 0.12; gate_2005-06_purchased_all 0.96 (marginal, very wide sigma); gate_1998-99_purchased_all 0.12'
+  - 'proposed_groups.yml: deferred_alternatives millet_sorghum_grain (added after the four-member group failed)'
+rejected:
+  - id: fish_fresh_frozen_named
+    verdict: fails the primary gate (1.17; seed 20260917 2.20; full wave 1.13; passes only on the total basis, 0.74). PR #937's fourth group is dropped.
+  - id: goat_mutton
+    verdict: passes every 2016-17 run (0.37-0.71) but fails 2012-13 (1.08) and is at the boundary in 2005-06 (1.00); rejected under the every-wave rule, which also honours the #935 split. Borderline -- a human may revisit.
+  - id: beer_pito
+    verdict: passes 2016-17 (0.15-0.53) but fails 2012-13 (1.50), 2005-06 (3.07) and 1998-99 (1.51); consistent with @ligon's ruling to keep Pito distinct from Beer.
+  - id: crab_shrimp
+    verdict: fails the primary (1.21) and the total basis (1.86); passes the second seed (0.61) and the full wave (0.31). The two populations disagree; the primary decides. A human may revisit.
+  - id: rice_unprepared
+    verdict: fails everywhere (3.72; 2012-13 3.16; 2005-06 1.02). Imported and local rice keep their #935 identities and the GLSS1-4 coarse Rice stays its own label.
+  - id: gari
+    verdict: fails (3.12; full wave 4.37). White and yellow gari stay distinct; the GLSS1-6 coarse Gari stays its own label.
+  - id: smoked_fish_origin
+    verdict: fails (2.02; seed 20260917 1.16; full wave 1.42). River and sea smoked fish stay distinct.
+  - id: palm_shea
+    verdict: fails everywhere but the total basis (3.59; 2012-13 2.81; 2005-06 3.25; 1998-99 3.47). Confirms #935's note that north/south consumption differs.
+  - id: cocoa_forms
+    verdict: fails on the full wave (2.47), the only population that identifies the pair.
+  - id: millet_sorghum
+    verdict: the four-member group fails on Millet (flour) (full wave 3.45; total basis 1.60); superseded by millet_sorghum_grain.
+  - id: bread_types
+    verdict: fails in 2016-17 (3.46) and 2005-06 (1.95); passes only 2012-13 (0.91).
+  - id: named_processed_fish, chicken_cuts, smoked_fish_broad, dried_pepper_forms
+    verdict: fail every run by a wide margin (2.7-7.1).
+  - id: tinned_milk_forms
+    verdict: not identifiable in 2016-17 on any population; fails 2012-13 (1.71) and 2005-06 (1.23).
+  - id: named_spirits, coconut_forms, pork_cuts, sausage
+    verdict: not gateable -- the members never share min_obs=30 households in 2016-17 on any population (named_spirits passes in 2012-13 where only Whisky and Schnapps co-occur, 0.02, but 2016-17 is where all three merge).
+  - id: margarine_butter, potato_sweet_potato, onion_shallot
+    verdict: not gateable by construction (see proposed_groups.yml not_gateable); singletons.

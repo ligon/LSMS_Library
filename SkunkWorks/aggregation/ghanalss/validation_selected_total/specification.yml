@@ -1,0 +1,32 @@
+wave: 2016-17
+basis: total
+n_sample: 14009
+n_foods: 178
+n_missing_market: 0
+n_missing_characteristics: 19
+n_positive_households_outside_sample: 0
+n_positive_households: 13926
+median_positive_foods: 28.0
+api_warning_counts:
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 1
+  NullIndexKeyWarning: 1
+seed: 20260916
+evaluation: validation
+reserved:
+- Onion
+- Egg
+anchor: Salt
+min_obs: 30
+min_prop_items: 0.1
+split_counts:
+  train: 8397
+  test: 2819
+  validation: 2793
+skipped_candidates: {}
+partitions:
+- fine
+- draft
+lsms_revision: 8e337b448
+cfe_revision: 0.10.0
+candidate_membership_sha256: 2d3a63fdedafc14cec539694a162b35d1cb2096604b9a5f34fe0aadf4935ada4
