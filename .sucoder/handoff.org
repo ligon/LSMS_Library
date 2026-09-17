@@ -28,8 +28,14 @@ committing again while a previous hook is still publishing.
 Warm build done (shared cache, all twelve quarters, no grain/index/null
 warnings); coverage graded (84 sane / 24 absent / 11 not-asked / 4
 asked-not-distributed / 1 unsure / 1 undeclared).
-Next actions: (1) the full test suite has NOT run since library code
-changed (=_dvc_cmd= str->list at six call sites, capability record,
+Full suite run on the mirror at =26322d400= (Slurm 39008163, 16 cores,
+58 min): 4 failed / 6,494 passed.  Two were GhanaAHIES's (no =Currency:=
+entry; no =population.yml=) -- fixed and re-verified (139 passed in
+test_population / test_currency / test_capability).  Two are GhanaLSS
+=food_prices= row pins stale since =fe4f736f0= (#913's 8H valuation) --
+pre-existing, filed as GH #943, not re-pinned.
+Next actions: (1) re-run the full suite after #943 is resolved (recipe
+below; the four other counts were green) (=_dvc_cmd= str->list at six call sites, capability record,
 global =kinship.yml=, a new country every corpus-wide test now sees) --
 burst it: =sbatch= on =co_carleton= / =savio4_htc= against the SHARED
 mirror, =bin/savio_venv.sh mount= first (the mirror's =.venv= symlink is
