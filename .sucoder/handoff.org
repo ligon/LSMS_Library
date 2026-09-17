@@ -25,10 +25,20 @@ features merge's publish hit a hook race (two publishes overlapping left
 the mirror's index dirty at =246341baf=): resolved by stashing the
 mirror's staged copy, re-pushing, and dropping the stash -- avoid
 committing again while a previous hook is still publishing.
-Next action: the full cold build into the shared cache
-(=$TMPDIR/warm_ghanaahies.py=, log =warm_ghanaahies.log=), then
-=make matrix= for GhanaAHIES, then the =absent_verdicts.csv= rows for the
-undistributed consumption features.
+Warm build done (shared cache, all twelve quarters, no grain/index/null
+warnings); coverage graded (84 sane / 24 absent / 11 not-asked / 4
+asked-not-distributed / 1 unsure / 1 undeclared).
+Next actions: (1) the full test suite has NOT run since library code
+changed (=_dvc_cmd= str->list at six call sites, capability record,
+global =kinship.yml=, a new country every corpus-wide test now sees) --
+burst it: =sbatch= on =co_carleton= / =savio4_htc= against the SHARED
+mirror, =bin/savio_venv.sh mount= first (the mirror's =.venv= symlink is
+dead), =.venv/bin/python -m pytest= (never =.venv/bin/pytest=: dead
+shebangs), =-n $SLURM_CPUS_ON_NODE --dist=loadfile=, =LSMS_BUILD_WORKERS=1=
++ BLAS pins, log under =/global/scratch=; (2) clone =cluster_features=,
+=people_last7days=, =anthropometry= into =2022/= and =2023/= (the 24
+=absent= cells); (3) the 2023Q3 weight decision, the =config.yml=
+restore, the =.dta= cleanup (all @ligon).
 
 ** Open for @ligon
 - =~/.config/lsms_library/config.yml= was overwritten at 12:41 (only
