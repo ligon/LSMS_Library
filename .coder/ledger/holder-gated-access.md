@@ -59,7 +59,7 @@ Design only; nothing implemented.
 - **`PROVENANCE_SOURCE` records where a wave was GOT, not what may be DONE**:
   09-04 note; `provenance.py:42-56, 169-182`.
 - **Warn-by-default / `LSMS_*_STRICT` lever**: `CLAUDE.md` §Sites R, B, Q, I.
-  Applied here to `unrecorded` only (design note Q2).
+  Applied here to `unrecorded` only (design note D5).
 - **Cache-hash levers**: `_BUILD_INPUT_SUFFIXES` `country.py:706`; non-recursive
   globs `country.py:933,945,996`; `CLAUDE.md` §"Cache Behavior".
 
@@ -105,9 +105,20 @@ Design only; nothing implemented.
 | strict lever | reuse the `LSMS_*_STRICT` pattern for `unrecorded` only | other mechanisms refuse by default (stated design) |
 
 ## §6 Open questions for the human
-See design note §"Open questions": Q1 recipients reading; Q2 `unrecorded`
-warn vs refuse; Q3 the 30 GhanaSPS files; Q4 refuse vs warn for `attestation`
-during migration. All four block Phase 2 or 3, none block Phase 1.
+The first draft's four were resolved by EL on 2026-09-17 (design note
+§"Decisions taken", D4–D8): `--recipient` per pubkey; `unrecorded` served
+with a warning; GhanaSPS 2017-18 supersession established
+(`slurm_logs/ghana_audit/SUPERSESSION_ghanasps_w3_2026-09-17.org` — every
+wired variable in the six pre-anonymization files is in the public release);
+`attestation`/`api-key` refuse; a site entitlement layer (`LSMS_SITE_CONFIG`,
+unioned with the user's config) for classes rather than a bypass flag.
+
+Remaining: the terms of the 100 non-Dataverse GhanaSPS 2017-18 files, and
+whether the `00_hh_info` geography (GH #579) is kept. Blocks Phase 4 only.
+
+Additional §2 row from D8: `config._config_dir` / `config.get`
+(`config.py:27-44, 70-88`) — extend with a site layer between user config
+and default; `platformdirs.site_config_path` is the natural default.
 
 ## Out of scope, noted so they are not lost
 - `pyproject.toml:7` says `CC-BY-4.0`; `LICENSE.txt` is CC BY-NC-SA 4.0.
