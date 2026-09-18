@@ -1,0 +1,89 @@
+#+title: Two jobs in one mechanism: alias tables and parameter tables
+#+date: [2026-09-18 Fri]
+
+Addendum to =DESIGN.org=, from @ligon: =categorical_mapping= is being asked to
+do two quite different things.  It is, and the corpus already has two table
+*shapes* for them --- what it lacks is any distinction in how they are
+*treated*.
+
+* The two jobs, as they appear in the files
+
+| | *alias* (job 2) | *parameter* (job 1) |
+|---+---+---|
+| example | =#+name: u= | =#+name: u_kg= |
+| key | a variant spelling (=Original Label=) | a canonical label (=Unit=) |
+| value | a canonical label (=Preferred Label=) | a quantity (kg) |
+| cardinality | many -> one | one -> one |
+| role in the pipeline | *produces* the canonical label | *consumes* it |
+| what a lower level does | *adds* aliases (collision = override) | *overrides a value* |
+| folds | yes --- and commensurability is a real question | *none*; a parameter table has no folds |
+| time variation | wave-varying SPELLINGS, handled by per-wave key columns | wave-varying VALUES --- *unrepresentable today* |
+
+They are *stages*, not variants: raw spelling --(alias)--> canonical label
+--(parameter)--> value.  Job 2's output is job 1's key.
+
+=Country._unit_kg_factors= (=country.py:2013=) already composes exactly these
+two stages and its docstring says so: "Keying the MASS on the canonical unit
+rather than the spelling is what makes one row serve every variant, and what
+lets a country override a regional unit."
+
+* Why the conflation is invisible
+
+=_ADDITIVE_CATEGORICAL_TABLES= contains *both* =u= and =u_kg=.  One flag, one
+merge rule, one positional key rule, applied to a many-to-one spelling table
+and a one-to-one value table alike.  Nothing in the framework knows they are
+different kinds of object, so nothing can treat them differently.
+
+* @ligon's example is unrepresentable today, and nobody has noticed
+
+The example: the global level says a pound is 0.45359237 kg; Guatemala's pound
+is 460 g; after 2015 Guatemala adopts the avoirdupois pound and it becomes
+453.59237 g.  Lower level trumps upper.
+
+Measured:
+
+- global =u_kg= has *exactly one row* --- =| Quintal | 100.00 |=;
+- *no country declares a =u_kg= table at all* (swept =countries/*/_/categorical_mapping.org=);
+- *no =u_kg= anywhere carries a wave axis.*
+
+So the country-override half of job 1 has *never been exercised*, and the
+time-varying half *cannot be expressed*.  The =Quintal= row exists precisely
+because the docstring anticipated this case --- "the global table says a
+=Quintal= is 100 kg (the metric centner, Ethiopia), and a Central American
+country redeclares it" --- and no Central American country ever did.
+
+That the gap has gone unnoticed is a consequence of the conflation: because
+=u_kg= is merged by the same machinery as =u=, it *looks* supported.
+
+* What this changes in DESIGN.org
+
+1. *=#+fold:= applies to alias tables only.*  A parameter table has no
+   many-to-one folds, so commensurability is not a question one can ask of it.
+   The 632 unguarded folds (=DESIGN.org= §1.5) are all job 2.
+2. *=#+keyspace:= applies to alias tables only.*  A parameter table's key is
+   the canonical vocabulary *by construction* --- that is what makes it a
+   parameter table.  Declaring a keyspace there is either redundant or a
+   contradiction.
+3. *A third sentinel is needed, and it is the primary one*: what KIND of table
+   this is.  =#+table: alias= vs =#+table: parameter=.  Everything else is
+   conditional on it, and the check "a parameter table must key on a label
+   that some alias table produces" becomes available --- which is the
+   composition =_unit_kg_factors= performs by hand today.
+4. *Parameter tables need a time axis and alias tables do not.*  An alias
+   table already handles wave variation through per-wave key columns
+   (=DESIGN.org= §1.3b: 122 of 134 wave-named columns are keys).  A parameter
+   table would need per-wave *value* columns --- a different shape, the
+   =| Unit | 2005-06 | ... | 2019-20 |= form --- and nothing in the corpus has
+   it.  Do not assume one mechanism serves both.
+5. *"Lower trumps upper" means two different things* and both are correct:
+   for a parameter table it is *value override on a key*; for an alias table
+   it is *row union, with override only on an alias collision*.  Stating them
+   as one rule is what made them look like one mechanism.
+
+* What NOT to conclude
+
+This is not an argument for splitting the file.  Both kinds can live in one
+=categorical_mapping.org= under different =#+name:= tables, as =u= and =u_kg=
+do in =lsms_library/categorical_mapping/u.org= today.  The argument is for the
+framework knowing which is which --- currently it cannot, and the visible cost
+is a one-row global table and an unrepresentable example.
