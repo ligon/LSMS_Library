@@ -1560,8 +1560,8 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
 
     **This function cannot read a DIRECTORY of per-table mappings.**  Each
     rung is the single file ``d + fn``, and ``fn`` defaults to
-    ``'categorical_mapping.org'`` -- of every ``get_categorical_mapping(``
-    call under ``countries/``, zero pass an explicit ``fn=``.  So a rung
+    ``'categorical_mapping.org'`` -- of the 71 ``get_categorical_mapping(``
+    calls in ``countries/**/*.py``, zero pass an explicit ``fn=``.  So a rung
     pointing at a directory of ``<tablename>.org`` files resolves nothing.
     In particular the cross-country rung as spelled in the four GhanaLSS wave
     ``mapping.py`` modules,

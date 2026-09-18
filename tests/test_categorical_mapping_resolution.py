@@ -23,6 +23,8 @@ placeholder ``Roof``/``Floor`` tables.  GH #953 holds the repair.
 from __future__ import annotations
 
 import inspect
+import os
+import re
 import textwrap
 from pathlib import Path
 
@@ -101,9 +103,17 @@ _MECHANISM_HELP = textwrap.dedent("""
     """).strip()
 
 
-def test_import_is_from_this_checkout():
-    """Guard against a ``.pth``-pinned import of a different checkout."""
-    assert (PKG_DIR / "categorical_mapping").is_dir(), PKG_DIR
+def test_import_is_from_the_expected_checkout():
+    """Guard against a ``.pth``-pinned import of a different checkout.
+
+    Only meaningful when the runner says which checkout it meant; a bare
+    ``is_dir()`` on the package would pass for any checkout, which is the
+    overclaiming this repo keeps calling out.
+    """
+    expected = os.environ.get("LSMS_EXPECTED_ROOT")
+    if not expected:
+        pytest.skip("set LSMS_EXPECTED_ROOT to assert which checkout is imported")
+    assert Path(expected).resolve() == REPO_ROOT, lsms_library.__file__
 
 
 def test_every_global_org_file_is_registered():
@@ -145,8 +155,9 @@ def test_ehcvm_units_is_named_by_at_least_one_wave_data_info():
 
     ``ehcvm.py`` only *cites* the file in prose; nothing there reads it.
     """
+    pattern = re.compile(r"""mappings:\s*\[\s*['"]ehcvm_units['"]""")
     hits = [p for p in (countries_root()).rglob("data_info.yml")
-            if "'ehcvm_units'" in p.read_text(encoding="utf-8")]
+            if pattern.search(p.read_text(encoding="utf-8"))]
     assert hits, (
         "No wave data_info.yml references ehcvm_units in a `mappings:` step, "
         "so lsms_library/categorical_mapping/ehcvm_units.org is now an "

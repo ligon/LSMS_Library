@@ -353,7 +353,7 @@ while one country varies it locally.
   tablename, dirs)` walks `dirs` and returns the **first hit**
   (`local_tools.py:1611`). Four GhanaLSS wave `mapping.py` modules spell the
   rungs: `_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']`.
-- **The read-time merge.** `Country.categorical_mapping` (`country.py:1977`)
+- **The read-time merge.** `Country.categorical_mapping` (`country.py:1997`)
   globs **every** `.org` in `lsms_library/categorical_mapping/`, keys the tables
   by `#+name:`, and merges the country's own `categorical_mapping.org` over
   them via `_merge_categorical_tables`.
@@ -372,7 +372,8 @@ local variation of `foo` must re-list every global row.
 
 1. **The cascade cannot read a directory of per-table files.** `fn` defaults to
    `categorical_mapping.org` and each rung is the single file `d + fn`; of the
-   90 `get_categorical_mapping(` calls under `countries/`, **zero** pass `fn=`.
+   71 `get_categorical_mapping(` calls in `countries/**/*.py`, **zero** pass
+   `fn=`.
    Its cross-country rung resolves to `lsms_library/countries/_/`, **which does
    not exist** — so the third rung has never reached anything, for any table.
    That is the open defect; #953 holds the repair and its options.
