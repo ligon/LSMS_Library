@@ -48,6 +48,7 @@ Unit decode (D-units / GH #348, #453, #384):
   labels with no leading digits (leak audit clean).
 """
 import re
+import sys
 import warnings
 
 import numpy as np
@@ -56,6 +57,17 @@ import pandas as pd
 from lsms_library.local_tools import (df_from_orgfile, get_categorical_mapping,
                                        get_dataframe, format_id, _to_numeric,
                                        to_parquet)
+
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
+# import ...`: that absolute PACKAGE import binds to whichever `lsms_library`
+# won sys.path rather than to the config tree LSMS_COUNTRIES_ROOT selects
+# (GH #948 / #436; CONTENTS.org Trap 6).  `../../_` is correct from this
+# script's own directory, which is where the Makefile runs it
+# (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
+# in this file already assumes.
+sys.path.append('../../_')
+from ghanalss import derive_produced_farmgate_value, to_country_food_labels
 
 t = '2016-17'
 
@@ -249,7 +261,6 @@ df = df.dropna(how='all')
 # the .sum()), and ONLY where BOTH factors exist -- a produced row missing
 # either keeps Expenditure NaN and carries NO key, so the labelled rows are
 # exactly the computed ones.
-from lsms_library.countries.GhanaLSS._.ghanalss import derive_produced_farmgate_value
 DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
 _prod = (df.index.get_level_values('s') == 'produced')
 _both = (_prod
@@ -266,6 +277,5 @@ assert df.loc[~_both, 'Derivation'].isna().all(), (
 if __name__ == '__main__':
     # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
     # Pure rename; an unmapped label raises rather than passing through.
-    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
     df = to_country_food_labels(df, '2016-17')
     to_parquet(df, 'food_acquired.parquet')
