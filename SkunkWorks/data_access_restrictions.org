@@ -6,6 +6,10 @@
 Design sketch for discussion.  *Nothing implemented.*  The shape below is EL's;
 the measurements, trade-offs and the two open questions are mine.
 
+Elaborated 2026-09-17 in [[file:holder_gated_access.org][holder_gated_access.org]], which inherits D1-D3
+by id, reverses the NADA-proxy step (EL), and corrects one premise: the
+"existing WB-API-key gate" this note relies on does not fire on any read path.
+
 * The problem
 The library will keep acquiring datasets whose terms are not the standard
 self-service ones: the 2021 Togo/Novissi phone survey (permission to use

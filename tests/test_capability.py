@@ -73,17 +73,34 @@ class TestCatalogMetadataCannotCloseACell:
         """No shipped record may propose a close it has not earned."""
         assert cap.audit() == []
 
-    def test_registry_records_are_all_catalog_only_today(self):
-        """Nobody has read a questionnaire yet -- so nothing may close yet.
+    # Series whose questionnaire a human has actually read (C4), and which may
+    # therefore propose a closing `not-asked`.  Adding a closing record means
+    # adding it HERE too, with the instrument's location -- so a promotion is a
+    # reviewable diff in the test as well as in the registry.
+    QUESTIONNAIRE_READ = {
+        # AHIES questionnaire (Final, 22-11-2021) + field manual, emailed by
+        # GSS 2026-09-17; lsms_library/countries/GhanaAHIES/_/AHIES_INSTRUMENTS.zip
+        ("GhanaAHIES", "AHIES"),
+    }
 
-        This test is expected to CHANGE when an RA validates a series; that is
-        the point.  It documents that today's records are the weak rung.
+    def test_only_series_whose_questionnaire_was_read_may_close(self):
+        """A closing record must be backed by a questionnaire someone read.
+
+        Until 2026-09-17 every record was `catalog-only` and this test asserted
+        that nothing closes.  It now asserts the same discipline as an explicit
+        allowlist: a record that proposes `not-asked` must be one of the
+        series named in QUESTIONNAIRE_READ, and those must be at the C4 rung.
         """
         for (country, series), c in cap._SERIES_CAPABILITY.items():
-            if c.lacks:
-                assert not c.closes, (
+            if c.lacks and c.closes:
+                assert (country, series) in self.QUESTIONNAIRE_READ, (
                     f"{country}/{series} claims to close cells; if a "
-                    "questionnaire really was read, update this test.")
+                    "questionnaire really was read, add it to "
+                    "QUESTIONNAIRE_READ with where the instrument lives.")
+        for key in self.QUESTIONNAIRE_READ:
+            c = cap._SERIES_CAPABILITY[key]
+            assert c.validation == QUESTIONNAIRE_VALIDATED
+            assert "C4" in c.checks_run
 
 
 # ---------------------------------------------------------------------------

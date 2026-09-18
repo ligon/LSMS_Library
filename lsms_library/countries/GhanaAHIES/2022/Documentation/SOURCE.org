@@ -1,0 +1,14 @@
+SOURCE
+
+https://microdata.statsghana.gov.gh/index.php/catalog/128
+
+#+CATALOG_ID: none
+#+CATALOG_IDNO: DDI-GHA-GSS-AHIES-2022-2024-v1.1
+#+CATALOG_TITLE: Annual Household Income and Expenditure Survey (AHIES) 2022-2024
+#+CATALOG_YEARS: 2022
+#+CATALOG_REPOSITORY: statsghana-central
+#+CATALOG_URL: https://microdata.statsghana.gov.gh/index.php/catalog/128
+#+PROVENANCE_SOURCE: external
+#+PROVENANCE_METHOD: external-source
+#+PROVENANCE_RECORDED: 2026-09-17
+#+PROVENANCE_NOTE: Obtained from the Ghana Statistical Service NADA (microdata.statsghana.gov.gh, catalog entry 128, data_access_type public), not the World Bank Microdata Library. Only resources 513 and 544 are linked on the catalog page; the remaining data files were retrieved from the same host by resource id and match the six files named in the v2.1 study documentation (resource 544).  GSS supplied the questionnaire and field manual by email at their own request that the data be set up in lsms_library.  See slurm_logs/ghana_ahies/README.org.  Resources used for this wave: 512 (2022 AHIES Q1-Q4_Rev_20250827_Stata.zip), 548 (2022 AHIES Q1-Q4_SEC567_edt.dta); 465 (2022 study documentation PDF).

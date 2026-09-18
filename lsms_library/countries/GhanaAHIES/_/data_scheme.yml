@@ -1,0 +1,177 @@
+Country: GhanaAHIES
+
+# Ghana Annual Household Income and Expenditure Survey (GSS, 2022-2024).
+#
+# EVERY table is script-path (`materialize: make`): GSS ships one person x
+# quarter file and one household x quarter (Sections 5-7) file per calendar
+# YEAR, while the wave label `t` is the QUARTER (`2024Q1` .. `2024Q4`).  Each
+# wave script reads its year folder's file once and writes one parquet
+# carrying all four quarters with `t` in the index; `Wave.grab_data` filters
+# to its own `t` (the Tanzania `2008-15` / Nigeria pp-ph pattern, see
+# `.claude/skills/multi-round-waves.md`).  `t` must be the quarter because
+# `hh_weight` is a per-quarter weight and `sample` carries one `weight` per
+# `(i, t)` -- a year-grained `t` would collapse four weights to one (GH #323).
+# Decisions and evidence: `_/CONTENTS.org`, `.coder/ledger/ghana-ahies.md`,
+# `slurm_logs/ghana_ahies/README.org`.
+#
+# Household id `i` = "{cluster}-{HholdID}" (stable across quarters and years;
+# `ghanaahies.household_id`).  The shipped `hhid` is QUARTER-scoped and is
+# never used as `i`.  `pid` = `new_pid`.
+#
+# NOT wired, deliberately: `food_acquired` and every consumption / income /
+# asset feature.  Sections 8-13 of the instrument are in no distributed file
+# (`asked-not-distributed`; the questionnaire in `_/AHIES_INSTRUMENTS.zip` is
+# the C4 evidence).  `household_characteristics` is auto-derived from
+# `household_roster` and must not be registered here.
+
+Data Scheme:
+  sample:
+    # Person file, collapsed to one row per household-quarter (hh_weight,
+    # region and urbrur are constant within a household-quarter: 0
+    # disagreements measured on 2024).  `v` = cluster (EA, 1-600); `weight`
+    # = `panel_weight` = `hh_weight` RAW (the library normalises to within-
+    # wave mean 1 at read).  No separate panel weight is shipped.  `strata` =
+    # "{region}-{Urban|Rural}" (the design stratifies EAs by region x
+    # locality; no stratum variable is shipped).
+    index: (i, t)
+    v: str
+    weight: float
+    panel_weight: float
+    strata: str
+    Rural: str
+    materialize: make
+
+  cluster_features:
+    # Person file design variables, built DIRECTLY at the (t, v) cluster
+    # grain: region / regdist / urbrur are asserted constant within every
+    # (cluster, quarter) group (0 disagreements in 2024, and constant across
+    # quarters) and the person rows are de-duplicated to one per cluster-
+    # quarter -- a checked de-dup, not an aggregation, with no `i` in the
+    # frame for the framework's household-to-cluster projection (GH #323
+    # Site 2) to collapse.  600 clusters in every quarter.  District =
+    # regdist value label (2021 PHC district / municipal / metropolitan area
+    # name; 247 in 2024, each in one region; raw labels carry leading blanks,
+    # stripped).  NO GPS is shipped in any AHIES file, so no Latitude /
+    # Longitude.
+    index: (t, v)
+    Region: str
+    District: str
+    Rural: str
+    materialize: make
+
+  household_roster:
+    # Person file Section 1.  Relationship = `s1aq2x` (GSS's corrected
+    # relationship code -- exactly one head per household-quarter, where the
+    # raw `s1aq2` has 31 double-headed and 1,423 headless household-quarters).
+    # Code 17 `Not member anymore` (a CAPI code absent from the paper
+    # instrument) marks a departed panel member and is DROPPED with a count
+    # (52 rows in 2024); see CONTENTS.org.  No residence-duration variable
+    # exists (no MonthsSpent/MonthsAway).
+    index: (t, i, pid)
+    Sex: str
+    Age: float
+    Relationship: str
+    Generation: int
+    Distance: int
+    Affinity: str
+    materialize: make
+
+  individual_education:
+    # Person file Section 2 (members 3+).  `s2aq3` (highest level attended)
+    # x `s2aq4` (highest grade COMPLETED at that level; 0 = none) -> a
+    # composite "<level> <grade>" label mapped through the country
+    # `harmonize_education` table onto the canonical ordinal vocabulary.
+    # `s2aq1` == 'Never attended' -> 'No education'.
+    index: (t, i, pid)
+    Educational Attainment: str
+    materialize: make
+
+  people_last7days:
+    # Person file Section 4A (members aged 5+), the Guinea-Bissau / Niger
+    # shape.  wage_work = s4aq1 (paid work for a non-member), farm_work =
+    # s4aq7 (a farm owned / rented by a member), SOB_work = s4aq11 (ran a
+    # household non-farm enterprise); *_hrs = the sum of that activity's
+    # seven per-day hour entries (s4aq3a-g / s4aq9a-g / s4aq13a-g; s4aq2 /
+    # s4aq8 / s4aq12 are DAYS despite s4aq2's "hours" label); Industry =
+    # s4aq41a1, the ISIC Rev.4 section of the main job, served as recorded
+    # (it is also asked of the temporarily absent); working_age = Age >= 5,
+    # the module's own eligibility threshold (the corpus convention: EHCVM
+    # 6, Malawi 5), not the ILO 15.
+    #
+    # THE MODULE IS A FIRST-YES CASCADE: the CAPI asks wage, domestic, farm,
+    # non-farm, family help, fishing / gathering, apprentice, voluntary IN
+    # THAT ORDER and skips the rest once one is Yes, so farm_work is NA for
+    # every wage worker and SOB_work for everyone with an earlier Yes.  NA
+    # is served as NA (nullable bool), never as False; compute shares on the
+    # answered rows.  The five unserved forms and the GSS-derived dummies
+    # (`worked`, `wagework`, ..., cross-checked, not served) are documented
+    # in the wave script and CONTENTS.org.
+    index: (t, i, pid)
+    farm_work: bool
+    SOB_work: bool
+    wage_work: bool
+    farm_hrs: {type: float, optional: true}
+    SB_hrs: {type: float, optional: true}
+    wage_hrs: {type: float, optional: true}
+    Industry: {type: str, optional: true}
+    working_age: bool
+    materialize: make
+
+  anthropometry:
+    # Person file Section 3B (Q3-Q5), measured on EVERY member every quarter;
+    # the GAP 5 shape (Uganda / Malawi / Tanzania / Nigeria): REPORTED
+    # measures only, one row per measured individual.  Weight = s3bq3 (kg);
+    # Height = s3bq4 (cm, standing or lying per s3bq5 -- the mode is not
+    # served, as in the precedents); Age_months = 12 * s1aq4y + s1aq4m
+    # (months filled for ages 0-4 only).  The questionnaire's "not measured"
+    # code (999 on paper) is spelled NEGATIVELY in the CAPI file (height -99,
+    # weight -99.94) and, with 575 other repeated negative weights, is
+    # decoded to NA and counted in the build log -- decoding, not screening.
+    # In-domain implausibles (weight exactly 99.0 x1,875 at all ages, 35.35
+    # x1,642, heights above 220 cm x3,861) are served as recorded and
+    # reported in CONTENTS.org.  No MUAC is measured; GSS's `BMI` column is
+    # 100% null in 2024, so it cannot cross-check this table.
+    index: (t, i, pid)
+    Weight: float
+    Height: float
+    Age_months: float
+    materialize: make
+
+  food_security:
+    # SEC01567 file, Section 5: the FAO 8-item Food Insecurity Experience
+    # Scale (FIES), 12-month recall, one row per household-quarter.
+    # s5q1..s5q8 map IN ORDER to the eight canonical items (Yes -> True,
+    # No -> False, "Don't Know" -> NA); FIES_score = count of True (NA only
+    # when all eight are NA).  Same shape as Guinea-Bissau.
+    index: (t, i)
+    Worried: bool
+    HealthyDiet: bool
+    FewFoods: bool
+    SkippedMeal: bool
+    AteLess: bool
+    RanOut: bool
+    Hungry: bool
+    WholeDay: bool
+    FIES_score: int
+    materialize: make
+
+  housing:
+    # SEC01567 file, Section 7 (categorical, per the GhanaLSS sibling shape
+    # plus Kosovo's `Type`).  Type = s7aq1 (dwelling type); Rooms = s7aq2
+    # (rooms occupied); Tenure = s7bq1 (holding arrangement); Roof = s7eq3;
+    # Floor = s7eq2; Walls = s7eq1 (main construction material); Water =
+    # s7dq1 (main drinking-water source); Toilet = s7dq24 (toilet facility);
+    # Electricity = s7dq10a (first-listed electricity source).  Roof/Floor
+    # are normalised through the GhanaLSS-identical `Roof` / `Floor` tables
+    # in `_/categorical_mapping.org`.
+    index: (t, i)
+    Type: str
+    Rooms: int
+    Tenure: str
+    Roof: str
+    Floor: str
+    Walls: str
+    Water: str
+    Toilet: str
+    Electricity: str
+    materialize: make

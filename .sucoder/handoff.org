@@ -1,4 +1,75 @@
-#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
+#+title: Handoff -- 2026-09-17 (Sue / Claude Fable 5.1), Savio job 39002769
+
+* GhanaAHIES: new country, in flight (2026-09-17)
+Working clone =/local/job39002769/mirrors/LSMS_Library=, branch
+=development=, last commit =99bfb8da8= (2024 pilot: sample,
+household_roster, individual_education, food_security, housing).
+Scaffold commit =0f7402895= (blobs on S3, provenance, catalog entry,
+capability record, =_dvc_cmd= fix).  Findings:
+=slurm_logs/ghana_ahies/README.org=; ledger =.coder/ledger/ghana-ahies.md=;
+idiosyncrasies =lsms_library/countries/GhanaAHIES/_/CONTENTS.org=.
+
+** Three worker agents were dispatched at ~14:20, each in its own worktree
+   and branch (hook publishes the branch to the mirror):
+- =/local/job39002769/worktrees/ghanaahies-2022= -> =feat/ghanaahies-2022=
+  (the five tables for the 2022 folder)
+- =/local/job39002769/worktrees/ghanaahies-2023= -> =feat/ghanaahies-2023=
+  (same for 2023, plus the 2023Q3 half-scale hh_weight investigation)
+- =/local/job39002769/worktrees/ghanaahies-2024-features= ->
+  =feat/ghanaahies-2024-features= (cluster_features, people_last7days,
+  anthropometry for 2024)
+Private data roots under =/local/job39002769/data/= (gone with the job).
+All three branches reviewed and merged (=a45fe175a=, =616742f0b=,
+=181dfb210=; CONTENTS.org hand-merged twice); worktrees removed.  The
+features merge's publish hit a hook race (two publishes overlapping left
+the mirror's index dirty at =246341baf=): resolved by stashing the
+mirror's staged copy, re-pushing, and dropping the stash -- avoid
+committing again while a previous hook is still publishing.
+Warm build done (shared cache, all twelve quarters, no grain/index/null
+warnings); coverage graded (84 sane / 24 absent / 11 not-asked / 4
+asked-not-distributed / 1 unsure / 1 undeclared).
+Full suite run on the mirror at =26322d400= (Slurm 39008163, 16 cores,
+58 min): 4 failed / 6,494 passed.  Two were GhanaAHIES's (no =Currency:=
+entry; no =population.yml=) -- fixed and re-verified (139 passed in
+test_population / test_currency / test_capability).  Two are GhanaLSS
+=food_prices= row pins stale since =fe4f736f0= (#913's 8H valuation) --
+pre-existing, filed as GH #943, not re-pinned.
+Next actions: (1) re-run the full suite after #943 is resolved (recipe
+below; the four other counts were green) (=_dvc_cmd= str->list at six call sites, capability record,
+global =kinship.yml=, a new country every corpus-wide test now sees) --
+burst it: =sbatch= on =co_carleton= / =savio4_htc= against the SHARED
+mirror, =bin/savio_venv.sh mount= first (the mirror's =.venv= symlink is
+dead), =.venv/bin/python -m pytest= (never =.venv/bin/pytest=: dead
+shebangs), =-n $SLURM_CPUS_ON_NODE --dist=loadfile=, =LSMS_BUILD_WORKERS=1=
++ BLAS pins, log under =/global/scratch=; (2) clone =cluster_features=,
+=people_last7days=, =anthropometry= into =2022/= and =2023/= (the 24
+=absent= cells); (3) the 2023Q3 weight decision, the =config.yml=
+restore, the =.dta= cleanup (all @ligon).
+
+** Open for @ligon
+- =~/.config/lsms_library/config.yml= was overwritten at 12:41 (only
+  =statsghana_api_key= remains; =microdata_api_key=, =data_dir=,
+  =phmecv_api_key= are gone).  Restore.
+- Decide the 2023Q3 =hh_weight= factor of two (uniform x0.4986 on that
+  column alone; see CONTENTS.org "The 2023 folder"): double in the wave
+  script, or serve as shipped.
+- Ask GSS for Sections 8-13 (consumption/expenditure/income/assets/NFE):
+  in no distributed file; the questionnaire is the C4 evidence for
+  =asked-not-distributed= verdicts on food_acquired etc. (add rows to
+  =.coder/coverage/absent_verdicts.csv= once the country is in the matrix).
+- The raw =.dta= copies still sit beside their =.dvc= sidecars in the
+  clone's =GhanaAHIES/*/Data/= (7.6 GB, node-local, refused by the reader
+  as "polluted"); blobs are on S3 and at
+  =/global/scratch/fsa/fc_jevons/ligon/ahies_gss_2026-09-17/=.  Delete when
+  convenient (=find lsms_library/countries/GhanaAHIES -name '*.dta' -execdir
+  test -e '{}.dvc' \; -print -delete=).
+- The squashfs venv image's console-script shebangs are dead
+  (=#!/global/scratch/.../.venv/bin/python=); =_dvc_cmd= now sidesteps it,
+  but =bin/savio_venv.sh update= should rewrite them.
+- WB catalog check for an AHIES mirror (needs the WB key); =population.yml=
+  entry for AHIES (edit the evidence base, re-promote).
+
+* Earlier handoffs, GitHub-side stream (Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624)
 
 
 * v0.14.0 release session (2026-09-16 evening, Sue / Claude Fable 5.1, Savio job 38975827)
@@ -262,7 +333,7 @@ Merge #930 once CI is green (=unit-tests= was in flight at handoff).  Then
 either #932 (the CI gap -- it is the one that lets this class of error repeat)
 or #928's P1/P2, which still needs its cache-invalidation measurement first.
 
-#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
+* Earlier handoff: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
 
 * Categorical-mapping session (2026-09-14/15, job 38854624)
 
@@ -367,7 +438,7 @@ reproducer as needing one.
 Merge #930 to un-red =development=, then decide #928's P1/P2 or file the CI
 gating gap.
 
-#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
+* Earlier handoff: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
 * GhanaLSS backlog session (2026-09-12, Sue / GPT-6, job 38734650)
 

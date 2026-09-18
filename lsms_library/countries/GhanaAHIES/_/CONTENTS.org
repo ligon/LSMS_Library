@@ -1,0 +1,640 @@
+#+title: Contents
+#+TODO: TODO WAITING | DONE
+
+The Ghana Annual Household Income and Expenditure Survey (AHIES) is the
+third Ghana series in this library, beside the Ghana Living Standards
+Survey (GhanaLSS) and the Ghana Socioeconomic Panel Survey (GhanaSPS).
+It is run by the Ghana Statistical Service (GSS) and distributed from
+GSS's own NADA instance (https://microdata.statsghana.gov.gh/, catalog
+entries 119 and 128); provenance is =external= (no World Bank id).
+Evidence base for everything below: =slurm_logs/ghana_ahies/README.org=
+(access, file inventory, measured design facts) and the prior-art ledger
+=.coder/ledger/ghana-ahies.md=.  Instruments (questionnaire + field
+manual, .docx, emailed by GSS) are in =_/AHIES_INSTRUMENTS.zip=.
+
+* Overview
+
+A QUARTERLY HOUSEHOLD PANEL: 10,800 households in 600 enumeration areas
+(18 per EA; 304 urban / 296 rural EAs) drawn from the 2021 Population and
+Housing Census frame, interviewed every quarter from 2022Q1 to 2024Q4
+(12 quarters), CAPI, 16 regions.  Sections 1-4 (demographics + migration,
+education, health, economic activity) are asked of every member; Sections
+5-7 (food security, respondent identification, housing) of the household.
+
+** What is distributed, and what is not
+
+GSS publishes six data files: per calendar year one PERSON x QUARTER file
+(Sections 1-4, 838 columns) and one HOUSEHOLD x QUARTER file (Sections 5-7,
+=SEC567_edt= / =SEC01567_edt=).
+
+| folder | file                                   | rows x cols   | grain               |
+|--------+----------------------------------------+---------------+---------------------|
+| 2022   | =2022 AHIES Q1-Q4_Rev_20250827.dta=    | 209,943 x 838 | person x quarter    |
+| 2023   | =2023 AHIES Q1-Q4_Rev_20250827.dta=    | 196,953 x 838 | person x quarter    |
+| 2024   | =2024 AHIES Q1-Q4_20250827.dta=        | 188,500 x 838 | person x quarter    |
+| 2022   | =2022 AHIES Q1-Q4_SEC567_edt.dta=      |  42,120 x 167 | household x quarter |
+| 2023   | =2023 AHIES Q1-Q4_SEC567_edt.dta=      |  39,631 x 132 | household x quarter |
+| 2024   | =2024 AHIES Q1-Q4_SEC01567_edt.dta=    |  39,298 x 147 | household x quarter |
+
+*Sections 8-13 of the instrument are in NO published file*: own-produce
+consumption (8), household expenditure on less-/frequently purchased items
+(9), transfers (10), miscellaneous income and expenditure (11), assets and
+durables (12), non-farm enterprises (13).  The survey's namesake content is
+absent from the distribution.  Consequently =food_acquired= and every
+consumption / income / asset feature is NOT wired; the verdict for those
+cells is =asked-not-distributed= (the questionnaire in hand is the C4
+evidence -- the questions exist), never =not-asked=.  EL has asked GSS for
+these sections (2026-09-17).
+
+*One scoped exception, found 2026-09-17 while wiring 2022*: the 2022
+=SEC567_edt= file carries 16 columns from Sections 10 and 11 -- the five
+Section 10 transfer SCREENING questions (=s10q1=, =s10q2=, =s10q3=,
+=s10bq1=, =s10bq2=: yes/no, e.g. "is there any member who lives away",
+"received money or goods in the past 3 months") and the eleven Section 11B
+miscellaneous-expenditure AMOUNTS (=s11bq1= .. =s11bq11=: property rate,
+gifts, weddings, bride price, funerals, religious offerings, tithe, ...)
+-- populated for 2022Q1-Q3 only (about 10,600 / 10,160 / 10,415 rows;
+2022Q4 all null) and absent from the 2023 and 2024 files.  =README.org=
+and the ledger call these "16 =s1*= columns"; they are =s10*= / =s11*=.
+No Section 8, 9, 12 or 13 content, no transfer amounts, no per-recipient
+rows: the "absent from the distribution" verdict stands for every
+consumption / income / asset FEATURE, but the sentence above is not
+literally true of the 2022 file.  Not wired (three quarters of screens and
+one sub-section of amounts do not make a table this library has a schema
+for); recorded so nobody re-discovers it.
+
+** Wiring status (2026-09-17)
+
+Per folder (=household_characteristics= derives automatically from
+=household_roster= everywhere):
+- =2024/= wired (2026-09-17): =sample=, =household_roster=,
+  =individual_education=, =food_security=, =housing=, then the same day
+  =cluster_features=, =people_last7days=, =anthropometry=.
+- =2023/= wired (2026-09-17) with the first five tables; see "The 2023
+  folder" for what differs.
+- =2022/= wired (2026-09-17) with the first five tables; see "2022 folder"
+  for what differs.
+A folder without a script for a table contributes nothing to that table's
+build (a =logger.warning= "no _/ directory" or a missing rule, not an
+error), because the country module lists all twelve quarters in =waves=.
+Note that =_join_v_from_sample= calls =sample()= with NO wave restriction,
+so any household-table call for one quarter builds =sample= for every
+wired folder (a 2.4-2.7 GB person-file read per folder).
+
+* The quarter grain: t is =YYYYQn=, folders are years
+
+Every table is script-path (=materialize: make=).  The wave FOLDERS are
+calendar years (=2022/=, =2023/=, =2024/=) because that is how GSS ships the
+files; the wave LABELS -- the values of =t= -- are the twelve quarters
+=2022Q1= .. =2024Q4=, mapped through =wave_folder_map= in
+=_/ghanaahies.py= exactly as Nigeria's post-planting / post-harvest rounds
+and Tanzania's =2008-15/= folder are.  Each wave script reads its folder's
+file ONCE and writes one parquet holding all four quarters with =t= in the
+index; =Wave.grab_data= filters to its own =t=.
+
+*Why the quarter and not the year* (EL, 2026-09-17): =hh_weight= is a
+per-quarter weight, and =sample= carries one =weight= per =(i, t)=.  A
+year-grained =t= would hand =_normalize_dataframe_index= four rows per
+household and it would SELECT one of the four weights (GH #323) --
+silently, since the parquet is written post-collapse.  The quarter grain
+is forced by the sample table; everything else follows it.
+
+The per-folder build is expensive: each person-file table re-reads a
+2.4-2.7 GB =.dta= (~20 s and ~3 GB RAM through =get_dataframe=, which has
+no =usecols=).  Build tables serially on a small node
+(=LSMS_BUILD_WORKERS=1=).
+
+* Identifiers
+
+- =i= = ="{cluster}-{HholdID}"= (=ghanaahies.household_id=).  =cluster= is
+  the EA (1-600) and =HholdID= the household's number within it (1-18);
+  the pair is the stable panel key across quarters AND years.  Panel
+  retention, quarters observed per =(cluster, HholdID)=: 2022 {4: 10,042;
+  3: 534; 2: 154; 1: 42}; 2023 {4: 9,782; 3: 288; 2: 90; 1: 81}; 2024
+  {4: 9,637; 3: 222; 2: 28; 1: 28}.
+- *=hhid= is QUARTER-SCOPED and must never be =i=.*  It is =qtr= (1-12 over
+  the panel) + 3-digit cluster + 2-digit household -- six digits for
+  quarters 1-9, seven for 10-12 -- so the same household has twelve
+  different =hhid= values.  The shipped =quarter= string (=2024Q1=) is what
+  =t= reads; =qtr= is the running quarter number (2024Q1 = 9).
+- =pid= = =new_pid= (person line within the household; =personid= agrees
+  99.8%).  0 nulls and 0 duplicates on =(cluster, HholdID, quarter,
+  new_pid)= in all three person files.  Across quarters the line is
+  stable: the 2024 Q1 x Q2 join on =(cluster, HholdID, new_pid)= matches
+  45,890 of 47,963 with sex agreeing 100% and age within one year 99.8%.
+- =v= = =cluster= as a string, served by =sample= only and joined onto
+  every household table at read.
+
+* Sampling design and the =sample= table
+
+Two-stage stratified: the 600 EAs are stratified by REGION x LOCALITY
+(urban/rural) and drawn from the 2021 PHC frame; 18 households are listed
+and selected per EA.  No stratum variable is shipped, so =strata= is
+constructed as ="{region}-{Urban|Rural}"= (32 values, e.g.
+=Ashanti-Urban=), from the person file's =region= (16 title-case labels)
+and =urbrur=.  Region and locality are constant within a cluster (0
+disagreements in 2024), and every quarter has all 600 clusters.
+
+*Weights.*  The person file carries =hh_weight= (per household-quarter;
+constant within a household-quarter, 0 disagreements) and =pop_weight=
+(per person).  =weight= = =panel_weight= = =hh_weight= RAW: no separate
+longitudinal weight is shipped, and the library normalises both columns to
+within-wave mean 1 at read, so =Country('GhanaAHIES').sample()= shows mean
+1.0 per quarter while the wave parquet keeps the expansion scale.  Read
+the raw scale at the RIGHT GRAIN: at household grain (what the parquet
+holds) the 2024 means are 901 / 904 / 918 / 928 for Q1-Q4; at person grain
+(what =README.org= reports) they are 833 / 834 / 847 / 854.  Both are
+correct; they differ because larger households carry smaller weights.
+=hh_weight= sums to ~8.2 M households per quarter (2021 PHC: 8.35 M);
+=pop_weight= to ~32 M persons.
+
+*Cluster features.*  =cluster_features= is built directly at =(t, v)= from
+the person file's =region= / =regdist= / =urbrur= (asserted constant within
+every cluster-quarter -- 0 disagreements in 2024 -- and de-duplicated, so
+the framework's household-to-cluster projection, GH #323 Site 2, has
+nothing to collapse).  =District= is the =regdist= value label: the 2021
+PHC district / municipal / metropolitan-area name (247 in 2024, each inside
+exactly one region; the raw labels carry seven leading blanks, stripped).
+The label set has 261 entries for 247 observed codes.  No GPS of any kind is
+shipped (no Latitude / Longitude).  With this table =market='Region'= works
+on every household table.
+
+*2023Q3 weight anomaly (recorded, not corrected).*  In the 2023 person
+file =hh_weight='s 2023Q3 mean is 402.3 against 720-854 in every other
+quarter of the panel -- half scale.  The within-wave normalisation HIDES
+this at the API (each quarter is rescaled to mean 1), so it is only
+visible in the raw parquet.  It is a GSS artefact to raise with GSS, not
+something to repair in config; the full measurement (a uniform factor
+of exactly two on =hh_weight= alone, =pop_weight= untouched) is in "The
+2023 folder" below and in =2023/_/sample.py='s docstring.  The 2024
+SEC01567 file also carries =hhwt_q9=, =wtpp_q10=, =hhwt_q10= (quarter-9
+and quarter-10 weights); the 2022 file =WTPP*= / =WTHH_*=; the 2023 file
+none.  =sample= takes its weight from the person file in every year.
+
+* Household roster (Section 1A)
+
+- *Relationship is =s1aq2x=, GSS's corrected code, not =s1aq2= -- where
+  =s1aq2x= is populated.*  In the 2022 file it is 100% null and the raw
+  =s1aq2= is already clean, so 2022 reads =s1aq2= (s"2022 folder").  Measured
+  on 2024: =s1aq2x= has exactly one 'Head' in 38,983 of 39,298
+  household-quarters (315 headless, 2 null codes -- both in 2024Q4, both
+  also null in =s1aq2=); the raw =s1aq2= has 31 double-headed and 1,423
+  headless household-quarters and 4,561 null codes, and the two disagree
+  on 10,249 rows.  =README.org= calls =s1aq2x= "a corrected duplicate";
+  the data say it is the corrected one.  *In 2023 this holds for Q2-Q4
+  only*: =s1aq2x= is 83.5% unfilled in 2023Q1, which reads =s1aq2=
+  instead (see "The 2023 folder").
+- *Code 17 'Not member anymore' is not in the paper questionnaire*, whose
+  relationship codes stop at 16 (Househelp); it was added in CAPI to keep
+  a departed person's panel line.  Those rows have sex and age but are
+  not members in that quarter, and the instrument has NO residence-
+  duration question (Section 1A is sex / relationship / DOB / age /
+  marital status / religion / nationality / ethnicity; 1B is migration),
+  so there is no =MonthsSpent= to carry the fact.  Serving them would
+  count non-members in =household_characteristics=.  Decision: the wave
+  scripts DROP them and print the count -- 52 rows in 2024, all in
+  2024Q1 (=s1aq2x=; =s1aq2= carries 92) -- so =household_roster= serves
+  47,911 / 47,238 / 46,384 / 46,915 rows for Q1-Q4 against person-file
+  counts of 47,963 / 47,238 / 46,384 / 46,915.  =individual_education=
+  applies the same filter.  The label is deliberately NOT in
+  =kinship.yml=: a null tuple there would mean "a relative of unrecorded
+  shape", which this is not.
+- The 315 headless household-quarters are mostly small (65 are a single
+  person: 566 of their 1,139 rows are 'Child', 200 'Spouse'); recorded,
+  not repaired.
+- Kinship labels added to =lsms_library/categorical_mapping/kinship.yml=
+  for this series: 'Spouse (Wife/Husband/Living together)' [0,0,affinal],
+  'Child (Son/Daughter)' [-1,0,consanguineal], 'Daughter in-law'
+  [-1,0,affinal], 'Great grandchild' [-3,0,consanguineal], 'Househelp'
+  [0,0,servant] (the questionnaire's code 16, a live-in domestic worker).
+  The other eleven labels already matched.
+- *Age* = =s1aq4y= (completed years, never null) plus =s1aq4m=/12 where
+  the months-beyond-years field is filled (asked for under-fives; 0-11).
+  A DOB triplet exists (=s1aq3a/b/c=; day carries a '98. Do not know'
+  label mixed into a numeric column) and is not used.
+- Value labels in the =.dta= are not valid UTF-8 (=pyreadstat= needs
+  =encoding='latin1'=; =get_dataframe='s default pandas path copes) and
+  several carry stray whitespace or a =?= for an apostrophe.
+
+* Education (Section 2A, members 3+)
+
+=Educational Attainment= is composed from =s2aq1= (ever attended),
+=s2aq3= (highest LEVEL attending / attended, 16 labels) and =s2aq4=
+(highest GRADE COMPLETED at that level; 0 = none yet -- field manual
+Section 2 Q4, grade ladders in its Appendix 5).  For the five graded
+levels (Primary 1-6, Middle Form 1-4, JSS/JHS 1-3, Secondary Form 1-5 +
+Lower/Upper 6, SSS/SHS 1-3(4)) the composite "<level> <grade>" label
+decides incomplete vs complete; other levels map from the label alone
+(tertiary as the GhanaLSS sibling does).  Table: =harmonize_education= in
+=_/categorical_mapping.org=, applied in the wave script.  Residues in
+2024: an unlabelled numeric =0.0= in =s2aq3= (401 rows) and 596
+attended-but-level-missing rows -> 'Unknown'; the 10,486 rows with
+=s2aq1= null are under-threes (mean age 1.2), served as NA and dropped by
+the framework's =dropna(how='all')=.
+
+* Anthropometry (Section 3B, Q3-Q5, EVERY member, every quarter)
+
+Weight (kg) and height (cm) are taken of every household member each
+quarter (questionnaire: "RESPONDENTS: ALL HOUSEHOLD MEMBERS"; manual:
+"measure the weight / height of each household member") -- 188,497 of the
+188,500 person-quarter rows in 2024 carry a value in both, the other 3 say
+"Scale not present".  Q5 records the mode of the height measurement
+(Standing / Lying); the precedents (Uganda, Malawi, Tanzania, Nigeria) fold
+standing and lying into one =Height= column and serve no mode, so the mode
+is recorded here and not served.  Mode by age in 2024: under 1: 2,258
+lying / 2 standing; 1: 3,430 / 58; 2: 4,634 / 103; 3-4: 9,626 / 684; 5-9:
+943 / 25,473; 10-17: 336 / 40,174; 18+: 573 / 100,203 -- so 1,852 members
+aged 5+ were measured lying and 60 under-twos standing.
+
+- *The "not measured" code is negative in the CAPI file.*  The paper
+  questionnaire says "NOT MEASURED CODE 999" for both questions; the file
+  spells it =-99= for height (13,001 rows, 6-9% in every age band; 11,622
+  of them with mode 'Standing') and =-99.94= for weight (2,298 rows,
+  float32).  A further 575 weight rows carry other repeated negative values
+  (=-23.12= x334, =-21.27= x235, =-25.845= x2, =-19.97= x2, =-30.87=,
+  =-28.395=), all aged 5+ (median 15) and all 'Standing' -- no scale reads
+  a negative kilogram; the repetition says a caregiver-and-child subtraction
+  (manual s3.5, "steps for taking the weight of a child who cannot stand")
+  landed on the wrong row.  All negatives are decoded to NA and counted in
+  the build log; 2,208 rows then have neither measure (all in 2024Q1) and
+  are dropped, as are 48 measured 'Not member anymore' rows, so
+  =anthropometry= serves 45,703 / 47,238 / 46,384 / 46,915 rows for Q1-Q4.
+- *In-domain implausibles are served as recorded, never clipped* (a
+  finding, not a screen): weight exactly =99.0= on 1,875 rows at ages 0-97
+  (the second most common value; 98.5 has 24 and 99.5 has 9, so nearly all
+  are a "don't know" code, but a real 99 kg is indistinguishable); weight
+  exactly =35.35= on 1,642 rows clustered at ages 14-16 (an imputation?);
+  heights above 220 cm on 3,861 rows (median age 17, median weight 40 kg,
+  values like 256.4 / 259.4 / 234.4; 3,850 'Standing'); heights under 40 cm
+  at ages over 5 on 87 rows; weight 2-170 kg overall.  Served ranges
+  (2024): Weight min 2.0 / p1 6.7 / p99 99.0 / max 170.0; Height min 2.0 /
+  p1 65.0 / p99 254.0 / max 308.9.
+- =Age_months= = 12 x =s1aq4y= + =s1aq4m= (the Malawi =cage= definition);
+  =s1aq4m= (0-11) is filled only for ages 0-4 (19,948 rows), so for members
+  5+ it is exactly twelve times the completed years.
+- The GSS-derived =BMI= column is 100% null in the 2024 person file; no
+  cross-check of the served measures is possible.  No MUAC is measured.
+
+* Economic activity in the past 7 days (Section 4A, members aged 5+)
+
+Section 4 Part A is asked of "ALL HOUSEHOLD MEMBERS AGED 5 YEARS OR OLDER"
+(questionnaire header; manual s9.4: "all household members aged 5 years and
+older").  =people_last7days= serves the Guinea-Bissau / Niger shape with
+=working_age= = Age >= 5, the module's own threshold and the corpus
+convention (EHCVM 6, Malawi 5) -- NOT the ILO 15, which is the threshold of
+Parts B, D, E and F.  =s4aq1= is null for every member under 5 and for 790
+members aged 5+ (median age 5; 548 of them in 2024Q4; no =availreason=).
+
+- *The module is a FIRST-YES CASCADE, not eight independent dummies.*  The
+  CAPI asks Q1 wage, Q4 domestic, Q7 farm, Q11 non-farm enterprise, Q15
+  family help, Q19 fishing / gathering, Q22 apprentice, Q25 voluntary in
+  that order, records the days and hours of the first Yes, and skips the
+  remaining activity questions -- measured exactly on 2024: null(s4aq4) =
+  null(s4aq1) + yes(s4aq1) (+ 390 rows answered anyway), null(s4aq11) =
+  null(s4aq7) + yes(s4aq7), null(s4aq15) = null(s4aq11) + yes(s4aq11).  So
+  =farm_work= is NA for a wage worker and =SOB_work= for anyone with an
+  earlier Yes; served as NA (nullable bool), never as False.  A "share doing
+  farm work" must be computed on answered rows.  Answered / Yes / NA in
+  2024 (after the not-member drop): wage_work 166,870 / 14,722 / 21,578;
+  farm_work 150,849 / 27,660 / 37,599; SOB_work 123,189 / 16,471 / 65,259.
+  The manual's Q1 skip ("did not work, code 2 and skip to Q4") describes
+  the No branch only; the Yes branch's skip is CAPI routing not on paper.
+- *=s4aq2= / =s4aq8= / =s4aq12= are DAYS worked (1-7)*, although the =.dta=
+  label on =s4aq2= says "how many hours": the manual's Q2 is "for how many
+  days", and the value equals the count of days with hours > 0 on 99.9% of
+  rows.  Hours are the per-day entries Q3 / Q9 / Q13 (a-g = the seven days);
+  =*_hrs= is their sum (wage median 40, p99 72, max 105; farm median 30,
+  max 96; enterprise median 35, max 170).  Seven daily entries exceed 24 h
+  (max 66 farm, 70 enterprise), served as recorded.
+- *Unserved forms* (2024 Yes counts): domestic work for a member (Q4) 447;
+  unpaid help in a member's farm / non-farm enterprise (Q15) 7,341 (farm
+  and non-farm are not separable); fishing / hunting / gathering (Q19)
+  417; apprenticeship (Q22) 3,305 (paid 190, paying 1,726, neither 1,389);
+  voluntary work (Q25) 241.  =s4aq28= (interviewer check) codes only
+  'Yes, Employment Work' / 'No' in 2024; its code 3 'Yes, Non-Employment
+  Work' never occurs.
+- =Industry= = =s4aq41a1=, the ISIC Rev.4 SECTION label of the main job
+  (21 labels; 78,602 rows).  It is asked after Q28 of anyone who worked in
+  the 7 days AND (Q29-Q38) of anyone temporarily absent from a job, so
+  19,755 rows carry an industry with none of the three served activities
+  Yes: 10,808 of them did no 7-day work at all (=s4aq28= No, temporarily
+  absent), the rest did an unserved form.  Served as recorded.  The 4- and
+  6-digit codes (=s4aq41a2= / =a3=) and the occupation codes (=s4aq40*=,
+  ISCO-08 major groups) are not served.
+- *GSS-derived dummies are a cross-check, not columns.*  =wagework= =
+  yes(s4aq1) OR yes(s4aq29, temporarily absent from a wage job): 16,007 =
+  14,723 + 1,284, exact.  =farmwork= = yes(s4aq7) OR yes(s4aq30) MINUS
+  production 'Only for own/family use' (=s4aq10=): 26,508 of 27,663 Q7-Yes
+  rows are flagged and 1,148 of the 1,155 unflagged ones are own-use-only.
+  =nonfarmwork= likewise (16,404 of 16,471; all 67 unflagged are own-use-
+  only, =s4aq14=).  =worked= = any 7-day Yes (70,189) plus 12,576 with
+  none; =employed= 75,698.  GSS thus draws the ILO 19th-ICLS employment
+  boundary (own-use production excluded, temporary absence included); this
+  table does not, it serves what was asked.
+- The 52 'Not member anymore' rows (45 with a Section 4A answer) are
+  dropped as in =household_roster=.
+
+* Sections 5-7 file (=SEC01567_edt=): food security and housing
+
+- 332 rows (81 / 94 / 95 / 62 per quarter of 2024) have a null =HholdID=
+  and NO Section 5-7 content; their =hhid= identifies them as exactly the
+  332 household-quarters that are in the person file but were not
+  interviewed for Sections 5-7.  Both scripts drop them with a count;
+  the served tables have 9,809 / 9,781 / 9,739 / 9,637 rows for Q1-Q4
+  (the person file: 9,890 / 9,875 / 9,834 / 9,699).  With those gone the
+  =(cluster, HholdID, quarter)= key is unique.
+- The file's =region= is UPPERCASE ('ASHANTI') and its =loctype= is null
+  for half the rows; neither is served (the person file supplies both).
+- =food_security=: FAO FIES, 8 items, 12-MONTH recall asked every
+  quarter, so consecutive quarters' windows overlap by nine months --
+  do not sum across =t=.  'Don't Know' exists only on =s5q6= (639 rows)
+  and is served NA.
+- =housing=: categorical, GhanaLSS-shaped plus =Type=.  =Electricity= is
+  the FIRST entry of a multi-response list (=s7dq10a=), where GLSS7 served
+  the most-used source; =Roof= / =Floor= go through the GhanaLSS-identical
+  =Roof= / =Floor= tables so the two Ghana series agree.
+
+* 2022 folder (wired 2026-09-17)
+
+Same five tables and the same scripts as 2024, with the 2022 file names
+(=2022 AHIES Q1-Q4_Rev_20250827.dta=, 209,943 x 838; =2022 AHIES
+Q1-Q4_SEC567_edt.dta=, 42,120 x 167) and the differences below.  Quarter
+labels ship as =2022Q1= .. =2022Q4=; =qtr= runs 1-4; =hhid= is six digits
+throughout (=qtr= + 3-digit cluster + 2-digit household -- verified on all
+41,919 keyed SEC567 rows).  Person rows 52,914 / 53,617 / 53,130 / 50,282;
+households 10,761 / 10,628 / 10,422 / 10,309; 600 clusters in every quarter;
+0 nulls / 0 duplicates on =(cluster, HholdID, quarter, new_pid)=.  Value-
+label sets of every variable the scripts read are identical to 2024's
+(relationship, sex, education level, region, locality, all housing and FIES
+items).
+
+** The person file: 319 of 838 columns are empty, =s1aq2x= among them
+
+The three years share one 838-column layout, but the 2022 file populates
+only 519 of them: 319 columns (38%) are 100% null -- =s1aq2x=, =s1aq5x=,
+=s2aq2=, =s2aq10_22=, most of =s4hq1*=, ... -- presumably questions or
+derived variables added in later rounds.  Every read of the file therefore
+fires the library's Site R guard verbatim:
+
+: NullReadWarning: GhanaAHIES/2022: read of ../Data/2022 AHIES Q1-Q4_Rev_20250827.dta
+: returned 209,943 row(s) x 838 column(s) but 319 of those columns (38%) are 100% NULL:
+: ['s1aq2x', 's1aq5x', 's2aq2', 's2aq10_22', 's4aq6o', 's4bq16d', 's4bq16e', 's4hq1aa',
+: 's4hq1ab', 's4hq1ac', 's4hq1ad', 's4hq1ae'] (+307 more). ...
+
+This is a property of the file, not a mis-parse: every column the three
+person-file scripts read is populated and the counts match the inventory
+exactly.  The warning is expected on every read of the 2022 person file
+(four in the verification run below: =sample= twice -- once for the 2022-
+restricted call, once when the v-join's unrestricted =sample()= rebuilt the
+all-wave union -- then =household_roster= and =individual_education=) and
+is deliberately not silenced.  Two other warnings accompany every read of a
+person file, 2022 and 2024 alike, from the reader in =ligonlibrary=:
+=RuntimeWarning: Issue with categorical mapping: s3bq3= and the same for
+=s3bq4= (two Section 3B columns whose value labels do not apply cleanly;
+neither is read by any script), and the =UnicodeWarning= latin-1 fallback
+noted under s"Household roster".
+
+*Consequence -- Relationship is the raw =s1aq2= in 2022.*  With =s1aq2x=
+empty, 2022 reads =s1aq2=, and measured on 2022 the raw code is already
+clean: 0 null codes, exactly one 'Head' in 41,922 of 42,120 household-
+quarters, 198 headless, 0 double-headed, and *no code 17 at all* (0 rows in
+every quarter on both columns; 2024 has 52, all in 2024Q1; 2023 has not
+been measured).  So the served roster
+equals the person file, row for row; the code-17 filter is kept and prints
+0.  The 2022 scripts =assert df['s1aq2x'].isna().all()= so that a GSS
+re-release which populates the corrected column fails loudly rather than
+silently serving the raw one.  The 198 headless household-quarters are
+recorded, not repaired (2024 has 315).
+
+Other person-file facts: =s1aq4y= never null, 0-120; =s1aq4m= filled on
+23,129 rows, of which 11 carry the '98' don't-know code (ignored by the
+0-11 gate); =s2aq1= null on 15,932 rows (mean age 1.07 -- under-threes,
+served NA and dropped by =dropna(how='all')=); the 2024 education residues
+are absent (no unlabelled =0.0= in =s2aq3=, 0 attended-but-level-missing),
+so 'Unknown' arises only from 'Other specify'.
+
+** Weights: the person file's =hh_weight=, and what the SEC567 weight columns are
+
+=sample= takes =hh_weight= from the person file as in every year; it is
+constant within a household-quarter (0 disagreements), region and =urbrur=
+are constant within a cluster (0 disagreements), 32 strata.  Raw means at
+HOUSEHOLD grain (the parquet): 776.7 / 786.4 / 803.2 / 852.1 for Q1-Q4; at
+PERSON grain (=README.org=): 720.7 / 728.9 / 743.6 / 789.2.  Sums:
+8,357,576 / 8,357,576 / 8,370,445 / 8,784,610 households -- Q1 and Q2 sum
+to the same total to the household, and Q4 is 5% above the 2021 PHC's
+8.35 M; the Q4 weights are the ones GSS re-issued (next paragraph).  API
+means are 1.0 per quarter after the within-wave normalisation.
+
+The 2022 =SEC567_edt= file carries six weight columns absent from the 2023
+and 2024 files: =WTPP1_Q4_20032023=, =WTPP2_Q4_08042023=,
+=WTPP3_Q4_14042023=, =WTPP4_Q4_18052023=, =WTHH_1=, =WTHH_2=.  All six are
+populated for *2022Q4 only* (10,112 rows; null in Q1-Q3).  Joined to the
+person file on =(cluster, HholdID, quarter)=:
+
+| column            | ratio to person-file =hh_weight= (min / median / max) | reading                                 |
+|-------------------+-------------------------------------------------------+-----------------------------------------|
+| =WTHH_2=          | 1.0000 / 1.0000 / 1.0000 (equal to 1e-6 on all 10,112) | THE SAME NUMBERS as =hh_weight=          |
+| =WTHH_1=          | 0.885 / 0.976 / 1.046                                 | an earlier household-weight calibration |
+| =WTPP1..4_Q4_*=   | 0.061 / 0.73-0.78 / 2.9                               | four dated (20 Mar - 18 May 2023) iterations of a Q4 weight, ~0.77x of the final |
+
+So the Q4 weight in the person file is =WTHH_2=; the dated column names
+indicate four Q4 iterations between 20 Mar and 18 May 2023, all left in
+the household file, and =WTHH_1= a further intermediate.  Not used:
+they cover one quarter, and the final one is already what =sample= serves.
+Also 2022-only in this file: =hhsize= (populated for 2022Q1 only, 10,760
+rows, equal to the person-file member count on 10,759 of them) and
+=q1room= .. =q3room2= (unlabelled).
+
+** SEC567 shells: 201, dropped
+
+201 rows have a null =HholdID= (and null =qtr=, =hhsize=, =loctype=):
+1 / 2 / 1 / 197 per quarter -- almost all in 2022Q4.  Their =hhid= and
+=cluster= are filled and decompose consistently, so the key COULD be
+recovered uniquely (0 duplicates after recovery); but they carry no
+Section 5-7 content at all -- the only non-null =s5*= / =s7*= cells are
+empty strings in the three free-text columns =s7dq14=, =s7dq17=, =s7dq22=
+-- and they are exactly the 201 household-quarters present in the person
+file but not in the keyed part of this file (outer join: 41,919 both, 201
+person-only, 0 SEC567-only).  Same decision as 2024's 332: dropped with a
+count, nothing to serve.  =food_security= and =housing= therefore hold
+10,760 / 10,626 / 10,421 / 10,112 rows.  "Don't Know" on =s5q6=: 618 rows.
+
+** Verification (worker agent, 2026-09-17; =Country('GhanaAHIES')=, waves restricted to 2022)
+
+Cold builds in a private =LSMS_DATA_DIR=, =LSMS_BUILD_WORKERS=1=, package
+identity asserted, every call =waves=['2022Q1'..'2022Q4']=:
+
+| table                       | rows per t (2022Q1..Q4)              | notes                                                                                                  |
+|-----------------------------+--------------------------------------+--------------------------------------------------------------------------------------------------------|
+| =sample=                    | 10,761 / 10,628 / 10,422 / 10,309    | = inventory; 600 =v= per quarter; API weight and panel_weight mean 1.0 per t; raw parquet 776.7 / 786.4 / 803.2 / 852.1 (household grain); 32 strata, 0 nulls.  51 s |
+| =household_roster=          | 52,914 / 53,617 / 53,130 / 50,282    | = the person file (0 code-17 rows); Sex {F 109,645, M 100,298}; Age 0 nulls, 0-120; every label expanded, Generation/Distance null only on 'Other relative' (8,096); no kinship warning.  100 s |
+| =household_characteristics= | 10,761 / 10,628 / 10,422 / 10,309    | derives; (t, v, i), 15 columns                                                                          |
+| =individual_education=      | 48,788 / 49,241 / 49,231 / 46,751    | 194,011 = 209,943 - 15,932 under-threes; 14 canonical labels, 161 'Unknown' (all 'Other specify').  25 s |
+| =food_security=             | 10,760 / 10,349 / 10,421 / 10,088    | wave parquet 10,760 / 10,626 / 10,421 / 10,112; the framework's =dropna(how='all')= then removes 301 keyed rows (277 in Q2, 24 in Q4) whose eight FIES items are ALL null -- household-quarters interviewed for Section 7 but not Section 5 (2024 has none).  RanOut NA 620; FIES_score 0-8, 0 nulls.  6 s |
+| =housing=                   | 10,760 / 10,626 / 10,420 / 10,112    | one all-null row (=2022Q3=, =i='192-15'=) dropped the same way; Roof/Floor canonical (Iron Sheets 36,712, Concrete 34,596); NA only where the source is NA (Rooms 376, Water 410, Toilet 408).  6 s |
+
+Warnings during the run: the =NullReadWarning= quoted above (four
+times, see there), the =s3bq3= / =s3bq4= =RuntimeWarning= and the
+=UnicodeWarning= on each person-file read, and nothing else -- no
+=GrainCollapseWarning=, no =NullIndexKeyWarning=, no unknown-kinship
+warning.  (=ResourceWarning: unclosed file= from =_build_registry.py:460=
+appears under =simplefilter('always')=; a library matter, not this
+country's.)  =tests/test_schema_consistency.py -k GhanaAHIES= passes;
+=find lsms_library/countries -name '*.parquet'= is empty.
+
+Cache note for whoever builds a single year: =_join_v_from_sample= calls
+=self.sample()= with no =waves=, so the first read of any household table
+restricted to 2022 still builds =sample= for every wired folder (2024's
+2.4 GB blob was pulled and its sample built in the 2022 worker's private
+cache).  Not a defect of the scripts; budget the blob pull.
+* The 2023 folder (wired 2026-09-17)
+
+Sources: =2023 AHIES Q1-Q4_Rev_20250827.dta= (196,953 x 838; the SAME
+838-column layout and order as 2024) and =2023 AHIES Q1-Q4_SEC567_edt.dta=
+(39,631 x 132).  Quarter labels ship as exactly =2023Q1= .. =2023Q4=
+(=qtr= 5-8); every 2023 script asserts that set, because =Wave.grab_data=
+filters on =t == self.year= and a respelt label would serve zero rows
+silently.  Per-quarter counts (person file / households / SEC567 rows):
+50,039 / 10,131 / 9,915; 47,713 / 10,113 / 9,862; 48,460 / 10,085 /
+10,027; 50,741 / 9,924 / 9,827.  600 clusters in every quarter; 0 nulls,
+0 duplicates on =(cluster, HholdID, quarter, new_pid)=; region, urbrur and
+=hh_weight= constant within a household-quarter (0 disagreements).
+Variable dumps (name, Stata type, label; =pyreadstat= metadata-only read
+with =encoding='latin1'=): =2023/Documentation/ahies2023_person_vars.tsv=
+and =ahies2023_sec567_vars.tsv=, the 2023 twins of
+=slurm_logs/ghana_ahies/ahies2024_*_vars.tsv= (kept out of =2023/_/= because
+=.tsv= is a build-input suffix and would enter every table's hash).
+
+** SEC567 column differences from 2024
+The 2023 file lacks 15 of 2024's 147 columns and has none of its own:
+=qtr=; the respondent-occupation block =s6q0b=, =s6q8d1-3=, =s6q8e1-4=,
+=s6q8f=, =s6q8f1=, =s6q8g= (so one =s6q*= column survives, =s6q7=); and the
+three weight columns =hhwt_q9=, =wtpp_q10=, =hhwt_q10=.  None is used by
+=food_security= or =housing=, whose scripts are otherwise the 2024 ones.
+*There are NO null-=HholdID= non-response shells* (2024 had 332); the
+shell drop in both scripts removes 0 rows.  The 216 / 251 / 58 / 97
+household-quarters in the person file but not in SEC567 were simply not
+interviewed for Sections 5-7 (0 SEC567 households are missing from the
+person file).  72 household-quarters answered Section 7A but carry NA on
+the three material questions (2024: 3) and 71-164 on the utilities; served
+as NA, not dropped.  Every label of every Section 5 / 7 variable used is in
+the 2024 vocabulary (same stray whitespace and =?s= defects); "Don't Know"
+on =s5q6= 599 rows.
+
+** Relationship: =s1aq2x= is unfilled in 2023Q1 -- per-quarter source
+Contrary to 2024, =s1aq2x= cannot be read throughout.  Class of =s1aq2x=
+by quarter (label / null / unlabelled numeric 0.0):
+
+| quarter | label  |   null | 0.0    | one head (s1aq2x) | one head (s1aq2) |
+|---------+--------+--------+--------+-------------------+------------------|
+| 2023Q1  |  8,248 | 31,779 | 10,012 |    1,583 / 10,131 |   9,915 / 10,131 |
+| 2023Q2  | 47,713 |      0 |      0 |            10,044 |            9,862 |
+| 2023Q3  | 48,460 |      0 |      0 |            10,024 |           10,024 |
+| 2023Q4  | 50,735 |      6 |      0 |             9,825 |   9,661 (+2 double, 3,205 null) |
+
+The Q1 fill is by household (8,316 household-quarters wholly unfilled,
+329 mixed, 31,608 wholly filled -- the latter almost all Q2-Q4).  Decision
+(worker, 2026-09-17): *2023Q1 reads =s1aq2=; 2023Q2-Q4 read =s1aq2x=* --
+a per-wave choice of source column, no row-wise composite.  A row-wise
+coalesce (=s1aq2x= where labelled, else =s1aq2=) was measured and rejected:
+it yields 9,950 one-head / 177 headless / *4 double-headed* Q1 households,
+because the partial fill inside the 329 mixed households re-assigns
+headship for some members only.  Cost of the rule: 168 Q1 rows where a
+filled =s1aq2x= disagrees with =s1aq2= are served as =s1aq2= says.  Where
+both columns are labelled (151,957 rows) they disagree on 5,058 (Q4 3,223,
+Q2 1,667, Q1 168), the largest pairs being Child -> Not member anymore
+(625), Grandchild <-> Child (403 + 317), Spouse -> Head (336).  Served
+heads per household-quarter: 9,915 / 10,044 / 10,024 / 9,825 with one head;
+216 / 69 / 61 / 99 headless; 0 double-headed; 6 null codes (Q4).
+=individual_education= carries an identical copy of the rule.
+
+** Code 17 in 2023
+'Not member anymore' rows dropped: 0 / 17 / 11 / *1,382* for Q1-Q4 (1,410;
+2024 had 52).  The Q4 block is an end-of-year clean-up: those 1,382 rows
+are ordinary members in =s1aq2= (which has code 17 on 11 rows, all Q3) and
+the person file shrinks from 50,741 rows in 2023Q4 to 47,963 in 2024Q1.
+Served =household_roster=: 50,039 / 47,696 / 48,449 / 49,359 rows.
+
+** The 2023Q3 =hh_weight=: a uniform factor of exactly two, recorded not corrected
+Measured on the person file (household grain = one row per
+=(cluster, HholdID, quarter)=; person grain = every row):
+
+| quarter | hh-quarters | hh_weight mean (hh) | (person) | sum hh_weight | pop_weight mean | sum pop_weight |
+|---------+-------------+---------------------+----------+---------------+-----------------+----------------|
+| 2023Q1  |      10,131 |               868.6 |    803.6 |     8,800,195 |           618.5 |     30,946,814 |
+| 2023Q2  |      10,113 |               874.2 |    809.9 |     8,840,925 |           648.4 |     30,934,756 |
+| 2023Q3  |      10,085 |               433.9 |    402.3 |     4,375,806 |           635.6 |     30,802,116 |
+| 2023Q4  |       9,924 |               882.7 |    813.9 |     8,760,327 |           614.5 |     31,181,284 |
+
+- Q3's sum is 49.5% of Q2's (2021 PHC: 8.35 M households; 2024 sums
+  ~8.2 M; 2023's non-Q3 quarters sum to 8.76-8.84 M, ABOVE the census).
+- It is uniform: the per-household ratio Q3/Q2 is 0.4986 +- 0.0022 over
+  10,026 households present in both (min 0.495, max 0.503; Q2/Q1 is
+  1.006 +- 0.009, Q4/Q3 is 2.03 +- 0.06); the ratio of quarter means is
+  0.495-0.504 in every one of the 16 regions and 0.495 urban / 0.498
+  rural.  Not concentrated anywhere.
+- =pop_weight= is NOT halved (per-person Q3/Q2 0.98 +- 0.02; sums
+  30.8-31.2 M in all four quarters), so =pop_weight / hh_weight= jumps
+  from ~0.78 to 1.59 in Q3.
+- Q3 has an ordinary number of household-quarters (10,085) and 0 null,
+  0 zero weights: not missing households, not a subset at zero.
+- At the API =sample()= shows mean 1.0 in every quarter (within-wave
+  normalisation), so weighted means, ratios and shares are unaffected and
+  the defect is invisible; anyone pooling RAW weights across quarters
+  (the wave parquet, or =pd.read_parquet= on the cache) must know.
+  Nothing is rescaled, dropped or imputed: whether to double Q3 is a
+  country decision for the human, and GSS has been asked.
+
+** Otherwise as 2024
+Sex 'Male'/'Female' (0 nulls); =s1aq4y= 0-116, never null; =s1aq4m=
+filled only under five.  Kinship vocabulary identical to 2024 (no new
+=kinship.yml= label).  Education: the 2024 label set; residues 81
+unlabelled 0.0 in =s2aq3= and 351 attended-but-level-missing -> 'Unknown'
+(625 served); 12,701 =s2aq1= nulls (mean age 1.2; 65 aged 3+) served NA
+and dropped.  Served =individual_education=: 46,379 / 44,949 / 45,330 /
+46,253.  Build: no GrainCollapseWarning, NullIndexKeyWarning,
+WeightNormalisationWarning or unknown-kinship warning; 5 schema tests pass.
+
+* Access and provenance
+
+GSS's NADA validates an API key but gates only metadata; every DOWNLOAD
+is anonymous and =api/resources= is refused even to a keyed user, so the
+library's WB-style =add_wave()= path cannot be used (=README.org= s
+"Access, measured").  The six files were fetched by resource id and
+placed in each folder's =Data/=; the instruments were emailed by GSS.
+=discover_waves('GhanaAHIES')= is non-discoverable for now; a World Bank
+mirror has not been checked (no WB key in that session).
+
+* LOGBOOK
+
+- 2026-09-17 :: Country created; access measured; six files inventoried;
+  quarter grain and id construction decided (EL).  2024 folder wired with
+  five tables (worker agent), then =cluster_features=, =people_last7days=,
+  =anthropometry= (worker agent, same day: the Section 4A first-yes cascade,
+  the negative not-measured codes and the =s4aq2= days-not-hours label
+  found and recorded above).
+- 2026-09-17 :: =2022/= wired with the same five tables (worker agent, branch
+  =feat/ghanaahies-2022=): =s1aq2x= empty in 2022 -> Relationship from
+  =s1aq2=; 201 SEC567 shells; SEC567 weight columns are 2022Q4-only and
+  =WTHH_2= equals the person file's =hh_weight=; Section 10 screens + 11B
+  amounts present for 2022Q1-Q3.  See s"2022 folder".
+- 2026-09-17 :: =2023/= wired with the same five tables (worker agent,
+  branch =feat/ghanaahies-2023=).  Findings: =s1aq2x= unfilled in 2023Q1
+  (per-quarter source rule); 1,382 code-17 rows in 2023Q4; the Q3
+  =hh_weight= halving measured as a uniform factor of two on =hh_weight=
+  alone.  See "The 2023 folder".
+- WAITING @ligon: the 2023Q3 =hh_weight= factor of two -- double it in the
+  wave script (with a note) or serve as shipped?  Recorded, not corrected,
+  until decided.
+- TODO =cluster_features=, =people_last7days=, =anthropometry= for the
+  =2022/= and =2023/= folders (clone the 2024 scripts; re-check the Section
+  4A cascade and the anthropometric codes per year).
+- WAITING Sections 8-13 from GSS (consumption, expenditure, transfers,
+  income, assets, enterprises).  Until then every consumption cell is
+  =asked-not-distributed=.
+- TODO =population.yml= entry (the study documentation states the
+  universe; edit the evidence base and re-promote rather than the yml).
+- TODO Raise the 2023Q3 =hh_weight= half-scale with GSS (measured: uniform
+  x0.4986 on =hh_weight=, =pop_weight= unaffected), and decide whether the
+  library should double it, serve it raw (current), or wait for a
+  re-issue.

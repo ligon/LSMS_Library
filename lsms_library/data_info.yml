@@ -1182,6 +1182,7 @@ Currency:
       '1998-99': GHC
       '2005-06': GHC
   GhanaSPS: GHS                     # waves 2009-10/2013-14/2017-18, all post-reform
+  GhanaAHIES: GHS                   # 2022Q1-2024Q4, all post-reform
   Guatemala: GTQ
   Guinea-Bissau: XOF
   Guyana: GYD
