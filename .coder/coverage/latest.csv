@@ -677,27 +677,27 @@ EthiopiaRHS,sample,2009,sane,declared,1357,warn: no_constant_columns
 EthiopiaRHS,shocks,,undeclared,absent,,not declared by this country for any wave
 EthiopiaRHS,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 EthiopiaRHS,updated_ids,,absent,absent,,empty / no entries
-GhanaAHIES,anthropometry,2022Q1,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2022Q2,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2022Q3,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2022Q4,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2023Q1,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2023Q2,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2023Q3,absent,absent,,source not declared for wave
-GhanaAHIES,anthropometry,2023Q4,absent,absent,,source not declared for wave
+GhanaAHIES,anthropometry,2022Q1,sane,declared,49302,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2022Q2,sane,declared,49944,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2022Q3,sane,declared,52557,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2022Q4,sane,declared,50132,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2023Q1,sane,declared,50039,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2023Q2,sane,declared,47615,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2023Q3,sane,declared,48342,warn: index_levels_match_scheme
+GhanaAHIES,anthropometry,2023Q4,sane,declared,49230,warn: index_levels_match_scheme
 GhanaAHIES,anthropometry,2024Q1,sane,declared,45703,warn: index_levels_match_scheme
 GhanaAHIES,anthropometry,2024Q2,sane,declared,47238,warn: index_levels_match_scheme
 GhanaAHIES,anthropometry,2024Q3,sane,declared,46384,warn: index_levels_match_scheme
 GhanaAHIES,anthropometry,2024Q4,sane,declared,46915,warn: index_levels_match_scheme
 GhanaAHIES,assets,,asked-not-distributed,absent,,"asked-not-distributed: AHIES questionnaire (Final, 22-11-2021) and Field Officers' Manual, emailed by GSS 2026-09-17 (GhanaAHIES/_/AHIES_INSTRUMENTS.zip; 13 sections: 1 demographics/migration, 2 education, 3 health, 4 economic activity, 5 FIES, 6 respondent ids, 7 housing, 8 own-produce consumption, 9 household expenditure, 10 transfers, 11 misc income/expenditure, 12 assets/durables, 13 non-farm enterprises). Section 12 (assets and durable consumer goods) is asked; no s12* column in any distributed file. Distributed files (GSS NADA entry 128, DDI v2.1 study doc, six files): person x quarter Sections 1-4 (838 cols) and household x quarter SEC567 (Sections 5-7); see slurm_logs/ghana_ahies/README.org and CONTENTS.org."
-GhanaAHIES,cluster_features,2022Q1,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2022Q2,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2022Q3,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2022Q4,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2023Q1,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2023Q2,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2023Q3,absent,absent,,source not declared for wave
-GhanaAHIES,cluster_features,2023Q4,absent,absent,,source not declared for wave
+GhanaAHIES,cluster_features,2022Q1,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2022Q2,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2022Q3,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2022Q4,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2023Q1,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2023Q2,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2023Q3,sane,declared,600,warn: has_household_index
+GhanaAHIES,cluster_features,2023Q4,sane,declared,600,warn: has_household_index
 GhanaAHIES,cluster_features,2024Q1,sane,declared,600,warn: has_household_index
 GhanaAHIES,cluster_features,2024Q2,sane,declared,600,warn: has_household_index
 GhanaAHIES,cluster_features,2024Q3,sane,declared,600,warn: has_household_index
@@ -772,14 +772,14 @@ GhanaAHIES,livestock,,not-asked,absent,,"not-asked: AHIES questionnaire (Final, 
 GhanaAHIES,months_food_inadequate,,not-asked,absent,,"not-asked: AHIES questionnaire (Final, 22-11-2021) and Field Officers' Manual, emailed by GSS 2026-09-17 (GhanaAHIES/_/AHIES_INSTRUMENTS.zip; 13 sections: 1 demographics/migration, 2 education, 3 health, 4 economic activity, 5 FIES, 6 respondent ids, 7 housing, 8 own-produce consumption, 9 household expenditure, 10 transfers, 11 misc income/expenditure, 12 assets/durables, 13 non-farm enterprises). Section 5 is the FAO 8-item FIES (12-month recall) only; no months-of-adequate-food (MAHFP) item: 0 occurrences of 'inadequate', 'enough food' or a months-of-food grid in the questionnaire."
 GhanaAHIES,nonfood_expenditures,,asked-not-distributed,absent,,"asked-not-distributed: AHIES questionnaire (Final, 22-11-2021) and Field Officers' Manual, emailed by GSS 2026-09-17 (GhanaAHIES/_/AHIES_INSTRUMENTS.zip; 13 sections: 1 demographics/migration, 2 education, 3 health, 4 economic activity, 5 FIES, 6 respondent ids, 7 housing, 8 own-produce consumption, 9 household expenditure, 10 transfers, 11 misc income/expenditure, 12 assets/durables, 13 non-farm enterprises). Section 9A (less frequently purchased items) and 11B (miscellaneous expenditure) are asked; only the eleven 11B amounts s11bq1-11 appear, in the 2022 SEC567 file for 2022Q1-Q3 -- no Section 9 columns in any file. Distributed files (GSS NADA entry 128, DDI v2.1 study doc, six files): person x quarter Sections 1-4 (838 cols) and household x quarter SEC567 (Sections 5-7); see slurm_logs/ghana_ahies/README.org and CONTENTS.org."
 GhanaAHIES,nutrition,,asked-not-distributed,absent,,"asked-not-distributed: nutrition is nutrient intake derived from food_acquired (CLAUDE.md, GhanaLSS/_/nutrition.py); its source Sections 8-9 are asked-not-distributed (see food_acquired). Distributed files (GSS NADA entry 128, DDI v2.1 study doc, six files): person x quarter Sections 1-4 (838 cols) and household x quarter SEC567 (Sections 5-7); see slurm_logs/ghana_ahies/README.org and CONTENTS.org."
-GhanaAHIES,people_last7days,2022Q1,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2022Q2,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2022Q3,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2022Q4,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2023Q1,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2023Q2,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2023Q3,absent,absent,,source not declared for wave
-GhanaAHIES,people_last7days,2023Q4,absent,absent,,source not declared for wave
+GhanaAHIES,people_last7days,2022Q1,sane,declared,52914,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2022Q2,sane,declared,53617,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2022Q3,sane,declared,53130,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2022Q4,sane,declared,50282,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2023Q1,sane,declared,50039,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2023Q2,sane,declared,47696,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2023Q3,sane,declared,48449,warn: index_levels_match_scheme
+GhanaAHIES,people_last7days,2023Q4,sane,declared,49359,warn: index_levels_match_scheme
 GhanaAHIES,people_last7days,2024Q1,sane,declared,47911,warn: index_levels_match_scheme
 GhanaAHIES,people_last7days,2024Q2,sane,declared,47238,warn: index_levels_match_scheme
 GhanaAHIES,people_last7days,2024Q3,sane,declared,46384,warn: index_levels_match_scheme

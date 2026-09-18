@@ -235,7 +235,7 @@ _SERIES_CAPABILITY: dict[tuple[str, str], SeriesCapability] = {
         country="GhanaAHIES", series="AHIES",
         provides=("household_roster", "household_characteristics",
                   "individual_education", "food_security", "housing",
-                  "people_last7days"),
+                  "people_last7days", "anthropometry", "cluster_features"),
         lacks=("crop_production", "plot_features", "plot_inputs",
                "plot_labor", "livestock", "shocks"),
         validation=QUESTIONNAIRE_VALIDATED,

@@ -43,16 +43,17 @@ Data Scheme:
 
   cluster_features:
     # Person file design variables, built DIRECTLY at the (t, v) cluster
-    # grain: region / regdist / urbrur are asserted constant within every
-    # (cluster, quarter) group (0 disagreements in 2024, and constant across
-    # quarters) and the person rows are de-duplicated to one per cluster-
-    # quarter -- a checked de-dup, not an aggregation, with no `i` in the
-    # frame for the framework's household-to-cluster projection (GH #323
-    # Site 2) to collapse.  600 clusters in every quarter.  District =
-    # regdist value label (2021 PHC district / municipal / metropolitan area
-    # name; 247 in 2024, each in one region; raw labels carry leading blanks,
-    # stripped).  NO GPS is shipped in any AHIES file, so no Latitude /
-    # Longitude.
+    # grain: region / regdist / urbrur are ASSERTED constant within every
+    # (cluster, quarter) group (0 disagreements in all twelve quarters, and
+    # constant across the quarters of each year) and the person rows are
+    # de-duplicated to one per cluster-quarter -- a checked de-dup, not an
+    # aggregation, with no `i` in the frame for the framework's household-to-
+    # cluster projection (GH #323 Site 2) to collapse.  600 clusters in every
+    # quarter of every year (measured per year, not asserted at a constant).
+    # District = regdist value label (2021 PHC district / municipal /
+    # metropolitan area name; 247 in every year, each in one region; raw
+    # labels carry leading blanks, stripped).  NO GPS is shipped in any AHIES
+    # file, so no Latitude / Longitude.
     index: (t, v)
     Region: str
     District: str
@@ -60,12 +61,15 @@ Data Scheme:
     materialize: make
 
   household_roster:
-    # Person file Section 1.  Relationship = `s1aq2x` (GSS's corrected
-    # relationship code -- exactly one head per household-quarter, where the
-    # raw `s1aq2` has 31 double-headed and 1,423 headless household-quarters).
-    # Code 17 `Not member anymore` (a CAPI code absent from the paper
-    # instrument) marks a departed panel member and is DROPPED with a count
-    # (52 rows in 2024); see CONTENTS.org.  No residence-duration variable
+    # Person file Section 1.  Relationship comes from GSS's corrected code
+    # `s1aq2x` WHERE THAT COLUMN IS FILLED and from the raw `s1aq2` where it
+    # is not: the source is chosen PER QUARTER (2022Q1-Q4 and 2023Q1 read
+    # `s1aq2`, everything else `s1aq2x` -- `s1aq2x` is 100% null in the 2022
+    # file and 83.5% unfilled in 2023Q1).  The table is
+    # `ghanaahies.RELATIONSHIP_SOURCE`; see CONTENTS.org for the measurement
+    # behind each entry.  Code 17 `Not member anymore` (a CAPI code absent
+    # from the paper instrument) marks a departed panel member and is DROPPED
+    # with a count -- 0 rows in 2022, 1,410 in 2023, 52 in 2024.  No residence-duration variable
     # exists (no MonthsSpent/MonthsAway).
     index: (t, i, pid)
     Sex: str
@@ -98,12 +102,16 @@ Data Scheme:
     # the module's own eligibility threshold (the corpus convention: EHCVM
     # 6, Malawi 5), not the ILO 15.
     #
-    # THE MODULE IS A FIRST-YES CASCADE: the CAPI asks wage, domestic, farm,
-    # non-farm, family help, fishing / gathering, apprentice, voluntary IN
-    # THAT ORDER and skips the rest once one is Yes, so farm_work is NA for
-    # every wage worker and SOB_work for everyone with an earlier Yes.  NA
-    # is served as NA (nullable bool), never as False; compute shares on the
-    # answered rows.  The five unserved forms and the GSS-derived dummies
+    # NA IS NOT FALSE.  An unasked question is served as NA (nullable bool),
+    # never as False, in every year; compute shares on the answered rows.
+    # WHY a question is unasked differs by year: in 2022 and 2024 the module
+    # is a strict FIRST-YES CASCADE (the CAPI asks wage, domestic, farm,
+    # non-farm, family help, fishing / gathering, apprentice, voluntary in
+    # that order and skips the rest once one is Yes, so farm_work is NA for a
+    # wage worker), but 2023 asked later questions after an earlier Yes on
+    # thousands of rows and is NOT a cascade -- there an NA is simply
+    # unanswered.  Every build re-measures the identity and prints it; the
+    # per-year residuals are in CONTENTS.org.  The five unserved forms and the GSS-derived dummies
     # (`worked`, `wagework`, ..., cross-checked, not served) are documented
     # in the wave script and CONTENTS.org.
     index: (t, i, pid)
@@ -123,14 +131,21 @@ Data Scheme:
     # measures only, one row per measured individual.  Weight = s3bq3 (kg);
     # Height = s3bq4 (cm, standing or lying per s3bq5 -- the mode is not
     # served, as in the precedents); Age_months = 12 * s1aq4y + s1aq4m
-    # (months filled for ages 0-4 only).  The questionnaire's "not measured"
-    # code (999 on paper) is spelled NEGATIVELY in the CAPI file (height -99,
-    # weight -99.94) and, with 575 other repeated negative weights, is
-    # decoded to NA and counted in the build log -- decoding, not screening.
-    # In-domain implausibles (weight exactly 99.0 x1,875 at all ages, 35.35
-    # x1,642, heights above 220 cm x3,861) are served as recorded and
-    # reported in CONTENTS.org.  No MUAC is measured; GSS's `BMI` column is
-    # 100% null in 2024, so it cannot cross-check this table.
+    # (months filled for ages 0-4 only).  A NEGATIVE value is not a
+    # measurement and is decoded to NA, counted per distinct value in the
+    # build log -- decoding, not screening.  THE NOT-MEASURED SPELLING IS
+    # YEAR- AND QUARTER-SPECIFIC: negative in 2024Q1 and 2023Q4 (the
+    # questionnaire's paper code is 999), plain missingness in 2022Q1-Q2, and
+    # POSITIVE elsewhere (3,529 weights of exactly 0 in 2022Q3, 10,994
+    # heights of ~3e-06 in 2023Q4, 6,275 heights of exactly 99).  The
+    # positive spellings are NOT decoded -- separating them from a real
+    # measurement needs a threshold, and a threshold is screening -- but they
+    # are counted per quarter and recorded in CONTENTS.org (WAITING @ligon).
+    # Other in-domain implausibles (weight exactly 99.0, 35.35, heights above
+    # 220 cm) are likewise served as recorded.  No MUAC is measured.  GSS's
+    # `BMI` column is 100% null in 2023 and 2024 but populated on 110,139
+    # rows in 2022, where it confirms the served Weight/Height to within 1%
+    # on 97.6% of rows -- the cross-check a 2024-only build could not do.
     index: (t, i, pid)
     Weight: float
     Height: float
