@@ -23,10 +23,26 @@ format_id(clust)+format_id(nh, zeropadding=2), NO separator) so the keys
 match and the framework's _join_v_from_sample() finds them.  `v` is NOT
 emitted -- the framework joins it at API time.
 """
+import sys
 from lsms_library.local_tools import to_parquet, get_dataframe, df_from_orgfile, format_id
 from lsms_library.paths import countries_root
 import numpy as np
 import pandas as pd
+
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern -- 1987-88 and 1988-89 do the same).  Deliberately not
+# `from lsms_library.countries.GhanaLSS._.ghanalss import ...`: that is an
+# absolute PACKAGE import, so it binds to whichever `lsms_library` happens to
+# be imported rather than to the config tree `LSMS_COUNTRIES_ROOT` selects --
+# Trap 6's disease, which would silently verify a future change to
+# `reduce_duplicate_food_rows` against the installed package's copy.  It also
+# resolves only through PEP 420 namespace packages (there is no `__init__.py`
+# under `countries/` or `GhanaLSS/_/`) and cannot survive a zipped import.
+# `../../_` is correct from this script's own directory, which is where the
+# Makefile runs it (`cd $(@D) && python food_acquired.py`) and which every
+# `../Data/...` read in this file already assumes.
+sys.path.append('../../_')
+from ghanalss import reduce_duplicate_food_rows
 
 t = '1998-99'
 
@@ -129,7 +145,6 @@ prod_long = prod_long.dropna(subset=['Quantity'])
 # `dropna=False` and would carry them through to a delivered `u` of 'nan'.
 # Deleting them here is not a fix -- a sentinel like Niger's 'Unknown' (#842)
 # is the country decision, and it is out of #936's scope.  See CONTENTS.org.
-from lsms_library.countries.GhanaLSS._.ghanalss import reduce_duplicate_food_rows
 prod_long = prod_long.dropna(subset=['u'])
 prod_long = reduce_duplicate_food_rows(prod_long, ['i', 'j', 'u', 'visit'])
 assert not prod_long.duplicated(['i', 'j', 'u', 'visit']).any(), (
