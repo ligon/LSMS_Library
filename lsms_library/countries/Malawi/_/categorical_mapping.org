@@ -428,6 +428,8 @@
 | 79 | Other (Specify) |  |
 | 99 | Other (Specify) |  |
 | 500 | Other (Specify) |  |
+| Kilogram | Kilogramme |  |
+| Kkilogram | Kilogramme |  |
 
 #+name: district
 | Alternate Spelling     | Preferred Label |
