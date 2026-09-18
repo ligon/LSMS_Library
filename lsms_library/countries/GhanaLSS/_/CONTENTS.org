@@ -3084,6 +3084,23 @@ including wave-table precedence and country-table fallback.  All eight
 cases failed against the package-relative paths before the fix.  No survey
 code or label has changed; the override now selects the intended tables.
 
+/Trap 6's twin, resolved 2026-09-18 (GH #948)./  The same disease from the
+other side: seven wave =food_acquired.py= scripts reached the country module
+through =from lsms_library.countries.GhanaLSS._.ghanalss import ...= (11
+sites), an absolute PACKAGE import.  It binds to whichever =lsms_library= won
+=sys.path= -- with only =LSMS_COUNTRIES_ROOT= set it resolved to
+=/global/scratch/.../mirrors/LSMS_Library/.../ghanalss.py= while every
+=../Data/*.dta= read in the same script came from the worktree.  GhanaLSS was
+the ONLY country doing this corpus-wide.  All 11 now use the house pattern,
+=sys.path.append('../../_')= + =from ghanalss import ...=, at the top of the
+file; the dead =sys.path.append('../../../_/')= at =2012-13/_/food_acquired.py=
+(it resolves to =countries/_=, which has no =ghanalss.py=) was deleted in the
+same pass.  Verified a no-op: all seven wave parquets and the country-level
+=food_acquired= (5,340,606 rows) are byte-identical before and after.  Note
+the import only ever worked through PEP 420 namespace packages -- there is no
+=__init__.py= under =countries/=, =GhanaLSS/= or =_/= -- so it would also have
+broken under a zipped install.
+
 ** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
 
 Found by the GhanaSPS =individual_education= task (PR #728) while reading this
