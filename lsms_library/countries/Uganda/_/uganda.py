@@ -397,9 +397,29 @@ def food_acquired(fn,myvars):
 
     unknown_units = set(units).difference(unitlabels.values())
     if len(unknown_units):
-        warnings.warn("Dropping some unknown unit codes!")
-        print(unknown_units)
-        df = df.loc[df.index.isin(unitlabels.values(),level='u')]
+        # GH #832.  This used to warn "Dropping some unknown unit codes!" with
+        # the labels merely `print`ed, so the warning could not be triaged:
+        # it did not say how many rows went, or which labels took them.  The
+        # corpus convention is to NAME what was dropped, not merely that
+        # something was.  The message is built per call (so Python's
+        # once-per-location warning de-duplication does not suppress a second,
+        # different wave) and the offending labels are sorted for determinism.
+        keep = df.index.isin(unitlabels.values(), level='u')
+        dropped = df.loc[~keep]
+        per_label = (dropped.index.get_level_values('u')
+                            .value_counts()
+                            .sort_values(ascending=False))
+        detail = ', '.join(f'{lab!r} ({n} rows)'
+                           for lab, n in per_label.items())
+        warnings.warn(
+            f"Uganda food_acquired: dropping {len(dropped)} of {len(df)} rows "
+            f"carrying {len(unknown_units)} unit label(s) that are not in the "
+            f"`u` table of _/categorical_mapping.org: {detail}.  These rows "
+            f"are REMOVED from food_acquired, not sentinel-filled.  Fix by "
+            f"adding the code to that table (or, if it is a keying slip, by "
+            f"recording it as such in _/CONTENTS.org)."
+        )
+        df = df.loc[keep]
 
     with open('../../_/conversion_to_kgs.json','r') as f:
         conversion_to_kgs = pd.Series(json.load(f))
