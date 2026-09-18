@@ -29,6 +29,11 @@ import pandas as pd
 # (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
 # in this file already assumes.
 sys.path.append('../../_')
+# Third rung of the wave -> country -> cross-country cascade the sibling
+# mapping.py modules spell out as `_dirs` (get_categorical_mapping returns the
+# first hit, local_tools.py:1556).  `countries/_/` does not exist today, so the
+# rung currently resolves to nothing; it is reserved, not dead.
+sys.path.append('../../../_/')
 from ghanalss import derive_produced_farmgate_value, to_country_food_labels
 from lsms_library.local_tools import (get_categorical_mapping, df_data_grabber,
                                        format_id, _to_numeric, to_parquet,

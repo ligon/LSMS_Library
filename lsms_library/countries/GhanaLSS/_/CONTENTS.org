@@ -3093,9 +3093,31 @@ sites), an absolute PACKAGE import.  It binds to whichever =lsms_library= won
 =../Data/*.dta= read in the same script came from the worktree.  GhanaLSS was
 the ONLY country doing this corpus-wide.  All 11 now use the house pattern,
 =sys.path.append('../../_')= + =from ghanalss import ...=, at the top of the
-file; the dead =sys.path.append('../../../_/')= at =2012-13/_/food_acquired.py=
-(it resolves to =countries/_=, which has no =ghanalss.py=) was deleted in the
-same pass.  Verified a no-op: all seven wave parquets and the country-level
+file, beside the =sys.path.append('../../../_/')= that four of them already
+carry.
+
+/That third entry is NOT dead weight/, and #948's original text (and the first
+revision of this paragraph) said it was.  It is the third rung of a deliberate
+*wave -> country -> cross-country cascade*: =get_categorical_mapping(fn,
+tablename, dirs)= walks =dirs= in order and returns the first hit
+(=local_tools.py:1556-1566=), and the wave =mapping.py= modules spell the
+cascade out as
+
+: _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+:           wave            country          cross-country
+
+=2012-13/_/food_acquired.py= had had its third rung removed in the first pass of
+#948 and it was restored; the three siblings (=1987-88:47=, =1991-92:59=,
+=2005-06:27=) were never touched.  /Stated accurately rather than papered over/:
+=lsms_library/countries/_/= does not exist today, so the third rung presently
+resolves to nothing and the cascade has two live levels, while the actual
+cross-country tables (=u.org=, =canonical_housing_labels.org=,
+=harmonize_education.org=, ...) live at =lsms_library/categorical_mapping/=,
+which is *off* this cascade and reached by explicit path.  The rung is reserved
+and correct to keep; wiring it is a design decision, not a rider on an import
+cleanup.
+
+Verified a no-op: all seven wave parquets and the country-level
 =food_acquired= (5,340,606 rows) are byte-identical before and after.  Note
 the import only ever worked through PEP 420 namespace packages -- there is no
 =__init__.py= under =countries/=, =GhanaLSS/= or =_/= -- so it would also have
