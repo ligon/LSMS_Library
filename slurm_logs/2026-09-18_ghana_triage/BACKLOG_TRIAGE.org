@@ -1,0 +1,166 @@
+#+title: GitHub backlog triage --- the Ghana set
+#+date: [2026-09-18 Fri]
+#+author: Sue (coordinator) + 2 read-only triage agents
+
+Supersedes =slurm_logs/2026-06-15_ghanalss_phase1/backlog_triage_2026-06-15.org=
+for the issues it covers.  That sweep graded *27* open issues; there are *122*
+today, so it is stale by roughly ninety-five issues as well as by three months.
+
+This pass is deliberately *not* a re-triage of all 122.  It covers the Ghana
+set --- twelve issues naming a Ghana country in the title, plus four
+cross-cutting issues where a Ghana country is the named instance --- because
+that is where the work is going next.  Everything outside that set is
+untriaged and should be assumed stale, not assumed fine.
+
+All measurements on =development= at =e93595087=, warm cache at
+=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=.  Nothing was edited
+and no issue was closed or commented: these are recommendations.
+
+* Verdict grid
+
+| Issue | Verdict | Tier | Effort | The defect as it stands today |
+|-------+---------+------+--------+-------------------------------|
+| #936 | STILL-LIVE (worse than filed) | B | hours | 1998-99 =Price=('Price','first')= fires on 7 real groups, 6 with disagreeing prices; since #916 the discarded price is multiplied by the summed quantity into a served =Expenditure= |
+| #942 | STILL-LIVE | A | multi-day | =v='s cross-wave identity is undeclared; three regimes coexist (0% / 79--100% / 0% continuity) and both affected countries document it only in prose no consumer reads |
+| #926 | STILL-LIVE | B/C | hours | 62 GhanaLSS curated-config cells (73 corpus-wide, 6 countries) hold U+0092/0094/0096 C1 controls; the served =j= labels are un-typeable and split the label axis |
+| #909 | STILL-LIVE | A/C | hours | =_compute_panel_spine= reads the cached roster parquet without consulting =read_parquet_cache_waves=, and reports a 100% MISS in words that scan as a pass |
+| #880 | STILL-LIVE | C | hours | =CONTENTS.org= argues wave-1 =MonthsAway= is "not wired" and that filling 0 "would fabricate data" while the live config fills it on all 18,889 rows |
+| #787 | PARTIAL | A | multi-day | Last-row-wins =rdict= and silent pass-through both untouched --- and #783 created a new instance: GhanaSPS =labels='FCT Label'= leaves 83% of served foods unrenamed, silently |
+| #832 | PARTIAL | B | hours each | GhanaLSS (473,660 rows) and Niger closed; Mali, Ethiopia, Uganda unfixed; Tanzania correctly blocked by its own config prohibition |
+| #851 | PARTIAL | C / D | a day + a ruling | Nine =within_wave_variation= cells carry an axis and null numbers; no row-grain carrier, so GLSS3's 30-day urban and 14-day rural still share one column |
+| #562 | PARTIAL | C | multi-day | Phase 3a shipped (6 waves =sane=); 3b unbuilt, and its two design questions are now answered by the Derivation registry rather than open |
+| #790 | PARTIAL | C | hours | The gitignore + guard half landed; three =to_csv= side-effect writers and Ethiopia's reader remain --- all *dead code*, so it is now a four-symbol deletion |
+| #913 | PARTIAL -> NEEDS-HUMAN | D | multi-day | Only 1991-92 is unvalued; the blocker is what =u='All'= means, and =basis='total'= silently returns a purchased-only figure for that wave |
+| #140 | RESCOPE | D | multi-day | Every P0/P1 premise is false (9 features, 39 =sane=, 0 =broken=); what remains is four unrelated children that should not share an umbrella |
+| #920 | RESCOPE | C | a day to diagnose | On a fast-path *hit* the cost is per-call O(rows) read-path transforms (2.66 s of 3.80 s), not re-aggregation; the reporter's 26x implies a *miss* not reproducible on a git checkout |
+| #928 | NEEDS-HUMAN | C | hours after a ruling | Nothing implemented; what is needed is the three-part vocabulary decision, and P1/P2 are cheap insurance once (2) is ruled on |
+| #797 | CLOSE + re-file | C | hours | The stated defect (mapping order) is fixed and measured; the hygiene half @ligon reserved has *regressed* --- 157 pure spelling variants against 149 at filing |
+| #783 | CLOSE | --- | --- | Landed in =f72818d0f= (PR #789); both Ghana countries carry =harmonize_food=, =food_items.org= is gone, countries with no food-label table went 8 -> 2 |
+
+* Shared roots --- fix these, not the symptoms
+
+** Root A --- GhanaLSS =food_acquired= reducer discipline (#936, #832-GhanaLSS)
+=food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so *any* duplicate index makes
+core SUM and re-derive =Price = Expenditure/Quantity= over the whole frame
+(=CONTENTS.org= "Trap 9").  #832's fix shipped an index-uniqueness assert in
+each of the four wave scripts.  1998-99's =groupby(...).agg(Price='first')= is
+the *one* collapse in the country sitting before that assert, bypassing the
+existing =ghanalss.reduce_duplicate_food_rows=.  Routing it through that helper
+closes #936 and completes the discipline #832 began.
+
+** Root B --- cp1252 decoded as Latin-1 (#926, #805)
+One mechanism, two layers: #805 is the reader, #926 is 73 already-committed
+config cells.  *Neither fix closes the other* --- a fixed reader will go on
+serving the committed artefacts.
+
+** Root C --- nobody has read the GLSS3 (1991-92) instrument (#913, #851)
+Same wave, same missing act.  #913 needs Section 8H's =u='All'= semantics; #851
+needs GLSS3's stratum-varying recall window stamped per row.  One session with
+=1991-92/Documentation/pdf/G3QPartB.pdf= and =G3Intman.pdf= section 1.9 feeds
+both.  Implementation warning already in the #851 thread: the stratum is *not*
+in =S9B.DTA=, and the window must not be inferred by counting visits present
+(that conflates protocol with non-response).
+
+* Ranked by whether a wrong number is being served
+
+1. *#936* --- the only issue in the set serving a wrong number today.  Seven rows
+   of GhanaLSS 1998-99 carry an =Expenditure= that is neither reported nor
+   correctly derived (10,000 against a truthful 9,000 in the sampled group),
+   with no warning: the grain audit is silent because the wave script destroyed
+   the duplicate before core could see it.
+2. *#913* --- a silently smaller aggregate for 1991-92 =basis='total'=.  Honest at
+   the row level, silent at the aggregate.
+3. *#942 / the Uganda =v= split* --- correct numbers, invalid pooling.  See below.
+4. *#832 residual, #926* --- produce no match rather than a wrong number.
+5. *#851 residual* --- a wrong comparison from correctly-served numbers.
+6. *#909, #787, #790, #797* --- no served data affected.
+
+* Contradictions found in files we treat as authoritative
+
+Reported rather than repaired; each needs a maintainer's eye.
+
+- *=GhanaLSS/_/CONTENTS.org=, Trap 9* asserts =Expenditure= is structurally NaN
+  on produced rows, so a duplicate would destroy 839,677 farmgate prices.  #916
+  made that false, and the same file says so 88 lines earlier.  The
+  purchased-side half is still true (=u='Value'= implies =Quantity ==
+  Expenditure=, so a duplicate fabricates =Price = 1.0= on ~4.33M rows).
+  Rewrite, do not delete.
+- *=GhanaLSS/_/CONTENTS.org:387=* calls GLSS2 a "fresh draw", but #942 measures a
+  clean 79-to-79 bijection between GLSS1 and GLSS2 clusters with Region and
+  Rural agreeing 79/79.  Both can be true if GLSS2 retained a panel subsample,
+  but the file does not say so --- and the proposed auto-derived crosswalk
+  depends on which is right.  Resolve before building one.
+- *=GhanaSPS/_/CONTENTS.org:594-650=* is #880 itself: unchanged since before the
+  issue was filed, and contradicted by the live config.  The reconciled
+  household count the issue declined to assert is *5,007* (the file says 5,008).
+
+* Proposed new issues --- evidence gathered, nothing filed
+
+1. *Ghana's =Region= vocabulary is two incompatible geographies.*  GhanaLSS
+   serves the pre-2018 10 regions; GhanaAHIES the post-2018 16.  Nine labels
+   collide, and the collision is the point: post-2018 =Northern= excludes
+   Savannah and North East, =Western= excludes Western North, =Volta= excludes
+   Oti.  =market='Region'= and a two-country =Feature('cluster_features')= pool
+   them with no signal.  Tier A, a day.
+2. *GhanaAHIES is not on the shared Ghana =Relationship= vocabulary.*  =9ad8e04f6=
+   built one vocabulary for GhanaLSS and GhanaSPS; AHIES has no =relationship=
+   table and serves 16 raw GSS labels, only 2 of which match.  Several are
+   literally rows in GhanaLSS's =Original Label= column, so the mapping exists
+   and is simply not applied.  Tier B, hours.
+3. *Promote =Roof= / =Floor= to the global categorical mapping.*  All three Ghana
+   countries curate the identical 9 Preferred Labels for each, independently,
+   with zero differences in any pair.  Precedent: =9ad8e04f6=.  Tier C, hours.
+4. *Uganda's =v= is four different geographic entities across eight waves* ---
+   community/EA code, a GPS coordinate bin (2009-10), parish code, and a
+   DISTRICT/PARISH name composite.  This is *not* #942: GhanaLSS is faithful
+   passthrough of a genuine renumbering, Uganda is a level whose *meaning*
+   changes.  Each wave is deliberate and documented; nothing signals that a
+   pooled =cluster_features= mixes three grains.  Tier B.
+
+* Suggested order
+
+#942 and the Uganda =v= split are the only Tier-A items whose consequence is an
+invalid inference from correct numbers, and neither is blocked.  #936 is one
+line and is serving a wrong number.  #787's coverage/conflict report is next ---
+it retroactively catches the GhanaSPS cell #783 created.  #880 and #790 are
+hours each and independent; do them first to clear the grid.  Close #783, and
+close-and-re-file #797, in the same pass.  #928 is blocked on a ruling, not on
+work.
+
+* What GhanaAHIES changes
+
+It declares no =food_acquired=: Sections 8--13 are =asked-not-distributed= with
+the questionnaire as C4 evidence.  So the food-side issues gain no third
+instance.  Where it does bear:
+
+- *#920 becomes more urgent* --- 12 waves, every table =materialize: make=, and
+  =sample= re-entered by =_join_v_from_sample= for every household table, so any
+  per-call O(rows) read cost is paid twelve times over.
+- *#140 gains its missing worked example* --- a 12-wave, all-script-path country
+  registered from scratch in one pass, with a ledger and a README.  The
+  =add-country= skill is now cheap to write, and that is the one #140 item
+  AHIES unblocks.
+- *#942 gains a third data point* and is immune by construction: =v= is the
+  prefix of =i=, 600 clusters in all twelve quarters, 100% continuity on all 11
+  consecutive pairs.  Ghana now spans *both* regimes, so a user working "in
+  Ghana" can assume neither.
+- *#880 gains urgency* --- AHIES has no residence-duration variable in any wave,
+  so the count-everyone fallback that #880's stale text describes as an exotic
+  wave-1 outcome is now live twelve times over.
+- *#790, #783, #787, #562* --- immune or not applicable.
+
+* Method, and its limits
+
+Two read-only agents, each assessing its issues against current =development=
+with =path:line= citations, measured numbers where cheap, and merged-PR
+reconciliation.  Both were required to read the relevant =_/CONTENTS.org= in
+full --- LOGBOOK and WAITING entries included --- and to report contradictions
+rather than assume the file was stale.  That requirement produced the three
+findings in the contradictions section above, which is the argument for keeping
+it in every dispatch brief.
+
+Limits worth stating: #920's headline number could not be reproduced here, and
+the report says so instead of explaining it away; Malawi's slice of #832 was
+not verified and is recorded as unchecked rather than clean; and #797's
+verification was a warm read, so =_expand_kinship='s unknown-label warning could
+not fire.
