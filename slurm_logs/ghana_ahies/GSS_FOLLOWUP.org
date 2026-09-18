@@ -1,0 +1,144 @@
+#+TITLE: AHIES 2022-2024: follow-up items for the Ghana Statistical Service
+#+AUTHOR: Ethan Ligon (prepared by Sue)
+#+DATE: 2026-09-18
+
+Every figure below was measured on the files as distributed from
+https://microdata.statsghana.gov.gh/ (catalog entries 119 and 128) on
+2026-09-17; the measurements are recorded in
+=lsms_library/countries/GhanaAHIES/_/CONTENTS.org= and
+=slurm_logs/ghana_ahies/README.org=.  File names are GSS's.
+
+* Data we are missing
+
+Requested grain and format for all items in this section: household
+\(\times\) quarter (person \(\times\) quarter where the section is
+individual-level), all twelve quarters 2022Q1--2024Q4, Stata =.dta=,
+keyed by =cluster=, =HholdID=, =quarter= -- the keys the =SEC567= files
+already use.
+
+- Section 8, consumption of own produce (agriculture) :: item-level rows
+  (item, quantity, unit, imputed value) per household-quarter.  Absent
+  from every distributed file, all three years.
+- Section 9, household expenditure :: Part A (less frequently purchased
+  items) and Part B (frequently purchased items): item, quantity, unit,
+  amount, source (purchased / own production / gift).  Absent in all
+  years.  This is the core of the survey for our use: without it no
+  consumption or food-demand analysis is possible.
+- Section 10, transfers :: per-recipient / per-sender rows with amounts.
+  Only the five screening questions (=s10q1=, =s10q2=, =s10q3=,
+  =s10bq1=, =s10bq2=) are present, and only in the 2022 =SEC567= file for
+  2022Q1--Q3.
+- Section 11, miscellaneous income and expenditure :: Part A (income) is
+  absent everywhere; Part B (expenditure) is present only as
+  =s11bq1=..=s11bq11= in 2022 for Q1--Q3.
+- Section 12, assets and durable consumer goods :: absent in all years.
+- Section 13, non-farm household enterprises :: absent in all years.
+- Interview dates :: no date-of-interview or visit-date variable exists
+  in any file; the cover-page date per household-quarter would let us
+  place each observation in time within the quarter.
+- CAPI codebook :: values that appear in the data but not in the paper
+  instrument: relationship-to-head code 17 "Not member anymore" (the
+  paper list ends at 16, Househelp); the anthropometric not-measured
+  codes =-99= (height, 13,001 rows in 2024) and =-99.94= (weight, 2,298
+  rows), where the paper says 999.
+- Community or market-price instrument :: if one was fielded alongside
+  AHIES, its microdata.  We found no such instrument in the household
+  questionnaire or the field officers' manual.
+
+* The 2023Q3 household weight
+
+In =2023 AHIES Q1-Q4_Rev_20250827.dta=, =hh_weight= in 2023Q3 is exactly
+half of its value in the adjacent quarters.
+
+#+name: tab:hh-weight-2023
+#+caption: 2023 weights by quarter, measured at household grain (one row per =cluster=, =HholdID=, =quarter=).
+| quarter | households | mean hh_weight | sum hh_weight | mean pop_weight | sum pop_weight |
+|---------+------------+----------------+---------------+-----------------+----------------|
+| 2023Q1  |     10,131 |          868.6 |     8,800,195 |           618.5 |     30,946,814 |
+| 2023Q2  |     10,113 |          874.2 |     8,840,925 |           648.4 |     30,934,756 |
+| 2023Q3  |     10,085 |          433.9 |     4,375,806 |           635.6 |     30,802,116 |
+| 2023Q4  |      9,924 |          882.7 |     8,760,327 |           614.5 |     31,181,284 |
+
+- The Q3 sum is 49.5% of Q2's.
+- The factor is uniform: the per-household ratio Q3/Q2 is \(0.4986 \pm
+  0.0022\) over the 10,026 households present in both quarters (minimum
+  0.495, maximum 0.503).  The ratio of quarter means is 0.495--0.504 in
+  every one of the 16 regions and 0.495 urban / 0.498 rural.  For
+  comparison Q2/Q1 is \(1.006 \pm 0.009\) and Q4/Q3 is \(2.03 \pm
+  0.06\).
+- It is not missing or zero-weighted households: Q3 has an ordinary
+  10,085 household-quarters with 0 null and 0 zero weights.
+- =pop_weight= is not affected (per-person Q3/Q2 \(0.98 \pm 0.02\); sums
+  30.8--31.2 million in all four quarters), so the ratio
+  =pop_weight/hh_weight= jumps from about 0.78 to 1.59 in Q3 alone.
+- For reference, the 2021 PHC counts about 8.35 million households; the
+  2024 quarters sum to about 8.2 million and the 2022 quarters to
+  7.8--8.1 million, while 2023's Q1, Q2 and Q4 sum to 8.76--8.84
+  million.
+
+Questions:
+
+1. Is the 2023Q3 =hh_weight= mis-scaled (for example a two-cycle or
+   half-sample adjustment applied once too often), and is the correct
+   value simply \(2 \times\) the distributed one?
+2. Which weight is authoritative for household-level estimates,
+   =hh_weight= or =pop_weight=, and how is each constructed (base weight,
+   non-response adjustment, post-stratification -- and to which control
+   totals)?
+3. Are the quarterly =hh_weight= sums calibrated to projected household
+   totals?  If so, which projection, and why do 2023's other quarters
+   exceed the 2021 PHC count while 2022 and 2024 fall below it?
+4. Will a revised 2023 file be posted, and will it carry a new version
+   or date suffix (the current files are =_Rev_20250827=)?
+
+* Other anomalies in the distributed files
+
+- Corrected relationship code =s1aq2x= :: 100% empty in the 2022 person
+  file and unfilled in 2023Q1 (31,779 null plus 10,012 unlabelled zeros
+  of 50,039 rows), but complete in 2023Q2--2024Q4.  Can it be supplied
+  for 2022 and 2023Q1?  (In 2024 the raw =s1aq2= has 31 double-headed
+  and 1,423 headless household-quarters, presumably why =s1aq2x=
+  exists.)
+- Empty columns in 2022 :: 319 of the 838 person-file columns are
+  entirely null in 2022 (=s1aq2x=, =s1aq5x=, =s2aq2=, most of =s4hq1*=,
+  ...).  Questions added in later rounds, or content lost in the
+  revision?
+- Relationship code 17 "Not member anymore" :: 0 rows in 2022; 17 / 11 /
+  1,382 in 2023Q2 / Q3 / Q4; 52 in 2024Q1.  Is the 2023Q4 block an
+  end-of-year roster clean-up, and should these lines be read as
+  departed members?
+- =SEC567= household files :: 332 rows in 2024 and 201 in 2022 carry a
+  null =HholdID= and no Section 5--7 content (none in 2023) --
+  non-response shells?  The 2022 file also carries =WTPP1_Q4_20032023=
+  .. =WTPP4_Q4_18052023=, =WTHH_1=, =WTHH_2= (2022Q4 only; =WTHH_2=
+  equals the person file's =hh_weight=), the 2024 file carries
+  =hhwt_q9=, =wtpp_q10=, =hhwt_q10=, and the 2023 file carries no weight
+  at all.  Which of these is intended for use?
+- Anthropometry, Section 3B (2024) :: besides =-99= and =-99.94=, weight
+  carries repeated negative values (=-23.12= \(\times\) 334, =-21.27=
+  \(\times\) 235; all ages 5 and over, all measured standing) -- a
+  caregiver-subtraction step applied where it should not be?  The value
+  99.0 kg appears 1,875 times across ages 0--97 and looks like a code
+  rather than a measurement.  =BMI= is 100% null in 2024.
+- Section 4A labels :: =s4aq2=, =s4aq8= and =s4aq12= are labelled "how
+  many hours" but hold days (1--7), consistent with the field manual;
+  the per-day hours are =s4aq3a=..=g= and siblings.  Seven daily entries
+  exceed 24 hours (maximum 70).
+
+* Website and access
+
+- Instruments not posted :: the questionnaire and the field officers'
+  manual are on neither catalog entry (119, 128); GSS supplied them by
+  email.  Posting them under "Related Materials" would help every user.
+- Data files only visible after login :: entry 128's data files appear
+  only in the logged-in "Get Microdata" tab; the 2024 STATA file is
+  filed under "Other Materials" rather than "Data Files", so it is the
+  only data file visible anonymously.
+- Entry 119 :: its data dictionary returns HTTP 500 and it reports no
+  data files; if 128 supersedes it, saying so on the page would help.
+- API :: the NADA =api/resources= endpoint refuses API-key holders
+  (=ACCESS-DENIED=), so programmatic discovery of files is impossible
+  even with a key, although the metadata endpoints work.
+- Identifiers :: the study documentation carries the DDI id
+  =DDI-GHA-GSS-AHIES-2022Q1-2024Q4-v2.1= while the catalog entry is
+  =DDI-GHA-GSS-AHIES-2022-2024-v1.1=.
