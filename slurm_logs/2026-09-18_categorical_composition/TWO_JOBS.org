@@ -36,9 +36,21 @@ different kinds of object, so nothing can treat them differently.
 
 * @ligon's example is unrepresentable today, and nobody has noticed
 
-The example: the global level says a pound is 0.45359237 kg; Guatemala's pound
-is 460 g; after 2015 Guatemala adopts the avoirdupois pound and it becomes
-453.59237 g.  Lower level trumps upper.
+The example, *illustrative and not a claim about Guatemala* (@ligon flagged it
+as invented; nothing here verifies a Guatemalan pound of any weight): a global
+level says a pound is 0.45359237 kg; some country's pound is 460 g; after some
+year that country adopts the avoirdupois pound and its value changes.  Lower
+level trumps upper, and the lower level's value is time-varying.
+
+*Do not read the numbers as data.*  What the example establishes is a SHAPE --
+a per-key value, overridden at a lower level, varying by wave -- and the shape
+is what the corpus cannot express.  The corpus does, separately, contain the
+ingredients for a real instance: Guatemala's =CONTENTS.org:593= documents
+=cnlib=, "factor de conversion a libras", a per-item factor converting the
+survey's reference unit into pounds, and =:574= records =libra= as a reported
+purchase unit.  So a pound-valued parameter is real in that survey; its
+weight, and whether it ever changed, are not established here and must not be
+asserted from this note.
 
 Measured:
 
