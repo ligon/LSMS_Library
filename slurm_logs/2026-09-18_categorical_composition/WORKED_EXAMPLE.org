@@ -1,0 +1,125 @@
+#+title: A worked example: GhanaLSS =harmonize_food= at two levels
+#+date: [2026-09-18 Fri]
+
+Companion to =DESIGN.org=.  Everything below is read out of the committed
+config; no data was built.  GhanaLSS is the *only* country in the corpus with
+any categorical table declared at two levels, and =harmonize_food= is declared
+at *nine* places: the country =_/= and each of the eight wave =_/= directories.
+So it is the one real instance of the nesting the design is about.
+
+* The two files, as they actually are
+
+** Wave: =GhanaLSS/1998-99/_/categorical_mapping.org=
+
+: #+name: harmonize_food
+: | Preferred Label     | Aggregate Label     | Code_9b | Label_9b            | Code_8h | Label_8h    |
+: |---------------------+---------------------+---------+---------------------+---------+-------------|
+: | Guinea corn/sorghum | Guinea corn/sorghum |       1 | Guinea corn/sorghum |         |             |
+: | Sorghum             | Sorghum             |         |                     |       4 | Sorghum     |
+: | Guinea Corn         | Guinea Corn         |         |                     |       7 | Guinea corn |
+
+Two *separate* code namespaces in one table: section 9B (purchases) and
+section 8H (own production) are different questionnaire sections with
+different code lists.  9B code 1 conflates guinea corn with sorghum; 8H splits
+them across codes 4 and 7.  Each namespace carries its own label column.
+
+** Country: =GhanaLSS/_/categorical_mapping.org=
+
+: #+name: harmonize_food
+: | Preferred Label     | Aggregate Label | 1987-88 | ... | 1998-99             | ... | 2016-17             | FCT Code |
+: |---------------------+-----------------+---------+-----+---------------------+-----+---------------------+----------|
+: | Guinea Corn/Sorghum | Millet/Sorghum  |         |     | Guinea Corn         |     |                     | 01_039   |
+: | Guinea Corn/Sorghum | Millet/Sorghum  |         |     | Guinea corn/sorghum |     | Guinea corn/sorghum | 01_039   |
+: | Guinea Corn/Sorghum | Millet/Sorghum  |         |     | Sorghum             |     |                     | 01_039   |
+
+219 rows, 215 distinct =Preferred Label=, 209 distinct =Aggregate Label=.  One
+column *per wave*, each holding that round's own spelling.
+
+* What each column is, in the design's vocabulary
+
+| column | level | role | why |
+|--------+-------+------+-----|
+| =Code_9b=, =Code_8h= | wave | *key*, =keyspace: code= | instrument codes, one namespace per questionnaire section |
+| =Label_9b=, =Label_8h= | wave | evidence for the decode | the code's printed label |
+| wave =Preferred Label= | wave | *canonical* | the wave's own vocabulary |
+| =1987-88= ... =2016-17= | country | *key*, =keyspace: label= | §1.3b exactly -- a wave-named column holding that wave's raw label |
+| country =Preferred Label= | country | *canonical* | the cross-round vocabulary |
+| =Aggregate Label= | country | =label= (alternate output) | what =labels='Aggregate'= serves |
+| =FCT Code= | country | *extra*, level-local | food-composition id; composes with nothing |
+
+*The positional rule picks =Aggregate Label= at BOTH levels* -- an *output*
+column, at the country level and at all eight wave levels.  It is harmless
+today only because every consumer names its columns explicitly.  This is
+=DESIGN.org= §3.1's claim, in the file.
+
+* The composition, and the fact that it already exists by hand
+
+Three stages, for a 1998-99 purchase row carrying 9B code =1=:
+
+: 1. decode   (wave, keyspace: code)    1  -> "Guinea corn/sorghum"
+: 2. fold     (country, keyspace: label)   -> "Guinea Corn/Sorghum"
+: 3. relabel  (country, alternate output)  -> "Millet/Sorghum"   [labels='Aggregate']
+
+Stage 2 is *already implemented*, as bespoke per-country code:
+=GhanaLSS/_/ghanalss.py:803= =to_country_food_labels(df, wave, level='j')= --
+"Map a wave's own =harmonize_food= label onto the COUNTRY one", keyed on the
+=<wave>= column, asserting the country table is a bijection onto that column
+and raising on an unmapped label rather than passing it through.
+
+Its own docstring records what the absence cost:
+
+#+begin_quote
+until 2026-09-16 *nothing applied it*, so the served =j= was the wave
+vocabulary and 45 of 225 labels never reached the country axis
+#+end_quote
+
+So the two-level composition this design describes is not hypothetical, and it
+is not new.  It is a real, load-bearing step that existed **only** as one
+country's hand-written function, was **missing for years**, and was added two
+days ago.  A framework that resolved =#+key:= and =#+keyspace:= across levels
+would have made it structural -- and would make the next country's version
+unnecessary rather than forgotten.
+
+* What this example demonstrates, point by point
+
+1. *Codes are terminal, and there can be more than one namespace.*  9B and 8H
+   codes never meet; each decodes to a label and the labels compose.  A model
+   with one key per table cannot express this -- =#+key:= must permit a
+   *sectioned* decode, or the wave table must be split into =harmonize_food_9b=
+   and =harmonize_food_8h=.  *This is a gap in DESIGN.org as written* and needs
+   deciding (see below).
+2. *§1.3b's wave-named keys are real and load-bearing here.*  The country
+   table's seven wave columns are its keys; =#+key: {wave}= is what names them.
+3. *Extra columns genuinely do not compose.*  =FCT Code= is constant down the
+   three sorghum rows and means nothing to any other level.
+4. *A fold that needs an assertion.*  Three 1998-99 labels -- =Guinea Corn=,
+   =Guinea corn/sorghum=, =Sorghum= -- fold to one country label
+   =Guinea Corn/Sorghum=, which then folds again into =Millet/Sorghum=.  The
+   normaliser cannot verify that: "Sorghum" is not a spelling variant of
+   "Guinea Corn".  It is =#+fold: asserted=, and the assertion is a real claim
+   about the instrument -- 8H distinguishes two grains that 9B conflates, so
+   the harmonisation *deliberately discards* a distinction the source recorded.
+   Whether the kilograms may then be added is exactly the #833 question, here
+   on the =j= axis, in the country that reported it.
+5. *GH #936 lives in this table.*  The three-codes-to-one-label fold that made
+   1998-99's =agg(Price='first')= live rather than latent is
+   =Other Meat=, in this same wave file, by the same mechanism.
+
+* The gap this example exposes
+
+=DESIGN.org= assumes one key per table per level.  The wave =harmonize_food=
+has *two* code namespaces in one table, and nothing in the proposed vocabulary
+says so.  Three options:
+
+1. =#+key: Code_9b, Code_8h= -- a list, with each key decoding independently
+   into the same =Preferred Label=.  Matches the file as written; means a key
+   is a set, not a column.
+2. Split into two named tables per wave.  Cleanest model, 8 wave files edited,
+   and every consumer that reads =harmonize_food= by name changes with it.
+3. =#+key: Code_9b= plus =#+column: Code_8h = key= -- a second key declared as
+   a column role.  Least churn, but makes =#+key:= and =#+column:= overlap.
+
+Recommend (1): the file already expresses two namespaces as two column pairs,
+and a list-valued =#+key:= describes what is there rather than reshaping the
+corpus to fit the vocabulary.  Worth deciding before any sentinel is written,
+because it changes the type of =#+key:=.
