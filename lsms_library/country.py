@@ -347,6 +347,26 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
+#
+# CROSS-REFERENCE (GH #953).  This is the *read-time* half of categorical
+# inheritance.  The other half is the *build-time* cascade,
+# ``local_tools.get_categorical_mapping(fn, tablename, dirs)``, whose
+# docstring carries the canonical statement of the whole model.  The two run
+# at different times over different layouts and agree on direction (local
+# beats global) but not on granularity:
+#
+#   cascade  -- one ``categorical_mapping.org`` per LEVEL; first hit wins, so
+#               override is whole-table; fall-through is per table.  It cannot
+#               read a directory of per-table files, so the cross-country rung
+#               it names (``countries/_/``) is unreachable and absent.
+#   merge    -- one ``<table>.org`` per TABLE in
+#               ``lsms_library/categorical_mapping/``.  ``Country.
+#               categorical_mapping`` globs them ALL and merges the country
+#               file over them, whole-table by default; the names below are
+#               the exception, merged per ROW.
+#
+# So the allow-list does NOT decide whether a global table is inherited (every
+# ``#+name:`` table in that directory is); it decides only the merge rule.
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
