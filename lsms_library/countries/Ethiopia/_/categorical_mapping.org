@@ -358,6 +358,27 @@ kg-conversion factors live in transformations._get_kg_factors /
 conversion_to_kgs.json -- this table is the label axis only.  Later
 gaps (crop/harvest units, community-price units) extend these rows.
 
+GH #832, 2026-09-18: `Other(Specify)` used to carry its own Preferred
+Label, so the survey's catch-all sat on the u axis under TWO labels that
+differ only by a space -- `Other (Specify)` (crop_production 5,498 rows
+across all four waves, community_prices 1 row in 2013-14) and
+`Other(Specify)` (community_prices 653 rows, 2015-16 only).  They are one
+value: both are the ESS's "Other (specify)" option, and this table already
+folds `Digigimosh` onto the SPACED form, so the spaced form is this
+country's canonical spelling and the unspaced one was the outlier.  The
+relabel cannot collide -- the two spellings share no wave on any table.
+Note the fold does NOT make these rows usable: a price "per Other
+(Specify)" is not a price, and a consumer must still drop them.  What it
+buys is that they are now droppable with ONE test instead of two.
+
+Note also, against `_/CONTENTS.org:193-195` ("No =u= table is wired into
+=_/categorical_mapping.org=; the framework's auto-discovery on =u= would
+be a no-op"): that statement is STALE.  This table exists, it is
+auto-discovered by name on the `u` index/column of every Ethiopia table,
+and it is not identity -- `Digigimosh -> Other (Specify)`, `KILOGRAM ->
+Kg`, `Littere -> Liter`, `pices -> Pieces` and ~30 more rows all relabel
+at API time.
+
 #+name: u
 | Original Label                     | Preferred Label                    |
 |------------------------------------+------------------------------------|
@@ -425,7 +446,7 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Packets                            | Packets                            |
 | Pieces                             | Pieces                             |
 | Other (Specify)                    | Other (Specify)                    |
-| Other(Specify)                     | Other(Specify)                     |
+| Other(Specify)                     | Other (Specify)                    |
 | Pack                               | Pack                               |
 | Pair                               | Pair                               |
 | Piece/Number Large                 | Piece/Number Large                 |

@@ -1297,6 +1297,26 @@ def _clean_unit_label(series):
     # Drop the U+FFFD replacement-char mojibake ESS W5 embeds in a few
     # labels (e.g. "Zorba/Akara � Large").
     s = s.str.replace('�', '', regex=False)
+    # ... and the DOUBLE-ENCODED form of the same character, which is what
+    # the ESS W3 (2015-16) sect9 harvest file actually stores (GH #832).
+    # The line above was written for exactly this label and silently missed
+    # it: the bytes on disk are U+FFFD's UTF-8 (EF BF BD) re-read as cp1252
+    # and re-encoded, so the stored text is the three characters
+    # 'Ï' + '¿' + '½', not U+FFFD, and a U+FFFD strip cannot see it.
+    #
+    # Evidence that the damaged and clean labels are ONE unit, not two:
+    # the same wave's own WB conversion table (Crop_CF_Wave3.dta) lists the
+    # very same three size-qualified names CLEANLY, under codes 191/192/193
+    # ("191. Zorba/Akara Small", "192. ... Medium", "193. ... Large"), and
+    # 2018-19 / 2021-22 ship the clean form in sect9 itself.  So this is an
+    # encoding repair, not a spelling merge, and it does NOT collapse the
+    # Small/Medium/Large granularity -- the size qualifier is preserved.
+    #
+    # Effect: 550 crop_production rows in 2015-16 (220 Large / 168 Medium /
+    # 162 Small) leave the off-axis label and land on the same `u` that
+    # 2018-19 and 2021-22 already use -- and therefore become matchable
+    # against the shipped conversion table, which had the factors all along.
+    s = s.str.replace('Ï¿½', '', regex=False)
     s = s.str.title()
     s = s.str.replace(r'\s+', ' ', regex=True)
     # Normalize the recurring "Meduim" misspelling BEFORE size matching.
