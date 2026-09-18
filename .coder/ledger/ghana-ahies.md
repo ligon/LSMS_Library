@@ -142,3 +142,49 @@ GhanaAHIES`: 5 passed.  `find lsms_library/countries -name '*.parquet'`: empty.
 - `2023/_/...` (branch `feat/ghanaahies-2023`, merge `181dfb210`): sample 10,131 / 10,113 / 10,085 / 9,924, roster 50,039 / 47,696 / 48,449 / 49,359 (code 17: 0 / 17 / 11 / 1,382). OK (§4, §5). `s1aq2x` unfilled in 2023Q1 -> per-quarter source rule (Q1 `s1aq2`, Q2-Q4 `s1aq2x`), row-wise coalesce measured and rejected (4 manufactured double-headed households). The 2023Q3 `hh_weight` is a uniform factor of exactly two on that column alone (per-household Q3/Q2 0.4986 +/- 0.0022; `pop_weight` unaffected): recorded, NOT corrected, WAITING on @ligon.
 - `2024/_/{cluster_features,people_last7days,anthropometry}.py` (branch `feat/ghanaahies-2024-features`, merge `616742f0b`): OK (§2 precedents GNB / Uganda / Tanzania; §4 "core aggregates nothing" -- cluster grain by asserted invariance, 0 disagreements). Section 4A is a first-yes cascade (later dummies NA by skip, served NA); asked of ages 5+ so `working_age = Age >= 5` (the module's threshold; DEVIATION from the brief's 15, evidenced from the questionnaire); `s4aq2`/`s4aq8`/`s4aq12` are days despite the label; anthropometric not-measured codes are negative (`-99`, `-99.94`) and decoded to NA with counts; weight 99.0 x 1,875 served as recorded and reported. `anthropometry` has no `Index Info` entry (nor do its four precedents) -- reported, not edited.
 - Framework observation (both wave agents): `_join_v_from_sample` calls `sample()` with no `waves`, so a one-quarter household-table read builds `sample` for every wired folder.
+
+### Phase 4 -- `cluster_features` / `people_last7days` / `anthropometry` for 2022 and 2023 (2026-09-18)
+
+Those three tables existed for 2024 only because the agent that wrote them was
+scoped to that folder, not for want of data (all three person files carry the
+same 838 variables; every column the builders read is populated in every year).
+**Hoisted, not cloned**: `build_cluster_features` / `build_anthropometry` /
+`build_people_last7days` now live in `countries/GhanaAHIES/_/ghanaahies.py`,
+year-parameterised, with nine thin `<year>/_/<table>.py` callers that resolve
+the year from `Path(__file__).resolve().parents[1].name` and the source file by
+glob (the 2024 person file has a different name from 2022/2023's). §2 reuse:
+the module is already the country's shared-helper home and is a prerequisite of
+every wave rule in `_/Makefile`, so a sibling `builders.py` would not trigger a
+rebuild; it stays import-safe (builders take an already-read frame).
+
+**2024 identity check (the safety property): PASSED.** The three 2024 parquets
+were copied before any edit and re-compared after the hoist: same row count,
+same index, same dtypes, `DataFrame.equals` True on all three
+(anthropometry 186,240x3, cluster_features 2,400x3, people_last7days
+188,448x8). Nothing was loosened to get there.
+
+Findings (full measurements in `_/CONTENTS.org` §"The three person-file tables
+across the three years"):
+- CONTRADICTION of the Phase-3 anthropometry write-up read as general: the
+  not-measured encoding is year- AND quarter-specific. 2022 has ZERO negatives
+  (plain missingness, plus 3,529 weights of exactly 0 in Q3); 2023 has 417
+  negative heights and 10,994 heights of ~3e-06, all in Q4; 6,275 heights of
+  exactly 99 across 2022Q4 and 2023Q1-Q3. Decode unchanged (negatives only) --
+  a threshold would be screening; counted, recorded, WAITING @ligon.
+- CONTRADICTION of §"Section 4A is a first-yes cascade": **2023 is not one**
+  (7,444 / 196 / 16,344 / 8,774 rows answer after an earlier Yes vs 0 in 2022
+  and 390 in 2024). NA-stays-NA survives as the rule; "NA because of an earlier
+  Yes" does not.
+- The 2022 `BMI` column (110,139 rows, null in 2023/2024) reproduces
+  `Weight/(Height/100)^2` within 1% on 105,976 of 108,560 rows -- an external
+  confirmation that the table is wired to the right columns, which the
+  2024-only build could not obtain.
+- `RELATIONSHIP_SOURCE` hoisted: the per-quarter `s1aq2` / `s1aq2x` rule is now
+  one table in `ghanaahies.py`. `household_roster.py` / `individual_education.py`
+  still carry private copies (agreeing today) -- named drift hazard, out of scope.
+- Process note, cost of ignoring it once: the `.pth` in `.venv` pins the package
+  to a DIFFERENT checkout (`/global/scratch/.../mirrors/LSMS_Library`), so the
+  first round of `make` builds wrote their parquets IN-TREE (GH #803 write side)
+  and the first API check served 2024 only, from that checkout's config tree.
+  `PYTHONPATH=<repo> LSMS_COUNTRIES_ROOT=<repo>/lsms_library/countries` fixes
+  both; the in-tree parquets were deleted and everything re-run.

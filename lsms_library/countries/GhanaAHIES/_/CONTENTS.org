@@ -66,14 +66,52 @@ for); recorded so nobody re-discovers it.
 ** Wiring status (2026-09-17)
 
 Per folder (=household_characteristics= derives automatically from
-=household_roster= everywhere):
-- =2024/= wired (2026-09-17): =sample=, =household_roster=,
-  =individual_education=, =food_security=, =housing=, then the same day
+=household_roster= everywhere): *all three folders now carry all eight
+tables* -- =sample=, =household_roster=, =individual_education=,
+=food_security=, =housing=, =cluster_features=, =people_last7days=,
+=anthropometry= -- so every table builds for all twelve quarters.
+- =2024/= wired 2026-09-17: the first five tables, then the same day
   =cluster_features=, =people_last7days=, =anthropometry=.
-- =2023/= wired (2026-09-17) with the first five tables; see "The 2023
+- =2023/= wired 2026-09-17 with the first five tables; see "The 2023
   folder" for what differs.
-- =2022/= wired (2026-09-17) with the first five tables; see "2022 folder"
+- =2022/= wired 2026-09-17 with the first five tables; see "2022 folder"
   for what differs.
+- =cluster_features=, =people_last7days= and =anthropometry= extended to
+  =2022/= and =2023/= on 2026-09-18.  Those three were 2024-only because the
+  agent that wrote them was scoped to that folder, NOT for want of data: all
+  three person files carry the same 838 variables and every column the three
+  builders read is populated in every year.  See s"The three person-file
+  tables across the three years" for the per-year measurements and
+  s"Where the builders live" for the structure.
+
+** Where the builders live (2026-09-18)
+
+=cluster_features=, =anthropometry= and =people_last7days= are built by
+=build_cluster_features= / =build_anthropometry= / =build_people_last7days=
+in =_/ghanaahies.py=, year-parameterised and shared by all three folders;
+each =<year>/_/<table>.py= is a thin caller that resolves its year from
+=Path(__file__).resolve().parents[1].name=, finds the person file by GLOB
+(the 2024 file is =2024 AHIES Q1-Q4_20250827.dta= while 2022/2023 are
+=..._Rev_20250827.dta=), reads it with =get_dataframe= and writes with
+=to_parquet=.
+
+Two things make that placement load-bearing.  The country =_/Makefile=
+names =ghanaahies.py= as a prerequisite of every wave rule, so a builder in
+a sibling module would not trigger a rebuild when edited; and
+=ghanaahies.py= must stay IMPORT-SAFE (the framework imports it for
+=waves=), so the builders take an already-read DataFrame and never read at
+import.  The shared docstrings state the RULE; the per-year MEASUREMENTS
+are in this file, and every build prints its own, so the build log is the
+evidence for what is written here.
+
+*The relationship-to-head source column is now one table,
+=ghanaahies.RELATIONSHIP_SOURCE=* (quarter -> =s1aq2= / =s1aq2x=, the rule
+measured per year and described under "Household roster" and "The 2023
+folder").  The three builders above read it; =household_roster.py= and
+=individual_education.py= in all three folders still carry their own private
+copies, written before it was hoisted.  They AGREE with the table today --
+that was checked -- but three copies of one rule is a drift hazard: fold
+them into =RELATIONSHIP_SOURCE= when those scripts are next touched.
 A folder without a script for a table contributes nothing to that table's
 build (a =logger.warning= "no _/ directory" or a missing rule, not an
 error), because the country module lists all twelve quarters in =waves=.
@@ -133,7 +171,8 @@ and selected per EA.  No stratum variable is shipped, so =strata= is
 constructed as ="{region}-{Urban|Rural}"= (32 values, e.g.
 =Ashanti-Urban=), from the person file's =region= (16 title-case labels)
 and =urbrur=.  Region and locality are constant within a cluster (0
-disagreements in 2024), and every quarter has all 600 clusters.
+disagreements in 2024), and every quarter has all 600 clusters (measured in all twelve quarters,
+2026-09-18; it was a 2024 measurement before that).
 
 *Weights.*  The person file carries =hh_weight= (per household-quarter;
 constant within a household-quarter, 0 disagreements) and =pop_weight=
@@ -150,11 +189,16 @@ correct; they differ because larger households carry smaller weights.
 
 *Cluster features.*  =cluster_features= is built directly at =(t, v)= from
 the person file's =region= / =regdist= / =urbrur= (asserted constant within
-every cluster-quarter -- 0 disagreements in 2024 -- and de-duplicated, so
+every cluster-quarter -- 0 disagreements in ALL TWELVE quarters, and the
+assert is what keeps it true -- and de-duplicated, so
 the framework's household-to-cluster projection, GH #323 Site 2, has
 nothing to collapse).  =District= is the =regdist= value label: the 2021
-PHC district / municipal / metropolitan-area name (247 in 2024, each inside
-exactly one region; the raw labels carry seven leading blanks, stripped).
+PHC district / municipal / metropolitan-area name (247 in every year, each
+inside exactly one region; the raw labels carry seven leading blanks,
+stripped).  The three years deliver the SAME cluster frame: 600 clusters per
+quarter, 247 districts, 16 regions, 1,216 urban / 1,184 rural cluster-
+quarters, and 0 clusters whose Region / District / Rural change across the
+quarters of a year.
 The label set has 261 entries for 247 observed codes.  No GPS of any kind is
 shipped (no Latitude / Longitude).  With this table =market='Region'= works
 on every household table.
@@ -234,6 +278,12 @@ the framework's =dropna(how='all')=.
 
 * Anthropometry (Section 3B, Q3-Q5, EVERY member, every quarter)
 
+Everything in this section that carries a COUNT was measured on *2024*.  The
+rule is the same in every year; what the rule touches is not -- in
+particular the "not measured" encoding changes from year to year and even
+from quarter to quarter.  Read s"The three person-file tables across the
+three years" before quoting a number here for 2022 or 2023.
+
 Weight (kg) and height (cm) are taken of every household member each
 quarter (questionnaire: "RESPONDENTS: ALL HOUSEHOLD MEMBERS"; manual:
 "measure the weight / height of each household member") -- 188,497 of the
@@ -246,7 +296,7 @@ lying / 2 standing; 1: 3,430 / 58; 2: 4,634 / 103; 3-4: 9,626 / 684; 5-9:
 943 / 25,473; 10-17: 336 / 40,174; 18+: 573 / 100,203 -- so 1,852 members
 aged 5+ were measured lying and 60 under-twos standing.
 
-- *The "not measured" code is negative in the CAPI file.*  The paper
+- *The "not measured" code is negative in the CAPI file -- IN 2024.*  The paper
   questionnaire says "NOT MEASURED CODE 999" for both questions; the file
   spells it =-99= for height (13,001 rows, 6-9% in every age band; 11,622
   of them with mode 'Standing') and =-99.94= for weight (2,298 rows,
@@ -273,7 +323,9 @@ aged 5+ were measured lying and 60 under-twos standing.
   =s1aq4m= (0-11) is filled only for ages 0-4 (19,948 rows), so for members
   5+ it is exactly twelve times the completed years.
 - The GSS-derived =BMI= column is 100% null in the 2024 person file; no
-  cross-check of the served measures is possible.  No MUAC is measured.
+  cross-check of the served measures is possible THERE.  It IS populated in
+  2022 (110,139 rows) and it confirms the wiring: see the per-year section
+  below.  No MUAC is measured in any year.
 
 * Economic activity in the past 7 days (Section 4A, members aged 5+)
 
@@ -285,7 +337,9 @@ convention (EHCVM 6, Malawi 5) -- NOT the ILO 15, which is the threshold of
 Parts B, D, E and F.  =s4aq1= is null for every member under 5 and for 790
 members aged 5+ (median age 5; 548 of them in 2024Q4; no =availreason=).
 
-- *The module is a FIRST-YES CASCADE, not eight independent dummies.*  The
+- *The module is a FIRST-YES CASCADE, not eight independent dummies -- in
+  2022 and 2024.  IT IS NOT ONE IN 2023* (measured 2026-09-18; see the
+  per-year section below).  In the two years where it holds:  The
   CAPI asks Q1 wage, Q4 domestic, Q7 farm, Q11 non-farm enterprise, Q15
   family help, Q19 fishing / gathering, Q22 apprentice, Q25 voluntary in
   that order, records the days and hours of the first Yes, and skips the
@@ -333,6 +387,170 @@ members aged 5+ (median age 5; 548 of them in 2024Q4; no =availreason=).
   table does not, it serves what was asked.
 - The 52 'Not member anymore' rows (45 with a Section 4A answer) are
   dropped as in =household_roster=.
+
+* The three person-file tables across the three years (2026-09-18)
+
+=cluster_features=, =anthropometry= and =people_last7days= now build for all
+twelve quarters from one shared, year-parameterised builder (s"Where the
+builders live").  Everything below was MEASURED during those builds; the
+numbers are in the build logs the builders print.  The 2024 outputs are
+byte-identical to what the 2024-only scripts produced before the hoist
+(=DataFrame.equals= True on all three tables, same index, same dtypes).
+
+** Rows served per quarter
+
+| table             |   2022Q1 |   Q2 |   Q3 |   Q4 |   2023Q1 |   Q2 |   Q3 |   Q4 |   2024Q1 |   Q2 |   Q3 |   Q4 |
+|-------------------+----------+------+------+------+----------+------+------+------+----------+------+------+------|
+| cluster_features  |      600 |  600 |  600 |  600 |      600 |  600 |  600 |  600 |      600 |  600 |  600 |  600 |
+| anthropometry     |   49,302 | 49,944 | 52,557 | 50,132 |   50,039 | 47,615 | 48,342 | 49,230 |   45,703 | 47,238 | 46,384 | 46,915 |
+| people_last7days  |   52,914 | 53,617 | 53,130 | 50,282 |   50,039 | 47,696 | 48,449 | 49,359 |   47,911 | 47,238 | 46,384 | 46,915 |
+
+=people_last7days= is the person file minus the departed lines, i.e. exactly
+=household_roster='s row counts.  =anthropometry= is that minus the rows
+with neither measure after decoding.
+
+** =anthropometry=: the "not measured" encoding is YEAR- AND QUARTER-SPECIFIC
+
+*This is the single most important finding of the 2026-09-18 pass.*  The
+2024 story -- "not measured is a negative sentinel" -- is FALSE for 2022 and
+only partly true for 2023.  Counts of each spelling, per year, on the raw
+=s3bq3= / =s3bq4= (the builder prints these per quarter):
+
+| year | measure | null   | negative | exactly 0 | 0 < x < 1 | exactly 99 | > 220 cm | non-null % |
+|------+---------+--------+----------+-----------+-----------+------------+----------+------------|
+| 2022 | Weight  | 12,588 |        0 |     3,529 |         0 |        114 |       -- |       94.0 |
+| 2022 | Height  | 12,138 |        0 |         0 |         0 |      1,730 |        0 |       94.2 |
+| 2023 | Weight  |    356 |        2 |         0 |         1 |      1,111 |       -- |       99.8 |
+| 2023 | Height  |    343 |      417 |         0 |    10,994 |      4,545 |      401 |       99.8 |
+| 2024 | Weight  |     10 |    2,873 |         0 |         0 |      1,875 |       -- |      100.0 |
+| 2024 | Height  |      3 |   13,001 |         0 |         0 |         -- |    3,861 |      100.0 |
+
+Where each spelling sits, which is what makes it a decoding question rather
+than a screening one -- each is concentrated in ONE quarter:
+- 2022: not-measured is plain MISSINGNESS, and it is a Q1/Q2 phenomenon
+  (weight nulls 7,843 / 3,767 / 825 / 153; height nulls 3,695 / 3,849 /
+  4,434 / 160).  Zero negatives, so the negatives-to-NA decode is a
+  measured no-op here, not an assumption.  The 3,529 weights of *exactly
+  0.0* are ALL in 2022Q3 and nowhere else.  =Height= = 99 is 1,564 of its
+  1,730 rows in 2022Q4.
+- 2023: the 417 negative heights and the 10,994 heights in (0, 1) -- values
+  like 3.05e-06 cm -- are ALL in 2023Q4, and =Height= = 99 (4,545 rows) is
+  Q1-Q3 only.  =Weight= = 99 (1,111) is Q3/Q4.
+- 2024: the negatives are ALL in 2024Q1 (13,001 heights at -99, 2,873
+  weights); =Weight= = 99 is spread evenly over the four quarters.
+
+*Served ranges.*  2022: Weight 0.0-170.0 (p1 0.0 because of the Q3 zeros;
+p99 97.2), Height 2.0-211.5 (p1 60.0, p99 181.4) -- *2024's ">220 cm"
+anomaly does not exist in 2022 at all* (0 rows), and 2023 has 401.  2023:
+Weight 0.99-170.0 (p99 99.0), Height 3.05e-07-279.8 (p1 0.0, p99 182.1).
+2024: Weight 2.0-170.0, Height 2.0-308.9.
+
+*What the build does, and does not, do.*  The rule is uniform and unchanged:
+a NEGATIVE value is not a measurement and is decoded to NA, with the counts
+printed; everything else is served exactly as recorded.  The non-negative
+spellings above are deliberately NOT decoded, because separating a zero, a
+1e-06 or a 99 from a real measurement needs a THRESHOLD, and a threshold is
+screening -- which this library does not do inside a build.  They are
+counted per quarter in the build log and recorded here instead.  A
+consequence worth stating plainly: =Country('GhanaAHIES').anthropometry()=
+today serves these values as measurements.  The counts in the table above
+are on the RAW column, before the departed-member and no-measure drops, so
+read them as upper bounds on what is served: 3,529 weights of 0 kg
+(2022Q3), 10,994 heights of ~0 cm (2023Q4), 6,275 heights of exactly 99 cm.  See the WAITING entry in the
+LOGBOOK.
+
+** =anthropometry=: the 2022 =BMI= column is a real cross-check, and it passes
+
+The GSS-derived =BMI= is 100% null in the 2023 and 2024 person files, but in
+2022 it is populated on *110,139* rows -- 45,110 / 33,682 / 31,347 / 0 for
+Q1-Q4.  Against the served measures:
+
+: BMI / (Weight / (Height/100)^2)  on 108,560 rows:
+:   median 1.0000, p1 1.0000, within 1% on 105,976 (97.6%)
+
+So =s3bq3= and =s3bq4= ARE the weight and height GSS itself used, in the
+units assumed here (kg and cm).  This is the cross-check the 2024-only build
+could not perform, and it is the strongest evidence the table is wired to
+the right columns.  =BMI='s own max of 19,834 is not a separate defect: it
+is what a 2 cm height does to the denominator.  =BMI= is populated on 1,579
+rows where a measure is missing or non-positive, so it is not simply a
+recomputation of the shipped pair.
+
+** =anthropometry=: the s3bq5 measurement MODE looks inverted in 2022
+
+Mode counts (the mode is recorded, never served -- the Uganda / Malawi /
+Tanzania / Nigeria precedents fold standing and lying into one =Height=):
+
+| year | Standing | Lying   | null   |
+|------+----------+---------+--------|
+| 2022 |   52,324 | 123,330 | 34,289 |
+| 2023 |  172,988 |  23,622 |    343 |
+| 2024 |  166,697 |  21,800 |      3 |
+
+2022's majority-Lying is not credible for a survey that measures every
+member (2023 and 2024 agree with each other and with the age crosstab
+above: lying is the under-fives).  The value labels of =s3bq5= are most
+likely swapped in the 2022 file.  Recorded because someone will otherwise
+"discover" it; no data consequence, since the column is not served.
+
+** =people_last7days=: 2023 IS NOT A FIRST-YES CASCADE
+
+The cascade identity re-measured per year -- for consecutive activity
+questions A then B, a cascade implies =null(B) = null(A) + yes(A)=.  Rows
+answering B AFTER an earlier Yes (a cascade says there should be none):
+
+| pair                     | 2022 |  2023 | 2024 |
+|--------------------------+------+-------+------|
+| s4aq1 (wage) -> s4aq4    |    0 | 7,444 |  390 |
+| s4aq4 -> s4aq7 (farm)    |    0 |   196 |    0 |
+| s4aq7 -> s4aq11 (SOB)    |    0 | 16,344 |   0 |
+| s4aq11 -> s4aq15         |    0 | 8,774 |    0 |
+
+2022 is a strict cascade (0 in every pair; 31 rows are null at =s4aq4= for
+another reason).  2024 is the cascade recorded above (390 answered anyway --
+and 1,244 rows are null at =s4aq4= for some OTHER reason, which the earlier
+2024 write-up did not mention; the identity was stated as exact and is not
+quite).  *2023 is not a cascade at all*: thousands of rows answer a later
+question after an earlier Yes.  What that changes: NA still means NOT ASKED
+and is still served as NA, never as False -- that part of the rule holds
+everywhere.  What it does NOT license in 2023 is the inference "=farm_work=
+is NA because this person already said Yes to wage work"; there, an NA is
+simply unanswered.  A share must still be computed on the answered rows.
+
+Answered / Yes / NA per served column, after the departed drop:
+
+| column    |                2022 |                2023 |                2024 |
+|-----------+---------------------+---------------------+---------------------|
+| wage_work | 182,688 / 15,442 / 27,255 | 171,987 / 14,781 / 23,556 | 166,870 / 14,722 / 21,578 |
+| farm_work | 166,733 / 28,486 / 43,210 | 163,775 / 28,606 / 31,768 | 150,849 / 27,660 / 37,599 |
+| SOB_work  | 138,247 / 15,867 / 71,696 | 151,415 / 17,203 / 44,128 | 123,189 / 16,471 / 65,259 |
+
+=Industry= is present on 87,666 / 82,577 / 78,602 rows (28,050 / 21,987 /
+19,755 of them with no served 7-day activity -- the temporarily absent and
+the unserved activity forms).  The unserved Yes counts, 2022 / 2023 / 2024:
+domestic work (=s4aq4=) 482 / 449 / 447; family help (=s4aq15=) 10,360 /
+9,084 / 7,341.  =s4aq19= (fishing / gathering), =s4aq22= (apprentice) and
+=s4aq25= (voluntary) are NOT plain yes/no questions -- =s4aq19= carries the
+production-destination label set ('Only for sale/barter', ...) beside 'No',
+=s4aq22= has three Yes variants and =s4aq25= spells its Yes ='Yes,'= -- so
+the builder reports their raw label counts and assumes nothing about which
+label means "did this".
+
+One 2023 row answers Yes to =s4aq1= with no hours recorded at all; it is
+served with =wage_hrs= NA (the =*_hrs= columns are declared optional).  The
+2024 build asserted that this could not happen; that assert was correct for
+2024 and wrong as a general rule, and is now a counted report.
+
+** Code 17 'Not member anymore', per year
+
+Dropped rows, measured on the source column each quarter actually uses:
+*2022: 0* (in every quarter, on BOTH =s1aq2= and =s1aq2x=); 2023: 1,410
+(0 / 17 / 11 / 1,382); 2024: 52 (all 2024Q1).  The full label set of both
+columns is printed per quarter by every build, so a re-release that respells
+the label -- which would turn this filter into a silent no-op -- shows up in
+the log rather than in the served data.  Checked 2026-09-18: the label is
+spelled identically in all three files, and 2022's zero is a real zero, not
+a spelling miss.
 
 * Sections 5-7 file (=SEC01567_edt=): food security and housing
 
@@ -626,9 +844,32 @@ mirror has not been checked (no WB key in that session).
 - WAITING @ligon: the 2023Q3 =hh_weight= factor of two -- double it in the
   wave script (with a note) or serve as shipped?  Recorded, not corrected,
   until decided.
-- TODO =cluster_features=, =people_last7days=, =anthropometry= for the
-  =2022/= and =2023/= folders (clone the 2024 scripts; re-check the Section
-  4A cascade and the anthropometric codes per year).
+- 2026-09-18 :: DONE =cluster_features=, =people_last7days= and
+  =anthropometry= extended to =2022/= and =2023/=.  Not cloned: the three
+  builders were HOISTED into =_/ghanaahies.py= as year-parameterised
+  functions and the nine wave scripts are thin callers (s"Where the builders
+  live").  2024's three outputs are unchanged by the hoist
+  (=DataFrame.equals= True, same index, same dtypes).  Findings, all in
+  s"The three person-file tables across the three years": the anthropometric
+  not-measured encoding is year- AND quarter-specific (2022 = plain
+  missingness plus 3,529 zero weights in Q3; 2023 = negatives and ~0 floats
+  in Q4, 99s in Q1-Q3; 2024 = negatives in Q1); *2023 is not a first-yes
+  cascade*; the 2022 =BMI= column cross-checks the served Weight/Height to
+  within 1% on 97.6% of rows; =s3bq5='s mode labels look swapped in 2022;
+  code 17 is a genuine 0 in 2022.  Also hoisted:
+  =ghanaahies.RELATIONSHIP_SOURCE=, the per-quarter relationship-source rule
+  the roster and education scripts still duplicate.
+- WAITING @ligon: the anthropometric NON-NEGATIVE not-measured spellings --
+  3,529 weights of exactly 0 kg (2022Q3), 10,994 heights of ~3e-06 cm
+  (2023Q4), 6,275 heights of exactly 99 cm (2022Q4 1,564 + 2023Q1-Q3 4,545),
+  1,111 + 114 weights of exactly 99 kg (counts on the raw column, i.e. upper
+  bounds on the served rows).  All are served AS RECORDED today.
+  Decoding them needs a threshold, and a threshold is screening, so the
+  build does not do it (the negatives-to-NA decode is unchanged).  Decide:
+  decode the exact sentinels (0, 99) per quarter where the concentration
+  makes the case, add a country-level screen, or serve as shipped and
+  document.  Same posture as the 2023Q3 =hh_weight= entry: recorded, not
+  corrected.
 - WAITING Sections 8-13 from GSS (consumption, expenditure, transfers,
   income, assets, enterprises).  Until then every consumption cell is
   =asked-not-distributed=.

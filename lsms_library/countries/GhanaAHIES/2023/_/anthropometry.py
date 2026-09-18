@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-"""Anthropometry (reported body measures) for GhanaAHIES 2024, all four
-quarters (t = 2024Q1 .. 2024Q4) from the one person x quarter file.
+"""Anthropometry (reported body measures) for GhanaAHIES 2023, all four
+quarters (t = 2023Q1 .. 2023Q4) from the one person x quarter file.
 
 Thin caller: the table is built by `ghanaahies.build_anthropometry`, which is
 shared by all three year folders and states the rule (Section 3B Q3-Q5, the
