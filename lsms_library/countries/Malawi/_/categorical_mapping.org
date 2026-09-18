@@ -225,6 +225,36 @@
 | OTHER (SPECIFY)                                                                                             | Other                                                    |
 | Other                                                                                                       | Other                                                    |
 
+# GH #832, 2026-09-18: the six plate-code rows 07 / 07c-07f used to carry
+# the Preferred Label `No.12 Plate` while their siblings 07a / 07b carried
+# `No 12 Plate`, so ONE unit shipped under two labels differing only by a
+# period -- measured on the delivered table, 2,430 rows on `No.12 Plate`
+# (2010-11 1,125 + 2013-14 1,305) against 8,764 on `No 12 Plate`, and BOTH
+# spellings occur inside EACH of those two waves.  They now all read
+# `No 12 Plate`.
+#
+# Evidence that `No 12 Plate` is the canonical one, from this file: the two
+# cross-table unit crosswalks below both decode plate code 7 to `No 12
+# Plate` -- `harmonize_crop_unit` (crop_production) and
+# `harmonize_price_unit` (community_prices) -- and each says in its own
+# header that it deliberately reuses "the same `u` Preferred Label
+# strings".  So the crop and price tables were already on the spaced
+# spelling and only food_acquired's 07/07c-07f rows were off it.  This
+# table is the ONLY place in the Malawi tree the string `No.12 Plate`
+# occurs (`grep -rn 'No\.12 Plate' lsms_library/countries/Malawi/`), so it
+# is the whole source of the split.
+#
+# Measured before landing, on the delivered 971,531-row food_acquired:
+# relabelling produces 0 duplicate index rows on (i, t, v, j, u, s) --
+# `food_acquired` is in `_ADDITIVE_MEASURE_COLUMNS`, so a collision would
+# make core SUM Quantity/Expenditure and re-derive Price over the frame.
+# Distinct `u` 641 -> 640; the merged label carries 2,430 + 8,764 = 11,194.
+#
+# NOT touched, deliberately: 06a `No.10 Plate (Flat)` / 06b `No.10 Plate
+# (Heaped)` beside 06 `No 10 Plate`.  Those are not two spellings of one
+# unit -- they add a heaping qualifier the survey asks about, and folding a
+# size/shape-qualified label onto its stem is the OPPOSITE defect (GH #832,
+# "Granularity is not spelling").
 #+name: u
 | Code | Preferred Label | hh_g03b_label |
 |------+-----------------+---------------|
@@ -263,13 +293,13 @@
 | 06d | No 10 Plate |  |
 | 06e | No 10 Plate |  |
 | 06f | No 10 Plate |  |
-| 07 | No.12 Plate |  |
+| 07 | No 12 Plate |  |
 | 07a | No 12 Plate | No 12 PLATE |
 | 07b | No 12 Plate | No 12 PLATE |
-| 07c | No.12 Plate |  |
-| 07d | No.12 Plate |  |
-| 07e | No.12 Plate |  |
-| 07f | No.12 Plate |  |
+| 07c | No 12 Plate |  |
+| 07d | No 12 Plate |  |
+| 07e | No 12 Plate |  |
+| 07f | No 12 Plate |  |
 | 08 | Bunch | bunch |
 | 08a | Bunch (Small) |  |
 | 08b | Bunch (Medium) |  |

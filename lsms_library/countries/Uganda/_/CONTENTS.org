@@ -839,6 +839,41 @@ inferred factor is the anti-pattern GH #850 exists to remove.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+** =food_acquired= DROPS rows whose unit label is off the =u= table
+
+Recorded 2026-09-18 (GH #832); the behaviour itself is much older and was
+undocumented until now.  After renaming =u= through
+=harmonized_unit_labels()=, =uganda.food_acquired= computes the set of
+delivered labels that are not Preferred Labels of the =u= table and
+removes every row carrying one:
+
+: unknown_units = set(units).difference(unitlabels.values())
+: if len(unknown_units):
+:     warnings.warn(...)
+:     df = df.loc[df.index.isin(unitlabels.values(), level='u')]
+
+Two things follow, and both are live caveats rather than settled design:
+
+- *It is the OPPOSITE of what =crop_production= does in this same
+  country.*  There an unrecognised unit becomes the =Unknown= SENTINEL
+  precisely so the row is not lost -- see "NA, never a sentinel -- and that
+  is deliberate" below.  =food_acquired= deletes instead.  Nobody appears
+  to have chosen that asymmetry; it is what the two code paths happen to
+  do.  Changing =food_acquired= to match would ADD rows, which is a mass
+  change and needs its own before/after.
+- *The loss is small but real and per-wave*: GH #832 measures at worst
+  0.22% of a wave (836 rows in 2019-20) and 698 purchased + 514 produced +
+  79 in-kind across the panel, on codes 800-802, 996-999 and the keying
+  slips =123060= / =142090= / =156087=.
+
+Until 2026-09-18 the warning said only "Dropping some unknown unit
+codes!", with the label set merely =print=ed -- so it could not be
+triaged, and because the message text was constant Python's
+once-per-location de-duplication suppressed it for a second wave dropping
+a DIFFERENT set.  The warning now names the row count, the frame size and
+every offending label with its own count, and is built per call.  The
+DROP itself is unchanged.
+
 * =people_last7days= counts MEMBERS, not visitors
 
 The question ("how many people were present in the last 7 days?") is

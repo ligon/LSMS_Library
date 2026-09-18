@@ -190,9 +190,31 @@ patch in =ethiopia.py:food_acquired=.  Source labels are read with
 parquet is written.  See =lsms_library/countries/Ethiopia/_/ethiopia.py=
 around lines 220-231 for the exact regex / =str.title()= calls.
 
-No =u= table is wired into =_/categorical_mapping.org=; the
-framework's auto-discovery on =u= would be a no-op (the labels are
-already canonical).
+*CORRECTED 2026-09-18 (GH #832).*  This paragraph used to read "No =u=
+table is wired into =_/categorical_mapping.org=; the framework's
+auto-discovery on =u= would be a no-op (the labels are already
+canonical)."  *Both halves are false.*  A =#+name: u= table has been in
+that file since the 2026-06-14 "Unit #0" pass (its own section header says
+so), it IS auto-discovered by name on the =u= index/column of every
+Ethiopia table, and it is not identity: =Digigimosh -> Other (Specify)=,
+=KILOGRAM -> Kg=, =Littere -> Liter=, =pices -> Pieces= and ~30 more rows
+all relabel at API time.  The "Unit #0 is FOUNDATION ONLY" claim in that
+table's own header ("the mapping is identity for every food_acquired
+unit") is the likely origin of the error -- it was true of the rows that
+existed on the day it was written, and the table has grown since.
+
+Two live consequences, so this is not a cosmetic correction:
+
+- a =u= spelling can be fixed EITHER in that table (API-time, affects the
+  served frame only) OR in =_clean_unit_label= (build-time, affects the
+  shipped-conversion-factor loader too, because that loader decodes its
+  own =unit_cd= through the same function).  They are not
+  interchangeable, and picking the wrong one silently de-synchronises the
+  two sides of the factor join.  GH #832 used the table for
+  =Other(Specify)= and =_clean_unit_label= for the Zorba mojibake, for
+  exactly that reason.
+- an edit to that table moves every Ethiopia cache hash, same as a
+  country-module edit.
 
 The =_/conversion_to_kgs.json= file is a kg-per-unit factor
 lookup consumed by =food_quantities= derivation -- it is a
@@ -1740,13 +1762,27 @@ coordinates.  Full set measured 2026-09-08: 2011-12 373/3,969 (34 tuples),
   occur in more than one Region* (one code spans 11).  Its formatting also
   drifts ('1' in W1-W3, '01' in W4-W5).  It is not usable as a geography
   key without namespacing it by Region.
-- =Region= carries 21 distinct strings for 11 regions -- Tigray/TIGRAY,
+- =Region= carried 21 distinct strings for 11 regions -- Tigray/TIGRAY,
   Somalie/SOMALI, Diredwa/DIRE DAWA, Gambelia/GAMBELA, Benshagul
   Gumuz/BENISHANGUL GUMUZ.  Values are internally consistent *within* a
   wave, so one-wave-at-a-time work is unaffected, but any cross-wave
-  pooling on Region is silently wrong.  Note "Sampling Design > Strata"
+  pooling on Region was silently wrong.  Note "Sampling Design > Strata"
   above says region names are harmonized via =categorical_mapping.org=;
-  that is true of =sample().strata= and NOT of =cluster_features.Region=.
+  that was true of =sample().strata= and NOT of =cluster_features.Region=.
+
+  *FIXED 2026-09-18 (GH #832)*: =_/categorical_mapping.org= now carries a
+  =#+name: Region= table, auto-applied by name, whose pairings are read
+  straight off the =strata= table in the same file -- the mapping this
+  repository already relies on for =sample().strata=, so no new judgement
+  is made.  Delivered =Region= is now 11 labels, and each one's row count
+  is the exact sum of its two spellings (Amhara 117 + 246 = 363, Oromia
+  119 + 238 = 357, Tigray 54 + 132 = 186, ...) over an unchanged 2,168
+  rows.  *It changes no collapse*: within each wave the spellings were
+  already unique per region (distinct Region per wave = 10 / 11 / 11 / 11
+  / 10, the region count), so the site-2 conflict set is untouched --
+  verified, the four =GrainCollapseWarning= cells stay at 373 / 454 / 732
+  / 1,240 with 2018-19 clean.  =District= is NOT fixed and remains as
+  described above.
 
 ** The unit axis, by contrast, is in good shape
 
@@ -1758,17 +1794,51 @@ rows carry a =u= that also occurs in =food_acquired=, and
 =community_prices \ food_acquired= is only {Packets, Pieces, Set, Spoon,
 Trip}.  =community_prices.j= joins =food_acquired.j= 47/47.
 
-Two small blemishes, neither worth a rebuild on its own:
+Two small blemishes, neither worth a rebuild on its own -- *both now FIXED
+under GH #832 (2026-09-18), which paid for the rebuild anyway*:
 
-- 550 =crop_production= rows carry mojibake units ("Zorba/Akara ... Large"
-  with a doubly-encoded replacement character) alongside the clean
-  "Zorba/Akara Large".  =_clean_unit_label= strips the U+FFFD character
+- 550 =crop_production= rows carried mojibake units ("Zorba/Akara ...
+  Large" with a doubly-encoded replacement character) alongside the clean
+  "Zorba/Akara Large".  =_clean_unit_label= stripped the U+FFFD character
   but the stored text is its double-encoded form.  Zero of the 3,721
-  usable sold rows are affected.
-- "Other (Specify)" and "Other(Specify)" both occur, differing only in the
-  space, and =crop_production= uses the spaced form while
-  =community_prices= and =food_acquired= use both.  Any analysis must drop
-  these rows anyway -- a price "per Other (Specify)" is not a price.
+  usable sold rows were affected.
+
+  Fixed in =_clean_unit_label=, *not* in the =u= table, because the
+  shipped-conversion-factor loader decodes its own =unit_cd= through the
+  same function -- a config-only fold would have cleaned the served
+  =crop_production.u= while leaving that loader on the damaged spelling.
+  Two details worth keeping:
+
+  1. *The sequence is U+00EF U+00BF U+00BD, and it must be stripped BEFORE
+     =str.title()=.*  The parquet spells it =Zorba/Akara Ï¿½ Large=
+     (U+00CF) only because title-casing upper-cases the leading =ï=.
+     Matching on the delivered spelling produces a rule that can never
+     fire -- which is exactly what the first attempt did, silently.
+  2. *The evidence that the damaged and clean labels are one unit* is
+     this wave's own WB conversion table, =Crop_CF_Wave3.dta=, which
+     lists the same three size-qualified names cleanly under codes
+     191/192/193.  So it is an encoding repair, not a spelling merge, and
+     the Small/Medium/Large granularity is preserved.
+
+  Measured effect: 550 rows leave the off-axis label; 541 of them gain a
+  shipped kg factor (=shipped= 62,164 -> 62,705, =none= 15,587 ->
+  15,046), the 2015-16 unit-label coverage ceiling rises 0.820 -> 0.8435,
+  and =Harvest_kg= goes 12,680,617.28 -> 12,685,707.32.  The nine that
+  still land on =none= have no =(crop, unit)= cell in the WB table.
+  =tests/test_ethiopia_shipped_factors.py= re-baselined in the same PR.
+
+- "Other (Specify)" and "Other(Specify)" both occurred, differing only in
+  the space, and =crop_production= used the spaced form while
+  =community_prices= and =food_acquired= used both.  Any analysis must
+  drop these rows anyway -- a price "per Other (Specify)" is not a price.
+
+  Folded onto the SPACED form in the =u= table (API-time is the right
+  layer here: nothing downstream of =_clean_unit_label= consumes this
+  label).  The spaced form is canonical on this country's own evidence --
+  the table already folds =Digigimosh= onto it.  Counts:
+  =food_acquired= 1,253 + 1,347 = 2,600; =community_prices= 653 + 1 =
+  654; =crop_production= already all-spaced at 5,498.  What it buys is
+  that the rows are droppable with ONE test instead of two.
 
 * shocks: one builder, and what "affected" means (GH #875, 2026-09-12)
 
