@@ -333,7 +333,7 @@ Merge #930 once CI is green (=unit-tests= was in flight at handoff).  Then
 either #932 (the CI gap -- it is the one that lets this class of error repeat)
 or #928's P1/P2, which still needs its cache-invalidation measurement first.
 
-#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
+* Earlier handoff: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
 
 * Categorical-mapping session (2026-09-14/15, job 38854624)
 
@@ -438,7 +438,7 @@ reproducer as needing one.
 Merge #930 to un-red =development=, then decide #928's P1/P2 or file the CI
 gating gap.
 
-#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
+* Earlier handoff: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
 
 * GhanaLSS backlog session (2026-09-12, Sue / GPT-6, job 38734650)
 
