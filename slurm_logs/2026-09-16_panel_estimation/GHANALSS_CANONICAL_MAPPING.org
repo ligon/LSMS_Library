@@ -1,0 +1,703 @@
+#+TITLE: GhanaLSS GLSS1/GLSS2 Section 9 -> canonical tables
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+
+Companion to =GHANALSS_SECTION9.org=, which inventories the source.  This note
+answers: which *canonical* tables can Section 9 populate, on what precedent,
+and where the canonical vocabulary has no slot for what the instrument asks.
+
+Scope, per @ligon 2026-09-16: *the two panel waves only* (1987-88, 1988-89).
+Later GLSS rounds do not extend the panel.
+
+* Where the canonical descriptions live
+
+- Index shapes :: =lsms_library/data_info.yml=, =Index Info > index_info=.
+- Column notes, spellings, required/optional :: same file, =Columns=.
+- Per-country declaration :: =countries/{C}/_/data_scheme.yml=.
+
+Two things worth knowing before reading the table below, because they change
+what "canonical" even constrains here:
+
+1. =crop_production=, =plot_features= and =livestock= are registered in
+   =index_info=.  *=plot_inputs= and =plot_labor= are NOT* -- that is open
+   issue *#569*.  They are governed entirely by per-country =data_scheme.yml=,
+   so their "canonical" shape is really the corpus convention.
+2. The =Columns= block is *not* an exhaustive column list.  It carries only
+   columns needing a note or a =spellings= block.  =crop_production.Quantity=,
+   for instance, appears in no =Columns= entry but is declared by every
+   country.  The operative vocabulary is what the countries agree on.
+
+* Land: yes, the canonical tables answer it -- but not via =plot_features=
+
+Canonically =Area= lives on *=plot_features=* (=(t, v, i, plot_id)=), as
+hectares, beside =AreaUnit= for the original survey unit.  That table is
+C4-validated *=not-asked=* for both panel waves: Section 9 has no farm-number
+column and no per-farm roster part.  So the canonical home for area is a table
+that legitimately does not exist here, and a synthetic =plot_id= is ruled out.
+
+*The precedent that resolves it is EthiopiaRHS* -- the corpus's other
+plot-less country (GH #512):
+
+: crop_production:
+:   index: (t, i, j, u)
+:   Quantity: float        # production, kg harvested
+:   Area_ha: float         # area planted, hectares
+
+It carries *area on the crop row*, not on a plot table.  GLSS1/GLSS2 Part B
+Q2 asks "how many *acres* of [crop] were harvested", i.e. exactly that shape --
+area per household-crop.  So =crop_production.Area_ha= (acres / 2.47105) is
+the conventional answer, with EthiopiaRHS as the named precedent.
+
+=Y09A.ACRFRM= (household total acres farmed) is a *second*, coarser land
+measure with no canonical home.  It should roughly equal the sum of =CROPH=
+over crops; the two disagreeing would be a useful check.  Recommend not
+wiring it initially.
+
+* The mapping, table by table
+
+** =crop_production= -- good fit, with one honest hole
+
+Index: =(t, i, j, u)= on the EthiopiaRHS precedent.
+
+| canonical column | GLSS1/2 | form | confidence |
+|------------------+---------+------+------------|
+| =Quantity=       | *none*  | never asked | *certain -- see below* |
+| =Quantity_sold=  | =CROPS=   | Q4 quantity | high |
+| =Unit_sold=      | =CROPSU=  | Q4 unit     | high |
+| =KgFactor=       | =CROPSUK= | Q5 "how many kilograms per [UNIT]" | high |
+| =Value_sold=     | =CROPSP=  | Q6 amount   | high |
+| =Area_ha=        | =CROPH=/2.47105 | Q2 acres harvested | high |
+| =intercropped=   | =CROPD=   | Q13         | high |
+
+=Unit_sold= and =KgFactor= are canonical *optional* columns (Uganda declares
+both).  =KgFactor='s canonical note -- "Kilograms per ONE unit of this row's
+=u=, AS THE INSTRUMENT REPORTS IT" -- describes =CROPSUK= exactly.
+
+*** =Quantity= is not asked, and must not be declared required
+
+Every other country declares =crop_production.Quantity= (harvest, in unit
+=u=).  Part B never asks it; it asks quantity *sold* only.  Declaring it
+required and all-null would trip *Site B* of the null-read guard ("required
+declared column 100% null in every wave") and raise =NullReadError= under
+=LSMS_READ_STRICT=1=.  So: declare it =optional: true=, or omit it.  Either is
+an honest statement that this instrument does not ask it; guessing a value
+from the sold quantity would not be.
+
+*** Open: what is =u=?
+
+Canonically =u= is the unit the *harvest* was measured in.  With no harvest
+quantity there is no such unit.  Two options, both defensible:
+
+- =(t, i, j, u)= with =u= = the sold unit (=CROPSU=).  Keeps the canonical
+  shape, but =u= then means something different than it does elsewhere --
+  and =Unit_sold= already holds that value, so it is duplicated.
+- =(t, i, j)=, no =u=.  Honest, and nothing forces =u=; but it departs from
+  the shape EthiopiaRHS kept deliberately ("degenerate here, but the canonical
+  shape carries =u= in the index uniformly").
+
+*I lean to the second* -- a duplicated level that means two things in two
+countries is worse than an absent one -- but it is your call.
+
+*** No canonical home: the disposition values
+
+=CROPKV= (value of crop kept for *seed*), =CROPPV= (value *given* to
+labourers/landowner/gifts), =CROPLV= (value *lost* to insects/rodents/fire/rot)
+are asked per crop and have *no counterpart anywhere in the corpus*.  They are
+new columns whatever we do.  They are also what makes a value-based output
+measure possible at all, so they are worth carrying.
+
+** =plot_inputs= -- excellent structural fit, no slot for spend
+
+Index: =(t, i, input, crop, u)= -- the *EHCVM precedent* (Benin, Togo, Burkina
+Faso, Cote d'Ivoire, Guinea-Bissau, Niger, Senegal all declare exactly this),
+which has *no plot level*.  GLSS1/2's input module is input x crop with no
+plot, so the shape matches without any adaptation.
+
+| canonical column | GLSS1/2 |
+|------------------+---------|
+| =Quantity=       | =FERTQNT=, =MANUQNT=, =INSCQNT= (fertilizer, manure, chemicals only) |
+| =u=              | =FERTQNTU=, =MANUQNTU=, =INSCQNTU= |
+| =Purchased=      | derivable -- the module asks whether the input was bought, and on credit |
+
+*** The gap: input SPEND has no canonical column, anywhere
+
+Swept every =data_scheme.yml=: the only value-bearing columns in any
+agricultural table are =crop_production.Value_sold= and livestock's
+=ValuePerAnimal= / =HerdValue= / =SalesValue=.  *No country's =plot_inputs=
+carries a cost, value or expenditure column.*  The corpus records input
+*quantities*.
+
+GLSS1/2 records input *spend*, and for four of the seven inputs it records
+*nothing else*:
+
+| input                | quantity? | spend        |
+|----------------------+-----------+--------------|
+| fertilizer           | yes       | =FERTAMT=    |
+| manure               | yes       | =MANUAMT=    |
+| chemicals            | yes       | =INSCAMT=    |
+| seeds / young plants | *no*      | =SEEDAMT=    |
+| transport            | *no*      | =TRANAMT=    |
+| containers           | *no*      | =CONTAMT=    |
+| storage              | *no*      | =STORAMT=    |
+
+Since "farm-level expenses" is the point of the exercise, dropping spend is not
+an option.  Because =plot_inputs= has no =index_info= or =Columns= entry
+(#569), adding a column is a *per-country declaration*, not a canonical schema
+change -- the same latitude by which Malawi declares =Improved= and Ethiopia
+declares =Applied=.  So this is cheap to do; what it needs is a *name we are
+willing to see other countries adopt*.
+
+*Open question*: the name.  =Value= is the least surprising given
+=Value_sold=; =Cost= says more clearly that it is an outlay.  Your call, and
+worth choosing as if it were canonical, because the next country that records
+input spend should reuse it.
+
+** =livestock= -- good fit
+
+Index: =(t, i, animal)=, the shape every country uses.  =Y09F= carries an
+animal code with owned / sold / bought counts and values, which lines up with
+=HeadCount= / =HeadSold= / =HeadAcquired= / =HerdValue= / =SalesValue=.
+
+*Confidence: medium.*  The mapping is inferred from variable names
+(=LIVSTN/SN/BN= counts, =LIVSTNV/SV/BV= values); the Part F form (p.53) has
+*not* been read yet.  Read it before wiring.
+
+** =plot_labor= -- poor fit, needs a decision
+
+Corpus convention is =(t, i, plot_id, source)= with =PersonDays= and =Wage=,
+and *every* country that declares it carries =plot_id= -- including the EHCVM
+countries that drop the plot level from =plot_inputs=.  There is no
+plot-less precedent for this table.
+
+GLSS1/2's labour (=Y09D3B=) is *household-level*: =CREXLAB= (hired-labour
+spend) plus a male/female/child x 4-period worker-count grid.  So it has
+neither a plot level nor person-days directly, and its headline number is
+again a *spend*.
+
+Options: a =(t, i, source)= variant (departs from a convention nothing else
+departs from), fold hired-labour spend into =plot_inputs= as another input row
+(structurally tidy, semantically a stretch), or leave labour unwired in the
+first pass and add it once the shape question is settled.  *Recommend the
+third* -- output, land, inputs and livestock are enough for a first Mundlak
+specification, and labour deserves its own decision rather than being decided
+by haste.
+
+* Summary of what needs your decision
+
+1. =crop_production= index: =(t, i, j, u)= with =u= = sold unit, or =(t, i, j)=?
+2. Names for the three disposition-value columns (seed / given / lost).
+3. Name for the input-spend column -- =Value=, =Cost=, or something else --
+   chosen as if canonical, since it would be the corpus's first.
+4. =plot_labor=: defer, or pick a shape now?
+5. =Quantity= on =crop_production=: declare =optional: true=, or omit entirely?
+
+* Not blocking, but worth knowing
+
+- Each input's crop list is capped at *four* lines in the form, so a household
+  cultivating more than four crops has its input spend truncated invisibly.
+- Wiring anything moves *every* GhanaLSS cache hash (the country
+  =data_scheme.yml= is hashed whole), so the bill is a whole-country cold
+  re-warm including the 5.26M-row =food_acquired=.
+- =crop_production= and =livestock= would be GhanaLSS's first agricultural
+  tables, so =Feature('crop_production')= gains a country -- worth a
+  cross-country check once built.
+
+* Decisions taken (@ligon, 2026-09-16)
+
+Index =(t, i, j)=, no =u=.  Input-spend column named =Cost=.  =plot_labor=
+deferred.  =Quantity= included -- see the caveat under "Dispositions" below.
+
+* Dispositions: what the four of them mean
+
+Part B does not ask a harvest quantity.  What it asks is *where the harvest
+went*, use by use, and what each part was worth.  Four uses are asked here and
+a fifth is asked elsewhere:
+
+| use            | asked | flag      | value     | question                                       |
+|----------------+-------+-----------+-----------+------------------------------------------------|
+| sold           | Q4/Q6 | --        | =CROPSP=  | "How much was the harvest of [...] sold for?"  |
+| kept for seed  | Q7/Q8 | =CROPK=   | =CROPKV=  | "How much would the same quantity of seed cost in the market?" |
+| given away     | Q9/Q10| =CROPP=   | =CROPPV=  | "Did you give part of the harvest to laborers, or to a land owner, or as a gift, or for ceremonies and fetishes?" |
+| lost           |Q11/Q12| =CROPL=   | =CROPLV=  | "Have you lost any part of the harvested crop to insects, rodents, fire, rotting etc.?" |
+| *eaten*        | *not in Section 9* | | | Section 12B, already wired as =derive_12b_fortnight_value= |
+
+=CROPL= is not a yes/no but a *cause* code, verified against the form:
+1 INSECTS, 2 RODENTS, 3 FIRE, 4 ROTTING, 5 OTHER/COMBINATION, 6 NO.  (A first
+pass over the fax misread 4 as "NOTHING"; it is ROTTING.)
+
+The flags and the values agree exactly -- GLSS1 =CROPK= YES = 6,152 and
+=CROPKV= non-null = 6,152; =CROPP= YES = 6,803 against 6,804 -- so there are no
+orphan values to reconcile.
+
+** The valuation basis is NOT the same across the four
+
+This is the part that matters economically and is invisible in the variable
+names:
+
+- =CROPSP= (sold) is what the household *received*.
+- =CROPKV=, =CROPPV=, =CROPLV= each answer "how much would the same quantity
+  *cost in the market*" -- an imputed *replacement* price, i.e. the buyer's
+  side of the farmgate/market gap, normally above what the household would get.
+
+So adding the four gives a total in *mixed prices*.  The repo already takes
+this distinction seriously: =.coder/ledger/585-own-production-valuation.md=
+requires a valuation's docstring to "state which side of the farmgate/market
+gap it lands on", and =GhanaLSS/_/CONTENTS.org= records the same contrast
+between Section 8H (farmgate) and Section 12B's =VFOODCPD= ("what it would cost
+to buy").  Carrying the four separately, which is what the canonical wide shape
+does anyway, keeps the choice with the analyst.
+
+** What each disposition IS, economically
+
+- *Seed* is an intermediate input, not final output: this season's harvest
+  retained as next season's input.
+- *Given* is a MIXED category and cannot be split.  Grain to labourers is a
+  wage in kind and grain to a land owner is rent in kind -- both factor
+  payments -- while gifts and ceremonies are transfers.  Counting the category
+  as output without also counting the factor-payment part as a cost overstates
+  profit.
+- *Lost* is realized output that perished.  For a production function
+  (technology) it belongs in output; for a revenue or profit function it does
+  not.
+- *Sold* is the only one measured at a transaction price.
+
+** Practical hazard: =CROPSP= is a PRICE PER UNIT, not a total
+
+=CROPSP= is denominated by =CROPSPU=, which draws on the same unit-code list as
+=CROPSU= (1 pound, 2 kilogram, 3 ton, 4 minibag, 5 maxibag, ..., 22 ALL).  The
+medians form a clean price ladder by unit size, which is what a per-unit price
+looks like and not what a total looks like:
+
+| =CROPSPU=       | median =CROPSP= (1987-88) |
+|-----------------+---------------------------|
+| 1 pound         |                        50 |
+| 2 kilogram      |                        75 |
+| 4 minibag       |                     1,600 |
+| 5 maxibag       |                     4,400 |
+| 3 ton           |                     7,500 |
+
+So =Value_sold= is *not* =CROPSP=.  It is =CROPSP= when =CROPSPU= = 22 (ALL),
+and =CROPSP= x (quantity expressed in =CROPSPU= units) otherwise -- and
+=CROPS= is denominated in =CROPSU=, which is not always the same unit, so the
+conversion has to go through =CROPSUK= (kg per sold unit) where it exists.
+
+This is GH *#824* ("crop_production: sale value is per SOLD unit but the table
+carries only the HARVEST unit =u=") appearing in a new country.  Read that
+issue before wiring =Value_sold=.
+
+Coverage note: =CROPSP= is populated on ~38% of rows (6,445 / 16,938 in GLSS1),
+consistent with most crop rows recording no sale at all; =CROPS= is non-null
+almost everywhere but is zero where nothing was sold.
+
+** Consequence for =Quantity=
+
+@ligon asked for =Quantity= to be included.  It has to be declared
+=optional: true= and will be *entirely NaN*: Part B asks quantity SOLD
+(=CROPS=) and never quantity harvested, and the other three dispositions are
+asked as values, not quantities, so no harvest quantity can be reconstructed.
+=optional: true= is also what keeps Site B of the null-read guard from raising
+=NullReadError= on a required all-null column.
+
+** Proposed names
+
+Parallel to the established =Value_sold=:
+
+| column        | source    |
+|---------------+-----------|
+| =Value_seed=  | =CROPKV=  |
+| =Value_given= | =CROPPV=  |
+| =Value_lost=  | =CROPLV=  |
+| =LossCause=   | =CROPL=   |
+
+=LossCause= is free information (insects / rodents / fire / rotting / other)
+and worth keeping.  The one thing the names do not convey is the valuation
+asymmetry above, which therefore belongs in the column notes.
+
+* =Value_sold= is a DERIVATION, and here is the evidence for its rule
+
+@ligon, 2026-09-16: compute =Value_sold= per GH #824, and register it through
+the derived-value machinery.
+
+** #824 is a RELATED but DIFFERENT problem -- do not conflate them
+
+#824 is about the *unit*: =Value_sold= is a recorded total, =Quantity_sold= is
+in the SOLD unit, and the table carries only the HARVEST unit =u=, so
+=Value_sold / Quantity_sold= is a price per the wrong unit.  Its fix is to
+carry =Unit_sold=.
+
+GhanaLSS has a *stronger* problem: =Value_sold= is *not recorded at all*.  Q6's
+=AMOUNT= is denominated by its own =UNIT= box (=CROPSPU=), so most rows carry a
+*price per unit*, not a total.  #824's remedy (carry =Unit_sold=) is necessary
+here but not sufficient -- the total has to be constructed, which is why this
+is a derivation and not a column mapping.
+
+** The evidence
+
+The form (p.44, block =9B1=, col 6) reads "How much was the harvest of [...]
+sold for?" over two boxes, =AMOUNT= and =UNIT=.  That is ambiguous on its own.
+The data resolves it -- =CROPSPU= is essentially bimodal:
+
+| relation of =CROPSPU= to =CROPSU= | 1987-88 | 1988-89 |
+|-----------------------------------+---------+---------|
+| equal (amount is per that unit)   |  91.3%  |  85.8%  |
+| = 22, i.e. ALL                    |   9.6%  |  15.9%  |
+| neither                           |   2.0%  |   0.95% |
+
+A form whose =UNIT= box merely restated a total would not need the box, and
+would not offer =ALL= as a distinct code.  Magnitudes agree: for maize, taking
+=CROPSP x CROPS= on same-unit rows gives a median 11,100 against 10,000 on the
+rows that report =ALL= (where =CROPSP= is unambiguously the total), whereas
+=CROPSP= alone gives 3,550 -- three times too small.  Cassava and cocoa behave
+the same way.
+
+*Caveat, recorded rather than smoothed over*: yam and plantains *overshoot*
+under the same rule (yam =CROPSP x CROPS= median 100,000 vs 8,000 on ALL rows).
+The =ALL= and same-unit groups are different households selling different
+amounts, so the comparison is confounded by transaction size and is
+*suggestive, not conclusive*, for those two crops.  This is the thing to check
+first if the derived values look wrong.
+
+** Proposed rule
+
+: Value_sold = CROPSP                  where CROPSPU == 22 (ALL)
+:            = CROPSP * CROPS          where CROPSPU == CROPSU
+:            = NaN                     otherwise (2.0% / 0.95% of sale rows)
+
+Leaving the residual NaN rather than converting it is a deliberate choice: the
+conversion would need a factor between two different container units that the
+survey does not supply for that row.
+
+** Proposed registry entry
+
+Key =GhanaLSS::crop_production::9b-sale-amount-per-unit=, in
+=GhanaLSS/_/derivations.yml= (a sibling of =population.yml=; a =.yml= there
+moves no cache hash).  Fields per =lsms_library/derivations.py=; allowed
+=basis= values are =config-comment=, =filename=, =modelling-choice=,
+=questionnaire=, =variable-label=.
+
+- waves :: =['1987-88', '1988-89']=
+- columns :: =[Value_sold]=
+- raw_variables :: =[Y09B.CROPS, Y09B.CROPSU, Y09B.CROPSP, Y09B.CROPSPU]=
+- assumptions ::
+  - Q6's =AMOUNT= is denominated by its own =UNIT= box -- =basis: questionnaire=,
+    evidence 1988-89 household questionnaire PDF p.44, form block =9B1= col 6.
+  - unit code 22 = =ALL=, so the amount is the whole sale -- =basis: questionnaire=,
+    evidence the unit-code legend at the foot of the same page.
+  - rows whose =CROPSPU= is neither =CROPSU= nor =ALL= are left NaN rather than
+    converted -- =basis: modelling-choice=.
+- validated_against :: *not yet done.*  The natural external check is
+  =PRICE.DAT= / =community_prices= (wired for this country; see
+  =.coder/ledger/562-ghanalss-community-prices.md=): the implied farmgate price,
+  =Value_sold / Quantity_sold= converted to kg through =CROPSUK=, should sit
+  below the community market price for the same crop and round.  Run it before
+  the entry claims validation -- and it is the check that would settle the yam
+  and plantain caveat above.
+
+** Two mechanical points
+
+- =Derivation= is not in the canonical =Columns: crop_production= block, so it
+  must be added there as =optional: true=.  =data_info.yml= is in no cache
+  fingerprint, so that costs nothing.
+- The stamp must go on AFTER any collapse.  Here there is none to worry about:
+  =(HID, CROP)= is *unique* in both waves (16,938 and 20,342 rows, zero
+  duplicates), so the declared =(t, i, j)= index is unique and
+  =_normalize_dataframe_index= has nothing to reduce.  That also independently
+  vindicates dropping =u= from the index.
+
+* Settled after the validation pass (Sue, 2026-09-16)
+
+** The yam and plantain "overshoot" was an artefact.  The rule stands.
+
+Both apparent failures dissolve on inspection, and neither is a data problem:
+
+- *Yam*: =CROPSU= is itself 22 (ALL) on 116 of the 214 rows my diagnostic
+  counted as "same-unit", because =CROPSU == CROPSPU == 22= satisfies both
+  masks.  Those rows belong in the ALL branch.  The diagnostic tested
+  same-unit first; the *rule* tests ALL first, so the rule was never affected.
+- *Cocoa* (62.5x): the same-unit rows sell in maxibags at a median 8,750 per
+  maxibag, the ALL rows in kilograms at an implied 140 per kg.  8,750 / 140 is
+  about 62 -- that ratio *is* the maxibag-to-kilogram conversion.  The two
+  groups agree; they simply sell in different units.
+
+Plantains, cassava and maize sit within ~1-3x with matching unit composition.
+The per-unit reading of =CROPSP= is confirmed.  *Test ALL before same-unit.*
+
+** =Quantity_sold= is in =Unit_sold=, NOT in kilograms
+
+Worth stating in the column notes, because the analyst's first instinct is
+=Value_sold / Quantity_sold= and that is a price per whatever container the
+household sold in -- which varies row by row.  The kilogram conversion is
+=Quantity_sold x KgFactor= for the unstarred (container) units and the metric
+factor for the starred ones.
+
+*And the canonical kg machinery does not reach this country.*
+=harvest_kg_factors= keys the reported factor to =(u, condition)= and needs
+=Quantity=; GhanaLSS has neither.  So =CROPSUK= is carried for the analyst's
+use, not for =harvest_kg=.
+
+*Small open point*: canonically =KgFactor= is "kilograms per ONE unit of this
+row's =u=".  Ours is kilograms per =Unit_sold=.  With no =u= in the table
+there is nothing else it could mean, so carrying it as =KgFactor= with a note
+is defensible -- but if you would rather it not borrow a name whose canonical
+definition points at a level this table does not have, say so.
+
+** =plot_inputs=: =u= is a COLUMN here, not an index level
+
+Both patterns exist in the corpus: Malawi and the EHCVM countries put =u= in
+the index; *Uganda, Ethiopia and Nigeria declare it as a column* (=u: str=)
+beside =Quantity=.
+
+GhanaLSS must follow the second.  Four of the seven inputs -- seed, transport,
+containers, storage -- are amount-only, so those rows have no quantity and no
+unit.  A NaN on a declared index level is Site I territory, and the first
+=groupby= deletes the row.  So: =index: (t, i, input, crop)= with =u: str= and
+=Cost: float= as columns.
+
+** =livestock= is in scope, and the mapping is now form-verified
+
+Part F (p.53) is one row per animal -- cattle, sheep, goats, chickens, pigs,
+other poultry, rabbits/guinea pigs, other -- with:
+
+| Q  | question                                           | variable   | canonical column |
+|----+----------------------------------------------------+------------+------------------|
+|  4 | how many of all ages owned at present              | =LIVSTN=   | =HeadCount=      |
+|  5 | if they sold one today, how much would they receive *altogether* | =LIVSTNV= | =HerdValue= |
+|  7 | how many have they sold                            | =LIVSTSN=  | =HeadSold=       |
+|  8 | how much received from sales in past 12 months     | =LIVSTSV=  | =SalesValue=     |
+| 10 | how many did they buy                              | =LIVSTBN=  | =HeadAcquired=   |
+| 11 | how much paid for all they bought                  | =LIVSTBV=  | (no canonical column) |
+| 12 | how many born or received as gifts                 | =LIVSTAD=  | (none)           |
+| 13 | how many *eaten* by the household                  | =LIVSTE=   | (none)           |
+| 14 | how many lost, stolen, given, sacrificed or died   | =LIVSTDI=  | (none)           |
+
+Five canonical columns map *directly*.  =ValuePerAnimal= is derivable as
+=HerdValue / HeadCount= (Q5 is explicitly "altogether"), which makes it a
+derivation, not a mapping.  =TLU= is a transform output and is declared by only
+one country (EthiopiaRHS); per-country subsets are normal -- Benin and Togo
+declare three columns.
+
+Q13 is *livestock own-consumption*, the exact parallel of the crop
+own-consumption gap, and has no canonical home.  Worth carrying.
+
+* "We are going to want to value those subsistence harvests" (@ligon, 2026-09-16)
+
+Correct, and it is the right question to press on -- but it does not run
+through =crop_production.u=, and measuring it turns up something more important
+than the index decision.
+
+** Section 9 already values three of the four dispositions, in cedis
+
+The form does not ask a quantity for seed, gifts or losses; it asks *"how much
+would the same quantity cost in the market"* and records an amount.  So those
+parts arrive pre-valued and need no unit and no price.
+
+** There is no quantity on a non-sale row for a unit to describe
+
+Measured on the non-sale rows (10,517 / 13,048):
+
+| field                | 1987-88 non-null | >0 |
+|----------------------+------------------+----|
+| =CROPS= (quantity)   |           10,505 |  *0* |
+| =CROPSUK= (kg/unit)  |                7 |  3 |
+| =CROPH= (acres)      |           10,517 | 8,068 |
+| =CROPKV= (seed val)  |            3,305 | 3,304 |
+| =CROPPV= (given val) |            3,173 | 3,170 |
+| =CROPLV= (lost val)  |            2,465 | 2,464 |
+
+=CROPS= is non-null but *literally zero* on every non-sale row -- the form's
+"IF NOTHING, WRITE ZERO AND ->7".  So =u= would have nothing to describe on
+precisely the 62-64% of rows it was being considered for.  The concern, followed
+through, *strengthens* the case for omitting it.
+
+** The real finding: ~19% of cropped rows are invisible to Section 9 entirely
+
+Of rows with harvested acreage > 0:
+
+|                                      | 1987-88 | 1988-89 |
+|--------------------------------------+---------+---------|
+| rows with acreage > 0                |  14,337 |  17,714 |
+| ...sold something                     | 43.7%   | 40.7%   |
+| ...carry SOME Section 9 value         | 81.1%   | 80.5%   |
+| *...carry NO Section 9 value at all*  | *18.9%* | *19.5%* |
+| households with >=1 such row          | 1,127 / 2,178 | 1,408 / 2,393 |
+| share of harvested ACRES in those rows| 13.9%   | 14.4%   |
+
+Those are crops grown and wholly consumed: acreage recorded, output valued
+nowhere in Section 9.  They have no quantity either, so *no index choice
+recovers them*.
+
+*** Consequence: the Section 12B splice is LOAD-BEARING, not optional
+
+An earlier section listed "splice 12B own-consumption, or use Section 9
+dispositions alone and state the omission" as an open question.  This
+measurement answers it.  Section 9 alone would serve *zero output* for ~19% of
+cropped rows covering ~14% of harvested acres and touching *half the farming
+households* (1,127 of 2,178; 1,408 of 2,393) -- and it would do so
+*non-randomly*, concentrated in exactly the subsistence-oriented households a
+production function is most likely to be about.  Regressing a value of output
+that is structurally zero for the most subsistence-oriented half of the sample
+would not be a noisy measure; it would be a selected one.
+
+So own-consumption from =food_acquired= (=s='produced'=, already derived for
+both waves by =12b-fortnight=) is required, not a refinement.  Its unit lives
+in =food_acquired='s own index =(t, i, j, u, s, visit)=; =crop_production= does
+not need one to make the join.
+
+*What the splice costs*, stated so it is chosen and not discovered: it crosses
+a recall window (Section 9 annual vs 12B fortnight annualised) and needs a
+crop-code to food-item mapping, since the two modules use different =j=
+vocabularies.  Both are real work and neither is affected by the index choice.
+
+* Price sources, and a correction (@ligon, 2026-09-16)
+
+@ligon: "You're proposing to use the produced values in food_acquired to get
+prices to value the stock of harvest?  Because if so there are other possible
+sources of prices."
+
+*Correction first.*  What was proposed was using the 12B *values* directly as
+the own-consumption component of output -- not deriving prices from them.  But
+the question exposes that the proposal does more work than was admitted:
+*Section 12B measures CONSUMPTION, not production.*  Substituting it is not a
+recall-window splice, it is substituting a different concept.  Home-produced
+food eaten in a year differs from the year's harvest by stocks carried, gifts
+received, and every non-food crop.  It is a proxy, and must be labelled one.
+
+** What there is to value, and what there is not
+
+Section 9 records exactly one quantity: the quantity *sold*.  Seed, gifts and
+losses arrive as values with *no quantity behind them*, and the ~19% of cropped
+rows with no Section 9 value at all have neither.  So a better price source
+does not rescue those rows -- but it does enable the *inverse* operation,
+backing an implied quantity out of a recorded value.
+
+** The four sources
+
+| source | grain | coverage in the panel waves | what it is |
+|--------+-------+------------------------------+------------|
+| household's own sale price, =CROPSP= per =CROPSPU= | crop row | ~40% of crop rows (sale rows only) | farmgate, *received* |
+| =community_prices= (=PRICE.DAT=) | =(t, v, j, u, obs)= | *sane* in both waves; 29,224 rows, 47 items | cluster market price |
+| =food_acquired= / =food_prices()= | =(t, i, j, u, s)= | *sane* in both waves | household unit values |
+| =median_price_valuation= ladder | geography median | existing machinery, ledger =585-own-production-valuation.md= | built for exactly this |
+
+*** =community_prices= and the crop list are COMPLEMENTARY, not overlapping
+
+Its 47 items are a consumer basket (it also carries aspirin, kerosene and
+buckets).  *Only 13 of the 30 crop-form items are findable in it* -- Plantain,
+Orange, Groundnut, Sugar, Cassava, Yam, Cocoyam, Maize, Rice, Millet, Sorghum,
+Tomato, Pepper.  There is *no cocoa, coffee, rubber, timber, cotton, kola,
+tobacco or pineapple*.
+
+That gap is less damaging than it looks, because it falls the convenient way:
+the missing items are the *cash* crops, which are the ones households *sell*
+and therefore the ones that carry their own sale price; the items
+=community_prices= does cover are the food staples that get eaten and carry no
+sale price.  The two sources cover complementary halves of the problem.
+
+** What prices can and cannot do here
+
+Can:
+1. *Invert values into quantities* -- =quantity_seed = CROPKV / price= -- giving
+   physical output components where today there are only cedis.
+2. *Re-value on ONE basis.*  Section 9 mixes a received price (sales) with a
+   market replacement price (seed, gifts, losses).  Valuing every component at a
+   single source removes an asymmetry the instrument built in.
+3. *Cross-check =Value_sold=* -- the implied farmgate price against the
+   community price for the same crop, cluster and round.  This is the
+   =validated_against= this note already owed.
+
+Cannot:
+- Recover the ~19% of cropped rows that carry neither a quantity nor a value.
+  Those have acreage and nothing else.
+
+** The trap: do NOT impute output from acreage
+
+The tempting fix for those rows is acreage x an assumed yield.  For a
+*production function* that is circular -- output imputed from land, then
+regressed on land, manufacturing the land coefficient.  Whatever is done with
+those rows, it must not be that.  Leaving them missing is honest; the 12B proxy
+is defensible if labelled; imputing from the regressor is not.
+
+* FINAL DESIGN (all decisions taken, 2026-09-16)
+
+@ligon: "We should not make up values for those missing rows.  Dealing with
+that missingness is a job for the downstream analysis.  If we need prices for
+some derived_value and don't have it directly we should use the median price
+ladder."
+
+** The two instructions turn out to be one
+
+=median_price_valuation= *values a quantity*: its step 3 is
+=out_col = imputed_price x quantity_col=.  The subsistence rows have no
+quantity, so the ladder is *structurally unable* to value them -- there is
+nothing to multiply.  "Do not make up values" and "use the ladder where a
+price is needed" therefore never conflict here.  Rows the instrument left
+empty stay =NaN=; downstream decides.
+
+** Where the ladder DOES apply: the =Value_sold= residual, and it is small
+
+Rung 3 below is its only use, and it governs *130 rows in 1987-88 and 69 in
+1988-89* -- 2.0% and 0.95% of sale rows, 0.5% of the table.  That is a fact
+worth putting in front of a reader before building the machinery: leaving those
+rows =NaN= is also defensible, and costs 199 rows out of 37,280.
+
+*Recommendation*: leave them NaN in the first pass, and record the rung as the
+sanctioned extension if a user ever needs them.  Building a geography-median
+ladder for 0.5% of rows is machinery ahead of demand -- and it is not
+"missingness" in the sense above, it is a unit mismatch, so the ladder would be
+a genuine derivation rather than fabrication if it is ever wanted.
+
+** =Value_sold=: the rule, as layers
+
+: rung 1  CROPSPU == 22 (ALL)    -> Value_sold = CROPSP              (test FIRST)
+: rung 2  CROPSPU == CROPSU      -> Value_sold = CROPSP * CROPS
+: rung 3  otherwise, kg known    -> median_price_valuation           [NOT BUILT]
+: rung 4  otherwise              -> NaN
+
+Rung 1 must be tested before rung 2: =CROPSU= is itself 22 on many rows, so the
+two masks overlap and a same-unit-first test misroutes them (this is what
+produced the spurious yam "overshoot").
+
+If rung 3 is ever built it needs a =Value_soldSource= column naming the rung,
+following =KgFactorSource= / =FOOD_KG_FACTOR_LAYERS=; and note its geography
+must come from =Y09B.CLUST= directly, because the derivation runs in the wave
+script *before* =_join_v_from_sample= puts =v= on the frame.
+
+** The tables, final
+
+*** =crop_production=, index =(t, i, j)=
+
+| column          | source                     | note |
+|-----------------+----------------------------+------|
+| =Quantity=      | --                         | =optional: true=, entirely NaN; never asked |
+| =Quantity_sold= | =CROPS=                    | denominated in =Unit_sold=, NOT kg |
+| =Unit_sold=     | =CROPSU=                   | canonical optional |
+| =KgFactor=      | =CROPSUK=                  | kg per =Unit_sold= (see the naming caveat above) |
+| =Value_sold=    | derived, rungs 1-2         | =Derivation= stamped |
+| =Value_seed=    | =CROPKV=                   | market replacement value |
+| =Value_given=   | =CROPPV=                   | market replacement value |
+| =Value_lost=    | =CROPLV=                   | market replacement value |
+| =LossCause=     | =CROPL=                    | insects/rodents/fire/rotting/other |
+| =Area_ha=       | =CROPH= / 2.47105          | EthiopiaRHS precedent |
+| =intercropped=  | =CROPD=                    | |
+| =Derivation=    | --                         | =optional: true=; add to canonical =Columns= |
+
+*** =plot_inputs=, index =(t, i, input, crop)=
+
+=u: str=, =Quantity: float=, =Cost: float=, =Purchased: bool= -- all *columns*,
+=u= deliberately not an index level (four of seven inputs are amount-only).
+
+*** =livestock=, index =(t, i, animal)=
+
+=HeadCount=, =HeadSold=, =HeadAcquired=, =HerdValue=, =SalesValue= map
+directly; =ValuePerAnimal= is a derivation (=HerdValue / HeadCount=, Q5 being
+explicitly "altogether").  Q12-Q14 (born/received, *eaten*, lost/stolen/died)
+have no canonical home and are worth carrying.
+
+*** =plot_labor= -- deferred.
+
+** Out of scope, by decision
+
+No 12B splice into =crop_production=; no acreage-based imputation; no
+value fabricated anywhere.  Section 12B own-consumption remains available to
+the analyst through =food_acquired(s='produced')=, which is already derived for
+both waves -- as a *consumption* proxy for production, which is what it is.

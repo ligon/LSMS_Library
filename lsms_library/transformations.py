@@ -3387,8 +3387,14 @@ KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
 #: The counts over these layers PARTITION the frame and sum to ``len(df)``, so
 #: every key is present on every call -- ``shipped: 0`` when no table is
 #: passed.
-KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'inferred',
-                    'none')
+#: ``metric`` (GH #929) is the READ half of what used to be counted as
+#: ``inferred``: a unit whose own label names its metric content (``Quintal``
+#: = 100 kg, ``50 kg bag``).  It sits directly above ``inferred`` and below
+#: everything that already outranked it, so separating it moves no
+#: ``kg_per_unit`` value -- it makes a DEFINITIONAL factor countable apart
+#: from a price-ratio guess, which the food ladder has done since GH #850.
+KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'metric',
+                    'inferred', 'none')
 
 
 def _level_or_column(df, name):
@@ -3910,6 +3916,34 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     inferred = _kg_factor_series(df, volume_as_mass=volume_as_mass)
     inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
 
+    # The READ half of `inferred`, separated out (GH #929).  `_kg_factor_series`
+    # returns one number per unit whether the unit NAMED its own metric content
+    # (`Quintal` is 100 kg by definition) or the price-ratio inference guessed
+    # it, and the crop ladder counted both as `inferred` -- the food ladder has
+    # had a `metric` layer since GH #850.  The asymmetry is not cosmetic: it
+    # cost Ethiopia's shipped table its only EXTERNAL check.  That check is
+    # "rows the WB table serves where the library has no independent opinion",
+    # and it was expressed as `kg_shipped.notna() & kg_inferred.isna()`.  When
+    # GH #838 seeded `quintal=100`, 13,924 quintal rows acquired an `inferred`
+    # value that is the SAME DEFINITION the WB table quotes, so they left the
+    # "no opinion" set and the check silently became the tautology its own
+    # docstring disowns for `Kg`/`Gram` ("both sides are quoting the definition
+    # of a kilogram ... a `j` mis-key would leave it at 1.0000 too").
+    #
+    # `_seeded_kg_factors` is KNOWN_METRIC plus the explicit-metric label
+    # parser -- read, never inferred -- and `_get_kg_factors` gives those seeds
+    # precedence over the inference, so wherever `metric` is present it holds
+    # the value `inferred` already carried.  `metric` therefore sits directly
+    # ABOVE `inferred` and below every layer that outranked it before, which
+    # makes this a RELABELLING: `kg_per_unit` is unchanged on every row, and
+    # `test_metric_layer_changes_no_kg_value` pins that.
+    _mwork, _mpromoted = _with_u_in_index(df)
+    _munits = _mwork.index.get_level_values('u').astype(str).str.lower()
+    metric = _valid_factor(
+        pd.Series(np.asarray(_munits)).map(
+            _seeded_kg_factors(df, volume_as_mass=volume_as_mass)))
+    metric = np.asarray(metric, dtype='float64')
+
     if 'KgFactor' in df.columns:
         reported, rejected = _screen_reported_factors(df, df['KgFactor'])
     else:
@@ -3952,8 +3986,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     rep_ok = ~np.isnan(reported)
     shp_ok = ~np.isnan(shipped)
     med_ok = ~np.isnan(survey_median)
+    met_ok = ~np.isnan(metric)
     inf_ok = ~np.isnan(inferred_arr)
 
+    # `resolved` is deliberately NOT re-expressed over `metric`: the seeds are
+    # already inside `inferred_arr` with precedence, so splitting the label
+    # cannot move a number.  Written this way so the relabelling stays
+    # provably value-preserving rather than approximately so.
     resolved = np.where(
         rep_ok, reported,
         np.where(shp_ok, shipped,
@@ -3962,7 +4001,8 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         rep_ok, 'reported',
         np.where(shp_ok, 'shipped',
                  np.where(med_ok, 'survey_median',
-                          np.where(inf_ok, 'inferred', 'none'))))
+                          np.where(met_ok, 'metric',
+                                   np.where(inf_ok, 'inferred', 'none')))))
 
     out = pd.DataFrame(
         {'kg_per_unit': resolved,
@@ -3972,6 +4012,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
          'kg_shipped': shipped,
          'kg_shipped_rejected': shipped_rejected,
          'kg_shipped_source': shipped_source,
+         'kg_metric': metric,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)

@@ -1,0 +1,28 @@
+wave: 1998-99
+basis: purchased
+n_sample: 5998
+n_foods: 109
+n_missing_market: 0
+n_missing_characteristics: 2
+n_positive_households_outside_sample: 0
+n_positive_households: 5998
+median_positive_foods: 21.0
+api_warning_counts:
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 1
+seed: 20260916
+reserved:
+- Onion
+- Egg
+anchor: Salt
+population: all
+n_fit_households: 5998
+rule: max(beta)-min(beta) < 1.348 * sigma_min, one fit per group
+n_reference: 8
+fit_options:
+  min_obs: 30
+  min_prop_items: 0.1
+  alltm: false
+se: CFEDemands Regression.get_beta(compute_se=True) resampling bootstrap
+specification: ff4c00f2b
+n_fine_goods: 58

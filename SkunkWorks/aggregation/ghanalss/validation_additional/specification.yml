@@ -1,0 +1,40 @@
+wave: 2016-17
+basis: purchased
+n_sample: 14009
+n_foods: 176
+n_missing_market: 0
+n_missing_characteristics: 19
+n_positive_households_outside_sample: 0
+n_positive_households: 13917
+median_positive_foods: 25.0
+api_warning_counts:
+  UserWarning: 8
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 1
+  NullIndexKeyWarning: 1
+seed: 20260916
+evaluation: validation
+reserved:
+- Onion
+- Egg
+anchor: Salt
+min_obs: 30
+min_prop_items: 0.1
+split_counts:
+  train: 8397
+  test: 2819
+  validation: 2793
+skipped_candidates:
+  onion_shallot: Touches a reserved prediction target.
+partitions:
+- fine
+- fish_fresh_frozen_named
+- crab_shrimp
+- bread_types
+- named_spirits
+- tinned_milk_forms
+- coconut_forms
+- named_processed_fish
+lsms_revision: a02edf4c4
+cfe_revision: 3cdfae9
+candidate_membership_sha256: 0da9ea3dd59b18c5ece7420c3f873c46dfce84f09d667413b5778fa43f57d38a
