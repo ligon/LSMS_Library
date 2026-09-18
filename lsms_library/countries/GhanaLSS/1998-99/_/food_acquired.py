@@ -106,9 +106,34 @@ prod_long = prod.melt(id_vars=['i', 'j', 'u', 'Price'],
                       var_name='visit', value_name='Quantity')
 prod_long['Quantity'] = prod_long['Quantity'].replace({'': np.nan, 0: np.nan})
 prod_long = prod_long.dropna(subset=['Quantity'])
-# Sum duplicate (i, j, u, visit) quantity records; carry the price (first).
-prod_long = prod_long.groupby(['i', 'j', 'u', 'visit'], as_index=False).agg(
-    Quantity=('Quantity', 'sum'), Price=('Price', 'first'))
+# Reduce duplicate (i, j, u, visit) records with the country's NAMED reducer:
+# `Quantity` SUMS and `Price` becomes the QUANTITY-WEIGHTED MEAN (GH #936).
+#
+# This groupby used to carry `Price=('Price', 'first')`, which is GH #323's
+# hazard and the reduction #871 removed from core -- and it was LIVE, not
+# latent: this wave's own `harmonize_food` maps three `Code_8h` codes onto the
+# single Preferred Label `Other Meat`, and `j` is assigned from that map above.
+# Measured on the 8H path: 98,504 melted produced rows -> 98,497 groups, i.e.
+# 7 duplicate groups (14 rows), every one of them `j='Other Meat'`, 6 of them
+# with DISAGREEING farmgate prices.  ('437210', 'Other Meat', 'All', visit 7)
+# held two rows priced 5,000 and 4,000 at one unit each; `first` served
+# Quantity=2 at Price=5,000, so the derived Expenditure = Q*P was 10,000 where
+# sum(q*p) is 9,000.  The weighted mean is the price OF THE HARMONISED
+# COMMODITY and makes Q*P == sum(q*p) hold exactly across the merge, which is
+# what this wave's 8h-farmgate derivation needs.
+#
+# The explicit `dropna(subset=['u'])` PRESERVES today's behaviour and makes it
+# visible: `groupby` defaults to `dropna=True`, so the old call silently
+# deleted the 22 melted rows whose unit code did not decode (GH #323 s3b's
+# disease inside a wave script), while `reduce_duplicate_food_rows` passes
+# `dropna=False` and would carry them through to a delivered `u` of 'nan'.
+# Deleting them here is not a fix -- a sentinel like Niger's 'Unknown' (#842)
+# is the country decision, and it is out of #936's scope.  See CONTENTS.org.
+from lsms_library.countries.GhanaLSS._.ghanalss import reduce_duplicate_food_rows
+prod_long = prod_long.dropna(subset=['u'])
+prod_long = reduce_duplicate_food_rows(prod_long, ['i', 'j', 'u', 'visit'])
+assert not prod_long.duplicated(['i', 'j', 'u', 'visit']).any(), (
+    'reduce_duplicate_food_rows left duplicates on (i, j, u, visit)')
 prod_long['s'] = 'produced'
 prod_long['Expenditure'] = np.nan
 
