@@ -342,6 +342,64 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 **Automatic categorical mappings.** If a column/index name in a returned DataFrame matches a table name in the country's `categorical_mapping.org` (case-insensitive) and that table has a `Preferred Label` column, the mapping is applied automatically — no `mappings:` declaration needed. For name mismatches (e.g. `harmonize_food` for index `j`), use the explicit `mappings:` syntax in `data_info.yml`. Cross-country label harmonization is a design sketch; see `SkunkWorks/cross_country_label_harmonization.org`.
 
+### Categorical mappings resolve wave → country → global, global LAST (GH #953)
+
+**One direction, two mechanisms, and they differ only in granularity.** The
+order is always local-first — a wave overrides its country, a country overrides
+the shared table — which is what lets `foo` mean one thing to most countries
+while one country varies it locally.
+
+- **The build-time cascade.** `local_tools.get_categorical_mapping(fn,
+  tablename, dirs)` walks `dirs` and returns the **first hit**
+  (`local_tools.py:1611`). Four GhanaLSS wave `mapping.py` modules spell the
+  rungs: `_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']`.
+- **The read-time merge.** `Country.categorical_mapping` (`country.py:1977`)
+  globs **every** `.org` in `lsms_library/categorical_mapping/`, keys the tables
+  by `#+name:`, and merges the country's own `categorical_mapping.org` over
+  them via `_merge_categorical_tables`.
+
+| | cascade | merge |
+|---|---|---|
+| layout of the global rung | one `categorical_mapping.org` per LEVEL | one `<table>.org` per TABLE |
+| fall-through | **per table** — a file lacking `foo` raises `KeyError`, the loop catches it, resolution continues | n/a (all globals are loaded) |
+| override | **whole-table** — the first rung that has `foo` supplies *all* of it | **whole-table by default; per ROW** for the four names in `_ADDITIVE_CATEGORICAL_TABLES` (`u`, `u_kg`, `harmonize_assets`, `harmonize_education`) |
+
+The per-row half is the intent — `country.py` already says so: *"inherit-and-override,
+not re-list-everything."* Under whole-table override a country wanting one
+local variation of `foo` must re-list every global row.
+
+**Two facts people keep getting wrong.**
+
+1. **The cascade cannot read a directory of per-table files.** `fn` defaults to
+   `categorical_mapping.org` and each rung is the single file `d + fn`; of the
+   90 `get_categorical_mapping(` calls under `countries/`, **zero** pass `fn=`.
+   Its cross-country rung resolves to `lsms_library/countries/_/`, **which does
+   not exist** — so the third rung has never reached anything, for any table.
+   That is the open defect; #953 holds the repair and its options.
+2. **`_ADDITIVE_CATEGORICAL_TABLES` does not decide whether a global table is
+   inherited.** Every `#+name:` table in the global directory is loaded for
+   every country; the allow-list picks only the *merge rule*. (#953's body says
+   otherwise; the code and `tests/test_categorical_mapping_resolution.py` say
+   this.)
+
+**Where a new SHARED table goes, and what makes it reachable.** Put it in
+`lsms_library/categorical_mapping/<table>.org` with a `#+name:` — and then wire
+it, because dropping a file there is *not* wiring. Pick one mechanism:
+`additive-merge` (add the name to `_ADDITIVE_CATEGORICAL_TABLES`),
+`data_info-mappings` (`mappings: ['<table>', '<key col>', '<label col>']` in a
+wave's `data_info.yml`), or `documentation-of-record` (a vocabulary guide read
+by a named test). Then register the file in `GLOBAL_ORG_REGISTRY` in
+`tests/test_categorical_mapping_resolution.py`, **which fails on any
+unregistered `.org` in that directory** and pins the order, the fall-through
+and both granularities. The six files today: `u.org`, `harmonize_assets.org`,
+`harmonize_education.org` (additive-merge), `ehcvm_units.org`
+(`mappings:` in Togo 2018 / Burkina 2018-19 / 2021-22 — `lsms_library/ehcvm.py`
+only *cites* it), `canonical_education_labels.org` (declares **no** tables at
+all) and `canonical_housing_labels.org` (documentation; its `Roof`/`Floor`
+tables are the `#+begin_example` placeholders, which the org reader does not
+skip, so every country inherits `<local variant 1> → <canonical>` — inert, and
+report-only under #953).
+
 ## MonthsSpent / MonthsAway / WeeksAway (2026-04-15)
 
 `household_roster` can optionally include a residence-duration column:

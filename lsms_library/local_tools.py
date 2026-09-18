@@ -1538,11 +1538,60 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
 
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
                             dirs: list[str] = ['./','../../_/','../../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
-    """Return mappings for categories.
+    """Return one named categorical table, resolved wave -> country -> global.
+
+    **The resolution model** (GH #953).  ``dirs`` is walked in order and the
+    FIRST rung that supplies *tablename* wins; every later rung contributes
+    nothing.  Callers spell the rungs local-first, so the order is
+
+        wave ``_/``  ->  country ``_/``  ->  cross-country     (global LAST)
+
+    which is what lets ``foo`` mean one thing to most countries while a single
+    country varies it locally.  Two properties follow, and people guess the
+    second one wrong:
+
+    - fall-through is **per table**.  A rung whose file lacks ``foo`` raises
+      ``KeyError``, the loop catches it, and resolution continues.  A country
+      file need not mention ``foo`` at all in order to inherit it.  This is
+      the good half of the design.
+    - override is **whole-table**.  The first rung that HAS ``foo`` supplies
+      ALL of it.  A country wanting one local row of ``foo`` must re-list
+      every other row; it cannot declare ``foo`` partially.
+
+    **This function cannot read a DIRECTORY of per-table mappings.**  Each
+    rung is the single file ``d + fn``, and ``fn`` defaults to
+    ``'categorical_mapping.org'`` -- of every ``get_categorical_mapping(``
+    call under ``countries/``, zero pass an explicit ``fn=``.  So a rung
+    pointing at a directory of ``<tablename>.org`` files resolves nothing.
+    In particular the cross-country rung as spelled in the four GhanaLSS wave
+    ``mapping.py`` modules,
+
+        _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+
+    names ``lsms_library/countries/_/``, **which does not exist**; the default
+    ``dirs`` here is a fifth, cwd-relative spelling of the same three rungs.
+    GH #953 holds the repair and its options are still open.
+
+    **Where the cross-country tables actually live, and the OTHER mechanism
+    that reads them.**  ``lsms_library/categorical_mapping/*.org``, one file
+    per table, consumed at READ time by
+    :meth:`lsms_library.country.Country.categorical_mapping`, which globs
+    every ``.org`` there, keys tables by ``#+name:``, and merges the country's
+    own ``categorical_mapping.org`` over them.  Same direction (local wins)
+    and the same whole-table granularity by default -- except for the names in
+    ``lsms_library.country._ADDITIVE_CATEGORICAL_TABLES``, which are merged
+    **per row**, so a country inherits the global rows and overrides only the
+    keys it redeclares.  That is inherit-and-override rather than
+    re-list-everything, and it is the granularity the cascade lacks.
+
+    ``tests/test_categorical_mapping_resolution.py`` pins all of the above.
 
     By default, searches for =tablename= in an orgfile
     'categorical_mapping.org'. But if fn is a path to a dta file instead,
     returns categories for tablename from the stata file.
+
+    A bare ``get_categorical_mapping(tablename=...)`` returns an EMPTY dict --
+    no value column is passed.  Prefer :func:`code_label_map`.
     """
     ext = Path(fn).suffix
 
