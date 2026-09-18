@@ -3241,9 +3241,13 @@ right and the built table did not match it.
 
 ** Trap 9: a duplicate index in =food_acquired= silently REWRITES =Price= table-wide (2026-09-05, GH #782/#323)
 
-*This one is armed and waiting.*  It did not fire in the shipped data, but only
-because =2005-06/_/food_acquired.py= now keeps its index unique on purpose.  Any
-future duplicate in GhanaLSS =food_acquired= re-arms it.
+*This one is armed and waiting at the CORE collapse.*  It did not fire there in
+the shipped data, but only because =2005-06/_/food_acquired.py= now keeps its
+index unique on purpose.  Any future duplicate in GhanaLSS =food_acquired=
+re-arms it.  *Its wave-script sibling, however, DID fire* -- see "a SECOND
+site" below (GH #936, 1998-99): a duplicate resolved with =first= upstream of
+the uniqueness assert never reaches core at all, and no guard in this country
+was looking there.
 
 =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so when its index is
 non-unique =Country._normalize_dataframe_index= does *not* collapse with
@@ -3258,22 +3262,69 @@ emits *no* =GrainCollapseWarning=.  Nothing here is a bug in core --- for a
 survey where =Expenditure = Quantity x Price=, the reconciliation is exactly
 right.
 
-*GhanaLSS is not such a survey.*  =Expenditure= is structurally =NaN= for
-=s='produced'= (the instrument records a farmgate =Price= and a =Quantity=, and
-never a produced value), and the re-derivation is applied to the *whole frame*,
-not merely to the duplicated groups.  Measured on the delivered table:
+*GhanaLSS is only PARTLY such a survey, and the split is per wave.*  The
+re-derivation is applied to the *whole frame*, not merely to the duplicated
+groups, so it has two distinct victims -- and they must be counted separately.
 
-| rows with a Price     | block does not fire | block fires |
-|-----------------------+---------------------+-------------|
-| =s='produced'=        |   883,789 (95.2%)   |  44,112 (4.8%) |
-| whole table           |   883,789           |   4,375,274 |
+/Corrected 2026-09-18 (GH #936)./  This passage used to assert that
+=Expenditure= is "structurally =NaN= for =s='produced'=" throughout, and
+concluded that one duplicate would /destroy 839,677 recorded farmgate prices/.
+*The first half has been false since GH #916* (=fe4f736f0=), which wired the
+8h-farmgate derivation: in GLSS4--GLSS7 a produced row now carries
+=Expenditure = Quantity x Price=, so =Expenditure/Quantity= gives the recorded
+price back.  The section "Section 8H own production is valued at the farmgate
+price (2026-09-13)", under "Files in GhanaLSS/_/ > food_acquired.py", already
+said so, and this trap was never updated to match.  *The purchased half was and remains true*, and it is much the larger
+of the two.  Both halves re-measured below on the delivered 5,340,606-row
+table.
 
-So a single duplicate anywhere in the table would *destroy 839,677 recorded
-farmgate prices* and *fabricate* a =Price= on ~4.33M purchased rows, where
-=u='Value'= makes =Quantity == Expenditure= and the "price" is therefore 1.0 ---
-the "Kwacha per Kwacha" quantity =CLAUDE.md= warns about.  Silently, and with the
-audit correctly reporting nothing, because the audit's premise is that the
-re-derivation is information-preserving.
+*Victim 1 -- a recorded farmgate price destroyed.*  Only where =Price= is
+present and =Expenditure= is NaN, i.e. where the value was NOT derived:
+
+| wave    | produced rows | with a =Price= | =Price= kept, =Expenditure= NaN |
+|---------+---------------+----------------+---------------------------------|
+| 1987-88 |        20,775 |              0 |                               0 |
+| 1988-89 |        23,337 |              0 |                               0 |
+| 1991-92 |       287,712 |        287,570 |                         287,570 |
+| 1998-99 |        98,440 |         98,370 |                               0 |
+| 2005-06 |       170,291 |        170,291 |                               0 |
+| 2012-13 |       197,925 |        197,924 |                               0 |
+| 2016-17 |       151,721 |        151,683 |                          12,928 |
+| total   |       950,201 |        905,838 |                     *300,498*   |
+
+So the produced-side exposure is *300,498 rows, not 839,677*, and it is not
+spread across the country: =1991-92= is 96% of it (deliberately not wired --
+see the 8H section), and 2016-17's 12,928 are produced rows carrying a price
+but no quantity (measured: all 12,928 have =Quantity= NaN), which
+=8h-farmgate= declines to value.  In the four Q x P
+waves the re-derivation is an algebraic *no-op* -- =(Q x P)/Q = P= -- which is
+the same fact the 8H section reports as "the served =Price= is byte-identical
+before and after in every wave".
+
+*Victim 2 -- a fabricated price, and this one is undiminished.*  On
+=s='purchased'= with =u='Value'= the LCU-only convention sets
+=Quantity == Expenditure=, so the re-derived "price" is *1.0* --- the "Kwacha
+per Kwacha" quantity =CLAUDE.md= warns about:
+
+| wave    | =u='Value'= rows | =Quantity == Expenditure= |
+|---------+------------------+---------------------------|
+| 1987-88 |           50,830 |                    50,830 |
+| 1988-89 |           49,312 |                    49,312 |
+| 1991-92 |          394,835 |                   394,835 |
+| 1998-99 |          443,755 |                   443,755 |
+| 2005-06 |          966,597 |                   966,597 |
+| 2012-13 |        1,511,750 |                 1,511,750 |
+| 2016-17 |           90,791 |                    90,791 |
+| total   |        3,507,870 |               *3,507,870* |
+
+(The "~4.33M" this trap used to quote is the old table's 4,375,274 - 44,112,
+i.e. every *purchased* row lacking a Price, not the =u='Value'= rows.  Today
+all 4,390,405 purchased rows lack a Price and 3,507,870 of them carry
+=u='Value'=; the rest have a physical unit and so do not collapse to 1.0.)
+
+Either way it happens silently, and with the audit correctly reporting
+nothing, because the audit's premise is that the re-derivation is
+information-preserving.
 
 Fixing 2005-06's decode (Trap 8) *created* 24 such duplicates in 12 groups --- two
 farmgate prices for one harmonised commodity, e.g. =mutton= and =goat= both
@@ -3281,6 +3332,47 @@ becoming =Goat=.  They are resolved in the wave script (=Quantity= sums, =Price=
 becomes the quantity-weighted mean) rather than left to core, which is what
 =CLAUDE.md= prescribes: core does not aggregate, and a reducer applied
 downstream "only puts a signature on the corpse".
+
+*The trap has a SECOND site, inside a wave script -- and there it was LIVE
+(2026-09-18, GH #936).*  Everything above is about a duplicate reaching
+/core/.  =1998-99/_/food_acquired.py= held its own reduction, upstream of the
+unit-canonicalisation uniqueness assert added by #832 and therefore invisible
+to it:
+
+: prod_long = prod_long.groupby(['i','j','u','visit'], as_index=False).agg(
+:     Quantity=('Quantity','sum'), Price=('Price','first'))
+
+GH #936 filed this as /latent/.  It was not.  This wave's own
+=harmonize_food= maps *three* =Code_8h= codes onto the single Preferred Label
+=Other Meat=, and =j= is assigned from that map before the groupby.  Measured
+on the 8H path: 98,504 melted produced rows collapse to 98,497 groups, i.e.
+*7 duplicate groups (14 rows), every one of them =Other Meat=, 6 of them with
+disagreeing farmgate prices*.  =('437210', 'Other Meat', 'All', visit 7)= held
+two rows priced 5,000 and 4,000 at one unit each; =first= served =Quantity=2=
+at =Price=5,000=, so the 8h-farmgate =Expenditure = Q x P= was *10,000* where
+=sum(q x p)= is *9,000*.  Replaced with =ghanalss.reduce_duplicate_food_rows=
+(=Quantity= sums, =Price= becomes the quantity-weighted mean), which is what
+the other three 8H waves use and what makes =Q x P == sum(q x p)= hold across
+the merge.  Delivered effect, measured on the 5,340,606-row table: the index
+is identical, =Quantity= and =Derivation= are untouched, the NA pattern is
+unchanged, and *exactly 6 rows* move (=Expenditure= total +103,500 cedis).
+
+/Note the arithmetic coincidence worth stating:/ core's additive path would
+have produced the /same/ weighted mean here -- it SUMs =Expenditure= and
+=Quantity= and divides -- so on the four Q x P waves the named reducer and
+core agree.  That is not a licence to leave the duplicate for core: core's
+re-derivation is applied to the *whole frame* and has the two victims tabled
+above, while the reducer touches only the duplicated groups.
+
+*Follow-up not taken in #936 (open).*  That same old =groupby= defaulted to
+=dropna=True=, so it silently deleted the *22* melted produced rows whose unit
+code did not decode -- GH #323 §3b's disease inside a wave script.
+=reduce_duplicate_food_rows= passes =dropna=False= and would carry them
+through to a delivered =u= of ='nan'= (the later =astype(str)=), which is
+worse, so the wave script now does =dropna(subset=['u'])= *explicitly*,
+preserving the shipped behaviour and making the deletion visible.  The real
+fix is a country decision -- an =Unknown= sentinel on =u=, Niger's landed
+pattern from GH #842 -- and it belongs in its own issue.
 
 *Corrects the commit message of =b93f9c2c=*, which described core's behaviour as
 =groupby().first()= discarding one price.  That was measured to be wrong: the
