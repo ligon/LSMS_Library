@@ -3272,9 +3272,9 @@ concluded that one duplicate would /destroy 839,677 recorded farmgate prices/.
 *The first half has been false since GH #916* (=fe4f736f0=), which wired the
 8h-farmgate derivation: in GLSS4--GLSS7 a produced row now carries
 =Expenditure = Quantity x Price=, so =Expenditure/Quantity= gives the recorded
-price back.  The "Section 8H own production is valued at the farmgate price"
-section 88 lines above already said so, and this trap was never updated to
-match.  *The purchased half was and remains true*, and it is much the larger
+price back.  The section "Section 8H own production is valued at the farmgate
+price (2026-09-13)", under "Files in GhanaLSS/_/ > food_acquired.py", already
+said so, and this trap was never updated to match.  *The purchased half was and remains true*, and it is much the larger
 of the two.  Both halves re-measured below on the delivered 5,340,606-row
 table.
 
@@ -3295,7 +3295,8 @@ present and =Expenditure= is NaN, i.e. where the value was NOT derived:
 So the produced-side exposure is *300,498 rows, not 839,677*, and it is not
 spread across the country: =1991-92= is 96% of it (deliberately not wired --
 see the 8H section), and 2016-17's 12,928 are produced rows carrying a price
-but no quantity, which =8h-farmgate= declines to value.  In the four Q x P
+but no quantity (measured: all 12,928 have =Quantity= NaN), which
+=8h-farmgate= declines to value.  In the four Q x P
 waves the re-derivation is an algebraic *no-op* -- =(Q x P)/Q = P= -- which is
 the same fact the 8H section reports as "the served =Price= is byte-identical
 before and after in every wave".
@@ -3316,9 +3317,10 @@ per Kwacha" quantity =CLAUDE.md= warns about:
 | 2016-17 |           90,791 |                    90,791 |
 | total   |        3,507,870 |               *3,507,870* |
 
-(The "~4.33M" this trap used to quote was the count of *all* rows without a
-Price, not the =u='Value'= rows; the measured figure is 3,507,870 of 4,390,405
-purchased rows.)
+(The "~4.33M" this trap used to quote is the old table's 4,375,274 - 44,112,
+i.e. every *purchased* row lacking a Price, not the =u='Value'= rows.  Today
+all 4,390,405 purchased rows lack a Price and 3,507,870 of them carry
+=u='Value'=; the rest have a physical unit and so do not collapse to 1.0.)
 
 Either way it happens silently, and with the audit correctly reporting
 nothing, because the audit's premise is that the re-derivation is
