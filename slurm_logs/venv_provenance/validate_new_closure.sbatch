@@ -36,6 +36,10 @@
 #SBATCH --time=10:00:00
 #SBATCH --output=/global/scratch/fsa/fc_jevons/ligon/venv_validate/%x_%j.out
 #SBATCH --error=/global/scratch/fsa/fc_jevons/ligon/venv_validate/%x_%j.err
+# Submitted from a /local clone, whose cwd does not exist on the target node.
+# Without --chdir slurmstepd logs 'couldn't chdir ... going to /tmp instead'.
+# Harmless (the script cds explicitly) but it is noise in every .err.
+#SBATCH --chdir=/global/scratch/fsa/fc_jevons/ligon/venv_validate
 set -uo pipefail
 
 MIRROR=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library
