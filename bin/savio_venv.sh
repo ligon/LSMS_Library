@@ -31,8 +31,27 @@ cmd_update() {
         echo ">> installing into master: $*"
         "$MASTER/bin/python" -m pip install "$@" || die "pip install into master failed"
     fi
-    echo ">> sanity-check master imports"
-    "$MASTER/bin/python" -c "import lsms_library" || die "master venv does not import lsms_library — fix deps before imaging"
+    # The master must NOT carry an editable install of this project (GH #957).
+    # `poetry install` re-adds one by default, so check rather than trust: an
+    # image built from a master carrying the .pth silently re-imposes ONE
+    # checkout on every consumer of the image, on every node.
+    local sp
+    sp="$(echo "$MASTER"/lib/python*/site-packages)"
+    if [ -e "$sp/lsms_library.pth" ] || compgen -G "$sp/lsms_library-*.dist-info" >/dev/null; then
+        die "master carries an editable install of lsms_library (.pth and/or dist-info in $sp).
+     That is what GH #957 removed; imaging it would re-impose one checkout on every
+     consumer.  Remove those, or reinstall with: poetry install --no-root"
+    fi
+    # Import check needs PYTHONPATH now, for the same reason.  Do NOT drop the
+    # check and do NOT rely on cwd: the old bare `import lsms_library` passed
+    # only because callers happened to `cd "$REPO"` first, which is the very
+    # accident GH #957 exists to remove.
+    echo ">> sanity-check master imports (PYTHONPATH=$REPO)"
+    PYTHONPATH="$REPO" "$MASTER/bin/python" -c "
+import lsms_library, os
+want, got = os.path.realpath('$REPO') + os.sep, os.path.realpath(lsms_library.__file__)
+assert got.startswith(want), 'imported %s, expected under %s' % (got, want)
+" || die "master venv does not import lsms_library from $REPO — fix deps before imaging"
     command -v mksquashfs >/dev/null || die "mksquashfs not found"
     local tmp="$IMG.tmp.$$"
     echo ">> building image (gzip) -> $IMG"
@@ -64,8 +83,20 @@ cmd_mount() {
         echo ">> FUSE unavailable; extracting image -> $mnt (unsquashfs)"
         unsquashfs -f -d "$mnt" "$IMG" >/dev/null || die "unsquashfs failed"
     fi
+    # VERIFY FIRST, THEN REPOINT.  The old order repointed $REPO/.venv -- a
+    # symlink shared by every job using this mirror -- and only then checked the
+    # import, so a failed check left the repoint in place (and exited nonzero).
+    # Verify through the mount path directly, which needs no symlink at all.
+    PYTHONPATH="$REPO" "$mnt/bin/python" -c "
+import lsms_library, os
+want, got = os.path.realpath('$REPO') + os.sep, os.path.realpath(lsms_library.__file__)
+assert got.startswith(want), 'imported %s, expected under %s' % (got, want)
+" || die "venv mounted at $mnt but import failed; $REPO/.venv left untouched"
+    # NOTE (GH #958): this symlink is per-clone state kept in a SHARED location.
+    # Two jobs on different nodes overwrite each other's value, and console
+    # scripts are shebanged through it.  Retiring it is #958's decision; until
+    # then, repointing it is at least no longer done before verification.
     ln -sfn "$mnt" "$REPO/.venv"
-    "$REPO/.venv/bin/python" -c "import lsms_library" || die "venv mounted but import failed"
     echo ">> .venv -> $mnt  (verified import OK)"
 }
 
