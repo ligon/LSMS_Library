@@ -1,0 +1,293 @@
+#+TITLE: Reverse-engineering a sample design: Ghana GLSS7
+#+AUTHOR: LSMS Library
+#+PROPERTY: header-args:jupyter-python :session glss7 :results output :exports both :eval no-export
+
+* What this is
+
+A worked example in reading a survey's design out of its own weights, then
+checking that reading against the survey's documentation.
+
+The arc is deliberately in this order: notice something odd in the data, form
+a hypothesis about the design, derive predictions the design would make, test
+them, and only then open the manual.  Reading the manual first teaches the
+design; deriving it first teaches how to interrogate a survey you have no
+manual for --- which is the common case.
+
+Ghana Living Standards Survey round 7 (2016/17) is the subject.  Everything
+below runs against =lsms_library=.
+
+- Prerequisites :: =lsms_library= installed with the =viz= extra
+  (=poetry install --with viz=), and access to the GhanaLSS microdata.
+
+* Setup
+
+#+name: setup
+#+begin_src jupyter-python
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+import lsms_library as ll
+
+WAVE = "2016-17"
+gh = ll.Country("GhanaLSS")
+print("waves:", gh.waves)
+#+end_src
+
+* 1. The anomaly
+
+Draw the age-sex structure twice: once counting people, once weighting them
+by the survey's sampling weights.
+
+#+name: two-pyramids
+#+begin_src jupyter-python
+from lsms_library.visualizations import population_pyramid
+
+ax = population_pyramid(gh, wave=WAVE, weights=True, ghost=False)
+ax.figure.set_size_inches(7, 5.5)
+#+end_src
+
+The filled bars are weighted; the outline is unweighted.  The outline stands
+proud of the fill at every young age band and hugs it at the old ones, so the
+unweighted sample contains proportionally *more children* than the population
+it represents.
+
+Two facts worth pinning down before explaining it.
+
+#+name: totals
+#+begin_src jupyter-python
+r = gh.household_roster(waves=[WAVE]).reset_index()
+s = gh.sample(waves=[WAVE]).reset_index()
+
+people = len(r)
+weighted_total = s.set_index("i")["weight"].reindex(r["i"]).sum()
+print(f"people in the roster      : {people:,}")
+print(f"sum of their weights      : {weighted_total:,.1f}")
+print(f"mean weight per household : {s['weight'].mean():.4f}")
+#+end_src
+
+The mean weight is 1 by construction --- the library normalises weights to
+within-wave mean 1 --- but that mean is taken over *households* while the
+roster is one row per *person*.  So the weighted person-total is
+\( \sum_h n_h w_h \), which equals the headcount only if weight and household
+size are uncorrelated.  It does not, which is the first clue.
+
+#+name: size-weight
+#+begin_src jupyter-python
+size = r.groupby("i").size().rename("hhsize")
+d = s.set_index("i").join(size).dropna(subset=["hhsize"])
+print("corr(weight, household size) =", round(d["weight"].corr(d["hhsize"]), 3))
+print()
+print(d.groupby(pd.cut(d.hhsize, [0, 1, 2, 3, 5, 8, 50],
+                       labels=["1", "2", "3", "4-5", "6-8", "9+"]),
+               observed=True)
+       .agg(households=("weight", "size"), mean_weight=("weight", "mean"))
+       .round(3).to_string())
+#+end_src
+
+Bigger households carry smaller weights.  Since bigger households hold more
+children, an unweighted count over-represents the young.  But household size
+is a *symptom*: nothing in a sample design weights on household size directly.
+The question is what the design was actually doing.
+
+* 2. Where the weights live
+
+#+name: weight-structure
+#+begin_src jupyter-python
+print("columns of sample():", list(s.columns))
+print()
+print("strata values      :", s["strata"].nunique())
+print("clusters (v)       :", s["v"].nunique())
+print("households/cluster : "
+      f"mean {s.groupby('v').size().mean():.1f}, "
+      f"min {s.groupby('v').size().min()}, max {s.groupby('v').size().max()}")
+#+end_src
+
+Ten strata, a thousand clusters, and a near-constant take of households per
+cluster.  That shape --- clusters drawn from strata, a fixed number of
+households from each cluster --- is a *two-stage stratified design*.  If that
+is right, it makes two predictions we can test.
+
+* 3. Two predictions, tested
+
+If clusters are drawn with probability proportional to size and then a fixed
+number of households is taken from each, every household in a cluster has the
+same selection probability, so:
+
+- Prediction 1 :: the weight is *constant within a cluster*.
+- Prediction 2 :: if strata are region-by-urban/rural, no cluster can contain
+  both urban and rural households.
+
+#+name: predictions
+#+begin_src jupyter-python
+g = s.groupby("v")["weight"]
+cv = (g.std().fillna(0) / g.mean())
+print(f"clusters with any within-cluster weight variation: "
+      f"{(cv > 1e-9).sum()} of {s['v'].nunique()}")
+
+mixed = s.groupby("v")["Rural"].nunique()
+print(f"clusters containing BOTH urban and rural households: "
+      f"{(mixed > 1).sum()} of {len(mixed)}")
+#+end_src
+
+Both hold exactly.  The design is two-stage stratified, and the stratification
+involves urban/rural even though the =strata= column shows only ten regions.
+
+* 4. How much of the weight does each level explain?
+
+Because the weight is constant within a cluster, the cluster is the finest
+level that carries any information.  Decompose the variance of the log weight
+sequentially: region first, then urban/rural within region, then cluster.
+
+#+name: decomposition
+#+begin_src jupyter-python
+cl = s.groupby("v").agg(w=("weight", "first"),
+                        strata=("strata", "first"),
+                        Rural=("Rural", "first"))
+cl["strata"] = cl["strata"].astype(str)
+cl["Rural"] = cl["Rural"].astype(str)
+cl["lw"] = np.log(cl["w"].astype(float))
+
+total = cl["lw"].var(ddof=0)
+
+def unexplained(keys):
+    m = cl.groupby(keys)["lw"].transform("mean")
+    return ((cl["lw"] - m) ** 2).mean()
+
+step1 = 1 - unexplained(["strata"]) / total
+step2 = (unexplained(["strata"]) - unexplained(["strata", "Rural"])) / total
+step3 = unexplained(["strata", "Rural"]) / total
+
+print(f"region            : {100 * step1:5.1f}% of variance")
+print(f"+ urban/rural     : {100 * step2:5.1f}%")
+print(f"+ cluster         : {100 * step3:5.1f}%  (saturates)")
+print(f"+ household       :   0.0%  (weight is constant within a cluster)")
+#+end_src
+
+Most of the variation is *between regions*.  A third is between clusters
+within a stratum, which a textbook two-stage design does not predict --- hold
+that thought.
+
+* 5. What the allocation bought
+
+#+name: strata-table
+#+begin_src jupyter-python
+r["Age"] = pd.to_numeric(r["Age"], errors="coerce")
+agg = r.groupby("i").agg(hhsize=("Age", "size"),
+                         kids=("Age", lambda a: (a < 15).sum()))
+d = s.set_index("i").join(agg).dropna(subset=["hhsize"])
+
+t = d.groupby("strata", observed=True).agg(
+        households=("weight", "size"),
+        mean_weight=("weight", "mean"),
+        mean_hhsize=("hhsize", "mean"))
+t["pct_under15"] = (100 * d.groupby("strata", observed=True)["kids"].sum()
+                    / d.groupby("strata", observed=True)["hhsize"].sum())
+t["pct_rural"] = 100 * d.assign(x=d["Rural"].eq("Rural")).groupby(
+        "strata", observed=True)["x"].mean()
+print(t.sort_values("mean_weight").round(2).to_string())
+#+end_src
+
+Every region got roughly the same number of households regardless of its
+population, so the weights span more than an order of magnitude --- and the
+heavily over-sampled regions are exactly the ones with the largest households
+and the youngest people.  That is the whole explanation of the anomaly in
+section 1: the young are concentrated in the over-sampled strata.
+
+* 6. Now open the manual
+
+The library carries each country's recorded idiosyncrasies, so the
+documentation is reachable from the API rather than the filesystem.
+
+#+name: notes
+#+begin_src jupyter-python
+print([h for lvl, kw, h in gh.note_topics if lvl == 1][:8])
+print()
+print(gh.notes("Strata")[:900])
+#+end_src
+
+The survey's own Main Report states the allocation rule: an average sample of
+1,500 households per *domain*, chosen so the poverty rate can be estimated at
+a stated significance level in each region, giving 15,000 nationally.  The
+design is stratified by region *and* by urban/rural --- twenty strata, not the
+ten the =strata= column exposes --- with 1,000 enumeration areas selected with
+probability proportional to size and fifteen households listed and drawn in
+each.
+
+So the reverse-engineering was right, and the documentation supplies the
+*reason*: precision per region, not proportionality to population.
+
+* 7. The residual third: a stale frame
+
+Section 4 left 36 per cent of the log-weight variance *within* stratum, which
+a clean two-stage design would not produce: with probability proportional to
+size and a fixed take, the design factors cancel and the weight is constant
+within a stratum.
+
+The Main Report's weight formula explains it.  It names two different counts
+for each enumeration area: \( M_{hi} \), the households recorded there in the
+2010 census, and \( M^{*}_{hi} \), the households *listed* immediately before
+fieldwork.  Selection uses the census count; the take of fifteen comes out of
+the listing.  The weight therefore carries a factor \( M^{*}_{hi} / M_{hi} \)
+--- six years of differential growth.
+
+#+name: drift
+#+begin_src jupyter-python
+resid = cl["lw"] - cl.groupby(["strata", "Rural"])["lw"].transform("mean")
+print(f"within-stratum sd of log weight : {resid.std():.3f}")
+print(f"implied growth ratio, p10 to p90: "
+      f"{np.exp(resid.quantile(0.10)):.2f} to {np.exp(resid.quantile(0.90)):.2f}")
+#+end_src
+
+* 8. What the variation costs
+
+Unequal weights cost precision.  Kish's approximation for the design effect
+from weighting alone is
+
+\[ \mathrm{deff}_w = 1 + \mathrm{CV}^2(w) \]
+
+#+name: deff
+#+begin_src jupyter-python
+def deff(x):
+    x = np.asarray(x, dtype=float)
+    return 1 + (x.std() / x.mean()) ** 2
+
+overall = deff(s["weight"])
+within = deff(np.exp(resid))
+print(f"all households      : deff = {overall:.3f}  "
+      f"-> effective n is {100 / overall:.0f}% of nominal")
+print(f"within stratum only : deff = {within:.3f}  <- attributable to frame drift")
+#+end_src
+
+The between-stratum part is a deliberate trade: it buys the per-region
+precision the allocation was designed for.  The within-stratum part buys
+nothing --- it is the cost of a six-year-old frame.
+
+* 9. What no weight can fix
+
+The weights correct the *bias* from selecting on a stale measure of size: the
+\( M^{*}/M \) factor is exactly the Horvitz-Thompson correction for the
+probability that actually applied.  They do not recover precision, as section
+8 shows.  And there is a third consequence they cannot touch at all: an
+enumeration area created *after* the 2010 census has \( M_{hi} = 0 \), hence
+selection probability zero, and cannot enter the sample however it is
+weighted.
+
+That falls on the newest peri-urban settlement --- the fastest-growing part of
+the population --- and it is a coverage gap, not an efficiency loss.
+
+* Exercises
+
+1. Repeat sections 1--5 for GLSS6 (=WAVE = "2012-13"=).  Does the same
+   allocation rule appear in the weights?
+2. Sections 3 and 4 assumed the cluster is the finest level carrying
+   information.  Show directly that adding household-level dummies to the
+   decomposition explains nothing further, and say why that is a property of
+   the design rather than of the data.
+3. The =strata= column exposes ten regions while the design has twenty
+   strata.  Compute a design-based standard error for mean household size both
+   ways and report the difference.  Which is correct, and why?
+4. Section 7 infers \( M^{*}/M \) from the residual.  What else could produce
+   within-stratum weight variation, and how would you tell the explanations
+   apart with the data available?
