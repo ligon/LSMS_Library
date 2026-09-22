@@ -34,7 +34,6 @@ env/
 /build/
 lsms_library/countries/build/
 /site/
-/poetry.lock
 # Mypy cache
 .mypy_cache/
 
