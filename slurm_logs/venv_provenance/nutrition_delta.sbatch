@@ -24,17 +24,30 @@ CLONE="/local/job$SLURM_JOB_ID/old"; MNT="/local/job$SLURM_JOB_ID/venv_img"
 LIVE=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library
 STAGE="/global/scratch/fsa/fc_jevons/ligon/venv_validate/nutrition_old_$SLURM_JOB_ID"
 
+# Mount the OLD closure by default.  Measured 2026-09-22: the tree at $BASE
+# does NOT run under the new one -- its panel_ids.json Make rule (the rule GH
+# #914 later removed) dies with pandas.errors.LossySetitemError /
+# "Invalid value '<ArrowStringArray>" under pandas 3.0.6.  That is also the
+# right experiment: the baseline was written by old code under the OLD venv,
+# so reproducing it needs both.  This is what .venv.sqfs.prev is kept for.
+IMG="${IMG:-$MIRROR/.venv.sqfs.prev}"
 shim="/local/job$SLURM_JOB_ID/.fuseshim"; mkdir -p "$shim" "$MNT"
 ln -sf /usr/bin/fusermount "$shim/fusermount3"
-PATH="$shim:$PATH" /usr/libexec/apptainer/bin/squashfuse_ll "$MIRROR/.venv.sqfs" "$MNT" || exit 1
+PATH="$shim:$PATH" /usr/libexec/apptainer/bin/squashfuse_ll "$IMG" "$MNT" || exit 1
+echo "venv image: $IMG"
+"$MNT/bin/python" -c "import pyarrow,pandas;print('  pyarrow',pyarrow.__version__,' pandas',pandas.__version__)"
 git clone --quiet "$MIRROR" "$CLONE" && git -C "$CLONE" checkout --quiet "$BASE" || exit 1
 echo "old tree at $(git -C "$CLONE" rev-parse --short HEAD)"
 
 mkdir -p "$STAGE"; ln -sfn "$LIVE/dvc-cache" "$STAGE/dvc-cache"
+# The OLD image still carries lsms_library.pth naming the MIRROR, so PYTHONPATH
+# alone is not enough for a script run.  PYTHONSAFEPATH drops the implicit
+# entries so PYTHONPATH wins -- and is NOT exported, so the wave scripts spawned
+# below keep their script dir and their sibling imports (see country.py).
 export PYTHONPATH="$CLONE" LSMS_DATA_DIR="$STAGE"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
 cd "$CLONE"
-"$MNT/bin/python" -c "import lsms_library,os;assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath('$CLONE')+os.sep)" || exit 1
+PYTHONSAFEPATH=1 "$MNT/bin/python" -c "import lsms_library,os;assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath('$CLONE')+os.sep)" || exit 1
 
 echo "=== building Uganda nutrition at $BASE ==="
 "$MNT/bin/python" -c "
