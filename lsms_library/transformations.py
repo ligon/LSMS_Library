@@ -1456,28 +1456,54 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # matching the ``g`` pattern, and dropping it would trade one silent error
 # for another.  Longest alternative first within each group, so ``ltr`` is
 # preferred to ``lt`` and ``kilogramme`` to ``kg``.
+# The number group admits a FRACTION (``1/2``, ``1/4``, ``3/4``).  Without it
+# the group matched only the digits ADJACENT to the unit token, so Uganda's
+# ``Packet(1/2lt / 1/2kg)`` read as 2 kg and ``Packet(1/4lt / 1/4kg)`` as 4 kg
+# -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
+# as the plural bug GH #850 fixed: a regex that reads PART of a
+# self-describing label and asserts the result.
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*milligrammes?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*tonnes?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*millilitres?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*centilitres?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*ml\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+
+def _metric_number(text):
+    """Value of a metric quantity token, which may be a fraction.
+
+    ``'50'`` -> 50.0, ``'0.5'`` -> 0.5, ``'1/2'`` -> 0.5, ``'3/4'`` -> 0.75.
+
+    Fractions are how Uganda's own container labels spell sub-unit sizes
+    (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
+    pattern captured only the digits adjacent to the unit token, so those read
+    as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+    """
+    t = str(text).strip()
+    if '/' in t:
+        num, _, den = t.partition('/')
+        d = float(den.strip())
+        if d == 0:
+            raise ZeroDivisionError(t)
+        return float(num.strip()) / d
+    return float(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1521,6 +1547,19 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     True
     >>> _parse_explicit_metric('20gallon drum') is None
     True
+
+    Fractions.  Uganda's container labels spell sub-unit sizes this way, and
+    before the fix the pattern captured only the digits ADJACENT to the unit
+    token -- so a half-kilo packet read as 2 kg and a quarter-kilo as 4 kg.
+
+    >>> _parse_explicit_metric('1/2 kg')
+    0.5
+    >>> _parse_explicit_metric('Packet(1/4lt / 1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('Packet -medium (1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('3/4 kg')
+    0.75
     """
     if not isinstance(s, str):
         return None
@@ -1530,8 +1569,8 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
         m = pattern.search(s)
         if m:
             try:
-                return float(m.group(1)) * scale
-            except (ValueError, IndexError):
+                return _metric_number(m.group(1)) * scale
+            except (ValueError, IndexError, ZeroDivisionError, TypeError):
                 return None
     return None
 
