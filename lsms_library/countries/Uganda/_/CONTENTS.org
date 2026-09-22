@@ -2801,7 +2801,7 @@ Country() cache, so it is immune to shared-cache staleness) and re-checks
 the 0-count / row-count / household-count / sum invariants above, plus
 that the fully-populated sentinel row is gone.
 
-** TODO Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
+** DONE Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
 
 Found 2026-08-20 while trying to verify this PR's refreshed
 =tests/fixtures/uganda_baseline.json= entries.  Not a data defect -- a
@@ -2826,6 +2826,34 @@ depends on whether some *other* module, running *earlier in the same
 session*, happens to build the table it pins -- i.e. on alphabetical test
 ordering.  Measured: the module alone is *53 skipped*; run after
 =test_uganda_crop_condition.py= it checks a handful and skips the rest.
+
+*Resolved [2026-09-22].*  The session-start purge is retired (repo-root
+=conftest.py=).  Both of its jobs are done by the library now: v0.8.0's content
+hash invalidates a parquet when the country module changes (measured -- editing
+=Uganda/_/uganda.py= moves the hash 58feecca8a82 -> 745cc5a5f599), and GH #803
+made an in-tree =var/*.parquet= unreadable rather than merely stale.
+
+Before/after, as this entry asked for:
+
+| measure                             | before      | after              |
+|-------------------------------------+-------------+--------------------|
+| =test_uganda_invariance.py= alone    | 53 skipped  | 52 passed, 1 FAILED |
+| Uganda in =test_table_structure=     | 0 cells     | present            |
+
+*The one failure is the point of the exercise.*  =var/nutrition.parquet= matches
+its baseline on shape (23801x15), columns and index names, and differs on
+=content_hash= -- the VALUES moved.  Not a dependency drift (=fooddatacentral=
+is 1.0.12 before and after today's lock) and not pyarrow (the other 52 entries
+pass against stored hashes under pyarrow 25).  The baseline was last written
+[2026-09-07] in =8ec0bab4e=; =nutrition.py= itself has not changed since
+[2026-05-07].  So something landed between [2026-09-07] and now that moved
+nutrient intake values -- GH #871 (the =most_complete_row= reducer, [2026-09-12])
+changed 544 served rows corpus-wide and is the first candidate to check.
+
+It went unnoticed for two weeks precisely because this module was skipping.
+*Do not regenerate the baseline before attributing the change*: that would pin
+whatever today produces and destroy the evidence, which is the failure mode this
+file was already warning about.
 
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
