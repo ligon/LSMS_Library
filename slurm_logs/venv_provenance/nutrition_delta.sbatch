@@ -39,6 +39,17 @@ echo "venv image: $IMG"
 git clone --quiet "$MIRROR" "$CLONE" && git -C "$CLONE" checkout --quiet "$BASE" || exit 1
 echo "old tree at $(git -C "$CLONE" rev-parse --short HEAD)"
 
+# GH #914, reproduced twice before this line existed: at $BASE the country
+# Makefiles still gave panel_ids.json a RULE, and in a fresh clone git sets
+# every file to checkout time -- so whether panel_ids.py lands newer than the
+# JSON is decided by a filesystem tick.  It did, the rule fired, and
+# panel_ids.py died with pandas.errors.LossySetitemError under BOTH closures
+# (so this was never a pandas 3.0.6 regression, as first diagnosed).  Making
+# the committed JSON newer than its script suppresses the rule, which is what
+# #914 achieved properly by deleting the rule.
+find "$CLONE/lsms_library/countries" -name '*_ids.json' -exec touch {} + 2>/dev/null
+echo "  touched $(find "$CLONE/lsms_library/countries" -name '*_ids.json' | wc -l) committed id crosswalks"
+
 mkdir -p "$STAGE"; ln -sfn "$LIVE/dvc-cache" "$STAGE/dvc-cache"
 # The OLD image still carries lsms_library.pth naming the MIRROR, so PYTHONPATH
 # alone is not enough for a script run.  PYTHONSAFEPATH drops the implicit
