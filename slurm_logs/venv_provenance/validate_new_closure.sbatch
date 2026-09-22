@@ -77,11 +77,33 @@ print('numpy   :', numpy.__version__)
 import cfe; print('cfe     :', getattr(cfe, '__version__', 'n/a'))
 " || { echo "FATAL: identity/import check failed"; fusermount -u "$MNT"; exit 1; }
 
-# --- 4. isolated COLD L2, shared warm L1 -------------------------------------
-mkdir -p "$STAGE"
-ln -sfn "$LIVE_CACHE/dvc-cache" "$STAGE/dvc-cache"
-export LSMS_DATA_DIR="$STAGE"
-echo "LSMS_DATA_DIR=$STAGE  (L2 cold; L1 -> $LIVE_CACHE/dvc-cache)"
+# --- 4. cache root -----------------------------------------------------------
+# TWO MODES, and both are needed.  Collection in this suite is DATA-DRIVEN:
+# tests/test_table_structure.py parametrizes over the (country, table) cells it
+# finds in the cache, so it yields 66 cases against a cold root and 2,400
+# against a warm one.  A cold run therefore collects 4,441 of 6,775 tests and
+# CANNOT check the structure of what it just wrote.
+#
+#   WARM_FROM unset -> fresh staging root, L2 COLD.  Exercises the parquet
+#                      WRITE path, which is the only reason to care about a
+#                      pyarrow major bump.
+#   WARM_FROM=<dir>  -> reuse that root, L2 WARM.  Collects the other 2,334
+#                      tests and checks the structure of parquets the cold
+#                      run wrote.
+#
+# L1 (the 29 GB DVC blob cache) is shared either way: blobs are
+# content-addressed, so sharing is safe and it avoids re-downloading from S3.
+if [ -n "${WARM_FROM:-}" ]; then
+    [ -d "$WARM_FROM" ] || { echo "FATAL: WARM_FROM does not exist: $WARM_FROM"; exit 1; }
+    export LSMS_DATA_DIR="$WARM_FROM"
+    echo "LSMS_DATA_DIR=$WARM_FROM  (L2 WARM, reused; read-side pass)"
+else
+    mkdir -p "$STAGE"
+    ln -sfn "$LIVE_CACHE/dvc-cache" "$STAGE/dvc-cache"
+    export LSMS_DATA_DIR="$STAGE"
+    echo "LSMS_DATA_DIR=$STAGE  (L2 cold; L1 -> $LIVE_CACHE/dvc-cache)"
+fi
+echo "collected: $("$MNT/bin/python" -m pytest --collect-only -q 2>/dev/null | tail -1)"
 
 # --- 5. thread discipline (CLAUDE.md scrum-master addendum 3b) ---------------
 # OpenBLAS sizes its pool from nproc, not from the worker count, so -n 32 on a
@@ -96,6 +118,6 @@ rc=$?
 echo "=== pytest exit=$rc ==="
 tail -25 "$LOG"
 echo "=== full log: $LOG ==="
-echo "=== staged L2 built under the new closure: $STAGE ($(du -sh --exclude=dvc-cache "$STAGE" 2>/dev/null | cut -f1)) ==="
+echo "=== L2 root: $LSMS_DATA_DIR ($(du -sh --exclude=dvc-cache "$LSMS_DATA_DIR" 2>/dev/null | cut -f1)) ==="
 fusermount -u "$MNT" 2>/dev/null
 exit $rc
