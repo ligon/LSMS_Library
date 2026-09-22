@@ -30,7 +30,11 @@ PY="$LV/bin/python"
 # must be told which checkout to use.  Without this the bare import below fails
 # outright -- it used to pass only via the .pth, which named the MIRROR, so this
 # job graded the clone's config against the mirror's library code.
-export PYTHONPATH="$WD"
+# PYTHONSAFEPATH makes PYTHONPATH authoritative: without it `python -m` and
+# `python <script>.py` put cwd / the script dir at sys.path[0], so the
+# `-m lsms_library.cli cache clear` below loaded the MIRROR's library while
+# the build two lines later loaded the clone's.
+export PYTHONSAFEPATH=1 PYTHONPATH="$WD"
 LSMS_COV_CODE_ROOT="$WD" "$PY" -c '
 import lsms_library, yaml, pandas, os, sys
 want = os.path.realpath(os.environ["LSMS_COV_CODE_ROOT"]).rstrip(os.sep) + os.sep

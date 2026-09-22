@@ -16,7 +16,12 @@ POETRY = poetry
 # and scripts/api_surface_audit.py do not.
 #
 # Prepend, never overwrite: a caller may have set PYTHONPATH deliberately.
-export PYTHONPATH := $(CURDIR)$(if $(PYTHONPATH),:$(PYTHONPATH),)
+# $(CURDIR) is the WORKING directory, not this file's directory, so
+# `make -f <repo>/Makefile` from elsewhere would export a PYTHONPATH
+# naming a tree with no lsms_library in it -- or a different checkout
+# that has one.  Derive it from MAKEFILE_LIST instead.
+REPO_ROOT := $(abspath $(dir $(firstword $(MAKEFILE_LIST))))
+export PYTHONPATH := $(REPO_ROOT)$(if $(PYTHONPATH),:$(PYTHONPATH),)
 
 # Pytest worker count.
 #

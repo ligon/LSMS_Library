@@ -178,7 +178,20 @@ cov_provision_venv() {
         PY="$repo/.venv.lustre/bin/python"
         echo "cov_provision_venv: falling back to the Lustre master $PY (slow imports)" >&2
     fi
-    export PY PYTHONPATH="$code_root"
+    # PYTHONSAFEPATH removes the implicit cwd / script-dir entry from sys.path,
+    # which is what makes PYTHONPATH AUTHORITATIVE here.  Without it `python -c`
+    # and `python -m` put cwd at sys.path[0] and every one of these scripts runs
+    # with cwd = "$repo" (the mirror) -- itself a checkout -- so the mirror won
+    # regardless of PYTHONPATH, and the check below correctly reported it and
+    # killed the job.  Measured on this node: same command, cwd = mirror,
+    #   unset          -> .../mirrors/LSMS_Library/lsms_library/__init__.py
+    #   PYTHONSAFEPATH -> .../<clone>/lsms_library/__init__.py
+    # It also fixes the two sibling sites that were NOT asserted and so were
+    # silently running mirror code: `-m lsms_library.cli cache clear` in the
+    # shard, and `ll.countries()` in the reseed controller.
+    # Verified safe for script runs: bench/matrix.py behaves identically under
+    # it, and nothing in bench/ imports a bare sibling module.
+    export PY PYTHONSAFEPATH=1 PYTHONPATH="$code_root"
     # code_root travels by ENVIRONMENT, not string interpolation: COV_WORKDIR is
     # operator-supplied and a quote or backslash in it would become a SyntaxError
     # reported as "venv provisioning failed".
