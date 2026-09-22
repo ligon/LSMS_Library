@@ -1,5 +1,23 @@
 POETRY = poetry
 
+# The venv no longer carries an editable install of this project (GH #957):
+# `lsms_library.pth` named ONE checkout -- the shared mirror -- so every
+# `python <script>.py` and every console script silently imported that
+# checkout no matter which tree the caller was working in.  With it gone,
+# the caller must say which checkout to import, and `export` here does it
+# once for every recipe rather than at ten call sites.
+#
+# It has to be an export, not a per-recipe prefix, because BOTH invocation
+# styles below lose the repo without it:
+#   - `poetry run pytest ...`         console script -> sys.path[0] is <venv>/bin
+#   - `poetry run python bench/x.py`  script run     -> sys.path[0] is bench/
+# Neither puts cwd on sys.path.  bench/matrix.py and scripts/gen_data_method_docs.py
+# carry their own sys.path shims; bench/build_feature.py, bench/feature_audit/scan.py
+# and scripts/api_surface_audit.py do not.
+#
+# Prepend, never overwrite: a caller may have set PYTHONPATH deliberately.
+export PYTHONPATH := $(CURDIR)$(if $(PYTHONPATH),:$(PYTHONPATH),)
+
 # Pytest worker count.
 #
 # Prefer $SLURM_CPUS_ON_NODE if set: it's the Slurm-authoritative,
@@ -35,11 +53,17 @@ PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 # directory doesn't exist).  ``--with test`` explicitly installs the
 # pytest-xdist / pytest-instafail / pytest-timeout group so a fresh
 # clone never trips on ``unrecognized arguments: -n --dist=loadfile``.
+#
+# ``--no-root`` is required, not cosmetic: without it `poetry install` reinstalls
+# this project as an editable root, recreating the `lsms_library.pth`
+# that GH #957 removed -- so the next `make test` would silently undo
+# that change.  The stamp's `poetry.lock` prerequisite means the rule
+# fires whenever the lock moves, which is exactly when it would bite.
 setup: .make/setup.stamp
 
 .make/setup.stamp: pyproject.toml poetry.lock
 	@mkdir -p $(@D)
-	$(POETRY) install --no-interaction --with test
+	$(POETRY) install --no-root --no-interaction --with test
 	@touch $@
 
 test: setup
