@@ -2850,10 +2850,36 @@ pass against stored hashes under pyarrow 25).  The baseline was last written
 nutrient intake values -- GH #871 (the =most_complete_row= reducer, [2026-09-12])
 changed 544 served rows corpus-wide and is the first candidate to check.
 
-It went unnoticed for two weeks precisely because this module was skipping.
-*Do not regenerate the baseline before attributing the change*: that would pin
-whatever today produces and destroy the evidence, which is the failure mode this
-file was already warning about.
+*Measured [2026-09-22]* (slurm job 39136237, =slurm_logs/venv_provenance/nutrition_delta.sbatch=):
+the old table was rebuilt at =8ec0bab4e= under the OLD closure
+(=.venv.sqfs.prev=, pyarrow 23.0.1 / pandas 3.0.2) and diffed against the
+current one.  The index is identical, so no household moved; the values did.
+
+| measure                       | value                        |
+|-------------------------------+------------------------------|
+| rows with any change          | 23,284 of 23,801 (*97.8%*)   |
+| cells changed                 | 337,664 of 357,015 (*94.6%*) |
+| median abs. relative change   | *0.24 -- 0.49* per changed cell |
+
+Per-nutrient totals, before -> after: Energy *-18.7%*, Protein *-19.5%*,
+Folate *-21.6%*, Vitamin B-12 *-31.6%*, Calcium -15.1%, Riboflavin -15.8%,
+Zinc -14.5%, Iron -12.9%, Niacin -13.0%, Thiamin -10.1%, Fiber -9.2%,
+Vitamin B-6 -4.7%, Carbohydrate -4.4%, Vitamin C -0.1%, Vitamin A *+2.1%*.
+
+*This is not a sample effect.*  =nutrition.py:19= is =uga.food_quantities()=,
+so the table is kilograms times nutrient density, and GH #850 moved Uganda's
+total kg by *-14.8%* on [2026-09-09] -- after the baseline was written.
+Energy at -18.7% is that correction plus the kg-factor work that followed
+(=#929= metric/inferred split, =#919= country-qualified units, =#874= the
+=u='Unknown'= sentinel, and the stated-vs-inferred reporting).  Vitamin A
+moving the other way, and B-12 changing on only 13,323 rows while every other
+nutrient changes on ~23,200, are both worth a look before anyone signs this off.
+
+Two weeks of a *corpus-scale revaluation* went unrecorded here because this
+module was skipping.  *Do not regenerate the baseline* until the direction is
+signed off: #850's own write-up adjudicates Ethiopia, Malawi and EthiopiaRHS as
+corrections and explicitly declines to sign off Niger; Uganda is not
+adjudicated either way in that passage.
 
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
