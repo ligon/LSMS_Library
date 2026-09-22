@@ -16,6 +16,22 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# The venv carries no editable install of this project (GH #957): `poetry
+# install --no-root` below deliberately does not install it, so nothing puts
+# the repo on sys.path by itself.  Neither invocation style used in this
+# workflow does either -- `poetry run pytest` is a console script
+# (sys.path[0] = <venv>/bin) and the wave scripts under countries/ are script
+# runs (sys.path[0] = the script's own directory).  One workflow-level
+# PYTHONPATH covers every job and every step.
+#
+# PYTHONSAFEPATH is deliberately NOT set here, although the Savio controllers
+# do set it.  It removes the script's own directory from sys.path, and the
+# `poetry run make -j2` step below runs country wave scripts that import a
+# sibling module by bare name (`from uganda import ...`).  Safe-path mode is
+# right for a controller process and wrong for a build subprocess.
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
 jobs:
   # Fast tests — no data access needed
   unit-tests:
@@ -28,7 +44,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Run tests
         env:
           LSMS_SKIP_AUTH: "1"
@@ -111,7 +127,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Verify DVC lockfiles
         id: check
         env:
@@ -143,7 +159,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Refresh lockfile hashes
         env:
           LSMS_SKIP_AUTH: "1"
@@ -200,7 +216,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Configure DVC credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
