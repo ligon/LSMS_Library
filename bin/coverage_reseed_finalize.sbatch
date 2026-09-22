@@ -24,9 +24,11 @@ INTERVAL="${COV_RESEED_DAYS:-30}"
 EXPIRES="${COV_EXPIRES:-}"
 echo "=== reseed finalize: node=$(hostname) branch=$BRANCH $(date) ==="
 
-cov_provision_venv "$REPO" || { echo "venv failed"; exit 1; }
 cov_have_internet || { echo "no internet; cannot push -> abort finalize (shards kept)"; exit 0; }
 cov_ensure_clone "$WD" "$BRANCH" "${COV_CLONE_SRC:-file://$REPO}" || { echo "clone failed"; exit 1; }
+
+# venv AFTER the clone: the clone is the code root (GH #957).
+cov_provision_venv "$REPO" "$WD" || { echo "venv failed"; exit 1; }
 
 n=$(ls "$SHARDS"/*.csv 2>/dev/null | wc -l)
 echo "  aggregating $n shards"
