@@ -75,12 +75,36 @@ jobs:
         run: pip install poetry
       - name: Install dependencies
         run: poetry install
+      # Separate from pytest so an import-time failure is attributed to the
+      # import, not lost inside test collection.
+      - name: Import + config smoke
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        run: >-
+          poetry run python -c "import sys, lsms_library as ll;
+          print(sys.version, sys.getfilesystemencoding(), __import__('locale').getpreferredencoding());
+          print(ll.__file__); c = ll.Country('Uganda'); print(c.waves); print(len(c.data_scheme))"
+      - name: Collect tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        run: >-
+          poetry run pytest --collect-only -q
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
       - name: Run portability + config tests
         env:
           LSMS_SKIP_AUTH: "1"
           # Deliberately OFF: UTF-8 mode would mask exactly the cp1252
           # decoding this job exists to catch.
           PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
           OPENBLAS_NUM_THREADS: "1"
           OMP_NUM_THREADS: "1"
           MKL_NUM_THREADS: "1"
