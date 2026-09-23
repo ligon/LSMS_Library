@@ -58,6 +58,39 @@ jobs:
           --timeout=600 --timeout-method=thread
           --durations=25
 
+  # Windows reader smoke.  Nothing else in CI runs on Windows, so this is the
+  # only place its defaults are exercised: the cp1252 text encoding, no
+  # ``fork`` start method, no process groups, a case-insensitive checkout.
+  # Scope is the READER path (install, load every country's config, parse
+  # every data_info.yml) -- script-path ``make`` builds are not expected to
+  # work on Windows yet.  No secrets: nothing here reads microdata.
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Run portability + config tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          # Deliberately OFF: UTF-8 mode would mask exactly the cp1252
+          # decoding this job exists to catch.
+          PYTHONUTF8: "0"
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          LSMS_BUILD_WORKERS: "1"
+        run: >-
+          poetry run pytest -n auto --dist=loadfile
+          --timeout=600 --timeout-method=thread
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
+
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
   # silent until someone needs the file.  scripts/dvc_remote_reachability.py
