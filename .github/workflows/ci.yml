@@ -66,6 +66,9 @@ jobs:
   # work on Windows yet.  No secrets: nothing here reads microdata.
   windows-smoke:
     runs-on: windows-latest
+    # A hang (first seen: `import lsms_library; Country('Uganda')` sat for an
+    # hour) must not run to the 6-hour default.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -83,10 +86,14 @@ jobs:
           PYTHONUTF8: "0"
           PYTHONUNBUFFERED: "1"
           PYTHONFAULTHANDLER: "1"
+        # dump_traceback_later: if anything blocks, print every thread's
+        # stack after 120 s and exit, so a hang names its own location.
         run: >-
-          poetry run python -c "import sys, lsms_library as ll;
-          print(sys.version, sys.getfilesystemencoding(), __import__('locale').getpreferredencoding());
-          print(ll.__file__); c = ll.Country('Uganda'); print(c.waves); print(len(c.data_scheme))"
+          poetry run python -c "import faulthandler, sys; faulthandler.dump_traceback_later(120, exit=True);
+          print(sys.version, sys.getfilesystemencoding(), __import__('locale').getpreferredencoding(), flush=True);
+          import lsms_library as ll; print('imported', ll.__file__, flush=True);
+          c = ll.Country('Uganda'); print('constructed', flush=True);
+          print(c.waves, flush=True); print(len(c.data_scheme), flush=True)"
       - name: Collect tests
         env:
           LSMS_SKIP_AUTH: "1"
