@@ -529,6 +529,21 @@ conflicting tuples for that cell.  That is a harmonisation-level
 collision on the input axis, not an identifier defect, and it is still
 open under GH #614 / #637 with the 2011-12 cell.
 
+*2011-12 has one household in the harvest module that is in no other
+file (found 2026-09-24 by
+=tests/test_niger_2014_15_extension_key.py::test_every_wave_keys_into_the_sample_universe[crop_production]=,
+which is RED on that cell and was never green there).*  =hid= 27010
+(grappe 270, menage 10) has two lines in =ecvmaas2e_p2.dta= (passage
+2, fields 1 and 2) and no line in the welfare file =ecvmamen_p1_en.dta=
+(3,968 households) or the roster =ecvmaind_p1p2_en.dta=; it is the only
+harvest =hid= absent from the welfare file, and it is served on two
+=crop_production= rows with no =v= (the =NullIndexKeyWarning= on
+=crop_production='s =v= level, 2 NaN rows, 2011-12, is this household).
+Not an EXTENSION or crosswalk artefact: the id is the survey's own,
+=updated_ids= has no 2011-12 entry, and the rows were served identically
+before the bundle.  Whether 27010 is a mis-keyed 2701 (grappe 27,
+menage 1, which does exist) is not adjudicated here.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
