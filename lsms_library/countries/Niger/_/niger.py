@@ -16,7 +16,10 @@ def i(x):
     """Create hhid from grappe + menage with '0' separator + zero-padded menage.
 
     Detects which wave based on column case:
-    - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE) -> no prefix
+    - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE, EXTENSION) -> no
+      prefix; the third element is APPENDED as one digit, so (2, 1, 2) ->
+      '20012'.  Every 2014-15 table passes all three (GH #679): EXTENSION 0 =
+      the 2011 household found in place, 1 = moved whole, 2 = a split-off.
     - 2018-19/2021-22 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
 
     Uses '0' separator and zero-padded menage (2 digits) to prevent ID
@@ -1192,31 +1195,21 @@ def _finish_people_last7days(df, t):
     # 2018-19 and 2021-22 -- 25,125 / 35,406 / 44,320 rows, ZERO duplicates,
     # this collapse is a no-op.
     #
-    # KEY BROKEN for 2014-15, and NOT fixable here.  ECVMA2 identifies a
-    # household by (GRAPPE, MENAGE, EXTENSION); `niger.i` builds `i` from
-    # (GRAPPE, MENAGE) only.  ECVMA2_MS01P1.dta holds 3,617 distinct
-    # (GRAPPE, MENAGE, EXTENSION) households but only 3,558 distinct
-    # (GRAPPE, MENAGE) -- so 59 households have no `i` of their own, and their
-    # members' line numbers (MS01Q00 = 1, 2, 3, ...) collide with the other
-    # household's.  Measured: 420 rows in 210 colliding (t, i, pid) groups, and
-    # EXTENSION differs in 210 of 210 (100%).  These are DIFFERENT REAL PEOPLE:
-    #
-    #   GRAPPE 2, MENAGE 1, line 1 -> EXTENSION 0: age 56, industry 316
-    #                                 EXTENSION 2: age 29, industry 321
-    #   GRAPPE 2, MENAGE 1, line 2 -> EXTENSION 0: age 11
-    #                                 EXTENSION 2: age 22
-    #
-    # `.first()` merges each pair into one person who was never enumerated.
-    #
-    # The defect is NOT local to this table.  Dropping EXTENSION is a wave-wide
-    # convention: 2014-15's `sample`, `household_roster` (same source file,
-    # same 210 collisions), `individual_education`, `livestock`,
-    # `crop_production`, `plot_inputs` and `plot_labor` all key on
-    # (GRAPPE, MENAGE).  Re-keying only people_last7days would break its join
-    # to sample() / household_roster and the panel_ids chain -- a regression,
-    # not a fix.  The correct fix is to add EXTENSION to `i` across the whole
-    # 2014-15 wave (and to re-derive panel_ids), which is its own change with
-    # its own verification.  Tracked on GH #637; do not "fix" it here.
+    # 2014-15 was KEY BROKEN until GH #679 (2026-09-24).  ECVMA2 identifies a
+    # household by (GRAPPE, MENAGE, EXTENSION); `i` used to be built from
+    # (GRAPPE, MENAGE) only, so the 59 households that share a
+    # (GRAPPE, MENAGE) with another (EXTENSION 2 = split-off, or 1 = moved)
+    # had no `i` of their own and their members' line numbers collided with
+    # the other household's -- 420 rows in 210 (t, i, pid) groups, EXTENSION
+    # differing in 210 of 210, and `.first()` merging each pair into one
+    # person who was never enumerated (GRAPPE 2, MENAGE 1, line 1: a 56-year-
+    # old in extension 0 and a 29-year-old in extension 2).  Every 2014-15
+    # table now keys on all three columns (2014-15/_/data_info.yml and the
+    # five wave scripts), and panel_ids.py links extensions 0 and 1 -- not the
+    # split-offs -- to the 2011-12 parent.  With the full key the
+    # (t, i, pid) index is unique in every wave and this collapse is a no-op
+    # everywhere; it stays as a guard against a stray duplicate in the
+    # 2014-15 m:1 labor->roster merge.
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df

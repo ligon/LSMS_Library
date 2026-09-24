@@ -404,16 +404,30 @@ The largest single loss is =cluster_features/2014-15=, which projects a
 household-grain frame onto =(t, v)= and destroys 42 of 3,617 rows
 across 4 conflicting clusters.
 
-** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12)
+** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12; FIXED by GH #679, 2026-09-24)
 
 The idiosyncrasy behind that =household_roster= entry, recorded because
 GH #871's corpus census had to look at it by hand: in 2014-15 the
-declared index =(t, i, pid)= is NOT unique -- 210 rows sit on a
-duplicated tuple, and the shape is a *blank line sharing a member
-number with a real one*.  Group =('2014-15','101008','1')= is two rows:
+declared index =(t, i, pid)= was NOT unique -- 210 rows sat on a
+duplicated tuple.  Group =('2014-15','101008','1')= was two rows:
 =(<NA>, NaN, <NA>, NaN)= and =(Masculin, 45.0, Chef de menage, 12.0)=.
 That is the #323 verdict verbatim -- the identifier is broken, not the
-reducer -- and it is NOT fixed here.
+reducer.
+
+CORRECTION (2026-09-24, GH #679).  This entry used to say the shape
+was "a *blank line sharing a member number with a real one*".  That
+describes 45 of the 210 colliding groups.  Measured on
+=ECVMA2_MS01P1.dta= (a line is "blank" when Sex, Age, Relationship and
+MonthsSpent are all missing): *165 of the 210 groups are two POPULATED
+people* -- e.g. =(GRAPPE 2, MENAGE 1, line 1)= is a 56-year-old in
+EXTENSION 0 and a 29-year-old in EXTENSION 2 -- and 45 are
+blank-vs-populated; none is blank-vs-blank.  The most-complete-row
+rule rescues the 45 (it serves the populated line) and silently drops
+a real person in each of the 165, so the entry understated the loss:
+what #871 changed was which row of a broken group is served, and the
+group was broken because =i= lacked EXTENSION.  The key is now fixed
+(next section); the (t, i, pid) index is unique in all four waves and
+this collapse no longer fires.
 
 What changed is what core serves.  Until #871 the collapse was
 =groupby().first()=, a per-column first-non-null that happened to
@@ -424,13 +438,74 @@ cell).  Core now serves the *most complete* observed row, so the head's
 row survives and is a row the survey actually recorded.  Same delivered
 values as before, for a defensible reason rather than by luck.
 
-Niger's other #871-visible cells are =assets/2014-15= (172 rows changed
+Niger's other #871-visible cells were =assets/2014-15= (172 rows changed
 under =nth(0)=, 0 under the landed rule), =shocks/2014-15=,
 =individual_education/2014-15= and =plot_inputs/{2011-12,2014-15}=; the
-last two are the only ones where the landed rule still changes a served
+last two are the only ones where the landed rule still changed a served
 row (11 + 2 rows on =Quantity=/=Purchased=, no new missings).  See
-=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  Fixing the
-=pid= key remains open under GH #614 / #637.
+=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  All of the
+2014-15 cells were the same missing EXTENSION level (see the next
+section); the 2011-12 =plot_inputs= cell is unrelated and still open
+under GH #614 / #637.
+
+** 2014-15: the household key is =(GRAPPE, MENAGE, EXTENSION)= (GH #679, 2026-09-24)
+
+ECVMA2 re-interviewed the 2011 households under a tracking rule
+(quoted under "Sampling universe" above), and its cover sheet carries
+the outcome per household in =EXTENSION=: 0 = found in place (3,478
+households), 1 = the whole household found after moving (77), 2 = a
+SPLIT-OFF, members who left the 2011 household and were interviewed as
+a household of their own (62).  So a =(GRAPPE, MENAGE)= is NOT a
+household: 3,617 households share 3,558 pairs, and 59 of them have
+their (GRAPPE, MENAGE) in common with another.  A pair carries the
+extension sets ={0}= 3,421, ={1}= 75, ={0, 2}= 57, ={1, 2}= 2, ={2}=
+3 -- never ={0, 1}=.
+
+Until 2026-09-24 every 2014-15 table built =i= from (GRAPPE, MENAGE)
+alone (the scripts said "EXTENSION omitted to match sample/roster", and
+=sample= omitted it too), so the 59 shadowed households were merged
+into their parents wherever a within-household key repeats: 210
+(t, i, pid) collisions in =household_roster= / =individual_education=
+/ =people_last7days=, 2,006 in =assets= (item codes), 367 in
+=plot_inputs=, 280 in =livestock=, 46 in =crop_production= -- every one
+of them 0 once EXTENSION is in the key.  Every 2014-15 source file
+carries the column (checked one by one, including the welfare file
+=sample= reads).
+
+*What changed.*  Every =i:= in =2014-15/_/data_info.yml= is
+=[GRAPPE, MENAGE, EXTENSION]=, the five wave scripts pass all three,
+and =niger.i= appends the extension as one digit: ='1001'= became
+='10010'=, and the split-off =(2, 1, 2)= is ='20012'=.  *This re-keys
+every 2014-15 household id*, so the committed crosswalk
+(=_/panel_ids.json=, =_/updated_ids.json=) was regenerated with
+=make panel-ids=.
+
+*DECISION, named because it is one (GH #679): extensions 0 and 1 link
+to the 2011-12 parent; extension 2 -- the split-off -- is a NEW
+household and is not linked.*  Linking a split-off to its parent's
+2011-12 =hid= would make =id_walk= rename parent and split-off to the
+same id and re-merge them: the collision #679 removes, under another
+name.  Because a pair never carries both 0 and 1, linking both never
+merges two 2014-15 households.  A split-off's origin is recoverable
+from the key: the parent is the same (GRAPPE, MENAGE) with extension 0
+or 1.  Linked: 3,529 households (was 3,251 under the two-column key --
+the namespace guard below had to skip 286 households whose 2011-12
+=hid= was spelled like another 2014-15 id; with the longer key it skips
+5).  Unlinked: 88 = 62 split-offs + 21 ext-0 households with no
+2011-12 =hid= in the individual file + the 5 guard-skipped.
+
+*One namespace collision remains, and no guard can remove it.*  The
+2011-12 id is the digit string =grappe*100 + menage= and the 2014-15
+id is also all digits, so an UNLINKED 2014-15 id can equal a 2011-12
+=hid=: exactly one does, the split-off ='20012'= (g=2, m=1, e=2), which
+is also 2011-12 household (g=200, m=12).  In a cross-wave join on =i=
+those two rows look like one panel household.  The guard in
+=panel_ids.py= only removes LINKS; an unlinked id it cannot touch.  A
+non-digit separator in the 2014-15 id would remove the class; not done
+here, because it would re-key the wave a second time.
+
+*Cache.*  =niger.py= (the =i= docstring and the retired KEY BROKEN
+comment) is in every Niger table's hash, so all 18 tables re-warm once.
 
 * Household Presence / MonthsSpent
 

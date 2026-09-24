@@ -7,8 +7,9 @@ Two source files, as the instrument splits harvest from sale:
   - ECVMA2_AS2E2P2.dta : CROP level (no plot) — sold qty + unit
     (AS02EQ12A / AS02EQ12B) and sale value (AS02EQ13).
 
-i is built from (GRAPPE, MENAGE) via niger.i (matching this wave's
-sample / roster idxvars, which omit EXTENSION).  As in 2021-22 the
+i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
+ECVMA2 household key, matching this wave's sample / roster idxvars
+(GH #679; EXTENSION 2 is a split-off household).  As in 2021-22 the
 crop-level sale is attributed only to (i, crop) pairs grown on a single
 plot; multi-plot crops keep Quantity_sold / Value_sold NaN (no fabricated
 split).  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
@@ -32,8 +33,8 @@ base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
 src = get_dataframe(base + 'ECVMA2_AS2E1P2.dta', convert_categoricals=True)
 srcn = get_dataframe(base + 'ECVMA2_AS2E1P2.dta', convert_categoricals=False)
 
-hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                           index=['GRAPPE', 'MENAGE'])), axis=1)
+hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                           index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 field = srcn['AS02EQ01'].apply(format_id)
 parcel = srcn['AS02EQ03'].apply(format_id)
 plot = field.astype(str) + '_' + parcel.astype(str)
@@ -54,8 +55,8 @@ df = pd.DataFrame({
 # --- crop-level sale block (AS2E2), single-plot attribution --------------
 sold = get_dataframe(base + 'ECVMA2_AS2E2P2.dta', convert_categoricals=True)
 soldn = get_dataframe(base + 'ECVMA2_AS2E2P2.dta', convert_categoricals=False)
-sold_i = sold.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                                index=['GRAPPE', 'MENAGE'])), axis=1)
+sold_i = sold.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                                index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 sold_crop = _crop_labels(soldn['AS02EQ110B'], sold['AS02EQ110B'], crop_map)
 sold_df = pd.DataFrame({
     'i':             sold_i.values,
