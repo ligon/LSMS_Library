@@ -32,24 +32,12 @@ No gh write and no code change were made; every close/comment is a proposal.
 Lesson (scrum-master skill, scatter-gather): this batched 4-6 issues per agent and ran 2 at a time on the 4-core slice -- wrong shape.  Next phase goes to Slurm as an array of headless =claude -p= agents, one per item; the pattern is verified by job 39197636 (=headless_probe.sbatch=, 35 s, =GH_REPO= set, =--permission-mode bypassPermissions=).
 Account baseline: =fc_jevons= 44,927 of 1,500,000 SUs (3%); all work here on =co_carleton=.
 
-** Fix phase DONE, review phase IN FLIGHT (2026-09-24 03:30)
-Fix arrays 39198802 (7) + 39198971 (#848) + 39199460 (niger-followup, running) on fc_jevons.  Branches on the mirror, all from =development= at 242573697/88f3fef96:
-| branch | commits | report | note |
-| fix/810-dvc-open | 2 | full | full suite green (4,244 passed); corpus re-warm, ties to #959 |
-| fix/868-reduce-agreed | 1 | LOST (commit msg only) | +792 lines, touches country.py/build_transforms.py + 7 Uganda wave scripts; corpus re-warm |
-| fix/811-region-tables | 3 | LOST (commit msgs only) | GB/BF/SN Region tables; BF labels are a DECISION |
-| fix/malawi-bundle | 2 | full | sale-side S/U, 642 contradictions suppressed; moved raw-nut Aggregate label beyond the ask |
-| fix/nigeria-824 | 2 | full | Unit_sold W1/W2; #867 spelling; 24-table Nigeria re-warm |
-| fix/niger-bundle | 5 | LOST + 3 tests and a CONTENTS edit destroyed | fix/niger-followup (39199460) recreates them and runs the cold rebuild |
-| fix/831-cache-clear | 1 | full | hash-neutral |
-| fix/848-uganda-condition2 | 1 | full | moved four pinned baselines with numbers |
-| fix/962-value-count-draft | 1 | parked | not for merge as-is |
-Harness lesson (fixed in dd60636aa): a headless turn ends on a text-only message, so a backgrounded test abandons the run; briefs now forbid backgrounding and the script salvages uncommitted work into a WIP commit.
-Review array 39199587 (7 red-team reviewers, read-only, VERDICT.md under =venv_validate/backlog_review_39199587/<key>/=).  Niger review to follow once 39199460 lands.
-After verdicts: trust-but-verify each branch yourself (=git diff --stat development..fix/<key>= on the mirror), then push reviewed branches to GitHub from the mirror and open PRs for @ligon (no PR has been opened; nothing merged; no gh write made).
+** Fix + review phases DONE (2026-09-24 05:10) -- read =slurm_logs/backlog_fix_2026-09-24/REVIEW_SUMMARY.org=
+Eight branches on the mirror, eight verdicts (2 pass, 5 pass-with-fixes, 1 needs-human), five decisions for @ligon listed there.  Nothing merged, no PR, no gh write.
+Next: decisions -> follow-up fix array (mechanical reviewer items) -> push to GitHub + PRs -> file the cross-cutting findings.
 
 ** Next concrete action
-@ligon reads the triage report; answers the escalations he wants acted on; then the fix phase runs as a Slurm array (one element per dispatch-plan step), each element cloning =development= from the mirror, mounting =.venv.sqfs= by hand, and publishing a =fix/<issue>= branch.
+@ligon answers the five decisions + the #868 bill in REVIEW_SUMMARY.org; then dispatch the follow-up array (savio3_htc if it has headroom), then PRs.
 
 #+title: Handoff -- 2026-09-17 (Sue / Claude Fable 5.1), Savio job 39002769
 

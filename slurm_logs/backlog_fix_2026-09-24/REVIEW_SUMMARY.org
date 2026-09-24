@@ -1,0 +1,38 @@
+#+title: Backlog fix phase 2026-09-24: branches, verdicts, decisions
+#+date: [2026-09-24 Thu 05:10]
+
+Eight fix branches (nine elements) and eight red-team verdicts, all on =fc_jevons= / =savio4_htc=, one 8-core element each.
+Inputs: =briefs/=, =review_briefs/=; outputs: =reports/= (the fix agents' self-reports and commit lists), =verdicts/= (the reviewers' VERDICT.md).
+Nothing is merged; no PR is open; no GitHub write has been made.  Every branch is on the shared mirror only.
+
+* Verdicts
+| branch | issues | verdict | reviewer's headline | decision for @ligon |
+|--------+--------+---------+---------------------+---------------------|
+| fix/811-region-tables | #811 | pass | every figure reproduces cold; new test discriminates; cost is a full re-warm of GB+BF+SN (53 tables), not "one wave" | accept three editorial spellings (GB =SAB= upper; BF =Mouhoum= -> =Mouhoun=; SEN unaccented) |
+| fix/848-uganda-condition2 | #848 | pass | two independent cold builds reproduce; 2019-20 questionnaire says "up to 2 conditions"; four pinned baselines moved with numbers | none |
+| fix/810-dvc-open | #810 | pass-with-fixes | symptom reproduced/gone; suite green (2 pre-existing order flakes); one false comment about the WB fallback; missing sources now reach the WB API (bounded ~60 s offline) | land beside the #959 corpus re-warm |
+| fix/831-cache-clear | #831 | pass-with-fixes | hash-neutral, regression-free; =ls-files= empty-set misreports pip installs inside a user git repo; =check-ignore= rationale false; suffix set misses =.dat .dct .ssp .tab .xls .xlsx= | move =Panama/1997/Data/unittable.csv= under =_/= (vs allowlist) |
+| fix/malawi-bundle | #833 #839 | pass-with-fixes | every figure reproduces; 561 tests; two docstrings must be fixed BEFORE merge (else a second Malawi re-warm) | is =shell_not_applicable= a wildcard for shell-less crops? 464 sales / 40.8M MWK (Tobacco, Cotton) are suppressed as contradictions today |
+| fix/nigeria-824 | #824 #867 | pass-with-fixes | Unit_sold reproduces to the row; the #867 alias ALSO re-values 9,640 Mali plot_inputs rows (+122,434 kg N, +13.5%), undisclosed, no cache signal | sign the 0.20 N share for Mali "Other inorganic" and Nigeria W1-W3 "other (specify)" (+2.5%), or drop the alias and let #867 carry it |
+| fix/niger-followup (contains fix/niger-bundle) | #679 #865 #824 #811 #833 | pass-with-fixes | every served number reproduces on the reviewer's own cold rebuild of all 23 tables; three prose figures wrong; red test must name hid 27010; re-key drops five old links | ext-2-only split-offs (3 households: (89,5) (95,1) (128,11)) -- keep their 2011 id or not (panel-design call) |
+| fix/868-reduce-agreed | #868 | needs-human | correct on every path, served values unchanged, suite clean; but a CORPUS-WIDE re-warm of both tiers for a disclosure-only fix (formatter/replay helpers sit under the tagged collapse) | pay it now, ride it with #810/#959's re-warm, or ask for the read-path placement the reviewer sketched |
+
+* Cross-cutting findings the reviewers surfaced (pre-existing; candidates for new issues)
+- BF =cluster_features= 2014 destroys 1,034 of 10,800 rows (94 =(t,v)= groups); both BF EHCVM waves drop their =df_geo= sub-df (=lat_dd_mod= not in columns).  Identical on development.
+- Nigeria country script =drop_duplicates(keep='first')=: 159 positive-sale rows discarded in W1/W2, 40 the only sale on their key; invisible to =grain_reports()=.
+- Nigeria W1/W2 also carry other-buyer sales (=sa3q16a/b=, =sa3q17=) that no table reads.
+- Niger: hid 27010 in the 2011-12 harvest module and in no roster/welfare file; assets served with duplicated =(i,t,j)=; plot_inputs seed-slot collisions.
+- =get_data_file= parses =grab_data='s =../Data/= candidate into =country='..'= ("No SOURCE.org found for ../.."); =paths.data_root= lru_cache poisoned by =monkeypatch.setenv= in =test_gh866_*=; order-dependent =test_ghanalss_aggregate[total]=.
+- =_sync_legacy_dvc_creds= is dead once no =dvc.api.open= caller remains (#810).
+
+* Proposed next steps
+1. @ligon answers the decision column (five decisions) and the #868 bill.
+2. One more fix array (same harness) applies the reviewers' mechanical follow-ups on the six pass-with-fixes branches, each from that branch: 810 (comment), 831 (five items), malawi (two docstrings + CONTENTS), nigeria (three prose items + Mali test pin), niger (four items incl. narrowing the red test), 868 (rename =dropped=, two docstrings) -- decisions applied where given.
+3. Push reviewed branches to GitHub from the mirror and open one PR per branch, verdict attached, for @ligon to merge.  811 and 848 are ready now.
+4. File the cross-cutting findings as issues (gh writes; needs the go-ahead).
+
+* Harness notes for the next dispatch
+- A headless turn ends on a text-only message; briefs now forbid backgrounding and the script salvages uncommitted work.  Cost before the fix: three lost reports, one lost set of tests (recreated).
+- =sbatch= flags go BEFORE the script path (39199587 died on line 14 for that).
+- Publish the briefs to the mirror BEFORE submitting (39198738 ran seven elements with no prompt).
+- Prefer =savio3_htc= next time when it has headroom (@ligon 2026-09-24); =savio4_htc= had 5,325 idle cores today and bills more per core-hour.
