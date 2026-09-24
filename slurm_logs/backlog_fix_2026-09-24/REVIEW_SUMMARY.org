@@ -24,6 +24,8 @@ Nothing is merged; no PR is open; no GitHub write has been made.  Every branch i
   Contradictions (647): price sides with the SALE field 379:207 -- the more reliable field, not reliably enough for a rule.
   Sharpened decision for @ligon: (a) implement the Groundnut price derivation (small, registered); (b) for crops where shelling does not apply, treat not-applicable AS the basis and attach (recovers ~166 sales / ~26.8M MWK of Tobacco+Cotton; the instrument's own wording supports it); (c) leave the 647 contradictions suppressed.
 
+- @ligon 2026-09-24, on the Malawi call: "this would be a derived value, see docs"; "the 647 contradictions could also sometimes produce a derived value, based on price".  Every non-exact attachment branch becomes a registered key (docs/guide/derivations.md, one key per branch); the remainder is a =rows: 0= deletion entry.  Implementation element =malawi-derivations= on =fix/malawi-bundle=.
+
 * Cross-cutting findings the reviewers surfaced (pre-existing; candidates for new issues)
 - BF =cluster_features= 2014 destroys 1,034 of 10,800 rows (94 =(t,v)= groups); both BF EHCVM waves drop their =df_geo= sub-df (=lat_dd_mod= not in columns).  Identical on development.
 - Nigeria country script =drop_duplicates(keep='first')=: 159 positive-sale rows discarded in W1/W2, 40 the only sale on their key; invisible to =grain_reports()=.
