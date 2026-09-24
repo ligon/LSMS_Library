@@ -34,13 +34,24 @@ cd "$CLONE"
 PYTHONSAFEPATH=1 "$MNT/bin/python" -c "import lsms_library,os,sys; p=os.path.realpath(lsms_library.__file__); sys.exit(0 if p.startswith(os.path.realpath('$CLONE')+os.sep) else 'imported '+p)" || { echo "IDENTITY FAILED"; exit 1; }
 echo "clone at $(git rev-parse --short HEAD); identity OK; data root seeded: $(ls $DATA | tr '\n' ' ')"
 git switch -c "fix/$KEY" --quiet
+export STAGE
 BRIEF=$MIRROR/slurm_logs/backlog_fix_2026-09-24/briefs/$KEY.md
 cp "$BRIEF" "$STAGE/brief.md"
 timeout 5h claude -p "$(cat "$BRIEF")" --output-format json --permission-mode bypassPermissions --max-turns 400 > "$STAGE/claude.json" 2> "$STAGE/claude.err"
 RC=$?
 echo "claude exit=$RC at $(date -Is)"
 "$MNT/bin/python" -c "import json,sys; d=json.load(open('$STAGE/claude.json')); open('$STAGE/REPORT.md','w').write(d.get('result','')); print('turns', d.get('num_turns'), 'cost', d.get('total_cost_usd'), 'reason', d.get('terminal_reason'))" 2>/dev/null || echo "no parsable claude.json"
-# Safety net: publish the element's branch even if the agent forgot, and record the tree state.
+# Safety net 1: anything the agent left uncommitted (a turn can end with work pending) is committed
+# on the element's branch rather than destroyed with /local.  .gitignore still applies.
+git status --short > "$STAGE/git_status_before_salvage.txt"
+if [ -s "$STAGE/git_status_before_salvage.txt" ]; then
+  git add -A && git commit -q -m "WIP salvaged by the harness: left uncommitted when the agent's turn ended ($KEY)
+
+$(cat "$STAGE/git_status_before_salvage.txt")
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>" && echo "salvaged uncommitted work into a WIP commit"
+fi
+# Safety net 2: publish the element's branch even if the agent forgot, and record the tree state.
 git status --short > "$STAGE/git_status.txt"; git log --oneline development..HEAD > "$STAGE/commits.txt"
 if [ -s "$STAGE/commits.txt" ]; then git push --quiet origin "fix/$KEY" 2>&1 | tail -2; echo "pushed fix/$KEY: $(wc -l < $STAGE/commits.txt) commit(s)"; else echo "no commits on fix/$KEY"; fi
 git diff --stat development..HEAD > "$STAGE/diffstat.txt"
