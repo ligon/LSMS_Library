@@ -513,8 +513,11 @@ rows for 2014-15 before -> after:* =sample= 3,558 -> 3,617;
 collapse used to drop); =people_last7days= 26,369 -> 26,579 (+210);
 =assets= 17,070 -> 17,267; =plot_inputs= 8,071 -> 8,134; =livestock=
 4,998 -> 5,018; =individual_education= 2,821 -> 2,834; =crop_production=
-8,753 -> 8,799 (+46).  The crosswalk holds 3,529 2014-15 -> 2011-12
-links and no linked value is itself a key.
+8,753 -> 8,799 (+46); =plot_labor= 15,803 -> 15,935; =shocks= 3,771 ->
+3,781; =housing= 3,558 -> 3,617; =food_security= 3,557 -> 3,616.  Every
+other (table, wave) serves the same row count as before the bundle,
+measured on all 23 tables.  The crosswalk holds 3,529 2014-15 ->
+2011-12 links and no linked value is itself a key.
 
 *Not everything in =plot_inputs= 2014-15 was the missing EXTENSION.*
 On the raw input file the full key (GRAPPE, MENAGE, EXTENSION,
@@ -1049,9 +1052,11 @@ spelling artefact: the s16d sold-unit labels are lower-case (='tiya'=,
 they agree on 13.4% of the 1,818 de-duplicated sale rows and through the
 =u= table on 89.8% (the =u= table gained ='sac de 100kg'= for this; the
 other sold spellings were already there).  The old 98.8% / 93.1% for
-2011-12 / 2018-19 were measured under a looser "priced" (=Value_sold > 0=
-only, raw spellings) and move to 98.7% / 92.3% under the definition
-above.  Pinned by =tests/test_niger_sold_unit.py=.
+2011-12 / 2018-19 predate =Unit_sold= and came from a raw-side join
+(=slurm_logs/price_sources/Niger/analysis.py::_sold_unit_map=); under
+the definition above they are 98.7% / 92.3%, and the source of the
+0.1-0.8 point gap is not adjudicated.  Pinned by
+=tests/test_niger_sold_unit.py=.
 
 *The crop-level sale block (2014-15 AS2E2, 2021-22 s16d) has no plot.*
 It is summed over =(i, crop, Unit_sold)= -- never across units -- and

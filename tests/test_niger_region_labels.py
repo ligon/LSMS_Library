@@ -6,8 +6,9 @@ urbaine de Niamey``, 2018-19 all LOWER-CASE and unaccented (``agadez``,
 ``tillaberi``), 2021-22 title-case unaccented with the ``gadez`` typo.  The
 ``Region`` table in ``Niger/_/categorical_mapping.org`` (auto-applied to the
 column by name) mapped every spelling but 2018-19's, so the served column
-carried 16 labels for 8 regions (measured 2026-09-24 on the pre-fix warm
-parquet: 19 raw spellings, 11 mapped onto 8 labels + 8 unmapped = 16).
+carried 16 labels for 8 regions (measured 2026-09-24: the 19 raw spellings
+of the pre-fix warm parquet, passed through the pre-#811 table, give 16
+distinct labels -- 11 spellings mapped onto 8 regions, 8 left unmapped).
 
 Two families, split as in ``tests/test_niger_value_sentinels.py``:
 
@@ -34,14 +35,17 @@ TABLE = "Region"
 REGIONS = frozenset({"Agadez", "Diffa", "Dosso", "Maradi", "Niamey", "Tahoua",
                      "Tillabéri", "Zinder"})
 
-#: Every spelling the four waves' source files carry (19), measured on the
-#: pre-transformation L2 parquet 2026-09-24.  A NEW spelling in a re-release
-#: would show up as a 9th served label, which ``TestServedRegion`` catches.
+#: Every spelling the four waves' source files carry (19), measured PER WAVE
+#: on the pre-transformation L2 parquet 2026-09-24 (``var/cluster_features
+#: .parquet`` grouped by ``t``).  The pre-#811 table, applied to these 19,
+#: yields 16 distinct labels (measured the same day); the current table
+#: yields 8.  A NEW spelling in a re-release would show up as a 9th served
+#: label, which ``TestServedRegion`` catches.
 RAW_SPELLINGS = {
     "2011-12": {"Agadez", "Diffa", "Dosso", "Maradi", "Niamey", "Tahoua",
                 "Tillabéri", "Zinder"},
     "2014-15": {"Agadez", "Diffa", "Dosso", "Maradi", "Communauté urbaine de Niamey",
-                "Tahoua", "Tillaberi", "Zinder"},
+                "Tahoua", "Tillabéri", "Zinder"},
     "2018-19": {"agadez", "diffa", "dosso", "maradi", "niamey", "tahoua",
                 "tillaberi", "zinder"},
     "2021-22": {"gadez", "Diffa", "Dosso", "Maradi", "Niamey", "Tahoua",
