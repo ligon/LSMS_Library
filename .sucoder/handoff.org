@@ -32,11 +32,21 @@ No gh write and no code change were made; every close/comment is a proposal.
 Lesson (scrum-master skill, scatter-gather): this batched 4-6 issues per agent and ran 2 at a time on the 4-core slice -- wrong shape.  Next phase goes to Slurm as an array of headless =claude -p= agents, one per item; the pattern is verified by job 39197636 (=headless_probe.sbatch=, 35 s, =GH_REPO= set, =--permission-mode bypassPermissions=).
 Account baseline: =fc_jevons= 44,927 of 1,500,000 SUs (3%); all work here on =co_carleton=.
 
-** Fix phase IN FLIGHT: Slurm array 39198738 (fc_jevons, savio4_htc, 7 elements, submitted 2026-09-24 ~02:40)
-Elements (=slurm_logs/backlog_fix_2026-09-24/elements.txt=; briefs in =briefs/=): 810-dvc-open, 868-reduce-agreed, 811-region-tables, niger-bundle, malawi-bundle, nigeria-824, 831-cache-clear.
-Each: private clone of =development=, hand-mounted =.venv.sqfs=, private =LSMS_DATA_DIR= under =/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39198738/<key>/data= (dvc-cache symlinked, country parquets copied), headless =claude -p= on the brief, branch =fix/<key>= pushed to the mirror; =REPORT.md=, =commits.txt=, =diffstat.txt= beside the data.
-Excluded (gated on @ligon): #848 (needs the #962 draft parked), #962, Tanzania (#836/#837), Ethiopia (#837), Mali (#822/#839), and all reconcile gh writes.
-On completion: trust-but-verify -- =git -C ~/mirrors/LSMS_Library branch --list 'fix/*'=, =git diff --stat development..fix/<key>= per branch, read each REPORT.md's SCOPE DEVIATIONS, then red-team before any PR.
+** Fix phase DONE, review phase IN FLIGHT (2026-09-24 03:30)
+Fix arrays 39198802 (7) + 39198971 (#848) + 39199460 (niger-followup, running) on fc_jevons.  Branches on the mirror, all from =development= at 242573697/88f3fef96:
+| branch | commits | report | note |
+| fix/810-dvc-open | 2 | full | full suite green (4,244 passed); corpus re-warm, ties to #959 |
+| fix/868-reduce-agreed | 1 | LOST (commit msg only) | +792 lines, touches country.py/build_transforms.py + 7 Uganda wave scripts; corpus re-warm |
+| fix/811-region-tables | 3 | LOST (commit msgs only) | GB/BF/SN Region tables; BF labels are a DECISION |
+| fix/malawi-bundle | 2 | full | sale-side S/U, 642 contradictions suppressed; moved raw-nut Aggregate label beyond the ask |
+| fix/nigeria-824 | 2 | full | Unit_sold W1/W2; #867 spelling; 24-table Nigeria re-warm |
+| fix/niger-bundle | 5 | LOST + 3 tests and a CONTENTS edit destroyed | fix/niger-followup (39199460) recreates them and runs the cold rebuild |
+| fix/831-cache-clear | 1 | full | hash-neutral |
+| fix/848-uganda-condition2 | 1 | full | moved four pinned baselines with numbers |
+| fix/962-value-count-draft | 1 | parked | not for merge as-is |
+Harness lesson (fixed in dd60636aa): a headless turn ends on a text-only message, so a backgrounded test abandons the run; briefs now forbid backgrounding and the script salvages uncommitted work into a WIP commit.
+Review array 39199587 (7 red-team reviewers, read-only, VERDICT.md under =venv_validate/backlog_review_39199587/<key>/=).  Niger review to follow once 39199460 lands.
+After verdicts: trust-but-verify each branch yourself (=git diff --stat development..fix/<key>= on the mirror), then push reviewed branches to GitHub from the mirror and open PRs for @ligon (no PR has been opened; nothing merged; no gh write made).
 
 ** Next concrete action
 @ligon reads the triage report; answers the escalations he wants acted on; then the fix phase runs as a Slurm array (one element per dispatch-plan step), each element cloning =development= from the mirror, mounting =.venv.sqfs= by hand, and publishing a =fix/<issue>= branch.
