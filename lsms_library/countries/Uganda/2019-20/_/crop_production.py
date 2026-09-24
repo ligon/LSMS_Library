@@ -30,6 +30,7 @@ side, so the two stay consistent.
 import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.country import grain_reports
 from uganda import crop_production_for_wave, CROP_COLMAPS
 
 t = '2019-20'
@@ -48,4 +49,8 @@ df4b = _try('../Data/Agric/agsec4b.dta')
 df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
 assert len(df) > 0, "crop_production produced no rows for 2019-20"
 assert df.index.is_unique, "Non-unique crop_production index for 2019-20"
-to_parquet(df, 'crop_production.parquet')
+# GH #868: the de-dup's reduce_to_agreed(on_conflict='na') files a grain
+# report in THIS process; stamp it into the wave parquet so the framework
+# can replay it warm (it cannot re-detect it from the de-duplicated frame).
+to_parquet(df, 'crop_production.parquet',
+           grain_audit=grain_reports('Uganda', 'crop_production'))

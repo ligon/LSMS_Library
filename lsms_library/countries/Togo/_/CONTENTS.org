@@ -569,6 +569,17 @@ offending grappes) if any column ever varies within one.  Wave frame
 6,171 -> 540; API unchanged at 540 rows with identical values;
 =assert_frame_equal= passes against the pre-fix API frame.
 
+2026-09-24 (GH #868): the framework now names the cell around this hook
+(=Wave.grab_data= sets =build_transforms.build_context= to
+=('Togo', 'cluster_features', '2018')=), so a bare alias like this one
+can file a grain report under the key the cache writer stamps.  Togo's
+hook keeps the default =on_conflict='raise'= and today's data has no
+disagreeing grappe, so nothing is filed and nothing changes here; the
+context is what would make an =on_conflict='na'= blanking survive the
+cache if one were ever declared.  The edit moved every table's build
+fingerprint corpus-wide (the report formatter is in every fingerprint),
+so Togo re-warms with everyone else -- not paid here.
+
 *Do not re-implement it here.*  The first draft of this fix hand-rolled
 a 40-line copy, whose =nunique(dropna=False)= guard read =NaN= as a
 CONTRADICTION rather than as absence --- against repo doctrine

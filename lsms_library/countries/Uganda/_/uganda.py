@@ -1580,9 +1580,17 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
         # only the label is withheld where the sources contradict each
         # other.  Such a group is a PRE-EXISTING defect in the summed
         # Quantity_sold that this column makes visible for the first time.
+        # GH #868: this runs OUT OF PROCESS (make -> the wave script), so no
+        # framework context names the cell; pass it, so the report files
+        # under ('Uganda', 'crop_production') -- the key the wave script hands
+        # to to_parquet(grain_audit=grain_reports(...)) and the framework
+        # replays into the country stamp.  A warm read then still names the
+        # 11 blanked groups.
         from lsms_library.build_transforms import reduce_to_agreed
         labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
-                                     on_conflict='na')
+                                     on_conflict='na',
+                                     country='Uganda', table='crop_production',
+                                     wave=t)
         df = num.join(firstcols).join(labelcols)
     return df[cols]
 
