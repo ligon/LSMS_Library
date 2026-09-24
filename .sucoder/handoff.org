@@ -34,6 +34,7 @@ Account baseline: =fc_jevons= 44,927 of 1,500,000 SUs (3%); all work here on =co
 
 ** Fix + review phases DONE (2026-09-24 05:10) -- read =slurm_logs/backlog_fix_2026-09-24/REVIEW_SUMMARY.org=
 Eight branches on the mirror, eight verdicts (2 pass, 5 pass-with-fixes, 1 needs-human), five decisions for @ligon listed there.  Nothing merged, no PR, no gh write.
+Bill: 95.8 fc_jevons core-hours over 25 jobs; ~USD 209 inference.
 Next: decisions -> follow-up fix array (mechanical reviewer items) -> push to GitHub + PRs -> file the cross-cutting findings.
 
 ** Next concrete action

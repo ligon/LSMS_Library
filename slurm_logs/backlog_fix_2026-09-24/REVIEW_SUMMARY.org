@@ -31,6 +31,10 @@ Nothing is merged; no PR is open; no GitHub write has been made.  Every branch i
 3. Push reviewed branches to GitHub from the mirror and open one PR per branch, verdict attached, for @ligon to merge.  811 and 848 are ready now.
 4. File the cross-cutting findings as issues (gh writes; needs the go-ahead).
 
+* Bill (session-end delta, skill protocol)
+=fc_jevons=: 95.8 core-hours over 25 Slurm jobs (17 agent elements + the two dead submissions 39198738 and 39199587, which cost ~7 x 5 min and 1 s).  Baseline at session start 44,927 of 1,500,000 SUs.
+Inference: about USD 209 across the 17 headless agents (per-element =cost= lines are in the slurm outputs).
+
 * Harness notes for the next dispatch
 - A headless turn ends on a text-only message; briefs now forbid backgrounding and the script salvages uncommitted work.  Cost before the fix: three lost reports, one lost set of tests (recreated).
 - =sbatch= flags go BEFORE the script path (39199587 died on line 14 for that).
