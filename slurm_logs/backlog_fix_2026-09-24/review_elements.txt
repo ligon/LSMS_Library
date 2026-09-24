@@ -6,3 +6,4 @@ nigeria-824 fix/nigeria-824 Nigeria
 831-cache-clear fix/831-cache-clear -
 848-uganda-condition2 fix/848-uganda-condition2 Uganda
 niger-followup fix/niger-followup Niger
+malawi-derivations fix/malawi-derivations Malawi
