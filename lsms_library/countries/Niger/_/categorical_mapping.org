@@ -228,20 +228,35 @@
 | produit absent        | Unknown          |      |                  |                       |
 | Produit absent        | Unknown          |      |                  |                       |
 
+# Region (auto-applied to cluster_features.Region by name).  The eight
+# regions arrive in four spellings across the four waves: 2011-12 title-case
+# with accents ('Tillabéri'); 2014-15 the same plus 'Communauté urbaine de
+# Niamey'; 2018-19 all LOWER-CASE and unaccented ('agadez', 'tillaberi');
+# 2021-22 title-case unaccented with the 'gadez' typo.  Until GH #811
+# (2026-09-24) the lower-case 2018-19 rows were missing, so the served
+# column carried 16 labels for 8 regions.
 #+NAME: Region
 | Original Label                 | Preferred Label                |
 |--------------------------------+--------------------------------|
 | Agadez                         | Agadez                         |
+| agadez                         | Agadez                         |
 | gadez                          | Agadez                         |
 | Communauté urbaine de Niamey   | Niamey                         |
 | Niamey                         | Niamey                         |
+| niamey                         | Niamey                         |
 | Diffa                          | Diffa                          |
+| diffa                          | Diffa                          |
 | Dosso                          | Dosso                          |
+| dosso                          | Dosso                          |
 | Maradi                         | Maradi                         |
+| maradi                         | Maradi                         |
 | Tahoua                         | Tahoua                         |
+| tahoua                         | Tahoua                         |
 | Tillabéri                      | Tillabéri                      |
 | Tillaberi                      | Tillabéri                      |
+| tillaberi                      | Tillabéri                      |
 | Zinder                         | Zinder                         |
+| zinder                         | Zinder                         |
 
 #+NAME: District
 | Original Label                 | Preferred Label                |
