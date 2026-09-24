@@ -1124,14 +1124,15 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                unit_sold=None, perennial=False):
-    """Reshape one sale module (I or Q) to (i, _crop_code, u) reported sale.
+                unit_sold=None, condition=None, perennial=False):
+    """Reshape one sale module (I or Q) to (i, _crop_code, u, condition_sold).
 
-    Returns a DataFrame with columns [i, _crop_code, u, Quantity_sold,
-    Value_sold] at the household-crop-unit grain (no plot).  Summed within
-    (i, _crop_code, u) because a household may report several sale rows for
-    the same crop -- this is the REPORTED total the household sold of that
-    crop IN THAT UNIT, not a derived aggregate over plots.
+    Returns a DataFrame with columns [i, _crop_code, u, condition_sold,
+    Quantity_sold, Value_sold] at the household-crop-unit-condition grain
+    (no plot).  Summed within that key because a household may report
+    several sale rows for the same crop -- this is the REPORTED total the
+    household sold of that crop IN THAT UNIT AND STATE, not a derived
+    aggregate over plots.
 
     ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
     Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
@@ -1145,6 +1146,23 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     Before this was read, a sale in kilogrammes was routinely stamped on a
     row whose ``u`` said ``50 kg Bag`` -- a silent factor-of-50 error in any
     per-kg price.
+
+    ``condition`` is the sale module's OWN shelled/unshelled column (Module
+    I ``ag_i02c`` in every wave; Module Q ``ag_q02c`` from 2016-17 on --
+    2010-11 and 2013-14 Module Q ask no such question).  Its Stata value
+    labels are the harvest's (``1 S: SHELLED, 2 U: UNSHELLED, 3 NOT
+    APPLICABLE``, identical in every wave that asks it), so it goes through
+    the same ``_crop_conditions`` map and lands in the same vocabulary as
+    ``crop_production.condition``; NULL and an absent column sentinel to
+    ``unknown_condition`` exactly as the harvest side does.  It was UNREAD
+    until GH #833: the sale merge keyed on ``(i, crop, u)`` alone, so a
+    sale the household reported UNSHELLED was stamped on a harvest row
+    reported SHELLED (and vice versa) -- measured on the four waves, 642 of
+    the 11,321 attached sales whose both sides answered the question
+    contradicted each other, 375 of them on Groundnut, where the two bases
+    differ by the shelling yield (~65%).  ``assemble_crop_production`` now
+    attaches a sale only to a harvest row whose condition it does not
+    contradict.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
@@ -1155,6 +1173,12 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     else:
         u = pd.Series(pd.NA, index=df.index, dtype='string')
 
+    if condition is not None and condition in df.columns:
+        cond_sold = _crop_conditions(df[condition])
+    else:
+        cond_sold = pd.Series(_CONDITION_UNKNOWN, index=df.index,
+                              dtype='object')
+
     qs = (pd.to_numeric(df[qty_sold], errors='coerce').astype('Float64')
           if qty_sold is not None and qty_sold in df.columns
           else pd.Series(pd.NA, index=df.index, dtype='Float64'))
@@ -1163,15 +1187,16 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
           else pd.Series(pd.NA, index=df.index, dtype='Float64'))
 
     out = pd.DataFrame({
-        'i':            df['hhid'].astype('string').values,
-        '_crop_code':   crop_code_int.values,
-        'u':            u.values,
-        'Quantity_sold': qs.values,
-        'Value_sold':   vs.values,
+        'i':              df['hhid'].astype('string').values,
+        '_crop_code':     crop_code_int.values,
+        'u':              u.values,
+        'condition_sold': cond_sold.values,
+        'Quantity_sold':  qs.values,
+        'Value_sold':     vs.values,
     })
     out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code', 'u'], as_index=False,
-                      dropna=False).agg(
+    grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
+                      as_index=False, dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     return grp
 
@@ -1185,6 +1210,8 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     t : str — wave id, used as the ``t`` index value.
     harvest_pieces : list[pd.DataFrame] — outputs of _harvest_block.
     sale_pieces : list[pd.DataFrame] — outputs of _sale_block (may be []).
+        A frame without a ``condition_sold`` column is treated as a sale
+        whose shelled/unshelled state is unrecorded (``unknown_condition``).
 
     Returns
     -------
@@ -1224,8 +1251,14 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     if sale_pieces:
         sale = pd.concat(sale_pieces, ignore_index=True)
         sale['u'] = sale['u'].astype('string')
-        sale = sale.groupby(['i', '_crop_code', 'u'], as_index=False,
-                            dropna=False).agg(
+        # A caller that built its sale frame without the sale-side S/U
+        # (pre-GH #833 shape, and the unit tests) is a sale whose condition
+        # is unrecorded -- the same sentinel the harvest side mints.
+        if 'condition_sold' not in sale.columns:
+            sale['condition_sold'] = _CONDITION_UNKNOWN
+        sale['condition_sold'] = sale['condition_sold'].astype('string')
+        skey = ['i', '_crop_code', 'u', 'condition_sold']
+        sale = sale.groupby(skey, as_index=False, dropna=False).agg(
             {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
         # Attach sale ONLY where the (i, crop) is grown on exactly one
         # plot, so the household-crop reported figure unambiguously
@@ -1237,71 +1270,118 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         # kilogramme-basis sale onto a `50 kg Bag` row -- Value_sold /
         # Quantity_sold then read as a price per 50 kg Bag when it was a
         # price per kg.  Merging on `u` too makes the ratio a price per the
-        # row's declared unit BY CONSTRUCTION.  It cannot multiply rows:
-        # harv is unique on (i, plot, crop, u) and, under the single-plot
-        # gate, sale is unique on (i, _crop_code, u).  A sale whose unit is
+        # row's declared unit BY CONSTRUCTION.  A sale whose unit is
         # unrecorded matches a harvest row whose unit is likewise
         # unrecorded (pd.merge matches null keys), which is the honest
         # pairing.
+        # AND only to a harvest row whose `condition` the sale does not
+        # CONTRADICT (GH #833).  The sale module asks its own S/U (ag_i02c /
+        # ag_q02c, read by `_sale_block` since #833); a sale reported
+        # UNSHELLED is not a quantity of the SHELLED harvest row's basis any
+        # more than a sale in kilogrammes is a quantity of a `50 kg Bag`
+        # row's, so the #824 rule applies unchanged: a sale that cannot be
+        # expressed at the row's declared grain is not attached.  Two
+        # conditions are compatible when they are EQUAL or when either side
+        # is `unknown_condition` -- the survey did not answer on that side,
+        # so there is nothing to contradict (every Module P harvest row and
+        # every 2010-11 / 2013-14 Module Q sale is `unknown_condition`, and
+        # perennial sales attach on exactly that wildcard).
+        # `shell_not_applicable` against `shelled` / `unshelled` IS a
+        # contradiction: both are answers, and they differ.
+        #
+        # With `condition_sold` in the sale key the (i, crop, u) pairing is
+        # m:m -- a household can report a shelled AND an unshelled sale of
+        # one crop in one unit, and a plot-crop can carry a shelled AND an
+        # unshelled harvest row in one unit (GH #854).  So the attach is
+        # decided per candidate PAIR: a sale lands on a harvest row iff the
+        # crop is single-plot, the sale is compatible with exactly ONE
+        # harvest row, and that harvest row is compatible with exactly ONE
+        # sale.  Everything else is suppressed and COUNTED, in one of two
+        # classes that the two warnings below keep apart:
+        #   * AMBIGUOUS -- more than one compatible pairing (a sale whose
+        #     S/U is unrecorded against a shelled + unshelled plot-crop; or
+        #     two sales both compatible with one row).  Attaching to all of
+        #     them would double-count the sale.  `attrs['sale_suppressed']`,
+        #     the GH #854 tally, unchanged in shape.
+        #   * BASIS MISMATCH -- a harvest row exists in the sale's unit, but
+        #     every one contradicts the sale's recorded condition.  Before
+        #     #833 these were attached, silently, on the wrong basis.
+        #     `attrs['sale_basis_mismatch']`.
         nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
                   .nunique().rename('_nplots').reset_index())
-        # GH #854: the single-plot gate alone stopped being sufficient the
-        # moment `condition` joined the harvest key.  Before it did, a
-        # single-plot (i, crop) had at most ONE harvest row per unit, so the
-        # household-crop sale total landed on exactly one row.  Now the same
-        # plot-crop can carry a shelled AND an unshelled row in the same `u`,
-        # and the m:1 merge would stamp the SAME Quantity_sold / Value_sold on
-        # both -- double-counting the sale and inventing a per-unit price on
-        # whichever row did not produce it.  The sale module records no
-        # condition of its own that we read (ag_i02c is unwired; GH #854
-        # scopes it out), so there is nothing to disambiguate WITH: the honest
-        # answer is to attach nothing and count it.
-        nrows = (harv.groupby(['i', '_crop_code', 'u'], dropna=False)
-                 .size().rename('_nrows').reset_index())
         harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
-        harv = harv.merge(nrows, on=['i', '_crop_code', 'u'], how='left')
-        harv = harv.merge(sale, on=['i', '_crop_code', 'u'], how='left')
-        single = (harv['_nplots'] == 1) & (harv['_nrows'] == 1)
+        n_harv = len(harv)
+        harv['_hrow'] = range(n_harv)
+        pairs = harv[['_hrow', 'i', '_crop_code', 'u', 'condition', '_nplots']] \
+            .merge(sale, on=['i', '_crop_code', 'u'], how='inner')
+        pairs['_compat'] = ((pairs['condition'] == pairs['condition_sold'])
+                            | (pairs['condition'] == _CONDITION_UNKNOWN)
+                            | (pairs['condition_sold'] == _CONDITION_UNKNOWN))
+        # Only single-plot crops are ever candidates; the multi-plot gate is
+        # the same one it always was and is not a suppression to report.
+        pairs = pairs[pairs['_nplots'] == 1]
+        compat = pairs[pairs['_compat']]
+        n_h = compat.groupby(skey, dropna=False).size().rename('_n_h')
+        n_s = compat.groupby('_hrow').size().rename('_n_s')
+        compat = (compat.merge(n_h.reset_index(), on=skey, how='left')
+                        .merge(n_s.reset_index(), on='_hrow', how='left'))
+        ok = compat[(compat['_n_h'] == 1) & (compat['_n_s'] == 1)]
+        assert not ok['_hrow'].duplicated().any()
+        harv = harv.merge(ok[['_hrow', 'Quantity_sold', 'Value_sold']],
+                          on='_hrow', how='left')
+        assert len(harv) == n_harv, 'the sale attach must not change rows'
+
+        def _tally(sales_df, rows_df):
+            amount = float(pd.to_numeric(sales_df['Value_sold'],
+                                         errors='coerce').sum())
+            return {'wave': t, 'sales': int(len(sales_df)),
+                    'rows': int(rows_df['_hrow'].nunique()),
+                    'value': amount}
 
         # "Attach nothing and COUNT IT" -- and the counting has to be code,
-        # not a number frozen in CONTENTS.org that will not move when the data
-        # does (GH #854 red-team item 6).  What is reported is the sales the
-        # NEW `_nrows` clause suppresses that the old single-plot gate would
-        # have attached: those are exactly the household-crop-unit totals that
-        # a condition-split plot-crop would have DOUBLE-counted.
-        suppressed = (harv['_nplots'] == 1) & (harv['_nrows'] > 1) \
-            & harv['Value_sold'].notna()
-        n_rows = int(suppressed.sum())
-        if n_rows:
-            hit = harv.loc[suppressed]
-            # One sale is stamped on each of the `_nrows` rows, so the sale
-            # COUNT is the number of distinct (i, crop, u) totals, not rows.
-            sales = hit.drop_duplicates(['i', '_crop_code', 'u'])
-            amount = float(pd.to_numeric(sales['Value_sold'],
-                                         errors='coerce').sum())
-            tally = {'wave': t, 'sales': int(len(sales)), 'rows': n_rows,
-                     'value': amount}
+        # not a number frozen in CONTENTS.org that will not move when the
+        # data does (GH #854 red-team item 6).
+        # AMBIGUOUS: a compatible pairing that is not 1:1.
+        ambiguous = compat[(compat['_n_h'] > 1) | (compat['_n_s'] > 1)]
+        amb_sales = ambiguous.drop_duplicates(skey)
+        tally = _tally(amb_sales, ambiguous)
+        if tally['sales']:
             warnings.warn(
-                f"Malawi/crop_production {t}: {len(sales)} household-crop "
-                f"sale(s) totalling {amount:,.0f} MWK were NOT attached to "
-                f"any harvest row, because the plot-crop is reported in more "
-                f"than one `condition` in the same unit ({n_rows} candidate "
-                f"rows).  The sale module records its own quantity and unit "
-                f"but its shelled/unshelled column (ag_i02c) is unwired, so "
-                f"there is nothing to say which harvest row the total belongs "
-                f"to; attaching it to both would double-count it.  Wiring "
-                f"ag_i02c is what lets these attach again.  GH #854.",
+                f"Malawi/crop_production {t}: {tally['sales']} household-crop "
+                f"sale(s) totalling {tally['value']:,.0f} MWK were NOT "
+                f"attached to any harvest row, because the pairing is "
+                f"AMBIGUOUS ({tally['rows']} candidate rows): the sale's "
+                f"shelled/unshelled answer is compatible with more than one "
+                f"harvest row of that plot-crop and unit (or one row with "
+                f"more than one sale), and attaching it to all of them "
+                f"would double-count it.  GH #854 / #833.",
                 SaleAttachmentWarning, stacklevel=2)
-        else:
-            tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+        # BASIS MISMATCH: a harvest row in the sale's unit exists, and none
+        # is compatible.
+        matched_any = compat.drop_duplicates(skey)[skey]
+        mism = pairs.merge(matched_any.assign(_m=True), on=skey, how='left')
+        mism = mism[mism['_m'].isna()]
+        mism_sales = mism.drop_duplicates(skey)
+        mismatch = _tally(mism_sales, mism)
+        if mismatch['sales']:
+            warnings.warn(
+                f"Malawi/crop_production {t}: {mismatch['sales']} "
+                f"household-crop sale(s) totalling {mismatch['value']:,.0f} "
+                f"MWK were NOT attached to any harvest row, because the "
+                f"sale's own shelled/unshelled answer (ag_i02c / ag_q02c) "
+                f"CONTRADICTS the condition of every harvest row of that "
+                f"plot-crop in that unit ({mismatch['rows']} candidate "
+                f"rows).  A sale on a different basis is not a quantity of "
+                f"the row's declared grain; before GH #833 it was attached "
+                f"anyway, silently.",
+                SaleAttachmentWarning, stacklevel=2)
 
-        harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
-        harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
-        harv = harv.drop(columns=['_nplots', '_nrows'])
+        harv = harv.drop(columns=['_nplots', '_hrow'])
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+        mismatch = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
 
     # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
     # collapse at the end of this function keys on (t, i, plot, crop) -- u is
@@ -1360,6 +1440,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # survive to_parquet (attrs are not written), which is why the warning
     # above exists as well -- the warning is what a build log sees.
     out.attrs['sale_suppressed'] = tally
+    out.attrs['sale_basis_mismatch'] = mismatch
     return out
 
 # --- IHS5 crop-side conversion factor tables (GH #854) -------------------

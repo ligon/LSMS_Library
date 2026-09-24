@@ -44,9 +44,11 @@ harvest = [
 sale = [
     _sale_block(i_mod, hhid='hhid', cropcode='ag_i0b', sold_flag='ag_i01',
                 qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+                condition='ag_i02c',
                 perennial=False),
     _sale_block(q, hhid='hhid', cropcode='ag_q0b', sold_flag='ag_q01',
                 qty_sold='ag_q02a', value_sold='ag_q03', unit_sold='ag_q02b',
+                condition='ag_q02c',
                 perennial=True),
 ]
 
