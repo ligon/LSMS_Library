@@ -1664,12 +1664,13 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
 
         return x
 
-    try:
-        with open(fn,mode='rb') as dta:
-            id = from_dta(dta)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            id = from_dta(dta)
+    # GH #810: read the crosswalk through the sanctioned reader (local ->
+    # DVC blob cache rooted at ``countries_root()`` -> WB fallback), exactly
+    # as the country-level copies in ``ghanalss.py`` / ``ghanasps.py`` /
+    # ``ethiopia.py`` already do.  The former ``dvc.api.open(fn)`` fallback
+    # carried no ``repo=``, so DVC resolved the repository from the CWD and
+    # walked every ``*.dvc`` beneath it.
+    id = get_dataframe(fn)
 
     id = id[[id0,id1]]
 
