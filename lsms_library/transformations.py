@@ -4511,6 +4511,16 @@ _NITROGEN_CONTENT = {
     'potash fertilizer': 0.0,
     'mixed fertilizer': 0.20,
     'inorganic fertilizer': 0.20,
+    # Nigeria's harmonize_input label for the GHS-Panel fertilizer-type
+    # code "4. OTHER (SPECIFY)" among the INORGANIC types (NPK / urea /
+    # other).  A SPELLING alias of the class share on the line above -- the
+    # label names the class `inorganic fertilizer` with an `other`
+    # qualifier, and `_normalise_input_label` yields `other inorganic`,
+    # which matched nothing (170 rows unmatched, GH #867).  Deliberately
+    # NOT a new number; and deliberately distinct from `other fertilizer`
+    # (0.0, below), whose label does not say inorganic.  The content half
+    # of #867 (NPS, D Compound, organics) is untouched here.
+    'other inorganic fertilizer': 0.20,
     # product vocabulary (Tanzania / Ethiopia / Malawi / Nigeria)
     'urea': 0.46,
     'can': 0.26,

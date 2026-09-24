@@ -382,7 +382,12 @@ def crop_production_for_wave(t, frames, crop_labels):
             kg_factor                        SURVEY-REPORTED "Kg/L conversion
                                              factor" column asked BESIDE
                                              `qty`/`unit` (optional; GH #859)
-            qty_sold, unit_sold, value_sold  reported sale columns (optional)
+            qty_sold, unit_sold, value_sold  reported sale columns (optional);
+                                             `unit_sold` is the sale's OWN
+                                             unit code (W1/W2 sa3q11b, GH
+                                             #824), decoded via `dec` and
+                                             canonicalised with _canon_unit
+                                             exactly as `unit` is
             plant_m, plant_y                 planting/harvest-start month/yr
             harv_m, harv_y                   harvest-end month/yr (optional)
             intercropped                     bool Series aligned to df (opt)
@@ -399,6 +404,15 @@ def crop_production_for_wave(t, frames, crop_labels):
     that is the survey's grain (W3-W5 record sales at hh-crop level, so
     the same sale value applies to every plot row of that hh-crop --
     a reported attribute, not a per-plot allocation).
+
+    `Unit_sold` (GH #824) is the unit the SALE was reported in, a second
+    unit distinct from the row's `u` (the HARVEST unit).  It is a plain
+    NA-bearing `string` column, never an index level and never
+    sentinel-filled: NA means the frame names no sold-unit column, or the
+    row records no sale.  Where it disagrees with `u` the row is a
+    data-quality FLAG, not an identification of the price denominator
+    (canonical note, lsms_library/data_info.yml `crop_production.
+    Unit_sold`).
     """
     pieces = []
     for fr in frames:
@@ -452,6 +466,20 @@ def crop_production_for_wave(t, frames, crop_labels):
                                       if fr.get('qty_sold') in df.columns else pd.NA)
             piece['Value_sold'] = (pd.to_numeric(df[fr['value_sold']], errors='coerce')
                                    if fr.get('value_sold') in df.columns else pd.NA)
+            # The sale's OWN unit code (GH #824), taken positionally off the
+            # same row as `qty_sold` and canonicalised through the SAME
+            # `_canon_unit` the harvest unit uses, so the two are comparable
+            # label-for-label.  Identified by the survey's VALUE-LABEL
+            # vocabulary: W1 sa3q11b / W2 sa3q11b carry the identical
+            # code->label set as the harvest unit column (36 / 48 labels),
+            # never by a variable label (W1's reads "(11a)...(unit)", a
+            # Stata varlabel slip) and never by a condition column that
+            # merges cleanly.  `_canon_unit` is size-agnostic, so a sale
+            # from a big sack of a harvest kept in a medium one agrees here
+            # (see _/CONTENTS.org for both agreement rates).
+            if fr.get('unit_sold') in dec.columns:
+                piece['Unit_sold'] = (dec[fr['unit_sold']].map(_canon_unit)
+                                      .astype('string').values)
 
         piece['planting_month'] = (
             _month_str(df[fr['plant_m']], df.get(fr.get('plant_y'))).values
@@ -476,6 +504,13 @@ def crop_production_for_wave(t, frames, crop_labels):
                 'planting_month', 'harvest_month', 'intercropped', 'perennial']:
         if col not in out.columns:
             out[col] = pd.NA
+    # Unit_sold is a `string` column, not object: a wave whose frames name
+    # no sold-unit column (W3-W5, whose sales sit in secta3ii at hh-crop
+    # grain) must still deliver an all-NA STRING column, for the same
+    # concat-dtype reason KgFactor is pinned to float below.
+    if 'Unit_sold' not in out.columns:
+        out['Unit_sold'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out['Unit_sold'] = out['Unit_sold'].astype('string')
     # KgFactor is float, not object: a wave with no `*_conv` column anywhere
     # must still deliver a FLOAT all-NaN column, or the country-level concat
     # of (all-NaN waves + float waves) degrades the dtype to object.
@@ -494,7 +529,7 @@ def crop_production_for_wave(t, frames, crop_labels):
     out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'crop'], keep='first')
 
     out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
-    out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold',
+    out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold', 'Unit_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial',
                'KgFactor']]
     return out
