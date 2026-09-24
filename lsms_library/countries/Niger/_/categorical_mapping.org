@@ -454,8 +454,27 @@
 # no value label (its label text is the bare number "166.0"), so pyreadstat
 # surfaces it as the float 166.0 — NOT a string — and the string-keyed org
 # table can't match it; it stays numeric ('166') exactly as in the baseline
-# (468 rows, the sole unresolved j-value, pre-existing).  Referenced from
-# each EHCVM wave's data_info.yml via
+# (468 rows, the sole unresolved j-value, pre-existing).  It CANNOT be
+# decoded (GH #833, 2026-09-24): both 2021-22 household questionnaires
+# (WB catalog 6276, vague 1 and vague 2) print a product list that ends at
+# 165 'Bières industrielles', the .dta value labels end there too, and the
+# sibling EHCVM-2 files give 166 a country-specific label (Burkina / Mali:
+# 'Riz importé 3').  Left as '166' rather than named by inference; the
+# evidence is in CONTENTS.org.
+#
+# CROSS-WAVE LABEL DRIFT (GH #833, 2026-09-24).  The 2021-22 instrument
+# SPLIT several items 2018-19 bundled, and respelled others.  Folded onto
+# one label only where the two waves name the SAME good: '89. Choux' ->
+# 'Chou' (plural spelling of one vegetable); '134. Sucre poudre' and '135.
+# Sucre morceaux' -> 'Sucre (poudre ou morceaux)' (2018-19's own label says
+# it covers both forms, and 2018-19 cannot be split).  NOT folded: 2018-19
+# 'Aubergine, Courge/Courgette' vs 2021-22 '93. Aubergine,' + '94.
+# Courge/Courgette' -- two goods bundled in one wave and split in the next;
+# the 2021-22 label is cleaned to 'Aubergine' (the trailing comma is the
+# 2018-19 bundle's truncation) and the crop rows follow.  The other splits
+# (Piment, Gingembre, Café, Pastèque/Melon, Vinaigre/moutarde, Crabes /
+# crevettes, Huile d'arachide) are recorded in CONTENTS.org, not folded.
+# Referenced from each EHCVM wave's data_info.yml via
 #   mappings: ['harmonize_food', 'Original Label', 'Preferred Label'].
 # SCOPE = food_acquired's existing items only (Unit #0 foundation); crop /
 # community-price items extend this table later.
@@ -503,7 +522,7 @@
 | ArÃ´me (Maggi, Jumbo, etc.)                                                               | Arôme (Maggi, Jumbo, etc.)                                                           |
 | 132. Attiéke                                                                              | Attiéke                                                                              |
 | AttiÃ©kÃ©                                                                                 | Attiéké                                                                              |
-| 93. Aubergine,                                                                            | Aubergine,                                                                           |
+| 93. Aubergine,                                                                            | Aubergine                                                                            |
 | Aubergine, Courge/Courgette                                                               | Aubergine, Courge/Courgette                                                          |
 | 107. Autre légumes frais n.d.a                                                            | Autre légumes frais n.d.a                                                            |
 | Autre lÃ©gumes frais n.d.a                                                                | Autre légumes frais n.d.a                                                            |
@@ -578,7 +597,7 @@
 | 137. Chocolat à croquer, pâte à tartiner                                                  | Chocolat à croquer, pâte à tartiner                                                  |
 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                                    | Chocolat à croquer, pâte à tartiner                                                  |
 | Chou                                                                                      | Chou                                                                                 |
-| 89. Choux                                                                                 | Choux                                                                                |
+| 89. Choux                                                                                 | Chou                                                                                 |
 | 74. Citrons                                                                               | Citrons                                                                              |
 | Citrons                                                                                   | Citrons                                                                              |
 | 108. Concentré de tomate                                                                  | Concentré de tomate                                                                  |
@@ -754,8 +773,8 @@
 | 146. Soumbala (moutarde africaine)                                                        | Soumbala (moutarde africaine)                                                        |
 | Soumbala (moutarde africaine)                                                             | Soumbala (moutarde africaine)                                                        |
 | Sucre (poudre ou morceaux)                                                                | Sucre (poudre ou morceaux)                                                           |
-| 135. Sucre morceaux                                                                       | Sucre morceaux                                                                       |
-| 134. Sucre poudre                                                                         | Sucre poudre                                                                         |
+| 135. Sucre morceaux                                                                       | Sucre (poudre ou morceaux)                                                           |
+| 134. Sucre poudre                                                                         | Sucre (poudre ou morceaux)                                                           |
 | 120. Sésame                                                                               | Sésame                                                                               |
 | SÃ©same                                                                                   | Sésame                                                                               |
 | 127. Taro, macabo                                                                         | Taro, macabo                                                                         |
@@ -844,8 +863,8 @@
 | calebassier                                                                               | Calebassier                                                                          |
 | Betterave                                                                                 | Betterave                                                                            |
 | betterave                                                                                 | Betterave                                                                            |
-| Aubergine                                                                                 | Aubergine,                                                                           |
-| aubergine                                                                                 | Aubergine,                                                                           |
+| Aubergine                                                                                 | Aubergine                                                                            |
+| aubergine                                                                                 | Aubergine                                                                            |
 | Concombre                                                                                 | Concombre                                                                            |
 | concombre                                                                                 | Concombre                                                                            |
 | Ail                                                                                       | Ail                                                                                  |
