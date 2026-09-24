@@ -7,3 +7,4 @@ nigeria-824 Nigeria
 831-cache-clear -
 848-uganda-condition2 Uganda
 niger-followup Niger fix/niger-bundle
+malawi-sale-basis-probe Malawi fix/malawi-bundle
