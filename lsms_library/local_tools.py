@@ -63,7 +63,6 @@ import struct
 import tempfile
 import numpy as np
 import pandas as pd
-import dvc.api
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date
@@ -78,6 +77,7 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import configparser
+import errno
 import os
 import ast
 import hashlib
@@ -1390,19 +1390,33 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
 
     else:
-        try:
-            with dvc.api.open(fn,mode='rb') as f:
-                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except (OSError, ValueError, KeyError, ImportError):
-            # DVC handle / config / network failure -> fall back to the WB
-            # Microdata download path.  Programmer bugs (TypeError,
-            # AttributeError) propagate so they aren't silently masked.
-            local_path = _try_get_data_file(fn)
-            if local_path is not None:
-                with open(local_path, mode='rb') as f:
-                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            else:
-                raise
+        # Neither local nor DVC-tracked at ``countries_root()``:
+        # ``file_system_path`` has already consulted the sidecar at cwd and
+        # at the countries root AND ``DVCFS.open`` (rooted at the countries
+        # root) before we get here, so the only route left is the WB
+        # Microdata download.  GH #810: this branch used to try
+        # ``dvc.api.open(fn, mode='rb')`` first, with no ``repo=`` -- DVC
+        # then resolved the repository from the CURRENT WORKING DIRECTORY
+        # and walked every ``*.dvc`` beneath it: 300-450 s per missing
+        # source from ``/tmp``, a ``YAMLValidationError`` raised on an
+        # unrelated malformed pytest fixture, and a ``BrokenProcessPool``
+        # when the walk ran inside a forked build worker (Nepal).  A
+        # missing source now fails fast, from any cwd, with the error the
+        # callers already handle (``FileNotFoundError``; ``grab_data`` and
+        # ``df_data_grabber(missing_ok=)`` catch that class).  Genuine WB
+        # fetch failures (network, auth) propagate from
+        # ``_try_get_data_file`` as before.
+        local_path = _try_get_data_file(fn)
+        if local_path is None:
+            raise FileNotFoundError(
+                errno.ENOENT,
+                "source is not on disk, has no DVC sidecar under "
+                f"{_COUNTRIES_DIR}, and could not be fetched from the World "
+                "Bank Microdata Library (see data_access.get_data_file)",
+                str(fn),
+            )
+        with open(local_path, mode='rb') as f:
+            df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
 
     # SITE R of the null-content audit.  The reader's ONLY post-read content
     # check: a frame of the right shape holding nothing is a mis-parse, not
