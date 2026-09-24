@@ -190,8 +190,9 @@ other three.  So =crop_production.crop == 'Groundnut'= joins the raw nut in
 2004-05 / 2010-11 / 2013-14 and a cooked street food in 2016-17 / 2019-20.
 Almost certainly a =difflib= artifact of the =food_items.org= construction
 above -- =Boiled sweet potatoes= *did* get its own =Sweet Potato - Boiled
-(Vendor)= label, =Boiled groundnuts= did not.  NOT fixed: splitting the label
-cold-rebuilds Malawi =food_acquired=.
+(Vendor)= label, =Boiled groundnuts= did not.  *Fixed 2026-09-24 (GH #833)*:
+see "crop_production: the SALE has its OWN condition" below for the split
+and its counts.
 
 *The general lesson, worth more than the instance*: in this survey a
 quantity column and its unit column are a PAIR, and the modules are free
@@ -206,16 +207,164 @@ the schema change, its vocabulary and its measurements.  The schema change
 this entry called out of scope was taken.
 
 =ag_i02c= (S/U -- "MAKE SURE TO ASK WHETHER THE REPORTED VALUE IS SHELLED OR
-UNSHELLED") is *still unread*, so the shelled/unshelled mismatch between
-harvest and sale is *still* a basis error on legumes and groundnut.  What
-#854 did about it is *defensive, not corrective*: because a plot-crop can
-now carry a shelled AND an unshelled row in the same =u=, the sale merge
-would have stamped the same =Quantity_sold= / =Value_sold= on both, so the
-gate in =assemble_crop_production= now also requires exactly one harvest row
-per =(i, _crop_code, u)=.  It attaches nothing rather than double-counting.
-Measured cost: *one* suppressed sale (2010-11 =303041430013=, Maize, 50 kg
-Bag: 1.5 bags / 2,500 MWK).  Wiring =ag_i02c= would let those attach again,
-correctly, and is the natural follow-up.
+UNSHELLED") was *still unread* until 2026-09-24, so the shelled/unshelled
+mismatch between harvest and sale was *still* a basis error on legumes and
+groundnut.  What #854 did about it was *defensive, not corrective*: because a
+plot-crop can now carry a shelled AND an unshelled row in the same =u=, the
+sale merge would have stamped the same =Quantity_sold= / =Value_sold= on
+both, so the gate in =assemble_crop_production= also required exactly one
+harvest row per =(i, _crop_code, u)=.  It attached nothing rather than
+double-counting.  Measured cost: *one* suppressed sale (2010-11
+=303041430013=, Maize, 50 kg Bag: 1.5 bags / 2,500 MWK).  *=ag_i02c= is now
+read (GH #833, 2026-09-24) and that sale attaches, to the shelled row* -- see
+"crop_production: the SALE has its OWN condition" below.
+
+* crop_production: the SALE has its OWN condition too (GH #833, fixed 2026-09-24)
+
+The sequel to "the SALE has its OWN unit" above, on the other half of the
+same pair.  Module I (and, from 2016-17, Module Q) asks the sale's
+shelled/unshelled state in its own column, on the harvest's own code list:
+
+: ag_i02c  How much of the harvested[CROP]was sold in total?(S/U)
+:          {1 S: SHELLED, 2 U: UNSHELLED, 3 NOT APPLICABLE}   -- every wave
+: ag_q02c  S/U, same labels                                    -- 2016-17, 2019-20 ONLY
+
+*Idiosyncrasy: Module Q has no =ag_q02c= before 2016-17.*  2010-11
+=ag_mod_q.dta= and 2013-14 =AG_MOD_Q_13.dta= carry no S/U column at all, so
+every perennial sale in those two waves is =unknown_condition= on the sale
+side -- as every Module P harvest row is on the harvest side, in every wave
+(P asks no condition question).  Perennial sales therefore attach on the
+unknown wildcard only, and that is the survey, not a gap in the wiring.
+Where Q does ask (2016-17 / 2019-20) the answer is overwhelmingly =3=
+(NOT APPLICABLE: 527 + 94 and 1,087 + 172 rows against 49 + 6 and 133 + 18
+=S=), which is compatible with P's =unknown_condition= and so changes
+nothing.
+
+** What was wrong, measured before the fix
+
+The merge keyed on =(i, crop, u)= alone, so a sale the household reported
+UNSHELLED landed on a harvest row reported SHELLED and vice versa.  Over the
+attached sales (=Quantity_sold > 0=) whose BOTH sides answered S or U:
+
+| wave    | both answered | agree | CONTRADICT | NA vs S/U |
+|---------+---------------+-------+------------+-----------|
+| 2010-11 |         2,513 | 2,339 |        174 |       127 |
+| 2013-14 |           943 |   895 |         48 |        11 |
+| 2016-17 |         3,099 | 2,941 |        158 |        89 |
+| 2019-20 |         4,766 | 4,504 |        262 |       238 |
+| total   |        11,321 |10,679 |        642 |       465 |
+
+375 of the 642 are Groundnut, then Rice 97, Maize 62, Soyabean 36: exactly
+the crops where the two bases differ by a shelling yield.  =Value_sold /
+Quantity_sold= on those rows was a price per the *other* basis, and the
+=condition= level -- which is what keys the shipped kg factors (GH #854) --
+converted it with the wrong factor.  The "NA vs S/U" column is the case
+where one side answered =NOT APPLICABLE= and the other =S= or =U=.
+
+** The rule
+
+=_sale_block= now reads the sale's S/U through the same =_crop_conditions=
+map as the harvest (NULL and an absent column -> =unknown_condition=), and
+groups on =(i, _crop_code, u, condition_sold)=.  =assemble_crop_production=
+attaches a sale to a harvest row iff the crop is single-plot (unchanged),
+the units are equal (GH #824, unchanged), and the two conditions are
+*compatible*: EQUAL, or either side =unknown_condition=.  Two answers that
+differ are a contradiction, and =shell_not_applicable= against =shelled= /
+=unshelled= IS one (decision, 2026-09-24: both are answers; the survey did
+not say "don't know", it said "no shell" on one side and "shelled" on the
+other).  The pairing is m:m in principle (a household can sell one crop in
+one unit shelled AND unshelled; a plot-crop can be harvested in one unit
+shelled AND unshelled), so it is decided per candidate pair: a sale lands
+only where it is compatible with exactly one harvest row and that row with
+exactly one sale.  Everything else is suppressed and counted in one of two
+tallies -- the #854 =attrs['sale_suppressed']= (AMBIGUOUS: more than one
+compatible pairing; shape unchanged) and the new
+=attrs['sale_basis_mismatch']= (a harvest row in the sale's unit exists and
+every one contradicts the sale).  Each has its own =SaleAttachmentWarning=.
+This is the #824 rule applied to the second half of the pair: a sale that
+cannot be expressed at the row's declared grain is not attached.
+
+*Checked, not assumed*: a Module I / Q line for a crop the household did NOT
+sell carries NULL quantity, value AND condition, and =_sale_block= sums it
+to a zero-valued =unknown_condition= sale.  Had such a line shared an
+=(i, crop, u)= key with a real sale it would have made the real sale
+ambiguous.  Measured on all four waves: *0* keys mix an unsold line with a
+sold one (the unsold lines have no unit, so they sit under =u = NULL=).
+
+** What moved
+
+Harvest rows are unchanged in every wave (33,420 / 12,616 / 37,170 /
+51,872).  Attached sales (=Quantity_sold > 0=), before -> after, and what the
+new tally holds:
+
+| wave    | attached before | after | contradictions attached | basis-mismatch sales | MWK suppressed |
+|---------+-----------------+-------+-------------------------+----------------------+----------------|
+| 2010-11 |           5,205 | 4,903 |   174 -> 0              |                  303 |      4,922,307 |
+| 2013-14 |           1,774 | 1,715 |    48 -> 0              |                   59 |        969,200 |
+| 2016-17 |           4,564 | 4,317 |   158 -> 0              |                  247 |     20,236,770 |
+| 2019-20 |           7,131 | 6,628 |   262 -> 0              |                  503 |     37,981,880 |
+
+The 303 / 59 / 247 / 503 are the CONTRADICT + "NA vs S/U" columns above to
+within 0-3 rows (the few that differ were on plot-crops carrying more than
+one condition); the ambiguity tally is now *0* in every wave, because the
+one #854 case (2010-11 =303041430013=, Maize, 50 kg Bag) now reads =S= on
+the sale side and attaches to the shelled row.  *Not lost data*: a sale the
+survey recorded on a basis no harvest row of that plot-crop shares cannot
+be expressed at =(t, i, plot_id, crop, u, condition)=, exactly as a sale in
+a unit no harvest row uses could not be after #824.  A user who wants the
+household-crop sale total regardless of basis has the raw modules and
+=_sale_block=.
+
+** The Groundnut label split, in the same re-warm
+
+=harmonize_food='s =Groundnut= row carried =Boiled groundnuts= in its 2016-17
+and 2019-20 columns AND the Aggregate Label =Groundnut, Vendor/Boiled= for
+the raw nut of 2004-05 / 2010-11 / 2013-14.  It is now two rows: =Groundnut=
+(Legumes; Aggregate =Groundnut, Whole=; 2004-05 / 2010-11 / 2013-14 only)
+and =Groundnut - Boiled (Vendor)= (Vendor; Aggregate =Groundnut,
+Vendor/Boiled=; 2016-17 / 2019-20 only), on the pattern of =Groundnut -
+Roasted (Vendor)= and =Sweet Potato - Boiled (Vendor)=.  The Aggregate
+correction for the three early waves is a decision taken here: leaving the
+raw nut in the vendor bucket while splitting the Preferred Label would have
+fixed the price comparison and left =labels='Aggregate'= wrong.
+=food_acquired= rows served as =j = 'Groundnut'=, by wave, before -> after:
+
+| wave    | Groundnut before | after | Groundnut - Boiled (Vendor) after |
+|---------+------------------+-------+-----------------------------------|
+| 2004-05 |            4,031 | 4,031 |                                 0 |
+| 2010-11 |            3,937 | 3,937 |                                 0 |
+| 2013-14 |            1,937 | 1,937 |                                 0 |
+| 2016-17 |              188 |     0 |                               188 |
+| 2019-20 |              225 |     0 |                               225 |
+
+So =crop_production.crop == 'Groundnut'= no longer meets a street food on
+the food axis; in 2016-17 / 2019-20 it meets nothing, because the raw nut
+there is =Groundnut (Shelled)= / =Groundnut Dried (Unshelled)= / =Groundnut
+Fresh (Unshelled)= -- which is the next point.
+
+** The "JOINS food_acquired.j" claim in =data_scheme.yml= was false (GH #839)
+
+Both the =crop_production= and the =community_prices= comments asserted
+that their =j= / =crop= labels JOIN =food_acquired.j=.  Measured on the warm
+build: 24 of 44 crop labels occur as a food label, 20 do not; 19 of 51
+priced items occur as a food label and 6 as a crop label.  The comments now
+state the measured facts and the reasons (a consumed form under a different
+label by design -- =Maize= vs =Maize Grain (Not As Ufa)=, =Cassava= vs
+=Cassava Tubers= / =Cassava Flour=, =Beans= vs =Bean, Brown= / =Bean, White=;
+crops with no food analogue; and one spelling, =Macadamia= vs =Macademia
+Nuts=).  Corrected in the same commit as the code change precisely because
+=data_scheme.yml= is in every Malawi table's cache hash and a comment edit
+alone would have cost the same re-warm (the deferral the file itself
+records for Mali, =Mali/_/CONTENTS.org=).
+
+*Cassava, for the record.*  GH #833 names a Uganda instance where
+=Cassava (flour)= is folded onto =Cassava= in one of two code schemes.
+Malawi's food side keeps =Cassava Flour= and =Cassava Tubers= apart in every
+wave, and the crop label =Cassava= is deliberately neither (the =harmonize_
+crop= comment: a new label "ONLY for crops with no food analogue").
+Malawi's two-code-scheme cassava is the Module P recode (=1= -> =100=), closed
+by =_PERENNIAL_RECODE= (GH #869).  Nothing in the Malawi mapping changes for
+this item.
 
 * crop_production: the IHS4/IHS5 perennial crop-code RECODE (GH #869, fixed 2026-09-13)
 
@@ -577,7 +726,11 @@ current build it fires exactly once:
 
 Two candidate rows, one sale: the old gate would have stamped 2,500 MWK on
 *both* the shelled and the unshelled row and booked 5,000.  Wiring =ag_i02c=
-(the sale module's own S/U) is what would let it attach again, correctly.
+(the sale module's own S/U) is what lets it attach again, correctly -- done
+2026-09-24 (GH #833): the sale says =S= and lands on the shelled row, and
+the ambiguity tally is 0 in every wave.  The tally has a sibling now,
+=attrs['sale_basis_mismatch']=, for the class that used to be attached
+silently on the wrong basis; see the section on the sale's own condition.
 
 ** =Feature('crop_production')= EXCLUDES Malawi until the framework fix lands (2026-09-10)
 
