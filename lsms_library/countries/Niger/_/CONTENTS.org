@@ -769,6 +769,64 @@ Only the four =u= tables change data.  No other country's cache hash
 moves (measured across Uganda / Ethiopia / GhanaLSS =food_acquired=,
 =crop_production=, =plot_inputs=: 9 of 9 unchanged).
 
+* The VALUE sentinel: an all-nines "don't know" on a quantity or a sale value (GH #865, 2026-09-24)
+
+Distinct from the =u= sentinel above, and it must not be conflated with
+it: =Unknown= says the UNIT was not recorded; this section is about a
+recorded NUMBER that is a code.  The ECVMA harvest and sale modules
+write "ne sait pas" as an all-nines value with NO value label (the
+=.dta= value-label sets for these columns are empty), so
+=convert_categoricals= cannot see it and the number was served as a
+harvest of 999,999 units.  Site Q (#857) reported it -- "eleven Mil
+rows with Quantity 999999" -- and by contract never NaNs; this is the
+adjudication.
+
+The codes are NOT the same width across waves, and the sale value uses
+a wider one than the quantities.  Measured in the raw files
+(=get_dataframe(..., convert_categoricals=False)=):
+
+| wave    | file                 | column      | code    | rows | note                                                                      |
+|---------+----------------------+-------------+---------+------+---------------------------------------------------------------------------|
+| 2011-12 | ecvmaas2e_p2         | as02eq07a   | 999999  |   11 | all with unit code 99 =manquant=; mil 3, sorgho 3, niebe 3, riz paddy 2 |
+| 2011-12 | ecvmaas2e_p2         | as02eq12a   | 999999  |    3 | 2 with unit 99, 1 with unit 1 (kg)                                        |
+| 2011-12 | ecvmaas2e_p2         | as02eq13    | 9999999 |    2 | both hid 20607, which carries all three codes on the same line            |
+| 2014-15 | ECVMA2_AS2E1P2       | AS02EQ07A   | 9999    |   23 | all with unit code 99 =Manquant=; Mil 7, Niebe 7, Sorgho 4, ...           |
+| 2014-15 | ECVMA2_AS2E2P2       | AS02EQ12A   | 9999    |    7 | all with sold-unit code 99                                                |
+| 2014-15 | ECVMA2_AS2E2P2       | AS02EQ13    | 9999999 |    7 |                                                                           |
+| 2021-22 | s16b_me_ner2021      | s16bq03a    | 9999    |    1 | an applied inorganic fertiliser with no unit (grappe 315, menage 10)     |
+
+The issue's "eleven Mil rows" was wrong on the crop: the eleven rows
+span four crops.  Every quantity-sentinel row also carries the
+missing-unit code, i.e. the whole line is a don't-know line, which is
+why =u = 'Unknown'= and this sentinel co-occur without being the same
+thing.  2018-19 carries none of these codes on any of the three
+columns (max harvest 10,000 kg, max sale 6,080,000 FCFA), nor does
+2021-22's harvest / sale module.
+
+Fix: each WAVE script maps its own literal codes to NA through
+=niger._na_exact= -- =QTY_SENTINELS= / =VALUE_SENTINELS= at the top of
+=2011-12/_/crop_production.py=, =2014-15/_/crop_production.py= and
+=2021-22/_/plot_inputs.py= -- exactly as =_coerce_wage= (999999) and
+=_COMMUNITY_PRICE_SENTINELS= (9999 / 99999) already do for wages and
+community prices.  The literal value only, never a range; the code
+sits in the wave script rather than in =_finish_crop_production= so
+that a new code moves one wave's hash rather than all 18 Niger tables.
+
+*Not stripped, recorded as a candidate.*  =plot_inputs= 2011-12 and
+2014-15 carry =as02cq05a= / =AS02CQ05A= == 999 on 35 / 8 rows and
+=as02cq08a= / =AS02CQ08A= == 999 on 19 / 2 rows, and 999 is the column
+maximum in both waves.  That is the =_coerce_days= 999 pattern, but it
+is also a plausible quantity for a 3-digit field, and no value label
+says which; left as served until someone reads the input module's
+questionnaire page.
+
+Served effect (see the =crop_production= / =plot_inputs= rows below,
+measured on the cold rebuild that landed this): no served =Quantity=,
+=Quantity_sold= or =Value_sold= equals a listed code.  A harvest line
+that carried ONLY a sentinel becomes all-NA and is dropped by
+=_finalize_result='s =dropna(how='all')=; the two hid-20607 lines are
+the clearest case.  Pinned by =tests/test_niger_value_sentinels.py=.
+
 * household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
 
 =s01_me_ner2018.dta= is Stata format 115 with no declared encoding, and its

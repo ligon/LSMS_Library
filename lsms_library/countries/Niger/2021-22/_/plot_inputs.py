@@ -23,7 +23,13 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from niger import (i as niger_i, _input_maps, _input_labels,
-                   _seed_crop_labels, _unit_labels, _finish_plot_inputs)
+                   _seed_crop_labels, _unit_labels, _finish_plot_inputs,
+                   _na_exact)
+
+# "Don't know" code of s16bq03a, unlabelled in the .dta (GH #865): 9999 on
+# exactly one applied-input row (grappe 315, menage 10, an inorganic
+# fertiliser with no unit).  Exact value only; s16bq07a carries none.
+QTY_SENTINELS = (9999,)
 
 
 src = get_dataframe('../Data/s16b_me_ner2021.dta', convert_categoricals=True)
@@ -46,7 +52,7 @@ df = pd.DataFrame({
     'input':              _input_labels(src['s16bq01'], input_map).values,
     'crop':               _seed_crop_labels(src['s16bq01'], seed_crop_map).values,
     'u':                  _unit_labels(src['s16bq03b'], unit_map).values,
-    'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
+    'Quantity':           _na_exact(srcn['s16bq03a'], QTY_SENTINELS).values,
     'Purchased':          purchased.values,
     'Quantity_purchased': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
 })

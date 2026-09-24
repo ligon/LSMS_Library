@@ -884,6 +884,24 @@ def _coerce_wage(series, sentinel=999999):
     return s.where(s != sentinel, pd.NA)
 
 
+def _na_exact(series, codes):
+    """Numeric cell -> Float64 with each EXACT value in *codes* mapped to NA.
+
+    The ECVMA harvest / sale modules record "don't know" as an all-nines
+    value with no value label (GH #865: 2011-12 ``as02eq07a`` / ``as02eq12a``
+    999999 and ``as02eq13`` 9999999; 2014-15 ``AS02EQ07A`` / ``AS02EQ12A``
+    9999 and ``AS02EQ13`` 9999999; 2021-22 ``s16bq03a`` 9999).  The same
+    convention the wage (``_coerce_wage``, 999999) and community-price
+    (``_COMMUNITY_PRICE_SENTINELS``) helpers already honour.  Only the literal
+    codes are stripped -- never a range -- and the codes live in the WAVE
+    script that names the column, so a new one moves that wave's hash only.
+    """
+    s = pd.to_numeric(series, errors='coerce').astype('Float64')
+    for code in codes:
+        s = s.where(s != code, pd.NA)
+    return s
+
+
 def plot_labor_ehcvm(src, t):
     """Build plot_labor for one EHCVM wave (2018-19 / 2021-22) from its
     s16a parcel module.  EHCVM records family vs non-family (hired) plot
