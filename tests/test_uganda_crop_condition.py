@@ -56,7 +56,12 @@ SENTINEL = "unknown_condition"
 #
 # Both numbers come from ONE cold rebuild (isolated LSMS_DATA_DIR with only
 # dvc-cache symlinked in, LSMS_COUNTRIES_ROOT pinned to the branch worktree,
-# Uganda cache physically removed), 2026-07-21, 133 683 rows.
+# Uganda cache physically removed), 2026-07-21, 133 683 rows.  (The table is
+# 130 606 rows since the 2009-10 `99999` strip, GH #861, and 133 331 since
+# the 2018-20 season-B second condition slot was wired, GH #848; the shares
+# below are the 2026-07-21 measurement, with the two season-B cells #848
+# moved re-measured on 2026-09-24: 2018-19 B 1 of 8 463 = 0.01%, 2019-20 B
+# 4 of 8 675 = 0.05%.)
 #
 # Observed `unknown_condition` share by (t, season), worst first:
 #     2009-10 A 25.72%   2009-10 B 20.46%   2010-11 A 7.10%   2013-14 B 4.35%

@@ -77,6 +77,16 @@ UNIT_SENTINEL = "Unknown"
 # for a regression to hide.
 N_5B_ROWS = 7041
 
+# GH #848 (2026-09-24): AGSEC5B's SECOND condition slot (s5bq06{a,b,c,d}_2) is
+# wired too.  It carries a harvest quantity on 1 436 rows but a unit code on
+# only 1 432, so exactly the slot-2 records that report a measure with no
+# unit code serve u='Unknown' -- 4, measured on the raw file AND on the built
+# table (3 coffee sales with Quantity/Value/KgFactor and no unit; 1 beans row
+# with Quantity 0 and nothing else).  The served count is asserted EQUAL to
+# the number derived from the raw file, not "small": slot 1 still contributes
+# 0, and a sentinel anywhere else is the pre-#842 symptom.
+N_5B_SLOT2_UNITLESS = 4
+
 # What actually distinguishes a Uganda harvest-unit column from any other
 # small-integer column, measured on both 2018-19 files (2026-09-09).
 #
@@ -378,8 +388,12 @@ def test_season_A_really_has_no_unit_column(colmap_2018_19, agsec5,
 def test_2018_19_season_B_serves_a_real_unit(crop_production, agsec5):
     """No `u='Unknown'` in 2018-19 season B where the source records a unit.
 
-    `a5bq6b` is non-null on all 7 041 rows and every code it uses is in
-    `harvest_units`, so the sentinel count must be exactly 0 — not "small".
+    Slot 1: `a5bq6b` is non-null on all 7 041 rows and every code it uses is
+    in `harvest_units`, so it contributes exactly 0 sentinels — not "small".
+    Slot 2 (GH #848): `s5bq06b_2` is null on a handful of records that DO
+    report a measure, and those are the only rows allowed to carry the
+    sentinel — their count is derived from the raw file here and asserted
+    equal, so the premise moves with the source and not with the build.
     """
     r = _wave_slice(crop_production, "B")
     assert len(r) > 0, f"{WAVE} season B built empty"
@@ -390,11 +404,23 @@ def test_2018_19_season_B_serves_a_real_unit(crop_production, agsec5):
         f"AGSEC5B a5bq6b populated on {raw_populated} rows, expected "
         f"{N_5B_ROWS}; the source changed and this test's premise with it"
     )
-    assert n_unknown == 0, (
+    b = agsec5["B"]
+    slot2_measure = (b[["s5bq06a_2", "s5bq07a_2", "s5bq08_2"]]
+                     .apply(pd.to_numeric, errors="coerce").notna().any(axis=1))
+    slot2_no_unit = pd.to_numeric(b["s5bq06b_2"], errors="coerce").isna()
+    slot2_unitless = int((slot2_measure & slot2_no_unit).sum())
+    assert slot2_unitless == N_5B_SLOT2_UNITLESS, (
+        f"AGSEC5B slot 2 reports a measure with no unit code on "
+        f"{slot2_unitless} rows, expected {N_5B_SLOT2_UNITLESS}; the source "
+        f"changed and this test's premise with it"
+    )
+    assert n_unknown == slot2_unitless, (
         f"{WAVE} season B serves u='{UNIT_SENTINEL}' on {n_unknown} of "
-        f"{len(r)} rows while AGSEC5B records a unit on all {raw_populated}. "
-        f"That is GH #842 regressing: check "
-        f"CROP_COLMAPS['{WAVE}']['B']['conditions'][0]['unit']."
+        f"{len(r)} rows while AGSEC5B records a unit on all {raw_populated} "
+        f"slot-1 rows and lacks one on only {slot2_unitless} slot-2 rows "
+        f"(GH #848). More is GH #842 regressing: check "
+        f"CROP_COLMAPS['{WAVE}']['B']['conditions'][0]['unit']; fewer means "
+        f"a quantity-bearing row was dropped."
     )
 
 
