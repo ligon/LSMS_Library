@@ -1,0 +1,62 @@
+#+title: GH #962 against the corpus's unit conventions
+#+date: [2026-09-24]
+
+* Question
+Is the second #962 attempt (uncommitted on =development=, job 39195255; the first attempt is =origin/fix/962-uganda-unit-sentinel=) consistent with how the rest of the corpus treats a row with no recorded unit?
+
+* The corpus has two sentinels with two meanings
+- =Value= :: money recorded, no physical quantity or unit.
+  Framework-reserved (=country._RESERVED_U_SENTINELS=, =transformations._CURRENCY_DENOMINATED_UNITS=); excluded from the kg inference by design (GH #770).
+  Convention (=.claude/skills/add-feature/food-acquired/SKILL.md= "LCU-only goods"): =Quantity = Expenditure=.
+  Written by GhanaLSS (6 waves), Panama (3 waves), EthiopiaRHS (code 30), Serbia (=dinar=).
+  The =Quantity = Expenditure= half is load-bearing: =food_quantities_from_acquired= does =replace(0, nan).dropna()= on =Quantity= before anything else, so a =Value= row with NaN =Quantity= is dropped from =food_quantities= in every mode.
+- =Unknown= :: a quantity recorded, no unit recorded.
+  =transformations.U_UNKNOWN=; recognised by =_unit_sentinel_mask= and refused by every rung of the kg ladder.
+  Written by Niger (=U_NA=), Burkina Faso 2014 (=U_NA=), Ethiopia, GhanaSPS crop, Uganda crop_production; declared in =data_info.yml= =missing_level_sentinels= for crop_production.
+  Consumer rule (=niger.py:494=): not a unit; exclude and count.
+
+Everything else that reaches =u= is a real unit and gets a kg minted by the price-ratio inference.
+Recognition is a spelling allowlist that fails open -- the issue's own diagnosis.
+
+* Census of the warm corpus (=u_census.py=, =u_census.out=)
+Spellings of "no unit" in =food_acquired= that the framework does NOT recognise, besides Uganda's ='---'= (7,359, cache purged 09-22 so absent from the census):
+| country  | label    |  rows |
+|----------+----------+-------|
+| GhanaLSS | =None=   | 2,508 |
+| Nigeria  | =None=   |   847 |
+| Cambodia | ='' =    | 3,010 |
+Nigeria's comes from =fillna('None')= in three =individual_unit_values.py= scripts -- the #962 shape exactly.
+=Other= (GhanaSPS 5,049; Malawi 894) is a survey answer, not an absence, and is a different case.
+NaN on =u= (GhanaLSS 13,380; GhanaSPS 13,903; nine crop_production cells) is #847's Site I, deleted by the first groupby.
+
+* The Uganda partition, measured on the 09-22 fixture (=u962_probe.py=)
+Fixture: =venv_validate/data_39131795/Uganda/var/food_acquired.parquet= (development build, 355,571 rows).
+All 7,359 ='---'= rows split as the draft says: 930 with =Quantity > 0=, 6,429 expenditure-only, 0 neither.
+The 930 are almost entirely =Other Tobacco= (460) and =Cigarettes= (337) in 2010-11 and 2011-12; the 6,429 are =Restaurant (food)= (4,763), =Other Foods= (1,090), =Other Juice= (484).
+
+What each relabelling does in the kg ladder, over the 7,359 rows:
+| variant                                            | rows minted a kg | rung(s)                    | rows in food_quantities |
+|----------------------------------------------------+------------------+----------------------------+-------------------------|
+| A. today (='---'=)                                 |            7,359 | unit 7,353 (0.065 kg)      | all, converted to kg    |
+| B. draft: qty->=Number of Units (General)=, exp-only->=Value=, Quantity NaN | **930** | unit 915, item_unit 15 (0.137 kg) | Value rows **dropped** (349,057) |
+| C. draft + =Quantity = Expenditure= on Value rows  |          **930** | same                       | Value rows carried (355,486) |
+| D. first attempt (all ->=Unknown=)                 |                0 | none                       | 930 carried native      |
+
+* Verdict
+The draft is consistent on the =Value= label and inconsistent on two points:
+1. It leaves =Quantity= NaN on =Value= rows, against the LCU-only convention; the 6,429 rows then vanish from =food_quantities= instead of being carried with =u='Value'= as GhanaLSS's 3.55M and Panama's 17,821 are.
+2. It relabels the 930 quantity-without-unit rows to a REAL Uganda unit, =Number of Units (General)=, rather than =Unknown=.
+   Every other country writes =Unknown= for that case, and the effect is measurable: all 930 get a minted kilogram again (915 on the u-pooled rung, now pooled with the genuine count rows and doubled to 0.137 kg).
+   That is the fabrication #962 is about, under a label that asserts the survey said "count" when it recorded nothing; the issue thread already notes that "a raw cigarette count is not a kilogram either".
+   The draft's own test file agrees: its xfail reason records the agreed shape as "a 'Value' unit for the value-denominated items, then U_NA for code 0 only".
+3. It also does not touch =unitlabels[int_k] = '---'= (the 143 blank-label codes), so ='---'= can still reach =u= and the xfail stays xfail.
+
+Consistent shape: exp-only -> =Value= with =Quantity = Expenditure=; quantity-without-unit -> =Unknown=; the 143 blank-label codes are a separate question (134 are curated physical units whose Preferred Label is blank -- promote the label, do not sentinel it), and PR #963 lands first because promoting them exposes the fraction parser.
+Framework follow-up worth its own issue: extend =missing_level_sentinels= (or a build-time fill in the wave builder) to =food_acquired= so the fill is not re-implemented per country, and a corpus test that every served =u= is a decoded label, a metric-parsable label, or a recognised sentinel -- Nigeria's =None= and Cambodia's ='' = are the next two instances.
+
+* Reproduce
+#+begin_src sh
+PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh962_units_consistency/u_census.py
+PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh962_units_consistency/u962_probe.py
+#+end_src
+The venv is the mirror's =.venv.sqfs= (2026-09-22 image, no editable install), mounted by hand at =/local/job$SLURM_JOB_ID/venv_img= with the =fusermount3= shim from =bin/savio_venv.sh=; =savio_venv.sh mount= itself cannot run from a =/local= clone (GH #958) and would repoint the mirror's shared =.venv= symlink.

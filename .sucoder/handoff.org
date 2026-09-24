@@ -1,3 +1,32 @@
+#+title: Handoff -- 2026-09-24 (Sue / Claude Fable 5.1), Savio job 39195255
+
+* State on arrival (2026-09-24 00:30)
+Working clone =/local/job39195255/mirrors/LSMS_Library=, branch =development= at =ea63d031b=.
+The previous handoff below is dated 09-17; the 09-22 venv/#962 session left no note.
+
+** Dirty tree = the SECOND #962 attempt, uncommitted
+- =lsms_library/countries/Uganda/_/uganda.py= (+115/-2): blank =untcd= -> internal token -> per row =Value= (exp-only) / =Number of Units (General)= (qty>0).
+  Leaves =unitlabels[int_k] = '---'= (the 143 blank-label codes) untouched.
+- =tests/test_962_unit_sentinel.py=: the branch's test plus an =xfail= whose reason records the agreed shape ("Value for value-denominated items, then U_NA for code 0 only"; #963 first).
+- =slurm_logs/venv_provenance/harvest_use_parquet_pin.sbatch=: already on the branch.
+- The FIRST attempt is =origin/fix/962-uganda-unit-sentinel= (=98371352c=, all '---' -> =Unknown=); @ligon stopped it because 134 of the 143 blank-label codes are curated physical units feeding a published paper.
+- Do not commit the draft to =development=: see =slurm_logs/gh962_units_consistency/README.org= -- it re-mints a kg for all 930 quantity rows and drops the 6,429 =Value= rows from =food_quantities=.  Decision for @ligon: park on a =fix/962-*= branch, rework to the agreed shape after PR #963 merges, or discard.
+
+** Venv (read GH #957/#958/#960/#961 and =slurm_logs/venv_provenance/README.org= first)
+- Image =~/mirrors/LSMS_Library/.venv.sqfs= (2026-09-22 00:33, no editable install, pandas 3.0.6 / pyarrow 25.0.1 / numpy 2.4.6 after the fresh =poetry lock=; the warm corpus was built under pandas 3.0.2 / pyarrow 23.0.1).
+- Mounted by hand at =/local/job39195255/venv_img= (squashfuse_ll + fusermount3 shim); clone-local =.venv= symlink points there.  Do NOT run =savio_venv.sh mount= from the mirror -- it repoints the mirror's shared symlink (#958).
+- Always =PYTHONSAFEPATH=1 PYTHONPATH=<clone>= for =-c= / =-m= / bench scripts; never export =PYTHONSAFEPATH= into wave-script subprocesses (=6df53a5c6=).
+- Uganda's warm cache was purged 09-22 09:21 (=var/= empty); fixtures from the 09-22 jobs are under =/global/scratch/fsa/fc_jevons/ligon/venv_validate/=.
+
+** Backlog (skill consulted 2026-09-24, no sweep dispatched)
+132 open issues (26 bug, 22 enhancement, 15 data-gap, 11 framework, 69 unlabelled; 86 opened in September).
+Six PRs await human merge: #951, #952, #954, #955, #963, #965.
+Reconcile candidates (verify, then close/comment -- none have =closedBy= links): #936 <- PR #947; #832 <- PR #949; #831 partial <- #917/#918; #788 vs #809 (closed by #938); #637 <- #871; #601 <- #603; #675 vs =_assert_built_required_columns=.
+=bench/feature_audit/backlog.workflow.js= needs =-R ligon/LSMS_Library= on every =gh= call, a real issues file, and its "#520/#521 just merged" prompt refreshed before it can run from a clone.
+
+** Next concrete action
+@ligon's call on the #962 draft (above); then, if a sweep is wanted, dry-run triage scoped to =bug=+=framework= (37 issues).
+
 #+title: Handoff -- 2026-09-17 (Sue / Claude Fable 5.1), Savio job 39002769
 
 * GhanaAHIES: new country, in flight (2026-09-17)
