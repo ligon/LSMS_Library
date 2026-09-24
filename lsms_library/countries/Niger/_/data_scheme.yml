@@ -186,6 +186,20 @@ Data Scheme:
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every
+    # wave records the sold unit in a column of its own (as02eq12b, AS02EQ12B,
+    # s16cq16b, s16dq05b), carried here as the per-row column Unit_sold,
+    # canonicalised through the same `u` table.  Where it disagrees with `u`
+    # the row is a data-quality FLAG, not an identification (canonical
+    # data_info.yml, Unit_sold note): exclude or resolve, and report the
+    # count.  NA-bearing, never sentinel-filled -- a column has no NaN-key
+    # hazard, and NA means "no sale, or no sold unit recorded".  In 2014-15
+    # and 2021-22 the sale block is crop-level; the sale is attributed only to
+    # a crop grown on ONE plot and sold in ONE unit.  `optional` because a
+    # row with no sale has no sold unit.
+    Unit_sold:
+      type: str
+      optional: true
     harvest_month: float
     intercropped: bool
     materialize: make

@@ -2,8 +2,9 @@
 
 Single source file: ecvmaas2e_p2.dta (rainy-season harvest module).  One
 row per reported (field, parcel, crop) harvest line; harvest qty + unit
-(as02eq07a / as02eq07b), sold qty + unit (as02eq12a / as02eq12b) and sale
-value (as02eq13) are all at this plot-crop grain; the module's unlabelled
+(as02eq07a / as02eq07b), sold qty + unit (as02eq12a / as02eq12b -> the
+``Unit_sold`` column, GH #824) and sale value (as02eq13) are all at this
+plot-crop grain; the module's unlabelled
 "don't know" codes (999999 on the quantities, 9999999 on the value) are
 mapped to NA, exact value only (GH #865).  ``hid`` already equals
 grappe*100+menage (the canonical 2011-12 household id), so i() just
@@ -55,6 +56,9 @@ df = pd.DataFrame({
     'Quantity':      _na_exact(srcn['as02eq07a'], QTY_SENTINELS).values,
     'Quantity_sold': _na_exact(srcn['as02eq12a'], QTY_SENTINELS).values,
     'Value_sold':    _na_exact(srcn['as02eq13'], VALUE_SENTINELS).values,
+    # The SOLD unit (as02eq12b), a second unit on the same line (GH #824);
+    # same 12-code label set as the harvest unit, same `u` table.
+    'Unit_sold':     _unit_labels(src['as02eq12b'], unit_map).values,
 })
 
 df = _finish_crop_production(df, '2011-12')

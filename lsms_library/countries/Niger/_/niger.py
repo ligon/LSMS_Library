@@ -534,7 +534,8 @@ def _crop_maps():
 
 def _finish_crop_production(df, t):
     """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
-    numeric columns, and guarantee the full schema column set."""
+    numeric columns, and guarantee the full schema column set (including the
+    NA-bearing ``Unit_sold`` column, GH #824)."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -549,6 +550,17 @@ def _finish_crop_production(df, t):
     df['t'] = t
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
+    # Unit_sold (GH #824): the unit the SALE was reported in, a per-row
+    # COLUMN beside the harvest unit `u` (which is the index level).  Every
+    # wave script passes it through the same `u` table as the harvest unit;
+    # unlike `u` it is NA-bearing, never sentinel-filled (canonical
+    # data_info.yml: a column has no NaN-key hazard, and NA says "no sale, or
+    # a sale whose unit the survey did not record", which no unit label can
+    # say) -- so the table's `Unknown` is folded back to NA here.
+    if 'Unit_sold' not in df.columns:
+        df['Unit_sold'] = pd.NA
+    df['Unit_sold'] = df['Unit_sold'].astype('string')
+    df['Unit_sold'] = df['Unit_sold'].where(df['Unit_sold'] != U_NA, pd.NA)
     # Drop placeholder rows with no crop recorded (a parcel listed but no
     # crop grown / reported on the line).  These carry no harvest data
     # (crop, Quantity, unit all NA) and are not item-level harvest records.
@@ -563,7 +575,8 @@ def _finish_crop_production(df, t):
     # groupby would have deleted.
     df = fill_missing_u(df)
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+            'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
+            'intercropped']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
     return df

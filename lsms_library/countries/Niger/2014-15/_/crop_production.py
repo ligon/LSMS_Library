@@ -5,7 +5,8 @@ Two source files, as the instrument splits harvest from sale:
     AS02EQ07B) plus the harvest start/end month (AS02EQ06A / AS02EQ06B).
     One row per reported (field, parcel, crop) line.
   - ECVMA2_AS2E2P2.dta : CROP level (no plot) — sold qty + unit
-    (AS02EQ12A / AS02EQ12B) and sale value (AS02EQ13).
+    (AS02EQ12A / AS02EQ12B -> the ``Unit_sold`` column, GH #824) and sale
+    value (AS02EQ13).
 
 i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
 ECVMA2 household key, matching this wave's sample / roster idxvars
@@ -74,12 +75,26 @@ sold_df = pd.DataFrame({
     'crop':          sold_crop.values,
     'Quantity_sold': _na_exact(sold['AS02EQ12A'], QTY_SENTINELS).values,
     'Value_sold':    _na_exact(sold['AS02EQ13'], VALUE_SENTINELS).values,
+    # The SOLD unit (AS02EQ12B; same 12-code label set as the harvest unit
+    # AS02EQ07B, same `u` table) -- GH #824.  Part of the KEY below, so a
+    # sale is never summed across units.
+    'Unit_sold':     _unit_labels(sold['AS02EQ12B'], unit_map).values,
 }).dropna(subset=['i', 'crop'])
-sold_one = sold_df.groupby(['i', 'crop'], as_index=False)[['Quantity_sold', 'Value_sold']].sum(min_count=1)
+# One sale record per (household, crop, SOLD UNIT).  Measured on
+# ECVMA2_AS2E2P2 (5,226 rows): every (household, crop) is one row, so the
+# sum is a no-op here; the key still names the grain the sum is taken over.
+sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
+            [['Quantity_sold', 'Value_sold']].sum(min_count=1))
 
+# Attribute ONLY to (i, crop) pairs grown on a single plot (no fabricated
+# split across plots) AND sold in a single unit (no fabricated conversion
+# across units -- a second unit would duplicate the harvest row).
 plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot_id'].nunique()
 single = plots_per[plots_per == 1].index
-sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)]
+units_per = sold_one.groupby(['i', 'crop']).size()
+one_unit = units_per[units_per == 1].index
+sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
+                    & sold_one.set_index(['i', 'crop']).index.isin(one_unit)]
 
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
 
