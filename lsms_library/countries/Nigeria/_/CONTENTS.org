@@ -1045,6 +1045,19 @@ column, never an index level, never sentinel-filled.  Pinned by
   appears in =Unit_sold= (W2 sold vocabulary) but never in =u=.
 - *Every pre-existing column is byte-identical* before and after (62,844
   rows, isolated cold build compared column-by-column).
+- *The served (API) frame reproduces the parquet counts exactly* -- both
+  3,451 / agree 3,374 (2011Q1) and 3,411 / 3,283 (2013Q1), and the only
+  label in =Unit_sold= absent from =u= is still =Olodo= -- so the read-path
+  categorical mapping / canonical-spelling passes do not move =u= away from
+  =Unit_sold= (neither has a =spellings= block; =Unit_sold= matches no
+  =categorical_mapping.org= table name).
+- *GH #867 rider, measured on this country's warm =plot_inputs= (96,620
+  rows)*: =transformations._NITROGEN_CONTENT= now aliases =other inorganic
+  fertilizer= to the existing =inorganic fertilizer= class share (0.20).
+  Nigeria's =Other Inorganic Fertilizer= label (170 rows) went from
+  unmatched to matched; =nitrogen_kg= matched rows 10,014 -> 10,184, plots
+  4,359 -> 4,472, total 173,672 -> 178,074 kg N.  A spelling alias, not a
+  new number; the NPS / D Compound / organic content decisions stay open.
 - *Cache*: =nigeria.py= and =data_scheme.yml= are in every Nigeria table's
   hash, so all 24 tables re-warm; only =crop_production='s content moves.
   With GH #866 landed the stale =var/crop_production.parquet= is evicted
