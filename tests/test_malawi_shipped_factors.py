@@ -733,16 +733,27 @@ class TestSaleConditionIsRead:
         assert out.attrs['sale_suppressed'] == {
             'wave': '2010-11', 'sales': 0, 'rows': 0, 'value': 0.0}
 
-    def test_not_applicable_against_shelled_is_a_contradiction(
+    def test_not_applicable_against_shelled_attaches_as_the_basis(
             self, malawi_mod):
-        """Both are answers, and they differ -- not a wildcard."""
-        with pytest.warns(malawi_mod.SaleAttachmentWarning,
-                          match='CONTRADICTS'):
+        """NOT APPLICABLE is the basis where the market does not price the
+        shelling (@ligon, 2026-09-24, part (b) of the three-part call).
+
+        This test used to assert the opposite -- that NA against S is a
+        contradiction and is suppressed (the 2026-09-24 morning decision,
+        reversed the same day).  With no reference cell the basis is
+        unpriced, so the sale attaches on the `sale-basis-not-applicable`
+        rung, under its registry key, with no warning.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled'])],
                 [self._sale('shell_not_applicable')])
-        assert pd.isna(out['Value_sold']).all()
-        assert out.attrs['sale_basis_mismatch']['sales'] == 1
+        assert out['Value_sold'].iloc[0] == 2500.0
+        assert out['Derivation'].iloc[0] == malawi_mod.SALE_BASIS_NOT_APPLICABLE
+        assert out.attrs['sale_basis_mismatch']['sales'] == 0
+        assert out.attrs['sale_basis_ladder'][
+            malawi_mod.SALE_BASIS_NOT_APPLICABLE]['sales'] == 1
 
     def test_unknown_on_either_side_is_compatible(self, malawi_mod):
         """A side that did not answer contradicts nothing (Module P / early Q)."""

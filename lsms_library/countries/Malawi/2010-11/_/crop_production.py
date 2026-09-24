@@ -5,9 +5,12 @@ Agriculture):
   * ag_mod_g — seasonal harvest, plot=ag_g0b, crop=ag_g0d (codes 1-48).
   * ag_mod_p — perennial harvest, plot=ag_p0b, crop=ag_p0d (codes->+1000).
   * ag_mod_i — seasonal SALE (hh, crop): crop=ag_i0b, sold=ag_i01,
-    qty=ag_i02a, value=ag_i03.  No plot id.
+    qty=ag_i02a, unit=ag_i02b, S/U=ag_i02c, value=ag_i03.  No plot id.
   * ag_mod_q — perennial SALE (hh, crop): crop=ag_q0b, qty=ag_q02a,
-    value=ag_q03.
+    unit=ag_q02b, value=ag_q03.  NO S/U column in this wave (ag_q02c
+    exists from 2016-17 only): every perennial sale is
+    `unknown_condition` on the sale side and attaches on the wildcard
+    (registered as Malawi::crop_production::sale-basis-unknown-wildcard).
 
 i = format_id(case_id), aligning with plot_features 2010-11.  Sale is
 attached only to single-plot (i, crop) rows (see malawi.assemble_
