@@ -17,6 +17,7 @@ LIVE=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library
 ROOT=/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_$SLURM_ARRAY_JOB_ID
 ELEMENTS=$MIRROR/slurm_logs/backlog_fix_2026-09-24/elements.txt
 LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID+1))p" "$ELEMENTS"); KEY=${LINE%% *}; COUNTRIES=${LINE#* }
+[ -n "$KEY" ] && [ -f "$MIRROR/slurm_logs/backlog_fix_2026-09-24/briefs/$KEY.md" ] || { echo "NO ELEMENT/BRIEF for task $SLURM_ARRAY_TASK_ID (elements.txt or brief missing on the mirror)"; exit 1; }
 STAGE=$ROOT/$KEY; DATA=$STAGE/data; CLONE=/local/job$SLURM_JOB_ID/clone; MNT=/local/job$SLURM_JOB_ID/venv_img
 mkdir -p "$STAGE" "$DATA" "$MNT" /local/job$SLURM_JOB_ID/tmp "/local/job$SLURM_JOB_ID/.fuseshim"
 echo "element=$KEY countries=$COUNTRIES host=$(hostname) cpus=$SLURM_CPUS_ON_NODE job=$SLURM_JOB_ID start=$(date -Is)"
