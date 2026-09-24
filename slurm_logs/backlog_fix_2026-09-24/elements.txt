@@ -5,3 +5,4 @@ niger-bundle Niger
 malawi-bundle Malawi
 nigeria-824 Nigeria
 831-cache-clear -
+848-uganda-condition2 Uganda
