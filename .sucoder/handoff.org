@@ -24,8 +24,16 @@ Six PRs await human merge: #951, #952, #954, #955, #963, #965.
 Reconcile candidates (verify, then close/comment -- none have =closedBy= links): #936 <- PR #947; #832 <- PR #949; #831 partial <- #917/#918; #788 vs #809 (closed by #938); #637 <- #871; #601 <- #603; #675 vs =_assert_built_required_columns=.
 =bench/feature_audit/backlog.workflow.js= needs =-R ligon/LSMS_Library= on every =gh= call, a real issues file, and its "#520/#521 just merged" prompt refreshed before it can run from a clone.
 
+** Triage run (2026-09-24 01:05-02:00, Workflow =wf_3abc353f-1c5=, 8 agents, dry run)
+Report: =slurm_logs/backlog_triage_2026-09-24/backlog_report.{md,json}= (inputs beside it).
+31 bug+framework issues: open 18 / resolved 1 / partial 12; tiers A 2, B 12, C 9, D 8.
+Proposed: close #957; partial-comments on 12; 12 root-cause clusters; a 14-step dispatch plan (roots first, one re-warm per country bundle); 23 decisions for @ligon.
+No gh write and no code change were made; every close/comment is a proposal.
+Lesson (scrum-master skill, scatter-gather): this batched 4-6 issues per agent and ran 2 at a time on the 4-core slice -- wrong shape.  Next phase goes to Slurm as an array of headless =claude -p= agents, one per item; the pattern is verified by job 39197636 (=headless_probe.sbatch=, 35 s, =GH_REPO= set, =--permission-mode bypassPermissions=).
+Account baseline: =fc_jevons= 44,927 of 1,500,000 SUs (3%); all work here on =co_carleton=.
+
 ** Next concrete action
-@ligon's call on the #962 draft (above); then, if a sweep is wanted, dry-run triage scoped to =bug=+=framework= (37 issues).
+@ligon reads the triage report; answers the escalations he wants acted on; then the fix phase runs as a Slurm array (one element per dispatch-plan step), each element cloning =development= from the mirror, mounting =.venv.sqfs= by hand, and publishing a =fix/<issue>= branch.
 
 #+title: Handoff -- 2026-09-17 (Sue / Claude Fable 5.1), Savio job 39002769
 
