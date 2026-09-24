@@ -16,14 +16,14 @@ MIRROR=/global/home/users/ligon/mirrors/LSMS_Library
 LIVE=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library
 ROOT=/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_$SLURM_ARRAY_JOB_ID
 ELEMENTS=$MIRROR/slurm_logs/backlog_fix_2026-09-24/elements.txt
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID+1))p" "$ELEMENTS"); KEY=${LINE%% *}; COUNTRIES=${LINE#* }
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID+1))p" "$ELEMENTS"); read -r KEY COUNTRIES BASE <<< "$LINE"; BASE=${BASE:-development}
 [ -n "$KEY" ] && [ -f "$MIRROR/slurm_logs/backlog_fix_2026-09-24/briefs/$KEY.md" ] || { echo "NO ELEMENT/BRIEF for task $SLURM_ARRAY_TASK_ID (elements.txt or brief missing on the mirror)"; exit 1; }
 STAGE=$ROOT/$KEY; DATA=$STAGE/data; CLONE=/local/job$SLURM_JOB_ID/clone; MNT=/local/job$SLURM_JOB_ID/venv_img
 mkdir -p "$STAGE" "$DATA" "$MNT" /local/job$SLURM_JOB_ID/tmp "/local/job$SLURM_JOB_ID/.fuseshim"
-echo "element=$KEY countries=$COUNTRIES host=$(hostname) cpus=$SLURM_CPUS_ON_NODE job=$SLURM_JOB_ID start=$(date -Is)"
+echo "element=$KEY countries=$COUNTRIES base=$BASE host=$(hostname) cpus=$SLURM_CPUS_ON_NODE job=$SLURM_JOB_ID start=$(date -Is)"
 ln -sf /usr/bin/fusermount "/local/job$SLURM_JOB_ID/.fuseshim/fusermount3"
 PATH="/local/job$SLURM_JOB_ID/.fuseshim:$PATH" /usr/libexec/apptainer/bin/squashfuse_ll "$MIRROR/.venv.sqfs" "$MNT" || { echo "MOUNT FAILED"; exit 1; }
-git clone --quiet --branch development "$MIRROR" "$CLONE" || { echo "CLONE FAILED"; exit 1; }
+git clone --quiet --branch "$BASE" "$MIRROR" "$CLONE" || { echo "CLONE FAILED"; exit 1; }
 git -C "$CLONE" config user.name "Sue the Coder"; git -C "$CLONE" config user.email "coder@sucoder.dev"
 ln -sfn "$MNT" "$CLONE/.venv"
 ln -sfn "$LIVE/dvc-cache" "$DATA/dvc-cache"
@@ -52,7 +52,7 @@ $(cat "$STAGE/git_status_before_salvage.txt")
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>" && echo "salvaged uncommitted work into a WIP commit"
 fi
 # Safety net 2: publish the element's branch even if the agent forgot, and record the tree state.
-git status --short > "$STAGE/git_status.txt"; git log --oneline development..HEAD > "$STAGE/commits.txt"
+git status --short > "$STAGE/git_status.txt"; git log --oneline "$BASE"..HEAD > "$STAGE/commits.txt"
 if [ -s "$STAGE/commits.txt" ]; then git push --quiet origin "fix/$KEY" 2>&1 | tail -2; echo "pushed fix/$KEY: $(wc -l < $STAGE/commits.txt) commit(s)"; else echo "no commits on fix/$KEY"; fi
-git diff --stat development..HEAD > "$STAGE/diffstat.txt"
+git diff --stat "$BASE"..HEAD > "$STAGE/diffstat.txt"
 echo "done element=$KEY end=$(date -Is)"
