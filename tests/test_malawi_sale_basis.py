@@ -12,7 +12,12 @@ exact match a registered derivation in ``countries/Malawi/_/derivations.yml``
 with its key stamped on the ``Derivation`` column.  Evidence:
 ``slurm_logs/backlog_fix_2026-09-24/malawi_sale_basis/README.org`` (branch
 ``fix/malawi-sale-basis-probe``); ``Malawi/_/CONTENTS.org``, "the sale-basis
-LADDER".
+LADDER".  Two rungs were added on 2026-09-25 on @ligon's rulings on the
+review of the ladder: ``sale-basis-from-price-overrule`` (the price decides
+on the S/U-sale-vs-NA-harvest side even against the sale's recorded
+answer) and ``sale-basis-no-reference`` (rung 3 split: admitted because NO
+reference exists, as distinct from a reference that measurably does not
+separate).
 
 Two tiers, following ``test_ghanalss_12b.py``:
 
@@ -46,33 +51,56 @@ FUNCTION = 'lsms_library.countries.Malawi._.malawi:derive_sale_basis'
 
 W = 'Malawi::crop_production::sale-basis-unknown-wildcard'
 P = 'Malawi::crop_production::sale-basis-from-price'
+OV = 'Malawi::crop_production::sale-basis-from-price-overrule'
 N = 'Malawi::crop_production::sale-basis-not-applicable'
+NR = 'Malawi::crop_production::sale-basis-no-reference'
 CS = 'Malawi::crop_production::contradiction-price-sale'
 CH = 'Malawi::crop_production::contradiction-price-harvest'
 DEL = 'Malawi::crop_production::sale-basis-unresolved'
-KEYS = (W, P, N, CS, CH)
+KEYS = (W, P, OV, N, NR, CS, CH)
+SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
 #: Delivered ROWS carrying each key, per wave -- measured on the cold build
-#: of 2026-09-24 (fix/malawi-bundle @ 13da05b11 -> this branch), AFTER the
-#: GH #869 unmapped-crop drop (which is why the wildcard's delivered rows are
-#: below its attached sales: 949 / 357 / 450 / 1,046).  Unsold Module I/Q
+#: of 2026-09-25 (fix/malawi-derivations @ 95449ffb9 -> this branch).  Rows
+#: are BELOW the attached sales on the wildcard (949 / 357 / 450 / 1,046
+#: sales) for TWO reasons, neither of them this ladder: the GH #869
+#: unmapped-crop drop (13 rows, all 2013-14) and the defensive collapse at
+#: the declared grain in `assemble_crop_production` (`_grain`, `Value_sold:
+#: 'first'`), which merges two same-label VARIETIES of one plot-crop
+#: (Citrus 1005/1010/1011, Groundnut 11/12/16, Maize 1/3) into one row and
+#: keeps one variety's sale -- 2 / 3 / 1 / 5 keyed wildcard sales, and 27
+#: sales / 373,600 MWK in all (6 / 3 / 1 / 17 per wave), a pre-existing
+#: composition the ladder does not touch (issue text in
+#: slurm_logs/backlog_fix_2026-09-24/issues_to_file.org).  Unsold Module I/Q
 #: lines summed to 0/0 by `_sale_block` (901 / 225 / 2,433 / 2,185) attach on
 #: the wildcard as 0.0, as they always did, and carry NO key.
+#: Before 2026-09-25 the not-applicable key carried N + NR (122 / 11 / 79 /
+#: 198) and the from-price key's harvest side refused what OV now carries.
 ROWS = {
-    '2010-11': {W: 947, P: 1, N: 122, CS: 67, CH: 19},
-    '2013-14': {W: 341, P: 0, N: 11, CS: 18, CH: 9},
-    '2016-17': {W: 449, P: 8, N: 79, CS: 47, CH: 23},
-    '2019-20': {W: 1041, P: 29, N: 198, CS: 85, CH: 51},
+    '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
+    '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
+    '2016-17': {W: 449, P: 8, OV: 2, N: 42, NR: 37, CS: 47, CH: 23},
+    '2019-20': {W: 1041, P: 29, OV: 2, N: 67, NR: 131, CS: 85, CH: 51},
 }
-#: Total Value_sold per wave, before (the GH #833 bundle) -> after.
+#: Total Value_sold per wave, before (the GH #833 bundle) -> after.  The
+#: overrule rung of 2026-09-25 moved 2016-17 by +37,000 (409,053,925 ->
+#: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
 VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_053_925.0, '2019-20': 527_653_548.0}
+                    '2016-17': 409_090_925.0, '2019-20': 527_773_548.0}
 #: Sales the ladder still suppresses (attrs['sale_basis_mismatch']), per
-#: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK).
+#: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK); after the ladder of
+#: 2026-09-24, 94 / 21 / 90 / 140 (13,805,180 MWK); the overrule rung took 2
+#: / 2 sales (37,000 / 120,000 MWK) out of 2016-17 / 2019-20.
 UNRESOLVED = {'2010-11': (94, 1_088_250.0), '2013-14': (21, 315_300.0),
-              '2016-17': (90, 6_009_600.0), '2019-20': (140, 6_392_030.0)}
+              '2016-17': (88, 5_972_600.0), '2019-20': (138, 6_272_030.0)}
+#: attrs['sale_basis_ladder'][DEL]['grounds'], summed over the four waves.
+UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
+                      'contradiction_price_undecided': 57,
+                      'na_sale_price_undecided': 6,
+                      'na_harvest_price_undecided': 7,
+                      'claimed_by_tier_a': 0}
 TOTAL_ROWS = {'2010-11': 33_420, '2013-14': 12_616, '2016-17': 37_170, '2019-20': 51_872}
 
 
@@ -101,7 +129,7 @@ def _source():
 # ---------------------------------------------------------------------------
 
 class TestRegistry:
-    def test_six_entries_one_per_rung(self):
+    def test_eight_entries_one_per_rung(self):
         r = derivation_records(COUNTRY)
         assert set(r) == set(KEYS) | {DEL}
         for key in KEYS:
@@ -111,7 +139,8 @@ class TestRegistry:
             assert rec.rows is None, key
             assert rec.function == FUNCTION, key
             assert rec.inputs.startswith('lsms_library.countries.Malawi._.malawi:inputs_sale_basis_'), key
-            assert rec.validated_against and rec.contents and rec.since == '2026-09-24', key
+            assert rec.validated_against and rec.contents, key
+            assert rec.since == SINCE.get(key, '2026-09-24'), key
 
     def test_the_deletion_entry(self):
         rec = derivation_records(COUNTRY)[DEL]
@@ -124,8 +153,29 @@ class TestRegistry:
         assert set(r[W].bases) == {'questionnaire', 'modelling-choice'}
         assert set(r[P].bases) == {'questionnaire', 'modelling-choice'}
         assert set(r[N].bases) == {'questionnaire', 'modelling-choice'}
-        for key in (CS, CH, DEL):
+        assert set(r[NR].bases) == {'questionnaire', 'modelling-choice'}
+        for key in (OV, CS, CH, DEL):
             assert 'modelling-choice' in r[key].bases
+        # the overrule of a RECORDED answer names no document: modelling-choice only
+        assert set(r[OV].bases) == {'modelling-choice'}
+
+    def test_the_two_grounds_of_rung_three_are_separate_keys(self):
+        """@ligon, 2026-09-25, ruling 2: measured non-separation vs. no
+        reference are exposed per row, and each entry names the other."""
+        r = derivation_records(COUNTRY)
+        assert 'sale-basis-no-reference' in r[N].rule
+        assert 'ABSENCE of evidence' in r[NR].rule
+        assert 'NOTHING' in r[NR].validated_against
+        assert 'sale-basis-from-price-overrule' in r[P].rule
+        assert 'overrule' in r[DEL].rule
+
+    def test_the_margin_prose_matches_the_gate(self):
+        """Review item 1: the gate admits the OUTER quarter between the
+        medians; the prose used to say any price between them resolves
+        nothing."""
+        r = derivation_records(COUNTRY)
+        assert 'OUTER' in r[P].rule and 'MIDDLE HALF' in r[P].rule
+        assert 'sits between' not in r[P].rule.lower().replace('sits between the medians resolves', 'X')
 
     def test_every_callable_resolves(self):
         r = derivation_records(COUNTRY)
@@ -135,7 +185,7 @@ class TestRegistry:
             fn = resolve_callable(rec.inputs)
             assert callable(fn) and 'wave' in inspect.signature(fn).parameters, key
             fns.add(fn)
-        assert len(fns) == 6, 'each key has its own inputs callable'
+        assert len(fns) == 8, 'each key has its own inputs callable'
 
     def test_the_contents_pointer_resolves(self):
         text = (MALAWI_ / 'CONTENTS.org').read_text()
@@ -163,6 +213,15 @@ class TestScripts:
         # and the collapse carries the branch through, so the stamp cannot
         # land on a row the collapse assembled from two
         assert "'_branch':        'first'" in src
+
+    def test_the_unresolved_warning_names_the_three_grounds(self):
+        """Review item 6: the deletion's warning used to say the sale
+        CONTRADICTS every row; the class holds three grounds."""
+        src = _source()
+        i = src.index('registered as the deletion "')      # the f-string, not the docstring
+        head = src[i - 1500:i]
+        assert 'three' in head and 'grounds' in head
+        assert 'CONTRADICTS' in head and 'SEPARATING' in head and 'claimed' in head
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_wave_script_asserts_uniqueness_on_the_declared_grain(self, wave):
@@ -228,15 +287,21 @@ class TestFunction:
             ((UNK, S, hi, mS, mU, 0.9), W),                  # wildcard
             ((S, UNK, hi, np.nan, np.nan, np.nan), W),
             ((UNK, UNK, np.nan, np.nan, np.nan, np.nan), W), # not an exact match
-            ((S, NA, hi, np.nan, np.nan, np.nan), N),        # no reference
-            ((NA, U, lo, mS, mU, 0.55), N),                  # does not separate
+            ((S, NA, hi, np.nan, np.nan, np.nan), NR),       # no reference: its own key
+            ((NA, U, hi, np.nan, np.nan, np.nan), NR),
+            ((NA, U, lo, mS, mU, 0.55), N),                  # MEASURED: does not separate
+            ((S, NA, hi, mS, mU, 0.3), N),                   # 0.3 is inside (0.25, 0.75)
             ((S, NA, hi, mS, mU, 0.9), P),                   # NA sale, price says S, row S
             ((U, NA, hi, mS, mU, 0.9), None),                # ... but the row is U
             ((U, NA, lo, mS, mU, 0.9), P),
             ((NA, S, hi, mS, mU, 0.9), P),                   # S sale vs NA row, corroborated
-            ((NA, S, lo, mS, mU, 0.9), None),                # ... contradicted by price
+            ((NA, S, lo, mS, mU, 0.9), OV),                  # ... contradicted: price OVERRULES
+            ((NA, U, hi, mS, mU, 0.9), OV),
+            ((NA, U, lo, mS, mU, 0.2), P),                   # P <= 0.25 separates too
             ((S, NA, mid, mS, mU, 0.9), None),               # separates, margin fails
+            ((NA, S, mid, mS, mU, 0.9), None),               # ... on the harvest-NA side too
             ((S, NA, np.nan, mS, mU, 0.9), None),            # separates, no price
+            ((NA, S, np.nan, mS, mU, 0.9), None),
             ((U, S, hi, mS, mU, 0.9), CS),                   # contradiction, price with the sale
             ((U, S, lo, mS, mU, 0.9), CH),                   # ... with the harvest row
             ((S, U, hi, mS, mU, 0.2), CH),                   # P <= 0.25 separates too
@@ -246,6 +311,22 @@ class TestFunction:
         cols = list(zip(*[c for c, _ in cases]))
         got = fn(*[np.array(c, dtype=object if i < 2 else float) for i, c in enumerate(cols)])
         assert list(got) == [e for _, e in cases]
+
+    def test_the_margin_is_the_outer_quarter(self, malawi_mod):
+        """margin > 0.5 x gap admits a price strictly between the medians
+        when it sits in the outer quarter of the interval; the middle half
+        is undecided (review item 1; the gate is unchanged, the prose was
+        wrong)."""
+        fn = resolve_callable(FUNCTION)
+        S, NA = 'shelled', 'shell_not_applicable'
+        mS, mU = np.log(100.0), np.log(30.0)
+        gap = mS - mU
+        inside_outer = mS - 0.2 * gap        # 20% of the way down from m_S
+        inside_middle = mS - 0.3 * gap       # 30%: inside the middle half
+        got = fn(np.array([S, S], dtype=object), np.array([NA, NA], dtype=object),
+                 np.array([inside_outer, inside_middle]), np.array([mS, mS]),
+                 np.array([mU, mU]), np.array([0.9, 0.9]))
+        assert list(got) == [P, None]
 
 
 # ---------------------------------------------------------------------------
@@ -322,7 +403,9 @@ class TestAssemble:
         assert out.attrs['sale_basis_ladder'][W] == {
             'sales': 1, 'value': 0.0, 'zero_quantity': 1, 'rungs': {}}
 
-    def test_not_applicable_with_no_reference_is_the_basis(self, malawi_mod):
+    def test_not_applicable_with_no_reference_is_its_own_key(self, malawi_mod):
+        """No reference cell at all: admitted on the ABSENCE of evidence,
+        under `sale-basis-no-reference` (ruling 2), not the measured key."""
         with warnings.catch_warnings():
             warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
             out = malawi_mod.assemble_crop_production(
@@ -331,9 +414,32 @@ class TestAssemble:
                         ('h2', 'R1', 'Tobacco', 5, KG, NA, 10)])],
                 [_sale([('h1', 5, KG, NA, 4, 2500),
                         ('h2', 5, KG, S, 4, 2500)])])
-        assert (out['Derivation'] == N).all()
-        assert out.attrs['sale_basis_ladder'][N]['not_applicable_side'] == {'sale': 1, 'harvest': 1}
+        assert (out['Derivation'] == NR).all()
+        assert out.attrs['sale_basis_ladder'][NR]['not_applicable_side'] == {'sale': 1, 'harvest': 1}
+        assert out.attrs['sale_basis_ladder'][N]['sales'] == 0
         assert out.attrs['sale_basis_mismatch']['sales'] == 0
+
+    def test_not_applicable_with_a_non_separating_reference_is_the_measured_key(self, malawi_mod):
+        """12 shelled and 12 unshelled Maize kg sales at ONE price: the
+        reference exists and measurably does not separate (P ~ 0.5), so the
+        NA pair lands on `sale-basis-not-applicable`, not no-reference."""
+        harv, sale = [], []
+        for k in range(12):
+            harv += [(f's{k}', 'R1', 'Maize', 1, KG, S, 10), (f'u{k}', 'R1', 'Maize', 1, KG, U, 10)]
+            sale += [(f's{k}', 1, KG, S, 1, 50 + (k % 3)), (f'u{k}', 1, KG, U, 1, 50 + ((k + 1) % 3))]
+        harv += [('x', 'R1', 'Maize', 1, KG, NA, 10), ('y', 'R1', 'Maize', 1, KG, S, 10)]
+        sale += [('x', 1, KG, S, 1, 51), ('y', 1, KG, NA, 1, 51)]
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
+            out = malawi_mod.assemble_crop_production('2010-11', [_harv(harv)], [_sale(sale)])
+        d = out.reset_index().set_index('i')['Derivation']
+        assert d.loc['x'] == N and d.loc['y'] == N
+        assert d.drop(['x', 'y']).isna().all()
+        L = out.attrs['sale_basis_ladder']
+        assert L['reference']['separating_fine'] == 0 and L['reference']['cells_fine'] == 1
+        assert L[N]['sales'] == 2 and L[N]['rungs'] == {'fine': 2}
+        assert L[N]['not_applicable_side'] == {'sale': 1, 'harvest': 1}
+        assert L[NR]['sales'] == 0
 
     def test_contradiction_with_no_reference_is_unresolved(self, malawi_mod):
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='CONTRADICTS'):
@@ -362,7 +468,7 @@ class TestAssemble:
             ('z', 'R1', 'Groundnut', 11, KG, U, 10),     # row U, sale S priced S -> sale wins
             ('m', 'R1', 'Groundnut', 11, KG, S, 10),     # NA sale priced between -> unresolved
             ('n', 'R1', 'Groundnut', 11, KG, NA, 10),    # NA row, sale S priced S -> corroborated
-            ('o', 'R1', 'Groundnut', 11, KG, NA, 10),    # NA row, sale S priced U -> unresolved
+            ('o', 'R1', 'Groundnut', 11, KG, NA, 10),    # NA row, sale S priced U -> OVERRULED
             ('q', 'R1', 'Groundnut', 11, KG, S, 10),     # exact S sale + NA sale priced S -> the
                                                          # second finds its row claimed: unresolved
         ]
@@ -384,17 +490,38 @@ class TestAssemble:
         assert d.loc[('z', U)] == CS and v.loc[('z', U)] == 100.0
         assert pd.isna(v.loc[('m', S)])
         assert d.loc[('n', NA)] == P
-        assert pd.isna(v.loc[('o', NA)])
+        assert d.loc[('o', NA)] == OV and v.loc[('o', NA)] == 30.0      # ruling 1
         assert pd.isna(d.loc[('q', S)]) and v.loc[('q', S)] == 100.0   # the exact one
         for k in range(12):                                             # reference untouched
             assert pd.isna(d.loc[(f's{k}', S)]) and pd.isna(d.loc[(f'u{k}', U)])
         L = out.attrs['sale_basis_ladder']
         assert L['reference'] == {'sales': 25, 'cells_fine': 1, 'cells_mid': 1, 'separating_fine': 1}
         assert L[P]['sales'] == 2 and L[P]['not_applicable_side'] == {'sale': 1, 'harvest': 1}
+        assert L[OV]['sales'] == 1 and L[OV]['not_applicable_side'] == {'sale': 0, 'harvest': 1}
+        assert L[OV]['value'] == 30.0 and L[OV]['rungs'] == {'fine': 1}
+        assert L[N]['sales'] == 0 and L[NR]['sales'] == 0
         assert L[CS]['sales'] == 1 and L[CH]['sales'] == 1
         assert L[P]['rungs'] == {'fine': 2}
-        assert out.attrs['sale_basis_mismatch']['sales'] == 3          # m, o, q's NA sale
+        assert out.attrs['sale_basis_mismatch']['sales'] == 2          # m, q's NA sale
+        assert L[DEL]['grounds'] == {'contradiction_no_separation': 0,
+                                     'contradiction_price_undecided': 0,
+                                     'na_sale_price_undecided': 1,        # m
+                                     'na_harvest_price_undecided': 0,
+                                     'claimed_by_tier_a': 1}              # q
         assert out.attrs['sale_suppressed']['sales'] == 0
+
+    def test_the_overruled_basis_is_on_the_decision_frame(self, malawi_mod, priced):
+        """The served row keeps its recorded `condition` (NA); the basis the
+        price chose lives on the decision frame, as on every price rung."""
+        harv, sale = priced
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', malawi_mod.SaleAttachmentWarning)
+            _, dec, _ = malawi_mod._attach_sales(
+                '2010-11', malawi_mod._consolidate_harvest([harv]), sale)
+        o = dec[dec['i'] == 'o'].iloc[0]
+        assert o['outcome'] == OV and o['basis'] == U and o['condition_sold'] == S
+        n = dec[dec['i'] == 'n'].iloc[0]
+        assert n['outcome'] == P and n['basis'] == S
 
     def test_monotone_over_the_bundle_rule(self, malawi_mod, priced):
         """Nothing tier A attaches is taken away by tier B: the exact and
@@ -464,6 +591,28 @@ class TestDelivered:
             assert summ[key]['in'] == 'crop_production'
         assert summ[DEL]['rows'] == 0
 
+    def test_the_two_new_keys_stamp_exactly_their_rows(self, delivered):
+        """The overrule rung is Groundnut on a not-applicable harvest row
+        with an S/U sale; the no-reference rung never lands on a Groundnut
+        row (every wave has a Groundnut reference)."""
+        ov = delivered[delivered['Derivation'] == OV]
+        assert len(ov) == sum(r[OV] for r in ROWS.values()) == 4
+        assert set(ov.index.get_level_values('crop')) == {'Groundnut'}
+        assert set(ov.index.get_level_values('condition')) == {'shell_not_applicable'}
+        assert (ov['Value_sold'] > 0).all()
+        assert ov['Value_sold'].sum() == pytest.approx(157_000.0)
+        nr = delivered[delivered['Derivation'] == NR]
+        assert len(nr) == sum(r[NR] for r in ROWS.values()) == 296
+        assert 'Groundnut' not in set(nr.index.get_level_values('crop'))
+        assert nr['Value_sold'].sum() == pytest.approx(13_270_507.0)
+        n = delivered[delivered['Derivation'] == N]
+        assert len(n) == sum(r[N] for r in ROWS.values()) == 114
+        assert n['Value_sold'].sum() == pytest.approx(25_416_200.0)
+        # Cotton is entirely no-reference; Tobacco is split across the two
+        crops = nr.index.get_level_values('crop').value_counts()
+        assert crops['Cotton'] == 57 and crops['Tobacco'] == 37
+        assert n.index.get_level_values('crop').value_counts()['Tobacco'] == 72
+
     def test_registry_lists_every_key(self, country):
         import lsms_library as ll
         assert set(country.derivations('crop_production')) == set(KEYS) | {DEL}
@@ -511,3 +660,36 @@ class TestDelivered:
         keys = raw.reset_index()[['i', '_crop_code', 'u', 'condition_sold']].drop_duplicates()
         assert len(keys) == UNRESOLVED[wave][0]
         assert (raw['outcome'] == 'unresolved').all()
+
+    @pytest.mark.parametrize('wave', ['2016-17', '2019-20'])
+    def test_the_overrule_inputs_are_the_contradicted_sales(self, country, wave):
+        try:
+            raw = country.derivation_inputs(OV, wave=wave)
+        except Exception as e:                # pragma: no cover - no microdata
+            pytest.skip(f'{COUNTRY} {wave} sources not available here: {e}')
+        keys = raw.reset_index()[['i', '_crop_code', 'u', 'condition_sold']].drop_duplicates()
+        assert len(keys) == 2
+        assert (raw['outcome'] == OV).all()
+        assert set(raw['condition_sold']) <= {'shelled', 'unshelled'}
+        # the price-chosen basis is the OTHER one from the recorded answer
+        assert (raw['basis'] != raw['condition_sold']).all()
+        assert set(raw.index.get_level_values('crop')) == {'Groundnut'}
+
+    def test_unresolved_grounds_sum_to_the_tally(self, malawi_mod):
+        """Replayed from sources for the smallest wave: the by-ground count
+        partitions the deletion."""
+        wave = '2013-14'
+        try:
+            harvest, sale, _ = malawi_mod._crop_pieces(wave)
+        except Exception as e:                # pragma: no cover - no microdata
+            pytest.skip(f'{COUNTRY} {wave} sources not available here: {e}')
+        harv = malawi_mod._consolidate_harvest(harvest)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            _, dec, tallies = malawi_mod._attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
+        g = tallies['sale_basis_ladder'][DEL]['grounds']
+        assert set(g) == set(UNRESOLVED_GROUNDS)
+        assert sum(g.values()) == tallies['sale_basis_mismatch']['sales'] == UNRESOLVED[wave][0]
+        assert g == {'contradiction_no_separation': 16, 'contradiction_price_undecided': 5,
+                     'na_sale_price_undecided': 0, 'na_harvest_price_undecided': 0,
+                     'claimed_by_tier_a': 0}

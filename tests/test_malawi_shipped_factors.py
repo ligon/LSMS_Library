@@ -740,9 +740,11 @@ class TestSaleConditionIsRead:
 
         This test used to assert the opposite -- that NA against S is a
         contradiction and is suppressed (the 2026-09-24 morning decision,
-        reversed the same day).  With no reference cell the basis is
-        unpriced, so the sale attaches on the `sale-basis-not-applicable`
-        rung, under its registry key, with no warning.
+        reversed the same day).  With no reference cell at all the basis
+        is UNMEASURED, so the sale attaches on the `sale-basis-no-reference`
+        rung (split from `sale-basis-not-applicable` on 2026-09-25, @ligon's
+        ruling 2: admission on the absence of evidence is its own key),
+        under its registry key, with no warning.
         """
         with warnings.catch_warnings():
             warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
@@ -750,10 +752,12 @@ class TestSaleConditionIsRead:
                 '2010-11', [self._harv(['shelled'])],
                 [self._sale('shell_not_applicable')])
         assert out['Value_sold'].iloc[0] == 2500.0
-        assert out['Derivation'].iloc[0] == malawi_mod.SALE_BASIS_NOT_APPLICABLE
+        assert out['Derivation'].iloc[0] == malawi_mod.SALE_BASIS_NO_REFERENCE
         assert out.attrs['sale_basis_mismatch']['sales'] == 0
         assert out.attrs['sale_basis_ladder'][
-            malawi_mod.SALE_BASIS_NOT_APPLICABLE]['sales'] == 1
+            malawi_mod.SALE_BASIS_NO_REFERENCE]['sales'] == 1
+        assert out.attrs['sale_basis_ladder'][
+            malawi_mod.SALE_BASIS_NOT_APPLICABLE]['sales'] == 0
 
     def test_unknown_on_either_side_is_compatible(self, malawi_mod):
         """A side that did not answer contradicts nothing (Module P / early Q)."""

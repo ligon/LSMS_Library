@@ -1230,7 +1230,14 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 #   0     equal, both stated                                 (none)
 #   1     either side unknown_condition                      sale-basis-unknown-wildcard
 #   2     one side NA, the cell SEPARATES, price decides     sale-basis-from-price
-#   3     one side NA, the cell does NOT separate / no ref   sale-basis-not-applicable
+#   2b    harvest NA, sale S/U, the cell separates and the   sale-basis-from-price-overrule
+#         price CONTRADICTS the sale's own answer: the price
+#         overrules it (@ligon, 2026-09-25, ruling 1)
+#   3     one side NA, a reference exists and does NOT       sale-basis-not-applicable
+#         separate (MEASURED unpriced)
+#   3b    one side NA, NO reference cell in the wave         sale-basis-no-reference
+#         (admitted on absence of evidence; @ligon,
+#         2026-09-25, ruling 2)
 #   4     both stated and different, price sides with the    contradiction-price-sale /
 #         sale's answer / the harvest row's                  contradiction-price-harvest
 #   5     everything else with a candidate row               sale-basis-unresolved (DELETION,
@@ -1245,14 +1252,31 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 #: grep for; keep them in ONE place.
 SALE_BASIS_WILDCARD = 'Malawi::crop_production::sale-basis-unknown-wildcard'
 SALE_BASIS_FROM_PRICE = 'Malawi::crop_production::sale-basis-from-price'
+#: Harvest NA, sale S/U, and an unambiguous price that CONTRADICTS the
+#: sale's own answer: the price overrules the recorded answer (@ligon,
+#: 2026-09-25, ruling 1).  Its own key so the overruled count is countable.
+SALE_BASIS_FROM_PRICE_OVERRULE = 'Malawi::crop_production::sale-basis-from-price-overrule'
 SALE_BASIS_NOT_APPLICABLE = 'Malawi::crop_production::sale-basis-not-applicable'
+#: One side NA and NO reference cell in the wave at all: admitted on absence
+#: of evidence, not on a measured non-separation (@ligon, 2026-09-25,
+#: ruling 2).  Split from `sale-basis-not-applicable` so the two grounds are
+#: exposed per row.
+SALE_BASIS_NO_REFERENCE = 'Malawi::crop_production::sale-basis-no-reference'
 SALE_BASIS_CONTRADICTION_SALE = 'Malawi::crop_production::contradiction-price-sale'
 SALE_BASIS_CONTRADICTION_HARVEST = 'Malawi::crop_production::contradiction-price-harvest'
 #: The deletion entry (rows: 0): a sale with a candidate row that no rung admitted.
 SALE_BASIS_UNRESOLVED = 'Malawi::crop_production::sale-basis-unresolved'
 SALE_BASIS_KEYS = (SALE_BASIS_WILDCARD, SALE_BASIS_FROM_PRICE,
-                   SALE_BASIS_NOT_APPLICABLE, SALE_BASIS_CONTRADICTION_SALE,
+                   SALE_BASIS_FROM_PRICE_OVERRULE,
+                   SALE_BASIS_NOT_APPLICABLE, SALE_BASIS_NO_REFERENCE,
+                   SALE_BASIS_CONTRADICTION_SALE,
                    SALE_BASIS_CONTRADICTION_HARVEST)
+#: The rungs whose attachment names a BASIS the price chose (`dec['basis']`).
+SALE_BASIS_PRICED_KEYS = (SALE_BASIS_FROM_PRICE, SALE_BASIS_FROM_PRICE_OVERRULE,
+                          SALE_BASIS_CONTRADICTION_SALE, SALE_BASIS_CONTRADICTION_HARVEST)
+#: The rungs whose pair has a not-applicable side (tallied per side).
+SALE_BASIS_NA_SIDE_KEYS = (SALE_BASIS_FROM_PRICE, SALE_BASIS_FROM_PRICE_OVERRULE,
+                           SALE_BASIS_NOT_APPLICABLE, SALE_BASIS_NO_REFERENCE)
 #: Outcome labels in the per-sale decision frame that are NOT registry keys.
 SALE_EXACT, SALE_AMBIGUOUS, SALE_UNRESOLVED = 'exact', 'ambiguous', 'unresolved'
 #: An attached zero-quantity, zero-value line: the survey's "did not sell".
@@ -1397,21 +1421,34 @@ def derive_sale_basis(condition, condition_sold, log_price,
       there is nothing to contradict -- and nothing to match either, which
       is why unknown-against-unknown is this rung and not an exact match.
     * one side ``shell_not_applicable``, the other shelled/unshelled:
-        - the cell does not SEPARATE (P inside the open interval
-          (1 - SALE_BASIS_SEPARATION_P, SALE_BASIS_SEPARATION_P)), or has
-          no reference -> ``SALE_BASIS_NOT_APPLICABLE``: where the market
-          does not price the basis, the basis does not discriminate the
-          sale, and not-applicable is the basis (Tobacco, Cotton; also
-          Maize / Rice / Soyabean, whose S and U sell at one price).
+        - a reference exists and the cell does not SEPARATE (P inside the
+          open interval (1 - SALE_BASIS_SEPARATION_P,
+          SALE_BASIS_SEPARATION_P)) -> ``SALE_BASIS_NOT_APPLICABLE``: the
+          market MEASURABLY does not price the basis, so the basis does not
+          discriminate the sale, and not-applicable is the basis (Tobacco;
+          also Maize / Rice / Soyabean, whose S and U sell at one price).
+        - NO reference cell in the wave (no ``(crop, u)`` or ``(crop)``
+          cell with ``SALE_BASIS_MIN_REFERENCE`` on each basis) ->
+          ``SALE_BASIS_NO_REFERENCE``: admitted on the ABSENCE of evidence
+          that the basis is priced, which is a weaker ground than the
+          measured one above and is therefore its own key (@ligon,
+          2026-09-25, ruling 2).  Cotton, Sweet Potato, Irish Potato ...
         - the cell separates and this sale's price is UNAMBIGUOUS (margin
-          > SALE_BASIS_MARGIN x gap): the price names a basis b.  A
-          not-applicable SALE is admitted to the harvest row whose
-          condition is b; a shelled/unshelled SALE against a
-          not-applicable ROW is admitted when b corroborates the sale's
-          own answer -> ``SALE_BASIS_FROM_PRICE``.  Otherwise ``None``.
-        - the cell separates but the price is missing or sits between the
-          medians -> ``None`` (a priced basis this sale's price cannot
-          decide; NOT rung 3, whose premise is that the basis is unpriced).
+          > SALE_BASIS_MARGIN x gap -- the price sits in the OUTER quarter
+          of the interval between the medians, or beyond it): the price
+          names a basis b.  A not-applicable SALE is admitted to the
+          harvest row whose condition is b; a shelled/unshelled SALE
+          against a not-applicable ROW is admitted when b corroborates the
+          sale's own answer -> ``SALE_BASIS_FROM_PRICE``; and when b
+          CONTRADICTS the sale's own answer the price overrules it ->
+          ``SALE_BASIS_FROM_PRICE_OVERRULE`` (@ligon, 2026-09-25, ruling
+          1: price decides on that side exactly as the contradiction rungs
+          do).  A not-applicable sale whose priced basis b is not the
+          row's condition -> ``None``.
+        - the cell separates but the price is missing or sits in the
+          middle half between the medians (margin <= SALE_BASIS_MARGIN x
+          gap) -> ``None`` (a priced basis this sale's price cannot decide;
+          NOT rung 3, whose premise is that the basis is unpriced).
     * both stated and different (a CONTRADICTION): admitted only when the
       cell separates and the price is unambiguous; the key says which
       field it sided with -- ``SALE_BASIS_CONTRADICTION_SALE`` when b is
@@ -1456,11 +1493,17 @@ def derive_sale_basis(condition, condition_sold, log_price,
 
     out[exact] = ''
     out[~exact & unknown] = SALE_BASIS_WILDCARD
-    out[na_pair & ~separates] = SALE_BASIS_NOT_APPLICABLE
-    # NA sale -> the row carrying the priced basis; S/U sale -> corroborated
+    # `separates` already requires a reference, so the two grounds must be
+    # split explicitly: MEASURED non-separation vs. no reference at all.
+    out[na_pair & has_ref & ~separates] = SALE_BASIS_NOT_APPLICABLE
+    out[na_pair & ~has_ref] = SALE_BASIS_NO_REFERENCE
+    # NA sale -> the row carrying the priced basis; S/U sale -> corroborated,
+    # or OVERRULED by an unambiguous contrary price
     price_row = na_pair & unamb & (c_s == _NOT_APPLICABLE) & (c_h == basis)
     price_sale = na_pair & unamb & (c_h == _NOT_APPLICABLE) & (c_s == basis)
+    price_overrule = na_pair & unamb & (c_h == _NOT_APPLICABLE) & (c_s != basis)
     out[price_row | price_sale] = SALE_BASIS_FROM_PRICE
+    out[price_overrule] = SALE_BASIS_FROM_PRICE_OVERRULE
     out[contradiction & unamb & (basis == c_s)] = SALE_BASIS_CONTRADICTION_SALE
     out[contradiction & unamb & (basis == c_h)] = SALE_BASIS_CONTRADICTION_HARVEST
     return out
@@ -1588,8 +1631,7 @@ def _attach_sales(t, harv, sale):
             b_basis = np.where(np.abs(ok_b['logp'] - ok_b['m_S']) <= np.abs(ok_b['logp'] - ok_b['m_U']),
                                _SHELLED, _UNSHELLED)
         dec.loc[ok_b['_srow'].to_numpy(), 'basis'] = np.where(
-            ok_b['_branch'].isin([SALE_BASIS_FROM_PRICE, SALE_BASIS_CONTRADICTION_SALE,
-                                  SALE_BASIS_CONTRADICTION_HARVEST]), b_basis, None)
+            ok_b['_branch'].isin(SALE_BASIS_PRICED_KEYS), b_basis, None)
     dec = dec.reset_index()
 
     # --- tallies (Python scalars only: they are json.dumps'd into the parquet) --
@@ -1613,12 +1655,38 @@ def _attach_sales(t, harv, sale):
                  'zero_quantity': int((~(qty > 0)).sum()),
                  'rungs': ({str(k): int(v) for k, v in sub['rung'].value_counts().items()}
                            if 'rung' in sub.columns and len(sub) else {})}
-        if name in (SALE_BASIS_FROM_PRICE, SALE_BASIS_NOT_APPLICABLE) and len(sub):
+        if name in SALE_BASIS_NA_SIDE_KEYS and len(sub):
             entry['not_applicable_side'] = {
                 'sale': int((sub['condition_sold'] == _NOT_APPLICABLE).sum()),
                 'harvest': int((sub['condition'] == _NOT_APPLICABLE).sum())}
         ladder[name] = entry
-    ladder[SALE_BASIS_UNRESOLVED] = {'sales': unresolved['sales'], 'value': unresolved['value'], 'rungs': {}}
+    # The deletion, by GROUND -- one count per way a candidate SALE fails,
+    # so the registry entry's three grounds are countable and the refused
+    # complement of each price rung is printed beside the rung (review of
+    # 2026-09-25, items 4 and 6).  A PARTITION of the unresolved sales: each
+    # is classified by its first refused tier-B pair (a sale with two
+    # refused pairs on different grounds is rare -- an S/U sale against one
+    # U row and one NA row -- and is counted once, on the first), or as
+    # `claimed_by_tier_a` when tier B never saw it because an exact match
+    # had already taken its row or its sale.
+    unresolved_srows = set(dec.loc[dec['outcome'] == SALE_UNRESOLVED, '_srow'])
+    refused = tier_b[tier_b['_branch'].isna() & tier_b['_srow'].isin(unresolved_srows)]
+    r_h, r_s = refused['condition'].to_numpy(), refused['condition_sold'].to_numpy()
+    r_sep = (refused['P'].notna() & ((refused['P'] >= SALE_BASIS_SEPARATION_P)
+                                     | (refused['P'] <= 1 - SALE_BASIS_SEPARATION_P))).to_numpy()
+    r_contra = np.isin(r_h, _SU) & np.isin(r_s, _SU)
+    ground = np.where(r_contra & ~r_sep, 'contradiction_no_separation',
+             np.where(r_contra, 'contradiction_price_undecided',
+             np.where(r_s == _NOT_APPLICABLE, 'na_sale_price_undecided',
+                      'na_harvest_price_undecided')))
+    per_sale = (pd.DataFrame({'_srow': refused['_srow'].to_numpy(), 'ground': ground})
+                .drop_duplicates('_srow')['ground'].value_counts())
+    grounds = {g: int(per_sale.get(g, 0)) for g in (
+        'contradiction_no_separation', 'contradiction_price_undecided',
+        'na_sale_price_undecided', 'na_harvest_price_undecided')}
+    grounds['claimed_by_tier_a'] = int(len(unresolved_srows - set(refused['_srow'])))
+    ladder[SALE_BASIS_UNRESOLVED] = {'sales': unresolved['sales'], 'value': unresolved['value'],
+                                     'rungs': {}, 'grounds': grounds}
     ladder['reference'] = {'sales': int(len(agree)),
                            'cells_fine': int(len(fine)), 'cells_mid': int(len(mid)),
                            'separating_fine': int(((fine['P'] >= SALE_BASIS_SEPARATION_P)
@@ -1687,9 +1755,11 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     on a rung the ladder admits: an exact basis match; the unknown
     wildcard (either side did not answer -- every Module P harvest row,
     every 2010-11 / 2013-14 Module Q sale); a not-applicable side decided
-    by PRICE where the wave's own agreeing sales show the basis is priced,
-    or taken AS the basis where they do not; a contradiction decided by
-    price.  Each rung past the exact match is a registered derivation and
+    by PRICE where the wave's own agreeing sales show the basis is priced
+    (corroborating the sale's own answer, or overruling it), taken AS the
+    basis where they measurably do not, or admitted on the absence of any
+    reference; a contradiction decided by price.  Each rung past the exact
+    match is a registered derivation and
     stamps its key on ``Derivation``; the 1:1 gate (a sale lands only where
     it is compatible with exactly one row and that row with exactly one
     sale) holds on every rung.  What no rung admits is suppressed and
@@ -1719,17 +1789,24 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
                 f"would double-count it.  GH #854 / #833.",
                 SaleAttachmentWarning, stacklevel=2)
         if mismatch['sales']:
+            grounds = tallies['sale_basis_ladder'].get(SALE_BASIS_UNRESOLVED, {}).get('grounds', {})
             warnings.warn(
                 f"Malawi/crop_production {t}: {mismatch['sales']} "
                 f"household-crop sale(s) totalling {mismatch['value']:,.0f} "
-                f"MWK were NOT attached to any harvest row, because the "
-                f"sale's own shelled/unshelled answer (ag_i02c / ag_q02c) "
-                f"CONTRADICTS the condition of every harvest row of that "
-                f"plot-crop in that unit ({mismatch['rows']} candidate "
-                f"rows) and no rung of the sale-basis ladder resolves it "
-                f"by price.  A sale on a different basis is not a quantity "
-                f"of the row's declared grain (GH #833); registered as the "
-                f"deletion {SALE_BASIS_UNRESOLVED}.",
+                f"MWK were NOT attached to any harvest row "
+                f"({mismatch['rows']} candidate rows), because no rung of "
+                f"the sale-basis ladder admits the pair on any of three "
+                f"grounds: the sale's own shelled/unshelled answer (ag_i02c "
+                f"/ ag_q02c) CONTRADICTS the harvest row's (ag_g13c) in a "
+                f"cell whose prices do not separate the bases or whose "
+                f"price cannot decide it; a not-applicable side in a "
+                f"SEPARATING cell whose sale price is missing, sits in the "
+                f"middle half between the medians, or names a basis no "
+                f"unclaimed row carries; or the row / sale was already "
+                f"claimed on an exact match.  By ground: {grounds}.  A sale "
+                f"on a different basis is not a quantity of the row's "
+                f"declared grain (GH #833); registered as the deletion "
+                f"{SALE_BASIS_UNRESOLVED}.",
                 SaleAttachmentWarning, stacklevel=2)
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
@@ -1961,8 +2038,16 @@ def inputs_sale_basis_from_price(wave):
     return _inputs_sale_basis(wave, SALE_BASIS_FROM_PRICE)
 
 
+def inputs_sale_basis_from_price_overrule(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_FROM_PRICE_OVERRULE)
+
+
 def inputs_sale_basis_not_applicable(wave):
     return _inputs_sale_basis(wave, SALE_BASIS_NOT_APPLICABLE)
+
+
+def inputs_sale_basis_no_reference(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_NO_REFERENCE)
 
 
 def inputs_sale_basis_contradiction_sale(wave):

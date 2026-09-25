@@ -276,7 +276,10 @@ the units are equal (GH #824, unchanged), and the two conditions are
 differ are a contradiction, and =shell_not_applicable= against =shelled= /
 =unshelled= IS one (decision, 2026-09-24: both are answers; the survey did
 not say "don't know", it said "no shell" on one side and "shelled" on the
-other).  The pairing is m:m in principle (a household can sell one crop in
+other) *[REVERSED the same day by @ligon's ruling, part (b): not-applicable
+IS the basis where shelling does not apply -- see "the sale-basis LADDER"
+below; the sentence stands only as the record of the morning's decision]*.
+The pairing is m:m in principle (a household can sell one crop in
 one unit shelled AND unshelled; a plot-crop can be harvested in one unit
 shelled AND unshelled), so it is decided per candidate pair: a sale lands
 only where it is compatible with exactly one harvest row and that row with
@@ -327,9 +330,10 @@ household-crop sale total regardless of basis has the raw modules and
 
 *Superseded the same day*: the 1,112 / 64.1M MWK this table withholds is
 now worked down by the sale-basis LADDER (two sections below) -- 345 sales
-/ 13.8M stay suppressed; the "NA vs S/U" decision above is reversed by
-@ligon's later ruling and the "CONTRADICT" class is partly resolved by
-price.  The table stands as the measurement of the #833 rule alone.
+/ 13.8M stayed suppressed on 2026-09-24, 341 / 13.6M since the overrule
+rung of 2026-09-25; the "NA vs S/U" decision above is reversed by @ligon's
+later ruling and the "CONTRADICT" class is partly resolved by price.  The
+table stands as the measurement of the #833 rule alone.
 
 ** The Groundnut label split, in the same re-warm
 
@@ -469,7 +473,10 @@ only which sales land on them, and the key, moved.
 |    0 | equal, both stated                                         | (none -- a survey answer)                                  |
 |    1 | either side =unknown_condition= (incl. both)               | =sale-basis-unknown-wildcard=                              |
 |    2 | one side NA, the cell SEPARATES, the price decides         | =sale-basis-from-price=                                    |
-|    3 | one side NA, the cell does NOT separate / no reference     | =sale-basis-not-applicable=                                |
+|   2b | harvest NA, sale S/U, the price CONTRADICTS the sale's own | =sale-basis-from-price-overrule= (2026-09-25, ruling 1)    |
+|      | answer and overrules it                                    |                                                            |
+|    3 | one side NA, a reference exists and does NOT separate      | =sale-basis-not-applicable=                                |
+|   3b | one side NA, NO reference cell in the wave                 | =sale-basis-no-reference= (2026-09-25, ruling 2)           |
 |    4 | both stated and different; price sides with sale / harvest | =contradiction-price-sale= / =contradiction-price-harvest= |
 |    5 | a candidate row exists and no rung admits the pair         | =sale-basis-unresolved= (DELETION, =rows: 0=)              |
 
@@ -481,31 +488,56 @@ value).  The gates are the probe's, as stated tolerances: >= 10 agreeing
 sales per basis in the wave's =(crop, u)= cell -- else =(crop)= on
 cell-relative log price with >= 3 in the own cell --, Mann-Whitney
 P(shelled > unshelled) outside (0.25, 0.75), and the sale's log-price
-margin between the two medians > 0.5 x their gap.  No crop allowlist: the
-gate is the data.
+margin between the two medians > 0.5 x their gap -- which admits a price
+in the OUTER QUARTER of the interval between the medians, not only one
+beyond them (the middle half is undecided; see "Decisions taken here").
+No crop allowlist: the gate is the data.
 
-** What each rung carries (cold build, 2026-09-24)
+*Cache cost*: =malawi.py= is in the input hash of every Malawi table, so
+all *21* registered Malawi tables re-warm on the next read of a shared
+root (measured with =Country._table_cache_hash= by the 2026-09-25 review;
+"eleven" in the 2026-09-24 report was the count of warm parquets in that
+agent's private root, not the re-warm scope).  Nothing outside Malawi
+moves; =build_transforms_fingerprint= is byte-identical.
+
+** What each rung carries (cold build, 2026-09-25; the 2026-09-24 figures noted where they differ)
 
 Sales attached per rung and MWK (=attrs['sale_basis_ladder']=, per wave;
 "unresolved" is =attrs['sale_basis_mismatch']=, the #833 tally before ->
-after):
+after).  =exact= is the survey's own answer and carries no key.
 
-| wave    | exact           | wildcard (of which 0/0 lines) | from-price   | not-applicable   | contra: sale    | contra: harvest | unresolved before -> after              |
-|---------+-----------------+-------------------------------+--------------+------------------+-----------------+-----------------+-----------------------------------------|
-| 2010-11 | 3,958 / 121.16M | 1,850 (901) / 5,680,988       | 1 / 800      | 122 / 3,156,227  | 67 / 599,290    | 19 / 77,740     | 303 / 4,922,307 -> 94 / 1,088,250       |
-| 2013-14 | 1,374 / 91.36M  | 582 (225) / 3,321,202         | 0            | 11 / 307,000     | 18 / 292,200    | 9 / 54,700      | 59 / 969,200 -> 21 / 315,300            |
-| 2016-17 | 3,868 / 382.45M | 2,883 (2,433) / 12,422,397    | 8 / 348,000  | 79 / 9,926,530   | 47 / 2,266,100  | 23 / 1,686,540  | 247 / 20,236,770 -> 90 / 6,009,600      |
-| 2019-20 | 5,593 / 464.02M | 3,231 (2,185) / 32,319,452    | 29 / 638,500 | 198 / 25,296,950 | 85 / 3,415,900  | 51 / 2,238,500  | 503 / 37,981,880 -> 140 / 6,392,030     |
-| total   |                 |                               | 38 / 987,300 | 410 / 38,686,707 | 217 / 6,573,490 | 102 / 4,057,480 | 1,112 / 64,110,157 -> 345 / 13,805,180  |
+| wave    | exact           | wildcard (of which 0/0 lines) | from-price   | from-price-overrule | not-applicable (measured) | no-reference     | contra: sale    | contra: harvest | unresolved before -> after             |
+|---------+-----------------+-------------------------------+--------------+---------------------+---------------------------+------------------+-----------------+-----------------+----------------------------------------|
+| 2010-11 | 3,958 / 121.16M | 1,850 (901) / 5,680,988       | 1 / 800      | 0                   | 5 / 68,400                | 117 / 3,087,827  | 67 / 599,290    | 19 / 77,740     | 303 / 4,922,307 -> 94 / 1,088,250      |
+| 2013-14 | 1,374 / 91.36M  | 582 (225) / 3,321,202         | 0            | 0                   | 0                         | 11 / 307,000     | 18 / 292,200    | 9 / 54,700      | 59 / 969,200 -> 21 / 315,300           |
+| 2016-17 | 3,868 / 382.45M | 2,883 (2,433) / 12,422,397    | 8 / 348,000  | 2 / 37,000          | 42 / 7,535,300            | 37 / 2,391,230   | 47 / 2,266,100  | 23 / 1,686,540  | 247 / 20,236,770 -> 88 / 5,972,600     |
+| 2019-20 | 5,593 / 464.02M | 3,231 (2,185) / 32,319,452    | 29 / 638,500 | 2 / 120,000         | 67 / 17,812,500           | 131 / 7,484,450  | 85 / 3,415,900  | 51 / 2,238,500  | 503 / 37,981,880 -> 138 / 6,272,030    |
+| total   |                 |                               | 38 / 987,300 | 4 / 157,000         | 114 / 25,416,200          | 296 / 13,270,507 | 217 / 6,573,490 | 102 / 4,057,480 | 1,112 / 64,110,157 -> 341 / 13,648,180 |
 
-Total =Value_sold= served: 1,112,045,346 -> 1,162,350,323 MWK (+50,304,977 =
-the three price/NA rungs exactly).  Delivered ROWS carrying a key (after the
-GH #869 unmapped-crop drop): wildcard 947 / 341 / 449 / 1,041, from-price 1
-/ 0 / 8 / 29, not-applicable 122 / 11 / 79 / 198, contradiction-sale 67 /
-18 / 47 / 85, contradiction-harvest 19 / 9 / 23 / 51 (pinned in
-=tests/test_malawi_sale_basis.py=).
+On 2026-09-24 the ladder had six keys: =not-applicable= carried both of
+today's NA columns (122 / 11 / 79 / 198 = 410 / 38,686,707) and the
+overrule rung did not exist (its 4 sales sat in "unresolved": 90 / 140 in
+2016-17 / 2019-20, 345 / 13,805,180 in all).
 
-Three things to read off the table.
+Total =Value_sold= served: 1,112,045,346 (the #833 bundle) -> 1,162,350,323
+(2026-09-24) -> *1,162,507,323* MWK (2026-09-25; +157,000 = the overrule
+rung exactly).  Delivered ROWS carrying a key: wildcard 947 / 341 / 449 /
+1,041, from-price 1 / 0 / 8 / 29, from-price-overrule 0 / 0 / 2 / 2,
+not-applicable 5 / 0 / 42 / 67, no-reference 117 / 11 / 37 / 131,
+contradiction-sale 67 / 18 / 47 / 85, contradiction-harvest 19 / 9 / 23 /
+51 (pinned in =tests/test_malawi_sale_basis.py=).
+
+The unresolved 341, by ground (=attrs['sale_basis_ladder'][unresolved]
+['grounds']=, a partition of the sales): contradiction in a cell that does
+not separate 80 / 16 / 70 / 105 = 271; contradiction in a separating cell
+whose price is missing or sits in the middle half 10 / 5 / 18 / 24 = 57;
+not-applicable SALE in a separating cell the price cannot decide (or whose
+priced basis no unclaimed row carries) 4 / 0 / 0 / 2 = 6 (267,800 MWK);
+shelled/unshelled sale against a not-applicable ROW in a separating cell
+whose price fails the margin 0 / 0 / 0 / 7 = 7 (550,400 MWK); claimed by
+tier A 0.
+
+Four things to read off the table.
 
 - *The wildcard is mostly "did not sell".*  5,744 of its 8,546 attached
   lines are Module I/Q lines with NULL quantity, value and S/U (the
@@ -515,61 +547,121 @@ Three things to read off the table.
   since before #833 and still are; they carry NO key, because a key marks a
   SALE and 0.0 is the survey's "no".  The 2,802 keyed wildcard sales are
   the perennial ones (Module P never asks S/U; Module Q not before 2016-17)
-  plus a few off-scheme codes.
+  plus a few off-scheme codes.  *Delivered keyed wildcard rows (947 / 341 /
+  449 / 1,041) are below the keyed sales (949 / 357 / 450 / 1,046) for TWO
+  reasons, neither of them the ladder*: the GH #869 unmapped-crop drop
+  (13, all 2013-14), and the defensive collapse at the declared grain at
+  the end of =assemble_crop_production= (=_grain=; =Quantity: 'sum'=,
+  =Value_sold: 'first'=), which merges two same-label VARIETIES of one
+  plot-crop in one unit and state (Citrus 1005 / 1010 / 1011, Groundnut 11
+  / 12 / 16, Maize 1 / 3) into one row, sums their harvest and keeps ONE
+  variety's sale -- 2 / 3 / 1 / 5 keyed wildcard sales, and *27 sales /
+  373,600 MWK in all* (6 / 3 / 1 / 17 per wave; 28,900 / 18,200 / 50,000 /
+  276,500 MWK), silently.  That is the GH #871 "compose, don't select"
+  pattern inside a wave script, pre-existing on the #833 bundle and
+  unchanged by the ladder; issue text in
+  =slurm_logs/backlog_fix_2026-09-24/issues_to_file.org=.
 - *The contradictions reproduce the probe exactly*: 86 / 27 / 70 / 136 =
   319 sales / 10,630,970 MWK, 217 siding with the sale's own answer and 102
   with the harvest row's, all Groundnut (the only crop whose cells
   separate).  328 / 12.8M stay unresolved: Rice, Maize, Soyabean, and the
-  Groundnut tail whose price sits between the medians.
-- *from-price is 38, not the probe's 17, and the difference is a decision.*
+  Groundnut tail whose price sits in the middle half between the medians.
+- *from-price is 38, not the probe's 17, and the difference is a side.*
   The probe sized only the NA-SALE side (17 sales / 477,800 MWK: 1 / 0 / 2
   / 14 by wave, all Groundnut, all inferred unshelled) -- and that is
   exactly what the NA-sale side of the rung delivers (=not_applicable_side:
   sale= 1 / 0 / 2 / 14).  The other 21 (0 / 0 / 6 / 15; 509,500 MWK) are
-  the S/U-SALE-vs-NA-HARVEST side, admitted only where the price
-  CORROBORATES the sale's own answer (a Groundnut sale that says shelled
-  and prices as shelled, on a harvest row that says "not applicable" to a
-  crop whose basis the market prices).  Where the price contradicts the
-  sale's own answer the pair stays unresolved: nothing is re-based.
+  the S/U-SALE-vs-NA-HARVEST side where the price CORROBORATES the sale's
+  own answer.  The refused complement, measured: on the NA-sale side 6
+  sales / 267,800 MWK (4 in 2010-11, 2 in 2019-20) whose price fails the
+  margin or names a basis no unclaimed row carries; on the S/U-sale side 11
+  sales / 707,400 MWK on 2026-09-24, of which *4 / 157,000 MWK carried an
+  unambiguous price that CONTRADICTED the sale's recorded answer* and were
+  left unresolved by that day's corroborate-only decision.
+- *The overrule rung (2026-09-25, ruling 1) takes those 4.*  @ligon: price
+  decides on that side too, exactly as the contradiction rungs do.  0 / 0 /
+  2 / 2, all Groundnut 50 kg Bag on the fine =(crop, u)= rung: in 2016-17
+  one sale recorded unshelled and priced as shelled (=logp= 9.10 against
+  m_S 9.21 / m_U 8.70) and one recorded shelled and priced as unshelled
+  (8.29); in 2019-20 both recorded unshelled and priced as shelled (9.21
+  against m_S 9.30 / m_U 8.52).  Its own key, so an overruled recorded
+  answer is countable and never hides inside =from-price=.  The 7 / 550,400
+  MWK on that side whose price fails the margin stay unresolved.
 
-** What the not-applicable rung carries, per crop -- read this before calling it "crops with no shell"
+** What the two not-applicable rungs carry, per crop -- read this before calling either "crops with no shell"
 
-Delivered rows under =sale-basis-not-applicable=, all waves:
+Rung 3 admits on two grounds that were ONE key on 2026-09-24 and are two
+since 2026-09-25 (@ligon, ruling 2): a reference exists in the wave and
+MEASURABLY does not separate (=sale-basis-not-applicable=), or NO reference
+cell exists in the wave at all (=sale-basis-no-reference= -- admission on
+the absence of evidence, which is a weaker ground and is exposed per row).
+Delivered rows, all waves:
 
-| crop          | rows | crop                 | rows |
-|---------------+------+----------------------+------|
-| Tobacco       |  109 | Rice                 |   25 |
-| Cotton        |   57 | Soyabean             |   24 |
-| Sweet Potato  |   48 | Maize                |    9 |
-| Irish Potato  |   26 | Pigeon Pea (Nandolo) |    7 |
-| Finger Millet |   24 | Sorghum              |    9 |
-| Tomato        |   17 | Nkwani               |   10 |
-| Sunflower     |    9 | Beans                |    4 |
-| (others)      |   32 |                      |      |
+| crop                 | not-applicable (measured) | no-reference | crop          | not-applicable (measured) | no-reference |
+|----------------------+---------------------------+--------------+---------------+---------------------------+--------------|
+| Tobacco              |                        72 |           37 | Irish Potato  |                           |           26 |
+| Rice                 |                        25 |              | Finger Millet |                           |           24 |
+| Maize                |                         9 |              | Tomato        |                           |           17 |
+| Soyabean             |                         8 |           16 | Nkwani        |                           |           10 |
+| Cotton               |                           |           57 | Sunflower     |                           |            9 |
+| Sweet Potato         |                           |           48 | Sorghum       |                           |            9 |
+| Pigeon Pea (Nandolo) |                           |            7 | Beans         |                           |            4 |
+| (others)             |                           |           32 |               |                           |              |
+| *total*              |                     *114* |        *296* |               |                           |              |
+
+(25,416,200 MWK measured; 13,270,507 MWK no-reference.)
 
 Tobacco 109 and Cotton 57 are the money (24.76M and 2.04M of the probe's
 465 class) and are what the ruling's part (b) was about: the harvest side
-is NA 86-100% of the time and a sale coded S prices as NA.  But *Maize,
-Rice and Soyabean land here too* -- 58 rows -- and on those crops a
-physical shelling basis EXISTS; it is only that the market does not price
-it (S/U ratio 0.94-1.00, P 0.42-0.54), so the rule "where the basis is not
-priced, NA is the basis" admits them on the same footing.  That is exactly
-what the key is for: a user who needs the shelled/unshelled distinction on
-Maize should treat these 58 rows' basis as unresolved and go to
+is NA 86-100% of the time and a sale coded S prices as NA.  *Tobacco is
+the one crop split across the two keys*: 72 rows sit in waves where its
+cell is measured (2016-17 P 0.47-0.59 non-separating; 2019-20 likewise)
+and 37 in waves where it has no reference (33 in 2010-11, 3 in 2013-14, 1
+in 2016-17).  *Cotton is entirely no-reference* -- no wave holds 10 shelled
+and 10 unshelled Cotton sales -- so its admission rests on the instrument's
+"applicable crops" wording and on the probe's POOLED cross-wave cell (P
+~0.5), never on an in-wave measurement.  *Maize, Rice and Soyabean land
+under the MEASURED key* (Maize 9, Rice 25, Soyabean 8: 42 rows) and on
+those crops a physical shelling basis EXISTS; it is only that the market
+does not price it (S/U ratio 0.94-1.00, P 0.42-0.54 in the wave's own
+cell), so the rule "where the basis is not priced, NA is the basis" admits
+them on the same footing.  *Soyabean's other 16 rows (all 2019-20) are
+no-reference*: the 2016-17 Soyabean cell is measured, the 2019-20 one is
+not, and the ladder never pools across waves -- so the "P 0.42-0.54" that
+the 2026-09-24 text quoted for all 58 Maize/Rice/Soyabean rows was the
+probe's pooled figure for those 16, not this wave's gate.  That is exactly
+what the two keys are for: a user who needs the shelled/unshelled
+distinction on Maize should treat the 42 measured rows' basis as
+unresolved and the 16 no-reference rows as unmeasured, and go to
 =derivation_inputs=.  Sweet Potato / Irish Potato / Finger Millet / Tomato
-(115 rows) are the enumerator's S/U on crops the instrument gives no
-meaning for, like Tobacco.
+(115 rows, all no-reference) are the enumerator's S/U on crops the
+instrument gives no meaning for, like Tobacco.
 
 ** Decisions taken here (named, not measured)
 
 - =unknown= against =unknown= is the WILDCARD, not an exact match: neither
   side answered, so there is no survey answer to match.  It carries the key.
 - A separating cell whose sale price is MISSING (Value_sold or
-  Quantity_sold not positive; 11 raw lines corpus-wide) or sits BETWEEN the
-  two medians resolves nothing and is unresolved -- not rung 3, whose
-  premise is that the basis is unpriced.
-- On the S/U-sale-vs-NA-harvest side the price must corroborate the sale's
-  own answer (above).
+  Quantity_sold not positive; 11 raw lines corpus-wide) or sits in the
+  MIDDLE HALF between the two medians (margin <= 0.5 x gap) resolves
+  nothing and is unresolved -- not rung 3, whose premise is that the basis
+  is unpriced.  A price strictly between the medians but in the OUTER
+  quarter IS admitted: that is what =margin > 0.5 x gap= means, and the
+  probe validated exactly that gate (87% on the admitted subset).  Measured
+  on the admitted price-rung sales: 9 / 1 / 9 / 58 = *77 of 357* (22%) sit
+  strictly between the medians (80 of 361 counting the overrule rung).
+  (The 2026-09-24 text said "sits BETWEEN the two medians resolves
+  nothing"; the code was right and the prose was wrong -- review of
+  2026-09-25, item 1.  @ligon confirmed the gate as validated, ruling 3.)
+- On the S/U-sale-vs-NA-harvest side the price DECIDES (2026-09-25, ruling
+  1): a price that corroborates the sale's own answer attaches under
+  =from-price=, a price that contradicts it attaches under
+  =from-price-overrule=.  (2026-09-24 had decided corroborate-only, leaving
+  4 sales / 157,000 MWK unresolved; reversed.)
+- Rung 3 is two keys (2026-09-25, ruling 2): =not-applicable= only where the
+  wave's own reference is MEASURED non-separating, =no-reference= where
+  none exists.  The second's =validated_against= says NOTHING, by
+  construction, and says what could and could not be measured.
 - Tiering: tier B never touches a row or sale tier A claimed, attached OR
   ambiguous.  A not-applicable sale whose priced basis sits on a row an
   exact-match sale already took is unresolved, not double-attached.
