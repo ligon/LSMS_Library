@@ -1,5 +1,20 @@
 #+title: Handoff -- 2026-09-25 (Sue / GPT-6), Savio job 39263225
 
+* Open PR review complete (2026-09-25 23:19 PDT)
+
+User requested consistency review and preferred merge order, not merging.
+Recommendation: #955 -> #951 -> #963 -> #952 -> #954 -> #966 (after its CI passes); hold #965.
+All seven fetched heads combine cleanly in both forward and reverse order, yielding the same tree; no actual PR was merged or changed.
+Durable findings: =slurm_logs/pr_merge_review_2026-09-25/REVIEW.org:1=; exact reviewed heads/checks, cache census and dependency metadata are beside it.
+
+- #965 blockers :: PyPI ligonlibrary remains 0.2.2 with python-magic; CI swaps in python-magic-bin. Also Wave.resources still default-decodes wave YAML: Tajikistan 2003 fails under cp1252, missed by the guard's country-only pattern. Fix the reader, accept its broad rebuild, release/floor the upstream dependency fix and rerun unswapped Windows CI.
+- #963 correction :: On current development it changes all 18 GhanaLSS scheme-key hashes (and seven food wave hashes), despite the PR's no-rewarm claim. Batch #963/#952 before rebuilding GhanaLSS. No hard code ordering edge; the fingerprint machinery is already on the base.
+- Verification :: Combined targeted selections passed 132 + 264 + 462 + 109 + 2 tests (overlapping selections). All seven Ghana import probes passed. Cold roster pairs preserve values after sorting; full GhanaLSS food output and Malawi parser comparisons agree exactly. The two historical Ghana tests are now green. No worker processes remain.
+- CI :: All six earlier PRs green; #966 still running at the final check. Current GitHub base =3cf124ca3=; combined local test commit =ed84314790fe= at =/local/job39263225/worktrees/pr-review-combined= (detached, clean).
+- Next action :: Address the two #965 blockers before treating its green CI as native Windows support; merge the other six only under a subsequent merge instruction and after #966 turns green. This review made no GitHub writes.
+
+-- Sue
+
 * Malawi units PR open (2026-09-25 22:59 PDT)
 
 User requested the existing Malawi units work as a PR and explicitly favored rebuilding when useful.
