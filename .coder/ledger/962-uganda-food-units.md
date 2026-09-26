@@ -8,7 +8,7 @@
 Finish Uganda's food-unit corrections without inventing a physical unit for a
 missing report or erasing recorded physical labels. Rebuild `food_acquired`,
 its runtime food derivations and `nutrition`; attribute changes while preserving
-expenditures, acquisition sources and household coverage. The parked
+expenditures, acquisition sources and food household-wave coverage. The parked
 `fix/962-uganda-unit-sentinel` and `fix/962-value-count-draft` branches contain
 rejected approaches and are evidence, not changes to cherry-pick.
 
@@ -69,8 +69,17 @@ Also inherit `.coder/ledger/STANDING.md` §§2-5 (IO, API derivation and cache h
 - Preserve reported physical quantities, every expenditure and source label.
   Any change outside the recorded-unit corrections must be explained separately.
 - Nutrition uses only kg rows. Test its matrix product from rebuilt quantity/FCT
-  inputs, but do not regenerate `tests/fixtures/uganda_baseline.json` or published
+  inputs; do not regenerate the historical nutrition baseline or published
   artifacts. Agreement with an old total is not evidence of correct units.
+  Food coverage is invariant; nutrition eligibility can shrink when a household
+  has no convertible kg quantity. The cold comparison must account for every
+  lost household-wave and its old nutrient contribution.
+  The initial blanket ban on editing `tests/fixtures/uganda_baseline.json` was
+  narrowed after the matched replay: nine food-acquisition content hashes pass
+  on the base and change with the fully attributed corrections. Update only
+  those hashes after final verification; preserve every other field, including
+  the already-failing nutrition entry. This accepts measured food-unit changes,
+  not an unexamined numerical rebaseline.
 - Use private L2 caches and shared read-only L1 blobs. Measure hash scope, rebuild
   cold and retain before/after evidence; inherit `STANDING.md` §4.
 
@@ -94,6 +103,21 @@ Also inherit `.coder/ledger/STANDING.md` §§2-5 (IO, API derivation and cache h
 
 ### Phase 3 - verification
 
-Pending implementation, targeted tests, independent review and cold comparison.
+Implementation is complete at `72f8bce34`. Independent code review found and
+resolved a categorical-unit assignment regression. All 28 focused tests and
+1,728 independent scalar-oracle cases pass, including duplicate and dtype
+boundaries. The initial full suite passed 6,698 tests with 211 skips, eight
+xfails and one xpass before the categorical guard; its skip coverage did not
+validate the built food fingerprints.
+
+Cold comparison preserves every purchased/all-source expenditure and every
+previously labelled physical acquisition row. All 7,359 old blank-unit rows
+are attributed: 6,429 Value, 905 Unknown, 24 residual codes and one physical
+code. Nutrition matches rebuilt kg quantities times unchanged FCT, but loses
+24 household-wave rows without a convertible quantity; 20 formerly had nonzero
+invented-factor estimates. Broader #850 adjudication remains outside scope.
+
+Final cold replay, selective food-fingerprint verification and publication
+status are recorded in `slurm_logs/uganda_units_2026-09-25/VALIDATION.org`.
 
 -- Sue
