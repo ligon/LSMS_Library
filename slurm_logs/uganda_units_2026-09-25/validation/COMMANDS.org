@@ -1,0 +1,97 @@
+#+title: Reproducing the Uganda unit comparison
+#+author: Sue
+
+* Environment and inputs
+
+The executed checkout was =/local/job39263225/worktrees/uganda-food-units=.
+The baseline ran there at ledger-only commit =b22720d25=, source-equivalent to =4c2223aa1=; the final cold replay ran at =72f8bce34=.
+Use separate checkouts at those source revisions for a new comparison.
+The scripts in this directory can be called by absolute path from either checkout.
+
+The Python executable was =/local/job39263225/venv_img/bin/python= (Python 3.11.6, pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1).
+BLAS/OMP/MKL and =LSMS_BUILD_WORKERS= were pinned to one.
+The final cold build used CPUs 24-35; the full suite used CPUs 8-23, 16 pytest workers and =--dist=loadfile=.
+Change affinity to match the allocation when reproducing elsewhere.
+
+Set the following task variables to absolute paths before running the commands: =UGA_CHECKOUT=, =UGA_PYTHON=, =UGA_TOOLS= (this directory), =UGA_DATA= (a fresh private data root), =UGA_L1= (an existing DVC blob cache), =UGA_OUTPUT= (private saved-frame directory), =UGA_SOURCE= (the source revision), and =UGA_TAG= (=base= or =final=).
+The source check includes tests: a checkout at =72f8bce34= reproduces the exact final build before the later food-fingerprint update.
+For the completed PR checkout, use its own HEAD as =UGA_SOURCE=.
+The later fixture/evidence commits do not change the library source or data hashes.
+
+#+begin_src sh :eval never-export :tangle no
+mkdir -p "$UGA_DATA" "$UGA_OUTPUT"
+ln -s "$UGA_L1" "$UGA_DATA/dvc-cache"
+cd "$UGA_CHECKOUT"
+unset PYTHONSAFEPATH
+export PATH="$(dirname "$UGA_PYTHON"):$PATH"
+export PYTHONPATH="$UGA_CHECKOUT"
+export LSMS_COUNTRIES_ROOT="$UGA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$UGA_DATA"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1
+"$UGA_PYTHON" "$UGA_TOOLS/validate_food_units.py" build \
+  --checkout "$UGA_CHECKOUT" --data-root "$UGA_DATA" \
+  --out "$UGA_OUTPUT" --tag "$UGA_TAG" --expected-source "$UGA_SOURCE" \
+  > "$UGA_OUTPUT/$UGA_TAG-build.log" 2>&1
+#+end_src
+
+Do not reuse a warm L2 directory or overwrite saved frames; the driver refuses both.
+The baseline/final pickle files stay private because they contain household records.
+Only aggregate JSON and source scripts are committed.
+
+* Compare and attribute
+
+Set =UGA_BASE_OUTPUT= and =UGA_FINAL_OUTPUT= to the saved-frame directories above; set =UGA_ATTR_WORK= to a private scratch directory for copies of versioned non-microdata inputs.
+Run from the final checkout with the same import/config environment.
+The build driver also checks =unitvalue=, =unitprice= and =kgprice= modes.
+
+#+begin_src sh :eval never-export :tangle no
+"$UGA_PYTHON" "$UGA_TOOLS/validate_food_units.py" compare \
+  --baseline-dir "$UGA_BASE_OUTPUT" --baseline-tag base \
+  --candidate-dir "$UGA_FINAL_OUTPUT" --candidate-tag final \
+  --report "$UGA_FINAL_OUTPUT/comparison.json"
+"$UGA_PYTHON" "$UGA_TOOLS/attribute_food_units.py" \
+  --checkout "$UGA_CHECKOUT" --baseline-ref 4c2223aa1 \
+  --candidate-ref "$UGA_SOURCE" \
+  --baseline-dir "$UGA_BASE_OUTPUT" --baseline-tag base \
+  --candidate-dir "$UGA_FINAL_OUTPUT" --candidate-tag final \
+  --proposal "$UGA_TOOLS/../catalog/proposed_mapping.csv" \
+  --work-dir "$UGA_ATTR_WORK" --report "$UGA_FINAL_OUTPUT/attribution.json"
+"$UGA_PYTHON" "$UGA_TOOLS/probe_portable.py" \
+  --output "$UGA_FINAL_OUTPUT/scalar-oracle.json"
+"$UGA_PYTHON" "$UGA_TOOLS/hash_inventory.py" "$UGA_FINAL_OUTPUT/hashes.json"
+#+end_src
+
+The attribution driver rereads eight raw modules, verifies DVC sidecars against the baseline git objects, and reconciles panel IDs with the existing walker.
+Its catalog classification is a curated input; metadata corroboration is reproduced separately by =../catalog/audit_catalog.py=.
+The FCT check reconciles recorded Org/CSV inputs; it does not refetch laboratory observations or USDA responses.
+
+* Tests and historical manifest
+
+The full suite used the following pytest arguments at =a45d319bd=, with =LSMS_SKIP_AUTH=1= and a private copy of available L2 caches.
+Its 211 skips included data not yet built, so a green run did not certify the later-built food fingerprints.
+
+#+begin_src sh :eval never-export :tangle no
+"$UGA_PYTHON" -m pytest -n 16 --dist=loadfile --timeout=600 \
+  --timeout-method=thread --durations=25 --no-purge -q > full-suite.log 2>&1
+#+end_src
+
+The focused final selection was:
+
+#+begin_src sh :eval never-export :tangle no
+"$UGA_PYTHON" -m pytest -n 16 --dist=loadfile --timeout=600 \
+  --timeout-method=thread --no-purge -ra -q \
+  tests/test_962_unit_sentinel.py tests/test_food_kg_inference.py \
+  tests/test_food_prices_units_kwarg.py tests/test_food_expenditures_basis.py \
+  tests/test_food_prices_dtype.py tests/test_u_code_leak.py \
+  tests/test_uganda_api_vs_replication.py tests/test_uganda_invariance.py \
+  > selected-tests.log 2>&1
+#+end_src
+
+The independent focused run uses just =tests/test_962_unit_sentinel.py= and two workers.
+To reproduce the historical-manifest comparison, run =tests/test_uganda_invariance.py= separately with =LSMS_DATA_DIR= pointing to each cold root, or use =compare_manifest.py --root CHECKOUT --base BASE_DATA --candidate FINAL_DATA --output REPORT=.
+The pre-update comparison used the unchanged fixture at =72f8bce34=.
+After accepting the nine food hashes, the food entries pass; the nutrition entry is deliberately retained and fails when its parquet is present.
+The base already fails its nutrition content hash; the corrected candidate additionally has 24 fewer rows, as accounted for in the main report.
+
+-- Sue

@@ -1,0 +1,30 @@
+{
+  "full_suite_before_categorical_guard": {
+    "source": "a45d319bd",
+    "passed": 6698,
+    "skipped": 211,
+    "xfailed": 8,
+    "xpassed": 1,
+    "seconds": 1260.96,
+    "exit_code": 0,
+    "limitation": "Manifest checks ran before food parquets were available; not evidence those hashes matched."
+  },
+  "final_independent_focused": {
+    "source": "72f8bce34",
+    "passed": 28,
+    "warnings": 2,
+    "seconds": 13.39,
+    "exit_code": 0
+  },
+  "final_post_food_hash_update_selection": {
+    "library_source": "72f8bce34",
+    "passed": 120,
+    "skipped": 58,
+    "failed": 1,
+    "seconds": 115.52,
+    "exit_code": 1,
+    "failed_node": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]",
+    "limitation": "Baseline also fails nutrition content hash. Candidate additionally has 24 fewer rows, fully attributed; historical nutrition fixture deliberately unchanged."
+  },
+  "api_audit_exit_code": 0
+}
