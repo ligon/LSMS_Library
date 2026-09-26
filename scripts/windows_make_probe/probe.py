@@ -5,6 +5,15 @@ import os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# PROBE_STRIP="Git,mingw64" drops matching PATH entries first, to model a
+# user whose only POSIX tools are the ones conda installed (the GitHub image
+# ships Git's and MinGW's on PATH; a typical Windows desktop does not).
+_strip = [s for s in os.environ.get("PROBE_STRIP", "").split(",") if s]
+if _strip:
+    os.environ["PATH"] = os.pathsep.join(
+        e for e in os.environ["PATH"].split(os.pathsep)
+        if not any(s.lower() in e.lower() for s in _strip))
+    print("stripped PATH entries matching:", _strip)
 make = shutil.which("make") or shutil.which("mingw32-make")
 git = shutil.which("git")
 git_usr_bin = Path(git).resolve().parents[1] / "usr" / "bin" if git else None
@@ -16,6 +25,19 @@ print("find on PATH:", shutil.which("find"))
 print("HOME set   :", "HOME" in os.environ)
 if make:
     print(subprocess.run([make, "--version"], capture_output=True, text=True).stdout.splitlines()[0])
+
+def attempt_relative(label):
+    """Wave.grab_data's call: cwd = the country's _/, target = '../<wave>/_/<t>.parquet'."""
+    work = Path(tempfile.mkdtemp(prefix="mkprobe"))
+    shutil.copytree(HERE / "Fakeland", work / "Fakeland")
+    env = os.environ.copy()
+    env["PATH"] = os.path.dirname(sys.executable) + os.pathsep + env["PATH"]
+    out = work / "Fakeland" / "2019-20" / "_" / "things.parquet"
+    r = subprocess.run([make, "-s", "../2019-20/_/things.parquet"], cwd=work / "Fakeland" / "_",
+                       env=env, capture_output=True, text=True, timeout=120)
+    ok = out.exists() and out.read_text(encoding="utf-8").strip() == "2019-20"
+    msg = (r.stdout + r.stderr).strip().replace("\n", " | ")[:300]
+    print(f"{'PASS' if ok else 'FAIL'}  {label:55s} rc={r.returncode}  {msg}")
 
 def attempt(label, data_root, target_style, shell_mode):
     work = Path(tempfile.mkdtemp(prefix="mkprobe"))
@@ -43,6 +65,7 @@ if not make:
     print("NO MAKE ON PATH -- stopping"); sys.exit(0)
 base = Path(tempfile.mkdtemp(prefix="lsmsdata"))
 spaced = Path(tempfile.mkdtemp(prefix="lsms data "))
+attempt_relative("relative wave target (grab_data shape), default shell")
 modes = ["default"] + (["git-sh", "git-sh+path"] if git_usr_bin and git_usr_bin.exists() else [])
 for shell_mode in modes:
     for style in ("native", "posix"):

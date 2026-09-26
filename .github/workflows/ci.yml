@@ -144,6 +144,23 @@ jobs:
         run: |
           $env:PATH = "C:\ProgramData\chocolatey\bin;" + $env:PATH
           python scripts/windows_make_probe/probe.py
+      # The conda route: native make + MSYS2 tools from conda-forge, with the
+      # runner's own Git / MinGW / chocolatey tools stripped from PATH so the
+      # measurement reflects a machine whose POSIX tools come from conda only.
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: false
+          miniforge-version: latest
+          python-version: '3.11'
+          activate-environment: probe
+      - name: Install make + m2 tools (conda-forge)
+        shell: cmd /C CALL {0}
+        run: conda install -y -c conda-forge make m2-bash m2-coreutils m2-findutils
+      - name: Probe (conda env, runner Git/MinGW/choco stripped)
+        shell: cmd /C CALL {0}
+        env:
+          PROBE_STRIP: '\Git\,mingw64,chocolatey'
+        run: python scripts/windows_make_probe/probe.py
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
