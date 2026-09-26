@@ -238,3 +238,57 @@ def test_runtime_sentinel_semantics_with_working_inference_control(uganda):
         expected = out if basis == 'total' else out.xs('purchased', level='s')
         expenditures = food_expenditures_from_acquired(out, basis=basis)
         assert expenditures['Expenditure'].sum() == expected['Expenditure'].sum()
+
+
+def _categorical_wide(rows):
+    wide = _wide(rows).reset_index()
+    wide['u'] = pd.Categorical(wide['u'], categories=['Kg', U_UNKNOWN], ordered=True)
+    return wide.set_index(['t', 'i', 'j', 'u'])
+
+
+@pytest.mark.parametrize('unit', ['Kg', U_UNKNOWN])
+def test_categorical_units_without_retyping_preserve_dtype_and_prices(uganda, unit):
+    wide = _categorical_wide([
+        _wide_row('reported', unit, quantity_home=2, value_home=20),
+        _wide_row('empty', unit),
+    ])
+    before = wide.copy(deep=True)
+    out = uganda.food_acquired_to_canonical(wide)
+    expected = wide.loc[[('2020', 'reported', 'rice', unit)],
+                        ['quantity_home', 'value_home', 'market']].rename(columns={
+        'quantity_home': 'Quantity', 'value_home': 'Expenditure', 'market': 'Price'})
+    expected = expected.assign(s='purchased').set_index('s', append=True)
+    pd.testing.assert_frame_equal(out, expected)
+    pd.testing.assert_frame_equal(wide, before)
+
+
+def test_categorical_unknown_can_become_value(uganda):
+    wide = _categorical_wide([_wide_row('h', value_home=20)])
+    before = wide.copy(deep=True)
+    out = uganda.food_acquired_to_canonical(wide)
+    assert len(out) == 1
+    row = out.loc[('2020', 'h', 'rice', 'Value', 'purchased')]
+    assert row['Quantity'] == row['Expenditure'] == 20
+    assert pd.isna(row['Price'])
+    pd.testing.assert_frame_equal(wide, before)
+
+
+def test_categorical_mixed_units_and_sources_remain_separate(uganda):
+    wide = _categorical_wide([
+        _wide_row('mixed', value_home=30, quantity_own=2, value_own=10,
+                  quantity_inkind=0, value_inkind=7),
+        _wide_row('physical', 'Kg', quantity_home=2, value_home=200,
+                  quantity_own=1, value_own=80),
+        _wide_row('cancel', quantity_home=2, quantity_away=-2, value_home=10),
+    ])
+    before = wide.copy(deep=True)
+    out = uganda.food_acquired_to_canonical(wide)
+    assert len(out) == 6
+    assert out.loc[('2020', 'mixed', 'rice', 'Value', 'purchased'), 'Quantity'] == 30
+    assert out.loc[('2020', 'mixed', 'rice', U_UNKNOWN, 'produced')].tolist() == [2, 10, 80]
+    assert out.loc[('2020', 'mixed', 'rice', 'Value', 'inkind'), 'Quantity'] == 7
+    assert out.loc[('2020', 'physical', 'rice', 'Kg', 'purchased')].tolist() == [2, 200, 100]
+    assert out.loc[('2020', 'physical', 'rice', 'Kg', 'produced')].tolist() == [1, 80, 80]
+    assert out.loc[('2020', 'cancel', 'rice', U_UNKNOWN, 'purchased')].tolist() == [0, 10, 100]
+    assert out.xs('Value', level='u')['Price'].isna().all()
+    pd.testing.assert_frame_equal(wide, before)

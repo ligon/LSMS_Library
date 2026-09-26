@@ -526,9 +526,14 @@ def food_acquired_to_canonical(df):
         no_quantity = (original_qty.isna() | original_qty.eq(0)).all(axis=1)
         value_only = (out['u'].eq(U_UNKNOWN) & no_quantity
                       & out['Expenditure'].gt(0))
-        out.loc[value_only, 'u'] = 'Value'
-        out.loc[value_only, 'Quantity'] = out.loc[value_only, 'Expenditure']
-        out.loc[value_only, 'Price'] = np.nan
+        if value_only.any():
+            # Categorical units may not contain Value.  Leave their dtype
+            # alone when no source row needs retyping.
+            if isinstance(out['u'].dtype, pd.CategoricalDtype):
+                out['u'] = out['u'].astype(object)
+            out.loc[value_only, 'u'] = 'Value'
+            out.loc[value_only, 'Quantity'] = out.loc[value_only, 'Expenditure']
+            out.loc[value_only, 'Price'] = np.nan
         return out
 
     # Purchased: fold home + away.  Sum with min_count=1 so a row with
