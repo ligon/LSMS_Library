@@ -78,15 +78,6 @@ jobs:
         run: pip install poetry
       - name: Install dependencies
         run: poetry install
-      # TEMPORARY -- remove once ligonlibrary ships its sys_platform markers
-      # (python-magic-bin on win32) and pyproject's floor is raised to it.
-      # python-magic has no libmagic on Windows and `import magic` HANGS
-      # (faulthandler: magic/compat.py:241, via ligonlibrary/dataframes.py:15),
-      # which blocks `import lsms_library`.
-      - name: Swap python-magic for python-magic-bin (interim)
-        run: |
-          poetry run pip uninstall -y python-magic
-          poetry run pip install python-magic-bin
       # Separate from pytest so an import-time failure is attributed to the
       # import, not lost inside test collection.
       - name: Import + config smoke
