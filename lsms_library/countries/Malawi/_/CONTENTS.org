@@ -493,12 +493,11 @@ in the OUTER QUARTER of the interval between the medians, not only one
 beyond them (the middle half is undecided; see "Decisions taken here").
 No crop allowlist: the gate is the data.
 
-*Cache cost*: =malawi.py= is in the input hash of every Malawi table, so
-all *21* registered Malawi tables re-warm on the next read of a shared
-root (measured with =Country._table_cache_hash= by the 2026-09-25 review;
-"eleven" in the 2026-09-24 report was the count of warm parquets in that
-agent's private root, not the re-warm scope).  Nothing outside Malawi
-moves; =build_transforms_fingerprint= is byte-identical.
+*Cache cost*: =malawi.py= is in the input hash of every Malawi table, so all *21 materialized source tables* re-warm on their next read.
+The 2026-09-25 review measured changes to all 24 scheme-key hashes; those keys also include the panel mapping and two legacy food aliases.
+"Eleven" in the 2026-09-24 report was the count of warm parquets in that agent's private root, not the re-warm scope.
+All 61 control hashes in Uganda, Niger and GhanaLSS, and four =build_transforms_fingerprint= values, are unchanged.
+The [[file:../../../../slurm_logs/malawi_units_pr_2026-09-25/VALIDATION.org][PR validation]] records cold builds of all 26 public API entries and the resulting data differences against GitHub development.
 
 ** What each rung carries (cold build, 2026-09-25; the 2026-09-24 figures noted where they differ)
 
