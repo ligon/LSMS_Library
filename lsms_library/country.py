@@ -1715,7 +1715,10 @@ class Wave:
                 jobs_flag = _make_jobs_flag()
                 if jobs_flag:
                     make_cmd.append(jobs_flag)
-                make_cmd.append('../' + str(relative_parquet_path))
+                # as_posix: on Windows str() gives '..\\wave\\_\\t.parquet'; make
+                # matches the rule, but its recipe's `cd $(@D)` runs in sh,
+                # which reads the backslashes as escapes (GH #964).
+                make_cmd.append('../' + relative_parquet_path.as_posix())
                 subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
