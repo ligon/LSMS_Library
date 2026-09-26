@@ -253,6 +253,40 @@ class TestScripts:
 # ---------------------------------------------------------------------------
 
 class TestFunction:
+    def test_all_null_unit_reference_below_floor(self, malawi_mod):
+        ref = pd.DataFrame({'crop': ['Groundnut'], 'u': [None],
+                            'condition': ['shelled'], 'logp': [np.log(10.0)]})
+        fine, mid, cell = malawi_mod._su_reference(ref)
+        assert fine.empty and mid.empty
+        assert len(cell) == 1 and cell.index.get_level_values('u').isna().all()
+        assert cell['cell_n'].iloc[0] == 1
+        assert cell['cell_med'].iloc[0] == pytest.approx(np.log(10.0))
+
+    def test_all_null_unit_reference_is_available_to_lookup(self, malawi_mod):
+        ref = pd.DataFrame({
+            'crop': ['Groundnut'] * 20, 'u': [None] * 20,
+            'condition': ['shelled'] * 10 + ['unshelled'] * 10,
+            'logp': [np.log(100.0)] * 10 + [np.log(30.0)] * 10,
+        })
+        fine, mid, cell = malawi_mod._su_reference(ref)
+        assert len(fine) == len(mid) == len(cell) == 1
+        assert fine.index.get_level_values('u').isna().all()
+        assert fine['n_S'].iloc[0] == fine['n_U'].iloc[0] == 10
+        assert cell['cell_n'].iloc[0] == 20
+        median = (np.log(100.0) + np.log(30.0)) / 2
+        assert cell['cell_med'].iloc[0] == pytest.approx(median)
+        assert mid['m_S'].iloc[0] == pytest.approx(np.log(100.0) - median)
+        assert mid['m_U'].iloc[0] == pytest.approx(np.log(30.0) - median)
+        pairs = pd.DataFrame({'crop': ['Groundnut'] * 2,
+                              'u': [None, 'Kilogramme']})
+        found = malawi_mod._lookup_reference(pairs, fine, mid, cell)
+        assert found.loc[0, 'rung'] == 'fine'
+        assert found.loc[0, 'm_S'] == pytest.approx(np.log(100.0))
+        assert found.loc[0, 'm_U'] == pytest.approx(np.log(30.0))
+        assert found.loc[0, 'P'] == 1.0
+        assert pd.isna(found.loc[1, 'rung'])
+        assert found.loc[1, ['m_S', 'm_U', 'P']].isna().all()
+
     def test_no_options(self):
         sig = inspect.signature(resolve_callable(FUNCTION))
         assert list(sig.parameters) == ['condition', 'condition_sold', 'log_price',
@@ -369,6 +403,23 @@ KG = 'Kilogramme'
 
 
 class TestAssemble:
+    def test_exact_null_unit_pair_keeps_amounts_and_rejects_other_unit(self, malawi_mod):
+        harv = malawi_mod._consolidate_harvest([
+            _harv([('h1', 'R1', 'Groundnut', 11, None, S, 10)])])
+        sale = _sale([('h1', 11, None, S, 3, 30),
+                      ('h1', 11, '50 kg Bag', S, 3, 300)])
+        out, decisions, tallies = malawi_mod._attach_sales('2010-11', harv, sale)
+        pd.testing.assert_frame_equal(harv, out[harv.columns])
+        assert out['u'].isna().all()
+        assert out['Quantity_sold'].iloc[0] == 3.0
+        assert out['Value_sold'].iloc[0] == 30.0
+        assert out['_branch'].iloc[0] == ''
+        assert decisions.loc[decisions['u'].isna(), 'outcome'].tolist() == ['exact']
+        assert decisions.loc[decisions['u'].notna(), 'outcome'].isna().all()
+        assert tallies['sale_basis_ladder']['reference']['sales'] == 1
+        assert tallies['sale_suppressed']['sales'] == 0
+        assert tallies['sale_basis_mismatch']['sales'] == 0
+
     def test_exact_match_carries_no_key_and_column_exists_without_sales(self, malawi_mod):
         out = malawi_mod.assemble_crop_production(
             '2010-11', [_harv([('h1', 'R1', 'Groundnut', 11, KG, S, 10)])],

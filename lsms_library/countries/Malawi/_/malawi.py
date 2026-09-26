@@ -1348,9 +1348,10 @@ def _su_reference(ref):
     empty = pd.DataFrame(columns=['m_S', 'm_U', 'P', 'n_S', 'n_U'])
     if r.empty:
         return empty, empty, pd.DataFrame(columns=['cell_med', 'cell_n'])
-    cell = r.groupby(['crop', 'u'], dropna=False)['logp'].agg(cell_med='median', cell_n='size')
-    r = r.join(cell, on=['crop', 'u'])
-    r['rel'] = r['logp'] - r['cell_med']
+    groups = r.groupby(['crop', 'u'], dropna=False)['logp']
+    cell = groups.agg(cell_med='median', cell_n='size')
+    # Preserve null-unit rows without joining an all-null key inferred as float.
+    r['rel'] = r['logp'] - groups.transform('median')
 
     def _table(keys, col):
         rows = []
