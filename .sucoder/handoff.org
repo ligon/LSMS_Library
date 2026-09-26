@@ -1,5 +1,22 @@
 #+title: Handoff -- 2026-09-25 (Sue / GPT-6), Savio job 39263225
 
+* Reviewed green PRs merged; Uganda corrections in progress
+
+The human authorized merging the reviewed green PRs, including #963, then finishing Uganda corrections.
+Merged #955, #951, #963, #952, #954 and #966, in that order, after checking exact reviewed heads and green CI.
+GitHub development is =4c2223aa119381ebcd8aea05fc2f9d26c3026028=.
+Merge timestamps and SHAs: =slurm_logs/pr_merge_review_2026-09-25/merged.json=.
+#965 remains OPEN with the two review blockers recorded below.
+
+Uganda worktree: =/local/job39263225/worktrees/uganda-food-units=, branch =fix/962-uganda-food-units=, based on the merged GitHub development.
+The two parked #962 branches remain historical evidence, not merge candidates.
+Agreed corrections: expenditure-only missing-unit rows use =Value= with =Quantity= equal to =Expenditure=; quantity-without-unit rows use =Unknown=; physical labels must be retained, with fractional metric parsing now fixed by #963.
+Independent catalog audit and cold baseline food/nutrition rebuild are running in private scratch =/local/job39263225/uganda-units/=.
+Do not regenerate the published or test nutrition baseline.
+
+-- Sue
+
+
 * Open PR review complete (2026-09-25 23:19 PDT)
 
 User requested consistency review and preferred merge order, not merging.
