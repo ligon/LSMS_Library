@@ -1,4 +1,49 @@
-#+title: Handoff -- 2026-09-25 (Sue / GPT-6), Savio job 39263225
+#+title: Handoff -- 2026-09-26 (Sue / GPT-6), Savio job 39263225
+
+* Merges complete; Uganda corrections open as PR #967 (2026-09-26 00:39 PDT)
+
+The authorized green PRs were merged in order: #955, #951, #963, #952, #954, #966.
+GitHub development is =4c2223aa119381ebcd8aea05fc2f9d26c3026028=; its post-merge CI run =36224578786= passed on retry 2.
+#965 remains open with the two documented Windows review blockers; green smoke CI does not resolve them.
+
+[[https://github.com/ligon/LSMS_Library/pull/967][Uganda PR #967]] is open against =development=, not merged.
+Branch =fix/962-uganda-food-units= is clean at =a2b44daa677a02c82b60e05016df45e194597e32= and published to the shared origin and GitHub.
+Checkout: =/local/job39263225/worktrees/uganda-food-units=.
+The final library source is =72f8bce34=; =24bd5d084= updates only nine verified food-acquisition content hashes and the ledger; =a2b44daa6= records aggregate evidence.
+CI runs =36227390417= (PR) and =36227371781= (push) were running at this checkpoint.
+No approval to merge this new PR has been assumed.
+
+** Verified behavior and scope
+
+All 7359 former =---= acquisitions are accounted for: 6429 Value, 905 Unknown, 24 distinct recorded-code residuals and one recovered physical fish-unit row.
+Value carries expenditure as quantity with no reported Price; Unknown retains native quantities; neither receives a kg factor.
+The catalog promotes 131 recorded measurement labels, preserving all source-wave strings and previously nonblank preferred labels.
+The 24 residual-code rows retain existing inferred factors; the fish label retains the existing 2 kg range-endpoint convention.
+All acquisitions, purchased/all-source expenditures, food household-wave coverage, previously labelled physical quantities/prices and FCT are exact against base.
+Seven outputs were cold-built on base and candidate; the final source replay plus three price modes equals the first candidate exactly.
+Kilograms change by -849.299850578, fully attributed.
+Nutrition equals rebuilt kg quantities times FCT, but loses 24 household-wave rows with no convertible kg quantity (20 previously nonzero); 60 retained rows change.
+The broader #850 nutrition drift and published-paper baseline remain scientifically unadjudicated.
+
+** Tests, evidence and next action
+
+28 focused tests and 1728 independent oracle cases pass; categorical review regression fixed.
+Initial full suite: 6698 passed, 211 skipped, eight xfailed, one xpassed; cache-dependent skips meant it did not check food hashes before their parquets existed.
+Matched cold data with the original manifest: base 11 passed/one nutrition failure/41 skipped; candidate two passed/ten failed/41 skipped.
+Exactly nine food content hashes change; all structural fields match, and final cold replay confirms each new hash.
+Only those nine hashes were updated; every other fixture field, including nutrition, remains unchanged.
+Final built-data selection: 120 passed, 58 skipped, one retained nutrition-manifest failure (115.52 s).
+The base already fails the nutrition hash; the candidate additionally differs by the 24 accounted-for rows. Do not describe every nutrition mismatch as preexisting.
+API audit passes; all 24 Uganda scheme hashes change, 429 other-country hashes and global fingerprints do not.
+
+Durable report on the PR branch: =slurm_logs/uganda_units_2026-09-25/VALIDATION.org:1=.
+Runnable commands: =slurm_logs/uganda_units_2026-09-25/validation/COMMANDS.org:1=; source ledger: =.coder/ledger/962-uganda-food-units.md:1=.
+Raw frames and logs remain private under =/local/job39263225/uganda-units/=; only aggregate evidence is committed.
+No local test/build/agent worker remains active.
+Next action: check PR #967 CI and review its recorded nutrition limitation; do not regenerate the historical nutrition baseline merely to make the manifest green.
+The billed allocation remains active. Run =sucoder release= when finished with the node.
+
+-- Sue
 
 * Reviewed green PRs merged; Uganda corrections in progress
 
