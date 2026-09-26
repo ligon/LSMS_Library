@@ -183,8 +183,10 @@ jobs:
           activate-environment: lsms
       - name: Install make + m2 tools, then the library
         shell: cmd /C CALL {0}
+        # `call`: conda is a .bat, and a batch file that runs another without
+        # `call` never returns -- the pip line below silently did not run.
         run: |
-          conda install -y -c conda-forge make m2-bash m2-coreutils m2-findutils
+          call conda install -y -c conda-forge make m2-bash m2-coreutils m2-findutils
           pip install .
       - name: Configure S3 read credentials
         shell: cmd /C CALL {0}
