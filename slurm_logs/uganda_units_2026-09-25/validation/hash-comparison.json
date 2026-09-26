@@ -1,0 +1,38 @@
+{
+  "base": "4c2223aa1",
+  "candidate_source": "72f8bce34",
+  "total_country_scheme_hashes": 453,
+  "changed_tables": {
+    "Uganda": [
+      "people_last7days",
+      "sample",
+      "cluster_features",
+      "household_roster",
+      "individual_education",
+      "shocks",
+      "earnings",
+      "food_acquired",
+      "fct",
+      "nutrition",
+      "interview_date",
+      "panel_ids",
+      "income",
+      "enterprise_income",
+      "assets",
+      "months_food_inadequate",
+      "housing",
+      "plot_features",
+      "crop_production",
+      "plot_inputs",
+      "livestock",
+      "anthropometry",
+      "plot_labor",
+      "nonfood_expenditures"
+    ]
+  },
+  "changed_global_fingerprints": [],
+  "errors": {
+    "base": {},
+    "candidate": {}
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "org_foods": 135,
+  "csv_foods": 137,
+  "matched_foods": 135,
+  "matched_nutrients": 15,
+  "cells": 2025,
+  "differing_cells": 0,
+  "max_abs_delta": 1.4210854715202004e-14,
+  "csv_labels_without_org_reconstruction": [
+    "Cooking Oil (refined)",
+    "Cooking Oil (unrefined)"
+  ],
+  "org_labels_without_csv": [],
+  "source_basis": "Org nutrition table per 100 g, multiplied by 10 as documented at nutrition.org:2188",
+  "csv_zeros_with_positive_org": 0,
+  "limitations": [
+    "This validates the committed CSV against its recorded source table/crosswalk, not original survey quantities or an independent laboratory source.",
+    "USDA additions are available as committed per-kg CSV but their upstream responses were not refetched.",
+    "Zeros represent both recorded zeros and the source recipe fillna(0); no clinical adequacy claim."
+  ]
+}

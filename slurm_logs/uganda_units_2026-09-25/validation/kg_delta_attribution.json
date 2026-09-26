@@ -1,0 +1,101 @@
+{
+  "kg_delta": -849.2998505776974,
+  "attribution": [
+    {
+      "raw_category": "missing_raw_unit",
+      "u": "Unknown",
+      "rows": 904,
+      "kg_before": 890.3835416666666,
+      "kg_after": 0.0,
+      "kg_delta": -890.3835416666666
+    },
+    {
+      "raw_category": "missing_raw_unit",
+      "u": "Value",
+      "rows": 6429,
+      "kg_before": 0.0,
+      "kg_after": 0.0,
+      "kg_delta": 0.0
+    },
+    {
+      "raw_category": "promoted_physical_code",
+      "u": "Fish Cut piece(Above 2  kg)",
+      "rows": 1,
+      "kg_before": 0.2583333333333333,
+      "kg_after": 8.0,
+      "kg_delta": 7.741666666666667
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "136",
+      "rows": 12,
+      "kg_before": 2.777083333333333,
+      "kg_after": 24.56897926634769,
+      "kg_delta": 21.791895933014356
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "139093",
+      "rows": 3,
+      "kg_before": 1.4854166666666666,
+      "kg_after": 6.708333333333334,
+      "kg_delta": 5.222916666666667
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "142090",
+      "rows": 1,
+      "kg_before": 0.06458333333333333,
+      "kg_after": 0.8823529411764706,
+      "kg_delta": 0.8177696078431372
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "142092",
+      "rows": 2,
+      "kg_before": 0.19374999999999998,
+      "kg_after": 2.768817204301075,
+      "kg_delta": 2.575067204301075
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "156087",
+      "rows": 3,
+      "kg_before": 0.38749999999999996,
+      "kg_after": 1.875000010477379,
+      "kg_delta": 1.487500010477379
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "156090",
+      "rows": 1,
+      "kg_before": 0.4520833333333333,
+      "kg_after": 1.75,
+      "kg_delta": 1.2979166666666666
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "156096",
+      "rows": 1,
+      "kg_before": 0.03229166666666666,
+      "kg_after": 0.125,
+      "kg_delta": 0.09270833333333334
+    },
+    {
+      "raw_category": "recorded_code_residual",
+      "u": "181087",
+      "rows": 1,
+      "kg_before": 0.06458333333333333,
+      "kg_after": 0.25,
+      "kg_delta": 0.18541666666666667
+    },
+    {
+      "raw_category": "zero_code",
+      "u": "Unknown",
+      "rows": 1,
+      "kg_before": 0.12916666666666665,
+      "kg_after": 0.0,
+      "kg_delta": -0.12916666666666665
+    }
+  ]
+}

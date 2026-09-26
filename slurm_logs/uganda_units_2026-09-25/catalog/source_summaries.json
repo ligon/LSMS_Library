@@ -1,0 +1,83 @@
+[
+  {
+    "wave": "2005-06",
+    "rows": 40394,
+    "blank_code_rows": 0,
+    "blank_codes_used": [],
+    "labels_count": 93,
+    "data_source": "lsms_library/countries/Uganda/2005-06/Data/GSEC14A.dta"
+  },
+  {
+    "wave": "2009-10",
+    "rows": 37890,
+    "blank_code_rows": 0,
+    "blank_codes_used": [],
+    "labels_count": 87,
+    "data_source": "lsms_library/countries/Uganda/2009-10/Data/GSEC15b.dta"
+  },
+  {
+    "wave": "2010-11",
+    "rows": 35232,
+    "blank_code_rows": 0,
+    "blank_codes_used": [],
+    "labels_count": 131,
+    "data_source": "lsms_library/countries/Uganda/2010-11/Data/GSEC15b.dta"
+  },
+  {
+    "wave": "2011-12",
+    "rows": 38743,
+    "blank_code_rows": 6,
+    "blank_codes_used": [
+      0,
+      136
+    ],
+    "labels_count": 265,
+    "data_source": "lsms_library/countries/Uganda/2011-12/Data/GSEC15B.dta"
+  },
+  {
+    "wave": "2013-14",
+    "rows": 50422,
+    "blank_code_rows": 2,
+    "blank_codes_used": [
+      142092
+    ],
+    "labels_count": 143,
+    "data_source": "lsms_library/countries/Uganda/2013-14/Data/GSEC15B.dta"
+  },
+  {
+    "wave": "2015-16",
+    "rows": 49751,
+    "blank_code_rows": 11,
+    "blank_codes_used": [
+      123060,
+      139093,
+      142090,
+      156087,
+      156090,
+      156096,
+      181087
+    ],
+    "labels_count": 143,
+    "data_source": "lsms_library/countries/Uganda/2015-16/Data/gsec15b.dta"
+  },
+  {
+    "wave": "2018-19",
+    "rows": 415532,
+    "blank_code_rows": 3,
+    "blank_codes_used": [
+      136
+    ],
+    "labels_count": 146,
+    "data_source": "lsms_library/countries/Uganda/2018-19/Data/GSEC15B.dta"
+  },
+  {
+    "wave": "2019-20",
+    "rows": 385434,
+    "blank_code_rows": 5,
+    "blank_codes_used": [
+      136
+    ],
+    "labels_count": 150,
+    "data_source": "lsms_library/countries/Uganda/2019-20/Data/HH/gsec15b.dta"
+  }
+]

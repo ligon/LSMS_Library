@@ -1,0 +1,144 @@
+Code,Proposed_Label,Source_Label,Source_Wave,Physical,Canonical_Equivalent,Raw_Rows,Rationale
+0,Unknown,,,False,,2,"Unlabelled zero code; agreed missing-unit sentinel policy."
+104002,Plastic Basin (5 ltrs),Plastic basin(5lts),2011-12,True,103,0,Existing canonical code 103; equivalent source container and size.
+104003,Sadolin Tin (3ltrs),Sadolin tin - 3lts,2011-12,True,133,0,Existing canonical code 133; equivalent source container and size.
+104087,Piece (Big),Piece/Unit -Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+104088,Piece (Medium),Piece/Unit -medium,2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+104089,Piece (Small),Piece/Unit -small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+105091,Heap (Medium),Heap - Medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+105092,Heap (Small),Heap - Small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+107087,Piece (Big),Piece/Unit-Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+107088,Piece (Medium),Piece/Unit-medium,2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+107089,Piece (Small),Piece/Unit-small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+107090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+107091,Heap (Medium),Heap - medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+107092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+109087,Piece (Big),Piece/Unit - Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+109088,Piece (Medium),Piece/Unit - medium,2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+109089,Piece (Small),Piece/Unit - small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+109090,Heap (Big),Heap -big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+109092,Heap (Small),Heap -small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+111087,Piece (Big),Piece/Unit-Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+111088,Piece (Medium),Piece/Unit-medium,2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+111089,Piece (Small),Piece/Unit- small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+111090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+113087,Piece (Big),Piece/Unit -Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+113088,Piece (Medium),Piece/Unit -medium,2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+113089,Piece (Small),Piece/Unit -small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+114087,"Piece (Big, 1 kg)",Piece/Unit-Big (1kg),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+114089,"Piece (Small, 0.5 kg)",piece/Unit - small (0.5kg),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+121087,Piece (Big),Piece/unit-Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+121089,Piece (Small),Piece/unit-small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+122055,Fish Whole (Small),Whole fish(small),2011-12,True,55,0,Existing canonical code 55; equivalent source container and size.
+122056,Fish Whole (Medium),Whole fish(medium),2011-12,True,56,0,Existing canonical code 56; equivalent source container and size.
+122057,Fish Whole (Large),Whole fish(large),2011-12,True,100,0,Existing canonical code 100; equivalent source container and size.
+123055,Fish Whole (Small),Whole fish(small),2011-12,True,55,0,Existing canonical code 55; equivalent source container and size.
+123056,Fish Whole (Medium),Whole fish(medium),2011-12,True,56,0,Existing canonical code 56; equivalent source container and size.
+123057,Fish Whole (Large),Whole fish(Large),2011-12,True,100,0,Existing canonical code 100; equivalent source container and size.
+123058,Fish Cut piece (up to 1kg),Cut piece(up to 1kg)-small,2011-12,True,58,0,Existing canonical code 58; equivalent source container and size.
+123059,Fish Cut piece (1 - 2 kg),Cut piece(1 to 2 kg)-medium,2011-12,True,59,0,Existing canonical code 59; equivalent source container and size.
+123060,Fish Cut piece(Above 2  kg),Cut piece(above 2kg)-Big,2011-12,True,60,1,Existing canonical code 60; equivalent source container and size.
+123090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+123091,Heap (Medium),Heap -medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+123092,Heap (Small),Heap -small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+124088,Piece,piece/unit,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+125050,Packet (1 lt/1 kg),Packet(1lt/1kg),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+125051,Packet (1/2 lt / 1/2 kg),Packet(1/2lt / 1/2kg),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+125052,Packet (1/4 lt / 1/4 kg),Packet(1/4lt / 1/4kg),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+128004,Bottle (350g),Bottle(350g),2011-12,True,132,0,Existing canonical code 132; equivalent source container and size.
+128005,Bottle (500g),Bottle(500g),2011-12,True,131,0,Existing canonical code 131; equivalent source container and size.
+128051,Packet (500 g),Packet -Big (1/2kg),2011-12,True,51,0,Existing canonical code 51; equivalent source container and size.
+128052,Packet (250 g),Packet -medium (1/4kg),2011-12,True,52,0,Existing canonical code 52; equivalent source container and size.
+128053,Packet (100 g),Packet -small (100g),2011-12,True,53,0,Existing canonical code 53; equivalent source container and size.
+129001,"Margarine (1 kg, Big)",Margarine-1kg(Big),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+129002,"Margarine (0.5 kg, Medium)",Margarine-0.5kg(medium),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+129003,"Margarine (0.25 kg, Small)",Margarine-0.25kg(small),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+129004,"Margarine (0.125 kg, Smallest)",Margarine-0.125kg(smallest),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+130090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+130091,Heap (Medium),Heap - Medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+130092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+131093,Cluster (Big),Cluster - Big,2011-12,True,93,0,Existing canonical code 93; same native unit and relative size.
+131094,Cluster (Medium),Cluster - medium,2011-12,True,94,0,Existing canonical code 94; same native unit and relative size.
+131095,Cluster (Small),Cluster - small,2011-12,True,95,0,Existing canonical code 95; same native unit and relative size.
+132087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+132088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+132089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+133087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+133088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+133089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+133090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+133092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+135087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+135088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+135089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+135090,Heap (Big),Heap - big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+135091,Heap (Medium),Heap - medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+135092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+135096,Bundle (Big),Bundle (Big),2011-12,True,96,0,Existing canonical code 96; same native unit and relative size.
+135097,Bundle (Medium),Bundle - medium,2011-12,True,97,0,Existing canonical code 97; same native unit and relative size.
+135098,Bundle (Small),Bundle (small),2011-12,True,98,0,Existing canonical code 98; same native unit and relative size.
+136087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+136088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+136089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+136090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+136091,Heap (Medium),Heap - medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+136092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+137087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+137088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+137089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+138096,Bundle (Big),Bundle - Big,2011-12,True,96,0,Existing canonical code 96; same native unit and relative size.
+138097,Bundle (Medium),Bundle - medium,2011-12,True,97,0,Existing canonical code 97; same native unit and relative size.
+138098,Bundle (Small),Bundle - small,2011-12,True,98,0,Existing canonical code 98; same native unit and relative size.
+151024,Soda (500 ml),soda-500ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+151026,Soda (300 ml),Soda-300ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+152024,Beer (500 ml),Beer-500ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+153001,153001,Other alcoholic drinks,2011-12,False,,0,Item-only source label establishes no measurement unit; explicit accepted code residual.
+154001,154001,Other drinks,2011-12,False,,0,Item-only source label establishes no measurement unit; explicit accepted code residual.
+155054,Stick,Cigarettes ( stick),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+155099,Packet (20 sticks),Packet(20 sticks),2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+157001,Plate,Food-plate,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+158024,Soda (500 ml),soda-500ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+158026,Soda (300 ml),Soda-300ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+159024,Beer (500 ml),Beer-500ml,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+160001,160001,Other Juice,2011-12,False,,0,Item-only source label establishes no measurement unit; explicit accepted code residual.
+161001,Plate,Other foods - plate,2011-12,True,,0,Recorded physical unit/size; spelling and punctuation only; no invented container.
+164087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+164088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+164089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+165087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+165088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+165089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+166087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+166088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+166089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+167087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+167088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+167089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+167090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+167091,Heap (Medium),Heap - medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+167092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+168087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+168088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+168089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+168090,Heap (Big),Heap - Big,2011-12,True,90,0,Existing canonical code 90; same native unit and relative size.
+168091,Heap (Medium),Heap -  medium,2011-12,True,91,0,Existing canonical code 91; same native unit and relative size.
+168092,Heap (Small),Heap - small,2011-12,True,92,0,Existing canonical code 92; same native unit and relative size.
+169087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+169088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+169089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+170087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+170088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+170089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+171087,Piece (Big),Piece/Unit (Big),2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+171088,Piece (Medium),Piece/Unit (medium),2011-12,True,88,0,Existing canonical code 88; same native unit and relative size.
+171089,Piece (Small),Piece/Unit (small),2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+807087,Piece (Big),Piece/unit-Big,2011-12,True,87,0,Existing canonical code 87; same native unit and relative size.
+807089,Piece (Small),Piece/unit-small,2011-12,True,89,0,Existing canonical code 89; same native unit and relative size.
+136,136,,,False,,12,No unit label in any wave codebook; explicit accepted code residual.
+156087,156087,,,False,,3,No unit label in any wave codebook; explicit accepted code residual.
+139093,139093,,,False,,3,No unit label in any wave codebook; explicit accepted code residual.
+142092,142092,,,False,,2,No unit label in any wave codebook; explicit accepted code residual.
+156096,156096,,,False,,1,No unit label in any wave codebook; explicit accepted code residual.
+156090,156090,,,False,,1,No unit label in any wave codebook; explicit accepted code residual.
+181087,181087,,,False,,1,No unit label in any wave codebook; explicit accepted code residual.
+142090,142090,,,False,,1,No unit label in any wave codebook; explicit accepted code residual.

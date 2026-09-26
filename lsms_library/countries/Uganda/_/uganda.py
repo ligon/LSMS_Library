@@ -285,14 +285,11 @@ def harmonized_unit_labels(key='Code', value='Preferred Label'):
     roadmap and Tier 1 convention (Malawi, Mali, Nigeria, Senegal,
     Burkina Faso).
 
-    The org table reuses the ``---`` sentinel for empty cells (per
-    ``df_from_orgfile``).  To preserve compatibility with the previous
-    CSV-based behaviour -- which carried explicit ``'---'`` strings as
-    the canonical label for unit codes that exist but lack a meaningful
-    label -- we restore those NaN-valued labels to the literal
-    ``'---'`` string.  Codes are coerced to ``int`` so the mapping
-    matches the float-typed ``u`` index values produced by the wave
-    scripts (``hash(1) == hash(1.0)``; a string key would not match).
+    An unexpectedly empty Preferred Label retains its distinct code as
+    a string; it must not become a shared invented unit.  Integer-valued
+    codes are coerced to ``int`` to match the float-typed ``u`` index
+    values produced by the wave scripts (``hash(1) == hash(1.0)``).
+    Genuine fractional codes are never truncated to a different code.
     """
     from lsms_library.local_tools import get_categorical_mapping
 
@@ -303,13 +300,14 @@ def harmonized_unit_labels(key='Code', value='Preferred Label'):
     unitlabels = {}
     for k, v in raw.items():
         try:
-            int_k = int(k)
+            numeric_k = float(k)
+            code = int(numeric_k) if numeric_k.is_integer() else k
         except (TypeError, ValueError):
-            int_k = k
-        if pd.isna(v):
-            unitlabels[int_k] = '---'
+            code = k
+        if pd.isna(v) or not str(v).strip():
+            unitlabels[code] = str(code)
         else:
-            unitlabels[int_k] = str(v).strip()
+            unitlabels[code] = str(v).strip()
     return unitlabels
 
 def harmonized_food_labels(fn=None,key='Code',value='Preferred Label'):
@@ -361,13 +359,18 @@ def harmonized_food_labels(fn=None,key='Code',value='Preferred Label'):
 
 
 def food_acquired(fn,myvars):
+    from lsms_library.country import _augment_numeric_code_keys
+    from lsms_library.transformations import U_UNKNOWN
 
     df = get_dataframe(fn,convert_categoricals=False)
 
     df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
 
-    # Replace missing unit values
-    df['units'] = df['units'].fillna('---')
+    # Missing is not a physical unit.  Cast before inserting the sentinel
+    # so nullable numeric and categorical source columns also accept it.
+    units = df['units'].astype(object)
+    blank = units.map(lambda value: isinstance(value, str) and not value.strip())
+    df['units'] = units.mask(units.isna() | blank, U_UNKNOWN)
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 
@@ -380,7 +383,7 @@ def food_acquired(fn,myvars):
         df = df.rename(index=fix,level=0)
 
     df = df.rename(index=harmonized_food_labels(),level='j')
-    unitlabels = harmonized_unit_labels()
+    unitlabels = _augment_numeric_code_keys(harmonized_unit_labels())
     df = df.rename(index=unitlabels,level='u')
 
     if not 'market' in df.columns:
@@ -395,7 +398,8 @@ def food_acquired(fn,myvars):
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('u').tolist()))
 
-    unknown_units = set(units).difference(unitlabels.values())
+    accepted_units = set(unitlabels.values()) | {U_UNKNOWN}
+    unknown_units = set(units).difference(accepted_units)
     if len(unknown_units):
         # GH #832.  This used to warn "Dropping some unknown unit codes!" with
         # the labels merely `print`ed, so the warning could not be triaged:
@@ -404,7 +408,7 @@ def food_acquired(fn,myvars):
         # something was.  The message is built per call (so Python's
         # once-per-location warning de-duplication does not suppress a second,
         # different wave) and the offending labels are sorted for determinism.
-        keep = df.index.isin(unitlabels.values(), level='u')
+        keep = df.index.isin(accepted_units, level='u')
         dropped = df.loc[~keep]
         per_label = (dropped.index.get_level_values('u')
                             .value_counts()
@@ -478,11 +482,13 @@ def food_acquired_to_canonical(df):
       do not record an imputed valuation distinct from value_inkind)
 
     Rows are kept where EITHER ``Quantity > 0`` OR ``Expenditure > 0``.
-    Expenditure-only rows (HH reported a food expenditure with no
-    quantity — common in Uganda's GSEC15b for food consumed away from
-    home) are legitimate data and are carried through with NaN
-    ``Quantity``.  Matches the shared
-    :func:`lsms_library.transformations.food_acquired_to_canonical` rule.
+    For ``u='Unknown'``, a source with positive expenditure and all its
+    original quantity fields zero or missing becomes ``u='Value'`` with
+    ``Quantity = Expenditure`` and missing ``Price``.  Purchased food
+    checks both home and away quantities before their sum: reported
+    negatives or cancelling quantities remain ``Unknown``.  Classify
+    before duplicate aggregation so expenditure-only and physical reports
+    remain separate.  Known units retain their quantities, including NaN.
 
     Notes
     -----
@@ -494,18 +500,18 @@ def food_acquired_to_canonical(df):
       ``sample()`` at API time.  See CLAUDE.md "## ``sample()`` and
       Cluster Identity".
     - ``Price`` is carried for purchased / produced rows from the
-      survey-reported ``market`` / ``farmgate`` columns.  The framework's
-      ``food_prices_from_acquired`` currently re-derives Price from
-      ``Expenditure / Quantity_kg`` and ignores a stored Price; the
-      stored Price preserves the survey-reported information for
-      consumers reading the wave parquet directly, and is forward-
-      compatible with a future framework change to prefer stored Price
-      where available (per DESIGN doc).
+      survey-reported ``market`` / ``farmgate`` columns, except for rows
+      retyped as ``Value``: those prices were not reported per currency
+      unit.  The wide input retains the original observations.  Runtime
+      ``unitprice`` / ``kgprice`` modes consume stored ``Price``;
+      ``unitvalue`` / ``kgvalue`` derive prices from expenditure/quantity.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     work = df.reset_index()
 
     # Build the three per-source pieces.
-    def _make(source_label, qty, expenditure, price):
+    def _make(source_label, qty, expenditure, price, quantity_columns):
         out = pd.DataFrame({
             't': work['t'].values,
             'i': work['i'].values,
@@ -516,11 +522,22 @@ def food_acquired_to_canonical(df):
             'Expenditure': pd.to_numeric(expenditure, errors='coerce').values,
             'Price': pd.to_numeric(price, errors='coerce').values,
         })
+        original_qty = work[quantity_columns]
+        no_quantity = (original_qty.isna() | original_qty.eq(0)).all(axis=1)
+        value_only = (out['u'].eq(U_UNKNOWN) & no_quantity
+                      & out['Expenditure'].gt(0))
+        if value_only.any():
+            # Categorical units may not contain Value.  Leave their dtype
+            # alone when no source row needs retyping.
+            if isinstance(out['u'].dtype, pd.CategoricalDtype):
+                out['u'] = out['u'].astype(object)
+            out.loc[value_only, 'u'] = 'Value'
+            out.loc[value_only, 'Quantity'] = out.loc[value_only, 'Expenditure']
+            out.loc[value_only, 'Price'] = np.nan
         return out
 
     # Purchased: fold home + away.  Sum with min_count=1 so a row with
-    # both NaN stays NaN (and is dropped below); a row with one value
-    # populated keeps that value.
+    # both NaN stays NaN; a row with one value populated keeps that value.
     purchased_qty = work[['quantity_home', 'quantity_away']].sum(
         axis=1, min_count=1)
     purchased_val = work[['value_home', 'value_away']].sum(
@@ -530,19 +547,18 @@ def food_acquired_to_canonical(df):
                                                                    index=work.index))
 
     purchased = _make('purchased', purchased_qty, purchased_val,
-                      purchased_price)
+                      purchased_price, ['quantity_home', 'quantity_away'])
     produced  = _make('produced',  work['quantity_own'], work['value_own'],
                       work['farmgate'] if 'farmgate' in work.columns
-                      else pd.Series(np.nan, index=work.index))
+                      else pd.Series(np.nan, index=work.index), ['quantity_own'])
     inkind    = _make('inkind',    work['quantity_inkind'],
                       work['value_inkind'],
-                      pd.Series(np.nan, index=work.index))
+                      pd.Series(np.nan, index=work.index), ['quantity_inkind'])
 
     from lsms_library.transformations import _finalize_canonical_food_acquired
 
     out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity --
-    # GH #246 C-2) and aggregate genuine source-data duplicates (e.g. two
+    # Filter (qty>0 | exp>0) and aggregate genuine source-data duplicates (e.g. two
     # ``Other (Specify)`` rows under one canonical key) via the shared tail
     # (GH #251): Quantity/Expenditure summed with min_count=1, per-unit
     # Price averaged.
