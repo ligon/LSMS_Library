@@ -14,6 +14,19 @@ Agreed corrections: expenditure-only missing-unit rows use =Value= with =Quantit
 Independent catalog audit and cold baseline food/nutrition rebuild are running in private scratch =/local/job39263225/uganda-units/=.
 Do not regenerate the published or test nutrition baseline.
 
+Progress at 2026-09-26 00:08 PDT: Uganda source commit =a45d319bd= and aggregate evidence commit =784dd2552= are published on =fix/962-uganda-food-units=.
+24 focused tests pass; the catalog audit preserves 289 keys, promotes 131 measurement labels and retains 11 distinct code residuals.
+The source-ledger commits are =b22720d25= / =d57e7e9d0=.
+Cold base output is saved under =/local/job39263225/uganda-units/nutrition/base_*=.
+Cold candidate and full suite are running separately; source remains frozen until they finish.
+Independent review found one categorical-index assignment regression in =uganda.py:529=; the code worker is preparing a narrow patch and tests but must wait for the freeze to end before applying.
+Review/reproducer: =/local/job39263225/uganda-units/catalog/code-review/REVIEW.md=.
+Full-suite log: =/local/job39263225/uganda-units/full-suite.log= (16 workers, CPUs 8-23, copied private L2 cache).
+Candidate build log: =/local/job39263225/uganda-units/nutrition/build_candidate.log= (CPUs 24-35, cold private L2).
+All 24 Uganda scheme hashes change; 429 other-country hashes and all global fingerprints remain unchanged.
+No Uganda PR has been opened yet.
+Post-merge GitHub CI run =36224578786= failed once during Poetry plugin installation (unavailable platformdirs 4.11.15); retry 2 passed installation and is running tests.
+
 -- Sue
 
 
