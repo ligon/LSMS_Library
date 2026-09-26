@@ -7,9 +7,12 @@ ag_p00, crop ag_p0c.  Sources (flat Data/):
   * AG_MOD_G_13 — seasonal harvest, plot=ag_g00, crop=ag_g0b (1-48).
   * AG_MOD_P_13 — perennial harvest, plot=ag_p00, crop=ag_p0c (->+1000).
   * AG_MOD_I_13 — seasonal SALE (hh, crop): crop=ag_i0b, sold=ag_i01,
-    qty=ag_i02a, value=ag_i03.
+    qty=ag_i02a, unit=ag_i02b, S/U=ag_i02c, value=ag_i03.
   * AG_MOD_Q_13 — perennial SALE (hh, crop): crop=ag_q0b, qty=ag_q02a,
-    value=ag_q03.
+    unit=ag_q02b, value=ag_q03.  NO S/U column in this wave (ag_q02c
+    exists from 2016-17 only): every perennial sale is
+    `unknown_condition` on the sale side and attaches on the wildcard
+    (registered as Malawi::crop_production::sale-basis-unknown-wildcard).
 
 i = format_id(y2_hhid), aligning with plot_features 2013-14.  See
 lsms_library/countries/Malawi/_/malawi.py.
@@ -44,9 +47,11 @@ harvest = [
 sale = [
     _sale_block(i_mod, hhid='hhid', cropcode='ag_i0b', sold_flag='ag_i01',
                 qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+                condition='ag_i02c',
                 perennial=False),
     _sale_block(q, hhid='hhid', cropcode='ag_q0b', sold_flag='ag_q01',
                 qty_sold='ag_q02a', value_sold='ag_q03', unit_sold='ag_q02b',
+                condition='ag_q02c',
                 perennial=True),
 ]
 

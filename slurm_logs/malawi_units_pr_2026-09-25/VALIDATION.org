@@ -1,0 +1,133 @@
+#+title: Malawi sale-unit PR validation -- 2026-09-25
+#+author: Sue (GPT-6)
+
+* Scope and environment
+
+Baseline: GitHub =development= at =3cf124ca3886e08e98a3e10324270ea8ecdccda6=.
+Candidate code: =2515d16686f556d630f89390383691ab3c13c7bc=; subsequent commits add only the ledger and these validation records plus a hash-excluded =CONTENTS.org= clarification.
+The branch contains only Malawi work cherry-picked onto the GitHub base, excluding unrelated changes on the shared mirror.
+
+Execution used Savio job 39263225, node =n0235.savio3=, an exclusive 40-core allocation with 93 GiB RAM.
+Python came from =/local/job39263225/venv_img/bin/python=, with pandas 3.0.6, pyarrow 25.0.1 and numpy 2.4.6.
+Baseline and candidate used separate initially empty L2 roots, sharing only the content-addressed DVC blob cache.
+The candidate built dependencies first, then used eight independent table workers with one build worker and one BLAS thread per process.
+All results below are from the final code; an earlier partial build was superseded.
+
+* Results
+
+- Cold builds :: All 26 public API entries succeeded on both revisions: 21 materialized source tables, four derived tables and the panel mapping.
+- Tests :: 517 passed, 42 warnings, zero failures/errors/skips in 369.73 seconds; all 18 delivered sale-basis tests ran.
+- Scoped Feature audit :: The baseline and candidate each produced the same 150 class-C warning findings, with no failures/errors/skips and no added or removed finding after checkout/cache path normalization.
+- Derivation inputs :: All 32 calls (eight keys across four waves) passed the join/deletion checks; Feature assembly retained the per-row keys and attrs.
+- Independent review :: PASS after the null-unit regression and documentation fixes; 675 graph-oracle cases passed. Ten seeded 5,000-row mixed/null-unit samples produced exactly equal old/new reference statistics (seed 20260925).
+- Cache integrity :: All 21 candidate country parquets match their expected content hash and declare all-wave coverage; no parquet was written inside the repository.
+- API audit :: Strict audit passed: 10 documented kwargs, 15 listed skills, no untracked hashed build inputs.
+
+The selected suite covers every =tests/test_malawi_*.py= file plus derivations, schema consistency, build-transform hashes and canonical Feature indices.
+It is not the entire repository suite.
+The audit's 150 findings include 120 ResourceWarnings; the remaining findings are pre-existing quantity, null-index, season, population and schema diagnostics.
+
+* Changes against GitHub development
+
+=crop_production= keeps all 135,078 rows, the exact index and all six harvest columns.
+Total served =Value_sold= falls from 1,176,153,003 to 1,162,507,323 MWK: 341 unresolved attachments (13,648,180 MWK) are withheld and one formerly ambiguous sale (2,500 MWK) attaches.
+Every surviving sale retains its reported quantity and value.
+The unresolved sales remain available through the registered deletion-input accessor.
+
+=food_acquired= keeps 971,531 rows and every reported quantity and expenditure after the intended labels are matched.
+=food_expenditures= likewise changes only labels.
+There are 35 changed inferred kilogram quantities, totaling +0.85217119 kg, and 31 changed prices.
+The factor replay in =trace_food_factors.py= reproduces both baseline and candidate derived tables exactly:
+
+- Raw/vendor separation :: 34 boiled-groundnut rows change weight because the existing pooled-unit fallback replaces an item reference mixed with raw groundnuts; five additional rows change factor source but have equal numerical factors.
+- Kilogram alias :: One roasted-groundnut row changes from the 0.324 kg unit fallback to the metric 1 kg factor; its price changes from about 925.93 to 300 MWK/kg.
+
+The maximum absolute row changes are 0.676 kg and about 4,224.53 MWK/kg.
+All changed inferred food quantities/prices occur in 2016-17 or 2019-20.
+No other foods or waves change numerically.
+
+=plot_inputs= changes exactly 93,162 native-unit labels from =Kilogram= to =Kilogramme=, with every value unchanged.
+The remaining 20 API entries, including the panel mapping, are unchanged in their served values, indices and dtypes.
+Generic date-parsing, resource and deprecation warnings were excluded from the direct table diagnostic comparison; the separate scoped Feature audit retains its full warning comparison.
+The food diagnostic count of stated/inferred item-unit contradictions decreases from 85 to 83; its 46 warned native-unit labels are unchanged.
+
+All 24 Malawi scheme-key hashes change, so the 21 materialized source tables rebuild on their next read.
+All 61 control hashes from Uganda, Niger and GhanaLSS, and the four checked framework fingerprints, remain identical.
+
+* Scope limits
+
+The price-overrule subgroup has four sales and no independently measured classification accuracy.
+Accuracy on agreeing reference sales does not establish accuracy on that subgroup.
+The approved thresholds and outer-quarter margin gate are unchanged.
+
+=derivation_inputs= returns selected raw sale-module rows and decision annotations.
+Full classifier replay uses =sale_basis_decisions=, which rereads harvest and reference sources; the returned sale frame alone is not a self-contained classifier dataset.
+The existing variety collapse still discards 27 sales totaling 373,600 MWK; its separate issue draft remains in =slurm_logs/backlog_fix_2026-09-24/issues_to_file.org=.
+
+* Reproduction
+
+Run from the candidate checkout with an importable project environment, source-data access, and a private data root.
+The selected tests used the already cold-built root with =--no-purge=; no shared caches were purged.
+The following is the executed test/audit environment, with checkout and data paths supplied by the shell:
+
+#+begin_src sh :eval never-export :tangle no :exports code
+export PYTHONPATH="$PWD"
+export LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job39263225/malawi-pr-review/verification/data_final
+export PATH=/local/job39263225/venv_img/bin:$PATH
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 PYTHONDONTWRITEBYTECODE=1
+unset PYTHONSAFEPATH LSMS_NO_CACHE
+python -m pytest -n 16 --dist=loadfile --no-purge -q -ra \
+  tests/test_malawi_*.py tests/test_derivations.py \
+  tests/test_schema_consistency.py tests/test_build_transform_hash.py \
+  tests/test_feature_canonical_index.py > pytest.log 2>&1
+python bench/feature_audit/scan.py \
+  --features crop_production food_acquired --countries Malawi \
+  --jobs 2 --phases 1,2 --out feature_audit.jsonl > feature_audit.log 2>&1
+python scripts/api_surface_audit.py --strict
+#+end_src
+
+For a new cold comparison, give each checkout a new =LSMS_DATA_DIR= containing only a =dvc-cache= symlink to the existing L1 blob cache.
+Set =MALAWI_OUTPUT= to a private artifact directory and =MALAWI_MANIFEST= to =results.json= for baseline or =final_build.json= for candidate.
+The following serial reproduction uses the same dependency ordering; the recorded candidate run parallelized independent source tables after the first three entries.
+Save pickles only in the private artifact directory, not in git.
+
+#+begin_src python :eval never-export :tangle no :exports code
+import json
+import os
+from pathlib import Path
+import warnings
+import pandas as pd
+import lsms_library as ll
+from lsms_library.diagnostics import load_feature
+
+assert Path(ll.__file__).resolve().parent == Path.cwd() / 'lsms_library'
+output = Path(os.environ['MALAWI_OUTPUT'])
+output.mkdir(parents=True, exist_ok=True)
+assert not list((Path(os.environ['LSMS_DATA_DIR']) / 'Malawi').rglob('*.parquet'))
+country = ll.Country('Malawi')
+first = ['panel_ids', 'sample', 'cluster_features']
+last = ['food_expenditures', 'food_prices', 'food_quantities',
+        'household_characteristics']
+order = first + [n for n in country.data_scheme if n not in first + last] + last
+results = []
+for name in order:
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        frame = load_feature(country, name)
+    if isinstance(frame, pd.DataFrame):
+        frame.to_pickle(output / (name + '.pkl'))
+    results.append(dict(table=name, rows=len(frame), type=type(frame).__name__,
+                        warnings=[dict(category=type(w.message).__name__,
+                                       message=str(w.message)) for w in caught]))
+(output / os.environ['MALAWI_MANIFEST']).write_text(json.dumps(results, indent=2))
+#+end_src
+
+The comparison runners beside this note take =--baseline=, =--final= and =--out= artifact directories.
+For =compare_outputs.py=, the baseline L2 root is =<baseline>/data= and the candidate L2 root is =<final>/data_final= so it can compare the panel companion parquet too.
+Run =trace_food_factors.py= first, then =compare_outputs.py=; use the candidate checkout and environment for both.
+The retained =food_factor_trace.json= contains only aggregate cells, no household identifiers.
+
+The original execution scripts, logs and private pickles were under =/local/job39263225/malawi-pr-review/= and disappear when the job ends.
+This note, comparison runners and aggregate factor trace are the durable record.
