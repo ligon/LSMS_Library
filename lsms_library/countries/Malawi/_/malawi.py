@@ -1161,8 +1161,11 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     the 11,321 attached sales whose both sides answered the question
     contradicted each other, 375 of them on Groundnut, where the two bases
     differ by the shelling yield (~65%).  ``assemble_crop_production`` now
-    attaches a sale only to a harvest row whose condition it does not
-    contradict.
+    passes the sale's stated answer to the sale-basis ladder: an exact
+    match, an unknown wildcard, or registered price and not-applicable
+    branches.  Price can resolve contradictions, including overruling the
+    sale's answer.  The ladder derives attachment/basis interpretation;
+    reported quantities, values and harvest condition stay unchanged.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
@@ -1742,8 +1745,10 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     -------
     pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
     condition, Quantity_sold, Value_sold, Derivation, planting_month,
-    harvest_month, intercropped, perennial.  Item-level reported values
-    only.  ``u`` and ``condition`` are declared INDEX LEVELS in
+    harvest_month, intercropped, perennial.  Quantities and values remain
+    reported; attachment/basis interpretation may be derived by the ladder
+    below.  The reported harvest condition is preserved.  ``u`` and
+    ``condition`` are declared INDEX LEVELS in
     ``_/data_scheme.yml`` and are promoted by the framework; they are left
     as columns here for the same reason ``u`` always was.
 

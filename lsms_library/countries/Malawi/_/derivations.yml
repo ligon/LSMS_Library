@@ -9,9 +9,12 @@
 # THE SALE-BASIS LADDER (2026-09-24).  crop_production attaches a
 # household-crop SALE (Module I seasonal / Module Q perennial: quantity,
 # unit, shelled/unshelled, value) to the single-plot harvest row (Module G /
-# P) measured in the sale's own unit.  Since GH #833 the sale's own S/U
-# answer (ag_i02c / ag_q02c) must not contradict the row's `condition`
-# (ag_g13c).  Every path by which a sale reaches a row OTHER than an exact
+# P) measured in the sale's own unit.  The ladder retains GH #833's exact
+# matches and unknown wildcard, and adds registered price rules that can
+# resolve contradictory S/U answers (ag_i02c / ag_q02c vs ag_g13c), plus
+# distinct not-applicable branches for measured non-separation or an absent
+# reference.  The reported harvest `condition` stays unchanged.  Every
+# path by which a sale reaches a row OTHER than an exact
 # match of two stated answers is a registered rung below, one key per rung
 # so the path taken is countable; the rows are decided per wave, inside
 # `malawi.assemble_crop_production` (`_attach_sales`), from that wave's own
@@ -247,14 +250,12 @@ Malawi::crop_production::sale-basis-from-price-overrule:
       basis: modelling-choice
       evidence: Malawi::crop_production::sale-basis-from-price
   validated_against: >-
-    The same leave-one-out as from-price (~80% per basis on Groundnut, 87%
-    on the margin > 0.5 x gap subset).  Its own accuracy cannot be measured
-    directly: by construction every sale here has a recorded answer the
-    price disagrees with, and there is no third source.  What can be said
-    is that the recorded field it overrules is the SALE's, which on the
-    contradictions sides with the price 61-77% of the time -- so the
-    overrule is expected to be right roughly four times in five and wrong
-    once, on 4 sales.  Delivered counts per wave are in
+    The from-price leave-one-out recovers the recorded basis on agreeing
+    reference sales (~80% per basis on Groundnut, 87% on the margin > 0.5
+    x gap subset).  These rates do not measure accuracy on the 4 overruled
+    sales: every sale here has a recorded answer the price disagrees with,
+    and there is no third-source oracle to establish which is correct.
+    Accuracy on those 4 cases is unmeasured.  Delivered counts per wave are in
     attrs['sale_basis_ladder'] and CONTENTS.org.
   contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
   since: '2026-09-25'

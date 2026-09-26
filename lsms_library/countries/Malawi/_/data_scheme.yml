@@ -181,14 +181,18 @@ Data Scheme:
   crop_production:
     # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
     # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
-    # values only -- harvest Quantity + native unit + condition, household-
-    # crop sale (Quantity_sold / Value_sold, attached to single-plot crops
-    # only, in the sale's OWN unit (ag_i02b / ag_q02b, GH #824) and only
-    # where the sale's OWN shelled/unshelled answer (ag_i02c / ag_q02c,
-    # GH #833) does not contradict the row's `condition`; a sale that
-    # cannot be expressed at the row's grain is not attached, and is
-    # counted -- see malawi.py:assemble_crop_production), item planting /
-    # harvest-end months, and intercropped / perennial flags.  Sources:
+    # harvest Quantity + native unit + condition, and household-crop sale
+    # Quantity_sold / Value_sold.  Sales attach to single-plot crops only,
+    # in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
+    # ladder admits exact stated condition matches, an unknown wildcard,
+    # registered price rules (including resolving contradictions), and
+    # distinct not-applicable branches for measured non-separation or an
+    # absent reference.  The ladder preserves reported quantities, values
+    # and harvest condition; derived attachment/basis interpretation is
+    # exposed by Derivation.  Unadmitted or ambiguous candidate sales are
+    # counted -- see malawi.py:assemble_crop_production.  Also includes
+    # item planting / harvest-end months and intercropped / perennial flags.
+    # Sources:
     # seasonal Module G + perennial Module P (plot-crop harvest), seasonal
     # Module I + perennial Module Q (household-crop sale).  crop on the
     # shared harmonize_crop -> harmonize_food Preferred Label axis.  THAT
