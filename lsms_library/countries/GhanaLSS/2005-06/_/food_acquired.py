@@ -32,6 +32,15 @@ import pandas as pd
 from lsms_library.local_tools import to_parquet, df_from_orgfile, get_dataframe
 from lsms_library.paths import countries_root
 import mapping
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
+# import ...`: that absolute PACKAGE import binds to whichever `lsms_library`
+# won sys.path rather than to the config tree LSMS_COUNTRIES_ROOT selects
+# (GH #948 / #436; CONTENTS.org Trap 6).  `../../_` is correct from this
+# script's own directory, which is where the Makefile runs it
+# (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
+# in this file already assumes.
+from ghanalss import derive_produced_farmgate_value, to_country_food_labels
 
 t = '2005-06'
 
@@ -221,7 +230,6 @@ assert not fa.index.duplicated().any(), (
 # the .sum()), and ONLY where BOTH factors exist -- a produced row missing
 # either keeps Expenditure NaN and carries NO key, so the labelled rows are
 # exactly the computed ones.
-from lsms_library.countries.GhanaLSS._.ghanalss import derive_produced_farmgate_value
 DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
 _prod = (fa.index.get_level_values('s') == 'produced')
 _both = (_prod
@@ -237,6 +245,5 @@ assert fa.loc[~_both, 'Derivation'].isna().all(), (
 
 # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
 # Pure rename; an unmapped label raises rather than passing through.
-from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
 fa = to_country_food_labels(fa, '2005-06')
 to_parquet(fa, 'food_acquired.parquet')

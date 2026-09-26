@@ -45,7 +45,7 @@ from mapping import i as i_helper
 import numpy as np
 import pandas as pd
 sys.path.append('../../../_/')
-from ghanalss import derive_12b_fortnight_value
+from ghanalss import derive_12b_fortnight_value, to_country_food_labels
 from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
                                       to_parquet)
 
@@ -142,6 +142,5 @@ f['Derivation'] = pd.Series(np.where(produced_mask, DERIVATION_12B, None),
 
 # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
 # Pure rename; an unmapped label raises rather than passing through.
-from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels
 f = to_country_food_labels(f, '1987-88')
 to_parquet(f, 'food_acquired.parquet')
