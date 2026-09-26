@@ -1,7 +1,7 @@
 
 rounds := $(shell ls -d ../2*-*)
 
-source = $(shell find $(rounds) -name '*.py')
+source = $(shell find $(rounds) -name "*.py")
 parquet := $(source:.py=.parquet)
 
 COUNTRY := $(shell basename "$$(cd .. && pwd)")

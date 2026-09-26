@@ -24,6 +24,22 @@ import lsms_library as ll
 print("lsms_library:", ll.__file__, "| data_root:", ll.paths.data_root() if hasattr(ll, "paths") else "?")
 
 failed = False
+
+# Makefile variable expansion: `$(shell find ...)` silently yields an empty
+# list if find mis-parses its pattern, which empties the country targets'
+# prerequisites.  Expand the installed Uganda Makefile and check.
+import subprocess
+from pathlib import Path
+mk_dir = Path(ll.__file__).parent / "countries" / "Uganda" / "_"
+r = subprocess.run(["make", "-s", "-pn"], cwd=mk_dir, capture_output=True, text=True)
+plist = next((l.split("=", 1)[1].split() for l in r.stdout.splitlines()
+              if l.startswith(("parquet := ", "parquet = "))), [])
+bad = [l for l in r.stderr.splitlines() if l.startswith("find:")]
+print(f"MAKEVARS Uganda parquet-list={len(plist)} find-errors={len(bad)}")
+for l in bad[:3]:
+    print("  ", l)
+if not plist or bad:
+    failed = True
 for spec in sys.argv[1:]:
     country, table = spec.split(":")
     t0 = time.time()
