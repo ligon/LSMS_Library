@@ -1,3 +1,35 @@
+#+title: Handoff -- 2026-09-25 (Sue / GPT-6), Savio job 39263225
+
+* Malawi units PR open (2026-09-25 22:59 PDT)
+
+User requested the existing Malawi units work as a PR and explicitly favored rebuilding when useful.
+[[https://github.com/ligon/LSMS_Library/pull/966][PR #966]] is open, ready for review, against GitHub =development=; GitHub reports it mergeable.
+CI unit tests were still running at handoff; local verification is complete.
+No PR was merged and no unrelated issue was closed.
+
+- Branch :: =fix/malawi-sale-units= at =a27aae6d6ea139f0c0b40a5ac0a2d4183d580893=; published to both the shared origin and GitHub.
+- Checkout :: =/local/job39263225/worktrees/malawi-units-pr=; clean.
+- Scope :: Cherry-picked only the two kilogram aliases and the Malawi bundle/derivation stack onto GitHub base =3cf124ca3=, excluding unrelated mirror-development commits.
+- Review fixes :: =1900ecbb3= corrects stale rule descriptions and unsupported accuracy extrapolation; =2515d1668= fixes an all-null-unit reference join with three regression tests.
+- Verification :: Both baseline and candidate cold-built all 26 Malawi API entries. 517 selected tests passed with no skips/failures/errors. All 32 derivation-input checks passed. Scoped Feature audit has the same 150 warnings on both revisions; independent review passed 675 attachment cases.
+- Data effects :: All 135,078 harvest rows and fields survive unchanged. Relative to GitHub, 341 sale attachments are suppressed and one 2,500 MWK sale is recovered. All changes to derived food quantities (35 rows) and prices (31 rows) are attributed to the label/alias fixes; raw quantities/expenditures are preserved. Plot inputs change only 93,162 unit labels.
+- Cache scope :: All 21 materialized Malawi source tables rebuild; all 24 scheme-key hashes change. The 61 other-country control hashes and four framework fingerprints are unchanged.
+- Durable record :: On the PR branch, =slurm_logs/malawi_units_pr_2026-09-25/VALIDATION.org:1=, comparison scripts and aggregate factor trace; =.coder/ledger/malawi-sale-basis-pr.md:1=.
+- Known limits :: =derivation_inputs= returns sale rows, not a self-contained classifier dataset; replay rereads harvest/reference sources. The pre-existing variety collapse (27 sales / 373,600 MWK) remains separate. GH #833/#839 include other countries and remain open.
+
+** Environment and next action
+
+This main clone remains on =development= (previous HEAD =7f7386294=); this handoff is the only new main-branch change.
+The working Python is =/local/job39263225/venv_img/bin/python= (pandas 3.0.6, pyarrow 25.0.1, numpy 2.4.6).
+Do not use the main clone's minimal Poetry-created =.venv= for verification; the mounted image has the tested dependencies.
+Use the worktree as cwd, set =PYTHONPATH= and =LSMS_COUNTRIES_ROOT= to it, pin BLAS/OMP/MKL threads to 1, use =LSMS_BUILD_WORKERS=1= and pytest =--dist=loadfile=.
+Private caches/logs/pickles are under =/local/job39263225/malawi-pr-review/=; they are not durable when the job ends.
+No worker, test, audit or build process remains active from this task.
+Next action: check =gh pr checks 966 -R ligon/LSMS_Library=, then human review/merge.
+The billed allocation remains active; run =sucoder release= when finished with the node.
+
+-- Sue
+
 #+title: Handoff -- 2026-09-24 (Sue / Claude Fable 5.1), Savio job 39195255
 
 * State on arrival (2026-09-24 00:30)
