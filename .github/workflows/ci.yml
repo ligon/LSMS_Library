@@ -122,6 +122,29 @@ jobs:
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
 
+  # GH #964 MEASUREMENT, not a gate: can GNU make + Git-for-Windows' sh drive
+  # a country-shaped Makefile when invoked from Python the way
+  # Country.run_make_target does?  Data-free fixture under
+  # scripts/windows_make_probe/.  Runs as the image ships, then after
+  # `choco install make`.  Replace with a real gate once #964 settles.
+  windows-make-probe:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Probe (image as shipped)
+        run: python scripts/windows_make_probe/probe.py
+      - name: Install GNU make (chocolatey)
+        run: choco install make -y --no-progress
+      - name: Probe (after choco install make)
+        run: |
+          $env:PATH = "C:\ProgramData\chocolatey\bin;" + $env:PATH
+          python scripts/windows_make_probe/probe.py
+
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
   # silent until someone needs the file.  scripts/dvc_remote_reachability.py
