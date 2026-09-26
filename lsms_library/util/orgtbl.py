@@ -90,7 +90,7 @@ def add_or_update_column(
     alignment (computed from the new max width per column).  Org-mode
     realignment in an editor is non-destructive on top of this.
     """
-    text = orgpath.read_text()
+    text = orgpath.read_text(encoding="utf-8")
     lines = text.splitlines(keepends=False)
 
     name_re = re.compile(rf'^#\+name:\s*{re.escape(table_name)}\s*$',
@@ -190,7 +190,7 @@ def add_or_update_column(
 
     new_lines = lines[:header_idx] + out_lines + lines[end_idx:]
     new_text = '\n'.join(new_lines) + ('\n' if text.endswith('\n') else '')
-    orgpath.write_text(new_text)
+    orgpath.write_text(new_text, encoding="utf-8")
 
     n_data_rows = sum(1 for r in new_data if r != 'SEPARATOR')
     return n_data_rows, unmapped
@@ -204,10 +204,10 @@ def _load_mapping(path: Path) -> dict[str, str]:
         except ImportError as exc:
             raise ImportError("PyYAML required to read .yml mappings; "
                               "install pyyaml") from exc
-        loaded = yaml.safe_load(path.read_text())
+        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
     elif suffix == '.json':
         import json
-        loaded = json.loads(path.read_text())
+        loaded = json.loads(path.read_text(encoding="utf-8"))
     else:
         raise ValueError(f"unsupported mapping file extension {suffix!r}; "
                          "use .yml/.yaml or .json")

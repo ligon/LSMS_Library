@@ -1988,7 +1988,7 @@ def scan_script_data_refs(script_path: str | Path):
     escapes -- a documented limitation of script-path coverage.
     """
     try:
-        src = Path(script_path).read_text()
+        src = Path(script_path).read_text(encoding="utf-8")
     except OSError:
         return
     try:

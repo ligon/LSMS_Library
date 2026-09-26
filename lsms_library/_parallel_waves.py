@@ -82,7 +82,7 @@ import traceback
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from multiprocessing import get_context
+from multiprocessing import get_all_start_methods, get_context
 from typing import Any, Callable
 
 WORKERS_ENV = "LSMS_BUILD_WORKERS"
@@ -151,7 +151,7 @@ def visible_cpus(env: dict | None = None) -> int:
 def _read_meminfo_available(path: str = "/proc/meminfo") -> int | None:
     """``MemAvailable`` in bytes, or ``None`` when unreadable (not Linux)."""
     try:
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith("MemAvailable:"):
                     return int(line.split()[1]) * 1024
@@ -177,7 +177,7 @@ def _cgroup_limit_paths() -> list[str]:
     the job node, not the root), then the two root-level spellings."""
     paths: list[str] = []
     try:
-        with open("/proc/self/cgroup") as fh:
+        with open("/proc/self/cgroup", encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith("0::"):
                     node = line.split(":", 2)[2].strip()
@@ -197,7 +197,7 @@ def _read_cgroup_limit(paths: list[str] | None = None) -> int | None:
     limits: list[int] = []
     for path in (paths if paths is not None else _cgroup_limit_paths()):
         try:
-            with open(path) as fh:
+            with open(path, encoding="utf-8") as fh:
                 raw = fh.read().strip()
         except OSError:
             continue
@@ -298,6 +298,20 @@ def _in_daemonic_process() -> bool:
         return True
 
 
+def _fork_available() -> bool:
+    """True where the ``fork`` start method exists.  The pool below is a
+    fork pool by design (see the module docstring), and Windows has no
+    ``fork``: ``get_context("fork")`` raises ``ValueError`` there.  So a
+    platform without it builds serially -- the same path as
+    ``LSMS_BUILD_WORKERS=1`` -- rather than failing every multi-wave build.
+    Deliberately not a switch to ``spawn``: the per-wave builder is a closure
+    over the live ``Country`` and cannot be pickled."""
+    try:
+        return "fork" in get_all_start_methods()
+    except Exception:  # noqa: BLE001 -- be conservative: no pool if unsure
+        return False
+
+
 def build_workers(n_targets: int, env: dict | None = None) -> int:
     """How many worker processes a cold build with ``n_targets`` distinct
     build targets should use.
@@ -310,8 +324,9 @@ def build_workers(n_targets: int, env: dict | None = None) -> int:
     Whatever the source, the result never exceeds ``visible_cpus()`` (an
     override cannot oversubscribe the cgroup) nor ``n_targets`` (a worker with
     nothing to build is a wasted fork), is at least 1, and is 1 inside a
-    worker process (no nested pools) or any daemonic process (which may
-    not fork at all -- see ``_in_daemonic_process``).
+    worker process (no nested pools), any daemonic process (which may
+    not fork at all -- see ``_in_daemonic_process``), or a platform with no
+    ``fork`` start method (Windows -- see ``_fork_available``).
 
     The MEMORY guard (:func:`memory_worker_cap`) caps the default at
     ``visible_memory_bytes() // worker_memory_budget()``: a build that fits
@@ -319,7 +334,7 @@ def build_workers(n_targets: int, env: dict | None = None) -> int:
     ``LSMS_BUILD_WORKERS=N`` MAY exceed that cap -- the user asked -- and a
     ``RuntimeWarning`` says so once per process.
     """
-    if _IN_WORKER or _in_daemonic_process():
+    if _IN_WORKER or _in_daemonic_process() or not _fork_available():
         return 1
     env = os.environ if env is None else env
     n_targets = max(0, int(n_targets))
