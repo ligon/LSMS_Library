@@ -1,0 +1,60 @@
+#+title: Uganda food-unit catalog audit, GH #962
+
+* Scope and evidence
+
+Sue; 2026-09-25; baseline =4c2223aa119381ebcd8aea05fc2f9d26c3026028=.
+The audit reads the eight raw food modules with =get_dataframe= and retains only code/item/wave/source aggregates, never household identifiers or microdata frames.
+The [[file:proposed_mapping.csv][143-row mapping]] records the exact preferred labels, their source strings, canonical equivalents, and observed raw-row counts.
+The [[file:raw_blank_usage.csv][raw-use counts]] and [[file:source_summaries.json][source inventory]] identify the observations supporting those counts.
+
+The baseline catalog has 289 codes and 143 blank preferred labels.
+Of the 134 blanks with a source string, 131 specify a unit or size and three name only an item (=153001=, =154001=, =160001=).
+All 134 strings match the 2011-12 Stata unit metadata exactly; the other seven wave codebooks omit them.
+Promoting 131 labels therefore uses one wave's codebook, not independent agreement across waves.
+The mapping reuses 111 canonical equivalents and preserves the recorded sizes and named forms of the other 20, without guessing containers for labels such as =Soda (500 ml)=.
+
+Only =123060= among the 131 occurs in the raw modules: one 2015-16 fish purchase, quantity 4 and expenditure 8,000.
+Its existing canonical equivalent =Fish Cut piece(Above 2  kg)= is parsed as 2 kg per piece (8 kg here), despite the label's lower bound and the legacy curated 3 kg factor.
+That range-endpoint policy is already pinned in =tests/test_food_kg_inference.py= and is unchanged.
+The fraction parser from GH #963 reads the half- and quarter-packet labels as 0.5 and 0.25 kg.
+
+* Recorded codes without measurement labels
+
+#+name: tab:unlabelled-unit-use
+| Code   | Raw rows | Waves                     | Recorded food/source use                  |
+|--------+----------+---------------------------+-------------------------------------------|
+| 0      | 2        | 2011-12                   | Beans purchase; Soda without Q or X       |
+| 136    | 12       | 2011-12, 2018-19, 2019-20 | Soda, beer, juice, water; purchases/gifts |
+| 139093 | 3        | 2015-16                   | Other vegetables; own production/gifts    |
+| 142092 | 2        | 2013-14                   | Groundnuts in shell; own production       |
+| 142090 | 1        | 2015-16                   | Groundnuts in shell; own production       |
+| 156087 | 3        | 2015-16                   | Other tobacco; purchases                  |
+| 156090 | 1        | 2015-16                   | Other tobacco; purchase                   |
+| 156096 | 1        | 2015-16                   | Other tobacco; own production             |
+| 181087 | 1        | 2015-16                   | Dry cassava; own production               |
+
+No source value-label map defines these nine codes.
+The 2011-12 and 2019-20 household questionnaires identify a food unit-code field but provide no corroborating definition of these codes in the extracted food sections.
+No meaning is inferred from item prefixes or numeric suffixes.
+Code 0 follows the agreed missing-unit policy; the other eight and the three unused item-only codes retain distinct numeric strings as accepted residuals.
+That treatment does not exclude them from existing kg inference; the separate cold [[file:../VALIDATION.org][validation report]] measures factor provenance and downstream changes.
+
+* Reproduction and checks
+
+From the candidate repository root, the command used for this audit is:
+
+#+begin_example
+env -u PYTHONSAFEPATH \
+  PATH=/local/job39263225/venv_img/bin:$PATH \
+  PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries" \
+  LSMS_DATA_DIR=/local/job39263225/uganda-units/catalog/data LSMS_SKIP_AUTH=1 \
+  OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 \
+  /local/job39263225/venv_img/bin/python \
+  slurm_logs/uganda_units_2026-09-25/catalog/audit_catalog.py \
+  --output /local/job39263225/uganda-units/catalog/final-audit
+#+end_example
+
+The script asserts 289 unchanged keys, exactly 143 changed preferred labels, unchanged source-wave columns and previously populated preferred labels, 111 reused canonical equivalents, and 131 matching source/preferred parser factors.
+It also checks the fraction factors, the documented fish endpoint, and absence of numeric-leading physical labels.
+It writes aggregate evidence and a baseline org-table copy only beneath the explicit output directory.
+No fixture, published baseline, or expected result is regenerated.
