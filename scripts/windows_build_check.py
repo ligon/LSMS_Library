@@ -1,4 +1,4 @@
-"""GH #964: cold-build real script-path tables and print a platform-independent
+"""GH #964 (CI job windows-script-build): cold-build real script-path tables and print a platform-independent
 fingerprint of each result, so a Windows build can be compared with Linux.
 
 Usage: python build_real.py Uganda:shocks Uganda:assets
@@ -24,6 +24,12 @@ import lsms_library as ll
 print("lsms_library:", ll.__file__, "| data_root:", ll.paths.data_root() if hasattr(ll, "paths") else "?")
 
 failed = False
+# EXPECT="Country:table=rows:digest,..." -- the Linux build's result.
+expect = {}
+for item in filter(None, os.environ.get("EXPECT", "").split(",")):
+    spec, want = item.split("=")
+    rows, digest = want.split(":")
+    expect[spec] = (int(rows), digest)
 
 # Makefile variable expansion: `$(shell find ...)` silently yields an empty
 # list if find mis-parses its pattern, which empties the country targets'
@@ -54,6 +60,9 @@ for spec in sys.argv[1:]:
     digest = int(pd.util.hash_pandas_object(flat.astype(str), index=False).sum()) & 0xFFFFFFFFFFFF
     waves = sorted(map(str, df.index.get_level_values("t").unique()))
     print(f"RESULT {spec} rows={len(df)} cols={df.shape[1]} waves={len(waves)} digest={digest:012x} ({time.time()-t0:.0f}s)")
+    if spec in expect and expect[spec] != (len(df), f"{digest:012x}"):
+        print(f"MISMATCH {spec}: expected rows={expect[spec][0]} digest={expect[spec][1]}")
+        failed = True
     for x in w:
         m = str(x.message)
         if "ake" in m or "script" in m.lower():

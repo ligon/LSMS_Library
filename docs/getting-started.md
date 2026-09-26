@@ -7,26 +7,44 @@ pip install LSMS_Library
 ```
 
 !!! note "Windows"
-    Reading data works on native Windows: `Country(...)`, `Feature(...)`,
-    every table built from a wave's `data_info.yml`, and anything already
-    in the cache. The cache lives at
-    `%USERPROFILE%\.local\share\lsms_library` unless you set `data_dir`
-    (see [Caching](guide/caching.md)).
+    On Windows, install into a **conda** environment. Reading data needs
+    nothing extra. About two in five of the corpus's tables, though, are
+    built by country scripts driven by GNU `make`, and conda-forge
+    supplies `make` and the POSIX tools those scripts use:
 
-    Two differences from Linux and macOS:
+    ```bat
+    conda env create -f environment-windows.yml
+    conda activate lsms
+    pip install LSMS_Library
+    ```
 
+    [`environment-windows.yml`](https://github.com/ligon/LSMS_Library/blob/master/environment-windows.yml)
+    installs `make`, `m2-bash`, `m2-coreutils` and `m2-findutils` from
+    conda-forge. With the environment active, those tools come before
+    `C:\Windows\System32` on `PATH`, which matters: Windows ships an
+    unrelated `find.exe` that GNU make's recipes cannot use. CI builds
+    script-path tables this way on every push and checks them against
+    the Linux build.
+
+    Three Windows-specific points:
+
+    - **Keep spaces out of the data directory's path.** `make` cannot
+      handle them. The default is `%USERPROFILE%\.local\share\lsms_library`,
+      so if your user name contains a space, set `data_dir` in
+      `config.yml` (or `LSMS_DATA_DIR`) to a path without one, such as
+      `C:\lsms_data` (see [Caching](guide/caching.md)).
     - **Builds are serial.** Windows has no `fork`, so a cold build runs
-      one wave at a time instead of spreading the waves across processes.
+      one wave at a time instead of spreading waves across processes.
       The results are identical; only the time differs.
-    - **Tables built by scripts may not build.** About two in five of the
-      corpus's tables are built by country scripts driven by GNU `make`
-      (`materialize: make` in a country's `data_scheme.yml`). Without
-      `make` the library runs the Python script directly where one exists,
-      but that path is not yet supported on Windows
-      ([#964](https://github.com/ligon/LSMS_Library/issues/964)). If you
-      need those tables built from source, use
-      [WSL](https://learn.microsoft.com/windows/wsl/install), where
-      everything works as on Linux.
+    - **In a `.bat` script, write `call conda ...`.** `conda` is itself a
+      batch file, and a batch file that runs another without `call` never
+      returns to the lines after it.
+
+    Without `make` (outside the conda environment), tables built by
+    scripts do not build yet on any platform
+    ([#968](https://github.com/ligon/LSMS_Library/issues/968)). Anything
+    already in the cache still reads. [WSL](https://learn.microsoft.com/windows/wsl/install)
+    also works, exactly as Linux does.
 
 ## Data Access
 
