@@ -75,6 +75,7 @@ import logging
 import os
 import warnings
 from pathlib import Path
+import shutil
 import subprocess
 import json
 from dataclasses import dataclass
@@ -149,6 +150,70 @@ def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
     env.setdefault("PYTHON", sys.executable)
     env["LSMS_DATA_DIR"] = str(data_root())
     return env
+
+
+_NO_MAKE_WARNED = False
+
+
+def _build_wave_script_target(make_dir: Path, wave_target: Path, *,
+                              force: bool = False) -> None:
+    """Build one wave's script-path parquet: ``make`` if installed, else the
+    wave script itself (GH #968).
+
+    ``make_dir`` is the country's ``_/`` (where the Makefile lives) and
+    ``wave_target`` the wave-relative target, ``<wave>/_/<table>.parquet``.
+    Raises ``subprocess.CalledProcessError`` when the build fails, as the
+    inline ``make`` call it replaces did.
+
+    **Without make.**  ``Wave.grab_data`` used to call ``make`` unguarded, so
+    on any machine without it every wave-script table raised
+    ``FileNotFoundError`` and the ``try_script`` fallback further down was
+    never reached.  The direct run is equivalent to the Makefile rule it
+    replaces, for every wave target in the corpus (measured 2026-09-29): all
+    87 wave-level rules in the 21 country Makefiles have the recipe
+    ``(cd $(@D) && python ./<table>.py)``, and none has a generated file as a
+    prerequisite -- only scripts and ``.org`` sources -- so there is nothing
+    ``make`` would build first.
+
+    **Why this is excluded from the build fingerprint**
+    (``_build_registry._EXCLUDED_CALLABLES``).  It decides only WHICH runner
+    executes the wave script; the bytes written are the script's.  The script
+    text, the country ``_/Makefile`` and the wave's other inputs are already
+    in ``Wave._input_hash``.  Keeping the invocation out of the fingerprint
+    means a later change to it -- a platform fix, a flag -- does not
+    cold-rebuild the corpus, as the #964 ``as_posix`` fix did when this code
+    still sat inline in ``grab_data``.
+    """
+    global _NO_MAKE_WARNED
+    env = _script_subprocess_env()
+    if shutil.which("make", path=env.get("PATH")):
+        cmd = ["make", "-s"]
+        if force:
+            cmd.append("-B")
+        jobs_flag = _make_jobs_flag()
+        if jobs_flag:
+            cmd.append(jobs_flag)
+        # as_posix: on Windows str() gives '..\\wave\\_\\t.parquet'; make
+        # matches the rule, but its recipe's `cd $(@D)` runs in sh, which
+        # reads the backslashes as escapes (GH #964).
+        cmd.append("../" + wave_target.as_posix())
+        subprocess.run(cmd, cwd=make_dir, check=True, env=env)
+        return
+
+    script = (make_dir.parent / wave_target).with_suffix(".py")
+    if not script.exists():
+        raise FileNotFoundError(
+            f"make is not installed and there is no wave script to run "
+            f"instead: {script}")
+    if not _NO_MAKE_WARNED:
+        _NO_MAKE_WARNED = True
+        warnings.warn(
+            "make is not on PATH: building script-path tables by running each "
+            "wave's script directly (equivalent for wave targets; GH #968). "
+            "Install GNU make (on Windows: environment-windows.yml) for "
+            "country-level targets.", RuntimeWarning, stacklevel=3)
+    subprocess.run([sys.executable, f"./{script.name}"], cwd=script.parent,
+                   check=True, env=env)
 
 
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
@@ -501,7 +566,7 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
     for yaml_path in sorted(yaml_paths):
         if not yaml_path.is_file():
             continue
-        with open(yaml_path, "r") as f:
+        with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
 
         stages = data.get("stages", {})
@@ -839,7 +904,7 @@ class Wave:
         if not info_path.exists():
             # warnings.warn(f"File not found: {info_path}")
             return {}
-        with open(info_path, 'r') as file:
+        with open(info_path, 'r', encoding="utf-8") as file:
             return load_yaml(file)
 
     @property
@@ -1695,31 +1760,12 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                # GH #803 write side: the child must import THIS package, or
-                # to_parquet's redirect misses and the parquet lands in-tree.
-                env = _script_subprocess_env()
-                # Mirror ``run_make_target`` (country.py ~line 1856): include
-                # ``_make_jobs_flag()`` so this wave-level legacy fallback can
-                # exploit the cores it was given.  Without this, every
-                # script-path table without a YAML data_info entry built
-                # serially regardless of cpu_count() -- the source of the
-                # cold-build slowness observed when calling derived features
-                # (e.g. Uganda's food_expenditures, which routes here per
-                # wave for food_acquired).
-                make_cmd = ["make", "-s"]
-                if intree_artefact:
-                    # GH #803: Make stats the target by its in-tree name; an
-                    # artefact newer than the script makes it "up to date" and
-                    # nothing runs.  Force the recipe.
-                    make_cmd.append("-B")
-                jobs_flag = _make_jobs_flag()
-                if jobs_flag:
-                    make_cmd.append(jobs_flag)
-                # as_posix: on Windows str() gives '..\\wave\\_\\t.parquet'; make
-                # matches the rule, but its recipe's `cd $(@D)` runs in sh,
-                # which reads the backslashes as escapes (GH #964).
-                make_cmd.append('../' + relative_parquet_path.as_posix())
-                subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
+                # GH #803 write side (the child imports THIS package), -B for
+                # an in-tree artefact, the jobs flag, the POSIX target (#964)
+                # and the no-make fallback (#968) all live in the helper, which
+                # is kept out of the build fingerprint.
+                _build_wave_script_target(cwd_path, relative_parquet_path,
+                                          force=intree_artefact)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
                 for candidate in candidates:
@@ -1966,7 +2012,7 @@ class Country:
         if '_resources_cache' not in self.__dict__:
             var = self.file_path / "_" / "data_scheme.yml"
             if var.exists():
-                with open(var) as f:
+                with open(var, encoding="utf-8") as f:
                     self.__dict__['_resources_cache'] = load_yaml(f)
             else:
                 self.__dict__['_resources_cache'] = {}
@@ -4330,7 +4376,7 @@ class Country:
                 if candidate.exists():
                     logger.debug(f"Reading {method_name} from cache {candidate}")
                     if candidate.suffix == ".json":
-                        with open(candidate, 'r') as json_file:
+                        with open(candidate, 'r', encoding="utf-8") as json_file:
                             return json.load(json_file)
                     else:
                         df = get_dataframe(candidate)
@@ -4356,7 +4402,7 @@ class Country:
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(cache_path, 'w') as json_file:
+                with open(cache_path, 'w', encoding="utf-8") as json_file:
                     json.dump(result, json_file)
                 logger.debug(f"Writing {method_name} to cache {cache_path}")
             elif isinstance(result, pd.DataFrame):

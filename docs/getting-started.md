@@ -40,10 +40,13 @@ pip install LSMS_Library
       batch file, and a batch file that runs another without `call` never
       returns to the lines after it.
 
-    Without `make` (outside the conda environment), tables built by
-    scripts do not build yet on any platform
-    ([#968](https://github.com/ligon/LSMS_Library/issues/968)). Anything
-    already in the cache still reads. [WSL](https://learn.microsoft.com/windows/wsl/install)
+    Without `make` (on any platform), the library runs each wave's build
+    script directly and warns once. For wave-level builds that is
+    equivalent to what `make` does: every wave rule in the country
+    Makefiles just runs that script, and no rule depends on a generated
+    file ([#968](https://github.com/ligon/LSMS_Library/issues/968)). The
+    few tables built only at the country level still want `make`, so
+    install it for full coverage. [WSL](https://learn.microsoft.com/windows/wsl/install)
     also works, exactly as Linux does.
 
 ## Data Access

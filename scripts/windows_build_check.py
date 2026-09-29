@@ -37,15 +37,20 @@ for item in filter(None, os.environ.get("EXPECT", "").split(",")):
 import subprocess
 from pathlib import Path
 mk_dir = Path(ll.__file__).parent / "countries" / "Uganda" / "_"
-r = subprocess.run(["make", "-s", "-pn"], cwd=mk_dir, capture_output=True, text=True)
-plist = next((l.split("=", 1)[1].split() for l in r.stdout.splitlines()
-              if l.startswith(("parquet := ", "parquet = "))), [])
-bad = [l for l in r.stderr.splitlines() if l.startswith("find:")]
-print(f"MAKEVARS Uganda parquet-list={len(plist)} find-errors={len(bad)}")
-for l in bad[:3]:
-    print("  ", l)
-if not plist or bad:
-    failed = True
+if shutil.which("make") is None:
+    print("MAKEVARS skipped: make not on PATH (the GH #968 no-make path)")
+    r = None
+else:
+    r = subprocess.run(["make", "-s", "-pn"], cwd=mk_dir, capture_output=True, text=True)
+if r is not None:
+    plist = next((l.split("=", 1)[1].split() for l in r.stdout.splitlines()
+                  if l.startswith(("parquet := ", "parquet = "))), [])
+    bad = [l for l in r.stderr.splitlines() if l.startswith("find:")]
+    print(f"MAKEVARS Uganda parquet-list={len(plist)} find-errors={len(bad)}")
+    for l in bad[:3]:
+        print("  ", l)
+    if not plist or bad:
+        failed = True
 for spec in sys.argv[1:]:
     country, table = spec.split(":")
     t0 = time.time()
