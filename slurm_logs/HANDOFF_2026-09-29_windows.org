@@ -1,0 +1,126 @@
+#+title: Handoff 2026-09-29 -- Windows builds (#964, #968, #965 follow-up): verify and re-warm on HPC
+#+author: Sue (Claude Opus 5.5)
+
+* Why this is handed off
+The work is written and committed, but it was not fully verified on the laptop that wrote it.
+The build-path test selection was killed at 86% by memory pressure (13 GB machine, 5 xdist workers building real data), after 1 =F= and about 20 =E=, before pytest printed which.
+Merging also requires a corpus-wide cache re-warm, which the laptop cannot do.
+Both jobs need the cluster.
+
+* State at time of writing
+- Branch :: =feature/964-windows-script-builds= on =gh= (=github.com/ligon/LSMS_Library=), head =2e378814f=, based on =development= @ =2a133a017=.
+- PR :: #969 into =development=, open, *not to be merged by an agent*.
+- CI on the last pushed commit before =2e378814f= (=a3faf7727=) :: =windows-script-build=, =windows-smoke=, =unit-tests= all green.
+  =2e378814f= has not been through CI yet at the time of writing.
+- Worktree on the laptop :: =/home/coder/mirrors/LSMS_Library-964= (irrelevant to you; use your own).
+
+* What the branch contains
+Three pieces, landed together so that the corpus re-warms once.
+
+** #964 -- script-path builds on native Windows through conda
+- =environment-windows.yml= :: python 3.11 plus conda-forge =make=, =m2-bash=, =m2-coreutils=, =m2-findutils=; the library via pip.
+- CI job =windows-script-build= :: builds that environment, strips the runner's own Git/MinGW/chocolatey tools from =PATH=, asserts =make=/=sh=/=find= resolve inside the conda env, cold-builds Uganda =shocks= and =assets=, and fails unless rows and content digest equal the Linux build (=EXPECT=).
+  Script: =scripts/windows_build_check.py=.
+- =dvc_permissions.py= :: GitPython imported lazily; =import lsms_library= used to fail with =ImportError: Bad git executable= on a machine without Git.
+  0 of 35 probed hashes move.
+- 17 country Makefiles :: =find $(rounds) -name \*.py= became =-name "*.py"=.
+  Windows make did not pass the escape (or a single-quoted form) through to MSYS =find=.
+  Linux expansion unchanged: =$(parquet)= is 128/55/48/50/59 words for Uganda/Nigeria/Tanzania/Malawi/Ethiopia before and after.
+- =docs/getting-started.md= :: the Windows note.
+
+** #968 -- script-path builds without =make=, any OS
+- =Wave.grab_data= called =make= unguarded, so without =make= every wave-script table raised =FileNotFoundError= (reproduced: Uganda =shocks=, =country.py:1719=).
+- The invocation moved to =country._build_wave_script_target=: =make= when installed (with the #964 =as_posix()= wave target), otherwise the wave script run directly, with one =RuntimeWarning=.
+- Equivalence argument, measured: all 87 wave-level rules in the 21 Makefiles have the recipe =(cd $(@D) && python ./<table>.py)=, and no wave rule has a generated file as a prerequisite (only scripts and =.org= sources).
+- The helper is in =_build_registry._EXCLUDED_CALLABLES=: it chooses the runner, and the script text and the country =_/Makefile= are already in =Wave._input_hash=.
+  A no-op edit to its body moves 0 of 35 probed hashes.
+  *Review this exclusion* -- it is a judgement, argued in the helper's docstring and in the registry comment.
+- Tests :: =tests/test_gh968_no_make_fallback.py= (both branches on a fake country, once-only warning, missing-script error, structural fingerprint exclusion).
+
+** #965 follow-up -- the nine deferred encoding readers
+- The readers left on the platform encoding in #965 (they sit in fingerprinted functions) now pass =encoding="utf-8"=: =_load_materialize_stage_map=, both =resources=, =load_json_cache= (read and write), two =sidecar.open()=, two =read_text()= in =_warm_dvc_cache_for_feature=.
+- The =get_dataframe= existence probe (=local_file=) now opens =rb= (it never decodes).
+- =tests/test_windows_portability.py::_FINGERPRINTED_EXEMPT= is now empty; the lint covers the whole core.
+
+* Verified so far (laptop, Linux)
+| check | result |
+|---+---|
+| =tests/test_gh968_no_make_fallback.py= + =tests/test_windows_portability.py= | 5 + 51 passed |
+| Uganda =shocks=, =assets=, cold, with =make= | 14,457 rows =64a53fa7af55=; 116,808 rows =9202ed542a14= |
+| same, =make= hidden from =PATH= | identical rows and digests, one =RuntimeWarning= |
+| no-op edit to =_build_wave_script_target= body | 0 of 35 probed hashes move |
+| Windows CI (=a3faf7727=, before #968/#965 were added) | Uganda =shocks=/=assets= equal the Linux digests |
+
+* Not verified -- your tasks, in order
+** TODO 0. Set up, and read before touching anything
+- Read =CLAUDE.md= (repo root), in particular scrum-master addendum 3 (the =.pth= trap), 3b (BLAS pinning and =--dist=loadfile=) and 4 (Savio venv).
+- Check out the branch in a worktree; set =PYTHONPATH= to it and *assert* the import:
+  #+begin_src python
+  import lsms_library, os; WT = os.environ['PYTHONPATH'].split(os.pathsep)[0]
+  assert lsms_library.__file__.startswith(WT), (lsms_library.__file__, WT)
+  #+end_src
+- Never invoke the =dvc= CLI; never =rm= a DVC lock.
+- Record in =~/.sucoder/bulletin.org= on the cluster host that you are doing this, with the job id.
+
+** TODO 1. Attribute the killed test run
+The selection that was killed (every test file mentioning the build path, plus the two new files):
+#+begin_src sh
+files=$(rg -l 'run_make_target|grab_data|_script_subprocess_env|_EXCLUDED_CALLABLES|build_transforms_fingerprint|make_jobs|materialize|Makefile|dvc_permissions|sidecar' tests | sort)
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 \
+  pytest -n <budget against uptime> --dist=loadfile --timeout=600 \
+  $files tests/test_gh968_no_make_fallback.py tests/test_windows_portability.py > t968.log 2>&1
+#+end_src
+- Write to a file, never through a pipe (CLAUDE.md 3b).
+- For each =FAILED= / =ERROR=: run the same test on =development= @ =2a133a017=.
+  If it fails there too, it is pre-existing: say so and move on.
+  If it passes there, it is ours: fix it on the branch, or stop and report.
+- Expected suspects if something is ours: tests that assert on the exact =make= argv or monkeypatch =subprocess.run= in =grab_data= (the call moved into the helper); tests that pin =_FINGERPRINTED_EXEMPT= contents or the removed ASCII-content tests.
+
+** TODO 2. Full unit suite
+Run it the way the Makefile does (=PYTEST_ARGS=, =Makefile:25=, plus the pins above).
+Same attribution rule: compare every failure with =development=.
+
+** TODO 3. Snapshot, re-warm, compare -- the real check
+The change is meant to be *behaviour-neutral on Linux*: every served table should come back identical after the re-warm.
+That is testable, so test it rather than assume it.
+1. *Before* clearing anything, snapshot a content digest of every L2-country parquet under the data root (=data_dir= in =~/.config/lsms_library/config.yml=; on Savio it has been =/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library=):
+   #+begin_src python
+   import pandas as pd, pathlib, json, sys
+   root = pathlib.Path(sys.argv[1]); out = {}
+   for p in sorted(root.glob('*/var/*.parquet')):
+       df = pd.read_parquet(p).reset_index()
+       df = df[sorted(df.columns)].astype(str).sort_values(sorted(df.columns), kind='mergesort')
+       out[str(p.relative_to(root))] = [len(df), int(pd.util.hash_pandas_object(df, index=False).sum()) & 0xFFFFFFFFFFFF]
+   json.dump(out, open(sys.argv[2], 'w'), indent=1)
+   #+end_src
+   The baseline must be =development= @ =2a133a017= (the branch's base), or the diff will mix in unrelated merges.
+   A warm parquet whose embedded =lsms_cache_hash= is =fresh= under that commit's code qualifies; one that grades =stale= there does not.
+   If the cache is older, warm it on =2a133a017= first, then snapshot; or snapshot only the tables that grade =fresh= and say which were excluded.
+2. Confirm the scope: every table's =build_transforms_fingerprint= moves (=grab_data=, =load_json_cache=, =resources=, =get_dataframe= all changed), and the 17 edited Makefiles move their countries' hashes too.
+   Stale caches rebuild on read on their own (v0.8.0 content hashes), so a clear is not required for correctness; clear per country anyway if the #866 note in =CLAUDE.md= applies (country-level =make= targets can mtime-skip).
+3. Re-warm every country and table.
+   Previous handoffs did =lsms-library cache clear --country C= followed by building each table (=slurm_logs/HANDOFF_2026-09-10.org=, "cleared + re-warmed").
+   Budget workers against the node's share, not =nproc=.
+4. Snapshot again and diff.
+   Every =(table, rows, digest)= should match.
+   Any mismatch is a finding: report the table and both values; do not "fix" it by editing data.
+   A table that newly fails to build is a finding too.
+
+** TODO 4. CI and report
+- Push only to =feature/964-windows-script-builds= (no force-push); confirm =windows-script-build=, =windows-smoke=, =unit-tests= are green on the new head.
+- Post a comment on PR #969 with: the test attribution (ours vs pre-existing), the re-warm scope and duration, and the snapshot diff (count identical / changed / newly failing).
+- Update the PR description if anything changed.
+- *Do not merge.*  The human merges.
+
+* Decisions already taken -- do not relitigate without evidence
+- Windows is supported through conda (@ligon, 2026-09-26: "the most natural stack for this kind of data work").
+  WSL is documented as the alternative; Git-for-Windows' =sh= is *not* used.
+- Only conda-forge =make= (native build).  Not =m2-make= (MSYS path semantics).
+- #968's fallback runs the *wave* script only.
+  Country-level targets without =make= still go through the existing =run_make_target= -> =try_script= path (unchanged); the docs say to install =make= for full coverage.
+- =_make_jobs_flag= and =_script_subprocess_env= are still in the fingerprint (reached via =run_make_target=).
+  Excluding them was considered and deliberately left for later: measure before proposing it.
+
+* Evidence trail
+- Issues :: #964, #968; PR #965 (merged) and #969.
+- Windows CI measurements :: this branch's history (the =windows-make-probe= job and its fixture existed from =5b6020d5a= to =69562e3b0= and were removed in =a3faf7727=; commit messages carry the findings).

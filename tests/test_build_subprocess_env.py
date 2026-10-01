@@ -117,21 +117,27 @@ def test_countries_root_alone_would_NOT_have_worked(tmp_path):
     )
 
 
-@pytest.mark.parametrize("qualname", ["Wave.grab_data", "Country._aggregate_wave_data"])
+@pytest.mark.parametrize(
+    "qualname", ["_build_wave_script_target", "Country._aggregate_wave_data"]
+)
 def test_shell_out_sites_do_not_build_their_own_env(qualname):
     """Static guard: neither site may hand-roll an environment again.
 
     ``run_make_target``/``build_env`` are nested functions inside
     ``Country._aggregate_wave_data``, so that is the enclosing source to read.
+    The wave-level site moved out of ``Wave.grab_data`` into the module-level
+    ``_build_wave_script_target`` (GH #968); ``grab_data`` must delegate to it
+    (``test_grab_data_delegates_its_shell_out``).
 
     This is the drift the helper exists to prevent -- two sites, two different
     ideas of what a child needs, no test that compared them.
     """
     from lsms_library import country as country_mod
 
-    cls_name, meth_name = qualname.split(".")
-    cls = getattr(country_mod, cls_name)
-    src = inspect.getsource(getattr(cls, meth_name))
+    obj = country_mod
+    for part in qualname.split("."):
+        obj = getattr(obj, part)
+    src = inspect.getsource(obj)
     assert "os.environ.copy()" not in src, (
         f"{qualname} constructs its own subprocess environment again. Build it "
         f"with country._script_subprocess_env() so both shell-out sites cannot "
@@ -139,4 +145,22 @@ def test_shell_out_sites_do_not_build_their_own_env(qualname):
     )
     assert "_script_subprocess_env" in src, (
         f"{qualname} no longer routes through _script_subprocess_env()"
+    )
+
+
+def test_grab_data_delegates_its_shell_out():
+    """``Wave.grab_data`` builds wave scripts only through the guarded helper.
+
+    Without this, the parametrized guard above could pass while ``grab_data``
+    grew a second, unguarded ``subprocess`` call of its own.
+    """
+    from lsms_library.country import Wave
+
+    src = inspect.getsource(Wave.grab_data)
+    assert "_build_wave_script_target(" in src, (
+        "Wave.grab_data no longer delegates to _build_wave_script_target()"
+    )
+    assert "subprocess.run" not in src and "os.environ.copy()" not in src, (
+        "Wave.grab_data shells out directly again; route it through "
+        "_build_wave_script_target() so it gets _script_subprocess_env()"
     )

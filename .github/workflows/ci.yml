@@ -122,6 +122,55 @@ jobs:
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
 
+  # Windows script-path builds (GH #964): the conda route documented in
+  # environment-windows.yml -- conda-forge make + m2 tools, the library via
+  # pip.  The runner's own Git / MinGW / chocolatey tools are stripped from
+  # PATH and make/sh/find are asserted to resolve inside the conda env, so
+  # this measures what a user with only that environment gets.  Cold-builds
+  # two Uganda script-path tables and checks them against the Linux build:
+  #   Uganda:shocks rows=14457 waves=8 digest=64a53fa7af55
+  #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # push-only: it needs the S3 reader secrets.
+  windows-script-build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: false
+          miniforge-version: latest
+          environment-file: environment-windows.yml
+          activate-environment: lsms
+      - name: Install the library
+        shell: cmd /C CALL {0}
+        run: pip install .
+      - name: Configure S3 read credentials
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          LSMS_SKIP_AUTH: "1"
+          AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
+        # No '%' anywhere: cmd would expand it as a variable reference.
+        run: >-
+          python -c "import os; from lsms_library.config import s3_creds_path as p;
+          e = os.environ; f = p(); f.parent.mkdir(parents=True, exist_ok=True);
+          f.write_text('[default]\naws_access_key_id = ' + e['AWS_ACCESS_KEY_ID'] + '\naws_secret_access_key = ' + e['AWS_SECRET_ACCESS_KEY'] + '\n', encoding='utf-8');
+          print('wrote', f)"
+      - name: Cold-build and compare with Linux
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          PROBE_STRIP: '\Git\,mingw64,chocolatey'
+          REQUIRE_CONDA_TOOLS: "1"
+          EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
+          LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
+          LSMS_BUILD_WORKERS: "1"
+          PYTHONUNBUFFERED: "1"
+        run: python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
+
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
   # silent until someone needs the file.  scripts/dvc_remote_reachability.py

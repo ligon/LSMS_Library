@@ -42,27 +42,13 @@ COUNTRIES = PKG / "countries"
 # Encoding lint
 # ---------------------------------------------------------------------------
 
-# Readers that still use the platform default encoding ON PURPOSE.  Each sits
-# inside a function whose source is folded into the cache fingerprint
-# (``_build_registry.build_transforms_fingerprint``), so editing it rebuilds
-# every cached table in the corpus -- measured 35 of 35 probed hashes moved
-# when these were changed.  They are exempt ONLY because the files they read
-# are ASCII where it matters, and each exemption is backed by a content test
-# below that fails the day that stops being true.  When some other change
-# forces a corpus re-warm anyway, fold ``encoding="utf-8"`` into these and
-# delete the entries.
-_FINGERPRINTED_EXEMPT = {
-    # (module path relative to lsms_library/, enclosing function): the files it reads
-    ("country.py", "_load_materialize_stage_map"): "dvc.yaml",
-    ("country.py", "resources"): "data_scheme.yml / country-level _/data_info.yml",
-    ("country.py", "load_json_cache"): "panel_ids.json / updated_ids.json",
-    ("local_tools.py", "_warm_dvc_cache_for_feature"):
-        "wave data_info.yml + .dvc sidecars (best-effort prewarm; errors swallowed)",
-    # Opens the file only to learn whether it exists and never reads it, so
-    # no decoding happens.  Inside get_dataframe, which every table's
-    # fingerprint includes.
-    ("local_tools.py", "local_file"): "(existence probe; nothing decoded)",
-}
+# Readers allowed to use the platform default encoding.  EMPTY, and meant to
+# stay so.  #965 exempted nine readers here because they sit in functions
+# folded into the build fingerprint (editing them moved 35 of 35 probed cache
+# hashes); they were fixed in #969, which pays that corpus re-warm anyway.
+# If a future reader must be exempted, say why next to it and pin the
+# content invariant that makes the platform encoding safe for it.
+_FINGERPRINTED_EXEMPT: dict[tuple[str, str], str] = {}
 
 _TEXT_METHODS = {"read_text", "write_text"}
 
@@ -127,48 +113,6 @@ def test_exemptions_are_still_live():
     assert not stale, f"exempt readers that no longer exist / no longer need it: {sorted(stale)}"
 
 
-# --- the content invariants the exemptions rest on --------------------------
-
-_NON_ASCII = re.compile(r"[^\x00-\x7F]")
-
-
-def _tracked(pattern: str) -> list[Path]:
-    try:
-        out = subprocess.run(["git", "ls-files", "-z", pattern], cwd=REPO,
-                             capture_output=True, text=True, check=True).stdout
-    except (OSError, subprocess.CalledProcessError):
-        pytest.skip("not a git checkout")
-    return [REPO / p for p in out.split("\0") if p]
-
-
-def test_data_scheme_non_ascii_only_in_comments():
-    """``Country.resources`` reads data_scheme.yml with the platform encoding.
-    Safe while every non-ASCII character is inside a ``#`` comment, which the
-    YAML parser discards: cp1252 garbles the comment and nothing else."""
-    bad = []
-    for p in COUNTRIES.glob("*/_/data_scheme.yml"):
-        for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
-            if _NON_ASCII.search(line.split("#", 1)[0]):
-                bad.append(f"{p.relative_to(REPO).as_posix()}:{i}")
-    assert not bad, ("non-ASCII outside a comment in a data_scheme.yml; the "
-                     "platform-encoding reader in Country.resources would "
-                     "misread it on Windows: " + ", ".join(bad))
-
-
-@pytest.mark.parametrize("pattern", [
-    # ``:(glob)`` so ``*`` stops at ``/`` (plain git pathspecs let it cross).
-    ":(glob)lsms_library/countries/*/_/data_info.yml",   # Country-level resources
-    ":(glob)**/dvc.yaml",                                # _load_materialize_stage_map
-    ":(glob)lsms_library/countries/*/_/panel_ids.json",  # load_json_cache
-    ":(glob)lsms_library/countries/*/_/updated_ids.json",
-    ":(glob)**/*.dvc",                                   # sidecars (Path.open, not linted)
-])
-def test_platform_encoding_inputs_are_ascii(pattern):
-    bad = [p.relative_to(REPO).as_posix() for p in _tracked(pattern)
-           if p.is_file() and not p.read_bytes().isascii()]
-    assert not bad, f"non-ASCII in files read with the platform encoding: {bad[:10]}"
-
-
 # ---------------------------------------------------------------------------
 # No fork
 # ---------------------------------------------------------------------------
@@ -217,6 +161,15 @@ def test_terminate_dvc_without_process_groups(monkeypatch):
 # ---------------------------------------------------------------------------
 # Checkout
 # ---------------------------------------------------------------------------
+
+def _tracked(pattern: str) -> list[Path]:
+    try:
+        out = subprocess.run(["git", "ls-files", "-z", pattern], cwd=REPO,
+                             capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("not a git checkout")
+    return [REPO / p for p in out.split("\0") if p]
+
 
 def test_no_tracked_paths_collide_case_insensitively():
     paths = [p.relative_to(REPO).as_posix() for p in _tracked("*")]

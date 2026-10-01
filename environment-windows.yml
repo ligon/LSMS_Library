@@ -1,0 +1,30 @@
+# Conda environment for LSMS_Library on native Windows (GH #964).
+#
+#   conda env create -f environment-windows.yml
+#   conda activate lsms
+#   pip install LSMS_Library
+#
+# About 40% of the corpus's tables are built by country scripts driven by
+# GNU make (`materialize: make` in a country's _/data_scheme.yml).  Those
+# Makefiles run `sh`, `ls`, `find` and `basename`, which Windows does not
+# have.  conda-forge supplies all of them, and `conda activate` puts them
+# ahead of C:\Windows\System32 on PATH -- which matters, because
+# System32\find.exe is a different program that fails on GNU find's
+# arguments.
+#
+# Verified on windows-latest (CI job `windows-script-build`): Uganda
+# `shocks` and `assets` built cold here match the Linux build row for row
+# and by content digest, with no Git or MinGW tools on PATH.
+#
+# Only `make` from conda-forge is the native Windows build that accepts
+# C:/ paths; do NOT substitute `m2-make` (MSYS make, POSIX path semantics).
+name: lsms
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - make
+  - m2-bash
+  - m2-coreutils
+  - m2-findutils
