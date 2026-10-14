@@ -1,0 +1,2 @@
+13da05b11 docs(Malawi): record the sale-side condition, the Groundnut split and the JOIN correction (GH #833, #839)
+1a040c61f fix(Malawi): read the SALE's own shelled/unshelled (ag_i02c / ag_q02c); split Boiled groundnuts; correct the JOIN claims (GH #833, #839)

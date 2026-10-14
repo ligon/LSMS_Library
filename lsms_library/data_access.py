@@ -401,7 +401,24 @@ def _terminate_dvc(proc: subprocess.Popen, grace: float = 30.0) -> bool:
 
     SIGTERM instead, to the whole process group (``dvc`` spawns children), and
     escalate only if it will not go.
+
+    Windows has no process groups or signals (``os.getpgid`` / ``os.killpg``
+    do not exist there), so the tree is ended with ``taskkill /T /F``.  That
+    is a hard kill -- there is no polite equivalent for a console process --
+    so it returns True; the caller's lock sweep runs either way.
     """
+    if not hasattr(os, "killpg"):
+        try:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           check=False)
+        except OSError:
+            proc.kill()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return True
     try:
         pgid = os.getpgid(proc.pid)
     except OSError:
@@ -819,7 +836,7 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
 
     legacy_creds = dvc_dir / "s3_creds"
     try:
-        user_text = user_creds.read_text()
+        user_text = user_creds.read_text(encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not read user-config s3_creds: %s", exc)
         return False
@@ -827,13 +844,13 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
     # Skip the write if the legacy file already matches.
     if legacy_creds.exists():
         try:
-            if legacy_creds.read_text() == user_text:
+            if legacy_creds.read_text(encoding="utf-8") == user_text:
                 return True
         except OSError:
             pass  # fall through to overwrite
 
     try:
-        legacy_creds.write_text(user_text)
+        legacy_creds.write_text(user_text, encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
         return False
@@ -909,7 +926,7 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
         return False
 
     try:
-        creds_file.write_text(decrypted)
+        creds_file.write_text(decrypted, encoding="utf-8")
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
@@ -1003,7 +1020,7 @@ def _read_source_url(country: str, wave: str) -> str | None:
     if not source.exists():
         return None
     try:
-        text = source.read_text()
+        text = source.read_text(encoding="utf-8")
         m = re.search(r'https?://[^\s\]\)]+', text)
         return m.group(0).rstrip("/") if m else None
     except (OSError, UnicodeDecodeError):

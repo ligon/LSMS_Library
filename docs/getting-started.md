@@ -6,6 +6,28 @@
 pip install LSMS_Library
 ```
 
+!!! note "Windows"
+    Reading data works on native Windows: `Country(...)`, `Feature(...)`,
+    every table built from a wave's `data_info.yml`, and anything already
+    in the cache. The cache lives at
+    `%USERPROFILE%\.local\share\lsms_library` unless you set `data_dir`
+    (see [Caching](guide/caching.md)).
+
+    Two differences from Linux and macOS:
+
+    - **Builds are serial.** Windows has no `fork`, so a cold build runs
+      one wave at a time instead of spreading the waves across processes.
+      The results are identical; only the time differs.
+    - **Tables built by scripts may not build.** About two in five of the
+      corpus's tables are built by country scripts driven by GNU `make`
+      (`materialize: make` in a country's `data_scheme.yml`). Without
+      `make` the library runs the Python script directly where one exists,
+      but that path is not yet supported on Windows
+      ([#964](https://github.com/ligon/LSMS_Library/issues/964)). If you
+      need those tables built from source, use
+      [WSL](https://learn.microsoft.com/windows/wsl/install), where
+      everything works as on Linux.
+
 ## Data Access
 
 The library ships configuration and harmonization code, not survey data. The
