@@ -408,8 +408,10 @@ def crop_production_for_wave(t, frames, crop_labels):
     `Unit_sold` (GH #824) is the unit the SALE was reported in, a second
     unit distinct from the row's `u` (the HARVEST unit).  It is a plain
     NA-bearing `string` column, never an index level and never
-    sentinel-filled: NA means the frame names no sold-unit column, or the
-    row records no sale.  Where it disagrees with `u` the row is a
+    sentinel-filled: NA means the frame names no sold-unit column (W3-W5),
+    the row records no sale, OR the sale's unit was simply not recorded
+    (41 positive-sale rows in 2011Q1, 6 in 2013Q1; measured 2026-10-14).
+    Where it disagrees with `u` the row is a
     data-quality FLAG, not an identification of the price denominator
     (canonical note, lsms_library/data_info.yml `crop_production.
     Unit_sold`).

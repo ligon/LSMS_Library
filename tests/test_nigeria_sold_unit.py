@@ -35,9 +35,15 @@ Four things are pinned, and they fail differently:
    is sales from a big sack of a harvest kept in a medium one, invisible to
    ``_canon_unit``.
 
-Plus the GH #867 rider: Nigeria's ``Other Inorganic Fertilizer`` label now
-resolves in ``_NITROGEN_CONTENT`` to the existing inorganic class share --
-a spelling alias, not a new number.
+Plus a GH #867 guard, inverted by ruling (@ligon, 2026-10-14): Nigeria's
+``Other Inorganic Fertilizer`` (W1-W3 instrument code "4. other (specify)",
+relabelled inorganic by ``categorical_mapping.org``) and Mali's ``Other
+inorganic`` must NOT resolve to a nitrogen share here.  An earlier commit
+on this branch aliased them to the 0.20 class share as a "spelling fix";
+measured, that moved Mali's served kg N by +13.5% (9,640 rows, +122,434 kg)
+and Nigeria's by +4,402 kg, undisclosed.  The vocabulary belongs to #867,
+with its own disclosure and a maintainer signature -- so this test fails
+the moment an alias reaches those labels by accident.
 
 Schema facts are READ from the country's ``data_scheme.yml`` and from
 ``lsms_library/data_info.yml``, never hardcoded (CLAUDE.md, "Canonical
@@ -328,21 +334,62 @@ class TestBuiltTable:
             assert nonnull.get(w, 0) == 0, (w, nonnull.get(w))
         assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
 
+    def test_api_frame_serves_unit_sold_through_finalize(self):
+        """Same counts on the SERVED frame -- exercises `_finalize_result`
+        (categorical mapping, canonical spellings, dtype coercion), which a
+        raw `read_parquet` of the cache does not.  Reads the warm parquet
+        only (`assume_cache_fresh=True`); never cold-builds in CI."""
+        from lsms_library.local_tools import data_root
+        path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
+        if not path.exists():
+            pytest.skip("no warm Nigeria crop_production parquet")
+        if UNIT_SOLD not in pd.read_parquet(path, columns=None).columns:
+            pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
+        import lsms_library as ll
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
+        assert UNIT_SOLD in df.columns
+        assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
+        assert UNIT_SOLD not in df.index.names
+        t = df.index.get_level_values("t")
+        nonnull = df[UNIT_SOLD].notna().groupby(np.asarray(t)).sum()
+        assert nonnull.get("2011Q1", 0) > 3000
+        assert nonnull.get("2013Q1", 0) > 3000
+        for w in ("2016Q1", "2019Q1", "2024Q1"):
+            assert nonnull.get(w, 0) == 0, (w, nonnull.get(w))
+        # The only sold label absent from the harvest vocabulary is Olodo
+        # (CONTENTS.org): the read-path passes do not move u and Unit_sold apart.
+        # (`u` is a column on the Country frame; Feature() moves it to the index.)
+        u = df["u"] if "u" in df.columns else df.index.get_level_values("u").to_series()
+        extra = set(df[UNIT_SOLD].dropna().unique()) - set(u.dropna().unique())
+        assert extra <= {"Olodo"}, extra
+
 
 # --------------------------------------------------------------------------
-# GH #867 rider: the Nigeria 'Other Inorganic Fertilizer' spelling
+# GH #867 guard: 'other inorganic' labels carry NO nitrogen share (by ruling)
 # --------------------------------------------------------------------------
+
+#: Labels that name an "other" fertilizer the instrument does not quantify.
+#: Nigeria W1-W3 `s11dq3` is {1 npk, 2 urea, 3 composite manure, 4 other
+#: (specify)}; `categorical_mapping.org` relabels code 4 "Other Inorganic
+#: Fertilizer".  Mali's EACI slot is `Other inorganic` (categorical_mapping
+#: `harmonize_input`).  A share for any of them is a maintainer decision on
+#: GH #867, not a spelling alias (@ligon, 2026-10-14).
+UNSHARED_OTHER_LABELS = ["Other Inorganic Fertilizer", "Other inorganic", "other (specify)"]
+
 
 class TestOtherInorganicSpelling:
-    def test_label_resolves_to_the_inorganic_class_share(self):
+    @pytest.mark.parametrize("label", UNSHARED_OTHER_LABELS)
+    def test_label_does_not_resolve_to_a_nitrogen_share(self, label):
         from lsms_library import transformations as T
-        keys = [k for k in T._normalise_input_label("Other Inorganic Fertilizer")
-                if k in T._NITROGEN_CONTENT]
-        assert keys, "Nigeria's 'Other Inorganic Fertilizer' still matches nothing"
-        # A spelling alias of the class share, not a new number.
-        assert T._NITROGEN_CONTENT[keys[0]] == T._NITROGEN_CONTENT["inorganic fertilizer"]
+        keys = [k for k in T._normalise_input_label(label) if k in T._NITROGEN_CONTENT]
+        assert not keys, (
+            f"{label!r} resolves to {keys} in _NITROGEN_CONTENT; a nitrogen share "
+            "for an 'other' fertilizer slot is a GH #867 decision, not an alias "
+            "(ruling @ligon 2026-10-14: Mali +13.5% kg N from the last one)")
 
-    def test_nitrogen_kg_counts_the_row_and_does_not_name_it_unmatched(self):
+    def test_nitrogen_kg_names_the_row_unmatched_and_warns(self):
         from lsms_library import transformations as T
         df = pd.DataFrame({
             "t": ["2011Q1"] * 2, "i": ["1", "1"], "plot_id": ["p1", "p1"],
@@ -353,8 +400,11 @@ class TestOtherInorganicSpelling:
             warnings.simplefilter("always")
             out = T.nitrogen_kg(df)
         tally = out.attrs["nitrogen_input_match"]
-        assert "Other Inorganic Fertilizer" in tally["matched_labels"]
-        assert tally["unmatched_rows"] == 0
-        assert float(out["Nitrogen_kg"].iloc[0]) == pytest.approx(
-            10 * T._NITROGEN_CONTENT["inorganic fertilizer"] + 10 * T._NITROGEN_CONTENT["urea"])
-        assert not [x for x in w if issubclass(x.category, T.NutrientCoverageWarning)]
+        assert "Other Inorganic Fertilizer" not in tally["matched_labels"]
+        assert tally["unmatched_rows"] == 1
+        assert "Other Inorganic Fertilizer" in tally["unmatched_labels"]
+        # Only the urea row contributes; the 'other' row contributes nothing
+        # and is NAMED rather than silently absorbed.
+        assert float(out["Nitrogen_kg"].iloc[0]) == pytest.approx(10 * T._NITROGEN_CONTENT["urea"])
+        cov = [x for x in w if issubclass(x.category, T.NutrientCoverageWarning)]
+        assert cov and "Other Inorganic Fertilizer" in str(cov[0].message)

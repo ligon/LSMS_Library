@@ -1029,9 +1029,21 @@ column, never an index level, never sentinel-filled.  Pinned by
   | 2011Q1 |            3,548 | 3,438 (96.9%)   | 3,466 (*97.7%*)          | 3,451 / 3,374 (97.8%)     |
   | 2013Q1 |            3,478 | 3,316 (95.3%)   | 3,349 (*96.3%*)          | 3,411 / 3,283 (96.2%)     |
 
-  (built-table counts are lower than raw because the build drops rows with
-  no resolved crop label and de-duplicates on the index grain -- the same
-  rule as every other column.)  Non-null =Unit_sold= on the built table:
+  Built-table counts are lower than raw, and the red team (2026-10-14)
+  decomposed the gap exactly: *0* positive-sale rows lose a crop label
+  (the earlier "no resolved crop label" explanation was wrong); *93* W1 and
+  *66* W2 positive-sale rows are discarded by the country script's
+  =drop_duplicates(subset=[t,i,plot_id,crop], keep='first')= (3,548 -> 3,455;
+  3,478 -> 3,412) -- of those 159 rows, 151 carry a *different*
+  =Quantity_sold= than the row kept for their key and 40 are keys whose kept
+  row records NO sale at all (17 W1, 23 W2); and 4 W1 / 1 W2 rows carry a
+  unit code with no Stata value label (=u= '5.0'/'0.0', =Unit_sold= '50.0')
+  that canonicalises to NA.  The dedup is a PRE-EXISTING silent grain
+  collapse (it governed =Quantity_sold= / =Value_sold= before =Unit_sold=
+  existed) at 122 W1 / 81 W2 duplicate keys among positive-sale rows alone;
+  it sits in the country script, upstream of every core audit, so
+  =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
+  Non-null =Unit_sold= on the built table:
   2011Q1 3,486, 2013Q1 3,430, W3-W5 0.  The top served disagreement cells
   are =l= -> =Kg= (10) and =Kg= <-> =Sack/Bag= (14) in 2011Q1, and =Kg= ->
   =Tiya= / =Mudu= (24) in 2013Q1: a kilogram harvest sold by the measure.
@@ -1051,13 +1063,35 @@ column, never an index level, never sentinel-filled.  Pinned by
   categorical mapping / canonical-spelling passes do not move =u= away from
   =Unit_sold= (neither has a =spellings= block; =Unit_sold= matches no
   =categorical_mapping.org= table name).
-- *GH #867 rider, measured on this country's warm =plot_inputs= (96,620
-  rows)*: =transformations._NITROGEN_CONTENT= now aliases =other inorganic
-  fertilizer= to the existing =inorganic fertilizer= class share (0.20).
-  Nigeria's =Other Inorganic Fertilizer= label (170 rows) went from
-  unmatched to matched; =nitrogen_kg= matched rows 10,014 -> 10,184, plots
-  4,359 -> 4,472, total 173,672 -> 178,074 kg N.  A spelling alias, not a
-  new number; the NPS / D Compound / organic content decisions stay open.
+- *GH #867 alias WITHDRAWN by ruling (@ligon, 2026-10-14).*  An earlier
+  commit on the #824 branch added =other inorganic fertilizer: 0.20= to
+  =transformations._NITROGEN_CONTENT= as a "spelling alias" for this
+  country's =Other Inorganic Fertilizer= label (170 rows; =nitrogen_kg=
+  matched rows 10,014 -> 10,184, plots 4,359 -> 4,472, total 173,672 ->
+  178,074 kg N, +4,402).  The red team found two things wrong with it.
+  (1) Reach: =_normalise_input_label= appends " fertilizer", so Mali's
+  =Other inorganic= (EACI slot, =Mali/_/categorical_mapping.org=
+  =harmonize_input=) resolved too -- 9,640 rows, Mali kg N 906,362 ->
+  1,028,796 (*+13.5%*), undisclosed anywhere.  (2) Provenance: W1-W3
+  =s11dq3= is {1 npk, 2 urea, 3 composite manure, 4 other (specify)}; the
+  instrument does not call code 4 inorganic -- =categorical_mapping.org:758=
+  does.  Only W4/W5 carry a source column literally named "other
+  inorganic" (36 + 25 rows; 109 of the 170 rest on the relabel).  Ruling:
+  no nitrogen share for either label on this branch; =transformations.py=
+  is byte-identical to =development= again (re-measured: Mali 906,361.8,
+  Nigeria 173,672.0 kg N), and =tests/test_nigeria_sold_unit.py::
+  TestOtherInorganicSpelling= now pins that =Other Inorganic Fertilizer=,
+  =Other inorganic= and =other (specify)= resolve to NOTHING.  Any share
+  for them lands on #867 with its own disclosure and a signature.
+- *Unit_sold NA has three causes*, not two: no sold-unit column (W3-W5),
+  no sale on the row, or a sale whose unit was simply not recorded -- 41
+  positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5 rows carry a
+  =Unit_sold= with no positive sale).
+- *Not read, pre-existing scope*: =Quantity_sold= / =Value_sold= /
+  =Unit_sold= are the MAIN buyer only.  The W1/W2 A3 files also carry
+  =sa3q16a/b= (quantity + unit sold to OTHER buyers) and =sa3q17= (their
+  value); neither the build nor this file used to mention them.  A
+  farmgate price built from the served columns is a main-buyer price.
 - *Cache*: =nigeria.py= and =data_scheme.yml= are in every Nigeria table's
   hash, so all 24 tables re-warm; only =crop_production='s content moves.
   With GH #866 landed the stale =var/crop_production.parquet= is evicted
