@@ -39,6 +39,14 @@ Nothing is merged; no PR is open; no GitHub write has been made.  Every branch i
 - =get_data_file= parses =grab_data='s =../Data/= candidate into =country='..'= ("No SOURCE.org found for ../.."); =paths.data_root= lru_cache poisoned by =monkeypatch.setenv= in =test_gh866_*=; order-dependent =test_ghanalss_aggregate[total]=.
 - =_sync_legacy_dvc_creds= is dead once no =dvc.api.open= caller remains (#810).
 
+- RULINGS (@ligon 2026-10-14, accepting the scrum master's recommendations on every open point):
+  - #811: accept the three editorial spellings (GB =SAB= upper; BF =Mouhoun=; SEN unaccented).  PR-ready.
+  - Nigeria #867 alias: do NOT sign the 0.20 N share for Mali "Other inorganic" / Nigeria W1-W3 "other (specify)"; drop the alias from =fix/nigeria-824= and let #867 carry it with its own disclosure.
+  - #831: move =Panama/1997/Data/unittable.csv= under =Panama/_/= rather than allowlist it.
+  - #868 bill: pay the corpus-wide re-warm, BUNDLED with #810 and #970 (one cold re-warm for the three).  Measured 2026-10-14: merging GitHub development through PR #965 moved 0/5 build fingerprints, so #965 does NOT already owe the re-warm; only Malawi (#966) and GhanaLSS (#952) hashes moved on the merge.
+  - Malawi: already ruled 2026-09-25 (above) and LANDED on GitHub as PR #966 (=fix/malawi-sale-units=, a rework of the =fix/malawi-bundle= -> =malawi-derivations-2= stack); the stack branches are superseded, not for PR.
+  - 2026-10-14 state: mirror development was merged with GitHub development (796386fa7; fork point 3cf124ca3, 54 vs 31 commits).  All seven remaining fix branches trial-merge clean onto it.
+
 * Proposed next steps
 1. @ligon answers the decision column (five decisions) and the #868 bill.
 2. One more fix array (same harness) applies the reviewers' mechanical follow-ups on the six pass-with-fixes branches, each from that branch: 810 (comment), 831 (five items), malawi (two docstrings + CONTENTS), nigeria (three prose items + Mali test pin), niger (four items incl. narrowing the red test), 868 (rename =dropped=, two docstrings) -- decisions applied where given.
