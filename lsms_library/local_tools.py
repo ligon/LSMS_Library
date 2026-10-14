@@ -1403,9 +1403,23 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # when the walk ran inside a forked build worker (Nepal).  A
         # missing source now fails fast, from any cwd, with the error the
         # callers already handle (``FileNotFoundError``; ``grab_data`` and
-        # ``df_data_grabber(missing_ok=)`` catch that class).  Genuine WB
-        # fetch failures (network, auth) propagate from
-        # ``_try_get_data_file`` as before.
+        # ``df_data_grabber(missing_ok=)`` catch that class).
+        #
+        # Two things about the WB route are NEW here, not "as before"
+        # (red team, 2026-09-24).  (1) It was previously UNREACHABLE from
+        # this branch: ``dvc.api.open`` raised ``PathMissingError`` -- a
+        # ``DvcException``, outside the caught ``(OSError, ValueError,
+        # KeyError, ImportError)`` -- so ``_try_get_data_file`` never ran
+        # for a plain missing source.  (2) ``get_data_file`` swallows its
+        # own network/HTTP/timeout errors to ``None`` (``_get_catalog_idno``,
+        # ``_find_stata_zip_url``, ``_download_and_extract``), so a WB fetch
+        # failure surfaces as THIS ``FileNotFoundError``, never as a
+        # propagated network error.  Cost per missing source: online, a few
+        # seconds of WB catalog calls; offline / firewalled, bounded by the
+        # ``urlopen(timeout=30)`` calls in those helpers plus one cached
+        # key validation per process (``permissions()`` is memoised).
+        # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
+        # every cold read.
         local_path = _try_get_data_file(fn)
         if local_path is None:
             raise FileNotFoundError(
