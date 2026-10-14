@@ -111,7 +111,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       # Separate from pytest so an import-time failure is attributed to the
       # import, not lost inside test collection.
       - name: Import + config smoke
