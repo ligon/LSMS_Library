@@ -99,7 +99,7 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
                 print("Operation aborted. Credentials were not written.")
                 return
 
-        with open(creds_file, 'w') as f:
+        with open(creds_file, 'w', encoding="utf-8") as f:
             f.write(str(decrypted_data))
         if interactive:
             print("*** Decryption successful; LSMS_Library can now stream data. ***")

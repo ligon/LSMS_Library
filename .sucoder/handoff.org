@@ -1,3 +1,154 @@
+#+title: Handoff -- 2026-10-14 (Sue / Claude Fable 5.1), Savio job 39919092
+
+* State at 16:20 PDT: forks reconciled, CI slimmed, follow-up array in flight
+
+** Done this session (all on =development=, published to the mirror AND pushed to GitHub)
+- Mirror development and GitHub development had FORKED at =3cf124ca3= (54 vs 31 commits).  Merged as =796386fa7=; lock regenerated =fa9c8d605=; two semantic conflicts the clean merge hid were fixed after the full suite (3 failed / 6748 passed, =/local/job39919092/tmp/gate1/pytest_full.log=): =tests/test_categorical_mapping_resolution.py= now pins the #693 fix (=2fbea0d2b=), and the windows-smoke =poetry install= lacks =--no-root= (fixed on PR #973, not yet merged).
+- Cache cost of the merge, measured: 0/5 build fingerprints moved; only Malawi (#966) and GhanaLSS (#952) table hashes moved.  Much of the scratch corpus was already stale BEFORE the merge (Niger/Tanzania =var/= grade stale on the pre-merge tree too).
+- =git merge= fires =post-merge=, not =post-commit=: the sucoder publish hook SKIPS merge commits.  Push by hand after a merge.
+- Rulings from @ligon (2026-10-14) recorded in =slurm_logs/backlog_fix_2026-09-24/REVIEW_SUMMARY.org= ("RULINGS" block): #811 spellings accepted; drop the #867 alias from nigeria-824; Panama csv under =_/=; #868 re-warm paid once, bundled with #810 and #970.  Malawi stack is superseded by merged PR #966.
+- GitHub: PR #971 (#811), #972 (#848), #973 (ci.yml: single run per PR, docs-only pushes skipped, =merge_group= trigger, =--no-root=).  #973 has auto-merge armed.  Ruleset 25124452 "development: required checks" (=unit-tests= required, no delete/force; admin bypass).  =allow_auto_merge= enabled.  GitHub MERGE QUEUE is NOT available: the repo is user-owned, and the =merge_queue= rule fails validation on every shape (org-only feature).  Use =gh pr merge --auto --merge N=.
+
+** In flight
+- Slurm array =39919516= (savio3_htc, 6 elements, 6h cap): =slurm_logs/backlog_fix_2026-10-14/= (briefs, elements.txt, sbatch).  Outputs under =/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39919516/<key>/= (REPORT.md, commits.txt, claude.err).  Each element merges origin/development into its base branch and pushes =fix/<key>= to the mirror.
+  Elements: 810-followup, 831-followup, nigeria-824-followup, niger-followup-2, 868-followup, 970-json-make.
+- CI on #973 and on the development push =2fbea0d2b=.
+
+** Next concrete actions
+1. When the array ends: read each REPORT.md; a red-team review array (reuse =backlog_fix_2026-09-24/review_array.sbatch= + review_briefs pattern) for the six branches, or at least for 970-json-make and nigeria-824-followup (data change).
+2. Open PRs for the six follow-up branches; bundle #810 + #868 + #970 in ONE merge window so the corpus re-warms once.  Then warm the shared cache cold (=slurm_logs= has the coverage_refresh sbatch).
+3. #967 (Uganda units) still needs human review; #969 (Windows script builds) has one windows-smoke failure of two.
+4. File the cross-cutting findings in =REVIEW_SUMMARY.org= as issues (gh writes; needs a go-ahead): BF cluster_features 2014 destruction + dropped df_geo; Nigeria drop_duplicates sale collapse + unread other-buyer columns; Niger hid 27010; data_root lru_cache poisoning in test_gh866; =../..= path parse in get_data_file.
+
+** Environment
+- Venv: =bash ~/mirrors/LSMS_Library/bin/savio_venv.sh mount= (mounts =.venv.sqfs= at =/local/job<ID>/venv_img=; it also repoints the MIRROR's =.venv= symlink, which is ignored).  Then =ln -sfn /local/job<ID>/venv_img .venv= in the clone and set =PYTHONPATH= to the clone.
+- Suite recipe that passed: =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 pytest -n 32 --dist=loadfile= -> 18 min on 40 cores.
+- Billed node; =sucoder release= when done.
+
+-- Sue
+
+#+title: Handoff -- 2026-09-26 (Sue / GPT-6), Savio job 39263225
+
+* Merges complete; Uganda corrections open as PR #967 (2026-09-26 00:39 PDT)
+
+The authorized green PRs were merged in order: #955, #951, #963, #952, #954, #966.
+GitHub development is =4c2223aa119381ebcd8aea05fc2f9d26c3026028=; its post-merge CI run =36224578786= passed on retry 2.
+#965 remains open with the two documented Windows review blockers; green smoke CI does not resolve them.
+
+[[https://github.com/ligon/LSMS_Library/pull/967][Uganda PR #967]] is open against =development=, not merged.
+Branch =fix/962-uganda-food-units= is clean at =a2b44daa677a02c82b60e05016df45e194597e32= and published to the shared origin and GitHub.
+Checkout: =/local/job39263225/worktrees/uganda-food-units=.
+The final library source is =72f8bce34=; =24bd5d084= updates only nine verified food-acquisition content hashes and the ledger; =a2b44daa6= records aggregate evidence.
+CI runs =36227390417= (PR) and =36227371781= (push) were running at this checkpoint.
+No approval to merge this new PR has been assumed.
+
+** Verified behavior and scope
+
+All 7359 former =---= acquisitions are accounted for: 6429 Value, 905 Unknown, 24 distinct recorded-code residuals and one recovered physical fish-unit row.
+Value carries expenditure as quantity with no reported Price; Unknown retains native quantities; neither receives a kg factor.
+The catalog promotes 131 recorded measurement labels, preserving all source-wave strings and previously nonblank preferred labels.
+The 24 residual-code rows retain existing inferred factors; the fish label retains the existing 2 kg range-endpoint convention.
+All acquisitions, purchased/all-source expenditures, food household-wave coverage, previously labelled physical quantities/prices and FCT are exact against base.
+Seven outputs were cold-built on base and candidate; the final source replay plus three price modes equals the first candidate exactly.
+Kilograms change by -849.299850578, fully attributed.
+Nutrition equals rebuilt kg quantities times FCT, but loses 24 household-wave rows with no convertible kg quantity (20 previously nonzero); 60 retained rows change.
+The broader #850 nutrition drift and published-paper baseline remain scientifically unadjudicated.
+
+** Tests, evidence and next action
+
+28 focused tests and 1728 independent oracle cases pass; categorical review regression fixed.
+Initial full suite: 6698 passed, 211 skipped, eight xfailed, one xpassed; cache-dependent skips meant it did not check food hashes before their parquets existed.
+Matched cold data with the original manifest: base 11 passed/one nutrition failure/41 skipped; candidate two passed/ten failed/41 skipped.
+Exactly nine food content hashes change; all structural fields match, and final cold replay confirms each new hash.
+Only those nine hashes were updated; every other fixture field, including nutrition, remains unchanged.
+Final built-data selection: 120 passed, 58 skipped, one retained nutrition-manifest failure (115.52 s).
+The base already fails the nutrition hash; the candidate additionally differs by the 24 accounted-for rows. Do not describe every nutrition mismatch as preexisting.
+API audit passes; all 24 Uganda scheme hashes change, 429 other-country hashes and global fingerprints do not.
+
+Durable report on the PR branch: =slurm_logs/uganda_units_2026-09-25/VALIDATION.org:1=.
+Runnable commands: =slurm_logs/uganda_units_2026-09-25/validation/COMMANDS.org:1=; source ledger: =.coder/ledger/962-uganda-food-units.md:1=.
+Raw frames and logs remain private under =/local/job39263225/uganda-units/=; only aggregate evidence is committed.
+No local test/build/agent worker remains active.
+Next action: check PR #967 CI and review its recorded nutrition limitation; do not regenerate the historical nutrition baseline merely to make the manifest green.
+The billed allocation remains active. Run =sucoder release= when finished with the node.
+
+-- Sue
+
+* Reviewed green PRs merged; Uganda corrections in progress
+
+The human authorized merging the reviewed green PRs, including #963, then finishing Uganda corrections.
+Merged #955, #951, #963, #952, #954 and #966, in that order, after checking exact reviewed heads and green CI.
+GitHub development is =4c2223aa119381ebcd8aea05fc2f9d26c3026028=.
+Merge timestamps and SHAs: =slurm_logs/pr_merge_review_2026-09-25/merged.json=.
+#965 remains OPEN with the two review blockers recorded below.
+
+Uganda worktree: =/local/job39263225/worktrees/uganda-food-units=, branch =fix/962-uganda-food-units=, based on the merged GitHub development.
+The two parked #962 branches remain historical evidence, not merge candidates.
+Agreed corrections: expenditure-only missing-unit rows use =Value= with =Quantity= equal to =Expenditure=; quantity-without-unit rows use =Unknown=; physical labels must be retained, with fractional metric parsing now fixed by #963.
+Independent catalog audit and cold baseline food/nutrition rebuild are running in private scratch =/local/job39263225/uganda-units/=.
+Do not regenerate the published or test nutrition baseline.
+
+Progress at 2026-09-26 00:08 PDT: Uganda source commit =a45d319bd= and aggregate evidence commit =784dd2552= are published on =fix/962-uganda-food-units=.
+24 focused tests pass; the catalog audit preserves 289 keys, promotes 131 measurement labels and retains 11 distinct code residuals.
+The source-ledger commits are =b22720d25= / =d57e7e9d0=.
+Cold base output is saved under =/local/job39263225/uganda-units/nutrition/base_*=.
+Cold candidate and full suite are running separately; source remains frozen until they finish.
+Independent review found one categorical-index assignment regression in =uganda.py:529=; the code worker is preparing a narrow patch and tests but must wait for the freeze to end before applying.
+Review/reproducer: =/local/job39263225/uganda-units/catalog/code-review/REVIEW.md=.
+Full-suite log: =/local/job39263225/uganda-units/full-suite.log= (16 workers, CPUs 8-23, copied private L2 cache).
+Candidate build log: =/local/job39263225/uganda-units/nutrition/build_candidate.log= (CPUs 24-35, cold private L2).
+All 24 Uganda scheme hashes change; 429 other-country hashes and all global fingerprints remain unchanged.
+No Uganda PR has been opened yet.
+Post-merge GitHub CI run =36224578786= failed once during Poetry plugin installation (unavailable platformdirs 4.11.15); retry 2 passed installation and is running tests.
+
+-- Sue
+
+
+* Open PR review complete (2026-09-25 23:19 PDT)
+
+User requested consistency review and preferred merge order, not merging.
+Recommendation: #955 -> #951 -> #963 -> #952 -> #954 -> #966 (after its CI passes); hold #965.
+All seven fetched heads combine cleanly in both forward and reverse order, yielding the same tree; no actual PR was merged or changed.
+Durable findings: =slurm_logs/pr_merge_review_2026-09-25/REVIEW.org:1=; exact reviewed heads/checks, cache census and dependency metadata are beside it.
+
+- #965 blockers :: PyPI ligonlibrary remains 0.2.2 with python-magic; CI swaps in python-magic-bin. Also Wave.resources still default-decodes wave YAML: Tajikistan 2003 fails under cp1252, missed by the guard's country-only pattern. Fix the reader, accept its broad rebuild, release/floor the upstream dependency fix and rerun unswapped Windows CI.
+- #963 correction :: On current development it changes all 18 GhanaLSS scheme-key hashes (and seven food wave hashes), despite the PR's no-rewarm claim. Batch #963/#952 before rebuilding GhanaLSS. No hard code ordering edge; the fingerprint machinery is already on the base.
+- Verification :: Combined targeted selections passed 132 + 264 + 462 + 109 + 2 tests (overlapping selections). All seven Ghana import probes passed. Cold roster pairs preserve values after sorting; full GhanaLSS food output and Malawi parser comparisons agree exactly. The two historical Ghana tests are now green. No worker processes remain.
+- CI :: All six earlier PRs green; #966 still running at the final check. Current GitHub base =3cf124ca3=; combined local test commit =ed84314790fe= at =/local/job39263225/worktrees/pr-review-combined= (detached, clean).
+- Next action :: Address the two #965 blockers before treating its green CI as native Windows support; merge the other six only under a subsequent merge instruction and after #966 turns green. This review made no GitHub writes.
+
+-- Sue
+
+* Malawi units PR open (2026-09-25 22:59 PDT)
+
+User requested the existing Malawi units work as a PR and explicitly favored rebuilding when useful.
+[[https://github.com/ligon/LSMS_Library/pull/966][PR #966]] is open, ready for review, against GitHub =development=; GitHub reports it mergeable.
+CI unit tests were still running at handoff; local verification is complete.
+No PR was merged and no unrelated issue was closed.
+
+- Branch :: =fix/malawi-sale-units= at =a27aae6d6ea139f0c0b40a5ac0a2d4183d580893=; published to both the shared origin and GitHub.
+- Checkout :: =/local/job39263225/worktrees/malawi-units-pr=; clean.
+- Scope :: Cherry-picked only the two kilogram aliases and the Malawi bundle/derivation stack onto GitHub base =3cf124ca3=, excluding unrelated mirror-development commits.
+- Review fixes :: =1900ecbb3= corrects stale rule descriptions and unsupported accuracy extrapolation; =2515d1668= fixes an all-null-unit reference join with three regression tests.
+- Verification :: Both baseline and candidate cold-built all 26 Malawi API entries. 517 selected tests passed with no skips/failures/errors. All 32 derivation-input checks passed. Scoped Feature audit has the same 150 warnings on both revisions; independent review passed 675 attachment cases.
+- Data effects :: All 135,078 harvest rows and fields survive unchanged. Relative to GitHub, 341 sale attachments are suppressed and one 2,500 MWK sale is recovered. All changes to derived food quantities (35 rows) and prices (31 rows) are attributed to the label/alias fixes; raw quantities/expenditures are preserved. Plot inputs change only 93,162 unit labels.
+- Cache scope :: All 21 materialized Malawi source tables rebuild; all 24 scheme-key hashes change. The 61 other-country control hashes and four framework fingerprints are unchanged.
+- Durable record :: On the PR branch, =slurm_logs/malawi_units_pr_2026-09-25/VALIDATION.org:1=, comparison scripts and aggregate factor trace; =.coder/ledger/malawi-sale-basis-pr.md:1=.
+- Known limits :: =derivation_inputs= returns sale rows, not a self-contained classifier dataset; replay rereads harvest/reference sources. The pre-existing variety collapse (27 sales / 373,600 MWK) remains separate. GH #833/#839 include other countries and remain open.
+
+** Environment and next action
+
+This main clone remains on =development= (previous HEAD =7f7386294=); this handoff is the only new main-branch change.
+The working Python is =/local/job39263225/venv_img/bin/python= (pandas 3.0.6, pyarrow 25.0.1, numpy 2.4.6).
+Do not use the main clone's minimal Poetry-created =.venv= for verification; the mounted image has the tested dependencies.
+Use the worktree as cwd, set =PYTHONPATH= and =LSMS_COUNTRIES_ROOT= to it, pin BLAS/OMP/MKL threads to 1, use =LSMS_BUILD_WORKERS=1= and pytest =--dist=loadfile=.
+Private caches/logs/pickles are under =/local/job39263225/malawi-pr-review/=; they are not durable when the job ends.
+No worker, test, audit or build process remains active from this task.
+Next action: check =gh pr checks 966 -R ligon/LSMS_Library=, then human review/merge.
+The billed allocation remains active; run =sucoder release= when finished with the node.
+
+-- Sue
+
 #+title: Handoff -- 2026-09-24 (Sue / Claude Fable 5.1), Savio job 39195255
 
 * State on arrival (2026-09-24 00:30)
@@ -32,14 +183,14 @@ No gh write and no code change were made; every close/comment is a proposal.
 Lesson (scrum-master skill, scatter-gather): this batched 4-6 issues per agent and ran 2 at a time on the 4-core slice -- wrong shape.  Next phase goes to Slurm as an array of headless =claude -p= agents, one per item; the pattern is verified by job 39197636 (=headless_probe.sbatch=, 35 s, =GH_REPO= set, =--permission-mode bypassPermissions=).
 Account baseline: =fc_jevons= 44,927 of 1,500,000 SUs (3%); all work here on =co_carleton=.
 
-** Fix phase IN FLIGHT: Slurm array 39198738 (fc_jevons, savio4_htc, 7 elements, submitted 2026-09-24 ~02:40)
-Elements (=slurm_logs/backlog_fix_2026-09-24/elements.txt=; briefs in =briefs/=): 810-dvc-open, 868-reduce-agreed, 811-region-tables, niger-bundle, malawi-bundle, nigeria-824, 831-cache-clear.
-Each: private clone of =development=, hand-mounted =.venv.sqfs=, private =LSMS_DATA_DIR= under =/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39198738/<key>/data= (dvc-cache symlinked, country parquets copied), headless =claude -p= on the brief, branch =fix/<key>= pushed to the mirror; =REPORT.md=, =commits.txt=, =diffstat.txt= beside the data.
-Excluded (gated on @ligon): #848 (needs the #962 draft parked), #962, Tanzania (#836/#837), Ethiopia (#837), Mali (#822/#839), and all reconcile gh writes.
-On completion: trust-but-verify -- =git -C ~/mirrors/LSMS_Library branch --list 'fix/*'=, =git diff --stat development..fix/<key>= per branch, read each REPORT.md's SCOPE DEVIATIONS, then red-team before any PR.
+** Fix + review phases DONE (2026-09-24 05:10) -- read =slurm_logs/backlog_fix_2026-09-24/REVIEW_SUMMARY.org=
+Eight branches on the mirror, eight verdicts (2 pass, 5 pass-with-fixes, 1 needs-human), five decisions for @ligon listed there.  Nothing merged, no PR, no gh write.
+Bill: 95.8 fc_jevons core-hours over 25 jobs; ~USD 209 inference.
+Malawi stack complete through fix/malawi-derivations-2 (2026-09-25); see REVIEW_SUMMARY.org "Rulings received".
+Next: decisions -> follow-up fix array (mechanical reviewer items) -> push to GitHub + PRs -> file the cross-cutting findings.
 
 ** Next concrete action
-@ligon reads the triage report; answers the escalations he wants acted on; then the fix phase runs as a Slurm array (one element per dispatch-plan step), each element cloning =development= from the mirror, mounting =.venv.sqfs= by hand, and publishing a =fix/<issue>= branch.
+@ligon answers the five decisions + the #868 bill in REVIEW_SUMMARY.org; then dispatch the follow-up array (savio3_htc if it has headroom), then PRs.
 
 #+title: Handoff -- 2026-09-17 (Sue / Claude Fable 5.1), Savio job 39002769
 

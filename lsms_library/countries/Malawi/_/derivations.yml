@@ -1,0 +1,515 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+#
+# THE SALE-BASIS LADDER (2026-09-24).  crop_production attaches a
+# household-crop SALE (Module I seasonal / Module Q perennial: quantity,
+# unit, shelled/unshelled, value) to the single-plot harvest row (Module G /
+# P) measured in the sale's own unit.  The ladder retains GH #833's exact
+# matches and unknown wildcard, and adds registered price rules that can
+# resolve contradictory S/U answers (ag_i02c / ag_q02c vs ag_g13c), plus
+# distinct not-applicable branches for measured non-separation or an absent
+# reference.  The reported harvest `condition` stays unchanged.  Every
+# path by which a sale reaches a row OTHER than an exact
+# match of two stated answers is a registered rung below, one key per rung
+# so the path taken is countable; the rows are decided per wave, inside
+# `malawi.assemble_crop_production` (`_attach_sales`), from that wave's own
+# Module I/Q.  Quantity_sold and Value_sold on a keyed row are the REPORTED
+# figures; what is derived is the ATTACHMENT -- which row a sale whose basis
+# the survey did not settle belongs to.  Rulings (@ligon, 2026-09-24):
+# "shelled vs unshelled is really a missing data problem, decipherable by
+# looking at prices" -- "this would be a derived value"; "the 647
+# contradictions could also sometimes produce a derived value, based on
+# price"; not-applicable IS the basis where shelling does not apply.
+# Evidence base: slurm_logs/backlog_fix_2026-09-24/malawi_sale_basis/
+# README.org (branch fix/malawi-sale-basis-probe) and CONTENTS.org, "the
+# sale-basis LADDER".
+#
+# Two rungs were added on 2026-09-25 (@ligon's rulings on the review of
+# the ladder): `sale-basis-from-price-overrule` (price decides on the
+# S/U-sale-vs-NA-harvest side even against the sale's recorded answer) and
+# `sale-basis-no-reference` (rung 3 split: admitted because NO reference
+# exists, as distinct from a reference that measurably does not separate).
+#
+# Shared by every rung: the one function `malawi:derive_sale_basis` (the
+# ladder is one decision), the gates SALE_BASIS_MIN_REFERENCE = 10 agreeing
+# sales per basis in the wave's own (crop, u) cell -- else (crop) on
+# cell-relative log price with >= 3 in the own cell --, SALE_BASIS_SEPARATION_P
+# = 0.75 (Mann-Whitney P(shelled > unshelled) at or beyond it on either
+# side), SALE_BASIS_MARGIN = 0.5 (the sale's log-price margin between the two
+# medians exceeds half their gap), and the GH #833 1:1 gate on every rung.
+# A zero-quantity, zero-value line (a crop the household did NOT sell,
+# summed to 0 by `_sale_block`) is served as 0.0 as before and carries NO
+# key: it is the survey's "did not sell", not a sale.
+
+Malawi::crop_production::sale-basis-unknown-wildcard:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    The sale is attached to the single-plot harvest row in its own unit when
+    EITHER side's shelled/unshelled state is `unknown_condition` (a NULL or
+    off-scheme S/U code, or a module that asks no S/U at all): the survey
+    did not answer on that side, so there is nothing to contradict -- and
+    nothing to match, which is why unknown-against-unknown is this rung and
+    not an exact match.  Every Module P harvest row (P asks no condition)
+    and every 2010-11 / 2013-14 Module Q sale (Q has no ag_q02c before
+    2016-17) reaches its row here.  1:1 gate as on every rung.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_wildcard
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+  assumptions:
+    - text: >-
+        Module Q asks no shelled/unshelled question before 2016-17, and
+        Module P never does: the IHS3 questionnaire's Module Q page prints
+        the column header QUANTITY UNIT (Module I prints QUANTITY UNIT S/U)
+        with only the boilerplate CODE FOR S/U legend; the IHS5 Module Q
+        page prints QUANTITY UNIT S/U.  Not-asked, verified on the
+        instrument, not asked-not-distributed.
+      basis: questionnaire
+      evidence: >-
+        IHS3 (2010-11) and IHS5 (2019-20) Agriculture Questionnaires,
+        Modules I, P, Q (slurm_logs/backlog_fix_2026-09-24/malawi_sale_basis/
+        README.org section 1); 2010-11 ag_mod_q.dta and 2013-14
+        AG_MOD_Q_13.dta carry no ag_q02c column.
+    - text: >-
+        a side that did not answer is COMPATIBLE with any answer on the
+        other side.  The alternative -- attaching nothing where either side
+        is unknown -- would strip every perennial sale of the corpus from
+        crop_production.
+      basis: modelling-choice
+      evidence: GH #833 rule (CONTENTS.org, "The rule"), unchanged here.
+  validated_against: >-
+    Not a price rule; nothing to validate against.  Delivered (cold build,
+    2026-09-24): the count and MWK per wave are in
+    attrs['sale_basis_ladder'] and CONTENTS.org, "the sale-basis LADDER".
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'
+
+Malawi::crop_production::sale-basis-from-price:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    One side answered NOT APPLICABLE (ag_i02c / ag_q02c or ag_g13c code 3)
+    and the other SHELLED or UNSHELLED, and the wave's own agreeing sales
+    (attached on an exact match, sale S/U/NA == harvest S/U/NA, Value_sold
+    and Quantity_sold > 0) show the basis is PRICED in the sale's cell:
+    >= 10 on each of shelled and unshelled in the (crop, u) cell on log
+    unit price (else in the (crop) cell on log price relative to the
+    sale's own (crop, u) median, that cell holding >= 3), with Mann-Whitney
+    P(shelled > unshelled) >= 0.75 or <= 0.25.  The sale's basis b is then
+    the median it is nearer, provided its margin ||logp - m_S| - |logp -
+    m_U|| exceeds 0.5 x |m_S - m_U| -- i.e. the price sits in the OUTER
+    quarter of the interval between the two medians, or beyond it.  A
+    not-applicable SALE is attached to the harvest row whose condition is
+    b; a shelled/unshelled SALE against a not-applicable ROW is attached
+    under THIS key when b corroborates the sale's own answer, and under
+    `sale-basis-from-price-overrule` when b contradicts it.  A separating
+    cell whose sale price is missing or sits in the MIDDLE HALF between the
+    medians (margin <= 0.5 x gap) resolves nothing (unresolved), and is NOT
+    rung 3.  Measured (cold build, 2026-09-25): 77 of the 357 sales
+    admitted on the three price rungs before the overrule rung existed --
+    9 / 1 / 9 / 58 per wave -- have a price strictly between the medians
+    but in the outer quarter; 80 of 361 with the overrule rung.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_from_price
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+  assumptions:
+    - text: >-
+        a shelled unit of a crop sells at a premium over an unshelled unit
+        of the same crop, in the same unit and wave, large enough to
+        identify the basis of a sale from its unit price.  TRUE FOR
+        GROUNDNUT ONLY: 1.6-2.2x per 50 kg bag, 3.7x per kilogramme, 4.4x
+        per large pail, P(S>U) 0.78-0.98, leave-one-out nearest-median
+        recall ~80% per basis, 87% on the unambiguous half.  FALSE for
+        Maize, Rice, Soyabean, Pigeon Pea, Tobacco, Cotton (ratio 0.94-1.00,
+        P 0.42-0.65).  The separation gate encodes this per CELL rather than
+        per crop -- there is no crop allowlist: a future wave in which Maize
+        separates is admitted and a Groundnut cell that does not is refused.
+      basis: modelling-choice
+      evidence: >-
+        slurm_logs/backlog_fix_2026-09-24/malawi_sale_basis/out/
+        separation_wave_crop_unit.csv and classify_validation_by_crop.csv
+        (README.org sections 3-4).
+    - text: >-
+        NOT APPLICABLE on one side of a crop whose other side says shelled
+        or unshelled, in a cell where the two bases are priced apart, is a
+        MISSING basis and not a third one: the instrument scopes S/U to
+        "FOR ALL APPLICABLE CROPS" by enumerator judgement with no crop
+        list, and the 18 not-applicable Groundnut bags of 2016-17 price
+        BETWEEN the shelled and the unshelled medians (S/NA 1.30, U/NA
+        0.78).
+      basis: questionnaire
+      evidence: >-
+        IHS3 and IHS5 Agriculture Questionnaires, Modules G and I: "FOR ALL
+        APPLICABLE CROPS, MAKE SURE TO ASK WHETHER THE REPORTED VALUE IS
+        SHELLED OR UNSHELLED", CODE FOR S/U 1/2/3; README.org section 3.
+    - text: >-
+        the reference population is the wave's own AGREEING sales; the
+        contradictions and the NA-vs-S/U sales are excluded from it because
+        they are what is being decided (testing them against a distribution
+        they are in is circular).  Never across waves: a wave script sees
+        one wave's Module I/Q, and the wave parquet must be a function of
+        that wave's inputs (the cross-wave (crop, u) rung the probe measured
+        is deliberately not used; it costs one Pigeon Pea sale).
+      basis: modelling-choice
+      evidence: README.org section 8, "Decisions taken in this probe".
+    - text: >-
+        the thresholds -- 10 per basis, P outside (0.25, 0.75), margin >
+        0.5 x gap -- are STATED TOLERANCES, not discovered boundaries.  10
+        matches the corpus's other reference floors; 0.75 is the smallest P
+        at which every Groundnut (t, crop, u) cell is admitted (min 0.777,
+        2016-17 50 kg Bag) and no non-Groundnut one is (max 0.738, Pigeon
+        Pea kg); 0.5 moves Groundnut's validated accuracy from 80% to 87%
+        for a fifth of the coverage.
+      basis: modelling-choice
+      evidence: README.org section 7.1; malawi.py SALE_BASIS_* constants.
+    - text: >-
+        on the S/U-sale-against-NA-row side THIS key carries only the sales
+        whose price CORROBORATES the sale's own answer (0 / 0 / 6 / 15 =
+        21 sales / 509,500 MWK); a sale whose stated basis an unambiguous
+        price contradicts is re-based under
+        `sale-basis-from-price-overrule` (@ligon, 2026-09-25, ruling 1 --
+        this used to be a corroborate-only decision that left those 4
+        sales / 157,000 MWK unresolved).  The refused complement of this
+        side is the 7 sales / 550,400 MWK (all 2019-20) whose price fails
+        the margin; on the NA-sale side 6 sales / 267,800 MWK (4 in
+        2010-11, 2 in 2019-20) are refused because the price fails the
+        margin or names a basis no unclaimed row carries.  Both complements
+        are counted in attrs['sale_basis_ladder'][unresolved]['grounds'].
+        (The probe measured only the NA-sale side, 17 sales / 477,800 MWK,
+        all Groundnut, all inferred unshelled -- delivered exactly.)
+      basis: modelling-choice
+      evidence: >-
+        README.org sections 4-5 (item 4) and 7.1; review of 2026-09-25
+        (slurm_logs/backlog_fix_2026-09-24/verdicts/malawi-derivations.md,
+        section 2).
+  validated_against: >-
+    Leave-one-out on the 8,693 agreeing S/U sales with a reference: nearest
+    median recovers the recorded basis for ~80% of Groundnut sales on each
+    basis (87% on the margin > 0.5 x gap subset), and at or below a coin
+    flip per basis on every other crop -- which is what the separation gate
+    refuses (README.org section 4, out/classify_validation_by_crop.csv).
+    Delivered counts per wave and side (sale NA / harvest NA) are in
+    attrs['sale_basis_ladder'] and CONTENTS.org.
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'
+
+Malawi::crop_production::sale-basis-from-price-overrule:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    The harvest row answered NOT APPLICABLE (ag_g13c code 3), the sale
+    answered SHELLED or UNSHELLED (ag_i02c / ag_q02c), the wave's own
+    agreeing sales show the basis is PRICED in the sale's cell (the
+    from-price gates: >= 10 per basis, Mann-Whitney P outside (0.25,
+    0.75)), and the sale's price is unambiguous (margin > 0.5 x gap) and
+    names the OTHER basis from the one the sale recorded.  The price
+    overrules the recorded answer: the sale is attached to the
+    not-applicable row under the price-chosen basis (`basis` on the
+    decision frame), exactly as the contradiction rungs re-base a sale
+    against a stated row.  Its own key so that an overruled recorded
+    answer is countable and never hides inside `sale-basis-from-price`.
+    Sales the price cannot decide on this side (margin failed) stay
+    unresolved.  1:1 gate as on every rung.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_from_price_overrule
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+  assumptions:
+    - text: >-
+        a recorded S/U answer on the sale side, against a harvest row that
+        stated nothing about the basis, may be OVERRULED by an unambiguous
+        price: on this side, as on the contradiction rungs, the price
+        decides which recorded answer was misrecorded, and a lone recorded
+        answer is not more reliable than a contradicted one.  This reverses
+        the 2026-09-24 corroborate-only decision (@ligon, 2026-09-25,
+        ruling 1: "price decides on that side too").
+      basis: modelling-choice
+      evidence: >-
+        review of 2026-09-25, section 5 item 1; @ligon's ruling 1 the same
+        day.  Measured: 4 sales / 157,000 MWK, 0 / 0 / 2 / 2 per wave, all
+        Groundnut 50 kg Bag on the fine (crop, u) rung; in 2016-17 one
+        recorded unshelled priced as shelled and one recorded shelled
+        priced as unshelled; in 2019-20 both recorded unshelled and priced
+        as shelled.
+    - text: the from-price entry's assumptions on separation and thresholds apply unchanged.
+      basis: modelling-choice
+      evidence: Malawi::crop_production::sale-basis-from-price
+  validated_against: >-
+    The from-price leave-one-out recovers the recorded basis on agreeing
+    reference sales (~80% per basis on Groundnut, 87% on the margin > 0.5
+    x gap subset).  These rates do not measure accuracy on the 4 overruled
+    sales: every sale here has a recorded answer the price disagrees with,
+    and there is no third-source oracle to establish which is correct.
+    Accuracy on those 4 cases is unmeasured.  Delivered counts per wave are in
+    attrs['sale_basis_ladder'] and CONTENTS.org.
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-25'
+
+Malawi::crop_production::sale-basis-not-applicable:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    One side answered NOT APPLICABLE and the other SHELLED or UNSHELLED, and
+    the wave's own agreeing sales MEASURABLY do not price the basis in the
+    sale's cell: a (crop, u) -- else (crop) -- reference holds >= 10 on
+    each basis and its Mann-Whitney P(shelled > unshelled) is strictly
+    inside (0.25, 0.75).  The sale is attached to the row, not-applicable
+    being the basis: where the market does not price the basis, the basis
+    does not discriminate the sale.  1:1 gate as on every rung.  A pair
+    with NO reference at all is NOT this key: it is
+    `sale-basis-no-reference` (split 2026-09-25, @ligon's ruling 2, so
+    that "measured unpriced" and "unmeasured" are exposed per row).  No
+    crop allowlist: Tobacco lands here because its cells do not separate,
+    and so do Maize, Rice and Soyabean, whose physical basis exists but
+    sells at one price -- the key is what makes that visible.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_not_applicable
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+  assumptions:
+    - text: >-
+        the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
+        by enumerator judgement, with no crop list and no ginned / cured
+        option: on a crop with no shell, "shelled" is an enumerator applying
+        a code the instrument gives no meaning on that crop, not a different
+        physical basis.  The harvest side of Tobacco and Cotton is
+        not-applicable 100% of the time in 2010-11 and 86-97% afterwards,
+        and a Tobacco or Cotton sale coded S sells at the NA price in 7 of
+        9 cells with >= 10 on each (P 0.47-0.59).
+      basis: questionnaire
+      evidence: >-
+        IHS3 and IHS5 Agriculture Questionnaires, Modules G and I; README.org
+        sections 1, 3 and 6 (out/tobacco_cotton.out, out/separation_*.csv).
+    - text: >-
+        where the market does not price the basis, the basis does not
+        discriminate the sale, so not-applicable IS the basis and the S/U
+        answer on the other side is not a contradiction of it.  This
+        reverses the GH #833 decision of 2026-09-24 that NA against S/U is
+        a contradiction (@ligon's later ruling the same day, part (b)).
+      basis: modelling-choice
+      evidence: >-
+        @ligon, 2026-09-24 (three-part call, part b); README.org section
+        7.2 item 1 (the money it governs: Tobacco 109 sales / 24.76M and
+        Cotton 57 / 2.04M of the 465).
+  validated_against: >-
+    The complement of the from-price validation: on every crop but
+    Groundnut the nearest-median rule scores at or below a coin flip per
+    basis, i.e. the S/U label carries no price content there (README.org
+    section 4).  That validation supports ONLY this key, whose every sale
+    sits in a measured non-separating cell: 5 / 0 / 42 / 67 = 114 sales /
+    25,416,200 MWK (Tobacco 72, Rice 25, Soyabean 8, Maize 9), all on the
+    fine or mid rung of the wave's own reference.  Before 2026-09-25 this
+    key also carried the 296 sales / 13,270,507 MWK with no in-wave
+    reference at all, which the validation does not reach; they are now
+    `sale-basis-no-reference`.  Per-crop delivered counts are in
+    CONTENTS.org, "the sale-basis LADDER" -- read the Maize / Rice /
+    Soyabean rows before treating this key as "crops with no shell".
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'
+
+Malawi::crop_production::sale-basis-no-reference:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    One side answered NOT APPLICABLE and the other SHELLED or UNSHELLED, and
+    the wave holds NO reference for the sale's crop: no (crop, u) cell and
+    no (crop) cell among that wave's agreeing sales carries >= 10 on each
+    of shelled and unshelled (or the (crop) cell exists but the sale's own
+    (crop, u) cell has fewer than 3 reference sales for the offset).  The
+    sale is attached to the row, not-applicable being the basis -- on the
+    ABSENCE of evidence that the market prices the basis, not on a
+    measurement that it does not.  That is a weaker ground than
+    `sale-basis-not-applicable` and is therefore its own key, exposed per
+    row (@ligon, 2026-09-25, ruling 2).  1:1 gate as on every rung.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_no_reference
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+  assumptions:
+    - text: >-
+        the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
+        by enumerator judgement, with no crop list and no ginned / cured
+        option: on a crop with no shell, "shelled" is an enumerator
+        applying a code the instrument gives no meaning on that crop, not
+        a different physical basis.  Cotton (57 rows, all here), Sweet
+        Potato, Irish Potato, Tomato, Finger Millet and the tail are that
+        case.
+      basis: questionnaire
+      evidence: >-
+        IHS3 and IHS5 Agriculture Questionnaires, Modules G and I; README.org
+        sections 1, 3 and 6.
+    - text: >-
+        where NOTHING in the wave measures whether the market prices the
+        basis, the sale is admitted with not-applicable as the basis
+        rather than suppressed.  This is admission on the absence of
+        evidence: a crop with fewer than 10 agreeing shelled or unshelled
+        sales in the wave has an unmeasured basis premium, not a measured
+        zero one.  Soyabean 2019-20 (16 rows) is the case to read: its
+        2016-17 cell IS measured (non-separating, P 0.42-0.54, under
+        `sale-basis-not-applicable`), its 2019-20 cell is not, and the
+        ladder never pools across waves.
+      basis: modelling-choice
+      evidence: >-
+        @ligon, 2026-09-24 (three-part call, part b) and 2026-09-25 (ruling
+        2: the two grounds are separate keys); review of 2026-09-25,
+        section 5 item 2.
+  validated_against: >-
+    NOTHING, by construction: this key exists precisely for the pairs the
+    from-price validation cannot reach, and the leave-one-out that supports
+    `sale-basis-not-applicable` was run on cells with a reference.  What
+    could be measured: the probe's POOLED (cross-wave) separation for the
+    crops that land here is at or below a coin flip wherever the pooled
+    cell is large enough (Tobacco, Cotton, Soyabean: P 0.42-0.59, README.org
+    section 3), which is consistent with -- not evidence for -- the
+    admission.  What could not: any crop whose pooled cell is also below
+    10 per basis (Sweet Potato, Irish Potato, Tomato, Finger Millet, the
+    tail) has no measurement at any grain.  Delivered: 117 / 11 / 37 / 131
+    = 296 sales / 13,270,507 MWK (Sweet Potato 48, Cotton 57, Tobacco 37,
+    Finger Millet 24, Irish Potato 26, Soyabean 16, Tomato 17, ...);
+    per-crop counts in CONTENTS.org.
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-25'
+
+Malawi::crop_production::contradiction-price-sale:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    The sale's own S/U (ag_i02c / ag_q02c) and the harvest row's (ag_g13c)
+    are both stated and DIFFERENT, the cell separates and the sale's price
+    is unambiguous (the from-price gates), and the price sides with the
+    SALE's stated basis.  The sale is attached to the contradicting row --
+    the only row of that plot-crop in that unit, or the exact match would
+    have taken it -- and this key says the harvest row's S/U was
+    overruled by the sale's answer plus its price.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_contradiction_sale
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+  assumptions:
+    - text: >-
+        where two recorded answers disagree, a price that sits
+        unambiguously at one of them decides which was misrecorded.  On
+        Groundnut the sale field is the more reliable of the two -- the
+        price sides with it 61% (sale S / harvest U) and 77% (sale U /
+        harvest S) of the time against a ~80% ceiling if the sale were
+        always right -- but not reliable enough to overrule the harvest by
+        RULE, which is why the decision is per sale and per price, and why
+        the two keys are separate.
+      basis: modelling-choice
+      evidence: >-
+        README.org section 4 item 5 and 7.2 item 2 (out/
+        classify_contradictions_by_direction.csv); @ligon, 2026-09-24:
+        "the 647 contradictions could also sometimes produce a derived
+        value, based on price".
+    - text: the from-price entry's assumptions on separation and thresholds apply unchanged.
+      basis: modelling-choice
+      evidence: Malawi::crop_production::sale-basis-from-price
+  validated_against: >-
+    The same leave-one-out (~80% / 87% on Groundnut).  The probe sized this
+    rung at 319 sales / 10,630,970 MWK across the four waves (217 siding
+    with the sale, 102 with the harvest), all Groundnut; the cold build
+    reproduces 86 / 27 / 70 / 136 per wave exactly (CONTENTS.org).
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'
+
+Malawi::crop_production::contradiction-price-harvest:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    As contradiction-price-sale, but the price sides with the HARVEST row's
+    stated basis: the sale's own S/U is overruled, and the sale is attached
+    to the row on the row's basis.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_contradiction_harvest
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+  assumptions:
+    - text: as contradiction-price-sale; the two keys exist so that the direction is countable (217 vs 102 in the probe).
+      basis: modelling-choice
+      evidence: README.org section 7.2 item 2; @ligon, 2026-09-24.
+    - text: the from-price entry's assumptions on separation and thresholds apply unchanged.
+      basis: modelling-choice
+      evidence: Malawi::crop_production::sale-basis-from-price
+  validated_against: as contradiction-price-sale.
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'
+
+Malawi::crop_production::sale-basis-unresolved:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold]
+  rows: 0
+  rule: >-
+    A DELETION.  A sale with a candidate harvest row (single-plot crop, same
+    unit) that no rung admits is attached to nothing, and is COUNTED in
+    attrs['sale_basis_mismatch'] and in the SaleAttachmentWarning the build
+    emits, on one of three grounds, each counted in
+    attrs['sale_basis_ladder'][this key]['grounds']: (1) a contradiction
+    whose cell does not separate (`contradiction_no_separation`: Rice,
+    Maize, Soyabean, Pigeon Pea) or whose price is missing or sits in the
+    middle half between the medians (`contradiction_price_undecided`: the
+    Groundnut tail); (2) a not-applicable pair in a SEPARATING cell whose
+    price is missing, fails the margin, or names a basis no unclaimed row
+    carries (`na_sale_price_undecided` / `na_harvest_price_undecided`; the
+    shelled/unshelled sale against a not-applicable row whose price
+    CONTRADICTS its own answer is no longer here -- it is
+    `sale-basis-from-price-overrule` since 2026-09-25); (3) a sale or row
+    an exact match already claimed (`claimed_by_tier_a`).  Ambiguous
+    pairings (more than one compatible row or sale) are a separate count,
+    attrs['sale_suppressed'] (GH #854), not this entry.
+    The dropped rows have nowhere to carry a key; `derivation_inputs`
+    returns them.
+  function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_unresolved
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+  assumptions:
+    - text: >-
+        a sale that cannot be expressed at the row's declared grain (t, i,
+        plot_id, crop, u, condition) is not attached: attaching it on the
+        wrong basis makes Value_sold / Quantity_sold a price per the OTHER
+        basis, which the condition-keyed kg factors then convert with the
+        wrong factor (GH #833).  Not lost data: the raw modules and
+        `_sale_block` still hold the household-crop total.
+      basis: modelling-choice
+      evidence: GH #833 (CONTENTS.org, "The rule"); README.org section 5.
+  validated_against: >-
+    The build's own suppression predicate: `derivation_inputs` returns
+    exactly the Module I/Q lines whose grouped sale has outcome
+    'unresolved', and their count and MWK per wave equal
+    attrs['sale_basis_mismatch'].  Before this ladder the same tally held
+    1,112 sales / 64,110,157 MWK (303 / 59 / 247 / 503); after the ladder
+    of 2026-09-24, 345 / 13,805,180 (94 / 21 / 90 / 140); after the
+    overrule rung of 2026-09-25, 341 / 13,648,180 (94 / 21 / 88 / 138) --
+    by ground: contradiction, no separation 271; contradiction, price
+    undecided 57; NA pair, price undecided 13 (6 sale-side / 267,800 MWK, 7
+    harvest-side / 550,400 MWK); claimed by tier A 0.  See CONTENTS.org.
+  contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
+  since: '2026-09-24'

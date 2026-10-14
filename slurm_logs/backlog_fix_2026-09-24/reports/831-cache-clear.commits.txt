@@ -1,0 +1,1 @@
+a12690068 cli: `cache clear` names in-tree .dta/.sav/.csv, sidecar-less first (GH #831)

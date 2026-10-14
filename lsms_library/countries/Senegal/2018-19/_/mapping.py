@@ -76,11 +76,20 @@ def Birthplace(value):
         return value.title()
     
 def Relationship(value):
+    '''Title-case the s01q02 label, and keep a missing answer MISSING.
+
+    GH #813.  The former guard was ``if value:``, and a float ``nan`` is
+    TRUTHY -- so an unanswered ``s01q02`` went through ``str(nan).title()``
+    and was served as the literal string ``'Nan'``.  3 of this wave's
+    66,119 person-rows (and 15,201 of 2021-22's 78,732).  A missing answer
+    is ``pd.NA``; non-null values are title-cased exactly as before, which
+    the cp1252 repair below (``_fix_relationship``, GH #801) relies on.
+    ``_decode_cp1252`` returns a non-string unchanged, so ``pd.NA`` passes
+    through the hook untouched.
     '''
-    Formatting relationship variable
-    '''
-    if value:
-        return str(value).title()
+    if pd.isna(value):
+        return pd.NA
+    return str(value).title()
 
 
 def _decode_cp1252(value):
