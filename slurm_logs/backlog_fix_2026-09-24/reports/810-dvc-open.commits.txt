@@ -1,0 +1,2 @@
+bebe68a51 gh810: get_dataframe's last-resort branch goes straight to the WB fallback, never through a cwd-rooted dvc.api.open
+4d4d16d64 gh810: change_id reads its crosswalk through get_dataframe, not a cwd-rooted dvc.api.open

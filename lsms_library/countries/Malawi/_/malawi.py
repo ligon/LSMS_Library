@@ -1124,14 +1124,15 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
 
 def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
-                unit_sold=None, perennial=False):
-    """Reshape one sale module (I or Q) to (i, _crop_code, u) reported sale.
+                unit_sold=None, condition=None, perennial=False):
+    """Reshape one sale module (I or Q) to (i, _crop_code, u, condition_sold).
 
-    Returns a DataFrame with columns [i, _crop_code, u, Quantity_sold,
-    Value_sold] at the household-crop-unit grain (no plot).  Summed within
-    (i, _crop_code, u) because a household may report several sale rows for
-    the same crop -- this is the REPORTED total the household sold of that
-    crop IN THAT UNIT, not a derived aggregate over plots.
+    Returns a DataFrame with columns [i, _crop_code, u, condition_sold,
+    Quantity_sold, Value_sold] at the household-crop-unit-condition grain
+    (no plot).  Summed within that key because a household may report
+    several sale rows for the same crop -- this is the REPORTED total the
+    household sold of that crop IN THAT UNIT AND STATE, not a derived
+    aggregate over plots.
 
     ``unit_sold`` is the sale module's OWN unit column (Module I ag_i02b,
     Module Q ag_q02b).  The sale quantity is asked in its own unit, on the
@@ -1145,6 +1146,26 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     Before this was read, a sale in kilogrammes was routinely stamped on a
     row whose ``u`` said ``50 kg Bag`` -- a silent factor-of-50 error in any
     per-kg price.
+
+    ``condition`` is the sale module's OWN shelled/unshelled column (Module
+    I ``ag_i02c`` in every wave; Module Q ``ag_q02c`` from 2016-17 on --
+    2010-11 and 2013-14 Module Q ask no such question).  Its Stata value
+    labels are the harvest's (``1 S: SHELLED, 2 U: UNSHELLED, 3 NOT
+    APPLICABLE``, identical in every wave that asks it), so it goes through
+    the same ``_crop_conditions`` map and lands in the same vocabulary as
+    ``crop_production.condition``; NULL and an absent column sentinel to
+    ``unknown_condition`` exactly as the harvest side does.  It was UNREAD
+    until GH #833: the sale merge keyed on ``(i, crop, u)`` alone, so a
+    sale the household reported UNSHELLED was stamped on a harvest row
+    reported SHELLED (and vice versa) -- measured on the four waves, 642 of
+    the 11,321 attached sales whose both sides answered the question
+    contradicted each other, 375 of them on Groundnut, where the two bases
+    differ by the shelling yield (~65%).  ``assemble_crop_production`` now
+    passes the sale's stated answer to the sale-basis ladder: an exact
+    match, an unknown wildcard, or registered price and not-applicable
+    branches.  Price can resolve contradictions, including overruling the
+    sale's answer.  The ladder derives attachment/basis interpretation;
+    reported quantities, values and harvest condition stay unchanged.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
@@ -1155,6 +1176,12 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
     else:
         u = pd.Series(pd.NA, index=df.index, dtype='string')
 
+    if condition is not None and condition in df.columns:
+        cond_sold = _crop_conditions(df[condition])
+    else:
+        cond_sold = pd.Series(_CONDITION_UNKNOWN, index=df.index,
+                              dtype='object')
+
     qs = (pd.to_numeric(df[qty_sold], errors='coerce').astype('Float64')
           if qty_sold is not None and qty_sold in df.columns
           else pd.Series(pd.NA, index=df.index, dtype='Float64'))
@@ -1163,52 +1190,533 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
           else pd.Series(pd.NA, index=df.index, dtype='Float64'))
 
     out = pd.DataFrame({
-        'i':            df['hhid'].astype('string').values,
-        '_crop_code':   crop_code_int.values,
-        'u':            u.values,
-        'Quantity_sold': qs.values,
-        'Value_sold':   vs.values,
+        'i':              df['hhid'].astype('string').values,
+        '_crop_code':     crop_code_int.values,
+        'u':              u.values,
+        'condition_sold': cond_sold.values,
+        'Quantity_sold':  qs.values,
+        'Value_sold':     vs.values,
     })
     out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code', 'u'], as_index=False,
-                      dropna=False).agg(
+    grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
+                      as_index=False, dropna=False).agg(
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     return grp
 
 
-def assemble_crop_production(t, harvest_pieces, sale_pieces):
-    """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
-    pieces into the canonical crop_production DataFrame for wave ``t``.
+# --- The sale-basis LADDER: registered derivations (2026-09-24) -----------
+#
+# GH #833 made the sale's own shelled/unshelled answer (ag_i02c / ag_q02c)
+# a condition of attachment and suppressed 1,112 sales / 64.1M MWK whose
+# basis the harvest row did not share.  @ligon's 2026-09-24 ruling on that
+# residue: "shelled vs unshelled is really a missing data problem,
+# decipherable by looking at prices" -- "this would be a derived value";
+# "the 647 contradictions could also sometimes produce a derived value,
+# based on price"; and not-applicable IS the basis where shelling does not
+# apply (the instrument's own wording: "FOR ALL APPLICABLE CROPS").  The
+# read-only probe behind the numbers is
+# slurm_logs/backlog_fix_2026-09-24/malawi_sale_basis/README.org (branch
+# fix/malawi-sale-basis-probe); its measured facts are in CONTENTS.org,
+# "can PRICE decide a sale's shelled/unshelled basis?".
+#
+# Every path by which a sale reaches a harvest row is now a RUNG with a
+# registry key (countries/Malawi/_/derivations.yml), stamped on the
+# `Derivation` column of exactly the harvest rows whose Quantity_sold /
+# Value_sold arrived through it -- one key per branch so the path taken is
+# countable (`attrs['sale_basis_ladder']`).  An EXACT basis match is a
+# survey answer and carries no key.  The ladder is decided INSIDE
+# `assemble_crop_production` because the attach is decided there; the
+# reference prices are the same wave's own agreeing sales, so a wave
+# parquet stays a function of that wave's inputs.
+#
+#   rung  pair (harvest, sale)                               key
+#   0     equal, both stated                                 (none)
+#   1     either side unknown_condition                      sale-basis-unknown-wildcard
+#   2     one side NA, the cell SEPARATES, price decides     sale-basis-from-price
+#   2b    harvest NA, sale S/U, the cell separates and the   sale-basis-from-price-overrule
+#         price CONTRADICTS the sale's own answer: the price
+#         overrules it (@ligon, 2026-09-25, ruling 1)
+#   3     one side NA, a reference exists and does NOT       sale-basis-not-applicable
+#         separate (MEASURED unpriced)
+#   3b    one side NA, NO reference cell in the wave         sale-basis-no-reference
+#         (admitted on absence of evidence; @ligon,
+#         2026-09-25, ruling 2)
+#   4     both stated and different, price sides with the    contradiction-price-sale /
+#         sale's answer / the harvest row's                  contradiction-price-harvest
+#   5     everything else with a candidate row               sale-basis-unresolved (DELETION,
+#                                                            rows: 0 -- the suppressed lines)
+#
+# Rungs 0-1 are the bundle's own compatibility rule and its 1:1 gate,
+# unchanged (tier A).  Rungs 2-4 (tier B) compete only for harvest rows and
+# sales that tier A left unclaimed, so nothing the bundle attached becomes
+# unattached (monotone, and measured so).
 
-    Parameters
-    ----------
-    t : str — wave id, used as the ``t`` index value.
-    harvest_pieces : list[pd.DataFrame] — outputs of _harvest_block.
-    sale_pieces : list[pd.DataFrame] — outputs of _sale_block (may be []).
+#: Registry keys, one per rung.  The literal strings are what the tests
+#: grep for; keep them in ONE place.
+SALE_BASIS_WILDCARD = 'Malawi::crop_production::sale-basis-unknown-wildcard'
+SALE_BASIS_FROM_PRICE = 'Malawi::crop_production::sale-basis-from-price'
+#: Harvest NA, sale S/U, and an unambiguous price that CONTRADICTS the
+#: sale's own answer: the price overrules the recorded answer (@ligon,
+#: 2026-09-25, ruling 1).  Its own key so the overruled count is countable.
+SALE_BASIS_FROM_PRICE_OVERRULE = 'Malawi::crop_production::sale-basis-from-price-overrule'
+SALE_BASIS_NOT_APPLICABLE = 'Malawi::crop_production::sale-basis-not-applicable'
+#: One side NA and NO reference cell in the wave at all: admitted on absence
+#: of evidence, not on a measured non-separation (@ligon, 2026-09-25,
+#: ruling 2).  Split from `sale-basis-not-applicable` so the two grounds are
+#: exposed per row.
+SALE_BASIS_NO_REFERENCE = 'Malawi::crop_production::sale-basis-no-reference'
+SALE_BASIS_CONTRADICTION_SALE = 'Malawi::crop_production::contradiction-price-sale'
+SALE_BASIS_CONTRADICTION_HARVEST = 'Malawi::crop_production::contradiction-price-harvest'
+#: The deletion entry (rows: 0): a sale with a candidate row that no rung admitted.
+SALE_BASIS_UNRESOLVED = 'Malawi::crop_production::sale-basis-unresolved'
+SALE_BASIS_KEYS = (SALE_BASIS_WILDCARD, SALE_BASIS_FROM_PRICE,
+                   SALE_BASIS_FROM_PRICE_OVERRULE,
+                   SALE_BASIS_NOT_APPLICABLE, SALE_BASIS_NO_REFERENCE,
+                   SALE_BASIS_CONTRADICTION_SALE,
+                   SALE_BASIS_CONTRADICTION_HARVEST)
+#: The rungs whose attachment names a BASIS the price chose (`dec['basis']`).
+SALE_BASIS_PRICED_KEYS = (SALE_BASIS_FROM_PRICE, SALE_BASIS_FROM_PRICE_OVERRULE,
+                          SALE_BASIS_CONTRADICTION_SALE, SALE_BASIS_CONTRADICTION_HARVEST)
+#: The rungs whose pair has a not-applicable side (tallied per side).
+SALE_BASIS_NA_SIDE_KEYS = (SALE_BASIS_FROM_PRICE, SALE_BASIS_FROM_PRICE_OVERRULE,
+                           SALE_BASIS_NOT_APPLICABLE, SALE_BASIS_NO_REFERENCE)
+#: Outcome labels in the per-sale decision frame that are NOT registry keys.
+SALE_EXACT, SALE_AMBIGUOUS, SALE_UNRESOLVED = 'exact', 'ambiguous', 'unresolved'
+#: An attached zero-quantity, zero-value line: the survey's "did not sell".
+SALE_NO_SALE = 'no_sale'
 
-    Returns
-    -------
-    pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
-    condition, Quantity_sold, Value_sold, planting_month, harvest_month,
-    intercropped, perennial.  Item-level reported values only.  ``u`` and
-    ``condition`` are declared INDEX LEVELS in ``_/data_scheme.yml`` and are
-    promoted by the framework; they are left as columns here for the same
-    reason ``u`` always was.
+#: The probe's gates, as STATED TOLERANCES (README.org section 7.1): the
+#: reference cell must hold at least this many agreeing sales on EACH basis;
+#: the two bases must SEPARATE -- Mann-Whitney P(shelled > unshelled) at or
+#: beyond this on either side; and the sale's own price must be unambiguous,
+#: its log-distance margin between the two medians exceeding this fraction
+#: of the gap.  0.75 is the smallest P at which every Groundnut (t, crop, u)
+#: cell is admitted (min 0.777) and no non-Groundnut one is (max 0.738).
+SALE_BASIS_MIN_REFERENCE = 10
+SALE_BASIS_SEPARATION_P = 0.75
+SALE_BASIS_MARGIN = 0.5
+#: The (crop) rung is on cell-RELATIVE log price and needs this many
+#: reference sales in the sale's own (crop, u) cell for the offset.
+SALE_BASIS_MIN_CELL = 3
+
+_SHELLED, _UNSHELLED, _NOT_APPLICABLE = 'shelled', 'unshelled', 'shell_not_applicable'
+_SU = (_SHELLED, _UNSHELLED)
+
+
+def _prob_greater(a, b):
+    """Mann-Whitney P(random a > random b), ties counted 1/2 -- the AUC.
+
+    ``scipy.stats.mannwhitneyu(a, b).statistic / (len(a) * len(b))``, in
+    numpy: scipy is not a declared dependency of the library.
+    """
+    a = np.asarray(a, dtype=float)
+    b = np.sort(np.asarray(b, dtype=float))
+    if len(a) == 0 or len(b) == 0:
+        return np.nan
+    lo = np.searchsorted(b, a, side='left')
+    hi = np.searchsorted(b, a, side='right')
+    return float((lo + 0.5 * (hi - lo)).sum() / (len(a) * len(b)))
+
+
+def _su_reference(ref):
+    """Shelled-vs-unshelled reference prices from one wave's AGREEING sales.
+
+    ``ref`` has one row per agreeing sale (attached at rung 0 with the sale's
+    own S/U/NA equal to the harvest row's), with columns ``crop``, ``u``,
+    ``condition`` and ``logp`` (log of Value_sold / Quantity_sold, per native
+    unit).  Returns three frames:
+
+    * ``fine`` -- indexed ``(crop, u)``: ``m_S``, ``m_U`` (median log price
+      per basis), ``P`` (P(S > U)), ``n_S``, ``n_U``; only cells with at
+      least ``SALE_BASIS_MIN_REFERENCE`` on EACH basis.
+    * ``mid`` -- indexed ``(crop,)``, the unit dropped: the same statistics
+      on REL = log price minus the median of the sale's own ``(crop, u)``
+      cell (all bases pooled), because per-kg and per-bag prices cannot be
+      pooled raw.
+    * ``cell`` -- indexed ``(crop, u)``: ``cell_med`` and ``cell_n`` over all
+      reference bases, the offset the ``mid`` rung needs.
+
+    Never across waves: a wave script sees one wave's Module I/Q, and the
+    wave parquet must be a function of that wave's inputs.
+    """
+    cols = ['crop', 'u', 'condition', 'logp']
+    r = ref.loc[ref['logp'].notna() & ref['condition'].isin(_SU + (_NOT_APPLICABLE,)),
+                cols].copy()
+    r['crop'] = r['crop'].astype(object)
+    r['u'] = r['u'].astype(object)
+    r['condition'] = r['condition'].astype(object)
+    empty = pd.DataFrame(columns=['m_S', 'm_U', 'P', 'n_S', 'n_U'])
+    if r.empty:
+        return empty, empty, pd.DataFrame(columns=['cell_med', 'cell_n'])
+    groups = r.groupby(['crop', 'u'], dropna=False)['logp']
+    cell = groups.agg(cell_med='median', cell_n='size')
+    # Preserve null-unit rows without joining an all-null key inferred as float.
+    r['rel'] = r['logp'] - groups.transform('median')
+
+    def _table(keys, col):
+        rows = []
+        for key, g in r[r['condition'].isin(_SU)].groupby(keys, dropna=False):
+            s = g.loc[g['condition'] == _SHELLED, col].to_numpy()
+            u = g.loc[g['condition'] == _UNSHELLED, col].to_numpy()
+            if len(s) >= SALE_BASIS_MIN_REFERENCE and len(u) >= SALE_BASIS_MIN_REFERENCE:
+                key = key if isinstance(key, tuple) else (key,)
+                rows.append((*key, float(np.median(s)), float(np.median(u)),
+                             _prob_greater(s, u), int(len(s)), int(len(u))))
+        out = pd.DataFrame(rows, columns=[*keys, 'm_S', 'm_U', 'P', 'n_S', 'n_U'])
+        return out.set_index(keys) if len(out) else empty
+
+    return _table(['crop', 'u'], 'logp'), _table(['crop'], 'rel'), cell
+
+
+def _lookup_reference(pairs, fine, mid, cell):
+    """Attach ``m_S``, ``m_U``, ``P`` and ``rung`` to each candidate pair.
+
+    The finest rung available: ``(crop, u)`` on log price, else ``(crop)``
+    on REL shifted back by the pair's own cell median (which needs at least
+    ``SALE_BASIS_MIN_CELL`` reference sales in that cell).  A pair with
+    neither gets NaN and ``rung`` None.
+    """
+    out = pairs.copy()
+    out['crop'] = out['crop'].astype(object)
+    out['u'] = out['u'].astype(object)
+    for c in ('m_S', 'm_U', 'P'):
+        out[c] = np.nan
+    out['rung'] = None
+    if len(fine):
+        f = fine.reindex(pd.MultiIndex.from_frame(out[['crop', 'u']]))
+        have = f['m_S'].notna().to_numpy()
+        for c in ('m_S', 'm_U', 'P'):
+            out.loc[have, c] = f[c].to_numpy()[have]
+        out.loc[have, 'rung'] = 'fine'
+    if len(mid):
+        m = mid.reindex(pd.Index(out['crop']))
+        cm = cell.reindex(pd.MultiIndex.from_frame(out[['crop', 'u']]))
+        have = (out['m_S'].isna().to_numpy() & m['m_S'].notna().to_numpy()
+                & (cm['cell_n'].fillna(0).to_numpy() >= SALE_BASIS_MIN_CELL))
+        off = cm['cell_med'].to_numpy()
+        out.loc[have, 'm_S'] = (m['m_S'].to_numpy() + off)[have]
+        out.loc[have, 'm_U'] = (m['m_U'].to_numpy() + off)[have]
+        out.loc[have, 'P'] = m['P'].to_numpy()[have]
+        out.loc[have, 'rung'] = 'mid'
+    return out
+
+
+def derive_sale_basis(condition, condition_sold, log_price,
+                      median_shelled, median_unshelled, p_shelled_over_unshelled):
+    """Which rung of the sale-basis ladder admits a (harvest row, sale) pair.
+
+    Vectorised over six equal-length inputs -- the harvest row's
+    ``condition``, the sale's ``condition_sold`` (both in the
+    ``harmonize_crop_condition`` vocabulary plus ``unknown_condition``), the
+    sale's log unit price (NaN where Value_sold or Quantity_sold is not
+    positive), and the pair's reference: the median log price of the
+    cell's agreeing SHELLED and UNSHELLED sales and the Mann-Whitney
+    P(shelled > unshelled) between them (NaN where no reference cell holds
+    ``SALE_BASIS_MIN_REFERENCE`` on each basis).  Returns an object array:
+    ``''`` for an exact match (no key), a registry key for an admitted
+    pair, ``None`` for a pair no rung admits.
+
+    The rules, in order:
+
+    * equal STATED conditions -> ``''``.  A survey answer, not a construction.
+    * either side ``unknown_condition`` (including both) ->
+      ``SALE_BASIS_WILDCARD``.  The survey did not answer on that side
+      (Module P never asks; Module Q has no S/U column before 2016-17), so
+      there is nothing to contradict -- and nothing to match either, which
+      is why unknown-against-unknown is this rung and not an exact match.
+    * one side ``shell_not_applicable``, the other shelled/unshelled:
+        - a reference exists and the cell does not SEPARATE (P inside the
+          open interval (1 - SALE_BASIS_SEPARATION_P,
+          SALE_BASIS_SEPARATION_P)) -> ``SALE_BASIS_NOT_APPLICABLE``: the
+          market MEASURABLY does not price the basis, so the basis does not
+          discriminate the sale, and not-applicable is the basis (Tobacco;
+          also Maize / Rice / Soyabean, whose S and U sell at one price).
+        - NO reference cell in the wave (no ``(crop, u)`` or ``(crop)``
+          cell with ``SALE_BASIS_MIN_REFERENCE`` on each basis) ->
+          ``SALE_BASIS_NO_REFERENCE``: admitted on the ABSENCE of evidence
+          that the basis is priced, which is a weaker ground than the
+          measured one above and is therefore its own key (@ligon,
+          2026-09-25, ruling 2).  Cotton, Sweet Potato, Irish Potato ...
+        - the cell separates and this sale's price is UNAMBIGUOUS (margin
+          > SALE_BASIS_MARGIN x gap -- the price sits in the OUTER quarter
+          of the interval between the medians, or beyond it): the price
+          names a basis b.  A not-applicable SALE is admitted to the
+          harvest row whose condition is b; a shelled/unshelled SALE
+          against a not-applicable ROW is admitted when b corroborates the
+          sale's own answer -> ``SALE_BASIS_FROM_PRICE``; and when b
+          CONTRADICTS the sale's own answer the price overrules it ->
+          ``SALE_BASIS_FROM_PRICE_OVERRULE`` (@ligon, 2026-09-25, ruling
+          1: price decides on that side exactly as the contradiction rungs
+          do).  A not-applicable sale whose priced basis b is not the
+          row's condition -> ``None``.
+        - the cell separates but the price is missing or sits in the
+          middle half between the medians (margin <= SALE_BASIS_MARGIN x
+          gap) -> ``None`` (a priced basis this sale's price cannot decide;
+          NOT rung 3, whose premise is that the basis is unpriced).
+    * both stated and different (a CONTRADICTION): admitted only when the
+      cell separates and the price is unambiguous; the key says which
+      field it sided with -- ``SALE_BASIS_CONTRADICTION_SALE`` when b is
+      the sale's own answer, ``SALE_BASIS_CONTRADICTION_HARVEST`` when b
+      is the harvest row's.  Otherwise ``None``.
+
+    No options, by design: the thresholds are the module constants above,
+    and a user wanting another rule re-derives from
+    ``Country('Malawi').derivation_inputs(key, wave=...)``.
+    """
+    c_h = np.asarray(pd.Series(condition).astype(object).where(pd.notna(condition), None))
+    c_s = np.asarray(pd.Series(condition_sold).astype(object).where(pd.notna(condition_sold), None))
+    logp = np.asarray(log_price, dtype=float)
+    m_s = np.asarray(median_shelled, dtype=float)
+    m_u = np.asarray(median_unshelled, dtype=float)
+    p = np.asarray(p_shelled_over_unshelled, dtype=float)
+    n = len(c_h)
+    out = np.empty(n, dtype=object)
+    out[:] = None
+
+    unknown = (c_h == _CONDITION_UNKNOWN) | (c_s == _CONDITION_UNKNOWN)
+    # An exact match is two STATED answers that agree.  unknown == unknown is
+    # not one -- neither side answered -- so it reaches the row on the
+    # wildcard and carries that key.
+    exact = (c_h == c_s) & ~unknown
+    has_ref = ~np.isnan(m_s) & ~np.isnan(m_u) & ~np.isnan(p)
+    separates = has_ref & ((p >= SALE_BASIS_SEPARATION_P)
+                           | (p <= 1.0 - SALE_BASIS_SEPARATION_P))
+    with np.errstate(invalid='ignore'):
+        d_s = np.abs(logp - m_s)
+        d_u = np.abs(logp - m_u)
+        gap = np.abs(m_s - m_u)
+        margin = np.abs(d_s - d_u)
+    unamb = separates & ~np.isnan(logp) & (margin > SALE_BASIS_MARGIN * gap)
+    basis = np.where(d_s <= d_u, _SHELLED, _UNSHELLED).astype(object)
+
+    h_su = np.isin(c_h, _SU)
+    s_su = np.isin(c_s, _SU)
+    na_pair = ~exact & ~unknown & (((c_h == _NOT_APPLICABLE) & s_su)
+                                   | ((c_s == _NOT_APPLICABLE) & h_su))
+    contradiction = ~exact & ~unknown & h_su & s_su
+
+    out[exact] = ''
+    out[~exact & unknown] = SALE_BASIS_WILDCARD
+    # `separates` already requires a reference, so the two grounds must be
+    # split explicitly: MEASURED non-separation vs. no reference at all.
+    out[na_pair & has_ref & ~separates] = SALE_BASIS_NOT_APPLICABLE
+    out[na_pair & ~has_ref] = SALE_BASIS_NO_REFERENCE
+    # NA sale -> the row carrying the priced basis; S/U sale -> corroborated,
+    # or OVERRULED by an unambiguous contrary price
+    price_row = na_pair & unamb & (c_s == _NOT_APPLICABLE) & (c_h == basis)
+    price_sale = na_pair & unamb & (c_h == _NOT_APPLICABLE) & (c_s == basis)
+    price_overrule = na_pair & unamb & (c_h == _NOT_APPLICABLE) & (c_s != basis)
+    out[price_row | price_sale] = SALE_BASIS_FROM_PRICE
+    out[price_overrule] = SALE_BASIS_FROM_PRICE_OVERRULE
+    out[contradiction & unamb & (basis == c_s)] = SALE_BASIS_CONTRADICTION_SALE
+    out[contradiction & unamb & (basis == c_h)] = SALE_BASIS_CONTRADICTION_HARVEST
+    return out
+
+
+def _one_to_one(pairs, skey):
+    """Split candidate pairs into the 1:1 ones and the ambiguous ones.
+
+    A sale lands only where it is compatible with exactly ONE harvest row
+    and that row with exactly ONE sale (GH #833).
+    """
+    if pairs.empty:
+        return pairs, pairs
+    n_h = pairs.groupby(skey, dropna=False)['_hrow'].transform('size')
+    n_s = pairs.groupby('_hrow')['_hrow'].transform('size')
+    ok = (n_h == 1) & (n_s == 1)
+    return pairs[ok], pairs[~ok]
+
+
+def _attach_sales(t, harv, sale):
+    """Run the sale-basis ladder: attach sales to harvest rows, decide per sale.
+
+    ``harv`` is the consolidated harvest frame (one row per
+    ``(i, plot_id, crop, u, condition, _crop_code)``); ``sale`` the
+    concatenated ``_sale_block`` output.  Returns ``(harv, decisions,
+    tallies)``: ``harv`` with ``Quantity_sold``, ``Value_sold`` and
+    ``_branch`` ('' on an exact match, a registry key otherwise, NA where
+    no sale attached); ``decisions`` one row per candidate sale (the
+    ``_sale_block`` key) with its ``outcome`` (``'exact'``, a key,
+    ``'ambiguous'``, ``'unresolved'``), ``rung`` and ``basis``; and the
+    three JSON-safe tallies that ride on ``attrs``.
+    """
+    skey = ['i', '_crop_code', 'u', 'condition_sold']
+    sale = sale.copy()
+    sale['u'] = sale['u'].astype('string')
+    if 'condition_sold' not in sale.columns:
+        sale['condition_sold'] = _CONDITION_UNKNOWN
+    sale['condition_sold'] = sale['condition_sold'].astype('string')
+    sale = sale.groupby(skey, as_index=False, dropna=False).agg(
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+    sale['_srow'] = range(len(sale))
+
+    nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
+              .nunique().rename('_nplots').reset_index())
+    harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
+    n_harv = len(harv)
+    harv['_hrow'] = range(n_harv)
+    pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots']] \
+        .merge(sale, on=['i', '_crop_code', 'u'], how='inner')
+    # Only single-plot crops are ever candidates (unchanged since GAP 1).
+    pairs = pairs[pairs['_nplots'] == 1].copy()
+    pairs['condition'] = pairs['condition'].astype(object)
+    pairs['condition_sold'] = pairs['condition_sold'].astype(object)
+
+    # --- tier A: the bundle's rule -- exact or wildcard, 1:1 ----------------
+    a_mask = ((pairs['condition'] == pairs['condition_sold'])
+              | (pairs['condition'] == _CONDITION_UNKNOWN)
+              | (pairs['condition_sold'] == _CONDITION_UNKNOWN))
+    tier_a = pairs[a_mask]
+    ok_a, amb_a = _one_to_one(tier_a, skey)
+    ok_a = ok_a.assign(_branch=np.where(
+        (ok_a['condition'] == ok_a['condition_sold'])
+        & (ok_a['condition'] != _CONDITION_UNKNOWN), '', SALE_BASIS_WILDCARD))
+
+    # --- the reference: this wave's agreeing sales --------------------------
+    with np.errstate(divide='ignore', invalid='ignore'):
+        priced = ((pd.to_numeric(ok_a['Value_sold'], errors='coerce') > 0)
+                  & (pd.to_numeric(ok_a['Quantity_sold'], errors='coerce') > 0))
+    agree = ok_a[(ok_a['_branch'] == '') & priced.to_numpy()].copy()
+    agree['logp'] = np.log(agree['Value_sold'].astype(float)
+                           / agree['Quantity_sold'].astype(float))
+    fine, mid, cell = _su_reference(agree)
+
+    # --- tier B: the price rungs, on what tier A left unclaimed -------------
+    claimed_h = set(tier_a['_hrow'])
+    claimed_s = set(tier_a['_srow'])
+    tier_b = pairs[~a_mask & ~pairs['_hrow'].isin(claimed_h)
+                   & ~pairs['_srow'].isin(claimed_s)].copy()
+    tier_b = _lookup_reference(tier_b, fine, mid, cell)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        v = pd.to_numeric(tier_b['Value_sold'], errors='coerce').astype(float).to_numpy()
+        q = pd.to_numeric(tier_b['Quantity_sold'], errors='coerce').astype(float).to_numpy()
+        tier_b['logp'] = np.where((v > 0) & (q > 0), np.log(v / q), np.nan)
+    tier_b['_branch'] = derive_sale_basis(
+        tier_b['condition'], tier_b['condition_sold'], tier_b['logp'],
+        tier_b['m_S'], tier_b['m_U'], tier_b['P'])
+    admitted = tier_b[tier_b['_branch'].notna()]
+    ok_b, amb_b = _one_to_one(admitted, skey)
+
+    ok = pd.concat([ok_a[['_hrow', '_srow', 'Quantity_sold', 'Value_sold', '_branch']],
+                    ok_b[['_hrow', '_srow', 'Quantity_sold', 'Value_sold', '_branch']]],
+                   ignore_index=True)
+    assert not ok['_hrow'].duplicated().any()
+    # A key marks a SALE.  A Module I / Q line the household did NOT sell
+    # (ag_i01 != 1: NULL quantity, value and S/U) is summed by `_sale_block`
+    # to a zero-quantity, zero-value "sale" under `unknown_condition`, and
+    # lands on a harvest row (typically one whose `u` is likewise NULL) as
+    # 0.0 -- as it has since before GH #833.  That 0.0 is the survey's
+    # "did not sell", not a construction of a sale's basis, so it carries no
+    # key; `attrs['sale_basis_ladder'][...]['zero_quantity']` counts them.
+    no_sale = ~((pd.to_numeric(ok['Quantity_sold'], errors='coerce') > 0)
+                | (pd.to_numeric(ok['Value_sold'], errors='coerce') > 0))
+    ok.loc[no_sale, '_branch'] = ''
+    zero_srow = set(ok.loc[no_sale, '_srow'])
+    ok = ok.drop(columns='_srow')
+    harv = harv.merge(ok, on='_hrow', how='left')
+    assert len(harv) == n_harv, 'the sale attach must not change rows'
+
+    # --- per-sale decisions -------------------------------------------------
+    dec = sale.set_index('_srow')[skey + ['Quantity_sold', 'Value_sold']].copy()
+    dec['crop'] = pd.Series(pairs.groupby('_srow')['crop'].first()).reindex(dec.index)
+    dec['outcome'] = None
+    dec['rung'] = None
+    dec['basis'] = None
+    cand = dec.index.isin(pairs['_srow'])
+    dec.loc[cand, 'outcome'] = SALE_UNRESOLVED
+    amb_all = pd.concat([amb_a, amb_b]) if len(amb_b) else amb_a
+    dec.loc[dec.index.isin(amb_all['_srow']), 'outcome'] = SALE_AMBIGUOUS
+    att = pd.concat([ok_a, ok_b]).set_index('_srow')
+    dec.loc[att.index, 'outcome'] = np.where(att['_branch'] == '', SALE_EXACT, att['_branch'])
+    dec.loc[dec.index.isin(zero_srow), 'outcome'] = SALE_NO_SALE
+    if len(ok_b):
+        dec.loc[ok_b['_srow'].to_numpy(), 'rung'] = ok_b['rung'].to_numpy()
+        with np.errstate(invalid='ignore'):
+            b_basis = np.where(np.abs(ok_b['logp'] - ok_b['m_S']) <= np.abs(ok_b['logp'] - ok_b['m_U']),
+                               _SHELLED, _UNSHELLED)
+        dec.loc[ok_b['_srow'].to_numpy(), 'basis'] = np.where(
+            ok_b['_branch'].isin(SALE_BASIS_PRICED_KEYS), b_basis, None)
+    dec = dec.reset_index()
+
+    # --- tallies (Python scalars only: they are json.dumps'd into the parquet) --
+    def _tally(sales_df, rows_df):
+        amount = float(pd.to_numeric(sales_df['Value_sold'], errors='coerce').sum())
+        return {'wave': t, 'sales': int(len(sales_df)),
+                'rows': int(rows_df['_hrow'].nunique()) if len(rows_df) else 0,
+                'value': amount}
+
+    ambiguous = _tally(amb_all.drop_duplicates(skey), amb_all)
+    unres_rows = pairs[pairs['_srow'].isin(dec.loc[dec['outcome'] == SALE_UNRESOLVED, '_srow'])]
+    unresolved = _tally(unres_rows.drop_duplicates(skey), unres_rows)
+    ladder = {}
+    for name in (SALE_EXACT, *SALE_BASIS_KEYS):
+        sub = att[att['_branch'] == ('' if name == SALE_EXACT else name)]
+        qty = pd.to_numeric(sub['Quantity_sold'], errors='coerce')
+        entry = {'sales': int(len(sub)),
+                 'value': float(pd.to_numeric(sub['Value_sold'], errors='coerce').sum()),
+                 # a `_sale_block` line the household did NOT sell sums to a
+                 # zero-quantity "sale"; counted so the key's reach is honest
+                 'zero_quantity': int((~(qty > 0)).sum()),
+                 'rungs': ({str(k): int(v) for k, v in sub['rung'].value_counts().items()}
+                           if 'rung' in sub.columns and len(sub) else {})}
+        if name in SALE_BASIS_NA_SIDE_KEYS and len(sub):
+            entry['not_applicable_side'] = {
+                'sale': int((sub['condition_sold'] == _NOT_APPLICABLE).sum()),
+                'harvest': int((sub['condition'] == _NOT_APPLICABLE).sum())}
+        ladder[name] = entry
+    # The deletion, by GROUND -- one count per way a candidate SALE fails,
+    # so the registry entry's three grounds are countable and the refused
+    # complement of each price rung is printed beside the rung (review of
+    # 2026-09-25, items 4 and 6).  A PARTITION of the unresolved sales: each
+    # is classified by its first refused tier-B pair (a sale with two
+    # refused pairs on different grounds is rare -- an S/U sale against one
+    # U row and one NA row -- and is counted once, on the first), or as
+    # `claimed_by_tier_a` when tier B never saw it because an exact match
+    # had already taken its row or its sale.
+    unresolved_srows = set(dec.loc[dec['outcome'] == SALE_UNRESOLVED, '_srow'])
+    refused = tier_b[tier_b['_branch'].isna() & tier_b['_srow'].isin(unresolved_srows)]
+    r_h, r_s = refused['condition'].to_numpy(), refused['condition_sold'].to_numpy()
+    r_sep = (refused['P'].notna() & ((refused['P'] >= SALE_BASIS_SEPARATION_P)
+                                     | (refused['P'] <= 1 - SALE_BASIS_SEPARATION_P))).to_numpy()
+    r_contra = np.isin(r_h, _SU) & np.isin(r_s, _SU)
+    ground = np.where(r_contra & ~r_sep, 'contradiction_no_separation',
+             np.where(r_contra, 'contradiction_price_undecided',
+             np.where(r_s == _NOT_APPLICABLE, 'na_sale_price_undecided',
+                      'na_harvest_price_undecided')))
+    per_sale = (pd.DataFrame({'_srow': refused['_srow'].to_numpy(), 'ground': ground})
+                .drop_duplicates('_srow')['ground'].value_counts())
+    grounds = {g: int(per_sale.get(g, 0)) for g in (
+        'contradiction_no_separation', 'contradiction_price_undecided',
+        'na_sale_price_undecided', 'na_harvest_price_undecided')}
+    grounds['claimed_by_tier_a'] = int(len(unresolved_srows - set(refused['_srow'])))
+    ladder[SALE_BASIS_UNRESOLVED] = {'sales': unresolved['sales'], 'value': unresolved['value'],
+                                     'rungs': {}, 'grounds': grounds}
+    ladder['reference'] = {'sales': int(len(agree)),
+                           'cells_fine': int(len(fine)), 'cells_mid': int(len(mid)),
+                           'separating_fine': int(((fine['P'] >= SALE_BASIS_SEPARATION_P)
+                                                   | (fine['P'] <= 1 - SALE_BASIS_SEPARATION_P)).sum())
+                           if len(fine) else 0}
+    harv = harv.drop(columns=['_nplots', '_hrow'])
+    return harv, dec, {'sale_suppressed': ambiguous, 'sale_basis_mismatch': unresolved,
+                       'sale_basis_ladder': ladder}
+
+
+def _consolidate_harvest(harvest_pieces):
+    """Collapse exact duplicate (i, plot, crop, u, condition) harvest rows.
+
+    Sums the reported quantity (a plot-crop may be split across several
+    recorded lines in the same unit and state); keeps the first non-null
+    date/flag.  A reported-line consolidation, NOT a cross-unit or
+    cross-state aggregation: rows in different units ``u`` OR different
+    ``condition`` stay distinct.  Adding ``condition`` to this key (GH #854)
+    is what stops shelled and unshelled kilograms of the same plot-crop from
+    being added together -- see ``data_info.yml``, "Quantities in different
+    conditions are NOT commensurable".
     """
     harv = pd.concat(harvest_pieces, ignore_index=True)
-
-    # Collapse exact duplicate (i, plot, crop, u, condition) harvest rows by
-    # summing reported quantity (a plot-crop may be split across several
-    # recorded lines in the same unit and state); keep the first non-null
-    # date/flag.  This is a reported-line consolidation, NOT a cross-unit or
-    # cross-state aggregation: rows in different units `u` OR different
-    # `condition` stay distinct.  Adding `condition` to this key (GH #854) is
-    # what stops shelled and unshelled kilograms of the same plot-crop from
-    # being added together -- see `data_info.yml`, "Quantities in different
-    # conditions are NOT commensurable".
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
-    harv = harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
+    return harv.groupby(['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code'],
                         as_index=False, dropna=False).agg({
         'Quantity':       'sum',
         # EXACT, not a reduction: `crop_variety` is a function of
@@ -1221,87 +1729,99 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         'perennial':      'first',
     })
 
+
+def assemble_crop_production(t, harvest_pieces, sale_pieces):
+    """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
+    pieces into the canonical crop_production DataFrame for wave ``t``.
+
+    Parameters
+    ----------
+    t : str — wave id, used as the ``t`` index value.
+    harvest_pieces : list[pd.DataFrame] — outputs of _harvest_block.
+    sale_pieces : list[pd.DataFrame] — outputs of _sale_block (may be []).
+        A frame without a ``condition_sold`` column is treated as a sale
+        whose shelled/unshelled state is unrecorded (``unknown_condition``).
+
+    Returns
+    -------
+    pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
+    condition, Quantity_sold, Value_sold, Derivation, planting_month,
+    harvest_month, intercropped, perennial.  Quantities and values remain
+    reported; attachment/basis interpretation may be derived by the ladder
+    below.  The reported harvest condition is preserved.  ``u`` and
+    ``condition`` are declared INDEX LEVELS in
+    ``_/data_scheme.yml`` and are promoted by the framework; they are left
+    as columns here for the same reason ``u`` always was.
+
+    Sale attachment is the LADDER above (``_attach_sales``): a sale is
+    attached ONLY where the (i, crop) is grown on exactly one plot, to the
+    harvest row measured in the SAME unit ``u`` as the sale (the sale
+    quantity is asked in its own unit, ag_i02b / ag_q02b, which differs
+    from the harvest unit for 22.2% of 2010-11 sale rows, GH #824), and only
+    on a rung the ladder admits: an exact basis match; the unknown
+    wildcard (either side did not answer -- every Module P harvest row,
+    every 2010-11 / 2013-14 Module Q sale); a not-applicable side decided
+    by PRICE where the wave's own agreeing sales show the basis is priced
+    (corroborating the sale's own answer, or overruling it), taken AS the
+    basis where they measurably do not, or admitted on the absence of any
+    reference; a contradiction decided by price.  Each rung past the exact
+    match is a registered derivation and
+    stamps its key on ``Derivation``; the 1:1 gate (a sale lands only where
+    it is compatible with exactly one row and that row with exactly one
+    sale) holds on every rung.  What no rung admits is suppressed and
+    COUNTED: ``attrs['sale_suppressed']`` (AMBIGUOUS pairings, the GH #854
+    tally, shape unchanged), ``attrs['sale_basis_mismatch']`` (UNRESOLVED
+    -- registered as the deletion ``sale-basis-unresolved``), and
+    ``attrs['sale_basis_ladder']`` (sales and MWK per rung).
+    """
+    harv = _consolidate_harvest(harvest_pieces)
+
     if sale_pieces:
         sale = pd.concat(sale_pieces, ignore_index=True)
-        sale['u'] = sale['u'].astype('string')
-        sale = sale.groupby(['i', '_crop_code', 'u'], as_index=False,
-                            dropna=False).agg(
-            {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
-        # Attach sale ONLY where the (i, crop) is grown on exactly one
-        # plot, so the household-crop reported figure unambiguously
-        # belongs to that single plot-crop.  Multi-plot crops keep NaN.
-        # AND only to the harvest row measured in the SAME unit `u` as the
-        # sale: the sale quantity is asked in its own unit (ag_i02b /
-        # ag_q02b) and differs from the harvest unit for 22.2% of 2010-11
-        # sale rows, so the old (i, _crop_code) merge stamped a
-        # kilogramme-basis sale onto a `50 kg Bag` row -- Value_sold /
-        # Quantity_sold then read as a price per 50 kg Bag when it was a
-        # price per kg.  Merging on `u` too makes the ratio a price per the
-        # row's declared unit BY CONSTRUCTION.  It cannot multiply rows:
-        # harv is unique on (i, plot, crop, u) and, under the single-plot
-        # gate, sale is unique on (i, _crop_code, u).  A sale whose unit is
-        # unrecorded matches a harvest row whose unit is likewise
-        # unrecorded (pd.merge matches null keys), which is the honest
-        # pairing.
-        nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
-                  .nunique().rename('_nplots').reset_index())
-        # GH #854: the single-plot gate alone stopped being sufficient the
-        # moment `condition` joined the harvest key.  Before it did, a
-        # single-plot (i, crop) had at most ONE harvest row per unit, so the
-        # household-crop sale total landed on exactly one row.  Now the same
-        # plot-crop can carry a shelled AND an unshelled row in the same `u`,
-        # and the m:1 merge would stamp the SAME Quantity_sold / Value_sold on
-        # both -- double-counting the sale and inventing a per-unit price on
-        # whichever row did not produce it.  The sale module records no
-        # condition of its own that we read (ag_i02c is unwired; GH #854
-        # scopes it out), so there is nothing to disambiguate WITH: the honest
-        # answer is to attach nothing and count it.
-        nrows = (harv.groupby(['i', '_crop_code', 'u'], dropna=False)
-                 .size().rename('_nrows').reset_index())
-        harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
-        harv = harv.merge(nrows, on=['i', '_crop_code', 'u'], how='left')
-        harv = harv.merge(sale, on=['i', '_crop_code', 'u'], how='left')
-        single = (harv['_nplots'] == 1) & (harv['_nrows'] == 1)
-
+        harv, _decisions, tallies = _attach_sales(t, harv, sale)
+        tally, mismatch = tallies['sale_suppressed'], tallies['sale_basis_mismatch']
         # "Attach nothing and COUNT IT" -- and the counting has to be code,
-        # not a number frozen in CONTENTS.org that will not move when the data
-        # does (GH #854 red-team item 6).  What is reported is the sales the
-        # NEW `_nrows` clause suppresses that the old single-plot gate would
-        # have attached: those are exactly the household-crop-unit totals that
-        # a condition-split plot-crop would have DOUBLE-counted.
-        suppressed = (harv['_nplots'] == 1) & (harv['_nrows'] > 1) \
-            & harv['Value_sold'].notna()
-        n_rows = int(suppressed.sum())
-        if n_rows:
-            hit = harv.loc[suppressed]
-            # One sale is stamped on each of the `_nrows` rows, so the sale
-            # COUNT is the number of distinct (i, crop, u) totals, not rows.
-            sales = hit.drop_duplicates(['i', '_crop_code', 'u'])
-            amount = float(pd.to_numeric(sales['Value_sold'],
-                                         errors='coerce').sum())
-            tally = {'wave': t, 'sales': int(len(sales)), 'rows': n_rows,
-                     'value': amount}
+        # not a number frozen in CONTENTS.org that will not move when the
+        # data does (GH #854 red-team item 6).
+        if tally['sales']:
             warnings.warn(
-                f"Malawi/crop_production {t}: {len(sales)} household-crop "
-                f"sale(s) totalling {amount:,.0f} MWK were NOT attached to "
-                f"any harvest row, because the plot-crop is reported in more "
-                f"than one `condition` in the same unit ({n_rows} candidate "
-                f"rows).  The sale module records its own quantity and unit "
-                f"but its shelled/unshelled column (ag_i02c) is unwired, so "
-                f"there is nothing to say which harvest row the total belongs "
-                f"to; attaching it to both would double-count it.  Wiring "
-                f"ag_i02c is what lets these attach again.  GH #854.",
+                f"Malawi/crop_production {t}: {tally['sales']} household-crop "
+                f"sale(s) totalling {tally['value']:,.0f} MWK were NOT "
+                f"attached to any harvest row, because the pairing is "
+                f"AMBIGUOUS ({tally['rows']} candidate rows): the sale's "
+                f"shelled/unshelled answer is compatible with more than one "
+                f"harvest row of that plot-crop and unit (or one row with "
+                f"more than one sale), and attaching it to all of them "
+                f"would double-count it.  GH #854 / #833.",
                 SaleAttachmentWarning, stacklevel=2)
-        else:
-            tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
-
-        harv['Quantity_sold'] = harv['Quantity_sold'].where(single, pd.NA)
-        harv['Value_sold'] = harv['Value_sold'].where(single, pd.NA)
-        harv = harv.drop(columns=['_nplots', '_nrows'])
+        if mismatch['sales']:
+            grounds = tallies['sale_basis_ladder'].get(SALE_BASIS_UNRESOLVED, {}).get('grounds', {})
+            warnings.warn(
+                f"Malawi/crop_production {t}: {mismatch['sales']} "
+                f"household-crop sale(s) totalling {mismatch['value']:,.0f} "
+                f"MWK were NOT attached to any harvest row "
+                f"({mismatch['rows']} candidate rows), because no rung of "
+                f"the sale-basis ladder admits the pair on any of three "
+                f"grounds: the sale's own shelled/unshelled answer (ag_i02c "
+                f"/ ag_q02c) CONTRADICTS the harvest row's (ag_g13c) in a "
+                f"cell whose prices do not separate the bases or whose "
+                f"price cannot decide it; a not-applicable side in a "
+                f"SEPARATING cell whose sale price is missing, sits in the "
+                f"middle half between the medians, or names a basis no "
+                f"unclaimed row carries; or the row / sale was already "
+                f"claimed on an exact match.  By ground: {grounds}.  A sale "
+                f"on a different basis is not a quantity of the row's "
+                f"declared grain (GH #833); registered as the deletion "
+                f"{SALE_BASIS_UNRESOLVED}.",
+                SaleAttachmentWarning, stacklevel=2)
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
+        harv['_branch'] = pd.array([pd.NA] * len(harv), dtype='string')
         tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+        mismatch = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
+        tallies = {'sale_suppressed': tally, 'sale_basis_mismatch': mismatch,
+                   'sale_basis_ladder': {}}
 
     # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
     # collapse at the end of this function keys on (t, i, plot, crop) -- u is
@@ -1349,18 +1869,205 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
             'crop_variety':   'first',
             'Quantity_sold':  'first',
             'Value_sold':     'first',
+            '_branch':        'first',
             'planting_month': 'first',
             'harvest_month':  'first',
             'intercropped':   'first',
             'perennial':      'first',
         })
 
+    # The registry key, stamped AFTER the collapse (CLAUDE.md, "Derived
+    # Values": a post-collapse stamp is the wave script's own uniqueness
+    # claim).  '' is an exact match and carries NO key; NA where no sale
+    # attached at all.
+    branch = harv['_branch'].astype(object)
+    harv['Derivation'] = pd.array(
+        [pd.NA if (b is None or pd.isna(b) or b == '') else str(b) for b in branch],
+        dtype='string')
+    harv = harv.drop(columns=['_branch'])
+
     out = harv.set_index(['t', 'i', 'plot_id', 'crop'])
     # Readable by a test without parsing a warning message.  It does NOT
     # survive to_parquet (attrs are not written), which is why the warning
     # above exists as well -- the warning is what a build log sees.
     out.attrs['sale_suppressed'] = tally
+    out.attrs['sale_basis_mismatch'] = mismatch
+    out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
     return out
+
+
+# --- the inputs behind the ladder's keys ------------------------------------
+#
+# `Country('Malawi').derivation_inputs(key, wave=...)` hands back the raw
+# Module I / Q lines, under their ORIGINAL variable names, keyed to join the
+# served (t, i, plot_id, crop, u, condition) rows on (t, i, crop, u).  The
+# source table below transcribes the four wave scripts
+# (`Malawi/<wave>/_/crop_production.py`), which stay the build's source of
+# truth; a test checks every file named here is named in its script.
+
+_CROP_SALE_SOURCES = {
+    '2010-11': [dict(half='full', dir='Data/Full_Sample/Agriculture',
+                     g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
+                     hhid='case_id', prefix='', plot='named',
+                     gplot='ag_g0b', gcrop='ag_g0d', pplot='ag_p0b', pcrop='ag_p0d',
+                     icrop='ag_i0b', qcrop='ag_q0b')],
+    '2013-14': [dict(half='full', dir='Data',
+                     g='AG_MOD_G_13.dta', p='AG_MOD_P_13.dta', i='AG_MOD_I_13.dta', q='AG_MOD_Q_13.dta',
+                     hhid='y2_hhid', prefix='', plot='named',
+                     gplot='ag_g00', gcrop='ag_g0b', pplot='ag_p00', pcrop='ag_p0c',
+                     icrop='ag_i0b', qcrop='ag_q0b')],
+    '2016-17': [dict(half='xs', dir='Data/Cross_Sectional',
+                     g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
+                     hhid='case_id', prefix='cs-17-', plot='garden',
+                     gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
+                     icrop='crop_code', qcrop='crop_code'),
+                dict(half='panel', dir='Data/Panel',
+                     g='ag_mod_g_16.dta', p='ag_mod_p_16.dta', i='ag_mod_i_16.dta', q='ag_mod_q_16.dta',
+                     hhid='y3_hhid', prefix='', plot='garden',
+                     gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
+                     icrop='crop_code', qcrop='crop_code')],
+    '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
+                     g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
+                     hhid='case_id', prefix='', plot='garden',
+                     gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
+                     icrop='crop_code', qcrop='crop_code'),
+                dict(half='panel', dir='Data/Panel',
+                     g='ag_mod_g_19.dta', p='ag_mod_p_19.dta', i='ag_mod_i_19.dta', q='ag_mod_q_19.dta',
+                     hhid='y4_hhid', prefix='', plot='garden',
+                     gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
+                     icrop='crop_code', qcrop='crop_code')],
+}
+
+#: The sale modules' variables, in questionnaire order, per module.
+_SALE_RAW_VARS = {'I': ['ag_i01', 'ag_i02a', 'ag_i02b', 'ag_i02c', 'ag_i03'],
+                  'Q': ['ag_q01', 'ag_q02a', 'ag_q02b', 'ag_q02c', 'ag_q03']}
+
+
+def _crop_pieces(wave):
+    """Read one wave's Modules G/P/I/Q as the wave script does.
+
+    Returns ``(harvest_pieces, sale_pieces, raw_lines)``: the first two are
+    what ``assemble_crop_production`` takes; ``raw_lines`` is one row per
+    raw Module I / Q line with the module's own columns plus the decoded
+    join keys (``t``, ``i``, ``crop``, ``u``, ``condition_sold``,
+    ``_crop_code``, ``module``, ``half``).  Nothing is cached.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _CROP_SALE_SOURCES:
+        raise ValueError(f'crop_production is built for {sorted(_CROP_SALE_SOURCES)}, not {wave!r}')
+    root = countries_root() / 'Malawi' / wave
+    unit_map = _malawi_code_map('harmonize_crop_unit')
+    harvest, sale, raw = [], [], []
+    for h in _CROP_SALE_SOURCES[wave]:
+        d = root / h['dir']
+        g, p, i_mod, q = (get_dataframe(str(d / h[k]), convert_categoricals=False)
+                          for k in ('g', 'p', 'i', 'q'))
+        for df in (g, p, i_mod, q):
+            df['hhid'] = h['prefix'] + df[h['hhid']].apply(format_id)
+        if h['plot'] == 'garden':
+            for df in (g, p):
+                df['plotkey'] = (df['gardenid'].apply(format_id) + '_'
+                                 + df['plotid'].apply(format_id))
+        pcrop = h['pcrop'] or ('ag_p0c' if 'ag_p0c' in p.columns else 'crop_code')
+        harvest += [
+            _harvest_block(g, hhid='hhid', plotkey=h['gplot'], cropcode=h['gcrop'],
+                           qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
+                           plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
+                           intercrop='ag_g01', perennial=False, t=wave),
+            _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
+                           qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
+                           harv_m='ag_p06c', perennial=True, t=wave),
+        ]
+        for mod, df, cropcol, perennial in (('I', i_mod, h['icrop'], False),
+                                            ('Q', q, h['qcrop'], True)):
+            names = _SALE_RAW_VARS[mod]
+            flag, qty, unit, cond, value = names
+            sale.append(_sale_block(df, hhid='hhid', cropcode=cropcol, sold_flag=flag,
+                                    qty_sold=qty, value_sold=value, unit_sold=unit,
+                                    condition=cond, perennial=perennial))
+            crop_label, code = _crop_codes(df[cropcol], perennial=perennial)
+            u = pd.to_numeric(df[unit], errors='coerce').astype('Int64').map(unit_map)
+            cond_sold = (_crop_conditions(df[cond]) if cond in df.columns
+                         else pd.Series(_CONDITION_UNKNOWN, index=df.index, dtype='object'))
+            line = pd.DataFrame({
+                't': wave, 'i': df['hhid'].astype('string').values,
+                'crop': crop_label.values, 'u': u.astype('string').values,
+                'condition_sold': cond_sold.astype('string').values,
+                '_crop_code': code.values, 'module': mod, 'half': h['half'],
+                h['hhid']: df[h['hhid']].values, cropcol: df[cropcol].values,
+            })
+            for n in names:
+                if n in df.columns:
+                    line[n] = df[n].values
+            raw.append(line[line['_crop_code'].notna()])
+    return harvest, sale, pd.concat(raw, ignore_index=True)
+
+
+def sale_basis_decisions(wave):
+    """Replay the ladder for one wave: one row per candidate sale.
+
+    Columns: the ``_sale_block`` key (``i``, ``_crop_code``, ``u``,
+    ``condition_sold``), ``crop``, ``Quantity_sold``, ``Value_sold``,
+    ``outcome`` (``'exact'``, a registry key, ``'ambiguous'``,
+    ``'unresolved'``, or None for a sale with no candidate harvest row),
+    ``rung`` and ``basis``.  Re-reads the sources through
+    ``get_dataframe``; nothing is cached.
+    """
+    harvest, sale, _ = _crop_pieces(wave)
+    harv = _consolidate_harvest(harvest)
+    _, dec, _ = _attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
+    return dec
+
+
+def _inputs_sale_basis(wave, outcome):
+    """Raw Module I / Q lines whose sale reached a harvest row via ``outcome``."""
+    harvest, sale, raw = _crop_pieces(wave)
+    harv = _consolidate_harvest(harvest)
+    _, dec, _ = _attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
+    key = ['i', '_crop_code', 'u', 'condition_sold']
+    picked = dec.loc[dec['outcome'] == outcome, key + ['outcome', 'rung', 'basis']]
+    for c in ('u', 'condition_sold'):
+        picked[c] = picked[c].astype('string')
+        raw[c] = raw[c].astype('string')
+    raw['_crop_code'] = raw['_crop_code'].astype('Int64')
+    picked['_crop_code'] = picked['_crop_code'].astype('Int64')
+    out = raw.merge(picked, on=key, how='inner')
+    return out.set_index(['t', 'i', 'crop', 'u'])
+
+
+def inputs_sale_basis_wildcard(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_WILDCARD)
+
+
+def inputs_sale_basis_from_price(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_FROM_PRICE)
+
+
+def inputs_sale_basis_from_price_overrule(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_FROM_PRICE_OVERRULE)
+
+
+def inputs_sale_basis_not_applicable(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_NOT_APPLICABLE)
+
+
+def inputs_sale_basis_no_reference(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_NO_REFERENCE)
+
+
+def inputs_sale_basis_contradiction_sale(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_CONTRADICTION_SALE)
+
+
+def inputs_sale_basis_contradiction_harvest(wave):
+    return _inputs_sale_basis(wave, SALE_BASIS_CONTRADICTION_HARVEST)
+
+
+def inputs_sale_basis_unresolved(wave):
+    """The SUPPRESSED sale lines -- the deletion entry's inputs (rows: 0)."""
+    return _inputs_sale_basis(wave, SALE_UNRESOLVED)
+
 
 # --- IHS5 crop-side conversion factor tables (GH #854) -------------------
 #

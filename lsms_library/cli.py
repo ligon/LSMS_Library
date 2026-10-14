@@ -47,7 +47,7 @@ _OrderedDumper.add_representer(  # type: ignore[arg-type]
 
 def _load_yaml(path: Path) -> OrderedDict:
     if path.exists():
-        data = yaml.load(path.read_text(), Loader=_OrderedLoader)
+        data = yaml.load(path.read_text(encoding="utf-8"), Loader=_OrderedLoader)
         if data is None:
             return OrderedDict()
         if not isinstance(data, OrderedDict):
@@ -58,7 +58,7 @@ def _load_yaml(path: Path) -> OrderedDict:
 
 def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False))
+    path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False), encoding="utf-8")
 
 
 def _countries_root() -> Path:

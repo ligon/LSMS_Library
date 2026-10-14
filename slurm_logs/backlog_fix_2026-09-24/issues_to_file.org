@@ -1,0 +1,87 @@
+#+TITLE: Issues to file from the 2026-09-24 backlog sweep (no gh write from the worker nodes)
+
+Each heading below is the text of one GitHub issue, drafted by a worker
+agent that had no =gh= write access.  File it, then replace the heading's
+body with the issue number.
+
+* Malawi crop_production: the defensive collapse in assemble_crop_production COMPOSES a row and silently drops 27 sales / 373,600 MWK
+
+** Symptom
+
+The grain-guard groupby at the end of
+=lsms_library/countries/Malawi/_/malawi.py::assemble_crop_production=
+(=_grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']=; reducers
+=Quantity: 'sum'=, =crop_variety: 'first'=, =Quantity_sold: 'first'=,
+=Value_sold: 'first'=, =_branch: 'first'=) fires when a household grew
+two same-label VARIETIES of one crop -- distinct =_crop_code= values that
+=harmonize_crop= maps to one Preferred Label -- on one plot, in one unit
+and one shelled/unshelled state.  The known pairs: Citrus 1005 / 1010 /
+1011, Groundnut 11 / 12 / 16, Maize 1 / 3 (local vs. hybrid / composite).
+The two rows are merged into one: harvest =Quantity= is SUMMED across the
+varieties, =crop_variety= is the first row's, and where BOTH varieties
+were sold =Quantity_sold= / =Value_sold= keep the FIRST variety's sale and
+drop the other.  The served row is a composite that exists nowhere in the
+survey: the plot's whole harvest against one variety's sale.
+
+Measured on the cold build of =fix/malawi-derivations= (2026-09-25 review;
+=collapse_loss.log=), identical on the GH #833 bundle:
+
+| wave    | plot-crop groups collapsed | groups with >= 2 sold rows | sales dropped by first() | MWK dropped | of which carried a registry key |
+|---------+----------------------------+----------------------------+--------------------------+-------------+---------------------------------|
+| 2010-11 |                        127 |                          6 |                        6 |      28,900 |                               2 |
+| 2013-14 |                         54 |                          2 |                        3 |      18,200 |                               3 |
+| 2016-17 |                          7 |                          1 |                        1 |      50,000 |                               1 |
+| 2019-20 |                         98 |                         16 |                       17 |     276,500 |                               5 |
+| total   |                        286 |                         25 |                       27 |     373,600 |                              11 |
+
+Nothing counts this.  It is in neither =attrs['sale_suppressed']= nor
+=attrs['sale_basis_mismatch']=, no =SaleAttachmentWarning= fires, and the
+sale-basis ladder's per-key tallies (=attrs['sale_basis_ladder']=) count
+SALES attached -- so the ladder's delivered ROWS per key are below its
+attached sales (wildcard 947 / 341 / 449 / 1,041 rows vs 949 / 357 / 450 /
+1,046 sales) and the 2026-09-24 accounting attributed the whole shortfall
+to the GH #869 unmapped-crop drop, which explains only 13 (all 2013-14).
+The remaining 2 / 3 / 1 / 5 are this collapse.
+
+** Why it is a bug and not a guard
+
+The comment above the groupby says it "survives only as a guard against a
+genuinely repeated line at that grain, which the groupby above has already
+consolidated".  That is true of =_consolidate_harvest= (keyed on
+=_crop_code=, so it never merges varieties) but false of this collapse,
+which keys on =crop= AFTER =_crop_code= has been dropped.  Two varieties
+are two rows at the *source's* grain and one row at the *declared* grain;
+the collapse resolves that by composing, which is the pattern GH #871
+removed from core (=most_complete_row=: SELECT an observed row, never
+compose one).  Composing here is worse than in core because the summed
+=Quantity= and the single =Value_sold= are then divided into each other
+downstream (=Value_sold / Quantity_sold= is a price; =Quantity= feeds
+=harvest_kg=).
+
+** Candidate fixes (either is a country decision; state which)
+
+1. Key the collapse on =crop_variety= too (add it to =_grain=), so the two
+   varieties stay two rows.  Cost: =(t, i, plot_id, crop, u, condition)= is
+   then not unique for those 286 groups, and the wave-script uniqueness
+   assert (=_GRAIN=) and the declared index in =data_scheme.yml= must
+   either admit =crop_variety= as a level or the framework's declared-index
+   collapse will fire on them instead (with a =GrainCollapseWarning=, which
+   at least counts them).
+2. Keep the grain and SELECT rather than compose: serve the most complete
+   observed row per group (the GH #871 rule), summing nothing, and COUNT
+   the dropped rows in a new =attrs= tally with a warning, so the loss is
+   visible.  Cost: the served =Quantity= for those plot-crops becomes one
+   variety's harvest rather than the plot total.
+
+Either way the 27 sales must be counted before they are dropped; the
+current silence is the defect.
+
+** Where
+
+- =lsms_library/countries/Malawi/_/malawi.py=, =assemble_crop_production=,
+  the =if harv.duplicated(_grain).any():= block.
+- Accounting corrected in =Malawi/_/CONTENTS.org= ("What each rung
+  carries", first bullet) and =tests/test_malawi_sale_basis.py= (=ROWS=
+  comment) on 2026-09-25; both cite this entry.
+- Reviewer's measurement: =backlog_review_39205842/malawi-derivations/verify/collapse_loss.log=
+  and =wildcard_949b.log= (scratch; the per-wave table above is a copy).

@@ -298,7 +298,7 @@ def read_provenance(countries_dir: Path, country: str,
         return WaveProvenance(country=country, wave=wave,
                               source=SOURCE_UNKNOWN, method="no-source-org")
     try:
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
         logger.debug("Could not read %s: %s", path, exc)
         return WaveProvenance(country=country, wave=wave,
@@ -310,7 +310,7 @@ def write_provenance(countries_dir: Path, prov: WaveProvenance) -> Path:
     """Write a wave's ``SOURCE.org``, creating ``Documentation/`` if needed."""
     path = source_org_path(countries_dir, prov.country, prov.wave)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_source_org(prov))
+    path.write_text(render_source_org(prov), encoding="utf-8")
     return path
 
 
