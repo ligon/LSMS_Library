@@ -40,12 +40,17 @@ def test_sidecarless_and_sidecar_beside_are_told_apart(tmp_path):
     dangerous = _plant(root, "Uganda/2019-20/Data/AGSEC5A.dta")
     refused = _plant(root, "Uganda/2013-14/Data/GSEC1.dta", sidecar=True)
     sav = _plant(root, "Uganda/2013-14/Data/HH.SAV")          # case-insensitive
+    dat = _plant(root, "GhanaLSS/1998-99/Data/SEC8B.DAT")      # fixed-width + .DCT: on the read chain
+    dct = _plant(root, "GhanaLSS/1998-99/Data/SEC8B.DCT")
+    xlsx = _plant(root, "Uganda/2013-14/Data/weights.xlsx", sidecar=True)
     (root / "Uganda/2013-14/Data/GSEC2.dta.dvc").write_text("outs: []\n")  # sidecar alone: fine
     _plant(root, "Uganda/2013-14/Data/notes.txt")                # not a data suffix
+    _plant(root, "Uganda/2013-14/Documentation/questionnaire.pdf")  # not on the read chain
+    _plant(root, "Uganda/2013-14/Data/UGA_2013.zip")             # archive, not a source
 
-    found = lsms_cli._intree_source_files(root, ["Uganda"], tracked=set())
-    assert found["no_sidecar"] == sorted([dangerous, sav])
-    assert found["with_sidecar"] == [refused]
+    found = lsms_cli._intree_source_files(root, ["Uganda", "GhanaLSS"], tracked=set())
+    assert found["no_sidecar"] == sorted([dangerous, sav, dat, dct])
+    assert found["with_sidecar"] == sorted([refused, xlsx])
     assert found["stray_dirs"] == []
     assert found["git_consulted"] is True
 
@@ -59,28 +64,76 @@ def test_clean_tree_reports_nothing(tmp_path):
 
 
 def test_git_tracked_and_underscore_dir_files_are_sources_not_strays(tmp_path):
-    """Nine tracked ``.csv`` lookup tables live in-tree today; six of them
-    match the ``*.csv`` ignore pattern and are tracked anyway.  A tracked
-    file is excluded by name; a file under ``_/`` is excluded by position,
-    which is what keeps the no-git fallback (a pip install has no ``.git``)
-    from listing the shipped tables on every run."""
+    """Nine tracked ``.csv`` lookup tables live in-tree today, every one
+    under a ``_/`` directory and every one un-ignored by a negation rule in
+    the repo's ``.gitignore`` (git considers none of them ignored).  A
+    tracked file is excluded by name; a file under ``_/`` is excluded by
+    position, which is what keeps the no-git fallback (a pip install has no
+    ``.git``) from listing the shipped tables on every run.  Since
+    ``Panama/_/unittable.csv`` moved out of ``1997/Data/`` the fallback has
+    no false positive on the shipped tree; a tracked file OUTSIDE ``_/`` is
+    the case git is still needed for, so it is planted here explicitly."""
     root = tmp_path / "countries"
-    tracked = _plant(root, "Panama/1997/Data/unittable.csv")
+    _plant(root, "Panama/_/unittable.csv")
     _plant(root, "Uganda/_/fct_usda.csv")
     _plant(root, "GhanaLSS/2005-06/_/food_label.csv")
+    tracked_outside = _plant(root, "Uganda/2013-14/Data/lookup.csv")
     stray = _plant(root, "Panama/1997/Data/HOGARES.dta")
 
     found = lsms_cli._intree_source_files(
         root, ["Panama", "Uganda", "GhanaLSS"],
-        tracked={"Panama/1997/Data/unittable.csv"})
+        tracked={"Uganda/2013-14/Data/lookup.csv"})
     assert found["no_sidecar"] == [stray]
+    assert found["git_consulted"] is True
 
-    # No git: the `_/` rule still holds; only the Data/ csv is a false positive,
-    # and the caller is told git was not consulted.
+    # No git: the `_/` rule still holds for the shipped tables; only the
+    # tracked file outside `_/` is a false positive, and the caller is told
+    # git was not consulted.
     found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS"],
                                           tracked=None)
-    assert found["no_sidecar"] == [stray, tracked]
+    assert found["no_sidecar"] == [stray, tracked_outside]
     assert found["git_consulted"] is False
+
+
+def test_git_tracking_nothing_under_the_root_is_not_consulted(tmp_path, monkeypatch):
+    """A pip install inside the user's own repository: the countries root
+    sits under an ignored ``venv/``, so ``git -C <root> ls-files -- .``
+    succeeds with EMPTY output.  That answer says nothing about the files
+    there and must not be read as "git tracks none of these" -- before this
+    fix it was, and the report then listed a shipped lookup table for
+    deletion with the "git could not be consulted" hint suppressed."""
+    import shutil
+    import subprocess
+    if shutil.which("git") is None:
+        import pytest
+        pytest.skip("git not on PATH")
+    repo = tmp_path / "userproject"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / ".gitignore").write_text("venv/\n")
+    subprocess.run(["git", "-C", str(repo), "add", ".gitignore"], check=True)  # index non-empty
+    root = repo / "venv/lsms_library/countries"
+    shipped = _plant(root, "Panama/1997/Data/lookup.csv")   # tracked upstream, invisible here
+    (root / "Panama/_").mkdir(parents=True)
+
+    assert lsms_cli._git_tracked_files(root) is None
+    found = lsms_cli._intree_source_files(root, ["Panama"])
+    assert found["git_consulted"] is False
+    assert found["no_sidecar"] == [shipped]
+
+    class _StubCountry:
+        def __init__(self, name, **kw):
+            pass
+
+        def clear_cache(self, **kw):
+            return []
+
+    monkeypatch.setattr(lsms_cli, "_countries_root", lambda: root)
+    monkeypatch.setattr(lsms_cli, "Country", _StubCountry)
+    result = cli_runner.invoke(lsms_cli.app, ["cache", "clear", "--country", "Panama", "--dry-run"])
+    assert result.exit_code == 0, result.output
+    assert str(shipped) in result.output
+    assert "git could not be consulted" in result.output
 
 
 def test_the_real_tree_consults_git_and_excludes_its_tracked_csvs():
@@ -91,10 +144,15 @@ def test_the_real_tree_consults_git_and_excludes_its_tracked_csvs():
     if tracked is None:
         import pytest
         pytest.skip("not a git checkout")
-    assert "Panama/1997/Data/unittable.csv" in tracked
+    assert "Panama/_/unittable.csv" in tracked
+    assert "Panama/1997/Data/unittable.csv" not in tracked
     found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS", "Malawi"])
     assert found["git_consulted"] is True
     assert not any(p.name == "unittable.csv" for p in found["no_sidecar"])
+    # ... and the `_/` position rule alone now covers every tracked table.
+    found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS", "Malawi"],
+                                          tracked=None)
+    assert found["no_sidecar"] == [] and found["with_sidecar"] == []
 
 
 def test_root_level_wave_dirs_are_swept_regardless_of_country(tmp_path):

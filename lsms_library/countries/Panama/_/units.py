@@ -105,5 +105,6 @@ if __name__ == "__main__":
 
 # --- Legacy: CSV -> units.json regeneration (reference only) ---------------
 # from lsms_library.local_tools import get_dataframe
-# units = get_dataframe('../1997/Data/unittable.csv')
+# units = get_dataframe('unittable.csv')   # sits beside this script in `_/`
+#                                           # (moved out of 1997/Data/, GH #831)
 # units.to_json('units.json', orient='records', lines=True)

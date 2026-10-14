@@ -61,7 +61,11 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False), encoding="utf-8")
 
 
-# GH #831: raw source files (.dta/.sav/.csv) inside the config tree.  The
+# GH #831: raw source files (.dta/.sav/.csv/.dat/.dct/.ssp/.tab/.xls/.xlsx --
+# every suffix that carries a ``.dvc`` sidecar in the tree AND sits on the
+# ``get_dataframe`` / ``get_data_file`` read chain; ``.pdf``/``.doc``/``.zip``
+# documentation and archives are deliberately not on it) inside the config
+# tree.  The
 # runtime no longer puts them there (every read-path fetch lands under
 # data_root() since #917), but a checkout can still hold them -- a manual
 # ``dvc pull`` run from the package tree, a WB zip extracted by hand, or a
@@ -79,17 +83,30 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
 # ``cache clear`` cannot remove them (it does not own the config tree) but it
 # is where a user looks when data looks stale, so it names them -- exactly as
 # it already names in-tree parquets (#803).
-_INTREE_SOURCE_SUFFIXES = frozenset({".dta", ".sav", ".csv"})
+_INTREE_SOURCE_SUFFIXES = frozenset({
+    ".dta", ".sav", ".csv", ".dat", ".dct", ".ssp", ".tab", ".xls", ".xlsx",
+})
 
 
 def _git_tracked_files(root: Path) -> "set[str] | None":
     """Paths (relative to *root*, POSIX) that git tracks under it.
 
-    ``None`` when git cannot be consulted -- a pip install has no ``.git``.
+    ``None`` when git cannot be consulted.  That is the no-``.git`` case (a
+    plain pip install) AND the case where ``ls-files`` answers but tracks
+    nothing under *root*: a package installed under an ignored ``venv/`` or
+    ``.venv/`` inside the user's own repository makes ``git -C <root>
+    ls-files -- .`` succeed with empty output, which says nothing about the
+    files there.  An empty set is therefore reported as "not consulted", not
+    as "git tracks none of these".  (On this checkout the set is never
+    empty: 11,695 tracked paths under ``countries/``.)
+
     Tracked files are *sources* (nine ``.csv`` lookup tables live in-tree,
-    e.g. ``Uganda/_/fct_usda.csv``), never strays.  ``git ls-files`` and not
-    ``git check-ignore``: six of the nine match the ``*.csv`` ignore pattern
-    and are tracked anyway, so check-ignore would call them strays.
+    all under a ``_/`` directory, e.g. ``Uganda/_/fct_usda.csv`` and
+    ``Panama/_/unittable.csv``), never strays.  They are tracked because the
+    repo's ``.gitignore`` un-ignores each of them by a negation rule beneath
+    the blanket ``*.csv`` -- git considers none of them ignored, so ``git
+    check-ignore`` would have worked too.  ``git ls-files`` is used because
+    tracked-ness, not ignore status, is the question being asked.
     """
     try:
         out = subprocess.run(
@@ -98,7 +115,8 @@ def _git_tracked_files(root: Path) -> "set[str] | None":
         ).stdout
     except (OSError, subprocess.CalledProcessError):
         return None
-    return {p.decode("utf-8", "surrogateescape") for p in out.split(b"\0") if p}
+    tracked = {p.decode("utf-8", "surrogateescape") for p in out.split(b"\0") if p}
+    return tracked or None
 
 
 def _intree_source_files(
@@ -124,7 +142,9 @@ def _intree_source_files(
     config by definition (``_BUILD_INPUT_SUFFIXES`` hashes its ``.csv``
     files as build inputs), so a data file there is a lookup table, not a
     stray -- and this keeps the no-git fallback from reporting the shipped
-    lookup tables on every pip install.
+    lookup tables on every pip install.  Every tracked lookup table lives
+    under ``_/`` (``Panama/_/unittable.csv`` was the last one moved there),
+    so the no-git fallback has no false positive on the shipped tree.
     """
     if tracked is ...:
         tracked = _git_tracked_files(root)
@@ -184,8 +204,9 @@ def _report_intree_source_files(root: Path, countries: Sequence[str]) -> None:
         for p in found["with_sidecar"]:
             print(f"  {p}")
     if not found["git_consulted"] and (found["no_sidecar"] or found["with_sidecar"]):
-        print("  (git could not be consulted, so a tracked lookup table outside "
-              "a `_/` directory may be listed above; `git ls-files` is the check)")
+        print("  (git could not be consulted -- no .git, or it tracks nothing under "
+              "this root -- so a tracked source outside a `_/` directory would be "
+              "listed above; `git ls-files` is the check)")
 
 
 def _countries_root() -> Path:
