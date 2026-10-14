@@ -171,3 +171,73 @@ def test_pythonsafepath_is_stripped_from_the_child(monkeypatch):
     )
     # and the child's import identity is still pinned without it
     assert env["PYTHONPATH"].split(os.pathsep)[0] == str(_PACKAGE_PARENT)
+
+
+# -- GH #970: inspect every shell-out CALL, not the enclosing function -------
+
+_SUBPROCESS_CALLS = {"run", "Popen", "check_output", "check_call", "call"}
+
+
+def _subprocess_calls_without_env(source: str):
+    """Yield ``(lineno, spelling)`` for every ``subprocess.<call>(...)`` in
+    ``source`` that passes no ``env=`` keyword.
+
+    An ``ast`` walk over the whole module, so a call nested three functions
+    deep inside ``Country._aggregate_wave_data`` is inspected on its own
+    merits.  The previous guard only read the *enclosing* method's text for
+    the helper's name, and ``build_env`` in the same method satisfied it while
+    the nested ``load_json_cache`` shelled out to ``make`` with the parent's
+    environment (GH #970).
+    """
+    import ast
+
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        fn = node.func
+        spelled = None
+        if (isinstance(fn, ast.Attribute) and isinstance(fn.value, ast.Name)
+                and fn.value.id == "subprocess" and fn.attr in _SUBPROCESS_CALLS):
+            spelled = f"subprocess.{fn.attr}"
+        elif isinstance(fn, ast.Name) and fn.id in _SUBPROCESS_CALLS:
+            spelled = fn.id
+        if spelled is None:
+            continue
+        if not any(kw.arg == "env" for kw in node.keywords):
+            yield node.lineno, spelled
+
+
+def test_every_subprocess_call_in_country_py_passes_env():
+    """Every ``subprocess.*`` call in ``country.py`` must pass ``env=``.
+
+    This is the guard GH #970 asked for.  It failed on the pre-fix code at
+    the ``make <method>.json`` call inside ``load_json_cache`` (then
+    ``country.py:4365``), which the function-level guard above let through.
+    """
+    from lsms_library import country as country_mod
+
+    source = Path(country_mod.__file__).read_text()
+    offenders = list(_subprocess_calls_without_env(source))
+    assert not offenders, (
+        "subprocess calls in country.py without an env= keyword: "
+        + ", ".join(f"{s} at line {ln}" for ln, s in offenders)
+        + ". Build the child's environment with _script_subprocess_env() -- "
+        "a child given the parent's environment can import a different "
+        "checkout and write its parquet in-tree (GH #803, #970)."
+    )
+
+
+def test_the_ast_guard_sees_a_nested_call_the_text_guard_missed():
+    """The AST walker must flag a bare ``subprocess.run`` even when the
+    enclosing function mentions the helper -- the exact shape of #970."""
+    src = (
+        "import subprocess\n"
+        "def outer():\n"
+        "    def build_env():\n"
+        "        return _script_subprocess_env()\n"
+        "    def inner():\n"
+        "        subprocess.run(['make'], check=True)\n"
+        "    subprocess.run(['make'], check=True, env=build_env())\n"
+    )
+    assert list(_subprocess_calls_without_env(src)) == [(6, "subprocess.run")]
