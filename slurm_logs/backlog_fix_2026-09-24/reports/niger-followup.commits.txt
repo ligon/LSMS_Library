@@ -1,0 +1,6 @@
+cad6c8797 Niger: re-measure three claims that were stated, not measured (GH #811, #824, #679)
+fcea61515 Niger: move the u-sentinel pins the bundle legitimately moves; record hid 27010 (GH #679, #865, #833)
+62662cfd3 Niger CONTENTS.org: Unit_sold is carried, the agreement figures re-measured, #833 recorded (GH #824, #833, #679)
+53e2752cb Niger: pin Unit_sold, the crop-level sale key and the s16d de-duplication (GH #824)
+99095ecee Niger: pin the food_acquired label folds and the code-166 decision (GH #833)
+198f03ad1 Niger: pin cluster_features.Region at 8 served labels (GH #811)

@@ -181,16 +181,42 @@ Data Scheme:
   crop_production:
     # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
     # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
-    # values only -- harvest Quantity + native unit, household-crop sale
-    # (Quantity_sold / Value_sold, attached to single-plot crops only),
-    # item planting / harvest-end months, and intercropped / perennial
-    # flags.  Sources: seasonal Module G + perennial Module P (plot-crop
-    # harvest), seasonal Module I + perennial Module Q (household-crop
-    # sale).  crop on the shared harmonize_crop -> harmonize_food
-    # Preferred Label axis so a crop that is also a consumed food (Rice,
-    # Sorghum, Groundnut, Tomato, ...) JOINS food_acquired.j; u on the
-    # shared `u` Preferred Label axis.  Plot grain aligns with
-    # plot_features.  Aggregates (harvest_kg / yield / share_kg_sold /
+    # harvest Quantity + native unit + condition, and household-crop sale
+    # Quantity_sold / Value_sold.  Sales attach to single-plot crops only,
+    # in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
+    # ladder admits exact stated condition matches, an unknown wildcard,
+    # registered price rules (including resolving contradictions), and
+    # distinct not-applicable branches for measured non-separation or an
+    # absent reference.  The ladder preserves reported quantities, values
+    # and harvest condition; derived attachment/basis interpretation is
+    # exposed by Derivation.  Unadmitted or ambiguous candidate sales are
+    # counted -- see malawi.py:assemble_crop_production.  Also includes
+    # item planting / harvest-end months and intercropped / perennial flags.
+    # Sources:
+    # seasonal Module G + perennial Module P (plot-crop harvest), seasonal
+    # Module I + perennial Module Q (household-crop sale).  crop on the
+    # shared harmonize_crop -> harmonize_food Preferred Label axis.  THAT
+    # IS A SHARED AXIS, NOT A JOIN (GH #839; this comment used to claim
+    # the crop labels "JOIN food_acquired.j", and 20 of 44 do not).
+    # Measured on the 2026-09-24 build: 24 of the 44 crop labels also occur
+    # as a food_acquired.j label (Rice, Sorghum, Groundnut, Tomato, Banana,
+    # Mango, Pigeon Pea (Nandolo), Ground Bean, Irish Potato, ...).  The 20
+    # that do not are (a) crops whose consumed form carries a DIFFERENT
+    # label by design -- Maize (crop) vs Maize Grain (Not As Ufa) / Green
+    # Maize / the ufa flours; Cassava vs Cassava Tubers / Cassava Flour;
+    # Sweet Potato vs Orange / White Sweet Potato; Beans vs Bean, Brown /
+    # Bean, White; Soyabean vs Soyabean Flour; Wheat vs Wheat Flour; Pea;
+    # Citrus vs Citrus, Naartje, Orange, Etc.; Macadamia vs Macademia Nuts
+    # (a spelling) -- and (b) crops with no food analogue at all (Tobacco,
+    # Cotton, Sunflower, Paprika, Peach, Custard Apple, Masau, Masuku, the
+    # Fodder / Fertiliser / Fuel Wood tree classes).  Groundnut joins the
+    # raw nut in 2004-05 / 2010-11 / 2013-14 only: in 2016-17 / 2019-20
+    # the food side is Groundnut (Shelled) / Groundnut Dried (Unshelled) /
+    # Groundnut Fresh (Unshelled), and the vendor snack `Boiled groundnuts`
+    # that used to be folded onto `Groundnut` in those two waves is now its
+    # own label, Groundnut - Boiled (Vendor) (GH #833).  A crop -> food
+    # crosswalk is a transformation, never this table.  u on the shared `u`
+    # Preferred Label axis.  Plot grain aligns with plot_features.  Aggregates (harvest_kg / yield / share_kg_sold /
     # main_crop / value-shares) are transformations, NOT stored columns.
     # 2004-05 (IHS2) deferred: household-level aggregated ag file, no
     # plot-crop roster.  See _/malawi.py:assemble_crop_production.
@@ -428,12 +454,19 @@ Data Scheme:
     #         NATIVE in the index: there is no household i here, so the
     #         framework's _join_v_from_sample does not apply.
     #   j  -- priced item on the shared harmonize_price_item -> harmonize_food
-    #         / harmonize_crop Preferred Label axis, so a community price for
-    #         a consumed food (Maize Grain (Not As Ufa), Rice, Beef, Tomato,
-    #         Banana, ...) JOINS food_acquired.j and crop_production.crop;
-    #         the non-food priced goods (soap, batteries, tools, fertilizer,
-    #         transport service, ganyu day-wage) carry their own labels on
-    #         the same axis.
+    #         / harmonize_crop Preferred Label axis.  A SHARED AXIS, NOT A
+    #         JOIN (GH #839; this comment used to say the items "JOIN
+    #         food_acquired.j and crop_production.crop").  Measured on the
+    #         2026-09-24 build: 19 of the 51 priced items also occur as a
+    #         food_acquired.j label (Maize Grain (Not As Ufa), Rice, Beef,
+    #         Tomato, Banana, ...) and 6 as a crop_production.crop label
+    #         (Banana, Beans, Cabbage, Rice, Tea, Tomato).  Maize Grain (Not
+    #         As Ufa) joins the food side but NOT the crop `Maize`; Beans
+    #         joins the crop side but NOT the food `Bean, Brown` / `Bean,
+    #         White`.  The non-food priced goods (soap, batteries, tools,
+    #         fertilizer, transport service, ganyu day-wage, the two
+    #         grinding costs) carry their own labels on the same axis and
+    #         join nothing, by design.
     #   u  -- native reported unit on the shared harmonize_price_unit -> `u`
     #         Preferred Label axis, so community_prices.u joins
     #         food_acquired.u / crop_production.u.

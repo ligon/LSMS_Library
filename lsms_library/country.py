@@ -368,6 +368,26 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
+#
+# CROSS-REFERENCE (GH #953).  This is the *read-time* half of categorical
+# inheritance.  The other half is the *build-time* cascade,
+# ``local_tools.get_categorical_mapping(fn, tablename, dirs)``, whose
+# docstring carries the canonical statement of the whole model.  The two run
+# at different times over different layouts and agree on direction (local
+# beats global) but not on granularity:
+#
+#   cascade  -- one ``categorical_mapping.org`` per LEVEL; first hit wins, so
+#               override is whole-table; fall-through is per table.  It cannot
+#               read a directory of per-table files, so the cross-country rung
+#               it names (``countries/_/``) is unreachable and absent.
+#   merge    -- one ``<table>.org`` per TABLE in
+#               ``lsms_library/categorical_mapping/``.  ``Country.
+#               categorical_mapping`` globs them ALL and merges the country
+#               file over them, whole-table by default; the names below are
+#               the exception, merged per ROW.
+#
+# So the allow-list does NOT decide whether a global table is inherited (every
+# ``#+name:`` table in that directory is); it decides only the merge rule.
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
@@ -735,7 +755,7 @@ def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, A
     if cached is not None:
         return cached
     try:
-        with open(path, "r") as fh:
+        with open(path, "r", encoding="utf-8") as fh:
             parsed = load_yaml(fh)
     except (OSError, yaml.YAMLError):
         parsed = {}
@@ -1203,7 +1223,7 @@ class Wave:
         """
         license_path = self.documentation_path / "LICENSE.org"
         if license_path.exists():
-            with open(license_path, 'r') as file:
+            with open(license_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"License file not found: {license_path}")
         return ""
@@ -1218,7 +1238,7 @@ class Wave:
         """
         source_path = self.documentation_path / "SOURCE.org"
         if source_path.exists():
-            with open(source_path, 'r') as file:
+            with open(source_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"Data source not found: {source_path}")
         return ""
@@ -2223,7 +2243,7 @@ class Country:
         if not path.exists():
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return ""
-        return _notes.extract(path.read_text(), topic=topic, state=state)
+        return _notes.extract(path.read_text(encoding="utf-8"), topic=topic, state=state)
 
     @property
     def note_topics(self) -> list[tuple[int, str | None, str]]:
@@ -2242,7 +2262,7 @@ class Country:
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return []
         return [(h.level, h.keyword, h.text)
-                for h in _notes.parse(path.read_text())]
+                for h in _notes.parse(path.read_text(encoding="utf-8"))]
 
     @property
     def population(self) -> dict[str, "PopulationRecord"]:
@@ -2351,8 +2371,8 @@ class Country:
             lic_path = doc / "LICENSE.org"
             rows.append({
                 't': t,
-                'source': src_path.read_text() if src_path.exists() else pd.NA,
-                'license': lic_path.read_text() if lic_path.exists() else pd.NA,
+                'source': src_path.read_text(encoding="utf-8") if src_path.exists() else pd.NA,
+                'license': lic_path.read_text(encoding="utf-8") if lic_path.exists() else pd.NA,
                 'documentation_path': str(doc),
             })
         if not rows:

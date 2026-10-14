@@ -10,6 +10,12 @@
 #
 # Add new labels here as they are encountered in survey data.
 #
+# DO NOT add a key that is not title-cased when its .title() twin is already
+# a key (GH #945).  _expand_kinship looks up ``label.title()`` FIRST and the
+# raw stripped label only as a fallback, so such a key can never be reached:
+# the twin always answers first.  70 of them had accumulated and were removed
+# on 2026-09-18; tests/test_kinship_yml_hygiene.py keeps the count at zero.
+#
 # Partial and full NULL tuples are DELIBERATE, not gaps (GH #698, #797;
 # decided 2026-09-07).  A component the instrument does not determine is
 # null; the lookup still MATCHES, so no "Unknown relationship labels"
@@ -278,61 +284,34 @@ Enfant Adoptif:          [-1, 0, consanguineal]
 
 # --- French / English variants (Niger EHCVM 2021-22) ---
 "Conjoint(E) Du Cm":                            [0, 0, affinal]
-"Conjoint(e) du CM":                             [0, 0, affinal]
 "Beau Fils, Belle Fille":                        [-1, 0, affinal]
-"Beau fils, belle fille":                        [-1, 0, affinal]
 "Beau Frère, Belle Soeur":                       [0, 1, affinal]
-"Beau frère, belle soeur":                       [0, 1, affinal]
 "Beau Père, Belle Mère":                         [1, 0, affinal]
-"Beau père, belle mère":                         [1, 0, affinal]
 "Grand-Père, Grand-Mère":                        [2, 0, consanguineal]
-"Grand-père, Grand-mère":                        [2, 0, consanguineal]
 "Neveu, Nièce":                                  [-1, 1, consanguineal]
-"Neveu, nièce":                                  [-1, 1, consanguineal]
 "Cousin, Cousine":                               [0, 2, consanguineal]
-"Cousin, cousine":                               [0, 2, consanguineal]
 "Autres Parents Du Cm Ou Du Conjoint(E)":        [null, null, null]
-"Autres parents du CM ou du conjoint(e)":        [null, null, null]
 "Domestique Ou Parent Du Domestique":            [0, 0, servant]
-"Domestique ou parent du domestique":            [0, 0, servant]
 "Personne Non Apparentée Au Cm Ou À La Conjointe": [0, 0, unrelated]
-"Personne non apparentée au CM ou à la conjointe": [0, 0, unrelated]
 "Household Head":                                [0, 0, consanguineal]
 "Father-In-Law,Mother-In-Law":                   [1, 0, affinal]
-"Father-in-law,mother-in-law":                   [1, 0, affinal]
 "Brother-In-Law,Sister-In-Law":                  [0, 1, affinal]
-"Brother-in-law,sister-in-law":                  [0, 1, affinal]
 "Domestic Or Relative Of Domestic":              [0, 0, servant]
-"Domestic or relative of domestic":              [0, 0, servant]
 "Other Non Related Person(Not Related)":         [0, 0, unrelated]
-"Other non related person(not related)":         [0, 0, unrelated]
 "Other Relative Of Head Or Spouse":              [null, null, null]
-"Other relative of head or spouse":              [null, null, null]
 
 # --- Tanzania NPS variants (all-caps Stata labels) ---
-"FATHER/MOTHER":                     [1, 0, consanguineal]
 "Father/Mother":                     [1, 0, consanguineal]
-"SISTER/BROTHER":                    [0, 1, consanguineal]
 "Sister/Brother":                    [0, 1, consanguineal]
-"STEP SON/DAUGHTER":                 [-1, 0, step]
 "Step Son/Daughter":                 [-1, 0, step]
-"STEP SON / DAUGHTER":               [-1, 0, step]
 "Step Son / Daughter":               [-1, 0, step]
-"BROTHER/SISTER IN-LAW":             [0, 1, affinal]
-"FATHER/MOTHER IN-LAW":             [1, 0, affinal]
 "LODGER/LODGER'S RELATIVE":         [0, 0, guest]
 "SERVANT OR SERVANT'S RELATIVE":    [0, 0, servant]
-"LIVE-IN SERVANT":                   [0, 0, servant]
 "Live-In Servant":                   [0, 0, servant]
-"OTHER NON-RELATIVE (SPECIFY)":      [0, 0, unrelated]
 "Other Non-Relative (Specify)":      [0, 0, unrelated]
-"OTHER NON-RELATIVES (SPECIFY)":     [0, 0, unrelated]
 "Other Non-Relatives (Specify)":     [0, 0, unrelated]
-"OTHER NON- RELATIVES (SPECIFY)":    [0, 0, unrelated]
 "Other Non- Relatives (Specify)":    [0, 0, unrelated]
-"OTHER RELATIVE (SPECIFY)":          [null, null, consanguineal]
 "Other Relative (Specify)":          [null, null, consanguineal]
-"OTHER RELATIVE(SPECIFY)":           [null, null, consanguineal]
 "Other Relative(Specify)":           [null, null, consanguineal]
 
 # --- Gendered-pair slash/comma variants (Iraq, Kazakhstan, Kosovo, South Africa) ---
@@ -422,45 +401,31 @@ Adopted/Stepchild:               [-1, 0, step]
 
 # --- Liberia variants ---
 "Live-In Maid/Domestic Help":            [0, 0, servant]
-"live-in maid/domestic help":            [0, 0, servant]
 "Live-In Maid'S / Domestic Help'S Relative": [0, 0, servant]
-"live-in maid's / domestic help's relative": [0, 0, servant]
 "Other Non Relatives":                   [0, 0, unrelated]
-"other non relatives":                   [0, 0, unrelated]
 
 # --- Cambodia variants ---
-"adopted child/foster child":    [-1, 0, foster]
 "Adopted Child/Foster Child":    [-1, 0, foster]
-"other non-relative including boarder": [0, 0, guest]
 "Other Non-Relative Including Boarder": [0, 0, guest]
 
 # --- Guyana variants ---
 Spouse Of Hoh:                           [0, 0, affinal]
-"Spouse of HoH":                         [0, 0, affinal]
 Married Child:                           [-1, 0, consanguineal]
 Spouse Of Married Child:                 [-1, 0, affinal]
-"Spouse of Married Child":               [-1, 0, affinal]
 Unmarried Child:                         [-1, 0, consanguineal]
 "Father/Mother/T-In-Law/M-In-Law":       [1, 0, consanguineal]
-"Father/Mother/T-in-law/M-in-law":       [1, 0, consanguineal]
 "Bro/Sis/B-In-Law/S-In-Law/Other Relative": [0, 1, consanguineal]
-"Bro/Sis/B-in-law/S-in-law/Other relative": [0, 1, consanguineal]
 "Servant/Employee/Other Non-Relative":   [0, 0, servant]
-"Servant/Employee/Other non-relative":   [0, 0, servant]
 
 # --- Pakistan variants ---
 Wife Or Husband:                 [0, 0, affinal]
-"Wife or Husband":               [0, 0, affinal]
 "Servant/Tenant":                [0, 0, servant]
 Other Not Related:               [0, 0, unrelated]
 "Other Not Related":             [0, 0, unrelated]
 
 # --- Tajikistan variants ---
-"father/mother of the wife of head":     [1, 0, affinal]
 "Father/Mother Of The Wife Of Head":     [1, 0, affinal]
-"father/mother of the husband of head":  [1, 0, affinal]
 "Father/Mother Of The Husband Of Head":  [1, 0, affinal]
-"no relation":                           [0, 0, unrelated]
 "No Relation":                           [0, 0, unrelated]
 Lodger:                                  [0, 0, guest]
 
@@ -532,22 +497,14 @@ Lodger:                                  [0, 0, guest]
 # The 2014 file's "Frere/s?ur" (literal "?" for the oe ligature) is
 # restored to "Frere/soeur" by Burkina_Faso/2014/_/mapping.py, not mapped
 # here (GH #801); it resolves through the "Frere/Soeur" key above.
-"Fils ou fille":                         [-1, 0, consanguineal]
 "Fils Ou Fille":                         [-1, 0, consanguineal]
-"Père / mère":                           [1, 0, consanguineal]
 "Père / Mère":                           [1, 0, consanguineal]
-"Frère/sœur":                            [0, 1, consanguineal]
-"Petit fils/fille":                      [-2, 0, consanguineal]
 "Petit Fils/Fille":                      [-2, 0, consanguineal]
-"Domestique/personnel de maison":        [0, 0, servant]
 "Domestique/Personnel De Maison":        [0, 0, servant]
 
 # --- Mali EHCVM 2017-18 variants (different punctuation/spelling) ---
-"Beau fils/ Belle fille":               [-1, 0, affinal]
 "Beau Fils/ Belle Fille":               [-1, 0, affinal]
-"Beau-frère, Belle soeur":              [0, 1, affinal]
 "Beau-Frère, Belle Soeur":              [0, 1, affinal]
-"Personne non apparentée au CM ni au conjoint": [0, 0, unrelated]
 "Personne Non Apparentée Au Cm Ni Au Conjoint": [0, 0, unrelated]
 "Cousin, Cousine":                      [0, 2, consanguineal]
 "Neveu, Nièce":                         [-1, 1, consanguineal]
@@ -592,18 +549,12 @@ Lodger:                                  [0, 0, guest]
 Father/month-in-Law:                     [1, 0, affinal]   # same typo without numeric prefix
 
 # --- Punctuation / spacing variants (Kazakhstan, Tajikistan, South Africa) ---
-"Brother/sister in-law":                 [0, 1, affinal]
 "Brother / sister-in-law":              [0, 1, affinal]
-"Brother/Sister in-law":                 [0, 1, affinal]
 "brother /sister-in-law":               [0, 1, affinal]
 "Child / Adopted Child":                 [-1, 0, consanguineal]
-"Child / adopted child":                 [-1, 0, consanguineal]
 "child - adopted child":                 [-1, 0, consanguineal]
-"child / adopted child":                 [-1, 0, consanguineal]
 "Father / Mother":                       [1, 0, consanguineal]
 "father - mother":                       [1, 0, consanguineal]
-"Father/mother in-law":                  [1, 0, affinal]
-"Father/Mother in-law":                  [1, 0, affinal]
 "Lodger/Lodger's relative":              [0, 0, guest]
 "Servant or servant's relative":         [0, 0, servant]
 "grandfather /mother":                   [2, 0, consanguineal]
@@ -625,7 +576,6 @@ Spouse/Partner:                          [0, 0, affinal]
 "grandson/daughter of head of household/spouse, partner":       [-2, 0, consanguineal]
 "parent of head of household/spouse, partner":                  [1, 0, consanguineal]
 "spouse, partner":                                              [0, 0, affinal]
-"spouse/partner":                                               [0, 0, affinal]
 "other relation":                                               [null, null, consanguineal]
 unrelated:                                                      [0, 0, unrelated]
 "father/mother of husband":                                     [1, 0, affinal]
@@ -639,17 +589,11 @@ unrelated:                                                      [0, 0, unrelated
 # --- Serbia and Montenegro (2003 long-phrase labels) ---
 # Title-case form (after .title()) is the primary lookup; raw form added as fallback.
 "Head Of The Household":                 [0, 0, consanguineal]
-"Head of the household":                 [0, 0, consanguineal]
 "Child Of The Head / Spouse":            [-1, 0, consanguineal]
-"Child of the head / spouse":            [-1, 0, consanguineal]
 "Grandchild Of The Head / Spouse":       [-2, 0, consanguineal]
-"Grandchild of the head / spouse":       [-2, 0, consanguineal]
 "Husband/Wife, Spouse":                  [0, 0, affinal]
-"Husband/wife, spouse":                  [0, 0, affinal]
 "Son/Daug. In Law Of The Head/Spouse":   [-1, 0, affinal]
-"Son/daug. in law of the head/spouse":   [-1, 0, affinal]
 "Parents Of The Head / Spouse":          [1, 0, consanguineal]
-"Parents of the head / spouse":          [1, 0, consanguineal]
 
 # --- Ethiopian Rural Household Survey (ERHS) q11_1b labels (GH #271) ---
 # Additive: Head, Grandchild, Grandparent, Niece/Nephew, Uncle/Aunt,
@@ -657,15 +601,10 @@ unrelated:                                                      [0, 0, unrelated
 "Wife/Husband/Partner":          [0, 0, affinal]
 "Father/Mother":                 [1, 0, consanguineal]
 "Sister/Brother":                [0, 1, consanguineal]
-"Son/Daughter-in-law":           [-1, 0, affinal]
 "Son/Daughter-In-Law":           [-1, 0, affinal]
-"Father/Mother-in-law":          [1, 0, affinal]
 "Father/Mother-In-Law":          [1, 0, affinal]
-"Brother/Sister-in-law":         [0, 1, affinal]
 "Brother/Sister-In-Law":         [0, 1, affinal]
-"Other relative of head":        [null, null, consanguineal]
 "Other Relative Of Head":        [null, null, consanguineal]
-"Other unrelated person":        [0, 0, unrelated]
 "Other Unrelated Person":        [0, 0, unrelated]
 "Servants":                      [0, 0, servant]
 "Tenant/Boarder":                [0, 0, guest]
@@ -703,10 +642,7 @@ unrelated:                                                      [0, 0, unrelated
 # domestic worker: servant).  Code 17 'Not member anymore' is deliberately NOT
 # here: it is not a relationship, and the wave script drops those rows.
 "Spouse (Wife/Husband/Living Together)":  [0, 0, affinal]
-"Spouse (Wife/Husband/Living together)":  [0, 0, affinal]
 "Child (Son/Daughter)":                   [-1, 0, consanguineal]
 "Daughter In-Law":                        [-1, 0, affinal]
-"Daughter in-law":                        [-1, 0, affinal]
 "Great Grandchild":                       [-3, 0, consanguineal]
-"Great grandchild":                       [-3, 0, consanguineal]
 Househelp:                                [0, 0, servant]
