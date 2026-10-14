@@ -49,6 +49,17 @@ WAVE_SCRIPTS = ("crop_production.py", "livestock.py", "people_last7days.py",
 #: Cover-sheet facts (ECVMA2_MS00P1.dta, measured 2026-09-24).
 HOUSEHOLDS = 3617
 HOUSEHOLDS_BY_EXTENSION = {0: 3478, 1: 77, 2: 62}
+
+# The ONE served household id that is legitimately outside sample()'s
+# universe, named so the universe test stays exact (narrowed, not
+# weakened): 2011-12 hid 27010 has two lines in the harvest module
+# ecvmaas2e_p2.dta and none in the welfare, roster, plot or passage-2
+# welfare files -- the 2-row NullIndexKeyWarning on crop_production's v.
+# Recorded in Niger/_/CONTENTS.org ("2011-12 has one household in the
+# harvest module that is in no other file", GH #679).  If the cell is
+# fixed (or 27010 adjudicated as a mis-keyed 2701) the test fails until
+# this entry is removed.
+KNOWN_STRAY = {("crop_production", "2011-12"): {"27010"}}
 #: 3,457 ext-0 + 77 ext-1 with a 2011-12 hid, minus 5 skipped by the
 #: namespace guard in panel_ids.py.  3,251 under the old two-column key.
 LINKED_2014_15 = 3529
@@ -193,9 +204,14 @@ class TestServedKey:
                 continue
             ids = set(df.xs(t, level="t").index.get_level_values("i"))
             stray = ids - sample_ids[t]
-            assert not stray, (
-                f"{table} {t}: {len(stray)} household ids not in sample(), "
-                f"e.g. {sorted(stray)[:5]}")
+            known = KNOWN_STRAY.get((table, t), set())
+            assert stray == known, (
+                f"{table} {t}: household ids not in sample() are {sorted(stray)[:5]} "
+                f"({len(stray)}), expected exactly {sorted(known)} -- a NEW stray is a "
+                f"broken key; a stray that has GONE means the cell was fixed and its "
+                f"KNOWN_STRAY entry must be removed.  See Niger/_/CONTENTS.org, "
+                f"'2011-12 has one household in the harvest module that is in no "
+                f"other file' (GH #679).")
 
     def test_person_index_is_unique_in_every_wave(self, country):
         for table in ("household_roster", "people_last7days"):

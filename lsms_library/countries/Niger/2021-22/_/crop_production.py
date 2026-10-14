@@ -56,9 +56,12 @@ soldn = get_dataframe('../Data/s16d_me_ner2021.dta', convert_categoricals=False)
 
 # THE s16d FILE REPEATS ITS CROP-LEVEL LINES (GH #824, measured 2026-09-24).
 # s16d has no plot column, yet 12,232 rows for 8,691 (household, crop)
-# pairs: 2,633 pairs carry 2-5 rows, and the multiplicity equals the number
-# of PLOTS the crop is grown on in s16c for 89.6% of them -- the export
-# replicated each crop-level record once per plot.  The repeated lines are
+# pairs: 2,633 pairs carry 2-8 rows, and joined on (grappe, menage, crop)
+# the multiplicity equals the number of s16c HARVEST LINES for 100% of the
+# 8,691 pairs (re-measured 2026-10-14; it equals the number of distinct
+# (field, parcel) plots for only 65.7% of the multi-row pairs) -- the
+# export replicated each crop-level record once per harvest line, so the
+# repeats are a join artefact.  The repeated lines are
 # byte-identical on all 47 columns (5,786 of the 6,174 multi-pair rows are
 # exact duplicates, and EVERY one of the 1,320 multi-pair rows that carries
 # a sale is).  Summing them, as this script did, served a single sale 2-4x:

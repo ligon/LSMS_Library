@@ -466,11 +466,23 @@ alone (the scripts said "EXTENSION omitted to match sample/roster", and
 =sample= omitted it too), so the 59 shadowed households were merged
 into their parents wherever a within-household key repeats: 210
 (t, i, pid) collisions in =household_roster= / =individual_education=
-/ =people_last7days=, 2,006 in =assets= (item codes), 367 in
-=plot_inputs=, 280 in =livestock=, 46 in =crop_production= -- every one
-of them 0 once EXTENSION is in the key.  Every 2014-15 source file
-carries the column (checked one by one, including the welfare file
-=sample= reads).
+/ =people_last7days=, 2,006 in =assets= (item codes), 46 in
+=crop_production= -- each 0 once EXTENSION is in the key.  The two
+figures first given here for =livestock= and =plot_inputs=, 280 and
+367, were two-column duplicate groups on ALL raw rows of the source
+files (41,200 livestock rows, species not owned included; 36,890 input
+rows, inputs not applied included), not table collisions.  On the rows
+the scripts keep (=AS4AQ05 == 1= owned, 6,758 rows; =AS02CQ03 == 1=
+applied, 8,179 rows) the two-column key collides on 17 and 50 groups,
+and both are 0 on (GRAPPE, MENAGE, EXTENSION).  That makes =livestock=
+clean after the fix but NOT =plot_inputs=: the served 2014-15 cell
+still collapses 35 destroyed rows / 29 conflicting groups (was 88 / 82
+before the key was fixed) -- the seed-slot collision described two
+paragraphs down, which is not an EXTENSION defect.  (Corrected
+2026-10-14 after the red-team review,
+=slurm_logs/backlog_fix_2026-09-24/verdicts/niger-followup.md=; every
+count re-measured.)  Every 2014-15 source file carries the column
+(checked one by one, including the welfare file =sample= reads).
 
 *What changed.*  Every =i:= in =2014-15/_/data_info.yml= is
 =[GRAPPE, MENAGE, EXTENSION]=, the five wave scripts pass all three,
@@ -494,6 +506,27 @@ the namespace guard below had to skip 286 households whose 2011-12
 5).  Unlinked: 88 = 62 split-offs + 21 ext-0 households with no
 2011-12 =hid= in the individual file + the 5 guard-skipped.
 
+*The re-key also DROPS five of the old 3,251 links* (measured
+2026-10-14 against the crosswalk at the merge-base, =242573697=: 3,246
+old links carry over with identical targets, 0 change target, the
+2011-12 / 2018-19 / 2021-22 maps are byte-identical).  Three go by the
+DECISION above: old keys =89005=, =95001=, =128011= -- pairs (89,5),
+(95,1), (128,11) -- are ext-2-ONLY on the cover sheet (EXTENSION set
+={2}=, no ext-0/1 sibling), i.e. split-offs whose parent was NOT
+re-interviewed.  For those three the collision argument does not bite
+(linking them could re-merge nothing), so delinking them is a choice,
+not a consequence: whether the sole surviving trace of a 2011 household
+should carry its 2011 =hid= is a panel-design call, taken here as "a
+split-off is a new household" uniformly, and reversible by adding ext 2
+to =LINKED_EXTENSIONS= for pairs with no ext-0/1 sibling.  Two go by
+the namespace guard: old keys =101010= and =201010= (ext-0 households
+(101,10) and (201,10)) reconstruct the 2011-12 hids =10110= and
+=20110=, which under the longer key are the ids of (1,11,0) and
+(2,11,0); the guard skips them so that =id_walk= cannot chain two
+2014-15 households onto one 2011-12 id.  The other three
+guard-skipped households (=10010=, =20010=, =20012= as prev_i) were
+skipped under the old key as well.
+
 *One namespace collision remains, and no guard can remove it.*  The
 2011-12 id is the digit string =grappe*100 + menage= and the 2014-15
 id is also all digits, so an UNLINKED 2014-15 id can equal a 2011-12
@@ -514,9 +547,13 @@ collapse used to drop); =people_last7days= 26,369 -> 26,579 (+210);
 =assets= 17,070 -> 17,267; =plot_inputs= 8,071 -> 8,134; =livestock=
 4,998 -> 5,018; =individual_education= 2,821 -> 2,834; =crop_production=
 8,753 -> 8,799 (+46); =plot_labor= 15,803 -> 15,935; =shocks= 3,771 ->
-3,781; =housing= 3,558 -> 3,617; =food_security= 3,557 -> 3,616.  Every
-other (table, wave) serves the same row count as before the bundle,
-measured on all 23 tables.  The crosswalk holds 3,529 2014-15 ->
+3,781; =housing= 3,558 -> 3,617; =food_security= 3,557 -> 3,616; and
+the derived =household_characteristics= 3,558 -> 3,616 (omitted from
+the first version of this list; derived at read time from the re-keyed
+roster, so it moved with it).  Every
+other (table, wave) serves the same row count as before the bundle
+EXCEPT the 2021-22 derived food tables, which move with the GH #833
+label fold (see that section).  The crosswalk holds 3,529 2014-15 ->
 2011-12 links and no linked value is itself a key.
 
 *Not everything in =plot_inputs= 2014-15 was the missing EXTENSION.*
@@ -923,6 +960,16 @@ median quantity 1 sachet, median last purchase (=s07bq08=) 150 FCFA --
 a small packaged good.  Left as the code rather than named by
 inference; it is the only numeric-looking =j= in the table.
 
+*Served rows the fold moves (2021-22, before -> after, measured
+2026-10-14 on the pre-fix warm root and the cold rebuild):*
+=food_acquired= 131,549 -> 131,544 (the five merged rows above; 239,882
+-> 239,877 over all waves), and the derived tables with it:
+=food_expenditures= 98,249 -> 98,231, =food_prices= 98,247 -> 98,244,
+=food_quantities= 131,549 -> 131,522.  All lossless consequences of
+summing the five =(t, v, i, j, u, s)= pairs and of the three =j=
+labels folding to one at the derived grains; no other (table, wave)
+moves under #833.
+
 *Cache.*  =categorical_mapping.org= is a build input in every Niger
 table's hash: one Niger re-warm, shared with GH #679 / #824 / #811.
 
@@ -1078,11 +1125,19 @@ line identical to another on every column is the same record, not a
 second sale; exact duplicates are dropped (=duplicated(keep='first')=,
 3,329 rows) BEFORE the sum.  On the single-plot pairs =Value_sold=
 78,934,620 -> 73,206,995 FCFA and =Quantity_sold= 36,975 -> 32,420.5,
-1,409 pairs either way.  (The explanation offered with the fix -- that
-the multiplicity equals the crop's number of plots in s16c -- holds for
-65.7% of the multi-row pairs when a plot is a distinct (field, parcel);
-the fix does not depend on it.)  2014-15's AS2E2 is one row per
-(household, crop) -- 5,226 rows, 5,226 keys -- so its sum is a no-op.
+1,409 pairs either way.  WHY the lines repeat (re-measured 2026-10-14,
+replacing the "one row per plot" explanation first offered with the
+fix): joined on (grappe, menage, crop), the s16d multiplicity equals
+the number of s16c HARVEST LINES for 100% of the 8,691 pairs -- all
+2,633 multi-row pairs, all 553 sale-bearing multi-row pairs, 0 pairs
+without an s16c match -- and equals the number of distinct (field,
+parcel) plots for only 1,729 of the 2,633 (65.7%), because a plot can
+carry a crop on more than one harvest line.  s16d is therefore the
+crop-level record replicated once per harvest line, a join artefact of
+the export, and dropping the exact duplicates is the removal of that
+artefact, not a judgement about second sales.  2014-15's AS2E2 is one
+row per (household, crop) -- 5,226 rows, 5,226 keys -- so its sum is a
+no-op.
 
 NOTE that rebuilding a raw-side sold-unit key needs =id_walk=: the API's
 =i= is the panel-walked id, so a raw-side join misses (2014-15: 38 of 434

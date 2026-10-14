@@ -43,6 +43,22 @@ households whose reconstructed hid is not in the 2011-12 individual
 file, 5 guard-skipped).  Under the previous two-column key the guard
 had to skip 286 households, so only 3,251 were linked.
 
+Five of those 3,251 old links are NOT in the new crosswalk (measured
+2026-10-14 against the merge-base crosswalk; 3,246 carry over with
+identical targets, 0 change target, the other three waves' maps are
+byte-identical).  Three go by the DECISION above -- old keys
+``89005``, ``95001``, ``128011``, pairs (89,5) / (95,1) / (128,11),
+are ext-2-ONLY on the cover sheet (EXTENSION set {2}, no ext-0/1
+sibling): split-offs whose parent was not re-interviewed, for which
+the collision argument does not bite; delinking them is a uniform
+"split-off = new household" choice, reversible by admitting ext 2 for
+pairs with no ext-0/1 sibling.  Two go by the namespace guard below --
+old keys ``101010`` and ``201010`` (ext-0 households (101,10) and
+(201,10)) reconstruct hids ``10110`` / ``20110``, which under the
+three-column key are the ids of (1,11,0) / (2,11,0).  The other three
+guard-skipped households (prev_i ``10010``, ``20010``, ``20012``) were
+skipped under the old key too.
+
 **EHCVM linkage is explicit.** The 2021-22 cover sheet
 ``s00_me_ner2021`` has ``s00q07f1`` (previous grappe) and
 ``s00q07f2`` (previous menage) columns plus a ``PanelHH`` flag. We
