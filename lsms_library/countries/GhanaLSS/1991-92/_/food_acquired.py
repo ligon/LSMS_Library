@@ -58,6 +58,15 @@ sys.path.append('.')
 sys.path.append('../../_')
 sys.path.append('../../../_/')
 import mapping
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
+# import ...`: that absolute PACKAGE import binds to whichever `lsms_library`
+# won sys.path rather than to the config tree LSMS_COUNTRIES_ROOT selects
+# (GH #948 / #436; CONTENTS.org Trap 6).  `../../_` is correct from this
+# script's own directory, which is where the Makefile runs it
+# (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
+# in this file already assumes.
+from ghanalss import to_country_food_labels, reconcile_after_crosswalk
 from lsms_library.local_tools import (get_categorical_mapping, format_id,
                                       df_data_grabber, _to_numeric,
                                       to_parquet, df_from_orgfile)
@@ -202,7 +211,6 @@ assert not fa.index.duplicated().any(), (
 if __name__=='__main__':
     # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
     # Pure rename; an unmapped label raises rather than passing through.
-    from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels, reconcile_after_crosswalk
     fa = to_country_food_labels(fa, '1991-92')
     # guinea corn + sorghum are one crop on two 8h lines -> one j; reduce
     # here, on the canonical grain, not in core (Trap 9).

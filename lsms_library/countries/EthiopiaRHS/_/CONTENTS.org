@@ -1118,3 +1118,54 @@ fix would miss it.  Measured: 1989's =u= set is
 ={'0','1','13','14','15','17','21','3','4','5','6','7','8','9'}= -- *no 30*.
 The currency code is a 1994+ phenomenon.  (Codeunit1.SPS, if decoded, would
 have to be re-checked on this point.)
+
+* 2026-09-18 -- the org table's empty =Preferred Label= was a STRING, not NA (GH #813)
+
+=_/categorical_mapping.org= maps three non-relationship codes to a blank
+=Preferred Label= and states the intent in as many words -- for =erhs_relation=,
+"Code -9 ... and any other non-1..16 value are not real relationships; they map
+to an empty Preferred Label so =_expand_kinship= treats them as genuine-missing
+(no spurious kinship warning), same as NaN"; for =erhs_relation_1989=, that
+codes 11 and 36 are "two single-row data-entry errors in demog89_1.relnhhed ...
+Mapped to empty -> NA Relationship".
+
+*The intent is right; the mechanism stopped one step short.*  A blank org cell
+parses as the empty STRING, and =df_data_grabber= applies the
+=Code -> Preferred Label= dict with =f.get(x, x)=, so the rows arrived carrying
+='='= -- a value, not a missing value.  Measured warm, exactly the rows the two
+paragraphs describe and nothing else:
+
+| wave | rows | code | what it is                                              |
+|------+------+------+---------------------------------------------------------|
+| 1997 |   76 |   -9 | =reltn4= "Head Died and Replaced" (the count 1997/_/data_info.yml itself records) |
+| 1989 |    2 | 11, 36 | two single-row data-entry errors in =demog89_1.relnhhed= |
+
+*Fixed in =_/ethiopiarhs.py::household_roster= (a =df_edit= hook), and the
+placement is forced.*  The composing myvar path in =Wave.column_mapping= returns
+=(formatting_functions[var_name], mapping_dic)= and =df_data_grabber='s tuple
+branch is =for i in f: return grabber(df, (s, i))= -- it applies only the FIRST
+element.  A =Relationship= formatter in this module would therefore REPLACE the
+org mapping rather than run after it.  The table's =df_edit= hook is the only
+country-level lever that sees the decoded label.
+
+*Served data did not move*, and this file already said why without knowing it:
+=_expand_kinship='s =_NA_SENTINELS= (commit 0d35af6ed, April 2026) absorbs
+='='=, which is what makes the "zero kinship warnings" claim above true.
+=Country('EthiopiaRHS').household_roster()= is identical before and after
+(51,574 rows, same =Relationship= and =(Generation, Distance, Affinity)=
+counts).  The cached parquet's =Relationship= nulls go 3,624 -> 3,702.
+
+*Same class, NOT fixed here*: =harmonize_unit= maps code =0= to a blank
+=Preferred Label= too, so the =u= axis carries the same empty string.  Reported,
+untouched -- =u= has no sentinel list behind it, so that one is a real served
+value and needs its own measurement.
+
+*Three dead kinship.yml keys trace to this wave and are NOT live mis-decodes*
+(GH #813 adjudication): =Other reative=, =Other unrelated= and =Tenant/Broader=
+were added by 22e0cab0 when 1999 was wired with =converted_categoricals= LEFT
+UNSET, so =roster.tab='s embedded value labels -- carrying IFPRI's own typos --
+reached kinship directly.  The wave was later moved to the ERHS code-based
+recipe (=converted_categoricals: False= + =mappings: ['erhs_relation', ...]=),
+which serves =Other relative of head= / =Other unrelated person= /
+=Tenant/Boarder=.  Nothing in the repo outside =kinship.yml= contains the
+strings "reative" or "Broader".

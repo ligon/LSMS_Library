@@ -636,3 +636,152 @@ class TestFeatureExclusionIsRecordedNotAccidental:
         if ledger.exists():
             text = ledger.read_text()
             assert 'modal' in text and '131,548' in text
+
+
+class TestSaleConditionIsRead:
+    """The sale module's own S/U (ag_i02c / ag_q02c) decides where a sale lands.
+
+    GH #833.  Before it was read, the merge keyed on (i, crop, u) alone, so a
+    sale the household reported UNSHELLED was stamped on a harvest row
+    reported SHELLED -- 642 of the 11,321 attached sales whose both sides
+    answered contradicted each other (375 on Groundnut).  The rule now: a
+    sale attaches only to a harvest row whose condition it does not
+    contradict (equal, or either side `unknown_condition`), and only when
+    that pairing is 1:1.  A contradiction is suppressed and COUNTED in its
+    own tally, `attrs['sale_basis_mismatch']`, beside the GH #854 ambiguity
+    tally, whose shape is unchanged.
+    """
+
+    @staticmethod
+    def _harv(conditions):
+        import pandas as _pd
+        n = len(conditions)
+        return _pd.DataFrame({
+            't': ['2010-11'] * n, 'i': ['h1'] * n, 'plot_id': ['R1'] * n,
+            'crop': ['Groundnut'] * n,
+            '_crop_code': _pd.array([11] * n, dtype='Int64'),
+            'u': _pd.array(['Kilogramme'] * n, dtype='string'),
+            'condition': _pd.array(list(conditions), dtype='string'),
+            'crop_variety': _pd.array(['Groundnut Chalimbana'] * n,
+                                      dtype='string'),
+            'Quantity': _pd.array([10.0 * (k + 1) for k in range(n)],
+                                  dtype='Float64'),
+            'planting_month': _pd.array([11] * n, dtype='Int64'),
+            'harvest_month': _pd.array([6] * n, dtype='Int64'),
+            'intercropped': _pd.array([False] * n, dtype='boolean'),
+            'perennial': _pd.array([False] * n, dtype='boolean'),
+        })
+
+    @staticmethod
+    def _sale(condition):
+        import pandas as _pd
+        return _pd.DataFrame({
+            'i': ['h1'], '_crop_code': _pd.array([11], dtype='Int64'),
+            'u': _pd.array(['Kilogramme'], dtype='string'),
+            'condition_sold': _pd.array([condition], dtype='string'),
+            'Quantity_sold': _pd.array([4.0], dtype='Float64'),
+            'Value_sold': _pd.array([2500.0], dtype='Float64'),
+        })
+
+    def test_sale_block_reads_the_sale_side_condition(self, malawi_mod):
+        """ag_i02c goes through the harvest's own code map; NULL is unknown."""
+        import pandas as _pd
+        raw = _pd.DataFrame({
+            'hhid': ['h1'] * 4, 'ag_i0b': [11] * 4, 'ag_i01': [1] * 4,
+            'ag_i02a': [1.0, 2.0, 3.0, 4.0], 'ag_i03': [10.0, 20.0, 30.0, 40.0],
+            'ag_i02b': [1] * 4, 'ag_i02c': [1.0, 2.0, 3.0, float('nan')],
+        })
+        out = malawi_mod._sale_block(
+            raw, hhid='hhid', cropcode='ag_i0b', sold_flag='ag_i01',
+            qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
+            condition='ag_i02c')
+        got = dict(zip(out['condition_sold'], out['Quantity_sold']))
+        assert got == {'shelled': 1.0, 'unshelled': 2.0,
+                       'shell_not_applicable': 3.0, 'unknown_condition': 4.0}
+        # and an absent column is the unknown sentinel, not an error
+        out = malawi_mod._sale_block(
+            raw.drop(columns='ag_i02c'), hhid='hhid', cropcode='ag_i0b',
+            sold_flag='ag_i01', qty_sold='ag_i02a', value_sold='ag_i03',
+            unit_sold='ag_i02b', condition='ag_i02c')
+        assert set(out['condition_sold']) == {'unknown_condition'}
+        assert out['Quantity_sold'].iloc[0] == 10.0
+
+    def test_condition_disambiguates_a_split_plot_crop(self, malawi_mod):
+        """The GH #854 suppression case, with the sale's S/U now known."""
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
+            out = malawi_mod.assemble_crop_production(
+                '2010-11', [self._harv(['shelled', 'unshelled'])],
+                [self._sale('unshelled')])
+        by_cond = out.set_index('condition')['Value_sold']
+        assert by_cond['unshelled'] == 2500.0
+        assert pd.isna(by_cond['shelled'])
+        assert out.attrs['sale_suppressed']['sales'] == 0
+        assert out.attrs['sale_basis_mismatch']['sales'] == 0
+
+    def test_a_contradicting_sale_is_not_attached_and_is_counted(
+            self, malawi_mod):
+        with pytest.warns(malawi_mod.SaleAttachmentWarning,
+                          match='CONTRADICTS'):
+            out = malawi_mod.assemble_crop_production(
+                '2010-11', [self._harv(['shelled'])], [self._sale('unshelled')])
+        assert pd.isna(out['Value_sold']).all()
+        assert pd.isna(out['Quantity_sold']).all()
+        assert out.attrs['sale_basis_mismatch'] == {
+            'wave': '2010-11', 'sales': 1, 'rows': 1, 'value': 2500.0}
+        # a contradiction is NOT an ambiguity: the #854 tally stays at zero
+        assert out.attrs['sale_suppressed'] == {
+            'wave': '2010-11', 'sales': 0, 'rows': 0, 'value': 0.0}
+
+    def test_not_applicable_against_shelled_attaches_as_the_basis(
+            self, malawi_mod):
+        """NOT APPLICABLE is the basis where the market does not price the
+        shelling (@ligon, 2026-09-24, part (b) of the three-part call).
+
+        This test used to assert the opposite -- that NA against S is a
+        contradiction and is suppressed (the 2026-09-24 morning decision,
+        reversed the same day).  With no reference cell at all the basis
+        is UNMEASURED, so the sale attaches on the `sale-basis-no-reference`
+        rung (split from `sale-basis-not-applicable` on 2026-09-25, @ligon's
+        ruling 2: admission on the absence of evidence is its own key),
+        under its registry key, with no warning.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
+            out = malawi_mod.assemble_crop_production(
+                '2010-11', [self._harv(['shelled'])],
+                [self._sale('shell_not_applicable')])
+        assert out['Value_sold'].iloc[0] == 2500.0
+        assert out['Derivation'].iloc[0] == malawi_mod.SALE_BASIS_NO_REFERENCE
+        assert out.attrs['sale_basis_mismatch']['sales'] == 0
+        assert out.attrs['sale_basis_ladder'][
+            malawi_mod.SALE_BASIS_NO_REFERENCE]['sales'] == 1
+        assert out.attrs['sale_basis_ladder'][
+            malawi_mod.SALE_BASIS_NOT_APPLICABLE]['sales'] == 0
+
+    def test_unknown_on_either_side_is_compatible(self, malawi_mod):
+        """A side that did not answer contradicts nothing (Module P / early Q)."""
+        for harv_c, sale_c in (('shelled', 'unknown_condition'),
+                               ('unknown_condition', 'shell_not_applicable'),
+                               ('unknown_condition', 'unknown_condition')):
+            with warnings.catch_warnings():
+                warnings.simplefilter('error',
+                                      malawi_mod.SaleAttachmentWarning)
+                out = malawi_mod.assemble_crop_production(
+                    '2010-11', [self._harv([harv_c])], [self._sale(sale_c)])
+            assert out['Value_sold'].iloc[0] == 2500.0, (harv_c, sale_c)
+
+    def test_two_sales_compatible_with_one_row_are_ambiguous(self, malawi_mod):
+        """A shelled sale and an unrecorded-condition sale of one plot-crop
+        both fit its single shelled row; attaching both would double-count."""
+        import pandas as _pd
+        sale = _pd.concat([self._sale('shelled'),
+                           self._sale('unknown_condition')],
+                          ignore_index=True)
+        with pytest.warns(malawi_mod.SaleAttachmentWarning, match='AMBIGUOUS'):
+            out = malawi_mod.assemble_crop_production(
+                '2010-11', [self._harv(['shelled'])], [sale])
+        assert pd.isna(out['Value_sold']).all()
+        assert out.attrs['sale_suppressed'] == {
+            'wave': '2010-11', 'sales': 2, 'rows': 1, 'value': 5000.0}
+        assert out.attrs['sale_basis_mismatch']['sales'] == 0
