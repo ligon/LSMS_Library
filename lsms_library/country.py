@@ -6474,9 +6474,12 @@ def _replay_grain_audit(reports: Any, country: str, table: str,
     how #323 survived its first fix.
 
     ``wave`` (GH #868) is the wave a WAVE-level parquet was read for; it fills a
-    report that carries no ``wave`` of its own and never overrides one -- a
-    Nigeria PP/PH wave parquet holds two rounds' reports, each already naming
-    its round.  Replaying a wave stamp files it under ``(country, table)``, so
+    report that carries no ``wave`` of its own and never overrides one.  Under
+    the framework's ``build_context`` a stamped report's ``wave`` is the wave
+    FOLDER (``Wave.year``), so a two-round folder (Nigeria PP/PH) must pass
+    ``wave=`` explicitly to the reducer to name the round -- only a report
+    filed that way arrives here already naming it.  Replaying a wave stamp
+    files it under ``(country, table)``, so
     the L2-country write that follows carries it forward: that is how a wave
     script's stamp reaches the country parquet without a second mechanism.
     """

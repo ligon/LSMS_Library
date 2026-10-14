@@ -434,7 +434,14 @@ def build_context(country: str | None = None, table: str | None = None,
 
 def _resolve_build_context(df: pd.DataFrame, country, table, wave) -> tuple:
     """Explicit argument -> framework context -> (wave only) the frame's own
-    single ``t`` -> ``None``."""
+    single ``t`` -> ``None``.
+
+    Under the framework context the ``wave`` is the wave FOLDER
+    (``Wave.year``, what ``Wave.grab_data`` passes to ``build_context``), so a
+    two-round folder (Nigeria PP/PH) must pass ``wave=`` explicitly to name
+    the round -- the context wins over the frame's ``t`` and would file both
+    rounds under the folder name.
+    """
     ctx = _BUILD_CONTEXT.get() or {}
     country = country if country is not None else ctx.get('country')
     table = table if table is not None else ctx.get('table')
@@ -465,7 +472,10 @@ def _cells_blanked_report(conflicts: pd.DataFrame, levels: list, n_rows: int,
     withhold a value the sources contradict, and the report names the groups
     and the columns so a warm read can say exactly that.  A consumer filtering
     the ledger on rows lost (``destroyed`` / ``nan_key_rows``) is deliberately
-    NOT alarmed by it.
+    NOT alarmed by it.  ``collapsed_rows`` (``rows - groups``) is the
+    projection / de-dup count -- how many input rows shared an index tuple
+    with another -- and never a loss; it is deliberately NOT called
+    ``dropped``, which on a Site 1 report counts rows the collapse removed.
     """
     bad = conflicts.any(axis=1)
     per_col = {str(c): int(conflicts[c].sum()) for c in conflicts.columns
@@ -480,7 +490,7 @@ def _cells_blanked_report(conflicts: pd.DataFrame, levels: list, n_rows: int,
         'cells_blanked': int(conflicts.to_numpy().sum()),
         'columns': per_col,
         'examples': [_json_key(k) for k in conflicts.index[bad][:5]],
-        'dropped': int(n_rows - len(conflicts)),
+        'collapsed_rows': int(n_rows - len(conflicts)),
         'destroyed': 0,
         'nan_key_rows': 0,
         'country': country,

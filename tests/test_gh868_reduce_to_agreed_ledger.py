@@ -197,7 +197,7 @@ def test_replay_is_fatal_under_strict_through_the_shared_lever(monkeypatch):
                 "levels": ["t", "v"], "rows": 6, "groups": 2,
                 "conflicting_groups": 1, "cells_blanked": 1,
                 "columns": {"Region": 1}, "examples": ["('2018-19', '01')"],
-                "dropped": 4, "destroyed": 0, "nan_key_rows": 0, "wave": "2018-19"}]
+                "collapsed_rows": 4, "destroyed": 0, "nan_key_rows": 0, "wave": "2018-19"}]
     with pytest.raises(GrainCollapseError, match="BLANKED"):
         _replay_grain_audit(stamped, "Testland", "cluster_features")
 
@@ -219,13 +219,15 @@ def test_group_keys_that_json_refuses_still_stamp(tmp_path):
 
 def test_wave_is_filled_on_replay_only_where_missing():
     """A wave parquet's stamp may already name its round (Nigeria PP/PH holds
-    two per folder); the parquet's wave fills only a report without one."""
+    two per folder, and names a round only where the script passed ``wave=``
+    explicitly -- the framework context files the FOLDER name); the parquet's
+    wave fills only a report without one."""
     stamped = [{"kind": "cells_blanked", "levels": ["t"], "rows": 2, "groups": 1,
                 "conflicting_groups": 1, "cells_blanked": 1, "columns": {"x": 1},
-                "examples": ["'a'"], "dropped": 1, "destroyed": 0, "nan_key_rows": 0},
+                "examples": ["'a'"], "collapsed_rows": 1, "destroyed": 0, "nan_key_rows": 0},
                {"kind": "cells_blanked", "levels": ["t"], "rows": 2, "groups": 1,
                 "conflicting_groups": 1, "cells_blanked": 1, "columns": {"x": 1},
-                "examples": ["'b'"], "dropped": 1, "destroyed": 0, "nan_key_rows": 0,
+                "examples": ["'b'"], "collapsed_rows": 1, "destroyed": 0, "nan_key_rows": 0,
                 "wave": "2010Q3"}]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

@@ -2687,8 +2687,15 @@ different processes:
 
 A warm read of either table therefore replays the blanking as a
 =GrainCollapseWarning= through core's one emit choke point, and
-=grain_reports('Uganda', <table>)= is non-empty for it; the cold-build
-signal is still the reducer's own =GrainConflictWarning=.  The 11 groups
+=grain_reports('Uganda', <table>)= is non-empty for it.  The cold-build
+signal depends on the process the reducer runs in (measured, red team
+2026-09-24 and follow-up 2026-10-14): for the in-process =cluster_features=
+hook it is unchanged -- the reducer's own =GrainConflictWarning= (8), no
+=GrainCollapseWarning=; for the out-of-process =crop_production= a cold
+=make= build emits the child's =GrainConflictWarning= on the child's stderr
+AND the parent's =GrainCollapseWarning= replay in-process (4), because the
+parent reads back the wave stamp the child just wrote.  Two classes for one
+finding on that path, by construction, not a double count.  The 11 groups
 themselves are unchanged -- the fix is disclosure, not behaviour -- and the
 #848 condition-2 question above is still the data question.  Verified on a
 fixture only (=tests/test_gh868_reduce_to_agreed_ledger.py=); *the Uganda
