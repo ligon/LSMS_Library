@@ -1,0 +1,53 @@
+#+title: Peru cluster joins and Panama valor quantities: landing follow-up
+
+* Source contracts and changes
+Peru 1994's household id pads SEGMENTO to three digits and encodes HOGAR as a
+fraction, not a household ordinal. The cluster id is the nationwide SEGMENTO,
+not an administrative composite. Only 1994 is wired; 1985/1990/1991 have data
+but no wave configuration. REG01._weight_ is identically one, alongside SPSS
+system variables, while documented domain expansion factors are absent.
+The approved sample expectation corrections name only Peru and those three
+waves. Every other country's coverage expectation remains set(Country.waves).
+No fabricated weight or general skip is introduced. The dedicated new Peru
+tests independently pin raw export-weight values and exact sample/cluster/
+roster joins (including all 3,862 people in the previously unpadded clusters).
+
+Panama 1997 code 77 means valor, distinct from the library's capital Value
+(Q=E) convention. Unit-77 quantities have no physical interpretation. The
+new test asserts all 10,614 surviving valor rows have NA Quantity and checks
+all 1997 expenditure against the independent raw ga106c sum (356,079.56).
+The 46 capital-Value rows retain Q=E. Corrected two documentation errors:
+two stray 7.7 records exist (unit 75 and missing unit); missing-amount rows
+are excluded by construction filters, before the eventual no-amount drop.
+
+* Known scope and residuals
+The original correction removes 412 no-amount records, including all 179
+obtained-in-valor rows (126 inkind, 39 produced, 14 other). They have neither
+interpretable quantity nor expenditure, so the served table no longer records
+that acquisition occurrence. The existing approved branch makes that choice;
+this follow-up preserves and discloses it. No new row deletion is added.
+Peru's real weight acquisition and wiring three earlier waves remain open
+coverage work; its declared food_acquired, individual_education and
+interview_date have pre-existing missing 1994 wiring. Panama's 443 null u keys
+and quantity outliers remain visible. No residual invented unit or broad
+sample exception is added.
+
+* Validation
+Empty private L2: Peru sample 3,623, cluster_features 364, roster 19,285;
+Panama food_acquired 570,942 (155,742 / 194,866 / 220,334 by wave).
+New source-backed tests plus existing sample checks for Peru/Panama:
+26 passed, 8 skipped, 1 xfailed in 22.21 s. All three new tests execute.
+Skips are existing weight/Rural/refreshment checks for absent inputs; Peru's
+weight presence check xfails under the newly documented narrow exception.
+No baseline/golden/dependency change. Other countries' sample tests belong to
+the coordinator's combined suite; the conditional changes only Peru.
+No in-tree parquets. Cache scope: Peru and Panama only; shared cache untouched.
+
+* Prior art
+.coder/ledger/700-777-landing.md anchors tests to existing Country APIs and
+source definitions. No new transformation or identity builder was introduced.
+
+* Independent review follow-up
+The two Panama expenditure assertions now pass rel=0, enforcing an absolute
+one-cent bound instead of pytest.approx default relative tolerance. The
+affected data-backed test passed again (1 passed, no skips, 17.26 s).

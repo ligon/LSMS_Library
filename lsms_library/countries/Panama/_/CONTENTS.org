@@ -983,12 +983,71 @@ also currency-denominated, so excluding it is right too.
 *But the stated rationale is FALSE for these 11,026 rows.*  GH #770 argues
 the factor exists and equals =1/price= (Value = Quantity x Price).  That
 holds for the capital-=Value= population, where =Quantity= genuinely is the
-expenditure.  It does *not* hold here: *99.5% of these rows carry
+expenditure.  It did *not* hold here: *99.5% of these rows carried
 =Quantity == 7.70=*, the undecoded sentinel of *GH #777* -- their =Quantity=
-is not a value at all, it is a parse artefact.  A Step 2 that recovers
-=Quantity / price= would silently manufacture =7.70/price= kilograms for
-eleven thousand rows.  *Do not build Step 2 for Panama without resolving
-#777 first.*
+was not a value at all, it was a parse artefact.  A Step 2 that recovered
+=Quantity / price= would have manufactured =7.70/price= kilograms for eleven
+thousand rows.  *Resolved 2026-10-14 (next subsection): lowercase-=value=
+rows now carry NO Quantity, so a Step 2 for Panama can no longer trip on
+them -- it must simply treat =Quantity = NA= as "no physical amount".*
+
+** The 7.70 is unit code 77 echoed into the quantity slot (GH #777, fixed 2026-10-14)
+Measured on the raw =GAST-A.DTA= (=convert_categoricals=False=), 215,937 rows:
+
+| field pair (quantity, unit)   | unit == 77 | quantity == 7.7 | both   |
+|-------------------------------+------------+-----------------+--------|
+| =ga106a=, =ga106b= (purchase) |     10,847 |          10,800 | 10,798 |
+| =ga110a=, =ga110b= (obtained) |        180 |             175 |    175 |
+
+On the 10,847 unit-77 purchase rows the quantity is 7.7 (10,798), NaN (43),
+77.0 (3), 6.0 (2) or 1.0 (1); on the 180 unit-77 obtained rows it is 7.7
+(175), 7777.7, 77.0, 15, 2 or NaN. Two other 7.7 rows exist: one under
+unit code 75 and one with no unit code.  So the 7-repunit family co-occurs with code 77
+almost exactly and with nothing else: it reads as *the unit code echoed
+into the quantity field at one implied decimal*, not as a free-standing
+missing-value sentinel.  That is an interpretation of the co-occurrence.
+The household questionnaire =pn97hhq.pdf= (LZW text layer decoded 2026-10-14;
+no =pdftotext= on the node) shows the GA grid as =CANTIDAD | UNIDAD COD |
+TOTAL B/.= and carries *no unit code card*; neither do =pn97com.pdf=,
+=Formulario_Precios.pdf= or =caratula.pdf=.  =_/units.json= (=Unitcode 77,
+Label 'valor', Translation 'value', Conversion null=) is therefore the sole
+decode of 77, and it says what matters: the enumerator recorded the item *in
+money*, so the quantity cell has no physical meaning whatever its digits.
+
+*** Decision A: Quantity -> NA on every unit-77 row, keyed on the CODE
+=1997/_/food_acquired.py= now sets =ga106a= / =ga110a= to NaN wherever the
+paired unit code is 77, *before* the canonical rows are built, and asserts
+that no =u == 'value'= row carries a Quantity.  Keyed on the unit code, not
+on the value 7.7: the six rows at 77.0 / 6.0 / 1.0 are equally meaningless
+"in valor", and both stray =7.7= rows are left alone (not unit 77).
+Option B (fold into the library's capital-=Value= convention with
+=Quantity = Expenditure=) was declined: it would relabel a survey code as a
+library construction without a =Derivation= entry.
+
+Measured, warm (development) -> cold rebuild with the fix, 1997:
+
+| quantity                                  |     before |      after |
+|-------------------------------------------+------------+------------|
+| rows                                      |    156,154 |    155,742 |
+| =u == 'value'= rows                       |     11,026 |     10,614 |
+| ... with non-null Quantity                |     10,983 |      *0* |
+| ... with Quantity == 7.70                 |     10,973 |      *0* |
+| Expenditure sum (B/.)                     | 356,079.56 | 356,079.56 |
+| =food_prices= kgvalue / kgprice rows      |    483,661 |    483,661 |
+| =food_prices= unitvalue / unitprice rows  |    501,027 |    490,456 |
+| =food_expenditures= rows / 1997 sum       | 501,480 / 356,079.56 | unchanged |
+| =food_quantities(units='kgs')= rows       |    570,803 |    559,820 |
+
+The *412 rows removed* are the unit-77 rows that had NO other amount: 233
+purchases whose =ga106c= was NaN or the 9999 sentinel, and all 179 obtained
+rows (126 inkind, 39 produced, 14 other), which never carry an expenditure.
+They used to be served as =Quantity = 7.70= and nothing else. Purchased
+rows now fail the purchase amount filter; obtained rows are excluded by
+=ga110a.notna()= when canonical source rows are constructed.  The 10,614 remaining
+=value= rows are expenditure-only observations, all =s = 'purchased'=.
+=food_quantities= loses the 10,983 rows whose only "quantity" was the
+sentinel (the carry rule keeps a row only while it has a Quantity); 2003 and
+2008 are byte-identical.
 
 ** The two spellings got DIFFERENT factors, and the winner was luck
 Before #770, =conversion_to_kgs= returned BOTH ='Value' -> 0.34891692= and

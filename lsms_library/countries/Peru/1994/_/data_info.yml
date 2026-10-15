@@ -125,11 +125,53 @@ cluster_features:
     # (leading zeros stripped), so without the normalisation the label mapping
     # is a SILENT no-op and raw numeric codes reach the user -- the exact
     # failure mode this issue is about.
+    #
+    # PADDING (GH #700, 2026-10-14): `v` is a scalar idxvar, so the framework
+    # applies the bare `format_id` and would serve '1', '10', '100' -- which
+    # does not join to the '001' segmento component of `i`.  The
+    # `cluster_features()` hook re-keys the v level through `v()` in
+    # `_/mapping.py` (zero-pad to width 3), the same function that pads
+    # `sample`'s v.  Served v therefore CHANGED from '1' to '001' on that date.
     file: REG01.DTA
     idxvars:
         v: segmento
     myvars:
         Region: a01
+        Rural: a06
+
+sample:
+    # Household -> sampling segment, from the same cover page as
+    # cluster_features (REG01.DTA, 3,623 rows, one per household, exactly
+    # unique on (segmento, vivienda, hogar)).  Declared (i, t); the framework
+    # joins `v` from here onto every household-level table at API time, so
+    # household_roster now carries v in its index without declaring it.
+    #
+    #   i     <- (segmento, vivienda, hogar) via `i()` -> '001-01-11'
+    #   v     <- segmento via `v()` -> '001'  (myvar: the name-bound function
+    #            IS applied here, and the `sample()` hook re-applies it so the
+    #            invariant set(v) == {i.split('-')[0]} does not depend on the
+    #            dispatch rule)
+    #   Rural <- a06, decoded by the `sample()` hook from the `Rural` table in
+    #            `Peru/_/categorical_mapping.org` ('1' Urbano / '2' Rural),
+    #            not via a YAML `mappings:` entry -- a06 is a STRING code and
+    #            the org reader keys Code as int64, so a dict decode would be a
+    #            silent no-op (the a01 trap documented above).
+    #
+    # NO weight / panel_weight / strata.  REG01's `_weight_` is identically 1
+    # on all 3,623 rows (std 0): an SPSS system variable exported next to
+    # `_casenum` and `_date`, not a sampling weight.  The seven domain
+    # expansion factors the catalog (617, "Sampling") documents for ENNIV 1994
+    # are not in the shipped microdata.  Declaring a column of ones would
+    # assert a self-weighting design the documentation contradicts, so the
+    # column is absent and `Peru/_/data_scheme.yml` says why.
+    file: REG01.DTA
+    idxvars:
+        i:
+            - segmento
+            - vivienda
+            - hogar
+    myvars:
+        v: segmento
         Rural: a06
 
 household_roster:

@@ -42,7 +42,15 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 # These are genuine data limitations, not library bugs — the underlying
 # micro-data simply has no weight column.  test_has_weight_column is
 # xfailed for these.
-NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan"}
+# Peru 1994 REG01._weight_ is an SPSS export artefact (constant 1);
+# the documented seven domain expansion factors are not in this extract.
+# See Peru/_/CONTENTS.org, "sample carries NO weight".
+NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan", "Peru"}
+
+# Peru alone has three acquired rounds without any wave configuration.
+# Do not infer exemptions from directory shape: multi-round countries use
+# wave_folder_map for valid rounds without their own _/ directories.
+PARTIALLY_WIRED_SAMPLE = {"Peru": {"1985", "1990", "1991"}}
 
 # ---------------------------------------------------------------------------
 # Raw-layer weight-scale checks (the home of the scale check after the
@@ -201,7 +209,7 @@ class TestSample:
     def test_covers_all_waves(self, country_name, sample_df):
         """sample() should cover all waves the country declares."""
         c = ll.Country(country_name)
-        expected_waves = set(c.waves)
+        expected_waves = set(c.waves) - PARTIALLY_WIRED_SAMPLE.get(country_name, set())
         actual_waves = set(sample_df.index.get_level_values("t").unique())
         missing = expected_waves - actual_waves
         assert not missing, (
