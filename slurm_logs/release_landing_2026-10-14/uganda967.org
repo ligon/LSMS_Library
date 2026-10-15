@@ -1,0 +1,92 @@
+#+title: Uganda #967 landing replay and historical nutrition gate
+
+* Status and scope
+Merged development 452302adcfdbf3af538ef06375df1ac6c5aaa8a0 into #967;
+replayed code at ebf4eb4deba8ef95afa9279e33dd658cb9929915. No fixture changed
+in this landing follow-up. The original branch includes its previously reviewed
+nine food-acquisition hash changes. No nutrition code, inference policy,
+published baseline, DVC input or dependency was changed.
+
+* Country contract and explicit hold
+CONTENTS Unit handling identifies the relevant idiosyncrasy: the curated
+conversion_to_kgs.json is dropped during canonicalization, so the API's kg
+factors come entirely from the runtime transformations factor ladder.
+The historical nutrition entry in CONTENTS explicitly says:
+#+begin_quote
+Do not regenerate the baseline until the direction is signed off
+#+end_quote
+The fixture at 8ec0bab4e (2026-09-07) predates #850 and subsequent factor work.
+The recorded September 22 cold comparison found 23,284/23,801 nutrient vectors
+changed (337,664/357,015 cells), including Energy -18.7%, B12 -31.6% and
+Vitamin A +2.1%. Those are historical evidence, NOT independently re-derived
+by this landing run. This run isolates #967 against CURRENT development;
+it does not certify every earlier food-unit mass assumption.
+
+* Exact manifest mismatch
+| version | shape | content_hash |
+|---------+-------+--------------|
+| historical fixture | 23801 x 15 | fc85fc2e2046f3c034d77b1b56da52dbafb9f38bd24f6f63331846677b6eee44 |
+| current development cold | 23801 x 15 | 1131b358677a55ce4b3af6a5e63d8897f1e08381e76ac76b5b978d88ffdaf17e |
+| #967 candidate cold | 23777 x 15 | 12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a |
+Columns, index names and dtypes still match. Base fails only hash; candidate
+fails shape and hash. Against candidate's food-updated manifest, 11 present
+entries pass, nutrition alone fails, and 41 entries are unbuilt. Base fails
+the nine candidate food hashes plus nutrition; that does not mean nine
+unrelated base regressions. Both roots expose the historical nutrition failure.
+
+* Independent incremental accounting
+Both roots started with empty L2 and only a shared L1 dvc-cache symlink.
+Source/config identities were asserted. Seven outputs and three additional
+price modes rebuilt successfully.
+
+Food acquisitions stay 355,571. Every purchased/all-source expenditure key
+and value, household/food/source coverage, and previously labelled physical
+row is identical. FCT stays exactly identical (15 x 113). Raw-source joins
+using the existing id walker account for all 7,359 old blank-unit rows:
+6,429 Value, 904 missing-unit Unknown plus one zero-code Unknown, 24 distinct
+residual-code rows, and one recorded fish-unit row. Quantity and expenditure
+replay exactly; raw sidecars are identical between revisions. Value carries
+87,861,051 UGX, Q=E and no reported Price. Neither Value nor Unknown gets a kg
+factor. Eight residual codes still use the existing inference.
+
+Kg falls 1,242,402.7733372827 -> 1,241,553.473486705 (-849.299850578):
+missing/zero-unit removal -890.512708333; fish recorded label +7.741666667;
+separate residual-code inference +33.471191089. No selected factor changes on
+unchanged physical labels. Fish's 2 kg lower endpoint is the EXISTING parser
+convention, not a newly measured mass.
+
+Nutrition agrees with rebuilt kg quantities times unchanged FCT on BOTH
+revisions to maximum absolute matrix replay difference 2.9802322387695312e-08;
+a separate food-by-food sum agrees within 1.1641532182693481e-10. These are the
+fresh comparison.json measurements, not exact equality. It loses 24
+household-wave rows (23 in 2010-11, one in
+2011-12), all without a convertible physical quantity after correction:
+four previously had zero nutrient vectors, twenty had nonzero estimates from
+fabricated factors. Sixty retained vectors change. Incremental Energy delta:
+-130,397.304616177. All 15 nutrient deltas are in comparison.json.
+This arithmetic verification is not external validation of every density,
+unresolved unit or the earlier #850 revaluation.
+
+* Concrete proposed manifest change, NOT applied
+[[file:uganda967/nutrition-manifest-proposed.patch][Proposed patch]] changes ONLY
+nutrition shape and content_hash to the cold candidate values, retaining all
+other fields and entries. Applying it accepts the current regression target,
+including the older unadjudicated revaluation. The coordinator must resolve
+the scientific direction hold; the proposal is not a wholesale rebaseline.
+
+* Tests and evidence
+Targeted sentinel, kg-inference and built-manifest tests: 85 passed, 41 skipped,
+one failure (retained nutrition comparison), 20.69 s. All 41 skips name
+unbuilt parquets; no needed food-chain assertion skipped. Pinned BLAS/OMP/MKL=1,
+LSMS_BUILD_WORKERS=1, taskset 8-15, pytest -n 6 --dist=loadfile. Existing make
+recipes may request -j4 inside that affinity. No shared cache or in-tree
+parquet changes. Aggregate-only evidence is in [[file:uganda967/][uganda967/]];
+private household frames and logs remain in release scratch. Reproduction
+uses the original #967 validation drivers with the two source SHAs above.
+
+* Limits and cache scope
+All Uganda table hashes move under original #967; other-country/global scope
+is unchanged. This evidence follow-up adds no invalidation. Seven rebuilt
+outputs do not certify all Uganda declarations. Existing off-table unit drops,
+extreme quantities, unresolved residual-unit masses and nutrient provenance
+limits remain as documented in the September #967 VALIDATION.org.
