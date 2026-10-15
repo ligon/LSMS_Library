@@ -16,13 +16,19 @@
   },
   {
     "file": "country-summary.tsv",
-    "bytes": 1673,
-    "sha256": "5456778517e3868ed690bdd14960a9e602d8aca60b9c739ba0c7c1cb9c52ab95"
+    "bytes": 1634,
+    "sha256": "4527dd11898975ed22e0f482ceb699ec1330e50855ce9fecc8a146a07822aeca",
+    "source_sha256": "5456778517e3868ed690bdd14960a9e602d8aca60b9c739ba0c7c1cb9c52ab95",
+    "source_bytes": 1673,
+    "normalization": "CRLF to LF only; parsed tabular records identical"
   },
   {
     "file": "table-summary.tsv",
-    "bytes": 128530,
-    "sha256": "137f753369ead1396c1fc18b929c6dbd1079316e56d94597a82b64bb04123154"
+    "bytes": 127980,
+    "sha256": "92c58061c95dd5aadb32f27b45c7359ea6f18e823b9d8be7f03ca2c947f74e73",
+    "source_sha256": "137f753369ead1396c1fc18b929c6dbd1079316e56d94597a82b64bb04123154",
+    "source_bytes": 128530,
+    "normalization": "CRLF to LF only; parsed tabular records identical"
   },
   {
     "file": "progress.json",
