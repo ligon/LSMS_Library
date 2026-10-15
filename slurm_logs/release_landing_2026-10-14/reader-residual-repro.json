@@ -1,0 +1,42 @@
+[
+  {
+    "name": "truncated-stata.bin",
+    "encoding": null,
+    "shape": [
+      0,
+      1
+    ],
+    "columns": [
+      "'r\\x02\\x01'"
+    ]
+  },
+  {
+    "name": "truncated-stata.bin",
+    "encoding": "latin-1",
+    "shape": [
+      0,
+      1
+    ],
+    "columns": [
+      "'r\\x02\\x01'"
+    ]
+  },
+  {
+    "name": "unknown.bin",
+    "encoding": null,
+    "error_type": "ReadstatError",
+    "message": "Unable to read from file",
+    "cause": null
+  },
+  {
+    "name": "unknown.bin",
+    "encoding": "latin-1",
+    "shape": [
+      0,
+      1
+    ],
+    "columns": [
+      "'\u00ff\u00fe\u00fd'"
+    ]
+  }
+]

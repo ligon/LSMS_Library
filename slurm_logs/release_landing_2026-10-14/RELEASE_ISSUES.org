@@ -339,9 +339,11 @@ Separate from #810's cwd-rooted data reads and #831's source-file policy. Eviden
 #+begin_example
 The release hardens claimed DTA files, but the wider reader tail still needs review: a path-string retry invokes read_spss for unrelated formats, ReadstatError can obscure the original failure, and permissive text decoding can turn unreadable binary headers into an empty frame.
 
-Add failing-before tests for unreadable non-DTA binary input under default and latin-1 encodings and for the SPSS path-string retry. Preserve valid text/XPORT/SPSS and exception causes; do not blanket-catch programmer errors or return empty data as recovery. This is not #712's fixed CSV-to-Stata dispatch or #699's working XPORT branch. Search found related closed #189 (parser-error boundaries); inspect its rationale before editing. #805's encoding policy remains separate.
+Confirmed on integrated source d7626368f: a .bin file containing bytes([114, 2, 1, 0]) + bytes(60) returns an empty (0, 1) DataFrame under both default and latin-1 decoding, with binary header bytes as its column name. A .bin file containing bytes([255, 254, 253, 0]) * 16 raises ReadstatError("Unable to read from file") with no explicit cause under default decoding, but returns an empty (0, 1) frame under latin-1. These synthetic inputs contain no survey data; the four outcomes are archived in reader-residual-repro.json.
 
-Evidence: slurm_logs/release_landing_2026-10-14/runtime-residuals.org. The non-DTA cases were not reproduced afresh by this documentation worker; verify the runtime review's reproducer before publication as a newly confirmed defect.
+Add failing-before tests for unreadable non-DTA binary input under default and latin-1 encodings and for the SPSS path-string retry. Preserve valid text/XPORT/SPSS and exception causes; do not blanket-catch programmer errors or return empty data as recovery. This is not #712's fixed CSV-to-Stata dispatch or #699's working XPORT branch. Closed #189 and its resolution in PR #200 were read: that change narrowed broad catches to parser/I/O exceptions so programmer errors propagate. Preserve that boundary; the present defect concerns format admission and diagnostic chaining. #805's encoding policy remains separate.
+
+Evidence: slurm_logs/release_landing_2026-10-14/runtime-residuals.org and reader-residual-repro.json. The coordinator independently repeated all four synthetic cases before publication; no production reader was changed by this investigation.
 #+end_example
 
 ** Proposed new issue: Isolate cached path roots across test environment overrides
