@@ -6344,7 +6344,7 @@ def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
     )
     if _labels_strict():
         raise LabelPassThroughError(msg)
-    warnings.warn(msg, LabelPassThroughWarning, stacklevel=3)
+    warnings.warn(msg, LabelPassThroughWarning, stacklevel=4)
     return report
 
 
