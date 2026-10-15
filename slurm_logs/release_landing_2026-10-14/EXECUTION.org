@@ -1,0 +1,48 @@
+#+title: Release landing execution record
+#+date: 2026-10-14
+
+* Authorization and scope
+The maintainer approved proceeding with WORKPLAN.org. The recommended #830
+first increment is fixed fivefold tolerance, warning-only, with the four
+observed Ghana flags disclosed and broader threshold policy left as residuals.
+No rejected historical design is revived by the instruction to land branches.
+
+* Branch reconciliation
+All 193 original ref versions now have a provisional disposition in
+branches.tsv: 82 landed, 63 superseded, 20 active, 18 retained rejected,
+6 historical archives, and 4 integration refs. No refs deleted.
+historical-patches.json records combined-patch comparisons with squash merges.
+The July27 audit is the evidence for rejected aggregation-in-core branches.
+Two genuinely absent fixes join the original 18: #600 provenance relations
+and #837 Ethiopia/Tanzania cluster projection, each assigned for fresh review.
+
+* #980 CI validation path
+Follow-up head: 67d781318cf9bed8162aa6c6e189cb52bad99e57.
+Added seven subprocess regressions for the real missing-credentials plugin;
+precisely marked the remaining data rebuild and removed synthetic network
+waits from locality/missing-file tests. Independent framework-lane approval.
+Initial focused run: 63 passed, 2 skipped, one missing Path import failure.
+After the import fix: affected file and plugin tests 35 passed in 18.50s.
+PR unit-tests and Windows smoke passed at the final head.
+Merged #980 at d9942cf7e96daee7e799e07174d0da97613d890c.
+
+Manual dispatch works despite master's older workflow. Run38681185279 has
+head67d781318cf9bed8162aa6c6e189cb52bad99e57; data-tests is executing.
+This establishes the candidate validation route; it is not a claim that
+#941's data failures are resolved. PR run:38681156745.
+
+* Isolation and resources
+Three worktree lanes: runtime CPU0-7, countries8-15, framework16-23;
+coordinator24-31. BLAS/OMP/MKL threads1, LSMS_BUILD_WORKERS=1, xdist6 with
+--dist=loadfile. Private L2 roots share only immutable DVC blobs. Shared L2
+has not been cleared or warmed by this session.
+Commits use core.hooksPath=/dev/null because the local post-commit hook
+auto-pushes to the filesystem origin. The first runtime merge hit that hook
+before discovery and published only its isolated landing branch to the mirror.
+
+* Open release gate: Uganda nutrition manifest
+No fixture changed. The historical fixture predates #850 and later kg changes;
+current development already disagrees before #967. Country-lane cold replay
+confirms #967's additional changes independently (food sums and kg×FCT),
+but the existing CONTENTS instruction requires direction signoff before
+regenerating the historical nutrition baseline. Detailed report forthcoming.

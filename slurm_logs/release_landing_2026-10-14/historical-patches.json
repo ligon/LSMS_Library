@@ -1,0 +1,72 @@
+[
+  {
+    "branch": "canonical-housing-labels",
+    "sha": "2f01353ba518b1ef539c9591f56b3003ebdda58f",
+    "pr": 229,
+    "merged": "066cd92ca0210e18d0206f39a9297d828a65ca65",
+    "patch_equal": true
+  },
+  {
+    "branch": "docs/601-universe-in-contents",
+    "sha": "ed3b06a4a717e0255436b18543ef0b80edd633bd",
+    "pr": 658,
+    "merged": "fb749f039d3c98df5a16d4e061d70654d1dad009",
+    "patch_equal": false
+  },
+  {
+    "branch": "feat/603-population-record-attrs",
+    "sha": "6ef12b4a0bf113c0bbe5358ed6cfc6329d51ba4a",
+    "pr": 796,
+    "merged": "fd52c013eb49cda2ff88ab5df18c5e2c65563b1f",
+    "patch_equal": true
+  },
+  {
+    "branch": "feat/603-population-record-attrs",
+    "sha": "7b87c22f2eb45d0baaba46d31d183b596d263f11",
+    "pr": 796,
+    "merged": "fd52c013eb49cda2ff88ab5df18c5e2c65563b1f",
+    "patch_equal": false
+  },
+  {
+    "branch": "fix/770-currency-denominated-units",
+    "sha": "1963709ffb2bdf9954c798367d91f6e831082bcb",
+    "pr": 784,
+    "merged": "71b6ce92d2f4727217dc60cd0c27dd25337c2c15",
+    "patch_equal": true
+  },
+  {
+    "branch": "fix/770-currency-denominated-units",
+    "sha": "54c4b625c158d5377a14755ea1593d3b9e78962e",
+    "pr": 784,
+    "merged": "71b6ce92d2f4727217dc60cd0c27dd25337c2c15",
+    "patch_equal": false
+  },
+  {
+    "branch": "fix/782-ghanalss-food-labels",
+    "sha": "cbde101aa440fc7ab750ae745d4aec19e200d97c",
+    "pr": 785,
+    "merged": "52819bbc8166bd1575278d19ff751ebee38406b1",
+    "patch_equal": true
+  },
+  {
+    "branch": "fix/783-consolidate-food-vocabularies",
+    "sha": "ee761fcb8327a806e3197bcd3d371a370819b31a",
+    "pr": 789,
+    "merged": "f72818d0fe039663507d1ca2e3d0b204629ef7c7",
+    "patch_equal": true
+  },
+  {
+    "branch": "fix/866-stale-country-parquet-not-laundered",
+    "sha": "cb6ec1ceb9eb17b46ecbcb547552c34e9db811e9",
+    "pr": 924,
+    "merged": "22232d4f21db8b507fc7cd77dd435c1a68176cc1",
+    "patch_equal": false
+  },
+  {
+    "branch": "investigate/dta-encoding",
+    "sha": "f4df2fb4c93a491e98f6c03194798dcf11406374",
+    "pr": 795,
+    "merged": "b2d38da885c28d7f6deaf9edf48461bf82cacd81",
+    "patch_equal": true
+  }
+]
