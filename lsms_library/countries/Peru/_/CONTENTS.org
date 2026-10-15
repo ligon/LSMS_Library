@@ -931,10 +931,17 @@ Magic bytes, MEASURED on the bare DVC blob of =N00A.SSP= (md5 =a7e26161...=):
 : HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!000...
 : SAS     SAS     SASLIB  6.06    World          09JUL92:16:50:38
 
-=get_dataframe()= still fails on them -- =local_tools.read_file= tries
-=.dta= / =.csv= / =.parquet= and never an XPORT branch -- so this is a
-*library gap, not an acquisition gap*.  The data is on disk today.
-*Filed as GH #699* with the reproduction.
+=get_dataframe()= *reads them since 2026-10-14* (GH #699): =local_tools.read_file=
+now sniffs the XPORT magic bytes and dispatches to =pandas.read_sas(format='xport')=
+before any other reader.  Verified on the three blobs held locally (=EXPEND.SSP=
+1509x5, =N00A.SSP= 1528x10, =PANEL.SSP= 3326x4, every column populated; see the
+table below for what the wrong reader would have served); the other 36 blobs
+were not present locally and are unverified.  Before that fix the chain had no
+XPORT branch, and the file died with an uncaught =ReadstatError= out of
+=pd.read_spss= on the path-string retry -- so this was a *library gap, not an
+acquisition gap*.  What remains is Tier D: writing =Peru/1990/_= (=sample= from
+=N00A=/=EXPEND= with =WT= as the weight, =PANEL.SSP= as the 1985<->1990 person
+link; =CID= is constant 1.0 and NOT a cluster id).
 
 *** Use =pandas.read_sas=, NOT =pyreadstat.read_xport=
 
