@@ -988,8 +988,8 @@ Measured on the raw =GAST-A.DTA= (=convert_categoricals=False=), 215,937 rows:
 
 On the 10,847 unit-77 purchase rows the quantity is 7.7 (10,798), NaN (43),
 77.0 (3), 6.0 (2) or 1.0 (1); on the 180 unit-77 obtained rows it is 7.7
-(175), 7777.7, 77.0, 15, 2 or NaN.  Only *one* 7.7 exists under any other
-unit (code 75, one row).  So the 7-repunit family co-occurs with code 77
+(175), 7777.7, 77.0, 15, 2 or NaN. Two other 7.7 rows exist: one under
+unit code 75 and one with no unit code.  So the 7-repunit family co-occurs with code 77
 almost exactly and with nothing else: it reads as *the unit code echoed
 into the quantity field at one implied decimal*, not as a free-standing
 missing-value sentinel.  That is an interpretation of the co-occurrence.
@@ -1006,7 +1006,7 @@ money*, so the quantity cell has no physical meaning whatever its digits.
 paired unit code is 77, *before* the canonical rows are built, and asserts
 that no =u == 'value'= row carries a Quantity.  Keyed on the unit code, not
 on the value 7.7: the six rows at 77.0 / 6.0 / 1.0 are equally meaningless
-"in valor", and the one unit-75 =7.7= is left alone (it is not the pattern).
+"in valor", and both stray =7.7= rows are left alone (not unit 77).
 Option B (fold into the library's capital-=Value= convention with
 =Quantity = Expenditure=) was declined: it would relabel a survey code as a
 library construction without a =Derivation= entry.
@@ -1028,8 +1028,9 @@ Measured, warm (development) -> cold rebuild with the fix, 1997:
 The *412 rows removed* are the unit-77 rows that had NO other amount: 233
 purchases whose =ga106c= was NaN or the 9999 sentinel, and all 179 obtained
 rows (126 inkind, 39 produced, 14 other), which never carry an expenditure.
-They used to be served as =Quantity = 7.70= and nothing else; now they fall to
-the script's existing "no amount at all" drop.  The 10,614 remaining
+They used to be served as =Quantity = 7.70= and nothing else. Purchased
+rows now fail the purchase amount filter; obtained rows are excluded by
+=ga110a.notna()= when canonical source rows are constructed.  The 10,614 remaining
 =value= rows are expenditure-only observations, all =s = 'purchased'=.
 =food_quantities= loses the 10,983 rows whose only "quantity" was the
 sentinel (the carry rule keeps a row only while it has a Quantity); 2003 and

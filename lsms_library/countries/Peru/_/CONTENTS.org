@@ -797,11 +797,13 @@ that catalog 617 ("Sampling") documents for ENNIV 1994 are not in any shipped
 file.  A =weight= column of ones would assert a self-weighting design the
 documentation contradicts (contrast GhanaLSS GLSS1-3, where constant 1.0 *is*
 the design), so the column is absent rather than fabricated.  Consequence:
-=tests/test_sample.py::test_has_weight_column[Peru]= is red until Peru is
-added to that test's =NO_WEIGHT_COUNTRIES= exemption, and
-=test_covers_all_waves[Peru]= is red because only 1994 is wired (the other
-three waves have no =_/= config at all -- see "Wiring status" below).  Both
-are honest reds; the exemption is the dispatcher's edit, not this fix's.
+=tests/test_sample.py= names Peru in =NO_WEIGHT_COUNTRIES=, and explicitly
+exempts only the unwired =1985=, =1990= and =1991= sample rounds from its
+coverage expectation (see "Wiring status" below). Other countries retain
+their full wave checks. =tests/test_peru_700.py= independently pins the
+1994 sample coverage, the raw export weight and the cluster/roster joins;
+these exceptions must be reconsidered when an earlier wave is wired or
+the actual expansion factors are acquired.
 
 ** The Guatemala float32 trap does NOT apply to 1994 -- but check 1985/1991
 

@@ -89,7 +89,8 @@ df['u_obtained'] = df['ga110b'].apply(decode_unit)
 # 10,798 of the 10,847 unit-77 purchase rows (77.0 on 3, 6.0 on 2, 1.0 on 1,
 # NaN on 43), and ga110a == 7.7 on 175 of the 180 unit-77 obtained rows (one
 # 7777.7).  The 7-repunit family co-occurs with code 77 almost exactly and
-# with no other unit (one stray 7.7 under unit 75), which reads as the unit
+# with two stray 7.7 rows (one under unit 75, one with no unit code),
+# which reads as the unit
 # code echoed into the quantity slot at one implied decimal -- an
 # interpretation of the co-occurrence; the household questionnaire
 # (pn97hhq.pdf) shows only the CANTIDAD / UNIDAD COD / TOTAL B/. grid and
@@ -98,10 +99,10 @@ df['u_obtained'] = df['ga110b'].apply(decode_unit)
 # Rule (option A of #777): key on the UNIT CODE, not on the value 7.7.  A
 # quantity "in valor" is not a quantity whatever its digits, so every
 # unit-77 quantity becomes NA; the expenditure (ga106c, median 2.59 B/.) is
-# real and is kept.  The stray unit-75 row is untouched.  Rows left with no
-# amount at all (unit-77 purchases without an expenditure, and every unit-77
-# obtained row, which has no expenditure by construction) are removed by the
-# existing "no amount" drop below rather than served as a sentinel.
+# real and is kept. Both stray rows are untouched. Unit-77 purchases
+# without expenditure are excluded by the purchase construction filter;
+# obtained rows have no expenditure and are excluded by ga110a.notna()
+# when the canonical source rows are constructed below.
 _UNIT_VALOR = 77
 _masked = {}
 for qcol, ucol in (('ga106a', 'ga106b'), ('ga110a', 'ga110b')):
