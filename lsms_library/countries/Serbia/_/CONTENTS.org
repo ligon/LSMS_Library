@@ -349,10 +349,17 @@ the pipe character ='|'= encodes the letter "đ" -- and a literal ='|'=
 cannot survive an org-mode pipe-delimited table at all.
 
 One behaviour change worth knowing, in the NEW capability only:
-=Country.categorical_mapping= parses with =to_numeric=True=, so
-=labels='proizvod'= yields =101=, not the zero-padded =0101=.  The wave
-script reads through =df_from_orgfile(..., to_numeric=False)= and is
-unaffected.
+=Country.categorical_mapping= parses with =to_numeric=True=, so the
+=proizvod= column is =int64= (=101=, not the zero-padded =0101=).  The
+wave script reads through =df_from_orgfile(..., to_numeric=False)= and
+is unaffected.  *Corrected 2026-10-14 (GH #787 (c))*: an earlier version
+of this note said =labels='proizvod'= "yields 101"; it did, but only by
+turning the =str= =j= level into integers, and =Country._relabel_j= now
+REFUSES a numeric column with =LabelUnavailableError= ("a code is not a
+label").  The code is still one read away:
+=Country('Serbia').categorical_mapping['harmonize_food']['proizvod']=.
+The same sentence in =categorical_mapping.org= (a hashed build input)
+is deliberately left as written.
 
 The historical description follows.
 Harmonizes the 100 food items of the 2007 diary (=m5_1_diary.dta=) into

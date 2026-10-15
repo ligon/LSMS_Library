@@ -3071,11 +3071,44 @@ class Country:
     def _relabel_j(self, df: pd.DataFrame, labels: str | None, *, reaggregate: bool) -> pd.DataFrame:
         """Rename the ``j`` index level using a column of the country's food label table.
 
-        ``labels='Preferred'`` (or ``None``) is a no-op.  For any other value
-        ``X``, look for a column named ``'X Label'`` (falling back to ``'X'``)
-        in ``food_items`` or ``harmonize_food`` under ``categorical_mapping``,
-        keyed on ``'Preferred Label'`` (the current ``j`` values).
+        **Accepted values** (GH #787).  A trailing ``' Label'`` is stripped
+        first, so ``'Aggregate Label'`` and ``'Aggregate'`` are one request
+        and ``'Preferred Label'`` is the same deliberate no-op as
+        ``'Preferred'`` / ``None`` -- it used to survive only by accident
+        (``table[['Preferred Label', 'Preferred Label']]`` is a duplicate-
+        column frame whose ``zip`` iterated column NAMES, so the rename was
+        an identity ``{'Preferred Label': 'Preferred Label'}``).  Any other
+        value ``X`` resolves to the column ``'X Label'`` (first) or bare
+        ``'X'`` of ``food_items`` / ``harmonize_food`` under
+        :attr:`categorical_mapping`, keyed on ``'Preferred Label'`` (the
+        served ``j``).  So every TEXT column of the crosswalk is selectable
+        -- ``'Original'`` on the EHCVM countries, per-wave columns such as
+        ``'2004-05'`` on Malawi, ``'FTC'`` on Tanzania -- not only
+        ``'Aggregate'``; the bare fallback is documented in
+        ``.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md``.
+        A **numeric** column (``Code``, ``FTC Code``, ``FDC ID``, a float
+        year column) is NOT a label and is refused with
+        :class:`LabelUnavailableError`: it would silently turn the ``str``
+        ``j`` level into integers (Uganda ``labels='Code'`` served
+        ``[101, 141, 1082]``).  Read the codes off
+        ``Country.categorical_mapping['harmonize_food']`` instead.
+
+        **A ``j`` the column does not label passes through unrenamed** --
+        ``rename`` leaves non-matches alone -- and that is REPORTED, never
+        silent: the count, row share and examples go on
+        ``result.attrs['labels_unmatched']`` with a
+        :class:`LabelPassThroughWarning` (fatal under ``LSMS_LABELS_STRICT``).
+        Measured in GH #787, Ethiopia ``labels='2011-12'`` left 51 of 76
+        served foods unrenamed, carrying 46.6% of expenditure, with row
+        count and total identical to the default read.  The report is taken
+        BEFORE the ``reaggregate`` sum, which is the irreversible step.
+
+        Not addressed here (GH #787 (d), a decision): a Preferred Label that
+        maps to MORE THAN ONE distinct target value is served last-row-wins
+        (Niger ``'Original'``: 153 such keys).
         """
+        if isinstance(labels, str):
+            labels = labels.removesuffix(' Label')
         if labels in (None, 'Preferred'):
             return df
         if not isinstance(df, pd.DataFrame) or 'j' not in (df.index.names or []):
@@ -3132,6 +3165,27 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
+        if pd.api.types.is_numeric_dtype(table[target]):
+            # A code column is a JOIN KEY, not a label variant: renaming `j`
+            # with it changes the level's dtype from str to int64/float64 and
+            # nothing downstream (Feature's concat, the `j`-keyed derived
+            # tables) expects that.  Int AND float: `FTC Code`, `FDC ID` and
+            # the EthiopiaRHS / Panama year columns parse as float64 codes.
+            # LabelUnavailableError, not a plain KeyError, so a cross-country
+            # call degrades with ONE aggregated warning (the same class a
+            # typo of the variant name already gets).  No escape hatch: the
+            # scalar `labels=` has no second channel, and the codes are one
+            # attribute read away.
+            text_cols = [c for c in table.columns
+                         if c != 'Preferred Label'
+                         and not pd.api.types.is_numeric_dtype(table[c])]
+            raise LabelUnavailableError(
+                f"labels={labels!r} on {self.name!r} names the NUMERIC column "
+                f"{target!r} of its food label table, which is a code, not a "
+                f"label (relabelling 'j' with it would change the level's "
+                f"dtype to {table[target].dtype}); label columns: {text_cols}. "
+                f"Read the codes off Country.categorical_mapping directly."
+            )
         # A food the requested column does not label must keep its Preferred
         # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
         # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
@@ -3186,6 +3240,18 @@ class Country:
         pairs = table[['Preferred Label', target]].dropna()
         rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
                  if str(k).strip() != '' and str(v).strip() != ''}
+        # GH #787 finding 2: `rename` leaves a `j` absent from `rdict`
+        # exactly as it was, so the served axis can be two vocabularies on
+        # one level -- and under reaggregate=True an unmatched `j` that
+        # string-collides with a target value is SUMMED into it.  Count the
+        # pass-through here, where both operands exist and before the
+        # irreversible sum.  A NaN `j` is a null-key concern (Site I, GH
+        # #847), not an unlabelled food, and is not counted.  A blank
+        # crosswalk cell (filtered above, GH #925) now shows up here as
+        # unmatched, which is the right place for it to show.
+        unmatched_report = _audit_label_pass_through(
+            df.index.get_level_values('j'), rdict,
+            country=self.name, labels=labels, column=target)
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
@@ -3197,6 +3263,9 @@ class Country:
         # non-load-bearing for correctness; see _join_v_from_sample
         # above and tests/test_id_walk.py.
         result.attrs = dict(df.attrs)
+        if unmatched_report is not None:
+            # After the attrs copy, or the groupby path would overwrite it.
+            result.attrs['labels_unmatched'] = unmatched_report
         return result
 
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str,
@@ -5404,6 +5473,15 @@ class Country:
                 "    canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to\n",
                 "    the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and\n",
                 "    ``labels='Aggregate'`` are the same request.\n",
+                "    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``\n",
+                "    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.\n",
+                "    Every TEXT column of the food label table is selectable\n",
+                "    (``'Original'`` on EHCVM countries, per-wave columns); a\n",
+                "    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A\n",
+                "    ``j`` the column does not label passes through unrenamed and\n",
+                "    is reported on ``result.attrs['labels_unmatched']`` with a\n",
+                "    ``LabelPassThroughWarning`` (fatal under\n",
+                "    ``LSMS_LABELS_STRICT=1``).  GH #787.\n",
                 "    Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)\n",
                 "    when the country cannot honour the request -- it curates no\n",
                 "    such label column, or the result has no such target at all;\n",
@@ -6187,6 +6265,87 @@ class GrainCollapseError(RuntimeError):
 
     Raised instead of the default warning when ``LSMS_GRAIN_STRICT`` is set.
     """
+
+
+class LabelPassThroughWarning(RuntimeWarning):
+    """``labels=X`` left some ``j`` values unrenamed (GH #787 finding 2).
+
+    Its own class (rather than a bare ``RuntimeWarning``) so callers and CI
+    can target it precisely: ``warnings.simplefilter("error",
+    LabelPassThroughWarning)``.  Made fatal by ``LSMS_LABELS_STRICT``
+    (:class:`LabelPassThroughError`) -- its own lever, not
+    ``LSMS_READ_STRICT`` or ``LSMS_GRAIN_STRICT``: a destroyed row, an empty
+    column and a half-relabelled axis are different concerns and must
+    ratchet separately.
+    """
+
+
+class LabelPassThroughError(RuntimeError):
+    """Raised instead of :class:`LabelPassThroughWarning` under
+    ``LSMS_LABELS_STRICT``."""
+
+
+_LABELS_STRICT_ENV = "LSMS_LABELS_STRICT"
+
+
+def _labels_strict() -> bool:
+    """Whether a label pass-through should RAISE rather than warn.
+
+    Same spelling semantics as ``_grain_strict`` / ``_read_strict``
+    (``{1, true, yes}``), so knowing one lever is knowing all of them.
+    """
+    return os.environ.get(_LABELS_STRICT_ENV, "").lower() in {"1", "true", "yes"}
+
+
+def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
+                              labels: str, column: str,
+                              n_examples: int = 10) -> dict | None:
+    """Report the ``j`` values *rdict* does not key, or ``None`` if it keys all.
+
+    Pure reporting: never fills, renames or drops.  The report is the dict
+    that :meth:`Country._relabel_j` stamps on ``attrs['labels_unmatched']``::
+
+        {'labels': 'Original', 'column': 'Original Label',
+         'n_unmatched': 51, 'n_values': 76, 'rows': 106958,
+         'row_share': 0.405, 'examples': ['Avocado', 'Beef', ...]}
+
+    NaN ``j`` values are excluded from both numerator and denominator -- a
+    null key is Site I's concern (GH #847), not an unlabelled food.
+    Deliberately no allowlist and no threshold: one unrenamed food is a
+    fact about the served axis, and a known-bad crosswalk stays loud until
+    it is fixed.
+    """
+    values = pd.Index(j_values)
+    non_null = values[values.notna()]
+    if len(non_null) == 0:
+        return None
+    keyed = non_null.isin(list(rdict))
+    if keyed.all():
+        return None
+    unmatched = non_null[~keyed]
+    distinct = unmatched.unique()
+    report = {
+        'labels': labels,
+        'column': column,
+        'n_unmatched': int(len(distinct)),
+        'n_values': int(non_null.nunique()),
+        'rows': int(len(unmatched)),
+        'row_share': float(len(unmatched) / len(non_null)),
+        'examples': [str(x) for x in sorted(map(str, distinct))[:n_examples]],
+    }
+    msg = (
+        f"{country}: labels={labels!r} (column {column!r}) leaves "
+        f"{report['n_unmatched']} of {report['n_values']} 'j' values "
+        f"UNRENAMED, on {report['rows']} rows ({report['row_share']:.1%}): "
+        f"the crosswalk does not label them, so they are served beside the "
+        f"relabelled ones under their Preferred Label.  Examples: "
+        f"{report['examples']}.  Details on result.attrs['labels_unmatched']; "
+        f"set {_LABELS_STRICT_ENV}=1 to make this fatal."
+    )
+    if _labels_strict():
+        raise LabelPassThroughError(msg)
+    warnings.warn(msg, LabelPassThroughWarning, stacklevel=3)
+    return report
 
 
 class GrainCollapseWarning(RuntimeWarning):

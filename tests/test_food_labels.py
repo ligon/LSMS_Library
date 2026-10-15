@@ -392,3 +392,116 @@ def test_gh783_standalone_food_items_org_stays_retired(country):
         f"labels=. Put it in _/categorical_mapping.org as `harmonize_food` "
         f"(GH #783; cf. Tanzania and Ethiopia 'Unit #0')."
     )
+
+
+# ---------------------------------------------------------------------------
+# GH #787 (a)-(c): argument normalisation, pass-through report, numeric refusal
+# ---------------------------------------------------------------------------
+
+from lsms_library.country import LabelPassThroughWarning, LabelPassThroughError
+from lsms_library.errors import LabelUnavailableError
+
+
+def test_relabel_j_preferred_label_is_a_deliberate_noop():
+    """'Preferred Label' is the literal column name; it must mean 'Preferred'.
+
+    It used to survive only by accident (a duplicate-column frame whose zip
+    iterated column NAMES, giving an identity rdict).  Now it is the same
+    short-circuit as 'Preferred': the SAME object comes back.
+    """
+    fake = _fake_country({"food_items": _food_items_table()})
+    df = _sample_expenditure_df()
+    assert fake._relabel_j(df, "Preferred Label", reaggregate=True) is df
+
+
+def test_relabel_j_suffixed_and_bare_spellings_are_one_request():
+    fake = _fake_country({"food_items": _food_items_table()})
+    df = _sample_expenditure_df()
+    a = fake._relabel_j(df, "Aggregate", reaggregate=True)
+    b = fake._relabel_j(df, "Aggregate Label", reaggregate=True)
+    pd.testing.assert_frame_equal(a, b)
+    assert set(a.index.get_level_values("j")) == {"Beans", "Matoke"}
+
+
+def test_relabel_j_reports_pass_through_in_attrs_and_warns():
+    """A j the column does not label passes through -- and says so."""
+    fake = _fake_country({"food_items": _partially_labelled_table("")})
+    df = _sample_expenditure_df()
+    with pytest.warns(LabelPassThroughWarning, match="2 of 4 'j' values UNRENAMED"):
+        out = fake._relabel_j(df, "Wave1", reaggregate=True)
+    rep = out.attrs["labels_unmatched"]
+    assert rep["n_unmatched"] == 2 and rep["n_values"] == 4
+    assert rep["rows"] == 2 and rep["row_share"] == pytest.approx(0.5)
+    assert rep["examples"] == ["Beans (dry)", "Matoke (cluster)"]
+    assert rep["column"] == "Wave1" and rep["labels"] == "Wave1"
+    # Reporting only: the frame itself is what it was before this landed.
+    assert len(out) == len(df)
+    assert out["Expenditure"].sum() == pytest.approx(df["Expenditure"].sum())
+
+
+def test_relabel_j_fully_covered_axis_is_silent_and_unmarked():
+    """Negative control: no unmatched j -> no warning, no attrs key."""
+    import warnings as _w
+    fake = _fake_country({"food_items": _food_items_table()})
+    with _w.catch_warnings():
+        _w.simplefilter("error", LabelPassThroughWarning)
+        out = fake._relabel_j(_sample_expenditure_df(), "Aggregate", reaggregate=True)
+    assert "labels_unmatched" not in out.attrs
+
+
+def test_relabel_j_pass_through_ignores_null_j():
+    """A NaN j is Site I's concern (GH #847), not an unlabelled food."""
+    import warnings as _w
+    idx = pd.MultiIndex.from_tuples(
+        [("T1", "V1", "H1", "Beans (fresh)"), ("T1", "V1", "H1", None)],
+        names=["t", "v", "i", "j"])
+    df = pd.DataFrame({"Expenditure": [10.0, 5.0]}, index=idx)
+    fake = _fake_country({"food_items": _food_items_table()})
+    with _w.catch_warnings():
+        _w.simplefilter("error", LabelPassThroughWarning)
+        out = fake._relabel_j(df, "Aggregate", reaggregate=False)
+    assert "labels_unmatched" not in out.attrs
+
+
+def test_relabel_j_pass_through_is_fatal_under_strict_lever(monkeypatch):
+    monkeypatch.setenv("LSMS_LABELS_STRICT", "1")
+    fake = _fake_country({"food_items": _partially_labelled_table("")})
+    with pytest.raises(LabelPassThroughError, match="UNRENAMED"):
+        fake._relabel_j(_sample_expenditure_df(), "Wave1", reaggregate=True)
+
+
+def test_relabel_j_pass_through_report_survives_reaggregate_attrs_copy():
+    """The report is stamped AFTER the attrs copy, so the groupby path keeps it."""
+    fake = _fake_country({"food_items": _partially_labelled_table("")})
+    df = _sample_expenditure_df()
+    df.attrs["id_converted"] = True
+    with pytest.warns(LabelPassThroughWarning):
+        out = fake._relabel_j(df, "Wave1", reaggregate=True)
+    assert out.attrs["id_converted"] is True
+    assert out.attrs["labels_unmatched"]["n_unmatched"] == 2
+
+
+@pytest.mark.parametrize("col, values", [
+    ("Code", [1, 2, 3, 4]),                 # int64 (Uganda / Nigeria / Tanzania)
+    ("FTC Code", [1.0, 2.0, None, 4.0]),    # float64 code (Ethiopia)
+])
+def test_relabel_j_refuses_numeric_target_as_label_unavailable(col, values):
+    """A code column is a join key, not a label; relabelling j with it turned
+    the str level into integers (Uganda labels='Code' -> [101, 141, 1082]).
+    LabelUnavailableError so a cross-country call degrades with ONE warning."""
+    table = _food_items_table().drop(columns="Code")
+    table[col] = values
+    fake = _fake_country({"food_items": table})
+    with pytest.raises(LabelUnavailableError) as ei:
+        fake._relabel_j(_sample_expenditure_df(), col, reaggregate=False)
+    msg = str(ei.value)
+    assert "NUMERIC" in msg and "Aggregate Label" in msg
+
+
+def test_relabel_j_string_typed_code_column_is_still_accepted():
+    """Mali's 'Code' column parses as str; the refusal is by dtype, not name."""
+    table = _food_items_table()
+    table["Code"] = ["c1", "c2", "c3", "c4"]
+    fake = _fake_country({"food_items": table})
+    out = fake._relabel_j(_sample_expenditure_df(), "Code", reaggregate=False)
+    assert set(out.index.get_level_values("j")) == {"c1", "c2", "c3", "c4"}
