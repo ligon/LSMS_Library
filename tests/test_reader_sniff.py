@@ -21,7 +21,7 @@ All tests here are synthetic (``tmp_path``), no DVC, no network; the one
 real-blob test skips unless the Peru blob is already in the local cache.
 
 Measured 2026-10-14 against every blob held locally (``_dvc_cache_path`` on
-8,752 sidecars, 5,673 present): all 4,697 ``.dta`` blobs pass
+8,752 sidecars, 5,674 present): all 4,697 ``.dta`` blobs pass
 ``_is_stata_dta`` -- 67 of them ONLY because the fourth header byte is not
 tested (Kyrgyz 1997, India 1997-98, GhanaLSS ``pov_gh5.dta`` carry
 0x3f..0xff in the "unused" slot) -- and no ``.csv`` / ``.sav`` / ``.dat`` /
