@@ -418,6 +418,28 @@ def _row_union_categorical(global_t: "pd.DataFrame",
     return combined.reset_index(drop=True)
 
 
+def _strip_string_values(s: pd.Series) -> pd.Series:
+    """Strip whitespace from the STRING values of *s*; leave every other value
+    untouched (GH #694).
+
+    ``Series.str.strip()`` on an ``object`` column is not a no-op for the
+    non-string entries: the ``.str`` accessor returns NaN for any element that
+    is not a string, so a column that merely shares its name with a
+    categorical-mapping table -- ``Rural`` holding ``0``/``1``, a numeric
+    ``Region`` code -- had its numeric values NULLED before ``.replace`` ever
+    ran.  Whitespace-padded labels still need the strip so they match the
+    mapping's keys, so strip only where the value is a ``str``.
+
+    String and categorical dtypes already hold only strings (or NA); they keep
+    the vectorised path, which also preserves their dtype.
+    """
+    if s.dtype == object:
+        return s.map(lambda v: v.strip() if isinstance(v, str) else v)
+    if hasattr(s, "str"):
+        return s.str.strip()
+    return s
+
+
 def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
     """Merge global and per-country categorical tables.
 
@@ -3045,9 +3067,7 @@ class Country:
                 continue
             rdict = _dict_for(col, key, target)
             if rdict:
-                if hasattr(df[col], 'str'):
-                    df[col] = df[col].str.strip()
-                df[col] = df[col].replace(rdict)
+                df[col] = _strip_string_values(df[col]).replace(rdict)
 
         # Apply to index levels
         if isinstance(df.index, pd.MultiIndex):

@@ -396,3 +396,63 @@ def test_wave_rung_of_the_read_time_merge_is_whole_table_even_for_allow_listed_n
     src = inspect.getsource(country_mod.Wave.categorical_mapping.fget)
     assert "_merge_categorical_tables" not in src
     assert "dic.update(all_dfs_from_orgfile(org_fn))" in src
+
+
+# ---------------------------------------------------------------------------
+# GH #694: the column branch of ``_apply_categorical_mappings`` must not null
+# non-string values.  ``Series.str.strip()`` on an object column returns NaN
+# for every element that is not a string, so a numeric column that merely
+# shared its name with a categorical table (``Rural`` = 0/1, a ``Region``
+# code) was emptied before ``.replace`` ran.  The index branch never stripped,
+# so the hazard was column-only.
+# ---------------------------------------------------------------------------
+
+class _StubCountry:
+    """The two attributes ``_apply_categorical_mappings`` reads."""
+    name = "Stub"
+
+    def __init__(self, tables):
+        self.categorical_mapping = tables
+
+
+def _apply(tables, df, **kw):
+    return country_mod.Country._apply_categorical_mappings(
+        _StubCountry(tables), df, **kw)
+
+
+_RURAL = pd.DataFrame({"Original Label": ["U", "R"],
+                       "Preferred Label": ["Urban", "Rural"]})
+
+
+def test_gh694_numeric_values_survive_a_same_named_table():
+    df = pd.DataFrame({"Rural": pd.Series([0, 1, 1, 0], dtype=object),
+                       "x": [1.0, 2.0, 3.0, 4.0]})
+    out = _apply({"Rural": _RURAL}, df)
+    assert out["Rural"].tolist() == [0, 1, 1, 0], (
+        "an unguarded .str.strip() nulls every non-string value (GH #694)")
+    assert out["Rural"].notna().all()
+
+
+def test_gh694_mixed_object_column_strips_strings_only():
+    df = pd.DataFrame({"Rural": pd.Series([" U", "R ", None, 1, 4], dtype=object)})
+    got = _apply({"Rural": _RURAL}, df)["Rural"].tolist()
+    assert got[:2] == ["Urban", "Rural"], "padded labels must still map"
+    assert got[2] is None or pd.isna(got[2])
+    assert got[3:] == [1, 4], "non-string values must pass through untouched"
+
+
+def test_gh694_string_and_categorical_dtypes_keep_the_vectorised_strip():
+    df = pd.DataFrame({"Rural": pd.Series([" U", "R "], dtype="string")})
+    assert _apply({"Rural": _RURAL}, df)["Rural"].tolist() == ["Urban", "Rural"]
+    df = pd.DataFrame({"Rural": pd.Series([" U", "R "], dtype="category")})
+    assert _apply({"Rural": _RURAL}, df)["Rural"].tolist() == ["Urban", "Rural"]
+
+
+def test_gh694_index_branch_unchanged_and_attrs_kept():
+    df = pd.DataFrame({"x": [1, 2]},
+                      index=pd.MultiIndex.from_tuples([("U", 1), ("R", 2)],
+                                                      names=["Rural", "i"]))
+    df.attrs["id_converted"] = True
+    out = _apply({"Rural": _RURAL}, df)
+    assert out.index.get_level_values("Rural").tolist() == ["Urban", "Rural"]
+    assert out.attrs.get("id_converted") is True
