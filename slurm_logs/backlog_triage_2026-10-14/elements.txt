@@ -1,0 +1,6 @@
+framework-cache-tests
+readers-encoding
+ghanalss-kinship-labels
+ehcvm-westafrica-gaps
+isa-east-gaps
+uganda-peru-misc
