@@ -8,11 +8,17 @@ Wave: 2023-24
 # (2023Q3 / 2024Q1) per the pp-ph skill.
 
 # `v` = composite cluster id (state/lga/ea) built from raw CODES; see the
-# GH #323 note in _/nigeria.py.  This wave has no cluster_features table, but
-# sample.v is what _join_v_from_sample() stamps onto every household table, so
-# the bare `ea` key is just as wrong here: it collapses the wave's 719 real
-# (state, lga, ea) clusters into 404 `ea` codes.  393 households carry the
-# ea == 0 'Moved' sentinel and become singletons.
+# GH #323 note in _/nigeria.py.  sample.v is what _join_v_from_sample() stamps
+# onto every household table, so the bare `ea` key is just as wrong here: the
+# cover page has 404 distinct `ea` codes but 518 real (state, lga, ea) clusters
+# (the BID's "518 EAs ... eligible for inclusion"), plus 393 households carrying
+# the ea == 0 'Moved' sentinel, each a singleton `moved-{hhid}` -- 911 `v`
+# values per round.  (An earlier version of this comment said "719 real
+# clusters"; 719 is the number of (state, lga, ea) groups INCLUDING the 201
+# (state, lga, 0) groups of movers, which are not clusters.)  The cover page's
+# own `cluster` column ({lga}-{ea}) is 1:1 with the composite key on the 518
+# real clusters -- a cross-check, not a substitute: it has no state and the
+# moved households all share `{lga}-0`.
 sample:
     dfs:
         - df_key
@@ -58,6 +64,55 @@ sample:
     final_index:
         - t
         - i
+
+# GH #841.  Same cover page as `sample`, same composite key, same shape as
+# W4's block -- MINUS df_geo. The acquired v01 extract lacks household
+# geovariables; WB catalog 6410 v02 (2026-09-16) adds
+# NGA_HouseholdGeovariables_Y5.dta. GH #978 tracks acquisition and wiring.
+# Pending that work, Latitude / Longitude are absent for 2023Q3 / 2024Q1:
+# the framework fills them NaN in
+# the cross-wave concat and the Site B null-content guard warns per wave
+# (the known country-grain `optional:` mismatch, CLAUDE.md).  Do not add an
+# `optional: true` for them in data_scheme.yml -- that would silence W1-W4 too.
+# Both quarters (2023Q3 / 2024Q1) read this block via wave_folder_map, as in
+# every other wave.
+cluster_features:
+    dfs:
+        - df_key
+        - df_main
+    df_key:
+        file: Post Planting Wave 5/Household/secta_plantingw5.dta
+        converted_categoricals: true
+        idxvars:
+            i: hhid
+        myvars:
+            v: [state, lga, ea, hhid]
+    df_main:
+        file: Post Planting Wave 5/Household/secta_plantingw5.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Region: zone
+            District: state
+            Rural:
+                - sector
+                - mapping:
+                    1. URBAN: Urban
+                    2. RURAL: Rural
+                    1. Urban: Urban
+                    2. Rural: Rural
+                    rural: Rural
+                    Rural: Rural
+                    RURAL: Rural
+                    urban: Urban
+                    Urban: Urban
+                    URBAN: Urban
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
+        - v
 
 individual_education:
     # GH #171: highest education level completed per household member.

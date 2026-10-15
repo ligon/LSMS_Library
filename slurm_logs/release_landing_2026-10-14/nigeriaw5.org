@@ -1,0 +1,39 @@
+#+title: Nigeria Wave 5 cluster landing follow-up (#841)
+
+* Result and evidence correction
+W5 cluster_features uses the cover page shared by both rounds: 911 clusters
+(518 real plus 393 household-specific movers) in each of 2023Q3 and 2024Q1.
+The country idiosyncrasy is that ea=0 marks movers; the cover-page cluster
+string {lga}-0 cannot identify them individually. sample and cluster_features
+must keep the same composite/mover key.
+The prior statement "Wave 5 ships NO household geovariables file ... by source,
+not by omission" contradicts catalog 6410 v02. Corrected in CONTENTS, YAML,
+and both test comments/docstrings: this repository acquired v01 (106 files),
+while v02 adds NGA_HouseholdGeovariables_Y5.dta (4,883 x 55), totcons_final.dta,
+and revises sect2b_harvestw5 and sect3d_harvestw5. Coordinates remain NA pending
+that acquisition; no optional:true exemption is added.
+
+* Existing residual, not a new issue
+GH #978 is OPEN and already contains the v02 acquisition/wiring task and
+acceptance criteria. Update it after #841 lands; do not file a duplicate.
+The all-NA assertion must be retired and GEO_QUARTERS extended when v02 df_geo
+is wired on hhid. Recheck both revised harvest files' consumers and W5
+coordinate disagreement before declaring that acquisition complete.
+Source evidence: full nigeria-w5-cluster verdict (2026-10-14), WB catalog 6410,
+and live #978 body re-read in this landing session.
+
+* Cache cost
+Every Nigeria L2-country table re-warms: the hash folds every wave's
+ data_info.yml even when that table is not declared in that wave. The review
+measured assets, shocks, food_acquired, plot_features, household_roster,
+sample, community_prices and cluster_features all moving. No other country
+moves. Do not promise reuse of all older-wave parquets without measuring it.
+Shared cache untouched; only private cold validation performed.
+
+* Validation (2026-10-14)
+Cold private build: cluster_features 7,070 rows over ten quarters, 911 in
+each W5 quarter; sample built from empty L2; community_prices 27,318 rows
+in 2024Q1. The full cluster-identity test file passed 34 tests, no skips,
+in 120.85 s. Both-round equality, coordinates for W1-W4, W5 geographic
+columns/missing-coordinate ratchet, sample joins and community-price joins
+all executed. No in-tree parquet and no shared-cache writes.
