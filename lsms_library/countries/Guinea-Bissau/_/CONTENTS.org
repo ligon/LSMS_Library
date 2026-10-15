@@ -190,6 +190,48 @@ enumeration areas (EAs) were selected from the sample frame. In the second
 stage, 12 households were selected in each enumeration area randomly.
 #+end_quote
 
+*** The weights say otherwise: allocation is REGION-level, by a factor of 5 (GH #812, measured 2026-10-14)
+
+The quote above describes the *mechanics* (450 EAs, 12 households each) and
+is silent on how the 450 EAs were split across regions.  The weights are
+not: =Country('Guinea-Bissau').sample(waves=['2018-19'])= -- 5,351
+households, 450 clusters, weight constant within every cluster -- puts
+*76.8% of the variance of log cluster weight BETWEEN the 9 =strata=
+values*, and the sample share over the weighted population share runs from
+0.65x to 3.24x:
+
+| =strata=       | households | clusters | sample share / weighted pop. share |
+|----------------+------------+----------+------------------------------------|
+| SAB            |      1,088 |       92 |                               0.65 |
+| Oio            |        571 |       48 |                               0.77 |
+| Cacheu         |        523 |       44 |                               0.79 |
+| Gabu           |        572 |       48 |                               0.87 |
+| Bafata         |        598 |       50 |                               1.07 |
+| Tombali        |        499 |       42 |                               1.44 |
+| Biombo         |        500 |       42 |                               1.61 |
+| Quinara        |        498 |       42 |                               2.14 |
+| Bolama-Bijagos |        502 |       42 |                               3.24 |
+
+(Seven of nine regions get ~42-50 clusters regardless of size: an
+equal-ish allocation over regions, which over-samples the small ones.  The
+ratio is invariant to the API's within-wave weight normalisation; the same
+script on the raw parquet weights gives the same numbers.)
+
+*Treat the design as region-stratified for inference; no source consulted
+states the allocation rule.*  Standard errors computed as if from a single
+national draw ignore strata that plainly exist.  Note that =sample.strata=
+is the library's slot name, wired from the cover-page region code
+(=2018-19/_/data_info.yml:16=, =strata: s00q01=) -- it is the library
+*reading* region as the stratum, not the survey *declaring* one.
+
+The same measurement on the sibling EHCVM 2018-19 waves that wire
+=strata=: Togo 66.5% between 6 regions (0.54x Lome commune to 1.90x
+Savanes), Benin 31.4% between 12 (0.65x Zou to 1.77x Donga, where the DDI
+*does* state a disproportionate allocation), CotedIvoire 36.5% between 33
+(0.33x Abidjan to 6.17x Folon).  Senegal, Mali, Niger and Burkina Faso's
+EHCVM waves (2018-19 and 2021-22) wire no =strata= key at all, so the check
+cannot run there -- a gap of its own.
+
 What *does* live inside this single library wave is a **seasonal split**,
 which a reader pooling the country must know about before averaging
 anything.  The library's =2018-19= directory contains both of the survey's
