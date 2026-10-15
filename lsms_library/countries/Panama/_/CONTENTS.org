@@ -858,6 +858,19 @@ food rows), and for Ethiopia 100 kg is right.  The latent hazard is noted at
      Ethiopia and Tanzania approach.
   4. The existing =units.py= script should be extended to produce the
      final JSON file.
+** DONE unittable.csv -- moved from 1997/Data/ to _/ (GH #831, 2026-10-14)
+=unittable.csv= is the git-tracked legacy source from which =units.json= was
+once regenerated (the recipe is the commented-out tail of =units.py=); nothing
+reads it by path.  It used to sit at =1997/Data/unittable.csv=, the ONE
+tracked data file in the whole tree outside a =_/= directory, un-ignored by
+full path in the repo =.gitignore=.  That position made it a false positive
+for the =cache clear= in-tree source audit on any install where git cannot be
+consulted (pip install; package under an ignored =venv/= in a user repo):
+the audit treats everything under =_/= as config by position, and a tracked
+file anywhere else is only recognised through =git ls-files=.  Ruling (@ligon
+2026-10-14): move it under =_/= rather than allowlist it in =cli.py=.  Cost:
+=_/*.csv= is a hashed build input, so every Panama table's L2-country hash
+moved once (a Panama re-warm); no other country's hash moved.
 ** DONE nutrition
 A food conversion table, with foods keyed to the "Preferred Labels" of =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=).   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
 
@@ -970,12 +983,71 @@ also currency-denominated, so excluding it is right too.
 *But the stated rationale is FALSE for these 11,026 rows.*  GH #770 argues
 the factor exists and equals =1/price= (Value = Quantity x Price).  That
 holds for the capital-=Value= population, where =Quantity= genuinely is the
-expenditure.  It does *not* hold here: *99.5% of these rows carry
+expenditure.  It did *not* hold here: *99.5% of these rows carried
 =Quantity == 7.70=*, the undecoded sentinel of *GH #777* -- their =Quantity=
-is not a value at all, it is a parse artefact.  A Step 2 that recovers
-=Quantity / price= would silently manufacture =7.70/price= kilograms for
-eleven thousand rows.  *Do not build Step 2 for Panama without resolving
-#777 first.*
+was not a value at all, it was a parse artefact.  A Step 2 that recovered
+=Quantity / price= would have manufactured =7.70/price= kilograms for eleven
+thousand rows.  *Resolved 2026-10-14 (next subsection): lowercase-=value=
+rows now carry NO Quantity, so a Step 2 for Panama can no longer trip on
+them -- it must simply treat =Quantity = NA= as "no physical amount".*
+
+** The 7.70 is unit code 77 echoed into the quantity slot (GH #777, fixed 2026-10-14)
+Measured on the raw =GAST-A.DTA= (=convert_categoricals=False=), 215,937 rows:
+
+| field pair (quantity, unit)   | unit == 77 | quantity == 7.7 | both   |
+|-------------------------------+------------+-----------------+--------|
+| =ga106a=, =ga106b= (purchase) |     10,847 |          10,800 | 10,798 |
+| =ga110a=, =ga110b= (obtained) |        180 |             175 |    175 |
+
+On the 10,847 unit-77 purchase rows the quantity is 7.7 (10,798), NaN (43),
+77.0 (3), 6.0 (2) or 1.0 (1); on the 180 unit-77 obtained rows it is 7.7
+(175), 7777.7, 77.0, 15, 2 or NaN. Two other 7.7 rows exist: one under
+unit code 75 and one with no unit code.  So the 7-repunit family co-occurs with code 77
+almost exactly and with nothing else: it reads as *the unit code echoed
+into the quantity field at one implied decimal*, not as a free-standing
+missing-value sentinel.  That is an interpretation of the co-occurrence.
+The household questionnaire =pn97hhq.pdf= (LZW text layer decoded 2026-10-14;
+no =pdftotext= on the node) shows the GA grid as =CANTIDAD | UNIDAD COD |
+TOTAL B/.= and carries *no unit code card*; neither do =pn97com.pdf=,
+=Formulario_Precios.pdf= or =caratula.pdf=.  =_/units.json= (=Unitcode 77,
+Label 'valor', Translation 'value', Conversion null=) is therefore the sole
+decode of 77, and it says what matters: the enumerator recorded the item *in
+money*, so the quantity cell has no physical meaning whatever its digits.
+
+*** Decision A: Quantity -> NA on every unit-77 row, keyed on the CODE
+=1997/_/food_acquired.py= now sets =ga106a= / =ga110a= to NaN wherever the
+paired unit code is 77, *before* the canonical rows are built, and asserts
+that no =u == 'value'= row carries a Quantity.  Keyed on the unit code, not
+on the value 7.7: the six rows at 77.0 / 6.0 / 1.0 are equally meaningless
+"in valor", and both stray =7.7= rows are left alone (not unit 77).
+Option B (fold into the library's capital-=Value= convention with
+=Quantity = Expenditure=) was declined: it would relabel a survey code as a
+library construction without a =Derivation= entry.
+
+Measured, warm (development) -> cold rebuild with the fix, 1997:
+
+| quantity                                  |     before |      after |
+|-------------------------------------------+------------+------------|
+| rows                                      |    156,154 |    155,742 |
+| =u == 'value'= rows                       |     11,026 |     10,614 |
+| ... with non-null Quantity                |     10,983 |      *0* |
+| ... with Quantity == 7.70                 |     10,973 |      *0* |
+| Expenditure sum (B/.)                     | 356,079.56 | 356,079.56 |
+| =food_prices= kgvalue / kgprice rows      |    483,661 |    483,661 |
+| =food_prices= unitvalue / unitprice rows  |    501,027 |    490,456 |
+| =food_expenditures= rows / 1997 sum       | 501,480 / 356,079.56 | unchanged |
+| =food_quantities(units='kgs')= rows       |    570,803 |    559,820 |
+
+The *412 rows removed* are the unit-77 rows that had NO other amount: 233
+purchases whose =ga106c= was NaN or the 9999 sentinel, and all 179 obtained
+rows (126 inkind, 39 produced, 14 other), which never carry an expenditure.
+They used to be served as =Quantity = 7.70= and nothing else. Purchased
+rows now fail the purchase amount filter; obtained rows are excluded by
+=ga110a.notna()= when canonical source rows are constructed.  The 10,614 remaining
+=value= rows are expenditure-only observations, all =s = 'purchased'=.
+=food_quantities= loses the 10,983 rows whose only "quantity" was the
+sentinel (the carry rule keeps a row only while it has a Quantity); 2003 and
+2008 are byte-identical.
 
 ** The two spellings got DIFFERENT factors, and the winner was luck
 Before #770, =conversion_to_kgs= returned BOTH ='Value' -> 0.34891692= and
@@ -1009,3 +1081,25 @@ Two idiosyncrasies already recorded above compound here:
    *37.2% that sentinel*.  So 1997's unit axis is the wave where a
    reader-level artefact, an undecoded =7.70= (#777) and a currency label all
    live in the same column.
+
+** Region-market lookup is not wired (2026-10-14 release audit)
+
+The current =sample()= supplies =v= from =upm= in all three waves, but exposes
+no =Region= column; neither the country scheme nor the wave configs declares
+=cluster_features=. At frozen source =7fa05179= the Feature audit records
+=food_expenditures=, =food_prices= and =food_quantities= with
+=market='Region'= failing for Panama with
+="cluster_features returned no data for any wave."=. =Feature= warns and
+excludes Panama from those variants, while ordinary declared-table calls
+succeed. The relevant helpers and declarations are unchanged since =v0.14.0=.
+This is a missing geography dependency, not missing cluster identity or proof
+that the raw files lack geographic variables.
+
+Any future mapping needs a source-backed definition of Region. In ENV-97 the
+planning-region domains exclude indigenous and hard-to-access areas, which
+have their own domains, and their boundaries "do not coincide with the
+Collection Regions created ad hoc for fieldwork" (quoted in the universe
+section above). Neither provinces, study domains nor fieldwork regions should
+be silently substituted for one another. The retained =panama.regional_data=
+helper does not register a live Region table.
+The missing lookup is tracked in [[https://github.com/ligon/LSMS_Library/issues/1009][GH #1009]].

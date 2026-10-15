@@ -1,0 +1,13 @@
+{
+  "source_scope": "quiescent runtime/data-corpus/GhanaLSS only",
+  "files": 88,
+  "bytes": 60298616,
+  "initial_copy_all_sha256_equal": true,
+  "initial_copy_all_inodes_distinct": true,
+  "after_copy_all_sha256_equal": true,
+  "after_copy_all_inodes_distinct": true,
+  "original_source_rechecked_unchanged_files": 88,
+  "shared_link": "dvc-cache only",
+  "writable_L2_links": 0,
+  "manifest_sha256": "2870fc3dc35d3d777ed1e1ff24b670274365d31722992384e8d93a964f195375"
+}

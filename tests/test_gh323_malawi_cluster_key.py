@@ -79,6 +79,7 @@ def _wave_config(wave):
 # 1.  2004-05: the broken key.
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_2004_05_v_is_the_fully_qualified_ea_code_not_the_within_TA_sequence(sample):
     """IHS2 drew 564 EAs of 20 households each.  `ea` collapses them to 110."""
     s = sample.reset_index()
@@ -93,6 +94,7 @@ def test_2004_05_v_is_the_fully_qualified_ea_code_not_the_within_TA_sequence(sam
     )
 
 
+@pytest.mark.requires_s3
 def test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum(
     cluster_features,
 ):
@@ -116,6 +118,7 @@ def test_2004_05_cluster_features_keeps_every_district_and_the_urban_stratum(
     )
 
 
+@pytest.mark.requires_s3
 def test_2004_05_source_shows_ea_is_not_a_cluster_id(mw):
     """The evidence, at source: `ea` merges districts, `psu` does not.
 
@@ -154,6 +157,7 @@ def test_2004_05_source_shows_ea_is_not_a_cluster_id(mw):
 # 2.  The invariant that makes the join work at all.
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", WAVES)
 def test_sample_v_and_cluster_features_v_are_the_same_key(
     wave, sample, cluster_features
@@ -179,6 +183,7 @@ def test_sample_v_and_cluster_features_v_are_the_same_key(
     )
 
 
+@pytest.mark.requires_s3
 def test_every_wave_uses_the_same_eight_digit_ea_keyspace(sample):
     """One `v` vocabulary across the whole country.
 
@@ -235,6 +240,7 @@ def test_geo_subframe_builds_i_exactly_as_the_main_frame_does(wave):
     )
 
 
+@pytest.mark.requires_s3
 def test_2016_17_clusters_actually_have_coordinates(cluster_features):
     """The consequence of the key fix above, measured at the API: 0 -> 779."""
     cf = cluster_features.reset_index()
@@ -252,6 +258,7 @@ def test_2016_17_clusters_actually_have_coordinates(cluster_features):
 # 4.  The residual, and why it is NOT re-keyed.
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_2013_14_within_cluster_spread_is_tracked_movers_not_a_broken_key():
     """The decisive measurement, pinned.
 

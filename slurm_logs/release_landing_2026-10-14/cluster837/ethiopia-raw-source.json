@@ -1,0 +1,107 @@
+{
+  "2011-12": {
+    "cover_rows": 3969,
+    "geo_rows": 3917,
+    "cover_hh_unique": true,
+    "geo_hh_unique": true,
+    "left_merge_rows": 3969,
+    "unmatched_cover_households": 52,
+    "clusters": 333,
+    "composite_region_district_ea_clusters": 333,
+    "distinct_value_conflicts": {
+      "saq01": 0,
+      "saq02": 0,
+      "rural": 0,
+      "LAT_DD_MOD": 0,
+      "LON_DD_MOD": 0
+    },
+    "mixed_missing_value_groups": {
+      "LAT_DD_MOD": 34,
+      "LON_DD_MOD": 34
+    }
+  },
+  "2013-14": {
+    "cover_rows": 5262,
+    "geo_rows": 5287,
+    "cover_hh_unique": true,
+    "geo_hh_unique": true,
+    "left_merge_rows": 5262,
+    "unmatched_cover_households": 0,
+    "clusters": 433,
+    "composite_region_district_ea_clusters": 433,
+    "distinct_value_conflicts": {
+      "saq01": 0,
+      "saq02": 0,
+      "rural": 0,
+      "lat_dd_mod": 38,
+      "lon_dd_mod": 38
+    },
+    "mixed_missing_value_groups": {
+      "lat_dd_mod": 5,
+      "lon_dd_mod": 5
+    }
+  },
+  "2015-16": {
+    "cover_rows": 4954,
+    "geo_rows": 4954,
+    "cover_hh_unique": true,
+    "geo_hh_unique": true,
+    "left_merge_rows": 4954,
+    "unmatched_cover_households": 0,
+    "clusters": 432,
+    "composite_region_district_ea_clusters": 432,
+    "distinct_value_conflicts": {
+      "saq01": 0,
+      "saq02": 0,
+      "rural": 0,
+      "lat_dd_mod": 72,
+      "lon_dd_mod": 72
+    },
+    "mixed_missing_value_groups": {
+      "lat_dd_mod": 0,
+      "lon_dd_mod": 0
+    }
+  },
+  "2018-19": {
+    "cover_rows": 6770,
+    "geo_rows": 6804,
+    "cover_hh_unique": true,
+    "geo_hh_unique": true,
+    "left_merge_rows": 6770,
+    "unmatched_cover_households": 90,
+    "clusters": 535,
+    "composite_region_district_ea_clusters": 535,
+    "distinct_value_conflicts": {
+      "saq01": 0,
+      "saq02": 0,
+      "saq14": 0,
+      "lat_mod": 0,
+      "lon_mod": 0
+    },
+    "mixed_missing_value_groups": {
+      "lat_mod": 0,
+      "lon_mod": 0
+    }
+  },
+  "2021-22": {
+    "cover_rows": 4959,
+    "geo_rows": 4890,
+    "cover_hh_unique": true,
+    "geo_hh_unique": true,
+    "left_merge_rows": 4959,
+    "unmatched_cover_households": 104,
+    "clusters": 435,
+    "composite_region_district_ea_clusters": 435,
+    "distinct_value_conflicts": {
+      "saq01": 0,
+      "saq02": 0,
+      "saq14": 0,
+      "lat_dd_mod": 72,
+      "lon_dd_mod": 72
+    },
+    "mixed_missing_value_groups": {
+      "lat_dd_mod": 49,
+      "lon_dd_mod": 49
+    }
+  }
+}

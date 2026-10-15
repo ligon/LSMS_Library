@@ -21,8 +21,10 @@ written parquet:
 These names are re-exported from ``lsms_library.transformations`` for
 backward compatibility with the country scripts that import them from there.
 """
+import contextvars
 import os
 import warnings
+from contextlib import contextmanager
 
 import numpy as np
 import pandas as pd
@@ -195,19 +197,28 @@ def _finalize_canonical_food_acquired(out: pd.DataFrame,
 
     levels = list(index_levels)
     if dedupe:
-        aggs = {
-            'Quantity': ('Quantity', lambda s: s.sum(min_count=1)),
-            'Expenditure': ('Expenditure', lambda s: s.sum(min_count=1)),
-        }
+        # Vectorised (cython) reducers, not per-group Python lambdas (GH
+        # #905): ``agg(lambda s: s.sum(min_count=1))`` calls back into Python
+        # once per group and pandas deep-copies ``df.attrs`` on each call --
+        # the same cost GH #871 removed from the core collapse.  The cython
+        # sum is pairwise where ``Series.sum`` accumulates in order, so a
+        # group's total may land on a neighbouring double -- a few ULP, <= 4
+        # pinned by tests/test_gh905_vectorised_min_count_sum.py (max 2
+        # measured on a 363,682-row frame); the NA
+        # pattern (``min_count=1``: an all-NaN group stays NaN), dtypes and
+        # column order are unchanged.
+        g = out.groupby(levels, dropna=False)
+        # Exact per-row kg (GH #378) is a *quantity*, so it sums like
+        # Quantity -- this is what lets different-size rows of one
+        # (item, unit) collapse without losing the exact kg total.
+        summed = [c for c in ('Quantity', 'Expenditure', 'Quantity_kg')
+                  if c in out.columns]
+        res = g[summed].sum(min_count=1)
         if 'Price' in out.columns:
             # Price is per-unit, so it averages (not sums) across dup rows.
-            aggs['Price'] = ('Price', 'mean')
-        if 'Quantity_kg' in out.columns:
-            # Exact per-row kg (GH #378) is a *quantity*, so it sums like
-            # Quantity -- this is what lets different-size rows of one
-            # (item, unit) collapse without losing the exact kg total.
-            aggs['Quantity_kg'] = ('Quantity_kg', lambda s: s.sum(min_count=1))
-        out = out.groupby(levels, dropna=False).agg(**aggs)
+            res['Price'] = g['Price'].mean()
+        out = res[[c for c in ('Quantity', 'Expenditure', 'Price', 'Quantity_kg')
+                   if c in res.columns]]
     else:
         out = out.set_index(levels)
 
@@ -397,6 +408,110 @@ def _grain_strict() -> bool:
     return os.environ.get(_GRAIN_STRICT_ENV, '').strip().lower() not in ('', '0', 'false', 'no')
 
 
+# ---------------------------------------------------------------------------
+# GH #868 -- WHO is reducing WHAT.  A reducer called as a bare ``df_edit`` hook
+# (``from ... import collapse_to_cluster_grain as cluster_features``) receives a
+# frame and nothing else, but the grain ledger is keyed ``(country, table)`` --
+# the key the L2-country cache writer stamps -- so a report filed without that
+# key is a report nobody stamps and no warm read replays.  The framework sets
+# this context around the hook call (``Wave.grab_data``); an out-of-process
+# wave script has no framework around it and passes the three explicitly.
+# A ``ContextVar`` (not a module global) so a forked wave worker and a thread
+# each see their own cell.  Runtime state, never a build input: it is not a
+# ``_CONST_TYPES`` container, so the fingerprint walk does not fold it.
+# ---------------------------------------------------------------------------
+_BUILD_CONTEXT: contextvars.ContextVar = contextvars.ContextVar(
+    'lsms_build_context', default=None)
+
+
+@contextmanager
+def build_context(country: str | None = None, table: str | None = None,
+                  wave: str | None = None):
+    """Name the ``(country, table, wave)`` cell a build helper is running for.
+
+    Used by the framework around a wave-module ``df_edit`` hook so that a
+    reducer invoked as a bare alias can still file its grain report under the
+    key the cache writer reads.  Explicit ``country=`` / ``table=`` / ``wave=``
+    arguments on the reducer win over the context.
+    """
+    token = _BUILD_CONTEXT.set({'country': country, 'table': table, 'wave': wave,
+                                'wave_folder': wave})
+    try:
+        yield
+    finally:
+        _BUILD_CONTEXT.reset(token)
+
+
+def _resolve_build_context(df: pd.DataFrame, country, table, wave) -> tuple:
+    """Explicit argument -> framework context -> (wave only) the frame's own
+    single ``t`` -> ``None``.
+
+    Under the framework context the ``wave`` is the wave FOLDER
+    (``Wave.year``, what ``Wave.grab_data`` passes to ``build_context``), so a
+    two-round folder (Nigeria PP/PH) must pass ``wave=`` explicitly to name
+    the round -- the context wins over the frame's ``t`` and would file both
+    rounds under the folder name. ``wave_folder`` retains that build folder
+    independently, so naming a round cannot exclude its report from the stamp.
+    """
+    ctx = _BUILD_CONTEXT.get() or {}
+    country = country if country is not None else ctx.get('country')
+    table = table if table is not None else ctx.get('table')
+    wave = wave if wave is not None else ctx.get('wave')
+    if wave is None and 't' in (df.index.names or []):
+        ts = df.index.get_level_values('t').dropna().unique()
+        if len(ts) == 1:
+            wave = str(ts[0])
+    wave_folder = ctx.get('wave_folder')
+    return country, table, wave, wave if wave_folder is None else wave_folder
+
+
+def _json_key(key) -> str:
+    """A group key as a plain string: numpy scalars and ``pd.NA`` in a
+    MultiIndex tuple are not JSON-serialisable, and the report is embedded in
+    the parquet as JSON (``local_tools.to_parquet``)."""
+    if isinstance(key, tuple):
+        return '(' + ', '.join(repr(str(k)) for k in key) + ')'
+    return repr(str(key))
+
+
+def _cells_blanked_report(conflicts: pd.DataFrame, levels: list, n_rows: int,
+                          country, table, wave, wave_folder) -> dict:
+    """The grain report for an ``on_conflict='na'`` reduction (GH #868).
+
+    Its own ``kind`` -- ``cells_blanked`` -- with ``destroyed`` and
+    ``nan_key_rows`` both ZERO, stated rather than omitted: this reducer never
+    drops a row (``dropna=False``, one row per index tuple).  What it does is
+    withhold a value the sources contradict, and the report names the groups
+    and the columns so a warm read can say exactly that.  A consumer filtering
+    the ledger on rows lost (``destroyed`` / ``nan_key_rows``) is deliberately
+    NOT alarmed by it.  ``collapsed_rows`` (``rows - groups``) is the
+    projection / de-dup count -- how many input rows shared an index tuple
+    with another -- and never a loss; it is deliberately NOT called
+    ``dropped``, which on a Site 1 report counts rows the collapse removed.
+    """
+    bad = conflicts.any(axis=1)
+    per_col = {str(c): int(conflicts[c].sum()) for c in conflicts.columns
+               if bool(conflicts[c].any())}
+    return {
+        'site': 'reduce_to_agreed',
+        'kind': 'cells_blanked',
+        'levels': [str(lvl) for lvl in levels],
+        'rows': int(n_rows),
+        'groups': int(len(conflicts)),
+        'conflicting_groups': int(bad.sum()),
+        'cells_blanked': int(conflicts.to_numpy().sum()),
+        'columns': per_col,
+        'examples': [_json_key(k) for k in conflicts.index[bad][:5]],
+        'collapsed_rows': int(n_rows - len(conflicts)),
+        'destroyed': 0,
+        'nan_key_rows': 0,
+        'country': country,
+        'table': table,
+        'wave': wave,
+        'wave_folder': wave_folder,
+    }
+
+
 def _conflict_message(conflicts: pd.DataFrame, levels: list, verb: str) -> str:
     """Human-readable, actionable account of a grain conflict.
 
@@ -420,7 +535,9 @@ def _conflict_message(conflicts: pd.DataFrame, levels: list, verb: str) -> str:
 
 
 def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
-                     na_is_conflict: bool = False) -> pd.DataFrame:
+                     na_is_conflict: bool = False,
+                     country: str | None = None, table: str | None = None,
+                     wave: str | None = None) -> pd.DataFrame:
     """Collapse rows sharing an index tuple, keeping ONLY values they AGREE on.
 
     The honest reducer for a table whose declared grain is COARSER than the
@@ -453,6 +570,21 @@ def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
       with it downstream is core's business -- see #323 Site 3.)
     * **A unique index is returned untouched** -- same rows, same order, same
       dtypes.  Nothing to collapse.
+    * **The signal survives the cache (GH #868).**  A blanking is also FILED
+      as a grain report -- kind ``cells_blanked``, naming the groups and the
+      columns, with ``destroyed`` and ``nan_key_rows`` both zero because no
+      row is lost -- under the ``(country, table)`` key the L2 cache writer
+      stamps into the parquet (``lsms_grain_audit``) and every warm read
+      replays.  Without that, the warning fires once, on the cold build that
+      ran the reducer, and the served table is silent about it forever
+      after -- the exact failure #323 fixed for core's own collapse.
+      ``country`` / ``table`` / ``wave`` come from the explicit arguments,
+      else from the framework's :func:`build_context` (set by
+      ``Wave.grab_data`` around a ``df_edit`` hook), else -- for the wave
+      only -- from the frame's single ``t``.  An out-of-process wave script
+      has no framework context and must pass them, and must hand the ledger
+      to ``to_parquet(..., grain_audit=grain_reports(country, table))`` so
+      the stamp travels with the wave parquet.
 
     Args:
         df: the frame as extracted, indexed by the declared (possibly
@@ -460,6 +592,8 @@ def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
         on_conflict: ``'raise'`` (default) or ``'na'``.
         na_is_conflict: treat a NaN alongside an observed value as a
             disagreement rather than as a missing report.
+        country, table, wave: the cell being built, for the grain report
+            (GH #868).  Optional; see the contract above for the fallbacks.
 
     Returns:
         One row per index tuple.
@@ -501,6 +635,14 @@ def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
                 "Collapsing would silently discard the difference." if on_conflict == 'raise'
                 else f"on_conflict='na' was requested but {_GRAIN_STRICT_ENV} is set.",
             ))
+        # GH #868: FILE before warning, ledger-only.  The cold-path signal
+        # stays the reducer's own ``GrainConflictWarning`` (pinned by tests);
+        # the ledger entry is what the cache writer stamps and the warm read
+        # replays, through country's single emit choke point.
+        from .country import _file_grain_report
+        _file_grain_report(_cells_blanked_report(
+            conflicts, levels, len(df),
+            *_resolve_build_context(df, country, table, wave)))
         warnings.warn(
             _conflict_message(conflicts, levels,
                               "on_conflict='na': blanking those cells rather than "
@@ -512,7 +654,9 @@ def reduce_to_agreed(df: pd.DataFrame, *, on_conflict: str = 'raise',
 
 
 def collapse_to_cluster_grain(df: pd.DataFrame, *, on_conflict: str = 'raise',
-                              na_is_conflict: bool = False) -> pd.DataFrame:
+                              na_is_conflict: bool = False,
+                              country: str | None = None, table: str | None = None,
+                              wave: str | None = None) -> pd.DataFrame:
     """Reduce a HOUSEHOLD-grain ``cluster_features`` extraction to CLUSTER grain.
 
     The named, discoverable case of :func:`reduce_to_agreed` -- and by far the
@@ -540,7 +684,8 @@ def collapse_to_cluster_grain(df: pd.DataFrame, *, on_conflict: str = 'raise',
     ``on_conflict='na'`` and ``LSMS_GRAIN_STRICT``).  Policy:
     ``SkunkWorks/grain_aggregation_policy.org``.
     """
-    return reduce_to_agreed(df, on_conflict=on_conflict, na_is_conflict=na_is_conflict)
+    return reduce_to_agreed(df, on_conflict=on_conflict, na_is_conflict=na_is_conflict,
+                            country=country, table=table, wave=wave)
 
 
 @build_transform(tables=['food_acquired'])

@@ -260,6 +260,7 @@ def built():
     return get
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     @pytest.mark.parametrize('country,wave', CELLS)

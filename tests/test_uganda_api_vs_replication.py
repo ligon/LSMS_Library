@@ -93,7 +93,10 @@ _SKIP_REASON = (
     f"or install the replication package at {_DEFAULT_REPL_DIR}"
 )
 
-pytestmark = pytest.mark.skipif(_REPL_DIR is None, reason=_SKIP_REASON)
+pytestmark = [
+    pytest.mark.skipif(_REPL_DIR is None, reason=_SKIP_REASON),
+    pytest.mark.requires_s3,
+]
 
 
 # ----------------------------------------------------------- per-feature specs

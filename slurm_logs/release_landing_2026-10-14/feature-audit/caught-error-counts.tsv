@@ -1,0 +1,61 @@
+feature	phase	country	exception_type	category	kwargs	count
+assets	1b-assembly	Nepal	FileNotFoundError	missing_source_or_unwired	{}	1
+assets	2-kwargs	Nepal	FileNotFoundError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+cluster_features	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+food_acquired	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+food_acquired	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+food_acquired	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_acquired	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_expenditures	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+food_expenditures	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+food_expenditures	2-kwargs	GhanaSPS	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_expenditures	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_expenditures	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_expenditures	2-kwargs	Panama	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_expenditures	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_expenditures	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_prices	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+food_prices	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+food_prices	2-kwargs	GhanaSPS	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""kgprice""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""kgvalue""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""unitprice""}"	1
+food_prices	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""unitvalue""}"	1
+food_prices	2-kwargs	Panama	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""kgprice""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""kgvalue""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""unitprice""}"	1
+food_prices	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""unitvalue""}"	1
+food_quantities	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+food_quantities	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+food_quantities	2-kwargs	GhanaSPS	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_quantities	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_quantities	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_quantities	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""kgs""}"	1
+food_quantities	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""units"": ""units""}"	1
+food_quantities	2-kwargs	Panama	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+food_quantities	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""labels"": ""Aggregate""}"	1
+food_quantities	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+food_quantities	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""kgs""}"	1
+food_quantities	2-kwargs	Peru	RuntimeError	missing_source_or_unwired	"{""units"": ""units""}"	1
+household_characteristics	1b-assembly	Armenia	RuntimeError	missing_source_or_unwired	{}	1
+household_characteristics	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+household_characteristics	2-kwargs	Armenia	RuntimeError	missing_source_or_unwired	"{""age_cuts"": [5, 15, 60]}"	1
+household_characteristics	2-kwargs	Armenia	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+household_characteristics	2-kwargs	GhanaSPS	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+household_characteristics	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""age_cuts"": [5, 15, 60]}"	1
+household_characteristics	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+household_roster	1b-assembly	Armenia	FileNotFoundError	missing_source_or_unwired	{}	1
+household_roster	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+household_roster	2-kwargs	Armenia	FileNotFoundError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+household_roster	2-kwargs	GhanaSPS	RuntimeError	missing_cluster_dependency	"{""market"": ""Region""}"	1
+household_roster	2-kwargs	Nepal	RuntimeError	missing_source_or_unwired	"{""market"": ""Region""}"	1
+individual_education	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+individual_education	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+interview_date	1b-assembly	Nepal	RuntimeError	missing_source_or_unwired	{}	1
+interview_date	1b-assembly	Peru	RuntimeError	missing_source_or_unwired	{}	1
+sample	1b-assembly	Nepal	FileNotFoundError	missing_source_or_unwired	{}	1

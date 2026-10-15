@@ -1,0 +1,18 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_helper_root_preserves_other_root_and_restores_paths[normal] _______
+../../control/framework/validation-followup/1003/negative/test_missing_exit_clear.py:187: in test_helper_root_preserves_other_root_and_restores_paths
+    assert data_root() == root_b, "no-argument root survived fixture teardown"
+E   AssertionError: no-argument root survived fixture teardown
+E   assert PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth0/helper') == PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth0/previous')
+E    +  where PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth0/helper') = data_root()
+_____ test_helper_root_preserves_other_root_and_restores_paths[exception] ______
+../../control/framework/validation-followup/1003/negative/test_missing_exit_clear.py:187: in test_helper_root_preserves_other_root_and_restores_paths
+    assert data_root() == root_b, "no-argument root survived fixture teardown"
+E   AssertionError: no-argument root survived fixture teardown
+E   assert PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth1/helper') == PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth1/previous')
+E    +  where PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-48/test_helper_root_preserves_oth1/helper') = data_root()
+=========================== short test summary info ============================
+FAILED ../../control/framework/validation-followup/1003/negative/test_missing_exit_clear.py::test_helper_root_preserves_other_root_and_restores_paths[normal]
+FAILED ../../control/framework/validation-followup/1003/negative/test_missing_exit_clear.py::test_helper_root_preserves_other_root_and_restores_paths[exception]
+2 failed, 16 deselected in 6.23s

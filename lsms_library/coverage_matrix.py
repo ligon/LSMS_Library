@@ -539,6 +539,231 @@ def _safe_build(co, feature, env):
             return None, f"{type(e).__name__}: {e}"
 
 
+# ---------------------------------------------------------------------------
+# Cross-wave scale check on monetary columns (GH #830)
+# ---------------------------------------------------------------------------
+# Every readiness check in :mod:`diagnostics` runs on ONE wave's slice, and
+# every one of them asks a shape question -- present, non-null, typed, unique.
+# None asks whether a wave's numbers are on the same SCALE as the waves beside
+# it.  Uganda 2015-16 shipped `a5aq8` (crop sale value) divided by 100 (GH #829):
+# correctly typed, uniquely indexed, non-null, graded `sane` -- and every
+# shilling figure in that wave was one percent of its neighbours'.  Only a
+# comparison ACROSS waves can see that, so it lives here in the grader (which
+# holds the whole country frame) and not in the per-slice sanity report.
+#
+# It REPORTS; it never changes a grade.  A flagged cell keeps its tier and gets
+# a ``warn: scale_ratio[...]`` note in `detail` (and a structured record from
+# :func:`monetary_scale_breaks` for the audit harness).  Warn-only is
+# deliberate: inflation, item mix and instrument changes all move a median
+# legitimately, so the check is a work queue, not a verdict.
+#
+# Which columns are monetary is NOT decided here: it is
+# :func:`currency._monetary_columns` -- the union of the built-in seed and every
+# ``monetary: true`` flag in `data_info.yml` / the country's `data_scheme.yml`.
+# `crop_production.Value_sold`, the #829 column, carries no YAML flag at all and
+# is monetary only through that seed, so reading the YAML alone would miss the
+# motivating case.
+#
+# Which wave pairs are comparable is not decided here either.  Two adjacent
+# waves denominated in different ISO codes (`currency_for(country, wave)`,
+# driven by `Currency: overrides` in `data_info.yml` -- GhanaLSS GHC->GHS 2007,
+# Tajikistan TJR->TJS 2000, Peru PEI->PEN 1991, ...) are incommensurable and the
+# pair is skipped.  That is a currency FACT already recorded for `convert()`,
+# not a known-bad-cell allowlist; there is deliberately no list of cells.
+
+#: Tolerance on the ratio of adjacent-wave medians: a wave whose median is more
+#: than this factor above or below every comparable neighbour is reported.  A
+#: STATED tolerance, not a discovered boundary -- Uganda's genuine adjacent
+#: ratios run 1.0-1.7 (ten years of inflation), the #829 defect sat at 0.01.
+SCALE_RATIO_TOLERANCE = 5.0
+
+#: Minimum positive, non-null values a wave must hold in the column (per item
+#: where the per-item form is used) before its median is trusted either as a
+#: candidate or as a reference.  The same floor Site Q uses for a cell.
+SCALE_RATIO_MIN_SUPPORT = 30
+
+#: Minimum items present with support in BOTH waves for the per-item form of
+#: the ratio to be used; below it the pooled medians are compared instead.
+SCALE_RATIO_MIN_SHARED_ITEMS = 3
+
+
+def _wave_median(block: pd.Series, items: pd.Series | None):
+    """Per-wave summary: (pooled median, {item: median}) with the support floor.
+
+    Returns ``None`` where the wave has fewer than ``SCALE_RATIO_MIN_SUPPORT``
+    positive values -- it is then neither judged nor used as a reference.
+    """
+    if len(block) < SCALE_RATIO_MIN_SUPPORT:
+        return None
+    per_item: dict = {}
+    if items is not None:
+        counts = block.groupby(items.values).agg(["median", "size"])
+        counts = counts[counts["size"] >= SCALE_RATIO_MIN_SUPPORT]
+        per_item = counts["median"].to_dict()
+    return float(block.median()), per_item, int(len(block))
+
+
+def _pair_ratio(a, b) -> tuple[float, str]:
+    """Ratio of wave *a*'s level to wave *b*'s, and which form produced it.
+
+    The per-item form -- the median over items (with support in both waves) of
+    the item's median ratio -- is used when enough items are shared; it is
+    robust to an item-mix shift between waves (a wave that sold more coffee and
+    fewer beans moves the pooled median without moving any item's).  A scale
+    defect moves EVERY item by the same factor, so the per-item median carries
+    it undiluted.  Otherwise the pooled medians are compared.
+    """
+    shared = sorted(set(a[1]) & set(b[1]), key=str)
+    if len(shared) >= SCALE_RATIO_MIN_SHARED_ITEMS:
+        ratios = [a[1][j] / b[1][j] for j in shared if b[1][j] > 0]
+        if len(ratios) >= SCALE_RATIO_MIN_SHARED_ITEMS:
+            return float(pd.Series(ratios).median()), f"per-item[{len(ratios)}]"
+    return a[0] / b[0], "pooled"
+
+
+def monetary_scale_breaks(df: pd.DataFrame, country: str, feature: str,
+                          waves=None, *, tolerance: float = SCALE_RATIO_TOLERANCE
+                          ) -> list[dict]:
+    """Waves whose monetary columns sit on a different SCALE from their neighbours.
+
+    For each monetary column of *feature* (:func:`currency._monetary_columns`,
+    intersected with ``df.columns``) and each wave with at least
+    ``SCALE_RATIO_MIN_SUPPORT`` positive values, the wave's level is compared
+    to each ADJACENT wave that (a) also has support and (b) is denominated in
+    the same ISO currency (``currency_for``; a redenomination boundary is not a
+    comparable pair).  Adjacency follows *waves* (the country's wave order;
+    defaults to the sorted ``t`` values).  A wave is reported when its ratio to
+    EVERY comparable neighbour lies outside ``[1/tolerance, tolerance]`` on the
+    same side -- the isolated-outlier shape of GH #829, where one wave is 100x
+    off and both neighbours agree with each other.  An EDGE wave has only one
+    comparable neighbour, so it is reported only when that neighbour is not
+    itself the outlier (A, B, C with B off: B is reported, A and C are not).
+    Reported, never acted on: *df* is not modified and no grade depends on
+    the result.
+
+    **What it cannot see, stated.**  A scale break that PERSISTS (waves A, B on
+    one scale, C, D on another) leaves C agreeing with D and B agreeing with A,
+    so neither is an isolated outlier and nothing is reported; a frame with
+    exactly two comparable waves reports BOTH (each is the other's only
+    neighbour, and the grader cannot say which is wrong -- the detail names the
+    pair).  A column with no wave holding 30 positive values is never judged.
+
+    Returns one record per ``(column, wave)``::
+
+        {"column", "wave", "median", "n", "neighbours": [(wave, median, ratio)],
+         "ratio": <median ratio across neighbours>,
+         "neighbour_forms": {wave: "pooled"|"per-item[k]"},
+         "form": "pooled"|"per-item[k]"|"mixed"}
+
+    ``median`` and the neighbours' ``median`` are always the POOLED per-wave
+    medians (so the reader sees the levels); each neighbour's ``ratio`` is the
+    pair's ratio in ``neighbour_forms[wave]``. ``form`` is their common form,
+    or ``mixed`` when the neighbours differ. The ratio may be per-item -- so
+    the two pooled medians printed side by side are not necessarily the inputs
+    to the ratio beside them.
+    """
+    from .currency import _monetary_columns, currency_for
+
+    names = list(df.index.names or [])
+    if "t" not in names:
+        return []
+    cols = [c for c in _monetary_columns(feature, country) if c in df.columns]
+    if not cols:
+        return []
+
+    t = df.index.get_level_values("t").astype(str)
+    items = (pd.Series(df.index.get_level_values("j").astype(str), index=df.index)
+             if "j" in names else None)
+    present = set(t.unique())
+    if waves is None:
+        order = sorted(present)
+    else:
+        order = [str(w) for w in waves if str(w) in present]
+        order += sorted(present - set(order))      # waves the caller did not list
+
+    t_series = pd.Series(t, index=df.index)
+    out: list[dict] = []
+    for col in cols:
+        # Positional, not label-based: the index is routinely non-unique.
+        x = pd.to_numeric(df[col], errors="coerce").astype("float64").to_numpy()
+        keep = x > 0                        # NaN compares False -> dropped too
+        values = pd.Series(x[keep])
+        tcol = pd.Series(t_series.to_numpy()[keep])
+        jcol = pd.Series(items.to_numpy()[keep]) if items is not None else None
+        summaries = {}
+        for w in order:
+            mask = (tcol == w).to_numpy()
+            summ = _wave_median(values[mask], jcol[mask] if jcol is not None else None)
+            if summ is not None:
+                summaries[w] = summ
+        usable = [w for w in order if w in summaries]
+        # Pass 1: every wave's comparable neighbours and its ratio to each.
+        # A country absent from the `Currency:` block (Afghanistan, 2026-10)
+        # resolves to pd.NA, and `pd.NA != pd.NA` is NA, not False -- so
+        # normalise to None first: two unknown codes are the SAME unknown unit
+        # and the pair is compared, rather than the check going silently inert.
+        def _code(w):
+            c = currency_for(country, w)
+            return None if pd.isna(c) else c
+        codes = {w: _code(w) for w in usable}
+        neighbours: dict[str, list] = {}
+        for k, w in enumerate(usable):
+            neigh = []
+            for nb in (usable[k - 1] if k > 0 else None,
+                       usable[k + 1] if k + 1 < len(usable) else None):
+                if nb is None:
+                    continue
+                if codes[nb] != codes[w]:                  # redenomination boundary
+                    continue
+                r, form = _pair_ratio(summaries[w], summaries[nb])
+                neigh.append((nb, summaries[nb][0], r, form))
+            neighbours[w] = neigh
+
+        def _out_of_band(neigh) -> bool:
+            if not neigh:
+                return False
+            return (all(r > tolerance for _, _, r, _ in neigh)
+                    or all(r < 1.0 / tolerance for _, _, r, _ in neigh))
+
+        # Pass 2: an INTERIOR wave (two comparable neighbours) is the outlier
+        # when it disagrees with both.  Pass 3: an EDGE wave has one neighbour,
+        # so "disagrees with every neighbour" is vacuous there -- it is reported
+        # only when that neighbour is not itself the outlier.  (In A, B, C with
+        # B 100x off, A and C each disagree with their only neighbour B; the
+        # break is B's, not theirs.)  Two comparable waves alone report both.
+        interior = {w for w, n in neighbours.items() if len(n) >= 2 and _out_of_band(n)}
+        edges = {w for w, n in neighbours.items()
+                 if len(n) == 1 and _out_of_band(n) and n[0][0] not in interior}
+        flagged = interior | edges
+        for w in usable:
+            if w not in flagged:
+                continue
+            neigh = neighbours[w]
+            out.append({
+                "column": col, "wave": w, "median": summaries[w][0],
+                "n": summaries[w][2],
+                "neighbours": [(nb, m, r) for nb, m, r, _ in neigh],
+                "ratio": float(pd.Series([r for _, _, r, _ in neigh]).median()),
+                "neighbour_forms": {nb: form for nb, _, _, form in neigh},
+                "form": (neigh[0][3] if len({form for _, _, _, form in neigh}) == 1
+                         else "mixed"),
+            })
+    return out
+
+
+def _scale_notes(breaks: list[dict]) -> dict[str, str]:
+    """``{wave: "warn: scale_ratio[...]"}`` from :func:`monetary_scale_breaks`."""
+    notes: dict[str, list[str]] = {}
+    for b in breaks:
+        nbs = ", ".join(
+            f"{nb}={m:,.0f} ({b['neighbour_forms'][nb]})"
+            for nb, m, _ in b["neighbours"])
+        notes.setdefault(b["wave"], []).append(
+            f"{b['column']} median {b['median']:,.0f} (n={b['n']}) is "
+            f"{b['ratio']:.3g}x its neighbour(s) {nbs} ({b['form']}; GH #830)")
+    return {w: "warn: scale_ratio[" + " | ".join(v) + "]" for w, v in notes.items()}
+
+
 def grade_feature(country_name, feature, waves, co, env, *,
                   avail_by_wave=None, blessed=frozenset(), verdicts=None,
                   blocked=None, readiness=True, country_level=False) -> list[dict]:
@@ -709,6 +934,18 @@ def grade_feature(country_name, feature, waves, co, env, *,
     # this change landed, so the regrade cannot bury them.
     populated = {c for c in df.columns if df[c].notna().any()}
 
+    # GH #830: cross-wave scale check on monetary columns.  Computed ONCE on the
+    # whole country frame (the per-slice sanity report cannot see across waves)
+    # and attached to the flagged wave's `detail` as a warn note.  It never
+    # touches `tier`.  A failure inside the check must not take the grade down
+    # with it -- it is a report about the data, not part of the build.
+    try:
+        scale_notes = _scale_notes(monetary_scale_breaks(df, country_name, feature, waves))
+    except Exception as e:  # noqa: BLE001 -- report-only, never fatal
+        scale_notes = {}
+        warnings.warn(f"{country_name}/{feature}: monetary scale check failed: "
+                      f"{type(e).__name__}: {e}", RuntimeWarning, stacklevel=2)
+
     cells = []
     for w in waves:
         blk = _blocked_cell(w)
@@ -734,8 +971,11 @@ def grade_feature(country_name, feature, waves, co, env, *,
         tier = tier_from_report(rep)
         if tier == "sane" and (country_name, feature, str(w)) in blessed:
             tier = "blessed"
+        detail = _report_summary(rep)
+        if str(w) in scale_notes:
+            detail += "; " + scale_notes[str(w)]
         cells.append(_cell(country_name, feature, w, tier, "declared",
-                           n_rows=len(sl), detail=_report_summary(rep)))
+                           n_rows=len(sl), detail=detail))
     return cells
 
 

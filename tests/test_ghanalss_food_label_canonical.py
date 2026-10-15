@@ -190,6 +190,7 @@ def delivered():
         'j': fa.index.get_level_values('j').astype(str)})
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     """End-to-end. Skipped when the GhanaLSS cache is cold."""

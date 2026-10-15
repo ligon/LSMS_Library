@@ -63,7 +63,6 @@ import struct
 import tempfile
 import numpy as np
 import pandas as pd
-import dvc.api
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date
@@ -78,6 +77,7 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import configparser
+import errno
 import os
 import ast
 import hashlib
@@ -371,7 +371,7 @@ def _ensure_dvc_pulled(fn) -> None:
             return  # no sidecar found at any interpretation; not DVC-tracked
 
         sidecar = abs_path.parent / f"{abs_path.name}.dvc"
-        with sidecar.open() as fh:
+        with sidecar.open(encoding="utf-8") as fh:
             sidecar_data = yaml.safe_load(fh)
         md5 = sidecar_data["outs"][0]["md5"]
         # Check both DVC 2.x and DVC 3.0 cache layouts.  DVC 3.x is
@@ -526,7 +526,7 @@ def _dvc_cache_path(fn) -> "Path | None":
             return None
 
         sidecar = abs_path.parent / f"{abs_path.name}.dvc"
-        with sidecar.open() as fh:
+        with sidecar.open(encoding="utf-8") as fh:
             md5 = yaml.safe_load(fh)["outs"][0]["md5"]
         for layout in (
             _DVC_CACHE_DIR / md5[:2] / md5[2:],                 # DVC 2.x
@@ -682,7 +682,7 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
             if not di_path.exists():
                 continue
             try:
-                data_info = yaml.safe_load(di_path.read_text())
+                data_info = yaml.safe_load(di_path.read_text(encoding="utf-8"))
             except (OSError, yaml.YAMLError):
                 continue
             if not isinstance(data_info, dict):
@@ -698,7 +698,7 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                 if not sidecar.exists():
                     continue  # untracked source — no DVC fetch needed
                 try:
-                    md5 = yaml.safe_load(sidecar.read_text())["outs"][0]["md5"]
+                    md5 = yaml.safe_load(sidecar.read_text(encoding="utf-8"))["outs"][0]["md5"]
                 except (KeyError, IndexError, TypeError, OSError, yaml.YAMLError):
                     continue
                 if md5 in seen_md5:
@@ -1180,6 +1180,125 @@ def _read_dat_with_dct(raw: bytes, names: list[str],
         f"See the .DAT/.DCT note in local_tools.py and GH #704.")
 
 
+# ---------------------------------------------------------------------------
+# Magic-byte sniffing for the binary readers (GH #699, GH #712)
+# ---------------------------------------------------------------------------
+#
+# ``read_file`` is a fallback chain: each reader is tried on the bytes and a
+# failure means "try the next one".  That only works when a reader handed the
+# wrong kind of file FAILS, and the Stata reader does not reliably do so.
+# ``pandas.io.stata.StataReader`` interprets the first byte of ANY file as a
+# Stata release number; a byte in 102..115 -- ``'f'`` .. ``'s'`` -- sends it
+# down the old-format header parser, which then reads a garbage variable count
+# off the next bytes and dies in whichever way that garbage dictates:
+# ``KeyError`` from the type map, ``MemoryError`` allocating nobs x nvar, or
+# (if lucky) the ``struct.error`` the ``except`` was written for.  A CSV whose
+# header starts ``hhid,`` (``'h'`` = 104) is the measured instance (#712);
+# ``region,`` (``'r'`` = 114 is in range too, but the following bytes happen
+# to be harmless) reads fine.  Content-dependent, and the exception that
+# escapes is not one the chain lists, so the file is unreadable rather than
+# falling through to ``read_csv``.
+#
+# The fix is to SNIFF, not to widen the ``except``: a bare ``except`` would
+# turn a genuinely broken ``.dta`` into a silent fall-through to ``read_csv``,
+# which is exactly the class of silent mis-read the null-read audit exists to
+# catch.  Every binary format in the corpus announces itself in its first
+# bytes, so the chain only hands a file to a reader whose format it carries:
+#
+# * Stata, formats 102..115 (Stata 1 .. 12): byte 0 is the release, byte 1
+#   the byte order (1 = HILO, 2 = LOHI; 0 in some format-102 files), byte 2
+#   the filetype (always 1), byte 3 "unused".  **Do not test byte 3.**  The
+#   spec says it is zero; the corpus says otherwise -- 67 of 4,811 held
+#   ``.dta`` blobs (Kyrgyz Republic 41, Timor-Leste 12, Tajikistan 10,
+#   India 3, GhanaLSS 1) carry 0x3f..0xff there, and pandas reads every one of
+#   them (it discards the byte unread).  Measured 2026-10-14, after a first
+#   draft of this sniff that DID test it rejected all 67.  Formats 117+
+#   (Stata 13+) are XML-framed and begin with the literal ``<stata_dta>``.
+# * SAS Transport (XPORT) V5 begins with an 80-byte library header record
+#   whose first 48 bytes are the literal below.  Peru 1990 ships 36 of them
+#   (``.SSP``, written by SAS 6.06/6.07 in 1992-93); before #699 the chain
+#   had no reader for them at all.  Use ``pandas.read_sas`` -- NOT
+#   ``pyreadstat.read_xport``, which on those files returns the right shape
+#   with 7 of 10 columns entirely NaN and no exception (see
+#   ``null_read_audit``; ``Peru/_/CONTENTS.org`` has the per-file table).
+#
+# The sniff reads at most ``_SNIFF_BYTES`` and restores the stream position,
+# so every read pays one small ``read`` and two ``seek``\ s.
+
+#: Bytes to read when sniffing a file's format.  48 covers the longest magic
+#: (the XPORT library header); anything larger is harmless.
+_SNIFF_BYTES = 64
+
+#: First 48 bytes of a SAS Transport (XPORT) V5 file.
+_XPORT_MAGIC = b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!'
+
+#: Stata 13+ files are XML-framed and open with this tag.
+_STATA_XML_MAGIC = b'<stata_dta>'
+
+#: Stata release numbers that use the fixed binary header (Stata 1 .. 12) --
+#: the list ``pandas.io.stata.StataReader._read_old_header`` accepts.
+_STATA_OLD_RELEASES = frozenset({102, 103, 104, 105, 108, 110, 111, 113, 114, 115})
+
+
+def _sniff_head(f, n: int = _SNIFF_BYTES) -> bytes:
+    """Return the first *n* bytes of *f* without disturbing it.
+
+    *f* is whatever ``read_file`` was handed: a path (``str`` / ``Path``) or
+    an open binary stream.  A stream is rewound to offset 0 afterwards, which
+    is where every reader in the chain expects to find it.  Anything that
+    cannot be sniffed (a non-seekable stream, an unreadable path) yields
+    ``b''``, which matches no magic and leaves the chain to behave as before.
+    """
+    try:
+        if isinstance(f, (str, Path)):
+            with open(f, 'rb') as fh:
+                return fh.read(n)
+        f.seek(0)
+        head = f.read(n)
+        f.seek(0)
+        return head
+    except (OSError, ValueError, AttributeError, TypeError):
+        return b''
+
+
+def _is_sas_xport(head: bytes) -> bool:
+    """True when *head* opens a SAS Transport (XPORT) V5 file."""
+    return head.startswith(_XPORT_MAGIC)
+
+
+def _is_stata_dta(head: bytes) -> bool:
+    """True when *head* carries a Stata ``.dta`` header (any release).
+
+    Old format (102..115): ``release, byteorder in {0, 1, 2}, filetype 1``;
+    the fourth byte is not examined (see the block comment above).  New
+    format (117+): the literal ``<stata_dta>``.  A file failing both is never
+    handed to a Stata reader.  Every one of the 4,697 ``.dta`` blobs held
+    locally on 2026-10-14 passes; no ``.csv`` / ``.sav`` / ``.dat`` does.
+    """
+    if head.startswith(_STATA_XML_MAGIC):
+        return True
+    if len(head) < 3:
+        return False
+    return (head[0] in _STATA_OLD_RELEASES and head[1] in (0, 1, 2)
+            and head[2] == 1)
+
+
+def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
+    """Read a SAS Transport (XPORT) file through ``pandas.read_sas``.
+
+    Not wrapped in a ``try``: the magic bytes have already said what the file
+    is, so a failure here is a broken XPORT file and must stay loud rather
+    than fall through to ``read_csv``.  Character variables are decoded as
+    ``latin-1`` unless the caller says otherwise -- ``read_sas`` with
+    ``encoding=None`` hands back raw ``bytes``, which no other reader in the
+    chain does.  (All 39 Peru 1990 files are numeric-only; the default is for
+    the next XPORT survey.)
+    """
+    if not isinstance(f, (str, Path)):
+        f.seek(0)
+    return pd.read_sas(f, format='xport', encoding=encoding or 'latin-1')
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -1191,7 +1310,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
     def local_file(fn):
     # Is the file local?
         try:
-            with open(fn) as f:
+            with open(fn, 'rb') as f:
                 pass
         except FileNotFoundError:
             return False
@@ -1273,6 +1392,19 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             return _read_dat_with_dct(raw, dct[0], dct[1], fn=fn,
                                       encoding=encoding)
 
+        # Sniff once; the binary readers below are dispatched on what the
+        # first bytes say the file is (see the block comment above
+        # ``_sniff_head``).
+        head = _sniff_head(f)
+        if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
+            raise ValueError(f'{fn} has a .dta suffix but no Stata header')
+
+        # SAS Transport (XPORT) -- Peru 1990 ``.SSP`` (GH #699).  Before the
+        # SPSS attempt: ``pd.read_spss`` on a path raises ``ReadstatError``
+        # for these, which its ``except`` does not list.
+        if _is_sas_xport(head):
+            return _read_sas_xport(f, fn, encoding)
+
         if isinstance(f,str):
             try:
                 return pd.read_spss(f,convert_categoricals=convert_categoricals)
@@ -1304,26 +1436,35 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (ArrowInvalid,):
             pass
 
-        try:
-            f.seek(0)
-            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
-        except (ValueError, struct.error):
-            pass
+        # Stata -- only when the header says so (GH #712).  Handed a file
+        # that is NOT Stata, ``StataReader`` reads a garbage header and dies
+        # with whatever that garbage dictates (``KeyError``, ``MemoryError``);
+        # the ``except`` below is deliberately NOT widened to absorb that,
+        # because a real ``.dta`` that fails must stay loud.
+        if _is_stata_dta(head):
+            try:
+                f.seek(0)
+                return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+            except (ValueError, struct.error):
+                pass
 
-        try:
-            # pyreadstat handles older Stata formats that pandas StataReader cannot.
-            if isinstance(f, str):
-                df_pr, meta = pyreadstat.read_dta(f, apply_value_formats=convert_categoricals, encoding=encoding)
-                return df_pr
-            else:
-                return _pyreadstat_via_tempfile(
-                    pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
-                    apply_value_formats=convert_categoricals, encoding=encoding)
-        except (ValueError, pyreadstat.ReadstatError, OSError,
-                NotImplementedError):
-            # Format-fallback: parser/IO errors mean "try the next reader"
-            # (csv, excel, feather, fwf).  Programmer bugs propagate.
-            pass
+            try:
+                # pyreadstat handles older Stata formats that pandas StataReader cannot.
+                if isinstance(f, str):
+                    df_pr, meta = pyreadstat.read_dta(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                    return df_pr
+                else:
+                    return _pyreadstat_via_tempfile(
+                        pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
+                        apply_value_formats=convert_categoricals, encoding=encoding)
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError) as exc:
+                # A claimed DTA whose binary decoders both failed must not
+                # become CSV under a permissive encoding such as latin-1.
+                if Path(fn).suffix.lower() == '.dta':
+                    raise ValueError(f'{fn} has a Stata header but cannot be decoded') from exc
+                # Other suffixes retain the existing format fallback.
+                pass
 
         try:
             f.seek(0)
@@ -1390,19 +1531,48 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
 
     else:
-        try:
-            with dvc.api.open(fn,mode='rb') as f:
-                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except (OSError, ValueError, KeyError, ImportError):
-            # DVC handle / config / network failure -> fall back to the WB
-            # Microdata download path.  Programmer bugs (TypeError,
-            # AttributeError) propagate so they aren't silently masked.
-            local_path = _try_get_data_file(fn)
-            if local_path is not None:
-                with open(local_path, mode='rb') as f:
-                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            else:
-                raise
+        # Neither local nor DVC-tracked at ``countries_root()``:
+        # ``file_system_path`` has already consulted the sidecar at cwd and
+        # at the countries root AND ``DVCFS.open`` (rooted at the countries
+        # root) before we get here, so the only route left is the WB
+        # Microdata download.  GH #810: this branch used to try
+        # ``dvc.api.open(fn, mode='rb')`` first, with no ``repo=`` -- DVC
+        # then resolved the repository from the CURRENT WORKING DIRECTORY
+        # and walked every ``*.dvc`` beneath it: 300-450 s per missing
+        # source from ``/tmp``, a ``YAMLValidationError`` raised on an
+        # unrelated malformed pytest fixture, and a ``BrokenProcessPool``
+        # when the walk ran inside a forked build worker (Nepal).  A
+        # missing source now fails fast, from any cwd, with the error the
+        # callers already handle (``FileNotFoundError``; ``grab_data`` catches
+        # it in its nested ``get_data``). ``df_data_grabber`` lets missing
+        # files propagate: its ``missing_ok`` covers missing columns only.
+        #
+        # Two things about the WB route are NEW here, not "as before"
+        # (red team, 2026-09-24).  (1) It was previously UNREACHABLE from
+        # this branch: ``dvc.api.open`` raised ``PathMissingError`` -- a
+        # ``DvcException``, outside the caught ``(OSError, ValueError,
+        # KeyError, ImportError)`` -- so ``_try_get_data_file`` never ran
+        # for a plain missing source.  (2) ``get_data_file`` swallows its
+        # own network/HTTP/timeout errors to ``None`` (``_get_catalog_idno``,
+        # ``_find_stata_zip_url``, ``_download_and_extract``), so a WB fetch
+        # failure surfaces as THIS ``FileNotFoundError``, never as a
+        # propagated network error.  Cost per missing source: online, a few
+        # seconds of WB catalog calls; offline / firewalled, bounded by the
+        # ``urlopen(timeout=30)`` calls in those helpers plus one cached
+        # key validation per process (``permissions()`` is memoised).
+        # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
+        # every cold read.
+        local_path = _try_get_data_file(fn)
+        if local_path is None:
+            raise FileNotFoundError(
+                errno.ENOENT,
+                "source is not on disk, has no DVC sidecar under "
+                f"{_COUNTRIES_DIR}, and could not be fetched from the World "
+                "Bank Microdata Library (see data_access.get_data_file)",
+                str(fn),
+            )
+        with open(local_path, mode='rb') as f:
+            df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
 
     # SITE R of the null-content audit.  The reader's ONLY post-read content
     # check: a frame of the right shape holding nothing is a mis-parse, not
@@ -1713,12 +1883,13 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
 
         return x
 
-    try:
-        with open(fn,mode='rb') as dta:
-            id = from_dta(dta)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            id = from_dta(dta)
+    # GH #810: read the crosswalk through the sanctioned reader (local ->
+    # DVC blob cache rooted at ``countries_root()`` -> WB fallback), exactly
+    # as the country-level copies in ``ghanalss.py`` / ``ghanasps.py`` /
+    # ``ethiopia.py`` already do.  The former ``dvc.api.open(fn)`` fallback
+    # carried no ``repo=``, so DVC resolved the repository from the CWD and
+    # walked every ``*.dvc`` beneath it.
+    id = get_dataframe(fn)
 
     id = id[[id0,id1]]
 

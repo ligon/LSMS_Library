@@ -177,6 +177,7 @@ def per_worker_mean():
     return out
 
 
+@pytest.mark.requires_s3
 @needs_data
 class TestServedHours:
 

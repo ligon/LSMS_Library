@@ -29,10 +29,13 @@ Country: Peru
 # ONLY 1994 IS WIRED.  1985 / 1990 / 1991 ship data (133 / 39 / 108 DVC
 # sidecars) but have no `_/` wave config, so every table below is `absent` for
 # those three waves.  `_/CONTENTS.org` ("Wiring status of the four waves")
-# says what each would need -- in particular 1990 ships SPSS/PC+ `.SSP` files,
-# which `get_dataframe()` cannot read at all, and 1985/1991 use an entirely
-# different (World-Bank-processed, English-named) variable scheme from 1994's
-# INE/Cuanto layout, so 1994's config does not transfer.
+# says what each would need -- in particular 1990 ships SAS Transport (XPORT)
+# `.SSP` files, which `get_dataframe()` reads since GH #699 (2026-10-14; an
+# earlier version of this comment called them SPSS/PC+ and unreadable -- both
+# wrong, see CONTENTS.org "1990 -- 39 DVC sidecars"), so wiring 1990 is a plain
+# add-wave task; and 1985/1991 use an entirely different (World-Bank-processed,
+# English-named) variable scheme from 1994's INE/Cuanto layout, so 1994's
+# config does not transfer.
 #
 # ---------------------------------------------------------------------------
 # The former `Index Info:` block was dropped.  It was inert -- only the
@@ -51,11 +54,31 @@ Data Scheme:
     Region: str
     Rural: str
 
+  sample:
+    # Household -> sampling segment (GH #700, wired 2026-10-14).  1994 only:
+    # `1994/_/data_info.yml` reads it from REG01, the same cover page as
+    # cluster_features.  `v` is SEGMENTO zero-padded to width 3 ('001'), the
+    # same string cluster_features now serves and the same as the first
+    # component of `i` ('001-01-11'); the padding decision and its history
+    # are in `_/CONTENTS.org`.
+    #
+    # weight / panel_weight / strata are DELIBERATELY ABSENT, not optional:
+    # REG01's `_weight_` is identically 1 on all 3,623 rows -- an SPSS system
+    # variable exported with `_casenum` / `_date`, not a sampling weight --
+    # and the seven domain expansion factors documented in WB catalog 617
+    # ("Sampling") were not shipped with the microdata.  A column of ones
+    # would claim a self-weighting design the documentation contradicts.
+    # Consequence: `Country('Peru').sample()` has no weight column, so
+    # weighted analysis of Peru is not possible from this library until the
+    # factors are obtained (an acquisition gap, not a config gap).
+    index: (i, t)
+    v: str
+    Rural: str
+
   household_roster:
-    # (t, i, pid).  `v` is NOT declared: Peru has no `sample` table, so
-    # `_join_v_from_sample()` has no source and `v` never appears.  Wiring
-    # `sample` (v and Rural, both from REG01) is the natural follow-up and
-    # needs no new source file.  Do NOT put `v` in this index until it exists.
+    # (t, i, pid).  `v` is NOT declared here and must not be: it is joined
+    # from `sample` by `_join_v_from_sample()` at API time (GH #700), so the
+    # served index is (t, v, i, pid) without this table owning v.
     #
     # i is the composite SEGMENTO-VIVIENDA-HOGAR, joined by `i()` in
     # `1994/_/mapping.py`; pid is B00-ORDEN.

@@ -1,0 +1,841 @@
+{
+  "corpus_source": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "gap_test_source": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+  "countries": 38,
+  "pairs": 549,
+  "outcomes": {
+    "success": 530,
+    "error": 19
+  },
+  "error_countries": {
+    "Peru": 6,
+    "Nepal": 11,
+    "Armenia": 2
+  },
+  "success_return_types": {
+    "DataFrame": 519,
+    "dict": 9,
+    "RecursiveDict": 2
+  },
+  "all_country_contents_hashes_match": true,
+  "all_worker_status_clean_complete": true,
+  "all_final_snapshot_reads_stable": true,
+  "final_country_cache_grades": {
+    "fresh": 422,
+    "legacy": 2
+  },
+  "hashless_country_caches_matching_baseline": [
+    {
+      "country": "Uganda",
+      "path": "var/earnings.parquet",
+      "stored_hash": null,
+      "footer_waves": null,
+      "country_read_policy": "stale",
+      "frame": {
+        "shape": [
+          22447,
+          1
+        ],
+        "columns": [
+          "Earnings"
+        ],
+        "index_names": [
+          "t",
+          "i"
+        ],
+        "dtypes": {
+          "Earnings": "float64"
+        },
+        "content_hash": "bfc2324ebbf322a519b8b4c6dd14b426a8c08ebb11ec6094d9f9c4b308b70e31",
+        "index_unique": true,
+        "null_counts": {
+          "Earnings": 0
+        },
+        "numeric_sums": {
+          "Earnings": 1857779223.0
+        },
+        "wave_rows": {
+          "2015-16": 3305,
+          "2018-19": 3180,
+          "2013-14": 3119,
+          "2019-20": 3064,
+          "2009-10": 2889,
+          "2011-12": 2805,
+          "2010-11": 2618,
+          "2005-06": 1467
+        }
+      }
+    },
+    {
+      "country": "Uganda",
+      "path": "var/fct.parquet",
+      "stored_hash": null,
+      "footer_waves": null,
+      "country_read_policy": "stale",
+      "frame": {
+        "shape": [
+          15,
+          113
+        ],
+        "columns": [
+          "Apples",
+          "Avocado",
+          "Beans (dry)",
+          "Beans (fresh)",
+          "Beef",
+          "Beer",
+          "Biscuits",
+          "Bogoya",
+          "Bongo",
+          "Bread",
+          "Cabbages",
+          "Cakes",
+          "Carrots",
+          "Cassava (dry)",
+          "Cassava (dry/flour)",
+          "Cassava (flour)",
+          "Cassava (fresh)",
+          "Chapati",
+          "Chicken",
+          "Chicken (broiler)",
+          "Chicken (local)",
+          "Chicken (off-layer)",
+          "Coffee",
+          "Cooking Oil",
+          "Cooking Oil (refined)",
+          "Cooking Oil (unrefined)",
+          "Cornflakes",
+          "Dodo",
+          "Donuts",
+          "Dry/Smoked Fish",
+          "Eggplant",
+          "Eggs",
+          "Fresh Fish",
+          "Garlic",
+          "Ghee",
+          "Ginger (fresh)",
+          "Ginger (powder)",
+          "Goat Meat",
+          "Green Pepper",
+          "Ground Nuts (in shell)",
+          "Ground Nuts (paste)",
+          "Ground Nuts (pounded)",
+          "Ground Nuts (shelled)",
+          "Honey",
+          "Ice Cream",
+          "Infant Formula",
+          "Irish Potatoes",
+          "Jackfruit (fresh)",
+          "Jam/Marmalade",
+          "Kabalagala",
+          "Macaroni/Spaghetti",
+          "Maize (cobs)",
+          "Maize (flour)",
+          "Maize (grains)",
+          "Mangos",
+          "Margarine, Butter, etc",
+          "Matoke (??)",
+          "Matoke (bunch)",
+          "Matoke (cluster)",
+          "Matoke (heap)",
+          "Matoke (other)",
+          "Milk (fresh)",
+          "Milk (powdered)",
+          "Millet",
+          "Millet Flour",
+          "Mukene",
+          "Mushrooms",
+          "Ndiizi",
+          "Nkejje (dried)",
+          "Okra",
+          "Onions",
+          "Oranges",
+          "Other Juice (packed)",
+          "Passion Fruits",
+          "Peas",
+          "Peas (dry)",
+          "Perch (dried)",
+          "Perch (fresh)",
+          "Pineapple",
+          "Plantains",
+          "Pork",
+          "Pumpkins",
+          "Restaurant (beer)",
+          "Restaurant (soda)",
+          "Rice",
+          "Salt",
+          "Samosas",
+          "Sausages",
+          "Sim Sim",
+          "Sim Sim (paste)",
+          "Soda",
+          "Sorghum",
+          "Soybeans (dry)",
+          "Soybeans (fresh)",
+          "Sugar",
+          "Sugarcane",
+          "Sweet Bananas",
+          "Sweet Potatoes (dry)",
+          "Sweet Potatoes (flour)",
+          "Sweet Potatoes (fresh)",
+          "Sweet Potatoes (white, flour)",
+          "Tea",
+          "Tea (leaves)",
+          "Tea (other)",
+          "Tilapia (dried)",
+          "Tilapia (fresh)",
+          "Tomatoes",
+          "Waragi",
+          "Water",
+          "Watermelon",
+          "Wheat (flour)",
+          "Yams (arrowroot)",
+          "Yoghurt"
+        ],
+        "index_names": [
+          "Nutrient"
+        ],
+        "dtypes": {
+          "Apples": "float64",
+          "Avocado": "float64",
+          "Beans (dry)": "float64",
+          "Beans (fresh)": "float64",
+          "Beef": "float64",
+          "Beer": "float64",
+          "Biscuits": "float64",
+          "Bogoya": "float64",
+          "Bongo": "float64",
+          "Bread": "float64",
+          "Cabbages": "float64",
+          "Cakes": "float64",
+          "Carrots": "float64",
+          "Cassava (dry)": "float64",
+          "Cassava (dry/flour)": "float64",
+          "Cassava (flour)": "float64",
+          "Cassava (fresh)": "float64",
+          "Chapati": "float64",
+          "Chicken": "float64",
+          "Chicken (broiler)": "float64",
+          "Chicken (local)": "float64",
+          "Chicken (off-layer)": "float64",
+          "Coffee": "float64",
+          "Cooking Oil": "float64",
+          "Cooking Oil (refined)": "float64",
+          "Cooking Oil (unrefined)": "float64",
+          "Cornflakes": "float64",
+          "Dodo": "float64",
+          "Donuts": "float64",
+          "Dry/Smoked Fish": "float64",
+          "Eggplant": "float64",
+          "Eggs": "float64",
+          "Fresh Fish": "float64",
+          "Garlic": "float64",
+          "Ghee": "float64",
+          "Ginger (fresh)": "float64",
+          "Ginger (powder)": "float64",
+          "Goat Meat": "float64",
+          "Green Pepper": "float64",
+          "Ground Nuts (in shell)": "float64",
+          "Ground Nuts (paste)": "float64",
+          "Ground Nuts (pounded)": "float64",
+          "Ground Nuts (shelled)": "float64",
+          "Honey": "float64",
+          "Ice Cream": "float64",
+          "Infant Formula": "float64",
+          "Irish Potatoes": "float64",
+          "Jackfruit (fresh)": "float64",
+          "Jam/Marmalade": "float64",
+          "Kabalagala": "float64",
+          "Macaroni/Spaghetti": "float64",
+          "Maize (cobs)": "float64",
+          "Maize (flour)": "float64",
+          "Maize (grains)": "float64",
+          "Mangos": "float64",
+          "Margarine, Butter, etc": "float64",
+          "Matoke (??)": "float64",
+          "Matoke (bunch)": "float64",
+          "Matoke (cluster)": "float64",
+          "Matoke (heap)": "float64",
+          "Matoke (other)": "float64",
+          "Milk (fresh)": "float64",
+          "Milk (powdered)": "float64",
+          "Millet": "float64",
+          "Millet Flour": "float64",
+          "Mukene": "float64",
+          "Mushrooms": "float64",
+          "Ndiizi": "float64",
+          "Nkejje (dried)": "float64",
+          "Okra": "float64",
+          "Onions": "float64",
+          "Oranges": "float64",
+          "Other Juice (packed)": "float64",
+          "Passion Fruits": "float64",
+          "Peas": "float64",
+          "Peas (dry)": "float64",
+          "Perch (dried)": "float64",
+          "Perch (fresh)": "float64",
+          "Pineapple": "float64",
+          "Plantains": "float64",
+          "Pork": "float64",
+          "Pumpkins": "float64",
+          "Restaurant (beer)": "float64",
+          "Restaurant (soda)": "float64",
+          "Rice": "float64",
+          "Salt": "float64",
+          "Samosas": "float64",
+          "Sausages": "float64",
+          "Sim Sim": "float64",
+          "Sim Sim (paste)": "float64",
+          "Soda": "float64",
+          "Sorghum": "float64",
+          "Soybeans (dry)": "float64",
+          "Soybeans (fresh)": "float64",
+          "Sugar": "float64",
+          "Sugarcane": "float64",
+          "Sweet Bananas": "float64",
+          "Sweet Potatoes (dry)": "float64",
+          "Sweet Potatoes (flour)": "float64",
+          "Sweet Potatoes (fresh)": "float64",
+          "Sweet Potatoes (white, flour)": "float64",
+          "Tea": "float64",
+          "Tea (leaves)": "float64",
+          "Tea (other)": "float64",
+          "Tilapia (dried)": "float64",
+          "Tilapia (fresh)": "float64",
+          "Tomatoes": "float64",
+          "Waragi": "float64",
+          "Water": "float64",
+          "Watermelon": "float64",
+          "Wheat (flour)": "float64",
+          "Yams (arrowroot)": "float64",
+          "Yoghurt": "float64"
+        },
+        "content_hash": "db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c",
+        "index_unique": true,
+        "null_counts": {
+          "Beans (dry)": 0,
+          "Cabbages": 0,
+          "Cassava (dry)": 0,
+          "Chapati": 0,
+          "Cooking Oil (refined)": 0,
+          "Dodo": 0,
+          "Donuts": 0,
+          "Eggplant": 0,
+          "Ground Nuts (pounded)": 0,
+          "Ground Nuts (shelled)": 0,
+          "Jam/Marmalade": 0,
+          "Kabalagala": 0,
+          "Maize (flour)": 0,
+          "Milk (fresh)": 0,
+          "Mukene": 0,
+          "Onions": 0,
+          "Oranges": 0,
+          "Rice": 0,
+          "Salt": 0,
+          "Soda": 0,
+          "Sweet Potatoes (fresh)": 0,
+          "Tea (leaves)": 0,
+          "Tomatoes": 0,
+          "Yams (arrowroot)": 0,
+          "Bread": 0,
+          "Restaurant (beer)": 0,
+          "Restaurant (soda)": 0,
+          "Water": 0,
+          "Beef": 0,
+          "Cassava (fresh)": 0,
+          "Eggs": 0,
+          "Irish Potatoes": 0,
+          "Mangos": 0,
+          "Matoke (bunch)": 0,
+          "Pork": 0,
+          "Waragi": 0,
+          "Avocado": 0,
+          "Beans (fresh)": 0,
+          "Beer": 0,
+          "Ground Nuts (paste)": 0,
+          "Nkejje (dried)": 0,
+          "Sorghum": 0,
+          "Maize (cobs)": 0,
+          "Perch (dried)": 0,
+          "Cooking Oil": 0,
+          "Fresh Fish": 0,
+          "Passion Fruits": 0,
+          "Sugar": 0,
+          "Tea": 0,
+          "Coffee": 0,
+          "Pineapple": 0,
+          "Dry/Smoked Fish": 0,
+          "Ghee": 0,
+          "Goat Meat": 0,
+          "Matoke (heap)": 0,
+          "Bogoya": 0,
+          "Perch (fresh)": 0,
+          "Ndiizi": 0,
+          "Matoke (cluster)": 0,
+          "Sweet Bananas": 0,
+          "Green Pepper": 0,
+          "Pumpkins": 0,
+          "Jackfruit (fresh)": 0,
+          "Samosas": 0,
+          "Matoke (other)": 0,
+          "Carrots": 0,
+          "Ginger (fresh)": 0,
+          "Millet Flour": 0,
+          "Tilapia (fresh)": 0,
+          "Margarine, Butter, etc": 0,
+          "Cassava (dry/flour)": 0,
+          "Chicken": 0,
+          "Sweet Potatoes (dry)": 0,
+          "Watermelon": 0,
+          "Ground Nuts (in shell)": 0,
+          "Cassava (flour)": 0,
+          "Millet": 0,
+          "Sim Sim": 0,
+          "Wheat (flour)": 0,
+          "Other Juice (packed)": 0,
+          "Ginger (powder)": 0,
+          "Peas": 0,
+          "Maize (grains)": 0,
+          "Garlic": 0,
+          "Plantains": 0,
+          "Peas (dry)": 0,
+          "Macaroni/Spaghetti": 0,
+          "Infant Formula": 0,
+          "Okra": 0,
+          "Sim Sim (paste)": 0,
+          "Milk (powdered)": 0,
+          "Cakes": 0,
+          "Ice Cream": 0,
+          "Yoghurt": 0,
+          "Matoke (??)": 0,
+          "Biscuits": 0,
+          "Bongo": 0,
+          "Sausages": 0,
+          "Sugarcane": 0,
+          "Mushrooms": 0,
+          "Tilapia (dried)": 0,
+          "Apples": 0,
+          "Tea (other)": 0,
+          "Chicken (broiler)": 0,
+          "Cooking Oil (unrefined)": 0,
+          "Honey": 0,
+          "Soybeans (dry)": 0,
+          "Sweet Potatoes (flour)": 0,
+          "Chicken (local)": 0,
+          "Sweet Potatoes (white, flour)": 0,
+          "Cornflakes": 0,
+          "Soybeans (fresh)": 0,
+          "Chicken (off-layer)": 0
+        },
+        "numeric_sums": {
+          "Beans (dry)": 11012.73,
+          "Cabbages": 1608.59,
+          "Cassava (dry)": 5482.6,
+          "Chapati": 4565.400000000001,
+          "Cooking Oil (refined)": 8840.0,
+          "Dodo": 5230.35,
+          "Donuts": 20118.109999999997,
+          "Eggplant": 691.09,
+          "Ground Nuts (pounded)": 9709.89,
+          "Ground Nuts (shelled)": 7484.68,
+          "Jam/Marmalade": 12738.280000000002,
+          "Kabalagala": 4883.8099999999995,
+          "Maize (flour)": 4956.879999999999,
+          "Milk (fresh)": 2149.1000000000004,
+          "Mukene": 1567.49,
+          "Onions": 1025.2,
+          "Oranges": 1965.69,
+          "Rice": 4677.629999999999,
+          "Salt": 500.0,
+          "Soda": 655.0,
+          "Sweet Potatoes (fresh)": 4482.0,
+          "Tea (leaves)": 93.54,
+          "Tomatoes": 1047.3,
+          "Yams (arrowroot)": 2171.89,
+          "Bread": 5978.550000000001,
+          "Restaurant (beer)": 566.2,
+          "Restaurant (soda)": 655.0,
+          "Water": 30.1,
+          "Beef": 2944.7000000000003,
+          "Cassava (fresh)": 2677.77,
+          "Eggs": 4013.5,
+          "Irish Potatoes": 1487.61,
+          "Mangos": 1751.3299999999997,
+          "Matoke (bunch)": 1542.3600000000001,
+          "Pork": 2555.2000000000003,
+          "Waragi": 2630.0,
+          "Avocado": 2908.9200000000005,
+          "Beans (fresh)": 3324.75,
+          "Beer": 566.2,
+          "Ground Nuts (paste)": 7746.24,
+          "Nkejje (dried)": 6759.540000000001,
+          "Sorghum": 4823.56,
+          "Maize (cobs)": 2348.71,
+          "Perch (dried)": 9482.57,
+          "Cooking Oil": 8840.0,
+          "Fresh Fish": 2082.0,
+          "Passion Fruits": 2560.3,
+          "Sugar": 4880.19,
+          "Tea": 0.0,
+          "Coffee": 113.30000000000001,
+          "Pineapple": 1023.8299999999999,
+          "Dry/Smoked Fish": 6625.14,
+          "Ghee": 17203.199999999997,
+          "Goat Meat": 1600.8,
+          "Matoke (heap)": 1542.3600000000001,
+          "Bogoya": 1542.3600000000001,
+          "Perch (fresh)": 2118.1,
+          "Ndiizi": 2583.91,
+          "Matoke (cluster)": 1542.3600000000001,
+          "Sweet Bananas": 1542.3600000000001,
+          "Green Pepper": 1470.8899999999999,
+          "Pumpkins": 4514.21,
+          "Jackfruit (fresh)": 1928.4799999999998,
+          "Samosas": 6897.099999999999,
+          "Matoke (other)": 1542.3600000000001,
+          "Carrots": 9491.449999999999,
+          "Ginger (fresh)": 3884.99,
+          "Millet Flour": 5684.51,
+          "Tilapia (fresh)": 1567.49,
+          "Margarine, Butter, etc": 38753.13,
+          "Cassava (dry/flour)": 5482.6,
+          "Chicken": 3040.41,
+          "Sweet Potatoes (dry)": 11051.009999999998,
+          "Watermelon": 852.77000006,
+          "Ground Nuts (in shell)": 7484.68,
+          "Cassava (flour)": 5482.6,
+          "Millet": 5744.15,
+          "Sim Sim": 17266.500000000004,
+          "Wheat (flour)": 4979.539999999999,
+          "Other Juice (packed)": 2310.7,
+          "Ginger (powder)": 16623.02,
+          "Peas": 4581.72,
+          "Maize (grains)": 2348.71,
+          "Garlic": 4108.45,
+          "Plantains": 2583.91,
+          "Peas (dry)": 11932.11,
+          "Macaroni/Spaghetti": 5055.92,
+          "Infant Formula": 31663.100000000002,
+          "Okra": 8473.5,
+          "Sim Sim (paste)": 17316.56,
+          "Milk (powdered)": 17847.859999999997,
+          "Cakes": 6076.62,
+          "Ice Cream": 11490.149999999998,
+          "Yoghurt": 4219.179999999999,
+          "Matoke (??)": 1542.3600000000001,
+          "Biscuits": 6816.18,
+          "Bongo": 2772.46,
+          "Sausages": 13854.109999999999,
+          "Sugarcane": 832.3000000000001,
+          "Mushrooms": 557.3399999999998,
+          "Tilapia (dried)": 6625.14,
+          "Apples": 836.6345000000001,
+          "Tea (other)": 73.34,
+          "Chicken (broiler)": 9880.510000000002,
+          "Cooking Oil (unrefined)": 8840.0,
+          "Honey": 3959.83,
+          "Soybeans (dry)": 9178.630000000001,
+          "Sweet Potatoes (flour)": 11051.009999999998,
+          "Chicken (local)": 3040.41,
+          "Sweet Potatoes (white, flour)": 6165.15,
+          "Cornflakes": 8422.269999999999,
+          "Soybeans (fresh)": 26252.840000000007,
+          "Chicken (off-layer)": 3040.41
+        },
+        "wave_rows": {}
+      }
+    }
+  ],
+  "tajikistan": {
+    "old_area_sum": 88238.0,
+    "new_area_sum": 882.38,
+    "exact_old_new_wave_and_new_country_fingerprint": true,
+    "script_unchanged_since_v014": true,
+    "runtime_exact_transformation_record": {
+      "path": "Tajikistan/var/plot_features.parquet",
+      "transformation": "existing 2007 script division by 100 from sotka to hectares",
+      "exact_after_transformation": true
+    },
+    "independent_frame_replay": false
+  },
+  "sample_weight_absence": {
+    "China": {
+      "shape": [
+        787,
+        1
+      ],
+      "columns": [
+        "v"
+      ],
+      "content_hash": "d4d29a54f8ed6667c700826c12e9530d14126e4caaf4fbf50d07bd4a3b09999d"
+    },
+    "Kazakhstan": {
+      "shape": [
+        1996,
+        2
+      ],
+      "columns": [
+        "Rural",
+        "v"
+      ],
+      "content_hash": "4de77756cdacd911ab1720d487e66bd75ebc62e50be30e63ec32fb4e5e7109b3"
+    },
+    "Pakistan": {
+      "shape": [
+        4967,
+        3
+      ],
+      "columns": [
+        "Rural",
+        "strata",
+        "v"
+      ],
+      "content_hash": "d426cc5501c3a9031118346d09f0de6b7bc7d5c08229ce645000d35953d24fd8"
+    },
+    "Peru": {
+      "shape": [
+        3623,
+        2
+      ],
+      "columns": [
+        "Rural",
+        "v"
+      ],
+      "content_hash": "8d79f118021b6bbda67b849eaad85fd81ef32bcb5d36aee018a3dd849e475f92"
+    }
+  },
+  "xml_results": {
+    "ordinary": {
+      "counts": {
+        "skipped": 18,
+        "passed": 15
+      },
+      "sha256": "29d760dd913201b3c1dfddfd50064ca630b6cb13cf47fc7f4fe211a224b9da0b"
+    },
+    "structural": {
+      "counts": {
+        "passed": 2352,
+        "skipped": 150,
+        "xfail": 5
+      },
+      "sha256": "7c1f44b4d742229d4b48a67aab719222ee87136676faeb0aade434022d38dd09"
+    },
+    "uganda_baseline": {
+      "counts": {
+        "passed": 30,
+        "failure": 1
+      },
+      "sha256": "0a433a3cdd2d327372ce3f4128b60a32fef18933a93d6eff5648709e15b773ef"
+    }
+  },
+  "ordinary_skip_nodes": [
+    {
+      "node": "tests.test_panel_attrition::test_panel_attrition_household_characteristics_is_upper_triangular",
+      "reason": "Requires cached Uganda household_characteristics (data build needed)"
+    },
+    {
+      "node": "tests.test_food_prices_dtype::test_food_prices_cache_dtype_float64",
+      "reason": "food_prices.parquet not in cache"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_uganda_makefile_backfill[household_characteristics]",
+      "reason": "Uganda/household_characteristics not cached (requires data build)"
+    },
+    {
+      "node": "tests.test_food_prices_dtype::test_food_quantities_cache_dtype_float64",
+      "reason": "food_quantities.parquet not in cache"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_uganda_makefile_backfill[food_expenditures]",
+      "reason": "Uganda/food_expenditures not cached (requires data build)"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_uganda_makefile_backfill[food_quantities]",
+      "reason": "Uganda/food_quantities not cached (requires data build)"
+    },
+    {
+      "node": "tests.test_panel_attrition::test_panel_attrition_consistency_between_tables",
+      "reason": "Requires cached Uganda household_characteristics and income (data build needed)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous[China]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous[Kazakhstan]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous[Pakistan]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_weight_scale_classes_are_unambiguous[Peru]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves[China]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves[Kazakhstan]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves[Pakistan]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_sample.TestSample::test_raw_expansion_totals_stable_across_waves[Peru]",
+      "reason": "no raw sample parquet to read (cold data root?)"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_uganda_makefile_backfill[food_prices]",
+      "reason": "Uganda/food_prices not cached (requires data build)"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_uganda_household_characteristics_has_m_index",
+      "reason": "household_characteristics parquet not cached (requires data build)"
+    },
+    {
+      "node": "tests.test_uganda_tables::test_fallback_path_uses_wave_data_scheme",
+      "reason": "Uganda/food_expenditures not cached (requires data build)"
+    }
+  ],
+  "derived_outputs": {
+    "food_expenditures": {
+      "shape": [
+        247049,
+        1
+      ],
+      "columns": [
+        "Expenditure"
+      ],
+      "index_names": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "s"
+      ],
+      "dtypes": {
+        "Expenditure": "Float64"
+      },
+      "country_cache": null
+    },
+    "food_prices": {
+      "shape": [
+        348181,
+        1
+      ],
+      "columns": [
+        "Price"
+      ],
+      "index_names": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "dtypes": {
+        "Price": "Float64"
+      },
+      "country_cache": null
+    },
+    "food_quantities": {
+      "shape": [
+        355487,
+        1
+      ],
+      "columns": [
+        "Quantity"
+      ],
+      "index_names": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "dtypes": {
+        "Quantity": "float64"
+      },
+      "country_cache": null
+    },
+    "household_characteristics": {
+      "shape": [
+        24364,
+        15
+      ],
+      "columns": [
+        "F 00-03",
+        "F 04-08",
+        "F 09-13",
+        "F 14-18",
+        "F 19-30",
+        "F 31-50",
+        "F 51+",
+        "M 00-03",
+        "M 04-08",
+        "M 09-13",
+        "M 14-18",
+        "M 19-30",
+        "M 31-50",
+        "M 51+",
+        "log HSize"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i"
+      ],
+      "dtypes": {
+        "F 00-03": "int64",
+        "F 04-08": "int64",
+        "F 09-13": "int64",
+        "F 14-18": "int64",
+        "F 19-30": "int64",
+        "F 31-50": "int64",
+        "F 51+": "int64",
+        "M 00-03": "int64",
+        "M 04-08": "int64",
+        "M 09-13": "int64",
+        "M 14-18": "int64",
+        "M 19-30": "int64",
+        "M 31-50": "int64",
+        "M 51+": "int64",
+        "log HSize": "float64"
+      },
+      "country_cache": null
+    }
+  },
+  "dtype_test_expected_columns": {
+    "_PRICE_COLS": [
+      "market",
+      "farmgate",
+      "market_away",
+      "market_home",
+      "market_own",
+      "unitvalue_away",
+      "unitvalue_home",
+      "unitvalue_inkind",
+      "unitvalue_own"
+    ],
+    "_QUANTITY_COLS": [
+      "quantity_away",
+      "quantity_home",
+      "quantity_inkind",
+      "quantity_own"
+    ]
+  },
+  "dtype_test_column_intersections_empty": true,
+  "limits": [
+    "No original corpus root access or survey API calls",
+    "Snapshot evidence review, not independent raw-source scientific audit or all changed-frame replays",
+    "Feature audit and mutating checks owned by other reviewers",
+    "Uganda nutrition baseline scientific hold retained"
+  ]
+}

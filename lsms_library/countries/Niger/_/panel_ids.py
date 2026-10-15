@@ -11,18 +11,53 @@ absent from the wave aggregation).
 **ECVMA linkage is implicit.** ECVMA-II (2014-15) re-uses the same
 ``(grappe, menage)`` numbering as ECVMA-I (2011-12) for re-visited
 households. The 2011-12 household ID is a scalar ``hid = grappe*100 +
-menage``. The 2014-15 household ID uses ``niger.i()``, and the
-2014-15 household roster declares ``idxvars: i: [GRAPPE, MENAGE]``
-(without EXTENSION), so the roster-level current ID is
-``format_id(grappe) + '0' + format_id(menage, zp=2)`` — e.g. ``'1001'``
-for ``(g=1, m=1)``. We link a 2014-15 household to its 2011-12
-counterpart when the reconstructed hid exists in 2011-12. Extension 2
-(split-off) cover rows collapse with their parent in the roster (they
-share the same ``(grappe, menage)``), so the linkage is effectively
-at the ``(grappe, menage)`` level.
+menage``. The 2014-15 household ID uses ``niger.i()`` on the FULL
+ECVMA2 key ``(GRAPPE, MENAGE, EXTENSION)`` -- every 2014-15 table
+declares ``idxvars: i: [GRAPPE, MENAGE, EXTENSION]`` since GH #679 --
+so the current ID is ``format_id(grappe) + '0' + format_id(menage, zp=2)
++ str(extension)``, e.g. ``'10010'`` for ``(g=1, m=1, e=0)``.
 
-Empirical counts (2026-04): 3557 unique ``(GRAPPE, MENAGE)`` pairs in
-the 2014-15 cover, ~3534 of which have a matching 2011-12 hid.
+``EXTENSION`` says what became of the 2011 household (ECVMA2 cover
+sheet): 0 = found in place; 1 = the WHOLE household, found after
+moving; 2 = a SPLIT-OFF -- members who left the 2011 household and were
+interviewed as a household of their own.  Measured on the cover sheet,
+a ``(GRAPPE, MENAGE)`` carries the extension sets ``{0}`` (3,421),
+``{1}`` (75), ``{0, 2}`` (57), ``{1, 2}`` (2) or ``{2}`` (3) -- never
+``{0, 1}``, so extensions 0 and 1 are never two 2014-15 households.
+
+**DECISION (GH #679): extensions 0 and 1 link to the 2011-12 parent;
+extension 2 does NOT.**  A split-off is a new household in the panel
+sense -- its members were enumerated in 2011 inside the parent, but the
+2014-15 record is the first observation of THIS household.  Linking it
+to the parent's hid would make ``id_walk`` rename both the parent and
+the split-off to the same 2011-12 id and re-merge them -- the very
+collision #679 removes, under another name.  A user who wants the
+split-off's origin can recover it from the key itself: the parent is
+the same ``(GRAPPE, MENAGE)`` with extension 0 or 1.
+
+Empirical counts (2026-09-24): 3,617 ``(GRAPPE, MENAGE, EXTENSION)``
+households in the 2014-15 cover (3,478 / 77 / 62 by extension);
+3,529 linked to a 2011-12 hid (3,457 ext-0 + 77 ext-1, minus 5 skipped
+by the namespace guard below); 88 unlinked (62 split-offs, 21 ext-0
+households whose reconstructed hid is not in the 2011-12 individual
+file, 5 guard-skipped).  Under the previous two-column key the guard
+had to skip 286 households, so only 3,251 were linked.
+
+Five of those 3,251 old links are NOT in the new crosswalk (measured
+2026-10-14 against the merge-base crosswalk; 3,246 carry over with
+identical targets, 0 change target, the other three waves' maps are
+byte-identical).  Three go by the DECISION above -- old keys
+``89005``, ``95001``, ``128011``, pairs (89,5) / (95,1) / (128,11),
+are ext-2-ONLY on the cover sheet (EXTENSION set {2}, no ext-0/1
+sibling): split-offs whose parent was not re-interviewed, for which
+the collision argument does not bite; delinking them is a uniform
+"split-off = new household" choice, reversible by admitting ext 2 for
+pairs with no ext-0/1 sibling.  Two go by the namespace guard below --
+old keys ``101010`` and ``201010`` (ext-0 households (101,10) and
+(201,10)) reconstruct hids ``10110`` / ``20110``, which under the
+three-column key are the ids of (1,11,0) / (2,11,0).  The other three
+guard-skipped households (prev_i ``10010``, ``20010``, ``20012``) were
+skipped under the old key too.
 
 **EHCVM linkage is explicit.** The 2021-22 cover sheet
 ``s00_me_ner2021`` has ``s00q07f1`` (previous grappe) and
@@ -88,32 +123,47 @@ cover14 = get_dataframe(
 )
 
 ecvma_14_to_11: dict[str, str] = {}
-# Iterate over unique (GRAPPE, MENAGE) pairs. The 2014-15 roster
-# declares idxvars as [GRAPPE, MENAGE] only (extensions are collapsed
-# with their parent), so the linkage is at the (grappe, menage) level.
-uniq_gm = cover14[['GRAPPE', 'MENAGE']].dropna().drop_duplicates()
+# Iterate over unique (GRAPPE, MENAGE, EXTENSION) triples -- the full ECVMA2
+# household key, which every 2014-15 table now declares (GH #679).
+KEY14 = ['GRAPPE', 'MENAGE', 'EXTENSION']
+uniq_gme = cover14[KEY14].dropna().drop_duplicates()
+
+# Extensions that link to the 2011-12 parent.  0 = found in place, 1 = the
+# whole household found after moving.  2 = SPLIT-OFF, deliberately NOT here:
+# see the module docstring (DECISION, GH #679).
+LINKED_EXTENSIONS = {0, 1}
 
 # First pass: build the set of 2014-15 current IDs (post-niger.i).
 # We need this to detect transitive-chain collisions in the second pass.
 cur_ids_14: set[str] = set()
-for _, row in uniq_gm.iterrows():
-    g, m = int(row['GRAPPE']), int(row['MENAGE'])
-    cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
+for _, row in uniq_gme.iterrows():
+    g, m, e = int(row['GRAPPE']), int(row['MENAGE']), int(row['EXTENSION'])
+    cur_i = niger_i(pd.Series([g, m, e], index=KEY14))
     if cur_i is not None:
         cur_ids_14.add(cur_i)
 
 # Second pass: build the linkage, skipping transitive-chain collisions.
-# niger.i(g, m) = format_id(g) + '0' + format_id(m, zp=2) and the
-# theoretical 2011-12 hid = g*100+m share a namespace: e.g.
-# (g=10, m=2) gives cur_i='10002' and prev_i='1002', and (g=1, m=2)
-# gives cur_i='1002'. If we add both linkages, updated_ids['2014-15']
-# would form a transitive chain '10002'->'1002'->'102' — and id_walk's
-# single-pass .replace() applied twice would collapse both households
-# into the single canonical '102', destroying one of them. We skip
-# any linkage whose prev_i also appears as another HH's cur_i.
-for _, row in uniq_gm.iterrows():
-    g, m = int(row['GRAPPE']), int(row['MENAGE'])
-    cur_i = niger_i(pd.Series([g, m], index=['GRAPPE', 'MENAGE']))
+# niger.i(g, m, e) = format_id(g) + '0' + format_id(m, zp=2) + str(e) and
+# the 2011-12 hid = g*100+m are both digit strings and share a namespace:
+# (g=1, m=1, e=0) gives cur_i='10010', which is also the hid of the 2011-12
+# household (g=100, m=10).  If (100, 10, 0) were linked to '10010',
+# updated_ids['2014-15'] would hold the chain '1000100'->'10010'->'101' and
+# id_walk (closure-resolved, local_tools._close_id_map) would send BOTH
+# 2014-15 households to '101'.  We skip any linkage whose prev_i is also
+# some household's cur_i.  Measured: 5 households skipped under the
+# three-column key ('10010', '10110', '20010', '20012', '20110' as prev_i);
+# under the old two-column key this guard skipped 286.
+#
+# The guard cannot cover the OTHER direction -- an UNLINKED 2014-15 id that
+# equals a 2011-12 hid stays as it is and reads as that 2011-12 household
+# in any cross-wave join.  Measured: exactly one, the split-off
+# (g=2, m=1, e=2) = '20012', which is also hid 20012 = (g=200, m=12).
+# A digit-only id format cannot exclude this; recorded in CONTENTS.org.
+for _, row in uniq_gme.iterrows():
+    g, m, e = int(row['GRAPPE']), int(row['MENAGE']), int(row['EXTENSION'])
+    if e not in LINKED_EXTENSIONS:
+        continue
+    cur_i = niger_i(pd.Series([g, m, e], index=KEY14))
     if cur_i is None:
         continue
     prev_i = str(g * 100 + m)

@@ -20,6 +20,8 @@ import yaml
 
 from lsms_library.paths import countries_root
 
+pytestmark = pytest.mark.requires_s3
+
 
 # ---------------------------------------------------------------------------
 # Collect countries that declare household_roster

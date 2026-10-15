@@ -1,0 +1,36 @@
+{
+  "scope": "saved records and metadata only; no library imports, API/cache access or source mutations",
+  "counts": {
+    "current_warning_patterns": 259,
+    "current_patterns_seen_in_prior_union": 26,
+    "current_patterns_unmatched_in_prior_union": 233,
+    "current_warning_records_in_matched_patterns": 487
+  },
+  "warnings": 3504,
+  "source_hashes_verified": 36,
+  "all_three_refs_listed_emitters_identical": true,
+  "index_name_pairs_equal": 100,
+  "index_name_comparison_gaps": 8,
+  "reviewed_files": {
+    "MANIFEST.json": {
+      "bytes": 450,
+      "sha256": "13a0087fd4eb023a9401ef04326016d74d17e450a80132ca09e20a57edf70c6b"
+    },
+    "REPORT.md": {
+      "bytes": 8765,
+      "sha256": "a045606cd9ed33f8eb9e639ead82f0587420fcb33754ce148a1bcb075d9eb339"
+    },
+    "compare_prior.py": {
+      "bytes": 7616,
+      "sha256": "e52f955ac86e2b9b6dc82862706c98e943afa594190f111b38ca3f7c07f32ef0"
+    },
+    "comparison.json": {
+      "bytes": 17066,
+      "sha256": "5bed2fe6431b1b95515fd6a230e16bb59f80d76a63aca09135e06e3819d836c4"
+    },
+    "run.log": {
+      "bytes": 1264,
+      "sha256": "2436a6704915d964ef5edda112567cbaae69ce49be4618966ceb9638ef29a71d"
+    }
+  }
+}

@@ -38,6 +38,27 @@ rows were served rather than deleted -- which is why #842 counted 441 and not
 5,663).  3,485 of the recovered rows carry a REPORTED harvest Quantity.
 ``plot_inputs``' 75 and ``crop_production``'s 34 pre-existing ``Manquant``
 rows are the same rows under the new spelling, not new ones.
+
+RE-MEASURED 2026-09-24 on the cold rebuild of the Niger bundle (GH #679 /
+#865 / #824 / #811 / #833), same private-root recipe.  Three tables move,
+each for a stated reason, none of them this test's:
+
+    table             rows before -> after     u=='Unknown' before -> after
+    crop_production      46,341 -> 46,376            4,920 -> 4,909
+    food_acquired       239,882 -> 239,877                8 -> 8
+    plot_inputs          42,364 -> 42,426               75 -> 74
+
+* ``crop_production`` +46 in 2014-15: the (GRAPPE, MENAGE, EXTENSION) key
+  (#679) un-collapses the 46 groups the two-column key merged.  -11 in
+  2011-12: the eleven harvest lines that carried ONLY the 999999 "don't
+  know" code (#865) are now all-NA and dropped by ``_finalize_result``;
+  every one of them was a ``u == 'Unknown'`` row, hence 3,146 -> 3,135.
+* ``food_acquired`` -5 in 2021-22: the sugar fold (#833) merges five
+  households' ``Sucre poudre`` + ``Sucre morceaux`` rows at the
+  ``(t, v, i, j, u, s)`` grain (an additive, lossless sum).
+* ``plot_inputs`` +63 in 2014-15 (#679, as above); -1 in 2021-22: the one
+  ``s16bq03a == 9999`` line (#865) is now all-NA and dropped, and it was
+  the wave's ``Unknown`` row, hence 14 -> 13.
 """
 from __future__ import annotations
 
@@ -62,27 +83,27 @@ U_TABLES = ("crop_production", "food_acquired", "plot_inputs", "community_prices
 
 # Cold-rebuild measurements (see the module docstring for provenance).
 EXPECTED_ROWS = {
-    "crop_production": 46341,
+    "crop_production": 46376,   # 46,341 before the 2026-09-24 Niger bundle
     # 239,031 before GH #876.  The derived purchase value drops rows whose
     # purchased quantity is zero and which used to survive on the raw s07bq08
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
-    "food_acquired": 239882,
-    "plot_inputs": 42364,
+    "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
+    "plot_inputs": 42426,       # 42,364 before the bundle
     "community_prices": 15423,
 }
 EXPECTED_SENTINEL = {
-    "crop_production": 4920,
+    "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines
     "food_acquired": 8,      # 12 before GH #876; one of the 8 is an inkind row
-    "plot_inputs": 75,
+    "plot_inputs": 74,          # 75 before GH #865 dropped the one 9999 line
     "community_prices": 0,
 }
 # Per-wave sentinel counts, so a wave-script regression cannot hide inside a
 # country total that happens to add up.
 EXPECTED_SENTINEL_BY_WAVE = {
-    "crop_production": {"2011-12": 3146, "2014-15": 373, "2018-19": 441, "2021-22": 960},
+    "crop_production": {"2011-12": 3135, "2014-15": 373, "2018-19": 441, "2021-22": 960},  # 2011-12 3,146 before GH #865
     "food_acquired": {"2018-19": 0, "2021-22": 8},   # 12 before GH #876
-    "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 14},
+    "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 13},   # 2021-22 14 before GH #865
     "community_prices": {"2011-12": 0, "2014-15": 0},
 }
 
@@ -322,6 +343,7 @@ class TestRelabelMechanism:
 # the built tables -- data-gated
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @needs_data
 class TestNoNullUnitIsServed:
     """No Niger table serves a NaN on its `u` index level."""

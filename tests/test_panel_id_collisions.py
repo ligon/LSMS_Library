@@ -191,6 +191,7 @@ needs_data = pytest.mark.skipif(
 )
 
 
+@pytest.mark.requires_s3
 @needs_data
 def test_ghanalss_split_household_food_not_summed_into_one():
     """(101332, 1988-89) must be its own total -- not its total plus 101332_1's.
@@ -227,6 +228,7 @@ def test_ghanalss_split_household_food_not_summed_into_one():
     )
 
 
+@pytest.mark.requires_s3
 @needs_data
 def test_ghanalss_split_household_roster_not_collapsed():
     """The split households keep their own members (4 and 6, not one set of 6)."""

@@ -87,6 +87,7 @@ def emp() -> pd.DataFrame:
         pytest.skip(f'India employment unavailable: {e}')
 
 
+@pytest.mark.requires_s3
 def test_act_level_is_declared(emp):
     """`act` must be part of the canonical index -- the guard against re-collapse."""
     assert 'act' in emp.index.names, (
@@ -94,6 +95,7 @@ def test_act_level_is_declared(emp):
         'collapses 6,194 duplicate tuples (GH #323)')
 
 
+@pytest.mark.requires_s3
 def test_no_gh323_collapse_warning_on_a_COLD_build(monkeypatch):
     """The warning fires ONLY on a cold build -- so this test MUST force one.
 
@@ -115,18 +117,21 @@ def test_no_gh323_collapse_warning_on_a_COLD_build(monkeypatch):
     assert int(df.index.duplicated().sum()) == 0
 
 
+@pytest.mark.requires_s3
 def test_wage_observations_are_not_destroyed(emp):
     """62% of wage observations were being discarded by groupby().first()."""
     assert int(emp['Cash_per_day'].notna().sum()) == 5627   # was 2136
     assert float(emp['Cash_per_day'].sum()) == 92116.0      # was 55498.0
 
 
+@pytest.mark.requires_s3
 def test_row_count_recovers(emp):
     """6,158 = 16,089 source rows - 9,931 all-NaN rows dropped by the
     pre-existing dropna(how='all') safety-net in country.py."""
     assert len(emp) == 6158                                 # was 2593
 
 
+@pytest.mark.requires_s3
 def test_frankenstein_person_is_not_fabricated(emp):
     """VALIDATE WHERE VALIDATION IS NEEDED: the ambiguous rows, not the free ones.
 
@@ -151,6 +156,7 @@ def test_frankenstein_person_is_not_fabricated(emp):
     assert float(person['Cash_per_day'].sum()) == 15.0
 
 
+@pytest.mark.requires_s3
 def test_every_person_activity_pair_is_distinct(emp):
     """`act` is a per-person slot: (i, pid, act) is exactly unique."""
     f = emp.index.to_frame()

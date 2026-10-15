@@ -1,0 +1,17 @@
+{
+  "original_unique": 2580,
+  "followup_unique": 2590,
+  "missing_original": [],
+  "additional": [
+    "tests/test_categorical_mapping_resolution.py::test_import_is_from_the_expected_checkout",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_a_poisoned_country_parquet_is_REBUILT_not_served[Nigeria/crop_production]",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_exactly_the_country_tier_call_sites_pass_the_flag",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_helper_root_preserves_other_root_and_restores_paths[exception]",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_helper_root_preserves_other_root_and_restores_paths[normal]",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_load_from_waves_takes_the_flag_and_defaults_it_off",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_the_eviction_precedes_the_country_fallback",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_the_helper_is_a_noop_on_an_absent_parquet",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_the_helper_never_deletes_a_json_tier_cache",
+    "tests/test_gh866_stale_country_parquet_not_laundered.py::test_the_rebuild_failure_is_still_raised_not_swallowed"
+  ]
+}

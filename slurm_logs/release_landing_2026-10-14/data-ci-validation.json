@@ -1,0 +1,35 @@
+{
+  "base": "47ce939afa1f253a5a76e0832620a3cbb6a4b817",
+  "head": "3d6b8218fbdb7e4f303afaa13218adcb40eda567",
+  "yaml_loader": "PyYAML BaseLoader (on key preserved)",
+  "environment": {
+    "LSMS_BUILD_WORKERS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "old_command": [
+    "poetry",
+    "run",
+    "pytest",
+    "--tb=short"
+  ],
+  "new_command": [
+    "poetry",
+    "run",
+    "pytest",
+    "--tb=short",
+    "--timeout=600",
+    "--timeout-method=thread",
+    "--durations=25"
+  ],
+  "rest_of_parsed_workflow_identical": true,
+  "production_tests_dependency_diff_empty": true,
+  "timeout_declared": "^2.3.0",
+  "timeout_locked": "2.4.0",
+  "timeout_installed": "2.4.0",
+  "exact_command_help_exit": 0,
+  "import": "/local/job39919092/release-work/framework/data-ci-execution-profile/lsms_library/__init__.py",
+  "countries_root": "/local/job39919092/release-work/framework/data-ci-execution-profile/lsms_library/countries",
+  "no_test_execution_or_survey_access": true
+}

@@ -1,0 +1,43 @@
+{
+  "source_sha": "ec1a5976751dbb4423bb4a9bb43efb62a8bd8077",
+  "exit_code": 0,
+  "passed": 4951,
+  "skipped": 2725,
+  "xfailed": 4,
+  "xpassed": 1,
+  "warnings": 998,
+  "pytest_seconds": 1581.3,
+  "collected": 7681,
+  "cache_presence_skips": 2580,
+  "credential_skips": 0,
+  "cache_presence_skips_by_file": {
+    "test_table_structure": 2507,
+    "test_863_transforms": 7,
+    "test_visualizations": 1,
+    "test_sample": 8,
+    "test_quantity_screen": 1,
+    "test_uganda_invariance": 31,
+    "test_gh866_stale_country_parquet_not_laundered": 9,
+    "test_id_format_id_canonical": 4,
+    "test_uganda_tables": 7,
+    "test_gh809_hashless_country_parquet": 1,
+    "test_food_prices_dtype": 2,
+    "test_panel_attrition": 2
+  },
+  "independent_replication_directory_skips": 15,
+  "source": "frozen integration before test-only #1003, includes original #967 runtime and unchanged nutrition fixture",
+  "cache": "physical copy of completed private #941 root; L1 dvc-cache symlink only",
+  "artifacts": {
+    "full-suite.log": {
+      "sha256": "fa8004a70e434c7a88adb694954dd27ee6a64ad596532b34fd6982d8f2651a7d",
+      "bytes": 343047,
+      "private_path": "/local/job39919092/release-work/logs/full-suite.log"
+    },
+    "full-suite.xml": {
+      "sha256": "5579dc9e99f67f8ad071d6f1e65bfb00e5778a9df40e15cd09273183fd2627ea",
+      "bytes": 1650891,
+      "private_path": "/local/job39919092/release-work/logs/full-suite.xml"
+    }
+  },
+  "pending": "Repeat skipped cache-presence checks against a physical copy of completed corpus; Uganda nutrition fixture remains unapproved."
+}

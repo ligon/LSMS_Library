@@ -71,6 +71,7 @@ def hook(benin):
     return fn
 
 
+@pytest.mark.requires_s3
 def test_wave_frame_is_at_cluster_grain(wave_frame):
     """The extraction must emit one row per cluster, not one per household."""
     assert len(wave_frame) == N_CLUSTERS, (
@@ -82,6 +83,7 @@ def test_wave_frame_is_at_cluster_grain(wave_frame):
     )
 
 
+@pytest.mark.requires_s3
 def test_wave_frame_has_no_duplicate_cluster_tuples(wave_frame):
     """No manufactured duplicates for the framework collapse to eat."""
     n_dup = int(wave_frame.index.duplicated().sum())
@@ -92,6 +94,7 @@ def test_wave_frame_has_no_duplicate_cluster_tuples(wave_frame):
     )
 
 
+@pytest.mark.requires_s3
 def test_every_cluster_carries_one_value_per_attribute(wave_frame):
     """The invariant the hook enforces -- asserted here on real data too.
 
@@ -109,6 +112,7 @@ def test_every_cluster_carries_one_value_per_attribute(wave_frame):
     )
 
 
+@pytest.mark.requires_s3
 def test_api_row_count_is_the_cluster_count(benin):
     """Regression guard: the API result is unchanged by the grain fix.
 

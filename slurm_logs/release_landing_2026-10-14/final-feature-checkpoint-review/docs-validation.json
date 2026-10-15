@@ -1,0 +1,363 @@
+{
+  "verdict": "APPROVE exact frozen documentation/evidence checkpoint; pending release/scientific/CI/shared-cache gates retained",
+  "base": "ae890a48f16f9cdb1b7b857af9d89eadf463265e",
+  "diff_sha256": "b43f338f32420244e02dc349f7fe6efae3d94781a924f561fb14702a42f390f5",
+  "diff_bytes": 236676,
+  "changed_paths": [
+    ".sucoder/handoff.org",
+    "docs/releases/v0.15.0.md",
+    "lsms_library/countries/Panama/_/CONTENTS.org",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org",
+    "slurm_logs/release_landing_2026-10-14/RELEASE_ISSUES.org",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org",
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/REVIEW.md",
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/check_evidence.py",
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/validation.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/MANIFEST.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/REPORT.md",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/TRIAGE.md",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/caught-error-counts.tsv",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/check-counts.tsv",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/cluster-counts.tsv",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/completion.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/feature-coverage.tsv",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/hard-finding-counts.tsv",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/market-dependency-history.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/original-preservation.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/provenance.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/publish_summary.py",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/run-metadata.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/run.sh",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/snapshot.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/summary.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/tenure-history.json",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/tenure_history.py",
+    "slurm_logs/release_landing_2026-10-14/feature-audit/verify_original.py",
+    "slurm_logs/release_landing_2026-10-14/feature-docs-build.json",
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/MANIFEST.json",
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/REPORT.md",
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/compare_prior.py",
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/comparison.json",
+    "slurm_logs/release_landing_2026-10-14/market-dependency-review/issue-filed.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/REVIEW.md",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/archive-manifest.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/check_evidence.py",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/validation.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/OLD_REPLAY_FINAL.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/OLD_REPLAY_FINAL.md",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/REPORT.md",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/archive-manifest.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/cancelled-comparison.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/comparison.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/copy-identity.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/environment-before.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/observe_ghana.py",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/ordered_replay.py",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/private-evidence-hashes.json",
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/probe_environment.py",
+    "slurm_logs/release_landing_2026-10-14/validation-candidate-1010.json"
+  ],
+  "all_changes_documentation_or_archival_evidence": true,
+  "archive_transforms": [
+    {
+      "file": "caught-error-counts.tsv",
+      "rows": 61,
+      "source": {
+        "bytes": 5733,
+        "sha256": "bde26b43de3adc5e2776b5fe38725cb741f21e9379aaf5b654c3387f5fd2b1de"
+      },
+      "archived": {
+        "bytes": 5672,
+        "sha256": "368823d28df6caa8423dddeb99e535ede77003043cc08f8c0c338fa83a785808"
+      }
+    },
+    {
+      "file": "check-counts.tsv",
+      "rows": 166,
+      "source": {
+        "bytes": 8440,
+        "sha256": "91fb61fef93594b396c7a9edb67add0fe6d92186a43f2b7b5af3aa871774a458"
+      },
+      "archived": {
+        "bytes": 8274,
+        "sha256": "3b9a5e794b18708e443adb63f979bc047bb94691f3f5387446903dff8a5adf03"
+      }
+    },
+    {
+      "file": "cluster-counts.tsv",
+      "rows": 267,
+      "source": {
+        "bytes": 9580,
+        "sha256": "e1ddcb8040d46f0cf59f9605f40e86a0595df62d8114f7a4fc8cd3f33014899f"
+      },
+      "archived": {
+        "bytes": 9313,
+        "sha256": "de16ea3fe2cc9bf809a439dfc2e1416b72af1a472b8866cc0ec373f86457552f"
+      }
+    },
+    {
+      "file": "feature-coverage.tsv",
+      "rows": 40,
+      "source": {
+        "bytes": 1302,
+        "sha256": "fbd515e56f49e86781c195d8a3b74432faa143ca70d6aad0d04c421a760c0ab1"
+      },
+      "archived": {
+        "bytes": 1262,
+        "sha256": "2f86c7f9e1b130a3c4aa8f5040b390f55105ec8f3be56e7e121524c0c25019ae"
+      }
+    },
+    {
+      "file": "hard-finding-counts.tsv",
+      "rows": 25,
+      "source": {
+        "bytes": 1558,
+        "sha256": "d10cbf1948b775146468e7be5fc50080461d6a0abb600570e9f1c8a7625faebe"
+      },
+      "archived": {
+        "bytes": 1533,
+        "sha256": "3d2845187432667f1fd949bb169eb79fd6cb957d2ee159538e767eb65e12a22d"
+      }
+    }
+  ],
+  "archive_sources_byte_identical_except_five_TSV_line_endings": true,
+  "source_core_manifest": {
+    "bytes": 2676,
+    "sha256": "b466a6048f5ba97e9ddc7e8415c9eefe5ea97ba56a775c83edf2c701eaa42baa"
+  },
+  "archived_core_manifest": {
+    "bytes": 4152,
+    "sha256": "455ab7e7229d31abd6c52bfb804b9ef51c8dad745aaa078d05172a0d02f18ca7"
+  },
+  "strict_docs_build_record_verified": {
+    "command": [
+      "taskset",
+      "-c",
+      "16-23",
+      "/local/job39919092/release-work/framework/release-validation-env/bin/python",
+      "-m",
+      "mkdocs",
+      "build",
+      "--strict",
+      "--site-dir",
+      "/local/job39919092/release-work/control/feature-docs-validation/site"
+    ],
+    "exit_code": 0,
+    "seconds": 4.0117565132677555,
+    "log_sha256": "985f70440675c89aac0289fe44d4d11037caa2939b1b120305c0eb7d86a2e82a",
+    "source_identity_asserted": true,
+    "empty_config_and_data_roots": true,
+    "AWS_environment_scrubbed": true
+  },
+  "candidate_source_equivalence_verified": true,
+  "reviewed_files": {
+    ".sucoder/handoff.org": {
+      "bytes": 13480,
+      "sha256": "191a7aa41a87318f97d960e5ef450d41af0d6fbde9ba5654709d82631261d137"
+    },
+    "docs/releases/v0.15.0.md": {
+      "bytes": 19693,
+      "sha256": "777296583426c5a25aafaada49296b65fb3972c7bc711a475ff8bcae4f0c8045"
+    },
+    "lsms_library/countries/Panama/_/CONTENTS.org": {
+      "bytes": 71980,
+      "sha256": "221ed58fe6f5610c57eaab7fdad1aace1cdd23e3fb691618856b29340585e433"
+    },
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org": {
+      "bytes": 15336,
+      "sha256": "ffffd3027841cb9b04d9ef02d0cfcb0ad81bc8c2702f9da7a5165d7c5f1881ac"
+    },
+    "slurm_logs/release_landing_2026-10-14/RELEASE_ISSUES.org": {
+      "bytes": 45639,
+      "sha256": "ea4bb0a61e832c85dd9574bb7f00cc315dde3c071c4ed689426d8775ce75919f"
+    },
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org": {
+      "bytes": 23787,
+      "sha256": "3850b73aa02818d800a106f2e13a300230260148439aaa050f759143b225f123"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/REVIEW.md": {
+      "bytes": 9198,
+      "sha256": "e4ff0b094a290b46549fc3df5057e90a0057d8f7c709739b5635b766203a4922"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/check_evidence.py": {
+      "bytes": 12412,
+      "sha256": "07bed472631905fc648226f0989f16cb320c950d45957ffd60b9f6062cb6ef50"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit-review/validation.json": {
+      "bytes": 9354,
+      "sha256": "9925112cb2a9f9e0cb2d00182611a72b793517fb16d276c431ee5657593ccd50"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/MANIFEST.json": {
+      "bytes": 4152,
+      "sha256": "455ab7e7229d31abd6c52bfb804b9ef51c8dad745aaa078d05172a0d02f18ca7"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/REPORT.md": {
+      "bytes": 8635,
+      "sha256": "caf93a35f1a7cc198206c75fc40419aa3e6ce92b7842ddb58070b07c677d0628"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/TRIAGE.md": {
+      "bytes": 13976,
+      "sha256": "98b497c91e58c81c67b88f874c9203dc3c56735c58ee7106b5ef95ccb46709ca"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/caught-error-counts.tsv": {
+      "bytes": 5672,
+      "sha256": "368823d28df6caa8423dddeb99e535ede77003043cc08f8c0c338fa83a785808"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/check-counts.tsv": {
+      "bytes": 8274,
+      "sha256": "3b9a5e794b18708e443adb63f979bc047bb94691f3f5387446903dff8a5adf03"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/cluster-counts.tsv": {
+      "bytes": 9313,
+      "sha256": "de16ea3fe2cc9bf809a439dfc2e1416b72af1a472b8866cc0ec373f86457552f"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/completion.json": {
+      "bytes": 543,
+      "sha256": "83b53587e268312394c43450130518c33eb707a380ddb91502da20549cf0e8d9"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/feature-coverage.tsv": {
+      "bytes": 1262,
+      "sha256": "2f86c7f9e1b130a3c4aa8f5040b390f55105ec8f3be56e7e121524c0c25019ae"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/hard-finding-counts.tsv": {
+      "bytes": 1533,
+      "sha256": "3d2845187432667f1fd949bb169eb79fd6cb957d2ee159538e767eb65e12a22d"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/market-dependency-history.json": {
+      "bytes": 1551,
+      "sha256": "aa55dd4ae84e4b69e10e519c7381234d2d0d126d62af5b7979bed082b149d687"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/original-preservation.json": {
+      "bytes": 431,
+      "sha256": "0a8fdb8fce7e7b71c711ccc70080766c0f4191a046131a9b60f30276b551bc41"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/provenance.json": {
+      "bytes": 3412,
+      "sha256": "eb66a364ce40ff8c00a8d8814593eae275853ec234f3c900e81b59d554d172e1"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/publish_summary.py": {
+      "bytes": 8078,
+      "sha256": "6564d4a68a21a654aabe8fa97d94affc0f5c340e47cb331725f1cbbf927b30f2"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/run-metadata.json": {
+      "bytes": 611,
+      "sha256": "1be927b13cbc2f730946b72f624e88bcc96cdcc96b5d98f267cc4dc3526f3049"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/run.sh": {
+      "bytes": 1238,
+      "sha256": "ec3557d64c39f32af1dffc75514ae1e18483ab4b7e606066a082286ac2f22888"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/snapshot.json": {
+      "bytes": 414,
+      "sha256": "6f607dbea57917bd9e39e216fb46e8fb7e28c51fd114d8561d3c9d2019644e38"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/summary.json": {
+      "bytes": 2733,
+      "sha256": "36cd0cc498eed9892d0c4777dc9df7e7f376b574148f70928cba699275ec06c5"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/tenure-history.json": {
+      "bytes": 5033,
+      "sha256": "b764311e1634adac4cd12a0135c37e6ce32c0db7b2dfe266105816481e341e4b"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/tenure_history.py": {
+      "bytes": 4128,
+      "sha256": "015c8c09cb1a752974c05e92a35585064bf14c3a2595a4cdc1fbec7437177112"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-audit/verify_original.py": {
+      "bytes": 1980,
+      "sha256": "50ba95bbe98765a856d7fda2efa639fb7275ad999d721480aee51d7fd05c6bce"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-docs-build.json": {
+      "bytes": 536,
+      "sha256": "91a073cb01820304eb5fd402f6ec63a62a485108276919d7de87028fdcc57138"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/MANIFEST.json": {
+      "bytes": 450,
+      "sha256": "13a0087fd4eb023a9401ef04326016d74d17e450a80132ca09e20a57edf70c6b"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/REPORT.md": {
+      "bytes": 8765,
+      "sha256": "a045606cd9ed33f8eb9e639ead82f0587420fcb33754ce148a1bcb075d9eb339"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/compare_prior.py": {
+      "bytes": 7616,
+      "sha256": "e52f955ac86e2b9b6dc82862706c98e943afa594190f111b38ca3f7c07f32ef0"
+    },
+    "slurm_logs/release_landing_2026-10-14/feature-prior-comparison/comparison.json": {
+      "bytes": 17066,
+      "sha256": "5bed2fe6431b1b95515fd6a230e16bb59f80d76a63aca09135e06e3819d836c4"
+    },
+    "slurm_logs/release_landing_2026-10-14/market-dependency-review/issue-filed.json": {
+      "bytes": 386,
+      "sha256": "827d58cd306c207c6e31556a64a087bf2153c80c70c85d046ca24e8c1f4e899e"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/REVIEW.md": {
+      "bytes": 5370,
+      "sha256": "832b336fd8a5290f11858a3e4bfe6223b1ff0b8af2d8b49fc60286ea2037b74a"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/archive-manifest.json": {
+      "bytes": 527,
+      "sha256": "49053edf9c5fafc6dc250b717b21750c877059797448f1c1cf448f9509a30ede"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/check_evidence.py": {
+      "bytes": 6304,
+      "sha256": "f624912aec72982c7670768a5a391bb7984007f5203e52f8b72c86c53c82160f"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010-review/validation.json": {
+      "bytes": 6335,
+      "sha256": "69728858e049cb5ab31a0a7fed2d20ff750107b1d2fb36090d43dd2a13a70c04"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/OLD_REPLAY_FINAL.json": {
+      "bytes": 3450,
+      "sha256": "b83e9de5ee77bb1ced2f816e3acc7aad5f920dcb92228844b18aa0f61d4fb9fe"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/OLD_REPLAY_FINAL.md": {
+      "bytes": 1766,
+      "sha256": "09f98ee32a051e7af1352d564e2b4c4eee9b36b2187ecf1d60afd6d405760d3e"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/REPORT.md": {
+      "bytes": 7055,
+      "sha256": "823a71b58e41f6dfe9b37c84df9cd1259cd781d780b73e438849e445b7a277bf"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/archive-manifest.json": {
+      "bytes": 1668,
+      "sha256": "8b6b75923afe74ed4cf337ccd72de832d55fbd66a08df7c139ae7e33c87b8b56"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/cancelled-comparison.json": {
+      "bytes": 2461,
+      "sha256": "04a4c8587229101511293bf450a7d43088459cb02c848a3aa19853c088c7a725"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/comparison.json": {
+      "bytes": 7411,
+      "sha256": "c2bd5e1dc3fb5f2e4c3bcbd4bbdb86f470d00258584e4690bf3af13a38ba24bf"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/copy-identity.json": {
+      "bytes": 471,
+      "sha256": "167c67741fa4ba8f497a00cec2117c603451ea36f0107ca57ba51ec74a644a72"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/environment-before.json": {
+      "bytes": 616,
+      "sha256": "359cf5df8777b4b257cb1f827d732b62d1a75a101505297bddaf0050b2962aaf"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/observe_ghana.py": {
+      "bytes": 2143,
+      "sha256": "e55336c0d1d7b7b1cc2b44636538518f06fcd2f9605883219e3b605f48e4d4e6"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/ordered_replay.py": {
+      "bytes": 1378,
+      "sha256": "86fb0b452ca025959af1cf06cc7badb0b2abb7cebce6c3aeab5b0984c17a4c0f"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/private-evidence-hashes.json": {
+      "bytes": 2298,
+      "sha256": "055295ac1868d9478042cfcbc3f721862a13d013416e070ffdebba03929f989c"
+    },
+    "slurm_logs/release_landing_2026-10-14/test-isolation-1010/probe_environment.py": {
+      "bytes": 1029,
+      "sha256": "d1cdb5153956e1f6ba6449e9b5675cee0b54fd28dd6c451a1a68b4fd8ec5623f"
+    },
+    "slurm_logs/release_landing_2026-10-14/validation-candidate-1010.json": {
+      "bytes": 755,
+      "sha256": "99aedf8432bac6188c4a2d5085ef97fd0677926c91b66eeac29de5042a9530ed"
+    }
+  }
+}

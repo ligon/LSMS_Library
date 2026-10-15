@@ -1,0 +1,34 @@
+{
+  "corpus": {
+    "unique_requests": 549,
+    "countries": 38,
+    "status": {
+      "success": 530,
+      "error": 19
+    },
+    "error_countries": {
+      "Armenia": 2,
+      "Nepal": 11,
+      "Peru": 6
+    }
+  },
+  "followup": {
+    "passed": 2416,
+    "skipped": 168,
+    "xfail": 5,
+    "failure": 1
+  },
+  "original_skip_outcomes": {
+    "passed": 2406,
+    "skipped": 168,
+    "xfail": 5,
+    "failure": 1
+  },
+  "missing_original": [],
+  "additional_cases": 10,
+  "all_private_log_xml_hashes_match_archive": true,
+  "failed_nodes": [
+    "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]"
+  ],
+  "evidence_files": 8
+}

@@ -1,0 +1,32 @@
+{
+  "source_sha": "ed1414fb9",
+  "tests": 451,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "seconds": 1311.84,
+  "classes": {
+    "tests.test_add_market_index_dedup.TestAddMarketIndexDedup": 3,
+    "tests.test_albania_cluster_features": 20,
+    "tests.test_build_transform_hash": 35,
+    "tests.test_burkina_faso_2014_passages": 15,
+    "tests.test_coverage_matrix": 63,
+    "tests.test_currency": 56,
+    "tests.test_currency_denominated_units": 20,
+    "tests.test_currency_livestock_registry": 14,
+    "tests.test_declared_spellings.TestCheckDeclaredSpellings": 8,
+    "tests.test_declared_spellings.TestSampleIsDeclared": 3,
+    "tests.test_declared_spellings.TestCountryRegressions": 7,
+    "tests.test_derivations.TestKeys": 8,
+    "tests.test_derivations.TestLoaderRefuses": 12,
+    "tests.test_derivations.TestRecordOnAttrs": 4,
+    "tests.test_derivations.TestAttach": 4,
+    "tests.test_derivations.TestResolve": 7,
+    "tests.test_derivations.TestRegistry": 8,
+    "tests.test_derivations.TestDelivered": 1,
+    "tests.test_ehcvm_7day.TestFunction": 12,
+    "tests.test_ehcvm_7day.TestConfig": 37,
+    "tests.test_ehcvm_7day.TestRegistry": 26,
+    "tests.test_ehcvm_7day.TestDelivered": 88
+  }
+}

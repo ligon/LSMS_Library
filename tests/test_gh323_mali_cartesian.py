@@ -66,6 +66,7 @@ def _wave_cluster_features(c, wave):
                     f'{type(exc).__name__}: {exc}')
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('wave', sorted(EXPECTED_WAVE_ROWS))
 def test_wave_cluster_features_is_not_a_cartesian(mali, wave):
     """The wave frame must not exceed the grain of its own sources.
@@ -101,6 +102,7 @@ def test_2021_22_cluster_features_is_a_single_file_extraction(mali):
     assert info.get('file') == 's00_me_mli2021.dta', info.get('file')
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('wave', sorted(EXPECTED_GRAPPES))
 def test_country_cluster_features_is_one_row_per_grappe(mali, wave):
     """After the collapse: exactly one row per surveyed cluster, no more."""
@@ -114,6 +116,7 @@ def test_country_cluster_features_is_one_row_per_grappe(mali, wave):
     assert sub.index.is_unique
 
 
+@pytest.mark.requires_s3
 def test_cover_page_geography_agrees_with_the_consumption_file():
     """s00q01 == `region` and s00q04 == `milieu`, per grappe, 513/513.
 
@@ -150,6 +153,7 @@ def test_cover_page_geography_agrees_with_the_consumption_file():
         f'(s00q04) and the consumption file (milieu):\n{bad_milieu.head()}')
 
 
+@pytest.mark.requires_s3
 def test_2021_22_gps_is_a_cluster_fix_not_a_household_fix():
     """One distinct (lat, lon) per grappe -- so `.first()` cannot pick wrongly.
 

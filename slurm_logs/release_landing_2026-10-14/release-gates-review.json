@@ -1,0 +1,16 @@
+{
+  "reviewer": "/root/country_landing",
+  "decision": "APPROVE",
+  "reviewed_tracked_diff_sha256": "8ba3dd6ddf720a4f81bf0a4ff4a5771f840885b23d4a9ca4e78915efefbc7a11",
+  "scope": [
+    ".sucoder/handoff.org",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org",
+    "validation-candidate-after-1012.json",
+    "feature-evidence-pr-1012.json"
+  ],
+  "evidence_sha256": {
+    "validation-candidate-after-1012.json": "9d7182ba7eb625b7222529993a360bbe62a1c6019f6561d7bbde7468c940e699",
+    "feature-evidence-pr-1012.json": "5ed4ba9a59b609b5e88f3c87b1e8194b2b8c1ee40e5cad6512bef991c8f81ffc"
+  },
+  "summary": "Completed validation/accounting/reconciliation is separated from pending CI, Uganda scientific decision, final landing/shared warm, and publication. Source equality checked against exact pathspec. No test/runtime/fixture edits."
+}

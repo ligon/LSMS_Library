@@ -2634,6 +2634,46 @@ and air coolers" onto "air conditioner - split chassis (cool)" would pool two
 different items.  *Comparing a GLSS7 =j= with a GLSS5/GLSS6 =j= is valid only
 for the 71 shared rows.*
 
+** =g7sec9a.dta= is a format-118 file whose strings MIX cp1252 bytes with ASCII (GH #926, 2026-10-14)
+
+The 2016-17 Section 9A file declares itself UTF-8 (header =<stata_dta>=,
+format 118), and its =s9aname= strings carry *raw cp1252 bytes* beside
+clean ASCII for the SAME words: the blob holds 41,803 =Women\x92s= next to
+97,531 =Women's=, and 411,886 bytes 0x92 (right single quote), 418,085 of
+0x96 (en dash) and 241,757 of 0x94 (right double quote, used as an inch
+mark in =Iron rods (1/4\x94)=) -- with zero UTF-8 curly quotes anywhere.
+Reading it through =get_dataframe('../Data/g7sec9a.dta',
+convert_categoricals=False)= (the wave script's own path; measured
+2026-10-14, pandas 3.0.6) raises *no* warning of any class: each string
+that fails UTF-8 is decoded per-string as latin-1, which maps the byte to
+the C1 control U+0092/U+0096/U+0094 and keeps going.  390,140 of the file's
+7,077,839 =s9aname= values (5.5%) therefore come out of the reader carrying
+a C1 control (41,803 rows read =Women\x92s=, 97,531 =Women's=).
+
+The =nonfood_items= crosswalk in =_/categorical_mapping.org= was derived
+from that read and *committed the controls*: 28 cells (=Preferred Label= and
+=Label_2016-17=, consistently) and 3 more in the wave's
+=harmonize_price_item= (codes 309 / 326 / 348, both the =Label= and the
+=Preferred Label=).  Because the label is served verbatim, that put a C1
+control in =nonfood_expenditures().j= on 25,585 rows (27 distinct =j=, all
+2016-17) and in =community_prices().j= and =.Description= on 927 rows each.
+Repaired 2026-10-14 by editing the config: U+0092 -> ='=, U+0096 -> =-=,
+U+0094 -> ="= (ASCII, this file's transcription convention; a decision, not
+a reading -- the source's intended characters are the typographic ones).
+Preferred Labels stay injective per wave (the wave script asserts it), and
+=tests/test_no_c1_controls_in_curated_labels.py= pins every served
+=Preferred Label= column corpus-wide and these two files in full.
+
+*The #805 reader rule will not protect a re-derivation.*  #805 decodes
+cp1252-first for format < 118 files; this file IS 118, and its bytes are
+mixed, so any future re-derivation of =nonfood_items= or
+=harmonize_price_item= from =g7sec9a.dta= reintroduces the controls unless
+the strings are transcoded first (re-encode the decoded string as latin-1
+and decode as cp1252, per string, where a C1 control is present).  The
+mixed encoding is also why this is not the 2012-13 code-262 artefact noted
+under the food vocabulary (a Mac-Roman NBSP read as latin-1): different
+file, different source charset, same symptom class.
+
 ** 2005-06 is in OLD cedi, and the served numbers look 1000x wrong until you look
 
 Median row: 2005-06 *60,000*, 2012-13 *23*, 2016-17 *35*.  That is the July
@@ -4407,7 +4447,10 @@ label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
 in 2016-17, none elsewhere.  Where the axis folds two
 price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
 Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
-=Description= tells them apart.  The overlap with =food_acquired().j= was
+=Description= tells them apart.  (Three 2016-17 price-item labels -- codes
+309 / 326 / 348 -- carried cp1252-as-latin-1 C1 controls until 2026-10-14;
+see "=g7sec9a.dta= is a format-118 file whose strings MIX cp1252 bytes with
+ASCII" under =nonfood_expenditures=, GH #926.)  The overlap with =food_acquired().j= was
 checked against the =harmonize_food= tables, not a built =food_acquired=
 (the corpus's largest table; not built on this slice).
 
@@ -4922,3 +4965,46 @@ six =input= values with =j='Farm-level'=: *322 rows / 2,477,260 cedis in
 FIXED six-row list, so a zero means the household spent nothing on that
 category) but NOT in the per-crop blocks above, where a crop is listed only
 when it had an expense.
+
+** Feature assembly drops null-key food rows separately from visit summation (2026-10-14)
+
+=Country('GhanaLSS').food_acquired()= retains the integer =visit= axis
+and is unique at that grain.  =Feature('food_acquired')(['GhanaLSS'])=
+removes =visit= to reach its canonical cross-country grain, then sums
+Quantity/Expenditure over the resulting duplicate keys.  That ordinary
+visit aggregation is distinct from the null-key deletion below; it does
+not standardize the recall windows documented above.
+
+On frozen source =7fa05179=, the country call serves 5,340,606 rows and
+the Feature call serves 1,704,880.  Of the reduction, 3,622,254 rows are
+combined through additive aggregation of non-null keys.  Another 13,472
+rows are deleted because the grouping keys contain nulls:
+
+| wave    | null key | deleted rows | Quantity checksum | Expenditure checksum |
+|---------+----------+--------------+-------------------+----------------------|
+| 1987-88 | v        |           54 |              8370 |                 8370 |
+| 1988-89 | v        |           38 | 5182.017543859649 |    5182.017543859649 |
+| 2016-17 | u        |        13380 |            3379.8 |              6720.55 |
+
+These are raw-column *audit checksums*, not kilograms or comparable
+economic totals: units, currencies and recall windows differ.  The
+GLSS7 set includes price-only produced rows; a deleted-row count is not
+a count of non-null quantities.  The country-native records remain
+available.  Independent in-memory replay from the raw food/sample
+parquets reproduces the mask and Feature row count; =math.fsum= of the
+retained input and output agrees for both additive columns.
+
+The collapse mechanism predates v0.14.0: =feature.py= and the relevant
+row-selector source are identical at that tag, pre-train =452302ad= and
+=7fa05179=.  Exact row counts on a rebuilt historical Country snapshot
+were not measured.  GH #847 explicitly scoped its change to reporting
+this class, not correcting every country.  Its closure does not mean
+these GhanaLSS rows are preserved in Feature assembly.
+
+This also qualifies Trap 9's "armed and waiting" description: no new
+Country duplicate is needed to activate the Feature collapse, because
+removing =visit= creates duplicate keys.  The 22 null-unit rows discussed
+under the 1998-99 wave reducer are a separate upstream loss, not the
+cohort counted here.  Choosing a source-supported unit/cluster treatment
+or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
+this note changes neither identifiers nor measures.

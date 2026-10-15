@@ -93,6 +93,7 @@ _UGANDA_AGSEC_FEATURES = [
 ]
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("feature", _UGANDA_AGSEC_FEATURES)
 def test_uganda_agsec_cached_ids_canonical(feature):
     """Cached Uganda AGSEC parquets carry canonical id levels (no builds)."""

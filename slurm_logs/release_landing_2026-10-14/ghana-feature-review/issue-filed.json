@@ -1,0 +1,8 @@
+{
+  "number": 1008,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1008",
+  "status": "OPEN",
+  "body_sha256": "222486e123aa9955128dbee17788990f3ee5fc450a3d451e4271fea550a91a77",
+  "evidence_commit": "da8a2e25370078186180410ca3acaa86e54af239",
+  "scope": "Pre-existing GhanaLSS Feature null-key deletion, independently replayed; no policy or survey-data change"
+}

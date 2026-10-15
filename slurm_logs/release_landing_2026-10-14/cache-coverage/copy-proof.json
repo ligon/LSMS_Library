@@ -1,0 +1,12 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "source": "/local/job39919092/release-work/runtime/data-corpus",
+  "target": "/local/job39919092/release-work/cache-coverage-data",
+  "copied_at_unix": 1792043919.9746532,
+  "regular_files": 1519,
+  "bytes": 340885785,
+  "all_file_hashes_equal": true,
+  "all_regular_inodes_distinct": true,
+  "source_unchanged_during_copy": true,
+  "only_shared_symlink": "dvc-cache"
+}

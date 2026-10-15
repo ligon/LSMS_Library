@@ -309,6 +309,7 @@ def test_qty_sentinel_absent_is_a_no_op(uganda_module, in_2009_10_wave_dir):
 # data-gated: the real 2009-10 wave, read directly (bypasses Country() cache)
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 @pytest.mark.skipif(
     not _aws_creds_available(),

@@ -1,4 +1,135 @@
-#+title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
+#+title: Handoff -- 2026-10-14 release landing IN PROGRESS
+
+* Current execution -- Codex, job39919092
+The maintainer approved WORKPLAN.org and said to proceed. Twenty-one implementation
+PRs are merged to development, plus evidence PRs #997/#998/#1007/#1012. GitHub, local main
+and filesystem origin development were synchronized at =729ff5123= after PR #1012
+passed unit and Windows checks. Corpus/coverage and Feature audit evidence
+are merged; this checkpoint adds only status corrections.
+#967 Uganda remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
+newly reproduced #1003 merged via PR1004 after independent review and CI.
+PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
+with no change to test selection or assertions. No release tag or publication yet;
+shared L2 is untouched.
+
+** Remaining decision, already asked
+Uganda CONTENTS explicitly says not to regenerate nutrition baseline until its
+direction is signed off. Exact historical replay and independent #967 accounting
+are complete; the proposed two-field shape/hash patch remains UNAPPLIED.
+The maintainer has been asked whether to accept the documented estimator and
+nominal-volume limitations for this release or hold for source review. A first
+report omitted the FCT row's specific yellow-variety study note; corrected full
+provenance supports the nonzero225 density as a specific override of the generic
+USDA starting note. No numeric correction is proposed from that ambiguity. Silence is
+not approval. See release_landing_2026-10-14/uganda-nutrition-history.org and
+uganda967.org on the integration branch / PR967. The -18.7% historical Energy
+change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
+
+** Validation and next work
+- Integration branch landing/release-v0.15.0 under release-work/integration
+  contains #967 plus all landed code and evidence. Runtime differences from
+  development are only the reviewed #967 country changes.
+- Native installed Windows conda job116251866840 passed on74c9398ec,
+  run38683117467. Its Linux data job and earlier38681185279 were cancelled
+  after the #1010 leak was reproduced; partial logs are preserved, no suite
+  totals inferred. Native Windows success remains a separate completed job.
+  Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
+  manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
+  matches the earlier candidate; only tests/CONTENTS/evidence differ.
+  Its unit result is3276passed4407skipped and Windows smoke327passed1skipped.
+  Controlled-profile candidatecf1840e02 is pushed as
+  release/v0.15.0-controlled-validation; manualCI38688613005 has the same
+  unit/Windows counts. Its credentialed job failed at 06:50:35 UTC on the
+  600-second timeout in GhanaLSS unitprice validation, while waiting for a
+  wave-build subprocess; no suite summary was produced. This is under
+  investigation, not a nutrition failure or established #941 recurrence.
+  Run38687547945 remains as an unpinned comparison. Corrected candidate
+  9d5bf200f was dispatched as run38697245468 after the exact ordered helper
+  plus Ghana test selection passed19tests in112.26s, with zero Ghana builds.
+  Test-only fix PR1011 merged as36a923305; it excludes held967. Current
+  integration =ea688bf51= includes merged evidence PR #1012. Production code, tests,
+  dependencies, build configuration and Feature harness match candidate =9d5bf200f=;
+  its full tree differs in documentation/evidence. Earlier integration =bf917d438=
+  had an identical full tree to =9d5bf200f=. The diagnosed flag leak is #1010, distinct
+  from #1003 and not a proved #941 cause.
+- #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
+- Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
+  Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
+  final6c4c2fc13 passed both PR checks and focused credentialed/no-credential runs.
+- Runtime corpus is COMPLETE at frozen7fa05179:549unique declared requests
+  across38countries,530success,19documentederrors,0empty in4527.97s. Gaps:
+  Armenia2(no source),Nepal11(no acquired source),Peru6(unwired). Original
+  release-work/runtime/data-corpus is quiescent and preserved. Final country
+  caches:422fresh plus Uganda earnings/fct hashless after sibling script
+  rewrites (#788/#809); no restamping to hide this. Feature phases1/2 are
+  COMPLETE over39features/549pairs/38baseline/17variant calls, with0scope
+  skips. Its3544emitted diagnostics are3504WARN,19known-sourceERROR,5existing
+  tenureFAIL,16PASS; these are not pytest totals or a clean semantic result.
+  Independent review and aggregate-only evidence are in feature-audit/ and
+  feature-audit-review/. Original1519files remain byte/metadata-identical.
+  Shared L2 is untouched. Partial June audits are not matched baselines;
+  feature-prior-comparison/ records26matching patterns,233unmatched patterns
+  (not233new defects), and reviewed source/value attribution. No unexplained
+  release-specific warning category identified; scientific triage remains.
+  Feature food assembly exposes a material pre-existing GhanaLSS null-key loss:
+  13472rows, independently replayed separately from visit aggregation. Full
+  Feature implementation and relevant selectors matchv0.14/pre-train/candidate;
+  exact historical input counts were not rebuilt. See ghana-feature-review/.
+  This measured country residual is now tracked by #1008; historical #323/#847
+  are closed reporting/mechanism references, not a fix for these rows.
+  Region-market variants also exclude GhanaSPS/Panama for a pre-existing
+  missing geography dependency; cluster IDs are present. Independently
+  reviewed CONTENTS notes retain the survey-domain caveats. GhanaSPS stays
+  under #140; the Panama residual is filed as #1009.
+- Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
+  4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
+  No credential skips; the 2,580 cache-presence skips were subsequently
+  checked against the completed corpus, with results below. Fifteen independent replication-dir tests lack the
+  external project; never point them at the same cache under test. Fourxfails
+  are source weight gaps; existing Pakistan#740 is the non-strict xpass.
+- Final-source cache-gap worktree is release-work/cache-coverage, branch
+  landing/cache-coverage, frozen4f1f044bb. The quiescent corpus was physically
+  copied to release-work/cache-coverage-data:1519files,340885785bytes, all
+  file hashes identical and all regular-file inodes distinct; only L1 symlink
+  shared. Source/config/cache identity assertions passed. Prepared driver is
+  control/full-suite/run_cache_coverage.py; session41298 completed. Results:
+  structural2352passed150skipped5knownxfails; ordinary15passed18skipped;
+  Uganda baseline30passed1knownnutritionfailure; mutating19passed0skipped.
+  All2580original gap nodes verified present in2590follow-up executions;
+  ten additional helper/identity cases, no missing selection. Of the original
+  skips2406nowpass;168remaining skips are classified in cache-coverage.org.
+  The full follow-up is2416passed168skipped5knownxfails1failure, not green.
+  Newly exposed legacy derived-table test coverage debt is filed as #1006;
+  concrete scope and independent review are in corpus-review/.
+  Keep structural/ordinary reads separate from the10cache-poisoning cases;
+  Uganda nutrition's known unapproved fixture remains a real held comparison.
+  Preserve L1; no writable L2 symlinks or source edits during active tests.
+- Release notes/issue reconciliation are independently reviewed and published
+  via998. Eighteen partial issue bodies/titles narrowed, all left OPEN; residuals
+  #1000FCT-note, #1001credential-copy, #1002binary-fallback, #1003test-root filed.
+  issue-reconciliation-applied.json records mutations. PR999 holds closures.
+- #1003 disposable probes confirm the absent-parquet helper can delete from a
+  previously cached root and leave its private root cached after teardown.
+  The JSON helper early-returns and does not poison the cache. Fixture-only repair
+  is merged via1004; no attribution to #941 is established.
+- Once science and validation gates pass: land967, verify combined development,
+  warm/promote verified shared caches once, release PR development->master with
+  MERGE COMMIT, make release v=0.15.0, explicit GitHub tag push/release, observe
+  publish workflow/PyPI and test the published installation.
+
+** Operational facts
+Main repo /local/job39919092/mirrors/LSMS_Library; venv /local/job39919092/venv_img.
+GitHub is explicit https://github.com/ligon/LSMS_Library.git; origin is filesystem.
+Use core.hooksPath=/dev/null for commits/merges: local post-commit auto-pushes.
+Each worktree uses cwd+PYTHONPATH and LSMS_COUNTRIES_ROOT matching that tree.
+BLAS/OMP/MKL=1,LSMS_BUILD_WORKERS=1,pytest -n6 --dist=loadfile, logs to files.
+No rejected historical refs deleted. #600 was ported/reviewed/merged via992;
+#837 old reducers were measured and rejected (483cells would be blanked),
+with sources restored and documentation/evidence merged via997.
+Durable plan/evidence: slurm_logs/release_landing_2026-10-14/.
+
+* Previous handoff (historical, superseded by current execution)
+Historical title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
 
 * Update 19:10 PDT -- reviews complete, three PRs open
 - All 16 branches reviewed: 3 pass (970-json-make, ci-skips, burkina-2014), 12 pass-with-fixes, 1 FAIL (framework-small: 14 tests red via the #915 raise).  Summary + per-branch §6 items: =slurm_logs/backlog_review_2026-10-14/REVIEW_SUMMARY.org=; verdicts copied to =verdicts/=.
@@ -31,4 +162,3 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 - Default branch is master: "Closes #N" never fires on a development merge -- close issues by hand with the PR cited.
 
 -- Sue
-

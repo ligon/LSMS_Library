@@ -149,6 +149,7 @@ def test_every_region_code_has_exactly_one_name(geocode):
     assert all(re.fullmatch(r"\d{2}", c) for c in geocode.TZ_REGION_BY_CODE)
 
 
+@pytest.mark.requires_s3
 def test_the_geocode_agrees_with_the_pollution_free_frame(geocode):
     """Round 1 is the ground truth: nobody has moved, so every household's
     reported region IS its cluster's region.  If the crosswalk were wrong this
@@ -209,6 +210,7 @@ def pre_collapse(tz):
     return out
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", WAVES)
 def test_cluster_features_is_one_row_per_cluster(cluster_features, wave):
     sub = cluster_features.xs(wave, level="t")
@@ -217,6 +219,7 @@ def test_cluster_features_is_one_row_per_cluster(cluster_features, wave):
         f"{wave}: {len(sub)} clusters, expected {CLUSTERS[wave]}")
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", WAVES)
 def test_contested_cells_stay_below_the_measured_ceiling(pre_collapse, wave):
     per_col = _contested(pre_collapse[wave])
@@ -228,6 +231,7 @@ def test_contested_cells_stay_below_the_measured_ceiling(pre_collapse, wave):
     )
 
 
+@pytest.mark.requires_s3
 def test_2008_09_is_the_uncontested_baseline(pre_collapse):
     """Round 1, before anyone has moved.  Every cluster's households agree on
     every attribute -- which is what makes them CLUSTER attributes, and what
@@ -236,6 +240,7 @@ def test_2008_09_is_the_uncontested_baseline(pre_collapse):
     assert sum(_contested(pre_collapse["2008-09"]).values()) == 0
 
 
+@pytest.mark.requires_s3
 def test_the_frame_reaching_the_projection_is_still_household_grain(pre_collapse):
     """The mover exclusion is a ROW FILTER, not an early collapse.
 
@@ -253,6 +258,7 @@ def test_the_frame_reaching_the_projection_is_still_household_grain(pre_collapse
 #     nothing.  This is what was broken outright in 2020-21.
 # --------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_cluster_features_v_is_a_key_sample_knows(cluster_features, sample):
     """Before this branch, ALL 417 of 2020-21's `(t, v)` pairs were unknown to
     `sample`: `cluster_features` keyed on `clusterid` while `sample` keyed on
@@ -273,6 +279,7 @@ def test_cluster_features_v_is_a_key_sample_knows(cluster_features, sample):
     assert per_wave == expected, per_wave
 
 
+@pytest.mark.requires_s3
 def test_2020_21_is_keyed_on_y5_cluster(cluster_features):
     """`y5_cluster` is hyphen-delimited `RR-DD-WWW-EE-CCC`; `clusterid` is a
     bare number and is BLANK for all 545 booster households.  A regression to
@@ -295,6 +302,7 @@ def test_2020_21_is_keyed_on_y5_cluster(cluster_features):
     )
 
 
+@pytest.mark.requires_s3
 def test_2020_21_booster_clusters_are_present(cluster_features):
     """`clusterid` is NaN for every booster household, so keying on it deleted
     them outright on a NaN key.  Keying on `y5_cluster` keeps them."""
@@ -306,6 +314,7 @@ def test_2020_21_booster_clusters_are_present(cluster_features):
 # 4.  The mover exclusion must not silently drop a cluster.
 # --------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_no_cluster_wave_is_lost_from_the_2008_15_folder(cluster_features):
     """Residency is tested per `(t, v)`, not per `v`: a cluster can have
     residents in one round and none in the next, and grouping on `v` alone lost
@@ -333,6 +342,7 @@ REGION_VS_GEOCODE_CEILING = {
 }
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", WAVES)
 def test_region_is_the_region_the_cluster_id_claims(cluster_features, geocode, wave):
     """The end-to-end statement of the fix: after the collapse, a cluster's

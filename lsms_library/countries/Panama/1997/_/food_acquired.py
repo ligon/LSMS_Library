@@ -82,6 +82,38 @@ def decode_unit(code):
 df['u_bought'] = df['ga106b'].apply(decode_unit)
 df['u_obtained'] = df['ga110b'].apply(decode_unit)
 
+# --- unit code 77 ('valor'): the QUANTITY slot carries no quantity (GH #777)
+# units.json decodes ga106b/ga110b == 77 as `valor` -> 'value': the enumerator
+# recorded the item in money, not in a physical unit.  On those rows the
+# quantity field is not a quantity: measured on GAST-A.DTA, ga106a == 7.7 on
+# 10,798 of the 10,847 unit-77 purchase rows (77.0 on 3, 6.0 on 2, 1.0 on 1,
+# NaN on 43), and ga110a == 7.7 on 175 of the 180 unit-77 obtained rows (one
+# 7777.7).  The 7-repunit family co-occurs with code 77 almost exactly and
+# with two stray 7.7 rows (one under unit 75, one with no unit code),
+# which reads as the unit
+# code echoed into the quantity slot at one implied decimal -- an
+# interpretation of the co-occurrence; the household questionnaire
+# (pn97hhq.pdf) shows only the CANTIDAD / UNIDAD COD / TOTAL B/. grid and
+# carries no unit code card, so units.json is the sole decode of 77.
+#
+# Rule (option A of #777): key on the UNIT CODE, not on the value 7.7.  A
+# quantity "in valor" is not a quantity whatever its digits, so every
+# unit-77 quantity becomes NA; the expenditure (ga106c, median 2.59 B/.) is
+# real and is kept. Both stray rows are untouched. Unit-77 purchases
+# without expenditure are excluded by the purchase construction filter;
+# obtained rows have no expenditure and are excluded by ga110a.notna()
+# when the canonical source rows are constructed below.
+_UNIT_VALOR = 77
+_masked = {}
+for qcol, ucol in (('ga106a', 'ga106b'), ('ga110a', 'ga110b')):
+    code = pd.to_numeric(df[ucol], errors='coerce')
+    hit = (code == _UNIT_VALOR) & df[qcol].notna()
+    _masked[qcol] = int(hit.sum())
+    df.loc[code == _UNIT_VALOR, qcol] = np.nan
+print(f"Panama 1997 food_acquired: unit code {_UNIT_VALOR} ('valor') quantities "
+      f"set to NA -- {_masked} (GH #777; expected ~10,804 / ~179 as of "
+      f"2026-10-14)", file=sys.stderr)
+
 # --- harmonize food item j -------------------------------------------------
 # GH #783: the vocabulary moved out of the standalone food_items.org into
 # _/categorical_mapping.org as `harmonize_food` -- the only file
@@ -192,11 +224,25 @@ out.loc[~np.isfinite(out['Price']), 'Price'] = np.nan
 
 idx = ['t', 'i', 'j', 'u', 's']
 
+# GH #777 invariant: a survey-coded 'value' row (unit 77) never carries a
+# quantity.  The library's own value-only rows are the CAPITAL 'Value'
+# (Quantity = Expenditure by convention) and are a different population --
+# see Panama/_/CONTENTS.org "Value and value are TWO populations".
+_valor_q = out.loc[out['u'] == 'value', 'Quantity']
+assert _valor_q.notna().sum() == 0, (
+    f"Panama 1997: {_valor_q.notna().sum()} u='value' rows still carry a "
+    f"Quantity; the unit-77 mask above did not fire (GH #777)"
+)
+
 # Collapse duplicate (t,i,j,u,s) keys (same item/unit/source reported twice);
 # sum the quantities/expenditures, mean the per-unit price.
-out = out.groupby(idx, dropna=False).agg(Quantity=('Quantity', lambda s: s.sum(min_count=1)),
-                                          Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
-                                          Price=('Price', 'mean'))
+# Vectorised reducers, not per-group lambdas (GH #905): sum keeps min_count=1
+# so an all-NaN group stays NaN; the cython sum may differ from an in-order
+# Series.sum by a few ULP (<= 4, pinned by
+# tests/test_gh905_vectorised_min_count_sum.py; max 2 measured).
+_g = out.groupby(idx, dropna=False)
+out = _g[['Quantity', 'Expenditure']].sum(min_count=1)
+out['Price'] = _g['Price'].mean()
 out = out.dropna(how='all')
 
 if __name__ == '__main__':

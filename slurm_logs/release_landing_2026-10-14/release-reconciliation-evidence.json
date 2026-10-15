@@ -1,0 +1,409 @@
+{
+  "prepared_at_utc": "2026-10-15T04:59:20.189188+00:00",
+  "source_range": {
+    "base_tag": "v0.14.0",
+    "base_commit": "1528fa937bcf87f146b3af9ebfdbe18b8f912750",
+    "frozen_head": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+    "commit_count": 339,
+    "changed_path_count": 585
+  },
+  "snapshots": {
+    "release-all-issues-live.json": {
+      "sha256": "c1263d52a82834b4999f7ff8748ee8c43c7e93b78d0cddcdb7137c731bf0ac21",
+      "bytes": 1388973
+    },
+    "release-issues-live.json": {
+      "sha256": "b8a90bfc0b79f891779d499e253d0ea5e9d05b98b8c78b43d7ba7d817ad8d0d6",
+      "bytes": 549438
+    },
+    "release-merged-prs-live.json": {
+      "sha256": "03b3f4696a94fd7080b68322eeb5909f1dc89792cd416b9cd139f912a60f99d0",
+      "bytes": 817507
+    },
+    "release-prs-final-addendum.json": {
+      "sha256": "4c1d60286f1bab4e061fcc9596834ac963780c419af7de642e433effcbd8d12a",
+      "bytes": 9090
+    },
+    "windows-job-final.json": {
+      "sha256": "d6b84e64a311040a72a8154463b33906834c7e715ebb1e26bb6f1ebada6056ef",
+      "bytes": 2413
+    }
+  },
+  "open_issue_count": 127,
+  "all_issue_count": 430,
+  "merged_pr_snapshot_count": 150,
+  "closure_candidates": [
+    679,
+    693,
+    694,
+    700,
+    703,
+    712,
+    734,
+    777,
+    810,
+    841,
+    865,
+    868,
+    880,
+    909,
+    959,
+    970
+  ],
+  "required_preserved_umbrellas": [
+    787,
+    794,
+    824,
+    830,
+    833,
+    837,
+    905,
+    941
+  ],
+  "windows_job": {
+    "id": 116251866840,
+    "run_id": 38683117467,
+    "head_sha": "74c9398ecf3c1908feb539a99bce3f3f6bf6d04f",
+    "html_url": "https://github.com/ligon/LSMS_Library/actions/runs/38683117467/job/116251866840",
+    "status": "completed",
+    "conclusion": "success",
+    "completed_at": "2026-10-15T04:52:43Z"
+  },
+  "post_freeze_pr_snapshot": [
+    {
+      "headRefName": "docs/release-landing-evidence",
+      "mergeCommit": {
+        "oid": "1973242b48ec62ab808bc8f6e0667054fbb0703f"
+      },
+      "mergedAt": "2026-10-15T04:54:17Z",
+      "number": 997,
+      "state": "MERGED",
+      "title": "docs: record landing evidence and resolve historical branch dispositions",
+      "url": "https://github.com/ligon/LSMS_Library/pull/997"
+    },
+    {
+      "headRefName": "fix/peru-panama",
+      "mergeCommit": {
+        "oid": "ef0150faef3e792d5fda8f4e54dd4532647d758a"
+      },
+      "mergedAt": "2026-10-15T04:47:46Z",
+      "number": 996,
+      "state": "MERGED",
+      "title": "Peru and Panama: preserve sample identity and money-only food rows",
+      "url": "https://github.com/ligon/LSMS_Library/pull/996"
+    },
+    {
+      "headRefName": "fix/nigeria-w5-cluster",
+      "mergeCommit": {
+        "oid": "1f27c08036b3f0de84051f794f2c346017cfa85d"
+      },
+      "mergedAt": "2026-10-15T04:47:41Z",
+      "number": 995,
+      "state": "MERGED",
+      "title": "Nigeria W5: restore cluster identity and household-geovariable joins",
+      "url": "https://github.com/ligon/LSMS_Library/pull/995"
+    },
+    {
+      "headRefName": "fix/nigeria-824-followup",
+      "mergeCommit": {
+        "oid": "cfcb73b3a1998c88bb238daa7376f76c45a9ee96"
+      },
+      "mergedAt": "2026-10-15T04:53:43Z",
+      "number": 994,
+      "state": "MERGED",
+      "title": "Nigeria: expose reported W1/W2 crop sale units",
+      "url": "https://github.com/ligon/LSMS_Library/pull/994"
+    },
+    {
+      "headRefName": "fix/niger-followup-2",
+      "mergeCommit": {
+        "oid": "f9d3cbbc2fd8982d072fe7f0259b34285826e30a"
+      },
+      "mergedAt": "2026-10-15T04:47:36Z",
+      "number": 993,
+      "state": "MERGED",
+      "title": "Niger: preserve household extension identity, sale units, and source missingness",
+      "url": "https://github.com/ligon/LSMS_Library/pull/993"
+    },
+    {
+      "headRefName": "fix/600-provenance-landing",
+      "mergeCommit": {
+        "oid": "7518eb09a13efd65fb5e9b1d0ee1d25a1d408f72"
+      },
+      "mergedAt": "2026-10-15T04:40:38Z",
+      "number": 992,
+      "state": "MERGED",
+      "title": "provenance: represent multiple holdings, aliases, and derived catalog entries",
+      "url": "https://github.com/ligon/LSMS_Library/pull/992"
+    },
+    {
+      "headRefName": "fix/868-followup",
+      "mergeCommit": {
+        "oid": "3f3c05456020aac9c1f4e72bc41dbd88252f24c6"
+      },
+      "mergedAt": "2026-10-15T04:54:00Z",
+      "number": 991,
+      "state": "MERGED",
+      "title": "audit: retain grain-conflict reports through round-aware cache stamps",
+      "url": "https://github.com/ligon/LSMS_Library/pull/991"
+    },
+    {
+      "headRefName": "fix/readers-xport-sniff",
+      "mergeCommit": {
+        "oid": "010b84ba065dfece8467015abe206da964c3546b"
+      },
+      "mergedAt": "2026-10-15T04:53:56Z",
+      "number": 990,
+      "state": "MERGED",
+      "title": "readers: sniff binary formats and reject malformed Stata input",
+      "url": "https://github.com/ligon/LSMS_Library/pull/990"
+    },
+    {
+      "headRefName": "fix/810-followup",
+      "mergeCommit": {
+        "oid": "220043fd1e6d9d768502cd175e12ebc1c77a84f0"
+      },
+      "mergedAt": "2026-10-15T04:53:52Z",
+      "number": 989,
+      "state": "MERGED",
+      "title": "data: resolve raw inputs without cwd-rooted DVC access",
+      "url": "https://github.com/ligon/LSMS_Library/pull/989"
+    },
+    {
+      "headRefName": "fix/kinship-974",
+      "mergeCommit": {
+        "oid": "331552b5c5ee219721b544cfbcda2c03adf13f13"
+      },
+      "mergedAt": "2026-10-15T04:47:31Z",
+      "number": 988,
+      "state": "MERGED",
+      "title": "kinship: remove unreachable duplicate keys and pin crop-unit policy",
+      "url": "https://github.com/ligon/LSMS_Library/pull/988"
+    },
+    {
+      "headRefName": "fix/grader-scale-830",
+      "mergeCommit": {
+        "oid": "0398e536f79668371f374ff10f028dfba3ebdf37"
+      },
+      "mergedAt": "2026-10-15T04:40:34Z",
+      "number": 987,
+      "state": "MERGED",
+      "title": "coverage: warn about monetary scale changes across waves",
+      "url": "https://github.com/ligon/LSMS_Library/pull/987"
+    },
+    {
+      "headRefName": "fix/labels-relabel-787",
+      "mergeCommit": {
+        "oid": "99995044246c81bcf884c31027c5a99546c9d647"
+      },
+      "mergedAt": "2026-10-15T04:40:31Z",
+      "number": 986,
+      "state": "MERGED",
+      "title": "labels: report unmatched food labels and reject numeric targets",
+      "url": "https://github.com/ligon/LSMS_Library/pull/986"
+    },
+    {
+      "headRefName": "fix/ghana-docs-encoding",
+      "mergeCommit": {
+        "oid": "ed50943988d92a1ca337a9e84e8b3ae085118b1f"
+      },
+      "mergedAt": "2026-10-15T04:40:27Z",
+      "number": 985,
+      "state": "MERGED",
+      "title": "labels: repair curated Ghana text and reconcile country documentation",
+      "url": "https://github.com/ligon/LSMS_Library/pull/985"
+    },
+    {
+      "headRefName": "fix/831-followup",
+      "mergeCommit": {
+        "oid": "c319a25d93709444ba01dbac47b9bbf23d97db62"
+      },
+      "mergedAt": "2026-10-15T04:40:23Z",
+      "number": 984,
+      "state": "MERGED",
+      "title": "cache: report in-tree sources and preserve tracked configuration inputs",
+      "url": "https://github.com/ligon/LSMS_Library/pull/984"
+    },
+    {
+      "headRefName": "fix/framework-small-2",
+      "mergeCommit": {
+        "oid": "fe4e34f777bbbae2a0b72e349757f26806990f81"
+      },
+      "mergedAt": "2026-10-15T04:40:19Z",
+      "number": 983,
+      "state": "MERGED",
+      "title": "framework: validate country names, preserve values, and harden diagnostics",
+      "url": "https://github.com/ligon/LSMS_Library/pull/983"
+    },
+    {
+      "headRefName": "fix/970-json-make",
+      "mergeCommit": {
+        "oid": "0f648c325042c0674c6d76df7468ce425088fbde"
+      },
+      "mergedAt": "2026-10-15T04:54:04Z",
+      "number": 982,
+      "state": "MERGED",
+      "title": "country: read JSON caches directly without invoking make (#970)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/982"
+    },
+    {
+      "headRefName": "fix/burkina-2014",
+      "mergeCommit": {
+        "oid": "1ea13f2dbae66f9fbf6593c2734325e2402d22c1"
+      },
+      "mergedAt": "2026-10-15T04:47:28Z",
+      "number": 981,
+      "state": "MERGED",
+      "title": "Burkina Faso: preserve missing food quantities and repair label crosswalk parsing",
+      "url": "https://github.com/ligon/LSMS_Library/pull/981"
+    },
+    {
+      "headRefName": "fix/ci-skips",
+      "mergeCommit": {
+        "oid": "d9942cf7e96daee7e799e07174d0da97613d890c"
+      },
+      "mergedAt": "2026-10-15T04:25:26Z",
+      "number": 980,
+      "state": "MERGED",
+      "title": "ci: skip unavailable data early and enable manual credentialed validation",
+      "url": "https://github.com/ligon/LSMS_Library/pull/980"
+    },
+    {
+      "headRefName": "fix/970-json-make",
+      "mergeCommit": {
+        "oid": "75a4497447b981471580cad7f51bbbaff47603a4"
+      },
+      "mergedAt": "2026-10-15T01:58:44Z",
+      "number": 979,
+      "state": "MERGED",
+      "title": "country: load_json_cache never shells out to make (#970)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/979"
+    },
+    {
+      "headRefName": "ci/merge-queue",
+      "mergeCommit": {
+        "oid": "9827c727dcffdf1d6abfb011da29e380f4672b71"
+      },
+      "mergedAt": "2026-10-15T00:07:22Z",
+      "number": 973,
+      "state": "MERGED",
+      "title": "ci: single run per PR, skip docs-only pushes, merge_group trigger",
+      "url": "https://github.com/ligon/LSMS_Library/pull/973"
+    },
+    {
+      "headRefName": "fix/848-uganda-condition2",
+      "mergeCommit": {
+        "oid": "15cf4c95ed0ea04a1feb0c7c0ed17b9af06ee12b"
+      },
+      "mergedAt": "2026-10-15T00:40:37Z",
+      "number": 972,
+      "state": "MERGED",
+      "title": "Uganda 2018-19/2019-20: wire the second AGSEC5B harvest-condition slot (#848)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/972"
+    },
+    {
+      "headRefName": "fix/811-region-tables",
+      "mergeCommit": {
+        "oid": "c45f8d02cef9539c97cba4d60c7d625ba6c33f60"
+      },
+      "mergedAt": "2026-10-15T00:41:28Z",
+      "number": 971,
+      "state": "MERGED",
+      "title": "Guinea-Bissau/Burkina Faso/Senegal: canonical Region labels via categorical_mapping.org (#811)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/971"
+    },
+    {
+      "headRefName": "feature/964-windows-script-builds",
+      "mergeCommit": {
+        "oid": "77ccb51bad5c405dd8cc6421372e7c01889d214a"
+      },
+      "mergedAt": "2026-10-15T04:53:47Z",
+      "number": 969,
+      "state": "MERGED",
+      "title": "build: support Windows conda, no-make wave scripts, and UTF-8 readers",
+      "url": "https://github.com/ligon/LSMS_Library/pull/969"
+    },
+    {
+      "headRefName": "fix/962-uganda-food-units",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 967,
+      "state": "OPEN",
+      "title": "Uganda: preserve recorded food units and distinguish value-only acquisitions",
+      "url": "https://github.com/ligon/LSMS_Library/pull/967"
+    },
+    {
+      "headRefName": "fix/malawi-sale-units",
+      "mergeCommit": {
+        "oid": "4c2223aa119381ebcd8aea05fc2f9d26c3026028"
+      },
+      "mergedAt": "2026-09-26T06:42:45Z",
+      "number": 966,
+      "state": "MERGED",
+      "title": "fix(Malawi): preserve sale units and disclose basis inferences",
+      "url": "https://github.com/ligon/LSMS_Library/pull/966"
+    },
+    {
+      "headRefName": "feature/windows-readers",
+      "mergeCommit": {
+        "oid": "2a133a017f32b0e8fdc430a28ebfd9d7af371815"
+      },
+      "mergedAt": "2026-09-26T18:09:40Z",
+      "number": 965,
+      "state": "MERGED",
+      "title": "Windows: make the reader path work on native Windows",
+      "url": "https://github.com/ligon/LSMS_Library/pull/965"
+    },
+    {
+      "headRefName": "fix/metric-fraction-parse",
+      "mergeCommit": {
+        "oid": "aa3abef8895cb9475377f3c3a327537d9b8f0bf7"
+      },
+      "mergedAt": "2026-09-26T06:42:23Z",
+      "number": 963,
+      "state": "MERGED",
+      "title": "fix(units): _parse_explicit_metric reads a FRACTION, not the digits beside the unit",
+      "url": "https://github.com/ligon/LSMS_Library/pull/963"
+    },
+    {
+      "headRefName": "docs/953-mapping-resolution-durable",
+      "mergeCommit": {
+        "oid": "2c273527584eacb685171172cc43a7536c734d0c"
+      },
+      "mergedAt": "2026-09-26T06:41:44Z",
+      "number": 955,
+      "state": "MERGED",
+      "title": "docs+tests: make the categorical-mapping resolution model durable (#953)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/955"
+    },
+    {
+      "headRefName": "fix/813-kinship-source-defects",
+      "mergeCommit": {
+        "oid": "379b9e07baa82be89c66b50e5905ef1d22263cb7"
+      },
+      "mergedAt": "2026-09-26T06:42:37Z",
+      "number": 954,
+      "state": "MERGED",
+      "title": "gh813: fix the two labels leaking into the kinship lookup, at source",
+      "url": "https://github.com/ligon/LSMS_Library/pull/954"
+    },
+    {
+      "headRefName": "fix/948-ghanalss-relative-imports",
+      "mergeCommit": {
+        "oid": "171502fbb4cf0cd52cb4e7f4f69bad52a078e370"
+      },
+      "mergedAt": "2026-09-26T06:42:30Z",
+      "number": 952,
+      "state": "MERGED",
+      "title": "GhanaLSS: wave scripts import the country module relative to the script, not absolutely (#948)",
+      "url": "https://github.com/ligon/LSMS_Library/pull/952"
+    }
+  ],
+  "limitations": [
+    "Documentation-only reconciliation; no source/fixture edits or external mutations.",
+    "Historical #850 nutrition movement predates v0.14.0; #967 incremental change remains pending approval.",
+    "Full corpus/integrated credentialed CI results and scientific disposition pending.",
+    "Final native Windows result is scoped to the recorded validation head.",
+    "Full issue bodies retained in local control snapshots; only titles/status/dispositions are committed."
+  ]
+}

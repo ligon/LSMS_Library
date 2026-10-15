@@ -25,6 +25,18 @@ on:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
+  # Manual trigger (GH #941).  `data-tests` otherwise runs only on a push to
+  # master / separate_data, i.e. once per release -- so a failure there
+  # (52 EHCVM failures on the v0.14.0 push, 2026-09-17) could not be
+  # re-exercised against a fix without cutting another release, and every
+  # later `schedule` run reported "data-tests skipped".  Dispatching on a
+  # chosen ref runs the whole workflow, data-tests included (see its `if`).
+  workflow_dispatch:
+    inputs:
+      run_windows_script_build:
+        description: Run credentialed Windows conda script builds on this ref
+        type: boolean
+        default: false
 
 # One live run per ref (push) or per PR (pull_request): a new push cancels the
 # run it supersedes instead of queueing beside it.  2026-09-07: fourteen
@@ -92,12 +104,11 @@ jobs:
           --timeout=600 --timeout-method=thread
           --durations=25
 
-  # Windows reader smoke.  Nothing else in CI runs on Windows, so this is the
-  # only place its defaults are exercised: the cp1252 text encoding, no
-  # ``fork`` start method, no process groups, a case-insensitive checkout.
+  # Windows reader smoke exercises platform defaults: cp1252 text encoding,
+  # no ``fork`` start method, no process groups, a case-insensitive checkout.
   # Scope is the READER path (install, load every country's config, parse
-  # every data_info.yml) -- script-path ``make`` builds are not expected to
-  # work on Windows yet.  No secrets: nothing here reads microdata.
+  # every data_info.yml). The credentialed conda job below covers script
+  # builds. No secrets here: nothing in this job reads microdata.
   windows-smoke:
     runs-on: windows-latest
     # A hang (first seen: `import lsms_library; Country('Uganda')` sat for an
@@ -156,6 +167,63 @@ jobs:
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
 
+  # Windows script-path builds (GH #964): the conda route documented in
+  # environment-windows.yml -- conda-forge make + m2 tools, the library via
+  # pip.  The runner's own Git / MinGW / chocolatey tools are stripped from
+  # PATH and make/sh/find are asserted to resolve inside the conda env, so
+  # this measures what a user with only that environment gets.  Cold-builds
+  # two Uganda script-path tables and checks them against the Linux build:
+  #   Uganda:shocks rows=14457 waves=8 digest=64a53fa7af55
+  #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # Secrets are restricted to integration pushes or an explicit maintainer
+  # dispatch; pull requests (including forks) never execute this job.
+  windows-script-build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    # This job checks the wheel installed by pip, including its configs.
+    # Override the workflow's checkout path for this job only.
+    env:
+      PYTHONPATH: ""
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_windows_script_build)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: false
+          miniforge-version: latest
+          environment-file: environment-windows.yml
+          activate-environment: lsms
+      - name: Install the library
+        shell: cmd /C CALL {0}
+        run: pip install .
+      - name: Configure S3 read credentials
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          LSMS_SKIP_AUTH: "1"
+          AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
+        # No '%' anywhere: cmd would expand it as a variable reference.
+        run: >-
+          python -c "import os; from lsms_library.config import s3_creds_path as p;
+          e = os.environ; f = p(); f.parent.mkdir(parents=True, exist_ok=True);
+          f.write_text('[default]\naws_access_key_id = ' + e['AWS_ACCESS_KEY_ID'] + '\naws_secret_access_key = ' + e['AWS_SECRET_ACCESS_KEY'] + '\n', encoding='utf-8');
+          print('wrote', f)"
+      - name: Cold-build and compare with Linux
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          PROBE_STRIP: '\Git\,mingw64,chocolatey'
+          REQUIRE_CONDA_TOOLS: "1"
+          REQUIRE_INSTALLED_LIBRARY: "1"
+          EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
+          LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
+          LSMS_BUILD_WORKERS: "1"
+          PYTHONUNBUFFERED: "1"
+        run: python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
+
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
   # silent until someone needs the file.  scripts/dvc_remote_reachability.py
@@ -198,7 +266,10 @@ jobs:
   # `dvc commit` to update dep hashes without re-running pipelines.
   dvc-lock-check:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # Push only: a manual `workflow_dispatch` on master (GH #941) must re-run
+    # the tests, not feed the lockfile-refresh job below, which commits and
+    # pushes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     outputs:
       is_dirty: ${{ steps.check.outputs.is_dirty }}
     steps:
@@ -289,7 +360,19 @@ jobs:
   # Full data tests — builds Uganda tables and runs invariance checks
   data-tests:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data')
+    # Apply the AGENTS.md 3b limits to both prerequisite builds and tests.
+    # Keep pytest sequential below so session-order failures remain visible.
+    env:
+      LSMS_BUILD_WORKERS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    # Push to a release branch, or a manual `workflow_dispatch` on any ref
+    # (GH #941): the dispatch is the only way to re-run this job on a fix
+    # without a release.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -315,4 +398,7 @@ jobs:
           poetry run make -j2
         timeout-minutes: 30
       - name: Run full test suite
-        run: poetry run pytest --tb=short
+        run: >-
+          poetry run pytest --tb=short
+          --timeout=600 --timeout-method=thread
+          --durations=25

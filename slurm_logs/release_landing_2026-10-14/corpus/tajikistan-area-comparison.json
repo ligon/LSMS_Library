@@ -1,0 +1,5 @@
+{
+  "path": "Tajikistan/var/plot_features.parquet",
+  "transformation": "existing 2007 script division by 100 from sotka to hectares",
+  "exact_after_transformation": true
+}

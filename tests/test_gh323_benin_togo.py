@@ -80,6 +80,7 @@ def _plot_inputs(c):
                     f'{type(exc).__name__}: {exc}')
 
 
+@pytest.mark.requires_s3
 def test_plot_inputs_keeps_every_reported_row(country):
     """Every reported input line-item must survive to the API."""
     expected = {'Benin': BENIN_ROWS, 'Togo': TOGO_ROWS}[country.name]
@@ -119,6 +120,7 @@ def test_harmonize_seed_crop_is_injective_over_labels_in_use(country):
     )
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('cname,hh,pairs', [
     # Benin grappe 133 / menage 53 reported BOTH
     #   "Autres semences"                9 kg   (own production)

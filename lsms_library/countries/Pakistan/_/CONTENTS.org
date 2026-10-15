@@ -156,6 +156,14 @@ urban and rural areas".
 *Consequence:* an unweighted pooled tabulation of Pakistan 1991 is roughly
 half-urban and will not describe Pakistan.  Use the supplied raising factors.
 
+*Library delivery caveat, 2026-10-14:* the catalog's claim that raising factors
+were incorporated into distributed data, and the instruction above, are not
+implemented by the current sample table. The cold corpus returned 4,967 rows
+with =v=, =Rural= and =strata= only, matching =1991/_/data_info.yml=. This is
+a documentation/delivery gap, not evidence that weights never existed in
+upstream files. Resolve it by tracing the catalog claim to the actual release
+files or a source-supported explanation; do not fabricate a weight.
+
 *Self-representing cities are a certainty stratum.*  Ten cities enter the sample
 with certainty rather than by chance.  Verbatim, from =sampling_procedure=:
 

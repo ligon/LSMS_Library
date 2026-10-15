@@ -10,8 +10,9 @@ Two source files (the WB ${lab_roster} / ${lab_roster2}):
 
 One row per (plot, source); PersonDays summed within source (man/woman/child
 or per-member cells); Wage = cash paid to hired labor.  i from
-(GRAPPE, MENAGE) via niger.i (matching crop_production / sample, which omit
-EXTENSION).  plot = "{field}_{parcel}" aligns with crop_production's plot key.
+(GRAPPE, MENAGE, EXTENSION) via niger.i -- the full ECVMA2 household key,
+matching crop_production / sample (GH #679).  plot = "{field}_{parcel}"
+aligns with crop_production's plot key.
 """
 import sys
 
@@ -25,8 +26,8 @@ from niger import (i as niger_i, _coerce_days, _coerce_wage,
 
 
 def _hh(df):
-    return df.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                                index=['GRAPPE', 'MENAGE'])),
+    return df.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                                index=['GRAPPE', 'MENAGE', 'EXTENSION'])),
                     axis=1)
 
 

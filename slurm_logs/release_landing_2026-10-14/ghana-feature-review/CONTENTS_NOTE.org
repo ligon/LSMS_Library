@@ -1,0 +1,42 @@
+** Feature assembly drops null-key food rows separately from visit summation (2026-10-14)
+
+=Country('GhanaLSS').food_acquired()= retains the integer =visit= axis
+and is unique at that grain.  =Feature('food_acquired')(['GhanaLSS'])=
+removes =visit= to reach its canonical cross-country grain, then sums
+Quantity/Expenditure over the resulting duplicate keys.  That ordinary
+visit aggregation is distinct from the null-key deletion below; it does
+not standardize the recall windows documented above.
+
+On frozen source =7fa05179=, the country call serves 5,340,606 rows and
+the Feature call serves 1,704,880.  Of the reduction, 3,622,254 rows are
+combined through additive aggregation of non-null keys.  Another 13,472
+rows are deleted because the grouping keys contain nulls:
+
+| wave    | null key | deleted rows | Quantity checksum | Expenditure checksum |
+|---------+----------+--------------+-------------------+----------------------|
+| 1987-88 | v        |           54 |              8370 |                 8370 |
+| 1988-89 | v        |           38 | 5182.017543859649 |    5182.017543859649 |
+| 2016-17 | u        |        13380 |            3379.8 |              6720.55 |
+
+These are raw-column *audit checksums*, not kilograms or comparable
+economic totals: units, currencies and recall windows differ.  The
+GLSS7 set includes price-only produced rows; a deleted-row count is not
+a count of non-null quantities.  The country-native records remain
+available.  Independent in-memory replay from the raw food/sample
+parquets reproduces the mask and Feature row count; =math.fsum= of the
+retained input and output agrees for both additive columns.
+
+The collapse mechanism predates v0.14.0: =feature.py= and the relevant
+row-selector source are identical at that tag, pre-train =452302ad= and
+=7fa05179=.  Exact row counts on a rebuilt historical Country snapshot
+were not measured.  GH #847 explicitly scoped its change to reporting
+this class, not correcting every country.  Its closure does not mean
+these GhanaLSS rows are preserved in Feature assembly.
+
+This also qualifies Trap 9's "armed and waiting" description: no new
+Country duplicate is needed to activate the Feature collapse, because
+removing =visit= creates duplicate keys.  The 22 null-unit rows discussed
+under the 1998-99 wave reducer are a separate upstream loss, not the
+cohort counted here.  Choosing a source-supported unit/cluster treatment
+or changing assembly's null-key policy requires its own reviewed fix;
+this note changes neither identifiers nor measures.

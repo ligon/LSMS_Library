@@ -1,0 +1,20 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_helper_root_preserves_other_root_and_restores_paths[normal] _______
+../../control/framework/validation-followup/1003/negative/test_missing_entry_clear.py:177: in test_helper_root_preserves_other_root_and_restores_paths
+    assert sentinel.exists(), "helper in A deleted the previously cached B parquet"
+E   AssertionError: helper in A deleted the previously cached B parquet
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-47/test_helper_root_preserves_oth0/previous/Uganda/var/livestock.parquet').exists
+_____ test_helper_root_preserves_other_root_and_restores_paths[exception] ______
+../../control/framework/validation-followup/1003/negative/test_missing_entry_clear.py:177: in test_helper_root_preserves_other_root_and_restores_paths
+    assert sentinel.exists(), "helper in A deleted the previously cached B parquet"
+E   AssertionError: helper in A deleted the previously cached B parquet
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/local/job39919092/tmp/pytest-of-ligon/pytest-47/test_helper_root_preserves_oth1/previous/Uganda/var/livestock.parquet').exists
+=========================== short test summary info ============================
+FAILED ../../control/framework/validation-followup/1003/negative/test_missing_entry_clear.py::test_helper_root_preserves_other_root_and_restores_paths[normal]
+FAILED ../../control/framework/validation-followup/1003/negative/test_missing_entry_clear.py::test_helper_root_preserves_other_root_and_restores_paths[exception]
+2 failed, 16 deselected in 6.26s

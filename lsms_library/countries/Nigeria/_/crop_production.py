@@ -9,9 +9,11 @@ are transformations).
 Per-wave source structure (post-harvest round):
 
   W1 2010-11  secta3_harvestw1.dta      single plot-crop file; sold +
-              (Post Harvest Wave 1/Agriculture)   value at plot-crop grain.
+              (Post Harvest Wave 1/Agriculture)   value at plot-crop grain,
+                                        with the sale's OWN unit (sa3q11b).
   W2 2012-13  secta3_harvestw2.dta      single plot-crop file; sold +
-              (Post Harvest Wave 2/Agriculture)   value at plot-crop grain.
+              (Post Harvest Wave 2/Agriculture)   value at plot-crop grain,
+                                        with the sale's OWN unit (sa3q11b).
   W3 2015-16  secta3i_harvestw3.dta     annual plot-crop harvest qty/unit.
               (sold/value live in secta3ii at hh-crop grain -- no plot
                linkage, so NOT attributed to a plot here.)
@@ -37,6 +39,18 @@ Deliberately NOT wired: sa3iq6d_conv (W4) and sa3iq15_conv (W5) belong to the
 unit/size/condition columns this build never reads -- their factor describes a
 different container; and sa3iiq1_conv (secta3ii, W4/W5) is at hh-crop grain
 with no plot linkage, the same reason W3-W5 sales are left NaN here.
+
+Unit_sold (GH #824): the A3 sale block asks q11 "How much did you sell to
+or through this [BUYER]?" with its OWN quantity and PROD. UNIT CODE
+(sa3q11b), distinct from the harvest unit q6b that `u` carries.  W1/W2 pass
+it as `unit_sold`; it is canonicalised through the same `_canon_unit` as
+`u`.  Identified by the survey's value-label vocabulary -- sa3q11b carries
+the identical code->label set as the harvest unit column in both waves (W1
+36 labels, W2 48) -- not by the variable label, whose W1 text reads
+"(11a)...(unit)".  W3-W5 name NO sold unit, for the same reason their
+Quantity_sold / Value_sold are NaN: the sale sits in secta3ii at hh-crop
+grain with no plot linkage (GH #843), so `Unit_sold` is legitimately all-NA
+there (hence `optional: true`).  No sold-CONDITION column exists in W1/W2 A3.
 
 crop labels (j): cropcode -> Preferred Label via harmonize_food (shared
 with food_acquired; reused food labels where the crop is a consumed food).
@@ -115,7 +129,7 @@ inter = _align_intercropped(
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='sa3q2',
     qty='sa3q6a', unit='sa3q6b',
-    qty_sold='sa3q11a', value_sold='sa3q12', sold_on='plot',
+    qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
     intercropped=inter, perennial=False)], crop_labels))
 
 # ----------------------------- W2 2012-13 -----------------------------
@@ -129,7 +143,7 @@ inter = _align_intercropped(
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3q6a1', unit='sa3q6a2',
-    qty_sold='sa3q11a', value_sold='sa3q12', sold_on='plot',
+    qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
     intercropped=inter, perennial=False)], crop_labels))
 
 # ----------------------------- W3 2015-16 -----------------------------
@@ -204,5 +218,8 @@ df = df.sort_index()
 # Concatenating all-NaN waves (W1-W3, no `*_conv` anywhere) with float waves
 # can degrade the dtype; pin it so the parquet stores a float column.
 df['KgFactor'] = pd.to_numeric(df['KgFactor'], errors='coerce').astype('float64')
+# Same pin for Unit_sold: W3-W5 deliver an all-NA column, and the parquet
+# must store a string column, not object.
+df['Unit_sold'] = df['Unit_sold'].astype('string')
 
 to_parquet(df, '../var/crop_production.parquet')

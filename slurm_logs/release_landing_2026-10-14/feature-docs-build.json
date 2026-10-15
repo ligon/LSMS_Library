@@ -1,0 +1,20 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "16-23",
+    "/local/job39919092/release-work/framework/release-validation-env/bin/python",
+    "-m",
+    "mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/local/job39919092/release-work/control/feature-docs-validation/site"
+  ],
+  "exit_code": 0,
+  "seconds": 4.0117565132677555,
+  "log_sha256": "985f70440675c89aac0289fe44d4d11037caa2939b1b120305c0eb7d86a2e82a",
+  "source_identity_asserted": true,
+  "empty_config_and_data_roots": true,
+  "AWS_environment_scrubbed": true
+}

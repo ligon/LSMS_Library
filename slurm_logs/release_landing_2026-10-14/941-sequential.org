@@ -1,0 +1,31 @@
+#+title: GH #941 sequential cold candidate validation
+
+* Result and limit
+451 passed, zero skipped,176 warnings in1311.84s (21m51s). All delivered
+EHCVM checks executed; no missing Derivation or in-kind regression reproduced.
+This discharges the requested local sequence, not the unexplained historical
+CI failure. Keep #941 open pending the full credentialed CI result and any
+remaining root-cause question. Per-class counts:941-sequential-counts.json.
+
+* Frozen source and isolation
+Source ed1414fb9 is the combined landing candidate before final Niger/#600
+and documentation/workflow/test-only follow-ups. All five runtime code changes
+are included. The final full-suite verification remains a distinct gate.
+Worktree /local/job39919092/release-work/941-validation; private empty L2 at
+/local/job39919092/release-work/941-data. Only dvc-cache links to shared L1.
+Package/config identity asserted; credentials present without printing them.
+BLAS/OMP/MKL=1;LSMS_BUILD_WORKERS=1;CPU32-39; one pytest process, no xdist.
+No shared cache cleared or written. Logs remain private because warnings can
+contain source household identifiers; only aggregate results are archived.
+
+* Invocation
+PYTHONPATH and LSMS_COUNTRIES_ROOT point to the frozen worktree, LSMS_DATA_DIR
+to the private root, and PATH begins with /local/job39919092/venv_img/bin.
+#+begin_src sh
+/local/job39919092/venv_img/bin/python -m pytest   tests/test_add_market_index_dedup.py tests/test_albania_cluster_features.py   tests/test_build_transform_hash.py tests/test_burkina_faso_2014_passages.py   tests/test_coverage_matrix.py tests/test_currency.py   tests/test_currency_denominated_units.py tests/test_currency_livestock_registry.py   tests/test_declared_spellings.py tests/test_derivations.py tests/test_ehcvm_7day.py   -p no:xdist -q --timeout=600 --timeout-method=thread   --junitxml=/local/job39919092/release-work/logs/941-sequential.xml
+#+end_src
+
+The selection includes both the original issue sequence and the revised
+comment's actual predecessor builders. It begins with an empty L2, uses normal
+cache semantics, and runs serially so fixture/module contamination can persist
+from earlier files into the delivered EHCVM checks.

@@ -1,0 +1,340 @@
+commit	author_date	parents	subject
+99ca87d68c80ab4a6dac0b029ecc52169da1cbb6	2026-09-14T21:57:23+00:00	e7135d2d87ab498577200abbda0a9c79e8969031	Tweak
+769b43e0ef89bc47019e76b08dacc15c9dda6ebe	2026-09-16T12:22:51+00:00	99ca87d68c80ab4a6dac0b029ecc52169da1cbb6	Thoughts on CFE Aggregation.
+71f1f7c55df3192994a1fe7c7daecbd830c6bd8c	2026-09-16T12:24:02+00:00	769b43e0ef89bc47019e76b08dacc15c9dda6ebe 6666e0fea268ac8fe228a85543ec0680c4b9c7df	Merge branch 'development' of github.com:ligon/LSMS_Library into development
+bef35636c5aaefc550edbe2290ea409ae0379545	2026-09-16T19:22:15-07:00	ce4695ebe14293aa6b1f11fe4035b14501a888a2	docs: handoff -- v0.14.0 released; decisions taken overnight, open items
+f3781bc588fa6ed1552e2414ecb2855b83f573df	2026-09-16T19:26:52-07:00	bef35636c5aaefc550edbe2290ea409ae0379545	docs(release): v0.14.0 notes -- the library does import cfe; say what 0.10.0 changes for it
+ac8b65b7f8da4d5ea29951c01acdea2a02bb9af9	2026-09-16T22:14:20-07:00	f3781bc588fa6ed1552e2414ecb2855b83f573df	docs: handoff -- master data-tests red (test_ehcvm_7day), filed as #941
+a5f545670f8543394823065e5c8661bb035bfc2a	2026-09-17T05:17:20+00:00	71f1f7c55df3192994a1fe7c7daecbd830c6bd8c f3781bc588fa6ed1552e2414ecb2855b83f573df	Merge branch 'development' of github.com:ligon/LSMS_Library into development
+5dcc48dbbe96f4ebb69fb625bf84b3271bffe566	2026-09-17T05:18:35+00:00	a5f545670f8543394823065e5c8661bb035bfc2a ac8b65b7f8da4d5ea29951c01acdea2a02bb9af9	Merge branch 'development' of github.com:ligon/LSMS_Library into development
+c7610080d51e6675c18b892776994bae9c324449	2026-09-17T05:20:55+00:00	769b43e0ef89bc47019e76b08dacc15c9dda6ebe 1528fa937bcf87f146b3af9ebfdbe18b8f912750	Merge branch 'master' of github.com:ligon/LSMS_Library
+5d4faa0a1c3d47db22eb78db5c4b99d095388569	2026-09-17T05:22:04+00:00	5dcc48dbbe96f4ebb69fb625bf84b3271bffe566 c7610080d51e6675c18b892776994bae9c324449	Merge branch 'master' into development
+c44546df9a8b1bd2bfbad1c79d827d65916a4dff	2026-09-17T06:50:30-07:00	5d4faa0a1c3d47db22eb78db5c4b99d095388569	docs: handoff -- #941 hypothesis reviewed and amended
+19a0526e319a8fd94e95de6e03e85de3650f791f	2026-09-17T08:56:46-07:00	6666e0fea268ac8fe228a85543ec0680c4b9c7df	design(access): holder-gated S3 access -- one gate per access class, none on the warm path
+84ef2daa644632222d31ff52de4700469d10ccd7	2026-09-17T08:57:18-07:00	19a0526e319a8fd94e95de6e03e85de3650f791f	ledger: holder-gated access -- the fetch path has no gate; D1-D3 inherited from 09-04
+7667ece3047b8ef9602a7d9ed72c1ba113c3e83e	2026-09-17T08:59:02-07:00	84ef2daa644632222d31ff52de4700469d10ccd7	design(access): the interactive authenticate() fallback is a second gate-less path; GhanaSPS 2017-18's 100 files are unrecorded
+533e508d85c9dabc54c75c88dd6bd7979ceae226	2026-09-17T09:14:30-07:00	7667ece3047b8ef9602a7d9ed72c1ba113c3e83e	design(access): resolve the four open questions (EL, 2026-09-17); site entitlement layer for classes; GhanaSPS 2017-18 supersession measured
+25485ab0e75c3e1958742c2c148b6202461b27d9	2026-09-17T09:15:09-07:00	533e508d85c9dabc54c75c88dd6bd7979ceae226	ledger: holder-gated access -- D4-D8 resolved; site config layer added to §2
+1d1b195b13bae14a764d9e2f6d6b33575c46d1b8	2026-09-17T09:15:31-07:00	25485ab0e75c3e1958742c2c148b6202461b27d9	design(access): mechanisms table points at D5, not the retired Q2
+bacf5cc20a52f78f380cc4a93505cd219df9601a	2026-09-17T09:49:30-07:00	1d1b195b13bae14a764d9e2f6d6b33575c46d1b8	design(access): config holds per-holder API keys (secrets) and one GPG fingerprint (identity); the public key lives in the committed recipient list
+66255a449158ad0e4422acf7ead4f178134b4923	2026-09-17T09:51:30-07:00	bacf5cc20a52f78f380cc4a93505cd219df9601a	design(access): the grant store -- public keys keyed by fingerprint, each with the classes it grants and the permission that authorises it
+c39eba7f65cdc9e9ac4ead53b95cc68271273422	2026-09-17T09:52:07-07:00	66255a449158ad0e4422acf7ead4f178134b4923	ledger: holder-gated access -- grant store row; encrypt_class.py replaces encrypt_to_recipients.py
+c98946259977b309ba23537234935278aa7efb59	2026-09-17T13:06:47-07:00	c39eba7f65cdc9e9ac4ead53b95cc68271273422	ledger+findings: GhanaAHIES -- GSS NADA access measured, six documented files inventoried, quarter grain decided
+0f7402895d7875b44cc9aa7c5f751240b6abddc6	2026-09-17T13:59:22-07:00	c98946259977b309ba23537234935278aa7efb59	GhanaAHIES: scaffold the Ghana AHIES 2022-2024 quarterly panel (six blobs + docs on S3, provenance, catalog, capability)
+99bfb8da813d23d357f435e9b8e7d78729296b63	2026-09-17T14:05:57-07:00	0f7402895d7875b44cc9aa7c5f751240b6abddc6	GhanaAHIES 2024: sample, household_roster, individual_education, food_security, housing (four quarters from one folder)
+5cbae3ef3ec8c9cd4370ec4325ee839bbf8b1949	2026-09-17T14:09:33-07:00	99bfb8da813d23d357f435e9b8e7d78729296b63	handoff: GhanaAHIES in flight -- three worktree agents, open items for @ligon
+cf59ca9ab83b726bd33020e4572e84225d454fc5	2026-09-17T14:15:44-07:00	99bfb8da813d23d357f435e9b8e7d78729296b63	GhanaAHIES 2022: wave scripts for sample, household_roster, individual_education, food_security, housing
+1f02a07f22cc00812b6ece69487f51c5b59c46a3	2026-09-17T14:20:58-07:00	cf59ca9ab83b726bd33020e4572e84225d454fc5	GhanaAHIES 2022: CONTENTS.org section + verification; food_security docstring (301 all-NA FIES rows)
+903285e5aa050da9a0906d183ba74789ceb08ed0	2026-09-17T14:22:57-07:00	1f02a07f22cc00812b6ece69487f51c5b59c46a3	GhanaAHIES 2022: docstring/CONTENTS corrections -- code-17 claim scoped to what was measured, housing served rows, warning counts
+44aace3b88e59716fb5436188d00fc7189b704a6	2026-09-17T14:23:07-07:00	99bfb8da813d23d357f435e9b8e7d78729296b63	GhanaAHIES 2023: sample, household_roster, individual_education, food_security, housing (four quarters from one folder)
+21066d40b7f44517968e1ee1ce3f634b368ffb2d	2026-09-17T14:24:06-07:00	99bfb8da813d23d357f435e9b8e7d78729296b63	GhanaAHIES 2024: cluster_features, people_last7days, anthropometry
+a45fe175a4ec6da95e925609c98bb44e7ef474c9	2026-09-17T14:25:42-07:00	5cbae3ef3ec8c9cd4370ec4325ee839bbf8b1949 903285e5aa050da9a0906d183ba74789ceb08ed0	Merge feat/ghanaahies-2022: five tables for the 2022 folder
+246341baf8966886233d691d2a45f9ba8b0d230e	2026-09-17T14:25:42-07:00	a45fe175a4ec6da95e925609c98bb44e7ef474c9	ghana_ahies notes: the 16 extra 2022 SEC567 columns are Section 10/11B amounts (2022Q1-Q3), not s1*
+9dfac394771725d42bfabb9e6f8a4063053734dc	2026-09-17T14:27:42-07:00	44aace3b88e59716fb5436188d00fc7189b704a6	GhanaAHIES 2023: commit the variable-metadata dumps under 2023/Documentation
+616742f0ba1ca1debf8a5c7fe2984ba512f234ff	2026-09-17T14:27:43-07:00	246341baf8966886233d691d2a45f9ba8b0d230e 21066d40b7f44517968e1ee1ce3f634b368ffb2d	Merge feat/ghanaahies-2024-features: cluster_features, people_last7days, anthropometry for 2024
+181dfb210c0a304ebeb7409c28bbcb9ff6be1cf7	2026-09-17T14:36:05-07:00	616742f0ba1ca1debf8a5c7fe2984ba512f234ff 9dfac394771725d42bfabb9e6f8a4063053734dc	Merge feat/ghanaahies-2023: five tables for the 2023 folder
+29038c32995c5c23b31f1c1807e14544ee096d32	2026-09-17T14:55:57-07:00	181dfb210c0a304ebeb7409c28bbcb9ff6be1cf7	GhanaAHIES: ledger Phase 3 for 2022/2023/features, warm-build log, handoff
+953df8c04068efa4b19b32970711cfbf4df62b41	2026-09-17T15:01:09-07:00	29038c32995c5c23b31f1c1807e14544ee096d32	coverage: GhanaAHIES graded -- 84 sane, 24 absent, 11 not-asked, 4 asked-not-distributed, 1 undeclared
+26322d40048550381622eee829557af03773aa60	2026-09-17T15:04:49-07:00	953df8c04068efa4b19b32970711cfbf4df62b41	coverage: GhanaAHIES community_prices is unsure, not not-asked (no community instrument in hand); handoff next actions
+ac1aa812a8a07dace77d1ff3afbd99c22dc6c3c9	2026-09-17T16:14:42-07:00	26322d40048550381622eee829557af03773aa60	GhanaAHIES: Currency entry (GHS) and population records for all twelve quarters
+7d7929e0851215428a2af914d9be6e9bfcdf089a	2026-09-18T03:28:17-07:00	ac1aa812a8a07dace77d1ff3afbd99c22dc6c3c9	ghana_ahies: follow-up items for GSS (missing sections, the 2023Q3 hh_weight query, file anomalies, site access)
+d58d00cd423942efcb7ae05d84335af9fc6bd3e7	2026-09-18T04:18:11-07:00	7d7929e0851215428a2af914d9be6e9bfcdf089a c44546df9a8b1bd2bfbad1c79d827d65916a4dff	Merge github/development (v0.14.0, GhanaLSS Aggregate re-curation, #941) into the mirror's development
+e93595087ded202083f5bf6b9bd56f729dac65fa	2026-09-18T04:18:49-07:00	d58d00cd423942efcb7ae05d84335af9fc6bd3e7	handoff: one #+title; earlier notes demoted to headlines
+d96bc38e834e2eb0825b1f9233714834f72e3b4b	2026-09-18T05:00:57-07:00	e93595087ded202083f5bf6b9bd56f729dac65fa	triage: update the backlog triage for the Ghana set (16 issues, 122 open)
+f49435cec57c520cc247f054879aa4dbcfb68d04	2026-09-18T05:17:02-07:00	d96bc38e834e2eb0825b1f9233714834f72e3b4b	fix(Mali): fold the 2014-15 `Boîte` unit onto the EHCVM `Boite` label (#832)
+f98f9217112b995b136e31220c66a28b7de8c2a3	2026-09-18T05:17:15-07:00	f49435cec57c520cc247f054879aa4dbcfb68d04	fix(Malawi): one plate, one label -- 07/07c-07f join 07a/07b on `No 12 Plate` (#832)
+155660b6fb0db33544743bebc4b5f458760b7c15	2026-09-18T05:17:29-07:00	f98f9217112b995b136e31220c66a28b7de8c2a3	fix(Ethiopia): one `Other (Specify)`, and repair the double-encoded Zorba mojibake (#832)
+104c1a80a5fa0e67210f24359e935afe3b73572e	2026-09-18T05:17:40-07:00	155660b6fb0db33544743bebc4b5f458760b7c15	fix(Uganda): the dropped-unit warning now names the rows and the labels (#832)
+9ce8c82146a7e9366881fb00fbc2a93ab480c89e	2026-09-18T05:18:04-07:00	104c1a80a5fa0e67210f24359e935afe3b73572e	docs(Uganda): record the food_acquired unknown-unit DROP in CONTENTS.org (#832)
+12c0dec2b08e85f3bcbbd0f56f2d4bbd7c2c9bb6	2026-09-18T05:24:25-07:00	d96bc38e834e2eb0825b1f9233714834f72e3b4b	GhanaAHIES: anthropometry, cluster_features and people_last7days for all twelve quarters
+85547fa92ef38487948af4c6086f867b858d5c7a	2026-09-18T05:30:38-07:00	9ce8c82146a7e9366881fb00fbc2a93ab480c89e	fix(Ethiopia): strip the mojibake BEFORE title-case -- U+00EF, not U+00CF (#832)
+e3e10210eef2e39fadb900b729be8709da05b947	2026-09-18T05:24:20-07:00	c44546df9a8b1bd2bfbad1c79d827d65916a4dff	GhanaLSS 1998-99 food_acquired: the Price reducer was LIVE, not latent (#936)
+ed5b098544af1cf6c8bbbea86117a8f8faaa16af	2026-09-18T05:33:34-07:00	e3e10210eef2e39fadb900b729be8709da05b947	CONTENTS.org Trap 9: correct three claims taken on word rather than measured
+c881bdbb3fa6e13a3f54c108ed8ba3ef248bc7a1	2026-09-18T05:41:28-07:00	ed5b098544af1cf6c8bbbea86117a8f8faaa16af	1998-99 food_acquired: import ghanalss RELATIVELY, the house pattern (Trap 6)
+9c34eb3d702fd421a5a558e089ffab683337bcbf	2026-09-18T13:04:27+00:00	c44546df9a8b1bd2bfbad1c79d827d65916a4dff e93595087ded202083f5bf6b9bd56f729dac65fa	Merge pull request #944 from ligon/feat/ghanaahies
+3ffa0597d5c37ead1331fb88a22436ceca0de81c	2026-09-18T06:05:41-07:00	85547fa92ef38487948af4c6086f867b858d5c7a	test(Ethiopia): re-baseline the three shipped-factor pins the #832 fix moves
+efe0199a3cd46c08b0c4c3fa463965f4e03cc6b4	2026-09-18T06:09:48-07:00	3ffa0597d5c37ead1331fb88a22436ceca0de81c	fix(Ethiopia): harmonize cluster_features.Region -- 21 spellings, 11 regions (#832)
+2fc56821dbb706405103011ecf047900d961d6b6	2026-09-18T06:24:04-07:00	12c0dec2b08e85f3bcbbd0f56f2d4bbd7c2c9bb6 9c34eb3d702fd421a5a558e089ffab683337bcbf	Merge remote-tracking branch 'github/development' into development
+fee6b983664d888addbc4cd7aec7c74db6536d73	2026-09-18T14:08:21+00:00	9c34eb3d702fd421a5a558e089ffab683337bcbf 2fc56821dbb706405103011ecf047900d961d6b6	Merge pull request #950 from ligon/feat/ghanaahies-quarters
+ff1eb3f6585d4e58471088f7c823a687b3ed833f	2026-09-18T14:10:21+00:00	fee6b983664d888addbc4cd7aec7c74db6536d73 c881bdbb3fa6e13a3f54c108ed8ba3ef248bc7a1	Merge pull request #947 from ligon/fix/936-ghanalss-price-collapse-clean
+3cf124ca3886e08e98a3e10324270ea8ecdccda6	2026-09-18T14:11:37+00:00	ff1eb3f6585d4e58471088f7c823a687b3ed833f efe0199a3cd46c08b0c4c3fa463965f4e03cc6b4	Merge pull request #949 from ligon/fix/832-unit-spelling-residuals
+a8c7496cd30b903322fdd54a4a8fb4c77fd57e09	2026-09-18T07:33:43-07:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	kinship.yml: remove the 70 keys the lookup can never reach, and a test that keeps it at zero
+4b7d5af9bf49ddba04783f21ae551d86ba8728d8	2026-09-18T07:38:48-07:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	GhanaLSS: import the country module relative to the script, not absolutely (#948)
+533b797d68359f4808e2f8d92adbf590a5074b79	2026-09-18T07:39:22-07:00	2fc56821dbb706405103011ecf047900d961d6b6	gh942: cluster-identity diagnosis and design note (no code change)
+5f3475b814456b6e3290758fa497a54bfc4209e8	2026-09-18T08:03:22-07:00	533b797d68359f4808e2f8d92adbf590a5074b79 3cf124ca3886e08e98a3e10324270ea8ecdccda6	Merge remote-tracking branch 'github/development' into development
+e4ef13721ebd148062b439188ab45a1e2a50b737	2026-09-18T08:03:36-07:00	4b7d5af9bf49ddba04783f21ae551d86ba8728d8	GhanaLSS CONTENTS.org: record #948 as Trap 6's twin
+6efb964371393a22baec99f91f1b82a9c15d8d3b	2026-09-18T08:14:22-07:00	e4ef13721ebd148062b439188ab45a1e2a50b737	GhanaLSS 2012-13: restore the cross-country rung of the cascade (#948)
+ede17d8ac244408c89c0816f2dfa7ce13f989cca	2026-09-18T08:28:48-07:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	gh813: Senegal Relationship -- a missing answer is NA, not the string 'Nan'
+1fcdf1e5a8772470a03903cd772369d76e668636	2026-09-18T08:29:00-07:00	ede17d8ac244408c89c0816f2dfa7ce13f989cca	gh813: EthiopiaRHS -- make the org table's deliberately-empty labels actually NA
+fff5bba1a4ea48478c1e4afdfb6ca38939928874	2026-09-18T08:31:22-07:00	1fcdf1e5a8772470a03903cd772369d76e668636	gh813: record both decode defects in the countries' CONTENTS.org
+9179a91d1cb35c7ee218a3ac21650b85185bd266	2026-09-18T08:36:59-07:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	docs+tests: make the categorical-mapping resolution model durable (GH #953)
+dd18033b5e1fd9f62350714dcaf26453d2040595	2026-09-18T08:38:48-07:00	9179a91d1cb35c7ee218a3ac21650b85185bd266	Correct two line refs, the call count, and an overclaiming test name
+717258b68cc6f92223868a558234247cfb1f2d27	2026-09-18T08:47:04-07:00	5f3475b814456b6e3290758fa497a54bfc4209e8	kinship: adjudication of #813's unreached keys, and what #698/#804 need
+07c9e697d60c395858344bcb71abef395699e1a0	2026-09-18T08:49:07-07:00	717258b68cc6f92223868a558234247cfb1f2d27	canonical_housing_labels.org: stop the illustrative Roof/Floor tables reaching the resolver (GH #693)
+4cd347e1995e86422762353274462178f87413f6	2026-09-18T09:45:37-07:00	07c9e697d60c395858344bcb71abef395699e1a0	design: a composition model for categorical mappings (roles, key namespaces, terminal decode, declared commensurability)
+e517b601afc0b11df6dece486f2589c871487696	2026-09-18T11:28:25-07:00	4cd347e1995e86422762353274462178f87413f6	design: a worked example of the categorical composition model (GhanaLSS harmonize_food)
+261ea5caa367972acfa4a48fc08423e0d53ca003	2026-09-18T11:39:22-07:00	e517b601afc0b11df6dece486f2589c871487696	ghanalss: reconciliation queue for the unread wave-level Aggregate Label columns
+5410b0420f95767b6ee2ff8653a2ffeef9b2e48f	2026-09-18T11:57:14-07:00	261ea5caa367972acfa4a48fc08423e0d53ca003	design: separate alias tables from parameter tables (addendum)
+ee09d4760375180375495eb746c2dcd611d3cdc1	2026-09-18T11:58:20-07:00	5410b0420f95767b6ee2ff8653a2ffeef9b2e48f	design: mark the pound example as illustrative, not a claim about Guatemala
+63bf5a3ac71387783f0d74012bf65c2c8889db45	2026-09-18T12:31:43-07:00	ee09d4760375180375495eb746c2dcd611d3cdc1	design: trace the proposed model against a real defect (Malawi's six kilograms)
+f27a82e2b7b2d034f65a39c1dabe5f6d8e9aa601	2026-09-18T16:04:11-07:00	63bf5a3ac71387783f0d74012bf65c2c8889db45	Malawi: fold the two free-text kilogram spellings onto Kilogramme
+9c5e2081e9540b99410987d9965e9690c42e6039	2026-09-21T23:34:19-07:00	f27a82e2b7b2d034f65a39c1dabe5f6d8e9aa601	venv: capture the master environment before anyone changes it
+51d82a7f076e7163be5ef81cdb4348503034d1c8	2026-09-21T23:35:16-07:00	9c5e2081e9540b99410987d9965e9690c42e6039	Revert the accidental deletion of lectures/glss7_sample_design.org
+69eb3319e8df6f4a5b8d18e945e11bdcab8fb35c	2026-09-22T00:21:22-07:00	51d82a7f076e7163be5ef81cdb4348503034d1c8	venv: track poetry.lock, and record the master after applying it
+3499425e2f4fdee1b1b934a8dd0fc1abb52d0d03	2026-09-22T00:24:49-07:00	69eb3319e8df6f4a5b8d18e945e11bdcab8fb35c	venv: savio3 job to validate the new closure before promoting it
+8e46e892aae8c7946e59115fbdf0be0e54ac844c	2026-09-22T00:40:39-07:00	3499425e2f4fdee1b1b934a8dd0fc1abb52d0d03	venv: --chdir on the validation job, to silence a per-run stepd error
+c7306a8a64cdb60c0883927814bbcdf61d4c148d	2026-09-22T00:58:47-07:00	8e46e892aae8c7946e59115fbdf0be0e54ac844c	venv: warm mode for the validation job -- a cold run collects 2/3 of the suite
+f759c60ae294a7f280f78377d2f246cfd5c52f3e	2026-09-22T01:35:18-07:00	c7306a8a64cdb60c0883927814bbcdf61d4c148d	gitignore: .venv.sqfs* so a staged image cannot be committed
+bd82d78da321a4a38ff7df4c36eb90b1d5675898	2026-09-22T01:43:36-07:00	f759c60ae294a7f280f78377d2f246cfd5c52f3e	make: --no-root, and export PYTHONPATH for every recipe
+7d97b03408b6f2e818dcd8b224e5ca1279c1512a	2026-09-22T01:44:11-07:00	bd82d78da321a4a38ff7df4c36eb90b1d5675898	savio_venv: guard against re-imaging an editable install, and verify before repointing
+55412e65e141a168015f2c121d10efa8b074dfec	2026-09-22T01:45:01-07:00	7d97b03408b6f2e818dcd8b224e5ca1279c1512a	coverage: provision the venv from the CLONE, after the clone exists
+588b5ffee3fb7c9dc6a011ec60ff92f76d8344ec	2026-09-22T01:45:21-07:00	55412e65e141a168015f2c121d10efa8b074dfec	coverage shard: PYTHONPATH + identity assert, and a matching config root
+d72054a7dab35011bad9e63e49e1698306d52cf9	2026-09-22T02:01:41-07:00	588b5ffee3fb7c9dc6a011ec60ff92f76d8344ec	venv: make PYTHONPATH authoritative, and fix a guard that failed open
+6df53a5c61ff2b6b8b617b608faca85cf9210c03	2026-09-22T02:07:31-07:00	d72054a7dab35011bad9e63e49e1698306d52cf9	venv: keep PYTHONSAFEPATH out of build subprocesses; pin --no-root in CI
+9a828b0cc23ae3249fc9bb794cd150aff4e753b3	2026-09-22T03:06:26-07:00	6df53a5c61ff2b6b8b617b608faca85cf9210c03	conftest: retire the default-mode Uganda cache purge
+6ea2e77742ca952920ac27f7ac9ca6bf0ccc5424	2026-09-22T03:11:13-07:00	9a828b0cc23ae3249fc9bb794cd150aff4e753b3	venv: job to measure how far Uganda nutrition moved from its baseline
+8601d1d198dc268611dac20ca6eac1c78f82de96	2026-09-22T03:45:44-07:00	6ea2e77742ca952920ac27f7ac9ca6bf0ccc5424	venv: measure the nutrition delta under the OLD closure
+5857af273636144550c35084a84646d7f1bed7cc	2026-09-22T04:21:18-07:00	8601d1d198dc268611dac20ca6eac1c78f82de96	venv: suppress the pre-#914 panel_ids rule in the delta job
+ea63d031b092f1ea4e9c99b2407bceb4bc5b3865	2026-09-22T04:24:57-07:00	5857af273636144550c35084a84646d7f1bed7cc	Uganda: the nutrition baseline drift is 97.8% of rows, not a sample effect
+91118fd1a5be1462941258bd4c27763595cb5629	2026-09-22T09:25:33-07:00	ffcae2797bf657098b3a68913e1587b663dc69f0	fix(units): _parse_explicit_metric reads a FRACTION, not the digits beside the unit
+61b6bdcbfa2cdb119af93f8ac4cab468b9fc7671	2026-09-23T20:13:08+00:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	Make the reader path work on native Windows
+04dd2fb238f45f95df57dd50120235ca9443b1dc	2026-09-23T20:16:32+00:00	61b6bdcbfa2cdb119af93f8ac4cab468b9fc7671	ci(windows-smoke): split import smoke and collection from the test run
+c73c830a23b2dd9fa3a917e0334c52062c915de4	2026-09-23T21:18:38+00:00	04dd2fb238f45f95df57dd50120235ca9443b1dc	ci(windows-smoke): cap the job at 20 min; dump the stack of a hung import
+b8243c91f6de9bbadbfbc33d652491ef1e7d144e	2026-09-23T21:29:52+00:00	c73c830a23b2dd9fa3a917e0334c52062c915de4	ci(windows-smoke): swap python-magic for python-magic-bin (interim)
+c5d70c8707332b3b61ea70b04d02423806ae4357	2026-09-24T00:46:36-07:00	ea63d031b092f1ea4e9c99b2407bceb4bc5b3865	gh962: the draft against the corpus's unit conventions, measured on the 09-22 fixture
+660850f9ba393f0e05612a085ccd9c1b56124835	2026-09-24T02:04:00-07:00	c5d70c8707332b3b61ea70b04d02423806ae4357	backlog: dry-run triage of the 31 open bug+framework issues, and the headless-agent probe
+7ec62725b93cd3b0f842b15bbca73c27f4feac1a	2026-09-24T02:25:49-07:00	660850f9ba393f0e05612a085ccd9c1b56124835	backlog: fix-phase array on fc_jevons -- seven ungated dispatch-plan steps as headless agents
+242573697018b706b0943ddb80a40cf31d840cf1	2026-09-24T02:29:09-07:00	7ec62725b93cd3b0f842b15bbca73c27f4feac1a	backlog: fail closed when an array element finds no brief on the mirror
+88f3fef9671de55f22ecc16fc94038a2d1e2064e	2026-09-24T02:42:14-07:00	242573697018b706b0943ddb80a40cf31d840cf1	backlog: eighth element, #848 (Uganda condition-2 slot), now that the #962 draft is parked
+a126900688bef511c0c437e3d84b17141ea96dc8	2026-09-24T02:47:28-07:00	242573697018b706b0943ddb80a40cf31d840cf1	cli: `cache clear` names in-tree .dta/.sav/.csv, sidecar-less first (GH #831)
+4d4d16d64fff909cd6311a2623f72eadec15dfce	2026-09-24T02:48:33-07:00	242573697018b706b0943ddb80a40cf31d840cf1	gh810: change_id reads its crosswalk through get_dataframe, not a cwd-rooted dvc.api.open
+6733342a070bf7fd00380aaa2ca37f5c1fa1b921	2026-09-24T02:49:35-07:00	242573697018b706b0943ddb80a40cf31d840cf1	fix(Guinea-Bissau): serve cluster_features.Region in the strata spelling (#811)
+b396bcb5272214865f4755ea9c8fbbf2a0469136	2026-09-24T02:49:35-07:00	6733342a070bf7fd00380aaa2ca37f5c1fa1b921	fix(Burkina_Faso): harmonize cluster_features.Region -- 22 spellings, 13 regions (#811)
+9ba85575b9e7de1981f46a01bc37bbe608242b80	2026-09-24T02:49:35-07:00	b396bcb5272214865f4755ea9c8fbbf2a0469136	fix(Senegal): title-case cluster_features.Region (#811)
+bebe68a518fef37b51717a12c7e7b669c355c88f	2026-09-24T02:51:16-07:00	4d4d16d64fff909cd6311a2623f72eadec15dfce	gh810: get_dataframe's last-resort branch goes straight to the WB fallback, never through a cwd-rooted dvc.api.open
+8cc7eed2b5b28c87b77d3c2130b6eb24476dbd71	2026-09-24T02:58:29-07:00	242573697018b706b0943ddb80a40cf31d840cf1	Nigeria: carry the sale's own unit as crop_production.Unit_sold (W1/W2, GH #824)
+dda202b514584925ceb212bb0f75ce32c0f721cd	2026-09-24T03:00:30-07:00	242573697018b706b0943ddb80a40cf31d840cf1	gh868: reduce_to_agreed(on_conflict='na') files a cells_blanked grain report that survives the cache
+d0ec4b32fff38d7ca6acb537e0ef0034e09502b0	2026-09-24T03:02:02-07:00	242573697018b706b0943ddb80a40cf31d840cf1	Niger 2014-15: key households on (GRAPPE, MENAGE, EXTENSION) (GH #679)
+f231e6a6c217bd79976e85e1549138ac2a839921	2026-09-24T03:04:20-07:00	d0ec4b32fff38d7ca6acb537e0ef0034e09502b0	Niger: map the unlabelled all-nines "don't know" codes to NA, exact value only (GH #865)
+d568ab428d8f810b873dc3819cab80f28fd09c90	2026-09-24T03:06:33-07:00	8cc7eed2b5b28c87b77d3c2130b6eb24476dbd71	Nigeria CONTENTS.org: Unit_sold reproduced on the API frame; #867 alias measured on plot_inputs
+04c1efbf9a384ad9952e98ccec24b121ae406071	2026-09-24T03:08:03-07:00	f231e6a6c217bd79976e85e1549138ac2a839921	Niger crop_production: carry the SOLD unit, key the crop-level sale on it, drop s16d's repeated lines (GH #824)
+b502bb28db4a93dfe55408cd67485501370ec942	2026-09-24T03:08:21-07:00	04c1efbf9a384ad9952e98ccec24b121ae406071	Niger cluster_features.Region: add the lower-case 2018-19 spellings (GH #811)
+d36054864f6703dab1df95b976be8c642c94b62f	2026-09-24T03:08:56-07:00	b502bb28db4a93dfe55408cd67485501370ec942	Niger harmonize_food: fold the cross-wave spellings of cabbage and sugar; clean 'Aubergine,'; code 166 stays (GH #833)
+dd60636aa317489beced3f824347607b01ca5e2d	2026-09-24T03:15:28-07:00	88f3fef9671de55f22ecc16fc94038a2d1e2064e	backlog: harness rule + salvage commit -- a headless turn ends on a text-only message
+27c7f157a6271b98df07a3df9248c8a922f587be	2026-09-24T03:17:04-07:00	dd60636aa317489beced3f824347607b01ca5e2d	backlog: ninth element -- finish the Niger bundle (lost tests, CONTENTS correction, the cold rebuild)
+cc25a626c0a7796f4fbac42ae7d4e6d5bf924213	2026-09-24T03:23:17-07:00	88f3fef9671de55f22ecc16fc94038a2d1e2064e	Uganda crop_production: wire the season-B second condition slot, 2018-19 and 2019-20 (GH #848)
+98f8b8e6f1c4c95258e3d37336237140a5125e63	2026-09-24T03:28:03-07:00	27c7f157a6271b98df07a3df9248c8a922f587be	backlog: red-team review array -- one adversarial reviewer per fix branch, read-only
+b5103b64fc181fe67913540d38f24e13d75a456d	2026-09-24T03:29:07-07:00	98f8b8e6f1c4c95258e3d37336237140a5125e63	handoff: fix phase done, review array in flight
+198f03ad10f2c8528f70725337d418580aae4a45	2026-09-24T03:50:32-07:00	d36054864f6703dab1df95b976be8c642c94b62f	Niger: pin cluster_features.Region at 8 served labels (GH #811)
+99095ecee5c686dde1df82f2f7c694c5cb096dba	2026-09-24T03:50:32-07:00	198f03ad10f2c8528f70725337d418580aae4a45	Niger: pin the food_acquired label folds and the code-166 decision (GH #833)
+53e2752cb809194faaec9c63b6ef04679c8333f5	2026-09-24T03:50:32-07:00	99095ecee5c686dde1df82f2f7c694c5cb096dba	Niger: pin Unit_sold, the crop-level sale key and the s16d de-duplication (GH #824)
+62662cfd3e52838c6f55b2d25b6c9cd7a646d53a	2026-09-24T03:50:32-07:00	53e2752cb809194faaec9c63b6ef04679c8333f5	Niger CONTENTS.org: Unit_sold is carried, the agreement figures re-measured, #833 recorded (GH #824, #833, #679)
+fcea61515bdee13356ff9f7d79146b3e236ef0ec	2026-09-24T04:04:21-07:00	62662cfd3e52838c6f55b2d25b6c9cd7a646d53a	Niger: move the u-sentinel pins the bundle legitimately moves; record hid 27010 (GH #679, #865, #833)
+cad6c8797776f6fe5e8ae0c6480225f82c9552b2	2026-09-24T04:13:40-07:00	fcea61515bdee13356ff9f7d79146b3e236ef0ec	Niger: re-measure three claims that were stated, not measured (GH #811, #824, #679)
+e9e7909384a2ef1c598d17ad0a312f11801b0166	2026-09-24T04:17:12-07:00	b5103b64fc181fe67913540d38f24e13d75a456d	backlog: Niger red-team review element (bundle + follow-up on one branch)
+d7690138250ef67c5de33be3bfd710858224002c	2026-09-24T05:05:04-07:00	e9e7909384a2ef1c598d17ad0a312f11801b0166	backlog: review summary, all eight verdicts and reports, handoff
+1e7029a0e493d9b57fc7c4cdecb63bef33aef47c	2026-09-24T05:08:15-07:00	d7690138250ef67c5de33be3bfd710858224002c	backlog: record the session bill in the review summary and handoff
+f53e0513abd222d86f3c9c1d16cb90c69f98bb14	2026-09-24T05:11:11-07:00	1e7029a0e493d9b57fc7c4cdecb63bef33aef47c	backlog: Malawi sale-basis diagnosis element -- infer a missing shelled/unshelled basis from price (@ligon's ruling)
+48cf2b5333db95f83c0b2c498132865743e29a9d	2026-09-24T05:56:52-07:00	f53e0513abd222d86f3c9c1d16cb90c69f98bb14	backlog: Malawi price-basis probe result -- price decides Groundnut only; Tobacco/Cotton have no basis to decide
+9fb4bfcd994c3b1a7f07d3417d413794713b22a3	2026-09-24T09:56:23-07:00	48cf2b5333db95f83c0b2c498132865743e29a9d	backlog: Malawi derivations element -- the sale-basis ladder as registered derivations, one key per branch
+4841766323f19045b94d2a394b75b893f2959067	2026-09-24T10:52:17-07:00	9fb4bfcd994c3b1a7f07d3417d413794713b22a3	backlog: Malawi derivations report + red-team review element
+cb2bd1e5a917b9030e24740fcc7fe359b6123572	2026-09-24T11:26:37-07:00	4841766323f19045b94d2a394b75b893f2959067	backlog: Malawi derivations verdict (pass-with-fixes) and the three decisions it raises
+3acb23b9b91d5650412f99be28010ad4bbbda4cd	2026-09-25T01:44:24-07:00	cb2bd1e5a917b9030e24740fcc7fe359b6123572	backlog: ruling on Malawi decision (i) -- add the overrule key
+599acec52498a5ddafdc3de4374543bd892c048d	2026-09-25T02:09:54-07:00	3acb23b9b91d5650412f99be28010ad4bbbda4cd	backlog: Malawi derivations follow-up element -- overrule key, no-reference key, review fixes
+7f73862948b25b280052844bd083dc65129ba58b	2026-09-25T02:50:21-07:00	599acec52498a5ddafdc3de4374543bd892c048d	backlog: Malawi derivations-2 delivered; stack recorded
+d38961ec3c93c449f0c44fc2500b4999b9aee85a	2026-09-18T16:04:11-07:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6	Malawi: fold the two free-text kilogram spellings onto Kilogramme
+2747547bfca2bf40dfbf414f600d55e50b9c2024	2026-09-24T03:01:55-07:00	d38961ec3c93c449f0c44fc2500b4999b9aee85a	fix(Malawi): read the SALE's own shelled/unshelled (ag_i02c / ag_q02c); split Boiled groundnuts; correct the JOIN claims (GH #833, #839)
+b169b92f38769a9568f1cc9e6ba27da9e58e9379	2026-09-24T03:13:12-07:00	2747547bfca2bf40dfbf414f600d55e50b9c2024	docs(Malawi): record the sale-side condition, the Groundnut split and the JOIN correction (GH #833, #839)
+d94f8ef51e6f8ccff4efefaa719455e7be7d83a4	2026-09-24T10:38:25-07:00	b169b92f38769a9568f1cc9e6ba27da9e58e9379	feat(Malawi): the sale-basis LADDER as registered derivations (GH #833 follow-up)
+d1993a94ca590e52dfe9108cb9c822fb23a92ae5	2026-09-25T02:30:54-07:00	d94f8ef51e6f8ccff4efefaa719455e7be7d83a4	feat(Malawi): two more rungs on the sale-basis ladder -- price OVERRULES a recorded S/U, and "no reference" is its own key (@ligon rulings, 2026-09-25)
+1900ecbb30c8d09d1f8ad9232ccb5fabcfee7065	2026-09-25T22:33:40-07:00	d1993a94ca590e52dfe9108cb9c822fb23a92ae5	Clarify Malawi sale-basis derivation documentation
+2515d16686f556d630f89390383691ab3c13c7bc	2026-09-25T22:37:10-07:00	1900ecbb30c8d09d1f8ad9232ccb5fabcfee7065	Preserve null-unit sales in Malawi basis references
+fd81ff02c2698b1b1d590ea739ce79f81055c617	2026-09-25T22:54:40-07:00	2515d16686f556d630f89390383691ab3c13c7bc	ledger(Malawi): record sale-basis reuse and validation
+a27aae6d6ea139f0c0b40a5ac0a2d4183d580893	2026-09-25T22:57:28-07:00	fd81ff02c2698b1b1d590ea739ce79f81055c617	docs(Malawi): record cold-build PR validation and cache scope
+e43dbe0964b41c499a4c629681ab5f14d85cd89c	2026-09-25T22:59:09-07:00	7f73862948b25b280052844bd083dc65129ba58b	docs: hand off Malawi units PR 966
+6934c89eb1df0def15e1e2d417510d25a05db95c	2026-09-25T23:19:56-07:00	e43dbe0964b41c499a4c629681ab5f14d85cd89c	docs: review open PR consistency and preferred merge order
+2c273527584eacb685171172cc43a7536c734d0c	2026-09-26T06:41:43+00:00	3cf124ca3886e08e98a3e10324270ea8ecdccda6 dd18033b5e1fd9f62350714dcaf26453d2040595	Merge pull request #955 from ligon/docs/953-mapping-resolution-durable
+b0e61fa235b690d927525f3bb9b143fd307450db	2026-09-26T06:42:15+00:00	2c273527584eacb685171172cc43a7536c734d0c a8c7496cd30b903322fdd54a4a8fb4c77fd57e09	Merge pull request #951 from ligon/fix/945-kinship-unreachable-keys
+aa3abef8895cb9475377f3c3a327537d9b8f0bf7	2026-09-26T06:42:23+00:00	b0e61fa235b690d927525f3bb9b143fd307450db 91118fd1a5be1462941258bd4c27763595cb5629	Merge pull request #963 from ligon/fix/metric-fraction-parse
+171502fbb4cf0cd52cb4e7f4f69bad52a078e370	2026-09-26T06:42:30+00:00	aa3abef8895cb9475377f3c3a327537d9b8f0bf7 6efb964371393a22baec99f91f1b82a9c15d8d3b	Merge pull request #952 from ligon/fix/948-ghanalss-relative-imports
+379b9e07baa82be89c66b50e5905ef1d22263cb7	2026-09-26T06:42:37+00:00	171502fbb4cf0cd52cb4e7f4f69bad52a078e370 fff5bba1a4ea48478c1e4afdfb6ca38939928874	Merge pull request #954 from ligon/fix/813-kinship-source-defects
+4c2223aa119381ebcd8aea05fc2f9d26c3026028	2026-09-26T06:42:44+00:00	379b9e07baa82be89c66b50e5905ef1d22263cb7 a27aae6d6ea139f0c0b40a5ac0a2d4183d580893	Merge pull request #966 from ligon/fix/malawi-sale-units
+75172f888a85f005c5a505f3fe9b208626eb08b4	2026-09-25T23:44:13-07:00	6934c89eb1df0def15e1e2d417510d25a05db95c	Record reviewed PR merges and Uganda continuation
+b22720d25bb45fb37957a75ca699b0c4d2d9e16e	2026-09-25T23:45:33-07:00	4c2223aa119381ebcd8aea05fc2f9d26c3026028	ledger: ground Uganda food-unit correction in existing sentinels
+d57e7e9d0a008334be44874d7ce828870c9e6afd	2026-09-25T23:54:40-07:00	b22720d25bb45fb37957a75ca699b0c4d2d9e16e	ledger: resolve Uganda source labels and value-only edge cases
+a45d319bd271dc7aa0873d4ca0b2ea30201576fd	2026-09-26T00:02:50-07:00	d57e7e9d0a008334be44874d7ce828870c9e6afd	fix(Uganda): preserve food unit meaning and value-only acquisitions
+784dd2552e0b8d97141ad60c7cf19ab380125672	2026-09-26T00:03:37-07:00	a45d319bd271dc7aa0873d4ca0b2ea30201576fd	docs: retain aggregate Uganda unit catalog evidence
+5ce6db6b337d05b37a2f713458d0273819b09fe0	2026-09-26T00:08:02-07:00	75172f888a85f005c5a505f3fe9b208626eb08b4	Record Uganda implementation and active verification
+72f8bce34f50159d0f0eb608d0b6578bfceac810	2026-09-26T00:25:57-07:00	784dd2552e0b8d97141ad60c7cf19ab380125672	Preserve categorical units when classifying value-only food
+24bd5d084b4562578523fda33a5586a6a0bf0e79	2026-09-26T00:36:42-07:00	72f8bce34f50159d0f0eb608d0b6578bfceac810	Pin the nine verified Uganda food acquisition fingerprints
+a2b44daa677a02c82b60e05016df45e194597e32	2026-09-26T00:37:29-07:00	24bd5d084b4562578523fda33a5586a6a0bf0e79	Record cold Uganda food and nutrition verification
+920da90582f1147b3f5dd63ee11dfa2c9c8fb62c	2026-09-26T00:39:33-07:00	5ce6db6b337d05b37a2f713458d0273819b09fe0	Record merged PRs and verified Uganda corrections PR967
+abad042f79fba2c12f18e4c1da671dddd298db86	2026-09-26T17:16:13+00:00	b8243c91f6de9bbadbfbc33d652491ef1e7d144e	Require ligonlibrary>=0.2.3; drop the interim python-magic swap
+2a133a017f32b0e8fdc430a28ebfd9d7af371815	2026-09-26T18:09:40+00:00	4c2223aa119381ebcd8aea05fc2f9d26c3026028 abad042f79fba2c12f18e4c1da671dddd298db86	Merge pull request #965 from ligon/feature/windows-readers
+5b6020d5a3bdde182c1fc99246036e6432116919	2026-09-26T18:21:17+00:00	2a133a017f32b0e8fdc430a28ebfd9d7af371815	Add a data-free probe of GNU make on windows-latest (GH #964)
+3b928f70f336ea376e092516e206aaa454915b8f	2026-09-26T18:28:36+00:00	5b6020d5a3bdde182c1fc99246036e6432116919	probe (GH #964): add a conda variant and a grab_data-shaped relative target
+b4ba0dec588da4f70e63a460ac9c319f4d01fe71	2026-09-26T18:34:11+00:00	3b928f70f336ea376e092516e206aaa454915b8f	ci (GH #964): cold-build real Uganda script-path tables on Windows via conda
+34c104ab98b35442014ea57380b79a8c5f1948e8	2026-09-26T18:36:55+00:00	b4ba0dec588da4f70e63a460ac9c319f4d01fe71	ci (GH #964): 'call conda' so the pip install line runs
+9f1335dec457f5a6c250470d1c1c272bcdb16d44	2026-09-26T18:43:58+00:00	34c104ab98b35442014ea57380b79a8c5f1948e8	Import GitPython lazily so 'import lsms_library' works without git
+505ca8b2b51b65e9ff29ead4dc607afa1cae91ea	2026-09-26T18:51:22+00:00	9f1335dec457f5a6c250470d1c1c272bcdb16d44	Windows make: POSIX wave target in grab_data; quote find globs (GH #964)
+69562e3b0bb3b0b2819927aab9ed7fd5176e99d2	2026-09-26T19:00:01+00:00	505ca8b2b51b65e9ff29ead4dc607afa1cae91ea	Makefiles: find -name "*.py" (double quotes); check the expansion on Windows
+a3faf7727c330444e476287035dbaa4364d017bd	2026-09-26T19:10:06+00:00	69562e3b0bb3b0b2819927aab9ed7fd5176e99d2	Windows via conda: environment-windows.yml, docs, one CI check (GH #964)
+2e378814f467301c414c554dc97df596e39f6bc6	2026-09-29T08:53:43+00:00	a3faf7727c330444e476287035dbaa4364d017bd	Build wave scripts without make (GH #968); fold in #965's deferred encoding readers
+60188284c02240ed0c0006c6afd45809313323a5	2026-09-29T08:54:48+00:00	2e378814f467301c414c554dc97df596e39f6bc6	Handoff: verify and re-warm #969 on HPC (Windows builds, #968, #965 follow-up)
+f9993cfe01713dea9fd356a769694b1ead6fa47e	2026-10-01T09:50:33+02:00	60188284c02240ed0c0006c6afd45809313323a5	Point the shell-out env guard at _build_wave_script_target (GH #968)
+796386fa70c1d7569a579b01c954a502b00eac1d	2026-10-14T15:51:33-07:00	920da90582f1147b3f5dd63ee11dfa2c9c8fb62c 2a133a017f32b0e8fdc430a28ebfd9d7af371815	Merge GitHub development (2a133a017, through PR #965) into mirror development
+fa9c8d605e9bd8b913dd124cd4eb4d00bca2de75	2026-10-14T15:54:56-07:00	796386fa70c1d7569a579b01c954a502b00eac1d	poetry.lock: regenerate for ligonlibrary>=0.2.3 (post-merge)
+4872a7b9ed0b33c6dafe49d78f1ef8c44c769674	2026-10-14T15:58:03-07:00	fa9c8d605e9bd8b913dd124cd4eb4d00bca2de75	backlog: record the 2026-10-14 rulings; follow-up array (6 elements) ready to dispatch
+53d6fb7770cdb1b281103e8b012fa70210e9ae27	2026-10-14T16:08:44-07:00	4872a7b9ed0b33c6dafe49d78f1ef8c44c769674	ci: push runs only on integration branches, skip docs-only pushes, add merge_group
+24cd065b02edcb10f3e51974849cb21239013f71	2026-10-14T16:11:20-07:00	53d6fb7770cdb1b281103e8b012fa70210e9ae27	ci: windows-smoke poetry install --no-root (test_every_poetry_install_passes_no_root)
+2fbea0d2b3df24829790703c4a14e2763112c7c6	2026-10-14T16:11:43-07:00	4872a7b9ed0b33c6dafe49d78f1ef8c44c769674	tests: canonical_housing_labels.org now pins the #693 fix, not the confusion
+e2d6b578902d3cee5a5daab6741bd70be3acd2a0	2026-10-14T16:12:30-07:00	2fbea0d2b3df24829790703c4a14e2763112c7c6	handoff: 2026-10-14 -- forks merged, CI slimmed, follow-up array 39919516 in flight
+340e30f1e9056199db3627db992e8a657968c5ab	2026-10-14T16:16:32-07:00	e2d6b578902d3cee5a5daab6741bd70be3acd2a0	backlog: local runner for the follow-up array (six headless agents on one savio3 node)
+438cb8060495765b60c467c5cb17839226b9e6f7	2026-10-14T16:17:25-07:00	a126900688bef511c0c437e3d84b17141ea96dc8 340e30f1e9056199db3627db992e8a657968c5ab	Merge remote-tracking branch 'origin/development' into fix/831-followup
+9ffefeb76fc28950470c91143548d14bc2b9aeab	2026-10-14T16:17:28-07:00	bebe68a518fef37b51717a12c7e7b669c355c88f 340e30f1e9056199db3627db992e8a657968c5ab	Merge remote-tracking branch 'origin/development' into fix/810-followup
+b471342e73b82719bf478e1ffc97411997a5ec98	2026-10-14T16:17:29-07:00	dda202b514584925ceb212bb0f75ce32c0f721cd 340e30f1e9056199db3627db992e8a657968c5ab	Merge remote-tracking branch 'origin/development' into fix/868-followup
+fcb4298d6b0a29f578b96daee01e0eea7d04aa1b	2026-10-14T16:17:31-07:00	d568ab428d8f810b873dc3819cab80f28fd09c90 340e30f1e9056199db3627db992e8a657968c5ab	Merge remote-tracking branch 'origin/development' into fix/nigeria-824-followup
+add102cbbb6ef4e60f239b74900cef7d331acac9	2026-10-14T16:17:31-07:00	cad6c8797776f6fe5e8ae0c6480225f82c9552b2 340e30f1e9056199db3627db992e8a657968c5ab	Merge remote-tracking branch 'origin/development' into fix/niger-followup-2
+858c41b474bb38a803b920eed14718a7e0f89175	2026-10-14T16:26:00-07:00	438cb8060495765b60c467c5cb17839226b9e6f7	cli: `cache clear` in-tree audit follow-ups -- empty ls-files is not consulted, wider suffix set, Panama unittable.csv under _/ (GH #831)
+110a73f12f8ae00af6ade3c43d3869343df363da	2026-10-14T16:24:06-07:00	fcb4298d6b0a29f578b96daee01e0eea7d04aa1b	Nigeria #824 follow-up: withdraw the #867 nitrogen alias by ruling; measured docs
+0014e7332139732a64af296b862f7d1044af4d3c	2026-10-14T16:26:53-07:00	9ffefeb76fc28950470c91143548d14bc2b9aeab	gh810 follow-up: the else-branch comment states what is NEW about the WB route, not "as before"
+9dfb8339455957739896730216493ba4453a9693	2026-10-14T16:27:22-07:00	b471342e73b82719bf478e1ffc97411997a5ec98	gh868 follow-up: name the wave-folder context, rename the cells_blanked collapse count, correct the cold-path sentence
+fde45bd6649256ac6400177537025d6b0dea29c1	2026-10-14T16:28:02-07:00	340e30f1e9056199db3627db992e8a657968c5ab	country: load_json_cache never shells out to make (GH #970)
+d6fe02ed71f1e51b8e7efaac41ab80c5ff7b5a35	2026-10-14T16:35:57-07:00	24cd065b02edcb10f3e51974849cb21239013f71 340e30f1e9056199db3627db992e8a657968c5ab	Merge branch 'development' into ci/merge-queue
+4998ef4d26c8c4fac86ca6bf871b130e6f28252a	2026-10-14T16:38:29-07:00	add102cbbb6ef4e60f239b74900cef7d331acac9	Niger: apply the red-team follow-ups to the #679 / #824 / #833 record (GH #679, #865, #824, #811, #833)
+a7cf04f2d20967ae85e0cfcd13b6ee13df72f695	2026-10-14T16:39:55-07:00	340e30f1e9056199db3627db992e8a657968c5ab	backlog: read-only triage array for the 74 open issues the 09-24 triage did not cover (6 groups, savio3 whole nodes)
+e34a708c673f5ada1350e065b4048afc50f06901	2026-10-14T16:48:25-07:00	a7cf04f2d20967ae85e0cfcd13b6ee13df72f695	backlog-workflow: an open issue must describe exactly the remaining work (narrow or split; never a bare partial)
+9827c727dcffdf1d6abfb011da29e380f4672b71	2026-10-14T17:07:22-07:00	2fbea0d2b3df24829790703c4a14e2763112c7c6 d6fe02ed71f1e51b8e7efaac41ab80c5ff7b5a35	Merge pull request #973 from ligon/ci/merge-queue
+c18745c493ce58704b80ad1eb023bdbff2ac59b0	2026-10-14T17:08:39-07:00	9ba85575b9e7de1981f46a01bc37bbe608242b80 e34a708c673f5ada1350e065b4048afc50f06901	Merge branch 'development' into tmp-811-region-tables
+182e19b76719a409f6f3d730ee67b487c275d0af	2026-10-14T17:08:43-07:00	cc25a626c0a7796f4fbac42ae7d4e6d5bf924213 e34a708c673f5ada1350e065b4048afc50f06901	Merge branch 'development' into tmp-848-uganda-condition2
+a91c934be21cea294a20181755c065968d6a9e8e	2026-10-14T17:09:07-07:00	e34a708c673f5ada1350e065b4048afc50f06901 9827c727dcffdf1d6abfb011da29e380f4672b71	Merge GitHub development (PR #973 merged) into mirror development
+75e347042f4a9d87f3deb7812f4135a3e388da79	2026-10-14T17:09:13-07:00	c18745c493ce58704b80ad1eb023bdbff2ac59b0 a91c934be21cea294a20181755c065968d6a9e8e	Merge branch 'development' into tmp-811-region-tables
+1d36fb97685c51113b6c5adb1ea7af0d3793adf9	2026-10-14T17:09:16-07:00	182e19b76719a409f6f3d730ee67b487c275d0af a91c934be21cea294a20181755c065968d6a9e8e	Merge branch 'development' into tmp-848-uganda-condition2
+d71e3954d70007504d852af2f48a297f0e75a3ac	2026-10-14T17:11:36-07:00	a91c934be21cea294a20181755c065968d6a9e8e	backlog: triage synthesis for the 74 untriaged issues (records, per-group reports, SYNTHESIS.org)
+eeb445ebf1d0b690bf71bc45bedb6c2215c7b53e	2026-10-14T17:11:43-07:00	110a73f12f8ae00af6ade3c43d3869343df363da	Nigeria CONTENTS.org / test comment: state the s11dq3 provenance per wave as measured
+ba27e8c1efe5f504ab82c93deee11f9fc291d8f4	2026-10-14T17:14:29-07:00	d71e3954d70007504d852af2f48a297f0e75a3ac	backlog: fix array 2 -- ten no-decision elements from the 2026-10-14 triage (briefs, elements, sbatch)
+2ed85b49b1382fa01b846063c63912eca19b534c	2026-10-14T17:15:09-07:00	ba27e8c1efe5f504ab82c93deee11f9fc291d8f4	backlog: fix array 2 -- complete the package (elements.txt, four remaining briefs)
+b6feef57812432d4ac89d7bd4f0669e933aabae4	2026-10-14T17:19:45-07:00	4998ef4d26c8c4fac86ca6bf871b130e6f28252a	Niger CONTENTS.org: scope the "every other table unchanged" claim to 2014-15; record the #865 row moves
+4ae96f1037d4a868e74267677b962a6b5a1d8b51	2026-10-14T17:28:34-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	country: strip only string values before a categorical replace (GH #694)
+21a8e9e071f5b98b217512db5b0e0e0e9bc490c7	2026-10-14T17:28:50-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	GhanaLSS: replace committed cp1252-as-latin-1 C1 controls in curated labels (GH #926)
+b374c7d7cd3528329f4a0af0c0e180a3db73d2cb	2026-10-14T17:29:22-07:00	fde45bd6649256ac6400177537025d6b0dea29c1	tests(gh970): clear the lru-cached data_root in the cold-root fixture
+e5c168e1422b86a1ce9c3ec0ecd192baeee5e2fd	2026-10-14T17:29:46-07:00	4ae96f1037d4a868e74267677b962a6b5a1d8b51	Country(): raise ValueError with near-miss suggestions for a name with no directory (GH #915, half 1)
+fb369fcea4b8e6240cbf935561b6c32d9ca3534a	2026-10-14T17:31:14-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	kinship.yml: apply the #813 adjudication -- delete 15 dead keys, collapse 15 duplicate lines (#974, #945)
+809233da27958c46998c97d6365db36a70b2ab71	2026-10-14T17:31:14-07:00	fb369fcea4b8e6240cbf935561b6c32d9ca3534a	harvest_kg_factors: document and pin that the crop ladder is blind to declared u_kg (#931 items 1+3)
+055af9ce3634c568bc2eef4351c19ad20c739871	2026-10-14T17:31:39-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	Nigeria: declare cluster_features for W5 (2023-24) from the cover page, no geovars (GH #841)
+f4ad88885bb9e8c05668a98a32824749822faf9b	2026-10-14T17:32:02-07:00	b374c7d7cd3528329f4a0af0c0e180a3db73d2cb	tests(gh970): restore the data_root cache on fixture teardown
+7cd765267a4ee599e9f0ad02d3ca37feeab06559	2026-10-14T17:32:46-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	Peru: wire sample (v, Rural) for 1994 and pad v to match i (GH #700)
+8c7d61c58a660f27d753d24c2931c2a2e3fac11a	2026-10-14T17:35:01-07:00	21a8e9e071f5b98b217512db5b0e0e0e9bc490c7	GhanaSPS: CONTENTS.org §2 -- wave-1 MonthsAway IS wired (NaN -> 0), superseding 'not wired' (GH #880)
+af637df9a1765e74e2711504a0d931c0ab4b5145	2026-10-14T17:35:01-07:00	8c7d61c58a660f27d753d24c2931c2a2e3fac11a	EHCVM: record the measured region-level allocation beneath the 'single two-stage draw' quotes (GH #812)
+df3b211f682d3e27e798896e638d3adad98d748f	2026-10-14T17:36:28-07:00	055af9ce3634c568bc2eef4351c19ad20c739871	Nigeria CONTENTS.org: state the W5 lossless-collapse claim from measurement
+dd0363fb621fd62eb57391faef50c0a29771ce32	2026-10-14T17:37:23-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	labels=: normalise ' Label', report pass-through, refuse numeric targets (GH #787 a-c)
+e95f8d7921c3b460dc951b0c8e69a68d7dd11e4d	2026-10-14T17:37:26-07:00	e5c168e1422b86a1ce9c3ec0ecd192baeee5e2fd	build_transforms: vectorised min_count=1 sums in the canonical food_acquired dedupe tail (GH #905)
+1d77c6ff282cc8a2947cec235c05d4dbecc502d7	2026-10-14T17:37:34-07:00	809233da27958c46998c97d6365db36a70b2ab71	EthiopiaRHS CONTENTS.org: record that the three dead kinship.yml typo keys are now deleted (#974)
+4855c09df4d193143916acb4b7a25515b7da995f	2026-10-14T17:38:05-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	local_tools: sniff magic bytes before the binary readers -- XPORT branch, Stata gate (GH #699, #712)
+15cf4c95ed0ea04a1feb0c7c0ed17b9af06ee12b	2026-10-14T17:40:37-07:00	a91c934be21cea294a20181755c065968d6a9e8e 1d36fb97685c51113b6c5adb1ea7af0d3793adf9	Merge pull request #972 from ligon/fix/848-uganda-condition2
+518b75df365b81fe10bdd3e2f23d9aa92ceb09ee	2026-10-14T17:40:51-07:00	e95f8d7921c3b460dc951b0c8e69a68d7dd11e4d	diagnostics: panel spine trusts the cached roster parquet only when its wave manifest covers every wave (GH #909)
+c45f8d02cef9539c97cba4d60c7d625ba6c33f60	2026-10-14T17:41:28-07:00	15cf4c95ed0ea04a1feb0c7c0ed17b9af06ee12b 75e347042f4a9d87f3deb7812f4135a3e388da79	Merge pull request #971 from ligon/fix/811-region-tables
+62a3b453a01c2a607882375b520f5b217f0e8f6d	2026-10-14T17:41:45-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	tests: the credential-less run-time net now warns, naming the unmarked test (GH #907)
+e887e163b511361caf1795fbc684b30e98627e71	2026-10-14T17:42:33-07:00	7cd765267a4ee599e9f0ad02d3ca37feeab06559	Panama 1997: unit code 77 ('valor') carries no quantity -- serve NA, not 7.70 (GH #777)
+77d2b9829cc96e165165d9cdabb59fe4bfa21809	2026-10-14T17:43:41-07:00	4855c09df4d193143916acb4b7a25515b7da995f	test_reader_sniff: census count is 5,674 present blobs, not 5,673
+f319c16cfd98362efd9f166739b429dedb2c827b	2026-10-14T17:43:57-07:00	62a3b453a01c2a607882375b520f5b217f0e8f6d	tests: mark the 56 files that reached a credential-less skip at run time with requires_s3 (GH #907)
+17d9f16ae542078504f2052ce239d6143595c2e1	2026-10-14T17:44:15-07:00	2ed85b49b1382fa01b846063c63912eca19b534c c45f8d02cef9539c97cba4d60c7d625ba6c33f60	Merge GitHub development (PRs #971, #972 merged) into mirror development
+28a166b31ae2fcc40adcddb18f3491ad4336fd57	2026-10-14T17:44:15-07:00	f319c16cfd98362efd9f166739b429dedb2c827b	ci: workflow_dispatch so data-tests can be re-run without a release (GH #941 step 1)
+c9ba8ca5ee22a7573d13b4ce27f7404d932dc2d2	2026-10-14T17:46:30-07:00	17d9f16ae542078504f2052ce239d6143595c2e1	backlog: red-team review array for the first six 2026-10-14 fix branches
+c7377eca4d1067803ba8037fc0075253d1ad5de4	2026-10-14T17:47:04-07:00	c9ba8ca5ee22a7573d13b4ce27f7404d932dc2d2	backlog: review array sbatch -- the array directive lives in the file now (09-24 passed it on the command line)
+59a110755b7684bc88adce11b4f90c9bab488803	2026-10-14T17:52:13-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	coverage grader: warn-only cross-wave scale check on monetary columns (GH #830)
+6922c077af5b1d1f386f081920586e407b5a6d2d	2026-10-14T17:54:32-07:00	dd0363fb621fd62eb57391faef50c0a29771ce32	labels=: point LabelPassThroughWarning at the caller; regenerate data-methods.md
+3973e909468b9b33137c6bc3e561d934b252779f	2026-10-14T17:57:17-07:00	af637df9a1765e74e2711504a0d931c0ab4b5145	ghana-docs-encoding: measured reader numbers, Guinea-Bissau outline fix, test non-vacuity (GH #926/#812)
+73b06e97b1efa09bb0e1b7b394063356763159e4	2026-10-14T17:58:32-07:00	59a110755b7684bc88adce11b4f90c9bab488803	coverage grader scale check: compare currencies after NA-normalisation (GH #830)
+3667886659da492e8e2df35ed69027d8f27c2a15	2026-10-14T17:59:37-07:00	2ed85b49b1382fa01b846063c63912eca19b534c	Burkina Faso 2014 food_acquired: money-only passages are NaN, not 0; repair the truncated crosswalk (GH #864, GH #794)
+e77fb214cba309f6bdac3ccee7b1c52542354879	2026-10-14T18:01:24-07:00	518b75df365b81fe10bdd3e2f23d9aa92ceb09ee	tests: test_table_structure parametrises over the DECLARED (country, table) set; a cold cell skips with a reason, an empty cache fails unless opted in (GH #703)
+e46b442e443c319bb3229e0b55eba8ae5e578429	2026-10-14T18:01:24-07:00	e77fb214cba309f6bdac3ccee7b1c52542354879	conftest: make pytest_addoption idempotent so pytest runs inside a git worktree (GH #734, item 1)
+e6c87feba5cdc48fdfe46711965aa5edadd76144	2026-10-14T18:01:24-07:00	e46b442e443c319bb3229e0b55eba8ae5e578429	_build_registry: close the source handle in framework_imports_fingerprint (GH #792, part 1)
+3d3b71bb359210a8e8ef5493371220e7e40d7b22	2026-10-14T18:02:09-07:00	c7377eca4d1067803ba8037fc0075253d1ad5de4	handoff: pause at 18:00 -- review array 39922500 and fix array 39921399 in flight, next actions listed
+88707ddb0370704ccc7b814a1dc9563303e5e10c	2026-10-14T18:08:33-07:00	3d3b71bb359210a8e8ef5493371220e7e40d7b22	backlog: review array batch 2 -- seven more 2026-10-14 fix branches
+77cb428e6b4a9f80a0f9c4879a82d8fae1a5c114	2026-10-14T18:10:33-07:00	28a166b31ae2fcc40adcddb18f3491ad4336fd57	tests/ci: harden the net's warning against filterwarnings=error; dvc-lock-check is push-only (GH #907, #941)
+de2284da2df4d2bd172c65c97204e97d9a6ec224	2026-10-14T18:11:23-07:00	e6c87feba5cdc48fdfe46711965aa5edadd76144	country: correct the _strip_string_values docstring (categorical .str.strip returns object, as before) (GH #694)
+61217ec9877415ccc8cef34d0538f3785260f6a4	2026-10-14T18:12:50-07:00	88707ddb0370704ccc7b814a1dc9563303e5e10c	backlog: review array batch 3 -- the last three fix-array-2 branches
+20b2605ebe902f1be364adfd6630af5ef12e6d77	2026-10-14T18:51:29-07:00	61217ec9877415ccc8cef34d0538f3785260f6a4	backlog: follow-up element framework-small-2 (the red-team FAIL: 14 tests red via the #915 raise)
+f080a5b272b645207f730593b0f0882c58a615b3	2026-10-14T18:54:02-07:00	de2284da2df4d2bd172c65c97204e97d9a6ec224 20b2605ebe902f1be364adfd6630af5ef12e6d77	Merge remote-tracking branch 'origin/development' into fix/framework-small-2
+75a4497447b981471580cad7f51bbbaff47603a4	2026-10-14T18:57:17-07:00	20b2605ebe902f1be364adfd6630af5ef12e6d77	backlog: red-team review summary for the sixteen 2026-10-14 branches (3 pass, 12 pass-with-fixes, 1 fail)
+9291b79deea8be7014b8c170f8cb3f7892a1d690	2026-10-14T18:57:44-07:00	77cb428e6b4a9f80a0f9c4879a82d8fae1a5c114 75a4497447b981471580cad7f51bbbaff47603a4	Merge branch 'development' into tmp-ci-skips
+650484236314f09d3f87fb1f329c481e75cb7eb0	2026-10-14T18:57:51-07:00	3667886659da492e8e2df35ed69027d8f27c2a15 75a4497447b981471580cad7f51bbbaff47603a4	Merge branch 'development' into tmp-burkina-2014
+b021bae5d905e5f82298d850396250db69c423e5	2026-10-14T18:59:11-07:00	75a4497447b981471580cad7f51bbbaff47603a4	backlog: record the resubmitted fix-array-2 job id
+dd85a53a866ef0c0f9c08e39c921add8c3a72b2a	2026-10-14T18:59:13-07:00	f4ad88885bb9e8c05668a98a32824749822faf9b b021bae5d905e5f82298d850396250db69c423e5	Merge branch 'development' into tmp970
+6be9f2bb2df7e3d8d778da79314862eb89161d04	2026-10-14T19:00:29-07:00	b021bae5d905e5f82298d850396250db69c423e5	handoff: reviews complete, PRs #980-#982 open, framework-small-2 in flight
+1e6dc1825b7663a76ce21e3c6ff7084d475fb735	2026-10-14T19:19:24-07:00	f080a5b272b645207f730593b0f0882c58a615b3	tests: make the mock country trees real countries_root() overrides so the GH #915 raise and the 14 tests agree
+2d78cfc3f62d9f7a251d5d660fa06be442c47c81	2026-10-14T19:22:26-07:00	1e6dc1825b7663a76ce21e3c6ff7084d475fb735	build_transforms, Panama food_acquired: say "a few ULP (<= 4, pinned)" not "1 ULP" (GH #905, red-team R2)
+89d11fa95e0ed5cf0a1392fc408191bca30a77bf	2026-10-14T19:22:26-07:00	2d78cfc3f62d9f7a251d5d660fa06be442c47c81	country: _strip_string_values docstring and the GH #694 guard test say "mixed object column" (red-team R4)
+fd3ebb1c5dfc68fb48f084fb1e3faa5ec8e57cfb	2026-10-14T19:38:01-07:00	89d11fa95e0ed5cf0a1392fc408191bca30a77bf	errata: 2d78cfc3f's cache-cost figure "0 of 55" came from an invalid probe
+a31257286cb6b649c1b98d44c1be089218f50631	2026-10-14T19:40:32-07:00	6be9f2bb2df7e3d8d778da79314862eb89161d04	handoff: framework-small-2 returned green
+452302adcfdbf3af538ef06375df1ac6c5aaa8a0	2026-10-14T21:13:21-07:00	a31257286cb6b649c1b98d44c1be089218f50631	plan: reconcile outstanding branches and gate the v0.15.0 release
+8431777c14ce6ed883b56988a2d0726b3834a3a9	2026-10-14T21:14:45-07:00	9291b79deea8be7014b8c170f8cb3f7892a1d690 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge branch 'development' into landing/ci-skips
+ebf4eb4deba8ef95afa9279e33dd658cb9929915	2026-10-14T21:14:49-07:00	a2b44daa677a02c82b60e05016df45e194597e32 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/uganda
+ef6280d655252f1a5d83519d8fe5cc7d44eef190	2026-10-14T21:14:50-07:00	b6feef57812432d4ac89d7bd4f0669e933aabae4 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/niger
+c1a82d0acff74226f26cf1af4dfeb865a9dcf3d3	2026-10-14T21:14:51-07:00	eeb445ebf1d0b690bf71bc45bedb6c2215c7b53e 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/nigeria824
+932d174bdea73a23ac444a36c866934d7b19ca01	2026-10-14T21:14:52-07:00	df3b211f682d3e27e798896e638d3adad98d748f 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/nigeriaw5
+7d8dad81718902cd3222bbd61794506e091e2cc8	2026-10-14T21:14:53-07:00	e887e163b511361caf1795fbc684b30e98627e71 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/perupanama
+6f37e2c97e7fbf2a76ae72c1d7def8fe9d89501f	2026-10-14T21:14:54-07:00	650484236314f09d3f87fb1f329c481e75cb7eb0 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/burkina
+23c890047c4eda96d9d96f3fc968de8a7c053910	2026-10-14T21:15:00-07:00	f9993cfe01713dea9fd356a769694b1ead6fa47e 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge development; preserve subprocess guards and enable explicit Windows validation
+7e7662fa9c265bcb20ea4cb2ce4edccb2babebb2	2026-10-14T21:15:25-07:00	fd3ebb1c5dfc68fb48f084fb1e3faa5ec8e57cfb 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/framework-small-2
+db971ee7dd8661b2bde4d4c68c0f68478a3f6219	2026-10-14T21:15:27-07:00	858c41b474bb38a803b920eed14718a7e0f89175 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/831-followup
+9f80aed08833643e765aa6e4c48ca2eccb97efee	2026-10-14T21:15:29-07:00	3973e909468b9b33137c6bc3e561d934b252779f 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/ghana-docs-encoding
+94c0203d37de19f32a208870d2c75b3ea00ff0db	2026-10-14T21:15:31-07:00	6922c077af5b1d1f386f081920586e407b5a6d2d 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/labels-relabel-787
+bc90098324bbf897051702a737ba1648c11adfb4	2026-10-14T21:15:32-07:00	73b06e97b1efa09bb0e1b7b394063356763159e4 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/grader-scale-830
+effe1c7938544d009b5341a015de7861e9ff14f4	2026-10-14T21:15:46-07:00	0014e7332139732a64af296b862f7d1044af4d3c 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/runtime-810
+917fb4e0bdd6227c10e34abdf268531f4fef6ae8	2026-10-14T21:16:41-07:00	effe1c7938544d009b5341a015de7861e9ff14f4	docs: distinguish missing-file and missing-column handling for #810
+d8053920697ccdaac2fd3e2a0077800079498109	2026-10-14T21:16:54-07:00	9dfb8339455957739896730216493ba4453a9693 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/runtime-868
+13acfbcd3c373af92318253d3fc60c6175e29c1e	2026-10-14T21:17:32-07:00	d8053920697ccdaac2fd3e2a0077800079498109	ledger(#868): preserve round identity through wave-folder stamps
+5caef972a63900ae9864c013f864c7be7c6d9cec	2026-10-14T21:18:56-07:00	77d2b9829cc96e165165d9cdabb59fe4bfa21809 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/runtime-readers
+9a60e2f9bc234c30e98bfdd565118bff86c3724d	2026-10-14T21:19:13-07:00	7d8dad81718902cd3222bbd61794506e091e2cc8	ledger: ground Peru and Panama landing regressions in source contracts
+d33093bc67c7b1836f41ded213ccd70d57ec790e	2026-10-14T21:19:28-07:00	bc90098324bbf897051702a737ba1648c11adfb4	ledger(#830): record approved warning policy and four-record census
+c38803d3cab5a647224b93b88593839d88e92cdb	2026-10-14T21:19:35-07:00	db971ee7dd8661b2bde4d4c68c0f68478a3f6219	test(#831): exercise no-git position guard before checkout skip
+197a863506e4f3c85544fdb9dfd1720307f3cf01	2026-10-14T21:20:30-07:00	5caef972a63900ae9864c013f864c7be7c6d9cec	ledger: constrain claimed Stata files to binary decoding
+1be21f178a4e4872105204e5ca0aaa3804e1a13b	2026-10-14T21:21:04-07:00	1d77c6ff282cc8a2947cec235c05d4dbecc502d7 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/kinship-974
+d831e5cb00269b22f3359aa06d01d081ed60f2c7	2026-10-14T21:21:11-07:00	9f80aed08833643e765aa6e4c48ca2eccb97efee	docs: correct EHCVM region counts and GhanaSPS interval endpoints
+7c229350a7fe35913b0151498a67607cd16ace63	2026-10-14T21:21:20-07:00	dd85a53a866ef0c0f9c08e39c921add8c3a72b2a 452302adcfdbf3af538ef06375df1ac6c5aaa8a0	Merge commit '452302adcfdbf3af538ef06375df1ac6c5aaa8a0' into landing/runtime-970
+67d781318cf9bed8162aa6c6e189cb52bad99e57	2026-10-14T21:22:19-07:00	8431777c14ce6ed883b56988a2d0726b3834a3a9	test(ci): cover credential skips and remove synthetic network waits
+e7c494aed6fc680b7055467478b82a0c4a8cc01c	2026-10-14T21:22:36-07:00	13acfbcd3c373af92318253d3fc60c6175e29c1e	fix(#868): retain round reports in wave-folder grain stamps
+34928ec68a1703b715dfe7f6373f120703e5b31f	2026-10-14T21:23:02-07:00	c1a82d0acff74226f26cf1af4dfeb865a9dcf3d3	Nigeria: clarify sold-row denominators and draft remaining sale issues
+f22f99212f2b6ec870f34c9da43ae0d12d752a82	2026-10-14T21:23:11-07:00	197a863506e4f3c85544fdb9dfd1720307f3cf01	fix: reject malformed Stata files before text fallback
+8fa4d5daf0b7b9fdf95ecceacb9a1dedce51f24f	2026-10-14T21:23:14-07:00	94c0203d37de19f32a208870d2c75b3ea00ff0db	docs(#787): specify label diagnostics and numeric-target refusal
+1641e1fff3286bd75979849381af17ef4c9e167e	2026-10-14T21:25:01-07:00	d33093bc67c7b1836f41ded213ccd70d57ec790e	fix(#830): report each neighbour ratio form and document diagnostic limits
+d9942cf7e96daee7e799e07174d0da97613d890c	2026-10-14T21:25:25-07:00	b021bae5d905e5f82298d850396250db69c423e5 67d781318cf9bed8162aa6c6e189cb52bad99e57	Merge pull request #980 from ligon/fix/ci-skips
+8bb3d5aeb5d328e0108450d2bc36470fd003c4d0	2026-10-14T21:25:40-07:00	1be21f178a4e4872105204e5ca0aaa3804e1a13b	docs(#974): name the accented EHCVM sibling label accurately
+17a914ed33427f0e74c02806f846ed524c4fbfdd	2026-10-14T21:25:40-07:00	23c890047c4eda96d9d96f3fc968de8a7c053910	ci: verify Windows conda builds use the installed wheel and configs
+986861c1a93bac2d4c263d0b3d2f1c28fe24602b	2026-10-14T21:26:37-07:00	ebf4eb4deba8ef95afa9279e33dd658cb9929915	Uganda: record cold release replay and isolate nutrition manifest decision
+6677925905c5865ff295d2cd455346bb1279dad1	2026-10-14T21:26:46-07:00	f22f99212f2b6ec870f34c9da43ae0d12d752a82	docs: identify the credentialed guard excluded from reader checks
+2549f6cc1a6585c7014c8b9f1cd57febdb96fca5	2026-10-14T21:27:03-07:00	452302adcfdbf3af538ef06375df1ac6c5aaa8a0	release: record CI landing and reconcile historical branches
+b3d035afec96f41e1bb02e59765114bebcc0b199	2026-10-14T21:27:35-07:00	932d174bdea73a23ac444a36c866934d7b19ca01	Nigeria: distinguish W5 v01 acquisition from available v02 geography
+902344f6097353e6d09bef3f1fc4c343df25964b	2026-10-14T21:27:37-07:00	9a60e2f9bc234c30e98bfdd565118bff86c3724d	Peru and Panama: pin source contracts and correct sample expectations
+d933c01da4571c8962df153463c51253e6a7dd3b	2026-10-14T21:28:09-07:00	d9942cf7e96daee7e799e07174d0da97613d890c 2549f6cc1a6585c7014c8b9f1cd57febdb96fca5	Merge release inventory and execution record
+9bcd3c55d191f2767271d9ce2e3d2214e679fd3b	2026-10-14T21:28:31-07:00	452302adcfdbf3af538ef06375df1ac6c5aaa8a0	ledger(#600): restore provenance design and record release-port invariants
+1182af2d0592d653e2c3865ed7edb63ed556998f	2026-10-14T21:28:55-07:00	d933c01da4571c8962df153463c51253e6a7dd3b 7e7662fa9c265bcb20ea4cb2ce4edccb2babebb2	Integrate framework fixes while retaining CI data markers
+0ee5b3f3e4ea3e83dacfd59594c56298fbb19b01	2026-10-14T21:29:18-07:00	1182af2d0592d653e2c3865ed7edb63ed556998f c38803d3cab5a647224b93b88593839d88e92cdb	Integrate reviewed release branch c38803d3c
+5a3f0c0f8a31880298f8b2decb34096a497366b7	2026-10-14T21:29:18-07:00	0ee5b3f3e4ea3e83dacfd59594c56298fbb19b01 d831e5cb00269b22f3359aa06d01d081ed60f2c7	Integrate reviewed release branch d831e5cb0
+79f9faaa504fcf59ad69ee4d563c233749be4149	2026-10-14T21:29:19-07:00	5a3f0c0f8a31880298f8b2decb34096a497366b7 8fa4d5daf0b7b9fdf95ecceacb9a1dedce51f24f	Integrate reviewed release branch 8fa4d5daf
+09a99a6342c315d0d394502a925eaf44e6319e3e	2026-10-14T21:29:19-07:00	79f9faaa504fcf59ad69ee4d563c233749be4149 1641e1fff3286bd75979849381af17ef4c9e167e	Integrate reviewed release branch 1641e1fff
+9a4c85707a1cfc753e8bfa9eeb33a610d72bb5a6	2026-10-14T21:29:19-07:00	09a99a6342c315d0d394502a925eaf44e6319e3e 8bb3d5aeb5d328e0108450d2bc36470fd003c4d0	Integrate reviewed release branch 8bb3d5aeb
+044c1bad5d1f34686f6fe6f153d1b61bd27bcf10	2026-10-14T21:29:19-07:00	9a4c85707a1cfc753e8bfa9eeb33a610d72bb5a6 17a914ed33427f0e74c02806f846ed524c4fbfdd	Integrate reviewed release branch 17a914ed3
+e1412cd385b7297dd20a8721584cae80ccf58af3	2026-10-14T21:29:19-07:00	044c1bad5d1f34686f6fe6f153d1b61bd27bcf10 917fb4e0bdd6227c10e34abdf268531f4fef6ae8	Integrate reviewed release branch 917fb4e0b
+50137d211c0844551826ff4b06474ab2f73176e6	2026-10-14T21:29:19-07:00	e1412cd385b7297dd20a8721584cae80ccf58af3 6677925905c5865ff295d2cd455346bb1279dad1	Integrate reviewed release branch 667792590
+568db2b4f193c95f073ca4f5323405031697c484	2026-10-14T21:29:19-07:00	50137d211c0844551826ff4b06474ab2f73176e6 e7c494aed6fc680b7055467478b82a0c4a8cc01c	Integrate reviewed release branch e7c494aed
+8652cbdd28828c9998a01edd93a9408ffe770039	2026-10-14T21:29:20-07:00	568db2b4f193c95f073ca4f5323405031697c484 7c229350a7fe35913b0151498a67607cd16ace63	Integrate reviewed release branch 7c229350a
+45783af9e28276a84a89738fd3f8a9e9dfa43108	2026-10-14T21:29:48-07:00	6f37e2c97e7fbf2a76ae72c1d7def8fe9d89501f	Burkina Faso: document money-only guard limits and verify cold conservation
+2009465f5a9405b0cfdb9a566d8d7504a45e6f3a	2026-10-14T21:30:30-07:00	17a914ed33427f0e74c02806f846ed524c4fbfdd d9942cf7e96daee7e799e07174d0da97613d890c	Merge commit 'd9942cf7e' into landing/runtime-windows
+dbaab1c6c79060d522221b96fa11fc8fab242794	2026-10-14T21:30:53-07:00	8652cbdd28828c9998a01edd93a9408ffe770039 34928ec68a1703b715dfe7f6373f120703e5b31f	Integrate country release candidate 34928ec68
+17082f7b4ea2cf3a892f5f3511f7b73ba8a1b0da	2026-10-14T21:30:53-07:00	dbaab1c6c79060d522221b96fa11fc8fab242794 b3d035afec96f41e1bb02e59765114bebcc0b199	Integrate country release candidate b3d035afe
+d2f25f05faeecf07296c649a7e04da44e575d15f	2026-10-14T21:30:53-07:00	17082f7b4ea2cf3a892f5f3511f7b73ba8a1b0da 902344f6097353e6d09bef3f1fc4c343df25964b	Integrate country release candidate 902344f60
+b1bb0a9e991bfdf7b311a935f73029eee3d8ca36	2026-10-14T21:30:53-07:00	d2f25f05faeecf07296c649a7e04da44e575d15f 45783af9e28276a84a89738fd3f8a9e9dfa43108	Integrate country release candidate 45783af9e
+ed1414fb91a35b0b154263e7b0b0aaf88b0f2f93	2026-10-14T21:30:53-07:00	b1bb0a9e991bfdf7b311a935f73029eee3d8ca36 986861c1a93bac2d4c263d0b3d2f1c28fe24602b	Integrate country release candidate 986861c1a
+5d4925a323af99ad5b766cfc5e0510d7fb655cf8	2026-10-14T21:31:14-07:00	9bcd3c55d191f2767271d9ce2e3d2214e679fd3b	fix(#600): restore many-to-many catalog provenance on current discovery
+396fa215d3b2b9e1e7fdaf83361d932a32ccd449	2026-10-14T21:32:08-07:00	2009465f5a9405b0cfdb9a566d8d7504a45e6f3a	ci: preserve manual Windows input when merging the data-test trigger
+059373913186fb7c018e272d6eda07a15f979cdd	2026-10-14T21:34:41-07:00	986861c1a93bac2d4c263d0b3d2f1c28fe24602b	docs: correct Uganda replay tolerances to fresh evidence
+bb51df7e769dbddce367698a827fef5c2584e52a	2026-10-14T21:35:10-07:00	ef6280d655252f1a5d83519d8fe5cc7d44eef190	docs: reconcile Niger follow-up evidence and remaining issue scope
+9fc6aa2e0efa0360f9d20489fef87f96acd5670b	2026-10-14T21:35:53-07:00	902344f6097353e6d09bef3f1fc4c343df25964b	test: enforce absolute cent tolerance for Panama expenditures
+a48a2652c3a5fdffca521315785389b85f9d53f9	2026-10-14T21:36:05-07:00	ed1414fb91a35b0b154263e7b0b0aaf88b0f2f93 396fa215d3b2b9e1e7fdaf83361d932a32ccd449	Integrate final reviewed release follow-up 396fa215d
+90ee57761cd4824193ca91dd858c332ae183cae2	2026-10-14T21:36:05-07:00	a48a2652c3a5fdffca521315785389b85f9d53f9 bb51df7e769dbddce367698a827fef5c2584e52a	Integrate final reviewed release follow-up bb51df7e7
+22d7914594a4492975394028f413be5d017411c4	2026-10-14T21:36:05-07:00	90ee57761cd4824193ca91dd858c332ae183cae2 5d4925a323af99ad5b766cfc5e0510d7fb655cf8	Integrate final reviewed release follow-up 5d4925a32
+d395235494ede6a758d846497a5a3c02c0cc77d3	2026-10-14T21:36:05-07:00	22d7914594a4492975394028f413be5d017411c4 059373913186fb7c018e272d6eda07a15f979cdd	Integrate final reviewed release follow-up 059373913
+7fa05179c8519f44ea329ba6387f5d6d6441a8ea	2026-10-14T21:37:49-07:00	d395235494ede6a758d846497a5a3c02c0cc77d3 9fc6aa2e0efa0360f9d20489fef87f96acd5670b	Integrate exact Panama expenditure tolerance
