@@ -1,0 +1,10 @@
+{
+  "issue": 962,
+  "url": "https://github.com/ligon/LSMS_Library/issues/962",
+  "state": "OPEN",
+  "title": "Food-unit sentinel coverage after #967: reconcile residual-code kg semantics and guard missing-unit spellings",
+  "before_body_sha256": "7afe779b115deba7ac8c355b909f9ce51eb8cfe9e598cd82ecc5a211d9f0e930",
+  "after_body_sha256": "bde0c9ff45f863d0de3426af3dbb741147cb0cbad74a2fbcf52edb265f9c5a21",
+  "original_uganda_defect_resolved": true,
+  "remaining_scope": "source-backed sentinel vocabulary coverage and residual-code contract documentation"
+}

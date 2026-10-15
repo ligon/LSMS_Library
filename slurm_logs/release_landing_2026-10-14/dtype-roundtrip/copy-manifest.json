@@ -1,0 +1,153 @@
+{
+  "source": "/local/job39919092/release-work/runtime/data-final-promotion",
+  "private": "/local/job39919092/release-work/framework/dtype-roundtrip-data",
+  "files": [
+    {
+      "country": "Liberia",
+      "path": "Liberia/var/interview_date.parquet",
+      "bytes": 24531,
+      "sha256": "73a439865b8db8c428394dbd82b2faaef8304ccd44536a23c0c792d38fac3acf",
+      "distinct_inode": true
+    },
+    {
+      "country": "Liberia",
+      "path": "Liberia/var/sample.parquet",
+      "bytes": 27551,
+      "sha256": "fad4c39a6a48a4c076b62f0110ba819647788912bca93036ac3dd5eca5813874",
+      "distinct_inode": true
+    },
+    {
+      "country": "Liberia",
+      "path": "Liberia/var/cluster_features.parquet",
+      "bytes": 4618,
+      "sha256": "4e2e4c138c3032301323cb9c82751ad1ab6e100b27730585a938ea8f8717d51d",
+      "distinct_inode": true
+    },
+    {
+      "country": "Liberia",
+      "path": "Liberia/2018-19/_/interview_date.parquet",
+      "bytes": 24423,
+      "sha256": "5b1701163abac8b32cf9a3e47273e670e0d23ea34ff865c19691ca01b6a9f230",
+      "distinct_inode": true
+    },
+    {
+      "country": "Liberia",
+      "path": "Liberia/2018-19/_/sample.parquet",
+      "bytes": 27441,
+      "sha256": "455404b348c17aa5890d42cb0374837d90647ba041ac1baa9edb9466da7f21d4",
+      "distinct_inode": true
+    },
+    {
+      "country": "Liberia",
+      "path": "Liberia/2018-19/_/cluster_features.parquet",
+      "bytes": 25392,
+      "sha256": "c9d44363ea9e1e82f1f7d9a3c748dea721eb1a4b6d9ad4d8ad755097eda1a7bf",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/var/sample.parquet",
+      "bytes": 178014,
+      "sha256": "8e9c3c0c69dcece14315f42a57dd7751cabf0eefa5c868c18977446df4df90f9",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/var/cluster_features.parquet",
+      "bytes": 52469,
+      "sha256": "64856b598f984547f7bce64ac25758f97a6d5498606d54c296e7dee348ecef83",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/var/household_roster.parquet",
+      "bytes": 1393142,
+      "sha256": "fe404f70b8755a1414817159cbc37982b61137a8b5c826fd5efd61b99dbbccd8",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2014-15/_/sample.parquet",
+      "bytes": 49797,
+      "sha256": "2a5060ffd7ac2aeb38baa1606c72faca1b42a2e45aaad19735d77cfe9abdc5fe",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2014-15/_/cluster_features.parquet",
+      "bytes": 31818,
+      "sha256": "690c58369b57d482767edb58d8125da4a1752579ed9ba68be7573120e592714c",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2014-15/_/household_roster.parquet",
+      "bytes": 310823,
+      "sha256": "cb78514e0a928fcaddb337849a15b27493905c966b01b57c092bb8165501ad2d",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2018-19/_/sample.parquet",
+      "bytes": 49735,
+      "sha256": "859ed84f8828f0a8fe0b5876157933032c05b70d2dc9f3ef81695861700a94ce",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2018-19/_/cluster_features.parquet",
+      "bytes": 29964,
+      "sha256": "27b975a9ea4e1e44354d91508ecc43bdf07f3e26f4944f2dbd7676f1abcec2f9",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2018-19/_/household_roster.parquet",
+      "bytes": 220844,
+      "sha256": "cde4889bd13b4ab763df7df76a84a629ab66ca26cedfb06b2d4d12d528e9c293",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2021-22/_/sample.parquet",
+      "bytes": 62548,
+      "sha256": "6664fa8ae3902d2158685ca8a362fd8000cde63c5fde05aa1cca15916714cb1e",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2021-22/_/cluster_features.parquet",
+      "bytes": 20951,
+      "sha256": "31df3c78f1fbb8958cebbca7dbc922e8d3d9d38e324b6ea95289b93022d876e8",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2021-22/_/household_roster.parquet",
+      "bytes": 211039,
+      "sha256": "4f45ee4669f5f69b05615f30e2ce0219e23bd695a4f350ea8e7b66407640968d",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2017-18/_/sample.parquet",
+      "bytes": 70719,
+      "sha256": "4c24ad63531cb87636f68183941ec5efa988128f8ea05074bace77f5cefc8577",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2017-18/_/cluster_features.parquet",
+      "bytes": 30406,
+      "sha256": "db0e9efbb57a8b6dbf0048d48bc1f1b2fc9e2fe010d58600ca9964f37bdc36a9",
+      "distinct_inode": true
+    },
+    {
+      "country": "Mali",
+      "path": "Mali/2017-18/_/household_roster.parquet",
+      "bytes": 764243,
+      "sha256": "6dac73fdbf8561cdd23064d737fa074793adfd2f74e4ad6c598a74ff704d7583",
+      "distinct_inode": true
+    }
+  ]
+}

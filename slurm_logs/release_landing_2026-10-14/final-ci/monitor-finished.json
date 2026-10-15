@@ -1,0 +1,8 @@
+{
+  "finished_utc": "2026-10-15T14:49:38.768045+00:00",
+  "run_id": 38746123119,
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "reason": "all jobs terminal; each completed log captured or three attempts exhausted",
+  "missing_log_jobs": [],
+  "semantic_review_required": true
+}

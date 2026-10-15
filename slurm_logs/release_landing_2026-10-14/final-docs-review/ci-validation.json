@@ -1,0 +1,94 @@
+{
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "run_id": 38746123119,
+  "conclusion": "success",
+  "terminal_logs_independently_verified": {
+    "data-tests": {
+      "log_sha256": "6cfa35d674a21ed1d54f3accc8ecd191dd00f7f28d092fe68ad45baaa4c9ca10",
+      "bytes": 457055,
+      "source_identity_present": true,
+      "summary_present": true
+    },
+    "unit-tests": {
+      "log_sha256": "40595c364d120e1c15a495edff1756534e626b83708d7abc414e87bc4fef68ee",
+      "bytes": 85198,
+      "source_identity_present": true,
+      "summary_present": true
+    },
+    "windows-smoke": {
+      "log_sha256": "fab6c1b927dc80ae0a01d44117d4b61741b538119f104537626e58dad97008f4",
+      "bytes": 96039,
+      "source_identity_present": true,
+      "summary_present": true
+    },
+    "windows-script-build": {
+      "log_sha256": "ddfee3c9f870d1a5aa9ec19a764e79a47d90f005a4af04913491c3d3a44fd58e",
+      "bytes": 138250,
+      "source_identity_present": true,
+      "summary_present": true
+    },
+    "dvc-remote-reachability": {
+      "log_sha256": "7410a2855d47ab735753913eebaa27927779626506e7787f81fa884a31a443b1",
+      "bytes": 20824,
+      "source_identity_present": true,
+      "summary_present": true
+    }
+  },
+  "markers_reconcile_to_terminal_totals": true,
+  "data_counts": {
+    ".": 4927,
+    "s": 2768,
+    "X": 1,
+    "x": 4
+  },
+  "previous_three_failures_recorded_passed": [
+    {
+      "node_id": "tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Uganda/assets]",
+      "zero_based_module_position": 2260,
+      "old_outcome": "failed",
+      "final_outcome": "passed",
+      "module_items": 2784
+    },
+    {
+      "node_id": "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Uganda/assets]",
+      "zero_based_module_position": 2714,
+      "old_outcome": "failed",
+      "final_outcome": "passed",
+      "module_items": 2784
+    },
+    {
+      "node_id": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]",
+      "zero_based_module_position": 49,
+      "old_outcome": "failed",
+      "final_outcome": "passed",
+      "module_items": 53
+    }
+  ],
+  "new_asset_regressions": {
+    ".": 5
+  },
+  "nutrition_baseline_module": {
+    ".": 52,
+    "s": 1
+  },
+  "native_expected_match": true,
+  "claims_not_made": [
+    "all tests executed",
+    "all baseline tests executed in CI",
+    "all skips classified",
+    "historical #941 cause identified"
+  ],
+  "evidence_sha256": {
+    "aggregate-results.json": "28c31c019686df04c6d0d632ce91a995e19efec52189cc06b62d56e64568614d",
+    "semantic-review.json": "19c605ed51e4b5d0bdb4344b56c3660343e35ffd389f141bd962bbca6d18b857",
+    "native-validation.json": "80e5b052ec6495408cd1ef82bd3e20d124e30dc03fed6484e460d0b427e8352f",
+    "REPORT.md": "2e1746c546f39860e7d2c3f80d44bea1c61d03618ce09b4c60366acc46487af5"
+  },
+  "publishable_bundle": {
+    "members": 9,
+    "manifest_sha256": "947985bc0c95e2e2718f10f0da29a67238a5aa88bf9b50f1592887e5a15a8bb6",
+    "REPORT_sha256": "655080efbb6054c32a06989f3120a37a65fc81fbb1952c5c184539dd58644902",
+    "all_members_match": true,
+    "raw_logs_not_included": true
+  }
+}

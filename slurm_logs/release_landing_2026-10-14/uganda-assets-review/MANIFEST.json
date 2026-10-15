@@ -1,0 +1,18 @@
+{
+  "bundle-validation.json": {
+    "bytes": 539,
+    "sha256": "a63fc08476101528fb5d3921148a6c96175eb38deb21c9dd5a169255f60f725a"
+  },
+  "evidence-validation.json": {
+    "bytes": 2338,
+    "sha256": "f7de23a8de7044567219b368185a05e607122e034914f19a3d0fddcc28974a63"
+  },
+  "REVIEW.md": {
+    "bytes": 5130,
+    "sha256": "f7bdd88d62e159ecdf15a4eaf02713207b1ed6c2a94ee3a247b2f80e9f4b05cd"
+  },
+  "source-validation.json": {
+    "bytes": 1149,
+    "sha256": "032f7a6872dd41e831ec64265bf681e8b70e83a5e34042539991b431ee2bed1b"
+  }
+}

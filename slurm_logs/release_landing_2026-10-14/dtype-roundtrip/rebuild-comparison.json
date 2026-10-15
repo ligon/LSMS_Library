@@ -1,0 +1,73 @@
+{
+  "observed_rows": 220732,
+  "rebuild_rows": 220732,
+  "index_order_equal": false,
+  "index_sets_equal": true,
+  "index_dtypes_observed": [
+    "str",
+    "str",
+    "string",
+    "str"
+  ],
+  "index_dtypes_rebuild": [
+    "str",
+    "str",
+    "string",
+    "str"
+  ],
+  "dtypes_observed": {
+    "Sex": "string",
+    "Age": "Float64",
+    "Relationship": "string",
+    "MonthsSpent": "string",
+    "Generation": "Int64",
+    "Distance": "Int64",
+    "Affinity": "string"
+  },
+  "dtypes_rebuild": {
+    "Sex": "string",
+    "Age": "Float64",
+    "Relationship": "string",
+    "MonthsSpent": "string",
+    "Generation": "Int64",
+    "Distance": "Int64",
+    "Affinity": "string"
+  },
+  "column_order_equal": true,
+  "column_differences": {
+    "Sex": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "Age": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "Relationship": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "MonthsSpent": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "Generation": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "Distance": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    },
+    "Affinity": {
+      "value_mismatches": 0,
+      "null_masks_equal": true
+    }
+  },
+  "sorted_exact_equal": true,
+  "sorted_hash_observed": "413d6ae3d9db82dda737f77da62a5de4ac652f57e248c00610512867ba828e45",
+  "sorted_hash_rebuilt": "413d6ae3d9db82dda737f77da62a5de4ac652f57e248c00610512867ba828e45",
+  "actual_cold_stringified_matches_actual_warm_sorted": true,
+  "cold_numeric_months_total": 2085227.0,
+  "warm_numeric_months_total": 2085227.0
+}

@@ -1,0 +1,26 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "pandas": "3.0.6",
+  "scope": "synthetic only; pure dtype functions; no API/cache operations",
+  "cases": {
+    "datetime_first": {
+      "default_valid": 2,
+      "per_style_valid": 4,
+      "mixed_valid": 4,
+      "declared_valid": 2,
+      "canonical_valid": 2,
+      "after_declared_dropna_rows": 2,
+      "no_visit_axis": true
+    },
+    "date_first": {
+      "default_valid": 2,
+      "per_style_valid": 4,
+      "mixed_valid": 4,
+      "declared_valid": 2,
+      "canonical_valid": 2,
+      "after_declared_dropna_rows": 2,
+      "no_visit_axis": true
+    }
+  },
+  "typed_object_valid": 4
+}

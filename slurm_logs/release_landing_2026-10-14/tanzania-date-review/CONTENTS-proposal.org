@@ -1,0 +1,31 @@
+* Known warm interview-date loss (GH #798, 2026-10-15)
+
+The four =2008-15/= UPD rounds store interview dates as space-separated
+timestamp strings in the raw country parquet; 2019-20 and 2020-21 store
+ISO timestamps with a =T= separator. On development =3914d8804= the raw
+cache contains 22,433 rows across six waves, including six originally
+null dates. Cold output serves 22,427 rows; an ordinary warm read
+serves only 16,534, losing all 1,184 valid dates from 2019-20 and all
+4,709 from 2020-21.
+
+Read-only replay shows normalization and the sample-=v= join preserve
+every raw row. Whole-column declared datetime coercion infers the older
+format and nulls those 5,893 later-wave dates; the all-null-row filter
+deletes them as well as the six original nulls. Mixed-format/per-wave
+parsing reproduces the complete cold result after the same null filter.
+This is not the Extended/Refresh sub-panel split, UPHI back-casting, or
+a new visit-key interpretation.
+
+The same two missing waves were reported in #798 before v0.14.0; the
+demonstrated normalization, join, coercion, finalization and writing
+functions are unchanged across v0.14.0 and this release. Exact older
+counts and dependency environments were not rebuilt. The raw cache
+and its six-wave footer remain complete and unchanged. Keep #798 open
+and distinguish raw-cache coverage from served warm API coverage; no
+parsing-policy or panel-grain change is implemented here.
+
+On a separate complete warm-cache copy, concatenating ordinary
+=interview_date(waves=[wave])= calls for all six waves, using
+=Country('Tanzania', preload_panel_ids=False)=, reproduced the exact
+22,427-row cold result without changing cache files. This is a bounded
+workaround for the verified cache/environment, not an all-wave fix.

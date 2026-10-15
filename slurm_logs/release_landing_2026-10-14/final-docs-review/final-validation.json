@@ -1,0 +1,857 @@
+{
+  "head": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "tracked_diff_sha256": "3b2c7c3d5770f98caabb165b47e5055f85c5c39ba7f6e6fda005ccacebac9900",
+  "tracked_paths": [
+    ".sucoder/handoff.org",
+    "docs/releases/v0.15.0.md",
+    "lsms_library/countries/Liberia/_/CONTENTS.org",
+    "lsms_library/countries/Mali/_/CONTENTS.org",
+    "lsms_library/countries/Tanzania/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org",
+    "slurm_logs/release_landing_2026-10-14/branches.tsv"
+  ],
+  "country_doc_hashes_unchanged_from_checkpoint": true,
+  "old_archived_files_unchanged": 132,
+  "new_files": [
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/preservation-after-promotion.json",
+      "bytes": 544,
+      "sha256": "a77287606d0be48b207dfc05c304f55e6331906b1392a5bc43aabb679e4be1d8"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/promotion-apply-gate.json",
+      "bytes": 957,
+      "sha256": "7212139a31df7518d2df3b7fc8ebd145f23c65ccbca76aa0b4c1dd8f665fbb3b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/promotion-manifest-review.json",
+      "bytes": 1214,
+      "sha256": "959f1e77fac3c74c8d272266ca7229c9dda0d2c77e626d7f5cce2a5283683699"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/promotion-manifest.json",
+      "bytes": 2722013,
+      "sha256": "e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/promotion-result.json",
+      "bytes": 1433,
+      "sha256": "5412fcb0a427272c99ec01436bf12c8c36ac504cf2e55e9f4bb8d7b040970087"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/promotion-tool-review.json",
+      "bytes": 1191,
+      "sha256": "975005781d421e74b3da56b328dc85256f62a5cf626201ac648b2d69f424ed34"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/session-cache-processes.json",
+      "bytes": 358,
+      "sha256": "8d106ceccbd77b49c5af4c6199c4ce6670ace9df7ff3d2cf3d65de35ed4c3ec8"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/shared-snapshot-review.json",
+      "bytes": 487,
+      "sha256": "c9a8b8d6ae1d9f0eb37f2037e4f069016bed8df22142091e593f0b60d570fe8e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/staging.json",
+      "bytes": 478,
+      "sha256": "2d0e8e39db045bd3c189eb7c610caa9347a62a58f68356832a36ebec904ead4b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/state.json",
+      "bytes": 114,
+      "sha256": "7c9a9970faf7dad51f45c7594da54c5d775e6dc23e5d85cd9e997d99a63296c6"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/cache-promotion/verification.json",
+      "bytes": 137,
+      "sha256": "0161d92d1bd580f20e0417a49f157c0333c5d980e5d3dd2252eebf5f4d834de7"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/credentialed-ci/completed-1010-ci.json",
+      "bytes": 4597,
+      "sha256": "1a68aeb7eb7e52c2675e5e87f6c20a7fc6abe29796150f7fd08d7b6b31f0f08c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/credentialed-ci/completed-1010-ci.md",
+      "bytes": 2294,
+      "sha256": "bcfe9d92b45e0c899d9f183341b26b29d45e52100398a656da6f53547568f261"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/credentialed-ci/final-ci-aggregate.json",
+      "bytes": 5997,
+      "sha256": "28c31c019686df04c6d0d632ce91a995e19efec52189cc06b62d56e64568614d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/credentialed-ci/final-native-validation.json",
+      "bytes": 745,
+      "sha256": "80e5b052ec6495408cd1ef82bd3e20d124e30dc03fed6484e460d0b427e8352f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip-review/MANIFEST.json",
+      "bytes": 389,
+      "sha256": "73e3699f24aef71ad381d1c5182038ee395bc4fcbf3bb8c4a8f63fadafcf324c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip-review/REVIEW.md",
+      "bytes": 6107,
+      "sha256": "389f9f6e98cda69d647084460aea985de563e6c7c3057b2d5b75fd89f0be1b17"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip-review/validation.json",
+      "bytes": 2970,
+      "sha256": "80efbd95851383eed926de9242bdbf9485463b0b59d446add9952dbd9e058ba2"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/LEDGER.md",
+      "bytes": 2235,
+      "sha256": "e96d7476e0f1c64319f653f854bdf82eff3a3dbee7376f7c91af9e3dadc0b75f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/REPORT.md",
+      "bytes": 9873,
+      "sha256": "a09f5bd7700575ce3acfb62674e692db2f181223a6f1e6828f101dab80789046"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/cold-copy-manifest.json",
+      "bytes": 2475,
+      "sha256": "d9b21a1e78ad4fa8b04bceecf378eafd3db539950c9c450f9b445ee6a0899dea"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/cold-result.json",
+      "bytes": 3042,
+      "sha256": "75362a2e938abfa5ad885cb9b659279d4e8091e55aaec8fb75f63fb233efd36b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/cold_probe.py",
+      "bytes": 2894,
+      "sha256": "1c5ffb827782e6e49170b9e8248cb374beb07117f4100a8ce1c38391074b21ca"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/compare_frames.py",
+      "bytes": 1838,
+      "sha256": "b294041faaf9491e3166c87099e505a6b4d236bd2ca979d649ecf6a85653988f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/copy-manifest.json",
+      "bytes": 4937,
+      "sha256": "ce5e0e53da16fe96bc4d4eb7e142dd61fc1f8adfe76a4963dd572052165a40ee"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/evidence-manifest.json",
+      "bytes": 2404,
+      "sha256": "affd8b6220dc976c2b31e7c2cca5321c9c0ed968e9e9d4748779a2909eb7e514"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/private-evidence-digests.json",
+      "bytes": 2476,
+      "sha256": "6a5ecbae2ca32018843a16b7955f11e4027400438ea97f89f12af01153e37464"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/probe.py",
+      "bytes": 4396,
+      "sha256": "11f39387f8b8456d28a779219fc22355b9fd7c923e42ca9acbc420c4861eb8fd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/rebuild-comparison.json",
+      "bytes": 1703,
+      "sha256": "561cef541fb6897dfbcf1059ff6dded340fce7698352ced7cc24f50b5310472e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/result.json",
+      "bytes": 8356,
+      "sha256": "94b3de9415e6e19f7155ef59c6653628616e6a11c3aa5a2882d4829618f4ea1f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/source-and-raw-identity.json",
+      "bytes": 2490,
+      "sha256": "df3c16a633fde44abe0abe2976f176d7ab075d48ae2414e1dffb73fc610b9f79"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/strict-semantics.json",
+      "bytes": 2436,
+      "sha256": "acd5290e7e46a47fe97765876249814d816d09ea87b9062c63b8b441cbdbe804"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/strict_semantics.py",
+      "bytes": 3553,
+      "sha256": "2cab9268095a90dc4afe1732dfb1b8a4c4f103d4c0434aab9e5d9e6ae1d88014"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/dtype-roundtrip/writer-events.json",
+      "bytes": 11902,
+      "sha256": "a57538ebfd3eaa395420a89b72e7ff87f86151ca2a1169102df110ec806a78c8"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/LEDGER.md",
+      "bytes": 1986,
+      "sha256": "e4368e8fb783f2990709259dcaf460ee75148d70075dfbe73fb1c8775f20d39a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/MANIFEST.json",
+      "bytes": 7181,
+      "sha256": "1d7abae603390278cf4a4489243811d359083939b3a50c4bdd59db5d19748228"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/PLAN.md",
+      "bytes": 14865,
+      "sha256": "809eb6e5b8b1c4b2ecb7822bf0dfc3264ea4551335a85de559af93ccdabc304a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/PROMOTION_COMMANDS.md",
+      "bytes": 6101,
+      "sha256": "9402cf0c4a55c2dd1d5e7ed0d9b9e1321602473351b83df7d326b583d705021e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/REPORT.md",
+      "bytes": 8210,
+      "sha256": "a54844bcaf27ad2aec05bc90bdcda4d461ed468d2cb26f448fcf2ec376608453"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/REPRODUCTION.md",
+      "bytes": 695,
+      "sha256": "af2ec9d8348c048ef862924b90b12f9ce30209f4c2d2b7c3d71d40e1d7a67f5f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/build_final_manifest.py",
+      "bytes": 13294,
+      "sha256": "c2219e54e5bd91336a6d9bf567bf78b2b24cc0e7de4645ad9b848d652a6fd006"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/check_final_hashes.py",
+      "bytes": 5102,
+      "sha256": "d3f4927562375362203bd76059f88a59420372bfc77a145a0e5a30b72151b6ba"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/check_promotion_transaction.py",
+      "bytes": 6660,
+      "sha256": "45cb5f00e390931fdf2a3c9e47c103a2e151cf81bb37b2b49b50ea9b386132fa"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/copy-summary.json",
+      "bytes": 694,
+      "sha256": "5c6e56a8ee4ac28ddccf59624aa2882a119c9af95139401dd2ffa6c8de616d2b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/date-workaround/REPORT.md",
+      "bytes": 1938,
+      "sha256": "012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/date-workaround/copy-manifest.json",
+      "bytes": 68781,
+      "sha256": "5abb94079e55e3d8333eaa0bdfb2f9d3fb22b066e384a5a3b5ca0f8741341c13"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/date-workaround/result.json",
+      "bytes": 8703,
+      "sha256": "08e22ded53bebce4f67a88072bfbec0ce9f25cf3f8931ed3a15258fe97f8af5a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/date-workaround/run.py",
+      "bytes": 5651,
+      "sha256": "83415112d20b77fe2e0f28179e318dee0a9586ddf3d85f0771f31efd834b422f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/final-validation-summary.json",
+      "bytes": 851,
+      "sha256": "45c7b0699e24e9a54540720ee631bb28e3b6f9b82258c825b4833846d40a95cb"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/final_env.sh",
+      "bytes": 805,
+      "sha256": "39efe70394070ce5cc463f22bafd5f011559d1adb9c3191faf2a2dd21a14f782"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/freeze_served_exceptions.py",
+      "bytes": 3895,
+      "sha256": "b9da6681807e71d562a8513b1894ee2c9d385142bc5d6d10c7307857364a941c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/mali-date-review/LEDGER.md",
+      "bytes": 1772,
+      "sha256": "d55eabeda37650deff3d757a3a63d990655aeecc1bf4f2a62916884284217f25"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/mali-date-review/REPORT.md",
+      "bytes": 4739,
+      "sha256": "8352d0c059020f233c4cfca6b232b1c69e5c83dc4bbe487a63fe6228e869d0c3"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/mali-date-review/replay.json",
+      "bytes": 6560,
+      "sha256": "cecb195687e1ecfa59ed131eccb730f1d24fb1c2f2a1a0d7252ee2d8470b4b9f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/mali-date-review/replay.py",
+      "bytes": 5474,
+      "sha256": "2f1b53028f9708a9f0f6662fc692a210a34ec4e6eafc8828818fe74f8bb7a73d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/prepare_copy.py",
+      "bytes": 4511,
+      "sha256": "3b382c25eddb96af9ba463965feed72b785fbb48089100ec53222988e79230cd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/prepare_targeted.py",
+      "bytes": 2258,
+      "sha256": "343c48c6186420e47cc8783c314211a128dab4f9f8b85aed5242ba988e0863d9"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/preservation.json",
+      "bytes": 544,
+      "sha256": "33fa7c00e0cdc058ab7e9a3111efc7d3331c582b821fa55204f2bb0dbdf7572a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/private-artifacts.json",
+      "bytes": 100561,
+      "sha256": "c64c1c1204d49f333ea910df95d2942e0922bc73c124b782ab132f39ada879de"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/promote_cache.py",
+      "bytes": 16157,
+      "sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/promotion-manifest.candidate.json",
+      "bytes": 2722012,
+      "sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/promotion-synthetic-checks.json",
+      "bytes": 472,
+      "sha256": "1be5cffa46a016c925f27cd3b40c37e7e0ec732fec67d6cbfa7074e63a999541"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/publish_aggregates.py",
+      "bytes": 5881,
+      "sha256": "7ce13435e58923af7caa2b6b548292d13507a15d02e8f22a7bbd90e0befad42f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/report-amendments.json",
+      "bytes": 1682,
+      "sha256": "39e3187ffbf95001b31d4cd6188e37fd2c4ae2347579cedf24b21d26c7ec1f03"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/cache-comparison.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/completion.json",
+      "bytes": 2500,
+      "sha256": "a687d46215e43bfebd5fccf66fa2426f45ae5f15770db812863973b35b84222f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/final-hash-impact.json",
+      "bytes": 1300318,
+      "sha256": "2448ad9d4226e6ddb1ea425874dc1f62094e762ac70d0cfd02e59591add85e24"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/promotion-exclusions.json",
+      "bytes": 3288,
+      "sha256": "e83d0aaad4f53097fd7623388a4e11fc810299cbc5f7a8950633229d0f92cc04"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/raw-cache-comparison.json",
+      "bytes": 41,
+      "sha256": "7e8b8ae737c7bc07afe61da028f0a5b724093c700448ae10110a6918b12f5833"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run/served-comparison.json",
+      "bytes": 9793,
+      "sha256": "fea63d21cf503c87e974c008d1e7954c40ddf4f3b8f8ad4057202650c39e1f08"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/run_final.py",
+      "bytes": 13589,
+      "sha256": "804e66ed9aaa486cc29e318f1931f731e1b948f6cc176b8a0dbe3b903584b2b2"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/runner-adaptation.diff",
+      "bytes": 3905,
+      "sha256": "826c929c7d9053b7922b2fe0480ec678928b41a6658df6848bf073f0a2733e82"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/runner-provenance.json",
+      "bytes": 332,
+      "sha256": "fba87895de2bd586ff72783950824da8424c2546c4239c5739697d5e3a759666"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/served-exceptions.json",
+      "bytes": 9612,
+      "sha256": "9520a4cb6960b9b09bb7783568151fd2f59878965ce1cb3c1136a34582b93490"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/summarize_final.py",
+      "bytes": 6655,
+      "sha256": "ec14a1e9b62cfd2bd508bfa92b6edcd2d231e43fe97481f1668061ad0c4e44d1"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/summary-adaptation.diff",
+      "bytes": 3722,
+      "sha256": "4f15446491aae99b1962245cebfc446c940c0cf65b032ca58bc50972c358f31e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/tables.tsv",
+      "bytes": 98810,
+      "sha256": "b0798aedb9a0c3f926796f1357a42b2e95f2dbdd01f4dd5e98d8040efb6192fd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/tanzania-date-review/LEDGER.md",
+      "bytes": 1084,
+      "sha256": "db21c5a23a8cece539fe551f2d8ecd3138e6b8b0b24a695b529b6c6de98aad09"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/tanzania-date-review/REPORT.md",
+      "bytes": 3893,
+      "sha256": "af4051cee71ee0e230a5b7bd481356d5dbb5d3b43ed3f24c8b3f630e899156e4"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/tanzania-date-review/replay.json",
+      "bytes": 6056,
+      "sha256": "107e89997a9e23890330f4b12a8869b312a96528563d3a32aff5ec8520f8c83d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/tanzania-date-review/replay.py",
+      "bytes": 5120,
+      "sha256": "747e1f276684dc309920f95ee08144899e5851adc72184629075676b537098b1"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/targeted-summary.json",
+      "bytes": 856,
+      "sha256": "4fe734e9aaf0900c65ccb4d5570edb561f6c8003ed279c4a3fbe61788b889fad"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/timing.json",
+      "bytes": 308,
+      "sha256": "d6023d5b76f23ab5b04ea90f581cdeecacafa3129882f4e7896b912721522d2b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/trailing-uganda-aggregate.json",
+      "bytes": 67582,
+      "sha256": "314428b4725664140550d52d5cf3bf97efd336a3a0505af6747812a6964c15fd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/trailing_uganda.py",
+      "bytes": 3564,
+      "sha256": "3ff0e1cb60b4e630b512c4e7b98590d92b2c17589cd958f716bfd8c8a3c89e9d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/uganda-sibling-write.json",
+      "bytes": 21134,
+      "sha256": "8f9335a2bb45eb264a294b2195d0ee519b4cf3f8fe6702d3bbb5e3048c32e820"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/verify_final_preservation.py",
+      "bytes": 2131,
+      "sha256": "f57d020f562d2ae8d07c91f6db70bac7aee70224732e6328294c8c41cbe22be7"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-cache-validation/warning-counts.tsv",
+      "bytes": 15560,
+      "sha256": "3c02f4b41fa91b50873e1fe41241a5fff42da8b2583647cf38663646b2c01574"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/REPORT.md",
+      "bytes": 8380,
+      "sha256": "655080efbb6054c32a06989f3120a37a65fc81fbb1952c5c184539dd58644902"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/aggregate-results.json",
+      "bytes": 5997,
+      "sha256": "28c31c019686df04c6d0d632ce91a995e19efec52189cc06b62d56e64568614d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/analyze_terminal.py",
+      "bytes": 3755,
+      "sha256": "a50c4cc17d2d949c672f82fc8b71910cbe4d8ef71d667a681e586fab7399d351"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/evidence-manifest.json",
+      "bytes": 1578,
+      "sha256": "947985bc0c95e2e2718f10f0da29a67238a5aa88bf9b50f1592887e5a15a8bb6"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/expected-native.json",
+      "bytes": 685,
+      "sha256": "3abd7beb87c3bb2c353e83e89ddea59c2890f64ffd913b039fb526bec6d8174c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/monitor-finished.json",
+      "bytes": 294,
+      "sha256": "313aedf66ac1226f9cbaed344a6ec7e40aac0c6d0eb68992f765a2d773b2a13d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/monitor-process.json",
+      "bytes": 264,
+      "sha256": "843c345f8c13de099e9c6ce22b343cbb109d3ac9ba5815c4730df3b988a80d81"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/monitor.py",
+      "bytes": 4460,
+      "sha256": "693306f8f2c14fe03d95477fc98a67427c5297b636dc1016f201842b8e3bb259"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/native-validation.json",
+      "bytes": 745,
+      "sha256": "80e5b052ec6495408cd1ef82bd3e20d124e30dc03fed6484e460d0b427e8352f"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-ci/semantic-review.json",
+      "bytes": 15446,
+      "sha256": "19c605ed51e4b5d0bdb4344b56c3660343e35ffd389f141bd962bbca6d18b857"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/final-original-ref-dispositions.json",
+      "bytes": 465,
+      "sha256": "b39ded6f09f4ad5d25ebbb3fc66a5ca068bc50dac9e99167b610aab9fdf41daa"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/issue962-reconciliation/REVIEW.md",
+      "bytes": 4595,
+      "sha256": "68e04aefc541682316b7a90a1db59205fc7a176c39e26c7f1ca53085151ba263"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/issue962-reconciliation/applied.json",
+      "bytes": 557,
+      "sha256": "62a7e5d8dc0e9cb08ce0d2f6394a674e60306e58c4d3eb36914f1fe21a60dd84"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/issue962-reconciliation/body.md",
+      "bytes": 5015,
+      "sha256": "bde0c9ff45f863d0de3426af3dbb741147cb0cbad74a2fbcf52edb265f9c5a21"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/issue962-reconciliation/evidence.json",
+      "bytes": 2128,
+      "sha256": "6aa5b18b070a0997e325d94c6afbe21ac7f9add97f688db8a995e323bb524e3a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/issue962-reconciliation/title.txt",
+      "bytes": 110,
+      "sha256": "dda4ea3ac9df4ce05f7947f9f50c0373fa912c4f1208fb3943ddbb13554cb3a7"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/landing-prs-final-implementation.json",
+      "bytes": 100352,
+      "sha256": "1af1a9d6d37c3bb6f742f1f641cbda55d6e84b79edb4a062a4d46ead3c089c51"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/CONTENTS-proposal.org",
+      "bytes": 1369,
+      "sha256": "9c0e67e2921afa0f7beaf2d24cef6144755e741eb52232e06c931fa03d2554c8"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/REVIEW.md",
+      "bytes": 5851,
+      "sha256": "b3c90c6ff168fe2b95e20cad8b0106176b4ef98225f66aae5fe22bc5448d0425"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/applied.json",
+      "bytes": 598,
+      "sha256": "39cb92d6185d559e1a9cc2a32c5ae524ad6958a4bd170b84e2e9ecb1e727c831"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/issue798-body-mali-checkpoint.md",
+      "bytes": 4202,
+      "sha256": "4321b9f20ee6134af425a143f856d02d59f1891d487e9e060bac2ec445b9a621"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/issue798-body.md",
+      "bytes": 5584,
+      "sha256": "0497a69fce1d9a796aea26fa20fb815f7e6732ba8b5d75399c84a2cc4bdf3549"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/issue798-title-mali-checkpoint.txt",
+      "bytes": 91,
+      "sha256": "5c52bef445534c3ce2d777f227ed072ac7ab9c45167a40b9f289fb5bfd35fc5b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/issue798-title.txt",
+      "bytes": 84,
+      "sha256": "02669ecb46cb1d19ec5a2fdbc8ebfb129ab1e3488e6ced49b250f0bc56e71c90"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/synthetic-result.json",
+      "bytes": 658,
+      "sha256": "45c5cf1229ec484952e6357985cffe0aed75a74cc3a6ed84d447755fc4597d71"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/synthetic_datetime.py",
+      "bytes": 2187,
+      "sha256": "e88f88b5d616ce6c25c68c2608b54aebaab23e08230177493db2b8f84fe305e9"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/mali-date-review/validation.json",
+      "bytes": 3713,
+      "sha256": "c59704e3eb51e11b0d5eda18e0c988732b2736fa255bd9aef34c243a4d802a11"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/post-approval-issue-updates.json",
+      "bytes": 1026,
+      "sha256": "ccd14f967d671ac96622efcddca5ebc353693acded0dc021621d94a4211b6da9"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/tanzania-date-review/CONTENTS-proposal.org",
+      "bytes": 1764,
+      "sha256": "3bb065246067b06febefa2999ef0f26cd9ed9cb61a9c9020f6808f673e3ec3ce"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/tanzania-date-review/REVIEW.md",
+      "bytes": 6352,
+      "sha256": "31627594243e16782e66067f076fb87e6ca5279a3a49d81f9a76b2d608aa7a7a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/tanzania-date-review/source-history.json",
+      "bytes": 2754,
+      "sha256": "43067b9826606c404901bc44dd926445c92bef349c6a5f69a49f5703b1e37dfd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/tanzania-date-review/validation.json",
+      "bytes": 3466,
+      "sha256": "5f0ed1d3d14a1efaecf805d1bb97e07d95a8f228b2d7fab922f3f0a66b8cac86"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets-review/MANIFEST.json",
+      "bytes": 531,
+      "sha256": "932c03f2e081c9f7aa1e400d6003e595827a20ae9be9f56a44ee9213a7ca17dd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets-review/REVIEW.md",
+      "bytes": 5130,
+      "sha256": "f7bdd88d62e159ecdf15a4eaf02713207b1ed6c2a94ee3a247b2f80e9f4b05cd"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets-review/bundle-validation.json",
+      "bytes": 539,
+      "sha256": "a63fc08476101528fb5d3921148a6c96175eb38deb21c9dd5a169255f60f725a"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets-review/evidence-validation.json",
+      "bytes": 2338,
+      "sha256": "f7de23a8de7044567219b368185a05e607122e034914f19a3d0fddcc28974a63"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets-review/source-validation.json",
+      "bytes": 1149,
+      "sha256": "032f7a6872dd41e831ec64265bf681e8b70e83a5e34042539991b431ee2bed1b"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/REPORT.md",
+      "bytes": 9686,
+      "sha256": "073978a933fd9de979096232508e6d5be94ec9a829362e88a0f18681c1532b0d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/copy-manifest.json",
+      "bytes": 1618,
+      "sha256": "8e4455a9649fb52314188a92780b909b84128214be3fb4be9aafff36333f7502"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/corrected-ci-result.json",
+      "bytes": 758,
+      "sha256": "0c849940817ecaa487b25f1f12febd6f0ed10b20d777c0387e53f6811ecf0239"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/evidence-manifest.json",
+      "bytes": 3654,
+      "sha256": "6d4b7273ead175d5ccd21e31a0d351023b649fff849faa645949d135dbfa7f63"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/fixed-copy-manifest.json",
+      "bytes": 1909,
+      "sha256": "7b4dc2c77028240447868d4eef725cb73daf2c3fecc0f427a3f6025ed9c97c08"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/fixed-replay-result.json",
+      "bytes": 1658,
+      "sha256": "5eaa9b71af9c5405cdec2f2c89b908ce38d75cea61249330767f869beddc0df5"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/fixed_replay.py",
+      "bytes": 3722,
+      "sha256": "76e6997fe08a040def33833f8f9edd334f8b679902f8cea52669310e3ee734dc"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/hash-scope-final-result.json",
+      "bytes": 1465,
+      "sha256": "f56d9d2d24ee90c53bd4fd0da583b18614834b0fc2e13a17241060b462622ae7"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/hash-scope-result.json",
+      "bytes": 1256,
+      "sha256": "2957e4f5a900ee3475f94136c4360024f043962e3ba81a98306b1f6ec8402bb3"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/hash_scope.py",
+      "bytes": 617,
+      "sha256": "ce484ef59256708f5e7285a16b22817fb390941ff2fc899de41ea36647e7d6ec"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/old-job-annotations.json",
+      "bytes": 876,
+      "sha256": "db0858a9993f9c1207461d2c0defd794871e46e32b570e6857e65e81012108aa"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/old-monitor-stopped.json",
+      "bytes": 532,
+      "sha256": "cda12afe0e3026ef7d8afe57c1e62261c9fde15952af8721ded2b41182902bcb"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/replay-result.json",
+      "bytes": 4379,
+      "sha256": "47f95a252ab7f3f64972ade04ed8823470c521a9cf0b3e4f4cec9d94c54e0b2e"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/replay.py",
+      "bytes": 3177,
+      "sha256": "da0914dee83e06019c60b7fb7e3af36df7ac9aa2b182c617425f2de1b52beff4"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/synthetic-result.json",
+      "bytes": 1372,
+      "sha256": "71d6533d25415361f4208e1058ac64a0545f180806ab105fdab7f0a9af4ffe42"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/synthetic_probe.py",
+      "bytes": 2712,
+      "sha256": "ede116cd11cdacc2228047371bac8f5f0743acab999f2884b6850b94b2e33c4d"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-assets/test-results.json",
+      "bytes": 576,
+      "sha256": "137360cb0a7fc3f963538aab2545118cb73b6be01cda7ac24da7795fe6ec97d9"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/CONTENTS-addendum.org",
+      "bytes": 1590,
+      "sha256": "ae411625a2303e1d21d85416ba69a54b8840a222082d453bd8460502c475a81c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/MANIFEST.json",
+      "bytes": 710,
+      "sha256": "c3839244499d196abfc49ddf5cf282d2d70e1e71f65698a865a26634352ace44"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/REVIEW.md",
+      "bytes": 5454,
+      "sha256": "10d00e5fb9a2591b4c1c0e970c3643f5b23a78963e995240dffc604ffd06599c"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/applied.json",
+      "bytes": 425,
+      "sha256": "948a58a1d04035633ddd1407c661851f4168ea8e9478549fb93b443b8df5d928"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/issue788-addendum.md",
+      "bytes": 2332,
+      "sha256": "1e80939c461b05945ef849d55933d154d7e1453e34337602f6e3c3190126fced"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/issue788-applied-body.md",
+      "bytes": 10741,
+      "sha256": "d0e9ae40d47ab0a053a5740350c2d1295224e7e25c2a748f54f675aecfd00289"
+    },
+    {
+      "path": "slurm_logs/release_landing_2026-10-14/uganda-sibling-review/validation.json",
+      "bytes": 2290,
+      "sha256": "537c86ad57862141e8b7e0e8a10946afe10c82e556b3e56135aafcc69ad21b55"
+    }
+  ],
+  "final_ci_bundle_members_verified": 9,
+  "final_ci_manifest_sha256": "947985bc0c95e2e2718f10f0da29a67238a5aa88bf9b50f1592887e5a15a8bb6",
+  "promotion_records_consistent": true,
+  "promotion_manifest_sha256": "e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d",
+  "actual_transaction_journal_sha256": "0f292c1d8c6a9a3a8d569b059c7ed30734a613a647070b7ccc8514d93b3f7542",
+  "journal_counts": {
+    "stage_started": 1,
+    "stage_complete": 1,
+    "apply_started": 1,
+    "backup_ready": 1215,
+    "mutation_intent": 1368,
+    "mutation_done": 1368,
+    "already_identical": 150,
+    "already_absent": 1,
+    "apply_complete": 1
+  },
+  "mutation_intent_and_completion_path_sets_equal": true,
+  "promotion_result": {
+    "verified_utc": "2026-10-15T14:57:11.067827+00:00",
+    "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+    "manifest_sha256": "e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d",
+    "transaction": "/global/scratch/fsa/fc_jevons/ligon/cache/.lsms-promotion-3914d8804-20261015T1441Z",
+    "final_shared_parquets": 1518,
+    "verified_files": 1518,
+    "created_paths": 153,
+    "replaced_paths_with_verified_backups": 1215,
+    "already_identical_paths": 150,
+    "planned_retirement_paths": 1,
+    "actual_deleted_paths": 0,
+    "already_absent_retirement": "Uganda/var/nutrition.parquet",
+    "unlisted_paths": 0,
+    "l1_preserved_in_place": true,
+    "per_file_atomic_journal_complete": true,
+    "backups_retained": true,
+    "second_verify_passed": true,
+    "original_and_final_private_caches_preserved": true,
+    "no_shared_library_api_calls": true,
+    "journal_events": {
+      "stage_started": 1,
+      "stage_complete": 1,
+      "apply_started": 1,
+      "backup_ready": 1215,
+      "mutation_intent": 1368,
+      "mutation_done": 1368,
+      "already_identical": 150,
+      "already_absent": 1,
+      "apply_complete": 1
+    },
+    "journal_sha256": "0f292c1d8c6a9a3a8d569b059c7ed30734a613a647070b7ccc8514d93b3f7542",
+    "verification_sha256": "0161d92d1bd580f20e0417a49f157c0333c5d980e5d3dd2252eebf5f4d834de7",
+    "note": "Tool verification retired=1 counts the planned retirement path; journal proves it was already absent and no unlink occurred."
+  },
+  "preservation_result": {
+    "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+    "checked_at": 1792076162.5316284,
+    "candidate_manifest_sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774",
+    "final_files": 1519,
+    "final_sha_size_mtime_device_inode_unchanged": true,
+    "original_corpus_unchanged": true,
+    "source_clean": true,
+    "in_tree_parquets": 0,
+    "shared_l2_access": false,
+    "scope": "Known session final-cache builders completed; later tests use a separate physical root. This is no global lock on external shared writers."
+  },
+  "no_cache_frame_or_API_access": true,
+  "tracked_diff_review_scope": "Documentation/evidence only; master merge, actual release command, tag and publication remain pending.",
+  "previous_reviewed_tracked_diff_sha256": "dcefc17f3f5bafcdcc04c3e2e704bb2b379f2de74145d09690a9371d4d7d92d6",
+  "strict_docs_check_addendum": {
+    "only_tracked_delta": "WORKPLAN strict-check success and source-equivalence prose",
+    "evidence_path": "slurm_logs/release_landing_2026-10-14/final-docs-checks.json",
+    "evidence_sha256": "f23bdd8e666c394e1fef5a12b6756980b05275cd687091e7cc6e506ad6a14f10",
+    "log_hashes_independently_verified": {
+      "strict_api_audit": {
+        "path": "/local/job39919092/release-work/control/final-release-docs/api-audit-final.log",
+        "sha256": "1361523f8c8725781a50257ff737e5f711fa2a69e1f95e1063ace46dc413d51a",
+        "last_lines": [
+          "           Use this skill when cutting a release of the LSMS Library. The primary path is...",
+          "",
+          "hashed build inputs untracked by git: none"
+        ]
+      },
+      "strict_docs_build": {
+        "path": "/local/job39919092/release-work/control/final-release-docs/mkdocs-final.log",
+        "sha256": "2a70b8d940ed244da75f7bddc898df91145e093a9ca198834d04907bf24c2093",
+        "last_lines": [
+          "  - releases/v0.15.0.md",
+          "INFO    -  mkdocstrings_handlers: Formatting signatures requires either Black or Ruff to be installed.",
+          "INFO    -  Documentation built in 3.22 seconds"
+        ]
+      }
+    },
+    "no_rerun_by_reviewer": true
+  }
+}

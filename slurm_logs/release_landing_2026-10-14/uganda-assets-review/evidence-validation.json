@@ -1,0 +1,59 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "review_scope": "read-only saved frames, source and evidence; no API, rebuild, cache reads or writes",
+  "comparisons": {
+    "raw": {
+      "exact": true,
+      "rows": 116808,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "t",
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "attrs_equal": true,
+      "id_converted": true,
+      "snapshot_sha256": {
+        "before_cache.pkl": "5ab36a3df3f40f1da4955574476fc1c733af3783c42a306afbf4d6546b7a465f",
+        "fixed_make_cache.pkl": "5ab36a3df3f40f1da4955574476fc1c733af3783c42a306afbf4d6546b7a465f"
+      }
+    },
+    "served": {
+      "exact": true,
+      "rows": 116808,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "t",
+        "j"
+      ],
+      "duplicates": 4237,
+      "attrs_equal": true,
+      "id_converted": true,
+      "snapshot_sha256": {
+        "before_api.pkl": "577678df8aea2b2adafd36bed3119535944913dad110f47598b18d4a81252f3c",
+        "fixed_api.pkl": "577678df8aea2b2adafd36bed3119535944913dad110f47598b18d4a81252f3c"
+      }
+    }
+  },
+  "eight_wave_exact_proof_reviewed": true,
+  "evidence_sha256": {
+    "fixed-replay-result.json": "5eaa9b71af9c5405cdec2f2c89b908ce38d75cea61249330767f869beddc0df5",
+    "fixed_replay.py": "76e6997fe08a040def33833f8f9edd334f8b679902f8cea52669310e3ee734dc",
+    "fixed-replay.log": "39f592a87b7fe6b5490d7a39d88b2150398cd10753b000d5dbc544c63f1c1e36",
+    "final-unit.log": "391a2e52ba72ca446d649ecead4e37af1c0dde9c9e6437a001852fece242b5e3",
+    "negative-control.log": "713f6020dffe02134eceac4ab005e96356e29955d4fb8110184d33f6f50be697",
+    "replay-result.json": "47f95a252ab7f3f64972ade04ed8823470c521a9cf0b3e4f4cec9d94c54e0b2e",
+    "replay.py": "da0914dee83e06019c60b7fb7e3af36df7ac9aa2b182c617425f2de1b52beff4",
+    "synthetic-result.json": "71d6533d25415361f4208e1058ac64a0545f180806ab105fdab7f0a9af4ffe42",
+    "hash-scope-result.json": "2957e4f5a900ee3475f94136c4360024f043962e3ba81a98306b1f6ec8402bb3",
+    "hash_scope.py": "ce484ef59256708f5e7285a16b22817fb390941ff2fc899de41ea36647e7d6ec",
+    "copy-manifest.json": "8e4455a9649fb52314188a92780b909b84128214be3fb4be9aafff36333f7502",
+    "fixed-copy-manifest.json": "7b4dc2c77028240447868d4eef725cb73daf2c3fecc0f427a3f6025ed9c97c08"
+  }
+}

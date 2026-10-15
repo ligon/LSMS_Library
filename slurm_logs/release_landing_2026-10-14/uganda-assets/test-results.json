@@ -1,0 +1,21 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "negative_control": {
+    "source": "c008327a92abfccf755ff608eb2a616455483a7c",
+    "failed": 5,
+    "seconds": 8.62,
+    "note": "tests added before assets.py changed"
+  },
+  "final_focused": {
+    "passed": 31,
+    "skipped": 0,
+    "warnings": 4,
+    "seconds": 13.7
+  },
+  "direct_existing_raw_checks": {
+    "passed": 2,
+    "note": "unchanged original test methods invoked directly with private built assets parquet"
+  },
+  "existing_assets_baseline_entries": 0,
+  "final_real_comparisons_check_exact": true
+}

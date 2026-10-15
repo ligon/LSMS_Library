@@ -1,0 +1,37 @@
+{
+  "job_id": 116460137762,
+  "conclusion": "success",
+  "expected": {
+    "Uganda:shocks": {
+      "rows": 14457,
+      "waves": 8,
+      "digest": "64a53fa7af55"
+    },
+    "Uganda:assets": {
+      "rows": 116808,
+      "waves": 8,
+      "digest": "9202ed542a14"
+    }
+  },
+  "actual": {
+    "Uganda:shocks": {
+      "rows": 14457,
+      "columns": 10,
+      "waves": 8,
+      "digest": "64a53fa7af55"
+    },
+    "Uganda:assets": {
+      "rows": 116808,
+      "columns": 1,
+      "waves": 8,
+      "digest": "9202ed542a14"
+    }
+  },
+  "matches_expected": true,
+  "installed_code_and_config_assertions_reached": true,
+  "make_prerequisite_check": {
+    "parquet_list": 126,
+    "find_errors": 0
+  },
+  "mismatch_or_raised_diagnostic": false
+}

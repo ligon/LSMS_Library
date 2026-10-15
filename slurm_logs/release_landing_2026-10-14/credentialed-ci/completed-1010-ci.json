@@ -1,0 +1,123 @@
+{
+  "candidate": "9d5bf200f170f322076626386689b498bebb1c06",
+  "run_url": "https://github.com/ligon/LSMS_Library/actions/runs/38697245468",
+  "jobs": [
+    {
+      "run_id": 38697245468,
+      "sha": "9d5bf200f170f322076626386689b498bebb1c06",
+      "job": "unit-tests",
+      "id": 116296632079,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T07:12:58Z",
+      "completedAt": "2026-10-15T07:15:43Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38697245468/job/116296632079",
+      "active_steps": [],
+      "log_bytes": 85378,
+      "log_sha256": "996d49de048ac065ca1879e634d41bd841dd24a5132ffa83faf526825e2a35eb",
+      "expected_full_source_sha_present_in_log": true,
+      "test_summaries": [
+        {
+          "summary": "3288 passed, 4407 skipped, 60 warnings in 126.41s (0:02:06)",
+          "counts": {
+            "passed": 3288,
+            "skipped": 4407,
+            "warnings": 60
+          },
+          "pytest_seconds": 126.41
+        }
+      ],
+      "failed_nodes": []
+    },
+    {
+      "run_id": 38697245468,
+      "sha": "9d5bf200f170f322076626386689b498bebb1c06",
+      "job": "data-tests",
+      "id": 116296632216,
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-15T07:12:58Z",
+      "completedAt": "2026-10-15T08:10:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38697245468/job/116296632216",
+      "active_steps": [],
+      "log_bytes": 461456,
+      "log_sha256": "e1895513df52c2c99b7c2cf8b0840b60890f04a469fe6f6afd64992627fe621e",
+      "expected_full_source_sha_present_in_log": true,
+      "test_summaries": [
+        {
+          "summary": "3 failed, 4919 passed, 2768 skipped, 4 xfailed, 1 xpassed, 1004 warnings in 3140.09s (0:52:20)",
+          "counts": {
+            "failed": 3,
+            "passed": 4919,
+            "skipped": 2768,
+            "xfailed": 4,
+            "xpassed": 1,
+            "warnings": 1004
+          },
+          "pytest_seconds": 3140.09
+        }
+      ],
+      "failed_nodes": [
+        {
+          "outcome": "FAILED",
+          "node_id": "tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Uganda/assets]"
+        },
+        {
+          "outcome": "FAILED",
+          "node_id": "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Uganda/assets]"
+        },
+        {
+          "outcome": "FAILED",
+          "node_id": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]"
+        }
+      ]
+    },
+    {
+      "run_id": 38697245468,
+      "sha": "9d5bf200f170f322076626386689b498bebb1c06",
+      "job": "windows-smoke",
+      "id": 116296632418,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T07:12:59Z",
+      "completedAt": "2026-10-15T07:16:49Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38697245468/job/116296632418",
+      "active_steps": [],
+      "log_bytes": 94943,
+      "log_sha256": "9b8872b0a6ac8af8f16c8ca97fea83d8bea31c69dd8708cd83ff380e9f733e55",
+      "expected_full_source_sha_present_in_log": true,
+      "test_summaries": [
+        {
+          "summary": "327 passed, 1 skipped in 9.70s",
+          "counts": {
+            "passed": 327,
+            "skipped": 1
+          },
+          "pytest_seconds": 9.7
+        }
+      ],
+      "failed_nodes": []
+    }
+  ],
+  "module_progress": {
+    "tests/test_ehcvm_7day.py": {
+      "passed_progress_markers": 163,
+      "progress_lines": [
+        "............................................... [ 12%]",
+        "........................................................................ [ 13%]",
+        "............................................                             [ 14%]"
+      ],
+      "interpretation": "All emitted outcomes in this complete module progress block are passes; no skipped/failing marker."
+    },
+    "tests/test_currency_denominated_units.py": {
+      "passed_progress_markers": 20,
+      "progress_lines": [
+        "....................            [  9%]"
+      ],
+      "interpretation": "All emitted outcomes in this complete module progress block are passes; no skipped/failing marker."
+    }
+  },
+  "data_log_sha256": "e1895513df52c2c99b7c2cf8b0840b60890f04a469fe6f6afd64992627fe621e",
+  "data_log_bytes": 461456,
+  "release_gate": "FAILED; two Uganda/assets checks and one nutrition baseline comparison. Nutrition direction approved by user after this run; fixture repair and assets investigation are subsequent work, not passes from this run."
+}

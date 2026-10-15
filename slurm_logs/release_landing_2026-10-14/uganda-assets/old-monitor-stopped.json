@@ -1,0 +1,13 @@
+{
+  "stopped_utc": "2026-10-15T13:20:59.809619+00:00",
+  "owned_pid": 4145642,
+  "reason": "All monitored jobs terminal. Old4f runner-lost-communication annotation and repeatedly unavailable completed-job log (HTTP404); avoid unbounded polling. Future log availability is unknown; manual capture remains possible.",
+  "missing_data_logs": [
+    {
+      "run": 38687547945,
+      "job": 116265764223,
+      "conclusion": "failure"
+    }
+  ],
+  "aggregate_sha256": "05636955d0d6a3a46422d00d2d4d74d01061f973573c406af364ee4ed0cc75ce"
+}

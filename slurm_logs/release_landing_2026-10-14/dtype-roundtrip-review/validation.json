@@ -1,0 +1,48 @@
+{
+  "verdict": "APPROVE bounded two-pair serialization exceptions and both country prose proposals",
+  "source_head": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "release_head": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "source_comparisons_verified": true,
+  "country_diff_since_v014": [
+    "lsms_library/countries/Mali/_/categorical_mapping.org"
+  ],
+  "bundle_and_proposals": {
+    "dtype-roundtrip-publishable": {
+      "manifest_sha256": "affd8b6220dc976c2b31e7c2cca5321c9c0ed968e9e9d4748779a2909eb7e514",
+      "members_verified": 15,
+      "member_hashes": {
+        "LEDGER.md": "e96d7476e0f1c64319f653f854bdf82eff3a3dbee7376f7c91af9e3dadc0b75f",
+        "REPORT.md": "a09f5bd7700575ce3acfb62674e692db2f181223a6f1e6828f101dab80789046",
+        "cold-copy-manifest.json": "d9b21a1e78ad4fa8b04bceecf378eafd3db539950c9c450f9b445ee6a0899dea",
+        "cold-result.json": "75362a2e938abfa5ad885cb9b659279d4e8091e55aaec8fb75f63fb233efd36b",
+        "cold_probe.py": "1c5ffb827782e6e49170b9e8248cb374beb07117f4100a8ce1c38391074b21ca",
+        "compare_frames.py": "b294041faaf9491e3166c87099e505a6b4d236bd2ca979d649ecf6a85653988f",
+        "copy-manifest.json": "ce5e0e53da16fe96bc4d4eb7e142dd61fc1f8adfe76a4963dd572052165a40ee",
+        "private-evidence-digests.json": "6a5ecbae2ca32018843a16b7955f11e4027400438ea97f89f12af01153e37464",
+        "probe.py": "11f39387f8b8456d28a779219fc22355b9fd7c923e42ca9acbc420c4861eb8fd",
+        "rebuild-comparison.json": "561cef541fb6897dfbcf1059ff6dded340fce7698352ced7cc24f50b5310472e",
+        "result.json": "94b3de9415e6e19f7155ef59c6653628616e6a11c3aa5a2882d4829618f4ea1f",
+        "source-and-raw-identity.json": "df3c16a633fde44abe0abe2976f176d7ab075d48ae2414e1dffb73fc610b9f79",
+        "strict-semantics.json": "acd5290e7e46a47fe97765876249814d816d09ea87b9062c63b8b441cbdbe804",
+        "strict_semantics.py": "2cab9268095a90dc4afe1732dfb1b8a4c4f103d4c0434aab9e5d9e6ae1d88014",
+        "writer-events.json": "a57538ebfd3eaa395420a89b72e7ff87f86151ca2a1169102df110ec806a78c8"
+      }
+    },
+    "dtype-roundtrip-proposals": {
+      "manifest_sha256": "48aed96495fd5a5801ae206312c3685024274d9e09e96debf029231915b5b183",
+      "members_verified": 2,
+      "member_hashes": {
+        "Liberia-CONTENTS-addendum.org": "6115052b90576aa767d746ffe7a892377e8838585b394c85645d9a499c53f818",
+        "Mali-CONTENTS-addendum.org": "102e852df86706f937104882e6cc8d2204c402da6639887fee419394ea95c50b"
+      }
+    }
+  },
+  "archive_byte_equal": true,
+  "archive_files_verified": 16,
+  "saved_cold_warm_shapes_dtypes_index_names_and_counts_reconciled": true,
+  "strict_checks_reviewed_not_rerun": true,
+  "recorded_original_final_target_parquet_hashes_agree": 7,
+  "reviewer_API_or_cache_access": false,
+  "privacy": "all published bundle members reviewed; aggregates, source probes, and digests only; no raw frames or logs",
+  "release_note_snapshot_sha256": "254c9ee8cf6c0c5bc4799e140f768342085d9863404bce2de7a7129eeecb485d"
+}

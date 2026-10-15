@@ -1,0 +1,38 @@
+{
+  "v0.14.0": {
+    "_enforce_declared_dtypes": "74aa6d13b6bb23fc67280324113e5bfc21f098c19a852c5cf9673c864c40e6ee",
+    "_enforce_canonical_dtypes": "9001f37fdae414685652b3d7b966ec1aff9cd1743493607bd06e871187ec89ef",
+    "_normalize_dataframe_index": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+    "_join_v_from_sample": "53d543973e56b0e795f892b8f57b2a315e3d40eb82d2885b37ae18be45fd7869",
+    "_finalize_result": "614528964a09ba57a0e3d3a5cab67789a703e6d27cb74fe2fa515c10fccd74be",
+    "to_parquet": "ec8d4232c192ef131e57e416e5bb5ee25bc775c3d1a027553eb37516cbb4b0ce",
+    "date_script_blob": "b1117145dabd17041adf18226901bf972f2ce977"
+  },
+  "452302adcfdbf3af538ef06375df1ac6c5aaa8a0": {
+    "_enforce_declared_dtypes": "74aa6d13b6bb23fc67280324113e5bfc21f098c19a852c5cf9673c864c40e6ee",
+    "_enforce_canonical_dtypes": "9001f37fdae414685652b3d7b966ec1aff9cd1743493607bd06e871187ec89ef",
+    "_normalize_dataframe_index": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+    "_join_v_from_sample": "53d543973e56b0e795f892b8f57b2a315e3d40eb82d2885b37ae18be45fd7869",
+    "_finalize_result": "614528964a09ba57a0e3d3a5cab67789a703e6d27cb74fe2fa515c10fccd74be",
+    "to_parquet": "ec8d4232c192ef131e57e416e5bb5ee25bc775c3d1a027553eb37516cbb4b0ce",
+    "date_script_blob": "b1117145dabd17041adf18226901bf972f2ce977"
+  },
+  "7fa05179c8519f44ea329ba6387f5d6d6441a8ea": {
+    "_enforce_declared_dtypes": "74aa6d13b6bb23fc67280324113e5bfc21f098c19a852c5cf9673c864c40e6ee",
+    "_enforce_canonical_dtypes": "9001f37fdae414685652b3d7b966ec1aff9cd1743493607bd06e871187ec89ef",
+    "_normalize_dataframe_index": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+    "_join_v_from_sample": "53d543973e56b0e795f892b8f57b2a315e3d40eb82d2885b37ae18be45fd7869",
+    "_finalize_result": "614528964a09ba57a0e3d3a5cab67789a703e6d27cb74fe2fa515c10fccd74be",
+    "to_parquet": "ec8d4232c192ef131e57e416e5bb5ee25bc775c3d1a027553eb37516cbb4b0ce",
+    "date_script_blob": "b1117145dabd17041adf18226901bf972f2ce977"
+  },
+  "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f": {
+    "_enforce_declared_dtypes": "74aa6d13b6bb23fc67280324113e5bfc21f098c19a852c5cf9673c864c40e6ee",
+    "_enforce_canonical_dtypes": "9001f37fdae414685652b3d7b966ec1aff9cd1743493607bd06e871187ec89ef",
+    "_normalize_dataframe_index": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+    "_join_v_from_sample": "53d543973e56b0e795f892b8f57b2a315e3d40eb82d2885b37ae18be45fd7869",
+    "_finalize_result": "614528964a09ba57a0e3d3a5cab67789a703e6d27cb74fe2fa515c10fccd74be",
+    "to_parquet": "ec8d4232c192ef131e57e416e5bb5ee25bc775c3d1a027553eb37516cbb4b0ce",
+    "date_script_blob": "b1117145dabd17041adf18226901bf972f2ce977"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "note": "Raw frames and logs remain private; only sizes and digests are archived.",
+  "files": [
+    {
+      "name": "Liberia-actual-cold.pkl",
+      "bytes": 101144,
+      "sha256": "ebe00d172496e54cdd51046fa5d47f94ecee8433f169c0f9b63af71229c33959"
+    },
+    {
+      "name": "Liberia-actual-warm.pkl",
+      "bytes": 101148,
+      "sha256": "fc1ab60b2a75d0ddf1cdb13e162fdfca20d72aa0d2cdd739f2ac85bd78c9fac9"
+    },
+    {
+      "name": "Liberia-pre-country-write.pkl",
+      "bytes": 92937,
+      "sha256": "6633908e3efa679e40ef0c6e93e67ee1ab4e7b8cc5bd66938bbaf5d72b363069"
+    },
+    {
+      "name": "Liberia-restored-cold.pkl",
+      "bytes": 101096,
+      "sha256": "e8ef39f858f8039faaab69a7b14304630626967f47b1f5f180c2e138538ef1b5"
+    },
+    {
+      "name": "Liberia-warm.pkl",
+      "bytes": 101148,
+      "sha256": "fc1ab60b2a75d0ddf1cdb13e162fdfca20d72aa0d2cdd739f2ac85bd78c9fac9"
+    },
+    {
+      "name": "Liberia-writer-probe.parquet",
+      "bytes": 52568,
+      "sha256": "9d1fd02e0d298a49da9b588ec1fe37b62edad0f8309bd73a1741f4e380f2bce8"
+    },
+    {
+      "name": "Mali-actual-cold.pkl",
+      "bytes": 22872303,
+      "sha256": "bf77b6fb454c5416597f33a1f860c0be87c8c387a17b7c13995db524623f47f5"
+    },
+    {
+      "name": "Mali-actual-warm.pkl",
+      "bytes": 23689969,
+      "sha256": "01abedcccd7ba8178ed6d3ada5b3c89f551c489cabad433fd79fcf8d1a7f4e98"
+    },
+    {
+      "name": "Mali-pre-country-write.pkl",
+      "bytes": 13428022,
+      "sha256": "fc903edb7bdb70f0ba2bceb1656c2b874e3c2a6ead0b7bca84c2c539e74fb814"
+    },
+    {
+      "name": "Mali-restored-cold.pkl",
+      "bytes": 22516869,
+      "sha256": "9a715fe5b994839ba703d5bd0777853808cace177c926cb0d2831fbe0b023009"
+    },
+    {
+      "name": "Mali-warm.pkl",
+      "bytes": 23689969,
+      "sha256": "4c32a5d8e00c3062a1467b6c459347bc2c9881af269429ac63809f5b87b5fded"
+    },
+    {
+      "name": "Mali-writer-probe.parquet",
+      "bytes": 1244150,
+      "sha256": "d60d1f7d4d96978eb2f74ad8149ea35b07375f555b54b72ed6717410ebfa1913"
+    },
+    {
+      "name": "cold-probe.log",
+      "bytes": 2713,
+      "sha256": "99a1804883b1f21b69e77efdafd9ad03ebbd6bee015abd5e8aee782bdf6789d1"
+    },
+    {
+      "name": "probe.log",
+      "bytes": 987,
+      "sha256": "0d30a451e9e798f7c2515612ca5037becf0c7f536c2bace482f7cb41fcc98693"
+    },
+    {
+      "name": "strict-semantics.log",
+      "bytes": 2436,
+      "sha256": "acd5290e7e46a47fe97765876249814d816d09ea87b9062c63b8b441cbdbe804"
+    }
+  ]
+}

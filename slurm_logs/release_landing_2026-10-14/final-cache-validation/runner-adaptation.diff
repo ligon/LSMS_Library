@@ -1,0 +1,71 @@
+--- completed-corpus/run_corpus.py
++++ final-promotion/run_final.py
+@@ -1,5 +1,6 @@
+ """Scratch release validation; reuses APIs and existing baseline fingerprint.
+-No writes outside OUT and the explicitly private DATA root; shared reads only.
++Reused for ordinary warm validation against an explicitly frozen final SHA.
++No shared-cache API calls or writes; the earlier cold snapshot supplies baseline evidence.
+ """
+ from __future__ import annotations
+ import argparse
+@@ -17,11 +18,14 @@
+ import traceback
+ import warnings
+ 
+-TREE = Path('/local/job39919092/release-work/runtime/corpus')
+-DATA = Path('/local/job39919092/release-work/runtime/data-corpus')
++TREE = Path(os.environ['LSMS_FINAL_WORKTREE']).resolve()
++assert TREE == Path('/local/job39919092/release-work/runtime/final-candidate')
++DATA = Path('/local/job39919092/release-work/runtime/data-final-promotion')
+ SHARED = Path('/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library')
+-OUT = Path('/local/job39919092/release-work/control/runtime/corpus')
+-SHA = '7fa05179c8519f44ea329ba6387f5d6d6441a8ea'
++OUT = Path('/local/job39919092/release-work/control/runtime/final-promotion/run')
++BASE = Path('/local/job39919092/release-work/control/runtime/corpus')
++SHA = os.environ['LSMS_FINAL_SHA']
++assert len(SHA) == 40 and all(c in '0123456789abcdef' for c in SHA)
+ 
+ 
+ def dump(path, value):
+@@ -45,6 +49,10 @@
+     assert countries_root().resolve() == TREE/'lsms_library/countries'
+     assert data_root().resolve() == DATA
+     assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=TREE, text=True).strip() == SHA
++    assert not subprocess.check_output(['git', 'status', '--short'], cwd=TREE, text=True)
++    assert os.sched_getaffinity(0) <= set(range(8))
++    for key in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'LSMS_BUILD_WORKERS', 'LSMS_MAKE_JOBS'):
++        assert os.environ.get(key) == '1', (key, os.environ.get(key))
+     for key in ('LSMS_NO_CACHE', 'PYTHONSAFEPATH', 'LSMS_BUILD_BACKEND'):
+         assert not os.environ.get(key), (key, os.environ.get(key))
+     spec = importlib.util.spec_from_file_location('release_fingerprint', TREE/'tests/generate_baseline.py')
+@@ -146,14 +154,17 @@
+     co = ll.Country(country, preload_panel_ids=False)
+     tables = list(co.data_scheme)
+     waves = list(co.waves)
+-    assert not list((DATA/country).rglob('*.parquet')), f'{country}: root must start empty'
++    gate = json.loads((OUT/'warm-start-approved.json').read_text())
++    assert gate['source_sha'] == SHA
++    assert not (dest/'results.jsonl').exists(), 'refusing duplicate country run'
+     contents = co.file_path/'_/CONTENTS.org'
+     # Retain a content identity so later findings cite the documentation read.
+     dump(dest/'identity.json', {'source_sha': SHA, 'package': ll.__file__, 'countries_root': str(co.file_path.parent),
+                               'waves': waves, 'tables': tables, 'start_time': time.time(),
+                               'contents_sha256': hashlib.sha256(contents.read_bytes()).hexdigest() if contents.is_file() else None})
+-    dump(dest/'status.json', {'stage': 'shared_baseline_snapshot', 'country': country})
+-    snapshot_country(country, SHARED, co, fingerprint, dest/'shared-baseline.json')
++    dump(dest/'status.json', {'stage': 'corpus_baseline_snapshot', 'country': country})
++    baseline = json.loads((BASE/country/'private-final-cache.json').read_text())
++    dump(dest/'corpus-baseline.json', baseline)
+     counts = collections.Counter()
+     for table in tables:
+         started = time.perf_counter()
+@@ -221,6 +232,9 @@
+ 
+ 
+ def run():
++    assert not (OUT/'completion.json').exists(), 'refusing duplicate completed run'
++    gate = json.loads((OUT/'warm-start-approved.json').read_text())
++    assert gate['source_sha'] == SHA
+     records = inventory()
+     countries = [r['country'] for r in records if 'tables' in r]
+     def one(name):
