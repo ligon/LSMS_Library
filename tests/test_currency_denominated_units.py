@@ -553,6 +553,12 @@ def test_panama_kgprice_loses_its_currency_rows():
     """
     c, _ = _country('Panama')
     assert len(c.food_prices(units='kgprice')) == PANAMA_KGPRICE_ROWS
-    # the *value modes are untouched in Panama: its Value rows have no kg
-    # anchor effect on any other unit
-    assert len(c.food_prices(units='unitvalue')) == 501_027
+    # the *value modes are untouched by #770 in Panama: its Value rows have
+    # no kg anchor effect on any other unit.  MOVED 501_027 -> 490_456 by
+    # GH #777 (2026-10-14): 1997's survey unit code 77 ('valor', served as
+    # lowercase u='value') carried the unit code echoed into the quantity
+    # slot (Quantity == 7.70 on 10,973 rows); those quantities are now NA,
+    # so the 10,571 rows whose "unit value" was Expenditure / 7.70 no longer
+    # exist.  kgprice/kgvalue 483,661 unchanged; unitprice 501,027 -> 490,456
+    # for the same reason.  Measured cold in a private LSMS_DATA_DIR.
+    assert len(c.food_prices(units='unitvalue')) == 490_456
