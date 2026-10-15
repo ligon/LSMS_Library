@@ -1,0 +1,19 @@
+{
+  "status": "complete_with_findings",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "scanner_exit_code": 0,
+  "scanner_exit_code_is_not_a_clean_diagnostics_gate": true,
+  "completed_utc_from_log_mtime": "2026-10-15T07:01:09.603388+00:00",
+  "features": 39,
+  "declared_pairs": 549,
+  "scope_skips": 0,
+  "statuses": {
+    "warn": 3504,
+    "error": 19,
+    "pass": 16,
+    "fail": 5
+  },
+  "original_cache_quiescent": true,
+  "original_preservation_artifact": "original-preservation.json",
+  "feature_process_exited": true
+}

@@ -24,7 +24,9 @@ the archived lane reports for reviewed heads, actual merges and validation.
 The private corpus rebuild completed: 530 of 549 declared requests succeeded;
 19 documented source/wiring gaps remain. Shared caches remain untouched.
 The cache-presence follow-up is complete, with the held nutrition failure;
-the Feature audit continues in another physical copy.
+the Feature audit completed in another physical copy, retaining all findings.
+The corrected credentialed CI candidate addresses the reproduced #1010 test
+flag leak; full CI remains a gate.
 The Uganda nutrition direction hold remains open; no release tag exists.
 
 * Evidence and corrections to the handoff
@@ -221,11 +223,16 @@ builders off intermediate development heads during the window.
 - [X] Enumerate every declared country/table, including noncanonical tables
   and empty/unavailable cells. Record success/failure and expected wave
   coverage; a scan of only canonical Feature tables is not a corpus census.
-- [ ] Reuse the deterministic Feature audit (read its README and relevant
+- [X] Reuse the deterministic Feature audit (read its README and relevant
   skills): canonical/all-feature assembly and kwarg checks; classify new
   findings against the recorded baseline rather than requiring old warnings
   to disappear. Store coverage outputs here, without overwriting blessed or
-  committed coverage snapshots as a side effect.
+  committed coverage snapshots as a side effect. The39-feature scan and
+  independent aggregate review are complete. No fully matched prior snapshot
+  exists; feature-prior-comparison/ documents the partial baseline, source
+  and value attribution, and comparison gaps. No unexplained release-specific
+  warning category was identified; unadjudicated warnings remain visible.
+  This does not claim a clean semantic audit or prove every finding historical.
 - [X] Compare rebuilt values with the baseline. #969 itself should preserve
   Linux values; the combined train intentionally changes selected countries.
   Attribute every changed table to a reviewed correction, and every new

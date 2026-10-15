@@ -1,0 +1,98 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "private_raw_artifacts": {
+    "results.jsonl": {
+      "bytes": 3749490,
+      "sha256": "3a453886803dd3de8b7049e8ab9ab55e918565c9b11601032d23c15356bc8e9e"
+    },
+    "scan.log": {
+      "bytes": 94390,
+      "sha256": "732c896359a6d6188897d540979bd58664b55780ac4aaea4ad45686678eb361c"
+    },
+    "clusters.json": {
+      "bytes": 388203,
+      "sha256": "5256ecf674ff0d43857af3a03206e95996eb90de43863ca42fc338c0d48014f5"
+    },
+    "summary.json": {
+      "bytes": 84447,
+      "sha256": "bad8453ec81d76b68b3c5664f9ea07ed1276d7254b8506af9eac205f9f094073"
+    },
+    "ghana-food-loss.log": {
+      "bytes": 2596,
+      "sha256": "bfed216b0b4aad2c0b1337f96e3607a3417d354decf32f6c49b6203ce0fc73d0"
+    }
+  },
+  "frozen_source_files": {
+    "bench/feature_audit/scan.py": {
+      "bytes": 40307,
+      "sha256": "83e182c35ff439a24ea1e46747373793055a4233881870f4970d07e648be694e"
+    },
+    "bench/feature_audit/cluster.py": {
+      "bytes": 4623,
+      "sha256": "eed7a6265f785172cd5ad6adf52cb66ac89d24870d1f94fa08674391e9675c12"
+    },
+    "lsms_library/diagnostics.py": {
+      "bytes": 76200,
+      "sha256": "dd82076e1e2f505871e1382100de9e4664d00c666b57dfb087cec2208463dc6c"
+    },
+    "lsms_library/feature.py": {
+      "bytes": 61147,
+      "sha256": "50884245706863fc37d608db844109efbb68225ebf6525b72319c6266b646930"
+    },
+    "lsms_library/country.py": {
+      "bytes": 379544,
+      "sha256": "b9618124a8af0ec6fd6f5a09f91210433cad6b60d896f7eafaee90f65faef13a"
+    }
+  },
+  "sanitization": "Only feature/phase/check/status counts, public country names, exception types/categories, configured kwargs, durations and coverage are published. Raw details, example values/keys, tracebacks and logs remain private.",
+  "launcher": {
+    "bytes": 1238,
+    "sha256": "ec3557d64c39f32af1dffc75514ae1e18483ab4b7e606066a082286ac2f22888"
+  },
+  "aggregate_generator": {
+    "bytes": 8078,
+    "sha256": "6564d4a68a21a654aabe8fa97d94affc0f5c340e47cb331725f1cbbf927b30f2"
+  },
+  "input_snapshot": {
+    "bytes": 414,
+    "sha256": "6f607dbea57917bd9e39e216fb46e8fb7e28c51fd114d8561d3c9d2019644e38"
+  },
+  "original_corpus_manifest": {
+    "bytes": 374608,
+    "sha256": "020b769159940cc0976278a710253a322fcbc85a2ffce7669ed388bbc4e715d8"
+  },
+  "original_preservation_check": {
+    "bytes": 431,
+    "sha256": "0a8fdb8fce7e7b71c711ccc70080766c0f4191a046131a9b60f30276b551bc41"
+  },
+  "run_metadata": {
+    "bytes": 611,
+    "sha256": "1be927b13cbc2f730946b72f624e88bcc96cdcc96b5d98f267cc4dc3526f3049"
+  },
+  "completion": {
+    "bytes": 543,
+    "sha256": "83b53587e268312394c43450130518c33eb707a380ddb91502da20549cf0e8d9"
+  },
+  "tenure_history": {
+    "bytes": 5033,
+    "sha256": "b764311e1634adac4cd12a0135c37e6ce32c0db7b2dfe266105816481e341e4b"
+  },
+  "market_dependency_history": {
+    "bytes": 1551,
+    "sha256": "aa55dd4ae84e4b69e10e519c7381234d2d0d126d62af5b7979bed082b149d687"
+  },
+  "replay_and_verification_generators": {
+    "tenure_history.py": {
+      "bytes": 4128,
+      "sha256": "015c8c09cb1a752974c05e92a35585064bf14c3a2595a4cdc1fbec7437177112"
+    },
+    "reconcile_ghana.py": {
+      "bytes": 4300,
+      "sha256": "08715afa9c067163166ca7fdea508bafbbbcd30992363e61660d0e33407dcd60"
+    },
+    "verify_original.py": {
+      "bytes": 1980,
+      "sha256": "50ba95bbe98765a856d7fda2efa639fb7275ad999d721480aee51d7fd05c6bce"
+    }
+  }
+}

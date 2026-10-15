@@ -1,0 +1,132 @@
+{
+  "source_before": "cf1840e02317bac052b99e1e6c9fa066a8ca45bc",
+  "source_fixed": "22a841ed8940c618680c5b4363fcb60e455b4a14",
+  "measured_utc": "2026-10-15T07:26:24.485790+00:00",
+  "before": {
+    "complete": true,
+    "helper_tests_passed": 6,
+    "NO_CACHE_after_helpers": "1",
+    "calls": [
+      {
+        "api": "_country",
+        "units": null,
+        "build_starts": 7,
+        "build_completions": 7,
+        "seconds": 329.2702096160501,
+        "rows": 5340606
+      },
+      {
+        "api": "food_prices",
+        "units": "unitvalue",
+        "build_starts": 7,
+        "build_completions": 7,
+        "seconds": 327.5550620658323,
+        "rows": 1676093
+      },
+      {
+        "api": "food_prices",
+        "units": "unitprice",
+        "build_starts": 7,
+        "build_completions": 7,
+        "seconds": 321.8530501164496,
+        "rows": 189656
+      },
+      {
+        "api": "food_quantities",
+        "units": "units",
+        "build_starts": 7,
+        "build_completions": 7,
+        "seconds": 332.6758528770879,
+        "rows": 1694623
+      }
+    ],
+    "total_api_seconds": 1311.35417467542,
+    "total_build_starts": 28,
+    "total_build_completions": 28,
+    "hash": "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904",
+    "manifest": [
+      "1987-88",
+      "1988-89",
+      "1991-92",
+      "1998-99",
+      "2005-06",
+      "2012-13",
+      "2016-17"
+    ],
+    "private_root_stable": true,
+    "private_evidence": {
+      "ordered-before.log": {
+        "bytes": 45305,
+        "sha256": "fbd024b6e9f339a635b6f787f135de1fbb043891498a8daa1934ea59a1705d90"
+      },
+      "ordered-before-events.jsonl": {
+        "bytes": 42751,
+        "sha256": "ad7a1c62d4fcfe3fb26d3da0919c0cf0110605ae98663b63cb64853e912a06c3"
+      }
+    }
+  },
+  "after": {
+    "complete": true,
+    "helper_tests_passed": 18,
+    "NO_CACHE_after_helpers": null,
+    "calls": [
+      {
+        "api": "_country",
+        "units": null,
+        "build_starts": 0,
+        "build_completions": 0,
+        "seconds": 24.20107430871576,
+        "rows": 5340606
+      },
+      {
+        "api": "food_prices",
+        "units": "unitvalue",
+        "build_starts": 0,
+        "build_completions": 0,
+        "seconds": 31.007334579713643,
+        "rows": 1676093
+      },
+      {
+        "api": "food_prices",
+        "units": "unitprice",
+        "build_starts": 0,
+        "build_completions": 0,
+        "seconds": 24.976922823116183,
+        "rows": 189656
+      },
+      {
+        "api": "food_quantities",
+        "units": "units",
+        "build_starts": 0,
+        "build_completions": 0,
+        "seconds": 29.572259828448296,
+        "rows": 1694623
+      }
+    ],
+    "total_api_seconds": 109.75759153999388,
+    "total_build_starts": 0,
+    "total_build_completions": 0,
+    "hash": "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904",
+    "manifest": [
+      "1987-88",
+      "1988-89",
+      "1991-92",
+      "1998-99",
+      "2005-06",
+      "2012-13",
+      "2016-17"
+    ],
+    "private_root_stable": true,
+    "private_evidence": {
+      "ordered-after.log": {
+        "bytes": 45430,
+        "sha256": "aba8cd6b4d0a78ac4ad9e9e6d16bf1a34473f06633c0c7901a5d4248b0023433"
+      },
+      "ordered-after-events.jsonl": {
+        "bytes": 7018,
+        "sha256": "59e3061d9decaf4c74beb5add7bd35da859d7697adae3819e58a3d1a86b172cb"
+      }
+    }
+  },
+  "original_source_files_rechecked_unchanged": 88
+}

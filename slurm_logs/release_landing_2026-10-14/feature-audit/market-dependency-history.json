@@ -1,0 +1,38 @@
+{
+  "v0.14.0": {
+    "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+    "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74",
+    "GhanaSPS": {
+      "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+      "cluster_features_declaration_present": false
+    },
+    "Panama": {
+      "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+      "cluster_features_declaration_present": false
+    }
+  },
+  "452302adcfdbf3af538ef06375df1ac6c5aaa8a0": {
+    "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+    "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74",
+    "GhanaSPS": {
+      "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+      "cluster_features_declaration_present": false
+    },
+    "Panama": {
+      "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+      "cluster_features_declaration_present": false
+    }
+  },
+  "7fa05179c8519f44ea329ba6387f5d6d6441a8ea": {
+    "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+    "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74",
+    "GhanaSPS": {
+      "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+      "cluster_features_declaration_present": false
+    },
+    "Panama": {
+      "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+      "cluster_features_declaration_present": false
+    }
+  }
+}

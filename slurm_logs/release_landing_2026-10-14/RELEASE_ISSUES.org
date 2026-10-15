@@ -438,3 +438,19 @@ actual integrated-suite/corpus/installed-Windows evidence and Uganda's signed
 decision. The release skill then requires a development-to-master merge commit,
 tag-derived build version, and verification that the publish workflow and PyPI
 artifact actually exist. This task performs none of those external actions.
+
+* Region-market dependency disposition -- GH #1009 / existing #140
+Independent source/config and audit-log review confirmed that GhanaSPS and
+Panama have cluster IDs but lack the Region lookup used by the requested
+Feature variants. GhanaSPS is already covered by open #140; no duplicate was
+filed. Panama's distinct geography dependency is now #1009. Evidence is in
+market-dependency-review/ at commit ae890a48f, including country design caveats
+and historical helper/config equality. No geography was inferred or changed.
+
+* Test environment isolation -- GH #1010 / PR #1011
+#1010 was filed after an absent LSMS_NO_CACHE value leaked as1 from the
+collect-only helper's simulated rebuild. PR1011 fixes only test isolation
+and adds12discriminating cases; it merged as36a923305 after independent
+review and both checks. The real Ghana test after the corrected helper file
+passes19tests with zero builds. Full credentialed CI remains separate;
+release PR999 carries the eventual Closes keyword. #941 is not closed.

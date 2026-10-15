@@ -200,3 +200,47 @@ framework lane is investigating repeated builds and session state using a
 separate scoped cache. Earlier unpinned GitHub data runs are retained.
 Private full-log SHA256: c3513a43cf7024dc1f3c4163ae28f1a369a4abb4796673e2e6b1f11c45d19dc8
 (111522bytes). This is an additional open validation gate, not a pass.
+
+* Complete Feature audit and subsequent CI isolation repair
+The frozen7fa05179 Feature phases1/2 scan completed39features across38countries:
+549Country calls,38baseline Feature assemblies and17configured variants, with
+zero scope skips. Its3544emitted diagnostic records are3504WARN,19ERROR,5FAIL
+and16PASS, not a pytest pass count. All19errors match documented corpus gaps;
+the5tenure FAILs remain failures and match pre-existing country mappings. The
+266clusters group findings but do not adjudicate all259warning clusters.
+Independent review approved the aggregate-only archival package; five TSV files
+were normalized fromCRLF toLF with parsed-row equality and original digests
+retained in MANIFEST.json. No original corpus file or shared L2 was changed.
+
+The controlled CI investigation reproduced #1010: passing collect-only controls
+leave LSMS_NO_CACHE=1 when initially absent, causing valid Ghana caches to
+rebuild repeatedly. PR1011 contains only a helper environment-restoration fix,
+12discriminating regressions and its ledger. The exact corrected sequential
+selection (helper file then original Ghana test) passed19tests in112.26s with
+zero Ghana subprocess builds. Unpatched four absence cases fail; eight
+present-state cases pass. No real rebuild behavior or data assertion changed.
+
+PR1011 merged at36a923305 on2026-10-15T07:19:49Z, exact reviewed
+headf00f329b37a793ec7ef17970431e5f4f6478dc4d, after independent review and
+unit/Windows success. The narrow development port excludes held #967.
+Main and filesystem mirror are synchronized. Integrationbf917d438 merges
+that actual development history and is full-tree-identical to CI candidate
+9d5bf200f. Only the helper test and ledger differ from earlier b1b7bae7;
+no production/config/workflow changes. Candidate unit results are3288passed
+4407skipped; Windows smoke327passed1skipped. Credentialed CI38697245468
+began its full suite at07:18:21UTC and remains pending.
+
+Older runs38681185279 and38683117467 were cancelled after the leak was
+reproduced, then their completed partial logs were captured. They have no
+final totals. Run38687547945 remains a comparison. Corrected credentialed CI
+and the Uganda scientific baseline decision are still open; no nutrition
+baseline or shared L2 changed.
+
+Read-only comparison with saved June audits found no matched full baseline.
+Twenty-six of259current warning patterns have historical matches;233unmatched
+patterns are not treated as new defects. The addendum accounts for deliberate
+#830/#787/#868/#864 diagnostics and corpus source/value changes, verifies100
+comparable cached index layouts unchanged, and retains seven absent historical
+cache pairs plus Nepal as explicit gaps. No unexplained release-specific
+warning category was identified within those limits. The original Feature
+outcomes and allFAIL/ERROR statuses remain unchanged; see feature-prior-comparison/.

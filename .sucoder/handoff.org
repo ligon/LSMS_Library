@@ -1,10 +1,10 @@
 #+title: Handoff -- 2026-10-14 release landing IN PROGRESS
 
 * Current execution -- Codex, job39919092
-The maintainer approved WORKPLAN.org and said to proceed. Twenty implementation
+The maintainer approved WORKPLAN.org and said to proceed. Twenty-one implementation
 PRs are merged to development, plus evidence PRs #997/#998/#1007. GitHub, local main
-and filesystem origin development are synchronized at c67c69279 after the
-independently reviewed corpus/coverage evidence PR #1007 passed both CI checks.
+and filesystem origin development are synchronized at36a923305 after independently reviewed PR1011 passed unit
+and Windows checks. Corpus/coverage evidence PR1007 is already merged.
 #967 Uganda remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
 newly reproduced #1003 merged via PR1004 after independent review and CI.
 PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
@@ -29,7 +29,9 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   contains #967 plus all landed code and evidence. Runtime differences from
   development are only the reviewed #967 country changes.
 - Native installed Windows conda job116251866840 passed on74c9398ec,
-  run38683117467. Its Linux data job and earlier38681185279 are still running.
+  run38683117467. Its Linux data job and earlier38681185279 were cancelled
+  after the #1010 leak was reproduced; partial logs are preserved, no suite
+  totals inferred. Native Windows success remains a separate completed job.
   Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
   manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
   matches the earlier candidate; only tests/CONTENTS/evidence differ.
@@ -40,8 +42,12 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   600-second timeout in GhanaLSS unitprice validation, while waiting for a
   wave-build subprocess; no suite summary was produced. This is under
   investigation, not a nutrition failure or established #941 recurrence.
-  All older data runs remain for comparison; no result is inferred from
-  elapsed time.
+  Run38687547945 remains as an unpinned comparison. Corrected candidate
+  9d5bf200f was dispatched as run38697245468 after the exact ordered helper
+  plus Ghana test selection passed19tests in112.26s, with zero Ghana builds.
+  Test-only fix PR1011 merged as36a923305; it excludes held967. Current
+  integrationbf917d438 has an identical full tree to validated candidate9d5. The
+  diagnosed flag leak is #1010, distinct from #1003 and not a proved #941 cause.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
@@ -52,13 +58,25 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   release-work/runtime/data-corpus is quiescent and preserved. Final country
   caches:422fresh plus Uganda earnings/fct hashless after sibling script
   rewrites (#788/#809); no restamping to hide this. Feature phases1/2 are
-  running over39features in a separate physical copy. Shared L2 is untouched.
+  COMPLETE over39features/549pairs/38baseline/17variant calls, with0scope
+  skips. Its3544emitted diagnostics are3504WARN,19known-sourceERROR,5existing
+  tenureFAIL,16PASS; these are not pytest totals or a clean semantic result.
+  Independent review and aggregate-only evidence are in feature-audit/ and
+  feature-audit-review/. Original1519files remain byte/metadata-identical.
+  Shared L2 is untouched. Partial June audits are not matched baselines;
+  feature-prior-comparison/ records26matching patterns,233unmatched patterns
+  (not233new defects), and reviewed source/value attribution. No unexplained
+  release-specific warning category identified; scientific triage remains.
   Feature food assembly exposes a material pre-existing GhanaLSS null-key loss:
   13472rows, independently replayed separately from visit aggregation. Full
   Feature implementation and relevant selectors matchv0.14/pre-train/candidate;
   exact historical input counts were not rebuilt. See ghana-feature-review/.
   This measured country residual is now tracked by #1008; historical #323/#847
   are closed reporting/mechanism references, not a fix for these rows.
+  Region-market variants also exclude GhanaSPS/Panama for a pre-existing
+  missing geography dependency; cluster IDs are present. Independently
+  reviewed CONTENTS notes retain the survey-domain caveats. GhanaSPS stays
+  under #140; the Panama residual is filed as #1009.
 - Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
   4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
   No credential skips; the 2,580 cache-presence skips were subsequently
@@ -140,4 +158,3 @@ PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), 
 - Default branch is master: "Closes #N" never fires on a development merge -- close issues by hand with the PR cited.
 
 -- Sue
-

@@ -1,0 +1,13 @@
+{
+  "source": "/local/job39919092/release-work/runtime/data-corpus",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "files_verified": 1519,
+  "all_sha256_unchanged": true,
+  "all_metadata_unchanged": true,
+  "only_original_symlink": {
+    "dvc-cache": "/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache"
+  },
+  "source_worktree_clean": true,
+  "in_tree_parquets": 0,
+  "seconds": 1.0534828761592507
+}

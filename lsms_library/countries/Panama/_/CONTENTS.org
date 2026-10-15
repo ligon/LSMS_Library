@@ -1102,3 +1102,4 @@ Collection Regions created ad hoc for fieldwork" (quoted in the universe
 section above). Neither provinces, study domains nor fieldwork regions should
 be silently substituted for one another. The retained =panama.regional_data=
 helper does not register a live Region table.
+The missing lookup is tracked in [[https://github.com/ligon/LSMS_Library/issues/1009][GH #1009]].
