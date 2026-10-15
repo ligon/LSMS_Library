@@ -1,0 +1,51 @@
+{
+  "quantity_rows_delta": 6430,
+  "value_rows_added": 6429,
+  "unknown_rows_added": 905,
+  "kg_rows_delta": -904,
+  "unknown_rows_colliding_with_other_physical_inputs": 1,
+  "collision_summaries": [
+    {
+      "wave": "2013-14",
+      "food": "Bread",
+      "source": "purchased",
+      "other_native_unit": "Loaf (1kg)",
+      "other_native_quantity": 1.0,
+      "unknown_quantity": 1.0
+    }
+  ],
+  "nutrition_all_household_row_delta_sums": {
+    "Energy": -130397.30461617693,
+    "Protein": 6473.696401115103,
+    "Fiber": -140.38892314990497,
+    "Folate": 5568.604362434886,
+    "Calcium": -22014.764900458948,
+    "Carbohydrate": -38212.20224047751,
+    "Iron": -297.92761946968915,
+    "Niacin": 1235.289420939398,
+    "Riboflavin": 3.405331584470508,
+    "Thiamin": 3.829603556040034,
+    "Vitamin A": -4381.270833333334,
+    "Vitamin B-12": 456.47706947767153,
+    "Vitamin B-6": 27.66107843405838,
+    "Vitamin C": -601.0223958333329,
+    "Zinc": -259.2551333247837
+  },
+  "nutrition_all_household_total_subtractions": {
+    "Energy": -130397.30461573601,
+    "Protein": 6473.696401119232,
+    "Fiber": -140.3889231532812,
+    "Folate": 5568.604362428188,
+    "Calcium": -22014.764900386333,
+    "Carbohydrate": -38212.20224046707,
+    "Iron": -297.92761946842074,
+    "Niacin": 1235.289420939982,
+    "Riboflavin": 3.4053315843921155,
+    "Thiamin": 3.829603555612266,
+    "Vitamin A": -4381.2708332538605,
+    "Vitamin B-12": 456.4770694775507,
+    "Vitamin B-6": 27.661078434437513,
+    "Vitamin C": -601.0223958194256,
+    "Zinc": -259.25513332430273
+  }
+}

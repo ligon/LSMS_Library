@@ -1,0 +1,141 @@
+#+title: Uganda food-unit corrections (GH #962)
+#+author: Sue
+#+date: 2026-09-26
+
+* Result and scope
+
+Missing unit reports previously shared the label =---=, which received an inferred kilogram factor.
+The correction distinguishes expenditures without quantities (=Value=, with quantity equal to expenditure) from reported quantities without units (=Unknown=).
+Neither receives a kilogram factor.
+The country catalog also recovers recorded measurement labels without turning undecoded codes into invented physical names.
+
+The final library source is =72f8bce34=.
+All seven outputs and three additional price modes were cold-rebuilt/replayed and match the first candidate =a45d319bd= exactly, including values, dtypes and canonical keys.
+The final change fixes a categorical-unit assignment regression found by independent review; it does not change ordinary raw-data output.
+The comparison base is merged GitHub development =4c2223aa119381ebcd8aea05fc2f9d26c3026028=, including fraction-parser PR #963.
+The baseline checkout at =b22720d25= differs only by its ledger; a source/test diff guard verified equivalence.
+No nutrition code, factor policy, published output or nutrition test baseline was changed.
+
+* Cold comparison
+
+Both revisions built these seven outputs from empty private L2 caches with the same shared content-addressed L1 blobs.
+The environment was Python from the node's mounted venv, pandas 3.0.6, numpy 2.4.6 and pyarrow 25.0.1.
+Package and country-config imports were asserted to use the intended checkout.
+
+#+name: uganda-food-output-rows
+| Output                        |     Base | Candidate |
+|-------------------------------+----------+-----------|
+| food_acquired                 |   355571 |    355571 |
+| food_quantities               |   349057 |    355487 |
+| food_prices (default kgvalue)  |   349081 |    348181 |
+| food_expenditures             |   247049 |    247049 |
+| food_kg_factors                |   355571 |    355571 |
+| fct                           | 15 x 113 |  15 x 113 |
+| nutrition                     |    23801 |     23777 |
+
+Every purchased expenditure key and value is identical.
+All-source expenditure grouped by =(t,i,j,s)=, with =min_count=1=, is identical.
+Household-wave, household-wave/source and household-wave/food/source coverage is identical.
+All 348212 previously labelled physical acquisition rows retain their quantities, expenditures and reported prices exactly.
+The FCT is identical, including its schema.
+
+** All former blank-unit records accounted for
+
+An independent join to numeric raw-source codes, using the existing panel-ID walker, accounts for all 7359 old =---= acquisition rows.
+Their original quantities and expenditures match exactly after ID reconciliation.
+
+#+name: uganda-former-blank-units
+| Raw classification                 | Rows | Result            |
+|------------------------------------+------+-------------------|
+| Missing unit, expenditure only     | 6429 | Value             |
+| Missing unit, quantity reported    |  904 | Unknown           |
+| Code 0, quantity reported          |    1 | Unknown           |
+| Physical code 123060               |    1 | Recorded fish unit |
+| Eight other recorded codes         |   24 | Distinct code strings |
+
+The =Value= rows carry 87861051 UGX, not a physical quantity; their canonical reported =Price= is missing.
+Their =unitvalue= prices are one; =unitprice= supplies no price.
+The 905 =Unknown= rows preserve their original quantities and prices; those quantities cannot be pooled across unresolved units.
+Neither group appears in either kilogram price mode.
+Quantity output gains 6430 rows: 6429 =Value= rows, 905 =Unknown= rows and 904 fewer kg rows.
+One bread acquisition formerly pooled an unknown-unit quantity with a known loaf quantity under the same kg key; the correction separates those two units.
+See [[file:validation/quantity_grain_delta.json][quantity grain and nutrient-total attribution]].
+
+The catalog audit promotes 131 measurement labels, of which 111 reuse an existing equivalent label.
+Three additional source strings name foods, not measures, and remain distinct code strings alongside eight unlabeled nonzero codes.
+All 134 source strings are found in the 2011-12 Stata metadata; other waves omit them rather than independently confirming them.
+See [[file:catalog/README.org][catalog audit and source provenance]].
+
+Only one promoted code is currently observed: code 123060 on a 2015-16 fish purchase, quantity 4 and expenditure 8000.
+Its recorded label is =Cut piece(above 2kg)-Big=.
+The existing parser assigns the 2 kg endpoint, yielding 8 kg; this is an existing range convention, not evidence that every such piece weighs exactly 2 kg.
+The separate curated JSON factor is not the runtime API factor source.
+
+The 24 residual-code rows still receive existing unit-pooled inference.
+Keeping their codes separate prevents pooling them under =---=; it does not establish measured masses or introduce a no-inference policy.
+
+** Kilograms and nutrition
+
+Kilograms decrease from 1242402.773337283 to 1241553.473486705, a change of -849.299850578 kg.
+Removing the fabricated factors from missing/zero units accounts for -890.512708333 kg; the recorded fish unit contributes +7.741666667 kg; separating the eight residual codes contributes +33.471191089 inferred kg.
+Unchanged native labels contribute no effective-factor or kilogram change.
+Eight diagnostic =kg_unit= candidates change, but the selected metric factor still wins and their served quantities/prices are unchanged.
+The aggregate attribution is in [[file:validation/kg_delta_attribution.json][kg_delta_attribution.json]].
+
+For both revisions, the rebuilt kilogram matrix multiplied by the FCT reproduces nutrition exactly (maximum absolute difference zero).
+A separate food-by-food sum agrees within 5.82e-11.
+Replay tolerances are =rtol=1e-12, atol=1e-10= for quantities and =rtol=1e-12, atol=1e-8= for nutrition.
+
+The existing kg-only nutrition calculation loses 24 household-wave rows: 23 in 2010-11 and one in 2011-12.
+All retain food acquisitions, but none retains a convertible kg quantity.
+Four previously had zero nutrient vectors and twenty had nonzero estimates based on invented factors.
+Sixty retained household-wave nutrient vectors also change.
+Total energy decreases by approximately 130397.304616, including the lost rows; this is a measured effect, not a correctness target.
+
+The unchanged FCT covers 113 of 128 candidate kg food labels and 96.5007% of kilograms.
+Unmatched food labels account for 43445.750568842 kg.
+A separate reconstruction checks 2025 committed FCT cells against their recorded Org source and documented hectogram-to-kg scale, with maximum roundoff 1.42e-14.
+Two cooking-oil CSV labels lack entries in that crosswalk; upstream USDA responses were not refetched.
+This verifies recorded provenance and arithmetic, not every physical unit mass or nutrient density.
+
+* Checks and remaining limits
+
+Focused synthetic tests and an independent scalar oracle cover source separation, original zero/missing quantities, negative/cancelling quantities, duplicate aggregation, numeric code types and preservation of physical rows.
+The final 28 focused tests pass; independent review passes 1728 input combinations with unique and duplicate keys, plus numeric/categorical dtype probes, with no remaining code/test finding.
+See [[file:validation/FINAL_REVIEW.md][the independent review]] and [[file:validation/final_probe_summary.json][scalar-oracle results]].
+
+The initial full suite at =a45d319bd= passed 6698 tests, skipped 211, xfailed eight and xpassed one in 1260.96 seconds.
+That run did not certify the food fingerprints: the manifest checks depend on whether a parquet has been built by the time they run.
+A later focused run against built data exposed nine food content-hash failures.
+Matched cold roots with the original fixture give 11 passes/one failure/41 skips on the base, versus two passes/ten failures/41 skips on the candidate.
+The nine introduced failures are precisely the food-acquisition hashes; all shapes, columns, index names and dtypes match the original fixture on both revisions.
+Those nine hashes were updated only after raw-row attribution and final cold-hash confirmation; every other fixture field is unchanged.
+See [[file:validation/manifest-before-update.json][matched pre-update results]] and [[file:validation/food_hash_update.json][the nine-field update proof]].
+
+The historical nutrition entry remains failing and unchanged.
+The base fails its content hash; the corrected candidate also differs in shape by the 24 household-wave rows accounted for above.
+This is an additional measured effect on an already-failing comparison, not a claim that all nutrition differences predate the change.
+The final post-update selection against the cold-built root has 120 passes, 58 skips and one failure, the retained =var/nutrition.parquet= comparison, in 115.52 seconds.
+All nine food fingerprints pass.
+Fifteen replication API checks skip because the external replication package is absent; the other skips concern unbuilt tables/caches.
+The repository API audit passes.
+
+All 24 Uganda scheme-key hashes change; all 429 other-country hashes and global build fingerprints remain unchanged.
+Seven food-chain outputs were explicitly cold-built; this is not a claim that all 24 Uganda tables were rebuilt.
+Hash inventories use [[file:validation/hash_inventory.py][hash_inventory.py]].
+
+Existing off-table-unit deletion remains: 428 wide source rows in 2018-19 and 831 in 2019-20.
+The historical CONTENTS count of 836 is retained as a dated discrepancy.
+The largest quantity remains 480000 kg, seven rows remain above 1000 kg, and existing metric/inference contradictions remain.
+No clipping, inference policy change or broad nutrition rebaselining is included.
+The earlier #850 nutrition drift and published-paper baseline remain separate scientific questions.
+
+* Reproduction
+
+The portable [[file:validation/validate_food_units.py][build/comparison driver]] asserts source identity before and after a build and requires a cold private L2 root.
+Only its =dvc-cache= symlink should point to shared L1 blobs.
+Saved frames and raw build logs contain household records and stay in private scratch; committed evidence is aggregate-only.
+[[file:validation/COMMANDS.org][Reproduction commands]] cover the source revisions, environment, private cold builds, comparison, raw-code attribution, scalar oracle, hash inventory and tests.
+[[file:validation/final_portable_build.json][Build results]], [[file:validation/final_portable_comparison.json][comparison assertions]], [[file:validation/final_revision_equivalence.json][final-revision equivalence]] and [[file:validation/final_portable_attribution.json][raw-source attribution]] contain the final aggregate evidence.
+
+-- Sue

@@ -1,0 +1,75 @@
+{
+  "checks": {
+    "food_acquired": {
+      "exact": true,
+      "shape": [
+        355571,
+        3
+      ]
+    },
+    "food_quantities": {
+      "exact": true,
+      "shape": [
+        355487,
+        1
+      ]
+    },
+    "food_prices": {
+      "exact": true,
+      "shape": [
+        348181,
+        1
+      ]
+    },
+    "food_expenditures": {
+      "exact": true,
+      "shape": [
+        247049,
+        1
+      ]
+    },
+    "food_kg_factors": {
+      "exact": true,
+      "shape": [
+        355571,
+        9
+      ]
+    },
+    "fct": {
+      "exact": true,
+      "shape": [
+        15,
+        113
+      ]
+    },
+    "nutrition": {
+      "exact": true,
+      "shape": [
+        23777,
+        15
+      ]
+    },
+    "food_prices_unitvalue": {
+      "exact": true,
+      "shape": [
+        355510,
+        1
+      ]
+    },
+    "food_prices_unitprice": {
+      "exact": true,
+      "shape": [
+        325816,
+        1
+      ]
+    },
+    "food_prices_kgprice": {
+      "exact": true,
+      "shape": [
+        325051,
+        1
+      ]
+    }
+  },
+  "comparison": "exact values, dtypes, columns and sorted canonical keys"
+}
