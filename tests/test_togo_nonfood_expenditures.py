@@ -97,6 +97,7 @@ def nonfood():
                     f'{type(exc).__name__}: {exc}')
 
 
+@pytest.mark.requires_s3
 def test_every_reported_line_item_survives(nonfood):
     assert len(nonfood) == TOGO_NONFOOD_ROWS, (
         f'Togo/nonfood_expenditures has {len(nonfood)} rows, expected '
@@ -104,6 +105,7 @@ def test_every_reported_line_item_survives(nonfood):
         f'being dropped between the wave script and the API.')
 
 
+@pytest.mark.requires_s3
 def test_recall_window_is_carried_and_not_annualised(nonfood):
     """The window must survive to the API, or the number is uninterpretable."""
     assert 'RecallWindow' in nonfood.columns, (
@@ -113,6 +115,7 @@ def test_recall_window_is_carried_and_not_annualised(nonfood):
     assert set(nonfood['RecallWindow'].dropna()) == set(WINDOWS_IN_ORDER)
 
 
+@pytest.mark.requires_s3
 def test_median_expenditure_rises_with_the_recall_window(nonfood):
     """A 7-day median far below a 12-month median, or the mapping is wrong."""
     med = (nonfood.groupby('RecallWindow', observed=True)['Expenditure']
@@ -126,6 +129,7 @@ def test_median_expenditure_rises_with_the_recall_window(nonfood):
     assert med['7 days'] < med['12 months'], med.to_dict()
 
 
+@pytest.mark.requires_s3
 def test_item_labels_are_a_subset_of_the_declared_table(nonfood):
     """Every delivered `j` must come from `nonfood_items`, and be unique.
 
@@ -146,6 +150,7 @@ def test_item_labels_are_a_subset_of_the_declared_table(nonfood):
     assert delivered <= set(declared), sorted(delivered - set(declared))
 
 
+@pytest.mark.requires_s3
 def test_household_ids_all_resolve_to_sample(nonfood):
     """No orphan households: `i` must match sample()'s composite EHCVM id."""
     s = Country('Togo').sample()

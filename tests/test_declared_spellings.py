@@ -196,6 +196,7 @@ def _aws_creds_available() -> bool:
     return False
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 @pytest.mark.skipif(
     not _aws_creds_available(),

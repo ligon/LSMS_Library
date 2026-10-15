@@ -45,6 +45,8 @@ import pytest
 
 from lsms_library import Country
 
+pytestmark = pytest.mark.requires_s3
+
 
 @pytest.fixture(scope="module")
 def cf():

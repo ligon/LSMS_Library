@@ -352,6 +352,7 @@ class TestRegistry:
 # data-gated
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 class TestDelivered:
     def test_summary_arrives_on_a_built_table(self):
         if "GhanaLSS" not in COUNTRIES:

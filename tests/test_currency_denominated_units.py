@@ -460,6 +460,7 @@ def _country(name):
     return c, fa
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_ghanalss_factor_map_loses_exactly_the_currency_key():
     """The provable control: ONE key moves, corpus-wide.
@@ -478,6 +479,7 @@ def test_ghanalss_factor_map_loses_exactly_the_currency_key():
     assert got == _get_kg_factors(without)
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_ghanalss_food_prices_are_not_a_made_up_constant():
     """The invariant is that no price is FABRICATED -- not that waves are empty.
@@ -515,6 +517,7 @@ def test_ghanalss_food_prices_are_not_a_made_up_constant():
     assert p.groupby('t')['Price'].std().min() > 0
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     """Only the kg-denominated modes touch the factor map.
@@ -543,6 +546,7 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     assert len(c.food_quantities(units='units')) == 1_694_623
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_panama_kgprice_loses_its_currency_rows():
     """``kgprice`` calls ``_get_kg_factors`` too, so Panama moves as well.

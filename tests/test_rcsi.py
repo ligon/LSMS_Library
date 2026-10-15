@@ -257,6 +257,7 @@ def test_custom_cutoffs_still_partition():
 # Data-gated: warm Malawi food_coping (GH #863's natural first country)
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_malawi_warm_food_coping_scores_cleanly():
     """Malawi fields exactly the standard five strategies (data_scheme.yml
     comment), so the default weights should apply with zero ValueErrors, and

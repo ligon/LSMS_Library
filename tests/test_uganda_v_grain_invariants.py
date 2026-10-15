@@ -23,6 +23,8 @@ from typing import Any
 import pandas as pd
 import pytest
 
+pytestmark = pytest.mark.requires_s3
+
 
 def _uganda_or_skip():
     """Return ``Country('Uganda')`` or skip if data is unavailable."""

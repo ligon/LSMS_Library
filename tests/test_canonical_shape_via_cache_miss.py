@@ -104,14 +104,17 @@ def _aws_creds_available() -> bool:
 
 
 # Module-level skip: every test in this file needs DVC -> S3 access.
-pytestmark = pytest.mark.skipif(
-    not _aws_creds_available(),
-    reason=(
-        "cache-miss tests need S3 credentials; provided by the "
-        "'data-tests' CI job (post-merge to master) and on Savio. "
-        "The 'unit-tests' CI job sets LSMS_SKIP_AUTH=1 and skips."
+pytestmark = [
+    pytest.mark.skipif(
+        not _aws_creds_available(),
+        reason=(
+            "cache-miss tests need S3 credentials; provided by the "
+            "'data-tests' CI job (post-merge to master) and on Savio. "
+            "The 'unit-tests' CI job sets LSMS_SKIP_AUTH=1 and skips."
+        ),
     ),
-)
+    pytest.mark.requires_s3,
+]
 
 
 # --------------------------------------------------------------------------

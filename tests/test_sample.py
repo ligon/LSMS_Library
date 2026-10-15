@@ -20,6 +20,8 @@ import lsms_library as ll
 from lsms_library.paths import countries_root, data_root
 from lsms_library.yaml_utils import load_yaml
 
+pytestmark = pytest.mark.requires_s3
+
 
 def _countries_with_sample() -> list[str]:
     """Discover countries whose data_scheme.yml declares a sample table."""

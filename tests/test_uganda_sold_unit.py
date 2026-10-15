@@ -431,6 +431,7 @@ def _codes(df, col):
     return pd.to_numeric(df[col], errors="coerce").dropna().astype(int)
 
 
+@pytest.mark.requires_s3
 def test_2018_19_season_a_sold_column_is_a_unit_by_its_values(uganda_module):
     """The evidence for ``s5aq07c_1``, re-derived rather than copied.
 
@@ -464,6 +465,7 @@ def test_2018_19_season_a_sold_column_is_a_unit_by_its_values(uganda_module):
     )
 
 
+@pytest.mark.requires_s3
 def test_2013_14_variable_label_swap_is_confined_to_the_harvest_pair(uganda_module):
     """2013-14 AGSEC5A's swap is a HARVEST-side defect only.
 
@@ -490,6 +492,7 @@ def test_2013_14_variable_label_swap_is_confined_to_the_harvest_pair(uganda_modu
     assert _codes(df, "a5aq6c").isin(units - conds).mean() >= 0.60
 
 
+@pytest.mark.requires_s3
 def test_2011_12_ships_no_sold_condition_column():
     """The colmap's ``condition_sold: None`` is a survey fact, not an omission."""
     for filename, prefix in (("AGSEC5A.dta", "a5aq"), ("AGSEC5B.dta", "a5bq")):
@@ -501,6 +504,7 @@ def test_2011_12_ships_no_sold_condition_column():
         assert f"{prefix}7c" in df.columns, "the sold UNIT is present in 2011-12"
 
 
+@pytest.mark.requires_s3
 def test_2010_11_season_a_sold_unit_is_capped_at_code_20():
     """A known, measured extract defect -- pinned so it cannot be forgotten.
 
@@ -529,6 +533,7 @@ def test_2010_11_season_a_sold_unit_is_capped_at_code_20():
     assert _codes(b, "a5bq7c").max() > 20, "season B is not capped"
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave,filename,unit_col,subdir", [
     ("2013-14", "AGSEC5A.dta", "a5aq7c", "Data"),
     ("2018-19", "AGSEC5A.dta", "s5aq07c_1", "Data"),
@@ -614,6 +619,7 @@ def built_table():
     return df.reset_index()
 
 
+@pytest.mark.requires_s3
 def test_shipped_counts_reproduce(built_table):
     """Every number this branch put into canonical prose, re-derived here.
 
@@ -647,6 +653,7 @@ def test_shipped_counts_reproduce(built_table):
     )
 
 
+@pytest.mark.requires_s3
 def test_the_largest_disagreement_cell_is_priced_like_a_sack(built_table):
     """The measurement that overturned the original consumer rule.
 

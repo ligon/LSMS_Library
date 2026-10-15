@@ -22,7 +22,7 @@ import pytest
 
 import lsms_library as ll
 
-pytestmark = pytest.mark.slow
+pytestmark = [pytest.mark.slow, pytest.mark.requires_s3]
 
 WAVES = ['1987-88', '1988-89', '1991-92', '1998-99', '2012-13', '2016-17']
 

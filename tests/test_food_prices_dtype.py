@@ -19,6 +19,8 @@ import pytest
 
 from lsms_library.paths import data_root
 
+pytestmark = pytest.mark.requires_s3
+
 
 # ---------------------------------------------------------------------------
 # Skip guard — both tests need the Uganda food_acquired cache to be warm

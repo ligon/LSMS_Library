@@ -7,6 +7,8 @@ import pytest
 import lsms_library as ll
 from lsms_library.paths import data_root, countries_root
 
+pytestmark = pytest.mark.requires_s3
+
 
 def _has_cached_table(country_name: str, table: str) -> bool:
     """Check if a table parquet exists at data_root or in-tree."""

@@ -43,6 +43,7 @@ def test_locality_in_dir():
     assert 'locality' in dir(c), "locality should appear in dir() listing"
 
 
+@pytest.mark.requires_s3
 def test_legacy_locality_shape():
     """legacy_locality() must return a DataFrame indexed by (i, t, m) with column Parish."""
     import lsms_library as ll

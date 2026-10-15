@@ -200,6 +200,7 @@ def test_no_dead_aggregation_key_in_ethiopia_config():
 
 # ---------------------------------------------------------------- data-backed
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('wave', sorted(EDU_ROWS))
 def test_individual_education_wave_frame_keeps_every_person(ethiopia, wave):
     """Every reported person reaches the wave frame on their own index tuple.
@@ -226,6 +227,7 @@ def test_individual_education_wave_frame_keeps_every_person(ethiopia, wave):
     )
 
 
+@pytest.mark.requires_s3
 def test_individual_education_recovers_the_two_conflated_students(ethiopia):
     """The W3 split-off pair that `first()` used to merge into one person.
 
@@ -252,6 +254,7 @@ def test_individual_education_recovers_the_two_conflated_students(ethiopia):
     )
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('wave', ETH_WAVES)
 def test_cluster_features_merge_manufactures_no_phantom_rows(ethiopia, wave):
     """The `dfs:` merge must emit no cartesian warning (GH #323 site 4).
