@@ -1,0 +1,66 @@
+#+title: Niger landing follow-up (#679, #824, #833, #865)
+
+* Scope and source contract
+Follow-up is documentation-only after merging development at 452302adc.
+CONTENTS names the load-bearing idiosyncrasy: ECVMA2 household identity is
+(GRAPPE, MENAGE, EXTENSION); split-off EXTENSION=2 is a separate household.
+The 2021-22 s16d crop sale is replicated by harvest LINE, not by distinct plot.
+The baseline citation now identifies development 340e30f1e, independently
+cold-built in the October 14 verdict, matching the old snapshot.
+No source/config/fixture policy changed in this follow-up.
+
+* Draft issue reconciliation (coordinator to publish after merge)
+** #824: retain open; narrow country claims
+Niger now carries Unit_sold and uses it to key crop-level sales. Exact repeated
+s16d exports are removed before summing. Nigeria's sa3q11b is handled by this
+release train's separate Nigeria branch. Uganda was already wired; Malawi's
+sold-unit/condition and sale-basis work is already on development (2747547bf,
+2515d1668; #966), so do not re-open those as missing extraction.
+Remaining: audit Ethiopia, Tanzania, Mali, Benin, Burkina_Faso, CotedIvoire,
+GhanaSPS, Guinea-Bissau, Senegal and Togo against source metadata, and make
+farmgate consumers respect Unit_sold and report unresolved disagreements.
+Tanzania's prior finding that sales are explicitly Kg is evidence to preserve.
+The old Niger 63% figure was a label-comparison artefact; current priced-row
+agreement is 98.7/89.4/92.3/89.0% (definitions in CONTENTS).
+** #833: retain open; distinguish implemented work from scientific residuals
+Niger folds Choux into Chou and the sugar forms into the existing combined
+label; strips the trailing comma from Aubergine without conflating it with
+courgette. The seven instrument split pairs in CONTENTS remain distinct;
+code 166 remains undecoded (468 rows), with no manufactured label.
+Malawi's sale-condition wiring, boiled-groundnut split, corrected JOIN claim
+and registered sale-basis ladder already landed (2747547bf, b169b92f3,
+d94f8ef51, d1993a94c, 2515d1668). The old issue prose describing those as absent
+must be corrected. The historical 5x groundnut comparison needs reevaluation
+on the corrected basis, not another duplicate implementation.
+Still live: Uganda aggregate grain/flour folds, Tanzania processed-food/crop
+identity, Ethiopia's physical-unit comparison, and the recorded Niger splits.
+** #679 / #865 disposition
+The EXTENSION identity defect and listed all-nines sentinels are fixed.
+Retain separately: plot_inputs 2014-15 seed-slot collapse (35 destroyed rows,
+29 groups; #614/#637), and harvest-only household 27010 in 2011-12 (two rows,
+missing v). The unlinked split-off id 20012 still aliases an unrelated 2011
+household in joins on i alone; CONTENTS already records this namespace issue.
+These are not grounds to weaken the exact identity regression.
+
+* Cache scope
+Original bundle moves every Niger table hash; the final review measured 22/22.
+This documentation-only follow-up adds no cache cost. Shared cache untouched.
+
+* Fresh validation after development merge
+Empty private L2, shared L1 blob-cache symlink only; worktree code/config
+identity asserted. Ten outputs rebuilt: sample 20,231, household_roster
+121,956, individual_education 80,445, people_last7days 125,294, assets 94,478,
+livestock 30,230, crop_production 46,376, plot_inputs 42,426, plot_labor 53,041,
+food_acquired 239,877. Assets retains its existing duplicate index; the other
+nine returned unique indices. 2014-15 sample carries 3,617 households, roster
+22,671 persons, education 2,834, crop 8,799, inputs 8,134 and labor 15,935 rows.
+Aggregate measurements: [[file:niger-cold-build.json][cold-build JSON]].
+
+All tests/test_niger_*.py: 139 passed, no skips, 19.63 s. Ordinary pytest
+-n 6 --dist=loadfile, taskset 8-15, BLAS/OMP/MKL=1 and LSMS_BUILD_WORKERS=1.
+The first validation path named the worktree =niger=; pytest imported that
+root package and shadowed the country's =niger.py=, producing 5 failures and
+10 errors. Importlib mode did not cure the package collision. Moving the
+worktree to =countries/niger-followup= fixed the harness without changing
+tests or country behavior. Pre-existing grain/null-read warnings remain,
+including the seed-slot collision and orphan harvest rows described above.

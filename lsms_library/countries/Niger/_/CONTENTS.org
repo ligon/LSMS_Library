@@ -541,7 +541,9 @@ here, because it would re-key the wave a second time.
 comment) is in every Niger table's hash, so all 18 tables re-warm once.
 
 *Measured on the cold rebuild that landed this (2026-09-24), served
-rows for 2014-15 before -> after:* =sample= 3,558 -> 3,617;
+rows for 2014-15 before -> after:* The before figures were independently
+reproduced by the October 14 review with a cold build of development at
+=340e30f1e=, matching the September 24 snapshot. =sample= 3,558 -> 3,617;
 =household_roster= 22,506 -> 22,671 (+165: the populated people the
 collapse used to drop); =people_last7days= 26,369 -> 26,579 (+210);
 =assets= 17,070 -> 17,267; =plot_inputs= 8,071 -> 8,134; =livestock=
