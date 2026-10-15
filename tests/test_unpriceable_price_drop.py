@@ -125,3 +125,108 @@ class TestDropSemanticsUnchanged:
             out = food_prices_from_acquired(fa, units='unitvalue')
         assert len(out) == 1
         assert np.isfinite(out['Price']).all()
+
+
+# ---------------------------------------------------------------------------
+# GH #864: a MONEY-ONLY recall occasion is by design, not loss.
+# ---------------------------------------------------------------------------
+
+def _fa_visits(rows):
+    """rows: (visit, i, j, u, s, Quantity, Expenditure) -> canonical frame
+    with a ``visit`` level (Burkina Faso's EMC 2014 shape)."""
+    idx = pd.MultiIndex.from_tuples(
+        [('2014', r[1], r[2], r[3], r[4], r[0]) for r in rows],
+        names=['t', 'i', 'j', 'u', 's', 'visit'])
+    return pd.DataFrame({'Quantity': [r[5] for r in rows],
+                         'Expenditure': [r[6] for r in rows]}, index=idx)
+
+
+def _money_only_frame(n_money_only=100, n_good=10, n_item_nonresponse=0):
+    """Passage 1 fields the quantity grid; passage 2 records money ONLY.
+
+    ``n_item_nonresponse`` rows sit in passage 1 with a null Quantity: the
+    same NaN, but inside a group that DOES report quantities -- real loss.
+    """
+    rows = [(1, f'g{k}', 'rice', 'Kg', 'purchased', 10.0, 500.0)
+            for k in range(n_good)]
+    rows += [(1, f'n{k}', 'salt', 'Unknown', 'purchased', np.nan, 50.0)
+             for k in range(n_item_nonresponse)]
+    rows += [(2, f'm{k}', 'rice', 'Unknown', 'purchased', np.nan, 500.0)
+             for k in range(n_money_only)]
+    return _fa_visits(rows)
+
+
+class TestMoneyOnlyRecallOccasion:
+    def test_money_only_rows_are_by_design_and_silent(self):
+        """A (t, visit, s) group with Quantity null on EVERY row is excluded
+        from BOTH sides of the loss fraction, in both ``*value`` modes."""
+        for units in ('kgvalue', 'unitvalue'):
+            with warnings.catch_warnings(record=True) as rec:
+                warnings.simplefilter('always')
+                out = food_prices_from_acquired(_money_only_frame(),
+                                                units=units)
+            assert not any(issubclass(w.category, UnpriceableRowsWarning)
+                           for w in rec), units
+            tally = out.attrs['price_rows_dropped']
+            assert tally['money_only'] == 100
+            assert tally['money_only_expected'] == 100
+            assert tally['expected_gross'] == 110
+            assert tally['expected'] == 10
+            assert tally['dropped_expected'] == 0
+            assert tally['lost_fraction'] == 0.0
+            # The by-design rows are still DROPPED, not served as NaN.
+            assert len(out) == 10
+
+    def test_item_nonresponse_inside_a_quantity_group_is_still_loss(self):
+        """The classifier is structural.  A null Quantity in a group that
+        reports quantities is item non-response and must stay in ``lost``."""
+        frame = _money_only_frame(n_money_only=100, n_good=10,
+                                  n_item_nonresponse=5)
+        with pytest.warns(UnpriceableRowsWarning) as rec:
+            out = food_prices_from_acquired(frame, units='unitvalue')
+        tally = out.attrs['price_rows_dropped']
+        assert tally['money_only'] == 100
+        assert tally['expected'] == 15
+        assert tally['dropped_expected'] == 5
+        assert tally['nan'] == 5
+        assert tally['lost_fraction'] == pytest.approx(5 / 15)
+        msg = str(rec[0].message)
+        assert 'dropped 5 of 15' in msg
+        assert 'MONEY-ONLY' in msg and '100 row(s)' in msg
+
+    def test_a_tiny_all_null_group_cannot_classify_itself(self):
+        """Below MONEY_ONLY_MIN_GROUP an all-null group is not a module that
+        fielded no grid; it is a handful of missing answers -- loss."""
+        from lsms_library.transformations import MONEY_ONLY_MIN_GROUP
+        small = MONEY_ONLY_MIN_GROUP - 1
+        frame = _money_only_frame(n_money_only=small, n_good=10)
+        with pytest.warns(UnpriceableRowsWarning):
+            out = food_prices_from_acquired(frame, units='unitvalue')
+        tally = out.attrs['price_rows_dropped']
+        assert tally['money_only'] == 0
+        assert tally['dropped_expected'] == small
+
+    def test_a_zero_quantity_is_never_money_only(self):
+        """The bucket is for a NULL quantity.  Expenditure against a ZERO
+        quantity is the GH #591 defect (``inf``) and must stay loud."""
+        rows = [(2, f'z{k}', 'rice', 'Unknown', 'purchased', 0.0, 500.0)
+                for k in range(100)]
+        rows += [(1, 'g', 'rice', 'Kg', 'purchased', 10.0, 500.0)]
+        with pytest.warns(UnpriceableRowsWarning, match=r'dropped 100 of 101'):
+            out = food_prices_from_acquired(_fa_visits(rows), units='unitvalue')
+        assert out.attrs['price_rows_dropped']['money_only'] == 0
+
+    def test_price_modes_do_not_use_the_bucket(self):
+        """In the ``*price`` modes ``expected`` is a REPORTED price; a null
+        Quantity beside a reported price is priceable, not money-only."""
+        frame = _money_only_frame(n_money_only=100, n_good=10)
+        frame['Price'] = 50.0
+        with warnings.catch_warnings(record=True) as rec:
+            warnings.simplefilter('always')
+            out = food_prices_from_acquired(frame, units='unitprice')
+        assert not any(issubclass(w.category, UnpriceableRowsWarning)
+                       for w in rec)
+        tally = out.attrs['price_rows_dropped']
+        assert tally['money_only'] == 0
+        assert tally['expected'] == 110
+        assert len(out) == 110
