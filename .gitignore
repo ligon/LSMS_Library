@@ -103,7 +103,7 @@ lsms_library/countries/*/var/*
 !lsms_library/countries/*/_/central_american_fct*.csv
 !lsms_library/countries/*/*/_/food_label.csv
 !lsms_library/countries/*/*/_/ihs3_conversions.csv
-!lsms_library/countries/Panama/1997/Data/unittable.csv
+!lsms_library/countries/Panama/_/unittable.csv
 
 # Other ignored patterns
 .coder-session/

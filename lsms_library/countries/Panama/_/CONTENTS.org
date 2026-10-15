@@ -858,6 +858,19 @@ food rows), and for Ethiopia 100 kg is right.  The latent hazard is noted at
      Ethiopia and Tanzania approach.
   4. The existing =units.py= script should be extended to produce the
      final JSON file.
+** DONE unittable.csv -- moved from 1997/Data/ to _/ (GH #831, 2026-10-14)
+=unittable.csv= is the git-tracked legacy source from which =units.json= was
+once regenerated (the recipe is the commented-out tail of =units.py=); nothing
+reads it by path.  It used to sit at =1997/Data/unittable.csv=, the ONE
+tracked data file in the whole tree outside a =_/= directory, un-ignored by
+full path in the repo =.gitignore=.  That position made it a false positive
+for the =cache clear= in-tree source audit on any install where git cannot be
+consulted (pip install; package under an ignored =venv/= in a user repo):
+the audit treats everything under =_/= as config by position, and a tracked
+file anywhere else is only recognised through =git ls-files=.  Ruling (@ligon
+2026-10-14): move it under =_/= rather than allowlist it in =cli.py=.  Cost:
+=_/*.csv= is a hashed build input, so every Panama table's L2-country hash
+moved once (a Panama re-warm); no other country's hash moved.
 ** DONE nutrition
 A food conversion table, with foods keyed to the "Preferred Labels" of =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=).   See https://docs.google.com/spreadsheets/d/1YwfdL0LMPVl3UGo-KfyvpC7S7KR_jDL54rsVLUQOCVE/, prepared by Kaylee Vu, which indexes the FCT at http://www.incap.int/mesocaribefoods/dmdocuments/TablaCAlimentos.pdf.
 
