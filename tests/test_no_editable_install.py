@@ -101,3 +101,67 @@ def test_makefiles_export_pythonpath(makefile):
         "directory, not this file's -- `make -f <repo>/Makefile` from elsewhere "
         "would name the wrong tree.  Use $(MAKEFILE_LIST)."
     )
+
+
+def _duplicate_workflow_keys(text):
+    """Inspect YAML nodes before a loader silently overwrites duplicate keys.
+
+    BaseLoader keeps GitHub's `on` spelling a string (YAML 1.1 otherwise
+    interprets it as True). This catches a clean git merge that loses a
+    dispatch input because a second workflow_dispatch appears later.
+    """
+    import yaml
+
+    duplicates = []
+
+    def walk(node, path):
+        if isinstance(node, yaml.MappingNode):
+            seen = set()
+            for key, value in node.value:
+                assert isinstance(key, yaml.ScalarNode), "workflow keys must be scalar"
+                child_path = (*path, key.value)
+                if key.value in seen:
+                    duplicates.append(".".join(child_path))
+                seen.add(key.value)
+                walk(value, child_path)
+        elif isinstance(node, yaml.SequenceNode):
+            for value in node.value:
+                walk(value, path)
+
+    walk(yaml.compose(text, Loader=yaml.BaseLoader), ())
+    return duplicates
+
+
+@pytest.mark.parametrize("workflow", sorted((REPO / ".github" / "workflows").glob("*.yml")),
+                         ids=lambda path: path.name)
+def test_workflow_yaml_mapping_keys_are_unique(workflow):
+    duplicates = _duplicate_workflow_keys(workflow.read_text(encoding="utf-8"))
+    assert not duplicates, f"{workflow.name}: duplicate YAML keys: {duplicates}"
+
+
+def test_workflow_duplicate_guard_sees_the_clean_merge_dispatch_collision():
+    text = """on:
+  workflow_dispatch:
+    inputs:
+      run_windows_script_build:
+        default: false
+  pull_request:
+  workflow_dispatch:
+"""
+    assert _duplicate_workflow_keys(text) == ["on.workflow_dispatch"]
+
+
+def test_ci_dispatch_keeps_windows_input_and_installed_wheel_scope():
+    import yaml
+
+    workflow = yaml.load((REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
+                         Loader=yaml.BaseLoader)
+    dispatch = workflow["on"]["workflow_dispatch"]
+    assert isinstance(dispatch, dict), "manual Windows input was lost from workflow_dispatch"
+    toggle = dispatch["inputs"]["run_windows_script_build"]
+    assert toggle["type"] == "boolean" and toggle["default"] == "false"
+    windows = workflow["jobs"]["windows-script-build"]
+    assert windows["env"]["PYTHONPATH"] == ""
+    assert "github.event_name == 'workflow_dispatch'" in windows["if"]
+    assert "inputs.run_windows_script_build" in windows["if"]
+    assert "github.event_name == 'workflow_dispatch'" in workflow["jobs"]["data-tests"]["if"]
