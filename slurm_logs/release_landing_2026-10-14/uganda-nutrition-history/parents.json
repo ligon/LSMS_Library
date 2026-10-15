@@ -1,0 +1,284 @@
+{
+  "e07e2a93f^": {
+    "sha": "1b07c3e991476ad0f6d717404524e904de654c1b",
+    "nutrition": {
+      "shape": [
+        23801,
+        15
+      ],
+      "index_names": [
+        "i",
+        "t"
+      ],
+      "columns": [
+        "Calcium",
+        "Carbohydrate",
+        "Energy",
+        "Fiber",
+        "Folate",
+        "Iron",
+        "Niacin",
+        "Protein",
+        "Riboflavin",
+        "Thiamin",
+        "Vitamin A",
+        "Vitamin B-12",
+        "Vitamin B-6",
+        "Vitamin C",
+        "Zinc"
+      ],
+      "dtypes": {
+        "Energy": "float64",
+        "Protein": "float64",
+        "Fiber": "float64",
+        "Folate": "float64",
+        "Calcium": "float64",
+        "Carbohydrate": "float64",
+        "Iron": "float64",
+        "Niacin": "float64",
+        "Riboflavin": "float64",
+        "Thiamin": "float64",
+        "Vitamin A": "float64",
+        "Vitamin B-12": "float64",
+        "Vitamin B-6": "float64",
+        "Vitamin C": "float64",
+        "Zinc": "float64"
+      },
+      "content_hash": "fc85fc2e2046f3c034d77b1b56da52dbafb9f38bd24f6f63331846677b6eee44"
+    },
+    "kg_total": 1457881.374651201,
+    "nutrients": {
+      "Energy": 2568249206.452736,
+      "Protein": 74135128.94345337,
+      "Fiber": 49517181.56575626,
+      "Folate": 612279531.341042,
+      "Calcium": 589458007.1533922,
+      "Carbohydrate": 419253150.84077567,
+      "Iron": 16155830.229107218,
+      "Niacin": 17071649.31096992,
+      "Riboflavin": 1398257.1550898382,
+      "Thiamin": 2033595.7761222702,
+      "Vitamin A": 1359024745.9732952,
+      "Vitamin B-12": 2295267.169837231,
+      "Vitamin B-6": 3633409.7231915565,
+      "Vitamin C": 107176958.14696117,
+      "Zinc": 8834106.107045664
+    },
+    "factor_sources": {}
+  },
+  "60f98ab1d^": {
+    "sha": "e07e2a93f1347a966b0e17d40ec2df28c060bb7b",
+    "nutrition": {
+      "shape": [
+        23801,
+        15
+      ],
+      "index_names": [
+        "i",
+        "t"
+      ],
+      "columns": [
+        "Calcium",
+        "Carbohydrate",
+        "Energy",
+        "Fiber",
+        "Folate",
+        "Iron",
+        "Niacin",
+        "Protein",
+        "Riboflavin",
+        "Thiamin",
+        "Vitamin A",
+        "Vitamin B-12",
+        "Vitamin B-6",
+        "Vitamin C",
+        "Zinc"
+      ],
+      "dtypes": {
+        "Energy": "float64",
+        "Protein": "float64",
+        "Fiber": "float64",
+        "Folate": "float64",
+        "Calcium": "float64",
+        "Carbohydrate": "float64",
+        "Iron": "float64",
+        "Niacin": "float64",
+        "Riboflavin": "float64",
+        "Thiamin": "float64",
+        "Vitamin A": "float64",
+        "Vitamin B-12": "float64",
+        "Vitamin B-6": "float64",
+        "Vitamin C": "float64",
+        "Zinc": "float64"
+      },
+      "content_hash": "1f51a69fd4c28a4b60a0835e8cd9e19f7c6faff8d05f66228b369f47b9e76514"
+    },
+    "kg_total": 1507383.0251276426,
+    "nutrients": {
+      "Energy": 2603010648.3443513,
+      "Protein": 69827022.2737996,
+      "Fiber": 49646974.0103733,
+      "Folate": 535970881.4383042,
+      "Calcium": 562845353.5358114,
+      "Carbohydrate": 438928445.65769607,
+      "Iron": 15621569.451562183,
+      "Niacin": 17185632.447534367,
+      "Riboflavin": 1380316.9079515648,
+      "Thiamin": 1993366.6017256465,
+      "Vitamin A": 1471898488.0302346,
+      "Vitamin B-12": 2185464.985258685,
+      "Vitamin B-6": 3875743.460826729,
+      "Vitamin C": 129816260.06492834,
+      "Zinc": 8484341.038118431
+    },
+    "factor_sources": {}
+  },
+  "f98c9762e^": {
+    "sha": "2bf63d5afd3edaa60b3b3cc92fdacee85e5ca849",
+    "nutrition": {
+      "shape": [
+        23801,
+        15
+      ],
+      "index_names": [
+        "i",
+        "t"
+      ],
+      "columns": [
+        "Calcium",
+        "Carbohydrate",
+        "Energy",
+        "Fiber",
+        "Folate",
+        "Iron",
+        "Niacin",
+        "Protein",
+        "Riboflavin",
+        "Thiamin",
+        "Vitamin A",
+        "Vitamin B-12",
+        "Vitamin B-6",
+        "Vitamin C",
+        "Zinc"
+      ],
+      "dtypes": {
+        "Energy": "float64",
+        "Protein": "float64",
+        "Fiber": "float64",
+        "Folate": "float64",
+        "Calcium": "float64",
+        "Carbohydrate": "float64",
+        "Iron": "float64",
+        "Niacin": "float64",
+        "Riboflavin": "float64",
+        "Thiamin": "float64",
+        "Vitamin A": "float64",
+        "Vitamin B-12": "float64",
+        "Vitamin B-6": "float64",
+        "Vitamin C": "float64",
+        "Zinc": "float64"
+      },
+      "content_hash": "d040cb5520fb5a0055eb6815fef7d57c2e9e1353367e2bd1a20e8f8f63a0dc26"
+    },
+    "kg_total": 1248117.870082979,
+    "nutrients": {
+      "Energy": 2099272575.3743355,
+      "Protein": 59765705.22022733,
+      "Fiber": 45092584.13131865,
+      "Folate": 482032388.5115436,
+      "Calcium": 501617435.3573783,
+      "Carbohydrate": 403863861.87427354,
+      "Iron": 14098076.196346289,
+      "Niacin": 14907901.64778346,
+      "Riboflavin": 1181169.723714736,
+      "Thiamin": 1834132.4931492326,
+      "Vitamin A": 1386750907.9677289,
+      "Vitamin B-12": 1571593.9439259071,
+      "Vitamin B-6": 3467147.768742856,
+      "Vitamin C": 108660777.2907844,
+      "Zinc": 7578371.315094754
+    },
+    "factor_sources": {
+      "survey_kg": 0,
+      "metric": 182550,
+      "item_unit": 73452,
+      "item_unit_tight": 718,
+      "unit": 98851,
+      "none": 0
+    }
+  },
+  "7cde56579^": {
+    "sha": "ccdbbd4d6b95a80962b98f8ae04e0baa23fa6cf2",
+    "nutrition": {
+      "shape": [
+        23801,
+        15
+      ],
+      "index_names": [
+        "i",
+        "t"
+      ],
+      "columns": [
+        "Calcium",
+        "Carbohydrate",
+        "Energy",
+        "Fiber",
+        "Folate",
+        "Iron",
+        "Niacin",
+        "Protein",
+        "Riboflavin",
+        "Thiamin",
+        "Vitamin A",
+        "Vitamin B-12",
+        "Vitamin B-6",
+        "Vitamin C",
+        "Zinc"
+      ],
+      "dtypes": {
+        "Energy": "float64",
+        "Protein": "float64",
+        "Fiber": "float64",
+        "Folate": "float64",
+        "Calcium": "float64",
+        "Carbohydrate": "float64",
+        "Iron": "float64",
+        "Niacin": "float64",
+        "Riboflavin": "float64",
+        "Thiamin": "float64",
+        "Vitamin A": "float64",
+        "Vitamin B-12": "float64",
+        "Vitamin B-6": "float64",
+        "Vitamin C": "float64",
+        "Zinc": "float64"
+      },
+      "content_hash": "e5239f7b905be9291e090c0f88e34d37e0e2397c95573020036bbc6ec18922a7"
+    },
+    "kg_total": 1248080.4041376158,
+    "nutrients": {
+      "Energy": 2099839229.1897025,
+      "Protein": 59756233.84684714,
+      "Fiber": 45097973.996736094,
+      "Folate": 482031255.1019817,
+      "Calcium": 501646771.7517075,
+      "Carbohydrate": 403946087.7026697,
+      "Iron": 14099589.292175388,
+      "Niacin": 14910492.388882633,
+      "Riboflavin": 1181162.4667085884,
+      "Thiamin": 1834297.3783145042,
+      "Vitamin A": 1386904929.9196904,
+      "Vitamin B-12": 1569868.7672663843,
+      "Vitamin B-6": 3467766.5573258153,
+      "Vitamin C": 108674560.23505512,
+      "Zinc": 7580236.9221389815
+    },
+    "factor_sources": {
+      "survey_kg": 0,
+      "metric": 182550,
+      "item_unit": 73315,
+      "item_unit_tight": 718,
+      "unit": 98988,
+      "none": 0
+    }
+  }
+}
