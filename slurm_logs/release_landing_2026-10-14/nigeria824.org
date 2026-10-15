@@ -1,0 +1,58 @@
+#+title: Nigeria sold-unit landing follow-up (#824)
+
+* Scope and source contract
+Merged development 452302adc. Clarifies positive-sale denominators and the
+existing first-row dedup comment; adds an explicit Unit_sold assertion to the
+column-preservation test. The implementation remains main-buyer sales at plot
+and crop grain. W3-W5 sales are household-crop records without plot linkage,
+so their plot-level sale fields and Unit_sold remain NA (#843).
+Source labels include composite manure beside other (specify); no nitrogen
+share is assigned to the editorial Other Inorganic Fertilizer label (#867).
+
+* Draft reconciliation for #824 (coordinator to publish after merge)
+Nigeria W1/W2 sa3q11b is now served as Unit_sold. Existing columns and row keys
+are preserved. Non-null counts: 3,486 / 3,430; raw both-unit agreement
+3,438/3,548 and 3,316/3,478; canonical built agreement 3,374/3,451 and
+3,283/3,411. Positive sales dropped by the pre-existing dedup total 96/66;
+93/66 of these record both units. Duplicated keys touching any positive sale:
+125/81; keys with multiple positive-sale rows: 78/43.
+Niger is fixed by the parallel branch in this release train. Uganda and Malawi
+extraction are already landed (Malawi 2747547bf; #966 includes 2515d1668).
+Leave #824 open for the remaining declarer audits and Unit_sold-aware farmgate
+consumers; see niger.org for the explicit remaining country list.
+The old CI --no-root failure is already fixed on development at 24cd065b0;
+no duplicate CI patch belongs here.
+
+* Draft new issue: Nigeria crop_production silently keeps one conflicting sale record
+The country script sorts (i, plot_id, crop) and drops duplicate keys, keeping
+the first WHOLE row (not the first non-null value). On W1/W2, 125/81 duplicated
+keys touch a positive sale; 96/66 positive-sale rows are discarded, including
+93/66 with both units. Of the latter, 151 have different Quantity_sold from
+the kept row; 40 keys (17/23) lose their only positive sale. Core grain audit
+cannot see this earlier reduction.
+Determine from source grain and questionnaire whether these are repeated
+records or a missing axis; preserve all source evidence. Acceptance: a named
+reducer/axis, exact dropped/preserved key accounting, tests for conflicting
+and identical repeats, and before/after sale totals. Related #824; do not
+silently change dedup in the sold-unit patch.
+
+* Draft new issue: Nigeria W1/W2 crop sales omit other buyers
+The served Quantity_sold/Value_sold/Unit_sold describe the main buyer only.
+Raw A3 also records sa3q16a/b (other-buyer quantity/unit) and sa3q17 (value),
+which are unread. Inspect the instrument and quantify coverage, then represent
+other buyers without summing unlike units or duplicating plot harvests.
+Acceptance: independent source totals, unit-specific accounting, a stated buyer
+grain and regression tests. Related #824 and the dedup issue above.
+
+* Cache scope
+Nigeria module comments are hashed: the full original branch and this comment
+correction invalidate Nigeria's 23 tables plus panel_ids in both tiers. No
+other country moves. Shared cache untouched; no nitrogen alias or DVC edit.
+
+* Validation (2026-10-14)
+Private empty-L2 crop build: 62,844 rows x 10 columns, unique index;
+Unit_sold non-null 3,486 / 3,430 / 0 / 0 / 0 across the five harvest rounds.
+Targeted sold-unit and no-editable-install files: 22 passed in 12.25 s
+(-n 6 --dist=loadfile, pinned BLAS/build workers). No skips.
+No in-tree parquet. Aggregate evidence: control/countries/nigeria824 in the
+release scratch; full original evidence remains in the reviewed verdict.

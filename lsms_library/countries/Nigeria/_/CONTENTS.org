@@ -978,12 +978,13 @@ sale block is the library's source for =Quantity_sold= / =Value_sold=.
 The A3 form (W1, =GHS_PANEL_AGRICULTURE_POST_HARVEST_FINAL.pdf= p. 13) gives
 q6 "How much did you harvest since the last interview?" a QUANTITY and a
 PROD. UNIT CODE, and gives q11 "How much did you sell to or through this
-[BUYER]?" *its own* QUANTITY and PROD. UNIT CODE.  =_/crop_production.py=
-passes =unit='sa3q6b'= (harvest) and =qty_sold='sa3q11a'=, =value_sold='sa3q12'=,
-but never =sa3q11b= -- and =nigeria.crop_production_for_wave= documents an
-=unit_sold= parameter in its docstring that the code never reads.
+[BUYER]?" *its own* QUANTITY and PROD. UNIT CODE.  Until 2026-09-24
+=_/crop_production.py= passed =unit='sa3q6b'= (harvest) and
+=qty_sold='sa3q11a'=, =value_sold='sa3q12'=, but never =sa3q11b= -- and
+=nigeria.crop_production_for_wave= documented an =unit_sold= parameter in
+its docstring that the code never read.
 
-So the stored =u= describes =Quantity=, and is applied to =Quantity_sold= by
+So the stored =u= describes =Quantity=, and was applied to =Quantity_sold= by
 assumption.  Measured on the raw files over rows with a positive sale
 (quantity > 0 and value > 0):
 
@@ -997,6 +998,123 @@ The assumption therefore holds for ~96% of rows and *fails for 3-5%*, where
 mismatches: harvested in kg, sold by Tiya / Mudu / Bag; sold from a
 big/large sack but harvested in a medium one).  Anyone computing a crop sale
 price per =u= should know the denominator's unit is inferred, not read.
+
+*** DONE =Unit_sold= is now carried on W1/W2 (GH #824, 2026-09-24)
+
+=_/crop_production.py= passes =unit_sold='sa3q11b'= for W1 and W2, and
+=nigeria.crop_production_for_wave= puts it on the row as the canonical
+optional column =Unit_sold= (=lsms_library/data_info.yml=), decoded through
+the SAME size-agnostic =_canon_unit= as =u=.  A plain NA-bearing =string=
+column, never an index level, never sentinel-filled.  Pinned by
+=tests/test_nigeria_sold_unit.py=.
+
+- *Identified by the value-label vocabulary, not the variable label.*  In
+  both waves =sa3q11b='s Stata value-label set is *identical* to the harvest
+  unit's (W1 =sa3q6b= / =sa3q11b=, 36 labels each; W2 =SECTA3_Q6A2= /
+  =SECTA3_Q11B=, 48 each) -- the check @ligon's condition-as-unit warning on
+  #824 demands, and stronger than Uganda's because the sets coincide.  W1's
+  *variable* label for =sa3q11b= reads "(11a).Quantity sold through buyer
+  (unit)" -- a varlabel slip (it is q11's unit, not q11a's quantity); the
+  value labels are what identify it.  No sold-CONDITION column exists in the
+  W1/W2 A3 files, so there is no =Condition_sold= here.
+- *Two agreement rates, and why they differ.*  The table above compares RAW
+  codes.  The served labels are size-collapsed (=_canon_unit= folds
+  big/medium/small sacks into =Sack/Bag=), so a sale from a big sack of a
+  harvest kept in a medium one AGREES on the served column and is invisible
+  to the =Unit_sold != u= flag -- the same collapse the KgFactor section
+  below records for the reported factor.  Re-measured 2026-09-24:
+
+  | wave   | both units (raw) | raw codes equal | canonical labels equal | built table: both / equal |
+  |--------+------------------+-----------------+------------------------+---------------------------|
+  | 2011Q1 |            3,548 | 3,438 (96.9%)   | 3,466 (*97.7%*)          | 3,451 / 3,374 (97.8%)     |
+  | 2013Q1 |            3,478 | 3,316 (95.3%)   | 3,349 (*96.3%*)          | 3,411 / 3,283 (96.2%)     |
+
+  Built-table counts are lower than raw, and the red team (2026-10-14)
+  decomposed the gap exactly: *0* positive-sale rows lose a crop label
+  (the earlier "no resolved crop label" explanation was wrong); *93* W1 and
+  *66* W2 positive-sale rows *that record both units* are discarded by the country script's
+  =drop_duplicates(subset=[t,i,plot_id,crop], keep='first')= (3,548 -> 3,455;
+  3,478 -> 3,412) -- of those 159 rows, 151 carry a *different*
+  =Quantity_sold= than the row kept for their key and 40 are keys whose kept
+  row records NO sale at all (17 W1, 23 W2); and 4 W1 / 1 W2 rows carry a
+  unit code with no Stata value label (=u= '5.0'/'0.0', =Unit_sold= '50.0')
+  that canonicalises to NA.  The dedup is a PRE-EXISTING silent grain
+  collapse (it governed =Quantity_sold= / =Value_sold= before =Unit_sold=
+  existed): 125 W1 / 81 W2 duplicated keys touch at least one positive-sale
+  row; 78 / 43 keys have multiple positive-sale rows. Counting all
+  positive-sale rows discarded gives 96 / 66 (the 93 / 66 above additionally
+  require both units);
+  it sits in the country script, upstream of every core audit, so
+  =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
+  Non-null =Unit_sold= on the built table:
+  2011Q1 3,486, 2013Q1 3,430, W3-W5 0.  The top served disagreement cells
+  are =l= -> =Kg= (10) and =Kg= <-> =Sack/Bag= (14) in 2011Q1, and =Kg= ->
+  =Tiya= / =Mudu= (24) in 2013Q1: a kilogram harvest sold by the measure.
+- *The consumer rule is the canonical one*: where the two disagree the row
+  is a data-quality FLAG, not an identification of which unit prices the
+  sale (measured on Uganda, =Unit_sold= is the closer denominator only ~40%
+  of the time).  Exclude or resolve those rows, and report how many.
+- *W3-W5 are all-NA by design, not a gap.*  Their sale block is =secta3ii=
+  at hh-crop grain with no plot linkage (GH #843), the same reason their
+  =Quantity_sold= / =Value_sold= are NaN; hence =optional: true=.  =Olodo=
+  appears in =Unit_sold= (W2 sold vocabulary) but never in =u=.
+- *Every pre-existing column is byte-identical* before and after (62,844
+  rows, isolated cold build compared column-by-column).
+- *The served (API) frame reproduces the parquet counts exactly* -- both
+  3,451 / agree 3,374 (2011Q1) and 3,411 / 3,283 (2013Q1), and the only
+  label in =Unit_sold= absent from =u= is still =Olodo= -- so the read-path
+  categorical mapping / canonical-spelling passes do not move =u= away from
+  =Unit_sold= (neither has a =spellings= block; =Unit_sold= matches no
+  =categorical_mapping.org= table name).
+- *GH #867 alias WITHDRAWN by ruling (@ligon, 2026-10-14).*  An earlier
+  commit on the #824 branch added =other inorganic fertilizer: 0.20= to
+  =transformations._NITROGEN_CONTENT= as a "spelling alias" for this
+  country's =Other Inorganic Fertilizer= label (170 rows; =nitrogen_kg=
+  matched rows 10,014 -> 10,184, plots 4,359 -> 4,472, total 173,672 ->
+  178,074 kg N, +4,402).  The red team found two things wrong with it.
+  (1) Reach: =_normalise_input_label= appends " fertilizer", so Mali's
+  =Other inorganic= (EACI slot, =Mali/_/categorical_mapping.org=
+  =harmonize_input=) resolved too -- 9,640 rows, Mali kg N 906,362 ->
+  1,028,796 (*+13.5%*), undisclosed anywhere.  (2) Provenance: the
+  fertilizer-type value labels are {1 npk, 2 urea, 3 composite manure,
+  4 other (specify)} in W1 and W2 (=s11dq3=, red team) and in W3
+  (=secta11d_harvestw3.dta= =s11dq3= / =s11dq15= / =s11dq27=, re-measured
+  2026-10-14).  W3's question STEM reads "MAIN TYPE OF ... INORGANIC
+  FERTILIZER USED ON [PLOT]" while option 3 is manure, so whether code 4 is
+  inorganic is the stem's word against its own option list; the
+  =harmonize_input= relabel (=categorical_mapping.org:758=) resolves that in
+  favour of "Other Inorganic Fertilizer" for W1-W3.  Only W4/W5 carry a
+  source label literally reading "other inorganic" (36 + 25 rows; 109 of
+  the 170 rest on the relabel).  That ambiguity is exactly why the share is
+  a #867 decision and not a spelling alias.  Ruling:
+  no nitrogen share for either label on this branch; =transformations.py=
+  is byte-identical to =development= again (re-measured: Mali 906,361.8,
+  Nigeria 173,672.0 kg N), and =tests/test_nigeria_sold_unit.py::
+  TestOtherInorganicSpelling= now pins that =Other Inorganic Fertilizer=,
+  =Other inorganic= and =other (specify)= resolve to NOTHING.  Any share
+  for them lands on #867 with its own disclosure and a signature.
+- *Unit_sold NA has three causes*, not two: no sold-unit column (W3-W5),
+  no sale on the row, or a sale whose unit was simply not recorded -- 41
+  positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5 rows carry a
+  =Unit_sold= with no positive sale).
+- *Not read, pre-existing scope*: =Quantity_sold= / =Value_sold= /
+  =Unit_sold= are the MAIN buyer only.  The W1/W2 A3 files also carry
+  =sa3q16a/b= (quantity + unit sold to OTHER buyers) and =sa3q17= (their
+  value); neither the build nor this file used to mention them.  A
+  farmgate price built from the served columns is a main-buyer price.
+- *Cache*: =nigeria.py= and =data_scheme.yml= are in every Nigeria table's
+  hash, so all 24 tables re-warm; only =crop_production='s content moves.
+  With GH #866 landed the stale =var/crop_production.parquet= is evicted
+  before the descent, =make= now *fails* on the absent rule-less target
+  (three "No rule to make target" lines, deliberately not suppressed) and
+  =try_script= runs =_/crop_production.py= -- verified on an isolated root:
+  the framework read served =Unit_sold=.
+- *Surprise, not fixed here*: the L2-country parquet stores =Quantity_sold=
+  and =Value_sold= as =string= (the =pd.NA= fill for W3-W5 degrades the
+  wave concat's dtype; both were already string before this change).  The
+  API read coerces them to =Float64= via =_enforce_canonical_dtypes=, so
+  nothing served is wrong, but =pd.read_parquet(cache_path)= needs
+  =pd.to_numeric= on them.
 
 ** =sa3q18= is an unwired farmgate valuation of the WHOLE harvest
 
