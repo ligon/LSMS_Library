@@ -143,11 +143,8 @@ def _frame_dicts_by_wave(source):
 
 def _raw(path):
     from lsms_library.local_tools import get_dataframe
-    try:
-        raw = get_dataframe(str(path), convert_categoricals=False)
-        dec = get_dataframe(str(path), convert_categoricals=True)
-    except Exception as exc:  # pragma: no cover - data-gated
-        pytest.skip(f"raw Nigeria harvest file unavailable: {exc}")
+    raw = get_dataframe(str(path), convert_categoricals=False)
+    dec = get_dataframe(str(path), convert_categoricals=True)
     return raw, dec
 
 
@@ -269,6 +266,7 @@ class TestConfig:
 # 3 + 4. identification and agreement (data-gated)
 # --------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", sorted(SOLD_UNIT_COLUMNS))
 class TestRawFiles:
     def test_sold_unit_shares_the_harvest_unit_value_label_set(self, wave):
@@ -278,10 +276,8 @@ class TestRawFiles:
         pyreadstat = pytest.importorskip("pyreadstat")
         from lsms_library.data_access import get_data_file
         cfg = SOLD_UNIT_COLUMNS[wave]
-        try:
-            path = get_data_file(str(NIGERIA / wave / cfg["file"]))
-        except Exception as exc:  # pragma: no cover - data-gated
-            pytest.skip(f"raw file unavailable: {exc}")
+        path = get_data_file(str(NIGERIA / wave / cfg["file"]))
+        assert path is not None, f"raw Nigeria harvest file unavailable: {wave}"
         _, meta = pyreadstat.read_dta(str(path), metadataonly=True)
         set_h = meta.variable_to_label.get(cfg["unit"])
         set_s = meta.variable_to_label.get(cfg["unit_sold"])
