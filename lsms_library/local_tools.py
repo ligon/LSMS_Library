@@ -63,7 +63,6 @@ import struct
 import tempfile
 import numpy as np
 import pandas as pd
-import dvc.api
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date
@@ -78,6 +77,7 @@ from pyarrow.lib import ArrowInvalid
 from functools import lru_cache
 from pathlib import Path
 import configparser
+import errno
 import os
 import ast
 import hashlib
@@ -1390,19 +1390,48 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
 
     else:
-        try:
-            with dvc.api.open(fn,mode='rb') as f:
-                df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except (OSError, ValueError, KeyError, ImportError):
-            # DVC handle / config / network failure -> fall back to the WB
-            # Microdata download path.  Programmer bugs (TypeError,
-            # AttributeError) propagate so they aren't silently masked.
-            local_path = _try_get_data_file(fn)
-            if local_path is not None:
-                with open(local_path, mode='rb') as f:
-                    df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            else:
-                raise
+        # Neither local nor DVC-tracked at ``countries_root()``:
+        # ``file_system_path`` has already consulted the sidecar at cwd and
+        # at the countries root AND ``DVCFS.open`` (rooted at the countries
+        # root) before we get here, so the only route left is the WB
+        # Microdata download.  GH #810: this branch used to try
+        # ``dvc.api.open(fn, mode='rb')`` first, with no ``repo=`` -- DVC
+        # then resolved the repository from the CURRENT WORKING DIRECTORY
+        # and walked every ``*.dvc`` beneath it: 300-450 s per missing
+        # source from ``/tmp``, a ``YAMLValidationError`` raised on an
+        # unrelated malformed pytest fixture, and a ``BrokenProcessPool``
+        # when the walk ran inside a forked build worker (Nepal).  A
+        # missing source now fails fast, from any cwd, with the error the
+        # callers already handle (``FileNotFoundError``; ``grab_data`` catches
+        # it in its nested ``get_data``). ``df_data_grabber`` lets missing
+        # files propagate: its ``missing_ok`` covers missing columns only.
+        #
+        # Two things about the WB route are NEW here, not "as before"
+        # (red team, 2026-09-24).  (1) It was previously UNREACHABLE from
+        # this branch: ``dvc.api.open`` raised ``PathMissingError`` -- a
+        # ``DvcException``, outside the caught ``(OSError, ValueError,
+        # KeyError, ImportError)`` -- so ``_try_get_data_file`` never ran
+        # for a plain missing source.  (2) ``get_data_file`` swallows its
+        # own network/HTTP/timeout errors to ``None`` (``_get_catalog_idno``,
+        # ``_find_stata_zip_url``, ``_download_and_extract``), so a WB fetch
+        # failure surfaces as THIS ``FileNotFoundError``, never as a
+        # propagated network error.  Cost per missing source: online, a few
+        # seconds of WB catalog calls; offline / firewalled, bounded by the
+        # ``urlopen(timeout=30)`` calls in those helpers plus one cached
+        # key validation per process (``permissions()`` is memoised).
+        # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
+        # every cold read.
+        local_path = _try_get_data_file(fn)
+        if local_path is None:
+            raise FileNotFoundError(
+                errno.ENOENT,
+                "source is not on disk, has no DVC sidecar under "
+                f"{_COUNTRIES_DIR}, and could not be fetched from the World "
+                "Bank Microdata Library (see data_access.get_data_file)",
+                str(fn),
+            )
+        with open(local_path, mode='rb') as f:
+            df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
 
     # SITE R of the null-content audit.  The reader's ONLY post-read content
     # check: a frame of the right shape holding nothing is a mis-parse, not
@@ -1713,12 +1742,13 @@ def change_id(x: pd.DataFrame, fn: str | None = None, id0: str | None = None, id
 
         return x
 
-    try:
-        with open(fn,mode='rb') as dta:
-            id = from_dta(dta)
-    except IOError:
-        with dvc.api.open(fn,mode='rb') as dta:
-            id = from_dta(dta)
+    # GH #810: read the crosswalk through the sanctioned reader (local ->
+    # DVC blob cache rooted at ``countries_root()`` -> WB fallback), exactly
+    # as the country-level copies in ``ghanalss.py`` / ``ghanasps.py`` /
+    # ``ethiopia.py`` already do.  The former ``dvc.api.open(fn)`` fallback
+    # carried no ``repo=``, so DVC resolved the repository from the CWD and
+    # walked every ``*.dvc`` beneath it.
+    id = get_dataframe(fn)
 
     id = id[[id0,id1]]
 

@@ -220,8 +220,6 @@ df = get_dataframe('../Data/sect1_hh_w5.dta')
 
 The relative path `../Data/file.dta` works because scripts run from the wave's `_/` directory. `get_dataframe` resolves it through the DVC filesystem when the file isn't local.
 
-Some older library functions (e.g., `age_sex_composition`) still use `dvc.api.open` internally -- that's fine, they accept the same relative paths. But new scripts should prefer `get_dataframe` for consistency.
-
 ## Cluster / Slurm Notes
 
 - The `import lsms_library` is slow (~90s) due to DVC initialization at import time. Budget for this in job time limits.
