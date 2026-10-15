@@ -68,3 +68,42 @@ def test_bad_feature_raises():
 def test_bad_country_raises():
     with pytest.raises(ValueError):
         ll.features(country="Xanadu")
+
+
+# ---------------------------------------------------------------------------
+# GH #915 (half 1): a name with no directory RAISES, naming the near misses.
+# Half 2 -- raising for an existing directory with no _/data_scheme.yml -- is
+# a separate decision and is deliberately not pinned here.
+# ---------------------------------------------------------------------------
+
+def test_gh915_typo_raises_value_error_naming_both_ghanas():
+    with pytest.raises(ValueError, match="No such country 'Ghana'") as ei:
+        ll.Country("Ghana")
+    msg = str(ei.value)
+    assert "GhanaLSS" in msg and "GhanaSPS" in msg
+    assert "lsms_library.countries()" in msg
+
+
+def test_gh915_suggestion_is_case_insensitive():
+    with pytest.raises(ValueError) as ei:
+        ll.Country("ghanalss")
+    assert "'GhanaLSS'" in str(ei.value)
+
+
+def test_gh915_no_near_miss_still_raises_and_counts_the_registry():
+    with pytest.raises(ValueError) as ei:
+        ll.Country("Zzzzqqq")
+    msg = str(ei.value)
+    assert "Did you mean" not in msg
+    assert f"{len(ll.countries())} are available" in msg
+
+
+def test_gh915_raises_every_time_not_once():
+    for _ in range(3):
+        with pytest.raises(ValueError):
+            ll.Country("Ghana")
+
+
+def test_gh915_path_traversal_is_still_rejected():
+    with pytest.raises(ValueError, match="path traversal"):
+        ll.Country("../..")
