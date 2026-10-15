@@ -912,7 +912,7 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 306  | MEN -WOMEN                     | Men -women                              | no   |      |       |                                                                                 |
 | 307  | WOMEN'S BLOUSE                 | Women's blouse                          | no   |      |       |                                                                                 |
 | 308  | WOMEN'S JACKET/BLAZER          | Women's jacket/blazer                   | no   |      |       |                                                                                 |
-| 309  | WOMENS POLYESTER SKIRT        | Womens polyester skirt                 | no   |      |       |                                                                                 |
+| 309  | WOMEN'S POLYESTER SKIRT        | Women's polyester skirt                 | no   |      |       |                                                                                 |
 | 310  | WOMEN'S DENIM SKIRT(JEANS)     | Women's denim skirt(jeans)              | no   |      |       |                                                                                 |
 | 311  | WOMEN'S NIGHTGOWN              | Women's nightgown                       | no   |      |       |                                                                                 |
 | 312  | WOMEN'S BATHROBE               | Women's bathrobe                        | no   |      |       |                                                                                 |
@@ -929,7 +929,7 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 323  | BOY'S UNDERPANTS               | Boy's underpants                        | no   |      |       |                                                                                 |
 | 324  | GIRL'S UNDERPANTS              | Girl's underpants                       | no   |      |       |                                                                                 |
 | 325  | GIRL'S DRESS                   | Girl's dress                            | no   |      |       |                                                                                 |
-| 326  | BABIES BODYSUIT               | Babies bodysuit                        | no   |      |       |                                                                                 |
+| 326  | BABIES' BODYSUIT               | Babies' bodysuit                        | no   |      |       |                                                                                 |
 | 327  | TROUSERS FOR MEN               | Trousers for men                        | no   |      |       |                                                                                 |
 | 328  | SHIRTS FOR MEN                 | Shirts for men                          | no   |      |       |                                                                                 |
 | 329  | MEN'S T-SHIRT                  | Men's t-shirt                           | no   |      |       |                                                                                 |
@@ -951,7 +951,7 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 345  | SCHOOL UNIFORMS FOR GIRLS      | School uniforms for girls               | no   |      |       |                                                                                 |
 | 346  | HANDKERCHIEF (WOMEN)           | Handkerchief (women)                    | no   |      |       |                                                                                 |
 | 347  | HANDKERCHIEF (MEN)             | Handkerchief (men)                      | no   |      |       |                                                                                 |
-| 348  | MENS BELT (LEATHER OR SYNTHET | Mens belt (leather or synthet          | no   |      |       |                                                                                 |
+| 348  | MEN'S BELT (LEATHER OR SYNTHET | Men's belt (leather or synthet          | no   |      |       |                                                                                 |
 | 349  | MEN'S SOCKS                    | Men's socks                             | no   |      |       |                                                                                 |
 | 350  | POLYESTER TIE                  | Polyester tie                           | no   |      |       |                                                                                 |
 | 351  | RAINCOAT                       | Raincoat                                | no   |      |       |                                                                                 |

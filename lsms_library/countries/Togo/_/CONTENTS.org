@@ -142,6 +142,19 @@ No booster, no ethnic or programme sub-sample, no refresh/extended split, no
 module subsample, and no cross-section-plus-panel combination is documented
 for this wave.  The design as stated is a plain stratified two-stage draw.
 
+"Stratified" is measurable, and the weights confirm it (GH #812, 2026-10-14):
+=Country('Togo').sample(waves=['2018'])= -- 6,171 households, 540 clusters,
+weight constant within cluster -- puts *66.5% of the variance of log
+cluster weight between the 6 =strata= (regions)*, with sample share over
+weighted population share from 0.54x (Lome commune, 1,034 households / 98
+clusters) through Plateaux 0.85, Maritime 0.89, Centrale 1.45, Kara 1.55 to
+1.90x (Savanes, 1,144 / 96).  All six regions get 72-98 clusters each
+regardless of size.  Treat the design as region-stratified for inference;
+no source consulted states the allocation rule.  (=sample.strata= is wired
+from the cover-page region code, =2018/_/data_info.yml:16=.)  The twin
+measurements for Guinea-Bissau (76.8%), Benin (31.4%) and CotedIvoire
+(36.5%) are in their =CONTENTS.org=.
+
 The one structure that could be mistaken for a sub-sample is the *two-wave
 seasonal split*, which is a fielding split of one sample, not two
 populations.  BID p.4, "Survey Characteristics" (verified verbatim):
