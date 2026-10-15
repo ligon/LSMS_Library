@@ -3038,6 +3038,40 @@ signed off: #850's own write-up adjudicates Ethiopia, Malawi and EthiopiaRHS as
 corrections and explicitly declines to sign off Niger; Uganda is not
 adjudicated either way in that passage.
 
+*Historical nutrition attribution [2026-10-14], without lifting the hold.*
+The [[file:../../../../slurm_logs/release_landing_2026-10-14/uganda-nutrition-history.org][release investigation]] reconstructs both the historical =fc85...eee44=
+and current-development =1131...daf17e= nutrition hashes EXACTLY from the
+same independently cold-verified food and FCT inputs (which themselves match
+the historical fixture). The full old package also reproduces the old hash.
+All movement is accounted for by four #850 commits: vocabulary +49,501.650 kg;
+per-unit denominator/item-axis -259,265.155 kg; per-wave support -37.466 kg;
+dispersion gate -5,677.631 kg. Later #874/#838/#919/#929/fraction-parser
+changes make zero difference on these inputs. Thus the earlier phrase
+“that correction plus the kg-factor work that followed” is contradicted by
+this exact replay; #871 is not needed to explain any part of this delta.
+
+The earlier “Uganda is not adjudicated either way in that passage” also needs
+qualification: the FULL #850 red-team report, §6.6, actually says “Uganda -14%,
+Nigeria -5%, Tanzania -2.6%: small, price anchors unchanged or improved. Fine.”
+That prior reviewer judgment is not a nutrition-fixture maintainer signoff.
+*The instruction not to regenerate until direction is signed off remains.*
+
+The replay reproduces 23,284 changed vectors and 337,664 changed cells.
+Vitamin A +2.0453% is mostly fresh/dry sweet potatoes gaining nominal kg in
+litre containers; B12 -31.6041% is mostly fish, eggs and milk losing kg, while
+many plant foods have zero B12 density. Every nutrient delta reconciles to
+food-by-food kg-factor changes times unchanged densities.
+
+A new source caveat is now explicit. =nutrition.org='s FCT row 4003,
+=SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW=, records Vitamin A RAE =225= micrograms
+per 100 g (2250/kg in the served FCT), but its source note says “vitamin A
+and carotenoids assumed = 0.” This pre-existing contradiction is unresolved;
+neither statement was silently preferred. Fresh sweet potatoes contribute
++79.42 million recorded micrograms to the historical A delta. Exact arithmetic
+does not establish which source statement is authoritative. Nominal
+volume-as-mass and range-endpoint assumptions also remain documented in the
+report; no density, mapping, factor policy or fixture was changed.
+
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
 verify a baseline entry, build the table explicitly and compare

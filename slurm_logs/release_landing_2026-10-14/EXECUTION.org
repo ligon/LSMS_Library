@@ -46,3 +46,55 @@ current development already disagrees before #967. Country-lane cold replay
 confirms #967's additional changes independently (food sums and kg×FCT),
 but the existing CONTENTS instruction requires direction signoff before
 regenerating the historical nutrition baseline. Detailed report forthcoming.
+
+* Integrated verification and review
+Candidate ed1414fb9 (before final Niger/#600 and workflow/test-only followups):
+full unit invocation with LSMS_SKIP_AUTH=1, privateL2, six loadfileworkers:
+3211 passed,4348 skipped,76warnings in144.22s. The skips are not accepted as
+credentialed-data proof. Exact current candidate after final reviewed additions
+is7fa05179c8519f44ea329ba6387f5d6d6441a8ea; a fresh private declared-table
+corpus census is assigned to the runtime lane, with max2countryprocesses.
+
+The #980/framework merge conflict preserves requires_s3 plus the request/cold
+cache failure guard. The text-clean #980/Windows merge had duplicate
+workflow_dispatch keys;396fa215d fixes this with a YAML-node duplicate-key
+regression that fails on the bad merge. Windows also asserts installed code
+and packaged configs rather than accepting checkout imports via PYTHONPATH.
+
+Final independent country review approved five fixes and Uganda's incremental
+source evidence. The proposed nutrition fixture patch remains unapplied.
+Reports from all three lanes and the independent country review are archived
+beside this file. New PRs983-996 cover the remaining branches;#967/#969/#981/
+#982 are updated in place. #600 is a reviewed port on a NEW remote branch,
+fix/600-provenance-landing; the old unreviewed historicalref is preserved.
+
+#988 initial CI failed installing dulwich after a truncated HTTP download;
+tests never ran. The failed job was retried without a code change.
+
+#941 sequential cold selection is running against frozened1414fb9 in a separate
+worktree/root with credentials and one process. It includes the revised issue
+comment's actual pre-EHCVM builders as well as its original candidate files.
+Native Windows dispatch38681713985 runs installed-wheel builds on17a914ed;
+#980 manual data run38681185279 has completed Uganda make and is in fullpytest.
+
+* Landing progress and native proof
+PRs #983, #984, #985, #986, #987 and #992 merged after both required unit
+and explicitly checked Windows smoke succeeded at their reviewed heads.
+#988 dependency-download rerun now passes; no source change was needed.
+Native Windows conda job116247523337 succeeded in dispatch38681713985:
+installed code/config identity and cold Linux-equivalent shocks/assets builds.
+Its head17a914ed precedes only the workflow-key consolidation on396fa215d;
+the integrated candidate will receive another native dispatch.
+
+Historical #837 final2877ab387 restores all three source files exactly to
+development. Raw-source replay rejects the recovered reducers: they blank
+364 Ethiopia GPS and119 Tanzania administrative cells and violate the existing
+household-grain regression. Documentation/evidence only will land; issue837
+remains open for scientific/source questions.
+
+* Ref disposition snapshot after twelve implementation merges
+{"active-landing": 7, "integration-reference": 4, "landed": 94, "retained-archive": 6, "retained-rejected": 19, "superseded": 63}
+See landing-prs.json for live-state snapshot with exact head and merge SHAs.
+#837 original implementation is retained-rejected, with documentation/evidence
+landed through this review branch. Uganda history is now causally accounted
+for; its source assumptions and explicit fixture hold remain.

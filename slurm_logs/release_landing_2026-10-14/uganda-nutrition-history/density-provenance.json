@@ -1,0 +1,86 @@
+[
+  {
+    "food": "Sweet Potatoes (fresh)",
+    "FCT_code": 4003.0,
+    "source_description": "SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW",
+    "source": "HarvestPlus Uganda",
+    "source_code": "11507",
+    "source_notes": "Based on USDA #11507 Sweet potato,unprepared; vitamin A and carotenoids assumed = 0.",
+    "Energy_per_kg": 1230.0,
+    "Vitamin_A_per_kg": 2250.0,
+    "B12_per_kg": 0.0,
+    "source_numeric_A_per_100g": 225.0
+  },
+  {
+    "food": "Sweet Potatoes (dry)",
+    "FCT_code": 4018.0,
+    "source_description": "SWEETPOTATO,YELLOW,WO/SKIN,DRIED,RAW",
+    "source": "HarvestPlus Uganda",
+    "source_code": "4008",
+    "source_notes": "Based on #4008 Sweetpotato,yellow,wo/skin,fresh,raw",
+    "Energy_per_kg": 3430.0,
+    "Vitamin_A_per_kg": 4960.0,
+    "B12_per_kg": 0.0,
+    "source_numeric_A_per_100g": 496.0
+  },
+  {
+    "food": "Fresh Fish",
+    "FCT_code": 15101.0,
+    "source_description": "FISH,SMALL,WHOLE (UNSPECIFIED),FRESH,RAW",
+    "source": "USDA-21",
+    "source_code": "15051",
+    "source_notes": "",
+    "Energy_per_kg": 1390.0,
+    "Vitamin_A_per_kg": 300.0,
+    "B12_per_kg": 24.0,
+    "source_numeric_A_per_100g": 30.0
+  },
+  {
+    "food": "Dry/Smoked Fish",
+    "FCT_code": 14006.0,
+    "source_description": "FISH,TILAPIA(TYPE2),SMOKED/DRIED,RAW",
+    "source": "HarvestPlus Uganda",
+    "source_code": "14001",
+    "source_notes": "Based on #14001 Fish,Tilapia (Type 2),raw",
+    "Energy_per_kg": 4130.0,
+    "Vitamin_A_per_kg": 0.0,
+    "B12_per_kg": 61.2,
+    "source_numeric_A_per_100g": 0.0
+  },
+  {
+    "food": "Eggs",
+    "FCT_code": 17001.0,
+    "source_description": "EGG,CHICKEN,WHOLE,RAW",
+    "source": "USDA-21",
+    "source_code": "1123",
+    "source_notes": "",
+    "Energy_per_kg": 1430.0,
+    "Vitamin_A_per_kg": 1400.0,
+    "B12_per_kg": 12.9,
+    "source_numeric_A_per_100g": 140.0
+  },
+  {
+    "food": "Milk (fresh)",
+    "FCT_code": 9001.0,
+    "source_description": "MILK,COW,WHOLE,FRESH,RAW",
+    "source": "USDA-21",
+    "source_code": "1077",
+    "source_notes": "",
+    "Energy_per_kg": 600.0,
+    "Vitamin_A_per_kg": 280.0,
+    "B12_per_kg": 4.4,
+    "source_numeric_A_per_100g": 28.0
+  },
+  {
+    "food": "Cooking Oil",
+    "FCT_code": 25001.0,
+    "source_description": "VEGETABLE OIL,UNSPECIFIED BRAND,RAW",
+    "source": "USDA-21",
+    "source_code": "4506",
+    "source_notes": "",
+    "Energy_per_kg": 8840.0,
+    "Vitamin_A_per_kg": 0.0,
+    "B12_per_kg": 0.0,
+    "source_numeric_A_per_100g": 0.0
+  }
+]
