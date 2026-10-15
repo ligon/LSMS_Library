@@ -591,63 +591,114 @@ and both the labels and the value distributions settle it (=s1d_2= takes
 
 Note also the source typo =sid_3i= (not =s1d_3i=) for "Q3i Day of birth".
 
-** 2. Wave 1 has NO usable MonthsAway, and the reason is not what it looks like
+** 2. Wave 1 MonthsAway IS wired: =s1d_27=, with a blank read as 0 (corrected 2026-10-14, GH #880)
 
 =s1d_27= "Q27 For how many months has person been away from this household in
-last 12 months" is the right variable and is the same question waves 2 and 3
-ask.  It is nonetheless *not wired*, because its missingness is
-household-level rather than person-level:
+last 12 months" is the MonthsAway question, the same one waves 2 and 3 ask,
+and it *is* declared for 2009-10 (=2009-10/_/data_info.yml:63-133=, the
+=household_roster= =myvars= block, which also carries the full evidence).
+The wave's =household_roster= =df_edit= hook (=2009-10/_/mapping.py=,
+=household_roster()=) fills NaN -> 0 and clips to 12.  The column is only
+52.7% populated in the file (9,956 of 18,889 members), and the fill is a
+*reading of the blanks* rather than a value the file states, which is why
+=data_scheme.yml= keeps the column =optional=.
 
-- non-null for 9,956 of 18,889 members (52.7%);
-- *2,188 of 5,009 households have NO member answered* and 2,537 have every
-  member answered; only 284 are partial.  48 whole EAs sit at 0%;
-- inside those 2,188 households the non-null rate of =s1d_27= is exactly
-  0.000000 and of =s1d_28= exactly 0.000000, while every other roster variable
-  is populated at the *same* rate as elsewhere (Sex 100%, Relationship 100%,
-  Age 99.96%, religion 97.6%, Q23 98.5%).  The households were fully
-  enumerated; only the Q27-Q33 absence block is missing;
-- the answer rate is flat across age (51-57% in every band, infants included),
-  so it is not an eligibility skip.
+Why a blank means "not away" (the one-paragraph version; the YAML has the
+tables):
 
-So NaN here does *not* mean "this person had left", which is the premise
-=roster_to_characteristics()= relies on when it drops NaN-residence members.
-Nor does NaN mean "never away": the survey records 0 *explicitly* for 8,840 of
-the 9,956 answered members, so filling 0 would fabricate data.
+- Q27-Q33 is a skip block.  Q28-Q33 are the follow-ups asked of people who
+  ARE away; of the 8,933 members with =s1d_27= missing, *nine* (0.101%, in 5
+  households) have any of Q28-Q33 populated.
+- The missingness is a *recording convention, per EA*, not a person
+  attribute: answer rates are bimodal (48 of 334 EAs at 0%, 128 at 100%, 17
+  in the 25-75% middle), and the share of RECORDED values that are non-zero
+  falls monotonically from 95.9% in the EAs that recorded almost nobody to
+  4-6% in the EAs that recorded everybody.  Teams that wrote down few people
+  wrote down the AWAY ones; teams that wrote everybody down wrote the zeros
+  too.  So the 8,840 explicit zeros are not evidence against NaN -> 0; they
+  are what the thorough teams wrote where the others left the cell blank.
 
-Measured cost of wiring it anyway: the derived =household_characteristics=
-would keep 9,942 of 18,889 persons and *2,817 of 5,009 households* -- 2,192
-households (43.8%) would silently vanish from a table whose
-=household_roster= is fully populated.  Leaving it undeclared instead trips the
-documented per-wave fallback in =roster_to_characteristics= ("a wave with no
-usable residence datum at all reverts to counting every roster member"), which
-emits a =UserWarning= naming =2009-10=.  That warning is expected and is the
-honest outcome: every roster member counted, mean household size 3.771.
+*** Measured delivered state (2026-10-14, cold private root)
 
-Note the delivered =household_characteristics= nonetheless has *5,008* wave-1
-households, not 5,009.  That is a separate, unrelated step: after the
-residence filter, =roster_to_characteristics= does
-=dropna(subset=['sex','age'])=, and 5 wave-1 members have a null =s1d_4i=.
-Four of them sit in households of size 2-4 that survive on their remaining
-members; the fifth, =hhno= 107254027, is a *one-person* household whose only
-member (a female head) has no age, so the household disappears.  Waves 2 and
-3 lose 12 and 8 households respectively (4,774 -> 4,762, 5,669 -> 5,661); there
-the residence filter and the null-Sex/Age drop both contribute and this note
-does not decompose them.
+=Country('GhanaSPS').household_characteristics()= (the full three-wave
+call; the wave-1 slice is read off =t=):
+
+| wave    | =household_roster= households | =household_characteristics= households | mean household size |
+|---------+-------------------------------+----------------------------------------+---------------------|
+| 2009-10 |                         5,009 |                                  5,007 |               3.769 |
+| 2013-14 |                         4,774 |                                  4,762 |               3.418 |
+| 2017-18 |                         5,669 |                                  5,661 |               3.346 |
+
+After the hook, wave 1's =MonthsAway= is non-null for all 18,889 members,
+max 12, with 17,773 zeros and 14 members reporting 12.  *No* "wave with no
+usable residence datum" =UserWarning= fires for =2009-10= any more; the
+only warnings on the call are =NullReadWarning= and =ResourceWarning=,
+neither about residence.  (An earlier version of this section quoted
+*5,008* and mean size *3.771* for wave 1 -- both measured under the
+fallback path that counted every roster member, and both superseded.)
+
+The two missing wave-1 households, each verified absent from the served
+table and each for a different reason:
+
+- =hhno= 107254027 :: a one-person household whose only member (a female
+  head) has no =s1d_4i= age; =roster_to_characteristics= does
+  =dropna(subset=['sex','age'])=.  Pre-existing; nothing to do with
+  MonthsAway.  (5 wave-1 members have a null age; the other four sit in
+  households of size 2-4 that survive on their remaining members.)
+- =hhno= 107268086 :: all three members report *12 months away* in the
+  source -- verified raw, the only household in the wave where every member
+  reports 12, and NOT the clipped value below.  All three have zero months
+  present, are filtered out, and the household disappears from a table its
+  roster populates.  The framework honouring the data, not a defect; named
+  because it is the kind of silent vanishing worth naming.
 
 Waves 2 and 3 have a *clean* =awaylast12= (16,353/16,354 and 18,980/19,006
-non-null, strictly 0-12), so they are filtered normally.
+non-null, strictly 0-12) and are filtered normally; their 12 and 8 missing
+households are the residence filter plus the null-Sex/Age drop, not
+decomposed here.
 
-*** The one out-of-range value
+*** Residuals -- open, documented rather than smoothed
 
-=s1d_27= takes the value *15* on exactly one row -- =hhno= 105144071,
-=hhmid= 2, a 48-year-old female spouse -- in a 12-month reference period.  No
-negatives, no other value above 12.  Its meaning could not be determined from
-any document in the corpus.  It is moot while the column is undeclared; anyone
-who wires =s1d_27= later must decide explicitly (leaving it NA is the
-documented default) rather than clip silently.  Note that
-=roster_to_characteristics= would *not* yield "-3 months present" for it: the
-conversion is =np.clip(12 - value, 0, None)=, so a 15 becomes 0 months present
-and the person is dropped -- quietly, which is the worse failure.
+- The 9 members with Q28-Q33 move data but no =s1d_27= are recorded as
+  never away under NaN -> 0, which for them is probably wrong.  0.05% of the
+  roster; the hook does not special-case them.
+- =s1d_27= takes the value *15* on exactly one row -- =hhno= 105144071,
+  =hhmid= 2, a 48-year-old female spouse -- in a 12-month reference period.
+  No negatives, no other value above 12; its meaning could not be
+  determined from any document in the corpus.  *Decision (mapping.py:74):
+  clipped to 12*, the largest value consistent with the reference period,
+  rather than guessed at as a keying error.  Left at 15 it would NOT have
+  surfaced as "-3 months present": =roster_to_characteristics= computes
+  =np.clip(12 - value, 0, None)=, so the person would have been dropped
+  silently -- the worse failure.  The household IS in the served
+  =household_characteristics= (verified).
+
+*** Superseded (2026-08 to 2026-09): "wave 1 has NO usable MonthsAway" -- kept as history
+
+Until the hook landed this section argued the opposite, and the config
+left the column undeclared.  The reasoning, so it is not re-derived: the
+column's missingness looked *household-level* (2,188 of 5,009 households
+with no member answered, 2,537 with every member answered, 284 partial; 48
+whole EAs at 0%), inside the all-missing households =s1d_27= AND =s1d_28=
+were both exactly 0.000000 non-null while every other roster variable was
+populated at the normal rate, and the answer rate was flat across age.
+From that it concluded NaN could mean neither "left" nor "never away", so
+that "filling 0 would fabricate data".
+
+*That was wrong, and the check was non-discriminating*: =s1d_28= is only
+0.1% non-null in the WHOLE file (18 rows), because it is a follow-up asked
+only of people who are away, so its absence in those households
+discriminated nothing.  The per-EA pattern above is what settles it.  The
+cost figures the old text quoted are real, but they are the cost of the
+*rejected alternative* -- declaring the column WITHOUT the fill -- not of
+wiring it: that path keeps 9,942 of 18,889 persons and 2,817 of 5,009
+households, i.e. drops 2,192 households (43.8%) from a table whose roster
+is fully populated.  And leaving the column undeclared, the path actually
+taken until then, tripped the per-wave fallback in
+=roster_to_characteristics= ("a wave with no usable residence datum at all
+reverts to counting every roster member"), which is where the superseded
+5,008 / 3.771 figures came from.  Adjudicated in
+=SkunkWorks/derived_values.org= (the branch-selection discussion).
 
 ** 3. The relationship vocabulary DRIFTS between waves
 
