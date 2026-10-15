@@ -1,11 +1,11 @@
 #+title: Handoff -- 2026-10-14 release landing IN PROGRESS
 
 * Current execution -- Codex, job39919092
-The maintainer approved WORKPLAN.org and said to proceed. Eighteen implementation
+The maintainer approved WORKPLAN.org and said to proceed. Nineteen implementation
 PRs are merged to development, plus evidence PRs #997/#998. GitHub, local main
-and filesystem origin development are synchronized at4c60e696f. #967 Uganda
-remains open; release PR #999 is DRAFT. A narrow test-isolation repair for
-newly reproduced #1003 is in progress. No release tag or publication yet;
+and filesystem origin development are synchronized at47ce939af. #967 Uganda
+remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
+newly reproduced #1003 merged via PR1004 after independent review and CI. No release tag or publication yet;
 shared L2 is untouched.
 
 ** Remaining decision, already asked
@@ -26,7 +26,10 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   contains #967 plus all landed code and evidence. Runtime differences from
   development are only the reviewed #967 country changes.
 - Native installed Windows conda job116251866840 passed on74c9398ec,
-  run38683117467. Linux credentialed full suite is still running in that run.
+  run38683117467. Its Linux data job and earlier38681185279 are still running.
+  Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
+  manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
+  matches the earlier candidate; only tests/CONTENTS/evidence differ.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
@@ -34,20 +37,27 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
 - Runtime lane is rebuilding549declared pairs across38countries from empty
   private L2 at release-work/runtime/data-corpus, frozen7fa05179. It will run
   Feature phases1/2 on a separate physical copy. Shared cache is untouched.
-- Full credentialed suite is running on frozenec1a59767 in release-work/full-suite,
-  private full-suite-data copied from the completed #941 root, CPU24-31/n6.
-  Logs: release-work/logs/full-suite.log/xml, session96369. After the corpus is
-  quiescent, copy its root for targeted cache-presence-only coverage gaps;
-  inspect the suite's skip reasons first. Explain every failure/coverage gap.
-  Do not mutate a worktree under active tests. Preserve L1; no L2 symlinks.
+- Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
+  4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
+  No credential skips;2580cache-presence skips remain for targeted follow-up
+  after corpus completion. Fifteen independent replication-dir tests lack the
+  external project; never point them at the same cache under test. Fourxfails
+  are source weight gaps; existing Pakistan#740 is the non-strict xpass.
+- Final-source cache-gap worktree is release-work/cache-coverage, branch
+  landing/cache-coverage. Copy the completed quiescent corpus physically into
+  a new private data root, set matching cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT and
+  LSMS_EXPECTED_ROOT, and run control/full-suite/cache-gap-groups.json cases.
+  Keep structural/ordinary reads separate from the10cache-poisoning cases;
+  Uganda nutrition's known unapproved fixture remains a real held comparison.
+  Preserve L1; no writable L2 symlinks or source edits during active tests.
 - Release notes/issue reconciliation are independently reviewed and published
   via998. Eighteen partial issue bodies/titles narrowed, all left OPEN; residuals
   #1000FCT-note, #1001credential-copy, #1002binary-fallback, #1003test-root filed.
   issue-reconciliation-applied.json records mutations. PR999 holds closures.
 - #1003 disposable probes confirm the absent-parquet helper can delete from a
   previously cached root and leave its private root cached after teardown.
-  The JSON helper early-returns and does not poison the cache. Framework agent
-  owns a new isolated fixture-only repair; no attribution to #941 is established.
+  The JSON helper early-returns and does not poison the cache. Fixture-only repair
+  is merged via1004; no attribution to #941 is established.
 - Once science and validation gates pass: land967, verify combined development,
   warm/promote verified shared caches once, release PR development->master with
   MERGE COMMIT, make release v=0.15.0, explicit GitHub tag push/release, observe

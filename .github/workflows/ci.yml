@@ -360,6 +360,13 @@ jobs:
   # Full data tests — builds Uganda tables and runs invariance checks
   data-tests:
     runs-on: ubuntu-latest
+    # Apply the AGENTS.md 3b limits to both prerequisite builds and tests.
+    # Keep pytest sequential below so session-order failures remain visible.
+    env:
+      LSMS_BUILD_WORKERS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
     # Push to a release branch, or a manual `workflow_dispatch` on any ref
     # (GH #941): the dispatch is the only way to re-run this job on a fix
     # without a release.
@@ -391,4 +398,7 @@ jobs:
           poetry run make -j2
         timeout-minutes: 30
       - name: Run full test suite
-        run: poetry run pytest --tb=short
+        run: >-
+          poetry run pytest --tb=short
+          --timeout=600 --timeout-method=thread
+          --durations=25

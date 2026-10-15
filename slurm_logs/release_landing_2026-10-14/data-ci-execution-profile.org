@@ -1,0 +1,47 @@
+#+title: Credentialed CI execution controls
+
+* Change and scope
+Base =47ce939afa1f253a5a76e0832620a3cbb6a4b817=. The =data-tests= job now
+inherits =LSMS_BUILD_WORKERS=1= and =OPENBLAS_NUM_THREADS=1=,
+=OMP_NUM_THREADS=1=, =MKL_NUM_THREADS=1= in both its prerequisite build and
+pytest steps. Its full-suite invocation remains sequential and gains the
+unit job's existing =--timeout=600 --timeout-method=thread --durations=25=.
+
+AGENTS.md / CLAUDE.md scrum-master addendum 3b records inherited DVC handles
+across fork and BLAS oversubscription as hazards, and requires these controls.
+The previous unit job already uses them; the credentialed data job did not.
+A timeout remains a failing nonzero outcome and can terminate pytest before
+a normal summary. It is not a skip, retry, or successful test completion.
+
+No production code, country config, test assertions/marks, dependencies,
+lockfiles, credentials, test selection, make command, job conditions, or cache
+hashes changed. The existing =make -j2= prerequisite and its 30-minute step
+timeout are retained. No xdist is added, preserving the session-order boundary
+for the historical #941 comparison.
+
+* Validation
+- Parsed the complete before/after workflow with PyYAML BaseLoader (preserving
+  the =on= key). Removing only the four new environment values and restoring
+  the old full-suite command yields the identical prior parsed workflow.
+- Asserted the precise sequential command and all four string-valued limits.
+- Local =python -m pytest --help --tb=short --timeout=600
+  --timeout-method=thread --durations=25= returned 0. The installed plugin is
+  pytest-timeout 2.4.0; pyproject already declares =^2.3.0=. No install/update.
+- Package/config identity asserted against this isolated worktree; empty
+  config and private data roots, LSMS_SKIP_AUTH=1, CPU16, all four limits set.
+  Only command help was invoked; no survey data or test suite was built.
+- =git diff --check= passed. Production/test/dependency path diff is empty.
+- Machine evidence: [[file:data-ci-execution-profile/validation.json][validation.json]]. Private reproducible driver and help
+  output: =control/framework/data-ci-execution-profile/=.
+
+* Limits and existing evidence
+This is not evidence that any current Actions job deadlocked, nor an
+explanation or closure of #941. Existing unpinned jobs 38681185279,
+38683117467, and 38687547945 remain independent comparison evidence.
+The coordinator owns dispatch/cancellation and interpretation of a fresh run.
+No GitHub writes were performed by this task.
+
+The earlier ordered fresh-root local #941 check passed 451 tests with zero
+skips using these controls and a 600-second thread timeout; see
+[[file:941-sequential.org][the separate sequence report]]. That is neither a full cold CI result nor
+root-cause attribution. The subsequent controlled full CI run is still needed.
