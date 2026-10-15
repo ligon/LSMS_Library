@@ -19,9 +19,10 @@ release gates below pass; GitHub Release and PyPI contain the intended version;
 an installation of the published wheel passes smoke checks; and the handoff
 records final SHAs, results, remaining issues, and cache status.
 
-This file is a workplan. Inventory and merge preflight are complete; no fixes,
-PR mutations, merges, cache clears, tags, or publication have been performed
-by this planning pass.
+Execution is underway under the maintainer's approval. See EXECUTION.org and
+the archived lane reports for reviewed heads, actual merges and validation.
+The private corpus rebuild is running; shared caches remain untouched.
+The Uganda nutrition direction hold remains open; no release tag exists.
 
 * Evidence and corrections to the handoff
 - Local planning base: =a31257286=; GitHub development: =b021bae5d9=.
@@ -64,20 +65,20 @@ by this planning pass.
   verdicts for the substantive blockers, and framework-small-2's report.
 - [X] Fetch mirror and GitHub refs; inventory all open PRs and branch tips;
   perform read-only =git merge-tree= trials of the 18 active branches.
-- [ ] Reconcile the 54 historical ref versions in =branches.tsv=. For a
+- [X] Reconcile the 54 historical ref versions in =branches.tsv=. For a
   squashed PR, compare the combined PR patch and its merge commit, then inspect
   any later branch tail. Preserve evidence for each final disposition.
   Prioritise =fix/323-*=, the five =rescue/2026-07-21/*= rows still unmatched,
   =feat/797-ghanalss-relationship-table=, =feat/parallel-wave-builds=,
   =fix/837-cluster-key-residual=, and =fix/600-provenance-1to1=.
-- [ ] Record the old Uganda #962 drafts as superseded by #967 after comparing
+- [X] Record the old Uganda #962 drafts as superseded by #967 after comparing
   their residual scripts/notes; explicitly exclude the PARKED value-count
   proposal from implementation. Check the Malawi sale-basis probe against
   merged #966 and the historical Ghana aggregate proposal against #940.
-- [ ] Archive external reports needed for review into this session directory
+- [X] Archive external reports needed for review into this session directory
   (including framework-small-2's REPORT and validation summaries). Do not rely
   on a /local/job*/ path surviving a Slurm allocation.
-- [ ] Synchronize the two handoff-only development commits without replacing
+- [X] Synchronize the two handoff-only development commits without replacing
   newer remote work. Keep all subsequent fixes isolated from this checkout.
 
 Gate: no active branch missing from the landing table; every historical
@@ -90,12 +91,12 @@ test/CI items. It enables manual data-tests and makes credential-free runs
 less expensive. Preserve =--no-root=, explicit checkout import paths, the
 single-PR-run policy, and the distinction between data tests and unit tests.
 
-- [ ] Add the missing regression for =UnmarkedS3TestWarning=, including
+- [X] Add the missing regression for =UnmarkedS3TestWarning=, including
   =-W error::UserWarning=. Verify the fixture actually exercises the warning.
-- [ ] Account for the remaining three credential-free network waiters named
+- [X] Account for the remaining three credential-free network waiters named
   by its verdict; use justified =requires_s3= markers or remove the unintended
   network access. Do not blanket-skip tests to get a green run.
-- [ ] Prove how to run credentialed CI on a pre-release candidate. Attempt
+- [X] Prove how to run credentialed CI on a pre-release candidate. Attempt
   =gh workflow run ci.yml --repo ligon/LSMS_Library --ref <candidate>= once
   the candidate carries #980, and verify the run's =head_sha= and jobs.
   Current master lacks =workflow_dispatch=. GitHub documents default-branch
@@ -104,7 +105,7 @@ single-PR-run policy, and the distinction between data tests and unit tests.
   trigger-only CI PR on master and merge master back. Do not wait until the
   release to discover that this gate cannot run.
   Reference: [[https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow][GitHub: manually running workflows]].
-- [ ] Enable a maintainer-triggered Windows script-build run on the candidate
+- [X] Enable a maintainer-triggered Windows script-build run on the candidate
   in #969, preserving its secrets restrictions. Its existing =push=-only job
   combined with development's new push filters would otherwise run only
   AFTER landing. Require the Windows job to execute, not skip.
@@ -140,14 +141,16 @@ and obtain an independent review of the final patch before merge.
 | fix/970-json-make / #982 | Preserve no-make JSON contract and fixture teardown; recheck after #969's UTF-8 JSON changes; reconcile residual filing and wrong-head #979 | GLOBAL bundle; no independent auto-merge |
 | feature/964-windows-script-builds / #969 | Resolve subprocess-env guard conflict; preserve #968 helper and fingerprint exclusion; re-review all nine encoding readers; rerun Linux with/without make and native Windows conda comparisons; update stale PR body to all three issues | GLOBAL bundle; overlaps 810/readers/970 |
 
-** Decision needed for grader-scale-830
+** Accepted first increment for grader-scale-830
 Recommended first increment: retain the fixed fivefold tolerance as a
 warning-only diagnostic, explicitly reporting the four observed Ghana flags;
 leave gap-aware/CPI-adjusted thresholds and persistent-break detection as named
 follow-ups. Two GhanaLSS flags are attributed to inflation in the review;
 the two GhanaSPS flags remain unadjudicated instrument/level differences.
 Accepting the diagnostic is not adjudicating those observations as errors.
-Record the maintainer's choice before landing this branch.
+The maintainer approved proceeding with the recommended plan. The branch
+implements this first increment and is merged as PR #987; no Ghana monetary
+observation is adjudicated as an error by this diagnostic.
 
 ** Execution lanes and shared-file ownership
 The work can run in four lanes if delegated: runtime/Windows bundle; country
@@ -162,10 +165,10 @@ relevant idiosyncrasy and quoting contradictions. Read applicable feature
 skills and script docstrings before editing. Record new idiosyncrasies.
 
 * Phase 3 — integrate once, verify the combined candidate
-- [ ] Build a disposable integration branch from current development. Merge
+- [X] Build a disposable integration branch from current development. Merge
   the final reviewed heads, recording each SHA. Re-run merge trials after
   shared-file changes; the initial 16 clean results are only a starting point.
-- [ ] Integrate the five global branches together: #969, #810, readers,
+- [X] Integrate the five global branches together: #969, #810, readers,
   #868, #970. Suggested conflict-resolution order: #969 -> #810 -> readers
   -> #868 -> #970. This order is a starting point, not a proved dependency.
   Preserve UTF-8 opens, binary existence probes, sniff guards, the no-make
