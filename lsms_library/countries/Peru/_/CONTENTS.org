@@ -758,12 +758,50 @@ people (20.0%)*.  The 304 three-digit segmentos match because padding to width
 corrected rather than deleted, because an over-claim here costs the next
 reader the same trust an under-claim does.)
 
-*Today this is harmless*: Peru has no =sample= table, so
-=_join_v_from_sample()= never runs and =v= never reaches a household-level
-table.  It becomes live the moment somebody wires =sample= (=v= and =Rural=,
-both already in REG01 -- the natural follow-up, *filed as GH #700*).
-*Whoever does that must decide the padding once and apply it to both*, or the
-household-to-cluster join will be quietly wrong rather than loudly broken.
+*Until 2026-10-14 this was harmless*: Peru had no =sample= table, so
+=_join_v_from_sample()= never ran and =v= never reached a household-level
+table.  GH #700 wired =sample= and so had to decide the padding once.
+
+*** RESOLVED 2026-10-14 (GH #700): =v= is now PADDED to width 3, in both tables
+
+Decision A was taken: pad =v= to match =i=, rather than strip =i='s padding.
+=i= is the household key and appears in every household-level table; =v= was
+one table's index and had never been joinable, so changing =v= disturbs less.
+Mechanism, because the obvious one does not work:
+
+- =v()= in =1994/_/mapping.py= returns =format_id(value, zeropadding=3)=.
+- The framework binds a module function to a same-named column only for
+  *myvars* and *list-valued* idxvars; a scalar idxvar (=cluster_features='
+  =v: segmento=) is routed to the bare =format_id= (=Wave.column_mapping=).
+  So =v()= pads =sample='s =v= (a myvar) on its own, and the
+  =cluster_features()= df_edit hook re-keys its =v= index level through the
+  same function.  =sample()='s hook re-applies it too, so the invariant does
+  not depend on the dispatch rule.
+
+*Served =v= CHANGED*: =cluster_features= returns ='001'=, ='010'=, ='100'=
+where it returned ='1'=, ='10'=, ='100'= before.  Anything that had hard-coded
+the unpadded strings must be updated.  Measured on a cold private build,
+2026-10-14:
+
+: set(sample.v) == set(cluster_features.v) == {i.split('-')[0] for i in sample.i}
+: -> True   (364 == 364 == 364 segmentos; 0 non-joining)
+: household_roster index: (i, t, v, pid); v null in 0 of 19,285 rows
+: household_characteristics index: (t, v, i); 3,621 rows
+
+*** =sample= carries NO weight, and that is a statement about the microdata
+
+REG01's =_weight_= is identically 1 on all 3,623 rows (std 0).  It sits next
+to =_casenum= and =_date= -- SPSS system variables that rode along in the
+export -- and is not a sampling weight.  The seven domain expansion factors
+that catalog 617 ("Sampling") documents for ENNIV 1994 are not in any shipped
+file.  A =weight= column of ones would assert a self-weighting design the
+documentation contradicts (contrast GhanaLSS GLSS1-3, where constant 1.0 *is*
+the design), so the column is absent rather than fabricated.  Consequence:
+=tests/test_sample.py::test_has_weight_column[Peru]= is red until Peru is
+added to that test's =NO_WEIGHT_COUNTRIES= exemption, and
+=test_covers_all_waves[Peru]= is red because only 1994 is wired (the other
+three waves have no =_/= config at all -- see "Wiring status" below).  Both
+are honest reds; the exemption is the dispatcher's edit, not this fix's.
 
 ** The Guatemala float32 trap does NOT apply to 1994 -- but check 1985/1991
 

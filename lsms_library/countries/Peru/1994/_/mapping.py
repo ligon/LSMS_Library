@@ -30,8 +30,10 @@ Series would break them when they are wired.
 A module-level function whose name matches a declared ``data_scheme`` table is
 dispatched by the framework as that table's ``df_edit`` hook: it receives the
 grabbed-and-indexed frame before ``_normalize_dataframe_index`` sees it.  The
-two hooks below exist so that every non-uniqueness in this wave is resolved by
-an EXPLICIT, declared policy.  Anything still non-unique at normalize time is
+``cluster_features`` and ``household_roster`` hooks below exist so that every
+non-uniqueness in this wave is resolved by an EXPLICIT, declared policy; the
+``sample`` hook exists so that ``v`` is padded identically in both tables that
+serve it (GH #700).  Anything still non-unique at normalize time is
 collapsed with a silent ``groupby().first()``, which is precisely the GH #323
 data loss.
 """
@@ -46,6 +48,13 @@ from lsms_library.local_tools import code_label_map, format_id
 # Field widths from dicciona.pdf's COMMON block: SEGMENTO N 3-5 (3),
 # VIVIENDA N 6-7 (2), HOGAR N 8-9 (2).
 _I_WIDTHS = (3, 2, 2)
+
+# The cluster key `v` is SEGMENTO alone, and it is padded to the SAME width as
+# the segmento component of `i` (GH #700).  Before 2026-10-14 `v` was served
+# unpadded ('1', '10', '100') while `i` carried '001-01-11', so the two keys did
+# not join for the 60 of 364 segmentos below 100 (`_/CONTENTS.org`).  One
+# constant, used by `i()`, `v()`, `cluster_features()` and `sample()`.
+_V_WIDTH = _I_WIDTHS[0]
 
 # Peru/_/ -- an ABSOLUTE path off this module, not a cwd-relative one: a
 # df_edit hook runs in-process with an arbitrary working directory, unlike a
@@ -101,6 +110,95 @@ def i(value):
     return '-'.join(parts)
 
 
+def v(value):
+    """Cluster id = SEGMENTO, zero-padded to width 3: ``1`` -> ``'001'``.
+
+    Identical to the first component of ``i()``, so
+    ``{s.split('-')[0] for s in i} == set(v)`` holds by construction (GH #700).
+
+    HOW IT IS APPLIED -- read this before relying on the name alone.  The
+    framework auto-binds a module function to a column of the SAME NAME, but
+    only for *myvars* and for *list-valued* idxvars; a scalar idxvar such as
+    ``cluster_features``' ``v: segmento`` is deliberately routed to the bare
+    ``format_id`` instead (``Wave.column_mapping``, country.py).  So this
+    function pads ``sample``'s ``v`` myvar on its own, and ``cluster_features``
+    re-keys its ``v`` INDEX LEVEL through it inside its df_edit hook.  Both
+    tables therefore serve the same strings; do not rely on the name to do it.
+
+    Accepts a scalar, or a one-element Series (the shape a list-valued idxvar
+    arrives in).
+    """
+    if isinstance(value, pd.Series):
+        if len(value) != 1:
+            raise ValueError(
+                f"Peru 1994 v(): expected 1 id part (segmento), got "
+                f"{len(value)}: {list(value)}"
+            )
+        value = value.iloc[0]
+    return format_id(value, zeropadding=_V_WIDTH)
+
+
+def _pad_v_level(df):
+    """Rebuild a ``v`` index level through :func:`v` (idempotent)."""
+    if 'v' not in (df.index.names or []):
+        return df
+    flat = df.reset_index()
+    flat['v'] = flat['v'].map(v).astype('string')
+    out = flat.set_index(list(df.index.names))
+    out.attrs = dict(df.attrs)
+    return out
+
+
+def _decode_geo_codes(df, cols=('Region', 'Rural')):
+    """Decode a01 / a06 codes to labels from Peru/_/categorical_mapping.org.
+
+    ``a01`` arrives ZERO-PADDED (``'06'``) and ``a06`` as the string ``'1'`` /
+    ``'2'``, while the org reader parses the tables' ``Code`` column as int64.
+    A YAML ``mappings:`` decode keyed on that int64 dict would therefore be a
+    SILENT no-op (``f.get('1', '1')`` returns the raw code), so the codes are
+    normalised to integers first and an unknown code is an error, never a
+    pass-through.
+    """
+    df = df.copy()
+    for col in cols:
+        if col not in df.columns:
+            continue
+        codes = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+        decode = _labels(col)
+        unknown = sorted({int(k) for k in codes.dropna().unique()
+                          if int(k) not in decode})
+        if unknown:
+            raise RuntimeError(
+                f"Peru 1994: {col} code(s) {unknown} are not in the '{col}' "
+                f"table of {_COUNTRY_DIR / 'categorical_mapping.org'}."
+            )
+        df[col] = codes.map(lambda k: decode.get(int(k)) if pd.notna(k)
+                            else pd.NA).astype('string')
+    return df
+
+
+def sample(df):
+    """df_edit hook for ``sample``: household -> segment map from REG01.
+
+    One row per household, keyed ``(t, i)``; ``v`` is the household's segmento
+    padded through :func:`v`, and ``Rural`` is ``a06`` decoded exactly as
+    ``cluster_features`` decodes it.  Because ``v`` here is a *myvar*, the
+    framework has already applied :func:`v` by name; it is applied again here
+    so the invariant does not depend on that dispatch rule (idempotent).
+
+    NO WEIGHT COLUMN, deliberately.  REG01's ``_weight_`` is identically 1 on
+    all 3,623 rows (std 0) -- an SPSS system variable exported alongside
+    ``_casenum`` and ``_date``, not a sampling weight -- and the seven domain
+    expansion factors the catalog documents for ENNIV 1994 were not shipped
+    with the microdata.  Wiring ``_weight_`` would declare the sample
+    self-weighting on no evidence.  See ``Peru/_/data_scheme.yml``.
+    """
+    df = df.copy()
+    if 'v' in df.columns:
+        df['v'] = df['v'].map(v).astype('string')
+    return _decode_geo_codes(df, cols=('Rural',))
+
+
 def cluster_features(df):
     """Reduce REG01 (household grain) to the (t, v) segment grain by MODE.
 
@@ -145,22 +243,13 @@ def cluster_features(df):
         the PARQUET, and a `Rural` column of 1s and 2s fails it -- correctly,
         since anything reading the cache directly sees no labels at all.
     """
-    df = df.copy()
-
-    for col in ('Region', 'Rural'):
-        if col in df.columns:
-            codes = pd.to_numeric(df[col], errors='coerce').astype('Int64')
-            decode = _labels(col)
-            unknown = sorted({int(k) for k in codes.dropna().unique()
-                              if int(k) not in decode})
-            if unknown:
-                raise RuntimeError(
-                    f"Peru 1994 cluster_features: {col} code(s) {unknown} are "
-                    f"not in the '{col}' table of "
-                    f"{_COUNTRY_DIR / 'categorical_mapping.org'}."
-                )
-            df[col] = codes.map(lambda k: decode.get(int(k)) if pd.notna(k)
-                                else pd.NA).astype('string')
+    # `v` is a SCALAR idxvar, so the framework gave it the bare `format_id`
+    # (no padding) rather than this module's `v()`; re-key it here so
+    # cluster_features and sample serve the same '001'-style strings (GH #700).
+    # This CHANGES the served v from '1' to '001' relative to builds before
+    # 2026-10-14.
+    df = _pad_v_level(df)
+    df = _decode_geo_codes(df, cols=('Region', 'Rural'))
 
     levels = list(df.index.names)
     grouped = df.groupby(level=levels, observed=True)
