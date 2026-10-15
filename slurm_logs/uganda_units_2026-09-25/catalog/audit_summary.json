@@ -1,0 +1,14 @@
+{
+  "baseline": "4c2223aa119381ebcd8aea05fc2f9d26c3026028",
+  "catalog_codes": 289,
+  "changed_preferred_labels": 143,
+  "physical_promotions": 131,
+  "existing_equivalents": 111,
+  "new_named_forms": 20,
+  "source_factor_matches": 131,
+  "source_label_conflicts": 0,
+  "blank_code_raw_rows": 27,
+  "physical_code_raw_rows": 1,
+  "source_wave_columns_unchanged": true,
+  "nonblank_preferred_labels_unchanged": true
+}

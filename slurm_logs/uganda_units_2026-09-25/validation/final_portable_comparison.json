@@ -1,0 +1,176 @@
+{
+  "baseline": {
+    "checks": {
+      "factor_times_quantity": true,
+      "kg_quantity_dot_fct": true,
+      "explicit_food_sum": true
+    },
+    "kg_rows": 349057,
+    "kg_total": 1242402.7733372827,
+    "quantity_rows_by_u": {
+      "kg": 349057
+    },
+    "factor_sources": {
+      "metric": 182550,
+      "unit": 112559,
+      "item_unit": 59744,
+      "item_unit_tight": 718
+    },
+    "nutrition_rows": 23801,
+    "nutrition_max_abs_replay_delta": 2.9802322387695312e-08,
+    "explicit_food_sum_max_abs_delta": 1.1641532182693481e-10,
+    "fct_kg_coverage": {
+      "matched_rows": 328567,
+      "matched_kg": 1198381.690598894,
+      "unmatched_kg": 44021.082738388606,
+      "missing_food_labels": [
+        "Cheese",
+        "Cigarettes",
+        "Other Alcoholic Drinks",
+        "Other Drinks",
+        "Other Fish (dried)",
+        "Other Fish (fresh)",
+        "Other Fruits",
+        "Other Juice",
+        "Other Juice (fresh)",
+        "Other Juice (restaurants)",
+        "Other Meat",
+        "Other Spices",
+        "Other Tobacco",
+        "Other Vegetables",
+        "Pawpaw",
+        "Restaurant (food)"
+      ]
+    }
+  },
+  "candidate": {
+    "checks": {
+      "factor_times_quantity": true,
+      "kg_quantity_dot_fct": true,
+      "explicit_food_sum": true
+    },
+    "kg_rows": 348153,
+    "kg_total": 1241553.473486705,
+    "quantity_rows_by_u": {
+      "Unknown": 905,
+      "Value": 6429,
+      "kg": 348153
+    },
+    "factor_sources": {
+      "metric": 182551,
+      "unit": 105230,
+      "item_unit": 59738,
+      "none": 7334,
+      "item_unit_tight": 718
+    },
+    "nutrition_rows": 23777,
+    "nutrition_max_abs_replay_delta": 2.9802322387695312e-08,
+    "explicit_food_sum_max_abs_delta": 1.1641532182693481e-10,
+    "fct_kg_coverage": {
+      "matched_rows": 328500,
+      "matched_kg": 1198107.7229178634,
+      "unmatched_kg": 43445.750568841664,
+      "missing_food_labels": [
+        "Cheese",
+        "Cigarettes",
+        "Other Alcoholic Drinks",
+        "Other Drinks",
+        "Other Fish (dried)",
+        "Other Fish (fresh)",
+        "Other Fruits",
+        "Other Juice",
+        "Other Juice (fresh)",
+        "Other Juice (restaurants)",
+        "Other Meat",
+        "Other Spices",
+        "Other Tobacco",
+        "Other Vegetables",
+        "Pawpaw"
+      ]
+    }
+  },
+  "checks": {
+    "food_expenditures_exact": true,
+    "fct_exact": true,
+    "all_source_expenditures_exact": true,
+    "coverage_t,i": true,
+    "coverage_t,i,s": true,
+    "coverage_t,i,j,s": true,
+    "existing_physical_rows_exact": true,
+    "existing_label_kg_prices_exact": true
+  },
+  "tolerances": {
+    "quantity": {
+      "rtol": 1e-12,
+      "atol": 1e-10
+    },
+    "nutrition": {
+      "rtol": 1e-12,
+      "atol": 1e-08
+    }
+  },
+  "factor_column_changes_on_unchanged_keys": {
+    "kg_per_unit": 0,
+    "KgFactorSource": 0,
+    "kg_survey": 0,
+    "kg_metric": 0,
+    "kg_item_unit": 0,
+    "kg_item_n_waves": 0,
+    "kg_item_wave_spread": 0,
+    "baseline_refused_spread": 0,
+    "kg_unit": 8
+  },
+  "candidate_nonphysical": {
+    "Value": {
+      "rows": 6429,
+      "nonmissing_factors": 0,
+      "expenditure": 87861051.0
+    },
+    "Unknown": {
+      "rows": 905,
+      "nonmissing_factors": 0,
+      "expenditure": 1730888.039999999
+    }
+  },
+  "nutrition_changes": {
+    "lost_rows": 24,
+    "added_rows": 0,
+    "lost_base_zero_vectors": 4,
+    "lost_base_nonzero_vectors": 20,
+    "surviving_changed_rows": 60,
+    "all_household_nutrient_row_delta_sums": {
+      "Energy": -130397.30461617693,
+      "Protein": 6473.696401115103,
+      "Fiber": -140.38892314990497,
+      "Folate": 5568.604362434886,
+      "Calcium": -22014.764900458948,
+      "Carbohydrate": -38212.20224047751,
+      "Iron": -297.92761946968915,
+      "Niacin": 1235.289420939398,
+      "Riboflavin": 3.405331584470508,
+      "Thiamin": 3.829603556040034,
+      "Vitamin A": -4381.270833333334,
+      "Vitamin B-12": 456.47706947767153,
+      "Vitamin B-6": 27.66107843405838,
+      "Vitamin C": -601.0223958333329,
+      "Zinc": -259.2551333247837
+    },
+    "all_household_nutrient_total_subtractions": {
+      "Energy": -130397.30461597443,
+      "Protein": 6473.696401119232,
+      "Fiber": -140.38892313838005,
+      "Folate": 5568.604362428188,
+      "Calcium": -22014.764900386333,
+      "Carbohydrate": -38212.202240526676,
+      "Iron": -297.9276194702834,
+      "Niacin": 1235.2894209418446,
+      "Riboflavin": 3.4053315843921155,
+      "Thiamin": 3.8296035560779274,
+      "Vitamin A": -4381.2708332538605,
+      "Vitamin B-12": 456.4770694777835,
+      "Vitamin B-6": 27.66107843350619,
+      "Vitamin C": -601.0223958492279,
+      "Zinc": -259.25513332523406
+    }
+  }
+}
