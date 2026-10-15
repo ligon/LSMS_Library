@@ -275,7 +275,7 @@ an exact common draft, not a claim that the four issues have one owner.
 * Conditional closures / validation still owed
 ** #962 — exact progress comment
 #+begin_example
-The 7,359 blank-unit rows have been source-classified and the #967 increment is independently accounted for, including unchanged acquisition quantities/expenditures and unchanged physical factors. The increment is -849.299850578 kg, 24 fewer nutrition household-wave rows and 60 changed retained vectors. Candidate nutrition is 23,777 x 15; the historical fixture remains 23,801 x 15.
+The 7,359 blank-unit rows have been source-classified and the #967 increment is independently accounted for, including unchanged acquisition quantities/expenditures and unchanged factors on previously labelled physical rows. Factors for the reclassified fish/residual rows do change. The increment is -849.299850578 kg, 24 fewer nutrition household-wave rows and 60 changed retained vectors. Candidate nutrition is 23,777 x 15; the historical fixture remains 23,801 x 15.
 
 Historical module replay on unchanged food/FCT inputs exactly reproduces the historical fc85fc2e… and current pre-#967 1131b358… hashes. Four #850 commits account for the whole historical difference; later #874/#838/#919/#929/fraction-parser changes contribute zero on these inputs. The historical -18.7208% Energy movement already shipped before v0.14.0 and is not caused by this release. PR #997 publishes the complete accounting.
 
@@ -311,13 +311,15 @@ issue was found. Related existing issues are listed below; searches cannot
 guarantee no differently worded duplicate. Nigeria sales residuals are kept in
 #824 above instead of proposing new issues immediately.
 
-** Proposed new issue: Reconcile Uganda sweet-potato FCT row 4003 with its vitamin-A source note
+** Proposed new issue: Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation
 #+begin_example
-Uganda/_/nutrition.org contains conflicting claims for fct 4003, SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW. The numeric row records vit_a_rae_mcg = 225 per 100 g; the generated CSV and served FCT agree at 2,250 mcg/kg. Its note says: "Based on USDA #11507 Sweet potato, unprepared; vitamin A and carotenoids assumed = 0." Both cannot describe the same curated record.
+Uganda/_/nutrition.org row 4003, SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW, records vit_a_rae_mcg = 225 per 100 g; the generated CSV and served FCT agree at 2,250 mcg/kg. Its generic fct_source_descr says: "Based on USDA #11507 Sweet potato,unprepared; vitamin A and carotenoids assumed = 0."
 
-This inconsistency predates #850 and v0.14.0. It was exposed by exact historical nutrition replay, not introduced by #967. No numeric value, density, crosswalk or source note was changed by the release investigation. The historical increase in the food's inferred mass multiplies the existing nonzero density; it does not explain which source claim is correct.
+The adjacent water_source_descr supplies more specific support: "Applied water content of 67.4 g based on an average of 3 yellow flesh varieties reported by Kidmose et al., 2007 (Salyboro,199062.1 and Nyathi Odiewo);betacarotene content also derived from the mean of the same 3 varieties." The same row records beta-carotene 2,697 and alpha-carotene 10 mcg/100 g. The white counterpart, row 3003, carries the generic zero note and zero carotene. Thus the yellow-variety note plausibly records a specific override of the USDA starting point; this is not an unsupported 225-versus-zero choice. The release review has not independently checked the cited paper/version.
 
-Acceptance: locate the intended food-composition source/version and edible/preparation basis; establish whether the numeric 225 or the zero assumption note is supported; reconcile the authoritative Org record and generated data together; report the resulting food/household/nutrient deltas with an independently derived check. If retaining the current density as a documented limitation, record the explicit scientific decision instead of silently choosing either claim. Keep the separate volume-as-mass/container assumptions explicit; resolving this density contradiction does not validate those assumptions.
+The conflicting general/specific descriptions predate #850 and v0.14.0. They were noticed during exact historical nutrition replay, not introduced by #967. The first release-accounting write-up omitted the adjacent supporting note; this narrowed draft corrects that omission. No numeric value, density, crosswalk or source note was changed by the release investigation.
+
+Acceptance: verify the cited yellow-variety source/version, edible/preparation basis and carotenoid-to-RAE derivation; reconcile the generic zero wording with the specific derivation. Preserve the present density unless source review supports a correction. If a numeric correction is warranted, update the authoritative Org record and generated data together and report food/household/nutrient deltas with an independently derived check. Keep the separate volume-as-mass/container assumptions explicit; reconciling this source note does not validate those assumptions.
 
 Evidence: slurm_logs/release_landing_2026-10-14/uganda-nutrition-history.org (PR #997), fct_uganda.csv and nutrition.org. The release nutrition fixture remains on its explicit approval hold until the maintainer decides its disposition.
 
