@@ -46,3 +46,8 @@ No in-tree parquets. Cache scope: Peru and Panama only; shared cache untouched.
 * Prior art
 .coder/ledger/700-777-landing.md anchors tests to existing Country APIs and
 source definitions. No new transformation or identity builder was introduced.
+
+* Independent review follow-up
+The two Panama expenditure assertions now pass rel=0, enforcing an absolute
+one-cent bound instead of pytest.approx default relative tolerance. The
+affected data-backed test passed again (1 passed, no skips, 17.26 s).

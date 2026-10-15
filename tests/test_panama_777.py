@@ -19,8 +19,8 @@ def test_valor_quantities_are_absent_but_expenditure_is_preserved():
                         convert_categoricals=False)
     expenditure = pd.to_numeric(raw.ga106c, errors="coerce")
     expected = expenditure.loc[expenditure.lt(9999)].sum()
-    assert expected == pytest.approx(356079.56, abs=0.01)
-    assert food.Expenditure.sum() == pytest.approx(expected, abs=0.01)
+    assert expected == pytest.approx(356079.56, rel=0, abs=0.01)
+    assert food.Expenditure.sum() == pytest.approx(expected, rel=0, abs=0.01)
     # The library's separate capital-Value convention still carries Q=E.
     monetary = food.loc[food.index.get_level_values("u") == "Value"]
     assert len(monetary) == 46
