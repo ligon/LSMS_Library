@@ -3,7 +3,9 @@
 * Current execution -- Codex, job39919092
 The maintainer approved WORKPLAN.org and said to proceed. Twenty implementation
 PRs are merged to development, plus evidence PRs #997/#998. GitHub, local main
-and filesystem origin development are synchronized at33189b532. #967 Uganda
+and filesystem origin development are synchronized atc67c69279 after the
+independently reviewed corpus/coverage evidence PR1007 passed both CI checks.
+#967 Uganda
 remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
 newly reproduced #1003 merged via PR1004 after independent review and CI.
 PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
@@ -48,6 +50,10 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   caches:422fresh plus Uganda earnings/fct hashless after sibling script
   rewrites (#788/#809); no restamping to hide this. Feature phases1/2 are
   running over39features in a separate physical copy. Shared L2 is untouched.
+  Feature food assembly exposes a material pre-existing GhanaLSS null-key loss:
+  13472rows, independently replayed separately from visit aggregation. Full
+  Feature implementation and relevant selectors matchv0.14/pre-train/candidate;
+  exact historical input counts were not rebuilt. See ghana-feature-review/.
 - Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
   4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
   No credential skips;2580cache-presence skips remain for targeted follow-up

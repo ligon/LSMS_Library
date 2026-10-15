@@ -172,3 +172,15 @@ cache invalidation/helper cases passed, with0skips. The remaining168skips
 are individually classified; coverage debt is retained, not called green.
 See cache-coverage.org and cache-coverage/selection-proof.json. No fixture
 change, shared-cache promotion, release tag or publication occurred.
+
+PR1007 merged atc67c69279 after unit and Windows checks passed on225ab998a.
+Main, GitHub development and filesystem origin synchronized; integration
+merged the published history cleanly. No live validation tree was changed.
+
+The ongoing Feature audit found GhanaLSS null-key deletion. Independent pure
+assembly replay confirms13472deletedrows, separate from3622254non-null visit
+rows combined by aggregation; retained additive totals agree exactly under
+math.fsum. Feature and relevant selector sources matchv0.14.0/pre-train/current
+candidate, establishing a pre-existing mechanism. Exact historical input
+counts remain unverified. The reviewed country note and release note preserve
+this material residual; they do not change keys, data or aggregation policy.
