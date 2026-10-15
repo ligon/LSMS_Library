@@ -937,7 +937,12 @@ loud/:
   audit but has ZERO clusters whose households actually disagree on
   =Region= / =Rural= / =District=;
 - households that genuinely DISAGREE get =<NA>= in the offending column
-  plus a =GrainConflictWarning= naming the clusters.
+  plus a =GrainConflictWarning= naming the clusters -- and, since
+  2026-09-24 (GH #868), a =cells_blanked= grain report filed under
+  =('Uganda', 'cluster_features')=, stamped into the wave and country
+  parquets and replayed on every warm read.  Before that the warning was a
+  cold-build-only signal; see the =crop_production= de-duplication section
+  for the mechanism, which is shared.
 
 *Consumers will now see =<NA>= where they previously saw a value*, and in
 the two =comm= panel waves it is a third of a column, not a handful of
@@ -2761,6 +2766,51 @@ no grain report and nothing stamps it into the wave parquet, so a warm read
 says nothing about the 11 groups.  That is the GH #323 "the signal must
 survive the cache" lesson, and it is a property of =reduce_to_agreed= itself
 -- Uganda's =cluster_features= hook has the same gap -- not of this change.
+
+*Closed 2026-09-24 (GH #868).*  The paragraph above is kept as the record of
+what was true; it no longer is.  =reduce_to_agreed(on_conflict='na')= now
+FILES a grain report of its own kind -- =cells_blanked=, naming the groups
+and the columns, with =destroyed= and =nan_key_rows= both ZERO because no row
+is dropped -- under the =(country, table)= key the cache writer stamps.  The
+two Uganda sites reach the ledger by different routes, because they run in
+different processes:
+
+- =crop_production=: the de-dup runs OUT of process (=make= -> the wave
+  script), so =crop_production_for_wave= passes =country='Uganda',
+  table='crop_production', wave=t= explicitly, each wave script hands the
+  ledger to =to_parquet(..., grain_audit=grain_reports('Uganda',
+  'crop_production'))=, and the framework replays that wave stamp when it
+  reads the wave parquet back (=Wave.grab_data='s script-path read and
+  =run_make_target=), which files it for the country stamp.  The country
+  concatenator =_/crop_production.py= folds the wave stamps too, for a
+  reader of ITS output (=LSMS_BUILD_BACKEND=make=).
+- =cluster_features=: the hook runs IN process, inside =Wave.grab_data=,
+  which now names the cell around the =df_edit= call
+  (=build_transforms.build_context=), stamps the hook's reports into the
+  L2-wave parquet, and replays them on an L2-wave hit -- so a country
+  rebuilt from warm wave parquets (the #891 union rebuild, where the hook
+  never runs) still carries them.
+
+A warm read of either table therefore replays the blanking as a
+=GrainCollapseWarning= through core's one emit choke point, and
+=grain_reports('Uganda', <table>)= is non-empty for it.  The cold-build
+signal depends on the process the reducer runs in (measured, red team
+2026-09-24 and follow-up 2026-10-14): for the in-process =cluster_features=
+hook it is unchanged -- the reducer's own =GrainConflictWarning= (8), no
+=GrainCollapseWarning=; for the out-of-process =crop_production= a cold
+=make= build emits the child's =GrainConflictWarning= on the child's stderr
+AND the parent's =GrainCollapseWarning= replay in-process (5), because the
+parent reads back the wave stamp the child just wrote.  Two classes for one
+finding on that path, by construction, not a double count.  The 12 groups
+include #848's twelfth group: a 2018-19 season-B =Condition_sold= conflict.
+The disclosure change leaves those values unchanged; the condition-2
+question above is still the data question.  Verified on a
+fixture only (=tests/test_gh868_reduce_to_agreed_ledger.py=); *the Uganda
+re-warm has NOT been paid*, and note the cost is not Uganda's alone: the
+report formatter =_format_grain_report= sits in every table's build
+fingerprint (reached from =_normalize_dataframe_index=), so every country's
+L2 hash moved -- measured on Malawi =household_roster= and Ethiopia
+=sample=, neither of which calls the reducer.
 
 *** Still not wired, deliberately
 
