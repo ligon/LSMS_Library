@@ -9,9 +9,10 @@ Merged on (GRAPPE, MENAGE, EXTENSION, person line number), exactly as
 NER_ECVMA2.do:1392-1473.  Keeps the REPORTED per-individual values — no
 nb_members_working_age rollup.
 
-ID / grain: i from (GRAPPE, MENAGE) via niger.i (matching household_roster /
-sample, which omit EXTENSION); pid = format_id(MS01Q00), matching
-household_roster's pid.  Grain (t, i, pid).
+ID / grain: i from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
+ECVMA2 household key, matching household_roster / sample (GH #679);
+pid = format_id(MS01Q00), matching household_roster's pid.  Grain
+(t, i, pid), unique now that split-off households have their own i.
 
 Reported fields:
   farm_work  MS04Q01 (1=Oui own farm last 7 days)
@@ -58,8 +59,8 @@ def _num(col):
     return pd.to_numeric(src[col], errors='coerce')
 
 
-i_val = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                              index=['GRAPPE', 'MENAGE'])),
+i_val = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                              index=['GRAPPE', 'MENAGE', 'EXTENSION'])),
                   axis=1)
 pid = src['MS01Q00'].apply(format_id)
 
