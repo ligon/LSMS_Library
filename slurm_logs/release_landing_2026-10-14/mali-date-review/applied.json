@@ -1,0 +1,12 @@
+{
+  "applied_utc": "2026-10-15T14:24:50.054667+00:00",
+  "number": 798,
+  "url": "https://github.com/ligon/LSMS_Library/issues/798",
+  "state": "OPEN",
+  "title": "Mali/Tanzania interview_date: mixed timestamp formats drop four waves on warm reads",
+  "before_body_sha256": "1cd82446dffddff479e364f60064eb684f1d01d118ad99f23fb9f026824ebf19",
+  "after_body_sha256": "0497a69fce1d9a796aea26fa20fb815f7e6732ba8b5d75399c84a2cc4bdf3549",
+  "draft_file_sha256": "0497a69fce1d9a796aea26fa20fb815f7e6732ba8b5d75399c84a2cc4bdf3549",
+  "concurrent_precondition_verified": true,
+  "no_runtime_change": true
+}

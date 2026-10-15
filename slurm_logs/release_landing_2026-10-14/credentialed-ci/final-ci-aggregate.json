@@ -1,0 +1,170 @@
+{
+  "observed_utc": "2026-10-15T14:49:35.090158+00:00",
+  "run_id": 38746123119,
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119",
+  "jobs": [
+    {
+      "name": "data-tests",
+      "databaseId": 116460137406,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T13:50:27Z",
+      "completedAt": "2026-10-15T14:49:31Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460137406",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 457055,
+      "log_sha256": "6cfa35d674a21ed1d54f3accc8ecd191dd00f7f28d092fe68ad45baaa4c9ca10",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "4927 passed, 2768 skipped, 4 xfailed, 1 xpassed, 1004 warnings in 3204.33s (0:53:24)",
+          "counts": {
+            "passed": 4927,
+            "skipped": 2768,
+            "xfailed": 4,
+            "xpassed": 1,
+            "warnings": 1004
+          },
+          "pytest_seconds": 3204.33
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "unit-tests",
+      "databaseId": 116460137477,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T13:50:27Z",
+      "completedAt": "2026-10-15T13:53:12Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460137477",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 85198,
+      "log_sha256": "40595c364d120e1c15a495edff1756534e626b83708d7abc414e87bc4fef68ee",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "3293 passed, 4407 skipped, 60 warnings in 128.74s (0:02:08)",
+          "counts": {
+            "passed": 3293,
+            "skipped": 4407,
+            "warnings": 60
+          },
+          "pytest_seconds": 128.74
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "windows-smoke",
+      "databaseId": 116460137580,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T13:50:27Z",
+      "completedAt": "2026-10-15T13:52:35Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460137580",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 96039,
+      "log_sha256": "fab6c1b927dc80ae0a01d44117d4b61741b538119f104537626e58dad97008f4",
+      "full_source_sha_present": true,
+      "test_summaries": [
+        {
+          "summary": "327 passed, 1 skipped in 11.41s",
+          "counts": {
+            "passed": 327,
+            "skipped": 1
+          },
+          "pytest_seconds": 11.41
+        }
+      ],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "windows-script-build",
+      "databaseId": 116460137762,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T13:50:27Z",
+      "completedAt": "2026-10-15T13:58:25Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460137762",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 138250,
+      "log_sha256": "ddfee3c9f870d1a5aa9ec19a764e79a47d90f005a4af04913491c3d3a44fd58e",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": [
+        "Uganda:shocks rows=14457 cols=10 waves=8 digest=64a53fa7af55 (62s)",
+        "Uganda:assets rows=116808 cols=1 waves=8 digest=9202ed542a14 (54s)"
+      ]
+    },
+    {
+      "name": "dvc-remote-reachability",
+      "databaseId": 116460138161,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-15T13:50:27Z",
+      "completedAt": "2026-10-15T13:50:48Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460138161",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 1,
+      "log_bytes": 20824,
+      "log_sha256": "7410a2855d47ab735753913eebaa27927779626506e7787f81fa884a31a443b1",
+      "full_source_sha_present": true,
+      "test_summaries": [],
+      "failed_nodes": [],
+      "native_results": []
+    },
+    {
+      "name": "dvc-lock-check",
+      "databaseId": 116460139629,
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-15T13:50:25Z",
+      "completedAt": "2026-10-15T13:50:25Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460139629",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 0
+    },
+    {
+      "name": "docs",
+      "databaseId": 116460140000,
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-15T13:50:25Z",
+      "completedAt": "2026-10-15T13:50:25Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460140000",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 0
+    },
+    {
+      "name": "refresh-dvc-locks",
+      "databaseId": 116460140181,
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-15T13:50:25Z",
+      "completedAt": "2026-10-15T13:50:25Z",
+      "url": "https://github.com/ligon/LSMS_Library/actions/runs/38746123119/job/116460140181",
+      "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+      "active_steps": [],
+      "log_capture_attempts": 0
+    }
+  ]
+}

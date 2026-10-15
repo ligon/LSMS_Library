@@ -1,0 +1,361 @@
+{
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "package": "/local/job39919092/release-work/runtime/final-candidate/lsms_library/__init__.py",
+  "pandas": "3.0.6",
+  "cache_root": "/local/job39919092/release-work/runtime/data-date-workaround",
+  "country_results": {
+    "Mali": {
+      "calls": [
+        {
+          "wave": "2014-15",
+          "seconds": 0.9456107895821333,
+          "served": {
+            "shape": [
+              3804,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "96079200b65cce3745460ee9f63b34f2e1404e7d251032de5f6394e5cca8c797"
+          },
+          "wave_rows": {
+            "2014-15": 3804
+          }
+        },
+        {
+          "wave": "2017-18",
+          "seconds": 0.052213133312761784,
+          "served": {
+            "shape": [
+              8390,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "88e26c72a89f0672b96e69b6707df3518d161eff4f91e9bcd0f465af5ab38663"
+          },
+          "wave_rows": {
+            "2017-18": 8390
+          }
+        },
+        {
+          "wave": "2018-19",
+          "seconds": 0.044215211644768715,
+          "served": {
+            "shape": [
+              6602,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "949f47d8415ae76ccd10783e709788208f3612069c829f287c46b7164a6f2e25"
+          },
+          "wave_rows": {
+            "2018-19": 6602
+          }
+        },
+        {
+          "wave": "2021-22",
+          "seconds": 0.046485574916005135,
+          "served": {
+            "shape": [
+              6143,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "e843a34f32d20f796459520fc31275c20bf4a80aa834628eb95a894274be3880"
+          },
+          "wave_rows": {
+            "2021-22": 6143
+          }
+        }
+      ],
+      "combined": {
+        "shape": [
+          24939,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "2d4fefbce6238f216a09e3042abaec82c8ed3aaeab330a630564f471ffeaf299"
+      },
+      "aligned_to_cold_order": {
+        "shape": [
+          24939,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "2d4fefbce6238f216a09e3042abaec82c8ed3aaeab330a630564f471ffeaf299"
+      },
+      "original_concat_order_equals_cold": true,
+      "exact_values_index_dtypes_equal_cold_after_alignment": true,
+      "wave_rows": {
+        "2017-18": 8390,
+        "2018-19": 6602,
+        "2021-22": 6143,
+        "2014-15": 3804
+      }
+    },
+    "Tanzania": {
+      "calls": [
+        {
+          "wave": "2008-09",
+          "seconds": 0.5407233936712146,
+          "served": {
+            "shape": [
+              3263,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "3db7a62d0c5eae4f9cc3450dfb4b2a77bef99f7b9a230074fbed44bd3abcc616"
+          },
+          "wave_rows": {
+            "2008-09": 3263
+          }
+        },
+        {
+          "wave": "2010-11",
+          "seconds": 0.07670836336910725,
+          "served": {
+            "shape": [
+              3923,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "25b14c6c68e34de99eeaa36efe803b22e496646e170356b530f6a8fbdf6aa463"
+          },
+          "wave_rows": {
+            "2010-11": 3923
+          }
+        },
+        {
+          "wave": "2012-13",
+          "seconds": 0.08042324986308813,
+          "served": {
+            "shape": [
+              5010,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "c1ad498730d452083414feb16bdf7b2196f561056bc50dcbb8f5e282c401c223"
+          },
+          "wave_rows": {
+            "2012-13": 5010
+          }
+        },
+        {
+          "wave": "2014-15",
+          "seconds": 0.08277618698775768,
+          "served": {
+            "shape": [
+              4338,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "7d1dcc818aa8baaaa3bdafad3ce665171ea51a14b95b3592c77a93f1647c510a"
+          },
+          "wave_rows": {
+            "2014-15": 4338
+          }
+        },
+        {
+          "wave": "2019-20",
+          "seconds": 0.07126384880393744,
+          "served": {
+            "shape": [
+              1184,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "2e53e8ef0f0c9f5b172aca8123b57629929fbd95b882962ffb6d721f42f61a80"
+          },
+          "wave_rows": {
+            "2019-20": 1184
+          }
+        },
+        {
+          "wave": "2020-21",
+          "seconds": 0.08145448938012123,
+          "served": {
+            "shape": [
+              4709,
+              1
+            ],
+            "columns": [
+              "Int_t"
+            ],
+            "index_names": [
+              "i",
+              "t",
+              "v"
+            ],
+            "dtypes": {
+              "Int_t": "datetime64[us]"
+            },
+            "content_hash": "db36979c3d38743a82b227c0b5b0fd4e65c4b304d6446ff52698b33b62006912"
+          },
+          "wave_rows": {
+            "2020-21": 4709
+          }
+        }
+      ],
+      "combined": {
+        "shape": [
+          22427,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "53085328789e3e2a72ae3b4f0150abe99e571e46fc76e680897f2e8f6832fd3c"
+      },
+      "aligned_to_cold_order": {
+        "shape": [
+          22427,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "53085328789e3e2a72ae3b4f0150abe99e571e46fc76e680897f2e8f6832fd3c"
+      },
+      "original_concat_order_equals_cold": true,
+      "exact_values_index_dtypes_equal_cold_after_alignment": true,
+      "wave_rows": {
+        "2012-13": 5010,
+        "2020-21": 4709,
+        "2014-15": 4338,
+        "2010-11": 3923,
+        "2008-09": 3263,
+        "2019-20": 1184
+      }
+    }
+  },
+  "ordinary_single_wave_calls": 10,
+  "physical_copy_files": 140,
+  "all_source_and_copy_parquets_unchanged": true,
+  "bypasses": [],
+  "LSMS_SKIP_AUTH": "setup skipped only; existing L1 credentials/cache environment retained"
+}

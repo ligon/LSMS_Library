@@ -244,3 +244,100 @@ comparable cached index layouts unchanged, and retains seven absent historical
 cache pairs plus Nepal as explicit gaps. No unexplained release-specific
 warning category was identified within those limits. The original Feature
 outcomes and allFAIL/ERROR statuses remain unchanged; see feature-prior-comparison/.
+
+* 2026-10-15: nutrition approved and #967 landed
+The maintainer said "Okay, thumbs up on #967" after the before/after accounting.
+Head 91cddb57bd3c329405f50390093ad8667f9f3efa changed only the two nutrition
+fixture fields and recorded approval, on top of the reviewed food patch.
+All 53 baseline entries matched; 127 focused tests passed, with no skips.
+Unit and Windows smoke succeeded in run 38742794295. PR #967 merged at
+dd647130802b348eb142370da312e5b651cc1b1e; main, GitHub and origin synchronized.
+Integration merged that history cleanly.
+
+Corrected full CI 38697245468 completed: 4,919 passed, 3 failed, 2,768 skipped,
+4 xfailed and 1 xpassed. Two failures are the Uganda assets country-script
+expansion, independently reproduced; the third is the now-approved nutrition
+fixture. All 163 EHCVM outcomes passed. Older unpinned run 38687547945 ended
+in runner communication loss, with no downloadable data log or pytest summary.
+The corrected run is not green. The assets repair subsequently passed
+independent review and landed as recorded below; final CI/cache gates remain. Shared L2 and the original corpus
+are untouched; no master merge, tag or publication has occurred.
+
+* Final implementation landed: PR #1014
+Independent review approved assets head 515864c993050c73e8add567b0a36e22f55af3ef.
+Five new tests fail on old code; all 31 focused tests pass on the reviewed head.
+Actual Makefile replay and subsequent API calls pass explicit exact-float frame
+comparisons and attrs checks. The private before/after raw and served snapshot
+pairs are also byte-identical. No assets entries exist in the Uganda baseline
+fixture; no assets invariance coverage is claimed from that manifest.
+
+Unit and Windows checks passed in run 38745576264. PR #1014 merged at
+3914d8804d7b2936d75041cea98bbc9ddb6d4c9f; main/GitHub/origin are synchronized,
+and its full tree equals the reviewed head. Integration matches too. This is
+23 merged implementation PRs. #788 was narrowed to the remaining general
+builder authority/detection question, retaining the sibling-write caveat.
+
+Final manual run 38746123119 was dispatched on that exact development SHA
+with native Windows builds enabled. Final private corpus validation runs at
+the same SHA. Shared L2 remains untouched; no master merge, tag or publication.
+
+* Final warm comparison: four attributed exceptions; #798 corrected
+Independent pure replay and source-history review reproduce existing Mali and
+Tanzania interview_date warm losses: 12,745 and 5,893 valid dates respectively.
+Tanzania's six original nulls remain separate. Mixed-format datetime coercion
+accounts for the exact saved fingerprints; normalization and sample-v joins
+are lossless. Complete raw caches remain unchanged. Ten ordinary per-wave
+calls on a new physical copy recover exact cold results with no cache writes.
+
+Issue #798's October 14 cold-only narrowing was corrected on October 15; both
+countries remain explicitly OPEN. The issue body was applied only after the
+prior body hash matched the saved snapshot. No visit/grain/parsing policy
+changed. Country CONTENTS additions record the findings and bounded workaround.
+
+Two additional served differences are existing serialization behavior:
+Liberia dates retain exact timestamps with s->ms precision; Mali MonthsSpent
+numeric scalars become strings, preserving exact numeric values and missingness.
+The inherited binary eligibility proxy remains a separate scientific caveat.
+No runtime, fixture or baseline was changed by these investigations. Final
+549-call validation accepts only these four pinned served-result differences,
+requires zero unexplained raw changes, and retains the known 19 source gaps.
+
+* Final private validation complete; shared copies staged
+All 549 declarations completed on 3914d8804: 530 successes and the same 19
+source/wiring errors. The 158 focused Uganda tests passed without failures or
+skips on a separate physical cache. All 1,519 raw fingerprints match the cold
+corpus; only the four pinned served-result exceptions remain. Original corpus
+and final private cache preservation passed after the tests.
+
+The trailing FCT rebuild also writes nutrition without metadata. Independent
+review approved preserving the exact final 423-fresh-plus-hashless-nutrition
+state, excluding only Uganda/var/nutrition.parquet and backing up/retiring its
+shared counterpart if present. #788 now records both directions of this cycle;
+the #967 scientific approval remains unchanged. No manual stamping or mixed-time
+cache assembly was used.
+
+Root reviewed candidate manifest b60bc490...8000774 and changed only its review
+status, yielding e26ae976...1046c8d. The 1,518 allowed files total 337,609,337 bytes.
+A new shared snapshot found 1,365 parquets, no nutrition counterpart and no
+unlisted extras. Staging completed with unchanged shared inventory: 153 new
+paths, 1,215 changed existing paths and 150 already-identical paths. No active
+L2 write has occurred; apply awaits final credentialed CI. Transaction and
+rollback evidence are retained outside the active country directories.
+
+* Final credentialed CI passed; shared promotion verified
+Run 38746123119 at 3914d8804 completed successfully: 4,927 passed, 2,768 skipped,
+four expected failures and one existing non-strict unexpected pass, with zero
+failures, in 3,204.33 seconds. All three formerly failed nodes executed and
+passed. Unit: 3,293 passed/4,407 skipped. Windows smoke: 327 passed/one skipped.
+Native installed shocks/assets builds retained the exact expected digests and
+eight-wave coverage. Historical #941 attribution remains unresolved.
+
+After that gate passed, the reviewed transaction applied 1,518 verified files:
+153 created, 1,215 replaced with backups, 150 already identical. The sole
+planned retirement (Uganda nutrition) was already absent, so zero files were
+deleted. The tool's verification field retired=1 counts the plan, not an unlink.
+A second read-only shared verification passed. Post-promotion preservation
+checked every original/final private parquet SHA/size/mtime/device/inode, with
+zero change, clean final source and zero in-tree parquets. Shared L1 stayed in
+place; backup and rollback journal remain retained. No shared library API
+was used during promotion. Final master merge/tag/publication remain next.

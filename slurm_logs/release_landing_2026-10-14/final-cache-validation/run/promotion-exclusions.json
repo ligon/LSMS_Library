@@ -1,0 +1,121 @@
+{
+  "Uganda/var/nutrition.parquet": {
+    "reason": "Ordinary fct rebuild invokes shared nutrition.py rule and rewrites nutrition without country hash/coverage; raw values unchanged. Existing #788/#809 sibling-write cycle.",
+    "sha256": "6cd206387a02646c9d7fc08b6413468c08d36e0b6530a0a04cc424a0ea013e0a",
+    "bytes": 3276846,
+    "mtime_ns": 1792074628973218010,
+    "device": 64770,
+    "inode": 22943630,
+    "disposition": "exclude_hashless_country_output",
+    "rows": 23777,
+    "physical_columns": 17,
+    "stored_hash": null,
+    "footer_waves": null,
+    "expected_hash": "0ad69bc28ac1b4571a11f322ff952075504dd1482dbe92acb573fb02be46426f",
+    "freshness": "legacy",
+    "country_read_policy": "stale",
+    "stable_during_read": true,
+    "frame": {
+      "shape": [
+        23777,
+        15
+      ],
+      "columns": [
+        "Calcium",
+        "Carbohydrate",
+        "Energy",
+        "Fiber",
+        "Folate",
+        "Iron",
+        "Niacin",
+        "Protein",
+        "Riboflavin",
+        "Thiamin",
+        "Vitamin A",
+        "Vitamin B-12",
+        "Vitamin B-6",
+        "Vitamin C",
+        "Zinc"
+      ],
+      "index_names": [
+        "i",
+        "t"
+      ],
+      "dtypes": {
+        "Calcium": "float64",
+        "Carbohydrate": "float64",
+        "Energy": "float64",
+        "Fiber": "float64",
+        "Folate": "float64",
+        "Iron": "float64",
+        "Niacin": "float64",
+        "Protein": "float64",
+        "Riboflavin": "float64",
+        "Thiamin": "float64",
+        "Vitamin A": "float64",
+        "Vitamin B-12": "float64",
+        "Vitamin B-6": "float64",
+        "Vitamin C": "float64",
+        "Zinc": "float64"
+      },
+      "content_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+      "index_unique": true,
+      "null_counts": {
+        "Energy": 0,
+        "Protein": 0,
+        "Fiber": 0,
+        "Folate": 0,
+        "Calcium": 0,
+        "Carbohydrate": 0,
+        "Iron": 0,
+        "Niacin": 0,
+        "Riboflavin": 0,
+        "Thiamin": 0,
+        "Vitamin A": 0,
+        "Vitamin B-12": 0,
+        "Vitamin B-6": 0,
+        "Vitamin C": 0,
+        "Zinc": 0
+      },
+      "numeric_sums": {
+        "Energy": 2087321650.4055085,
+        "Protein": 59659272.812136635,
+        "Fiber": 44959090.78001048,
+        "Folate": 480057258.49484074,
+        "Calcium": 500428460.912665,
+        "Carbohydrate": 400968619.9280133,
+        "Iron": 14077041.57278697,
+        "Niacin": 14848906.162517546,
+        "Riboflavin": 1177634.2046318685,
+        "Thiamin": 1827740.494745871,
+        "Vitamin A": 1386816237.711104,
+        "Vitamin B-12": 1570325.2443358696,
+        "Vitamin B-6": 3461413.057443164,
+        "Vitamin C": 107079675.93032491,
+        "Zinc": 7557728.022500987
+      },
+      "wave_rows": {
+        "2015-16": 3216,
+        "2018-19": 3128,
+        "2013-14": 3082,
+        "2005-06": 3071,
+        "2019-20": 3009,
+        "2009-10": 2890,
+        "2011-12": 2786,
+        "2010-11": 2595
+      }
+    },
+    "raw_fingerprint_matches_cold_corpus": true,
+    "physical_sha_matches_initial_copy": false,
+    "declared_waves": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ]
+  }
+}

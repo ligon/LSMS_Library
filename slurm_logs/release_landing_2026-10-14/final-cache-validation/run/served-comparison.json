@@ -1,0 +1,411 @@
+{
+  "baseline_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "final_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "pairs": 549,
+  "differences": [
+    {
+      "country": "Liberia",
+      "table": "interview_date",
+      "field": "served",
+      "before": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[s]"
+        },
+        "content_hash": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "after": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[ms]"
+        },
+        "content_hash": "5998082be93cb80d5bbe5e298f6cec70ef43fc5452704bc129a078ccd194707e",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "classification": "serialization_timestamp_resolution",
+      "scope": "Seconds to milliseconds; exact timestamps at ns, missingness, index and wave counts preserved."
+    },
+    {
+      "country": "Mali",
+      "table": "household_roster",
+      "field": "served",
+      "before": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "object",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "d7ff366add23225bbdd3fbec487ac91afb19128a692ac464ca675bef3f183da9",
+        "index_unique": true,
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "numeric_sums": {
+          "Age": 4766736.0,
+          "Generation": -158683.0,
+          "Distance": 27832.0
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "after": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "string",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "6c400824a4bd8599e7921b1049a55e914c99661b0925571db2d5b348317607de",
+        "index_unique": true,
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "numeric_sums": {
+          "Age": 4766736.0,
+          "Generation": -158683.0,
+          "Distance": 27832.0
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "classification": "serialization_numeric_scalars_to_text",
+      "scope": "MonthsSpent numeric scalars become text through existing writer cast. Exact numeric values, null masks, keys, waves and other six columns preserved; arithmetic interface differs."
+    },
+    {
+      "country": "Mali",
+      "table": "interview_date",
+      "field": "served",
+      "before": {
+        "shape": [
+          24939,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "2d4fefbce6238f216a09e3042abaec82c8ed3aaeab330a630564f471ffeaf299",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2017-18": 8390,
+          "2018-19": 6602,
+          "2021-22": 6143,
+          "2014-15": 3804
+        }
+      },
+      "after": {
+        "shape": [
+          12194,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "9285bfbf9190053270d4f4d20b4f8ec4b92e52610c4e5637559003c63196aa94",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2017-18": 8390,
+          "2014-15": 3804
+        }
+      },
+      "classification": "existing_798_warm_date_row_loss",
+      "scope": "Existing mixed whole-column datetime parsing drops 12,745 valid warm rows. Complete raw cache preserved; no production repair and no API parity claim."
+    },
+    {
+      "country": "Tanzania",
+      "table": "interview_date",
+      "field": "served",
+      "before": {
+        "shape": [
+          22427,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "53085328789e3e2a72ae3b4f0150abe99e571e46fc76e680897f2e8f6832fd3c",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2012-13": 5010,
+          "2020-21": 4709,
+          "2014-15": 4338,
+          "2010-11": 3923,
+          "2008-09": 3263,
+          "2019-20": 1184
+        }
+      },
+      "after": {
+        "shape": [
+          16534,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[us]"
+        },
+        "content_hash": "d593293bb3d884ed191bfb83f73cc63d0d9954c3b87204bd0bde010cc21e9215",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2012-13": 5010,
+          "2014-15": 4338,
+          "2010-11": 3923,
+          "2008-09": 3263
+        }
+      },
+      "classification": "existing_798_warm_date_row_loss",
+      "scope": "Existing mixed whole-column datetime parsing drops 5,893 valid warm rows, separate from six original null dates. Complete raw cache preserved; no production repair and no API parity claim."
+    }
+  ],
+  "unexplained_differences": [],
+  "universal_cold_warm_api_equality": false,
+  "exception_manifest_sha256": "9520a4cb6960b9b09bb7783568151fd2f59878965ce1cb3c1136a34582b93490",
+  "counts": {
+    "success": 530,
+    "error": 19
+  },
+  "error_pairs": [
+    {
+      "country": "Peru",
+      "table": "individual_education",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_acquired",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "interview_date",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_expenditures",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_prices",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Peru",
+      "table": "food_quantities",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "sample",
+      "type": "FileNotFoundError"
+    },
+    {
+      "country": "Nepal",
+      "table": "cluster_features",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "household_roster",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "individual_education",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_acquired",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "interview_date",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "assets",
+      "type": "FileNotFoundError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_expenditures",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_prices",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_quantities",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Nepal",
+      "table": "household_characteristics",
+      "type": "RuntimeError"
+    },
+    {
+      "country": "Armenia",
+      "table": "household_roster",
+      "type": "FileNotFoundError"
+    },
+    {
+      "country": "Armenia",
+      "table": "household_characteristics",
+      "type": "RuntimeError"
+    }
+  ]
+}

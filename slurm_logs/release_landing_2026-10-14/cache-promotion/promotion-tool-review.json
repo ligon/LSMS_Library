@@ -1,0 +1,24 @@
+{
+  "reviewed_utc": "2026-10-15T14:31:55.509758+00:00",
+  "tool_sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e",
+  "tool_review": "Approved per-file staging/backup/atomic replacement and guarded rollback mechanics; no active-cache action yet",
+  "verified_mechanics": [
+    "fixed source/shared roots",
+    "digest-pinned manifest and final SHA",
+    "safe relative parquet-only allowlist, no L1 or writable symlink paths",
+    "country requires matching hash and declared-wave manifest",
+    "fresh full shared inventory before staging and apply",
+    "source and staged-byte verification",
+    "fsynced backup and intent journal before per-file os.replace",
+    "per-file concurrent change checks",
+    "unlisted shared parquet metadata preserved",
+    "rollback refuses to overwrite concurrent changes"
+  ],
+  "limitations": [
+    "No global lock on unrelated builders; known session builders must be quiescent or on private roots",
+    "Complete raw cache promotion does not repair documented served #798 date losses"
+  ],
+  "final_manifest_review": "pending",
+  "live_shared_snapshot": "pending",
+  "active_cache_mutation_authorized_by_this_record": false
+}

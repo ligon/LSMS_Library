@@ -1,0 +1,80 @@
+{
+  "classification": "aggregate evidence and source-only probes; no survey records or raw logs",
+  "files": [
+    {
+      "name": "LEDGER.md",
+      "bytes": 2235,
+      "sha256": "e96d7476e0f1c64319f653f854bdf82eff3a3dbee7376f7c91af9e3dadc0b75f"
+    },
+    {
+      "name": "REPORT.md",
+      "bytes": 9873,
+      "sha256": "a09f5bd7700575ce3acfb62674e692db2f181223a6f1e6828f101dab80789046"
+    },
+    {
+      "name": "cold-copy-manifest.json",
+      "bytes": 2475,
+      "sha256": "d9b21a1e78ad4fa8b04bceecf378eafd3db539950c9c450f9b445ee6a0899dea"
+    },
+    {
+      "name": "cold-result.json",
+      "bytes": 3042,
+      "sha256": "75362a2e938abfa5ad885cb9b659279d4e8091e55aaec8fb75f63fb233efd36b"
+    },
+    {
+      "name": "cold_probe.py",
+      "bytes": 2894,
+      "sha256": "1c5ffb827782e6e49170b9e8248cb374beb07117f4100a8ce1c38391074b21ca"
+    },
+    {
+      "name": "compare_frames.py",
+      "bytes": 1838,
+      "sha256": "b294041faaf9491e3166c87099e505a6b4d236bd2ca979d649ecf6a85653988f"
+    },
+    {
+      "name": "copy-manifest.json",
+      "bytes": 4937,
+      "sha256": "ce5e0e53da16fe96bc4d4eb7e142dd61fc1f8adfe76a4963dd572052165a40ee"
+    },
+    {
+      "name": "private-evidence-digests.json",
+      "bytes": 2476,
+      "sha256": "6a5ecbae2ca32018843a16b7955f11e4027400438ea97f89f12af01153e37464"
+    },
+    {
+      "name": "probe.py",
+      "bytes": 4396,
+      "sha256": "11f39387f8b8456d28a779219fc22355b9fd7c923e42ca9acbc420c4861eb8fd"
+    },
+    {
+      "name": "rebuild-comparison.json",
+      "bytes": 1703,
+      "sha256": "561cef541fb6897dfbcf1059ff6dded340fce7698352ced7cc24f50b5310472e"
+    },
+    {
+      "name": "result.json",
+      "bytes": 8356,
+      "sha256": "94b3de9415e6e19f7155ef59c6653628616e6a11c3aa5a2882d4829618f4ea1f"
+    },
+    {
+      "name": "source-and-raw-identity.json",
+      "bytes": 2490,
+      "sha256": "df3c16a633fde44abe0abe2976f176d7ab075d48ae2414e1dffb73fc610b9f79"
+    },
+    {
+      "name": "strict-semantics.json",
+      "bytes": 2436,
+      "sha256": "acd5290e7e46a47fe97765876249814d816d09ea87b9062c63b8b441cbdbe804"
+    },
+    {
+      "name": "strict_semantics.py",
+      "bytes": 3553,
+      "sha256": "2cab9268095a90dc4afe1732dfb1b8a4c4f103d4c0434aab9e5d9e6ae1d88014"
+    },
+    {
+      "name": "writer-events.json",
+      "bytes": 11902,
+      "sha256": "a57538ebfd3eaa395420a89b72e7ff87f86151ca2a1169102df110ec806a78c8"
+    }
+  ]
+}

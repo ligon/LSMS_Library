@@ -1,0 +1,20 @@
+{
+  "original_ref_versions": 193,
+  "original_branch_names": 184,
+  "counts": {
+    "landed": 101,
+    "retained-archive": 6,
+    "superseded": 63,
+    "integration-reference": 4,
+    "retained-rejected": 19
+  },
+  "no_branch_deletions": true,
+  "inventory_fields_before_final_disposition_remain_planning_snapshot": true,
+  "additional_implementation_prs": [
+    1004,
+    1005,
+    1011,
+    1014
+  ],
+  "development": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f"
+}

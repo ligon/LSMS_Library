@@ -1,0 +1,80 @@
+{
+  "source": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "independent_source_history_checks": 16,
+  "four_function_bodies_identical_across_four_refs": true,
+  "normalization_preserves_raw_frame": true,
+  "exact_missing_rows": 12745,
+  "cold_served_hash": "2d4fefbce6238f216a09e3042abaec82c8ed3aaeab330a630564f471ffeaf299",
+  "warm_served_hash": "9285bfbf9190053270d4f4d20b4f8ec4b92e52610c4e5637559003c63196aa94",
+  "recorded_raw_file_identity": {
+    "sha256": "51d963e95751f5ba8df564175862fb21f1046510082c51ba0ea784de8c216d32",
+    "bytes": 136208,
+    "mtime_ns": 1792041407111515046,
+    "device": 64770,
+    "inode": 22943913
+  },
+  "recorded_source_identities_checked": true,
+  "reviewer_cache_or_table_api_access": false,
+  "evidence_sha256": {
+    "replay.py": "2f1b53028f9708a9f0f6662fc692a210a34ec4e6eafc8828818fe74f8bb7a73d",
+    "replay.json": "cecb195687e1ecfa59ed131eccb730f1d24fb1c2f2a1a0d7252ee2d8470b4b9f",
+    "replay.log": "2c63a256c17b5aac5347ccbbf12511248e29a7a38192b7c27b2db8e4d09d6cf8",
+    "LEDGER.md": "d55eabeda37650deff3d757a3a63d990655aeecc1bf4f2a62916884284217f25",
+    "REPORT.md": "8352d0c059020f233c4cfca6b232b1c69e5c83dc4bbe487a63fe6228e869d0c3"
+  },
+  "selected_records_sha256": {
+    "cold": "2dcc66f735223c360f1aef8e1dfa6ea3aa4977b2de37814f1a66f171260dbf5f",
+    "warm": "2d324cbedca6b877800fa4c9bfdc2c2d58f72a588130c93400aefb952de1eb50"
+  },
+  "raw_cache_expected_and_stored_hash": "a5b1e5802c611a94c9db74992cc4dda808386f92079c4e71f028e45d4f92c728",
+  "raw_cache_footer_waves": [
+    "2014-15",
+    "2017-18",
+    "2018-19",
+    "2021-22"
+  ],
+  "synthetic_result": {
+    "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+    "pandas": "3.0.6",
+    "scope": "synthetic only; pure dtype functions; no API/cache operations",
+    "cases": {
+      "datetime_first": {
+        "default_valid": 2,
+        "per_style_valid": 4,
+        "mixed_valid": 4,
+        "declared_valid": 2,
+        "canonical_valid": 2,
+        "after_declared_dropna_rows": 2,
+        "no_visit_axis": true
+      },
+      "date_first": {
+        "default_valid": 2,
+        "per_style_valid": 4,
+        "mixed_valid": 4,
+        "declared_valid": 2,
+        "canonical_valid": 2,
+        "after_declared_dropna_rows": 2,
+        "no_visit_axis": true
+      }
+    },
+    "typed_object_valid": 4
+  },
+  "review_artifacts_sha256": {
+    "REVIEW.md": "b3c90c6ff168fe2b95e20cad8b0106176b4ef98225f66aae5fe22bc5448d0425",
+    "issue798-title.txt": "02669ecb46cb1d19ec5a2fdbc8ebfb129ab1e3488e6ced49b250f0bc56e71c90",
+    "issue798-body.md": "0497a69fce1d9a796aea26fa20fb815f7e6732ba8b5d75399c84a2cc4bdf3549",
+    "CONTENTS-proposal.org": "9c0e67e2921afa0f7beaf2d24cef6144755e741eb52232e06c931fa03d2554c8",
+    "synthetic_datetime.py": "e88f88b5d616ce6c25c68c2608b54aebaab23e08230177493db2b8f84fe305e9",
+    "synthetic-result.json": "45c5cf1229ec484952e6357985cffe0aed75a74cc3a6ed84d447755fc4597d71"
+  },
+  "mali_only_checkpoint_review_artifacts_sha256": {
+    "REVIEW.md": "b3c90c6ff168fe2b95e20cad8b0106176b4ef98225f66aae5fe22bc5448d0425",
+    "issue798-title.txt": "5c52bef445534c3ce2d777f227ed072ac7ab9c45167a40b9f289fb5bfd35fc5b",
+    "issue798-body.md": "4321b9f20ee6134af425a143f856d02d59f1891d487e9e060bac2ec445b9a621",
+    "CONTENTS-proposal.org": "9c0e67e2921afa0f7beaf2d24cef6144755e741eb52232e06c931fa03d2554c8",
+    "synthetic_datetime.py": "e88f88b5d616ce6c25c68c2608b54aebaab23e08230177493db2b8f84fe305e9",
+    "synthetic-result.json": "45c5cf1229ec484952e6357985cffe0aed75a74cc3a6ed84d447755fc4597d71"
+  },
+  "prior_runtime_REPORT_sha256": "61a6f8337a41c942358573e857303c79bc69a00c1b68e917da3accedd0091d67",
+  "tanzania_followup_review": "control/countries/tanzania-date-review/REVIEW.md"
+}

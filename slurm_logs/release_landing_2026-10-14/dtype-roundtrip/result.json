@@ -1,0 +1,340 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "runtime_identical_to": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "versions": {
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1"
+  },
+  "countries": {
+    "Liberia": {
+      "table": "interview_date",
+      "api_seconds": 0.706005129031837,
+      "warm_record": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[ms]"
+        },
+        "content_hash": "5998082be93cb80d5bbe5e298f6cec70ef43fc5452704bc129a078ccd194707e",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "cold_record": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[s]"
+        },
+        "content_hash": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+        "index_unique": true,
+        "null_counts": {
+          "Int_t": 0
+        },
+        "numeric_sums": {},
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "private_warm": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[ms]"
+        },
+        "content_hash": "5998082be93cb80d5bbe5e298f6cec70ef43fc5452704bc129a078ccd194707e",
+        "null_counts": {
+          "Int_t": 0
+        },
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "dtype_only_restoration": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[s]"
+        },
+        "content_hash": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+        "null_counts": {
+          "Int_t": 0
+        },
+        "wave_rows": {
+          "2018-19": 2787
+        }
+      },
+      "restored_matches_cold_hash": true,
+      "restored_matches_cold_schema": true,
+      "index_exactly_unchanged": true,
+      "other_columns_exactly_unchanged": true,
+      "null_mask_unchanged": true,
+      "timestamps_exactly_equal_in_ns": true,
+      "writer_input_dtype": "datetime64[s]",
+      "writer_return_dtype": "datetime64[s]",
+      "writer_reloaded_dtype": "datetime64[ms]",
+      "arrow_physical_type": "timestamp[ms]",
+      "writer_roundtrip_value_index_exact_after_dtype_only_restoration": true,
+      "writer_reloaded_column_equals_warm_column": true
+    },
+    "Mali": {
+      "table": "household_roster",
+      "api_seconds": 1.5502737890928984,
+      "warm_record": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "string",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "6c400824a4bd8599e7921b1049a55e914c99661b0925571db2d5b348317607de",
+        "index_unique": true,
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "numeric_sums": {
+          "Age": 4766736.0,
+          "Generation": -158683.0,
+          "Distance": 27832.0
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "cold_record": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "object",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "d7ff366add23225bbdd3fbec487ac91afb19128a692ac464ca675bef3f183da9",
+        "index_unique": true,
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "numeric_sums": {
+          "Age": 4766736.0,
+          "Generation": -158683.0,
+          "Distance": 27832.0
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "private_warm": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "string",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "6c400824a4bd8599e7921b1049a55e914c99661b0925571db2d5b348317607de",
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "dtype_only_restoration": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "object",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "6c400824a4bd8599e7921b1049a55e914c99661b0925571db2d5b348317607de",
+        "null_counts": {
+          "Sex": 23357,
+          "Age": 141,
+          "Relationship": 2,
+          "MonthsSpent": 43823,
+          "Generation": 6105,
+          "Distance": 6105,
+          "Affinity": 6105
+        },
+        "wave_rows": {
+          "2017-18": 94071,
+          "2018-19": 46014,
+          "2021-22": 43472,
+          "2014-15": 37175
+        }
+      },
+      "restored_matches_cold_hash": false,
+      "restored_matches_cold_schema": true,
+      "index_exactly_unchanged": true,
+      "other_columns_exactly_unchanged": true,
+      "null_mask_unchanged": true,
+      "non_null_python_type_counts": {
+        "str": 176909
+      },
+      "writer_input_dtype": "object",
+      "writer_return_dtype": "string",
+      "writer_reloaded_dtype": "string",
+      "arrow_physical_type": "large_string",
+      "writer_roundtrip_value_index_exact_after_dtype_only_restoration": true,
+      "writer_reloaded_column_equals_warm_column": true
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "source": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "independent_function_history_checks": 24,
+  "independent_script_blob_checks": 4,
+  "all_history_equal": true,
+  "original_null_dates": 6,
+  "additional_valid_dates_lost": 5893,
+  "raw_rows": 22433,
+  "cold_rows": 22427,
+  "warm_rows": 16534,
+  "normalization_preserves_raw_fingerprint": true,
+  "v_join_preserves_row_and_null_counts": true,
+  "cold_and_warm_saved_fingerprints_match_replay": true,
+  "recorded_raw_cache_metadata_unchanged": {
+    "bytes": 199984,
+    "mtime_ns": 1792042625619000883,
+    "rows": 22433,
+    "physical_columns": 3,
+    "stored_hash": "e844d7656f30c7dda03b09476e2cc40ec591bb0b90e24f646e365bb45a0400f4",
+    "footer_waves": [
+      "2008-09",
+      "2010-11",
+      "2012-13",
+      "2014-15",
+      "2019-20",
+      "2020-21"
+    ],
+    "expected_hash": "e844d7656f30c7dda03b09476e2cc40ec591bb0b90e24f646e365bb45a0400f4",
+    "freshness": "fresh",
+    "stable_during_read": true
+  },
+  "recorded_input_file_identities": {
+    "dates": {
+      "sha256": "41ce97601e33b270ee552e40273d3e8ad90c7e509b0532ff20f14a712df83909",
+      "bytes": 199984,
+      "mtime_ns": 1792042625619000883,
+      "device": 64770,
+      "inode": 22944449
+    },
+    "sample": {
+      "sha256": "2ac46c72db853017f4f2d789a317808327609ea74d63d60a620e317a178c697a",
+      "bytes": 396067,
+      "mtime_ns": 1792042505977073094,
+      "device": 64770,
+      "inode": 22944456
+    }
+  },
+  "reviewer_table_api_or_cache_access": false,
+  "evidence_sha256": {
+    "replay.py": "747e1f276684dc309920f95ee08144899e5851adc72184629075676b537098b1",
+    "replay.json": "107e89997a9e23890330f4b12a8869b312a96528563d3a32aff5ec8520f8c83d",
+    "replay.log": "b7a04c9c49afa3825d50429eed24c48af9a955976c5b57ec84b794f1da8affa7"
+  },
+  "selected_records_sha256": {
+    "cold": "bb045ae6e1e1f41d6d6af8a7e3ee8b6f59eac2a3d51d069cd6f58945413bfe0b",
+    "warm": "40b00aca19ecff04ccf28adaac427ad51b40773c2af4552fe671151add212757"
+  },
+  "final_runtime_report_sha256": {
+    "Mali": "8352d0c059020f233c4cfca6b232b1c69e5c83dc4bbe487a63fe6228e869d0c3",
+    "Tanzania": "af4051cee71ee0e230a5b7bd481356d5dbb5d3b43ed3f24c8b3f630e899156e4",
+    "workaround": "012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162"
+  },
+  "workaround_verified_from_saved_evidence": {
+    "calls": 10,
+    "physically_distinct_parquet_copies": 140,
+    "source_and_copies_recorded_unchanged": true,
+    "exact_cold_frames": true,
+    "exact_tested_constructor": "Country(country, preload_panel_ids=False)"
+  },
+  "workaround_evidence_sha256": {
+    "REPORT.md": "012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162",
+    "result.json": "08e22ded53bebce4f67a88072bfbec0ce9f25cf3f8931ed3a15258fe97f8af5a",
+    "run.py": "83415112d20b77fe2e0f28179e318dee0a9586ddf3d85f0771f31efd834b422f",
+    "copy-manifest.json": "5abb94079e55e3d8333eaa0bdfb2f9d3fb22b066e384a5a3b5ca0f8741341c13"
+  },
+  "review_artifacts_sha256": {
+    "REVIEW.md": "31627594243e16782e66067f076fb87e6ca5279a3a49d81f9a76b2d608aa7a7a",
+    "CONTENTS-proposal.org": "3bb065246067b06febefa2999ef0f26cd9ed9cb61a9c9020f6808f673e3ec3ce",
+    "source-history.json": "43067b9826606c404901bc44dd926445c92bef349c6a5f69a49f5703b1e37dfd"
+  },
+  "combined_issue_artifacts_sha256": {
+    "issue798-title.txt": "02669ecb46cb1d19ec5a2fdbc8ebfb129ab1e3488e6ced49b250f0bc56e71c90",
+    "issue798-body.md": "0497a69fce1d9a796aea26fa20fb815f7e6732ba8b5d75399c84a2cc4bdf3549"
+  }
+}

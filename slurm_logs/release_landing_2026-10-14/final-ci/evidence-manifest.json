@@ -1,0 +1,52 @@
+{
+  "classification": "aggregate-only terminal evidence and source-only tools; no raw survey logs",
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "run_id": 38746123119,
+  "files": [
+    {
+      "name": "REPORT.md",
+      "bytes": 8380,
+      "sha256": "655080efbb6054c32a06989f3120a37a65fc81fbb1952c5c184539dd58644902"
+    },
+    {
+      "name": "aggregate-results.json",
+      "bytes": 5997,
+      "sha256": "28c31c019686df04c6d0d632ce91a995e19efec52189cc06b62d56e64568614d"
+    },
+    {
+      "name": "analyze_terminal.py",
+      "bytes": 3755,
+      "sha256": "a50c4cc17d2d949c672f82fc8b71910cbe4d8ef71d667a681e586fab7399d351"
+    },
+    {
+      "name": "expected-native.json",
+      "bytes": 685,
+      "sha256": "3abd7beb87c3bb2c353e83e89ddea59c2890f64ffd913b039fb526bec6d8174c"
+    },
+    {
+      "name": "monitor-finished.json",
+      "bytes": 294,
+      "sha256": "313aedf66ac1226f9cbaed344a6ec7e40aac0c6d0eb68992f765a2d773b2a13d"
+    },
+    {
+      "name": "monitor-process.json",
+      "bytes": 264,
+      "sha256": "843c345f8c13de099e9c6ce22b343cbb109d3ac9ba5815c4730df3b988a80d81"
+    },
+    {
+      "name": "monitor.py",
+      "bytes": 4460,
+      "sha256": "693306f8f2c14fe03d95477fc98a67427c5297b636dc1016f201842b8e3bb259"
+    },
+    {
+      "name": "native-validation.json",
+      "bytes": 745,
+      "sha256": "80e5b052ec6495408cd1ef82bd3e20d124e30dc03fed6484e460d0b427e8352f"
+    },
+    {
+      "name": "semantic-review.json",
+      "bytes": 15446,
+      "sha256": "19c605ed51e4b5d0bdb4344b56c3660343e35ffd389f141bd962bbca6d18b857"
+    }
+  ]
+}

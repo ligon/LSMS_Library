@@ -1,0 +1,15 @@
+{
+  "scope": "synthetic bytes only; no real cache or library APIs",
+  "script_sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e",
+  "cases": {
+    "roundtrip": "passed",
+    "concurrent_before_apply": "passed",
+    "interrupted_apply": "passed",
+    "source_changed": "passed",
+    "rollback_concurrent": "passed",
+    "paths": "passed"
+  },
+  "real_shared_l2_writes": 0,
+  "original_or_final_cache_access": 0,
+  "temporary_files_removed": true
+}

@@ -1,0 +1,22 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "base": "dd647130802b348eb142370da312e5b651cc1b1e",
+  "clean": true,
+  "diff_sha256": "03a793d3ef1de819eeca0c5a0817d1d2031f195b8580614246749cd35cd63e61",
+  "changed_paths": [
+    ".coder/ledger/uganda-assets-concat.md",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/assets.py",
+    "tests/test_uganda_assets_script.py"
+  ],
+  "assets_baseline_entries": 0,
+  "files": {
+    ".coder/ledger/uganda-assets-concat.md": "8f2591104cd8ebc4a99727b140c6b083b777256b2e3d54b1cec3acd840c85363",
+    "lsms_library/countries/Uganda/_/CONTENTS.org": "5cd8887035e98b3b7bd7079be3ba3d3f4f32ea06b439b2a7017045ef2dedeb5a",
+    "lsms_library/countries/Uganda/_/assets.py": "f71a9a9ff7a502e6f3c10b598a0c2f500e3d4c5661ea5a0d01619e77890082b4",
+    "tests/test_uganda_assets_script.py": "ff4da2454d1e18a6a7a4d6227d6819ece0f0731e4f2330062068e318130ce211"
+  },
+  "old_assets_blob_v014": "0da4929d149831c4f5a3351643b9377e5ebf26e0",
+  "old_assets_blob_development": "0da4929d149831c4f5a3351643b9377e5ebf26e0",
+  "new_assets_blob": "da68a08bfb87607a3a79ff8cc2d43d4ffd897c24"
+}

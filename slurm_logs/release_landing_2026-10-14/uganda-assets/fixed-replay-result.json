@@ -1,0 +1,75 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "package": "/local/job39919092/release-work/framework/uganda-assets/lsms_library/__init__.py",
+  "root": "/local/job39919092/release-work/framework/uganda-assets-fixed-data",
+  "changed_assets_script": true,
+  "comparison_check_exact": true,
+  "make_seconds": 56.199055259115994,
+  "make_cache": {
+    "rows": 116808,
+    "index": [
+      "t",
+      "i",
+      "j"
+    ],
+    "columns": [
+      "Value"
+    ],
+    "dtypes": {
+      "Value": "float64"
+    },
+    "duplicates": 0,
+    "null_values": 0,
+    "id_converted": true
+  },
+  "make_hash": null,
+  "make_manifest": null,
+  "make_equals_canonical_raw_exact": true,
+  "unchanged_waves": {
+    "2010-11": true,
+    "2009-10": true,
+    "2019-20": true,
+    "2013-14": true,
+    "2005-06": true,
+    "2011-12": true,
+    "2018-19": true,
+    "2015-16": true
+  },
+  "existing_raw_checks": {
+    "test_no_duplicate_rows": "passed",
+    "test_feature_is_sane": "passed"
+  },
+  "existing_asset_invariance": {},
+  "api_seconds": 52.75042312312871,
+  "api_equals_prior_exact": true,
+  "served_api": {
+    "rows": 116808,
+    "index": [
+      "i",
+      "t",
+      "j"
+    ],
+    "columns": [
+      "Value"
+    ],
+    "dtypes": {
+      "Value": "float64"
+    },
+    "duplicates": 4237,
+    "null_values": 0,
+    "id_converted": true
+  },
+  "canonical_cache_equals_prior_exact": true,
+  "api_cache_hash": "b30d0fd4afbe78159cfceae8add20e94e912b9980c192c0bd93e0f9ed09cba1a",
+  "api_cache_manifest": [
+    "2005-06",
+    "2009-10",
+    "2010-11",
+    "2011-12",
+    "2013-14",
+    "2015-16",
+    "2018-19",
+    "2019-20"
+  ],
+  "in_tree_parquet_count": 0
+}

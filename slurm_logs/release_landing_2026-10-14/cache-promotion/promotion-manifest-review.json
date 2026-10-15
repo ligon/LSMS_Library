@@ -1,0 +1,24 @@
+{
+  "reviewed_utc": "2026-10-15T14:39:57.507268+00:00",
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "candidate_sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774",
+  "reviewed_manifest_sha256": "e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d",
+  "only_candidate_change": "validation_status: pending_parent_review -> reviewed_for_promotion",
+  "file_entries": 1518,
+  "country_files_fresh_with_full_coverage": 423,
+  "wave_files_fresh": 632,
+  "legacy_wave_files_with_verified_provenance": 461,
+  "verified_panel_companions": 2,
+  "sole_exclusion_and_backup_retirement": "Uganda/var/nutrition.parquet",
+  "all_raw_fingerprints_equal": 1519,
+  "served_exceptions": "exactly four independently reviewed pairs; no universal parity claim",
+  "focused_tests": {
+    "passed": 158,
+    "failed": 0,
+    "skipped": 0
+  },
+  "original_and_final_preservation_verified": true,
+  "tool_sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e",
+  "stage_disposition": "approved after fresh shared snapshot and explicit retention inventory",
+  "apply_hold": "Final credentialed CI run38746123119 remains in progress; do not apply until it passes"
+}

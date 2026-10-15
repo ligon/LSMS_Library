@@ -334,3 +334,28 @@ Tracked in GitHub issue #350.
 
 (Note: the NHFS *does* carry §17 Shocks and §10 Land Parcels, so `shocks` and
 `plot_features` remain implementable for Liberia — handled in their own batches.)
+
+* Interview-date cache precision (2026-10-15 release validation)
+
+The 2018-19 =interview_date= table takes =Int_t= from =interview_date1=;
+repeat-visit fields =interview_date2= and =interview_date3= are not substituted.
+A private cold build returns =datetime64[s]=, while a subsequent read of its
+Parquet returns =datetime64[ms]=.  The writer receives and returns seconds,
+but the stored Arrow/Parquet timestamp is milliseconds.  This is an existing
+serialization difference, not a change to the chosen interview date.
+
+Measured on release source =3914d8804=: all 2,787 served timestamps are
+exactly equal after conversion to nanoseconds.  Index =(i,t,v)=, unique keys,
+row order, null mask and the sole 2018-19 wave are unchanged.  The underlying
+wave and country caches each contain 2,986 rows, including 199 missing dates;
+the finalizer removes those all-null rows on both cold and warm calls.
+Restoring only the timestamp dtype reproduces the original cold served
+fingerprint exactly.  Strict dtype comparisons can therefore distinguish
+cold and warm calls even though their dates agree.
+
+This was checked on separate physical copies and an independent source
+rebuild; original/final corpus parquet bytes are identical.  No precision
+normalization, survey value, cache or baseline was changed.  The finding is
+limited to this table and does not explain the separate missing-wave date
+coverage issue in other countries under GH #798.  Aggregate proof and
+reproduction scripts are in the release =dtype-roundtrip= evidence bundle.

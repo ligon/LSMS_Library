@@ -1,0 +1,12 @@
+{
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "checked_at": 1792076162.5316284,
+  "candidate_manifest_sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774",
+  "final_files": 1519,
+  "final_sha_size_mtime_device_inode_unchanged": true,
+  "original_corpus_unchanged": true,
+  "source_clean": true,
+  "in_tree_parquets": 0,
+  "shared_l2_access": false,
+  "scope": "Known session final-cache builders completed; later tests use a separate physical root. This is no global lock on external shared writers."
+}

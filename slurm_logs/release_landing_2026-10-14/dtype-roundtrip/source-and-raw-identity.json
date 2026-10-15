@@ -1,0 +1,59 @@
+{
+  "observed_utc": "2026-10-15T14:20:10.236215+00:00",
+  "probe_head": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "release_head": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "original_corpus_source": "7fa05179c",
+  "runtime_subtree_identical": true,
+  "relevant_runtime_files_unchanged_since_original_corpus": true,
+  "original_final_raw_target_files": [
+    {
+      "path": "Liberia/2018-19/_/interview_date.parquet",
+      "bytes": 24423,
+      "original_sha256": "5b1701163abac8b32cf9a3e47273e670e0d23ea34ff865c19691ca01b6a9f230",
+      "final_sha256": "5b1701163abac8b32cf9a3e47273e670e0d23ea34ff865c19691ca01b6a9f230",
+      "byte_identical": true
+    },
+    {
+      "path": "Liberia/var/interview_date.parquet",
+      "bytes": 24531,
+      "original_sha256": "73a439865b8db8c428394dbd82b2faaef8304ccd44536a23c0c792d38fac3acf",
+      "final_sha256": "73a439865b8db8c428394dbd82b2faaef8304ccd44536a23c0c792d38fac3acf",
+      "byte_identical": true
+    },
+    {
+      "path": "Mali/2014-15/_/household_roster.parquet",
+      "bytes": 310823,
+      "original_sha256": "cb78514e0a928fcaddb337849a15b27493905c966b01b57c092bb8165501ad2d",
+      "final_sha256": "cb78514e0a928fcaddb337849a15b27493905c966b01b57c092bb8165501ad2d",
+      "byte_identical": true
+    },
+    {
+      "path": "Mali/2017-18/_/household_roster.parquet",
+      "bytes": 764243,
+      "original_sha256": "6dac73fdbf8561cdd23064d737fa074793adfd2f74e4ad6c598a74ff704d7583",
+      "final_sha256": "6dac73fdbf8561cdd23064d737fa074793adfd2f74e4ad6c598a74ff704d7583",
+      "byte_identical": true
+    },
+    {
+      "path": "Mali/2018-19/_/household_roster.parquet",
+      "bytes": 220844,
+      "original_sha256": "cde4889bd13b4ab763df7df76a84a629ab66ca26cedfb06b2d4d12d528e9c293",
+      "final_sha256": "cde4889bd13b4ab763df7df76a84a629ab66ca26cedfb06b2d4d12d528e9c293",
+      "byte_identical": true
+    },
+    {
+      "path": "Mali/2021-22/_/household_roster.parquet",
+      "bytes": 211039,
+      "original_sha256": "4f45ee4669f5f69b05615f30e2ce0219e23bd695a4f350ea8e7b66407640968d",
+      "final_sha256": "4f45ee4669f5f69b05615f30e2ce0219e23bd695a4f350ea8e7b66407640968d",
+      "byte_identical": true
+    },
+    {
+      "path": "Mali/var/household_roster.parquet",
+      "bytes": 1393142,
+      "original_sha256": "fe404f70b8755a1414817159cbc37982b61137a8b5c826fd5efd61b99dbbccd8",
+      "final_sha256": "fe404f70b8755a1414817159cbc37982b61137a8b5c826fd5efd61b99dbbccd8",
+      "byte_identical": true
+    }
+  ]
+}

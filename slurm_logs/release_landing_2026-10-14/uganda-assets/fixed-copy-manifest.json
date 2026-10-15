@@ -1,0 +1,60 @@
+{
+  "source": "/local/job39919092/release-work/framework/uganda-assets-diagnosis-data/Uganda",
+  "target": "/local/job39919092/release-work/framework/uganda-assets-fixed-data/Uganda",
+  "files": [
+    {
+      "path": "2010-11/_/assets.parquet",
+      "bytes": 54831,
+      "sha256": "d41fd52e6ab8aa50907b8fae5f9149b889397fabbe95a26e24293ef0148fbf5f",
+      "distinct_inode": true
+    },
+    {
+      "path": "2009-10/_/assets.parquet",
+      "bytes": 62306,
+      "sha256": "11cf4700a7316fa68352035dbc6a735d007f95ef25f5c8c82579291c56cf7fd9",
+      "distinct_inode": true
+    },
+    {
+      "path": "2019-20/_/assets.parquet",
+      "bytes": 120740,
+      "sha256": "585810c4e39f7ef225d3ecdff4caa1678c821c1c586e5f0d5df994d8d5682f36",
+      "distinct_inode": true
+    },
+    {
+      "path": "2013-14/_/assets.parquet",
+      "bytes": 57449,
+      "sha256": "c9aea958126a7995f942d5d1e0448a1f4b2e8ac5137f9312f5a4c33dd18d80d9",
+      "distinct_inode": true
+    },
+    {
+      "path": "2005-06/_/assets.parquet",
+      "bytes": 75426,
+      "sha256": "566b2ef07568f4f4a649f0a0c0443e3b68e11dd545137a20db4b6582643d8c13",
+      "distinct_inode": true
+    },
+    {
+      "path": "2011-12/_/assets.parquet",
+      "bytes": 57267,
+      "sha256": "17842287428a1faa9356c3e62d6c887bae0526135cf710091afd18861622ef83",
+      "distinct_inode": true
+    },
+    {
+      "path": "2018-19/_/assets.parquet",
+      "bytes": 122668,
+      "sha256": "bdd812f0acd8ab2475ace5ce6ce134f9d7a0668dde4a9a7f650d45b573bf58c5",
+      "distinct_inode": true
+    },
+    {
+      "path": "2015-16/_/assets.parquet",
+      "bytes": 58813,
+      "sha256": "7a0115a1c61e9a3d196f21b2773423fac69cd5a1d3929d749103eb614b3531b2",
+      "distinct_inode": true
+    },
+    {
+      "path": "var/assets.parquet",
+      "bytes": 395912,
+      "sha256": "7526705bf439d3b1ee6a7df562a81b22c61d173724593f2bd6d879e2ed2e637d",
+      "distinct_inode": true
+    }
+  ]
+}

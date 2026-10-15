@@ -1,0 +1,26 @@
+{
+  "final_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "files": 1518,
+  "final_private_files": 1519,
+  "excluded_files": 1,
+  "shared_retirement_paths": [
+    "Uganda/var/nutrition.parquet"
+  ],
+  "bytes": 337609337,
+  "classifications": {
+    "script_wave_legacy_verified_provenance": 461,
+    "wave_fresh": 632,
+    "country_fresh_full_coverage": 423,
+    "companion_verified_provenance": 2
+  },
+  "pairs_without_comparison_difference": 545,
+  "successful_pairs_exactly_equal": 526,
+  "bounded_serialization_exceptions": 2,
+  "existing_798_row_loss_exceptions": 2,
+  "universal_cold_warm_api_equality": false,
+  "raw_cache_fingerprints_equal": 1519,
+  "original_preserved": true,
+  "shared_l2_access": false,
+  "candidate_manifest_sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774",
+  "seconds": 89.71189967636019
+}

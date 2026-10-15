@@ -1,0 +1,242 @@
+{
+  "source": "17308b3d4f35dc7d569ec42b89c24fa82271ecfe",
+  "package": "/local/job39919092/release-work/integration/lsms_library/__init__.py",
+  "private_root": "/local/job39919092/release-work/framework/uganda-assets-diagnosis-data",
+  "initial_canonical_cached": {
+    "rows": 116808,
+    "columns": [
+      "Value"
+    ],
+    "index": [
+      "t",
+      "i",
+      "j"
+    ],
+    "duplicates": 0,
+    "all_null_rows": 0,
+    "non_null_numeric": {
+      "Value": 116808
+    }
+  },
+  "waves": {
+    "2005-06": {
+      "rows": 22994,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 22994
+      }
+    },
+    "2009-10": {
+      "rows": 16306,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 16306
+      }
+    },
+    "2010-11": {
+      "rows": 14394,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 14394
+      }
+    },
+    "2011-12": {
+      "rows": 14846,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 14846
+      }
+    },
+    "2013-14": {
+      "rows": 14477,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 14477
+      }
+    },
+    "2015-16": {
+      "rows": 15073,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 15073
+      }
+    },
+    "2018-19": {
+      "rows": 9227,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 9227
+      }
+    },
+    "2019-20": {
+      "rows": 9491,
+      "columns": [
+        "Value"
+      ],
+      "index": [
+        "i",
+        "j"
+      ],
+      "duplicates": 0,
+      "all_null_rows": 0,
+      "non_null_numeric": {
+        "Value": 9491
+      }
+    }
+  },
+  "naive_concat": {
+    "rows": 116808,
+    "columns": [
+      "Value"
+    ],
+    "index": [
+      "t",
+      "i",
+      "j"
+    ],
+    "duplicates": 0,
+    "all_null_rows": 0,
+    "non_null_numeric": {
+      "Value": 116808
+    }
+  },
+  "country_script_seconds": 6.80225876159966,
+  "country_script": {
+    "rows": 790688,
+    "columns": [
+      "j",
+      "level_2",
+      "assets"
+    ],
+    "index": [
+      "i",
+      "t",
+      "m"
+    ],
+    "duplicates": 673841,
+    "all_null_rows": 0,
+    "non_null_numeric": {
+      "assets": 116808
+    }
+  },
+  "country_script_hash": null,
+  "country_script_manifest": null,
+  "actual_tests_before_api": {
+    "test_no_duplicate_rows": {
+      "outcome": "failed",
+      "message": "Uganda/assets: 673841/790688 duplicate index entries (85.2%)"
+    },
+    "test_feature_is_sane": {
+      "outcome": "failed",
+      "message": "Uganda/assets failed sanity checks: 673841/790688 duplicates (85.2%)"
+    }
+  },
+  "canonical_api_seconds": 54.327308119274676,
+  "canonical_api": {
+    "rows": 116808,
+    "columns": [
+      "Value"
+    ],
+    "index": [
+      "i",
+      "t",
+      "j"
+    ],
+    "duplicates": 4237,
+    "all_null_rows": 0,
+    "non_null_numeric": {
+      "Value": 116808
+    }
+  },
+  "canonical_cache_after": {
+    "rows": 116808,
+    "columns": [
+      "Value"
+    ],
+    "index": [
+      "t",
+      "i",
+      "j"
+    ],
+    "duplicates": 0,
+    "all_null_rows": 0,
+    "non_null_numeric": {
+      "Value": 116808
+    }
+  },
+  "canonical_cache_hash": "9bedfd3b18655fcf0b61774ef3a1fe9b8e1709679d32d33af7fe44de6b824fcb",
+  "canonical_cache_manifest": [
+    "2005-06",
+    "2009-10",
+    "2010-11",
+    "2011-12",
+    "2013-14",
+    "2015-16",
+    "2018-19",
+    "2019-20"
+  ],
+  "actual_tests_after_api": {
+    "test_no_duplicate_rows": {
+      "outcome": "passed"
+    },
+    "test_feature_is_sane": {
+      "outcome": "passed"
+    }
+  }
+}

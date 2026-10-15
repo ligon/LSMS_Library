@@ -1,0 +1,29 @@
+SCOPE DEVIATIONS
+
+None. Read-only source/evidence review plus a four-row synthetic pure-helper probe. No Country/Feature call, survey/cache read, cache write, tracked-file edit, Git mutation, GitHub write, or production repair by this reviewer. The synthetic probe used CPUs 8-15 and BLAS/build-worker limits of 1.
+
+Verdict: APPROVE the bounded existing-limitation disposition for Mali, with #798 explicitly open. The 12,745 lost warm-served rows are material, but fully attributed; this finding does not violate WORKPLAN's "no unexplained data loss" criterion. It does not establish that the complete release gate has passed, that all countries have cold/warm parity, or that warm Mali interview_date is complete. A new production change is not required merely to explain this gate result. A future repair needs its own regression and date-interpretation review; format='mixed' here is diagnostic evidence, not an approved library-wide policy.
+
+The complete raw country parquet may remain a promotion candidate: it retains 24,939 rows, all four footer waves, a matching freshness hash, and its recorded bytes/metadata are unchanged. This approval is conditional on promoting the verified raw artifact, never serializing the incomplete 12,194-row served result over it, and retaining the exception in release/coverage reporting. Overall promotion still depends on the coordinator's remaining gates.
+
+Country contract read first: Mali/_/CONTENTS.org, including the TODO keyword declaration and the absence of actual TODO/WAITING entry headings or LOGBOOK blocks. Named idiosyncrasy: the first two waves are EAC-I (2014-15/2017-18), while 2018-19/2021-22 are EHCVM; their cached date representations differ. CONTENTS:60-63 explicitly corrects the Overview's uniform-EHCVM implication: "Only *2018-19 and 2021-22* are EHCVM; *2014-15 and 2017-18 are EAC-I*". Its sampling design says each cluster is visited in "exactly one =vague=" (20-23), whereas data_scheme.yml:69 says "EHCVM visits each household across multiple vagues/passages" and :72 says "groupby.first()". These are recorded documentation contradictions, not permission to alter visit keys or the signed aggregation contract.
+
+Evidence reviewed on final source 3914d8804d7b2936d75041cea98bbc9ddb6d4c9f; the review worktree 515864c993050c73e8add567b0a36e22f55af3ef has the identical tree a429971ae87d6523cd8eac2d4670396f7b4cc8f1.
+
+| Wave | Raw / cold served | Warm served | Dates nulled during declared coercion |
+|---|---:|---:|---:|
+| 2014-15 EAC-I | 3,804 | 3,804 | 0 |
+| 2017-18 EAC-I | 8,390 | 8,390 | 0 |
+| 2018-19 EHCVM | 6,602 | 0 | 6,602 |
+| 2021-22 EHCVM | 6,143 | 0 | 6,143 |
+| Total | 24,939 | 12,194 | 12,745 |
+
+Runtime replay establishes the exact failing route: normalization retains the raw frame; country.py:6115 calls whole-column pd.to_datetime(errors='coerce') on strings mixing YYYY-MM-DD HH:MM:SS with YYYY-MM-DD. Under recorded pandas 3.0.6 it creates exactly 12,745 NaT values. Canonical coercion (:6177) does not recover them; _finalize_result's dropna(how='all') (:3554) removes them. The resulting fingerprint is exactly the saved warm API fingerprint 9285bfbf9190053270d4f4d20b4f8ec4b92e52610c4e5637559003c63196aa94. Per-wave and mixed-format parsing agree and reproduce the saved full cold fingerprint 2d4fefbce6238f216a09e3042abaec82c8ed3aaeab330a630564f471ffeaf299. These are content fingerprints, distinct from the raw file SHA-256 51d963e95751f5ba8df564175862fb21f1046510082c51ba0ea784de8c216d32 and expected/stored cache hash a5b1e5802c611a94c9db74992cc4dda808386f92079c4e71f028e45d4f92c728.
+
+The independent synthetic probe reproduces the problem with no visit axis: both datetime-first and date-first mixed string columns retain only two of four valid dates through current coercion; per-style/mixed parsing retains four, as does a typed Timestamp input. This corroborates the mechanism without survey access or another API build.
+
+Historical attribution: independently recomputed 16 AST function-text hashes (four functions across v0.14.0, pre-train 452302ad, corpus 7fa05179, final 3914d880) and matched the runtime evidence. _enforce_declared_dtypes, _enforce_canonical_dtypes, _finalize_result and to_parquet are each unchanged. The September 9 #798 owner comment independently reports the same four raw counts and two-wave warm result at eecd6305 and d2729e81. Its statement "so the dropna(how=\"all\") after dtype coercion is not it" relied on per-wave parsing, which never exercised the mixed whole column. The October 14 issue claim "both halves no longer reproduce on development" is contradicted for Mali by this exact warm result; its cited cold success was insufficient. No historical dependency environment or survey snapshot was rebuilt here, and no Tanzania conclusion is inferred from Mali.
+
+Stable evidence is under control/runtime/final-promotion/mali-date-review/{REPORT.md,replay.py,replay.json,replay.log,LEDGER.md}; exact hashes are in validation.json in this review folder. Selected cold and warm Mali record fingerprints were independently reconciled with control/runtime/corpus/Mali/results.jsonl and control/runtime/final-promotion/run/Mali/results.jsonl. File preservation/freshness facts were checked against recorded runtime metadata, not by rereading final or original caches. The original issue snapshot is control/ci-completion/issue798-before.json. Runtime REPORT.md SHA-256: 61a6f8337a41c942358573e857303c79bc69a00c1b68e917da3accedd0091d67.
+
+Proposed replacement title/body are issue798-title.txt and issue798-body.md. Keep Tanzania 2019-20/2020-21 unresolved until independently measured; retain the coverage-snapshot refresh and Mali stale grain-comment work. CONTENTS-proposal.org supplies a small coordinator-owned documentation addition. No implementation, fixture, survey-design or numeric policy change is proposed.

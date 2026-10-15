@@ -1,0 +1,6 @@
+{
+  "observed_utc": "2026-10-15T14:39:03.975462+00:00",
+  "scope": "same-user visible processes with explicit LSMS_DATA_DIR; no claim of global lock or discovery of other users/external nodes",
+  "processes": [],
+  "known_session_builders": "Final-root APIs finished; other validation uses independent private roots; remote CI does not use this shared L2"
+}

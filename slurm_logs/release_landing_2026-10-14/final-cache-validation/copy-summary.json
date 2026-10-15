@@ -1,0 +1,22 @@
+{
+  "source": "/local/job39919092/release-work/runtime/data-corpus",
+  "target": "/local/job39919092/release-work/runtime/data-final-promotion",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "files": 1519,
+  "bytes": 340885785,
+  "extension_counts": {
+    ".parquet": 1519
+  },
+  "all_sha256_equal": true,
+  "all_inodes_distinct": true,
+  "original_verified_before_and_after": true,
+  "source_worktree_clean": true,
+  "only_symlink": {
+    "dvc-cache": "/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/dvc-cache"
+  },
+  "library_api_calls": 0,
+  "shared_l2_writes": 0,
+  "final_sha_received": false,
+  "final_validation_started": false,
+  "seconds": 3.1452891808003187
+}

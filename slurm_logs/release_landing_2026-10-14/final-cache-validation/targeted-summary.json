@@ -1,0 +1,26 @@
+{
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "passed": 158,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "warnings": 20,
+  "seconds": 15.45,
+  "selection": [
+    "tests/test_962_unit_sentinel.py",
+    "tests/test_food_kg_inference.py",
+    "tests/test_uganda_invariance.py",
+    "tests/test_uganda_assets_script.py",
+    "tests/test_assets_additive.py",
+    "tests/test_gh772_uganda_earnings_shape.py"
+  ],
+  "options": "-n 6 --dist=loadfile --timeout=600 --timeout-method=thread --durations=10 -q -ra",
+  "cpus": "0-7",
+  "blas_build_make_workers": 1,
+  "cache_root": "/local/job39919092/release-work/runtime/data-final-targeted",
+  "package_and_config_identity_asserted": true,
+  "cache_bypasses": [],
+  "log_sha256": "8edb22dc84210d1a0368d6e381c8929069da2a0e5e940cf26ea49b94d5b69c15",
+  "log_bytes": 14333,
+  "log_private": true
+}

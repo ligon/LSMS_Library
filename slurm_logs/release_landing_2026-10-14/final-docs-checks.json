@@ -1,0 +1,16 @@
+{
+  "checked_utc": "2026-10-15T15:02:42.398370+00:00",
+  "base_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "strict_api_audit": {
+    "exit_code": 0,
+    "log_sha256": "1361523f8c8725781a50257ff737e5f711fa2a69e1f95e1063ace46dc413d51a"
+  },
+  "strict_docs_build": {
+    "exit_code": 0,
+    "interpreter": "/local/job39919092/release-work/framework/release-validation-env/bin/python",
+    "log_sha256": "2a70b8d940ed244da75f7bddc898df91145e093a9ca198834d04907bf24c2093"
+  },
+  "setup_note": "Initial docs invocation used base Python without MkDocs and stopped before building; rerun used the existing private docs-tool environment. No dependency/source change was needed.",
+  "runtime_config_unchanged_except_prose_contents": true,
+  "tests_dependencies_build_recipe_unchanged": true
+}

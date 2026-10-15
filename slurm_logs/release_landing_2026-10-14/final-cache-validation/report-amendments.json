@@ -1,0 +1,24 @@
+{
+  "scope": "Coordinator-approved prose corrections after initial independent review; no replay JSON, numerical result, source generator, cache or test change.",
+  "amendments": [
+    {
+      "file": "mali-date-review/REPORT.md",
+      "initial_review_sha256": "61a6f8337a41c942358573e857303c79bc69a00c1b68e917da3accedd0091d67",
+      "current_sha256": "8352d0c059020f233c4cfca6b232b1c69e5c83dc4bbe487a63fe6228e869d0c3",
+      "change": "No production repair is implemented or authorized by this diagnosis → No production repair is included in this release change. This describes release disposition, not missing user authorization."
+    },
+    {
+      "file": "tanzania-date-review/REPORT.md",
+      "initial_review_sha256": "29e4ca35bf33712c9e978c04e2d80cc5a9cb04d8f658edaf63122b80d367224a",
+      "current_sha256": "af4051cee71ee0e230a5b7bd481356d5dbb5d3b43ed3f24c8b3f630e899156e4",
+      "change": "No production repair is authorized → No production repair is included in this release change."
+    },
+    {
+      "file": "date-workaround/REPORT.md",
+      "initial_review_sha256": "05b68442c49245491f3d57d397c1a18283a40360b7327a37f51f39b30f6c72c0",
+      "current_sha256": "012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162",
+      "change": "Example Country constructor now includes preload_panel_ids=False, exactly as the actual tested generator already did. No additional API run was necessary."
+    }
+  ],
+  "review_note": "Historical review artifacts can retain earlier hashes; later validations may record both. served-exceptions.json pins the current report and stable replay hashes. The initial and amended reports are not claimed byte-identical."
+}

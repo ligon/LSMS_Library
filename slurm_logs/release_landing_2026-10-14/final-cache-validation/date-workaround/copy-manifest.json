@@ -1,0 +1,1966 @@
+{
+  "source": {
+    "Mali/2014-15/_/cluster_features.parquet": {
+      "sha256": "690c58369b57d482767edb58d8125da4a1752579ed9ba68be7573120e592714c",
+      "bytes": 31818,
+      "mtime_ns": 1792041259164354278,
+      "device": 64770,
+      "inode": 22943942
+    },
+    "Mali/2014-15/_/community_prices.parquet": {
+      "sha256": "b6b0e73630b01bfde344a25e790df392df61f485c0755871af5cd332b42aa634",
+      "bytes": 95836,
+      "mtime_ns": 1792041647985386656,
+      "device": 64770,
+      "inode": 22943945
+    },
+    "Mali/2014-15/_/crop_production.parquet": {
+      "sha256": "5023f2b329eef1dfcf8db15025e4b16a2db4c008389f7751bf53d02ecf5ed07d",
+      "bytes": 75864,
+      "mtime_ns": 1792041500813244211,
+      "device": 64770,
+      "inode": 22943944
+    },
+    "Mali/2014-15/_/food_acquired.parquet": {
+      "sha256": "f3842f19b008535c31ad59404991a02938987e7f7e790e7d3c761d0e5e697e6d",
+      "bytes": 606432,
+      "mtime_ns": 1792041375725268384,
+      "device": 64770,
+      "inode": 22943943
+    },
+    "Mali/2014-15/_/food_coping.parquet": {
+      "sha256": "0c83682a177ab39538fc4099c7600a8c06e66c51ab40ba8f11c54da0216b2f92",
+      "bytes": 37442,
+      "mtime_ns": 1792041475495047730,
+      "device": 64770,
+      "inode": 22943940
+    },
+    "Mali/2014-15/_/household_roster.parquet": {
+      "sha256": "cb78514e0a928fcaddb337849a15b27493905c966b01b57c092bb8165501ad2d",
+      "bytes": 310823,
+      "mtime_ns": 1792041265698405391,
+      "device": 64770,
+      "inode": 22943947
+    },
+    "Mali/2014-15/_/housing.parquet": {
+      "sha256": "330dc2dfc15e83c4d2fe2316427e6e8ae727c0dd0dc9592274cbd5c79b10cd80",
+      "bytes": 24974,
+      "mtime_ns": 1792041426055663926,
+      "device": 64770,
+      "inode": 22943946
+    },
+    "Mali/2014-15/_/individual_education.parquet": {
+      "sha256": "20bf24a05996fcba6eb3f1957586594bceea833f348d1f8d325d8933a3c71a8e",
+      "bytes": 257668,
+      "mtime_ns": 1792041326838884190,
+      "device": 64770,
+      "inode": 22943937
+    },
+    "Mali/2014-15/_/interview_date.parquet": {
+      "sha256": "85ba87a2be29629f927658ca653ce4be2b3a4c888ec44d84935d5317e559a09e",
+      "bytes": 45714,
+      "mtime_ns": 1792041398594448111,
+      "device": 64770,
+      "inode": 22943934
+    },
+    "Mali/2014-15/_/livestock.parquet": {
+      "sha256": "bc9923ea7f666c2bf61c7cf80e40e0f9539d2e10a967c75bfa66490af94b43cd",
+      "bytes": 45188,
+      "mtime_ns": 1792041556603677170,
+      "device": 64770,
+      "inode": 22943936
+    },
+    "Mali/2014-15/_/people_last7days.parquet": {
+      "sha256": "ee66c247582ef2ae83018b396112d50a47a81baf254089182ad6f0f665039fb5",
+      "bytes": 324393,
+      "mtime_ns": 1792041618734159530,
+      "device": 64770,
+      "inode": 22943939
+    },
+    "Mali/2014-15/_/plot_inputs.parquet": {
+      "sha256": "d28c01babc6e46fe3f6ef95440f4e2195bf11538217266f73ba2b2160790f01e",
+      "bytes": 115703,
+      "mtime_ns": 1792041527204449019,
+      "device": 64770,
+      "inode": 22943941
+    },
+    "Mali/2014-15/_/plot_labor.parquet": {
+      "sha256": "02e130be0e52ef67e993daba05c0c321c54dfaac8f48021b8d8a3e770dff9c0b",
+      "bytes": 64956,
+      "mtime_ns": 1792041596025983208,
+      "device": 64770,
+      "inode": 22943935
+    },
+    "Mali/2014-15/_/sample.parquet": {
+      "sha256": "2a5060ffd7ac2aeb38baa1606c72faca1b42a2e45aaad19735d77cfe9abdc5fe",
+      "bytes": 49797,
+      "mtime_ns": 1792041256538333736,
+      "device": 64770,
+      "inode": 22943938
+    },
+    "Mali/2014-15/_/shocks.parquet": {
+      "sha256": "1de1b0de1bda47a4060581af7028f801332d5c607171aa389b9263ac545a5adc",
+      "bytes": 148257,
+      "mtime_ns": 1792041430185696170,
+      "device": 64770,
+      "inode": 22943948
+    },
+    "Mali/2017-18/_/cluster_features.parquet": {
+      "sha256": "db0e9efbb57a8b6dbf0048d48bc1f1b2fc9e2fe010d58600ca9964f37bdc36a9",
+      "bytes": 30406,
+      "mtime_ns": 1792041259427356336,
+      "device": 64770,
+      "inode": 22943986
+    },
+    "Mali/2017-18/_/crop_production.parquet": {
+      "sha256": "30bbdc302b93dca53881451967f6cf822c26cd2b179684df148820f68b6ab883",
+      "bytes": 164690,
+      "mtime_ns": 1792041514394349607,
+      "device": 64770,
+      "inode": 22943987
+    },
+    "Mali/2017-18/_/household_roster.parquet": {
+      "sha256": "6dac73fdbf8561cdd23064d737fa074793adfd2f74e4ad6c598a74ff704d7583",
+      "bytes": 764243,
+      "mtime_ns": 1792041273520466580,
+      "device": 64770,
+      "inode": 22943989
+    },
+    "Mali/2017-18/_/housing.parquet": {
+      "sha256": "1438872441cf3b80db04511b50c6c57bcd626c586bf002515209640c7e6c1f85",
+      "bytes": 50663,
+      "mtime_ns": 1792041426405666677,
+      "device": 64770,
+      "inode": 22943988
+    },
+    "Mali/2017-18/_/individual_education.parquet": {
+      "sha256": "b0f5de1f3f64ec494a9cfa5d32d2bd3ef272b9e75b5e9a9e471a3e64406fdf76",
+      "bytes": 612099,
+      "mtime_ns": 1792041332125925741,
+      "device": 64770,
+      "inode": 22943982
+    },
+    "Mali/2017-18/_/interview_date.parquet": {
+      "sha256": "1a4ccf58347f49259658a4683b1666eb6e6970e795be3bed895e57eec15bd260",
+      "bytes": 83098,
+      "mtime_ns": 1792041401455470596,
+      "device": 64770,
+      "inode": 22943979
+    },
+    "Mali/2017-18/_/livestock.parquet": {
+      "sha256": "fe2aa7cae87694b10cb3a8df6bb478fe29b053563a45ad4936b050c95db63f3f",
+      "bytes": 119831,
+      "mtime_ns": 1792041587620917946,
+      "device": 64770,
+      "inode": 22943981
+    },
+    "Mali/2017-18/_/people_last7days.parquet": {
+      "sha256": "e1e3f8cb5fa994198ece1cc95f5eefa3ce4b2edf0eada308468e1ef751d2e87e",
+      "bytes": 743462,
+      "mtime_ns": 1792041639850323490,
+      "device": 64770,
+      "inode": 22943984
+    },
+    "Mali/2017-18/_/plot_inputs.parquet": {
+      "sha256": "bd1f67aca10a42f183964693589c3e982b15b691a927cc54902454504596d86b",
+      "bytes": 304555,
+      "mtime_ns": 1792041546345597563,
+      "device": 64770,
+      "inode": 22943985
+    },
+    "Mali/2017-18/_/plot_labor.parquet": {
+      "sha256": "59c6fb0fab3f05020a808159caaf62eff00ad1639755a033b67714450cb47075",
+      "bytes": 170391,
+      "mtime_ns": 1792041606052061057,
+      "device": 64770,
+      "inode": 22943980
+    },
+    "Mali/2017-18/_/sample.parquet": {
+      "sha256": "4c24ad63531cb87636f68183941ec5efa988128f8ea05074bace77f5cefc8577",
+      "bytes": 70719,
+      "mtime_ns": 1792041257319339845,
+      "device": 64770,
+      "inode": 22943983
+    },
+    "Mali/2017-18/_/shocks.parquet": {
+      "sha256": "7b83223041760dd38d2bf93db1d2c02b482e1dc0b5f395471e9df8a493701def",
+      "bytes": 68001,
+      "mtime_ns": 1792041431355705243,
+      "device": 64770,
+      "inode": 22943990
+    },
+    "Mali/2018-19/_/assets.parquet": {
+      "sha256": "59c0cc6fc05287ec573fd0414f037c4bf119814645b2adc7a1582c8668527914",
+      "bytes": 335297,
+      "mtime_ns": 1792041416480588677,
+      "device": 64770,
+      "inode": 22943956
+    },
+    "Mali/2018-19/_/cluster_features.parquet": {
+      "sha256": "27b975a9ea4e1e44354d91508ecc43bdf07f3e26f4944f2dbd7676f1abcec2f9",
+      "bytes": 29964,
+      "mtime_ns": 1792041261541372873,
+      "device": 64770,
+      "inode": 22943957
+    },
+    "Mali/2018-19/_/food_acquired.parquet": {
+      "sha256": "66ece06e8849b0f2c1e9456c4bfe9058a13fe71d6c051a1622c1b0500ebf65f9",
+      "bytes": 710219,
+      "mtime_ns": 1792041385189342762,
+      "device": 64770,
+      "inode": 22943958
+    },
+    "Mali/2018-19/_/food_security.parquet": {
+      "sha256": "6d8af724450e4a1fb1bf90f320d160ce892324f87fcfcacb7049ac6ce7d93db3",
+      "bytes": 60938,
+      "mtime_ns": 1792041338522976015,
+      "device": 64770,
+      "inode": 22943952
+    },
+    "Mali/2018-19/_/household_roster.parquet": {
+      "sha256": "cde4889bd13b4ab763df7df76a84a629ab66ca26cedfb06b2d4d12d528e9c293",
+      "bytes": 220844,
+      "mtime_ns": 1792041298283660293,
+      "device": 64770,
+      "inode": 22943961
+    },
+    "Mali/2018-19/_/housing.parquet": {
+      "sha256": "dc0ddef67389149417601f838eae2bab0302a33536c11add083c20627df6dace",
+      "bytes": 42031,
+      "mtime_ns": 1792041426809669852,
+      "device": 64770,
+      "inode": 22943960
+    },
+    "Mali/2018-19/_/individual_education.parquet": {
+      "sha256": "8822ef496b75b2fa22f0cd020bf2f3df4ce5c8c35dde7637a7231c7e84d34301",
+      "bytes": 105309,
+      "mtime_ns": 1792041333994940430,
+      "device": 64770,
+      "inode": 22943953
+    },
+    "Mali/2018-19/_/interview_date.parquet": {
+      "sha256": "21a756a30f7542c8c4923c2305baf639f28530ce4343631deaf95c27a43b9e04",
+      "bytes": 47806,
+      "mtime_ns": 1792041404349493340,
+      "device": 64770,
+      "inode": 22943951
+    },
+    "Mali/2018-19/_/plot_features.parquet": {
+      "sha256": "4112335a0b33195128b7949b046e0c6bbc7941341a810bcae8342171ba0e6f5e",
+      "bytes": 65786,
+      "mtime_ns": 1792041483999113726,
+      "device": 64770,
+      "inode": 22943954
+    },
+    "Mali/2018-19/_/sample.parquet": {
+      "sha256": "859ed84f8828f0a8fe0b5876157933032c05b70d2dc9f3ef81695861700a94ce",
+      "bytes": 49735,
+      "mtime_ns": 1792041257735343100,
+      "device": 64770,
+      "inode": 22943955
+    },
+    "Mali/2018-19/_/shocks.parquet": {
+      "sha256": "41e063ea783522dd3e973a45fb4816eb6fac87ffd13896a128e88a92a217202e",
+      "bytes": 122380,
+      "mtime_ns": 1792041448925841541,
+      "device": 64770,
+      "inode": 22943962
+    },
+    "Mali/2018-19/_/subjective_well_being.parquet": {
+      "sha256": "da34eab8ac80c030d4493d201546fa21c5b9d7744c883456ad8f002cb498ed87",
+      "bytes": 44254,
+      "mtime_ns": 1792041337242965956,
+      "device": 64770,
+      "inode": 22943959
+    },
+    "Mali/2021-22/_/assets.parquet": {
+      "sha256": "fc55421675fcbf753f46b654778a90d8c04a5058c785d04bb84531721bef4709",
+      "bytes": 318173,
+      "mtime_ns": 1792041424672653057,
+      "device": 64770,
+      "inode": 22943970
+    },
+    "Mali/2021-22/_/cluster_features.parquet": {
+      "sha256": "31df3c78f1fbb8958cebbca7dbc922e8d3d9d38e324b6ea95289b93022d876e8",
+      "bytes": 20951,
+      "mtime_ns": 1792041261888375587,
+      "device": 64770,
+      "inode": 22943971
+    },
+    "Mali/2021-22/_/food_acquired.parquet": {
+      "sha256": "03b073d5a1e4d6266953f1042ed7ab1a3c6a7f5e560366c24e99f9fc92b09a31",
+      "bytes": 576209,
+      "mtime_ns": 1792041394227413791,
+      "device": 64770,
+      "inode": 22943972
+    },
+    "Mali/2021-22/_/food_security.parquet": {
+      "sha256": "044ea028418174c6f49a45f40ce46a2fd9fe2664411321529e596ec81b592867",
+      "bytes": 71060,
+      "mtime_ns": 1792041338973979560,
+      "device": 64770,
+      "inode": 22943966
+    },
+    "Mali/2021-22/_/household_roster.parquet": {
+      "sha256": "4f45ee4669f5f69b05615f30e2ce0219e23bd695a4f350ea8e7b66407640968d",
+      "bytes": 211039,
+      "mtime_ns": 1792041321649843410,
+      "device": 64770,
+      "inode": 22943975
+    },
+    "Mali/2021-22/_/housing.parquet": {
+      "sha256": "d680f8dbecd55c871af988ff2906f9396660b0ee86aa2454b3711776afd986d7",
+      "bytes": 38390,
+      "mtime_ns": 1792041427239673231,
+      "device": 64770,
+      "inode": 22943974
+    },
+    "Mali/2021-22/_/individual_education.parquet": {
+      "sha256": "a369395148a7a960aad5e727c9b9bbca1f47ec9ff61566782f93e0e3e80988f0",
+      "bytes": 106083,
+      "mtime_ns": 1792041335865955134,
+      "device": 64770,
+      "inode": 22943967
+    },
+    "Mali/2021-22/_/interview_date.parquet": {
+      "sha256": "596b7457872062bb8b091ed6bb2fa1d3e07e4299d2aa8ffdb53142932f420f9c",
+      "bytes": 44852,
+      "mtime_ns": 1792041406996514142,
+      "device": 64770,
+      "inode": 22943965
+    },
+    "Mali/2021-22/_/plot_features.parquet": {
+      "sha256": "c69952773208b4cd84d55b7c59a16afa50b424bfbba66cf90c90562ebcbdbc99",
+      "bytes": 69522,
+      "mtime_ns": 1792041492098176578,
+      "device": 64770,
+      "inode": 22943968
+    },
+    "Mali/2021-22/_/sample.parquet": {
+      "sha256": "6664fa8ae3902d2158685ca8a362fd8000cde63c5fde05aa1cca15916714cb1e",
+      "bytes": 62548,
+      "mtime_ns": 1792041258365348028,
+      "device": 64770,
+      "inode": 22943969
+    },
+    "Mali/2021-22/_/shocks.parquet": {
+      "sha256": "93432405ba5f889b3a995bc05d74ed6099870c34907bcb5516d6181ca603d356",
+      "bytes": 110482,
+      "mtime_ns": 1792041467692987182,
+      "device": 64770,
+      "inode": 22943976
+    },
+    "Mali/2021-22/_/subjective_well_being.parquet": {
+      "sha256": "6498ed158900295255182cb16c209ef06e864e1a48278df7a5a3974fff7f5be2",
+      "bytes": 40465,
+      "mtime_ns": 1792041337667969296,
+      "device": 64770,
+      "inode": 22943973
+    },
+    "Mali/var/assets.parquet": {
+      "sha256": "81c9a408c61159be3b2971a7a9a1b0d2fc8c90d0f0d93c31286112ad74295800",
+      "bytes": 633203,
+      "mtime_ns": 1792041425046655997,
+      "device": 64770,
+      "inode": 22943920
+    },
+    "Mali/var/cluster_features.parquet": {
+      "sha256": "64856b598f984547f7bce64ac25758f97a6d5498606d54c296e7dee348ecef83",
+      "bytes": 52469,
+      "mtime_ns": 1792041261939375986,
+      "device": 64770,
+      "inode": 22943924
+    },
+    "Mali/var/community_prices.parquet": {
+      "sha256": "e3fbb664a5f469ed3dc191754a30ee1a07e46716a2d3ce5dff8d7f50912d597c",
+      "bytes": 90235,
+      "mtime_ns": 1792041648489390569,
+      "device": 64770,
+      "inode": 22943928
+    },
+    "Mali/var/crop_production.parquet": {
+      "sha256": "53f6f771c418d2b169bbf85421d708b14928e8473792b2574d991b082be4f13c",
+      "bytes": 227941,
+      "mtime_ns": 1792041514988354216,
+      "device": 64770,
+      "inode": 22943927
+    },
+    "Mali/var/food_acquired.parquet": {
+      "sha256": "80e7514876b9b7d044c5bbd2f92b0383de4fc38ebb2998166f1ce0c01ef199e0",
+      "bytes": 1736526,
+      "mtime_ns": 1792041395601424589,
+      "device": 64770,
+      "inode": 22943925
+    },
+    "Mali/var/food_coping.parquet": {
+      "sha256": "f2fefcafe56908ab2861e60c672b2ba92a31a0c366d26a464cd4f63212af893e",
+      "bytes": 37907,
+      "mtime_ns": 1792041476090052348,
+      "device": 64770,
+      "inode": 22943922
+    },
+    "Mali/var/food_security.parquet": {
+      "sha256": "d4cb568832e16a20c9c7cd071425e08e4c867d768155786cbbfec9f7a2c630e6",
+      "bytes": 81062,
+      "mtime_ns": 1792041339028979992,
+      "device": 64770,
+      "inode": 22943915
+    },
+    "Mali/var/household_roster.parquet": {
+      "sha256": "fe404f70b8755a1414817159cbc37982b61137a8b5c826fd5efd61b99dbbccd8",
+      "bytes": 1393142,
+      "mtime_ns": 1792041322084846829,
+      "device": 64770,
+      "inode": 22943930
+    },
+    "Mali/var/housing.parquet": {
+      "sha256": "d6bc1476dfe0bfea9dc0c368434828e268b9f3b658963c2458956ed7d76b44b7",
+      "bytes": 103108,
+      "mtime_ns": 1792041427290673632,
+      "device": 64770,
+      "inode": 22943929
+    },
+    "Mali/var/individual_education.parquet": {
+      "sha256": "be28bba7ffab6d9d56bc50064ab3a3ba2c1af63520dcf2ef68c9fd335280ad05",
+      "bytes": 975215,
+      "mtime_ns": 1792041336128957201,
+      "device": 64770,
+      "inode": 22943917
+    },
+    "Mali/var/interview_date.parquet": {
+      "sha256": "51d963e95751f5ba8df564175862fb21f1046510082c51ba0ea784de8c216d32",
+      "bytes": 136208,
+      "mtime_ns": 1792041407111515046,
+      "device": 64770,
+      "inode": 22943913
+    },
+    "Mali/var/livestock.parquet": {
+      "sha256": "f9ca4e7b891bd944e742860f310faf8d807a07ce908fc8affb15338b4ac7f73b",
+      "bytes": 160179,
+      "mtime_ns": 1792041588220922605,
+      "device": 64770,
+      "inode": 22943916
+    },
+    "Mali/var/people_last7days.parquet": {
+      "sha256": "c4c4885f7b2f2fcc9ebbfae7feda85c6c675e48ca87406730351be33f411f8e5",
+      "bytes": 956528,
+      "mtime_ns": 1792041640544328878,
+      "device": 64770,
+      "inode": 22943921
+    },
+    "Mali/var/plot_features.parquet": {
+      "sha256": "1c007727d5ee823bf48e2fb4e2f1014a4982aadb20f0e9198b4e9d8072b4be36",
+      "bytes": 118399,
+      "mtime_ns": 1792041492658180924,
+      "device": 64770,
+      "inode": 22943918
+    },
+    "Mali/var/plot_inputs.parquet": {
+      "sha256": "712ea841456d70b92c41b8064224559eada0086f19bd4220db02acf32df8f787",
+      "bytes": 403925,
+      "mtime_ns": 1792041546978602475,
+      "device": 64770,
+      "inode": 22943923
+    },
+    "Mali/var/plot_labor.parquet": {
+      "sha256": "c30b4b73cc23ffb07502a3fc4708cd5475caa4f6a3f8f0e53944e1201ae7548a",
+      "bytes": 230011,
+      "mtime_ns": 1792041606564065033,
+      "device": 64770,
+      "inode": 22943914
+    },
+    "Mali/var/sample.parquet": {
+      "sha256": "8e9c3c0c69dcece14315f42a57dd7751cabf0eefa5c868c18977446df4df90f9",
+      "bytes": 178014,
+      "mtime_ns": 1792041258484348959,
+      "device": 64770,
+      "inode": 22943919
+    },
+    "Mali/var/shocks.parquet": {
+      "sha256": "1168d64b03f1ed5b97b470e04560a405f85d2409e29c7d4dcd2116df398b2b73",
+      "bytes": 392233,
+      "mtime_ns": 1792041467967989317,
+      "device": 64770,
+      "inode": 22943931
+    },
+    "Mali/var/subjective_well_being.parquet": {
+      "sha256": "6a330f2e1ca728029915389db7dcf73960ca372019921917d52a0c97facbb1aa",
+      "bytes": 52439,
+      "mtime_ns": 1792041337711969641,
+      "device": 64770,
+      "inode": 22943926
+    },
+    "Tanzania/2008-15/_/anthropometry.parquet": {
+      "sha256": "bdd9841862fff762491340479d679619afeb7c6ceafd65b5aeb415fd986ced59",
+      "bytes": 680095,
+      "mtime_ns": 1792042560386495023,
+      "device": 64770,
+      "inode": 22944513
+    },
+    "Tanzania/2008-15/_/cluster_features.parquet": {
+      "sha256": "f8b31e2183cdc1a6dfbec389fc5a8eae3c77f4b7ef5f1f8071f427ca9f89b014",
+      "bytes": 127386,
+      "mtime_ns": 1792042512816126129,
+      "device": 64770,
+      "inode": 22944519
+    },
+    "Tanzania/2008-15/_/food_acquired.parquet": {
+      "sha256": "4a8bba7bfd1c3d367149c6e9a547f89c52b017268f3405367be5cb8a705b32f7",
+      "bytes": 922121,
+      "mtime_ns": 1792042660700272928,
+      "device": 64770,
+      "inode": 22944520
+    },
+    "Tanzania/2008-15/_/food_coping.parquet": {
+      "sha256": "f2ed3aa298090ae1a3ad6a0b147860349ad92a82e08c6c7d802415d7ad361cc9",
+      "bytes": 204476,
+      "mtime_ns": 1792042604016833364,
+      "device": 64770,
+      "inode": 22944518
+    },
+    "Tanzania/2008-15/_/household_roster.parquet": {
+      "sha256": "b7004eba65fde776dd680f068596304dea052e486038b36d9ff2e2f0ada79058",
+      "bytes": 727358,
+      "mtime_ns": 1792042530251261333,
+      "device": 64770,
+      "inode": 22944522
+    },
+    "Tanzania/2008-15/_/housing.parquet": {
+      "sha256": "4da054aad46fb15720b69449608d8b7460cf3310bfd3a5ca79be5d0fbe90fadf",
+      "bytes": 114534,
+      "mtime_ns": 1792042695819545267,
+      "device": 64770,
+      "inode": 22944521
+    },
+    "Tanzania/2008-15/_/individual_education.parquet": {
+      "sha256": "a89be97c1d8ddea28bc09c4b467089d0e42b51fa04990dd58b56e9753301a2e3",
+      "bytes": 285094,
+      "mtime_ns": 1792042539292331444,
+      "device": 64770,
+      "inode": 22944516
+    },
+    "Tanzania/2008-15/_/interview_date.parquet": {
+      "sha256": "f9fef5fdecdea7743c8a55b147d4a5b6c7b555817febaa49a1be9c64f45840fa",
+      "bytes": 143170,
+      "mtime_ns": 1792042624824994725,
+      "device": 64770,
+      "inode": 22944514
+    },
+    "Tanzania/2008-15/_/life_satisfaction.parquet": {
+      "sha256": "62d67faafbae2d8a52bdecf750e006391f07785024220085aa3b63502f98064f",
+      "bytes": 326808,
+      "mtime_ns": 1792042581474658556,
+      "device": 64770,
+      "inode": 22944515
+    },
+    "Tanzania/2008-15/_/sample.parquet": {
+      "sha256": "9e44640954266361593261e4acc24e64b1b7412580a862565c6b781acd49bad5",
+      "bytes": 284611,
+      "mtime_ns": 1792042504849064347,
+      "device": 64770,
+      "inode": 22944517
+    },
+    "Tanzania/2008-15/_/shocks.parquet": {
+      "sha256": "c43e24797e1079e2a89dc199002cfdcd27ac3bf545d99b7f954437920a5afeca",
+      "bytes": 191959,
+      "mtime_ns": 1792042521448193068,
+      "device": 64770,
+      "inode": 22944523
+    },
+    "Tanzania/2019-20/_/anthropometry.parquet": {
+      "sha256": "38781dc7c8e015e30203bc73f3cb26ff04e7ab228a4086f35872a2c871542054",
+      "bytes": 31431,
+      "mtime_ns": 1792042567296548609,
+      "device": 64770,
+      "inode": 22944470
+    },
+    "Tanzania/2019-20/_/assets.parquet": {
+      "sha256": "86fc02ec3bfd0c174ae05ee44cda35421fa590b399d9f1e13589153811f0314a",
+      "bytes": 102886,
+      "mtime_ns": 1792042688722490232,
+      "device": 64770,
+      "inode": 22944479
+    },
+    "Tanzania/2019-20/_/cluster_features.parquet": {
+      "sha256": "2cb21fc38f3a54adfbded2f2fbe7e87c3301e190f2f42bb74c72e20c1d91992b",
+      "bytes": 12118,
+      "mtime_ns": 1792042513451131053,
+      "device": 64770,
+      "inode": 22944483
+    },
+    "Tanzania/2019-20/_/community_cluster_xwalk.parquet": {
+      "sha256": "6697b30887fddebe7e5bc0a57065438b0652b55b87aeb2e9a48c6f9b1bca7e6d",
+      "bytes": 5935,
+      "mtime_ns": 1792042804659384271,
+      "device": 64770,
+      "inode": 22944474
+    },
+    "Tanzania/2019-20/_/community_prices.parquet": {
+      "sha256": "15c04494025e271c715d7678e6f7720a6927b8d333eaf2f204fcb96821dc11e5",
+      "bytes": 16148,
+      "mtime_ns": 1792042791493283173,
+      "device": 64770,
+      "inode": 22944486
+    },
+    "Tanzania/2019-20/_/crop_production.parquet": {
+      "sha256": "3e8081740ea95328e0bb240639b7b819c725611a854c04acb19cc9f791600f6a",
+      "bytes": 28236,
+      "mtime_ns": 1792042717350712235,
+      "device": 64770,
+      "inode": 22944485
+    },
+    "Tanzania/2019-20/_/food_acquired.parquet": {
+      "sha256": "e4f9da7cf3d1bc6348f156fce067ebb011dfc40c20316147e016ddd522648467",
+      "bytes": 65665,
+      "mtime_ns": 1792042670179346435,
+      "device": 64770,
+      "inode": 22944484
+    },
+    "Tanzania/2019-20/_/food_coping.parquet": {
+      "sha256": "1d88e3deae20403fc21e51feb6ff7c3d90d4400aa6dbdfb387b76652b685b9b7",
+      "bytes": 23628,
+      "mtime_ns": 1792042610899886740,
+      "device": 64770,
+      "inode": 22944481
+    },
+    "Tanzania/2019-20/_/household_roster.parquet": {
+      "sha256": "d43e3c1b317969a5247eac746c12cb2746bf608cb91e6823742f5e3091e0ffbe",
+      "bytes": 29410,
+      "mtime_ns": 1792042531392270182,
+      "device": 64770,
+      "inode": 22944488
+    },
+    "Tanzania/2019-20/_/housing.parquet": {
+      "sha256": "471b10b02e0c129b20fbe9aaa76fd6da7464bc2b959e1fba0b7ea3a389136574",
+      "bytes": 11121,
+      "mtime_ns": 1792042696443550106,
+      "device": 64770,
+      "inode": 22944487
+    },
+    "Tanzania/2019-20/_/individual_education.parquet": {
+      "sha256": "df59827d645e1c3f6b4291488282d93550d04c08564689bd42cae19e7b67d8e7",
+      "bytes": 14407,
+      "mtime_ns": 1792042546061383936,
+      "device": 64770,
+      "inode": 22944476
+    },
+    "Tanzania/2019-20/_/interview_date.parquet": {
+      "sha256": "9adae44505b5f40d944621ae2cd5db5357f16526df6f9da06361e6355acd1e90",
+      "bytes": 22825,
+      "mtime_ns": 1792042625367998936,
+      "device": 64770,
+      "inode": 22944471
+    },
+    "Tanzania/2019-20/_/life_satisfaction.parquet": {
+      "sha256": "43ae492e0afe65cef712252121ac7d4335c2e2c0ee511f115a740df728c15bff",
+      "bytes": 22331,
+      "mtime_ns": 1792042588459712723,
+      "device": 64770,
+      "inode": 22944473
+    },
+    "Tanzania/2019-20/_/livestock.parquet": {
+      "sha256": "f0985941e2c2ddf235675caf4e1e2f6c641d7e4253bc06c01dfd01bd6b072b01",
+      "bytes": 10654,
+      "mtime_ns": 1792042777101172660,
+      "device": 64770,
+      "inode": 22944475
+    },
+    "Tanzania/2019-20/_/people_last7days.parquet": {
+      "sha256": "9cd31a55c9427770a31a97c7370e328e9d5b7b01757e023c48716dfe68d5dca3",
+      "bytes": 32330,
+      "mtime_ns": 1792042761078049624,
+      "device": 64770,
+      "inode": 22944480
+    },
+    "Tanzania/2019-20/_/plot_features.parquet": {
+      "sha256": "64e602d06f11e9b2951ba9f1c717c42532281386706565aa275ae372fbaf9473",
+      "bytes": 29593,
+      "mtime_ns": 1792042703541605150,
+      "device": 64770,
+      "inode": 22944477
+    },
+    "Tanzania/2019-20/_/plot_inputs.parquet": {
+      "sha256": "9423d28643e2ab36e1a0e32e588d973423a197ea751ceb0495e15e8b87e53c68",
+      "bytes": 18765,
+      "mtime_ns": 1792042731818824431,
+      "device": 64770,
+      "inode": 22944482
+    },
+    "Tanzania/2019-20/_/plot_labor.parquet": {
+      "sha256": "326f07f907c7246af7cf2a10dbe2fb4b531f632be59a9f58c7bfbdcf73a2e503",
+      "bytes": 10974,
+      "mtime_ns": 1792042746724939410,
+      "device": 64770,
+      "inode": 22944472
+    },
+    "Tanzania/2019-20/_/sample.parquet": {
+      "sha256": "67749416ede03b370cdf8704ba98a6e1b350adcf275adc00196e7aa76beaf5d4",
+      "bytes": 33191,
+      "mtime_ns": 1792042505615070287,
+      "device": 64770,
+      "inode": 22944478
+    },
+    "Tanzania/2019-20/_/shocks.parquet": {
+      "sha256": "81548721050fd35c402d12b3247cd4a004e70faca2c3a38629ca0b4cb79927f1",
+      "bytes": 15606,
+      "mtime_ns": 1792042522175198706,
+      "device": 64770,
+      "inode": 22944489
+    },
+    "Tanzania/2020-21/_/anthropometry.parquet": {
+      "sha256": "50b524a3b27b2cda343cf3de3895249614bac895e60318991696a21855f62790",
+      "bytes": 94062,
+      "mtime_ns": 1792042573654597913,
+      "device": 64770,
+      "inode": 22944492
+    },
+    "Tanzania/2020-21/_/cluster_features.parquet": {
+      "sha256": "8855f02d7b49d915f85f69be128cd0955c5b99ab9abc670023219279b2f77dda",
+      "bytes": 32832,
+      "mtime_ns": 1792042513626132410,
+      "device": 64770,
+      "inode": 22944504
+    },
+    "Tanzania/2020-21/_/community_cluster_xwalk.parquet": {
+      "sha256": "4c7e92dbfc6a65813c76a7c854009762db017dff81d4ea3c76e49f1171b8fd54",
+      "bytes": 14463,
+      "mtime_ns": 1792042810919432340,
+      "device": 64770,
+      "inode": 22944496
+    },
+    "Tanzania/2020-21/_/community_prices.parquet": {
+      "sha256": "4a33c73d5d34337c6ace524fcf0a8dc90ef92278917c0b7c0241311ce30df1fe",
+      "bytes": 58515,
+      "mtime_ns": 1792042797851331994,
+      "device": 64770,
+      "inode": 22944507
+    },
+    "Tanzania/2020-21/_/crop_production.parquet": {
+      "sha256": "fec92d4515f1e549c477f3d1f8db56088733893d0046ff8240bc62b7ea83b64e",
+      "bytes": 83525,
+      "mtime_ns": 1792042724373766697,
+      "device": 64770,
+      "inode": 22944506
+    },
+    "Tanzania/2020-21/_/food_acquired.parquet": {
+      "sha256": "b0f3af06e49bca237269f78430cfddd6cc332e34c5ebb6bec0c206de31de8ac8",
+      "bytes": 32831,
+      "mtime_ns": 1792042677482403068,
+      "device": 64770,
+      "inode": 22944505
+    },
+    "Tanzania/2020-21/_/food_coping.parquet": {
+      "sha256": "0add6281a109f3b677cfa2f5a84850d6a939874a6cc477ca4b675116adf7e9cf",
+      "bytes": 94387,
+      "mtime_ns": 1792042617437937441,
+      "device": 64770,
+      "inode": 22944502
+    },
+    "Tanzania/2020-21/_/household_roster.parquet": {
+      "sha256": "ff2a848620046e868dc1164f08c129279de3d83d2033609226aba58294db4f83",
+      "bytes": 101424,
+      "mtime_ns": 1792042531830273578,
+      "device": 64770,
+      "inode": 22944509
+    },
+    "Tanzania/2020-21/_/housing.parquet": {
+      "sha256": "9d2adf8533ccbcf5fbc11137e60da0203a269bb61072ae2f1c46ea0427c1966c",
+      "bytes": 34830,
+      "mtime_ns": 1792042696614551433,
+      "device": 64770,
+      "inode": 22944508
+    },
+    "Tanzania/2020-21/_/individual_education.parquet": {
+      "sha256": "b9b2ab863a6ea0a67837ca78c647a58112d5dbb57ce64ecc78275ad87ec40da3",
+      "bytes": 47192,
+      "mtime_ns": 1792042552754435839,
+      "device": 64770,
+      "inode": 22944498
+    },
+    "Tanzania/2020-21/_/interview_date.parquet": {
+      "sha256": "bf1c926be11c8eccf8ab33703f17802b2fbaa6c2b1d66807a818da5776eb04f2",
+      "bytes": 79443,
+      "mtime_ns": 1792042625492999906,
+      "device": 64770,
+      "inode": 22944493
+    },
+    "Tanzania/2020-21/_/life_satisfaction.parquet": {
+      "sha256": "45ba0813affe74d0feb3244f31d2c58737aa044dcbdf35e4d8d1000974facca6",
+      "bytes": 79728,
+      "mtime_ns": 1792042595051763842,
+      "device": 64770,
+      "inode": 22944495
+    },
+    "Tanzania/2020-21/_/livestock.parquet": {
+      "sha256": "f5ca0f594ef313da74d4c692445f6d824e64344525266c24c3db2f438c9541f5",
+      "bytes": 32167,
+      "mtime_ns": 1792042784464229199,
+      "device": 64770,
+      "inode": 22944497
+    },
+    "Tanzania/2020-21/_/people_last7days.parquet": {
+      "sha256": "dd0ed74ad5a665ebdde7f911a31764d477e6310c90805eaefbf1e5306a95cbf7",
+      "bytes": 108216,
+      "mtime_ns": 1792042770080118748,
+      "device": 64770,
+      "inode": 22944501
+    },
+    "Tanzania/2020-21/_/plot_features.parquet": {
+      "sha256": "43bd32d499fc8d24a8d964386dba9881804c0e5f8429be96c29c72e9e78a5722",
+      "bytes": 67397,
+      "mtime_ns": 1792042710358658014,
+      "device": 64770,
+      "inode": 22944499
+    },
+    "Tanzania/2020-21/_/plot_inputs.parquet": {
+      "sha256": "2b697eca7a72c79065d7efd61bb5d2ff8b8aca1b50ddfc04a51f9826190f7088",
+      "bytes": 57005,
+      "mtime_ns": 1792042739675885284,
+      "device": 64770,
+      "inode": 22944503
+    },
+    "Tanzania/2020-21/_/plot_labor.parquet": {
+      "sha256": "dc26081616af8c2d8b532baa050c1c8b0fafc0be39dfb59f6b4bd22824ba03c3",
+      "bytes": 40757,
+      "mtime_ns": 1792042753778993576,
+      "device": 64770,
+      "inode": 22944494
+    },
+    "Tanzania/2020-21/_/sample.parquet": {
+      "sha256": "ef65a0f5a95d137e8c138c037116f61bb29cf00ae56d6263b392a4c0f46fb187",
+      "bytes": 124480,
+      "mtime_ns": 1792042505829071946,
+      "device": 64770,
+      "inode": 22944500
+    },
+    "Tanzania/2020-21/_/shocks.parquet": {
+      "sha256": "b4fd37dd9ee275d4591edb34141cc6d413ea11e54483fbbe4bc8294240f17e0c",
+      "bytes": 76010,
+      "mtime_ns": 1792042523140206189,
+      "device": 64770,
+      "inode": 22944510
+    },
+    "Tanzania/var/anthropometry.parquet": {
+      "sha256": "d31efd846df702f7d8fe95fa489f2473abe643098cef85fd55859b9ef86c13c9",
+      "bytes": 742862,
+      "mtime_ns": 1792042574168601899,
+      "device": 64770,
+      "inode": 22944448
+    },
+    "Tanzania/var/assets.parquet": {
+      "sha256": "317cb9377af74075282e7550fbb4e204f2f0b93e1a894633f146bf589fc4b024",
+      "bytes": 104920,
+      "mtime_ns": 1792042688841491155,
+      "device": 64770,
+      "inode": 22944457
+    },
+    "Tanzania/var/cluster_features.parquet": {
+      "sha256": "a8e54ae6b5431bc6e22ef285afe11f7b7e4f082c4ae9795ae77b427daa1a6ae7",
+      "bytes": 25459,
+      "mtime_ns": 1792042513679132821,
+      "device": 64770,
+      "inode": 22944461
+    },
+    "Tanzania/var/community_cluster_xwalk.parquet": {
+      "sha256": "799801b9f093c153a17dc8ffce973f54e451163c7149d7a66765e2080d53783d",
+      "bytes": 16676,
+      "mtime_ns": 1792042811323435442,
+      "device": 64770,
+      "inode": 22944452
+    },
+    "Tanzania/var/community_prices.parquet": {
+      "sha256": "68e852ea7874510910eb08811e9d82b81871da42c28638c94fcacb961af5377c",
+      "bytes": 62427,
+      "mtime_ns": 1792042798272335227,
+      "device": 64770,
+      "inode": 22944464
+    },
+    "Tanzania/var/crop_production.parquet": {
+      "sha256": "825bcef4cb5dc770ed4309a1c3c109888c73dcda6ca1f01a23f8fe3bd2bd5c68",
+      "bytes": 104724,
+      "mtime_ns": 1792042724841770326,
+      "device": 64770,
+      "inode": 22944463
+    },
+    "Tanzania/var/food_acquired.parquet": {
+      "sha256": "89f4859b2ddc3703015026b3117fbd82fb69dbdfdb9208b2a8df137fa1256954",
+      "bytes": 989220,
+      "mtime_ns": 1792042678072407643,
+      "device": 64770,
+      "inode": 22944462
+    },
+    "Tanzania/var/food_coping.parquet": {
+      "sha256": "2256b5fcfc9fea4656a73fec4693abed6754069d9ebcb74b985d6cf7e38041ae",
+      "bytes": 306009,
+      "mtime_ns": 1792042617933941288,
+      "device": 64770,
+      "inode": 22944459
+    },
+    "Tanzania/var/household_roster.parquet": {
+      "sha256": "05b1b031cfe3f98621007ec512c7e863fa074aaef4ef905620385b1ed8d95756",
+      "bytes": 821684,
+      "mtime_ns": 1792042532026275098,
+      "device": 64770,
+      "inode": 22944466
+    },
+    "Tanzania/var/housing.parquet": {
+      "sha256": "f5b0b6c49ae07b42dec96a8358e92779c13b78617b7687a56c485a8292f97643",
+      "bytes": 118575,
+      "mtime_ns": 1792042696693552045,
+      "device": 64770,
+      "inode": 22944465
+    },
+    "Tanzania/var/individual_education.parquet": {
+      "sha256": "174c4dfa72f795cf3eaad68206a6f5b2f722f7b15a97938b1fe86d0499a59a91",
+      "bytes": 313061,
+      "mtime_ns": 1792042553259439755,
+      "device": 64770,
+      "inode": 22944454
+    },
+    "Tanzania/var/interview_date.parquet": {
+      "sha256": "41ce97601e33b270ee552e40273d3e8ad90c7e509b0532ff20f14a712df83909",
+      "bytes": 199984,
+      "mtime_ns": 1792042625619000883,
+      "device": 64770,
+      "inode": 22944449
+    },
+    "Tanzania/var/life_satisfaction.parquet": {
+      "sha256": "cd48a9b56939ad3e921fc91a0afa9988106d1a3e5fc8ca42f23a01f8e91f8ceb",
+      "bytes": 371638,
+      "mtime_ns": 1792042595569767859,
+      "device": 64770,
+      "inode": 22944451
+    },
+    "Tanzania/var/livestock.parquet": {
+      "sha256": "58016fa25dd9b4e27cb69330d7d384cee5611a03707529c27304f67dc5862afc",
+      "bytes": 39935,
+      "mtime_ns": 1792042784925232739,
+      "device": 64770,
+      "inode": 22944453
+    },
+    "Tanzania/var/people_last7days.parquet": {
+      "sha256": "0cdff83422df08e0973264923c37d32d84fd2659afff17b943ce0d8f5af9720d",
+      "bytes": 137269,
+      "mtime_ns": 1792042770565122472,
+      "device": 64770,
+      "inode": 22944458
+    },
+    "Tanzania/var/plot_features.parquet": {
+      "sha256": "5e440cd854617a60c9507ee556bc4afcaa0a1f6d9da31ddb735fea04ee5ff72b",
+      "bytes": 88222,
+      "mtime_ns": 1792042710825661635,
+      "device": 64770,
+      "inode": 22944455
+    },
+    "Tanzania/var/plot_inputs.parquet": {
+      "sha256": "981adb7cc45f6c5afc8f1493631e54312a90fdd4e06f5b9a56bb8c532dab374f",
+      "bytes": 72572,
+      "mtime_ns": 1792042740088888455,
+      "device": 64770,
+      "inode": 22944460
+    },
+    "Tanzania/var/plot_labor.parquet": {
+      "sha256": "b3181472b0f637ece48e04058cd74542a4dc2cf749c5c50b4b7997644e5c579b",
+      "bytes": 49819,
+      "mtime_ns": 1792042754199996809,
+      "device": 64770,
+      "inode": 22944450
+    },
+    "Tanzania/var/sample.parquet": {
+      "sha256": "2ac46c72db853017f4f2d789a317808327609ea74d63d60a620e317a178c697a",
+      "bytes": 396067,
+      "mtime_ns": 1792042505977073094,
+      "device": 64770,
+      "inode": 22944456
+    },
+    "Tanzania/var/shocks.parquet": {
+      "sha256": "34d0101d21c1b5605f5f5394271e17740c7f4d7aefd80b4142608d46986a78f3",
+      "bytes": 247333,
+      "mtime_ns": 1792042523302207445,
+      "device": 64770,
+      "inode": 22944467
+    }
+  },
+  "copy": {
+    "Mali/2014-15/_/cluster_features.parquet": {
+      "sha256": "690c58369b57d482767edb58d8125da4a1752579ed9ba68be7573120e592714c",
+      "bytes": 31818,
+      "mtime_ns": 1792041259164354278,
+      "device": 64770,
+      "inode": 23462269
+    },
+    "Mali/2014-15/_/community_prices.parquet": {
+      "sha256": "b6b0e73630b01bfde344a25e790df392df61f485c0755871af5cd332b42aa634",
+      "bytes": 95836,
+      "mtime_ns": 1792041647985386656,
+      "device": 64770,
+      "inode": 23462272
+    },
+    "Mali/2014-15/_/crop_production.parquet": {
+      "sha256": "5023f2b329eef1dfcf8db15025e4b16a2db4c008389f7751bf53d02ecf5ed07d",
+      "bytes": 75864,
+      "mtime_ns": 1792041500813244211,
+      "device": 64770,
+      "inode": 23462271
+    },
+    "Mali/2014-15/_/food_acquired.parquet": {
+      "sha256": "f3842f19b008535c31ad59404991a02938987e7f7e790e7d3c761d0e5e697e6d",
+      "bytes": 606432,
+      "mtime_ns": 1792041375725268384,
+      "device": 64770,
+      "inode": 23462270
+    },
+    "Mali/2014-15/_/food_coping.parquet": {
+      "sha256": "0c83682a177ab39538fc4099c7600a8c06e66c51ab40ba8f11c54da0216b2f92",
+      "bytes": 37442,
+      "mtime_ns": 1792041475495047730,
+      "device": 64770,
+      "inode": 23462267
+    },
+    "Mali/2014-15/_/household_roster.parquet": {
+      "sha256": "cb78514e0a928fcaddb337849a15b27493905c966b01b57c092bb8165501ad2d",
+      "bytes": 310823,
+      "mtime_ns": 1792041265698405391,
+      "device": 64770,
+      "inode": 23462274
+    },
+    "Mali/2014-15/_/housing.parquet": {
+      "sha256": "330dc2dfc15e83c4d2fe2316427e6e8ae727c0dd0dc9592274cbd5c79b10cd80",
+      "bytes": 24974,
+      "mtime_ns": 1792041426055663926,
+      "device": 64770,
+      "inode": 23462273
+    },
+    "Mali/2014-15/_/individual_education.parquet": {
+      "sha256": "20bf24a05996fcba6eb3f1957586594bceea833f348d1f8d325d8933a3c71a8e",
+      "bytes": 257668,
+      "mtime_ns": 1792041326838884190,
+      "device": 64770,
+      "inode": 23462264
+    },
+    "Mali/2014-15/_/interview_date.parquet": {
+      "sha256": "85ba87a2be29629f927658ca653ce4be2b3a4c888ec44d84935d5317e559a09e",
+      "bytes": 45714,
+      "mtime_ns": 1792041398594448111,
+      "device": 64770,
+      "inode": 23462261
+    },
+    "Mali/2014-15/_/livestock.parquet": {
+      "sha256": "bc9923ea7f666c2bf61c7cf80e40e0f9539d2e10a967c75bfa66490af94b43cd",
+      "bytes": 45188,
+      "mtime_ns": 1792041556603677170,
+      "device": 64770,
+      "inode": 23462263
+    },
+    "Mali/2014-15/_/people_last7days.parquet": {
+      "sha256": "ee66c247582ef2ae83018b396112d50a47a81baf254089182ad6f0f665039fb5",
+      "bytes": 324393,
+      "mtime_ns": 1792041618734159530,
+      "device": 64770,
+      "inode": 23462266
+    },
+    "Mali/2014-15/_/plot_inputs.parquet": {
+      "sha256": "d28c01babc6e46fe3f6ef95440f4e2195bf11538217266f73ba2b2160790f01e",
+      "bytes": 115703,
+      "mtime_ns": 1792041527204449019,
+      "device": 64770,
+      "inode": 23462268
+    },
+    "Mali/2014-15/_/plot_labor.parquet": {
+      "sha256": "02e130be0e52ef67e993daba05c0c321c54dfaac8f48021b8d8a3e770dff9c0b",
+      "bytes": 64956,
+      "mtime_ns": 1792041596025983208,
+      "device": 64770,
+      "inode": 23462262
+    },
+    "Mali/2014-15/_/sample.parquet": {
+      "sha256": "2a5060ffd7ac2aeb38baa1606c72faca1b42a2e45aaad19735d77cfe9abdc5fe",
+      "bytes": 49797,
+      "mtime_ns": 1792041256538333736,
+      "device": 64770,
+      "inode": 23462265
+    },
+    "Mali/2014-15/_/shocks.parquet": {
+      "sha256": "1de1b0de1bda47a4060581af7028f801332d5c607171aa389b9263ac545a5adc",
+      "bytes": 148257,
+      "mtime_ns": 1792041430185696170,
+      "device": 64770,
+      "inode": 23462275
+    },
+    "Mali/2017-18/_/cluster_features.parquet": {
+      "sha256": "db0e9efbb57a8b6dbf0048d48bc1f1b2fc9e2fe010d58600ca9964f37bdc36a9",
+      "bytes": 30406,
+      "mtime_ns": 1792041259427356336,
+      "device": 64770,
+      "inode": 23462313
+    },
+    "Mali/2017-18/_/crop_production.parquet": {
+      "sha256": "30bbdc302b93dca53881451967f6cf822c26cd2b179684df148820f68b6ab883",
+      "bytes": 164690,
+      "mtime_ns": 1792041514394349607,
+      "device": 64770,
+      "inode": 23462314
+    },
+    "Mali/2017-18/_/household_roster.parquet": {
+      "sha256": "6dac73fdbf8561cdd23064d737fa074793adfd2f74e4ad6c598a74ff704d7583",
+      "bytes": 764243,
+      "mtime_ns": 1792041273520466580,
+      "device": 64770,
+      "inode": 23462316
+    },
+    "Mali/2017-18/_/housing.parquet": {
+      "sha256": "1438872441cf3b80db04511b50c6c57bcd626c586bf002515209640c7e6c1f85",
+      "bytes": 50663,
+      "mtime_ns": 1792041426405666677,
+      "device": 64770,
+      "inode": 23462315
+    },
+    "Mali/2017-18/_/individual_education.parquet": {
+      "sha256": "b0f5de1f3f64ec494a9cfa5d32d2bd3ef272b9e75b5e9a9e471a3e64406fdf76",
+      "bytes": 612099,
+      "mtime_ns": 1792041332125925741,
+      "device": 64770,
+      "inode": 23462309
+    },
+    "Mali/2017-18/_/interview_date.parquet": {
+      "sha256": "1a4ccf58347f49259658a4683b1666eb6e6970e795be3bed895e57eec15bd260",
+      "bytes": 83098,
+      "mtime_ns": 1792041401455470596,
+      "device": 64770,
+      "inode": 23462306
+    },
+    "Mali/2017-18/_/livestock.parquet": {
+      "sha256": "fe2aa7cae87694b10cb3a8df6bb478fe29b053563a45ad4936b050c95db63f3f",
+      "bytes": 119831,
+      "mtime_ns": 1792041587620917946,
+      "device": 64770,
+      "inode": 23462308
+    },
+    "Mali/2017-18/_/people_last7days.parquet": {
+      "sha256": "e1e3f8cb5fa994198ece1cc95f5eefa3ce4b2edf0eada308468e1ef751d2e87e",
+      "bytes": 743462,
+      "mtime_ns": 1792041639850323490,
+      "device": 64770,
+      "inode": 23462311
+    },
+    "Mali/2017-18/_/plot_inputs.parquet": {
+      "sha256": "bd1f67aca10a42f183964693589c3e982b15b691a927cc54902454504596d86b",
+      "bytes": 304555,
+      "mtime_ns": 1792041546345597563,
+      "device": 64770,
+      "inode": 23462312
+    },
+    "Mali/2017-18/_/plot_labor.parquet": {
+      "sha256": "59c6fb0fab3f05020a808159caaf62eff00ad1639755a033b67714450cb47075",
+      "bytes": 170391,
+      "mtime_ns": 1792041606052061057,
+      "device": 64770,
+      "inode": 23462307
+    },
+    "Mali/2017-18/_/sample.parquet": {
+      "sha256": "4c24ad63531cb87636f68183941ec5efa988128f8ea05074bace77f5cefc8577",
+      "bytes": 70719,
+      "mtime_ns": 1792041257319339845,
+      "device": 64770,
+      "inode": 23462310
+    },
+    "Mali/2017-18/_/shocks.parquet": {
+      "sha256": "7b83223041760dd38d2bf93db1d2c02b482e1dc0b5f395471e9df8a493701def",
+      "bytes": 68001,
+      "mtime_ns": 1792041431355705243,
+      "device": 64770,
+      "inode": 23462317
+    },
+    "Mali/2018-19/_/assets.parquet": {
+      "sha256": "59c0cc6fc05287ec573fd0414f037c4bf119814645b2adc7a1582c8668527914",
+      "bytes": 335297,
+      "mtime_ns": 1792041416480588677,
+      "device": 64770,
+      "inode": 23462283
+    },
+    "Mali/2018-19/_/cluster_features.parquet": {
+      "sha256": "27b975a9ea4e1e44354d91508ecc43bdf07f3e26f4944f2dbd7676f1abcec2f9",
+      "bytes": 29964,
+      "mtime_ns": 1792041261541372873,
+      "device": 64770,
+      "inode": 23462284
+    },
+    "Mali/2018-19/_/food_acquired.parquet": {
+      "sha256": "66ece06e8849b0f2c1e9456c4bfe9058a13fe71d6c051a1622c1b0500ebf65f9",
+      "bytes": 710219,
+      "mtime_ns": 1792041385189342762,
+      "device": 64770,
+      "inode": 23462285
+    },
+    "Mali/2018-19/_/food_security.parquet": {
+      "sha256": "6d8af724450e4a1fb1bf90f320d160ce892324f87fcfcacb7049ac6ce7d93db3",
+      "bytes": 60938,
+      "mtime_ns": 1792041338522976015,
+      "device": 64770,
+      "inode": 23462279
+    },
+    "Mali/2018-19/_/household_roster.parquet": {
+      "sha256": "cde4889bd13b4ab763df7df76a84a629ab66ca26cedfb06b2d4d12d528e9c293",
+      "bytes": 220844,
+      "mtime_ns": 1792041298283660293,
+      "device": 64770,
+      "inode": 23462288
+    },
+    "Mali/2018-19/_/housing.parquet": {
+      "sha256": "dc0ddef67389149417601f838eae2bab0302a33536c11add083c20627df6dace",
+      "bytes": 42031,
+      "mtime_ns": 1792041426809669852,
+      "device": 64770,
+      "inode": 23462287
+    },
+    "Mali/2018-19/_/individual_education.parquet": {
+      "sha256": "8822ef496b75b2fa22f0cd020bf2f3df4ce5c8c35dde7637a7231c7e84d34301",
+      "bytes": 105309,
+      "mtime_ns": 1792041333994940430,
+      "device": 64770,
+      "inode": 23462280
+    },
+    "Mali/2018-19/_/interview_date.parquet": {
+      "sha256": "21a756a30f7542c8c4923c2305baf639f28530ce4343631deaf95c27a43b9e04",
+      "bytes": 47806,
+      "mtime_ns": 1792041404349493340,
+      "device": 64770,
+      "inode": 23462278
+    },
+    "Mali/2018-19/_/plot_features.parquet": {
+      "sha256": "4112335a0b33195128b7949b046e0c6bbc7941341a810bcae8342171ba0e6f5e",
+      "bytes": 65786,
+      "mtime_ns": 1792041483999113726,
+      "device": 64770,
+      "inode": 23462281
+    },
+    "Mali/2018-19/_/sample.parquet": {
+      "sha256": "859ed84f8828f0a8fe0b5876157933032c05b70d2dc9f3ef81695861700a94ce",
+      "bytes": 49735,
+      "mtime_ns": 1792041257735343100,
+      "device": 64770,
+      "inode": 23462282
+    },
+    "Mali/2018-19/_/shocks.parquet": {
+      "sha256": "41e063ea783522dd3e973a45fb4816eb6fac87ffd13896a128e88a92a217202e",
+      "bytes": 122380,
+      "mtime_ns": 1792041448925841541,
+      "device": 64770,
+      "inode": 23462289
+    },
+    "Mali/2018-19/_/subjective_well_being.parquet": {
+      "sha256": "da34eab8ac80c030d4493d201546fa21c5b9d7744c883456ad8f002cb498ed87",
+      "bytes": 44254,
+      "mtime_ns": 1792041337242965956,
+      "device": 64770,
+      "inode": 23462286
+    },
+    "Mali/2021-22/_/assets.parquet": {
+      "sha256": "fc55421675fcbf753f46b654778a90d8c04a5058c785d04bb84531721bef4709",
+      "bytes": 318173,
+      "mtime_ns": 1792041424672653057,
+      "device": 64770,
+      "inode": 23462297
+    },
+    "Mali/2021-22/_/cluster_features.parquet": {
+      "sha256": "31df3c78f1fbb8958cebbca7dbc922e8d3d9d38e324b6ea95289b93022d876e8",
+      "bytes": 20951,
+      "mtime_ns": 1792041261888375587,
+      "device": 64770,
+      "inode": 23462298
+    },
+    "Mali/2021-22/_/food_acquired.parquet": {
+      "sha256": "03b073d5a1e4d6266953f1042ed7ab1a3c6a7f5e560366c24e99f9fc92b09a31",
+      "bytes": 576209,
+      "mtime_ns": 1792041394227413791,
+      "device": 64770,
+      "inode": 23462299
+    },
+    "Mali/2021-22/_/food_security.parquet": {
+      "sha256": "044ea028418174c6f49a45f40ce46a2fd9fe2664411321529e596ec81b592867",
+      "bytes": 71060,
+      "mtime_ns": 1792041338973979560,
+      "device": 64770,
+      "inode": 23462293
+    },
+    "Mali/2021-22/_/household_roster.parquet": {
+      "sha256": "4f45ee4669f5f69b05615f30e2ce0219e23bd695a4f350ea8e7b66407640968d",
+      "bytes": 211039,
+      "mtime_ns": 1792041321649843410,
+      "device": 64770,
+      "inode": 23462302
+    },
+    "Mali/2021-22/_/housing.parquet": {
+      "sha256": "d680f8dbecd55c871af988ff2906f9396660b0ee86aa2454b3711776afd986d7",
+      "bytes": 38390,
+      "mtime_ns": 1792041427239673231,
+      "device": 64770,
+      "inode": 23462301
+    },
+    "Mali/2021-22/_/individual_education.parquet": {
+      "sha256": "a369395148a7a960aad5e727c9b9bbca1f47ec9ff61566782f93e0e3e80988f0",
+      "bytes": 106083,
+      "mtime_ns": 1792041335865955134,
+      "device": 64770,
+      "inode": 23462294
+    },
+    "Mali/2021-22/_/interview_date.parquet": {
+      "sha256": "596b7457872062bb8b091ed6bb2fa1d3e07e4299d2aa8ffdb53142932f420f9c",
+      "bytes": 44852,
+      "mtime_ns": 1792041406996514142,
+      "device": 64770,
+      "inode": 23462292
+    },
+    "Mali/2021-22/_/plot_features.parquet": {
+      "sha256": "c69952773208b4cd84d55b7c59a16afa50b424bfbba66cf90c90562ebcbdbc99",
+      "bytes": 69522,
+      "mtime_ns": 1792041492098176578,
+      "device": 64770,
+      "inode": 23462295
+    },
+    "Mali/2021-22/_/sample.parquet": {
+      "sha256": "6664fa8ae3902d2158685ca8a362fd8000cde63c5fde05aa1cca15916714cb1e",
+      "bytes": 62548,
+      "mtime_ns": 1792041258365348028,
+      "device": 64770,
+      "inode": 23462296
+    },
+    "Mali/2021-22/_/shocks.parquet": {
+      "sha256": "93432405ba5f889b3a995bc05d74ed6099870c34907bcb5516d6181ca603d356",
+      "bytes": 110482,
+      "mtime_ns": 1792041467692987182,
+      "device": 64770,
+      "inode": 23462303
+    },
+    "Mali/2021-22/_/subjective_well_being.parquet": {
+      "sha256": "6498ed158900295255182cb16c209ef06e864e1a48278df7a5a3974fff7f5be2",
+      "bytes": 40465,
+      "mtime_ns": 1792041337667969296,
+      "device": 64770,
+      "inode": 23462300
+    },
+    "Mali/var/assets.parquet": {
+      "sha256": "81c9a408c61159be3b2971a7a9a1b0d2fc8c90d0f0d93c31286112ad74295800",
+      "bytes": 633203,
+      "mtime_ns": 1792041425046655997,
+      "device": 64770,
+      "inode": 23208837
+    },
+    "Mali/var/cluster_features.parquet": {
+      "sha256": "64856b598f984547f7bce64ac25758f97a6d5498606d54c296e7dee348ecef83",
+      "bytes": 52469,
+      "mtime_ns": 1792041261939375986,
+      "device": 64770,
+      "inode": 23208841
+    },
+    "Mali/var/community_prices.parquet": {
+      "sha256": "e3fbb664a5f469ed3dc191754a30ee1a07e46716a2d3ce5dff8d7f50912d597c",
+      "bytes": 90235,
+      "mtime_ns": 1792041648489390569,
+      "device": 64770,
+      "inode": 23208845
+    },
+    "Mali/var/crop_production.parquet": {
+      "sha256": "53f6f771c418d2b169bbf85421d708b14928e8473792b2574d991b082be4f13c",
+      "bytes": 227941,
+      "mtime_ns": 1792041514988354216,
+      "device": 64770,
+      "inode": 23208844
+    },
+    "Mali/var/food_acquired.parquet": {
+      "sha256": "80e7514876b9b7d044c5bbd2f92b0383de4fc38ebb2998166f1ce0c01ef199e0",
+      "bytes": 1736526,
+      "mtime_ns": 1792041395601424589,
+      "device": 64770,
+      "inode": 23208842
+    },
+    "Mali/var/food_coping.parquet": {
+      "sha256": "f2fefcafe56908ab2861e60c672b2ba92a31a0c366d26a464cd4f63212af893e",
+      "bytes": 37907,
+      "mtime_ns": 1792041476090052348,
+      "device": 64770,
+      "inode": 23208839
+    },
+    "Mali/var/food_security.parquet": {
+      "sha256": "d4cb568832e16a20c9c7cd071425e08e4c867d768155786cbbfec9f7a2c630e6",
+      "bytes": 81062,
+      "mtime_ns": 1792041339028979992,
+      "device": 64770,
+      "inode": 23208832
+    },
+    "Mali/var/household_roster.parquet": {
+      "sha256": "fe404f70b8755a1414817159cbc37982b61137a8b5c826fd5efd61b99dbbccd8",
+      "bytes": 1393142,
+      "mtime_ns": 1792041322084846829,
+      "device": 64770,
+      "inode": 23208847
+    },
+    "Mali/var/housing.parquet": {
+      "sha256": "d6bc1476dfe0bfea9dc0c368434828e268b9f3b658963c2458956ed7d76b44b7",
+      "bytes": 103108,
+      "mtime_ns": 1792041427290673632,
+      "device": 64770,
+      "inode": 23208846
+    },
+    "Mali/var/individual_education.parquet": {
+      "sha256": "be28bba7ffab6d9d56bc50064ab3a3ba2c1af63520dcf2ef68c9fd335280ad05",
+      "bytes": 975215,
+      "mtime_ns": 1792041336128957201,
+      "device": 64770,
+      "inode": 23208834
+    },
+    "Mali/var/interview_date.parquet": {
+      "sha256": "51d963e95751f5ba8df564175862fb21f1046510082c51ba0ea784de8c216d32",
+      "bytes": 136208,
+      "mtime_ns": 1792041407111515046,
+      "device": 64770,
+      "inode": 23208830
+    },
+    "Mali/var/livestock.parquet": {
+      "sha256": "f9ca4e7b891bd944e742860f310faf8d807a07ce908fc8affb15338b4ac7f73b",
+      "bytes": 160179,
+      "mtime_ns": 1792041588220922605,
+      "device": 64770,
+      "inode": 23208833
+    },
+    "Mali/var/people_last7days.parquet": {
+      "sha256": "c4c4885f7b2f2fcc9ebbfae7feda85c6c675e48ca87406730351be33f411f8e5",
+      "bytes": 956528,
+      "mtime_ns": 1792041640544328878,
+      "device": 64770,
+      "inode": 23208838
+    },
+    "Mali/var/plot_features.parquet": {
+      "sha256": "1c007727d5ee823bf48e2fb4e2f1014a4982aadb20f0e9198b4e9d8072b4be36",
+      "bytes": 118399,
+      "mtime_ns": 1792041492658180924,
+      "device": 64770,
+      "inode": 23208835
+    },
+    "Mali/var/plot_inputs.parquet": {
+      "sha256": "712ea841456d70b92c41b8064224559eada0086f19bd4220db02acf32df8f787",
+      "bytes": 403925,
+      "mtime_ns": 1792041546978602475,
+      "device": 64770,
+      "inode": 23208840
+    },
+    "Mali/var/plot_labor.parquet": {
+      "sha256": "c30b4b73cc23ffb07502a3fc4708cd5475caa4f6a3f8f0e53944e1201ae7548a",
+      "bytes": 230011,
+      "mtime_ns": 1792041606564065033,
+      "device": 64770,
+      "inode": 23208831
+    },
+    "Mali/var/sample.parquet": {
+      "sha256": "8e9c3c0c69dcece14315f42a57dd7751cabf0eefa5c868c18977446df4df90f9",
+      "bytes": 178014,
+      "mtime_ns": 1792041258484348959,
+      "device": 64770,
+      "inode": 23208836
+    },
+    "Mali/var/shocks.parquet": {
+      "sha256": "1168d64b03f1ed5b97b470e04560a405f85d2409e29c7d4dcd2116df398b2b73",
+      "bytes": 392233,
+      "mtime_ns": 1792041467967989317,
+      "device": 64770,
+      "inode": 23208848
+    },
+    "Mali/var/subjective_well_being.parquet": {
+      "sha256": "6a330f2e1ca728029915389db7dcf73960ca372019921917d52a0c97facbb1aa",
+      "bytes": 52439,
+      "mtime_ns": 1792041337711969641,
+      "device": 64770,
+      "inode": 23208843
+    },
+    "Tanzania/2008-15/_/anthropometry.parquet": {
+      "sha256": "bdd9841862fff762491340479d679619afeb7c6ceafd65b5aeb415fd986ced59",
+      "bytes": 680095,
+      "mtime_ns": 1792042560386495023,
+      "device": 64770,
+      "inode": 23462385
+    },
+    "Tanzania/2008-15/_/cluster_features.parquet": {
+      "sha256": "f8b31e2183cdc1a6dfbec389fc5a8eae3c77f4b7ef5f1f8071f427ca9f89b014",
+      "bytes": 127386,
+      "mtime_ns": 1792042512816126129,
+      "device": 64770,
+      "inode": 23462391
+    },
+    "Tanzania/2008-15/_/food_acquired.parquet": {
+      "sha256": "4a8bba7bfd1c3d367149c6e9a547f89c52b017268f3405367be5cb8a705b32f7",
+      "bytes": 922121,
+      "mtime_ns": 1792042660700272928,
+      "device": 64770,
+      "inode": 23462392
+    },
+    "Tanzania/2008-15/_/food_coping.parquet": {
+      "sha256": "f2ed3aa298090ae1a3ad6a0b147860349ad92a82e08c6c7d802415d7ad361cc9",
+      "bytes": 204476,
+      "mtime_ns": 1792042604016833364,
+      "device": 64770,
+      "inode": 23462390
+    },
+    "Tanzania/2008-15/_/household_roster.parquet": {
+      "sha256": "b7004eba65fde776dd680f068596304dea052e486038b36d9ff2e2f0ada79058",
+      "bytes": 727358,
+      "mtime_ns": 1792042530251261333,
+      "device": 64770,
+      "inode": 23462394
+    },
+    "Tanzania/2008-15/_/housing.parquet": {
+      "sha256": "4da054aad46fb15720b69449608d8b7460cf3310bfd3a5ca79be5d0fbe90fadf",
+      "bytes": 114534,
+      "mtime_ns": 1792042695819545267,
+      "device": 64770,
+      "inode": 23462393
+    },
+    "Tanzania/2008-15/_/individual_education.parquet": {
+      "sha256": "a89be97c1d8ddea28bc09c4b467089d0e42b51fa04990dd58b56e9753301a2e3",
+      "bytes": 285094,
+      "mtime_ns": 1792042539292331444,
+      "device": 64770,
+      "inode": 23462388
+    },
+    "Tanzania/2008-15/_/interview_date.parquet": {
+      "sha256": "f9fef5fdecdea7743c8a55b147d4a5b6c7b555817febaa49a1be9c64f45840fa",
+      "bytes": 143170,
+      "mtime_ns": 1792042624824994725,
+      "device": 64770,
+      "inode": 23462386
+    },
+    "Tanzania/2008-15/_/life_satisfaction.parquet": {
+      "sha256": "62d67faafbae2d8a52bdecf750e006391f07785024220085aa3b63502f98064f",
+      "bytes": 326808,
+      "mtime_ns": 1792042581474658556,
+      "device": 64770,
+      "inode": 23462387
+    },
+    "Tanzania/2008-15/_/sample.parquet": {
+      "sha256": "9e44640954266361593261e4acc24e64b1b7412580a862565c6b781acd49bad5",
+      "bytes": 284611,
+      "mtime_ns": 1792042504849064347,
+      "device": 64770,
+      "inode": 23462389
+    },
+    "Tanzania/2008-15/_/shocks.parquet": {
+      "sha256": "c43e24797e1079e2a89dc199002cfdcd27ac3bf545d99b7f954437920a5afeca",
+      "bytes": 191959,
+      "mtime_ns": 1792042521448193068,
+      "device": 64770,
+      "inode": 23462395
+    },
+    "Tanzania/2019-20/_/anthropometry.parquet": {
+      "sha256": "38781dc7c8e015e30203bc73f3cb26ff04e7ab228a4086f35872a2c871542054",
+      "bytes": 31431,
+      "mtime_ns": 1792042567296548609,
+      "device": 64770,
+      "inode": 23462342
+    },
+    "Tanzania/2019-20/_/assets.parquet": {
+      "sha256": "86fc02ec3bfd0c174ae05ee44cda35421fa590b399d9f1e13589153811f0314a",
+      "bytes": 102886,
+      "mtime_ns": 1792042688722490232,
+      "device": 64770,
+      "inode": 23462351
+    },
+    "Tanzania/2019-20/_/cluster_features.parquet": {
+      "sha256": "2cb21fc38f3a54adfbded2f2fbe7e87c3301e190f2f42bb74c72e20c1d91992b",
+      "bytes": 12118,
+      "mtime_ns": 1792042513451131053,
+      "device": 64770,
+      "inode": 23462355
+    },
+    "Tanzania/2019-20/_/community_cluster_xwalk.parquet": {
+      "sha256": "6697b30887fddebe7e5bc0a57065438b0652b55b87aeb2e9a48c6f9b1bca7e6d",
+      "bytes": 5935,
+      "mtime_ns": 1792042804659384271,
+      "device": 64770,
+      "inode": 23462346
+    },
+    "Tanzania/2019-20/_/community_prices.parquet": {
+      "sha256": "15c04494025e271c715d7678e6f7720a6927b8d333eaf2f204fcb96821dc11e5",
+      "bytes": 16148,
+      "mtime_ns": 1792042791493283173,
+      "device": 64770,
+      "inode": 23462358
+    },
+    "Tanzania/2019-20/_/crop_production.parquet": {
+      "sha256": "3e8081740ea95328e0bb240639b7b819c725611a854c04acb19cc9f791600f6a",
+      "bytes": 28236,
+      "mtime_ns": 1792042717350712235,
+      "device": 64770,
+      "inode": 23462357
+    },
+    "Tanzania/2019-20/_/food_acquired.parquet": {
+      "sha256": "e4f9da7cf3d1bc6348f156fce067ebb011dfc40c20316147e016ddd522648467",
+      "bytes": 65665,
+      "mtime_ns": 1792042670179346435,
+      "device": 64770,
+      "inode": 23462356
+    },
+    "Tanzania/2019-20/_/food_coping.parquet": {
+      "sha256": "1d88e3deae20403fc21e51feb6ff7c3d90d4400aa6dbdfb387b76652b685b9b7",
+      "bytes": 23628,
+      "mtime_ns": 1792042610899886740,
+      "device": 64770,
+      "inode": 23462353
+    },
+    "Tanzania/2019-20/_/household_roster.parquet": {
+      "sha256": "d43e3c1b317969a5247eac746c12cb2746bf608cb91e6823742f5e3091e0ffbe",
+      "bytes": 29410,
+      "mtime_ns": 1792042531392270182,
+      "device": 64770,
+      "inode": 23462360
+    },
+    "Tanzania/2019-20/_/housing.parquet": {
+      "sha256": "471b10b02e0c129b20fbe9aaa76fd6da7464bc2b959e1fba0b7ea3a389136574",
+      "bytes": 11121,
+      "mtime_ns": 1792042696443550106,
+      "device": 64770,
+      "inode": 23462359
+    },
+    "Tanzania/2019-20/_/individual_education.parquet": {
+      "sha256": "df59827d645e1c3f6b4291488282d93550d04c08564689bd42cae19e7b67d8e7",
+      "bytes": 14407,
+      "mtime_ns": 1792042546061383936,
+      "device": 64770,
+      "inode": 23462348
+    },
+    "Tanzania/2019-20/_/interview_date.parquet": {
+      "sha256": "9adae44505b5f40d944621ae2cd5db5357f16526df6f9da06361e6355acd1e90",
+      "bytes": 22825,
+      "mtime_ns": 1792042625367998936,
+      "device": 64770,
+      "inode": 23462343
+    },
+    "Tanzania/2019-20/_/life_satisfaction.parquet": {
+      "sha256": "43ae492e0afe65cef712252121ac7d4335c2e2c0ee511f115a740df728c15bff",
+      "bytes": 22331,
+      "mtime_ns": 1792042588459712723,
+      "device": 64770,
+      "inode": 23462345
+    },
+    "Tanzania/2019-20/_/livestock.parquet": {
+      "sha256": "f0985941e2c2ddf235675caf4e1e2f6c641d7e4253bc06c01dfd01bd6b072b01",
+      "bytes": 10654,
+      "mtime_ns": 1792042777101172660,
+      "device": 64770,
+      "inode": 23462347
+    },
+    "Tanzania/2019-20/_/people_last7days.parquet": {
+      "sha256": "9cd31a55c9427770a31a97c7370e328e9d5b7b01757e023c48716dfe68d5dca3",
+      "bytes": 32330,
+      "mtime_ns": 1792042761078049624,
+      "device": 64770,
+      "inode": 23462352
+    },
+    "Tanzania/2019-20/_/plot_features.parquet": {
+      "sha256": "64e602d06f11e9b2951ba9f1c717c42532281386706565aa275ae372fbaf9473",
+      "bytes": 29593,
+      "mtime_ns": 1792042703541605150,
+      "device": 64770,
+      "inode": 23462349
+    },
+    "Tanzania/2019-20/_/plot_inputs.parquet": {
+      "sha256": "9423d28643e2ab36e1a0e32e588d973423a197ea751ceb0495e15e8b87e53c68",
+      "bytes": 18765,
+      "mtime_ns": 1792042731818824431,
+      "device": 64770,
+      "inode": 23462354
+    },
+    "Tanzania/2019-20/_/plot_labor.parquet": {
+      "sha256": "326f07f907c7246af7cf2a10dbe2fb4b531f632be59a9f58c7bfbdcf73a2e503",
+      "bytes": 10974,
+      "mtime_ns": 1792042746724939410,
+      "device": 64770,
+      "inode": 23462344
+    },
+    "Tanzania/2019-20/_/sample.parquet": {
+      "sha256": "67749416ede03b370cdf8704ba98a6e1b350adcf275adc00196e7aa76beaf5d4",
+      "bytes": 33191,
+      "mtime_ns": 1792042505615070287,
+      "device": 64770,
+      "inode": 23462350
+    },
+    "Tanzania/2019-20/_/shocks.parquet": {
+      "sha256": "81548721050fd35c402d12b3247cd4a004e70faca2c3a38629ca0b4cb79927f1",
+      "bytes": 15606,
+      "mtime_ns": 1792042522175198706,
+      "device": 64770,
+      "inode": 23462361
+    },
+    "Tanzania/2020-21/_/anthropometry.parquet": {
+      "sha256": "50b524a3b27b2cda343cf3de3895249614bac895e60318991696a21855f62790",
+      "bytes": 94062,
+      "mtime_ns": 1792042573654597913,
+      "device": 64770,
+      "inode": 23462364
+    },
+    "Tanzania/2020-21/_/cluster_features.parquet": {
+      "sha256": "8855f02d7b49d915f85f69be128cd0955c5b99ab9abc670023219279b2f77dda",
+      "bytes": 32832,
+      "mtime_ns": 1792042513626132410,
+      "device": 64770,
+      "inode": 23462376
+    },
+    "Tanzania/2020-21/_/community_cluster_xwalk.parquet": {
+      "sha256": "4c7e92dbfc6a65813c76a7c854009762db017dff81d4ea3c76e49f1171b8fd54",
+      "bytes": 14463,
+      "mtime_ns": 1792042810919432340,
+      "device": 64770,
+      "inode": 23462368
+    },
+    "Tanzania/2020-21/_/community_prices.parquet": {
+      "sha256": "4a33c73d5d34337c6ace524fcf0a8dc90ef92278917c0b7c0241311ce30df1fe",
+      "bytes": 58515,
+      "mtime_ns": 1792042797851331994,
+      "device": 64770,
+      "inode": 23462379
+    },
+    "Tanzania/2020-21/_/crop_production.parquet": {
+      "sha256": "fec92d4515f1e549c477f3d1f8db56088733893d0046ff8240bc62b7ea83b64e",
+      "bytes": 83525,
+      "mtime_ns": 1792042724373766697,
+      "device": 64770,
+      "inode": 23462378
+    },
+    "Tanzania/2020-21/_/food_acquired.parquet": {
+      "sha256": "b0f3af06e49bca237269f78430cfddd6cc332e34c5ebb6bec0c206de31de8ac8",
+      "bytes": 32831,
+      "mtime_ns": 1792042677482403068,
+      "device": 64770,
+      "inode": 23462377
+    },
+    "Tanzania/2020-21/_/food_coping.parquet": {
+      "sha256": "0add6281a109f3b677cfa2f5a84850d6a939874a6cc477ca4b675116adf7e9cf",
+      "bytes": 94387,
+      "mtime_ns": 1792042617437937441,
+      "device": 64770,
+      "inode": 23462374
+    },
+    "Tanzania/2020-21/_/household_roster.parquet": {
+      "sha256": "ff2a848620046e868dc1164f08c129279de3d83d2033609226aba58294db4f83",
+      "bytes": 101424,
+      "mtime_ns": 1792042531830273578,
+      "device": 64770,
+      "inode": 23462381
+    },
+    "Tanzania/2020-21/_/housing.parquet": {
+      "sha256": "9d2adf8533ccbcf5fbc11137e60da0203a269bb61072ae2f1c46ea0427c1966c",
+      "bytes": 34830,
+      "mtime_ns": 1792042696614551433,
+      "device": 64770,
+      "inode": 23462380
+    },
+    "Tanzania/2020-21/_/individual_education.parquet": {
+      "sha256": "b9b2ab863a6ea0a67837ca78c647a58112d5dbb57ce64ecc78275ad87ec40da3",
+      "bytes": 47192,
+      "mtime_ns": 1792042552754435839,
+      "device": 64770,
+      "inode": 23462370
+    },
+    "Tanzania/2020-21/_/interview_date.parquet": {
+      "sha256": "bf1c926be11c8eccf8ab33703f17802b2fbaa6c2b1d66807a818da5776eb04f2",
+      "bytes": 79443,
+      "mtime_ns": 1792042625492999906,
+      "device": 64770,
+      "inode": 23462365
+    },
+    "Tanzania/2020-21/_/life_satisfaction.parquet": {
+      "sha256": "45ba0813affe74d0feb3244f31d2c58737aa044dcbdf35e4d8d1000974facca6",
+      "bytes": 79728,
+      "mtime_ns": 1792042595051763842,
+      "device": 64770,
+      "inode": 23462367
+    },
+    "Tanzania/2020-21/_/livestock.parquet": {
+      "sha256": "f5ca0f594ef313da74d4c692445f6d824e64344525266c24c3db2f438c9541f5",
+      "bytes": 32167,
+      "mtime_ns": 1792042784464229199,
+      "device": 64770,
+      "inode": 23462369
+    },
+    "Tanzania/2020-21/_/people_last7days.parquet": {
+      "sha256": "dd0ed74ad5a665ebdde7f911a31764d477e6310c90805eaefbf1e5306a95cbf7",
+      "bytes": 108216,
+      "mtime_ns": 1792042770080118748,
+      "device": 64770,
+      "inode": 23462373
+    },
+    "Tanzania/2020-21/_/plot_features.parquet": {
+      "sha256": "43bd32d499fc8d24a8d964386dba9881804c0e5f8429be96c29c72e9e78a5722",
+      "bytes": 67397,
+      "mtime_ns": 1792042710358658014,
+      "device": 64770,
+      "inode": 23462371
+    },
+    "Tanzania/2020-21/_/plot_inputs.parquet": {
+      "sha256": "2b697eca7a72c79065d7efd61bb5d2ff8b8aca1b50ddfc04a51f9826190f7088",
+      "bytes": 57005,
+      "mtime_ns": 1792042739675885284,
+      "device": 64770,
+      "inode": 23462375
+    },
+    "Tanzania/2020-21/_/plot_labor.parquet": {
+      "sha256": "dc26081616af8c2d8b532baa050c1c8b0fafc0be39dfb59f6b4bd22824ba03c3",
+      "bytes": 40757,
+      "mtime_ns": 1792042753778993576,
+      "device": 64770,
+      "inode": 23462366
+    },
+    "Tanzania/2020-21/_/sample.parquet": {
+      "sha256": "ef65a0f5a95d137e8c138c037116f61bb29cf00ae56d6263b392a4c0f46fb187",
+      "bytes": 124480,
+      "mtime_ns": 1792042505829071946,
+      "device": 64770,
+      "inode": 23462372
+    },
+    "Tanzania/2020-21/_/shocks.parquet": {
+      "sha256": "b4fd37dd9ee275d4591edb34141cc6d413ea11e54483fbbe4bc8294240f17e0c",
+      "bytes": 76010,
+      "mtime_ns": 1792042523140206189,
+      "device": 64770,
+      "inode": 23462382
+    },
+    "Tanzania/var/anthropometry.parquet": {
+      "sha256": "d31efd846df702f7d8fe95fa489f2473abe643098cef85fd55859b9ef86c13c9",
+      "bytes": 742862,
+      "mtime_ns": 1792042574168601899,
+      "device": 64770,
+      "inode": 23462320
+    },
+    "Tanzania/var/assets.parquet": {
+      "sha256": "317cb9377af74075282e7550fbb4e204f2f0b93e1a894633f146bf589fc4b024",
+      "bytes": 104920,
+      "mtime_ns": 1792042688841491155,
+      "device": 64770,
+      "inode": 23462329
+    },
+    "Tanzania/var/cluster_features.parquet": {
+      "sha256": "a8e54ae6b5431bc6e22ef285afe11f7b7e4f082c4ae9795ae77b427daa1a6ae7",
+      "bytes": 25459,
+      "mtime_ns": 1792042513679132821,
+      "device": 64770,
+      "inode": 23462333
+    },
+    "Tanzania/var/community_cluster_xwalk.parquet": {
+      "sha256": "799801b9f093c153a17dc8ffce973f54e451163c7149d7a66765e2080d53783d",
+      "bytes": 16676,
+      "mtime_ns": 1792042811323435442,
+      "device": 64770,
+      "inode": 23462324
+    },
+    "Tanzania/var/community_prices.parquet": {
+      "sha256": "68e852ea7874510910eb08811e9d82b81871da42c28638c94fcacb961af5377c",
+      "bytes": 62427,
+      "mtime_ns": 1792042798272335227,
+      "device": 64770,
+      "inode": 23462336
+    },
+    "Tanzania/var/crop_production.parquet": {
+      "sha256": "825bcef4cb5dc770ed4309a1c3c109888c73dcda6ca1f01a23f8fe3bd2bd5c68",
+      "bytes": 104724,
+      "mtime_ns": 1792042724841770326,
+      "device": 64770,
+      "inode": 23462335
+    },
+    "Tanzania/var/food_acquired.parquet": {
+      "sha256": "89f4859b2ddc3703015026b3117fbd82fb69dbdfdb9208b2a8df137fa1256954",
+      "bytes": 989220,
+      "mtime_ns": 1792042678072407643,
+      "device": 64770,
+      "inode": 23462334
+    },
+    "Tanzania/var/food_coping.parquet": {
+      "sha256": "2256b5fcfc9fea4656a73fec4693abed6754069d9ebcb74b985d6cf7e38041ae",
+      "bytes": 306009,
+      "mtime_ns": 1792042617933941288,
+      "device": 64770,
+      "inode": 23462331
+    },
+    "Tanzania/var/household_roster.parquet": {
+      "sha256": "05b1b031cfe3f98621007ec512c7e863fa074aaef4ef905620385b1ed8d95756",
+      "bytes": 821684,
+      "mtime_ns": 1792042532026275098,
+      "device": 64770,
+      "inode": 23462338
+    },
+    "Tanzania/var/housing.parquet": {
+      "sha256": "f5b0b6c49ae07b42dec96a8358e92779c13b78617b7687a56c485a8292f97643",
+      "bytes": 118575,
+      "mtime_ns": 1792042696693552045,
+      "device": 64770,
+      "inode": 23462337
+    },
+    "Tanzania/var/individual_education.parquet": {
+      "sha256": "174c4dfa72f795cf3eaad68206a6f5b2f722f7b15a97938b1fe86d0499a59a91",
+      "bytes": 313061,
+      "mtime_ns": 1792042553259439755,
+      "device": 64770,
+      "inode": 23462326
+    },
+    "Tanzania/var/interview_date.parquet": {
+      "sha256": "41ce97601e33b270ee552e40273d3e8ad90c7e509b0532ff20f14a712df83909",
+      "bytes": 199984,
+      "mtime_ns": 1792042625619000883,
+      "device": 64770,
+      "inode": 23462321
+    },
+    "Tanzania/var/life_satisfaction.parquet": {
+      "sha256": "cd48a9b56939ad3e921fc91a0afa9988106d1a3e5fc8ca42f23a01f8e91f8ceb",
+      "bytes": 371638,
+      "mtime_ns": 1792042595569767859,
+      "device": 64770,
+      "inode": 23462323
+    },
+    "Tanzania/var/livestock.parquet": {
+      "sha256": "58016fa25dd9b4e27cb69330d7d384cee5611a03707529c27304f67dc5862afc",
+      "bytes": 39935,
+      "mtime_ns": 1792042784925232739,
+      "device": 64770,
+      "inode": 23462325
+    },
+    "Tanzania/var/people_last7days.parquet": {
+      "sha256": "0cdff83422df08e0973264923c37d32d84fd2659afff17b943ce0d8f5af9720d",
+      "bytes": 137269,
+      "mtime_ns": 1792042770565122472,
+      "device": 64770,
+      "inode": 23462330
+    },
+    "Tanzania/var/plot_features.parquet": {
+      "sha256": "5e440cd854617a60c9507ee556bc4afcaa0a1f6d9da31ddb735fea04ee5ff72b",
+      "bytes": 88222,
+      "mtime_ns": 1792042710825661635,
+      "device": 64770,
+      "inode": 23462327
+    },
+    "Tanzania/var/plot_inputs.parquet": {
+      "sha256": "981adb7cc45f6c5afc8f1493631e54312a90fdd4e06f5b9a56bb8c532dab374f",
+      "bytes": 72572,
+      "mtime_ns": 1792042740088888455,
+      "device": 64770,
+      "inode": 23462332
+    },
+    "Tanzania/var/plot_labor.parquet": {
+      "sha256": "b3181472b0f637ece48e04058cd74542a4dc2cf749c5c50b4b7997644e5c579b",
+      "bytes": 49819,
+      "mtime_ns": 1792042754199996809,
+      "device": 64770,
+      "inode": 23462322
+    },
+    "Tanzania/var/sample.parquet": {
+      "sha256": "2ac46c72db853017f4f2d789a317808327609ea74d63d60a620e317a178c697a",
+      "bytes": 396067,
+      "mtime_ns": 1792042505977073094,
+      "device": 64770,
+      "inode": 23462328
+    },
+    "Tanzania/var/shocks.parquet": {
+      "sha256": "34d0101d21c1b5605f5f5394271e17740c7f4d7aefd80b4142608d46986a78f3",
+      "bytes": 247333,
+      "mtime_ns": 1792042523302207445,
+      "device": 64770,
+      "inode": 23462339
+    }
+  }
+}

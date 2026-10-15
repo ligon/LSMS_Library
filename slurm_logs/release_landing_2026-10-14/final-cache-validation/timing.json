@@ -1,0 +1,6 @@
+{
+  "country_process_wall_seconds": 2098.114767551422,
+  "recorded_pause_seconds": 404.23982334136963,
+  "per_table_elapsed_sum_seconds": 2662.8248709188774,
+  "scope": "Elapsed table/wall measurements include the diagnostic SIGSTOP pause when applicable; wall times overlap across at most two countries."
+}

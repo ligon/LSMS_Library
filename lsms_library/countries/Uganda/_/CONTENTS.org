@@ -1898,6 +1898,34 @@ Both builders remain available. Country-script output remains hashless;
 GH #809's rebuild policy and GH #788's general sibling-write/authority
 questions are unchanged.
 
+*** Coupled FCT/nutrition writes still change sibling freshness [2026-10-15]
+
+The October 14 hashless FCT/earnings observation above is one call-order
+state. On final release source =3914d8804=, ordinary trailing calls
+=fct(), earnings(), fct(), earnings()= leave FCT and earnings fresh but
+=var/nutrition.parquet= hashless, with no wave-coverage footer.
+=_/Makefile:142-143= gives FCT and nutrition the same =nutrition.py=
+recipe; the script writes both without metadata, and the framework
+verifies/stamps only the requested table. The recipe and script predate
+v0.14.0. Repeating only the FCT/earnings reads does not repair the
+nutrition sibling's metadata.
+
+Nutrition's frame remains the approved #967 result: 23,777 x 15,
+content hash =12d25f6e...50e3a=. All 1,519 final raw-frame fingerprints
+and schemas match the cold corpus, but final country metadata is
+423 fresh plus this one hashless artifact, not 424 simultaneously
+fresh. Matching values do not establish freshness metadata.
+
+The release cache-promotion disposition excludes exactly
+=Uganda/var/nutrition.parquet= and calls for backup-then-retirement of
+its shared counterpart if present. It preserves the private artifact
+and does not manually stamp it or combine earlier cache snapshots.
+Under #809 the next ordinary nutrition read rebuilds; that same recipe
+can leave FCT hashless again. This is a bounded cache disposition,
+not a repair of the general #788 builder-authority/sibling-write issue,
+which remains open. The October 15 #967 approval remains in force;
+no nutrition value, factor policy or fixture changes here.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\

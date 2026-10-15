@@ -22,12 +22,17 @@ records final SHAs, results, remaining issues, and cache status.
 Execution is underway under the maintainer's approval. See EXECUTION.org and
 the archived lane reports for reviewed heads, actual merges and validation.
 The private corpus rebuild completed: 530 of 549 declared requests succeeded;
-19 documented source/wiring gaps remain. Shared caches remain untouched.
-The cache-presence follow-up is complete, with the held nutrition failure;
+19 documented source/wiring gaps remain. Final shared promotion is complete,
+with its exact file allowlist, exception and rollback evidence recorded below.
+The cache-presence follow-up is complete, with the then-held nutrition failure;
 the Feature audit completed in another physical copy, retaining all findings.
-The corrected credentialed CI candidate addresses the reproduced #1010 test
-flag leak; full CI remains a gate.
-The Uganda nutrition direction hold remains open; no release tag exists.
+Corrected CI completed with 4,919 passes and three Uganda failures: two assets
+checks and the historical nutrition fixture. The maintainer approved #967 on
+October 15; its narrowly updated fixture passed all 53 entries and the focused
+selection passed 127 tests. PRs #967 and #1014 are merged. Final combined-source
+CI at 3914d8804 passed 4,927 credentialed tests with zero failures; final
+private cache validation and 158 focused tests passed. Shared promotion and
+its independent read-only verification passed; no release tag exists.
 
 * Evidence and corrections to the handoff
 - Local planning base: =a31257286=; GitHub development: =b021bae5d9=.
@@ -182,26 +187,32 @@ skills and script docstrings before editing. Record new idiosyncrasies.
   with BLAS threads pinned, =LSMS_BUILD_WORKERS=1=, and
   =-n <allocated budget> --dist=loadfile=. Write output to files.
   Full credentialed run: 4,951 passed, zero failures. Follow-up of all 2,580
-  cache-presence skips is complete, with the one held nutrition failure.
+  cache-presence skips is complete, with the then-held nutrition failure.
   See full-suite.org and cache-coverage.org for counts and coverage limits.
 - [X] Run the credentialed sequential cold selection named by #941: 451 passed,
   zero skipped at ed1414fb9. Every selected delivery assertion executed.
-- [ ] Complete and record the credentialed data-tests workflow against the
-  candidate. Corrected run 38697245468 remains in progress after the #1010
-  test flag repair. Investigate any EHCVM Derivation/inkind loss; the old
-  failure cause remains unresolved. A warm parallel pass does not clear #941.
+- [X] Complete and record the credentialed data-tests workflow against the
+  candidate. Corrected run 38697245468 completed: 4,919 passed, three Uganda
+  failures (assets twice, nutrition once), 2,768 skips, four xfails, one xpass.
+  All 163 EHCVM outcomes passed. Final run 38746123119 at 3914d8804 passed
+  4,927 tests, 2,768 skips, four xfails and one existing xpass, with zero
+  failures in 3,204.33 seconds. The three old failed nodes executed and passed.
+  The old #941 cause remains unresolved.
 - [X] Validate installed-wheel behaviour from outside the checkout: package
   data, import without Git, no-make wave fallback, and native Windows conda
   script builds. Assert the installed package path; do not let PYTHONPATH
   silently substitute this source checkout for the wheel.
-  Completed at frozen74c9398ec; later changes affect tests/docs/CI only.
+  Completed at frozen74c9398ec; final native Windows run 38746123119 also
+  passed on 3914d8804 after the assets change: shocks 14,457 rows, assets
+  116,808 rows, eight waves each, expected digests. Smoke: 327 pass/1 skip.
 - [X] Independently check the changed data expectations: Burkina money-only
   rows, Peru cluster identity, Panama quantities, Nigeria/Niger sale units,
   and the #967 Uganda kg/nutrition accounting and historical attribution.
   Reviewed before/after evidence is archived; unchanged invariants remain.
-- [ ] Obtain the explicitly required Uganda nutrition direction decision.
-  Arithmetic reconciliation does not lift that scientific hold. The proposed
-  two-field nutrition fixture change remains unapplied.
+- [X] Obtain the explicitly required Uganda nutrition direction decision.
+  Maintainer: "Okay, thumbs up on #967" (2026-10-15), after before/after review.
+  Only the two nutrition fixture fields changed; 127 focused tests passed,
+  all 53 baseline entries matched, and #967 merged at dd6471308 after PR checks.
 
 Gate: no unexplained regression, no worker crash accepted as a test result,
 no required data test accepted merely because it skipped, and independent
@@ -217,15 +228,27 @@ builders off intermediate development heads during the window.
 - [X] Before the window, snapshot the reference revision, cache coverage,
   data digests/row counts and freshness. An old warm parquet is not a baseline
   merely because it exists. Separate package-data equality from footer hashes.
-- [ ] Merge the reviewed branches to development and reconcile mirror/GitHub
-  tips. Verify resulting content against the tested integration candidate;
-  re-run affected checks if conflict resolutions or code changed.
-- [ ] Rebuild the corpus against the FINAL combined development revision,
+- [X] Merge the reviewed branches to development and reconcile mirror/GitHub
+  tips. All 23 implementation PRs are landed at 3914d8804; its full tree is
+  identical to reviewed assets head 515864c99. Integration also matches.
+  Final CI run 38746123119 includes credentialed data and native Windows.
+  Original 193 ref versions now have final dispositions: 101 landed, 63
+  superseded, 19 retained rejected, six archives and four integration refs;
+  none remains active. See final-original-ref-dispositions.json.
+- [X] Rebuild the corpus against the FINAL combined development revision,
   serially within each country and with bounded parallelism across countries.
   Preserve L1 blobs. Prefer a fresh private L2 root sharing L1 for cold proof;
   perform the shared-cache warm only after the final heads have landed.
   Do not use assume_cache_fresh=True or a global LSMS_NO_CACHE loop as proof
   of a complete warm; script-path caches have different bypass behaviour.
+  Final private pass at 3914d8804 is complete: 549 requests, 530 successes,
+  same 19 source/wiring errors; all 28 Uganda served outputs match. Final
+  focused tests: 158 passed, zero skips/failures. Reviewed manifest admits
+  1,518 files and excludes only the hashless nutrition sibling described below.
+  Promotion completed after final credentialed CI passed: 153 new paths,
+  1,215 replacements with verified backups, 150 identical paths retained,
+  zero deletions. Second verification passed; both private roots and L1 are
+  preserved. The sole planned retirement target was already absent.
 - [X] Enumerate every declared country/table, including noncanonical tables
   and empty/unavailable cells. Record success/failure and expected wave
   coverage; a scan of only canonical Feature tables is not a corpus census.
@@ -254,6 +277,21 @@ Gate: one documented warm of the final release tree, every requested cell
 accounted for, and no unexplained data loss. Private branch verification can
 require additional scoped builds; "once" refers to the shared corpus warm.
 
+Final comparison retains four bounded, investigated served-result exceptions:
+the existing #798 mixed-date warm losses in Mali (12,745 valid dates) and
+Tanzania (5,893); Liberia date precision s->ms with identical timestamps; and
+Mali MonthsSpent numeric-to-string serialization with exact numeric values,
+missingness and keys. Raw parquets remain complete and unchanged. Independent
+reviews support attribution, not general API parity or scientific approval.
+No extra pair or unexplained raw change is accepted by the final manifest.
+Trailing Uganda fct/earnings reads exposed the reciprocal #788 nutrition
+rewrite. Final metadata: 423 fresh country parquets plus one hashless nutrition
+file, whose approved values are unchanged. All 1,519 raw fingerprints match.
+Exclude that exact file and back up/retire its shared counterpart if present;
+it is absent in the fresh shared snapshot. Do not assemble a fictional
+424-fresh snapshot or manually stamp metadata. Default nutrition reads rebuild
+and can leave FCT hashless again. Independent review approved this disposition.
+
 * Phase 5 — reconcile issues and prepare the release
 - [X] Apply reviewed issue reconciliation: 18 partial scopes narrowed with
   source/PR references, residuals filed and verified complete scopes listed
@@ -271,7 +309,9 @@ require additional scoped builds; "once" refers to the shared corpus warm.
   current dependency changes, both-tier rebuild cost and known residuals.
 - [X] Run =make api-audit STRICT=1=, docs build, and package-content/version
   checks. Retain dynamic versioning's [project]/[tool.poetry] conventions.
-  Frozen74c9398ec passed; the later docs checkpoint passed a strict docs build.
+  Frozen74c9398ec passed; the final documentation checkpoint also passed
+  strict API audit and strict MkDocs build. Runtime/config (except prose
+  CONTENTS), tests, dependencies and build recipe match validated 3914d8804.
   Final tagged package verification remains in Phase 6.
 - [X] Open development -> master release PR. List only verified fully
   resolved issues, with one =Closes #N= keyword per issue. Include all gates,
