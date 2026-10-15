@@ -181,10 +181,18 @@ def pytest_runtest_makereport(item, call):
     # net exists because four PRs in one day went red for environmental
     # reasons (#625/#641/#644/#632), and turning the net itself into a
     # failure would reinstate exactly that.
-    warnings.warn(
-        f"{item.nodeid} reached a credential-less skip at RUN time; add "
-        "`pytestmark = pytest.mark.requires_s3` (or mark the test) so it is "
-        "skipped at collection time instead (GH #907)",
-        UnmarkedS3TestWarning,
-        stacklevel=1,
-    )
+    # pytest's recorder wraps the whole runtest protocol, this hook included,
+    # and applies the item's `filterwarnings` marks inside it -- so under a
+    # `filterwarnings("error")` this warn would RAISE here and the net would
+    # crash instead of converting.  The inner catch_warnings restores the
+    # filters afterwards and, being non-recording, leaves pytest's outer
+    # recorder in place, so the warning still reaches the summary.
+    with warnings.catch_warnings():
+        warnings.simplefilter("always", UnmarkedS3TestWarning)
+        warnings.warn(
+            f"{item.nodeid} reached a credential-less skip at RUN time; add "
+            "`pytestmark = pytest.mark.requires_s3` (or mark the test) so it "
+            "is skipped at collection time instead (GH #907)",
+            UnmarkedS3TestWarning,
+            stacklevel=1,
+        )

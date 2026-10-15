@@ -205,7 +205,10 @@ jobs:
   # `dvc commit` to update dep hashes without re-running pipelines.
   dvc-lock-check:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # Push only: a manual `workflow_dispatch` on master (GH #941) must re-run
+    # the tests, not feed the lockfile-refresh job below, which commits and
+    # pushes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     outputs:
       is_dirty: ${{ steps.check.outputs.is_dirty }}
     steps:
