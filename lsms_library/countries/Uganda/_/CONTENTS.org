@@ -1867,6 +1867,37 @@ scripts (this entry) makes the two builders *agree* for =earnings= and
 verified -- but that is convergence by hand, one table at a time, and
 =assets= still disagrees with its own script.
 
+*** Country =assets= compiler correction [2026-10-15]
+
+The preceding disagreement is historical for =assets= after this correction;
+the general GH #788 authority/detection decision remains open. Corrected
+release CI run =38697245468= explicitly ran the country Makefile before its
+raw-cache checks. Its =_/assets.py= emitted 790,688 rows with 673,841 duplicate
+=(i,t,m)= keys, columns =j, level_2, assets=, and only 116,808 non-null asset
+values. A private replay of that unchanged script reproduced both failures
+exactly. The wave concatenation had been the source of the earlier 116,808-row
+measurement above; a warm API check alone therefore missed this build route.
+
+The compiler now concatenates the eight actual wave frames under =t=,
+retains =Value= and item =j=, and applies the existing household =id_walk=
+once. It does not squeeze, manufacture absent wave/item rows, or bake =m=
+into the cache. On physical private copies, the actual Makefile target
+rebuilds all eight waves and emits 116,808 rows, no duplicate raw keys, and
+the same values, dtypes, index, ordering and =id_converted= attribute as the
+existing canonical raw cache. The served API is unchanged, including its
+4,237 existing duplicate keys after item-label harmonization; no new reducer
+or label policy is introduced here. Existing wave ownership/zero-value
+filters and the gsec14 stock definition remain unchanged.
+
+Synthetic tests execute the shipped compiler for disjoint waves, singleton
+rows, multiple items, an all-null wave, and wave-specific household crosswalks.
+All five fail against the former script and pass after the repair. The
+existing Uganda baseline manifest contains no assets entry, so this is not a
+baseline regeneration or a claim that its invariance sweep covered assets.
+Both builders remain available. Country-script output remains hashless;
+GH #809's rebuild policy and GH #788's general sibling-write/authority
+questions are unchanged.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\
