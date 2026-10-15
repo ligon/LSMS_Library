@@ -858,7 +858,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Automobile radio with cd player, mp3 playback |  |  | 459 |  |  | automobile radio with cd player, mp3 playback |
 | Azargloss emulsion |  |  | 191 |  |  | azargloss emulsion |
 | Azargloss oil |  |  | 192 |  |  | azargloss oil |
-| Babies bodysuit |  |  | 56 |  |  | babies bodysuit |
+| Babies' bodysuit |  |  | 56 |  |  | babies' bodysuit |
 | Baby sitters,day care attendants, nannies etc |  |  | 344 |  |  | baby sitters,day care attendants, nannies etc |
 | Baby sitters,day care attendants,nannies etc | 114 | 115 |  | baby sitters,day care attendants,nannies etc | baby sitters,day care attendants,nannies etc |  |
 | Barbie baby doll for girls |  |  | 509 |  |  | barbie baby doll for girls |
@@ -885,7 +885,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Brooms | 106 | 107 | 338 | brooms | brooms | brooms |
 | Bucket |  |  | 316 |  |  | bucket |
 | Buckets | 97 | 98 |  | buckets | buckets |  |
-| Budget hotel, capital city  no star bed only |  |  | 593 |  |  | budget hotel, capital city  no star bed only |
+| Budget hotel, capital city - no star bed only |  |  | 593 |  |  | budget hotel, capital city - no star bed only |
 | Calanders | 202 | 203 |  | calanders | calanders |  |
 | Calculator (scientific) |  |  | 493 |  |  | calculator (scientific) |
 | Calculators/organizers | 166 | 167 |  | calculators/organizers | calculators/organizers |  |
@@ -901,8 +901,8 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Carpentary services |  |  | 218 |  |  | carpentary services |
 | Cd/dvd |  |  | 497 |  |  | cd/dvd |
 | Cement(minor repairs) | 49 | 50 | 170 | cement(minor repairs) | cement(minor repairs) | cement(minor repairs) |
-| Charcoal  maxibag |  |  | 230 |  |  | charcoal  maxibag |
-| Charcoal  minibag |  |  | 231 |  |  | charcoal  minibag |
+| Charcoal - maxibag |  |  | 230 |  |  | charcoal - maxibag |
+| Charcoal - minibag |  |  | 231 |  |  | charcoal - minibag |
 | Charges for money orders, bankers drafts |  |  | 634 |  |  | charges for money orders, bankers drafts |
 | Charges for money orders/bankers draft/charges for bank sevi | 245 | 246 |  | charges for money orders/bankers draft/charges for bank sevi | charges for money orders/bankers draft/charges for bank sevi |  |
 | Chest of drawers (3 pull out drawers) |  |  | 244 |  |  | chest of drawers (3 pull out drawers) |
@@ -914,8 +914,8 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Children (6) |  |  | 156 |  |  | children |
 | Children clothing | 31 | 32 |  | children clothing | children clothing |  |
 | Children footwear | 42 | 43 |  | children footwear | children footwear |  |
-| Childrens dress shoes |  |  | 151 |  |  | childrens dress shoes |
-| Childrens long boots |  |  | 152 |  |  | childrens long boots |
+| Children's dress shoes |  |  | 151 |  |  | children's dress shoes |
+| Children's long boots |  |  | 152 |  |  | children's long boots |
 | Cinema/theatre/video houses |  |  | 539 |  |  | cinema/theatre/video houses |
 | Cinemas (visiting) | 193 | 194 |  | cinemas (visiting) | cinemas (visiting) |  |
 | Clothing materials for children | 9 | 10 |  | clothing materials for children | clothing materials for children |  |
@@ -990,7 +990,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Dry cleaning - other material |  |  | 130 |  |  | dry cleaning - other material |
 | Dry cleaning - trousers |  |  | 127 |  |  | dry cleaning - trousers |
 | Dust/quarry dust hullow -6 inches |  |  | 183 |  |  | dust/quarry dust hullow -6 inches |
-| Dust/quarry dust hullow  5 inches |  |  | 185 |  |  | dust/quarry dust hullow  5 inches |
+| Dust/quarry dust hullow - 5 inches |  |  | 185 |  |  | dust/quarry dust hullow - 5 inches |
 | Dvd-player (specify) |  |  | 458 |  |  | dvd-player (specify) |
 | Electric fans | 86 | 87 |  | electric fans | electric fans |  |
 | Electric iron- dry |  |  | 293 |  |  | electric iron- dry |
@@ -1024,7 +1024,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Fair and amusement parks(trade fairs,children fairs) | 192 | 193 |  | fair and amusement parks(trade fairs,children fairs) | fair and amusement parks(trade fairs,children fairs) |  |
 | Fees for gown(graduation) |  |  | 580 |  |  | fees for gown(graduation) |
 | Fertilizers for gardening | 183 | 184 | 518 | fertilizers for gardening | fertilizers for gardening | fertilizers for gardening |
-| Film processing and photo printing  normal service, 36 prints |  |  | 541 |  |  | film processing and photo printing  normal service, 36 prints |
+| Film processing and photo printing - normal service, 36 prints |  |  | 541 |  |  | film processing and photo printing - normal service, 36 prints |
 | Firewood |  |  | 232 |  |  | firewood |
 | Fitness centres(use of) | 190 | 191 |  | fitness centres(use of) | fitness centres(use of) |  |
 | Floor mat (tiles) | 72 | 73 | 248 | floor mat (tiles) | floor mat (tiles) | floor mat (tiles) |
@@ -1045,14 +1045,14 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Game cards(chess,ludo,etc) | 177 | 178 |  | game cards(chess,ludo,etc) | game cards(chess,ludo,etc) |  |
 | Gas cookers,stoves and coalpots | 82 | 83 |  | gas cookers,stoves and coalpots | gas cookers,stoves and coalpots |  |
 | Gas for household use | 65 | 66 |  | gas for household use | gas for household use |  |
-| Gas for household use  14.5kg |  |  | 226 |  |  | gas for household use  14.5kg |
-| Gas for household use  5kg |  |  | 227 |  |  | gas for household use  5kg |
+| Gas for household use - 14.5kg |  |  | 226 |  |  | gas for household use - 14.5kg |
+| Gas for household use - 5kg |  |  | 227 |  |  | gas for household use - 5kg |
 | Gas stove, 2 burners |  |  | 281 |  |  | gas stove, 2 burners |
 | Gas stove, with oven |  |  | 280 |  |  | gas stove, with oven |
 | Generators (household use) | 104 | 105 | 285 | generators (household use) | generators (household use) | generators (household use) |
 | Gifts and tips | 235 | 236 | 622 | gifts and tips | gifts and tips | gifts and tips |
 | Girl's dress |  |  | 55 |  |  | girl's dress |
-| Girls underpants |  |  | 54 |  |  | girls underpants |
+| Girl's underpants |  |  | 54 |  |  | girl's underpants |
 | Graduation fees |  |  | 579 |  |  | graduation fees |
 | Graduation fees excluding gown |  |  | 582 |  |  | graduation fees excluding gown |
 | Greeting cards |  |  | 561 |  |  | greeting cards |
@@ -1069,8 +1069,8 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Hostel dormitory |  |  | 595 |  |  | hostel dormitory |
 | Hostels private |  |  | 589 |  |  | hostels private |
 | Hostels public |  |  | 590 |  |  | hostels public |
-| Hotel, capital city  2 star bed and breakfast |  |  | 592 |  |  | hotel, capital city  2 star bed and breakfast |
-| Hotel, capital city  3 star bed and breakfast |  |  | 591 |  |  | hotel, capital city  3 star bed and breakfast |
+| Hotel, capital city - 2 star bed and breakfast |  |  | 592 |  |  | hotel, capital city - 2 star bed and breakfast |
+| Hotel, capital city - 3 star bed and breakfast |  |  | 591 |  |  | hotel, capital city - 3 star bed and breakfast |
 | House boys/house maids | 112 | 113 | 342 | house boys/house maids | house boys/house maids | house boys/house maids |
 | House keepers/caretakers | 113 | 114 |  | house keepers/caretakers | house keepers/caretakers |  |
 | Housekeepers/caretakers |  |  | 343 |  |  | housekeepers/caretakers |
@@ -1091,12 +1091,12 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Infinix |  |  | 441 |  |  | infinix |
 | International flight one way |  |  | 431 |  |  | international flight one way |
 | International flight two way |  |  | 432 |  |  | international flight two way |
-| Iron rods (1/4) diameter |  |  | 171 |  |  | iron rods (1/4) diameter |
-| Iron rods (3/4) diameter |  |  | 174 |  |  | iron rods (3/4) diameter |
-| Iron rods (5/8) diameter |  |  | 175 |  |  | iron rods (5/8) diameter |
+| Iron rods (1/4") diameter |  |  | 171 |  |  | iron rods (1/4") diameter |
+| Iron rods (3/4") diameter |  |  | 174 |  |  | iron rods (3/4") diameter |
+| Iron rods (5/8") diameter |  |  | 175 |  |  | iron rods (5/8") diameter |
 | Iron rods and roofing sheets | 50 | 51 |  | iron rods and roofing sheets | iron rods and roofing sheets |  |
-| Iron rods(1/2) diameter |  |  | 173 |  |  | iron rods(1/2) diameter |
-| Iron rods(3/8) diameter |  |  | 172 |  |  | iron rods(3/8) diameter |
+| Iron rods(1/2") diameter |  |  | 173 |  |  | iron rods(1/2") diameter |
+| Iron rods(3/8") diameter |  |  | 172 |  |  | iron rods(3/8") diameter |
 | Jeans ( women) |  |  | 74 |  |  | jeans ( women) |
 | Jeans (men) | 20 | 21 | 73 | jeans (men) | jeans (men) | jeans (men) |
 | Jeans (women) | 19 | 20 |  | jeans (women) | jeans (women) |  |
@@ -1161,7 +1161,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Men's socks |  |  | 98 |  |  | men's socks |
 | Men's t-shirt |  |  | 60 |  |  | men's t-shirt |
 | Mens' long boots |  |  | 140 |  |  | mens' long boots |
-| Mens belt (leather or synthetic) |  |  | 97 |  |  | mens belt (leather or synthetic) |
+| Men's belt (leather or synthetic) |  |  | 97 |  |  | men's belt (leather or synthetic) |
 | Metal |  |  | 210 |  |  | metal |
 | Microsoft (nokia) |  |  | 450 |  |  | microsoft (nokia) |
 | Microwave oven |  |  | 284 |  |  | microwave oven |
@@ -1368,9 +1368,9 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Sewage removal | 58 | 59 | 222 | sewage removal | sewage removal | sewage removal |
 | Shirt short sleeves |  |  | 64 |  |  | shirt short sleeves |
 | Shirts | 16 | 17 | 59 | shirts | shirts | shirts |
-| Shoe repair  childrens classic shoes |  |  | 160 |  |  | shoe repair  childrens classic shoes |
-| Shoe repair  mens classic shoes |  |  | 159 |  |  | shoe repair  mens classic shoes |
-| Shoe repair  womens street shoes |  |  | 158 |  |  | shoe repair  womens street shoes |
+| Shoe repair - children's classic shoes |  |  | 160 |  |  | shoe repair - children's classic shoes |
+| Shoe repair - men's classic shoes |  |  | 159 |  |  | shoe repair - men's classic shoes |
+| Shoe repair - women's street shoes |  |  | 158 |  |  | shoe repair - women's street shoes |
 | Shoe shine service charges | 43 | 44 | 165 | shoe shine service charges | shoe shine service charges | shoe shine service charges |
 | Shorts | 17 | 18 |  | shorts | shorts |  |
 | Shovels |  |  | 325 |  |  | shovels |
@@ -1383,14 +1383,14 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Sliding door |  |  | 208 |  |  | sliding door |
 | Smock | 12 | 13 |  | smock | smock |  |
 | Soft contact lenses |  |  | 350 |  |  | soft contact lenses |
-| Solid  5 inches |  |  | 184 |  |  | solid  5 inches |
+| Solid - 5 inches |  |  | 184 |  |  | solid - 5 inches |
 | Solid- 4 inches |  |  | 186 |  |  | solid- 4 inches |
 | Solid- 6 inches |  |  | 182 |  |  | solid- 6 inches |
 | Sony experia |  |  | 448 |  |  | sony experia |
 | Spark plug |  |  | 410 |  |  | spark plug |
 | Sport shoes - brand imitations |  |  | 136 |  |  | sport shoes - brand imitations |
-| Sport shoes  brand imitations (1) |  |  | 142 |  |  | sport shoes  brand imitations |
-| Sport shoes  brand imitations (2) |  |  | 148 |  |  | sport shoes  brand imitations |
+| Sport shoes - brand imitations (1) |  |  | 142 |  |  | sport shoes - brand imitations |
+| Sport shoes - brand imitations (2) |  |  | 148 |  |  | sport shoes - brand imitations |
 | Sports shirt | 18 | 19 |  | sports shirt | sports shirt |  |
 | Sports stadium (watching football & others) | 191 | 192 |  | sports stadium (watching football & others) | sports stadium (watching football & others) |  |
 | Spring mattress (single) |  |  | 239 |  |  | spring mattress (single) |
@@ -1409,7 +1409,7 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Table fan (desk fan) |  |  | 296 |  |  | table fan (desk fan) |
 | Tablecloth |  |  | 267 |  |  | tablecloth |
 | Tablet computer |  |  | 617 |  |  | tablet computer |
-| Tailoring charges - african dress  (slit & kaba) |  |  | 104 |  |  | tailoring charges - african dress  (slit & kaba) |
+| Tailoring charges - african dress - (slit & kaba) |  |  | 104 |  |  | tailoring charges - african dress - (slit & kaba) |
 | Tailoring charges - african type suit (1) |  |  | 102 |  |  | tailoring charges - african type suit |
 | Tailoring charges - african type suit (2) |  |  | 108 |  |  | tailoring charges - african type suit |
 | Tailoring charges - african type suit (3) |  |  | 113 |  |  | tailoring charges - african type suit |
@@ -1517,8 +1517,8 @@ GLSS5/GLSS6 =j= is only valid for the 71 shared rows.*
 | Women's nightgown |  |  | 36 |  |  | women's nightgown |
 | Women's pullover |  |  | 40 |  |  | women's pullover |
 | Women's summer pants(trousers) |  |  | 32 |  |  | women's summer pants(trousers) |
-| Womens dress shoes |  |  | 145 |  |  | womens dress shoes |
-| Womens polyester skirt |  |  | 34 |  |  | womens polyester skirt |
+| Women's dress shoes |  |  | 145 |  |  | women's dress shoes |
+| Women's polyester skirt |  |  | 34 |  |  | women's polyester skirt |
 | Wood,doors and windows | 53 | 54 |  | wood,doors and windows | wood,doors and windows |  |
 | Wrist watch (battery) (specify) |  |  | 601 |  |  | wrist watch (battery) (specify) |
 | Wrist watch (digital watch) (specify) |  |  | 602 |  |  | wrist watch (digital watch) (specify) |

@@ -616,6 +616,18 @@ for this wave: no urban booster, no poor-household oversample, no
 refugee/migrant module subsample.  Searched: the full catalog 4292 study
 description and the catalog-hosted BID.
 
+But the allocation across regions is far from proportional, and nothing
+quoted above says so (GH #812, measured 2026-10-14):
+=Country('CotedIvoire').sample(waves=['2018-19'])= -- 12,992 households,
+1,084 clusters, weight constant within cluster -- puts *36.5% of the
+variance of log cluster weight between the 33 =strata= (regions /
+autonomous districts)*, with sample share over weighted population share
+from 0.33x (Autonome d'Abidjan) to 6.17x (Folon).  Treat the design as
+region-stratified for inference; no source consulted states the allocation
+rule.  =sample.strata= is wired from the cover-page region code
+(=2018-19/_/data_info.yml:16=).  Sibling measurements: Guinea-Bissau
+76.8%, Togo 66.5%, Benin 31.4%.
+
 ** 3. Gaps, recorded as gaps
 
 - 1985-86, 1986-87, 1987-88, 1988-89 :: *no universe statement exists.*
