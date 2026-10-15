@@ -1650,8 +1650,21 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
 #                      is the unit, and the questionnaire disagrees with BOTH
 #                      files (form: 5A p.13 Unit=6b, 5B p.24 Unit=6c).  Only
 #                      the values decide.  See _/CONTENTS.org.
+#                      SLOT 2 (s5bq06{a,b,c,d}_2, 1 436 harvest records) is
+#                      wired since GH #848; it uses WB names while slot 1
+#                      in the SAME file uses the legacy ones -- do not
+#                      assume one prefix per file.  It is a second
+#                      CONDITION of the same plot-crop in season B (harvest
+#                      dates June/July 2018 like slot 1), not a season slot
+#                      as its variable label claims.  Vocabulary decides
+#                      again: s5bq06b_2 is 100% in `harvest_units`, 69.4%
+#                      unit-only; s5bq06c_2 100% in `harvest_conditions`,
+#                      91.1% condition-only.
 #   2019-20            WB names throughout: s5{a,b}q06b_{1,2} = unit,
-#                      s5{a,b}q06c_{1,2} = condition, one pair per slot.
+#                      s5{a,b}q06c_{1,2} = condition, one pair per slot;
+#                      both slots wired in both seasons (season B's slot 2
+#                      since GH #848; s5bq06b_2 64.2% unit-only, s5bq06c_2
+#                      84.8% condition-only).
 #
 # KG FACTOR (`kg_factor` -> the KgFactor column).  UNPS asks q6d, "Record the
 # conversion factor into kg", beside every harvest record.  It is a
@@ -1737,12 +1750,13 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
 # home is a `KgFactor_sold` column beside `Unit_sold`; wiring it ADDS a
 # column and needs its own before/after, exactly as `kg_factor` did (#849).
 #
-# ALSO UNWIRED, for the same reason the matching harvest slots are: 2018-19
-# AGSEC5B's `_2` sold slot (s5bq07{a,b,c}_2, 574-577 non-null), and 2019-20
+# ALSO UNWIRED, for the same reason the matching harvest slots are: 2019-20
 # AGSEC5A's `_11` / `_21` "PART HARVEST" slots -- s5aq07{a,b,c}_{11,21},
 # the sale block belonging to the questionnaire's separate
 # partially-harvested repeat page.  CROP_COLMAPS reads neither, on the
-# harvest side or the sold side, so the two sides stay consistent.
+# harvest side or the sold side, so the two sides stay consistent.  (The
+# 2018-19 AGSEC5B `_2` sold slot, s5bq07{a,b,c}_2, used to be listed here;
+# it is wired with its harvest slot since GH #848.)
 #
 # A NAMED column that is absent from the source now RAISES (`_require` ->
 # CropColmapError) instead of silently falling back.  Write `None` to declare
@@ -1906,11 +1920,32 @@ CROP_COLMAPS = {
                               'value_sold': 's5aq08_1',
                               'month': 's5aq06f_1', 'kg_factor': 'a5aq6d'}]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
-                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
-                              'condition_sold': 's5bq07b_1',
-                              'value_sold': 's5bq08_1',
-                              'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'}]},
+              'conditions': [
+                  # Slot 1: LEGACY a5bq6{b,c,d} names for unit / condition /
+                  # kg factor beside WB s5bq0?_1 names for everything else.
+                  {'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
+                   'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                   'condition_sold': 's5bq07b_1',
+                   'value_sold': 's5bq08_1',
+                   'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'},
+                  # Slot 2 (GH #848): the SAME plot-crop harvested in a
+                  # SECOND CONDITION within season B -- NOT a season slot,
+                  # although s5bq06a_2 is variable-labelled "during the
+                  # second season of 2017": its harvest-end dates are
+                  # June/July 2018 on 1 423 of 1 435 rows, the same window
+                  # as slot 1, whereas AGSEC5A (the real 2017 second
+                  # season) ends Nov/Dec 2017.  All-WB names.  Unit vs
+                  # condition by value-label vocabulary: s5bq06b_2 is 100%
+                  # inside `harvest_units` (69.4% unit-only, 0% cond-only,
+                  # decodes Kg / Sack (100 kgs) / Plastic Basin); s5bq06c_2
+                  # is 100% inside `harvest_conditions` (91.1% cond-only,
+                  # modal 45 "Dry - grain" vs slot 1's modal 20).
+                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                   'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
+                   'condition_sold': 's5bq07b_2',
+                   'value_sold': 's5bq08_2',
+                   'month': 's5bq06f_2', 'kg_factor': 's5bq06d_2'},
+              ]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
                       'flag': 's4aq08', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
@@ -1929,11 +1964,21 @@ CROP_COLMAPS = {
                    'month': 's5aq06f_2'},
               ]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
-                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
-                              'condition_sold': 's5bq07b_1',
-                              'value_sold': 's5bq08_1',
-                              'month': 's5bq06f_1'}]},
+              'conditions': [
+                  {'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
+                   'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                   'condition_sold': 's5bq07b_1', 'value_sold': 's5bq08_1',
+                   'month': 's5bq06f_1'},
+                  # Slot 2 (GH #848), labelled "(2019, condition2)" in the
+                  # file: the same shape as season A's slot 2 above.  No
+                  # `kg_factor` on EITHER 2019-20 slot, deliberately -- this
+                  # wave's q6d (s5bq06d_1 / s5bq06d_2, 7 366 / 921 non-null)
+                  # is #849's scope and needs its own before/after.
+                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                   'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
+                   'condition_sold': 's5bq07b_2', 'value_sold': 's5bq08_2',
+                   'month': 's5bq06f_2'},
+              ]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
                       'flag': 's4aq08', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',

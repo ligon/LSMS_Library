@@ -1078,10 +1078,12 @@ the Stata metadata on 2026-07-21:
 | 2015-16 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
 | 2015-16 | AGSEC5B | a5bq6b    | a5bq6c    | value labels mojibaked (=ï¿½= for the en-dash)           |
 | 2018-19 | AGSEC5A | a5aq6b    | (none)    | no unit column exists -> u='Unknown'; re-tested by value range, #842 |
-| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b    | unit WIRED 2026-09-09 (#842); was =unit: None=           |
+| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b    | slot 1; unit WIRED 2026-09-09 (#842); was =unit: None=   |
+| 2018-19 | AGSEC5B | s5bq06c_2 | s5bq06b_2 | slot 2, WB names in the same file; wired 2026-09-24 (#848) |
 | 2019-20 | agsec5a | s5aq06c_1 | s5aq06b_1 | slot 1                                                   |
 | 2019-20 | agsec5a | s5aq06c_2 | s5aq06b_2 | slot 2                                                   |
-| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1 (slot 2 not wired; see Known Issues)              |
+| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1                                                   |
+| 2019-20 | agsec5b | s5bq06c_2 | s5bq06b_2 | slot 2, wired 2026-09-24 (#848)                          |
 
 *The SALE has its own unit and its own condition* (GH #824, wired
 2026-09-09).  UNPS question 7 is compound -- "how much of the harvest was
@@ -1105,9 +1107,9 @@ questionnaires on 2026-09-09:
 | 2015-16 | AGSEC5A | a5aq7b         | a5aq7c     | 3 862 / 3 891          | (=A5AQ7D=, the sold kg factor, is upper-case in this file only)      |
 | 2015-16 | AGSEC5B | a5bq7b         | a5bq7c     | 2 977 / 3 001          | 7b carries no value labels; values are 100% in-scheme               |
 | 2018-19 | AGSEC5A | s5aq07b_1      | s5aq07c_1  | 2 734 / 2 934          | *a sold unit EXISTS although the harvest side has none* (#842)      |
-| 2018-19 | AGSEC5B | s5bq07b_1      | s5bq07c_1  | 2 331 / 2 530          | =_2= slot not wired (mirrors the unwired harvest =_2= slot)          |
+| 2018-19 | AGSEC5B | s5bq07b_1/_2   | s5bq07c_1/_2 | 2 331+574 / 2 530+577 | slots 1 and 2 (slot 2 wired with its harvest slot, #848)            |
 | 2019-20 | agsec5a | s5aq07b_1/_2   | s5aq07c_1/_2 | 2 759+572 / 2 884+573 | slots 1 and 2; =_11= / =_21= "part harvest" slots not wired         |
-| 2019-20 | agsec5b | s5bq07b_1      | s5bq07c_1  | 2 584 / 2 705          | slot 2 not wired (mirrors the unwired harvest slot 2)               |
+| 2019-20 | agsec5b | s5bq07b_1/_2   | s5bq07c_1/_2 | 2 584+506 / 2 705+511 | slots 1 and 2 (slot 2 wired with its harvest slot, #848)            |
 
 *7b is the condition and 7c the unit in every wave and every season.*  The
 discriminating statistics are the share of values that are codes occurring
@@ -1313,10 +1315,12 @@ second harvest record for the SAME plot-crop in the SAME season B, exactly like
 2019-20's =_2= slot (labelled "condition2"), and its =s5bq06c_2= is 91.1%
 condition-only codes with a different modal condition (45) from slot 1.
 
-Still not wired: it ADDS ~1 435 rows, which is a mass change requiring its own
-before/after, and #842 is verified against a rows-unchanged invariant.  Its
-columns are =s5bq06a_2= / =s5bq06b_2= (unit) / =s5bq06c_2= (condition) /
-=s5bq06d_2= (kg factor, 935 non-null) / =s5bq07a_2= / =s5bq08_2=.
+It stayed outside #842 because it ADDS rows and #842 was verified against a
+rows-unchanged invariant.  *Wired 2026-09-24 under GH #848*, together with
+2019-20 season B's slot 2; the before/after is in the "#848" DONE entry
+below.  Its columns are =s5bq06a_2= / =s5bq06b_2= (unit) / =s5bq06c_2=
+(condition) / =s5bq06d_2= (kg factor, 935 non-null) / =s5bq07a_2= /
+=s5bq07b_2= / =s5bq07c_2= / =s5bq08_2= / =s5bq06f_2=.
 
 *** Naming vintages are mixed WITHIN one file
 
@@ -2078,27 +2082,111 @@ season A "genuinely has no unit column" was re-tested by value range at the
 same time and *stands* — with the correction that the unit was asked and
 lost in the extract, not never asked.
 
-** TODO Second condition slot dropped for 2019-20 season B
+** DONE Second condition slot was dropped for 2018-19 AND 2019-20 season B (GH #848)
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/848][#848]]
+- Status :: *FIXED 2026-09-24*, =uganda.py= =CROP_COLMAPS['2018-19']['B']=
+  and =['2019-20']['B']= each gained a second =conditions= entry.
 
 =agsec5b.dta= (2019-20) carries =s5bq06a_2= / =s5bq06b_2= / =s5bq06c_2=,
-labelled "(2019, condition2)", with 1 306 non-null conditions.
-=CROP_COLMAPS= reads only slot 1, so those harvest records are absent from
-=crop_production= entirely.
+labelled "(2019, condition2)", with 1 307 harvest quantities (1 306 non-null
+conditions).  2018-19 =AGSEC5B= has the same =_2= slot (1 436 quantities).
+=CROP_COLMAPS= read only slot 1 of both, so those harvest records were absent
+from =crop_production= entirely -- while 2019-20 season A already read BOTH
+its slots (an asymmetry since #323).
 
-2018-19 AGSEC5B has the same =_2= slot (1 436 non-null quantities).  This
-entry used to say it "may be a SEASON slot rather than a condition slot"
-because its variable label reads "during the second season of 2017".
-*Settled 2026-09-09 (#842): the label is wrong and it IS a condition slot.*
-Slot 2's harvest-end date is 2018 on 1 423 of 1 435 rows, modal months June
-(660) / July (504) -- the same window as slot 1 (2018 on 6 948/7 041; June
-2 924, July 1 359) -- whereas AGSEC5A, which really does cover the 2017
-second season, ends Nov/Dec 2017 (month 12 on 3 466 rows, year 2017 on
-5 583).  It is a second harvest record for the same plot-crop in the same
-season B.
+This entry used to say the 2018-19 slot "may be a SEASON slot rather than a
+condition slot" because its variable label reads "during the second season
+of 2017".  *Settled 2026-09-09 (#842): the label is wrong and it IS a
+condition slot.*  Slot 2's harvest-end date is 2018 on 1 423 of 1 435 rows,
+modal months June (660) / July (504) -- the same window as slot 1 (2018 on
+6 948/7 041; June 2 924, July 1 359) -- whereas AGSEC5A, which really does
+cover the 2017 second season, ends Nov/Dec 2017 (month 12 on 3 466 rows,
+year 2017 on 5 583).  It is a second harvest record for the same plot-crop
+in the same season B.
 
-Still unwired: adding either slot ADDS mass (~1 435 rows for 2018-19), so
-both stay outside #842, which is verified against a rows-unchanged
-invariant, just as they stayed outside the #323 condition fix.
+*** Which column is which: the vocabulary, again
+
+Decided by value-label vocabulary against =harvest_units= (46 codes, 35
+unit-only) and =harvest_conditions= (20 codes, 9 condition-only), never by
+the variable label -- the same rule as every other wave:
+
+| file             | column      | n     | in unit | unit-only | in cond | cond-only | modes (decoded)                                   |
+|------------------+-------------+-------+---------+-----------+---------+-----------+---------------------------------------------------|
+| 2018-19 AGSEC5B  | =s5bq06b_2= | 1 432 | 100%    | 69.4%     | 30.6%   | 0.0%      | Kg 498, Sack (100 kgs) 333, Plastic Basin 212     |
+| 2018-19 AGSEC5B  | =s5bq06c_2= | 1 435 | 8.9%    | 0.0%      | 100%    | 91.1%     | Dry - grain 1 024, Dry at harvest - grain 121     |
+| 2018-19 AGSEC5B  | =s5bq07c_2= |   574 | 100%    | 80.0%     | 20.0%   | 0.0%      | sold unit                                         |
+| 2018-19 AGSEC5B  | =s5bq07b_2= |   577 | 4.2%    | 0.0%      | 100%    | 95.8%     | sold condition                                    |
+| 2019-20 agsec5b  | =s5bq06b_2= | 1 302 | 100%    | 64.2%     | 35.8%   | 0.0%      | Kg 385, Sack (100 kgs) 265, Plastic Basin 205     |
+| 2019-20 agsec5b  | =s5bq06c_2= | 1 306 | 15.2%   | 0.0%      | 100%    | 84.8%     | Dry - grain 910, Dry at harvest - grain 116       |
+| 2019-20 agsec5b  | =s5bq07c_2= |   506 | 100%    | 72.5%     | 27.5%   | 0.0%      | sold unit                                         |
+| 2019-20 agsec5b  | =s5bq07b_2= |   511 | 8.6%    | 0.0%      | 100%    | 91.4%     | sold condition                                    |
+
+Slot 2's modal condition is 45 "Dry - grain" (71% of its rows) against slot
+1's modal 20 "Fresh/raw harvested": the second slot is overwhelmingly the
+DRIED re-report of a crop whose first record is fresh, which is precisely
+what the =condition= index level exists to keep apart (#323/#637).
+
+The 2018-19 kg factor =s5bq06d_2= (934 positive of 935 non-null, median 20)
+is wired as =KgFactor= on the slot-2 rows, like slot 1's =a5bq6d=.  *2019-20
+gets NO kg_factor on either slot*, deliberately: that wave's q6d
+(=s5bq06d_1= 7 366 non-null, =s5bq06d_2= 921) is #849's scope and needs its
+own before/after; wiring it here would have moved kilograms that already
+resolve through the unit label.
+
+*** Before / after (cold, private =LSMS_DATA_DIR=, 2026-09-24)
+
+Both reads were cold (the wave scripts ran; 91.6 s), =PYTHONPATH= and the
+imported package pinned to the branch clone.
+
+| quantity                                   | before            | after             |
+|--------------------------------------------+-------------------+-------------------|
+| rows, whole table                          | 130 606           | *133 331*         |
+| rows, 2018-19 season B                     | 7 041             | *8 463* (+1 422)  |
+| rows, 2019-20 season B                     | 7 372             | *8 675* (+1 303)  |
+| rows, every other =(t, season)=            | —                 | *identical*       |
+| =sum(Quantity)=                            | 7 309 085.96      | 7 434 726.31      |
+| =sum(Quantity_sold)=                       | 18 134 251.40     | 18 197 452.70     |
+| =sum(Value_sold)=                          | 10 709 007 434.04 | 10 879 808 638.04 |
+| =KgFactor= non-null                        | 14 149            | 15 074            |
+| =u='Unknown'=, 2018-19 season B            | 0                 | *4*               |
+| =u='Unknown'=, 2019-20 season B            | 133               | 137               |
+| =unknown_condition=, 2018-19 B / 2019-20 B | 0 / 3             | 1 / 4             |
+| distinct =u=, 2018-19 B / 2019-20 B        | 30 / 30           | 32 / 32           |
+| =harvest_kg= rows (plot-crop grain)        | 78 532            | 78 571            |
+| =harvest_kg= sum, kg                       | 28 680 848.60     | *29 093 322.41*   |
+| … of which 2018-19 / 2019-20               | 5 904 803 / 3 668 441 | 6 152 896 / 3 832 822 |
+| =kg_factor_sources.reported=               | 14 050            | 14 972            |
+| =reported_implausible=                     | 99                | 102               |
+
+*Rows added = slot-2 records minus additive collisions.*  A slot-2 record
+that shares =(t, i, plot_id, j, u, condition, season)= with slot 1 -- the
+same crop re-reported in the SAME unit and the SAME condition -- collides
+and is SUMMED by the de-duplication block: *14 of 1 436* (2018-19) and *4
+of 1 307* (2019-20; the triage's raw-file count of 3 was one short, because
+the served key goes through the code-to-label maps).  On those 18 groups
+=Quantity= / =Quantity_sold= / =Value_sold= are sums, =KgFactor= and
+=harvest_month= are slot 1's (=first()=), and the sold labels go through
+=reduce_to_agreed=: 6 of the 14 2018-19 groups have a slot-2 label where
+slot 1 had none (completed, NA -> label) and *one* -- Beans on plot
+=ab7c3a9b…-2-1= -- carries two different =Condition_sold= values and is
+blanked with a =GrainConflictWarning=, so the corpus count of blanked
+groups is now *12 of 133 331* (was 11 of 130 606).  Whether those 18
+groups are duplicate keyings or two genuinely distinct records is the same
+open question as the pre-existing 433 (see "OPEN GRAIN QUESTION" under
+#824); slot 2 could not have been *causing* the 433, since it was not read.
+
+*The 4 new 2018-19 =Unknown= units are the source's, not a wiring error*:
+=s5bq06b_2= is null on 4 records that report a measure -- 3 coffee sales
+with =Quantity=, =Value_sold= and a =KgFactor= but no unit code, and 1
+beans row with =Quantity= 0 and nothing else (also the wave's one new
+=unknown_condition=).  =tests/test_gh842_uganda_harvest_unit.py= now
+derives that count from the raw file and asserts the served sentinel count
+EQUAL to it.  Slot 2's 22-23 distinct unit codes are all inside
+=harvest_units= (the 2 new distinct =u= per cell are slot-2-only labels).
+
+*Not wired*: 2019-20 season A's =_11= / =_21= "part harvest" slots (#647,
+no verdict), on either side.
 
 ** TODO =KgFactor= is wired for 2018-19 only; every other wave ships one too
 
@@ -2119,7 +2207,10 @@ Measured non-null / rows, per wave (season A + season B):
 | 2018-19 | 7 134/7 153    | 7 037/7 041   |
 | 2019-20 | 6 977/8 429    | 7 366/9 356   |
 
-(2019-20 uses =s5{a,b}q06d_1=; 2018-19 slot 2 has =s5bq06d_2=, 935 non-null.)
+(2019-20 uses =s5{a,b}q06d_1=, and its season-B slot 2 =s5bq06d_2= has 921
+non-null -- neither wired.  2018-19 slot 2's =s5bq06d_2=, 935 non-null, IS
+wired since #848, so the 2018-19 season-B count above is now 7 037 + 935
+over 7 041 + 1 436 records.)
 
 *Why the others are deliberately left out.* Their kilograms already resolve
 through the unit label, so once =harvest_kg= prefers a per-row =KgFactor=,
@@ -2466,7 +2557,12 @@ be extended to waves 1-2.)
 =Quantity_sold= that know both units (=u != 'Unknown'=, =Unit_sold= non-null);
 by wave-season 92.0-98.0%, i.e. *3.9% disagree*.  (The "95-97% agree" figure
 in #824 was *Nigeria's*; this is Uganda's.)  2018-19 season A is excluded from
-that count by construction -- =u= is =Unknown= on all of it.
+that count by construction -- =u= is =Unknown= on all of it.  *Since #848
+(2026-09-24)* the count is *41 162 / 96.14%* -- the 2018-20 season-B second
+condition slot adds 1 079 sale rows knowing both units (2018-19 B 2 904 rows
+at 96.3%, 2019-20 B 3 088 at 97.0%) -- the by-wave-season range is the same
+92.0-98.0%, and the largest disagreement cell (priced, =u='Sack (100 kgs)'=,
+=Unit_sold='Kg'=) is 165 rows, was 162.
 
 *Definition matters here and an earlier version of this entry shipped the
 looser one.*  Restricted to rows with a positive =Quantity_sold= -- the rows
@@ -2617,7 +2713,9 @@ agreed value is kept, a conflicted cell is set NA with a
 130 606 groups* -- 2009-10 6 =Unit_sold=; 2011-12 1; 2013-14 2 =Unit_sold= +
 1 =Condition_sold=; 2015-16 1 =Condition_sold=.  Those groups are a
 pre-existing defect in the summed =Quantity_sold= that this column makes
-visible for the first time.
+visible for the first time.  (12 of 133 331 since #848 wired the 2018-20
+season-B second condition slot: one 2018-19 B =Condition_sold= conflict
+between the two slots.)
 
 *OPEN GRAIN QUESTION: the 11 groups are 11 of 433, and a LEVEL IS MISSING*
 (2026-09-10, from the red-team of this change, item 4).  Measured on the
@@ -2644,12 +2742,20 @@ plus 2 debes -- but it is not the fix.
 unread condition-2 slots.  [[https://github.com/ligon/LSMS_Library/issues/848][#848]] records that 2018-19 =AGSEC5B= ships a
 FULL-harvest condition-2 slot (=s5bq06a_2= n=1 436, =s5bq06b_2= n=1 432,
 =s5bq07a_2= n=1 435, =s5bq07b_2= n=577, =s5bq07c_2= n=574) that
-=CROP_COLMAPS= reads on neither side, while 2019-20 season A DOES wire its
+=CROP_COLMAPS= read on neither side, while 2019-20 season A DOES wire its
 condition-2 slot -- an asymmetry, and 14x the row count of the part-harvest
 =_11= / =_21= question (#647).  A second record for the same plot-crop in the
 same season is exactly the shape that produces a 433-group collision, so
-wiring #848 and re-counting the collisions is the first experiment, not a
+wiring #848 and re-counting the collisions was the first experiment, not a
 speculative new index level.
+
+*Experiment run, 2026-09-24 (#848 DONE entry above): it does NOT explain
+the 433.*  Slot 2 was not read, so it could not have been producing
+collisions; wiring it ADDS 18 collision groups (14 in 2018-19 B, 4 in
+2019-20 B, all "same crop, same unit, same condition, reported in both
+slots") and one more blanked =Condition_sold= (12 of 133 331 groups now).
+The 433 pre-existing groups are entirely within slot 1 / the long-form
+waves and still want a record ordinal.
 
 Two properties of that reducer worth knowing before you rely on it.  *Under
 =LSMS_GRAIN_STRICT=1= these 11 groups make the Uganda build FATAL* -- that is
@@ -2715,12 +2821,13 @@ L2 hash moved -- measured on Malawi =household_roster= and Ethiopia
    that would give 2018-19 season A a per-kg farmgate price without going
    through a unit label.  Natural name =KgFactor_sold=; wiring it ADDS a
    column and needs its own before/after, exactly as =kg_factor= did (#849).
-2. *2018-19 AGSEC5B's =_2= sold slot* (=s5bq07{a,b,c}_2=, 574-577 non-null)
-   and *2019-20 AGSEC5A's =_11= / =_21= "part harvest" slots*
+2. *2019-20 AGSEC5A's =_11= / =_21= "part harvest" slots*
    (=s5aq07{a,b,c}_{11,21}= -- the sale block of the questionnaire's separate
    partially-harvested repeat page, first seen on the 2018-19 form at
-   stream/page 17).  =CROP_COLMAPS= reads neither on the harvest side either,
-   so the two sides stay consistent; wiring them ADDS rows.
+   stream/page 17).  =CROP_COLMAPS= reads them on neither side, so the two
+   sides stay consistent; wiring them ADDS rows.  (2018-19 AGSEC5B's =_2=
+   sold slot, =s5bq07{a,b,c}_2=, used to be listed here; wired with its
+   harvest slot under #848, 2026-09-24.)
 3. *A per-kg conversion of the sale.*  =crop_production= serves REPORTED
    values only.  Converting =Quantity_sold= to kilograms is a transformation
    and belongs beside =transformations.harvest_kg=.  Note for whoever writes
