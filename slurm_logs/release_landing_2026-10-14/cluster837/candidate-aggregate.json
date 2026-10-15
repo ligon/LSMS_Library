@@ -1,0 +1,296 @@
+{
+  "Ethiopia/2011-12": {
+    "pre_shape": [
+      333,
+      5
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      333,
+      5
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 333,
+      "District": 333,
+      "Rural": 333,
+      "Latitude": 333,
+      "Longitude": 333
+    },
+    "warning_categories": []
+  },
+  "Ethiopia/2013-14": {
+    "pre_shape": [
+      433,
+      5
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      433,
+      5
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 433,
+      "District": 433,
+      "Rural": 433,
+      "Latitude": 395,
+      "Longitude": 395
+    },
+    "warning_categories": [
+      "GrainConflictWarning"
+    ]
+  },
+  "Ethiopia/2015-16": {
+    "pre_shape": [
+      432,
+      5
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      432,
+      5
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 432,
+      "District": 432,
+      "Rural": 432,
+      "Latitude": 360,
+      "Longitude": 360
+    },
+    "warning_categories": [
+      "GrainConflictWarning"
+    ]
+  },
+  "Ethiopia/2018-19": {
+    "pre_shape": [
+      535,
+      5
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      535,
+      5
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 535,
+      "District": 535,
+      "Rural": 535,
+      "Latitude": 516,
+      "Longitude": 516
+    },
+    "warning_categories": []
+  },
+  "Ethiopia/2021-22": {
+    "pre_shape": [
+      435,
+      5
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      435,
+      5
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 435,
+      "District": 435,
+      "Rural": 435,
+      "Latitude": 360,
+      "Longitude": 360
+    },
+    "warning_categories": [
+      "GrainConflictWarning"
+    ]
+  },
+  "Tanzania/2019-20": {
+    "pre_shape": [
+      147,
+      3
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      147,
+      3
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 146,
+      "District": 112,
+      "Rural": 111
+    },
+    "warning_categories": [
+      "GrainConflictWarning",
+      "RuntimeWarning"
+    ]
+  },
+  "Tanzania/2020-21": {
+    "pre_shape": [
+      515,
+      3
+    ],
+    "pre_index": [
+      "t",
+      "v"
+    ],
+    "served_shape": [
+      515,
+      3
+    ],
+    "served_index": [
+      "t",
+      "v"
+    ],
+    "real_conflicts": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0
+    },
+    "missing_and_value_groups": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0
+    },
+    "row_conflict_groups": 0,
+    "conflicting_rows_removed_by_core": 0,
+    "served_nonnull": {
+      "Region": 513,
+      "District": 483,
+      "Rural": 502
+    },
+    "warning_categories": [
+      "GrainConflictWarning",
+      "RuntimeWarning"
+    ]
+  }
+}
