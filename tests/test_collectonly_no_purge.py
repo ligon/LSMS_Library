@@ -19,8 +19,12 @@ re-added an unconditional purge would fail here rather than pass.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
+from contextlib import nullcontext
 from pathlib import Path
+
+import pytest
 
 # NOT ``import conftest``.  That spelling resolves to the broken top-level
 # ``tests``/``conftest`` shipped by a dependency and aborts pytest COLLECTION in
@@ -78,6 +82,10 @@ def _run(monkeypatch, **kw):
                         lambda c: calls.append(("country", c)))
     monkeypatch.setattr(conftest, "_purge_data_root_caches",
                         lambda: calls.append(("all", None)))
+    # GH #1010: pytest_configure assigns this directly for rebuild requests.
+    # delenv alone records nothing when the variable is initially absent,
+    # leaving later tests in forced-rebuild mode after monkeypatch teardown.
+    monkeypatch.setenv("LSMS_NO_CACHE", "")
     monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
     cfg = _Config(**kw)
     conftest.pytest_configure(cfg)
@@ -129,3 +137,32 @@ def test_no_purge_flag_is_accepted_and_inert(monkeypatch):
     # accepted so existing invocations (handoffs, docs) do not start erroring.
     cfg, calls = _run(monkeypatch, collectonly=False, no_purge=True)
     assert calls == [], f"--no-purge must remain harmless, got {calls}"
+
+
+@pytest.mark.parametrize("initial", [None, "0", "1"])
+@pytest.mark.parametrize("rebuild_option", ["rebuild", "rebuild_caches"])
+@pytest.mark.parametrize("exceptional", [False, True])
+def test_rebuild_control_restores_no_cache_environment(
+    monkeypatch, initial, rebuild_option, exceptional
+):
+    """A simulated rebuild must not make later tests bypass their warm cache."""
+    # Register the original state even when the requested initial state is
+    # absent; this outer guard also isolates the failing-before control.
+    monkeypatch.setenv("LSMS_NO_CACHE", initial if initial is not None else "")
+    if initial is None:
+        monkeypatch.delenv("LSMS_NO_CACHE")
+
+    exit_context = (
+        pytest.raises(RuntimeError, match="simulated test failure")
+        if exceptional else nullcontext()
+    )
+    with exit_context:
+        with pytest.MonkeyPatch.context() as scoped:
+            _run(scoped, collectonly=False, **{rebuild_option: True})
+            configured = os.environ.get("LSMS_NO_CACHE")
+            assert configured == "1"
+            if exceptional:
+                raise RuntimeError("simulated test failure")
+
+    restored = os.environ.get("LSMS_NO_CACHE")
+    assert restored == initial
