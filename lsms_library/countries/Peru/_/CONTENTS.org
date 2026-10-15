@@ -935,8 +935,10 @@ Magic bytes, MEASURED on the bare DVC blob of =N00A.SSP= (md5 =a7e26161...=):
 now sniffs the XPORT magic bytes and dispatches to =pandas.read_sas(format='xport')=
 before any other reader.  Verified on the three blobs held locally (=EXPEND.SSP=
 1509x5, =N00A.SSP= 1528x10, =PANEL.SSP= 3326x4, every column populated; see the
-table below for what the wrong reader would have served); the other 36 blobs
-were not present locally and are unverified.  Before that fix the chain had no
+table below for what the wrong reader would have served); the other 33 =.SSP=
+blobs were not present locally and are unverified.  There are 36 =.SSP= files
+among the 39 sidecars; the other three are =FORMAT.ZIP= and two Documentation
+files.  Before that fix the chain had no
 XPORT branch, and the file died with an uncaught =ReadstatError= out of
 =pd.read_spss= on the path-string retry -- so this was a *library gap, not an
 acquisition gap*.  What remains is Tier D: writing =Peru/1990/_= (=sample= from

@@ -29,3 +29,9 @@ Extend the existing sniff and Stata fallback gates. No new reader or parser.
 ## §6 Open questions
 The general unreadable-binary/text-tail and uncaught path-retry SPSS failure
 remain separate residuals. This approved follow-up closes only the DTA path.
+
+## Phase 3 verification
+OK (§2–§5): existing readers and exception classes retained. All 89 focused
+tests pass; one optional real-blob test skips if EXPEND.SSP is absent. The four
+new corruption cases give 3 failures/1 pass on the pre-fix tree, including
+the discriminating truncated latin-1 case.

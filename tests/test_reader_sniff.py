@@ -10,8 +10,8 @@ garbage dictates -- a ``KeyError`` from the type map on this stack, a
 ``except (ValueError, struct.error)`` lists.  A CSV whose header begins
 ``hhid,`` was unreadable (#712); ``region,`` read fine.  Content-dependent.
 
-And the chain had no SAS Transport (XPORT) branch at all, so Peru 1990's 39
-``.SSP`` files were on disk and unreadable (#699); ``pyreadstat.read_xport``
+And the chain had no SAS Transport (XPORT) branch at all, so Peru 1990's 36
+``.SSP`` files (39 sidecars including FORMAT.ZIP and two Documentation files) were on disk and unreadable (#699); ``pyreadstat.read_xport``
 is not the answer either -- it returns the right shape with 7 of 10 columns
 NaN and no exception (``tests/test_null_read_guard.py``).
 
@@ -21,10 +21,10 @@ All tests here are synthetic (``tmp_path``), no DVC, no network; the one
 real-blob test skips unless the Peru blob is already in the local cache.
 
 Measured 2026-10-14 against every blob held locally (``_dvc_cache_path`` on
-8,752 sidecars, 5,674 present): all 4,697 ``.dta`` blobs pass
+9,985 sidecars, 5,873 present, independent review census): all 4,811 ``.dta`` blobs pass
 ``_is_stata_dta`` -- 67 of them ONLY because the fourth header byte is not
-tested (Kyrgyz 1997, India 1997-98, GhanaLSS ``pov_gh5.dta`` carry
-0x3f..0xff in the "unused" slot) -- and no ``.csv`` / ``.sav`` / ``.dat`` /
+tested (Kyrgyz Republic 41, Timor-Leste 12, Tajikistan 10, India 3,
+GhanaLSS 1 carry 0x3f..0xff in the "unused" slot) -- and no ``.csv`` / ``.sav`` / ``.dat`` /
 ``.dct`` blob does.  Three ``.ssp`` blobs are XPORT; nothing else is.
 """
 
@@ -204,17 +204,15 @@ def test_a_real_dta_still_reads(tmp_path):
     assert got['val'].tolist() == [0.5, 1.5, 2.5]
 
 
-#: How an unreadable binary file leaves ``get_dataframe`` today.  The stream
-#: pass ends in ``ValueError('Unknown file type')``; ``get_dataframe`` then
-#: retries with the path string, and ``pd.read_spss`` on that path raises
-#: ``ReadstatError``, which its ``except`` does not list.  Loud either way,
-#: which is what these tests pin; the inconsistent TYPE is a pre-existing
-#: sibling defect of #712 (same function, different reader) and is
-#: deliberately not widened here.
+#: A claimed DTA fails before text fallback if its Stata decoders fail.
+#: The outer path-string retry can still raise SPSS ReadstatError; its
+#: inconsistent error type is a separate reader-chain issue. Keep that
+#: diagnostic visible while checking that neither encoding serves garbage.
 _LOUD = (ValueError, pd.errors.ParserError, pyreadstat.ReadstatError)
 
 
-def test_a_truncated_dta_still_fails_loudly(tmp_path):
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+def test_a_truncated_dta_still_fails_loudly(tmp_path, encoding):
     """The sniff passes (the header is genuine), the Stata readers fail, and
     the chain must end in an error -- never a frame of shredded bytes.  A
     widened ``except`` is exactly what would break this."""
@@ -224,21 +222,20 @@ def test_a_truncated_dta_still_fails_loudly(tmp_path):
     fn.write_bytes(raw[:len(raw) // 2])
     assert _is_stata_dta(_sniff_head(str(fn)))
     with pytest.raises(_LOUD):
-        get_dataframe(str(fn))
+        get_dataframe(str(fn), encoding=encoding)
 
 
-def test_a_corrupt_header_dta_is_not_a_garbage_frame(tmp_path):
-    """A ``.dta`` whose header is unreadable fails the sniff and falls to the
-    text readers, as before; those must not quietly hand back the bytes as a
-    one-column frame."""
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+def test_a_corrupt_header_dta_is_not_a_garbage_frame(tmp_path, encoding):
+    """A .dta suffix with non-Stata magic fails before the text readers."""
     df = pd.DataFrame({'hhid': np.arange(50), 'val': np.linspace(0, 1, 50)})
     raw = bytearray(_stata_dta(df))
     raw[0] = 0  # release 0: not Stata by any reading
     fn = tmp_path / 'corrupt.dta'
     fn.write_bytes(bytes(raw))
     assert not _is_stata_dta(_sniff_head(str(fn)))
-    with pytest.raises(_LOUD):
-        get_dataframe(str(fn))
+    with pytest.raises(ValueError, match="has a .dta suffix but no Stata header"):
+        get_dataframe(str(fn), encoding=encoding)
 
 
 # ---------------------------------------------------------------------------

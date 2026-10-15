@@ -1208,14 +1208,14 @@ def _read_dat_with_dct(raw: bytes, names: list[str],
 # * Stata, formats 102..115 (Stata 1 .. 12): byte 0 is the release, byte 1
 #   the byte order (1 = HILO, 2 = LOHI; 0 in some format-102 files), byte 2
 #   the filetype (always 1), byte 3 "unused".  **Do not test byte 3.**  The
-#   spec says it is zero; the corpus says otherwise -- 67 of 4,697 held
-#   ``.dta`` blobs (Kyrgyz 1997, India 1997-98, GhanaLSS 2005-06
-#   ``pov_gh5.dta``) carry 0x3f..0xff there, and pandas reads every one of
+#   spec says it is zero; the corpus says otherwise -- 67 of 4,811 held
+#   ``.dta`` blobs (Kyrgyz Republic 41, Timor-Leste 12, Tajikistan 10,
+#   India 3, GhanaLSS 1) carry 0x3f..0xff there, and pandas reads every one of
 #   them (it discards the byte unread).  Measured 2026-10-14, after a first
 #   draft of this sniff that DID test it rejected all 67.  Formats 117+
 #   (Stata 13+) are XML-framed and begin with the literal ``<stata_dta>``.
 # * SAS Transport (XPORT) V5 begins with an 80-byte library header record
-#   whose first 48 bytes are the literal below.  Peru 1990 ships 39 of them
+#   whose first 48 bytes are the literal below.  Peru 1990 ships 36 of them
 #   (``.SSP``, written by SAS 6.06/6.07 in 1992-93); before #699 the chain
 #   had no reader for them at all.  Use ``pandas.read_sas`` -- NOT
 #   ``pyreadstat.read_xport``, which on those files returns the right shape
@@ -1396,6 +1396,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # first bytes say the file is (see the block comment above
         # ``_sniff_head``).
         head = _sniff_head(f)
+        if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
+            raise ValueError(f'{fn} has a .dta suffix but no Stata header')
 
         # SAS Transport (XPORT) -- Peru 1990 ``.SSP`` (GH #699).  Before the
         # SPSS attempt: ``pd.read_spss`` on a path raises ``ReadstatError``
@@ -1456,9 +1458,12 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                         pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
                         apply_value_formats=convert_categoricals, encoding=encoding)
             except (ValueError, pyreadstat.ReadstatError, OSError,
-                    NotImplementedError):
-                # Format-fallback: parser/IO errors mean "try the next reader"
-                # (csv, excel, feather, fwf).  Programmer bugs propagate.
+                    NotImplementedError) as exc:
+                # A claimed DTA whose binary decoders both failed must not
+                # become CSV under a permissive encoding such as latin-1.
+                if Path(fn).suffix.lower() == '.dta':
+                    raise ValueError(f'{fn} has a Stata header but cannot be decoded') from exc
+                # Other suffixes retain the existing format fallback.
                 pass
 
         try:
