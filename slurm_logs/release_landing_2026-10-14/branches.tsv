@@ -1,0 +1,194 @@
+branch	sha	remotes	behind_development	ahead_of_development	initial_disposition	prs	non_equivalent_patch_subjects	final_disposition	evidence
+analysis/panel-estimation	81a4eae4509e8f29009e638575b7ab44600cdb0f	github,origin	215	0	ancestor-of-development	#934 MERGED -> development			
+canonical-housing-labels	2f01353ba518b1ef539c9591f56b3003ebdda58f	github	1883	3	reconcile-historical	#229 MERGED -> development	2f01353ba feat(housing): Tanzania + Nigeria Roof/Floor harmonization (#170) | 6dc351a87 feat(housing): per-country Roof/Floor harmonization for 11 countries (#170) | f9cdf7853 docs(housing): canonical Roof / Floor Preferred-Label vocabulary (#170)		
+chore/archive-2026-05-18-build-blockers	dcb02385d3119f2135447b35a831fa8f92909ff9	github	1822	1	reconcile-historical		dcb02385d docs(slurm_logs): archive 2026-05-18 ERHS build blockers & resolutions		
+chore/dvc-reachability-ci	c6862b2ae124c35e6e54b355266f7fcfa579336c	github	751	0	ancestor-of-development	#754 MERGED -> development			
+chore/feature-vocabulary-nutrition-nonfood	1214ce892a739da36ce1bbcf8ec34a68e7e5391c	github	701	0	ancestor-of-development	#774 MERGED -> development			
+chore/feature-vocabulary-nutrition-nonfood	82ef7c17f4183e52d9ebdf31a7eded65943b965a	origin	677	1	patch-equivalent-to-development	#774 MERGED -> development			
+chore/ghanasps-matrix-refresh	0307b56f404ef23cf45e205c11eba194d11ecafb	github	804	0	ancestor-of-development	#723 MERGED -> development			
+chore/handoff-2026-05-19	fdf179d6b1b71f4d07bbef1abfe775c25fd7d8af	github	1822	1	reconcile-historical		fdf179d6b docs(handoff): 2026-05-19 session state — EthiopiaRHS + follow-ons		
+ci/bound-and-parallelise-unit-tests	95653dcdb2ffb80ea00e2cc763db2a653d355cf2	github	305	0	ancestor-of-development	#906 MERGED -> development			
+ci/merge-queue	d6fe02ed71f1e51b8e7efaac41ab80c5ff7b5a35	github,origin	28	0	ancestor-of-development	#973 MERGED -> development			
+development	b021bae5d905e5f82298d850396250db69c423e5	github	2	0	integration-ref	#938 MERGED -> master; #912 MERGED -> master; #885 MERGED -> master; #870 MERGED -> master; #814 CLOSED -> master; #807 MERGED -> master; #766 MERGED -> master; #745 MERGED -> master; #744 MERGED -> master; #743 MERGED -> master; #739 MERGED -> master; #663 MERGED -> master; #590 MERGED -> master; #559 MERGED -> master; #557 MERGED -> master; #555 MERGED -> master; #182 CLOSED -> master; #83 MERGED -> development; #82 MERGED -> development; #77 MERGED -> development; #72 MERGED -> development; #61 MERGED -> development; #59 MERGED -> development; #58 MERGED -> development			
+development	a31257286cb6b649c1b98d44c1be089218f50631	origin	0	0	integration-ref	#938 MERGED -> master; #912 MERGED -> master; #885 MERGED -> master; #870 MERGED -> master; #814 CLOSED -> master; #807 MERGED -> master; #766 MERGED -> master; #745 MERGED -> master; #744 MERGED -> master; #743 MERGED -> master; #739 MERGED -> master; #663 MERGED -> master; #590 MERGED -> master; #559 MERGED -> master; #557 MERGED -> master; #555 MERGED -> master; #182 CLOSED -> master; #83 MERGED -> development; #82 MERGED -> development; #77 MERGED -> development; #72 MERGED -> development; #61 MERGED -> development; #59 MERGED -> development; #58 MERGED -> development			
+docs/323-grain-collapse-sites	f85dcc18db2d60cfbcb85cbc5ae8698b09619db1	github	1102	2	reconcile-historical		f85dcc18d docs(#323): corrections -- first() fabricates a row; Uganda is Site 1; Site 2 is 17 countries | 36e594545 docs(#323): the grain collapse has four sites, not one		
+docs/601-population-record	637e94bbf22a444a32bfaec94179874491210129	github	1049	1	patch-equivalent-to-development	#603 CLOSED -> development			
+docs/601-population-record	67f2a992710a31dcbf6ebb786b78ad852ca17c3e	origin	1102	1	patch-equivalent-to-development	#603 CLOSED -> development			
+docs/601-universe-in-contents	ed3b06a4a717e0255436b18543ef0b80edd633bd	origin	1032	1	reconcile-historical	#658 MERGED -> development	ed3b06a4a docs(#601): record the sampling universe, exclusions and sub-samples in 38 country CONTENTS.org		
+docs/603-adopt	637e94bbf22a444a32bfaec94179874491210129	origin	1049	1	patch-equivalent-to-development				
+docs/730-ghanasps-not-ppph	ed38e0215acf2cb2ff04e0a9026bd3d838c2f44d	github	786	0	ancestor-of-development	#735 MERGED -> development			
+docs/826-ghanalss-price-quantity	bf6978990ef328f635c757135a74db5ea6f018a2	github	304	0	ancestor-of-development	#887 MERGED -> development			
+docs/953-mapping-resolution-durable	dd18033b5e1fd9f62350714dcaf26453d2040595	github,origin	120	0	ancestor-of-development	#955 MERGED -> development			
+docs/community-prices-pattern	61df7515b74bdc46bfc1354f3b9a6259bcc088e5	github,origin	670	1	patch-equivalent-to-development	#779 MERGED -> development			
+docs/currency-conversion-docstring	05feec4b3a9bb47b8630d21d1ef3da663e003fd2	github,origin	670	1	patch-equivalent-to-development	#786 MERGED -> development			
+docs/ghanalss-panel-tension	ae749963090bd6c0caf88a1049c4820560ce524f	github	813	0	ancestor-of-development	#721 MERGED -> development			
+docs/ghanasps-agriculture	507a9ee673fbe2cee0c4438349a929b2dfb2f9e4	github	793	0	ancestor-of-development	#729 MERGED -> development			
+docs/glss3-selfweighting	70edd1f06228dc05432133de898518a4fe5fbb08	github	980	0	ancestor-of-development	#715 MERGED -> development			
+docs/handoff-2026-07-22	0b3c21497f653c8fb804c52622248488c41d7d11	github	991	1	reconcile-historical	#662 CLOSED -> development	0b3c21497 docs: handoff for the 2026-07-21/22 session		
+docs/handoff-2026-09-15	916ee21cadc7470064d08e7cb6b29f44664b6ee3	github,origin	252	2	reconcile-historical		916ee21ca docs(handoff): the verified suite number, and the branch-reversion hazard | 126a672d3 docs: handoff -- categorical mapping session, two PRs open, development red until #930		
+docs/handoff-2026-09-15-corrected	63c78a278163597cf590f8fd63908dcaee8a61ac	github,origin	236	0	ancestor-of-development	#933 MERGED -> development			
+docs/handoff-941	c44546df9a8b1bd2bfbad1c79d827d65916a4dff	origin	170	0	ancestor-of-development				
+docs/handoff-datatests	ac8b65b7f8da4d5ea29951c01acdea2a02bb9af9	origin	182	0	ancestor-of-development				
+docs/handoff-v0.14.0	bef35636c5aaefc550edbe2290ea409ae0379545	origin	184	0	ancestor-of-development				
+docs/kenyalps-provenance	aa50721c853c35cf5a1a860d6793f431a81ffb2c	github	743	0	ancestor-of-development	#759 MERGED -> development			
+docs/v0.14.0-notes	8e337b4480c1acbb1683756c944408748f5b7ffb	origin	189	0	ancestor-of-development				
+docs/v0.14.0-notes-940	ce4695ebe14293aa6b1f11fe4035b14501a888a2	origin	185	0	ancestor-of-development				
+docs/v0.14.0-notes-cfe	f3781bc588fa6ed1552e2414ecb2855b83f573df	origin	183	0	ancestor-of-development				
+feat/171-education-foundation	8ed17eb1ac94d912e0b5da8c7c1cdf7fb1ebc564	github	1303	1	patch-equivalent-to-development	#487 MERGED -> development			
+feat/603-population-record	7279778b4589353fc8439e9073507313a7941981	github	834	0	ancestor-of-development	#720 MERGED -> development			
+feat/603-population-record-attrs	6ef12b4a0bf113c0bbe5358ed6cfc6329d51ba4a	github	584	8	reconcile-historical	#796 MERGED -> development	575ba89c7 docs(#603): re-point the _finalize_result line citations after the merge | 7b87c22f2 docs(#603): the record change is not in a shipped release; cite the issue | 55a322e9c feat(#603): put PopulationRecords on df.attrs, not plain dicts | 18cf5f7d0 docs(#603): GLSS7 Main Report closes the GhanaLSS 2016-17 excuse		
+feat/603-population-record-attrs	7b87c22f2eb45d0baaba46d31d183b596d263f11	origin	639	3	reconcile-historical	#796 MERGED -> development	7b87c22f2 docs(#603): the record change is not in a shipped release; cite the issue | 55a322e9c feat(#603): put PopulationRecords on df.attrs, not plain dicts | 18cf5f7d0 docs(#603): GLSS7 Main Report closes the GhanaLSS 2016-17 excuse		
+feat/724-undeclared-tier	f285c8b7a8195eb677dc78c4f039076838c9002d	github	799	0	ancestor-of-development	#725 MERGED -> development			
+feat/797-ghanalss-relationship-table	f13f6480563cc5241dcda68ab93de23861e4d701	github,origin	614	1	reconcile-historical		f13f64805 WIP(wt-797-curation): GhanaLSS relationship table curation, 1987-88 + 1988-89		
+feat/coverage-blessed	0a0497dfd533bdd8d9d969924afb0e378bc5dc11	github	1119	1	patch-equivalent-to-development	#593 MERGED -> development			
+feat/ethiopiarhs-livestock-roster	48e8f559756b10f07f2179e7139d341624e3b5c1	github	780	0	ancestor-of-development	#738 MERGED -> development			
+feat/ethiopiarhs-prices	4cd0b4b9c71984f80a7c197ff9824902faeca2f1	github	1476	2	reconcile-historical		f96f0493d feat(EthiopiaRHS): wire bespoke community/market prices config (#275)		
+feat/ghanaahies-2022	903285e5aa050da9a0906d183ba74789ceb08ed0	origin	222	0	ancestor-of-development				
+feat/ghanaahies-2023	9dfac394771725d42bfabb9e6f8a4063053734dc	origin	223	0	ancestor-of-development				
+feat/ghanaahies-2024-features	21066d40b7f44517968e1ee1ce3f634b368ffb2d	origin	224	0	ancestor-of-development				
+feat/ghanalss-community-prices	8d3bcd2741ec1269202b83303f4e58eaa59b1570	github	723	0	ancestor-of-development	#762 MERGED -> development			
+feat/ghanalss-nutrition-fct	b64817ae4d3d8a58775828ce1d49a022a08a94ed	github	702	0	ancestor-of-development	#769 MERGED -> development			
+feat/ghanalss-produced-qp	730f0a775e1fa245ae893ec0fe0453d8e75c2a97	github	249	0	ancestor-of-development	#916 MERGED -> development			
+feat/ghanalss-visit-dates	e9915405c6e7628d477331f6353663d180430b0b	github	303	0	ancestor-of-development	#890 MERGED -> development			
+feat/ghanasps-crop-production	2cd4208cfa2cc89af59730191f228c5d0d2aa610	github	724	0	ancestor-of-development	#761 MERGED -> development			
+feat/ghanasps-housing	d2bb22532bbe7cdbc3240cfbc51d951a565c4772	github	794	0	ancestor-of-development	#726 MERGED -> development			
+feat/ghanasps-individual-education	ec7f261ee6ccec284e7d581e8791a9e2e3bc8d83	github	799	0	ancestor-of-development	#728 MERGED -> development			
+feat/ghanasps-livestock	c1997f6e0f3a4c98469138da8305036067f563e0	github	739	0	ancestor-of-development	#760 MERGED -> development			
+feat/ghanasps-plot-features	0b5dae7c892c96ef0f5aa3710bae6e3b339eea3a	github	762	0	ancestor-of-development	#752 MERGED -> development			
+feat/ghanasps-plot-labor	8565d41c92c9150bc1633b3d293aed24ed32d813	github	703	0	ancestor-of-development	#768 MERGED -> development			
+feat/livestock-canonical-schema	6b4570e3921348cc334fa4555733d2a29ed77972	github	784	0	ancestor-of-development	#736 MERGED -> development			
+feat/normalise-sample-weights	6ec88cdf4dfb400ba5c5203babe3ecf10e32b137	github	826	0	ancestor-of-development	#718 MERGED -> development			
+feat/parallel-wave-builds	4be26e1bfb903195ef5c6a42c7a46eae1f657b31	github,origin	615	1	reconcile-historical		4be26e1bf WIP(wt-parallel-waves): parallel wave builds		
+feat/togo-nonfood-expenditures	5f0a2055e9f0f820d4c7b5e4ec63a7878ffe9d8b	github	698	0	ancestor-of-development	#773 MERGED -> development			
+feat/wave-provenance-catalog-id	4cc05d3a92dc98c58b77659154c47b9120ce2325	origin	1111	2	patch-equivalent-to-development	#595 MERGED -> development			
+feature/964-windows-script-builds	f9993cfe01713dea9fd356a769694b1ead6fa47e	github	91	11	active-landing	#969 OPEN -> development			
+feature/ghanalss-aggregate-curation	e70b8df89fc04bb21927c160e60c3a47c0495499	github	231	14	reconcile-historical	#937 CLOSED -> development	e70b8df89 Declare the scoring cutoff instead of inheriting score_w's default | b2b2c6240 ledger: record verified Ghana Aggregate publication | 8c1e0519e Publish and validate GhanaLSS Aggregate food labels | 8715d8a94 ledger: ground GhanaLSS aggregation validation and publication | a02edf4c4 ledger: verify GhanaLSS inventory and draft curation | 91c48a682 Inventory GhanaLSS food support and draft five semantic groups | 80fe79fb6 ledger: ground GhanaLSS delivered-food inventory and draft curation | 8ba6ffba2 Simulate food aggregation with Uganda household observation patterns | 6ae626d38 ledger: verify Uganda masks and historical preparation comparison | c92c224ea ledger: ground Uganda observation-pattern simulations | 8eed2bfea ledger: verify fixed-population partition comparisons | f3c77a11c Evaluate supplied food partitions on fixed welfare populations | 704812162 Document CFE aggregation review and semantic curation design | 539d7adb5 ledger: ground supplied-partition welfare evaluation		
+fix/323-albania	cbebdce4f820c6df5f1e8f3be9bc45d9791d6765	github	1123	1	reconcile-historical		cbebdce4f fix(albania): explicit, checked cluster grain + 2004 semantic fix (GH #323)		
+fix/323-burkina-faso	df5636d4800b5bd32c9ec86461f5990d61f704f7	github	1123	1	reconcile-historical		df5636d48 fix(#323): Burkina Faso — four passages, NaN-key annihilation, and two silent collapses		
+fix/323-cambodia	9a86386633fe3fd120e3e89199e04ebc9df3d794	github	1126	1	reconcile-historical	#613 CLOSED -> development	9a8638663 fix(#323): declare AND enforce the household->cluster collapse (Cambodia)		
+fix/323-cotedivoire	fb321db0db54670f12361fd741ef82d141a36d15	github	1123	2	reconcile-historical		fb321db0d docs(CotedIvoire): record full-suite result + the grappe_gps repo-hygiene defect | fc3be2033 fix(CotedIvoire): stop silently dropping rows on a non-unique index (GH #323)		
+fix/323-ethiopia	38d2147861b41ad4d67a56e64e529d1cfc9a5c34	github	1123	2	reconcile-historical		38d214786 docs(ledger): record cross-country blast radius + merge-order dependency (GH #323) | 972429152 fix(ethiopia): stop the silent index collapse in 5 tables (GH #323)		
+fix/323-ethiopiarhs	2a7611248f2e16964ad1d610bb9adb518361edb7	github	1126	1	reconcile-historical		2a7611248 fix(#323): honour declared aggregation; stop double-counting EthiopiaRHS food		
+fix/323-ghanalss	81331198c2ac35838f989b3a310a17ab290211a3	github	1126	1	reconcile-historical	#609 CLOSED -> development	81331198c fix(GhanaLSS): make the #323 index collapse declared-and-checked, not silent		
+fix/323-guinea-bissau	96f781d46eac2c9bc018b35585ef607471af37a8	github	1126	1	reconcile-historical		96f781d46 fix(#323): stop silently collapsing a non-unique declared index		
+fix/323-iraq	24ac7074891517c9e95915ab9a5d656bf3ac1546	github	1126	2	reconcile-historical		24ac70748 docs(iraq): record the cluster_features projection and the cluster-964 <NA> (GH #323) | 30c99c21d fix(iraq): declare the cluster_features collapse and enforce its invariant (GH #323)		
+fix/323-kazakhstan	b6ad458d0eb88fd8fbc8b9f3a4b98d1e5bb2b7e0	github	1126	2	reconcile-historical		b6ad458d0 docs(#323): record the cold byte-identity regression evidence for Kazakhstan | fc1e946e7 fix(kazakhstan): declare + enforce the aggregation behind a non-unique index (GH #323)		
+fix/323-kosovo	8411c171aa4c5e96f70420a714476bf58da3b937	github	1123	1	reconcile-historical		8411c171a fix(#323): Kosovo housing is a dwelling-STRUCTURE roster, not a HH table		
+fix/323-liberia	83e536d890a1cfe911ba7d32e8a7ef6b3dd7e997	github	1123	1	reconcile-historical		83e536d89 fix(Liberia): rekey cluster `v` from `ea_code` to `ea_unique` (GH #323)		
+fix/323-malawi	ce908b24b402ae54e7851472743171c18aa829e1	github	1102	2	reconcile-historical		ce908b24b ledger(#323-Malawi): instrument validation, the four defects, and two corrections to the handed-down diagnosis | 256da101d fix(Malawi/#323): four stacked silent-collapse bugs in cluster_features + shocks		
+fix/323-mali	a8fe61cca509e66193326401fa8824bd6b9ee5bb	github	1126	1	reconcile-historical		a8fe61cca fix(#323): Mali — pid wired to the respondent, not the person; keep both EACI visits		
+fix/323-niger	5c554ee91e75a5e04c86ddc96eec4768b5a4cd61	github	1123	1	reconcile-historical		5c554ee91 fix(niger): restore the collapsed household key + close the #323 class (GH #323)		
+fix/323-nigeria	64889309c8ebd7029a7c8eb8a96420b03917ea33	github	1123	1	reconcile-historical		64889309c fix(#323): Nigeria -- the cluster key, the cartesian geo merge, the item_seq roster		
+fix/323-senegal	fb198f4fb4dca816f602b991699471a61444196d	github	1123	1	reconcile-historical		fb198f4fb fix(senegal): declare + enforce duplicate-index aggregation (GH #323)		
+fix/323-serbia-and-montenegro	9b6436fa88453602ff46616497db0003a2ddb34b	github	1123	1	reconcile-historical		9b6436fa8 fix(serbia): extract cluster_features at cluster grain, not person grain (GH #323)		
+fix/323-south-africa	7bbf0ed23586bc756778ee7a98adc5739150fc0a	github	1123	2	reconcile-historical		7bbf0ed23 docs(#323): record South Africa regression evidence in the ledger | fe52743fd fix(#323): declare + ENFORCE the South Africa cluster_features reduction		
+fix/323-tajikistan	6d0fae406fd74aecc4c6febf6d6ae897205fb8ee	github	1123	1	reconcile-historical	#610 CLOSED -> development	6d0fae406 fix(#323): enforce the silent household->cluster collapse in cluster_features		
+fix/323-tanzania	01b69f862571139628fc371814c107d84ea21d69	github	1123	1	reconcile-historical		01b69f862 fix(Tanzania): declare the household->cluster reduction; stop mislabeling clusters (GH #323)		
+fix/323-timor-leste	cfe13d427653ba89d2956d77de603b7fa4f6239e	github	1123	1	reconcile-historical		cfe13d427 fix(timor-leste): declare the cluster_features de-duplication (GH #323)		
+fix/323-togo-config	dc92615a96413fc3574e95a0ccb5d5ae79c04a0f	origin	1062	1	patch-equivalent-to-development	#632 MERGED -> development			
+fix/503-guyana	730bc89ec36b74ac4164445413e56204333c1e16	github	1102	1	reconcile-historical		730bc89ec fix(Guyana): household identity is (ED, SN, HH), not (ED, HH) — GH #503		
+fix/600-provenance-1to1	8afe909ae4ca2ca6fe1838a96cd8e0fecb32c6e7	github	1102	1	reconcile-historical		8afe909ae fix(provenance): catalog_id is not a 1:1 key — a partial record is a false claim (#600)		
+fix/605-ci-skip	7495263e11b6d2d8ffb59aa359c0874e0de74ba1	github	1120	1	patch-equivalent-to-development				
+fix/713-glss4-weight	7b252bd37d00c4120f0ea1da6dc2edf8f5d69940	github	808	0	ancestor-of-development	#714 MERGED -> development			
+fix/716-get-data-file-paths	f88e3fd40492e454c6b9d0eca5830313892c0904	github	835	0	ancestor-of-development	#717 MERGED -> development			
+fix/719-collectonly-purge	4c5ddd691e538ef8ee6eb47f0f20b5ff6c8e120e	github	803	0	ancestor-of-development	#722 MERGED -> development			
+fix/727-housing-canon-bamboo-terrazzo	82e78e863f35f3e83c7ba7e7e63e4b361fcd3822	github	726	0	ancestor-of-development	#765 MERGED -> development			
+fix/741-s3-unlock-pure-python	904db9935d99efa1e6c83030383fe68371435aea	github	771	0	ancestor-of-development	#742 MERGED -> development			
+fix/753-ghanalss-config-root	bfa2a61b72f0af1eb28e2963405417ed1858ee8a	github	304	0	ancestor-of-development	#886 MERGED -> development			
+fix/757-country-wave-inputs	ba2083d8c9794bc98ceec2d39812a21bf93d565c	github	303	0	ancestor-of-development	#888 MERGED -> development			
+fix/763-sidecar-fast-path	5754138015c697dc28c704565522c32caeb8c0c2	github	242	0	ancestor-of-development	#922 MERGED -> development			
+fix/770-currency-denominated-units	1963709ffb2bdf9954c798367d91f6e831082bcb	github	581	16	reconcile-historical	#784 MERGED -> development	"912539deb test(#770): re-derive the GhanaLSS all-wave counts cold after #785 | 08a186d62 test(#770): delete the vacuous all-currency test rather than keep a third one | b8b0e931a docs(#770): retire the ""662 labels"" claim; report case-variant label collisions | 0707644e6 fix(#770): currency rows get their own bucket in _drop_unpriceable | 8d230c6bf fix(#770): EthiopiaRHS and Serbia canonicalise currency labels onto Value | fcecb25fc test(#770): a real positive control, and drop a dead marker alias | 678c5e80f docs(GhanaLSS): why six food_prices waves are CORRECTLY empty after #770 | 1949d5377 fix(#770): currency-denominated u labels get no inferred kg factor"		
+fix/770-currency-denominated-units	54c4b625c158d5377a14755ea1593d3b9e78962e	origin	642	9	reconcile-historical	#784 MERGED -> development	"08a186d62 test(#770): delete the vacuous all-currency test rather than keep a third one | b8b0e931a docs(#770): retire the ""662 labels"" claim; report case-variant label collisions | 0707644e6 fix(#770): currency rows get their own bucket in _drop_unpriceable | 8d230c6bf fix(#770): EthiopiaRHS and Serbia canonicalise currency labels onto Value | fcecb25fc test(#770): a real positive control, and drop a dead marker alias | 678c5e80f docs(GhanaLSS): why six food_prices waves are CORRECTLY empty after #770 | 1949d5377 fix(#770): currency-denominated u labels get no inferred kg factor"		
+fix/780-ghanalss-fingerprint	2346a6c738052cfae11d0d3ee29cbf876ca24d32	github	303	0	ancestor-of-development	#889 MERGED -> development			
+fix/782-ghanalss-food-labels	cbde101aa440fc7ab750ae745d4aec19e200d97c	github,origin	670	8	reconcile-historical	#785 MERGED -> development	cbde101aa docs(GhanaLSS): Trap 9 -- correct b93f9c2c's diagnosis; the hazard is worse than .first() | 9439c6203 docs(GhanaLSS): correct idiosyncrasy 3 -- 2005-06 own production now maps; +110,213 kg | b93f9c2c4 fix(GhanaLSS): resolve 2005-06's merged farmgate prices in the wave script, not by core's .first() | a1130763c docs(GhanaLSS): record the #782 decode trap and the one-vocabulary rule | c183cf49e test(GhanaLSS): the canonical-j guard, so an unmatched decode fails loudly | 8536d112c fix(GhanaLSS): one food vocabulary, not two -- price items rejoin the food axis | 5dd3720fe fix(GhanaLSS): reconcile 7 cross-wave Preferred Label drifts to the country table | c2d37af9d fix(GhanaLSS): 2005-06 own production decodes; 149,047 rows shipped raw survey labels		
+fix/783-consolidate-food-vocabularies	ee761fcb8327a806e3197bcd3d371a370819b31a	github,origin	584	6	reconcile-historical	#789 MERGED -> development	d1f68b4fd test(labels): move the GhanaLSS food-label pin, and pin the #783 property itself | 98a0b7a21 refactor(config): consolidate six stranded food vocabularies into harmonize_food		
+fix/800-tajikistan-2003-relationship	1fce84b112f745e7e3a628d2ac623b15d22f3e7d	github,origin	615	1	reconcile-historical		1fce84b11 WIP(wt-800-taj): Tajikistan 2003 relationship decode + CONTENTS		
+fix/801-relationship-mojibake	b23c0d25a552417b3ec6214176b827c0b980126d	github,origin	613	1	patch-equivalent-to-development				
+fix/803-never-read-intree-parquets	9719a32dfa29bd0c8a00521579f73a6f01c5df5f	github,origin	614	1	patch-equivalent-to-development				
+fix/809-hashless-country-parquet-is-stale	836289d47f994715826a555d94b52f4ec39e02a0	github	251	0	ancestor-of-development	#918 MERGED -> development			
+fix/810-dvc-open	bebe68a518fef37b51717a12c7e7b669c355c88f	origin	89	2	superseded-by:fix/810-followup				
+fix/810-followup	0014e7332139732a64af296b862f7d1044af4d3c	origin	31	4	active-landing				
+fix/811-region-tables	75e347042f4a9d87f3deb7812f4135a3e388da79	github,origin	19	0	ancestor-of-development	#971 MERGED -> development			
+fix/813-kinship-source-defects	fff5bba1a4ea48478c1e4afdfb6ca38939928874	github,origin	119	0	ancestor-of-development	#954 MERGED -> development			
+fix/829-uganda-2015-16-value-sold	d909213f5b43e97a937c052dbb234ecbb6abdb88	origin	537	3	patch-equivalent-to-development				
+fix/831-cache-clear	a126900688bef511c0c437e3d84b17141ea96dc8	origin	89	1	superseded-by:fix/831-followup				
+fix/831-followup	858c41b474bb38a803b920eed14718a7e0f89175	origin	31	3	active-landing				
+fix/832-unit-spelling-residuals	efe0199a3cd46c08b0c4c3fa463965f4e03cc6b4	origin	131	0	ancestor-of-development	#949 MERGED -> development			
+fix/837-cluster-key-residual	c8bf36d813eb9f97570da58e365abf42385d68c0	github,origin	277	1	reconcile-historical		c8bf36d81 WIP(wt-fix-837-cluster-key-residual): Ethiopia + Tanzania cluster-key residual		
+fix/838-ethiopia-pinned-numbers	ffcae2797bf657098b3a68913e1587b663dc69f0	github,origin	236	0	ancestor-of-development	#930 MERGED -> development			
+fix/848-uganda-condition2	1d36fb97685c51113b6c5adb1ea7af0d3793adf9	github,origin	21	0	ancestor-of-development	#972 MERGED -> development			
+fix/866-stale-country-parquet-not-laundered	88ac40464f42da18c9121f0d8d2c5643ec2324c2	github	236	0	ancestor-of-development	#924 MERGED -> development			
+fix/866-stale-country-parquet-not-laundered	cb6ec1ceb9eb17b46ecbcb547552c34e9db811e9	origin	236	2	reconcile-historical	#924 MERGED -> development	cb6ec1ceb docs(handoff): local regression green (165 passed); PR #924 CI in progress | 31849fdb9 docs(handoff): GH #866 state, PR #924, and the regression run to check first		
+fix/868-followup	9dfb8339455957739896730216493ba4453a9693	origin	31	3	active-landing				
+fix/868-reduce-agreed	dda202b514584925ceb212bb0f75ce32c0f721cd	origin	89	1	superseded-by:fix/868-followup				
+fix/891-wave-subset-cache	f2ea24fc6f16bcdc382ef3174134e7c8b18276d8	github	311	0	ancestor-of-development	#893 MERGED -> development			
+fix/914-panel-ids-are-sources	6e4dc5b683f0d903179ee4368df124cc9facdc9b	github	250	0	ancestor-of-development	#917 MERGED -> development			
+fix/914-panel-ids-are-sources	6deaaf2d179388750092572a1cb6671ccdc79095	origin	250	1	patch-equivalent-to-development	#917 MERGED -> development			
+fix/916-food-prices-includes-derived-valuations	67e9a841e50bcda5525a436b4b703a7a87ce6629	github,origin	236	0	ancestor-of-development	#923 MERGED -> development			
+fix/919-country-qualified-units	9102f7a2c5d3e138bffd68b80a870858f782f541	github	240	0	ancestor-of-development	#921 MERGED -> development			
+fix/936-ghanalss-price-collapse	658c54584a20f0b9cc57a0c6e4dec8e45462a2f6	github	139	1	patch-equivalent-to-development	#946 CLOSED -> development			
+fix/936-ghanalss-price-collapse	79ea55a70a376a739f93fcd54fc6563a7b03f4a4	origin	139	2	patch-equivalent-to-development	#946 CLOSED -> development			
+fix/936-ghanalss-price-collapse-clean	c881bdbb3fa6e13a3f54c108ed8ba3ef248bc7a1	origin	167	0	ancestor-of-development	#947 MERGED -> development			
+fix/945-kinship-unreachable-keys	a8c7496cd30b903322fdd54a4a8fb4c77fd57e09	github,origin	121	0	ancestor-of-development	#951 MERGED -> development			
+fix/948-ghanalss-relative-imports	6efb964371393a22baec99f91f1b82a9c15d8d3b	github,origin	119	0	ancestor-of-development	#952 MERGED -> development			
+fix/962-uganda-food-units	a2b44daa677a02c82b60e05016df45e194597e32	github,origin	97	7	active-landing	#967 OPEN -> development			
+fix/962-uganda-unit-sentinel	439aed68ef1364095a3f59ab2052ec6ad23891f5	origin	93	3	reconcile-historical		439aed68e venv: harvest Uganda quantities/nutrition at pin/use_parquet | 5a7e2d5a6 venv: job to measure what GH #962 changes in the served Uganda data | 98371352c fix(Uganda): write the recognised no-unit sentinel, not the repo's null marker (#962)		
+fix/962-value-count-draft	c7b97515db1f64df4d657527e115311ff9de3f98	origin	89	1	reconcile-historical		c7b97515d Uganda #962, second attempt (PARKED, not for merge as-is)		
+fix/970-json-make	dd85a53a866ef0c0f9c08e39c921add8c3a72b2a	github,origin	2	4	active-landing	#982 OPEN -> development; #979 MERGED -> development			
+fix/burkina-2014	650484236314f09d3f87fb1f329c481e75cb7eb0	github,origin	3	2	active-landing	#981 OPEN -> development			
+fix/ci-skips	9291b79deea8be7014b8c170f8cb3f7892a1d690	github,origin	3	5	active-landing	#980 OPEN -> development			
+fix/framework-small	de2284da2df4d2bd172c65c97204e97d9a6ec224	origin	21	8	superseded-by:fix/framework-small-2				
+fix/framework-small-2	fd3ebb1c5dfc68fb48f084fb1e3faa5ec8e57cfb	origin	4	13	active-landing				
+fix/ghana-docs-encoding	3973e909468b9b33137c6bc3e561d934b252779f	origin	21	4	active-landing				
+fix/ghanalss-692-695-y01c-tables	66f65db5b6a2b3a39fa18514f59ab10dc247eb51	github	762	0	ancestor-of-development	#751 MERGED -> development			
+fix/ghanalss-731-705-education-urban	7231bfbc37a9d58f8b34bb505cfccd2a72cc1f4e	github	750	0	ancestor-of-development	#756 MERGED -> development			
+fix/ghanalss-aggregate-recuration	63ab3f6a033f7d7d04dac0f8c39fee5310fd2543	github,origin	187	0	ancestor-of-development	#940 MERGED -> development			
+fix/ghanalss-label-crosswalk	8766f882c35c219cd3ada059ee021c5eacba2ded	github,origin	191	0	ancestor-of-development	#935 MERGED -> development			
+fix/grader-scale-830	73b06e97b1efa09bb0e1b7b394063356763159e4	origin	21	2	active-landing				
+fix/kinship-974	1d77c6ff282cc8a2947cec235c05d4dbecc502d7	origin	21	3	active-landing				
+fix/klps2-dta-originals	990d3426200af81f56d252c3275d1cbba8dcc090	github	707	0	ancestor-of-development	#767 MERGED -> development			
+fix/labels-relabel-787	6922c077af5b1d1f386f081920586e407b5a6d2d	origin	21	2	active-landing				
+fix/malawi-bundle	13da05b1106a2ce0de9048fe8f0b32164d53a49d	origin	89	2	patch-equivalent-to-development				
+fix/malawi-derivations	95449ffb91ce9515e422d26f2d276068d4e094dc	origin	89	3	patch-equivalent-to-development				
+fix/malawi-derivations-2	a2051b6acbe27bb7024d003b561edeaf53b1ea95	origin	89	4	patch-equivalent-to-development				
+fix/malawi-sale-basis-probe	7398de55fddbcb0fdfdf51a762fd986d2439d1e8	origin	89	5	reconcile-historical		7398de55f probe(Malawi): all 17 price-attached sales are inferred UNSHELLED | 43cbcd583 probe(Malawi): the proposal uses within-wave reference rungs only; 17 sales / 477,800 MWK | 1ff7f4f2e probe(Malawi): can PRICE decide a sale's shelled/unshelled basis? -- measured, not implemented		
+fix/malawi-sale-docs	2515d16686f556d630f89390383691ab3c13c7bc	origin	115	0	ancestor-of-development				
+fix/malawi-sale-units	a27aae6d6ea139f0c0b40a5ac0a2d4183d580893	github,origin	113	0	ancestor-of-development	#966 MERGED -> development			
+fix/metric-fraction-parse	91118fd1a5be1462941258bd4c27763595cb5629	github,origin	235	0	ancestor-of-development	#963 MERGED -> development			
+fix/niger-bundle	d36054864f6703dab1df95b976be8c642c94b62f	origin	89	5	superseded-by:fix/niger-followup-2				
+fix/niger-followup	cad6c8797776f6fe5e8ae0c6480225f82c9552b2	origin	89	11	superseded-by:fix/niger-followup-2				
+fix/niger-followup-2	b6feef57812432d4ac89d7bd4f0669e933aabae4	origin	31	14	active-landing				
+fix/nigeria-824	d568ab428d8f810b873dc3819cab80f28fd09c90	origin	89	2	superseded-by:fix/nigeria-824-followup				
+fix/nigeria-824-followup	eeb445ebf1d0b690bf71bc45bedb6c2215c7b53e	origin	31	5	active-landing				
+fix/nigeria-w5-cluster	df3b211f682d3e27e798896e638d3adad98d748f	origin	21	2	active-landing				
+fix/panel-ids-pandas3-dtype	5025641bec390ca61af98d2b24301da4395a326b	origin	306	2	patch-equivalent-to-development				
+fix/peru-panama	e887e163b511361caf1795fbc684b30e98627e71	origin	21	2	active-landing				
+fix/prices-ethiopia	8acb0dbe267d39914a908c60548ce194bdc7d6d4	origin	561	1	patch-equivalent-to-development				
+fix/prices-ghanalss	0331a5e911b5691261b07f9e189c6e76f79de764	origin	561	2	patch-equivalent-to-development				
+fix/prices-malawi	305277841db6ca6ca367f78dec33d4a25c73aafb	origin	561	3	patch-equivalent-to-development				
+fix/prices-mali	b42c1c807a1850c2e406c5c25eb553150c4bdeef	origin	561	2	patch-equivalent-to-development				
+fix/prices-niger	4732a5eb72fbd1097f17c1c302404f13703c6399	origin	561	1	patch-equivalent-to-development				
+fix/prices-nigeria	0178127e6218c3d23e9220afca64192c4fcadc5e	origin	561	1	patch-equivalent-to-development				
+fix/prices-tanzania	38e988ee3ced85b65f594ebf9e381fb4917cd5f9	origin	561	1	patch-equivalent-to-development				
+fix/prices-uganda	179af5461b2ee4f734acd8f107968bfa7a259dea	origin	561	1	patch-equivalent-to-development				
+fix/pytest-testpaths	e70b840a416618589ebcde6a42f63493439c9dbf	github	795	0	ancestor-of-development	#733 MERGED -> development			
+fix/readers-xport-sniff	77d2b9829cc96e165165d9cdabb59fe4bfa21809	origin	21	2	active-landing				
+fix/readme-doi-badge	cb7e0cb9023fd512051e30da2cc066f7e4cb4629	github	765	0	ancestor-of-development	#747 MERGED -> development			
+fix/relabel-j-empty-string	156279ef84f22d10c7210f74b4f4a82e77ef0584	github,origin	248	0	ancestor-of-development	#927 MERGED -> development			
+hotfix/v0.11.0-version-placeholder	df67f197e447dd9e74aa5ede0dd02a214a471975	github	700	0	ancestor-of-development	#815 MERGED -> master			
+integrate/pr-886-893	aa4322c19c0f8fedfa4f352fb52abd6d806d7514	github	286	0	ancestor-of-development	#895 MERGED -> development			
+investigate/797-finalize-order	a430d572f78807169e3aa69594394f9fc7feb40a	github,origin	616	1	reconcile-historical		a430d572f WIP(wt-797-swap): investigate _finalize_result ordering; GhanaLSS 1991-92 + Peru 1994		
+investigate/dta-encoding	f4df2fb4c93a491e98f6c03194798dcf11406374	github,origin	584	9	reconcile-historical	#795 MERGED -> development	4cbb655e0 docs(encoding): re-scope the Senegal / Burkina Faso claims against GH #801 and #805 | df32593f4 docs(burkina_faso): confirm the leak cold, name the real cause (cp1252), bound the cohort figure | 0a8d4ab88 docs(burkina_faso): 12,933 rows of served food_acquired.j are mojibake | 86fee9420 docs(encoding): correct the BF claim, and record that this is a six-country cohort | 7889307ea test(encoding): sweep harness + raw records for the .dta value-label encoding audit | 839281ccb docs(encoding): record the load-bearing mojibake in Senegal, and BF's dead encoding= scripts		
+master	1528fa937bcf87f146b3af9ebfdbe18b8f912750	github	181	0	integration-ref	#181 MERGED -> master; #138 MERGED -> master; #81 MERGED -> development; #78 CLOSED -> development; #76 MERGED -> development; #75 MERGED -> development; #74 CLOSED -> development; #73 CLOSED -> development; #71 MERGED -> development; #69 CLOSED -> development; #68 MERGED -> development; #67 MERGED -> development; #66 CLOSED -> development; #65 MERGED -> development; #56 MERGED -> development; #55 MERGED -> development; #54 MERGED -> development; #53 MERGED -> development; #48 MERGED -> development; #47 CLOSED -> development; #46 MERGED -> development; #44 MERGED -> development; #41 MERGED -> development; #40 MERGED -> development; #38 MERGED -> development; #36 MERGED -> development; #34 MERGED -> development; #33 MERGED -> development; #31 MERGED -> development; #27 MERGED -> development; #25 MERGED -> Faye; #24 CLOSED -> Faye; #22 MERGED -> development; #21 MERGED -> Faye; #18 CLOSED -> Faye; #17 MERGED -> Faye; #16 MERGED -> Faye; #15 MERGED -> Faye; #14 MERGED -> Faye; #12 MERGED -> Faye; #11 MERGED -> master; #10 MERGED -> development; #9 MERGED -> master; #8 CLOSED -> master; #7 MERGED -> master; #6 MERGED -> master; #5 MERGED -> master; #4 MERGED -> master; #3 MERGED -> master; #2 MERGED -> master; #1 MERGED -> master			
+master	e7135d2d87ab498577200abbda0a9c79e8969031	origin	249	0	integration-ref	#181 MERGED -> master; #138 MERGED -> master; #81 MERGED -> development; #78 CLOSED -> development; #76 MERGED -> development; #75 MERGED -> development; #74 CLOSED -> development; #73 CLOSED -> development; #71 MERGED -> development; #69 CLOSED -> development; #68 MERGED -> development; #67 MERGED -> development; #66 CLOSED -> development; #65 MERGED -> development; #56 MERGED -> development; #55 MERGED -> development; #54 MERGED -> development; #53 MERGED -> development; #48 MERGED -> development; #47 CLOSED -> development; #46 MERGED -> development; #44 MERGED -> development; #41 MERGED -> development; #40 MERGED -> development; #38 MERGED -> development; #36 MERGED -> development; #34 MERGED -> development; #33 MERGED -> development; #31 MERGED -> development; #27 MERGED -> development; #25 MERGED -> Faye; #24 CLOSED -> Faye; #22 MERGED -> development; #21 MERGED -> Faye; #18 CLOSED -> Faye; #17 MERGED -> Faye; #16 MERGED -> Faye; #15 MERGED -> Faye; #14 MERGED -> Faye; #12 MERGED -> Faye; #11 MERGED -> master; #10 MERGED -> development; #9 MERGED -> master; #8 CLOSED -> master; #7 MERGED -> master; #6 MERGED -> master; #5 MERGED -> master; #4 MERGED -> master; #3 MERGED -> master; #2 MERGED -> master; #1 MERGED -> master			
+rescue/2026-07-21/323-assets-item-seq	66b0ae52aa04e7b16c924ce16326a3d78ca4c18a	github	1099	4	reconcile-historical		66b0ae52a rescue(WIP): uncommitted work from worktree 323-assets-item-seq | bc4714eb2 fix(#323): assets Value is additive; an all-NA group is NA, not a fabricated 0		
+rescue/2026-07-21/323-benin	2feeeb99402d47dd786c885833f44bae160e06a6	github	1123	1	reconcile-historical		2feeeb994 rescue(WIP): uncommitted work from worktree 323-benin		
+rescue/2026-07-21/323-togo	ab0d1086f4aae61a5221a685664787d1f5313cf1	github	1123	1	reconcile-historical		ab0d1086f rescue(WIP): uncommitted work from worktree 323-togo		
+rescue/2026-07-21/323-uganda	d4b4e04cb851b1d5fa05b4930b2e8185643e9974	github	1123	1	reconcile-historical		d4b4e04cb rescue(WIP): uncommitted work from worktree 323-uganda		
+rescue/2026-07-21/602-spellings	296849a02a7f262635f8aa8e0b59160290c910f2	github	1119	1	reconcile-historical		296849a02 rescue(WIP): uncommitted work from worktree 602-spellings		
+rescue/2026-07-21/stash-0	02d7e434714ea562282c83b179b3fe770265b0df	github	1102	4	patch-equivalent-to-development				
+rescue/2026-07-21/stash-1	06afe08c8164d289a0ac400bade840733808f435	github	1123	2	patch-equivalent-to-development				
+rescue/2026-07-21/stash-2	de3fa6b014e5ba6eeb3c3136993dc2ad4f34bd99	github	1102	2	patch-equivalent-to-development				
+test/assets-mincount	c83947d44ca441217848d278546056be2499dd95	origin	1102	1	patch-equivalent-to-development				
+uganda-rm-units-org	0bc58afc5a115adde2fc4b6def968bd5516e4a63	github	1863	1	patch-equivalent-to-development	#240 MERGED -> development			
+use_parquet	990a6beebd4d9277f30554fd62207091db01372f	github	2779	0	ancestor-of-development				

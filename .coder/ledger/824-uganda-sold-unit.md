@@ -143,7 +143,9 @@ capped column, and its nullity is not random.
 
 **Agreement** — `Unit_sold == u`, rows with a positive `Quantity_sold` that
 know both (`u != 'Unknown'`, `Unit_sold` non-null): **96.06%** panel-wide
-(**40,083** rows), by wave-season 92.0–98.0%; i.e. **3.9% disagree**.  (The
+(**40,083** rows), by wave-season 92.0–98.0%; i.e. **3.9% disagree**.  [2026-09-24,
+GH #848: 41,162 rows / 96.14% after the 2018-20 season-B second condition slot;
+same range, same 3.9%; largest disagreement cell 162 → 165.]  (The
 looser "any row carrying both labels" definition gives 40,183 / 95.98%; the
 sale-row restriction is the one to quote and the one now shipped.  The
 2026-09-09 version of this ledger shipped 40,183 and a 2009-10 season-A
