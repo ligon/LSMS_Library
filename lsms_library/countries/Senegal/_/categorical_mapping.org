@@ -447,6 +447,65 @@
 | verre                                | Verre                  |
 | verre Ã   thÃ©                       | Verre à thé             |
 
+* Region
+
+GH #811 (sibling of the Guinea-Bissau case), 2026-09-24.
+=cluster_features.Region= (=s00q01=) is served in 14 labels for 14
+regions, identical across 2018-19 and 2021-22 -- thirteen lower-case
+(=dakar=, =thies=, ...) beside one title-case =Saint-Louis=, the latter
+because both waves' =data_info.yml= carry an inline =SAINT-LOUIS ->
+Saint-Louis= mapping and nothing else.  No within-Senegal join was ever
+broken; this table is COSMETIC -- casing consistency with the other
+EHCVM countries' =Region= (Guinea-Bissau, Burkina_Faso, Niger) so a
+cross-country =Feature('cluster_features')= filter on a title-case name
+matches Senegal too.
+
+Title case of the raw label, no accents added (=Thies=, =Kedougou=,
+=Sedhiou= -- accents would be a judgement beyond case, and the source
+does not carry them).  =Saint-Louis= keeps its hyphen.  Senegal's
+=sample= has no =strata= column, so the Guinea-Bissau "Region == strata"
+check has no analogue here.  The inline =SAINT-LOUIS= mapping in
+=data_info.yml= is left as it is (harmless, and a build input).
+
+*Cache cost*: this file is a build input (folded into =Wave._input_hash=),
+so the edit moves every Senegal cache hash -- two waves, seven
+script-path tables.  Not paid here; verified on the read path with
+=assume_cache_fresh=True=: 14 labels -> 14, 1,194 rows, per-wave counts
+unchanged.
+
+#+name: Region
+| Alternate Spelling | Preferred Label |
+|-------------+-------------|
+| dakar       | Dakar       |
+| Dakar       | Dakar       |
+| diourbel    | Diourbel    |
+| Diourbel    | Diourbel    |
+| fatick      | Fatick      |
+| Fatick      | Fatick      |
+| kaffrine    | Kaffrine    |
+| Kaffrine    | Kaffrine    |
+| kaolack     | Kaolack     |
+| Kaolack     | Kaolack     |
+| kedougou    | Kedougou    |
+| Kedougou    | Kedougou    |
+| kolda       | Kolda       |
+| Kolda       | Kolda       |
+| louga       | Louga       |
+| Louga       | Louga       |
+| matam       | Matam       |
+| Matam       | Matam       |
+| sedhiou     | Sedhiou     |
+| Sedhiou     | Sedhiou     |
+| tambacounda | Tambacounda |
+| Tambacounda | Tambacounda |
+| thies       | Thies       |
+| Thies       | Thies       |
+| ziguinchor  | Ziguinchor  |
+| Ziguinchor  | Ziguinchor  |
+| saint-louis | Saint-Louis |
+| SAINT-LOUIS | Saint-Louis |
+| Saint-Louis | Saint-Louis |
+
 #+NAME: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
