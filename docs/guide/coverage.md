@@ -89,6 +89,68 @@ cannot know which waves it serves.
     Only `panel_ids` and `updated_ids` are still keyed by name: they return
     dicts, not DataFrames, so there is no `t` to slice and no wave axis to grade.
 
+### A `sane` cell can be 100x off: the cross-wave scale note (GH #830)
+
+Every readiness check is a **shape** check on one wave's slice — present,
+non-null, typed, uniquely indexed. None of them asks whether a wave's numbers
+are on the same *scale* as the waves beside it. Uganda 2015-16 shipped its crop
+sale value `a5aq8` divided by 100 (GH #829): every row correctly typed and
+indexed, every shilling figure one percent of its neighbours', graded `sane`.
+
+So the grader now compares, for every **monetary** column of a table, each
+wave's median (of positive values) to its adjacent waves' and attaches a
+`warn: scale_ratio[...]` note to the cell's `detail` when the wave is more than
+5x above or below **every** comparable neighbour. The note names the column,
+the wave's median and support, the neighbours' medians and the ratio. **It does
+not change the tier** — inflation, item mix and instrument changes all move a
+median legitimately, so this is a work queue, not a verdict. The same records
+reach the audit harness as `scale` findings (`bench/feature_audit/scan.py`),
+and `coverage_matrix.monetary_scale_breaks(df, country, feature)` returns them
+for any frame.
+
+Three design points, so the check is not misread:
+
+- **Which columns are monetary is `currency._monetary_columns`**, the registry
+  `convert()` already uses — the built-in seed plus every `monetary: true` flag
+  in `data_info.yml` / a country's `data_scheme.yml`. `crop_production.Value_sold`,
+  the #829 column, carries no YAML flag at all and is monetary only through the
+  seed; a YAML scan would have missed the motivating case.
+- **A redenomination is a currency fact, not an allowlist.** Two adjacent waves
+  whose ISO codes differ (`currency_for(country, wave)`, driven by the
+  `Currency: overrides` block — GhanaLSS GHC→GHS at 2007, Tajikistan TJR→TJS at
+  2000, Peru PEI→PEN at 1991) are incommensurable and are not compared. There is
+  deliberately **no list of cells** that may jump.
+- **5 is a stated tolerance, not a discovered boundary.** Uganda's genuine
+  adjacent ratios run 1.0–1.7 over ten years of inflation; the #829 defect sat
+  at 0.01. Each wave needs 30 positive values to be judged or to serve as a
+  reference (the Site Q floor). Where the table has a `j` level the ratio is the
+  median over items of the per-item ratio (robust to a wave that sold more
+  coffee and fewer beans), falling back to pooled medians below 3 shared items.
+
+What it **cannot** see, stated: a break that *persists* (waves A, B on one
+scale, C, D on another) leaves every wave agreeing with one neighbour, so
+nothing is reported; and a frame with exactly two comparable waves reports both,
+because with one neighbour each the grader cannot say which is wrong.
+
+A `sane` tier still does not establish item coverage or correct unit labels,
+and an unconfigured redenomination can be a persistent break that this test
+misses. Each neighbour's ratio form (`per-item[k]` or `pooled`) is carried in
+`neighbour_forms` and printed beside its median; the record's summary `form`
+is `mixed` if they differ. The displayed medians are always pooled levels.
+
+The approved first increment retains the fixed fivefold, warning-only
+threshold without CPI or elapsed-year adjustment. The independent October 14
+review found **four records across three of 87 warm monetary country-tables**:
+GhanaLSS `community_prices.Price` (1998-99, 5.56x), GhanaLSS
+`food_acquired.Price` (1991-92, 0.16x), and GhanaSPS
+`crop_production.Value_sold` (2009-10, 0.167x; 2017-18, 6.0x). The review
+attributes the two GhanaLSS records to inflation across a seven-year gap;
+the GhanaSPS instrument/level difference remains unadjudicated. These are
+triage notes, not four established errors. Persistent-break detection,
+`community_prices` comparison grain, and gap-aware tolerance remain #830
+follow-ups; the census and its provenance are in
+`.coder/ledger/830-grader-scale.md`.
+
 ## Adjudicating an `absent` cell
 
 `absent` alone says only *"the feature is not declared for this wave."* That
