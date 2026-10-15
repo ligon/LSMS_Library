@@ -1,0 +1,147 @@
+hhid	string	Household id code
+quarter	string	Year_Quarter
+cluster	int16	Cluster
+HholdID	int8	Household id
+qtr	int8	Quarter
+region	int8	regcode
+s5q1	int8	During the last 12 MONTHS, was there a time when You were worried you would not
+s5q2	int8	Still thinking about the last 12 MONTHS, was there a time when you were unable t
+s5q3	int8	Was there a time when you ate only a few kinds of foods because of a lack of mon
+s5q4	int8	Was there a time when you had to skip a meal because there was not enough money
+s5q5	int8	Still thinking about the last 12 MONTHS, was there a time when you ate less than
+s5q6	int8	Was there a time when your household ran out of food because of a lack of money
+s5q7	int8	Was there a time when you were hungry but did not eat because there was not enou
+s5q8	int8	During the last 12 MONTHS, was there a time when you went without eating for a w
+s6q0b	int8	Person Id_s6q0b
+s6q7	int8	during the past 3 months did any member of the household own and/or operate a fa
+s6q8d1	int8	Industry of main occupation (code) - Major
+s6q8d2	int16	ISIC CODE_s6q8d2
+s6q8d3	int32	ISIC CODE_s6q8d3
+s6q8e1	int8	Regular paid employee
+s6q8e2	int8	Casual worker
+s6q8e3	int8	Contributing family worker
+s6q8e4	int8	Apprentice
+s6q8f	int8	Where is the business/enterprise located?
+s6q8f1	int8	What is the enterprise?s main mode of doing business / how do you carry out your
+s6q8g	int8	Does (NAME) keep any form of accounting record on the business/enterprise?
+s7aq1	int8	In what type of dwelling does the household live
+s7aq2	int8	How many rooms household occupy
+s7aq3	int8	How many rooms used for sleeping
+s7aq4	int8	Do other households share this room with you?
+s7aq5	int8	How many households, including your household, share this sleeping room
+s7bq1	int8	What is the present holding/tenancy arrangement of the dwelling?
+s7bq2	int8	Who owns this dwelling?
+s7cq1	int32	How much does the household pay in cash towards the rent?
+s7cq1b	int8	Time unit_s7cq1b
+s7cq2	int8	Does your household supply goods or services in exchange or use of this dwelling
+s7cq3a	int16	What is the approximate value of these goods and services provided by your house
+s7cq3b	int8	Time unit_s7cq3b
+s7cq4	int8	Is part or all of the rent paid by someone who is not a member of your household
+s7cq5	int8	Who pays for the rent?
+s7cq6a	int16	How much is paid
+s7cq6b	int8	Time unit_s7cq6b
+s7cq7	int32	How much did your household spend for minor construction or repair cost and pain
+s7cq8a1	double	Imputed Rent_8a1 (Estimate how much it would have cost if you were paying)
+s7cq8a2	int8	Time unit_s7cq8a2
+s7cq8b1	int16	Imputed Rent_8b1 ( Estimate how much it would have cost if you were paying)
+s7cq8b2	int8	Time unit_s7cq8b2
+s7cq9	int8	Built/made improvements or additions to the dwelling in the past 3 months
+s7cq10a1	int8	Additional/improvements made on Additional rooms
+s7cq10a2	int16	What additions or improvements were made
+s7cq10b1	int8	Were any additional/improvements made on Built fences/fence walls?
+s7cq10b2	int16	Amount_s7cq10b2
+s7cq10c1	int8	Were any additional/improvements made on Built a terrace/porch/balcony
+s7cq10c2	int16	Amount_s7cq10c2
+s7cq10d1	int8	Were any additional/improvement made on Changed roof/?
+s7cq10d2	int16	Amount_s7cq10d2
+s7cq10e1	int8	Were any additional/improvements made on Changed floors/walls?
+s7cq10e2	int16	Amount_s7cq10e2
+s7cq10f1	int8	Were any additional/improvement made on Changed doors/windows?
+s7cq10f2	int16	Amount_s7cq10f2
+s7cq10g1	int8	Were any additional/improvement made on Installed sanitary facilities?
+s7cq10g2	int16	Amount_s7cq10g2
+s7cq10h1	int8	Were any additional/improvement made on Installed water tank?
+s7cq10h2	int16	Amount_s7cq10h2
+s7cq10i1	int8	Were any additional/improvement made on Installed security system?
+s7cq10i2	int16	Amount_s7cq10i2
+s7cq10j1	int8	Were any additional/improvement made on Installed fence gate?
+s7cq10j2	int16	Amount_s7cq10j2
+s7cq10k1	int8	Were any additional/improvement made on Changed/fixed ceiling?
+s7cq10k2	int16	Amount_s7cq10k2
+s7cq10l1	int8	Were any additiona/improvement made on Installed lighting system?
+s7cq10l2	int16	Amount_s7cq10l2
+s7cq10m1	int8	Were any additional/improvement mase on Plastering?
+s7cq10m2	int16	Amount_s7cq10m2
+s7cq10n1	int8	Were any additional/improvement made on Painting?
+s7cq10n2	int16	Amount_s7cq10n2
+s7cq10o1	int8	Were any additional/improvement made on Others?
+s7cq10o2	int16	Other_Amount_s7cq10o2
+s7cq10p	int32	Total amount_s7cq10p
+s7cq11	int32	What was the TOTAL cost of the construction, improvements or additions made to y
+s7dq1	int8	What is the main source of drinking water for this Household?
+s7dq2a	int8	Is this water source the household?s own production?
+s7dq2b1	int16	Distance
+s7dq2b2	int8	Distance Code
+s7dq2c	int16	How long does it take to go to the water source, get water and come back
+s7dq3a	int8	How much water does your household use in a day?
+s7dq3b	int8	Unit of quantity used
+s7dq4	int8	Does the household pay a regular bill for water supply?
+s7dq5a	int16	How much was your last bill?
+s7dq5b	int8	Time unit_s7dq5b
+s7dq6	int16	How much did your household pay to a private water Vendor,neighbour or standpipe
+s7dq7	int8	Did your household sell any water to someone else?
+s7dq8a	int8	How much does your household sell water?Amount
+s7dq8b	int8	Unit of water sold
+s7dq9	int16	How much did your household receive for the water sold in the past 2 weeks?
+s7dq10a	int8	What are the different sources of electricity that you use in your household in
+s7dq10b	int8	What are the different sources of electricity that you use in your household in
+s7dq10c	int8	What are the different sources of electricity that you use in your household in
+s7dq10d	int8	What are the different sources of electricity that you use in your household in
+s7dq11	int8	What is the source of power for the mini-grid
+s7dq12	int8	What is the MAIN reason why the household is not connected to the national grid?
+s7dq13	int8	What is the main source of lighting for your Dwelling
+s7dq14	string	Which of these different light bulb do you use with the main electricity system?
+s7dq14a	int8	Incandescent Light Bulb
+s7dq14b	int8	Fluorescent tube (with choke)
+s7dq14c	int8	Compact fluorescent light (CFL) Bulb
+s7dq14d	int8	LED Light Bulb
+s7dq14e	int8	Light Bulb, Other/Unknown type
+s7dq15a	double	How much did your household spend on electricity on your last bill?
+s7dq15b	int8	Time unit_s7dq15b
+s7dq16	int8	What is the main fuel used by the household for cooking?
+s7dq17	string	What type of biomas cook stove does the household use
+s7dq17a	string	None (Use other fuel)
+s7dq17b	int8	Traditional coalpot /Three-stone tripod stove
+s7dq17c	int8	Car rim/type metal stove
+s7dq17d	int8	Improved mud-stove with/without chimney (e.g. Mukyea)
+s7dq17e	int8	Ceramic/clay stove (e.g. gyapa, toyola, holy cook)
+s7dq17f	int8	Improved charcoal stove
+s7dq17g	int8	Improved firewood stove
+s7dq17h	int8	Improved Pellet/Briquette stove
+s7dq17i	int8	Other stove (specify)
+s7dq18a	int8	How long have you been using your main biomas cook stove_Time
+s7dq19	int8	In the past 3 months, where did you normally cook with the cookstove?
+s7dq20	int8	Do you usually use a chimney, hood or other exhaust system while using this stov
+s7dq21	int8	How does your household dispose of refuse?
+s7dq22	string	How does your household dispose of waste water (from bathroom, kitchen, laundry,
+s7dq22a	int8	Flows or thrown into drains/gutter
+s7dq22b	int8	Through drainage into a pit (soak away)
+s7dq22c	int8	Thrown onto the ground/street/outside
+s7dq22d	int8	Through the sewerage system
+s7dq22e	int8	Other waste water disposal method
+s7dq23a	double	How much does this household pay for refuse disposal?
+s7dq23b	int8	Time unit_s7dq23b
+s7dq24	int8	What type of toilet facility is usually used by the household?
+s7dq25	int8	Do you share this toilet facility with other households?
+s7dq26	int8	How many households including your household use this toilet facility?
+s7dq27a	double	How much does the household pay for the use of the toilet facility?
+s7dq27b	int8	Time unit_s7dq27b
+s7dq28a	double	How much was your last bill (only your part if shared)?
+s7dq28b	int8	Time unit_s7dq28b
+s7eq1	int8	What is the main construction material used for the outer wall?
+s7eq2	int8	What is the main construction material used for the floor?
+s7eq3	int8	What is the main material used for the roof?
+loctype	int8	localitytype
+hhwt_q9	double	None
+wtpp_q10	double	None
+hhwt_q10	double	None

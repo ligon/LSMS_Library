@@ -22,6 +22,7 @@ W4 (2018-19) and W5 (2021-22) draw entirely new samples with no
 backward link.
 """
 import json
+from pathlib import Path as _Path
 import sys
 
 import pandas as pd
@@ -52,9 +53,16 @@ df3 = df3.set_index(['t', 'i'])[['previous_i']]
 panel_ids_df = pd.concat([df2, df3], axis=0)
 D, updated_ids = panel_ids(panel_ids_df)
 
-with open('panel_ids.json', 'w') as f:
+# GH #914: write beside THIS script, never into the process's cwd.  These two
+# files are committed sources; `make panel-ids` regenerates them in place for a
+# maintainer to review as a diff.  Resolving off __file__ means a maintainer who
+# runs the script from somewhere other than `_/` updates the tracked files
+# rather than scattering copies.
+_HERE = _Path(__file__).resolve().parent
+
+with open(_HERE / 'panel_ids.json', 'w') as f:
     json_ready = {','.join(k): ','.join(v) for k, v in D.data.items()}
     json.dump(json_ready, f)
 
-with open('updated_ids.json', 'w') as f:
+with open(_HERE / 'updated_ids.json', 'w') as f:
     json.dump(updated_ids, f)

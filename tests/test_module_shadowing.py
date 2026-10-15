@@ -161,3 +161,57 @@ def test_no_in_package_module_imports_a_shadowed_name_as_a_module():
         + "\nImport the symbols by name instead: "
           "`from .recall import recall_records`."
     )
+
+
+# ---------------------------------------------------------------------------
+# `countries`: the third shadow, pointing the other way (GH #883 follow-on)
+# ---------------------------------------------------------------------------
+
+def test_countries_survives_importing_the_countries_subpackage():
+    """`ll.countries` must stay the callable after the namespace package loads.
+
+    Unlike `recall` / `derivations` -- imported eagerly in `__init__`, so the
+    callable is bound last and wins -- `lsms_library/countries/` is a namespace
+    package imported LAZILY.  The import system therefore rebinds the attribute
+    long after `__init__` has finished, and the callable loses a race it is not
+    even running in.  A data descriptor on the module's type pins it.
+
+    Reachable from ordinary use: `DerivationRecord.resolve()` imports whatever
+    module the registry names, and most registered derivations live under
+    `lsms_library.countries.*`.
+    """
+    import importlib
+    import lsms_library as ll
+
+    assert callable(ll.countries)
+    importlib.import_module("lsms_library.countries")
+    assert callable(ll.countries), (
+        "ll.countries was rebound to the namespace package -- the data "
+        "descriptor in lsms_library/__init__.py is gone (GH #883)"
+    )
+    assert isinstance(ll.countries(), list) and ll.countries()
+
+
+def test_resolving_a_country_derivation_does_not_break_countries():
+    """The path that actually bites: `rec.resolve()` on a country module."""
+    import lsms_library as ll
+    from lsms_library.derivations import resolve_callable
+
+    fn = resolve_callable(
+        "lsms_library.countries.GhanaLSS._.ghanalss:derive_12b_fortnight_value"
+    )
+    assert callable(fn)
+    assert callable(ll.countries), (
+        "resolving a country-module derivation clobbered ll.countries"
+    )
+
+
+def test_every_import_form_still_reaches_the_subpackage():
+    """Pinning the attribute must not break importing the package itself."""
+    import importlib
+    import sys
+
+    mod = importlib.import_module("lsms_library.countries")
+    assert sys.modules["lsms_library.countries"] is mod
+    from lsms_library.countries.GhanaLSS._ import ghanalss
+    assert ghanalss.__name__ == "lsms_library.countries.GhanaLSS._.ghanalss"

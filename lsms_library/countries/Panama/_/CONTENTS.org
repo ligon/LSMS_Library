@@ -798,6 +798,38 @@ print(df_to_orgtbl(df))
 | Otros                                                  | otros                                                  | Cocos                     | ---  |
 
 
+** The quintal is the SPANISH quintal here, and =units.json= is wrong about it
+
+Adjudicated by @ligon, 2026-09-15, while checking whether GH #838's
+=quintal=100kg= seed could reach Panama (it cannot -- see below).
+
+=units.json= record 12 reads:
+
+: {"Unitcode":12,"Label":"quintal","Translation":"centner","Conversion to Pounds":220.462}
+
+*220.462 lb is 100.000 kg* -- the METRIC quintal, to six significant figures.
+That is not a rounding artefact; somebody computed it.  =units.py='s
+=STANDARD_POUNDS= overrides it with =100.0= lb (45.359 kg, the Spanish
+quintal) and =label_to_kgs= gives the override precedence over the source.
+It is the *only one of six* =STANDARD_POUNDS= entries that contradicts its
+source; the other five agree within 1%.
+
+*The override is correct and the source is wrong.*  The judgement is that
+whoever compiled =units.json= took the quintal for a universal measure and
+filled in the metric centner.  In Panama it is 100 libras.  Recorded here
+because the override is a 2.2x correction applied silently, and nothing said
+why -- the =units.py= comment states the Spanish/metric ambiguity but not
+that the shipped table takes the wrong side of it.
+
+*Not a GH #838 exposure.*  =KNOWN_METRIC= gained =quintal: 100= in #838 and
+is keyed on the country-blind lower-cased label, but Panama's wave scripts
+mint the =Translation= (=centner=), which is not a =KNOWN_METRIC= key.
+Measured 2026-09-15 over every served =u= label: Panama serves =centner= (23
+rows) and =arroba= (12), neither of which that lookup reaches; Ethiopia is the
+only country in the corpus serving a literal =Quintal= (13,977 crop rows + 16
+food rows), and for Ethiopia 100 kg is right.  The latent hazard is noted at
+=transformations.py='s =KNOWN_METRIC= entry by commit =313a937b8=.
+
 ** TODO conversion_to_kgs.json -- GitHub Issue #117
 - What is missing :: A =conversion_to_kgs.json= file mapping survey
   measurement units to kilograms has not been created. The nutrition

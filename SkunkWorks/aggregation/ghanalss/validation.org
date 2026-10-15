@@ -1,0 +1,205 @@
+#+TITLE: GhanaLSS Aggregate: the beta-spread gate, selection and validation (post-#935)
+#+AUTHOR: Sue
+#+DATE: 2026-09-17
+
+* Published partition
+
+The country =Aggregate Label= column combines four groups.  The 215
+Preferred labels delivered across seven waves map to 209 groups; every
+other label, tobacco included, retains its exact Preferred name.  This is
+a conservative semantic partition passed through the beta-spread gate, not
+an estimate of an optimal aggregation.
+
+#+name: tab:ghanalss-selected-groups
+#+caption: The complete set of selected groups. Every other label remains a singleton.
+| Aggregate                | Exact Preferred members                        | Waves where distinct members merge |
+|--------------------------+------------------------------------------------+------------------------------------|
+| Sugar (cubed/granulated) | Sugar (cubed); Sugar (granulated)              | 2016-17                            |
+| Malt Drinks              | Malt Drinks (bottle); Malt Drinks (canned)     | 2016-17                            |
+| Macaroni/Spaghetti       | Macaroni/Spaghetti; Macaroni; Spaghetti        | 2016-17 (GLSS1/2 label renamed)    |
+| Millet/Sorghum           | Millet/Sorghum; Millet; Guinea Corn/Sorghum    | 1991-92..2016-17 (GLSS1/2 renamed) |
+
+[[file:selected_groups.yml][Selected groups]] records the verdicts, including every rejected candidate
+with its ratios; [[file:selected_partition.yml][the exhaustive map]] is what =publish_ghana.py= wrote.
+Candidates and their source evidence are in [[file:proposed_groups.yml][proposed_groups.yml]]; the
+inventory is [[file:review.org][review.org]].  Generic =Sugar= (1987-88..2012-13) stays
+separate because its early source label is "Sugar, candy, honey and
+sugarcane"; =Millet (flour)= stays separate because the four-member millet
+group fails on it.  These names describe Ghana groups and assert no
+equivalence to another country's aggregates.
+
+This supersedes the PR #937 partition of 2026-09-16 (233 wave labels ->
+228 groups: cubed/granulated sugar, malt drinks, pasta, Kapla/Tilapia),
+which was keyed on the vocabulary that leaked before PR #935 applied the
+wave->country crosswalk.  Three of its four groups survive on the corrected
+axis; =Fish (kapla/tilapia, fresh or frozen)= fails the gate and is dropped;
+=Millet/Sorghum= is new, because #935 created the labels it joins.
+
+* The gate
+
+The rule is the parent skill's: for every multi-member bucket,
+=max(beta) - min(beta) < 1.348 * sigma_min= (a 50% two-sided normal
+interval), beta and sigma from ONE CFE fit containing every member --
+CFE's beta is a rank-1 factor identified up to a per-fit scale, so loadings
+from two fits are not comparable.  Where every member survives the full
+fine preparation the fine fit is used; otherwise the members are fitted
+TOGETHER beside the eight densest non-member foods and Salt (PR #937's
+probe basket), and that one probe supplies beta and sigma.  Sigma is
+CFEDemands 0.10.0's resampling bootstrap
+(=Regression.get_beta(compute_se=True)=, >= 30 draws of the residual matrix
+within Region, IQR-based), seeded so a rerun reproduces it.  Implementation:
+[[file:../ghana_gate.py][ghana_gate.py]]; outputs =gate_*/gate.csv=, =loadings.csv=,
+=probe_loadings.csv=, =gate_specification.yml=.
+
+Populations.  Primary: 2016-17 purchased amounts summed over the six
+recalls, Region markets, PR #937's controls, on its seed-20260916 60%
+training split (8,397 households; 86 goods survive the fine preparation).
+CFE's =prepare_data= keeps a pair of goods only if at least =min_obs=30=
+households report both, so a sparse pair cannot be jointly identified on
+the split (Macaroni x Spaghetti: 45 households in the whole wave); such
+groups are gated on the full 2016-17 wave (14,009 households, 93 goods),
+which is the stricter population, not a relaxation.  A group must ALSO
+pass in every other wave where two or more of its members are delivered:
+2012-13, 2005-06 and 1998-99 were gated on their full waves (16,772 /
+8,687 / 5,998 households; 83 / 76 / 58 goods).  1991-92 is not gated: its
+rural households are asked over 14 days and its urban ones over 30, and a
+Region market does not absorb that.  Sensitivity runs -- a second split
+seed (20260917), the total recorded-value basis -- are reported and are
+not decisive.  Scoring in the validation below uses =min_goods=1=
+explicitly (PR #937 =e70b8df=); whether the ranking is stable in
+=min_goods= is GH #939 and was not attempted.
+
+#+name: tab:ghanalss-gate
+#+caption: Ratio = spread / (1.348 sigma_min); < 1 passes. "unid." = the members never share 30 households on that population; "--" = fewer than two members delivered.
+| Candidate                    | 2016-17 split | seed 2 | total | 2016-17 full | 2012-13 | 2005-06 | 1998-99 | Verdict   |
+|------------------------------+---------------+--------+-------+--------------+---------+---------+---------+-----------|
+| Sugar (cubed/granulated)     |      0.96     |  0.26  | 1.87  |     0.75     |   --    |   --    |   --    | selected  |
+| Malt Drinks                  |      0.80     |  0.48  | 0.80  |     1.13     |   --    |   --    |   --    | selected  |
+| Macaroni/Spaghetti           |     unid.     | unid.  | unid. |     0.27     |   --    |   --    |   --    | selected  |
+| Millet/Sorghum (grain)       |      0.62     |  0.34  | 0.31  |     0.77     |  0.12   |  0.96   |  0.12   | selected  |
+| Goat/Mutton                  |      0.71     |  0.53  | 0.54  |     0.37     |  1.08   |  1.00   |  unid.  | rejected  |
+| Beer/Pito                    |      0.43     |  0.15  | 0.53  |     0.40     |  1.50   |  3.07   |  1.51   | rejected  |
+| Fish (kapla/tilapia)         |      1.17     |  2.20  | 0.74  |     1.13     |   --    |   --    |   --    | rejected  |
+| Crab and shrimp              |      1.21     |  0.61  | 1.86  |     0.31     |   --    |   --    |   --    | rejected  |
+| Rice (imported/local)        |      3.72     |  4.23  | 3.87  |     4.64     |  3.16   |  1.02   |   --    | rejected  |
+| Gari (white/yellow)          |      3.12     |  3.80  | 2.14  |     4.37     |   --    |   --    |   --    | rejected  |
+| Fish (smoked) river/sea      |      2.02     |  1.16  | 1.60  |     1.42     |   --    |   --    |   --    | rejected  |
+| Oil (palm)/Shea Butter       |      3.59     |  3.31  | 0.69  |     3.60     |  2.81   |  3.25   |  3.47   | rejected  |
+| Cocoa Powder + malted drinks |     unid.     | unid.  | unid. |     2.47     |   --    |   --    |   --    | rejected  |
+| Millet/Sorghum (incl. flour) |     unid.     | unid.  | 1.60  |     3.45     |  unid.  |  unid.  |  unid.  | rejected  |
+| Bread + Sugar Bread          |      3.46     |  3.07  | 2.92  |     4.31     |  0.91   |  1.95   |   --    | rejected  |
+| Milk (evaporated/condensed)  |     unid.     | unid.  | unid. |    unid.     |  1.71   |  1.23   |   --    | rejected  |
+| Fish (canned/tuna/mackerel)  |      4.67     |  5.17  | 3.92  |     7.12     |   --    |   --    |   --    | rejected  |
+| Chicken cuts                 |      2.86     |  3.13  | 2.85  |     5.40     |   --    |   --    |   --    | rejected  |
+| Smoked fish (all species)    |      3.86     |  2.85  | 3.12  |     3.67     |   --    |   --    |   --    | rejected  |
+| Pepper (dried/powder)        |      2.73     |  4.29  | 2.71  |     4.45     |   --    |   --    |   --    | rejected  |
+| Spirits (gin/whisky/schnapps)|     unid.     | unid.  | unid. |    unid.     |  0.02   |  unid.  |   --    | not gateable |
+| Coconut, pork cuts, sausages |     unid.     | unid.  | unid. |    unid.     |   --    |   --    |   --    | not gateable |
+
+Borderline verdicts a human may want to revisit: =Goat/Mutton= (passes
+every 2016-17 run, fails 2012-13 at 1.08, sits at 1.00 in 2005-06),
+=Crab and shrimp= (the split and the full wave disagree), the sugar
+group's total-basis 1.87 and the malt group's full-wave 1.13.  All four
+are documented with the conservative choice: the primary decides for
+2016-17, and a group has to be sound in every wave it merges.  Not
+gateable by construction, and singletons: =Margarine= / =Margarine/Butter=
+(never co-occur; no =Butter= label exists), =Potato= / =Sweet Potato=
+(Sweet Potato is own-production only from 1991-92 on), =Onion= / =Shallot=
+(Onion is a reserved target).
+
+Loadings in Salt units on the primary population, for the selected groups:
+Sugar (cubed) 1.87 +- 0.85 and Sugar (granulated) 2.03 +- 0.13; Malt Drinks
+(bottle) 1.46 +- 0.25 and (canned) 1.73 +- 0.32; Macaroni 0.90 +- 0.26 and
+Spaghetti 0.98 +- 0.20 (full wave); Millet 1.60 +- 0.71 and Guinea
+Corn/Sorghum 2.19 +- 0.89.  Note what the rule does and does not say: a
+sparse member with a wide sigma passes easily (the skill's own instruction
+is to place sparse items by conceptual fit), so a pass is "not
+distinguishable at 50% confidence", never "equal".
+
+* Held-out validation
+
+Design as PR #937: fixed 60/20/20 household split within Region x Rural
+(seed 20260916), the CFEDemands 0.10.0 preparation and frozen scoring with
+=min_obs=30=, =min_prop_items=0.1=, =alltm=False=, =min_goods=1=, Salt as
+the singleton anchor, Onion and Egg reserved as prediction targets, survey
+weights in coverage, normalisation and the prediction diagnostics.  The
+fine map and the four-group map (=draft= in the CSVs) are compared on the
+validation split on both bases and once on the final test split; the
+memberships were frozen before the test split was examined.
+
+#+name: tab:ghanalss-heldout
+#+caption: Filled from validation_selected_purchased, validation_selected_total and test_selected (summary.csv, prediction.csv). Delta is selected minus fine; intervals are validation-PSU resampling conditional on the training fits.
+| Basis / split          | Map  | Fit goods | Fit cov. | Score cov. | Scored | Onion MSE | Egg MSE  | Onion delta [2.5, 97.5]      | Egg delta [2.5, 97.5]         |
+|------------------------+------+-----------+----------+------------+--------+-----------+----------+------------------------------+-------------------------------|
+| purchased / validation | fine |        86 |  0.9435  |   0.9927   |   2769 |  0.41252  | 0.71776  |                              |                               |
+| purchased / validation | four |        87 |  0.9435  |   0.9927   |   2769 |  0.41240  | 0.71680  | -0.00011 [-0.00105, 0.00083] | -0.00096 [-0.00316, 0.00148]  |
+| total / validation     | fine |        88 |  0.9591  |   0.9930   |   2771 |  0.42504  | 0.77477  |                              |                               |
+| total / validation     | four |        89 |  0.9590  |   0.9930   |   2771 |  0.42458  | 0.77197  | -0.00045 [-0.00147, 0.00063] | -0.00281 [-0.00562, -0.00025] |
+| purchased / test       | fine |        86 |  0.9435  |   0.9947   |   2802 |  0.34623  | 0.74163  |                              |                               |
+| purchased / test       | four |        87 |  0.9435  |   0.9947   |   2802 |  0.34698  | 0.74177  | +0.00075 [-0.00004, 0.00143] | +0.00014 [-0.00235, 0.00251]  |
+
+The four-group map admits one more fitted good than the fine map on each
+basis (the merged sugar / pasta / millet items clear the pairwise support
+they lacked separately); fitting and scoring coverage are unchanged to four
+decimals; every reserved-food difference is within its conditional
+interval, on the test split slightly against the aggregation (Onion +0.2%,
+Egg +0.02%) and on the validation split slightly for it.
+
+As with PR #937, the group support gains do not translate into scored
+coverage gains (frozen scoring already reaches almost every household), and
+the reserved-food prediction differences are within their conditional
+intervals.  These checks support a limited practical partition; they do not
+establish a welfare-precision gain.  The fine Preferred output remains the
+default.
+
+* Publication and verification
+
+=publish_ghana.py= wrote the =Aggregate Label= column after =Preferred
+Label= for all 219 rows (215 distinct Preferred labels; the four extra rows
+are the per-wave spelling rows of one label and carry the same Aggregate);
+it appended NO rows -- post-#935 the served axis is the country table --
+and the writer now refuses an append by default.  Wave and FCT cells are
+untouched.  =nutrition.py= recognises =YYYY-YY= wave columns explicitly
+(PR #937's change) so the new column is not read as a survey round.
+
+Tests: =tests/test_ghanalss_aggregate.py= (configuration: selection
+disjoint and on the country axis, publication universe = country axis,
+every wave label named in its country column, the column complete and
+unambiguous and equal to the selection; delivered: =food_acquired= is a
+row-preserving rename and =food_expenditures= a sum of levels on both
+bases, all seven waves), plus the canonical-label, nutrition, label,
+schema and derivations suites and the four =food_prices= /
+=food_quantities= pins, which the default =j= does not read.  Results are
+in the PR.
+
+* Reproduction
+
+From the worktree root, with CFEDemands 0.10.0 shadowed ahead of the venv:
+
+#+begin_example
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PYTHONPATH="<cfe010>:$PWD:$PWD/SkunkWorks"
+G=SkunkWorks/aggregation/ghanalss
+
+python -m SkunkWorks.aggregation.ghana_inventory
+python -m SkunkWorks.aggregation.ghana_gate --wave 2016-17 --basis purchased --output $G/gate_2016-17_purchased
+python -m SkunkWorks.aggregation.ghana_gate --wave 2016-17 --basis purchased --seed 20260917 --output $G/gate_2016-17_purchased_seed2
+python -m SkunkWorks.aggregation.ghana_gate --wave 2016-17 --basis total --output $G/gate_2016-17_total
+for w in 2016-17 2012-13 2005-06 1998-99; do
+  python -m SkunkWorks.aggregation.ghana_gate --wave $w --basis purchased --population all --output $G/gate_${w}_purchased_all
+done
+for basis in purchased total; do
+  python -m SkunkWorks.aggregation.ghana_validation --basis $basis --names fine draft \
+    --specification $G/selected_groups.yml --output $G/validation_selected_$basis
+done
+python -m SkunkWorks.aggregation.ghana_validation --names fine draft --evaluation test \
+  --specification $G/selected_groups.yml --output $G/test_selected
+python -m SkunkWorks.aggregation.publish_ghana          # refuses an append
+#+end_example
+
+PR #937's other outputs (=validation_purchased=, =validation_additional=,
+=bootstrap_purchased=, =probes_purchased=, =simulation_selected=) are kept
+as the record of the pre-#935 run and were not regenerated; their
+=specification.yml= files name the revision they were made from.
+
+--Sue

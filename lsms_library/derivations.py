@@ -70,6 +70,14 @@ The loader refuses an entry missing ``rule``, ``function``, ``inputs``,
 ``raw_variables`` or ``assumptions``, or an assumption without a ``basis`` --
 the ``PopulationRecord`` discipline: a record that cannot say what it did and
 why is not a record.
+
+``rows`` is either a selector mapping (``{s: produced}`` -- which served rows
+carry the key) or the integer ``0``, which names a **deletion**: the derived
+rows are dropped, so none survive to carry a key and the only disclosure is
+the registry entry itself -- listed at ``rows: 0`` by
+:func:`summary_for_frame`, with the ``inputs`` callable returning the dropped
+rows.  A nonzero integer is refused: a served count is measured off the frame,
+not declared.
 """
 from __future__ import annotations
 
@@ -315,6 +323,42 @@ class DerivationRecord(dict):
         waves = self.get("waves", "all")
         return waves == "all" or str(wave) in {str(w) for w in waves}
 
+    #: The record fields whose value NAMES a callable, as ``'module:function'``.
+    _CALLABLE_FIELDS = ("function", "inputs")
+
+    def resolve(self, field: str = "function"):
+        """Return the callable that ``field`` names (default ``function``).
+
+        The record STORES the name, not the function, and that is deliberate on
+        three counts -- the first two are this class's reasons for being a
+        ``dict`` subclass at all:
+
+        1. the record rides on ``df.attrs``, which ``pandas.io.parquet``
+           serialises with a bare ``json.dumps``; a callable there turns any
+           user's ``df.to_parquet()`` on an API frame into a ``TypeError``;
+        2. pandas propagates ``attrs`` only when every input compares EQUAL,
+           and a callable compares by IDENTITY -- after a module reload the
+           record would silently stop propagating, where a string never does;
+        3. resolving eagerly would IMPORT every country module to build the
+           records, and a country module runs data reads at import (which is
+           why ``tests/test_derivations.py`` reads them with ``ast``).
+
+        So resolution is lazy and stores nothing: the name stays greppable,
+        serialisable and comparable by value, and this hands you the function.
+
+        Raises ``KeyError`` if *field* is not one that names a callable, or if
+        the record does not carry it; ``ValueError`` / ``AttributeError`` (from
+        :func:`resolve_callable`) if the name is malformed or does not resolve.
+        """
+        if field not in self._CALLABLE_FIELDS:
+            raise KeyError(
+                f"{field!r} does not name a callable; "
+                f"resolvable fields are {list(self._CALLABLE_FIELDS)}")
+        spec = self.get(field)
+        if spec is None:
+            raise KeyError(f"{self.get('key')}: no {field!r} recorded")
+        return resolve_callable(spec)
+
     @classmethod
     def from_config(cls, key: str, block: Mapping[str, Any],
                     file_country: str | None) -> "DerivationRecord":
@@ -380,13 +424,23 @@ class DerivationRecord(dict):
         if isinstance(columns, str):
             columns = [columns]
         rows = block.get("rows")
-        if rows is not None and not isinstance(rows, Mapping):
-            raise ValueError(f"{key}: rows must be a mapping selector "
-                             f"(e.g. {{s: produced}}) or null, got {rows!r}")
+        if rows is not None:
+            if isinstance(rows, bool) or not isinstance(rows, (int, Mapping)):
+                raise ValueError(
+                    f"{key}: rows must be a mapping selector "
+                    f"(e.g. {{s: produced}}), the integer 0 (a DELETION: the "
+                    f"derived rows are dropped, so none carry the key), or "
+                    f"null, got {rows!r}")
+            if isinstance(rows, int) and rows != 0:
+                raise ValueError(
+                    f"{key}: a numeric rows is only ever 0 (a DELETION -- the "
+                    f"derived rows are dropped, so none carry the key); got "
+                    f"{rows!r}.  A nonzero served count is measured off the "
+                    f"frame, not declared.")
         return cls(
             key=key, country=country or None, table=table or None, name=name,
             waves=waves, columns=list(columns),
-            rows=dict(rows) if rows is not None else None,
+            rows=rows if isinstance(rows, int) else (dict(rows) if rows is not None else None),
             rule=str(block["rule"]).strip(), function=block["function"],
             inputs=block["inputs"], raw_variables=[str(r) for r in raw],
             assumptions=clean_assumptions,

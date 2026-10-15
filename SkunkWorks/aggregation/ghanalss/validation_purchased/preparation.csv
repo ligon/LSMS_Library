@@ -1,0 +1,1896 @@
+j,n_obs_input,n_obs_matched,n_obs_retained,retained,reason,partition
+Agushie Seed,526,523,518,True,retained,fine
+Akpeteshie,706,705,0,False,covariance_support,fine
+Apple,374,373,371,True,retained,fine
+Avocado,388,388,388,True,retained,fine
+Bambara Bean,0,0,0,False,min_obs,fine
+Banana,1943,1939,1925,True,retained,fine
+Beef,2655,2650,2641,True,retained,fine
+Beef (corned),152,152,0,False,covariance_support,fine
+Beef (face),72,72,0,False,covariance_support,fine
+Beef (leg),374,373,0,False,covariance_support,fine
+Beef (offal),355,355,0,False,covariance_support,fine
+Beef (steak),1278,1272,1271,True,retained,fine
+Beer,954,953,869,True,retained,fine
+Biscuit,2691,2682,2668,True,retained,fine
+Bitters,361,360,0,False,covariance_support,fine
+Bread,5218,5207,5094,True,retained,fine
+Cabbage,0,0,0,False,min_obs,fine
+Canned Fruits,22,22,0,False,min_obs,fine
+Carrot,847,844,844,True,retained,fine
+Cashew,18,18,0,False,min_obs,fine
+Cassava (dough),3338,3331,3325,True,retained,fine
+Cassava (dried),1210,1210,1204,True,retained,fine
+Cassava (fresh),2648,2639,2638,True,retained,fine
+"Cassava (white, flour)",2376,2369,2354,True,retained,fine
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,fine
+Cerelac (Baby food),391,391,0,False,covariance_support,fine
+Chewing Gum,830,827,824,True,retained,fine
+Chicken (breast),333,333,0,False,covariance_support,fine
+Chicken (broiler),163,163,0,False,covariance_support,fine
+Chicken (frozen),195,193,0,False,covariance_support,fine
+Chicken (gizzard),62,62,0,False,covariance_support,fine
+Chicken (live),439,437,0,False,covariance_support,fine
+Chicken (thigh),1872,1870,1864,True,retained,fine
+Chicken (wing),658,658,653,True,retained,fine
+Chilli Powder (black pepper),47,47,0,False,covariance_support,fine
+Chocolate,60,60,0,False,covariance_support,fine
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,fine
+Cocoa Powder,62,62,0,False,covariance_support,fine
+Coconut (dried),29,29,0,False,min_obs,fine
+Coconut (fresh),821,818,811,True,retained,fine
+Cocoyam,624,622,622,True,retained,fine
+Cocoyam Leaves,2510,2506,2502,True,retained,fine
+Coffee,136,136,0,False,covariance_support,fine
+Condiment,5998,5988,5662,True,retained,fine
+Cooked Rice and Stew,4666,4657,4489,True,retained,fine
+Corflake,24,24,0,False,min_obs,fine
+Couscous,4,4,0,False,min_obs,fine
+Cowpea,1581,1580,1567,True,retained,fine
+Crab,325,323,323,True,retained,fine
+Curry Power,419,418,417,True,retained,fine
+Dawadawa,1412,1411,0,False,covariance_support,fine
+Eggplant,4161,4151,4129,True,retained,fine
+Eggplant Leaf,0,0,0,False,min_obs,fine
+Fish (canned),1374,1370,1367,True,retained,fine
+Fish (dried),1849,1848,1835,True,retained,fine
+Fish (fried),2632,2624,2598,True,retained,fine
+Fish (salted),1765,1755,1744,True,retained,fine
+"Fish (smoked, river)",3121,3119,3067,True,retained,fine
+"Fish (smoked, sea)",2662,2657,2652,True,retained,fine
+Fried Plantian and Beans,1996,1993,1915,True,retained,fine
+Garlic,2031,2027,2023,True,retained,fine
+Gin,103,103,0,False,covariance_support,fine
+Ginger,2226,2221,2214,True,retained,fine
+Goat,748,747,740,True,retained,fine
+Grape,21,21,0,False,min_obs,fine
+Groundnut,3365,3358,3329,True,retained,fine
+Guinea corn/sorghum,207,207,0,False,covariance_support,fine
+Guineafowl,75,75,0,False,covariance_support,fine
+Herring (smoked),5229,5222,4901,True,retained,fine
+Honey,99,99,0,False,covariance_support,fine
+Ice Cream,517,516,515,True,retained,fine
+Instant Noodle,499,499,499,True,retained,fine
+Juice,962,961,956,True,retained,fine
+Jute Leaf,0,0,0,False,min_obs,fine
+Kapla,1819,1816,1796,True,retained,fine
+Kenkey/Banku,4836,4828,4640,True,retained,fine
+Khebabs,373,373,0,False,covariance_support,fine
+Kola Nut,509,509,0,False,covariance_support,fine
+Lime,77,77,0,False,covariance_support,fine
+Macaroni,192,192,0,False,covariance_support,fine
+Mackerel (processed),1349,1348,1344,True,retained,fine
+Maize (cob),0,0,0,False,min_obs,fine
+Maize (flour/dough),3705,3698,3685,True,retained,fine
+Maize (grain),1989,1988,1924,True,retained,fine
+Maizena,3,3,0,False,min_obs,fine
+Malt Drinks (bottle),1408,1404,1389,True,retained,fine
+Malt Drinks (canned),912,912,902,True,retained,fine
+Mango,505,504,500,True,retained,fine
+Margarine,178,178,0,False,covariance_support,fine
+Milk (evaporated),1915,1911,1900,True,retained,fine
+Milk (fresh),160,160,0,False,covariance_support,fine
+Milk (powdered),1721,1714,1711,True,retained,fine
+"Milk (tinned, condensed)",27,27,0,False,min_obs,fine
+Millet,271,271,0,False,covariance_support,fine
+Millet (flour),113,113,0,False,covariance_support,fine
+Oil (coconut),184,182,0,False,covariance_support,fine
+Oil (groundnut),424,424,0,False,covariance_support,fine
+Oil (palm kernel),56,56,0,False,covariance_support,fine
+Oil (palm),3316,3305,3297,True,retained,fine
+Oil (vegetable),4940,4929,4867,True,retained,fine
+Okra,5035,5030,4906,True,retained,fine
+Orange,2036,2029,2015,True,retained,fine
+Other Alcoholic Beverages,0,0,0,False,min_obs,fine
+Other Beverages,201,198,0,False,covariance_support,fine
+Other Cereal,33,33,0,False,covariance_support,fine
+Other Domestic Poultry,0,0,0,False,min_obs,fine
+Other Fish,1050,1047,973,True,retained,fine
+Other Flours,0,0,0,False,min_obs,fine
+Other Fruits,115,115,0,False,covariance_support,fine
+Other Grains,0,0,0,False,min_obs,fine
+Other Leafy Vegetable,0,0,0,False,min_obs,fine
+Other Meat,254,253,0,False,covariance_support,fine
+Other Milk Products,439,439,439,True,retained,fine
+Other Nut/Seed,0,0,0,False,min_obs,fine
+Other Oils,60,60,0,False,covariance_support,fine
+Other Prepared Meals,3919,3912,3797,True,retained,fine
+Other Pulses,0,0,0,False,min_obs,fine
+Other Spices,237,236,0,False,covariance_support,fine
+Other Spirits,61,61,0,False,covariance_support,fine
+Other Tubers,13,12,0,False,min_obs,fine
+Other Vegetables,1345,1342,1319,True,retained,fine
+Palm Nut,1428,1422,1421,True,retained,fine
+Pawpaw,347,346,0,False,covariance_support,fine
+"Pepper (dried, red)",2210,2208,2022,True,retained,fine
+Pepper (fresh),5740,5728,5585,True,retained,fine
+Pepper (powder),2051,2042,2032,True,retained,fine
+Pineapple,726,724,722,True,retained,fine
+Pizza,28,28,0,False,min_obs,fine
+Plantain,3063,3053,3050,True,retained,fine
+Pork,336,336,0,False,covariance_support,fine
+Pork (feet),56,55,0,False,covariance_support,fine
+Pork (fillet),3,3,0,False,min_obs,fine
+Pork (rib),3,3,0,False,min_obs,fine
+Pork (shoulder),2,2,0,False,min_obs,fine
+Potato,197,196,0,False,covariance_support,fine
+Rice (imported),4206,4194,4178,True,retained,fine
+Rice (local),2962,2959,2880,True,retained,fine
+Salmon (smoked),4327,4316,4304,True,retained,fine
+Salt,5116,5107,4768,True,retained,fine
+Sausage (beef),45,45,0,False,covariance_support,fine
+Sausage (chicken),61,61,0,False,covariance_support,fine
+Sausage (pork),2,2,0,False,min_obs,fine
+Schnapps,11,11,0,False,min_obs,fine
+Shallot,281,281,0,False,covariance_support,fine
+Shea Butter,980,978,0,False,covariance_support,fine
+Shrimp,129,129,0,False,covariance_support,fine
+Snail,201,200,0,False,covariance_support,fine
+Soft Drinks,1473,1467,1461,True,retained,fine
+Soup,1870,1868,1771,True,retained,fine
+Soybean,0,0,0,False,min_obs,fine
+Spaghetti,311,311,310,True,retained,fine
+Spinach,0,0,0,False,min_obs,fine
+Sugar (cubed),187,187,0,False,covariance_support,fine
+Sugar (granulated),4770,4763,4613,True,retained,fine
+Sugar Bread,4440,4431,4340,True,retained,fine
+Sweet Pepper,463,460,460,True,retained,fine
+Sweet Potato,0,0,0,False,min_obs,fine
+Taro,11,11,0,False,min_obs,fine
+Tea,972,972,950,True,retained,fine
+Tilapia,492,492,492,True,retained,fine
+Tomato (fresh),6670,6658,6456,True,retained,fine
+Tomato (paste),5711,5699,5608,True,retained,fine
+Tuna (processed),131,131,0,False,covariance_support,fine
+Tuo Zaafi,1067,1065,1020,True,retained,fine
+Vinegar,14,14,0,False,min_obs,fine
+Water,4683,4671,4544,True,retained,fine
+Water Yam,181,181,0,False,covariance_support,fine
+Watermelon,981,980,973,True,retained,fine
+Wheat Flour,63,63,0,False,covariance_support,fine
+Whisky,31,31,0,False,covariance_support,fine
+White Oats,499,497,496,True,retained,fine
+Wine,122,122,0,False,covariance_support,fine
+Yam,3357,3353,3344,True,retained,fine
+Yoghurt,1446,1444,1429,True,retained,fine
+Agushie Seed,526,523,518,True,retained,rice_unprepared
+Akpeteshie,706,705,0,False,covariance_support,rice_unprepared
+Apple,374,373,371,True,retained,rice_unprepared
+Avocado,388,388,388,True,retained,rice_unprepared
+Bambara Bean,0,0,0,False,min_obs,rice_unprepared
+Banana,1943,1939,1925,True,retained,rice_unprepared
+Beef,2655,2650,2641,True,retained,rice_unprepared
+Beef (corned),152,152,0,False,covariance_support,rice_unprepared
+Beef (face),72,72,0,False,covariance_support,rice_unprepared
+Beef (leg),374,373,0,False,covariance_support,rice_unprepared
+Beef (offal),355,355,0,False,covariance_support,rice_unprepared
+Beef (steak),1278,1272,1271,True,retained,rice_unprepared
+Beer,954,953,869,True,retained,rice_unprepared
+Biscuit,2691,2682,2668,True,retained,rice_unprepared
+Bitters,361,360,0,False,covariance_support,rice_unprepared
+Bread,5218,5207,5094,True,retained,rice_unprepared
+Cabbage,0,0,0,False,min_obs,rice_unprepared
+Canned Fruits,22,22,0,False,min_obs,rice_unprepared
+Carrot,847,844,844,True,retained,rice_unprepared
+Cashew,18,18,0,False,min_obs,rice_unprepared
+Cassava (dough),3338,3331,3325,True,retained,rice_unprepared
+Cassava (dried),1210,1210,1204,True,retained,rice_unprepared
+Cassava (fresh),2648,2639,2637,True,retained,rice_unprepared
+"Cassava (white, flour)",2376,2369,2354,True,retained,rice_unprepared
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,rice_unprepared
+Cerelac (Baby food),391,391,0,False,covariance_support,rice_unprepared
+Chewing Gum,830,827,824,True,retained,rice_unprepared
+Chicken (breast),333,333,0,False,covariance_support,rice_unprepared
+Chicken (broiler),163,163,0,False,covariance_support,rice_unprepared
+Chicken (frozen),195,193,0,False,covariance_support,rice_unprepared
+Chicken (gizzard),62,62,0,False,covariance_support,rice_unprepared
+Chicken (live),439,437,0,False,covariance_support,rice_unprepared
+Chicken (thigh),1872,1870,1864,True,retained,rice_unprepared
+Chicken (wing),658,658,653,True,retained,rice_unprepared
+Chilli Powder (black pepper),47,47,0,False,covariance_support,rice_unprepared
+Chocolate,60,60,0,False,covariance_support,rice_unprepared
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,rice_unprepared
+Cocoa Powder,62,62,0,False,covariance_support,rice_unprepared
+Coconut (dried),29,29,0,False,min_obs,rice_unprepared
+Coconut (fresh),821,818,811,True,retained,rice_unprepared
+Cocoyam,624,622,622,True,retained,rice_unprepared
+Cocoyam Leaves,2510,2506,2502,True,retained,rice_unprepared
+Coffee,136,136,0,False,covariance_support,rice_unprepared
+Condiment,5998,5988,5662,True,retained,rice_unprepared
+Cooked Rice and Stew,4666,4657,4489,True,retained,rice_unprepared
+Corflake,24,24,0,False,min_obs,rice_unprepared
+Couscous,4,4,0,False,min_obs,rice_unprepared
+Cowpea,1581,1580,1567,True,retained,rice_unprepared
+Crab,325,323,323,True,retained,rice_unprepared
+Curry Power,419,418,417,True,retained,rice_unprepared
+Dawadawa,1412,1411,0,False,covariance_support,rice_unprepared
+Eggplant,4161,4151,4128,True,retained,rice_unprepared
+Eggplant Leaf,0,0,0,False,min_obs,rice_unprepared
+Fish (canned),1374,1370,1367,True,retained,rice_unprepared
+Fish (dried),1849,1848,1835,True,retained,rice_unprepared
+Fish (fried),2632,2624,2598,True,retained,rice_unprepared
+Fish (salted),1765,1755,1744,True,retained,rice_unprepared
+"Fish (smoked, river)",3121,3119,3067,True,retained,rice_unprepared
+"Fish (smoked, sea)",2662,2657,2651,True,retained,rice_unprepared
+Fried Plantian and Beans,1996,1993,1915,True,retained,rice_unprepared
+Garlic,2031,2027,2023,True,retained,rice_unprepared
+Gin,103,103,0,False,covariance_support,rice_unprepared
+Ginger,2226,2221,2214,True,retained,rice_unprepared
+Goat,748,747,740,True,retained,rice_unprepared
+Grape,21,21,0,False,min_obs,rice_unprepared
+Groundnut,3365,3358,3329,True,retained,rice_unprepared
+Guinea corn/sorghum,207,207,0,False,covariance_support,rice_unprepared
+Guineafowl,75,75,0,False,covariance_support,rice_unprepared
+Herring (smoked),5229,5222,4901,True,retained,rice_unprepared
+Honey,99,99,0,False,covariance_support,rice_unprepared
+Ice Cream,517,516,515,True,retained,rice_unprepared
+Instant Noodle,499,499,499,True,retained,rice_unprepared
+Juice,962,961,956,True,retained,rice_unprepared
+Jute Leaf,0,0,0,False,min_obs,rice_unprepared
+Kapla,1819,1816,1796,True,retained,rice_unprepared
+Kenkey/Banku,4836,4828,4640,True,retained,rice_unprepared
+Khebabs,373,373,0,False,covariance_support,rice_unprepared
+Kola Nut,509,509,0,False,covariance_support,rice_unprepared
+Lime,77,77,0,False,covariance_support,rice_unprepared
+Macaroni,192,192,0,False,covariance_support,rice_unprepared
+Mackerel (processed),1349,1348,1344,True,retained,rice_unprepared
+Maize (cob),0,0,0,False,min_obs,rice_unprepared
+Maize (flour/dough),3705,3698,3685,True,retained,rice_unprepared
+Maize (grain),1989,1988,1924,True,retained,rice_unprepared
+Maizena,3,3,0,False,min_obs,rice_unprepared
+Malt Drinks (bottle),1408,1404,1389,True,retained,rice_unprepared
+Malt Drinks (canned),912,912,902,True,retained,rice_unprepared
+Mango,505,504,500,True,retained,rice_unprepared
+Margarine,178,178,0,False,covariance_support,rice_unprepared
+Milk (evaporated),1915,1911,1900,True,retained,rice_unprepared
+Milk (fresh),160,160,0,False,covariance_support,rice_unprepared
+Milk (powdered),1721,1714,1711,True,retained,rice_unprepared
+"Milk (tinned, condensed)",27,27,0,False,min_obs,rice_unprepared
+Millet,271,271,0,False,covariance_support,rice_unprepared
+Millet (flour),113,113,0,False,covariance_support,rice_unprepared
+Oil (coconut),184,182,0,False,covariance_support,rice_unprepared
+Oil (groundnut),424,424,0,False,covariance_support,rice_unprepared
+Oil (palm kernel),56,56,0,False,covariance_support,rice_unprepared
+Oil (palm),3316,3305,3297,True,retained,rice_unprepared
+Oil (vegetable),4940,4929,4866,True,retained,rice_unprepared
+Okra,5035,5030,4906,True,retained,rice_unprepared
+Orange,2036,2029,2015,True,retained,rice_unprepared
+Other Alcoholic Beverages,0,0,0,False,min_obs,rice_unprepared
+Other Beverages,201,198,0,False,covariance_support,rice_unprepared
+Other Cereal,33,33,0,False,covariance_support,rice_unprepared
+Other Domestic Poultry,0,0,0,False,min_obs,rice_unprepared
+Other Fish,1050,1047,973,True,retained,rice_unprepared
+Other Flours,0,0,0,False,min_obs,rice_unprepared
+Other Fruits,115,115,0,False,covariance_support,rice_unprepared
+Other Grains,0,0,0,False,min_obs,rice_unprepared
+Other Leafy Vegetable,0,0,0,False,min_obs,rice_unprepared
+Other Meat,254,253,0,False,covariance_support,rice_unprepared
+Other Milk Products,439,439,439,True,retained,rice_unprepared
+Other Nut/Seed,0,0,0,False,min_obs,rice_unprepared
+Other Oils,60,60,0,False,covariance_support,rice_unprepared
+Other Prepared Meals,3919,3912,3797,True,retained,rice_unprepared
+Other Pulses,0,0,0,False,min_obs,rice_unprepared
+Other Spices,237,236,0,False,covariance_support,rice_unprepared
+Other Spirits,61,61,0,False,covariance_support,rice_unprepared
+Other Tubers,13,12,0,False,min_obs,rice_unprepared
+Other Vegetables,1345,1342,1319,True,retained,rice_unprepared
+Palm Nut,1428,1422,1421,True,retained,rice_unprepared
+Pawpaw,347,346,0,False,covariance_support,rice_unprepared
+"Pepper (dried, red)",2210,2208,2022,True,retained,rice_unprepared
+Pepper (fresh),5740,5728,5584,True,retained,rice_unprepared
+Pepper (powder),2051,2042,2032,True,retained,rice_unprepared
+Pineapple,726,724,722,True,retained,rice_unprepared
+Pizza,28,28,0,False,min_obs,rice_unprepared
+Plantain,3063,3053,3049,True,retained,rice_unprepared
+Pork,336,336,0,False,covariance_support,rice_unprepared
+Pork (feet),56,55,0,False,covariance_support,rice_unprepared
+Pork (fillet),3,3,0,False,min_obs,rice_unprepared
+Pork (rib),3,3,0,False,min_obs,rice_unprepared
+Pork (shoulder),2,2,0,False,min_obs,rice_unprepared
+Potato,197,196,0,False,covariance_support,rice_unprepared
+Rice (unprepared),6180,6168,6072,True,retained,rice_unprepared
+Salmon (smoked),4327,4316,4304,True,retained,rice_unprepared
+Salt,5116,5107,4768,True,retained,rice_unprepared
+Sausage (beef),45,45,0,False,covariance_support,rice_unprepared
+Sausage (chicken),61,61,0,False,covariance_support,rice_unprepared
+Sausage (pork),2,2,0,False,min_obs,rice_unprepared
+Schnapps,11,11,0,False,min_obs,rice_unprepared
+Shallot,281,281,0,False,covariance_support,rice_unprepared
+Shea Butter,980,978,0,False,covariance_support,rice_unprepared
+Shrimp,129,129,0,False,covariance_support,rice_unprepared
+Snail,201,200,0,False,covariance_support,rice_unprepared
+Soft Drinks,1473,1467,1461,True,retained,rice_unprepared
+Soup,1870,1868,1771,True,retained,rice_unprepared
+Soybean,0,0,0,False,min_obs,rice_unprepared
+Spaghetti,311,311,310,True,retained,rice_unprepared
+Spinach,0,0,0,False,min_obs,rice_unprepared
+Sugar (cubed),187,187,0,False,covariance_support,rice_unprepared
+Sugar (granulated),4770,4763,4613,True,retained,rice_unprepared
+Sugar Bread,4440,4431,4340,True,retained,rice_unprepared
+Sweet Pepper,463,460,460,True,retained,rice_unprepared
+Sweet Potato,0,0,0,False,min_obs,rice_unprepared
+Taro,11,11,0,False,min_obs,rice_unprepared
+Tea,972,972,950,True,retained,rice_unprepared
+Tilapia,492,492,492,True,retained,rice_unprepared
+Tomato (fresh),6670,6658,6455,True,retained,rice_unprepared
+Tomato (paste),5711,5699,5608,True,retained,rice_unprepared
+Tuna (processed),131,131,0,False,covariance_support,rice_unprepared
+Tuo Zaafi,1067,1065,1020,True,retained,rice_unprepared
+Vinegar,14,14,0,False,min_obs,rice_unprepared
+Water,4683,4671,4544,True,retained,rice_unprepared
+Water Yam,181,181,0,False,covariance_support,rice_unprepared
+Watermelon,981,980,973,True,retained,rice_unprepared
+Wheat Flour,63,63,0,False,covariance_support,rice_unprepared
+Whisky,31,31,0,False,covariance_support,rice_unprepared
+White Oats,499,497,496,True,retained,rice_unprepared
+Wine,122,122,0,False,covariance_support,rice_unprepared
+Yam,3357,3353,3344,True,retained,rice_unprepared
+Yoghurt,1446,1444,1429,True,retained,rice_unprepared
+Agushie Seed,526,523,518,True,retained,sugar_refined
+Akpeteshie,706,705,0,False,covariance_support,sugar_refined
+Apple,374,373,371,True,retained,sugar_refined
+Avocado,388,388,388,True,retained,sugar_refined
+Bambara Bean,0,0,0,False,min_obs,sugar_refined
+Banana,1943,1939,1925,True,retained,sugar_refined
+Beef,2655,2650,2641,True,retained,sugar_refined
+Beef (corned),152,152,0,False,covariance_support,sugar_refined
+Beef (face),72,72,0,False,covariance_support,sugar_refined
+Beef (leg),374,373,0,False,covariance_support,sugar_refined
+Beef (offal),355,355,0,False,covariance_support,sugar_refined
+Beef (steak),1278,1272,1271,True,retained,sugar_refined
+Beer,954,953,869,True,retained,sugar_refined
+Biscuit,2691,2682,2668,True,retained,sugar_refined
+Bitters,361,360,0,False,covariance_support,sugar_refined
+Bread,5218,5207,5094,True,retained,sugar_refined
+Cabbage,0,0,0,False,min_obs,sugar_refined
+Canned Fruits,22,22,0,False,min_obs,sugar_refined
+Carrot,847,844,844,True,retained,sugar_refined
+Cashew,18,18,0,False,min_obs,sugar_refined
+Cassava (dough),3338,3331,3325,True,retained,sugar_refined
+Cassava (dried),1210,1210,1204,True,retained,sugar_refined
+Cassava (fresh),2648,2639,2638,True,retained,sugar_refined
+"Cassava (white, flour)",2376,2369,2354,True,retained,sugar_refined
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,sugar_refined
+Cerelac (Baby food),391,391,0,False,covariance_support,sugar_refined
+Chewing Gum,830,827,824,True,retained,sugar_refined
+Chicken (breast),333,333,0,False,covariance_support,sugar_refined
+Chicken (broiler),163,163,0,False,covariance_support,sugar_refined
+Chicken (frozen),195,193,0,False,covariance_support,sugar_refined
+Chicken (gizzard),62,62,0,False,covariance_support,sugar_refined
+Chicken (live),439,437,0,False,covariance_support,sugar_refined
+Chicken (thigh),1872,1870,1864,True,retained,sugar_refined
+Chicken (wing),658,658,653,True,retained,sugar_refined
+Chilli Powder (black pepper),47,47,0,False,covariance_support,sugar_refined
+Chocolate,60,60,0,False,covariance_support,sugar_refined
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,sugar_refined
+Cocoa Powder,62,62,0,False,covariance_support,sugar_refined
+Coconut (dried),29,29,0,False,min_obs,sugar_refined
+Coconut (fresh),821,818,811,True,retained,sugar_refined
+Cocoyam,624,622,622,True,retained,sugar_refined
+Cocoyam Leaves,2510,2506,2502,True,retained,sugar_refined
+Coffee,136,136,0,False,covariance_support,sugar_refined
+Condiment,5998,5988,5662,True,retained,sugar_refined
+Cooked Rice and Stew,4666,4657,4489,True,retained,sugar_refined
+Corflake,24,24,0,False,min_obs,sugar_refined
+Couscous,4,4,0,False,min_obs,sugar_refined
+Cowpea,1581,1580,1567,True,retained,sugar_refined
+Crab,325,323,323,True,retained,sugar_refined
+Curry Power,419,418,417,True,retained,sugar_refined
+Dawadawa,1412,1411,0,False,covariance_support,sugar_refined
+Eggplant,4161,4151,4129,True,retained,sugar_refined
+Eggplant Leaf,0,0,0,False,min_obs,sugar_refined
+Fish (canned),1374,1370,1367,True,retained,sugar_refined
+Fish (dried),1849,1848,1835,True,retained,sugar_refined
+Fish (fried),2632,2624,2598,True,retained,sugar_refined
+Fish (salted),1765,1755,1744,True,retained,sugar_refined
+"Fish (smoked, river)",3121,3119,3067,True,retained,sugar_refined
+"Fish (smoked, sea)",2662,2657,2652,True,retained,sugar_refined
+Fried Plantian and Beans,1996,1993,1915,True,retained,sugar_refined
+Garlic,2031,2027,2023,True,retained,sugar_refined
+Gin,103,103,0,False,covariance_support,sugar_refined
+Ginger,2226,2221,2214,True,retained,sugar_refined
+Goat,748,747,740,True,retained,sugar_refined
+Grape,21,21,0,False,min_obs,sugar_refined
+Groundnut,3365,3358,3329,True,retained,sugar_refined
+Guinea corn/sorghum,207,207,0,False,covariance_support,sugar_refined
+Guineafowl,75,75,0,False,covariance_support,sugar_refined
+Herring (smoked),5229,5222,4901,True,retained,sugar_refined
+Honey,99,99,0,False,covariance_support,sugar_refined
+Ice Cream,517,516,515,True,retained,sugar_refined
+Instant Noodle,499,499,499,True,retained,sugar_refined
+Juice,962,961,956,True,retained,sugar_refined
+Jute Leaf,0,0,0,False,min_obs,sugar_refined
+Kapla,1819,1816,1796,True,retained,sugar_refined
+Kenkey/Banku,4836,4828,4640,True,retained,sugar_refined
+Khebabs,373,373,0,False,covariance_support,sugar_refined
+Kola Nut,509,509,0,False,covariance_support,sugar_refined
+Lime,77,77,0,False,covariance_support,sugar_refined
+Macaroni,192,192,0,False,covariance_support,sugar_refined
+Mackerel (processed),1349,1348,1344,True,retained,sugar_refined
+Maize (cob),0,0,0,False,min_obs,sugar_refined
+Maize (flour/dough),3705,3698,3685,True,retained,sugar_refined
+Maize (grain),1989,1988,1924,True,retained,sugar_refined
+Maizena,3,3,0,False,min_obs,sugar_refined
+Malt Drinks (bottle),1408,1404,1389,True,retained,sugar_refined
+Malt Drinks (canned),912,912,902,True,retained,sugar_refined
+Mango,505,504,500,True,retained,sugar_refined
+Margarine,178,178,0,False,covariance_support,sugar_refined
+Milk (evaporated),1915,1911,1900,True,retained,sugar_refined
+Milk (fresh),160,160,0,False,covariance_support,sugar_refined
+Milk (powdered),1721,1714,1711,True,retained,sugar_refined
+"Milk (tinned, condensed)",27,27,0,False,min_obs,sugar_refined
+Millet,271,271,0,False,covariance_support,sugar_refined
+Millet (flour),113,113,0,False,covariance_support,sugar_refined
+Oil (coconut),184,182,0,False,covariance_support,sugar_refined
+Oil (groundnut),424,424,0,False,covariance_support,sugar_refined
+Oil (palm kernel),56,56,0,False,covariance_support,sugar_refined
+Oil (palm),3316,3305,3297,True,retained,sugar_refined
+Oil (vegetable),4940,4929,4867,True,retained,sugar_refined
+Okra,5035,5030,4906,True,retained,sugar_refined
+Orange,2036,2029,2015,True,retained,sugar_refined
+Other Alcoholic Beverages,0,0,0,False,min_obs,sugar_refined
+Other Beverages,201,198,0,False,covariance_support,sugar_refined
+Other Cereal,33,33,0,False,covariance_support,sugar_refined
+Other Domestic Poultry,0,0,0,False,min_obs,sugar_refined
+Other Fish,1050,1047,973,True,retained,sugar_refined
+Other Flours,0,0,0,False,min_obs,sugar_refined
+Other Fruits,115,115,0,False,covariance_support,sugar_refined
+Other Grains,0,0,0,False,min_obs,sugar_refined
+Other Leafy Vegetable,0,0,0,False,min_obs,sugar_refined
+Other Meat,254,253,0,False,covariance_support,sugar_refined
+Other Milk Products,439,439,439,True,retained,sugar_refined
+Other Nut/Seed,0,0,0,False,min_obs,sugar_refined
+Other Oils,60,60,0,False,covariance_support,sugar_refined
+Other Prepared Meals,3919,3912,3797,True,retained,sugar_refined
+Other Pulses,0,0,0,False,min_obs,sugar_refined
+Other Spices,237,236,0,False,covariance_support,sugar_refined
+Other Spirits,61,61,0,False,covariance_support,sugar_refined
+Other Tubers,13,12,0,False,min_obs,sugar_refined
+Other Vegetables,1345,1342,1319,True,retained,sugar_refined
+Palm Nut,1428,1422,1421,True,retained,sugar_refined
+Pawpaw,347,346,0,False,covariance_support,sugar_refined
+"Pepper (dried, red)",2210,2208,2022,True,retained,sugar_refined
+Pepper (fresh),5740,5728,5585,True,retained,sugar_refined
+Pepper (powder),2051,2042,2032,True,retained,sugar_refined
+Pineapple,726,724,722,True,retained,sugar_refined
+Pizza,28,28,0,False,min_obs,sugar_refined
+Plantain,3063,3053,3050,True,retained,sugar_refined
+Pork,336,336,0,False,covariance_support,sugar_refined
+Pork (feet),56,55,0,False,covariance_support,sugar_refined
+Pork (fillet),3,3,0,False,min_obs,sugar_refined
+Pork (rib),3,3,0,False,min_obs,sugar_refined
+Pork (shoulder),2,2,0,False,min_obs,sugar_refined
+Potato,197,196,0,False,covariance_support,sugar_refined
+Rice (imported),4206,4194,4178,True,retained,sugar_refined
+Rice (local),2962,2959,2880,True,retained,sugar_refined
+Salmon (smoked),4327,4316,4304,True,retained,sugar_refined
+Salt,5116,5107,4768,True,retained,sugar_refined
+Sausage (beef),45,45,0,False,covariance_support,sugar_refined
+Sausage (chicken),61,61,0,False,covariance_support,sugar_refined
+Sausage (pork),2,2,0,False,min_obs,sugar_refined
+Schnapps,11,11,0,False,min_obs,sugar_refined
+Shallot,281,281,0,False,covariance_support,sugar_refined
+Shea Butter,980,978,0,False,covariance_support,sugar_refined
+Shrimp,129,129,0,False,covariance_support,sugar_refined
+Snail,201,200,0,False,covariance_support,sugar_refined
+Soft Drinks,1473,1467,1461,True,retained,sugar_refined
+Soup,1870,1868,1771,True,retained,sugar_refined
+Soybean,0,0,0,False,min_obs,sugar_refined
+Spaghetti,311,311,310,True,retained,sugar_refined
+Spinach,0,0,0,False,min_obs,sugar_refined
+Sugar (cubed/granulated),4842,4835,4685,True,retained,sugar_refined
+Sugar Bread,4440,4431,4340,True,retained,sugar_refined
+Sweet Pepper,463,460,460,True,retained,sugar_refined
+Sweet Potato,0,0,0,False,min_obs,sugar_refined
+Taro,11,11,0,False,min_obs,sugar_refined
+Tea,972,972,950,True,retained,sugar_refined
+Tilapia,492,492,492,True,retained,sugar_refined
+Tomato (fresh),6670,6658,6456,True,retained,sugar_refined
+Tomato (paste),5711,5699,5608,True,retained,sugar_refined
+Tuna (processed),131,131,0,False,covariance_support,sugar_refined
+Tuo Zaafi,1067,1065,1020,True,retained,sugar_refined
+Vinegar,14,14,0,False,min_obs,sugar_refined
+Water,4683,4671,4544,True,retained,sugar_refined
+Water Yam,181,181,0,False,covariance_support,sugar_refined
+Watermelon,981,980,973,True,retained,sugar_refined
+Wheat Flour,63,63,0,False,covariance_support,sugar_refined
+Whisky,31,31,0,False,covariance_support,sugar_refined
+White Oats,499,497,496,True,retained,sugar_refined
+Wine,122,122,0,False,covariance_support,sugar_refined
+Yam,3357,3353,3344,True,retained,sugar_refined
+Yoghurt,1446,1444,1429,True,retained,sugar_refined
+Agushie Seed,526,523,518,True,retained,malt_packaging
+Akpeteshie,706,705,0,False,covariance_support,malt_packaging
+Apple,374,373,371,True,retained,malt_packaging
+Avocado,388,388,388,True,retained,malt_packaging
+Bambara Bean,0,0,0,False,min_obs,malt_packaging
+Banana,1943,1939,1924,True,retained,malt_packaging
+Beef,2655,2650,2641,True,retained,malt_packaging
+Beef (corned),152,152,0,False,covariance_support,malt_packaging
+Beef (face),72,72,0,False,covariance_support,malt_packaging
+Beef (leg),374,373,0,False,covariance_support,malt_packaging
+Beef (offal),355,355,0,False,covariance_support,malt_packaging
+Beef (steak),1278,1272,1271,True,retained,malt_packaging
+Beer,954,953,869,True,retained,malt_packaging
+Biscuit,2691,2682,2667,True,retained,malt_packaging
+Bitters,361,360,0,False,covariance_support,malt_packaging
+Bread,5218,5207,5092,True,retained,malt_packaging
+Cabbage,0,0,0,False,min_obs,malt_packaging
+Canned Fruits,22,22,0,False,min_obs,malt_packaging
+Carrot,847,844,844,True,retained,malt_packaging
+Cashew,18,18,0,False,min_obs,malt_packaging
+Cassava (dough),3338,3331,3325,True,retained,malt_packaging
+Cassava (dried),1210,1210,1204,True,retained,malt_packaging
+Cassava (fresh),2648,2639,2638,True,retained,malt_packaging
+"Cassava (white, flour)",2376,2369,2353,True,retained,malt_packaging
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,malt_packaging
+Cerelac (Baby food),391,391,0,False,covariance_support,malt_packaging
+Chewing Gum,830,827,824,True,retained,malt_packaging
+Chicken (breast),333,333,0,False,covariance_support,malt_packaging
+Chicken (broiler),163,163,0,False,covariance_support,malt_packaging
+Chicken (frozen),195,193,0,False,covariance_support,malt_packaging
+Chicken (gizzard),62,62,0,False,covariance_support,malt_packaging
+Chicken (live),439,437,0,False,covariance_support,malt_packaging
+Chicken (thigh),1872,1870,1864,True,retained,malt_packaging
+Chicken (wing),658,658,653,True,retained,malt_packaging
+Chilli Powder (black pepper),47,47,0,False,covariance_support,malt_packaging
+Chocolate,60,60,0,False,covariance_support,malt_packaging
+Cocoa (milk powder beverages),3006,2998,2970,True,retained,malt_packaging
+Cocoa Powder,62,62,0,False,covariance_support,malt_packaging
+Coconut (dried),29,29,0,False,min_obs,malt_packaging
+Coconut (fresh),821,818,811,True,retained,malt_packaging
+Cocoyam,624,622,622,True,retained,malt_packaging
+Cocoyam Leaves,2510,2506,2502,True,retained,malt_packaging
+Coffee,136,136,0,False,covariance_support,malt_packaging
+Condiment,5998,5988,5662,True,retained,malt_packaging
+Cooked Rice and Stew,4666,4657,4487,True,retained,malt_packaging
+Corflake,24,24,0,False,min_obs,malt_packaging
+Couscous,4,4,0,False,min_obs,malt_packaging
+Cowpea,1581,1580,1567,True,retained,malt_packaging
+Crab,325,323,323,True,retained,malt_packaging
+Curry Power,419,418,417,True,retained,malt_packaging
+Dawadawa,1412,1411,0,False,covariance_support,malt_packaging
+Eggplant,4161,4151,4129,True,retained,malt_packaging
+Eggplant Leaf,0,0,0,False,min_obs,malt_packaging
+Fish (canned),1374,1370,1367,True,retained,malt_packaging
+Fish (dried),1849,1848,1835,True,retained,malt_packaging
+Fish (fried),2632,2624,2598,True,retained,malt_packaging
+Fish (salted),1765,1755,1744,True,retained,malt_packaging
+"Fish (smoked, river)",3121,3119,3067,True,retained,malt_packaging
+"Fish (smoked, sea)",2662,2657,2652,True,retained,malt_packaging
+Fried Plantian and Beans,1996,1993,1915,True,retained,malt_packaging
+Garlic,2031,2027,2023,True,retained,malt_packaging
+Gin,103,103,0,False,covariance_support,malt_packaging
+Ginger,2226,2221,2214,True,retained,malt_packaging
+Goat,748,747,740,True,retained,malt_packaging
+Grape,21,21,0,False,min_obs,malt_packaging
+Groundnut,3365,3358,3329,True,retained,malt_packaging
+Guinea corn/sorghum,207,207,0,False,covariance_support,malt_packaging
+Guineafowl,75,75,0,False,covariance_support,malt_packaging
+Herring (smoked),5229,5222,4901,True,retained,malt_packaging
+Honey,99,99,0,False,covariance_support,malt_packaging
+Ice Cream,517,516,515,True,retained,malt_packaging
+Instant Noodle,499,499,499,True,retained,malt_packaging
+Juice,962,961,955,True,retained,malt_packaging
+Jute Leaf,0,0,0,False,min_obs,malt_packaging
+Kapla,1819,1816,1796,True,retained,malt_packaging
+Kenkey/Banku,4836,4828,4639,True,retained,malt_packaging
+Khebabs,373,373,0,False,covariance_support,malt_packaging
+Kola Nut,509,509,0,False,covariance_support,malt_packaging
+Lime,77,77,0,False,covariance_support,malt_packaging
+Macaroni,192,192,0,False,covariance_support,malt_packaging
+Mackerel (processed),1349,1348,1344,True,retained,malt_packaging
+Maize (cob),0,0,0,False,min_obs,malt_packaging
+Maize (flour/dough),3705,3698,3685,True,retained,malt_packaging
+Maize (grain),1989,1988,1924,True,retained,malt_packaging
+Maizena,3,3,0,False,min_obs,malt_packaging
+Malt Drinks,1977,1973,1948,True,retained,malt_packaging
+Mango,505,504,500,True,retained,malt_packaging
+Margarine,178,178,0,False,covariance_support,malt_packaging
+Milk (evaporated),1915,1911,1900,True,retained,malt_packaging
+Milk (fresh),160,160,0,False,covariance_support,malt_packaging
+Milk (powdered),1721,1714,1711,True,retained,malt_packaging
+"Milk (tinned, condensed)",27,27,0,False,min_obs,malt_packaging
+Millet,271,271,0,False,covariance_support,malt_packaging
+Millet (flour),113,113,0,False,covariance_support,malt_packaging
+Oil (coconut),184,182,0,False,covariance_support,malt_packaging
+Oil (groundnut),424,424,0,False,covariance_support,malt_packaging
+Oil (palm kernel),56,56,0,False,covariance_support,malt_packaging
+Oil (palm),3316,3305,3297,True,retained,malt_packaging
+Oil (vegetable),4940,4929,4867,True,retained,malt_packaging
+Okra,5035,5030,4906,True,retained,malt_packaging
+Orange,2036,2029,2015,True,retained,malt_packaging
+Other Alcoholic Beverages,0,0,0,False,min_obs,malt_packaging
+Other Beverages,201,198,0,False,covariance_support,malt_packaging
+Other Cereal,33,33,0,False,covariance_support,malt_packaging
+Other Domestic Poultry,0,0,0,False,min_obs,malt_packaging
+Other Fish,1050,1047,973,True,retained,malt_packaging
+Other Flours,0,0,0,False,min_obs,malt_packaging
+Other Fruits,115,115,0,False,covariance_support,malt_packaging
+Other Grains,0,0,0,False,min_obs,malt_packaging
+Other Leafy Vegetable,0,0,0,False,min_obs,malt_packaging
+Other Meat,254,253,0,False,covariance_support,malt_packaging
+Other Milk Products,439,439,439,True,retained,malt_packaging
+Other Nut/Seed,0,0,0,False,min_obs,malt_packaging
+Other Oils,60,60,0,False,covariance_support,malt_packaging
+Other Prepared Meals,3919,3912,3796,True,retained,malt_packaging
+Other Pulses,0,0,0,False,min_obs,malt_packaging
+Other Spices,237,236,0,False,covariance_support,malt_packaging
+Other Spirits,61,61,0,False,covariance_support,malt_packaging
+Other Tubers,13,12,0,False,min_obs,malt_packaging
+Other Vegetables,1345,1342,1319,True,retained,malt_packaging
+Palm Nut,1428,1422,1421,True,retained,malt_packaging
+Pawpaw,347,346,0,False,covariance_support,malt_packaging
+"Pepper (dried, red)",2210,2208,2022,True,retained,malt_packaging
+Pepper (fresh),5740,5728,5585,True,retained,malt_packaging
+Pepper (powder),2051,2042,2032,True,retained,malt_packaging
+Pineapple,726,724,722,True,retained,malt_packaging
+Pizza,28,28,0,False,min_obs,malt_packaging
+Plantain,3063,3053,3050,True,retained,malt_packaging
+Pork,336,336,0,False,covariance_support,malt_packaging
+Pork (feet),56,55,0,False,covariance_support,malt_packaging
+Pork (fillet),3,3,0,False,min_obs,malt_packaging
+Pork (rib),3,3,0,False,min_obs,malt_packaging
+Pork (shoulder),2,2,0,False,min_obs,malt_packaging
+Potato,197,196,0,False,covariance_support,malt_packaging
+Rice (imported),4206,4194,4178,True,retained,malt_packaging
+Rice (local),2962,2959,2880,True,retained,malt_packaging
+Salmon (smoked),4327,4316,4304,True,retained,malt_packaging
+Salt,5116,5107,4768,True,retained,malt_packaging
+Sausage (beef),45,45,0,False,covariance_support,malt_packaging
+Sausage (chicken),61,61,0,False,covariance_support,malt_packaging
+Sausage (pork),2,2,0,False,min_obs,malt_packaging
+Schnapps,11,11,0,False,min_obs,malt_packaging
+Shallot,281,281,0,False,covariance_support,malt_packaging
+Shea Butter,980,978,0,False,covariance_support,malt_packaging
+Shrimp,129,129,0,False,covariance_support,malt_packaging
+Snail,201,200,0,False,covariance_support,malt_packaging
+Soft Drinks,1473,1467,1460,True,retained,malt_packaging
+Soup,1870,1868,1769,True,retained,malt_packaging
+Soybean,0,0,0,False,min_obs,malt_packaging
+Spaghetti,311,311,310,True,retained,malt_packaging
+Spinach,0,0,0,False,min_obs,malt_packaging
+Sugar (cubed),187,187,0,False,covariance_support,malt_packaging
+Sugar (granulated),4770,4763,4612,True,retained,malt_packaging
+Sugar Bread,4440,4431,4339,True,retained,malt_packaging
+Sweet Pepper,463,460,460,True,retained,malt_packaging
+Sweet Potato,0,0,0,False,min_obs,malt_packaging
+Taro,11,11,0,False,min_obs,malt_packaging
+Tea,972,972,950,True,retained,malt_packaging
+Tilapia,492,492,492,True,retained,malt_packaging
+Tomato (fresh),6670,6658,6456,True,retained,malt_packaging
+Tomato (paste),5711,5699,5608,True,retained,malt_packaging
+Tuna (processed),131,131,0,False,covariance_support,malt_packaging
+Tuo Zaafi,1067,1065,1018,True,retained,malt_packaging
+Vinegar,14,14,0,False,min_obs,malt_packaging
+Water,4683,4671,4542,True,retained,malt_packaging
+Water Yam,181,181,0,False,covariance_support,malt_packaging
+Watermelon,981,980,973,True,retained,malt_packaging
+Wheat Flour,63,63,0,False,covariance_support,malt_packaging
+Whisky,31,31,0,False,covariance_support,malt_packaging
+White Oats,499,497,496,True,retained,malt_packaging
+Wine,122,122,0,False,covariance_support,malt_packaging
+Yam,3357,3353,3344,True,retained,malt_packaging
+Yoghurt,1446,1444,1428,True,retained,malt_packaging
+Agushie Seed,526,523,518,True,retained,pasta
+Akpeteshie,706,705,0,False,covariance_support,pasta
+Apple,374,373,371,True,retained,pasta
+Avocado,388,388,388,True,retained,pasta
+Bambara Bean,0,0,0,False,min_obs,pasta
+Banana,1943,1939,1926,True,retained,pasta
+Beef,2655,2650,2641,True,retained,pasta
+Beef (corned),152,152,0,False,covariance_support,pasta
+Beef (face),72,72,0,False,covariance_support,pasta
+Beef (leg),374,373,0,False,covariance_support,pasta
+Beef (offal),355,355,0,False,covariance_support,pasta
+Beef (steak),1278,1272,1271,True,retained,pasta
+Beer,954,953,869,True,retained,pasta
+Biscuit,2691,2682,2668,True,retained,pasta
+Bitters,361,360,0,False,covariance_support,pasta
+Bread,5218,5207,5095,True,retained,pasta
+Cabbage,0,0,0,False,min_obs,pasta
+Canned Fruits,22,22,0,False,min_obs,pasta
+Carrot,847,844,844,True,retained,pasta
+Cashew,18,18,0,False,min_obs,pasta
+Cassava (dough),3338,3331,3325,True,retained,pasta
+Cassava (dried),1210,1210,1204,True,retained,pasta
+Cassava (fresh),2648,2639,2638,True,retained,pasta
+"Cassava (white, flour)",2376,2369,2354,True,retained,pasta
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,pasta
+Cerelac (Baby food),391,391,391,True,retained,pasta
+Chewing Gum,830,827,824,True,retained,pasta
+Chicken (breast),333,333,0,False,covariance_support,pasta
+Chicken (broiler),163,163,0,False,covariance_support,pasta
+Chicken (frozen),195,193,0,False,covariance_support,pasta
+Chicken (gizzard),62,62,0,False,covariance_support,pasta
+Chicken (live),439,437,0,False,covariance_support,pasta
+Chicken (thigh),1872,1870,1864,True,retained,pasta
+Chicken (wing),658,658,653,True,retained,pasta
+Chilli Powder (black pepper),47,47,0,False,covariance_support,pasta
+Chocolate,60,60,0,False,covariance_support,pasta
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,pasta
+Cocoa Powder,62,62,0,False,covariance_support,pasta
+Coconut (dried),29,29,0,False,min_obs,pasta
+Coconut (fresh),821,818,812,True,retained,pasta
+Cocoyam,624,622,622,True,retained,pasta
+Cocoyam Leaves,2510,2506,2502,True,retained,pasta
+Coffee,136,136,0,False,covariance_support,pasta
+Condiment,5998,5988,5663,True,retained,pasta
+Cooked Rice and Stew,4666,4657,4491,True,retained,pasta
+Corflake,24,24,0,False,min_obs,pasta
+Couscous,4,4,0,False,min_obs,pasta
+Cowpea,1581,1580,1567,True,retained,pasta
+Crab,325,323,323,True,retained,pasta
+Curry Power,419,418,417,True,retained,pasta
+Dawadawa,1412,1411,0,False,covariance_support,pasta
+Eggplant,4161,4151,4129,True,retained,pasta
+Eggplant Leaf,0,0,0,False,min_obs,pasta
+Fish (canned),1374,1370,1367,True,retained,pasta
+Fish (dried),1849,1848,1835,True,retained,pasta
+Fish (fried),2632,2624,2599,True,retained,pasta
+Fish (salted),1765,1755,1744,True,retained,pasta
+"Fish (smoked, river)",3121,3119,3067,True,retained,pasta
+"Fish (smoked, sea)",2662,2657,2652,True,retained,pasta
+Fried Plantian and Beans,1996,1993,1915,True,retained,pasta
+Garlic,2031,2027,2023,True,retained,pasta
+Gin,103,103,0,False,covariance_support,pasta
+Ginger,2226,2221,2214,True,retained,pasta
+Goat,748,747,740,True,retained,pasta
+Grape,21,21,0,False,min_obs,pasta
+Groundnut,3365,3358,3330,True,retained,pasta
+Guinea corn/sorghum,207,207,0,False,covariance_support,pasta
+Guineafowl,75,75,0,False,covariance_support,pasta
+Herring (smoked),5229,5222,4902,True,retained,pasta
+Honey,99,99,0,False,covariance_support,pasta
+Ice Cream,517,516,515,True,retained,pasta
+Instant Noodle,499,499,499,True,retained,pasta
+Juice,962,961,956,True,retained,pasta
+Jute Leaf,0,0,0,False,min_obs,pasta
+Kapla,1819,1816,1796,True,retained,pasta
+Kenkey/Banku,4836,4828,4643,True,retained,pasta
+Khebabs,373,373,0,False,covariance_support,pasta
+Kola Nut,509,509,0,False,covariance_support,pasta
+Lime,77,77,0,False,covariance_support,pasta
+Mackerel (processed),1349,1348,1344,True,retained,pasta
+Maize (cob),0,0,0,False,min_obs,pasta
+Maize (flour/dough),3705,3698,3685,True,retained,pasta
+Maize (grain),1989,1988,1924,True,retained,pasta
+Maizena,3,3,0,False,min_obs,pasta
+Malt Drinks (bottle),1408,1404,1389,True,retained,pasta
+Malt Drinks (canned),912,912,902,True,retained,pasta
+Mango,505,504,500,True,retained,pasta
+Margarine,178,178,0,False,covariance_support,pasta
+Milk (evaporated),1915,1911,1900,True,retained,pasta
+Milk (fresh),160,160,0,False,covariance_support,pasta
+Milk (powdered),1721,1714,1711,True,retained,pasta
+"Milk (tinned, condensed)",27,27,0,False,min_obs,pasta
+Millet,271,271,0,False,covariance_support,pasta
+Millet (flour),113,113,0,False,covariance_support,pasta
+Oil (coconut),184,182,0,False,covariance_support,pasta
+Oil (groundnut),424,424,0,False,covariance_support,pasta
+Oil (palm kernel),56,56,0,False,covariance_support,pasta
+Oil (palm),3316,3305,3298,True,retained,pasta
+Oil (vegetable),4940,4929,4867,True,retained,pasta
+Okra,5035,5030,4906,True,retained,pasta
+Orange,2036,2029,2016,True,retained,pasta
+Other Alcoholic Beverages,0,0,0,False,min_obs,pasta
+Other Beverages,201,198,0,False,covariance_support,pasta
+Other Cereal,33,33,0,False,covariance_support,pasta
+Other Domestic Poultry,0,0,0,False,min_obs,pasta
+Other Fish,1050,1047,973,True,retained,pasta
+Other Flours,0,0,0,False,min_obs,pasta
+Other Fruits,115,115,0,False,covariance_support,pasta
+Other Grains,0,0,0,False,min_obs,pasta
+Other Leafy Vegetable,0,0,0,False,min_obs,pasta
+Other Meat,254,253,0,False,covariance_support,pasta
+Other Milk Products,439,439,439,True,retained,pasta
+Other Nut/Seed,0,0,0,False,min_obs,pasta
+Other Oils,60,60,0,False,covariance_support,pasta
+Other Prepared Meals,3919,3912,3799,True,retained,pasta
+Other Pulses,0,0,0,False,min_obs,pasta
+Other Spices,237,236,0,False,covariance_support,pasta
+Other Spirits,61,61,0,False,covariance_support,pasta
+Other Tubers,13,12,0,False,min_obs,pasta
+Other Vegetables,1345,1342,1319,True,retained,pasta
+Palm Nut,1428,1422,1421,True,retained,pasta
+Pasta (macaroni/spaghetti),478,478,477,True,retained,pasta
+Pawpaw,347,346,344,True,retained,pasta
+"Pepper (dried, red)",2210,2208,2022,True,retained,pasta
+Pepper (fresh),5740,5728,5585,True,retained,pasta
+Pepper (powder),2051,2042,2032,True,retained,pasta
+Pineapple,726,724,722,True,retained,pasta
+Pizza,28,28,0,False,min_obs,pasta
+Plantain,3063,3053,3050,True,retained,pasta
+Pork,336,336,0,False,covariance_support,pasta
+Pork (feet),56,55,0,False,covariance_support,pasta
+Pork (fillet),3,3,0,False,min_obs,pasta
+Pork (rib),3,3,0,False,min_obs,pasta
+Pork (shoulder),2,2,0,False,min_obs,pasta
+Potato,197,196,0,False,covariance_support,pasta
+Rice (imported),4206,4194,4179,True,retained,pasta
+Rice (local),2962,2959,2880,True,retained,pasta
+Salmon (smoked),4327,4316,4304,True,retained,pasta
+Salt,5116,5107,4768,True,retained,pasta
+Sausage (beef),45,45,0,False,covariance_support,pasta
+Sausage (chicken),61,61,0,False,covariance_support,pasta
+Sausage (pork),2,2,0,False,min_obs,pasta
+Schnapps,11,11,0,False,min_obs,pasta
+Shallot,281,281,0,False,covariance_support,pasta
+Shea Butter,980,978,0,False,covariance_support,pasta
+Shrimp,129,129,0,False,covariance_support,pasta
+Snail,201,200,0,False,covariance_support,pasta
+Soft Drinks,1473,1467,1461,True,retained,pasta
+Soup,1870,1868,1772,True,retained,pasta
+Soybean,0,0,0,False,min_obs,pasta
+Spinach,0,0,0,False,min_obs,pasta
+Sugar (cubed),187,187,0,False,covariance_support,pasta
+Sugar (granulated),4770,4763,4613,True,retained,pasta
+Sugar Bread,4440,4431,4342,True,retained,pasta
+Sweet Pepper,463,460,460,True,retained,pasta
+Sweet Potato,0,0,0,False,min_obs,pasta
+Taro,11,11,0,False,min_obs,pasta
+Tea,972,972,950,True,retained,pasta
+Tilapia,492,492,492,True,retained,pasta
+Tomato (fresh),6670,6658,6456,True,retained,pasta
+Tomato (paste),5711,5699,5608,True,retained,pasta
+Tuna (processed),131,131,0,False,covariance_support,pasta
+Tuo Zaafi,1067,1065,1021,True,retained,pasta
+Vinegar,14,14,0,False,min_obs,pasta
+Water,4683,4671,4546,True,retained,pasta
+Water Yam,181,181,0,False,covariance_support,pasta
+Watermelon,981,980,973,True,retained,pasta
+Wheat Flour,63,63,0,False,covariance_support,pasta
+Whisky,31,31,0,False,covariance_support,pasta
+White Oats,499,497,496,True,retained,pasta
+Wine,122,122,0,False,covariance_support,pasta
+Yam,3357,3353,3344,True,retained,pasta
+Yoghurt,1446,1444,1430,True,retained,pasta
+Agushie Seed,526,523,518,True,retained,gari
+Akpeteshie,706,705,0,False,covariance_support,gari
+Apple,374,373,371,True,retained,gari
+Avocado,388,388,388,True,retained,gari
+Bambara Bean,0,0,0,False,min_obs,gari
+Banana,1943,1939,1925,True,retained,gari
+Beef,2655,2650,2641,True,retained,gari
+Beef (corned),152,152,0,False,covariance_support,gari
+Beef (face),72,72,0,False,covariance_support,gari
+Beef (leg),374,373,0,False,covariance_support,gari
+Beef (offal),355,355,0,False,covariance_support,gari
+Beef (steak),1278,1272,1271,True,retained,gari
+Beer,954,953,869,True,retained,gari
+Biscuit,2691,2682,2668,True,retained,gari
+Bitters,361,360,0,False,covariance_support,gari
+Bread,5218,5207,5094,True,retained,gari
+Cabbage,0,0,0,False,min_obs,gari
+Canned Fruits,22,22,0,False,min_obs,gari
+Carrot,847,844,844,True,retained,gari
+Cashew,18,18,0,False,min_obs,gari
+Cassava (dough),3338,3331,3325,True,retained,gari
+Cassava (dried),1210,1210,1204,True,retained,gari
+Cassava (fresh),2648,2639,2638,True,retained,gari
+Cerelac (Baby food),391,391,0,False,covariance_support,gari
+Chewing Gum,830,827,824,True,retained,gari
+Chicken (breast),333,333,0,False,covariance_support,gari
+Chicken (broiler),163,163,0,False,covariance_support,gari
+Chicken (frozen),195,193,0,False,covariance_support,gari
+Chicken (gizzard),62,62,0,False,covariance_support,gari
+Chicken (live),439,437,0,False,covariance_support,gari
+Chicken (thigh),1872,1870,1864,True,retained,gari
+Chicken (wing),658,658,653,True,retained,gari
+Chilli Powder (black pepper),47,47,0,False,covariance_support,gari
+Chocolate,60,60,0,False,covariance_support,gari
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,gari
+Cocoa Powder,62,62,0,False,covariance_support,gari
+Coconut (dried),29,29,0,False,min_obs,gari
+Coconut (fresh),821,818,811,True,retained,gari
+Cocoyam,624,622,622,True,retained,gari
+Cocoyam Leaves,2510,2506,2502,True,retained,gari
+Coffee,136,136,0,False,covariance_support,gari
+Condiment,5998,5988,5663,True,retained,gari
+Cooked Rice and Stew,4666,4657,4489,True,retained,gari
+Corflake,24,24,0,False,min_obs,gari
+Couscous,4,4,0,False,min_obs,gari
+Cowpea,1581,1580,1567,True,retained,gari
+Crab,325,323,323,True,retained,gari
+Curry Power,419,418,417,True,retained,gari
+Dawadawa,1412,1411,0,False,covariance_support,gari
+Eggplant,4161,4151,4129,True,retained,gari
+Eggplant Leaf,0,0,0,False,min_obs,gari
+Fish (canned),1374,1370,1367,True,retained,gari
+Fish (dried),1849,1848,1835,True,retained,gari
+Fish (fried),2632,2624,2599,True,retained,gari
+Fish (salted),1765,1755,1745,True,retained,gari
+"Fish (smoked, river)",3121,3119,3067,True,retained,gari
+"Fish (smoked, sea)",2662,2657,2652,True,retained,gari
+Fried Plantian and Beans,1996,1993,1915,True,retained,gari
+Gari,2555,2548,2532,True,retained,gari
+Garlic,2031,2027,2023,True,retained,gari
+Gin,103,103,0,False,covariance_support,gari
+Ginger,2226,2221,2214,True,retained,gari
+Goat,748,747,740,True,retained,gari
+Grape,21,21,0,False,min_obs,gari
+Groundnut,3365,3358,3329,True,retained,gari
+Guinea corn/sorghum,207,207,0,False,covariance_support,gari
+Guineafowl,75,75,0,False,covariance_support,gari
+Herring (smoked),5229,5222,4902,True,retained,gari
+Honey,99,99,0,False,covariance_support,gari
+Ice Cream,517,516,515,True,retained,gari
+Instant Noodle,499,499,499,True,retained,gari
+Juice,962,961,956,True,retained,gari
+Jute Leaf,0,0,0,False,min_obs,gari
+Kapla,1819,1816,1796,True,retained,gari
+Kenkey/Banku,4836,4828,4640,True,retained,gari
+Khebabs,373,373,0,False,covariance_support,gari
+Kola Nut,509,509,0,False,covariance_support,gari
+Lime,77,77,0,False,covariance_support,gari
+Macaroni,192,192,0,False,covariance_support,gari
+Mackerel (processed),1349,1348,1344,True,retained,gari
+Maize (cob),0,0,0,False,min_obs,gari
+Maize (flour/dough),3705,3698,3685,True,retained,gari
+Maize (grain),1989,1988,1924,True,retained,gari
+Maizena,3,3,0,False,min_obs,gari
+Malt Drinks (bottle),1408,1404,1389,True,retained,gari
+Malt Drinks (canned),912,912,902,True,retained,gari
+Mango,505,504,500,True,retained,gari
+Margarine,178,178,0,False,covariance_support,gari
+Milk (evaporated),1915,1911,1900,True,retained,gari
+Milk (fresh),160,160,0,False,covariance_support,gari
+Milk (powdered),1721,1714,1711,True,retained,gari
+"Milk (tinned, condensed)",27,27,0,False,min_obs,gari
+Millet,271,271,0,False,covariance_support,gari
+Millet (flour),113,113,0,False,covariance_support,gari
+Oil (coconut),184,182,0,False,covariance_support,gari
+Oil (groundnut),424,424,0,False,covariance_support,gari
+Oil (palm kernel),56,56,0,False,covariance_support,gari
+Oil (palm),3316,3305,3297,True,retained,gari
+Oil (vegetable),4940,4929,4867,True,retained,gari
+Okra,5035,5030,4906,True,retained,gari
+Orange,2036,2029,2015,True,retained,gari
+Other Alcoholic Beverages,0,0,0,False,min_obs,gari
+Other Beverages,201,198,0,False,covariance_support,gari
+Other Cereal,33,33,0,False,covariance_support,gari
+Other Domestic Poultry,0,0,0,False,min_obs,gari
+Other Fish,1050,1047,973,True,retained,gari
+Other Flours,0,0,0,False,min_obs,gari
+Other Fruits,115,115,0,False,covariance_support,gari
+Other Grains,0,0,0,False,min_obs,gari
+Other Leafy Vegetable,0,0,0,False,min_obs,gari
+Other Meat,254,253,0,False,covariance_support,gari
+Other Milk Products,439,439,439,True,retained,gari
+Other Nut/Seed,0,0,0,False,min_obs,gari
+Other Oils,60,60,0,False,covariance_support,gari
+Other Prepared Meals,3919,3912,3797,True,retained,gari
+Other Pulses,0,0,0,False,min_obs,gari
+Other Spices,237,236,0,False,covariance_support,gari
+Other Spirits,61,61,0,False,covariance_support,gari
+Other Tubers,13,12,0,False,min_obs,gari
+Other Vegetables,1345,1342,1319,True,retained,gari
+Palm Nut,1428,1422,1421,True,retained,gari
+Pawpaw,347,346,0,False,covariance_support,gari
+"Pepper (dried, red)",2210,2208,2022,True,retained,gari
+Pepper (fresh),5740,5728,5585,True,retained,gari
+Pepper (powder),2051,2042,2032,True,retained,gari
+Pineapple,726,724,722,True,retained,gari
+Pizza,28,28,0,False,min_obs,gari
+Plantain,3063,3053,3050,True,retained,gari
+Pork,336,336,0,False,covariance_support,gari
+Pork (feet),56,55,0,False,covariance_support,gari
+Pork (fillet),3,3,0,False,min_obs,gari
+Pork (rib),3,3,0,False,min_obs,gari
+Pork (shoulder),2,2,0,False,min_obs,gari
+Potato,197,196,0,False,covariance_support,gari
+Rice (imported),4206,4194,4179,True,retained,gari
+Rice (local),2962,2959,2880,True,retained,gari
+Salmon (smoked),4327,4316,4304,True,retained,gari
+Salt,5116,5107,4768,True,retained,gari
+Sausage (beef),45,45,0,False,covariance_support,gari
+Sausage (chicken),61,61,0,False,covariance_support,gari
+Sausage (pork),2,2,0,False,min_obs,gari
+Schnapps,11,11,0,False,min_obs,gari
+Shallot,281,281,0,False,covariance_support,gari
+Shea Butter,980,978,0,False,covariance_support,gari
+Shrimp,129,129,0,False,covariance_support,gari
+Snail,201,200,0,False,covariance_support,gari
+Soft Drinks,1473,1467,1461,True,retained,gari
+Soup,1870,1868,1771,True,retained,gari
+Soybean,0,0,0,False,min_obs,gari
+Spaghetti,311,311,310,True,retained,gari
+Spinach,0,0,0,False,min_obs,gari
+Sugar (cubed),187,187,0,False,covariance_support,gari
+Sugar (granulated),4770,4763,4614,True,retained,gari
+Sugar Bread,4440,4431,4341,True,retained,gari
+Sweet Pepper,463,460,460,True,retained,gari
+Sweet Potato,0,0,0,False,min_obs,gari
+Taro,11,11,0,False,min_obs,gari
+Tea,972,972,950,True,retained,gari
+Tilapia,492,492,492,True,retained,gari
+Tomato (fresh),6670,6658,6456,True,retained,gari
+Tomato (paste),5711,5699,5609,True,retained,gari
+Tuna (processed),131,131,0,False,covariance_support,gari
+Tuo Zaafi,1067,1065,1020,True,retained,gari
+Vinegar,14,14,0,False,min_obs,gari
+Water,4683,4671,4544,True,retained,gari
+Water Yam,181,181,0,False,covariance_support,gari
+Watermelon,981,980,973,True,retained,gari
+Wheat Flour,63,63,0,False,covariance_support,gari
+Whisky,31,31,0,False,covariance_support,gari
+White Oats,499,497,496,True,retained,gari
+Wine,122,122,0,False,covariance_support,gari
+Yam,3357,3353,3344,True,retained,gari
+Yoghurt,1446,1444,1429,True,retained,gari
+Agushie Seed,526,523,518,True,retained,chicken_cuts
+Akpeteshie,706,705,0,False,covariance_support,chicken_cuts
+Apple,374,373,371,True,retained,chicken_cuts
+Avocado,388,388,388,True,retained,chicken_cuts
+Bambara Bean,0,0,0,False,min_obs,chicken_cuts
+Banana,1943,1939,1925,True,retained,chicken_cuts
+Beef,2655,2650,2641,True,retained,chicken_cuts
+Beef (corned),152,152,0,False,covariance_support,chicken_cuts
+Beef (face),72,72,0,False,covariance_support,chicken_cuts
+Beef (leg),374,373,0,False,covariance_support,chicken_cuts
+Beef (offal),355,355,0,False,covariance_support,chicken_cuts
+Beef (steak),1278,1272,1272,True,retained,chicken_cuts
+Beer,954,953,869,True,retained,chicken_cuts
+Biscuit,2691,2682,2668,True,retained,chicken_cuts
+Bitters,361,360,0,False,covariance_support,chicken_cuts
+Bread,5218,5207,5093,True,retained,chicken_cuts
+Cabbage,0,0,0,False,min_obs,chicken_cuts
+Canned Fruits,22,22,0,False,min_obs,chicken_cuts
+Carrot,847,844,844,True,retained,chicken_cuts
+Cashew,18,18,0,False,min_obs,chicken_cuts
+Cassava (dough),3338,3331,3325,True,retained,chicken_cuts
+Cassava (dried),1210,1210,1204,True,retained,chicken_cuts
+Cassava (fresh),2648,2639,2638,True,retained,chicken_cuts
+"Cassava (white, flour)",2376,2369,2354,True,retained,chicken_cuts
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,chicken_cuts
+Cerelac (Baby food),391,391,0,False,covariance_support,chicken_cuts
+Chewing Gum,830,827,824,True,retained,chicken_cuts
+Chicken (broiler),163,163,0,False,covariance_support,chicken_cuts
+Chicken (frozen),195,193,0,False,covariance_support,chicken_cuts
+Chicken (gizzard),62,62,0,False,covariance_support,chicken_cuts
+Chicken (live),439,437,0,False,covariance_support,chicken_cuts
+Chicken cuts,2394,2392,2377,True,retained,chicken_cuts
+Chilli Powder (black pepper),47,47,0,False,covariance_support,chicken_cuts
+Chocolate,60,60,0,False,covariance_support,chicken_cuts
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,chicken_cuts
+Cocoa Powder,62,62,0,False,covariance_support,chicken_cuts
+Coconut (dried),29,29,0,False,min_obs,chicken_cuts
+Coconut (fresh),821,818,811,True,retained,chicken_cuts
+Cocoyam,624,622,622,True,retained,chicken_cuts
+Cocoyam Leaves,2510,2506,2502,True,retained,chicken_cuts
+Coffee,136,136,0,False,covariance_support,chicken_cuts
+Condiment,5998,5988,5663,True,retained,chicken_cuts
+Cooked Rice and Stew,4666,4657,4488,True,retained,chicken_cuts
+Corflake,24,24,0,False,min_obs,chicken_cuts
+Couscous,4,4,0,False,min_obs,chicken_cuts
+Cowpea,1581,1580,1567,True,retained,chicken_cuts
+Crab,325,323,323,True,retained,chicken_cuts
+Curry Power,419,418,417,True,retained,chicken_cuts
+Dawadawa,1412,1411,0,False,covariance_support,chicken_cuts
+Eggplant,4161,4151,4130,True,retained,chicken_cuts
+Eggplant Leaf,0,0,0,False,min_obs,chicken_cuts
+Fish (canned),1374,1370,1367,True,retained,chicken_cuts
+Fish (dried),1849,1848,1835,True,retained,chicken_cuts
+Fish (fried),2632,2624,2598,True,retained,chicken_cuts
+Fish (salted),1765,1755,1744,True,retained,chicken_cuts
+"Fish (smoked, river)",3121,3119,3068,True,retained,chicken_cuts
+"Fish (smoked, sea)",2662,2657,2652,True,retained,chicken_cuts
+Fried Plantian and Beans,1996,1993,1914,True,retained,chicken_cuts
+Garlic,2031,2027,2023,True,retained,chicken_cuts
+Gin,103,103,0,False,covariance_support,chicken_cuts
+Ginger,2226,2221,2214,True,retained,chicken_cuts
+Goat,748,747,740,True,retained,chicken_cuts
+Grape,21,21,0,False,min_obs,chicken_cuts
+Groundnut,3365,3358,3329,True,retained,chicken_cuts
+Guinea corn/sorghum,207,207,0,False,covariance_support,chicken_cuts
+Guineafowl,75,75,0,False,covariance_support,chicken_cuts
+Herring (smoked),5229,5222,4901,True,retained,chicken_cuts
+Honey,99,99,0,False,covariance_support,chicken_cuts
+Ice Cream,517,516,515,True,retained,chicken_cuts
+Instant Noodle,499,499,499,True,retained,chicken_cuts
+Juice,962,961,956,True,retained,chicken_cuts
+Jute Leaf,0,0,0,False,min_obs,chicken_cuts
+Kapla,1819,1816,1796,True,retained,chicken_cuts
+Kenkey/Banku,4836,4828,4640,True,retained,chicken_cuts
+Khebabs,373,373,0,False,covariance_support,chicken_cuts
+Kola Nut,509,509,0,False,covariance_support,chicken_cuts
+Lime,77,77,0,False,covariance_support,chicken_cuts
+Macaroni,192,192,0,False,covariance_support,chicken_cuts
+Mackerel (processed),1349,1348,1344,True,retained,chicken_cuts
+Maize (cob),0,0,0,False,min_obs,chicken_cuts
+Maize (flour/dough),3705,3698,3685,True,retained,chicken_cuts
+Maize (grain),1989,1988,1924,True,retained,chicken_cuts
+Maizena,3,3,0,False,min_obs,chicken_cuts
+Malt Drinks (bottle),1408,1404,1389,True,retained,chicken_cuts
+Malt Drinks (canned),912,912,902,True,retained,chicken_cuts
+Mango,505,504,500,True,retained,chicken_cuts
+Margarine,178,178,0,False,covariance_support,chicken_cuts
+Milk (evaporated),1915,1911,1900,True,retained,chicken_cuts
+Milk (fresh),160,160,0,False,covariance_support,chicken_cuts
+Milk (powdered),1721,1714,1711,True,retained,chicken_cuts
+"Milk (tinned, condensed)",27,27,0,False,min_obs,chicken_cuts
+Millet,271,271,0,False,covariance_support,chicken_cuts
+Millet (flour),113,113,0,False,covariance_support,chicken_cuts
+Oil (coconut),184,182,0,False,covariance_support,chicken_cuts
+Oil (groundnut),424,424,0,False,covariance_support,chicken_cuts
+Oil (palm kernel),56,56,0,False,covariance_support,chicken_cuts
+Oil (palm),3316,3305,3297,True,retained,chicken_cuts
+Oil (vegetable),4940,4929,4867,True,retained,chicken_cuts
+Okra,5035,5030,4906,True,retained,chicken_cuts
+Orange,2036,2029,2015,True,retained,chicken_cuts
+Other Alcoholic Beverages,0,0,0,False,min_obs,chicken_cuts
+Other Beverages,201,198,0,False,covariance_support,chicken_cuts
+Other Cereal,33,33,0,False,covariance_support,chicken_cuts
+Other Domestic Poultry,0,0,0,False,min_obs,chicken_cuts
+Other Fish,1050,1047,973,True,retained,chicken_cuts
+Other Flours,0,0,0,False,min_obs,chicken_cuts
+Other Fruits,115,115,0,False,covariance_support,chicken_cuts
+Other Grains,0,0,0,False,min_obs,chicken_cuts
+Other Leafy Vegetable,0,0,0,False,min_obs,chicken_cuts
+Other Meat,254,253,0,False,covariance_support,chicken_cuts
+Other Milk Products,439,439,439,True,retained,chicken_cuts
+Other Nut/Seed,0,0,0,False,min_obs,chicken_cuts
+Other Oils,60,60,0,False,covariance_support,chicken_cuts
+Other Prepared Meals,3919,3912,3797,True,retained,chicken_cuts
+Other Pulses,0,0,0,False,min_obs,chicken_cuts
+Other Spices,237,236,0,False,covariance_support,chicken_cuts
+Other Spirits,61,61,0,False,covariance_support,chicken_cuts
+Other Tubers,13,12,0,False,min_obs,chicken_cuts
+Other Vegetables,1345,1342,1319,True,retained,chicken_cuts
+Palm Nut,1428,1422,1421,True,retained,chicken_cuts
+Pawpaw,347,346,0,False,covariance_support,chicken_cuts
+"Pepper (dried, red)",2210,2208,2022,True,retained,chicken_cuts
+Pepper (fresh),5740,5728,5585,True,retained,chicken_cuts
+Pepper (powder),2051,2042,2032,True,retained,chicken_cuts
+Pineapple,726,724,722,True,retained,chicken_cuts
+Pizza,28,28,0,False,min_obs,chicken_cuts
+Plantain,3063,3053,3050,True,retained,chicken_cuts
+Pork,336,336,0,False,covariance_support,chicken_cuts
+Pork (feet),56,55,0,False,covariance_support,chicken_cuts
+Pork (fillet),3,3,0,False,min_obs,chicken_cuts
+Pork (rib),3,3,0,False,min_obs,chicken_cuts
+Pork (shoulder),2,2,0,False,min_obs,chicken_cuts
+Potato,197,196,0,False,covariance_support,chicken_cuts
+Rice (imported),4206,4194,4178,True,retained,chicken_cuts
+Rice (local),2962,2959,2880,True,retained,chicken_cuts
+Salmon (smoked),4327,4316,4304,True,retained,chicken_cuts
+Salt,5116,5107,4769,True,retained,chicken_cuts
+Sausage (beef),45,45,0,False,covariance_support,chicken_cuts
+Sausage (chicken),61,61,0,False,covariance_support,chicken_cuts
+Sausage (pork),2,2,0,False,min_obs,chicken_cuts
+Schnapps,11,11,0,False,min_obs,chicken_cuts
+Shallot,281,281,0,False,covariance_support,chicken_cuts
+Shea Butter,980,978,0,False,covariance_support,chicken_cuts
+Shrimp,129,129,0,False,covariance_support,chicken_cuts
+Snail,201,200,0,False,covariance_support,chicken_cuts
+Soft Drinks,1473,1467,1461,True,retained,chicken_cuts
+Soup,1870,1868,1771,True,retained,chicken_cuts
+Soybean,0,0,0,False,min_obs,chicken_cuts
+Spaghetti,311,311,310,True,retained,chicken_cuts
+Spinach,0,0,0,False,min_obs,chicken_cuts
+Sugar (cubed),187,187,0,False,covariance_support,chicken_cuts
+Sugar (granulated),4770,4763,4612,True,retained,chicken_cuts
+Sugar Bread,4440,4431,4339,True,retained,chicken_cuts
+Sweet Pepper,463,460,460,True,retained,chicken_cuts
+Sweet Potato,0,0,0,False,min_obs,chicken_cuts
+Taro,11,11,0,False,min_obs,chicken_cuts
+Tea,972,972,950,True,retained,chicken_cuts
+Tilapia,492,492,492,True,retained,chicken_cuts
+Tomato (fresh),6670,6658,6457,True,retained,chicken_cuts
+Tomato (paste),5711,5699,5608,True,retained,chicken_cuts
+Tuna (processed),131,131,0,False,covariance_support,chicken_cuts
+Tuo Zaafi,1067,1065,1020,True,retained,chicken_cuts
+Vinegar,14,14,0,False,min_obs,chicken_cuts
+Water,4683,4671,4544,True,retained,chicken_cuts
+Water Yam,181,181,0,False,covariance_support,chicken_cuts
+Watermelon,981,980,973,True,retained,chicken_cuts
+Wheat Flour,63,63,0,False,covariance_support,chicken_cuts
+Whisky,31,31,0,False,covariance_support,chicken_cuts
+White Oats,499,497,496,True,retained,chicken_cuts
+Wine,122,122,0,False,covariance_support,chicken_cuts
+Yam,3357,3353,3344,True,retained,chicken_cuts
+Yoghurt,1446,1444,1429,True,retained,chicken_cuts
+Agushie Seed,526,523,518,True,retained,pork_cuts
+Akpeteshie,706,705,0,False,covariance_support,pork_cuts
+Apple,374,373,371,True,retained,pork_cuts
+Avocado,388,388,388,True,retained,pork_cuts
+Bambara Bean,0,0,0,False,min_obs,pork_cuts
+Banana,1943,1939,1925,True,retained,pork_cuts
+Beef,2655,2650,2641,True,retained,pork_cuts
+Beef (corned),152,152,0,False,covariance_support,pork_cuts
+Beef (face),72,72,0,False,covariance_support,pork_cuts
+Beef (leg),374,373,0,False,covariance_support,pork_cuts
+Beef (offal),355,355,0,False,covariance_support,pork_cuts
+Beef (steak),1278,1272,1271,True,retained,pork_cuts
+Beer,954,953,869,True,retained,pork_cuts
+Biscuit,2691,2682,2668,True,retained,pork_cuts
+Bitters,361,360,0,False,covariance_support,pork_cuts
+Bread,5218,5207,5094,True,retained,pork_cuts
+Cabbage,0,0,0,False,min_obs,pork_cuts
+Canned Fruits,22,22,0,False,min_obs,pork_cuts
+Carrot,847,844,844,True,retained,pork_cuts
+Cashew,18,18,0,False,min_obs,pork_cuts
+Cassava (dough),3338,3331,3325,True,retained,pork_cuts
+Cassava (dried),1210,1210,1204,True,retained,pork_cuts
+Cassava (fresh),2648,2639,2638,True,retained,pork_cuts
+"Cassava (white, flour)",2376,2369,2354,True,retained,pork_cuts
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,pork_cuts
+Cerelac (Baby food),391,391,0,False,covariance_support,pork_cuts
+Chewing Gum,830,827,824,True,retained,pork_cuts
+Chicken (breast),333,333,0,False,covariance_support,pork_cuts
+Chicken (broiler),163,163,0,False,covariance_support,pork_cuts
+Chicken (frozen),195,193,0,False,covariance_support,pork_cuts
+Chicken (gizzard),62,62,0,False,covariance_support,pork_cuts
+Chicken (live),439,437,0,False,covariance_support,pork_cuts
+Chicken (thigh),1872,1870,1864,True,retained,pork_cuts
+Chicken (wing),658,658,653,True,retained,pork_cuts
+Chilli Powder (black pepper),47,47,0,False,covariance_support,pork_cuts
+Chocolate,60,60,0,False,covariance_support,pork_cuts
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,pork_cuts
+Cocoa Powder,62,62,0,False,covariance_support,pork_cuts
+Coconut (dried),29,29,0,False,min_obs,pork_cuts
+Coconut (fresh),821,818,811,True,retained,pork_cuts
+Cocoyam,624,622,622,True,retained,pork_cuts
+Cocoyam Leaves,2510,2506,2502,True,retained,pork_cuts
+Coffee,136,136,0,False,covariance_support,pork_cuts
+Condiment,5998,5988,5662,True,retained,pork_cuts
+Cooked Rice and Stew,4666,4657,4489,True,retained,pork_cuts
+Corflake,24,24,0,False,min_obs,pork_cuts
+Couscous,4,4,0,False,min_obs,pork_cuts
+Cowpea,1581,1580,1567,True,retained,pork_cuts
+Crab,325,323,323,True,retained,pork_cuts
+Curry Power,419,418,417,True,retained,pork_cuts
+Dawadawa,1412,1411,0,False,covariance_support,pork_cuts
+Eggplant,4161,4151,4129,True,retained,pork_cuts
+Eggplant Leaf,0,0,0,False,min_obs,pork_cuts
+Fish (canned),1374,1370,1367,True,retained,pork_cuts
+Fish (dried),1849,1848,1835,True,retained,pork_cuts
+Fish (fried),2632,2624,2598,True,retained,pork_cuts
+Fish (salted),1765,1755,1744,True,retained,pork_cuts
+"Fish (smoked, river)",3121,3119,3067,True,retained,pork_cuts
+"Fish (smoked, sea)",2662,2657,2652,True,retained,pork_cuts
+Fried Plantian and Beans,1996,1993,1915,True,retained,pork_cuts
+Garlic,2031,2027,2023,True,retained,pork_cuts
+Gin,103,103,0,False,covariance_support,pork_cuts
+Ginger,2226,2221,2214,True,retained,pork_cuts
+Goat,748,747,740,True,retained,pork_cuts
+Grape,21,21,0,False,min_obs,pork_cuts
+Groundnut,3365,3358,3329,True,retained,pork_cuts
+Guinea corn/sorghum,207,207,0,False,covariance_support,pork_cuts
+Guineafowl,75,75,0,False,covariance_support,pork_cuts
+Herring (smoked),5229,5222,4901,True,retained,pork_cuts
+Honey,99,99,0,False,covariance_support,pork_cuts
+Ice Cream,517,516,515,True,retained,pork_cuts
+Instant Noodle,499,499,499,True,retained,pork_cuts
+Juice,962,961,956,True,retained,pork_cuts
+Jute Leaf,0,0,0,False,min_obs,pork_cuts
+Kapla,1819,1816,1796,True,retained,pork_cuts
+Kenkey/Banku,4836,4828,4640,True,retained,pork_cuts
+Khebabs,373,373,0,False,covariance_support,pork_cuts
+Kola Nut,509,509,0,False,covariance_support,pork_cuts
+Lime,77,77,0,False,covariance_support,pork_cuts
+Macaroni,192,192,0,False,covariance_support,pork_cuts
+Mackerel (processed),1349,1348,1344,True,retained,pork_cuts
+Maize (cob),0,0,0,False,min_obs,pork_cuts
+Maize (flour/dough),3705,3698,3685,True,retained,pork_cuts
+Maize (grain),1989,1988,1924,True,retained,pork_cuts
+Maizena,3,3,0,False,min_obs,pork_cuts
+Malt Drinks (bottle),1408,1404,1389,True,retained,pork_cuts
+Malt Drinks (canned),912,912,902,True,retained,pork_cuts
+Mango,505,504,500,True,retained,pork_cuts
+Margarine,178,178,0,False,covariance_support,pork_cuts
+Milk (evaporated),1915,1911,1900,True,retained,pork_cuts
+Milk (fresh),160,160,0,False,covariance_support,pork_cuts
+Milk (powdered),1721,1714,1711,True,retained,pork_cuts
+"Milk (tinned, condensed)",27,27,0,False,min_obs,pork_cuts
+Millet,271,271,0,False,covariance_support,pork_cuts
+Millet (flour),113,113,0,False,covariance_support,pork_cuts
+Oil (coconut),184,182,0,False,covariance_support,pork_cuts
+Oil (groundnut),424,424,0,False,covariance_support,pork_cuts
+Oil (palm kernel),56,56,0,False,covariance_support,pork_cuts
+Oil (palm),3316,3305,3297,True,retained,pork_cuts
+Oil (vegetable),4940,4929,4867,True,retained,pork_cuts
+Okra,5035,5030,4906,True,retained,pork_cuts
+Orange,2036,2029,2015,True,retained,pork_cuts
+Other Alcoholic Beverages,0,0,0,False,min_obs,pork_cuts
+Other Beverages,201,198,0,False,covariance_support,pork_cuts
+Other Cereal,33,33,0,False,covariance_support,pork_cuts
+Other Domestic Poultry,0,0,0,False,min_obs,pork_cuts
+Other Fish,1050,1047,973,True,retained,pork_cuts
+Other Flours,0,0,0,False,min_obs,pork_cuts
+Other Fruits,115,115,0,False,covariance_support,pork_cuts
+Other Grains,0,0,0,False,min_obs,pork_cuts
+Other Leafy Vegetable,0,0,0,False,min_obs,pork_cuts
+Other Meat,254,253,0,False,covariance_support,pork_cuts
+Other Milk Products,439,439,439,True,retained,pork_cuts
+Other Nut/Seed,0,0,0,False,min_obs,pork_cuts
+Other Oils,60,60,0,False,covariance_support,pork_cuts
+Other Prepared Meals,3919,3912,3797,True,retained,pork_cuts
+Other Pulses,0,0,0,False,min_obs,pork_cuts
+Other Spices,237,236,0,False,covariance_support,pork_cuts
+Other Spirits,61,61,0,False,covariance_support,pork_cuts
+Other Tubers,13,12,0,False,min_obs,pork_cuts
+Other Vegetables,1345,1342,1319,True,retained,pork_cuts
+Palm Nut,1428,1422,1421,True,retained,pork_cuts
+Pawpaw,347,346,0,False,covariance_support,pork_cuts
+"Pepper (dried, red)",2210,2208,2022,True,retained,pork_cuts
+Pepper (fresh),5740,5728,5585,True,retained,pork_cuts
+Pepper (powder),2051,2042,2032,True,retained,pork_cuts
+Pineapple,726,724,722,True,retained,pork_cuts
+Pizza,28,28,0,False,min_obs,pork_cuts
+Plantain,3063,3053,3050,True,retained,pork_cuts
+Pork,336,336,0,False,covariance_support,pork_cuts
+Pork (feet),56,55,0,False,covariance_support,pork_cuts
+Pork cuts,8,8,0,False,min_obs,pork_cuts
+Potato,197,196,0,False,covariance_support,pork_cuts
+Rice (imported),4206,4194,4178,True,retained,pork_cuts
+Rice (local),2962,2959,2880,True,retained,pork_cuts
+Salmon (smoked),4327,4316,4304,True,retained,pork_cuts
+Salt,5116,5107,4768,True,retained,pork_cuts
+Sausage (beef),45,45,0,False,covariance_support,pork_cuts
+Sausage (chicken),61,61,0,False,covariance_support,pork_cuts
+Sausage (pork),2,2,0,False,min_obs,pork_cuts
+Schnapps,11,11,0,False,min_obs,pork_cuts
+Shallot,281,281,0,False,covariance_support,pork_cuts
+Shea Butter,980,978,0,False,covariance_support,pork_cuts
+Shrimp,129,129,0,False,covariance_support,pork_cuts
+Snail,201,200,0,False,covariance_support,pork_cuts
+Soft Drinks,1473,1467,1461,True,retained,pork_cuts
+Soup,1870,1868,1771,True,retained,pork_cuts
+Soybean,0,0,0,False,min_obs,pork_cuts
+Spaghetti,311,311,310,True,retained,pork_cuts
+Spinach,0,0,0,False,min_obs,pork_cuts
+Sugar (cubed),187,187,0,False,covariance_support,pork_cuts
+Sugar (granulated),4770,4763,4613,True,retained,pork_cuts
+Sugar Bread,4440,4431,4340,True,retained,pork_cuts
+Sweet Pepper,463,460,460,True,retained,pork_cuts
+Sweet Potato,0,0,0,False,min_obs,pork_cuts
+Taro,11,11,0,False,min_obs,pork_cuts
+Tea,972,972,950,True,retained,pork_cuts
+Tilapia,492,492,492,True,retained,pork_cuts
+Tomato (fresh),6670,6658,6456,True,retained,pork_cuts
+Tomato (paste),5711,5699,5608,True,retained,pork_cuts
+Tuna (processed),131,131,0,False,covariance_support,pork_cuts
+Tuo Zaafi,1067,1065,1020,True,retained,pork_cuts
+Vinegar,14,14,0,False,min_obs,pork_cuts
+Water,4683,4671,4544,True,retained,pork_cuts
+Water Yam,181,181,0,False,covariance_support,pork_cuts
+Watermelon,981,980,973,True,retained,pork_cuts
+Wheat Flour,63,63,0,False,covariance_support,pork_cuts
+Whisky,31,31,0,False,covariance_support,pork_cuts
+White Oats,499,497,496,True,retained,pork_cuts
+Wine,122,122,0,False,covariance_support,pork_cuts
+Yam,3357,3353,3344,True,retained,pork_cuts
+Yoghurt,1446,1444,1429,True,retained,pork_cuts
+Agushie Seed,526,523,518,True,retained,smoked_fish
+Akpeteshie,706,705,0,False,covariance_support,smoked_fish
+Apple,374,373,371,True,retained,smoked_fish
+Avocado,388,388,388,True,retained,smoked_fish
+Bambara Bean,0,0,0,False,min_obs,smoked_fish
+Banana,1943,1939,1925,True,retained,smoked_fish
+Beef,2655,2650,2640,True,retained,smoked_fish
+Beef (corned),152,152,0,False,covariance_support,smoked_fish
+Beef (face),72,72,0,False,covariance_support,smoked_fish
+Beef (leg),374,373,0,False,covariance_support,smoked_fish
+Beef (offal),355,355,0,False,covariance_support,smoked_fish
+Beef (steak),1278,1272,1271,True,retained,smoked_fish
+Beer,954,953,867,True,retained,smoked_fish
+Biscuit,2691,2682,2668,True,retained,smoked_fish
+Bitters,361,360,0,False,covariance_support,smoked_fish
+Bread,5218,5207,5070,True,retained,smoked_fish
+Cabbage,0,0,0,False,min_obs,smoked_fish
+Canned Fruits,22,22,0,False,min_obs,smoked_fish
+Carrot,847,844,844,True,retained,smoked_fish
+Cashew,18,18,0,False,min_obs,smoked_fish
+Cassava (dough),3338,3331,3322,True,retained,smoked_fish
+Cassava (dried),1210,1210,1201,True,retained,smoked_fish
+Cassava (fresh),2648,2639,2638,True,retained,smoked_fish
+"Cassava (white, flour)",2376,2369,2352,True,retained,smoked_fish
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,smoked_fish
+Cerelac (Baby food),391,391,0,False,covariance_support,smoked_fish
+Chewing Gum,830,827,823,True,retained,smoked_fish
+Chicken (breast),333,333,0,False,covariance_support,smoked_fish
+Chicken (broiler),163,163,0,False,covariance_support,smoked_fish
+Chicken (frozen),195,193,0,False,covariance_support,smoked_fish
+Chicken (gizzard),62,62,0,False,covariance_support,smoked_fish
+Chicken (live),439,437,0,False,covariance_support,smoked_fish
+Chicken (thigh),1872,1870,1860,True,retained,smoked_fish
+Chicken (wing),658,658,653,True,retained,smoked_fish
+Chilli Powder (black pepper),47,47,0,False,covariance_support,smoked_fish
+Chocolate,60,60,0,False,covariance_support,smoked_fish
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,smoked_fish
+Cocoa Powder,62,62,0,False,covariance_support,smoked_fish
+Coconut (dried),29,29,0,False,min_obs,smoked_fish
+Coconut (fresh),821,818,811,True,retained,smoked_fish
+Cocoyam,624,622,622,True,retained,smoked_fish
+Cocoyam Leaves,2510,2506,2501,True,retained,smoked_fish
+Coffee,136,136,0,False,covariance_support,smoked_fish
+Condiment,5998,5988,5651,True,retained,smoked_fish
+Cooked Rice and Stew,4666,4657,4467,True,retained,smoked_fish
+Corflake,24,24,0,False,min_obs,smoked_fish
+Couscous,4,4,0,False,min_obs,smoked_fish
+Cowpea,1581,1580,1567,True,retained,smoked_fish
+Crab,325,323,323,True,retained,smoked_fish
+Curry Power,419,418,417,True,retained,smoked_fish
+Dawadawa,1412,1411,0,False,covariance_support,smoked_fish
+Eggplant,4161,4151,4121,True,retained,smoked_fish
+Eggplant Leaf,0,0,0,False,min_obs,smoked_fish
+Fish (canned),1374,1370,1367,True,retained,smoked_fish
+Fish (dried),1849,1848,1818,True,retained,smoked_fish
+Fish (fried),2632,2624,2593,True,retained,smoked_fish
+Fish (salted),1765,1755,1734,True,retained,smoked_fish
+Fried Plantian and Beans,1996,1993,1904,True,retained,smoked_fish
+Garlic,2031,2027,2023,True,retained,smoked_fish
+Gin,103,103,0,False,covariance_support,smoked_fish
+Ginger,2226,2221,2214,True,retained,smoked_fish
+Goat,748,747,740,True,retained,smoked_fish
+Grape,21,21,0,False,min_obs,smoked_fish
+Groundnut,3365,3358,3323,True,retained,smoked_fish
+Guinea corn/sorghum,207,207,0,False,covariance_support,smoked_fish
+Guineafowl,75,75,0,False,covariance_support,smoked_fish
+Honey,99,99,0,False,covariance_support,smoked_fish
+Ice Cream,517,516,515,True,retained,smoked_fish
+Instant Noodle,499,499,498,True,retained,smoked_fish
+Juice,962,961,956,True,retained,smoked_fish
+Jute Leaf,0,0,0,False,min_obs,smoked_fish
+Kapla,1819,1816,1780,True,retained,smoked_fish
+Kenkey/Banku,4836,4828,4623,True,retained,smoked_fish
+Khebabs,373,373,0,False,covariance_support,smoked_fish
+Kola Nut,509,509,0,False,covariance_support,smoked_fish
+Lime,77,77,0,False,covariance_support,smoked_fish
+Macaroni,192,192,0,False,covariance_support,smoked_fish
+Mackerel (processed),1349,1348,1344,True,retained,smoked_fish
+Maize (cob),0,0,0,False,min_obs,smoked_fish
+Maize (flour/dough),3705,3698,3680,True,retained,smoked_fish
+Maize (grain),1989,1988,1921,True,retained,smoked_fish
+Maizena,3,3,0,False,min_obs,smoked_fish
+Malt Drinks (bottle),1408,1404,1389,True,retained,smoked_fish
+Malt Drinks (canned),912,912,902,True,retained,smoked_fish
+Mango,505,504,500,True,retained,smoked_fish
+Margarine,178,178,0,False,covariance_support,smoked_fish
+Milk (evaporated),1915,1911,1900,True,retained,smoked_fish
+Milk (fresh),160,160,0,False,covariance_support,smoked_fish
+Milk (powdered),1721,1714,1711,True,retained,smoked_fish
+"Milk (tinned, condensed)",27,27,0,False,min_obs,smoked_fish
+Millet,271,271,0,False,covariance_support,smoked_fish
+Millet (flour),113,113,0,False,covariance_support,smoked_fish
+Oil (coconut),184,182,0,False,covariance_support,smoked_fish
+Oil (groundnut),424,424,0,False,covariance_support,smoked_fish
+Oil (palm kernel),56,56,0,False,covariance_support,smoked_fish
+Oil (palm),3316,3305,3295,True,retained,smoked_fish
+Oil (vegetable),4940,4929,4864,True,retained,smoked_fish
+Okra,5035,5030,4900,True,retained,smoked_fish
+Orange,2036,2029,2015,True,retained,smoked_fish
+Other Alcoholic Beverages,0,0,0,False,min_obs,smoked_fish
+Other Beverages,201,198,0,False,covariance_support,smoked_fish
+Other Cereal,33,33,0,False,covariance_support,smoked_fish
+Other Domestic Poultry,0,0,0,False,min_obs,smoked_fish
+Other Fish,1050,1047,970,True,retained,smoked_fish
+Other Flours,0,0,0,False,min_obs,smoked_fish
+Other Fruits,115,115,0,False,covariance_support,smoked_fish
+Other Grains,0,0,0,False,min_obs,smoked_fish
+Other Leafy Vegetable,0,0,0,False,min_obs,smoked_fish
+Other Meat,254,253,0,False,covariance_support,smoked_fish
+Other Milk Products,439,439,439,True,retained,smoked_fish
+Other Nut/Seed,0,0,0,False,min_obs,smoked_fish
+Other Oils,60,60,0,False,covariance_support,smoked_fish
+Other Prepared Meals,3919,3912,3793,True,retained,smoked_fish
+Other Pulses,0,0,0,False,min_obs,smoked_fish
+Other Spices,237,236,0,False,covariance_support,smoked_fish
+Other Spirits,61,61,0,False,covariance_support,smoked_fish
+Other Tubers,13,12,0,False,min_obs,smoked_fish
+Other Vegetables,1345,1342,1317,True,retained,smoked_fish
+Palm Nut,1428,1422,1418,True,retained,smoked_fish
+Pawpaw,347,346,0,False,covariance_support,smoked_fish
+"Pepper (dried, red)",2210,2208,2019,True,retained,smoked_fish
+Pepper (fresh),5740,5728,5576,True,retained,smoked_fish
+Pepper (powder),2051,2042,2032,True,retained,smoked_fish
+Pineapple,726,724,722,True,retained,smoked_fish
+Pizza,28,28,0,False,min_obs,smoked_fish
+Plantain,3063,3053,3048,True,retained,smoked_fish
+Pork,336,336,0,False,covariance_support,smoked_fish
+Pork (feet),56,55,0,False,covariance_support,smoked_fish
+Pork (fillet),3,3,0,False,min_obs,smoked_fish
+Pork (rib),3,3,0,False,min_obs,smoked_fish
+Pork (shoulder),2,2,0,False,min_obs,smoked_fish
+Potato,197,196,0,False,covariance_support,smoked_fish
+Rice (imported),4206,4194,4174,True,retained,smoked_fish
+Rice (local),2962,2959,2877,True,retained,smoked_fish
+Salt,5116,5107,4753,True,retained,smoked_fish
+Sausage (beef),45,45,0,False,covariance_support,smoked_fish
+Sausage (chicken),61,61,0,False,covariance_support,smoked_fish
+Sausage (pork),2,2,0,False,min_obs,smoked_fish
+Schnapps,11,11,0,False,min_obs,smoked_fish
+Shallot,281,281,0,False,covariance_support,smoked_fish
+Shea Butter,980,978,0,False,covariance_support,smoked_fish
+Shrimp,129,129,0,False,covariance_support,smoked_fish
+Smoked fish,7258,7246,6850,True,retained,smoked_fish
+Snail,201,200,0,False,covariance_support,smoked_fish
+Soft Drinks,1473,1467,1461,True,retained,smoked_fish
+Soup,1870,1868,1767,True,retained,smoked_fish
+Soybean,0,0,0,False,min_obs,smoked_fish
+Spaghetti,311,311,310,True,retained,smoked_fish
+Spinach,0,0,0,False,min_obs,smoked_fish
+Sugar (cubed),187,187,0,False,covariance_support,smoked_fish
+Sugar (granulated),4770,4763,4607,True,retained,smoked_fish
+Sugar Bread,4440,4431,4319,True,retained,smoked_fish
+Sweet Pepper,463,460,460,True,retained,smoked_fish
+Sweet Potato,0,0,0,False,min_obs,smoked_fish
+Taro,11,11,0,False,min_obs,smoked_fish
+Tea,972,972,950,True,retained,smoked_fish
+Tilapia,492,492,491,True,retained,smoked_fish
+Tomato (fresh),6670,6658,6444,True,retained,smoked_fish
+Tomato (paste),5711,5699,5597,True,retained,smoked_fish
+Tuna (processed),131,131,0,False,covariance_support,smoked_fish
+Tuo Zaafi,1067,1065,1015,True,retained,smoked_fish
+Vinegar,14,14,0,False,min_obs,smoked_fish
+Water,4683,4671,4543,True,retained,smoked_fish
+Water Yam,181,181,0,False,covariance_support,smoked_fish
+Watermelon,981,980,973,True,retained,smoked_fish
+Wheat Flour,63,63,0,False,covariance_support,smoked_fish
+Whisky,31,31,0,False,covariance_support,smoked_fish
+White Oats,499,497,496,True,retained,smoked_fish
+Wine,122,122,0,False,covariance_support,smoked_fish
+Yam,3357,3353,3343,True,retained,smoked_fish
+Yoghurt,1446,1444,1429,True,retained,smoked_fish
+Agushie Seed,526,523,518,True,retained,sausage
+Akpeteshie,706,705,0,False,covariance_support,sausage
+Apple,374,373,371,True,retained,sausage
+Avocado,388,388,388,True,retained,sausage
+Bambara Bean,0,0,0,False,min_obs,sausage
+Banana,1943,1939,1925,True,retained,sausage
+Beef,2655,2650,2641,True,retained,sausage
+Beef (corned),152,152,0,False,covariance_support,sausage
+Beef (face),72,72,0,False,covariance_support,sausage
+Beef (leg),374,373,0,False,covariance_support,sausage
+Beef (offal),355,355,0,False,covariance_support,sausage
+Beef (steak),1278,1272,1271,True,retained,sausage
+Beer,954,953,869,True,retained,sausage
+Biscuit,2691,2682,2668,True,retained,sausage
+Bitters,361,360,0,False,covariance_support,sausage
+Bread,5218,5207,5094,True,retained,sausage
+Cabbage,0,0,0,False,min_obs,sausage
+Canned Fruits,22,22,0,False,min_obs,sausage
+Carrot,847,844,844,True,retained,sausage
+Cashew,18,18,0,False,min_obs,sausage
+Cassava (dough),3338,3331,3325,True,retained,sausage
+Cassava (dried),1210,1210,1204,True,retained,sausage
+Cassava (fresh),2648,2639,2638,True,retained,sausage
+"Cassava (white, flour)",2376,2369,2354,True,retained,sausage
+"Cassava (yellow, flour)",247,247,0,False,covariance_support,sausage
+Cerelac (Baby food),391,391,0,False,covariance_support,sausage
+Chewing Gum,830,827,824,True,retained,sausage
+Chicken (breast),333,333,0,False,covariance_support,sausage
+Chicken (broiler),163,163,0,False,covariance_support,sausage
+Chicken (frozen),195,193,0,False,covariance_support,sausage
+Chicken (gizzard),62,62,0,False,covariance_support,sausage
+Chicken (live),439,437,0,False,covariance_support,sausage
+Chicken (thigh),1872,1870,1864,True,retained,sausage
+Chicken (wing),658,658,653,True,retained,sausage
+Chilli Powder (black pepper),47,47,0,False,covariance_support,sausage
+Chocolate,60,60,0,False,covariance_support,sausage
+Cocoa (milk powder beverages),3006,2998,2971,True,retained,sausage
+Cocoa Powder,62,62,0,False,covariance_support,sausage
+Coconut (dried),29,29,0,False,min_obs,sausage
+Coconut (fresh),821,818,811,True,retained,sausage
+Cocoyam,624,622,622,True,retained,sausage
+Cocoyam Leaves,2510,2506,2502,True,retained,sausage
+Coffee,136,136,0,False,covariance_support,sausage
+Condiment,5998,5988,5662,True,retained,sausage
+Cooked Rice and Stew,4666,4657,4489,True,retained,sausage
+Corflake,24,24,0,False,min_obs,sausage
+Couscous,4,4,0,False,min_obs,sausage
+Cowpea,1581,1580,1567,True,retained,sausage
+Crab,325,323,323,True,retained,sausage
+Curry Power,419,418,417,True,retained,sausage
+Dawadawa,1412,1411,0,False,covariance_support,sausage
+Eggplant,4161,4151,4129,True,retained,sausage
+Eggplant Leaf,0,0,0,False,min_obs,sausage
+Fish (canned),1374,1370,1367,True,retained,sausage
+Fish (dried),1849,1848,1835,True,retained,sausage
+Fish (fried),2632,2624,2598,True,retained,sausage
+Fish (salted),1765,1755,1744,True,retained,sausage
+"Fish (smoked, river)",3121,3119,3067,True,retained,sausage
+"Fish (smoked, sea)",2662,2657,2652,True,retained,sausage
+Fried Plantian and Beans,1996,1993,1915,True,retained,sausage
+Garlic,2031,2027,2023,True,retained,sausage
+Gin,103,103,0,False,covariance_support,sausage
+Ginger,2226,2221,2214,True,retained,sausage
+Goat,748,747,740,True,retained,sausage
+Grape,21,21,0,False,min_obs,sausage
+Groundnut,3365,3358,3329,True,retained,sausage
+Guinea corn/sorghum,207,207,0,False,covariance_support,sausage
+Guineafowl,75,75,0,False,covariance_support,sausage
+Herring (smoked),5229,5222,4901,True,retained,sausage
+Honey,99,99,0,False,covariance_support,sausage
+Ice Cream,517,516,515,True,retained,sausage
+Instant Noodle,499,499,499,True,retained,sausage
+Juice,962,961,956,True,retained,sausage
+Jute Leaf,0,0,0,False,min_obs,sausage
+Kapla,1819,1816,1796,True,retained,sausage
+Kenkey/Banku,4836,4828,4640,True,retained,sausage
+Khebabs,373,373,0,False,covariance_support,sausage
+Kola Nut,509,509,0,False,covariance_support,sausage
+Lime,77,77,0,False,covariance_support,sausage
+Macaroni,192,192,0,False,covariance_support,sausage
+Mackerel (processed),1349,1348,1344,True,retained,sausage
+Maize (cob),0,0,0,False,min_obs,sausage
+Maize (flour/dough),3705,3698,3685,True,retained,sausage
+Maize (grain),1989,1988,1924,True,retained,sausage
+Maizena,3,3,0,False,min_obs,sausage
+Malt Drinks (bottle),1408,1404,1389,True,retained,sausage
+Malt Drinks (canned),912,912,902,True,retained,sausage
+Mango,505,504,500,True,retained,sausage
+Margarine,178,178,0,False,covariance_support,sausage
+Milk (evaporated),1915,1911,1900,True,retained,sausage
+Milk (fresh),160,160,0,False,covariance_support,sausage
+Milk (powdered),1721,1714,1711,True,retained,sausage
+"Milk (tinned, condensed)",27,27,0,False,min_obs,sausage
+Millet,271,271,0,False,covariance_support,sausage
+Millet (flour),113,113,0,False,covariance_support,sausage
+Oil (coconut),184,182,0,False,covariance_support,sausage
+Oil (groundnut),424,424,0,False,covariance_support,sausage
+Oil (palm kernel),56,56,0,False,covariance_support,sausage
+Oil (palm),3316,3305,3297,True,retained,sausage
+Oil (vegetable),4940,4929,4867,True,retained,sausage
+Okra,5035,5030,4906,True,retained,sausage
+Orange,2036,2029,2015,True,retained,sausage
+Other Alcoholic Beverages,0,0,0,False,min_obs,sausage
+Other Beverages,201,198,0,False,covariance_support,sausage
+Other Cereal,33,33,0,False,covariance_support,sausage
+Other Domestic Poultry,0,0,0,False,min_obs,sausage
+Other Fish,1050,1047,973,True,retained,sausage
+Other Flours,0,0,0,False,min_obs,sausage
+Other Fruits,115,115,0,False,covariance_support,sausage
+Other Grains,0,0,0,False,min_obs,sausage
+Other Leafy Vegetable,0,0,0,False,min_obs,sausage
+Other Meat,254,253,0,False,covariance_support,sausage
+Other Milk Products,439,439,439,True,retained,sausage
+Other Nut/Seed,0,0,0,False,min_obs,sausage
+Other Oils,60,60,0,False,covariance_support,sausage
+Other Prepared Meals,3919,3912,3797,True,retained,sausage
+Other Pulses,0,0,0,False,min_obs,sausage
+Other Spices,237,236,0,False,covariance_support,sausage
+Other Spirits,61,61,0,False,covariance_support,sausage
+Other Tubers,13,12,0,False,min_obs,sausage
+Other Vegetables,1345,1342,1319,True,retained,sausage
+Palm Nut,1428,1422,1421,True,retained,sausage
+Pawpaw,347,346,0,False,covariance_support,sausage
+"Pepper (dried, red)",2210,2208,2022,True,retained,sausage
+Pepper (fresh),5740,5728,5585,True,retained,sausage
+Pepper (powder),2051,2042,2032,True,retained,sausage
+Pineapple,726,724,722,True,retained,sausage
+Pizza,28,28,0,False,min_obs,sausage
+Plantain,3063,3053,3050,True,retained,sausage
+Pork,336,336,0,False,covariance_support,sausage
+Pork (feet),56,55,0,False,covariance_support,sausage
+Pork (fillet),3,3,0,False,min_obs,sausage
+Pork (rib),3,3,0,False,min_obs,sausage
+Pork (shoulder),2,2,0,False,min_obs,sausage
+Potato,197,196,0,False,covariance_support,sausage
+Rice (imported),4206,4194,4178,True,retained,sausage
+Rice (local),2962,2959,2880,True,retained,sausage
+Salmon (smoked),4327,4316,4304,True,retained,sausage
+Salt,5116,5107,4768,True,retained,sausage
+Sausage,100,100,0,False,covariance_support,sausage
+Schnapps,11,11,0,False,min_obs,sausage
+Shallot,281,281,0,False,covariance_support,sausage
+Shea Butter,980,978,0,False,covariance_support,sausage
+Shrimp,129,129,0,False,covariance_support,sausage
+Snail,201,200,0,False,covariance_support,sausage
+Soft Drinks,1473,1467,1461,True,retained,sausage
+Soup,1870,1868,1771,True,retained,sausage
+Soybean,0,0,0,False,min_obs,sausage
+Spaghetti,311,311,310,True,retained,sausage
+Spinach,0,0,0,False,min_obs,sausage
+Sugar (cubed),187,187,0,False,covariance_support,sausage
+Sugar (granulated),4770,4763,4613,True,retained,sausage
+Sugar Bread,4440,4431,4340,True,retained,sausage
+Sweet Pepper,463,460,460,True,retained,sausage
+Sweet Potato,0,0,0,False,min_obs,sausage
+Taro,11,11,0,False,min_obs,sausage
+Tea,972,972,950,True,retained,sausage
+Tilapia,492,492,492,True,retained,sausage
+Tomato (fresh),6670,6658,6456,True,retained,sausage
+Tomato (paste),5711,5699,5608,True,retained,sausage
+Tuna (processed),131,131,0,False,covariance_support,sausage
+Tuo Zaafi,1067,1065,1020,True,retained,sausage
+Vinegar,14,14,0,False,min_obs,sausage
+Water,4683,4671,4544,True,retained,sausage
+Water Yam,181,181,0,False,covariance_support,sausage
+Watermelon,981,980,973,True,retained,sausage
+Wheat Flour,63,63,0,False,covariance_support,sausage
+Whisky,31,31,0,False,covariance_support,sausage
+White Oats,499,497,496,True,retained,sausage
+Wine,122,122,0,False,covariance_support,sausage
+Yam,3357,3353,3344,True,retained,sausage
+Yoghurt,1446,1444,1429,True,retained,sausage
+Agushie Seed,526,523,518,True,retained,draft
+Akpeteshie,706,705,0,False,covariance_support,draft
+Apple,374,373,371,True,retained,draft
+Avocado,388,388,388,True,retained,draft
+Bambara Bean,0,0,0,False,min_obs,draft
+Banana,1943,1939,1925,True,retained,draft
+Beef,2655,2650,2641,True,retained,draft
+Beef (corned),152,152,0,False,covariance_support,draft
+Beef (face),72,72,0,False,covariance_support,draft
+Beef (leg),374,373,0,False,covariance_support,draft
+Beef (offal),355,355,0,False,covariance_support,draft
+Beef (steak),1278,1272,1271,True,retained,draft
+Beer,954,953,869,True,retained,draft
+Biscuit,2691,2682,2667,True,retained,draft
+Bitters,361,360,0,False,covariance_support,draft
+Bread,5218,5207,5093,True,retained,draft
+Cabbage,0,0,0,False,min_obs,draft
+Canned Fruits,22,22,0,False,min_obs,draft
+Carrot,847,844,844,True,retained,draft
+Cashew,18,18,0,False,min_obs,draft
+Cassava (dough),3338,3331,3325,True,retained,draft
+Cassava (dried),1210,1210,1204,True,retained,draft
+Cassava (fresh),2648,2639,2637,True,retained,draft
+Cerelac (Baby food),391,391,391,True,retained,draft
+Chewing Gum,830,827,824,True,retained,draft
+Chicken (breast),333,333,0,False,covariance_support,draft
+Chicken (broiler),163,163,0,False,covariance_support,draft
+Chicken (frozen),195,193,0,False,covariance_support,draft
+Chicken (gizzard),62,62,0,False,covariance_support,draft
+Chicken (live),439,437,0,False,covariance_support,draft
+Chicken (thigh),1872,1870,1864,True,retained,draft
+Chicken (wing),658,658,653,True,retained,draft
+Chilli Powder (black pepper),47,47,0,False,covariance_support,draft
+Chocolate,60,60,0,False,covariance_support,draft
+Cocoa (milk powder beverages),3006,2998,2970,True,retained,draft
+Cocoa Powder,62,62,0,False,covariance_support,draft
+Coconut (dried),29,29,0,False,min_obs,draft
+Coconut (fresh),821,818,812,True,retained,draft
+Cocoyam,624,622,622,True,retained,draft
+Cocoyam Leaves,2510,2506,2502,True,retained,draft
+Coffee,136,136,0,False,covariance_support,draft
+Condiment,5998,5988,5664,True,retained,draft
+Cooked Rice and Stew,4666,4657,4489,True,retained,draft
+Corflake,24,24,0,False,min_obs,draft
+Couscous,4,4,0,False,min_obs,draft
+Cowpea,1581,1580,1567,True,retained,draft
+Crab,325,323,323,True,retained,draft
+Curry Power,419,418,417,True,retained,draft
+Dawadawa,1412,1411,0,False,covariance_support,draft
+Eggplant,4161,4151,4128,True,retained,draft
+Eggplant Leaf,0,0,0,False,min_obs,draft
+Fish (canned),1374,1370,1367,True,retained,draft
+Fish (dried),1849,1848,1835,True,retained,draft
+Fish (fried),2632,2624,2600,True,retained,draft
+Fish (salted),1765,1755,1745,True,retained,draft
+"Fish (smoked, river)",3121,3119,3067,True,retained,draft
+"Fish (smoked, sea)",2662,2657,2651,True,retained,draft
+Fried Plantian and Beans,1996,1993,1915,True,retained,draft
+Gari,2555,2548,2531,True,retained,draft
+Garlic,2031,2027,2023,True,retained,draft
+Gin,103,103,0,False,covariance_support,draft
+Ginger,2226,2221,2214,True,retained,draft
+Goat,748,747,740,True,retained,draft
+Grape,21,21,0,False,min_obs,draft
+Groundnut,3365,3358,3330,True,retained,draft
+Guinea corn/sorghum,207,207,0,False,covariance_support,draft
+Guineafowl,75,75,0,False,covariance_support,draft
+Herring (smoked),5229,5222,4903,True,retained,draft
+Honey,99,99,0,False,covariance_support,draft
+Ice Cream,517,516,515,True,retained,draft
+Instant Noodle,499,499,499,True,retained,draft
+Juice,962,961,955,True,retained,draft
+Jute Leaf,0,0,0,False,min_obs,draft
+Kapla,1819,1816,1796,True,retained,draft
+Kenkey/Banku,4836,4828,4642,True,retained,draft
+Khebabs,373,373,0,False,covariance_support,draft
+Kola Nut,509,509,0,False,covariance_support,draft
+Lime,77,77,0,False,covariance_support,draft
+Mackerel (processed),1349,1348,1344,True,retained,draft
+Maize (cob),0,0,0,False,min_obs,draft
+Maize (flour/dough),3705,3698,3685,True,retained,draft
+Maize (grain),1989,1988,1924,True,retained,draft
+Maizena,3,3,0,False,min_obs,draft
+Malt Drinks,1977,1973,1948,True,retained,draft
+Mango,505,504,500,True,retained,draft
+Margarine,178,178,0,False,covariance_support,draft
+Milk (evaporated),1915,1911,1900,True,retained,draft
+Milk (fresh),160,160,0,False,covariance_support,draft
+Milk (powdered),1721,1714,1711,True,retained,draft
+"Milk (tinned, condensed)",27,27,0,False,min_obs,draft
+Millet,271,271,0,False,covariance_support,draft
+Millet (flour),113,113,0,False,covariance_support,draft
+Oil (coconut),184,182,0,False,covariance_support,draft
+Oil (groundnut),424,424,0,False,covariance_support,draft
+Oil (palm kernel),56,56,0,False,covariance_support,draft
+Oil (palm),3316,3305,3298,True,retained,draft
+Oil (vegetable),4940,4929,4866,True,retained,draft
+Okra,5035,5030,4906,True,retained,draft
+Orange,2036,2029,2016,True,retained,draft
+Other Alcoholic Beverages,0,0,0,False,min_obs,draft
+Other Beverages,201,198,0,False,covariance_support,draft
+Other Cereal,33,33,0,False,covariance_support,draft
+Other Domestic Poultry,0,0,0,False,min_obs,draft
+Other Fish,1050,1047,973,True,retained,draft
+Other Flours,0,0,0,False,min_obs,draft
+Other Fruits,115,115,0,False,covariance_support,draft
+Other Grains,0,0,0,False,min_obs,draft
+Other Leafy Vegetable,0,0,0,False,min_obs,draft
+Other Meat,254,253,0,False,covariance_support,draft
+Other Milk Products,439,439,439,True,retained,draft
+Other Nut/Seed,0,0,0,False,min_obs,draft
+Other Oils,60,60,0,False,covariance_support,draft
+Other Prepared Meals,3919,3912,3798,True,retained,draft
+Other Pulses,0,0,0,False,min_obs,draft
+Other Spices,237,236,0,False,covariance_support,draft
+Other Spirits,61,61,0,False,covariance_support,draft
+Other Tubers,13,12,0,False,min_obs,draft
+Other Vegetables,1345,1342,1319,True,retained,draft
+Palm Nut,1428,1422,1421,True,retained,draft
+Pasta (macaroni/spaghetti),478,478,477,True,retained,draft
+Pawpaw,347,346,344,True,retained,draft
+"Pepper (dried, red)",2210,2208,2022,True,retained,draft
+Pepper (fresh),5740,5728,5584,True,retained,draft
+Pepper (powder),2051,2042,2032,True,retained,draft
+Pineapple,726,724,722,True,retained,draft
+Pizza,28,28,0,False,min_obs,draft
+Plantain,3063,3053,3049,True,retained,draft
+Pork,336,336,0,False,covariance_support,draft
+Pork (feet),56,55,0,False,covariance_support,draft
+Pork (fillet),3,3,0,False,min_obs,draft
+Pork (rib),3,3,0,False,min_obs,draft
+Pork (shoulder),2,2,0,False,min_obs,draft
+Potato,197,196,0,False,covariance_support,draft
+Rice (unprepared),6180,6168,6074,True,retained,draft
+Salmon (smoked),4327,4316,4304,True,retained,draft
+Salt,5116,5107,4768,True,retained,draft
+Sausage (beef),45,45,0,False,covariance_support,draft
+Sausage (chicken),61,61,0,False,covariance_support,draft
+Sausage (pork),2,2,0,False,min_obs,draft
+Schnapps,11,11,0,False,min_obs,draft
+Shallot,281,281,0,False,covariance_support,draft
+Shea Butter,980,978,0,False,covariance_support,draft
+Shrimp,129,129,0,False,covariance_support,draft
+Snail,201,200,0,False,covariance_support,draft
+Soft Drinks,1473,1467,1460,True,retained,draft
+Soup,1870,1868,1770,True,retained,draft
+Soybean,0,0,0,False,min_obs,draft
+Spinach,0,0,0,False,min_obs,draft
+Sugar (cubed/granulated),4842,4835,4685,True,retained,draft
+Sugar Bread,4440,4431,4342,True,retained,draft
+Sweet Pepper,463,460,460,True,retained,draft
+Sweet Potato,0,0,0,False,min_obs,draft
+Taro,11,11,0,False,min_obs,draft
+Tea,972,972,950,True,retained,draft
+Tilapia,492,492,492,True,retained,draft
+Tomato (fresh),6670,6658,6455,True,retained,draft
+Tomato (paste),5711,5699,5609,True,retained,draft
+Tuna (processed),131,131,0,False,covariance_support,draft
+Tuo Zaafi,1067,1065,1019,True,retained,draft
+Vinegar,14,14,0,False,min_obs,draft
+Water,4683,4671,4544,True,retained,draft
+Water Yam,181,181,0,False,covariance_support,draft
+Watermelon,981,980,973,True,retained,draft
+Wheat Flour,63,63,0,False,covariance_support,draft
+Whisky,31,31,0,False,covariance_support,draft
+White Oats,499,497,496,True,retained,draft
+Wine,122,122,0,False,covariance_support,draft
+Yam,3357,3353,3344,True,retained,draft
+Yoghurt,1446,1444,1429,True,retained,draft

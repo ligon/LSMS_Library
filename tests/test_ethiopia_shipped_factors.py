@@ -205,8 +205,16 @@ def test_the_unit_label_match_rate_is_pinned(ethiopia):
     catches it.  Measured 2026-09-09 on the raw sect9 files.
     """
     from lsms_library.local_tools import get_dataframe
+    # 2026-09-18, GH #832: 2015-16 moves 0.820 -> 0.8435 (measured 0.843513).
+    # That wave's sect9 spelled three units "Zorba/Akara <mojibake> {Large,
+    # Medium, Small}" -- the double-encoded U+FFFD -- while its OWN conversion
+    # table spells them cleanly under codes 191/192/193, so 550 harvest rows
+    # could not match a factor that was sitting right there.
+    # `ethiopia._clean_unit_label` now strips that sequence, which RAISES the
+    # ceiling this test pins.  The other three waves are unchanged (they never
+    # carried the damaged spelling): 0.692744 / 0.819809 / 0.776213.
     expect = {"2013-14": (0.69, "sect9_ph_w2.dta", "ph_s9q04_b"),
-              "2015-16": (0.82, "sect9_ph_w3.dta", "ph_s9q04_b"),
+              "2015-16": (0.84, "sect9_ph_w3.dta", "ph_s9q04_b"),
               "2018-19": (0.81, "sect9_ph_w4.dta", "s9q05b"),
               "2021-22": (0.77, "sect9_ph_w5.dta", "s9q05b")}
     for t, (floor, h, ucol) in expect.items():
@@ -300,7 +308,41 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     Measured 2026-09-09 on a cold isolated build.  Update these numbers in the
     same PR as any deliberate change; do not loosen the assertions.
 
-    2026-09-10, GH #850 defect (c): the ``before`` split moves by ONE row,
+    2026-09-14, GH #919: the ``before`` split moves by ONE row AGAIN,
+    26,547 -> 26,548 ``inferred`` and 58,972 -> 58,971 ``none`` -- the same
+    mechanism as the #850 note below, for the same reason.  ``f7c1eb380``
+    seeded ``centilitre`` into ``KNOWN_METRIC``, and Ethiopia's
+    ``crop_production`` carries exactly one ``Centilitres`` row, which stopped
+    falling through to ``none``.  That half of ``f7c1eb380`` is correct and
+    kept: a centilitre is a centilitre everywhere.
+
+    The OTHER half of that commit seeded ``quintal``, which is NOT universal --
+    the metric centner (100 kg) in Ethiopia, 100 *pounds* (45.36 kg) in Central
+    America -- and it moved 13,977 rows off the ``shipped`` rung onto
+    ``metric``, taking with them the one non-tautological external check this
+    file has (see ``test_quintal_is_exactly_100kg_on_every_newly_served_row``
+    and ``Ethiopia/_/CONTENTS.org``).  ``quintal`` now lives in
+    ``categorical_mapping/u.org``'s ``u_kg`` table, where a country can
+    override it; Ethiopia inherits 100 kg from the global default, the shipped
+    rung reclaims its rows, and the newly-served count returns to 43,384.
+
+    2026-09-15, GH #929 split the crop ladder's ``metric`` layer out of
+    ``inferred``, mirroring the food ladder since GH #850.  The counts below
+    move from ``inferred`` to ``metric`` WITHOUT changing: measured across
+    both splits, 0 of 85,519 ``kg_per_unit`` values differ, the NaN pattern is
+    identical, and ``Harvest_kg`` sums to the same 12,680,617.283538.  The
+    seeds were always inside the inference with precedence; only the label
+    they are counted under is new.  ``inferred`` is 0 in BOTH splits -- the
+    price-ratio inference contributes nothing to this country at all, which
+    was invisible while the two layers shared a bucket.
+
+    That this reads 26,548 rather than the 40,525 an earlier draft of #929
+    measured is GH #919: that draft was written on a base without it, while
+    ``quintal`` was still seeded into ``KNOWN_METRIC``.  The ratio assertion
+    below is left at ``> 6 *`` for the same reason -- #919 returned the
+    un-shipped total to 1,905,712 (ratio 6.654), so it holds as written.
+
+    2026-09-10, GH #850 defect (c): the ``before`` split moved by ONE row,
     26,546 -> 26,547 ``inferred`` and 58,973 -> 58,972 ``none``.  That branch
     taught ``_parse_explicit_metric`` the plural / abbreviated metric
     spellings (``50 kgs``, ``20 lts``), which ``_kg_factor_series`` reads, so
@@ -323,12 +365,27 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     after = harvest_kg(cp, shipped_factors=_load(ethiopia))
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["inferred"] == 26_547 and b["none"] == 58_972
-    assert a["shipped"] == 62_164 and a["shipped_matched"] == 62_164
-    assert a["inferred"] == 7_767 and a["none"] == 15_588
+    assert b["metric"] == 26_548 and b["none"] == 58_971
+    # 2026-09-18, GH #832: `shipped` / `shipped_matched` 62,164 -> 62,705 and
+    # `none` 15,587 -> 15,046, both by the SAME 541 rows.  Those are 2015-16
+    # Zorba/Akara harvest rows whose unit label carried the double-encoded
+    # U+FFFD mojibake; `_clean_unit_label` now strips it, so they join the
+    # shipped table instead of falling through to `none`.  (550 rows carry the
+    # damaged label; 9 of them have no (crop, unit) cell in the WB table and
+    # still land on `none`.)  `metric` and the whole `before` split do not
+    # move -- nothing about the metric seeds changed.  Harvest_kg total
+    # 12,680,617.28 -> 12,685,707.32; the ratio asserted below rises
+    # 6.654 -> 6.657, so `> 6 *` still holds as written.
+    assert a["shipped"] == 62_705 and a["shipped_matched"] == 62_705
+    assert a["metric"] == 7_768 and a["none"] == 15_046
+    # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
+    # as its own assertion rather than folded into the counts above: if the
+    # price-ratio inference ever starts serving this country, that is a fact
+    # about Ethiopia worth failing over, not a number to re-baseline.
+    assert b["inferred"] == 0 and a["inferred"] == 0
     assert a["shipped_implausible"] == 0
     assert sum(a[k] for k in ("reported", "shipped", "survey_median",
-                              "inferred", "none")) == len(cp)
+                              "metric", "inferred", "none")) == len(cp)
     # 2011-12 ships no factor file and must be UNTOUCHED.
     bt = before.groupby(level="t")["Harvest_kg"].sum()
     at = after.groupby(level="t")["Harvest_kg"].sum()
@@ -349,7 +406,7 @@ def test_quintal_is_exactly_100kg_on_every_newly_served_row(ethiopia):
     would leave it at 1.0000 too (``Kg`` is crop-independent).  That test
     pinned a tautology.
 
-    ``Quintal`` is the real check.  It is 13,924 of the 43,384 NEWLY-SERVED
+    ``Quintal`` is the real check.  It is 13,924 of the 43,925 NEWLY-SERVED
     rows (~64% of the newly-served kilograms), the library infers **no**
     factor for it, and the WB table says exactly 100.0 for every crop in
     every wave -- which is what a quintal is.  External, not definitional.
@@ -369,7 +426,11 @@ def test_quintal_is_exactly_100kg_on_every_newly_served_row(ethiopia):
     cp = ll.Country("Ethiopia").crop_production()
     fa = harvest_kg_factors(cp, shipped_factors=_load(ethiopia))
     newly = fa["kg_shipped"].notna() & fa["kg_inferred"].isna()
-    assert int(newly.sum()) == 43_384
+    # 2026-09-18, GH #832: 43,384 -> 43,925.  The +541 are 2015-16
+    # Zorba/Akara rows whose mojibake unit label now matches the shipped
+    # table (see the sibling before/after test).  `Quintal` is untouched at
+    # 13,924, which is why the two counts are pinned separately.
+    assert int(newly.sum()) == 43_925
     u = fa.index.get_level_values("u")
     quintal = newly & (u == "Quintal")
     assert int(quintal.sum()) == 13_924

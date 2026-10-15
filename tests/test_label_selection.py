@@ -908,3 +908,91 @@ def test_feature_default_is_unaffected(synthetic_tree):
         print('FEATURE_DEFAULT_OK')
         """, synthetic_tree)
     assert "FEATURE_DEFAULT_OK" in out
+
+
+# ---------------------------------------------------------------------------
+# 4. `_relabel_j` must PASS THROUGH a `j` value the label table does not cover
+#
+# Not a hypothetical.  Two live classes of `j` value are absent from every
+# food-label table by construction:
+#
+#   * non-food crops on `crop_production` -- Cocoa, Rubber, Cotton, Timber,
+#     Tobacco, Kenef (GhanaLSS alone serves 31 distinct `j`, five of them
+#     non-food);
+#   * the `Farm-level` sentinel, which marks a row the survey recorded at farm
+#     grain because the expense is NOT ATTRIBUTABLE to a crop -- structural,
+#     not a missing value (@ligon, 2026-09-16).  GhanaLSS `plot_inputs` uses it
+#     for Section 9 Q43-44, 759 rows carrying ~2.5M/2.8M cedis.
+#
+# `_relabel_j` renames with ``df.rename(index=rdict, level='j')``, which leaves
+# unmapped keys ALONE.  The tempting one-line "simplification" to
+# ``index.map(rdict)`` maps them to NaN instead -- putting NaN on a DECLARED
+# index level, which the first groupby then deletes (CLAUDE.md, "Site I").
+# That refactor would silently drop every non-food crop in the corpus, so the
+# behaviour is pinned here rather than left to pandas semantics.
+# ---------------------------------------------------------------------------
+
+def _food_label_table() -> pd.DataFrame:
+    """A minimal food-label table: two items mapped, everything else absent."""
+    return pd.DataFrame({
+        "Preferred Label": ["Maize", "Rice"],
+        "Aggregate Label": ["Cereals", "Cereals"],
+    })
+
+
+def _j_frame(values) -> pd.DataFrame:
+    idx = pd.MultiIndex.from_tuples(
+        [("2000", f"h{n}", v) for n, v in enumerate(values, 1)],
+        names=["t", "i", "j"])
+    return pd.DataFrame({"Cost": [float(n) for n in range(1, len(values) + 1)]},
+                        index=idx)
+
+
+def _relabeller(cat_maps, name="Fixtureland"):
+    fake = SimpleNamespace(name=name, categorical_mapping=cat_maps)
+    fake._relabel_j = _CountryCls._relabel_j.__get__(fake)
+    return fake
+
+
+def test_an_unmapped_j_value_survives_relabelling_unchanged():
+    """A non-food crop and the `Farm-level` sentinel both pass through."""
+    c = _relabeller({"food_items": _food_label_table()})
+    df = _j_frame(["Maize", "Cocoa", "Farm-level"])
+    out = c._relabel_j(df, "Aggregate", reaggregate=False)
+
+    assert len(out) == len(df), "relabelling must not drop rows"
+    assert list(out.index.get_level_values("j")) == ["Cereals", "Cocoa", "Farm-level"]
+    assert out.index.get_level_values("j").isna().sum() == 0
+    assert out["Cost"].sum() == df["Cost"].sum()
+
+
+def test_unmapped_j_survives_the_reaggregating_path_too():
+    """`reaggregate=True` groups on the renamed level; unmapped keys keep
+    their own group rather than collapsing into a NaN bucket."""
+    c = _relabeller({"food_items": _food_label_table()})
+    df = _j_frame(["Maize", "Rice", "Cocoa", "Farm-level"])
+    out = c._relabel_j(df, "Aggregate", reaggregate=True)
+
+    j = sorted(out.index.get_level_values("j").unique())
+    assert j == ["Cereals", "Cocoa", "Farm-level"]
+    assert out.index.get_level_values("j").isna().sum() == 0
+    assert out["Cost"].sum() == df["Cost"].sum(), "reaggregation must conserve the total"
+
+
+def test_index_map_would_destroy_them_which_is_why_rename_is_used():
+    """The specific refactor this pins against.
+
+    ``rename`` and ``map`` look interchangeable and are not: ``map`` returns
+    NaN for every key absent from the dict.  Here that is two of three rows.
+    """
+    df = _j_frame(["Maize", "Cocoa", "Farm-level"])
+    rdict = {"Maize": "Cereals"}
+
+    kept = df.rename(index=rdict, level="j")
+    assert list(kept.index.get_level_values("j")) == ["Cereals", "Cocoa", "Farm-level"]
+
+    mapped = df.index.get_level_values("j").map(rdict)
+    assert mapped.isna().sum() == 2, (
+        "if this ever stops being true, `map` became safe and the comment "
+        "above is stale -- but do not switch `_relabel_j` over without "
+        "re-checking the Site I consequence")

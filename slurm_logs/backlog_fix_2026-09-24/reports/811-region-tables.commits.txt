@@ -1,0 +1,3 @@
+9ba85575b fix(Senegal): title-case cluster_features.Region (#811)
+b396bcb52 fix(Burkina_Faso): harmonize cluster_features.Region -- 22 spellings, 13 regions (#811)
+6733342a0 fix(Guinea-Bissau): serve cluster_features.Region in the strata spelling (#811)

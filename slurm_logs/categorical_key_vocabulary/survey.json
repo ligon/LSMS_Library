@@ -1,0 +1,5332 @@
+[
+{
+"scope": "Albania",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 17,
+"spell": {}
+},
+{
+"scope": "Azerbaijan",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 11,
+"spell": {
+"Unknown": 2
+}
+},
+{
+"scope": "Benin",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 79,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 41,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 160,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Benin",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 45,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 292,
+"spell": {
+"NaN": 1
+}
+},
+{
+"scope": "Burkina_Faso",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 71,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 42,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 13,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "Burkina_Faso",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 45,
+"spell": {}
+},
+{
+"scope": "Cambodia",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 24,
+"spell": {
+"Unknown": 2
+}
+},
+{
+"scope": "Cambodia",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Cambodia",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Cambodia",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"2019-20",
+"Code",
+"FCT ID"
+],
+"key": "2019-20",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 64,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 51,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 41,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 165,
+"spell": {}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 34,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "CotedIvoire",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 45,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "strata",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 40,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_acquire",
+"cols": [
+"Wave",
+"Code",
+"Preferred Label"
+],
+"key": "Wave",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 39,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_area_unit",
+"cols": [
+"Wave",
+"Code",
+"Preferred Label"
+],
+"key": "Wave",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 45,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"2011-12",
+"2013-14",
+"2015-16",
+"2018-19",
+"2021-22",
+"FTC Code",
+"FDC ID"
+],
+"key": "2011-12",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"FTC Code"
+],
+"labelish": [],
+"nrows": 81,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 130,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_community_price",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 30,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_crop",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 99,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_species",
+"cols": [
+"Wave",
+"Code",
+"Preferred Label"
+],
+"key": "Wave",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 83,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_industry",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "Ethiopia",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 89,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_relation",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 17,
+"spell": {
+"empty-string": 1
+}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_relation_1989",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {
+"empty-string": 2
+}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_village_region",
+"cols": [
+"Code",
+"Region"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_village_woreda",
+"cols": [
+"Code",
+"Woreda"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_site_region_1989",
+"cols": [
+"Code",
+"Region"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "erhs_sex",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 4,
+"spell": {
+"NaN": 2
+}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate",
+"Bellemare-etal13 Label",
+"1989",
+"1994a",
+"1994b",
+"1995",
+"1997"
+],
+"key": "Aggregate",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 105,
+"spell": {}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "harmonize_unit",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 97,
+"spell": {
+"empty-string": 1
+}
+},
+{
+"scope": "EthiopiaRHS",
+"table": "harmonize_community_food",
+"cols": [
+"Code",
+"Original Label",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Original Label"
+],
+"nrows": 43,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "mixed",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "relationship_glss1",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "relationship",
+"cols": [
+"Original Label",
+"Preferred Label",
+"Comparable Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 25,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "unit_9b",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 75,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 106,
+"spell": {
+"Unknown": 2
+}
+},
+{
+"scope": "GhanaLSS",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"1987-88",
+"1988-89",
+"1991-92",
+"1998-99",
+"2005-06",
+"2012-13",
+"2016-17",
+"FCT Code"
+],
+"key": "1987-88",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"FCT Code"
+],
+"labelish": [],
+"nrows": 205,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "nonfood_items",
+"cols": [
+"Preferred Label",
+"Code_2005-06",
+"Code_2012-13",
+"Code_2016-17",
+"Label_2005-06",
+"Label_2012-13",
+"Label_2016-17"
+],
+"key": "Code_2005-06",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 687,
+"spell": {}
+},
+{
+"scope": "GhanaLSS",
+"table": "nonfood_items_9b",
+"cols": [
+"Preferred Label",
+"Code_2005-06",
+"Code_2012-13",
+"Code_2016-17",
+"Label_2005-06",
+"Label_2012-13",
+"Label_2016-17"
+],
+"key": "Code_2005-06",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 204,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1987-88",
+"table": "FOODCD",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 52,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1987-88",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_12A",
+"Label_12A",
+"Code_12B",
+"Label_12B"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 61,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1987-88",
+"table": "region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1987-88",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 47,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "FOODCD",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 52,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "nrcreg_region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 17,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "nrcpl_place_type",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_12A",
+"Label_12A",
+"Code_12B",
+"Label_12B"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 61,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1988-89",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 48,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "relationship",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "rural",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "units",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 26,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "homagrcd",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 57,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "fdexpcd",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 107,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_9b",
+"Label_9b",
+"Code_8h",
+"Label_8h"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 122,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1991-92",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 117,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "region",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "relationship",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "rural",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "s8hq9",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 26,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "homagrcd",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 58,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "fdexpcd",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 90,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_9b",
+"Label_9b",
+"Code_8h",
+"Label_8h"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 117,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/1998-99",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 123,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/2005-06",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_9b",
+"Label_9b",
+"Code_8h",
+"Label_8h"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 180,
+"spell": {
+"empty-string": 49
+}
+},
+{
+"scope": "GhanaLSS/2005-06",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 32,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "GhanaLSS/2012-13",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_9b",
+"Label_9b",
+"Code_8h",
+"Label_8h"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 183,
+"spell": {
+"empty-string": 50
+}
+},
+{
+"scope": "GhanaLSS/2012-13",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 33,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "GhanaLSS/2012-13",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 157,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/2016-17",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"Aggregate Label",
+"Code_9b",
+"Label_9b",
+"Code_8h",
+"Label_8h"
+],
+"key": "Aggregate Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 502,
+"spell": {
+"empty-string": 165
+}
+},
+{
+"scope": "GhanaLSS/2016-17",
+"table": "units",
+"cols": [
+"Code",
+"Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": false,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 75,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/2016-17",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 33,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "GhanaLSS/2016-17",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Label",
+"Preferred Label",
+"Food",
+"Unit",
+"Basis",
+"Note"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Label"
+],
+"nrows": 643,
+"spell": {}
+},
+{
+"scope": "GhanaLSS/2016-17",
+"table": "harmonize_price_unit",
+"cols": [
+"Text",
+"Preferred Label"
+],
+"key": "Text",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 95,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 69,
+"spell": {
+"Unknown": 5
+}
+},
+{
+"scope": "GhanaSPS",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 17,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 16,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "AreaUnit",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 16,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "Tenure",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 16,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_species",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 82,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_crop",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 97,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harvest_units",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 65,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_stage",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 25,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_labor_source",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 15,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "WageUnit",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 19,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "relationship",
+"cols": [
+"Original Label",
+"Preferred Label",
+"Comparable Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 10,
+"spell": {}
+},
+{
+"scope": "GhanaSPS",
+"table": "harmonize_food",
+"cols": [
+"2009-10",
+"2013-14",
+"2017-18",
+"Preferred Label",
+"Food Codes",
+"FCT Label"
+],
+"key": "2009-10",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 98,
+"spell": {
+"empty-string": 4
+}
+},
+{
+"scope": "Guatemala",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 9,
+"spell": {
+"Unknown": 2
+}
+},
+{
+"scope": "Guatemala",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"2000",
+"FCT code"
+],
+"key": "2000",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"FCT code"
+],
+"labelish": [],
+"nrows": 99,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 29,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "strata",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 163,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Guinea-Bissau",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 44,
+"spell": {}
+},
+{
+"scope": "Guyana",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 16,
+"spell": {
+"Unknown": 2
+}
+},
+{
+"scope": "Guyana",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "India",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Iraq",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 21,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "Iraq",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Iraq",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 10,
+"spell": {}
+},
+{
+"scope": "Kazakhstan",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Kosovo",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Liberia",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 19,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"GD Category",
+"Aggregate Label",
+"Aggregate (short)",
+"2004-05",
+"2010-11",
+"2016-17",
+"2019-20",
+"2013-14"
+],
+"key": "GD Category",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 147,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_shocks",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 71,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "u",
+"cols": [
+"Code",
+"Preferred Label",
+"hh_g03b_label"
+],
+"key": "Code",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 170,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "district",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "Rural",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "region",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 17,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_irrigation",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_crop",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 69,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_crop_unit",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 13,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_crop_condition",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_crop_variety",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 69,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 13,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_species",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 23,
+"spell": {
+"NaN": 1
+}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_labor_source",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_industry",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_price_item",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 51,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_price_unit",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 21,
+"spell": {}
+},
+{
+"scope": "Malawi",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 23,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "Region",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "u",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2018-19",
+"2021-22"
+],
+"key": "Code",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 74,
+"spell": {
+"empty-string": 3
+}
+},
+{
+"scope": "Mali",
+"table": "harmonize_food",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2018-19",
+"2021-22"
+],
+"key": "Code",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 327,
+"spell": {
+"empty-string": 2
+}
+},
+{
+"scope": "Mali",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_topography",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_soil_fertility",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2017-18"
+],
+"key": "Code",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_species",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2017-18"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_labor_source",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2017-18"
+],
+"key": "Code",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_industry",
+"cols": [
+"Code",
+"Preferred Label",
+"2014-15",
+"2017-18"
+],
+"key": "Code",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Mali",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 41,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "Mali",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 47,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label",
+"Code",
+"2018-19",
+"2021-22"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [
+"Original Label"
+],
+"nrows": 136,
+"spell": {
+"Unknown": 4
+}
+},
+{
+"scope": "Niger",
+"table": "Region",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "District",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 96,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 10,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 484,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 41,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_species_ecvma",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 33,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Niger",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 23,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "Niger",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 100,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_food",
+"cols": [
+"Code",
+"Preferred Label",
+"Aggregate Label",
+"2010Q3",
+"2011Q1",
+"2012Q3",
+"2013Q1",
+"2015Q3",
+"2016Q1",
+"2018Q3",
+"2019Q1"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 258,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "u",
+"cols": [
+"Code",
+"Preferred Label",
+"2010-11",
+"2012-13",
+"2015-16",
+"2018-19"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 100,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "Region",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 18,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "strata",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 24,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "District",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 111,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_acquire",
+"cols": [
+"Wave",
+"Code",
+"Preferred Label"
+],
+"key": "Wave",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 30,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label",
+"2010Q3",
+"2012Q3",
+"2015Q3",
+"2018Q3",
+"2023Q3"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_species",
+"cols": [
+"Code",
+"Preferred Label",
+"Species",
+"2010-11",
+"2012-13",
+"2015-16",
+"2018-19",
+"2023-24"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 23,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_labor_source",
+"cols": [
+"Code",
+"Preferred Label",
+"Concept"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_industry",
+"cols": [
+"Code",
+"Preferred Label",
+"s3q14 (W1-W4)",
+"s4aq41_code (W5)"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Nigeria",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 116,
+"spell": {}
+},
+{
+"scope": "Pakistan",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Pakistan",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Panama",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"2008",
+"2003",
+"1997",
+"FCT ID"
+],
+"key": "2008",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 81,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "Relationship",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 10,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "Sex",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "Region",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 25,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "Rural",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "EST-CIVIL",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 7,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "LENGUA",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Peru",
+"table": "SI_NO",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 315,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 120,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 42,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 13,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Senegal",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 47,
+"spell": {}
+},
+{
+"scope": "Serbia",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 13,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "Serbia",
+"table": "harmonize_food",
+"cols": [
+"Preferred Label",
+"proizvod",
+"Serbian Label",
+"FCT ID"
+],
+"key": "proizvod",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [],
+"labelish": [],
+"nrows": 100,
+"spell": {}
+},
+{
+"scope": "South Africa",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "South Africa",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 16,
+"spell": {}
+},
+{
+"scope": "Tajikistan",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 19,
+"spell": {
+"Unknown": 1
+}
+},
+{
+"scope": "Tajikistan",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Tajikistan",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "Region",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 56,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "District",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 361,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 4,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_food",
+"cols": [
+"Code",
+"Preferred Label",
+"2008-15",
+"2019-20",
+"2020-21",
+"FTC Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 60,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label",
+"2008-15",
+"2019-20",
+"2020-21"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 20,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_crop",
+"cols": [
+"Code",
+"Preferred Label",
+"Crop",
+"2019-20",
+"2020-21"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 103,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label",
+"2019-20",
+"2020-21"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_species",
+"cols": [
+"Code",
+"Preferred Label",
+"2019-20",
+"2020-21"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 17,
+"spell": {
+"empty-string": 3
+}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_community_price",
+"cols": [
+"Code",
+"Preferred Label",
+"2019-20",
+"2020-21"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 52,
+"spell": {}
+},
+{
+"scope": "Tanzania",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 32,
+"spell": {}
+},
+{
+"scope": "Timor-Leste",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "Timor-Leste",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 14,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "u",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 13,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_tenure",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_species_ehcvm",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 11,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_input",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 41,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_seed_crop",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_food",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 162,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 9,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "harmonize_assets",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 45,
+"spell": {}
+},
+{
+"scope": "Togo",
+"table": "nonfood_items",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 122,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "districts",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 12,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_food",
+"cols": [
+"Code",
+"Preferred Label",
+"Aggregate Label",
+"Nutrition Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 175,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "Roof",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 25,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "Floor",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 23,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "strata",
+"cols": [
+"Alternate Spelling",
+"Preferred Label"
+],
+"key": "Alternate Spelling",
+"ktype": "label",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Alternate Spelling"
+],
+"nrows": 8,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "u",
+"cols": [
+"Code",
+"Preferred Label",
+"2005-06",
+"2009-10",
+"2010-11",
+"2011-12",
+"2013-14",
+"2015-16",
+"2018-19",
+"2019-20"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 289,
+"spell": {
+"NaN": 143
+}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_tenure_system",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 6,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_soil",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 5,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_water",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 3,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_acquire",
+"cols": [
+"Wave",
+"File",
+"Code",
+"Preferred Label"
+],
+"key": "Wave",
+"ktype": "label",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 71,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_crop",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 61,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harvest_units",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 46,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harvest_conditions",
+"cols": [
+"Code",
+"Preferred Label",
+"Source Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 20,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_input",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 15,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_pesticide_unit",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 2,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_species",
+"cols": [
+"Code",
+"Preferred Label"
+],
+"key": "Code",
+"ktype": "numeric",
+"has_pref": true,
+"codeish": [
+"Code"
+],
+"labelish": [],
+"nrows": 40,
+"spell": {}
+},
+{
+"scope": "Uganda",
+"table": "harmonize_education",
+"cols": [
+"Original Label",
+"Preferred Label"
+],
+"key": "Original Label",
+"ktype": "mixed",
+"has_pref": true,
+"codeish": [],
+"labelish": [
+"Original Label"
+],
+"nrows": 51,
+"spell": {
+"Unknown": 7
+}
+}
+]

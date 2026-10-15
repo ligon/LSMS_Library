@@ -212,7 +212,10 @@ plot_features:
     # matching household_roster's i.  This wave has no variable/value labels:
     # s8bq4 = farm size, s8bq4c = unit code (decoded with the GLSS area-unit
     # codes 1=Acres,2=Poles,3=Ropes,4=Hectare; verified against the GLSS7
-    # value labels and the code-frequency distribution).  s8bq8 in this wave
+    # value labels and the code-frequency distribution).  Area is converted
+    # per-row to HECTARES on AreaUnit by the ghanalss.plot_features df_edit
+    # hook (canonical schema, GH #879; the GSS producer factors recovered
+    # from GhanaSPS 2009-10's shipped area_ha).  s8bq8 in this wave
     # is a value field (not a tenure code), and the GLSS3 tenure code is not
     # recoverable, so Tenure is omitted.  Section 10 is non-farm ENTERPRISES.
     file: S8B.DTA

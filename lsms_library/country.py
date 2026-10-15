@@ -60,6 +60,7 @@ from .transformations import validate_acquisition_source
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
@@ -97,6 +98,79 @@ JSON_CACHE_METHODS = {'panel_ids', 'updated_ids'}
 # food_quantities/food_prices; ``'Value'`` marks LCU-only goods.  A country's
 # ``#+name: u`` categorical table must not remap these on *derived* food
 # tables (GH #361) — see ``_apply_categorical_mappings(protect_u_sentinels=)``.
+#: Directory that must be on a build subprocess's ``PYTHONPATH`` for
+#: ``import lsms_library`` to resolve to *this* package rather than whichever
+#: checkout the interpreter's ``.pth`` files happen to pin.  Derived from this
+#: module's own location, so it is correct for a git clone, a worktree and a
+#: pip install alike, and -- unlike ``countries_root()`` -- it is unaffected by
+#: the ``LSMS_COUNTRIES_ROOT`` override (GH #436), which may point at a config
+#: tree in a different checkout entirely.
+_PACKAGE_PARENT = Path(__file__).resolve().parent.parent
+
+
+def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
+    """Environment for a Make/wave-script subprocess on the build path.
+
+    Every build that shells out must hand the child the SAME library it is
+    itself running, or the child silently builds against another checkout.
+    That is the write side of the ``.pth`` trap (GH #803): ``to_parquet`` ->
+    ``_resolve_data_path`` only redirects a script's output under
+    :func:`data_root` when the script's file lies under the *imported*
+    package's ``countries_root()``, so a child that imports a different
+    checkout writes its parquet in-tree, where nothing will ever read it.
+
+    Both shell-out sites now build their environment here, because they did
+    not agree and the disagreement was invisible:
+
+    * ``Wave.grab_data``'s legacy wave-level fallback set ``PATH`` and
+      ``LSMS_DATA_DIR`` but no ``PYTHONPATH`` at all;
+    * ``Country.run_make_target``'s ``build_env`` set ``PYTHONPATH`` to
+      ``countries_root()`` -- which is NOT importable as ``lsms_library`` and
+      therefore, measured, leaves the child importing exactly what it would
+      have imported with no ``PYTHONPATH`` set.  It looked like a guard and
+      was not one.
+
+    ``_PACKAGE_PARENT`` is prepended so it wins over any inherited entry;
+    anything already on ``PYTHONPATH`` is preserved after it, as are any
+    *extra_pythonpath* entries a caller needs (``run_make_target`` passes
+    ``countries_root()``, which it has always put there).
+    """
+    env = os.environ.copy()
+    bin_dir = os.path.dirname(sys.executable)
+    env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+
+    parts = [str(_PACKAGE_PARENT), *(str(p) for p in extra_pythonpath)]
+    inherited = env.get("PYTHONPATH", "")
+    for entry in inherited.split(os.pathsep):
+        if entry and entry not in parts:
+            parts.append(entry)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+
+    # PYTHONSAFEPATH must NOT reach the child.  It removes the script's own
+    # directory from sys.path, and 338 wave/country scripts under countries/
+    # import a sibling module by bare name (``from ethiopia import Waves``,
+    # ``from malawi import ...``) -- that spelling resolves ONLY through the
+    # script-dir entry.  Measured: with it set, `Ethiopia/_/food_coping.py`
+    # dies with ``ModuleNotFoundError: No module named 'ethiopia'``.
+    #
+    # The controllers that spawn these children set it deliberately, because it
+    # is what makes PYTHONPATH authoritative for THEM (bin/coverage_lib.sh,
+    # bin/coverage_reseed_shard.sbatch).  Since this function copies os.environ,
+    # it inherited into every child.  Stripping it here is the narrow fix: the
+    # child's import identity is already pinned by _PACKAGE_PARENT leading
+    # PYTHONPATH above, so it needs no help from safe-path mode, while its
+    # sibling imports need the script dir that safe-path mode removes.
+    #
+    # This would have been SILENT: coverage_matrix.py grades any build
+    # exception as a 'broken' cell, so the job exits 0 and publishes a snapshot
+    # in which every script-path cell has flipped to broken.
+    env.pop("PYTHONSAFEPATH", None)
+
+    env.setdefault("PYTHON", sys.executable)
+    env["LSMS_DATA_DIR"] = str(data_root())
+    return env
+
+
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
@@ -293,7 +367,27 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
-_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'harmonize_assets', 'harmonize_education'})
+#
+# CROSS-REFERENCE (GH #953).  This is the *read-time* half of categorical
+# inheritance.  The other half is the *build-time* cascade,
+# ``local_tools.get_categorical_mapping(fn, tablename, dirs)``, whose
+# docstring carries the canonical statement of the whole model.  The two run
+# at different times over different layouts and agree on direction (local
+# beats global) but not on granularity:
+#
+#   cascade  -- one ``categorical_mapping.org`` per LEVEL; first hit wins, so
+#               override is whole-table; fall-through is per table.  It cannot
+#               read a directory of per-table files, so the cross-country rung
+#               it names (``countries/_/``) is unreachable and absent.
+#   merge    -- one ``<table>.org`` per TABLE in
+#               ``lsms_library/categorical_mapping/``.  ``Country.
+#               categorical_mapping`` globs them ALL and merges the country
+#               file over them, whole-table by default; the names below are
+#               the exception, merged per ROW.
+#
+# So the allow-list does NOT decide whether a global table is inherited (every
+# ``#+name:`` table in that directory is); it decides only the merge rule.
+_ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
 def _categorical_key_column(table: "pd.DataFrame") -> str | None:
@@ -660,7 +754,7 @@ def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, A
     if cached is not None:
         return cached
     try:
-        with open(path, "r") as fh:
+        with open(path, "r", encoding="utf-8") as fh:
             parsed = load_yaml(fh)
     except (OSError, yaml.YAMLError):
         parsed = {}
@@ -1128,7 +1222,7 @@ class Wave:
         """
         license_path = self.documentation_path / "LICENSE.org"
         if license_path.exists():
-            with open(license_path, 'r') as file:
+            with open(license_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"License file not found: {license_path}")
         return ""
@@ -1143,7 +1237,7 @@ class Wave:
         """
         source_path = self.documentation_path / "SOURCE.org"
         if source_path.exists():
-            with open(source_path, 'r') as file:
+            with open(source_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"Data source not found: {source_path}")
         return ""
@@ -1621,10 +1715,9 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                env = os.environ.copy()
-                env["LSMS_DATA_DIR"] = str(data_root())
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+                # GH #803 write side: the child must import THIS package, or
+                # to_parquet's redirect misses and the parquet lands in-tree.
+                env = _script_subprocess_env()
                 # Mirror ``run_make_target`` (country.py ~line 1856): include
                 # ``_make_jobs_flag()`` so this wave-level legacy fallback can
                 # exploit the cores it was given.  Without this, every
@@ -1957,6 +2050,70 @@ class Country:
                 global_maps, country_maps)
         return self.__dict__['_categorical_mapping_cache']
 
+    def _unit_kg_factors(self) -> dict[str, float]:
+        """Raw ``u`` label -> kilograms, from this country's own tables (GH #919).
+
+        Composes the two categorical tables that already carry global defaults
+        with per-country override (``_ADDITIVE_CATEGORICAL_TABLES``):
+
+        * ``u``     -- raw label -> ``Preferred Label`` (however the country
+          keys it: ``Code`` for Malawi/Mali/Uganda, ``Original Label`` for the
+          rest; ``_categorical_key_column`` resolves either);
+        * ``u_kg``  -- ``Preferred Label`` -> kilograms.
+
+        Keying the MASS on the canonical unit rather than the spelling is what
+        makes one row serve every variant, and what lets a country override a
+        regional unit: the global table says a ``Quintal`` is 100 kg (the metric
+        centner, Ethiopia), and a Central American country redeclares it as
+        45.36 kg (100 lb) in its own ``u_kg``.
+
+        **Why the composition happens HERE and not in ``transformations``.**
+        The kg factor is computed BEFORE the categorical mapping is applied --
+        the derived-food dispatch is ``_aggregate_wave_data`` -> ``transform_fn``
+        -> ``_finalize_result``, so ``conversion_to_kgs`` sees the RAW ``u``
+        (GH #770 rejected a fix that assumed otherwise).  Returning a
+        raw-label-keyed dict means nothing downstream has to know about label
+        harmonisation or about ordering.
+
+        The canonical name is emitted as a key in its own right, so a country
+        whose raw labels are already canonical (Ethiopia serves ``Quintal``)
+        resolves without needing a ``u`` row for it.
+        """
+        maps = self.categorical_mapping
+        table = maps.get('u_kg')
+        if table is None or not hasattr(table, 'columns'):
+            return {}
+        if 'Unit' not in table.columns or 'Kg' not in table.columns:
+            warnings.warn(
+                f"{self.name}: a `u_kg` categorical table must have `Unit` and "
+                f"`Kg` columns; got {list(table.columns)}.  Ignoring it."
+            )
+            return {}
+
+        canonical: dict[str, float] = {}
+        for unit, kg in zip(table['Unit'], table['Kg']):
+            try:
+                value = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if not np.isfinite(value) or value <= 0:
+                continue
+            canonical[str(unit).strip().lower()] = value
+        if not canonical:
+            return {}
+
+        factors = dict(canonical)
+        u_table = maps.get('u')
+        if u_table is not None and hasattr(u_table, 'columns') \
+                and 'Preferred Label' in u_table.columns:
+            source = _categorical_key_column(u_table)
+            if source is not None:
+                for raw, preferred in zip(u_table[source], u_table['Preferred Label']):
+                    key = str(preferred).strip().lower()
+                    if key in canonical:
+                        factors[str(raw).strip().lower()] = canonical[key]
+        return factors
+
     @property
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
@@ -2067,7 +2224,7 @@ class Country:
         if not path.exists():
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return ""
-        return _notes.extract(path.read_text(), topic=topic, state=state)
+        return _notes.extract(path.read_text(encoding="utf-8"), topic=topic, state=state)
 
     @property
     def note_topics(self) -> list[tuple[int, str | None, str]]:
@@ -2086,7 +2243,7 @@ class Country:
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return []
         return [(h.level, h.keyword, h.text)
-                for h in _notes.parse(path.read_text())]
+                for h in _notes.parse(path.read_text(encoding="utf-8"))]
 
     @property
     def population(self) -> dict[str, "PopulationRecord"]:
@@ -2195,8 +2352,8 @@ class Country:
             lic_path = doc / "LICENSE.org"
             rows.append({
                 't': t,
-                'source': src_path.read_text() if src_path.exists() else pd.NA,
-                'license': lic_path.read_text() if lic_path.exists() else pd.NA,
+                'source': src_path.read_text(encoding="utf-8") if src_path.exists() else pd.NA,
+                'license': lic_path.read_text(encoding="utf-8") if lic_path.exists() else pd.NA,
                 'documentation_path': str(doc),
             })
         if not rows:
@@ -2975,10 +3132,60 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
-        rdict = (table[['Preferred Label', target]]
-                 .dropna()
-                 .set_index('Preferred Label')[target]
-                 .to_dict())
+        # A food the requested column does not label must keep its Preferred
+        # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
+        # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
+        # STRINGS for blank org cells, not NaN, so in a table whose blanks parse
+        # that way every unlabelled food was renamed to `''` -- and because
+        # food_expenditures / food_quantities call this with `reaggregate=True`,
+        # they were then SUMMED into a single unnamed `j` bucket.  Measured on
+        # GhanaLSS `labels='1987-88'`: 129 SERVED foods collapsed into one `''`
+        # bucket over 55,314 rows (6.2%), with Expenditure conserved -- so
+        # nothing was lost, it was silently merged, which is worse than an
+        # error and indistinguishable from a real category in the result.
+        #
+        # Three counts differ and only the third is "foods merged": 146 blank
+        # crosswalk ROWS -> 142 distinct Preferred Labels mapped to `''` -> 129
+        # of those that actually appear in the served frame.  An earlier version
+        # of this comment quoted the row count as the food count.
+        #
+        # 13 (country, column) pairs corpus-wide -- GhanaLSS all 8, GhanaSPS 4,
+        # Panama 1; worst GhanaLSS `1988-89` 143 and GhanaSPS `FCT Label` 77.
+        # Mali is NOT among them: its blanks are real NaN that `.dropna()`
+        # always caught, and the one row per column that looked affected was a
+        # blank-Preferred-Label row keying `'' -> ''`.  It bit exactly where
+        # `.dropna()` had nothing to catch: GhanaLSS's wave columns carry 0 NaN
+        # and 146 empty strings, Mali's carry 127 real NaN.
+        #
+        # Blank is treated as absent on BOTH sides: a blank key is not a food
+        # label to rename FROM, any more than a blank value is one to rename TO.
+        # (Those blank-key rows are themselves a parse artefact -- Mali's `| #
+        # ...` comment rows and GhanaSPS's trailing padding rows are read as
+        # data by `all_dfs_from_orgfile`.)
+        #
+        # THIRD BEHAVIOUR, deliberate: `to_dict()` was last-wins over all rows
+        # including blank ones, so a Preferred Label duplicated with a real
+        # label early and a blank later served `''`.  Filtering before the dict
+        # makes the real label from the sibling row win -- 6 served foods under
+        # `1987-88` (`Rice`, `Sugar`, `Cassava (flour)`, ...).  That follows the
+        # `.dropna()` principle (a real-then-NaN duplicate always served the
+        # real one) but it is NOT "keeps its Preferred Label", so it is stated
+        # here and pinned by test_relabel_j_duplicate_label_prefers_the_real_row.
+        #
+        # This costs NO cache invalidation -- measured, 0 of 119 country table
+        # hashes.  NOT because `_finalize_result` is in `_EXCLUDED_CALLABLES`:
+        # `_relabel_j` is not reached from there at all, but from the generated
+        # accessor in `Country.__getattr__` (:5015, :5083), AFTER
+        # `_aggregate_wave_data` has returned.  It is free because no
+        # `@build_transform`-tagged callable references it.  Moving this call
+        # INTO `_finalize_result` would change that.
+        #
+        # GH #787 covers the neighbouring case (a `j` absent from the dict
+        # passing through unrenamed); this is a `j` PRESENT in it and mapped to
+        # nothing.  Reproducer: slurm_logs/relabel_j_empty_string/.
+        pairs = table[['Preferred Label', target]].dropna()
+        rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
+                 if str(k).strip() != '' and str(v).strip() != ''}
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
@@ -3270,6 +3477,46 @@ class Country:
             check_quantities(
                 df, country=self.name, table=str(method_name or "?"))
 
+            # SITE I (GH #847): a NaN on a DECLARED INDEX LEVEL.  Site B asks
+            # whether a declared column holds anything; this asks the same of
+            # the declared levels themselves.  The row is SERVED, so no
+            # build-path guard fires; it vanishes in the first groupby
+            # (`groupby` defaults to dropna=True), counted at the collapse by
+            # GH #323 and otherwise never counted.  Warns-and-names, same
+            # ledger pattern as the other two guards; the country-level fix
+            # (sentinel / explicit drop) is deliberately not a framework
+            # function.
+            #
+            # Here for the same two reasons as SITE B: `_finalize_result` runs
+            # on EVERY read (warm cache included), so no stamp-and-replay is
+            # needed; and it is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # this costs no cache invalidation.  Measured (stash-probe,
+            # 2026-09-13): 0 of 10 probed table hashes and 0 of 3 build
+            # fingerprints moved.
+            #
+            # The level list is the union of the country's OWN declaration
+            # (`data_scheme.yml`, under whatever spelling it uses) and the
+            # canonical one (`data_info.yml`'s Index Info, plus the table's
+            # `level_aliases` spellings -- e.g. Niger declares no `v` but the
+            # v-join adds one, and Uganda spells the plot axis `plot` where
+            # the canonical name is `plot_id`).  A frame whose index matches
+            # either list still names the NaN-keyed level; both lists are
+            # cheap to build and the audit only ever inspects levels the
+            # frame actually carries.
+            _index_levels = list(_declared_index_levels(scheme_entry))
+            _canonical = _canonical_index_levels().get(str(method_name or ""), ())
+            _aliases = _canonical_index_level_aliases().get(str(method_name or ""), {})
+            for lvl in _canonical:
+                if lvl not in _index_levels:
+                    _index_levels.append(lvl)
+                alias_of = {a for a, c in _aliases.items() if c == lvl}
+                for a in alias_of:
+                    if a not in _index_levels:
+                        _index_levels.append(a)
+            check_index_levels(
+                df, _index_levels,
+                country=self.name, table=str(method_name or "?"))
+
         return df
 
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
@@ -3503,6 +3750,85 @@ class Country:
                     logger.debug(f"v0.8.0 evicted hashless stale wave cache: {p}")
             except OSError:
                 pass
+
+    def _evict_stale_country_cache(self, method_name: str) -> None:
+        """Delete the L2-country parquet before the COUNTRY-level fallback runs.
+
+        The country tier's twin of :meth:`_evict_hashless_wave_caches`, and it
+        exists for the same reason one tier down: ``make`` is not a reliable
+        judge of whether its own output is current, so the only way to stop it
+        handing back an artefact it did not build is to remove the artefact.
+
+        **GH #866.**  ``run_make_target(method_name, wave=None)`` runs
+        ``make -s <data_root>/<C>/var/<table>.parquet`` and then returns the
+        first candidate path that ``exists()``.  With the target already on
+        disk, make has two ways to do nothing and exit 0 -- and both were
+        being read as success:
+
+        - **no rule for the target** -> ``... is up to date``, exit 0.  Five
+          cells: Nigeria ``crop_production``, ``livestock``,
+          ``people_last7days``, ``plot_inputs``, ``plot_labor``.
+        - **a rule, but mtime-skipped** -> a `data_scheme.yml` / country-module
+          edit moves the content hash without touching any prerequisite, so
+          make judges the target current.  Four cells: Ethiopia ``nutrition``,
+          EthiopiaRHS ``community_prices``, GhanaLSS ``nutrition``, Nigeria
+          ``anthropometry``.
+
+        Either way ``try_script`` -- the ONLY caller of a country's
+        ``_/<table>.py`` -- is never reached, the stale frame is served, and
+        the descent then writes it back stamped with the CURRENT expected hash.
+        That last step is what makes the defect permanent and invisible: every
+        later read grades ``fresh``, so a census of the corpus finds nothing.
+        Nigeria ``livestock`` was reproduced going 23,196 rows -> 5 rows served
+        and re-stamped with the correct hash.
+
+        Removing the file closes both forms **by construction** -- neither "up
+        to date" nor an mtime skip is reachable for a target that does not
+        exist -- where detecting one of them would not close the other.
+
+        Called from exactly one place: immediately before the country fallback
+        in ``load_from_waves``, and only when the caller passed
+        ``evict_country_cache=True``.  That placement is load-bearing, not
+        tidiness.  **13 Make rules across 12 countries consume a
+        library-managed ``var/*.parquet`` as a PREREQUISITE**, so deleting one
+        is not a local operation: ``Tanzania/_/Makefile:43`` needs
+        ``$(VAR_DIR)/cluster_features.parquet``, which is itself rule-less, so
+        deleting *that* and failing the rebuild would leave Tanzania's whole
+        food chain's make target hard-failing with ``No rule to make target``.
+        The country fallback is reached only when NO wave produced rows, so a
+        wave-produced table like ``cluster_features`` can never be deleted here
+        and that hazard is unreachable.  Evicting at the read gate instead --
+        i.e. for any stale country parquet -- would have walked straight into
+        it.
+        """
+        if method_name in JSON_CACHE_METHODS:
+            # Belt and braces.  No JSON-tier caller passes the flag, and
+            # `load_with_dvc_cache` routes these to `load_json_cache` before
+            # `load_dataframe_with_dvc` runs -- but `panel_ids.json` is a
+            # committed SOURCE (GH #914), and reasoning about reachability is
+            # how that got broken once already.  Assert "never deletes", not
+            # "never reached".
+            return
+        cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+        try:
+            cache_path.unlink(missing_ok=True)
+        except OSError as error:
+            # Not silent.  If the removal fails we are about to hand `make` the
+            # very file the gate refused, i.e. the defect is live again for this
+            # read -- and the descent will then re-stamp it.  "The fix did not
+            # apply" and "the fix applied" must not look the same.
+            warnings.warn(
+                f"GH #866: could not evict the stale country cache at "
+                f"{cache_path} ({error!r}); the {self.name}/{method_name} "
+                f"build may serve and re-stamp stale data",
+                category=UserWarning,
+                stacklevel=2,
+            )
+            return
+        logger.debug(
+            f"GH #866 evicted stale country cache before make/script fallback: "
+            f"{cache_path}"
+        )
 
     def _assert_built_required_columns(self, df: Any, method_name: str,
                                        scheme_entry: Any,
@@ -3749,17 +4075,12 @@ class Country:
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             def build_env() -> dict[str, str]:
-                env = os.environ.copy()
-                bin_dir = os.path.dirname(sys.executable)
-                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-                pythonpath = env.get("PYTHONPATH", "")
-                if str(repo_root) not in pythonpath.split(os.pathsep):
-                    pythonpath = f"{repo_root}{os.pathsep}{pythonpath}" if pythonpath else str(repo_root)
-                env["PYTHONPATH"] = pythonpath
-                env.setdefault("PYTHON", sys.executable)
-                # Ensure subprocess scripts also redirect data paths
-                env["LSMS_DATA_DIR"] = str(data_root())
-                return env
+                # `repo_root` is countries_root(), which is NOT importable as
+                # `lsms_library`; passing it alone left the child importing
+                # whatever the interpreter's .pth pinned.  Keep it (callers
+                # have always had it on the path) but lead with the package
+                # parent, which is what actually fixes import identity.
+                return _script_subprocess_env(repo_root)
 
             def try_make(make_dir: Path) -> Path | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
@@ -3855,7 +4176,7 @@ class Country:
             df_local = map_index(df_local)
             return df_local
 
-        def load_from_waves(waves):
+        def load_from_waves(waves, *, evict_country_cache=False):
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -3992,6 +4313,17 @@ class Country:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
 
+            # GH #866: no wave produced rows, so the country-level
+            # make/script fallback is about to run -- and `try_make` would
+            # otherwise be handed the very parquet the read gate refused, call
+            # it a successful build, and re-stamp it as fresh.  Remove it
+            # first, so make either has no rule (exit 2 -> `try_script` runs
+            # the country script) or has one and must actually run the recipe.
+            # Gated by the caller: see `evict_country_cache` in
+            # `load_dataframe_with_dvc`.
+            if evict_country_cache:
+                self._evict_stale_country_cache(method_name)
+
             country_fallback = run_make_target(method_name, wave=None)
             if isinstance(country_fallback, dict):
                 if country_fallback:
@@ -4124,6 +4456,42 @@ class Country:
             if cache_exists and not no_cache:
                 cache_expected_hash = self._table_cache_hash(method_name, waves)
                 freshness = cache_freshness(cache_path, cache_expected_hash)
+                # GH #809: at the COUNTRY tier, no hash means no evidence --
+                # rebuild rather than trust-once-and-stamp.
+                #
+                # `legacy` was built for the v0.8.0 migration: a parquet that
+                # PREDATES stamping is trusted once and re-stamped so the next
+                # read is guarded.  A country-level `var/<table>.parquet` that a
+                # `make` recipe wrote moments ago is not a legacy artefact -- it
+                # is a build output that skipped the stamp, because a country
+                # script's `to_parquet('../var/x.parquet')` passes no
+                # `cache_hash=`.  Grading it `legacy` let a script that
+                # disagrees with the framework become the served truth and then
+                # made that permanent: the re-stamp writes the CURRENT expected
+                # hash onto unverified content, so every later read grades
+                # `fresh` and the evidence that anything was ever wrong is gone.
+                # That is #808's instance (GhanaLSS `change_id`'s `_0` panel-id
+                # convention beating `updated_ids`) and the reason a census of
+                # hashless parquets finds nothing: laundering is indistinguishable
+                # from a legitimate build after the fact.
+                #
+                # Scoped to THIS call site deliberately.  The two wave-tier
+                # calls (`Wave.grab_data`, `run_make_target`) must keep their
+                # `legacy` grade: script-path L2-wave parquets are written
+                # hashless BY DESIGN, so grading them stale would rebuild on
+                # every read forever.  Those are handled by
+                # `_evict_hashless_wave_caches` before each rebuild descent
+                # (GH #479) -- a different mechanism for a different tier.
+                #
+                # Measured before landing: 0 of 376 warm country-level
+                # parquets are hashless, so the immediate re-warm is nil; and a
+                # deliberately de-stamped parquet rebuilds ONCE and then serves
+                # from a stamped cache -- verified on a YAML-path table (China
+                # `cluster_features`: 0.4s then 0.0s) and on the make-path class
+                # the issue names (Cambodia `food_acquired`: 6.7s then 0.3s,
+                # 0.2s), content identical to the pre-strip frame in both.
+                if freshness == "legacy":
+                    freshness = "stale"
                 # GH #891: a non-stale parquet is still only usable if it was
                 # built from a superset of the requested waves.  Unknown
                 # coverage (a pre-#891 parquet with no hash to corroborate it)
@@ -4164,12 +4532,15 @@ class Country:
                             read_parquet_grain_audit(cache_path),
                             self.name, method_name,
                         )
-                        if freshness == "legacy" and cache_expected_hash is not None:
-                            # Trust-once-then-stamp: parquet predates
-                            # hashing; assume it matches current sources
-                            # (same assumption v0.7.0 already made) and
-                            # stamp it so the next read is guarded.
-                            stamp_parquet_hash(cache_path, cache_expected_hash)
+                        # GH #809: there is deliberately NO trust-once-and-stamp
+                        # here any more.  A hashless country parquet is graded
+                        # `stale` above and never reaches this branch, so the
+                        # only parquets served from here are ones whose stored
+                        # hash we checked (`fresh`) or whose inputs we could not
+                        # enumerate (`unverifiable`, which stamps nothing
+                        # precisely because it has nothing to assert).  Stamping
+                        # the current expected hash onto unverified content is
+                        # what made the defect permanent rather than transient.
                         logger.debug(
                             f"v0.8.0 cache read ({freshness}): {method_name} "
                             f"from {cache_path}"
@@ -4190,6 +4561,29 @@ class Country:
                             stacklevel=2,
                         )
 
+            # GH #866: everything below is the rebuild descent, so we have
+            # already decided not to serve `cache_path` -- it graded STALE, or
+            # fresh-but-coverage-short, or LSMS_NO_CACHE skipped the gate
+            # entirely, or it is absent, or it would not read.  In all of those
+            # the country-level make/script fallback must not be handed it back.
+            #
+            # The one case where it must NOT be deleted is a request this
+            # descent is not going to replace.  `build_waves` is the UNION of
+            # the request and the cache's own coverage (GH #891), so a stale or
+            # coverage-short descent normally rebuilds everything the parquet
+            # covered and the test passes.  What it excludes is
+            # `LSMS_NO_CACHE=1` with a strict subset of waves -- there the gate
+            # never ran, so no union was taken and `build_waves` is just the
+            # request.  If that subset happens to be barren, `load_from_waves`
+            # returns empty and reaches the country fallback holding a
+            # perfectly FRESH all-waves parquet; today's behaviour there is
+            # accidentally correct (the whole frame comes back and
+            # `_restrict_to_waves` filters it to the right empty frame), and
+            # deleting it would turn a correct answer into a hard failure.
+            evict_country_cache = (
+                {str(w) for w in build_waves} >= {str(w) for w in self.waves}
+            )
+
             dvc_root = self.file_path.parent
 
             repo: Repo | None = None
@@ -4201,7 +4595,7 @@ class Country:
                     if not stage_infos:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
-                        df = load_from_waves(build_waves)
+                        df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -4347,7 +4741,7 @@ class Country:
                                     combined_outputs = consolidate_stage_outputs(stage_outputs)
                                     if combined_outputs is not None:
                                         return combined_outputs
-                                    return load_from_waves(waves)
+                                    return load_from_waves(waves, evict_country_cache=evict_country_cache)
 
                         stage_outputs = collect_stage_outputs(stage_infos)
                         if not stage_outputs:
@@ -4377,7 +4771,7 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(build_waves)
+                df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -4846,6 +5240,10 @@ class Country:
                         transform_kwargs['units'] = units
                     if name in {'food_prices', 'food_quantities'}:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
+                        # GH #919: the country's own declared unit masses, keyed
+                        # on the RAW label so the transform needs no knowledge of
+                        # label harmonisation or of dispatch order.
+                        transform_kwargs['unit_kg'] = self._unit_kg_factors()
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
                     if name == 'food_expenditures' and valuation is not None:
@@ -5353,6 +5751,72 @@ def _no_v_join_tables() -> frozenset[str]:
         return _compute_no_v_join(data)
     except Exception:
         return _NO_V_JOIN_FALLBACK
+
+
+def _parse_index_info(data: dict) -> dict[str, list[str]]:
+    """``Index Info > index_info`` as ``{table: [level, ...]}``.
+
+    Pure parsing -- the same paren/comma shape :func:`_compute_no_v_join`
+    reads, factored so the Site-I audit (GH #847) and the v-join set never
+    disagree on what the canonical index of a table *is*.  Tables without a
+    string entry are skipped.
+    """
+    out: dict[str, list[str]] = {}
+    if not isinstance(data, dict):
+        return out
+    specs = (data.get("Index Info", {}) or {}).get("index_info", {}) or {}
+    for table, spec in specs.items():
+        if not isinstance(spec, str):
+            continue
+        cleaned = spec.strip()
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1]
+        levels = [tok.strip() for tok in cleaned.split(",") if tok.strip()]
+        if levels:
+            out[str(table)] = levels
+    return out
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_level_aliases() -> dict[str, dict[str, str]]:
+    """Per-table ``level_aliases`` from ``data_info.yml``: ``{table: {alias: canonical}}``.
+
+    Read once with the canonical levels so a country that spells an axis by
+    its alias (Uganda's ``plot`` for the canonical ``plot_id``, or ``crop``
+    for ``j``) is still checked under the name its frame carries.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        aliases = ((data.get("Index Info", {}) or {}).get("level_aliases")
+                   or {})
+        return {str(t): {str(a): str(c) for a, c in m.items()}
+                for t, m in aliases.items() if isinstance(m, dict)}
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def _canonical_index_levels() -> dict[str, list[str]]:
+    """The canonical per-table index from ``data_info.yml`` (Index Info).
+
+    Deliberately separate from the country's ``data_scheme.yml``: the scheme
+    declares what the country EMITS (Uganda's ``crop_production`` spells the
+    plot axis ``plot``, no ``v``), while the served frame carries the v-joined,
+    aliased canonical index.  The null-index audit (GH #847) reads both --
+    the scheme's own list plus the canonical one -- so a level that exists
+    under either spelling is still named on the frame it reaches.  Returns
+    ``{}`` when the file is unreadable, matching the v-join fallback's
+    "never invent a declaration" posture.
+    """
+    try:
+        info_path = files("lsms_library") / "data_info.yml"
+        with open(info_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return _parse_index_info(data)
+    except Exception:
+        return {}
 
 
 @lru_cache(maxsize=1)

@@ -1,0 +1,185 @@
+#+TITLE: GhanaLSS GLSS1/GLSS2 Section 9: what is there, and what wiring it would take
+#+AUTHOR: Sue
+#+DATE: <2026-09-16 Wed>
+
+* Why this exists
+
+The GLSS1 -> GLSS2 rotating panel (712 households, 1987-88 <-> 1988-89) is the
+only *wired* panel in GhanaLSS, and GhanaLSS declares no =crop_production=, so
+=CANDIDATES.org= ruled it out for an agricultural production regression.  This
+note asks whether that is a data absence or a wiring gap.
+
+*It is a wiring gap.*  Both panel waves ship the complete Section 9
+(Agro-Pastoral Activities) suite -- 22 files each, output, land, labour,
+purchased inputs and capital -- and none of it is declared.
+
+For a Mundlak-style specification at *farm* grain (@ligon, 2026-09-16: "we can
+get by with farm-level expenses and revenues, don't need plot level") this is
+enough.  It is *not* enough for anything plot-level, and that is not a defect
+to fix -- see the standing verdict in [[*What must NOT be done][What must NOT be done]].
+
+* What the two waves ship
+
+Section numbers moved between GLSS2 and GLSS3: agriculture is *Section 9* in
+GLSS1/GLSS2 and *Section 8* from GLSS3 on (=GhanaLSS/_/CONTENTS.org=).  Do not
+carry a file-name mapping across that boundary.
+
+| part | file(s)                | grain           | carries                                                |
+|------+------------------------+-----------------+--------------------------------------------------------|
+| A    | =Y09A=                 | household       | =ACRFRM= acres farmed, =ACRIRR= irrigated, land values |
+| B    | =Y09B=                 | household-crop  | acres harvested, quantity sold + unit + kg/unit, and   |
+|      |                        |                 | the VALUE of sales, seed kept, gifts given, losses     |
+| C    | =Y09C=                 | household-crop  | age of tree crops                                      |
+| D1A  | =Y09D1A=               | household-crop  | seed/plant spend (=SEEDAMT=)                            |
+| D1B  | =Y09D1B=               | household-crop  | fertilizer quantity + unit + spend (=FERTAMT=)          |
+| D1C  | =Y09D1C=               | household-crop  | manure quantity + unit + spend                          |
+| D2A  | =Y09D2A=               | household-crop  | insecticide/chemical quantity + spend                   |
+| D2B  | =Y09D2B=               | household-crop  | transport spend                                         |
+| D2C  | =Y09D2C=               | household-crop  | container spend                                         |
+| D3A  | =Y09D3A=               | household-crop  | storage spend                                           |
+| D3B  | =Y09D3B=               | household        | *labour*: =CREXLAB= hired-labour spend, plus a          |
+|      |                        |                 | male/female/child x 4-period worker grid                |
+| D4A/B| =Y09D4A=, =Y09D4B=     | household-crop  | sharecropping in / out                                  |
+| D4C  | =Y09D4C=               | household       | communal labour weeks                                   |
+| D5   | =Y09D5=                | household       | extension contacts                                      |
+| E    | =Y09E=                 | household-prod  | sales of food products made from homegrown crops,      |
+|      |                        |                 | with their expenses (=PRSALEX=)                          |
+| F    | =Y09F=                 | household-animal| livestock counts + values, owned/sold/bought            |
+| G    | =Y09G=                 | household-prod  | animal-product sales (=ANPRSALV=)                        |
+| H    | =Y09H=                 | household       | veterinary spend                                        |
+| I    | =Y09I=                 | household       | other livestock expenditure                             |
+| J    | =Y09J=                 | household       | hand tools (=TOOL1..TOOL8=)                             |
+| K    | =Y09K=                 | household-item  | farming equipment: owned/bought/sold/leased, counts    |
+|      |                        |                 | AND values                                              |
+
+Row counts, both parsed cleanly through =get_dataframe= with *no* all-null
+columns (so the =.DAT=/=.DCT= mis-parse hazard that bit =COMM.DAT= does not
+apply here): =Y09A= 2,644 / 2,938 rows; =Y09B= 16,938 / 20,342.
+
+* The form, read
+
+The GLSS1/GLSS2 questionnaires are image-only CCITT-fax scans with no text
+layer.  They were read with the repo's existing renderer,
+=slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py=, whose
+=PAGE_INDEX.org= locates Section 9 at PDF pp.42-55.  Part B is p.44-45, Part D
+p.47-51.
+
+** Part B (Crops), p.44 -- the column-to-variable map
+
+| Q     | question                                                    | variable            |
+|-------+-------------------------------------------------------------+---------------------|
+|     1 | grown in past 12 months? (cross per crop)                   | row selector        |
+|     2 | how many *acres* were harvested                             | =CROPH=             |
+|     3 | how many acres not yet in production                        | =CROPNC=            |
+|     4 | how much was *sold* (quantity, unit)                        | =CROPS=, =CROPSU=   |
+|     5 | if unstarred unit: how many *kilograms per unit*            | =CROPSUK=           |
+|     6 | how much was the harvest sold *for* (amount)                | =CROPSP=            |
+|   7-8 | kept part for *seed*? / market value of that quantity       | =CROPK=, =CROPKV=   |
+|  9-10 | *gave* part to labourers/landowner/gifts? / its value       | =CROPP=, =CROPPV=   |
+| 11-12 | *lost* part to insects/rodents/fire/rot? / its value        | =CROPL=, =CROPLV=   |
+| 13-14 | intercropped? / which crops                                 | =CROPD=, =CROPD1/2= |
+
+*** =CROPH= is ACRES, not a harvest quantity
+
+This is the single most important finding in this note, and it is the opposite
+of what the variable name suggests.  Read as a harvest quantity it would be
+wrong by construction and silently so -- 0.2 for a cocoa row is 0.2 acres.
+
+*** There is NO total-harvest quantity anywhere in Part B
+
+The form asks quantity *sold* (Q4) and never quantity *harvested*.  So output
+at this grain cannot be a kilogram figure, and =transformations.harvest_kg=
+and the whole kg ladder are simply not applicable.  That is a convenience as
+much as a constraint: it sidesteps the unit problem that disqualified GhanaSPS.
+
+*Output must therefore be a VALUE*, summing the four disposition values the
+form does ask for:
+
+: GVP_partial = CROPSP (sold) + CROPKV (seed) + CROPPV (given) + CROPLV (lost)
+
+*** ...and that sum omits own consumption, which is usually the largest use
+
+The form never asks what the household ate.  Taking the sum above as gross
+value of production would understate smallholder output badly and
+*differentially* -- households that sell more would look more productive purely
+through the disposition margin.
+
+The repo already has the missing piece, for exactly these two waves:
+=derive_12b_fortnight_value= (=GhanaLSS/_/ghanalss.py:532=) mints an
+=Expenditure= for =s='produced'= rows in GLSS1/GLSS2 from Section 12B, is
+registered as =GhanaLSS::food_acquired::12b-fortnight= in =_/derivations.yml=,
+and is tested in =tests/test_ghanalss_12b.py=.  See
+=.coder/ledger/ghanalss-produced-qp.md= and =585-own-production-valuation.md=
+for the valuation machinery generally.
+
+*Open design question, not resolved here*: Section 9 is an annual recall and
+Section 12B is a fortnight annualised.  Adding them is a recall-window splice,
+and =attrs['recall']= exists precisely to disclose that sort of thing.  Whether
+to splice, or to use Section 9 dispositions alone and state the omission, is @ligon's
+call.
+
+** Part D (Farm Inputs), p.47 -- expenses, per crop
+
+Seeds (Q1-6), fertilizer (Q7-13) and manure (Q14-19) each follow the same
+shape: a crop list with codes, then quantity (fertilizer and manure only, with
+a unit code) and *amount spent*.  Chemicals, transport, containers and storage
+repeat it on pp.48-51.  All are keyed by crop code, so they aggregate to the
+farm by summing -- which is the grain wanted.
+
+*Limitation to record*: each input's crop list is capped at *four* lines
+(=01..04=).  A household cultivating more than four crops has its input spend
+truncated, and the truncation is invisible in the data.
+
+* What would have to be built
+
+Nothing is declared today: =crop_production=, =plot_inputs=, =plot_labor= and
+=livestock= are all =undeclared= for GhanaLSS, and =plot_features= is wired for
+GLSS3-GLSS7 only.
+
+The precedent for a plot-less country is *EthiopiaRHS*, which declares
+
+: crop_production:
+:   index: (t, i, j, u)
+
+with a comment recording that =u= is degenerate but kept because the canonical
+shape carries it, and which puts area on the crop row as =Area_ha= (GH #512,
+"documented household-grain coarse table").  GhanaLSS's Part B has exactly that
+shape, with acres instead of hectares.
+
+* What must NOT be done
+
+=GhanaLSS/plot_features= for 1987-88 and 1988-89 carries a *closing*
+=not-asked= verdict in =.coder/coverage/absent_verdicts.csv=, C4-validated
+against the form itself (there is no farm-number column and no per-farm roster
+part anywhere in Section 9).  A synthetic single-=plot_id= row would contradict
+a permanent, evidenced record.
+
+=CONTENTS.org= adds the specific trap: *do not read =Y09A:IDFARM= as a plot
+identifier.*  =Y09A= has exactly one row per household; =IDFARM= is the Section
+7 field recording *who answers* the agriculture module.
+
+* Cost, stated before anyone starts
+
+Adding any table to =GhanaLSS/_/data_scheme.yml= moves *every* GhanaLSS table's
+cache hash (=Country._table_cache_hash= hashes that file whole), so the bill is
+a whole-country cold re-warm including the 5.26M-row =food_acquired=.  Budget
+it; do not trigger it casually while exploring.  Use
+=LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries= to test config under
+development against the live package without touching the shared tree.
+
+* Open questions for @ligon
+
+1. *Output measure* -- Section 9 dispositions alone (sold + seed + gifts + losses), or
+   spliced with the Section 12B own-consumption value?  The second is more nearly GVP
+   and crosses a recall window.
+2. *Scope* -- wire only the two panel waves, or attempt GLSS3+ too?  GLSS3+
+   have a genuine per-plot roster, so one country table would mix plot-grain
+   and household-grain waves and put NaN on a declared index level for GLSS1/2
+   (Site I territory; =groupby= then deletes those rows).
+3. *Table shape* -- one =crop_production= on the EthiopiaRHS pattern carrying
+   acres and the four disposition values, plus a separate farm-level expense
+   table?  Or a single wide farm-level table, given that Mundlak wants farm
+   aggregates anyway?
+4. *Land* -- =Y09A.ACRFRM= (household total) and =Y09B.CROPH= (per crop) are
+   both available and should roughly agree.  Which is authoritative, and is the
+   discrepancy worth carrying as a check?

@@ -11,7 +11,7 @@ Purchases (Section 9B / Code_9b) are value-only: Expenditure = recorded value,
 u = 'Value', Quantity = Expenditure (no fabricated physical quantity; price-based
 imputation is a later, out-of-scope phase).  Production (Section 8H / Code_8h)
 carries a real Quantity in a native unit ``u`` plus a farmgate Price; its
-Expenditure is left NaN (no produced value is recorded).
+Expenditure is DERIVED as Quantity * Price on rows carrying both (registry key GhanaLSS::food_acquired::8h-farmgate); the survey records no total, so the value is a construction, not an answer.
 
 Food codes map to canonical ``j`` via the harmonize_food table, decoded on the
 NUMERIC CODE axis for both modules and asserted to be exhaustive (GH #782); rows
@@ -32,6 +32,15 @@ import pandas as pd
 from lsms_library.local_tools import to_parquet, df_from_orgfile, get_dataframe
 from lsms_library.paths import countries_root
 import mapping
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
+# import ...`: that absolute PACKAGE import binds to whichever `lsms_library`
+# won sys.path rather than to the config tree LSMS_COUNTRIES_ROOT selects
+# (GH #948 / #436; CONTENTS.org Trap 6).  `../../_` is correct from this
+# script's own directory, which is where the Makefile runs it
+# (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
+# in this file already assumes.
+from ghanalss import derive_produced_farmgate_value, to_country_food_labels
 
 t = '2005-06'
 
@@ -105,7 +114,8 @@ x = x.reset_index()
 # ================================ PRODUCED (s8h) ==============================
 # Real quantity (s8hq3..s8hq12 = the 2nd..11th visits) in a native unit
 # (s8hq13), with a farmgate Price
-# (s8hq14).  Expenditure left NaN -- no produced value is recorded.
+# (s8hq14).  Expenditure is DERIVED (Quantity * Price) at the foot of this
+# script -- the survey records no total.  Key: 8h-farmgate.
 #
 # The file is read TWICE, and both reads are load-bearing (GH #782).  The
 # ``convert_categoricals=True`` read is required for ``s8hq1`` ('yes'/'no', not
@@ -210,4 +220,30 @@ assert not fa.index.duplicated().any(), (
     'spellings share a Preferred Label for one (household, item, visit); '
     'resolve it here, not in core (CONTENTS.org Trap 9)')
 
+# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
+# Section 8H reports a quantity and a farmgate price but never a total, so the
+# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
+# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
+#
+# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
+# SUMs the additive measures and re-derives Price, so a string must not reach
+# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
+# either keeps Expenditure NaN and carries NO key, so the labelled rows are
+# exactly the computed ones.
+DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
+_prod = (fa.index.get_level_values('s') == 'produced')
+_both = (_prod
+         & pd.to_numeric(fa['Quantity'], errors='coerce').notna().to_numpy()
+         & pd.to_numeric(fa['Price'], errors='coerce').notna().to_numpy())
+_kept = pd.to_numeric(fa['Expenditure'], errors='coerce').to_numpy(dtype=float)
+_qp = derive_produced_farmgate_value(fa['Quantity'], fa['Price'])
+fa['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+fa['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                index=fa.index, dtype='string')
+assert fa.loc[~_both, 'Derivation'].isna().all(), (
+    'a row with no computed value carries the 8h-farmgate key')
+
+# Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+# Pure rename; an unmapped label raises rather than passing through.
+fa = to_country_food_labels(fa, '2005-06')
 to_parquet(fa, 'food_acquired.parquet')

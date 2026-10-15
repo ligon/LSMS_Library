@@ -1,0 +1,150 @@
+#+TITLE: GhanaLSS food aggregation: inventory and candidate draft (post-#935)
+#+AUTHOR: Sue
+#+DATE: 2026-09-17
+
+* Result
+
+This records the inventory that the 2026-09-17 selection
+([[file:validation.org][validation and publication report]]) was made from.  It supersedes the
+2026-09-16 inventory of PR #937, which measured the WAVE vocabulary that
+leaked through =food_acquired= before PR #935 applied the wave->country
+crosswalk (233 delivered labels, 47 absent from the country table).  That
+run's numbers are retained in git history only.
+
+GhanaLSS delivers *215* distinct Preferred labels across its seven waves,
+and the country =harmonize_food= table has *215* distinct Preferred labels:
+the two sets are identical (=inventory.yml=:
+=delivered_labels_absent_from_country: []=,
+=country_labels_not_delivered: []=).  Every proposed member is delivered.
+The [[file:proposed_groups.yml][candidate specification]] names 18 groups to gate plus six deferred
+alternatives; applied all at once it would map the 215 labels to 188
+groups ([[file:draft_partition.yml][draft partition]]).  Three tobacco labels are inventoried and
+excluded from food support.  Nothing in this file is a live mapping: the
+published column is the [[file:selected_groups.yml][selection]].
+
+* Observed support
+
+Counts use positive monetary amounts.  Zero and unavailable amounts both
+contribute zero; a price-only row does not establish positive expenditure.
+The denominator is the entire API =sample= for the wave, including
+households with no food records.  Tobacco is excluded.  The two bases are
+purchased expenditure and total recorded acquisition value, using the
+library's existing monetary derivation without additional valuation.
+
+#+name: tab:ghanalss-food-support
+#+caption: Distinct positive foods per household, summed over visits within each wave. Density is the fraction of positive household-item cells.
+| Wave    | Sample HH | Food labels | Median purchased | Median total | Purchased density | Total density |
+|---------+-----------+-------------+------------------+--------------+-------------------+---------------|
+| 1987-88 |      3147 |          58 |               15 |           21 |             0.278 |         0.367 |
+| 1988-89 |      3194 |          58 |               14 |           21 |             0.266 |         0.365 |
+| 1991-92 |      4523 |         114 |               21 |           21 |             0.199 |         0.199 |
+| 1998-99 |      5998 |         109 |               21 |           26 |             0.205 |         0.239 |
+| 2005-06 |      8687 |         113 |               25 |           28 |             0.235 |         0.259 |
+| 2012-13 |     16772 |         114 |               26 |           29 |             0.241 |         0.261 |
+| 2016-17 |     14009 |         178 |               25 |           28 |             0.150 |         0.164 |
+
+Only the per-wave label counts moved against the pre-#935 inventory
+(2005-06 111 -> 113, 2012-13 112 -> 114, 2016-17 176 -> 178, the early
+waves unchanged): the crosswalk un-merges items previously conflated under
+one label (mutton under =Goat=, pito under =Beer=/=Wine=), and the
+medians and densities are unchanged to the third decimal.
+
+Pair support is the binding constraint on the gate.  Across the 178 food
+labels in 2016-17, the median number of households reporting both members
+of an unordered pair is 36 for purchases and 56 for total recorded value,
+and only 52.6% / 59.3% of pairs have at least 30 such households.  CFE's
+=prepare_data= keeps a pair of goods only if at least =min_obs=30=
+households report BOTH, which is why several candidates cannot be gated on
+the 60% training split at all (=Macaroni= x =Spaghetti=: 45 households in
+the whole wave) and why five can be gated on no population (see
+=validation.org=).
+
+* The candidates
+
+The [[file:proposed_groups.yml][specification]] records exact members and source-table evidence for every
+candidate.  They fall in three families:
+
+- *PR #937's four selected groups* on the corrected spellings:
+  =Sugar (cubed/granulated)=, =Malt Drinks=, =Macaroni/Spaghetti= (label
+  changed from "Pasta (macaroni/spaghetti)" to the coarse GLSS1/2 member so
+  the series is continuous) and =Fish (kapla/tilapia, fresh or frozen)=.
+- *One candidate per label PR #935 renamed or split*, so that each of
+  those decisions is made through the gate rather than inherited: =Rice=
+  (imported/local), =Gari= (white/yellow), =Fish (smoked)= (river/sea),
+  =Millet/Sorghum= (millet, millet flour, guinea corn/sorghum; and a
+  grain-only variant added after the first gate runs), =Oil (palm)/Shea
+  Butter=, =Cocoa Powder= (with the malted-drink group), =Goat/Mutton=,
+  =Beer/Pito=.
+- *PR #937's additional semantic candidates* re-keyed where a member was a
+  leaked wave spelling (=Milk (tinned, condensed)= -> =Milk (tinned,
+  condensed/unsweetened)=; =Pepper (dried, red)= -> =Pepper (dried)=).
+
+Three pairs are listed as =not_gateable= and default to singletons:
+=Margarine= / =Margarine/Butter= (never co-occur; no =Butter= label
+anywhere to test against), =Potato= / =Sweet Potato= (Sweet Potato is
+own-production only from 1991-92 on) and =Onion= / =Shallot= (Onion is a
+reserved prediction target).
+
+#+name: tab:ghanalss-candidate-support
+#+caption: Positive support in 2016-17 on the purchased basis. Gain compares the union with its best-supported single member; "both" is the pair support the gate needs.
+| Candidate                             | Largest member HH | Union HH | Gain HH | HH reporting both |
+|---------------------------------------+-------------------+----------+---------+-------------------|
+| Rice                                  |              7054 |    10333 |    3279 |              1623 |
+| Bread (including sugar bread)         |              8786 |    11318 |    2532 |              4909 |
+| Fish (smoked)                         |              5238 |     7722 |    2484 |              1986 |
+| Fish (canned or in oil/sauce)         |              2397 |     3898 |    1501 |               948 |
+| Oil (palm)/Shea Butter                |              5497 |     6862 |    1365 |               268 |
+| Malt Drinks                           |              2363 |     3356 |     993 |               552 |
+| Beer/Pito                             |               903 |     1627 |     724 |               170 |
+| Fish (kapla/tilapia, fresh or frozen) |              3018 |     3583 |     565 |               268 |
+| Millet/Sorghum                        |               433 |      777 |     344 |               159 |
+| Gari                                  |              3999 |     4312 |     313 |               122 |
+| Macaroni/Spaghetti                    |               543 |      832 |     289 |                45 |
+| Crab and shrimp                       |               555 |      709 |     154 |                64 |
+| Goat/Mutton                           |              1142 |     1269 |     127 |               123 |
+| Sugar (cubed/granulated)              |              7971 |     8096 |     125 |               175 |
+| Cocoa Powder                          |              5058 |     5118 |      60 |                32 |
+| Spirits (gin/whisky/schnapps)         |               179 |      234 |      55 |                13 |
+| Milk (evaporated/condensed)           |              3353 |     3390 |      37 |                18 |
+| Coconut (fresh/dried)                 |              1395 |     1425 |      30 |                15 |
+
+Unlike the #937 draft, several candidates now merge distinct items in
+EARLIER waves too (=group_support.csv=): =Goat/Mutton=, =Beer/Pito=,
+=Millet/Sorghum= and =Oil (palm)/Shea Butter= in 1991-92, 1998-99, 2005-06
+and 2012-13, =Rice=, =Bread= and the tinned-milk and spirits pairs in
+2005-06 and 2012-13.  The gate is therefore read in those waves as well; a
+group has to be sound everywhere it actually merges.
+
+* Survey qualifications
+
+The [[file:../../../lsms_library/countries/GhanaLSS/_/CONTENTS.org][country notes]] document different recall designs.  GLSS7 has six
+five-day food recalls; GLSS3 uses seven rural and ten urban asks with
+different recall lengths, which is why 1991-92 is not used to gate anything
+here (a Region market does not absorb an urban/rural exposure gap).  The
+table above is an inventory of observed support, not evidence that all
+waves measure a common consumption period.
+
+Total recorded value includes the API's existing own-production amounts
+(=8h-farmgate= for 1998-99..2016-17, =12b-fortnight= for GLSS1/2; GLSS3
+own-production expenditure is not wired).  Two households with positive
+food amounts lie outside =sample= in each of 1987-88 and 1988-89 and are
+reported separately; there are none in the other five waves.
+
+* Reproduction
+
+From the worktree root, with CFEDemands 0.10.0 shadowed ahead of the venv
+(=pip install --no-deps --target <dir> 'CFEDemands==0.10.0'=; the mirror
+venv carries 0.8.2, which has no =score_w=):
+
+#+begin_example
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PYTHONPATH="<dir>:$PWD:$PWD/SkunkWorks"
+python -m SkunkWorks.aggregation.ghana_inventory
+#+end_example
+
+=inventory.yml= records the label reconciliation (empty both ways), the
+non-foods, the configuration revision (=ff4c00f2b=, the =development= merge
+of #935) and the API warning counts (3 =NullReadWarning=, 5
+=QuantityImplausibleWarning=, 1 =NullIndexKeyWarning=, all pre-existing
+data audits).  Saved outputs contain only item, group, wave and visit
+summaries; no household identifiers.

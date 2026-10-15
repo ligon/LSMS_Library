@@ -112,6 +112,22 @@ class ShippedFactorWarning(UserWarning):
     """
 
 
+class StatedVsInferredKgWarning(UserWarning):
+    """The price-ratio inference disagrees with a unit label's OWN stated size.
+
+    A label that names its metric content (``Sac moyen (50 kg)``, ``Gramme``,
+    ``Centilitre``) is served its STATED factor -- the label is survey
+    information, the inference is an estimate.  When the two disagree by more
+    than :data:`STATED_VS_INFERRED_TOLERANCE`, the disagreement is evidence
+    about the unit vocabulary (a broken kg baseline, a label that means two
+    sizes) and was previously thrown away.  This warning names both numbers.
+
+    Its own class so it can be filtered or promoted
+    (``warnings.simplefilter('error', StatedVsInferredKgWarning)``)
+    independently of the library's other warnings.
+    """
+
+
 class UnitLabelCollisionWarning(UserWarning):
     """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
 
@@ -1343,6 +1359,18 @@ def _normalize_columns(df):
 
     return df
 
+#: The largest ratio of inferred to stated kg-per-unit (in either direction)
+#: at which the price-ratio inference is still taken as AGREEING with a label
+#: that names its own metric content.  Beyond it the stated factor is served
+#: and the disagreement is reported (:class:`StatedVsInferredKgWarning`).
+#: Set BELOW Mali's ``Sac moyen`` -- stated 50 kg, inferred 26.2, a 1.91x
+#: disagreement and the SMALLEST of the contradictions GH #838 names (``Sac
+#: large`` is 3.0x, ``Gramme`` 708x): a tolerance of 2 (the wave-spread
+#: sibling, :data:`FOOD_KG_WAVE_SPREAD_REPORT`) would let the canonical case
+#: through.  50% estimation noise on a container whose size the label states
+#: is already evidence about the unit vocabulary.
+STATED_VS_INFERRED_TOLERANCE = 1.5
+
 # Unit labels that STATE their own metric content, mapped to kilograms per
 # one such unit.  Matched against the lower-cased ``u`` label, exactly.
 #
@@ -1360,18 +1388,31 @@ def _normalize_columns(df):
 # are NOT a general licence to grow this dict by guessing: each one is a label
 # a country in the corpus actually mints.  A spelling nobody uses costs a line
 # here and buys nothing; a spelling somebody uses and is missing costs an
-# invented weight.
+# invented weight.  GH #838's additions (``milligramme``, ``centilitre``,
+# ``quintal``, ``tonne`` and plurals) each name a label the corpus mints:
+# Mali's and Ethiopia's ``Centilitre``, GhanaLSS's ``milligramme``, Ethiopia's
+# ``Quintal`` (the metric centner, 100 kg), Mali's / Niger's / GhanaSPS's
+# ``Tonne``.
 KNOWN_METRIC = {
     'kg': 1, 'kilogram': 1, 'kilogramme': 1,
     'kgs': 1, 'kilograms': 1, 'kilogrammes': 1, 'kilo': 1, 'kilos': 1,
     'g': 1/1000, 'gram': 1/1000, 'gramm': 1/1000,
     'grams': 1/1000, 'gramme': 1/1000, 'grammes': 1/1000,
     'gm': 1/1000, 'gms': 1/1000,
-    'milligram': 1e-6,
+    'milligram': 1e-6, 'milligramme': 1e-6, 'milligrammes': 1e-6,
+    # `quintal` USED TO BE HERE at 100 (the metric centner) and was removed in
+    # GH #919: it is country-qualified, not universal -- the Spanish quintal is
+    # 100 lb (45.36 kg), and the pound is itself regional.  It now lives in
+    # `categorical_mapping/u.org`'s `u_kg` table, where a country can override
+    # it; see that file for the full reasoning.  Nothing in KNOWN_METRIC may be
+    # country-qualified, because `_seeded_kg_factors` lets an entry here beat
+    # every country-level factor unconditionally.
+    'tonne': 1000, 'tonnes': 1000,
     'l': 1, 'litre': 1, 'liter': 1, 'litres': 1, 'liters': 1,
     'ml': 1/1000, 'cl': 1/100,
     'millilitre': 1/1000, 'milliliter': 1/1000,
     'millilitres': 1/1000, 'milliliters': 1/1000, 'mili liter': 1/1000,
+    'centilitre': 1/100, 'centilitres': 1/100,
     'pound': 0.453592, 'lbs': 0.453592,
 }
 
@@ -1387,7 +1428,7 @@ KNOWN_METRIC = {
 _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
                 'ml', 'cl',
                 'millilitre', 'milliliter', 'millilitres', 'milliliters',
-                'mili liter')
+                'mili liter', 'centilitre', 'centilitres')
 
 # Explicit-metric pattern triples: (regex, scale, is_volume).
 # ``regex`` matches the numeric prefix; ``scale`` converts to kg (or kg-
@@ -1415,20 +1456,54 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # matching the ``g`` pattern, and dropping it would trade one silent error
 # for another.  Longest alternative first within each group, so ``ltr`` is
 # preferred to ``lt`` and ``kilogramme`` to ``kg``.
+# The number group admits a FRACTION (``1/2``, ``1/4``, ``3/4``).  Without it
+# the group matched only the digits ADJACENT to the unit token, so Uganda's
+# ``Packet(1/2lt / 1/2kg)`` read as 2 kg and ``Packet(1/4lt / 1/4kg)`` as 4 kg
+# -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
+# as the plural bug GH #850 fixed: a regex that reads PART of a
+# self-describing label and asserts the result.
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
+                re.IGNORECASE), 1e-6, False),
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
+                re.IGNORECASE), 1000, False),
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*ml\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
+                re.IGNORECASE), 1/1000, True),
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
+                re.IGNORECASE), 1/100, True),
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+
+def _metric_number(text):
+    """Value of a metric quantity token, which may be a fraction.
+
+    ``'50'`` -> 50.0, ``'0.5'`` -> 0.5, ``'1/2'`` -> 0.5, ``'3/4'`` -> 0.75.
+
+    Fractions are how Uganda's own container labels spell sub-unit sizes
+    (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
+    pattern captured only the digits adjacent to the unit token, so those read
+    as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+    """
+    t = str(text).strip()
+    if '/' in t:
+        num, _, den = t.partition('/')
+        d = float(den.strip())
+        if d == 0:
+            raise ZeroDivisionError(t)
+        return float(num.strip()) / d
+    return float(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1472,6 +1547,19 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     True
     >>> _parse_explicit_metric('20gallon drum') is None
     True
+
+    Fractions.  Uganda's container labels spell sub-unit sizes this way, and
+    before the fix the pattern captured only the digits ADJACENT to the unit
+    token -- so a half-kilo packet read as 2 kg and a quarter-kilo as 4 kg.
+
+    >>> _parse_explicit_metric('1/2 kg')
+    0.5
+    >>> _parse_explicit_metric('Packet(1/4lt / 1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('Packet -medium (1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('3/4 kg')
+    0.75
     """
     if not isinstance(s, str):
         return None
@@ -1481,13 +1569,13 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
         m = pattern.search(s)
         if m:
             try:
-                return float(m.group(1)) * scale
-            except (ValueError, IndexError):
+                return _metric_number(m.group(1)) * scale
+            except (ValueError, IndexError, ZeroDivisionError, TypeError):
                 return None
     return None
 
 
-def _seeded_kg_factors(df, *, volume_as_mass=True):
+def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """The kg factors that are READ rather than inferred.
 
     :data:`KNOWN_METRIC` plus whatever :func:`_parse_explicit_metric` can
@@ -1505,6 +1593,19 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
         for u in _FLUID_UNITS:
             factors.pop(u, None)
 
+    # GH #919: DECLARED factors outrank KNOWN_METRIC, and are the only layer a
+    # country can override.  `unit_kg` arrives already keyed on the RAW `u`
+    # label, composed by `Country._unit_kg_factors` from the country's merged
+    # `u` (raw -> Preferred Label) and `u_kg` (Preferred Label -> kg) tables.
+    # It is composed THERE rather than here because the kg factor is computed
+    # before the categorical mapping is applied -- `conversion_to_kgs` sees the
+    # raw `u` (GH #770) -- so this function must never assume harmonisation has
+    # run.  A `volume_as_mass=False` caller still drops the fluid spellings
+    # above; a declared row for a fluid unit is the country's own statement and
+    # is left alone.
+    for key, kg in (unit_kg or {}).items():
+        factors[str(key).lower()] = kg
+
     if 'u' in (df.index.names or []):
         labels = df.index.get_level_values('u').dropna().unique()
     elif 'u' in df.columns:
@@ -1521,7 +1622,7 @@ def _seeded_kg_factors(df, *, volume_as_mass=True):
     return factors
 
 
-def _get_kg_factors(df, *, volume_as_mass=True):
+def _get_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     """Build a combined kg-per-unit mapping from known metric units,
     explicit-metric label parsing, and price-ratio inference on the data.
 
@@ -1541,7 +1642,7 @@ def _get_kg_factors(df, *, volume_as_mass=True):
         recovers the actual specific gravity per (item, region, time)
         when enough kg-reporting households share the cell.
     """
-    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    factors = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     # Infer additional factors from price ratios where possible
     if 'Expenditure' in df.columns and 'Quantity' in df.columns:
@@ -1575,6 +1676,7 @@ def _get_kg_factors(df, *, volume_as_mass=True):
                 seeded = frozenset(factors)   # KNOWN_METRIC + label parser
                 won: dict[str, tuple[str, float]] = {}
                 collisions: dict[str, list[tuple[str, float]]] = {}
+                contradicting: dict[str, set[tuple[str, float]]] = {}
                 for unit, factor in inferred.items():
                     key = unit.lower()
                     if key in _CURRENCY_DENOMINATED_UNITS:
@@ -1590,10 +1692,39 @@ def _get_kg_factors(df, *, volume_as_mass=True):
                     if decided_here and key in won and won[key][1] != factor:
                         collisions.setdefault(key, [won[key]]).append(
                             (unit, float(factor)))
+                    elif key in seeded:
+                        # GH #838: the label STATES its own metric content
+                        # and the stated factor is served -- that precedence
+                        # is the fix -- but an inference that contradicts the
+                        # label by more than the tolerance is evidence about
+                        # the unit vocabulary and was previously thrown away.
+                        stated = factors[key]
+                        worst = max(factor / stated, stated / factor)
+                        if worst > STATED_VS_INFERRED_TOLERANCE:
+                            contradicting.setdefault(key, set()).add(
+                                (unit, float(factor)))
                     if key not in factors:
                         factors[key] = factor
                     if decided_here:
                         won.setdefault(key, (unit, float(factor)))
+                if contradicting:
+                    detail = '; '.join(
+                        f"{k!r}: stated {factors[k]:.6g} kg, inferred "
+                        + ', '.join(f"{lbl!r}->{f:.6g}"
+                                    for lbl, f in sorted(v))
+                        for k, v in sorted(contradicting.items()))
+                    warnings.warn(
+                        f"_get_kg_factors: {len(contradicting)} unit label(s) "
+                        f"STATE a metric content the price-ratio inference "
+                        f"contradicts by more than "
+                        f"{STATED_VS_INFERRED_TOLERANCE:g}x; the STATED "
+                        f"factor is served.  {detail}.  Treat this as "
+                        f"evidence about the unit vocabulary (a broken kg "
+                        f"baseline, or a label that means two sizes) -- the "
+                        f"inference is an estimate, the label is not.",
+                        StatedVsInferredKgWarning,
+                        stacklevel=2,
+                    )
                 if collisions:
                     detail = '; '.join(
                         f"{k!r}: " + ', '.join(f"{lbl!r}->{f:.6g}"
@@ -1650,7 +1781,7 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
-def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
+def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
@@ -1722,7 +1853,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     otherwise lose a row it can serve.
     """
     idx_names = list(df.index.names or [])
-    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass)
+    seeded = _seeded_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
 
     if 'u' in idx_names:
         units = df.index.get_level_values('u').astype(str).str.lower()
@@ -1739,6 +1870,12 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
     refused = np.zeros(len(df), dtype=bool)
     kg_unit = np.full(len(df), np.nan)
     have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
+    contradicting = {}
+    # Reported below, once it is known whether the item arm ran -- a second
+    # ``conversion_to_kgs`` call can raise the warning the u-rung merge
+    # already emitted, and a warning raised inside the ``try`` would be
+    # swallowed by the guard meant for the estimator's numeric failures.
+    item_contradicting = None
     if have_price:
         group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
         if group_levels:
@@ -1753,6 +1890,16 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
             for lbl, f in per_u.items():
                 if np.isfinite(f) and f > 0:
                     lowered.setdefault(str(lbl).lower(), float(f))
+            # GH #838: the ladder already serves the seeded factor (the
+            # ``metric`` rung outranks ``item_unit``/``unit``); what was
+            # missing is the REPORT that the inference contradicted the
+            # label's own stated size.  Same comparison as the
+            # ``_get_kg_factors`` twin.
+            contradicting.update({
+                k: (seeded[k], f) for k, f in lowered.items()
+                if k in seeded and seeded[k] > 0
+                and max(f / seeded[k], seeded[k] / f)
+                > STATED_VS_INFERRED_TOLERANCE})
             kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
 
             if item_col in idx_names or item_col in df.columns:
@@ -1764,6 +1911,22 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                         tight_tolerance=tight_tolerance,
                         baseline_max_spread=baseline_max_spread,
                         _detail=True)
+                    # GH #838, item arm: a ``(j, u)`` inference that
+                    # contradicts the label's own stated size.  Counted but
+                    # not warned here -- the u-rung merge below reports the
+                    # label ONCE, and this detail frame only adds which ITEMS
+                    # the contradiction came from.
+                    if detail is not None and len(detail):
+                        us = detail.index.get_level_values('u').astype(
+                            str).str.lower()
+                        stated = pd.Series(us).map(seeded).to_numpy()
+                        inf = detail['kg_per_unit'].to_numpy()
+                        bad = (np.isfinite(stated) & (stated > 0)
+                               & np.isfinite(inf) & (inf > 0)
+                               & (np.maximum(inf / stated, stated / inf)
+                                  > STATED_VS_INFERRED_TOLERANCE))
+                        if bad.any():
+                            item_contradicting = int(bad.sum())
                 except (ValueError, ZeroDivisionError, KeyError):
                     detail = None
                 if detail is not None and len(detail):
@@ -1821,6 +1984,31 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j',
                             would_have = _valid_factor(
                                 uref.reindex(key)['kg_per_unit'])
                             refused = np.isnan(kg_item) & ~np.isnan(would_have)
+
+    # GH #838: the ladder already serves the seeded factor (the ``metric``
+    # rung outranks ``item_unit``/``unit``); what was missing is the REPORT
+    # that an inference contradicted the label's own stated size.  Same
+    # comparison as the ``_get_kg_factors`` twin, emitted once per call,
+    # OUTSIDE the estimator's ``try`` so it can never be swallowed by the
+    # guard meant for numeric failures.
+    if contradicting:
+        detail_txt = '; '.join(
+            f"{k!r}: stated {st:.6g} kg, inferred {inf:.6g}"
+            for k, (st, inf) in sorted(contradicting.items()))
+        items_txt = (f" (the item-keyed inference contradicts the label on "
+                     f"{item_contradicting} (item, unit) cell(s))"
+                     if item_contradicting else "")
+        warnings.warn(
+            f"food_kg_factors: {len(contradicting)} unit label(s) "
+            f"STATE a metric content the price-ratio inference "
+            f"contradicts by more than "
+            f"{STATED_VS_INFERRED_TOLERANCE:g}x; the STATED factor "
+            f"is served (the ``metric`` rung).  {detail_txt}{items_txt}.  "
+            f"Treat this as evidence about the unit vocabulary (a broken "
+            f"kg baseline, or a label that means two sizes).",
+            StatedVsInferredKgWarning,
+            stacklevel=2,
+        )
 
     # ``u='Unknown'`` / ``'Manquant'`` / a NaN label is the ABSENCE of a unit,
     # not a unit.  The crop twin has always excluded these rows from the
@@ -2560,7 +2748,7 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -2635,7 +2823,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -2675,7 +2863,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True):
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -2773,7 +2961,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
 
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -2789,7 +2977,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True):
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass)
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
@@ -3238,8 +3426,14 @@ KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
 #: The counts over these layers PARTITION the frame and sum to ``len(df)``, so
 #: every key is present on every call -- ``shipped: 0`` when no table is
 #: passed.
-KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'inferred',
-                    'none')
+#: ``metric`` (GH #929) is the READ half of what used to be counted as
+#: ``inferred``: a unit whose own label names its metric content (``Quintal``
+#: = 100 kg, ``50 kg bag``).  It sits directly above ``inferred`` and below
+#: everything that already outranked it, so separating it moves no
+#: ``kg_per_unit`` value -- it makes a DEFINITIONAL factor countable apart
+#: from a price-ratio guess, which the food ladder has done since GH #850.
+KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'metric',
+                    'inferred', 'none')
 
 
 def _level_or_column(df, name):
@@ -3761,6 +3955,34 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     inferred = _kg_factor_series(df, volume_as_mass=volume_as_mass)
     inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
 
+    # The READ half of `inferred`, separated out (GH #929).  `_kg_factor_series`
+    # returns one number per unit whether the unit NAMED its own metric content
+    # (`Quintal` is 100 kg by definition) or the price-ratio inference guessed
+    # it, and the crop ladder counted both as `inferred` -- the food ladder has
+    # had a `metric` layer since GH #850.  The asymmetry is not cosmetic: it
+    # cost Ethiopia's shipped table its only EXTERNAL check.  That check is
+    # "rows the WB table serves where the library has no independent opinion",
+    # and it was expressed as `kg_shipped.notna() & kg_inferred.isna()`.  When
+    # GH #838 seeded `quintal=100`, 13,924 quintal rows acquired an `inferred`
+    # value that is the SAME DEFINITION the WB table quotes, so they left the
+    # "no opinion" set and the check silently became the tautology its own
+    # docstring disowns for `Kg`/`Gram` ("both sides are quoting the definition
+    # of a kilogram ... a `j` mis-key would leave it at 1.0000 too").
+    #
+    # `_seeded_kg_factors` is KNOWN_METRIC plus the explicit-metric label
+    # parser -- read, never inferred -- and `_get_kg_factors` gives those seeds
+    # precedence over the inference, so wherever `metric` is present it holds
+    # the value `inferred` already carried.  `metric` therefore sits directly
+    # ABOVE `inferred` and below every layer that outranked it before, which
+    # makes this a RELABELLING: `kg_per_unit` is unchanged on every row, and
+    # `test_metric_layer_changes_no_kg_value` pins that.
+    _mwork, _mpromoted = _with_u_in_index(df)
+    _munits = _mwork.index.get_level_values('u').astype(str).str.lower()
+    metric = _valid_factor(
+        pd.Series(np.asarray(_munits)).map(
+            _seeded_kg_factors(df, volume_as_mass=volume_as_mass)))
+    metric = np.asarray(metric, dtype='float64')
+
     if 'KgFactor' in df.columns:
         reported, rejected = _screen_reported_factors(df, df['KgFactor'])
     else:
@@ -3803,8 +4025,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     rep_ok = ~np.isnan(reported)
     shp_ok = ~np.isnan(shipped)
     med_ok = ~np.isnan(survey_median)
+    met_ok = ~np.isnan(metric)
     inf_ok = ~np.isnan(inferred_arr)
 
+    # `resolved` is deliberately NOT re-expressed over `metric`: the seeds are
+    # already inside `inferred_arr` with precedence, so splitting the label
+    # cannot move a number.  Written this way so the relabelling stays
+    # provably value-preserving rather than approximately so.
     resolved = np.where(
         rep_ok, reported,
         np.where(shp_ok, shipped,
@@ -3813,7 +4040,8 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         rep_ok, 'reported',
         np.where(shp_ok, 'shipped',
                  np.where(med_ok, 'survey_median',
-                          np.where(inf_ok, 'inferred', 'none'))))
+                          np.where(met_ok, 'metric',
+                                   np.where(inf_ok, 'inferred', 'none')))))
 
     out = pd.DataFrame(
         {'kg_per_unit': resolved,
@@ -3823,6 +4051,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
          'kg_shipped': shipped,
          'kg_shipped_rejected': shipped_rejected,
          'kg_shipped_source': shipped_source,
+         'kg_metric': metric,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)

@@ -1,0 +1,24 @@
+country: GhanaLSS
+waves:
+- 1987-88
+- 1988-89
+- 1991-92
+- 1998-99
+- 2005-06
+- 2012-13
+- 2016-17
+n_delivered_labels: 215
+n_country_preferred_labels: 215
+source_revision: ff4c00f2b
+nonfood_labels:
+- Cigarette
+- Other Tobacco
+- Tobacco
+n_draft_groups: 188
+delivered_labels_absent_from_country: []
+country_labels_not_delivered: []
+proposed_members_not_delivered: []
+api_warning_counts:
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 5
+  NullIndexKeyWarning: 1

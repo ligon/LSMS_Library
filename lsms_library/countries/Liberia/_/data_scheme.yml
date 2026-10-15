@@ -35,11 +35,13 @@ Data Scheme:
   plot_features:
     # 2018-19 Section 10 (Land Parcels), National Household Forest Survey.
     # Clean LONG: one row per (i, plot_id) where plot_id = parcel_id.
-    # Area=S10_4 in native unit; AreaUnit=S10_4B (acres/lot(s)/hectares/
-    # other -- not homogeneous, so Area is kept native).  Tenure=S10_5
-    # mapped to the canonical vocabulary.  No SoilType / Irrigated /
-    # TenureSystem in this instrument; parcel GPS (S10_6A/B) is actually
-    # use-payment amount/period and ~98% NaN, so it is omitted.
+    # Area=S10_4 converted per-row to HECTARES on AreaUnit=S10_4B
+    # (acres / lot(s) / hectares / other) by the wave mapping.py
+    # plot_features hook (canonical schema, GH #879); lot(s) and other
+    # have no in-repo factor, so those rows serve NaN Area -- honest.
+    # Tenure=S10_5 mapped to the canonical vocabulary.  No SoilType /
+    # Irrigated / TenureSystem in this instrument; parcel GPS (S10_6A/B)
+    # is actually use-payment amount/period and ~98% NaN, so it is omitted.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str

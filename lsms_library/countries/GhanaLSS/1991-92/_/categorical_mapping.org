@@ -318,7 +318,7 @@ GLSS3 and GLSS4 (one form) speak one vocabulary.  Verbatim source wording:
 | Sweet Potato                   | Sweet Potato                   |         |                                                 |      16 | Sweet potatoes                 |
 | Other Tubers                   | Other Tubers                   |      13 | Other starchy roots and tubers                  |      17 | Other roots & tubers           |
 | Konkonte                       | Konkonte                       |      14 | Konkonte                                        |         |                                |
-| Cassava (flour)                | Cassava                        |      15 | Gari                                            |      11 | Cassava –gari                  |
+| Gari                           | Gari                           |      15 | Gari                                            |      11 | Cassava –gari                  |
 | Cassava (dough)                | Cassava                        |      16 | Cassava dough                                   |      12 | Cassava (other forms)          |
 | Other Starchy Products         | Other Starchy Products         |      17 | Other starchy products                          |         |                                |
 | Cowpea                         | Pulses, Nuts                   |         |                                                 |      22 | Cowpeas                        |
@@ -371,7 +371,7 @@ GLSS3 and GLSS4 (one form) speak one vocabulary.  Verbatim source wording:
 | Other Eggs                     | Other Eggs                     |      65 | Other eggs (not chicken)                        |         |                                |
 | Beef                           | Beef                           |      53 | Fresh Beef (Cattle)                             |      63 | Beef                           |
 | Beef (corned)                  | Beef                           |      52 | Corned Beef                                     |         |                                |
-| Goat                           | Goat                           |      56 | Fresh Mutton                                    |      64 | Mutton                         |
+| Mutton                         | Mutton                         |      56 | Fresh Mutton                                    |      64 | Mutton                         |
 | Pork                           | Pork                           |      57 | Pork                                            |      65 | Pork                           |
 | Goat                           | Goat                           |      55 | Goat (fresh)                                    |      66 | Goat                           |
 | Other Meat                     | Other Meat                     |      59 | Other Meat (except Poultry)                     |      67 | Other Domestic meat            |
@@ -413,7 +413,7 @@ GLSS3 and GLSS4 (one form) speak one vocabulary.  Verbatim source wording:
 | Soft Drinks                    | Soft Drinks                    |      98 | Soft Drinks and Minerals                        |         |                                |
 | Beer                           | Beer                           |      99 | Local and Imported Beer and Guinness            |         |                                |
 | Wine                           | Wine                           |     100 | Palm Wine                                       |         |                                |
-| Beer                           | Beer                           |     101 | Pito                                            |         |                                |
+| Pito                           | Pito                           |     101 | Pito                                            |         |                                |
 | Akpeteshie                     | Spirits                        |     102 | Akpeteshie and Other Local Spirits              |         |                                |
 | Gin                            | Spirits                        |     103 | Gin                                             |         |                                |
 | Other Alcoholic Beverages      | Other Alcoholic Beverages      |     104 | Other Alcoholic Beverages                       |      90 | Alcoholic beverages            |
@@ -468,7 +468,7 @@ code 5 (Rice imported vs Sorghum, n=50) and codes 47-49, flagged in =Note=.
 | 10   | Yam                                                             | Yam                              | yes  | Kilogram     | 1     | GLSS4 code 11                                                                |
 | 11   | Plantain                                                        | Plantain                         | yes  | Kilogram     | 1     | GLSS4 code 12                                                                |
 | 12   | Cassava (fresh)                                                 | Cassava                          | yes  | Kilogram     | 1     | GLSS4 code 13                                                                |
-| 13   | Gari                                                            | Cassava (flour)                  | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it; GLSS4 code 14                    |
+| 13   | Gari                                                            | Gari                             | yes  | Kilogram     | 1     | gari = cassava flour, as the axis codes it; GLSS4 code 14                    |
 | 14   | Cassava dough                                                   | Cassava (dough)                  | yes  | Kilogram     | 1     | GLSS4 code 15                                                                |
 | 15   | Konkonte (flour)                                                | Konkonte                         | yes  | Kilogram     | 1     | GLSS4 code 16                                                                |
 | 16   | Cowpeas (small beans)                                           | Small Bean                       | yes  | Kilogram     | 1     | the 9b consumption label is Small beans; GLSS4 code 17                       |

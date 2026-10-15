@@ -128,7 +128,9 @@ D, updated_ids = panel_ids(Waves)
 # ... write to JSON
 ```
 
-Add `panel_ids: !make` to `data_scheme.yml` and a Makefile target.
+Add `panel_ids: !make` to `data_scheme.yml`, and a **`.PHONY: panel-ids`
+maintainer target** to the Makefile -- *not* a rule making `panel_ids.json`.
+See "How the crosswalk is persisted" below; this distinction is load-bearing.
 
 ### Pattern 3: Custom function (for complex ID construction)
 
@@ -138,6 +140,65 @@ Tanzania's 2008-15 multi-round file and Niger's composite IDs need custom Python
 # Tanzania: map_08_15() groups by UPHI (universal panel ID) and shifts r_hhid
 # Niger: parse hhid="grappe-menage-extension", zero-pad, handle splits
 ```
+
+## How the crosswalk is persisted (GH #914, #894)
+
+**The committed JSON is a SOURCE, not a build product.** `panel_ids.json` and
+`updated_ids.json` are git-tracked, ship in the wheel, and are regenerated only
+by a deliberate maintainer action:
+
+```sh
+make -C lsms_library/countries/{C}/_ panel-ids   # then review the diff
+```
+
+That is design **A**, and it is the convention (#894). A panel crosswalk is a
+*harmonization decision*, not a derived measurement: it is small (GhanaLSS is
+714 mappings, 4 ms to recompute), identical for every user, and the input to
+every longitudinal result -- so it belongs where a change to it shows up as a
+reviewable line-level diff. Nine countries do this: Burkina_Faso, Ethiopia,
+EthiopiaRHS, GhanaLSS, Mali, Niger, Senegal, Tanzania, Uganda.
+
+Malawi and Nigeria are design **B** (per-wave `data_info.yml` wiring, cache
+parquet only). `Country._compute_panel_ids` branches on which it got -- A
+returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts -- so both
+arrive at the same API. Converting them to A is #894's remaining work; they are
+named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a *twelfth*
+country cannot pick a design by accident.
+
+### Never make the JSON a Make target
+
+The nine Makefiles used to carry:
+
+```make
+panel_ids.json updated_ids.json: panel_ids.py      # DO NOT REINTRODUCE
+	python panel_ids.py
+```
+
+This regenerates the crosswalk whenever `panel_ids.py` is the newer file -- and
+**on a pip install, which of the two is newer is decided by the millisecond the
+wheel was unpacked.** Measured on the real 0.13.0 wheel: the zip stores `.json`
+before `.py` alphabetically, and 5 of the 9 countries straddled a filesystem
+tick and landed with the script ~1 ms ahead. The recipe then ran with cwd inside
+`site-packages`, and the script wrote a bare relative path, so on a JupyterHub
+or any root-owned install it died with `PermissionError` three layers inside a
+`make` subprocess.
+
+The blast radius was every table, not just `panel_ids`:
+`Country._finalize_result` calls `id_walk(df, self.updated_ids)` on every read
+(`country.py:3107`), and Uganda additionally had
+`$(parquet) $(var): panel_ids.json`.
+
+Two rules follow, both pinned by `tests/test_panel_ids_persistence.py`:
+
+1. **No rule may have `panel_ids.json` or `updated_ids.json` on its left-hand
+   side.** Keeping them as *prerequisites* is fine and correct -- make just
+   checks the file is there and is not newer than what depends on it.
+2. **`panel_ids.py` must write relative to `Path(__file__).parent`**, never a
+   bare relative path, which resolves against whatever cwd the caller had.
+
+`make clean` must not delete them either: with no rule to remake them, a country
+would be unbuildable until `git checkout`.
+
 
 ## Detective work
 

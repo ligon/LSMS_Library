@@ -50,6 +50,7 @@ import logging
 import os
 import random
 import re
+import shutil
 import signal
 import subprocess
 import tempfile
@@ -63,7 +64,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import config
-from .paths import countries_root
+from .paths import countries_root, data_root
 from .provenance import (
     SOURCE_WORLDBANK,
     WaveProvenance,
@@ -78,6 +79,37 @@ logger = logging.getLogger(__name__)
 # *before* import (the worktree model); it does NOT track a later override +
 # ``countries_root.cache_clear()`` within the same process.
 _COUNTRIES_DIR = countries_root()
+
+
+def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
+    """Where a raw file fetched at READ time is written.
+
+    ``countries_root()`` is the *config* tree: reviewed YAML, scripts and
+    committed crosswalks.  The runtime must never write into it (GH #803 for
+    parquets, GH #914 for the panel crosswalk, GH #831 for this).  Two reasons,
+    one fatal and one merely expensive:
+
+    * On a shared install -- a JupyterHub, a system Python, anything installed
+      as root -- the package directory is not writable by the user running the
+      code, so a fetch raises ``PermissionError`` from inside whatever call
+      needed the file.
+    * Even where it succeeds it litters: two sweeps found 433 workspace copies
+      of source files under ``countries_root()`` (1.31 GB), and a copy without
+      a ``.dvc`` sidecar *shadows the DVC blob silently*, because the reader's
+      chain is local file -> DVC -> WB and the stray wins at step one.
+
+    So a read-path fetch lands under ``data_root()``, mirroring the config
+    tree's layout (``{data_root}/{Country}/{wave}/Data/...``) beside the rest
+    of the cache, and the resolved path is what gets returned to the reader.
+
+    ``populate_cache=True`` is the ACQUISITION path (``add_wave`` /
+    ``populate_and_push``), run by a maintainer in a writable checkout that
+    then ``dvc add``s what was extracted.  Landing in the config tree is the
+    entire point there, so that branch is unchanged.
+    """
+    if populate_cache:
+        return _COUNTRIES_DIR / path
+    return data_root() / path
 
 # ---------------------------------------------------------------------------
 # Country -> WB catalog registry
@@ -254,6 +286,21 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
                "University study distributed via Harvard Dataverse "
                "(doi:10.7910/DVN/T8G8IV), not the World Bank Microdata "
                "Library.  There is nothing to discover in the WB catalog."),
+    # GhanaAHIES: the Annual Household Income and Expenditure Survey is
+    # published on the Ghana Statistical Service NADA
+    # (microdata.statsghana.gov.gh, entries 119 and 128), the host that also
+    # supplied GLSS6/7.  Its downloads are anonymous but the host refuses
+    # ``api/resources`` even to a keyed user, so neither ``discover_waves``
+    # nor ``add_wave`` can drive it.  Whether the WB Microdata Library
+    # mirrors it is UNCHECKED (2026-09-17); flip this to a GHA spec with an
+    # ``_AHIES`` idno pin if it does.  See slurm_logs/ghana_ahies/README.org.
+    "GhanaAHIES": CountryCatalog(
+        None, discoverable=False,
+        reason="Ghana AHIES is distributed by the Ghana Statistical Service "
+               "NADA (microdata.statsghana.gov.gh), not the World Bank "
+               "Microdata Library; the GSS host's resources API refuses "
+               "unauthenticated and keyed callers alike, so discovery is "
+               "manual.  See slurm_logs/ghana_ahies/README.org."),
     "KenyaLPS": CountryCatalog(
         None, discoverable=False,
         reason="Kenya Life Panel Survey is not distributed via the World "
@@ -270,16 +317,30 @@ _COUNTRY_CODES: dict[str, str] = {
 }
 
 
-def _dvc_cmd() -> str:
-    """Return path to the ``dvc`` executable in the current venv.
+def _dvc_cmd() -> list[str]:
+    """Return the argv prefix that runs ``dvc`` for the current interpreter.
 
-    Falls back to bare ``"dvc"`` if no venv-local binary is found.
+    Prefers ``[sys.executable, "-m", "dvc"]`` whenever the ``dvc`` package is
+    importable: that is exactly the venv the library itself is running in, and
+    it does not depend on a console-script shebang.  Shebangs are what broke
+    on Savio (2026-09-17): the squashfs venv image (``bin/savio_venv.sh``)
+    ships ``.venv/bin/dvc`` with ``#!/global/scratch/.../.venv/bin/python`` --
+    a path that no longer exists -- so ``exec`` failed with ``ENOENT`` and
+    ``push_to_cache_batch`` pushed 0 of 6 files.  ``SkunkWorks/savio_venv.md``
+    already says "always invoke as ``.venv/bin/python -m <module>``"; this
+    makes the library obey it.
+
+    Falls back to the venv-local ``dvc`` script, then bare ``"dvc"``, when the
+    package is not importable from this interpreter.
     """
+    import importlib.util
     import sys
+    if importlib.util.find_spec("dvc") is not None:
+        return [sys.executable, "-m", "dvc"]
     venv_dvc = Path(sys.executable).parent / "dvc"
     if venv_dvc.exists():
-        return str(venv_dvc)
-    return "dvc"
+        return [str(venv_dvc)]
+    return ["dvc"]
 
 
 # DVC serializes every repo operation on ``.dvc/tmp/lock``.  Concurrent
@@ -340,7 +401,24 @@ def _terminate_dvc(proc: subprocess.Popen, grace: float = 30.0) -> bool:
 
     SIGTERM instead, to the whole process group (``dvc`` spawns children), and
     escalate only if it will not go.
+
+    Windows has no process groups or signals (``os.getpgid`` / ``os.killpg``
+    do not exist there), so the tree is ended with ``taskkill /T /F``.  That
+    is a hard kill -- there is no polite equivalent for a console process --
+    so it returns True; the caller's lock sweep runs either way.
     """
+    if not hasattr(os, "killpg"):
+        try:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           check=False)
+        except OSError:
+            proc.kill()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return True
     try:
         pgid = os.getpgid(proc.pid)
     except OSError:
@@ -758,7 +836,7 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
 
     legacy_creds = dvc_dir / "s3_creds"
     try:
-        user_text = user_creds.read_text()
+        user_text = user_creds.read_text(encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not read user-config s3_creds: %s", exc)
         return False
@@ -766,13 +844,13 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
     # Skip the write if the legacy file already matches.
     if legacy_creds.exists():
         try:
-            if legacy_creds.read_text() == user_text:
+            if legacy_creds.read_text(encoding="utf-8") == user_text:
                 return True
         except OSError:
             pass  # fall through to overwrite
 
     try:
-        legacy_creds.write_text(user_text)
+        legacy_creds.write_text(user_text, encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
         return False
@@ -848,7 +926,7 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
         return False
 
     try:
-        creds_file.write_text(decrypted)
+        creds_file.write_text(decrypted, encoding="utf-8")
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
@@ -942,7 +1020,7 @@ def _read_source_url(country: str, wave: str) -> str | None:
     if not source.exists():
         return None
     try:
-        text = source.read_text()
+        text = source.read_text(encoding="utf-8")
         m = re.search(r'https?://[^\s\]\)]+', text)
         return m.group(0).rstrip("/") if m else None
     except (OSError, UnicodeDecodeError):
@@ -1246,7 +1324,7 @@ def _s3_writer_credentialpath(remote: str | None, dvc_dir: Path):
     prior = config_local.read_text(encoding="utf-8") if had_local else None
     try:
         _run_dvc_with_lock_retry(
-            [_dvc_cmd(), "remote", "modify", "--local",
+            [*_dvc_cmd(), "remote", "modify", "--local",
              target, "credentialpath", str(write_path)],
             cwd=str(dvc_dir.parent), timeout=60,
         )
@@ -1304,7 +1382,7 @@ def push_to_cache(path: str | Path,
     try:
         if dvc_add:
             result = _run_dvc_with_lock_retry(
-                [_dvc_cmd(), "add", str(abs_path)],
+                [*_dvc_cmd(), "add", str(abs_path)],
                 cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
             if result.returncode != 0:
@@ -1312,7 +1390,7 @@ def push_to_cache(path: str | Path,
                 return False
             logger.info("dvc add: %s", abs_path)
 
-        push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
+        push_cmd = [*_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
         with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
@@ -1382,7 +1460,7 @@ def push_to_cache_batch(paths: list[str | Path],
     try:
         # --- Batched dvc add -----------------------------------------------
         if dvc_add:
-            add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
+            add_cmd = [*_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
             logger.info("dvc add: %d files ...", len(abs_paths))
             result = _run_dvc_with_lock_retry(
                 add_cmd,
@@ -1397,7 +1475,7 @@ def push_to_cache_batch(paths: list[str | Path],
 
         # --- Batched dvc push ----------------------------------------------
         dvc_files = [str(p) + ".dvc" for p in abs_paths]
-        push_cmd = [_dvc_cmd(), "push"] + dvc_files
+        push_cmd = [*_dvc_cmd(), "push"] + dvc_files
         if remote:
             push_cmd.extend(["-r", remote])
         logger.info("dvc push: %d files ...", len(abs_paths))
@@ -1446,7 +1524,7 @@ def unpushed_blobs(remote: str | None = None,
         Sorted paths that are out of sync with the remote (need a push).
         Empty when everything tracked is already on the remote.
     """
-    cmd = [_dvc_cmd(), "status", "--cloud", "--json"]
+    cmd = [*_dvc_cmd(), "status", "--cloud", "--json"]
     if remote:
         cmd += ["-r", remote]
     if targets:
@@ -1499,6 +1577,9 @@ def populate_and_push(country: str, wave: str,
     dummy = f"{country}/{wave}/Data/_probe_.dta"
     get_data_file(dummy, populate_cache=True)
 
+    # Acquisition only: extract into the config tree so the caller can
+    # `dvc add` what landed.  The read path never reaches this (see
+    # _fetch_destination).
     data_dir = _COUNTRIES_DIR / country / wave / "Data"
     if not data_dir.exists():
         logger.warning("No Data directory after download: %s", data_dir)
@@ -2060,7 +2141,12 @@ def get_data_file(path: str | Path,
         unavailable.
     """
     path = _as_countries_relative(Path(path))
-    abs_path = _COUNTRIES_DIR / path
+    # Read from the config tree if the file is already there (a maintainer
+    # checkout with real data in it is a normal working state, and every
+    # pre-#831 fetch landed there), but WRITE to data_root().  See
+    # _fetch_destination.
+    intree_path = _COUNTRIES_DIR / path
+    abs_path = _fetch_destination(path, populate_cache)
     target_filename = path.name
 
     # Parse country/wave from the path
@@ -2072,10 +2158,13 @@ def get_data_file(path: str | Path,
     country = parts[0]
     wave = parts[1]
 
-    # 1. Local file already exists
-    if abs_path.exists():
-        logger.debug("Local hit: %s", abs_path)
-        return abs_path
+    # 1. Local file already exists -- in the cache, or in the config tree
+    #    (where every pre-#831 fetch put it, and where a maintainer's checkout
+    #    legitimately holds data).
+    for candidate in (abs_path, intree_path):
+        if candidate.exists():
+            logger.debug("Local hit: %s", candidate)
+            return candidate
 
     perms = permissions(path)
     logger.debug("Permissions: %s", perms)
@@ -2088,13 +2177,42 @@ def get_data_file(path: str | Path,
         if resource != "wb_api"
     )
     if dvc_readable:
+        # GH #763: take the SAME lock-free pair ``get_dataframe`` takes --
+        # ``_ensure_dvc_pulled`` (parse the sidecar for its md5, then a direct
+        # S3 GET of that blob) followed by ``_dvc_cache_path`` (locate the L1
+        # blob on disk).  The DVCFileSystem route below does the same job by
+        # walking DVC's index over ~10k sidecars on Lustre, which costs ~93 s
+        # per call *regardless of file size* and is paid even when the blob is
+        # already cached, because ``fs.exists`` walks it too.  The CLAUDE.md
+        # access table already describes both readers as sharing one lock-free
+        # path; before this they did not.
+        #
+        # The sidecar lives beside the file in the CONFIG tree (it is reviewed,
+        # tracked metadata), so resolution is against ``intree_path`` even
+        # though the materialised copy lands under ``data_root()``.
         try:
-            # Reuse the module-level DVCFS singleton from local_tools
-            # rather than constructing a fresh DVCFileSystem here.
-            # Same root, same config; the singleton avoids paying the
-            # ~0.5-2s DVC handle construction cost on every WB-API
-            # fallback fetch.  See slurm_logs/DESIGN_dvc_layer1_caching.md
-            # ("Hot spot 2") for the full rationale.
+            from .local_tools import _dvc_cache_path, _ensure_dvc_pulled
+            _ensure_dvc_pulled(intree_path)
+            blob = _dvc_cache_path(intree_path)
+            if blob is not None:
+                abs_path.parent.mkdir(parents=True, exist_ok=True)
+                # Copy rather than return the blob path directly: the blob is
+                # named by its md5 and carries no suffix, and callers (and
+                # ``get_dataframe``'s own parser dispatch) key off the
+                # extension.  One local copy against ~93 s of index walk.
+                shutil.copyfile(blob, abs_path)
+                logger.info("Fetched from DVC (sidecar fast path): %s", path)
+                return abs_path
+        except (OSError, ValueError, KeyError, ImportError) as e:
+            logger.debug("DVC sidecar fast path failed: %s", e)
+
+        try:
+            # Fallback for a tracked path with no usable sidecar.  Reuse the
+            # module-level DVCFS singleton from local_tools rather than
+            # constructing a fresh DVCFileSystem here.  Same root, same
+            # config; the singleton avoids paying the ~0.5-2s DVC handle
+            # construction cost.  See
+            # slurm_logs/DESIGN_dvc_layer1_caching.md ("Hot spot 2").
             from .local_tools import DVCFS as fs
             dvc_path = str(path)
             if fs.exists(dvc_path):

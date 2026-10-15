@@ -30,8 +30,10 @@ Data Scheme:
   plot_features:
     # Parcel roster, 2019-20 hh_sec_8.dta. Single clean LONG file
     # (one row per (HHID, parcel)), so YAML path -- no script needed.
-    # Area is in mixed native units carried in AreaUnit; no area
-    # standardization. SoilType is not collected by this module.
+    # Area is converted to HECTARES per-row on AreaUnit by the
+    # cambodia.plot_features df_edit hook (canonical schema, GH #879);
+    # units without a factor (RAI, KONG) serve NaN Area, honest.
+    # SoilType is not collected by this module.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str

@@ -44,6 +44,58 @@
 | sab                | SAB             |
 | tombali            | Tombali         |
 
+* Region
+
+GH #811, 2026-09-24.  =cluster_features.Region= and =sample.strata= read
+the SAME source variable (=s00q01=, =2018-19/_/data_info.yml=) and the raw
+parquets hold identical values in both, yet they were served in two
+spellings: =strata= through the table above (=SAB=, =Bafata=, ...,
+=Bolama-Bijagos=) and =Region= raw (=sab=, =bafata=, ..., =BOLAMA_BIJAGOS=),
+because the auto-applied mapping is matched BY NAME and no =Region= table
+existed.  A user filtering =Region == 'Bafata'= got nothing; a
+=strata= <-> =Region= join matched zero rows.
+
+*The evidence is the =strata= table immediately above*, which this repo
+has relied on since 2026-04-09: every row below is that table's row
+verbatim (so =sab -> SAB=, upper-case, NOT title case -- the point is that
+the two columns agree), plus an identity row per Preferred Label so a
+value that already arrives canonical round-trips.  No new judgement is
+made here.  Same shape as Ethiopia's =Region= table (GH #832, efe0199a3).
+
+*It cannot change the collapse.*  The mapping is applied in
+=_finalize_result=, AFTER the build-time =(t, v)= projection, and the
+raw values are constant within grappe at source anyway
+(=_/CONTENTS.org=, "Cluster Features -- the many-to-one projection").
+The stored wave/country parquets keep the raw lower-case values; only the
+served frame changes -- 450 rows, 9 labels before and after.
+
+*Cache cost*: this file is a build input (=_/*.org= is folded into
+=Wave._input_hash=; only =CONTENTS.org= is skipped), so editing it moves
+every Guinea-Bissau cache hash -- one wave, small.  The issue's "read-path
+only, no cache hash moves" is wrong on that point.
+
+#+name: Region
+| Alternate Spelling | Preferred Label |
+|--------------------+-----------------|
+| BOLAMA_BIJAGOS     | Bolama-Bijagos  |
+| Bolama-Bijagos     | Bolama-Bijagos  |
+| bafata             | Bafata          |
+| Bafata             | Bafata          |
+| biombo             | Biombo          |
+| Biombo             | Biombo          |
+| cacheu             | Cacheu          |
+| Cacheu             | Cacheu          |
+| gabu               | Gabu            |
+| Gabu               | Gabu            |
+| oio                | Oio             |
+| Oio                | Oio             |
+| quinara            | Quinara         |
+| Quinara            | Quinara         |
+| sab                | SAB             |
+| SAB                | SAB             |
+| tombali            | Tombali         |
+| Tombali            | Tombali         |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|

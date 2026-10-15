@@ -48,6 +48,63 @@ waves in casing and spelling. This table harmonizes them.
 | Addis Ababa Urban           | Addis Ababa Urban        |
 | ADDIS ABABA Urban           | Addis Ababa Urban        |
 
+* Region
+
+GH #832, 2026-09-18.  `cluster_features.Region` carried **21 distinct
+strings for 11 regions** and was NOT harmonized -- Tigray/TIGRAY,
+Somalie/SOMALI, Diredwa/DIRE DAWA, Gambelia/GAMBELA, Benshagul
+Gumuz/BENISHANGUL GUMUZ, Harari/HARAR.  ESS W1-W3 write mixed case and
+W4-W5 write upper case.  `_/CONTENTS.org` records this ("cluster_features
+District is not a district, and Region is not harmonized") and notes that
+the `Strata` section above "says region names are harmonized via
+categorical_mapping.org; that is true of `sample().strata` and NOT of
+`cluster_features.Region`".  This table closes that gap.
+
+*The evidence is the `strata` table immediately above*, which this repo
+already relies on: every pair below is exactly the pairing `strata`
+asserts for the same region, in force today for `sample().strata`.  No
+new judgement is made here -- the mapping is read off a decision the
+repository has already taken, and the Preferred Labels are its Region
+components verbatim.
+
+*It cannot change any collapse.*  Measured on the delivered table before
+landing: within EACH wave the spellings are already unique per region
+(distinct Region per wave = 10 / 11 / 11 / 11 / 10, i.e. the region count),
+so no two rows of one wave differ only by spelling and
+`_collapse_to_cluster_grain`'s conflict set is untouched.  Verified: the
+four `GrainCollapseWarning` cells stay at 373 / 454 / 732 / 1,240 rows
+destroyed (2018-19 clean), and the 2,168 rows regroup 21 labels into 11
+with the row counts summing exactly (Amhara 117 + 246 = 363, Oromia 119 +
+238 = 357, Tigray 54 + 132 = 186, ...).
+
+What this buys: cross-wave pooling on Region stops being silently wrong.
+Per-wave work was never affected, which is why nothing warned.
+
+#+name: Region
+| Alternate Spelling  | Preferred Label     |
+|---------------------+---------------------|
+| Tigray              | Tigray              |
+| TIGRAY              | Tigray              |
+| Afar                | Afar                |
+| AFAR                | Afar                |
+| Amhara              | Amhara              |
+| AMHARA              | Amhara              |
+| Oromia              | Oromia              |
+| OROMIA              | Oromia              |
+| Somalie             | Somali              |
+| SOMALI              | Somali              |
+| Benshagul Gumuz     | Benishangul Gumuz   |
+| BENISHANGUL GUMUZ   | Benishangul Gumuz   |
+| SNNP                | SNNP                |
+| Gambelia            | Gambela             |
+| GAMBELA             | Gambela             |
+| Harari              | Harar               |
+| HARAR               | Harar               |
+| Diredwa             | Dire Dawa           |
+| DIRE DAWA           | Dire Dawa           |
+| Addis Ababa         | Addis Ababa         |
+| ADDIS ABABA         | Addis Ababa         |
+
 #+name: Roof
 | Alternate Spelling     | Preferred Label  |
 |------------------------+------------------|
@@ -358,6 +415,27 @@ kg-conversion factors live in transformations._get_kg_factors /
 conversion_to_kgs.json -- this table is the label axis only.  Later
 gaps (crop/harvest units, community-price units) extend these rows.
 
+GH #832, 2026-09-18: `Other(Specify)` used to carry its own Preferred
+Label, so the survey's catch-all sat on the u axis under TWO labels that
+differ only by a space -- `Other (Specify)` (crop_production 5,498 rows
+across all four waves, community_prices 1 row in 2013-14) and
+`Other(Specify)` (community_prices 653 rows, 2015-16 only).  They are one
+value: both are the ESS's "Other (specify)" option, and this table already
+folds `Digigimosh` onto the SPACED form, so the spaced form is this
+country's canonical spelling and the unspaced one was the outlier.  The
+relabel cannot collide -- the two spellings share no wave on any table.
+Note the fold does NOT make these rows usable: a price "per Other
+(Specify)" is not a price, and a consumer must still drop them.  What it
+buys is that they are now droppable with ONE test instead of two.
+
+Note also, against `_/CONTENTS.org:193-195` ("No =u= table is wired into
+=_/categorical_mapping.org=; the framework's auto-discovery on =u= would
+be a no-op"): that statement is STALE.  This table exists, it is
+auto-discovered by name on the `u` index/column of every Ethiopia table,
+and it is not identity -- `Digigimosh -> Other (Specify)`, `KILOGRAM ->
+Kg`, `Littere -> Liter`, `pices -> Pieces` and ~30 more rows all relabel
+at API time.
+
 #+name: u
 | Original Label                     | Preferred Label                    |
 |------------------------------------+------------------------------------|
@@ -425,7 +503,7 @@ gaps (crop/harvest units, community-price units) extend these rows.
 | Packets                            | Packets                            |
 | Pieces                             | Pieces                             |
 | Other (Specify)                    | Other (Specify)                    |
-| Other(Specify)                     | Other(Specify)                     |
+| Other(Specify)                     | Other (Specify)                    |
 | Pack                               | Pack                               |
 | Pair                               | Pair                               |
 | Piece/Number Large                 | Piece/Number Large                 |

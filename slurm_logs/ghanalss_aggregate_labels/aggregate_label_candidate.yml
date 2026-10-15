@@ -1,0 +1,179 @@
+# GhanaLSS candidate 'Aggregate Label', keyed on country harmonize_food
+# 'Preferred Label'.  Derived by the CROSSWALK route:
+#   country PL -> that row's per-wave label column -> wave harmonize_food
+#   'Preferred Label' -> wave 'Aggregate Label'.
+# 173 unambiguous; 22 conflicted (NOT included -- see conflicts.org).
+# Feed to: python -m lsms_library.util.orgtbl ... --column 'Aggregate Label'
+Agushie Seed: Pulses, Nuts
+Akpeteshie: Spirits
+Animals Fat: Oils, Fats
+Apple: Apple
+Avocado: Avocado
+Baby Milk: Milk
+Bambara Bean: Pulses, Nuts
+Banana: Banana
+Banku: Banku
+Bean: Pulses, Nuts
+Beef: Beef
+Beef (face): Beef
+Beef (leg): Beef
+Beef (offal): Beef
+Beef (steak): Beef
+Beer: Beer
+Biscuit: Biscuit
+Bitters: Spirits
+Bread: Bread
+Broad Bean: Pulses, Nuts
+Cabbage: Cabbage
+Canned Fruits: Canned Fruits
+Carrot: Carrot
+Cashew: Cashew
+Cassava: Cassava
+Cassava (dough): Cassava
+Cassava (dried): Cassava
+Cassava (flour): Cassava
+Cerelac (Baby food): Cerelac (Baby food)
+Chewing Gum: Chewing Gum
+Chicken: Chicken
+Chicken (breast): Chicken
+Chicken (frozen): Chicken
+Chicken (gizzard): Chicken
+Chicken (live): Chicken
+Chicken (thigh): Chicken
+Chicken (wing): Chicken
+Chilli Powder (black pepper): Chilli Powder (black pepper)
+Coconut (dried): Coconut
+Cocoyam: Cocoyam
+Coffee: Coffee
+Cola Nut: Pulses, Nuts
+Condiment: Condiment
+Confectionary (not frozen): Confectionary (not frozen)
+Cooked Rice and Stew: Cooked Rice and Stew
+Corflake: Other Cereal
+Couscous: Other Cereal
+Cowpea: Pulses, Nuts
+Crab: Fish
+Crustacean: Fish
+Curry Power: Curry Power
+Dove/Pigeon: Dove/pigeon
+Duck: Duck
+Egg: Egg
+Eggplant Leaf: Eggplant Leaf
+Emotuo: Emotuo
+Fast Food: Fast Food
+Fish (canned): Fish
+Fish (dried): Fish
+Fish (fresh and frozen): Fish
+Fish (fried): Fish
+Fish (salted): Fish
+Fish (smoked): Fish
+Garlic: Garlic
+Gin: Spirits
+Ginger: Ginger
+Grape: Grape
+Guinea Corn: Guinea Corn
+Guinea Corn/Sorghum: Guinea corn/sorghum
+Herring (smoked): Fish
+Honey: Honey
+Instant Noodle: Other Cereal
+Jam: Jam
+Juice: Juice
+Jute Leaf: Jute Leaf
+Kapla: Fish
+Koko: Koko
+Kola Nut: Pulses, Nuts
+Konkonte: Konkonte
+Lime: Lime
+Macaroni/Spaghetti: Other Cereal
+Mackerel (processed): Fish
+Maize: Maize
+Maize (cob): Maize
+Maize (flour/dough): Maize
+Maize (grain): Maize
+Maizena: Other Cereal
+Malt Drinks (bottle): Malt Drinks (bottle)
+Malt Drinks (canned): Malt Drinks (canned)
+Mango: Mango
+Milk (evaporated): Milk
+Milk (fresh): Milk
+Milk (powder): Milk
+Milk (tinned, condensed/unsweetened): Milk
+Millet: Millet
+Millet (flour): Millet
+Oil (coconut): Oils, Fats
+Oil (groundnut): Oils, Fats
+Oil (palm kernel): Oils, Fats
+Okra: Okra
+Onion: Onion
+Orange: Orange
+Other Alcoholic Beverages: Other Alcoholic Beverages
+Other Beverages: Other Beverages
+Other Canned Vegetables: Other Canned Vegetables
+Other Cereal: Other Cereal
+Other Condiments & Spices: Other Condiments & Spices
+Other Confectioneries: Other Confectioneries
+Other Domestic Poultry: Other Domestic Poultry
+Other Drinks: Other Drink
+Other Eggs: Other Eggs
+Other Fish: Other Fish
+Other Flours: Other Flours
+Other Fruits: Other Fruits
+Other Grains: Other Grains
+Other Leafy Vegetables: Other Leafy Vegetable
+Other Meat: Other Meat
+Other Miscellaneous Food Items: Other Miscellaneous Food Items
+Other Nuts/Seeds: Pulses, Nuts
+Other Oil Seeds: Pulses, Nuts
+Other Poultry: Other Poultry
+Other Prepared Meals: Other Prepared Meals
+Other Pulses: Pulses, Nuts
+Other Spices: Other Spices
+Other Spirits: Spirits
+Other Starchy Products: Other Starchy Products
+Other Tobacco: Other Tobacco
+Other Tubers: Other Tubers
+Other Vegetables: Other Vegetables
+Pawpaw: Pawpaw
+Pepper: Pepper
+Pepper (dried): Pepper
+Pepper (powder): Pepper
+Pineapple: Pineapple
+Plantain: Plantain
+Pork: Pork
+Pork (feet): Pork
+Pork (fillet): Pork
+Pork (rib): Pork
+Pork (shoulder): Pork
+Salmon (smoked): Fish
+Salt: Salt
+Sausage (beef): Sausage
+Sausage (chicken): Sausage
+Sausage (pork): Sausage
+Schnapps: Spirits
+Shallot: Shallot
+Shea Butter: Oils, Fats
+Shrimp: Fish
+Small Bean: Pulses, Nuts
+Soft Drinks: Soft Drinks
+Sorghum: Sorghum
+Soup: Soup
+Soybean: Pulses, Nuts
+Spinach: Spinach
+Sugar: Sugar
+Sweet Pepper: Sweet Pepper
+Taro: Taro
+Tea: Tea
+Tilapia: Fish
+Tobacco: Tobacco
+Tomato (fresh): Tomato
+Tuna (processed): Fish
+Vinegar: Vinegar
+Water: Water
+Water Yam: Water Yam
+Watermelon: Watermelon
+Wheat Flour: Wheat Flour
+Whisky: Spirits
+White Oat: White Oats
+Wine: Wine
+Yam: Yam
+Yoghurt: Other Milk Products

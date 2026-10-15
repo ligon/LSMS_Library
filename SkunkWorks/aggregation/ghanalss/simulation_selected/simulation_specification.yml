@@ -1,0 +1,30 @@
+wave: 2016-17
+basis: purchased
+n_sample: 14009
+n_foods: 176
+n_missing_market: 0
+n_missing_characteristics: 19
+n_positive_households_outside_sample: 0
+n_positive_households: 13917
+median_positive_foods: 25.0
+api_warning_counts:
+  NullReadWarning: 3
+  QuantityImplausibleWarning: 1
+  NullIndexKeyWarning: 1
+seeds:
+- 11
+- 12
+- 13
+regimes:
+- masked
+- substitutes
+- unequal
+source: survey_simulation.survey_inputs; cfe.dgp.expenditures
+masks: All sampled households; synthetic controls and welfare independent of mask.
+anchor: Salt
+anchor_loading: 0.6
+sigma_eps: 0.2
+fit_options:
+  min_obs: 30
+  min_prop_items: 0.1
+  alltm: true

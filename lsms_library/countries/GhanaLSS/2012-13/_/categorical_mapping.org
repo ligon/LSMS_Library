@@ -26,7 +26,7 @@
 | Pork                         | Pork                         |      19 | pork                                                         |      65 | pork                       |
 | Beef                         | Beef                         |      20 | beef                                                         |      63 | beef                       |
 | Goat                         | Goat                         |      21 | goat meat                                                    |      66 | goat                       |
-| Goat                         | Goat                         |      22 | mutton                                                       |      64 | mutton                     |
+| Mutton                       | Mutton                       |      22 | mutton                                                       |      64 | mutton                     |
 | Other Meat                   | Other Meat                   |      23 | bushmeat/wild game                                           |      68 | wild game                  |
 | Other Meat                   | Other Meat                   |      24 | other meat (dog, cat,etc.)                                   |      67 | other domestic meat        |
 | Chicken (live)               | Chicken                      |      27 | chicken                                                      |      60 | chicken                    |
@@ -54,7 +54,7 @@
 | Oil (palm kernel)            | Oils, Fats                   |      60 | palm kernel oil                                              |      29 | palm kernel oil            |
 | Oil (palm)                   | Oils, Fats                   |      61 | palm oil                                                     |      28 | palm oil                   |
 | Shea Butter                  | Oils, Fats                   |      62 | shea butter                                                  |      32 | shea butter                |
-| Margarine                    | Oils, Fats                   |      63 | margarine/butter                                             |         |                            |
+| Margarine/Butter             | Margarine/Butter             |      63 | margarine/butter                                             |         |                            |
 | Other Oils                   | Oils, Fats                   |      64 | other vegetable oils including animal fats                   |      33 | other oil                  |
 | Coconut (fresh)              | Coconut                      |      68 | coconut                                                      |      26 | coconut                    |
 | Banana                       | Banana                       |      69 | banana                                                       |      40 | bananas                    |
@@ -104,7 +104,7 @@
 | Other Pulses                 | Pulses, Nuts                 |     119 | other pulses and nuts                                        |      24 | other legumes/pulses       |
 | Other Nut/Seed               | Pulses, Nuts                 |         |                                                              |      27 | other nuts/seeds           |
 | Cassava (dough)              | Cassava                      |     123 | cassava-dough                                                |      12 | cassava(other forms)       |
-| Cassava (flour)              | Cassava                      |     124 | gari                                                         |      11 | cassava-gari               |
+| Gari                         | Gari                         |     124 | gari                                                         |      11 | cassava-gari               |
 | Other Flours                 | Other Flours                 |     125 | other processed starchy staples                              |       9 | other flours               |
 | Coffee                       | Coffee                       |     129 | coffee                                                       |         |                            |
 | Cocoa Powder                 | Cocoa Powder                 |     130 | chocolate drinks (including milo,bournvita etc)              |         |                            |
@@ -120,7 +120,7 @@
 | Akpeteshie                   | Spirits                      |     145 | akpeteshie                                                   |         |                            |
 | Other Spirits                | Spirits                      |     146 | other spirits                                                |         |                            |
 | Wine                         | Wine                         |     150 | palm wine/raffia palm wine etc                               |         |                            |
-| Wine                         | Wine                         |     151 | pito/brukutu,etc                                             |         |                            |
+| Pito                         | Pito                         |     151 | pito/brukutu,etc                                             |         |                            |
 | Wine                         | Wine                         |     152 | other local wine                                             |         |                            |
 | Wine                         | Wine                         |     153 | other imported wine                                          |         |                            |
 | Beer                         | Beer                         |     157 | beer (local)                                                 |         |                            |
@@ -300,7 +300,7 @@ market carry identical prices) -- kept native.
 | 33   | vegetable oil (frytol, obaapa)                                      | Other Oils                                                          | yes  | Liter      |       |                                              |
 | 34   | palm oil                                                            | Oil (palm)                                                          | yes  | Liter      |       |                                              |
 | 35   | shea butter                                                         | Shea Butter                                                         | yes  | Kilogram   |       |                                              |
-| 36   | margarine (canned, sachet)                                          | Margarine                                                           | yes  | Kilogram   |       |                                              |
+| 36   | margarine (canned, sachet)                                          | Margarine                                                           | own  | Kilogram   |       | axis conflates margarine with butter         |
 | 37   | kolanut                                                             | Cola Nut                                                            | yes  | Kilogram   |       |                                              |
 | 38   | coconut (fresh)                                                     | Coconut (fresh)                                                     | yes  | Kilogram   |       |                                              |
 | 39   | banana                                                              | Banana                                                              | yes  | Kilogram   |       |                                              |
@@ -331,7 +331,7 @@ market carry identical prices) -- kept native.
 | 64   | maggi cubes                                                         | Condiment                                                           | yes  | Kilogram   |       |                                              |
 | 65   | cassava (fresh)                                                     | Cassava (fresh)                                                     | yes  | Kilogram   |       |                                              |
 | 66   | cassava dough                                                       | Cassava (dough)                                                     | yes  | Kilogram   |       |                                              |
-| 67   | cassava flour (konkonte)                                            | Cassava (flour)                                                     | yes  | Kilogram   |       |                                              |
+| 67   | cassava flour (konkonte)                                            | Gari                                                                | yes  | Kilogram   |       |                                              |
 | 68   | cocoyam                                                             | Cocoyam                                                             | yes  | Kilogram   |       |                                              |
 | 69   | plantain                                                            | Plantain                                                            | yes  | Kilogram   |       |                                              |
 | 70   | yam                                                                 | Yam                                                                 | yes  | Kilogram   |       |                                              |
@@ -340,7 +340,7 @@ market carry identical prices) -- kept native.
 | 73   | groundnut (roasted)                                                 | Groundnut                                                           | yes  | Kilogram   |       |                                              |
 | 74   | palm nut fruits                                                     | Palm Nut                                                            | yes  | Kilogram   |       |                                              |
 | 75   | other pulse and nuts specified (e.g. cashew nut, tiger nuts)        | Other Nut/Seed                                                      | yes  | Kilogram   |       |                                              |
-| 76   | gari                                                                | Cassava (flour)                                                     | yes  | Kilogram   |       |                                              |
+| 76   | gari                                                                | Gari                                                                | yes  | Kilogram   |       |                                              |
 | 77   | coffee (nescafe - tin)                                              | Coffee                                                              | yes  | Kilogram   |       |                                              |
 | 78   | chocolate drinks (milo, bournvita, other specified)                 | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |
 | 79   | pure cocoa powder (without milk, e.g. brown gold)                   | Cocoa Powder                                                        | yes  | Kilogram   |       |                                              |

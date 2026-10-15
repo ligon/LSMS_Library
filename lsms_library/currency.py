@@ -90,16 +90,28 @@ _DEFAULT_MONETARY: dict[str, frozenset[str]] = {
     "food_prices": frozenset({"Price"}),
     "community_prices": frozenset({"Price"}),
     "assets": frozenset({"Value", "Purchase Price"}),
-    # livestock: the three canonical value columns, split by additivity
-    # (ValuePerAnimal / HerdValue / SalesValue -- see `Columns: livestock`
-    # in data_info.yml).  `Purchase Price` was here as a copy-paste from the
+    # livestock: the four canonical value columns, split by additivity
+    # (ValuePerAnimal is a unit price and NOT additive; HerdValue,
+    # SalesValue and PurchaseValue are totals and are -- see
+    # `Columns: livestock` in data_info.yml).  `Purchase Price` was here as a copy-paste from the
     # `assets` line above and is dropped: NO country declares it in
     # livestock (it is an assets-only column, in Senegal / Mali / Togo /
     # Benin).  Kept in lockstep with the YAML by
     # tests/test_currency_livestock_registry.py -- see the note below.
-    "livestock": frozenset({"ValuePerAnimal", "HerdValue", "SalesValue"}),
+    "livestock": frozenset({"ValuePerAnimal", "HerdValue", "SalesValue",
+                            "PurchaseValue"}),
     "crop_production": frozenset({"Value_sold"}),
-    "plot_labor": frozenset({"Wage"}),
+    # `Cost` joined the corpus with the GLSS1/GLSS2 farm tables: it is local
+    # currency (Section 9 Part D asks how much was SPENT), and it must be
+    # registered or `conversion.convert` walks straight past it.  On
+    # `plot_labor` that failure was SILENT rather than absent -- the table
+    # already qualified as monetary through `Wage`, so it acquired a currency
+    # label while `Cost` stayed in nominal units.  GLSS1/GLSS2 are pre-2007
+    # cedis, so the skipped factor is ~1e4, not a rounding detail.  The
+    # livestock registry test is livestock-scoped and screens `value|price`,
+    # so neither table tripped it.
+    "plot_inputs": frozenset({"Cost"}),
+    "plot_labor": frozenset({"Wage", "Cost"}),
     "earnings": frozenset({"Earnings"}),
     "income": frozenset({"income", "TotalIncome", "CropIncome",
                          "LivestockIncome", "OffFarmIncome", "WageIncome"}),

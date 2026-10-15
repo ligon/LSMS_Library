@@ -31,6 +31,22 @@ def _scalar(value):
     return value
 
 
+def Area(value):
+    """Convert plot area (``q09a04``) to HECTARES.
+
+    The canonical schema (``lsms_library/data_info.yml``, GH #879)
+    declares ``plot_features.Area`` in hectares with ``AreaUnit`` the
+    PROVENANCE label of the original unit; this wave records area in
+    square metres, so divide by 10,000.  ``value`` is a scalar per cell
+    (df_data_grabber applies this elementwise); missing stays missing.
+    """
+    v = _scalar(value)
+    try:
+        return float(v) / 10000.0
+    except (TypeError, ValueError):
+        return pd.NA
+
+
 def AreaUnit(value):
     """Constant area unit for plot_features.
 
@@ -38,6 +54,10 @@ def AreaUnit(value):
     metres.  ``value`` (the area itself) is ignored; we return the
     constant unit string, with :class:`pandas.NA` where the area is
     missing so the unit isn't asserted for a plot with no recorded area.
+
+    Since GH #879 this is a PROVENANCE label: the served ``Area`` is in
+    hectares (see :func:`Area`); 'square meters' names the unit the
+    SURVEY recorded.
     """
     if pd.isna(_scalar(value)):
         return pd.NA

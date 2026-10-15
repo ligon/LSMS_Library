@@ -1,0 +1,25 @@
+id,label,section,members_in_wave,members_absent,n_in_wave,status,fit,spread,sigma_min,ratio,passes,betas,ses
+sugar_refined,Sugar (cubed/granulated),groups,[],"[""Sugar (cubed)"", ""Sugar (granulated)""]",0,not_cooccurring,,,,,,,
+malt_packaging,Malt Drinks,groups,"[""Malt Drinks (bottle)""]","[""Malt Drinks (canned)""]",1,not_cooccurring,,,,,,,
+pasta,Macaroni/Spaghetti,groups,[],"[""Macaroni/Spaghetti"", ""Macaroni"", ""Spaghetti""]",0,not_cooccurring,,,,,,,
+fish_fresh_frozen_named,"Fish (kapla/tilapia, fresh or frozen)",groups,[],"[""Kapla"", ""Tilapia""]",0,not_cooccurring,,,,,,,
+rice_unprepared,Rice,groups,"[""Rice (imported)"", ""Rice (local)""]","[""Rice""]",2,gated,fine,0.18856074808935266,0.13678874487067202,1.0226123555169861,False,"{""Rice (imported)"": 1.9534547013040002, ""Rice (local)"": 1.7648939532146475}","{""Rice (imported)"": 0.13678874487067202, ""Rice (local)"": 0.3859683249671588}"
+gari,Gari,groups,"[""Gari""]","[""Gari (white)"", ""Gari (yellow)""]",1,not_cooccurring,,,,,,,
+smoked_fish_origin,Fish (smoked),groups,"[""Fish (smoked)""]","[""Fish (smoked, river)"", ""Fish (smoked, sea)""]",1,not_cooccurring,,,,,,,
+millet_sorghum,Millet/Sorghum,groups,"[""Millet"", ""Millet (flour)"", ""Guinea Corn/Sorghum""]","[""Millet/Sorghum"", ""Millet (flour)""]",3,member_unidentified,probe,,,,,"{""Millet"": 4.261471548026971, ""Guinea Corn/Sorghum"": 2.4444277713147833}","{""Millet"": 2.5456857383222573, ""Guinea Corn/Sorghum"": 1.3079903138325684}"
+palm_shea,Oil (palm)/Shea Butter,groups,"[""Oil (palm)"", ""Shea Butter""]","[""Oil (palm)/Shea Butter""]",2,gated,fine,0.47886214256457105,0.10936692754426407,3.248138958826036,False,"{""Oil (palm)"": 1.5222134475122515, ""Shea Butter"": 1.0433513049476806}","{""Oil (palm)"": 0.10936692754426407, ""Shea Butter"": 0.29322293626218154}"
+cocoa_forms,Cocoa Powder,groups,"[""Cocoa Powder""]","[""Cocoa (milk powder beverages)""]",1,not_cooccurring,,,,,,,
+goat_mutton,Goat/Mutton,groups,"[""Goat"", ""Mutton""]",[],2,gated,fine,0.44191656118946937,0.32931004835726607,0.9955094856113398,True,"{""Goat"": 1.716102227441557, ""Mutton"": 1.2741856662520876}","{""Goat"": 0.32931004835726607, ""Mutton"": 0.38021885721157167}"
+beer_pito,Beer/Pito,groups,"[""Beer"", ""Pito""]",[],2,gated,probe,8.083169045586118,1.9543530679127639,3.068235880392151,False,"{""Beer"": 10.430373057412657, ""Pito"": 2.347204011826539}","{""Beer"": 3.7043138525688133, ""Pito"": 1.9543530679127639}"
+crab_shrimp,Crab and shrimp,groups,[],"[""Crab"", ""Shrimp""]",0,not_cooccurring,,,,,,,
+bread_types,Bread (including sugar bread),groups,"[""Bread"", ""Sugar Bread""]",[],2,gated,fine,0.38089929990708027,0.14496583461152324,1.9491920077519325,False,"{""Bread"": 1.6058057700177053, ""Sugar Bread"": 1.9867050699247855}","{""Bread"": 0.1775078173546775, ""Sugar Bread"": 0.14496583461152324}"
+named_spirits,Spirits (gin/whisky/schnapps),groups,"[""Whisky"", ""Schnapps""]","[""Gin"", ""Schnapps""]",2,member_unidentified,probe,,,,,"{""Whisky"": 6.128925363372547}","{""Whisky"": 2.188812464483072}"
+tinned_milk_forms,Milk (evaporated/condensed),groups,"[""Milk (evaporated)"", ""Milk (tinned, condensed/unsweetened)""]",[],2,gated,probe,9.604964047959427,5.814338799540732,1.2254779941256406,False,"{""Milk (evaporated)"": 5.607394437495802, ""Milk (tinned, condensed/unsweetened)"": 15.212358485455228}","{""Milk (evaporated)"": 5.814338799540732, ""Milk (tinned, condensed/unsweetened)"": 20.414671324674636}"
+coconut_forms,Coconut (fresh/dried),groups,"[""Coconut (fresh)""]","[""Coconut (dried)""]",1,not_cooccurring,,,,,,,
+named_processed_fish,Fish (canned or in oil/sauce),groups,"[""Fish (canned)""]","[""Tuna (processed)"", ""Mackerel (processed)""]",1,not_cooccurring,,,,,,,
+chicken_cuts,Chicken cuts,deferred_alternatives,[],"[""Chicken (breast)"", ""Chicken (thigh)"", ""Chicken (wing)""]",0,not_cooccurring,,,,,,,
+pork_cuts,Pork cuts,deferred_alternatives,[],"[""Pork (rib)"", ""Pork (shoulder)"", ""Pork (fillet)""]",0,not_cooccurring,,,,,,,
+smoked_fish_broad,Smoked fish (all species),deferred_alternatives,"[""Fish (smoked)""]","[""Fish (smoked, river)"", ""Fish (smoked, sea)"", ""Herring (smoked)"", ""Salmon (smoked)""]",1,not_cooccurring,,,,,,,
+sausage,Sausage,deferred_alternatives,[],"[""Sausage (beef)"", ""Sausage (pork)"", ""Sausage (chicken)""]",0,not_cooccurring,,,,,,,
+dried_pepper_forms,Pepper (dried/powder),deferred_alternatives,[],"[""Pepper (dried)"", ""Pepper (powder)""]",0,not_cooccurring,,,,,,,
+millet_sorghum_grain,Millet/Sorghum (grain),deferred_alternatives,"[""Millet"", ""Guinea Corn/Sorghum""]","[""Millet/Sorghum""]",2,gated,probe,1.8170437767121879,1.4009413778888606,0.9621782504573875,True,"{""Millet"": 4.261471548026971, ""Guinea Corn/Sorghum"": 2.4444277713147833}","{""Millet"": 1.953524973762179, ""Guinea Corn/Sorghum"": 1.4009413778888606}"

@@ -26,10 +26,28 @@ LV="/local/job${SLURM_JOB_ID}/venv"
 mkdir -p "$LV"
 tar -C "$REPO/.venv.lustre" -cf - . 2>/dev/null | tar -C "$LV" -xf - 2>/dev/null
 PY="$LV/bin/python"
-"$PY" -c 'import lsms_library, yaml, pandas' || { echo "venv provisioning FAILED"; exit 1; }
+# The venv carries no editable install of this project (GH #957), so the import
+# must be told which checkout to use.  Without this the bare import below fails
+# outright -- it used to pass only via the .pth, which named the MIRROR, so this
+# job graded the clone's config against the mirror's library code.
+# PYTHONSAFEPATH makes PYTHONPATH authoritative: without it `python -m` and
+# `python <script>.py` put cwd / the script dir at sys.path[0], so the
+# `-m lsms_library.cli cache clear` below loaded the MIRROR's library while
+# the build two lines later loaded the clone's.
+export PYTHONSAFEPATH=1 PYTHONPATH="$WD"
+LSMS_COV_CODE_ROOT="$WD" "$PY" -c '
+import lsms_library, yaml, pandas, os, sys
+want = os.path.realpath(os.environ["LSMS_COV_CODE_ROOT"]).rstrip(os.sep) + os.sep
+got = os.path.realpath(lsms_library.__file__)
+if not got.startswith(want):
+    sys.exit("imported %s, expected under %s" % (got, want))
+' || { echo "venv provisioning FAILED"; exit 1; }
 
 echo "--- cache clear '$C' (authoritative) ---"
-"$PY" -m lsms_library.cli cache clear --country "$C" || echo "  (clear noop/failed)"
+# Same LSMS_COUNTRIES_ROOT as the build below: without it this line resolved
+# countries_root() from a different tree than the build it is clearing for.
+LSMS_COUNTRIES_ROOT="$WD/lsms_library/countries" \
+    "$PY" -m lsms_library.cli cache clear --country "$C" || echo "  (clear noop/failed)"
 echo "--- cold build '$C' ---"
 LSMS_COUNTRIES_ROOT="$WD/lsms_library/countries" \
     "$PY" "$WD/bench/matrix.py" --countries "$C" \

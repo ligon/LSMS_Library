@@ -31,8 +31,47 @@ cmd_update() {
         echo ">> installing into master: $*"
         "$MASTER/bin/python" -m pip install "$@" || die "pip install into master failed"
     fi
-    echo ">> sanity-check master imports"
-    "$MASTER/bin/python" -c "import lsms_library" || die "master venv does not import lsms_library — fix deps before imaging"
+    # The master must NOT carry an editable install of this project (GH #957).
+    # `poetry install` re-adds one by default, so check rather than trust: an
+    # image built from a master carrying the .pth silently re-imposes ONE
+    # checkout on every consumer of the image, on every node.
+    # ITERATE the glob and FAIL CLOSED.  `sp="$(echo .../python*/...)"` joins
+    # multiple matches with a space and leaves the literal pattern when there is
+    # none, so both cases produced a nonexistent path and the guard passed --
+    # exactly the states it exists for (a master rebuilt against a new Python
+    # minor with the old lib/python3.10 tree left behind).
+    local sp found=0
+    for sp in "$MASTER"/lib/python*/site-packages; do
+        [ -d "$sp" ] || continue
+        found=1
+        if [ -e "$sp/lsms_library.pth" ] || compgen -G "$sp/lsms_library-*.dist-info" >/dev/null; then
+            die "master carries an editable install of lsms_library in $sp.
+     That is what GH #957 removed; imaging it would re-impose ONE checkout on every
+     consumer of this image, on every node.  Remove it with:
+         rm -f  $sp/lsms_library.pth
+         rm -rf $sp/lsms_library-*.dist-info
+         rm -f  $MASTER/bin/lsms-library
+     (\`poetry install --no-root\` only SKIPS installing the root -- it does not
+     uninstall one that is already there.)"
+        fi
+    done
+    [ "$found" = 1 ] || die "no lib/python*/site-packages under $MASTER -- refusing to image an unrecognisable venv"
+    # Import check needs PYTHONPATH now, for the same reason.  Do NOT drop the
+    # check and do NOT rely on cwd: the old bare `import lsms_library` passed
+    # only because callers happened to `cd "$REPO"` first, which is the very
+    # accident GH #957 exists to remove.
+    # PYTHONSAFEPATH: without it cwd lands at sys.path[0], so running this from
+    # inside $REPO satisfies the check no matter what the venv contains -- the
+    # cwd accident GH #957 exists to remove.  sys.exit, not assert: PYTHONOPTIMIZE
+    # in the environment strips asserts and the check would silently pass.
+    echo ">> sanity-check master imports (PYTHONPATH=$REPO)"
+    LSMS_WANT_ROOT="$REPO" PYTHONSAFEPATH=1 PYTHONPATH="$REPO" "$MASTER/bin/python" -c '
+import lsms_library, os, sys
+want = os.path.realpath(os.environ["LSMS_WANT_ROOT"]).rstrip(os.sep) + os.sep
+got = os.path.realpath(lsms_library.__file__)
+if not got.startswith(want):
+    sys.exit("imported %s, expected under %s" % (got, want))
+' || die "master venv does not import lsms_library from $REPO — fix deps before imaging"
     command -v mksquashfs >/dev/null || die "mksquashfs not found"
     local tmp="$IMG.tmp.$$"
     echo ">> building image (gzip) -> $IMG"
@@ -64,8 +103,22 @@ cmd_mount() {
         echo ">> FUSE unavailable; extracting image -> $mnt (unsquashfs)"
         unsquashfs -f -d "$mnt" "$IMG" >/dev/null || die "unsquashfs failed"
     fi
+    # VERIFY FIRST, THEN REPOINT.  The old order repointed $REPO/.venv -- a
+    # symlink shared by every job using this mirror -- and only then checked the
+    # import, so a failed check left the repoint in place (and exited nonzero).
+    # Verify through the mount path directly, which needs no symlink at all.
+    LSMS_WANT_ROOT="$REPO" PYTHONSAFEPATH=1 PYTHONPATH="$REPO" "$mnt/bin/python" -c '
+import lsms_library, os, sys
+want = os.path.realpath(os.environ["LSMS_WANT_ROOT"]).rstrip(os.sep) + os.sep
+got = os.path.realpath(lsms_library.__file__)
+if not got.startswith(want):
+    sys.exit("imported %s, expected under %s" % (got, want))
+' || die "venv mounted at $mnt but import failed; $REPO/.venv left untouched"
+    # NOTE (GH #958): this symlink is per-clone state kept in a SHARED location.
+    # Two jobs on different nodes overwrite each other's value, and console
+    # scripts are shebanged through it.  Retiring it is #958's decision; until
+    # then, repointing it is at least no longer done before verification.
     ln -sfn "$mnt" "$REPO/.venv"
-    "$REPO/.venv/bin/python" -c "import lsms_library" || die "venv mounted but import failed"
     echo ">> .venv -> $mnt  (verified import OK)"
 }
 

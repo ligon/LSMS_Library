@@ -9,7 +9,21 @@ all: panel_ids.json
 # Panel IDs are constructed from raw 2018-19 and 2021-22 cover sheets.
 # See panel_ids.py for the EHCVM PanelHH-based linkage (mixed
 # explicit/implicit panel structure).
-panel_ids.json updated_ids.json: panel_ids.py mali.py
+# panel_ids.json / updated_ids.json are REVIEWED SOURCES, committed to the
+# config tree -- NOT build products (GH #914, #894).  They deliberately carry
+# no rule.  A rule here fires whenever panel_ids.py happens to be the newer
+# file, and on a pip install which of the two is newer is decided by the
+# millisecond the wheel was unpacked (measured on the real 0.13.0 wheel: 5 of
+# these 9 countries land with the script 1 ms ahead).  The recipe then writes
+# into site-packages, which on any shared install is not writable by the user
+# running the code -- PermissionError from three layers inside a `make`
+# subprocess.  Regenerating the crosswalk is a deliberate maintainer action,
+# reviewed as a diff to the committed JSON:
+#
+#     make panel-ids
+#
+.PHONY: panel-ids
+panel-ids:
 	python panel_ids.py
 
 # Wave-level plot_features (GH #167).  The framework's grab_data calls
@@ -92,6 +106,7 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py ../2014-15/_/community_
 	python community_prices.py
 
 clean:
-	rm -f panel_ids.json updated_ids.json
+	@echo "nothing to clean: panel_ids.json / updated_ids.json are committed"
+	@echo "sources, not build products (GH #914).  Regenerate: make panel-ids"
 
 .PHONY: all clean

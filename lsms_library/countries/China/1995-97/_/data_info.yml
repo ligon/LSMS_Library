@@ -92,7 +92,10 @@ plot_features:
     # S05B.DTA is the genuine per-plot farming roster: one row per
     # (household, plot), keyed by s05bpn ("PLOT NUMBER", 1..10).  3186
     # rows / 734 households.  Variable labels confirm plot-level detail:
-    #   s05b02 = "AREA OF THE PLOT"  (reported in mu; see PlotArea/AreaUnit)
+    #   s05b02 = "AREA OF THE PLOT"  (reported in mu; PlotArea() filters
+    #            the (0, 1000) mu range and DIVIDES BY 15, serving hectares
+    #            per the canonical schema -- GH #879; AreaUnit keeps 'mu'
+    #            as the provenance label of the native unit)
     #   s05b09 = "IS IT IRRIGATED?"  (1 yes / 2 no -> Irrigated bool)
     # The file carries CODES only (no Stata value labels) for the
     # categorical land-attribute questions (s05b10 quality, s05b11 type,

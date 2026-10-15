@@ -28,7 +28,7 @@ rows. `Price` is never summed. `labels=None`/`'Preferred'` is a no-op.
 
 ## The contract when a country lacks the column
 
-Only **4 of 16** food countries curate an Aggregate column. A country that
+Only **5 of 16** food countries curate an Aggregate column. A country that
 didn't **cannot honour the request** — and the behavior is deliberately
 different at the two API levels (Contract B, "loud structured degrade";
 settled 2026-06, PR #550):
@@ -62,10 +62,22 @@ degrade over a real bug.
 
 | group | countries | what they have |
 |-------|-----------|----------------|
-| ✅ have it | EthiopiaRHS, Malawi, Nigeria, Uganda | `Aggregate` / `Aggregate Label` |
+| ✅ have it | EthiopiaRHS, GhanaLSS, Malawi, Nigeria, Uganda | `Aggregate` / `Aggregate Label` |
 | ✗ EHCVM (7) | Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo | only `Original Label` |
 | ✗ wave-coded (3) | Ethiopia, Mali, Tanzania | wave columns + codes, no Aggregate |
-| ✗ no label table (2) | GhanaLSS, Nepal | none |
+| ✗ no label table (1) | Nepal | none |
+
+GhanaLSS gained its country column on 2026-09-17 (re-curated on the #935
+wave->country crosswalk; PR #937 had keyed it on the leaked wave vocabulary):
+four groups selected through the parent skill's β-spread gate
+(`SkunkWorks/aggregation/ghana_gate.py`) — `Sugar (cubed/granulated)`,
+`Malt Drinks`, `Macaroni/Spaghetti`, `Millet/Sorghum` — and the other 205
+of its 215 Preferred Labels kept as named singletons, so `labels='Aggregate'`
+maps 215 → 209. Its wave-level Aggregate columns are not live inputs to this
+API. See `SkunkWorks/aggregation/ghanalss/validation.org` for the gate
+results, the rejected candidates and the measured tradeoffs; curation does
+not itself establish a welfare precision gain. The FCT crosswalk is
+untouched.
 
 Regenerate this if unsure:
 
@@ -124,8 +136,8 @@ breaks.
 
 So, when adding the column to a batch of countries:
 
-- Diff your proposed group names against the four that already have it
-  (EthiopiaRHS/Malawi/Nigeria/Uganda) and **reuse their names** wherever the
+- Diff your proposed group names against the countries that already have it
+  (EthiopiaRHS/GhanaLSS/Malawi/Nigeria/Uganda) and **reuse their names** wherever the
   concept matches (`Maize`, `Rice`, `Beans`, `Cooking Oil`, …) rather than
   inventing a parallel label.
 - Read `SkunkWorks/cross_country_label_harmonization.org` first — the shared

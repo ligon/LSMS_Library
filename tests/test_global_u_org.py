@@ -34,13 +34,12 @@ def test_country_u_table_inherits_global_kg_additively():
 def test_global_u_does_not_define_contested_metric_canonicals():
     # Only kilogram is globally canonicalized; gram/litre/ml are deferred
     # (Layer 3), so the global table must not force them.
-    import re
-    from pathlib import Path
+    # Parse the file's TABLES rather than scanning its lines: since GH #919
+    # u.org also carries `u_kg` (canonical unit -> kilograms), and a line-based
+    # scan reads that table's numbers as if they were Preferred Labels.
+    from lsms_library.local_tools import all_dfs_from_orgfile
     from lsms_library.paths import countries_root
     u_org = countries_root().parent / "categorical_mapping" / "u.org"
-    text = u_org.read_text(encoding="utf-8")
-    table = [ln for ln in text.splitlines()
-             if ln.strip().startswith("|") and "Preferred Label" not in ln
-             and not set(ln.strip()) <= set("|-+ ")]
-    prefs = {ln.split("|")[2].strip() for ln in table}
+    tables = all_dfs_from_orgfile(u_org)
+    prefs = set(tables["u"]["Preferred Label"].dropna().astype(str).str.strip())
     assert prefs == {"Kg"}, f"global u.org should map only to Kg, got {prefs}"

@@ -48,6 +48,7 @@ Unit decode (D-units / GH #348, #453, #384):
   labels with no leading digits (leak audit clean).
 """
 import re
+import sys
 import warnings
 
 import numpy as np
@@ -56,6 +57,17 @@ import pandas as pd
 from lsms_library.local_tools import (df_from_orgfile, get_categorical_mapping,
                                        get_dataframe, format_id, _to_numeric,
                                        to_parquet)
+
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern).  Deliberately not `from lsms_library.countries.GhanaLSS._.ghanalss
+# import ...`: that absolute PACKAGE import binds to whichever `lsms_library`
+# won sys.path rather than to the config tree LSMS_COUNTRIES_ROOT selects
+# (GH #948 / #436; CONTENTS.org Trap 6).  `../../_` is correct from this
+# script's own directory, which is where the Makefile runs it
+# (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
+# in this file already assumes.
+sys.path.append('../../_')
+from ghanalss import derive_produced_farmgate_value, to_country_food_labels
 
 t = '2016-17'
 
@@ -239,5 +251,31 @@ df = df.groupby(idx, dropna=False)[value_cols].sum(min_count=1)
 
 df = df.dropna(how='all')
 
+# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
+# Section 8H reports a quantity and a farmgate price but never a total, so the
+# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
+# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
+#
+# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
+# SUMs the additive measures and re-derives Price, so a string must not reach
+# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
+# either keeps Expenditure NaN and carries NO key, so the labelled rows are
+# exactly the computed ones.
+DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
+_prod = (df.index.get_level_values('s') == 'produced')
+_both = (_prod
+         & pd.to_numeric(df['Quantity'], errors='coerce').notna().to_numpy()
+         & pd.to_numeric(df['Price'], errors='coerce').notna().to_numpy())
+_kept = pd.to_numeric(df['Expenditure'], errors='coerce').to_numpy(dtype=float)
+_qp = derive_produced_farmgate_value(df['Quantity'], df['Price'])
+df['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+df['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                index=df.index, dtype='string')
+assert df.loc[~_both, 'Derivation'].isna().all(), (
+    'a row with no computed value carries the 8h-farmgate key')
+
 if __name__ == '__main__':
+    # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+    # Pure rename; an unmapped label raises rather than passing through.
+    df = to_country_food_labels(df, '2016-17')
     to_parquet(df, 'food_acquired.parquet')

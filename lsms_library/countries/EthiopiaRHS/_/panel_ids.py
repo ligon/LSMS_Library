@@ -29,6 +29,7 @@ No household-split variable exists in ERHS (attrition is person-level
 in the roster, not an id change) -> updated_ids.json is empty.
 """
 import json
+from pathlib import Path as _Path
 
 import pandas as pd
 
@@ -82,11 +83,18 @@ for _, r in hh97.iterrows():
     if cur in r1_3_ids:                # household carried from 1995
         D[f'1997,{cur}'] = f'1995,{cur}'
 
-with open('panel_ids.json', 'w') as f:
+# GH #914: write beside THIS script, never into the process's cwd.  These two
+# files are committed sources; `make panel-ids` regenerates them in place for a
+# maintainer to review as a diff.  Resolving off __file__ means a maintainer who
+# runs the script from somewhere other than `_/` updates the tracked files
+# rather than scattering copies.
+_HERE = _Path(__file__).resolve().parent
+
+with open(_HERE / 'panel_ids.json', 'w') as f:
     json.dump(D, f)
 
 # No household-split tracking in ERHS.
-with open('updated_ids.json', 'w') as f:
+with open(_HERE / 'updated_ids.json', 'w') as f:
     json.dump({}, f)
 
 print(f'panel_ids.json: {len(D)} edges '

@@ -135,8 +135,11 @@ plot_features:
     # Section 8B (Agricultural land) is a clean per-plot roster: one row per
     # (household, farm).  s8bq3 = "Farm number" -> plot_id.  hid is already
     # the canonical clust/nh composite, matching household_roster's i.
-    # s8bq4a/s8bq4b = farm size + unit; s8bq8 = how the land was obtained
-    # (mapped to the canonical Tenure vocabulary).  NB Section 10 in GLSS7
+    # s8bq4a/s8bq4b = farm size + unit; Area is converted per-row to
+    # HECTARES on AreaUnit by the ghanalss.plot_features df_edit hook
+    # (canonical schema, GH #879; GSS producer factors from GhanaSPS
+    # 2009-10).  s8bq8 = how the land was obtained (mapped to the canonical
+    # Tenure vocabulary).  NB Section 10 in GLSS7
     # is non-farm ENTERPRISES, not plots.
     file: g7sec8b.dta
     idxvars:

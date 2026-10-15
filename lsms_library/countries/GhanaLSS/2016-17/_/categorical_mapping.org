@@ -49,8 +49,8 @@
 | White Oats                    | White Oats                    |      49 | Other oats                                           |         |                                |
 | Cassava (dried)               | Cassava                       |      53 | Cassava - Kokonte                                    |         |                                |
 | Cassava (dough)               | Cassava                       |      54 | Cassava dough                                        |      12 | 12. Cassava(other forms)       |
-| Cassava (yellow, flour)       | Cassava                       |      55 | Yellow gari                                          |      11 | 11. Cassava-gari               |
-| Cassava (white, flour)        | Cassava                       |      56 | White gari                                           |         |                                |
+| Gari (yellow)                 | Gari (yellow)                 |      55 | Yellow gari                                          |      11 | 11. Cassava-gari               |
+| Gari (white)                  | Gari (white)                  |      56 | White gari                                           |         |                                |
 | Sugar Bread                   | Bread                         |      58 | Sugar bread                                          |         |                                |
 | Bread                         | Bread                         |      59 | Whole wheat bread                                    |         |                                |
 | Bread                         | Bread                         |      60 | Butter bread                                         |         |                                |
@@ -88,7 +88,7 @@
 | Pork (fillet)                 | Pork                          |     108 | pork , fillet                                        |         |                                |
 | Pork (feet)                   | Pork                          |     109 | Pork feet                                            |         |                                |
 | Pork                          | Pork                          |     110 | Other pork meat                                      |         |                                |
-| Goat                          | Goat                          |     115 | mutton mixed cut                                     |      68 | 68. Mutton                     |
+| Mutton                        | Mutton                        |     115 | mutton mixed cut                                     |      68 | 68. Mutton                     |
 | Goat                          | Goat                          |     116 | Goat , live                                          |      70 | 70. Goat                       |
 | Goat                          | Goat                          |     117 | Goat meat                                            |         |                                |
 | Chicken (live)                | Chicken                       |     118 | Local breed                                          |      63 | 63. Chicken                    |
@@ -274,8 +274,8 @@
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     554 | Bournvita                                            |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     555 | Cow bell (coffee, choco etc.)                        |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     556 | This way chocolate drink                             |         |                                |
-| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     557 | Country milk                                         |         |                                |
-| Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     558 | Ideal                                                |         |                                |
+| Milk (fresh)                  | Milk (fresh)                  |     557 | Country milk                                         |         |                                |
+| Milk (evaporated)             | Milk (evaporated)             |     558 | Ideal                                                |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     559 | Milo                                                 |         |                                |
 | Cocoa (milk powder beverages) | Cocoa (milk powder beverages) |     560 | Richoco                                              |         |                                |
 | Other Beverages               | Other Beverages               |     561 | Other beverage drinks                                |      92 | 92. Non-alcoholic beverages    |
@@ -323,7 +323,7 @@
 | Beer                          | Beer                          |     635 | National beer (star/club)                            |         |                                |
 | Beer                          | Beer                          |     636 | Dark beer (e.g. Guilder, Guinness)                   |         |                                |
 | Beer                          | Beer                          |     637 | Beer (Imported)                                      |         |                                |
-| Beer                          | Beer                          |     638 | Traditional beer (Pito)                              |         |                                |
+| Pito                          | Pito                          |     638 | Traditional beer (Pito)                              |         |                                |
 | Other Alcoholic Beverages     | Other Alcoholic Beverages     |         |                                                      |      91 | 91. Alcoholic beverages        |
 | Cigarette                     | Tobacco                       |     645 | Cigarette                                            |         |                                |
 | Tobacco                       | Tobacco                       |     646 | Tobacco (processed)                                  |         |                                |
@@ -686,7 +686,7 @@ cluster/region pairs) -- kept native, told apart by =obs=.
 | 24   | WHITE OATS                     | White Oats                              | yes  |      |       |                                                                                 |
 | 25   | CASSAVA - KOKONTE              | Cassava (dried)                         | yes  |      |       |                                                                                 |
 | 26   | CASSAVA DOUGH                  | Cassava (dough)                         | yes  |      |       |                                                                                 |
-| 27   | CASSAVA - GARI                 | Cassava (yellow, flour)                 | yes  |      |       | unqualified gari; the axis places Code_8h "Cassava-gari" under the yellow label |
+| 27   | CASSAVA - GARI                 | Gari (yellow)                           | yes  |      |       | unqualified gari; the axis places Code_8h "Cassava-gari" under the yellow label |
 | 28   | SUGAR BREAD                    | Sugar Bread                             | yes  |      |       |                                                                                 |
 | 29   | WHOLE WHEAT BREAD              | Bread                                   | yes  |      |       |                                                                                 |
 | 30   | BUTTER BREAD                   | Bread                                   | yes  |      |       |                                                                                 |

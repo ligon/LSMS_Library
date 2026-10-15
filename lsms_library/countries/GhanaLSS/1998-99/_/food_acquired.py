@@ -13,7 +13,9 @@ modules into the `s` (source) index level:
 - s='produced'   : Section 8H (SEC8H.DTA).  Records produced QUANTITY
   (s8hq3..s8hq8 = the same 2nd..7th visits) in a native unit (s8hq9) plus a unit price
   (s8hq10).  We emit Quantity, the native u, and Price; Expenditure is
-  left NaN (no produced value is recorded).
+  DERIVED as Quantity * Price (key
+  8h-farmgate) -- the survey records no total, so the value is a
+  construction, not an answer.
 
 The household id `i` is built with the SAME construction sample() and
 household_roster() use (the wave mapping.py `i()` helper:
@@ -21,10 +23,27 @@ format_id(clust)+format_id(nh, zeropadding=2), NO separator) so the keys
 match and the framework's _join_v_from_sample() finds them.  `v` is NOT
 emitted -- the framework joins it at API time.
 """
+import sys
 from lsms_library.local_tools import to_parquet, get_dataframe, df_from_orgfile, format_id
 from lsms_library.paths import countries_root
 import numpy as np
 import pandas as pd
+
+# The country's own helpers, imported RELATIVE to this script (the house
+# pattern -- 1987-88 and 1988-89 do the same).  Deliberately not
+# `from lsms_library.countries.GhanaLSS._.ghanalss import ...`: that is an
+# absolute PACKAGE import, so it binds to whichever `lsms_library` happens to
+# be imported rather than to the config tree `LSMS_COUNTRIES_ROOT` selects --
+# Trap 6's disease, which would silently verify a future change to
+# `reduce_duplicate_food_rows` against the installed package's copy.  It also
+# resolves only through PEP 420 namespace packages (there is no `__init__.py`
+# under `countries/` or `GhanaLSS/_/`) and cannot survive a zipped import.
+# `../../_` is correct from this script's own directory, which is where the
+# Makefile runs it (`cd $(@D) && python food_acquired.py`) and which every
+# `../Data/...` read in this file already assumes.
+sys.path.append('../../_')
+from ghanalss import (reduce_duplicate_food_rows, derive_produced_farmgate_value,
+                      to_country_food_labels, reconcile_after_crosswalk)
 
 t = '1998-99'
 
@@ -104,9 +123,33 @@ prod_long = prod.melt(id_vars=['i', 'j', 'u', 'Price'],
                       var_name='visit', value_name='Quantity')
 prod_long['Quantity'] = prod_long['Quantity'].replace({'': np.nan, 0: np.nan})
 prod_long = prod_long.dropna(subset=['Quantity'])
-# Sum duplicate (i, j, u, visit) quantity records; carry the price (first).
-prod_long = prod_long.groupby(['i', 'j', 'u', 'visit'], as_index=False).agg(
-    Quantity=('Quantity', 'sum'), Price=('Price', 'first'))
+# Reduce duplicate (i, j, u, visit) records with the country's NAMED reducer:
+# `Quantity` SUMS and `Price` becomes the QUANTITY-WEIGHTED MEAN (GH #936).
+#
+# This groupby used to carry `Price=('Price', 'first')`, which is GH #323's
+# hazard and the reduction #871 removed from core -- and it was LIVE, not
+# latent: this wave's own `harmonize_food` maps three `Code_8h` codes onto the
+# single Preferred Label `Other Meat`, and `j` is assigned from that map above.
+# Measured on the 8H path: 98,504 melted produced rows -> 98,497 groups, i.e.
+# 7 duplicate groups (14 rows), every one of them `j='Other Meat'`, 6 of them
+# with DISAGREEING farmgate prices.  ('437210', 'Other Meat', 'All', visit 7)
+# held two rows priced 5,000 and 4,000 at one unit each; `first` served
+# Quantity=2 at Price=5,000, so the derived Expenditure = Q*P was 10,000 where
+# sum(q*p) is 9,000.  The weighted mean is the price OF THE HARMONISED
+# COMMODITY and makes Q*P == sum(q*p) hold exactly across the merge, which is
+# what this wave's 8h-farmgate derivation needs.
+#
+# The explicit `dropna(subset=['u'])` PRESERVES today's behaviour and makes it
+# visible: `groupby` defaults to `dropna=True`, so the old call silently
+# deleted the 22 melted rows whose unit code did not decode (GH #323 s3b's
+# disease inside a wave script), while `reduce_duplicate_food_rows` passes
+# `dropna=False` and would carry them through to a delivered `u` of 'nan'.
+# Deleting them here is not a fix -- a sentinel like Niger's 'Unknown' (#842)
+# is the country decision, and it is out of #936's scope.  See CONTENTS.org.
+prod_long = prod_long.dropna(subset=['u'])
+prod_long = reduce_duplicate_food_rows(prod_long, ['i', 'j', 'u', 'visit'])
+assert not prod_long.duplicated(['i', 'j', 'u', 'visit']).any(), (
+    'reduce_duplicate_food_rows left duplicates on (i, j, u, visit)')
 prod_long['s'] = 'produced'
 prod_long['Expenditure'] = np.nan
 
@@ -160,4 +203,33 @@ assert not fa.index.duplicated().any(), (
     'spellings share a Preferred Label for one (household, item, visit); '
     'resolve it here, not in core (CONTENTS.org Trap 9)')
 
+# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
+# Section 8H reports a quantity and a farmgate price but never a total, so the
+# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
+# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
+#
+# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
+# SUMs the additive measures and re-derives Price, so a string must not reach
+# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
+# either keeps Expenditure NaN and carries NO key, so the labelled rows are
+# exactly the computed ones.
+DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
+_prod = (fa.index.get_level_values('s') == 'produced')
+_both = (_prod
+         & pd.to_numeric(fa['Quantity'], errors='coerce').notna().to_numpy()
+         & pd.to_numeric(fa['Price'], errors='coerce').notna().to_numpy())
+_kept = pd.to_numeric(fa['Expenditure'], errors='coerce').to_numpy(dtype=float)
+_qp = derive_produced_farmgate_value(fa['Quantity'], fa['Price'])
+fa['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+fa['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                index=fa.index, dtype='string')
+assert fa.loc[~_both, 'Derivation'].isna().all(), (
+    'a row with no computed value carries the 8h-farmgate key')
+
+# Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+# Pure rename; an unmapped label raises rather than passing through.
+fa = to_country_food_labels(fa, '1998-99')
+# guinea corn + sorghum are one crop on two 8h lines -> one j; reduce
+# here, on the canonical grain, not in core (Trap 9).
+fa = reconcile_after_crosswalk(fa)
 to_parquet(fa, 'food_acquired.parquet')

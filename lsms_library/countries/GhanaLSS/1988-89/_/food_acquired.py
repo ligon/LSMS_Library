@@ -50,7 +50,7 @@ import pandas as pd
 sys.path.append('../../_')          # ghanalss.py (country-level helpers)
 sys.path.append('.')                # mapping.py  (this wave's i() helper)
 import mapping
-from ghanalss import derive_12b_fortnight_value
+from ghanalss import derive_12b_fortnight_value, to_country_food_labels
 from lsms_library.local_tools import (df_from_orgfile, format_id, get_dataframe,
                                       to_parquet)
 
@@ -171,4 +171,7 @@ produced_mask = f.index.get_level_values('s') == 'produced'
 f['Derivation'] = pd.Series(np.where(produced_mask, DERIVATION_12B, None),
                             index=f.index, dtype='string')
 
+# Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
+# Pure rename; an unmapped label raises rather than passing through.
+f = to_country_food_labels(f, '1988-89')
 to_parquet(f, 'food_acquired.parquet')

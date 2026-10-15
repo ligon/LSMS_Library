@@ -1,0 +1,232 @@
+#+title: GhanaLSS label-table fixes -- what landed (steps 1-4)
+#+date: [2026-09-16]
+
+Steps 1-4 of the revised plan in =TABLE_AUDIT.org=.  Step 5 (designing
+=Aggregate Label=) deliberately NOT done.
+
+* Verification (post-rebuild, all seven waves rebuilt from source)
+
+| check                                         | result                |
+|-----------------------------------------------+-----------------------|
+| served =j= not a country Preferred Label      | *0* (was 45 of 225)   |
+| duplicate index tuples in =food_acquired=     | *0*                   |
+| Expenditure per wave, before vs after         | *identical, all 7*    |
+| distinct =j= vs country Preferred Labels      | *215 = 215* bijection |
+| =tests/test_ghanalss_food_label_canonical.py= | *32 passed*           |
+
+Row counts *rose*: =food_acquired= 5,338,617 -> 5,340,706 (+2,089),
+=food_expenditures= 1,404,564 -> 1,406,068.  That is the un-merging of rows
+previously conflated under one label (mutton under =Goat=, pito under
+=Wine=/=Beer=); expenditure is unchanged to the cent, which is what makes it a
+recovery of detail rather than a change of content.
+
+* What changed
+
+** Lcp is applied (the crosswalk now runs)
+
+=ghanalss.to_country_food_labels(df, wave)= maps a wave's own =harmonize_food=
+Preferred Label onto the country one, called from all seven
+=_/food_acquired.py= scripts just before =to_parquet=.  Pure rename; an
+unmapped label *raises* rather than passing through, because a silent
+pass-through is the defect being replaced.
+
+** The seven splits (@ligon)
+
+=Rice= -> =Rice= / =Rice (imported)= / =Rice (local)=; likewise
+=Fish (smoked)=, =Sugar=, =Cocoa Powder=, =Macaroni/Spaghetti=,
+=Potato/Sweet Potato=, and the gari family below.
+
+** Label defects fixed
+
+| fix | evidence |
+|-----+----------|
+| =Cocoyam Leaves= 1998-99 cell held =Coffee=; moved to the =Coffee= row | 8,935 rows were being served FCT 04_009 (cocoyam) instead of 12_009 (coffee) |
+| =Cola Nut= merged into =Kola Nut= (K spelling, @ligon) | one food, two PLs, disjoint waves, 19,076 rows |
+| =Cassava (flour)= renamed *=Gari=*; 2016-17 split =Gari (white)= / =Gari (yellow)= | the raw labels are =Garri=/=Gari=/=White gari=/=Yellow gari= in *every* wave -- there is no cassava-flour item in GLSS at all.  FCT corrected 02_004 ("Cassava, flour") -> *02_039* ("... white gari") |
+| =Mutton= split out of =Goat= | the survey lists mutton and goat *separately* in 91/98/05/12/16 and the harmonization merged them; 87/88 have only =Mutton= and were being served as =Goat= |
+| =Pito= given its own PL (@ligon: keep distinct from beer) | pito was =Beer= in 91/98/16 and =Wine= in 05/12 -- inconsistent three ways |
+| 2016-17 code 558 =Ideal= -> =Milk (evaporated)= | in Tins its median unit price is *3.00*, identical to code 301 =Ideal= evaporated, against Milo 12.00 and cocoa powder 13.50; in Satchets 1.00, identical to code 202 =Ideal (sachet)= |
+| =Sweet Potato= given FCT *02_022*, and GLSS1/2's =Potato or sweet potato= folded into it | was inheriting =Potato, raw= (02_009) from the collapse; see "Still open" item 2, resolved |
+| =Milk (evaporated)= 1987-88 dead reference removed | no 1987-88 row produces it |
+
+** Gaps filled
+
+Six new rows (=Sugar Bread=, =Oil (vegetable)= FCT 11_010, =Pizza=, =Khebabs=,
+=Tuo Zaafi=, =Fried Plantain and Beans= -- the last spelled correctly, with the
+wave's own typo =Fried Plantian and Beans= kept in the 2016-17 cell, which is
+what the per-wave columns are for), seven blank cells, plus new rows for
+=Mutton=, =Pito=.
+
+** The new invariant
+
+=TestVocabulary.test_country_column_is_a_bijection_onto_the_wave_axis= --
+config-only, per wave: no wave label missing from the country column, no dead
+reference, no ambiguous entry.  =TestDelivered= moved up a rung: delivered =j=
+must now be a *country* Preferred Label.  The old wave-axis assertion was the
+right invariant on =Lw=; it could never have caught this.
+
+* Still open, for decision
+
+1. *RESOLVED (@ligon, 2026-09-16): GLSS1/2's conflated cereal is
+   =Millet/Sorghum=.*  The raw label is =Millet, guinea corn or sorghua (grain
+   or flour)= and the Preferred Label said only =Millet= -- the =Goat=/mutton
+   pattern.  Confirmed it is an EARLY-ROUNDS-ONLY item: from GLSS3 the
+   instrument asks =Millet=, =Millet flour= and =Guinea corn/sorghum=
+   separately, so =Millet= silently changed meaning at GLSS3 for anyone using
+   it as a panel.
+
+   Named =Millet/Sorghum= rather than a three-way compound because *guinea corn
+   and sorghum are the same crop* (@ligon), and millet is a close consumption
+   substitute the questionnaire designers evidently grouped with it.  Done at
+   the WAVE level (@ligon) -- both 87/88 tables now say =Millet/Sorghum= -- with
+   a matching country row.
+
+   Measured: =Millet/Sorghum= *884 rows* (453 + 431), 87/88 only, 721 produced
+   + 163 purchased; =Millet= is now *13,094 rows over 91-16 only* and means
+   millet in every wave it appears.  FCT kept at =01_095= (pearl millet):
+   sorghum is =01_039= and the two are close (370 vs 345 kcal, 8.3 vs 11.5 g
+   protein), so carrying millet's values for the mixture beats blanking it and
+   dropping 884 rows out of =nutrition= entirely.
+
+   *The GLSS1/2 PRICE survey is finer than its expenditure module* and prices
+   millet separately (item 4).  Since the 87/88 food axis no longer names plain
+   millet, that item is re-flagged =Food: own= -- which per =CONTENTS.org:3357=
+   means exactly "the axis does not name this food", and is now a true
+   statement -- mirroring item 3 (=Guinea Corn=), which the original curator had
+   already flagged =own= for the same reason.
+2. *RESOLVED (@ligon, 2026-09-16): =Potato/Sweet Potato= folded into
+   =Sweet Potato=.*  GLSS1/2 ask one question, =Potato or sweet potato=, so the
+   compound label was the INSTRUMENT's conflation faithfully recorded, not ours
+   (=Macaroni and Spaghetti= is the same shape and is untouched).  But a
+   randomly drawn Ghanaian potato is far more likely to be a sweet potato than
+   an Irish one, so the honest reading of that item is sweet potato: the ruling
+   is a judgement about Ghana, not about the instrument, and it is recorded
+   here as such rather than inferred from the label.
+
+   Done at the COUNTRY level, which is what the crosswalk is for -- the 87/88
+   wave tables still say =Potato/Sweet Potato=, and the country table's 1987-88
+   and 1988-89 cells carry that spelling against Preferred Label
+   =Sweet Potato=.  FCT follows the label: *02_022* (sweet potato, pale flesh)
+   rather than 02_009 (=Potato, raw=).
+
+   Measured: =Sweet Potato= 1,759 -> *2,202* rows (= 1,759 + the 443 formerly
+   under =Potato/Sweet Potato=), now spanning *all seven waves*, and it gains a
+   purchase series it did not have -- 91-16 are entirely own-production
+   (1,982), the 87/88 rows are purchased (220).  =Potato= keeps 02_009 and
+   stays 2016-17-only (484 rows), which is the genuine Irish-potato item.
+   Country Preferred Labels 215 -> 214; bijection, 0 off-axis, 0 duplicates and
+   Expenditure per wave all still hold; 32 tests pass.
+3. *RESOLVED (@ligon, 2026-09-16): =557 'Country milk'= -> =Milk (fresh)=.*
+   Ghana's "Country milk" (branded Countre Dairy) is a bottled, shelf-stable
+   UHT milk drink imported from Belgium -- so it is liquid milk, not a cocoa
+   beverage.  =Milk (fresh)= is the liquid-milk label on the 2016-17 axis and
+   carries FCT *10_029* ("Milk, cow, whole, raw, 4.5% fat"), which is what UHT
+   milk is nutritionally.  Note =Other Milk Products= would have been wrong:
+   its FCT is 10_028, *cheese*.  Delivered: =Milk (fresh)= now 7,270 rows
+   including 746 in 2016-17.
+
+   This is the fact the price probe could not supply -- n=52 at unit =Single=
+   was suggestive of milk but never decisive, and it was correctly left
+   =unsure= rather than guessed.
+4. *RESOLVED (@ligon, 2026-09-16): =Margarine/Butter= where the instrument
+   conflates them, =Margarine= where it does not.*  Unlike potato and millet
+   this is *non-monotonic* -- the instrument went back and forth, so no
+   "early rounds are coarser" rule works and it had to be settled per wave:
+
+   | wave | raw label | margarine alone? | rows |
+   |------+-----------+------------------+------|
+   | 87-88, 88-89 | =Butter, margarine= | no | 275, 217 |
+   | 91-92, 98-99 | =Margarine= | *yes* | 577, 835 |
+   | 05-06, 12-13 | =margarine/butter= | no | 1,114, 1,887 |
+   | 16-17 | =Margarine= | *yes* | 353 |
+
+   91/98 corroborate themselves: those waves put dairy butter explicitly
+   elsewhere, in =Other milk products (Including butter & cheese)= (code 70),
+   so code 33 =Margarine= is not quietly carrying it.  Delivered:
+   =Margarine= *1,765* rows (91/98/16), =Margarine/Butter= *3,493*
+   (87/88/05/12).  FCT stays *11_006*: margarine 728 kcal / 937 ug vitamin A
+   against butter 739 / 838, close on everything.
+
+6. *NEW, found while checking margarine: GLSS1/2 also fold SHEA BUTTER into
+   PALM OIL.*  Code 329 is =Palm oil and shea butter= -> =Oil (palm)=; from
+   GLSS3 =Shea Butter= is its own item and a large one (*36,058* rows against
+   =Oil (palm)='s 88,800).  Same meaning-shift, bigger item, and north/south
+   consumption differs sharply.  Split as =Oil (palm)/Shea Butter= (87/88,
+   *4,239* rows); =Oil (palm)= is now clean over 91-16 (*88,800*).
+
+   *Its FCT is deliberately BLANK, unlike the other composites.*  Energy would
+   have justified keeping palm oil's 11_004 (898 vs shea butter's 900 kcal),
+   but *vitamin A is 5,720 ug against 0* -- and vitamin A is precisely what
+   this food group is read for in Ghana.  Carrying 11_004 would assert 5,720
+   for a mixture roughly a quarter of which has none, invisibly; the repo's
+   own rule for Vitamin K applies ("omitted, NOT zero-filled -- a zero would
+   assert these foods contain none").  Cost: those 4,239 rows drop out of
+   =nutrition=.  Reversible if someone would rather have approximate energy
+   than no row.
+
+7. *The GLSS1/2 and GLSS5/6 price surveys are again FINER than their
+   expenditure modules*, as with millet.  Price items =Palm oil= (87/88,
+   weighed, median 0.79 kg) and =margarine (canned, sachet)= (12-13) name the
+   specific good, so they are re-flagged =Food: own= with a note -- true, since
+   those axes no longer name it.  *Three separate times now the
+   =test_price_items_share_the_food_vocabulary= guard has caught a rename
+   before it shipped*; it is the most valuable test in this file.
+
+5. *RESOLVED (@ligon, 2026-09-16): guinea corn + sorghum reconciled with a
+   named reducer.*  In 91/98 ONLY, purchased and produced sorghum sat under
+   DIFFERENT labels.  =Guinea corn/sorghum= is =Code_9b=1= (purchase side, =Code_8h=
+   empty), while =Sorghum= (=Code_8h=4=) and =Guinea Corn= (=Code_8h=7=) are
+   own-production.  From GLSS5 on the instrument puts =9b=1= and =8h=4= on ONE
+   row, so the later waves already do it right.  Since guinea corn IS sorghum,
+   those two waves serve one crop under three labels, split by module:
+   purchased 765 rows, produced 5,948 + 207.
+
+   *Not a free rename*: 115 colliding keys (80 in 1991-92, 35 in 1998-99) --
+   households that filed both own-production lines -- 58 of them disagreeing on
+   Price.  Resolved with =ghanalss.reduce_duplicate_food_rows= (Quantity SUMS,
+   Price becomes the QUANTITY-WEIGHTED MEAN, the =Goat= precedent at
+   =CONTENTS.org:3280=), called through =reconcile_after_crosswalk=.
+
+   *WHERE the reduction happens was the whole design question, and the first
+   answer was wrong.*  The merge was first done by renaming the two 8h
+   Preferred Labels in the WAVE tables, which forced =Price= into the
+   pre-unstack groupby key so two farmgate prices would not be summed -- and
+   that restructure perturbed 1991-92's row count by *+637 for reasons having
+   nothing to do with sorghum* (it also silently resurrected 262 rows with a NA
+   =u= that the old =dropna=True= had dropped).  Backed out.
+
+   The merge now happens at *Lcp*: the wave tables keep =Sorghum= and
+   =Guinea Corn= as their own labels -- those really are two lines on that
+   questionnaire and rewriting a round's vocabulary is not ours to do -- and
+   the country table's per-wave columns map both onto Preferred Label
+   =Guinea Corn/Sorghum=, which is exactly what those columns are for.  The
+   reducer then runs once, after the crosswalk, on the canonical grain.  The
+   wave pipeline is untouched.
+
+   Measured against a rebuild of the TRUE prior state (not an assumed
+   baseline): 1991-92 *682,627 -> 682,547*, exactly *-80*, matching the 80
+   collisions measured in that wave; corpus *-100* rows total; Expenditure
+   identical per wave in all seven, which is what the quantity-weighted mean
+   guarantees (Q*P = sum(q*p)).
+
+   A =min_count=1= bug in the first version of the reducer turned all-NA groups
+   into recorded zeros and added *+32,040 phantom rows*; caught before commit
+   by the row count, not by a test.
+
+* Remaining =.first()= reducers in GhanaLSS wave scripts (2026-09-16)
+
+@ligon asked whether these had all been dealt with.  *GH #871 fixed CORE* --
+=most_complete_row= replaced =groupby().first()= at all three core collapse
+sites -- and closed 2026-09-12.  It did not touch country wave scripts, and
+=CLAUDE.md='s own rule is that a reducer belongs in the wave script, so a
+script-level =.first()= was never in its scope.  What remains here:
+
+- =1998-99/_/food_acquired.py:110= -- =Price=('Price','first')= on
+  =(i, j, u, visit)=.  A latent hazard only: it fires when that groupby sees a
+  duplicate, and with the sorghum merge now happening AFTER Lcp it sees none.
+  Not changed, so this commit does only what it claims.
+- =2005-06/_/food_acquired.py:172= -- =_pf=('Price','first')= is the deliberate
+  divide-by-zero fallback INSIDE that wave's own weighted-mean reducer, i.e.
+  the correct pattern, not a defect.
+
+The mirror is up to date: =origin/development= is =6666e0fea=, 0 commits behind.

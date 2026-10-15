@@ -15,9 +15,10 @@ a1 and a2 alone).  We therefore tag plot_id with the tenure flavour
 preserving the per-plot identity.
 
 Per-subsection canonical columns:
-  Area       q3  (numeric; unit not in the data -- TLSS records land in
-                  sotka = 1/100 ha = 100 m^2, the standard Tajik unit ->
-                  AreaUnit hardcoded to 'sotka')
+  Area       q3  converted to HECTARES (canonical unit; GH #879).  TLSS
+                  records land in sotka = 1/100 ha = 100 m^2, the standard
+                  Tajik unit -> Area = q3 / 100, and AreaUnit is hardcoded
+                  to 'sotka' as the PROVENANCE label of the native unit.
   SoilType   q4  (land kind: ANNUAL CROP LAND / TREE CROP LAND / PASTURE ...)
   Irrigated  q6 (a1, a2) / q5 (a3)   Yes/No -> bool
   Tenure         the subsection itself
@@ -44,7 +45,10 @@ def _subsection(fn, tenure, area, soil, irrig, title=None):
     # tenure-tagged plot identity (plotcode restarts per subsection)
     out['plot_id'] = tenure + '-' + df['plotcode'].astype('Int64').astype(str)
 
-    out['Area'] = pd.to_numeric(df[area], errors='coerce').astype(float)
+    # Canonical schema: Area in HECTARES, AreaUnit the provenance label of
+    # the original native unit (lsms_library/data_info.yml, GH #879).
+    # TLSS records land in sotka = 1/100 ha, so divide by 100.
+    out['Area'] = pd.to_numeric(df[area], errors='coerce').astype(float) / 100.0
     out['AreaUnit'] = AREA_UNIT
     out['Tenure'] = tenure
     out['TenureSystem'] = (

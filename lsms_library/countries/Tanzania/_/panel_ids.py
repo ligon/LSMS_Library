@@ -11,6 +11,7 @@ Tanzania needs bespoke handling:
 3. 2020-21 links to 2014-15 (refresh panel), not to 2019-20 (extended panel).
 """
 import json
+from pathlib import Path as _Path
 import sys
 import pandas as pd
 
@@ -80,9 +81,16 @@ for wave in sorted_waves:
 
 # --- Phase 3: Write JSON outputs ---
 
-with open('panel_ids.json', 'w') as f:
+# GH #914: write beside THIS script, never into the process's cwd.  These two
+# files are committed sources; `make panel-ids` regenerates them in place for a
+# maintainer to review as a diff.  Resolving off __file__ means a maintainer who
+# runs the script from somewhere other than `_/` updates the tracked files
+# rather than scattering copies.
+_HERE = _Path(__file__).resolve().parent
+
+with open(_HERE / 'panel_ids.json', 'w') as f:
     json_ready = {','.join(k): ','.join(v) for k, v in recursive_D.data.items()}
     json.dump(json_ready, f)
 
-with open('updated_ids.json', 'w') as f:
+with open(_HERE / 'updated_ids.json', 'w') as f:
     json.dump(updated_ids, f)

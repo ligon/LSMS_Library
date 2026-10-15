@@ -854,70 +854,81 @@ via _canon_unit.  W3-W5 record the unit per row; W1/W2 carry NO unit column
 fixed C8 unit (_W1W2_PRICE_UNIT).  All 30 units used already exist in `u`
 (no extension needed).
 
-*** The C8 SIZE field is recorded by the survey and NOT read by the build
+*** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 
 Found 2026-09-08 while comparing =community_prices= against the household
-unit value.  The post-harvest community form has *three* price columns, not
-two: the W4 questionnaire prints "2. PLEASE USE A QUANTITY OF ONE (1) FOR
-[ITEM] AND THE UNIT OF MEASURE YOU ARE USING" over a pair of sub-columns
-headed *UNIT OF MEASURE* and *SIZE*, then "3. What is the price for the
-item?" in NAIRA (=ph_w4_community_quest.pdf=, C8, p. 13).  The data carry
-the SIZE:
+unit value; fixed 2026-09-13 (GH #834).  The post-harvest community form
+has *three* price columns, not two: the W4 questionnaire prints "2. PLEASE
+USE A QUANTITY OF ONE (1) FOR [ITEM] AND THE UNIT OF MEASURE YOU ARE USING"
+over a pair of sub-columns headed *UNIT OF MEASURE* and *SIZE*, then "3.
+What is the price for the item?" in NAIRA (=ph_w4_community_quest.pdf=,
+C8, p. 13).  The data carry the SIZE:
 
 | wave   | unit column | size / quantity column(s)             | read by the build? |
 |--------+-------------+---------------------------------------+--------------------|
 | W1, W2 | *none*      | *none* (unit printed per item on form)  | n/a                |
-| W3     | =c8q2= (size baked into the label, e.g. "Heap Small") | =c8q2b= free text ('250g', '75cl', 'wrap') | =c8q2= only, size stripped by =_canon_unit= |
-| W4     | =c8q2= ("90. HEAP")  | =c8q2c= coded ("0. SMALL", "34. 250 GRAMS") | *NO* |
-| W5     | =c8aq2_b=   | =c8aq2_a= (quantity), =c8aq2_c= (size), =c8aq2_cvn= (kg/l factor) | *NO* |
+| W3     | =c8q2= (size baked into the label, e.g. "Heap Small") | =c8q2b= free text ('250g', '75cl', 'wrap') | =c8q2b= parsed since #834 -- but it is BLANK on 13,767 of 13,768 metric-unit rows, so W3's g/cl rows are now DROPPED (only the one '50cl' row survives) |
+| W4     | =c8q2= ("90. HEAP")  | =c8q2c= coded ("0. SMALL", "34. 250 GRAMS") | YES since #834 |
+| W5     | =c8aq2_b=   | =c8aq2_a= (quantity), =c8aq2_c= (size), =c8aq2_cvn= (kg/l factor) | YES since #834 (the coded =c8aq2_c= quantity; =c8aq2_a= and =c8aq2_cvn= agree with it and are a cross-check) |
 
-Two consequences, both measured.
+The pre-fix defects, both measured (kept here because the =Derivation=
+registry entry cites them):
 
-1. *The size axis is discarded.*  =_canon_unit= is documented as returning a
-   "size-agnostic base Preferred Label", so "Heap Small" / "Heap Medium" /
-   "Heap Large" all become =Heap=, and =community_prices_for_wave= then keeps
-   the FIRST of the collapsed duplicates.  W4 raw counts show the axis is
-   real and populated: HEAP 2,144 small / 1,986 medium / 409 large; PIECE
-   1,450 / 2,595 / 557; MUDU 1,385 small / 817 large; also DERICA, TIYA,
-   BOWL, CONGO, WRAP, LOAF, TUBER, BASIN, KOBIOWU.  =food_acquired= keeps
-   the size ("small heap", "medium heap", ...), so the two tables sit on
-   *different unit axes* and only 15 of =food_acquired='s 81 =u= labels
-   intersect =community_prices='s 30.  The 15 that do match include Kg, g,
-   cl, l, Bottle/Can, Basin, Basket, Crate, Sack/Bag, Tuber, Wheelbarrow,
-   Wrap, Sachet, tin, other specify.
+1. *The size axis was discarded.*  =_canon_unit= returns a "size-agnostic
+   base Preferred Label", so "Heap Small" / "Heap Medium" / "Heap Large"
+   all became =Heap= and =community_prices_for_wave= kept the FIRST of the
+   collapsed duplicates.  W4 raw counts: HEAP 2,144 small / 1,986 medium /
+   409 large; PIECE 1,450 / 2,595 / 557; MUDU 1,385 / 817.  =food_acquired=
+   keeps the size ("small heap", ...), so the two tables sat on different
+   unit axes (15 of 81 vs 30 labels intersecting).  *NOT repaired by #834*:
+   restoring the size axis changes the published =u= vocabulary of a
+   shipped table and makes it wave-heterogeneous (W1/W2 print one unit per
+   item and can never carry a size) -- that remains a maintainer design
+   decision, and the reported fix is a size-specific per-row frame (the
+   crop-unit =Size= precedent below), not a re-label of the =u= axis.
 
-2. *The metric rows are not per-unit prices, which contradicts the
-   =data_scheme.yml= contract* ("Price: prevailing price of one unit `u` of
-   item `j`").  Where the size field states an explicit metric quantity --
-   W4 "30. 20 GRAMS", "34. 250 GRAMS", "36. 500 GRAMS", "24. 75 CL", "23. 60
-   CL", "20. 33 CL" -- the reported Naira figure is the price of THAT
-   package, stored against =u= = =g= or =cl= as though it were one gram or
-   one centilitre.  Measured against the household unit value on matched
-   =(t, j, u, geography)= cells (2011Q1-2019Q1, 1,171 matched cells):
+2. *The metric rows were not per-unit prices.*  Where the size field
+   states an explicit metric quantity (W4 "30. 20 GRAMS", "34. 250 GRAMS",
+   "24. 75 CL", ...), the reported Naira figure is the price of THAT
+   package, stored against =g= / =cl= as though it were one gram or one
+   centilitre.  Pre-fix matched-cell medians against the household unit
+   value (2011Q1-2019Q1): 1.000 on =Kg= and =l=, but *1/189 on =g=* and
+   *1/42 on =cl=*.
 
-   | u  | matched cells | median log gap | median ratio survey/community |
-   |----+---------------+----------------+-------------------------------|
-   | Kg |           596 |          0.000 | *1.000*                         |
-   | l  |           124 |          0.000 | *1.000*                         |
-   | g  |           130 |         -5.244 | 0.0053  (~1/189)              |
-   | cl |           125 |         -3.738 | 0.0238  (~1/42)               |
+   *The fix* (=nigeria.community_prices_for_wave=, registered as
+   =Nigeria::community_prices::c8-metric-size= in =_/derivations.yml=): a
+   coded metric size is decoded to a quantity in g or cl, the reported
+   price is divided by it, and the row's =u= becomes the metric base unit,
+   with the derivation key in the =Derivation= column (5,393 rows 2019Q1,
+   5,339 2024Q1, 1 2016Q1).  A metric-*unit* row whose package size is
+   UNRECORDED -- all of W3's 13,768 g/cl rows bar one (c8q2b blank) PLUS
+   all 3,433 of W3's Kg/l rows (the same blank free text; the
+   deletion-entry sweep found these -- the pre-#834 prose dropped them
+   without ever counting them), and W5's 133 rows on '2. GRAMS (G)'
+   (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded package
+   and cannot be normalised.  The drop is registered as the deletion entry
+   =Nigeria::community_prices::c8-unrecorded-size-drop= (rows: 0 -- a
+   dropped row has nowhere to carry a key; =derivation_inputs= returns the
+   14,603 / 0 / 133 dropped source rows per wave).  *W4 drops NOTHING
+   under this rule.*  The pre-#834 prose (here and in the registry)
+   described W4's 1,191 rows on raw unit code 1 as a dropped 'Grams(g)'
+   unit with c8q2c blank -- but =sectc8_harvestw4.dta= decodes that unit
+   label as '1. KILOGRAMS (KG)', a blank size beside KILOGRAMS reads as
+   one kilogram, and the rows are SERVED under =Kg= (W4 =Kg= count 1,191,
+   none derived).  The '99. ONE SIZE
+   ONLY' code is the questionnaire's own statement that the price IS of
+   one unit and is the single exemption.  W1/W2's fixed per-item units are
+   unchanged (their =cl= sachet/bottle-water rows were already of a fixed
+   printed size; they now read ~40x-111x the household =cl= unit value and
+   are the known-residual scale gap on a per-item axis nothing records).
 
-   Kg and l -- the units for which "quantity one" is unambiguous -- agree
-   *exactly*.  The g and cl ratios are the package sizes the size field
-   records (20-500 g; 33-75 cl).  This supersedes the vaguer note in
-   =.coder/ledger/591-nigeria-prices.md= section 6 ("community_prices =u='g'= rows
-   look mis-scaled ... ratio approximately 1/400"): the cause is now known and it
-   is the unread size column, not an unexplained scale error, and =cl= is
-   affected as well as =g=.
-
-   *Consumers should exclude =u in (g, cl)= from =community_prices= until this
-   is fixed*, or the price is wrong by two orders of magnitude.  Not repaired
-   here: restoring the size axis changes the published =u= vocabulary of a
-   shipped table and makes it wave-heterogeneous (W1/W2 can never carry it --
-   the form prints one unit per item), which is a maintainer design decision,
-   not a mapping fix.  The protocol's per-unit remedy (=Price / NumberOfUnits=)
-   is available for W4/W5 from the coded size and for W5 from =c8aq2_a= /
-   =c8aq2_cvn=; W3's quantity is free text and would need parsing.
+   Post-fix matched-cell medians, 2019Q1: *1.000 on =g= (265 cells) and on
+   =cl= (207)*, item-by-item 0.87-1.5 (palm oil and groundnut oil exactly
+   1.000) -- the same agreement =Kg= and =l= always showed.  W4/W5 gained
+   3,368 / 3,267 =cl= rows and 2,025 / 2,072 =g= rows that the survey
+   recorded under SACHET / PACKET / BOTTLE/CAN and that no wave script had
+   ever surfaced; 2024Q1 has no household-side =cl= unit to validate
+   against.
 
 *** C8 is POST-HARVEST ONLY -- why community_prices grades =dropped= on every PP round
 

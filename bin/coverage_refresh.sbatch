@@ -73,10 +73,6 @@ if [ "${COV_NO_RESUBMIT:-0}" != "1" ] && [ "$RETRY" = "0" ]; then
 fi
 [ "$expired" = "1" ] && { echo "expired; exiting without work."; exit 0; }
 
-# --- 2. venv -------------------------------------------------------------------
-if ! cov_provision_venv "$REPO"; then echo "venv provisioning failed"; exit 1; fi
-echo "  PY=$PY"
-
 # --- 3. connectivity gate (+ bounded retry onto a connected node) --------------
 if ! cov_have_internet; then
     echo "no internet on $(hostname)."
@@ -91,6 +87,15 @@ fi
 if ! cov_ensure_clone "$WORKDIR" "$BRANCH" "${COV_CLONE_SRC:-file://$REPO}"; then
     echo "clone/fetch failed"; exit 1
 fi
+
+# --- 4b. venv (AFTER the clone: cov_provision_venv needs the clone as its
+#         code root, so that `import lsms_library` resolves to the branch being
+#         graded rather than to the mirror's working tree) -----------------------
+# The `echo "  PY=$PY"` below MOVED WITH THE CALL.  This script runs under
+# `set -u`, where an unbound expansion is FATAL, so leaving it behind at its old
+# position would abort every refresh at that line before the clone ever ran.
+if ! cov_provision_venv "$REPO" "$WORKDIR"; then echo "venv provisioning failed"; exit 1; fi
+echo "  PY=$PY  PYTHONPATH=$PYTHONPATH"
 
 # --- 5. expiry warning (always, even on no-change polls) -----------------------
 cov_notify_expiry "$BRANCH" "$EXPIRES"

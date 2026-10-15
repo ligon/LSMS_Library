@@ -156,3 +156,197 @@ GhanaLSS::interview_date::anchored-chronology-glss5:
     regression tests. This checks the fixed model, not external truth of each date.
   contents: GhanaLSS/_/CONTENTS.org, interviewer visit dates
   since: '2026-09-12'
+
+GhanaLSS::food_acquired::8h-farmgate:
+  waves: ['1998-99', '2005-06', '2012-13', '2016-17']
+  columns: [Expenditure]
+  rows: {s: produced}
+  rule: >-
+    Expenditure = Quantity * Price, where Quantity is the amount of the
+    home-produced food consumed in the recall window (section 8H's per-visit
+    quantity questions, in the native unit u) and Price is the farmgate price
+    of one such unit that the household itself reports.  Section 8H never asks
+    the total value, so the product is a CONSTRUCTION, not an answer.  Computed
+    only where BOTH factors are present; a row missing either is served with
+    Expenditure NaN and carries no key, so the labelled rows are exactly the
+    computed ones.  This valuation is at the PRODUCER price and is therefore
+    not comparable with the 12b-fortnight key, which values own consumption at
+    what it would cost to BUY.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_produced_farmgate_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_produced_farmgate
+  raw_variables:
+    - SEC8H.s8hq10          # 1998-99 farmgate price
+    - sec8h.s8hq14          # 2005-06 farmgate price
+    - sec8h.s8hq10          # 2012-13 farmgate price
+    - g7sec8h.s8hq{v}p      # 2016-17 farmgate price, asked once per visit
+  assumptions:
+    - text: >-
+        the section-8H price variable is the farmgate (producer) price of one
+        native unit of the home-produced item, not a market or purchase price
+      basis: config-comment
+      evidence: >-
+        stated by the wave scripts themselves -- GhanaLSS/2005-06/_/food_acquired.py
+        ("a farmgate Price (s8hq14)") and GhanaLSS/2012-13/_/food_acquired.py
+        ("a farmgate Price (s8hq10)").  NOT read off the questionnaire or the
+        Stata variable label in this session, which is why the basis is
+        config-comment and not questionnaire/variable-label: upgrading it is a
+        bounded one-RA, one-PDF step.
+    - text: >-
+        own consumption is valued at the household's OWN reported farmgate
+        price rather than at a market price, a wave median, or the purchase
+        price of the same item elsewhere in the wave
+      basis: modelling-choice
+      evidence: >-
+        @ligon, 2026-09-13 ("this is a policy change made policy by our new
+        derived_values machinery").  No document supplies the choice; section
+        8H reports a price per household and the library uses it as reported.
+        The alternatives are computable from Country.derivation_inputs.
+    - text: >-
+        1991-92 is excluded: 80,282 of its 286,922 produced rows (28%) carry
+        both factors and its dominant unit is 'All' (93,349 rows), which reads
+        as "the whole harvest" rather than a countable quantity
+      basis: config-comment
+      evidence: >-
+        measured 2026-09-13 on the warm corpus; .coder/ledger/ghanalss-produced-qp.md
+        section 7.  Serving a 28%-covered wave would look complete and would not be.
+
+GhanaLSS::crop_production::9b-sale-amount-per-unit:
+  waves: ['1987-88', '1988-89']
+  columns: [Value_sold]
+  rule: >-
+    Value_sold = CROPSP                  where CROPSPU decodes to 'All'
+               = CROPSP * CROPS          where CROPSPU == CROPSU
+               = NaN                     otherwise.
+    Section 9 Part B column 6 ("How much was the harvest of [...] sold for?")
+    has TWO boxes, AMOUNT (CROPSP) and UNIT (CROPSPU), so the amount is
+    denominated by its own unit box and is not in general a total.  The 'All'
+    branch MUST be tested first: CROPSU is itself 'All' on many rows, so the
+    two masks overlap and a same-unit-first test multiplies a whole-lot total
+    by a quantity (a 12x error on yam, caught in design).  Measured over sale
+    rows: 'All' 9.6% / 16.0%, same-unit 88.0% / 82.8%, neither 2.4% / 1.2%
+    (1987-88 / 1988-89).
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_9b_sale_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_9b
+  raw_variables: [Y09B.CROPS, Y09B.CROPSU, Y09B.CROPSP, Y09B.CROPSPU]
+  assumptions:
+    - text: >-
+        the AMOUNT in Q6 is denominated by the UNIT box beside it, rather than
+        being a total with a redundant unit -- the box also offers code 22
+        'All', which a total would not need
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.44, form block 9B1 column 6
+        (image-only CCITT scan; rendered with
+        slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py)
+    - text: >-
+        unit code 22 decodes to 'All', meaning the amount covers the whole
+        quantity sold rather than one container
+      basis: questionnaire
+      evidence: the unit-code legend printed at the foot of the same page
+    - text: >-
+        a row whose amount unit is neither the sold unit nor 'All' is left NaN
+        rather than converted; the survey relates no factor between the two
+        containers on that row (130 rows in 1987-88, 69 in 1988-89)
+      basis: modelling-choice
+      evidence: >-
+        slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org,
+        "Value_sold is a DERIVATION"
+  validated_against: >-
+    NOT yet checked against an external series.  What IS established: the rung
+    shares above, and a magnitude check against the rows that report 'All'
+    (where CROPSP is unambiguously a total) -- on maize, CROPSP * CROPS gives a
+    median 11,100 against 10,000 on the 'All' rows, while CROPSP alone gives
+    3,550.  Cocoa's apparent 62x gap between the two groups is the
+    maxibag-to-kilogram ratio, the groups selling in different units.  The
+    check still owed is community_prices (sane in both waves): the implied
+    farmgate price, Value_sold / Quantity_sold converted through KgFactor,
+    should sit below the cluster market price for the same crop and round.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part B records a sale PRICE, not a sale value"
+  since: '2026-09-16'
+
+GhanaLSS::livestock::9f-herd-value-from-unit-price:
+  waves: ['1987-88', '1988-89']
+  columns: [HerdValue]
+  rule: >-
+    HerdValue = HeadCount * ValuePerAnimal (Y09F.LIVSTN * Y09F.LIVSTNV), NaN
+    where either factor is missing.  Section 9 Part F Q5 -- "If they wanted to
+    sell one of these [...] today, how much money would they receive
+    altogether?" -- records a price PER HEAD, not the value of the herd, so the
+    additive HerdValue the canonical schema documents has to be constructed.
+    That is the reverse of most countries, where the herd value is recorded.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_9f_herd_value
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_9f
+  raw_variables: [Y09F.LIVSTN, Y09F.LIVSTNV]
+  assumptions:
+    - text: >-
+        Q5 records a price per head rather than a value for the whole herd.
+        The form's wording is ambiguous ("sell ONE of these ... receive
+        ALTOGETHER"), so this was measured, not read: corr(log HeadCount,
+        log LIVSTNV) is -0.16..+0.08 across every animal type, chickens report
+        a median 400 at both 4 head and 20 head, and cattle 20,000 at both 2
+        head and 15 -- a herd value would scale with the herd and does not
+      basis: modelling-choice
+      evidence: >-
+        slurm_logs/2026-09-16_panel_estimation/GHANALSS_CANONICAL_MAPPING.org;
+        the cross-check is that Q8's sale value DOES move with the number sold
+        (corr 0.65-0.80) and SalesValue / HeadSold recovers the same per-head
+        figure (chickens 400, cattle 20,000)
+    - text: >-
+        a household not currently raising the animal answers neither factor
+        (Q3 routes past both), so the product is left NaN rather than zero
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.53, form block 9F column 3
+        skip instruction
+  validated_against: >-
+    Internally cross-checked, not against an external series: Q8's sale value
+    divided by HeadSold recovers ValuePerAnimal to within rounding on the two
+    animals with enough sale rows to compare (chickens 400 vs 400, cattle
+    20,000 vs 20,000), which is what establishes that Q5 is a per-head price
+    and hence that this product is the herd value.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 9 Part F records a price per head"
+  since: '2026-09-16'
+
+GhanaLSS::labor::5eg-hours-per-week-from-days-and-hours:
+  waves: ['1987-88', '1988-89']
+  columns: [HoursPerWeek]
+  rule: >-
+    HoursPerWeek = DaysPerWeek * HoursPerDay (Y05E1.OCCMYD * Y05E1.OCCMYH for
+    the main 12-month job, Y05G1.OCCSYD * Y05G1.OCCSYH for the secondary),
+    NaN where either factor is missing.  Section 5's two module families ask
+    the same annual quantity in different shapes: Parts B and C ask usual
+    HOURS PER WEEK during the past 12 months directly (Q7), while Parts E and
+    G decompose it into DAYS A WEEK (Q6) and HOURS A DAY (Q7).  Constructing
+    it here makes the single expression WeeksPerYear x HoursPerWeek valid on
+    every row of `labor`.  Reported on the B/C rows, which carry NA here.
+  function: lsms_library.countries.GhanaLSS._.ghanalss:derive_5eg_hours_per_week
+  inputs: lsms_library.countries.GhanaLSS._.ghanalss:inputs_5eg
+  raw_variables: [Y05E1.OCCMYD, Y05E1.OCCMYH, Y05G1.OCCSYD, Y05G1.OCCSYH]
+  assumptions:
+    - text: >-
+        the two factors describe the same weeks, so their product carries no
+        averaging assumption of its own -- Part E Q6 is asked as "During these
+        weeks, how many days a week did you work?", referring to the weeks
+        counted in Q5
+      basis: questionnaire
+      evidence: >-
+        1988-89 household questionnaire PDF p.26, form block 5E1 columns 5-7
+        (image-only CCITT scan, rendered with
+        slurm_logs/ghana_audit/glss2_questionnaire/render_pages.py)
+    - text: >-
+        a missing factor means the grid was skipped rather than a zero worked
+        -- Part E Q3 routes a 12-month job that repeats the 7-day job straight
+        to Part F -- so the product is left NaN, not 0
+      basis: questionnaire
+      evidence: >-
+        same page, column 3; measured, the detail columns are populated on
+        1,701 of 8,182 rows (1987-88) and 1,986 of 7,806 (1988-89), exactly
+        the rows answering "Different work"
+  validated_against: >-
+    NOT checked against an external series.  Internal cross-check: on the
+    Parts B/C rows, where HoursPerWeek is REPORTED rather than constructed,
+    WeeksPerYear x HoursPerWeek gives a median 1,050 annual hours (p10 200,
+    p90 2,400) -- p90 being about 48 weeks x 50 hours -- so the scale the
+    construction has to match is established independently of it.
+  contents: GhanaLSS/_/CONTENTS.org, "Section 5 carries the ANNUAL labour measure"
+  since: '2026-09-16'

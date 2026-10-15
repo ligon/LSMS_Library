@@ -38,7 +38,9 @@ from lsms_library.transformations import (
 )
 
 # 'pound' is in KNOWN_METRIC (0.453592) and is not the kilogram unit, so the
-# inferred layer can serve it without the kg-must-weigh-1 rule firing.
+# metric layer can serve it without the kg-must-weigh-1 rule firing.  (It was
+# the `inferred` layer until GH #929 split the READ half out; `pound` is in
+# KNOWN_METRIC, so nothing in this file exercises price-ratio inference.)
 POUND, POUND_KG = "pound", 0.453592
 KNOWN_UNIT = "kg"
 
@@ -114,11 +116,19 @@ def test_shipped_wins_over_survey_median():
     assert f["kg_survey_median"].iloc[-1] == 50.0
 
 
-def test_shipped_wins_over_inferred():
+def test_shipped_wins_over_the_unit_derived_layers():
+    """POUND is READ from KNOWN_METRIC, so unshipped it lands in `metric`.
+
+    Renamed from `test_shipped_wins_over_inferred` at GH #929: the fixture
+    never exercised price-ratio inference, and saying `inferred` in the name
+    hid that.  `kg_inferred` still carries the value -- the metric seeds are
+    inside it with precedence -- which is why the companion assertion below
+    is unchanged.
+    """
     rows = [("2019-20", "h1", "h1-1-1", "Maize", POUND, "dried", "A", 2.0)]
     table = _table([("Maize", POUND, 0.5)], ["j", "u"])
     df = _cp(rows)
-    assert harvest_kg_factors(df)["KgFactorSource"].iloc[0] == "inferred"
+    assert harvest_kg_factors(df)["KgFactorSource"].iloc[0] == "metric"
     f = harvest_kg_factors(df, shipped_factors=table)
     assert f["KgFactorSource"].iloc[0] == "shipped"
     assert f["kg_per_unit"].iloc[0] == 0.5
@@ -136,8 +146,11 @@ def test_shipped_reaches_a_unit_no_other_layer_can_serve():
 
 
 def test_shipped_is_in_the_layer_vocabulary_at_rank_two():
+    # `metric` joined at rank four in GH #929, between `survey_median` and
+    # `inferred`; `shipped` keeps rank two, which is what this test is for.
     assert KG_FACTOR_LAYERS == ("reported", "shipped", "survey_median",
-                                "inferred", "none")
+                                "metric", "inferred", "none")
+    assert KG_FACTOR_LAYERS.index("shipped") == 1
 
 
 # ---------------------------------------------------------------------------
@@ -392,7 +405,7 @@ def test_an_implausible_shipped_factor_is_counted_not_applied():
     assert list(f["kg_shipped_rejected"]) == [True, True, True]
     assert f["kg_shipped"].isna().all()
     # NOT clipped, NOT rescaled: each row falls through as if never offered
-    assert list(f["KgFactorSource"]) == ["none", "inferred", "none"]
+    assert list(f["KgFactorSource"]) == ["none", "metric", "none"]
     assert f["kg_per_unit"].iloc[1] == 1.0
     counts = f.attrs["kg_factor_sources"]
     assert counts["shipped"] == 0
@@ -480,8 +493,9 @@ def test_the_counts_dict_gains_both_keys_and_still_partitions():
                                                    "shipped_matched"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     assert counts == {"reported": 0, "shipped": 1, "survey_median": 0,
-                      "inferred": 1, "none": 2, "reported_implausible": 0,
-                      "shipped_implausible": 1, "shipped_matched": 2}
+                      "metric": 1, "inferred": 0, "none": 2,
+                      "reported_implausible": 0, "shipped_implausible": 1,
+                      "shipped_matched": 2}
 
 
 def test_the_source_column_rides_through():

@@ -1,0 +1,56 @@
+#+title: Categorical key column and ignorance vocabulary --- survey behind GH #928
+#+date: [2026-09-14 Mon]
+
+Measurements behind the proposal in GH #928 (refers to #813; builds on #842,
+#502).  Config-only: no microdata, no warm cache, runs in seconds.
+
+#+begin_src sh
+  PYTHONPATH=$PWD .venv/bin/python slurm_logs/categorical_key_vocabulary/survey.py /tmp/survey.json
+  PYTHONPATH=$PWD .venv/bin/python slurm_logs/categorical_key_vocabulary/reachability.py
+#+end_src
+
+- =survey.py= :: inventories all 297 =categorical_mapping.org= tables --- columns,
+  the positional key, its type, whether a code-ish AND a label-ish column both
+  exist, and the ignorance spelling of every =Preferred Label= cell.
+  =survey.json= is the committed output.
+- =reachability.py= :: answers which of =country.py='s four positional
+  key-column sites can actually fire, and whether any LIVE table has a
+  non-conventional positional key.
+
+* Headline numbers
+
+| key type across 297 tables      | 141 label / 135 numeric / 21 mixed |
+| tables with BOTH code and label | 30                                 |
+| non-conventional positional key | 24                                 |
+| ...of those, on a LIVE path     | *0*                                |
+| =u= merge: aligned / fallback   | 9 / 4 (Malawi, Mali, Nigeria, Uganda) |
+
+*The last two rows are the point.*  The positional key is correct everywhere it
+currently fires, so =#+key:= is insurance for adding =Status=/=Notes= columns,
+not a fix for a live defect.  The one live consequence of positional keying is
+the silent merge fallback, which is why Malawi serves four spellings of the
+kilogram over 146,284 rows while five sibling countries serve one.
+
+* Ignorance spellings
+
+The parser keeps the two authored forms distinguishable --- =---= becomes NaN, a
+blank cell becomes the empty string --- so *NaN means somebody wrote the
+sentinel and empty string means somebody left it blank*:
+
+| =Unknown=            |  36 | =harmonize_education= x15, Niger =u= x4 (#842) |
+| NaN (authored =---=) | 147 | *Uganda =u= 143*, EthiopiaRHS 2, Burkina 1, Malawi 1 |
+| empty string         | 280 | GhanaLSS wave =harmonize_food= 264 (that is #925), Mali 5, EthiopiaRHS 4, GhanaSPS 4, Tanzania 3 |
+
+* Two traps these scripts fell into
+
+Recorded because both produced confident wrong answers first:
+
+1. =Country.data_scheme= is a *list* of table names, not a dict.  Iterating it
+   as =.items()= silently yields nothing.
+2. In =data_scheme.yml= the tables are nested under a =Data Scheme:= key, and
+   the file carries =!make= tags that =yaml.safe_load= refuses.  Reading the
+   top level gives you table names where you wanted column names.
+
+=reachability.py= asserts =Roof/Floor/Sex/Rural= are among the extracted
+columns for exactly this reason: a silent miscount here changes the proposal's
+conclusion.

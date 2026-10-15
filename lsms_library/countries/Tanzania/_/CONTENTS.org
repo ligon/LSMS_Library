@@ -1425,18 +1425,18 @@ absorbs the kg conversion); the load is commented out at
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
-*** =new_harmonize_units= TRUNCATES every quantity to an integer (2026-09-08)
+*** =new_harmonize_units= TRUNCATES every quantity to an integer (2026-09-08) -- FIXED (GH #835, 2026-09-13)
 
 Found during the five-source price study (=slurm_logs/price_sources/Tanzania/=).
-=tanzania.new_harmonize_units= scales each quantity by its unit factor with
+=tanzania.new_harmonize_units= used to scale each quantity by its unit factor with
 
 : df[pair['quant'][i]] = df[pair['quant'][i]].astype(np.int64) * df[pair['unit'][i]]
 
-The =astype(np.int64)= is a *floor*, applied to the quantity as REPORTED, before
-the unit factor multiplies it.  The cast is not incidental --- it is what makes
-the =Piece: 'p'= trick work (=int(3) * 'p' == 'ppp'=, later counted back to 3) ---
-so this is not a one-line fix.  Two distinct consequences, both measured on the
-source =.dta= (purchased rows with a positive reported quantity):
+The =astype(np.int64)= was a *floor*, applied to the quantity as REPORTED, before
+the unit factor multiplied it.  The cast was not incidental --- it is what makes
+the =Piece: 'p'= trick work (=int(3) * 'p' == 'ppp'=, later counted back to 3).
+Two distinct consequences, measured on the source =.dta= (purchased rows with a
+positive reported quantity):
 
 | wave    |       n | non-integer q | q<1 -> 0 -> NaN (row LOSES its unit value) | q>1 non-integer (unit value INFLATED) |
 |---------+---------+---------------+--------------------------------------------+---------------------------------------|
@@ -1444,16 +1444,25 @@ source =.dta= (purchased rows with a positive reported quantity):
 | 2019-20 |  12,825 |   732 (5.71%) |                                393 (3.06%) |                                   339 |
 | 2020-21 |   4,699 |   251 (5.34%) |                                 88 (1.87%) |                                   163 |
 
-The inflation is not small where it bites: the median inflated row is a
+The inflation was not small where it bit: the median inflated row was a
 quantity of the form =N.5= floored to =N=, i.e. a unit value overstated by
-*1.5x* (p90 1.50, max 1.90).  The recent waves are the worst affected because
+*1.5x* (p90 1.50, max 1.90).  The recent waves were the worst affected because
 their enumerators recorded fractional KILOGRAMS (0.25, 0.5, 1.5) where the
 2008-15 rounds more often switched to GRAMS, which the cast leaves alone.
-So ~1.4% of all purchased rows corpus-wide carry a ~50% overstated unit value,
-and 852 rows are dropped outright.  This is *reported, not fixed*: it changes
-=food_acquired.Quantity= library-wide and the =Piece= sentinel depends on the
-cast.  It also explains the residual 97.0% / 98.1% (not 100%) non-null
-=Quantity= on purchased rows in the two recent waves.
+So ~1.4% of all purchased rows corpus-wide carried a ~50% overstated unit
+value, and 852 rows were dropped outright (this explained the residual
+97.0% / 98.1%, not 100%, non-null =Quantity= on purchased rows in the two
+recent waves).
+
+FIXED (GH #835, 2026-09-13): the =int64= cast is now applied ONLY to rows
+whose unit is the piece sentinel =p= (a piece quantity is a COUNT and is
+integer-valued by construction); all other rows keep their fractional
+quantity through the conversion.  The =Piece= sentinel dispatch is unchanged.
+Verified: the 852 lost sub-1-quantity rows are now served (852/852 of the
+source fractional purchased quantities appear verbatim), the 4,581 inflated
+=N.5= rows are unfloored (spot-checked 3.5 kg unchanged, unit value
+halved vs. the floored build), and the piece branch still dispatches and
+decodes counts correctly.
 
 *** The (u) axis on =food_acquired= is MIXED CASE, and it will not join =community_prices=
 

@@ -1,0 +1,679 @@
+# HISTORICAL (PR #937, 2026-09-16): this review was made on the WAVE vocabulary
+# that reached the API before PR #935 applied the wave->country crosswalk.
+# Two members are spelled as leaked wave labels and no longer exist on the
+# served axis: 'Milk (tinned, condensed)' is the country label
+# 'Milk (tinned, condensed/unsweetened)', and 'Pepper (dried, red)' is
+# 'Pepper (dried)'.  The candidates were carried into proposed_groups.yml
+# (schema_version 2) on the corrected spellings and gated there; this file
+# is kept for its source-row evidence and sha256 provenance only.
+schema_version: 1
+country: GhanaLSS
+status: draft
+author: Sue
+date: '2026-09-16'
+source_revision: 8715d8a943aec66d9d5ecd054e5ee76f05b70c4b
+purpose: >-
+  Additional exact-member candidates after reviewing all 233 delivered
+  Preferred labels. These extend the five groups and four deferred alternatives
+  in proposed_groups.yml; none is a statistical approval or a live mapping.
+default: Keep every item not selected in an evaluated group as its own singleton.
+scope:
+  reviewed_waves: ['1987-88', '1988-89', '1991-92', '1998-99', '2005-06', '2012-13', '2016-17']
+  expenditure_bases: [purchased, total_recorded_value]
+  review_kind: semantic_scope_only
+  reviewer: Sue
+  review_date: '2026-09-16'
+  statistical_approval: false
+  exact_members_only: >-
+    Every purchase and own-production mapping for each exact member was reviewed
+    across all seven waves. A member can be absent in a wave, or a group can only
+    rename one existing label there. Neither requires adding a generic historical
+    label outside the proposed set. All such outside labels retain their identity.
+  historical_evidence: >-
+    Earlier source rows determine the meanings already inside these exact members.
+    They are not evidence that betas, survey errors or recall periods are stable
+    across waves. Code_12A/12B are purchase/own-production columns in GLSS1/2;
+    Code_9b/8h serve those roles in GLSS3-7.
+  total_basis_review: >-
+    An item with only purchase mappings adds no new semantic content on the total
+    recorded-value basis. Only Onion and Coconut (fresh) among the proposed members
+    have own-production mappings. Their complete rows are included below. Reviewing
+    a mapped production code does not assert that its amount is currently emitted
+    in every wave; GLSS3's own-production amounts are not wired in the current API.
+  primary_empirical_comparison: 2016-17 household wave-total purchased amounts
+reviewed_inputs:
+  item_review:
+    path: SkunkWorks/aggregation/ghanalss/item_review.csv
+    sha256: 160b5d433cc1d7167c4f5e4603b91dcd2c69d70b8a1a8f53ff3590024f3ceb1f
+    distinct_preferred_labels: 233
+  support:
+    path: SkunkWorks/aggregation/ghanalss/item_support.csv
+    sha256: 09b544f2d47eec0e623f5ad1859836a224d3e77540a6d191c933c1c88eeaae81
+    interpretation: >-
+      positive_households below copies n_positive_sample for 2016-17 purchased
+      amounts from the existing summary. These are separate member counts, not
+      union support, estimation retention, rescued households or beta evidence.
+      No microdata were loaded or statistical fits performed for this proposal.
+  existing_candidates:
+    path: SkunkWorks/aggregation/ghanalss/proposed_groups.yml
+    sha256: 753536fc367457ccc3621132384a22f2d246ace2cf7ae817fee33e41e84f7d47
+    ids: [rice_unprepared, sugar_refined, malt_packaging, pasta, gari,
+          chicken_cuts, pork_cuts, smoked_fish, sausage]
+  semantic_design:
+    path: SkunkWorks/semantic_curation_proposal.org
+    sha256: 8345f17de36632316514ef39902c8aaa6472ce8c3efd2ca14b74a4a955ee5717
+sources:
+  glss1:
+    path: lsms_library/countries/GhanaLSS/1987-88/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: a92ff631052de81d297fcecf1a83e9d45c0910c10f2542c7b279c10fc842a6de
+  glss2:
+    path: lsms_library/countries/GhanaLSS/1988-89/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 598faeffb0087010b9476ebe2de555d7303caa2453ba13a6f7b582c3976f5102
+  glss3:
+    path: lsms_library/countries/GhanaLSS/1991-92/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 770f35d753d7483c754b35bbf38ba9a14e732a693352fbae43a6c0bd8bdab484
+  glss4:
+    path: lsms_library/countries/GhanaLSS/1998-99/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 01f9c9d69c7eab7ab27d11082beeb709c968da81a88ef4e426aa1be24f69aaad
+  glss5:
+    path: lsms_library/countries/GhanaLSS/2005-06/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 522e857a47eb3f9e92cf355c4e4696e71f1175935abc85939f12c86130766504
+  glss6:
+    path: lsms_library/countries/GhanaLSS/2012-13/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 57bac32bf6c32786bd009e8df4793195c85332ac5aecce5200a2342a8c100365
+  glss7:
+    path: lsms_library/countries/GhanaLSS/2016-17/_/categorical_mapping.org
+    table: harmonize_food
+    sha256: 466782c9f0b01195eeca73d7fad67e21d5bafd69dee659ea853f6d1a146b7eaf
+documents:
+  glss7_module_b:
+    path: lsms_library/countries/GhanaLSS/2016-17/Documentation/GLSS7_MODULE B _14_10_16.docx
+    sha256: e41c9911506d3afa54e6ee2ef763f39fe9d7d6f66a638620ef50cdf2dfb58b54
+    section: 'Section 9, Part B: Expenses (Frequently Purchased Items)'
+    locator_method: >-
+      Zero-based paragraph_index in word/document.xml: enumerate every .//w:p
+      in document order, joining its .//w:t texts and stripping outer whitespace.
+      The code lists identify the questionnaire blocks independently of layout.
+country_context:
+  path: lsms_library/countries/GhanaLSS/_/CONTENTS.org
+  sha256: 6d0f77d98fe98caebfd9ad0a58e9b19268f36aa632eddb52bc7830a7a09fac15
+  idiosyncrasies:
+    - >-
+      Lines 1646-1677 describe six diary-supported five-day recalls in GLSS7:
+      a wave total covers 30 days inside a 35-day cycle.
+    - >-
+      Lines 1679-1709 document that Section 9B mixes food and nonfood; Code_9b
+      coverage performs the food selection. A module position is not semantic
+      authority to add nonfood items to the estimation basket.
+    - >-
+      The correction at lines 3324-3342 states that historical wave Aggregate
+      columns are not live and the country FCT crosswalk does not define the
+      delivered item partition. Neither supplies approval for these groups.
+  contradictions_found: []
+  documentation_review: >-
+    The country notes, including Open items and relevant dated corrections,
+    were read before the source-table review. No TODO/WAITING/LOGBOOK entry
+    supplies an additional aggregation decision. The source cautions below
+    are qualifications for future curation, not reasons to dismiss the notes.
+whole_group_rules:
+  - >-
+    Consider each listed set as a complete proposal. No pairwise chaining,
+    automatic addition of an Other category, or union with another candidate
+    is authorized. Recheck the full fine-member set whenever membership changes.
+  - >-
+    Members of these additional sets are disjoint from each other and from the
+    existing nine sets. Display names must remain unique in the full partition.
+  - >-
+    Approved semantic scope below covers only these exact complete sets and their
+    recorded definitions. Membership or source changes reopen that review. Store
+    the accepted policy digest with an evaluated partition. Statistical evidence
+    remains a separate publication requirement; a fit cannot resolve a documentary
+    ambiguity about what an item measures.
+  - >-
+    Similar product names or older joint questionnaire entries do not imply
+    similar betas, common error variances, or low aggregation cost. An
+    unidentified sparse-item beta remains unknown after semantic review.
+experiment_reservations:
+  normalization_anchor: Salt
+  prediction_targets: [Onion, Egg]
+  overlapping_candidates:
+    onion_shallot: [Onion]
+  handling: >-
+    Onion/shallot remains a semantic candidate. It must not enter score
+    construction in the predeclared experiment that holds Onion out. A separate
+    comparison can hold out the complete proposed group; merging the predictor
+    with the reserved target after declaring that experiment would change it.
+    No other proposal below touches Salt, Onion or Egg.
+
+groups:
+  - id: fish_fresh_frozen_named
+    label: Fish (kapla/tilapia, fresh or frozen)
+    members: [Kapla, Tilapia]
+    semantic_scope:
+      status: approved
+      waves_with_members: ['2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: No mapping for either exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      Both purchase labels explicitly identify fresh/frozen fish, distinguished
+      here by species. This extends the search beyond the existing smoked-fish
+      candidate while retaining the preservation boundary.
+    positive_households: {Kapla: 3018, Tilapia: 833}
+    evidence:
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 149, preferred: Kapla, raw_label: 'Kpala (Starvids) frozen', line: 116}
+          - {code: 160, preferred: Tilapia, raw_label: 'Tilapia (fresh and frozen)', line: 127}
+      - source: glss3
+        code_column: Code_8h
+        role: exclusion_evidence
+        rows:
+          - {code: 69, preferred: 'Fish (fresh and frozen)', raw_label: 'Fish & Shellfish', line: 387}
+    constraints:
+      - Exclude smoked, dried, salted, fried and processed fish and all shellfish.
+      - >-
+        Do not add Fish, Other Fish or Fish (fresh and frozen) from earlier waves
+        by name. The old production mapping for the latter also covers Fish &
+        Shellfish; an all-wave or total-value extension requires separate review.
+    caveats:
+      - >-
+        The Tilapia label already combines fresh and frozen. Species, sourcing,
+        quality and prices can still differ from the explicitly frozen Kapla.
+
+  - id: crab_shrimp
+    label: Crab and shrimp
+    members: [Crab, Shrimp]
+    semantic_scope:
+      status: approved
+      waves_with_members: ['2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: No mapping for either exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      Two separately named crustacean foods form a bounded candidate, without
+      adding fish or the heterogeneous historical Crustaceans item.
+    positive_households: {Crab: 555, Shrimp: 218}
+    evidence:
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 150, preferred: Shrimp, raw_label: Shrimps, line: 117}
+          - {code: 152, preferred: Crab, raw_label: Crab, line: 119}
+      - source: glss5
+        code_column: Code_9b
+        role: exclusion_evidence
+        rows:
+          - {code: 33, preferred: Crustaceans, raw_label: 'crustaceans (snails,lobsters,crabs,prawns)', line: 33}
+    constraints:
+      - Keep Snail and Crustaceans outside the group, as well as every fish item.
+      - Do not infer that either modern member is fresh; preservation is unspecified.
+    caveats:
+      - >-
+        Species, edible yield and preparation can differ. The joint label is
+        interpretable but does not establish similar loadings or sufficient
+        combined support. Historical Crustaceans explicitly includes snails.
+
+  - id: bread_types
+    label: Bread (including sugar bread)
+    members: [Bread, Sugar Bread]
+    semantic_scope:
+      status: approved
+      waves_with_members: ['1991-92', '1998-99', '2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2005-06', '2012-13', '2016-17']
+      own_production: No mapping for either exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      GLSS7 separates sugar bread from whole-wheat, butter, tea and other bread.
+      The full two-member set has a clear bread interpretation. Both members
+      are already common; this is a coverage/aggregation-cost comparison,
+      not a priority sparse-item rescue.
+    positive_households: {Bread: 8786, Sugar Bread: 7441}
+    evidence:
+      - source: glss3
+        code_column: Code_9b
+        rows:
+          - {code: 6, preferred: Bread, raw_label: 'Bread, buns', line: 310}
+      - source: glss4
+        code_column: Code_9b
+        rows:
+          - {code: 6, preferred: Bread, raw_label: 'Bread, buns', line: 286}
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 7, preferred: Sugar Bread, raw_label: bread-sugar bread, line: 14}
+          - {code: 8, preferred: Bread, raw_label: other bread, line: 15}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 7, preferred: Sugar Bread, raw_label: bread-sugar bread, line: 15}
+          - {code: 8, preferred: Bread, raw_label: other bread, line: 16}
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 58, preferred: Sugar Bread, raw_label: Sugar bread, line: 54}
+          - {code: 59, preferred: Bread, raw_label: Whole wheat bread, line: 55}
+          - {code: 60, preferred: Bread, raw_label: Butter bread, line: 56}
+          - {code: 61, preferred: Bread, raw_label: Tea bread, line: 57}
+          - {code: 62, preferred: Bread, raw_label: Other bread, line: 58}
+    constraints:
+      - Do not extend to biscuits, cereal products, confectionery or prepared meals.
+    caveats:
+      - Sweetening, formulation and quality may distinguish household demand.
+      - The 1991-92 and 1998-99 application only renames Bread, whose source includes buns.
+
+  - id: onion_shallot
+    label: Onion and shallot
+    members: [Onion, Shallot]
+    semantic_scope:
+      status: approved
+      waves_with_members: ['1987-88', '1988-89', '1991-92', '1998-99', '2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: >-
+        Onion has production mappings in all seven waves. Every raw production
+        label says onions, so adding those values introduces no outside product.
+        Shallot is purchase-only. The 1998-99 Onion mapping is production-only.
+      country_wide_obstruction: null
+    reason: >-
+      GLSS7 names large onions and shallots separately, while the GLSS3 purchase
+      item explicitly combined onions and shallot. This supports considering
+      the complete pair, without extending it to all vegetables or alliums.
+    positive_households: {Onion: 12092, Shallot: 486}
+    experiment_conflicts: [Onion]
+    evidence:
+      - source: glss1
+        code_column: Code_12A
+        rows:
+          - {code: 346, preferred: Onion, raw_label: Onions, line: 182}
+      - source: glss1
+        code_column: Code_12B
+        rows:
+          - {code: 346, preferred: Onion, raw_label: Onions, line: 182}
+      - source: glss2
+        code_column: Code_12A
+        rows:
+          - {code: 346, preferred: Onion, raw_label: Onions, line: 299}
+      - source: glss2
+        code_column: Code_12B
+        rows:
+          - {code: 346, preferred: Onion, raw_label: Onions, line: 299}
+      - source: glss3
+        code_column: Code_9b
+        rows:
+          - {code: 46, preferred: Onion, raw_label: Onions and Shallot, line: 355}
+      - source: glss3
+        code_column: Code_8h
+        rows:
+          - {code: 41, preferred: Onion, raw_label: Onions, line: 355}
+      - source: glss4
+        code_column: Code_8h
+        rows:
+          - {code: 41, preferred: Onion, raw_label: Onions, line: 330}
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 85, preferred: Onion, raw_label: 'onions (large/small)', line: 72}
+      - source: glss5
+        code_column: Code_8h
+        rows:
+          - {code: 51, preferred: Onion, raw_label: onions, line: 72}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 85, preferred: Onion, raw_label: 'onions (large/small)', line: 74}
+      - source: glss6
+        code_column: Code_8h
+        rows:
+          - {code: 51, preferred: Onion, raw_label: onions, line: 74}
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 461, preferred: Onion, raw_label: 'Onions (large)', line: 209}
+          - {code: 462, preferred: Shallot, raw_label: Shallots, line: 210}
+      - source: glss7
+        code_column: Code_8h
+        rows:
+          - {code: 51, preferred: Onion, raw_label: '51. Onions', line: 209}
+    constraints:
+      - Exclude Garlic and every residual or other vegetable label.
+      - Respect the complete-group target reservation recorded above.
+    caveats:
+      - >-
+        The older joint instrument is precedent for interpretation, not evidence
+        that the modern separate items have equal betas or similar errors.
+
+  - id: named_spirits
+    label: Spirits (gin/whisky/schnapps)
+    members: [Gin, Whisky, Schnapps]
+    semantic_scope:
+      status: approved
+      waves_with_members: ['1991-92', '1998-99', '2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2005-06', '2012-13', '2016-17']
+      own_production: No mapping for any exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      An exact set of three named spirits, rather than all alcoholic beverages.
+      The older purchase item already combines whiskies and gins; adding the
+      separately named schnapps is an explicit proposed product-family extension.
+      Schnapps has very little recorded support and its loading may be unidentified.
+    positive_households: {Gin: 179, Whisky: 56, Schnapps: 12}
+    evidence:
+      - source: glss3
+        code_column: Code_9b
+        rows:
+          - {code: 103, preferred: Gin, raw_label: Gin, line: 418}
+      - source: glss4
+        code_column: Code_9b
+        rows:
+          - {code: 103, preferred: Gin, raw_label: Gin, line: 389}
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 618, preferred: Gin, raw_label: Gin, line: 314}
+          - {code: 619, preferred: Whisky, raw_label: Whisky, line: 315}
+          - {code: 622, preferred: Schnapps, raw_label: Schnapps, line: 318}
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 143, preferred: Schnapps, raw_label: schnapps, line: 114}
+          - {code: 144, preferred: Whisky, raw_label: whiskies and gins, line: 115}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 143, preferred: Schnapps, raw_label: schnapps, line: 118}
+          - {code: 144, preferred: Whisky, raw_label: whiskies and gins, line: 119}
+    constraints:
+      - Exclude Akpeteshie, Bitters, Other Spirits, Wine, Beer and other beverages.
+      - Do not label the group imported, commercial or bottled; these are not recorded here.
+    caveats:
+      - >-
+        Brands, alcohol content, ceremonial uses and quality are not resolved by
+        these labels. Evaluate the whole proposed triple, not a transitive union
+        of independently tested pairs. Even combined support may remain poor.
+      - >-
+        The earlier Whisky item already includes gin; this causes no outside
+        membership. Applying the group in 1991-92 or 1998-99 only renames Gin.
+
+  - id: tinned_milk_forms
+    label: Milk (evaporated/condensed)
+    members: ['Milk (evaporated)', 'Milk (tinned, condensed)']
+    semantic_scope:
+      status: approved
+      waves_with_members: ['2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2005-06', '2012-13', '2016-17']
+      own_production: No mapping for either exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      Two named forms of concentrated tinned milk provide an explicit form
+      relaxation worth testing for the sparse condensed item. GLSS5 names the
+      unsweetened evaporated and condensed forms directly; GLSS7 retains the
+      distinction in both the questionnaire headings and Preferred labels while
+      listing brands beneath them.
+    semantic_relaxation: Combine evaporated and condensed forms, with their formulation differences.
+    positive_households: {'Milk (evaporated)': 3269, 'Milk (tinned, condensed)': 55}
+    evidence:
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 301, preferred: 'Milk (evaporated)', raw_label: Ideal, line: 162}
+          - {code: 302, preferred: 'Milk (evaporated)', raw_label: Peak, line: 163}
+          - {code: 303, preferred: 'Milk (evaporated)', raw_label: Nunu, line: 164}
+          - {code: 304, preferred: 'Milk (evaporated)', raw_label: Vega, line: 165}
+          - {code: 305, preferred: 'Milk (evaporated)', raw_label: Carnation, line: 166}
+          - {code: 306, preferred: 'Milk (evaporated)', raw_label: Other milk, line: 167}
+          - {code: 401, preferred: 'Milk (tinned, condensed)', raw_label: Peak, line: 168}
+          - {code: 402, preferred: 'Milk (tinned, condensed)', raw_label: Other tinned milk, line: 169}
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 47, preferred: 'Milk (evaporated)', raw_label: 'tinned milk (unsweetened,evaporated)', line: 45}
+          - {code: 48, preferred: 'Milk (tinned, condensed)', raw_label: 'tinned milk (condensed)', line: 46}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 47, preferred: 'Milk (evaporated)', raw_label: 'tinned milk (unsweetened,evaporated)', line: 47}
+          - {code: 48, preferred: 'Milk (tinned, condensed)', raw_label: 'tinned milk (condensed)', line: 48}
+    documentary_evidence:
+      - document: glss7_module_b
+        paragraph_index: 21432
+        heading: 'Evaporated Milk (e.g. Ideal, Peak etc.)'
+        codes: [301, 302, 303, 304, 305, 306]
+      - document: glss7_module_b
+        paragraph_index: 21568
+        heading: 'Tinned milk (condensed)'
+        codes: [401, 402]
+    constraints:
+      - Exclude fresh milk, powdered milk, baby milk, dairy desserts and milk beverages.
+      - >-
+        Do not add generic Milk, Milk product, Other Milk Products or the old
+        Milk (tinned, unsweetened) label without a separate scope review.
+    caveats:
+      - >-
+        This deliberately permits a meaningful processing/formulation difference;
+        it is not a packaging-only equivalence. Sugar content, uses and prices
+        may produce substantial aggregation error. The questionnaire confirms
+        the GLSS7 forms; it does not provide their ingredient compositions.
+
+  - id: coconut_forms
+    label: Coconut (fresh/dried)
+    members: ['Coconut (fresh)', 'Coconut (dried)']
+    semantic_scope:
+      status: approved
+      waves_with_members: ['2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: >-
+        Coconut (fresh) has a coconut production code in 2005-06, 2012-13 and
+        2016-17. Its raw form is unspecified, which fits the proposed group of
+        coconut forms without importing oil or another food. Coconut (dried)
+        is purchase-only. Form shares cannot be recovered from those older rows.
+      country_wide_obstruction: null
+    reason: >-
+      The instrument explicitly distinguishes two forms of the same named food.
+      The dried item is sparse. This proposed complete pair tests an explicit
+      preservation relaxation while keeping processed coconut oil outside it.
+    semantic_relaxation: Combine fresh and dried coconut.
+    positive_households: {'Coconut (fresh)': 1395, 'Coconut (dried)': 45}
+    evidence:
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 68, preferred: 'Coconut (fresh)', raw_label: coconut, line: 57}
+      - source: glss5
+        code_column: Code_8h
+        rows:
+          - {code: 26, preferred: 'Coconut (fresh)', raw_label: coconut, line: 57}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 68, preferred: 'Coconut (fresh)', raw_label: coconut, line: 59}
+      - source: glss6
+        code_column: Code_8h
+        rows:
+          - {code: 26, preferred: 'Coconut (fresh)', raw_label: coconut, line: 59}
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 432, preferred: 'Coconut (fresh)', raw_label: 'Coconut (fresh)', line: 185}
+          - {code: 433, preferred: 'Coconut (dried)', raw_label: 'Coconut (dried)', line: 186}
+      - source: glss7
+        code_column: Code_8h
+        rows:
+          - {code: 26, preferred: 'Coconut (fresh)', raw_label: '26. Coconut', line: 185}
+    constraints:
+      - Exclude Oil (coconut), other nuts/seeds and generic Coconut from earlier waves.
+      - >-
+        Applying the group in 2005-06 and 2012-13 only renames Coconut (fresh),
+        whose purchase and production sources say coconut without a form.
+    caveats:
+      - >-
+        Drying can change culinary use, concentration, storage and purchasers.
+        The source establishes the common food identity, not interchangeable
+        demand or errors. Do not generalize this pair into a fresh/dried rule.
+
+  - id: named_processed_fish
+    label: Fish (canned or in oil/sauce)
+    members: ['Fish (canned)', 'Tuna (processed)', 'Mackerel (processed)']
+    semantic_scope:
+      status: approved
+      waves_with_members: ['1991-92', '1998-99', '2005-06', '2012-13', '2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: No mapping for any exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: null
+    reason: >-
+      The GLSS7 questionnaire identifies the three brand blocks as canned sardines
+      in vegetable oil, tuna in vegetable oil, and mackerel in tomato sauce.
+      This resolves their previously missing preparation headings and supports a
+      bounded processed-fish candidate beyond smoked fish. Older Fish (canned)
+      is generic canned fish; its singleton rename does not assert sardine content.
+    semantic_relaxation: Combine species and oil/sauce formulations within these exact processed-fish items.
+    positive_households: {'Fish (canned)': 2397, 'Tuna (processed)': 236, 'Mackerel (processed)': 2270}
+    evidence:
+      - source: glss3
+        code_column: Code_9b
+        rows:
+          - {code: 76, preferred: 'Fish (canned)', raw_label: Canned fish, line: 390}
+      - source: glss4
+        code_column: Code_9b
+        rows:
+          - {code: 76, preferred: 'Fish (canned)', raw_label: Canned fish, line: 361}
+      - source: glss5
+        code_column: Code_9b
+        rows:
+          - {code: 38, preferred: 'Fish (canned)', raw_label: 'fish (canned)', line: 39}
+      - source: glss6
+        code_column: Code_9b
+        rows:
+          - {code: 38, preferred: 'Fish (canned)', raw_label: 'fish (canned)', line: 41}
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 165, preferred: 'Fish (canned)', raw_label: Titus, line: 129}
+          - {code: 166, preferred: 'Fish (canned)', raw_label: Princess, line: 130}
+          - {code: 167, preferred: 'Fish (canned)', raw_label: Obaapa, line: 131}
+          - {code: 168, preferred: 'Fish (canned)', raw_label: Gino, line: 132}
+          - {code: 169, preferred: 'Fish (canned)', raw_label: Smile, line: 133}
+          - {code: 170, preferred: 'Fish (canned)', raw_label: Lele, line: 134}
+          - {code: 171, preferred: 'Fish (canned)', raw_label: Vega, line: 135}
+          - {code: 172, preferred: 'Fish (canned)', raw_label: Other sardines, line: 136}
+          - {code: 176, preferred: 'Tuna (processed)', raw_label: Star kist, line: 137}
+          - {code: 177, preferred: 'Tuna (processed)', raw_label: Vega, line: 138}
+          - {code: 178, preferred: 'Tuna (processed)', raw_label: Geisha, line: 139}
+          - {code: 179, preferred: 'Tuna (processed)', raw_label: Tesco, line: 140}
+          - {code: 180, preferred: 'Tuna (processed)', raw_label: John West, line: 141}
+          - {code: 181, preferred: 'Tuna (processed)', raw_label: Other, line: 142}
+          - {code: 185, preferred: 'Mackerel (processed)', raw_label: African Queen, line: 143}
+          - {code: 186, preferred: 'Mackerel (processed)', raw_label: Geisha, line: 144}
+          - {code: 187, preferred: 'Mackerel (processed)', raw_label: Gino, line: 145}
+          - {code: 188, preferred: 'Mackerel (processed)', raw_label: Ena pa, line: 146}
+          - {code: 189, preferred: 'Mackerel (processed)', raw_label: Obaapa, line: 147}
+          - {code: 190, preferred: 'Mackerel (processed)', raw_label: Delay, line: 148}
+          - {code: 191, preferred: 'Mackerel (processed)', raw_label: Teacher, line: 149}
+          - {code: 192, preferred: 'Mackerel (processed)', raw_label: Other mackerel, line: 150}
+    documentary_evidence:
+      - document: glss7_module_b
+        paragraph_index: 20460
+        heading: 'Fish (canned) -Sardines in vegetable oil'
+        codes: [165, 166, 167, 168, 169, 170, 171, 172]
+      - document: glss7_module_b
+        paragraph_index: 20745
+        heading: Tuna in vegetable oil
+        codes: [176, 177, 178, 179, 180, 181]
+      - document: glss7_module_b
+        paragraph_index: 20885
+        heading: Mackerel in tomato sauce
+        codes: [185, 186, 187, 188, 189, 190, 191, 192]
+    constraints:
+      - Exclude the separately delivered fresh, frozen, smoked, dried, salted, fried and unspecified fish items.
+      - Do not reinterpret earlier generic canned fish as sardines, or require matching another historical label.
+    caveats:
+      - >-
+        The questionnaire establishes oil/sauce preparations, not identical
+        packaging or composition. Species, sauce, quality and purchasers can
+        differ. The proposed display name therefore does not call every member
+        canned, and statistical costs remain untested.
+
+deferred_alternatives:
+  - id: dried_pepper_forms
+    label: Pepper (dried red/powder)
+    members: ['Pepper (dried, red)', 'Pepper (powder)']
+    status: needs_documentary_review
+    semantic_scope:
+      status: needs_documentary_review
+      waves_with_members: ['2016-17']
+      within_wave_merge_waves: ['2016-17']
+      own_production: No mapping for either exact member in any wave; total adds no new source rows.
+      country_wide_obstruction: >-
+        The questionnaire also says only Powder Pepper. Neither it nor the raw
+        mapping identifies the powder's plant or blend; the intended narrow
+        whole/ground red-pepper interpretation is still unsupported.
+    reason: >-
+      A dried red pepper and a pepper powder could form a narrow whole/ground
+      candidate, beyond the current nine candidates. Confirm the powder's
+      contents before treating grinding as their only material distinction.
+    positive_households: {'Pepper (dried, red)': 3654, 'Pepper (powder)': 3413}
+    evidence:
+      - source: glss7
+        code_column: Code_9b
+        rows:
+          - {code: 459, preferred: 'Pepper (dried, red)', raw_label: 'Dried pepper (red)', line: 207}
+          - {code: 460, preferred: 'Pepper (powder)', raw_label: Powder Pepper, line: 208}
+          - {code: 528, preferred: 'Chilli Powder (black pepper)', raw_label: 'Chilli powder (black pepper)', line: 260}
+      - source: glss5
+        code_column: Code_9b
+        role: exclusion_evidence
+        rows:
+          - {code: 100, preferred: 'Chilli Powder (black pepper)', raw_label: black pepper, line: 84}
+    documentary_evidence:
+      - document: glss7_module_b
+        paragraph_index: 22595
+        heading: 'Dried pepper (red)'
+        codes: [459]
+      - document: glss7_module_b
+        paragraph_index: 22615
+        heading: Powder Pepper
+        codes: [460]
+    constraints:
+      - >-
+        Exclude Chilli Powder (black pepper), fresh pepper, sweet pepper and
+        all other spices. Do not include old Pepper (dry) without scope review.
+    caveats:
+      - >-
+        Powder Pepper does not identify plant, blend or additives. The separate
+        Chilli Powder (black pepper) label is internally ambiguous and its older
+        source says black pepper. Neither name resolves the powder's identity.
+      - Both members are already common; this has low priority for sparse-item rescue.
+
+other_items_kept_separate:
+  - members: [Cocoa Powder, 'Cocoa (milk powder beverages)', Chocolate Drink]
+    reason: >-
+      Cocoa Powder changes meaning: GLSS5 Code_9b 130 says chocolate drinks
+      (including milo,bournvita etc), while GLSS7 code 551 says Pure Cocoa Powder
+      (eg. Brown gold). The GLSS7 beverage set includes Cow bell (coffee, choco
+      etc.) at code 555. This is not a stable all-wave cocoa commodity.
+    evidence: ['glss5:107', 'glss7:272', 'glss7:275']
+  - members: ['Milk (powder)', 'Milk (powdered)', Baby Milk]
+    reason: >-
+      Do not treat spelling similarity as a complete milk-powder definition.
+      GLSS5 maps both milk powder (code 45) and baby milk (code 46) to Milk
+      (powdered). Infant formula needs explicit review before a powder pool.
+    evidence: ['glss5:43', 'glss5:44']
+  - members: [Egg, Other Eggs]
+    reason: >-
+      A joint egg group would be a cross-wave question and would touch the
+      reserved Egg target. In GLSS7, codes 416 and 417 already deliver both
+      chicken and other eggs as Egg, so this adds no within-wave candidate.
+    evidence: ['glss7:175', 'glss7:176']
+  - members: [Tomato Puree, 'Tomato (paste)', 'Tomato (fresh)', Tomato]
+    reason: >-
+      Puree/paste terminology warrants a cross-wave review, but Tomato Puree
+      is not a separate GLSS7 delivered item. Fresh versus concentrated tomato
+      remains a processing distinction; no new broad tomato group is proposed.
+  - members: [Salt]
+    reason: No additional semantically narrow salt group was identified; it remains unmerged.

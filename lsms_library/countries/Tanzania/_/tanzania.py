@@ -795,17 +795,34 @@ def new_harmonize_units(df, unit_conversion):
     df = df.fillna(0).replace(unit_conversion).replace(['none', 'NONE', 'hakuna'], 0)
     pattern = r"[p+]"
     for i in range(4):
-        df[pair['quant'][i]] = df[pair['quant'][i]].astype(np.int64) * df[pair['unit'][i]]
+        qcol = pair['quant'][i]
+        ucol = pair['unit'][i]
+        # GH #835: do NOT astype(np.int64) the quantity -- that floors every
+        # reported quantity (sub-1 quantities become 0 and are dropped below;
+        # N.5 becomes N, inflating the unit value).  The 'p' repetition trick
+        # needs an int only because int * str repeats the string, so floor
+        # ONLY the piece-sentinel rows, where the quantity is a piece COUNT
+        # and is integer-valued by construction.
+        u = df[ucol]
+        is_piece = u == 'p'
+        if is_piece.any():
+            combined = pd.Series(pd.NA, index=df.index, dtype='object')
+            combined.loc[is_piece] = df.loc[is_piece, qcol].astype(np.int64) * u[is_piece]
+            combined.loc[~is_piece] = df.loc[~is_piece, qcol] * u[~is_piece]
+            df[qcol] = combined
+        else:
+            df[qcol] = df[qcol] * u
         df[pair['quant'][i]] = df[pair['quant'][i]].replace('', 0)
-        if df[pair['quant'][i]].dtype != 'O':
+        if df[pair['quant'][i]].dtype != 'O' or not is_piece.any():
+            # No piece-sentinel rows in this column -- nothing left to detect.
             df[pair['unit'][i]] = 'kg'
-        else: 
+        else:
             # NB: dropped a vestigial ``.to_frame()`` here — under pandas 2.x
             # it produced a 2-D mask that ``np.where`` returned as a 2-D
             # ndarray, which then failed to assign back into a 1-D column
             # (``ArrowInvalid: only handle 1-dimensional arrays``).  Series
             # comparison stays 1-D, so the rest of the expression is fine.
-            df[pair['unit'][i]] = np.where(df[pair['quant'][i]].str.contains(pattern) == True, 'piece', 'kg')
+            df[pair['unit'][i]] = np.where(df[pair['quant'][i]].astype(str).str.contains(pattern) == True, 'piece', 'kg')
             df[pair['quant'][i]] = df[pair['quant'][i]].apply(lambda x: x if str(x).count('p') == 0 else str(x).count('p'))
 
     df['agg_u'] = df[pair['unit']].apply(lambda x: max(x) if min(x) == max(x) else min(x) + '+' + max(x), axis = 1)

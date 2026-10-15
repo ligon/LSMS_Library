@@ -1,0 +1,339 @@
+#+title: GhanaLSS =Aggregate Label=: what the wave columns can and cannot supply
+#+date: [2026-09-15]
+
+Measurement record behind a proposed country-level =Aggregate Label= column on
+=GhanaLSS/_/categorical_mapping.org= (=#+name: harmonize_food=).  Every number
+below is reproducible from the warm cache at =data_root()=; see =README.md= for
+the scripts.
+
+* Why this was opened
+
+=Country('GhanaLSS').food_expenditures(labels='Aggregate')= raises
+=LabelUnavailableError=.  Two places record that as deliberate --
+=categorical_mapping.org:511= and =CONTENTS.org:1218= -- naming the same three
+blockers: 14 cross-wave conflicts, 9 orphan Preferred Labels, one mojibake
+value.  Re-measured, *two of the three are stale*, and the constraint that
+actually binds is a fourth one that neither entry names.
+
+* The three recorded blockers, re-measured
+
+#+name: tab:recorded-blockers
+| recorded                            | measured                                             |
+|-------------------------------------+------------------------------------------------------|
+| 14 PLs conflict across waves        | *22* by the crosswalk route; about half are spelling |
+| 9 PLs appear in no wave table       | *0*.  7 are case/plural variants (=Dove/Pigeon= vs   |
+|                                     | =Dove/pigeon=, =White Oat= vs =White Oats=); 2 are   |
+|                                     | one-to-many merges the wave columns already encode   |
+|                                     | (=Milk (tinned, condensed/unsweetened)= and          |
+|                                     | =Pepper (dried)= each cover two wave items).         |
+|                                     | The crosswalk resolves *195 of 195*                  |
+| mojibake =Cooked Rice and Stew Ê Ê= | *gone* -- fixed by GH #782, which =CONTENTS.org:3319= |
+|                                     | records; the two prose entries were not updated      |
+
+The orphan count collapses because the naive join is the wrong join.  The
+country table carries *one column per GLSS round holding that round's own
+Preferred Label*, so the route is
+
+: country 'Preferred Label' -> country's <wave> column -> wave harmonize_food 'Preferred Label' -> wave 'Aggregate Label'
+
+not country-PL to wave-PL directly.  Joined that way, coverage is complete.
+
+* The transformation ladder (@ligon, 2026-09-16) -- and the two things it corrects
+
+The crosswalk arrow above (=country PL -> wave column -> wave PL -> wave
+Aggregate=) is a *lookup path used to harvest candidate values*, not the
+sequence of transformations the data undergoes.  Stated as a pipeline it runs
+the other way:
+
+#+name: tab:ladder
+| step   | what it is                                                       | implemented? |
+|--------+------------------------------------------------------------------+--------------|
+| =Ld=   | wave-level labels/codes from the raw files                       | yes          |
+| =Ld'=  | normalisation of =Ld= (else identity)                            | yes          |
+| =Lw=   | wave =harmonize_food= =Preferred Label=; unmatched pass through  | yes          |
+| =Lc=   | =Lw= one-to-one into a wave COLUMN of country =harmonize_food=   | *no*         |
+| =Lcp=  | that row's country =Preferred Label=                             | *no*         |
+| =Lca=  | that row's =Aggregate Label=                                     | *no column*  |
+
+*=Lc= and =Lcp= are not applied to =food_acquired= anywhere.*  Every wave's
+=_/food_acquired.py= reads =./categorical_mapping.org= -- its OWN table -- and
+none reaches the country file.  The served =j= is =Lw=, full stop.
+
+=_/nutrition.py= is the one consumer that does implement them:
+=_load_food_codes= is documented /"(wave, native label) -> FCT Code, plus
+Preferred Label -> FCT Code"/ and builds =by_wave= from the country table's
+per-wave columns, using the country-PL match only as a *fallback* for waves
+whose scripts already emit the harmonised label.  That is =Lc= composed with
+=Lcp=, materialised -- evidence the ladder is the intended design rather than a
+post-hoc reading.
+
+** The ladder's structural claims, measured
+
+- *=Lc= is one-to-one: exactly true.*  Zero ambiguous cells in all seven wave
+  columns (59/59, 58/58, 115/115, 112/112, 113/113, 114/114, 168/168 distinct).
+- *=Lw= -> =Lc= is near-total*: 13 of 675 delivered =(wave, label)= pairs have no
+  entry in their own wave column, and *GLSS1-GLSS4 are zero*.  *Five* of the 13
+  are already country Preferred Labels absent only from their own wave column
+  (=Cooked Rice and Stew=, =Kenkey/Banku=, =Kola Nut=, =Other Prepared Meals=,
+  =Soup=, all 2016-17) -- five blank cells to fill, not missing curation.  The
+  remaining *8 pairs / 6 distinct labels* are genuinely unknown: =Sugar Bread=
+  (in three waves), =Fried Plantian and Beans=, =Khebabs=, =Oil (vegetable)=,
+  =Pizza=, =Tuo Zaafi=.
+- *=Lcp= is onto, nearly*: 188 of 195 Preferred Labels are reached by delivered
+  data.  The 7 never reached (=Eggplant Leaf=, =Guinea Corn=, =Jute Leaf=,
+  =Other Grains=, =Other Nuts/Seeds=, =Sorghum=, =Soybean=) are vocabulary
+  entries with no observations, which is benign.
+
+** The collapses are already written down, and never applied
+
+The country table has 205 rows for 195 Preferred Labels because the extra rows
+*are* the harmonisation:
+
+: Rice (imported) + Rice (local)              -> Rice
+: Cassava (white, flour) + (yellow, flour)    -> Cassava (flour)
+: Fish (smoked, river) + (smoked, sea)        -> Fish (smoked)
+: Sugar (cubed) + Sugar (granulated)          -> Sugar
+: Macaroni + Spaghetti                        -> Macaroni/Spaghetti
+: Potato + Sweet Potato                       -> Potato/Sweet Potato
+
+Applying =Lcp= alone moves the served axis *225 -> 194 distinct =j=*, relabelling
+169,919 rows (12.1%).
+
+*** But =Lcp= is NOT a pure rename on =food_acquired= -- it needs a reducer (Trap 9)
+
+Measured: applying the map to =food_acquired= at its =(i,t,v,j,u,s,visit)= grain
+takes duplicate index tuples *0 -> 2,324* (2016-17: 2,528 rows in a collided
+group; 2012-13: 1,838; 2005-06: 282).  They fall exactly on the six encoded
+collapses -- =Rice= 2,580 rows, =Fish (smoked)= 2,050, then =Sugar= 6,
+=Cassava (flour)= 6, =Macaroni/Spaghetti= 4, =Cocoa Powder= 2 -- i.e. households
+that bought both imported and local rice, or both river- and sea-smoked fish, in
+the same visit.
+
+=food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so leaving that to core means
+=Quantity=/=Expenditure= are SUMmed and =Price= is *re-derived* -- precisely
+=CONTENTS.org:3244= Trap 9, which notes it "did not fire in the shipped data,
+only because 2005-06 keeps its index unique on purpose".  Applying =Lcp=
+carelessly arms it.  The repo's own precedent (=CONTENTS.org:3280=, the =Goat=
+collapse) says what to do: *reduce in the wave script with a named reducer*
+(=Quantity= sums, =Price= becomes the quantity-weighted mean), because "core
+does not aggregate".
+
+At =food_expenditures= grain =(i,t,v,j,s)= the same map yields 5,944 duplicates,
+and there the sum is simply correct -- expenditure is additive and =u=/=visit=
+have already been summed over.  *So the cost is entirely on the =food_acquired=
+side*, which is very plausibly why =Lcp= was never applied.
+
+*** And the encoded collapse is itself an untested aggregation decision
+
+=Rice (imported)= + =Rice (local)= -> =Rice= discards a distinction a demand
+system might well want to keep, and it has never been through the beta-spread
+test that =add-feature/food-acquired/SKILL.md= requires of the =Aggregate=
+column.  There are effectively *two* aggregation layers here, and the finer one
+is baked into =Preferred Label= where no criterion governs it.  If buckets are
+being designed anyway, the cleaner arrangement is to keep =Preferred Label= fine
+(=Rice (local)= / =Rice (imported)= distinct) and put the collapse in
+=Aggregate Label=, where it is visible, optional and testable.
+
+** What this corrects in the sections below
+
+1. *The "45 strays" are a symptom of the missing =Lcp=, not an independent
+   blocker and not a gap in the country table.*  Measured against the wave
+   column the ladder actually specifies, the config is 98% complete.  The fix is
+   to EXECUTE a mapping that already exists, not to reconcile two vocabularies --
+   though executing it is a wave-script change with a reducer, not a rename.
+2. *"Two label authorities in tension" was the wrong diagnosis.*  There is one
+   authority (the country table) and a missing step.  The #782 test asserting
+   =j ⊆ wave Preferred Labels= is not a rival authority -- it is the correct
+   invariant on =Lw=, i.e. on the INPUT to =Lc=.  What is missing is any
+   invariant on =Lc=/=Lcp=.
+
+* The symptom, as originally measured: two label authorities, and =j= sits between them
+
+=_relabel_j= keys on the *country* table's =Preferred Label= and applies
+=df.rename(index=..., level='j')= -- *unmapped values pass through silently*.
+Measured against a warm =food_expenditures()= (1,404,564 rows, 225 distinct =j=):
+*45 of 225 served labels are absent from the country table.*  They are
+wave-level Preferred Labels reaching =j= directly.
+
+*This is not an unguarded area -- it is guarded to a different axis.*
+=tests/test_ghanalss_food_label_canonical.py= (GH #782) exists precisely to stop
+raw labels reaching =j=, and its central assertion is
+=test_delivered_j_is_on_the_wave_food_axis=: every delivered =j= must be a
+Preferred Label *of the wave that produced it*.  Meanwhile
+=CONTENTS.org:3304= states that *"the country-level =harmonize_food= is the
+authority"*, and both =_relabel_j= and =_/nutrition.py='s =by_label= fallback key
+on it.  The two are not reconciled anywhere, and nothing tests the join between
+them.  Run today: *25 passed* -- fully green, with all 45 strays present.
+
+So the gap is structural, not an oversight: a wave-PL that never made it into
+the country table's =Preferred Label= column is *legal* to the guard and
+*invisible* to =_relabel_j=.
+
+** Size of the exposure
+
+14.0% of rows, concentrated in the early rounds.
+
+*RETRACTED: the "6.5% of expenditure corpus-wide" figure first recorded here.*
+GhanaLSS spans the 2007 cedi redenomination and nothing rebases it, so a
+cross-wave nominal sum is meaningless: 2005-06 alone is *93.6%* of the
+"national" total (14.6e9 old cedis against 5.4e6 new for 2016-17).  Any
+percentage-of-national in this document is therefore approximately a
+percentage-of-2005-06 and should not be quoted.  The WITHIN-wave columns below
+are unaffected and stand.
+
+#+name: tab:unmapped-by-wave
+| wave    | unmapped rows % | unmapped expenditure % |
+|---------+-----------------+------------------------|
+| 1987-88 |            16.2 |                   33.9 |
+| 1988-89 |            16.0 |                   36.0 |
+| 1991-92 |            16.7 |                   14.4 |
+| 1998-99 |            15.0 |                   22.0 |
+| 2005-06 |             8.7 |                    5.4 |
+| 2012-13 |             8.2 |                   12.8 |
+| 2016-17 |            22.6 |                   26.3 |
+
+A country-table =Aggregate Label= keyed on =Preferred Label= alone would, in
+GLSS2, aggregate 64% of expenditure and leave 36% at fine granularity *in the
+same returned frame, with no warning*.  Biggest single offenders:
+=Rice (imported)= 2.19% of all expenditure, =Sugar Bread= 1.09%,
+=Crustaceans= 0.83%, =Cassava (fresh)= 0.69%, =Rice (local)= 0.58%.
+
+Routing through the per-wave columns fixes almost all of it: unresolvable
+served labels fall *45 -> 6*.
+
+** The six that resolve by no route
+
+: Fried Plantian and Beans, Khebabs, Oil (vegetable), Pizza, Sugar Bread, Tuo Zaafi
+
+*Three of these are already on the record.*  =CONTENTS.org:2263= (item 4, GH #109)
+names =Oil (vegetable)=, =Sugar Bread= and =Kola Nut= as "missing from
+=harmonize_food= entirely ... worth *+27.4% of 2016-17 Energy* on their own".
+This measurement adds =Fried Plantian and Beans=, =Khebabs=, =Pizza= and
+=Tuo Zaafi=, and confirms the first two from the expenditure side --
+=Sugar Bread= alone is 1.09% of national food expenditure.  (=Kola Nut= does not
+appear in =food_expenditures=; it is a =nutrition=-side case.)
+=Fried Plantian and Beans= also carries a typo for "Plantain".
+
+* The framing number: reconciling the wave columns is barely an aggregation
+
+Of the 195 country Preferred Labels the crosswalk resolves, 173 are unambiguous
+and 22 conflict.  The 173 map onto *105 distinct Aggregate values -- 91 of them
+singletons*, with only 14 genuine multi-PL buckets.  Including conflicted rows,
+the whole scheme is *195 -> 134*.
+
+#+name: tab:aggregation-depth
+| country            | Preferred Labels | Aggregate buckets | reduction |
+|--------------------+------------------+-------------------+-----------|
+| Malawi             |              147 |                65 |       56% |
+| Uganda             |              175 |                80 |       54% |
+| GhanaLSS, proposed |              195 |               134 |       31% |
+
+The genuine buckets that exist are sound food groups -- =Fish= (15 PLs),
+=Pulses, Nuts= (12), =Chicken= (7), =Spirits= (6), =Other Cereal= (6),
+=Oils, Fats= (5), =Milk= (5), =Beef= (5).  But 91 singletons means the
+wave-level =Aggregate Label= columns were serving as a *spelling-normalisation*
+layer, not a demand-estimation bucketing -- and the country table's
+=Preferred Label= column already does that job.
+
+*So a mechanically reconciled column would satisfy the API contract and do
+almost nothing for CFE.*  The skill's stated purpose for this column
+(=add-feature/food-acquired/SKILL.md=, "Designing the =Aggregate Label=") is
+30-60 buckets sized for =prepare_data='s =min_obs=30= floor.  134 is not that.
+
+* The 22 conflicts are fewer than 22 decisions
+
+** Kind 1 -- one curator's scheme vs another's (12)
+
+GLSS1/2 curate fine; GLSS3/4 introduced the coarse food-group names and later
+rounds mostly kept them.  *The coarse value is the majority-wave value in only
+6 of these 12*, so "follow the majority" is not a rule that settles them.
+
+#+name: tab:kind1-conflicts
+| Preferred Label     | fine value          | coarse value        | coarse supplied by    | coarse is majority? |
+|---------------------+---------------------+---------------------+-----------------------+---------------------|
+| Margarine           | Margarine           | Oils, Fats          | 1991-92 onward        | yes (5-2)           |
+| Oil (palm)          | Oil (palm)          | Oils, Fats          | 1991-92 onward        | yes (5-2)           |
+| Other Oils          | Other Oils          | Oils, Fats          | 1991-92 onward        | yes (5-2)           |
+| Palm Nut            | Palm Nut            | Pulses, Nuts        | 1991-92 onward        | yes (5-2)           |
+| Groundnut           | Groundnut           | Pulses, Nuts        | 1991-92 onward        | yes (5-2)           |
+| Ice Cream           | Ice Cream           | Other Milk Products | 2005-06 onward        | yes (3-2)           |
+| Coconut (fresh)     | Coconut             | Pulses, Nuts        | 1991-92, 1998-99 only | *no* (2-5)          |
+| Other Milk Products | Other Milk Products | Milk                | 1991-92, 1998-99      | *no* (2-3)          |
+| Beef (corned)       | Corned Beef         | Beef                | 1991-92 only          | *no* (1-3)          |
+| Snail               | Snail               | Fish                | 2016-17 only          | *no* (1-3)          |
+| Dawadawa            | Dawadawa            | Pulses, Nuts        | 1991-92, 1998-99      | tie (2-2)           |
+| Cigarette           | Cigarette           | Tobacco             | 2005-06, 2016-17      | tie (2-2)           |
+
+=Snail -> Fish= additionally fails the =FCT Code= type-coherence check -- snail
+is a mollusc, not a finfish -- so it should not be taken even though it is the
+coarser option.  This is the check the =FCT Code= column is good for: 181 of 205
+rows carry a FAO/INFOODS key, and a proposed bucket spanning two FCT groups is
+suspect.
+
+** Kind 2 -- spelling / near-identity, mechanical (9)
+
+=Chocolate= vs =Chocolate Drink=; =Cocoa Powder= vs =Cocoa (milk powder
+beverages)=; =Eggplant= vs =Eggplant/Cucumber=; =Guinea Fowl= vs =Guineafowl=;
+=Kenkey/Banku= vs =Kenkey=; =Rice= vs =Rice (local)=; =Tomato (paste)= vs
+=Tomato Puree=; =Potato/Sweet Potato= vs =Potato= vs =Sweet Potato=; =Cocoyam
+Leaves= (see below).  Resolve to the country table's own =Preferred Label=
+spelling -- the authority rule from GH #782, which settled exactly this class
+for =Egg=/=Eggs= and five siblings *against* majority wave usage.
+
+** Kind 3 -- one genuine curation error (1)
+
+=Cocoyam Leaves= -> *=Coffee=* in 1998-99.  Cocoyam leaves are a leafy
+vegetable; this is a mis-keyed row in =1998-99/_/categorical_mapping.org=, not a
+bucketing choice, and should be fixed there rather than adjudicated here.
+
+*=Goat= -> =Mutton= in GLSS1/2 is NOT an error* -- checked before filing.  That
+wave's raw survey label at code 324 is literally =Mutton= (=1987-88/_/categorical_mapping.org:160=),
+and the country table's =Goat= row records =Mutton= in both GLSS1 and GLSS2
+columns.  The wave Aggregate is the survey's own word; whether the country PL
+should be =Goat= or =Mutton= is a separate curation question, not a defect.
+
+* Recommendation
+
+Three routes, in increasing cost:
+
+1. *Mechanical.*  Land the reconciled 134-bucket column.  Cheap, stops the API
+   raising -- but ships a column that looks like an aggregation and is 68%
+   singletons.  Not recommended on its own.
+2. *Design proper buckets.*  Run CFE at Preferred-Label grain, apply the
+   beta-spread test (=max(beta) - min(beta) < 1.348 * sigma_min=), target 30-60
+   buckets.  =cfe 0.8.2= is importable in this venv.
+3. *Hybrid (recommended).*  Take the crosswalk's 14 genuine food-group buckets
+   as the type-coherence seed, resolve Kind-1 conflicts case by case (majority
+   does not settle them), then run beta-spread only to place the 91 singletons.
+   This reuses curation already done rather than re-deriving it, with =FCT Code=
+   as an independent coherence check on every proposed bucket.
+
+* Prerequisites, whichever route
+
+1. *Fix the =j= axis first, at the COUNTRY level.*  The 45 strays are already
+   covered by the country table's per-wave columns (=viaWaveCol= is 7-21 per
+   wave), so this is a rename from wave-PL to country-PL -- exactly the
+   operation GH #782 performed for its seven drifts, and justified by the same
+   authority rule.  *No framework change*: =_relabel_j= is shared by every
+   country and is not what is wrong here.  Six labels need adding to the country
+   table as new rows first.  This is a =j=-axis defect in its own right, worth
+   its own issue independent of any Aggregate work -- and note that closing it
+   should also extend the #782 guard to assert the country/wave join, which is
+   the check whose absence let this stand.
+2. *Cache cost.*  =categorical_mapping.org= is in =_input_hash= for *every*
+   GhanaLSS table, so adding the column cold-rebuilds the whole country --
+   =food_acquired= alone is ~5.3M rows.  Budget one full country re-warm.
+3. *Docs to correct in the same change:*
+   - =categorical_mapping.org:511= and =CONTENTS.org:1218= -- rewrite (do not
+     delete) both: the 9 orphans were join artefacts, the mojibake was fixed by
+     #782, and neither entry names the served-=j= constraint.
+   - =.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md= -- its
+     coverage table files GhanaLSS under "no label table", wrong since GH #783
+     migrated =harmonize_food= into =categorical_mapping.org=.
+
+* Artifacts
+
+- =aggregate_label_candidate.yml= -- 173 unambiguous =Preferred Label ->
+  Aggregate Label= pairs, in =lsms_library/util/orgtbl.py= input format.
+  *Not for landing as-is* -- see the recommendation.
+- =conflicts.json= -- the 22 conflicted PLs with per-wave attribution.

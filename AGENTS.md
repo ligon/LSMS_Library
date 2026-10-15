@@ -130,13 +130,32 @@ The library has three cache tiers (see `docs/guide/caching.md` for the full pict
 
 Override the data root with `data_dir` in `~/.config/lsms_library/config.yml` or the `LSMS_DATA_DIR` env var (env var wins). All three tiers move together.
 
-- **Automatic content-hash staleness (v0.8.0).** Each cached parquet embeds a content hash (pyarrow schema metadata key `lsms_cache_hash`) covering its pre-finalize inputs: `LSMS_CACHE_SCHEMA` (a manual library-version lever in `local_tools.py`), the wave's `data_info.yml`, the wave + country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any wave/country `_/{table}.py` script, the country `_/data_scheme.yml` (table registry + `materialize` flags), the country `_/Makefile` (defines every `!make` build), the build-time `*.org` inputs in `_/` (`food_items.org`, `categorical_mapping.org`, … — `CONTENTS.org` excluded as docs), and the **DVC sidecar md5** of each declared source (`.dta` never hashed/downloaded). On read: match → serve; mismatch → rebuild; **no embedded hash** (pre-v0.8.0 parquet) → trust-once + re-stamp (no rebuild-all on upgrade). Implemented in `Wave._input_hash()` / `Country._table_cache_hash()` with read gates at the L2-country read and both L2-wave reads (`local_tools.cache_freshness` / `stamp_parquet_hash`). Recompute is ~1–4 ms (config/sidecar reads only — no `.dta` hash, no S3, no tree walk), so the v0.7.0 fast path is preserved. *Excluded by design* (they re-run post-read, never touching the parquet): `_finalize_result`, kinship, spellings, categorical mappings, `_join_v_from_sample`. *Limitations*: (a) script-path sources referenced via **dynamically-built paths** (not string literals) are covered only by the script-text hash — an out-of-band edit to such a source still needs a manual clear; (b) script-path L2-wave parquets are written hashless by their scripts, so they can't self-invalidate — `Country._evict_hashless_wave_caches` evicts them before **every** rebuild descent (stale L2-country hash, **absent** L2-country parquet, or `LSMS_NO_CACHE`) so the rebuild re-runs the script (**GH #479** — this closes former *residual F1*: eviction previously fired only in the *stale-hash* branch, so a partial cache (waves present, country table never materialized), or an `LSMS_NO_CACHE` run for which script-path waves are "soft", silently reused stale hashless wave data; the deferred *stamp-after-Make* alternative was rejected as unsafe because `make` can mtime-skip a "fresh" output). Belt-and-suspenders: `Country._assert_built_required_columns` (post-`_finalize_result`, script-path tables only) raises an actionable error if a build is missing a required declared column — the stale-wave-parquet symptom — instead of silently returning wrong data; (c) `assume_cache_fresh=True` skips the hash check entirely. Manual overrides remain (in increasing aggression):
+- **Automatic content-hash staleness (v0.8.0).** Each cached parquet embeds a content hash (pyarrow schema metadata key `lsms_cache_hash`) covering its pre-finalize inputs: `LSMS_CACHE_SCHEMA` (a manual library-version lever in `local_tools.py`), the wave's `data_info.yml`, the wave + country modules (`{wave_folder}.py`, `{country}.py`, `mapping.py`), any wave/country `_/{table}.py` script, the country `_/data_scheme.yml` (table registry + `materialize` flags), the country `_/Makefile` (defines every `!make` build), the build-time `*.org` inputs in `_/` (`food_items.org`, `categorical_mapping.org`, … — `CONTENTS.org` excluded as docs), and the **DVC sidecar md5** of each declared source (`.dta` never hashed/downloaded). On read: match → serve; mismatch → rebuild; **no embedded hash** → depends on the TIER, and the split is GH #809. At the **L2-wave** read it still grades `legacy` → trust-once + re-stamp, because script-path wave parquets are written hashless *by design* and grading them stale would rebuild them on every read forever (they are handled instead by `_evict_hashless_wave_caches`, below). At the **L2-country** read it grades **`stale` → rebuild**: there, "hashless" does not mean "old" — a country script's `to_parquet('../var/x.parquet')` passes no `cache_hash=`, so a `var/<table>.parquet` a `make` recipe wrote *moments ago* was graded identically to a pre-v0.8.0 artefact. **The re-stamp was what made that permanent**: writing the current expected hash onto unverified content means every later read grades `fresh`, so a script that disagrees with the framework becomes the served truth indefinitely and the evidence is destroyed — which is why a census finds nothing (0 of 376 warm country parquets are hashless) and why #808 was caught only through its symptom in the served data. The country tier therefore no longer stamps a parquet it did not verify. Cost of the reversal: a genuine pre-v0.8.0 country parquet rebuilds instead of migrating — nil in practice, and v0.8.0 is five minor versions back. Implemented in `Wave._input_hash()` / `Country._table_cache_hash()` with read gates at the L2-country read and both L2-wave reads (`local_tools.cache_freshness` / `stamp_parquet_hash`). Recompute is ~1–4 ms (config/sidecar reads only — no `.dta` hash, no S3, no tree walk), so the v0.7.0 fast path is preserved. *Excluded by design* (they re-run post-read, never touching the parquet): `_finalize_result`, kinship, spellings, categorical mappings, `_join_v_from_sample`. *Limitations*: (a) script-path sources referenced via **dynamically-built paths** (not string literals) are covered only by the script-text hash — an out-of-band edit to such a source still needs a manual clear; (b) script-path L2-wave parquets are written hashless by their scripts, so they can't self-invalidate — `Country._evict_hashless_wave_caches` evicts them before **every** rebuild descent (stale L2-country hash, **absent** L2-country parquet, or `LSMS_NO_CACHE`) so the rebuild re-runs the script (**GH #479** — this closes former *residual F1*: eviction previously fired only in the *stale-hash* branch, so a partial cache (waves present, country table never materialized), or an `LSMS_NO_CACHE` run for which script-path waves are "soft", silently reused stale hashless wave data; the deferred *stamp-after-Make* alternative was rejected as unsafe because `make` can mtime-skip a "fresh" output). Belt-and-suspenders: `Country._assert_built_required_columns` (post-`_finalize_result`, script-path tables only) raises an actionable error if a build is missing a required declared column — the stale-wave-parquet symptom — instead of silently returning wrong data; (c) `assume_cache_fresh=True` skips the hash check entirely. Manual overrides remain (in increasing aggression):
     1. `LSMS_NO_CACHE=1` in the session — bypasses L2-country reads and L2-wave reads on the YAML path. *Soft*: script-path L2-wave parquets (Nigeria PP/PH, Tanzania multi-round) are still read by `run_make_target` without consulting the env var, so a stale L2-wave parquet can shadow a source-script fix.
     2. `lsms-library cache clear --country {Country}` — physically removes L2-country (`var/`), the country-level companion (`_/`), AND every L2-wave parquet (`{wave}/_/{table}.parquet`) for that country. As of 2026-04-25 this also enumerates round-name wave dirs (Nigeria's `2012Q3/`, `2013Q1/`) that don't match `Country.waves`.
     3. `pytest --rebuild-caches` (or `make test-full`) — same as the CLI above for *every* country under `data_root()`, run before the test session, then sets `LSMS_NO_CACHE=1`. Use when verifying a wave-script fix in CI; previously a stale L2-wave parquet could pass a test the source-only fix would have failed (Nigeria/Senegal age sentinels, 2026-04-25).
     4. `LSMS_BUILD_BACKEND=make` — bypasses both parquet tiers entirely; see below.
 - **Wave coverage is carried by a manifest, not by the hash (v0.12.1+, GH #891/#892).** Single-wave and all-wave requests share one path (`var/{table}.parquet`), and `Country._table_cache_hash` used to fold the **requested** wave set into the hash — so `sample(waves=['2016-17'])` and `sample()` each graded the other's cache stale and rebuilt it. Measured on Albania: **6 rebuilds for 6 alternating calls, now 1**. The hash now folds `set(waves) | set(self.waves)`, which for an all-waves request is byte-identical to the old payload, so **no warm all-wave parquet is invalidated by the change itself**. Coverage moved to a new schema-metadata key `lsms_cache_waves` (`local_tools.read_parquet_cache_waves`, same footer-only ~1 ms read as `lsms_grain_audit`), recording the waves the parquet was **BUILT** from — *not* the waves present in its `t` level, because a wave contributing zero rows is dropped during aggregation and would otherwise be permanently unsatisfiable. Read path: serve when `set(waves) ⊆ manifest`, **filtered to the requested waves on the way out**; on a miss rebuild the **union** of requested and already-cached coverage. The union is what makes convergence monotone — plain superset-serving still thrashes on alternating *distinct* subsets (`['a']`,`['b']`,`['a']`), because each build shrinks coverage to its own request. *Migration*: a pre-#891 parquet has no manifest, and coverage must never be guessed (GhanaLSS `household_roster` was observed holding **1 of 7 waves**); but the old wave-dependent hash is itself a coverage marker — a stored hash matching the all-waves expectation can only have come from an all-waves build, so those keep serving subset requests with no rebuild, while a subset build grades `stale` and rebuilds once. **The wave set in the hash was also what accidentally prevented #892**, where `assume_cache_fresh=True` returned the parquet whole ignoring `waves` (Albania: six waves, 90,731 rows, for a one-wave request) — so the two had to be fixed together. A full-`self.waves` request is a deliberate **pass-through**, not a filter that matches everything: a row whose `t` is NULL would otherwise be silently deleted on every serve, which is the `groupby(dropna=True)` complaint (`grain_aggregation_policy.org` §3b) in a second place. *Caveat*: under `LSMS_NO_CACHE` the manifest is not consulted, so that run can shrink a warm parquet's coverage; the next ordinary request rebuilds once.
-- **`LSMS_BUILD_BACKEND=make`** bypasses both parquet tiers — every call rebuilds from source, with no L2-country or L2-wave writes or reads. (L1 still serves blobs; the bypass is over the harmonized parquet layer only.)
+- **`LSMS_BUILD_BACKEND=make`** bypasses both parquet tiers — every call rebuilds from source, with no L2-country or L2-wave *writes*. (L1 still serves blobs; the bypass is over the harmonized parquet layer only.) **It does still READ the country parquet, and that sentence used to say otherwise** (red team, GH #866, 2026-09-14): a `materialize: make` table sets `prefer_make_backend` and goes straight to `run_make_target(method_name)` (`country.py:4610`), never entering `load_from_waves`, and `try_make` then hands back an existing `var/<t>.parquet` exactly as described below — **53 no-rule ∩ `materialize: make` pairs, 44 excluding `panel_ids`**. It *serves* stale rather than re-stamping it (no write-back follows), so it does not destroy its own evidence the way #866 does, and it is deliberately **not** covered by #866's fix: the eviction is placed where only country-only tables reach it, and applying it at `4610` would put ~196 `(country, table)` pairs inside the prerequisite hazard named below. Own issue.
+
+- **`make` is not a judge of whether its own output is current (GH #866).** `run_make_target(method_name, wave=None)` runs `make -s <data_root>/<C>/var/<table>.parquet` and then returns the first candidate path that `exists()`. With the target already on disk, make has **two** ways to do nothing and exit 0, and both were read as a successful build: **no rule** for the target (`... is up to date`), or **a rule that mtime-skips** — a `data_scheme.yml` / country-module edit moves the content hash without touching any prerequisite, so make judges the target current. Either way `try_script` — the ONLY caller of a country's `_/<table>.py` — is never reached, the stale frame is served, **and the descent writes it back stamped with the CURRENT expected hash**. That re-stamp is the whole severity: every later read grades `fresh`, so a census of the corpus finds nothing and the bug destroys its own evidence. Reproduced: `Nigeria/livestock` 23,196 rows → 5 rows served and re-stamped with the correct hash.
+
+  **The fix is removal, and its PLACEMENT is the design.** `Country._evict_stale_country_cache` is called from exactly one place — immediately before `country_fallback = run_make_target(method_name, wave=None)` in `load_from_waves`, and only when the caller passed `evict_country_cache=True` (the three `load_dataframe_with_dvc` call sites; the JSON tier and the two `not use_dvc` routes pass nothing). Removing the file closes **both** forms by construction: neither "up to date" nor an mtime skip is reachable for a target that does not exist, where detecting one would not catch the other.
+
+  **Do NOT move it up to the read gate.** **13 Make rules across 12 countries consume a library-managed `var/*.parquet` as a PREREQUISITE**, so deleting one is not a local operation — `Tanzania/_/Makefile:43` needs `$(VAR_DIR)/cluster_features.parquet`, which is itself rule-less, so deleting *that* and failing the rebuild leaves Tanzania's entire food chain's make target hard-failing with `No rule to make target` until someone notices. The country fallback is reached only when **no wave produced rows**, so a wave-produced table like `cluster_features` can never be deleted there and the hazard is unreachable. Evicting on "any stale country parquet" walks straight into it.
+
+  **The guard `{build_waves} >= {self.waves}`** exists for the one case where the parquet at the country fallback is genuinely *valid*: under `LSMS_NO_CACHE` the read gate never runs, so no coverage union is taken and `build_waves` is just the request — and a strict subset that happens to be barren reaches the fallback holding a FRESH all-waves parquet, where today's laundering is *accidentally correct* (the whole frame comes back and `_restrict_to_waves` filters it to the right empty frame).
+
+  **Live surface, measured per-target with `make -n` against a root where the target is absent** — and note a bare census is not enough: a literal `<t>.parquet:` regex misses **grouped-target rules** (`Tanzania/_/Makefile:34` is `a.parquet b.parquet c.parquet &: …`, which GNU Make 4.2.1 parses as an ordinary multi-target rule), and a fake root produces false negatives because make names the unmakeable *prerequisite* rather than the target.
+
+  | form | cells |
+  |---|---|
+  | no rule | Nigeria `crop_production`, `livestock`, `people_last7days`, `plot_inputs`, `plot_labor` |
+  | rule, mtime-skipped | Ethiopia `nutrition`, EthiopiaRHS `community_prices`, GhanaLSS `nutrition`, Nigeria `anthropometry` |
+
+  All nine have a country-level `_/<table>.py`, so the fix converts *serve stale silently* into *rebuild correctly*, never into `_rebuild_failure_error`. Costs, stated: **a corpus-wide COLD re-warm** (`load_from_waves` is nested in `_aggregate_wave_data`, `@build_transform()` with no `tables=`, so every L2-country hash moves — and `Wave.grab_data` folds `build_transforms_fingerprint`, so every L2-wave parquet goes stale too); **three `Makefile execution failed … No rule to make target` warnings** per affected build, deliberately not suppressed because silencing them re-hides what the fix exists to expose; and **`assume_cache_fresh=True` stops being a recovery lever for those nine cells**, since after one ordinary read there is nothing left to trust.
+
+  **Still open, a DIFFERENT route (not fixed here).** `run_make_target(method_name, wave=w)` appends the **country** target to `make_targets` *and* to `unique_candidates` unconditionally (`country.py:3876,3933`), so inside `build_wave`'s `use_legacy` branch a failed wave target can fall through to the country parquet, which answers "up to date" and is returned as that one wave's data, sliced to `t == w`. Conditional rather than enumerable, and it means "country-only" is **sufficient but not necessary** for laundering. Own issue.
 - **`assume_cache_fresh=True`** is a narrower in-process short-circuit at the top of `_aggregate_wave_data` that still calls `_finalize_result` (so kinship expansion, spelling normalization, and `_join_v_from_sample` still apply). Use when L2-country is known fresh to skip all DVC / existence checks. It ignores `LSMS_NO_CACHE`. (`trust_cache=True` is a deprecated alias for `assume_cache_fresh=True` — still accepted, emits `DeprecationWarning`; slated for removal in a future release.)
 - **Cache vs. API**: cached parquets store pre-transformation data. Kinship expansion, canonical spelling enforcement, and dtype coercion happen in `_finalize_result()` on every read — not at cache write time. So `pd.read_parquet(cache_path)` shows raw `Relationship` strings; the Country API shows decomposed `(Sex, Generation, Distance, Affinity)`.
 - **DVC stage layer is retired (v0.7.0).** Country-level `dvc.yaml` files are now `stages: {}`. All data loading goes through the cache + `load_from_waves` path. The `reproduce()` code path in `country.py` is dead code pending removal. See `SkunkWorks/dvc_object_management.org`.
@@ -230,6 +249,47 @@ override.
 
 **Always write parquets with `to_parquet(df, 'name.parquet')`** from `local_tools`. It redirects to `data_root()` via `_resolve_data_path()`, which inspects the call stack to infer country/wave and handles three patterns: bare `foo.parquet` from wave scripts, `../var/foo.parquet` from country scripts, and `../wave/_/foo.parquet` cross-wave refs. **A `*.parquet` inside `countries_root()` is never read (GH #803)** -- before that fix `Wave.grab_data` and `run_make_target` *preferred* an in-tree `{wave}/_/{table}.parquet` to running the wave script, and because such files are hashless they graded `legacy` at the v0.8.0 gate and were stamped into the L2-country parquet with a fresh hash (109 files, 14 countries, on the main checkout). They get written when a script runs from a checkout that is not the imported package: `_resolve_data_path` redirects only when the *caller's file* is under the package's `countries_root()`, otherwise the literal relative path lands next to the script (the write-side `.pth` trap, scrum-master addendum 3). The library now warns (`InTreeParquetWarning`) and ignores them; delete them (`find lsms_library/countries -name '*.parquet' -delete` -- none are tracked).
 
+### `countries_root()` is READ-ONLY at runtime — one invariant, three issues
+
+The config tree holds *reviewed sources*: YAML, wave scripts, the committed
+panel crosswalk. **Everything the library produces goes under `data_root()`.**
+Three bugs are the same bug wearing different hats, and stating them together
+is the point — each was found separately and fixed separately:
+
+| | what wrote into the tree | symptom |
+|---|---|---|
+| **#803** (fixed) | a wave script run from the wrong checkout wrote its parquet in-tree | the reader *preferred* it to re-running the script; hashless, so it graded `legacy` and was re-stamped fresh |
+| **#914** (fixed) | a Make rule regenerated the committed `panel_ids.json` | `PermissionError` on any shared install, from three layers inside a `make` subprocess |
+| **#831** (read path fixed) | `get_data_file` materialised **every** fetched raw file there — the DVC branch wrote the blob to `_COUNTRIES_DIR / path`, the WB branch extracted zips there | 433 stray copies / 1.31 GB; 33 with no `.dvc` sidecar **silently shadow the DVC blob**, since the read chain is local → DVC → WB and the stray wins at step one |
+
+They share one user-visible symptom, which is why fixing them one at a time
+kept feeling like whack-a-mole: **on a shared install the package directory is
+not writable by the user running the code**, so a call that was only trying to
+*read* data dies with `PermissionError`. A teaching hub gets twenty
+simultaneous hard failures, not twenty slow cells.
+
+**The one sanctioned exception is acquisition.** `add_wave()` and
+`populate_and_push()` pass `populate_cache=True` and extract into the config
+tree on purpose, because the next step is `dvc add` on what landed. That branch
+is the *only* place a runtime write into `countries_root()` is correct, it is
+reached from nowhere else, and `data_access._fetch_destination` is the single
+function that decides — route any new fetch through it rather than composing
+`_COUNTRIES_DIR / path` yourself.
+
+Cache cost of the #831 fix: **none**. No `data_access` symbol reaches any
+build fingerprint (measured with a no-op probe inside `get_data_file`: all
+three probed `build_transforms_fingerprint` values byte-identical). Contrast
+`get_dataframe`, where any edit moves 37/37.
+
+**Still live, and a *different* invariant — don't conflate them.** #809: a
+hashless `var/<table>.parquet` written by a `make` recipe grades `legacy` at
+the v0.8.0 gate, is trusted once, and is re-stamped with the current hash — so
+a script that disagrees with the framework becomes the served truth with no
+signal. That is about *trust in an artefact's provenance*, not about *where it
+was written*, and it needs its own measurement (the fix changes which caches
+rebuild). Related: #808 (an instance, fixed by removing the path), #479
+(hashless wave parquets evicted before every rebuild descent).
+
 **Anti-patterns — do not use:**
 
 | Anti-pattern                                             | Why                                              |
@@ -281,6 +341,65 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 **Canonical spellings.** Columns in `data_info.yml` can declare a `spellings` inverse dict mapping canonical value → list of accepted variants. `_enforce_canonical_spellings()` replaces variants with canonical forms at API time, on both column values and index levels.
 
 **Automatic categorical mappings.** If a column/index name in a returned DataFrame matches a table name in the country's `categorical_mapping.org` (case-insensitive) and that table has a `Preferred Label` column, the mapping is applied automatically — no `mappings:` declaration needed. For name mismatches (e.g. `harmonize_food` for index `j`), use the explicit `mappings:` syntax in `data_info.yml`. Cross-country label harmonization is a design sketch; see `SkunkWorks/cross_country_label_harmonization.org`.
+
+### Categorical mappings resolve wave → country → global, global LAST (GH #953)
+
+**One direction, two mechanisms, and they differ only in granularity.** The
+order is always local-first — a wave overrides its country, a country overrides
+the shared table — which is what lets `foo` mean one thing to most countries
+while one country varies it locally.
+
+- **The build-time cascade.** `local_tools.get_categorical_mapping(fn,
+  tablename, dirs)` walks `dirs` and returns the **first hit**
+  (`local_tools.py:1611`). Four GhanaLSS wave `mapping.py` modules spell the
+  rungs: `_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']`.
+- **The read-time merge.** `Country.categorical_mapping` (`country.py:1997`)
+  globs **every** `.org` in `lsms_library/categorical_mapping/`, keys the tables
+  by `#+name:`, and merges the country's own `categorical_mapping.org` over
+  them via `_merge_categorical_tables`.
+
+| | cascade | merge |
+|---|---|---|
+| layout of the global rung | one `categorical_mapping.org` per LEVEL | one `<table>.org` per TABLE |
+| fall-through | **per table** — a file lacking `foo` raises `KeyError`, the loop catches it, resolution continues | n/a (all globals are loaded) |
+| override | **whole-table** — the first rung that has `foo` supplies *all* of it | **whole-table by default; per ROW** for the four names in `_ADDITIVE_CATEGORICAL_TABLES` (`u`, `u_kg`, `harmonize_assets`, `harmonize_education`) |
+
+The per-row half is the intent — `country.py` already says so: *"inherit-and-override,
+not re-list-everything."* Under whole-table override a country wanting one
+local variation of `foo` must re-list every global row.
+
+**Two facts people keep getting wrong.**
+
+1. **The cascade cannot read a directory of per-table files.** `fn` defaults to
+   `categorical_mapping.org` and each rung is the single file `d + fn`; of the
+   71 `get_categorical_mapping(` calls in `countries/**/*.py`, **zero** pass
+   `fn=`.
+   Its cross-country rung resolves to `lsms_library/countries/_/`, **which does
+   not exist** — so the third rung has never reached anything, for any table.
+   That is the open defect; #953 holds the repair and its options.
+2. **`_ADDITIVE_CATEGORICAL_TABLES` does not decide whether a global table is
+   inherited.** Every `#+name:` table in the global directory is loaded for
+   every country; the allow-list picks only the *merge rule*. (#953's body says
+   otherwise; the code and `tests/test_categorical_mapping_resolution.py` say
+   this.)
+
+**Where a new SHARED table goes, and what makes it reachable.** Put it in
+`lsms_library/categorical_mapping/<table>.org` with a `#+name:` — and then wire
+it, because dropping a file there is *not* wiring. Pick one mechanism:
+`additive-merge` (add the name to `_ADDITIVE_CATEGORICAL_TABLES`),
+`data_info-mappings` (`mappings: ['<table>', '<key col>', '<label col>']` in a
+wave's `data_info.yml`), or `documentation-of-record` (a vocabulary guide read
+by a named test). Then register the file in `GLOBAL_ORG_REGISTRY` in
+`tests/test_categorical_mapping_resolution.py`, **which fails on any
+unregistered `.org` in that directory** and pins the order, the fall-through
+and both granularities. The six files today: `u.org`, `harmonize_assets.org`,
+`harmonize_education.org` (additive-merge), `ehcvm_units.org`
+(`mappings:` in Togo 2018 / Burkina 2018-19 / 2021-22 — `lsms_library/ehcvm.py`
+only *cites* it), `canonical_education_labels.org` (declares **no** tables at
+all) and `canonical_housing_labels.org` (documentation; its `Roof`/`Floor`
+tables are the `#+begin_example` placeholders, which the org reader does not
+skip, so every country inherits `<local variant 1> → <canonical>` — inert, and
+report-only under #953).
 
 ## MonthsSpent / MonthsAway / WeeksAway (2026-04-15)
 
@@ -396,6 +515,18 @@ Every guard above stops one question short. The shape guards ask whether a decla
 | accessor | `quantity_reports(country=, table=)`, twin of `null_read_reports()`; each report carries every offender, not just the dozen the warning prints |
 | scope | `crop_production.Quantity` only (`_SCREENED_COLUMNS` is the extension point); 30,876 rows corpus-wide get no reference at all and are never judged |
 
+## Site I: a NaN on a DECLARED INDEX LEVEL (`null_index_audit.py`, GH #847)
+
+Every guard above stops one question short of the index itself. Site B asks whether a declared column holds anything; `_audit_index_collapse` asks whether the index is unique (and counts the NaN-keyed rows its own collapse deletes, GH #323 §3b); Site Q asks whether a value is possible. None looks at a **partly-null declared index level on the read path** — where a wave's index happens to be unique no collapse runs, the rows are served intact, and nothing anywhere counts them. The row then vanishes in the first `groupby` anything reaches (pandas' `groupby` defaults to `dropna=True`), and the loss is attributed to the consumer's code. **Site I** (in `Country._finalize_result`, beside Sites B and Q) counts NaN keys per level, per wave `t`, over the union of the country's own `data_scheme.yml` declaration and the canonical `data_info.yml` Index Info (plus `level_aliases`, so Uganda's `plot` spelling is still checked) — then **warns and names**. It never fills and never drops: the country-level fix (a sentinel like Niger's `'Unknown'` at GH #842, or an explicit drop-with-count) is a separate country decision; this issue is only the report. Same warn-by-default, **same `LSMS_READ_STRICT` lever as `null_read_audit`** (a NaN key is the null-content class sitting on the index axis, not a fourth concern), own `NullIndexKeyWarning` class, `null_index_reports(country=, table=)` accessor, deliberately no allowlist.
+
+| | measured |
+|---|---|
+| trigger | any NaN on a level named by the table's declared index (scheme ∪ canonical Index Info ∪ aliases), counted per wave `t` |
+| corpus firing | **19 cells of 384 warm L2 tables** (`bench/null_index_census.py`, 2026-09-13): GhanaLSS `food_acquired` u=13,380 (2016-17), GhanaLSS `plot_features` plot_id=13,944, CotedIvoire `crop_production` u=6,365, Malawi `crop_production` u=8,535 + plot_id=40, GhanaSPS `food_acquired` u=13,903, Niger `crop_production` v=2 (2011-12), plus a 1–1,000-row tail. No threshold, no exclusion — 19 cells is a work queue, not a firehose |
+| cost | integer-code arithmetic per declared level; ~0.03–0.07 ms on Niger's 46k-row read, ~0.4 ms on the corpus's largest frame (GhanaLSS `food_acquired`, 5.34M rows); zero I/O |
+| lever | `LSMS_READ_STRICT=1` → `NullIndexKeyError` (shared with `null_read_audit`, deliberately — not a fourth lever) |
+| cache | pure reporting, input returned unchanged; `check_index_levels` / `audit_index_levels` in `_EXCLUDED_CALLABLES`, `_NULL_INDEX_LEDGER` in `_EXCLUDED_CONSTANTS`. Stash-probe: **0 of 10** probed `_table_cache_hash` values and **0 of 3** `build_transforms_fingerprint` values moved |
+
 ## Coverage Matrix (v0.9.0+)
 
 `make matrix` grades every `(country, feature, wave)` cell on a tier ladder — `absent` / `dropped` / `broken` / `builds` / `sane` / `blessed` — and commits a snapshot to `.coder/coverage/latest.csv`. `ll.coverage()` reads it back. See `docs/guide/coverage.md`.
@@ -495,9 +626,28 @@ A served number that is a **construction** from survey answers, not a survey ans
 
 **Registering one.** (1) `countries/{C}/_/derivations.yml` — a *sibling* of `population.yml`, never a block in `data_scheme.yml`: `_SCHEME_NON_COLUMN_KEYS` is `{index, materialize, backend, aggregation}`, so a `derivation:` key there would be read as a **required column** (`test_nothing_in_a_data_scheme_names_a_derivation` pins this). Key is `country::table::name`, three slots, an empty slot meaning "all"; the **wave is not in the key** (every row carries `t`) — scope goes in the entry's `waves:`, and a rule that genuinely differs by wave is a different *name*. Framework-level entries (empty country slot) go in `lsms_library/derivations.yml`. The loader refuses an entry missing `rule`, `function`, `inputs`, `raw_variables` or `assumptions`, or an assumption without a `basis` from `derivations.BASES` — `modelling-choice` NAMES a choice no document supplies and is deliberately not `recall.BASIS_LADDER`. (2) Declare `Derivation` `optional: true` under `Columns: {table}` in the canonical `data_info.yml` if that table does not already carry it. (3) **Stamp the column in the wave script, AFTER any collapse** — `_normalize_dataframe_index` SUMs `_ADDITIVE_MEASURE_COLUMNS`, and since GH #871 it reduces `Derivation` on that branch with the **union** of the group's distinct keys (`derivations.union_keys_by_group`), so a summed row's provenance no longer silently keeps one of two keys; off that branch the served flag is the selected row's own. That makes a post-collapse stamp *safer* than it was, not unnecessary: the union is only correct for a column the framework itself wrote, the uniqueness of your key is still your claim to make, and the wave-script uniqueness assert stays the first guard (`test_ghanalss_12b.py` has a static source-order check for exactly this). `_finalize_result` never writes the label — only the `attrs` summary. (4) Write the `inputs` callable so the frame **joins to the served rows**: reusing the YAML's `idxvars` is not enough where a `mapping.py` post-processes the index (mojibake sweeps cost 80,563 of CotedIvoire's 218,224 purchased keys before it was measured — `6d1bd05f4`); the framework re-keys `i` through `updated_ids` for you.
 
-**Cache cost, measured.** The mechanism itself is free: the loader, the `attach_derivations` call in `_finalize_result` (in `_build_registry._EXCLUDED_CALLABLES`), the `.yml` siblings and the `data_info.yml` declaration moved **0 of 14** probed hashes; `feature.py` is read-path and in no build fingerprint (#873: **207** `Country._table_cache_hash` values across 10 countries plus 4 `build_transforms_fingerprint` values, all byte-identical). What costs is **where you put the function**: the GhanaLSS instance moved **5 of 14** — every GhanaLSS table and nothing else — because `derive_12b_fortnight_value` lives in `{country}.py`, which is in EVERY table of that country's input hash. So the bill for a new instance is **one country re-warm, not one wave**. Corollary, and this is a live design decision: put a country-binding *wrapper* in the **wave's `mapping.py`**, not the country module — `Togo/2018/_/mapping.py:inputs_food_acquired` is a wave-level wrapper rather than a `functools.partial` in `Togo/_/togo.py` for exactly this reason. A function shared by many countries belongs in the library (`lsms_library/ehcvm.py:derive_ehcvm_purchase_value`, registered once per country: eight records, one function).
+**Cache cost, measured.** The mechanism itself is free: the loader, the `attach_derivations` call in `_finalize_result` (in `_build_registry._EXCLUDED_CALLABLES`), the `.yml` siblings and the `data_info.yml` declaration moved **0 of 14** probed hashes; `feature.py` is read-path and in no build fingerprint (#873: **207** `Country._table_cache_hash` values across 10 countries plus 4 `build_transforms_fingerprint` values, all byte-identical). What costs is **where you put the function**: the GhanaLSS instance moved **5 of 14** — every GhanaLSS table and nothing else — because `derive_12b_fortnight_value` lives in `{country}.py`, which is in EVERY table of that country's input hash. So the bill for a new instance is **one country re-warm, not one wave**. Corollary, and this is a live design decision: put a country-binding *wrapper* in the **wave's `mapping.py`**, not the country module — `Togo/2018/_/mapping.py:inputs_food_acquired` is a wave-level wrapper rather than a `functools.partial` in `Togo/_/togo.py` for exactly this reason.
+
+> **That corollary buys LESS than the sentence above it implies, and the difference has already misled a review (PR #900, 2026-09-13).** It narrows the blast radius from *every wave* to *one wave*; it does **NOT** scope invalidation to the one table the derivation serves. `Wave._input_hash(self, table)` takes a table, but the **only** table-dependent thing it hashes is `btf=build_transforms_fingerprint(table)` — the `binp:` loop (`country.py:918-923`) globs the wave dir *and* the country `_/` dir and hashes **every** file whose suffix is in `_BUILD_INPUT_SUFFIXES`, which includes `.py`:
+>
+> ```python
+> for d in (wave_dir, self.country.file_path / "_"):
+>     for p in sorted(d.glob("*")):
+>         if p.suffix.lower() in _BUILD_INPUT_SUFFIXES:
+>             parts.append(f"binp:{p.name}=" + (cached_file_hash(p) or "none"))
+> ```
+>
+> So a wave's `mapping.py` is in the input hash of **every table that wave builds**, and since `Country._table_cache_hash` folds every wave, the country's L2-country hashes move for **all** its tables either way. Measured on Nigeria: moving `derive_c8_metric_package_unit_price` from `nigeria.py` to per-wave `mapping.py` wrappers still moved **24 of 24** tables (@ligon, PR #900 — instrumented `_input_hash`; the `mapping.py` hash is identical for `community_prices` and `sample`).
+>
+> **So budget a full country re-warm for a new derivation wherever you put the function.** Per-table scoping would need a hasher change — gating `binp:`/`mod:` by the table's declared script and imports — which is framework work, not a placement choice. Follow the placement rule for locality and blast-radius-across-waves; do not quote it as a cache saving. A function shared by many countries belongs in the library (`lsms_library/ehcvm.py:derive_ehcvm_purchase_value`, registered once per country: eight records, one function).
 
 **Carriers.** The **column** rides concat, groupby, cache and parquet, and `Feature()`'s concat fills `NA` for a country without it. The **`attrs` summary** dies at that concat (attrs survive only when every input agrees) and is re-attached explicitly by `feature._ATTRS_CARRIERS` — `(name, keys, attach)` triples for population, recall and derivations, captured per country before `_harmonize_country_frame` / `pd.concat` and re-attached for the KEPT countries only (GH #873, 2026-09-12). A fourth carrier is one entry there and no other code.
+
+**A derived value is a FIRST-CLASS value: no served table may exclude one for being derived** (@ligon, 2026-09-14; *"I've had to make this remark more than once"*). The derived food tables — `food_expenditures`, `food_prices`, `food_quantities` — consume `food_acquired` as it stands, registry-derived rows included. `food_prices` does **not** filter to survey-reported valuations, and a test that pins a row count is pinning *today's* derivations, not a policy.
+
+**The reason is the machinery, and it is what changed.** Before `Derivation`, a served construction was irreversible: a user handed a valued row could not recover what the survey actually said, so the conservative default — serve nothing rather than something constructed — was the honest one. It is no longer needed. `ll.derivations()` names every construction, `derivation_inputs` returns the raw rows **at the input grain with the original variable names**, and `rec.resolve()` hands back the function itself. Nothing is lost by valuing a row, because the original is one call away. **So the default parquets should carry sensible defaults, not minimal ones** — the flexibility the registry buys is spent on serving more, not on serving less.
+
+> **This does NOT reverse "empty food prices is better than a made up constant"** (the ruling behind `tests/test_currency_denominated_units.py::test_ghanalss_food_prices_is_one_wave_and_not_constant`, where six of seven GhanaLSS waves returned 1,066,978 rows all carrying the single value 2.035038). That ruling is about a **fabrication** — a constant with no survey behind it, unregistered, unlabelled and unrecoverable. A registered derivation is the opposite on every count: it names a function, cites its `raw_variables`, records its `assumptions` with a `basis`, stamps `Derivation` on the row, and hands the inputs back. **Fabricated vs. derived is the distinction; "computed vs. reported" is not.** When a wave stops being empty because a derivation now values it (GhanaLSS 1998-99/2005-06/2012-13/2016-17 under `GhanaLSS::food_acquired::8h-farmgate`, PR #916), the pinned count moves and the test's baseline moves with it — it has not regressed.
 
 **Two decisions, both 2026-09-11.** *No warning at `Feature()` level* — a `PopulationHeterogeneityWarning`-style warning was considered and declined: the `attrs` summary already says what is below and where to look, and `Country(...)` calls have the column. *No options on a derivation function* — the cache is content-addressed and a cached parquet must be one identifiable construction; a user wanting another assumption re-derives from `derivation_inputs`, which is what it is for. Describe the alternatives in the docstring; serve one.
 
@@ -529,6 +679,36 @@ Rules:
 Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_logs/PLAN_sample_v_migration.org`, `slurm_logs/DESIGN_sample_as_v_source.org`.
 
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
+
+**The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
+Nine countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Mali, Niger,
+Senegal, Tanzania, Uganda) ship git-tracked `_/panel_ids.json` +
+`_/updated_ids.json`; Malawi and Nigeria derive theirs from per-wave
+`data_info.yml` into a cache parquet only. **Design A is the convention** — a
+panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
+to recompute, identical for every user, and the input to every longitudinal
+result), so it belongs where a change shows up as a reviewable diff.
+Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
+diff; converting Malawi/Nigeria to A is #894's remaining work, and they are
+named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a twelfth
+country cannot pick a design by accident.
+
+> **Never give the JSON a Make rule.** The nine Makefiles used to carry
+> `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,
+> which regenerates whenever the script is the newer file — and **on a pip
+> install which of the two is newer is decided by the millisecond the wheel was
+> unpacked**: the zip stores `.json` before `.py` alphabetically, and measured
+> on the real 0.13.0 wheel 5 of the 9 straddled a filesystem tick and landed
+> with the script ~1 ms ahead. The recipe then ran with cwd inside
+> `site-packages` and the script wrote a bare relative path, so every non-root
+> user on a shared install got `PermissionError` raised three layers inside a
+> `make` subprocess. The blast radius was **every table**, not just
+> `panel_ids`: `_finalize_result` calls `id_walk(df, self.updated_ids)` on every
+> read (`country.py:3107`). Keeping the JSON as a *prerequisite* is fine and
+> correct; putting it on a rule's left-hand side is not, `make clean` must not
+> delete it, and `panel_ids.py` must write relative to `Path(__file__).parent`.
+> Pinned by `tests/test_panel_ids_persistence.py`, which reproduces the trigger
+> (script made newer than the JSON) rather than the spelling.
 
 ## Panel ID Transitive Chains and the `attrs` Flag
 

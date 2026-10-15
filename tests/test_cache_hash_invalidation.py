@@ -224,9 +224,33 @@ def test_schema_version_is_a_real_lever(temp_data_dir, monkeypatch):
            "LSMS_NO_CACHE (set by --rebuild-caches) bypasses; the test's "
            "premise does not exist under a cold gate",
 )
-def test_legacy_country_parquet_is_trust_once_stamped(temp_data_dir, monkeypatch):
-    """A pre-hash L2-country parquet is read (not rebuilt) and stamped so
-    the next read is guarded."""
+def test_hashless_country_parquet_is_rebuilt_not_trusted(temp_data_dir, monkeypatch):
+    """A hashless L2-COUNTRY parquet is rebuilt, not served and stamped (GH #809).
+
+    **This test formerly asserted the opposite** -- it was
+    ``test_legacy_country_parquet_is_trust_once_stamped``, and it pinned the
+    v0.8.0 migration design: a parquet with no embedded hash predates stamping,
+    so trust it once and re-stamp it, and no upgrade triggers a corpus rebuild.
+
+    That reasoning does not survive contact with the country tier, because
+    "hashless" there does not mean "old". A country script's
+    ``to_parquet('../var/x.parquet')`` passes no ``cache_hash=``, so a
+    ``var/<table>.parquet`` a ``make`` recipe wrote *moments ago* is hashless
+    too and graded identically. And the re-stamp is what made it permanent:
+    writing the CURRENT expected hash onto unverified content means every later
+    read grades ``fresh``, so a script that disagrees with the framework becomes
+    the served truth forever and the evidence is destroyed. #808 is the instance
+    that was caught, and only because its symptom was visible in the data.
+
+    What the reversal costs: a genuine pre-v0.8.0 parquet now rebuilds instead
+    of migrating. Measured 2026-09-14, that cost is nil in practice -- 0 of 376
+    warm country-level parquets are hashless -- and v0.8.0 is five minor
+    versions back. What it buys is that the gate can no longer launder a
+    recipe's output into a fresh cache entry.
+
+    The WAVE tier is unchanged and must stay so: script-path L2-wave parquets
+    are hashless by design (see ``test_legacy_wave_parquet_*`` and GH #479).
+    """
     # The v-join is a read-time transform unrelated to the cache-hash
     # behavior under test; stub it so the test doesn't try to materialize
     # `sample` (which hits S3 in a no-credentials CI environment).
@@ -248,10 +272,16 @@ def test_legacy_country_parquet_is_trust_once_stamped(temp_data_dir, monkeypatch
     assert lt.read_parquet_cache_hash(var_p) is None
 
     df = c.housing()
-    # The fast path served our seeded data (proves no rebuild from source).
-    assert "Roof" in df.columns
-    assert set(df["Roof"]) <= {"Grass", "Iron Sheets"}
-    # ... and migrated the parquet to the current hash.
+    # The seeded frame must NOT have been served: a hashless country parquet is
+    # evidence-free, so the gate rebuilds through the framework path.  The
+    # sentinel values are the tell -- a real build of this fixture does not
+    # produce exactly {Grass, Iron Sheets} over exactly h1/h2.
+    served = set(df["Roof"]) if "Roof" in df.columns else set()
+    assert not (len(df) == 2 and served == {"Grass", "Iron Sheets"}), (
+        "the hashless parquet was served unverified (GH #809)"
+    )
+    # Whatever the rebuild produced, it is stamped -- so the next read is a
+    # genuine cache hit rather than another rebuild (no loop).
     assert lt.read_parquet_cache_hash(var_p) == expected
     assert lt.cache_freshness(var_p, expected) == "fresh"
 

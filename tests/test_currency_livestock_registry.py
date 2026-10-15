@@ -91,15 +91,21 @@ def test_registry_matches_canonical_yaml():
     )
 
 
-def test_canonical_value_columns_are_the_expected_three():
+def test_canonical_value_columns_are_the_expected_four():
     """The additivity split is a definition; pin the vocabulary itself.
 
     ValuePerAnimal (a unit price, NOT additive), HerdValue (a stock total,
     additive) and SalesValue (a transaction-flow total, additive) are three
     genuinely different quantities that were all once spelled `Value`.
     Adding a fourth is a definitional act and should be deliberate.
+
+    PurchaseValue is that fourth, added 2026-09-16: the purchase-side twin of
+    SalesValue, additive, with HeadAcquired as its denominator.  It was NOT
+    one of the columns once spelled `Value`, so this is an addition to the
+    vocabulary rather than a rename within it.
     """
-    assert _yaml_monetary() == {"ValuePerAnimal", "HerdValue", "SalesValue"}
+    assert _yaml_monetary() == {"ValuePerAnimal", "HerdValue", "SalesValue",
+                               "PurchaseValue"}
 
 
 def test_every_declared_livestock_value_column_is_monetary():
