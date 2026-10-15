@@ -188,6 +188,10 @@ def _money_only_rows(v, units, expected):
     not loss.  The test is deliberately structural: a group with any
     reported quantity keeps its null-Quantity rows as real, reportable loss,
     and a group smaller than :data:`MONEY_ONLY_MIN_GROUP` never qualifies.
+    A mis-bound quantity column can also satisfy this structural test; it
+    cannot establish questionnaire coverage. Site B is an independent
+    wave-level null-column guard, but does not detect a null purchased group
+    when another source in that wave still carries quantities.
 
     Only the ``*value`` modes are judged: in the ``*price`` modes
     ``expected`` is a REPORTED price, and a reported price on a row with no

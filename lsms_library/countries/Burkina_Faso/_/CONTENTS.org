@@ -467,9 +467,10 @@ The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only pass
 CORRECTION (2026-10-14, GH #864).  "=Quantity= ... NaN for passages 2--4"
 described the SOURCE, not the served table: =food_acquired_to_canonical=
 fills a null quantity with 0 before computing the purchased quantity, so
-every passage-2/3/4 purchased row (405,127) and 43,906 passage-1 rows were
-SERVED with =Quantity = 0= -- "bought none" -- against a positive
-Expenditure.  =2014/_/mapping.py::_restore_missing_quantity= now puts the
+every passage-2/3/4 purchased row (405,127) and 44,125 passage-1 rows were
+SERVED with =Quantity = 0=. Of the passage-1 zeros, 43,906 replaced
+missing source quantities; 219 came from the existing subtraction/clipping
+rule. The latter remain zero after this correction.  =2014/_/mapping.py::_restore_missing_quantity= now puts the
 NaN back wherever the source quantity was null.  Produced rows for passages
 2--4 do not exist (=qautocons= is a passage-1 variable; the p2--p4
 =autocons= VALUE is still unread, see the 2026-10-14 section at the end).
