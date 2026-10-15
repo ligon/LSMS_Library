@@ -1,0 +1,17 @@
+{
+  "aggregate_only": true,
+  "files": {
+    "comparison.json": {
+      "bytes": 17066,
+      "sha256": "5bed2fe6431b1b95515fd6a230e16bb59f80d76a63aca09135e06e3819d836c4"
+    },
+    "compare_prior.py": {
+      "bytes": 7616,
+      "sha256": "e52f955ac86e2b9b6dc82862706c98e943afa594190f111b38ca3f7c07f32ef0"
+    },
+    "REPORT.md": {
+      "bytes": 8765,
+      "sha256": "a045606cd9ed33f8eb9e639ead82f0587420fcb33754ce148a1bcb075d9eb339"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "run": 38681185279,
+    "source_sha": "67d781318cf9bed8162aa6c6e189cb52bad99e57",
+    "job": 116245886555,
+    "url": "https://github.com/ligon/LSMS_Library/actions/runs/38681185279/job/116245886555",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "bytes": 111745,
+    "sha256": "2a158787aed93acbae630d8519769c36d34f1310dc735a30ad2930695b5d2730",
+    "source_sha_present": true,
+    "last_completed_progress": "2026-10-15T07:04:00.6794005Z tests/test_s3_unlock.py .......                                          [ 66%]",
+    "selected_progress": [
+      "2026-10-15T04:50:46.4961522Z tests/test_collectonly_no_purge.py ......                                [  8%]",
+      "2026-10-15T05:15:59.0114189Z tests/test_currency_denominated_units.py ....................            [ 13%]",
+      "2026-10-15T05:18:32.4635790Z tests/test_ehcvm_7day.py ............................................... [ 18%]"
+    ],
+    "failure_progress_markers": [],
+    "final_summary": false,
+    "classification": "Operator cancellation; incomplete result. No assertion failure marker in captured file progress. No observed GH941 missing-Derivation or inkind symptom. Uganda historical nutrition assertion not reached."
+  },
+  {
+    "run": 38683117467,
+    "source_sha": "74c9398ecf3c1908feb539a99bce3f3f6bf6d04f",
+    "job": 116251866635,
+    "url": "https://github.com/ligon/LSMS_Library/actions/runs/38683117467/job/116251866635",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "bytes": 108804,
+    "sha256": "d2913b5d3dc36f3385c70b8d4b845d49c83cd9f830ea27524cee1af0ed2332ea",
+    "source_sha_present": true,
+    "last_completed_progress": "2026-10-15T07:02:58.3212314Z tests/test_module_shadowing.py ........                                  [ 34%]",
+    "selected_progress": [
+      "2026-10-15T05:10:32.6487353Z tests/test_collectonly_no_purge.py ......                                [  6%]",
+      "2026-10-15T05:35:50.3280683Z tests/test_currency_denominated_units.py ....................            [  8%]",
+      "2026-10-15T05:38:39.6965346Z tests/test_ehcvm_7day.py ............................................... [ 12%]"
+    ],
+    "failure_progress_markers": [],
+    "final_summary": false,
+    "classification": "Operator cancellation; incomplete result. No assertion failure marker in captured file progress. No observed GH941 missing-Derivation or inkind symptom. Uganda historical nutrition assertion not reached."
+  }
+]

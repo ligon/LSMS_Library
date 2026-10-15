@@ -1,0 +1,515 @@
+{
+  "observed_utc": "2026-10-15T06:54:16.524919+00:00",
+  "scope": "Git object reads and saved aggregate evidence only; no API or cache access",
+  "refs": {
+    "v0.14.0": {
+      "commit": "1528fa937bcf87f146b3af9ebfdbe18b8f912750",
+      "helpers_sha256_ast_source_segment": {
+        "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+        "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74"
+      },
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "countries": {
+        "GhanaSPS": {
+          "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+          "declared_tables": [
+            "food_acquired",
+            "household_roster",
+            "individual_education",
+            "sample",
+            "housing",
+            "plot_features",
+            "livestock",
+            "crop_production",
+            "plot_labor"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight",
+            "strata",
+            "Rural"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/GhanaSPS/2009-10/_/data_info.yml": {
+              "blob": "c7ead6ca0f0a5ea58e1bec03c4408109ad39fcdf",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "id3",
+                "weight": "hhweight3",
+                "panel_weight": "hhweight3",
+                "strata": "loc7",
+                "Rural": "urbrur"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2013-14/_/data_info.yml": {
+              "blob": "481999297b1a49998fb32348305d6a1e517261c4",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2017-18/_/data_info.yml": {
+              "blob": "797fa6fe5207cfe17066482dd1b8d98c0dea2cd5",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary",
+                "strata": "region"
+              }
+            }
+          }
+        },
+        "Panama": {
+          "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+          "declared_tables": [
+            "sample",
+            "food_acquired"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/Panama/1997/_/data_info.yml": {
+              "blob": "ddcb793cdef9804f4f3eae12443ca6249acd5c62",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm"
+              }
+            },
+            "lsms_library/countries/Panama/2003/_/data_info.yml": {
+              "blob": "baac722cf671b772e70d68fd6d10f5f527061bee",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            },
+            "lsms_library/countries/Panama/2008/_/data_info.yml": {
+              "blob": "754abda283f7d1fb3e98e2247b93f0eed9ad496f",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            }
+          }
+        }
+      }
+    },
+    "452302adcfdbf3af538ef06375df1ac6c5aaa8a0": {
+      "commit": "452302adcfdbf3af538ef06375df1ac6c5aaa8a0",
+      "helpers_sha256_ast_source_segment": {
+        "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+        "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74"
+      },
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "countries": {
+        "GhanaSPS": {
+          "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+          "declared_tables": [
+            "food_acquired",
+            "household_roster",
+            "individual_education",
+            "sample",
+            "housing",
+            "plot_features",
+            "livestock",
+            "crop_production",
+            "plot_labor"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight",
+            "strata",
+            "Rural"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/GhanaSPS/2009-10/_/data_info.yml": {
+              "blob": "c7ead6ca0f0a5ea58e1bec03c4408109ad39fcdf",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "id3",
+                "weight": "hhweight3",
+                "panel_weight": "hhweight3",
+                "strata": "loc7",
+                "Rural": "urbrur"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2013-14/_/data_info.yml": {
+              "blob": "481999297b1a49998fb32348305d6a1e517261c4",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2017-18/_/data_info.yml": {
+              "blob": "797fa6fe5207cfe17066482dd1b8d98c0dea2cd5",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary",
+                "strata": "region"
+              }
+            }
+          }
+        },
+        "Panama": {
+          "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+          "declared_tables": [
+            "sample",
+            "food_acquired"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/Panama/1997/_/data_info.yml": {
+              "blob": "ddcb793cdef9804f4f3eae12443ca6249acd5c62",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm"
+              }
+            },
+            "lsms_library/countries/Panama/2003/_/data_info.yml": {
+              "blob": "baac722cf671b772e70d68fd6d10f5f527061bee",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            },
+            "lsms_library/countries/Panama/2008/_/data_info.yml": {
+              "blob": "754abda283f7d1fb3e98e2247b93f0eed9ad496f",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            }
+          }
+        }
+      }
+    },
+    "7fa05179c8519f44ea329ba6387f5d6d6441a8ea": {
+      "commit": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+      "helpers_sha256_ast_source_segment": {
+        "_market_lookup": "28badc458588033448a756d887b473b9a556347e0d904309208adac02a789e1c",
+        "_add_market_index": "06abd186d9338a8ab91c042da8d944ec50cfaa973643421b89e1dc0a6423bc74"
+      },
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "countries": {
+        "GhanaSPS": {
+          "data_scheme_blob": "2851131b2861815c5f5ed1374b85a609030777e0",
+          "declared_tables": [
+            "food_acquired",
+            "household_roster",
+            "individual_education",
+            "sample",
+            "housing",
+            "plot_features",
+            "livestock",
+            "crop_production",
+            "plot_labor"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight",
+            "strata",
+            "Rural"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/GhanaSPS/2009-10/_/data_info.yml": {
+              "blob": "c7ead6ca0f0a5ea58e1bec03c4408109ad39fcdf",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "id3",
+                "weight": "hhweight3",
+                "panel_weight": "hhweight3",
+                "strata": "loc7",
+                "Rural": "urbrur"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2013-14/_/data_info.yml": {
+              "blob": "481999297b1a49998fb32348305d6a1e517261c4",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary"
+              }
+            },
+            "lsms_library/countries/GhanaSPS/2017-18/_/data_info.yml": {
+              "blob": "797fa6fe5207cfe17066482dd1b8d98c0dea2cd5",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "FPrimary",
+                "strata": "region"
+              }
+            }
+          }
+        },
+        "Panama": {
+          "data_scheme_blob": "76cf7430a49a97b697c9206fe87eced9dbb91d1e",
+          "declared_tables": [
+            "sample",
+            "food_acquired"
+          ],
+          "sample_declared_columns": [
+            "index",
+            "v",
+            "weight",
+            "panel_weight"
+          ],
+          "wave_configs": {
+            "lsms_library/countries/Panama/1997/_/data_info.yml": {
+              "blob": "ddcb793cdef9804f4f3eae12443ca6249acd5c62",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm"
+              }
+            },
+            "lsms_library/countries/Panama/2003/_/data_info.yml": {
+              "blob": "baac722cf671b772e70d68fd6d10f5f527061bee",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            },
+            "lsms_library/countries/Panama/2008/_/data_info.yml": {
+              "blob": "754abda283f7d1fb3e98e2247b93f0eed9ad496f",
+              "cluster_features_declared": false,
+              "sample_myvars": {
+                "v": "upm",
+                "weight": "factor",
+                "panel_weight": "factor"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "corpus": {
+    "GhanaSPS": {
+      "results_sha256": "0cc34d72608bf64d6902c75b0a3b5aff6a113c283879b5a22e0ebfe94f2cec34",
+      "success_pairs": 13,
+      "declared_waves": [
+        "2009-10",
+        "2013-14",
+        "2017-18"
+      ],
+      "sample_served": {
+        "shape": [
+          15452,
+          5
+        ],
+        "columns": [
+          "Rural",
+          "panel_weight",
+          "strata",
+          "v",
+          "weight"
+        ],
+        "index_names": [
+          "i",
+          "t"
+        ],
+        "dtypes": {
+          "Rural": "string",
+          "panel_weight": "Float64",
+          "strata": "string",
+          "v": "string",
+          "weight": "Float64"
+        },
+        "content_hash": "29ffe274d35fbfb794a8513d168de0169b40e8508d68d666e807462beadcf31a",
+        "index_unique": true,
+        "null_counts": {
+          "v": 0,
+          "weight": 10443,
+          "panel_weight": 10443,
+          "strata": 4774,
+          "Rural": 10443
+        },
+        "numeric_sums": {
+          "weight": 5009.0,
+          "panel_weight": 5009.0
+        },
+        "wave_rows": {
+          "2017-18": 5669,
+          "2009-10": 5009,
+          "2013-14": 4774
+        }
+      }
+    },
+    "Panama": {
+      "results_sha256": "2851dca1d39ab9ad26d6ad6a7a681012e01a65d5a0cd4665619072adf25fa415",
+      "success_pairs": 5,
+      "declared_waves": [
+        "1997",
+        "2003",
+        "2008"
+      ],
+      "sample_served": {
+        "shape": [
+          18353,
+          3
+        ],
+        "columns": [
+          "panel_weight",
+          "v",
+          "weight"
+        ],
+        "index_names": [
+          "i",
+          "t"
+        ],
+        "dtypes": {
+          "panel_weight": "Float64",
+          "v": "string",
+          "weight": "Float64"
+        },
+        "content_hash": "f412b1939703d62c01ebf1bd55a2077736c74f55b5d456b51ec366a1e95f92de",
+        "index_unique": true,
+        "null_counts": {
+          "v": 0,
+          "weight": 4945,
+          "panel_weight": 4945
+        },
+        "numeric_sums": {
+          "weight": 13408.0,
+          "panel_weight": 13408.0
+        },
+        "wave_rows": {
+          "2008": 7045,
+          "2003": 6363,
+          "1997": 4945
+        }
+      }
+    }
+  },
+  "audit_snapshot": {
+    "complete_lines": 2641,
+    "complete_prefix_sha256": "89b37f30d0037e53b9f0a4cdd0caaf85bd3d86b3127822dde1874f02e03afcaf",
+    "warnings": [
+      {
+        "phase": "2-kwargs",
+        "feature": "food_expenditures",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_expenditures for GhanaSPS: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "food_expenditures",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_expenditures for Panama: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "food_prices",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_prices for GhanaSPS: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "food_prices",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_prices for Panama: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "food_quantities",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_quantities for GhanaSPS: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "food_quantities",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load food_quantities for Panama: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning"
+      },
+      {
+        "phase": "2-kwargs",
+        "feature": "household_characteristics",
+        "check": "runtime_warning",
+        "status": "warn",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "severity": "A",
+        "expected": true,
+        "detail": "Failed to load household_characteristics for GhanaSPS: RuntimeError: cluster_features returned no data for any wave.",
+        "metrics": {},
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning"
+      }
+    ]
+  }
+}

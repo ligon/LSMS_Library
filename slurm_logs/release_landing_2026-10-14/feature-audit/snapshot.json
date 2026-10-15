@@ -1,0 +1,12 @@
+{
+  "source": "/local/job39919092/release-work/runtime/data-corpus",
+  "target": "/local/job39919092/release-work/runtime/data-feature-audit",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "files": 1519,
+  "bytes": 340885785,
+  "all_files_sha256_equal": true,
+  "all_file_inodes_distinct": true,
+  "source_metadata_unchanged": true,
+  "only_symlink": "dvc-cache",
+  "seconds": 2.0061092376708984
+}

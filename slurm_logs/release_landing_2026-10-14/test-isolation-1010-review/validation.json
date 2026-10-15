@@ -1,0 +1,207 @@
+{
+  "scope": "read-only saved evidence/source review; no APIs, cache access or survey rerun",
+  "verdict": "APPROVE test isolation change and aggregate evidence; release/scientific holds retained",
+  "base": "cf1840e02317bac052b99e1e6c9fa066a8ca45bc",
+  "fix": "22a841ed8940c618680c5b4363fcb60e455b4a14",
+  "development_port": "f00f329b37a793ec7ef17970431e5f4f6478dc4d",
+  "changed_paths": [
+    ".coder/ledger/ci-ghana-repeat-build.md",
+    "tests/test_collectonly_no_purge.py"
+  ],
+  "old_functions_ast_identical_except_one_setenv": true,
+  "development_port_test_blob_identical": true,
+  "events": {
+    "isolated": {
+      "records": 6,
+      "events": {
+        "observer_ready": 1,
+        "test_setup": 1,
+        "test_report": 3,
+        "finish": 1
+      },
+      "hash_and_manifest_stable": true,
+      "calls": []
+    },
+    "ordered-before": {
+      "records": 37,
+      "events": {
+        "observer_ready": 1,
+        "before_preceding_suite": 1,
+        "after_preceding_suite": 1,
+        "api_start": 3,
+        "build_start": 15,
+        "build_end": 14,
+        "api_end": 2
+      },
+      "hash_and_manifest_stable": true,
+      "calls": [
+        {
+          "api": "_country",
+          "seconds": 329.2702096160501,
+          "rows": 5340606
+        },
+        {
+          "api": "food_prices",
+          "units": "unitvalue",
+          "seconds": 327.5550620658323,
+          "rows": 1676093
+        }
+      ]
+    },
+    "ordered-after": {
+      "records": 12,
+      "events": {
+        "observer_ready": 1,
+        "before_preceding_suite": 1,
+        "after_preceding_suite": 1,
+        "api_start": 4,
+        "api_end": 4,
+        "replay_passed": 1
+      },
+      "hash_and_manifest_stable": true,
+      "calls": [
+        {
+          "api": "_country",
+          "seconds": 24.20107430871576,
+          "rows": 5340606
+        },
+        {
+          "api": "food_prices",
+          "units": "unitvalue",
+          "seconds": 31.007334579713643,
+          "rows": 1676093
+        },
+        {
+          "api": "food_prices",
+          "units": "unitprice",
+          "seconds": 24.976922823116183,
+          "rows": 189656
+        },
+        {
+          "api": "food_quantities",
+          "units": "units",
+          "seconds": 29.572259828448296,
+          "rows": 1694623
+        }
+      ]
+    },
+    "exact-selection-after": {
+      "records": 78,
+      "events": {
+        "observer_ready": 1,
+        "test_setup": 19,
+        "test_report": 57,
+        "finish": 1
+      },
+      "hash_and_manifest_stable": true,
+      "calls": []
+    }
+  },
+  "reviewed_publishable": {
+    "REPORT.md": {
+      "bytes": 7055,
+      "sha256": "823a71b58e41f6dfe9b37c84df9cd1259cd781d780b73e438849e445b7a277bf"
+    },
+    "cancelled-comparison.json": {
+      "bytes": 2461,
+      "sha256": "04a4c8587229101511293bf450a7d43088459cb02c848a3aa19853c088c7a725"
+    },
+    "comparison.json": {
+      "bytes": 7411,
+      "sha256": "c2bd5e1dc3fb5f2e4c3bcbd4bbdb86f470d00258584e4690bf3af13a38ba24bf"
+    },
+    "copy-identity.json": {
+      "bytes": 471,
+      "sha256": "167c67741fa4ba8f497a00cec2117c603451ea36f0107ca57ba51ec74a644a72"
+    },
+    "environment-before.json": {
+      "bytes": 616,
+      "sha256": "359cf5df8777b4b257cb1f827d732b62d1a75a101505297bddaf0050b2962aaf"
+    },
+    "observe_ghana.py": {
+      "bytes": 2143,
+      "sha256": "e55336c0d1d7b7b1cc2b44636538518f06fcd2f9605883219e3b605f48e4d4e6"
+    },
+    "ordered_replay.py": {
+      "bytes": 1378,
+      "sha256": "86fb0b452ca025959af1cf06cc7badb0b2abb7cebce6c3aeab5b0984c17a4c0f"
+    },
+    "private-evidence-hashes.json": {
+      "bytes": 2298,
+      "sha256": "055295ac1868d9478042cfcbc3f721862a13d013416e070ffdebba03929f989c"
+    },
+    "probe_environment.py": {
+      "bytes": 1029,
+      "sha256": "d1cdb5153956e1f6ba6449e9b5675cee0b54fd28dd6c451a1a68b4fd8ec5623f"
+    }
+  },
+  "private_hashes_verified": {
+    "environment-before.json": {
+      "bytes": 655,
+      "sha256": "04225d61e48c92cee6abf45e694549591f779fdb22a9743a52b8ba5c1fd08283",
+      "boundary": "complete"
+    },
+    "regression-before.log": {
+      "bytes": 1733,
+      "sha256": "bb5c4f7f58c82a2af09feb8080e5877c22b4397cdb385c72bea5105d37456ffd",
+      "boundary": "complete"
+    },
+    "regression-after.log": {
+      "bytes": 99,
+      "sha256": "cdf51e5c680baeb49e2b88f7c365e2d38bc9bd2601753b595585fb2e3097055a",
+      "boundary": "complete"
+    },
+    "isolated-test.log": {
+      "bytes": 16747,
+      "sha256": "0dccd8865f67ff133750362dd9d61e5f181038ec2e735c9db99074d94c2a3827",
+      "boundary": "complete"
+    },
+    "isolated-events.jsonl": {
+      "bytes": 3961,
+      "sha256": "f19ed2b217e5319f57ef3bd9214411529c0a771f0e6f2ecaf6fbe86d8faae6ec",
+      "boundary": "complete"
+    },
+    "ordered-before.log": {
+      "bytes": 23162,
+      "sha256": "185587b144fe939809628b8dd054653df9ebfcc8f74a38bd6520d005c9a0fffa",
+      "boundary": "in-progress checkpoint",
+      "private_snapshot_file": "publish-checkpoint-ordered-before.log"
+    },
+    "ordered-before-events.jsonl": {
+      "bytes": 23240,
+      "sha256": "02c28114de1fe71fc6f7c9921cb5fd8ac2c67306fc02ce40ad9df77363e53e57",
+      "boundary": "in-progress checkpoint",
+      "private_snapshot_file": "publish-checkpoint-ordered-before-events.jsonl"
+    },
+    "ordered-after.log": {
+      "bytes": 45430,
+      "sha256": "aba8cd6b4d0a78ac4ad9e9e6d16bf1a34473f06633c0c7901a5d4248b0023433",
+      "boundary": "complete"
+    },
+    "ordered-after-events.jsonl": {
+      "bytes": 7018,
+      "sha256": "59e3061d9decaf4c74beb5add7bd35da859d7697adae3819e58a3d1a86b172cb",
+      "boundary": "complete"
+    },
+    "exact-selection-after.log": {
+      "bytes": 17684,
+      "sha256": "18f77b54fcf7c8f488a2648137e0dd2362861cea4ea5968860634010455bad77",
+      "boundary": "complete"
+    },
+    "exact-selection-after-events.jsonl": {
+      "bytes": 54336,
+      "sha256": "4abb556561f6402a7ea688f40de1a9c7763c3717050766128f9c97b5d4e68e08",
+      "boundary": "complete"
+    },
+    "ordered_replay.py": {
+      "bytes": 1378,
+      "sha256": "86fb0b452ca025959af1cf06cc7badb0b2abb7cebce6c3aeab5b0984c17a4c0f",
+      "boundary": "complete"
+    },
+    "observe_ghana.py": {
+      "bytes": 2143,
+      "sha256": "e55336c0d1d7b7b1cc2b44636538518f06fcd2f9605883219e3b605f48e4d4e6",
+      "boundary": "complete"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "number": 1009,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1009",
+  "status": "OPEN",
+  "body_sha256": "f6e2ed5846317926d95ce2777c4d0681013c63c4afef1c9747d47dd8beb56a82",
+  "evidence_commit": "ae890a48f16f9cdb1b7b857af9d89eadf463265e",
+  "scope": "Pre-existing Panama Region-market geography dependency; GhanaSPS already tracked under #140; no mapping or data change"
+}

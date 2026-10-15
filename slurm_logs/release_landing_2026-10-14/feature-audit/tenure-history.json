@@ -1,0 +1,109 @@
+{
+  "refs": [
+    "1528fa937bcf87f146b3af9ebfdbe18b8f912750",
+    "452302adcfdbf3af538ef06375df1ac6c5aaa8a0",
+    "7fa05179c8519f44ea329ba6387f5d6d6441a8ea"
+  ],
+  "history": {
+    "1528fa937bcf87f146b3af9ebfdbe18b8f912750": {
+      "country_tree_git_hashes": {
+        "Albania": "2927302116adf32cb8cbfc83341ec5d50fc27406",
+        "Cambodia": "ceba4474f12d210550e904a8cc08e93fa0bc0336",
+        "Kosovo": "895a859600092a479dba03622fa632bddfbb4c26",
+        "Tajikistan": "0efe7bda3e3de9c598845d4dde7134863dca4c88",
+        "Timor-Leste": "11c93f0d052bf0ff608df14aaaac2322d44c05ab"
+      },
+      "declared_spellings_function_sha256": "21f1f3424ea0946c7795b93f8eca651f7a8f9952115a819a5c54c05d04d534cb",
+      "known_unharmonized_declaration_sha256": "ee56f690b731e8f679b83d7e10a85c691267dbf1b5d5d2eaa33c0e2ac0d7fb2f",
+      "plot_features_schema_sha256": "584677880b0787094b2016698ef642bcb114750fdeff9897a55a293ef1e50065"
+    },
+    "452302adcfdbf3af538ef06375df1ac6c5aaa8a0": {
+      "country_tree_git_hashes": {
+        "Albania": "2927302116adf32cb8cbfc83341ec5d50fc27406",
+        "Cambodia": "ceba4474f12d210550e904a8cc08e93fa0bc0336",
+        "Kosovo": "895a859600092a479dba03622fa632bddfbb4c26",
+        "Tajikistan": "0efe7bda3e3de9c598845d4dde7134863dca4c88",
+        "Timor-Leste": "11c93f0d052bf0ff608df14aaaac2322d44c05ab"
+      },
+      "declared_spellings_function_sha256": "21f1f3424ea0946c7795b93f8eca651f7a8f9952115a819a5c54c05d04d534cb",
+      "known_unharmonized_declaration_sha256": "ee56f690b731e8f679b83d7e10a85c691267dbf1b5d5d2eaa33c0e2ac0d7fb2f",
+      "plot_features_schema_sha256": "584677880b0787094b2016698ef642bcb114750fdeff9897a55a293ef1e50065"
+    },
+    "7fa05179c8519f44ea329ba6387f5d6d6441a8ea": {
+      "country_tree_git_hashes": {
+        "Albania": "2927302116adf32cb8cbfc83341ec5d50fc27406",
+        "Cambodia": "5646af19daed5ccb182b2ff954b15f5d2b10f294",
+        "Kosovo": "895a859600092a479dba03622fa632bddfbb4c26",
+        "Tajikistan": "0efe7bda3e3de9c598845d4dde7134863dca4c88",
+        "Timor-Leste": "11c93f0d052bf0ff608df14aaaac2322d44c05ab"
+      },
+      "declared_spellings_function_sha256": "21f1f3424ea0946c7795b93f8eca651f7a8f9952115a819a5c54c05d04d534cb",
+      "known_unharmonized_declaration_sha256": "ee56f690b731e8f679b83d7e10a85c691267dbf1b5d5d2eaa33c0e2ac0d7fb2f",
+      "plot_features_schema_sha256": "584677880b0787094b2016698ef642bcb114750fdeff9897a55a293ef1e50065"
+    }
+  },
+  "country_changes_v0_14_to_frozen": {
+    "Albania": [],
+    "Cambodia": [
+      "lsms_library/countries/Cambodia/_/Makefile"
+    ],
+    "Kosovo": [],
+    "Tajikistan": [],
+    "Timor-Leste": []
+  },
+  "cambodia_only_diff": "diff --git a/lsms_library/countries/Cambodia/_/Makefile b/lsms_library/countries/Cambodia/_/Makefile\nindex 8fa6e3725..84fc8406b 100644\n--- a/lsms_library/countries/Cambodia/_/Makefile\n+++ b/lsms_library/countries/Cambodia/_/Makefile\n@@ -1,6 +1,6 @@\n rounds := $(shell ls -d ../[12]*)\n \n-source = $(shell find $(rounds) -name \\*.py)\n+source = $(shell find $(rounds) -name \"*.py\")\n parquet := $(source:.py=.parquet)\n \n COUNTRY := $(shell basename \"$$(cd .. && pwd)\")\n",
+  "read_only_label_comparisons": {
+    "Albania": {
+      "tenure_columns": [
+        "Tenure",
+        "TenureSystem"
+      ],
+      "rows": 20176,
+      "shared_and_cold_private_tenure_frames_exactly_equal": true,
+      "source_file_metadata_unchanged": true
+    },
+    "Cambodia": {
+      "tenure_columns": [
+        "Tenure",
+        "TenureSystem"
+      ],
+      "rows": 3005,
+      "shared_and_cold_private_tenure_frames_exactly_equal": true,
+      "source_file_metadata_unchanged": true
+    },
+    "Kosovo": {
+      "tenure_columns": [
+        "Tenure",
+        "TenureSystem"
+      ],
+      "rows": 6469,
+      "shared_and_cold_private_tenure_frames_exactly_equal": true,
+      "source_file_metadata_unchanged": true
+    },
+    "Tajikistan": {
+      "tenure_columns": [
+        "Tenure",
+        "TenureSystem"
+      ],
+      "rows": 3974,
+      "shared_and_cold_private_tenure_frames_exactly_equal": true,
+      "source_file_metadata_unchanged": true
+    },
+    "Timor-Leste": {
+      "tenure_columns": [
+        "Tenure"
+      ],
+      "rows": 6308,
+      "shared_and_cold_private_tenure_frames_exactly_equal": true,
+      "source_file_metadata_unchanged": true
+    }
+  },
+  "issue": {
+    "number": 602,
+    "title": "Declared 'spellings' are mapped but never ENFORCED \u2014 Uganda 2005-06 Rural is 2263 rows of the string '0', and it grades sane",
+    "state": "CLOSED",
+    "url": "https://github.com/ligon/LSMS_Library/issues/602"
+  },
+  "issue_body_sha256": "2fffd6ed8ea6239908ce02ab23b1389b8cb65184c04d927ffe8dd6606b900f24",
+  "interpretation": "Five real unresolved tenure-vocabulary defects explicitly documented by the pre-existing test enumeration and ledger602 section7. Closed602 fixed enforcement, not these mappings. No historical cold rebuild or historical exact input-count claim. Existing shared cache is corroborating evidence, not a truth baseline."
+}

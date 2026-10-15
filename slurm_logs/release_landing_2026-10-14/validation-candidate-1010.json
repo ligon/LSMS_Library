@@ -1,0 +1,13 @@
+{
+  "previous_integration": "b1b7bae7ceadeb1a6be2812c9ddb3b571281a056",
+  "corrected_candidate": "9d5bf200f170f322076626386689b498bebb1c06",
+  "implementation_tested": "22a841ed8940c618680c5b4363fcb60e455b4a14",
+  "changed_paths": [
+    ".coder/ledger/ci-ghana-repeat-build.md",
+    "tests/test_collectonly_no_purge.py"
+  ],
+  "both_changed_files_equal_tested_implementation": true,
+  "workflow_run": 38697245468,
+  "branch": "release/v0.15.0-cache-flag-validation",
+  "interpretation": "Only test isolation and its ledger differ from the source-equivalence checkpoint. Runtime, country config, dependencies, harness and workflow are unchanged. Credentialed CI is newly dispatched, not passed. Pending Uganda #967 remains included only as a candidate."
+}

@@ -1,0 +1,18 @@
+{
+  "source": "/local/job39919092/release-work/control/countries/1010-review",
+  "aggregate_only": true,
+  "files": {
+    "REVIEW.md": {
+      "bytes": 5370,
+      "sha256": "832b336fd8a5290f11858a3e4bfe6223b1ff0b8af2d8b49fc60286ea2037b74a"
+    },
+    "validation.json": {
+      "bytes": 6335,
+      "sha256": "69728858e049cb5ab31a0a7fed2d20ff750107b1d2fb36090d43dd2a13a70c04"
+    },
+    "check_evidence.py": {
+      "bytes": 6304,
+      "sha256": "f624912aec72982c7670768a5a391bb7984007f5203e52f8b72c86c53c82160f"
+    }
+  }
+}

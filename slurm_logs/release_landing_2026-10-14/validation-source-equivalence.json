@@ -1,0 +1,104 @@
+{
+  "observed_utc": "2026-10-15T06:50:57.472386+00:00",
+  "integration_sha": "b1b7bae7ceadeb1a6be2812c9ddb3b571281a056",
+  "scope": [
+    "lsms_library",
+    "tests",
+    "bench",
+    ".github/workflows",
+    "pyproject.toml",
+    "poetry.lock",
+    "Makefile"
+  ],
+  "comparisons": [
+    {
+      "validation": "corpus_and_feature_audit",
+      "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+      "runtime_or_country_build_configuration_differences": [],
+      "country_documentation_differences": [
+        "lsms_library/countries/Ethiopia/_/CONTENTS.org",
+        "lsms_library/countries/Nepal/_/CONTENTS.org",
+        "lsms_library/countries/Pakistan/_/CONTENTS.org",
+        "lsms_library/countries/Tajikistan/_/CONTENTS.org",
+        "lsms_library/countries/Tanzania/_/CONTENTS.org",
+        "lsms_library/countries/Uganda/_/CONTENTS.org"
+      ],
+      "test_differences": [
+        "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "tests/test_nigeria_sold_unit.py"
+      ],
+      "workflow_differences": [
+        ".github/workflows/ci.yml"
+      ],
+      "build_dependency_or_harness_differences": []
+    },
+    {
+      "validation": "installed_package_and_native_windows",
+      "source_sha": "74c9398ecf3c1908feb539a99bce3f3f6bf6d04f",
+      "runtime_or_country_build_configuration_differences": [],
+      "country_documentation_differences": [
+        "lsms_library/countries/Nepal/_/CONTENTS.org",
+        "lsms_library/countries/Pakistan/_/CONTENTS.org",
+        "lsms_library/countries/Tajikistan/_/CONTENTS.org",
+        "lsms_library/countries/Uganda/_/CONTENTS.org"
+      ],
+      "test_differences": [
+        "tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "tests/test_nigeria_sold_unit.py"
+      ],
+      "workflow_differences": [
+        ".github/workflows/ci.yml"
+      ],
+      "build_dependency_or_harness_differences": []
+    },
+    {
+      "validation": "full_credentialed_suite",
+      "source_sha": "ec1a5976751dbb4423bb4a9bb43efb62a8bd8077",
+      "runtime_or_country_build_configuration_differences": [],
+      "country_documentation_differences": [
+        "lsms_library/countries/Nepal/_/CONTENTS.org",
+        "lsms_library/countries/Pakistan/_/CONTENTS.org",
+        "lsms_library/countries/Tajikistan/_/CONTENTS.org",
+        "lsms_library/countries/Uganda/_/CONTENTS.org"
+      ],
+      "test_differences": [
+        "tests/test_gh866_stale_country_parquet_not_laundered.py"
+      ],
+      "workflow_differences": [
+        ".github/workflows/ci.yml"
+      ],
+      "build_dependency_or_harness_differences": []
+    },
+    {
+      "validation": "cache_presence_followup",
+      "source_sha": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+      "runtime_or_country_build_configuration_differences": [],
+      "country_documentation_differences": [
+        "lsms_library/countries/Nepal/_/CONTENTS.org",
+        "lsms_library/countries/Pakistan/_/CONTENTS.org",
+        "lsms_library/countries/Tajikistan/_/CONTENTS.org",
+        "lsms_library/countries/Uganda/_/CONTENTS.org"
+      ],
+      "test_differences": [],
+      "workflow_differences": [
+        ".github/workflows/ci.yml"
+      ],
+      "build_dependency_or_harness_differences": []
+    },
+    {
+      "validation": "controlled_credentialed_CI",
+      "source_sha": "cf1840e02317bac052b99e1e6c9fa066a8ca45bc",
+      "runtime_or_country_build_configuration_differences": [],
+      "country_documentation_differences": [
+        "lsms_library/countries/Nepal/_/CONTENTS.org",
+        "lsms_library/countries/Pakistan/_/CONTENTS.org",
+        "lsms_library/countries/Tajikistan/_/CONTENTS.org",
+        "lsms_library/countries/Uganda/_/CONTENTS.org"
+      ],
+      "test_differences": [],
+      "workflow_differences": [],
+      "build_dependency_or_harness_differences": []
+    }
+  ],
+  "interpretation": "All five frozen validation revisions have identical tracked package runtime and country build configuration, dependency/build inputs, and audit harness to this integration checkpoint. The only package differences are CONTENTS.org documentation, excluded from build hashes. Test and workflow differences are listed explicitly; earlier test results are not described as a rerun of later tests. This is source equivalence, not byte equality of versioned wheel artifacts, passing CI, approval of nutrition, or proof that pending #967 has landed."
+}

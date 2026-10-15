@@ -1,0 +1,356 @@
+{
+  "observed_utc": "2026-10-15T07:14:12.026127+00:00",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "scope": "saved aggregates/private diagnostics and source only; no APIs, builds or cache access",
+  "counts": {
+    "features": 39,
+    "countries": 38,
+    "country_pairs": 549,
+    "baseline_calls": 38,
+    "variants": 17,
+    "records": 3544,
+    "statuses": {
+      "warn": 3504,
+      "error": 19,
+      "pass": 16,
+      "fail": 5
+    },
+    "phases": {
+      "1a-sanity": 1234,
+      "1b-assembly": 808,
+      "2-kwargs": 1502
+    },
+    "clusters": 266
+  },
+  "hard_errors_exactly_match_corpus": true,
+  "error_pairs": [
+    [
+      "Armenia",
+      "household_characteristics"
+    ],
+    [
+      "Armenia",
+      "household_roster"
+    ],
+    [
+      "Nepal",
+      "assets"
+    ],
+    [
+      "Nepal",
+      "cluster_features"
+    ],
+    [
+      "Nepal",
+      "food_acquired"
+    ],
+    [
+      "Nepal",
+      "food_expenditures"
+    ],
+    [
+      "Nepal",
+      "food_prices"
+    ],
+    [
+      "Nepal",
+      "food_quantities"
+    ],
+    [
+      "Nepal",
+      "household_characteristics"
+    ],
+    [
+      "Nepal",
+      "household_roster"
+    ],
+    [
+      "Nepal",
+      "individual_education"
+    ],
+    [
+      "Nepal",
+      "interview_date"
+    ],
+    [
+      "Nepal",
+      "sample"
+    ],
+    [
+      "Peru",
+      "food_acquired"
+    ],
+    [
+      "Peru",
+      "food_expenditures"
+    ],
+    [
+      "Peru",
+      "food_prices"
+    ],
+    [
+      "Peru",
+      "food_quantities"
+    ],
+    [
+      "Peru",
+      "individual_education"
+    ],
+    [
+      "Peru",
+      "interview_date"
+    ]
+  ],
+  "five_fails_match_existing_known_defect_set": true,
+  "historical_source_hashes_independently_verified": true,
+  "caught_exception_categories": {
+    "missing_source_or_unwired": 52,
+    "missing_cluster_dependency": 8
+  },
+  "aggregate_checksum_reconciliation": [
+    {
+      "feature": "assets",
+      "column": "Quantity",
+      "kept_countries": [
+        "Malawi",
+        "Nigeria",
+        "Uganda"
+      ],
+      "excluded_for_labels": 20,
+      "retained_country_fsum": 992524.0,
+      "feature_aggregate": 992524.0,
+      "known_Ghana_raw_checksum_loss": 0,
+      "floating_remainder": 0.0
+    },
+    {
+      "feature": "food_acquired",
+      "column": "Quantity",
+      "kept_countries": [
+        "EthiopiaRHS",
+        "GhanaLSS",
+        "Malawi",
+        "Nigeria",
+        "Uganda"
+      ],
+      "excluded_for_labels": 15,
+      "retained_country_fsum": 15802337681.107212,
+      "feature_aggregate": 15802320749.28967,
+      "known_Ghana_raw_checksum_loss": 16931.817543859648,
+      "floating_remainder": -2.7372116164769977e-06
+    },
+    {
+      "feature": "food_acquired",
+      "column": "Expenditure",
+      "kept_countries": [
+        "EthiopiaRHS",
+        "GhanaLSS",
+        "Malawi",
+        "Nigeria",
+        "Uganda"
+      ],
+      "excluded_for_labels": 15,
+      "retained_country_fsum": 20790649534.164608,
+      "feature_aggregate": 20790629261.596897,
+      "known_Ghana_raw_checksum_loss": 20272.567543859648,
+      "floating_remainder": 0.0001670168167038355
+    },
+    {
+      "feature": "food_expenditures",
+      "column": "Expenditure",
+      "kept_countries": [
+        "EthiopiaRHS",
+        "GhanaLSS",
+        "Malawi",
+        "Nigeria",
+        "Uganda"
+      ],
+      "excluded_for_labels": 15,
+      "retained_country_fsum": 16841208012.354643,
+      "feature_aggregate": 16841208012.354641,
+      "known_Ghana_raw_checksum_loss": 0,
+      "floating_remainder": 1.9073486328125e-06
+    },
+    {
+      "feature": "food_quantities",
+      "column": "Quantity",
+      "kept_countries": [
+        "EthiopiaRHS",
+        "GhanaLSS",
+        "Malawi",
+        "Nigeria",
+        "Uganda"
+      ],
+      "excluded_for_labels": 15,
+      "retained_country_fsum": 15755335319.931122,
+      "feature_aggregate": 15755335319.931122,
+      "known_Ghana_raw_checksum_loss": 0,
+      "floating_remainder": 0.0
+    }
+  ],
+  "preservation_evidence_internally_consistent": true,
+  "preservation_limit": "Verifier logic and recorded manifest/result inspected; original bytes not reread by reviewer",
+  "public_tsv_headers": {
+    "feature-coverage.tsv": [
+      "feature",
+      "declared_country_pairs",
+      "duration_seconds_rounded",
+      "emitted_records",
+      "phase1a_country_calls",
+      "phase1b_baseline_calls",
+      "phase2_variant_calls"
+    ],
+    "check-counts.tsv": [
+      "feature",
+      "phase",
+      "check",
+      "status",
+      "count"
+    ],
+    "caught-error-counts.tsv": [
+      "feature",
+      "phase",
+      "country",
+      "exception_type",
+      "category",
+      "kwargs",
+      "count"
+    ],
+    "hard-finding-counts.tsv": [
+      "feature",
+      "phase",
+      "country",
+      "check",
+      "status",
+      "exception_type",
+      "count"
+    ],
+    "cluster-counts.tsv": [
+      "cluster_id",
+      "check",
+      "severity",
+      "status",
+      "record_count",
+      "feature_count",
+      "country_count"
+    ]
+  },
+  "publishable_manifest_verified": true,
+  "reviewed_artifacts": {
+    "publishable/tenure-history.json": {
+      "bytes": 5033,
+      "sha256": "b764311e1634adac4cd12a0135c37e6ce32c0db7b2dfe266105816481e341e4b"
+    },
+    "publishable/feature-coverage.tsv": {
+      "bytes": 1302,
+      "sha256": "fbd515e56f49e86781c195d8a3b74432faa143ca70d6aad0d04c421a760c0ab1"
+    },
+    "publishable/hard-finding-counts.tsv": {
+      "bytes": 1558,
+      "sha256": "d10cbf1948b775146468e7be5fc50080461d6a0abb600570e9f1c8a7625faebe"
+    },
+    "publishable/TRIAGE.md": {
+      "bytes": 13976,
+      "sha256": "98b497c91e58c81c67b88f874c9203dc3c56735c58ee7106b5ef95ccb46709ca"
+    },
+    "publishable/provenance.json": {
+      "bytes": 3412,
+      "sha256": "f2d9e145c563084a9779261fe8c08757c283dc3735d9a4be129872c57da95e25"
+    },
+    "publishable/tenure_history.py": {
+      "bytes": 4128,
+      "sha256": "015c8c09cb1a752974c05e92a35585064bf14c3a2595a4cdc1fbec7437177112"
+    },
+    "publishable/publish_summary.py": {
+      "bytes": 7745,
+      "sha256": "ed7fe78e5e75b812cf52d8b92dd8ba2cc8190b1ff19930ebe06a43c177503630"
+    },
+    "publishable/run-metadata.json": {
+      "bytes": 611,
+      "sha256": "1be927b13cbc2f730946b72f624e88bcc96cdcc96b5d98f267cc4dc3526f3049"
+    },
+    "publishable/verify_original.py": {
+      "bytes": 1980,
+      "sha256": "50ba95bbe98765a856d7fda2efa639fb7275ad999d721480aee51d7fd05c6bce"
+    },
+    "publishable/market-dependency-history.json": {
+      "bytes": 1551,
+      "sha256": "aa55dd4ae84e4b69e10e519c7381234d2d0d126d62af5b7979bed082b149d687"
+    },
+    "publishable/check-counts.tsv": {
+      "bytes": 8440,
+      "sha256": "91fb61fef93594b396c7a9edb67add0fe6d92186a43f2b7b5af3aa871774a458"
+    },
+    "publishable/MANIFEST.json": {
+      "bytes": 2676,
+      "sha256": "91c9c1c1b3033571b94edefb67e97843fbabcf479ce9c847e86e2a220fdb6f76"
+    },
+    "publishable/snapshot.json": {
+      "bytes": 414,
+      "sha256": "6f607dbea57917bd9e39e216fb46e8fb7e28c51fd114d8561d3c9d2019644e38"
+    },
+    "publishable/run.sh": {
+      "bytes": 1238,
+      "sha256": "ec3557d64c39f32af1dffc75514ae1e18483ab4b7e606066a082286ac2f22888"
+    },
+    "publishable/caught-error-counts.tsv": {
+      "bytes": 5733,
+      "sha256": "bde26b43de3adc5e2776b5fe38725cb741f21e9379aaf5b654c3387f5fd2b1de"
+    },
+    "publishable/cluster-counts.tsv": {
+      "bytes": 9580,
+      "sha256": "e1ddcb8040d46f0cf59f9605f40e86a0595df62d8114f7a4fc8cd3f33014899f"
+    },
+    "publishable/summary.json": {
+      "bytes": 2733,
+      "sha256": "36cd0cc498eed9892d0c4777dc9df7e7f376b574148f70928cba699275ec06c5"
+    },
+    "publishable/completion.json": {
+      "bytes": 543,
+      "sha256": "83b53587e268312394c43450130518c33eb707a380ddb91502da20549cf0e8d9"
+    },
+    "publishable/original-preservation.json": {
+      "bytes": 431,
+      "sha256": "0a8fdb8fce7e7b71c711ccc70080766c0f4191a046131a9b60f30276b551bc41"
+    },
+    "publishable/REPORT.md": {
+      "bytes": 8276,
+      "sha256": "7e3934ccbc0aa58cb734d673ae0a37910169b64848e87a8de3f0669fdcff0d43"
+    },
+    "REPORT.md": {
+      "bytes": 8276,
+      "sha256": "7e3934ccbc0aa58cb734d673ae0a37910169b64848e87a8de3f0669fdcff0d43"
+    },
+    "TRIAGE.md": {
+      "bytes": 13976,
+      "sha256": "98b497c91e58c81c67b88f874c9203dc3c56735c58ee7106b5ef95ccb46709ca"
+    },
+    "completion.json": {
+      "bytes": 543,
+      "sha256": "83b53587e268312394c43450130518c33eb707a380ddb91502da20549cf0e8d9"
+    },
+    "original-preservation.json": {
+      "bytes": 431,
+      "sha256": "0a8fdb8fce7e7b71c711ccc70080766c0f4191a046131a9b60f30276b551bc41"
+    },
+    "snapshot.json": {
+      "bytes": 414,
+      "sha256": "6f607dbea57917bd9e39e216fb46e8fb7e28c51fd114d8561d3c9d2019644e38"
+    },
+    "tenure-history.json": {
+      "bytes": 5033,
+      "sha256": "b764311e1634adac4cd12a0135c37e6ce32c0db7b2dfe266105816481e341e4b"
+    },
+    "market-dependency-history.json": {
+      "bytes": 1551,
+      "sha256": "aa55dd4ae84e4b69e10e519c7381234d2d0d126d62af5b7979bed082b149d687"
+    },
+    "publish_summary.py": {
+      "bytes": 7745,
+      "sha256": "ed7fe78e5e75b812cf52d8b92dd8ba2cc8190b1ff19930ebe06a43c177503630"
+    },
+    "verify_original.py": {
+      "bytes": 1980,
+      "sha256": "50ba95bbe98765a856d7fda2efa639fb7275ad999d721480aee51d7fd05c6bce"
+    }
+  }
+}

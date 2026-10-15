@@ -1081,3 +1081,25 @@ Two idiosyncrasies already recorded above compound here:
    *37.2% that sentinel*.  So 1997's unit axis is the wave where a
    reader-level artefact, an undecoded =7.70= (#777) and a currency label all
    live in the same column.
+
+** Region-market lookup is not wired (2026-10-14 release audit)
+
+The current =sample()= supplies =v= from =upm= in all three waves, but exposes
+no =Region= column; neither the country scheme nor the wave configs declares
+=cluster_features=. At frozen source =7fa05179= the Feature audit records
+=food_expenditures=, =food_prices= and =food_quantities= with
+=market='Region'= failing for Panama with
+="cluster_features returned no data for any wave."=. =Feature= warns and
+excludes Panama from those variants, while ordinary declared-table calls
+succeed. The relevant helpers and declarations are unchanged since =v0.14.0=.
+This is a missing geography dependency, not missing cluster identity or proof
+that the raw files lack geographic variables.
+
+Any future mapping needs a source-backed definition of Region. In ENV-97 the
+planning-region domains exclude indigenous and hard-to-access areas, which
+have their own domains, and their boundaries "do not coincide with the
+Collection Regions created ad hoc for fieldwork" (quoted in the universe
+section above). Neither provinces, study domains nor fieldwork regions should
+be silently substituted for one another. The retained =panama.regional_data=
+helper does not register a live Region table.
+The missing lookup is tracked in [[https://github.com/ligon/LSMS_Library/issues/1009][GH #1009]].

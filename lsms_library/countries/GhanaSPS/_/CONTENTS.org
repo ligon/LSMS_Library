@@ -2143,3 +2143,26 @@ EVERY GhanaSPS table, so this edit rebuilds the country once for everyone.
 Verified on a warm-then-rebuilt read 2026-09-07: 54,251 rows, ten labels, no
 "Unknown relationship labels" warning; the tuple change is confined to the
 617 adopted rows.
+
+** Region-market dependency remains missing (2026-10-14 release audit; GH #140)
+
+Cluster identity is available through =sample()=, as documented above; it is
+not a geographic =Region= lookup. The current =sample= exposes no =Region=
+column (=2017-18='s source =region= is mapped to =strata=), and neither the
+country scheme nor its wave configs declares =cluster_features=. The frozen
+release audit at =7fa05179= records =market='Region'= calls for
+=food_expenditures=, =food_prices= and =food_quantities= raising
+="cluster_features returned no data for any wave."=; =Feature= warns and
+excludes GhanaSPS from those variants. It records the same exception for
+=household_characteristics(market='Region')=. Ordinary declared-table calls
+succeed. The relevant market helpers and declarations are unchanged since
+=v0.14.0=; this is a retained dependency gap.
+
+The earlier =other_features.py= TODO says, "For now, all of 2013-14 has Ghana
+set as its region." That is not an implemented fallback in the current API.
+It remains a historical claim to reconcile, alongside the documented wave-2
+source geography gap. Do not recreate the earlier false claim that cluster
+identity is unavailable, infer Region from =strata= without source review, or
+fabricate a national market to hide the dependency failure. GH #110 was closed
+as superseded by the still-open umbrella [[https://github.com/ligon/LSMS_Library/issues/140][#140]],
+whose plan already includes =cluster_features=.
