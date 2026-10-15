@@ -184,3 +184,19 @@ math.fsum. Feature and relevant selector sources matchv0.14.0/pre-train/current
 candidate, establishing a pre-existing mechanism. Exact historical input
 counts remain unverified. The reviewed country note and release note preserve
 this material residual; they do not change keys, data or aggregation policy.
+
+* Controlled credentialed CI timeout -- 2026-10-15 06:50 UTC
+Run38688613005, data job116269105325, frozen candidatecf1840e02, completed
+with failure. The 600-second pytest thread timeout stopped
+=test_currency_denominated_units.py::test_ghanalss_unitvalue_and_units_modes_are_unaffected=
+at the second food-prices call (=units='unitprice'=, line545). The stack is
+inside =load_from_waves -> Wave.grab_data -> _build_wave_script_target ->
+subprocess.run -> os.waitpid=. The log reached about8% of the suite and has
+no final pytest totals. No nutrition assertion had been reached in this
+diagnostic, and no #941 or cache-root cause is established.
+
+The same test passed in115.218s in the completed local full suite. The
+framework lane is investigating repeated builds and session state using a
+separate scoped cache. Earlier unpinned GitHub data runs are retained.
+Private full-log SHA256: c3513a43cf7024dc1f3c4163ae28f1a369a4abb4796673e2e6b1f11c45d19dc8
+(111522bytes). This is an additional open validation gate, not a pass.

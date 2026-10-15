@@ -36,8 +36,12 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   Its unit result is3276passed4407skipped and Windows smoke327passed1skipped.
   Controlled-profile candidatecf1840e02 is pushed as
   release/v0.15.0-controlled-validation; manualCI38688613005 has the same
-  unit/Windows counts and its credentialed job is running. All older data
-  runs remain for comparison; no result is inferred from elapsed time.
+  unit/Windows counts. Its credentialed job failed at 06:50:35 UTC on the
+  600-second timeout in GhanaLSS unitprice validation, while waiting for a
+  wave-build subprocess; no suite summary was produced. This is under
+  investigation, not a nutrition failure or established #941 recurrence.
+  All older data runs remain for comparison; no result is inferred from
+  elapsed time.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
