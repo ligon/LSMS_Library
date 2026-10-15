@@ -1180,6 +1180,125 @@ def _read_dat_with_dct(raw: bytes, names: list[str],
         f"See the .DAT/.DCT note in local_tools.py and GH #704.")
 
 
+# ---------------------------------------------------------------------------
+# Magic-byte sniffing for the binary readers (GH #699, GH #712)
+# ---------------------------------------------------------------------------
+#
+# ``read_file`` is a fallback chain: each reader is tried on the bytes and a
+# failure means "try the next one".  That only works when a reader handed the
+# wrong kind of file FAILS, and the Stata reader does not reliably do so.
+# ``pandas.io.stata.StataReader`` interprets the first byte of ANY file as a
+# Stata release number; a byte in 102..115 -- ``'f'`` .. ``'s'`` -- sends it
+# down the old-format header parser, which then reads a garbage variable count
+# off the next bytes and dies in whichever way that garbage dictates:
+# ``KeyError`` from the type map, ``MemoryError`` allocating nobs x nvar, or
+# (if lucky) the ``struct.error`` the ``except`` was written for.  A CSV whose
+# header starts ``hhid,`` (``'h'`` = 104) is the measured instance (#712);
+# ``region,`` (``'r'`` = 114 is in range too, but the following bytes happen
+# to be harmless) reads fine.  Content-dependent, and the exception that
+# escapes is not one the chain lists, so the file is unreadable rather than
+# falling through to ``read_csv``.
+#
+# The fix is to SNIFF, not to widen the ``except``: a bare ``except`` would
+# turn a genuinely broken ``.dta`` into a silent fall-through to ``read_csv``,
+# which is exactly the class of silent mis-read the null-read audit exists to
+# catch.  Every binary format in the corpus announces itself in its first
+# bytes, so the chain only hands a file to a reader whose format it carries:
+#
+# * Stata, formats 102..115 (Stata 1 .. 12): byte 0 is the release, byte 1
+#   the byte order (1 = HILO, 2 = LOHI; 0 in some format-102 files), byte 2
+#   the filetype (always 1), byte 3 "unused".  **Do not test byte 3.**  The
+#   spec says it is zero; the corpus says otherwise -- 67 of 4,811 held
+#   ``.dta`` blobs (Kyrgyz Republic 41, Timor-Leste 12, Tajikistan 10,
+#   India 3, GhanaLSS 1) carry 0x3f..0xff there, and pandas reads every one of
+#   them (it discards the byte unread).  Measured 2026-10-14, after a first
+#   draft of this sniff that DID test it rejected all 67.  Formats 117+
+#   (Stata 13+) are XML-framed and begin with the literal ``<stata_dta>``.
+# * SAS Transport (XPORT) V5 begins with an 80-byte library header record
+#   whose first 48 bytes are the literal below.  Peru 1990 ships 36 of them
+#   (``.SSP``, written by SAS 6.06/6.07 in 1992-93); before #699 the chain
+#   had no reader for them at all.  Use ``pandas.read_sas`` -- NOT
+#   ``pyreadstat.read_xport``, which on those files returns the right shape
+#   with 7 of 10 columns entirely NaN and no exception (see
+#   ``null_read_audit``; ``Peru/_/CONTENTS.org`` has the per-file table).
+#
+# The sniff reads at most ``_SNIFF_BYTES`` and restores the stream position,
+# so every read pays one small ``read`` and two ``seek``\ s.
+
+#: Bytes to read when sniffing a file's format.  48 covers the longest magic
+#: (the XPORT library header); anything larger is harmless.
+_SNIFF_BYTES = 64
+
+#: First 48 bytes of a SAS Transport (XPORT) V5 file.
+_XPORT_MAGIC = b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!'
+
+#: Stata 13+ files are XML-framed and open with this tag.
+_STATA_XML_MAGIC = b'<stata_dta>'
+
+#: Stata release numbers that use the fixed binary header (Stata 1 .. 12) --
+#: the list ``pandas.io.stata.StataReader._read_old_header`` accepts.
+_STATA_OLD_RELEASES = frozenset({102, 103, 104, 105, 108, 110, 111, 113, 114, 115})
+
+
+def _sniff_head(f, n: int = _SNIFF_BYTES) -> bytes:
+    """Return the first *n* bytes of *f* without disturbing it.
+
+    *f* is whatever ``read_file`` was handed: a path (``str`` / ``Path``) or
+    an open binary stream.  A stream is rewound to offset 0 afterwards, which
+    is where every reader in the chain expects to find it.  Anything that
+    cannot be sniffed (a non-seekable stream, an unreadable path) yields
+    ``b''``, which matches no magic and leaves the chain to behave as before.
+    """
+    try:
+        if isinstance(f, (str, Path)):
+            with open(f, 'rb') as fh:
+                return fh.read(n)
+        f.seek(0)
+        head = f.read(n)
+        f.seek(0)
+        return head
+    except (OSError, ValueError, AttributeError, TypeError):
+        return b''
+
+
+def _is_sas_xport(head: bytes) -> bool:
+    """True when *head* opens a SAS Transport (XPORT) V5 file."""
+    return head.startswith(_XPORT_MAGIC)
+
+
+def _is_stata_dta(head: bytes) -> bool:
+    """True when *head* carries a Stata ``.dta`` header (any release).
+
+    Old format (102..115): ``release, byteorder in {0, 1, 2}, filetype 1``;
+    the fourth byte is not examined (see the block comment above).  New
+    format (117+): the literal ``<stata_dta>``.  A file failing both is never
+    handed to a Stata reader.  Every one of the 4,697 ``.dta`` blobs held
+    locally on 2026-10-14 passes; no ``.csv`` / ``.sav`` / ``.dat`` does.
+    """
+    if head.startswith(_STATA_XML_MAGIC):
+        return True
+    if len(head) < 3:
+        return False
+    return (head[0] in _STATA_OLD_RELEASES and head[1] in (0, 1, 2)
+            and head[2] == 1)
+
+
+def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
+    """Read a SAS Transport (XPORT) file through ``pandas.read_sas``.
+
+    Not wrapped in a ``try``: the magic bytes have already said what the file
+    is, so a failure here is a broken XPORT file and must stay loud rather
+    than fall through to ``read_csv``.  Character variables are decoded as
+    ``latin-1`` unless the caller says otherwise -- ``read_sas`` with
+    ``encoding=None`` hands back raw ``bytes``, which no other reader in the
+    chain does.  (All 39 Peru 1990 files are numeric-only; the default is for
+    the next XPORT survey.)
+    """
+    if not isinstance(f, (str, Path)):
+        f.seek(0)
+    return pd.read_sas(f, format='xport', encoding=encoding or 'latin-1')
+
+
 def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
@@ -1273,6 +1392,19 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             return _read_dat_with_dct(raw, dct[0], dct[1], fn=fn,
                                       encoding=encoding)
 
+        # Sniff once; the binary readers below are dispatched on what the
+        # first bytes say the file is (see the block comment above
+        # ``_sniff_head``).
+        head = _sniff_head(f)
+        if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
+            raise ValueError(f'{fn} has a .dta suffix but no Stata header')
+
+        # SAS Transport (XPORT) -- Peru 1990 ``.SSP`` (GH #699).  Before the
+        # SPSS attempt: ``pd.read_spss`` on a path raises ``ReadstatError``
+        # for these, which its ``except`` does not list.
+        if _is_sas_xport(head):
+            return _read_sas_xport(f, fn, encoding)
+
         if isinstance(f,str):
             try:
                 return pd.read_spss(f,convert_categoricals=convert_categoricals)
@@ -1304,26 +1436,35 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         except (ArrowInvalid,):
             pass
 
-        try:
-            f.seek(0)
-            return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
-        except (ValueError, struct.error):
-            pass
+        # Stata -- only when the header says so (GH #712).  Handed a file
+        # that is NOT Stata, ``StataReader`` reads a garbage header and dies
+        # with whatever that garbage dictates (``KeyError``, ``MemoryError``);
+        # the ``except`` below is deliberately NOT widened to absorb that,
+        # because a real ``.dta`` that fails must stay loud.
+        if _is_stata_dta(head):
+            try:
+                f.seek(0)
+                return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+            except (ValueError, struct.error):
+                pass
 
-        try:
-            # pyreadstat handles older Stata formats that pandas StataReader cannot.
-            if isinstance(f, str):
-                df_pr, meta = pyreadstat.read_dta(f, apply_value_formats=convert_categoricals, encoding=encoding)
-                return df_pr
-            else:
-                return _pyreadstat_via_tempfile(
-                    pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
-                    apply_value_formats=convert_categoricals, encoding=encoding)
-        except (ValueError, pyreadstat.ReadstatError, OSError,
-                NotImplementedError):
-            # Format-fallback: parser/IO errors mean "try the next reader"
-            # (csv, excel, feather, fwf).  Programmer bugs propagate.
-            pass
+            try:
+                # pyreadstat handles older Stata formats that pandas StataReader cannot.
+                if isinstance(f, str):
+                    df_pr, meta = pyreadstat.read_dta(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                    return df_pr
+                else:
+                    return _pyreadstat_via_tempfile(
+                        pyreadstat.read_dta, f, Path(fn).suffix or '.dta',
+                        apply_value_formats=convert_categoricals, encoding=encoding)
+            except (ValueError, pyreadstat.ReadstatError, OSError,
+                    NotImplementedError) as exc:
+                # A claimed DTA whose binary decoders both failed must not
+                # become CSV under a permissive encoding such as latin-1.
+                if Path(fn).suffix.lower() == '.dta':
+                    raise ValueError(f'{fn} has a Stata header but cannot be decoded') from exc
+                # Other suffixes retain the existing format fallback.
+                pass
 
         try:
             f.seek(0)

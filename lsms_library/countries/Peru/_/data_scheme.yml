@@ -29,10 +29,13 @@ Country: Peru
 # ONLY 1994 IS WIRED.  1985 / 1990 / 1991 ship data (133 / 39 / 108 DVC
 # sidecars) but have no `_/` wave config, so every table below is `absent` for
 # those three waves.  `_/CONTENTS.org` ("Wiring status of the four waves")
-# says what each would need -- in particular 1990 ships SPSS/PC+ `.SSP` files,
-# which `get_dataframe()` cannot read at all, and 1985/1991 use an entirely
-# different (World-Bank-processed, English-named) variable scheme from 1994's
-# INE/Cuanto layout, so 1994's config does not transfer.
+# says what each would need -- in particular 1990 ships SAS Transport (XPORT)
+# `.SSP` files, which `get_dataframe()` reads since GH #699 (2026-10-14; an
+# earlier version of this comment called them SPSS/PC+ and unreadable -- both
+# wrong, see CONTENTS.org "1990 -- 39 DVC sidecars"), so wiring 1990 is a plain
+# add-wave task; and 1985/1991 use an entirely different (World-Bank-processed,
+# English-named) variable scheme from 1994's INE/Cuanto layout, so 1994's
+# config does not transfer.
 #
 # ---------------------------------------------------------------------------
 # The former `Index Info:` block was dropped.  It was inert -- only the
