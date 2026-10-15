@@ -2642,11 +2642,13 @@ clean ASCII for the SAME words: the blob holds 41,803 =Women\x92s= next to
 97,531 =Women's=, and 411,886 bytes 0x92 (right single quote), 418,085 of
 0x96 (en dash) and 241,757 of 0x94 (right double quote, used as an inch
 mark in =Iron rods (1/4\x94)=) -- with zero UTF-8 curly quotes anywhere.
-=pd.read_stata= raises *no* =UnicodeWarning= (pandas 3.0.6): each string
+Reading it through =get_dataframe('../Data/g7sec9a.dta',
+convert_categoricals=False)= (the wave script's own path; measured
+2026-10-14, pandas 3.0.6) raises *no* warning of any class: each string
 that fails UTF-8 is decoded per-string as latin-1, which maps the byte to
 the C1 control U+0092/U+0096/U+0094 and keeps going.  390,140 of the file's
-7,077,839 =s9aname= values therefore came out of the reader carrying a C1
-control.
+7,077,839 =s9aname= values (5.5%) therefore come out of the reader carrying
+a C1 control (41,803 rows read =Women\x92s=, 97,531 =Women's=).
 
 The =nonfood_items= crosswalk in =_/categorical_mapping.org= was derived
 from that read and *committed the controls*: 28 cells (=Preferred Label= and

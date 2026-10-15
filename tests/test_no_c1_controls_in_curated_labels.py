@@ -126,3 +126,6 @@ def test_scanner_sees_the_known_tables():
     cells = [c for _, c in _preferred_label_cells(text)]
     assert "Charcoal - maxibag" in cells
     assert "Women's dress shoes" in cells
+    text = (countries_root() / GHANALSS_FILES[1]).read_text(encoding="utf-8")
+    cells = [c for _, c in _preferred_label_cells(text)]
+    assert "Women's polyester skirt" in cells          # harmonize_price_item code 309
