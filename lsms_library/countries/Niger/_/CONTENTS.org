@@ -551,9 +551,11 @@ collapse used to drop); =people_last7days= 26,369 -> 26,579 (+210);
 the derived =household_characteristics= 3,558 -> 3,616 (omitted from
 the first version of this list; derived at read time from the re-keyed
 roster, so it moved with it).  Every
-other (table, wave) serves the same row count as before the bundle
-EXCEPT the 2021-22 derived food tables, which move with the GH #833
-label fold (see that section).  The crosswalk holds 3,529 2014-15 ->
+other 2014-15 cell serves the same row count as before the bundle.
+(The bundle's other row moves are in other waves and recorded under
+their own issues: the #865 sentinel drops in =crop_production= 2011-12
+and =plot_inputs= 2021-22, and the #833 fold in =food_acquired= 2021-22
+and the three derived food tables.)  The crosswalk holds 3,529 2014-15 ->
 2011-12 links and no linked value is itself a key.
 
 *Not everything in =plot_inputs= 2014-15 was the missing EXTENSION.*
@@ -902,7 +904,11 @@ measured on the cold rebuild that landed this): no served =Quantity=,
 =Quantity_sold= or =Value_sold= equals a listed code.  A harvest line
 that carried ONLY a sentinel becomes all-NA and is dropped by
 =_finalize_result='s =dropna(how='all')=; the two hid-20607 lines are
-the clearest case.  Pinned by =tests/test_niger_value_sentinels.py=.
+the clearest case.  Served rows before -> after (pre-fix warm root vs
+cold rebuild, re-measured 2026-10-14): =crop_production= 2011-12 11,948
+-> 11,937 (the eleven sentinel-only lines); =plot_inputs= 2021-22
+12,433 -> 12,432; no other wave of either table moves under #865.
+Pinned by =tests/test_niger_value_sentinels.py=.
 
 * food_acquired: cross-wave label drift between the two EHCVM waves (GH #833, 2026-09-24)
 
@@ -966,9 +972,10 @@ inference; it is the only numeric-looking =j= in the table.
 -> 239,877 over all waves), and the derived tables with it:
 =food_expenditures= 98,249 -> 98,231, =food_prices= 98,247 -> 98,244,
 =food_quantities= 131,549 -> 131,522.  All lossless consequences of
-summing the five =(t, v, i, j, u, s)= pairs and of the three =j=
-labels folding to one at the derived grains; no other (table, wave)
-moves under #833.
+summing the five =(t, v, i, j, u, s)= pairs at which the two 2021-22
+sugar labels meet (=Choux= and =Aubergine,= are renames with no 2021-22
+sibling, so they merge nothing); no other (table, wave) moves under
+#833.
 
 *Cache.*  =categorical_mapping.org= is a build input in every Niger
 table's hash: one Niger re-warm, shared with GH #679 / #824 / #811.
