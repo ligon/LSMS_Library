@@ -282,6 +282,7 @@ def uga():
     return Country("Uganda")
 
 
+@pytest.mark.requires_s3
 @_SKIP_NO_CACHE
 def test_default_labels_matches_preferred(uga):
     """``labels='Preferred'`` is the explicit form of the default."""
@@ -292,6 +293,7 @@ def test_default_labels_matches_preferred(uga):
     )
 
 
+@pytest.mark.requires_s3
 @_SKIP_NO_CACHE
 def test_aggregate_collapses_variants(uga):
     """``labels='Aggregate'`` replaces Preferred labels with coarser Aggregate ones."""
@@ -316,6 +318,7 @@ def test_aggregate_collapses_variants(uga):
     assert len(j_agg) <= len(j_pref)
 
 
+@pytest.mark.requires_s3
 @_SKIP_NO_CACHE
 def test_aggregate_preserves_total_expenditure(uga):
     """Summing collapses groups; the grand total must be preserved."""
@@ -327,6 +330,7 @@ def test_aggregate_preserves_total_expenditure(uga):
     assert agg_total == pytest.approx(pref_total, rel=1e-9)
 
 
+@pytest.mark.requires_s3
 @_SKIP_NO_CACHE
 def test_unknown_labels_raise_keyerror(uga):
     """A non-existent label column raises ``KeyError`` listing what's available."""

@@ -182,6 +182,7 @@ def _cached_ids():
     return [f"{c}/{t}" for c, t, _ in CACHED]
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize(
     "country,table,path",
     CACHED,
@@ -278,6 +279,7 @@ class TestTableStructure:
 # Diagnostics integration: is_this_feature_sane
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize(
     "country,table,path",
     CACHED,
@@ -332,6 +334,7 @@ def _countries_with_housing() -> list[str]:
 _HOUSING_COUNTRIES = _countries_with_housing()
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("country_name", _HOUSING_COUNTRIES)
 class TestHousingVDtype:
     """GH #142: housing() must return v as pd.StringDtype, never mixed int/str.
@@ -381,6 +384,7 @@ class TestHousingVDtype:
 # ---------------------------------------------------------------------------
 
 class TestCachePopulation:
+    @pytest.mark.requires_s3
     def test_at_least_one_country_has_cached_data(self):
         """Sanity check: at least one country has materialized tables."""
         if len(CACHED) == 0:

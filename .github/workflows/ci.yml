@@ -25,6 +25,13 @@ on:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
+  # Manual trigger (GH #941).  `data-tests` otherwise runs only on a push to
+  # master / separate_data, i.e. once per release -- so a failure there
+  # (52 EHCVM failures on the v0.14.0 push, 2026-09-17) could not be
+  # re-exercised against a fix without cutting another release, and every
+  # later `schedule` run reported "data-tests skipped".  Dispatching on a
+  # chosen ref runs the whole workflow, data-tests included (see its `if`).
+  workflow_dispatch:
 
 # One live run per ref (push) or per PR (pull_request): a new push cancels the
 # run it supersedes instead of queueing beside it.  2026-09-07: fourteen
@@ -198,7 +205,10 @@ jobs:
   # `dvc commit` to update dep hashes without re-running pipelines.
   dvc-lock-check:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # Push only: a manual `workflow_dispatch` on master (GH #941) must re-run
+    # the tests, not feed the lockfile-refresh job below, which commits and
+    # pushes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     outputs:
       is_dirty: ${{ steps.check.outputs.is_dirty }}
     steps:
@@ -289,7 +299,12 @@ jobs:
   # Full data tests — builds Uganda tables and runs invariance checks
   data-tests:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data')
+    # Push to a release branch, or a manual `workflow_dispatch` on any ref
+    # (GH #941): the dispatch is the only way to re-run this job on a fix
+    # without a release.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

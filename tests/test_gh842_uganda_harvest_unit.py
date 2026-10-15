@@ -299,6 +299,7 @@ def test_kg_factor_is_declared_optional_in_the_scheme(uganda_scheme):
 # source-level tests — identify the columns by VALUE, never by label
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 @needs_data
 def test_wired_unit_column_holds_unit_codes(colmap_2018_19, agsec5,
@@ -340,6 +341,7 @@ def test_wired_unit_column_holds_unit_codes(colmap_2018_19, agsec5,
     )
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 @needs_data
 def test_season_A_really_has_no_unit_column(colmap_2018_19, agsec5,
@@ -384,6 +386,7 @@ def test_season_A_really_has_no_unit_column(colmap_2018_19, agsec5,
 # built-table tests
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_2018_19_season_B_serves_a_real_unit(crop_production, agsec5):
     """No `u='Unknown'` in 2018-19 season B where the source records a unit.
@@ -424,6 +427,7 @@ def test_2018_19_season_B_serves_a_real_unit(crop_production, agsec5):
     )
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_2018_19_B_unit_vocabulary_is_canonical(crop_production, harvest_units):
     """Every `u` served for 2018-19 is a `harvest_units` Preferred Label.
@@ -448,6 +452,7 @@ def test_2018_19_B_unit_vocabulary_is_canonical(crop_production, harvest_units):
     )
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_kg_factor_is_carried_for_2018_19(crop_production):
     """`KgFactor` reaches the table for 2018-19, and only for 2018-19.
@@ -491,6 +496,7 @@ MIN_ROWS_PER_UNIT = 30
 KG_RATIO_LO, KG_RATIO_HI = 0.8, 1.25
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_wired_unit_agrees_with_the_reported_kg_factor(crop_production):
     """The two kg routes are independent, so agreement validates the wiring.

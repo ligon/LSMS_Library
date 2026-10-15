@@ -200,6 +200,7 @@ def built():
     return df
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_built_kgfactor_nonnull_counts(built):
     assert "KgFactor" in built.columns
@@ -208,6 +209,7 @@ def test_built_kgfactor_nonnull_counts(built):
     assert got == EXPECTED_KGFACTOR_NONNULL
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_built_kgfactor_is_a_positive_float_rate(built):
     kgf = pd.to_numeric(built["KgFactor"], errors="coerce")
@@ -220,6 +222,7 @@ def test_built_kgfactor_is_a_positive_float_rate(built):
     assert present.max() <= KG_FACTOR_MAX
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_waves_without_a_conv_column_report_nothing(built):
     """W1-W3 have no `*_conv` in ANY harvest file -- all-NaN is the truth,

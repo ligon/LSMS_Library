@@ -225,6 +225,7 @@ def test_country_numeraire_guards():
 # End-to-end (cache-gated)
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_country_numeraire_end_to_end():
     uga = Country("Uganda", preload_panel_ids=False)
     try:
@@ -238,6 +239,7 @@ def test_country_numeraire_end_to_end():
     assert ppp.attrs["conversion"]["to"] == "PPP-2017"
 
 
+@pytest.mark.requires_s3
 def test_feature_numeraire_end_to_end():
     try:
         f = Feature("food_expenditures")(["Mali", "Niger"], numeraire="PPP-2017")

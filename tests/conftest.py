@@ -29,6 +29,7 @@ guard is deliberately conditioned on the environment rather than on the
 exception alone.
 """
 import os
+import warnings
 from pathlib import Path
 
 import pytest
@@ -87,6 +88,14 @@ requires_s3 = pytest.mark.skipif(
            "deliberately data-free (see the data-tests job for the "
            "credentialed run)",
 )
+
+class UnmarkedS3TestWarning(UserWarning):
+    """A data-dependent test skipped via the run-time net, not a mark.
+
+    Emitted by ``pytest_runtest_makereport`` below.  Every instance names a
+    test that should carry ``requires_s3`` (GH #907).
+    """
+
 
 _SKIP_REASON = (
     "needs S3 credentials to build country data; the unit-tests job is "
@@ -159,8 +168,31 @@ def pytest_runtest_makereport(item, call):
 
     report.outcome = "skipped"
     report.longrepr = (
-        str(item.fspath),
+        str(item.path),
         item.location[1],
         "Skipped: no S3 credentials, so this test cannot build country data. "
         "Add `requires_s3` from tests/conftest.py to skip it explicitly.",
     )
+    # The net is the EXPENSIVE skip path (GH #907): the test ran, reached
+    # DVC -> S3 and waited out a network failure to arrive at a skip that a
+    # `requires_s3` mark decides for free at collection time.  Say so in the
+    # warnings summary, naming the test, so the list of unmarked files
+    # cannot silently regrow.  Deliberately a warning and not a failure: the
+    # net exists because four PRs in one day went red for environmental
+    # reasons (#625/#641/#644/#632), and turning the net itself into a
+    # failure would reinstate exactly that.
+    # pytest's recorder wraps the whole runtest protocol, this hook included,
+    # and applies the item's `filterwarnings` marks inside it -- so under a
+    # `filterwarnings("error")` this warn would RAISE here and the net would
+    # crash instead of converting.  The inner catch_warnings restores the
+    # filters afterwards and, being non-recording, leaves pytest's outer
+    # recorder in place, so the warning still reaches the summary.
+    with warnings.catch_warnings():
+        warnings.simplefilter("always", UnmarkedS3TestWarning)
+        warnings.warn(
+            f"{item.nodeid} reached a credential-less skip at RUN time; add "
+            "`pytestmark = pytest.mark.requires_s3` (or mark the test) so it "
+            "is skipped at collection time instead (GH #907)",
+            UnmarkedS3TestWarning,
+            stacklevel=1,
+        )

@@ -322,6 +322,7 @@ class TestRelabelMechanism:
 # the built tables -- data-gated
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @needs_data
 class TestNoNullUnitIsServed:
     """No Niger table serves a NaN on its `u` index level."""

@@ -7,6 +7,8 @@ that don't supply it are byte-identical to before (additive).
 """
 from __future__ import annotations
 
+import pytest
+
 import numpy as np
 import pandas as pd
 
@@ -95,6 +97,7 @@ def test_conversion_to_kgs_unchanged_without_quantity_kg():
     assert 'bowl' in out and out['bowl'] > 0
 
 
+@pytest.mark.requires_s3
 def test_malawi_food_quantities_kg_total_preserved():
     """Malawi's kg total, re-pinned deliberately.
 

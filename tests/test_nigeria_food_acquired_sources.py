@@ -18,7 +18,10 @@ cache is warm.  Skipped when the Nigeria microdata isn't available.
 """
 import pytest
 
-pytestmark = pytest.mark.filterwarnings('ignore::UserWarning')
+pytestmark = [
+    pytest.mark.filterwarnings('ignore::UserWarning'),
+    pytest.mark.requires_s3,
+]
 
 COUNTRY = 'Nigeria'
 

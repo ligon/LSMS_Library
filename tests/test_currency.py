@@ -167,6 +167,7 @@ def test_country_guard_bad_mode():
         uga.food_expenditures(currency="bogus")
 
 
+@pytest.mark.requires_s3
 def test_country_default_is_backward_compatible():
     """Default call must NOT carry a currency level (grain unchanged)."""
     uga = Country("Uganda", preload_panel_ids=False)
@@ -180,6 +181,7 @@ def test_country_default_is_backward_compatible():
     assert CURRENCY_LEVEL not in df.columns
 
 
+@pytest.mark.requires_s3
 def test_country_currency_index_roundtrip():
     uga = Country("Uganda", preload_panel_ids=False)
     try:
@@ -196,6 +198,7 @@ def test_country_currency_index_roundtrip():
 # Cross-country Feature (skipped when microdata unavailable)
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_feature_xof_consistency():
     try:
         f = Feature("food_expenditures")(["Mali", "Niger"])
@@ -207,6 +210,7 @@ def test_feature_xof_consistency():
     assert codes == {"XOF"}, codes
 
 
+@pytest.mark.requires_s3
 def test_feature_ghana_per_wave():
     try:
         g = Feature("food_expenditures")(["GhanaLSS"])
@@ -234,6 +238,7 @@ def test_feature_ghana_per_wave():
     assert post or "2005-06" in by_wave, "no GhanaLSS waves materialized"
 
 
+@pytest.mark.requires_s3
 def test_feature_non_monetary_unaffected():
     """Default currency='index' must be a silent no-op for non-monetary tables."""
     try:
