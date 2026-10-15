@@ -91,3 +91,29 @@ development. Raw-source replay rejects the recovered reducers: they blank
 364 Ethiopia GPS and119 Tanzania administrative cells and violate the existing
 household-grain regression. Documentation/evidence only will land; issue837
 remains open for scientific/source questions.
+
+* Ref disposition snapshot after twelve implementation merges
+{"active-landing": 7, "integration-reference": 4, "landed": 94, "retained-archive": 6, "retained-rejected": 19, "superseded": 63}
+See landing-prs.json for live-state snapshot with exact head and merge SHAs.
+#837 original implementation is retained-rejected, with documentation/evidence
+landed through this review branch. Uganda history is now causally accounted
+for; its source assumptions and explicit fixture hold remain.
+
+* Completed controlled merge window
+PR #994 final6c4c2fc13 passed unit/Windows after its narrow raw-test correction.
+PRs #969, #989, #990, #991 and #982 merged in one controlled window,
+2026-10-15 04:53:47–04:54:04 UTC. Shared L2 remained untouched throughout.
+Final integrated native Windows job116251866840 passed on74c9398ec in
+run38683117467. The same candidate unit run had3274passes,4405skips and
+only the two Nigeria metadata failures corrected by6c4c2fc13; the corrected
+file independently passes in both credential-free and credentialed settings.
+The integrated Linux data job completed Uganda make and is running fullpytest.
+
+PR #997 merged the historical dispositions and archived evidence. GitHub
+development1973242b4 contains18implementation PRs plus that evidence PR;
+only implementation PR #967 remains open, pending its explicit science hold.
+Integration against the real GitHub merges changes no runtime source beyond
+already reviewed heads; the sole merge conflict is this append-only log.
+The earlier Windows dispatch38681713985 was cancelled after its native job
+succeeded, because its superseded unit job was still running without #980.
+Its job success is retained; the whole cancelled run is not called green.
