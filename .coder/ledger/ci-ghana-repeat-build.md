@@ -1,4 +1,4 @@
-# Prior-Art Ledger — CI Ghana repeated builds
+# Prior-Art Ledger — GH #1010 CI Ghana repeated builds
 
 **Search tier used:** ripgrep + git floor; no index mutation.
 
@@ -28,4 +28,7 @@ Reuse actual test helper, MonkeyPatch teardown, actual Ghana API and parquet foo
 None block the authorized diagnosis and narrow test isolation repair. Whether this completely explains runner wall time requires rerunning controlled CI; local evidence alone cannot prove that.
 
 ### Phase 3 — verification
-Pending.
+- `_run` — OK (§2, §5): first register the original environment through `MonkeyPatch.setenv`, then delete it as before. This records original absence as well as existing values, so the direct configuration assignment is undone. Production `pytest_configure` and explicit rebuild policy are unchanged.
+- Regression — OK (§4): 12 cases exercise absent / 0 / 1, both rebuild switches, and normal / exceptional exit. Against the old helper, four initially-absent cases failed and eight existing-value cases passed (0.12s). After the one-line behavioral fix, all 18 file tests passed (0.06s); no purges run because the existing spies remain.
+- Initial actual Ghana test on an 88-file / 60,298,616-byte physical private cache copy passed in 111.94s: no cache bypass, matching hash c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904, all seven waves covered, no observed Ghana build subprocess. Ordered old helper sequence leaves NO_CACHE=1 and immediately rebuilds despite those same fresh inputs. Full ordered before/after call evidence is in progress, recorded externally under control/framework/ci-ghana-repeat-build; final report will distinguish runner causation limits.
+- No production, country configuration, science assertion, dependency, baseline, timeout, or skip change. The profiling skill was read; this task records API/subprocess events and cache metadata, without changing hashed production functions. Source-hash equality before/after observer installation is asserted.
