@@ -994,3 +994,18 @@ def test_scale_check_positive_control_uganda_2015_16_value_sold():
     breaks = cov.monetary_scale_breaks(d2, "Uganda", "crop_production", waves)
     assert [(b["column"], b["wave"]) for b in breaks] == [("Value_sold", "2015-16")]
     assert breaks[0]["ratio"] < 1 / cov.SCALE_RATIO_TOLERANCE
+
+
+def test_scale_check_country_without_a_currency_entry_is_still_checked():
+    """`currency_for` returns pd.NA for a country absent from `Currency:`
+    (Afghanistan today), and `pd.NA != pd.NA` RAISES.  Two unknown codes must
+    read as the same unit, so the check still runs rather than going inert."""
+    from lsms_library.currency import currency_for
+    assert pd.isna(currency_for("NoSuchCountry", "w1"))
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0})
+    breaks = cov.monetary_scale_breaks(df, "NoSuchCountry", "crop_production",
+                                       ["w1", "w2", "w3"])
+    assert [b["wave"] for b in breaks] == ["w2"]
+    assert cov.monetary_scale_breaks(_money_frame({"w1": 1.0, "w2": 1.2}),
+                                     "NoSuchCountry", "crop_production",
+                                     ["w1", "w2"]) == []

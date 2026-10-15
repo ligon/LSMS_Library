@@ -652,6 +652,12 @@ def monetary_scale_breaks(df: pd.DataFrame, country: str, feature: str,
 
         {"column", "wave", "median", "n", "neighbours": [(wave, median, ratio)],
          "ratio": <median ratio across neighbours>, "form": "pooled"|"per-item[k]"}
+
+    ``median`` and the neighbours' ``median`` are always the POOLED per-wave
+    medians (so the reader sees the levels); each neighbour's ``ratio`` is the
+    pair's ratio in the ``form`` stated, which may be the per-item form -- so
+    the two pooled medians printed side by side are not necessarily the inputs
+    to the ratio beside them.
     """
     from .currency import _monetary_columns, currency_for
 
@@ -689,15 +695,22 @@ def monetary_scale_breaks(df: pd.DataFrame, country: str, feature: str,
                 summaries[w] = summ
         usable = [w for w in order if w in summaries]
         # Pass 1: every wave's comparable neighbours and its ratio to each.
+        # A country absent from the `Currency:` block (Afghanistan, 2026-10)
+        # resolves to pd.NA, and `pd.NA != pd.NA` is NA, not False -- so
+        # normalise to None first: two unknown codes are the SAME unknown unit
+        # and the pair is compared, rather than the check going silently inert.
+        def _code(w):
+            c = currency_for(country, w)
+            return None if pd.isna(c) else c
+        codes = {w: _code(w) for w in usable}
         neighbours: dict[str, list] = {}
         for k, w in enumerate(usable):
-            cur = currency_for(country, w)
             neigh = []
             for nb in (usable[k - 1] if k > 0 else None,
                        usable[k + 1] if k + 1 < len(usable) else None):
                 if nb is None:
                     continue
-                if currency_for(country, nb) != cur:       # redenomination boundary
+                if codes[nb] != codes[w]:                  # redenomination boundary
                     continue
                 r, form = _pair_ratio(summaries[w], summaries[nb])
                 neigh.append((nb, summaries[nb][0], r, form))
