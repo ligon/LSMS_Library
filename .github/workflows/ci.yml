@@ -1,9 +1,27 @@
 name: CI
 
 on:
+  # Pushes run CI only on the integration branches.  `branches: ["**"]` ran
+  # every PR twice (one run for the push, one for the pull_request), which is
+  # the doubled `unit-tests` check on every PR before 2026-10-14.  PR branches
+  # are covered by the pull_request event below; the merge queue by merge_group.
   push:
-    branches: ["**"]
+    branches: [development, master, separate_data]
+    # Notes and ledgers do not need a 30-minute run.  Deliberately NOT applied
+    # to pull_request: a docs-only PR would then have no `unit-tests` check,
+    # and the ruleset that requires it would hold the PR forever.
+    paths-ignore:
+      - 'slurm_logs/**'
+      - '.coder/**'
+      - 'SkunkWorks/**'
+      - 'lectures/**'
+      - '**.org'
+      - '**.md'
   pull_request:
+  # The development merge queue (ruleset "development merge queue", 2026-10-14)
+  # tests each merge group once; without this trigger a queued PR never gets
+  # its required check and sits in the queue indefinitely.
+  merge_group:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
@@ -93,7 +111,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       # Separate from pytest so an import-time failure is attributed to the
       # import, not lost inside test collection.
       - name: Import + config smoke
