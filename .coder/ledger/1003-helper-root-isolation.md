@@ -61,7 +61,18 @@ failure remains unproved and separate. Parent owns independent review/publishing
 
 ### Phase 3 — verification
 
-Pending targeted execution and discriminatory missing-entry/missing-exit-clear
-controls. Frozen discovery source is d7626368f; implementation base is GitHub
-development 1973242b4. Aggregate discovery evidence will accompany the fix;
-it contains only disposable path names and booleans, no survey rows or credentials.
+- `private_helper_root` — OK (§§2–5): reuses local before/finally path-cache
+  discipline and MonkeyPatch context; only two helpers request it. No global
+  fixture or production-path abstraction added.
+- Two-root regression — OK (§4): exercises actual absent helper, preserves B's
+  sentinel and restores both cached argument forms after normal/exceptional
+  exit. Disposable negative copies omitting entry or finally clear each fail
+  both new cases for the corresponding required invariant.
+- Delivered tests — OK (§4): Tier-2 source byte-identical to base. Targeted
+  GH866 + GH970 files give 10 passed/10 absent-warm-cache skips in 10.13 s;
+  all synthetic helper and source checks execute without credentials.
+- Discovery evidence is frozen at d7626368f; implementation base is GitHub
+  development 1973242b4. Aggregate logs/JSON under
+  `slurm_logs/release_landing_2026-10-14/1003-helper-root-isolation/` contain only
+  synthetic paths/assertions, not survey rows or credentials. No cache hashes
+  move: package/config/build input source is unchanged.
