@@ -513,6 +513,35 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
 
+** DONE cluster_features -- =Region= spelled 22 ways for 13 regions (GH #811, 2026-09-24)
+
+=cluster_features.Region= served 22 distinct strings for the 13 regions
+across the three waves, and nothing warned because each wave is
+internally consistent -- only cross-wave pooling was wrong.  2014 (EMC
+=region=) writes unhyphenated mixed case (=Centre Est=, =Centre sud=,
+=Plateau central=, =Sud Ouest=, =Hauts Bassins=) and singular =Cascade=;
+2018-19 (=s00q01=) hyphenates everything except =Hauts Bassins=; 2021-22
+hyphenates everything AND carries a source typo, =Boucle du Mouhoum=
+(the two earlier waves and the region's official name have =Mouhoun=).
+
+Fixed with a =#+name: Region= table in =_/categorical_mapping.org=
+(auto-applied by name at read time).  This is a DECISION, not one read
+off a strata table as in Guinea-Bissau / Ethiopia: Burkina has no
+strata spellings to inherit (2014 =strate= is a bare 1-26 Region x
+Milieu code; the EHCVM waves ship none).  The Preferred Labels are the
+2021-22 spellings -- the fully hyphenated official forms -- with
+=Mouhoum= corrected to =Mouhoun= and =Cascade= to =Cascades=.  Which
+region each string names is never in doubt; only the punctuation was.
+Served, read path: 22 -> 13 labels over 2,035 rows, per-wave distinct
+13/13/13 before and after (so the =(t, v)= projection cannot move), each
+pooled count the sum of its variants (Hauts-Bassins 84+60+60 = 204,
+Boucle du Mouhoun 75+49+44 = 168, ...).  Stored parquets keep the raw
+strings.
+
+Cache: =_/categorical_mapping.org= is a build input, so the edit moves
+every Burkina_Faso cache hash -- three waves, eleven script-path tables.
+Not paid in the fixing branch; verified with =assume_cache_fresh=True=.
+
 ** DONE household_roster
 *** 2014 wave (EMC): Relationship code 6 ships a literal "?" (GH #801)
 =emc2014_p1_individu_27022015.dta= (Stata format 113, Latin-1 labels)

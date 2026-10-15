@@ -30,6 +30,16 @@ Both visits' q6d ("conversion factor into kg") is carried as `KgFactor`,
 a survey-reported kg-per-unit RATE.  That is what keeps season A usable
 despite having no unit: its kilograms are Quantity * KgFactor.
 
+AGSEC5B also ships a SECOND harvest record per plot-crop -- s5bq06a_2 /
+s5bq06b_2 (unit) / s5bq06c_2 (condition) / s5bq06d_2 (kg factor), 1 436
+records -- read since GH #848.  It is a second CONDITION of the same crop
+in the same season B (harvest-end June/July 2018 on 1 423 of 1 435 rows,
+like slot 1), NOT the 2017 second season its variable label names; that
+season is AGSEC5A.  Slot 1 uses the legacy a5bq6{b,c,d} names and slot 2
+the WB s5bq06{b,c,d}_2 names, in the same file.  14 slot-2 records share
+(plot, crop, unit, condition) with slot 1 and are summed; 4 report a
+quantity with no unit code and serve u='Unknown'.  AGSEC5A has no _2 slot.
+
 The harvest CONDITION is an index level in its own right (GH #323/#637).
 See uganda.CROP_COLMAPS for the per-wave column map.
 
