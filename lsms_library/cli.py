@@ -14,7 +14,7 @@ import typer
 import yaml
 
 from .country import Country, _log_issue
-from .local_tools import to_parquet
+from .local_tools import _is_polluted_workspace_copy, to_parquet
 from .paths import countries_root
 from .util.generate_dvc_stages import discover_countries as _discover_dvc_countries
 from .util.generate_dvc_stages import generate_country as _generate_dvc_country
@@ -59,6 +59,154 @@ def _load_yaml(path: Path) -> OrderedDict:
 def _dump_yaml(data: OrderedDict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.dump(data, Dumper=_OrderedDumper, sort_keys=False), encoding="utf-8")
+
+
+# GH #831: raw source files (.dta/.sav/.csv/.dat/.dct/.ssp/.tab/.xls/.xlsx --
+# every suffix that carries a ``.dvc`` sidecar in the tree AND sits on the
+# ``get_dataframe`` / ``get_data_file`` read chain; ``.pdf``/``.doc``/``.zip``
+# documentation and archives are deliberately not on it) inside the config
+# tree.  The
+# runtime no longer puts them there (every read-path fetch lands under
+# data_root() since #917), but a checkout can still hold them -- a manual
+# ``dvc pull`` run from the package tree, a WB zip extracted by hand, or a
+# pre-#917 install -- and the two classes carry very different risk:
+#
+#   * BESIDE a ``.dvc`` sidecar: ``get_dataframe`` refuses the workspace copy
+#     and reads the blob (one UserWarning per read); costs disk, never
+#     correctness.  400 files / 1.31 GB in the 2026-09-08 sweep.
+#   * WITHOUT a sidecar: the reader's chain is local -> DVC -> WB, so the
+#     copy is SERVED in preference to the DVC blob, silently.  33 files in
+#     the same sweep, in ten ``countries/<wave>/`` dirs with the country
+#     segment missing.  This is the class the old cleanup one-liner
+#     (``-execdir test -e '{}.dvc' -delete``) cannot find by construction.
+#
+# ``cache clear`` cannot remove them (it does not own the config tree) but it
+# is where a user looks when data looks stale, so it names them -- exactly as
+# it already names in-tree parquets (#803).
+_INTREE_SOURCE_SUFFIXES = frozenset({
+    ".dta", ".sav", ".csv", ".dat", ".dct", ".ssp", ".tab", ".xls", ".xlsx",
+})
+
+
+def _git_tracked_files(root: Path) -> "set[str] | None":
+    """Paths (relative to *root*, POSIX) that git tracks under it.
+
+    ``None`` when git cannot be consulted.  That is the no-``.git`` case (a
+    plain pip install) AND the case where ``ls-files`` answers but tracks
+    nothing under *root*: a package installed under an ignored ``venv/`` or
+    ``.venv/`` inside the user's own repository makes ``git -C <root>
+    ls-files -- .`` succeed with empty output, which says nothing about the
+    files there.  An empty set is therefore reported as "not consulted", not
+    as "git tracks none of these".  (On this checkout the set is never
+    empty: thousands of tracked paths under ``countries/``.)
+
+    Tracked files are *sources* (nine ``.csv`` lookup tables live in-tree,
+    all under a ``_/`` directory, e.g. ``Uganda/_/fct_usda.csv`` and
+    ``Panama/_/unittable.csv``), never strays.  They are tracked because the
+    repo's ``.gitignore`` un-ignores each of them by a negation rule beneath
+    the blanket ``*.csv`` -- git considers none of them ignored, so ``git
+    check-ignore`` would have worked too.  ``git ls-files`` is used because
+    tracked-ness, not ignore status, is the question being asked.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z", "--", "."],
+            capture_output=True, check=True, text=False,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    tracked = {p.decode("utf-8", "surrogateescape") for p in out.split(b"\0") if p}
+    return tracked or None
+
+
+def _intree_source_files(
+    root: Path,
+    countries: Sequence[str],
+    tracked: "set[str] | None | object" = ...,
+) -> dict:
+    """Classify raw data files under ``root`` (GH #831).
+
+    Walks each named country dir plus every root-level dir whose name starts
+    with a digit -- a wave dir with the country segment missing, the shape
+    the stray extraction produced (``countries/2015-16/Data/...``); those
+    are never reachable through a country name.  Returns::
+
+        {"with_sidecar":  [Path, ...],   # refused by get_dataframe; disk only
+         "no_sidecar":    [Path, ...],   # SERVED over the DVC blob
+         "stray_dirs":    [Path, ...],   # digit-named dirs at the root
+         "git_consulted": bool}
+
+    ``tracked`` is the set of git-tracked relative paths to exclude; the
+    default consults git, ``None`` means "git unavailable, exclude nothing".
+    Files under a ``_/`` component are always excluded: that directory is
+    config by definition (``_BUILD_INPUT_SUFFIXES`` hashes its ``.csv``
+    files as build inputs), so a data file there is a lookup table, not a
+    stray -- and this keeps the no-git fallback from reporting the shipped
+    lookup tables on every pip install.  Every tracked lookup table lives
+    under ``_/`` (``Panama/_/unittable.csv`` was the last one moved there),
+    so the no-git fallback has no false positive on the shipped tree.
+    """
+    if tracked is ...:
+        tracked = _git_tracked_files(root)
+    stray_dirs = sorted(
+        p for p in root.iterdir()
+        if p.is_dir() and p.name[:1].isdigit()
+    ) if root.is_dir() else []
+    scan = [root / c for c in dict.fromkeys(countries)] + stray_dirs
+
+    with_sidecar: list[Path] = []
+    no_sidecar: list[Path] = []
+    seen: set[Path] = set()
+    for d in scan:
+        if not d.is_dir():
+            continue
+        for p in d.rglob("*"):
+            if p in seen or p.suffix.lower() not in _INTREE_SOURCE_SUFFIXES:
+                continue
+            if not p.is_file():
+                continue
+            rel = p.relative_to(root)
+            if "_" in rel.parts[:-1]:
+                continue
+            if tracked is not None and rel.as_posix() in tracked:
+                continue
+            seen.add(p)
+            (with_sidecar if _is_polluted_workspace_copy(p) else no_sidecar).append(p)
+    return {
+        "with_sidecar": sorted(with_sidecar),
+        "no_sidecar": sorted(no_sidecar),
+        "stray_dirs": stray_dirs,
+        "git_consulted": tracked is not None,
+    }
+
+
+def _report_intree_source_files(root: Path, countries: Sequence[str]) -> None:
+    """Print the GH #831 audit; silent when the tree is clean."""
+    found = _intree_source_files(root, countries)
+    if found["stray_dirs"]:
+        print(f"WARNING: {len(found['stray_dirs'])} directory(ies) at the root of "
+              f"{root} named like a wave, with no country segment (GH #831) "
+              f"-- no country name reaches them; delete them:")
+        for p in found["stray_dirs"]:
+            print(f"  {p}")
+    if found["no_sidecar"]:
+        print(f"WARNING: {len(found['no_sidecar'])} in-tree source file(s) under "
+              f"{root} with NO .dvc sidecar (GH #831) -- get_dataframe SERVES "
+              f"these in preference to the DVC blob; delete each unless it is "
+              f"new data awaiting `dvc add`:")
+        for p in found["no_sidecar"]:
+            print(f"  {p}")
+    if found["with_sidecar"]:
+        print(f"WARNING: {len(found['with_sidecar'])} in-tree workspace copy(ies) "
+              f"of DVC-tracked file(s) under {root} (GH #831) -- refused by "
+              f"get_dataframe, so they only cost disk and a warning per read; "
+              f"delete them:")
+        for p in found["with_sidecar"]:
+            print(f"  {p}")
+    if not found["git_consulted"] and (found["no_sidecar"] or found["with_sidecar"]):
+        print("  (git could not be consulted -- no .git, or it tracks nothing under "
+              "this root -- so a tracked source outside a `_/` directory would be "
+              "listed above; `git ls-files` is the check)")
 
 
 def _countries_root() -> Path:
@@ -238,6 +386,10 @@ def cache_clear(
               f"-- never read (GH #803); delete them:")
         for p in stray:
             print(f"  {p}")
+
+    # GH #831: the same report for raw source files (.dta/.sav/.csv), in two
+    # classes -- a copy WITHOUT a sidecar is served over the DVC blob.
+    _report_intree_source_files(_countries_root(), target_countries)
 
 
 def _slug(value: str) -> str:

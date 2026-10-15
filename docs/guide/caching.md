@@ -241,7 +241,13 @@ clear the affected country's cache before rebuilding so the next call
 actually reads your new source data rather than an older cached parquet.
 `lsms-library cache clear` evicts both L2-country and L2-wave; the L1
 blob cache stays populated either way, so the rebuild won't re-fetch
-from S3.
+from S3.  The command also audits the config tree, which it does not own
+and never deletes from: it names any in-tree `*.parquet` (never read, GH
+#803) and any in-tree raw source file -- `.dta`, `.sav`, `.csv`, `.dat`,
+`.dct`, `.ssp`, `.tab`, `.xls`, `.xlsx` -- distinguishing a copy beside its
+`.dvc` sidecar (refused by `get_dataframe`, disk cost only) from one with
+no sidecar, which `get_dataframe` serves in preference to the DVC blob
+(GH #831).
 
 To clear the L1 blob cache too (rarely needed):
 
