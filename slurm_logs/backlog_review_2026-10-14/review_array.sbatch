@@ -6,12 +6,14 @@
 #SBATCH --mem=0
 #SBATCH --time=05:00:00
 #SBATCH --job-name=backlog-review2
+#SBATCH --array=0-5
+#SBATCH --chdir=/global/scratch/fsa/fc_jevons/ligon/venv_validate
 #SBATCH --output=/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_review2_%A/slurm_%a.out
 # Red-team review, one element per fix branch.  Read-only w.r.t. the branch: no commit, no push.
 set -uo pipefail
 MIRROR=/global/home/users/ligon/mirrors/LSMS_Library
 LIVE=/global/scratch/fsa/fc_jevons/ligon/cache/lsms_library
-ROOT=/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_review_$SLURM_ARRAY_JOB_ID
+ROOT=/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_review2_$SLURM_ARRAY_JOB_ID
 ELEMENTS=$MIRROR/slurm_logs/backlog_review_2026-10-14/elements.txt
 LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID+1))p" "$ELEMENTS"); read -r KEY BRANCH COUNTRIES <<< "$LINE"
 BRIEF=$MIRROR/slurm_logs/backlog_review_2026-10-14/briefs/$KEY.md
