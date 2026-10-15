@@ -2,7 +2,7 @@ SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2936
 
-#+CATALOG_ID: 2936
+#+CATALOG_ID: 2936, 2939
 #+CATALOG_IDNO: MWI_2016_IHS-IV_v04_M
 #+CATALOG_TITLE: Fourth Integrated Household Survey 2016-2017
 #+CATALOG_YEARS: 2016-2017
@@ -11,4 +11,6 @@ https://microdata.worldbank.org/index.php/catalog/2936
 #+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2936
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
+#+PROVENANCE_VALIDATION: content-validated
 #+PROVENANCE_RECORDED: 2026-07-12
+#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fourth Integrated Household Survey, id 2936 (99 of 99 files match 2936's WB datafile list). Data/Panel/ is the 2016 wave of the Integrated Household Panel Survey, id 2939 (MWI_2010-2016_IHPS_v03_M, "Long-Term Panel, 102 EAs"): 97 of its 98 files appear in 2939's WB datafile list and NONE in 2936's. The other CATALOG_* keys above describe the primary entry (2936). We hold 2939's 2016 wave; 2939 also re-releases the 2010 and 2013 IHPS data with updated panel weights, which we hold in their original release form (1003, 2248). Checked 2026-07-12 against the WB datafile API.
