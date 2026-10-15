@@ -17,6 +17,7 @@ cost nothing, then cache-gated delivered tests.
 """
 
 import ast
+import os
 import shutil
 from pathlib import Path
 
@@ -122,12 +123,27 @@ def test_the_rebuild_failure_is_still_raised_not_swallowed():
     assert "raise _rebuild_failure_error(self.name, method_name)" in body
 
 
-def test_the_helper_never_deletes_a_json_tier_cache(tmp_path, monkeypatch):
+@pytest.fixture
+def private_helper_root(tmp_path):
+    """Scope only synthetic helpers; delivered tests retain their warm roots.
+
+    Reuse the before/finally discipline from the GH970 fixture (ledger #1003
+    §§2–4). Restoring an environment variable does not clear its cached paths.
+    """
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        data_root.cache_clear()
+        try:
+            yield tmp_path
+        finally:
+            data_root.cache_clear()
+
+
+def test_the_helper_never_deletes_a_json_tier_cache(private_helper_root):
     """`panel_ids.json` is a committed SOURCE (GH #914).  No JSON-tier caller
     passes the flag today, but reachability arguments are how #914 got broken
     once already -- so assert *never deletes*, not *never reached*."""
-    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
-    victim = tmp_path / "Uganda" / "var" / "panel_ids.parquet"
+    victim = private_helper_root / "Uganda" / "var" / "panel_ids.parquet"
     victim.parent.mkdir(parents=True)
     victim.write_bytes(b"not really a parquet")
     for name in sorted(JSON_CACHE_METHODS):
@@ -135,9 +151,45 @@ def test_the_helper_never_deletes_a_json_tier_cache(tmp_path, monkeypatch):
     assert victim.exists(), "a JSON_CACHE_METHODS name must never be evicted here"
 
 
-def test_the_helper_is_a_noop_on_an_absent_parquet(tmp_path, monkeypatch):
-    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+def test_the_helper_is_a_noop_on_an_absent_parquet(private_helper_root):
     Country("Uganda")._evict_stale_country_cache("livestock")   # must not raise
+
+
+@pytest.mark.parametrize("exceptional_exit", [False, True], ids=["normal", "exception"])
+def test_helper_root_preserves_other_root_and_restores_paths(tmp_path, monkeypatch,
+                                                           exceptional_exit):
+    """A cached B cannot be deleted by a helper in A or replaced at teardown."""
+    root_a, root_b = tmp_path / "helper", tmp_path / "previous"
+    root_a.mkdir()
+    sentinel = root_b / "Uganda" / "var" / "livestock.parquet"
+    sentinel.parent.mkdir(parents=True)
+    sentinel.write_bytes(b"unrelated private sentinel, not survey data")
+    monkeypatch.setenv("LSMS_DATA_DIR", str(root_b))
+    data_root.cache_clear()
+    assert data_root() == root_b
+    assert data_root("Uganda") == root_b / "Uganda"
+
+    # Drive the real fixture's lifetime so both sides of its teardown can be
+    # observed. Its private MonkeyPatch restores B before these assertions.
+    lifecycle = private_helper_root.__wrapped__(root_a)
+    try:
+        assert next(lifecycle) == root_a
+        test_the_helper_is_a_noop_on_an_absent_parquet(root_a)
+        assert sentinel.exists(), "helper in A deleted the previously cached B parquet"
+        assert data_root() == root_a
+        assert data_root("Uganda") == root_a / "Uganda"
+        if exceptional_exit:
+            with pytest.raises(RuntimeError, match="synthetic helper failure"):
+                lifecycle.throw(RuntimeError("synthetic helper failure"))
+        else:
+            lifecycle.close()
+        assert os.environ["LSMS_DATA_DIR"] == str(root_b)
+        assert data_root() == root_b, "no-argument root survived fixture teardown"
+        assert data_root("Uganda") == root_b / "Uganda", "country root survived teardown"
+        assert sentinel.exists()
+    finally:
+        lifecycle.close()
+        data_root.cache_clear()
 
 
 # ==========================================================================
