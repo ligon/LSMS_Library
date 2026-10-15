@@ -1,0 +1,57 @@
+{
+  "base": "c67c69279608820f49591f2ddbda577d049abf72",
+  "head": "da8a2e25370078186180410ca3acaa86e54af239",
+  "working_diff_sha256": "c8d70cca1fba7552b0aa20d387838d5266429612f000c9246ba3582de99175af",
+  "changed_files": {
+    ".sucoder/handoff.org": "b965312063cdf8f538b4205c05ddf32a08e53b976c3699d98ce814c8650e6777",
+    "docs/releases/v0.15.0.md": "2955b50a21a1576f8857206fdb42d41f7a2be654d8e4846207f1f2a1823b3f22",
+    "lsms_library/countries/GhanaLSS/_/CONTENTS.org": "9032ff719cd9779548f35987ee2a9f52cc21644b002b54d0d17509e2f92344b5",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org": "4c43e96ba6b7cc123ca50dfc42154de6296c30c5345e46e1a232766911613377",
+    "slurm_logs/release_landing_2026-10-14/RELEASE_ISSUES.org": "9bd5139f45ab1661a8c602b3679a40251aa8e4fd63cabe9e3828c292af20b975",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org": "3a15686c336074afd0fa8e2c28f5a811d38bac5369eaa0798259055e3362db83",
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/CONTENTS_NOTE.org": "31ee3c0ef6de5813ccaaa2ff2ec999f16f914c2cd7e95050ae340da453ae3252",
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/REVIEW.md": "0d48d84340a9224c14e87bea9d185c2b60fba8b011bd9e7c30c633e92600c99b",
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/replay.json": "12c178004e0afc3512a5d03032b6138a6f09cd3033b38133736000a44c49ea45",
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/replay.py": "42b7e3077f439a63c47dbb60561555bb764585506194fee752b0848e4ae4fc30",
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/issue-filed.json": "b7e8ba11cfea7f0b1040e78d3764766baf1810aaa35b5371a993b608ecd1b663"
+  },
+  "untracked": [
+    "slurm_logs/release_landing_2026-10-14/ghana-feature-review/issue-filed.json"
+  ],
+  "github_development": "c67c69279608820f49591f2ddbda577d049abf72",
+  "main_HEAD_development_origin": [
+    "c67c69279608820f49591f2ddbda577d049abf72",
+    "c67c69279608820f49591f2ddbda577d049abf72",
+    "c67c69279608820f49591f2ddbda577d049abf72"
+  ],
+  "prs": {
+    "967": {
+      "baseRefName": "development",
+      "headRefName": "fix/962-uganda-food-units",
+      "isDraft": false,
+      "number": 967,
+      "state": "OPEN",
+      "url": "https://github.com/ligon/LSMS_Library/pull/967"
+    },
+    "999": {
+      "baseRefName": "master",
+      "headRefName": "development",
+      "isDraft": true,
+      "number": 999,
+      "state": "OPEN",
+      "url": "https://github.com/ligon/LSMS_Library/pull/999"
+    }
+  },
+  "issue_1008": {
+    "state": "OPEN",
+    "body_sha256_matches_file": true,
+    "url": "https://github.com/ligon/LSMS_Library/issues/1008"
+  },
+  "production_source_tests_fixtures_changed": false,
+  "diff_check_exit": 0,
+  "limits": [
+    "Read-only review of checkpoint, not approval of unfinished Feature audit",
+    "No new docs/package/test build performed",
+    "Pending Uganda scientific hold, #967 merge, final development/shared-cache verification and publication retained"
+  ]
+}

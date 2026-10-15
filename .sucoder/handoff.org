@@ -2,11 +2,10 @@
 
 * Current execution -- Codex, job39919092
 The maintainer approved WORKPLAN.org and said to proceed. Twenty implementation
-PRs are merged to development, plus evidence PRs #997/#998. GitHub, local main
-and filesystem origin development are synchronized atc67c69279 after the
-independently reviewed corpus/coverage evidence PR1007 passed both CI checks.
-#967 Uganda
-remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
+PRs are merged to development, plus evidence PRs #997/#998/#1007. GitHub, local main
+and filesystem origin development are synchronized at c67c69279 after the
+independently reviewed corpus/coverage evidence PR #1007 passed both CI checks.
+#967 Uganda remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
 newly reproduced #1003 merged via PR1004 after independent review and CI.
 PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
 with no change to test selection or assertions. No release tag or publication yet;
@@ -54,10 +53,12 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   13472rows, independently replayed separately from visit aggregation. Full
   Feature implementation and relevant selectors matchv0.14/pre-train/candidate;
   exact historical input counts were not rebuilt. See ghana-feature-review/.
+  This measured country residual is now tracked by #1008; historical #323/#847
+  are closed reporting/mechanism references, not a fix for these rows.
 - Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
   4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
-  No credential skips;2580cache-presence skips remain for targeted follow-up
-  against the completed corpus. Fifteen independent replication-dir tests lack the
+  No credential skips; the 2,580 cache-presence skips were subsequently
+  checked against the completed corpus, with results below. Fifteen independent replication-dir tests lack the
   external project; never point them at the same cache under test. Fourxfails
   are source weight gaps; existing Pakistan#740 is the non-strict xpass.
 - Final-source cache-gap worktree is release-work/cache-coverage, branch

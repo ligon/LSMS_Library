@@ -5006,5 +5006,5 @@ Country duplicate is needed to activate the Feature collapse, because
 removing =visit= creates duplicate keys.  The 22 null-unit rows discussed
 under the 1998-99 wave reducer are a separate upstream loss, not the
 cohort counted here.  Choosing a source-supported unit/cluster treatment
-or changing assembly's null-key policy requires its own reviewed fix;
+or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
 this note changes neither identifiers nor measures.

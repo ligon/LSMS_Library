@@ -9,6 +9,14 @@ prerequisites. The independent source/artifact review and exact proposed
 scope are archived in =corpus-review/=. This is new test-coverage debt;
 it does not relax the nutrition hold, explain #941 or close a scientific issue.
 
+Filed [[https://github.com/ligon/LSMS_Library/issues/1008][#1008]] after independent API and pure-assembly replays confirmed
+GhanaLSS Feature deletion of13,472null-key food rows, separate from legitimate
+visit aggregation. Relevant code is unchanged sincev0.14.0; exact historical
+input counts were not rebuilt. Closed #323/#847 describe the mechanism and
+reporting, not a completed fix for this cohort. Evidence and the reviewed
+country note are in =ghana-feature-review/=. No aggregation policy or survey
+value was changed as part of filing this residual.
+
 PR #998 published these reviewed drafts and evidence, merged as =4c60e696f=.
 The coordinator narrowed 18 open issue bodies/titles after confirming that
 none had changed since the independent review; every issue remains OPEN.

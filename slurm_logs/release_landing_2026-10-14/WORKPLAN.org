@@ -23,7 +23,8 @@ Execution is underway under the maintainer's approval. See EXECUTION.org and
 the archived lane reports for reviewed heads, actual merges and validation.
 The private corpus rebuild completed: 530 of 549 declared requests succeeded;
 19 documented source/wiring gaps remain. Shared caches remain untouched.
-Feature and cache-presence follow-up checks use separate physical copies.
+The cache-presence follow-up is complete, with the held nutrition failure;
+the Feature audit continues in another physical copy.
 The Uganda nutrition direction hold remains open; no release tag exists.
 
 * Evidence and corrections to the handoff
@@ -205,7 +206,7 @@ Use explicit reviewed head SHAs and observe required checks. Do not enable
 independent auto-merge on #982 or another bundle member. Keep shared-cache
 builders off intermediate development heads during the window.
 
-- [ ] Before the window, snapshot the reference revision, cache coverage,
+- [X] Before the window, snapshot the reference revision, cache coverage,
   data digests/row counts and freshness. An old warm parquet is not a baseline
   merely because it exists. Separate package-data equality from footer hashes.
 - [ ] Merge the reviewed branches to development and reconcile mirror/GitHub
@@ -217,7 +218,7 @@ builders off intermediate development heads during the window.
   perform the shared-cache warm only after the final heads have landed.
   Do not use assume_cache_fresh=True or a global LSMS_NO_CACHE loop as proof
   of a complete warm; script-path caches have different bypass behaviour.
-- [ ] Enumerate every declared country/table, including noncanonical tables
+- [X] Enumerate every declared country/table, including noncanonical tables
   and empty/unavailable cells. Record success/failure and expected wave
   coverage; a scan of only canonical Feature tables is not a corpus census.
 - [ ] Reuse the deterministic Feature audit (read its README and relevant
@@ -225,12 +226,16 @@ builders off intermediate development heads during the window.
   findings against the recorded baseline rather than requiring old warnings
   to disappear. Store coverage outputs here, without overwriting blessed or
   committed coverage snapshots as a side effect.
-- [ ] Compare rebuilt values with the baseline. #969 itself should preserve
+- [X] Compare rebuilt values with the baseline. #969 itself should preserve
   Linux values; the combined train intentionally changes selected countries.
   Attribute every changed table to a reviewed correction, and every new
   build failure or lost wave to an investigated cause.
-- [ ] Verify both parquet tiers' freshness/coverage and the absence of
+- [X] Verify both parquet tiers' freshness/coverage and the absence of
   in-tree generated parquets. Record elapsed time, resources and exclusions.
+  The cold corpus completed at frozen7fa05179; corpus/ and cache-coverage.org
+  record all requests, comparisons and the two final Uganda hashless country
+  outputs. Measurement is complete; this is not a claim that every cache is
+  fresh or that the final development/shared-cache gate has passed.
 
 Gate: one documented warm of the final release tree, every requested cell
 accounted for, and no unexplained data loss. Private branch verification can
@@ -241,20 +246,23 @@ require additional scoped builds; "once" refers to the shared corpus warm.
   partial issue or split a different residual; a bare "partly fixed" comment
   is insufficient. In particular, do not close #794, #824, #833, #787,
   #830, #905, or #941 solely because one associated branch merged.
-- [ ] Reconcile existing #978 rather than duplicating Nigeria W5 acquisition;
+- [X] Reconcile existing #978 rather than duplicating Nigeria W5 acquisition;
   retain the 12 DECISION issues unless separately decided. Previously
   acknowledged source-acquisition gaps (#975/#976/#977) get explicit release
   notes where relevant, not invented coverage.
-- [ ] Draft =docs/releases/v0.15.0.md= from the FINAL diff since v0.14.0,
+- [X] Draft =docs/releases/v0.15.0.md= from the integrated diff since v0.14.0,
   including already-merged changes, not just this train. Cover user-visible
   data corrections, Windows/conda and no-make behaviour, labels diagnostics,
   current dependency changes, both-tier rebuild cost and known residuals.
-- [ ] Run =make api-audit STRICT=1=, docs build, and package-content/version
+- [X] Run =make api-audit STRICT=1=, docs build, and package-content/version
   checks. Retain dynamic versioning's [project]/[tool.poetry] conventions.
-- [ ] Open development -> master release PR. List only verified fully
+  Frozen74c9398ec passed; the later docs checkpoint passed a strict docs build.
+  Final tagged package verification remains in Phase 6.
+- [X] Open development -> master release PR. List only verified fully
   resolved issues, with one =Closes #N= keyword per issue. Include all gates,
-  exact final SHAs and evidence locations. Merge with a MERGE COMMIT, never
-  squash; preserve development/master ancestry.
+  validation SHAs and evidence locations. PR #999 is open as a DRAFT.
+- [ ] After the remaining gates pass, finalize PR #999 and merge with a
+  MERGE COMMIT, never squash; preserve development/master ancestry.
 
 * Phase 6 — tag, publish, and verify the installed release
 - [ ] Verify master contains the approved candidate, required CI including
