@@ -53,6 +53,9 @@ def test_subprocess_override_routes_all_layers(tmp_path):
     """Env set before import => every countries-tree resolver honors it."""
     ov = tmp_path / "countries"
     ov.mkdir()
+    # GH #915: Country(name) raises for a name with no directory under the
+    # (overridden) countries_root(); an empty directory is enough to construct.
+    (ov / "Uganda").mkdir()
     script = textwrap.dedent(
         f"""
         import warnings; warnings.simplefilter("ignore")
