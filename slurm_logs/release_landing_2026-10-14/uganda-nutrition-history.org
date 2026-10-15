@@ -148,21 +148,55 @@ basins (+28826.875 kg, A +64860468.75) and 20-litre debes (+10842.5 kg,
 A +24395625). Thus its opposite direction is an item-composition consequence
 of the changed kg factors, dominated by the volume convention.
 
-*New source contradiction, left unresolved.* =nutrition.org= =fct= row 4003,
+*Source-provenance correction [2026-10-14 release-draft review].* The first
+version of this report called row 4003 a "New source contradiction, left
+unresolved" and said "Those claims cannot both describe that numeric record."
+That conclusion omitted a specific derivation note in the SAME row. The
+stronger claim of competing unsupported intended values is withdrawn; the
+complete recorded provenance supports a specific override of a generic
+starting assumption. This correction changes no numerical replay result.
+
+=nutrition.org='s =fct= row 4003,
 =SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW=, records =vit_a_rae_mcg= *225 per 100 g*,
-which correctly becomes 2250/kg in the CSV and served FCT. Its source note,
-however, reads:
+which correctly becomes 2250/kg in the CSV and served FCT. Its =fct_source=
+is =HarvestPlus Uganda=, =fct_source_code= is =11507=, and
+=fct_source_descr= reads:
 #+begin_quote
 Based on USDA #11507 Sweet potato,unprepared; vitamin A and carotenoids assumed = 0.
 #+end_quote
-Those claims cannot both describe that numeric record. This pre-existing FCT
-inconsistency is not introduced by #850 and does not disturb the exact replay.
-It prevents treating the positive A movement as independently source-validated
-nutrition merely because the multiplication is right. No source claim was
-silently preferred, and neither density nor crosswalk was edited. Resolving
-which producer record is authoritative needs source curation or an explicit
-acceptance of this documented limitation. Recorded sources for the principal
-contributors are in [[file:uganda-nutrition-history/density-provenance.json][density-provenance.json]].
+But the adjacent =water_source_descr= also records the carotenoid derivation:
+#+begin_quote
+Applied water content of 67.4 g based on an average of 3 yellow flesh varieties reported by Kidmose et al., 2007 (Salyboro,199062.1 and Nyathi Odiewo);betacarotene content also derived from the mean of the same 3 varieties.
+#+end_quote
+The retention-factor source/code/description fields are empty. The numeric
+record is retinol =0=, alpha-carotene =10=, beta-carotene =2697=,
+beta-cryptoxanthin =0=, vitamin A RAE =225= and vitamin A IU =4503=, per
+100 g. Using the dietary-carotenoid RAE factors stated by the
+[[https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/][NIH Office of Dietary Supplements]] (read 2026-10-14),
+=0 + 2697/12 + 10/24 + 0/24 = 225.1666667=, which rounds to the recorded
+whole-microgram =225=. The nearby WHITE sweet-potato row 3003 carries the
+same generic zero note, a West 1988 water adjustment, and zero carotenoids
+and RAE. The yellow row's specific note therefore supplies a coherent
+explanation for its nonzero value; it is not evidence that zero should
+replace 225.
+
+The interpretation is a recorded specific yellow-variety carotenoid override
+to the generic USDA starting assumptions. It is an inference from the full
+record, not independent verification of Kidmose et al. (2007): that paper's
+measurements, variety selection and preparation basis have not been checked
+in this investigation. Any follow-up should clarify the general note's scope
+and confirm the cited derivation/source version before proposing a numerical
+change. The same fields and numbers are present at =8ec0bab4e=, =v0.14.0=
+and this investigation's integrated parent. Thus this clarification is
+neither a #850 nor a #967 numerical change.
+
+Full source rows, exact revision identities and the arithmetic check are in
+[[file:uganda-nutrition-history/fct4003-provenance-correction.json][fct4003-provenance-correction.json]]. The earlier
+[[file:uganda-nutrition-history/density-provenance.json][density-provenance.json]] captures the principal contributors but is not a
+complete account of row 4003's provenance; use this addendum with it. No
+density, source table, crosswalk, factor policy or fixture was edited. This
+does not independently validate nominal food-container masses or lift the
+explicit nutrition-baseline hold.
 
 B12 falls by *725398.402571* recorded micrograms, mostly Fresh Fish
 (-210099.610345), Dry/Smoked Fish (-209016.076873), Eggs (-128147.916339),
@@ -219,8 +253,10 @@ built there. No in-tree parquets. Only aggregate evidence is committed.
 The unexplained historical regression is now an exact causal accounting.
 Accepting the current nutrition fixture would acknowledge the documented
 arithmetic correction and the already shipped estimator/nominal-volume
-conventions; it would not independently validate physical masses or resolve
-the contradictory sweet-potato FCT source note. The explicit hold remains
+conventions; it would not independently validate physical masses or the
+cited sweet-potato paper. The full recorded FCT provenance supports the
+nonzero density; the earlier omitted-evidence claim is corrected above.
+The explicit hold remains
 until the maintainer chooses whether to accept these limitations for this
 release or first resolve the source/physical assumptions. #967 additionally
 requires accepting its separately proved 24-row loss and small nutrient delta;

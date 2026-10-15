@@ -3086,15 +3086,29 @@ litre containers; B12 -31.6041% is mostly fish, eggs and milk losing kg, while
 many plant foods have zero B12 density. Every nutrient delta reconciles to
 food-by-food kg-factor changes times unchanged densities.
 
-A new source caveat is now explicit. =nutrition.org='s FCT row 4003,
-=SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW=, records Vitamin A RAE =225= micrograms
-per 100 g (2250/kg in the served FCT), but its source note says “vitamin A
-and carotenoids assumed = 0.” This pre-existing contradiction is unresolved;
-neither statement was silently preferred. Fresh sweet potatoes contribute
-+79.42 million recorded micrograms to the historical A delta. Exact arithmetic
-does not establish which source statement is authoritative. Nominal
-volume-as-mass and range-endpoint assumptions also remain documented in the
-report; no density, mapping, factor policy or fixture was changed.
+*Correction to that investigation's FCT caveat [2026-10-14].* Its first
+addendum called row 4003 a "pre-existing contradiction" and said "Exact
+arithmetic does not establish which source statement is authoritative."
+That framing omitted the same row's specific yellow-variety derivation.
+=nutrition.org='s =SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW= row does carry a
+generic USDA #11507 note saying "vitamin A and carotenoids assumed = 0."
+But its adjacent =water_source_descr= explicitly derives beta-carotene from
+the mean of three yellow-flesh varieties in Kidmose et al. (2007): Salyboro,
+199062.1 and Nyathi Odiewo. It records beta-carotene =2697= and alpha-carotene
+=10= micrograms/100 g, with retinol and beta-cryptoxanthin zero. Their dietary
+RAE calculation is =2697/12 + 10/24 = 225.1667=, rounding to the recorded
+=225= (2250/kg served). The complete record supports a specific carotenoid
+override to the generic starting assumption; it does not support choosing
+zero in place of 225. The report quotes both complete source notes and the
+NIH RAE conversion reference, with an exact historical-fields comparison.
+
+This is recorded provenance and arithmetic consistency, not an independent
+check of the cited paper's measurements, varieties or preparation basis.
+Follow-up should clarify the generic note and confirm that derivation before
+any numeric proposal. Fresh sweet potatoes still contribute +79.42 million
+recorded micrograms to the historical A delta. Nominal volume-as-mass and
+range-endpoint assumptions remain separate; no density, source table,
+mapping, factor policy or fixture was changed. *The baseline hold remains.*
 
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
