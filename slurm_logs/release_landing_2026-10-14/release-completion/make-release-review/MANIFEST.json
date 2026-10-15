@@ -1,0 +1,18 @@
+{
+  "MAKE_RELEASE_REVIEW.md": {
+    "bytes": 7069,
+    "sha256": "f106142e15af52ccaf3a366b9ec17e293418fc171111f1166992676ef6f2d4a9"
+  },
+  "make-release-outcomes.json": {
+    "bytes": 70147,
+    "sha256": "71727dbe32756ac852307945ded88d1f3e13275e71a6a4be85f757026370f779"
+  },
+  "make-release-evidence-review.json": {
+    "bytes": 4843,
+    "sha256": "903fd7caa773f6773186afc46bb1e754cc704b824dbb5f1d015dcf272f72fa0a"
+  },
+  "classify_release_outcomes.py": {
+    "bytes": 8498,
+    "sha256": "487e9a4de2f3b85ed00b2bc5697ac68cebc783be8eb5d6b29137eb2e2c46bb60"
+  }
+}

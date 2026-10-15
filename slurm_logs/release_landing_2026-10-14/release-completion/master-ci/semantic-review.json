@@ -1,0 +1,685 @@
+{
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "run_id": 38759333750,
+  "all_module_marker_counts": {
+    "tests/test_863_transforms.py": {
+      ".": 49,
+      "s": 7
+    },
+    "tests/test_962_unit_sentinel.py": {
+      ".": 28
+    },
+    "tests/test_acquisition_source_validation.py": {
+      ".": 11
+    },
+    "tests/test_add_market_index_dedup.py": {
+      ".": 3
+    },
+    "tests/test_age_dtype_consistency.py": {
+      ".": 70,
+      "s": 4
+    },
+    "tests/test_age_handler.py": {
+      ".": 33
+    },
+    "tests/test_age_intervals.py": {
+      ".": 22
+    },
+    "tests/test_albania_cluster_features.py": {
+      ".": 20
+    },
+    "tests/test_api_discoverability.py": {
+      ".": 6
+    },
+    "tests/test_assets_additive.py": {
+      ".": 17
+    },
+    "tests/test_build_subprocess_env.py": {
+      ".": 12
+    },
+    "tests/test_build_transform_hash.py": {
+      ".": 35
+    },
+    "tests/test_burkina_faso_2014_passages.py": {
+      ".": 15
+    },
+    "tests/test_burkina_faso_food_labels.py": {
+      ".": 6
+    },
+    "tests/test_cache_hash_invalidation.py": {
+      ".": 22
+    },
+    "tests/test_canonical_shape_via_cache_miss.py": {
+      ".": 7
+    },
+    "tests/test_canonical_spellings.py": {
+      ".": 6
+    },
+    "tests/test_capability.py": {
+      ".": 19
+    },
+    "tests/test_catalog.py": {
+      ".": 14
+    },
+    "tests/test_categorical_mapping_resolution.py": {
+      "s": 1,
+      ".": 31
+    },
+    "tests/test_categorical_merge.py": {
+      ".": 8
+    },
+    "tests/test_china_index_uniqueness.py": {
+      ".": 16
+    },
+    "tests/test_cli.py": {
+      ".": 2
+    },
+    "tests/test_collectonly_no_purge.py": {
+      ".": 18
+    },
+    "tests/test_conftest_addoption_idempotent.py": {
+      ".": 2
+    },
+    "tests/test_conftest_net.py": {
+      ".": 7
+    },
+    "tests/test_conversion.py": {
+      ".": 20
+    },
+    "tests/test_conversion_table_matching.py": {
+      ".": 3
+    },
+    "tests/test_countries_root_override.py": {
+      ".": 12
+    },
+    "tests/test_coverage_matrix.py": {
+      ".": 63
+    },
+    "tests/test_crop_kg_factor.py": {
+      ".": 36
+    },
+    "tests/test_currency.py": {
+      ".": 56
+    },
+    "tests/test_currency_denominated_units.py": {
+      ".": 20
+    },
+    "tests/test_currency_livestock_registry.py": {
+      ".": 14
+    },
+    "tests/test_dat_dct_reader.py": {
+      ".": 18
+    },
+    "tests/test_data_access.py": {
+      ".": 41
+    },
+    "tests/test_data_separation.py": {
+      ".": 20
+    },
+    "tests/test_declared_spellings.py": {
+      ".": 18
+    },
+    "tests/test_derivations.py": {
+      ".": 44
+    },
+    "tests/test_docs_coverage_hook.py": {
+      ".": 15
+    },
+    "tests/test_doctests.py": {
+      ".": 2
+    },
+    "tests/test_dvc_caching.py": {
+      ".": 38
+    },
+    "tests/test_dvc_lock_hygiene.py": {
+      ".": 6
+    },
+    "tests/test_ehcvm_7day.py": {
+      ".": 163
+    },
+    "tests/test_ethiopia_food_sources.py": {
+      ".": 8
+    },
+    "tests/test_ethiopia_shipped_factors.py": {
+      ".": 21
+    },
+    "tests/test_ethiopian_calendar.py": {
+      ".": 58
+    },
+    "tests/test_ethiopiarhs_double_punch.py": {
+      ".": 3
+    },
+    "tests/test_feature.py": {
+      ".": 25
+    },
+    "tests/test_feature_attrs_carriers.py": {
+      ".": 18
+    },
+    "tests/test_feature_canonical_index.py": {
+      ".": 41
+    },
+    "tests/test_feature_vocabulary.py": {
+      ".": 10
+    },
+    "tests/test_finalize_order_797.py": {
+      ".": 5
+    },
+    "tests/test_food_expenditures_basis.py": {
+      ".": 6
+    },
+    "tests/test_food_kg_inference.py": {
+      ".": 46
+    },
+    "tests/test_food_labels.py": {
+      ".": 42
+    },
+    "tests/test_food_prices_dtype.py": {
+      "s": 2,
+      ".": 2
+    },
+    "tests/test_food_prices_units_kwarg.py": {
+      ".": 18
+    },
+    "tests/test_format_id.py": {
+      ".": 33
+    },
+    "tests/test_get_data_file_paths.py": {
+      ".": 9
+    },
+    "tests/test_gh323_benin_cluster_features.py": {
+      ".": 8
+    },
+    "tests/test_gh323_benin_togo.py": {
+      ".": 6,
+      "s": 2
+    },
+    "tests/test_gh323_ethiopia_config.py": {
+      ".": 21
+    },
+    "tests/test_gh323_explicit_reducers.py": {
+      ".": 23
+    },
+    "tests/test_gh323_grain_contract.py": {
+      ".": 17
+    },
+    "tests/test_gh323_malawi_cluster_key.py": {
+      ".": 14
+    },
+    "tests/test_gh323_malawi_gb_cartesian.py": {
+      ".": 16
+    },
+    "tests/test_gh323_mali_cartesian.py": {
+      ".": 11
+    },
+    "tests/test_gh323_site4_dfs_merge.py": {
+      ".": 28
+    },
+    "tests/test_gh323_tanzania_cluster_key.py": {
+      ".": 28
+    },
+    "tests/test_gh323_togo_cluster_features.py": {
+      ".": 6
+    },
+    "tests/test_gh637_malawi_first_sites.py": {
+      ".": 22
+    },
+    "tests/test_gh637_tanzania_shocks_household_id.py": {
+      ".": 11
+    },
+    "tests/test_gh637_uganda_plot_inputs_season.py": {
+      ".": 7
+    },
+    "tests/test_gh645_to_parquet_null_coercion.py": {
+      ".": 17
+    },
+    "tests/test_gh763_get_data_file_fast_path.py": {
+      ".": 5
+    },
+    "tests/test_gh772_uganda_earnings_shape.py": {
+      ".": 9
+    },
+    "tests/test_gh803_intree_parquet_never_read.py": {
+      ".": 11
+    },
+    "tests/test_gh808_script_path_predicate.py": {
+      ".": 5
+    },
+    "tests/test_gh809_hashless_country_parquet.py": {
+      ".": 5,
+      "s": 1
+    },
+    "tests/test_gh810_no_cwd_rooted_dvc.py": {
+      ".": 5
+    },
+    "tests/test_gh819_vjoin_order.py": {
+      ".": 9
+    },
+    "tests/test_gh831_cache_clear_intree_sources.py": {
+      ".": 9
+    },
+    "tests/test_gh831_no_runtime_writes_into_config_tree.py": {
+      ".": 6
+    },
+    "tests/test_gh838_stated_vs_inferred.py": {
+      ".": 6
+    },
+    "tests/test_gh842_uganda_harvest_unit.py": {
+      ".": 8
+    },
+    "tests/test_gh866_stale_country_parquet_not_laundered.py": {
+      ".": 9,
+      "s": 9
+    },
+    "tests/test_gh868_reduce_to_agreed_ledger.py": {
+      ".": 25
+    },
+    "tests/test_gh871_most_complete_row.py": {
+      ".": 46
+    },
+    "tests/test_gh875_ethiopia_shocks_one_builder.py": {
+      ".": 18
+    },
+    "tests/test_gh891_wave_subset_cache.py": {
+      ".": 20
+    },
+    "tests/test_gh905_vectorised_min_count_sum.py": {
+      ".": 7
+    },
+    "tests/test_gh909_panel_spine_coverage.py": {
+      ".": 4
+    },
+    "tests/test_gh919_country_qualified_units.py": {
+      ".": 14
+    },
+    "tests/test_gh968_no_make_fallback.py": {
+      ".": 5
+    },
+    "tests/test_gh970_no_json_make.py": {
+      ".": 2
+    },
+    "tests/test_ghanalss_12b.py": {
+      ".": 24
+    },
+    "tests/test_ghanalss_8h_farmgate.py": {
+      ".": 35
+    },
+    "tests/test_ghanalss_aggregate.py": {
+      ".": 14
+    },
+    "tests/test_ghanalss_community_prices.py": {
+      ".": 6
+    },
+    "tests/test_ghanalss_food_label_canonical.py": {
+      ".": 32
+    },
+    "tests/test_ghanalss_food_security_key_gh323.py": {
+      ".": 1
+    },
+    "tests/test_ghanalss_interview_date.py": {
+      ".": 15
+    },
+    "tests/test_ghanalss_nutrition.py": {
+      ".": 11
+    },
+    "tests/test_ghanalss_visit_alignment.py": {
+      ".": 39
+    },
+    "tests/test_ghanalss_visit_derivations.py": {
+      ".": 17
+    },
+    "tests/test_ghanalss_visit_inference.py": {
+      ".": 12
+    },
+    "tests/test_ghanasps_crop_production.py": {
+      ".": 27
+    },
+    "tests/test_ghanasps_livestock.py": {
+      ".": 28
+    },
+    "tests/test_ghanasps_plot_features.py": {
+      ".": 15
+    },
+    "tests/test_ghanasps_plot_labor.py": {
+      ".": 24
+    },
+    "tests/test_global_u_org.py": {
+      ".": 3
+    },
+    "tests/test_grain_collapse.py": {
+      ".": 14
+    },
+    "tests/test_grain_collapse_cluster_features.py": {
+      ".": 12
+    },
+    "tests/test_guatemala_psu_grain.py": {
+      ".": 7
+    },
+    "tests/test_guinea_bissau_cluster_features.py": {
+      ".": 6
+    },
+    "tests/test_guyana_index_uniqueness.py": {
+      ".": 23
+    },
+    "tests/test_harmonize_method_auto_dispatch.py": {
+      ".": 5
+    },
+    "tests/test_housing_canon.py": {
+      ".": 49
+    },
+    "tests/test_id_format_id_canonical.py": {
+      ".": 12
+    },
+    "tests/test_id_walk.py": {
+      ".": 15
+    },
+    "tests/test_india_employment_activity_index.py": {
+      ".": 7
+    },
+    "tests/test_join_v_silent_skip_warn.py": {
+      ".": 5
+    },
+    "tests/test_kinship_other_relative.py": {
+      ".": 13
+    },
+    "tests/test_kinship_yml_hygiene.py": {
+      ".": 7
+    },
+    "tests/test_label_selection.py": {
+      ".": 47
+    },
+    "tests/test_locality_deprecation.py": {
+      ".": 5
+    },
+    "tests/test_malawi_cassava_recode.py": {
+      ".": 8
+    },
+    "tests/test_malawi_sale_basis.py": {
+      ".": 55
+    },
+    "tests/test_malawi_shipped_factors.py": {
+      ".": 44
+    },
+    "tests/test_malawi_unit_cleanup.py": {
+      ".": 8
+    },
+    "tests/test_median_price_valuation.py": {
+      ".": 66
+    },
+    "tests/test_metric_fraction_parse.py": {
+      ".": 27
+    },
+    "tests/test_module_shadowing.py": {
+      ".": 8
+    },
+    "tests/test_niger_2014_15_extension_key.py": {
+      ".": 20
+    },
+    "tests/test_niger_cluster_features_geo.py": {
+      ".": 10
+    },
+    "tests/test_niger_food_label_drift.py": {
+      ".": 26
+    },
+    "tests/test_niger_labor_hours.py": {
+      ".": 8
+    },
+    "tests/test_niger_region_labels.py": {
+      ".": 10
+    },
+    "tests/test_niger_sold_unit.py": {
+      ".": 26
+    },
+    "tests/test_niger_u_sentinel.py": {
+      ".": 25
+    },
+    "tests/test_niger_value_sentinels.py": {
+      ".": 14
+    },
+    "tests/test_nigeria_cluster_identity.py": {
+      ".": 34
+    },
+    "tests/test_nigeria_food_acquired_sources.py": {
+      ".": 6
+    },
+    "tests/test_nigeria_kg_factor.py": {
+      ".": 10
+    },
+    "tests/test_nigeria_sold_unit.py": {
+      ".": 18
+    },
+    "tests/test_no_c1_controls_in_curated_labels.py": {
+      ".": 4
+    },
+    "tests/test_no_editable_install.py": {
+      ".": 8
+    },
+    "tests/test_no_v_join_declarative.py": {
+      ".": 10
+    },
+    "tests/test_nonfood_expenditures_schema.py": {
+      ".": 24,
+      "s": 1
+    },
+    "tests/test_normalize_index_j_preserved.py": {
+      ".": 3
+    },
+    "tests/test_notes.py": {
+      ".": 15
+    },
+    "tests/test_null_index_guard.py": {
+      ".": 23
+    },
+    "tests/test_null_read_guard.py": {
+      ".": 35
+    },
+    "tests/test_orgfile_missing_table.py": {
+      ".": 5
+    },
+    "tests/test_own_production_valuation.py": {
+      ".": 48
+    },
+    "tests/test_pakistan_cluster_features.py": {
+      "X": 1,
+      ".": 7
+    },
+    "tests/test_panama_777.py": {
+      ".": 1
+    },
+    "tests/test_panel_attrition.py": {
+      "s": 2
+    },
+    "tests/test_panel_id_collisions.py": {
+      ".": 20
+    },
+    "tests/test_panel_ids_dtype.py": {
+      ".": 5
+    },
+    "tests/test_panel_ids_persistence.py": {
+      ".": 56
+    },
+    "tests/test_parallel_waves.py": {
+      ".": 39
+    },
+    "tests/test_peru_700.py": {
+      ".": 2
+    },
+    "tests/test_plot_id_canonical.py": {
+      ".": 17
+    },
+    "tests/test_population.py": {
+      ".": 64
+    },
+    "tests/test_provenance.py": {
+      ".": 8
+    },
+    "tests/test_pytest_scoping.py": {
+      ".": 2
+    },
+    "tests/test_quantity_kg.py": {
+      ".": 7
+    },
+    "tests/test_quantity_screen.py": {
+      ".": 39
+    },
+    "tests/test_rcsi.py": {
+      ".": 17
+    },
+    "tests/test_reader_sniff.py": {
+      ".": 36,
+      "s": 1
+    },
+    "tests/test_recall_record.py": {
+      ".": 33
+    },
+    "tests/test_repository_discovery.py": {
+      ".": 18
+    },
+    "tests/test_roster_residence_filter.py": {
+      ".": 13
+    },
+    "tests/test_roster_to_characteristics_movers.py": {
+      ".": 8
+    },
+    "tests/test_s3_credential_precedence.py": {
+      ".": 11
+    },
+    "tests/test_s3_fetch_retry.py": {
+      ".": 5
+    },
+    "tests/test_s3_unlock.py": {
+      ".": 7
+    },
+    "tests/test_sample.py": {
+      ".": 518,
+      "s": 85,
+      "x": 4
+    },
+    "tests/test_schema_consistency.py": {
+      ".": 282
+    },
+    "tests/test_serbia_cluster_key.py": {
+      ".": 8
+    },
+    "tests/test_shipped_factors.py": {
+      ".": 37
+    },
+    "tests/test_table_structure.py": {
+      "s": 2631,
+      ".": 153
+    },
+    "tests/test_tanzania_community_cluster_xwalk.py": {
+      ".": 6
+    },
+    "tests/test_tanzania_grain_gh323.py": {
+      ".": 13
+    },
+    "tests/test_tests_package_not_shadowed.py": {
+      ".": 2
+    },
+    "tests/test_timor_leste_interview_date.py": {
+      ".": 11
+    },
+    "tests/test_togo_nonfood_expenditures.py": {
+      ".": 7
+    },
+    "tests/test_u_code_leak.py": {
+      ".": 9
+    },
+    "tests/test_u_sentinel_protection.py": {
+      ".": 5
+    },
+    "tests/test_uganda_323_grain.py": {
+      ".": 27
+    },
+    "tests/test_uganda_99999.py": {
+      ".": 7
+    },
+    "tests/test_uganda_api_vs_replication.py": {
+      "s": 15
+    },
+    "tests/test_uganda_assets_script.py": {
+      ".": 5
+    },
+    "tests/test_uganda_crop_condition.py": {
+      ".": 13
+    },
+    "tests/test_uganda_intercropped.py": {
+      ".": 46
+    },
+    "tests/test_uganda_invariance.py": {
+      ".": 52,
+      "s": 1
+    },
+    "tests/test_uganda_sold_unit.py": {
+      ".": 21
+    },
+    "tests/test_uganda_tables.py": {
+      "s": 6,
+      ".": 3
+    },
+    "tests/test_uganda_v_grain_invariants.py": {
+      ".": 13
+    },
+    "tests/test_unpriceable_price_drop.py": {
+      ".": 13
+    },
+    "tests/test_version_placeholder.py": {
+      ".": 4
+    },
+    "tests/test_visualizations.py": {
+      ".": 65
+    },
+    "tests/test_visualizations_export.py": {
+      ".": 2
+    },
+    "tests/test_volume_as_mass_kwarg.py": {
+      ".": 58
+    },
+    "tests/test_wave_getattr.py": {
+      ".": 10
+    },
+    "tests/test_wave_provenance.py": {
+      ".": 52
+    },
+    "tests/test_weight_normalisation.py": {
+      ".": 20
+    },
+    "tests/test_windows_portability.py": {
+      ".": 46
+    }
+  },
+  "marker_totals": {
+    ".": 4927,
+    "s": 2768,
+    "X": 1,
+    "x": 4
+  },
+  "comparison_manual_run": 38746123119,
+  "module_outcome_count_differences": {},
+  "previously_resolved_uganda_cases": [
+    {
+      "node_id": "tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Uganda/assets]",
+      "zero_based_module_position": 2260,
+      "module_items": 2784,
+      "master_marker": ".",
+      "master_outcome": "passed"
+    },
+    {
+      "node_id": "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Uganda/assets]",
+      "zero_based_module_position": 2714,
+      "module_items": 2784,
+      "master_marker": ".",
+      "master_outcome": "passed"
+    },
+    {
+      "node_id": "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]",
+      "zero_based_module_position": 49,
+      "module_items": 53,
+      "master_marker": ".",
+      "master_outcome": "passed"
+    }
+  ],
+  "skip_reason_limit": "Only actual module markers/counts are available; terminal output does not provide a per-node skip-reason ledger.",
+  "no_new_test_execution": true,
+  "identity_proof": "source-identity.json establishes unchanged tests/config/workflow relative to validated3914; prior affected collection-order proof is in final-ci-publishable."
+}

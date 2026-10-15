@@ -1,0 +1,33 @@
+{
+  "version": "0.15.0",
+  "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "runtime_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "started_utc": "2026-10-15T15:20:13.168692+00:00",
+  "finished_utc": "2026-10-15T15:37:21.836469+00:00",
+  "seconds": 1028.667356162332,
+  "exit_code": 0,
+  "actual_make_release_executed": true,
+  "summary": "7376 passed, 314 skipped, 9 xfailed, 1 xpassed, 968 warnings in 1024.34s (0:17:04)",
+  "counts": {
+    "passed": 7376,
+    "skipped": 314,
+    "xfailed": 9,
+    "xpassed": 1,
+    "warnings": 968
+  },
+  "junit_cases": 7700,
+  "junit_failures": 0,
+  "junit_errors": 0,
+  "junit_skip_types": {
+    "pytest.skip": 314,
+    "pytest.xfail": 9
+  },
+  "checkout_clean": true,
+  "annotated_tag_created": true,
+  "tag_target": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "data_root": "/local/job39919092/release-work/release-make-data",
+  "log_sha256": "99012c6a69034ed9425023785bead72464b4ce992f91ff456f01498d8c395711",
+  "junit_sha256": "ee54438d87a10c6fe83af30e69ab31e03b84b98a3cb025b9af6542e5087f86f2",
+  "raw_logs_and_xml_private": true,
+  "published_by_this_command": false
+}

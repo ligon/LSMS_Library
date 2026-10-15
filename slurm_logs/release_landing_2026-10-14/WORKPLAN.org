@@ -32,7 +32,12 @@ October 15; its narrowly updated fixture passed all 53 entries and the focused
 selection passed 127 tests. PRs #967 and #1014 are merged. Final combined-source
 CI at 3914d8804 passed 4,927 credentialed tests with zero failures; final
 private cache validation and 158 focused tests passed. Shared promotion and
-its independent read-only verification passed; no release tag exists.
+its independent read-only verification passed. PR #1015 archived final evidence,
+and #999 merged into master at cb44e3522. The actual release target passed
+7,376 tests with zero failures/errors and created a local annotated v0.15.0.
+Master data CI passed 4,927 tests with zero failures. The annotated tag is on
+GitHub and the mirror; GitHub Release and PyPI publication succeeded. Published-artifact installation checks passed. This completion change carries
+master ancestry into development; its PR records final external refs after merge.
 
 * Evidence and corrections to the handoff
 - Local planning base: =a31257286=; GitHub development: =b021bae5d9=.
@@ -297,8 +302,8 @@ and can leave FCT hashless again. Independent review approved this disposition.
   source/PR references, residuals filed and verified complete scopes listed
   individually in draft release PR #999. The application manifest is archived.
   In particular, #794, #824, #833, #787, #830, #905 and #941 remain open.
-- [ ] After the release merge, verify the intended 21 issue closures and
-  retained residuals against their final states; record the release SHA.
+- [X] After release merge #999 at cb44e3522, verify all 21 intended issue
+  closures and ten selected retained-open scopes; every expected state matched.
 - [X] Reconcile existing #978 rather than duplicating Nigeria W5 acquisition;
   retain the 12 DECISION issues unless separately decided. Previously
   acknowledged source-acquisition gaps (#975/#976/#977) get explicit release
@@ -315,32 +320,50 @@ and can leave FCT hashless again. Independent review approved this disposition.
   Final tagged package verification remains in Phase 6.
 - [X] Open development -> master release PR. List only verified fully
   resolved issues, with one =Closes #N= keyword per issue. Include all gates,
-  validation SHAs and evidence locations. PR #999 is open as a DRAFT.
-- [ ] After the remaining gates pass, finalize PR #999 and merge with a
-  MERGE COMMIT, never squash; preserve development/master ancestry.
+  validation SHAs and evidence locations. PR #999 merged at cb44e3522.
+- [X] Finalize PR #999 and merge with a MERGE COMMIT. Parents 1528fa937
+  and 2e41feda3 preserve master/development ancestry.
 
 * Phase 6 — tag, publish, and verify the installed release
-- [ ] Verify master contains the approved candidate, required CI including
-  data-tests is green, the release notes are final, and the intended tag does
-  not already exist. Use a clean master checkout for tagging.
-- [ ] Run the repository's actual release target with pinned BLAS/build
-  threads and a budgeted worker count:
-  =make release v=0.15.0 PYTEST_WORKERS=<allocated budget>=.
-  Its implementation runs tests then creates an annotated tag; the local
-  Makefile comments describing a sanity build are stale. CI builds artifacts.
-- [ ] Push the tag explicitly to GitHub (origin here is only the mirror),
+- [X] Verify the existing local annotated tag targets the approved master
+  commit and complete required master data CI before push/publication.
+  The clean checkout and absence of the tag were checked before local creation;
+  preserve those historical preconditions separately from the current state.
+  Master run 38759333750 passed all applicable jobs at cb44e3522; the
+  data suite recorded 4,927 passed, 2,768 skipped, four xfailed, one xpassed.
+- [X] Run the actual =make release v=0.15.0= on clean master cb44e3522,
+  with PYTEST_ARGS selecting eight loadfile workers, timeout 600/thread,
+  single BLAS/build workers and a new physical cache copy. Result: 7,376
+  passed, 314 skipped, nine xfailed, one xpassed, zero failures/errors.
+  Local annotated tag d4ff03d28 targets cb44e3522. The target does not build
+  distributions; publishing CI does. Original logs/XML remain private.
+  The one Guyana read-guard skip separately passed on an isolated copy;
+  original suite counts and unknown skip cause remain unchanged.
+- [X] Push the tag explicitly to GitHub (origin here is only the mirror),
   then publish the GitHub Release with =--repo ligon/LSMS_Library= and
   =--notes-file docs/releases/v0.15.0.md=.
-- [ ] Observe =publish.yml= for that tag. If the release event produces no
+  Annotated object d4ff03d28 is present in both remotes and peels to cb44e3522.
+- [X] Observe =publish.yml= for that tag. If the release event produces no
   run, use the documented workflow_dispatch fallback with =tag=v0.15.0=.
   Verify the run's tag/commit, wheel and sdist versions, and successful PyPI
   upload. Do not mistake a published GitHub page for a published package.
-- [ ] Install the version from PyPI into a clean environment outside the
-  repo; check =importlib.metadata.version('lsms_library')=, packaged configs,
-  data-free API smoke, and a small credentialed data call where available.
-- [ ] Synchronize master/development ancestry without force pushes; update
+  Automatic release-event run 38767928967 passed build and publish; PyPI
+  supplied the verified, non-yanked 0.15.0 wheel and source archive.
+- [X] Install the version from PyPI into a clean environment outside the
+  repo; verify version, every packaged file, dependency compatibility and
+  data-free API/config smoke. A separate ordinary warm Uganda assets call
+  matched all 116,808 rows/eight waves and preserved all 172 private parquets.
+  Native installed Windows credentialed cold builds passed in master CI;
+  the published-wheel smoke does not claim a cold or credentialed rebuild.
+  No-Git sdist rebuild has identical member contents; archive compression
+  differs, with all differences independently explained and recorded.
+- [ ] Merge the final completion PR to carry master ancestry into development; update
   the handoff with release URL, publish run, final refs, cache results, and
   final branch/issue dispositions. Keep retained historical branches intact.
+  This change descends from tagged master. Final GitHub/mirror ref verification
+  is recorded on the completion PR after merge; no force push or deletion.
+  This checkbox records the pre-merge document checkpoint; the PR's final
+  ref record establishes completion without another self-referential commit.
 
 * Sources for execution
 - [[file:../../.claude/skills/backlog-workflow/SKILL.md][Backlog skill]] and [[file:../../.claude/skills/release/SKILL.md][release skill]].

@@ -1,6 +1,64 @@
-#+title: Handoff -- 2026-10-14 release landing IN PROGRESS
+#+title: Handoff -- v0.15.0 released 2026-10-15
 
-* Current execution -- 2026-10-15 final implementation validation
+* Current execution -- 2026-10-15 v0.15.0 published and verified
+All 23 implementation PRs and the final evidence PR #1015 are merged. Release
+PR #999 merged development into master with two-parent commit
+=cb44e3522a2426ba03431ca9a218cc63fe03f6c9= at 15:19:31 UTC. The complete tree
+equals final documentation head =2e41feda3=; runtime/tests/dependencies/build
+inputs match validated =3914d8804= except the reviewed CONTENTS prose.
+All 21 intended issue closures and ten selected retained-open scopes were
+verified. No PR remained open immediately after the release merge.
+
+The actual =make release v=0.15.0= passed at this master commit using a new
+physical cache copy, eight loadfile workers, 600-second per-test timeout and
+single BLAS/build workers: 7,376 passed, 314 skipped, nine expected failures,
+one existing non-strict unexpected pass, zero failures/errors in 1,024.34 s.
+No credential-guard skip occurred. Four weight expectations and five known
+#602 tenure defects account for the expected failures. All skip categories
+are independently reviewed; they are not blanket source-availability claims.
+One Guyana cached sanity assertion skipped after its read retry exhausted;
+it separately passed on a 13-file physical copy without skips. Its original
+exception/cause remains unknown, and the suite's 314-skip count is unchanged.
+
+Annotated =v0.15.0= object =d4ff03d28ab417c5d98f8e1e7c94d1261b8331bc=
+peels to =cb44e3522a2426ba03431ca9a218cc63fe03f6c9= on GitHub and the
+filesystem mirror. Master CI =38759333750= PASSED: 4,927 data passes,
+2,768 skips, four expected failures, one existing non-strict unexpected pass,
+zero failures. All applicable unit/Windows/docs/DVC jobs passed; no refresh
+or master change occurred. The automatic release-event publishing run
+=38767928967= passed both jobs. Release:
+https://github.com/ligon/LSMS_Library/releases/tag/v0.15.0
+PyPI: https://pypi.org/project/LSMS-Library/0.15.0/
+
+Downloaded wheel SHA256 =a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0=;
+source archive =e8ed24a6609268b02220e2eb94c7809ab5c153468094614c8af2b8444c78c657=.
+Every one of 11,751 package members matches the tag. The no-Git source rebuild
+has identical contents for all 11,756 wheel members and equivalent metadata;
+compressed archive bytes differ only in independently explained DEFLATE
+encoding and associated sizes/offsets. Do not claim byte-identical archives.
+Fresh installation from PyPI brought 170 dependencies and passed pip check,
+20 public-callable/config checks, and a separate ordinary warm Uganda assets
+call: 116,808 rows, eight waves, exact expected content and all 172 private
+parquets unchanged. Cold credentialed Windows builds are separate evidence.
+
+Both 1,519-file frozen evidence roots retain their recorded identities after
+the isolated release tests. The verified 1,518-file shared promotion and its
+recoverable backups stand. No shared/frozen L2 API was used for installation
+validation. All 193 ref versions have dispositions: 101 landed, 63 superseded,
+19 rejected, six archives, four integration refs; zero active unresolved refs.
+Historical branches remain intact. The final completion change descends from
+release master and restores that ancestry to development when merged. Final
+external refs are recorded in its PR body after merge, avoiding a self-referential
+commit hash. Remaining work is the documented issue backlog, not a release hold.
+At this document's pre-merge checkpoint, the completion PR and final ref check
+remain to be finished; publication and installed-release verification are complete.
+
+The #967 approval and existing scientific limitations remain unchanged:
+Mali/Tanzania warm-date loss, Liberia precision and Mali scalar conversion,
+19 source/wiring gaps, Feature findings, and Uganda's reciprocal FCT/nutrition
+metadata loss remain explicit. Publication is not a new scientific approval.
+
+* Prior execution checkpoint -- final implementation validation (historical)
 The maintainer approved #967: "Okay, thumbs up on #967" after reviewing the
 before/after nutrition accounting and inherited assumptions. Its approved
 fixture change is merged. All 53 baseline entries match; 127 focused tests

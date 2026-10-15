@@ -1,0 +1,16 @@
+[
+  {
+    "job": "docs",
+    "conclusion": "success",
+    "selected_diagnostic_lines": [
+      "##[group]Run mkdocs build --strict",
+      "mkdocs build --strict",
+      "INFO    -  Documentation built in 2.92 seconds"
+    ]
+  },
+  {
+    "job": "dvc-lock-check",
+    "conclusion": "success",
+    "selected_diagnostic_lines": []
+  }
+]

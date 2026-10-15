@@ -1,0 +1,25 @@
+{
+  "executed_scripts": {
+    "installed_data_smoke.py": {
+      "sha256": "2636d32294af869359d27bbba82e8b39dca891ceae2c25cb38eb8e1db4044867",
+      "bytes": 8104
+    },
+    "run_installed_data_smoke.py": {
+      "sha256": "d8636a43ccda8ee5a19e32192e1c355c39ea3fb26ba102007fc5804c2bdf3477",
+      "bytes": 1706
+    }
+  },
+  "installation_evidence": {
+    "path": "/local/job39919092/release-work/control/final-release-docs/installation.json",
+    "sha256": "3819dfc322bbcd9678c7905a49b6f9d3c7447d86bf8af029ee0996c13ffeabbe",
+    "bytes": 478
+  },
+  "private_raw_log": {
+    "path": "/local/job39919092/release-work/control/runtime/published-data-smoke/run.log",
+    "sha256": "c7a3e13422ae15c90b590105d77e38217a11fd766f680505165a63a99a26fa9d",
+    "bytes": 1740
+  },
+  "empty_config_remains_empty": true,
+  "raw_log_published": false,
+  "scope": "Review/result aggregate evidence only; no survey rows or raw warning logs."
+}

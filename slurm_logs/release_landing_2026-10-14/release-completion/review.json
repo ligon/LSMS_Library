@@ -1,0 +1,471 @@
+{
+  "head": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "tracked_diff_sha256": "0799a6813a2305c1952a247eabe2c79c6e923e2bdf80a1036d4bebb9bb2da964",
+  "tracked_paths": [
+    ".sucoder/handoff.org",
+    "docs/releases/v0.15.0.md",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org"
+  ],
+  "prior_checkpoint_preserved_files": 19,
+  "manifest_checks": [
+    {
+      "path": "master-ci/evidence-manifest.json",
+      "members_verified": 14,
+      "sha256": "ee962869bd34a972342ccc89a81ca4a50fae7388651c3fe4f834708a7a3a3d07"
+    },
+    {
+      "path": "publish-ci/evidence-manifest.json",
+      "members_verified": 3,
+      "sha256": "87fa4ce46badeb7602e61bd26820e7c158727c3573536984a52f9d05e4f6418b"
+    },
+    {
+      "path": "MANIFEST.json",
+      "members_verified": 75,
+      "sha256": "5b130d01891db658251fd6e1fcc913013314e2ff48bd0563d7164f6894a0c130"
+    },
+    {
+      "path": "artifact-validation/MANIFEST.json",
+      "members_verified": 10,
+      "sha256": "9ecd124e90d72a81642d212f490f45ef256ffc6a4354c47f699ea1993d208899"
+    },
+    {
+      "path": "installed-data-smoke/MANIFEST.json",
+      "members_verified": 5,
+      "sha256": "98f5cb9b5023d8ab96d51f9be64772a6c3d3bdde30adfcbe5a9e12563ce3da84"
+    },
+    {
+      "path": "make-release-review/MANIFEST.json",
+      "members_verified": 4,
+      "sha256": "a6140de5a2d6a54d674d8292040aad541d283cbb4f2c9706589394f9ec749678"
+    },
+    {
+      "path": "private-install-log-digests.json",
+      "members_verified": 4
+    }
+  ],
+  "archive_members": 75,
+  "archive_files": [
+    {
+      "name": "CHECKPOINT_REVIEW.md",
+      "bytes": 3173,
+      "sha256": "b77d3846fc420a3dab946e92d76fb91032666246c7a501d228756743a0003240"
+    },
+    {
+      "name": "README.md",
+      "bytes": 5630,
+      "sha256": "3e4909a11cdb25369e8b9750cc8531f73a75ddf87ae899f23220da5d5aeba61c"
+    },
+    {
+      "name": "artifact-comparison.json",
+      "bytes": 1497,
+      "sha256": "504ba2b53f6099fb15fc8ea4063447eb2e161e711b613bfc4b7d522ee08a4b71"
+    },
+    {
+      "name": "artifact-validation/MANIFEST.json",
+      "bytes": 1316,
+      "sha256": "9ecd124e90d72a81642d212f490f45ef256ffc6a4354c47f699ea1993d208899"
+    },
+    {
+      "name": "artifact-validation/REVIEW.md",
+      "bytes": 4396,
+      "sha256": "1e3dca00fadff75bfedac990fd1d95d777b7150a156c4739cb431f7fca7f15d4"
+    },
+    {
+      "name": "artifact-validation/container-correction/REVIEW.md",
+      "bytes": 3833,
+      "sha256": "7c6153a68c831b30468b3cd90119bcb87bb6e2eddc7cdf89821a07dc4a7d945b"
+    },
+    {
+      "name": "artifact-validation/container-correction/comparison.json",
+      "bytes": 4452129,
+      "sha256": "5454bcdbd2d5ffcea73e45617fcb542bb464609b67415ee9e3f5e41e5d871a5b"
+    },
+    {
+      "name": "artifact-validation/container-correction/headers.json",
+      "bytes": 528,
+      "sha256": "5d698615d41c522b24ac769e47571a65479d8fe11abf0b30c886e126202eb3cb"
+    },
+    {
+      "name": "artifact-validation/container-correction/review.json",
+      "bytes": 1312,
+      "sha256": "0eba2390c17a65a505b7d3ba8ff7415353132cbeb53164c23f5f184a7cb778fe"
+    },
+    {
+      "name": "artifact-validation/container-correction/verify_artifacts.py",
+      "bytes": 3565,
+      "sha256": "b4286b5a7b1f75120479b51b20557b4012028917013c041dc1f8e9452952c4aa"
+    },
+    {
+      "name": "artifact-validation/fetch_published.py",
+      "bytes": 4543,
+      "sha256": "dd8e787ea641a2a63c046451999ebe05fad7a66727aaed5d01ccd8c3ccb0d059"
+    },
+    {
+      "name": "artifact-validation/install_published.py",
+      "bytes": 1871,
+      "sha256": "d734031e9d3eec102e0637909e74737422429d93c53548384e0597005e07e296"
+    },
+    {
+      "name": "artifact-validation/installed_data_smoke.py",
+      "bytes": 8104,
+      "sha256": "2636d32294af869359d27bbba82e8b39dca891ceae2c25cb38eb8e1db4044867"
+    },
+    {
+      "name": "artifact-validation/published_smoke.py",
+      "bytes": 4400,
+      "sha256": "9cd0f2ed112cdad519d25bdc46c2f4219a6c0304417fe57554ace57ad245e85a"
+    },
+    {
+      "name": "artifact-validation/rebuild_sdist.py",
+      "bytes": 1799,
+      "sha256": "dc691807a71593a1adeb625cb575d6a14b7bf75347a96caa8f5a0bf8e5d1fd4b"
+    },
+    {
+      "name": "artifact-validation/review.json",
+      "bytes": 2510,
+      "sha256": "efe13aa03022b0d5389790506f786ff349740ea67013b1bce87ebc3858bb1e1c"
+    },
+    {
+      "name": "artifact-validation/run_installed_data_smoke.py",
+      "bytes": 1706,
+      "sha256": "d8636a43ccda8ee5a19e32192e1c355c39ea3fb26ba102007fc5804c2bdf3477"
+    },
+    {
+      "name": "artifact-validation/run_published_smoke.py",
+      "bytes": 1281,
+      "sha256": "d7b6d35527a6d8b82a75c4a296609dd4285cc0e2daf25d4420d67925b5ccf7d1"
+    },
+    {
+      "name": "artifact-validation/verify_artifacts.py",
+      "bytes": 1738,
+      "sha256": "7046c5b81fff2b5fc923133299fe9c1a9244b2dabc4644be47094a759dee2f49"
+    },
+    {
+      "name": "completion-checkpoint-validation.json",
+      "bytes": 6279,
+      "sha256": "020a2fd294309c7db1bf91f0ffcbe1fc0154401217368283c854574ed51b9fd1"
+    },
+    {
+      "name": "docs-validation.json",
+      "bytes": 401,
+      "sha256": "3522a55dead069a1974d2309cba7d0886bab77e4ab4ae82b7dd24ef48bf1fb33"
+    },
+    {
+      "name": "guyana-sanity-followup/copy-proof.json",
+      "bytes": 6311,
+      "sha256": "b7bf9b7c1eef98ce5bd6407864a231e08fca68e73cb5e2f3889a20067fdd0a93"
+    },
+    {
+      "name": "guyana-sanity-followup/result.json",
+      "bytes": 962,
+      "sha256": "eb1257569e52cfda2cab9db5df014cdcea8a67b2e02c495073c842bcd61b587a"
+    },
+    {
+      "name": "guyana-sanity-followup/verify_guyana_skip.py",
+      "bytes": 3549,
+      "sha256": "8cc8eaa265f31a819de3a6e9293ed7f6f28ddbb436696202b262dfc1d25d02cc"
+    },
+    {
+      "name": "installation.json",
+      "bytes": 478,
+      "sha256": "3819dfc322bbcd9678c7905a49b6f9d3c7447d86bf8af029ee0996c13ffeabbe"
+    },
+    {
+      "name": "installed-data-smoke/MANIFEST.json",
+      "bytes": 622,
+      "sha256": "98f5cb9b5023d8ab96d51f9be64772a6c3d3bdde30adfcbe5a9e12563ce3da84"
+    },
+    {
+      "name": "installed-data-smoke/RESULT.md",
+      "bytes": 2205,
+      "sha256": "ee621bfd50eb3141c54b5fea55f6cefd917469989b918f3bc76e382dc44e65fc"
+    },
+    {
+      "name": "installed-data-smoke/REVIEW.md",
+      "bytes": 4396,
+      "sha256": "1e3dca00fadff75bfedac990fd1d95d777b7150a156c4739cb431f7fca7f15d4"
+    },
+    {
+      "name": "installed-data-smoke/private-log-digest.json",
+      "bytes": 121,
+      "sha256": "929a5416db45efda5b60bcc2be736d81570af288325eec0b206850536a9d7d9f"
+    },
+    {
+      "name": "installed-data-smoke/provenance.json",
+      "bytes": 925,
+      "sha256": "71b87ab5e688092b6ec933ee5d1195de4b562630ac7fc9bb81f83f6cab8c8305"
+    },
+    {
+      "name": "installed-data-smoke/result.json",
+      "bytes": 1740,
+      "sha256": "c7a3e13422ae15c90b590105d77e38217a11fd766f680505165a63a99a26fa9d"
+    },
+    {
+      "name": "installed-data-smoke/review.json",
+      "bytes": 2510,
+      "sha256": "efe13aa03022b0d5389790506f786ff349740ea67013b1bce87ebc3858bb1e1c"
+    },
+    {
+      "name": "installed-distributions.json",
+      "bytes": 7568,
+      "sha256": "4725975ce001f8666dac9eafaa89a78d9e6b37d08b36be77a40395dc16690fda"
+    },
+    {
+      "name": "installed-smoke.json",
+      "bytes": 4415,
+      "sha256": "53b4fc9e4be0c1ef90e0842bbf4c679220b9318044247b7fc1b0345d34da10c6"
+    },
+    {
+      "name": "issue941-final-ci-body.md",
+      "bytes": 4678,
+      "sha256": "7d58093c0a1eca87cec546a15d001b9b33f1a65c88568b7ac986507bb4438e6e"
+    },
+    {
+      "name": "issue941-final-ci-update.json",
+      "bytes": 339,
+      "sha256": "6e41f723bde94b639fb339029c7c7b4735a0a43adee0628a6154f21eba622ae3"
+    },
+    {
+      "name": "issues-after-release-merge.json",
+      "bytes": 9665,
+      "sha256": "46b0f45007e34313797961ba31052e8f139b3f210e43bf5a64102c25a58d6b4d"
+    },
+    {
+      "name": "local-release-tag.json",
+      "bytes": 353,
+      "sha256": "cd86f2465963aaf1aacb286c4f5bcf77a649b9dcd06bdd2ae70b5d5f6bf3e33e"
+    },
+    {
+      "name": "make-release-review/MAKE_RELEASE_REVIEW.md",
+      "bytes": 7069,
+      "sha256": "f106142e15af52ccaf3a366b9ec17e293418fc171111f1166992676ef6f2d4a9"
+    },
+    {
+      "name": "make-release-review/MANIFEST.json",
+      "bytes": 565,
+      "sha256": "a6140de5a2d6a54d674d8292040aad541d283cbb4f2c9706589394f9ec749678"
+    },
+    {
+      "name": "make-release-review/classify_release_outcomes.py",
+      "bytes": 8498,
+      "sha256": "487e9a4de2f3b85ed00b2bc5697ac68cebc783be8eb5d6b29137eb2e2c46bb60"
+    },
+    {
+      "name": "make-release-review/make-release-evidence-review.json",
+      "bytes": 4843,
+      "sha256": "903fd7caa773f6773186afc46bb1e754cc704b824dbb5f1d015dcf272f72fa0a"
+    },
+    {
+      "name": "make-release-review/make-release-outcomes.json",
+      "bytes": 70147,
+      "sha256": "71727dbe32756ac852307945ded88d1f3e13275e71a6a4be85f757026370f779"
+    },
+    {
+      "name": "make-release-summary.json",
+      "bytes": 1131,
+      "sha256": "4ef3fe0af50edcdb779a5dccf01815d39e2e14b3a4c2b5cec941ae63e97ec027"
+    },
+    {
+      "name": "master-ci/REPORT.md",
+      "bytes": 5105,
+      "sha256": "c241518507f995a7ccbbd30de73010c831e1209909b9e873e6888933aedd0120"
+    },
+    {
+      "name": "master-ci/aggregate-results.json",
+      "bytes": 6747,
+      "sha256": "9af43e91317316cf957fa0b66bb3047c6e47cb1cc28c9ac83bed122fec63e0d7"
+    },
+    {
+      "name": "master-ci/docs-lock-observations.json",
+      "bytes": 334,
+      "sha256": "9801edc4add55f3f58af227e4cf12ed5a06fa45d8df26e3afa0ca22e125ade84"
+    },
+    {
+      "name": "master-ci/evidence-manifest.json",
+      "bytes": 2357,
+      "sha256": "ee962869bd34a972342ccc89a81ca4a50fae7388651c3fe4f834708a7a3a3d07"
+    },
+    {
+      "name": "master-ci/expected-native.json",
+      "bytes": 755,
+      "sha256": "8610fe06e5b928e75f46dbb26cd4fae5c3bd9b351547056b4454fa0da2f112fa"
+    },
+    {
+      "name": "master-ci/freeze_terminal.py",
+      "bytes": 5719,
+      "sha256": "e783b3dc9cf016f6c80f256b1f27c7ca86b7f17beff6ac98eb1816f33c0367f5"
+    },
+    {
+      "name": "master-ci/master-tip-history.jsonl",
+      "bytes": 204,
+      "sha256": "7588e68ce2dc4b696c0be2e9625d522996065cdebe66ddf54cc3870889e46ca1"
+    },
+    {
+      "name": "master-ci/master-tip.json",
+      "bytes": 214,
+      "sha256": "9f18c57709497efe029d9d247e02a48feff2f97aabc089e4262d0d92580330f8"
+    },
+    {
+      "name": "master-ci/monitor-finished.json",
+      "bytes": 615,
+      "sha256": "1aaebad1bc7791fe87bc790835de2c3720b3528bc53d4dbccd9d0e75b85657c6"
+    },
+    {
+      "name": "master-ci/monitor-process.json",
+      "bytes": 266,
+      "sha256": "599c46605962471ac50a4121da552af6856e5405e77d6123ea5fd99fdb2fad8b"
+    },
+    {
+      "name": "master-ci/monitor.py",
+      "bytes": 6133,
+      "sha256": "e7c2e3601a1a0897e4243f5896b0ead962af9f1203519c6a06561ddd7cedae26"
+    },
+    {
+      "name": "master-ci/native-validation.json",
+      "bytes": 805,
+      "sha256": "626f17dea249c71acc4fd7c032ccb91b8517a43d91ff7beb4c3fe4ac2389dc89"
+    },
+    {
+      "name": "master-ci/render_report.py",
+      "bytes": 3878,
+      "sha256": "b094b46a31f3dd0149a6efbf6adf8d49b452c7dc462f93e7e5044fd479c8f911"
+    },
+    {
+      "name": "master-ci/semantic-review.json",
+      "bytes": 15235,
+      "sha256": "5a025a1ed9c654f793fd5552646587ff6720f4ba2837a8b3013c5417c1a7b74b"
+    },
+    {
+      "name": "master-ci/source-identity.json",
+      "bytes": 504,
+      "sha256": "7c0e360560c0d2cccf9a87fbbf0ed36427cb35bfa64b6550e19334fcd0fe9fa4"
+    },
+    {
+      "name": "open-prs-after-master-merge.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "name": "pip-check.json",
+      "bytes": 177,
+      "sha256": "c7ee62a57b641739589af69e0d4b486956c85f0a425d8723fb661f715dfb074e"
+    },
+    {
+      "name": "pr1015-merged.json",
+      "bytes": 174,
+      "sha256": "188388b84dff21ccf771442b309a455226fdac8c5be1bda775173acc16af489c"
+    },
+    {
+      "name": "pr1015-premerge.json",
+      "bytes": 2397,
+      "sha256": "c55a68f4debd7eb3e40bc5f1c34924450a24565e235317f735e1ea5ad53856d2"
+    },
+    {
+      "name": "pr999-merged.json",
+      "bytes": 173,
+      "sha256": "c4b43839a460efd43920e08bfd103f174d30c4bb723069ab3bdc32af3ebfa63e"
+    },
+    {
+      "name": "pr999-premerge.json",
+      "bytes": 7724,
+      "sha256": "5808ec91e4128325ad86641a1eba9276ff27d2aa1e443b0fee3f0a4381386256"
+    },
+    {
+      "name": "preservation-after-isolated-release-tests.json",
+      "bytes": 543,
+      "sha256": "3c4a59d118983c8f132c50fa144141e9f7ad500a6f8ba9113a4102cc2066efc1"
+    },
+    {
+      "name": "private-install-log-digests.json",
+      "bytes": 725,
+      "sha256": "2b793f6021e6f8d062fbb6cbce5e7891edaa1b83e63bd4eea210e242ea19c64f"
+    },
+    {
+      "name": "publication-preflight.json",
+      "bytes": 21881,
+      "sha256": "3fa614197e5426d5b56afb47e02e3ad605c04fc224fde164033314b20456d73d"
+    },
+    {
+      "name": "publish-ci/REPORT.md",
+      "bytes": 2330,
+      "sha256": "8d652ff04509e62f7a91e0c9995c05cbc7cae589314dc73e1d2d8e56cfd1806d"
+    },
+    {
+      "name": "publish-ci/aggregate-results.json",
+      "bytes": 4554,
+      "sha256": "67044044ed49e0a150d616faa7cd9031c7dd46912dccc4a2a9280b40ddb55236"
+    },
+    {
+      "name": "publish-ci/evidence-manifest.json",
+      "bytes": 559,
+      "sha256": "87fa4ce46badeb7602e61bd26820e7c158727c3573536984a52f9d05e4f6418b"
+    },
+    {
+      "name": "publish-ci/freeze_evidence.py",
+      "bytes": 5839,
+      "sha256": "e5638e8ebeaac82b0c7f5e66ac32d0e98d67c5981202f27a26e4bc079ab76214"
+    },
+    {
+      "name": "published-artifacts.json",
+      "bytes": 1546,
+      "sha256": "b8bfd43caff2c2aace53674ea7725fee3c7ce121db616d77b57eb71a25f8432f"
+    },
+    {
+      "name": "published-github-release.json",
+      "bytes": 213,
+      "sha256": "54a0319a50f31eaa01dbc1409c7da75213f5acee24fbd99b6448dfac38489fc9"
+    },
+    {
+      "name": "sdist-rebuild.json",
+      "bytes": 479,
+      "sha256": "561d35223fc3ac6223fca810e40c684f5c293defb8cc6a04c6b14404b0bbe274"
+    }
+  ],
+  "root_manifest_sha256": "5b130d01891db658251fd6e1fcc913013314e2ff48bd0563d7164f6894a0c130",
+  "private_install_log_digest_checks": 4,
+  "actual_pip_install_dependencies": 170,
+  "docs_validation_log_digest_verified": true,
+  "master_and_publish_terminal_logs_verified": 9,
+  "publication_api_capture_digests_verified": 6,
+  "downloaded_distribution_digests_verified": 2,
+  "archive_text_only": true,
+  "credential_literal_scan_hits": [],
+  "master_ci": {
+    "run_id": 38759333750,
+    "conclusion": "success",
+    "data_summary": {
+      "summary": "4927 passed, 2768 skipped, 4 xfailed, 1 xpassed, 1004 warnings in 3137.91s (0:52:17)",
+      "counts": {
+        "passed": 4927,
+        "skipped": 2768,
+        "xfailed": 4,
+        "xpassed": 1,
+        "warnings": 1004
+      },
+      "pytest_seconds": 3137.91
+    }
+  },
+  "publish_ci": {
+    "run_id": 38767928967,
+    "event": "release",
+    "conclusion": "success"
+  },
+  "no_cache_or_library_api_operations": true,
+  "verdict": "APPROVE final publication/install documentation delta; completion PR and final refs remain pending",
+  "reviewed_utc": "2026-10-15T16:38:24.834347+00:00",
+  "prior_checkpoint_diff_sha256": "fba9e844f267ee59cc2c58e488d90ae90cd5ad612539189acaed5aac0092f81e",
+  "correction_reviewed": "Final ancestry/ref completion checkbox remains unchecked; handoff explicitly states the completion PR/ref check is pending.",
+  "review_report": {
+    "name": "FINAL_REVIEW.md",
+    "bytes": 5755,
+    "sha256": "9c9c783ec1de024008737b4285b0499abd69a9df15372293a4fc712355bc91be"
+  },
+  "limits": [
+    "No test, survey API, build, cache or external state mutation during review.",
+    "Warm installed-data smoke is not a cold or credentialed rebuild.",
+    "All wheel member bytes match; compressed archive bytes differ. CI compressor identity is unknown.",
+    "Previously reviewed scientific limitations and open issue scopes remain unchanged.",
+    "Coordinator may append review/docs verification and refresh root manifest, preserving the pinned 75 archive files."
+  ]
+}

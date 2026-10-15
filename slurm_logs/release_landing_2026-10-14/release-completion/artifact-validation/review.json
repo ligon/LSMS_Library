@@ -1,0 +1,60 @@
+{
+  "verdict": "APPROVE prepared validation scripts; execution results remain pending publication/installation",
+  "scope": "Read-only source/evidence review. No Git/GitHub mutations, table API calls, cache reads or cache writes by reviewer. Two new separate control smoke scripts were prepared and syntax-compiled only at coordinator request.",
+  "reviewed_scripts": {
+    "fetch_published.py": {
+      "sha256": "dd8e787ea641a2a63c046451999ebe05fad7a66727aaed5d01ccd8c3ccb0d059",
+      "bytes": 4543
+    },
+    "install_published.py": {
+      "sha256": "d734031e9d3eec102e0637909e74737422429d93c53548384e0597005e07e296",
+      "bytes": 1871
+    },
+    "published_smoke.py": {
+      "sha256": "9cd0f2ed112cdad519d25bdc46c2f4219a6c0304417fe57554ace57ad245e85a",
+      "bytes": 4400
+    },
+    "run_published_smoke.py": {
+      "sha256": "d7b6d35527a6d8b82a75c4a296609dd4285cc0e2daf25d4420d67925b5ccf7d1",
+      "bytes": 1281
+    },
+    "rebuild_sdist.py": {
+      "sha256": "dc691807a71593a1adeb625cb575d6a14b7bf75347a96caa8f5a0bf8e5d1fd4b",
+      "bytes": 1799
+    },
+    "verify_artifacts.py": {
+      "sha256": "7046c5b81fff2b5fc923133299fe9c1a9244b2dabc4644be47094a759dee2f49",
+      "bytes": 1738
+    }
+  },
+  "prepared_data_smoke_scripts": {
+    "installed_data_smoke.py": {
+      "sha256": "2636d32294af869359d27bbba82e8b39dca891ceae2c25cb38eb8e1db4044867",
+      "bytes": 8104
+    },
+    "run_installed_data_smoke.py": {
+      "sha256": "d8636a43ccda8ee5a19e32192e1c355c39ea3fb26ba102007fc5804c2bdf3477",
+      "bytes": 1706
+    }
+  },
+  "ambient_version_override_variable_names": [],
+  "resolved_review_findings": [
+    "Both wheel and sdist now scan forbidden credential/parquet filenames, and assertion is scoped to filenames.",
+    "Sdist rebuild now scrubs credential prefixes and redirects AWS/config/data lookups to new empty locations.",
+    "Every packaged lsms_library member now matches exact tagged git blob/path inventory, without generated exceptions."
+  ],
+  "assets_full_served_expectation": {
+    "rows": 116808,
+    "content_hash": "ef853b421deca593f6e5286a7925317689561515a48bb629234f94202ebdf714",
+    "index_names": [
+      "i",
+      "t",
+      "j"
+    ],
+    "dtypes": {
+      "Value": "float64"
+    },
+    "duplicate_keys": 4237
+  },
+  "assets_subset_limit": "2019-20 served row count9491 is recorded; no independent served-subset digest is present in saved aggregate corpus. Raw wave digest must not be substituted. Prepared smoke uses the full existing served expectation."
+}

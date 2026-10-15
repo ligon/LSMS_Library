@@ -1,0 +1,10 @@
+{
+  "observed_utc": "2026-10-15T16:31:29.710588+00:00",
+  "command": "mkdocs build --strict --clean --site-dir <private control>/completion-site",
+  "exit": 0,
+  "seconds": 3.18,
+  "log_bytes": 1333,
+  "log_sha256": "b47b6ff5232abfdd183a47ed56c9ae66adcb2cbeec9a13b3f4943b5227241f2f",
+  "source_worktree": "release-completion",
+  "tracked_changes": "handoff, release notes, WORKPLAN, EXECUTION only"
+}

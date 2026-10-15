@@ -1,0 +1,9 @@
+{
+  "version": "0.15.0",
+  "wheel_url": "https://files.pythonhosted.org/packages/b8/07/9f7372ae555316c0dac916316e058d9ca333c66f953a38a379e948a94844/lsms_library-0.15.0-py3-none-any.whl",
+  "wheel_sha256": "a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0",
+  "interpreter": "/local/job39919092/release-work/published-install-env/bin/python",
+  "installed_from_public_pypi": true,
+  "fresh_environment_without_prior_lsms": true,
+  "dependencies_installed": 170
+}

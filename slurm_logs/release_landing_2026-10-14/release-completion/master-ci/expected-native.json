@@ -1,0 +1,26 @@
+{
+  "source": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "source_files": [
+    ".github/workflows/ci.yml",
+    "scripts/windows_build_check.py"
+  ],
+  "tables": {
+    "Uganda:shocks": {
+      "rows": 14457,
+      "waves": 8,
+      "digest": "64a53fa7af55"
+    },
+    "Uganda:assets": {
+      "rows": 116808,
+      "waves": 8,
+      "digest": "9202ed542a14"
+    }
+  },
+  "requirements": [
+    "installed wheel code and packaged configs outside checkout",
+    "make/sh/find from conda environment",
+    "nonempty Makefile parquet list and zero find errors"
+  ],
+  "digest_algorithm": "Canonical sorted columns/rows; pandas hash_pandas_object of string values; sum modulo2^48,12hex",
+  "runtime_identical_to": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f"
+}
