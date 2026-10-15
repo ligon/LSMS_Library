@@ -32,6 +32,7 @@ remain separate residuals. This approved follow-up closes only the DTA path.
 
 ## Phase 3 verification
 OK (§2–§5): existing readers and exception classes retained. All 89 focused
-tests pass; one optional real-blob test skips if EXPEND.SSP is absent. The four
+tests pass; the separate credential-gated country-data guard skips. The
+Peru EXPEND.SSP blob test ran (standalone reader suite: 37 passed). The four
 new corruption cases give 3 failures/1 pass on the pre-fix tree, including
 the discriminating truncated latin-1 case.
