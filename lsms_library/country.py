@@ -57,6 +57,7 @@ from .currency import attach_currency, is_monetary_table
 # imports in this file are function-local for historical reasons; this one is
 # on the hot read path (_finalize_result), so it is hoisted.
 from .transformations import validate_acquisition_source
+from .build_transforms import build_context
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
@@ -1529,6 +1530,10 @@ class Wave:
                         if (expected_wave_hash is not None
                                 and read_parquet_cache_hash(cache_path) is None):
                             stamp_parquet_hash(cache_path, expected_wave_hash)
+                        # GH #868: a report filed INSIDE this wave's build (a
+                        # df_edit hook's reduce_to_agreed) can only be replayed
+                        # from the stamp -- the hook did not run on this hit.
+                        _replay_wave_stamp(cache_path, self.country.name, request, self.year)
                         return df_cached
 
         def check_adding_t(df):
@@ -1590,7 +1595,10 @@ class Wave:
             df = pd.concat(dfs, axis=0, sort=False)
 
             if df_edit_function:
-                df = df_edit_function(df)
+                # GH #868: name the cell for a reducer the hook calls, so its
+                # grain report files under the key the cache writer stamps.
+                with build_context(self.country.name, request, self.year):
+                    df = df_edit_function(df)
 
             return df
 
@@ -1734,7 +1742,9 @@ class Wave:
                 if drop_cols:
                     df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
-                    df = df_edit_function(df)
+                    # GH #868: see the same wrap in get_data above.
+                    with build_context(self.country.name, request, self.year):
+                        df = df_edit_function(df)
 
                 # GH #323/#515: did a swallowed KeyError cost a REQUIRED column?
                 # Judged HERE -- after the merge, after `derived:`, after
@@ -1850,6 +1860,9 @@ class Wave:
                 return pd.DataFrame()
 
             df = pd.read_parquet(parquet_fn)
+            # GH #868: the wave script ran out of process; whatever its
+            # reducer reported lives only in the stamp it wrote.
+            _replay_wave_stamp(parquet_fn, self.country.name, request, self.year)
             # NOTE: we deliberately do NOT trust-once-stamp script-path
             # wave parquets here.  They are written hashless by the
             # _/<table>.py scripts, so stamping the current hash onto a
@@ -1877,8 +1890,14 @@ class Wave:
                 and not df.empty):
             try:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
+                # GH #868: carry the reports this wave's build filed (a
+                # df_edit hook's reduce_to_agreed) with the wave parquet, so
+                # a country rebuild from warm wave parquets -- where the hook
+                # does not run -- still stamps them into the country parquet.
                 df = to_parquet(df, cache_path, absolute_path=True,
-                                cache_hash=self._input_hash(request))
+                                cache_hash=self._input_hash(request),
+                                grain_audit=_wave_grain_audit(
+                                    self.country.name, request, self.year))
             except (OSError, ValueError, ArrowInvalid) as exc:
                 # Disk full / permission denied / parquet serialization
                 # failure -> warn and continue with the in-memory df.
@@ -4341,6 +4360,8 @@ class Country:
                     return json.load(json_file)
 
             df_local = get_dataframe(str(output_path))
+            # GH #868: a wave script's grain report exists only in its stamp.
+            _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
             return df_local
 
@@ -6559,6 +6580,28 @@ def _format_grain_report(report: dict[str, Any]) -> str:
     where = f"{country}/{table}" + (f"/{wave}" if wave else "")
     levels = ", ".join(report.get("levels") or [])
     site = report.get("site")
+    if report.get("kind") == "cells_blanked":
+        # GH #868: the EXPLICIT reducer (build_transforms.reduce_to_agreed,
+        # on_conflict='na').  Not a row loss -- no row is dropped -- so none
+        # of the sentences below fit, and in particular not "do NOT declare a
+        # reducer": this report was filed BY the sanctioned reducer, invoked
+        # in writing at the call site.  It withheld a value the sources
+        # contradict; say that, and name the groups and columns.
+        cols = report.get("columns") or {}
+        per_col = ", ".join(f"{c}: {n:,}" for c, n in cols.items()) or "?"
+        examples = ", ".join(report.get("examples") or []) or "?"
+        return (
+            f"{where}: reduce_to_agreed(on_conflict='na') on ({levels}) found "
+            f"{report.get('conflicting_groups', 0):,} of {report.get('groups', 0):,} "
+            f"index group(s) whose rows DISAGREE, and BLANKED "
+            f"{report.get('cells_blanked', 0):,} cell(s) rather than pick a winner "
+            f"(conflicted groups per column: {per_col}; e.g. {examples}). "
+            f"No row was dropped: the group is served with the withheld value "
+            f"missing. Such a group is a pre-existing defect in the source "
+            f"(a broken identifier or a missing index level), made visible by "
+            f"the reducer -- fix it there. "
+            f"Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323."
+        )
     duplicated = bool(report.get("dropped") or report.get("destroyed")
                       or report.get("unauditable"))
     # GH #323 Site 2: the household -> cluster projection.  Not a *declared*-index
@@ -6634,12 +6677,24 @@ def _format_grain_report(report: dict[str, Any]) -> str:
 _GRAIN_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
 
 
-def _record_grain_report(report: dict[str, Any]) -> None:
-    """Emit a grain-collapse report and file it for the cache writer."""
+def _file_grain_report(report: dict[str, Any]) -> None:
+    """File a grain report for the cache writer WITHOUT emitting it.
+
+    The ledger-only half of :func:`_record_grain_report`, for a site that
+    emits its own signal (``build_transforms.reduce_to_agreed`` warns with its
+    own ``GrainConflictWarning`` class, pinned by tests) but still needs the
+    report stamped into the parquet and replayed warm (GH #868).  Same
+    append-unless-identical rule as the parallel-wave relay.
+    """
     key = (report.get("country") or "?", report.get("table") or "?")
     existing = _GRAIN_LEDGER.setdefault(key, [])
     if report not in existing:
         existing.append(report)
+
+
+def _record_grain_report(report: dict[str, Any]) -> None:
+    """Emit a grain-collapse report and file it for the cache writer."""
+    _file_grain_report(report)
     _emit_grain_report(report)
 
 
@@ -6667,13 +6722,26 @@ def grain_reports(country: str | None = None, table: str | None = None) -> list[
     return out
 
 
-def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
+def _replay_grain_audit(reports: Any, country: str, table: str,
+                        wave: str | None = None) -> None:
     """Re-emit reports stamped into an L2 parquet by the cold build (GH #323).
 
     THIS IS THE LINE THAT MAKES THE FIX REAL.  Without it every warning is a
     cold-build-only event, and since practically all reads are warm, the loss goes
     back to being invisible the moment the cache is populated -- which is precisely
     how #323 survived its first fix.
+
+    ``wave`` (GH #868) is the wave a WAVE-level parquet was read for; it fills a
+    report that carries no ``wave`` of its own and never overrides one.  Under
+    the framework's ``build_context`` a stamped report's ``wave`` is the wave
+    FOLDER (``Wave.year``), so a two-round folder (Nigeria PP/PH) must pass
+    ``wave=`` explicitly to the reducer to name the round -- only a report
+    filed that way arrives here already naming it. ``wave_folder`` keeps the
+    framework folder identity separate when selecting that wave stamp.
+    Replaying a wave stamp
+    files it under ``(country, table)``, so
+    the L2-country write that follows carries it forward: that is how a wave
+    script's stamp reaches the country parquet without a second mechanism.
     """
     if not isinstance(reports, list):
         return
@@ -6681,10 +6749,56 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
         if not isinstance(report, dict):
             continue
         report = {**report, "country": country, "table": table, "from_cache": True}
+        if wave is not None and report.get("wave") is None:
+            report["wave"] = wave
         # _record_ (not just _emit_): grain_reports() must be a reliable account of
         # what a session lost, whether the loss happened during THIS process's cold
         # build or during some earlier one whose parquet we are now serving.
         _record_grain_report(report)
+
+
+def _replay_wave_stamp(path: Path | str, country: str, table: str, wave: str | None) -> None:
+    """Replay the ``lsms_grain_audit`` stamp of a WAVE-level parquet (GH #868).
+
+    Called at every place a wave parquet is read back instead of rebuilt --
+    the YAML-path L2-wave hit and the script-path read in ``Wave.grab_data``,
+    and ``run_make_target``'s read -- because a report filed INSIDE a wave
+    build (a ``df_edit`` hook's ``reduce_to_agreed``, or an out-of-process
+    wave script's) exists in no other process and is re-detectable from no
+    other frame.  Footer-only read, ~1 ms.
+    """
+    _replay_grain_audit(read_parquet_grain_audit(path), country, table, wave=wave)
+
+
+# Sites whose report is filed INSIDE a wave's build stage -- i.e. from within
+# ``Wave.grab_data`` -- and so is re-detectable from no later frame.  Only these
+# belong in a WAVE parquet's stamp.  Site 1 (``_normalize_dataframe_index``) and
+# Site 2 (``Wave.cluster_features``) run AFTER grab_data, in the parent, and
+# re-audit on every rebuild: freezing one of their reports into a wave parquet
+# would let it outlive the loss it describes (a direct ``grab_data`` call outside
+# ``_aggregate_wave_data`` sees a ledger nobody popped).
+_WAVE_BUILD_SITES = frozenset({"reduce_to_agreed"})
+
+
+def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] | None:
+    """The reports this process's build of one WAVE filed for ``(country,
+    table)``, for stamping into that wave's L2 parquet (GH #868).
+
+    Filtered on the report's ``wave_folder`` (legacy fallback: ``wave``) and
+    ``site``, leaving ``wave`` free to name a round within that folder.
+    Not filtered on a ledger snapshot: the ledger de-duplicates identical reports, so a delta could
+    miss a report an earlier call in the same process already filed.  A
+    ``from_cache`` report is EXCLUDED, not carried: it was replayed from some
+    earlier stamp, and this write is a cold rebuild of the wave -- what is
+    true now is what the build just filed.
+    """
+    if wave is None:
+        return None
+    out = [r for r in _GRAIN_LEDGER.get((country, table), [])
+           if str(r.get("wave_folder", r.get("wave"))) == str(wave)
+           and r.get("site") in _WAVE_BUILD_SITES
+           and not r.get("from_cache")]
+    return out or None
 
 
 # ---------------------------------------------------------------------------

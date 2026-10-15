@@ -23,6 +23,7 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.country import grain_reports
 from uganda import crop_production_for_wave, CROP_COLMAPS
 
 t = '2015-16'
@@ -98,4 +99,8 @@ for _df, _col in ((df5a, 'a5aq8'), (df5b, 'a5bq8')):
 df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
 assert len(df) > 0, f"crop_production produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique crop_production index for {t}"
-to_parquet(df, 'crop_production.parquet')
+# GH #868: the de-dup's reduce_to_agreed(on_conflict='na') files a grain
+# report in THIS process; stamp it into the wave parquet so the framework
+# can replay it warm (it cannot re-detect it from the de-duplicated frame).
+to_parquet(df, 'crop_production.parquet',
+           grain_audit=grain_reports('Uganda', 'crop_production'))
