@@ -1,0 +1,390 @@
+#+title: v0.15.0 issue reconciliation — draft, no external mutations
+#+date: 2026-10-14
+
+* Scope, frozen evidence and limits
+Reviewed =v0.14.0= (=1528fa937bcf87f146b3af9ebfdbe18b8f912750=) through
+=7fa05179c8519f44ea329ba6387f5d6d6441a8ea=: 339 commits including merges,
+585 changed paths. [[file:release-commit-inventory.tsv][Complete commit inventory]]
+keeps the full range visible; September GhanaAHIES, Malawi, venv and reader
+work is included, not just the October landing train. Also reviewed the
+separate #837 documentation disposition =2877ab387=, which restores the
+three historical WIP source files exactly to development.
+
+Read =.claude/skills/release/SKILL.md=. Publish via a development-to-master
+MERGE COMMIT; one closing keyword per verified issue. No tag, release, issue,
+comment, PR or remote ref was changed by this task. No source/fixture edit.
+
+Read-only GitHub snapshot: all 430 issues (open and closed), the current open
+issues, and 150 latest merged PRs; the last list covers the prior release and
+all later merges. [[file:release-open-issue-dispositions.tsv][All 127 open-issue dispositions]]
+records closure candidates, narrowed residuals and unchanged scopes;
+[[file:release-reconciliation-evidence.json][Snapshot hashes and final PR/Windows metadata]]
+make the evidence boundary reproducible. Initial
+/tmp/lsms-release-plan-20261014 inventories were
+also reconciled. Newly merged PR numbers are evidence of publication, not a
+substitute for checking implementation: #979 was merged with the wrong source
+head; #970's actual implementation is carried by #982 and the frozen tree.
+Local integration merges and remote merge commits have different SHAs, so
+evidence below names source commits and reviewed tests rather than asserting
+every remote merge SHA is an ancestor of this local frozen head.
+
+Inputs: country/runtime/framework control REPORTs and COUNTRY_REVIEW; archived
+full verdicts; current issue bodies; merged PR bodies; final source/config
+diffs; historical release notes; country CONTENTS including live WAITING/TODO.
+The latest source-backed measurements are linked in the per-issue drafts.
+This documentation task did not rebuild the corpus, re-run the full suite,
+execute native Windows or independently repeat every September measurement.
+The parent owns those final gates and the explicit Uganda scientific decision.
+No aggregate test total below is presented as a final release result.
+
+Post-frozen follow-up: independently reviewed PR #994's narrow
+=TestRawFiles= credential marker and removal of broad exception-to-skip paths.
+Approved: config tests remain selected, four raw tests execute with credentials,
+and unavailable data is skipped before access without credentials. Parent's
+reported checks: 12 passed/6 skipped credential-free; 16 passed/2 absent-warm
+table skips credentialed. Final head =6c4c2fc13= passed both CI gates and PR
+#994 is merged. This is not silently folded into the 7fa source range.
+
+Post-frozen evidence addendum, checked 2026-10-14 Pacific:
+- The native Windows job [[https://github.com/ligon/LSMS_Library/actions/runs/38683117467/job/116251866840][116251866840]]
+  succeeded at =74c9398ecf3c1908feb539a99bce3f3f6bf6d04f=, including installed
+  package/config identity and cold-build comparison steps. Final integrated
+  source inclusion and corpus evidence remain the coordinator's gates.
+- Historical Uganda replay =e49e4627d=, integrated as =39941147c= and published
+  in merged PR #997, reproduces both old/current nutrition hashes exactly.
+  All historical movement is in four #850 commits already shipped before
+  v0.14.0. It is not a new v0.15.0 regression. See
+  [[file:uganda-nutrition-history.org][historical accounting]] and the new source-contradiction draft below.
+- Read-only PR refresh confirms #980–#997 merged (including the country PRs
+  #993–#996); #967 remains OPEN pending scientific direction. Remote
+  development is =1973242b48ec62ab808bc8f6e0667054fbb0703f= at this snapshot.
+  The coordinator reports integration =c03e51233= has only the original #967
+  runtime/test differences versus development, besides documentation/logs.
+  These facts do not mean the release has been published or all gates passed.
+- The coordinator's requested #941 sequential cold selection at =ed1414fb9=
+  completed: 451 passed, 0 skipped, 176 warnings in 1,311.84 seconds. Eleven
+  predecessor/EHCVM files ran in one process with an empty private L2, linked
+  L1 and one build/BLAS worker; every TestDelivered assertion executed. See
+  =941-sequential.org= when integrated. The full credentialed GitHub data job
+  =38683117467= is still running; the historical root cause remains unknown.
+
+* Verified full closure candidates after integration and release gates
+These issue requests are complete in the reviewed source; they may be named
+in the release merge PR once that source reaches the release branch. Remaining
+country/scientific concerns are named separately and must not be swept closed.
+
+| issue | source evidence | verification and boundary |
+|-------+-----------------+---------------------------|
+| #679 | d0ec4b32f, bb51df7e7 | Niger EXTENSION identity; 139 targeted passes, 3,617 W2 sample households. Seed-slot/orphan/namespace residuals stay separate. |
+| #693 | 07c9e697d, 2fbea0d2b | Named example tables defanged; live global Roof/Floor placeholders absent. This is issue option (b), not a general block-aware Org parser. |
+| #694 | 4ae96f103, 89d11fa95 | Mixed-object numeric values survive string stripping; categorical-mapping regression and framework review. |
+| #700 | 7cd765267, 9fc6aa2e0 | Source-backed Peru 1994 sample/cluster/roster join tests; constant-one export weight explicitly excluded. |
+| #703 | e77fb214c | Declared table parametrization, named cold skips, empty-cache failure unless opted in. Does not certify credentialed corpus coverage. |
+| #712 | 4855c09df, f22f99212 | Magic gate and malformed-DTA negative controls; real SSP tests run. Other binary fallback defects remain separate. |
+| #734 | e46b442e4 | Idempotent option registration plus repeated successful worktree pytest runs. Import identity still must be asserted. |
+| #777 | e887e163b, 9fc6aa2e0 | Panama code-77 Quantity NA; raw expenditure preserved within one cent, rel=0; capital-Value convention unchanged. |
+| #810 | 4d4d16d64, bebe68a51, 917fb4e0b | Both cwd-rooted dvc.api.open routes removed; 9 focused passes. Missing-column policy is distinct from file lookup. |
+| #841 | 055af9ce3, b3d035afe | 34 cluster tests pass; live issue explicitly closes on W5 wiring. Available v02 GPS acquisition stays #978. |
+| #865 | f231e6a6c, bb51df7e7 | Exact source sentinel values decoded; 139 Niger tests pass; no range clipping. |
+| #868 | dda202b51, e7c494aed | Persistent reducer audit including explicit rounds; 109 passes and failing-before round tests; real cold/warm Uganda replay. |
+| #880 | 8c7d61c58, d831e5cb0 | GhanaSPS docs now state the existing MonthsAway decision, retained history, measured endpoints and residuals. |
+| #909 | 518b75df3 | Panel spine checks cache manifest coverage and names missing targets; focused diagnostic tests pass. |
+| #959 | 69eb3319e, fa9c8d605 | Explicit fresh-resolve decision, tracked lock and archived before/after environment. Final corpus validation still gates release. |
+| #970 | fde45bd66, f4ad88885 | JSON reads never invoke make; subprocess-env guard and root-cache fixture checks pass. #979's merge alone was not evidence. |
+
+Proposed exact release-PR closing block (do not add conditional or residual issues):
+#+begin_example
+Closes #679. Closes #693. Closes #694. Closes #700.
+Closes #703. Closes #712. Closes #734. Closes #777.
+Closes #810. Closes #841. Closes #865. Closes #868.
+Closes #880. Closes #909. Closes #959. Closes #970.
+#+end_example
+
+Proposed exact closure comment for each row is the row's source/evidence
+sentence plus: "Resolved by the v0.15.0 release merge. The scope and remaining
+limitations are recorded in RELEASE_ISSUES.org; this closure does not imply
+all related country or corpus issues are resolved." Prefer the explicit
+closing block above; do not post comments before the release merge is real.
+
+* Required umbrellas: keep OPEN and replace stale bodies
+The blocks below are exact proposed replacement bodies. Preserve the original
+evidence via issue history and link existing reports; do not append a bare
+"partially done" while leaving false present-tense claims as the issue's scope.
+
+** #787 — proposed title: labels=: resolve ambiguous targets and preserve diagnostics through Feature
+#+begin_example
+Implemented in the v0.15.0 candidate: label-column normalization, Preferred Label as a no-op, numeric-target refusal, unmatched-label warnings/attrs and LSMS_LABELS_STRICT. The earlier blank-target loss was already fixed by #925. These changes are covered by the reviewed label-selection tests.
+
+Remaining:
+1. Decide whether one Preferred Label mapping to multiple distinct nonmissing targets must raise instead of retaining last-row-wins. The reviewed conflicts include Niger, Senegal, Burkina Faso and Uganda Cassava flour; do not choose a target by row order as a scientific ruling.
+2. Curate each country's intended Aggregate/other label variants and missing mappings under the existing Aggregate contract.
+3. Carry labels_unmatched through Feature concatenation using the existing attrs carrier; warnings already survive.
+4. Correct numeric-target examples in Guatemala/_/categorical_mapping.org and Serbia/_/categorical_mapping.org when those countries next rewarm. They are hashed build inputs and were deliberately not changed in this read-path increment.
+
+Evidence: slurm_logs/release_landing_2026-10-14/ labels follow-up; docs/guide/label-selection.md; the aggregate-labels skill. Retain the issue until these residual semantics are resolved.
+#+end_example
+
+** #794 — proposed title: Finish Mali mojibake repair and decide strategy-B migration
+#+begin_example
+The Burkina Faso 2014 quantity/crosswalk branch is now in the release candidate. Its cp1252 repair and crosswalk parsing preserve row coverage and all non-Quantity values after the documented label replacements; the prior claim that this half has not landed is obsolete.
+
+Remaining: repair Mali's two harmonize_food Code cells and its 2018-19 j after checking the source, and decide whether Benin, Burkina Faso, Senegal and Togo should migrate to the in-repo _decode_mojibake hook with a crosswalk re-key in the same change. The existing strategy-B keys remain load-bearing. A blanket transcoding pass would change matching and is not authorized by the Burkina repair.
+
+Evidence: slurm_logs/release_landing_2026-10-14/burkina.org and the prior strategy-B census. Keep this issue open; #926's curated-label residuals and #805's reader policy are related but distinct.
+#+end_example
+
+** #824 — proposed title: Complete sold-unit audits and use Unit_sold in farmgate consumers
+#+begin_example
+Niger now carries Unit_sold, keys crop-level sales on it and removes exact repeated s16d exports before summing. Nigeria W1/W2 now carries sa3q11b through the same canonicalizer as the harvest unit. Uganda already carried the sold unit; Malawi's sold-unit/condition wiring and registered sale-basis ladder landed in #966. Do not repeat those implementations or describe them as missing.
+
+Remaining: audit Ethiopia, Tanzania, Mali, Benin, Burkina_Faso, CotedIvoire, GhanaSPS, Guinea-Bissau, Senegal and Togo against source metadata, then update farmgate/median-price consumers to respect sale-unit basis and report unresolved disagreements. Preserve Tanzania's prior finding that sales are explicitly Kg.
+
+Correct the Niger denominator: the old 63% figure was a label-comparison artefact; the current priced-row unit agreement is 98.7/89.4/92.3/89.0% under the definitions in CONTENTS.
+
+Nigeria residuals also need explicit ownership: W1/W2 whole-row dedup discards 96/66 positive-sale rows (93/66 have both units), and other-buyer sales are unread. Keys touching any positive sale are 125/81; keys with multiple positive-sale rows are 78/43. These denominators are different. W3-W5 household-crop sales without plot linkage remain #843; whole-harvest valuation remains #844. Keep the W1/W2 residuals here until separately filed, rather than pretending Unit_sold repairs their lost amounts.
+
+Evidence: slurm_logs/release_landing_2026-10-14/niger.org and nigeria824.org; Nigeria/Niger/Malawi CONTENTS. The harvested-unit index remains unchanged.
+#+end_example
+
+** #830 — proposed title: Extend monetary scale diagnostics beyond isolated neighbor jumps
+#+begin_example
+The approved first increment is implemented: monetary columns are compared to neighboring waves with a fixed fivefold tolerance, existing support floor and ISO currency boundary. It emits warnings/findings without downgrading the coverage tier. Diagnostics retain each neighbor's actual comparison form and mark mixed forms explicitly. Tests include the cold Uganda positive control.
+
+Remaining: persistent level breaks (A,B versus C,D), unconfigured redenominations, community_prices comparison grain, and gap/CPI-aware thresholds. The review census found four records across three of 87 warm monetary country-tables: GhanaLSS community_prices.Price 1998-99, GhanaLSS food_acquired.Price 1991-92, and GhanaSPS crop_production.Value_sold 2009-10/2017-18. GhanaLSS's long-gap inflation explanation is cited review evidence; GhanaSPS's season-versus-buyer-channel instruments need source-matched comparison before any correction.
+
+A warning is an investigation queue, not proof of corruption. Sane still does not establish item coverage or correct unit labels. Keep this issue open for these documented detection gaps; do not rerun the original increment as if absent.
+#+end_example
+
+** #833 — proposed title: Resolve remaining raw/processed commodity folds after Malawi and Niger repairs
+#+begin_example
+Completed: Malawi reads sale-side shelled/unshelled condition, distinguishes boiled groundnuts, corrects the crop-to-food JOIN claim and discloses its sale-basis ladder through registered derivations (#966). Niger folds the evidenced cabbage/sugar spellings and removes the trailing comma from Aubergine without conflating eggplant and courgette. Uganda's crop-label join correction is already recorded; verify its existing commit rather than duplicate it.
+
+Remaining: Uganda grain/flour Aggregate folds; Tanzania processed-food versus harvested-crop identity; Ethiopia's per-item physical-unit comparison; Niger's seven instrument split pairs and undecoded code 166 (468 rows). Preserve these distinctions until source evidence supports a change. Malawi's historical 5x groundnut comparison must be reevaluated on the corrected sale basis; its old unread-condition explanation is no longer current.
+
+Do not let one harmonization pass both fold spelling variants and collapse scientifically different processing states. Evidence remains in slurm_logs/price_sources and the country CONTENTS, supplemented by slurm_logs/release_landing_2026-10-14/niger.org.
+#+end_example
+
+** #837 — proposed title: Resolve source-grain cluster disagreements without bypassing the signed audit
+#+begin_example
+The old description is partly false on current development. Since #871, core selects the most complete observed household row; it no longer fabricates a per-column first() composite. Direct raw Ethiopia cover/geovariable one-to-one joins show zero Region/District/Rural conflicts in all five waves. W1's 373 loss rows in 34 groups are missing-versus-recorded GPS, not administrative disagreement. Adding Region/District to its EA key changes no cluster count. Current W1 already serves all 333 GPS fixes.
+
+Recovered proposal c8bf36d81 was tested and rejected. Its early reduce_to_agreed hooks would blank exactly 364 Ethiopia GPS cells and 119 Tanzania attribute cells while removing household grain before the existing Site-2 audit. The Tanzania ledger explicitly forbids this early projection, and its existing household-grain test fails on the proposal and passes after restoration. Original code is retained in history, not in the release's served behavior.
+
+Remaining: source-specific treatment of the shipped coordinate disagreements (38/72/72 Ethiopia EAs in W2/W3/W5), district identity/harmonization and Tanzania's documented household-grain Rural/district differences. Uganda's parish-versus-EA question remains #689; its existing country-specific blanking policy is not changed here. Raw administrative agreement alone does not certify every coordinate or exclude miscoding within one administrative area.
+
+Evidence: slurm_logs/release_landing_2026-10-14/cluster837.org and aggregate/raw-source JSON; .coder/ledger/837-landing-review.md. Any new completion/blanking exception needs its own explicit scientific decision.
+#+end_example
+
+** #905 — proposed title: Finish the vectorized min_count reducer sweep
+#+begin_example
+The canonical food-acquisition dedupe tail and all three Panama food scripts now use vectorized groupby.sum(min_count=1). Regression tolerance is a few ULP (<=4), not byte-identical sums; column order and missingness are preserved.
+
+Remaining food sites: GhanaSPS 2009-10, 2013-14 and 2017-18 food_acquired; Cambodia 2019-20 food_acquired; Serbia 2007 food_acquired; Guatemala 2000 food_acquired; GhanaLSS/_/ghanalss.py reduce_duplicate_food_rows. Related nonfood sites remain in GhanaSPS crop production, Mali plot_inputs, Iraq/Albania assets, Tanzania and Malawi country modules. The GhanaSPS country-module site is a crop reducer, not a food reducer.
+
+Use the exact site inventory in slurm_logs/release_landing_2026-10-14/framework-small-2-report.md. Convert with isolated cold before/after checks, explicit column order and the existing floating-point bound. Each script/module change has country cache cost. No broad sweep was authorized or completed by the first increment.
+#+end_example
+
+** #941 — proposed title unchanged; exact replacement body
+#+begin_example
+The historical sequential credentialed data-tests failure remains unresolved. The v0.14.0 run served pre-#876 EHCVM food_acquired shapes (missing Derivation/inkind rows) and failed 52 TestDelivered cases, while independent cold country builds were correct.
+
+Implemented since filing: manual credentialed data-test dispatch, worktree/import-identity protections, several root-cache fixture repairs, and clearer unexpected credential-skip diagnostics. These make the failure testable; they do not prove its ordering cause or close it. Parallel warm success and isolated cold-country success are not the required negative control.
+
+The requested ordered fresh-root sequence now passed at ed1414fb9: 451 passed, 0 skipped, 176 warnings in 1,311.84 seconds. Eleven predecessor/EHCVM files from the issue's latest comments ran in one process with an empty private L2, linked L1 and single build/BLAS workers. All TestDelivered assertions executed; no Derivation/inkind failure occurred. The coordinator is archiving identities, logs and aggregate counts in 941-sequential.org.
+
+Remaining: finish and record the full credentialed GitHub data job (run 38683117467), preserve its executed/skip coverage, and investigate the historical poisoning test or alternate cause if it recurs. The successful selected sequence improves the evidence but does not identify the old CI root cause or justify closure on its own. Keep this issue open until a discriminatory reproduction/fix or explicitly documented resolution exists. The release corpus rebuild is still in progress at the documentation freeze; update this body with its result without converting incomplete or skipped coverage into a pass.
+#+end_example
+
+* Other narrowed issues — exact proposed comments / replacement scope
+
+** #600: retain open for failed-backfill preservation
+#+begin_example
+The many-to-many provenance model is implemented and tested: multiple IDs, covered/derived relations, aliases, unknown logical-wave handling and backward-compatible scalar/Boolean behavior. Fixed-catalog replay corrects seven previously false missing results; no country-table hash changes in the 103-table probe.
+
+Remaining scope: a failed backfill lookup whose primary catalog ID is absent/filtered still replaces provenance with UNKNOWN and can discard existing hand-recorded metadata. Successful re-stamps preserve the fields. Decide whether failed resolution should leave the record intact or write a separate review artifact. No broad backfill or new live WB census was run. Do not claim preservation under every failure outcome.
+#+end_example
+
+** #699: retain open; title Wire Peru 1990 tables after the XPORT reader repair
+#+begin_example
+The SAS XPORT reader gap is fixed and all columns are preserved in the three verified SSP files. Peru 1990 has 36 SSP blobs among 39 sidecars, not 39 SSP files; the other 33 SSP files were not verified by the reader census.
+
+Remaining: inspect the other modules and wire Peru/1990 tables. It is Metropolitan Lima only; EXPEND.WT is a real survey weight; N00A.CID is constant one and is not a cluster; PANEL is a person-level link. Do not revive the disproved SPSS/conversion/acquisition blocker. Reader repair is not completed survey configuration.
+#+end_example
+
+** #792: retain open; title Document the remaining sample-design gaps after closing the handle leak
+#+begin_example
+The _build_registry source handle now closes correctly (e6c87feba). Remaining from the narrowed body: record GhanaSPS 2013-14/2017-18 and Tajikistan 1999 weight availability accurately in sample documentation. Their documented lack of weights must not be converted into invented weights. Panama/Serbia & Montenegro questionnaire checks already have #977; do not file that work twice. Existing strata/Rural gaps from the original evidence remain unadjudicated where not covered by a newer issue.
+#+end_example
+
+** #812: retain open with completed Guinea-Bissau/Togo documentation distinguished
+#+begin_example
+The original Guinea-Bissau documentation contradiction is corrected while preserving the source quote. Measured allocation is now stated accurately: SAB has 92 clusters and the other eight regions 42–50. Togo's six allocations are 72–98; the earlier five-of-six wording was corrected. These are documentation changes, not a new sampling-weight adjustment.
+
+Remaining follow-up scope: source-backed allocation/strata investigation for Senegal, Mali, Niger and Burkina Faso where strata are not wired. Keep documented design, measured allocation and inference distinct. Reuse #792/#793 for overlapping sample documentation/model work rather than claiming those country gaps are fixed by this prose update.
+#+end_example
+
+** #831: retain open; title Decide sidecar-less in-tree source read policy
+#+begin_example
+The WB extraction write side was fixed by #917. The v0.15.0 candidate now reports sidecar-backed and sidecar-less in-tree source files from cache clear, preserves tracked configuration inputs and tests the no-git positional guard.
+
+Remaining: get_dataframe still prefers an existing sidecar-less source inside countries_root, intentionally supporting newly prepared acquisition. Decide whether to warn, require an explicit opt-in, or retain this behavior with CLI reporting. The new report does not change which bytes are served, so it does not complete this policy half. Import-time credential writes are a separate residual, not this source-file reader rule.
+#+end_example
+
+** #864: retain open with the warning fix marked done
+#+begin_example
+The money-only bucket and Burkina Faso 2014 missing-quantity restoration are implemented; passage 2–4 money-only rows no longer masquerade as zero physical quantity. Fresh before/after evidence preserves all expenditure and non-Quantity values. The all-null heuristic's limitation is documented: it can also describe a mis-bound quantity column, and a whole-wave null guard can miss a purchased-only defect when other sources are populated.
+
+Remaining country adjudication: passage-1 item-specific missingness, whether qachat is purchased or total quantity (219 existing Produced>=Quantity clips), and the unread p2–p4 autocons VALUE fields. Do not add those amounts or declare the questionnaire semantics settled from the warning heuristic. See burkina.org for raw positive-row counts and the exact cold comparison.
+#+end_example
+
+** #915: retain open; title Decide whether Country rejects existing unregistered directories
+#+begin_example
+Names without a directory now raise ValueError immediately with near-miss suggestions. The first half is covered by tests and the fixture repairs preserve that behavior.
+
+Remaining: existing directories without a Data Scheme still construct. Decide whether the accepted set must exactly match countries(), including acquisition/scaffold use cases, and reconcile both API docstrings with that decision. Raising for Ghana is not proof that .dvc or a bare scaffold is refused.
+#+end_example
+
+** #926: retain open with GhanaLSS repair complete
+#+begin_example
+GhanaLSS's curated C1 punctuation was repaired in the release candidate and the no-C1 regression passes. The repair is country-config-specific and incurs a GhanaLSS rewarm.
+
+Remaining: the load-bearing C1 key cells in Mali/Niger/Burkina/Uganda, ISO-8859 units.org files, and a safe transcoding/re-derivation policy. Do not globally rewrite keys that still match damaged raw labels. #794 owns strategy-B migration; #805's pre-118 reader encoding policy remains separate and is not fixed by Windows text portability.
+#+end_example
+
+** #931: retain open for the crop ladder decision
+#+begin_example
+The crop/food declared-unit asymmetry is now documented and pinned by a regression. harvest_kg_factors intentionally remains blind to declared unit_kg; food uses it.
+
+Remaining: decide whether crop conversion should consume u_kg. If yes, re-express Ethiopia's external shipped-quintal check in the same change so it cannot become a tautology. No new factor behavior was adopted in this documentation increment.
+#+end_example
+
+** #974: retain open; do not rehome to closed #945
+#+begin_example
+The release candidate removes the adjudicated dead keys and duplicate identical lines; tuple decompositions are unchanged. Source empty/Nan decode fixes and the earlier unreachable-key removal were already completed by #954/#951.
+
+Remaining: canonicalize reachable spelling-variant groups without reducing reached coverage or changing their Generation/Distance/Affinity values. Reconcile canonical keys with the actual lookup normalization and live Peru/Guatemala spellings before folding. #813 and #945 are CLOSED; #974 explicitly owns this unfinished half, so it must not be closed by referring the work back to those closed issues. #698/#804 remain separate decomposition/source questions.
+#+end_example
+
+** #839, #867, #805, #953: exact progress comment
+#+begin_example
+The v0.15.0 candidate does not resolve this issue's remaining decision/source work. Malawi's JOIN/condition documentation was corrected, but #839's Mali/Tanzania claims remain separate. Nigeria's proposed generic inorganic nitrogen alias was withdrawn by ruling, so #867's scientific vocabulary is not implemented by that branch. Reader portability/magic checks do not implement #805's pre-118 cp1252 policy. #953's resolution-model documentation/tests describe the two mechanisms; they do not choose directory-rung semantics or unify them. Keep the relevant issue open and retain its existing remaining scope.
+#+end_example
+Publish only the sentence(s) relevant to each numbered issue; the paragraph is
+an exact common draft, not a claim that the four issues have one owner.
+
+* Conditional closures / validation still owed
+** #962 — exact progress comment
+#+begin_example
+The 7,359 blank-unit rows have been source-classified and the #967 increment is independently accounted for, including unchanged acquisition quantities/expenditures and unchanged factors on previously labelled physical rows. Factors for the reclassified fish/residual rows do change. The increment is -849.299850578 kg, 24 fewer nutrition household-wave rows and 60 changed retained vectors. Candidate nutrition is 23,777 x 15; the historical fixture remains 23,801 x 15.
+
+Historical module replay on unchanged food/FCT inputs exactly reproduces the historical fc85fc2e… and current pre-#967 1131b358… hashes. Four #850 commits account for the whole historical difference; later #874/#838/#919/#929/fraction-parser changes contribute zero on these inputs. The historical -18.7208% Energy movement already shipped before v0.14.0 and is not caused by this release. PR #997 publishes the complete accounting.
+
+Do not regenerate nutrition until the explicit CONTENTS scientific hold is signed off. The proposed patch changes only nutrition shape/hash and is stored unapplied in uganda967/nutrition-manifest-proposed.patch. Arithmetic replay validates calculations, not inherited litre-as-kg/container assumptions or the newly documented row-4003 vitamin-A/source-note contradiction. The maintainer has been asked to accept the documented limitations and nutrition-only fixture update, or hold for source review; that answer is pending. Close only after the coordinator records the scientific disposition and required final checks.
+#+end_example
+
+** #964 / #968 — exact progress comment
+#+begin_example
+The no-make wave-script fallback, UTF-8 readers, conda setup and installed-wheel/config identity guards are implemented. Isolated Linux make/no-make builds match for Uganda shocks and assets; source-checkout negative control fails the installed-identity check as intended.
+
+Native Windows conda validation now passed at 74c9398ecf3c1908feb539a99bce3f3f6bf6d04f: https://github.com/ligon/LSMS_Library/actions/runs/38683117467/job/116251866840. The installed identity and cold-build comparison steps succeeded. This supersedes the earlier pending-Windows statement. Record inclusion of this reviewed portability source in the final integrated head and retain the job evidence before closing; final corpus validation and release publication remain separate gates.
+#+end_example
+
+** #907 — exact progress comment
+#+begin_example
+Known data tests are marked for collection-time credential skips, and an unexpected runtime credential skip now warns. Pytester exercises the production hook, including warning-as-error, setup/call phases and preservation of true errors; narrow synthetic test fixes avoid unnecessary network reads. The later Nigeria TestRawFiles marker preserves its data-free tests.
+
+Remaining verification from this issue's acceptance criteria: record the credential-free CI before/after executed-test coverage and wall time, accounting for added/removed tests and confirming that mixed files did not lose data-free coverage. Local focused hook tests do not establish that whole-job invariant. Keep this issue open until that comparison is recorded; #932/#941 still own credentialed coverage and the sequential EHCVM failure.
+#+end_example
+
+** #957 — exact progress comment
+#+begin_example
+Repository install recipes now use --no-root, checkout PYTHONPATH is explicit, and image-building guards reject a baked editable root/dist-info. Source identity tests and worktree validation exercise the intended checkout.
+
+Before closing the operational artifact issue, record that the deployed image generation has neither the stale editable path nor stale lsms_library dist-info and that its CLI/import behavior matches the documented bootstrap. Cwd still wins for python -c; identity assertions remain necessary. #958/#960/#961's multi-node ownership and documentation are not completed by these guards.
+#+end_example
+
+* New residual drafts — searched before proposing
+Search evidence: all 430 current/closed issue bodies scanned for credential-sync,
+SPSS/binary fallback, cached data_root, sale-duplicate and FCT/vitamin-A terms; read-only GitHub
+searches also run. No dedicated current credential-sync or root-cache isolation
+issue was found. Related existing issues are listed below; searches cannot
+guarantee no differently worded duplicate. Nigeria sales residuals are kept in
+#824 above instead of proposing new issues immediately.
+
+** Proposed new issue: Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation
+#+begin_example
+Uganda/_/nutrition.org row 4003, SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW, records vit_a_rae_mcg = 225 per 100 g; the generated CSV and served FCT agree at 2,250 mcg/kg. Its generic fct_source_descr says: "Based on USDA #11507 Sweet potato,unprepared; vitamin A and carotenoids assumed = 0."
+
+The adjacent water_source_descr supplies more specific support: "Applied water content of 67.4 g based on an average of 3 yellow flesh varieties reported by Kidmose et al., 2007 (Salyboro,199062.1 and Nyathi Odiewo);betacarotene content also derived from the mean of the same 3 varieties." The same row records beta-carotene 2,697 and alpha-carotene 10 mcg/100 g. The white counterpart, row 3003, carries the generic zero note and zero carotene. Thus the yellow-variety note plausibly records a specific override of the USDA starting point; this is not an unsupported 225-versus-zero choice. The release review has not independently checked the cited paper/version.
+
+The conflicting general/specific descriptions predate #850 and v0.14.0. They were noticed during exact historical nutrition replay, not introduced by #967. The first release-accounting write-up omitted the adjacent supporting note; this narrowed draft corrects that omission. No numeric value, density, crosswalk or source note was changed by the release investigation.
+
+Acceptance: verify the cited yellow-variety source/version, edible/preparation basis and carotenoid-to-RAE derivation; reconcile the generic zero wording with the specific derivation. Preserve the present density unless source review supports a correction. If a numeric correction is warranted, update the authoritative Org record and generated data together and report food/household/nutrient deltas with an independently derived check. Keep the separate volume-as-mass/container assumptions explicit; reconciling this source note does not validate those assumptions.
+
+Evidence: slurm_logs/release_landing_2026-10-14/uganda-nutrition-history.org (PR #997), fct_uganda.csv and nutrition.org. The release nutrition fixture remains on its explicit approval hold until the maintainer decides its disposition.
+
+Duplicate check: all 430 issue bodies and live searches for "sweet potato" and "4003" found no dedicated source-contradiction issue. #771 concerns tracked FCT/API-key/fallback reproducibility, #833 concerns processed-food identity, and #956 concerns GhanaLSS label columns. Closed #231 concerns the generic volume-as-mass option. This draft owns the distinct row-4003 source adjudication; link those existing scopes instead of duplicating them.
+#+end_example
+
+** Proposed new issue: Remove runtime credential writes into the installed countries tree
+#+begin_example
+_sync_legacy_dvc_creds copies user-config credentials into countries_root()/.dvc/s3_creds at import and from _auto_unlock_s3. The reader already passes config.s3_creds_path() to DVCFS, so user-config credentials should not require a package-tree write.
+
+Coordinate __init__.py/data_access.py, the tests/conftest.py credential resolver, test_s3_unlock monkeypatches and scripts/dvc_remote_reachability.py. Preserve an explicit legacy fallback only if policy requires it. Acceptance: import from a read-only installed package performs no credential write there; user-config-only credentials execute requires_s3 tests and still permit source reads. CI's manually created in-tree credentials must not conceal this case. Attach no credentials.
+
+Separate from #810's cwd-rooted data reads and #831's source-file policy. Evidence: slurm_logs/release_landing_2026-10-14/runtime-residuals.org; source symbols remain in the frozen tree.
+#+end_example
+
+** Proposed new issue: Keep unreadable non-DTA binaries out of text fallback
+#+begin_example
+The release hardens claimed DTA files, but the wider reader tail still needs review: a path-string retry invokes read_spss for unrelated formats, ReadstatError can obscure the original failure, and permissive text decoding can turn unreadable binary headers into an empty frame.
+
+Add failing-before tests for unreadable non-DTA binary input under default and latin-1 encodings and for the SPSS path-string retry. Preserve valid text/XPORT/SPSS and exception causes; do not blanket-catch programmer errors or return empty data as recovery. This is not #712's fixed CSV-to-Stata dispatch or #699's working XPORT branch. Search found related closed #189 (parser-error boundaries); inspect its rationale before editing. #805's encoding policy remains separate.
+
+Evidence: slurm_logs/release_landing_2026-10-14/runtime-residuals.org. The non-DTA cases were not reproduced afresh by this documentation worker; verify the runtime review's reproducer before publication as a newly confirmed defect.
+#+end_example
+
+** Proposed new issue: Isolate cached path roots across test environment overrides
+#+begin_example
+The reviewed test_gh866_stale_country_parquet_not_laundered helper-noop test sets LSMS_DATA_DIR without clearing paths.data_root's lru cache. A temporary root can survive onto another test on the same worker. The #970 fixture already clears both data_root/countries_root before use and in finally; that local fix is not a suite-wide isolation policy.
+
+Add a discriminatory two-root/teardown sequence, then use either a reusable fixture or targeted clears under a defined policy. Keep data_root and countries_root overrides aligned. Warm parallel success is not proof that process state was restored. Cross-reference #778/#941 for cache concurrency/session-order symptoms, without asserting this is their proven root cause.
+
+Recheck the final integrated tree before posting: the parent may repair this concrete site during corpus validation. Evidence frozen in slurm_logs/release_landing_2026-10-14/runtime-residuals.org; no new source change was made by the release-notes task.
+#+end_example
+
+* Already closed / separately tracked work: do not reopen or duplicate
+- #832 / PR #949: Mali/Ethiopia/Malawi spellings and Uganda dropped-label
+  diagnostics are present. #936 / PR #947: GhanaLSS live Price reducer fixed.
+  #948 / PR #952: relative imports fixed. #848 / PR #972: second Uganda
+  season-B slot fixed. #811 / PR #971 plus Niger follow-up: region labels.
+- #813/#945 are closed; their reachable-key residual is #974. #698/#804 remain
+  scientific/source questions. #953 and #956 retain inheritance/aggregate work.
+- Nigeria v02 acquisition is already #978, weight questionnaire checks #977,
+  Kyrgyz bootstrap #975, inaccessible sentinel-sweep inputs #976. Do not file
+  these again. CI --no-root was already fixed by 24cd065b0.
+- #709's dated threshold-document correction, #740's Pakistan xfail removal,
+  #798's coverage snapshot, #932's credentialed CI coverage and #958/#960/#961
+  venv operations remain open; no patch in this range completes their narrowed
+  requests. The draft release notes do not advertise them as fixed.
+- GhanaAHIES has live CONTENTS WAITING entries for 2023Q3 weight scale,
+  nonnegative anthropometric nonmeasurement spellings and unavailable sections
+  8–13. Its eight-table addition does not adjudicate these. The population
+  TODO contradicts the later ac1aa812a population entry; cite the actual
+  current config and keep the remaining instrument caveats, rather than
+  treating every dated TODO as an unfixed implementation request.
+
+* Full-range release summary and final gate handoff
+The notes cover GhanaAHIES; country identity/unit/quantity/label corrections;
+Malawi registered sale-basis derivations; source-reader/Windows portability;
+many-to-many discovery provenance; labels/scale/grain/panel diagnostics;
+vectorized reductions; test/CI/import/lockfile reproducibility; and unresolved
+scientific/source decisions. Holder-gated access and categorical-composition
+documents in this range are designs, not shipped access-control/commensurability
+implementations. No claims of those features appear in the notes.
+
+Before publication, the coordinator must replace pending statements with
+actual integrated-suite/corpus/installed-Windows evidence and Uganda's signed
+decision. The release skill then requires a development-to-master merge commit,
+tag-derived build version, and verification that the publish workflow and PyPI
+artifact actually exist. This task performs none of those external actions.
