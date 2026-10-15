@@ -95,9 +95,9 @@ ROUNDS = [
 # Every wave declares cluster_features (W5 since GH #841).
 CF_ROUNDS = ROUNDS
 CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
-# Waves that ship a household geovariables file.  W5 (2023-24) ships NONE --
-# nothing matching *geo*/*gps* under 2023-24/Data and no lat/lon on the cover
-# page -- so its Latitude/Longitude are absent BY SOURCE (GH #841).
+# Waves with acquired and wired household geovariables. W5 is still the
+# v01 extract: WB v02 supplies NGA_HouseholdGeovariables_Y5.dta, queued for
+# acquisition and wiring under GH #978. Its coordinates remain missing here.
 GEO_ROUNDS = ROUNDS[:4]
 GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
 NO_GEO_QUARTERS = [q for pair in ROUNDS[4:] for q in pair]
@@ -168,10 +168,10 @@ def test_every_wave_has_coordinates_in_every_round(cf, t):
 @pytest.mark.parametrize('t', NO_GEO_QUARTERS)
 def test_w5_has_geography_but_no_coordinates_in_either_round(cf, t):
     """GH #841: W5 declares cluster_features from the cover page alone.  Wave 5
-    ships no geovariables file, so Latitude/Longitude are all-NaN there BY
-    SOURCE -- while Region/District/Rural, which the cover page does carry, are
-    fully populated.  The all-NaN assertion is deliberate: if a W5 geovariables
-    file is ever acquired and wired, this test should fail and be retired."""
+    v01 lacks the geovariables file supplied in WB v02 (GH #978), so
+    Latitude/Longitude remain all-NaN while Region/District/Rural are
+    populated. Retire this assertion and extend GEO_QUARTERS when the v02
+    file is acquired and wired as df_geo on hhid, as W4 does."""
     wave = cf.loc[t]
     assert len(wave) > 0, f'{t} missing from cluster_features'
     for col in ['Region', 'District', 'Rural']:

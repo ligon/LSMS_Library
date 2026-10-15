@@ -170,14 +170,20 @@ page's own =cluster= column (={lga}-{ea}=) is 1:1 with the composite key on
 the 518 real clusters; it has no state component and all movers share
 ={lga}-0=, so it is a cross-check, not a key.
 
-*** Wave 5 ships NO household geovariables file (GH #841)
+*** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
 
-Nothing matching =*geo*= / =*gps*= exists anywhere under =2023-24/Data=, and
-the cover page =secta_plantingw5.dta= carries no lat/lon.  =cluster_features=
+The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
+contains 106 files and no household geovariables file; the cover page
+=secta_plantingw5.dta= carries no lat/lon. This is an acquisition gap,
+not a claim that the survey did not collect coordinates. WB catalog 6410
+version =v02_M= (changed 2026-09-16) adds =NGA_HouseholdGeovariables_Y5.dta=
+(4,883 households, 55 variables) and =totcons_final.dta=, and revises
+=sect2b_harvestw5.dta= and =sect3d_harvestw5.dta=. Existing GH #978 tracks
+that refresh and the coordinate wiring; it needs no duplicate issue.  =cluster_features=
 for 2023-24 is therefore declared from the cover page alone (=df_key= +
 =df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
 fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
-=Longitude= are 100% NaN there /by source, not by omission/.  The Site B
+=Longitude= are 100% NaN there pending the v02 acquisition.  The Site B
 null-content guard warns for exactly those two waves on every
 =cluster_features()= read; that is the known country-grain =optional:=
 mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in

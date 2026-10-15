@@ -66,10 +66,11 @@ sample:
         - i
 
 # GH #841.  Same cover page as `sample`, same composite key, same shape as
-# W4's block -- MINUS df_geo.  Wave 5 ships NO household geovariables file
-# (nothing matching *geo* / *gps* anywhere under 2023-24/Data, and the
-# cover page carries no lat/lon), so Latitude / Longitude are absent for
-# 2023Q3 / 2024Q1 BY SOURCE, not by omission: the framework fills them NaN in
+# W4's block -- MINUS df_geo. The acquired v01 extract lacks household
+# geovariables; WB catalog 6410 v02 (2026-09-16) adds
+# NGA_HouseholdGeovariables_Y5.dta. GH #978 tracks acquisition and wiring.
+# Pending that work, Latitude / Longitude are absent for 2023Q3 / 2024Q1:
+# the framework fills them NaN in
 # the cross-wave concat and the Site B null-content guard warns per wave
 # (the known country-grain `optional:` mismatch, CLAUDE.md).  Do not add an
 # `optional: true` for them in data_scheme.yml -- that would silence W1-W4 too.
