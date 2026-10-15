@@ -1,0 +1,110 @@
+{
+  "head": "d7626368f922a7fcd8aa53b944458610e6b36c85",
+  "import": "/local/job39919092/release-work/framework/validation-followup-d762/lsms_library/__init__.py",
+  "cwd": "/local/job39919092/release-work/framework/validation-followup-d762",
+  "cases": [
+    {
+      "helper": "test_the_helper_never_deletes_a_json_tier_cache",
+      "prewarmed_root_b": false,
+      "before_cache": {
+        "hits": 0,
+        "misses": 0,
+        "maxsize": null,
+        "currsize": 0
+      },
+      "after_helper_cache": {
+        "hits": 0,
+        "misses": 0,
+        "maxsize": null,
+        "currsize": 0
+      },
+      "restored_env_b": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpaihr9vu_/restored-root-b",
+      "after_teardown_resolutions": {
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpaihr9vu_/restored-root-b/Uganda",
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpaihr9vu_/restored-root-b"
+      },
+      "after_explicit_clear": {
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpaihr9vu_/restored-root-b",
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpaihr9vu_/restored-root-b/Uganda"
+      }
+    },
+    {
+      "helper": "test_the_helper_never_deletes_a_json_tier_cache",
+      "prewarmed_root_b": true,
+      "before_cache": {
+        "hits": 0,
+        "misses": 2,
+        "maxsize": null,
+        "currsize": 2
+      },
+      "after_helper_cache": {
+        "hits": 0,
+        "misses": 2,
+        "maxsize": null,
+        "currsize": 2
+      },
+      "restored_env_b": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpssjzext1/restored-root-b",
+      "after_teardown_resolutions": {
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpssjzext1/restored-root-b/Uganda",
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpssjzext1/restored-root-b"
+      },
+      "after_explicit_clear": {
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpssjzext1/restored-root-b",
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpssjzext1/restored-root-b/Uganda"
+      }
+    },
+    {
+      "helper": "test_the_helper_is_a_noop_on_an_absent_parquet",
+      "prewarmed_root_b": false,
+      "before_cache": {
+        "hits": 0,
+        "misses": 0,
+        "maxsize": null,
+        "currsize": 0
+      },
+      "after_helper_cache": {
+        "hits": 0,
+        "misses": 1,
+        "maxsize": null,
+        "currsize": 1
+      },
+      "restored_env_b": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpnbo1xuus/restored-root-b",
+      "after_teardown_resolutions": {
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpnbo1xuus/helper-root-a/Uganda",
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpnbo1xuus/restored-root-b"
+      },
+      "after_explicit_clear": {
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpnbo1xuus/restored-root-b",
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmpnbo1xuus/restored-root-b/Uganda"
+      }
+    },
+    {
+      "helper": "test_the_helper_is_a_noop_on_an_absent_parquet",
+      "prewarmed_root_b": true,
+      "before_cache": {
+        "hits": 0,
+        "misses": 2,
+        "maxsize": null,
+        "currsize": 2
+      },
+      "after_helper_cache": {
+        "hits": 1,
+        "misses": 2,
+        "maxsize": null,
+        "currsize": 2
+      },
+      "restored_env_b": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmp8hw2erq_/restored-root-b",
+      "after_teardown_resolutions": {
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmp8hw2erq_/restored-root-b/Uganda",
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmp8hw2erq_/restored-root-b"
+      },
+      "after_explicit_clear": {
+        "None": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmp8hw2erq_/restored-root-b",
+        "Uganda": "/local/job39919092/release-work/control/framework/validation-followup/disposable/tmp8hw2erq_/restored-root-b/Uganda"
+      }
+    }
+  ],
+  "prewarmed_other_root_sentinel_deleted": true,
+  "sentinel_scope": "Only a synthetic disposable file created by this probe",
+  "does_not_establish_941_causality": true
+}
