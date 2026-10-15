@@ -200,7 +200,9 @@ def _finalize_canonical_food_acquired(out: pd.DataFrame,
         # once per group and pandas deep-copies ``df.attrs`` on each call --
         # the same cost GH #871 removed from the core collapse.  The cython
         # sum is pairwise where ``Series.sum`` accumulates in order, so a
-        # group's total may land on a neighbouring double (1 ULP); the NA
+        # group's total may land on a neighbouring double -- a few ULP, <= 4
+        # pinned by tests/test_gh905_vectorised_min_count_sum.py (max 2
+        # measured on a 363,682-row frame); the NA
         # pattern (``min_count=1``: an all-NaN group stays NaN), dtypes and
         # column order are unchanged.
         g = out.groupby(levels, dropna=False)

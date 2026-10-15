@@ -196,7 +196,8 @@ idx = ['t', 'i', 'j', 'u', 's']
 # sum the quantities/expenditures, mean the per-unit price.
 # Vectorised reducers, not per-group lambdas (GH #905): sum keeps min_count=1
 # so an all-NaN group stays NaN; the cython sum may differ from an in-order
-# Series.sum by 1 ULP.
+# Series.sum by a few ULP (<= 4, pinned by
+# tests/test_gh905_vectorised_min_count_sum.py; max 2 measured).
 _g = out.groupby(idx, dropna=False)
 out = _g[['Quantity', 'Expenditure']].sum(min_count=1)
 out['Price'] = _g['Price'].mean()

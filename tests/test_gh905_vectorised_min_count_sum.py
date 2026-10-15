@@ -6,8 +6,9 @@ Python lambdas (~30x faster on 400k rows; the lambda form also deep-copies
 The contract this pins: against the old lambda reducer the result has the
 same index, column order, dtypes and NA pattern (an all-NaN group stays NaN,
 a NaN KEY is kept because ``dropna=False``), and every value agrees to within
-a couple of ULP -- cython sums pairwise where ``Series.sum`` accumulates in
-order, exactly as GH #871 measured for the core collapse.
+a few ULP (<= 4, the bound asserted below; max 2 measured) -- cython sums
+pairwise where ``Series.sum`` accumulates in order, exactly as GH #871
+measured for the core collapse.
 """
 from __future__ import annotations
 
