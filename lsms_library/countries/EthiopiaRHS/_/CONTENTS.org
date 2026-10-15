@@ -1168,4 +1168,7 @@ reached kinship directly.  The wave was later moved to the ERHS code-based
 recipe (=converted_categoricals: False= + =mappings: ['erhs_relation', ...]=),
 which serves =Other relative of head= / =Other unrelated person= /
 =Tenant/Boarder=.  Nothing in the repo outside =kinship.yml= contains the
-strings "reative" or "Broader".
+strings "reative" or "Broader".  The three keys were deleted from
+=kinship.yml= on 2026-10-14 (GH #974); =tests/test_kinship_yml_hygiene.py=
+pins them out, and a warm =household_roster()= read of this country emits no
+unknown-label warning without them (measured, 51,574 rows).
