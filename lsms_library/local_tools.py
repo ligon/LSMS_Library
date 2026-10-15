@@ -1402,8 +1402,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # unrelated malformed pytest fixture, and a ``BrokenProcessPool``
         # when the walk ran inside a forked build worker (Nepal).  A
         # missing source now fails fast, from any cwd, with the error the
-        # callers already handle (``FileNotFoundError``; ``grab_data`` and
-        # ``df_data_grabber(missing_ok=)`` catch that class).
+        # callers already handle (``FileNotFoundError``; ``grab_data`` catches
+        # it in its nested ``get_data``). ``df_data_grabber`` lets missing
+        # files propagate: its ``missing_ok`` covers missing columns only.
         #
         # Two things about the WB route are NEW here, not "as before"
         # (red team, 2026-09-24).  (1) It was previously UNREACHABLE from
