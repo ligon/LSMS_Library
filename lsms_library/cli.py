@@ -98,7 +98,7 @@ def _git_tracked_files(root: Path) -> "set[str] | None":
     ls-files -- .`` succeed with empty output, which says nothing about the
     files there.  An empty set is therefore reported as "not consulted", not
     as "git tracks none of these".  (On this checkout the set is never
-    empty: 11,695 tracked paths under ``countries/``.)
+    empty: thousands of tracked paths under ``countries/``.)
 
     Tracked files are *sources* (nine ``.csv`` lookup tables live in-tree,
     all under a ``_/`` directory, e.g. ``Uganda/_/fct_usda.csv`` and

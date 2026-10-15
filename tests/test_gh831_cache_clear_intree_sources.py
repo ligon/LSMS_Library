@@ -140,6 +140,10 @@ def test_the_real_tree_consults_git_and_excludes_its_tracked_csvs():
     """On this checkout git answers, and the nine tracked csvs never appear.
     (A clean tree is the expected state -- GH #803's twin invariant.)"""
     root = lsms_cli._countries_root()
+    # ... and the `_/` position rule alone now covers every tracked table.
+    found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS", "Malawi"],
+                                          tracked=None)
+    assert found["no_sidecar"] == [] and found["with_sidecar"] == []
     tracked = lsms_cli._git_tracked_files(root)
     if tracked is None:
         import pytest
@@ -149,10 +153,6 @@ def test_the_real_tree_consults_git_and_excludes_its_tracked_csvs():
     found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS", "Malawi"])
     assert found["git_consulted"] is True
     assert not any(p.name == "unittable.csv" for p in found["no_sidecar"])
-    # ... and the `_/` position rule alone now covers every tracked table.
-    found = lsms_cli._intree_source_files(root, ["Panama", "Uganda", "GhanaLSS", "Malawi"],
-                                          tracked=None)
-    assert found["no_sidecar"] == [] and found["with_sidecar"] == []
 
 
 def test_root_level_wave_dirs_are_swept_regardless_of_country(tmp_path):
