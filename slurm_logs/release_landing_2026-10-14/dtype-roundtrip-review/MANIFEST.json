@@ -1,0 +1,15 @@
+{
+  "scope": "aggregate independent review; no survey/cache/API operations",
+  "files": [
+    {
+      "name": "REVIEW.md",
+      "bytes": 6107,
+      "sha256": "389f9f6e98cda69d647084460aea985de563e6c7c3057b2d5b75fd89f0be1b17"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 2970,
+      "sha256": "80efbd95851383eed926de9242bdbf9485463b0b59d446add9952dbd9e058ba2"
+    }
+  ]
+}

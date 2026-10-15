@@ -1018,3 +1018,80 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* Roster cache scalar types and presence-proxy caveat (2026-10-15)
+
+The four roster waves mix EAC-I 2014-15/2017-18 and EHCVM 2018-19/2021-22.
+On a cold country build, =MonthsSpent= is an =object= column containing
+strings from 2014-15, floats from 2017-18, and integers from 2018-19; 2021-22
+supplies no =MonthsSpent= values.  The country Parquet writer converts object
+columns to Arrow strings while preserving the original missingness mask.
+Unlike =Wave.grab_data=, the country writer's caller does not rebind the
+returned converted frame.  The cold served frame thus retains mixed Python
+scalar types, while the next warm call contains strings.  This is an
+existing interface difference, including numeric-to-text conversion rather
+than just a dtype name change; direct arithmetic/type-sensitive consumers
+must account for it.
+
+Private cold/warm replay on release source =3914d8804= retained all 220,732
+rows, unique =(i,t,v,pid)= keys, six other columns, all null masks and these
+wave counts:
+
+| Wave    | Rows   | Nonmissing MonthsSpent | Cold scalar types | Warm scalar types |
+|---------+--------+------------------------+-------------------+-------------------|
+| 2014-15 | 37,175 |                 36,825 | strings           | strings           |
+| 2017-18 | 94,071 |                 94,070 | floats            | strings           |
+| 2018-19 | 46,014 |                 46,014 | integers          | strings           |
+| 2021-22 | 43,472 |                      0 | none              | none              |
+
+All 43,823 missing values remain missing.  Numeric comparison of every
+nonmissing value is exact.  Applying the writer's actual string conversion
+and saved missingness mask reproduces the full warm frame exactly.  A fresh
+rebuild used a different row order; its index values, names and dtypes match
+exactly after sorting, and alignment to the original order reconstructs the
+original cold fingerprint.  The original and final corpus parquet bytes
+are identical.  This proof does not turn general cold/warm dtype equality
+into an API guarantee; GH #645's existing regression checks preserved row
+counts for education tables, not exact roster scalar types.
+
+** Existing documentation/source contradiction: eligibility is not duration
+
+The earlier =Household Presence / MonthsSpent= section says EHCVM binary
+eligibility filters “do not give a continuous duration measure” and advises
+using them “rather than expecting a =MonthsSpent= column in
+=household_roster()=.”  Current source nevertheless maps 2018-19 =s01q12=
+with =Oui -> 12= and =Non -> 0= into =MonthsSpent=.  The 2017-18 EAC-I source
+similarly maps =s1q13=; 2014-15 uses continuous =s01q11=, and 2021-22 supplies
+no such column.  The 2018-19 values are therefore an existing binary
+eligibility proxy, not independently measured continuous months present.
+This contradiction needs to remain visible when interpreting the column.
+
+The serialization investigation neither changes nor scientifically approves
+those mappings.  Numeric equality across cache states is not validation of
+the proxy's meaning.  No runtime, cache, assertion or baseline change was
+made.  Aggregate proof and reproduction scripts are in the release
+=dtype-roundtrip= evidence bundle.  The separate =interview_date= wave/row
+coverage loss under GH #798 is not covered by this scalar-type exception.
+
+* Known warm interview-date loss (GH #798, 2026-10-15)
+
+Mali combines EAC-I (2014-15/2017-18) and EHCVM (2018-19/2021-22).
+The complete raw country =interview_date= cache stores EAC-I dates as
+=YYYY-MM-DD HH:MM:SS= strings and EHCVM dates as =YYYY-MM-DD= strings.
+On development =3914d8804=, cold output contains 24,939 rows across all
+four waves, but an ordinary warm read serves only 12,194 EAC-I rows.
+Whole-column declared datetime coercion infers one format and nulls
+exactly the 6,602 and 6,143 EHCVM dates; the subsequent all-null-row
+filter removes them. Index normalization preserves every raw row.
+Per-wave and mixed-format parsing reproduce the full cold result in a
+read-only diagnostic; no parsing-policy change is implemented here.
+
+This is the same warm loss recorded in #798 on September 9, before
+v0.14.0. Its October 14 cold-only "no longer reproduces" narrowing was
+premature. The raw parquet remains complete and unchanged; raw cache
+coverage and served warm API coverage must be reported separately.
+Keep #798 open. The =data_scheme.yml= comment claiming EHCVM household
+visits across multiple vagues and =groupby.first()= also conflicts with
+this file's one-vague-per-grappe convention and the signed current
+reducer. That documentation tension is separate from the demonstrated
+datetime loss; it does not authorize a visit-key or reducer change.

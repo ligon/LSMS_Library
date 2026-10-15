@@ -1,0 +1,50 @@
+{
+  "source": "/local/job39919092/release-work/control/framework/1010-publishable",
+  "aggregate_only": true,
+  "files": {
+    "REPORT.md": {
+      "bytes": 7055,
+      "sha256": "823a71b58e41f6dfe9b37c84df9cd1259cd781d780b73e438849e445b7a277bf"
+    },
+    "cancelled-comparison.json": {
+      "bytes": 2461,
+      "sha256": "04a4c8587229101511293bf450a7d43088459cb02c848a3aa19853c088c7a725"
+    },
+    "comparison.json": {
+      "bytes": 7411,
+      "sha256": "c2bd5e1dc3fb5f2e4c3bcbd4bbdb86f470d00258584e4690bf3af13a38ba24bf"
+    },
+    "copy-identity.json": {
+      "bytes": 471,
+      "sha256": "167c67741fa4ba8f497a00cec2117c603451ea36f0107ca57ba51ec74a644a72"
+    },
+    "environment-before.json": {
+      "bytes": 616,
+      "sha256": "359cf5df8777b4b257cb1f827d732b62d1a75a101505297bddaf0050b2962aaf"
+    },
+    "observe_ghana.py": {
+      "bytes": 2143,
+      "sha256": "e55336c0d1d7b7b1cc2b44636538518f06fcd2f9605883219e3b605f48e4d4e6"
+    },
+    "ordered_replay.py": {
+      "bytes": 1378,
+      "sha256": "86fb0b452ca025959af1cf06cc7badb0b2abb7cebce6c3aeab5b0984c17a4c0f"
+    },
+    "private-evidence-hashes.json": {
+      "bytes": 2298,
+      "sha256": "055295ac1868d9478042cfcbc3f721862a13d013416e070ffdebba03929f989c"
+    },
+    "probe_environment.py": {
+      "bytes": 1029,
+      "sha256": "d1cdb5153956e1f6ba6449e9b5675cee0b54fd28dd6c451a1a68b4fd8ec5623f"
+    },
+    "OLD_REPLAY_FINAL.md": {
+      "bytes": 1766,
+      "sha256": "09f98ee32a051e7af1352d564e2b4c4eee9b36b2187ecf1d60afd6d405760d3e"
+    },
+    "OLD_REPLAY_FINAL.json": {
+      "bytes": 3450,
+      "sha256": "b83e9de5ee77bb1ced2f816e3acc7aad5f920dcb92228844b18aa0f61d4fb9fe"
+    }
+  }
+}

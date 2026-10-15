@@ -1,0 +1,8 @@
+{
+  "base": "/local/job39919092/release-work/control/runtime/corpus/run_corpus.py",
+  "base_sha256": "efd52efa1eb57fe738b01d47bced4543837cc8348110a53e5648f8985efc3533",
+  "adapted_sha256": "804e66ed9aaa486cc29e318f1931f731e1b948f6cc176b8a0dbe3b903584b2b2",
+  "exact_replacements": 9,
+  "syntax_checked": true,
+  "executed": false
+}

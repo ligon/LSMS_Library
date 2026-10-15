@@ -1,0 +1,9 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "files": 17,
+  "public_payload_hashes_match": true,
+  "listed_private_files_absent": true,
+  "review": "All text/JSON/generators read; aggregate counts and source/cache-file metadata only, no real household rows or identifiers. Private before/after pickles, assertion excerpts and raw logs excluded.",
+  "report_sha256": "073978a933fd9de979096232508e6d5be94ec9a829362e88a0f18681c1532b0d",
+  "manifest_sha256": "6d4b7273ead175d5ccd21e31a0d351023b649fff849faa645949d135dbfa7f63"
+}

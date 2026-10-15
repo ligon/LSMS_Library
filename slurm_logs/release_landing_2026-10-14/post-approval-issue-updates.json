@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-15",
+  "updates": [
+    {
+      "issue": 941,
+      "before_body_sha256": "1e525aa39d1eb9d520c827c86e6057d81573dfa534da17600070383c12337365",
+      "after_body_sha256": "daf90cb81cc976dc6b5b47687b1034b973f637ec165794aefa03dd2238456cb0",
+      "state": "OPEN",
+      "reason": "Completed CI results; historical cause unresolved"
+    },
+    {
+      "issue": 788,
+      "before_body_sha256": "a8e6c84e3d099b357ec25db4fefc8653c5ecc95d588f7c3b9f3cbd49f1c32ee7",
+      "after_body_sha256": "6411cc1c50dafd7d69694ee877f91917273e075aae37450d3b1c98fb21daa4a6",
+      "state": "OPEN",
+      "reason": "Uganda assets aligned by1014; general builder decision remains"
+    },
+    {
+      "issue": 962,
+      "before_body_sha256": "7afe779b115deba7ac8c355b909f9ce51eb8cfe9e598cd82ecc5a211d9f0e930",
+      "after_body_sha256": "bde0c9ff45f863d0de3426af3dbb741147cb0cbad74a2fbcf52edb265f9c5a21",
+      "state": "OPEN",
+      "reason": "Uganda fixed by967; original corpus-wide guard and contract docs remain"
+    }
+  ]
+}

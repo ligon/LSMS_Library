@@ -1,0 +1,131 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "countries": {
+    "Liberia": {
+      "cold_seconds": 1.272442203015089,
+      "cold": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[s]"
+        },
+        "content_hash": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+        "null_count": 0,
+        "non_null_python_type_counts": {
+          "Timestamp": 2787
+        }
+      },
+      "warm": {
+        "shape": [
+          2787,
+          1
+        ],
+        "columns": [
+          "Int_t"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v"
+        ],
+        "dtypes": {
+          "Int_t": "datetime64[ms]"
+        },
+        "content_hash": "5998082be93cb80d5bbe5e298f6cec70ef43fc5452704bc129a078ccd194707e",
+        "null_count": 0,
+        "non_null_python_type_counts": {
+          "Timestamp": 2787
+        }
+      },
+      "actual_cold_matches_original_fingerprint": true,
+      "actual_warm_matches_final_record": true
+    },
+    "Mali": {
+      "cold_seconds": 56.8785996157676,
+      "cold": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "object",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "c28c4d5e0dcf9f1762df70189c445fbc9f5bdaf922f80bbca9c658600346d294",
+        "null_count": 43823,
+        "non_null_python_type_counts": {
+          "float": 94070,
+          "int": 46014,
+          "str": 36825
+        }
+      },
+      "warm": {
+        "shape": [
+          220732,
+          7
+        ],
+        "columns": [
+          "Affinity",
+          "Age",
+          "Distance",
+          "Generation",
+          "MonthsSpent",
+          "Relationship",
+          "Sex"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "pid"
+        ],
+        "dtypes": {
+          "Affinity": "string",
+          "Age": "Float64",
+          "Distance": "Int64",
+          "Generation": "Int64",
+          "MonthsSpent": "string",
+          "Relationship": "string",
+          "Sex": "string"
+        },
+        "content_hash": "9869140252edbf5c4d2537ed4fc7f2365a4cc3813ed4c6574becdd06713909d1",
+        "null_count": 43823,
+        "non_null_python_type_counts": {
+          "str": 176909
+        }
+      },
+      "actual_cold_matches_original_fingerprint": false,
+      "actual_warm_matches_final_record": false
+    }
+  }
+}

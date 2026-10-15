@@ -166,6 +166,53 @@ def _as_float(s):
                                                       na_value=np.nan)
 
 
+#: Smallest group that may classify itself as money-only (GH #864).  A single
+#: expenditure row with a null Quantity is item non-response, not a module
+#: that fielded no quantity grid; the floor keeps a tiny group from laundering
+#: its own loss.  Any real money-only occasion is thousands of rows.
+MONEY_ONLY_MIN_GROUP = 30
+
+#: Index levels a money-only recall occasion is identified on, in order;
+#: whichever of them the frame carries are used.
+MONEY_ONLY_GROUP_LEVELS = ('t', 'visit', 's')
+
+
+def _money_only_rows(v, units, expected):
+    """Boolean mask of EXPECTED rows that sit in a money-only recall occasion.
+
+    A recall occasion is money-only when the survey recorded expenditure and
+    fielded no quantity grid, so ``Quantity`` is null on EVERY row of its
+    ``(t, visit, s)`` group (whichever of those levels the frame carries) --
+    Burkina Faso's EMC 2014 passages 2-4 are the live instance (GH #864).
+    Such rows cannot yield a unit value in any mode, so they are by design,
+    not loss.  The test is deliberately structural: a group with any
+    reported quantity keeps its null-Quantity rows as real, reportable loss,
+    and a group smaller than :data:`MONEY_ONLY_MIN_GROUP` never qualifies.
+    A mis-bound quantity column can also satisfy this structural test; it
+    cannot establish questionnaire coverage. Site B is an independent
+    wave-level null-column guard, but does not detect a null purchased group
+    when another source in that wave still carries quantities.
+
+    Only the ``*value`` modes are judged: in the ``*price`` modes
+    ``expected`` is a REPORTED price, and a reported price on a row with no
+    quantity is perfectly priceable.  Returns an all-False mask when the
+    frame has no ``Quantity`` column or none of the group levels.
+    """
+    n = len(v)
+    if units not in ('kgvalue', 'unitvalue') or 'Quantity' not in v.columns:
+        return np.zeros(n, dtype=bool)
+    levels = [lvl for lvl in MONEY_ONLY_GROUP_LEVELS
+              if lvl in (v.index.names or [])]
+    if not levels or n == 0:
+        return np.zeros(n, dtype=bool)
+    q_null = np.isnan(_as_float(v['Quantity']))
+    keys = [v.index.get_level_values(lvl) for lvl in levels]
+    grp = pd.Series(q_null).groupby(keys, dropna=False, observed=True)
+    all_null = grp.transform('all').to_numpy(dtype=bool)
+    big_enough = (grp.transform('size').to_numpy() >= MONEY_ONLY_MIN_GROUP)
+    return all_null & big_enough & q_null & np.asarray(expected, dtype=bool)
+
+
 def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     """Drop rows with a 0 / +-inf / NaN Price -- loudly (GH #591).
 
@@ -207,6 +254,21 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     no adjustment -- a currency row is perfectly priceable there
     (``Expenditure / Quantity``), so it stays in the denominator.
 
+    Money-only recall occasions are the second by-design bucket (GH #864)
+    ----------------------------------------------------------------------
+    Burkina Faso's EMC 2014 re-asks the 7-day food module in four quarterly
+    passages and fields the quantity grid in passage 1 ONLY: passages 2-4
+    record money and nothing else (405,127 served rows).  No unit value can
+    exist for them in any mode, and before this bucket they were 64.8% of
+    the country's "loss" -- a warning pinned there cannot report the next
+    real break in its own cell.  :func:`_money_only_rows` identifies them
+    STRUCTURALLY, as a ``(t, visit, s)`` group whose Quantity is null on
+    every row (``MONEY_ONLY_MIN_GROUP`` rows or more), so a null quantity
+    inside a group that does report quantities stays what it is -- real,
+    reportable loss.  Judged in the ``*value`` modes only; tallied as
+    ``money_only`` / ``money_only_expected``; excluded from ``lost`` and
+    ``expected`` exactly as ``currency`` is.  A row is never in both.
+
     Parameters
     ----------
     v : DataFrame
@@ -236,10 +298,23 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     # a threshold can usefully bite on.  In the unit* modes a currency row is
     # priceable (Expenditure / Quantity), so nothing is excluded there.
     if units in ('kgvalue', 'kgprice') and 'u' in (v.index.names or []):
-        by_design = _is_currency_denominated(
+        currency = _is_currency_denominated(
             v.index.get_level_values('u')) & expected
     else:
-        by_design = np.zeros(len(v), dtype=bool)
+        currency = np.zeros(len(v), dtype=bool)
+
+    # Money-only recall occasions are the SECOND by-design bucket (GH #864).
+    # A survey module that records expenditure and fields no quantity grid
+    # at all (Burkina Faso EMC 2014, passages 2-4: 405,127 rows) cannot
+    # produce a unit value in any mode, and counting those rows as loss pins
+    # the warning at ~65% forever -- the GH #770 failure in a second place.
+    # The classifier is STRUCTURAL, not per-row: a group (over whichever of
+    # `t`, `visit`, `s` the frame carries) in which Quantity is null on
+    # EVERY row is money-only by construction; a group with any reported
+    # quantity keeps its NaN rows as the real, reportable loss they are
+    # (item non-response, a quantity variable bound to nothing, ...).
+    money_only = _money_only_rows(v, units, expected) & ~currency
+    by_design = currency | money_only
     effective = expected & ~by_design
 
     lost = int((dropped & effective).sum())
@@ -253,8 +328,13 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
         'expected_gross': int(expected.sum()),
         # Dropped by design because the unit is currency-denominated; NOT
         # counted in `dropped_expected` / `lost_fraction`.
-        'currency': int((dropped & by_design).sum()),
-        'currency_expected': int(by_design.sum()),
+        'currency': int((dropped & currency).sum()),
+        'currency_expected': int(currency.sum()),
+        # Dropped by design because the recall occasion recorded money and
+        # fielded no quantity grid (GH #864); NOT counted in
+        # `dropped_expected` / `lost_fraction`.
+        'money_only': int((dropped & money_only).sum()),
+        'money_only_expected': int(money_only.sum()),
         'dropped_total': int(dropped.sum()),
         'dropped_expected': lost,
         'inf': int((is_inf & effective).sum()),
@@ -274,6 +354,15 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"the residual real loss."
             if tally['currency'] else ""
         )
+        money_only_note = (
+            f"  A further {tally['money_only']:,} row(s) were dropped because "
+            f"their recall occasion is MONEY-ONLY: every row of that "
+            f"(t, visit, s) group has a null Quantity, i.e. the survey "
+            f"recorded expenditure and fielded no quantity grid (Burkina "
+            f"Faso EMC 2014 passages 2-4, GH #864).  Those are BY DESIGN and "
+            f"EXCLUDED from the count and the fraction above."
+            if tally['money_only'] else ""
+        )
         warnings.warn(
             f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
             f"priceable rows ({lost / n_expected:.1%}) because Price was "
@@ -285,7 +374,8 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"Quantity -- typically a 0-as-missing sentinel or a quantity "
             f"variable mapped to the wrong survey question (GH #591).  A NaN "
             f"Price means the quantity was missing OR the unit has no kg "
-            f"factor.{currency_note}  See GH #591, GH #770.",
+            f"factor.{currency_note}{money_only_note}  See GH #591, GH #770, "
+            f"GH #864.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )
@@ -1456,28 +1546,54 @@ _FLUID_UNITS = ('l', 'litre', 'liter', 'litres', 'liters',
 # matching the ``g`` pattern, and dropping it would trade one silent error
 # for another.  Longest alternative first within each group, so ``ltr`` is
 # preferred to ``lt`` and ``kilogramme`` to ``kg``.
+# The number group admits a FRACTION (``1/2``, ``1/4``, ``3/4``).  Without it
+# the group matched only the digits ADJACENT to the unit token, so Uganda's
+# ``Packet(1/2lt / 1/2kg)`` read as 2 kg and ``Packet(1/4lt / 1/4kg)`` as 4 kg
+# -- 4x and 16x overstatements of a half- and quarter-kilo packet.  Same shape
+# as the plural bug GH #850 fixed: a regex that reads PART of a
+# self-describing label and asserts the result.
 _EXPLICIT_METRIC_PATTERNS = (
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:kilogrammes?|kilograms?|kgs?)\b',
                 re.IGNORECASE), 1, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:grammes?|grams?|gms?|grs?|g)\b',
                 re.IGNORECASE), 1/1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*milligrammes?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*milligrammes?\b',
                 re.IGNORECASE), 1e-6, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*tonnes?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*tonnes?\b',
                 re.IGNORECASE), 1000, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:lbs?|pounds?)\b',
                 re.IGNORECASE), 0.453592, False),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*millilitres?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*millilitres?\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*centilitres?\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*centilitres?\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*ml\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*ml\b',
                 re.IGNORECASE), 1/1000, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*cl\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*cl\b',
                 re.IGNORECASE), 1/100, True),
-    (re.compile(r'(\d+(?:\.\d+)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
+    (re.compile(r'(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?)\s*(?:litres?|liters?|ltrs?|lts?|l)\b',
                 re.IGNORECASE), 1, True),
 )
+
+
+def _metric_number(text):
+    """Value of a metric quantity token, which may be a fraction.
+
+    ``'50'`` -> 50.0, ``'0.5'`` -> 0.5, ``'1/2'`` -> 0.5, ``'3/4'`` -> 0.75.
+
+    Fractions are how Uganda's own container labels spell sub-unit sizes
+    (``Packet(1/2lt / 1/2kg)``, ``Packet -medium (1/4kg)``).  Before this the
+    pattern captured only the digits adjacent to the unit token, so those read
+    as 2 kg and 4 kg -- a 4x and a 16x overstatement.
+    """
+    t = str(text).strip()
+    if '/' in t:
+        num, _, den = t.partition('/')
+        d = float(den.strip())
+        if d == 0:
+            raise ZeroDivisionError(t)
+        return float(num.strip()) / d
+    return float(t)
 
 
 def _parse_explicit_metric(s, *, volume_as_mass=True):
@@ -1521,6 +1637,19 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
     True
     >>> _parse_explicit_metric('20gallon drum') is None
     True
+
+    Fractions.  Uganda's container labels spell sub-unit sizes this way, and
+    before the fix the pattern captured only the digits ADJACENT to the unit
+    token -- so a half-kilo packet read as 2 kg and a quarter-kilo as 4 kg.
+
+    >>> _parse_explicit_metric('1/2 kg')
+    0.5
+    >>> _parse_explicit_metric('Packet(1/4lt / 1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('Packet -medium (1/4kg)')
+    0.25
+    >>> _parse_explicit_metric('3/4 kg')
+    0.75
     """
     if not isinstance(s, str):
         return None
@@ -1530,8 +1659,8 @@ def _parse_explicit_metric(s, *, volume_as_mass=True):
         m = pattern.search(s)
         if m:
             try:
-                return float(m.group(1)) * scale
-            except (ValueError, IndexError):
+                return _metric_number(m.group(1)) * scale
+            except (ValueError, IndexError, ZeroDivisionError, TypeError):
                 return None
     return None
 
@@ -1564,6 +1693,17 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     # run.  A `volume_as_mass=False` caller still drops the fluid spellings
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
+    #
+    # GH #931: only the FOOD callers pass `unit_kg` (`food_kg_factors`, via
+    # `Country.<food_prices|food_quantities>`).  `harvest_kg_factors` calls
+    # this function with `unit_kg` defaulted, and `_kg_factor_series` cannot
+    # pass it at all, so the crop ladder is blind to declared `u_kg` rows.
+    # That is deliberate for now: Ethiopia's external check on the WB shipped
+    # crop factors (`Quintal` == 100.0 where the library has no opinion;
+    # `test_quintal_is_exactly_100kg_on_every_newly_served_row`) depends on
+    # the crop ladder NOT holding a declared quintal.  Pinned by
+    # `tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg`;
+    # see the `harvest_kg_factors` docstring before threading `unit_kg` here.
     for key, kg in (unit_kg or {}).items():
         factors[str(key).lower()] = kg
 
@@ -3787,6 +3927,30 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``country`` are all optional.
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
+
+        There is deliberately NO ``unit_kg`` parameter here (GH #931).  The
+        FOOD ladder (:func:`food_kg_factors`) receives a country's declared
+        ``u_kg`` table through ``unit_kg`` -- composed by
+        ``Country._unit_kg_factors`` and passed only for ``food_prices`` /
+        ``food_quantities`` -- and lets it outrank :data:`KNOWN_METRIC`
+        (GH #919).  The CROP ladder never sees that table: its ``metric``
+        layer seeds :func:`_seeded_kg_factors` with ``unit_kg`` defaulted,
+        and ``inferred`` goes through :func:`_kg_factor_series`, which has no
+        ``unit_kg`` either.  So a unit a country declares in ``u_kg`` (say
+        ``Quintal: 100``) is served ``none`` here unless a ``KgFactor``
+        column, a *shipped_factors* table or :data:`KNOWN_METRIC` supplies
+        it.  The asymmetry is LOAD-BEARING, not an oversight: Ethiopia's only
+        EXTERNAL check on the World Bank's shipped factor table is that
+        ``Quintal`` comes back as exactly 100.0 on 13,924 rows the library
+        has NO independent opinion about
+        (``tests/test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``,
+        ``Ethiopia/_/CONTENTS.org`` "The real external check").  Teaching
+        this ladder to read ``u_kg`` would make that check a tautology, the
+        way the ``Kg``/``Gram`` overlap already is.  Whether the crop ladder
+        SHOULD read ``u_kg`` is an open decision (GH #931 item 2) that has to
+        land together with a re-expressed external check; the asymmetry
+        itself is pinned by
+        ``tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg``.
     min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
         ``N`` for the ``survey_median`` layer.  One number is applied to
         every group, but the groups are per country-wave, so a thin module

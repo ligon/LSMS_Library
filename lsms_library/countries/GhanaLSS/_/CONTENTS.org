@@ -2634,6 +2634,46 @@ and air coolers" onto "air conditioner - split chassis (cool)" would pool two
 different items.  *Comparing a GLSS7 =j= with a GLSS5/GLSS6 =j= is valid only
 for the 71 shared rows.*
 
+** =g7sec9a.dta= is a format-118 file whose strings MIX cp1252 bytes with ASCII (GH #926, 2026-10-14)
+
+The 2016-17 Section 9A file declares itself UTF-8 (header =<stata_dta>=,
+format 118), and its =s9aname= strings carry *raw cp1252 bytes* beside
+clean ASCII for the SAME words: the blob holds 41,803 =Women\x92s= next to
+97,531 =Women's=, and 411,886 bytes 0x92 (right single quote), 418,085 of
+0x96 (en dash) and 241,757 of 0x94 (right double quote, used as an inch
+mark in =Iron rods (1/4\x94)=) -- with zero UTF-8 curly quotes anywhere.
+Reading it through =get_dataframe('../Data/g7sec9a.dta',
+convert_categoricals=False)= (the wave script's own path; measured
+2026-10-14, pandas 3.0.6) raises *no* warning of any class: each string
+that fails UTF-8 is decoded per-string as latin-1, which maps the byte to
+the C1 control U+0092/U+0096/U+0094 and keeps going.  390,140 of the file's
+7,077,839 =s9aname= values (5.5%) therefore come out of the reader carrying
+a C1 control (41,803 rows read =Women\x92s=, 97,531 =Women's=).
+
+The =nonfood_items= crosswalk in =_/categorical_mapping.org= was derived
+from that read and *committed the controls*: 28 cells (=Preferred Label= and
+=Label_2016-17=, consistently) and 3 more in the wave's
+=harmonize_price_item= (codes 309 / 326 / 348, both the =Label= and the
+=Preferred Label=).  Because the label is served verbatim, that put a C1
+control in =nonfood_expenditures().j= on 25,585 rows (27 distinct =j=, all
+2016-17) and in =community_prices().j= and =.Description= on 927 rows each.
+Repaired 2026-10-14 by editing the config: U+0092 -> ='=, U+0096 -> =-=,
+U+0094 -> ="= (ASCII, this file's transcription convention; a decision, not
+a reading -- the source's intended characters are the typographic ones).
+Preferred Labels stay injective per wave (the wave script asserts it), and
+=tests/test_no_c1_controls_in_curated_labels.py= pins every served
+=Preferred Label= column corpus-wide and these two files in full.
+
+*The #805 reader rule will not protect a re-derivation.*  #805 decodes
+cp1252-first for format < 118 files; this file IS 118, and its bytes are
+mixed, so any future re-derivation of =nonfood_items= or
+=harmonize_price_item= from =g7sec9a.dta= reintroduces the controls unless
+the strings are transcoded first (re-encode the decoded string as latin-1
+and decode as cp1252, per string, where a C1 control is present).  The
+mixed encoding is also why this is not the 2012-13 code-262 artefact noted
+under the food vocabulary (a Mac-Roman NBSP read as latin-1): different
+file, different source charset, same symptom class.
+
 ** 2005-06 is in OLD cedi, and the served numbers look 1000x wrong until you look
 
 Median row: 2005-06 *60,000*, 2012-13 *23*, 2016-17 *35*.  That is the July
@@ -3084,6 +3124,45 @@ including wave-table precedence and country-table fallback.  All eight
 cases failed against the package-relative paths before the fix.  No survey
 code or label has changed; the override now selects the intended tables.
 
+/Trap 6's twin, resolved 2026-09-18 (GH #948)./  The same disease from the
+other side: seven wave =food_acquired.py= scripts reached the country module
+through =from lsms_library.countries.GhanaLSS._.ghanalss import ...= (11
+sites), an absolute PACKAGE import.  It binds to whichever =lsms_library= won
+=sys.path= -- with only =LSMS_COUNTRIES_ROOT= set it resolved to
+=/global/scratch/.../mirrors/LSMS_Library/.../ghanalss.py= while every
+=../Data/*.dta= read in the same script came from the worktree.  GhanaLSS was
+the ONLY country doing this corpus-wide.  All 11 now use the house pattern,
+=sys.path.append('../../_')= + =from ghanalss import ...=, at the top of the
+file, beside the =sys.path.append('../../../_/')= that four of them already
+carry.
+
+/That third entry is NOT dead weight/, and #948's original text (and the first
+revision of this paragraph) said it was.  It is the third rung of a deliberate
+*wave -> country -> cross-country cascade*: =get_categorical_mapping(fn,
+tablename, dirs)= walks =dirs= in order and returns the first hit
+(=local_tools.py:1556-1566=), and the wave =mapping.py= modules spell the
+cascade out as
+
+: _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+:           wave            country          cross-country
+
+=2012-13/_/food_acquired.py= had had its third rung removed in the first pass of
+#948 and it was restored; the three siblings (=1987-88:47=, =1991-92:59=,
+=2005-06:27=) were never touched.  /Stated accurately rather than papered over/:
+=lsms_library/countries/_/= does not exist today, so the third rung presently
+resolves to nothing and the cascade has two live levels, while the actual
+cross-country tables (=u.org=, =canonical_housing_labels.org=,
+=harmonize_education.org=, ...) live at =lsms_library/categorical_mapping/=,
+which is *off* this cascade and reached by explicit path.  The rung is reserved
+and correct to keep; wiring it is a design decision, not a rider on an import
+cleanup.
+
+Verified a no-op: all seven wave parquets and the country-level
+=food_acquired= (5,340,606 rows) are byte-identical before and after.  Note
+the import only ever worked through PEP 420 namespace packages -- there is no
+=__init__.py= under =countries/=, =GhanaLSS/= or =_/= -- so it would also have
+broken under a zipped install.
+
 ** Trap 7: one label, two instruments -- =U6= is a university year in GLSS1/2/3 and Upper Sixth in GLSS5/6/7 (2026-09-02, GH #731)
 
 Found by the GhanaSPS =individual_education= task (PR #728) while reading this
@@ -3241,9 +3320,13 @@ right and the built table did not match it.
 
 ** Trap 9: a duplicate index in =food_acquired= silently REWRITES =Price= table-wide (2026-09-05, GH #782/#323)
 
-*This one is armed and waiting.*  It did not fire in the shipped data, but only
-because =2005-06/_/food_acquired.py= now keeps its index unique on purpose.  Any
-future duplicate in GhanaLSS =food_acquired= re-arms it.
+*This one is armed and waiting at the CORE collapse.*  It did not fire there in
+the shipped data, but only because =2005-06/_/food_acquired.py= now keeps its
+index unique on purpose.  Any future duplicate in GhanaLSS =food_acquired=
+re-arms it.  *Its wave-script sibling, however, DID fire* -- see "a SECOND
+site" below (GH #936, 1998-99): a duplicate resolved with =first= upstream of
+the uniqueness assert never reaches core at all, and no guard in this country
+was looking there.
 
 =food_acquired= is in =_ADDITIVE_MEASURE_COLUMNS=, so when its index is
 non-unique =Country._normalize_dataframe_index= does *not* collapse with
@@ -3258,22 +3341,69 @@ emits *no* =GrainCollapseWarning=.  Nothing here is a bug in core --- for a
 survey where =Expenditure = Quantity x Price=, the reconciliation is exactly
 right.
 
-*GhanaLSS is not such a survey.*  =Expenditure= is structurally =NaN= for
-=s='produced'= (the instrument records a farmgate =Price= and a =Quantity=, and
-never a produced value), and the re-derivation is applied to the *whole frame*,
-not merely to the duplicated groups.  Measured on the delivered table:
+*GhanaLSS is only PARTLY such a survey, and the split is per wave.*  The
+re-derivation is applied to the *whole frame*, not merely to the duplicated
+groups, so it has two distinct victims -- and they must be counted separately.
 
-| rows with a Price     | block does not fire | block fires |
-|-----------------------+---------------------+-------------|
-| =s='produced'=        |   883,789 (95.2%)   |  44,112 (4.8%) |
-| whole table           |   883,789           |   4,375,274 |
+/Corrected 2026-09-18 (GH #936)./  This passage used to assert that
+=Expenditure= is "structurally =NaN= for =s='produced'=" throughout, and
+concluded that one duplicate would /destroy 839,677 recorded farmgate prices/.
+*The first half has been false since GH #916* (=fe4f736f0=), which wired the
+8h-farmgate derivation: in GLSS4--GLSS7 a produced row now carries
+=Expenditure = Quantity x Price=, so =Expenditure/Quantity= gives the recorded
+price back.  The section "Section 8H own production is valued at the farmgate
+price (2026-09-13)", under "Files in GhanaLSS/_/ > food_acquired.py", already
+said so, and this trap was never updated to match.  *The purchased half was and remains true*, and it is much the larger
+of the two.  Both halves re-measured below on the delivered 5,340,606-row
+table.
 
-So a single duplicate anywhere in the table would *destroy 839,677 recorded
-farmgate prices* and *fabricate* a =Price= on ~4.33M purchased rows, where
-=u='Value'= makes =Quantity == Expenditure= and the "price" is therefore 1.0 ---
-the "Kwacha per Kwacha" quantity =CLAUDE.md= warns about.  Silently, and with the
-audit correctly reporting nothing, because the audit's premise is that the
-re-derivation is information-preserving.
+*Victim 1 -- a recorded farmgate price destroyed.*  Only where =Price= is
+present and =Expenditure= is NaN, i.e. where the value was NOT derived:
+
+| wave    | produced rows | with a =Price= | =Price= kept, =Expenditure= NaN |
+|---------+---------------+----------------+---------------------------------|
+| 1987-88 |        20,775 |              0 |                               0 |
+| 1988-89 |        23,337 |              0 |                               0 |
+| 1991-92 |       287,712 |        287,570 |                         287,570 |
+| 1998-99 |        98,440 |         98,370 |                               0 |
+| 2005-06 |       170,291 |        170,291 |                               0 |
+| 2012-13 |       197,925 |        197,924 |                               0 |
+| 2016-17 |       151,721 |        151,683 |                          12,928 |
+| total   |       950,201 |        905,838 |                     *300,498*   |
+
+So the produced-side exposure is *300,498 rows, not 839,677*, and it is not
+spread across the country: =1991-92= is 96% of it (deliberately not wired --
+see the 8H section), and 2016-17's 12,928 are produced rows carrying a price
+but no quantity (measured: all 12,928 have =Quantity= NaN), which
+=8h-farmgate= declines to value.  In the four Q x P
+waves the re-derivation is an algebraic *no-op* -- =(Q x P)/Q = P= -- which is
+the same fact the 8H section reports as "the served =Price= is byte-identical
+before and after in every wave".
+
+*Victim 2 -- a fabricated price, and this one is undiminished.*  On
+=s='purchased'= with =u='Value'= the LCU-only convention sets
+=Quantity == Expenditure=, so the re-derived "price" is *1.0* --- the "Kwacha
+per Kwacha" quantity =CLAUDE.md= warns about:
+
+| wave    | =u='Value'= rows | =Quantity == Expenditure= |
+|---------+------------------+---------------------------|
+| 1987-88 |           50,830 |                    50,830 |
+| 1988-89 |           49,312 |                    49,312 |
+| 1991-92 |          394,835 |                   394,835 |
+| 1998-99 |          443,755 |                   443,755 |
+| 2005-06 |          966,597 |                   966,597 |
+| 2012-13 |        1,511,750 |                 1,511,750 |
+| 2016-17 |           90,791 |                    90,791 |
+| total   |        3,507,870 |               *3,507,870* |
+
+(The "~4.33M" this trap used to quote is the old table's 4,375,274 - 44,112,
+i.e. every *purchased* row lacking a Price, not the =u='Value'= rows.  Today
+all 4,390,405 purchased rows lack a Price and 3,507,870 of them carry
+=u='Value'=; the rest have a physical unit and so do not collapse to 1.0.)
+
+Either way it happens silently, and with the audit correctly reporting
+nothing, because the audit's premise is that the re-derivation is
+information-preserving.
 
 Fixing 2005-06's decode (Trap 8) *created* 24 such duplicates in 12 groups --- two
 farmgate prices for one harmonised commodity, e.g. =mutton= and =goat= both
@@ -3281,6 +3411,47 @@ becoming =Goat=.  They are resolved in the wave script (=Quantity= sums, =Price=
 becomes the quantity-weighted mean) rather than left to core, which is what
 =CLAUDE.md= prescribes: core does not aggregate, and a reducer applied
 downstream "only puts a signature on the corpse".
+
+*The trap has a SECOND site, inside a wave script -- and there it was LIVE
+(2026-09-18, GH #936).*  Everything above is about a duplicate reaching
+/core/.  =1998-99/_/food_acquired.py= held its own reduction, upstream of the
+unit-canonicalisation uniqueness assert added by #832 and therefore invisible
+to it:
+
+: prod_long = prod_long.groupby(['i','j','u','visit'], as_index=False).agg(
+:     Quantity=('Quantity','sum'), Price=('Price','first'))
+
+GH #936 filed this as /latent/.  It was not.  This wave's own
+=harmonize_food= maps *three* =Code_8h= codes onto the single Preferred Label
+=Other Meat=, and =j= is assigned from that map before the groupby.  Measured
+on the 8H path: 98,504 melted produced rows collapse to 98,497 groups, i.e.
+*7 duplicate groups (14 rows), every one of them =Other Meat=, 6 of them with
+disagreeing farmgate prices*.  =('437210', 'Other Meat', 'All', visit 7)= held
+two rows priced 5,000 and 4,000 at one unit each; =first= served =Quantity=2=
+at =Price=5,000=, so the 8h-farmgate =Expenditure = Q x P= was *10,000* where
+=sum(q x p)= is *9,000*.  Replaced with =ghanalss.reduce_duplicate_food_rows=
+(=Quantity= sums, =Price= becomes the quantity-weighted mean), which is what
+the other three 8H waves use and what makes =Q x P == sum(q x p)= hold across
+the merge.  Delivered effect, measured on the 5,340,606-row table: the index
+is identical, =Quantity= and =Derivation= are untouched, the NA pattern is
+unchanged, and *exactly 6 rows* move (=Expenditure= total +103,500 cedis).
+
+/Note the arithmetic coincidence worth stating:/ core's additive path would
+have produced the /same/ weighted mean here -- it SUMs =Expenditure= and
+=Quantity= and divides -- so on the four Q x P waves the named reducer and
+core agree.  That is not a licence to leave the duplicate for core: core's
+re-derivation is applied to the *whole frame* and has the two victims tabled
+above, while the reducer touches only the duplicated groups.
+
+*Follow-up not taken in #936 (open).*  That same old =groupby= defaulted to
+=dropna=True=, so it silently deleted the *22* melted produced rows whose unit
+code did not decode -- GH #323 §3b's disease inside a wave script.
+=reduce_duplicate_food_rows= passes =dropna=False= and would carry them
+through to a delivered =u= of ='nan'= (the later =astype(str)=), which is
+worse, so the wave script now does =dropna(subset=['u'])= *explicitly*,
+preserving the shipped behaviour and making the deletion visible.  The real
+fix is a country decision -- an =Unknown= sentinel on =u=, Niger's landed
+pattern from GH #842 -- and it belongs in its own issue.
 
 *Corrects the commit message of =b93f9c2c=*, which described core's behaviour as
 =groupby().first()= discarding one price.  That was measured to be wrong: the
@@ -4276,7 +4447,10 @@ label, recurs across blocks, or is an "OTHER (SPECIFY)" line: 80 such codes
 in 2016-17, none elsewhere.  Where the axis folds two
 price items together (Goat (fresh) + Fresh mutton -> =Goat=; Onion +
 Shallots -> =Onion=; palm wine -> =Wine=, pito -> =Beer=) both are kept and
-=Description= tells them apart.  The overlap with =food_acquired().j= was
+=Description= tells them apart.  (Three 2016-17 price-item labels -- codes
+309 / 326 / 348 -- carried cp1252-as-latin-1 C1 controls until 2026-10-14;
+see "=g7sec9a.dta= is a format-118 file whose strings MIX cp1252 bytes with
+ASCII" under =nonfood_expenditures=, GH #926.)  The overlap with =food_acquired().j= was
 checked against the =harmonize_food= tables, not a built =food_acquired=
 (the corpus's largest table; not built on this slice).
 
@@ -4791,3 +4965,46 @@ six =input= values with =j='Farm-level'=: *322 rows / 2,477,260 cedis in
 FIXED six-row list, so a zero means the household spent nothing on that
 category) but NOT in the per-crop blocks above, where a crop is listed only
 when it had an expense.
+
+** Feature assembly drops null-key food rows separately from visit summation (2026-10-14)
+
+=Country('GhanaLSS').food_acquired()= retains the integer =visit= axis
+and is unique at that grain.  =Feature('food_acquired')(['GhanaLSS'])=
+removes =visit= to reach its canonical cross-country grain, then sums
+Quantity/Expenditure over the resulting duplicate keys.  That ordinary
+visit aggregation is distinct from the null-key deletion below; it does
+not standardize the recall windows documented above.
+
+On frozen source =7fa05179=, the country call serves 5,340,606 rows and
+the Feature call serves 1,704,880.  Of the reduction, 3,622,254 rows are
+combined through additive aggregation of non-null keys.  Another 13,472
+rows are deleted because the grouping keys contain nulls:
+
+| wave    | null key | deleted rows | Quantity checksum | Expenditure checksum |
+|---------+----------+--------------+-------------------+----------------------|
+| 1987-88 | v        |           54 |              8370 |                 8370 |
+| 1988-89 | v        |           38 | 5182.017543859649 |    5182.017543859649 |
+| 2016-17 | u        |        13380 |            3379.8 |              6720.55 |
+
+These are raw-column *audit checksums*, not kilograms or comparable
+economic totals: units, currencies and recall windows differ.  The
+GLSS7 set includes price-only produced rows; a deleted-row count is not
+a count of non-null quantities.  The country-native records remain
+available.  Independent in-memory replay from the raw food/sample
+parquets reproduces the mask and Feature row count; =math.fsum= of the
+retained input and output agrees for both additive columns.
+
+The collapse mechanism predates v0.14.0: =feature.py= and the relevant
+row-selector source are identical at that tag, pre-train =452302ad= and
+=7fa05179=.  Exact row counts on a rebuilt historical Country snapshot
+were not measured.  GH #847 explicitly scoped its change to reporting
+this class, not correcting every country.  Its closure does not mean
+these GhanaLSS rows are preserved in Feature assembly.
+
+This also qualifies Trap 9's "armed and waiting" description: no new
+Country duplicate is needed to activate the Feature collapse, because
+removing =visit= creates duplicate keys.  The 22 null-unit rows discussed
+under the 1998-99 wave reducer are a separate upstream loss, not the
+cohort counted here.  Choosing a source-supported unit/cluster treatment
+or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
+this note changes neither identifiers nor measures.

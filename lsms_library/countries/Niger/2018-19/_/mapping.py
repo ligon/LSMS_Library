@@ -162,10 +162,11 @@ def _fix_relationship(value):
 
     The ``Relationship`` formatter above has already ``.title()``-cased
     the label, and ``str.title`` treats the control byte as a word break,
-    so the artefact reaches the hook as ``Frere, S<U+009C>Ur``; decoding
-    alone would give ``Frere, SoeUr``.  Re-titling a decoded string yields
-    ``Frere, Soeur``, the label the sibling EHCVM-1 waves serve.  Values
-    the decode leaves alone are returned untouched.
+    so the artefact reaches the hook as ``Frère, S<U+009C>Ur``; decoding
+    alone would give ``Frère, SœUr``. Re-titling yields ``Frère, Sœur``,
+    the accented sibling EHCVM-1 label. The unused ASCII ``Frere, Soeur``
+    kinship key was removed under GH #974. Values the decode leaves alone
+    are returned untouched.
     """
     fixed = _decode_cp1252(value)
     if isinstance(fixed, str) and fixed != value:

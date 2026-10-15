@@ -30,6 +30,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+pytestmark = pytest.mark.requires_s3
+
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 BASELINE_PATH = FIXTURES_DIR / "uganda_baseline.json"

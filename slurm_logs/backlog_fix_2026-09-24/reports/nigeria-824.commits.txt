@@ -1,0 +1,2 @@
+d568ab428 Nigeria CONTENTS.org: Unit_sold reproduced on the API frame; #867 alias measured on plot_inputs
+8cc7eed2b Nigeria: carry the sale's own unit as crop_production.Unit_sold (W1/W2, GH #824)

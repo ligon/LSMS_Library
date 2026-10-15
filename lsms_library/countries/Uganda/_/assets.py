@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
 """
-Compile data on reported household assets.
+Compile the real wave observations into a (t, i, j) assets panel.
+
+Keep the item axis and Value column intact.  Stacking each wave into a Series
+and aligning those Series in a DataFrame manufactures absent wave/item rows
+under pandas 3; squeezing also broadcasts a one-row wave as a scalar.
 """
+from lsms_library.local_tools import to_parquet, get_dataframe
+
 import sys
 import pandas as pd
-import numpy as np
 from uganda import id_walk, Waves
 import json
 
@@ -16,16 +19,11 @@ x = {}
 for t in list(Waves.keys()):
     print(t, file=sys.stderr)
     x[t] = get_dataframe('../'+t+'/_/assets.parquet')
-    x[t] = x[t].stack().squeeze()
 
 
-x = pd.DataFrame(x)
-x.columns.names = ['t']
-x = pd.DataFrame({'assets':x.stack()})
+x = pd.concat(x, names=['t'])
 
 updated_ids = json.load(open('updated_ids.json'))
-x = id_walk(x, updated_ids)                    # ← renames j→i
-x['m'] = 'Uganda'
-x = x.reset_index().set_index(['i','t','m'])   # ← now 'i' exists
+x = id_walk(x, updated_ids)
 
 to_parquet(x, '../var/assets.parquet')

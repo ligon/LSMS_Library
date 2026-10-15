@@ -1,430 +1,252 @@
-#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
-
-
-* GhanaLSS food-label crosswalk session (2026-09-16, PR #935)
-
-Merged from =fix/ghanalss-label-crosswalk='s own handoff note when the branch was
-brought up to date with =development= (2026-09-16); headings demoted one level,
-text otherwise verbatim.
-
-** State
-
-- Branch =fix/ghanalss-label-crosswalk=, *5 commits*, 5 ahead of
-  =development=, 0 behind.  Working tree clean.  Published to the shared
-  mirror and (as of this note) pushed to GitHub with a PR open.
-- Last commit: =684120114= "reconcile guinea corn + sorghum at Lcp with a
-  named reducer".
-- Full record: =slurm_logs/ghanalss_aggregate_labels/= -- =FINDINGS.org= (the
-  ladder + the original diagnosis), =TABLE_AUDIT.org= (every defect found),
-  =LANDED.org= (what shipped, with the decisions and who made them), plus 12
-  re-runnable scripts and =README.md= saying how to run them.
-
-** What the task was, and what it turned into
-
-Asked: find =Aggregate= labels for GhanaLSS =food_expenditures=.
-Found: =labels='Aggregate'= raises, and the two places that record this as
-deliberate name three blockers of which *two were stale*.  The one that binds
-was unrecorded: the country =harmonize_food= table carries a per-wave
-crosswalk (=Lc . Lcp= in @ligon's ladder) that *was never applied*, so the
-served =j= was the WAVE vocabulary and 45 of 225 labels sat off the country
-axis -- 14% of rows, ~36% of GLSS2 expenditure, silently.
-
-So steps 1-4 fixed the =j= axis.  *Step 5 -- designing the =Aggregate Label=
-column -- is NOT started*, by agreement: @ligon wanted to discuss principles
-of aggregation first.  That is the next conversation.
-
-** Invariants now holding at HEAD
-
-| check                                | value                 |
-|--------------------------------------+-----------------------|
-| served =j= off the country axis      | *0* (was 45 of 225)   |
-| duplicate index tuples               | *0*                   |
-| distinct =j= vs country labels       | *215 = 215* bijection |
-| Expenditure per wave, before/after   | identical, all seven  |
-| =test_ghanalss_food_label_canonical= | *32 passed*           |
-
-Two new guards: =TestDelivered= now asserts =j= is on the COUNTRY axis (it
-asserted the WAVE axis, which was right for =Lw= and could never have caught
-this), and a config-only per-wave bijection test.
-
-** Next steps, in order
-
-1. *Design =Aggregate Label=* (step 5).  Read =FINDINGS.org= "The framing
-   number" first: a mechanical reconciliation of the wave columns yields
-   195 -> 134 buckets with *91 singletons*, against Malawi 147 -> 65 and Uganda
-   175 -> 80.  The wave-level Aggregate columns were a spelling layer, not a
-   demand-estimation bucketing.  GH *#226* is the principled auto-aggregation
-   script this probably belongs in; GH *#925* constrains it -- a blank cell
-   becomes one unnamed bucket, so the column must be complete for all 215
-   labels.
-2. *Rebuild and inspect =nutrition=.*  NOT done.  It will change: the
-   Cocoyam/Coffee fix (8,935 rows), gari 02_004 -> 02_039, sweet potato
-   02_022, and the deliberately-blank =Oil (palm)/Shea Butter= composite
-   (4,239 rows drop out).  Do this before anyone quotes a GhanaLSS nutrient
-   number.
-3. *The latent =.first()=* at =1998-99/_/food_acquired.py:110= -- filed as its
-   own issue; does not fire today.
-
-** Traps worth knowing (all cost time this session)
-
-- =.pth= points at =/global/scratch/.../mirrors/LSMS_Library=, a THIRD
-  checkout.  Always run wave scripts with both
-  =PYTHONPATH=<clone>= and =LSMS_COUNTRIES_ROOT=<clone>/lsms_library/countries=,
-  and assert =/local/job*/ in lsms_library.__file__=.
-- =2005-06/_/categorical_mapping.org= has *mixed CRLF/LF* line endings.  A
-  naive read/write normalises the whole file and buries the real edit in a
-  372-line diff.  Preserve per-line terminators.
-- Org tables *right-align numeric columns*.  Regenerating a wave table with a
-  left-justifying writer rewrites every row.  Edit the changed LINES in place.
-- =groupby().agg('sum')= returns *0.0 for an all-NA group*.  Use
-  =min_count=1=, or phantom rows sail past a later =dropna(how='all')=
-  (+32,040 of them here).
-- Do not compute an "expected" row count from an assumed baseline.  Rebuild
-  the true prior state and measure; that is what finally resolved a +637 that
-  three rounds of reasoning had not.
-- The shared mirror's =.venv= symlink points at whichever job last ran
-  =bin/savio_venv.sh mount=.  Two agents on different nodes will ping-pong it.
-  A clone's own =.venv= should point straight at its mount.
-
-* Mirror cleanup and the #930 rebase (2026-09-15 afternoon, job 38854624)
-
-Supersedes the next-action suggestions below.  Worked *directly in the shared
-mirror* (=~/mirrors/LSMS_Library=, which resolves to
-=/global/scratch/fsa/fc_jevons/ligon/mirrors/LSMS_Library=) on =development=,
-at @ligon's direction -- not in a node-local clone.  Note that the WIP-snapshot
-safety net watches the clone, not the mirror, so work here is durable only once
-committed.
-
-** Two corrections to the 08:49 section below, which is left verbatim
-
-1. *=development= was never red.*  That section says "development red until
-   #930"; #930's own commit message said the Ethiopia tests "have been failing
-   on development since #898".  Both were measured against the shared mirror's
-   =development=, which was *15 commits behind GitHub*.  #919 (=7bb2d9955=,
-   merged 2026-09-14) had already fixed the same root cause by the opposite
-   route: it REMOVED the =quintal=100= seed from =KNOWN_METRIC= instead of
-   working around it.  Verified against GitHub's =development= (=6666e0fea=):
-   both named tests PASS, and 93 passed across the three files #930 touches.
-   =git merge-base --is-ancestor 7bb2d9955 3d5915cb8= is *false* -- that is the
-   one-line proof #930 was built without #919.
-2. *#930's head had already moved* past the =3d5915cb8= recorded below
-   (=8d9df49d7=, 12:54 that day), and has since been rebased to =ffcae2797=.
-
-*The general lesson, which cost this session an hour to unpick*: a claim about
-=development= measured in the mirror is not a claim about =development=.  Check
-=git rev-list --left-right --count development...origin/development= after a
-=fetch= before believing one.
-
-** What landed
-
-- *Mirror =development= fast-forwarded* =7b7d330fd= -> =6666e0fea=, clean
-  (0 divergent).  It had been 15 behind; its =origin/development= tracking ref
-  was staler still (=3b6a0fda9=), which is why it read "ahead 25".
-- *PR #930 rebased* onto =6666e0fea= and force-pushed (=--force-with-lease=
-  pinned to =8d9df49d7=) -> =ffcae2797=.  Now MERGEABLE.  Retitled and its body
-  rewritten; the old title claimed it restored an external check that #919 had
-  already restored.  *Layer split only*: the =test_quintal_...= re-expression
-  and the pinned-totals swap were DROPPED, because taking them would have
-  downgraded the check #919 repaired.
-- *Filed [[https://github.com/ligon/LSMS_Library/issues/931][#931]]* -- =harvest_kg_factors= never receives #919's =unit_kg=, so the
-  crop ladder is blind to declared =u_kg= rows.  That blindness is LOAD-BEARING
-  (it is what keeps Ethiopia's external check non-tautological) and is
-  undocumented; fixing it silently would re-break the check.
-- *Filed [[https://github.com/ligon/LSMS_Library/issues/932][#932]]* -- 247 =requires_s3= tests of 6,482 skip on every PR and on
-  =development=, so a red suite reports green.  This is thread 1 of the 08:49
-  section, now filed.  It is *why* the stale-base claim above travelled through
-  a commit message, a PR body and a handoff note unchallenged.  Confirmed live:
-  #930's own check run shows =data-tests: skipping=.
-- *Mirror worktree/branch cleanup*: 95 worktrees -> 8, 132 branches -> 39.
-
-** Measured, so it need not be re-derived
-
-#930 re-measured on the correct base (=measure_930.py= in the record dir):
-
-| quantity | value |
-|----------+-------|
-| =kg_per_unit= differing, either split | *0 of 85,519*, NaN pattern identical |
-| =Harvest_kg= total | 12,680,617.283538, identical both trees |
-| before | =inferred= 26,548 -> =metric= 26,548; =none= 58,971 unchanged |
-| after | =inferred= 7,768 -> =metric= 7,768; =none= 15,587 unchanged |
-| ratio =at/bt= | 6.654, so the original =assert > 6 *= holds |
-| verification | 148 passed, 0 failed, across six test files |
-
-=inferred= is *0 in both splits* -- the price-ratio inference serves Ethiopia
-not one crop row.  That corpus fact survives #919 and is now pinned.
-
-Every number in #930's ORIGINAL message (=at.sum()= 12,691,567, =bt.sum()=
-8,799,669, ratio 1.44) was an artifact of the missing base.  Do not quote them.
-
-** Mirror hygiene
-
-- Kept deliberately: =master=, =development=, the 4 open-PR branches, 15
-  mirror-only unmerged branches (incl. 8 =fix/prices-*=), 4 where the mirror is
-  AHEAD of GitHub (=chore/feature-vocabulary-nutrition-nonfood= by 25 commits),
-  and 7 worktrees with uncommitted tracked edits plus the 7 branches they pin.
-- *Those 7 dirty worktrees are the remaining tidy-up*: resolve the edits, then
-  their branches are deletable.  =wt-801-mojibake= has 13 modified files.
-- 9 untracked =slurm_logs/= files were tarballed before their worktrees were
-  removed (4 Lorenz PNGs, =REVIEW_784.org=, 3 GLSS probe logs).
-- 50 untracked files remain under =slurm_logs/= in the mirror's own tree --
-  briefs, matrix runs, 6 =HANDOFF_*.org=.  Either commit or clear them; today
-  they are neither.
-
-** Record
-
-Everything above is reproducible from
-=/global/scratch/fsa/fc_jevons/ligon/tmp/wt-cleanup-2026-09-15/= (durable
-scratch, NOT node-local): =CLEANUP_RECORD.org=,
-=FINDING_930_superseded.org=, =measure_930.py= with its JSON/npy outputs, and
-the removal/deletion logs.
-
-** Next concrete action
-
-Merge #930 once CI is green (=unit-tests= was in flight at handoff).  Then
-either #932 (the CI gap -- it is the one that lets this class of error repeat)
-or #928's P1/P2, which still needs its cache-invalidation measurement first.
-
-#+title: Handoff -- 2026-09-15 (Sue / Claude Opus 5), Savio job 38854624
-
-* Categorical-mapping session (2026-09-14/15, job 38854624)
-
-Supersedes the next-action suggestions below.  Working clone
-=/local/job38854624/mirrors/LSMS_Library=; =origin= is the shared mirror.
-Nothing was merged.  Two PRs are open for human review.
-
-** Open for merge
-
-| PR | issue | branch | head | re-warm cost |
-|----+-------+--------+------+--------------|
-| [[https://github.com/ligon/LSMS_Library/pull/927][#927]] | #925 | =fix/relabel-j-empty-string= | =156279ef8= | *GhanaLSS, 17 of 119 table hashes* |
-| [[https://github.com/ligon/LSMS_Library/pull/930][#930]] | #929 | =fix/838-ethiopia-pinned-numbers= | =3d5915cb8= | none (0 of 119) |
-
-*#930 un-reds =development=.*  Two assertions in
-=tests/test_ethiopia_shipped_factors.py= have been failing since #898 merged.
-
-** Issues filed
-
-- #925 :: =labels=<col>= renamed an unlabelled food to the empty string and
-  =reaggregate=True= summed 129 served foods into one unnamed =j= bucket
-  (GhanaLSS =1987-88=, 55,314 rows, Expenditure conserved).  Fixed by #927.
-- #926 :: GhanaLSS =nonfood_expenditures= serves 25,585 rows with cp1252 C1
-  controls in =j=.  The bad code points are committed in curated config
-  (=ebd38d393=), so the #805 reader fix will NOT clear them.  *Unfixed.*
-- #928 :: proposal, *awaiting review* -- name the categorical key column
-  (=#+key:= / =idxvars=) and the ignorance vocabulary (=Status= / =Notes=,
-  =FIXME= / =UNDECODABLE=).  Refers to #813.  Survey committed at
-  =slurm_logs/categorical_key_vocabulary/= (config-only, seconds to run).
-- #929 :: crop kg ladder had no =metric= layer.  Fixed by #930.
-
-** What #930 actually fixes, because the framing matters
-
-#838 is CORRECT (a quintal is the metric centner; 13,978 Ethiopian rows that
-converted to nothing now convert).  What it also did was turn the WB shipped
-table's only EXTERNAL check into a tautology -- the same failure the test's own
-docstring disowns for =Kg=/=Gram=.  Re-baselining =13,924 -> 0= would have
-passed CI and retired the check silently.  Instead the crop ladder gained the
-=metric= layer the food ladder has had since #850.  Relabelling only: 0 of
-85,519 =kg_per_unit= values differ, Harvest_kg totals identical, 0 cache
-hashes moved.
-
-Fell out of it: *=inferred= is now 0 for BOTH Ethiopia and Uganda* -- the
-crop-side price-ratio inference serves neither country a single row.
-
-** Open threads, in the order I would take them
-
-1. *CI gating -- not filed, and it is why development can sit red.*  The
-   credentialed =data-tests= job runs only on pushes to =master= /
-   =separate_data=, so all *247 =requires_s3= tests of 6,482* skip on every PR
-   and on =development=.  #930 fixes the current redness; the gap remains.
-   Options discussed, none chosen: run data-tests on PRs to development; run
-   only the pinned-number subset; a scheduled nightly; or decide it is
-   deliberate.
-2. *#928 review.*  P1/P2 (=#+key:=, consolidating the four positional
-   key-column sites) are library-side and free -- but MEASURE first:
-   =all_dfs_from_orgfile= is reached from the =@build_transform=-tagged
-   =df_data_grabber=, so it may invalidate corpus-wide.  P3/P4 are per-country
-   and must be batched (any =categorical_mapping.org= edit costs that country
-   a re-warm).
-3. *Malawi's four kilograms* (#832).  Malawi serves =Kg= / =kg= / =Kilogram= /
-   =Kilogramme= over 146,284 rows while Uganda, Nigeria, Niger, Benin and Togo
-   serve one.  =categorical_mapping/u.org= holds the unifying rows and cannot
-   reach Malawi: =_row_union_categorical= falls back silently when key columns
-   disagree (=u= aligns for 9 countries, falls back for 4).
-4. *"Site M"* -- discussed, not decided.  #693, #694, #674, #925 and the merge
-   fallback are one failure class: the loader returns something that LOOKS
-   like a valid answer.  Every other layer in this library has a named audit
-   site; the categorical-mapping layer has none.  The open question is the
-   TRIGGER, not the site -- per the null-read guard's own history, a per-column
-   form fired 887 times and the frame-fraction form 0.
-5. *#926* -- the C1 controls need a config repair, independent of #805.
-
-** Measured facts worth not re-deriving
-
-- =---= parses to NaN, a blank cell to the empty string.  So *NaN means
-  somebody wrote the sentinel; empty string means somebody left it blank.*
-- =Country.data_scheme= is a LIST of table names, not a dict; and
-  =data_scheme.yml= nests tables under =Data Scheme:= behind =!make= tags.
-  Both produced confident wrong answers during this session.
-- =Country._table_cache_hash= takes =(table, waves)=.  Calling it with one
-  argument and catching the TypeError compares error strings, not hashes --
-  that is how "0 of 12 moved" got into a commit message wrongly.
-- =CONTENTS.org= is the one =.org= the cache hasher skips
-  (=_ORG_HASH_SKIP=), so prose there is free.
-- Panama's quintal: =units.json= says 220.462 lb = 100.000 kg; =units.py=
-  overrides to 100 lb and wins.  @ligon adjudicated 2026-09-15 that the
-  override is right and the source compiler mistook a Spanish measure for a
-  universal one.  Recorded in =Panama/_/CONTENTS.org=.
-
-** Session hygiene note
-
-Three separate measurements in this session were wrong on first run (a broken
-cache probe, a cross-branch hash comparison, and two bad =data_scheme= reads).
-Each was caught before or shortly after reporting, and =45fb9fa8c= exists
-solely to correct five numbers and one mechanism an independent red-team found
-in my own earlier commits.  Treat any figure here without a committed
-reproducer as needing one.
-
-* Next concrete action
-
-Merge #930 to un-red =development=, then decide #928's P1/P2 or file the CI
-gating gap.
-
-#+title: Handoff -- 2026-09-12 (Sue / Claude Fable 5.1), Savio job 38714904
-
-* GhanaLSS backlog session (2026-09-12, Sue / GPT-6, job 38734650)
-
-This section supersedes the older next-action suggestions below. The working
-clone is =/local/job38734650/mirrors/LSMS_Library=, branch =development=;
-=origin= is the durable shared mirror. No PR was auto-merged.
-
-** Changes prepared for human merge
-
-| issue | PR | branch | code commit | result |
-|-------+----+--------+-------------+--------|
-| #753 | [[https://github.com/ligon/LSMS_Library/pull/886][#886]] | fix/753-ghanalss-config-root | 19b94acca | Four early-wave label maps honor countries_root |
-| #826 | [[https://github.com/ligon/LSMS_Library/pull/887][#887]] | docs/826-ghanalss-price-quantity | 4bb08cf6c | Qualify reported QTY; preserve raw fields |
-| #757 | [[https://github.com/ligon/LSMS_Library/pull/888][#888]] | fix/757-country-wave-inputs | 27ab8b285 | Inherited country/global Org edits invalidate wave caches |
-| #780 | [[https://github.com/ligon/LSMS_Library/pull/889][#889]] | fix/780-ghanalss-fingerprint | ee8a63e05 | Fingerprint compiled patterns; warn on degraded fingerprints |
-
-All branch commits were published to origin by the post-commit hook and
-pushed to GitHub. Each fix has isolated worktree verification and independent
-review. Per-task ledgers for #757/#780 were committed separately.
-
-The user explicitly chose documentation-only handling for #826. The 5,351
-screened-out GLSS7 observations are not all confirmed gram entries. Millet
-quantity is 4000 at cluster 70735 and 4100 at 70789/70791; the raw-cache
-=Kilogram= label must count as the API's =Kg= when reproducing the screen.
-No automatic unit correction, filtering, or imputation was introduced.
-
-** Verification and cache implications
-
-- #753: eight new sentinel cases fail on original code; override suite 12
-  passed plus one existing rural regression. Scoped Feature audit retained
-  identical roster/sample/cluster cached DataFrames and substantive findings.
-- #757: 22 tests passed in worker and independent review. Restoring the old
-  hash method makes the synthetic Old -> mapping edit -> stale -> New cache
-  regression fail. Country-only edits remain country-scoped; global edits
-  invalidate broadly. Initial sampled hashes changed 46/46 by design.
-- #780: 35 tests passed, including all country import closures and Ghana
-  cross-process determinism. Standalone pattern coverage also picks up the
-  shared DCT parser's previously omitted pattern: all five control hashes
-  change; removing only standalone recognition restores their old hashes.
-  Normal warnings retain best-effort loading. Under caller-selected
-  warnings-as-errors the wave warning raises and the country outer catch
-  returns None; this is explicitly tested.
-- Combined targeted suite: 69 passed, 16 existing warnings, using
-  =-n 32 --dist=loadfile=, =LSMS_BUILD_WORKERS=1= and =--no-purge=.
-- Both cache fixes deliberately cause initial broad invalidation. No shared
-  cache was purged; data verification uses private L2 copies and shared L1.
-  Even #826 documentation edits can move Ghana hashes because source files
-  and data_scheme.yml are hashed whole.
-- Combined GhanaLSS/Albania Feature audit: all eight default API frames
-  identical before/after under symmetric parquet roundtrip, including values,
-  labels, indexes and dtypes. All 34 baseline substantive findings remain.
-  Ten additional rebuild warnings concern Albania's Makefile, absent in both
-  checkouts; no new schema/assembly/data findings. Source stderr about 711
-  null-PSU person rows and 83 sentinel-coded households matches Albania's
-  CONTENTS.org. Existing unclosed-file ResourceWarnings decreased 522 -> 48.
-  GitHub CI was still pending at handoff.
-
-Reproduce targeted tests with the checkout as cwd, =PYTHONPATH= pointing to
-it, and the main clone's =.venv/bin/python -m pytest= on
-=tests/test_countries_root_override.py=,
-=tests/test_cache_hash_invalidation.py=, and
-=tests/test_build_transform_hash.py=. Feature audit scope:
-=--features household_roster sample cluster_features individual_education
---countries GhanaLSS Albania --phases 1=. GitNexus tools were unavailable;
-review used ripgrep call-site analysis, diffs, and executable regressions.
-
-** Reconciliation and remaining decisions
-
-- Closed #563: nutrition already implemented in PR #769; 10 current tests pass.
-- Closed #770: currency-as-mass defect already fixed in PR #784; 16 current
-  non-slow regression tests pass.
-- #797 Ghana relationship harmonization already implemented; global kinship
-  variant cleanup remains human-owned. #873 derivation attrs also already
-  fixed, despite the older handoff suggestion below.
-- #783 vocabulary migration landed in #789, but Ghana's Aggregate column
-  remains intentionally absent pending the documented CFE curation decision.
-- #832 Ghana unit spellings already fixed; other countries remain in scope.
-- #709 pandas >=3.0 floor already landed; ancillary requests remain.
-- #562 phase 3a community prices exists for six waves. Phase 3b inverse
-  imputation remains a design task; GLSS5 prices are asked-not-distributed.
-- #826 remains open for consumer quantity-basis handling. Visit-date wiring,
-  recall normalization (#851), and broad cache issues #778/#809 remain separate.
-
-Next action: review/merge the four PRs after CI, then choose the next Ghana
-data-design task. Keep the source-field preservation decision above intact.
-The node has 32 CPUs / 93 GiB RAM; FCA usage at setup was 42,593.38 of
-1,500,000 SUs. The prepared venv image is mounted node-locally; the empty
-bootstrap venv was preserved as =.venv.bootstrap=. Release the billed node
-with =sucoder release= when finished.
-
-* State (2026-09-12, evening)
-- *v0.12.0 RELEASED* (2026-09-12): PR #885 merged into master with a merge
-  commit (2cbcbb046), tag =v0.12.0= on it (GitHub + mirror), GitHub
-  release created from =docs/releases/v0.12.0.md=, #871-#878 auto-closed,
-  =development= fast-forwarded to the same commit on both remotes.
-  Verify PyPI shows 0.12.0 (=gh run list --workflow=publish.yml=); if the
-  release event did not fire, =gh workflow run publish.yml --ref master
-  -f tag=v0.12.0= (release skill).
-- Merged today, each reviewed by a separate Opus agent: #878, #875, #877,
-  #872, #873, #874, #876, #871 (most-complete observed row at all three
-  collapses; reverses the 2026-07-13 completion doctrine), plus the
-  derivations user guide + CLAUDE.md section, the #871 census
-  (=bench/grain_census_871.py=), and the release notes.
-- Filed, open: #879-#884.  Follow-ups from #871: #866 (rule-less var/
-  targets do not rebuild on a hash move) was worked around by evicting
-  the 18 affected parquets and rebuilding; the fix is still open.
-- Caches: the WHOLE corpus was re-warmed after #871 (both tiers, from
-  L1), 36 countries + the two space-named ones + the 18 #866 tables; 0
-  build errors except Peru's known-absent cells.  Logs:
-  =/local/job38714904/tmp/claude-43292/rewarm_all/= (node-local; gone
-  with the job).
-- Tests: full non-slow suite green at 86fd0af44 (5,871 passed) before
-  #871; the post-#871 run on 0f4eff9a7 was in flight at handoff time --
-  see the PR's status.  Recipe: CLAUDE.md addendum 3b.
-- Coverage regrade done per country on the warm corpus (3304cf289): no
-  tier moved.  Quirk: a single-country =make matrix= run does not apply
-  the curated =blocked= verdicts (Nepal graded 'broken'); rows restored.
-
-* Open questions for @ligon
-- All merged refs deleted (mirror and local).  #879-#884 filed for the
-  remaining findings; #871 parked.
-- Coverage regrade is due for: Uganda crop_production (all 7 waves),
-  Ethiopia food_acquired (all 5), the 12 EHCVM food_acquired cells,
-  Niger people_last7days (both waves), Ethiopia shocks.  =make matrix=
-  was not run today.
-- Design follow-ons recorded in =SkunkWorks/derived_values.org=:
-  =Feature()= re-attach of =attrs['derivations']= (with #873), derived
-  table attrs, retrofit of the census sites, NSO request for GLSS
-  visit dates (=slurm_logs/2026-09-11_ghanalss_visit_dates/FINDINGS.org=).
-- ~350 in-tree workspace copies of DVC-tracked files in the main
-  clone (not the worktrees) -- the library warns; cleanup command in
-  =CLAUDE.md= ("A *.parquet inside countries_root() is never read");
-  not run.
-
-* Next concrete action
-Wire the per-visit dates that 5 of 7 GLSS waves ship into
-=interview_date= (=melt_visit_intervals=), per FINDINGS.org; or the
-=Feature()= re-attach for #873.
+#+title: Handoff -- 2026-10-14 release landing IN PROGRESS
+
+* Current execution -- 2026-10-15 final implementation validation
+The maintainer approved #967: "Okay, thumbs up on #967" after reviewing the
+before/after nutrition accounting and inherited assumptions. Its approved
+fixture change is merged. All 53 baseline entries match; 127 focused tests
+passed with no skips. No estimator or FCT numeric change accompanied approval.
+Historical holds below are superseded for this reviewed patch only.
+
+All 23 implementation PRs are merged. Main, GitHub and filesystem origin
+development agree at =3914d8804d7b2936d75041cea98bbc9ddb6d4c9f= after PR #1014.
+Its full tree equals independently reviewed assets head =515864c99=; integration
+also matches. Evidence PRs #997/#998/#1007/#1012/#1013 are merged. Release PR
+#999 remains draft; no release tag or publication yet. Shared L2 promotion is
+complete and verified as recorded below.
+
+Assets repair: actual country Makefile output changes 790,688 malformed rows
+to 116,808 Value rows on (t,i,j), retaining id_walk. Five new regressions fail
+on the old script; 31 focused tests pass on the final head. Exact frame comparisons (check_exact=True) preserve all eight wave frames,
+canonical raw values and served API values; the raw/API comparisons also check
+attrs. The 4,237 existing post-label API duplicate keys remain unchanged. Independent review approved code and aggregate evidence. PR unit and
+Windows checks passed. Broader builder authority/detection remains #788.
+
+Earlier corrected CI =38697245468= at =9d5bf200f= is COMPLETE: 4,919 passed,
+3 failed, 2,768 skipped, 4 xfailed, 1 xpassed in 3,140.09 seconds. Failures:
+Uganda/assets twice plus the now-approved nutrition fixture. All 163 EHCVM
+module outcomes passed; #941's old root cause remains unresolved. The old
+unpinned =38687547945= ended in runner communication loss without a captured
+pytest summary. Never infer totals or a specific resource/network cause.
+
+Final manual CI =38746123119= PASSED on =3914d8804=: credentialed data has
+4,927 passed, 2,768 skipped, four expected failures and one existing non-strict
+unexpected pass, with no failures, in 3,204.33 seconds.
+Unit: 3,293 passed/4,407 skipped. Windows smoke: 327 passed/1 skipped. Native
+installed Windows shocks/assets builds passed with expected digests and all
+eight waves (14,457/116,808 rows). All enabled jobs completed successfully.
+Final hash preflight changed only Uganda: 28 country hashes and 149 observed
+cached wave hashes. All 549 ordinary calls completed: 530 successes and the
+same 19 source/wiring errors. All 28 Uganda outputs match the cold corpus.
+The final focused selection passed 158 tests, with zero failures/skips.
+Original cold corpus =runtime/data-corpus= remains preserved. Its physical
+copy =runtime/data-final-promotion= started with 1,519 equal-hash, distinct-inode
+parquets. Targeted tests used a further independent copy. Shared L2 now holds
+the reviewed 1,518-file promotion; both private evidence roots remain unchanged.
+
+Four cold/warm exceptions are independently attributed, not normalized away.
+#798 remains OPEN and its October 14 cold-only narrowing has been corrected:
+Mali warm interview_date loses 12,745 valid EHCVM dates (24,939 -> 12,194);
+Tanzania loses 5,893 later-wave dates (22,427 -> 16,534), separate from six
+original nulls. Whole-column coercion of mixed timestamp strings exactly
+reproduces both losses; relevant source is unchanged since v0.14.0. Complete
+raw caches remain preserved. Ten ordinary single-wave calls on a new physical
+copy recover exact cold values/index/order/dtypes, using preload_panel_ids=False.
+Liberia interview_date has seconds->milliseconds dtype with identical dates;
+Mali MonthsSpent numeric scalars become strings with exact numeric values,
+missingness and keys. Its inherited binary-to-12/0 proxy contradiction remains
+explicit and scientifically unapproved by this investigation. No blanket
+cold/warm parity or new production fix is claimed.
+
+Final trailing reads made fct/earnings fresh but exposed the reciprocal
+nutrition sibling write: final metadata is 423 fresh country files plus one
+hashless nutrition file. Its approved values remain unchanged. All 1,519 raw
+frame fingerprints match the cold corpus. #788 remains OPEN with this exact
+cycle documented. The reviewed manifest admits 1,518 files and excludes only
+Uganda/var/nutrition.parquet, with backup-then-retirement if present in shared
+L2. It is absent in the new shared snapshot, so no old nutrition file needs
+retiring. Neither manual stamping nor mixed-time snapshot assembly was used.
+
+Promotion requires a reviewed file manifest, fresh shared snapshot, staged
+physical copies, per-file backups and atomic replacements with rollback journal.
+Preserve shared L1 in place; never swap the whole root or copy the L1 symlink.
+The tool passed synthetic concurrency/interruption/rollback checks. Root reviewed
+manifest SHA =e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d=;
+only its review-status field differs from candidate SHA =b60bc490...8000774=.
+Physical staging completed in
+=/global/scratch/fsa/fc_jevons/ligon/cache/.lsms-promotion-3914d8804-20261015T1441Z=.
+The shared inventory stayed unchanged before/during staging. Apply completed
+after final credentialed CI passed; a second read-only verification passed.
+Created 153 paths, replaced 1,215 with verified backups, retained 150 identical
+files, deleted none. Tool verification's retired=1 counts the planned nutrition
+path, whose journal disposition is already_absent. L1 stayed in place. Original
+and final private SHA/size/mtime/device/inode identities still match. Backups
+and rollback journal remain in the transaction. No global lock is claimed.
+
+Next: land final release notes/evidence; merge #999 development->master with
+MERGE COMMIT; actual
+make release v=0.15.0; explicit GitHub tag/release; verify publishing, PyPI and
+installed artifact. General release authorization persists; do not ask again.
+
+* Prior execution checkpoint (historical; superseded where noted above)
+** Archived execution -- before #967 approval
+The maintainer approved WORKPLAN.org and said to proceed. Twenty-one implementation
+PRs are merged to development, plus evidence PRs #997/#998/#1007/#1012. GitHub, local main
+and filesystem origin development were synchronized at =729ff5123= after PR #1012
+passed unit and Windows checks. Corpus/coverage and Feature audit evidence
+are merged; this checkpoint adds only status corrections.
+#967 Uganda remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
+newly reproduced #1003 merged via PR1004 after independent review and CI.
+PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
+with no change to test selection or assertions. No release tag or publication yet;
+shared L2 is untouched.
+
+** Remaining decision, already asked
+Uganda CONTENTS explicitly says not to regenerate nutrition baseline until its
+direction is signed off. Exact historical replay and independent #967 accounting
+are complete; the proposed two-field shape/hash patch remains UNAPPLIED.
+The maintainer has been asked whether to accept the documented estimator and
+nominal-volume limitations for this release or hold for source review. A first
+report omitted the FCT row's specific yellow-variety study note; corrected full
+provenance supports the nonzero225 density as a specific override of the generic
+USDA starting note. No numeric correction is proposed from that ambiguity. Silence is
+not approval. See release_landing_2026-10-14/uganda-nutrition-history.org and
+uganda967.org on the integration branch / PR967. The -18.7% historical Energy
+change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
+
+** Validation and next work
+- Integration branch landing/release-v0.15.0 under release-work/integration
+  contains #967 plus all landed code and evidence. Runtime differences from
+  development are only the reviewed #967 country changes.
+- Native installed Windows conda job116251866840 passed on74c9398ec,
+  run38683117467. Its Linux data job and earlier38681185279 were cancelled
+  after the #1010 leak was reproduced; partial logs are preserved, no suite
+  totals inferred. Native Windows success remains a separate completed job.
+  Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
+  manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
+  matches the earlier candidate; only tests/CONTENTS/evidence differ.
+  Its unit result is3276passed4407skipped and Windows smoke327passed1skipped.
+  Controlled-profile candidatecf1840e02 is pushed as
+  release/v0.15.0-controlled-validation; manualCI38688613005 has the same
+  unit/Windows counts. Its credentialed job failed at 06:50:35 UTC on the
+  600-second timeout in GhanaLSS unitprice validation, while waiting for a
+  wave-build subprocess; no suite summary was produced. This is under
+  investigation, not a nutrition failure or established #941 recurrence.
+  Run38687547945 remains as an unpinned comparison. Corrected candidate
+  9d5bf200f was dispatched as run38697245468 after the exact ordered helper
+  plus Ghana test selection passed19tests in112.26s, with zero Ghana builds.
+  Test-only fix PR1011 merged as36a923305; it excludes held967. Current
+  integration =ea688bf51= includes merged evidence PR #1012. Production code, tests,
+  dependencies, build configuration and Feature harness match candidate =9d5bf200f=;
+  its full tree differs in documentation/evidence. Earlier integration =bf917d438=
+  had an identical full tree to =9d5bf200f=. The diagnosed flag leak is #1010, distinct
+  from #1003 and not a proved #941 cause.
+- #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
+- Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
+  Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
+  final6c4c2fc13 passed both PR checks and focused credentialed/no-credential runs.
+- Runtime corpus is COMPLETE at frozen7fa05179:549unique declared requests
+  across38countries,530success,19documentederrors,0empty in4527.97s. Gaps:
+  Armenia2(no source),Nepal11(no acquired source),Peru6(unwired). Original
+  release-work/runtime/data-corpus is quiescent and preserved. Final country
+  caches:422fresh plus Uganda earnings/fct hashless after sibling script
+  rewrites (#788/#809); no restamping to hide this. Feature phases1/2 are
+  COMPLETE over39features/549pairs/38baseline/17variant calls, with0scope
+  skips. Its3544emitted diagnostics are3504WARN,19known-sourceERROR,5existing
+  tenureFAIL,16PASS; these are not pytest totals or a clean semantic result.
+  Independent review and aggregate-only evidence are in feature-audit/ and
+  feature-audit-review/. Original1519files remain byte/metadata-identical.
+  Shared L2 is untouched. Partial June audits are not matched baselines;
+  feature-prior-comparison/ records26matching patterns,233unmatched patterns
+  (not233new defects), and reviewed source/value attribution. No unexplained
+  release-specific warning category identified; scientific triage remains.
+  Feature food assembly exposes a material pre-existing GhanaLSS null-key loss:
+  13472rows, independently replayed separately from visit aggregation. Full
+  Feature implementation and relevant selectors matchv0.14/pre-train/candidate;
+  exact historical input counts were not rebuilt. See ghana-feature-review/.
+  This measured country residual is now tracked by #1008; historical #323/#847
+  are closed reporting/mechanism references, not a fix for these rows.
+  Region-market variants also exclude GhanaSPS/Panama for a pre-existing
+  missing geography dependency; cluster IDs are present. Independently
+  reviewed CONTENTS notes retain the survey-domain caveats. GhanaSPS stays
+  under #140; the Panama residual is filed as #1009.
+- Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
+  4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
+  No credential skips; the 2,580 cache-presence skips were subsequently
+  checked against the completed corpus, with results below. Fifteen independent replication-dir tests lack the
+  external project; never point them at the same cache under test. Fourxfails
+  are source weight gaps; existing Pakistan#740 is the non-strict xpass.
+- Final-source cache-gap worktree is release-work/cache-coverage, branch
+  landing/cache-coverage, frozen4f1f044bb. The quiescent corpus was physically
+  copied to release-work/cache-coverage-data:1519files,340885785bytes, all
+  file hashes identical and all regular-file inodes distinct; only L1 symlink
+  shared. Source/config/cache identity assertions passed. Prepared driver is
+  control/full-suite/run_cache_coverage.py; session41298 completed. Results:
+  structural2352passed150skipped5knownxfails; ordinary15passed18skipped;
+  Uganda baseline30passed1knownnutritionfailure; mutating19passed0skipped.
+  All2580original gap nodes verified present in2590follow-up executions;
+  ten additional helper/identity cases, no missing selection. Of the original
+  skips2406nowpass;168remaining skips are classified in cache-coverage.org.
+  The full follow-up is2416passed168skipped5knownxfails1failure, not green.
+  Newly exposed legacy derived-table test coverage debt is filed as #1006;
+  concrete scope and independent review are in corpus-review/.
+  Keep structural/ordinary reads separate from the10cache-poisoning cases;
+  Uganda nutrition's known unapproved fixture remains a real held comparison.
+  Preserve L1; no writable L2 symlinks or source edits during active tests.
+- Release notes/issue reconciliation are independently reviewed and published
+  via998. Eighteen partial issue bodies/titles narrowed, all left OPEN; residuals
+  #1000FCT-note, #1001credential-copy, #1002binary-fallback, #1003test-root filed.
+  issue-reconciliation-applied.json records mutations. PR999 holds closures.
+- #1003 disposable probes confirm the absent-parquet helper can delete from a
+  previously cached root and leave its private root cached after teardown.
+  The JSON helper early-returns and does not poison the cache. Fixture-only repair
+  is merged via1004; no attribution to #941 is established.
+- Once science and validation gates pass: land967, verify combined development,
+  warm/promote verified shared caches once, release PR development->master with
+  MERGE COMMIT, make release v=0.15.0, explicit GitHub tag push/release, observe
+  publish workflow/PyPI and test the published installation.
+
+** Operational facts
+Main repo /local/job39919092/mirrors/LSMS_Library; venv /local/job39919092/venv_img.
+GitHub is explicit https://github.com/ligon/LSMS_Library.git; origin is filesystem.
+Use core.hooksPath=/dev/null for commits/merges: local post-commit auto-pushes.
+Each worktree uses cwd+PYTHONPATH and LSMS_COUNTRIES_ROOT matching that tree.
+BLAS/OMP/MKL=1,LSMS_BUILD_WORKERS=1,pytest -n6 --dist=loadfile, logs to files.
+No rejected historical refs deleted. #600 was ported/reviewed/merged via992;
+#837 old reducers were measured and rejected (483cells would be blanked),
+with sources restored and documentation/evidence merged via997.
+Durable plan/evidence: slurm_logs/release_landing_2026-10-14/.
+
+* Previous handoff (historical, superseded by current execution)
+Historical title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
+
+* Update 19:10 PDT -- reviews complete, three PRs open
+- All 16 branches reviewed: 3 pass (970-json-make, ci-skips, burkina-2014), 12 pass-with-fixes, 1 FAIL (framework-small: 14 tests red via the #915 raise).  Summary + per-branch §6 items: =slurm_logs/backlog_review_2026-10-14/REVIEW_SUMMARY.org=; verdicts copied to =verdicts/=.
+- PRs open for the clean passes: #982 (#970, part of the re-warm bundle -- do NOT merge alone), #980 (ci-skips), #981 (burkina-2014).  #979 is a dead duplicate of #982 (scripting slip), closed.
+- Follow-up element =framework-small-2= DONE (job 39924156): suite 15 failed -> 0 failed (5595 passed), pushed =fix/framework-small-2= (22 commits incl. the base). Needs a re-review element before PR; report at /global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39924156/framework-small-2/REPORT.md.
+- Proposed next (needs @ligon's nod -- usage limit): two follow-up elements walking the 12 pass-with-fixes branches six each (mostly prose/test-wording; peru-panama has two newly red tests/test_sample.py cells; kinship-974 needs a development merge resolving tests/test_crop_kg_factor.py), then PRs; the re-warm bundle (810-followup, 868-followup, 970, readers-xport-sniff) merges in ONE window followed by a cold corpus re-warm.
+- Issue filed from a review: #978 (Nigeria W5 WB v02 geovariables); #841 narrowed to it.
+
+* State at pause
+Everything below runs headless and publishes to the mirror on its own; nothing needs this session alive except the ONE local agent (970-json-make, /local/job39919092/elements/970-json-make, pushes =fix/970-json-make= when done).  If the node is released before it finishes, re-run element 5 of =slurm_logs/backlog_fix_2026-10-14/run_local.sh= (or as a savio3 job via fix_array_savio3.sbatch) -- nothing else is lost.
+
+** Merged today (GitHub + mirror development agree at 17d9f16ae + later notes)
+PR #973 (CI: one run per PR, docs-only pushes skipped, merge_group, --no-root), #971 (#811 Region labels), #972 (#848 Uganda condition-2).  Auto-merge + ruleset "development: required checks" are on; merge queue is org-only (user-owned repo), see earlier handoff.
+
+** Branches pushed to the mirror, AWAITING review/PR (verdicts under /global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_review2_39922500/<key>/VERDICT.md)
+- Review array 39922500 (running at pause): fix/810-followup, fix/nigeria-824-followup, fix/868-followup, fix/niger-followup-2, fix/nigeria-w5-cluster, fix/kinship-974.
+- Pushed, NOT yet reviewed: fix/831-followup, fix/peru-panama, fix/labels-relabel-787, fix/ghana-docs-encoding, fix/grader-scale-830.
+- Still running at pause (fix array 2, job 39921399): readers-xport-sniff, framework-small, ci-skips, burkina-2014; local: 970-json-make.
+  Reports: /global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix2_39921399/<key>/REPORT.md and backlog_fix_local_39919092/<key>/REPORT.md.
+
+** Next concrete actions
+1. =python slurm_logs/backlog_review_2026-10-14/make_review_briefs.py <key>=<fix-brief> ...= for the unreviewed branches (fix briefs in backlog_fix_2026-10-14/briefs and backlog_fix2_2026-10-14/briefs), then =sbatch slurm_logs/backlog_review_2026-10-14/review_array.sbatch= with --array sized to elements.txt (delete elements.txt first or the generator appends).
+2. Read verdicts; apply pass-with-fixes items (another follow-up element each, same harness); open PRs.  BUNDLE the corpus-re-warm branches in ONE merge window: fix/810-followup, fix/868-followup, fix/970-json-make, fix/readers-xport-sniff (all touch get_dataframe / build path).  Then a cold re-warm of the shared cache.
+3. Narrow-or-split: done for all 27 partials (see SYNTHESIS.org §2 and the issue headers).  Decisions for @ligon: 12 issues retitled "DECISION: ...".
+4. Issues closed today: 948 936 813 945 832 802 783 772 750 858 811 848; filed: 974 975 976 977.
+
+** Harness notes
+- savio3 whole nodes (fix_array_savio3.sbatch pattern) are the right place for agents; savio3_htc contends for RAM/IO (@ligon).  Six local agents on one 40-core node also worked (run_local.sh, 6 cores each).
+- =git merge= does not trigger the sucoder post-commit publish hook: push by hand after a merge.
+- Default branch is master: "Closes #N" never fires on a development merge -- close issues by hand with the PR cited.
+
+-- Sue

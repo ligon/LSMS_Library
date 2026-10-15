@@ -57,6 +57,7 @@ from .currency import attach_currency, is_monetary_table
 # imports in this file are function-local for historical reasons; this one is
 # on the hot read path (_finalize_result), so it is hoisted.
 from .transformations import validate_acquisition_source
+from .build_transforms import build_context
 from .errors import LabelUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
@@ -75,6 +76,7 @@ import logging
 import os
 import warnings
 from pathlib import Path
+import shutil
 import subprocess
 import json
 from dataclasses import dataclass
@@ -146,9 +148,93 @@ def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
             parts.append(entry)
     env["PYTHONPATH"] = os.pathsep.join(parts)
 
+    # PYTHONSAFEPATH must NOT reach the child.  It removes the script's own
+    # directory from sys.path, and 338 wave/country scripts under countries/
+    # import a sibling module by bare name (``from ethiopia import Waves``,
+    # ``from malawi import ...``) -- that spelling resolves ONLY through the
+    # script-dir entry.  Measured: with it set, `Ethiopia/_/food_coping.py`
+    # dies with ``ModuleNotFoundError: No module named 'ethiopia'``.
+    #
+    # The controllers that spawn these children set it deliberately, because it
+    # is what makes PYTHONPATH authoritative for THEM (bin/coverage_lib.sh,
+    # bin/coverage_reseed_shard.sbatch).  Since this function copies os.environ,
+    # it inherited into every child.  Stripping it here is the narrow fix: the
+    # child's import identity is already pinned by _PACKAGE_PARENT leading
+    # PYTHONPATH above, so it needs no help from safe-path mode, while its
+    # sibling imports need the script dir that safe-path mode removes.
+    #
+    # This would have been SILENT: coverage_matrix.py grades any build
+    # exception as a 'broken' cell, so the job exits 0 and publishes a snapshot
+    # in which every script-path cell has flipped to broken.
+    env.pop("PYTHONSAFEPATH", None)
+
     env.setdefault("PYTHON", sys.executable)
     env["LSMS_DATA_DIR"] = str(data_root())
     return env
+
+
+_NO_MAKE_WARNED = False
+
+
+def _build_wave_script_target(make_dir: Path, wave_target: Path, *,
+                              force: bool = False) -> None:
+    """Build one wave's script-path parquet: ``make`` if installed, else the
+    wave script itself (GH #968).
+
+    ``make_dir`` is the country's ``_/`` (where the Makefile lives) and
+    ``wave_target`` the wave-relative target, ``<wave>/_/<table>.parquet``.
+    Raises ``subprocess.CalledProcessError`` when the build fails, as the
+    inline ``make`` call it replaces did.
+
+    **Without make.**  ``Wave.grab_data`` used to call ``make`` unguarded, so
+    on any machine without it every wave-script table raised
+    ``FileNotFoundError`` and the ``try_script`` fallback further down was
+    never reached.  The direct run is equivalent to the Makefile rule it
+    replaces, for every wave target in the corpus (measured 2026-09-29): all
+    87 wave-level rules in the 21 country Makefiles have the recipe
+    ``(cd $(@D) && python ./<table>.py)``, and none has a generated file as a
+    prerequisite -- only scripts and ``.org`` sources -- so there is nothing
+    ``make`` would build first.
+
+    **Why this is excluded from the build fingerprint**
+    (``_build_registry._EXCLUDED_CALLABLES``).  It decides only WHICH runner
+    executes the wave script; the bytes written are the script's.  The script
+    text, the country ``_/Makefile`` and the wave's other inputs are already
+    in ``Wave._input_hash``.  Keeping the invocation out of the fingerprint
+    means a later change to it -- a platform fix, a flag -- does not
+    cold-rebuild the corpus, as the #964 ``as_posix`` fix did when this code
+    still sat inline in ``grab_data``.
+    """
+    global _NO_MAKE_WARNED
+    env = _script_subprocess_env()
+    if shutil.which("make", path=env.get("PATH")):
+        cmd = ["make", "-s"]
+        if force:
+            cmd.append("-B")
+        jobs_flag = _make_jobs_flag()
+        if jobs_flag:
+            cmd.append(jobs_flag)
+        # as_posix: on Windows str() gives '..\\wave\\_\\t.parquet'; make
+        # matches the rule, but its recipe's `cd $(@D)` runs in sh, which
+        # reads the backslashes as escapes (GH #964).
+        cmd.append("../" + wave_target.as_posix())
+        subprocess.run(cmd, cwd=make_dir, check=True, env=env)
+        return
+
+    script = (make_dir.parent / wave_target).with_suffix(".py")
+    if not script.exists():
+        raise FileNotFoundError(
+            f"make is not installed and there is no wave script to run "
+            f"instead: {script}")
+    if not _NO_MAKE_WARNED:
+        _NO_MAKE_WARNED = True
+        warnings.warn(
+            "make is not on PATH: building script-path tables by running each "
+            "wave's script directly (equivalent for wave targets; GH #968). "
+            "Install GNU make (on Windows: environment-windows.yml) for "
+            "country-level targets.", RuntimeWarning, stacklevel=3)
+    subprocess.run([sys.executable, f"./{script.name}"], cwd=script.parent,
+                   check=True, env=env)
 
 
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
@@ -347,6 +433,26 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # (categorical_mapping/harmonize_education.org) is the shared base; per-country
 # tables add only their country-specific attainment labels (English grade
 # names, French/Portuguese levels, numeric grade codes) as overrides on top.
+#
+# CROSS-REFERENCE (GH #953).  This is the *read-time* half of categorical
+# inheritance.  The other half is the *build-time* cascade,
+# ``local_tools.get_categorical_mapping(fn, tablename, dirs)``, whose
+# docstring carries the canonical statement of the whole model.  The two run
+# at different times over different layouts and agree on direction (local
+# beats global) but not on granularity:
+#
+#   cascade  -- one ``categorical_mapping.org`` per LEVEL; first hit wins, so
+#               override is whole-table; fall-through is per table.  It cannot
+#               read a directory of per-table files, so the cross-country rung
+#               it names (``countries/_/``) is unreachable and absent.
+#   merge    -- one ``<table>.org`` per TABLE in
+#               ``lsms_library/categorical_mapping/``.  ``Country.
+#               categorical_mapping`` globs them ALL and merges the country
+#               file over them, whole-table by default; the names below are
+#               the exception, merged per ROW.
+#
+# So the allow-list does NOT decide whether a global table is inherited (every
+# ``#+name:`` table in that directory is); it decides only the merge rule.
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
@@ -376,6 +482,58 @@ def _row_union_categorical(global_t: "pd.DataFrame",
     combined = pd.concat([country_t, global_t], ignore_index=True, sort=False)
     combined = combined.drop_duplicates(subset=[ck], keep="first")
     return combined.reset_index(drop=True)
+
+
+def _strip_string_values(s: pd.Series) -> pd.Series:
+    """Strip whitespace from the STRING values of *s*; leave every other value
+    untouched (GH #694).
+
+    ``Series.str.strip()`` on an ``object`` column is not a no-op for the
+    non-string entries: the ``.str`` accessor returns NaN for any element that
+    is not a string, so a column that merely shares its name with a
+    categorical-mapping table -- a mixed object column such as ``Rural``
+    holding ``0``/``1`` beside labels, or an object-dtype ``Region`` code --
+    had every non-string value NULLED before ``.replace`` ever ran.  Whitespace-padded labels still need the strip so they match the
+    mapping's keys, so strip only where the value is a ``str``.
+
+    String and categorical dtypes already hold only strings (or NA); they keep
+    the vectorised path, exactly as before (``.str.strip()`` returns a string
+    Series for a string dtype and an object Series for a categorical).
+    """
+    if s.dtype == object:
+        return s.map(lambda v: v.strip() if isinstance(v, str) else v)
+    if hasattr(s, "str"):
+        return s.str.strip()
+    return s
+
+
+def _no_such_country_message(country_name: str) -> str:
+    """The ``ValueError`` text for a name with no directory under
+    ``countries_root()`` (GH #915).
+
+    Names the near misses from the REGISTERED list (``catalog._country_dirs``,
+    the same list ``lsms_library.countries()`` returns), matched
+    case-insensitively so ``'ghanalss'`` offers ``'GhanaLSS'`` and ``'Ghana'``
+    offers both ``'GhanaLSS'`` and ``'GhanaSPS'``.  Before this the constructor
+    only *warned* -- once per call site, under Python's default filter -- and
+    the failure surfaced later as a ``FileNotFoundError`` naming an install
+    path the user never chose.
+    """
+    import difflib
+    from .catalog import _country_dirs   # lazy: catalog imports from here
+    registered = list(_country_dirs())
+    by_lower = {}
+    for n in registered:
+        by_lower.setdefault(n.lower(), n)
+    close_lower = difflib.get_close_matches(country_name.lower(),
+                                            list(by_lower), n=3, cutoff=0.6)
+    close = [by_lower[c] for c in close_lower]
+    msg = f"No such country {country_name!r}."
+    if close:
+        msg += f" Did you mean {' or '.join(map(repr, close))}?"
+    msg += (f" {len(registered)} are available; "
+            f"see lsms_library.countries().")
+    return msg
 
 
 def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
@@ -481,7 +639,7 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
     for yaml_path in sorted(yaml_paths):
         if not yaml_path.is_file():
             continue
-        with open(yaml_path, "r") as f:
+        with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
 
         stages = data.get("stages", {})
@@ -714,7 +872,7 @@ def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, A
     if cached is not None:
         return cached
     try:
-        with open(path, "r") as fh:
+        with open(path, "r", encoding="utf-8") as fh:
             parsed = load_yaml(fh)
     except (OSError, yaml.YAMLError):
         parsed = {}
@@ -819,7 +977,7 @@ class Wave:
         if not info_path.exists():
             # warnings.warn(f"File not found: {info_path}")
             return {}
-        with open(info_path, 'r') as file:
+        with open(info_path, 'r', encoding="utf-8") as file:
             return load_yaml(file)
 
     @property
@@ -1182,7 +1340,7 @@ class Wave:
         """
         license_path = self.documentation_path / "LICENSE.org"
         if license_path.exists():
-            with open(license_path, 'r') as file:
+            with open(license_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"License file not found: {license_path}")
         return ""
@@ -1197,7 +1355,7 @@ class Wave:
         """
         source_path = self.documentation_path / "SOURCE.org"
         if source_path.exists():
-            with open(source_path, 'r') as file:
+            with open(source_path, 'r', encoding="utf-8") as file:
                 return file.read()
         warnings.warn(f"Data source not found: {source_path}")
         return ""
@@ -1372,6 +1530,10 @@ class Wave:
                         if (expected_wave_hash is not None
                                 and read_parquet_cache_hash(cache_path) is None):
                             stamp_parquet_hash(cache_path, expected_wave_hash)
+                        # GH #868: a report filed INSIDE this wave's build (a
+                        # df_edit hook's reduce_to_agreed) can only be replayed
+                        # from the stamp -- the hook did not run on this hit.
+                        _replay_wave_stamp(cache_path, self.country.name, request, self.year)
                         return df_cached
 
         def check_adding_t(df):
@@ -1433,7 +1595,10 @@ class Wave:
             df = pd.concat(dfs, axis=0, sort=False)
 
             if df_edit_function:
-                df = df_edit_function(df)
+                # GH #868: name the cell for a reducer the hook calls, so its
+                # grain report files under the key the cache writer stamps.
+                with build_context(self.country.name, request, self.year):
+                    df = df_edit_function(df)
 
             return df
 
@@ -1577,7 +1742,9 @@ class Wave:
                 if drop_cols:
                     df = df.drop(columns=[c for c in drop_cols if c in df.columns])
                 if df_edit_function:
-                    df = df_edit_function(df)
+                    # GH #868: see the same wrap in get_data above.
+                    with build_context(self.country.name, request, self.year):
+                        df = df_edit_function(df)
 
                 # GH #323/#515: did a swallowed KeyError cost a REQUIRED column?
                 # Judged HERE -- after the merge, after `derived:`, after
@@ -1675,28 +1842,12 @@ class Wave:
 
                 cwd_path = self.file_path.parent / "_"
                 relative_parquet_path = make_target_intree.relative_to(cwd_path.parent)
-                # GH #803 write side: the child must import THIS package, or
-                # to_parquet's redirect misses and the parquet lands in-tree.
-                env = _script_subprocess_env()
-                # Mirror ``run_make_target`` (country.py ~line 1856): include
-                # ``_make_jobs_flag()`` so this wave-level legacy fallback can
-                # exploit the cores it was given.  Without this, every
-                # script-path table without a YAML data_info entry built
-                # serially regardless of cpu_count() -- the source of the
-                # cold-build slowness observed when calling derived features
-                # (e.g. Uganda's food_expenditures, which routes here per
-                # wave for food_acquired).
-                make_cmd = ["make", "-s"]
-                if intree_artefact:
-                    # GH #803: Make stats the target by its in-tree name; an
-                    # artefact newer than the script makes it "up to date" and
-                    # nothing runs.  Force the recipe.
-                    make_cmd.append("-B")
-                jobs_flag = _make_jobs_flag()
-                if jobs_flag:
-                    make_cmd.append(jobs_flag)
-                make_cmd.append('../' + str(relative_parquet_path))
-                subprocess.run(make_cmd, cwd=cwd_path, check=True, env=env)
+                # GH #803 write side (the child imports THIS package), -B for
+                # an in-tree artefact, the jobs flag, the POSIX target (#964)
+                # and the no-make fallback (#968) all live in the helper, which
+                # is kept out of the build fingerprint.
+                _build_wave_script_target(cwd_path, relative_parquet_path,
+                                          force=intree_artefact)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
                 for candidate in candidates:
@@ -1709,6 +1860,9 @@ class Wave:
                 return pd.DataFrame()
 
             df = pd.read_parquet(parquet_fn)
+            # GH #868: the wave script ran out of process; whatever its
+            # reducer reported lives only in the stamp it wrote.
+            _replay_wave_stamp(parquet_fn, self.country.name, request, self.year)
             # NOTE: we deliberately do NOT trust-once-stamp script-path
             # wave parquets here.  They are written hashless by the
             # _/<table>.py scripts, so stamping the current hash onto a
@@ -1736,8 +1890,14 @@ class Wave:
                 and not df.empty):
             try:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
+                # GH #868: carry the reports this wave's build filed (a
+                # df_edit hook's reduce_to_agreed) with the wave parquet, so
+                # a country rebuild from warm wave parquets -- where the hook
+                # does not run -- still stamps them into the country parquet.
                 df = to_parquet(df, cache_path, absolute_path=True,
-                                cache_hash=self._input_hash(request))
+                                cache_hash=self._input_hash(request),
+                                grain_audit=_wave_grain_audit(
+                                    self.country.name, request, self.year))
             except (OSError, ValueError, ArrowInvalid) as exc:
                 # Disk full / permission denied / parquet serialization
                 # failure -> warn and continue with the in-memory df.
@@ -1906,7 +2066,7 @@ class Country:
         if not country_dir.is_relative_to(countries_dir):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
         if not country_dir.is_dir():
-            warnings.warn(f"Country directory not found for {country_name!r}")
+            raise ValueError(_no_such_country_message(country_name))
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -1943,7 +2103,7 @@ class Country:
         if '_resources_cache' not in self.__dict__:
             var = self.file_path / "_" / "data_scheme.yml"
             if var.exists():
-                with open(var) as f:
+                with open(var, encoding="utf-8") as f:
                     self.__dict__['_resources_cache'] = load_yaml(f)
             else:
                 self.__dict__['_resources_cache'] = {}
@@ -2184,7 +2344,7 @@ class Country:
         if not path.exists():
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return ""
-        return _notes.extract(path.read_text(), topic=topic, state=state)
+        return _notes.extract(path.read_text(encoding="utf-8"), topic=topic, state=state)
 
     @property
     def note_topics(self) -> list[tuple[int, str | None, str]]:
@@ -2203,7 +2363,7 @@ class Country:
             warnings.warn(f"No CONTENTS.org for {self.name} ({path})")
             return []
         return [(h.level, h.keyword, h.text)
-                for h in _notes.parse(path.read_text())]
+                for h in _notes.parse(path.read_text(encoding="utf-8"))]
 
     @property
     def population(self) -> dict[str, "PopulationRecord"]:
@@ -2312,8 +2472,8 @@ class Country:
             lic_path = doc / "LICENSE.org"
             rows.append({
                 't': t,
-                'source': src_path.read_text() if src_path.exists() else pd.NA,
-                'license': lic_path.read_text() if lic_path.exists() else pd.NA,
+                'source': src_path.read_text(encoding="utf-8") if src_path.exists() else pd.NA,
+                'license': lic_path.read_text(encoding="utf-8") if lic_path.exists() else pd.NA,
                 'documentation_path': str(doc),
             })
         if not rows:
@@ -3005,9 +3165,7 @@ class Country:
                 continue
             rdict = _dict_for(col, key, target)
             if rdict:
-                if hasattr(df[col], 'str'):
-                    df[col] = df[col].str.strip()
-                df[col] = df[col].replace(rdict)
+                df[col] = _strip_string_values(df[col]).replace(rdict)
 
         # Apply to index levels
         if isinstance(df.index, pd.MultiIndex):
@@ -3031,11 +3189,44 @@ class Country:
     def _relabel_j(self, df: pd.DataFrame, labels: str | None, *, reaggregate: bool) -> pd.DataFrame:
         """Rename the ``j`` index level using a column of the country's food label table.
 
-        ``labels='Preferred'`` (or ``None``) is a no-op.  For any other value
-        ``X``, look for a column named ``'X Label'`` (falling back to ``'X'``)
-        in ``food_items`` or ``harmonize_food`` under ``categorical_mapping``,
-        keyed on ``'Preferred Label'`` (the current ``j`` values).
+        **Accepted values** (GH #787).  A trailing ``' Label'`` is stripped
+        first, so ``'Aggregate Label'`` and ``'Aggregate'`` are one request
+        and ``'Preferred Label'`` is the same deliberate no-op as
+        ``'Preferred'`` / ``None`` -- it used to survive only by accident
+        (``table[['Preferred Label', 'Preferred Label']]`` is a duplicate-
+        column frame whose ``zip`` iterated column NAMES, so the rename was
+        an identity ``{'Preferred Label': 'Preferred Label'}``).  Any other
+        value ``X`` resolves to the column ``'X Label'`` (first) or bare
+        ``'X'`` of ``food_items`` / ``harmonize_food`` under
+        :attr:`categorical_mapping`, keyed on ``'Preferred Label'`` (the
+        served ``j``).  So every TEXT column of the crosswalk is selectable
+        -- ``'Original'`` on the EHCVM countries, per-wave columns such as
+        ``'2004-05'`` on Malawi, ``'FTC'`` on Tanzania -- not only
+        ``'Aggregate'``; the bare fallback is documented in
+        ``.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md``.
+        A **numeric** column (``Code``, ``FTC Code``, ``FDC ID``, a float
+        year column) is NOT a label and is refused with
+        :class:`LabelUnavailableError`: it would silently turn the ``str``
+        ``j`` level into integers (Uganda ``labels='Code'`` served
+        ``[101, 141, 1082]``).  Read the codes off
+        ``Country.categorical_mapping['harmonize_food']`` instead.
+
+        **A ``j`` the column does not label passes through unrenamed** --
+        ``rename`` leaves non-matches alone -- and that is REPORTED, never
+        silent: the count, row share and examples go on
+        ``result.attrs['labels_unmatched']`` with a
+        :class:`LabelPassThroughWarning` (fatal under ``LSMS_LABELS_STRICT``).
+        Measured in GH #787, Ethiopia ``labels='2011-12'`` left 51 of 76
+        served foods unrenamed, carrying 46.6% of expenditure, with row
+        count and total identical to the default read.  The report is taken
+        BEFORE the ``reaggregate`` sum, which is the irreversible step.
+
+        Not addressed here (GH #787 (d), a decision): a Preferred Label that
+        maps to MORE THAN ONE distinct target value is served last-row-wins
+        (Niger ``'Original'``: 153 such keys).
         """
+        if isinstance(labels, str):
+            labels = labels.removesuffix(' Label')
         if labels in (None, 'Preferred'):
             return df
         if not isinstance(df, pd.DataFrame) or 'j' not in (df.index.names or []):
@@ -3092,6 +3283,27 @@ class Country:
                 f"Column {target!r} not in food label table on {self.name!r}; "
                 f"available: {available}"
             )
+        if pd.api.types.is_numeric_dtype(table[target]):
+            # A code column is a JOIN KEY, not a label variant: renaming `j`
+            # with it changes the level's dtype from str to int64/float64 and
+            # nothing downstream (Feature's concat, the `j`-keyed derived
+            # tables) expects that.  Int AND float: `FTC Code`, `FDC ID` and
+            # the EthiopiaRHS / Panama year columns parse as float64 codes.
+            # LabelUnavailableError, not a plain KeyError, so a cross-country
+            # call degrades with ONE aggregated warning (the same class a
+            # typo of the variant name already gets).  No escape hatch: the
+            # scalar `labels=` has no second channel, and the codes are one
+            # attribute read away.
+            text_cols = [c for c in table.columns
+                         if c != 'Preferred Label'
+                         and not pd.api.types.is_numeric_dtype(table[c])]
+            raise LabelUnavailableError(
+                f"labels={labels!r} on {self.name!r} names the NUMERIC column "
+                f"{target!r} of its food label table, which is a code, not a "
+                f"label (relabelling 'j' with it would change the level's "
+                f"dtype to {table[target].dtype}); label columns: {text_cols}. "
+                f"Read the codes off Country.categorical_mapping directly."
+            )
         # A food the requested column does not label must keep its Preferred
         # Label -- that is what the historical `.dropna()` was for.  `.dropna()`
         # alone does NOT achieve it: `all_dfs_from_orgfile` returns EMPTY
@@ -3146,6 +3358,18 @@ class Country:
         pairs = table[['Preferred Label', target]].dropna()
         rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
                  if str(k).strip() != '' and str(v).strip() != ''}
+        # GH #787 finding 2: `rename` leaves a `j` absent from `rdict`
+        # exactly as it was, so the served axis can be two vocabularies on
+        # one level -- and under reaggregate=True an unmatched `j` that
+        # string-collides with a target value is SUMMED into it.  Count the
+        # pass-through here, where both operands exist and before the
+        # irreversible sum.  A NaN `j` is a null-key concern (Site I, GH
+        # #847), not an unlabelled food, and is not counted.  A blank
+        # crosswalk cell (filtered above, GH #925) now shows up here as
+        # unmatched, which is the right place for it to show.
+        unmatched_report = _audit_label_pass_through(
+            df.index.get_level_values('j'), rdict,
+            country=self.name, labels=labels, column=target)
         result = df.rename(index=rdict, level='j')
         if reaggregate:
             numeric = result.select_dtypes(include='number')
@@ -3157,6 +3381,9 @@ class Country:
         # non-load-bearing for correctness; see _join_v_from_sample
         # above and tests/test_id_walk.py.
         result.attrs = dict(df.attrs)
+        if unmatched_report is not None:
+            # After the attrs copy, or the groupby path would overwrite it.
+            result.attrs['labels_unmatched'] = unmatched_report
         return result
 
     def _finalize_result(self, df: Any, scheme_entry: dict[str, Any], method_name: str,
@@ -4133,6 +4360,8 @@ class Country:
                     return json.load(json_file)
 
             df_local = get_dataframe(str(output_path))
+            # GH #868: a wave script's grain report exists only in its stamp.
+            _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
             return df_local
 
@@ -4307,7 +4536,7 @@ class Country:
                 if candidate.exists():
                     logger.debug(f"Reading {method_name} from cache {candidate}")
                     if candidate.suffix == ".json":
-                        with open(candidate, 'r') as json_file:
+                        with open(candidate, 'r', encoding="utf-8") as json_file:
                             return json.load(json_file)
                     else:
                         df = get_dataframe(candidate)
@@ -4316,24 +4545,21 @@ class Country:
                             return df
                         return df
 
-            try:
-                make_cmd = ["make", "-s"]
-                jobs_flag = _make_jobs_flag()
-                if jobs_flag:
-                    make_cmd.append(jobs_flag)
-                make_cmd.append(f"{method_name}.json")
-                subprocess.run(make_cmd, cwd=self.file_path / "_", check=True)
-            except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                logger.warning(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.")
-                result = load_from_waves(waves)
-            else:
-                result = run_make_target(method_name)
-                if result is None:
-                    raise _rebuild_failure_error(self.name, method_name)
+            # No cached candidate: derive the crosswalk from the waves.  This
+            # used to shell out to ``make -s <method>.json`` first, with the
+            # parent's environment (no ``_script_subprocess_env``) -- but the
+            # JSON is a committed SOURCE or a cache, never a Make product
+            # (GH #914: no country Makefile has a ``.json`` target), so the
+            # call could only fail and log a misleading "Makefile build
+            # failed" warning on every cold Design-B read (Malawi, Nigeria),
+            # or raise ``FileNotFoundError`` where ``make`` is absent
+            # (GH #964/#968).  Removed in GH #970; nothing here spawns a
+            # subprocess, so there is no ``make`` to gate on.
+            result = load_from_waves(waves)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(cache_path, 'w') as json_file:
+                with open(cache_path, 'w', encoding="utf-8") as json_file:
                     json.dump(result, json_file)
                 logger.debug(f"Writing {method_name} to cache {cache_path}")
             elif isinstance(result, pd.DataFrame):
@@ -5364,6 +5590,15 @@ class Country:
                 "    canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to\n",
                 "    the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and\n",
                 "    ``labels='Aggregate'`` are the same request.\n",
+                "    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``\n",
+                "    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.\n",
+                "    Every TEXT column of the food label table is selectable\n",
+                "    (``'Original'`` on EHCVM countries, per-wave columns); a\n",
+                "    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A\n",
+                "    ``j`` the column does not label passes through unrenamed and\n",
+                "    is reported on ``result.attrs['labels_unmatched']`` with a\n",
+                "    ``LabelPassThroughWarning`` (fatal under\n",
+                "    ``LSMS_LABELS_STRICT=1``).  GH #787.\n",
                 "    Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)\n",
                 "    when the country cannot honour the request -- it curates no\n",
                 "    such label column, or the result has no such target at all;\n",
@@ -6149,6 +6384,87 @@ class GrainCollapseError(RuntimeError):
     """
 
 
+class LabelPassThroughWarning(RuntimeWarning):
+    """``labels=X`` left some ``j`` values unrenamed (GH #787 finding 2).
+
+    Its own class (rather than a bare ``RuntimeWarning``) so callers and CI
+    can target it precisely: ``warnings.simplefilter("error",
+    LabelPassThroughWarning)``.  Made fatal by ``LSMS_LABELS_STRICT``
+    (:class:`LabelPassThroughError`) -- its own lever, not
+    ``LSMS_READ_STRICT`` or ``LSMS_GRAIN_STRICT``: a destroyed row, an empty
+    column and a half-relabelled axis are different concerns and must
+    ratchet separately.
+    """
+
+
+class LabelPassThroughError(RuntimeError):
+    """Raised instead of :class:`LabelPassThroughWarning` under
+    ``LSMS_LABELS_STRICT``."""
+
+
+_LABELS_STRICT_ENV = "LSMS_LABELS_STRICT"
+
+
+def _labels_strict() -> bool:
+    """Whether a label pass-through should RAISE rather than warn.
+
+    Same spelling semantics as ``_grain_strict`` / ``_read_strict``
+    (``{1, true, yes}``), so knowing one lever is knowing all of them.
+    """
+    return os.environ.get(_LABELS_STRICT_ENV, "").lower() in {"1", "true", "yes"}
+
+
+def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
+                              labels: str, column: str,
+                              n_examples: int = 10) -> dict | None:
+    """Report the ``j`` values *rdict* does not key, or ``None`` if it keys all.
+
+    Pure reporting: never fills, renames or drops.  The report is the dict
+    that :meth:`Country._relabel_j` stamps on ``attrs['labels_unmatched']``::
+
+        {'labels': 'Original', 'column': 'Original Label',
+         'n_unmatched': 51, 'n_values': 76, 'rows': 106958,
+         'row_share': 0.405, 'examples': ['Avocado', 'Beef', ...]}
+
+    NaN ``j`` values are excluded from both numerator and denominator -- a
+    null key is Site I's concern (GH #847), not an unlabelled food.
+    Deliberately no allowlist and no threshold: one unrenamed food is a
+    fact about the served axis, and a known-bad crosswalk stays loud until
+    it is fixed.
+    """
+    values = pd.Index(j_values)
+    non_null = values[values.notna()]
+    if len(non_null) == 0:
+        return None
+    keyed = non_null.isin(list(rdict))
+    if keyed.all():
+        return None
+    unmatched = non_null[~keyed]
+    distinct = unmatched.unique()
+    report = {
+        'labels': labels,
+        'column': column,
+        'n_unmatched': int(len(distinct)),
+        'n_values': int(non_null.nunique()),
+        'rows': int(len(unmatched)),
+        'row_share': float(len(unmatched) / len(non_null)),
+        'examples': [str(x) for x in sorted(map(str, distinct))[:n_examples]],
+    }
+    msg = (
+        f"{country}: labels={labels!r} (column {column!r}) leaves "
+        f"{report['n_unmatched']} of {report['n_values']} 'j' values "
+        f"UNRENAMED, on {report['rows']} rows ({report['row_share']:.1%}): "
+        f"the crosswalk does not label them, so they are served beside the "
+        f"relabelled ones under their Preferred Label.  Examples: "
+        f"{report['examples']}.  Details on result.attrs['labels_unmatched']; "
+        f"set {_LABELS_STRICT_ENV}=1 to make this fatal."
+    )
+    if _labels_strict():
+        raise LabelPassThroughError(msg)
+    warnings.warn(msg, LabelPassThroughWarning, stacklevel=4)
+    return report
+
+
 class GrainCollapseWarning(RuntimeWarning):
     """A declared index was non-unique; collapsing it destroyed rows (GH #323).
 
@@ -6261,6 +6577,28 @@ def _format_grain_report(report: dict[str, Any]) -> str:
     where = f"{country}/{table}" + (f"/{wave}" if wave else "")
     levels = ", ".join(report.get("levels") or [])
     site = report.get("site")
+    if report.get("kind") == "cells_blanked":
+        # GH #868: the EXPLICIT reducer (build_transforms.reduce_to_agreed,
+        # on_conflict='na').  Not a row loss -- no row is dropped -- so none
+        # of the sentences below fit, and in particular not "do NOT declare a
+        # reducer": this report was filed BY the sanctioned reducer, invoked
+        # in writing at the call site.  It withheld a value the sources
+        # contradict; say that, and name the groups and columns.
+        cols = report.get("columns") or {}
+        per_col = ", ".join(f"{c}: {n:,}" for c, n in cols.items()) or "?"
+        examples = ", ".join(report.get("examples") or []) or "?"
+        return (
+            f"{where}: reduce_to_agreed(on_conflict='na') on ({levels}) found "
+            f"{report.get('conflicting_groups', 0):,} of {report.get('groups', 0):,} "
+            f"index group(s) whose rows DISAGREE, and BLANKED "
+            f"{report.get('cells_blanked', 0):,} cell(s) rather than pick a winner "
+            f"(conflicted groups per column: {per_col}; e.g. {examples}). "
+            f"No row was dropped: the group is served with the withheld value "
+            f"missing. Such a group is a pre-existing defect in the source "
+            f"(a broken identifier or a missing index level), made visible by "
+            f"the reducer -- fix it there. "
+            f"Set LSMS_GRAIN_STRICT=1 to make this fatal. GH #868 / #323."
+        )
     duplicated = bool(report.get("dropped") or report.get("destroyed")
                       or report.get("unauditable"))
     # GH #323 Site 2: the household -> cluster projection.  Not a *declared*-index
@@ -6336,12 +6674,24 @@ def _format_grain_report(report: dict[str, Any]) -> str:
 _GRAIN_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
 
 
-def _record_grain_report(report: dict[str, Any]) -> None:
-    """Emit a grain-collapse report and file it for the cache writer."""
+def _file_grain_report(report: dict[str, Any]) -> None:
+    """File a grain report for the cache writer WITHOUT emitting it.
+
+    The ledger-only half of :func:`_record_grain_report`, for a site that
+    emits its own signal (``build_transforms.reduce_to_agreed`` warns with its
+    own ``GrainConflictWarning`` class, pinned by tests) but still needs the
+    report stamped into the parquet and replayed warm (GH #868).  Same
+    append-unless-identical rule as the parallel-wave relay.
+    """
     key = (report.get("country") or "?", report.get("table") or "?")
     existing = _GRAIN_LEDGER.setdefault(key, [])
     if report not in existing:
         existing.append(report)
+
+
+def _record_grain_report(report: dict[str, Any]) -> None:
+    """Emit a grain-collapse report and file it for the cache writer."""
+    _file_grain_report(report)
     _emit_grain_report(report)
 
 
@@ -6369,13 +6719,26 @@ def grain_reports(country: str | None = None, table: str | None = None) -> list[
     return out
 
 
-def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
+def _replay_grain_audit(reports: Any, country: str, table: str,
+                        wave: str | None = None) -> None:
     """Re-emit reports stamped into an L2 parquet by the cold build (GH #323).
 
     THIS IS THE LINE THAT MAKES THE FIX REAL.  Without it every warning is a
     cold-build-only event, and since practically all reads are warm, the loss goes
     back to being invisible the moment the cache is populated -- which is precisely
     how #323 survived its first fix.
+
+    ``wave`` (GH #868) is the wave a WAVE-level parquet was read for; it fills a
+    report that carries no ``wave`` of its own and never overrides one.  Under
+    the framework's ``build_context`` a stamped report's ``wave`` is the wave
+    FOLDER (``Wave.year``), so a two-round folder (Nigeria PP/PH) must pass
+    ``wave=`` explicitly to the reducer to name the round -- only a report
+    filed that way arrives here already naming it. ``wave_folder`` keeps the
+    framework folder identity separate when selecting that wave stamp.
+    Replaying a wave stamp
+    files it under ``(country, table)``, so
+    the L2-country write that follows carries it forward: that is how a wave
+    script's stamp reaches the country parquet without a second mechanism.
     """
     if not isinstance(reports, list):
         return
@@ -6383,10 +6746,56 @@ def _replay_grain_audit(reports: Any, country: str, table: str) -> None:
         if not isinstance(report, dict):
             continue
         report = {**report, "country": country, "table": table, "from_cache": True}
+        if wave is not None and report.get("wave") is None:
+            report["wave"] = wave
         # _record_ (not just _emit_): grain_reports() must be a reliable account of
         # what a session lost, whether the loss happened during THIS process's cold
         # build or during some earlier one whose parquet we are now serving.
         _record_grain_report(report)
+
+
+def _replay_wave_stamp(path: Path | str, country: str, table: str, wave: str | None) -> None:
+    """Replay the ``lsms_grain_audit`` stamp of a WAVE-level parquet (GH #868).
+
+    Called at every place a wave parquet is read back instead of rebuilt --
+    the YAML-path L2-wave hit and the script-path read in ``Wave.grab_data``,
+    and ``run_make_target``'s read -- because a report filed INSIDE a wave
+    build (a ``df_edit`` hook's ``reduce_to_agreed``, or an out-of-process
+    wave script's) exists in no other process and is re-detectable from no
+    other frame.  Footer-only read, ~1 ms.
+    """
+    _replay_grain_audit(read_parquet_grain_audit(path), country, table, wave=wave)
+
+
+# Sites whose report is filed INSIDE a wave's build stage -- i.e. from within
+# ``Wave.grab_data`` -- and so is re-detectable from no later frame.  Only these
+# belong in a WAVE parquet's stamp.  Site 1 (``_normalize_dataframe_index``) and
+# Site 2 (``Wave.cluster_features``) run AFTER grab_data, in the parent, and
+# re-audit on every rebuild: freezing one of their reports into a wave parquet
+# would let it outlive the loss it describes (a direct ``grab_data`` call outside
+# ``_aggregate_wave_data`` sees a ledger nobody popped).
+_WAVE_BUILD_SITES = frozenset({"reduce_to_agreed"})
+
+
+def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] | None:
+    """The reports this process's build of one WAVE filed for ``(country,
+    table)``, for stamping into that wave's L2 parquet (GH #868).
+
+    Filtered on the report's ``wave_folder`` (legacy fallback: ``wave``) and
+    ``site``, leaving ``wave`` free to name a round within that folder.
+    Not filtered on a ledger snapshot: the ledger de-duplicates identical reports, so a delta could
+    miss a report an earlier call in the same process already filed.  A
+    ``from_cache`` report is EXCLUDED, not carried: it was replayed from some
+    earlier stamp, and this write is a cold rebuild of the wave -- what is
+    true now is what the build just filed.
+    """
+    if wave is None:
+        return None
+    out = [r for r in _GRAIN_LEDGER.get((country, table), [])
+           if str(r.get("wave_folder", r.get("wave"))) == str(wave)
+           and r.get("site") in _WAVE_BUILD_SITES
+           and not r.get("from_cache")]
+    return out or None
 
 
 # ---------------------------------------------------------------------------

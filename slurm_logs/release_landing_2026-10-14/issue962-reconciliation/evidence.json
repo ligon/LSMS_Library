@@ -1,0 +1,29 @@
+{
+  "source": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "equivalent_development": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "original_issue": {
+    "url": "https://github.com/ligon/LSMS_Library/issues/962",
+    "title": "Uganda's no-unit sentinel is spelled '---', which `_U_SENTINELS` does not know, so 7,359 unitless rows are given an invented kg factor (GH #874 is a no-op for Uganda)",
+    "state": "OPEN",
+    "body_sha256": "7afe779b115deba7ac8c355b909f9ce51eb8cfe9e598cd82ecc5a211d9f0e930",
+    "snapshot_sha256": "d5d5ff361610d4fb8fcbbd576ea14217bfd702aeafddce6c71fc34c012a42b26"
+  },
+  "reviewed_source_sha256": {
+    "lsms_library/countries/Uganda/_/CONTENTS.org": "5cd8887035e98b3b7bd7079be3ba3d3f4f32ea06b439b2a7017045ef2dedeb5a",
+    ".coder/ledger/962-uganda-food-units.md": "f4dcf52b2a14cc6543ebbfabdfbf73839a6569e3de8629d3e47c624454d1e420",
+    "lsms_library/countries/Uganda/_/uganda.py": "214be9a903de002765c55cbd5947c6a426fab4813e6bfa1a61f274e063b10842",
+    "lsms_library/transformations.py": "2fe7d8972efc8541f8a2869bed8d7ebb57f0b24735391b04786948df8a355f62",
+    "tests/test_962_unit_sentinel.py": "58166073020d07aac37b1500c2c014b9e13c1b544480968ddc3ec68a35fea80e",
+    "tests/test_food_kg_inference.py": "454d8cdbce992548d3791faf5d7343c758a2367f0c045e2e4c3bde10812ddadc",
+    "tests/test_u_code_leak.py": "bdb09ccee2f164da8852e651c539ec95c2ddebe2b9550d4e9e139286dea9257e",
+    ".claude/skills/add-feature/food-acquired/units/SKILL.md": "ed4a0151212163f08df968b38177c506570b4584a9d7485fe3bfd2d1669483ce",
+    "slurm_logs/release_landing_2026-10-14/uganda967.org": "9fb7b6f5954d432911dbb1663de2c64e0833ce479b1e1204111240fc03d77dbf",
+    "slurm_logs/release_landing_2026-10-14/uganda-nutrition-history.org": "7e73398508a6797b5883d4f2eba032eebd9859bef0633225c8c520837ea6047f"
+  },
+  "draft_sha256": {
+    "REVIEW.md": "68e04aefc541682316b7a90a1db59205fc7a176c39e26c7f1ca53085151ba263",
+    "body.md": "bde0c9ff45f863d0de3426af3dbb741147cb0cbad74a2fbcf52edb265f9c5a21",
+    "title.txt": "dda4ea3ac9df4ce05f7947f9f50c0373fa912c4f1208fb3943ddbb13554cb3a7"
+  },
+  "no_live_github_or_corpus_query": true
+}

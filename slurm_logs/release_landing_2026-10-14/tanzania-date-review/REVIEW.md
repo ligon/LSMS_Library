@@ -1,0 +1,31 @@
+SCOPE DEVIATIONS
+
+None. Read-only source and saved-evidence review; private review artifacts only. No table API, cache read/write, Git mutation, tracked-file edit or GitHub write by this reviewer. No additional build or test run.
+
+Verdict: APPROVE the Tanzania extension of existing #798. All 5,893 newly lost valid dates are attributed to mixed-format datetime coercion, separate from six originally missing dates. This supersedes the earlier Mali review's pending Tanzania status. It does not approve a parsing-policy change or claim universal parity. The complete raw parquet remains a promotion candidate under the other release gates; never replace it with incomplete served output.
+
+Read Tanzania CONTENTS first, including LOGBOOK, TODO #113/#449/#118, WAITING #114 and wave food_acquired entries; also read the Tanzania panel-design and multi-round skills. Idiosyncrasies: one 2008-15 UPD folder supplies four logical waves with deliberate UPHI descendant back-casting; 2019-20 follows the Extended Panel while 2020-21 follows the disjoint Refresh Panel plus 545 urban-booster households. CONTENTS says "2019-20 and 2020-21 have zero household overlap by design." These facts do not explain loss within those separate waves. The older interview_date script explicitly verifies agreement of replicated household-round dates before deduplication; no key/reducer change is proposed.
+
+Recorded documentation contradictions: the #112 LOGBOOK says "THE PREMISE OF THIS ENTRY NO LONGER HOLDS ... every quantity column is PRESENT", while TODO #118 still says "The 2019-20 and 2020-21 waves are missing food quantity data". WAITING #114 retains the unresolved UPHI/r_hhid grain decision despite the closed issue. These are separate from #798. No country note currently records this date-format loss. CONTENTS also warns its food_labels table is a build input despite the document's hash exclusion; the proposed addition is prose only and leaves that table untouched.
+
+Final source 3914d8804d7b2936d75041cea98bbc9ddb6d4c9f equals the full tree of reviewed frozen worktree 515864c993050c73e8add567b0a36e22f55af3ef. Source: Tanzania/_/data_scheme.yml:104-106 declares Int_t datetime; newer data_info.yml entries select hh_a18; 2008-15/_/interview_date.py constructs dates from year/month/day and maps four rounds. country.py:2631 joins v, :6115 coerces declared dates, :6177 coerces canonical dates, and :3554 filters all-null rows.
+
+| Wave | Raw | Original null dates | Cold served | Warm served | Newly nulled dates |
+|---|---:|---:|---:|---:|---:|
+| 2008-09 | 3,265 | 2 | 3,263 | 3,263 | 0 |
+| 2010-11 | 3,924 | 1 | 3,923 | 3,923 | 0 |
+| 2012-13 | 5,010 | 0 | 5,010 | 5,010 | 0 |
+| 2014-15 | 4,341 | 3 | 4,338 | 4,338 | 0 |
+| 2019-20 | 1,184 | 0 | 1,184 | 0 | 1,184 |
+| 2020-21 | 4,709 | 0 | 4,709 | 0 | 4,709 |
+| Total | 22,433 | 6 | 22,427 | 16,534 | 5,893 |
+
+Reviewed replay uses in-memory pure functions and a stub with preloaded sample lookup, so the v-join cannot make a hidden table call. Normalization preserves the raw fingerprint; the left join preserves every row and original null count. Older strings use space timestamps; all newer-wave dates use ISO T timestamps. Under pandas 3.0.6, whole-column pd.to_datetime(errors='coerce') creates exactly 5,893 new NaT values. Canonical coercion does not recover them. The null filter reproduces the saved warm fingerprint d593293bb3d884ed191bfb83f73cc63d0d9954c3b87204bd0bde010cc21e9215. Mixed/per-wave parsing and removal of only the six original nulls reproduces the cold fingerprint 53085328789e3e2a72ae3b4f0150abe99e571e46fc76e680897f2e8f6832fd3c, including the joined index.
+
+Independently reconciled all shapes, dtypes, index names, per-wave counts and fingerprints with saved cold/final records. Complete country-cache metadata match, including all six footer waves and fresh expected/stored hash e844d7656f30c7dda03b09476e2cc40ec591bb0b90e24f646e365bb45a0400f4. Runtime records unchanged bytes/mtime/inode and date-parquet SHA-256 41ce97601e33b270ee552e40273d3e8ad90c7e509b0532ff20f14a712df83909; the sample file is unchanged too. These are recorded preservation facts, not independent cache rereads. Both API records have NullIndexKeyWarning; the demonstrated loss is coercion, and this finding does not resolve broader cluster-identity issues.
+
+History: independently extracted six function texts (_normalize_dataframe_index, _join_v_from_sample, both dtype helpers, _finalize_result, to_parquet) across v0.14.0, pre-train 452302ad, corpus 7fa05179 and final 3914d880. All 24 hashes agree by function. The older interview_date.py blob is also identical at all four refs (b1117145dabd17041adf18226901bf972f2ce977). The original #798 reports the same two Tanzania waves missing before this release. Unlike Mali's September 9 counts, Tanzania's exact earlier counts are not recorded there. No old dependency environment or historical survey snapshot was rebuilt: current counts must not be projected backward.
+
+Optional workaround reviewed separately: runtime's ten actual single-wave calls on a new 140-file physical copy, using Country(country, preload_panel_ids=False), concatenate to exact cold fingerprints and check_exact=True values/index/dtypes. Concatenation already has cold row order; alignment was identity. All source/copy file identities remain unchanged. This supports the tested single-wave form for these complete warm caches, not arbitrary cache states or default constructor behavior. REPORT snippet was corrected to include the tested preload_panel_ids=False (reviewed corrected REPORT SHA-256 012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162); no new API run was needed. All-wave behavior remains defective.
+
+Exact hashes and selected-record reconciliation are in validation.json; independently computed source hashes are in source-history.json. Runtime evidence is control/runtime/final-promotion/tanzania-date-review/{replay.py,replay.json,replay.log,REPORT.md}; optional workaround is sibling date-workaround/{run.py,result.json,copy-manifest.json}. Joint issue title/body are control/countries/mali-date-review/issue798-{title.txt,body.md}; earlier Mali-only draft is preserved as *-mali-checkpoint.*. CONTENTS-proposal.org here supplies the Tanzania addition. Scope is transparent limitation accounting, not implementation or release authorization.

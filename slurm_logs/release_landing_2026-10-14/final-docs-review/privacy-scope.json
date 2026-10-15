@@ -1,0 +1,6 @@
+{
+  "reviewed_new_files": 132,
+  "no_binary_frames_or_raw_logs_in_new_files": true,
+  "literal_secret_pattern_flags": [],
+  "scope": "Aggregate counts, file and frame fingerprints, schema/type descriptions, survey-wave names, source-only probes and manifests; no household row data or identifiers found. Private paths and cache inode/mtime metadata remain provenance, not portable reproduction inputs."
+}

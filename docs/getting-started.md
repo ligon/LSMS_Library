@@ -6,6 +6,49 @@
 pip install LSMS_Library
 ```
 
+!!! note "Windows"
+    On Windows, install into a **conda** environment. Reading data needs
+    nothing extra. About two in five of the corpus's tables, though, are
+    built by country scripts driven by GNU `make`, and conda-forge
+    supplies `make` and the POSIX tools those scripts use:
+
+    ```bat
+    conda env create -f environment-windows.yml
+    conda activate lsms
+    pip install LSMS_Library
+    ```
+
+    [`environment-windows.yml`](https://github.com/ligon/LSMS_Library/blob/master/environment-windows.yml)
+    installs `make`, `m2-bash`, `m2-coreutils` and `m2-findutils` from
+    conda-forge. With the environment active, those tools come before
+    `C:\Windows\System32` on `PATH`, which matters: Windows ships an
+    unrelated `find.exe` that GNU make's recipes cannot use. CI builds
+    script-path tables this way on every push and checks them against
+    the Linux build.
+
+    Three Windows-specific points:
+
+    - **Keep spaces out of the data directory's path.** `make` cannot
+      handle them. The default is `%USERPROFILE%\.local\share\lsms_library`,
+      so if your user name contains a space, set `data_dir` in
+      `config.yml` (or `LSMS_DATA_DIR`) to a path without one, such as
+      `C:\lsms_data` (see [Caching](guide/caching.md)).
+    - **Builds are serial.** Windows has no `fork`, so a cold build runs
+      one wave at a time instead of spreading waves across processes.
+      The results are identical; only the time differs.
+    - **In a `.bat` script, write `call conda ...`.** `conda` is itself a
+      batch file, and a batch file that runs another without `call` never
+      returns to the lines after it.
+
+    Without `make` (on any platform), the library runs each wave's build
+    script directly and warns once. For wave-level builds that is
+    equivalent to what `make` does: every wave rule in the country
+    Makefiles just runs that script, and no rule depends on a generated
+    file ([#968](https://github.com/ligon/LSMS_Library/issues/968)). The
+    few tables built only at the country level still want `make`, so
+    install it for full coverage. [WSL](https://learn.microsoft.com/windows/wsl/install)
+    also works, exactly as Linux does.
+
 ## Data Access
 
 The library ships configuration and harmonization code, not survey data. The

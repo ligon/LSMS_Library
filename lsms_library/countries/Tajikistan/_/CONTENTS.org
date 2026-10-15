@@ -541,3 +541,24 @@ ships codes only in every roster variable.  Reading the file with
 with =errors='ignore'= and strips it to punctuation, whereas
 =pyreadstat.read_dta(blob, encoding='cp1251')= decodes correctly.  Do not
 "fix" the keys without fixing that reader first.
+
+* 2007 plot identity and area-unit provenance (GH #879; recorded 2026-10-14)
+The land roster combines =r1m12a1= (owned, 3,685 plots), =r1m12a2=
+(rented/borrowed in, 269), and =r1m12a3= (rented/lent out, 20).
+=plotcode= restarts within each subsection: 231 =(hhid, plotcode)= keys
+collide between owned and rented-in sections. =2007/_/plot_features.py=
+therefore prefixes =plot_id= with tenure (=owned-1=, =rented_in-1=, ...),
+preserving 3,974 unique =(t, i, plot_id)= keys. Do not strip the tenure tag.
+
+The source unit is sotka (1/100 hectare). The script has served
+=Area = q3 / 100= in hectares since #879 (=dedb1c7a7=, before v0.14.0).
+=AreaUnit='sotka'= preserves the original survey unit, not the served unit,
+following =lsms_library/data_info.yml='s canonical contract. The registry
+comment "Area is in sotka (1/100 ha)" contradicts that implementation and
+must not be interpreted as the served-unit contract.
+
+The October cold corpus reproduced 3,974 rows with Area total 882.38 hectares.
+The prior shared country aggregate held 88,238, while its wave parquet already
+matched the rebuilt country frame by fingerprint. This exposes an older stale
+aggregate, not a conversion introduced by the v0.15.0 train. The total is a
+validation checksum, not a nationally weighted land estimate.

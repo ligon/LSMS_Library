@@ -1,0 +1,23 @@
+{
+  "approved_utc": "2026-10-15T14:53:16.188841+00:00",
+  "manifest_sha256": "e26ae976f3576c9c4f1a27211f291768643064f6e6b83375781394d091046c8d",
+  "tool_sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e",
+  "ci_run": 38746123119,
+  "ci_status": "success",
+  "ci_aggregate_sha256": "28c31c019686df04c6d0d632ce91a995e19efec52189cc06b62d56e64568614d",
+  "data_tests": {
+    "summary": "4927 passed, 2768 skipped, 4 xfailed, 1 xpassed, 1004 warnings in 3204.33s (0:53:24)",
+    "counts": {
+      "passed": 4927,
+      "skipped": 2768,
+      "xfailed": 4,
+      "xpassed": 1,
+      "warnings": 1004
+    },
+    "pytest_seconds": 3204.33
+  },
+  "independent_manifest_and_exclusion_review_complete": true,
+  "transaction": "/global/scratch/fsa/fc_jevons/ligon/cache/.lsms-promotion-3914d8804-20261015T1441Z",
+  "apply_disposition": "proceed after tool rechecks unchanged shared inventory and staged bytes",
+  "no_global_lock_claim": true
+}

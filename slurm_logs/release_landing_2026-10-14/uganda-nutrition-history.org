@@ -1,0 +1,263 @@
+#+title: Uganda historical nutrition baseline: exact reconstruction and remaining signoff
+#+date: 2026-10-14
+
+* Scope deviations
+None. Evidence and documentation only. No fixture, inference policy, nutrient
+density, country mapping, dependency, DVC sidecar, or shared L2 changed.
+The country instruction remains binding: *Do not regenerate the baseline until
+the direction is signed off.* This report supplies evidence for that decision;
+it does not take it. #967's incremental correction is a separate comparison.
+
+* Result
+The historical =8ec0bab4e= nutrition baseline is reconstructed *bit for bit*
+from the country lane's independently cold-rebuilt CURRENT base food and FCT
+inputs. The CURRENT =452302adc= output is also reconstructed bit for bit from
+those same inputs. Four #850 commits account for the entire historical delta.
+Later #874, #838, #919, #929 and the fraction parser change have zero effect on
+this Uganda input. The household index and all 15 nutrient columns are unchanged.
+
+| output | shape | content hash |
+|--------+-------+--------------|
+| historical fixture and replay | 23801 x 15 | fc85fc2e2046f3c034d77b1b56da52dbafb9f38bd24f6f63331846677b6eee44 |
+| current cold base and replay | 23801 x 15 | 1131b358677a55ce4b3af6a5e63d8897f1e08381e76ac76b5b978d88ffdaf17e |
+| #967 cold candidate, separate country-lane proof | 23777 x 15 | 12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a |
+
+The raw current-base food parquet (355571 x 3) also matches the historical
+fixture hash =48c64d990d05afdaca6b2aa8bb188738dd50729d277c2e2cea257bac6146b900=;
+the FCT (15 x 113) matches
+=db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c=.
+Thus this comparison requires no hypothesis about changing food records,
+composition inputs, dependency versions, or sample membership.
+
+* Country contract and contradictions retained
+Read =Uganda/_/CONTENTS.org=, including LOGBOOK/WAITING/TODO, before replay.
+Relevant idiosyncrasy: Uganda's curated =conversion_to_kgs.json= is joined into
+=Kgs= and then discarded by canonicalization. Nutrition therefore uses runtime
+=food_quantities= factors, not that curated lookup. The live off-table-unit
+DROP, the 2015-16 crop-sale x100 WAITING caveat, the unrecorded nonfood recall
+window, and the panel/cluster TODOs are separate matters; none was changed.
+
+Two nutrition-history statements require explicit correction, not silent erasure:
+
+1. CONTENTS attributes Energy -18.7% to “that correction plus the kg-factor
+   work that followed” (#929/#919/#874 and stated/inferred reporting). Exact
+   parent/commit replays show the final current hash already at =7cde56579=,
+   the #850 dispersion gate. All named later transforms return that same hash.
+   The earlier suggestion that #871 was a candidate is also eliminated for
+   this historical delta: unchanged food/FCT inputs reproduce both endpoints.
+2. CONTENTS says “Uganda is not adjudicated either way in that passage.” The
+   FULL =slurm_logs/2026-09-09_epar_curation/REDTEAM_P2_850_impl.org= §6.6 says
+   “Uganda -14%, Nigeria -5%, Tanzania -2.6%: small, price anchors unchanged or
+   improved. Fine.” That is a prior reviewer judgment. It is not a specific
+   maintainer ruling on the nutrition fixture or on all food-container masses,
+   and does not override the explicit hold.
+
+* Exact commits, with the same input held fixed
+Each row is an actual historical module, with its direct parent also replayed
+and checked against the preceding result. Totals are unweighted panel sums,
+not national nutritional estimates. Nutrient units are those recorded in the
+FCT; Energy is kcal, Vitamin A is RAE micrograms, B12 is micrograms.
+
+| commit | change | kg delta | Energy delta | Vitamin A delta | B12 delta |
+|--------+--------+----------+--------------+-----------------+-----------|
+| e07e2a93f | metric spelling/container vocabulary | +49501.650476 | +34761441.891618 | +112873742.056941 | -109802.184579 |
+| 60f98ab1d | per-unit denominator, item axis, support/provenance | -259265.155045 | -503738072.970039 | -85147580.062500 | -613871.041333 |
+| f98c9762e | support floor per wave before pooling | -37.465945 | +566653.815366 | +154021.951964 | -1725.176660 |
+| 7cde56579 | approved baseline spread gate at 10 | -5677.630800 | -12387181.479571 | -84310.937734 | +0.000000 |
+
+Kg total: *1457881.374651201 -> 1242402.773337283*, a loss of
+215478.601313918 kg (14.78%). The final rung census is =metric= 182550,
+=item_unit= 59744, =item_unit_tight= 718, =unit= 112559; these partition all
+355571 acquisition rows. 205340 factors differ, 198898 on rows with a quantity.
+No survey-supplied food =Quantity_kg= overrides this ladder here.
+
+The exact metadata and all 15 nutrient totals are in [[file:uganda-nutrition-history/stages.json][stages.json]].
+Direct-parent equality checks are in [[file:uganda-nutrition-history/parents.json][parents.json]]. The post-#850
+stages =0554ec907=, =f7c1eb380=, =7bb2d9955=, =ffcae2797=, =91118fd1a= and
+=452302adc= have identical factors, kg totals and nutrition hashes on this input.
+
+* Arithmetic correction versus physical assumptions
+The old step 2 took a median of Expenditure where the definition required
+Expenditure/Quantity. Its ratio therefore had units of kg per transaction,
+then was multiplied by quantity again. That is a dimensional arithmetic defect.
+
+To separate it from the item-axis design, a *labelled, unshipped in-memory
+counterfactual* changes exactly that one expression in =e07e2a93f= and nothing
+else. It loses *280185.922520 kg*, Energy 527469544.708529, A 83160295.414035,
+and B12 662508.316752. Moving from that counterfactual to the actual
+=60f98ab1d= item-axis/support code restores *20920.767476 kg*, Energy
+23731471.738485 and B12 48637.275419, while A falls another 1987284.648465.
+The two sum to the shipped commit's delta. This isolates the denominator's
+numerical effect; it does not validate a common-price assumption as a weighing
+method. Neither counterfactual is proposed as a new policy.
+
+The vocabulary commit has a different evidentiary basis:
+
+| newly recognized label basis | kg delta | Energy delta | A delta | B12 delta |
+|-----------------------------+----------+--------------+---------+-----------|
+| explicit mass, e.g. Sack (50 kgs) | +9424.520619 | +10969643.847541 | +4524272.982486 | 0 |
+| volume treated as equal mass, e.g. Plastic Basin (15 lts) | +40077.129857 | +23791798.044077 | +108349469.074455 | -109802.184579 |
+
+The canonical labels and their per-wave spellings are recorded in Uganda's
+=categorical_mapping.org= =u= table. The curated kg JSON agrees with nominal
+50-kg sacks, 15-litre basins -> 15 kg, and 20-litre debes -> 20 kg. These are
+recorded conventions, not a fresh independent weighing study. #850's archived
+crop-side review also reports matching median respondent KgFactors for some
+bean/maize containers, and important groundnut disagreements. Those crop
+observations do not establish every FOOD item/container mass in this table.
+
+Current volume-as-mass labels account for *272322.945475 kg* (21.92% of
+current kg), Energy 486440120.359896 (23.30%), and A 157606654.001662.
+The range/threshold parser remains another assumption: e.g. =Gourd (1-5lts)=
+serves 5, while the curated JSON says 3.5; =Fish Cut piece (1 - 2 kg)= serves
+2 while the JSON says 1.5. The six existing range labels account for
+3774.25 kg, with per-label exposure in [[file:uganda-nutrition-history/analysis.json][analysis.json]]. No endpoint/midpoint
+policy was chosen here. Nominal masses, a common within-item price per kg,
+fixed support floors, cross-wave pooling, the u-only fallback and the
+already approved gate remain assumptions behind the estimates.
+
+* Nutrient pattern, including the two formerly unexplained cases
+The replay independently reproduces the September 22 finding exactly:
+*23284/23801* household vectors and *337664/357015* cells change.
+There is no household/index movement in this historical comparison.
+
+| nutrient | total change % | changed household rows |
+|----------+----------------+------------------------|
+| Energy | -18.7208 | 23252 |
+| Protein | -19.5350 | 23225 |
+| Fiber | -9.2048 | 23002 |
+| Folate | -21.5960 | 23223 |
+| Calcium | -15.0999 | 23266 |
+| Carbohydrate | -4.3521 | 23210 |
+| Iron | -12.8653 | 23203 |
+| Niacin | -13.0273 | 23225 |
+| Riboflavin | -15.7787 | 23231 |
+| Thiamin | -10.1229 | 23222 |
+| Vitamin A | +2.0453 | 22818 |
+| Vitamin B-12 | -31.6041 | 13323 |
+| Vitamin B-6 | -4.7345 | 23224 |
+| Vitamin C | -0.0902 | 23005 |
+| Zinc | -14.4454 | 23235 |
+
+Vitamin A rises by *27795873.008672* recorded micrograms. Fresh sweet potatoes
+alone contribute +79421046.813552 (quantity +35298.243028 kg, unchanged
+2250 micrograms/kg); dry sweet potatoes +14323175.255290 (quantity
++2887.736947 kg, unchanged 4960/kg). Other foods offset much of those gains.
+The largest individual positive cells are fresh sweet potatoes in 15-litre
+basins (+28826.875 kg, A +64860468.75) and 20-litre debes (+10842.5 kg,
+A +24395625). Thus its opposite direction is an item-composition consequence
+of the changed kg factors, dominated by the volume convention.
+
+*Source-provenance correction [2026-10-14 release-draft review].* The first
+version of this report called row 4003 a "New source contradiction, left
+unresolved" and said "Those claims cannot both describe that numeric record."
+That conclusion omitted a specific derivation note in the SAME row. The
+stronger claim of competing unsupported intended values is withdrawn; the
+complete recorded provenance supports a specific override of a generic
+starting assumption. This correction changes no numerical replay result.
+
+=nutrition.org='s =fct= row 4003,
+=SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW=, records =vit_a_rae_mcg= *225 per 100 g*,
+which correctly becomes 2250/kg in the CSV and served FCT. Its =fct_source=
+is =HarvestPlus Uganda=, =fct_source_code= is =11507=, and
+=fct_source_descr= reads:
+#+begin_quote
+Based on USDA #11507 Sweet potato,unprepared; vitamin A and carotenoids assumed = 0.
+#+end_quote
+But the adjacent =water_source_descr= also records the carotenoid derivation:
+#+begin_quote
+Applied water content of 67.4 g based on an average of 3 yellow flesh varieties reported by Kidmose et al., 2007 (Salyboro,199062.1 and Nyathi Odiewo);betacarotene content also derived from the mean of the same 3 varieties.
+#+end_quote
+The retention-factor source/code/description fields are empty. The numeric
+record is retinol =0=, alpha-carotene =10=, beta-carotene =2697=,
+beta-cryptoxanthin =0=, vitamin A RAE =225= and vitamin A IU =4503=, per
+100 g. Using the dietary-carotenoid RAE factors stated by the
+[[https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/][NIH Office of Dietary Supplements]] (read 2026-10-14),
+=0 + 2697/12 + 10/24 + 0/24 = 225.1666667=, which rounds to the recorded
+whole-microgram =225=. The nearby WHITE sweet-potato row 3003 carries the
+same generic zero note, a West 1988 water adjustment, and zero carotenoids
+and RAE. The yellow row's specific note therefore supplies a coherent
+explanation for its nonzero value; it is not evidence that zero should
+replace 225.
+
+The interpretation is a recorded specific yellow-variety carotenoid override
+to the generic USDA starting assumptions. It is an inference from the full
+record, not independent verification of Kidmose et al. (2007): that paper's
+measurements, variety selection and preparation basis have not been checked
+in this investigation. Any follow-up should clarify the general note's scope
+and confirm the cited derivation/source version before proposing a numerical
+change. The same fields and numbers are present at =8ec0bab4e=, =v0.14.0=
+and this investigation's integrated parent. Thus this clarification is
+neither a #850 nor a #967 numerical change.
+
+Full source rows, exact revision identities and the arithmetic check are in
+[[file:uganda-nutrition-history/fct4003-provenance-correction.json][fct4003-provenance-correction.json]]. The earlier
+[[file:uganda-nutrition-history/density-provenance.json][density-provenance.json]] captures the principal contributors but is not a
+complete account of row 4003's provenance; use this addendum with it. No
+density, source table, crosswalk, factor policy or fixture was edited. This
+does not independently validate nominal food-container masses or lift the
+explicit nutrition-baseline hold.
+
+B12 falls by *725398.402571* recorded micrograms, mostly Fresh Fish
+(-210099.610345), Dry/Smoked Fish (-209016.076873), Eggs (-128147.916339),
+and fresh milk (-78467.782383). Their unchanged densities are 24, 61.2, 12.9
+and 4.4 micrograms/kg. Much of the fish movement is in the item-keyed
+Whole Small/Medium estimates; milk's Cup/Mug(0.5lt) alone explains
+-77031.789997. Most plant-food densities are zero, so many quantity changes
+cannot move B12. Of the 23801 households, 5202 have a zero B12 vector in both
+versions; another 5276 retain their nonzero B12 value. This accounts for the
+13323 changed rows without a special B12 computation or sample loss.
+
+Energy's largest decreases are Cooking Oil (-185288030.100338) and refined
+Cooking Oil (-52956129.205628), largely their Akendo estimates. Their recorded
+8840 kcal/kg densities explain why these relatively small kg changes dominate
+Energy. All foods/units and all 15 nutrient contributions are retained in
+[[file:uganda-nutrition-history/by-food-unit.csv][by-food-unit.csv]].
+
+* Verification and reproducibility
+=nutrition.py= is unchanged between historical and current endpoints. The
+replay uses the real historical transformation modules, then that script's
+kg filter, (i,t,j) sum, zero-fill and food-by-nutrient matrix multiplication.
+A second aggregation multiplies each native row's kg-factor change by its
+food density, grouped by food/unit/rung, and reconciles ALL 15 nutrient deltas.
+Maximum discrepancy is *1.44e-6* absolute across panel-wide sums; exact matrix
+endpoint hashes are independent of that summation-order tolerance.
+
+The entire historical package in a separate =8ec0bab4e= worktree also produces
+=fc85...eee44=, confirming the historical-module replay did not depend on a
+new helper's semantics. To unpickle the current API frames in that old
+package, copy them with =attrs={}= first: a new recall metadata class did not
+exist in September. Values, index and dtypes stay unchanged. No old dependency
+closure or cold historical rebuild was needed; current dependencies reproduce
+the original content hash exactly.
+
+Reproduction drivers: [[file:uganda-nutrition-history/replay.py][replay.py]], [[file:uganda-nutrition-history/analyze.py][analyze.py]],
+[[file:uganda-nutrition-history/source_provenance.py][source_provenance.py]]. Inputs are private country-lane
+=base_{food_acquired,fct,nutrition}.pkl= and its independently cold base L2.
+Use the copied private inputs from the release scratch directory, or regenerate
+them with #967's archived validation driver. =replay.py= takes =--root=,
+=--input-dir=, =--out=, =--refs=; run the listed actual refs into =stages/=,
+=e07e2a93f+denom= into =counterfactual/=, and the four direct parents into
+=parents/=. =analyze.py= takes =--root=, =--inputs=, =--data-root= and
+=--evidence= (parent of those subdirectories). =source_provenance.py= takes
+=--root=, =--inputs=, =--out=. All assert import and cwd identity.
+
+Execution used =/local/job39919092/venv_img/bin/python=, =taskset -c 16-23=,
+BLAS/OMP/MKL=1, =LSMS_BUILD_WORKERS=1=; PYTHONPATH and LSMS_COUNTRIES_ROOT
+both pointed at the active worktree. No pytest run is needed for an evidence
+addendum: the numerical replay/assertions are the relevant validation.
+Private =LSMS_DATA_DIR= contains only the permitted L1 symlink; no L2 was
+built there. No in-tree parquets. Only aggregate evidence is committed.
+
+* What remains for the maintainer
+The unexplained historical regression is now an exact causal accounting.
+Accepting the current nutrition fixture would acknowledge the documented
+arithmetic correction and the already shipped estimator/nominal-volume
+conventions; it would not independently validate physical masses or the
+cited sweet-potato paper. The full recorded FCT provenance supports the
+nonzero density; the earlier omitted-evidence claim is corrected above.
+The explicit hold remains
+until the maintainer chooses whether to accept these limitations for this
+release or first resolve the source/physical assumptions. #967 additionally
+requires accepting its separately proved 24-row loss and small nutrient delta;
+that evidence is in =uganda967.org=. No baseline regeneration is performed here.

@@ -1,0 +1,76 @@
+#+title: GhanaSPS 2017-18: are the pre-anonymization files superseded by the public release?
+#+date: [2026-09-17 Wed]
+#+author: Sue
+
+* Question (EL, 2026-09-17)
+=FINDINGS_ghanasps_provenance.org= (2026-08-19) partitions our 100 wave-3
+files against Harvard Dataverse =doi:10.7910/DVN/E5QP0F= v1.2: 66
+byte-identical, 29 with MORE variables than the public copy (a
+pre-anonymization build), 4 with no public counterpart, and 11 public files
+we lack.  The 29 sit in the open S3 bucket with terms unrecorded
+(=2017-18/Documentation/LICENSE.org:34-56=).  Before deciding what to do with
+them: does anything we *wire* depend on a variable the producers removed?
+
+* Method (reproducible, no venv, no data access)
+Dataverse API only.  File list, then per-file DDI variable names:
+
+: curl -sS -L "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/E5QP0F"
+: curl -sS -L "https://dataverse.harvard.edu/api/access/datafile/<id>/metadata/ddi"   # <var name="...">
+
+Our side: =size:= from each =Data/<file>.dvc= sidecar (compared with the
+public =originalFileSize=), and the variables =_/data_info.yml= names per
+=file:= block.  The "wired" column was checked by hand against the YAML after
+a first automated pass mis-attributed =livestock='s three variables to
+=04i_landtenure= (the =livestock= =file:= is a two-line list at
+=data_info.yml:376=).
+
+* Result
+| file                                          |     ours |   public | identical? | wired variables                                 | missing in public |
+|-----------------------------------------------+----------+----------+------------+-------------------------------------------------+-------------------|
+| =00_hh_info.dta=                              |   586677 |   350540 | NO         | FPrimary, region                                | none              |
+| =01b2_roster.dta=                             |   665527 |   665527 | yes        | FPrimary, hhmid, ageyears, gender, relationship | --                |
+| =01d_background.dta=                          | 13813729 |  9663623 | NO         | FPrimary, hhmid, awaylast12                     | none              |
+| =01gi_generaleducation.dta=                   | 12661485 |  8837555 | NO         | FPrimary, hhmid, attended, highestgrade, highestqual | none          |
+| =04h_agsection.dta=                           |  4648058 |  4178745 | NO         | FPrimary, plotid, totalsize, plotunit           | none              |
+| =04i_landtenure.dta=                          |  9035894 |  9035894 | yes        | FPrimary, plotid, obtainhow                     | --                |
+| =03ai_animalquestions.dta= (+ =_osp=)         |   562815 |   562815 | yes        | quantity, quantitysold, currentvalue, ...       | --                |
+| =04n_harvestquestions.dta=                    |  2406415 |  2406415 | yes        | FPrimary, plotid, harvestquantity, ...          | --                |
+| =04o_cropsalesstoresquestions.dta=            |  5103039 |  4129392 | NO         | FPrimary, plotid, *soldprice, *soldquantity     | none              |
+| =12a_housingcharacteristics1iii_structure.dta= |  2267700 |  1886015 | NO         | FPrimary, materialfloor, materialroof           | none              |
+| =11a_foodconsumption_prod_purch.dta=          | 26576266 | 26576266 | yes        | (food_acquired script)                          | --                |
+| =11c_otheritems.dta=                          |  1544106 |  1544106 | yes        | (script)                                        | --                |
+| =04m_aglabourquestions.dta=                   | 11763181 | 11763181 | yes        | (script)                                        | --                |
+| =01fi_employmentmain.dta=                     |  1273246 |  1150873 | NO         | not wired                                       | n/a               |
+| =01b2_newroster.dta= / =01b2_preroster.dta=   |  1239371 / 3966265 | 422413 / 1882674 | NO | not wired (SOURCING NOTE in YAML)     | n/a               |
+
+Raw per-file output: =scratchpad/ghanasps_w3_supersession.txt= for the
+session; the table above is the durable copy.
+
+** Answer
+- *Superseded for everything currently wired.*  Six of the nine YAML-wired
+  files are pre-anonymization copies; every variable the YAML names in all
+  six is present in the public copy's DDI.  Replacing those six with the
+  Dataverse files would change no wired column.  (Whether values match
+  row-for-row is not tested here -- the findings doc verified identical row
+  counts on 2026-08-19; a value-level diff needs a venv and the blobs.)
+- *Not superseded for one thing nobody reads yet:* the sub-district
+  geography stripped from =00_hh_info= (=d_code=, =district=, =comm_code= per
+  GH #140; three variables gone, attribution not re-verified) is what a
+  =sample= / =cluster_features= feature would be built on (GH #579).  That is
+  the one reason to keep any pre-anonymization file, and if kept it is the
+  first =gpg-recipients= customer that is *already in the bucket*
+  (=SkunkWorks/holder_gated_access.org=).
+- *Correction to the findings doc:* =01fi_employmentmain.dta= is listed
+  there as "only in ours" (vs IHSN).  Dataverse v1.2 Wave 3 has it
+  (1,150,873 bytes, 65 variables); ours is a 1,273,246-byte
+  pre-anonymization copy.  The four with no public counterpart are
+  =00_comm_info=, =01c_consentunder18=, =public_services=, =rural-urban=;
+  none is wired (the YAML says =rural-urban= is the only urban/rural source
+  and is NOT wired).
+
+* What this does and does not settle
+It settles that option B/C of =FINDINGS_ghanasps_provenance.org:706-708=
+(replace the differing files with the public release; add the 11 missing)
+costs nothing at the API today.  It does not settle the terms of the 100
+files, which =LICENSE.org= still asks to be resolved, and it does not decide
+#579's geography question.

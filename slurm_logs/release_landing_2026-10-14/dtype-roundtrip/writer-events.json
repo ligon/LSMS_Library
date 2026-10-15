@@ -1,0 +1,571 @@
+[
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Liberia/2018-19/_/interview_date.parquet",
+    "before": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[s]"
+      },
+      "content_hash": "985671779db0a339ebb04d24213d7d85b0233835937df5aa6775d63859070b7e",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    },
+    "returned": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[s]"
+      },
+      "content_hash": "985671779db0a339ebb04d24213d7d85b0233835937df5aa6775d63859070b7e",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    },
+    "stored": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[ms]"
+      },
+      "content_hash": "399bd6aadc7d556be94eb59d853b4cdc733bd0e56628a20c176a13a6aff56cfc",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Liberia/var/interview_date.parquet",
+    "before": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[s]"
+      },
+      "content_hash": "985671779db0a339ebb04d24213d7d85b0233835937df5aa6775d63859070b7e",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    },
+    "returned": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[s]"
+      },
+      "content_hash": "985671779db0a339ebb04d24213d7d85b0233835937df5aa6775d63859070b7e",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    },
+    "stored": {
+      "shape": [
+        2986,
+        1
+      ],
+      "columns": [
+        "Int_t"
+      ],
+      "index_names": [
+        "t",
+        "i"
+      ],
+      "dtypes": {
+        "Int_t": "datetime64[ms]"
+      },
+      "content_hash": "399bd6aadc7d556be94eb59d853b4cdc733bd0e56628a20c176a13a6aff56cfc",
+      "null_count": 199,
+      "non_null_python_type_counts": {
+        "Timestamp": 2787
+      }
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Mali/2014-15/_/household_roster.parquet",
+    "before": {
+      "shape": [
+        37175,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "object",
+        "MonthsSpent": "object",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "26149cd4837242dd737e5b38610247161737625feb66dbb40e03a5648c09ab75",
+      "null_count": 350,
+      "non_null_python_type_counts": {
+        "int": 36825
+      }
+    },
+    "returned": {
+      "shape": [
+        37175,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "string",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "26149cd4837242dd737e5b38610247161737625feb66dbb40e03a5648c09ab75",
+      "null_count": 350,
+      "non_null_python_type_counts": {
+        "str": 36825
+      }
+    },
+    "stored": {
+      "shape": [
+        37175,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "string",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "26149cd4837242dd737e5b38610247161737625feb66dbb40e03a5648c09ab75",
+      "null_count": 350,
+      "non_null_python_type_counts": {
+        "str": 36825
+      }
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Mali/2017-18/_/household_roster.parquet",
+    "before": {
+      "shape": [
+        94071,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "object",
+        "MonthsSpent": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "0d65397167e325a32f7b67eb0da977fe859ef6d1648e50c472dfab23977734ac",
+      "null_count": 1,
+      "non_null_python_type_counts": {
+        "float": 94070
+      }
+    },
+    "returned": {
+      "shape": [
+        94071,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "0d65397167e325a32f7b67eb0da977fe859ef6d1648e50c472dfab23977734ac",
+      "null_count": 1,
+      "non_null_python_type_counts": {
+        "float": 94070
+      }
+    },
+    "stored": {
+      "shape": [
+        94071,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "0d65397167e325a32f7b67eb0da977fe859ef6d1648e50c472dfab23977734ac",
+      "null_count": 1,
+      "non_null_python_type_counts": {
+        "float": 94070
+      }
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Mali/2018-19/_/household_roster.parquet",
+    "before": {
+      "shape": [
+        46014,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "MonthsSpent": "int64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "228ba07558d61d7ed19830e4f386f836966ebba3351d367c104ebbd9956947f8",
+      "null_count": 0,
+      "non_null_python_type_counts": {
+        "int": 46014
+      }
+    },
+    "returned": {
+      "shape": [
+        46014,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "MonthsSpent": "int64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "228ba07558d61d7ed19830e4f386f836966ebba3351d367c104ebbd9956947f8",
+      "null_count": 0,
+      "non_null_python_type_counts": {
+        "int": 46014
+      }
+    },
+    "stored": {
+      "shape": [
+        46014,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "MonthsSpent": "int64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "228ba07558d61d7ed19830e4f386f836966ebba3351d367c104ebbd9956947f8",
+      "null_count": 0,
+      "non_null_python_type_counts": {
+        "int": 46014
+      }
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Mali/2021-22/_/household_roster.parquet",
+    "before": {
+      "shape": [
+        43472,
+        3
+      ],
+      "columns": [
+        "Age",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "8655c69e9288da0a9ecdb77f49e6743beebdc50831bb85d185becbeb6546982b",
+      "null_count": null,
+      "non_null_python_type_counts": {}
+    },
+    "returned": {
+      "shape": [
+        43472,
+        3
+      ],
+      "columns": [
+        "Age",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "8655c69e9288da0a9ecdb77f49e6743beebdc50831bb85d185becbeb6546982b",
+      "null_count": null,
+      "non_null_python_type_counts": {}
+    },
+    "stored": {
+      "shape": [
+        43472,
+        3
+      ],
+      "columns": [
+        "Age",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "float64",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "8655c69e9288da0a9ecdb77f49e6743beebdc50831bb85d185becbeb6546982b",
+      "null_count": null,
+      "non_null_python_type_counts": {}
+    }
+  },
+  {
+    "path": "/local/job39919092/release-work/framework/dtype-cold-data/Mali/var/household_roster.parquet",
+    "before": {
+      "shape": [
+        220732,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "object",
+        "MonthsSpent": "object",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "517a93d88fc8ba2f6dd393313cbbc30b848c7fe61e8b156f2b04a6ddae1f82df",
+      "null_count": 43823,
+      "non_null_python_type_counts": {
+        "float": 94070,
+        "int": 46014,
+        "str": 36825
+      }
+    },
+    "returned": {
+      "shape": [
+        220732,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "string",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "94f6a5dbeb5e618e946b9c79800c18f32542d8a20a8f23f30db3702387b45395",
+      "null_count": 43823,
+      "non_null_python_type_counts": {
+        "str": 176909
+      }
+    },
+    "stored": {
+      "shape": [
+        220732,
+        4
+      ],
+      "columns": [
+        "Age",
+        "MonthsSpent",
+        "Relationship",
+        "Sex"
+      ],
+      "index_names": [
+        "t",
+        "i",
+        "pid"
+      ],
+      "dtypes": {
+        "Age": "string",
+        "MonthsSpent": "string",
+        "Relationship": "str",
+        "Sex": "str"
+      },
+      "content_hash": "94f6a5dbeb5e618e946b9c79800c18f32542d8a20a8f23f30db3702387b45395",
+      "null_count": 43823,
+      "non_null_python_type_counts": {
+        "str": 176909
+      }
+    }
+  }
+]

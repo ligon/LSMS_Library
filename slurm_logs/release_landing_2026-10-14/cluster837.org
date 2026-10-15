@@ -1,0 +1,122 @@
+#+title: Historical #837 cluster hooks: reviewed and rejected under current contract
+
+* Disposition
+Original recovered =c8bf36d81= is retained in history. Its three source edits
+were tested after merging development =452302adc= (candidate =5a8b34265=),
+then restored to development's exact contents. Do not port the early
+=reduce_to_agreed= hooks. The landing change is documentation/evidence only;
+#837 remains a scientific/source-resolution residual, not unexplained work.
+The release coordinator confirmed this disposition on October 14.
+
+* Existing decisions and country idiosyncrasies read first
+Read both country CONTENTS files including LOGBOOK/WAITING/TODO. Ethiopia's
+native household id changes in W2/W3; GPS uses four different column spellings
+across five waves. Tanzania tracks movers under their original cluster and
+uses wave-specific geocode schemes; SDD split-off households cannot describe
+the frame cluster. Its #114 WAITING back-casting caveat survives a closed
+GitHub issue and applies to all 2008-15 tables, unrelated to this proposal.
+
+The Tanzania ledger =.coder/ledger/323-tanzania-key.md= §6.1 explicitly says:
+#+begin_quote
+The config does NOT collapse to (t, v) itself — no reduce_to_agreed,
+no collapse_to_cluster_grain hook.
+#+end_quote
+The next sentences explain that early collapse drives the core loss
+instrument to zero and require household grain to remain visible.
+=tests/test_gh323_tanzania_cluster_key.py= already pins =i= survival.
+
+CLAUDE's GH #871 decision signed 2026-09-12 requires core to select the most
+complete observed row; it explicitly reverses the earlier complementary
+missingness doctrine. Country completion can be an explicit signed exception,
+but existence of =reduce_to_agreed= does not sign this particular exception.
+The recovered WIP's claims about replacing arbitrary =first()= and recovering
+GPS predate the current selector. See ledger [[file:../../.coder/ledger/837-landing-review.md][837 landing review]].
+
+* Ethiopia: independent raw-source reconstruction
+Each wave's cover page and geovariable file has a unique native household id.
+A direct one-to-one left join (no Country formatter/reducer) preserves exactly
+3969 / 5262 / 4954 / 6770 / 4959 cover households. Missing geovariable matches:
+52 / 0 / 0 / 90 / 104. Clusters: 333 / 433 / 432 / 535 / 435; adding raw Region
+and District to the EA key changes none of these counts.
+
+| wave | distinct nonmissing GPS conflicts | mixed missing/recorded GPS groups | admin conflicts |
+|------+----------------------------------+-----------------------------------+-----------------|
+| 2011-12 | 0 | 34 | 0 |
+| 2013-14 | 38 | 5 | 0 |
+| 2015-16 | 72 | 0 | 0 |
+| 2018-19 | 0 | 0 | 0 |
+| 2021-22 | 72 | 49 | 0 |
+
+Latitude and longitude have identical counts. The W1 whole-row audit's
+373 losses in 34 groups are entirely mixed missing/recorded coordinates.
+CONTENTS previously said "the disagreement is in Region / District / Rural,
+not in the coordinates". That inference was demonstrably false and is now
+corrected while quoting its prior claim. This does not prove every raw GPS
+value correct or exclude miscoding within the same administrative area; it
+does rule out the proposed observed cross-district EA-code collision as the
+explanation for these conflicts.
+
+Current development already serves W1 GPS for 333/333 EAs (not WIP's claimed
+299), and W5 432/435 (not 396). Candidate recovers no cells. Its only value
+changes are populated-to-NA GPS cells: W2 38 x 2 = 76, W3 72 x 2 = 144,
+W5 72 x 2 = 144, total 364. W1/W4 are exactly unchanged. Index, row counts
+and other values remain equal. A scientific decision about source coordinate
+disagreement cannot be replaced with a cleanup claim.
+
+* Tanzania: existing source distinctions retained
+Cold development frames after the existing resident filter have 679 household
+rows / 147 clusters in 2019-20 and 2863 / 515 in 2020-21. They reproduce the
+CONTENTS "The residue, honestly" counts:
+
+| wave | Region | District | Rural | total |
+|------+--------+----------+-------+-------|
+| 2019-20 | 1 | 35 | 36 | 72 |
+| 2020-21 | 2 | 32 | 13 | 47 |
+
+The source columns are t0_region/t0_district/sdd_rural in SDD and
+hh_a01_1/hh_a02_1/y5_rural in Y5. The established residency/cluster-key fix is
+left intact; no composite key is manufactured to split moving households.
+CONTENTS records district variants/splits and household-grain Rural answers;
+this review corroborates the source disagreement counts, not every geographic
+interpretation of those variants. The WIP would blank precisely these 119
+currently populated cells (no other value change), remove =i=, and make the
+core audit see zero household conflicts. It emits its own GrainConflictWarning
+on the cold reduction, but that does not preserve the existing core contract.
+
+* Discriminatory validation
+The existing Tanzania country test file on fresh private L2:
+- development base: 28 passed, no skips, 26.19 s;
+- recovered WIP: 27 passed, one failed, no skips, 26.26 s;
+- failure: test_the_frame_reaching_the_projection_is_still_household_grain,
+  2019-20: "i is gone -- the config collapsed early".
+The restored source passes all 28 tests, no skips, 25.94 s, on a third
+independent empty L2 root. No assertion was weakened and no redundant test
+was added. Candidate-versus-base comparison proves identical indices/columns,
+and that all changes are exactly the 364 + 119 populated-to-NA cells above.
+
+* Evidence, reproduction and cache scope
+[[file:cluster837/][Aggregate JSON and replay drivers]] contain direct raw-source
+join counts, base/candidate wave summaries and exact served-cell accounting.
+The drivers require PYTHONPATH and LSMS_COUNTRIES_ROOT for the intended tree,
+private LSMS_DATA_DIR, and LSMS_REVIEW_OUT pointing to private scratch;
+probe.py additionally requires PROBE_LABEL. Household frames stay in private
+scratch, not this commit. Package identity and no in-tree parquets are asserted.
+Both source probes began with empty L2 and only an L1 dvc-cache symlink.
+taskset 8-15; BLAS/OMP/MKL=1; LSMS_BUILD_WORKERS=1;
+pytest -n 6 --dist=loadfile --no-purge, output to files.
+
+Private roots: cluster837-base-data, cluster837-data, cluster837-restored-data
+under release-work/countries. Shared cache and original refs were untouched.
+Restored source files match development exactly; final CONTENTS/ledger/report
+changes do not invalidate data caches. Original WIP country/module changes
+would have incurred country cache invalidation; they are not retained.
+
+* Proposed #837 issue reconciliation (coordinator publication only)
+Keep open for a source/scientific decision. Correct the Ethiopia premise:
+there is no observed administrative conflict, W1 loss is mixed missing GPS,
+and a region/district composite does not split the current EAs. Remove the
+claim that current core composes an arbitrary per-column first row: #871
+already selects a complete observed row. Tanzania district harmonization
+remains distinct from removing its household-grain audit. Record rejection
+of c8bf36d81's blanket blanking hooks and link this evidence; do not mark
+all coordinate or administrative disagreements resolved.

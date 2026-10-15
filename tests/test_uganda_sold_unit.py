@@ -8,7 +8,9 @@ on.  ``CROP_COLMAPS`` wired neither, so ``Value_sold / Quantity_sold`` was a
 price denominated in a unit the row did not carry while ``u`` advertised the
 harvest unit.  Measured on the built table (2026-09-10, isolated
 ``LSMS_DATA_DIR``): the two units differ on 3.9% of the 40,083 rows with a
-positive ``Quantity_sold`` that know both units, and on the 565 disagreeing
+positive ``Quantity_sold`` that know both units (41,162 rows since GH #848
+wired the 2018-20 season-B second condition slot, 2026-09-24; the share is
+unchanged), and on the 565 disagreeing
 priced rows whose two labels both name a weight in KILOGRAMS the two readings
 differ by a median factor of 50 -- >= 100x on 47.4% of them.  Same pathology Malawi closed in ``85947ff5``; different
 shape, because Uganda's sale is on the harvest row and needs no merge.
@@ -431,6 +433,7 @@ def _codes(df, col):
     return pd.to_numeric(df[col], errors="coerce").dropna().astype(int)
 
 
+@pytest.mark.requires_s3
 def test_2018_19_season_a_sold_column_is_a_unit_by_its_values(uganda_module):
     """The evidence for ``s5aq07c_1``, re-derived rather than copied.
 
@@ -464,6 +467,7 @@ def test_2018_19_season_a_sold_column_is_a_unit_by_its_values(uganda_module):
     )
 
 
+@pytest.mark.requires_s3
 def test_2013_14_variable_label_swap_is_confined_to_the_harvest_pair(uganda_module):
     """2013-14 AGSEC5A's swap is a HARVEST-side defect only.
 
@@ -490,6 +494,7 @@ def test_2013_14_variable_label_swap_is_confined_to_the_harvest_pair(uganda_modu
     assert _codes(df, "a5aq6c").isin(units - conds).mean() >= 0.60
 
 
+@pytest.mark.requires_s3
 def test_2011_12_ships_no_sold_condition_column():
     """The colmap's ``condition_sold: None`` is a survey fact, not an omission."""
     for filename, prefix in (("AGSEC5A.dta", "a5aq"), ("AGSEC5B.dta", "a5bq")):
@@ -501,6 +506,7 @@ def test_2011_12_ships_no_sold_condition_column():
         assert f"{prefix}7c" in df.columns, "the sold UNIT is present in 2011-12"
 
 
+@pytest.mark.requires_s3
 def test_2010_11_season_a_sold_unit_is_capped_at_code_20():
     """A known, measured extract defect -- pinned so it cannot be forgotten.
 
@@ -529,6 +535,7 @@ def test_2010_11_season_a_sold_unit_is_capped_at_code_20():
     assert _codes(b, "a5bq7c").max() > 20, "season B is not capped"
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave,filename,unit_col,subdir", [
     ("2013-14", "AGSEC5A.dta", "a5aq7c", "Data"),
     ("2018-19", "AGSEC5A.dta", "s5aq07c_1", "Data"),
@@ -585,9 +592,14 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
 #: reproduce (the first counted non-sale rows, the second counted non-priced
 #: rows, the third was a transcription error).  Pinned here so canonical
 #: prose cannot drift from the table again.
-SALE_ROWS_KNOWING_BOTH = 40_083         # Quantity_sold > 0, u != Unknown, Unit_sold notna
-AGREEMENT_SHARE = 0.9606                # Unit_sold == u on those rows
-LARGEST_DISAGREEMENT_CELL = 162         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
+#:
+#: Moved 2026-09-24 by GH #848 (the 2018-20 season-B second condition slot,
+#: +2,725 rows, 1,079 of them sale rows knowing both units): 40,083 -> 41,162;
+#: 0.9606 -> 0.9614 (by wave-season still 92.0-98.0%, "3.9% disagree" holds);
+#: 162 -> 165.  2009-10 is untouched by #848 and its coverage did not move.
+SALE_ROWS_KNOWING_BOTH = 41_162         # Quantity_sold > 0, u != Unknown, Unit_sold notna
+AGREEMENT_SHARE = 0.9614                # Unit_sold == u on those rows
+LARGEST_DISAGREEMENT_CELL = 165         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
 W2009_10_A_COVERAGE = 0.968             # Unit_sold non-null / sale rows
 
 
@@ -614,6 +626,7 @@ def built_table():
     return df.reset_index()
 
 
+@pytest.mark.requires_s3
 def test_shipped_counts_reproduce(built_table):
     """Every number this branch put into canonical prose, re-derived here.
 
@@ -647,6 +660,7 @@ def test_shipped_counts_reproduce(built_table):
     )
 
 
+@pytest.mark.requires_s3
 def test_the_largest_disagreement_cell_is_priced_like_a_sack(built_table):
     """The measurement that overturned the original consumer rule.
 

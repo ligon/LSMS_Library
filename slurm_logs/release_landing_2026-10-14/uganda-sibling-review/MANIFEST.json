@@ -1,0 +1,25 @@
+{
+  "scope": "independent review, proposed country/issue prose; no data or mutations",
+  "files": [
+    {
+      "name": "REVIEW.md",
+      "bytes": 5454,
+      "sha256": "10d00e5fb9a2591b4c1c0e970c3643f5b23a78963e995240dffc604ffd06599c"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 2290,
+      "sha256": "537c86ad57862141e8b7e0e8a10946afe10c82e556b3e56135aafcc69ad21b55"
+    },
+    {
+      "name": "CONTENTS-addendum.org",
+      "bytes": 1590,
+      "sha256": "ae411625a2303e1d21d85416ba69a54b8840a222082d453bd8460502c475a81c"
+    },
+    {
+      "name": "issue788-addendum.md",
+      "bytes": 2332,
+      "sha256": "1e80939c461b05945ef849d55933d154d7e1453e34337602f6e3c3190126fced"
+    }
+  ]
+}

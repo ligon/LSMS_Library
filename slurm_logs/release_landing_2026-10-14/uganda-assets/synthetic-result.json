@@ -1,0 +1,76 @@
+{
+  "disjoint_two_rows_each": {
+    "input_rows": 4,
+    "old_script": {
+      "rows": 8,
+      "index": [
+        "i",
+        "t",
+        "m"
+      ],
+      "columns": [
+        "j",
+        "level_2",
+        "assets"
+      ],
+      "duplicates": 4,
+      "non_null_values": 4,
+      "null_assets": 4
+    },
+    "concat_reference": {
+      "rows": 4,
+      "index": [
+        "t",
+        "i",
+        "j"
+      ],
+      "columns": [
+        "Value"
+      ],
+      "duplicates": 0,
+      "non_null_values": 4,
+      "null_assets": null
+    },
+    "old_preserves_axis": false,
+    "old_preserves_schema": false,
+    "old_preserves_row_count": false,
+    "singleton_broadcast": false
+  },
+  "singleton_wave": {
+    "input_rows": 3,
+    "old_script": {
+      "rows": 4,
+      "index": [
+        "i",
+        "t",
+        "m"
+      ],
+      "columns": [
+        "j",
+        "level_2",
+        "assets"
+      ],
+      "duplicates": 2,
+      "non_null_values": 4,
+      "null_assets": 0
+    },
+    "concat_reference": {
+      "rows": 3,
+      "index": [
+        "t",
+        "i",
+        "j"
+      ],
+      "columns": [
+        "Value"
+      ],
+      "duplicates": 0,
+      "non_null_values": 3,
+      "null_assets": null
+    },
+    "old_preserves_axis": false,
+    "old_preserves_schema": false,
+    "old_preserves_row_count": false,
+    "singleton_broadcast": true
+  }
+}

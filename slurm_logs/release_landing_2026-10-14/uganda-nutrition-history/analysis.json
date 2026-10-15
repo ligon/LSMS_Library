@@ -1,0 +1,5678 @@
+{
+  "successive": [
+    {
+      "old": "8ec0bab4e",
+      "new": "71b6ce92d",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "unpartitioned",
+          "oldkg": 1457881.374651201,
+          "newkg": 1457881.374651201,
+          "dkg": 0.0,
+          "rows": 355571,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "71b6ce92d",
+      "new": "e07e2a93f",
+      "factor_rows_changed": 33210,
+      "native_rows_with_quantity_and_change": 33208,
+      "nutrient_rows_changed": 15193,
+      "nutrient_cells_changed": 196778,
+      "kg_delta": 49501.65047644144,
+      "nutrient_delta": {
+        "Energy": 34761441.891618066,
+        "Protein": -4308106.6696537,
+        "Fiber": 129792.44461708056,
+        "Folate": -76308649.90273783,
+        "Calcium": -26612653.617581867,
+        "Carbohydrate": 19675294.8169226,
+        "Iron": -534260.7775450301,
+        "Niacin": 113983.13656437688,
+        "Riboflavin": -17940.247138274528,
+        "Thiamin": -40229.17439663057,
+        "Vitamin A": 112873742.05694124,
+        "Vitamin B-12": -109802.18457854672,
+        "Vitamin B-6": 242333.73763519712,
+        "Vitamin C": 22639301.917967275,
+        "Zinc": -349765.06892725104
+      },
+      "source_replay_max_abs_error": 1.1920928955078125e-07,
+      "by_final_rung": [
+        {
+          "rung": "unpartitioned",
+          "oldkg": 1457881.374651201,
+          "newkg": 1507383.0251276426,
+          "dkg": 49501.65047644144,
+          "rows": 355571,
+          "Energy": 34761441.89161818,
+          "Protein": -4308106.669653697,
+          "Fiber": 129792.44461708031,
+          "Folate": -76308649.90273789,
+          "Calcium": -26612653.61758186,
+          "Carbohydrate": 19675294.816922627,
+          "Iron": -534260.7775450295,
+          "Niacin": 113983.13656437576,
+          "Riboflavin": -17940.247138274386,
+          "Thiamin": -40229.17439663041,
+          "Vitamin A": 112873742.05694138,
+          "Vitamin B-12": -109802.18457854861,
+          "Vitamin B-6": 242333.73763518996,
+          "Vitamin C": 22639301.91796729,
+          "Zinc": -349765.0689272509
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Beans (dry)",
+              "dkg": -14153.589586840135,
+              "Energy": -49112955.86633527
+            },
+            {
+              "j": "Maize (flour)",
+              "dkg": -3251.383333447886,
+              "Energy": -11997604.5004227
+            },
+            {
+              "j": "Milk (fresh)",
+              "dkg": -17614.02577782369,
+              "Energy": -10568415.466694213
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": -6056.616666714351,
+              "Energy": -10296248.333414396
+            },
+            {
+              "j": "Ground Nuts (pounded)",
+              "dkg": -1690.7036577917395,
+              "Energy": -9586289.739679163
+            },
+            {
+              "j": "Millet",
+              "dkg": -2361.3068885202088,
+              "Energy": -8925740.03860639
+            },
+            {
+              "j": "Sim Sim",
+              "dkg": -1418.333334421118,
+              "Energy": -8127050.006233007
+            },
+            {
+              "j": "Sorghum",
+              "dkg": -1997.1504170459384,
+              "Energy": -6770339.913785731
+            }
+          ],
+          "positive": [
+            {
+              "j": "Maize (cobs)",
+              "dkg": 3043.948717948718,
+              "Energy": 5235591.794871795
+            },
+            {
+              "j": "Irish Potatoes",
+              "dkg": 7093.645833735665,
+              "Energy": 5462107.291976462
+            },
+            {
+              "j": "Mangos",
+              "dkg": 10638.358333323276,
+              "Energy": 6914932.916660129
+            },
+            {
+              "j": "Sweet Potatoes (dry)",
+              "dkg": 3046.536223306779,
+              "Energy": 10449619.245942252
+            },
+            {
+              "j": "Cassava (fresh)",
+              "dkg": 7814.7487406810615,
+              "Energy": 12503597.985089699
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": 8857.166666666666,
+              "Energy": 27811503.333333332
+            },
+            {
+              "j": "Cassava (dry/flour)",
+              "dkg": 11743.761142033904,
+              "Energy": 36875409.98598646
+            },
+            {
+              "j": "Sweet Potatoes (fresh)",
+              "dkg": 43649.93584481653,
+              "Energy": 53689421.08912433
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Milk (fresh)",
+              "dkg": -17614.02577782369,
+              "Vitamin A": -4931927.2177906325
+            },
+            {
+              "j": "Ghee",
+              "dkg": -81.63226193270158,
+              "Vitamin A": -685711.0002346933
+            },
+            {
+              "j": "Margarine, Butter, etc",
+              "dkg": -35.900000013411045,
+              "Vitamin A": -294021.00010983646
+            },
+            {
+              "j": "Peas",
+              "dkg": -619.7750007990747,
+              "Vitamin A": -254107.75032762066
+            },
+            {
+              "j": "Bongo",
+              "dkg": -583.375,
+              "Vitamin A": -215848.75
+            },
+            {
+              "j": "Sweet Potatoes (flour)",
+              "dkg": -9.5,
+              "Vitamin A": -47120.0
+            },
+            {
+              "j": "Peas (dry)",
+              "dkg": -1368.3333333333333,
+              "Vitamin A": -41050.0
+            },
+            {
+              "j": "Ice Cream",
+              "dkg": -28.3125,
+              "Vitamin A": -33408.75
+            }
+          ],
+          "positive": [
+            {
+              "j": "Infant Formula",
+              "dkg": 18.912499994039536,
+              "Vitamin A": 89456.124971807
+            },
+            {
+              "j": "Oranges",
+              "dkg": 878.4833332835385,
+              "Vitamin A": 96633.16666118924
+            },
+            {
+              "j": "Matoke (bunch)",
+              "dkg": 5119.230769230769,
+              "Vitamin A": 153576.92307692306
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": 8857.166666666666,
+              "Vitamin A": 620001.6666666666
+            },
+            {
+              "j": "Cassava (dry/flour)",
+              "dkg": 11743.761142033904,
+              "Vitamin A": 822063.2799423733
+            },
+            {
+              "j": "Mangos",
+              "dkg": 10638.358333323276,
+              "Vitamin A": 4042576.1666628444
+            },
+            {
+              "j": "Sweet Potatoes (dry)",
+              "dkg": 3046.536223306779,
+              "Vitamin A": 15110819.667601625
+            },
+            {
+              "j": "Sweet Potatoes (fresh)",
+              "dkg": 43649.93584481653,
+              "Vitamin A": 98212355.6508372
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Milk (fresh)",
+              "dkg": -17614.02577782369,
+              "Vitamin B-12": -77501.71342242423
+            },
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": -365.2750002145767,
+              "Vitamin B-12": -22354.830013132094
+            },
+            {
+              "j": "Mukene",
+              "dkg": -439.0,
+              "Vitamin B-12": -6936.200000000001
+            },
+            {
+              "j": "Bongo",
+              "dkg": -583.375,
+              "Vitamin B-12": -2566.8500000000004
+            },
+            {
+              "j": "Fresh Fish",
+              "dkg": -20.283333336313564,
+              "Vitamin B-12": -486.8000000715256
+            },
+            {
+              "j": "Ice Cream",
+              "dkg": -28.3125,
+              "Vitamin B-12": -110.41874999999999
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": -8.5,
+              "Vitamin B-12": -31.450000000000003
+            },
+            {
+              "j": "Ghee",
+              "dkg": -81.63226193270158,
+              "Vitamin B-12": -8.163226193270159
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 141.41666666666666,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 20.5625,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 36.408333333333424,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 61.25,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": -6056.616666714351,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Restaurant (beer)",
+              "dkg": 6.666666666666668,
+              "Vitamin B-12": 1.3333333333333337
+            },
+            {
+              "j": "Infant Formula",
+              "dkg": 18.912499994039536,
+              "Vitamin B-12": 192.90749993920326
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "e07e2a93f",
+      "new": "60f98ab1d",
+      "factor_rows_changed": 171049,
+      "native_rows_with_quantity_and_change": 164609,
+      "nutrient_rows_changed": 22987,
+      "nutrient_cells_changed": 330909,
+      "kg_delta": -259265.15504466355,
+      "nutrient_delta": {
+        "Energy": -503738072.9700394,
+        "Protein": -10061317.053572835,
+        "Fiber": -4554389.879055594,
+        "Folate": -53938492.926755056,
+        "Calcium": -61227918.1784288,
+        "Carbohydrate": -35064583.783434376,
+        "Iron": -1523493.2552162006,
+        "Niacin": -2277730.79975094,
+        "Riboflavin": -199147.18423681575,
+        "Thiamin": -159234.10857641816,
+        "Vitamin A": -85147580.06249963,
+        "Vitamin B-12": -613871.0413327852,
+        "Vitamin B-6": -408595.69208385545,
+        "Vitamin C": -21155482.7741441,
+        "Zinc": -905969.7230236937
+      },
+      "source_replay_max_abs_error": 5.736947059631348e-07,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 159928.96787602978,
+          "newkg": 93243.48750598874,
+          "dkg": -66685.48037004104,
+          "rows": 73452,
+          "Energy": -81557225.89178303,
+          "Protein": -5503491.936258378,
+          "Fiber": -1641510.2779419334,
+          "Folate": -14014208.109706063,
+          "Calcium": -10017640.828797765,
+          "Carbohydrate": -10716090.567673912,
+          "Iron": -519920.9985629203,
+          "Niacin": -1149263.8781253474,
+          "Riboflavin": -52499.96126452829,
+          "Thiamin": -69292.48000150122,
+          "Vitamin A": -16260569.274587316,
+          "Vitamin B-12": -388255.1339954084,
+          "Vitamin B-6": -136274.9725517457,
+          "Vitamin C": -3851297.4304935113,
+          "Zinc": -367204.8624909819
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 723.4114842267016,
+          "newkg": 266.0892857142857,
+          "dkg": -457.32219851241587,
+          "rows": 718,
+          "Energy": -187502.1013900905,
+          "Protein": -4115.899786611743,
+          "Fiber": -13719.665955372478,
+          "Folate": -86891.21771735902,
+          "Calcium": -150916.32550909725,
+          "Carbohydrate": -43902.93105719193,
+          "Iron": -1371.9665955372477,
+          "Niacin": -4495.477211377049,
+          "Riboflavin": -265.24687513720124,
+          "Thiamin": -301.8326510181945,
+          "Vitamin A": -3818640.3575786725,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": -631.104633947134,
+          "Vitamin C": -26982.00971223254,
+          "Zinc": -914.6443970248317
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 316388.38653573574,
+          "newkg": 124266.03405962566,
+          "dkg": -192122.35247611007,
+          "rows": 98851,
+          "Energy": -421993344.9768658,
+          "Protein": -4553709.217527902,
+          "Fiber": -2899159.9351583426,
+          "Folate": -39837393.59933129,
+          "Calcium": -51059361.024122514,
+          "Carbohydrate": -24304590.284703173,
+          "Iron": -1002200.2900577472,
+          "Niacin": -1123971.4444142065,
+          "Riboflavin": -146381.9760971489,
+          "Thiamin": -89639.79592389896,
+          "Vitamin A": -65068370.430333436,
+          "Vitamin B-12": -225615.90733736663,
+          "Vitamin B-6": -271689.6148981594,
+          "Vitamin C": -17277203.33393837,
+          "Zinc": -537850.2161356908
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Cooking Oil",
+              "dkg": -21070.91666799745,
+              "Energy": -186266903.34509748
+            },
+            {
+              "j": "Cooking Oil (refined)",
+              "dkg": -5999.619929335371,
+              "Energy": -53036640.17532468
+            },
+            {
+              "j": "Maize (cobs)",
+              "dkg": -19584.63158794971,
+              "Energy": -33685566.331273496
+            },
+            {
+              "j": "Donuts",
+              "dkg": -1711.6979886863608,
+              "Energy": -31067318.49465745
+            },
+            {
+              "j": "Chapati",
+              "dkg": -7772.321181646763,
+              "Energy": -21373883.249528598
+            },
+            {
+              "j": "Matoke (bunch)",
+              "dkg": -22903.054633044383,
+              "Energy": -20383718.6234095
+            },
+            {
+              "j": "Avocado",
+              "dkg": -9456.554466375552,
+              "Energy": -15130487.146200882
+            },
+            {
+              "j": "Eggs",
+              "dkg": -9933.94700300847,
+              "Energy": -14205544.214302111
+            }
+          ],
+          "positive": [
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Ice Cream",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Maize (grains)",
+              "dkg": 4.06886663855824,
+              "Energy": 6998.450618320177
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": 8.196721683566317,
+              "Energy": 25737.706086398233
+            },
+            {
+              "j": "Bread",
+              "dkg": 218.9093871220912,
+              "Energy": 582298.9697447626
+            },
+            {
+              "j": "Cassava (flour)",
+              "dkg": 197.86987816335642,
+              "Energy": 621311.4174329392
+            },
+            {
+              "j": "Chicken",
+              "dkg": 599.4720468916122,
+              "Energy": 1288864.900816966
+            },
+            {
+              "j": "Irish Potatoes",
+              "dkg": 2856.4065389942243,
+              "Energy": 2199433.035025553
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Sweet Potatoes (fresh)",
+              "dkg": -8351.692816571393,
+              "Vitamin A": -18791308.837285634
+            },
+            {
+              "j": "Dodo",
+              "dkg": -10059.695011983214,
+              "Vitamin A": -14687154.717495495
+            },
+            {
+              "j": "Eggs",
+              "dkg": -9933.94700300847,
+              "Vitamin A": -13907525.804211859
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -16800.086991632437,
+              "Vitamin A": -7056036.5364856245
+            },
+            {
+              "j": "Ghee",
+              "dkg": -647.1367552585488,
+              "Vitamin A": -5435948.744171809
+            },
+            {
+              "j": "Kabalagala",
+              "dkg": -4142.655876807039,
+              "Vitamin A": -4556921.464487743
+            },
+            {
+              "j": "Pumpkins",
+              "dkg": -1173.3482477491257,
+              "Vitamin A": -4329655.034194274
+            },
+            {
+              "j": "Carrots",
+              "dkg": -460.0036774707907,
+              "Vitamin A": -3841030.706881102
+            }
+          ],
+          "positive": [
+            {
+              "j": "Water",
+              "dkg": -36.1546568627451,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tea (other)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Apples",
+              "dkg": -80.7433803368586,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": 8.196721683566317,
+              "Vitamin A": 573.770517849642
+            },
+            {
+              "j": "Cassava (flour)",
+              "dkg": 197.86987816335642,
+              "Vitamin A": 13850.891471434948
+            },
+            {
+              "j": "Chicken",
+              "dkg": 599.4720468916122,
+              "Vitamin A": 251778.25969447714
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Fresh Fish",
+              "dkg": -8662.59664316189,
+              "Vitamin B-12": -207902.31943588538
+            },
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": -3050.0203735228997,
+              "Vitamin B-12": -186661.24685960147
+            },
+            {
+              "j": "Eggs",
+              "dkg": -9933.94700300847,
+              "Vitamin B-12": -128147.91633880929
+            },
+            {
+              "j": "Tilapia (dried)",
+              "dkg": -487.77168316719394,
+              "Vitamin B-12": -29851.62700983227
+            },
+            {
+              "j": "Perch (dried)",
+              "dkg": -233.09783862937886,
+              "Vitamin B-12": -18974.164064431443
+            },
+            {
+              "j": "Nkejje (dried)",
+              "dkg": -53.832996988229546,
+              "Vitamin B-12": -17081.209944365237
+            },
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": -804.4866685430153,
+              "Vitamin B-12": -12710.889362979642
+            },
+            {
+              "j": "Perch (fresh)",
+              "dkg": -331.1178347115847,
+              "Vitamin B-12": -6291.238859520109
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tea (other)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -16800.086991632437,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": -220.24718592218593,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": -36.1546568627451,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": -602.485240995212,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Chicken",
+              "dkg": 599.4720468916122,
+              "Vitamin B-12": 1858.3633453639982
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "60f98ab1d",
+      "new": "f98c9762e",
+      "factor_rows_changed": 9051,
+      "native_rows_with_quantity_and_change": 9051,
+      "nutrient_rows_changed": 7323,
+      "nutrient_cells_changed": 96007,
+      "kg_delta": -37.4659453631958,
+      "nutrient_delta": {
+        "Energy": 566653.8153655437,
+        "Protein": -9471.373380465213,
+        "Fiber": 5389.865417386383,
+        "Folate": -1133.4095656132422,
+        "Calcium": 29336.394327936865,
+        "Carbohydrate": 82225.82839700281,
+        "Iron": 1513.095829090429,
+        "Niacin": 2590.7410991215875,
+        "Riboflavin": -7.257006149583541,
+        "Thiamin": 164.88516527098713,
+        "Vitamin A": 154021.95196426223,
+        "Vitamin B-12": -1725.176659524779,
+        "Vitamin B-6": 618.7885829426888,
+        "Vitamin C": 13782.944271008553,
+        "Zinc": 1865.607044261871
+      },
+      "source_replay_max_abs_error": 1.862645149230957e-09,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 93042.9131153985,
+          "newkg": 93000.75752274953,
+          "dkg": -42.155592648971584,
+          "rows": 73315,
+          "Energy": 343440.4189484881,
+          "Protein": -8507.45960271741,
+          "Fiber": 3077.22204417368,
+          "Folate": 8506.34916090979,
+          "Calcium": 22668.25258585315,
+          "Carbohydrate": 91234.76126130151,
+          "Iron": 1526.0266341629,
+          "Niacin": 2050.1519168539903,
+          "Riboflavin": -17.827778139436695,
+          "Thiamin": 284.82882314224565,
+          "Vitamin A": -108217.14774488113,
+          "Vitamin B-12": -1713.325596590908,
+          "Vitamin B-6": 715.8334860418161,
+          "Vitamin C": 5563.898804286694,
+          "Zinc": 2095.127802999691
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 124466.6084502159,
+          "newkg": 124471.29809750168,
+          "dkg": 4.689647285775777,
+          "rows": 98988,
+          "Energy": 223213.39641705388,
+          "Protein": -963.9137777472367,
+          "Fiber": 2312.6433732126898,
+          "Folate": -9639.758726522643,
+          "Calcium": 6668.141742084092,
+          "Carbohydrate": -9008.932864300268,
+          "Iron": -12.930805072512953,
+          "Niacin": 540.5891822675849,
+          "Riboflavin": 10.57077198985298,
+          "Thiamin": -119.94365787125886,
+          "Vitamin A": 262239.09970914526,
+          "Vitamin B-12": -11.851062933869194,
+          "Vitamin B-6": -97.04490309914408,
+          "Vitamin C": 8219.045466721716,
+          "Zinc": -229.5207587378377
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Beans (fresh)",
+              "dkg": -88.95072008533867,
+              "Energy": -151216.22414507577
+            },
+            {
+              "j": "Fresh Fish",
+              "dkg": -71.2704545454545,
+              "Energy": -99065.93181818177
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": -20.955882352941174,
+              "Energy": -65801.47058823529
+            },
+            {
+              "j": "Maize (grains)",
+              "dkg": -30.36,
+              "Energy": -52219.2
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -123.0111111121044,
+              "Energy": -22142.000000178792
+            },
+            {
+              "j": "Passion Fruits",
+              "dkg": -16.384382739938033,
+              "Energy": -15892.851257739887
+            },
+            {
+              "j": "Ground Nuts (pounded)",
+              "dkg": -1.082251602564103,
+              "Energy": -6136.366586538464
+            },
+            {
+              "j": "Goat Meat",
+              "dkg": -4.666666666666666,
+              "Energy": -5086.666666666666
+            }
+          ],
+          "positive": [
+            {
+              "j": "Onions",
+              "dkg": 48.60562499914323,
+              "Energy": 19442.249999657295
+            },
+            {
+              "j": "Ground Nuts (paste)",
+              "dkg": 3.8169642857142847,
+              "Energy": 22443.749999999993
+            },
+            {
+              "j": "Sugar",
+              "dkg": 5.880723443223444,
+              "Energy": 22758.39972527473
+            },
+            {
+              "j": "Sim Sim",
+              "dkg": 7.075,
+              "Energy": 40539.75
+            },
+            {
+              "j": "Irish Potatoes",
+              "dkg": 122.47916666666663,
+              "Energy": 94308.9583333333
+            },
+            {
+              "j": "Cassava (dry/flour)",
+              "dkg": 32.95833333333333,
+              "Energy": 103489.16666666666
+            },
+            {
+              "j": "Ghee",
+              "dkg": 28.254015269151136,
+              "Energy": 247505.17375776396
+            },
+            {
+              "j": "Maize (cobs)",
+              "dkg": 248.875,
+              "Energy": 428065.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Tomatoes",
+              "dkg": -123.0111111121044,
+              "Vitamin A": -51664.66666708384
+            },
+            {
+              "j": "Fresh Fish",
+              "dkg": -71.2704545454545,
+              "Vitamin A": -21381.13636363635
+            },
+            {
+              "j": "Passion Fruits",
+              "dkg": -16.384382739938033,
+              "Vitamin A": -10486.004953560341
+            },
+            {
+              "j": "Cassava (dry)",
+              "dkg": -20.955882352941174,
+              "Vitamin A": -1466.9117647058824
+            },
+            {
+              "j": "Peas",
+              "dkg": -1.9194677871148453,
+              "Vitamin A": -786.9817927170865
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (dried)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Perch (fresh)",
+              "dkg": 1.8537990196078433,
+              "Vitamin A": 166.8419117647059
+            },
+            {
+              "j": "Cassava (dry/flour)",
+              "dkg": 32.95833333333333,
+              "Vitamin A": 2307.083333333333
+            },
+            {
+              "j": "Ghee",
+              "dkg": 28.254015269151136,
+              "Vitamin A": 237333.72826086957
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Fresh Fish",
+              "dkg": -71.2704545454545,
+              "Vitamin B-12": -1710.490909090908
+            },
+            {
+              "j": "Goat Meat",
+              "dkg": -4.666666666666666,
+              "Vitamin B-12": -52.73333333333333
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": -88.95072008533867,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -123.0111111121044,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Ghee",
+              "dkg": 28.254015269151136,
+              "Vitamin B-12": 2.8254015269151136
+            },
+            {
+              "j": "Perch (fresh)",
+              "dkg": 1.8537990196078433,
+              "Vitamin B-12": 35.222181372549024
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "f98c9762e",
+      "new": "7cde56579",
+      "factor_rows_changed": 19301,
+      "native_rows_with_quantity_and_change": 19299,
+      "nutrient_rows_changed": 10791,
+      "nutrient_cells_changed": 150950,
+      "kg_delta": -5677.630800333054,
+      "nutrient_delta": {
+        "Energy": -12387181.479570912,
+        "Protein": -103434.73111078524,
+        "Fiber": -138742.82780185493,
+        "Folate": -1979565.2115045236,
+        "Calcium": -1196296.074145641,
+        "Carbohydrate": -2939255.572408541,
+        "Iron": -22249.791768867413,
+        "Niacin": -62821.51578603191,
+        "Riboflavin": -3531.667408308335,
+        "Thiamin": -6560.7131721885235,
+        "Vitamin A": -84310.93773426388,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": -6381.160961089173,
+        "Vitamin C": -1594283.2823347151,
+        "Zinc": -22249.64450463667
+      },
+      "source_replay_max_abs_error": 4.842877388000488e-07,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 68986.51383877562,
+          "newkg": 71861.26815126931,
+          "dkg": 2874.754312493694,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 148485.5417814756,
+          "newkg": 139933.15666864885,
+          "dkg": -8552.385112826749,
+          "rows": 112559,
+          "Energy": -12387181.479571396,
+          "Protein": -103434.73111078498,
+          "Fiber": -138742.827801854,
+          "Folate": -1979565.2115045162,
+          "Calcium": -1196296.0741456011,
+          "Carbohydrate": -2939255.572408588,
+          "Iron": -22249.791768867843,
+          "Niacin": -62821.51578603267,
+          "Riboflavin": -3531.6674083085986,
+          "Thiamin": -6560.713172188341,
+          "Vitamin A": -84310.93773426034,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": -6381.160961089267,
+          "Vitamin C": -1594283.2823347372,
+          "Zinc": -22249.64450463707
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Cassava (fresh)",
+              "dkg": -7800.7163900927,
+              "Energy": -12481146.22414832
+            },
+            {
+              "j": "Margarine, Butter, etc",
+              "dkg": -1.472642307692308,
+              "Energy": -44812.50542307694
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Coffee",
+              "dkg": 7.565625,
+              "Energy": 605.25
+            },
+            {
+              "j": "Eggplant",
+              "dkg": 575.7166666666667,
+              "Energy": 138172.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Cassava (fresh)",
+              "dkg": -7800.7163900927,
+              "Vitamin A": -78007.163900927
+            },
+            {
+              "j": "Margarine, Butter, etc",
+              "dkg": -1.472642307692308,
+              "Vitamin A": -12060.940500000002
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Eggplant",
+              "dkg": 575.7166666666667,
+              "Vitamin A": 5757.166666666666
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "7cde56579",
+      "new": "0554ec907",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "0554ec907",
+      "new": "f7c1eb380",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "f7c1eb380",
+      "new": "7bb2d9955",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "7bb2d9955",
+      "new": "ffcae2797",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "ffcae2797",
+      "new": "91118fd1a",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "91118fd1a",
+      "new": "live",
+      "factor_rows_changed": 0,
+      "native_rows_with_quantity_and_change": 0,
+      "nutrient_rows_changed": 0,
+      "nutrient_cells_changed": 0,
+      "kg_delta": 0.0,
+      "nutrient_delta": {
+        "Energy": 0.0,
+        "Protein": 0.0,
+        "Fiber": 0.0,
+        "Folate": 0.0,
+        "Calcium": 0.0,
+        "Carbohydrate": 0.0,
+        "Iron": 0.0,
+        "Niacin": 0.0,
+        "Riboflavin": 0.0,
+        "Thiamin": 0.0,
+        "Vitamin A": 0.0,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": 0.0,
+        "Vitamin C": 0.0,
+        "Zinc": 0.0
+      },
+      "source_replay_max_abs_error": 0.0,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 71861.26815126931,
+          "newkg": 71861.26815126931,
+          "dkg": 0.0,
+          "rows": 59744,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 266.0892857142857,
+          "newkg": 266.0892857142857,
+          "dkg": 0.0,
+          "rows": 718,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 139933.15666864885,
+          "newkg": 139933.15666864885,
+          "dkg": 0.0,
+          "rows": 112559,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beef",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Bogoya",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "overall": {
+    "old": "8ec0bab4e",
+    "new": "live",
+    "factor_rows_changed": 205340,
+    "native_rows_with_quantity_and_change": 198898,
+    "nutrient_rows_changed": 23284,
+    "nutrient_cells_changed": 337664,
+    "kg_delta": -215478.60131391836,
+    "nutrient_delta": {
+      "Energy": -480797158.74262804,
+      "Protein": -14482329.827717729,
+      "Fiber": -4557950.39682301,
+      "Folate": -132227841.45056346,
+      "Calcium": -89007531.47582823,
+      "Carbohydrate": -18246318.71052327,
+      "Iron": -2078490.7287010062,
+      "Niacin": -2223978.437873477,
+      "Riboflavin": -220626.35578954808,
+      "Thiamin": -205859.11097996595,
+      "Vitamin A": 27795873.00867204,
+      "Vitamin B-12": -725398.4025708658,
+      "Vitamin B-6": -172024.32682680895,
+      "Vitamin C": -96681.19424057555,
+      "Zinc": -1276118.8294113157
+    },
+    "source_replay_max_abs_error": 1.430511474609375e-06,
+    "by_final_rung": [
+      {
+        "rung": "item_unit",
+        "oldkg": 126601.18989607012,
+        "newkg": 71861.26815126931,
+        "dkg": -54739.921744800806,
+        "rows": 59744,
+        "Energy": -74130726.30952518,
+        "Protein": -5432760.355949124,
+        "Fiber": -1481149.850251396,
+        "Folate": -12496204.877872847,
+        "Calcium": -9123444.326092148,
+        "Carbohydrate": -9209214.524359874,
+        "Iron": -499794.0824947312,
+        "Niacin": -1099199.2390816929,
+        "Riboflavin": -49795.76418889327,
+        "Thiamin": -65045.839893090226,
+        "Vitamin A": -15512264.308323935,
+        "Vitamin B-12": -389858.95669385116,
+        "Vitamin B-6": -130346.11528536303,
+        "Vitamin C": -3086516.3284579287,
+        "Zinc": -349182.7766933621
+      },
+      {
+        "rung": "item_unit_tight",
+        "oldkg": 723.4114842267016,
+        "newkg": 266.0892857142857,
+        "dkg": -457.32219851241587,
+        "rows": 718,
+        "Energy": -187502.1013900905,
+        "Protein": -4115.899786611743,
+        "Fiber": -13719.665955372478,
+        "Folate": -86891.21771735902,
+        "Calcium": -150916.32550909725,
+        "Carbohydrate": -43902.93105719193,
+        "Iron": -1371.9665955372477,
+        "Niacin": -4495.477211377049,
+        "Riboflavin": -265.24687513720124,
+        "Thiamin": -301.8326510181945,
+        "Vitamin A": -3818640.3575786725,
+        "Vitamin B-12": 0.0,
+        "Vitamin B-6": -631.104633947134,
+        "Vitamin C": -26982.00971223254,
+        "Zinc": -914.6443970248317
+      },
+      {
+        "rung": "metric",
+        "oldkg": 980840.6087552088,
+        "newkg": 1030342.2592316503,
+        "dkg": 49501.65047644144,
+        "rows": 182550,
+        "Energy": 34761441.89161818,
+        "Protein": -4308106.669653697,
+        "Fiber": 129792.44461708031,
+        "Folate": -76308649.90273789,
+        "Calcium": -26612653.61758186,
+        "Carbohydrate": 19675294.816922627,
+        "Iron": -534260.7775450295,
+        "Niacin": 113983.13656437576,
+        "Riboflavin": -17940.247138274386,
+        "Thiamin": -40229.17439663041,
+        "Vitamin A": 112873742.05694138,
+        "Vitamin B-12": -109802.18457854861,
+        "Vitamin B-6": 242333.73763518996,
+        "Vitamin C": 22639301.91796729,
+        "Zinc": -349765.0689272509
+      },
+      {
+        "rung": "unit",
+        "oldkg": 349716.1645156954,
+        "newkg": 139933.15666864885,
+        "dkg": -209783.00784704657,
+        "rows": 112559,
+        "Energy": -441240372.22332954,
+        "Protein": -4737346.9023284055,
+        "Fiber": -3192873.3252333472,
+        "Folate": -43336095.45223464,
+        "Calcium": -53120517.206645794,
+        "Carbohydrate": -28668496.072028793,
+        "Iron": -1043063.9020657138,
+        "Niacin": -1234266.858144772,
+        "Riboflavin": -152625.0975872421,
+        "Thiamin": -100282.2640392273,
+        "Vitamin A": -65746964.38236681,
+        "Vitamin B-12": -225737.26129844863,
+        "Vitamin B-6": -283380.84454268875,
+        "Vitamin C": -19622484.77403768,
+        "Zinc": -576256.3393936858
+      }
+    ],
+    "top_contributors": {
+      "Energy": {
+        "negative": [
+          {
+            "j": "Cooking Oil",
+            "dkg": -20960.184400490685,
+            "Energy": -185288030.10033765
+          },
+          {
+            "j": "Cooking Oil (refined)",
+            "dkg": -5990.512353577795,
+            "Energy": -52956129.20562771
+          },
+          {
+            "j": "Beans (dry)",
+            "dkg": -14556.105381997986,
+            "Energy": -50509685.67553301
+          },
+          {
+            "j": "Donuts",
+            "dkg": -1711.6979886863608,
+            "Energy": -31067318.49465745
+          },
+          {
+            "j": "Maize (cobs)",
+            "dkg": -16291.80787000099,
+            "Energy": -28021909.536401704
+          },
+          {
+            "j": "Chapati",
+            "dkg": -7772.321181646763,
+            "Energy": -21373883.249528598
+          },
+          {
+            "j": "Matoke (bunch)",
+            "dkg": -17783.823863813614,
+            "Energy": -15827603.238794114
+          },
+          {
+            "j": "Avocado",
+            "dkg": -9205.512799708886,
+            "Energy": -14728820.479534216
+          }
+        ],
+        "positive": [
+          {
+            "j": "Chicken",
+            "dkg": 599.4720468916122,
+            "Energy": 1288864.900816966
+          },
+          {
+            "j": "Sweet Potatoes (white, flour)",
+            "dkg": 456.5833333333333,
+            "Energy": 1566080.8333333333
+          },
+          {
+            "j": "Ground Nuts (in shell)",
+            "dkg": 571.2963113510486,
+            "Energy": 2496564.8806040827
+          },
+          {
+            "j": "Irish Potatoes",
+            "dkg": 10072.531539396556,
+            "Energy": 7755849.285335348
+          },
+          {
+            "j": "Sweet Potatoes (dry)",
+            "dkg": 2887.7369466309924,
+            "Energy": 9904937.726944303
+          },
+          {
+            "j": "Cassava (dry)",
+            "dkg": 8844.407505997291,
+            "Energy": 27771439.568831496
+          },
+          {
+            "j": "Cassava (dry/flour)",
+            "dkg": 11767.486680207905,
+            "Energy": 36949908.17585282
+          },
+          {
+            "j": "Sweet Potatoes (fresh)",
+            "dkg": 35298.24302824514,
+            "Energy": 43416838.92474152
+          }
+        ]
+      },
+      "Vitamin A": {
+        "negative": [
+          {
+            "j": "Dodo",
+            "dkg": -10059.695011983214,
+            "Vitamin A": -14687154.717495495
+          },
+          {
+            "j": "Eggs",
+            "dkg": -9933.94700300847,
+            "Vitamin A": -13907525.804211859
+          },
+          {
+            "j": "Tomatoes",
+            "dkg": -16781.681436077877,
+            "Vitamin A": -7048306.203152708
+          },
+          {
+            "j": "Ghee",
+            "dkg": -700.5150019220993,
+            "Vitamin A": -5884326.0161456335
+          },
+          {
+            "j": "Milk (fresh)",
+            "dkg": -17833.586905118318,
+            "Vitamin A": -4993404.33343313
+          },
+          {
+            "j": "Kabalagala",
+            "dkg": -4142.655876807039,
+            "Vitamin A": -4556921.464487743
+          },
+          {
+            "j": "Pumpkins",
+            "dkg": -1173.3482477491257,
+            "Vitamin A": -4329655.034194274
+          },
+          {
+            "j": "Carrots",
+            "dkg": -460.0036774707907,
+            "Vitamin A": -3841030.706881102
+          }
+        ],
+        "positive": [
+          {
+            "j": "Cassava (flour)",
+            "dkg": 266.63922337537474,
+            "Vitamin A": 18664.745636276217
+          },
+          {
+            "j": "Infant Formula",
+            "dkg": 16.630648797292473,
+            "Vitamin A": 78662.9688111934
+          },
+          {
+            "j": "Chicken",
+            "dkg": 599.4720468916122,
+            "Vitamin A": 251778.25969447714
+          },
+          {
+            "j": "Mangos",
+            "dkg": 881.3857038952132,
+            "Vitamin A": 334926.56748018105
+          },
+          {
+            "j": "Cassava (dry)",
+            "dkg": 8844.407505997291,
+            "Vitamin A": 619108.5254198104
+          },
+          {
+            "j": "Cassava (dry/flour)",
+            "dkg": 11767.486680207905,
+            "Vitamin A": 823724.0676145533
+          },
+          {
+            "j": "Sweet Potatoes (dry)",
+            "dkg": 2887.7369466309924,
+            "Vitamin A": 14323175.255289722
+          },
+          {
+            "j": "Sweet Potatoes (fresh)",
+            "dkg": 35298.24302824514,
+            "Vitamin A": 79421046.81355156
+          }
+        ]
+      },
+      "Vitamin B-12": {
+        "negative": [
+          {
+            "j": "Fresh Fish",
+            "dkg": -8754.15043104366,
+            "Vitamin B-12": -210099.6103450478
+          },
+          {
+            "j": "Dry/Smoked Fish",
+            "dkg": -3415.2953737374764,
+            "Vitamin B-12": -209016.07687273357
+          },
+          {
+            "j": "Eggs",
+            "dkg": -9933.94700300847,
+            "Vitamin B-12": -128147.91633880929
+          },
+          {
+            "j": "Milk (fresh)",
+            "dkg": -17833.586905118318,
+            "Vitamin B-12": -78467.78238252061
+          },
+          {
+            "j": "Tilapia (dried)",
+            "dkg": -487.77168316719394,
+            "Vitamin B-12": -29851.62700983227
+          },
+          {
+            "j": "Perch (dried)",
+            "dkg": -233.09783862937886,
+            "Vitamin B-12": -18974.164064431443
+          },
+          {
+            "j": "Nkejje (dried)",
+            "dkg": -53.832996988229546,
+            "Vitamin B-12": -17081.209944365237
+          },
+          {
+            "j": "Tilapia (fresh)",
+            "dkg": -804.4866685430153,
+            "Vitamin B-12": -12710.889362979642
+          }
+        ],
+        "positive": [
+          {
+            "j": "Tea (other)",
+            "dkg": 0.0,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Tomatoes",
+            "dkg": -16781.681436077877,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Watermelon",
+            "dkg": -220.24718592218593,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Wheat (flour)",
+            "dkg": 20.5625,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Yams (arrowroot)",
+            "dkg": -541.235240995212,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Apples",
+            "dkg": -80.7433803368586,
+            "Vitamin B-12": 0.0
+          },
+          {
+            "j": "Infant Formula",
+            "dkg": 16.630648797292473,
+            "Vitamin B-12": 169.63261773238324
+          },
+          {
+            "j": "Chicken",
+            "dkg": 599.4720468916122,
+            "Vitamin B-12": 1858.3633453639982
+          }
+        ]
+      }
+    }
+  },
+  "denominator_counterfactual": [
+    {
+      "old": "e07e2a93f",
+      "new": "e07e2a93f+denom",
+      "factor_rows_changed": 173021,
+      "native_rows_with_quantity_and_change": 166581,
+      "nutrient_rows_changed": 22991,
+      "nutrient_cells_changed": 331392,
+      "kg_delta": -280185.92252032086,
+      "nutrient_delta": {
+        "Energy": -527469544.7085287,
+        "Protein": -11732377.320213795,
+        "Fiber": -4837094.579025898,
+        "Folate": -60810866.2794101,
+        "Calcium": -65345847.63246666,
+        "Carbohydrate": -39539732.9166595,
+        "Iron": -1692667.0235048432,
+        "Niacin": -2738584.241708514,
+        "Riboflavin": -208379.07450560352,
+        "Thiamin": -176516.59343401456,
+        "Vitamin A": -83160295.41403511,
+        "Vitamin B-12": -662508.3167520573,
+        "Vitamin B-6": -435085.43428213976,
+        "Vitamin C": -23695135.191534705,
+        "Zinc": -980814.1564396715
+      },
+      "source_replay_max_abs_error": 4.5299530029296875e-06,
+      "by_final_rung": [
+        {
+          "rung": "unpartitioned",
+          "oldkg": 1507383.0251276426,
+          "newkg": 1227197.1026073217,
+          "dkg": -280185.92252032086,
+          "rows": 355571,
+          "Energy": -527469544.7085242,
+          "Protein": -11732377.320213841,
+          "Fiber": -4837094.579025916,
+          "Folate": -60810866.279410645,
+          "Calcium": -65345847.63246683,
+          "Carbohydrate": -39539732.9166597,
+          "Iron": -1692667.0235048463,
+          "Niacin": -2738584.2417084775,
+          "Riboflavin": -208379.07450560282,
+          "Thiamin": -176516.5934340131,
+          "Vitamin A": -83160295.41403458,
+          "Vitamin B-12": -662508.3167520703,
+          "Vitamin B-6": -435085.4342821413,
+          "Vitamin C": -23695135.19153484,
+          "Zinc": -980814.1564396693
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Cooking Oil",
+              "dkg": -21070.91666799745,
+              "Energy": -186266903.34509748
+            },
+            {
+              "j": "Cooking Oil (refined)",
+              "dkg": -5999.619929335371,
+              "Energy": -53036640.17532468
+            },
+            {
+              "j": "Maize (cobs)",
+              "dkg": -19173.89488264335,
+              "Energy": -32979099.198146563
+            },
+            {
+              "j": "Donuts",
+              "dkg": -1711.6979886863608,
+              "Energy": -31067318.49465745
+            },
+            {
+              "j": "Chapati",
+              "dkg": -7772.321181646763,
+              "Energy": -21373883.249528598
+            },
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": -5038.938240900391,
+              "Energy": -20810814.934918616
+            },
+            {
+              "j": "Matoke (bunch)",
+              "dkg": -22903.054633044383,
+              "Energy": -20383718.6234095
+            },
+            {
+              "j": "Cassava (fresh)",
+              "dkg": -11099.056709505709,
+              "Energy": -17758490.735209133
+            }
+          ],
+          "positive": [
+            {
+              "j": "Sweet Potatoes (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Sweet Potatoes (white, flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tea",
+              "dkg": -75.38897960495426,
+              "Energy": 0.0
+            },
+            {
+              "j": "Tea (other)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": -36.1546568627451,
+              "Energy": 0.0
+            },
+            {
+              "j": "Cornflakes",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Energy": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Energy": 0.0
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Sweet Potatoes (fresh)",
+              "dkg": -8351.692816571393,
+              "Vitamin A": -18791308.837285634
+            },
+            {
+              "j": "Dodo",
+              "dkg": -10059.695011983214,
+              "Vitamin A": -14687154.717495495
+            },
+            {
+              "j": "Eggs",
+              "dkg": -9933.94700300847,
+              "Vitamin A": -13907525.804211859
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -16914.93334881214,
+              "Vitamin A": -7104272.006501099
+            },
+            {
+              "j": "Kabalagala",
+              "dkg": -4142.655876807039,
+              "Vitamin A": -4556921.464487743
+            },
+            {
+              "j": "Pumpkins",
+              "dkg": -1173.3482477491257,
+              "Vitamin A": -4329655.034194274
+            },
+            {
+              "j": "Ghee",
+              "dkg": -465.7744959460929,
+              "Vitamin A": -3912505.7659471803
+            },
+            {
+              "j": "Mangos",
+              "dkg": -9756.972629428063,
+              "Vitamin A": -3707649.5991826635
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tilapia (dried)",
+              "dkg": -487.77168316719394,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tea (other)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": -804.4866685430153,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": -711.8556141567802,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": -36.1546568627451,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": -6.781330290736986,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": -5038.938240900391,
+              "Vitamin B-12": -308383.0203431039
+            },
+            {
+              "j": "Fresh Fish",
+              "dkg": -5541.063758557443,
+              "Vitamin B-12": -132985.53020537863
+            },
+            {
+              "j": "Eggs",
+              "dkg": -9933.94700300847,
+              "Vitamin B-12": -128147.91633880929
+            },
+            {
+              "j": "Tilapia (dried)",
+              "dkg": -487.77168316719394,
+              "Vitamin B-12": -29851.62700983227
+            },
+            {
+              "j": "Perch (dried)",
+              "dkg": -233.09783862937886,
+              "Vitamin B-12": -18974.164064431443
+            },
+            {
+              "j": "Nkejje (dried)",
+              "dkg": -53.832996988229546,
+              "Vitamin B-12": -17081.209944365237
+            },
+            {
+              "j": "Tilapia (fresh)",
+              "dkg": -804.4866685430153,
+              "Vitamin B-12": -12710.889362979642
+            },
+            {
+              "j": "Mukene",
+              "dkg": -292.06900452488685,
+              "Vitamin B-12": -4614.690271493212
+            }
+          ],
+          "positive": [
+            {
+              "j": "Tea (other)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": -16914.93334881214,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Waragi",
+              "dkg": -711.8556141567802,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Water",
+              "dkg": -36.1546568627451,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Watermelon",
+              "dkg": -220.24718592218593,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": -602.485240995212,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "old": "e07e2a93f+denom",
+      "new": "60f98ab1d",
+      "factor_rows_changed": 74036,
+      "native_rows_with_quantity_and_change": 74030,
+      "nutrient_rows_changed": 21519,
+      "nutrient_cells_changed": 305569,
+      "kg_delta": 20920.767475657347,
+      "nutrient_delta": {
+        "Energy": 23731471.738484886,
+        "Protein": 1671060.266640939,
+        "Fiber": 282704.69997026917,
+        "Folate": 6872373.35265553,
+        "Calcium": 4117929.4540374735,
+        "Carbohydrate": 4475149.133225395,
+        "Iron": 169173.76828864336,
+        "Niacin": 460853.44195753784,
+        "Riboflavin": 9231.890268788477,
+        "Thiamin": 17282.484857594583,
+        "Vitamin A": -1987284.6484648723,
+        "Vitamin B-12": 48637.275419294754,
+        "Vitamin B-6": 26489.742198287793,
+        "Vitamin C": 2539652.417390759,
+        "Zinc": 74844.43341597235
+      },
+      "source_replay_max_abs_error": 3.995373845100403e-07,
+      "by_final_rung": [
+        {
+          "rung": "item_unit",
+          "oldkg": 72244.00873555033,
+          "newkg": 93243.48750598874,
+          "dkg": 20999.478770438418,
+          "rows": 73452,
+          "Energy": 23763743.36934548,
+          "Protein": 1671768.6682939786,
+          "Fiber": 285066.0388136998,
+          "Folate": 6887328.498664332,
+          "Calcium": 4143904.1813152046,
+          "Carbohydrate": 4482705.417524403,
+          "Iron": 169409.9021729848,
+          "Niacin": 461627.17398524453,
+          "Riboflavin": 9277.54281976144,
+          "Thiamin": 17334.43431215025,
+          "Vitamin A": -1330045.3370429168,
+          "Vitamin B-12": 48637.27541929522,
+          "Vitamin B-6": 26598.36378508686,
+          "Vitamin C": 2544296.383782807,
+          "Zinc": 75001.85600553383
+        },
+        {
+          "rung": "item_unit_tight",
+          "oldkg": 344.80058049535603,
+          "newkg": 266.0892857142857,
+          "dkg": -78.71129478107032,
+          "rows": 718,
+          "Energy": -32271.63086023883,
+          "Protein": -708.4016530296328,
+          "Fiber": -2361.3388434321096,
+          "Folate": -14955.14600840336,
+          "Calcium": -25974.727277753205,
+          "Carbohydrate": -7556.2842989827495,
+          "Iron": -236.13388434321092,
+          "Niacin": -773.7320276979212,
+          "Riboflavin": -45.652550973020794,
+          "Thiamin": -51.949454555506414,
+          "Vitamin A": -657239.3114219372,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": -108.62158679787703,
+          "Vitamin C": -4643.966392083149,
+          "Zinc": -157.42258956214064
+        },
+        {
+          "rung": "metric",
+          "oldkg": 1030342.2592316503,
+          "newkg": 1030342.2592316503,
+          "dkg": 0.0,
+          "rows": 182550,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        },
+        {
+          "rung": "unit",
+          "oldkg": 124266.03405962566,
+          "newkg": 124266.03405962566,
+          "dkg": 0.0,
+          "rows": 98851,
+          "Energy": 0.0,
+          "Protein": 0.0,
+          "Fiber": 0.0,
+          "Folate": 0.0,
+          "Calcium": 0.0,
+          "Carbohydrate": 0.0,
+          "Iron": 0.0,
+          "Niacin": 0.0,
+          "Riboflavin": 0.0,
+          "Thiamin": 0.0,
+          "Vitamin A": 0.0,
+          "Vitamin B-12": 0.0,
+          "Vitamin B-6": 0.0,
+          "Vitamin C": 0.0,
+          "Zinc": 0.0
+        }
+      ],
+      "top_contributors": {
+        "Energy": {
+          "negative": [
+            {
+              "j": "Fresh Fish",
+              "dkg": -3121.532884604448,
+              "Energy": -4338930.709600182
+            },
+            {
+              "j": "Ghee",
+              "dkg": -181.36225931245593,
+              "Energy": -1588733.3915771141
+            },
+            {
+              "j": "Ground Nuts (paste)",
+              "dkg": -148.88257276186,
+              "Energy": -875429.5278397368
+            },
+            {
+              "j": "Onions",
+              "dkg": -1782.1963769098188,
+              "Energy": -712878.5507639274
+            },
+            {
+              "j": "Maize (cobs)",
+              "dkg": -410.73670530635695,
+              "Energy": -706467.133126934
+            },
+            {
+              "j": "Margarine, Butter, etc",
+              "dkg": -16.087859783512844,
+              "Energy": -489553.5732122959
+            },
+            {
+              "j": "Ground Nuts (shelled)",
+              "dkg": -36.0,
+              "Energy": -157320.0
+            },
+            {
+              "j": "Eggplant",
+              "dkg": -575.7166666666667,
+              "Energy": -138172.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Cassava (flour)",
+              "dkg": 263.3755605591519,
+              "Energy": 826999.2601557369
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 300.4562111801242,
+              "Energy": 1042583.052795031
+            },
+            {
+              "j": "Beans (fresh)",
+              "dkg": 681.4451401041313,
+              "Energy": 1158456.7381770231
+            },
+            {
+              "j": "Bread",
+              "dkg": 641.9471428571428,
+              "Energy": 1707579.4
+            },
+            {
+              "j": "Irish Potatoes",
+              "dkg": 3785.315184468524,
+              "Energy": 2914692.692040764
+            },
+            {
+              "j": "Chicken",
+              "dkg": 1464.9089147286825,
+              "Energy": 3149554.1666666674
+            },
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": 1988.9178673774913,
+              "Energy": 8214230.792269039
+            },
+            {
+              "j": "Cassava (fresh)",
+              "dkg": 7800.7163900927,
+              "Energy": 12481146.22414832
+            }
+          ]
+        },
+        "Vitamin A": {
+          "negative": [
+            {
+              "j": "Ghee",
+              "dkg": -181.36225931245593,
+              "Vitamin A": -1523442.97822463
+            },
+            {
+              "j": "Fresh Fish",
+              "dkg": -3121.532884604448,
+              "Vitamin A": -936459.8653813343
+            },
+            {
+              "j": "Carrots",
+              "dkg": -78.71129478107032,
+              "Vitamin A": -657239.3114219372
+            },
+            {
+              "j": "Margarine, Butter, etc",
+              "dkg": -16.087859783512844,
+              "Vitamin A": -131759.5716269702
+            },
+            {
+              "j": "Passion Fruits",
+              "dkg": -128.6661829505365,
+              "Vitamin A": -82346.35708834336
+            },
+            {
+              "j": "Perch (fresh)",
+              "dkg": -149.4219067890314,
+              "Vitamin A": -13447.971611012825
+            },
+            {
+              "j": "Eggplant",
+              "dkg": -575.7166666666667,
+              "Vitamin A": -5757.166666666666
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin A": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Cassava (dry)",
+              "dkg": 27.61377708978328,
+              "Vitamin A": 1932.96439628483
+            },
+            {
+              "j": "Cassava (dry/flour)",
+              "dkg": 201.039917184265,
+              "Vitamin A": 14072.79420289855
+            },
+            {
+              "j": "Peas",
+              "dkg": 44.773754786664995,
+              "Vitamin A": 18357.239462532645
+            },
+            {
+              "j": "Cassava (flour)",
+              "dkg": 263.3755605591519,
+              "Vitamin A": 18436.28923914063
+            },
+            {
+              "j": "Tomatoes",
+              "dkg": 114.84635717970355,
+              "Vitamin A": 48235.47001547553
+            },
+            {
+              "j": "Cassava (fresh)",
+              "dkg": 7800.7163900927,
+              "Vitamin A": 78007.163900927
+            },
+            {
+              "j": "Sweet Potatoes (dry)",
+              "dkg": 114.69050567595458,
+              "Vitamin A": 568864.9081527347
+            },
+            {
+              "j": "Chicken",
+              "dkg": 1464.9089147286825,
+              "Vitamin A": 615261.7441860466
+            }
+          ]
+        },
+        "Vitamin B-12": {
+          "negative": [
+            {
+              "j": "Fresh Fish",
+              "dkg": -3121.532884604448,
+              "Vitamin B-12": -74916.78923050675
+            },
+            {
+              "j": "Perch (fresh)",
+              "dkg": -149.4219067890314,
+              "Vitamin B-12": -2839.0162289915966
+            },
+            {
+              "j": "Ghee",
+              "dkg": -181.36225931245593,
+              "Vitamin B-12": -18.136225931245594
+            },
+            {
+              "j": "Apples",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beer",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Biscuits",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Beans (dry)",
+              "dkg": 300.4562111801242,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Avocado",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            }
+          ],
+          "positive": [
+            {
+              "j": "Watermelon",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Wheat (flour)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yoghurt",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Yams (arrowroot)",
+              "dkg": 0.0,
+              "Vitamin B-12": 0.0
+            },
+            {
+              "j": "Goat Meat",
+              "dkg": 3.592391304347826,
+              "Vitamin B-12": 40.59402173913044
+            },
+            {
+              "j": "Beef",
+              "dkg": 3.724289405684755,
+              "Vitamin B-12": 107.63196382428941
+            },
+            {
+              "j": "Chicken",
+              "dkg": 1464.9089147286825,
+              "Vitamin B-12": 4541.217635658916
+            },
+            {
+              "j": "Dry/Smoked Fish",
+              "dkg": 1988.9178673774913,
+              "Vitamin B-12": 121721.77348350247
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "nutrients": [
+    {
+      "nutrient": "Energy",
+      "old": 2568249206.4527516,
+      "new": 2087452047.7101245,
+      "percent": -18.720814067989178,
+      "changed_rows": 23252,
+      "old_nonzero_rows": 23711,
+      "new_nonzero_rows": 23711
+    },
+    {
+      "nutrient": "Protein",
+      "old": 74135128.94345334,
+      "new": 59652799.115735516,
+      "percent": -19.535043688619247,
+      "changed_rows": 23225,
+      "old_nonzero_rows": 23515,
+      "new_nonzero_rows": 23515
+    },
+    {
+      "nutrient": "Fiber",
+      "old": 49517181.56575667,
+      "new": 44959231.168933615,
+      "percent": -9.204785597036247,
+      "changed_rows": 23002,
+      "old_nonzero_rows": 23389,
+      "new_nonzero_rows": 23389
+    },
+    {
+      "nutrient": "Folate",
+      "old": 612279531.3410411,
+      "new": 480051689.8904783,
+      "percent": -21.595992464577684,
+      "changed_rows": 23223,
+      "old_nonzero_rows": 23513,
+      "new_nonzero_rows": 23513
+    },
+    {
+      "nutrient": "Calcium",
+      "old": 589458007.1533942,
+      "new": 500450475.6775654,
+      "percent": -15.09989352857607,
+      "changed_rows": 23266,
+      "old_nonzero_rows": 23716,
+      "new_nonzero_rows": 23716
+    },
+    {
+      "nutrient": "Carbohydrate",
+      "old": 419253150.84077704,
+      "new": 401006832.13025385,
+      "percent": -4.352100556413641,
+      "changed_rows": 23210,
+      "old_nonzero_rows": 23697,
+      "new_nonzero_rows": 23697
+    },
+    {
+      "nutrient": "Iron",
+      "old": 16155830.22910745,
+      "new": 14077339.50040644,
+      "percent": -12.865267208343523,
+      "changed_rows": 23203,
+      "old_nonzero_rows": 23633,
+      "new_nonzero_rows": 23633
+    },
+    {
+      "nutrient": "Niacin",
+      "old": 17071649.31097007,
+      "new": 14847670.873096604,
+      "percent": -13.027320309610403,
+      "changed_rows": 23225,
+      "old_nonzero_rows": 23515,
+      "new_nonzero_rows": 23515
+    },
+    {
+      "nutrient": "Riboflavin",
+      "old": 1398257.1550898312,
+      "new": 1177630.7993002841,
+      "percent": -15.778668107396376,
+      "changed_rows": 23231,
+      "old_nonzero_rows": 23544,
+      "new_nonzero_rows": 23544
+    },
+    {
+      "nutrient": "Thiamin",
+      "old": 2033595.7761222809,
+      "new": 1827736.665142315,
+      "percent": -10.122912006264295,
+      "changed_rows": 23222,
+      "old_nonzero_rows": 23513,
+      "new_nonzero_rows": 23513
+    },
+    {
+      "nutrient": "Vitamin A",
+      "old": 1359024745.9732652,
+      "new": 1386820618.9819372,
+      "percent": 2.0452808597510863,
+      "changed_rows": 22818,
+      "old_nonzero_rows": 22990,
+      "new_nonzero_rows": 22990
+    },
+    {
+      "nutrient": "Vitamin B-12",
+      "old": 2295267.16983724,
+      "new": 1569868.7672663918,
+      "percent": -31.604094377487534,
+      "changed_rows": 13323,
+      "old_nonzero_rows": 18599,
+      "new_nonzero_rows": 18599
+    },
+    {
+      "nutrient": "Vitamin B-6",
+      "old": 3633409.723191538,
+      "new": 3461385.3963647303,
+      "percent": -4.734514957914071,
+      "changed_rows": 23224,
+      "old_nonzero_rows": 23508,
+      "new_nonzero_rows": 23508
+    },
+    {
+      "nutrient": "Vitamin C",
+      "old": 107176958.1469613,
+      "new": 107080276.95272076,
+      "percent": -0.0902070705421365,
+      "changed_rows": 23005,
+      "old_nonzero_rows": 23166,
+      "new_nonzero_rows": 23166
+    },
+    {
+      "nutrient": "Zinc",
+      "old": 8834106.107045636,
+      "new": 7557987.277634312,
+      "percent": -14.445364521867754,
+      "changed_rows": 23235,
+      "old_nonzero_rows": 23651,
+      "new_nonzero_rows": 23651
+    }
+  ],
+  "exact_endpoint_parent_and_full_old_checks": true,
+  "input_fingerprints": {
+    "food_acquired": {
+      "hash": "48c64d990d05afdaca6b2aa8bb188738dd50729d277c2e2cea257bac6146b900",
+      "historical_hash": "48c64d990d05afdaca6b2aa8bb188738dd50729d277c2e2cea257bac6146b900",
+      "shape": [
+        355571,
+        3
+      ],
+      "historical_shape": [
+        355571,
+        3
+      ]
+    },
+    "fct": {
+      "hash": "db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c",
+      "historical_hash": "db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c",
+      "shape": [
+        15,
+        113
+      ],
+      "historical_shape": [
+        15,
+        113
+      ]
+    }
+  },
+  "vocabulary_by_family": [
+    {
+      "family": "explicit_mass",
+      "dkg": 9424.520619412171,
+      "Energy": 10969643.847541254,
+      "Protein": 157464.2010135438,
+      "Fiber": 291502.77388682833,
+      "Folate": 1960116.589119026,
+      "Calcium": 1404714.9106462887,
+      "Carbohydrate": 2661974.1824638196,
+      "Iron": 45729.24621870791,
+      "Niacin": 71024.98821006453,
+      "Riboflavin": 6772.014859139312,
+      "Thiamin": 6026.382227088247,
+      "Vitamin A": 4524272.982486264,
+      "Vitamin B-12": 0.0,
+      "Vitamin B-6": 29006.869554129367,
+      "Vitamin C": 889847.6198333283,
+      "Zinc": 27266.430471515767
+    },
+    {
+      "family": "volume_as_mass",
+      "dkg": 40077.12985702928,
+      "Energy": 23791798.044076923,
+      "Protein": -4465570.870667241,
+      "Fiber": -161710.32926974795,
+      "Folate": -78268766.49185692,
+      "Calcium": -28017368.52822815,
+      "Carbohydrate": 17013320.63445881,
+      "Iron": -579990.0237637374,
+      "Niacin": 42958.1483543112,
+      "Riboflavin": -24712.261997413694,
+      "Thiamin": -46255.556623718665,
+      "Vitamin A": 108349469.07445511,
+      "Vitamin B-12": -109802.1845785486,
+      "Vitamin B-6": 213326.8680810606,
+      "Vitamin C": 21749454.29813396,
+      "Zinc": -377031.49939876667
+    }
+  ],
+  "vocabulary_units": [
+    {
+      "family": "explicit_mass",
+      "u": "Sack (100 kgs)",
+      "rows": 21,
+      "kg_delta": 6621.153846153846,
+      "energy_delta": 6440711.538461538,
+      "vitamin_a_delta": 1739057.6923076923,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "explicit_mass",
+      "u": "Sack (120 kgs)",
+      "rows": 2,
+      "kg_delta": 160.0,
+      "energy_delta": 328000.0,
+      "vitamin_a_delta": 240000.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "explicit_mass",
+      "u": "Sack (50 kgs)",
+      "rows": 62,
+      "kg_delta": 2591.043750299141,
+      "energy_delta": 4148434.8760440014,
+      "vitamin_a_delta": 2504926.5625,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "explicit_mass",
+      "u": "Sack (80 kgs)",
+      "rows": 2,
+      "kg_delta": 52.323022959183675,
+      "energy_delta": 52497.43303571429,
+      "vitamin_a_delta": 40288.72767857143,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Bottle (1.5ltr)",
+      "rows": 151,
+      "kg_delta": 31.200000000000028,
+      "energy_delta": 5664.000000000005,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Bottle (1ltr)",
+      "rows": 169,
+      "kg_delta": -6.488636363636294,
+      "energy_delta": -395.681818181814,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Bottle (2ltr)",
+      "rows": 26,
+      "kg_delta": 46.00000000000001,
+      "energy_delta": 7360.000000000001,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Cup/Mug(0.5lt)",
+      "rows": 22250,
+      "kg_delta": -68925.08321918898,
+      "energy_delta": -171269245.32006162,
+      "vitamin_a_delta": -6918958.250451818,
+      "b12_delta": -106907.54775996273
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Glass(0.25lt)",
+      "rows": 3399,
+      "kg_delta": -4686.467499967478,
+      "energy_delta": -9874565.499822572,
+      "vitamin_a_delta": -152766.25,
+      "b12_delta": -3710.59375
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Gourd (1-5lts)",
+      "rows": 198,
+      "kg_delta": 1902.1974947798813,
+      "energy_delta": 3076238.241522828,
+      "vitamin_a_delta": 43763.49987940118,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Gourd (5-10lts)",
+      "rows": 16,
+      "kg_delta": 347.78225806451616,
+      "energy_delta": 123245.33770161291,
+      "vitamin_a_delta": 53015.05796370968,
+      "b12_delta": 153.02419354838713
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Gourd (Above 10 lts)",
+      "rows": 4,
+      "kg_delta": 55.38461538461538,
+      "energy_delta": 0.0,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (1 lt)",
+      "rows": 247,
+      "kg_delta": -30.74545454997002,
+      "energy_delta": -76121.33337325032,
+      "vitamin_a_delta": -4132.121212121208,
+      "b12_delta": -64.93333333333328
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (10 lts)",
+      "rows": 29,
+      "kg_delta": 362.68571270613796,
+      "energy_delta": 294077.1416371289,
+      "vitamin_a_delta": 308659.99871948734,
+      "b12_delta": 55.31428548480783
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (2 lts)",
+      "rows": 112,
+      "kg_delta": 182.40000002185505,
+      "energy_delta": 277126.00019319856,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (20 lts)",
+      "rows": 54,
+      "kg_delta": 1545.3333333134651,
+      "energy_delta": 1257416.6666666667,
+      "vitamin_a_delta": 893833.3333333333,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (3 lts)",
+      "rows": 123,
+      "kg_delta": 269.6116668223093,
+      "energy_delta": 539287.1346653055,
+      "vitamin_a_delta": 4083.3333333333335,
+      "b12_delta": 0.04166666666666667
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jerrican (5 lts)",
+      "rows": 58,
+      "kg_delta": 335.1167857370207,
+      "energy_delta": 725719.3502009767,
+      "vitamin_a_delta": 123741.78571428572,
+      "b12_delta": 28.289285714285718
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jug (1.5 lts)",
+      "rows": 89,
+      "kg_delta": 171.97916666666669,
+      "energy_delta": 5541.250000000001,
+      "vitamin_a_delta": 0.0,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jug (2 lts)",
+      "rows": 628,
+      "kg_delta": 1686.6666666666667,
+      "energy_delta": 1110336.6666666667,
+      "vitamin_a_delta": 9223.333333333334,
+      "b12_delta": 1.3333333333333337
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Jug (2.5ltrs)",
+      "rows": 94,
+      "kg_delta": 319.25,
+      "energy_delta": 1097170.0,
+      "vitamin_a_delta": 647.5,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Plastic Basin (15 lts)",
+      "rows": 3935,
+      "kg_delta": 80477.1250042133,
+      "energy_delta": 153348153.76300943,
+      "vitamin_a_delta": 83236146.2505728,
+      "b12_delta": 191.24999999999997
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Plastic Basin (5 ltrs)",
+      "rows": 827,
+      "kg_delta": 7777.8333333383,
+      "energy_delta": 15299808.333455024,
+      "vitamin_a_delta": 4475149.999998758,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Sadolin Tin (3ltrs)",
+      "rows": 20,
+      "kg_delta": 74.51612903225806,
+      "energy_delta": 91654.83870967741,
+      "vitamin_a_delta": 167661.29032258064,
+      "b12_delta": 0.0
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Tin (5 lts)",
+      "rows": 184,
+      "kg_delta": 1395.8325000543148,
+      "energy_delta": 2297010.4876540527,
+      "vitamin_a_delta": 642625.3125,
+      "b12_delta": 51.637499999999996
+    },
+    {
+      "family": "volume_as_mass",
+      "u": "Tin (Debe) (20 lts)",
+      "rows": 510,
+      "kg_delta": 16745.000000298023,
+      "energy_delta": 25456316.667069994,
+      "vitamin_a_delta": 25466775.00044803,
+      "b12_delta": 400.0
+    }
+  ],
+  "current_mass_by_basis": [
+    {
+      "rung": "item_unit",
+      "family": "other",
+      "kg": 71861.26815126931,
+      "Energy": 88384588.5573486,
+      "Protein": 9722592.701632641,
+      "Fiber": 1243588.5006981385,
+      "Folate": 19909002.5698312,
+      "Calcium": 13449121.315173458,
+      "Carbohydrate": 8276216.748634975,
+      "Iron": 668799.4061342699,
+      "Niacin": 2033746.0128488715,
+      "Riboflavin": 56045.10644550101,
+      "Thiamin": 68033.13990285501,
+      "Vitamin A": 11437492.582195403,
+      "Vitamin B-12": 619925.8426636189,
+      "Vitamin B-6": 155085.75426319634,
+      "Vitamin C": 4433483.049809354,
+      "Zinc": 374235.71068289655
+    },
+    {
+      "rung": "item_unit_tight",
+      "family": "other",
+      "kg": 266.0892857142857,
+      "Energy": 109096.60714285714,
+      "Protein": 2394.8035714285716,
+      "Fiber": 7982.678571428572,
+      "Folate": 50556.96428571429,
+      "Calcium": 87809.46428571429,
+      "Carbohydrate": 25544.571428571428,
+      "Iron": 798.2678571428571,
+      "Niacin": 2615.6576785714287,
+      "Riboflavin": 154.33178571428573,
+      "Thiamin": 175.61892857142857,
+      "Vitamin A": 2221845.535714286,
+      "Vitamin B-12": 0.0,
+      "Vitamin B-6": 367.20321428571424,
+      "Vitamin C": 15699.267857142859,
+      "Zinc": 532.1785714285714
+    },
+    {
+      "rung": "metric",
+      "family": "explicit_mass",
+      "kg": 758019.3137562423,
+      "Energy": 1315826198.7677739,
+      "Protein": 33088950.60244432,
+      "Fiber": 30516868.1114586,
+      "Folate": 273711452.63323283,
+      "Calcium": 298402642.16438764,
+      "Carbohydrate": 275453526.4432151,
+      "Iron": 8978776.471208861,
+      "Niacin": 8660974.129091805,
+      "Riboflavin": 722141.4102763109,
+      "Thiamin": 1196766.8365173992,
+      "Vitamin A": 1164201619.7974331,
+      "Vitamin B-12": 517898.965404672,
+      "Vitamin B-6": 2248239.293744496,
+      "Vitamin C": 45646746.635689124,
+      "Zinc": 4876989.7067646505
+    },
+    {
+      "rung": "metric",
+      "family": "volume_as_mass",
+      "kg": 272322.94547540793,
+      "Energy": 486440120.3598965,
+      "Protein": 13086773.836898439,
+      "Fiber": 9853143.377775744,
+      "Folate": 150025561.88827205,
+      "Calcium": 150579025.89853564,
+      "Carbohydrate": 90506072.2644055,
+      "Iron": 3668316.1470708055,
+      "Niacin": 3000261.8904143637,
+      "Riboflavin": 276671.1294287425,
+      "Thiamin": 488308.15184718417,
+      "Vitamin A": 157606654.0016616,
+      "Vitamin B-12": 262424.16900896677,
+      "Vitamin B-6": 725558.1461196982,
+      "Vitamin C": 39823057.45303036,
+      "Zinc": 1865266.5000390713
+    },
+    {
+      "rung": "unit",
+      "family": "other",
+      "kg": 139933.15666864885,
+      "Energy": 196692043.417963,
+      "Protein": 3752087.1711886832,
+      "Fiber": 3337648.500429722,
+      "Folate": 36355115.83485656,
+      "Calcium": 37931876.835182995,
+      "Carbohydrate": 26745472.10256969,
+      "Iron": 760649.2081353606,
+      "Niacin": 1150073.1830629937,
+      "Riboflavin": 122618.8213640155,
+      "Thiamin": 74452.91794630492,
+      "Vitamin A": 51353007.06493306,
+      "Vitamin B-12": 169619.7901891342,
+      "Vitamin B-6": 332134.99902305345,
+      "Vitamin C": 17161290.546334762,
+      "Zinc": 440963.18157626427
+    }
+  ],
+  "range_exposure": [
+    {
+      "u": "Fish Cut piece (1 - 2 kg)",
+      "rows": 59,
+      "kg": 240.5,
+      "energy": 484355.0,
+      "vitamin_a": 33315.0,
+      "b12": 7759.3
+    },
+    {
+      "u": "Fish Cut piece (up to 1kg)",
+      "rows": 174,
+      "kg": 416.0,
+      "energy": 1033600.0,
+      "vitamin_a": 50655.0,
+      "b12": 16437.3
+    },
+    {
+      "u": "Fish Cut piece(Above 2  kg)",
+      "rows": 8,
+      "kg": 52.0,
+      "energy": 198320.0,
+      "vitamin_a": 1800.0,
+      "b12": 2959.2000000000003
+    },
+    {
+      "u": "Gourd (1-5lts)",
+      "rows": 198,
+      "kg": 2605.7500000298023,
+      "energy": 4214025.0,
+      "vitamin_a": 59950.0,
+      "b12": 0.0
+    },
+    {
+      "u": "Gourd (5-10lts)",
+      "rows": 16,
+      "kg": 400.0,
+      "energy": 141750.0,
+      "vitamin_a": 60975.0,
+      "b12": 176.0
+    },
+    {
+      "u": "Gourd (Above 10 lts)",
+      "rows": 4,
+      "kg": 60.0,
+      "energy": 0.0,
+      "vitamin_a": 0.0,
+      "b12": 0.0
+    }
+  ]
+}

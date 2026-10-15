@@ -1,12 +1,42 @@
 name: CI
 
 on:
+  # Pushes run CI only on the integration branches.  `branches: ["**"]` ran
+  # every PR twice (one run for the push, one for the pull_request), which is
+  # the doubled `unit-tests` check on every PR before 2026-10-14.  PR branches
+  # are covered by the pull_request event below; the merge queue by merge_group.
   push:
-    branches: ["**"]
+    branches: [development, master, separate_data]
+    # Notes and ledgers do not need a 30-minute run.  Deliberately NOT applied
+    # to pull_request: a docs-only PR would then have no `unit-tests` check,
+    # and the ruleset that requires it would hold the PR forever.
+    paths-ignore:
+      - 'slurm_logs/**'
+      - '.coder/**'
+      - 'SkunkWorks/**'
+      - 'lectures/**'
+      - '**.org'
+      - '**.md'
   pull_request:
+  # The development merge queue (ruleset "development merge queue", 2026-10-14)
+  # tests each merge group once; without this trigger a queued PR never gets
+  # its required check and sits in the queue indefinitely.
+  merge_group:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
+  # Manual trigger (GH #941).  `data-tests` otherwise runs only on a push to
+  # master / separate_data, i.e. once per release -- so a failure there
+  # (52 EHCVM failures on the v0.14.0 push, 2026-09-17) could not be
+  # re-exercised against a fix without cutting another release, and every
+  # later `schedule` run reported "data-tests skipped".  Dispatching on a
+  # chosen ref runs the whole workflow, data-tests included (see its `if`).
+  workflow_dispatch:
+    inputs:
+      run_windows_script_build:
+        description: Run credentialed Windows conda script builds on this ref
+        type: boolean
+        default: false
 
 # One live run per ref (push) or per PR (pull_request): a new push cancels the
 # run it supersedes instead of queueing beside it.  2026-09-07: fourteen
@@ -15,6 +45,22 @@ on:
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+# The venv carries no editable install of this project (GH #957): `poetry
+# install --no-root` below deliberately does not install it, so nothing puts
+# the repo on sys.path by itself.  Neither invocation style used in this
+# workflow does either -- `poetry run pytest` is a console script
+# (sys.path[0] = <venv>/bin) and the wave scripts under countries/ are script
+# runs (sys.path[0] = the script's own directory).  One workflow-level
+# PYTHONPATH covers every job and every step.
+#
+# PYTHONSAFEPATH is deliberately NOT set here, although the Savio controllers
+# do set it.  It removes the script's own directory from sys.path, and the
+# `poetry run make -j2` step below runs country wave scripts that import a
+# sibling module by bare name (`from uganda import ...`).  Safe-path mode is
+# right for a controller process and wrong for a build subprocess.
+env:
+  PYTHONPATH: ${{ github.workspace }}
 
 jobs:
   # Fast tests — no data access needed
@@ -28,7 +74,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Run tests
         env:
           LSMS_SKIP_AUTH: "1"
@@ -57,6 +103,126 @@ jobs:
           poetry run pytest -n auto --dist=loadfile
           --timeout=600 --timeout-method=thread
           --durations=25
+
+  # Windows reader smoke exercises platform defaults: cp1252 text encoding,
+  # no ``fork`` start method, no process groups, a case-insensitive checkout.
+  # Scope is the READER path (install, load every country's config, parse
+  # every data_info.yml). The credentialed conda job below covers script
+  # builds. No secrets here: nothing in this job reads microdata.
+  windows-smoke:
+    runs-on: windows-latest
+    # A hang (first seen: `import lsms_library; Country('Uganda')` sat for an
+    # hour) must not run to the 6-hour default.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install --no-root
+      # Separate from pytest so an import-time failure is attributed to the
+      # import, not lost inside test collection.
+      - name: Import + config smoke
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        # dump_traceback_later: if anything blocks, print every thread's
+        # stack after 120 s and exit, so a hang names its own location.
+        run: >-
+          poetry run python -c "import faulthandler, sys; faulthandler.dump_traceback_later(120, exit=True);
+          print(sys.version, sys.getfilesystemencoding(), __import__('locale').getpreferredencoding(), flush=True);
+          import lsms_library as ll; print('imported', ll.__file__, flush=True);
+          c = ll.Country('Uganda'); print('constructed', flush=True);
+          print(c.waves, flush=True); print(len(c.data_scheme), flush=True)"
+      - name: Collect tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        run: >-
+          poetry run pytest --collect-only -q
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
+      - name: Run portability + config tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          # Deliberately OFF: UTF-8 mode would mask exactly the cp1252
+          # decoding this job exists to catch.
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          LSMS_BUILD_WORKERS: "1"
+        run: >-
+          poetry run pytest -n auto --dist=loadfile
+          --timeout=600 --timeout-method=thread
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
+
+  # Windows script-path builds (GH #964): the conda route documented in
+  # environment-windows.yml -- conda-forge make + m2 tools, the library via
+  # pip.  The runner's own Git / MinGW / chocolatey tools are stripped from
+  # PATH and make/sh/find are asserted to resolve inside the conda env, so
+  # this measures what a user with only that environment gets.  Cold-builds
+  # two Uganda script-path tables and checks them against the Linux build:
+  #   Uganda:shocks rows=14457 waves=8 digest=64a53fa7af55
+  #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # Secrets are restricted to integration pushes or an explicit maintainer
+  # dispatch; pull requests (including forks) never execute this job.
+  windows-script-build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    # This job checks the wheel installed by pip, including its configs.
+    # Override the workflow's checkout path for this job only.
+    env:
+      PYTHONPATH: ""
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_windows_script_build)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: false
+          miniforge-version: latest
+          environment-file: environment-windows.yml
+          activate-environment: lsms
+      - name: Install the library
+        shell: cmd /C CALL {0}
+        run: pip install .
+      - name: Configure S3 read credentials
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          LSMS_SKIP_AUTH: "1"
+          AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
+        # No '%' anywhere: cmd would expand it as a variable reference.
+        run: >-
+          python -c "import os; from lsms_library.config import s3_creds_path as p;
+          e = os.environ; f = p(); f.parent.mkdir(parents=True, exist_ok=True);
+          f.write_text('[default]\naws_access_key_id = ' + e['AWS_ACCESS_KEY_ID'] + '\naws_secret_access_key = ' + e['AWS_SECRET_ACCESS_KEY'] + '\n', encoding='utf-8');
+          print('wrote', f)"
+      - name: Cold-build and compare with Linux
+        shell: cmd /C CALL {0}
+        working-directory: ${{ runner.temp }}
+        env:
+          PROBE_STRIP: '\Git\,mingw64,chocolatey'
+          REQUIRE_CONDA_TOOLS: "1"
+          REQUIRE_INSTALLED_LIBRARY: "1"
+          EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
+          LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
+          LSMS_BUILD_WORKERS: "1"
+          PYTHONUNBUFFERED: "1"
+        run: python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
@@ -100,7 +266,10 @@ jobs:
   # `dvc commit` to update dep hashes without re-running pipelines.
   dvc-lock-check:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # Push only: a manual `workflow_dispatch` on master (GH #941) must re-run
+    # the tests, not feed the lockfile-refresh job below, which commits and
+    # pushes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     outputs:
       is_dirty: ${{ steps.check.outputs.is_dirty }}
     steps:
@@ -111,7 +280,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Verify DVC lockfiles
         id: check
         env:
@@ -143,7 +312,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Refresh lockfile hashes
         env:
           LSMS_SKIP_AUTH: "1"
@@ -191,7 +360,19 @@ jobs:
   # Full data tests — builds Uganda tables and runs invariance checks
   data-tests:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data')
+    # Apply the AGENTS.md 3b limits to both prerequisite builds and tests.
+    # Keep pytest sequential below so session-order failures remain visible.
+    env:
+      LSMS_BUILD_WORKERS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    # Push to a release branch, or a manual `workflow_dispatch` on any ref
+    # (GH #941): the dispatch is the only way to re-run this job on a fix
+    # without a release.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -200,7 +381,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Configure DVC credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
@@ -217,4 +398,7 @@ jobs:
           poetry run make -j2
         timeout-minutes: 30
       - name: Run full test suite
-        run: poetry run pytest --tb=short
+        run: >-
+          poetry run pytest --tb=short
+          --timeout=600 --timeout-method=thread
+          --durations=25

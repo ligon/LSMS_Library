@@ -146,13 +146,13 @@ Each country with a ``housing`` table in ``data_scheme.yml`` must
 declare two tables in its ``categorical_mapping.org``:
 
 #+begin_example
-#+name: Roof
+,#+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
 | <local variant 1>  | <canonical>     |
 | ...                | ...             |
 
-#+name: Floor
+,#+name: Floor
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
 | ...                | ...             |

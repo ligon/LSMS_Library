@@ -1,0 +1,1107 @@
+{
+ "generated": "2026-09-24",
+ "head": "c5d70c870 (development)",
+ "repo": "/local/job39195255/mirrors/LSMS_Library",
+ "sources": {
+  "merged_prs": "slurm_logs/backlog_triage_2026-09-24/merged_prs.json (117 PRs, merged 2026-08-21..2026-09-18, numbers 661-950)",
+  "open_prs": "slurm_logs/backlog_triage_2026-09-24/open_prs.json (#951 #952 #954 #955 #963 #965)",
+  "issues": "slurm_logs/backlog_triage_2026-09-24/issues.json"
+ },
+ "counts": {
+  "open": 18,
+  "resolved": 1,
+  "partial": 12,
+  "duplicate": 0,
+  "tierA": 2,
+  "tierB": 12,
+  "tierC": 9,
+  "tierD": 8
+ },
+ "reconcile_close": [
+  {
+   "number": 957,
+   "action": "close",
+   "resolved_by": "7d97b0340, bd82d78da, d72054a7d, 6df53a5c6 (direct commits, all ancestors of HEAD c5d70c870); decision #957 comment 2026-09-22T06:49",
+   "why": "Editable install stripped, image promoted 2026-09-22 00:33, guards + PYTHONPATH levers landed and pinned by tests/test_no_editable_install.py. Verified: 4 commits are ancestors of HEAD; no PR exists (merged_prs.json has none, as the record says). Two residuals (missing `lsms-library` console script, __version__ '0.0.0') go to #960."
+  },
+  {
+   "number": 958,
+   "action": "comment-partial",
+   "resolved_by": "55412e65e, d72054a7d, 7d97b0340 (caller fixed + verify-before-repoint) -- all ancestors",
+   "why": "Core defects D1-D4 and the shebang defect are untouched (savio_venv.sh:21-23, :121); the live blocker is @ligon's shebang/symlink choice. Cross-check: blocked_by lists 957, which is now resolved, so the decision is the ONLY live blocker."
+  },
+  {
+   "number": 959,
+   "action": "comment-partial",
+   "resolved_by": "69eb3319e (poetry.lock tracked), 9c5e2081e (provenance) -- ancestors; decision #959 comment 2026-09-22T06:49",
+   "why": "Lock-tracking half done; the paired cold re-warm / LSMS_CACHE_SCHEMA bump has not happened (local_tools.py:1840 still 5) and the live cache is a pyarrow 23/25 mix. Also: scripts/dvc_remote_reachability.py:71 boto3 now undeclared."
+  },
+  {
+   "number": 961,
+   "action": "comment-partial",
+   "resolved_by": "tracker: #957 via 7d97b0340/bd82d78da/d72054a7d/6df53a5c6; #959 via 69eb3319e",
+   "why": "Keep open as tracker; closes when #958's decision and #960's docs land (#960 confirmed OPEN via gh)."
+  },
+  {
+   "number": 680,
+   "action": "comment-partial",
+   "resolved_by": "PR #687 (merged 2026-08-22, in merged_prs.json, closes #680) guard; 6df53a5c6 CI PYTHONPATH closes the CI symptom",
+   "why": "Root cause upstream (ligon/fooddatacentral#5 OPEN, PyPI still 1.0.12). merged_prs.json ALSO surfaces PR #733 (2026-08-24) as 'Refs #729, #680' -- checked its body: it cites #680 only as 'same failure shape', not a fix; the venv group note's 'only #687' is therefore slightly incomplete but the substance stands. Guard docstring paragraph about lsms_library.pth is stale."
+  },
+  {
+   "number": 832,
+   "action": "comment-partial",
+   "resolved_by": "b55b37e1a (GhanaLSS), 9a97f2cb6 (Niger) -- ancestors; PR #949 (merged 2026-09-18, closes #832 per merged_prs.json); PR #947 (merged 2026-09-18) refs #832",
+   "why": "Six of seven country instances landed. Close ONLY after the two residuals #949's body names (Malawi six kg spellings incl. the framework `_metric_kg_factor` lowercase stamp; Tanzania piece/Piece needing a non-label sentinel, categorical_mapping.org:595-600) get their own issue numbers -- filing them is a gh write for the human. Cross-check: #833 lists 'blocked_by #832 for the Ethiopia u-axis fold', but #833's Ethiopia row (gh issue view 833 body:23) is a PHYSICAL-QUANTITY mismatch (bunch-vs-kg, Leafy Greens ratio 0.40) -- not the spelling folds #949 landed; it must not hold #832 open and needs its own home in the u-vocabulary cluster."
+  },
+  {
+   "number": 824,
+   "action": "comment-partial",
+   "resolved_by": "66c1ff6ab + 2bb32afec (Uganda, merge 42e1c19e) -- ancestors; 85947ff52 (Malawi) -- ancestor; data_info.yml:784 canonical Unit_sold block",
+   "why": "Design settled and Uganda/Malawi/GhanaLSS landed; Nigeria (W1/W2 now, W3-W5 behind #843 -- confirmed OPEN) and Niger (sums Quantity_sold across units) remain. Record recommends splitting into two country issues and closing this one."
+  },
+  {
+   "number": 647,
+   "action": "comment-partial",
+   "resolved_by": "66c1ff6ab (#824) -- documentation half only",
+   "why": "uganda.py:1846-1851 and CONTENTS.org:2669-2674 now name the `_11`/`_21` slots as unwired; the questionnaire adjudication (does 'part harvest' mean a still-standing crop?) is still the human step. Raw probe: only 2019-20 agsec5a carries the family."
+  },
+  {
+   "number": 637,
+   "action": "comment-partial",
+   "resolved_by": "PRs #636 (2026-07-21), #638 (07-22), #646 (08-21), #651 (08-21) -- all MERGED per gh (below merged_prs.json's 2026-08-21/#661 floor, so absent from the file); GH #871 via PR #885 (in merged_prs.json)",
+   "why": "Premise reversed by the author in-thread; 33/38 sites cleared; core answered by most_complete_row. Residuals: Malawi malawi.py:934/1899/1977 review, stale inventory (~60 files), explicit-skipna lint. Note: PR #739 (release v0.10.0) body lists 'closes #637' yet the issue is open -- a release-notes mention, not a close. Record recommends close + one spin-off."
+  },
+  {
+   "number": 689,
+   "action": "comment-partial",
+   "resolved_by": "PR #634 (a5bd64439, authored 2026-07-21, merged 2026-08-21 per gh; predates merged_prs.json floor) -- docs ask only",
+   "why": "Ask 1 was already met at filing (CONTENTS.org:916-1000). Remaining: a data_scheme.yml note, ask 2 (Rural at cluster grain, a decision), ask 3 blocked on #450 (confirmed OPEN)."
+  },
+  {
+   "number": 831,
+   "action": "comment-partial",
+   "resolved_by": "PR #917 (6e4dc5b68, merged 2026-09-14, closes #831) write side; PR #922 (575413801) fast path; PR #918 also lists #831 -- all in merged_prs.json",
+   "why": "Runtime no longer writes into countries_root(); two bullets remain and #917's body names them ('Not fixed here'): sidecar-less in-tree files are still READ (local_tools.py:1195-1214) and `cache clear` reports parquets only (cli.py:228-240). Read-policy decision pending."
+  },
+  {
+   "number": 839,
+   "action": "comment-partial",
+   "resolved_by": "522458fa2 (Tanzania #112 DONE entry), 477b1a6e7 (Mali CONTENTS correction) -- ancestors",
+   "why": "Mali data_scheme.yml:59-65 still carries the three false claims (deferred for cache cost, and the cache moved twice anyway: 57d2ffafd, cd5172557); Malawi data_scheme.yml:191/:433 JOIN claim untouched."
+  },
+  {
+   "number": 833,
+   "action": "comment-partial",
+   "resolved_by": "6451615b3 (Uganda 141/741) -- ancestor; f4f9bdcb4 + 91fab6454 via GH #854 (CLOSED); 43d2900fb via GH #869 (CLOSED) -- ancestors",
+   "why": "Three of seven items landed. Open: Malawi ag_i02c + Boiled groundnuts, Tanzania harmonize_crop food-label reuse, Niger drift pairs + code 166, Uganda Aggregate flour (a design question), Ethiopia u-axis (see #832 cross-check: not a spelling fold, needs its own item)."
+  }
+ ],
+ "reconcile_dropped": [],
+ "cross_checks": [
+  "All 26 claimed fix commits are ancestors of HEAD c5d70c870 (git merge-base --is-ancestor). PRs #949, #947, #917, #922, #918, #885, #687 are in merged_prs.json; PRs #634, #636, #638, #646, #651, #642 predate the file's floor (merged 2026-08-21 .. 2026-09-18, numbers 661-950) and were verified MERGED with `gh pr view`. Nothing dropped from reconcile_close.",
+  "All 31 issues are OPEN (`gh issue list --state open`), so no record is stale on state.",
+  "#833 vs #832: #833 says its Ethiopia item is blocked by #832 ('u-axis fold'); #832's record and PR #949 cover Ethiopia SPELLING folds (Other (Specify), Zorba mojibake, Region). #833's Ethiopia row (issue body line 23) is a physical-quantity mismatch (bunch-vs-kg across crop_production and price tables, Leafy Greens 0.40, Banana 0.045). Not closed by #949; must not hold #832 open; needs its own item in the u-vocabulary cluster.",
+  "#958 lists 957 in blocked_by; #957 is resolved, so the shebang/symlink decision is the only live blocker.",
+  "venv group note says merged_prs.json 'only surfaces #687 for #680'; PR #733 (2026-08-24) also lists #680 in refs -- its body cites #680 only as 'same failure shape'. Not a fix; the note's substance stands.",
+  "PR #739 (release v0.10.0) body lists 'closes #637' while #637 is open: a release-notes mention, not a close.",
+  "#837's record quotes Ethiopia CONTENTS.org:1752-1757 ('disagreement is in Region/District/Rural, not the coordinates') as CONTRADICTED by the pre-collapse 2011-12 wave parquet (0 groups disagree on those columns; all 34 are NaN-vs-value GPS). Reported as a finding, per the guardrail; not softened.",
+  "#679's record quotes Niger CONTENTS.org:408-416 (#871 entry: 'a blank line sharing a member number with a real one') as understating the loss: niger.py:1204-1207 shows real-vs-real collisions (age 56 vs 29). Reported, not assumed stale.",
+  "#836's record quotes Tanzania CONTENTS.org:1485-1503 ('editing food_labels changes what food_acquired builds') as CONTRADICTED by the warm parquet (251,730 rows = wave sum; script never ran). Reported.",
+  "#811's issue text claims a cache-free fix; both the record and CLAUDE.md's cache section say categorical_mapping.org is a hashed `_/*.org` build input. Plan budgets the Guinea-Bissau re-warm.",
+  "#848 and #962 both touch Uganda/_/uganda.py; the working tree at c5d70c870 has an uncommitted #962 draft on that file (git status). Plan step 1 parks it before #848.",
+  "Open PRs pending human merge (#951 #952 #954 #955 #963 #965) honoured: #963 blocks #962; #955 (#953 mapping resolution docs+tests) does not change by-name resolution, so #811 is not blocked by it; none of the others touch these 31 issues."
+ ],
+ "clusters": [
+  {
+   "key": "venv-per-clone-state-in-shared-location",
+   "issues": [
+    957,
+    958,
+    961
+   ],
+   "root_fix": "Per-clone state (editable-install path, .venv symlink, console-script shebangs) must live with the clone, not the mirror. #957 landed the .pth/dist-info half. Remaining root: @ligon's shebang/symlink decision (#958 comment 2026-09-22T06:42), then one PR making savio_venv.sh take <repo>+<code_root> like coverage_lib.sh:128-176, dropping `ln -sfn $REPO/.venv` (savio_venv.sh:121), flock around cmd_update, a generation id, and the installed-vs-pyproject assert. #961 closes when that and #960 land. (#960 not in this batch.)"
+  },
+  {
+   "key": "u-vocabulary-unguarded",
+   "issues": [
+    962,
+    832,
+    833
+   ],
+   "root_fix": "The `u` axis is an unvalidated free string: null markers ('---' Uganda, 'None' Nigeria 847 / GhanaLSS 2,508, '' Cambodia 3,010), second spellings, and sentinels-that-are-labels (Tanzania piece/Piece) pass presence/uniqueness/Site I/Q. Framework fix with no issue yet: extend `missing_level_sentinels` (data_info.yml, today crop_production only) to `food_acquired`, plus a corpus test that every served `u` is a decoded label, `_parse_explicit_metric`-parsable, or in `_U_SENTINELS` (transformations.py:3336). Country halves: #962 (blocked on PR #963 + basis decision), #832's two residuals (Malawi kg from four code paths, Tanzania piece), and #833's Ethiopia bunch-vs-kg item (mis-filed under #832 -- it is a physical-quantity fold, not a spelling)."
+  },
+  {
+   "key": "price-provenance-undeclared",
+   "issues": [
+    845,
+    828
+   ],
+   "root_fix": "food_acquired.Price is absent (15 of 19 warm countries), office-derived Exp/Qty (Uganda h15bq12), library-derived (GhanaLSS produced, #916) or elicited (Guatemala/Panama/Serbia, unverified) and nothing in config says which; food_prices(units='unitprice') returns an empty frame silently (transformations.py:2916-2921, pinned by tests/test_food_prices_units_kwarg.py:93) or a spurious identity. One per-country Price-provenance declaration read by food_prices_from_acquired (raise a PriceUnavailableError sibling of LabelUnavailableError, errors.py:9, caught at feature.py:1051 under Contract B; docstring/attrs when derived) closes both. #828 needs the raise-vs-warn call; #845 is docs now."
+  },
+  {
+   "key": "community-prices-obs-grain",
+   "issues": [
+    840,
+    822
+   ],
+   "root_fix": "community_prices has NO index_info entry in data_info.yml (:53-125; Feature Vocabulary :1106 only), so (t,v,j,u) is a per-country assertion while the instruments carry a variety/releve/obs axis: Mali collapses variety by row order (mali.py:855-858) and reads only releve 3 (Mali/2014-15/_/community_prices.py), Niger builds `obs` (niger.py:1268-1279) then drops it (:1408), GhanaLSS ships `obs`. One canonical decision (register community_prices in index_info with an optional obs/variety level, per #323-D1 'fix the index, do not declare a reducer'; or accept #822's releve coalesce as a stated fill rule) then one Mali rewrite + Niger keeping its level. Tanzania's #840 instance is the deliberate j lump, not this cluster. Rider: state Quantity = Poids (kg) in the Mali script + data_scheme.yml (#822 M3, CONTENTS.org:746-756) and correct data_scheme.yml:59-65 (#839) in the same Mali re-warm."
+  },
+  {
+   "key": "crop-sold-unit",
+   "issues": [
+    824
+   ],
+   "root_fix": "Sale value is per SOLD unit but the table carried only the harvest u. Contract settled and landed (Uganda 66c1ff6ab/2bb32afec, Malawi 85947ff52, data_info.yml:784-865: Unit_sold/Condition_sold optional columns, disagreement is a FLAG). Remaining: Nigeria pass sa3q11b for W1/W2 (nigeria.py:368/451, _/crop_production.py:118,132; W3-W5 behind #843), Niger read the b-column in all four wave scripts and re-key the sale aggregation on (i, crop, sold unit) BEFORE the sum at Niger/2014-15/_/crop_production.py:66."
+  },
+  {
+   "key": "uganda-wide-colmap-slot1-only",
+   "issues": [
+    848,
+    647
+   ],
+   "root_fix": "Uganda 2018-20 WIDE-vintage CROP_COLMAPS enumerate one `conditions` slot per season where the source ships parallel slot families: condition-2 (`_2`, unread in 2018-19 B uganda.py:2037-2041 and 2019-20 B :2046-2050; 1,436 + 1,307 rows; 14 + 3 additive collisions) and part-harvest (`_11`/`_21`, 2019-20 A only, ~100 rows). One PR adding slot entries to the two B colmaps (unit-vs-condition by value-label vocabulary, uganda.py:1703) closes #848 and, with a questionnaire verdict, #647; one Uganda re-warm."
+  },
+  {
+   "key": "deferred-for-cache-cost",
+   "issues": [
+    839,
+    833
+   ],
+   "root_fix": "Config corrections parked because a data_scheme.yml / categorical_mapping.org edit cold-rebuilds the country (cscheme=/binp:/org whole-file hashing, country.py:3566, :1018) -- and the hash inputs then moved anyway without the corrections (Mali 57d2ffafd, cd5172557; Malawi nine malawi.py commits since 09-08). Root fix is procedural: bundle Mali data_scheme.yml:59-65 with the #822 Mali edit, and Malawi data_scheme.yml:191/:433 + Boiled-groundnut split + ag_i02c wiring in one Malawi re-warm, under @ligon's PR #918 ruling. Hashing parsed YAML (#839's framework ask) removes only the comment case at one corpus re-warm; option, not root."
+  },
+  {
+   "key": "acquisition-path",
+   "issues": [
+    831,
+    650
+   ],
+   "root_fix": "What add_wave may land untracked in countries_root() and whether get_dataframe may READ it before `dvc add` (local_tools.py:1195-1214) is one policy decision governing #831's last bullet; #650 (add_wave fetches only the Stata zip, data_access.py:1035-1073) is separate plumbing on the same acquisition path. Decide the read policy once; the `cache clear` .dta/.sav/.csv listing (cli.py:228-240) and the Documentation/ fetch are then mechanical and hash-neutral (per #917's data_access measurement)."
+  },
+  {
+   "key": "read-time-label-table-missing (cross-group)",
+   "issues": [
+    811,
+    837,
+    833
+   ],
+   "root_fix": "A served label column is spelling-split because no `#+name: <Column>` table exists in the country's categorical_mapping.org (auto-applied by name, country.py:2885-2894). Template: Ethiopia Region under #832 (efe0199a3). Instances: #811 Guinea-Bissau Region (+ Burkina_Faso 22/13, Niger 16/8, Senegal 14 -- no issue yet), #837 Tanzania harmonize_district (118 District cells, CONTENTS.org:1792-1811) and Ethiopia District-namespaced-by-Region (CONTENTS.org:1759), #833 Niger drift pairs (Chou/Choux, Sucre x3, code 166) and Tanzania harmonize_crop food-label reuse. Each is a config table + one country re-warm (categorical_mapping.org IS a hashed build input -- #811's 'cache-free' claim is wrong)."
+  },
+  {
+   "key": "canonical-index-info-undeclared (cross-group)",
+   "issues": [
+    840,
+    822,
+    862
+   ],
+   "root_fix": "A feature's grain lives only in per-country comments or a reservation comment: community_prices has no index_info entry (#840/#822), plot_cultivation is reserved at data_info.yml:307-311 while #439's design doc reserves decision_making (t,i,pid,domain) for the same construct (#862). Registering the grain canonically is the prerequisite for every country edit in both."
+  },
+  {
+   "key": "conflict-signal-dies-at-cache (dependency, not a root)",
+   "issues": [
+    868,
+    837
+   ],
+   "root_fix": "reduce_to_agreed(on_conflict='na') only warnings.warn()s (build_transforms.py:498-509), files no _record_grain_report, so nothing is stamped or replayed warm (country.py:4584/4632 stamp; 4511/4672 replay). Uganda's pattern therefore cannot be recommended to Tanzania/Ethiopia for #837's Rural/GPS residue until #868 lands: route the 'na' branch through the ledger (distinct report kind), and fold wave-parquet stamps into the country stamp for the make-run path."
+  },
+  {
+   "key": "stata-missing-code-served-as-data",
+   "issues": [
+    865
+   ],
+   "root_fix": "Numeric missing codes (999999 / 9999 / 9999999) pass through pd.to_numeric and are served (Niger 2011-12/_/crop_production.py:42-46; 2014-15 uses a DIFFERENT code). niger.py already strips them for wages (:877) and community prices (:1307). Exact-value strip in the wave scripts per the #861 Uganda pattern (uganda.py:1510-1515), with before/after counts; closed siblings #861, #777 (Panama 7.70)."
+  }
+ ],
+ "dispatch_plan": [
+  {
+   "order": 0,
+   "issues": [
+    957,
+    832,
+    637,
+    689,
+    824,
+    647,
+    680,
+    831,
+    839,
+    833,
+    958,
+    959,
+    961
+   ],
+   "tier": "reconcile (human gh writes)",
+   "what": "Post the reconcile comments/closes from the table above (#957 close; the twelve partials comment). File the four new issues this triage surfaced: (i) #832 residual Malawi kg spellings incl. framework `_metric_kg_factor` lowercase stamp; (ii) #832 residual Tanzania piece/Piece non-label sentinel; (iii) framework u-vocabulary guard -- `missing_level_sentinels` to food_acquired + corpus `u` test (Nigeria 'None' 847, GhanaLSS 'None' 2,508, Cambodia '' 3,010; also #833's Ethiopia bunch-vs-kg item); (iv) Region spelling siblings Burkina_Faso/Niger/Senegal (or widen #811). Then close #832.",
+   "verify": "None (no code). Cost: nil.",
+   "blocked_by": "Guardrails: no gh write in this run -- human action."
+  },
+  {
+   "order": 1,
+   "issues": [
+    962,
+    848
+   ],
+   "tier": "prerequisite (human, git)",
+   "what": "Park the uncommitted #962 draft in the working tree (`M lsms_library/countries/Uganda/_/uganda.py`, untracked tests/test_962_unit_sentinel.py; git status at c5d70c870) on a fix/962-* branch. #848 edits the same file and must not start on a dirty uganda.py.",
+   "verify": "`git status --short` clean on development. Cost: nil.",
+   "blocked_by": "human (git write)."
+  },
+  {
+   "order": 2,
+   "issues": [
+    810
+   ],
+   "tier": "B (auto); rider: #959 corpus re-warm decision",
+   "what": "#810: replace both dvc.api.open sites (local_tools.py:1394 get_dataframe, :1671 change_id) with the countries_root-rooted path (DVCFS at :198 / _try_get_data_file), fail fast; add a tmp_path-cwd test with a malformed foo.dta.dvc. Editing get_dataframe moves 37/37 build fingerprints, so SCHEDULE IT BESIDE the #959 paired re-warm decision so the corpus re-warms once, not twice (soft dependency, not a blocker).",
+   "verify": "New test: no YAMLValidationError, sub-second failure from a tmp cwd; existing suite via `make test` recipe (-n, --dist=loadfile, LSMS_BUILD_WORKERS=1, BLAS threads pinned). Cost: one CORPUS re-warm (shared with #959 if executed).",
+   "blocked_by": "soft: coordinate with #959 decision (execute re-warm vs accept mixed-writer corpus)."
+  },
+  {
+   "order": 3,
+   "issues": [
+    868
+   ],
+   "tier": "B (auto, framework)",
+   "what": "Route reduce_to_agreed(on_conflict='na') conflicts through _record_grain_report with a distinct report kind (cells_blanked, naming groups+columns) so test_uganda_323_grain.py:258's destroyed/nan_key filter is untouched; inject country/table/wave at the framework boundary; for the make-run path make wave-script to_parquet(grain_audit=) stamps fold into the country stamp at country.py:4600-4632. Must precede any recommendation of the Uganda pattern to Tanzania/Ethiopia in #837.",
+   "verify": "Fixture test: conflicting frame through reduce_to_agreed(on_conflict='na'), write/re-read parquet, assert grain_reports() non-empty and replay fires. Cost: fixture only; budget a Uganda + Togo re-warm because whether the in-function imports at uganda.py:201/1696 reach framework_imports_fingerprint is UNVERIFIED.",
+   "blocked_by": ""
+  },
+  {
+   "order": 4,
+   "issues": [
+    679,
+    865,
+    824,
+    811,
+    833
+   ],
+   "tier": "B (Niger bundle: diagnose-then-fix + auto)",
+   "what": "ONE Niger re-warm (niger.py/categorical_mapping.org are in all 18 Niger table hashes, CONTENTS.org:690-695). Sequence inside the branch: (a) #679 first -- add EXTENSION as third `i:` element in 2014-15/_/data_info.yml (7 blocks) and the five wave scripts; regenerate committed panel_ids.json/updated_ids.json via `make -C lsms_library/countries/Niger/_ panel-ids`, review the diff, re-check the transitive-chain guard panel_ids.py:99-115; name the EXTENSION=2 previous_i decision (default: split-offs are new households). (b) #865 -- exact-value strips in the WAVE scripts (2011-12: 999999/9999999; 2014-15: 9999; plot_inputs 2021-22: 9999), not in _finish_crop_production. (c) #824-Niger -- read the b-column in all four wave scripts, re-key sale aggregation on (i, crop, sold unit) before the sum, carry Unit_sold. (d) #811-Niger -- add lower-case rows to the existing Region table (categorical_mapping.org:230-242). (e) #833-Niger -- harmonize_food over Chou/Choux, Aubergine, Sucre x3; decode code 166 from the 2021-22 questionnaire. Add CONTENTS.org entries for each and correct the #871 characterisation at :408-416.",
+   "verify": "Per wave: roster i-values subset of sample i; 2014-15 serves 3,617 households / 26,579 roster rows; no served Quantity/Quantity_sold/Value_sold equals a listed code (before/after counts); Unit_sold agreement shares match CONTENTS.org:785-800; served Region 8 labels; no j label '166'. Cost: one Niger cold rebuild (18 tables).",
+   "blocked_by": "EXTENSION=2 previous_i decision must be NAMED in the PR (default acceptable)."
+  },
+  {
+   "order": 5,
+   "issues": [
+    811
+   ],
+   "tier": "A (auto)",
+   "what": "Guinea-Bissau: add `#+name: Region` table to _/categorical_mapping.org with the strata table's rows verbatim (sab -> SAB, BOLAMA_BIJAGOS -> Bolama-Bijagos), mirroring efe0199a3. Burkina_Faso (new table 22 -> 13) and Senegal (case-normalise 14) as the sibling issue from step 0.",
+   "verify": "Served cluster_features.Region vocabulary == served sample.strata vocabulary (9 == 9); tests/test_guinea_bissau_cluster_features.py passes. Cost: one Guinea-Bissau re-warm (one wave, small) -- NOT cache-free.",
+   "blocked_by": ""
+  },
+  {
+   "order": 6,
+   "issues": [
+    848
+   ],
+   "tier": "B (auto); rider: #647 verdict if given",
+   "what": "Uganda: add a second `conditions` entry to CROP_COLMAPS['2018-19']['B'] (uganda.py:2037-2041) and ['2019-20']['B'] (:2046-2050), harvest + sold sides + kg_factor s5bq06d_2; unit-vs-condition by value-label vocabulary (uganda.py:1703). If @ligon's #647 questionnaire verdict is 'include', add the `_11`/`_21` family in the same PR; if 'exclude', one sentence at uganda.py:1846.",
+   "verify": "Before/after: +1,436 (2018-19) / +1,307 (2019-20) rows, 14 / 3 additive collisions, harvest_kg delta reported; move tests/test_uganda_crop_condition.py:59 baseline (133,683) and the CONTENTS.org:2076 TODO. Cost: full Uganda re-warm (uganda.py in every Uganda table hash).",
+   "blocked_by": "step 1 (park #962 draft); #647 verdict optional."
+  },
+  {
+   "order": 7,
+   "issues": [
+    836,
+    837,
+    833
+   ],
+   "tier": "B (Tanzania bundle)",
+   "what": "ONE Tanzania re-warm. (a) #836 -- with a human nod, retire Tanzania/_/food_acquired.py + Makefile:43-44 (also removes the cluster_features.parquet-as-prerequisite hazard CLAUDE.md names under #866), demote CONTENTS.org:1301 food_labels to docs, update :1485-1503, add a framework test that no countries/**/*.py calls df_from_orgfile('CONTENTS.org', ...). (b) #837-Tanzania -- add the harmonize_district table CONTENTS.org:1792-1811 proposes (118 District cells); Rural 264 is a human decision (keep loud loss / drop Rural from cluster_features / blank via reduce_to_agreed once #868 lands). (c) #833-Tanzania -- harvest-form labels in harmonize_crop (categorical_mapping.org:671-684) and a CONTENTS.org entry.",
+   "verify": "#836: one cold Tanzania food_acquired build with warnings captured (expect 'Makefile execution failed' or no change in 251,730 rows); #837: cluster_features stamp shrinks by ~118 District cells; #833: no food label served as a crop. Cost: one Tanzania cold rebuild (18 script tables; largest CONTENTS.org).",
+   "blocked_by": "#836 retirement nod; Rural decision; #868 for the blanking option."
+  },
+  {
+   "order": 8,
+   "issues": [
+    837
+   ],
+   "tier": "B (Ethiopia, diagnose)",
+   "what": "Ethiopia: do NOT re-key v (the issue's proposed composite is the wrong fix -- Region/District/Rural disagree in 0 clusters in every wave; every conflict is GPS). Diagnostic: explain why 38/72/72 EAs carry more than one displaced GPS point in 2013-14/2015-16/2021-22, then decide the cluster GPS rule (EA-level point vs move per-household coordinates out of the cluster table). Separately namespace District by Region as a categorical_mapping.org label fix (pattern efe0199a3). Correct Ethiopia CONTENTS.org:1752 and the issue text with the per-column numbers.",
+   "verify": "Pre-collapse {wave}/_/cluster_features.parquet per-column reconstruction reproduces the stamp; after the label fix the District defect (30 of 37 codes span >1 Region, CONTENTS.org:1759) is 0. Cost: read-only diagnostic, then one Ethiopia cluster_features-only rebuild.",
+   "blocked_by": "GPS rule decision."
+  },
+  {
+   "order": 9,
+   "issues": [
+    833
+   ],
+   "tier": "B (Malawi bundle); rider: #839 Malawi comment correction",
+   "what": "ONE Malawi re-warm: wire ag_i02c (sale-side S/U) into the sale merge (malawi.py:1256 'ag_i02c is unwired'); give `Boiled groundnuts` its own label (categorical_mapping.org:90); reconcile the Cassava (flour) two-code-scheme note where it applies; correct Malawi data_scheme.yml:191/:433 JOIN claim in the same commit (#839 rider).",
+   "verify": "harvest/sale shelled-unshelled basis agreement counts before/after (CONTENTS.org:201-217); Groundnut no longer receives vendor-snack rows; Malawi crop_production/food_acquired build clean. Cost: one Malawi cold rebuild.",
+   "blocked_by": ""
+  },
+  {
+   "order": 10,
+   "issues": [
+    822
+   ],
+   "tier": "B (Mali bundle, gated on the #840 grain decision); rider: #839 Mali comment correction",
+   "what": "After the grain decision (escalation): either (a) coalesce releve 1 -> 2 -> 3 per (v, variety, u) in Mali/2014-15/_/community_prices.py -- recovers 26,745 rows, no grain change; or (b) register community_prices in index_info with optional `obs` and carry it (GhanaLSS shape), Niger then keeps the `obs` it already builds (niger.py:1408 drop removed). Either way: fix the docstring, state Quantity = Poids (kg) in script + data_scheme.yml, correct data_scheme.yml:59-65 (#839 rider), add Tanzania/Niger CONTENTS.org keep-first entries.",
+   "verify": "Row count 23,646 -> ~50k (a) or ~3x (b); relevé 1 vs 3 log-ratio median 0.000 reproduced; index_info entry present if (b). Cost: one Mali re-warm (+ Niger community_prices if (b)).",
+   "blocked_by": "grain decision (#840/#822 escalation)."
+  },
+  {
+   "order": 11,
+   "issues": [
+    824
+   ],
+   "tier": "B (Nigeria, W1/W2 only); rider: #867 Nigeria spelling (no cache cost)",
+   "what": "Nigeria: add `unit_sold` to crop_production_for_wave frames (nigeria.py:368/451), pass sa3q11b from _/crop_production.py:118,132 for W1/W2, canonicalise through the harvest u table (value-label vocabulary). Also fold the #867 Nigeria 'Other Inorganic Fertilizer' spelling into `_NITROGEN_CONTENT` (transformations.py, no cache cost) as a rider.",
+   "verify": "Unit_sold agreement 96.9% / 95.3% reproduced (CONTENTS.org:976-1000); W3-W5 untouched. Cost: one Nigeria crop_production re-warm (PP/PH -- read pp-ph skill first).",
+   "blocked_by": "#843 for W3-W5 (OPEN; out of scope here)."
+  },
+  {
+   "order": 12,
+   "issues": [
+    831
+   ],
+   "tier": "B (mechanical half only)",
+   "what": "Extend `cache clear` (cli.py:228-240) to list in-tree .dta/.sav/.csv with and without sidecars. The read-policy half (refuse / warn-but-serve sidecar-less in-tree files, local_tools.py:1195-1214) waits on the escalation.",
+   "verify": "Unit test on a tmp countries_root with a sidecar-less .dta; hash-neutral (no cli/data_access symbol in a build fingerprint, per #917). Cost: nil.",
+   "blocked_by": "read-policy decision for the other half."
+  },
+  {
+   "order": 13,
+   "issues": [
+    962
+   ],
+   "tier": "B (human-gated, after PR #963)",
+   "what": "Once PR #963 merges and @ligon signs the shape: blank-untcd rows -> u='Value' WITH Quantity=Expenditure when expenditure-only, U_UNKNOWN when quantity-present; promote the 134 curated blank-label codes, U_NA for code 0 only; CONTENTS.org entry for the blank-untcd route.",
+   "verify": "7,359 unitless rows no longer take the 0.0646 u-pooled kg factor; 6,429 Value rows stay in food_quantities; the -14.4% kg drift decomposed and reported against the openICPSR baseline. Cost: Uganda re-warm (combine with step 6 if timing allows).",
+   "blocked_by": "PR #963 (open, pending human merge); basis decision; fix-shape sign-off."
+  }
+ ],
+ "escalate": [
+  {
+   "number": 957,
+   "decision": "Close #957 now (all four commits are on development, image promoted 2026-09-22 00:33), with the two residuals -- missing `lsms-library` console script, __version__ '0.0.0' -- moved to #960?"
+  },
+  {
+   "number": 958,
+   "decision": "Shebang/symlink strategy: (A) `python -m` is the only supported invocation, (B) rewrite shebangs at image-build time, or (C) a predictable per-clone symlink? That choice unblocks the one mechanical PR (clone-aware savio_venv.sh with flock + generation id + installed-vs-pyproject assert)."
+  },
+  {
+   "number": 959,
+   "decision": "Execute the paired cold re-warm now (LSMS_CACHE_SCHEMA 5 -> 6, ideally in the same window as #810's get_dataframe edit so the corpus re-warms once), or explicitly accept the mixed pyarrow 23/25 corpus on the strength of the #961 coda? And: declare or drop the boto3 import at scripts/dvc_remote_reachability.py:71?"
+  },
+  {
+   "number": 961,
+   "decision": "Keep #961 open as the tracker until #958's decision and #960's docs land -- confirm, or fold the remaining checklist into #958/#960 and close?"
+  },
+  {
+   "number": 680,
+   "decision": "Nudge ligon/fooddatacentral#5 for a 1.0.13 release (then raise the floor past 1.0.12)? Meanwhile, may the guard docstring (tests/test_tests_package_not_shadowed.py:27-31) be corrected to say the shield is PYTHONPATH, not the .pth?"
+  },
+  {
+   "number": 962,
+   "decision": "Two calls: (1) is the post-#850 Uganda kg basis accepted, given the pre-#850 artifacts reproduce the openICPSR deposit bit-for-bit and #850 is 97% of the -14.4% drift? (2) Sign the fix shape -- blank-untcd rows: 'Value' with Quantity=Expenditure when expenditure-only, U_UNKNOWN when quantity-present; the 134 curated blank-label codes promoted, U_NA for code 0 only -- after PR #963?"
+  },
+  {
+   "number": 845,
+   "decision": "May an agent land the docs-only PR (transformations.py:2861 units= docstring, data-methods.md:93, uganda.py:609-613, Uganda CONTENTS.org 'Price is UBOS's own Exp/Qty' entry, five-row provenance table) now, ahead of the #828 provenance-declaration design?"
+  },
+  {
+   "number": 828,
+   "decision": "When a *price mode needs a Price column the table lacks (15 of 19 warm countries): RAISE a PriceUnavailableError caught at feature.py:1051 under Contract B (Feature degrades per country, one aggregated warning; rewrites the pinned test at test_food_prices_units_kwarg.py:93), or WARN and keep concatenating empties?"
+  },
+  {
+   "number": 840,
+   "decision": "Grain decision for community_prices, once at the canonical level: register it in data_info.yml index_info with an optional `obs`/`variety` level (GhanaLSS shape; Mali and Niger stop dropping the axis), or keep (t,v,j,u) with a STATED selection rule (which #323-D1 argues against)? Tanzania's j-lump stays keep-first-with-warning either way unless a source-item level is accepted."
+  },
+  {
+   "number": 822,
+   "decision": "Mali 2014-15 relevés: (a) coalesce relevé 1 -> 2 -> 3 (recovers 26,745 rows, no grain change, a fill rule not a reducer since P1==P3 where both exist), or (b) carry `obs` per GhanaLSS (needs the #840 index_info entry)? Same decision as #840."
+  },
+  {
+   "number": 827,
+   "decision": "Close #827 with the decomposition (21,074 unpriced / 20,498 non-food with unit implicit in the label / 1,356 food, 1,330 beer -- the food yardstick loses ~26 rows), recorded in Malawi CONTENTS.org? Or do you want a label-derived `u` for items whose label names the unit (a bottle, a 50 kg grind), which CONTENTS.org:711-718 currently forbids?"
+  },
+  {
+   "number": 647,
+   "decision": "From the UNPS partially-harvested repeat page (2018-19 form p.17 / 2019-20 ag questionnaire): does 'part harvest' mean a still-standing crop? Exclude (one sentence at uganda.py:1846, no rebuild) or include (a distinguishing flag beside `condition`, folded into the #848 Uganda re-warm)?"
+  },
+  {
+   "number": 867,
+   "decision": "Please supply cited nominal N shares for NPS (~19%?) and D Compound, and rule on organic inputs (a share, or a documented refusal). The Nigeria 'Other Inorganic Fertilizer' spelling and Guinea-Bissau Portuguese keys are mechanical riders once that is written."
+  },
+  {
+   "number": 862,
+   "decision": "One shape or two: is plot_cultivation (t,i,plot,season,pid,role) the plot-domain instance of #439's reserved decision_making (t,i,pid,domain), or a separate table? And must `season` be a level for Ethiopia/Tanzania as it is for Uganda?"
+  },
+  {
+   "number": 637,
+   "decision": "Close #637 with a reconciliation comment (premise reversed in-thread; sites cleared by #636/#638/#646/#651; core answered by #871/PR #885) and spin off one task -- key-soundness review of Malawi malawi.py:934/1899/1977 plus sites added since 2026-07-21, optionally with the explicit-skipna AST lint?"
+  },
+  {
+   "number": 836,
+   "decision": "Nod to retire Tanzania/_/food_acquired.py and Makefile:43-44 (dead on the default backend: warm parquet 251,730 rows = wave sum, script never ran; wrong on its own terms if it did), demoting the CONTENTS.org:1301 food_labels table to documentation?"
+  },
+  {
+   "number": 837,
+   "decision": "Tanzania Rural (264 contested cells, a per-household attribute in a cluster table): keep the loud loss, drop Rural from cluster_features (sample() has it per household), or blank via reduce_to_agreed once #868 lands? And for Ethiopia: cluster GPS rule -- take the EA-level point, or move per-household coordinates out of the cluster table? (Do NOT re-key v; the issue's composite proposal is the wrong fix.)"
+  },
+  {
+   "number": 660,
+   "decision": "Is Ethiopia's `sample` the HH-questionnaire cover (ag/geo orphans W2 25, W3 26, W4 120, W5 40 recorded as unweighted by construction), or the union of covers with a source flag? Authorise the cold diagnostic read of the unwired sect_cover_pp_w{N}.dta + BID interview-status flags first?"
+  },
+  {
+   "number": 689,
+   "decision": "Ask 2: keep Uganda cluster_features.Rural at cluster grain with honest <NA> from 2013-14, or build a wave-grain `optional` mechanism (framework work shared with the Niger Latitude case)? Ask 1 is already met by PR #634; ask 3 waits on #450."
+  },
+  {
+   "number": 831,
+   "decision": "Read policy for a sidecar-less data file inside countries_root(): refuse (as #803 does for parquets; breaks the add_wave develop-before-`dvc add` workflow), or warn-but-serve (InTreeDataWarning) with `cache clear` listing them? The listing half is mechanical and hash-neutral either way."
+  },
+  {
+   "number": 839,
+   "decision": "Confirm the PR #918 ruling applies: land the Mali data_scheme.yml:59-65 and Malawi data_scheme.yml:191/:433 comment corrections bundled with the Mali/Malawi steps above (one re-warm each)? Separately: do you want data_scheme.yml hashed as parsed YAML (one-time corpus re-warm, comment edits then free)?"
+  },
+  {
+   "number": 833,
+   "decision": "Uganda `Aggregate` bucket contract: demand estimation (CFE beta-spread test, flour may stay with the grain) or price comparison (split Maize (flour)/Millet Flour/Cassava (flour) out)? The other four country items are dispatched above."
+  },
+  {
+   "number": 650,
+   "decision": "Approve the add_wave() extension to fetch DDI/BID/questionnaire resources from the same api/resources listing (offline-testable), and assign the backfill of Ethiopia/Niger/Senegal 2021-22 Documentation/ to someone with the WB API key + S3 write creds?"
+  }
+ ],
+ "group_notes": [
+  {
+   "group": "venv-infra",
+   "note": "Four of the six (#957, #958, #961, and the docs sibling #960) are one defect: per-clone state (the editable-install path, the .venv symlink, the console-script shebangs) kept in a shared location, which a single node hides. #957's half is done via direct commits to development (no PRs); the remaining root-cluster work is #958's unmade decision on the shebang/symlink strategy, after which savio_venv.sh can be made clone-aware in one PR (the shape already exists in coverage_lib.sh:128-176). #959 is its own decision, executed on the lock side but with the paired live-cache re-warm not done (LSMS_CACHE_SCHEMA still 5; sampled live parquets are a pyarrow 23/25 mix). #680's exposure now rides on the same PYTHONPATH lever #957 made authoritative. #810 is the only auto-fixable silent-cost bug in the group and is unrelated to the venv cluster except by family resemblance.",
+   "condensed": true
+  },
+  {
+   "group": "units-kg",
+   "note": "Two root causes plus an outlier. (1) #962 and #832 share 'the u axis is an unvalidated free string': a null marker ('---', 'None', ''), a second spelling, or a sentinel that is also a label passes every guard. #832's folds have landed (b55b37e1a, 9a97f2cb6, PR #949); #962's Uganda fix is blocked on a human decision, but its framework half (Nigeria 'None' 847 rows, GhanaLSS 'None' 2,508, Cambodia '' 3,010; slurm_logs/gh962_units_consistency/u_census.out) has NO issue yet. (2) #845 and #828 share 'Price provenance is undeclared'. (3) #865 belongs with #861 (closed) and #777: Stata-style numeric missing codes served as data.",
+   "condensed": true
+  },
+  {
+   "group": "prices-crop-units",
+   "note": "All four are consequences of one design fact: the community/sale price instruments record MORE axes than the tables carry. (1) community-prices-obs-grain (#840 Mali+Niger, #822): data_info.yml has NO index_info entry for community_prices (:53-125; Feature Vocabulary :1106 only) while GhanaLSS ships an obs level and Niger builds one then drops it (niger.py:1268-1279, :1408). Tanzania's #840 instance is NOT this cluster (deliberate j lump, tanzania.py:2053-2058). (2) crop-sold-unit (#824): landed for Uganda/Malawi, canonical Unit_sold at data_info.yml:784; Nigeria W1/W2 tractable, W3-W5 behind #843; Niger SUMS Quantity_sold across units (Niger/2014-15/_/crop_production.py:66). #827 is not a defect as stated (decomposition: 21,074 unpriced, 20,498 non-food, 1,356 food of which 1,330 beer).",
+   "condensed": true
+  },
+  {
+   "group": "crop-config",
+   "note": "Thematic, not causal. Only #848 and #647 share a root (uganda-wide-colmap-slot1-only). #867 is a nutrient-content decision with two mechanical sub-parts (Nigeria 'Other Inorganic Fertilizer' spelling miss, Guinea-Bissau Portuguese labels); #862 is a schema proposal blocked on reconciling two reserved shapes under #439. None of the four is referenced by any merged or open PR; #647's documentation half landed in 66c1ff6ab (#824).",
+   "condensed": true
+  },
+  {
+   "group": "grain-collapse",
+   "note": "No single root cause. #637's premise was reversed in-thread and worked by #636/#638/#646/#651 and GH #871 (PR #885); residue is a stale inventory, Malawi's three sites and the skipna lint. #837 is live in the warm stamps but two of three diagnoses are contradicted by the pre-collapse wave parquets (Ethiopia 100% GPS; Tanzania reproduces CONTENTS.org's residue; Uganda IS #689). #868 and #837 interlock as a DEPENDENCY. #836 is a dead legacy script that is not the producer on the default backend.",
+   "condensed": true
+  },
+  {
+   "group": "identity-cluster",
+   "note": "Four different identity questions: #679 WHICH KEY (top priority), #811 WHICH SPELLING (Ethiopia #832 fix efe0199a3 is the template; siblings Burkina_Faso 22/13, Niger 16/8, Senegal 14), #660 WHICH FRAME, #689 WHICH GRAIN. All four have ZERO comments; #811's claim that the fix is cache-free is wrong (categorical_mapping.org is a hashed build input).",
+   "condensed": true
+  },
+  {
+   "group": "config-hygiene",
+   "note": "A process finding: #839 and two #833 items were deferred for cache cost and the hash inputs moved anyway (Mali 57d2ffafd, cd5172557; Malawi nine malawi.py commits since 09-08) with the corrections never bundled in. @ligon's PR #918 ruling covers the re-warm. A weaker 'acquisition-path' cluster links #831's last bullet and #650. Tanzania and Niger CONTENTS.org carry no entry for their #833 items.",
+   "condensed": true
+  }
+ ],
+ "records": [
+  {
+   "number": 957,
+   "tier": "D",
+   "type": "infra",
+   "tractability": "human",
+   "dedup_status": "resolved-in-development",
+   "priority": 4,
+   "summary": "The venv image's editable install (.pth) named the shared mirror, so `python <script>.py` from a /local clone silently imported the mirror, and dist-info froze __version__ 2060 commits stale. @ligon decided `pip uninstall` (not .pth-only) on 2026-09-21; the master was stripped, .venv.sqfs re-imaged and promoted 2026-09-22 00:33 (the old closure kept as .venv.sqfs.prev), and the guard/lever work all landed as direct commits to development with no PR: savio_venv.sh cmd_update refuses to image a master carrying lsms_library.pth or lsms_library-*.dist-info (bin/savio_venv.sh:43-58), both Makefiles export PYTHONPATH and `poetry install --no-root` (Makefile:24,71), CI passes --no-root at all four sites with workflow-level PYTHONPATH (.github/workflows/ci.yml:33,47,130,162,219), and tests/test_no_editable_install.py pins both halves. Verified on this node: the mounted image has no lsms_library.pth/dist-info and `PYTHONSAFEPATH=1` without PYTHONPATH gives ModuleNotFoundError (loud, as designed). The issue's own residual (cwd beats PYTHONPATH for -c/-m) was worked, not ignored: PYTHONSAFEPATH is set in the Savio controllers (d72054a7d) and deliberately popped for build subprocesses because 338 wave scripts import a sibling by bare name (6df53a5c6, tests/test_build_subprocess_env.py). Two residuals belong to #960's docs, not here: the `lsms-library` console script no longer exists in the image (`ls venv_img/bin` has no lsms-*) while CLAUDE.md still documents `lsms-library cache clear`, and __version__ now serves '0.0.0' by design (lsms_library/__init__.py:127-129).",
+   "evidence": "bin/savio_venv.sh:34-74 (guard + PYTHONPATH import check); Makefile:24,62-71; .github/workflows/ci.yml:25-33,47; tests/test_no_editable_install.py:1-20; lsms_library/__init__.py:126-129; commits 7d97b0340, bd82d78da, d72054a7d, 6df53a5c6, 55412e65e, 588b5ffee; live: /global/scratch/.../mirrors/LSMS_Library/.venv.lustre has no lsms_library* in site-packages, /local/job39195255/venv_img has none; .venv.sqfs mtime 2026-09-22 00:33 > master site-packages 00:19; #961 comment 2026-09-22T08:47 'Implemented and promoted'",
+   "approach": "Close the issue (human gh write); fold the two residuals (missing `lsms-library` console script, __version__ '0.0.0') into #960's docs pass.",
+   "resolved_by": "7d97b0340, bd82d78da, d72054a7d, 6df53a5c6 (direct commits, no PR); decision in #957 comment 2026-09-22T06:49",
+   "blocked_by": [],
+   "root_cluster": "venv-per-clone-state-in-shared-location",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "none",
+   "title": "The venv image's editable install names the shared mirror, so `python <script>.py` from a /local clone silently runs the mirror's code -- and `__version__` is 2060 commits stale"
+  },
+  {
+   "number": 958,
+   "tier": "D",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 2,
+   "summary": "bin/savio_venv.sh and the mirror's .venv symlink assume one node/one checkout/one job; the issue lists four defects plus a fifth (console scripts shebanged through the shared symlink) and a live caller (coverage_lib) that performed defect 2 on every run. At HEAD only the peripheral parts are fixed: the live caller now mounts at the job's own path and never repoints the shared symlink (bin/coverage_lib.sh:139-176, 55412e65e/d72054a7d, and it already splits <repo> from <code_root> at :128-131, which is exactly the shape defect 1 needs); mount now verifies before repointing (bin/savio_venv.sh:106-122); and the image is current with its master (00:33 vs 00:19). The core defects are untouched: D1 REPO still derives MASTER/IMG from BASH_SOURCE (savio_venv.sh:21-23), so the script is still only runnable from the mirror; D2 `ln -sfn \"$mnt\" \"$REPO/.venv\"` remains at :121 with a comment deferring to '#958's decision'; D3 no flock anywhere under bin/ or scripts/; D4 no generation id. Defect 5 is in force on this node today: `/local/job39195255/venv_img/bin/pytest --version` -> 'bad interpreter: .../mirrors/LSMS_Library/.venv/bin/python: No such file or directory', because the mirror's .venv still dangles at /local/job39008163/venv_img (Sep 17), and .envrc:8 pins VIRTUAL_ENV to that same dangling path. Classified D because the blocking item is @ligon's unmade three-way choice (accept python -m as the only invocation / rewrite shebangs at image-build time / predictable per-clone symlink) from the 2026-09-22T06:42 comment; @ligon's #959 comment (07:40) also asked for an installed-vs-pyproject assertion in cmd_update, which is not present.",
+   "evidence": "bin/savio_venv.sh:21-23 (D1), :117-121 (D2), no 'flock'/'generation' in bin/ (grep), :81 mv -f swap (D4 context); bin/coverage_lib.sh:128-176 (caller fixed, 55412e65e + d72054a7d); .envrc:8; live: mirror .venv -> /local/job39008163/venv_img (ls -l, Sep 17); `head -1 /local/job39195255/venv_img/bin/pytest` = #!/global/scratch/.../mirrors/LSMS_Library/.venv/bin/python; pytest --version -> bad interpreter; .venv.sqfs 2026-09-22 00:33 vs .venv.lustre site-packages 00:19; #958 comments 2026-09-22T06:42 and 07:24",
+   "approach": "Human decision first (shebang strategy: python -m only vs rewrite at image time vs predictable per-clone symlink); then a mechanical PR: savio_venv.sh takes <repo> and <code_root> like coverage_lib.sh, drops the `ln -sfn $REPO/.venv`, wraps cmd_update's master mutation + mksquashfs in flock on the Lustre mirror, stamps a generation id printed by mount, and adds the installed-vs-pyproject check @ligon asked for.",
+   "resolved_by": "55412e65e, d72054a7d, 7d97b0340 (partial: caller + verify-before-repoint only)",
+   "blocked_by": [
+    "decision on shebang/symlink strategy (#958 comment 2026-09-22T06:42)",
+    "957"
+   ],
+   "root_cluster": "venv-per-clone-state-in-shared-location",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "none",
+   "title": "bin/savio_venv.sh and the mirror's .venv symlink assume one node, one checkout and one job -- four defects that only appear with simultaneous multi-node work"
+  },
+  {
+   "number": 959,
+   "tier": "D",
+   "type": "infra",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 4,
+   "summary": "No lock file was tracked, so nothing recorded the environment the warm corpus was built under. @ligon chose option B (fresh resolve) on 2026-09-21 and it is executed: poetry.lock is tracked (git ls-files), .gitignore no longer lists /poetry.lock (only lsmsvenv/, venv/, .venv, .venv.lustre/, .venv.sqfs*), the before/after freezes are committed under slurm_logs/venv_provenance/ (9c5e2081e, 69eb3319e), the cold validation ran green (4228 passed, savio3 job 39131795) and the image was promoted. The stated pairing of the decision, a deliberate cold re-warm of the live cache (or an LSMS_CACHE_SCHEMA bump), has NOT happened: LSMS_CACHE_SCHEMA is still 5 with no commit since 09-15, and the live cache is mixed-writer (sampled: Ethiopia/GhanaLSS/Niger var parquets written by pyarrow 25.0.1 on 09-22 09:16-09:22, Malawi/Tanzania/Nigeria/Kosovo/Albania still pyarrow 23.0.1 from 09-16..09-18; Uganda/var is absent). Dependency versions are not in any build fingerprint, so those cells grade fresh indefinitely. The #961 coda (pyarrow 23->25 invisible in the Uganda/openICPSR comparison) makes this low-urgency, not done. Also open from the thread: `scripts/dvc_remote_reachability.py:71 import boto3` is now undeclared since boto3 left the closure.",
+   "evidence": "git ls-files poetry.lock; .gitignore:12-20 (no /poetry.lock entry); commits 9c5e2081e, 69eb3319e, 3499425e2, c7306a8a6; slurm_logs/venv_provenance/{master_freeze_2026-09-21.txt,master_freeze_2026-09-22_after_sync.txt,README.org}; lsms_library/local_tools.py:1840 LSMS_CACHE_SCHEMA = 5 and empty `git log -S'LSMS_CACHE_SCHEMA' --since=2026-09-15`; pq.read_metadata(...).created_by sample over 10 live var parquets (5 x 23.0.1, 3 x 25.0.1, Uganda missing); #959 comments 2026-09-22T06:49 (decision), 07:22 (corrected diff), 07:59 (validation green)",
+   "approach": "Human: decide whether to execute the paired re-warm now (LSMS_CACHE_SCHEMA bump or corpus cache clear) or explicitly accept the mixed-writer corpus on the strength of the #961 coda; either way close the lock-tracking part and declare/fix the boto3 import.",
+   "resolved_by": "69eb3319e (lock tracked), 9c5e2081e (provenance); decision in #959 comment 2026-09-22T06:49",
+   "blocked_by": [
+    "decision: execute the paired cold re-warm or accept mixed-writer corpus"
+   ],
+   "root_cluster": "",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "corpus-rewarm",
+   "title": "No lock file is tracked (/poetry.lock is gitignored), so nothing records the environment the warm parquet corpus was built under"
+  },
+  {
+   "number": 961,
+   "tier": "D",
+   "type": "umbrella",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 4,
+   "summary": "Tracker for the multi-node venv workplan. Sub-state at HEAD: #957 executed (uninstall decision, image promoted, guards and PYTHONPATH levers landed, direct commits no PRs); #959 executed except its paired live-cache re-warm; #958 partial (caller fixed, four core defects plus the shebang defect still live, one decision pending); #960 untouched (no commit to SkunkWorks/savio_venv.md, CLAUDE.md, AGENTS.md or .venv.lustre/README since 09-20; CLAUDE.md:92 and AGENTS.md:92 still prescribe the adopt-or-build recipe the tracker says is dead, and the README still calls /local persistent at :18,44 against the tracker's own measurement); ligon/sucoder#27/#28 are external. The three @ligon comments carry the decisions (#957 uninstall, #959 fresh resolve) and the promotion record; the coda records that the toolchain produced #962. Nothing here is auto-fixable; the tracker closes when #958's decision and #960's docs land.",
+   "evidence": "#961 comments 2026-09-22T07:34, 08:47, 13:34; commits 9c5e2081e..6df53a5c6 (git log --since=2026-09-21); bin/savio_venv.sh:21-23,121; empty `git log --since=2026-09-20 -- SkunkWorks/savio_venv.md CLAUDE.md AGENTS.md docs/`; CLAUDE.md:92; SkunkWorks/savio_venv.md:4,54-58; .venv.lustre/README_WHY_THIS_EXISTS.md:18,44 (mirror); gh issue view 960 -> OPEN",
+   "approach": "Keep open as the tracker; the remaining work is the #958 decision and the #960 docs pass (add: `lsms-library` CLI absent from image, __version__ 0.0.0 by design, PYTHONSAFEPATH controller/build split, re-warm status).",
+   "resolved_by": "partial: #957 via 7d97b0340/bd82d78da/d72054a7d/6df53a5c6; #959 via 69eb3319e",
+   "blocked_by": [
+    "958",
+    "960"
+   ],
+   "root_cluster": "venv-per-clone-state-in-shared-location",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "none",
+   "title": "[tracking] The venv layering assumes one node, one checkout and one job -- workplan for simultaneous multi-node work"
+  },
+  {
+   "number": 680,
+   "tier": "D",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 3,
+   "summary": "fooddatacentral 1.0.12 ships a broken top-level `tests` package that shadows ours and aborts collection. Root cause is unchanged: upstream ligon/fooddatacentral#5 is OPEN, PyPI latest is still 1.0.12 (2026-02-19), poetry.lock pins 1.0.12, and the mounted image still ships site-packages/tests. Two things changed since filing, in opposite directions and neither in the issue: (a) CI now sets workflow-level PYTHONPATH=github.workspace (6df53a5c6, ci.yml:33), which puts the repo's tests/ ahead of site-packages, so the 'green locally, red in CI' mechanism is closed as a side effect of #957 (the issue's option 3); (b) the local `.pth` shield the guard test's docstring relies on no longer exists post-#957. Probed on this node from /tmp with PYTHONSAFEPATH=1: find_spec('tests') resolves to venv_img/.../site-packages/tests without PYTHONPATH and to the clone's tests/ with it, so local exposure now rides entirely on the PYTHONPATH lever (Makefile export / cwd for python -m). PR #687's guard (tests/test_tests_package_not_shadowed.py) reports the resolution and AST-rejects `from tests.conftest import`; its docstring paragraph about lsms_library.pth is stale. Blocked on an upstream 1.0.13 release; local action is a floor bump when it exists.",
+   "evidence": "pyproject.toml:29 fooddatacentral (>=1.0.10,<2.0.0); poetry.lock:1850-1858 (1.0.12); PyPI JSON: latest 1.0.12; gh issue view 5 -R ligon/fooddatacentral -> OPEN; ls venv_img/lib/python3.11/site-packages/ shows tests + fooddatacentral-1.0.12.dist-info; .github/workflows/ci.yml:25-33 (6df53a5c6); tests/test_tests_package_not_shadowed.py:27-31,60-80 (PR #687, merged 2026-08-22); probe: find_spec('tests').origin with/without PYTHONPATH",
+   "approach": "Human/upstream: nudge ligon/fooddatacentral#5 to cut 1.0.13, then raise the floor past it; meanwhile a one-line docs fix to the guard docstring (the shield is PYTHONPATH now, not the .pth) and note the CI mechanism is already closed by 6df53a5c6.",
+   "resolved_by": "PR #687 (guard), 6df53a5c6 (CI PYTHONPATH closes the CI symptom); root cause not resolved",
+   "blocked_by": [
+    "ligon/fooddatacentral#5 (upstream release 1.0.13)"
+   ],
+   "root_cluster": "",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "none",
+   "title": "bug: fooddatacentral ships a broken top-level `tests` package that shadows ours — kills the whole suite at collection in CI"
+  },
+  {
+   "number": 810,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 2,
+   "summary": "get_dataframe's last-resort branch calls `dvc.api.open(fn, mode='rb')` with no repo=, so DVC resolves the repository from CWD and walks every *.dvc under it; from /tmp that means 300-450 s per missing source and a YAMLValidationError on a malformed pytest fixture, and (second comment) a BrokenProcessPool on Nepal from the walk running inside a forked build worker. Nothing has moved: both sites are unchanged at local_tools.py:1394 (get_dataframe) and :1671 (change_id, 4 callers), `git log -S'dvc.api.open'` shows only pre-issue commits, and no test runs get_dataframe from a tmp_path cwd. The branch is reached only when file_system_path finds no sidecar at cwd or _COUNTRIES_DIR (:1219-1231), i.e. for genuinely absent sources, so the right fix is to drop dvc.api.open there and go straight to _try_get_data_file / DVCFS (rooted at _COUNTRIES_DIR, :198), not to pass repo= (which still pays the sidecar walk). Armenia/Nepal are where the symptom surfaced, not the locus.",
+   "evidence": "lsms_library/local_tools.py:1392-1405 (dvc.api.open with no repo=), :1667-1672 (change_id), :198 DVCFS = DVCFileSystem(_COUNTRIES_DIR), :1219-1231 file_system_path candidates; `git log --oneline -S'dvc.api.open' -- lsms_library/local_tools.py` -> d82c1044f, 6ffb118db, 96577be50 (all pre-issue); grep tests/ for YAMLValidationError/dvc.api.open -> no cwd test; #810 comment 2026-09-07T22:40 (Nepal BrokenProcessPool); CLAUDE.md anti-pattern table names dvc.api.open",
+   "approach": "Replace both dvc.api.open sites with the countries_root-rooted path (DVCFS.open or straight to _try_get_data_file, fail fast with the WB-fallback error) and add a test that calls get_dataframe on a nonexistent source from a tmp_path cwd holding a malformed foo.dta.dvc, asserting no YAMLValidationError and sub-second failure. Note: editing get_dataframe moves every build fingerprint (37/37), so budget a corpus re-warm as with any get_dataframe edit.",
+   "resolved_by": "",
+   "blocked_by": [],
+   "root_cluster": "",
+   "country": "framework",
+   "contents_org": "n/a",
+   "verify_cost": "none",
+   "title": "get_dataframe's last-resort dvc.api.open() resolves the DVC repo from CWD (7-minute sidecar walk from /tmp, trips on pytest fixtures)"
+  },
+  {
+   "number": 962,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 2,
+   "country": "Uganda",
+   "root_cluster": "u-vocabulary-unguarded",
+   "resolved_by": "",
+   "blocked_by": [
+    "PR #963",
+    "@ligon decision on #850 vs the published pre-#850 Uganda basis (issue comments 2026-09-22)",
+    "fix shape decision recorded in .sucoder/handoff.org:12-13"
+   ],
+   "summary": "Confirmed at HEAD: transformations.py:3336 `_U_SENTINELS = {'unknown','manquant'}` and uganda.py:361 still writes `'---'` for the 143 blank-Preferred-Label codes (134 of which are curated physical units feeding a published paper), while the committed uganda.py:~421 fillna's blank `untcd` with `'---'` too; so the 7,359 unitless rows still take the u-pooled 0.0646 kg factor. Two fix attempts exist and neither is on development: origin/fix/962-uganda-unit-sentinel (98371352c, all `'---'` -> `Unknown`; handoff.org:12 and the xfail reason at tests/test_962_unit_sentinel.py:139-148 -- both agent-written -- say @ligon stopped it because it would relabel the 134 curated units) and the uncommitted working-tree diff (Value/`Number of Units (General)` split), which slurm_logs/gh962_units_consistency/README.org measured as re-minting a kg for all 930 quantity rows (0.137 kg, u-pooled) and dropping the 6,429 Value rows from food_quantities because Quantity stays NaN against the LCU-only `Quantity = Expenditure` convention. @ligon's own two comments establish a separate fact: the pre-#850 Uganda artifacts reproduce the openICPSR deposit bit-for-bit and #850 is 97% of the -14.4% kg drift, so whether to accept the new basis is his call. Tier B (silent fabrication of a unit), human because the two routes by which `'---'` reaches `u` (blank untcd vs blank Preferred Label) need different treatments and the agreed shape ('Value' for value-denominated items, U_NA for code 0 only, after #963) is not yet signed.",
+   "evidence": "lsms_library/transformations.py:3332-3354; lsms_library/countries/Uganda/_/uganda.py:361 (`unitlabels[int_k] = '---'`), :421 (working tree, was `fillna('---')`), :440-441 (`market` median), local_tools.py:1721/1776; commit 98371352c on origin/fix/962-uganda-unit-sentinel (NOT ancestor of HEAD c5d70c870); HEAD commit c5d70c870 message + slurm_logs/gh962_units_consistency/README.org (variants A-D table) + u962_probe.out; .sucoder/handoff.org:7-13; tests/test_962_unit_sentinel.py (untracked) xfail :139-148; gh issue 962 comments by ligon 2026-09-22 (bisect to 60f98ab1d/#850); open PR #963 body ('Found while bisecting ... #962', fraction labels are Uganda-only and latent because those codes' Preferred Label is blank)",
+   "contents_org": "Uganda/_/CONTENTS.org:844-870 (recorded 2026-09-18, GH #832): `food_acquired` DELETES rows whose unit label is off the `u` table -- 'It is the OPPOSITE of what crop_production does in this same country. There an unrecognised unit becomes the Unknown SENTINEL ... Nobody appears to have chosen that asymmetry'. Also uganda.py:341-361 docstring: `'---'` was restored deliberately 'for compatibility with a pre-2026 CSV mapping'. No CONTENTS entry yet for the blank-untcd rows or for #962 itself.",
+   "approach": "Decision for @ligon: (a) park the uncommitted draft on a fix/962-* branch (do not commit to development), (b) land PR #963 first, (c) implement the agreed shape -- blank-untcd rows: expenditure-only -> u='Value' WITH Quantity=Expenditure (GhanaLSS/Panama convention), quantity-present -> U_UNKNOWN (mints nothing); the 143 blank-label codes: promote the 134 curated labels rather than sentinel them, U_NA for code 0 only. Separately file the framework half (Nigeria 'None', GhanaLSS 'None', Cambodia '') as a missing_level_sentinels extension to food_acquired plus a corpus u-vocabulary test.",
+   "verify_cost": "one-country-rebuild",
+   "title": "Uganda's no-unit sentinel is spelled '---', which `_U_SENTINELS` does not know, so 7,359 unitless rows are given an invented kg factor (GH #874 is a no-op for Uganda)"
+  },
+  {
+   "number": 832,
+   "tier": "A",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "partial",
+   "priority": 3,
+   "country": "GhanaLSS, Niger, Mali, Ethiopia, Malawi, Uganda, Tanzania",
+   "root_cluster": "u-vocabulary-unguarded",
+   "resolved_by": "b55b37e1a (GhanaLSS), 9a97f2cb6 (Niger), PR #949 (Mali/Ethiopia/Uganda/Malawi No 12 Plate); PR #947 cites the #832 uniqueness assert",
+   "blocked_by": [],
+   "summary": "Six of the seven country instances have landed on development: GhanaLSS unit_labels.org canonicalisation restored in all five wave scripts (b55b37e1a, ancestor of HEAD; grep confirms `unit_labels` in 1991-92/1998-99/2005-06/2012-13/2016-17 food_acquired.py), Niger Tia/Tiya unified onto Tiya (9a97f2cb6; categorical_mapping.org:166,178,187,226 all -> Tiya), and PR #949 (merged 2026-09-18, refs #832) folded Mali Boîte/Boite, Ethiopia Other (Specify) + Zorba mojibake + Region, Malawi No.12/No 12 Plate, and made Uganda's drop warning name its rows (uganda.py:454-470, CONTENTS.org:844-870). The issue is still OPEN with no closing comment. Two residuals are explicitly reported-not-fixed in #949's body: Malawi's six kilogram spellings come from FOUR code paths (u table, 2004-05's closed label set, free text, and `_metric_kg_factor` stamping lowercase `kg` -- the last is framework) so 'a mapping in the u table' cannot reach them; and Tanzania piece/Piece is forbidden by Tanzania/_/categorical_mapping.org:595-600 pending 'a u sentinel that is not also a label' (PR #902/#835 fixed the flooring, not the sentinel). Neither residual has its own issue (gh search returned none).",
+   "evidence": "git merge-base --is-ancestor b55b37e1a HEAD -> ANCESTOR; git log -S'Tiya' -- Niger/_/categorical_mapping.org -> 9a97f2cb6; merged_prs.json #949 closes ['832','926'], files: Ethiopia/_/{CONTENTS.org,categorical_mapping.org,ethiopia.py}, Malawi/_/categorical_mapping.org, Mali/_/categorical_mapping.org, Uganda/_/{CONTENTS.org,uganda.py}; #949 body sections 1-4 and 'What #832 gets wrong, measured'; Tanzania/_/categorical_mapping.org:595-600; Tanzania/_/tanzania.py:825 ('piece' sentinel); gh issue 832 state OPEN, 0 comments",
+   "contents_org": "Uganda/_/CONTENTS.org:844-870 (added by #949): 'food_acquired DROPS rows whose unit label is off the u table ... at worst 0.22% of a wave (836 rows in 2019-20)'. Tanzania/_/categorical_mapping.org:595-600 (config, not CONTENTS): 'Registering piece -> Piece here would rewrite the live (u) axis value and regress food_acquired'. Ethiopia CONTENTS.org:193-195 stale claim ('No u table is wired') corrected by #949.",
+   "approach": "Reconcile: comment on #832 citing b55b37e1a, 9a97f2cb6 and #949 with the before/after counts, file two residual issues (Malawi kg spellings incl. the framework `_metric_kg_factor` lowercase stamp; Tanzania piece/Piece needs a non-label sentinel), then close. Verify with a `u` census over warm parquets (the u_census.py pattern).",
+   "verify_cost": "warm-read",
+   "title": "The `u` axis is split by spelling in 7 countries: one unit under two labels (GhanaLSS 473,660 rows; Niger 26,000+)"
+  },
+  {
+   "number": 845,
+   "tier": "C",
+   "type": "docs",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 4,
+   "country": "Uganda (plus GhanaLSS, Guatemala, Panama, Serbia as the only other Price carriers)",
+   "root_cluster": "price-provenance-undeclared",
+   "resolved_by": "",
+   "blocked_by": [],
+   "summary": "Unchanged at HEAD: transformations.py:2861-2865 still documents `'unitprice'` as 'reported Price ... NaN where the survey did not record a unit price ... market price for s='purchased', farmgate for s='produced'', docs/guide/data-methods.md:93 repeats it ('reported Price as-is'), and Uganda/_/CONTENTS.org has no entry saying UBOS's h15bq12 'Market Price' is Expenditure/Quantity (grep for back-calc/elicited/h15bq12 finds nothing). Uganda's Price is fed from `market='h15bq12'` (2011-12/_/food_acquired.py:12) through uganda.py:440-441 (median of `^market` columns) and :639. A second stale claim sits beside it: uganda.py:609-613 says the framework 're-derives Price ... and ignores a stored Price', false since the units= kwarg (transformations.py:2932 serves the stored column). Census of warm food_acquired parquets answers the issue's open question: only GhanaLSS, Guatemala, Panama, Serbia carry Price (Uganda's cache was purged 09-22 but carries it), and GhanaLSS's produced Price is a registered derivation (#916), so the per-country provenance table is five rows. Pure documentation; no data moves.",
+   "evidence": "lsms_library/transformations.py:2847-2865, :2932; docs/guide/data-methods.md:87-93; lsms_library/countries/Uganda/2011-12/_/food_acquired.py:12; Uganda/_/uganda.py:440-441, :566, :606-613, :639; pyarrow schema census of /global/scratch/.../lsms_library/*/var/food_acquired.parquet (Price present: GhanaLSS, Guatemala, Panama, Serbia; absent in the other 15); git log --grep 845 -> nothing; commit 26e795dcf (elicitation-language docs) touches Uganda CONTENTS but not Price; slurm_logs/price_sources/Uganda/REPORT.org section 2",
+   "contents_org": "Uganda/_/CONTENTS.org records nothing about the Price column's provenance (grep 'Market Price|back-calc|h15bq12|elicited' -> only :2966 on housing rent). The relevant recorded idiosyncrasy is uganda.py:566/:606-613: Price is 'survey-reported market/farmgate' -- which the issue's raw-.dta check (1.72/5.21/1.51% differing) shows is UBOS's own Exp/Qty.",
+   "approach": "Docs PR: amend the units= docstring (transformations.py:2861) and data-methods.md:93 to say Price is whatever the office recorded and may be its own Exp/Qty; fix uganda.py:609-613; add a Uganda CONTENTS.org 'Price is derived by UBOS' entry citing REPORT.org section 2; optionally a five-row provenance table. Longer term, fold into the per-country Price-provenance declaration shared with #828.",
+   "verify_cost": "none",
+   "title": "food_prices(units='unitprice') docs: for Uganda the stored Price IS Exp/Qty, not an elicited price (94.4-99.9% of rows)"
+  },
+  {
+   "number": 828,
+   "tier": "C",
+   "type": "enhancement",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 3,
+   "country": "framework",
+   "root_cluster": "price-provenance-undeclared",
+   "resolved_by": "",
+   "blocked_by": [
+    "decision: raise (Contract B degrade in Feature) vs warn"
+   ],
+   "summary": "Unchanged at HEAD: transformations.py:2916-2921 returns `df.iloc[0:0]` with an empty Price column when `'Price' not in df.columns` under kgprice/unitprice, with no warning. Two corrections to the issue: the behaviour is PINNED by tests/test_food_prices_units_kwarg.py:93 (`test_food_prices_unitprice_no_price_column_returns_empty`), so it was a deliberate Phase-4 choice not an oversight; and the blast radius is 15 of 19 warm food_acquired parquets lacking Price (Benin, Burkina_Faso, Cambodia, CotedIvoire, Ethiopia, EthiopiaRHS, GhanaSPS, Guinea-Bissau, Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Togo), not 6. The pattern the issue asks for exists: LabelUnavailableError (errors.py:9) is caught by name at feature.py:1051 and reported once under Contract B, but its handler and docstring are labels-specific, so a sibling exception (or a rename to a general 'request cannot be honoured' class) is part of the edit. Raising means Feature('food_prices')(units='unitprice') degrades over 15 countries with one aggregated warning; warning keeps concatenating empties. Small edit either way; human because it changes Feature() shape and rewrites a pinned test.",
+   "evidence": "lsms_library/transformations.py:2900-2921; tests/test_food_prices_units_kwarg.py:93-97; lsms_library/errors.py:9-22; lsms_library/feature.py:1051-1055; docs/guide/data-methods.md:76-93 (labels= raises LabelUnavailableError, units= says nothing); pyarrow schema census over 19 warm food_acquired parquets; git log --grep 828 -> nothing; merged_prs.json has no PR referencing 828",
+   "contents_org": "n/a",
+   "approach": "Default recommendation: raise a `PriceUnavailableError` (sibling of LabelUnavailableError, same KeyError base) naming country and missing column when a *price mode needs Price the table lacks; catch it at feature.py:1051 alongside LabelUnavailableError so Feature degrades per country under Contract B; rewrite test :93 to assert the raise; document under units= in data-methods.md. @ligon to confirm raise vs warn.",
+   "verify_cost": "none",
+   "title": "food_prices(units='unitprice'|'kgprice') returns an empty frame silently when food_acquired has no Price column (6 countries); should raise or warn like labels= does"
+  },
+  {
+   "number": 865,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 2,
+   "country": "Niger",
+   "root_cluster": "",
+   "resolved_by": "",
+   "blocked_by": [],
+   "summary": "Nothing landed: git log -S'999999' -- Niger touches no crop code, and Niger/2011-12/_/crop_production.py:42-46 passes `as02eq07a` straight through `pd.to_numeric`; `_finish_crop_production` (niger.py:533-565) coerces and fills `u` but strips no value sentinel. Verified in the raw .dta (get_dataframe, convert_categoricals=False): 2011-12 ecvmaas2e_p2.dta has as02eq07a==999999 on 11 rows (all with unit code 99 -> served u=Unknown), as02eq12a==999999 on 3, as02eq13==9999999 on 2; 2014-15 ECVMA2_AS2E1P2.dta uses a DIFFERENT code, AS02EQ07A==9999 on 23 rows. The warm parquet serves all of them: Quantity 999999 x11 in 2011-12 across FOUR crops (Mil 3, Niébé 3, Riz Paddy 2, Sorgho 3 -- the issue's 'eleven Mil rows' is wrong), Quantity 9999 x23 in 2014-15, Quantity_sold 999999 x3 / 9999 x5, Value_sold 9999999 x7 (2 in 2011-12, 5 in 2014-15), and plot_inputs 2021-22 Quantity 9999 x1. Precedent inside the same module: niger.py:877 `_coerce_wage(sentinel=999999)` and :1307 `_COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)` already strip these codes for wages and community prices, so the convention is known and only crop_production/plot_inputs miss it. Site Q reports it but never NaNs (by contract), so the value is served.",
+   "evidence": "lsms_library/countries/Niger/2011-12/_/crop_production.py:42-46; Niger/2014-15/_/crop_production.py:31-33; Niger/_/niger.py:533-565, :846, :877-878, :1307, :1343; raw probes this session (as02eq07a n=11978 max=999999, 999999 x11 with as02eq07b=99; AS02EQ07A max=9999, 9999 x23; as02eq13 9999999 x2); warm parquet /global/scratch/.../Niger/var/crop_production.parquet (47,077 rows) counts above; plot_inputs.parquet 2021-22 Quantity 9999 x1; #861 precedent landed at Uganda/_/uganda.py:1510-1515, :1887-1896 (`qty_sentinel: 99999`); gh issue 865: 0 comments",
+   "contents_org": "Niger/_/CONTENTS.org:534-700 'The u sentinel: a quantity recorded with no unit (GH #842 / #847)' -- :679 'u == 'Unknown' is NOT a unit. Exclude it before any per-unit price, quantity or conversion, and REPORT how many rows you excluded.' Every sentinel-quantity row here also carries u=Unknown, corroborating a wholly don't-know line. No CONTENTS entry mentions a 999999/9999/9999999 VALUE sentinel (grep returns nothing). Cache note at :690-695: editing niger.py re-hashes all 18 Niger tables.",
+   "approach": "Exact-value strip at the wave level per the #861 pattern -- 2011-12: Quantity/Quantity_sold 999999, Value_sold 9999999; 2014-15: Quantity/Quantity_sold 9999, and check Value_sold; plot_inputs 2021-22 Quantity 9999 -- with before/after counts, never a range; put the literals in the wave scripts (moves only those waves' hashes) rather than in `_finish_crop_production` (moves all 18 Niger tables); add a CONTENTS.org entry beside the u-sentinel section; a test asserting no served Quantity/Quantity_sold/Value_sold equals a listed code.",
+   "verify_cost": "one-country-rebuild",
+   "title": "Niger 2011-12: eleven Mil rows carry Quantity 999999 with u=Unknown -- an unstripped missing-value sentinel (sibling of #861)"
+  },
+  {
+   "number": 840,
+   "tier": "C",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 2,
+   "summary": "Three community_prices builds keep one row per (t,v,j,u) by row order over a surplus axis, and the three instances are not one defect. Mali: a genuine VARIETY axis (s04q02) collapsed at `mali.py:855-858` (`sort_values` on passage then `drop_duplicates(keep='first')`); the script's own comment at `mali.py:815-818` claims the collision is 'Verified harmless ... median max/min ratio ~1.13, median CV ~0.09' while `Mali/_/CONTENTS.org:730-745` documents Concentre de tomate at 600/125/225 FCFA under one (v,j,u) -- both true (median vs tail), the docstring understates. Niger: variety->product folded at the `j` mapping and `niger.py:1408` `drop_duplicates(subset=['t','v','j','u'], keep='first')` after `niger.py:1268-1279` had built an `obs` (1/2/3) level for exactly this purpose. Tanzania: NOT a variety axis but the deliberate `j` label lump (`tanzania.py:2044-2070`: 261/1,281 colliding groups each span >1 SOURCE ITEM CODE, zero repeat a code, and 'no additional index level is available that would not break the shared `j` vocabulary'); its comment already cites #323 D1 and says 'Left for a maintainer decision'. No PR, commit or @ligon comment touches it since filing (issue has zero comments; merged_prs.json/open_prs.json have no #840 ref). Canonical `data_info.yml` has no `index_info` entry for community_prices (Feature Vocabulary :1106 only), so the (t,v,j,u) grain is per-country assertion, and GhanaLSS already ships an `obs` level -- the precedent the issue names.",
+   "evidence": "lsms_library/countries/Mali/_/mali.py:806-820,855-858; Mali/_/CONTENTS.org:730-745; Tanzania/_/tanzania.py:2044-2075; Niger/_/niger.py:1268-1279,1403-1408; Niger/_/data_scheme.yml:408-415; lsms_library/data_info.yml:53-125 (no community_prices in index_info), :1106; warm GhanaLSS/var/community_prices.parquet cols ['Price','NumberOfUnits','Description','t','v','j','u','obs']; PR #779 finding 4; gh issue view 840 (OPEN, 0 comments)",
+   "country": "Mali, Tanzania, Niger",
+   "contents_org": "Mali/_/CONTENTS.org:730-745 'The (t, v, j, u) key collapses the VARIETY axis, and varieties differ ... 7,263 of 32,479 (22.4%) of (v, j, u) groups within a passage carried more than one priced variety, so which price survives is questionnaire order, not a definition.' Tanzania and Niger CONTENTS.org carry NO variety/keep-first entry (grep returned none); the record lives only in code comments -- a docs gap to close.",
+   "resolved_by": "",
+   "root_cluster": "community-prices-obs-grain",
+   "blocked_by": [
+    "maintainer decision: register community_prices in data_info.yml index_info with an optional obs/variety level vs. a stated selection rule (#323 D1 argues against the reducer branch)"
+   ],
+   "approach": "Decide the grain once at the canonical level (index_info entry with optional `obs`/`variety`, GhanaLSS shape), then Mali+Niger stop dropping the axis (Niger already builds `obs`); Tanzania stays keep-first-with-warning unless a source-item level is accepted alongside the lumped `j`. Add CONTENTS.org entries for Tanzania and Niger either way.",
+   "verify_cost": "one-country-rebuild",
+   "title": "community_prices drops the variety axis, keeping one (t,v,j,u) row arbitrarily (Mali 22.4%, Tanzania ~90%, Niger 90->45)"
+  },
+  {
+   "number": 822,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 2,
+   "summary": "Confirmed at HEAD: `Mali/2014-15/_/community_prices.py` reads only s04q09/q10/q11 (`_SRC` loop builds u/Price/Quantity from those three columns only) and its docstring still calls that 'the consolidated unit / quantity / price reading', which `Mali/_/CONTENTS.org:711-714` records as wrong (Stata label: 'Unite du produit du 3eme releve'). Warm `Mali/var/community_prices.parquet` is 23,646 rows with cols [Price, Quantity, t, v, j, u] -- no obs level, no weight semantics stated. Nothing has landed: no PR references #822, no commit touches Mali/2014-15 community_prices since 2026-08-01 (git log), issue has zero comments. The human decision is real and CONTENTS.org:723-728 frames it: relevés 1 and 3 agree exactly where both exist (n=31,408, median log ratio 0.000, IQR 0.000), so a coalesce (relevé 1, then 2, then 3) recovers the 26,745 lost rows WITHOUT a grain change and is not a #323-D1 reducer (it fills a missing reading, it does not choose between disagreeing ones), whereas an `obs` level would mostly triple identical rows but is the GhanaLSS precedent. The Quantity-is-weight half (M3) is already documented at CONTENTS.org:746-756 but not in the script or data_scheme.yml (data_scheme comment overlap with open #839). The 'companion issue' for wiring 2018-19 `s05_co_mli2018.dta` was NOT found among open issues in issues.json; the todo record is CONTENTS.org:860-895.",
+   "evidence": "lsms_library/countries/Mali/2014-15/_/community_prices.py (whole file, `_SRC` loop reads s04q09/q10/q11 only); Mali/_/CONTENTS.org:701-728 (three relevés table: 66,742 / 49,081 / 40,237), :746-756 (Poids KG), :860-895 (2018-19 s05_co unwired); warm Mali/var/community_prices.parquet 23,646 rows; git log --since=2026-08-01 -- Mali/2014-15/_/community_prices.py empty; gh issue view 822 (OPEN, 0 comments); merged_prs.json/open_prs.json no #822",
+   "country": "Mali",
+   "contents_org": "Mali/_/CONTENTS.org:711-728: '=2014-15/_/community_prices.py= reads *only relevé 3*, and its docstring calls that \"the consolidated ... reading\". The Stata variable labels say otherwise ... *26,745 product-variety rows carry a price in relevé 1 or 2 and nothing in relevé 3*, and are lost outright. This is a COVERAGE loss, not a bias ... median log(P3/P1) is exactly 0.000 with an IQR of 0.000 ... A fix would take relevé 1 (the best-populated) with the others as fallback, or carry an =obs= level as GhanaLSS does. Reported, not fixed: it changes what =community_prices()= serves for every consumer.' Also :746-756: '=community_prices.Quantity= is a WEIGHT IN KG, not a count of units ... It is NOT a =NumberOfUnits=.'",
+   "resolved_by": "",
+   "root_cluster": "community-prices-obs-grain",
+   "blocked_by": [
+    "same grain decision as #840 (obs level vs coalesce)"
+   ],
+   "approach": "Maintainer picks: (a) coalesce relevé 1->2->3 per (v, variety, u) -- recovers 26,745 rows, no grain change, documented as a stated rule; or (b) carry `obs` per GhanaLSS -- needs the index_info entry. Either way fix the docstring and state Quantity = Poids (kg) in script + data_scheme.yml; do the 2018-19 s05_co wiring as a separate todo (no issue exists yet).",
+   "verify_cost": "one-country-rebuild",
+   "title": "Mali community_prices reads only relevé 3 of 3: 40,237 of 156,060 readings used, 26,745 (t,v,j,u) rows lost; weight field is the per-kg basis, not NumberOfUnits"
+  },
+  {
+   "number": 827,
+   "tier": "C",
+   "type": "data",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 4,
+   "summary": "Not a defect as stated: the headline conflates three populations. Measured on the warm parquet (now 87,057 rows after `f27a82e2b`/`f98f92171` label folds; pattern unchanged): 42,928 rows have blank `u`, of which 21,074 have NO Price at all (Available=No rows -- no price basis to lose), 20,498 are PRICED NON-FOOD items (Soft Drink (Bottle) 1,673, Battery 1,657, Cigarettes 1,599, Trousers 1,575, Cost To Grind 50 Kg Maize 1,555, Hand Hoe, Panga, Sickle, Axe, Bicycle, Ganyu Wage ... -- the unit is implicit in the item label), and only 1,356 are priced rows on the 19 food_acquired-joinable items, 1,330 of them 'Bottled/Canned Beer'. The food yardstick loses ~26 rows, not half. The blank is at source, not in the decode: raw 2010-11 `com_ck.dta` has 9,810 null `com_ck00b3` among 31,364 priced rows, the free-text `com_ck00b3_os` is populated on 974/976 code-21 (Other) rows and on 0 of the null-code rows, and the 2019-20 files carry no column beyond ea_id/com_ck00a/cka/ckb/ckc/ckd. `Malawi/_/CONTENTS.org:711-718` already recorded 'All 17 non-food items ... are 100% unit-less' when the issue was filed. `_price_block` (malawi.py:3084-3140) maps every code present; one code 23 row is outside the 1-21 map. Remaining human question: whether label-embedded units (a bottle, a 50 kg grind, a day) should be served as a derived `u` -- CONTENTS.org says never fill.",
+   "evidence": "warm Malawi/var/community_prices.parquet probe (87,057 rows; u null 42,928; priced&u-null 21,854 = 20,498 non-food + 1,356 food, 1,330 beer); raw Malawi/2010-11/Data/Full_Sample/Community/com_ck.dta probe (priced 31,364, com_ck00b3 null 9,810, _os non-blank on null-code rows 0); Malawi/2019-20 com_ck.dta + com_ck_19.dta probe (no extra columns); lsms_library/countries/Malawi/_/malawi.py:3071-3140,3142-3185; Malawi/_/categorical_mapping.org:970-995 (codes 3/4 = grinding services); Malawi/_/CONTENTS.org:689-745; git log f27a82e2b, f98f92171",
+   "country": "Malawi",
+   "contents_org": "Malawi/_/CONTENTS.org:711-718: '*The unit is a free field, not pre-printed*, and is often blank. =u= is missing for *38,506 of 82,635* rows and =NumberOfUnits= for 38,356; the two are missing together ... All 17 non-food items (soap, hoe, bicycle, ganyu wage, the two grinding *services*) are 100% unit-less. A blank unit is *unknown*, not \"one piece\": these rows have no usable per-unit price and must be dropped and counted, never filled.' The issue's 'half the yardstick' contradicts the file's own decomposition (of 31,959 food rows, 25,587 have both).",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [],
+   "approach": "Close with the decomposition (unpriced / non-food / beer), add it to CONTENTS.org with the current 87,057-row counts; no code change unless the maintainer wants a label-derived `u` for items whose label names the unit, which CONTENTS.org currently forbids.",
+   "verify_cost": "none",
+   "title": "Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick"
+  },
+  {
+   "number": 824,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "diagnose-then-fix",
+   "dedup_status": "partial",
+   "priority": 2,
+   "summary": "Partially resolved with the design settled. Landed: Uganda `Unit_sold` + `Condition_sold` as reported columns (`66c1ff6a`, red-team `2bb32afe`, merge `42e1c19e`; `Uganda/_/data_scheme.yml:182-224`; 21 references in tests/test_uganda_sold_unit.py; Uganda warm parquet absent at probe time so verified from config+tests, not cache); Malawi (`85947ff5`, a DIFFERENT shape -- `_sale_block` maps ag_i02b/ag_q02b and merges sale onto harvest on (i, crop, u), so no `Unit_sold` column and the ratio is per the row's own u by construction); GhanaLSS carries `Unit_sold` (ghanalss.py:1052; warm parquet True); canonical `data_info.yml:784-865` declares `Unit_sold`/`Condition_sold` optional with @ligon's decisions (column not index level; disagreement is a data-quality FLAG not an identification -- Unit_sold is the closer denominator only 40.5%; take the unit from the survey's value-label vocabulary, never a condition column that merges cleanly). Still open, as @ligon's 2026-09-10 comment says: Nigeria -- `nigeria.crop_production_for_wave(t, frames, crop_labels)` (nigeria.py:368) reads `fr['qty_sold']` at :451 but has no `unit_sold` handling despite the docstring at :385; `_/crop_production.py:118,132` pass sa3q11a/sa3q12 and never sa3q11b (Nigeria/_/CONTENTS.org:976-1000; W1/W2 tractable now, W3-W5 has no sale price at all per open #843). Niger -- worse than 'drops the unit': `Niger/2014-15/_/crop_production.py:63-66` discards AS02EQ12B then `groupby(['i','crop']).sum(min_count=1)` SUMS Quantity_sold across sale rows in different units (2018-19/2021-22 likewise read s16cq16a/s16dq05a without the b column), so the fix is a re-key on the sold unit, not a column append. Warm parquets: 13 of 14 crop_production declarers lack Unit_sold (Malawi by design).",
+   "evidence": "gh issue view 824 comments (@ligon 2026-09-08, 09-09, 09-10); commits 66c1ff6ab, 2bb32afec, 85947ff52 (git show), 42e1c19e; lsms_library/data_info.yml:784-865; Uganda/_/data_scheme.yml:182-224; tests/test_uganda_sold_unit.py; Nigeria/_/nigeria.py:368,385,451; Nigeria/_/crop_production.py:118,132; Nigeria/_/CONTENTS.org:976-1000; Niger/2014-15/_/crop_production.py:54-70; Niger/2018-19/_/crop_production.py:45; Niger/_/CONTENTS.org:785-800; warm parquet schema probe (Unit_sold only in GhanaLSS); #843 OPEN, #848 OPEN, #868 OPEN",
+   "country": "Nigeria, Niger (open); Uganda, Malawi, GhanaLSS (done)",
+   "contents_org": "Nigeria/_/CONTENTS.org:976-1000: 'The SALE has its own unit code (=sa3q11b=), and =u= is the HARVEST unit ... =_/crop_production.py= passes =unit='sa3q6b'= ... but never =sa3q11b= -- and =nigeria.crop_production_for_wave= documents an =unit_sold= parameter in its docstring that the code never reads' (96.9% / 95.3% agree). Niger/_/CONTENTS.org:785-800: 'every wave records the sold unit in its OWN column that the feature drops: =as02eq12b= (2011-12), =AS02EQ12B= (2014-15 AS2E2), =s16cq16b= (2018-19), =s16dq05b= (2021-22) ... 2011-12 98.8%, 2014-15 89.4%, 2018-19 93.1%, 2021-22 63.0% ... any per-unit use ... must first restrict to rows where the two agree'; plus :685 the Unknown-u interaction. Uganda/_/CONTENTS.org (per-wave sold-unit column evidence, 2018-19 s5aq07c_1) records the landed half.",
+   "resolved_by": "66c1ff6a + 2bb32afe (Uganda, merge 42e1c19e); 85947ff5 (Malawi); data_info.yml:784 canonical block",
+   "root_cluster": "crop-sold-unit",
+   "blocked_by": [
+    "#843 (Nigeria W3-W5 has no sale price at all; only W1/W2 can carry Unit_sold now)"
+   ],
+   "approach": "Nigeria: add `unit_sold` to `crop_production_for_wave` frames, pass sa3q11b from `_/crop_production.py` for W1/W2, canonicalise through the harvest u table (value-label vocabulary, per @ligon's trap warning). Niger: read the b-column in all four wave scripts and re-key the sale aggregation on (i, crop, sold unit) before any sum, then carry Unit_sold; both per the settled Uganda contract (flag, not identification). Consider splitting into two country issues and closing this one.",
+   "verify_cost": "one-country-rebuild",
+   "title": "crop_production: sale value is per SOLD unit but the table carries only the HARVEST unit u -- Nigeria ignores sa3q11b (95-97% agree), Niger 63-99% by wave; farmgate prices need Unit_sold"
+  },
+  {
+   "number": 848,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 2,
+   "summary": "Uganda's 2018-20 WIDE-vintage colmaps read one `conditions` slot where the source ships two. At HEAD `CROP_COLMAPS['2018-19']['B']` (uganda.py:2037-2041) and `['2019-20']['B']` (uganda.py:2046-2050) wire slot 1 only, while `['2019-20']['A']` (uganda.py:2029-2036) already wires both slots (commit b28b50242, #323). Raw column probe of the L1 blobs confirms the unread slots: 2018-19 AGSEC5B ships `s5bq06{a..f}_2` + `s5bq07{a,b,c}_2` (1,436 non-null quantities), 2019-20 agsec5b ships the same family labelled '(2019, condition2)' (1,307 non-null) -- a second cell the issue only asked to check and which has no issue number of its own, only `CONTENTS.org:2076` TODO; 2018-19 AGSEC5A has NO `_2` slot (33 columns). So the fix is exactly two cells, harvest and sold sides each. Collision count measured on the raw files (the 'first experiment' CONTENTS.org:2639-2646 asks for): slot-2 records sharing BOTH unit and condition with slot 1 -- 14 of 1,436 (2018-19), 3 of 1,307 (2019-20) -- would be summed by the additive collapse; the rest land as new `condition` rows (slot-2 modal condition 45 vs slot-1 modal 24). That also means slot 2 cannot explain the pre-existing 433 duplicate groups, since it is not read today. Not touched by any merged/open PR; the uncommitted uganda.py diff in the working tree is #962 (food units), unrelated.",
+   "evidence": "lsms_library/countries/Uganda/_/uganda.py:2037-2041, :2046-2050, :2029-2036, :1703-1708 (value-label rule), :1846-1851; raw L1 blobs 62f4e464… (2018-19 AGSEC5B, 84 cols) and 5a62f8e7… (2019-20 agsec5b, 78 cols) column-name + collision probe 2026-09-24; commits b28b50242 (#323), 7a4279da0 (#842); merged_prs.json/open_prs.json: no PR references #848; tests/test_uganda_crop_condition.py:59 (133,683-row baseline that will move)",
+   "country": "Uganda",
+   "contents_org": "CONTENTS.org:1297-1314 'The 5B second slot IS a condition slot, not a season slot -- the old note was wrong … Still not wired: it ADDS ~1 435 rows, which is a mass change requiring its own before/after'; CONTENTS.org:2076-2091 TODO 'Second condition slot dropped for 2019-20 season B … 1 306 non-null conditions'; CONTENTS.org:1318-1321 mixed naming vintages within one file (slot 1 legacy a5bq6{b,c,d}, slot 2 WB s5bq06{b,c,d}_2)",
+   "resolved_by": "",
+   "root_cluster": "uganda-wide-colmap-slot1-only",
+   "blocked_by": [],
+   "approach": "Add a second `conditions` entry to CROP_COLMAPS['2018-19']['B'] and ['2019-20']['B'] (harvest + sold sides, plus kg_factor s5bq06d_2 for 2018-19), deciding unit-vs-condition columns by value-label vocabulary per uganda.py:1703; before/after: +1,436/+1,307 rows, 14/3 additive collisions, harvest_kg delta, then move the CONTENTS.org TODO and test baseline; full Uganda re-warm (uganda.py is in every Uganda table hash).",
+   "verify_cost": "one-country-rebuild",
+   "title": "Uganda 2018-19 AGSEC5B: second harvest-condition slot (s5bq06{a,b,c,d}_2, ~1,435 rows) is not wired; it is a condition slot, not a season"
+  },
+  {
+   "number": 647,
+   "tier": "D",
+   "type": "data",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 4,
+   "summary": "Asks whether Uganda 2019-20 agsec5a's PART-harvest slots (`_11`/`_21`, ~100 rows, ~477 units vs ~601k full-harvest) are deliberately excluded, and for the reason to be written at the colmap site. The documentation half landed: uganda.py:1846-1851 (commit 66c1ff6ab, #824) now names the `_11`/`_21` slots as unwired 'so the two sides stay consistent', and CONTENTS.org:2669-2674 records them as 'the sale block of the questionnaire's separate partially-harvested repeat page, first seen on the 2018-19 form at stream/page 17'. The decision half has not: nobody has adjudicated from the questionnaire whether 'part harvest' means a still-standing crop, and 'stay consistent' is not that reason. The issue's 'not checked' section is now answered by a raw column probe: only 2019-20 agsec5a carries the `_11`/`_21` family; 2019-20 agsec5b, 2018-19 AGSEC5A and AGSEC5B do not -- set beside CONTENTS.org:2672 (form page present in 2018-19, no extract columns), that is an asked-not-distributed-shaped fact for the coverage verdicts. The questionnaire could not be read in this session (2019-20 ag questionnaire blob absent from L1; 2018-19 agriculture_qx.pdf present but no poppler/pypdf/fitz available), so the instrument reading remains the human step.",
+   "evidence": "lsms_library/countries/Uganda/_/uganda.py:1846-1851 (commit 66c1ff6ab); raw L1 probe of agsec5a d097f036… (150 cols incl. s5aq06{a-f}_{11,21}, s5aq07{a-c}_{11,21}), agsec5b 5a62f8e7… (no `_11`/`_21`), 2018-19 AGSEC5A/5B (none); CONTENTS.org:1104, :2669-2674; RELEASE_v0.10.0_closes.org:359 lists #647 as untouched; no merged/open PR references #647",
+   "country": "Uganda",
+   "contents_org": "CONTENTS.org:2669-2674 '2019-20 AGSEC5A's =_11= / =_21= \"part harvest\" slots (=s5aq07{a,b,c}_{11,21}= -- the sale block of the questionnaire's separate partially-harvested repeat page, first seen on the 2018-19 form at stream/page 17). =CROP_COLMAPS= reads neither on the harvest side either, so the two sides stay consistent; wiring them ADDS rows.'",
+   "resolved_by": "66c1ff6ab (documentation half only, #824)",
+   "root_cluster": "uganda-wide-colmap-slot1-only",
+   "blocked_by": [
+    "questionnaire adjudication (2018-19 form p.17 / 2019-20 ag questionnaire) by someone who can read the UNPS instrument"
+   ],
+   "approach": "Human reads the partially-harvested repeat page and records the verdict at uganda.py:1846 and CONTENTS.org; if excluded, one sentence saying why (no rebuild); if included, a distinguishing level/flag alongside `condition` and a Uganda re-warm -- decide together with #848 since both are extra slot families in the same WIDE colmaps.",
+   "verify_cost": "none",
+   "title": "question: Uganda 2019-20 crop_production silently drops the PART-harvest columns (s5aq06*_11/_21)"
+  },
+  {
+   "number": 867,
+   "tier": "C",
+   "type": "enhancement",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 3,
+   "summary": "`_NITROGEN_CONTENT` (transformations.py:4507-4523) still has no entry for NPS, D Compound, any organic input or Guinea-Bissau's Portuguese labels; the code deliberately keeps them unmatched and loud (transformations.py:4552-4556, 4625-4632). Re-probed at HEAD against warm plot_inputs parquets with `_normalise_input_label`: Ethiopia `NPS` 5,264 / `Manure` 27,261 / `Compost` 4,295; every Guinea-Bissau label incl. `Adubos inorgânicos - ureia` 190 (real urea); Tanzania `Organic Fertilizer` 727; Mali Manure/Compost 11,148/2,673; Benin organics 271/158 -- unchanged from the issue. Malawi's warm parquet is absent, so `D Compound Fertilizer` is confirmed only as a label (Malawi/_/categorical_mapping.org:845), not at runtime. New finding not in the issue: Nigeria `Other Inorganic Fertilizer` (170 rows) is unmatched -- the strip rule yields `other inorganic`, not the key `inorganic fertilizer` (0.20) -- a spelling-shaped miss, not a content decision. No PR references #867; v0.11.1 notes (docs/releases/v0.11.1.md:49-51) and the 863 ledger (.coder/ledger/863-transforms.md:344-349) file it as the deferred content half of #863 (closed). The core ask (sourced nominal N shares for NPS ~19% and D Compound, and an organic policy) is a citation-backed human decision; GNB label harmonisation and the Nigeria spelling are mechanical sub-parts.",
+   "evidence": "lsms_library/transformations.py:4507-4523, :4537-4556, :4600-4632, :4660-4680; warm-parquet probe 2026-09-24 (Ethiopia/Tanzania/Guinea-Bissau/Mali/Benin/Nigeria plot_inputs; Malawi, Uganda absent); Malawi/_/categorical_mapping.org:845; Guinea-Bissau/_/data_scheme.yml:189-196; commits 01b81d4ce, 610538644; docs/releases/v0.11.1.md:49-51; .coder/ledger/863-transforms.md:344-349; slurm_logs/2026-09-16_panel_estimation/CANDIDATES.org:228-230",
+   "country": "Ethiopia, Malawi, Guinea-Bissau (plus organic labels in Tanzania, Mali, Benin, Burkina Faso, CotedIvoire, Niger, Senegal, Togo, Nigeria)",
+   "contents_org": "Ethiopia/_/CONTENTS.org:1315-1322 'W3 (2015-16): … NPS INTRODUCED … DAP nearly disappears by W5 (3 rows) as NPS displaces it' -- an NPS share decision governs most of Ethiopia's later-wave nitrogen; :1331-1333 'NO nitrogen_kg / seed_kg sums … those are transformations'. Guinea-Bissau CONTENTS.org is silent; its deliberate no-harmonize policy is in data_scheme.yml:189-196 ('has NEITHER harmonize_input NOR harmonize_seed_crop, so the raw Portuguese input labels … pass through unchanged (visible / flagged)'). Malawi CONTENTS.org silent on D Compound.",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [
+    "human decision: sourced N shares for NPS / D Compound and an explicit organic policy (share or documented refusal)"
+   ],
+   "approach": "Maintainer records cited shares for `nps` and `d compound` and writes the organic policy into the `_NITROGEN_CONTENT` comment; an agent can separately add the Nigeria `other inorganic` spelling and a Guinea-Bissau `harmonize_input` (or Portuguese keys) -- no cache cost, transformations.py reaches no fingerprint.",
+   "verify_cost": "warm-read",
+   "title": "_NITROGEN_CONTENT has no entry for NPS, D Compound or any organic input, so those fertilizer rows contribute 0 kg N silently"
+  },
+  {
+   "number": 862,
+   "tier": "C",
+   "type": "enhancement",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 4,
+   "summary": "Schema proposal for a `plot_cultivation (t, i, plot, season, pid, role)` decision-maker table. Nothing is built: `plot_cultivation` appears only as a reservation comment (data_info.yml:307-311, :326, :369; the issue's `:228-232` has drifted) and no country wires the 21 raw ids. The blocking finding is a design collision the issue does not name: the #439 design doc already reserves `decision_making (t, i, pid, domain)` with `domain in {asset, income, plot, enterprise}` (DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org:192) for the same construct, under the same umbrella -- two reserved shapes, neither built. @ligon's only comment (2026-09-09) fixes the companion umbrella as #863 (now CLOSED via v0.11.1, PR #870) and keeps `dm_gender` on #862, so there is no other home for it. Ethiopia's holder structure (ethiopia.py:628 'host several holders (decision-makers) who each number their parcels') is the per-country idiosyncrasy the grain must absorb. Column-adds are mechanical once the schema is settled; the schema decision is the work.",
+   "evidence": "lsms_library/data_info.yml:307-311, :326, :369; grep for plot_cultivation in data_scheme.yml files: none; slurm_logs/DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org:192; slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org; slurm_logs/2026-09-09_epar_curation/issues/COMMENT_439.md; gh issue 439 OPEN, 167 CLOSED, 863 CLOSED (PR #870); gh issue 862 comment by ligon 2026-09-09; lsms_library/countries/Ethiopia/_/ethiopia.py:628, :747, :1000",
+   "country": "Uganda, Tanzania, Ethiopia (framework schema)",
+   "contents_org": "Ethiopia: ethiopia.py:628 / CONTENTS 'holders' -- plot_id = holder_parcel_field already folds holder in (ethiopia.py:747, :1000); Uganda CONTENTS.org records two seasons per wave (AGSEC3A/3B), which is why `season` must be a level; Tanzania 2012-13 lives in the 2008-15 multi-round tree with no AG_SEC_* files (COMMENT_439.md:7) so it is an acquisition, not a column-add.",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [
+    "#439 design decision: reconcile `decision_making (t,i,pid,domain)` with `plot_cultivation (t,i,plot,season,pid,role)` before any wave script is touched"
+   ],
+   "approach": "@ligon picks one shape (or defines plot_cultivation as the plot-domain instance of decision_making) and rules on the season level for Ethiopia/Tanzania; then dispatch column-adds to the already-open AGSEC3A/3B, sect3_pp_w4, AG_SEC_3A scripts with a wave-level `season`-bearing index.",
+   "verify_cost": "none",
+   "title": "Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)"
+  },
+  {
+   "number": 868,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 2,
+   "country": "framework (callers: Uganda; Togo)",
+   "contents_org": "Uganda/_/CONTENTS.org:2653-2657: \"*the =GrainConflictWarning= is a COLD-BUILD signal only*: =reduce_to_agreed= files no grain report and nothing stamps it into the wave parquet, so a warm read says nothing about the 11 groups. ... it is a property of =reduce_to_agreed= itself -- Uganda's =cluster_features= hook has the same gap\". Consistent with the issue; also records the 11-of-433 disagreeing crop_production groups as a MISSING LEVEL (#848 condition-2 slot), which is the data question the issue separates out.",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [],
+   "verify_cost": "one-country-rebuild",
+   "summary": "Confirmed at HEAD: `reduce_to_agreed` (build_transforms.py:422) on a conflict with on_conflict='na' only calls warnings.warn (lines 498-509); it never calls `_record_grain_report`, so `_GRAIN_LEDGER` (country.py:6356) is empty for it and the L2-country stamp written at country.py:4584/4632 carries nothing -- the warm replay at 4511/4672 has nothing to replay. Scope correction: at HEAD `collapse_to_cluster_grain` is reached only by Togo (Togo/2018/_/mapping.py:88) with the default 'raise', which is loud by construction; the silent gap is Uganda's two on_conflict='na' sites -- the in-process cluster_features df_edit hook (uganda.py:226) and the out-of-process crop_production de-dup (uganda.py:1697, run by make via Uganda/_/Makefile:106-107). Two wrinkles the issue does not name: the reducer receives a bare frame with no country/table/wave context, and for the make-run path the child's `_GRAIN_LEDGER` is a different process, so a wave-script `to_parquet(grain_audit=...)` stamp would still never reach the country parquet because `read_parquet_grain_audit` is only ever called on the country cache_path (country.py:4511, 4672) -- wave-stamp propagation is absent. No merged or open PR touches it (merged_prs.json / open_prs.json: no #868 ref; `git log -S'_record_grain_report' -- lsms_library/build_transforms.py` is empty).",
+   "evidence": "lsms_library/build_transforms.py:422-511 (warn only, no report); lsms_library/country.py:6356-6373 (_GRAIN_LEDGER/_record_grain_report), :4584 and :4632 (stamp from ledger), :4511 and :4672 (replay reads country cache_path only); callers: lsms_library/countries/Uganda/_/uganda.py:201-226 and :1696-1698, Togo/2018/_/mapping.py:88; tests/test_uganda_323_grain.py:258-266 filters reports on destroyed/nan_key_rows; tests/test_build_transform_hash.py:36-42 says the helper is deliberately untagged and versioned via framework_imports_fingerprint -- whether the in-function imports at uganda.py:201/1696 are caught is UNVERIFIED, so budget a Uganda (and Togo) re-warm rather than asserting none.",
+   "approach": "Route the 'na' branch through the same ledger: either intercept GrainConflictWarning at the framework boundary where the df_edit hook / grab_data runs and convert it to `_record_grain_report` with a distinct report kind (e.g. cells_blanked, naming groups+columns) so test_uganda_323_grain.py:258's destroyed/nan_key filter is untouched, or add country=/table=/wave= kwargs the framework injects; honour `_grain_strict` (already does). For the make-run path (Uganda crop_production) the wave script must pass grain_audit= to to_parquet AND the consolidation at country.py:4600-4632 must fold wave-parquet stamps into the country stamp (absent today). Fixture test: build a conflicting frame through reduce_to_agreed(on_conflict='na'), write/re-read the parquet, assert the report replays and grain_reports() is non-empty. No allowlist; no change to what the reducer returns.",
+   "title": "reduce_to_agreed (build_transforms.py:422) only warnings.warn()s on a conflict: no grain report, no lsms_grain_audit stamp, so a warm read is silent and grain_reports() is empty"
+  },
+  {
+   "number": 637,
+   "tier": "C",
+   "type": "umbrella",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 4,
+   "country": "framework; Malawi (residual)",
+   "contents_org": "n/a",
+   "resolved_by": "PR #636 (grain contract tests), PR #638 (EHCVM six sites: no key broken), PR #646 (Uganda plot_inputs re-keyed; six sites reviewed), PR #651 (Tanzania 21 sites; 2008-15 shocks re-keyed), GH #871 / PR #885 (core Sites 1-2 -> most_complete_row); spin-offs #679 (Niger EXTENSION, open), #848 (Uganda condition-2 slot, open)",
+   "root_cluster": "",
+   "blocked_by": [],
+   "verify_cost": "none",
+   "summary": "Filed as '49 sites fabricate composite rows'; the author reversed the premise in-thread the same day (2026-07-21: NaN is absence, the composite is a lossless completion when the key is sound; `.first(skipna=False)` withdrawn as a regression) and re-read the issue as an inventory of sites whose correctness depends on key soundness. That inventory was then worked: #638 (EHCVM six, strict no-op), #646 (Uganda plot_inputs fixed; Niger EXTENSION -> #679; Uganda crop_production grain -> CONTENTS.org + #848), #651 (Tanzania 21 sites; shocks re-keyed, the 'zero duplicates is not a sound key' trap recorded) -- 33 of 38 multi-column sites cleared. The carved-out 'arbitrary resolution of genuine disagreement' question was answered for core by GH #871 (PR #885, merged 2026-09-12): `most_complete_row` at all three core sites (country.py:6542), and CLAUDE.md records that #871 reversed the 07-13 completion doctrine for core while `reduce_to_agreed` keeps completion deliberately (na_is_conflict=False). What is left is not a bug: Malawi's three multi-column sites (malawi.py:934, 1899, 1977) never got the per-wave `i`-in-sample() check the Tanzania review prescribed; the inventory is stale (grep at HEAD: groupby().first() code lines in ~60 country files, incl. China/Peru/Guyana/Guatemala/Albania/Pakistan/Serbia/GhanaLSS/Togo/Benin sites not in the filed 49); and remediation item 4 (a lint requiring explicit skipna=) was never done. Classified partial rather than superseded because the Malawi review and the lint are concrete residual deliverables the author named.",
+   "evidence": "gh issue 637 comments 2026-07-21T19:44/19:49/20:06/20:40 and 2026-07-22T03:30/03:33 (all @ligon); PRs #636/#638/#646/#651 MERGED (gh pr view); lsms_library/country.py:6139, 6488, 6542-6585 (#871 selector); merged_prs.json: #885 refs #871; grep -rn 'groupby.*\\.first()' lsms_library/countries at HEAD -> ~60 files; lsms_library/countries/Malawi/_/malawi.py:934,1899,1977; issues #679 and #848 OPEN.",
+   "approach": "Human decision: close #637 with a reconciliation comment (premise reversed; sites cleared by #638/#646/#651; core answered by #871) and spin off one small task -- 'key-soundness review: Malawi malawi.py:934/1899/1977 plus sites added since 2026-07-21, using the per-wave i-vs-sample() overlap check' -- optionally with the explicit-skipna lint as a tests/ AST check. No code change belongs on #637 itself.",
+   "title": "bug: groupby().first() is not first_row() — skipna=True fabricates composite rows (49 sites)"
+  },
+  {
+   "number": 837,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "diagnose-then-fix",
+   "dedup_status": "open",
+   "priority": 2,
+   "country": "Ethiopia, Tanzania, Uganda",
+   "contents_org": "Tanzania/_/CONTENTS.org:1792-1811 \"The residue, honestly -- 385 cells still contested. None of it is a key defect ... District (118) overwhelmingly two names for one place ... (a =harmonize_district= table would close most of them) ... Rural (264) EAs whose households are not all classified alike ... recorded per HOUSEHOLD ... This is real sub-cluster variation, not a merge of two clusters\" -- CONTRADICTS the issue's 'key is not unique' framing and is REPRODUCED to the cell by the wave parquets (Rural 78+113+24+36+13=264, District 34+17+35+32=118, Region 1+2=3). Ethiopia/_/CONTENTS.org:1752-1757 \"in W1 the disagreement is in =Region= / =District= / =Rural=, not in the coordinates\" -- CONTRADICTED by the pre-collapse 2011-12 wave parquet (0 groups disagree on those three columns; all 34 groups are NaN-vs-value on Latitude/Longitude); :1759-1785 confirms District (30 of 37 codes span >1 Region) is NOT fixed and that #832 (Region spellings, 2026-09-18) 'changes no collapse'. Uganda/_/CONTENTS.org:960-963 \"=v= is a PARISH from 2013-14 on ... =Rural= and the GPS are therefore not parish attributes at all: 65 / 122 / 122 clusters conflict on =Rural=\" -- the issue's Uganda row is this, disclosed by design pending #689.",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [
+    "#689 (Uganda part)",
+    "#868 (before recommending reduce_to_agreed on_conflict='na' to Tanzania/Ethiopia for the Rural/GPS residue)"
+   ],
+   "verify_cost": "one-country-rebuild",
+   "summary": "Still live at HEAD: the warm `var/cluster_features.parquet` stamps (Ethiopia 2026-09-18, Tanzania 2026-09-17) carry exactly the issue's numbers (Ethiopia 373/454/732/1,240 rows, 34/43/72/111 groups; Tanzania 605/1,304/404/197/177). But the pre-collapse L2-wave parquets (`{wave}/_/cluster_features.parquet`, the frame Wave.cluster_features projects) change the diagnosis. Ethiopia: Region/District/Rural disagree in ZERO clusters in every wave; every conflicting group is Latitude/Longitude, and of those the NaN-vs-value share (households with no GPS fix, served correctly by most_complete_row since #871) is 34/34, 5/43, 0/72, 39/111 -- the genuine multi-point EAs are 38 (2013-14), 72 (2015-16), 72 (2021-22), 2018-19 clean. So `v = ea_id` is a sound key for the cluster attributes; the issue's 'make v a composite of district + cluster code' is the wrong fix, and Ethiopia's District defect (CONTENTS.org:1759, bare code reused across regions) is a label-identity problem that does not cause the collapse. Tanzania: the counts reproduce CONTENTS.org's residue exactly -- District 118 is spelling variants and real mid-panel splits (a harmonize_district table, config, auto-applied by name like Ethiopia's #832 Region table), Rural 264 is a per-household attribute (modal share 0.75-0.88) sitting in a cluster table, Region 3 are boundary straddles; commit 38be590e6 (PR #642) deliberately kept the frame at household grain so the audit fires. Uganda: the hook already blanks disagreeing cells via reduce_to_agreed; the residual is the parish>EA grain, which is #689. Nothing merged references #837; #819 closed the leading-zero/v-join half.",
+   "evidence": "warm stamps: /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/{Ethiopia,Tanzania}/var/cluster_features.parquet lsms_grain_audit (site=Wave.cluster_features); per-column reconstruction from {Country}/{wave}/_/cluster_features.parquet reproducing rows_destroyed exactly; lsms_library/country.py:1781-1804 (Site 2), :6473 (_collapse_to_cluster_grain), :6542 (most_complete_row); Ethiopia/*/_/data_info.yml cluster_features v: ea_id / ea_id2, 2021-22 df_geo keyed on household_id only (:25); commit efe0199a3 (#832 Region); commit 38be590e6 / PR #642; slurm_logs/price_sources/DATA_PROBLEMS.csv:44-47 (P07); gh issue 689 OPEN, 819 CLOSED.",
+   "approach": "Split by country, all config-level, no reducer (D1). Ethiopia: first step is to explain why 38/72/72 EAs carry more than one displaced GPS point in 2013-14/2015-16/2021-22 (tracked movers? household-level displacement?) and then decide the cluster GPS rule (take the EA-level point, or move per-household coordinates out of the cluster table per CLAUDE.md); do NOT re-key v; separately namespace District by Region as a label fix (categorical_mapping.org, same pattern as #832). Tanzania: add the harmonize_district table CONTENTS.org already proposes (closes ~118 District cells; verify by cluster_features-only rebuild and the stamp shrinking); Rural 264 needs a human decision -- keep the loud loss, drop Rural from cluster_features (sample() has it per household), or blank it via reduce_to_agreed on_conflict='na' once #868 makes that signal survive the cache. Uganda: resolve under #689. Correct the issue text and Ethiopia CONTENTS.org:1752 with the per-column numbers.",
+   "title": "GH #323 site 2 residual: the (t,v) cluster key is still non-unique in Ethiopia, Tanzania, Uganda (up to 1,304 rows a wave)"
+  },
+  {
+   "number": 836,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 4,
+   "country": "Tanzania",
+   "contents_org": "Tanzania/_/CONTENTS.org:1485-1503 \"=Tanzania/_/food_acquired.py= line 34 reads its item-label table out of *this file* ... So editing the =food_labels= table below changes what =food_acquired= builds and does *not* invalidate the L2 cache ... Reported, not fixed\". The first half is true at HEAD; the second half is CONTRADICTED by the warm parquet: the served var/food_acquired.parquet has 251,730 rows = the sum of the three wave parquets (229,649 + 16,179 + 5,902) and MORE rows than distinct (t,i,j) (250,134), so the script's `x.loc[~x.index.duplicated()]` on (j,t,i) at food_acquired.py:52 never ran -- the framework assembled the table from the wave parquets and the CONTENTS.org table played no part. Also relevant: :1083 WAITING #114 (r_hhid/UPHI duplicates) is a country-level panel property, not this script's concern.",
+   "resolved_by": "",
+   "root_cluster": "",
+   "blocked_by": [],
+   "verify_cost": "one-country-rebuild",
+   "summary": "The code is as filed: country.py:721 `_ORG_HASH_SKIP = {\"CONTENTS.org\"}` excludes it from every org hash loop (:954, :966, :3586), and Tanzania/_/food_acquired.py:34 does `df_from_orgfile('CONTENTS.org','food_labels')` (table at CONTENTS.org:1301); the corpus grep confirms Tanzania is the only such reader. But the premise that this decides what is SERVED does not hold on the default backend: `materialize: make` (data_scheme.yml:117) still goes through load_dataframe_with_dvc -> load_from_waves, and the country-level `_/food_acquired.py` is reached only by the no-wave-rows country fallback or under LSMS_BUILD_BACKEND=make (country.py:4791-4794). The warm parquet proves it (rows = wave sum; > distinct (t,i,j); index (t,i,j,u,s); lsms_cache_hash present). Worse, the script is wrong on its own terms if it ever runs: it renames index level `i` -- the HOUSEHOLD id -- with the food-label map (a no-op that also warns 'Extra labels without preferred label!' for every household), and its (j,t,i) de-dup would silently discard the (u,s) grain (1,596 rows). So this is a dead legacy concatenator sitting on a hash hole, not a live staleness bug; the trap for the next reader of `_ORG_HASH_SKIP` is real but the cost today is nil. Not referenced by any merged/open PR; last touches to the script are 0f6022086/44320d102 (housekeeping).",
+   "evidence": "lsms_library/country.py:715-721, :948-957, :962-968, :3580-3588; lsms_library/countries/Tanzania/_/food_acquired.py:8, :15-16, :34-53, :64; Tanzania/_/data_scheme.yml:108-117 (materialize: make); Tanzania/_/Makefile:37-44; lsms_library/country.py:4780-4794 (make backend dispatch); warm parquet probe: /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Tanzania/{var,2008-15/_,2019-20/_,2020-21/_}/food_acquired.parquet (251,730 = 229,649+16,179+5,902; distinct (t,i,j) 250,134); slurm_logs/price_sources/DATA_PROBLEMS.csv:70 (P20); CLAUDE.md #866 section (country fallback reached only when no wave produced rows; make backend reads var/ parquet).",
+   "approach": "Retire `Tanzania/_/food_acquired.py` and its Makefile rule (Makefile:43-44, which also removes the `$(VAR_DIR)/cluster_features.parquet`-as-prerequisite hazard CLAUDE.md names under #866), leaving the wave scripts as the producers; demote the `food_labels` table in CONTENTS.org to documentation (or delete it) and update :1485-1503. Add a framework test that no `countries/**/*.py` calls df_from_orgfile with 'CONTENTS.org', so `_ORG_HASH_SKIP`'s premise is enforced rather than grepped. Confirm before deleting with one cold Tanzania food_acquired build with warnings captured (expect either 'Makefile execution failed' or the script's 'Extra labels without preferred label!' if it does run). Deleting a country-level concatenator wants a human nod; cost is one Tanzania food_acquired re-warm (the script text is in the cbinp hash).",
+   "title": "Tanzania/_/food_acquired.py reads a build table out of CONTENTS.org, which the cache hash deliberately skips"
+  },
+  {
+   "number": 679,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "diagnose-then-fix",
+   "dedup_status": "open",
+   "priority": 1,
+   "country": "Niger",
+   "summary": "Niger 2014-15 (ECVMA2) identifies a household by (GRAPPE, MENAGE, EXTENSION) but every table's `i` is built from (GRAPPE, MENAGE), so 59 split-off/mover households share an id with their parent and 210 (t,i,pid) tuples collide; the collapse then serves one person for two. Still true at HEAD: 2014-15/_/data_info.yml declares `i: [GRAPPE, MENAGE]` in every block, the five 2014-15 wave scripts omit EXTENSION on purpose 'to match sample/roster', panel_ids.py collapses extensions with their parent, and the warm household_roster parquet holds 26,369 rows for 2014-15 = 26,579 source rows minus exactly the 210 collisions, with 3,558 distinct i (sample: 3,558). No merged or open PR touches it (parent #637 is still open; PR #646 documented it and declined to fix). niger.i already accepts a third element (niger.py:41-44), so the fix is config + scripts + a crosswalk regeneration, but it re-keys EVERY 2014-15 id ('1001' -> '10010'), so panel_ids.json/updated_ids.json (committed source, #914/cd5172557) must be regenerated and the transitive-chain guard at panel_ids.py:99-115 re-checked.",
+   "evidence": "lsms_library/countries/Niger/_/niger.py:41-44 (i() appends EXTENSION only when handed 3 columns); niger.py:1195-1218 (PR #646 comment: KEY BROKEN, 3,617 vs 3,558, 210/210 collisions differ on EXTENSION, 'do not fix here'); lsms_library/countries/Niger/2014-15/_/data_info.yml:8-9,33-34,46-47,82-83,143-144,191-192,204-205 (i: [GRAPPE, MENAGE]); 2014-15/_/livestock.py:40, crop_production.py:11, plot_inputs.py:16, plot_labor.py:14, people_last7days.py:13 (EXTENSION omitted to match roster); Niger/_/panel_ids.py:11-25,91-93 (extensions collapsed with parent); warm parquet Niger/var/household_roster.parquet 2014-15: 26,369 rows, 3,558 distinct i, 0 duplicate tuples (collapse already applied); git log --since=2026-08-21 on niger.py / 2014-15 data_info.yml / panel_ids.py shows only #877, #842, plot_id and #914 commits, none touching the key; gh: issue OPEN, 0 comments; #637 OPEN; PR #646 MERGED 2026-08-21.",
+   "contents_org": "Niger/_/CONTENTS.org:260-262: 'Split-offs are carried (the wave's household key is =GRAPPE + MENAGE + EXTENSION=, with =EXTENSION= 0 = non-mover, 1 = whole household moved, 2 = split-off individual in a new household)' -- the idiosyncrasy. CONTRADICTION to report: CONTENTS.org:408-416 (GH #871 entry) characterises the 210 duplicated 2014-15 roster tuples as 'a *blank line sharing a member number with a real one*' (group ('2014-15','101008','1') = one blank row + the head), whereas the issue and niger.py:1204-1207 show groups where BOTH rows are populated people (age 56 vs 29; 11 vs 22). The #871 most-complete-row collapse rescues the blank-vs-real shape but silently drops a person in the real-vs-real shape, so the CONTENTS.org entry understates the loss. No CONTENTS.org entry cites #679 at all (grep '#679' -> none; no TODO/WAITING entries exist in the file).",
+   "approach": "In 2014-15/_/data_info.yml add EXTENSION as the third element of every `i:` idxvars list and pass it in the five wave scripts; regenerate Niger's committed panel_ids.json/updated_ids.json with `make -C lsms_library/countries/Niger/_ panel-ids` and review the diff; then verify PER WAVE that roster i-values live in the sample universe and that 2014-15 serves 3,617 households / 26,579 roster rows. Decision to name, not assume: whether EXTENSION=2 split-offs get a previous_i to the 2011-12 parent (if they do, id_walk re-merges the two households and the collision returns under another name); default = split-offs are new households, EXTENSION 0/1 link. Add a CONTENTS.org entry and correct the #871 characterisation.",
+   "resolved_by": "",
+   "blocked_by": [],
+   "root_cluster": "",
+   "verify_cost": "one-country-rebuild",
+   "title": "bug: Niger 2014-15 household id omits EXTENSION — 59 households have no `i` of their own, 210 person-collisions"
+  },
+  {
+   "number": 811,
+   "tier": "A",
+   "type": "bug",
+   "tractability": "auto",
+   "dedup_status": "open",
+   "priority": 2,
+   "country": "Guinea-Bissau (siblings measured: Burkina_Faso, Niger, Senegal)",
+   "summary": "Confirmed at HEAD on served values: Guinea-Bissau cluster_features.Region is served raw ('sab', 'bafata', ..., 'BOLAMA_BIJAGOS') while sample.strata is served normalised ('SAB', 'Bafata', ..., 'Bolama-Bijagos'), because _/categorical_mapping.org has carried a `#+NAME: strata` table since bc70d3af0 (2026-04-09) and has no `Region` table; both columns read the same source variable s00q01 (2018-19/_/data_info.yml:16,48) and the raw parquet holds identical lower-case values in both. Nothing merged or open addresses it, but the identical fix landed for Ethiopia under #832 (efe0199a3, PR #949, 2026-09-18: a `#+name: Region` table read off the same file's `strata` table). Two corrections to the issue: the fix is NOT cache-free (categorical_mapping.org is among the `_/*.org` build inputs folded into Wave._input_hash per CLAUDE.md's cache section, so every Guinea-Bissau table re-warms -- one wave, small), and the canonical spelling should mirror the existing strata table ('SAB' upper-case, not title case) or the strata<->Region join it wants still misses. The sweep the issue asks for, done on SERVED values: Burkina_Faso 22 labels for 13 regions (no table), Niger 16 for 8 (its Region table at categorical_mapping.org:230-242 lacks the lower-case variants), Senegal 14 with 'Saint-Louis' beside 13 lower-case names (no table); Benin, Togo, CotedIvoire clean.",
+   "evidence": "lsms_library/countries/Guinea-Bissau/_/categorical_mapping.org:34-44 (strata table, Alternate Spelling -> Preferred Label; no Region table: grep -il '^#+name: *region$' lists Ethiopia, Malawi, Peru, Tanzania, Mali, Nigeria, Niger, GhanaLSS only); Guinea-Bissau/2018-19/_/data_info.yml:16 (strata: s00q01) and :48 (Region: s00q01); raw parquets Guinea-Bissau/var/cluster_features.parquet and var/sample.parquet both hold {'sab','bafata','oio','gabu','cacheu','tombali','quinara','biombo','BOLAMA_BIJAGOS'}; served via Country(c, assume_cache_fresh=True): GB Region raw, GB strata normalised, Niger Region 16 labels, Burkina_Faso 22, Senegal 14; country.py:2885-2894 (_apply_categorical_mappings: table name matched to column name case-insensitively, applied when a Preferred Label column exists); precedent commit efe0199a3 (#832, in merged PR #949); CLAUDE.md cache section lists categorical_mapping.org among hashed `_/*.org` build inputs; open PR #955 (#953, mapping resolution model) is docs+tests and does not change by-name resolution; gh: issue OPEN, 0 comments.",
+   "contents_org": "Guinea-Bissau/_/CONTENTS.org:408-440 ('Cluster Features -- the many-to-one projection (GH #323)'): Region (s00q01) and Rural (s00q04) are 'PERFECTLY CONSTANT WITHIN GRAPPE at source', so re-spelling is safe for the collapse; :139-150 ('SAB is urban-only by design') names SAB as the one region a pooled analysis trips over, which is also the label whose case differs most ('sab' vs 'SAB'); :276-300 leaves 'one vague per grappe, or two?' unresolved -- unrelated to spelling but worth knowing before touching the cluster table. No entry mentions the Region/strata split.",
+   "approach": "Add a `#+name: Region` table to Guinea-Bissau/_/categorical_mapping.org with the strata table's rows verbatim (BOLAMA_BIJAGOS -> Bolama-Bijagos, sab -> SAB, lower-case -> title case), mirroring efe0199a3; verify served cluster_features.Region == served sample.strata vocabulary (9 == 9) and that tests/test_guinea_bissau_cluster_features.py still passes; budget the Guinea-Bissau re-warm. Then file or widen to the measured siblings: Burkina_Faso (new table, 22 -> 13), Niger (add lower-case rows to the existing table, 16 -> 8), Senegal (case-normalise, 14 -> 14 title case).",
+   "resolved_by": "",
+   "blocked_by": [],
+   "root_cluster": "",
+   "verify_cost": "one-country-rebuild",
+   "title": "Guinea-Bissau: cluster_features.Region and sample.strata spell the same nine regions three different ways"
+  },
+  {
+   "number": 660,
+   "tier": "D",
+   "type": "data",
+   "tractability": "human",
+   "dedup_status": "open",
+   "priority": 3,
+   "country": "Ethiopia",
+   "summary": "Confirmed and extended from warm parquets: households present in plot_features but absent from sample are W1 0, W2 25, W3 26, W4 120, W5 40 (the issue measured only W4/W5 and asked about ESS1-3), and NONE of them appear in household_roster either -- sample and roster agree exactly in every wave -- so the orphans are missing from the entire HH-questionnaire frame, not just the cover file the library happens to read. CONTENTS.org:1057-1060 independently records that the household GEOVARIABLES file also carries households the cover lacks (W2 25, W4 124, W5 35; W2 matches exactly), so these households exist in the ag and geo releases but were never enumerated in the household questionnaire. Route (c) of the issue is NOT ruled out: every wave ships an unwired post-planting cover sect_cover_pp_w{N}.dta (and sect_cover_ph_w4/w5) with .dvc sidecars, and the ag modules' own cover has never been read. Nothing merged or open touches it; no comment on the issue. Deciding whether `sample` should be the union of covers (and where those households' weights and Rural come from) needs the BID's interview-status flags -- a human call, preceded by a cold diagnostic read.",
+   "evidence": "warm parquets Ethiopia/var/{plot_features,crop_production,plot_inputs,sample,household_roster}.parquet: plot_features-not-sample = 0/25/26/120/40 for 2011-12..2021-22; orphans in household_roster = 0 in every wave; roster-vs-sample symmetric difference = 0 in every wave; example orphan ids 010101088800910083, 010102088801010012 (2018-19); Ethiopia/2018-19/_/data_info.yml:24 and :192 (sample and cluster_features read sect_cover_hh_w4.dta); lsms_library/countries/Ethiopia/{2011-12,2013-14,2015-16,2018-19,2021-22}/Data/sect_cover_pp_w{1..5}.dta.dvc exist and are referenced by no data_info.yml (grep sect_cover -> only _hh_, _ls_, _ph_); merged_prs.json: no PR since 2026-08-01 references #660 (Ethiopia PRs 688/#683 Rural, 949/#832 Region, 885 food sources are unrelated); gh: issue OPEN, 0 comments; parent #603 CLOSED 2026-08-24 without addressing it.",
+   "contents_org": "Ethiopia/_/CONTENTS.org:334-336: 'the =sample= feature uses the household-level cover page (=sect_cover_hh_w{N}.dta=), which provides one row per household per wave (not per visit)' -- the frame choice at issue; :1057-1060: '=merge_how: left= is declared in all five waves: the cover page is authoritative for which households exist, and the geo file carries households the cover does not (W2 25, W4 124, W5 35)' -- an already-recorded instance of the same frame gap, decided in favour of the HH cover for cluster_features; :925-945 (plot_features built from sect2_pp/sect3_pp with holder_id in the key). No entry records the ag-vs-cover mismatch or cites #660.",
+   "approach": "Diagnostic first (cold, one agent): read sect_cover_pp_w4/w5.dta and the geo files for the 120/40 ids and report whether they carry an HH-questionnaire completion flag; check the ESS4/ESS5 BID for households with an agriculture interview but no household interview. Then a human decision: keep `sample` = HH cover (and record the ag orphans as unweighted by construction in CONTENTS.org + a coverage note), or build `sample` from the union of covers with an explicit source flag. Record the W2/W3 counts and the geo-file coincidence in CONTENTS.org either way.",
+   "resolved_by": "",
+   "blocked_by": [],
+   "root_cluster": "",
+   "verify_cost": "one-country-rebuild",
+   "title": "bug: Ethiopia — 120 / 40 households appear in the agriculture files but not the cover page"
+  },
+  {
+   "number": 689,
+   "tier": "C",
+   "type": "docs",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 4,
+   "country": "Uganda",
+   "summary": "Ask 1 (record in CONTENTS.org that Uganda's `v` is a parish from 2013-14 and cluster_features is a projection with honest <NA>) was already satisfied when the issue was filed: commit a5bd64439 (dated 2026-07-21, first commit of PR #634, merged 2026-08-21, issue filed 2026-08-22) added CONTENTS.org:916-1000, which states both causes verbatim and points users to sample() for per-household Rural/Region; the issue's claim that the reasoning 'lives only in a Python docstring' was already false. What remains is a note in the data_scheme.yml cluster_features block (lines 19-25 carry none), ask 2 (whether Rural should be declared at cluster grain for Uganda from 2013-14 -- a naming/disclosure decision, and data_info.yml declares cluster_features.Rural required at country grain, so 'absent from four waves' hits the same country-vs-wave granularity mismatch CLAUDE.md records for Niger Latitude), and ask 3 (recover the EA from the harmonised geovariables), which is blocked on open #450. No comment from @ligon; #682's Rural audit (PR 686/688) adjudicated these cells as documented-correct. Not a code defect; reconcile, do not patch.",
+   "evidence": "git log -S'is a PROJECTION, and it says what it could not resolve' -> a5bd64439 (author/commit date 2026-07-21); gh pr view 634 --json commits,files lists a5bd64439 and lsms_library/countries/Uganda/_/CONTENTS.org; PR #634 MERGED 2026-08-21T06:37Z, issue created 2026-08-22; Uganda/_/CONTENTS.org:916-1000 and :53-60; Uganda/_/data_scheme.yml:19-25 (cluster_features block, no comment); Uganda/_/uganda.py:146-191 (cluster_features docstring, the authority the issue cites); lsms_library/data_info.yml:278-284 (cluster_features.Region/Rural required: true, country grain); #450 OPEN; #682 MERGED 2026-08-22; gh: issue OPEN, 0 comments.",
+   "contents_org": "Uganda/_/CONTENTS.org:960-963: '=v= is a PARISH from 2013-14 on, and a parish contains several enumeration areas, some urban and some rural, each with its own geovar fix. =Rural= and the GPS are therefore not parish attributes at all: 65 / 122 / 122 clusters conflict on =Rural= in 2015-16 / 2018-19 / 2019-20 (70 in 2013-14)'; :965-966 'For a per-household answer use =sample()='; :53-60 the cluster-identifier table (h1aq4a parish code -> parish_code -> DISTRICT/PARISH composite) and :63-130 why 2018-19/2019-20 v is the (district, parish) composite (parish_code has 19 distinct values for 751 parishes; 20 names recur across districts). Consistent with the issue; the issue's ask 1 is already met here.",
+   "approach": "Reconcile: comment on the issue that CONTENTS.org:916-1000 (PR #634) already records it; add a one-paragraph note to the data_scheme.yml cluster_features block. Then a decision from @ligon on ask 2 (keep Rural at cluster grain with honest <NA>, or a wave-grain optional mechanism -- the latter is framework work shared with the Niger Latitude case); ask 3 waits on #450.",
+   "resolved_by": "PR #634 (a5bd64439) -- docs part only",
+   "blocked_by": [
+    "#450"
+   ],
+   "root_cluster": "",
+   "verify_cost": "none",
+   "title": "Uganda: `cluster_features` is at PARISH grain from 2013-14 — coarser than the sampling cluster (EA)"
+  },
+  {
+   "number": 831,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "human",
+   "dedup_status": "partial",
+   "priority": 3,
+   "country": "framework",
+   "summary": "The write side is fixed: PR #917 (6e4dc5b68, merged 2026-09-14) routes every read-path fetch through data_access._fetch_destination (data_access.py:84-120), which lands under data_root() unless populate_cache=True (the add_wave/populate_and_push acquisition branch), with a static guard and tests/test_gh831_no_runtime_writes_into_config_tree.py; PR #922 (575413801) added the sidecar fast path so get_data_file no longer walks the DVC index. At HEAD the clone has 0 stray countries/<wave>/ dirs and 0 in-tree parquets; the one in-tree data file (Panama/1997/Data/unittable.csv) is git-tracked, not a stray. Two of the issue's three bullets remain, and #917's body names them under 'Not fixed here': (a) get_dataframe still serves a sidecar-less file inside countries_root() -- local_tools.py:1195-1214 deliberately allows it ('new data being prepped for dvc add, user scratch data'); (b) `cache clear` reports only in-tree parquets (cli.py:228-240), not .dta/.sav. Severity has dropped because the runtime no longer creates the dangerous class, but the reader behaviour that let a stray shadow the DVC blob is unchanged.",
+   "evidence": "lsms_library/data_access.py:84-120 (_fetch_destination); lsms_library/local_tools.py:1195-1214 (sidecar-less in-tree file accepted); lsms_library/cli.py:228-240 (parquet-only stray report); PR #917 body 'Not fixed here'; PR #922; merged_prs.json 917/922/918 closes lists; find lsms_library/countries -name '*.parquet' -> 0; ls -d lsms_library/countries/[0-9]* -> none; git ls-files shows Panama/1997/Data/unittable.csv tracked",
+   "resolved_by": "PR #917 (6e4dc5b68) read-path writes; PR #922 (575413801) fast path",
+   "approach": "Decision needed from @ligon: may a sidecar-less data file inside countries_root() be READ at all? Refusing it (as #803 does for parquets) closes the shadowing hole but breaks the add_wave workflow, where a maintainer develops wave config against files extracted before `dvc add`. A middle path: warn (InTreeDataWarning) but serve, and extend `cache clear` to list in-tree .dta/.sav/.csv with and without sidecars -- that half is mechanical and hash-neutral (no data_access/cli symbol is in a build fingerprint, per #917).",
+   "blocked_by": [
+    "decision: read policy for untracked files in countries_root()"
+   ],
+   "verify_cost": "none",
+   "contents_org": "n/a",
+   "root_cluster": "acquisition-path",
+   "title": "WB-zip fallback extracts source files into the package tree (433 found today, 33 without sidecars in stray countries/<wave>/ dirs); sidecar-less copies shadow the DVC cache"
+  },
+  {
+   "number": 839,
+   "tier": "C",
+   "type": "docs",
+   "tractability": "auto",
+   "dedup_status": "partial",
+   "priority": 3,
+   "country": "Mali, Tanzania, Malawi",
+   "summary": "Tanzania half is DONE on development: 522458fa2 closed the #112 WAITING entry (CONTENTS.org:578 is now '** DONE ... CLOSED [2026-09-08]', with the measured non-null counts at :590-600 and the statement that the Critical line is FALSE at :613); #113 was already closed 2026-06-15, so 'decide whether #113 is still wanted' is moot. Mali half is HALF done: the correction landed in CONTENTS.org (477b1a6e7, :897-908) but data_scheme.yml:59-65 still carries all three false claims ('incorrectly maps Quantity: s13q02', 'legacy non-canonical shape', 'mixes shapes across waves'). It was deferred because cscheme= hashes the whole file (country.py:3566) -- and that deferral has already failed: Mali's hash inputs moved on 2026-09-10 (57d2ffafd touched data_scheme.yml for plot_id) and 2026-09-14 (cd5172557, Makefile), so the country re-warmed twice with the false comment surviving. The third instance, Malawi data_scheme.yml:191 and :433 ('JOINS food_acquired.j'; 17 of 41 do not), is untouched. The framework ask (hash parsed YAML so comment edits are free) is a design choice, not a root fix.",
+   "evidence": "lsms_library/countries/Mali/_/data_scheme.yml:59-65; lsms_library/countries/Mali/_/CONTENTS.org:897-908 (commit 477b1a6e7); lsms_library/countries/Tanzania/_/CONTENTS.org:578-620 (commit 522458fa2); lsms_library/country.py:3558-3566 (cscheme= whole-file hash); git log --since=2026-09-08 -- Mali/_/data_scheme.yml Mali/_/Makefile -> 57d2ffafd, cd5172557; lsms_library/countries/Malawi/_/data_scheme.yml:191,433; gh issue 113 CLOSED 2026-06-15; origin/fix/prices-mali (ad5119e32) and origin/fix/prices-tanzania (38e988ee3) are the unpushed branches the issue names, both superseded by the development commits",
+   "resolved_by": "522458fa2 (Tanzania CONTENTS DONE entry), 477b1a6e7 (Mali CONTENTS correction); Mali data_scheme.yml and Malawi JOIN claim still open",
+   "approach": "Correct Mali data_scheme.yml:59-65 and Malawi data_scheme.yml:191/:433 now, bundled with the next substantive edit or on their own -- @ligon's ruling in PR #918 ('rebuilding cache on this 32 core cluster is not a big deal') already covers the re-warm. Separately decide whether to canonicalise data_scheme.yml before hashing (yaml.safe_load -> stable dump): it removes the standing incentive to leave false comments in place, at the price of one corpus-wide re-warm when the payload format changes, and it does nothing for label edits that genuinely change data.",
+   "blocked_by": [],
+   "verify_cost": "one-country-rebuild",
+   "contents_org": "Mali CONTENTS.org:897-908: 'The data_scheme.yml comment on 2014-15 food_acquired is STALE ... All three claims are false as of GH #380 ... Left uncorrected on purpose: a comment change in data_scheme.yml moves every Mali table's cache hash ... Correct it when that file is next edited for another reason.' Tanzania CONTENTS.org:578-586: '** DONE Missing food quantities in 2019-20 and 2020-21 (#112) ... Resolved: the current build carries the quantities ... non-null on 97.6% of 2019-20 rows and 98.5% of 2020-21 rows'. Note the Mali entry's own condition (next edit) has since been met twice without the correction landing.",
+   "root_cluster": "deferred-for-cache-cost",
+   "title": "A config comment the data contradict: Mali data_scheme.yml (3 false claims since #380) and Tanzania CONTENTS.org (#112)"
+  },
+  {
+   "number": 833,
+   "tier": "B",
+   "type": "bug",
+   "tractability": "diagnose-then-fix",
+   "dedup_status": "partial",
+   "priority": 2,
+   "country": "Malawi, Uganda, Tanzania, Niger, Ethiopia",
+   "summary": "Umbrella over seven per-country label folds; three items have landed, four have not, and one turns out to be a design question rather than a bug. Landed: Uganda harmonize_crop 141->Millet / 741->Matoke (6451615b3 on development, categorical_mapping.org:739,771); Malawi harvest `condition` is now a real index level read from ag_g13c (GH #854 closed, f4f9bdcb4; warm crop_production.parquet index is (t,i,plot_id,crop,u,condition)); Malawi perennial recode (#869 closed, 43d2900fb). Still open at HEAD: Malawi ag_i02c (sale-side S/U) unread, so the harvest/sale shelled-unshelled basis error persists (CONTENTS.org:208-217); Malawi `Boiled groundnuts` -> `Groundnut` fold (categorical_mapping.org:90 vs :93,:140,:144), deferred for cache cost while malawi.py was edited nine times since 09-08; Tanzania harmonize_crop reuses the FOOD labels Seeds/Nuts/Coffee & Cocoa/Tea (dry) for the harvested crop (categorical_mapping.org:671-684) with no CONTENTS entry; Niger drift pairs are in SERVED output (measured on the warm parquet: Chou 628 rows 2018-19 vs Choux 973 rows 2021-22; 'Aubergine,' 452 vs 'Aubergine, Courge/Courgette' 1156; three Sucre spellings 4883/80/5462) and the undecoded code '166' is served as a j label on 468 rows in 2021-22 (the only `166` in the mapping file is in harmonize_assets:1206). Uganda Aggregate folds Maize (flour)->Maize (:35,:122-123) and Millet Flour->Millet (:124); but the bucket contract is the CFE beta-spread test (add-feature/food-acquired/SKILL.md:415-445), not a raw/processed rule, so splitting flour out is a design decision, not a defect -- and a new instance the issue missed: code 182 `Cassava (flour)` -> Preferred `Cassava` (:100) while 1082 -> `Cassava (flour)` (:113), so Cassava is only 'clean' in one code scheme. Ethiopia's u-axis fold is unadjudicated and belongs with #832.",
+   "evidence": "lsms_library/countries/Uganda/_/categorical_mapping.org:35,100,113,122-124,739,771; commit 6451615b3; lsms_library/countries/Malawi/_/malawi.py:1036-1112 (_harvest_block reads condition), :1256 ('ag_i02c is unwired'); Malawi categorical_mapping.org:90,93,140,144,148; Malawi CONTENTS.org:183-217; Tanzania categorical_mapping.org:671-684; pyarrow read of /global/scratch/fsa/fc_jevons/ligon/cache/lsms_library/Niger/var/food_acquired.parquet (j x t counts above; 178 distinct j); Niger categorical_mapping.org:490-491,564-565,740-742,1206; .claude/skills/add-feature/food-acquired/SKILL.md:415-445; gh issue 854 CLOSED 2026-09-10, 869 CLOSED 2026-09-13, 832 OPEN; slurm_logs/price_sources/DATA_PROBLEMS.csv (P09 rows present)",
+   "resolved_by": "6451615b3 (Uganda 141/741); f4f9bdcb4 + 91fab6454 via #854 (Malawi condition); 43d2900fb via #869",
+   "approach": "Split per country, each a one-country config edit plus re-warm: (1) Malawi -- wire ag_i02c into the sale merge and give `Boiled groundnuts` its own label as `Sweet Potato - Boiled (Vendor)` already has; (2) Tanzania -- give harmonize_crop harvest-form labels (Coffee cherry, Cashew in-shell, ...) instead of the food label, and record the reuse in CONTENTS.org; (3) Niger -- extend harmonize_food over the drift pairs and decode 166 from the 2021-22 questionnaire (add a CONTENTS entry: none exists); (4) Uganda -- @ligon decides whether `Aggregate` buckets are for demand estimation (beta-spread, flour may stay) or price comparison (split flour out); the price study should use Preferred Labels either way; also reconcile Cassava (flour) across the two code schemes; (5) Ethiopia -- fold into #832's unit sweep.",
+   "blocked_by": [
+    "decision: Aggregate bucket contract (beta-spread vs raw/processed) for the Uganda item",
+    "#832 for the Ethiopia u-axis fold"
+   ],
+   "verify_cost": "one-country-rebuild",
+   "contents_org": "Malawi CONTENTS.org:183-194: 'harmonize_food maps the Preferred Label Groundnut <- Boiled groundnuts in 2016-17 and 2019-20 -- a vendor snack ... NOT fixed: splitting the label cold-rebuilds Malawi food_acquired.' and :201-217: 'Half fixed 2026-09-09 (GH #854) ... ag_i02c ... is still unread, so the shelled/unshelled mismatch between harvest and sale is still a basis error ... Wiring ag_i02c would let those attach again, correctly, and is the natural follow-up.' Tanzania and Niger CONTENTS.org carry NO entry on the harmonize_crop label reuse or the j drift pairs / code 166 (grep for harmonize_crop, Choux, 166 returns nothing) -- a genuine idiosyncrasy to add. Uganda CONTENTS.org records the 141/741 fix (commit 6451615b3 added 85 lines) but nothing on the flour-in-grain Aggregate fold.",
+   "root_cluster": "deferred-for-cache-cost",
+   "title": "harmonize_* folds raw and processed into one `j` in 5 countries: Malawi groundnut 5.0x, Uganda maize 3.33x are milling"
+  },
+  {
+   "number": 650,
+   "tier": "D",
+   "type": "data",
+   "tractability": "diagnose-then-fix",
+   "dedup_status": "open",
+   "priority": 4,
+   "country": "Ethiopia, Niger, Senegal",
+   "summary": "Unchanged since filed. The corpus sweep at HEAD (105 wave dirs with a _/ config) finds exactly the same three stub-only Documentation dirs: Ethiopia/2021-22 [LICENSE, SOURCE, SOURCE.org], Niger/2021-22 [SOURCE.org], Senegal/2021-22 [SOURCE.org]. add_wave() still downloads only the Stata zip: _find_stata_zip_url (data_access.py:1035-1073) already iterates the full NADA api/resources/{idno} listing -- where the DDI/BID/questionnaire resources also appear -- and filters for the one zip, so fetching documentation is a filter-and-store change on existing plumbing, not new machinery. No merged PR references #650 (merged_prs.json), no CONTENTS.org cites it, and coverage.py has no documentation-stub check. Each country's CONTENTS.org independently records the gap and names what the WB catalog holds (Niger: 2 questionnaires + BID en/fr at catalog 6276; Ethiopia: ESS4 BID at catalog 3823; Senegal: catalog 6278). A fourth near-instance the file-count probe cannot see: Ethiopia 2018-19 'local DDI is a stub' (CONTENTS.org:860). The GhanaAHIES scaffold (0f7402895) shows the target pattern: Documentation/*.pdf.dvc beside SOURCE.org.",
+   "evidence": "ls lsms_library/countries/{Ethiopia,Niger,Senegal}/2021-22/Documentation/; lsms_library/data_access.py:1035-1073 (_find_stata_zip_url), :1852-1870 (add_wave docstring: 'downloads the Stata zip'), :1973 (mkdir Documentation only); git log --since=2026-07-22 -- lsms_library/data_access.py (no documentation-fetch commit); merged_prs.json (no PR closes/refs #650); .claude/skills/add-wave/SKILL.md:119-120; CONTRIBUTING.org:201; commit 0f7402895 (AHIES Documentation/*.pdf.dvc)",
+   "resolved_by": "",
+   "approach": "Two steps, different owners: (1) extend add_wave() to store the non-zip resources from the same api/resources listing under Documentation/ and push them with push_to_cache_batch (testable offline against a recorded listing; no build fingerprint moves, per #917's measurement of data_access); (2) backfill the three waves -- needs a WB API key and S3 write creds, so a maintainer/RA task; write the minimum Documentation standard (SOURCE.org + LICENSE + DDI/BID + questionnaire) into CONTRIBUTING.org and the add-wave skill, and add the stub-only check to the coverage grader so the gap is surfaced rather than found by accident.",
+   "blocked_by": [
+    "WB API key + S3 write credentials for the backfill"
+   ],
+   "verify_cost": "none",
+   "contents_org": "Ethiopia CONTENTS.org:861: '| 2021-22 | *no* -- no documentation at all | catalog only |' (and :860 '2018-19 | *no* -- local DDI is a stub'). Niger CONTENTS.org:181-186: 'lsms_library/countries/Niger/2021-22/Documentation/, which contains *only* SOURCE.org -- no PDFs, no DVC-tracked documentation of any kind; then WB catalog 6276 ... the related-materials listing (2 household questionnaires + Basic Information Document in English and French)'. Senegal CONTENTS.org:201: '| Senegal/2021-22/Documentation/ | contains only SOURCE.org; no DDI PDF, no report |'. All three agree with the issue and with the file system at HEAD.",
+   "root_cluster": "acquisition-path",
+   "title": "Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing"
+  }
+ ]
+}

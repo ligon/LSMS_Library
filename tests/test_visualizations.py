@@ -101,6 +101,7 @@ def test_palette_does_not_encode_sex_by_colour():
     assert len(colours) == 1, "unconditioned pyramid must use a single ink"
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_country_pyramid_carries_its_universe_caption():
     """A real country states what population it represents."""
@@ -702,6 +703,7 @@ def _gini_of_line(line):
     return 1.0 - float(np.sum(np.diff(F) * (L[1:] + L[:-1])))
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_uganda_lorenz_gini_and_zero_count_are_recomputed_not_pinned():
     """Uganda 2013-14 defaults, checked against an independent computation.
@@ -795,6 +797,7 @@ def test_a_wide_item_by_household_table_raises_citing_gh817():
     assert "#817" in msg and "Expenditure" in msg and "columns" in msg
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_uganda_nonfood_table_is_long_and_draws_since_gh817():
     """The other half of #817: Uganda's own table is no longer the wide one.
@@ -821,6 +824,7 @@ def test_uganda_nonfood_table_is_long_and_draws_since_gh817():
     assert "nonfood_expenditures" in _all_text(ax)
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_nigeria_default_wave_is_the_most_recent_the_measure_holds():
     """Country.waves ends in 2024Q1, which has no food rows; the default must

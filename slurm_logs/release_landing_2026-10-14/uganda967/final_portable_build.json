@@ -1,0 +1,183 @@
+{
+  "source_sha": "ebf4eb4deba8ef95afa9279e33dd658cb9929915",
+  "expected_source": "ebf4eb4deba8ef95afa9279e33dd658cb9929915",
+  "import": "/local/job39919092/release-work/countries/uganda/lsms_library/__init__.py",
+  "python": "3.11.6 (main, Jun 25 2024, 17:53:21) [GCC 11.4.0]",
+  "versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1"
+  },
+  "tables": {
+    "food_acquired": {
+      "shape": [
+        355571,
+        3
+      ],
+      "index": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "index_unique": true,
+      "seconds": 96.73634423874319,
+      "warning_classes": {
+        "ResourceWarning": 151,
+        "RuntimeWarning": 2,
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1
+      }
+    },
+    "food_quantities": {
+      "shape": [
+        355487,
+        1
+      ],
+      "index": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "index_unique": true,
+      "seconds": 6.5630135256797075,
+      "warning_classes": {
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 2,
+        "StatedVsInferredKgWarning": 1
+      }
+    },
+    "food_prices": {
+      "shape": [
+        348181,
+        1
+      ],
+      "index": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "index_unique": true,
+      "seconds": 6.284353851340711,
+      "warning_classes": {
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 2,
+        "StatedVsInferredKgWarning": 1
+      }
+    },
+    "food_expenditures": {
+      "shape": [
+        247049,
+        1
+      ],
+      "index": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "s"
+      ],
+      "index_unique": true,
+      "seconds": 2.5631956439465284,
+      "warning_classes": {
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1
+      }
+    },
+    "food_kg_factors": {
+      "shape": [
+        355571,
+        9
+      ],
+      "index": [
+        "i",
+        "t",
+        "v",
+        "j",
+        "u",
+        "s"
+      ],
+      "index_unique": true,
+      "seconds": 2.6683390783146024,
+      "warning_classes": {
+        "StatedVsInferredKgWarning": 1
+      }
+    },
+    "fct": {
+      "shape": [
+        15,
+        113
+      ],
+      "index": [
+        "Nutrient"
+      ],
+      "index_unique": true,
+      "seconds": 132.0372313996777,
+      "warning_classes": {}
+    },
+    "nutrition": {
+      "shape": [
+        23777,
+        15
+      ],
+      "index": [
+        "i",
+        "t",
+        "v"
+      ],
+      "index_unique": true,
+      "seconds": 132.75219206977636,
+      "warning_classes": {}
+    }
+  },
+  "errors": {},
+  "price_modes": {
+    "unitvalue": {
+      "rows": 355510,
+      "nonphysical": {
+        "Value": {
+          "rows": 6429,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "Unknown": {
+          "rows": 900,
+          "min": 0.009999999776482582,
+          "max": 25000.0
+        }
+      }
+    },
+    "unitprice": {
+      "rows": 325816,
+      "nonphysical": {
+        "Value": {
+          "rows": 0
+        },
+        "Unknown": {
+          "rows": 765,
+          "min": 50.0,
+          "max": 20000.0
+        }
+      }
+    },
+    "kgprice": {
+      "rows": 325051,
+      "nonphysical": {
+        "Value": {
+          "rows": 0
+        },
+        "Unknown": {
+          "rows": 0
+        }
+      }
+    }
+  }
+}

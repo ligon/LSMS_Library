@@ -1,0 +1,248 @@
+{
+  "isolated": {
+    "complete": true,
+    "build_starts": 0,
+    "build_completions": 0,
+    "calls": [],
+    "expected_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "stored_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "manifests": [
+      [
+        "1987-88",
+        "1988-89",
+        "1991-92",
+        "1998-99",
+        "2005-06",
+        "2012-13",
+        "2016-17"
+      ]
+    ],
+    "distinct_private_roots": 1,
+    "NO_CACHE_before_helpers": null,
+    "NO_CACHE_after_helpers": null,
+    "pytest_results": [
+      {
+        "node": "tests/test_currency_denominated_units.py::test_ghanalss_unitvalue_and_units_modes_are_unaffected",
+        "outcome": "passed",
+        "seconds": 111.93748418521136
+      }
+    ]
+  },
+  "ordered-before": {
+    "complete": false,
+    "build_starts": 15,
+    "build_completions": 14,
+    "calls": [
+      {
+        "api": "_country",
+        "seconds": 329.2702096160501,
+        "rows": 5340606
+      },
+      {
+        "api": "food_prices",
+        "units": "unitvalue",
+        "seconds": 327.5550620658323,
+        "rows": 1676093
+      }
+    ],
+    "expected_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "stored_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "manifests": [
+      [
+        "1987-88",
+        "1988-89",
+        "1991-92",
+        "1998-99",
+        "2005-06",
+        "2012-13",
+        "2016-17"
+      ]
+    ],
+    "distinct_private_roots": 1,
+    "NO_CACHE_before_helpers": null,
+    "NO_CACHE_after_helpers": "1",
+    "pytest_results": []
+  },
+  "ordered-after": {
+    "complete": true,
+    "build_starts": 0,
+    "build_completions": 0,
+    "calls": [
+      {
+        "api": "_country",
+        "seconds": 24.20107430871576,
+        "rows": 5340606
+      },
+      {
+        "api": "food_prices",
+        "units": "unitvalue",
+        "seconds": 31.007334579713643,
+        "rows": 1676093
+      },
+      {
+        "api": "food_prices",
+        "units": "unitprice",
+        "seconds": 24.976922823116183,
+        "rows": 189656
+      },
+      {
+        "api": "food_quantities",
+        "units": "units",
+        "seconds": 29.572259828448296,
+        "rows": 1694623
+      }
+    ],
+    "expected_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "stored_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "manifests": [
+      [
+        "1987-88",
+        "1988-89",
+        "1991-92",
+        "1998-99",
+        "2005-06",
+        "2012-13",
+        "2016-17"
+      ]
+    ],
+    "distinct_private_roots": 1,
+    "NO_CACHE_before_helpers": null,
+    "NO_CACHE_after_helpers": null,
+    "pytest_results": []
+  },
+  "exact-selection-after": {
+    "complete": true,
+    "build_starts": 0,
+    "build_completions": 0,
+    "calls": [],
+    "expected_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "stored_hashes": [
+      "c5f41b5cd6651509b55c11430793a07b26ba38654c1f7dc043308f0f1bd3c904"
+    ],
+    "manifests": [
+      [
+        "1987-88",
+        "1988-89",
+        "1991-92",
+        "1998-99",
+        "2005-06",
+        "2012-13",
+        "2016-17"
+      ]
+    ],
+    "distinct_private_roots": 1,
+    "NO_CACHE_before_helpers": null,
+    "NO_CACHE_after_helpers": null,
+    "pytest_results": [
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_collect_only_purges_nothing",
+        "outcome": "passed",
+        "seconds": 0.0001909155398607254
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_collect_only_with_rebuild_caches_purges_nothing",
+        "outcome": "passed",
+        "seconds": 0.00017174705862998962
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_collect_only_still_registers_markers",
+        "outcome": "passed",
+        "seconds": 0.00016183406114578247
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_real_run_purges_nothing_by_default",
+        "outcome": "passed",
+        "seconds": 0.00016559753566980362
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_real_run_with_rebuild_caches_still_purges_everything",
+        "outcome": "passed",
+        "seconds": 0.00017388351261615753
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_no_purge_flag_is_accepted_and_inert",
+        "outcome": "passed",
+        "seconds": 0.00015895068645477295
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild-None]",
+        "outcome": "passed",
+        "seconds": 0.0001808376982808113
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild-0]",
+        "outcome": "passed",
+        "seconds": 0.00018290895968675613
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild-1]",
+        "outcome": "passed",
+        "seconds": 0.00020271819084882736
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild_caches-None]",
+        "outcome": "passed",
+        "seconds": 0.00018614251166582108
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild_caches-0]",
+        "outcome": "passed",
+        "seconds": 0.00017980486154556274
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[False-rebuild_caches-1]",
+        "outcome": "passed",
+        "seconds": 0.0001638690009713173
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild-None]",
+        "outcome": "passed",
+        "seconds": 0.0002952367067337036
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild-0]",
+        "outcome": "passed",
+        "seconds": 0.00020310655236244202
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild-1]",
+        "outcome": "passed",
+        "seconds": 0.0002647796645760536
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild_caches-None]",
+        "outcome": "passed",
+        "seconds": 0.00020112842321395874
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild_caches-0]",
+        "outcome": "passed",
+        "seconds": 0.00019275397062301636
+      },
+      {
+        "node": "tests/test_collectonly_no_purge.py::test_rebuild_control_restores_no_cache_environment[True-rebuild_caches-1]",
+        "outcome": "passed",
+        "seconds": 0.00020083598792552948
+      },
+      {
+        "node": "tests/test_currency_denominated_units.py::test_ghanalss_unitvalue_and_units_modes_are_unaffected",
+        "outcome": "passed",
+        "seconds": 108.70462435763329
+      }
+    ]
+  }
+}

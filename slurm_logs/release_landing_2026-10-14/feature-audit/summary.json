@@ -1,0 +1,121 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "features_completed": 39,
+  "declared_country_pairs": 549,
+  "country_count": 38,
+  "phases_requested": [
+    1,
+    2
+  ],
+  "phase1a_country_calls": 549,
+  "phase1b_baseline_feature_calls": 38,
+  "phase2_feature_variant_calls": 17,
+  "phase2_grid": {
+    "food_prices": [
+      {
+        "units": "kgvalue"
+      },
+      {
+        "units": "unitvalue"
+      },
+      {
+        "units": "kgprice"
+      },
+      {
+        "units": "unitprice"
+      },
+      {
+        "labels": "Aggregate"
+      },
+      {
+        "market": "Region"
+      }
+    ],
+    "food_quantities": [
+      {
+        "units": "kgs"
+      },
+      {
+        "units": "units"
+      },
+      {
+        "labels": "Aggregate"
+      },
+      {
+        "market": "Region"
+      }
+    ],
+    "food_expenditures": [
+      {
+        "labels": "Aggregate"
+      },
+      {
+        "market": "Region"
+      }
+    ],
+    "food_acquired": [
+      {
+        "labels": "Aggregate"
+      }
+    ],
+    "assets": [
+      {
+        "labels": "Aggregate"
+      }
+    ],
+    "household_characteristics": [
+      {
+        "age_cuts": [
+          5,
+          15,
+          60
+        ]
+      },
+      {
+        "market": "Region"
+      }
+    ],
+    "household_roster": [
+      {
+        "market": "Region"
+      }
+    ]
+  },
+  "non_dataframe_property_note": "panel_ids is loaded in phase1a; existing harness intentionally does not assemble it as a DataFrame.",
+  "scope_skips": 0,
+  "records": 3544,
+  "status_counts": {
+    "warn": 3504,
+    "error": 19,
+    "pass": 16,
+    "fail": 5
+  },
+  "diagnostic_clusters": 266,
+  "cluster_status_counts": {
+    "fail": 5,
+    "error": 2,
+    "warn": 259
+  },
+  "phase_counts": {
+    "1a-sanity": 1234,
+    "1b-assembly": 808,
+    "2-kwargs": 1502
+  },
+  "feature_caught_exception_count": 60,
+  "feature_caught_categories": {
+    "missing_source_or_unwired": 52,
+    "missing_cluster_dependency": 8
+  },
+  "wall_seconds_approx": 3731.362534046173,
+  "sum_rounded_feature_seconds": 3720,
+  "sequential_jobs": 1,
+  "cpu_affinity": "0-7",
+  "blas_threads": 1,
+  "lsms_build_workers": 1,
+  "timeout_limitation": "jobs=1 path runs sequentially; printed build_timeout=600s is not enforced by that path.",
+  "authentication": "LSMS_SKIP_AUTH=1 suppresses import-time setup/unlock/prompt only. Existing credentials and shared L1 were available; normal lazy access remains enabled. This is NOT a credential-free audit (see #1001).",
+  "raw_records_private": true,
+  "raw_logs_private": true,
+  "passing_checks_note": "Existing scanner omits most passing sanity/assembly checks. Emitted-record counts are diagnostic counts, not test pass totals.",
+  "interpreter_version": "3.11.6"
+}

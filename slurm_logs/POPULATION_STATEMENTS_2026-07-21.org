@@ -163,7 +163,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 
 ** The table
 
-#+CAPTION: Population-statement survey, all 111 waves.  The universe tag is
+#+CAPTION: Population-statement survey, all 114 waves (111 of the 2026-07-21 sweep + GhanaAHIES 2022/2023/2024, added 2026-09-17).  The universe tag is
 #+CAPTION: editorial (see the tag legend); everything else is recorded fact.
 #+NAME: tbl:summary
 | country               | wave      | source_type         | confidence | universe tag (editorial) |
@@ -204,6 +204,9 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | EthiopiaRHS           | 1999      | local-documentation | high       | subnational-area         |
 | EthiopiaRHS           | 2004      | local-documentation | high       | subnational-area         |
 | EthiopiaRHS           | 2009      | local-documentation | medium     | subnational-area         |
+| GhanaAHIES            | 2022      | local-documentation | high       | national-all-households  |
+| GhanaAHIES            | 2023      | local-documentation | high       | national-all-households  |
+| GhanaAHIES            | 2024      | local-documentation | high       | national-all-households  |
 | GhanaLSS              | 1987-88   | local-documentation | high       | national-all-households  |
 | GhanaLSS              | 1988-89   | local-documentation | high       | national-claimed         |
 | GhanaLSS              | 1991-92   | local-documentation | high       | national-all-households  |
@@ -284,7 +287,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 
 | universe tag             | waves |
 |--------------------------+-------|
-| national-all-households  |    37 |
+| national-all-households  |    40 |
 | national-claimed         |    28 |
 | region-excluded          |    18 |
 | subnational-area         |    11 |
@@ -294,19 +297,19 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   111 |
+| TOTAL                    |   114 |
 
 *** Source and confidence counts
 
 | source_type            | waves |
 |------------------------+-------|
-| local-documentation    |    63 |
+| local-documentation    |    66 |
 | wb-catalog             |    41 |
 | not-found              |     7 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    85 |
+| high                   |    88 |
 | medium                 |    24 |
 | low                    |     2 |
 
@@ -1401,6 +1404,110 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 CONFIDENCE MEDIUM, and the reason matters. The shared overview document is dated July 20, 2011 and its title covers 1989-2009, and Section 1 (p. 2) explicitly lists 2009 among the rounds — so the ERHS-wide universe statement is documented as covering Round 7. BUT the document also says, at Section 2 v "Other survey rounds" (p. 5): "Data have also been collected in 2009. This data will be made available in the future." — i.e. the body of the document was written before the 2009 release, and there is NO 2009-specific description of coverage, village count, or exclusions anywhere in the local documentation. Whether the 15-village frame was fully re-surveyed in 2009 is NOT stated in any document in this repo. Table of Contents.pdf does record "19 files in Excel format with data on the 15 communities surveyed in Round 7 (2009) of the survey" for the community module, which is the closest thing to a 2009 coverage statement. Note also this quote is assembled from two non-contiguous passages, marked with "...".
+#+end_quote
+
+** GhanaAHIES
+
+*** GhanaAHIES 2022
+
+- Survey :: Annual Household Income and Expenditure Survey (AHIES) 2022, Ghana Statistical Service; study id DDI-GHA-GSS-AHIES-2022Q1-2022Q3-v1.0 (GSS NADA catalog entry 119; superseded for data by entry 128)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: national-all-households
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/GhanaAHIES/2022/Documentation/AHIES2022_Documentationq1q2q3_20230504.pdf
+- Locator :: p. 4, "Scope & Coverage" > "Universe"; sampling sentence at p. 5, "Sampling" > "Sampling Procedure".  The 2022-2024 study documentation (2024/Documentation/2022-2024_AHIES_Q1-Q4_Sec1-7.pdf, p. 4) carries the identical sentence.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+The universe covers the population living within individual households in Ghana. However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded.
+#+end_quote
+
+Translation (supplied by the extractor; NOT source text):
+
+#+begin_quote
+n/a -- the quoted documentation is already in English.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+From the same UNIVERSE field: "However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded" (sic: "baracks", "nursery,and").
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+GhanaAHIES is a quarterly household PANEL (10,800 households in 600 EAs drawn from the 2021 PHC frame; 18 per EA; 304 urban / 296 rural EAs, per the study documentation's Sampling Procedure), interviewed every quarter from 2022Q1 to 2024Q4.  The repository's wave DIRECTORIES are calendar years and its API wave labels are quarters (YYYYQn, via wave_folder_map), so this one row expands to four config entries.  The universe field NAMES the population ('the population living within individual households in Ghana') and states the institutional and nomadic exclusions, which is what earns national-all-households (the same phrasing GhanaLSS 2012-13 earned the tag on).  The documentation was obtained from the Ghana Statistical Service NADA (microdata.statsghana.gov.gh, entry 128 resources 544 and 465), not the World Bank; it is DVC-tracked in the repository.  Sampling Procedure, verbatim: 'With the sampling procedure, 10,800 households in 600 EAs, consisting of 304 (50.67%) urban and 296 (49.33%) rural households were drawn from the 2021 Population and Housing Census listing frame to form the secondary sampling units. A random sampling methodology was adopted to select eighteen (18) households per selected EAs in all regions to form the full sample for the fieldwork to be able to produce regionally representative expenditures for GDP.'  Text extracted with pdfminer; no diacritics are involved.
+#+end_quote
+
+*** GhanaAHIES 2023
+
+- Survey :: Annual Household Income and Expenditure Survey (AHIES) 2022-2024, Ghana Statistical Service; study id DDI-GHA-GSS-AHIES-2022Q1-2024Q4-v2.1 (GSS NADA catalog entry 128)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: national-all-households
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/GhanaAHIES/2024/Documentation/2022-2024_AHIES_Q1-Q4_Sec1-7.pdf
+- Locator :: p. 4, "Scope & Coverage" > "Universe"; sampling sentence at p. 4, "Sampling" > "Sampling Procedure".  The 2023 quarters have no year-specific study document; the 2022-2024 documentation covers them.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+The universe covers the population living within individual households in Ghana. However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded
+#+end_quote
+
+Translation (supplied by the extractor; NOT source text):
+
+#+begin_quote
+n/a -- the quoted documentation is already in English.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+From the same UNIVERSE field: "However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded" (sic: "baracks", "nursery,and").
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+GhanaAHIES is a quarterly household PANEL (10,800 households in 600 EAs drawn from the 2021 PHC frame; 18 per EA; 304 urban / 296 rural EAs, per the study documentation's Sampling Procedure), interviewed every quarter from 2022Q1 to 2024Q4.  The repository's wave DIRECTORIES are calendar years and its API wave labels are quarters (YYYYQn, via wave_folder_map), so this one row expands to four config entries.  The universe field NAMES the population ('the population living within individual households in Ghana') and states the institutional and nomadic exclusions, which is what earns national-all-households (the same phrasing GhanaLSS 2012-13 earned the tag on).  The documentation was obtained from the Ghana Statistical Service NADA (microdata.statsghana.gov.gh, entry 128 resources 544 and 465), not the World Bank; it is DVC-tracked in the repository.  Sampling Procedure, verbatim: 'With the sampling procedure, 10,800 households in 600 EAs, consisting of 304 (50.67%) urban and 296 (49.33%) rural households were drawn from the 2021 Population and Housing Census listing frame to form the secondary sampling units. A random sampling methodology was adopted to select eighteen (18) households per selected EAs in all regions to form the full sample for the fieldwork to be able to produce regionally representative expenditures for GDP.'  Text extracted with pdfminer; no diacritics are involved.
+#+end_quote
+
+*** GhanaAHIES 2024
+
+- Survey :: Annual Household Income and Expenditure Survey (AHIES) 2022-2024, Ghana Statistical Service; study id DDI-GHA-GSS-AHIES-2022Q1-2024Q4-v2.1 (GSS NADA catalog entry 128)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: national-all-households
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/GhanaAHIES/2024/Documentation/2022-2024_AHIES_Q1-Q4_Sec1-7.pdf
+- Locator :: p. 4, "Scope & Coverage" > "Universe"; sampling sentence at p. 4, "Sampling" > "Sampling Procedure".
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+The universe covers the population living within individual households in Ghana. However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded
+#+end_quote
+
+Translation (supplied by the extractor; NOT source text):
+
+#+begin_quote
+n/a -- the quoted documentation is already in English.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+From the same UNIVERSE field: "However, such population which is defined as institutionalised population as persons living at elderly houses, rest homes, correction facilities, military baracks, and hospitals with special characteristics, nursery,and also nomadic population are excluded" (sic: "baracks", "nursery,and").
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+GhanaAHIES is a quarterly household PANEL (10,800 households in 600 EAs drawn from the 2021 PHC frame; 18 per EA; 304 urban / 296 rural EAs, per the study documentation's Sampling Procedure), interviewed every quarter from 2022Q1 to 2024Q4.  The repository's wave DIRECTORIES are calendar years and its API wave labels are quarters (YYYYQn, via wave_folder_map), so this one row expands to four config entries.  The universe field NAMES the population ('the population living within individual households in Ghana') and states the institutional and nomadic exclusions, which is what earns national-all-households (the same phrasing GhanaLSS 2012-13 earned the tag on).  The documentation was obtained from the Ghana Statistical Service NADA (microdata.statsghana.gov.gh, entry 128 resources 544 and 465), not the World Bank; it is DVC-tracked in the repository.  Sampling Procedure, verbatim: 'With the sampling procedure, 10,800 households in 600 EAs, consisting of 304 (50.67%) urban and 296 (49.33%) rural households were drawn from the 2021 Population and Housing Census listing frame to form the secondary sampling units. A random sampling methodology was adopted to select eighteen (18) households per selected EAs in all regions to form the full sample for the fieldwork to be able to produce regionally representative expenditures for GDP.'  Text extracted with pdfminer; no diacritics are involved.
 #+end_quote
 
 ** GhanaLSS

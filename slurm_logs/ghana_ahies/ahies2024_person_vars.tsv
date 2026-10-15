@@ -1,0 +1,838 @@
+hhid	string		Household ID
+quarter	string		None
+cluster	int16		Cluster
+HholdID	int8		Household ID
+new_pid	int8		None
+qtr	int8		None
+s1aq1	int8	S1AQ1	Sex
+s1aq2	int8	S1AQ2	Relationship to head
+s1aq4y	int16		Age
+s1aq2x	int8	S1AQ2X	Relationship to head
+s2aq1	int8	S2AQ1	Has [NAME] ever attended school or is [NAME] attending school now?
+s2aq3	int8	S2AQ3	What is the highest level of schooling [NAME] is attending now/attended in the p
+s1aq4m	int8		Age in Month
+s1aq5	int8	S1AQ5	Marital Status
+s1aq6	int8	S1AQ6	Religious denomination
+s1aq6o	string		Other Specify
+s1aq7	int8	S1AQ7	Nationality
+s1aq8	int16	S1AQ8	Name of Other Nationality Country
+s1aq9a	int8	S1AQ9A	Ethnicity (Major)
+s1aq9ao	string		Other Soecify Major
+s1aq9b	int16	S1AQ9B	Detail Ethnicity
+s1aq9bo	string		Other Specify Detail
+s1aq5x	int8	S1AQ5X	Marital Status
+s1bq1	int8	S1BQ1	Was (NAME) born in this village or town?
+s1bq2a	int8	S1BQ2A	Born in another region
+s1bq2o	string		Other specify
+s1bq2b	int16	S1BA2B	In what District was name born
+s1bq3	int8	S1BQ3	Has (NAME) been living in this town/village since birth?
+s1bq4	int8		How long has (NAME) been living continuously in this town/village?
+s1bq5a	int8	S1BQ5A	Where was (NAME) living before moving here?
+s1bq5b	int16	S1BQ5B	Which Region Name living before  moving here
+s1bq6	int8		How long did (NAME) live in ???
+s1bq7	int8	S1BQ7	What was (NAME?s) main reason for moving to this village/town?
+s1bq7o	string		Other specify
+s2aq2	int8	S2AQ2	What is/was the main reason why (NAME) has never attended school?
+s2aq2o	string		Other Specify
+s2aq3o	string		Other specify
+s2aq4	int8		What is the highest grade (form/class/level, etc.) [NAME] has completed at that
+s2aq4o	string		Other Specify
+s2aq5	int8	S2AQ5	Did (NAME) attend school/college at any time during the past 3 months?
+s2aq6	int8	S2AQ6	Is (NAME) still in school?
+s2aq7	int8	S2AQ7	Is the school (Name) attending Private or Public?
+s2aq8a	int8	S2AQ8A	By what means does (NAME) usually go to and from school? - From
+s2aq8ao	string		Other Specify
+s2aq8b	int8	S2AQ8B	By what means does (NAME) usually go to and from school? - To
+s2aq8bo	string		Other Specify
+s2aq9a	int8		How much time does (NAME) spend going to and from school daily? Hours
+s2aq9b	int8		How much time does (NAME) spend going to and from school daily? Minutes
+s2aq10	string		Indicate which of the following you spent on:
+s2aq11a1	int16		Application_form
+s2aq11a2	double		Tution_Fee
+s2aq11a3	double		Administrative_Fee
+s2aq11a4	double		Registration_Fee
+s2aq11a5	double		Sports Fee
+s2aq11a6	double		Medical Fee
+s2aq11a7	double		Uniform Cost
+s2aq11a8	int16		Cadet Uniform Cost
+s2aq11a9	int16		Change Over Dress Cost
+s2aq11a10	double		PTA Dues
+s2aq11a11	double		Exercise Books Cost
+s2aq11a12	double		Text Books Cost
+s2aq11a13	double		Toilettries/Utilities Fees
+s2aq11a14	double		School Supplies Cost
+s2aq11a15	double		Transportation Cost
+s2aq11a16	double		Cost of Food at School
+s2aq11a17	int16		School Accomodation Cost
+s2aq11a18	double		School Extra Classes Cost
+s2aq11a19	double		Private Extra Classes Cost
+s2aq11a20	double		Printing Fee
+s2aq11a21	double		School Development Levy
+s2aq11a22	int16		Graduation Fee
+s2aq11a23	double		Teachers Appreciation Fee
+s2aq11a24	double		In-Kind Expenses
+s2aq11a25	int16		Our Day Levy
+s2aq11a26	double		Other expense 1
+s2aq11a27	double		Other expense 2
+s2aq11a28	double		Other expense 3
+s2aq11a26o	string		How much did you spend on?? Other 1
+s2aq11a27o	string		How much did you spend on?? Other 2
+s2aq11a28o	string		How much did you spend on?? Other 3
+s2aq11a29	double		Lump Sum
+s2aq12	int8	S2AQ12	Who paid for most of (NAME?S) the educational expenses?
+s2aq12o	string		Other Specify
+s2aq13	int8	S2AQ13	Did (NAME) receive a scholarship/ bursary during the past 3 months?
+s2aq13o	string		Other Specify
+s2aq14	int32		What was the amount of (NAME?S) scholarship/ bursary received for the past 3 mon
+s2aq15	string		Is (NAME) currently receiving any of these training?
+s2aq15a	int8	yesno	Clerical
+s2aq15b	int8	yesno	Managerial
+s2aq15c	int8	yesno	Data Science
+s2aq15d	int8	yesno	ICT
+s2aq15e	int8	yesno	Marketing
+s2aq15f	int8	yesno	Teaching
+s2aq15g	int8	yesno	Leadership
+s2aq15h	int8	yesno	Medicine
+s2aq15i	int8	yesno	Accounting
+s2aq15j	int8	yesno	Skills/Trade
+s2aq15k	int8	yesno	Farming practices
+s2aq15l	int8	yesno	Other training
+s2aq15z	int8	yesno	None
+s2aq15o	string		Other specify
+s2aq16	int16		How much in all did (NAME) pay for the training in the past 3 months?
+s2aq7n	int8	s2aq7n	RECODE of s2aq7 (Is the school (Name) attending Private or Public?)
+s2aq10_02	int8		Tuition fee
+s2aq10_22	int8		Graduation fee
+s2aq10_29	int8		Lump sum (if cannot give breakdown)
+s2aq10_30	int8		None
+s2bq1	int8	S2BQ1	Is (Name) an apprentice or has (Name) ever been an apprentice?
+s2bq2a	int8		How long was (is) the apprenticeship? Years
+s2bq2b	int8		How long was (is) the apprenticeship? Months
+s2bq3a	string		What is the main trade (NAME) is learning or learnt? Trade
+s2bq3b	int16	S2BQ3B	Trade Code
+s3aq1	int8	S3AQ1	During the past 2 weeks has (NAME) suffered from either an illness or injury?
+s3aq2	int8		For how many days during the past 2 weeks has  (NAME) suffered from this conditi
+s3aq3	int8	S3AQ3	During the past 2 weeks, did (NAME) have to stop the usual activities because of
+s3aq3a	string		Other specify
+s3aq4	int8		For how many days?
+s3aq4o	string		Other specify
+s3aq5	int8	S3AQ5	During the past 2 weeks has (NAME) consulted a health practitioner, visited a he
+s3aq6	int8	S3AQ6	On the most recent visit whom did (NAME) consult?
+s3aq6o	string		Other Specify
+s3aq7	int8	S3AQ7	What was the main reason for the most recent visit?
+s3aq7o	string		Other specify
+s3aq8m	int8	S3AQ8M	Where did the consultation take place? Name of facility (Main Group)
+s3aq8a	string		Where did the consultation take place? Name of facility
+s3aq8b	int8	S3AQ8B	Where did the consultation take place? facility code
+s3aq8o	string		Other specify
+s3aq9	double		How much did (NAME) pay for the registration/ card/folder at the health facility
+s3aq10	double		How much did (NAME) pay for consultation?
+s3aq11	double		How much did (NAME) pay for diagnosis (x-ray, lab, etc.)?
+s3aq12	double		How much did (NAME) pay for drugs and treatment?
+s3aq13	double		How much did (NAME) pay for overall treatment or services received?
+s3aq14	double		How much did (NAME) pay for any other services?
+s3aq15	double		How much did (NAME) pay to travel there and return?
+s3aq16	int8	S3AQ16	During the past 2 weeks was (NAME) admitted to a hospital or health facility for
+s3aq17	int8		How many nights did (NAME) stay in hospital/health facility during the past 2 we
+s3aq18	double		How much did (NAME) or will (NAME) pay for staying in a hospital/health facility
+s3aq19	int8	S3AQ19	During the past 2 weeks did (NAME) buy any medicine or medical supplies?
+s3aq20	double		How much did (NAME) pay altogether for these medicines and medical supplies?
+s3aq21	double		Total medical expenses
+s3aq22a	int8	S3AQ22A	During the past 3 months was (NAME) admitted to a hospital or health facility fo
+s3aq22b	int16		How much did (NAME) spend on admissions for any illness or injury in the last 3
+s3aq23	int8	S3AQ23	Who usually pays for the largest portions of (NAME?s) health expenses incl. Cons
+s3aq23o	string		Other Specify
+s3bq1	int8	S3BQ1	Has (NAME) ever been registered with a health insurance scheme?
+s3bq2	int8	S3BQ2	Is (NAME) currently covered?
+s3bq3	double	S3BQ3	TAKE WEIGHT (KG) OF MEMBER
+s3bq3o	string		Other Specify
+s3bq4	double	S3BQ4	TAKE HEIGHT (CM) OF MEMBER
+s3bq4o	string		Other Specify
+s3bq5	int8	S3BQ5	WHAT IS THE MODE OF MEASUREMENT (HEIGHT)
+s3cq1	int8	S3CQ1	Does (NAME) have difficulty seeing, even if wearing glasses? Will you say that [
+s3cq2	int8	S3CQ2	Does (NAME) have difficulty hearing, even if using a hearing aid? Will you say t
+s3cq3	int8	S3CQ3	Does (NAME) have difficulty walking or climbing stairs? Will you say that [NAME]
+s3cq4	int8	S3CQ4	Does (NAME) have difficulty remembering or concentrating Will you say that [NAME
+s3cq5	int8	S3CQ5	Does (NAME) have difficulty with self-care such as washing all over the body or
+s3cq6	int8	S3CQ6	Using (his/her) usual language, does (NAME) have difficulty communicating (e.g.
+s4aq6o	int8	S4AQ6O	Which of the following type of work did Name do in the past 7 days
+s4aq1	int8	S4AQ1	During the past 7 days, did [NAME] work for a wage, salary, commission, other pa
+s4aq2	int8		During the past 7 days, how many hours did [NAME] work for a wage/salary?
+s4aq3a	int8		Wage/salary work hours: Day 1
+s4aq3b	int8		Wage/salary work hours: Day 2
+s4aq3c	int8		Wage/salary work hours: Day 3
+s4aq3d	int8		Wage/salary work hours: Day 4
+s4aq3e	int8		Wage/salary work hours: Day 5
+s4aq3f	int8		Wage/salary work hours: Day 6
+s4aq3g	int8		Wage/salary work hours: Day 7
+s4aq4	int8	S4AQ4	During the past 7 days, did [NAME] work as a domestic worker for a wage, salary,
+s4aq5	int8		During the past 7 days, for how many days did (NAME) do domestic work?
+s4aq6a	int8		Domestic work hours: Day 1
+s4aq6b	int8		Domestic work hours: Day 2
+s4aq6c	int8		Domestic work hours: Day 3
+s4aq6d	int8		Domestic work hours: Day 4
+s4aq6e	int8		Domestic work hours: Day 5
+s4aq6f	int8		Domestic work hours: Day 6
+s4aq6g	int8		Domestic work hours: Day 7
+s4aq7	int8	S4AQ7	During the past 7 days, did [NAME] work on a farm that is owned or rented by a m
+s4aq8	int8		During the past 7 days, how many days has (NAME) done on this farm or other agri
+s4aq9a	int8		Farm Enterprise work hours: Day 1
+s4aq9b	int8		Farm Enterprise work hours: Day 2
+s4aq9c	int8		Farm Enterprise work hours: Day 3
+s4aq9d	int8		Farm Enterprise work hours: Day 4
+s4aq9e	int8		Farm Enterprise work hours: Day 5
+s4aq9f	int8		Farm Enterprise work hours: Day 6
+s4aq9g	int8		Farm Enterprise work hours: Day 7
+s4aq10	int8	S4AQ10	Are the products obtained from this activity on the farm mainly intended for sal
+s4aq11	int8	S4AQ11	During the past 7 days, did [NAME] run/manage a non-farm enterprise of any size
+s4aq12	int8		During the past 7 days, for how many days did (NAME) work in the non-farm enterp
+s4aq13a	int8		Non-Farm Enterprise work hours: Day 1
+s4aq13b	int8		Non-Farm Enterprise work hours: Day 2
+s4aq13c	int8		Non-Farm Enterprise work hours: Day 3
+s4aq13d	int8		Non-Farm Enterprise work hours: Day 4
+s4aq13e	int8		Non-Farm Enterprise work hours: Day 5
+s4aq13f	int8		Non-Farm Enterprise work hours: Day 6
+s4aq13g	int8		Non-Farm Enterprise work hours: Day 7
+s4aq14	int8	S4AQ14	Are the products/services obtained from this activity on the non-farm enterprise
+s4aq15	int8	S4AQ15	During the past 7 days, did [NAME] help/work in a farm/non-farm enterprise of an
+s4aq16	int8		During the past 7 days, for how many days did (NAME) help/work in the farm/non-f
+s4aq17a	int8		Family help work hours: Day 1
+s4aq17b	int8		Family help work hours: Day 2
+s4aq17c	int8		Family help work hours: Day 3
+s4aq17d	int8		Family help work hours: Day 4
+s4aq17e	int8		Family help work hours: Day 5
+s4aq17f	int8		Family help work hours: Day 6
+s4aq17g	int8		Family help work hours: Day 7
+s4aq18	int8	S4AQ18	Are the products/services obtained from this activity on the non-farm enterprise
+s4aq19	int8	S4AQ19	During the past 7 days, did [NAME] catch fish, prawns, wildlife or collect any o
+s4aq20	int8		During the past 7 days, for how many days did (NAME) do this activity?
+s4aq21a	int8		Non Productive Agric work hours: Day 1
+s4aq21b	int8		Non Productive Agric work hours: Day 2
+s4aq21c	int8		Non Productive Agric work hours: Day 3
+s4aq21d	int8		Non Productive Agric work hours: Day 4
+s4aq21e	int8		Non Productive Agric work hours: Day 5
+s4aq21f	int8		Non Productive Agric work hours: Day 6
+s4aq21g	int8		Non Productive Agric work hours: Day 7
+s4aq22	int8	S4AQ22	During the past 7 days, did [NAME] work as an apprentice even if it was for at l
+s4aq23	int8		During the past 7 days, for how many days did (NAME) work as an apprentice?
+s4aq24a	int8		Apprenticeship work hours: Day 1
+s4aq24b	int8		Apprenticeship work hours: Day 2
+s4aq24c	int8		Apprenticeship work hours: Day 3
+s4aq24d	int8		Apprenticeship work hours: Day 4
+s4aq24e	int8		Apprenticeship work hours: Day 5
+s4aq24f	int8		Apprenticeship work hours: Day 6
+s4aq24g	int8		Apprenticeship work hours: Day 7
+s4aq25	int8	S4AQ25	During the past 7 days, did [NAME] do any voluntary work for someone who is not
+s4aq26	int8		During the past 7 days, for how many days did (NAME) do voluntary work?
+s4aq27a	int8		Voluntary work hours: Day 1
+s4aq27b	int8		Voluntary work hours: Day 2
+s4aq27c	int8		Voluntary work hours: Day 3
+s4aq27d	int8		Voluntary work hours: Day 4
+s4aq27e	int8		Voluntary work hours: Day 5
+s4aq27f	int8		Voluntary work hours: Day 6
+s4aq27g	int8		Voluntary work hours: Day 7
+s4aq28	int8	S4AQ28	INTERVIEWER:  IS THERE A 'YES' RESPONSE IN QUESTIONS 1, 4, 7, 11, 15, 19, 22 or
+s4aq29	int8	S4AQ29	Even though [NAME] did not do any activity in the past seven days, does [NAME] h
+s4aq29a	int8	S4AQ29A	Even though (NAME) did not do any activities in the past seven days , does Name
+s4aq30	int8	S4AQ30	Even though [NAME] did not do any activity in the past seven days, does [NAME] r
+s4aq31	int8	S4AQ31	Are the products obtained from this activity on the farm mainly intended for sal
+s4aq32	int8	S4AQ32	Even though [NAME] did not do any activity in the past seven days, does [NAME] r
+s4aq33	int8	S4AQ33	Are the products/services obtained from this activity on the non-farm enterprise
+s4aq34	int8	S4AQ34	Even though [NAME] did not do any activities in the past seven days, does [NAME]
+s4aq35	int8	S4AQ35	Even though [NAME] did not do any activities in the past seven days, does [NAME]
+s4aq36	int8	S4AQ36	Even though [NAME] did not do any activities in the past seven days, does [NAME]
+s4aq37	int8	S4AQ37	Does [NAME] do any work involuntarily for someone who is not a member of [NAME?s
+s4aq38	int8	S4AQ38	INTERVIEWER CHECK:  IS THERE A 'YES' RESPONSE IN QUESTIONS 29, 30, 32, 34, 35, 3
+s4aq39	int8	S4AQ39	What is the main reason [NAME] did not do this activity during the past seven da
+s4aq39a	string		Other Specify
+s4aq40a1	int8	S4AQ40A1	Main occupation (code) - Major
+s4aq40a2	int16		Main occupation (code) - Detail (4)
+s4aq40a3	int32		Main occupation (code) - Detail (6)
+s4aq41a1	int8	S4AQ41A1	Industry of main occupation (code) - Major
+s4aq41a2	int16		Industry of main occupation (code) - Detail (4)
+s4aq41a3	int32		Industry of main occupation (code) - Detail (6)
+s4aq42	int8	S4AQ42	In what sector is [NAME] mainly working?
+s4aq43	int8		How long has (NAME) been doing this work?
+s4aq43m	int8		How long has (NAME) been doing this work?
+s4aq44	int8	S4AQ44	Where do you usually do your main work?
+s4aq44a	string		Other Specify
+s4aq45	int8	S4AQ45	Is the work you do regular or temporary?
+s4aq46	int8	S4AQ46	What is [NAME?s] status in this job?
+s4aq46a	string		Other Specify
+s4aq47	int8	S4AQ47	Does [NAME] have a contract/agreement (written or verbal) or letter of appointme
+s4aq48	int8	S4AQ48	Does [NAME's] employer provide health insurance coverage (either partial or full
+s4aq49	int8	S4AQ49	In this job, is (NAME) entitled to paid holidays/leave?
+s4aq50	int8	S4AQ50	Is (NAME) entitled to paid sick leave and/or maternity leave on this job?
+s4aq51	int8	S4AQ51	Is [NAME] entitled to any social security benefits in this job?
+s4aq52	string		What type of social security benefit will/does [NAME] benefits?
+s4aq52b	int8	yesno	Two-tier Scheme
+s4aq52c	int8	yesno	SSNIT scheme
+s4aq52d	int8	yesno	Cap 30
+s4aq52e	int8	yesno	Other benefit
+s4aq52o	string		Other Specify
+s4aq52a	string		Other Specify
+s4aq53	int8	S4AQ53	Is [NAME] entitled to free or subsidized medical care in this job?
+s4aq54	int8	S4AQ54	Is [NAME] paid on a timely basis or a piece rate basis
+s4aq54a	string		Other specify
+s4aq55a	double		How much is [NAME's] payment for this job? IF [NAME] HAS NOT YET BEEN PAID, ASK:
+s4aq55b	int8	S4AQ55B	Time Unit of payment
+s4aq56	int8	S4AQ56	Does [NAME] receive other payments (including bonuses, commission, allowances, t
+s4aq57a	double		ow much is [NAME's] other cash payments (including bonuses, commission, allowanc
+s4aq57b	int8	S4AQ57B	Time Unit of payment
+s4aq58	int8	S4AQ58	Does [NAME] receive any payment in-kind?
+s4aq59a	double		What is the value of goods and services you received?
+s4aq59b	int8	S4AQ59B	Time Unit of payment
+s4aq60	int8		Who in your household mainly decides on the use of this payment?
+s4bq1	int8		During the past 7 days, how many jobs did you do/have altogether?
+s4bq2a1	int8	S4BQ2A1	Main occupation (code) - Major
+s4bq2a2	int16		Main occupation (code) - Detail (4)
+s4bq2a3	int32		Main occupation (code) - Detail (6)
+s4bq3a1	int32	S4BQ3A1	Industry of main occupation (code) - Major
+s4bq3a2	int16		Industry of main occupation (code) - Detail (4)
+s4bq3a3	int32		Industry of main occupation (code) - Detail (6)
+s4bq4	int8		During the past 7 days, for how many days did (NAME) on this second job?
+s4bq5a	int8		For the ?? . days worked, how many hours did [NAME] do in this second job? Day 1
+s4bq5b	int8		Day 2
+s4bq5c	int8		Day 3
+s4bq5d	int8		Day 4
+s4bq5e	int8		Day 5
+s4bq5f	int8		Day 6
+s4bq5g	int8		Day 7
+s4bq6	int8	S4BQ6	In what sector is [NAME] mainly working?
+s4bq7	int8	S4BQ7	What is [NAME?s] status in this job?
+s4bq7a	string		Other Specify
+s4bq8	int8	S4BQ8	Is [NAME] paid on a timely basis or a piece rate basis
+s4bq8a	string		Other specify
+s4bq9	int32		How much is [NAME's] payment for this job? IF [NAME] HAS NOT YET BEEN PAID, ASK:
+s4bq9a	int8	S4BQ9A	Time Unit of payment
+s4bq10	int8	S4BQ10	Does [NAME] receive any payment for this work in the form of goods and services?
+s4bq11a	int16		What is the value of goods and services you received?
+s4bq11b	int8	S4BQ11B	Time Unit of payment
+s4bq12	int8	S4BQ12	Does [NAME] have a contract/agreement (written or verbal) or letter of appointme
+s4bq13	int8	S4BQ13	In this job, is (NAME) entitled to paid holidays/leave?
+s4bq14	int8	S4BQ14	Is (NAME) entitled to paid sick leave and/or maternity leave on this job?
+s4bq15	int8	S4BQ15	Is [NAME] entitled to any social security benefits in this job?
+s4bq16	string		What type of social security benefit will/does [NAME] benefits?
+s4bq16a	int8	yesno	Three(3) Tier Scheme
+s4bq16b	int8	yesno	Two(2) Tier Scheme
+s4bq16c	int8	yesno	SSNIT Scheme
+s4bq16d	int8	yesno	CAP 30
+s4bq16e	int8	yesno	Other Scheme
+s4bq16_other	string		Other Specify
+s4bq17	int8	S4BQ17	Is [NAME] entitled to free or subsidized medical care in this job?
+s4bq18	int8	S4BQ18	Where do you usually do your main work?
+s4bq18a	string		Other specify
+s4bq19	int8	S4BQ19	Is the work you do regular or temporary?
+s4cq1	int16		During the past 7 days, what were your total hours of work in your economic acti
+s4cq2_old	int8	S4CQ2	Total Number of hours
+s4cq3	int8	S4CQ3	Was (NAME) available for additional hours of work in the past seven days?
+s4cq4	int8	S4CQ4	Was (NAME) willing to work for additional hours in the past seven days?
+s4cq6	int8	S4CQ6	Did (NAME) wish to change jobs or to have another job in addition to (NAME?s) pr
+s4cq7	int8	S4CQ7	Did (NAME) seek to change (NAME?S) job in the past 7 days?
+s4cq8	int8	S4CQ8	What was the most important reason that made (NAME) seek to do that?
+s4cq8o	string		Other Specify
+s4cq9	int8	S4CQ9	What steps did (NAME) take to change your work situation or increase earnings?
+s4cq9a	string		Other Specify
+s4cq10	int8	S4CQ10	Is (NAME) ready and have the requirements to change his/her work situation durin
+s4dq1	int8	S4DQ1	Worked for pay, profit, commission or family gain during past 12 months
+s4dq2	int8	S4DQ2	During the months that (NAME) worked, was it the same as (NAME?s) main or second
+s4dq2o	string		Other Specify
+s4dq3a1	int32	S4DQ3A1	Main occupation (code) - Major
+s4dq3a2	int16		Main occupation (code) - Detail (4)
+s4dq3a3	int32		Main occupation (code) - Detail (6)
+s4dq4a1	int8	S4DQ4A1	Industry of main occupation (code) - Major
+s4dq4a2	int16		Industry of main occupation (code) - Detail (4)
+s4dq4a3	int32		Industry of main occupation (code) - Detail (6)
+s4dq5	int8	S4DQ5	What is [NAME?s] status in this job?
+s4dq5a	string		Other Specify
+s4dq6	int8	S4DQ6	In what sector is [NAME] mainly working?
+s4dq7	int8	S4DQ7	Did (NAME) receive any payment for this work in the form of cash, goods or servi
+s4eq1	int8	S4EQ1	Was (NAME) available for work during the past 7 days, if there had been an oppor
+s4eq2	int8	S4EQ2	Has (NAME) made any effort during the past 7 days to find work or start own busi
+s4eq3	int8	S4EQ3	Why has (NAME) not made any effort to find work or start a business?
+s4eq3o	string		Other Specify
+s4eq4	int8	S4EQ4	What did (NAME) do in this period to find work or start a business?
+s4eq4o	string		Other Specify
+s4eq5	int8	S4EQ5	Would (NAME) be willing to work part time? (i.e. 20 hours a week)
+s4eq6	int8	S4EQ6	During this period what type of employment was (NAME) mainly seeking and availab
+s4eq6o	string		Other Specify
+s4eq7	int8	S4EQ7	How long has (NAME) been seeking and available for work?
+s4eq8a1	int8	S4EQ8A1	Main occupation (code) - Major
+s4eq8a2	int16		Main occupation (code) - Detail (4)
+s4eq8a3	int32		Main occupation (code) - Detail (6)
+s4eq9	int16		What is the lowest wage is for which (NAME) is willing to work for someone?
+s4eq9a	int8	S4EQ9A	Time Unit of payment
+s4eq10	int8	S4EQ10	Why was (NAME) not available for work during the past 7 days?
+s4eq10o	string		Other Specify
+s4eq11	int8	S4EQ11	Under which conditions, if any, would (NAME) become available for work?
+s4eq11o	string		Other Specify
+s4eq12	int8	S4EQ12	Has (NAME) ever refused a job that was offered to him/her?
+s4eq13	int8	S4EQ13	Why did (NAME) refuse the job?
+s4eq13o	string		Other Specify
+s4eq14	int8	S4EQ14	What is the main reason (NAME) is not getting a job?
+s4fq1	int8	S4FQ1	Has [NAME] worked in more than one institution or organization in his/her workin
+s4fq2a	int8		How long did it take [NAME] to secure employment/ income earning activities afte
+s4fq2b	int8		Length of Transition  Month
+s4fq2c	int8	S4FQ2C	Level of education?
+s4fq2co	string		Other Specify
+s4fq3a	int8		How long did it take [NAME] to secure employment/ income earning activities afte
+s4fq3b	int8		Length of Transition  Month
+s4fq3c	int8	S4FQ3C	Level of education?
+s4fq3co	string		Other  Specify
+s4fq4	int8		At what age did you start to work for the first time in your life? (As regular o
+s4gq1a	int8	S4GQ1A	Superficial injuries or open wounds
+s4gq1b	int8	S4GQ1B	Fractures
+s4gq1c	int8	S4GQ1C	Dislocations, sprains or strains
+s4gq1d	int8	S4GQ1D	Burns, corrosions, scalds or frostbite
+s4gq1e	int8	S4GQ1E	Breathing problems
+s4gq1f	int8	S4GQ1F	Eye problems
+s4gq1g	int8	S4GQ1G	Skin problems
+s4gq1h	int8	S4GQ1H	Stomach problems/ diarrhoea
+s4gq1i	int8	S4GQ1I	Fever
+s4gq1j	int8	S4GQ1J	Extreme fatigue
+s4gq1k	int8	S4GQ1K	Snake bite
+s4gq1l	int8	S4GQ1L	Insect bite (including mosquito bites)
+s4gq1m	int8	S4GQ1M	Other (specify)
+s4gq1mo	string		Other (specify)
+s4gq2	int8	S4GQ2	Think about (NAME?s) most serious illness/injury, how did this/these affect your
+s4gq3	int8	S4GQ3	Why did (NAME) not stop work as result of this illness or injury?
+s4gq3o	string		Other Specify
+s4gq4a1	double	S4GQ4A1	Main occupation (code) - Major
+s4gq4a2	double		Main occupation (code) - Detail (4)
+s4gq4a3	int32		Main occupation (code) - Detail (6)
+s4gq5	int8	S4GQ5	Does (NAME) operate any tool/machinery/heavy equipment at work?
+s4gq6	string		What type of tools, equipment or machines does (NAME) use at work?
+s4gq6o	string		Other specify
+s4gq7a	int8	S4GQ7A	Dust, fumes
+s4gq7b	int8	S4GQ7B	Fire, gas, flames
+s4gq7c	int8	S4GQ7C	Loud noise or vibration
+s4gq7d	int8	S4GQ7D	Extreme cold or heat
+s4gq7e	int8	S4GQ7E	Dangerous tools (knives etc)
+s4gq7f	int8	S4GQ7F	Work  underground
+s4gq7g	int8	S4GQ7G	Work at heights
+s4gq7h	int8	S4GQ7H	Work in water/lake/pond/river
+s4gq7i	int8	S4GQ7I	Workplace too dark or confined
+s4gq7j	int8	S4GQ7J	Insufficient ventilation
+s4gq7k	int8	S4GQ7K	Chemicals (pesticides, glues, etc.)
+s4gq7l	int8	S4GQ7L	Explosives
+s4gq7m	int8	S4GQ7M	Narcotic drugs
+s4gq7n	int8	S4GQ7N	Arms (guns)
+s4gq7o	int8	S4GQ7O	Other things, processes or conditions bad for your health  or safety specify
+s4gq7oo	string		Other Specify
+s4gq8a	int8	S4GQ8A	Constantly shouted at
+s4gq8b	int8	S4GQ8B	Repeatedly insulted
+s4gq8c	int8	S4GQ8C	Beaten /physically hurt
+s4gq8d	int8	S4GQ8D	Sexually harassed (touched or done things to NAME that NAME did not want)
+s4gq8e	int8	S4GQ8E	Other specify
+s4gq8eo	string		other specify
+s4gq9a	int8	S4GQ9A	Posting of safety signages or warnings
+s4gq9b	int8	S4GQ9B	Workers? orientation on safety and health hazards at work
+s4gq9c	int8	S4GQ9C	Installation of machine guards on moving parts/equipment
+s4gq9d	int8	S4GQ9D	Emergency preparedness and response activities for earthquake, fire, chemical sp
+s4gq9e	int8	S4GQ9E	Regular monitoring and control of hazards such as chemicals, noise and heat in w
+s4gq9f	int8	S4GQ9F	Submission of required reports on illnesses/injuries to MELR
+s4gq9g	int8	S4GQ9G	Trainings on safety and health for officers and workers
+s4gq9h	int8	S4GQ9H	Smoke-free workplace
+s4gq9i	int8	S4GQ9I	Periodic/annual medical exam of workers
+s4gq9j	int8	S4GQ9J	Periodic/annual medical exam for workers
+s4gq9k	int8	S4GQ9K	Provision of appropriate personal protective equipment (PPE) such as respirators
+s4gq9l	int8	S4GQ9L	Provision of COVID-19 related PPEs
+s4gq9m	int8	S4GQ9M	HIV and AIDS education in the workplace
+s4gq9n	int8	S4GQ9N	Hepatitis B education in the workplace
+s4gq9o	int8	S4GQ9O	Other (specify)
+s4gq9oo	string		Other (specify)
+s4gq10a	int8	S4GQ10A	Hearing Conservation Program
+s4gq10b	int8	S4GQ10B	Monitoring/Surveillance of Occupational and Work-Related Injuries and Illnesses
+s4gq10c	int8	S4GQ10C	Healthy Lifestyle Program such as smoking cessation
+s4gq10d	int8	S4GQ10D	Regular physical exercise
+s4gq10e	int8	S4GQ10E	Good nutrition and stress management
+s4gq10f	int8	S4GQ10F	Policy on non-discrimination of workers who have/had Pulmonary Tuberculosis (PTB
+s4gq10g	int8	S4GQ10G	Policy on non-discrimination of workers confirmed/suspected/perceived to have HI
+s4gq10h	int8	S4GQ10H	Policy on non-discrimination of migrant workers in particular women
+s4gq10i	int8	S4GQ10I	Policy on non-discrimination of workers confirmed/suspected/perceived to have He
+s4gq10j	int8	S4GQ10J	Anti-Sexual Harassment Program h. HIV and AIDS Prevention and Control Policy
+s4gq10k	int8	S4GQ10K	Program Indoor Air Quality Program
+s4gq10l	int8	S4GQ10L	Fire Prevention and Control Program
+s4gq10m	int8	S4GQ10M	Chemical Safety Program such as provision of Globally Harmonized System (GHS) la
+s4gq10n	int8	S4GQ10N	Other (specify)
+s4gq10no	string		Other (specify)
+s4gq11	string		Which of the following designated health and safety personnel does your employer
+s4gq11o	string		Other specify
+s4gq12a	int8	S4GQ12A	Is your safety officer accredited by the MELR?
+s4gq12b	int8	S4GQ12B	Is your safety officer accredited by the MELR?
+s4gq12c	int8	S4GQ12C	Is your safety officer accredited by the MELR?
+s4gq12d	int8	S4GQ12D	Is your safety officer accredited by the MELR?
+s4gq12e	int8	S4GQ12E	Is your safety officer accredited by the MELR?
+s4gq12f	int8	S4GQ12F	Is your safety officer accredited by the MELR?
+s4gq12g	int8	S4GQ12G	Is your safety officer accredited by the MELR?
+s4gq13a	int8	S4GQ13A	Freedom of association
+s4gq13b	int8	S4GQ13B	Effective recognition of the rights to collective bargaining
+s4gq13c	int8	S4GQ13C	Minimum wage salary
+s4gq13d	int8	S4GQ13D	Elimination of discrimination in respect of employment and occupation
+s4gq13e	int8	S4GQ13E	Other (specify)
+s4gq13eo	string		Other (specify)
+s4gq14	int8	S4GQ14	In your opinion do you think these laws are enforced/implemented by the agencies
+s4aq60x	int8		Who in your household mainly decides on the use of this payment?
+s4bq16_others	string		Other Specify
+s4hq1aa	int8		None
+s4hq1ab	int8		None
+s4aq52ox	string		Other Specify
+s4cq9o	string		Other Specify
+s4dq5o	string		Other Specify
+s4hq11a	string		Which of the following does [NAME] perceive as work?
+s4hq1ac	int8		Learning a trade/Craft (Mechanic/Carpentry/Sewing etc.)
+s4hq1ad	int8		Volunteering service to the community/country without pay
+s4hq1ae	int8		Engaging in own productive activity for some income
+s4hq1af	int8		Helping out your household/family in the house/business
+s4hq11b	string		Anyother suggestion on what work is?
+s4hq2	string		Why do People Work
+s4hq12a	int8		People work for money/income
+s4hq12b	int8		People work for prestige in society
+s4hq12c	int8		People work for social recognition
+s4hq2d	int8		People work for self-esteem
+s4hq2e	int8		People work for fulfilment
+s4hq2f	int8		People work to practice profession
+s4hq2g	int8		People work for opportunity to serve
+s4hq2h	int8		People work to have a place to go everyday
+s4hq2i	int8		People work to contribute to national development
+s4hq2j	int8		People work to meet society/family expectations
+s4hq2k	int8		A man is expected to work
+s4hq2z	int8		People work for other reasons (specified)
+s4hq2o	string		Other specify
+s4hq3	string		What does [NAME] consider the value of work from your perspective - Central to o
+s4hq3a	int8		Value of work is central to one's existence
+s4hq3b	int8		Value of work is income earned
+s4hq3c	int8		Value of work is the fulfilment
+s4hq3d	int8		Value of work is improving societal well-being
+s4hq3e	int8		Value of work is the self-esteem
+s4hq3f	int8		Value of work is an obligation
+s4hq3g	int8		Value of work is making a good living
+s4hq3h	int8		Value of work is ensuring participation in political and economic life
+s4hq3i	int8		Value of work is enjoying respect/acceptance from the community
+s4hq3j	int8		Value of work is a social status
+s4hq3z	int8		Other value of work specified
+s4hq3_other	string		Other Specify
+s4hq13a	int8	S403A	What does [NAME] consider the value of work from your perspective - Central to o
+s4hq13b	int8	S403B	What does [NAME] consider the value of work from your perspective - Income earne
+s4hq13c	int8	S403C	What does [NAME] consider the value of work from your perspective - The fulfilme
+s4hq13d	int8	S403D	What does [NAME] consider the value of work from your perspective - Improving so
+s4hq13e	int8	S403E	What does [NAME] consider the value of work from your perspective - The Self-Est
+s4hq13f	int8	S403F	What does [NAME] consider the value of work from your perspective - It is an obl
+s4hq13g	int8	S403G	What does [NAME] consider the value of work from your perspective  - Making a go
+s4hq13h	int8	S403H	What does [NAME] consider the value of work from your perspective -  - Ensuring
+s4hq13i	int8	S403I	What does [NAME] consider the value of work from your perspective -  Enjoying re
+s4hq13j	int8	S403J	What does [NAME] consider the value of work from your perspective - As a social
+s4hq13z	int8		What does [NAME] consider the value of work from your perspective - Other Specif
+s4hq4	string		In [NAME]?s opinion, which of the following contribute to the socio-economic wel
+s4hq4a	int8		Unpaid training activities
+s4hq4b	int8		Volunteering activities
+s4hq4c	int8		Household care activities
+s4hq5	int8	S405	Indicate how unpaid training activities contribute to the socio-economic well-be
+s4hq6	int8	S406	Indicate how volunteering activities contribute to the socio-economic well-being
+s4hq6o	string		Other specify
+s4hq7	int8	S407	Indicate how household care activities contribute to the socio-economic well-bei
+s4hq7o	string		Other specify
+s4hq8	int8	S408	Which of the following forms of work does [NAME]?s community value most?
+s4hq9	string		What does [NAME] perceive as the value of his/her work in the next five years?
+s4hq9a	int8		Central to one's existence
+s4hq9b	int8		Income earned
+s4hq9c	int8		The fulfilment
+s4hq9d	int8		Improving societal well-being
+s4hq9e	int8		The self-esteem
+s4hq9f	int8		It is an obligation
+s4hq9g	int8		Making a good living
+s4hq9h	int8		Ensuring participation in political and economic life
+s4hq9z	int8		Other perceived value of work
+s4hq9o	string		Other specify
+s4hq10a	string		What does [NAME] think would be the effect of technological innovations and auto
+s4hq10aa	int8		Would have no effect on my job
+s4hq10ab	int8		I can lose my job if I don't upgrade my skills
+s4hq10ac	int8		I would be out of job soon
+s4hq10b	string		Anyother effect, please indicate
+s4hq11a1	int8	S411CA1	Main occupation (code) - Major
+s4hq11a2	int16		Main occupation (code) - Detail (4)
+s4hq11a3	int32		Main occupation (code) - Detail (6)
+s4hq11b1	int8	S411CB1	Main occupation (code) - Major
+s4hq11b2	int16		Main occupation (code) - Detail (4)
+s4hq11b3	int32		Main occupation (code) - Detail (6)
+s4hq11c1	int8	S411CC1	Main occupation (code) - Major
+s4hq11c2	int16		Main occupation (code) - Detail (4)
+s4hq11c3	int32		Main occupation (code) - Detail (6)
+s4hq12a1	int8	S412CA1	Main occupation (code) - Major
+s4hq12a2	int16		Main occupation (code) - Detail (4)
+s4hq12a3	int32		Main occupation (code) - Detail (6)
+s4hq12b1	int8	S412CB1	Main occupation (code) - Major
+s4hq12b2	int16		Main occupation (code) - Detail (4)
+s4hq12b3	int32		Main occupation (code) - Detail (6)
+s4hq12c1	int8	S412CC1	Main occupation (code) - Major
+s4hq12c2	int16		Main occupation (code) - Detail (4)
+s4hq12c3	int32		Main occupation (code) - Detail (6)
+s4hq13d1	int32	S413CA1	Main occupation (code) - Major
+s4hq13d2	int16		Main occupation (code) - Detail (4)
+s4hq13d3	int32		Main occupation (code) - Detail (6)
+s4hq13e1	int8	S413CB1	Main occupation (code) - Major
+s4hq13e2	int16		Main occupation (code) - Detail (4)
+s4hq13e3	int32		Main occupation (code) - Detail (6)
+s4hq13f1	int8	S413CC1	Main occupation (code) - Major
+s4hq13f2	int16		Main occupation (code) - Detail (4)
+s4hq13f3	int32		Main occupation (code) - Detail (6)
+s4pid4h	int8	PID4H	Is name available to respond to the value of work questions
+BMI	float		Body Mass Index of persons in households
+pop_weight	float		Population weight
+hh_weight	float		Household weight
+availreason	int8	AVAILREASON	Why member not available in the household
+s4cq2	int16	y1q1_s4cq2	RECODE of y1q1_tothrs
+worked	int8		None
+wagework	int8		None
+domesticwork	int8		None
+farmwork	int8		None
+nonfarmwork	int8		None
+familyhelpwork	int8		None
+nonproagricwork	int8		None
+apprenticework	int8		None
+employed	int8		None
+nonwagework	int8		None
+ownusework	int8		None
+unpaidwork	int8		None
+voluntwork	int8		None
+otherwork	int8		None
+nowork	int8		None
+unemployed	int8		None
+outsidelabforce	int8		None
+econact	int8	econact	None
+personid	int8		None
+s1aq3	int32		Date of birth
+s1aq3a	int8	S1AQ3A_VS1	Day of birth
+s1aq3b	int8	S1AQ3B_VS1	Month of birth
+s1aq3c	int16		Year of birth
+s2aq10_01	int8		Application form
+s2aq10_03	int8		Admission fee
+s2aq10_04	int8		Registration fee
+s2aq10_05	int8		Sports fee
+s2aq10_06	int8		Medical fees
+s2aq10_07	int8		Uniform (school, Friday wear, career day, cultural)
+s2aq10_08	int8		Cadet uniform
+s2aq10_09	int8		Change over dress
+s2aq10_10	int8		PTA dues
+s2aq10_11	int8		Exercise books
+s2aq10_12	int8		Textbooks
+s2aq10_13	int8		Toileteries/utilities
+s2aq10_14	int8		School supplies
+s2aq10_15	int8		Transportation (in and out)
+s2aq10_16	int8		Food at school
+s2aq10_17	int8		Accommodation at school
+s2aq10_18	int8		Expenses on extra classes organized by school
+s2aq10_19	int8		Expenses on private extra classes organized at home
+s2aq10_20	int8		Printing
+s2aq10_21	int8		Development levy
+s2aq10_23	int8		Teacher's motivation/appreciation fee
+s2aq10_24	int8		In-kind expenses
+s2aq10_25	int8		Our day levy
+s2aq10_26	int8		Other 1 (specify)
+s2aq10_27	int8		Other 2 (specify)
+s2aq10_28	int8		Other 3 (specify)
+s4gq6_001	int8		Adze
+s4gq6_002	int8		Antenna
+s4gq6_003	int8		Anvil
+s4gq6_004	int8		Articulator truck
+s4gq6_005	int8		Axe
+s4gq6_006	int8		Babycourt
+s4gq6_007	int8		Baking sheet
+s4gq6_008	int8		Barbecue grill
+s4gq6_009	int8		Barrel
+s4gq6_010	int8		Belt
+s4gq6_011	int8		Bicycle
+s4gq6_012	int8		Blade
+s4gq6_013	int8		Block-making machine
+s4gq6_014	int8		Block-making machine (local)
+s4gq6_015	int8		Boat
+s4gq6_016	int8		Bolt/Nut
+s4gq6_017	int8		Boot
+s4gq6_018	int8		Bottle
+s4gq6_019	int8		Bowl
+s4gq6_020	int8		Broom
+s4gq6_021	int8		Brush
+s4gq6_023	int8		Bull-dozer
+s4gq6_024	int8		Bus
+s4gq6_025	int8		Cake mixer
+s4gq6_026	int8		Camera
+s4gq6_027	int8		Car/Lorry
+s4gq6_028	int8		Cart
+s4gq6_029	int8		Chalk
+s4gq6_030	int8		Chisel
+s4gq6_031	int8		Clippers
+s4gq6_032	int8		Comb
+s4gq6_033	int8		Computer
+s4gq6_034	int8		Computer accessories
+s4gq6_035	int8		Concrete mixer
+s4gq6_036	int8		Corn mill
+s4gq6_037	int8		Cramp
+s4gq6_038	int8		Crow bar
+s4gq6_039	int8		Curtains
+s4gq6_040	int8		Cushion
+s4gq6_041	int8		Cutlass/Matchet
+s4gq6_042	int8		Cutter
+s4gq6_043	int8		Cuttlary
+s4gq6_044	int8		Dibble stick
+s4gq6_046	int8		Drier/Dryer
+s4gq6_047	int8		Drum
+s4gq6_048	int8		Dusters
+s4gq6_049	int8		Earth chisel
+s4gq6_050	int8		Flour mill
+s4gq6_051	int8		Flour mixer
+s4gq6_053	int8		Foams
+s4gq6_054	int8		Fridges
+s4gq6_055	int8		Funeral bed
+s4gq6_056	int8		Gas Cylinder
+s4gq6_057	int8		Generator
+s4gq6_058	int8		Gloves
+s4gq6_059	int8		Goggle
+s4gq6_060	int8		Go-to-hell
+s4gq6_061	int8		Grinding stone
+s4gq6_062	int8		Grinding stone (machine)
+s4gq6_063	int8		Gun/Riffle/Pistol
+s4gq6_064	int8		Hacksaw  Blade
+s4gq6_065	int8		Hair pins
+s4gq6_066	int8		Hairdryers
+s4gq6_067	int8		Hammer
+s4gq6_068	int8		Hand trowel
+s4gq6_069	int8		Head pan
+s4gq6_070	int8		Hoe
+s4gq6_071	int8		Horn
+s4gq6_072	int8		Ice chest
+s4gq6_073	int8		Iron (box)
+s4gq6_074	int8		Iron (electrical)
+s4gq6_075	int8		Jerk
+s4gq6_076	int8		Kettle
+s4gq6_077	int8		Knife
+s4gq6_078	int8		Ladder
+s4gq6_079	int8		Ladle
+s4gq6_080	int8		Lantern
+s4gq6_081	int8		Leather
+s4gq6_082	int8		Lights
+s4gq6_083	int8		Loom
+s4gq6_085	int8		Mattock
+s4gq6_086	int8		Microwave oven
+s4gq6_087	int8		Mobile phone
+s4gq6_088	int8		Mop
+s4gq6_089	int8		Mortar
+s4gq6_090	int8		Motorbike
+s4gq6_091	int8		Mow hammer
+s4gq6_092	int8		Mower
+s4gq6_093	int8		Musical instruments
+s4gq6_094	int8		Nail cutter
+s4gq6_095	int8		Nail filler
+s4gq6_096	int8		Needle
+s4gq6_097	int8		Net/Net drift
+s4gq6_099	int8		Outboard motor
+s4gq6_100	int8		Oven
+s4gq6_101	int8		Paddle
+s4gq6_102	int8		Paddle (food)
+s4gq6_103	int8		Parachute
+s4gq6_104	int8		Patch
+s4gq6_105	int8		Pedicure machine
+s4gq6_106	int8		Pen/Pencil
+s4gq6_107	int8		Pestle
+s4gq6_108	int8		Pick axe
+s4gq6_109	int8		Pin
+s4gq6_110	int8		Pinches
+s4gq6_111	int8		Plane
+s4gq6_112	int8		Plier
+s4gq6_113	int8		Porters pan
+s4gq6_114	int8		Pot
+s4gq6_115	int8		Potter's  wheel
+s4gq6_116	int8		Pre-mix fuel
+s4gq6_117	int8		Printing screen
+s4gq6_118	int8		Razor
+s4gq6_120	int8		Roler
+s4gq6_121	int8		Ruler
+s4gq6_122	int8		Sail
+s4gq6_123	int8		Saw
+s4gq6_124	int8		Scale
+s4gq6_125	int8		Scissors
+s4gq6_126	int8		Scrappers
+s4gq6_127	int8		Screw/Screw driver
+s4gq6_128	int8		Serving  cups
+s4gq6_129	int8		Serving  plate
+s4gq6_130	int8		Sewing robes
+s4gq6_131	int8		Shaving machine
+s4gq6_132	int8		Shears
+s4gq6_133	int8		Shifting spanner
+s4gq6_134	int8		Shovel
+s4gq6_135	int8		Sickle
+s4gq6_136	int8		Sieve
+s4gq6_137	int8		Spade
+s4gq6_138	int8		Spanner
+s4gq6_139	int8		Spirit level
+s4gq6_140	int8		Spoon
+s4gq6_141	int8		Spraying machine
+s4gq6_142	int8		Screw driver
+s4gq6_143	int8		Steel blade
+s4gq6_144	int8		Stirring stick
+s4gq6_145	int8		Stove (electric)
+s4gq6_147	int8		Syringe
+s4gq6_148	int8		Talisma
+s4gq6_149	int8		Tanker
+s4gq6_150	int8		Tape measure
+s4gq6_151	int8		Tea cup
+s4gq6_152	int8		Telephone
+s4gq6_153	int8		Telescope
+s4gq6_154	int8		Tester
+s4gq6_155	int8		Thermometer
+s4gq6_156	int8		Torch
+s4gq6_157	int8		Towel
+s4gq6_159	int8		Tractor
+s4gq6_160	int8		Train
+s4gq6_161	int8		Trancheon
+s4gq6_162	int8		Trowel
+s4gq6_163	int8		Typewriter
+s4gq6_164	int8		Utensils
+s4gq6_165	int8		Vacuum
+s4gq6_166	int8		Vulcanizing machine
+s4gq6_167	int8		Water hose
+s4gq6_168	int8		Watering can
+s4gq6_169	int8		Weighing scale
+s4gq6_170	int8		Wheelbarrow
+s4gq6_171	int8		Wooden smoother
+s4gq6_172	int8		Other (specify)
+s4gq11a	int8		Trained First-Aider
+s4gq11b	int8		Occupational Health Nurse
+s4gq11c	int8		Occupational Health Physician
+s4gq11d	int8		Dentist
+s4gq11e	int8		Industrial Hygienist
+s4gq11f	int8		Safety Officer
+s4gq11h	int8		None
+s4eq13x	int8	S4EQ13X_VS1	Why did (NAME) refuse the job?
+s4cq1x	int16		During the past 7 days, what were your total hours of work in your economic acti
+s4hq1a	string		Which of the following does [NAME] perceive as work?
+s4hq1b	string		Anyother suggestion on what work is?
+s4hq2a	int8	yesno	For the money/income
+s4hq2b	int8	yesno	Prestige in society
+s4hq2c	int8	yesno	Social recognition
+s4hq2_other	string		Other specify
+s4hq7_other	string		Other specify
+s4hq9_other	string		Other specify
+s411ca3	int32		Main occupation (code) - Detail (6)
+s411cb3	int32		Main occupation (code) - Detail (6)
+s411cc3	int32		Main occupation (code) - Detail (6)
+s412ca3	int32		Main occupation (code) - Detail (6)
+s412cb3	int32		Main occupation (code) - Detail (6)
+s412cc3	int32		Main occupation (code) - Detail (6)
+s413ca3	int32		Main occupation (code) - Detail (6)
+s413cb3	int32		Main occupation (code) - Detail (6)
+s413cc3	int32		Main occupation (code) - Detail (6)
+s410x	int8	S410X_VS1	What does [NAME] think would be the effect of technological innovations and auto
+s410xo	string		What does [NAME] think would be the effect of technological innovations and auto
+s4gq6_022	int8		Buffet Stand/Warmers
+s4gq6_052	int8		Flower
+s4gq6_084	int8		Machine writer
+s4gq6_146	int8		Stove (kerosene)
+s4gq11g	int8		Other (specify)
+s4gq11o_other	string		Other specify
+s4gq6_158	int8		Toys
+s4gq6_045	int8		None
+s4gq6_098	int8		None
+s4cq5	int8		None
+region	int8	reg	region
+urbrur	int8	loc2	Locality classification (2 categories)
+regdist	int16	distcode	None

@@ -1,0 +1,13 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "pid": 3988011,
+  "started_epoch_approx": 1792043938.240854,
+  "clock_ticks_per_second": 100,
+  "command": "bench/feature_audit/scan.py --features all --phases 1,2 --jobs 1 --include-no-microdata",
+  "cpu_affinity": "0-7",
+  "blas_threads": 1,
+  "lsms_build_workers": 1,
+  "data_root": "/local/job39919092/release-work/runtime/data-feature-audit",
+  "original_data_root_preserved": "/local/job39919092/release-work/runtime/data-corpus",
+  "timeout_note": "jobs=1 path runs sequentially; printed build_timeout=600s is not enforced by that path."
+}

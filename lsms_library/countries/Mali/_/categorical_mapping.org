@@ -19,6 +19,20 @@
 # 2018-19 / 2021-22 waves).  `Code` is the raw source label (Mali records
 # foods/units as strings, not numeric codes), so it IS the cross-wave join
 # key; the per-wave columns mark which EHCVM/EACI wave emits each raw label
+# GH #832, 2026-09-18: the EACI 2014-15 code `Boîte` used to carry its own
+# Preferred Label `Boîte`, so one box shipped under two labels -- 5,682 rows
+# in 2014-15 spelled `Boîte` and 13,658 rows in 2018-19 / 2021-22 spelled
+# `Boite` -- and a cross-wave unit panel split silently.  It now folds onto
+# `Boite`, the label already curated for the three EHCVM codes below (`boite`,
+# `Boite de tomate`, `Boite de lait concentré`).  Evidence that these are one
+# unit, not two: the two instruments' unit LISTS are otherwise folded across
+# exactly this accent/case boundary already -- `unité`/`Unité`, `verre`/`Verre`,
+# `kg`/`Kg`, `litre`/`Litre`, `sachet industriel`/`Sachet` -- and both raw
+# vocabularies are the generic French container word.  `Boîte` was the one pair
+# the curation missed.  NOT an encoding artefact: the accented form is
+# well-formed UTF-8 in EACIALI_p1.dta's own value labels (s13q03b/04b/05b), so
+# this is a spelling fold, not a mojibake repair (cf. GH #926).  The relabel
+# cannot collide: the two spellings are disjoint in `t`.
 # (x = present, --- = absent).  food_acquired waves: 2014-15 (EACI s13),
 # 2018-19 and 2021-22 (EHCVM s07b).  2017-18 has no food_acquired module.
 
@@ -66,7 +80,7 @@
 | unité                        | Unité           | ---     | x       | x       |
 | verre                        | Verre           | ---     | x       | x       |
 | Autre                        | Autre           | x       | ---     | ---     |
-| Boîte                        | Boîte           | x       | ---     | ---     |
+| Boîte                        | Boite           | x       | ---     | ---     |
 | Centilitre                   | Centilitre      | x       | ---     | ---     |
 | Gramme                       | Gramme          | x       | ---     | ---     |
 | Kg                           | Kg              | x       | ---     | ---     |

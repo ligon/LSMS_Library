@@ -1,0 +1,81 @@
+{
+  "Liberia": {
+    "raw_rebuild_row_order_matches_original": true,
+    "index_key_sets_exact": true,
+    "sorted_index_values_names_and_dtypes_exact_before_reindex": true,
+    "row_order_aligned_for_reconstruction_only": true,
+    "aligned_cold_fingerprint": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+    "recorded_cold_fingerprint": "12468dab89868f7c9790ab1a0fdc67d87a66d8ac2602b6e5071c17818179d7b3",
+    "aligned_cold_matches_recorded": true,
+    "warm_frame_exact_after_alignment": true,
+    "other_columns_exact": true,
+    "null_mask_exact": true,
+    "wave_details": {
+      "2018-19": {
+        "rows": 2787,
+        "nonnull": 2787,
+        "cold_non_null_types": {
+          "Timestamp": 2787
+        },
+        "warm_non_null_types": {
+          "Timestamp": 2787
+        }
+      }
+    },
+    "timestamp_values_exact_at_ns": true
+  },
+  "Mali": {
+    "raw_rebuild_row_order_matches_original": false,
+    "index_key_sets_exact": true,
+    "sorted_index_values_names_and_dtypes_exact_before_reindex": true,
+    "row_order_aligned_for_reconstruction_only": true,
+    "aligned_cold_fingerprint": "d7ff366add23225bbdd3fbec487ac91afb19128a692ac464ca675bef3f183da9",
+    "recorded_cold_fingerprint": "d7ff366add23225bbdd3fbec487ac91afb19128a692ac464ca675bef3f183da9",
+    "aligned_cold_matches_recorded": true,
+    "warm_frame_exact_after_alignment": true,
+    "other_columns_exact": true,
+    "null_mask_exact": true,
+    "wave_details": {
+      "2014-15": {
+        "rows": 37175,
+        "nonnull": 36825,
+        "cold_non_null_types": {
+          "str": 36825
+        },
+        "warm_non_null_types": {
+          "str": 36825
+        }
+      },
+      "2017-18": {
+        "rows": 94071,
+        "nonnull": 94070,
+        "cold_non_null_types": {
+          "float": 94070
+        },
+        "warm_non_null_types": {
+          "str": 94070
+        }
+      },
+      "2018-19": {
+        "rows": 46014,
+        "nonnull": 46014,
+        "cold_non_null_types": {
+          "int": 46014
+        },
+        "warm_non_null_types": {
+          "str": 46014
+        }
+      },
+      "2021-22": {
+        "rows": 43472,
+        "nonnull": 0,
+        "cold_non_null_types": {},
+        "warm_non_null_types": {}
+      }
+    },
+    "numeric_month_values_exact": true,
+    "numeric_months_sum": 2085227.0,
+    "nonserialization_value_mismatches": 0,
+    "exact_writer_cast_reproduces_full_warm_frame": true
+  }
+}

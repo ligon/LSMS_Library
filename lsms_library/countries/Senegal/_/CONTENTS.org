@@ -14,6 +14,30 @@ Brief table of contents and todo list.
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
 
+* cluster_features -- =Region= case-normalised (GH #811, 2026-09-24)
+
+=cluster_features.Region= (=s00q01=) is served in 14 labels for 14
+regions, identical across 2018-19 and 2021-22: thirteen lower-case
+(=dakar=, =thies=, =sedhiou=, ...) beside one title-case =Saint-Louis=,
+the latter only because both waves' =data_info.yml= carry an inline
+=SAINT-LOUIS -> Saint-Louis= mapping.  No within-Senegal join was ever
+broken -- unlike Guinea-Bissau, where =Region= and =strata= disagreed.
+A =#+name: Region= table in =_/categorical_mapping.org= now title-cases
+the raw labels (no accents added: =Thies=, =Kedougou=, =Sedhiou= -- the
+source has none, and adding them would be a judgement beyond case), so a
+cross-country =Feature('cluster_features')= filter on a title-case name
+matches Senegal as it does the other EHCVM countries.  Cosmetic.
+
+Senegal's =sample= carries NO =strata= column (its two-file merge is
+cover page + weights), so the Guinea-Bissau "Region == strata" check has
+no analogue here.  The inline =SAINT-LOUIS= mapping is left in place.
+
+Served, read path: 14 -> 14 labels, 1,194 rows, per-wave counts
+unchanged.  Cache: =_/categorical_mapping.org= is a build input, so the
+edit moves every Senegal cache hash (two waves, seven script-path
+tables).  Not paid in the fixing branch; verified with
+=assume_cache_fresh=True=.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
@@ -41,16 +65,19 @@ value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
 =Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
 reads the file through pandas =StataReader=, which decodes every pre-118
 file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
-served =Frere, S<U+009C>Ur= (2,749 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
+served =Frère, S<U+009C>Ur= (2,749 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
 =encoding='cp1252'=, reads the same file correctly -- the defect is the
 reader's Latin-1 fallback, not the file (bytes and decoder matrix in
 =slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
 
 Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
 as cp1252, and =_fix_relationship= re-title-cases the result; the =household_roster= hook applies it to =Relationship=
-only.  Served label is now =Frere, Soeur= with the ligature restored,
+only.  Served label is now =Frère, Sœur= with the ligature restored,
 the label the 2021-22 wave and Niger 2018-19 serve; kinship tuple [0, 1, consanguineal] unchanged; 2,749 rows changed,
-nothing else.  The C1-control spellings were deleted from
+nothing else.  Spelling corrected in this paragraph on 2026-10-14: the
+previous =Frere, Soeur= omitted both the accent and ligature despite the
+raw-byte evidence above. That unused ASCII kinship key is removed by GH #974;
+the delivered accented label is unchanged. The C1-control spellings were deleted from
 =lsms_library/categorical_mapping/kinship.yml= at the same time, so that
 file no longer carries the artefact and a regression would surface as an
 =Unknown relationship labels= warning instead of resolving silently.
@@ -641,3 +668,47 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-09-18 -- =Relationship= served a missing answer as the string 'Nan' (GH #813)
+
+Both waves' =_/mapping.py= guarded the =s01q02= formatter with =if value:=,
+and a float =nan= is *TRUTHY* -- so every unanswered relationship went through
+=str(nan).title()= and was served as the literal label =Nan=.  Not a survey
+vocabulary item: the string is the pipeline's, not the instrument's.
+
+*Rows*: 15,201 of 78,732 in 2021-22, 3 of 66,119 in 2018-19 -- exactly the rows
+whose =s01q02= is null in =s01_me_sen2021.dta= / =s01_me_sen2018.dta=.
+
+*What the 15,201 are, and why it matters.*  2021-22 is a panel wave, and Survey
+Solutions pre-populates the Section-1 roster grid from the 2018-19 enumeration.
+On all 15,201 rows =s01qpreload_relation= is populated (15,200 of 15,201) while
+every LIVE Section-1 column is null: =s01q01= (sex), =s01q03a= (DOB year),
+=s01q04a= (age), =s01q00=, =s01q12=.  They are CAPI ghost rows -- people the
+preload offered and the interviewer did not enrol.  The wave's own
+=household_roster= hook already says so and already drops them:
+
+: # Drop CAPI preload ghost rows: Survey Solutions pre-populates a fixed
+: # roster grid from a prior enumeration round (s01qpreload_* columns).
+: df = df.dropna(subset=['Sex', 'Age', 'Relationship'], how='all')
+
+*that filter could never fire*, because =Relationship= was guaranteed to be a
+non-null string.  With the =pd.isna= guard in place it fires, and the wave
+parquet holds 63,531 rows for 2021-22 instead of 78,732.
+
+*Served data did not move.*  =_expand_kinship='s =_NA_SENTINELS= (commit
+0d35af6ed, April 2026) already mapped ='Nan'= to NA, and =_finalize_result='s
+=dropna(how='all')= already removed the ghost rows downstream, so
+=Country('Senegal').household_roster()= is row-for-row and label-for-label
+identical before and after (129,650 rows; 66,119 + 63,531; same
+=(Generation, Distance, Affinity)= counts).  What the fix buys is that the
+defect is gone from the cache and the country no longer leans on a framework
+sentinel list to undo its own bug.
+
+*Do not confuse this with the encoding work.*  The =.title()= call is untouched
+for non-null values -- the GH #801 =_fix_relationship= repair depends on that
+spelling -- and nothing here goes near the mojibake-keyed =u= / =j= crosswalks
+warned about above.
+
+*Latent elsewhere*: =Niger/2018-19/_/mapping.py= carries the identical
+=if value:= formatter.  Niger's =s01q02= has no nulls, so it emits no ='Nan'=
+today; left alone deliberately, so the GH #813 fix stays provably targeted.

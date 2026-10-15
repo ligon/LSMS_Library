@@ -10,11 +10,12 @@ carries its own 6c condition column drawing on the same 20-code scheme as
 the 2009-16 long-form waves.  That condition is now an index level
 (GH #323/#637).
 
-KNOWN GAP: season B's agsec5b.dta also carries a slot _2
-(s5bq06a_2 / s5bq06b_2 / s5bq06c_2, labelled "(2019, condition2)", 1 306
-non-null conditions) which CROP_COLMAPS does not read, so those harvest
-records are absent from the table entirely.  Adding them ADDS mass and so
-is deliberately left to a separate change; see Uganda/_/CONTENTS.org.
+Season B's agsec5b.dta carries the same slot _2 (s5bq06a_2 / s5bq06b_2 /
+s5bq06c_2, labelled "(2019, condition2)", 1 307 harvest records) and it is
+read too, since GH #848: +1 303 season-B rows (4 slot-2 records share
+(plot, crop, unit, condition) with slot 1 and are summed by the
+de-duplication block).  No kg_factor is wired on either 2019-20 slot; this
+wave's q6d is #849's scope.  See Uganda/_/CONTENTS.org.
 
 Crop module lives under Data/Agric/.  See uganda.CROP_COLMAPS['2019-20'].
 
@@ -23,13 +24,14 @@ agsec4b for season B -- one roster per season, never borrowed across them
 (GH #872).
 
 The SOLD unit (s5?q07c_1/_2) and SOLD condition (s5?q07b_1/_2) are carried
-as Unit_sold / Condition_sold (GH #824), one pair per wired slot.  Season A's
-_11 / _21 'part harvest' slots are NOT read, on the sold side or the harvest
-side, so the two stay consistent.
+as Unit_sold / Condition_sold (GH #824), one pair per wired slot -- four
+slots now, two per season.  Season A's _11 / _21 'part harvest' slots are
+NOT read, on the sold side or the harvest side, so the two stay consistent.
 """
 import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.country import grain_reports
 from uganda import crop_production_for_wave, CROP_COLMAPS
 
 t = '2019-20'
@@ -48,4 +50,8 @@ df4b = _try('../Data/Agric/agsec4b.dta')
 df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
 assert len(df) > 0, "crop_production produced no rows for 2019-20"
 assert df.index.is_unique, "Non-unique crop_production index for 2019-20"
-to_parquet(df, 'crop_production.parquet')
+# GH #868: the de-dup's reduce_to_agreed(on_conflict='na') files a grain
+# report in THIS process; stamp it into the wave parquet so the framework
+# can replay it warm (it cannot re-detect it from the de-duplicated frame).
+to_parquet(df, 'crop_production.parquet',
+           grain_audit=grain_reports('Uganda', 'crop_production'))

@@ -85,7 +85,7 @@ def check_configured(country_dir: Path, wave: str) -> bool:
     if not data_info.exists():
         return False
     try:
-        with open(data_info) as f:
+        with open(data_info, encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
     except (yaml.YAMLError, OSError) as exc:
         logger.warning("Could not read %s: %s", data_info, exc)
@@ -102,7 +102,7 @@ def read_source_url(country_dir: Path, wave: str) -> str | None:
     if not source.exists():
         return None
     try:
-        text = source.read_text()
+        text = source.read_text(encoding="utf-8")
     except OSError as exc:
         logger.warning("Could not read %s: %s", source, exc)
         return None
@@ -128,7 +128,7 @@ def guess_idxvar(country_dir: Path, wave: str) -> dict:
     if not data_info.exists():
         return {"v": "grappe"}
     try:
-        with open(data_info) as f:
+        with open(data_info, encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
     except (yaml.YAMLError, OSError) as exc:
         logger.warning("Could not read %s: %s", data_info, exc)
@@ -246,7 +246,7 @@ def cmd_audit(args: argparse.Namespace) -> None:
             if not di.exists():
                 continue
             try:
-                with open(di) as f:
+                with open(di, encoding="utf-8") as f:
                     cfg = yaml.safe_load(f) or {}
             except (yaml.YAMLError, OSError) as exc:
                 logger.warning("Could not read %s: %s", di, exc)
@@ -415,7 +415,7 @@ def _find_missing_geo_waves() -> list[tuple[str, str, Path]]:
             if not di.exists():
                 continue
             try:
-                with open(di) as f:
+                with open(di, encoding="utf-8") as f:
                     cfg = yaml.safe_load(f) or {}
             except (yaml.YAMLError, OSError) as exc:
                 logger.warning("Could not read %s: %s", di, exc)

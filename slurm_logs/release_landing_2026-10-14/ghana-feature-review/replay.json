@@ -1,0 +1,105 @@
+{
+  "input_source": "Frozen corpus pre-finalize country food/sample parquets; native (t,i) v join",
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "country_rows": 5340606,
+  "feature_rows": 1704880,
+  "null_key_rows": 13472,
+  "null_rows_by_level": {
+    "v": 92,
+    "u": 13380
+  },
+  "legitimate_nonnull_visit_row_reduction": 3622254,
+  "lost_by_wave": {
+    "1987-88": {
+      "rows": 54,
+      "checksums": {
+        "Quantity": 8370.0,
+        "Expenditure": 8370.0
+      },
+      "source_counts": {
+        "purchased": 54
+      }
+    },
+    "1988-89": {
+      "rows": 38,
+      "checksums": {
+        "Quantity": 5182.017543859649,
+        "Expenditure": 5182.017543859649
+      },
+      "source_counts": {
+        "purchased": 31,
+        "produced": 7
+      }
+    },
+    "2016-17": {
+      "rows": 13380,
+      "checksums": {
+        "Quantity": 3379.8,
+        "Expenditure": 6720.55
+      },
+      "source_counts": {
+        "produced": 12958,
+        "purchased": 422
+      }
+    }
+  },
+  "checksums_not_physical_or_comparable_economic_totals": true,
+  "fsum_reconciliation": {
+    "Quantity": {
+      "before_fsum": 15658040288.258314,
+      "nonnull_input_fsum": 15658023356.44077,
+      "lost_input_fsum": 16931.817543859648,
+      "after_fsum": 15658023356.44077,
+      "before_minus_after": 16931.817544937134,
+      "nonnull_minus_after": 0.0,
+      "difference_minus_lost": 1.0774856491480023e-06,
+      "all_terms_residual_fsum": 9.529356470583394e-14
+    },
+    "Expenditure": {
+      "before_fsum": 19059899600.908863,
+      "nonnull_input_fsum": 19059879328.341316,
+      "lost_input_fsum": 20272.567543859648,
+      "after_fsum": 19059879328.341316,
+      "before_minus_after": 20272.567546844482,
+      "nonnull_minus_after": 0.0,
+      "difference_minus_lost": 2.9848342819605023e-06,
+      "all_terms_residual_fsum": 1.4628553056394988e-10
+    }
+  },
+  "source_identity": {
+    "v0.14.0": {
+      "commit": "1528fa937bcf87f146b3af9ebfdbe18b8f912750",
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "most_complete_row_sha256": "4411e22b9f411b964c5a9f5285e350939ae4acce48f52d57cbf2404bd8ca1098",
+      "_normalize_dataframe_index_sha256": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+      "union_keys_by_group_sha256": "7b196ac43c91a0b52b0c437f5ad6e9ac7e8bc6e52c5945c7cb7f795fcd6d2ea6"
+    },
+    "452302adcfdbf3af538ef06375df1ac6c5aaa8a0": {
+      "commit": "452302adcfdbf3af538ef06375df1ac6c5aaa8a0",
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "most_complete_row_sha256": "4411e22b9f411b964c5a9f5285e350939ae4acce48f52d57cbf2404bd8ca1098",
+      "_normalize_dataframe_index_sha256": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+      "union_keys_by_group_sha256": "7b196ac43c91a0b52b0c437f5ad6e9ac7e8bc6e52c5945c7cb7f795fcd6d2ea6"
+    },
+    "7fa05179c8519f44ea329ba6387f5d6d6441a8ea": {
+      "commit": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+      "feature_blob": "acb72acd21d4538dc569c685ae47ded53e209563",
+      "most_complete_row_sha256": "4411e22b9f411b964c5a9f5285e350939ae4acce48f52d57cbf2404bd8ca1098",
+      "_normalize_dataframe_index_sha256": "2bf5423816c82d3099264e93da1618879ffefd09265aa817afd83d48f883b3ff",
+      "union_keys_by_group_sha256": "7b196ac43c91a0b52b0c437f5ad6e9ac7e8bc6e52c5945c7cb7f795fcd6d2ea6"
+    }
+  },
+  "pandas_version": "3.0.6",
+  "warning_counts": {
+    "GrainCollapseWarning": 1
+  },
+  "read_parquets_size_mtime_unchanged": true,
+  "private_root_has_no_files": true,
+  "seconds": 31.13875825982541,
+  "limits": [
+    "No historical Country input rebuild",
+    "No Country/Feature API calls",
+    "Replays assembly on current raw values with v joined from same native sample cache; currency omitted because determined by t, already a grouping key",
+    "No recommended sentinel or groupby policy change"
+  ]
+}

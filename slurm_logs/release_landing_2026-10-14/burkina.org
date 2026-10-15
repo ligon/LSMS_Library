@@ -1,0 +1,45 @@
+#+title: Burkina Faso money-only quantity and encoding repair (#981)
+
+* Final PR title
+Burkina Faso: preserve missing food quantities and repair label crosswalk parsing
+
+* Review follow-up
+Merged development 452302adc; the Region crosswalk remains intact.
+Correct the earlier count shorthand: passage 1 had 44,125 served zeros;
+43,906 were manufactured from missing qachat and become NA; 219 existing
+Produced >= Quantity clips remain zero. All 405,127 purchased passage-2/3/4
+rows become NA because those files record expenditure without a quantity grid.
+The idiosyncrasy is four separate 7-day recalls under one wave, with visit
+retained. The org crosswalk's literal NEL key must remain on one physical line.
+The money_only diagnostic docstring now names its limitation: a mis-bound
+quantity column can also satisfy the all-null group test. Site B independently
+checks a whole wave; other populated sources can prevent it detecting a
+purchased-only mistake. The bucket does not prove questionnaire coverage.
+
+* Draft residual reconciliation
+#864: quantity-null restoration is done; retain questionnaire adjudication of
+passage-1 item-specific missingness, whether qachat is purchased or total
+quantity (219 clipped zeros), and unread p2-p4 autocons VALUE (23,528 / 24,934 /
+37,029 positive raw rows). No rows or money are added for the latter here.
+#794: Burkina crosswalk parsing/labels fixed; existing issue is already narrowed
+to Mali and the strategy-B migration decision. Keep those open. Old unused
+2014 and EHCVM scripts are a separate cleanup, not live source readers.
+
+* Cache scope
+Original branch invalidates every Burkina_Faso table, no other country;
+transformations change is read-path only. This docstring is excluded from
+build fingerprints. No shared cache cleared or warmed. Private cold baseline
+and branch frames are compared before claiming conservation.
+
+* Fresh cold validation
+Current development 452302adc and candidate each rebuilt food_acquired
+from empty private L2. Both have 765,816 rows and the identical index after
+the four documented label replacements. Every non-Quantity column is exactly
+equal row-by-row. Exactly 449,033 quantities change, all zero -> NA; no
+other quantity changes. 2014 expenditure remains 342,110,515 and quantity
+sum remains 4,208,737.600000024. Passage counts reproduce the table above.
+Aggregate evidence: [[file:burkina-cold-comparison.json][cold comparison]].
+Passage, encoding/crosswalk and price-loss tests: 34 passed, no skips,
+28.92 s (-n 6 --dist=loadfile, pinned threads). Other Burkina tables were
+independently proven equal in the original full verdict; not rebuilt again
+for this documentation-only follow-up. No in-tree parquet.

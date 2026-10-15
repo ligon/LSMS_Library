@@ -1,0 +1,22 @@
+{
+  "run_id": 38697245468,
+  "source": "9d5bf200f170f322076626386689b498bebb1c06",
+  "url": "https://github.com/ligon/LSMS_Library/actions/runs/38697245468",
+  "conclusion": "failure",
+  "pytest_seconds": 3140.09,
+  "counts": {
+    "passed": 4919,
+    "skipped": 2768,
+    "xfailed": 4,
+    "xpassed": 1,
+    "failed": 3,
+    "warnings": 1004
+  },
+  "failures": [
+    "tests/test_table_structure.py::TestTableStructure::test_no_duplicate_rows[Uganda/assets]",
+    "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Uganda/assets]",
+    "tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]"
+  ],
+  "log_bytes": 461456,
+  "log_sha256": "e1895513df52c2c99b7c2cf8b0840b60890f04a469fe6f6afd64992627fe621e"
+}

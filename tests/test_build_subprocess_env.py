@@ -117,21 +117,27 @@ def test_countries_root_alone_would_NOT_have_worked(tmp_path):
     )
 
 
-@pytest.mark.parametrize("qualname", ["Wave.grab_data", "Country._aggregate_wave_data"])
+@pytest.mark.parametrize(
+    "qualname", ["_build_wave_script_target", "Country._aggregate_wave_data"]
+)
 def test_shell_out_sites_do_not_build_their_own_env(qualname):
     """Static guard: neither site may hand-roll an environment again.
 
     ``run_make_target``/``build_env`` are nested functions inside
     ``Country._aggregate_wave_data``, so that is the enclosing source to read.
+    The wave-level site moved out of ``Wave.grab_data`` into the module-level
+    ``_build_wave_script_target`` (GH #968); ``grab_data`` must delegate to it
+    (``test_grab_data_delegates_its_shell_out``).
 
     This is the drift the helper exists to prevent -- two sites, two different
     ideas of what a child needs, no test that compared them.
     """
     from lsms_library import country as country_mod
 
-    cls_name, meth_name = qualname.split(".")
-    cls = getattr(country_mod, cls_name)
-    src = inspect.getsource(getattr(cls, meth_name))
+    obj = country_mod
+    for part in qualname.split("."):
+        obj = getattr(obj, part)
+    src = inspect.getsource(obj)
     assert "os.environ.copy()" not in src, (
         f"{qualname} constructs its own subprocess environment again. Build it "
         f"with country._script_subprocess_env() so both shell-out sites cannot "
@@ -140,3 +146,122 @@ def test_shell_out_sites_do_not_build_their_own_env(qualname):
     assert "_script_subprocess_env" in src, (
         f"{qualname} no longer routes through _script_subprocess_env()"
     )
+
+
+def test_grab_data_delegates_its_shell_out():
+    """``Wave.grab_data`` builds wave scripts only through the guarded helper.
+
+    Without this, the parametrized guard above could pass while ``grab_data``
+    grew a second, unguarded ``subprocess`` call of its own.
+    """
+    from lsms_library.country import Wave
+
+    src = inspect.getsource(Wave.grab_data)
+    assert "_build_wave_script_target(" in src, (
+        "Wave.grab_data no longer delegates to _build_wave_script_target()"
+    )
+    assert "subprocess.run" not in src and "os.environ.copy()" not in src, (
+        "Wave.grab_data shells out directly again; route it through "
+        "_build_wave_script_target() so it gets _script_subprocess_env()"
+    )
+
+
+def test_pythonsafepath_is_stripped_from_the_child(monkeypatch):
+    """A build subprocess must NOT inherit PYTHONSAFEPATH.
+
+    Safe-path mode removes the script's own directory from ``sys.path``.  338
+    wave/country scripts under ``countries/`` import a sibling module by bare
+    name (``from ethiopia import Waves``), and that spelling resolves ONLY
+    through the script-dir entry -- so with it set, every script-path build
+    dies with ``ModuleNotFoundError: No module named 'ethiopia'``.
+
+    The controllers that spawn these children set it deliberately
+    (``bin/coverage_lib.sh``, ``bin/coverage_reseed_shard.sbatch``): it is what
+    makes ``PYTHONPATH`` authoritative for *them*, because ``python -c`` and
+    ``python -m`` otherwise put cwd at ``sys.path[0]`` and those jobs run with
+    cwd = the shared mirror, itself a checkout.  Right for a controller, wrong
+    for a build subprocess -- and this function is the boundary between them.
+
+    It would have failed SILENTLY: ``coverage_matrix`` grades any build
+    exception as a ``broken`` cell, so the job exits 0 and publishes a snapshot
+    in which every script-path cell has flipped to broken.
+    """
+    monkeypatch.setenv("PYTHONSAFEPATH", "1")
+    env = _script_subprocess_env()
+    assert "PYTHONSAFEPATH" not in env, (
+        "PYTHONSAFEPATH leaked into the build-subprocess environment; sibling "
+        "imports in countries/*/_/*.py resolve only via the script-dir entry "
+        "that it removes"
+    )
+    # and the child's import identity is still pinned without it
+    assert env["PYTHONPATH"].split(os.pathsep)[0] == str(_PACKAGE_PARENT)
+
+
+# -- GH #970: inspect every shell-out CALL, not the enclosing function -------
+
+_SUBPROCESS_CALLS = {"run", "Popen", "check_output", "check_call", "call"}
+
+
+def _subprocess_calls_without_env(source: str):
+    """Yield ``(lineno, spelling)`` for every ``subprocess.<call>(...)`` in
+    ``source`` that passes no ``env=`` keyword.
+
+    An ``ast`` walk over the whole module, so a call nested three functions
+    deep inside ``Country._aggregate_wave_data`` is inspected on its own
+    merits.  The previous guard only read the *enclosing* method's text for
+    the helper's name, and ``build_env`` in the same method satisfied it while
+    the nested ``load_json_cache`` shelled out to ``make`` with the parent's
+    environment (GH #970).
+    """
+    import ast
+
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        fn = node.func
+        spelled = None
+        if (isinstance(fn, ast.Attribute) and isinstance(fn.value, ast.Name)
+                and fn.value.id == "subprocess" and fn.attr in _SUBPROCESS_CALLS):
+            spelled = f"subprocess.{fn.attr}"
+        elif isinstance(fn, ast.Name) and fn.id in _SUBPROCESS_CALLS:
+            spelled = fn.id
+        if spelled is None:
+            continue
+        if not any(kw.arg == "env" for kw in node.keywords):
+            yield node.lineno, spelled
+
+
+def test_every_subprocess_call_in_country_py_passes_env():
+    """Every ``subprocess.*`` call in ``country.py`` must pass ``env=``.
+
+    This is the guard GH #970 asked for.  It failed on the pre-fix code at
+    the ``make <method>.json`` call inside ``load_json_cache`` (then
+    ``country.py:4365``), which the function-level guard above let through.
+    """
+    from lsms_library import country as country_mod
+
+    source = Path(country_mod.__file__).read_text()
+    offenders = list(_subprocess_calls_without_env(source))
+    assert not offenders, (
+        "subprocess calls in country.py without an env= keyword: "
+        + ", ".join(f"{s} at line {ln}" for ln, s in offenders)
+        + ". Build the child's environment with _script_subprocess_env() -- "
+        "a child given the parent's environment can import a different "
+        "checkout and write its parquet in-tree (GH #803, #970)."
+    )
+
+
+def test_the_ast_guard_sees_a_nested_call_the_text_guard_missed():
+    """The AST walker must flag a bare ``subprocess.run`` even when the
+    enclosing function mentions the helper -- the exact shape of #970."""
+    src = (
+        "import subprocess\n"
+        "def outer():\n"
+        "    def build_env():\n"
+        "        return _script_subprocess_env()\n"
+        "    def inner():\n"
+        "        subprocess.run(['make'], check=True)\n"
+        "    subprocess.run(['make'], check=True, env=build_env())\n"
+    )
+    assert list(_subprocess_calls_without_env(src)) == [(6, "subprocess.run")]

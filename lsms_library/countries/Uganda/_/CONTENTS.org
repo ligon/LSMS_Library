@@ -793,22 +793,13 @@ here is not the full UNPS series.
 
 * Unit handling for =food_acquired=
 
-The =u= (unit) index level on =food_acquired= is canonical at
-parquet-write time via =harmonized_unit_labels()= in
-=lsms_library/countries/Uganda/_/uganda.py=.  It reads the =#+name: u=
-table in =_/categorical_mapping.org= via =get_categorical_mapping=
-(Tier 1 convention shared with Malawi, Mali, Nigeria, Senegal, Burkina
-Faso) and returns a =Code -> Preferred Label= dict where the canonical
-labels (=Kg=, =Gram=, =Litre=, =Akendo (Small)=, =Sack (120 kgs)=,
-...) are already in human-readable form.  =food_acquired()= renames
-the =u= index level through this map, so by the time the wave parquet
-is written the =u= index carries clean labels.
+The =u= (unit) index level on =food_acquired= is decoded at parquet-write time via =harmonized_unit_labels()= in =lsms_library/countries/Uganda/_/uganda.py=.
+It reads the =#+name: u= table in =_/categorical_mapping.org= via =get_categorical_mapping= (Tier 1 convention shared with Malawi, Mali, Nigeria, Senegal, Burkina Faso) and returns a =Code -> Preferred Label= dict.
+The preferred labels include native units (=Kg=, =Gram=, =Litre=, =Akendo (Small)=, =Sack (120 kgs)=, ...), the missing-unit sentinel =Unknown=, and the explicitly accepted code residuals below.
+=food_acquired()= renames the =u= index through this map; source-specific missing-unit handling then distinguishes =Unknown= from =Value= before the canonical parquet is written.
 
-The =u= table also retains the per-wave variant columns (=2005-06=,
-=2009-10=, ..., =2019-20=) that document the raw label appearing in
-each wave's questionnaire.  These extra columns are unused at runtime
-but preserve the cross-wave provenance previously captured in the
-retired =_/unitlabels.py= file.
+The =u= table also retains the per-wave variant columns (=2005-06=, =2009-10=, ..., =2019-20=) that document the raw unit labels in each wave's Stata metadata.
+These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
 
 The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
@@ -838,6 +829,74 @@ with it.  The framework must NOT read it at runtime: a stored
 inferred factor is the anti-pattern GH #850 exists to remove.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
+
+** Recorded labels and accepted residuals (GH #962, 2026-09-25)
+
+The 143 previously blank Preferred Labels were not all missing units.
+Of these, 134 have source strings, all in the 2011-12 food module's Stata unit metadata; every string matches its recorded org-table column exactly, and the other seven wave codebooks omit these codes rather than corroborating them.
+Of the 134 strings, 131 name a measurement unit or size; the other three name only an item: =153001= (Other alcoholic drinks), =154001= (Other drinks), and =160001= (Other Juice).
+The earlier description of all 134 as physical units was therefore too broad.
+The catalog promotes the 131 measurement labels, reusing 111 existing canonical equivalents and retaining the recorded sizes and named forms of the other 20; all source-wave columns are unchanged.
+
+Only one promoted code occurs in the eight raw food modules: =123060=, =Cut piece(above 2kg)-Big=, on one 2015-16 purchased dry/smoked-fish row (quantity 4, expenditure 8,000).
+It now uses the existing preferred label =Fish Cut piece(Above 2  kg)=.
+The existing metric parser reads this lower-bound label as 2 kg per piece, hence 8 kg for this row; the legacy curated factor is 3 kg, and =tests/test_food_kg_inference.py= explicitly records that disagreement.
+This changes the decoded label, not the parser's range-endpoint policy or the reported quantity.
+The half- and quarter-packet labels require the fraction parser fixed in GH #963.
+
+Eight recorded codes have no unit label in any wave: =136=, =156087=, =139093=, =142092=, =156096=, =156090=, =181087=, and =142090=.
+They remain distinct numeric-string residuals, as do the three item-only codes above; none is replaced with an invented unit or the shared =Unknown= sentinel.
+The eight occur on 24 raw food rows; the three item-only codes occur on none.
+These are accepted code residuals under the food-unit skill, not a claim that their physical meaning is known or that the kg inference excludes them.
+Code =0= occurs on two raw rows and follows the agreed missing-unit policy; the codebooks themselves do not define it as a unit.
+The aggregate source counts, full mapping, and reproducible audit are in [[file:../../../../slurm_logs/uganda_units_2026-09-25/catalog/README.org][the catalog evidence]].
+
+Missing-unit handling is per acquisition source, before duplicate aggregation.
+A source with a reported quantity uses =Unknown=; one with expenditure but only zero or missing original quantities uses =Value= with =Quantity = Expenditure=.
+Negative quantities and cancelling home/away quantities are still reported quantities.
+A =Value= row has no canonical reported =Price=; raw wide market/farmgate observations remain available, and a unit value can still be computed from expenditure divided by quantity.
+The independent cold comparison in [[file:../../../../slurm_logs/uganda_units_2026-09-25/VALIDATION.org][the validation report]] measures the resulting factor provenance and downstream totals.
+
+** =food_acquired= DROPS rows whose unit label is off the =u= table
+
+Recorded 2026-09-18 (GH #832); the behaviour itself is much older and was
+undocumented until now.  After renaming =u= through
+=harmonized_unit_labels()=, =uganda.food_acquired= computes the set of
+delivered labels that are not Preferred Labels of the =u= table and
+removes every row carrying one:
+
+: unknown_units = set(units).difference(unitlabels.values())
+: if len(unknown_units):
+:     warnings.warn(...)
+:     df = df.loc[df.index.isin(unitlabels.values(), level='u')]
+
+Two things follow, and both are live caveats rather than settled design:
+
+- *It is the OPPOSITE of what =crop_production= does in this same
+  country.*  There an unrecognised unit becomes the =Unknown= SENTINEL
+  precisely so the row is not lost -- see "NA, never a sentinel -- and that
+  is deliberate" below.  =food_acquired= deletes instead.  Nobody appears
+  to have chosen that asymmetry; it is what the two code paths happen to
+  do.  Changing =food_acquired= to match would ADD rows, which is a mass
+  change and needs its own before/after.
+- *The loss is small but real and per-wave*: GH #832 measures at worst
+  0.22% of a wave (836 rows in 2019-20) and 698 purchased + 514 produced +
+  79 in-kind across the panel, on codes 800-802, 996-999 and the keying
+  slips =123060= / =142090= / =156087=.
+
+Those GH #832 counts are historical observations, not the current baseline.
+A cold build at =4c2223aa1= on 2026-09-25 drops 428 of 53,211 pre-canonical wide rows in 2018-19 (codes =996=, =997=, =998=, =999=) and 831 of 48,571 in 2019-20 (codes =800=, =801=, =802=, =996=, =997=, =998=, =999=).
+In that baseline, =123060=, =142090=, and =156087= already have catalog entries with blank Preferred Labels, so they decode to =---= and survive this off-map filter; their inclusion in the older dropped-code list does not describe the current path.
+GH #962 changes those catalog entries but leaves the warning/drop behavior for unlisted codes in place.
+See [[file:../../../../slurm_logs/uganda_units_2026-09-25/VALIDATION.org][the cold-build evidence]] for the current comparison.
+
+Until 2026-09-18 the warning said only "Dropping some unknown unit
+codes!", with the label set merely =print=ed -- so it could not be
+triaged, and because the message text was constant Python's
+once-per-location de-duplication suppressed it for a second wave dropping
+a DIFFERENT set.  The warning now names the row count, the frame size and
+every offending label with its own count, and is built per call.  The
+DROP itself is unchanged.
 
 * =people_last7days= counts MEMBERS, not visitors
 
@@ -902,7 +961,12 @@ loud/:
   audit but has ZERO clusters whose households actually disagree on
   =Region= / =Rural= / =District=;
 - households that genuinely DISAGREE get =<NA>= in the offending column
-  plus a =GrainConflictWarning= naming the clusters.
+  plus a =GrainConflictWarning= naming the clusters -- and, since
+  2026-09-24 (GH #868), a =cells_blanked= grain report filed under
+  =('Uganda', 'cluster_features')=, stamped into the wave and country
+  parquets and replayed on every warm read.  Before that the warning was a
+  cold-build-only signal; see the =crop_production= de-duplication section
+  for the mechanism, which is shared.
 
 *Consumers will now see =<NA>= where they previously saw a value*, and in
 the two =comm= panel waves it is a third of a column, not a handful of
@@ -1038,10 +1102,12 @@ the Stata metadata on 2026-07-21:
 | 2015-16 | AGSEC5A | a5aq6b    | a5aq6c    | variable + value labels agree                            |
 | 2015-16 | AGSEC5B | a5bq6b    | a5bq6c    | value labels mojibaked (=ï¿½= for the en-dash)           |
 | 2018-19 | AGSEC5A | a5aq6b    | (none)    | no unit column exists -> u='Unknown'; re-tested by value range, #842 |
-| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b    | unit WIRED 2026-09-09 (#842); was =unit: None=           |
+| 2018-19 | AGSEC5B | a5bq6c    | a5bq6b    | slot 1; unit WIRED 2026-09-09 (#842); was =unit: None=   |
+| 2018-19 | AGSEC5B | s5bq06c_2 | s5bq06b_2 | slot 2, WB names in the same file; wired 2026-09-24 (#848) |
 | 2019-20 | agsec5a | s5aq06c_1 | s5aq06b_1 | slot 1                                                   |
 | 2019-20 | agsec5a | s5aq06c_2 | s5aq06b_2 | slot 2                                                   |
-| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1 (slot 2 not wired; see Known Issues)              |
+| 2019-20 | agsec5b | s5bq06c_1 | s5bq06b_1 | slot 1                                                   |
+| 2019-20 | agsec5b | s5bq06c_2 | s5bq06b_2 | slot 2, wired 2026-09-24 (#848)                          |
 
 *The SALE has its own unit and its own condition* (GH #824, wired
 2026-09-09).  UNPS question 7 is compound -- "how much of the harvest was
@@ -1065,9 +1131,9 @@ questionnaires on 2026-09-09:
 | 2015-16 | AGSEC5A | a5aq7b         | a5aq7c     | 3 862 / 3 891          | (=A5AQ7D=, the sold kg factor, is upper-case in this file only)      |
 | 2015-16 | AGSEC5B | a5bq7b         | a5bq7c     | 2 977 / 3 001          | 7b carries no value labels; values are 100% in-scheme               |
 | 2018-19 | AGSEC5A | s5aq07b_1      | s5aq07c_1  | 2 734 / 2 934          | *a sold unit EXISTS although the harvest side has none* (#842)      |
-| 2018-19 | AGSEC5B | s5bq07b_1      | s5bq07c_1  | 2 331 / 2 530          | =_2= slot not wired (mirrors the unwired harvest =_2= slot)          |
+| 2018-19 | AGSEC5B | s5bq07b_1/_2   | s5bq07c_1/_2 | 2 331+574 / 2 530+577 | slots 1 and 2 (slot 2 wired with its harvest slot, #848)            |
 | 2019-20 | agsec5a | s5aq07b_1/_2   | s5aq07c_1/_2 | 2 759+572 / 2 884+573 | slots 1 and 2; =_11= / =_21= "part harvest" slots not wired         |
-| 2019-20 | agsec5b | s5bq07b_1      | s5bq07c_1  | 2 584 / 2 705          | slot 2 not wired (mirrors the unwired harvest slot 2)               |
+| 2019-20 | agsec5b | s5bq07b_1/_2   | s5bq07c_1/_2 | 2 584+506 / 2 705+511 | slots 1 and 2 (slot 2 wired with its harvest slot, #848)            |
 
 *7b is the condition and 7c the unit in every wave and every season.*  The
 discriminating statistics are the share of values that are codes occurring
@@ -1273,10 +1339,12 @@ second harvest record for the SAME plot-crop in the SAME season B, exactly like
 2019-20's =_2= slot (labelled "condition2"), and its =s5bq06c_2= is 91.1%
 condition-only codes with a different modal condition (45) from slot 1.
 
-Still not wired: it ADDS ~1 435 rows, which is a mass change requiring its own
-before/after, and #842 is verified against a rows-unchanged invariant.  Its
-columns are =s5bq06a_2= / =s5bq06b_2= (unit) / =s5bq06c_2= (condition) /
-=s5bq06d_2= (kg factor, 935 non-null) / =s5bq07a_2= / =s5bq08_2=.
+It stayed outside #842 because it ADDS rows and #842 was verified against a
+rows-unchanged invariant.  *Wired 2026-09-24 under GH #848*, together with
+2019-20 season B's slot 2; the before/after is in the "#848" DONE entry
+below.  Its columns are =s5bq06a_2= / =s5bq06b_2= (unit) / =s5bq06c_2=
+(condition) / =s5bq06d_2= (kg factor, 935 non-null) / =s5bq07a_2= /
+=s5bq07b_2= / =s5bq07c_2= / =s5bq08_2= / =s5bq06f_2=.
 
 *** Naming vintages are mixed WITHIN one file
 
@@ -1756,6 +1824,16 @@ its script:
 =cache_freshness= grades a hashless parquet =legacy=, and =legacy= means
 *trust once, then stamp* -- its docstring says so explicitly
 ("trust-once-then-stamp migration of legacy / *script-written* parquets").
+*Policy update, 2026-10-14:* that description predates GH #809. The current
+L2-country read gate treats hashless country parquets as stale and rebuilds;
+script-written wave parquets have a different policy. The completed cold
+corpus still ended with hashless =var/fct.parquet= and =var/earnings.parquet=
+after nutrition/income builds rewrote sibling outputs. Both final frames
+matched their recorded baseline fingerprints, but hash/coverage metadata was
+absent. This preserves GH #788's authoritative-builder/sibling-write question;
+it does not justify stamping unverified content or changing the separately
+held nutrition baseline. The measurements below describe the earlier policy.
+
 Measured:
 
 : before API call: stamped = NO  | rows = 22447
@@ -1788,6 +1866,65 @@ scripts (this entry) makes the two builders *agree* for =earnings= and
 =enterprise_income= -- both now deliver 22 447 and 13 935 by either path,
 verified -- but that is convergence by hand, one table at a time, and
 =assets= still disagrees with its own script.
+
+*** Country =assets= compiler correction [2026-10-15]
+
+The preceding disagreement is historical for =assets= after this correction;
+the general GH #788 authority/detection decision remains open. Corrected
+release CI run =38697245468= explicitly ran the country Makefile before its
+raw-cache checks. Its =_/assets.py= emitted 790,688 rows with 673,841 duplicate
+=(i,t,m)= keys, columns =j, level_2, assets=, and only 116,808 non-null asset
+values. A private replay of that unchanged script reproduced both failures
+exactly. The wave concatenation had been the source of the earlier 116,808-row
+measurement above; a warm API check alone therefore missed this build route.
+
+The compiler now concatenates the eight actual wave frames under =t=,
+retains =Value= and item =j=, and applies the existing household =id_walk=
+once. It does not squeeze, manufacture absent wave/item rows, or bake =m=
+into the cache. On physical private copies, the actual Makefile target
+rebuilds all eight waves and emits 116,808 rows, no duplicate raw keys, and
+the same values, dtypes, index, ordering and =id_converted= attribute as the
+existing canonical raw cache. The served API is unchanged, including its
+4,237 existing duplicate keys after item-label harmonization; no new reducer
+or label policy is introduced here. Existing wave ownership/zero-value
+filters and the gsec14 stock definition remain unchanged.
+
+Synthetic tests execute the shipped compiler for disjoint waves, singleton
+rows, multiple items, an all-null wave, and wave-specific household crosswalks.
+All five fail against the former script and pass after the repair. The
+existing Uganda baseline manifest contains no assets entry, so this is not a
+baseline regeneration or a claim that its invariance sweep covered assets.
+Both builders remain available. Country-script output remains hashless;
+GH #809's rebuild policy and GH #788's general sibling-write/authority
+questions are unchanged.
+
+*** Coupled FCT/nutrition writes still change sibling freshness [2026-10-15]
+
+The October 14 hashless FCT/earnings observation above is one call-order
+state. On final release source =3914d8804=, ordinary trailing calls
+=fct(), earnings(), fct(), earnings()= leave FCT and earnings fresh but
+=var/nutrition.parquet= hashless, with no wave-coverage footer.
+=_/Makefile:142-143= gives FCT and nutrition the same =nutrition.py=
+recipe; the script writes both without metadata, and the framework
+verifies/stamps only the requested table. The recipe and script predate
+v0.14.0. Repeating only the FCT/earnings reads does not repair the
+nutrition sibling's metadata.
+
+Nutrition's frame remains the approved #967 result: 23,777 x 15,
+content hash =12d25f6e...50e3a=. All 1,519 final raw-frame fingerprints
+and schemas match the cold corpus, but final country metadata is
+423 fresh plus this one hashless artifact, not 424 simultaneously
+fresh. Matching values do not establish freshness metadata.
+
+The release cache-promotion disposition excludes exactly
+=Uganda/var/nutrition.parquet= and calls for backup-then-retirement of
+its shared counterpart if present. It preserves the private artifact
+and does not manually stamp it or combine earlier cache snapshots.
+Under #809 the next ordinary nutrition read rebuilds; that same recipe
+can leave FCT hashless again. This is a bounded cache disposition,
+not a repair of the general #788 builder-authority/sibling-write issue,
+which remains open. The October 15 #967 approval remains in force;
+no nutrition value, factor policy or fixture changes here.
 
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
@@ -2038,27 +2175,111 @@ season A "genuinely has no unit column" was re-tested by value range at the
 same time and *stands* — with the correction that the unit was asked and
 lost in the extract, not never asked.
 
-** TODO Second condition slot dropped for 2019-20 season B
+** DONE Second condition slot was dropped for 2018-19 AND 2019-20 season B (GH #848)
+
+- GitHub :: [[https://github.com/ligon/LSMS_Library/issues/848][#848]]
+- Status :: *FIXED 2026-09-24*, =uganda.py= =CROP_COLMAPS['2018-19']['B']=
+  and =['2019-20']['B']= each gained a second =conditions= entry.
 
 =agsec5b.dta= (2019-20) carries =s5bq06a_2= / =s5bq06b_2= / =s5bq06c_2=,
-labelled "(2019, condition2)", with 1 306 non-null conditions.
-=CROP_COLMAPS= reads only slot 1, so those harvest records are absent from
-=crop_production= entirely.
+labelled "(2019, condition2)", with 1 307 harvest quantities (1 306 non-null
+conditions).  2018-19 =AGSEC5B= has the same =_2= slot (1 436 quantities).
+=CROP_COLMAPS= read only slot 1 of both, so those harvest records were absent
+from =crop_production= entirely -- while 2019-20 season A already read BOTH
+its slots (an asymmetry since #323).
 
-2018-19 AGSEC5B has the same =_2= slot (1 436 non-null quantities).  This
-entry used to say it "may be a SEASON slot rather than a condition slot"
-because its variable label reads "during the second season of 2017".
-*Settled 2026-09-09 (#842): the label is wrong and it IS a condition slot.*
-Slot 2's harvest-end date is 2018 on 1 423 of 1 435 rows, modal months June
-(660) / July (504) -- the same window as slot 1 (2018 on 6 948/7 041; June
-2 924, July 1 359) -- whereas AGSEC5A, which really does cover the 2017
-second season, ends Nov/Dec 2017 (month 12 on 3 466 rows, year 2017 on
-5 583).  It is a second harvest record for the same plot-crop in the same
-season B.
+This entry used to say the 2018-19 slot "may be a SEASON slot rather than a
+condition slot" because its variable label reads "during the second season
+of 2017".  *Settled 2026-09-09 (#842): the label is wrong and it IS a
+condition slot.*  Slot 2's harvest-end date is 2018 on 1 423 of 1 435 rows,
+modal months June (660) / July (504) -- the same window as slot 1 (2018 on
+6 948/7 041; June 2 924, July 1 359) -- whereas AGSEC5A, which really does
+cover the 2017 second season, ends Nov/Dec 2017 (month 12 on 3 466 rows,
+year 2017 on 5 583).  It is a second harvest record for the same plot-crop
+in the same season B.
 
-Still unwired: adding either slot ADDS mass (~1 435 rows for 2018-19), so
-both stay outside #842, which is verified against a rows-unchanged
-invariant, just as they stayed outside the #323 condition fix.
+*** Which column is which: the vocabulary, again
+
+Decided by value-label vocabulary against =harvest_units= (46 codes, 35
+unit-only) and =harvest_conditions= (20 codes, 9 condition-only), never by
+the variable label -- the same rule as every other wave:
+
+| file             | column      | n     | in unit | unit-only | in cond | cond-only | modes (decoded)                                   |
+|------------------+-------------+-------+---------+-----------+---------+-----------+---------------------------------------------------|
+| 2018-19 AGSEC5B  | =s5bq06b_2= | 1 432 | 100%    | 69.4%     | 30.6%   | 0.0%      | Kg 498, Sack (100 kgs) 333, Plastic Basin 212     |
+| 2018-19 AGSEC5B  | =s5bq06c_2= | 1 435 | 8.9%    | 0.0%      | 100%    | 91.1%     | Dry - grain 1 024, Dry at harvest - grain 121     |
+| 2018-19 AGSEC5B  | =s5bq07c_2= |   574 | 100%    | 80.0%     | 20.0%   | 0.0%      | sold unit                                         |
+| 2018-19 AGSEC5B  | =s5bq07b_2= |   577 | 4.2%    | 0.0%      | 100%    | 95.8%     | sold condition                                    |
+| 2019-20 agsec5b  | =s5bq06b_2= | 1 302 | 100%    | 64.2%     | 35.8%   | 0.0%      | Kg 385, Sack (100 kgs) 265, Plastic Basin 205     |
+| 2019-20 agsec5b  | =s5bq06c_2= | 1 306 | 15.2%   | 0.0%      | 100%    | 84.8%     | Dry - grain 910, Dry at harvest - grain 116       |
+| 2019-20 agsec5b  | =s5bq07c_2= |   506 | 100%    | 72.5%     | 27.5%   | 0.0%      | sold unit                                         |
+| 2019-20 agsec5b  | =s5bq07b_2= |   511 | 8.6%    | 0.0%      | 100%    | 91.4%     | sold condition                                    |
+
+Slot 2's modal condition is 45 "Dry - grain" (71% of its rows) against slot
+1's modal 20 "Fresh/raw harvested": the second slot is overwhelmingly the
+DRIED re-report of a crop whose first record is fresh, which is precisely
+what the =condition= index level exists to keep apart (#323/#637).
+
+The 2018-19 kg factor =s5bq06d_2= (934 positive of 935 non-null, median 20)
+is wired as =KgFactor= on the slot-2 rows, like slot 1's =a5bq6d=.  *2019-20
+gets NO kg_factor on either slot*, deliberately: that wave's q6d
+(=s5bq06d_1= 7 366 non-null, =s5bq06d_2= 921) is #849's scope and needs its
+own before/after; wiring it here would have moved kilograms that already
+resolve through the unit label.
+
+*** Before / after (cold, private =LSMS_DATA_DIR=, 2026-09-24)
+
+Both reads were cold (the wave scripts ran; 91.6 s), =PYTHONPATH= and the
+imported package pinned to the branch clone.
+
+| quantity                                   | before            | after             |
+|--------------------------------------------+-------------------+-------------------|
+| rows, whole table                          | 130 606           | *133 331*         |
+| rows, 2018-19 season B                     | 7 041             | *8 463* (+1 422)  |
+| rows, 2019-20 season B                     | 7 372             | *8 675* (+1 303)  |
+| rows, every other =(t, season)=            | —                 | *identical*       |
+| =sum(Quantity)=                            | 7 309 085.96      | 7 434 726.31      |
+| =sum(Quantity_sold)=                       | 18 134 251.40     | 18 197 452.70     |
+| =sum(Value_sold)=                          | 10 709 007 434.04 | 10 879 808 638.04 |
+| =KgFactor= non-null                        | 14 149            | 15 074            |
+| =u='Unknown'=, 2018-19 season B            | 0                 | *4*               |
+| =u='Unknown'=, 2019-20 season B            | 133               | 137               |
+| =unknown_condition=, 2018-19 B / 2019-20 B | 0 / 3             | 1 / 4             |
+| distinct =u=, 2018-19 B / 2019-20 B        | 30 / 30           | 32 / 32           |
+| =harvest_kg= rows (plot-crop grain)        | 78 532            | 78 571            |
+| =harvest_kg= sum, kg                       | 28 680 848.60     | *29 093 322.41*   |
+| … of which 2018-19 / 2019-20               | 5 904 803 / 3 668 441 | 6 152 896 / 3 832 822 |
+| =kg_factor_sources.reported=               | 14 050            | 14 972            |
+| =reported_implausible=                     | 99                | 102               |
+
+*Rows added = slot-2 records minus additive collisions.*  A slot-2 record
+that shares =(t, i, plot_id, j, u, condition, season)= with slot 1 -- the
+same crop re-reported in the SAME unit and the SAME condition -- collides
+and is SUMMED by the de-duplication block: *14 of 1 436* (2018-19) and *4
+of 1 307* (2019-20; the triage's raw-file count of 3 was one short, because
+the served key goes through the code-to-label maps).  On those 18 groups
+=Quantity= / =Quantity_sold= / =Value_sold= are sums, =KgFactor= and
+=harvest_month= are slot 1's (=first()=), and the sold labels go through
+=reduce_to_agreed=: 6 of the 14 2018-19 groups have a slot-2 label where
+slot 1 had none (completed, NA -> label) and *one* -- Beans on plot
+=ab7c3a9b…-2-1= -- carries two different =Condition_sold= values and is
+blanked with a =GrainConflictWarning=, so the corpus count of blanked
+groups is now *12 of 133 331* (was 11 of 130 606).  Whether those 18
+groups are duplicate keyings or two genuinely distinct records is the same
+open question as the pre-existing 433 (see "OPEN GRAIN QUESTION" under
+#824); slot 2 could not have been *causing* the 433, since it was not read.
+
+*The 4 new 2018-19 =Unknown= units are the source's, not a wiring error*:
+=s5bq06b_2= is null on 4 records that report a measure -- 3 coffee sales
+with =Quantity=, =Value_sold= and a =KgFactor= but no unit code, and 1
+beans row with =Quantity= 0 and nothing else (also the wave's one new
+=unknown_condition=).  =tests/test_gh842_uganda_harvest_unit.py= now
+derives that count from the raw file and asserts the served sentinel count
+EQUAL to it.  Slot 2's 22-23 distinct unit codes are all inside
+=harvest_units= (the 2 new distinct =u= per cell are slot-2-only labels).
+
+*Not wired*: 2019-20 season A's =_11= / =_21= "part harvest" slots (#647,
+no verdict), on either side.
 
 ** TODO =KgFactor= is wired for 2018-19 only; every other wave ships one too
 
@@ -2079,7 +2300,10 @@ Measured non-null / rows, per wave (season A + season B):
 | 2018-19 | 7 134/7 153    | 7 037/7 041   |
 | 2019-20 | 6 977/8 429    | 7 366/9 356   |
 
-(2019-20 uses =s5{a,b}q06d_1=; 2018-19 slot 2 has =s5bq06d_2=, 935 non-null.)
+(2019-20 uses =s5{a,b}q06d_1=, and its season-B slot 2 =s5bq06d_2= has 921
+non-null -- neither wired.  2018-19 slot 2's =s5bq06d_2=, 935 non-null, IS
+wired since #848, so the 2018-19 season-B count above is now 7 037 + 935
+over 7 041 + 1 436 records.)
 
 *Why the others are deliberately left out.* Their kilograms already resolve
 through the unit label, so once =harvest_kg= prefers a per-row =KgFactor=,
@@ -2426,7 +2650,12 @@ be extended to waves 1-2.)
 =Quantity_sold= that know both units (=u != 'Unknown'=, =Unit_sold= non-null);
 by wave-season 92.0-98.0%, i.e. *3.9% disagree*.  (The "95-97% agree" figure
 in #824 was *Nigeria's*; this is Uganda's.)  2018-19 season A is excluded from
-that count by construction -- =u= is =Unknown= on all of it.
+that count by construction -- =u= is =Unknown= on all of it.  *Since #848
+(2026-09-24)* the count is *41 162 / 96.14%* -- the 2018-20 season-B second
+condition slot adds 1 079 sale rows knowing both units (2018-19 B 2 904 rows
+at 96.3%, 2019-20 B 3 088 at 97.0%) -- the by-wave-season range is the same
+92.0-98.0%, and the largest disagreement cell (priced, =u='Sack (100 kgs)'=,
+=Unit_sold='Kg'=) is 165 rows, was 162.
 
 *Definition matters here and an earlier version of this entry shipped the
 looser one.*  Restricted to rows with a positive =Quantity_sold= -- the rows
@@ -2577,7 +2806,9 @@ agreed value is kept, a conflicted cell is set NA with a
 130 606 groups* -- 2009-10 6 =Unit_sold=; 2011-12 1; 2013-14 2 =Unit_sold= +
 1 =Condition_sold=; 2015-16 1 =Condition_sold=.  Those groups are a
 pre-existing defect in the summed =Quantity_sold= that this column makes
-visible for the first time.
+visible for the first time.  (12 of 133 331 since #848 wired the 2018-20
+season-B second condition slot: one 2018-19 B =Condition_sold= conflict
+between the two slots.)
 
 *OPEN GRAIN QUESTION: the 11 groups are 11 of 433, and a LEVEL IS MISSING*
 (2026-09-10, from the red-team of this change, item 4).  Measured on the
@@ -2604,12 +2835,20 @@ plus 2 debes -- but it is not the fix.
 unread condition-2 slots.  [[https://github.com/ligon/LSMS_Library/issues/848][#848]] records that 2018-19 =AGSEC5B= ships a
 FULL-harvest condition-2 slot (=s5bq06a_2= n=1 436, =s5bq06b_2= n=1 432,
 =s5bq07a_2= n=1 435, =s5bq07b_2= n=577, =s5bq07c_2= n=574) that
-=CROP_COLMAPS= reads on neither side, while 2019-20 season A DOES wire its
+=CROP_COLMAPS= read on neither side, while 2019-20 season A DOES wire its
 condition-2 slot -- an asymmetry, and 14x the row count of the part-harvest
 =_11= / =_21= question (#647).  A second record for the same plot-crop in the
 same season is exactly the shape that produces a 433-group collision, so
-wiring #848 and re-counting the collisions is the first experiment, not a
+wiring #848 and re-counting the collisions was the first experiment, not a
 speculative new index level.
+
+*Experiment run, 2026-09-24 (#848 DONE entry above): it does NOT explain
+the 433.*  Slot 2 was not read, so it could not have been producing
+collisions; wiring it ADDS 18 collision groups (14 in 2018-19 B, 4 in
+2019-20 B, all "same crop, same unit, same condition, reported in both
+slots") and one more blanked =Condition_sold= (12 of 133 331 groups now).
+The 433 pre-existing groups are entirely within slot 1 / the long-form
+waves and still want a record ordinal.
 
 Two properties of that reducer worth knowing before you rely on it.  *Under
 =LSMS_GRAIN_STRICT=1= these 11 groups make the Uganda build FATAL* -- that is
@@ -2621,6 +2860,51 @@ says nothing about the 11 groups.  That is the GH #323 "the signal must
 survive the cache" lesson, and it is a property of =reduce_to_agreed= itself
 -- Uganda's =cluster_features= hook has the same gap -- not of this change.
 
+*Closed 2026-09-24 (GH #868).*  The paragraph above is kept as the record of
+what was true; it no longer is.  =reduce_to_agreed(on_conflict='na')= now
+FILES a grain report of its own kind -- =cells_blanked=, naming the groups
+and the columns, with =destroyed= and =nan_key_rows= both ZERO because no row
+is dropped -- under the =(country, table)= key the cache writer stamps.  The
+two Uganda sites reach the ledger by different routes, because they run in
+different processes:
+
+- =crop_production=: the de-dup runs OUT of process (=make= -> the wave
+  script), so =crop_production_for_wave= passes =country='Uganda',
+  table='crop_production', wave=t= explicitly, each wave script hands the
+  ledger to =to_parquet(..., grain_audit=grain_reports('Uganda',
+  'crop_production'))=, and the framework replays that wave stamp when it
+  reads the wave parquet back (=Wave.grab_data='s script-path read and
+  =run_make_target=), which files it for the country stamp.  The country
+  concatenator =_/crop_production.py= folds the wave stamps too, for a
+  reader of ITS output (=LSMS_BUILD_BACKEND=make=).
+- =cluster_features=: the hook runs IN process, inside =Wave.grab_data=,
+  which now names the cell around the =df_edit= call
+  (=build_transforms.build_context=), stamps the hook's reports into the
+  L2-wave parquet, and replays them on an L2-wave hit -- so a country
+  rebuilt from warm wave parquets (the #891 union rebuild, where the hook
+  never runs) still carries them.
+
+A warm read of either table therefore replays the blanking as a
+=GrainCollapseWarning= through core's one emit choke point, and
+=grain_reports('Uganda', <table>)= is non-empty for it.  The cold-build
+signal depends on the process the reducer runs in (measured, red team
+2026-09-24 and follow-up 2026-10-14): for the in-process =cluster_features=
+hook it is unchanged -- the reducer's own =GrainConflictWarning= (8), no
+=GrainCollapseWarning=; for the out-of-process =crop_production= a cold
+=make= build emits the child's =GrainConflictWarning= on the child's stderr
+AND the parent's =GrainCollapseWarning= replay in-process (5), because the
+parent reads back the wave stamp the child just wrote.  Two classes for one
+finding on that path, by construction, not a double count.  The 12 groups
+include #848's twelfth group: a 2018-19 season-B =Condition_sold= conflict.
+The disclosure change leaves those values unchanged; the condition-2
+question above is still the data question.  Verified on a
+fixture only (=tests/test_gh868_reduce_to_agreed_ledger.py=); *the Uganda
+re-warm has NOT been paid*, and note the cost is not Uganda's alone: the
+report formatter =_format_grain_report= sits in every table's build
+fingerprint (reached from =_normalize_dataframe_index=), so every country's
+L2 hash moved -- measured on Malawi =household_roster= and Ethiopia
+=sample=, neither of which calls the reducer.
+
 *** Still not wired, deliberately
 
 1. *The SOLD kg factor* =a5?q7d= / =A5?Q7D= ("Record conversion factor into
@@ -2631,12 +2915,13 @@ survive the cache" lesson, and it is a property of =reduce_to_agreed= itself
    that would give 2018-19 season A a per-kg farmgate price without going
    through a unit label.  Natural name =KgFactor_sold=; wiring it ADDS a
    column and needs its own before/after, exactly as =kg_factor= did (#849).
-2. *2018-19 AGSEC5B's =_2= sold slot* (=s5bq07{a,b,c}_2=, 574-577 non-null)
-   and *2019-20 AGSEC5A's =_11= / =_21= "part harvest" slots*
+2. *2019-20 AGSEC5A's =_11= / =_21= "part harvest" slots*
    (=s5aq07{a,b,c}_{11,21}= -- the sale block of the questionnaire's separate
    partially-harvested repeat page, first seen on the 2018-19 form at
-   stream/page 17).  =CROP_COLMAPS= reads neither on the harvest side either,
-   so the two sides stay consistent; wiring them ADDS rows.
+   stream/page 17).  =CROP_COLMAPS= reads them on neither side, so the two
+   sides stay consistent; wiring them ADDS rows.  (2018-19 AGSEC5B's =_2=
+   sold slot, =s5bq07{a,b,c}_2=, used to be listed here; wired with its
+   harvest slot under #848, 2026-09-24.)
 3. *A per-kg conversion of the sale.*  =crop_production= serves REPORTED
    values only.  Converting =Quantity_sold= to kilograms is a transformation
    and belongs beside =transformations.harvest_kg=.  Note for whoever writes
@@ -2766,7 +3051,7 @@ Country() cache, so it is immune to shared-cache staleness) and re-checks
 the 0-count / row-count / household-count / sum invariants above, plus
 that the fully-populated sentinel row is gone.
 
-** TODO Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
+** DONE Uganda is the ONE country pytest deletes the cache of, and two tests rely on the cache
 
 Found 2026-08-20 while trying to verify this PR's refreshed
 =tests/fixtures/uganda_baseline.json= entries.  Not a data defect -- a
@@ -2791,6 +3076,131 @@ depends on whether some *other* module, running *earlier in the same
 session*, happens to build the table it pins -- i.e. on alphabetical test
 ordering.  Measured: the module alone is *53 skipped*; run after
 =test_uganda_crop_condition.py= it checks a handful and skips the rest.
+
+*Resolved [2026-09-22].*  The session-start purge is retired (repo-root
+=conftest.py=).  Both of its jobs are done by the library now: v0.8.0's content
+hash invalidates a parquet when the country module changes (measured -- editing
+=Uganda/_/uganda.py= moves the hash 58feecca8a82 -> 745cc5a5f599), and GH #803
+made an in-tree =var/*.parquet= unreadable rather than merely stale.
+
+Before/after, as this entry asked for:
+
+| measure                             | before      | after              |
+|-------------------------------------+-------------+--------------------|
+| =test_uganda_invariance.py= alone    | 53 skipped  | 52 passed, 1 FAILED |
+| Uganda in =test_table_structure=     | 0 cells     | present            |
+
+*The one failure is the point of the exercise.*  =var/nutrition.parquet= matches
+its baseline on shape (23801x15), columns and index names, and differs on
+=content_hash= -- the VALUES moved.  Not a dependency drift (=fooddatacentral=
+is 1.0.12 before and after today's lock) and not pyarrow (the other 52 entries
+pass against stored hashes under pyarrow 25).  The baseline was last written
+[2026-09-07] in =8ec0bab4e=; =nutrition.py= itself has not changed since
+[2026-05-07].  So something landed between [2026-09-07] and now that moved
+nutrient intake values -- GH #871 (the =most_complete_row= reducer, [2026-09-12])
+changed 544 served rows corpus-wide and is the first candidate to check.
+
+*Measured [2026-09-22]* (slurm job 39136237, =slurm_logs/venv_provenance/nutrition_delta.sbatch=):
+the old table was rebuilt at =8ec0bab4e= under the OLD closure
+(=.venv.sqfs.prev=, pyarrow 23.0.1 / pandas 3.0.2) and diffed against the
+current one.  The index is identical, so no household moved; the values did.
+
+| measure                       | value                        |
+|-------------------------------+------------------------------|
+| rows with any change          | 23,284 of 23,801 (*97.8%*)   |
+| cells changed                 | 337,664 of 357,015 (*94.6%*) |
+| median abs. relative change   | *0.24 -- 0.49* per changed cell |
+
+Per-nutrient totals, before -> after: Energy *-18.7%*, Protein *-19.5%*,
+Folate *-21.6%*, Vitamin B-12 *-31.6%*, Calcium -15.1%, Riboflavin -15.8%,
+Zinc -14.5%, Iron -12.9%, Niacin -13.0%, Thiamin -10.1%, Fiber -9.2%,
+Vitamin B-6 -4.7%, Carbohydrate -4.4%, Vitamin C -0.1%, Vitamin A *+2.1%*.
+
+*This is not a sample effect.*  =nutrition.py:19= is =uga.food_quantities()=,
+so the table is kilograms times nutrient density, and GH #850 moved Uganda's
+total kg by *-14.8%* on [2026-09-09] -- after the baseline was written.
+Energy at -18.7% is that correction plus the kg-factor work that followed
+(=#929= metric/inferred split, =#919= country-qualified units, =#874= the
+=u='Unknown'= sentinel, and the stated-vs-inferred reporting).  Vitamin A
+moving the other way, and B-12 changing on only 13,323 rows while every other
+nutrient changes on ~23,200, are both worth a look before anyone signs this off.
+
+Two weeks of a *corpus-scale revaluation* went unrecorded here because this
+module was skipping.  *Do not regenerate the baseline* until the direction is
+signed off: #850's own write-up adjudicates Ethiopia, Malawi and EthiopiaRHS as
+corrections and explicitly declines to sign off Niger; Uganda is not
+adjudicated either way in that passage.
+
+*Historical nutrition attribution [2026-10-14], without lifting the hold.*
+The [[file:../../../../slurm_logs/release_landing_2026-10-14/uganda-nutrition-history.org][release investigation]] reconstructs both the historical =fc85...eee44=
+and current-development =1131...daf17e= nutrition hashes EXACTLY from the
+same independently cold-verified food and FCT inputs (which themselves match
+the historical fixture). The full old package also reproduces the old hash.
+All movement is accounted for by four #850 commits: vocabulary +49,501.650 kg;
+per-unit denominator/item-axis -259,265.155 kg; per-wave support -37.466 kg;
+dispersion gate -5,677.631 kg. Later #874/#838/#919/#929/fraction-parser
+changes make zero difference on these inputs. Thus the earlier phrase
+“that correction plus the kg-factor work that followed” is contradicted by
+this exact replay; #871 is not needed to explain any part of this delta.
+
+The earlier “Uganda is not adjudicated either way in that passage” also needs
+qualification: the FULL #850 red-team report, §6.6, actually says “Uganda -14%,
+Nigeria -5%, Tanzania -2.6%: small, price anchors unchanged or improved. Fine.”
+That prior reviewer judgment is not a nutrition-fixture maintainer signoff.
+*The instruction not to regenerate until direction is signed off remains.*
+
+The replay reproduces 23,284 changed vectors and 337,664 changed cells.
+Vitamin A +2.0453% is mostly fresh/dry sweet potatoes gaining nominal kg in
+litre containers; B12 -31.6041% is mostly fish, eggs and milk losing kg, while
+many plant foods have zero B12 density. Every nutrient delta reconciles to
+food-by-food kg-factor changes times unchanged densities.
+
+*Correction to that investigation's FCT caveat [2026-10-14].* Its first
+addendum called row 4003 a "pre-existing contradiction" and said "Exact
+arithmetic does not establish which source statement is authoritative."
+That framing omitted the same row's specific yellow-variety derivation.
+=nutrition.org='s =SWEETPOTATO,YELLOW,W/SKIN,FRESH,RAW= row does carry a
+generic USDA #11507 note saying "vitamin A and carotenoids assumed = 0."
+But its adjacent =water_source_descr= explicitly derives beta-carotene from
+the mean of three yellow-flesh varieties in Kidmose et al. (2007): Salyboro,
+199062.1 and Nyathi Odiewo. It records beta-carotene =2697= and alpha-carotene
+=10= micrograms/100 g, with retinol and beta-cryptoxanthin zero. Their dietary
+RAE calculation is =2697/12 + 10/24 = 225.1667=, rounding to the recorded
+=225= (2250/kg served). The complete record supports a specific carotenoid
+override to the generic starting assumption; it does not support choosing
+zero in place of 225. The report quotes both complete source notes and the
+NIH RAE conversion reference, with an exact historical-fields comparison.
+
+This is recorded provenance and arithmetic consistency, not an independent
+check of the cited paper's measurements, varieties or preparation basis.
+Follow-up should clarify the generic note and confirm that derivation before
+any numeric proposal. Fresh sweet potatoes still contribute +79.42 million
+recorded micrograms to the historical A delta. Nominal volume-as-mass and
+range-endpoint assumptions remain separate; no density, source table,
+mapping, factor policy or fixture was changed. *The baseline hold remains.*
+
+*Maintainer decision [2026-10-15]: the #967 nutrition direction hold is lifted.*
+After the before/after explanation and the concrete nutrition-only manifest
+proposal, the maintainer explicitly replied:
+#+begin_quote
+Okay, thumbs up on #967
+#+end_quote
+This approves the reviewed #967 candidate and the proposed two-field change
+in =tests/fixtures/uganda_baseline.json=: =var/nutrition.parquet= changes
+from 23,801 x 15 / =fc85...eee44= to 23,777 x 15 /
+=12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a=.
+Only =shape= and =content_hash= change; columns, index names, dtypes and
+every other manifest entry retain their reviewed values. The old hold and
+its investigations above are historical evidence, not outstanding approval
+requirements for this specific patch. See the dated approval and focused
+verification in [[file:../../../../slurm_logs/release_landing_2026-10-14/uganda967.org][the #967 landing record]].
+
+This accepts the documented regression target for this release. It does not
+change the runtime factor ladder, reinterpret a litre as a measured mass,
+choose new range endpoints, or independently verify the cited FCT paper.
+The recorded nominal-container, residual-code and nutrient-provenance limits
+remain; the curated conversion JSON still is not the API's kg-factor input.
+No baseline generator or wholesale fixture refresh was used.
 
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To

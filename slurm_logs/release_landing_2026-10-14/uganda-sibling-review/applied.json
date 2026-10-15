@@ -1,0 +1,10 @@
+{
+  "applied_utc": "2026-10-15T14:40:45.252560+00:00",
+  "number": 788,
+  "state": "OPEN",
+  "url": "https://github.com/ligon/LSMS_Library/issues/788",
+  "before_body_sha256": "6411cc1c50dafd7d69694ee877f91917273e075aae37450d3b1c98fb21daa4a6",
+  "after_body_sha256": "d0e9ae40d47ab0a053a5740350c2d1295224e7e25c2a748f54f675aecfd00289",
+  "concurrent_precondition_verified": true,
+  "scientific_967_approval_unchanged": true
+}

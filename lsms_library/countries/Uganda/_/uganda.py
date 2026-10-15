@@ -285,14 +285,11 @@ def harmonized_unit_labels(key='Code', value='Preferred Label'):
     roadmap and Tier 1 convention (Malawi, Mali, Nigeria, Senegal,
     Burkina Faso).
 
-    The org table reuses the ``---`` sentinel for empty cells (per
-    ``df_from_orgfile``).  To preserve compatibility with the previous
-    CSV-based behaviour -- which carried explicit ``'---'`` strings as
-    the canonical label for unit codes that exist but lack a meaningful
-    label -- we restore those NaN-valued labels to the literal
-    ``'---'`` string.  Codes are coerced to ``int`` so the mapping
-    matches the float-typed ``u`` index values produced by the wave
-    scripts (``hash(1) == hash(1.0)``; a string key would not match).
+    An unexpectedly empty Preferred Label retains its distinct code as
+    a string; it must not become a shared invented unit.  Integer-valued
+    codes are coerced to ``int`` to match the float-typed ``u`` index
+    values produced by the wave scripts (``hash(1) == hash(1.0)``).
+    Genuine fractional codes are never truncated to a different code.
     """
     from lsms_library.local_tools import get_categorical_mapping
 
@@ -303,13 +300,14 @@ def harmonized_unit_labels(key='Code', value='Preferred Label'):
     unitlabels = {}
     for k, v in raw.items():
         try:
-            int_k = int(k)
+            numeric_k = float(k)
+            code = int(numeric_k) if numeric_k.is_integer() else k
         except (TypeError, ValueError):
-            int_k = k
-        if pd.isna(v):
-            unitlabels[int_k] = '---'
+            code = k
+        if pd.isna(v) or not str(v).strip():
+            unitlabels[code] = str(code)
         else:
-            unitlabels[int_k] = str(v).strip()
+            unitlabels[code] = str(v).strip()
     return unitlabels
 
 def harmonized_food_labels(fn=None,key='Code',value='Preferred Label'):
@@ -361,13 +359,18 @@ def harmonized_food_labels(fn=None,key='Code',value='Preferred Label'):
 
 
 def food_acquired(fn,myvars):
+    from lsms_library.country import _augment_numeric_code_keys
+    from lsms_library.transformations import U_UNKNOWN
 
     df = get_dataframe(fn,convert_categoricals=False)
 
     df = df.loc[:,[v for v in myvars.values()]].rename(columns={v:k for k,v in myvars.items()})
 
-    # Replace missing unit values
-    df['units'] = df['units'].fillna('---')
+    # Missing is not a physical unit.  Cast before inserting the sentinel
+    # so nullable numeric and categorical source columns also accept it.
+    units = df['units'].astype(object)
+    blank = units.map(lambda value: isinstance(value, str) and not value.strip())
+    df['units'] = units.mask(units.isna() | blank, U_UNKNOWN)
 
     df = df.set_index(['HHID','item','units']).dropna(how='all')
 
@@ -380,7 +383,7 @@ def food_acquired(fn,myvars):
         df = df.rename(index=fix,level=0)
 
     df = df.rename(index=harmonized_food_labels(),level='j')
-    unitlabels = harmonized_unit_labels()
+    unitlabels = _augment_numeric_code_keys(harmonized_unit_labels())
     df = df.rename(index=unitlabels,level='u')
 
     if not 'market' in df.columns:
@@ -395,11 +398,32 @@ def food_acquired(fn,myvars):
     # Get list of units used in current survey
     units = list(set(df.index.get_level_values('u').tolist()))
 
-    unknown_units = set(units).difference(unitlabels.values())
+    accepted_units = set(unitlabels.values()) | {U_UNKNOWN}
+    unknown_units = set(units).difference(accepted_units)
     if len(unknown_units):
-        warnings.warn("Dropping some unknown unit codes!")
-        print(unknown_units)
-        df = df.loc[df.index.isin(unitlabels.values(),level='u')]
+        # GH #832.  This used to warn "Dropping some unknown unit codes!" with
+        # the labels merely `print`ed, so the warning could not be triaged:
+        # it did not say how many rows went, or which labels took them.  The
+        # corpus convention is to NAME what was dropped, not merely that
+        # something was.  The message is built per call (so Python's
+        # once-per-location warning de-duplication does not suppress a second,
+        # different wave) and the offending labels are sorted for determinism.
+        keep = df.index.isin(accepted_units, level='u')
+        dropped = df.loc[~keep]
+        per_label = (dropped.index.get_level_values('u')
+                            .value_counts()
+                            .sort_values(ascending=False))
+        detail = ', '.join(f'{lab!r} ({n} rows)'
+                           for lab, n in per_label.items())
+        warnings.warn(
+            f"Uganda food_acquired: dropping {len(dropped)} of {len(df)} rows "
+            f"carrying {len(unknown_units)} unit label(s) that are not in the "
+            f"`u` table of _/categorical_mapping.org: {detail}.  These rows "
+            f"are REMOVED from food_acquired, not sentinel-filled.  Fix by "
+            f"adding the code to that table (or, if it is a keying slip, by "
+            f"recording it as such in _/CONTENTS.org)."
+        )
+        df = df.loc[keep]
 
     with open('../../_/conversion_to_kgs.json','r') as f:
         conversion_to_kgs = pd.Series(json.load(f))
@@ -458,11 +482,13 @@ def food_acquired_to_canonical(df):
       do not record an imputed valuation distinct from value_inkind)
 
     Rows are kept where EITHER ``Quantity > 0`` OR ``Expenditure > 0``.
-    Expenditure-only rows (HH reported a food expenditure with no
-    quantity — common in Uganda's GSEC15b for food consumed away from
-    home) are legitimate data and are carried through with NaN
-    ``Quantity``.  Matches the shared
-    :func:`lsms_library.transformations.food_acquired_to_canonical` rule.
+    For ``u='Unknown'``, a source with positive expenditure and all its
+    original quantity fields zero or missing becomes ``u='Value'`` with
+    ``Quantity = Expenditure`` and missing ``Price``.  Purchased food
+    checks both home and away quantities before their sum: reported
+    negatives or cancelling quantities remain ``Unknown``.  Classify
+    before duplicate aggregation so expenditure-only and physical reports
+    remain separate.  Known units retain their quantities, including NaN.
 
     Notes
     -----
@@ -474,18 +500,18 @@ def food_acquired_to_canonical(df):
       ``sample()`` at API time.  See CLAUDE.md "## ``sample()`` and
       Cluster Identity".
     - ``Price`` is carried for purchased / produced rows from the
-      survey-reported ``market`` / ``farmgate`` columns.  The framework's
-      ``food_prices_from_acquired`` currently re-derives Price from
-      ``Expenditure / Quantity_kg`` and ignores a stored Price; the
-      stored Price preserves the survey-reported information for
-      consumers reading the wave parquet directly, and is forward-
-      compatible with a future framework change to prefer stored Price
-      where available (per DESIGN doc).
+      survey-reported ``market`` / ``farmgate`` columns, except for rows
+      retyped as ``Value``: those prices were not reported per currency
+      unit.  The wide input retains the original observations.  Runtime
+      ``unitprice`` / ``kgprice`` modes consume stored ``Price``;
+      ``unitvalue`` / ``kgvalue`` derive prices from expenditure/quantity.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     work = df.reset_index()
 
     # Build the three per-source pieces.
-    def _make(source_label, qty, expenditure, price):
+    def _make(source_label, qty, expenditure, price, quantity_columns):
         out = pd.DataFrame({
             't': work['t'].values,
             'i': work['i'].values,
@@ -496,11 +522,22 @@ def food_acquired_to_canonical(df):
             'Expenditure': pd.to_numeric(expenditure, errors='coerce').values,
             'Price': pd.to_numeric(price, errors='coerce').values,
         })
+        original_qty = work[quantity_columns]
+        no_quantity = (original_qty.isna() | original_qty.eq(0)).all(axis=1)
+        value_only = (out['u'].eq(U_UNKNOWN) & no_quantity
+                      & out['Expenditure'].gt(0))
+        if value_only.any():
+            # Categorical units may not contain Value.  Leave their dtype
+            # alone when no source row needs retyping.
+            if isinstance(out['u'].dtype, pd.CategoricalDtype):
+                out['u'] = out['u'].astype(object)
+            out.loc[value_only, 'u'] = 'Value'
+            out.loc[value_only, 'Quantity'] = out.loc[value_only, 'Expenditure']
+            out.loc[value_only, 'Price'] = np.nan
         return out
 
     # Purchased: fold home + away.  Sum with min_count=1 so a row with
-    # both NaN stays NaN (and is dropped below); a row with one value
-    # populated keeps that value.
+    # both NaN stays NaN; a row with one value populated keeps that value.
     purchased_qty = work[['quantity_home', 'quantity_away']].sum(
         axis=1, min_count=1)
     purchased_val = work[['value_home', 'value_away']].sum(
@@ -510,19 +547,18 @@ def food_acquired_to_canonical(df):
                                                                    index=work.index))
 
     purchased = _make('purchased', purchased_qty, purchased_val,
-                      purchased_price)
+                      purchased_price, ['quantity_home', 'quantity_away'])
     produced  = _make('produced',  work['quantity_own'], work['value_own'],
                       work['farmgate'] if 'farmgate' in work.columns
-                      else pd.Series(np.nan, index=work.index))
+                      else pd.Series(np.nan, index=work.index), ['quantity_own'])
     inkind    = _make('inkind',    work['quantity_inkind'],
                       work['value_inkind'],
-                      pd.Series(np.nan, index=work.index))
+                      pd.Series(np.nan, index=work.index), ['quantity_inkind'])
 
     from lsms_library.transformations import _finalize_canonical_food_acquired
 
     out = pd.concat([purchased, produced, inkind], ignore_index=True)
-    # Filter (qty>0 | exp>0; expenditure-only rows kept with NaN Quantity --
-    # GH #246 C-2) and aggregate genuine source-data duplicates (e.g. two
+    # Filter (qty>0 | exp>0) and aggregate genuine source-data duplicates (e.g. two
     # ``Other (Specify)`` rows under one canonical key) via the shared tail
     # (GH #251): Quantity/Expenditure summed with min_count=1, per-unit
     # Price averaged.
@@ -1560,9 +1596,17 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
         # only the label is withheld where the sources contradict each
         # other.  Such a group is a PRE-EXISTING defect in the summed
         # Quantity_sold that this column makes visible for the first time.
+        # GH #868: this runs OUT OF PROCESS (make -> the wave script), so no
+        # framework context names the cell; pass it, so the report files
+        # under ('Uganda', 'crop_production') -- the key the wave script hands
+        # to to_parquet(grain_audit=grain_reports(...)) and the framework
+        # replays into the country stamp.  A warm read then still names the
+        # 11 blanked groups.
         from lsms_library.build_transforms import reduce_to_agreed
         labelcols = reduce_to_agreed(df[['Unit_sold', 'Condition_sold']],
-                                     on_conflict='na')
+                                     on_conflict='na',
+                                     country='Uganda', table='crop_production',
+                                     wave=t)
         df = num.join(firstcols).join(labelcols)
     return df[cols]
 
@@ -1622,8 +1666,21 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
 #                      is the unit, and the questionnaire disagrees with BOTH
 #                      files (form: 5A p.13 Unit=6b, 5B p.24 Unit=6c).  Only
 #                      the values decide.  See _/CONTENTS.org.
+#                      SLOT 2 (s5bq06{a,b,c,d}_2, 1 436 harvest records) is
+#                      wired since GH #848; it uses WB names while slot 1
+#                      in the SAME file uses the legacy ones -- do not
+#                      assume one prefix per file.  It is a second
+#                      CONDITION of the same plot-crop in season B (harvest
+#                      dates June/July 2018 like slot 1), not a season slot
+#                      as its variable label claims.  Vocabulary decides
+#                      again: s5bq06b_2 is 100% in `harvest_units`, 69.4%
+#                      unit-only; s5bq06c_2 100% in `harvest_conditions`,
+#                      91.1% condition-only.
 #   2019-20            WB names throughout: s5{a,b}q06b_{1,2} = unit,
-#                      s5{a,b}q06c_{1,2} = condition, one pair per slot.
+#                      s5{a,b}q06c_{1,2} = condition, one pair per slot;
+#                      both slots wired in both seasons (season B's slot 2
+#                      since GH #848; s5bq06b_2 64.2% unit-only, s5bq06c_2
+#                      84.8% condition-only).
 #
 # KG FACTOR (`kg_factor` -> the KgFactor column).  UNPS asks q6d, "Record the
 # conversion factor into kg", beside every harvest record.  It is a
@@ -1709,12 +1766,13 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None):
 # home is a `KgFactor_sold` column beside `Unit_sold`; wiring it ADDS a
 # column and needs its own before/after, exactly as `kg_factor` did (#849).
 #
-# ALSO UNWIRED, for the same reason the matching harvest slots are: 2018-19
-# AGSEC5B's `_2` sold slot (s5bq07{a,b,c}_2, 574-577 non-null), and 2019-20
+# ALSO UNWIRED, for the same reason the matching harvest slots are: 2019-20
 # AGSEC5A's `_11` / `_21` "PART HARVEST" slots -- s5aq07{a,b,c}_{11,21},
 # the sale block belonging to the questionnaire's separate
 # partially-harvested repeat page.  CROP_COLMAPS reads neither, on the
-# harvest side or the sold side, so the two sides stay consistent.
+# harvest side or the sold side, so the two sides stay consistent.  (The
+# 2018-19 AGSEC5B `_2` sold slot, s5bq07{a,b,c}_2, used to be listed here;
+# it is wired with its harvest slot since GH #848.)
 #
 # A NAMED column that is absent from the source now RAISES (`_require` ->
 # CropColmapError) instead of silently falling back.  Write `None` to declare
@@ -1878,11 +1936,32 @@ CROP_COLMAPS = {
                               'value_sold': 's5aq08_1',
                               'month': 's5aq06f_1', 'kg_factor': 'a5aq6d'}]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
-                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
-                              'condition_sold': 's5bq07b_1',
-                              'value_sold': 's5bq08_1',
-                              'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'}]},
+              'conditions': [
+                  # Slot 1: LEGACY a5bq6{b,c,d} names for unit / condition /
+                  # kg factor beside WB s5bq0?_1 names for everything else.
+                  {'qty': 's5bq06a_1', 'unit': 'a5bq6b', 'condition': 'a5bq6c',
+                   'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                   'condition_sold': 's5bq07b_1',
+                   'value_sold': 's5bq08_1',
+                   'month': 's5bq06f_1', 'kg_factor': 'a5bq6d'},
+                  # Slot 2 (GH #848): the SAME plot-crop harvested in a
+                  # SECOND CONDITION within season B -- NOT a season slot,
+                  # although s5bq06a_2 is variable-labelled "during the
+                  # second season of 2017": its harvest-end dates are
+                  # June/July 2018 on 1 423 of 1 435 rows, the same window
+                  # as slot 1, whereas AGSEC5A (the real 2017 second
+                  # season) ends Nov/Dec 2017.  All-WB names.  Unit vs
+                  # condition by value-label vocabulary: s5bq06b_2 is 100%
+                  # inside `harvest_units` (69.4% unit-only, 0% cond-only,
+                  # decodes Kg / Sack (100 kgs) / Plastic Basin); s5bq06c_2
+                  # is 100% inside `harvest_conditions` (91.1% cond-only,
+                  # modal 45 "Dry - grain" vs slot 1's modal 20).
+                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                   'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
+                   'condition_sold': 's5bq07b_2',
+                   'value_sold': 's5bq08_2',
+                   'month': 's5bq06f_2', 'kg_factor': 's5bq06d_2'},
+              ]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
                       'flag': 's4aq08', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
@@ -1901,11 +1980,21 @@ CROP_COLMAPS = {
                    'month': 's5aq06f_2'},
               ]},
         'B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid', 'crop': 'cropID',
-              'conditions': [{'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
-                              'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
-                              'condition_sold': 's5bq07b_1',
-                              'value_sold': 's5bq08_1',
-                              'month': 's5bq06f_1'}]},
+              'conditions': [
+                  {'qty': 's5bq06a_1', 'unit': 's5bq06b_1', 'condition': 's5bq06c_1',
+                   'qty_sold': 's5bq07a_1', 'unit_sold': 's5bq07c_1',
+                   'condition_sold': 's5bq07b_1', 'value_sold': 's5bq08_1',
+                   'month': 's5bq06f_1'},
+                  # Slot 2 (GH #848), labelled "(2019, condition2)" in the
+                  # file: the same shape as season A's slot 2 above.  No
+                  # `kg_factor` on EITHER 2019-20 slot, deliberately -- this
+                  # wave's q6d (s5bq06d_1 / s5bq06d_2, 7 366 / 921 non-null)
+                  # is #849's scope and needs its own before/after.
+                  {'qty': 's5bq06a_2', 'unit': 's5bq06b_2', 'condition': 's5bq06c_2',
+                   'qty_sold': 's5bq07a_2', 'unit_sold': 's5bq07c_2',
+                   'condition_sold': 's5bq07b_2', 'value_sold': 's5bq08_2',
+                   'month': 's5bq06f_2'},
+              ]},
         'intercrop': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',
                       'flag': 's4aq08', 'crop': 'cropID'},
         'intercrop_B': {'hhid': 'hhid', 'parcel': 'parcelID', 'plot': 'pltid',

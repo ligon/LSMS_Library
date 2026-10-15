@@ -22,7 +22,6 @@ requested via ``lsms_library.authenticate()``.
 
 See ``CLAUDE.md`` "Three-Tier Credential Model" for the full rationale.
 """
-import git
 from pathlib import Path
 import getpass
 import pkgutil
@@ -40,6 +39,12 @@ def is_git_repo(path='.'):
     Returns:
     bool: True if the path is a valid Git repository, False otherwise.
     """
+    # Imported here, not at module level: GitPython raises ImportError at
+    # import time when no git executable is on PATH ("Bad git executable"),
+    # and this module is imported by ``import lsms_library``.  A Windows
+    # machine without Git could not import the library at all (GH #964).
+    import git
+
     try:
         _ = git.Repo(path).git_dir
         return True
@@ -99,7 +104,7 @@ def authenticate(gpg_key_file='s3_reader_creds.gpg', max_attempts: int = 3,
                 print("Operation aborted. Credentials were not written.")
                 return
 
-        with open(creds_file, 'w') as f:
+        with open(creds_file, 'w', encoding="utf-8") as f:
             f.write(str(decrypted_data))
         if interactive:
             print("*** Decryption successful; LSMS_Library can now stream data. ***")

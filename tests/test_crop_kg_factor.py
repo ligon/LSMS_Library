@@ -571,15 +571,85 @@ def test_uganda_harvest_kg_baseline():
     cp = ll.Country("Uganda").crop_production()
     assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
-    assert len(cp) == 130_606
-    assert len(res) == 78_532
-    assert res["Harvest_kg"].sum() == pytest.approx(28_680_848.595393997, rel=1e-9)
+    assert len(cp) == 133_331
+    assert len(res) == 78_571
+    assert res["Harvest_kg"].sum() == pytest.approx(29_093_322.407894, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 14_050, "shipped": 0, "survey_median": 57,
-        "metric": 86_978, "inferred": 0, "none": 29_521,
-        "reported_implausible": 99, "shipped_implausible": 0,
+        "reported": 14_972, "shipped": 0, "survey_median": 555,
+        "metric": 88_190, "inferred": 0, "none": 29_614,
+        "reported_implausible": 102, "shipped_implausible": 0,
         "shipped_matched": 0}
     # GH #929: all 86,978 moved from `inferred` to `metric` and NOTHING else
     # changed -- same Harvest_kg sum, same row counts.  Uganda's crop factors,
     # like Ethiopia's, are entirely READ; the price-ratio inference serves this
     # country nothing.
+    #
+    # GH #848 (2026-09-24): the second harvest-CONDITION slot of 2018-19
+    # AGSEC5B and 2019-20 agsec5b is now read, and the numbers MOVED,
+    # deliberately.  Cold private-root build, before -> after:
+    #   rows              130,606 -> 133,331  (+1,422 2018-19 B = 1,436 slot-2
+    #                     records - 14 that share (plot, crop, u, condition)
+    #                     with slot 1 and are summed; +1,303 2019-20 B =
+    #                     1,307 - 4)
+    #   harvest_kg rows    78,532 ->  78,571  (plot-crop grain; slot 2 mostly
+    #                     adds a condition to a plot-crop already present)
+    #   Harvest_kg sum     28,680,848.595 -> 29,093,322.408 kg  (+412,473.8;
+    #                     2018-19 5,904,803 -> 6,152,896, 2019-20 3,668,441
+    #                     -> 3,832,822)
+    #   reported           14,050 -> 14,972  (s5bq06d_2, 934 positive factors,
+    #                     minus the 9 collisions where slot 1's factor is
+    #                     kept by first(); 2019-20 wires NO kg_factor, #849)
+    #   reported_implausible   99 -> 102     survey_median 57 -> 555
+    #   metric         86,978 -> 88,190      none 29,521 -> 29,614
+
+
+# ---------------------------------------------------------------------------
+# GH #931: the crop ladder does NOT read a country's declared `u_kg` table
+# ---------------------------------------------------------------------------
+
+def test_crop_ladder_is_blind_to_declared_unit_kg():
+    """A declared ``u_kg`` factor reaches the FOOD ladder and not this one.
+
+    ``harvest_kg_factors`` takes no ``unit_kg`` and threads none into
+    ``_seeded_kg_factors`` / ``_kg_factor_series``; the same unit the seeded
+    dict WOULD resolve when handed a declaration is served ``none`` here.
+    ``quintal`` is the unit because GH #919 keeps it out of ``KNOWN_METRIC``
+    and out of the explicit-metric parser, so the ONLY way it could resolve
+    is through a declaration.
+
+    This pins an ASYMMETRY that is load-bearing (GH #931): Ethiopia's single
+    external check on the World Bank's shipped crop factor table is that
+    ``Quintal`` is exactly 100.0 on the rows the library holds no opinion on
+    (``test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``).
+    If the crop ladder starts reading ``u_kg``, that check becomes the
+    tautology its own docstring disowns for ``Kg``/``Gram`` -- so this test
+    going red is the signal to re-express the external check in the SAME
+    change, not to delete the assertion.
+    """
+    import inspect
+    from lsms_library.transformations import _seeded_kg_factors
+
+    assert "unit_kg" not in inspect.signature(harvest_kg_factors).parameters, (
+        "GH #931: harvest_kg_factors grew a unit_kg parameter; re-express the "
+        "Ethiopia quintal check in the same change and update this pin")
+
+    rows = [
+        ("2019-20", "h1", "h1-1-1", "Teff", "quintal", "dried", "A", 3.0, np.nan),
+        ("2019-20", "h1", "h1-1-1", "Maize", KNOWN_UNIT, "dried", "A", 40.0, np.nan),
+    ]
+    df = _frame(rows, with_kgfactor=False)
+    declared = {"quintal": 100.0}
+
+    # The declaration WOULD resolve the unit if it were threaded through...
+    assert "quintal" not in _seeded_kg_factors(df)
+    assert _seeded_kg_factors(df, unit_kg=declared)["quintal"] == 100.0
+
+    # ...and the crop ladder never threads it: the row is `none`, not 100 kg.
+    f = harvest_kg_factors(df)
+    q = f.xs("quintal", level="u")
+    assert q["KgFactorSource"].tolist() == ["none"], (
+        "GH #931: the crop ladder served a declared u_kg factor; Ethiopia's "
+        "Quintal == 100.0 external check is now a tautology -- re-express it")
+    assert np.isnan(q["kg_per_unit"]).all()
+    assert f.attrs["kg_factor_sources"]["none"] == 1
+    assert f.attrs["kg_factor_sources"]["metric"] == 1

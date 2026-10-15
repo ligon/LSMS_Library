@@ -1,0 +1,14 @@
+{
+  "transaction": "/global/scratch/fsa/fc_jevons/ligon/cache/.lsms-promotion-3914d8804-20261015T1441Z",
+  "state": "staged",
+  "active_l2_writes": 0,
+  "apply_hold": "credentialed CI38746123119 pending",
+  "shared_snapshot_files": 1365,
+  "manifest_files": 1518,
+  "new_paths": 153,
+  "changed_existing_paths": 1215,
+  "already_identical_paths": 150,
+  "retire_existing_paths": 0,
+  "sole_retirement_path_absent": "Uganda/var/nutrition.parquet",
+  "unlisted_shared_paths": 0
+}

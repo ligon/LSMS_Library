@@ -1,0 +1,20 @@
+[
+  {
+    "path": "Mali/2018-19/_/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  },
+  {
+    "path": "Mali/2021-22/_/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  },
+  {
+    "path": "Mali/var/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  }
+]

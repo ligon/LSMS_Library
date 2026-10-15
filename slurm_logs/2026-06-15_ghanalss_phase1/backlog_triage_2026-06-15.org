@@ -2,6 +2,12 @@
 #+DATE: 2026-06-15
 #+AUTHOR: Sue (coordinator) + 5 read-only audit agents (batches A-E)
 
+#+begin_quote
+*Superseded for the Ghana set, [2026-09-18 Fri].*  This sweep graded 27 open
+issues; there are 122 today.  See =slurm_logs/2026-09-18_ghana_triage/BACKLOG_TRIAGE.org=
+for the Ghana issues.  Everything else here is stale and should be re-checked
+before being relied on.
+#+end_quote
 Read-only audit: each open issue assessed vs the current codebase + recent
 merged PRs.  Dispositions are recommendations; nothing was closed/edited.
 

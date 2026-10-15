@@ -52,10 +52,29 @@ def mock_country_structure(tmp_path, monkeypatch):
     from lsms_library.paths import data_root
     data_root.cache_clear()
 
+    # GH #915: ``Country(name)`` raises ``ValueError`` for a name with no
+    # directory under ``countries_root()``, so the mock country must exist in
+    # a REAL config tree.  Use a tree SEPARATE from the data tree above: with
+    # ``countries_root() == data_root()`` every cache parquet these tests
+    # write would sit "in-tree" and trip the GH #803 artefact guard.  Both
+    # resolvers are ``lru_cache``d, and ``monkeypatch`` restores the env var
+    # but not the caches, so clear them on entry AND on exit.
+    config_root = (tmp_path / "config").resolve()
+    (config_root / "TestCountry" / "_").mkdir(parents=True)
+    (config_root / "TestCountry" / "_" / "data_scheme.yml").write_text(
+        "Country: TestCountry\nData Scheme:\n  test_data:\n")
+    monkeypatch.setenv("LSMS_COUNTRIES_ROOT", str(config_root))
+    from lsms_library.paths import countries_root
+    from lsms_library.catalog import _country_dirs
+    countries_root.cache_clear()
+    _country_dirs.cache_clear()
+
     yield country_root
 
     # Clean up cache after test
     data_root.cache_clear()
+    countries_root.cache_clear()
+    _country_dirs.cache_clear()
 
 
 @pytest.fixture

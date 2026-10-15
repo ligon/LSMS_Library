@@ -1,0 +1,17 @@
+{
+  "reviewed_utc": "2026-10-15T14:41:05.335973+00:00",
+  "snapshot_sha256": "dd7c6eb2dc408c1b457236a6ca2c04ed46a8625259da5e57fab672ac45d5737a",
+  "shared_files": 1365,
+  "promote": 1518,
+  "new_paths": 153,
+  "replacement_paths": 1365,
+  "byte_identical_paths": 150,
+  "sole_retirement": {
+    "Uganda/var/nutrition.parquet": null
+  },
+  "unlisted_retained_count": 0,
+  "unlisted_country_counts": {},
+  "unlisted_retained": {},
+  "active_l2_writes": 0,
+  "no_global_lock_claim": true
+}

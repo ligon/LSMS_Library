@@ -56,7 +56,12 @@ SENTINEL = "unknown_condition"
 #
 # Both numbers come from ONE cold rebuild (isolated LSMS_DATA_DIR with only
 # dvc-cache symlinked in, LSMS_COUNTRIES_ROOT pinned to the branch worktree,
-# Uganda cache physically removed), 2026-07-21, 133 683 rows.
+# Uganda cache physically removed), 2026-07-21, 133 683 rows.  (The table is
+# 130 606 rows since the 2009-10 `99999` strip, GH #861, and 133 331 since
+# the 2018-20 season-B second condition slot was wired, GH #848; the shares
+# below are the 2026-07-21 measurement, with the two season-B cells #848
+# moved re-measured on 2026-09-24: 2018-19 B 1 of 8 463 = 0.01%, 2019-20 B
+# 4 of 8 675 = 0.05%.)
 #
 # Observed `unknown_condition` share by (t, season), worst first:
 #     2009-10 A 25.72%   2009-10 B 20.46%   2010-11 A 7.10%   2013-14 B 4.35%
@@ -283,6 +288,7 @@ def _source_path(wave: str, basename: str) -> Path | None:
     return None
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 @pytest.mark.skipif(
     not _aws_creds_available(),
@@ -339,6 +345,7 @@ def test_crop_colmap_columns_resolve_in_source():
 # built-table tests
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_condition_is_an_index_level(crop_production):
     assert LEVEL in list(crop_production.index.names), (
         f"crop_production index is {list(crop_production.index.names)}; harvest "
@@ -346,6 +353,7 @@ def test_condition_is_an_index_level(crop_production):
     )
 
 
+@pytest.mark.requires_s3
 def test_condition_level_has_no_nulls(crop_production):
     """A null index key is SILENTLY DROPPED by the duplicate collapse's
     `groupby(level=...)` (pandas default dropna=True), so the level must carry
@@ -354,6 +362,7 @@ def test_condition_level_has_no_nulls(crop_production):
     assert int(pd.isna(values).sum()) == 0
 
 
+@pytest.mark.requires_s3
 def test_condition_values_are_canonical(crop_production, canonical_vocabulary):
     observed = set(crop_production.index.get_level_values(LEVEL).unique())
     unknown = {v for v in observed if pd.notna(v)} - canonical_vocabulary
@@ -363,10 +372,12 @@ def test_condition_values_are_canonical(crop_production, canonical_vocabulary):
     )
 
 
+@pytest.mark.requires_s3
 def test_index_is_unique(crop_production):
     assert crop_production.index.is_unique
 
 
+@pytest.mark.requires_s3
 def test_fresh_and_dry_no_longer_collide(crop_production):
     """The measured GH #323 example: one household's coffee off one plot,
     reported twice in the same month and unit — 240 kg dry and 100 kg fresh.
@@ -393,6 +404,7 @@ def test_fresh_and_dry_no_longer_collide(crop_production):
     assert {"dried_in_pods", "fresh_in_pods"} <= set(sel[LEVEL])
 
 
+@pytest.mark.requires_s3
 def test_condition_actually_separates_records(crop_production):
     """Sanity: the level does real work — thousands of plot-crop-unit-season
     groups carry more than one condition.  A level that never varies would
@@ -422,6 +434,7 @@ def _by_wave_season(crop_production):
     return f.groupby(["t", "season"])
 
 
+@pytest.mark.requires_s3
 def test_sentinel_share_bounded_per_wave_season(crop_production):
     """No wave-season may be mostly `unknown_condition`.
 
@@ -441,6 +454,7 @@ def test_sentinel_share_bounded_per_wave_season(crop_production):
     )
 
 
+@pytest.mark.requires_s3
 def test_condition_varies_within_every_wave_season(crop_production):
     """Every wave-season must decode a real spread of conditions.
 

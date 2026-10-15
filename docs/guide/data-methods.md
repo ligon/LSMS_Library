@@ -78,6 +78,15 @@ labels : str or dict, optional
     canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to
     the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and
     ``labels='Aggregate'`` are the same request.
+    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``
+    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.
+    Every TEXT column of the food label table is selectable
+    (``'Original'`` on EHCVM countries, per-wave columns); a
+    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A
+    ``j`` the column does not label passes through unrenamed and
+    is reported on ``result.attrs['labels_unmatched']`` with a
+    ``LabelPassThroughWarning`` (fatal under
+    ``LSMS_LABELS_STRICT=1``).  GH #787.
     Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)
     when the country cannot honour the request -- it curates no
     such label column, or the result has no such target at all;
@@ -155,6 +164,15 @@ labels : str or dict, optional
     canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to
     the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and
     ``labels='Aggregate'`` are the same request.
+    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``
+    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.
+    Every TEXT column of the food label table is selectable
+    (``'Original'`` on EHCVM countries, per-wave columns); a
+    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A
+    ``j`` the column does not label passes through unrenamed and
+    is reported on ``result.attrs['labels_unmatched']`` with a
+    ``LabelPassThroughWarning`` (fatal under
+    ``LSMS_LABELS_STRICT=1``).  GH #787.
     Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)
     when the country cannot honour the request -- it curates no
     such label column, or the result has no such target at all;
@@ -214,6 +232,15 @@ labels : str or dict, optional
     canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to
     the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and
     ``labels='Aggregate'`` are the same request.
+    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``
+    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.
+    Every TEXT column of the food label table is selectable
+    (``'Original'`` on EHCVM countries, per-wave columns); a
+    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A
+    ``j`` the column does not label passes through unrenamed and
+    is reported on ``result.attrs['labels_unmatched']`` with a
+    ``LabelPassThroughWarning`` (fatal under
+    ``LSMS_LABELS_STRICT=1``).  GH #787.
     Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)
     when the country cannot honour the request -- it curates no
     such label column, or the result has no such target at all;
@@ -265,6 +292,15 @@ labels : str or dict, optional
     canonical ``Urban``/``Rural``.  The key ``'j'`` is routed to
     the scalar behaviour, so ``labels={'j': 'Aggregate'}`` and
     ``labels='Aggregate'`` are the same request.
+    A trailing ``' Label'`` is stripped, so ``'Aggregate Label'``
+    is ``'Aggregate'`` and ``'Preferred Label'`` is the no-op.
+    Every TEXT column of the food label table is selectable
+    (``'Original'`` on EHCVM countries, per-wave columns); a
+    NUMERIC column (``'Code'``, ``'FTC Code'``) is refused.  A
+    ``j`` the column does not label passes through unrenamed and
+    is reported on ``result.attrs['labels_unmatched']`` with a
+    ``LabelPassThroughWarning`` (fatal under
+    ``LSMS_LABELS_STRICT=1``).  GH #787.
     Raises ``LabelUnavailableError`` (a ``KeyError`` subclass)
     when the country cannot honour the request -- it curates no
     such label column, or the result has no such target at all;

@@ -1,0 +1,2565 @@
+{
+  "files": {
+    "copy-manifest.json": {
+      "sha256": "ca1c1bed52f9711f707da285ee4cd3159265d5cbfa64ffe95ec40c503421bb7b",
+      "bytes": 374782
+    },
+    "date-workaround/run-retry.log": {
+      "sha256": "9586e5b88fbab0ab49d3e5f5bcde48ee146727c76882453b448369114463d85b",
+      "bytes": 14946
+    },
+    "date-workaround/run.log": {
+      "sha256": "68ab8f680cb1750c589dc40b274f915bcc5165c92b5d47c7daf1b36fccb4d152",
+      "bytes": 197
+    },
+    "final-manifest-reviewed-exclusion.log": {
+      "sha256": "45c7b0699e24e9a54540720ee631bb28e3b6f9b82258c825b4833846d40a95cb",
+      "bytes": 851
+    },
+    "final-manifest.log": {
+      "sha256": "4338d42f4574cc9283020d42f4b683afe04abce25f37a2b1cfc0e27312a419c9",
+      "bytes": 485
+    },
+    "final-run.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-summary.log": {
+      "sha256": "799d210cce354fcbcb5d75bde72a01fc1797d0404087907df4d6de5741a0a9c5",
+      "bytes": 910
+    },
+    "final-targeted.log": {
+      "sha256": "8edb22dc84210d1a0368d6e381c8929069da2a0e5e940cf26ea49b94d5b69c15",
+      "bytes": 14333
+    },
+    "hash-preflight.log": {
+      "sha256": "48e5b854ec8cfd1a5231e27fb17bf8b38ae2c5ebbb9735d6011a6efaed89344d",
+      "bytes": 419
+    },
+    "mali-date-review/replay.log": {
+      "sha256": "2c63a256c17b5aac5347ccbbf12511248e29a7a38192b7c27b2db8e4d09d6cf8",
+      "bytes": 743
+    },
+    "run/Albania/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Albania/cluster_features-warnings.json": {
+      "sha256": "5c011b1a499503797867f2567e5a8998f56e412be6207c69eef3e85ca74f6bd5",
+      "bytes": 839
+    },
+    "run/Albania/household_characteristics-warnings.json": {
+      "sha256": "654db7125f6af9a6ff9b38d1c0e5cdab1f5a485221ba6c34522bff2552cbd61e",
+      "bytes": 1003
+    },
+    "run/Albania/household_roster-warnings.json": {
+      "sha256": "419d310b584619d444c82c701a29513c7852cb746e595395cd8a3f735c74ef05",
+      "bytes": 2254
+    },
+    "run/Albania/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Albania/individual_education-warnings.json": {
+      "sha256": "9968fef6db3b594bb9db93c4b955c948ba9ad2fc6c5b16c92c2203056a19766f",
+      "bytes": 599
+    },
+    "run/Albania/interview_date-warnings.json": {
+      "sha256": "8997e2c81de291640f8b5d423a60c011aa5b6a3e90a60dc3db56fcba18b0e0e8",
+      "bytes": 594
+    },
+    "run/Albania/plot_features-warnings.json": {
+      "sha256": "989bff2ee84cbf0c01751f2e971cb42a879b437b4d701bf5cafab8c15742ce48",
+      "bytes": 3344
+    },
+    "run/Albania/results.jsonl": {
+      "sha256": "7e9e232f84332fe35878ca65a2cc66acda1e8078eb43ab566bd4d4529606ccff",
+      "bytes": 26289
+    },
+    "run/Albania/sample-warnings.json": {
+      "sha256": "e49200b49dfd64f0ddd585ea81b2dae18189624e9e82920ef1efc5050f7d4da7",
+      "bytes": 1650
+    },
+    "run/Albania/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Albania/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Albania.log": {
+      "sha256": "5f53558bd27401887fb808c8857fa7477959e31a198c9ff7ea03116fb17a748e",
+      "bytes": 963
+    },
+    "run/Armenia/household_characteristics-warnings.json": {
+      "sha256": "b695a7e8844ce1af3088aae436cc9bb63b9940d8db1657a355a8c9623873ea91",
+      "bytes": 129
+    },
+    "run/Armenia/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Armenia/results.jsonl": {
+      "sha256": "4e6e1d6fd559745de44d0a1ef3f400cb0ed048e1da989c6d81bafd46d34e0648",
+      "bytes": 10110
+    },
+    "run/Armenia.log": {
+      "sha256": "312d501af16a5fd9d9fcc85f76c13d24a6f20c37c3c9c8eafe25704610707c5e",
+      "bytes": 2230
+    },
+    "run/Azerbaijan/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan/results.jsonl": {
+      "sha256": "e443fd6cc6aa0bcb91dc7f1f3d12e902f0417a81b2dfd59fcafbc86ff802ff83",
+      "bytes": 10612
+    },
+    "run/Azerbaijan/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Azerbaijan.log": {
+      "sha256": "2b0c7bcf8688aa772f0358b80be18bc3d6f32608318e4914fcc9198913b73752",
+      "bytes": 642
+    },
+    "run/Benin/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/crop_production-warnings.json": {
+      "sha256": "a2cad8d1130989362b213ad5e19bf6a54ed1fb87dd4c9d57ba0ed08b8f56265d",
+      "bytes": 1583
+    },
+    "run/Benin/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/food_prices-warnings.json": {
+      "sha256": "1e4b67e49e830238f42958bae2ea3ea007148bae2e07a2461aba08349534c83a",
+      "bytes": 624
+    },
+    "run/Benin/food_quantities-warnings.json": {
+      "sha256": "1e4b67e49e830238f42958bae2ea3ea007148bae2e07a2461aba08349534c83a",
+      "bytes": 624
+    },
+    "run/Benin/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/people_last7days-warnings.json": {
+      "sha256": "d673c34575e9d30c7b80793ec7f17f9601d672b2feec3a085e35a4f14977a96d",
+      "bytes": 708
+    },
+    "run/Benin/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/plot_inputs-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/results.jsonl": {
+      "sha256": "b010a67f94b9993b2969daf35392e3aed03540c4eb76570a428961caad1d2235",
+      "bytes": 30879
+    },
+    "run/Benin/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Benin.log": {
+      "sha256": "43485d3784d6e3c983e8afd5fc5f22e10c7aae60f287303f03545d562d5be768",
+      "bytes": 1792
+    },
+    "run/Burkina_Faso/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/cluster_features-warnings.json": {
+      "sha256": "38b2093ac515b1cd6db69d7188f0c18babd3433bd3c2baf18c8901ffa867ff43",
+      "bytes": 629
+    },
+    "run/Burkina_Faso/crop_production-warnings.json": {
+      "sha256": "518e5aa9aa741b516078b7f366c5c0d2da427671d85ad5f9cbdb02ff95797606",
+      "bytes": 1497
+    },
+    "run/Burkina_Faso/food_acquired-warnings.json": {
+      "sha256": "a8d1776ec805a17f6468e86ed39efe7360f7d4f6bf2b05c5ecc52332dfbea095",
+      "bytes": 1435
+    },
+    "run/Burkina_Faso/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/food_expenditures-warnings.json": {
+      "sha256": "a8d1776ec805a17f6468e86ed39efe7360f7d4f6bf2b05c5ecc52332dfbea095",
+      "bytes": 1435
+    },
+    "run/Burkina_Faso/food_prices-warnings.json": {
+      "sha256": "2519fee6f937bb40bf8b784bd2ed67caf71d4488ceeab78cfa46aac91e7f6567",
+      "bytes": 3555
+    },
+    "run/Burkina_Faso/food_quantities-warnings.json": {
+      "sha256": "36593ff765c882d48bcab30064dbb548f9c0e1329386e11c3fd6cb59ba39153f",
+      "bytes": 2591
+    },
+    "run/Burkina_Faso/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/household_characteristics-warnings.json": {
+      "sha256": "3a68cfebe35fdb719465293c4cc0b677074ca382cc91308dd3b4ce561376ee8c",
+      "bytes": 989
+    },
+    "run/Burkina_Faso/household_roster-warnings.json": {
+      "sha256": "6d81761eabfb1a99a09fa4373519180b15d52fa7fc9f01295cbe64bb7911cf3b",
+      "bytes": 1447
+    },
+    "run/Burkina_Faso/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/individual_education-warnings.json": {
+      "sha256": "05459d99805e66ca54cec6a3921c959cb1ff82678b15d34975bf6b56f1c32483",
+      "bytes": 608
+    },
+    "run/Burkina_Faso/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/months_food_inadequate-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/people_last7days-warnings.json": {
+      "sha256": "b36ed8d43e906e9e855b965d468d7fb5df08e3671811e1000c46ca3c6e38c7eb",
+      "bytes": 715
+    },
+    "run/Burkina_Faso/plot_features-warnings.json": {
+      "sha256": "42d636a9a8413cf5f8e82385775faf9139bd0521fa4ea1569c2391d9c4006836",
+      "bytes": 2559
+    },
+    "run/Burkina_Faso/plot_inputs-warnings.json": {
+      "sha256": "643806f1b12dafa0e37cbad780d6211b2b08515a88ed86209477185edf569909",
+      "bytes": 642
+    },
+    "run/Burkina_Faso/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso/results.jsonl": {
+      "sha256": "737d7baa06c4dafd04678a5b8f7d944a4b9adc57500de5c7a4ac4eb84f77d200",
+      "bytes": 43152
+    },
+    "run/Burkina_Faso/sample-warnings.json": {
+      "sha256": "22fac9467f0c8f04893ee37fea3d11e3f938925681e422cffbb2079b414e5f87",
+      "bytes": 846
+    },
+    "run/Burkina_Faso/shocks-warnings.json": {
+      "sha256": "8646e753eea85d91be75feca19059d5a2dbae29074fcf9e0a6d397e8af8fe977",
+      "bytes": 1576
+    },
+    "run/Burkina_Faso/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Burkina_Faso.log": {
+      "sha256": "a6ad06f487be6e74c1c1a5241d8ea0d17c89250ec3decb63322d323ce1cf41b4",
+      "bytes": 2216
+    },
+    "run/Cambodia/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/food_prices-warnings.json": {
+      "sha256": "34b6e189d22bc1cbb36e05c6d96bd8a84ea07fb5077455a50f488290a06c65fc",
+      "bytes": 636
+    },
+    "run/Cambodia/food_quantities-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia/results.jsonl": {
+      "sha256": "c8f330b52b0ee00cc97816ec5ad0fc7523b9b2cf9dad1152b55c0e284f98bee7",
+      "bytes": 16153
+    },
+    "run/Cambodia/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Cambodia.log": {
+      "sha256": "423da409d3eb1416fda42d59e15d4f8fe383c58fd114fffa67fcb8b65581b0f1",
+      "bytes": 1071
+    },
+    "run/China/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China/results.jsonl": {
+      "sha256": "b374afec460fe83c9d5bb45e6202ee6229cda2bb98ee227a00ac54e610462170",
+      "bytes": 8968
+    },
+    "run/China/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/China.log": {
+      "sha256": "8cbead6b9df15e46cb0334d312450c6da0667a98666175ee1b742593dc1d5cf9",
+      "bytes": 527
+    },
+    "run/CotedIvoire/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/cluster_features-warnings.json": {
+      "sha256": "140434d29971f1f388bc5de549371c89ddf8a241327a550d9075328bebc6ce09",
+      "bytes": 2370
+    },
+    "run/CotedIvoire/crop_production-warnings.json": {
+      "sha256": "8316008f7fd07f63fa84af0e86c15a68233230a98c6e484c5793e7a70353ec47",
+      "bytes": 2545
+    },
+    "run/CotedIvoire/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/food_prices-warnings.json": {
+      "sha256": "df4715fe6f59c0e90146e76a6dcfbbf3dfaf6be54b633c65b547f0340489a9ef",
+      "bytes": 643
+    },
+    "run/CotedIvoire/food_quantities-warnings.json": {
+      "sha256": "df4715fe6f59c0e90146e76a6dcfbbf3dfaf6be54b633c65b547f0340489a9ef",
+      "bytes": 643
+    },
+    "run/CotedIvoire/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/household_characteristics-warnings.json": {
+      "sha256": "2d0fffe36898556cbf40e17cc8e5270e741fed0eb7eb5248e245ed52f2973f16",
+      "bytes": 1057
+    },
+    "run/CotedIvoire/household_roster-warnings.json": {
+      "sha256": "035a8066151de0aa96897aa9be05babf9bf1d7e85946cb1926d0592e6fc7cdc6",
+      "bytes": 631
+    },
+    "run/CotedIvoire/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/individual_education-warnings.json": {
+      "sha256": "beb7ec1bac01dd732d22fa521662e4c7e0d4cef2aa7f0a7ac2404fbf836dda5d",
+      "bytes": 1271
+    },
+    "run/CotedIvoire/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/people_last7days-warnings.json": {
+      "sha256": "ae4a3718c8b8eac93fd0fbb73318e1869b92f3604e24a11897e72f1497d12783",
+      "bytes": 714
+    },
+    "run/CotedIvoire/plot_features-warnings.json": {
+      "sha256": "b61ec6e915e1d152f0a2b50dca808fd36ff71b7251a4943be9c07d5b96ed7315",
+      "bytes": 1667
+    },
+    "run/CotedIvoire/plot_inputs-warnings.json": {
+      "sha256": "b56261ef25dd8a986beccf15182368e621545ffc5ee77effabb2239fad39c943",
+      "bytes": 637
+    },
+    "run/CotedIvoire/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/results.jsonl": {
+      "sha256": "4a4a43938915407cdd8e581f97c4a96e870821421b319365c14567cfc2d7f695",
+      "bytes": 39310
+    },
+    "run/CotedIvoire/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/CotedIvoire.log": {
+      "sha256": "74afb76f49df2f9f9d8adf962b3f1ab5c749193b3959fb52c8a7ae16b1dad4b0",
+      "bytes": 1916
+    },
+    "run/Ethiopia/anthropometry-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/cluster_features-warnings.json": {
+      "sha256": "6e758cc80410eb4df4debef142fbac3e33bc8324cdd494a0d6de7177462bef08",
+      "bytes": 4354
+    },
+    "run/Ethiopia/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/crop_production-warnings.json": {
+      "sha256": "cf7074c34df4406ef49367696e6cadaf977ac8af8ef0f3a24146a3952ec3ab21",
+      "bytes": 6779
+    },
+    "run/Ethiopia/food_acquired-warnings.json": {
+      "sha256": "9d2ecdb95d88fb7788fa9f0e59a4f1432c98302d752c0e8b47972ceb37d0e1dd",
+      "bytes": 8138
+    },
+    "run/Ethiopia/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/food_expenditures-warnings.json": {
+      "sha256": "9d2ecdb95d88fb7788fa9f0e59a4f1432c98302d752c0e8b47972ceb37d0e1dd",
+      "bytes": 8138
+    },
+    "run/Ethiopia/food_prices-warnings.json": {
+      "sha256": "710ecb46995c27400d8de60b52aa2f82d3e2e756451a614c99ee7d1904569644",
+      "bytes": 8693
+    },
+    "run/Ethiopia/food_quantities-warnings.json": {
+      "sha256": "710ecb46995c27400d8de60b52aa2f82d3e2e756451a614c99ee7d1904569644",
+      "bytes": 8693
+    },
+    "run/Ethiopia/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/interview_date-warnings.json": {
+      "sha256": "fc79df4fb9bbedcc5d022d8205cf64845f13e9cf702823d4212dcbb93704f95b",
+      "bytes": 1216
+    },
+    "run/Ethiopia/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/nutrition-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/plot_features-warnings.json": {
+      "sha256": "8b63f40fc41011ba2dc1628b956f48f287e06ff874ad783761e88f63ffe0e3cf",
+      "bytes": 3226
+    },
+    "run/Ethiopia/plot_inputs-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/results.jsonl": {
+      "sha256": "cac98cc40c491ab8cb4fc44aed0fd32e47166e43a5f0d21dbd08325c6a81cf51",
+      "bytes": 63017
+    },
+    "run/Ethiopia/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Ethiopia/shocks-warnings.json": {
+      "sha256": "3cbfe7a85009e481fcc47aec4b5bd75c26bb9843450c1e33d4801b6331017fb8",
+      "bytes": 842
+    },
+    "run/Ethiopia.log": {
+      "sha256": "16867fd6704e3decc3542c274569970a93fd7d968ab4a37965a81ffde64b7371",
+      "bytes": 2186
+    },
+    "run/EthiopiaRHS/anthropometry-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/consumption-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/crop_production-warnings.json": {
+      "sha256": "c4d1ff039f3625d5aeceb853f869693ad2f7c23e51b210684bfdffdf1a0c4ac6",
+      "bytes": 2421
+    },
+    "run/EthiopiaRHS/food_acquired-warnings.json": {
+      "sha256": "5e626f3c3aab38bbecbe2f1ba9f5947f4510322c0076f4ca47e96551309078ed",
+      "bytes": 615
+    },
+    "run/EthiopiaRHS/food_expenditures-warnings.json": {
+      "sha256": "5e626f3c3aab38bbecbe2f1ba9f5947f4510322c0076f4ca47e96551309078ed",
+      "bytes": 615
+    },
+    "run/EthiopiaRHS/food_prices-warnings.json": {
+      "sha256": "329a0db466bd921f22bab187b686f265ff92346bf3bce48b8cbda1e5f9dc5e33",
+      "bytes": 2676
+    },
+    "run/EthiopiaRHS/food_quantities-warnings.json": {
+      "sha256": "a3ccef1418f4d2603b7d2872ea9f7dec31e4c5db2708648fe8790771767af79c",
+      "bytes": 1689
+    },
+    "run/EthiopiaRHS/hhsize-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/income-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS/plot_features-warnings.json": {
+      "sha256": "aa6308988c955ab68de737cd0123b74798844831272936f230fe8baf77472827",
+      "bytes": 604
+    },
+    "run/EthiopiaRHS/results.jsonl": {
+      "sha256": "9ebe5c57d97f4d3d4faac12fa1402dcfd02aebee418ebca865cb97b21a89e4bf",
+      "bytes": 38925
+    },
+    "run/EthiopiaRHS/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/EthiopiaRHS.log": {
+      "sha256": "b772c5017d7b64e140246c65890d6d355bb044bb08f382b7a94f4dc6e6cb336c",
+      "bytes": 1625
+    },
+    "run/GhanaAHIES/anthropometry-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES/results.jsonl": {
+      "sha256": "1bcfc47503ec32b3f1d2fd0fc86a627d347b9abff8e3385565a4fb2e8a8ec263",
+      "bytes": 43988
+    },
+    "run/GhanaAHIES/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaAHIES.log": {
+      "sha256": "2526e6a9ff6a4858c59d0f861e2cd7bd633a56c8c19a855632c4c08a653f51b2",
+      "bytes": 826
+    },
+    "run/GhanaLSS/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/crop_production-warnings.json": {
+      "sha256": "7313def50f4545ca37a5fb4e6ee98c3fc0868547279ad695631b85fb6d04fda4",
+      "bytes": 598
+    },
+    "run/GhanaLSS/food_acquired-warnings.json": {
+      "sha256": "4b54aadeba7d1625be1d17ca40996a15534ecdfb647da3c9911e68abeb8fc2aa",
+      "bytes": 10103
+    },
+    "run/GhanaLSS/food_expenditures-warnings.json": {
+      "sha256": "4b54aadeba7d1625be1d17ca40996a15534ecdfb647da3c9911e68abeb8fc2aa",
+      "bytes": 10103
+    },
+    "run/GhanaLSS/food_prices-warnings.json": {
+      "sha256": "d9695fc2bf7bf1469496c972008697083ea3329669ead08e716acc628c682d8c",
+      "bytes": 10653
+    },
+    "run/GhanaLSS/food_quantities-warnings.json": {
+      "sha256": "81a752e3e63577e3132c65d598954614d9192cc48658ab047e55dc08fd3454e6",
+      "bytes": 11260
+    },
+    "run/GhanaLSS/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/household_characteristics-warnings.json": {
+      "sha256": "3f66e73c16d9e7ac49383925c3504a08014189e2bc07a353adad765971bd322c",
+      "bytes": 1035
+    },
+    "run/GhanaLSS/household_roster-warnings.json": {
+      "sha256": "5b238ec3d3e4e708933d1fb1c8cc855c18e66fa785869f729e7cd674ee57af6d",
+      "bytes": 1458
+    },
+    "run/GhanaLSS/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/individual_education-warnings.json": {
+      "sha256": "51f519ea58427f704efe9b2d4ea7619304698db439ffb35f6d92091c19220cdf",
+      "bytes": 626
+    },
+    "run/GhanaLSS/interview_date-warnings.json": {
+      "sha256": "f14e0b7ad3e9f7f4148234fbf586143262d10e59187915083725a806461f3c1d",
+      "bytes": 598
+    },
+    "run/GhanaLSS/labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/nonfood_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/nutrition-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/plot_features-warnings.json": {
+      "sha256": "60379e7f486941cbe13029300df2645e9c0f0107baf0cf3d6a044e92c225ed05",
+      "bytes": 4511
+    },
+    "run/GhanaLSS/plot_inputs-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaLSS/results.jsonl": {
+      "sha256": "985a54525d66b3aeeb339d2e8a27baeb9437a82fa28d5a2823f5f4241540eeae",
+      "bytes": 57389
+    },
+    "run/GhanaLSS/sample-warnings.json": {
+      "sha256": "e544f336e114091c447397d0d480383e6e177d49f0887e60ba942ac167d6d2af",
+      "bytes": 838
+    },
+    "run/GhanaLSS.log": {
+      "sha256": "b58e0a54bc75814e5374611fbc9828a1500fd4878058c506dcead8388631a95d",
+      "bytes": 1941
+    },
+    "run/GhanaSPS/crop_production-warnings.json": {
+      "sha256": "3b768fc86e18d9aeaeedb0fa13dec9a6862241e75e0cb903b99b8223084401b8",
+      "bytes": 3035
+    },
+    "run/GhanaSPS/food_acquired-warnings.json": {
+      "sha256": "68ec363fb7fb93fef6cfa1ec9c868c3c83b4f50607ef578957b4c89cfe9c127f",
+      "bytes": 7875
+    },
+    "run/GhanaSPS/food_expenditures-warnings.json": {
+      "sha256": "7402d1f3fe6bb5caabccc16f62cfc1e843865fed743545e28e10501c97195da4",
+      "bytes": 4539
+    },
+    "run/GhanaSPS/food_prices-warnings.json": {
+      "sha256": "1e7148e1c45b33c5b32de0583ac91d859676fdfb266f4d170ff1bbdb6bae2991",
+      "bytes": 5628
+    },
+    "run/GhanaSPS/food_quantities-warnings.json": {
+      "sha256": "ea8eb99ea729de15f54b64f9398aa9291ea79ab8fc838531260f19ba8d4e5fae",
+      "bytes": 5632
+    },
+    "run/GhanaSPS/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/plot_features-warnings.json": {
+      "sha256": "66f1174b13f19fa3f99fe71996aaebc8fbf303c3230a7ba9a8c96b1f71f33794",
+      "bytes": 953
+    },
+    "run/GhanaSPS/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/GhanaSPS/results.jsonl": {
+      "sha256": "92789d72cfba6fae6a0a024f6762accf7116064388aee4f8d5b7da15f2bd711a",
+      "bytes": 25633
+    },
+    "run/GhanaSPS/sample-warnings.json": {
+      "sha256": "136f1d26c8cc03caa2b212f5a1d44398781a927001448a40e99b26306a5f4cff",
+      "bytes": 3339
+    },
+    "run/GhanaSPS.log": {
+      "sha256": "840ef1488e5ec80e26a539459ef447465adf905f03b2faf743be7c324629d3be",
+      "bytes": 1151
+    },
+    "run/Guatemala/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/food_acquired-warnings.json": {
+      "sha256": "166ecddd2fbfc5fbccb63b9a4dc11a5e1940e0cc5246bfc1aea24b3b0798e749",
+      "bytes": 1842
+    },
+    "run/Guatemala/food_expenditures-warnings.json": {
+      "sha256": "166ecddd2fbfc5fbccb63b9a4dc11a5e1940e0cc5246bfc1aea24b3b0798e749",
+      "bytes": 1842
+    },
+    "run/Guatemala/food_prices-warnings.json": {
+      "sha256": "166ecddd2fbfc5fbccb63b9a4dc11a5e1940e0cc5246bfc1aea24b3b0798e749",
+      "bytes": 1842
+    },
+    "run/Guatemala/food_quantities-warnings.json": {
+      "sha256": "166ecddd2fbfc5fbccb63b9a4dc11a5e1940e0cc5246bfc1aea24b3b0798e749",
+      "bytes": 1842
+    },
+    "run/Guatemala/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/results.jsonl": {
+      "sha256": "b4119403c5b89866fbfec03233d9124c2a2db3be4b229c74eaa9e28866f61936",
+      "bytes": 14571
+    },
+    "run/Guatemala/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guatemala.log": {
+      "sha256": "d6f795e8592f5bb6b162775bd110c92468b7c64f1e657423363685b18c4d5b5f",
+      "bytes": 986
+    },
+    "run/Guinea-Bissau/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/crop_production-warnings.json": {
+      "sha256": "83d05e711ed363891b977ad0e25df2b47c5c398f5f96cf28561a861c22b8070e",
+      "bytes": 1663
+    },
+    "run/Guinea-Bissau/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/food_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/food_quantities-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/people_last7days-warnings.json": {
+      "sha256": "be3aa64ad6ec2be8eb3ce33e7e7749cb159f5027b08575f30bebb91761362b2c",
+      "bytes": 716
+    },
+    "run/Guinea-Bissau/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/plot_inputs-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/results.jsonl": {
+      "sha256": "0cda4a85e79e0acbf744e609e41e8bac783c7bd29d21d50f55f5bc9464d65ea9",
+      "bytes": 30995
+    },
+    "run/Guinea-Bissau/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guinea-Bissau.log": {
+      "sha256": "7127931e93ca9d7789aff73863263fe77473a04a970d8b186def1d090ed6554d",
+      "bytes": 1956
+    },
+    "run/Guyana/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana/results.jsonl": {
+      "sha256": "8cb36758e6ca77674eb4bf17d48c6c1d76f18a4ad4b37a4fcfaccbdb0ebe85e8",
+      "bytes": 11577
+    },
+    "run/Guyana/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Guyana.log": {
+      "sha256": "cd2406e51dd9154c4a8628228673faecb0729b6a48ced3a1b6f352513539783a",
+      "bytes": 693
+    },
+    "run/India/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India/employment-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India/household_characteristics-warnings.json": {
+      "sha256": "69f5f37e2e9ae8f5a2c3abc6f2109510ec81a9ab4638dbc06a326ed5fde67c30",
+      "bytes": 978
+    },
+    "run/India/household_roster-warnings.json": {
+      "sha256": "554530d6fd963e77a3245a557fcdb71937175bce8e1e2aaf0e71508249135dac",
+      "bytes": 596
+    },
+    "run/India/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India/individual_education-warnings.json": {
+      "sha256": "f6949525b6c45a03032c5176c036c9523cdf041f244e96b0c633bb187efa5080",
+      "bytes": 600
+    },
+    "run/India/interview_date-warnings.json": {
+      "sha256": "9eec9896632e2f3fa818c0d2bf35cbf684f30fc12296e1ba301f3668e0a40e7c",
+      "bytes": 594
+    },
+    "run/India/months_food_inadequate-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India/results.jsonl": {
+      "sha256": "f5d9c02218e6e7179b041e67a40f5746ebb9b0a06ccf1f0ff4fa01fb8d046f5b",
+      "bytes": 15004
+    },
+    "run/India/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/India.log": {
+      "sha256": "daa46fbd92d4587798f83f892a93d55c1fb0ab74be2c823ab1ca0aa23a53af95",
+      "bytes": 860
+    },
+    "run/Iraq/assets-warnings.json": {
+      "sha256": "551a9b083e1d8b5ea3f9e6ccb72bc4a77cd9e9ab1a5cecb66867863123953f46",
+      "bytes": 829
+    },
+    "run/Iraq/cluster_features-warnings.json": {
+      "sha256": "cad492efef0a1dce8320323030a0d8aeae267a91b25d235fbb62442925db7e05",
+      "bytes": 616
+    },
+    "run/Iraq/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/life_satisfaction-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/results.jsonl": {
+      "sha256": "619e3883cb439e0ee493648d10ab5dc33edf49870948e4b76a50a5df56518d4a",
+      "bytes": 18145
+    },
+    "run/Iraq/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Iraq.log": {
+      "sha256": "2c98f1d572a4ef798a16effc18ff065e07ec6c8ced6edbe1b7a33c2b5fc1c624",
+      "bytes": 842
+    },
+    "run/Kazakhstan/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/cluster_features-warnings.json": {
+      "sha256": "0e2bc689650349140bf5802d4b045dfc58c41a47e2c138e4974354c4f697626d",
+      "bytes": 1088
+    },
+    "run/Kazakhstan/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/results.jsonl": {
+      "sha256": "0bfd04d20d69f2f6cd682b376ec95a93760d553b0808a641e680a84f645ef379",
+      "bytes": 11756
+    },
+    "run/Kazakhstan/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kazakhstan.log": {
+      "sha256": "348065cb1b63c4054d193e5206625666b0416f0cdc2b7c0fbab4c8239faf7374",
+      "bytes": 732
+    },
+    "run/Kosovo/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/housing-warnings.json": {
+      "sha256": "75c210cf88c8eeb78f47eaf7bd4a17603165cfea239bdf742965b1e348d8da5e",
+      "bytes": 614
+    },
+    "run/Kosovo/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo/results.jsonl": {
+      "sha256": "df1b97bb061143b21ccbb17198a46068b533a04e31d32d20416ef3a53b78199e",
+      "bytes": 13324
+    },
+    "run/Kosovo/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Kosovo.log": {
+      "sha256": "5dd3d641f0424ffc2f5b8ea8076b197a2420c8ecc007b05b8362798c37b43a4b",
+      "bytes": 778
+    },
+    "run/Liberia/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/cluster_features-warnings.json": {
+      "sha256": "c279e3aa1bdbd8ca1a0fe287a2e92e96a40845110f5747a15f541fc4992e2712",
+      "bytes": 1091
+    },
+    "run/Liberia/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/months_food_inadequate-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/results.jsonl": {
+      "sha256": "0c64e0986fc187cffc67e14d6e6b6bcf2e22353909c51d7fa5adcd3ec41827b1",
+      "bytes": 14970
+    },
+    "run/Liberia/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Liberia.log": {
+      "sha256": "b121691f0e693fb8b16a86b835356226e65cda24d0696eef0166edb611a4edb5",
+      "bytes": 884
+    },
+    "run/Malawi/anthropometry-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/assets-warnings.json": {
+      "sha256": "20d337753800374c0d5332c27588fd2af718d4ada40af06eb2471d513c5874fc",
+      "bytes": 1676
+    },
+    "run/Malawi/cluster_features-warnings.json": {
+      "sha256": "3f6217ba7faf99b7da998bf94a971727b80e4ae17b820e1c837ba0c0ade75024",
+      "bytes": 4937
+    },
+    "run/Malawi/community_prices-warnings.json": {
+      "sha256": "c2f23ee2a54a9c1dd2a9cb5333f125079952f794746f9d3247bd81926e7a6a7f",
+      "bytes": 624
+    },
+    "run/Malawi/crop_production-warnings.json": {
+      "sha256": "fc91935dc4258077861ba70318b2019ea1e761bd21eb5c54b7a5a836e3996b72",
+      "bytes": 4388
+    },
+    "run/Malawi/food_acquired-warnings.json": {
+      "sha256": "359fd69a137541c1cd0dccb15a48232e40e38ee6084bfe667ec81b9980e1ea4c",
+      "bytes": 10270
+    },
+    "run/Malawi/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/food_expenditures-warnings.json": {
+      "sha256": "359fd69a137541c1cd0dccb15a48232e40e38ee6084bfe667ec81b9980e1ea4c",
+      "bytes": 10270
+    },
+    "run/Malawi/food_prices-warnings.json": {
+      "sha256": "37057a4a576e28e7df371d11d8a06e675f2ddef794bba7881553633f4e28bdf4",
+      "bytes": 12976
+    },
+    "run/Malawi/food_quantities-warnings.json": {
+      "sha256": "37057a4a576e28e7df371d11d8a06e675f2ddef794bba7881553633f4e28bdf4",
+      "bytes": 12976
+    },
+    "run/Malawi/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/months_food_inadequate-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/plot_features-warnings.json": {
+      "sha256": "19dbccacbb7c3ab1fefb6b565a4c9d3c0ff14eeadcec3ae3ff0c2bb22e8281ef",
+      "bytes": 5077
+    },
+    "run/Malawi/plot_inputs-warnings.json": {
+      "sha256": "64e8a71aaaacc6bfb6eac7fb724f9a9a4b02c52ec9d7edb4d1124ada1a642dba",
+      "bytes": 1560
+    },
+    "run/Malawi/plot_labor-warnings.json": {
+      "sha256": "4cf986481d011b759a8ea858d04e7fe29fb6bfe3f3e3a7c6047a0a990d2c93ba",
+      "bytes": 598
+    },
+    "run/Malawi/results.jsonl": {
+      "sha256": "82be621fcb7b18d4dabb57bf204f9e1376715d06fc247ec78994fbb0fb34ed79",
+      "bytes": 66494
+    },
+    "run/Malawi/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi/shocks-warnings.json": {
+      "sha256": "6ac62c4a7e1a647e2c631c774a64ab9987d062e15e72dc636d79e67ed7c29c5e",
+      "bytes": 2409
+    },
+    "run/Malawi/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Malawi.log": {
+      "sha256": "61bf06861e8cd361174c731aff9b4d129a12011cba6eaca3300b14694ae3e35a",
+      "bytes": 2248
+    },
+    "run/Mali/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/crop_production-warnings.json": {
+      "sha256": "cc682edc64fa871350261c51a1bffd01c8416d6c76c119f6dccfa3c137bcfb61",
+      "bytes": 4297
+    },
+    "run/Mali/food_acquired-warnings.json": {
+      "sha256": "b996eee953b45951d1bf10cece18fcc4727342f55431c48fb93a182bff9fe618",
+      "bytes": 2793
+    },
+    "run/Mali/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/food_expenditures-warnings.json": {
+      "sha256": "b996eee953b45951d1bf10cece18fcc4727342f55431c48fb93a182bff9fe618",
+      "bytes": 2793
+    },
+    "run/Mali/food_prices-warnings.json": {
+      "sha256": "5e78235830a559cf85091389a11156423695d18b51c681f4777676dd7093cc33",
+      "bytes": 3935
+    },
+    "run/Mali/food_quantities-warnings.json": {
+      "sha256": "7bef3ab07983297c2820cdbd0cb3ceb89174f43a735e8489fccbb91fd7a01ae7",
+      "bytes": 3939
+    },
+    "run/Mali/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/household_characteristics-warnings.json": {
+      "sha256": "987f6642f03256d35c954b25efe6be970487df825ea6b6d07c8f21f2606a874b",
+      "bytes": 396
+    },
+    "run/Mali/household_roster-warnings.json": {
+      "sha256": "b22153fbca1eb958934cfcdddd83d76604eaa13d19c4620900525585805b586e",
+      "bytes": 839
+    },
+    "run/Mali/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/interview_date-warnings.json": {
+      "sha256": "9be7129906dce023954a60bb800a32932cddbb07020b83e62792f038a485a615",
+      "bytes": 1252
+    },
+    "run/Mali/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/plot_features-warnings.json": {
+      "sha256": "5d974021414ad80b0cd3a41b8c2c9f0aa02cb960887ee38c82a62228f14264f2",
+      "bytes": 999
+    },
+    "run/Mali/plot_inputs-warnings.json": {
+      "sha256": "55d1b867d1894b6c63966ac857048c85ad4ec158b97226cb613d3ebbdd8a605b",
+      "bytes": 609
+    },
+    "run/Mali/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/results.jsonl": {
+      "sha256": "1c5169b1b76b702cfa9322f30b54f8bcc580f622ac9720480bdc99abf48eb384",
+      "bytes": 48357
+    },
+    "run/Mali/sample-warnings.json": {
+      "sha256": "b22153fbca1eb958934cfcdddd83d76604eaa13d19c4620900525585805b586e",
+      "bytes": 839
+    },
+    "run/Mali/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Mali.log": {
+      "sha256": "848d18e6964bd3d377227461858f9cd8203f4a8963ef924cfca72e99326b84d3",
+      "bytes": 2015
+    },
+    "run/Nepal/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nepal/cluster_features-warnings.json": {
+      "sha256": "6cb354470cca76bd2caff9aa882625b355927cfc49d5d68bc367981e4dadd9b8",
+      "bytes": 847
+    },
+    "run/Nepal/food_acquired-warnings.json": {
+      "sha256": "a2d8fe8381132ad8ba107d61d029d426b260d01f957af682c8685e96c0b9ff26",
+      "bytes": 829
+    },
+    "run/Nepal/food_expenditures-warnings.json": {
+      "sha256": "c81a168078db1b3f9926ab473a452d8d51fbd0ca60d0350e90daf647396c34bf",
+      "bytes": 1679
+    },
+    "run/Nepal/food_prices-warnings.json": {
+      "sha256": "f91b04f7aa963223dc89c0b9587fe8ffe6ddc17e8ec12d22d845ad85d311462a",
+      "bytes": 1643
+    },
+    "run/Nepal/food_quantities-warnings.json": {
+      "sha256": "3d26885841c8f3d7011b96f3b5e8bc25625df25f24e43836c2d87806287bd858",
+      "bytes": 1667
+    },
+    "run/Nepal/household_characteristics-warnings.json": {
+      "sha256": "9087e5d132fbba838a07de97a8aaef0b93ac8377500b5094de92b9b2a06e5487",
+      "bytes": 1745
+    },
+    "run/Nepal/household_roster-warnings.json": {
+      "sha256": "0bed1f39dc4aa8e06a096bc99ee4e27337aee6d76eaeafcf582fedcd7dc64903",
+      "bytes": 847
+    },
+    "run/Nepal/individual_education-warnings.json": {
+      "sha256": "8971a949f229827699d056f3e4e6589461a28b7664c30f1d492c466f91154f87",
+      "bytes": 871
+    },
+    "run/Nepal/interview_date-warnings.json": {
+      "sha256": "8fc84759ca54d197690faf4ff9386ac467f77d08bab2fc53c33df3d7ab881714",
+      "bytes": 835
+    },
+    "run/Nepal/results.jsonl": {
+      "sha256": "f58abba0569869951b0c4619eed1dd4cbaf9eceefe984b22fbbf859fe8292590",
+      "bytes": 42251
+    },
+    "run/Nepal/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nepal.log": {
+      "sha256": "afe56c1080899fc29ba8e7875e0283c5f0b58aff0e3162293eec592c283ba3cc",
+      "bytes": 10719
+    },
+    "run/Niger/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/cluster_features-warnings.json": {
+      "sha256": "cb28720a5720e372f52f4ebba9482a706d165b7002dca60f9c6e165045a300dc",
+      "bytes": 2750
+    },
+    "run/Niger/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/crop_production-warnings.json": {
+      "sha256": "cb71f3028f6bbb9e13c5f1c07cf8c2eee73d45c18027b702c28ee0798deb0a31",
+      "bytes": 4445
+    },
+    "run/Niger/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/food_prices-warnings.json": {
+      "sha256": "595afa3b08ff612d301d4e0e93342f586b3b3cf593b6f64d53efd4a7a23d13f0",
+      "bytes": 427
+    },
+    "run/Niger/food_quantities-warnings.json": {
+      "sha256": "595afa3b08ff612d301d4e0e93342f586b3b3cf593b6f64d53efd4a7a23d13f0",
+      "bytes": 427
+    },
+    "run/Niger/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/household_roster-warnings.json": {
+      "sha256": "4c269a2c2dded3e2e8f77f929536951f380a9060a315bbcae10118ac92aa9506",
+      "bytes": 841
+    },
+    "run/Niger/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/people_last7days-warnings.json": {
+      "sha256": "213ebbd6e8152950df7cc1c22e58f30ab33bd5981af04f392174967d50db513f",
+      "bytes": 3365
+    },
+    "run/Niger/plot_features-warnings.json": {
+      "sha256": "7b27996465135627c8ffc3f212e13c29ecf4b221abaa4159fe891ffc66109988",
+      "bytes": 1499
+    },
+    "run/Niger/plot_inputs-warnings.json": {
+      "sha256": "56be100c5c8bb9d568a6cbcc083413ad4f6e5c1d3170a86b27152886ee025a5c",
+      "bytes": 2517
+    },
+    "run/Niger/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger/results.jsonl": {
+      "sha256": "ab2ce380288a7d15f3cf8891e343d4b60841d50c1db85479199edd2a8a0ca8da",
+      "bytes": 50159
+    },
+    "run/Niger/sample-warnings.json": {
+      "sha256": "4c269a2c2dded3e2e8f77f929536951f380a9060a315bbcae10118ac92aa9506",
+      "bytes": 841
+    },
+    "run/Niger/shocks-warnings.json": {
+      "sha256": "e2c4cd8485fadd32950aa3b9a83a5bf4fa32054a939c8e89d1cf0fc339ac4147",
+      "bytes": 826
+    },
+    "run/Niger/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Niger.log": {
+      "sha256": "b4fb6e8d87417292b42066b113be522d814c848f6226200c873e487622213fad",
+      "bytes": 1960
+    },
+    "run/Nigeria/anthropometry-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/assets-warnings.json": {
+      "sha256": "24c99f82c4f83d170bedb6e20d9103525ae82b8d71241c80d7174c93cf005d97",
+      "bytes": 2903
+    },
+    "run/Nigeria/cluster_features-warnings.json": {
+      "sha256": "3f06cc8b95c74fc79bdc514b1e7cf89002bbdc2b31678954f1a67d7e02d62741",
+      "bytes": 8676
+    },
+    "run/Nigeria/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/crop_production-warnings.json": {
+      "sha256": "fa2eb99007bbd06591a740f8c843033b84a17c9483d21192be7194336192dba2",
+      "bytes": 8023
+    },
+    "run/Nigeria/food_acquired-warnings.json": {
+      "sha256": "6432ef1c56816505d87407d1628025f7624fc8dce7b615ea8044229d45601151",
+      "bytes": 11632
+    },
+    "run/Nigeria/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/food_expenditures-warnings.json": {
+      "sha256": "6432ef1c56816505d87407d1628025f7624fc8dce7b615ea8044229d45601151",
+      "bytes": 11632
+    },
+    "run/Nigeria/food_prices-warnings.json": {
+      "sha256": "c11d4104c4273d21b457db15d845032076cc7f4b522259a438692108f328621d",
+      "bytes": 12223
+    },
+    "run/Nigeria/food_quantities-warnings.json": {
+      "sha256": "5838c9ef8ee66397479cef5e8281bebc3738ced4494a1e10ce49e24e147bb116",
+      "bytes": 12227
+    },
+    "run/Nigeria/household_characteristics-warnings.json": {
+      "sha256": "30de37ff70804270912a8180446a9846be5d9ff6d2768d06410a4a061edebc29",
+      "bytes": 1007
+    },
+    "run/Nigeria/household_roster-warnings.json": {
+      "sha256": "562f2e53e19856b53c36215a8cc2b9de765785c0ae9c8fac0f9854c36d38d2bf",
+      "bytes": 609
+    },
+    "run/Nigeria/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/individual_education-warnings.json": {
+      "sha256": "03f7da6930701bc39a80d07c0ebf22d418ebac165d3a974f48016c2e3a7335b9",
+      "bytes": 611
+    },
+    "run/Nigeria/interview_date-warnings.json": {
+      "sha256": "13e6b6947ed97a7786fb7d276aa69842b55dc9b17fa731cfda94ba44405a488d",
+      "bytes": 596
+    },
+    "run/Nigeria/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/nonfood_expenditures-warnings.json": {
+      "sha256": "7a99adf7f42028f1b19c79a69f239d6ed5594d7808d0625ae48b22290b95ec2f",
+      "bytes": 613
+    },
+    "run/Nigeria/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/plot_features-warnings.json": {
+      "sha256": "057f8e3832dfa2e46903ec4ad4e514587d22700fa5265d4d0562376baac6b7e7",
+      "bytes": 4976
+    },
+    "run/Nigeria/plot_inputs-warnings.json": {
+      "sha256": "e4111af81d7e1ddca64a8bac69d28c56f40cb5bc5dbba4bc41224f09dfd6f6f2",
+      "bytes": 1689
+    },
+    "run/Nigeria/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/results.jsonl": {
+      "sha256": "0792aecad346f9d286fe30592cc54929f2e36d792be48bad5404c44287582fdc",
+      "bytes": 55571
+    },
+    "run/Nigeria/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Nigeria.log": {
+      "sha256": "596a5e8eb255b32fb7b360a5711c54006b8ebfe4e65e71c924f03b5d2b62f4a5",
+      "bytes": 2088
+    },
+    "run/Pakistan/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Pakistan/household_characteristics-warnings.json": {
+      "sha256": "b2bdfc989dde8cd723c202cd6da1d40d11400dc12656cedc8bd77c08060ca6a6",
+      "bytes": 981
+    },
+    "run/Pakistan/household_roster-warnings.json": {
+      "sha256": "caf5283d8a89274371c185754a6f222318b091c42f99c30ef44588f0c75268cf",
+      "bytes": 598
+    },
+    "run/Pakistan/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Pakistan/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Pakistan/results.jsonl": {
+      "sha256": "372bed4dcb3339b8f55c28a635a23e20650b1c7584e6b2d181d5330e0525766e",
+      "bytes": 9129
+    },
+    "run/Pakistan/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Pakistan.log": {
+      "sha256": "e051bd645be493947111ed708f3c9235d152e2f551d53755b8f47e7ca55507c7",
+      "bytes": 534
+    },
+    "run/Panama/food_acquired-warnings.json": {
+      "sha256": "f064d5b3a82149eb310412b75e62b5ae7a1924c7e6378918b6782101f2972978",
+      "bytes": 6550
+    },
+    "run/Panama/food_expenditures-warnings.json": {
+      "sha256": "b29cb94bc22cae08938e7b32592aa21408892a039afbeb95e9bc21f01870d47a",
+      "bytes": 4906
+    },
+    "run/Panama/food_prices-warnings.json": {
+      "sha256": "698a83b0e5e1bb4ffaee7cd2504dd4e359cc7e48d50ad8c1a77511231c4bd3df",
+      "bytes": 5838
+    },
+    "run/Panama/food_quantities-warnings.json": {
+      "sha256": "698a83b0e5e1bb4ffaee7cd2504dd4e359cc7e48d50ad8c1a77511231c4bd3df",
+      "bytes": 5838
+    },
+    "run/Panama/results.jsonl": {
+      "sha256": "cbcf5eb690f3268a33004178f63feb5e0730170a54320c931527dee0469fcfb4",
+      "bytes": 7104
+    },
+    "run/Panama/sample-warnings.json": {
+      "sha256": "f7faed20fc609590a0afc12d9b98f6cc34b2ec58c3bcf3da1865bec17dd8f74a",
+      "bytes": 1647
+    },
+    "run/Panama.log": {
+      "sha256": "24f41d4d9e82060e61f1b9a632349cadd146c89bfdd4f646f9f0b060e247f849",
+      "bytes": 427
+    },
+    "run/Peru/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Peru/food_acquired-warnings.json": {
+      "sha256": "de8338b5c9968bfc2c8147f821bf9c76185f1c1e06c5c49827f2e7c743468a27",
+      "bytes": 114
+    },
+    "run/Peru/food_expenditures-warnings.json": {
+      "sha256": "b8558ea15f8adabf03057ecbd2c403b3ceaf49e44f3fa085e3b0ce50ae10f0b7",
+      "bytes": 229
+    },
+    "run/Peru/food_prices-warnings.json": {
+      "sha256": "6ff7219fc5dda381b58d6b2218b8dc346ddc92e8cf94d3196bca0b0b0c6fcf19",
+      "bytes": 223
+    },
+    "run/Peru/food_quantities-warnings.json": {
+      "sha256": "d078a2e237ad11b2832ee33c375d989b46c44c49ed5413ae97d5ba47b05d357e",
+      "bytes": 227
+    },
+    "run/Peru/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Peru/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Peru/individual_education-warnings.json": {
+      "sha256": "c18441f68dd2573da0144275909eae587e76e0bd4ec44c7c607e4ad8502894c7",
+      "bytes": 121
+    },
+    "run/Peru/interview_date-warnings.json": {
+      "sha256": "3dac095213a07ff6f5d82ddbfc12dc716d6c0f06869add78b498bd8b78791f63",
+      "bytes": 115
+    },
+    "run/Peru/results.jsonl": {
+      "sha256": "7d467597876c512a3d756955993645f615d3832ca0996ffbf3918e53748a997b",
+      "bytes": 25012
+    },
+    "run/Peru/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Peru.log": {
+      "sha256": "1c1e877d6dc4734f499ecb42b0c875ecc69a44a9ab263c87246c921310c09a47",
+      "bytes": 7490
+    },
+    "run/Senegal/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/crop_production-warnings.json": {
+      "sha256": "e34b129393770c68a1d388d69c315372109c481faa1020b51fb1ebabd329e930",
+      "bytes": 1474
+    },
+    "run/Senegal/food_acquired-warnings.json": {
+      "sha256": "e7c337df7bca321bfd3e3001c4d54cfecd208352e6bde8d53c397dbc0716f916",
+      "bytes": 596
+    },
+    "run/Senegal/food_expenditures-warnings.json": {
+      "sha256": "e7c337df7bca321bfd3e3001c4d54cfecd208352e6bde8d53c397dbc0716f916",
+      "bytes": 596
+    },
+    "run/Senegal/food_prices-warnings.json": {
+      "sha256": "948ebce96bfc2cb0b76a3572d0b703907524f3f911ff6d1046cab0ff52b5704d",
+      "bytes": 1649
+    },
+    "run/Senegal/food_quantities-warnings.json": {
+      "sha256": "948ebce96bfc2cb0b76a3572d0b703907524f3f911ff6d1046cab0ff52b5704d",
+      "bytes": 1649
+    },
+    "run/Senegal/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/people_last7days-warnings.json": {
+      "sha256": "61182fbb0f1626af36eb045ef0af4d898acb00c263b8a20c9c9bcb1b75bb870d",
+      "bytes": 710
+    },
+    "run/Senegal/plot_features-warnings.json": {
+      "sha256": "23f2d30bf6f4be15d1903f5e4c2d8392eaafec445a8edbea041593b1552ff0bb",
+      "bytes": 1473
+    },
+    "run/Senegal/plot_inputs-warnings.json": {
+      "sha256": "4e249ce38bf53c3138311a08975c8c2c9b5c183c7b1c602396dada04b724993b",
+      "bytes": 634
+    },
+    "run/Senegal/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/results.jsonl": {
+      "sha256": "a6296b65602f5962f1ec16d12606984ad1b4e56ddcbe6ec7fbc44f149b927d5a",
+      "bytes": 36588
+    },
+    "run/Senegal/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Senegal.log": {
+      "sha256": "2548f69f84b177bb1b4efedd4d6e0884de1583d6c1278af130688a939bcef2e5",
+      "bytes": 1913
+    },
+    "run/Serbia/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/food_acquired-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/food_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/food_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/food_quantities-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia/results.jsonl": {
+      "sha256": "19b047f084d86b374cac89423316bab1f0a208456b99d765a32d6293ca6ef79b",
+      "bytes": 15658
+    },
+    "run/Serbia/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia and Montenegro/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia and Montenegro/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia and Montenegro/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Serbia and Montenegro/life_satisfaction-warnings.json": {
+      "sha256": "3efc210529cb7f7c056ccd22f42faf334a8ac13dcf727837cdd6dcdc478951ee",
+      "bytes": 858
+    },
+    "run/Serbia and Montenegro/results.jsonl": {
+      "sha256": "c6120735bfa5a1b51c2fa44579756c32eba7274d41e3ffb1968fdb7c673d8f5f",
+      "bytes": 9239
+    },
+    "run/Serbia and Montenegro/sample-warnings.json": {
+      "sha256": "3efc210529cb7f7c056ccd22f42faf334a8ac13dcf727837cdd6dcdc478951ee",
+      "bytes": 858
+    },
+    "run/Serbia and Montenegro.log": {
+      "sha256": "11b705c9b6dffb9c76b3a1f258b8a4d1bd47eb660a0149947415d056cf636b23",
+      "bytes": 520
+    },
+    "run/Serbia.log": {
+      "sha256": "d89ed0a19fe58a113265b61720690137f43bdead57a46eb32ccd4407a19b8740",
+      "bytes": 1041
+    },
+    "run/South Africa/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/life_satisfaction-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa/results.jsonl": {
+      "sha256": "141e3f97cb46366a8c8f907774a8777972d06b4793d6da838020480bb11024a5",
+      "bytes": 13372
+    },
+    "run/South Africa/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/South Africa.log": {
+      "sha256": "92e29aa64c6a5b56e3da768a19c5a2e02c8a76f8f29dc6f35e32c39028e0d856",
+      "bytes": 838
+    },
+    "run/Tajikistan/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/food_security_hfias-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/housing-warnings.json": {
+      "sha256": "af848d2bc1c005740ff93bed7f37028596e922cf1e43a602da71c742df17df30",
+      "bytes": 6632
+    },
+    "run/Tajikistan/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/interview_date-warnings.json": {
+      "sha256": "8b06fca232ae698fe88c2159d633ab0d201c8cdf43e6dde77416a17222fed0c9",
+      "bytes": 1663
+    },
+    "run/Tajikistan/life_satisfaction-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tajikistan/results.jsonl": {
+      "sha256": "d0ca46e9ef1bce4dfb88cb0829cd32703c29c2975ed435f05d43c71e0edc1261",
+      "bytes": 22825
+    },
+    "run/Tajikistan/sample-warnings.json": {
+      "sha256": "8b06fca232ae698fe88c2159d633ab0d201c8cdf43e6dde77416a17222fed0c9",
+      "bytes": 1663
+    },
+    "run/Tajikistan.log": {
+      "sha256": "a2ac727c3cfcc3bb9c81f27a82f236bb3451bd506d1cedf83b7c820c5b5dca66",
+      "bytes": 923
+    },
+    "run/Tanzania/anthropometry-warnings.json": {
+      "sha256": "3be108ff921c15e08cf129aaa91c270de13a2e6ea33892957b9fe247ed7a9d7a",
+      "bytes": 834
+    },
+    "run/Tanzania/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/cluster_features-warnings.json": {
+      "sha256": "df37a0042a957b39b9f020370493f040d4671d00c6d65517567a8f8395dee8f4",
+      "bytes": 6286
+    },
+    "run/Tanzania/community_cluster_xwalk-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/community_prices-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/crop_production-warnings.json": {
+      "sha256": "2f55d505d2b211e5fa5ad5be97950cce03bbd276da05d79b74481eca34488531",
+      "bytes": 2901
+    },
+    "run/Tanzania/food_acquired-warnings.json": {
+      "sha256": "6dd941500f40d7ce5d87badf3c5d031526cf30719dd389abd9d252622560ba41",
+      "bytes": 9941
+    },
+    "run/Tanzania/food_coping-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/food_expenditures-warnings.json": {
+      "sha256": "6dd941500f40d7ce5d87badf3c5d031526cf30719dd389abd9d252622560ba41",
+      "bytes": 9941
+    },
+    "run/Tanzania/food_prices-warnings.json": {
+      "sha256": "712a34da6f886f9e90506c3c3c847beed48d8c214ee5ec5549b7d5955f7cced3",
+      "bytes": 10534
+    },
+    "run/Tanzania/food_quantities-warnings.json": {
+      "sha256": "5f440cea7c33017ad79033614aa358cb4ab924bf155b09a783df3fcdb0213ca7",
+      "bytes": 10538
+    },
+    "run/Tanzania/household_characteristics-warnings.json": {
+      "sha256": "9bf476e17169bdb261bacb0ee10f9da93ae5cab7d19dfb34abb0ffba4f2bad37",
+      "bytes": 987
+    },
+    "run/Tanzania/household_roster-warnings.json": {
+      "sha256": "275c491b877047ffc9d2e51a61310d18ae636b11b891fac9150c42b7dd7e1a74",
+      "bytes": 601
+    },
+    "run/Tanzania/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/individual_education-warnings.json": {
+      "sha256": "aade052ba2b3445e72c1aa86941732e67f3f75b767a9746c19ccb171cf3a991b",
+      "bytes": 605
+    },
+    "run/Tanzania/interview_date-warnings.json": {
+      "sha256": "0ea9d128a1b1449b5b56710a8d66dd794b19a2f2c5c3f987edbe49a1b013c6cc",
+      "bytes": 598
+    },
+    "run/Tanzania/life_satisfaction-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/people_last7days-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/plot_inputs-warnings.json": {
+      "sha256": "3ecedee0ab54bcf379dc97f7558e793ed24763b0d4e39085aa15ca8ee43cb001",
+      "bytes": 612
+    },
+    "run/Tanzania/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/results.jsonl": {
+      "sha256": "0f6818c6e0e2868ffd3eb49160055fd5fd0b0c2eb9ce060578f05b2e5a7b900f",
+      "bytes": 58716
+    },
+    "run/Tanzania/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Tanzania/shocks-warnings.json": {
+      "sha256": "aa658622a7d8018befb45cf412e795765aeb6e94d28f7b91f00b0d74e023680d",
+      "bytes": 2544
+    },
+    "run/Tanzania.log": {
+      "sha256": "e07c0a4137818b9a59001544b9c2019186cd28f0ed7649cca2c7941a5d1d45f8",
+      "bytes": 2208
+    },
+    "run/Timor-Leste/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/life_satisfaction-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/months_food_inadequate-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/plot_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste/results.jsonl": {
+      "sha256": "e603a0393e398bb64406304ba8824670a651d0878523f112faf138f6563fa2b6",
+      "bytes": 16034
+    },
+    "run/Timor-Leste/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Timor-Leste.log": {
+      "sha256": "a30d7551473a9687cd8137c9e91f866ba88f1ea8d4840ace9dfa2d2df319f428",
+      "bytes": 837
+    },
+    "run/Togo/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/cluster_features-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/crop_production-warnings.json": {
+      "sha256": "7838a9e51758d1b24ee03143c9d0e7fe3ba70d893b087eecf24e3ffe08992c79",
+      "bytes": 1471
+    },
+    "run/Togo/food_acquired-warnings.json": {
+      "sha256": "7d5e82c26648ce9f246031a71d663c6fd17ff205872d581b3b1901eb4d2a69b8",
+      "bytes": 873
+    },
+    "run/Togo/food_expenditures-warnings.json": {
+      "sha256": "7d5e82c26648ce9f246031a71d663c6fd17ff205872d581b3b1901eb4d2a69b8",
+      "bytes": 873
+    },
+    "run/Togo/food_prices-warnings.json": {
+      "sha256": "774ed8798e123d87b32edf15a6c89cce6b3c82f7a3d72f3a0ebef20f9fe031cc",
+      "bytes": 1261
+    },
+    "run/Togo/food_quantities-warnings.json": {
+      "sha256": "774ed8798e123d87b32edf15a6c89cce6b3c82f7a3d72f3a0ebef20f9fe031cc",
+      "bytes": 1261
+    },
+    "run/Togo/food_security-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/household_characteristics-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/household_roster-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/housing-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/individual_education-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/interview_date-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/nonfood_expenditures-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/people_last7days-warnings.json": {
+      "sha256": "07424d1f1cb6c1df70e03d19c13767e9600f2c4b7341ca2476711d660a038b37",
+      "bytes": 707
+    },
+    "run/Togo/plot_features-warnings.json": {
+      "sha256": "c01f46fb885c311af23b770d5b86fd3f2842586039a64fee73ff448e794344a9",
+      "bytes": 1653
+    },
+    "run/Togo/plot_inputs-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/plot_labor-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/results.jsonl": {
+      "sha256": "0f36fdbe0e38938d151c3b2c9d74dfb1689da8353154311f4a0f4977874946d7",
+      "bytes": 32167
+    },
+    "run/Togo/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/shocks-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo/subjective_well_being-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Togo.log": {
+      "sha256": "cbdaa54c1f613459c07179e95f98c13a3b13ca1aa292efc9c51133c361fd5b99",
+      "bytes": 1860
+    },
+    "run/Uganda/anthropometry-warnings.json": {
+      "sha256": "9215003836911ff7f123af1b364c754ba78e9d11371ee7a2e5cd48efe1255ae3",
+      "bytes": 845
+    },
+    "run/Uganda/assets-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/cluster_features-warnings.json": {
+      "sha256": "40d90ac8d5b8e754808c92d89b068f9811f6f003175471094d2bac79e9b6e416",
+      "bytes": 9702
+    },
+    "run/Uganda/crop_production-warnings.json": {
+      "sha256": "f587030adadca0f9866f90c441ca431bcbac45a9281e6a3bce7a130a6736418f",
+      "bytes": 14207
+    },
+    "run/Uganda/earnings-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/enterprise_income-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/fct-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/food_acquired-warnings.json": {
+      "sha256": "0ac4e2c0503aaac4bbd344b990ae7576aa577134a305ef86b7f934d2e74f9a33",
+      "bytes": 4160
+    },
+    "run/Uganda/food_expenditures-warnings.json": {
+      "sha256": "0ac4e2c0503aaac4bbd344b990ae7576aa577134a305ef86b7f934d2e74f9a33",
+      "bytes": 4160
+    },
+    "run/Uganda/food_prices-warnings.json": {
+      "sha256": "55d70e2af873cf4581e4c0e9bd1efd6f6620752b9d937004d9f6a8e084c417dd",
+      "bytes": 8520
+    },
+    "run/Uganda/food_quantities-warnings.json": {
+      "sha256": "e9d61e052c3a6d2b356c1c4a33068d44cbf443e6c98bf6027f15202bf8016138",
+      "bytes": 8524
+    },
+    "run/Uganda/household_characteristics-warnings.json": {
+      "sha256": "75add16a1fff47f6d6c68af2f31a0ff5155395c43d99b7ec87177e5c884d233d",
+      "bytes": 1062
+    },
+    "run/Uganda/household_roster-warnings.json": {
+      "sha256": "2347be294fedc94081c4d00cbe6be2494d1ef7dd388a09af9d075f181c7ddc5c",
+      "bytes": 632
+    },
+    "run/Uganda/housing-warnings.json": {
+      "sha256": "9514a825378698971cf3c7c727b5a83f177cf539b4ced383f394dd64f2c9ad35",
+      "bytes": 507
+    },
+    "run/Uganda/income-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/individual_education-warnings.json": {
+      "sha256": "4b7c2f8531a1ff926c90fed3cc731d2516c22f0e5770bf95f3a680c42e918efa",
+      "bytes": 635
+    },
+    "run/Uganda/interview_date-warnings.json": {
+      "sha256": "05c5b706dc606b523a1cdc2e139f2b3ee7297ee6fdef295007c98ebe04b1bd29",
+      "bytes": 618
+    },
+    "run/Uganda/livestock-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/months_food_inadequate-warnings.json": {
+      "sha256": "c08e040e8c4dba55d968a3b6c29ff4e8f908242c5cd6d9f064a6aac614a4555f",
+      "bytes": 851
+    },
+    "run/Uganda/nonfood_expenditures-warnings.json": {
+      "sha256": "639eaa80e909984668ae2cacc5786c12efa44fc98eecc41933d8b89ce0b3af02",
+      "bytes": 1154
+    },
+    "run/Uganda/nutrition-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/panel_ids-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/people_last7days-warnings.json": {
+      "sha256": "6e61d4453839b669e65a1df33210b647a8ec6eacea4182e713735076746144f6",
+      "bytes": 816
+    },
+    "run/Uganda/plot_features-warnings.json": {
+      "sha256": "0e7ff106a8ad4c3e3584ed52acb450e2d57d8f75c561d2096a3f707a1f2684fe",
+      "bytes": 7427
+    },
+    "run/Uganda/plot_inputs-warnings.json": {
+      "sha256": "c0a98b9b8bbec97b32743754e7212f8ddb3ec8624dacc570bca154ce3dd2ae9c",
+      "bytes": 598
+    },
+    "run/Uganda/plot_labor-warnings.json": {
+      "sha256": "5c35eb369c45c5e8b6538abe2054e2974934767a1ce62ab592c721200f45e5d3",
+      "bytes": 623
+    },
+    "run/Uganda/results.jsonl": {
+      "sha256": "b0eb121a5fcc1b72ee1548b98d6214dd3d3331886d7c657b1af3a5b15dbdbff4",
+      "bytes": 98810
+    },
+    "run/Uganda/sample-warnings.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "run/Uganda/shocks-warnings.json": {
+      "sha256": "583915897ca39ca6e076242753051c3bffbb9b4cd117a2cbaa4a3afa6fdbeac3",
+      "bytes": 591
+    },
+    "run/Uganda.log": {
+      "sha256": "73c55ea67a0bbce05e1efd6241b66e817c69005b6b5a766405dc8512ec338ad3",
+      "bytes": 32431
+    },
+    "run/trailing-uganda.json": {
+      "sha256": "a760f9a3e7305d8050384a8c690440e84451d044d37af6301b3a19bd99829d8e",
+      "bytes": 67558
+    },
+    "tanzania-date-review/replay.log": {
+      "sha256": "b7a04c9c49afa3825d50429eed24c48af9a955976c5b57ec84b794f1da8affa7",
+      "bytes": 1180
+    },
+    "targeted-copy-manifest.json": {
+      "sha256": "16e77709e5c0d6ed16eef26b793af838bb111c0ae4fcf69e58279277bf20f510",
+      "bytes": 749100
+    },
+    "targeted-copy.log": {
+      "sha256": "e3e46aade0c4c07b1dbc98578764ca67423ab8a8919cf4e9f60a562773c05c07",
+      "bytes": 340
+    },
+    "trailing-uganda.log": {
+      "sha256": "eef415b72aae1914b00679ce3e2081cbfcc1c6217a2c1543c444a341e9a56a82",
+      "bytes": 11463
+    }
+  },
+  "privacy": "Raw warnings/logs may include survey identifiers or example rows and remain private. Only hashes, sizes and sanitized aggregate summaries are published."
+}

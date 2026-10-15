@@ -147,6 +147,53 @@ def _drop_double_punched(flat):
     return flat.drop_duplicates(subset=subset)
 
 
+def household_roster(df):
+    """Make the org table's DELIBERATELY-EMPTY Preferred Labels actually NA.
+
+    GH #813.  `_/categorical_mapping.org` maps three non-relationship codes
+    to a blank `Preferred Label`, and says why in as many words:
+
+        "Code -9 ("Head Died and Replaced", round-4 reltn4 interview-status
+        sentinel) and any other non-1..16 value are not real relationships;
+        they map to an empty Preferred Label so `_expand_kinship` treats
+        them as genuine-missing (no spurious kinship warning), same as NaN."
+
+    and, for `erhs_relation_1989`, that codes 11 and 36 are "two single-row
+    data-entry errors in demog89_1.relnhhed -- the labelled scheme is 1..9
+    only.  Mapped to empty -> NA Relationship".
+
+    The intent is right; the mechanism stops one step short.  A blank org
+    cell parses as the empty STRING, and `df_data_grabber` applies the
+    `Code -> Preferred Label` dict with `f.get(x, x)`, so the rows arrive
+    carrying `''` -- a value, not a missing value.  Measured on the warm
+    corpus, exactly the rows the two paragraphs above describe: 76 in 1997
+    (reltn4 == -9, the count `1997/_/data_info.yml` itself records) and 2 in
+    1989 (relnhhed 11 and 36).  Nothing else in ERHS emits an empty label.
+
+    Served output does not move: `_expand_kinship`'s `_NA_SENTINELS`
+    (commit 0d35af6ed) already absorbs `''`, which is why
+    `_/CONTENTS.org`'s "zero kinship warnings" is true.  What changes is
+    that the CACHED table stops storing a survey-shaped empty string for a
+    code the survey never gave a relationship to, and the country stops
+    depending on a framework sentinel list to undo its own decode gap.
+
+    The composing myvar path cannot do this: `map_formatting_function`
+    returns `(formatting_functions[var_name], mapping_dic)` and
+    `df_data_grabber`'s tuple branch (`for i in f: return grabber(df,(s,i))`)
+    applies only the FIRST element -- a `Relationship` formatter here would
+    REPLACE the org mapping, not run after it.  The table's `df_edit` hook
+    is the only country-level lever that sees the decoded label.
+    """
+    if 'Relationship' not in df.columns:
+        return df
+    rel = df['Relationship']
+    blank = rel.map(lambda x: isinstance(x, str) and not x.strip())
+    if blank.any():
+        df = df.copy()
+        df.loc[blank, 'Relationship'] = pd.NA
+    return df
+
+
 def food_acquired(df):
     """Melt ERHS wide per-source food columns into canonical long form.
 

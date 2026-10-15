@@ -134,6 +134,13 @@ _EXCLUDED_CALLABLES = frozenset({
     # fix would otherwise have moved every table's hash a second time.
     "lsms_library.country.Country._assert_built_required_columns",
     "lsms_library.country.Country._is_script_path",
+    # The wave-script RUNNER (GH #968): make if installed, else the wave
+    # script directly.  It decides which program executes the script, not
+    # what the script writes -- the script text and the country _/Makefile
+    # are already in Wave._input_hash.  Without this entry every edit to the
+    # invocation (the #964 as_posix fix, the #968 fallback) moved every
+    # table's hash.  Pinned by tests/test_windows_portability.py.
+    "lsms_library.country._build_wave_script_target",
     # The null-content audit (null_read_audit): pure REPORTING.  It measures the
     # frame and warns; it provably returns its input unchanged, so no byte of
     # any parquet depends on it.  `check_read` is called from `get_dataframe`,
@@ -457,7 +464,11 @@ def framework_imports_fingerprint(paths: tuple) -> str:
     parts: list = []
     for path in paths:
         try:
-            tree = ast.parse(open(path, encoding="utf-8").read())
+            # GH #792: read via a closed handle -- the bare open() leaked a
+            # ResourceWarning per fingerprinted source (746 of 774 warnings
+            # on Feature("sample")).
+            with open(path, encoding="utf-8") as fh:
+                tree = ast.parse(fh.read())
         except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
             continue
         targets = []          # (module_name, attr)

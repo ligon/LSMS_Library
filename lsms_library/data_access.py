@@ -64,6 +64,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from . import config
+from .catalog_relations import derived_from, same_study_aliases
 from .paths import countries_root, data_root
 from .provenance import (
     SOURCE_WORLDBANK,
@@ -286,6 +287,21 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
                "University study distributed via Harvard Dataverse "
                "(doi:10.7910/DVN/T8G8IV), not the World Bank Microdata "
                "Library.  There is nothing to discover in the WB catalog."),
+    # GhanaAHIES: the Annual Household Income and Expenditure Survey is
+    # published on the Ghana Statistical Service NADA
+    # (microdata.statsghana.gov.gh, entries 119 and 128), the host that also
+    # supplied GLSS6/7.  Its downloads are anonymous but the host refuses
+    # ``api/resources`` even to a keyed user, so neither ``discover_waves``
+    # nor ``add_wave`` can drive it.  Whether the WB Microdata Library
+    # mirrors it is UNCHECKED (2026-09-17); flip this to a GHA spec with an
+    # ``_AHIES`` idno pin if it does.  See slurm_logs/ghana_ahies/README.org.
+    "GhanaAHIES": CountryCatalog(
+        None, discoverable=False,
+        reason="Ghana AHIES is distributed by the Ghana Statistical Service "
+               "NADA (microdata.statsghana.gov.gh), not the World Bank "
+               "Microdata Library; the GSS host's resources API refuses "
+               "unauthenticated and keyed callers alike, so discovery is "
+               "manual.  See slurm_logs/ghana_ahies/README.org."),
     "KenyaLPS": CountryCatalog(
         None, discoverable=False,
         reason="Kenya Life Panel Survey is not distributed via the World "
@@ -302,16 +318,30 @@ _COUNTRY_CODES: dict[str, str] = {
 }
 
 
-def _dvc_cmd() -> str:
-    """Return path to the ``dvc`` executable in the current venv.
+def _dvc_cmd() -> list[str]:
+    """Return the argv prefix that runs ``dvc`` for the current interpreter.
 
-    Falls back to bare ``"dvc"`` if no venv-local binary is found.
+    Prefers ``[sys.executable, "-m", "dvc"]`` whenever the ``dvc`` package is
+    importable: that is exactly the venv the library itself is running in, and
+    it does not depend on a console-script shebang.  Shebangs are what broke
+    on Savio (2026-09-17): the squashfs venv image (``bin/savio_venv.sh``)
+    ships ``.venv/bin/dvc`` with ``#!/global/scratch/.../.venv/bin/python`` --
+    a path that no longer exists -- so ``exec`` failed with ``ENOENT`` and
+    ``push_to_cache_batch`` pushed 0 of 6 files.  ``SkunkWorks/savio_venv.md``
+    already says "always invoke as ``.venv/bin/python -m <module>``"; this
+    makes the library obey it.
+
+    Falls back to the venv-local ``dvc`` script, then bare ``"dvc"``, when the
+    package is not importable from this interpreter.
     """
+    import importlib.util
     import sys
+    if importlib.util.find_spec("dvc") is not None:
+        return [sys.executable, "-m", "dvc"]
     venv_dvc = Path(sys.executable).parent / "dvc"
     if venv_dvc.exists():
-        return str(venv_dvc)
-    return "dvc"
+        return [str(venv_dvc)]
+    return ["dvc"]
 
 
 # DVC serializes every repo operation on ``.dvc/tmp/lock``.  Concurrent
@@ -372,7 +402,24 @@ def _terminate_dvc(proc: subprocess.Popen, grace: float = 30.0) -> bool:
 
     SIGTERM instead, to the whole process group (``dvc`` spawns children), and
     escalate only if it will not go.
+
+    Windows has no process groups or signals (``os.getpgid`` / ``os.killpg``
+    do not exist there), so the tree is ended with ``taskkill /T /F``.  That
+    is a hard kill -- there is no polite equivalent for a console process --
+    so it returns True; the caller's lock sweep runs either way.
     """
+    if not hasattr(os, "killpg"):
+        try:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           check=False)
+        except OSError:
+            proc.kill()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return True
     try:
         pgid = os.getpgid(proc.pid)
     except OSError:
@@ -790,7 +837,7 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
 
     legacy_creds = dvc_dir / "s3_creds"
     try:
-        user_text = user_creds.read_text()
+        user_text = user_creds.read_text(encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not read user-config s3_creds: %s", exc)
         return False
@@ -798,13 +845,13 @@ def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
     # Skip the write if the legacy file already matches.
     if legacy_creds.exists():
         try:
-            if legacy_creds.read_text() == user_text:
+            if legacy_creds.read_text(encoding="utf-8") == user_text:
                 return True
         except OSError:
             pass  # fall through to overwrite
 
     try:
-        legacy_creds.write_text(user_text)
+        legacy_creds.write_text(user_text, encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
         return False
@@ -880,7 +927,7 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
         return False
 
     try:
-        creds_file.write_text(decrypted)
+        creds_file.write_text(decrypted, encoding="utf-8")
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
@@ -974,7 +1021,7 @@ def _read_source_url(country: str, wave: str) -> str | None:
     if not source.exists():
         return None
     try:
-        text = source.read_text()
+        text = source.read_text(encoding="utf-8")
         m = re.search(r'https?://[^\s\]\)]+', text)
         return m.group(0).rstrip("/") if m else None
     except (OSError, UnicodeDecodeError):
@@ -1278,7 +1325,7 @@ def _s3_writer_credentialpath(remote: str | None, dvc_dir: Path):
     prior = config_local.read_text(encoding="utf-8") if had_local else None
     try:
         _run_dvc_with_lock_retry(
-            [_dvc_cmd(), "remote", "modify", "--local",
+            [*_dvc_cmd(), "remote", "modify", "--local",
              target, "credentialpath", str(write_path)],
             cwd=str(dvc_dir.parent), timeout=60,
         )
@@ -1336,7 +1383,7 @@ def push_to_cache(path: str | Path,
     try:
         if dvc_add:
             result = _run_dvc_with_lock_retry(
-                [_dvc_cmd(), "add", str(abs_path)],
+                [*_dvc_cmd(), "add", str(abs_path)],
                 cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
             )
             if result.returncode != 0:
@@ -1344,7 +1391,7 @@ def push_to_cache(path: str | Path,
                 return False
             logger.info("dvc add: %s", abs_path)
 
-        push_cmd = [_dvc_cmd(), "push", str(abs_path) + ".dvc"]
+        push_cmd = [*_dvc_cmd(), "push", str(abs_path) + ".dvc"]
         if remote:
             push_cmd.extend(["-r", remote])
         with _s3_writer_credentialpath(remote, _COUNTRIES_DIR / ".dvc"):
@@ -1414,7 +1461,7 @@ def push_to_cache_batch(paths: list[str | Path],
     try:
         # --- Batched dvc add -----------------------------------------------
         if dvc_add:
-            add_cmd = [_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
+            add_cmd = [*_dvc_cmd(), "add"] + [str(p) for p in abs_paths]
             logger.info("dvc add: %d files ...", len(abs_paths))
             result = _run_dvc_with_lock_retry(
                 add_cmd,
@@ -1429,7 +1476,7 @@ def push_to_cache_batch(paths: list[str | Path],
 
         # --- Batched dvc push ----------------------------------------------
         dvc_files = [str(p) + ".dvc" for p in abs_paths]
-        push_cmd = [_dvc_cmd(), "push"] + dvc_files
+        push_cmd = [*_dvc_cmd(), "push"] + dvc_files
         if remote:
             push_cmd.extend(["-r", remote])
         logger.info("dvc push: %d files ...", len(abs_paths))
@@ -1478,7 +1525,7 @@ def unpushed_blobs(remote: str | None = None,
         Sorted paths that are out of sync with the remote (need a push).
         Empty when everything tracked is already on the remote.
     """
-    cmd = [_dvc_cmd(), "status", "--cloud", "--json"]
+    cmd = [*_dvc_cmd(), "status", "--cloud", "--json"]
     if remote:
         cmd += ["-r", remote]
     if targets:
@@ -1694,16 +1741,77 @@ def wave_provenance(country: str, wave: str) -> WaveProvenance:
 def local_catalog_ids(country: str) -> dict[str, list[str]]:
     """Map each WB catalog id we hold locally -> the wave dirs holding it.
 
-    One catalog entry can legitimately back **several** wave directories: WB
-    id 1001 (``UGA_2005-2009_UNPS``) covers both ``Uganda/2005-06/`` and
-    ``Uganda/2009-10/``.  Hence a list, not a scalar.
+    The relation is **many-to-many** and both directions are live:
+
+    * one entry, several dirs -- WB id 1001 (``UGA_2005-2009_UNPS``) backs both
+      ``Uganda/2005-06/`` and ``Uganda/2009-10/``;
+    * one dir, several entries -- ``Malawi/2016-17/`` holds the Fourth
+      Integrated Household Survey (2936) in ``Data/Cross_Sectional/`` **and**
+      the 2016 wave of the Integrated Household Panel Survey (2939) in
+      ``Data/Panel/``.  Reading only the first id reported a study we hold as
+      missing (GH #600).
     """
     held: dict[str, list[str]] = {}
     for wave in _local_waves(country):
         prov = read_provenance(_COUNTRIES_DIR, country, wave)
-        if prov.is_worldbank and prov.catalog_id:
-            held.setdefault(prov.catalog_id, []).append(wave)
+        if not prov.is_worldbank:
+            continue
+        for cid in prov.catalog_ids:
+            held.setdefault(cid, []).append(wave)
     return {k: sorted(v) for k, v in held.items()}
+
+
+def local_covered_ids(country: str) -> dict[str, list[str]]:
+    """Map each catalog id *covered* by a release we hold -> the dirs covering it.
+
+    Covered is **not** held: ``Tanzania/2008-15/`` holds the Uniform Panel
+    Dataset (3814) and none of the files of the four individual NPS rounds (76,
+    1050, 2252, 2862) -- but the UPD's ``round`` column carries those four
+    rounds' data, which is why ``Country('Tanzania').waves`` exposes four waves
+    out of the one directory.  Those entries are neither held nor missing, and
+    calling them either is a false claim.
+
+    See ``#+CATALOG_COVERS:`` in :mod:`lsms_library.provenance`.
+    """
+    covered: dict[str, list[str]] = {}
+    for wave in _local_waves(country):
+        prov = read_provenance(_COUNTRIES_DIR, country, wave)
+        if not prov.is_worldbank:
+            continue
+        for cid in prov.covers:
+            covered.setdefault(cid, []).append(wave)
+    return {k: sorted(v) for k, v in covered.items()}
+
+
+def _logical_wave_labels(country: str) -> set[str]:
+    """Wave labels the country *exposes* that are not directories of their own.
+
+    Multi-round folders back several logical waves: ``Tanzania/2008-15/`` backs
+    ``2008-09``, ``2010-11``, ``2012-13`` and ``2014-15`` (see
+    ``.claude/skills/multi-round-waves.md``).  Those labels name waves we
+    genuinely have, so a catalog entry carrying one of them can never honestly
+    be reported as a confident ``no`` -- at worst it is ``unknown``.
+
+    This is the structural backstop for GH #600: it fires from the country's own
+    ``wave_folder_map``, with nothing to hand-maintain, so the *next* multi-round
+    folder someone adds cannot emit a false "missing wave" even if its
+    ``SOURCE.org`` never gets a ``#+CATALOG_COVERS:`` line.
+
+    A country whose module cannot be loaded yields an empty set: this refines a
+    ``no`` into an ``unknown`` and must never be able to break discovery.
+    """
+    # ``Country`` reads the *package* config tree, so it can only be asked about
+    # the tree this module is pointed at.  When they differ (a test's temp tree),
+    # say nothing rather than answer from the wrong tree.
+    if Path(_COUNTRIES_DIR) != Path(countries_root()):
+        return set()
+    try:
+        from .country import Country
+        waves = set(Country(country).waves)
+    except (ImportError, OSError, KeyError, ValueError, AttributeError) as exc:
+        logger.debug("Could not read logical waves for %s: %s", country, exc)
+        return set()
+    return waves - set(_local_waves(country))
 
 
 def discover_waves(country: str,
@@ -1731,18 +1839,42 @@ def discover_waves(country: str,
         Retained for display and for the label fallback below.
     ``local``
         ``bool`` -- ``True`` only when a local wave directory *records* this
-        catalog id.  Unchanged in type and truthiness from previous releases,
-        so existing callers keep working.
+        catalog id (or the id of the same study under another repository's id;
+        see ``same_study`` in :mod:`lsms_library.catalog_relations`).  Unchanged
+        in type and truthiness from previous releases, so existing callers keep
+        working: ``covered`` / ``derived`` / ``unknown`` rows all keep
+        ``local=False``, because we do not hold their *files*.
     ``local_status``
-        ``"yes"`` / ``"no"`` / ``"unknown"`` -- the honest tri-state.
-        ``"unknown"`` means a directory whose label matches this entry exists
-        but has no recorded WB catalog id, so we cannot say whether it holds
-        this study or a different one that happens to share a year range.
-        These rows have ``local=False``: an unverified claim is treated as
-        not-held, because wrongly believing we hold a survey is the failure
-        mode that hides missing data.
+        ``"yes"`` / ``"covered"`` / ``"derived"`` / ``"unknown"`` / ``"no"``.
+        A ``no`` has to be **earned** -- it is a confident claim that we neither
+        hold this study nor anything containing it, and a confident wrong answer
+        is worse than an admitted gap (GH #600):
+
+        ``yes``
+            A wave dir records this catalog id.
+        ``covered``
+            We do not hold this entry's files, but a release we *do* hold
+            subsumes its content -- ``Tanzania/2008-15/`` holds the Uniform
+            Panel Dataset (3814), whose ``round`` column carries the four
+            individual NPS rounds (76, 1050, 2252, 2862).  Not a gap; not an
+            acquisition target.  Declared per-directory with
+            ``#+CATALOG_COVERS:``.
+        ``derived``
+            This entry is built *out of* entries we hold, all of them -- e.g.
+            Nigeria 5835 (``NGA_2010-2019_NUPD``), the four GHS-Panel waves we
+            hold, harmonized.  Declared in ``catalog_relations.yml``; downgraded
+            back to ``no`` automatically if any constituent stops being held.
+        ``unknown``
+            We cannot say.  Either a directory whose label matches this entry
+            has no recorded WB catalog id, or the entry's label is a *logical*
+            wave living inside a multi-round folder whose record does not
+            account for it.  A structurally incomplete record must never
+            masquerade as a complete one.
+        ``no``
+            Not held, not covered, not derived: a real gap.
     ``local_waves``
-        The wave directories backing this entry (empty unless ``local``).
+        The wave directories that back, cover, or constitute this entry (empty
+        for ``no``).
 
     Which WB *collections* are searched is per-country config: the
     ``repositories`` field of :class:`CountryCatalog`, defaulting to
@@ -1780,24 +1912,55 @@ def discover_waves(country: str,
     entries = [e for e in _wb_catalog_search_many(spec.code, collections)
                if spec.matches(e)]
 
-    held = local_catalog_ids(country)
-    # Wave dirs whose WB catalog id we do NOT know: either no SOURCE.org, or
-    # one that records a non-WB source.  These are the only dirs for which we
-    # fall back to the old label heuristic -- and we mark the result unknown.
+    aliases = same_study_aliases()
+
+    def canonical_holdings(records):
+        # Equivalence applies to BOTH sides of the lookup, including a tree
+        # that records an alias instead of the registry's canonical id.
+        merged = {}
+        for cid, waves in records.items():
+            merged.setdefault(aliases.get(cid, cid), set()).update(waves)
+        return {cid: sorted(waves) for cid, waves in merged.items()}
+
+    held = canonical_holdings(local_catalog_ids(country))
+    covered = canonical_holdings(local_covered_ids(country))
+    derived = derived_from()
+
+    # Labels we cannot resolve to a catalog id, for two different reasons:
+    #  * a wave DIR with no recorded WB id (no SOURCE.org, or a non-WB source);
+    #  * a LOGICAL wave with no dir of its own, i.e. one of several rounds
+    #    living inside a multi-round folder (Tanzania's 2008-15/) that the
+    #    folder's record does not otherwise account for.
+    # Both mean "a wave with this label exists locally, but nothing ties it to
+    # this catalog entry".  That is an `unknown`, never a `no` (GH #600).
     unresolved = {
         w for w in _local_waves(country)
         if not read_provenance(_COUNTRIES_DIR, country, w).is_worldbank
-    }
+    } | _logical_wave_labels(country)
 
     for e in entries:
         e["wave"] = _catalog_to_wave_label(e)
-        if e["id"] in held:
+        cid = aliases.get(e["id"], e["id"])
+        constituents = [aliases.get(c, c) for c in derived.get(cid, [])]
+        if cid in held:
             e["local"] = True
             e["local_status"] = "yes"
-            e["local_waves"] = held[e["id"]]
+            e["local_waves"] = held[cid]
+        elif cid in covered:
+            # Content held, files not: a release we hold subsumes this entry.
+            e["local"] = False
+            e["local_status"] = "covered"
+            e["local_waves"] = covered[cid]
+        elif constituents and all(c in held for c in constituents):
+            # A derived re-release of studies we hold -- ALL of them.  Holding
+            # only some is not enough, and then this falls through to `no`.
+            e["local"] = False
+            e["local_status"] = "derived"
+            e["local_waves"] = sorted(
+                {w for c in constituents for w in held[c]})
         elif e["wave"] in unresolved:
-            # A directory with this label exists, but nothing records what it
-            # actually holds.  Do not claim either way.
+            # A wave with this label exists, but nothing records what it holds.
+            # Do not claim either way.
             e["local"] = False
             e["local_status"] = "unknown"
             e["local_waves"] = [e["wave"]]

@@ -606,6 +606,7 @@ def _warm(country, table):
     return df
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_livestock_sales_value():
     ls = _warm('Malawi', 'livestock')
     if 'ValuePerAnimal' not in ls.columns or 'HeadSold' not in ls.columns:
@@ -621,6 +622,7 @@ def test_malawi_warm_livestock_sales_value():
     assert len(out) <= len(ls)
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_food_acquired_hdds_partition_guard_bites():
     """The real Malawi j vocabulary is large; a mapping that does not cover
     it must raise rather than silently deflate every household's score."""
@@ -631,6 +633,7 @@ def test_malawi_warm_food_acquired_hdds_partition_guard_bites():
         hdds(fa, groups=groups)
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_food_acquired_hdds_scores_in_range():
     fa = _warm('Malawi', 'food_acquired')
     items = sorted({str(x) for x in fa.index.get_level_values('j')})
@@ -645,6 +648,7 @@ def test_malawi_warm_food_acquired_hdds_scores_in_range():
     assert out['HDDS'].max() > 1
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_fertilizer_rate():
     """len>0 / finite / >=0 all PASSED on a column of 331 exact zeros before
     the label normalisation landed -- 'right shape, no content'.  Assert
@@ -660,6 +664,7 @@ def test_malawi_warm_fertilizer_rate():
     assert out['Nitrogen_kg_per_ha'].sum() > 0
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels():
     """Malawi writes 'Urea Fertilizer' where _NITROGEN_CONTENT's key is
     'urea'.  Exact-equality matching resolved ONLY 'Other Fertilizer'
@@ -750,6 +755,7 @@ def test_fertilizer_rate_parcel_default_bridges_the_two_vocabularies():
                    'Nitrogen_kg_per_ha'] == pytest.approx(23.0)
 
 
+@pytest.mark.requires_s3
 def test_uganda_warm_crop_production_revenue_and_diversity():
     cp = _warm('Uganda', 'crop_production')
     rev = gross_crop_revenue(cp)
@@ -766,6 +772,7 @@ def test_uganda_warm_crop_production_revenue_and_diversity():
     assert div['Crop_diversity'].max() < math.log(500)
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household():
     cp = _warm('Malawi', 'crop_production')
     rev = gross_crop_revenue(cp)
@@ -780,6 +787,7 @@ def test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household():
         rev['Gross_crop_revenue'].reindex(regrouped.index).round(4))
 
 
+@pytest.mark.requires_s3
 def test_malawi_warm_crop_diversity():
     cp = _warm('Malawi', 'crop_production')
     div = crop_diversity(cp)

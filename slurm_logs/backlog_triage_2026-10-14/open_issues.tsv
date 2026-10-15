@@ -1,0 +1,100 @@
+970		load_json_cache shells out to 'make panel_ids.json' without _script_subprocess_env(); post-#914 the call can o
+968		Script-path builds crash with FileNotFoundError when make is not installed (no fallback to the wave script)
+964		Windows: build script-path (make) tables without make
+962	bug,framework	Uganda's no-unit sentinel is spelled '---', which `_U_SENTINELS` does not know, so 7,359 unitless rows are giv
+961	framework	[tracking] The venv layering assumes one node, one checkout and one job -- workplan for simultaneous multi-nod
+960	documentation	The venv documents describe a world with one node and one checkout: four statements that are now wrong (/local
+959	framework	No lock file is tracked (/poetry.lock is gitignored), so nothing records the environment the warm parquet corp
+958	bug,framework	bin/savio_venv.sh and the mirror's .venv symlink assume one node, one checkout and one job -- four defects tha
+957	bug,framework	The venv image's editable install names the shared mirror, so `python <script>.py` from a /local clone silentl
+956		GhanaLSS wave-level harmonize_food carries an Aggregate Label column nothing can read, and it disagrees with t
+953		get_categorical_mapping cannot read a DIRECTORY of mappings, so the cascade's cross-country rung is unreachabl
+948		GhanaLSS wave scripts import their country module absolutely, so LSMS_COUNTRIES_ROOT silently does not apply (
+945		kinship.yml has no canonicalisation rule: 157 of 473 keys are spelling variants and 70 are unreachable by cons
+942		v is wave-scoped in some countries: the same cluster gets a new id each round, with no crosswalk
+941		master data-tests: EHCVM food_acquired served WITHOUT Derivation / inkind rows in the sequential cold CI sessi
+939		Check whether partition ranking is stable in min_goods before relying on the aggregation selection
+936		GhanaLSS 1998-99 food_acquired reduces Price with groupby().first() — latent, but it is the hazard #871 fixed 
+932		247 requires_s3 tests skip on every PR and on development, so a red suite reports green
+931		harvest_kg_factors is blind to declared `unit_kg`, and that asymmetry is load-bearing but undocumented
+928		Proposal: name the key column (#+key:/idxvars) and the ignorance vocabulary (Status/Notes, FIXME/UNDECODABLE) 
+926		GhanaLSS nonfood_expenditures serves 25,585 rows with cp1252-as-Latin1 C1 controls in j; the bad code points a
+920		food_acquired() re-aggregates on every call: 26x the cost of reading the country-level parquet that is already
+915		Country() validates against the filesystem while countries() documents the accepted set: typos warn once and f
+913		GhanaLSS own production is never valued: Price and Quantity present, Expenditure empty from 1991-92 on
+909		test_ghanalss_panel_consistency passes or fails on ambient cache coverage; _panel_spine trusts a partial cache
+908		Cache mechanism code is inside the content fingerprint: one comment in load_dataframe_with_dvc cold-rebuilds t
+907		80% of CI's skipped tests take the expensive skip path: 56 files reach a skip via a network timeout instead of
+905		perf: groupby-agg lambda with min_count=1 is ~145x slower than vectorized; used in _finalize_canonical_food_ac
+894		panel_ids is persisted two different ways: committed JSON (9 countries) vs cache parquet (Malawi, Nigeria)
+882	data-gap	Niger 2011-12 people_last7days: participation dummies are 30-day (ms04q03/q05) and 12-month (ms04q02) question
+881	data-gap	Nigeria W4 `food_acquired`: the `purchased` row is a 30-day last-purchase event (q9a/q10) sitting beside 7-day
+880	documentation	GhanaSPS/_/CONTENTS.org still documents wave-1 `MonthsAway` as "not wired" and "filling 0 would fabricate data
+868	bug,framework	reduce_to_agreed (build_transforms.py:422) only warnings.warn()s on a conflict: no grain report, no lsms_grain
+867	bug	_NITROGEN_CONTENT has no entry for NPS, D Compound or any organic input, so those fertilizer rows contribute 0
+865	bug,data-gap	Niger 2011-12: eleven Mil rows carry Quantity 999999 with u=Unknown -- an unstripped missing-value sentinel (s
+864		food_prices() reports Burkina Faso 2014 as 64.8% unpriceable and blames the wrong cause: three of four EMC pas
+862	enhancement,framework	Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's conven
+860	enhancement,data-gap	Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x
+858	enhancement,diagnostics	Tanzania: check plot_inputs against plot_features/crop_production for the 2020-21 roster mismatch EPAR reports
+856	enhancement,data-gap	Malawi: no free-text unit/crop recovery on the harvest side, and the unmapped-crop drop is not counted
+855	enhancement,data-gap	Malawi: _livestock_block never reads ag_r07 ("owned exactly 12 months ago"), which is present in all four wave
+851		Nothing records a table's recall window, so summed expenditures mix reference periods across waves, countries 
+849	enhancement	Uganda: carry the survey-reported KgFactor (a5?q6d) in all seven waves, not only 2018-19, once harvest_kg pref
+848	bug	Uganda 2018-19 AGSEC5B: second harvest-condition slot (s5bq06{a,b,c,d}_2, ~1,435 rows) is not wired; it is a c
+846	documentation,data-gap	Tanzania: record a not-asked capability for food price and own-consumption value (Section J qq.2-6 is the C4 e
+845	documentation,framework	food_prices(units='unitprice') docs: for Uganda the stored Price IS Exp/Qty, not an elicited price (94.4-99.9%
+844	data-gap	Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table carries
+843	data-gap	Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop grain, the build ne
+841	data-gap	Nigeria cluster_features undeclared for W5 while sample and community_prices ship it: 24,184 price rows have n
+840	bug	community_prices drops the variety axis, keeping one (t,v,j,u) row arbitrarily (Mali 22.4%, Tanzania ~90%, Nig
+839	bug,documentation	A config comment the data contradict: Mali data_scheme.yml (3 false claims since #380) and Tanzania CONTENTS.o
+837	bug	GH #323 site 2 residual: the (t,v) cluster key is still non-unique in Ethiopia, Tanzania, Uganda (up to 1,304 
+836	bug,framework	Tanzania/_/food_acquired.py reads a build table out of CONTENTS.org, which the cache hash deliberately skips
+833	bug	harmonize_* folds raw and processed into one `j` in 5 countries: Malawi groundnut 5.0x, Uganda maize 3.33x are
+832	bug	The `u` axis is split by spelling in 7 countries: one unit under two labels (GhanaLSS 473,660 rows; Niger 26,0
+831	bug,framework	WB-zip fallback extracts source files into the package tree (433 found today, 33 without sidecars in stray cou
+830	enhancement,diagnostics	Coverage grader is blind to scale: a monetary column 100x off in one wave grades sane (Uganda 2015-16 Value_so
+828	enhancement,framework	food_prices(units='unitprice'|'kgprice') returns an empty frame silently when food_acquired has no Price colum
+827	bug	Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis i
+824	bug	crop_production: sale value is per SOLD unit but the table carries only the HARVEST unit u -- Nigeria ignores 
+823	data-gap	Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_
+822	bug	Mali community_prices reads only relevé 3 of 3: 40,237 of 156,060 readings used, 26,745 (t,v,j,u) rows lost; w
+821	data-gap	Mali 2018-19 ships a grappe-grain community price module (s05_co_mli2018.dta, 549/549 grappes) that community_
+820	data-gap	Ethiopia crop_production reads ESS §11 (field crops) only; the §12 tree/fruit/root module -- more sale records
+816	enhancement	Burkina Faso coverage starts at 2014: the Enquête Prioritaire series (1994, 1998) exists and is a different in
+813	enhancement	kinship.yml: 131 keys no survey reaches, plus '' (EthiopiaRHS) and 'Nan' (Senegal) leaking into the kinship lo
+812	documentation	Guinea-Bissau: CONTENTS.org calls the design "a single two-stage national draw", but the weights show delibera
+811	bug	Guinea-Bissau: cluster_features.Region and sample.strata spell the same nine regions three different ways
+810	bug	get_dataframe's last-resort dvc.api.open() resolves the DVC repo from CWD (7-minute sidecar walk from /tmp, tr
+805		get_dataframe decodes every pre-118 .dta as Latin-1; cp1252 files (EHCVM-1 2018-19 s01_me_*) serve C1 controls
+804		Tajikistan 1999 household_roster: code 14 served as 'lodger' but the questionnaire prints 14 = Other (13 = Lod
+802		tests: 11 subprocess integration tests fail on Savio with dvc.config.ConfigError "expected 'url'" for remote l
+798		Coverage refresh: 4 interview_date regressions (Mali, Tanzania) and 2 nutrition cells broken on arrival (Guate
+794		UnicodeWarning in from_dta: the warning is benign; the silent latin-1 path beside it is where the risk lives (
+793		Record how each sample was DRAWN: a `sampling.yml` sibling of `population.yml`
+792		Feature("sample") emits 774 warnings: 746 are one unclosed file handle, 15 are real (waves with no weights/str
+791		Add UEMOA PHMECV as a source: 4 missing EHCVM 2021-22 waves + 8 ERI-ESI studies (access is human-reviewed)
+790		Generated .csv in a country _/ is gitignored yet hashed: cache freshness becomes local to your checkout (Ethio
+788		A country script's output is laundered into looking framework-fresh: hashless `var/{table}.parquet` is trusted
+787		labels= honours its flagship request on 4 of 22 food countries, silently accepts every crosswalk column, and i
+783		Consolidate stranded food vocabularies into categorical_mapping.org: six countries (GhanaLSS, GhanaSPS, Cambod
+781		No verdict vocabulary for `dropped`: a correctly-empty cell is graded as "the silent-drop bug class" with no w
+778		pytest -n against a cold shared cache: a country aggregate built from a partial wave set caches as fresh, so d
+777		Panama 1997: 99.1% of u='Value' rows carry Quantity = 7.70, an undecoded missing-value sentinel served as data
+772		Uganda/earnings delivers 'earnings' where the scheme declares 'Earnings' (plus a stray level_1) — two test fai
+771		Uganda/Ethiopia nutrition.py silently rebuild their FCT from the live USDA API when the un-tracked fct_usda.cs
+750		Reachability sweep of .dvc sidecars: ~21 genuine misses (was: a much larger figure, since corrected)
+740		test_extraction_is_cluster_grain fails on any data-credentialed machine, and CI cannot see it
+737		EthiopiaRHS TLU is on a different scale than the library's: implied 0.83 per adult bovine vs _TLU_FACTORS 0.70
+734		pytest cannot run inside a git worktree: lsms_library.pth hardcodes the main checkout, so conftest.py register
+712		get_dataframe's Stata attempt catches only (ValueError, struct.error) — a CSV whose leading bytes look like a 
+709		`1.7498e100` is Stata's pre-108 `double` missing code (2^333), not corruption — but `pandas >=2.2` lets it thr
+706		CotedIvoire 1985-89: four unwired community-questionnaire files (COMM85-88.DAT), rural-only
+703		test_table_structure.py: clearing a country's cache makes its tests VANISH, not fail — a green run is not a co
+702		Afghanistan: `_/` config exists but declares no `Data Scheme:` — two waves of data unreachable
+701		Peru: wire ENNIV 1991 — the closest of the three unwired waves to a quick win
+700		Peru: wire `sample` (v, Rural) for 1994 — and settle the v/i padding inconsistency
+699		local_tools: `read_file` has no SAS XPORT branch — Peru 1990 (39 files) is on disk and unreadable
+698		kinship: `Otro Pariente` is undetermined by the instrument — the corpus files it three different ways
+694		_apply_categorical_mappings nulls non-string values via an unguarded .str.strip() on any column whose name mat

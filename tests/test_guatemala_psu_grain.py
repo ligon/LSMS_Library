@@ -28,6 +28,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+pytestmark = pytest.mark.requires_s3
+
 
 def _guatemala_or_skip():
     try:

@@ -1,0 +1,659 @@
+#+title: GH #942 --- =v= is wave-scoped in some countries: diagnosis and design
+#+date: 2026-09-18
+
+Diagnosis and design only.  No repository file was created, edited or deleted;
+no mutating git command was run; no issue was filed or commented.  All
+measurements are warm-cache reads of =~/.local/share/lsms_library/{C}/var/sample.parquet=,
+either directly or through =Country(C).sample()= (so post-=id_walk=,
+post-=_finalize_result= --- what a user actually sees).  Nothing required a
+build, so the savio3 burst route was offered and *not taken*.  Library identity
+asserted in every run: =lsms_library.__file__= under
+=/local/job39002769/mirrors/LSMS_Library=.  Scripts:
+=/local/job39002769/tmp/gh942/{regime,glss,probe,api2}.py=.
+
+* 1. The GLSS2 contradiction, and its resolution
+
+** The contradiction
+
+=GhanaLSS/_/CONTENTS.org:389-390= (the per-round keyspace table):
+
+: | GLSS1     | 1xxx             | 200 EAs from 1984 census frame    |
+: | GLSS2     | 2xxx             | 200 EAs, fresh draw               |
+
+#942 measures a clean 79-to-79 bijection between GLSS1 and GLSS2 clusters with
+=Region= and =Rural= agreeing 79/79.  A fresh draw does not produce that.
+
+** It is already flagged in the same file, and marked unresolved
+
+=GhanaLSS/_/CONTENTS.org:1109-1121=, "Tensions with the existing text in this
+file", item s2 --- which the section header at =:1076= records as *unresolved*
+(only s1 was resolved in place):
+
+#+begin_quote
+The documentation says GLSS1 used master-sample replicates 1 and 5 (2 x 100
+EAs), and that GLSS2 was *half* retained GLSS1 workloads plus *half* from
+replicate 6 (100 EAs).  "Fresh draw" is therefore accurate for at most half of
+GLSS2.
+#+end_quote
+
+So the file contradicts itself at two line numbers.  The brief's "the file does
+not say so" is true of the table but not of the file.
+
+** The document that settles it is in the repository
+
+=GhanaLSS/1991-92/Documentation/pdf/G3report.pdf=, Appendix 1, "Sample design
+for GLSS1 and GLSS2", printed page 110 (quoted verbatim at =CONTENTS.org:927=):
+
+#+begin_quote
+The original idea was that a rotating panel design would be used, with half of
+the sample being retained each year for re-interview and the other half being
+replaced. ... Half the workloads from GLSS1 were therefore retained for GLSS2,
+and attempts were made to re-interview the same households. The other half of
+the GLSS2 sample was taken from the 100 EAs in replicate 6 of the master
+sample.
+#+end_quote
+
+And the master-sample construction, same appendix, printed page 109
+(=CONTENTS.org:933=): 800 EAs drawn PPS from the 1984 census, assigned to eight
+replicates of 100; GLSS1 used replicates 1 and 5.
+
+** The measurement that corroborates it
+
+Realised keyspaces, warm =sample.parquet= (=tmp/gh942/glss.py=):
+
+| quantity                         | GLSS1 (1987-88) | GLSS2 (1988-89) |
+|----------------------------------+-----------------+-----------------|
+| households                       |            3147 |            3194 |
+| distinct =v=                     |         *176*   |         *170*   |
+| =v= appearing in the 79-pair set |              79 |              79 |
+| =v= appearing in no pair         |          *97*   |          *91*   |
+
+That is the documented design, realised: about half of GLSS1's clusters recur
+in GLSS2 under the =2xxx= numbering (79), and about half of GLSS2 is new (91,
+against replicate 6's design figure of 100).  Household linkage is real and by
+design --- 712 households at the API, 714 in =PANELC.DAT=
+(=CONTENTS.org= §"Panel Linkage (GLSS1 to GLSS2)").
+
+** Verdict
+
+*GLSS2 is not a fresh draw.*  It is a half-retained rotating panel.
+=CONTENTS.org:390= is wrong as written and should read something like:
+
+: | GLSS2 | 2xxx | ~170 EAs; ~half retained from GLSS1 (renumbered), ~half from master-sample replicate 6 |
+
+*Two caveats a crosswalk builder must carry.*
+
+1. /The household-derived crosswalk is a LOWER BOUND on retained clusters./
+   Half of 176 is ~88; we recover 79.  Either nine retained workloads yielded
+   zero successful re-interviews, or "workload" is not exactly "EA".  Nothing in
+   the repository distinguishes these, so a derived crosswalk must be labelled a
+   floor, not the design.
+2. /It is complete for what it can be./  The 97 GLSS1 and 91 GLSS2 unpaired
+   clusters are genuinely different EAs; there is no missing linkage to find.
+   The bijection is not a partial view of a 176-to-170 mapping.
+
+*Consequence for #942.*  The 79 pairs are the *panel half* of one boundary, not
+evidence that GLSS renumbers faithfully in general.  GLSS2 -> GLSS3 has *zero*
+household linkage (measured; and =CONTENTS.org:959= quotes GSS abandoning the
+rotation at GLSS3), so no crosswalk is derivable there by any method.
+
+* 2. The corpus survey
+
+** Method, and the two ways it lies
+
+Per country, per consecutive wave pair: households sharing =i=, the share
+keeping the same =v=, whether the induced cluster-pair relation is a bijection,
+and the distinct =v= count each side.  Measured through =Country(C).sample()=,
+so =updated_ids= has already re-keyed =i=.
+
+Two false-positive modes fire in this corpus.  Both are reported per row so no
+cell is read as evidence it cannot bear.
+
+*** F1 --- spurious linkage: =i= is renumbered 1..N each wave
+
+=Tajikistan/_/CONTENTS.org:331= quotes the WB documentation:
+
+#+begin_quote
+The TLSS99, TLSS03 and TLSS07 data cannot be used as panel data. The same
+households were not visited in all surveys.
+#+end_quote
+
+Yet the measure finds 960 "shared" households at 2003->2007 and 1,503 at
+2007->2009.  Their =i= values are =['1','10','100', ... '998','999']= in both
+waves --- sequential household numbers restarted each round.  Panama is the
+same.  *Neither country has any =panel_ids= configuration at all* (no
+=panel_ids.json=, no =panel_ids.py=, no =data_scheme.yml= entry).
+
+So Panama's 1.0%/0.0% and Tajikistan's 0.0%/0.6% are not evidence of a
+wave-scoped =v=.  They are evidence of nothing.  Same for CotedIvoire
+1988-89 -> 2018-19: 1,097 "shared" households across thirty years and a change
+of survey programme (CILSS -> EHCVM), =nA=100=, =nB=1084=.
+
+*** F2 --- =i= embeds =v=: what it does and does NOT disqualify
+
+Where the household id is built from the cluster code (EHCVM =grappe_menage=,
+Malawi, GhanaSPS, ...), a household matched on =i= must carry the same =v=.
+Measured corpus-wide as "does the row's =v= occur as a substring of its =i=":
+
+: Azerbaijan Benin Burkina_Faso China CotedIvoire GhanaAHIES GhanaSPS
+: Guinea-Bissau Guyana Kosovo Malawi Mali Niger Pakistan Senegal Serbia
+: "Serbia and Montenegro" South Africa Timor-Leste Togo    = 1.00
+: Iraq 0.997   EthiopiaRHS 0.983   Albania 0.844   Ethiopia 0.714   Liberia 0.561
+
+*It is important not to over-read this.*  Where the linkage is genuine, "the
+household's id embeds its cluster number and it linked across waves" means the
+survey wrote the *same cluster number* for that household in both rounds ---
+which is exactly what =stable= asserts for #942's purposes.  What F2 actually
+disqualifies is the *mover / bijection* diagnostic: a household that changed
+cluster would have changed =i= too, so it cannot appear in the matched set at
+all.  Those countries can be read as =stable= for the API contract, with
+*movers unobservable*, and cannot be read as evidence about the draw.
+
+What F2 *does* void is a =same_v= reading where the linkage itself is
+unverified: there, id-composition and id-collision are indistinguishable.
+
+** The partition
+
+*** (i) Independently informative --- =i-embeds-v= = 0.00 on the matched households
+
+*GhanaLSS, Ethiopia, Nigeria, Tanzania, Uganda.*  (#942 checked GhanaLSS,
+Uganda, Tanzania and Malawi; this set drops Malawi --- which is F2 --- and adds
+Ethiopia and Nigeria.)
+
+| country  | boundary           |   hh | same  | pairs | nonbij |  nA |  nB | reading                              |
+|----------+--------------------+------+-------+-------+--------+-----+-----+--------------------------------------|
+| GhanaLSS | 1987-88 -> 1988-89 |  712 | 0.0%  |    79 |      0 | 176 | 170 | *wave-scoped* (panel half; §1)       |
+| Ethiopia | 2011-12 -> 2013-14 | 3776 | 0.0%  |   333 |      0 | 333 | 433 | *wave-scoped*, COMPLETE bijection    |
+| Ethiopia | 2013-14 -> 2015-16 | 4887 | 100%  |   432 |      0 | 433 | 432 | panel-stable (=i-embeds-v= 0.26)     |
+| Ethiopia | 2018-19 -> 2021-22 | 4849 | 100%  |   427 |      0 | 535 | 435 | F2 (=i-embeds-v= 1.00)               |
+| Nigeria  | 2010Q3 -> 2011Q1   | 5000 | 100%  |   500 |      0 | 500 | 500 | panel-stable (PP/PH round pair)      |
+| Nigeria  | 2011Q1 -> 2012Q3   | 4859 | 96.9% |   647 |     99 | 500 | 647 | panel-stable + *sample expansion*    |
+| Nigeria  | 2013Q1 -> 2015Q3   | 4597 | 96.5% |   780 |    115 | 647 | 792 | ditto                                |
+| Nigeria  | 2016Q1 -> 2018Q3   | 1493 | 94.7% |   325 |     45 | 792 | 685 | ditto                                |
+| Nigeria  | 2019Q1 -> 2023Q3   | 5067 | 93.2% |   911 |    154 | 685 | 911 | ditto                                |
+| Tanzania | 2008-09 -> 2010-11 | 3077 | 100%  |   409 |      0 | 409 | 409 | panel-stable                         |
+| Tanzania | 2010-11 -> 2012-13 | 2904 | 79.6% |   409 |      0 | 409 | 409 | panel-stable; 20% are *movers*       |
+| Tanzania | 2012-13 -> 2014-15 |  521 | 79.3% |   114 |     20 | 409 | 493 | panel-stable; sub-panel split        |
+| Tanzania | 2014-15 -> 2019-20 |  849 | 0.0%  |   310 |    131 | 493 | 247 | *wave-scoped*, NOT a bijection       |
+| Tanzania | 2019-20 -> 2020-21 |    0 | ---   |     0 |    --- | --- | --- | *refresh-by-design* (no linkage)     |
+| Uganda   | 2005-06 -> 2009-10 | 2601 | 0.0%  |   471 |    127 | 322 | 656 | *rendering* + *synthetic* (§2.3)     |
+| Uganda   | 2009-10 -> 2010-11 | 2640 | 68.9% |   664 |    231 | 656 | 324 | synthetic =v= resolving              |
+| Uganda   | 2010-11 -> 2011-12 | 2510 | 0.0%  |   322 |      2 | 324 | 321 | *rendering change* (§2.3a)           |
+| Uganda   | 2011-12 -> 2013-14 | 1717 | 0.0%  |   498 |    169 | 321 | 706 | *meaning change* (EA -> parish)      |
+| Uganda   | 2013-14 -> 2015-16 | 2871 | 88.4% |   839 |    245 | 706 | 875 | parish code, partly stable           |
+| Uganda   | 2015-16 -> 2018-19 | 2973 | 0.0%  |   865 |    163 | 875 | 781 | *meaning change* (code -> name pair) |
+| Uganda   | 2018-19 -> 2019-20 | 2986 | 94.2% |   807 |     64 | 781 | 824 | name composite, mostly stable        |
+
+*** (ii) =stable= in the API-contract sense --- crosswalk-backed linkage, F2, movers unobservable
+
+Countries with a =panel_ids= crosswalk whose =i= embeds =v=, all at 100%
+(Niger 99.4%): *Burkina_Faso, Malawi, Mali, Niger, Senegal, EthiopiaRHS.*
+Declarable =stable= with =source_type: derived-from-data=, and a note that
+movers cannot be seen by this method.
+
+*** (iii) =stable= on design attestation plus a clean measurement, no crosswalk
+
+*GhanaSPS* (334/334 clusters both boundaries, 0 violations) and *GhanaAHIES*
+(600/600 across all eleven quarter boundaries, 0 violations).  Both are
+designed panels tracking the same households; the measurement is consistent
+and the cluster count is invariant to the unit.
+
+*CotedIvoire 1985-86 .. 1988-89* is the interesting one and is *not* junk.
+=CotedIvoire/_/CONTENTS.org:418= quotes the CILSS design:
+
+#+begin_quote
+100 Primary Sampling Units (PSUs) were selected ... a cluster of 16 households
+was selected within each PSU ... Half of the households were replaced each year
+while the other half (the panel households in 1986, 1987 and 1988) were
+interviewed a second time.
+#+end_quote
+
+=nA= = =nB= = 100 in every year, and 52/50/50 cluster pairs with zero
+violations.  *This is the same survey generation and the same rotating
+half-panel design as GLSS1/GLSS2, and CILSS kept its cluster numbers.*  So
+GLSS's renumbering is a choice GSS made, not a property of 1980s LSMS rotation
+--- a direct same-era counterexample, and the strongest argument that #942's
+complaint is about a fixable local decision rather than an era.  Caveat:
+=CONTENTS.org:425-426= says "household IDs may change --- no panel_ids
+implemented yet", so the =i= linkage here is unverified; record as
+=source_type: derived-from-data=, =confidence: medium=.
+
+*** (iv) =unobservable=
+
+- *No household linkage*: GhanaLSS 1988-89 onward (all five boundaries),
+  Ethiopia 2015-16->2018-19, Niger 2014-15->2018-19, Malawi 2004-05->2010-11,
+  Albania 2002/2003/2004 and 2008->2012, EthiopiaRHS 1989->1994a /
+  1997->1999 / 1999->2004, Iraq, Timor-Leste, Tajikistan 1999->2003, Tanzania
+  2019-20->2020-21.
+- *Unverified linkage, no crosswalk, F2*: Albania 2005->2008, Serbia and
+  Montenegro 2002->2003, CotedIvoire 1988-89->2018-19.
+- *Single-wave countries* (no boundary exists): Azerbaijan, Benin, Cambodia,
+  China, Guatemala, Guinea-Bissau, Guyana, India, Kazakhstan, Kosovo, Liberia,
+  Pakistan, Serbia, South Africa, Togo.
+
+** Uganda is THREE defects, and only one of them is #942
+
+*** (a) Two renderings of the same EA code --- library-side, repairable
+
+Both =2010-11/_/data_info.yml:47= and =2011-12/_/data_info.yml:47= map
+=v: comm=.  Same variable, same survey, 0.0% agreement, 322 pairs, 2
+non-bijective.  Measured over all 322 pairs:
+
+| check                       | agreement |
+|-----------------------------+-----------|
+| first character             |   322/322 |
+| last four characters        |   322/322 |
+| first *three* characters    |   272/322 |
+| =b= with char at index 3 removed = =a= |   272/322 |
+
+Lengths are 7 in 2009-10/2010-11 and 8 in 2005-06/2011-12, uniformly.  So for
+*272 of 322* pairs the 8-digit form is the 7-digit form with *one digit
+inserted at position 3* (=1020001= -> =10210001=) --- a field widened, not a new
+draw.  The remaining *50* are genuine recodes of the middle field
+(=1140003= -> =11030003=, =1150004= -> =10730004=), i.e. Uganda's district
+reorganisations.  Region digit and EA serial survive both.
+
+The keyspaces:
+
+| pair               | distinct =v= |            shared |
+|--------------------+--------------+-------------------|
+| 2005-06 vs 2011-12 |    322 / 321 | *321* (identical) |
+| 2009-10 vs 2010-11 |    656 / 324 |               270 |
+| 2005-06 vs 2010-11 |    322 / 324 |             *0*   |
+
+Uganda alternates between two renderings of one identifier --- 8-digit
+(2005-06, 2011-12) and 7-digit (2009-10, 2010-11) --- and =Country('Uganda')=
+serves both verbatim.  *This vindicates =Uganda/_/CONTENTS.org= §"Hybrid =v= in
+2009-10", which says 2009-10's =comm= is "the /original/ 2005-06 sampling-frame
+EA".*  It is; the library renders it in a different width.  The 0% at
+2005-06 -> 2009-10 and 2010-11 -> 2011-12 is *ours*, not GSS's.  Note the fix is
+not a pure truncation in either direction: 8->7 is (dropping index 3) for 272
+and wrong for 50; 7->8 is not a function without the pair table.  The 322 pairs
+are the fix.
+
+*** (b) A synthetic coordinate bin standing in for a cluster
+
+=Uganda/2009-10/_/data_info.yml:93-96= declares, for =sample=:
+
+#+begin_src yaml
+    derived:
+        v:
+            kind: coalesce_coord_bin
+            lat: _lat
+            lon: _lon
+#+end_src
+
+=build_transforms.py:218-219= --- =fill_v_with_coord_bin(df, target='v', ...,
+grid_degrees=0.05, prefix='@')=.  Measured: *339 of that wave's 656 =v= values
+begin with =@=* (e.g. =@-1.40,+29.95=).  More than half of 2009-10's "clusters"
+are 0.05-degree GPS bins for movers and split-offs whose =comm= is blank.  A
+deliberate, documented choice (it keeps 565 households from being deleted by
+the =(t,v)= collapse --- =2009-10/_/data_info.yml:103-110=), and *not a
+cluster*.  Any cross-wave =v= operation on Uganda 2009-10 is, for half its
+clusters, grouping on a geographic rounding.
+
+*** (c) Genuine meaning change
+
+=Uganda/_/CONTENTS.org:44-52=: =comm= (EA) through 2011-12, =h1aq4a= parish code
+2013-14, =parish_code= 2015-16, =DISTRICT/PARISH= name composite 2018-19 and
+2019-20.  The 0% at 2011-12 -> 2013-14 and 2015-16 -> 2018-19 is this.
+Irreparable by any crosswalk: a parish is not an EA, and a mapping between them
+is many-to-many.
+
+*** Why the three must stay separate
+
+Different fixes, different truth conditions.  (a) is a 322-entry recode the
+library can apply with no survey input and no loss.  (b) is a sentinel that
+should be *labelled*, not linked.  (c) admits no fix and can only be declared.
+A single "wave-scoped" tag over Uganda would promise a crosswalk for (c) that
+cannot exist and would hide that (a) is ours to fix.  *GhanaLSS renumbers
+faithfully; Uganda does three different things at seven boundaries.*
+
+** Ethiopia is a second, cleaner GhanaLSS --- and it is new
+
+=Ethiopia/_/CONTENTS.org:353-360= already records the variable change:
+
+: | 2011-12 | =ea_id=   | string |
+: | 2013-14 | =ea_id2=  | string |
+: Waves 2-3 use =ea_id2= (the wave-2 re-identified EA), while waves
+: 1, 4, and 5 use =ea_id=.
+
+confirmed in config at =Ethiopia/2011-12/_/data_info.yml:26= and
+=2013-14/_/data_info.yml:30=.  What is *not* recorded is that the two code
+spaces are *disjoint*: 3,776 panel households, 0% agreement, and a *complete*
+333-to-433 bijection with zero violations --- every one of W1's 333 EAs maps to
+exactly one W2 EA.
+
+A better #942 instance than GhanaLSS: total on the earlier wave, derivable
+exactly from existing panel linkage, and the survey itself calls =ea_id2= a
+re-identification rather than a new draw.  *The ESS may ship the crosswalk
+directly* --- =ea_id= and =ea_id2= coexist in the Y2 geovars file
+(=CONTENTS.org:978=: "household_id(2), ea_id(2)").  *Not verified* (needs a cold
+read of =Pub_ETH_HouseholdGeovars_Y2=); the first thing a crosswalk implementer
+should check.
+
+** Tanzania: the brief's premise needs one correction
+
+The brief says Tanzania's 0% continuity is the NPS refresh and is by design.
+Measured, *the 0% cell and the refresh are different cells*:
+
+- =2019-20 -> 2020-21=: *zero shared households*.  This is the refresh --- the
+  extended and refresh sub-panels are disjoint
+  (=.claude/skills/tanzania-panel-design.md=: "2019-20 and 2020-21 have zero
+  household overlap ... correct by design").  It says nothing about =v=, because
+  there is no household through which to observe it.
+- =2014-15 -> 2019-20=: *849 shared households, 0.0% same =v=, 310 pairs, 131
+  non-bijective*.  These are *extended-panel* households --- tracked by design
+  --- that kept =i= and lost =v=.  =2019-20/_/data_info.yml:24= maps
+  =v: clusterid=; =2020-21/_/data_info.yml:19= maps =v: y5_cluster=; 2012-13 and
+  2014-15 are script-path (the =2008-15/= multi-round folder,
+  =.claude/skills/multi-round-waves.md=) and declare no =v:= in YAML at all.
+
+So Tanzania is =wave-scoped= at 2014-15->2019-20 and =refresh-by-design= at
+2019-20->2020-21, and unlike GhanaLSS and Ethiopia its wave-scoped boundary is
+*not a bijection* (131 violations over 310 pairs) --- tracked households
+genuinely moved between clusters.  *A crosswalk is not recoverable there even in
+principle.*
+
+*Main structural finding of this survey:* refresh-by-design is a fact about
+*household* continuity; wave-scoped is a fact about *cluster-id* continuity.
+They are orthogonal, they occur at different boundaries of the same country, and
+a one-dimensional regime enum cannot express both.
+
+** =Mover=: #942's parenthetical is not reproduced
+
+#942 says "GhanaLSS also carries a literal =Mover= sentinel in =v=".  Measured:
+=Mover= occurs *zero* times in GhanaLSS's =sample= or =cluster_features= =v=,
+and =grep -rn Mover lsms_library/countries/= returns nothing.  The only
+occurrence in the codebase is =transformations.py:507=,
+=roster_to_characteristics(..., mover_sentinel='Mover')= --- a library-wide
+default substituting =Mover= for a NaN =v= when deriving
+=household_characteristics= (GH #197/#268), applied to *every* country.  #942's
+reading that this makes GLSS renumbering "harder to read as intentional"
+therefore does not stand: the sentinel is ours.
+
+* 3. Where the declaration should live
+
+** The three candidates, and the measured cache cost of each
+
+| placement                                      | cache cost                                | measured how     |
+|------------------------------------------------+-------------------------------------------+------------------|
+| new =countries/{C}/_/sampling.yml= sibling      | *zero*                                    | code + #793      |
+| block inside =countries/{C}/_/data_scheme.yml=  | *every L2-country parquet of that country* | code             |
+| canonical =lsms_library/data_info.yml=          | *zero*                                    | code + CLAUDE.md |
+
+Read off the code, by =path:line=:
+
+- =country.py:706= --- =_BUILD_INPUT_SUFFIXES = {".py", ".csv", ".json", ".txt", ".tab", ".tsv"}=.
+  *=.yml= is not in it.*
+- =country.py:993-998= (=Wave._input_hash=) and =country.py:3558-3560=
+  (=Country._table_cache_hash=) --- the only globs over =_/=, both gated on that
+  suffix set, plus =*.org= at =:3566=.  A new =.yml= sibling is invisible to
+  both.
+- =country.py:921= --- the only =data_info.yml= hashed is the *per-wave* one
+  (=wave_dir / "data_info.yml"=).  The canonical =lsms_library/data_info.yml= is
+  loaded only on read paths (=feature.py:123,150,430=;
+  =country.py:5708,5749,5774,5789,5836=) and appears in no build fingerprint.
+- =country.py:3546= --- ="cscheme=" + cached_file_hash(cdir / "data_scheme.yml")=.
+  Hashed *whole, by name*, for every table, so any new key in it invalidates
+  every L2-country parquet for that country.  (=Wave._input_hash= does *not*
+  hash =data_scheme.yml= --- checked; so the L2-wave tier is not moved by this
+  route, and the claim is stated no wider than that.)
+
+Corroborating measurements already in the record, not re-run here: #793 probed 8
+=_table_cache_hash= and 3 =build_transforms_fingerprint= values with and without
+=Uganda/_/sampling.yml= --- all 11 byte-identical.  CLAUDE.md §"Derived Values"
+records the same for =derivations.yml= (0 of 14) and for the =data_info.yml=
+declaration.
+
+So *cost does not discriminate* between the sibling file and the canonical
+=data_info.yml=; it only rules out =data_scheme.yml=.  Choose on content.
+
+** Recommendation: the =panel:= block of =sampling.yml= (#793)
+
+*Not =data_info.yml=.*  That file holds cross-country *conventions* --- required
+columns, canonical spellings, canonical indexes.  "Ethiopia renumbered its EAs
+between W1 and W2" is a per-country, per-wave fact about a survey, the category
+=population.yml= and =sampling.yml= exist for.  It would be the first
+per-country datum in a file whose discipline is that it holds none.
+
+*Not a new =cluster_identity.yml=.*  #793 already proposes =sampling.yml= with a
+=panel:= key (its Uganda exemplar has =panel: {role: panel-baseline, rotation: null}=).
+Cluster-id continuity across rounds *is* a draw-and-rotation fact; it belongs in
+the same record as "half the workloads were retained".  A separate file would put
+the GLSS1/GLSS2 rotation in one file and its consequence for =v= in another.
+
+*But do not block #942 on #793's full schema.*  #793 is a large curation project
+(stages, PPS, oversamples, ~24 countries with no documentation, an unverified
+NADA DDI acquisition route).  #942 needs three fields per boundary.  Recommend:
+*#942 lands =sampling.yml= with only the =panel:= block populated, plus the
+=PopulationRecord=-style loader and =Country(...).sampling=; #793 grows the same
+file with the design fields.*  #793 gets its loader for free; #942 does not wait.
+
+** The shape
+
+Per *wave*, describing that wave's relation to *the preceding wave in
+=Country.waves=* --- the grain is the boundary, not the country.  GhanaLSS
+renumbers at 1988-89 and is unlinkable thereafter; Uganda changes regime at seven
+consecutive boundaries; Tanzania is panel-stable, then wave-scoped, then
+refreshed.  *A single tag per country is wrong for all five informative
+countries.*
+
+#+begin_src yaml
+Sampling:
+  '1988-89':
+    panel:
+      household_continuity: rotating-panel   # | panel | refresh | independent | unknown
+      cluster_id_continuity: wave-scoped     # | stable | wave-scoped | redefined | mixed | unobservable
+      cluster_id_note: |-
+        GLSS2 renumbers retained GLSS1 EAs under the 2xxx scheme.  79 of
+        GLSS1's 176 clusters recur; the other 91 GLSS2 clusters are from
+        master-sample replicate 6.  The 79 is a LOWER BOUND (derived from
+        household linkage), not the design figure.
+      source_type: local-documentation       # | wb-catalog | derived-from-data | not-found
+      confidence: high                       # | medium | low
+      source_file: '1991-92/Documentation/pdf/G3report.pdf'
+      locator: 'Appendix 1, printed page 110'
+#+end_src
+
+| =cluster_id_continuity= | means                                      | instance                             |
+|-------------------------+--------------------------------------------+--------------------------------------|
+| =stable=                | the same EA keeps its id                   | GhanaSPS, GhanaAHIES, Nigeria, CILSS |
+| =wave-scoped=           | renumbered; a crosswalk is meaningful      | GhanaLSS 1988-89, Ethiopia 2013-14   |
+| =redefined=             | =v= denotes a different KIND of thing      | Uganda 2013-14, 2018-19              |
+| =mixed=                 | some clusters synthetic                    | Uganda 2009-10 (339/656 =@lat,lon=)  |
+| =unobservable=          | no verified linkage; cannot be determined  | GhanaLSS 1991-92 onward, Iraq        |
+
+*=refresh-by-design= is NOT a =cluster_id_continuity= value.*  It is
+=household_continuity: refresh= (Tanzania 2020-21) --- exactly the distinction
+the brief requires the scheme to express, and the one-dimensional enum in #942's
+"Possible resolutions" cannot.
+
+*There is deliberately no =rendered-differently= value*, although §2.3(a) is a
+real corpus phenomenon.  Q5 recommends treating it as a library defect to fix;
+declaring it in =sampling.yml= would record a bug as a survey design fact ---
+#793's own "launder a screen into a record" objection.  Until Q5 is decided,
+Uganda 2009-10 and 2011-12 *measure* as wave-scoped and must not be *declared*
+so; leave them =unobservable= with the note, or hold the two entries.
+
+*The triple travels with the record*, as =PopulationRecord.from_config= requires
+(=population.py:130=) and =capability.audit()= requires: =source_type= /
+=confidence= / =locator=, refused if absent.  A value reached by §2's
+measurement is =source_type: derived-from-data=, and by #793's own rule a
+=derived-from-data= record must not be readable as documentation.  Given §2's
+two false-positive modes that rule is load-bearing: a =derived-from-data=
+reading for a country with unverified linkage is unfalsifiable by construction
+and should be written =unobservable= with the reason, not =stable=.
+
+*A possible third field, flagged not decided.*  Malawi serves 100% continuity
+because the IHPS tracks households and reports the *baseline* EA; Tanzania
+serves 79.6% because it reports the household's *current* cluster.  Both are
+defensible and they mean different things --- and for clustering standard
+errors, the *baseline* EA is the design cluster.  A
+=cluster_reference: baseline-ea | current-location= field would name it.  Out of
+scope here; raised for @ligon.
+
+* 4. What the library should DO with it
+
+** The hazard is pooling WAVES, not pooling COUNTRIES
+
+=PopulationHeterogeneityWarning= (=feature.py:896=, =population.py:122=) warns
+at =Feature()= and is *silent* at =Country()=, because the hazard it names only
+arises when countries are pooled.
+
+#942's hazard is the opposite shape.  Its own reproduction is a *single-country,
+two-wave =Country()= call*:
+
+#+begin_src python
+hc = g.household_characteristics(waves=["1987-88", "1988-89"])
+#+end_src
+
+So the warning must fire at =Country=, not at =Feature=.  Copying the population
+precedent's *placement* would put it exactly where the bug is not.
+
+** Proposal
+
+*Warn, never fence, never rewrite.*
+
+1. =ClusterIdentityWarning(UserWarning)= in a new =lsms_library/sampling.py=
+   (sibling of =population.py=).
+2. Raised from =Country._finalize_result= when *all* of: the frame carries =v=;
+   it spans more than one =t=; and some consecutive boundary among the
+   *returned* waves has =cluster_id_continuity= in
+   ={wave-scoped, redefined, mixed}=.
+   *Deliberately NOT on =unobservable=.*  GhanaLSS 1991-92 onward are genuinely
+   different EAs with distinct prefixes and no linkage, so grouping on =v= across
+   them is *correct*; warning there would false-alarm on every multi-wave
+   GhanaLSS call and train the reader to ignore it.
+3. *Dedup key required.*  =_join_v_from_sample= re-enters =sample()=, which runs
+   its own =_finalize_result=, before the outer table's runs --- so a naive
+   "once per call" fires twice.  Key the emission on
+   =(country, frozenset(waves))= for the duration of the outermost call.
+4. Message names country, boundaries and values, states that *nothing was
+   dropped or rewritten*, and gives the remedy the workshop found by hand:
+   #+begin_quote
+   GhanaLSS: `v` is not comparable across 1987-88 -> 1988-89
+   (cluster_id_continuity: wave-scoped -- GLSS2 renumbers retained GLSS1 EAs).
+   Rows are returned unchanged.  Group within a wave, or `.droplevel('v')`
+   before a cross-wave reshape.
+   #+end_quote
+5. =Country.sampling= property returning ={wave: SamplingRecord}=, mirroring
+   =Country.population=.
+6. =df.attrs['sampling']=, and a *fourth entry in =feature._ATTRS_CARRIERS==
+   (=feature.py:98-117=) so the record survives =Feature()='s concat.  CLAUDE.md
+   records that =recall= and =derivations= had their =merge_attrs= "written,
+   documented as load-bearing, and never called" until #873 --- do not repeat it.
+7. =sampling_reports(country=, table=)=, twin of =null_read_reports()= /
+   =quantity_reports()=.
+8. =LSMS_CLUSTER_STRICT=1= -> =ClusterIdentityError=.  *Its own lever*, for the
+   reason CLAUDE.md gives for each of the others: a destroyed row, an empty
+   column, an impossible value and an incomparable key are separate concerns and
+   must ratchet separately.
+
+*No returned data changes* --- not one row, not one index value, under any
+setting except the opt-in strict lever.  Cache cost zero: =_finalize_result= is
+in =_build_registry._EXCLUDED_CALLABLES= (CLAUDE.md §Population: "Attach point is
+load-bearing ... so it costs no cache invalidation"), and the =.yml= is invisible
+to the hasher (§3.1).
+
+** Deliberately NOT proposed
+
+- *No allowlist of known-bad boundaries.*  Same reasoning as =_grain_strict=,
+  =null_read_audit= and =quantity_audit=: an allowlist is the same disease with a
+  registry.  =unobservable= is a recorded verdict with a reason, not an
+  exemption.
+- *No default =droplevel('v')=.*  That is a default that silently drops data ---
+  what @ligon declined in #603.
+- *No auto-derivation of the record from §2's measurement.*  §2 has two
+  false-positive modes; a generated record would encode the artefact.
+
+* 5. Out of scope, and why
+
+*The crosswalk is out of scope for #942.  Recommendation: declare the regime;
+make the crosswalk a follow-up.*
+
+1. *It is derivable for two boundaries in the whole corpus.*  GhanaLSS
+   1987-88->1988-89 (79 pairs, a lower bound, §1) and Ethiopia 2011-12->2013-14
+   (333 pairs, complete).  Tanzania 2014-15->2019-20 has 131 non-bijective pairs
+   over 310 --- not derivable *in principle*, since tracked households genuinely
+   changed cluster.  Uganda's zero-agreement boundaries are (a) a recode, (b) a
+   sentinel and (c) a meaning change; a household-derived crosswalk addresses
+   none.  A crosswalk built on #942's method covers *two cells* and would be read
+   as covering the class.
+2. *The regime declaration is the prerequisite.*  You cannot decide where to
+   apply a crosswalk without a machine-readable statement of which boundaries
+   want one.  Today that is prose no consumer reads --- the whole of #942's
+   complaint.
+3. *Uganda's cheapest real fix is not a crosswalk at all* (§2.3a): a 322-entry
+   table fixing two of seven boundaries with no survey input.  Its own issue.
+4. *Rewriting =v= changes served data*, and that decision has not been taken ---
+   §6 Q3.
+
+Also out of scope: #793's design fields (stages, PPS, oversamples); the Ethiopia
+geovars crosswalk read (§2.4, worth doing, needs a cold read); any change to
+=_join_v_from_sample=; the =cluster_reference= field (§3.3).
+
+* 6. Open decisions for @ligon
+
+** Q1.  Is the unit of declaration the wave boundary, or the country?
+
+- *Per boundary* (recommended).  Expresses Uganda's seven different answers and
+  Tanzania's three.  Cost: ~104 wave entries, most =unobservable= or =stable=
+  with a one-line reason.
+- *Per country.*  38 entries.  Cost: wrong for GhanaLSS, Uganda, Tanzania,
+  Ethiopia and Nigeria --- five of the five countries where the question is
+  answerable.  Recommend against.
+
+** Q2.  One field or two?
+
+- *Two orthogonal fields* (recommended): =household_continuity= and
+  =cluster_id_continuity=.  Required to state that Tanzania's 2019-20->2020-21
+  break is a refresh (a household fact) while its 2014-15->2019-20 break is
+  renumbering (a cluster fact).  The brief requires exactly this distinction.
+- *One enum.*  Simpler; collapses the two Tanzania rows and loses the
+  by-design/defect distinction the skill file exists to preserve.
+
+** Q3.  If a crosswalk is later built, WHERE does it apply?
+
+- *(a) Rewrite =v= at =_join_v_from_sample=.*  Symmetric with =id_walk= on =i=,
+  read-path, zero cache cost.  *Changes served index values* for GhanaLSS and
+  Ethiopia --- every existing cross-wave result moves.
+- *(b) Add a =v_panel= level alongside =v=.*  Nothing served changes; the user
+  opts in.  Cost: a new index level on every household table of the affected
+  countries, plus a =Feature()= alignment decision for countries lacking it.
+- *(c) A =cluster_ids= table, twin of =panel_ids=.*  Nothing changes anywhere;
+  the user joins it.  Cheapest and most honest; also the easiest to not use,
+  which is how #942 arose.
+
+Recommend *(c)* first and *(b)* as the opt-in ergonomic layer.  (a) is a silent
+change to returned data of exactly the kind #603 declined.
+
+** Q4.  Does =CONTENTS.org:390= get corrected in this issue or its own?
+
+The "fresh draw" row is wrong (§1); correcting it is a two-line edit that also
+resolves =Tensions= s2, recorded in the file as unresolved.  Read-only here.
+Recommend folding into #942's PR, since #942's crosswalk rationale cites the row.
+
+** Q5.  Should Uganda's rendering defect (§2.3a) become its own issue?
+
+Recommend *yes*, and *not* folded into #942.  It is a library-side formatting
+inconsistency with a 322-entry deterministic fix, it currently reads as a
+wave-scoped =v= and would be mis-declared as one, and it is the only one of the
+three Uganda defects that can simply be repaired.  Note the 272/50 split (§2.3a):
+the fix is the pair table, not a digit rule.
+
+** Q6.  Does the Ethiopia geovars file already ship the crosswalk?
+
+=CONTENTS.org:978= lists =Pub_ETH_HouseholdGeovars_Y2= as carrying
+"household_id(2), ea_id(2)" --- both id generations side by side.  If so,
+Ethiopia's crosswalk is a *read* rather than an inference, and should be read
+from the survey rather than derived from panel households.  Unverified here
+(needs a cold source read).  One bounded check before any derivation code is
+written.
+
+** Q7.  Should =cluster_reference: baseline-ea | current-location= be a third field?
+
+Malawi serves the baseline EA (100% continuity), Tanzania the current cluster
+(79.6%).  Both defensible, different meanings, and for clustering standard errors
+the baseline is the design cluster.  Adding it makes the record right; it also
+widens the curation.  Raised, not recommended either way.

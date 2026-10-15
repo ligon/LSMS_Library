@@ -1,0 +1,49 @@
+#+title: Proposed appended CONTENTS notes — review only, not applied
+
+* Append to GhanaSPS/_/CONTENTS.org
+
+** Region-market dependency remains missing (2026-10-14 release audit; GH #140)
+
+Cluster identity is available through =sample()=, as documented above; it is
+not a geographic =Region= lookup. The current =sample= exposes no =Region=
+column (=2017-18='s source =region= is mapped to =strata=), and neither the
+country scheme nor its wave configs declares =cluster_features=. The frozen
+release audit at =7fa05179= records =market='Region'= calls for
+=food_expenditures=, =food_prices= and =food_quantities= raising
+="cluster_features returned no data for any wave."=; =Feature= warns and
+excludes GhanaSPS from those variants. It records the same exception for
+=household_characteristics(market='Region')=. Ordinary declared-table calls
+succeed. The relevant market helpers and declarations are unchanged since
+=v0.14.0=; this is a retained dependency gap.
+
+The earlier =other_features.py= TODO says, "For now, all of 2013-14 has Ghana
+set as its region." That is not an implemented fallback in the current API.
+It remains a historical claim to reconcile, alongside the documented wave-2
+source geography gap. Do not recreate the earlier false claim that cluster
+identity is unavailable, infer Region from =strata= without source review, or
+fabricate a national market to hide the dependency failure. GH #110 was closed
+as superseded by the still-open umbrella [[https://github.com/ligon/LSMS_Library/issues/140][#140]],
+whose plan already includes =cluster_features=.
+
+* Append to Panama/_/CONTENTS.org
+
+** Region-market lookup is not wired (2026-10-14 release audit)
+
+The current =sample()= supplies =v= from =upm= in all three waves, but exposes
+no =Region= column; neither the country scheme nor the wave configs declares
+=cluster_features=. At frozen source =7fa05179= the Feature audit records
+=food_expenditures=, =food_prices= and =food_quantities= with
+=market='Region'= failing for Panama with
+="cluster_features returned no data for any wave."=. =Feature= warns and
+excludes Panama from those variants, while ordinary declared-table calls
+succeed. The relevant helpers and declarations are unchanged since =v0.14.0=.
+This is a missing geography dependency, not missing cluster identity or proof
+that the raw files lack geographic variables.
+
+Any future mapping needs a source-backed definition of Region. In ENV-97 the
+planning-region domains exclude indigenous and hard-to-access areas, which
+have their own domains, and their boundaries "do not coincide with the
+Collection Regions created ad hoc for fieldwork" (quoted in the universe
+section above). Neither provinces, study domains nor fieldwork regions should
+be silently substituted for one another. The retained =panama.regional_data=
+helper does not register a live Region table.

@@ -1,0 +1,28 @@
+{
+  "source": "unmodified cf1840 helper",
+  "actual_tests": true,
+  "purge_spies_only": true,
+  "rows": [
+    {
+      "initial": null,
+      "inside": "1",
+      "after_rebuild_teardown": "1",
+      "inside_following_test": null,
+      "after_following_teardown": "1"
+    },
+    {
+      "initial": "0",
+      "inside": "1",
+      "after_rebuild_teardown": "0",
+      "inside_following_test": null,
+      "after_following_teardown": "0"
+    },
+    {
+      "initial": "1",
+      "inside": "1",
+      "after_rebuild_teardown": "1",
+      "inside_following_test": null,
+      "after_following_teardown": "1"
+    }
+  ]
+}

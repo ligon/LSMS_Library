@@ -1,0 +1,343 @@
+#+title: Release landing execution record
+#+date: 2026-10-14
+
+* Authorization and scope
+The maintainer approved proceeding with WORKPLAN.org. The recommended #830
+first increment is fixed fivefold tolerance, warning-only, with the four
+observed Ghana flags disclosed and broader threshold policy left as residuals.
+No rejected historical design is revived by the instruction to land branches.
+
+* Branch reconciliation
+All 193 original ref versions now have a provisional disposition in
+branches.tsv: 82 landed, 63 superseded, 20 active, 18 retained rejected,
+6 historical archives, and 4 integration refs. No refs deleted.
+historical-patches.json records combined-patch comparisons with squash merges.
+The July27 audit is the evidence for rejected aggregation-in-core branches.
+Two genuinely absent fixes join the original 18: #600 provenance relations
+and #837 Ethiopia/Tanzania cluster projection, each assigned for fresh review.
+
+* #980 CI validation path
+Follow-up head: 67d781318cf9bed8162aa6c6e189cb52bad99e57.
+Added seven subprocess regressions for the real missing-credentials plugin;
+precisely marked the remaining data rebuild and removed synthetic network
+waits from locality/missing-file tests. Independent framework-lane approval.
+Initial focused run: 63 passed, 2 skipped, one missing Path import failure.
+After the import fix: affected file and plugin tests 35 passed in 18.50s.
+PR unit-tests and Windows smoke passed at the final head.
+Merged #980 at d9942cf7e96daee7e799e07174d0da97613d890c.
+
+Manual dispatch works despite master's older workflow. Run38681185279 has
+head67d781318cf9bed8162aa6c6e189cb52bad99e57; data-tests is executing.
+This establishes the candidate validation route; it is not a claim that
+#941's data failures are resolved. PR run:38681156745.
+
+* Isolation and resources
+Three worktree lanes: runtime CPU0-7, countries8-15, framework16-23;
+coordinator24-31. BLAS/OMP/MKL threads1, LSMS_BUILD_WORKERS=1, xdist6 with
+--dist=loadfile. Private L2 roots share only immutable DVC blobs. Shared L2
+has not been cleared or warmed by this session.
+Commits use core.hooksPath=/dev/null because the local post-commit hook
+auto-pushes to the filesystem origin. The first runtime merge hit that hook
+before discovery and published only its isolated landing branch to the mirror.
+
+* Open release gate: Uganda nutrition manifest
+No fixture changed. The historical fixture predates #850 and later kg changes;
+current development already disagrees before #967. Country-lane cold replay
+confirms #967's additional changes independently (food sums and kg×FCT),
+but the existing CONTENTS instruction requires direction signoff before
+regenerating the historical nutrition baseline. Detailed report forthcoming.
+
+* Integrated verification and review
+Candidate ed1414fb9 (before final Niger/#600 and workflow/test-only followups):
+full unit invocation with LSMS_SKIP_AUTH=1, privateL2, six loadfileworkers:
+3211 passed,4348 skipped,76warnings in144.22s. The skips are not accepted as
+credentialed-data proof. Exact current candidate after final reviewed additions
+is7fa05179c8519f44ea329ba6387f5d6d6441a8ea; a fresh private declared-table
+corpus census is assigned to the runtime lane, with max2countryprocesses.
+
+The #980/framework merge conflict preserves requires_s3 plus the request/cold
+cache failure guard. The text-clean #980/Windows merge had duplicate
+workflow_dispatch keys;396fa215d fixes this with a YAML-node duplicate-key
+regression that fails on the bad merge. Windows also asserts installed code
+and packaged configs rather than accepting checkout imports via PYTHONPATH.
+
+Final independent country review approved five fixes and Uganda's incremental
+source evidence. The proposed nutrition fixture patch remains unapplied.
+Reports from all three lanes and the independent country review are archived
+beside this file. New PRs983-996 cover the remaining branches;#967/#969/#981/
+#982 are updated in place. #600 is a reviewed port on a NEW remote branch,
+fix/600-provenance-landing; the old unreviewed historicalref is preserved.
+
+#988 initial CI failed installing dulwich after a truncated HTTP download;
+tests never ran. The failed job was retried without a code change.
+
+#941 sequential cold selection is running against frozened1414fb9 in a separate
+worktree/root with credentials and one process. It includes the revised issue
+comment's actual pre-EHCVM builders as well as its original candidate files.
+Native Windows dispatch38681713985 runs installed-wheel builds on17a914ed;
+#980 manual data run38681185279 has completed Uganda make and is in fullpytest.
+
+* Landing progress and native proof
+PRs #983, #984, #985, #986, #987 and #992 merged after both required unit
+and explicitly checked Windows smoke succeeded at their reviewed heads.
+#988 dependency-download rerun now passes; no source change was needed.
+Native Windows conda job116247523337 succeeded in dispatch38681713985:
+installed code/config identity and cold Linux-equivalent shocks/assets builds.
+Its head17a914ed precedes only the workflow-key consolidation on396fa215d;
+the integrated candidate will receive another native dispatch.
+
+Historical #837 final2877ab387 restores all three source files exactly to
+development. Raw-source replay rejects the recovered reducers: they blank
+364 Ethiopia GPS and119 Tanzania administrative cells and violate the existing
+household-grain regression. Documentation/evidence only will land; issue837
+remains open for scientific/source questions.
+
+* Ref disposition snapshot after twelve implementation merges
+{"active-landing": 7, "integration-reference": 4, "landed": 94, "retained-archive": 6, "retained-rejected": 19, "superseded": 63}
+See landing-prs.json for live-state snapshot with exact head and merge SHAs.
+#837 original implementation is retained-rejected, with documentation/evidence
+landed through this review branch. Uganda history is now causally accounted
+for; its source assumptions and explicit fixture hold remain.
+
+* Completed controlled merge window
+PR #994 final6c4c2fc13 passed unit/Windows after its narrow raw-test correction.
+PRs #969, #989, #990, #991 and #982 merged in one controlled window,
+2026-10-15 04:53:47–04:54:04 UTC. Shared L2 remained untouched throughout.
+Final integrated native Windows job116251866840 passed on74c9398ec in
+run38683117467. The same candidate unit run had3274passes,4405skips and
+only the two Nigeria metadata failures corrected by6c4c2fc13; the corrected
+file independently passes in both credential-free and credentialed settings.
+The integrated Linux data job completed Uganda make and is running fullpytest.
+
+PR #997 merged the historical dispositions and archived evidence. GitHub
+development1973242b4 contains18implementation PRs plus that evidence PR;
+only implementation PR #967 remains open, pending its explicit science hold.
+Integration against the real GitHub merges changes no runtime source beyond
+already reviewed heads; the sole merge conflict is this append-only log.
+The earlier Windows dispatch38681713985 was cancelled after its native job
+succeeded, because its superseded unit job was still running without #980.
+Its job success is retained; the whole cancelled run is not called green.
+
+New draft release-page strict docs build initially found three repository-only
+relative links; changed them to explicit GitHub source links. Final strict
+MkDocs build passes. This check is after adding the new release page, separate
+from the earlier packaging/docs proof. No runtime source changed.
+
+PR #998 merged the release-plan/evidence docs at 4c60e696f after unit and
+Windows checks passed. Main, GitHub development and filesystem origin were
+synchronized. Integration merged that history; three docs conflicts were
+resolved to the reviewed published versions (strict-docs link fixes, binary
+reproducer and additive execution note). Release PR #999 is draft.
+
+Reconciled 18 existing issue scopes, preserving OPEN; filed residuals
+#1000–#1003. Mutation manifest is issue-reconciliation-applied.json. A
+disposable-root negative control proved #1003's helper fixture can use a
+previously cached root. A narrow fixture repair is underway independently of
+the frozen full suite; no attribution to historical #941 is implied.
+
+PR1004 merged at47ce939af after both required checks passed. Main/GitHub/
+filesystem origin synchronized; integration reconciled the published history.
+Full local credentialed suite at frozenec1a59767 completed4951passed,2725skips,
+4xfails,1existing non-strictxpass,0failures in1581.30s. Archived counts identify
+2580cache-presence gaps and0credential skips; follow-up groups are in private
+control/full-suite/cache-gap-groups.json.
+
+Final validation source4f1f044bb is frozen at release-work/cache-coverage and
+pushed to release/v0.15.0-final-validation. ManualCI run38687547945 adds the
+reviewed1003 fixture andNigeria credential correction to the earlier74c
+candidate; no runtime changes (CONTENTS docs only in package diff). Native
+installedWindows need not repeat: its reviewed runtime source is identical.
+Older manualdata runs remain for evidence/comparison; no running worktree was
+mutated and no release/tag was published.
+
+PR1005 merged at33189b532 after independent review and both PR checks.
+Main/GitHub/filesystem origin synchronized. It pins build and BLAS threads
+for the credentialed data job and adds a600second per-test thread timeout;
+test selection, assertions, sequential execution and make prerequisites remain.
+Controlled candidatecf1840e02 differs from4f1f044bb only in that CI profile
+among package/test/workflow paths. Manualrun38688613005 completed unit checks
+with3276passed4407skipped and Windows smoke327passed1skipped; its data job is
+still running. Older data jobs are retained for comparison. No timeout or
+deadlock causation is attributed to #941 without a completed diagnostic.
+
+The declared corpus completed at7fa05179:549unique requests,530success,
+19documentederrors (Armenia2,Nepal11,Peru6),0empty,38countries. Original
+private cache is quiescent; independent physical copies serve the Feature
+audit and gap tests. See corpus/REPORT.md and preserved file manifests.
+
+Cache-presence follow-up at frozen4f1f044bb completed:2416passed168skipped,
+5existing tenure xfails and1known held nutrition failure. XML node sets prove
+all2580original skips were selected, plus10helper/identity checks. All19
+cache invalidation/helper cases passed, with0skips. The remaining168skips
+are individually classified; coverage debt is retained, not called green.
+See cache-coverage.org and cache-coverage/selection-proof.json. No fixture
+change, shared-cache promotion, release tag or publication occurred.
+
+PR1007 merged atc67c69279 after unit and Windows checks passed on225ab998a.
+Main, GitHub development and filesystem origin synchronized; integration
+merged the published history cleanly. No live validation tree was changed.
+
+The ongoing Feature audit found GhanaLSS null-key deletion. Independent pure
+assembly replay confirms13472deletedrows, separate from3622254non-null visit
+rows combined by aggregation; retained additive totals agree exactly under
+math.fsum. Feature and relevant selector sources matchv0.14.0/pre-train/current
+candidate, establishing a pre-existing mechanism. Exact historical input
+counts remain unverified. The reviewed country note and release note preserve
+this material residual; they do not change keys, data or aggregation policy.
+
+* Controlled credentialed CI timeout -- 2026-10-15 06:50 UTC
+Run38688613005, data job116269105325, frozen candidatecf1840e02, completed
+with failure. The 600-second pytest thread timeout stopped
+=test_currency_denominated_units.py::test_ghanalss_unitvalue_and_units_modes_are_unaffected=
+at the second food-prices call (=units='unitprice'=, line545). The stack is
+inside =load_from_waves -> Wave.grab_data -> _build_wave_script_target ->
+subprocess.run -> os.waitpid=. The log reached about8% of the suite and has
+no final pytest totals. No nutrition assertion had been reached in this
+diagnostic, and no #941 or cache-root cause is established.
+
+The same test passed in115.218s in the completed local full suite. The
+framework lane is investigating repeated builds and session state using a
+separate scoped cache. Earlier unpinned GitHub data runs are retained.
+Private full-log SHA256: c3513a43cf7024dc1f3c4163ae28f1a369a4abb4796673e2e6b1f11c45d19dc8
+(111522bytes). This is an additional open validation gate, not a pass.
+
+* Complete Feature audit and subsequent CI isolation repair
+The frozen7fa05179 Feature phases1/2 scan completed39features across38countries:
+549Country calls,38baseline Feature assemblies and17configured variants, with
+zero scope skips. Its3544emitted diagnostic records are3504WARN,19ERROR,5FAIL
+and16PASS, not a pytest pass count. All19errors match documented corpus gaps;
+the5tenure FAILs remain failures and match pre-existing country mappings. The
+266clusters group findings but do not adjudicate all259warning clusters.
+Independent review approved the aggregate-only archival package; five TSV files
+were normalized fromCRLF toLF with parsed-row equality and original digests
+retained in MANIFEST.json. No original corpus file or shared L2 was changed.
+
+The controlled CI investigation reproduced #1010: passing collect-only controls
+leave LSMS_NO_CACHE=1 when initially absent, causing valid Ghana caches to
+rebuild repeatedly. PR1011 contains only a helper environment-restoration fix,
+12discriminating regressions and its ledger. The exact corrected sequential
+selection (helper file then original Ghana test) passed19tests in112.26s with
+zero Ghana subprocess builds. Unpatched four absence cases fail; eight
+present-state cases pass. No real rebuild behavior or data assertion changed.
+
+PR1011 merged at36a923305 on2026-10-15T07:19:49Z, exact reviewed
+headf00f329b37a793ec7ef17970431e5f4f6478dc4d, after independent review and
+unit/Windows success. The narrow development port excludes held #967.
+Main and filesystem mirror are synchronized. Integrationbf917d438 merges
+that actual development history and is full-tree-identical to CI candidate
+9d5bf200f. Only the helper test and ledger differ from earlier b1b7bae7;
+no production/config/workflow changes. Candidate unit results are3288passed
+4407skipped; Windows smoke327passed1skipped. Credentialed CI38697245468
+began its full suite at07:18:21UTC and remains pending.
+
+Older runs38681185279 and38683117467 were cancelled after the leak was
+reproduced, then their completed partial logs were captured. They have no
+final totals. Run38687547945 remains a comparison. Corrected credentialed CI
+and the Uganda scientific baseline decision are still open; no nutrition
+baseline or shared L2 changed.
+
+Read-only comparison with saved June audits found no matched full baseline.
+Twenty-six of259current warning patterns have historical matches;233unmatched
+patterns are not treated as new defects. The addendum accounts for deliberate
+#830/#787/#868/#864 diagnostics and corpus source/value changes, verifies100
+comparable cached index layouts unchanged, and retains seven absent historical
+cache pairs plus Nepal as explicit gaps. No unexplained release-specific
+warning category was identified within those limits. The original Feature
+outcomes and allFAIL/ERROR statuses remain unchanged; see feature-prior-comparison/.
+
+* 2026-10-15: nutrition approved and #967 landed
+The maintainer said "Okay, thumbs up on #967" after the before/after accounting.
+Head 91cddb57bd3c329405f50390093ad8667f9f3efa changed only the two nutrition
+fixture fields and recorded approval, on top of the reviewed food patch.
+All 53 baseline entries matched; 127 focused tests passed, with no skips.
+Unit and Windows smoke succeeded in run 38742794295. PR #967 merged at
+dd647130802b348eb142370da312e5b651cc1b1e; main, GitHub and origin synchronized.
+Integration merged that history cleanly.
+
+Corrected full CI 38697245468 completed: 4,919 passed, 3 failed, 2,768 skipped,
+4 xfailed and 1 xpassed. Two failures are the Uganda assets country-script
+expansion, independently reproduced; the third is the now-approved nutrition
+fixture. All 163 EHCVM outcomes passed. Older unpinned run 38687547945 ended
+in runner communication loss, with no downloadable data log or pytest summary.
+The corrected run is not green. The assets repair subsequently passed
+independent review and landed as recorded below; final CI/cache gates remain. Shared L2 and the original corpus
+are untouched; no master merge, tag or publication has occurred.
+
+* Final implementation landed: PR #1014
+Independent review approved assets head 515864c993050c73e8add567b0a36e22f55af3ef.
+Five new tests fail on old code; all 31 focused tests pass on the reviewed head.
+Actual Makefile replay and subsequent API calls pass explicit exact-float frame
+comparisons and attrs checks. The private before/after raw and served snapshot
+pairs are also byte-identical. No assets entries exist in the Uganda baseline
+fixture; no assets invariance coverage is claimed from that manifest.
+
+Unit and Windows checks passed in run 38745576264. PR #1014 merged at
+3914d8804d7b2936d75041cea98bbc9ddb6d4c9f; main/GitHub/origin are synchronized,
+and its full tree equals the reviewed head. Integration matches too. This is
+23 merged implementation PRs. #788 was narrowed to the remaining general
+builder authority/detection question, retaining the sibling-write caveat.
+
+Final manual run 38746123119 was dispatched on that exact development SHA
+with native Windows builds enabled. Final private corpus validation runs at
+the same SHA. Shared L2 remains untouched; no master merge, tag or publication.
+
+* Final warm comparison: four attributed exceptions; #798 corrected
+Independent pure replay and source-history review reproduce existing Mali and
+Tanzania interview_date warm losses: 12,745 and 5,893 valid dates respectively.
+Tanzania's six original nulls remain separate. Mixed-format datetime coercion
+accounts for the exact saved fingerprints; normalization and sample-v joins
+are lossless. Complete raw caches remain unchanged. Ten ordinary per-wave
+calls on a new physical copy recover exact cold results with no cache writes.
+
+Issue #798's October 14 cold-only narrowing was corrected on October 15; both
+countries remain explicitly OPEN. The issue body was applied only after the
+prior body hash matched the saved snapshot. No visit/grain/parsing policy
+changed. Country CONTENTS additions record the findings and bounded workaround.
+
+Two additional served differences are existing serialization behavior:
+Liberia dates retain exact timestamps with s->ms precision; Mali MonthsSpent
+numeric scalars become strings, preserving exact numeric values and missingness.
+The inherited binary eligibility proxy remains a separate scientific caveat.
+No runtime, fixture or baseline was changed by these investigations. Final
+549-call validation accepts only these four pinned served-result differences,
+requires zero unexplained raw changes, and retains the known 19 source gaps.
+
+* Final private validation complete; shared copies staged
+All 549 declarations completed on 3914d8804: 530 successes and the same 19
+source/wiring errors. The 158 focused Uganda tests passed without failures or
+skips on a separate physical cache. All 1,519 raw fingerprints match the cold
+corpus; only the four pinned served-result exceptions remain. Original corpus
+and final private cache preservation passed after the tests.
+
+The trailing FCT rebuild also writes nutrition without metadata. Independent
+review approved preserving the exact final 423-fresh-plus-hashless-nutrition
+state, excluding only Uganda/var/nutrition.parquet and backing up/retiring its
+shared counterpart if present. #788 now records both directions of this cycle;
+the #967 scientific approval remains unchanged. No manual stamping or mixed-time
+cache assembly was used.
+
+Root reviewed candidate manifest b60bc490...8000774 and changed only its review
+status, yielding e26ae976...1046c8d. The 1,518 allowed files total 337,609,337 bytes.
+A new shared snapshot found 1,365 parquets, no nutrition counterpart and no
+unlisted extras. Staging completed with unchanged shared inventory: 153 new
+paths, 1,215 changed existing paths and 150 already-identical paths. No active
+L2 write has occurred; apply awaits final credentialed CI. Transaction and
+rollback evidence are retained outside the active country directories.
+
+* Final credentialed CI passed; shared promotion verified
+Run 38746123119 at 3914d8804 completed successfully: 4,927 passed, 2,768 skipped,
+four expected failures and one existing non-strict unexpected pass, with zero
+failures, in 3,204.33 seconds. All three formerly failed nodes executed and
+passed. Unit: 3,293 passed/4,407 skipped. Windows smoke: 327 passed/one skipped.
+Native installed shocks/assets builds retained the exact expected digests and
+eight-wave coverage. Historical #941 attribution remains unresolved.
+
+After that gate passed, the reviewed transaction applied 1,518 verified files:
+153 created, 1,215 replaced with backups, 150 already identical. The sole
+planned retirement (Uganda nutrition) was already absent, so zero files were
+deleted. The tool's verification field retired=1 counts the plan, not an unlink.
+A second read-only shared verification passed. Post-promotion preservation
+checked every original/final private parquet SHA/size/mtime/device/inode, with
+zero change, clean final source and zero in-tree parquets. Shared L1 stayed in
+place; backup and rollback journal remain retained. No shared library API
+was used during promotion. Final master merge/tag/publication remain next.

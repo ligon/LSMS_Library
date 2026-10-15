@@ -1,0 +1,303 @@
+{
+  "source_sha": "3914d8804d7b2936d75041cea98bbc9ddb6d4c9f",
+  "package": "/local/job39919092/release-work/runtime/final-candidate/lsms_library/__init__.py",
+  "pandas": "3.0.6",
+  "inputs_unchanged": {
+    "dates": {
+      "sha256": "41ce97601e33b270ee552e40273d3e8ad90c7e509b0532ff20f14a712df83909",
+      "bytes": 199984,
+      "mtime_ns": 1792042625619000883,
+      "device": 64770,
+      "inode": 22944449
+    },
+    "sample": {
+      "sha256": "2ac46c72db853017f4f2d789a317808327609ea74d63d60a620e317a178c697a",
+      "bytes": 396067,
+      "mtime_ns": 1792042505977073094,
+      "device": 64770,
+      "inode": 22944456
+    }
+  },
+  "table_api_calls": 0,
+  "cache_writes": 0,
+  "raw": {
+    "shape": [
+      22433,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "dtypes": {
+      "Int_t": "string"
+    },
+    "content_hash": "f0d346d45b3e3dea7ebcccfa57ef544919732a183b280ea6328f590b5b0f44e0",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4341,
+      "2010-11": 3924,
+      "2008-09": 3265,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 2,
+      "2010-11": 1,
+      "2012-13": 0,
+      "2014-15": 3,
+      "2019-20": 0,
+      "2020-21": 0
+    }
+  },
+  "normalized": {
+    "shape": [
+      22433,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "t",
+      "i"
+    ],
+    "dtypes": {
+      "Int_t": "string"
+    },
+    "content_hash": "f0d346d45b3e3dea7ebcccfa57ef544919732a183b280ea6328f590b5b0f44e0",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4341,
+      "2010-11": 3924,
+      "2008-09": 3265,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 2,
+      "2010-11": 1,
+      "2012-13": 0,
+      "2014-15": 3,
+      "2019-20": 0,
+      "2020-21": 0
+    }
+  },
+  "after_v_join": {
+    "shape": [
+      22433,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "v"
+    ],
+    "dtypes": {
+      "Int_t": "string"
+    },
+    "content_hash": "e5ff5ddf666057424ecc5c231f9f9709d2335e136851070104d99e6d4df98de8",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4341,
+      "2010-11": 3924,
+      "2008-09": 3265,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 2,
+      "2010-11": 1,
+      "2012-13": 0,
+      "2014-15": 3,
+      "2019-20": 0,
+      "2020-21": 0
+    }
+  },
+  "after_declared_dtype": {
+    "shape": [
+      22433,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "v"
+    ],
+    "dtypes": {
+      "Int_t": "datetime64[us]"
+    },
+    "content_hash": "9fb1cc48eb52900f9d88b85026dab6fc07a59bc7e844263ec3ae8275bd1caca0",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4341,
+      "2010-11": 3924,
+      "2008-09": 3265,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 2,
+      "2010-11": 1,
+      "2012-13": 0,
+      "2014-15": 3,
+      "2019-20": 1184,
+      "2020-21": 4709
+    }
+  },
+  "after_canonical_dtype": {
+    "shape": [
+      22433,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "v"
+    ],
+    "dtypes": {
+      "Int_t": "datetime64[us]"
+    },
+    "content_hash": "9fb1cc48eb52900f9d88b85026dab6fc07a59bc7e844263ec3ae8275bd1caca0",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4341,
+      "2010-11": 3924,
+      "2008-09": 3265,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 2,
+      "2010-11": 1,
+      "2012-13": 0,
+      "2014-15": 3,
+      "2019-20": 1184,
+      "2020-21": 4709
+    }
+  },
+  "after_dropna": {
+    "shape": [
+      16534,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "v"
+    ],
+    "dtypes": {
+      "Int_t": "datetime64[us]"
+    },
+    "content_hash": "d593293bb3d884ed191bfb83f73cc63d0d9954c3b87204bd0bde010cc21e9215",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2014-15": 4338,
+      "2010-11": 3923,
+      "2008-09": 3263
+    },
+    "null_dates_by_wave": {
+      "2008-09": 0,
+      "2010-11": 0,
+      "2012-13": 0,
+      "2014-15": 0
+    }
+  },
+  "mixed_parse_after_dropna": {
+    "shape": [
+      22427,
+      1
+    ],
+    "columns": [
+      "Int_t"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "v"
+    ],
+    "dtypes": {
+      "Int_t": "datetime64[us]"
+    },
+    "content_hash": "53085328789e3e2a72ae3b4f0150abe99e571e46fc76e680897f2e8f6832fd3c",
+    "wave_rows": {
+      "2012-13": 5010,
+      "2020-21": 4709,
+      "2014-15": 4338,
+      "2010-11": 3923,
+      "2008-09": 3263,
+      "2019-20": 1184
+    },
+    "null_dates_by_wave": {
+      "2008-09": 0,
+      "2010-11": 0,
+      "2012-13": 0,
+      "2014-15": 0,
+      "2019-20": 0,
+      "2020-21": 0
+    }
+  },
+  "raw_date_formats_by_wave": {
+    "2008-09": {
+      "rows": 3265,
+      "raw_nulls": 2,
+      "date_only": 0,
+      "date_and_time": 3263,
+      "timestamp_iso_t": 0
+    },
+    "2010-11": {
+      "rows": 3924,
+      "raw_nulls": 1,
+      "date_only": 0,
+      "date_and_time": 3923,
+      "timestamp_iso_t": 0
+    },
+    "2012-13": {
+      "rows": 5010,
+      "raw_nulls": 0,
+      "date_only": 0,
+      "date_and_time": 5010,
+      "timestamp_iso_t": 0
+    },
+    "2014-15": {
+      "rows": 4341,
+      "raw_nulls": 3,
+      "date_only": 0,
+      "date_and_time": 4338,
+      "timestamp_iso_t": 0
+    },
+    "2019-20": {
+      "rows": 1184,
+      "raw_nulls": 0,
+      "date_only": 0,
+      "date_and_time": 0,
+      "timestamp_iso_t": 1184
+    },
+    "2020-21": {
+      "rows": 4709,
+      "raw_nulls": 0,
+      "date_only": 0,
+      "date_and_time": 0,
+      "timestamp_iso_t": 4709
+    }
+  },
+  "per_wave_parse_equals_mixed_exactly": true,
+  "default_parse_then_drop_matches_warm_digest_exactly": true,
+  "mixed_parse_then_drop_matches_cold_digest_exactly": true,
+  "original_null_rows": 6
+}

@@ -1,0 +1,11 @@
+966	2026-09-26	fix(Malawi): preserve sale units and disclose basis inferences	#833 #839
+965	2026-09-26	Windows: make the reader path work on native Windows	#964
+963	2026-09-26	fix(units): _parse_explicit_metric reads a FRACTION, not the digits be	#850 #962
+955	2026-09-26	docs+tests: make the categorical-mapping resolution model durable (#95	#953
+954	2026-09-26	gh813: fix the two labels leaking into the kinship lookup, at source	#801 #813 #900
+952	2026-09-26	GhanaLSS: wave scripts import the country module relative to the scrip	#436 #753 #808 #947 #948
+951	2026-09-26	kinship.yml: remove the 70 keys the lookup can never reach, and a test	#813 #945
+950	2026-09-18	GhanaAHIES: three tables across all twelve quarters, and the updated G	#140 #783 #797 #916 #920 #936 #944 #945 #947 #949
+949	2026-09-18	fix: close GH #832's four residual unit-spelling instances (Mali, Ethi	#832 #926
+947	2026-09-18	GhanaLSS 1998-99 food_acquired: replace the Price 'first' reducer — it	#323 #803 #832 #842 #871 #916 #935 #936 #946
+944	2026-09-18	GhanaAHIES: Ghana Statistical Service AHIES quarterly panel (2022Q1-20	#941 #943

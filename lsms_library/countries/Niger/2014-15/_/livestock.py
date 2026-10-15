@@ -12,9 +12,10 @@ Columns:
   AS4AQ43  number bought in the last 12 months (HeadAcquired)
   AS4AQ51  number sold on the hoof in the last 12 months (HeadSold)
 
-i is built from (GRAPPE, MENAGE) via niger.i — matching this wave's
-sample / household_roster idxvars, which omit EXTENSION (the roster file
-HAS an EXTENSION column but the canonical 2014-15 id is grappe0menage).
+i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i — the full ECVMA2
+household key, matching this wave's sample / household_roster idxvars
+(GH #679: 59 households share a (GRAPPE, MENAGE) with another and differ
+only on EXTENSION, so the two-column id merged them).
 Only owned rows (AS4AQ05==1) are kept; the WB binary = any such row per HH.
 Grain (t, i, animal); no v level (livestock is in the framework
 _no_v_join set).
@@ -37,9 +38,9 @@ ecvma_map, _ = _species_maps()
 owned = srcn['AS4AQ05'] == 1
 srcn = srcn[owned.values]
 
-# i from (GRAPPE, MENAGE) only (EXTENSION omitted to match sample/roster).
-hh = srcn.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE']],
-                                            index=['GRAPPE', 'MENAGE'])), axis=1)
+# i from the full (GRAPPE, MENAGE, EXTENSION) household key (GH #679).
+hh = srcn.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
+                                            index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 
 df = pd.DataFrame({
     'i':            hh.values,

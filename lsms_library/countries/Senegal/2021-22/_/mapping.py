@@ -76,11 +76,28 @@ def Birthplace(value):
         return value.title()
 
 def Relationship(value):
+    '''Title-case the s01q02 label, and keep a missing answer MISSING.
+
+    GH #813.  The former guard was ``if value:``, and a float ``nan`` is
+    TRUTHY -- so every unanswered ``s01q02`` went through
+    ``str(nan).title()`` and was served as the literal string ``'Nan'``.
+    That is 15,201 of this wave's 78,732 person-rows (and 3 in 2018-19):
+    Survey Solutions pre-populates the roster grid from the 2018-19
+    enumeration (``s01qpreload_*``, populated in 15,200 of the 15,201) and
+    the interviewer left every live Section-1 column blank -- ``s01q01``,
+    ``s01q03a``, ``s01q04a``, ``s01q00`` and ``s01q12`` are ALL null on
+    exactly those rows.  They are CAPI ghost rows, which is why
+    ``household_roster`` below drops rows whose Sex, Age and Relationship
+    are all null -- a filter that could never fire while this function
+    guaranteed a non-null string.
+
+    A missing answer is ``pd.NA``.  Non-null values are title-cased exactly
+    as before (the cp1252 repair in ``_fix_relationship``, GH #801, depends
+    on that spelling), and ``pd.isna`` leaves nothing else changed.
     '''
-    Formatting relationship variable
-    '''
-    if value:
-        return str(value).title()
+    if pd.isna(value):
+        return pd.NA
+    return str(value).title()
 
 def Region(value):
     '''

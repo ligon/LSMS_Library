@@ -1,0 +1,22 @@
+{
+  "REVIEW.md": {
+    "sha256": "228274a8689b683b313e6bc7290b8a4e7f39fe5728d8931ed4f6740878886c16",
+    "bytes": 9356
+  },
+  "checkpoint-validation.json": {
+    "sha256": "689eb2d2f3622258a1ca3919634a908616725c63b9a35fb77b9295f914c9a43d",
+    "bytes": 31430
+  },
+  "privacy-scope.json": {
+    "sha256": "2bb9c15b07a49da44e94ff10835c40f64b5077206cb479bae28d873eda6875ae",
+    "bytes": 405
+  },
+  "ci-validation.json": {
+    "sha256": "6aff1ff07c75e7e7661d52cfa25c9d9c5d2b072a7e42968190228efb7e0c502b",
+    "bytes": 3152
+  },
+  "final-validation.json": {
+    "sha256": "1881310855ae7ff56f9cd88ee29ec93ad4c1bb08ba0dd6b999e38ecbb6928ad0",
+    "bytes": 36650
+  }
+}

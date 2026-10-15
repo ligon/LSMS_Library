@@ -1,0 +1,67 @@
+[
+  {
+    "table": "sample",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "household_roster",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "individual_education",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "people_last7days",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "assets",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true,
+    "quantity_sum_absolute_difference": 0.0
+  },
+  {
+    "table": "livestock",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "crop_production",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true,
+    "quantity_sum_absolute_difference": 0.0
+  },
+  {
+    "table": "plot_inputs",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true,
+    "quantity_sum_absolute_difference": 0.0
+  },
+  {
+    "table": "plot_labor",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true
+  },
+  {
+    "table": "food_acquired",
+    "shape_equal": true,
+    "index_uniqueness_equal": true,
+    "wave_counts_equal": true,
+    "quantity_sum_absolute_difference": 0.0,
+    "expenditure_sum_absolute_difference": 0.0
+  }
+]

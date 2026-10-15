@@ -1,0 +1,214 @@
+{
+  "LEDGER.md": {
+    "sha256": "e4368e8fb783f2990709259dcaf460ee75148d70075dfbe73fb1c8775f20d39a",
+    "bytes": 1986
+  },
+  "PLAN.md": {
+    "sha256": "809eb6e5b8b1c4b2ecb7822bf0dfc3264ea4551335a85de559af93ccdabc304a",
+    "bytes": 14865
+  },
+  "PROMOTION_COMMANDS.md": {
+    "sha256": "9402cf0c4a55c2dd1d5e7ed0d9b9e1321602473351b83df7d326b583d705021e",
+    "bytes": 6101
+  },
+  "REPORT.md": {
+    "sha256": "a54844bcaf27ad2aec05bc90bdcda4d461ed468d2cb26f448fcf2ec376608453",
+    "bytes": 8210
+  },
+  "REPRODUCTION.md": {
+    "sha256": "af2ec9d8348c048ef862924b90b12f9ce30209f4c2d2b7c3d71d40e1d7a67f5f",
+    "bytes": 695
+  },
+  "build_final_manifest.py": {
+    "sha256": "c2219e54e5bd91336a6d9bf567bf78b2b24cc0e7de4645ad9b848d652a6fd006",
+    "bytes": 13294
+  },
+  "check_final_hashes.py": {
+    "sha256": "d3f4927562375362203bd76059f88a59420372bfc77a145a0e5a30b72151b6ba",
+    "bytes": 5102
+  },
+  "check_promotion_transaction.py": {
+    "sha256": "45cb5f00e390931fdf2a3c9e47c103a2e151cf81bb37b2b49b50ea9b386132fa",
+    "bytes": 6660
+  },
+  "copy-summary.json": {
+    "sha256": "5c6e56a8ee4ac28ddccf59624aa2882a119c9af95139401dd2ffa6c8de616d2b",
+    "bytes": 694
+  },
+  "date-workaround/REPORT.md": {
+    "sha256": "012dc89464003a69fcb730a4c0a18a46f847a245c2f3cd418a8df1e265561162",
+    "bytes": 1938
+  },
+  "date-workaround/copy-manifest.json": {
+    "sha256": "5abb94079e55e3d8333eaa0bdfb2f9d3fb22b066e384a5a3b5ca0f8741341c13",
+    "bytes": 68781
+  },
+  "date-workaround/result.json": {
+    "sha256": "08e22ded53bebce4f67a88072bfbec0ce9f25cf3f8931ed3a15258fe97f8af5a",
+    "bytes": 8703
+  },
+  "date-workaround/run.py": {
+    "sha256": "83415112d20b77fe2e0f28179e318dee0a9586ddf3d85f0771f31efd834b422f",
+    "bytes": 5651
+  },
+  "final-validation-summary.json": {
+    "sha256": "45c7b0699e24e9a54540720ee631bb28e3b6f9b82258c825b4833846d40a95cb",
+    "bytes": 851
+  },
+  "final_env.sh": {
+    "sha256": "39efe70394070ce5cc463f22bafd5f011559d1adb9c3191faf2a2dd21a14f782",
+    "bytes": 805
+  },
+  "freeze_served_exceptions.py": {
+    "sha256": "b9da6681807e71d562a8513b1894ee2c9d385142bc5d6d10c7307857364a941c",
+    "bytes": 3895
+  },
+  "mali-date-review/LEDGER.md": {
+    "sha256": "d55eabeda37650deff3d757a3a63d990655aeecc1bf4f2a62916884284217f25",
+    "bytes": 1772
+  },
+  "mali-date-review/REPORT.md": {
+    "sha256": "8352d0c059020f233c4cfca6b232b1c69e5c83dc4bbe487a63fe6228e869d0c3",
+    "bytes": 4739
+  },
+  "mali-date-review/replay.json": {
+    "sha256": "cecb195687e1ecfa59ed131eccb730f1d24fb1c2f2a1a0d7252ee2d8470b4b9f",
+    "bytes": 6560
+  },
+  "mali-date-review/replay.py": {
+    "sha256": "2f1b53028f9708a9f0f6662fc692a210a34ec4e6eafc8828818fe74f8bb7a73d",
+    "bytes": 5474
+  },
+  "prepare_copy.py": {
+    "sha256": "3b382c25eddb96af9ba463965feed72b785fbb48089100ec53222988e79230cd",
+    "bytes": 4511
+  },
+  "prepare_targeted.py": {
+    "sha256": "343c48c6186420e47cc8783c314211a128dab4f9f8b85aed5242ba988e0863d9",
+    "bytes": 2258
+  },
+  "preservation.json": {
+    "sha256": "33fa7c00e0cdc058ab7e9a3111efc7d3331c582b821fa55204f2bb0dbdf7572a",
+    "bytes": 544
+  },
+  "private-artifacts.json": {
+    "sha256": "c64c1c1204d49f333ea910df95d2942e0922bc73c124b782ab132f39ada879de",
+    "bytes": 100561
+  },
+  "promote_cache.py": {
+    "sha256": "1d927d8a3c16ec8e970c0bfb4c67175ab7227d5779cba15578490dea6b4ce85e",
+    "bytes": 16157
+  },
+  "promotion-manifest.candidate.json": {
+    "sha256": "b60bc490cd12b4a3de7ccdb7002630b6b9fc0e4e2b5e4d56a7f3be5578000774",
+    "bytes": 2722012
+  },
+  "promotion-synthetic-checks.json": {
+    "sha256": "1be5cffa46a016c925f27cd3b40c37e7e0ec732fec67d6cbfa7074e63a999541",
+    "bytes": 472
+  },
+  "publish_aggregates.py": {
+    "sha256": "7ce13435e58923af7caa2b6b548292d13507a15d02e8f22a7bbd90e0befad42f",
+    "bytes": 5881
+  },
+  "report-amendments.json": {
+    "sha256": "39e3187ffbf95001b31d4cd6188e37fd2c4ae2347579cedf24b21d26c7ec1f03",
+    "bytes": 1682
+  },
+  "run/cache-comparison.json": {
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "bytes": 3
+  },
+  "run/completion.json": {
+    "sha256": "a687d46215e43bfebd5fccf66fa2426f45ae5f15770db812863973b35b84222f",
+    "bytes": 2500
+  },
+  "run/final-hash-impact.json": {
+    "sha256": "2448ad9d4226e6ddb1ea425874dc1f62094e762ac70d0cfd02e59591add85e24",
+    "bytes": 1300318
+  },
+  "run/promotion-exclusions.json": {
+    "sha256": "e83d0aaad4f53097fd7623388a4e11fc810299cbc5f7a8950633229d0f92cc04",
+    "bytes": 3288
+  },
+  "run/raw-cache-comparison.json": {
+    "sha256": "7e8b8ae737c7bc07afe61da028f0a5b724093c700448ae10110a6918b12f5833",
+    "bytes": 41
+  },
+  "run/served-comparison.json": {
+    "sha256": "fea63d21cf503c87e974c008d1e7954c40ddf4f3b8f8ad4057202650c39e1f08",
+    "bytes": 9793
+  },
+  "run_final.py": {
+    "sha256": "804e66ed9aaa486cc29e318f1931f731e1b948f6cc176b8a0dbe3b903584b2b2",
+    "bytes": 13589
+  },
+  "runner-adaptation.diff": {
+    "sha256": "826c929c7d9053b7922b2fe0480ec678928b41a6658df6848bf073f0a2733e82",
+    "bytes": 3905
+  },
+  "runner-provenance.json": {
+    "sha256": "fba87895de2bd586ff72783950824da8424c2546c4239c5739697d5e3a759666",
+    "bytes": 332
+  },
+  "served-exceptions.json": {
+    "sha256": "9520a4cb6960b9b09bb7783568151fd2f59878965ce1cb3c1136a34582b93490",
+    "bytes": 9612
+  },
+  "summarize_final.py": {
+    "sha256": "ec14a1e9b62cfd2bd508bfa92b6edcd2d231e43fe97481f1668061ad0c4e44d1",
+    "bytes": 6655
+  },
+  "summary-adaptation.diff": {
+    "sha256": "4f15446491aae99b1962245cebfc446c940c0cf65b032ca58bc50972c358f31e",
+    "bytes": 3722
+  },
+  "tables.tsv": {
+    "sha256": "b0798aedb9a0c3f926796f1357a42b2e95f2dbdd01f4dd5e98d8040efb6192fd",
+    "bytes": 98810
+  },
+  "tanzania-date-review/LEDGER.md": {
+    "sha256": "db21c5a23a8cece539fe551f2d8ecd3138e6b8b0b24a695b529b6c6de98aad09",
+    "bytes": 1084
+  },
+  "tanzania-date-review/REPORT.md": {
+    "sha256": "af4051cee71ee0e230a5b7bd481356d5dbb5d3b43ed3f24c8b3f630e899156e4",
+    "bytes": 3893
+  },
+  "tanzania-date-review/replay.json": {
+    "sha256": "107e89997a9e23890330f4b12a8869b312a96528563d3a32aff5ec8520f8c83d",
+    "bytes": 6056
+  },
+  "tanzania-date-review/replay.py": {
+    "sha256": "747e1f276684dc309920f95ee08144899e5851adc72184629075676b537098b1",
+    "bytes": 5120
+  },
+  "targeted-summary.json": {
+    "sha256": "4fe734e9aaf0900c65ccb4d5570edb561f6c8003ed279c4a3fbe61788b889fad",
+    "bytes": 856
+  },
+  "timing.json": {
+    "sha256": "d6023d5b76f23ab5b04ea90f581cdeecacafa3129882f4e7896b912721522d2b",
+    "bytes": 308
+  },
+  "trailing-uganda-aggregate.json": {
+    "sha256": "314428b4725664140550d52d5cf3bf97efd336a3a0505af6747812a6964c15fd",
+    "bytes": 67582
+  },
+  "trailing_uganda.py": {
+    "sha256": "3ff0e1cb60b4e630b512c4e7b98590d92b2c17589cd958f716bfd8c8a3c89e9d",
+    "bytes": 3564
+  },
+  "uganda-sibling-write.json": {
+    "sha256": "8f9335a2bb45eb264a294b2195d0ee519b4cf3f8fe6702d3bbb5e3048c32e820",
+    "bytes": 21134
+  },
+  "verify_final_preservation.py": {
+    "sha256": "f57d020f562d2ae8d07c91f6db70bac7aee70224732e6328294c8c41cbe22be7",
+    "bytes": 2131
+  },
+  "warning-counts.tsv": {
+    "sha256": "3c02f4b41fa91b50873e1fe41241a5fff42da8b2583647cf38663646b2c01574",
+    "bytes": 15560
+  }
+}

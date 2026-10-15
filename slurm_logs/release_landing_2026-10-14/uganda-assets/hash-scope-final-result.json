@@ -1,0 +1,52 @@
+{
+  "source_before": "17308b3d4f35dc7d569ec42b89c24fa82271ecfe",
+  "source_after": "515864c993050c73e8add567b0a36e22f55af3ef",
+  "runtime_diff": "Uganda/_/assets.py only; CONTENTS differences excluded by hash",
+  "Uganda": {
+    "country_tables_checked": 28,
+    "country_tables_changed": 28,
+    "changed_country_tables": [
+      "people_last7days",
+      "sample",
+      "cluster_features",
+      "household_roster",
+      "individual_education",
+      "shocks",
+      "earnings",
+      "food_acquired",
+      "fct",
+      "nutrition",
+      "interview_date",
+      "panel_ids",
+      "income",
+      "enterprise_income",
+      "assets",
+      "months_food_inadequate",
+      "housing",
+      "plot_features",
+      "crop_production",
+      "plot_inputs",
+      "livestock",
+      "anthropometry",
+      "plot_labor",
+      "nonfood_expenditures",
+      "food_expenditures",
+      "food_prices",
+      "food_quantities",
+      "household_characteristics"
+    ],
+    "wave_table_pairs_checked": 224,
+    "wave_table_pairs_changed": 224,
+    "assets_before": "9bedfd3b18655fcf0b61774ef3a1fe9b8e1709679d32d33af7fe44de6b824fcb",
+    "assets_after": "b30d0fd4afbe78159cfceae8add20e94e912b9980c192c0bd93e0f9ed09cba1a"
+  },
+  "GhanaSPS": {
+    "country_tables_checked": 13,
+    "country_tables_changed": 0,
+    "changed_country_tables": [],
+    "wave_table_pairs_checked": 39,
+    "wave_table_pairs_changed": 0,
+    "assets_before": null,
+    "assets_after": null
+  }
+}

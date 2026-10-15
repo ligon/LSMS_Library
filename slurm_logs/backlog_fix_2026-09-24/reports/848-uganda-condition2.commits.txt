@@ -1,0 +1,1 @@
+cc25a626c Uganda crop_production: wire the season-B second condition slot, 2018-19 and 2019-20 (GH #848)
