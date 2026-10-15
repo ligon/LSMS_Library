@@ -184,18 +184,24 @@ skills and script docstrings before editing. Record new idiosyncrasies.
   Full credentialed run: 4,951 passed, zero failures. Follow-up of all 2,580
   cache-presence skips is complete, with the one held nutrition failure.
   See full-suite.org and cache-coverage.org for counts and coverage limits.
-- [ ] Run the credentialed sequential cold selection named by #941, followed
-  by the credentialed data-tests workflow against the candidate. Investigate
-  any EHCVM Derivation/inkind loss. A warm parallel pass does not clear #941.
+- [X] Run the credentialed sequential cold selection named by #941: 451 passed,
+  zero skipped at ed1414fb9. Every selected delivery assertion executed.
+- [ ] Complete and record the credentialed data-tests workflow against the
+  candidate. Corrected run 38697245468 remains in progress after the #1010
+  test flag repair. Investigate any EHCVM Derivation/inkind loss; the old
+  failure cause remains unresolved. A warm parallel pass does not clear #941.
 - [X] Validate installed-wheel behaviour from outside the checkout: package
   data, import without Git, no-make wave fallback, and native Windows conda
   script builds. Assert the installed package path; do not let PYTHONPATH
   silently substitute this source checkout for the wheel.
   Completed at frozen74c9398ec; later changes affect tests/docs/CI only.
-- [ ] Check independent data expectations, especially #967 Uganda nutrition,
-  Burkina money-only rows, Peru cluster identity, Panama quantities, and
-  Nigeria/Niger sale units. Review each changed expectation with before/after
-  evidence; retain every unchanged invariant.
+- [X] Independently check the changed data expectations: Burkina money-only
+  rows, Peru cluster identity, Panama quantities, Nigeria/Niger sale units,
+  and the #967 Uganda kg/nutrition accounting and historical attribution.
+  Reviewed before/after evidence is archived; unchanged invariants remain.
+- [ ] Obtain the explicitly required Uganda nutrition direction decision.
+  Arithmetic reconciliation does not lift that scientific hold. The proposed
+  two-field nutrition fixture change remains unapplied.
 
 Gate: no unexplained regression, no worker crash accepted as a test result,
 no required data test accepted merely because it skipped, and independent
@@ -249,10 +255,12 @@ accounted for, and no unexplained data loss. Private branch verification can
 require additional scoped builds; "once" refers to the shared corpus warm.
 
 * Phase 5 — reconcile issues and prepare the release
-- [ ] Update each resolved issue with its actual merged PR/SHA. Narrow a
-  partial issue or split a different residual; a bare "partly fixed" comment
-  is insufficient. In particular, do not close #794, #824, #833, #787,
-  #830, #905, or #941 solely because one associated branch merged.
+- [X] Apply reviewed issue reconciliation: 18 partial scopes narrowed with
+  source/PR references, residuals filed and verified complete scopes listed
+  individually in draft release PR #999. The application manifest is archived.
+  In particular, #794, #824, #833, #787, #830, #905 and #941 remain open.
+- [ ] After the release merge, verify the intended 21 issue closures and
+  retained residuals against their final states; record the release SHA.
 - [X] Reconcile existing #978 rather than duplicating Nigeria W5 acquisition;
   retain the 12 DECISION issues unless separately decided. Previously
   acknowledged source-acquisition gaps (#975/#976/#977) get explicit release

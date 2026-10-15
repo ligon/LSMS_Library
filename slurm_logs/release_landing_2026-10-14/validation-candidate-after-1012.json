@@ -1,0 +1,18 @@
+{
+  "base_ci_candidate": "9d5bf200f170f322076626386689b498bebb1c06",
+  "integration_head": "ea688bf51e33e22e3781db97a5123a9061cdc9e7",
+  "development_head": "729ff51238ed609ab56a1fc5ff43bda750b9c389",
+  "compared_paths": [
+    "lsms_library",
+    ":!lsms_library/countries/*/_/CONTENTS.org",
+    "tests",
+    ".github/workflows",
+    "pyproject.toml",
+    "poetry.lock",
+    "Makefile",
+    "bench/feature_audit"
+  ],
+  "diff_exit_code": 0,
+  "diff_stdout": "",
+  "scope": "Runtime/config, tests, workflow, dependency, build and Feature harness equality. Country CONTENTS docs are excluded. No full-tree equality or completed credentialed CI claim."
+}

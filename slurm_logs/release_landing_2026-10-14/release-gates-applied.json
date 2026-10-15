@@ -1,0 +1,16 @@
+{
+  "updated_at_utc": "2026-10-15T07:49:12.239605+00:00",
+  "reviewer": "/root/country_landing",
+  "issue_941": {
+    "url": "https://github.com/ligon/LSMS_Library/issues/941",
+    "body_sha256": "1e525aa39d1eb9d520c827c86e6057d81573dfa534da17600070383c12337365",
+    "state": "OPEN",
+    "change": "Replace cancelled-run/still-building corpus instructions with completed corpus, #1010 evidence and corrected CI pending; preserve unresolved historical cause."
+  },
+  "pr_999": {
+    "url": "https://github.com/ligon/LSMS_Library/pull/999",
+    "body_sha256": "27e8cf7430295ae4a446ae7b855238ed89696f5df58bb680ffb58b8420e2e3fe",
+    "draft": true,
+    "change": "Mark reviewed Feature evidence complete; retain final CI, Uganda decision and final combined-head/shared-cache warm as open gates."
+  }
+}
