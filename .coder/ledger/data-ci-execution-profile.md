@@ -21,7 +21,7 @@ selection, credentials, skips, or production cache hashes.
 | Credentialed CI | `.github/workflows/ci.yml`, `jobs.data-tests` | Existing `make -j2`, sequential `pytest --tb=short`, credential setup, and dispatch condition stay intact. |
 | Timeout dependency | `pyproject.toml:62`, `pytest-timeout = "^2.3.0"` | Already declared; verify local plugin and option availability, no dependency edits. |
 | Sequential #941 probe | `slurm_logs/release_landing_2026-10-14/941-sequential.org` | Existing 451-pass / zero-skip fresh-root ordered run used one build worker, BLAS=1, and 600-second thread timeouts. |
-| Historical CI marking analysis | `slurm_logs/release_landing_2026-10-14/907-coverage.org` if present; private `control/framework/validation-followup/907-REPORT.md` | Distinguish execution controls from test marking/selection; no marking edits here. |
+| Historical CI marking analysis | `slurm_logs/release_landing_2026-10-14/907-ci-coverage.md` and `907-independent-review.md` | Distinguish execution controls from test marking/selection; no marking edits here. |
 
 ## §3 Definitions & conventions in force
 
@@ -65,4 +65,8 @@ attribution remain independent questions.
 
 ### Phase 3 — verification
 
-Pending YAML/structural comparison, command availability, and independent review.
+- `jobs.data-tests.env` — **OK (§2–§5)**: all four values match the existing unit job; job scope covers build and test steps.
+- Full-suite command — **OK (§2–§5)**: exact prior command plus the existing timeout/duration flags, no xdist or filters.
+- Workflow comparison — **OK (§4)**: removing only those intended semantic edits gives the identical before-workflow YAML tree. Production, tests, dependencies, and locks are unchanged.
+- Command availability — **OK (§2)**: pytest help parsed the exact options successfully with installed pytest-timeout 2.4.0. Source/config identity asserted.
+- Independent review is requested on the frozen branch; completion of a future credentialed Actions run is outside this local verification.
