@@ -12,16 +12,18 @@ import warnings
 import pytest
 
 
-def test_locality_emits_deprecation_warning():
+def test_locality_emits_deprecation_warning(monkeypatch):
     """Country('Uganda').locality() must emit DeprecationWarning."""
     import lsms_library as ll
+    from lsms_library import transformations
+    # The warning belongs to the public compatibility wrapper; building the
+    # shim's data is covered separately by test_legacy_locality_shape.
+    sentinel = object()
+    monkeypatch.setattr(transformations, "legacy_locality", lambda country: sentinel)
     c = ll.Country('Uganda')
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        try:
-            c.locality()
-        except Exception:  # broad catch intentional: shim may fail if Uganda data is unavailable
-            pass  # we only care that the warning fired
+        assert c.locality() is sentinel
         assert any(
             issubclass(warning.category, DeprecationWarning)
             and 'sample()' in str(warning.message)

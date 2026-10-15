@@ -27,6 +27,7 @@ from __future__ import annotations
 
 
 import warnings
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -415,10 +416,22 @@ def test_hard_error_says_optional_true_is_country_wide(testland):
     assert "EVERY wave of Testland" in msg
 
 
-def test_missing_file_stays_soft_even_for_a_required_column(testland):
+def test_missing_file_stays_soft_even_for_a_required_column(testland, monkeypatch):
     """A file that is not AVAILABLE is not a config bug -- no YAML edit fixes
     it, and hard-failing would break every legitimate partial-data checkout.
     Only the KeyError kind (file loaded, column absent) escalates."""
+    from lsms_library import local_tools
+
+    read = local_tools.get_dataframe
+
+    def missing_geo(path, *args, **kwargs):
+        # Exercise the real Wave missing-file handling without asking remote
+        # storage to find a deliberately absent synthetic fixture.
+        if Path(path).name == "absent.csv":
+            raise FileNotFoundError(path)
+        return read(path, *args, **kwargs)
+
+    monkeypatch.setattr(local_tools, "get_dataframe", missing_geo)
     wave = testland(data_info=_data_info(geo_file="absent.csv"), geo_file="geo.csv")
     with pytest.warns(UserWarning, match="could not load"):
         df = wave.grab_data("cluster_features")
