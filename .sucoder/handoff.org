@@ -26,7 +26,10 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   contains #967 plus all landed code and evidence. Runtime differences from
   development are only the reviewed #967 country changes.
 - Native installed Windows conda job116251866840 passed on74c9398ec,
-  run38683117467. Linux credentialed full suite is still running in that run.
+  run38683117467. Its Linux data job and earlier38681185279 are still running.
+  Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
+  manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
+  matches the earlier candidate; only tests/CONTENTS/evidence differ.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
