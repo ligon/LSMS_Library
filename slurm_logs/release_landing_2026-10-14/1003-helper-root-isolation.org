@@ -1,0 +1,60 @@
+#+title: #1003 — isolate two synthetic country-cache helper tests
+#+date: 2026-10-14
+
+* Scope deviations
+None. Fix is limited to one test file plus its ledger and aggregate evidence.
+No production source, survey record, fixture baseline, dependency, DVC input or
+shared cache changed. Delivered tests retain their ambient cache. No inference
+is made that this defect caused #941 or another historical suite failure.
+
+* Defect reproduced before the change
+Read-only probe source: =d7626368f922a7fcd8aa53b944458610e6b36c85=.
+The actual absent-parquet helper resolves =data_root('Uganda')= under private
+root A. Pytest's MonkeyPatch restores environment B, but the cached country
+path remains =A/Uganda=; the uncached no-argument call can simultaneously
+resolve B. An explicit =data_root.cache_clear()= restores agreement.
+
+In the opposite direction, prewarming B before running the helper with
+=LSMS_DATA_DIR=A= makes its eviction operate on B. The probe created a dummy
+=B/Uganda/var/livestock.parquet= and verified the helper deleted it while A's
+target was absent. This was a disposable synthetic sentinel only.
+
+The JSON helper is different: =JSON_CACHE_METHODS= returns before resolving
+the root, so that helper alone adds zero cache entries and does not directly
+poison the path cache. Both helpers share the new private fixture to keep their
+declared temporary-root scope reliable.
+
+[[file:1003-helper-root-isolation/discovery-probe.json][Discovery probe]] records the cold/prewarmed cases and the synthetic deletion.
+Private directories were removed after the read-only probe; no survey records
+or credentials appear in the evidence.
+
+* Fix and discriminatory verification
+Implementation base: GitHub development =1973242b48ec62ab808bc8f6e0667054fbb0703f=.
+=private_helper_root= reuses GH970's entry/finally cache-clear discipline,
+scoping its own MonkeyPatch context so environment B is restored before the
+caller resumes. Only the two helper tests request it; it is not autouse.
+Country/config root is unchanged. Tier-2 delivered source is byte-identical
+to the base revision.
+
+The new two-root regression prewarms both data-root argument forms under B,
+invokes the actual absent helper under A, checks B's sentinel survives, then
+checks both root forms after normal AND exceptional fixture teardown.
+
+| validation | result |
+|------------+--------|
+| GH866 and GH970 files, credential-free | 10 passed, 10 skipped, 10.13 s |
+| disposable copy with entry clear removed | both new cases FAIL: B sentinel deleted |
+| disposable copy with finally clear removed | both new cases FAIL: A survives teardown |
+
+Ten skips are the original GH866 delivered-cache checks against an empty
+private data root. All helper/source/new regressions and GH970 cold synthetic
+checks execute. No skip or assertion was weakened. Negative copies and their
+pytest root live outside the source checkout; the published source retains
+both clears. See [[file:1003-helper-root-isolation/validation.json][commands/exit codes]], [[file:1003-helper-root-isolation/targeted.log][targeted log]],
+[[file:1003-helper-root-isolation/missing-entry-clear.log][entry negative control]] and [[file:1003-helper-root-isolation/missing-exit-clear.log][exit negative control]].
+
+Used =/local/job39919092/venv_img/bin/python= with import/config identity
+assertions, empty LSMS_CONFIG_DIR, no credentials, private empty LSMS_DATA_DIR,
+BLAS/OMP/MKL=1 and LSMS_BUILD_WORKERS=1. Targeted pytest used CPUs 16–23,
+=-n 6 --dist=loadfile=; negative controls used CPU 16. No global cache clear or
+rebuild. The running integration/full-suite/corpus worktrees were untouched.

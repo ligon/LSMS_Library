@@ -122,3 +122,15 @@ New draft release-page strict docs build initially found three repository-only
 relative links; changed them to explicit GitHub source links. Final strict
 MkDocs build passes. This check is after adding the new release page, separate
 from the earlier packaging/docs proof. No runtime source changed.
+
+PR #998 merged the release-plan/evidence docs at 4c60e696f after unit and
+Windows checks passed. Main, GitHub development and filesystem origin were
+synchronized. Integration merged that history; three docs conflicts were
+resolved to the reviewed published versions (strict-docs link fixes, binary
+reproducer and additive execution note). Release PR #999 is draft.
+
+Reconciled 18 existing issue scopes, preserving OPEN; filed residuals
+#1000–#1003. Mutation manifest is issue-reconciliation-applied.json. A
+disposable-root negative control proved #1003's helper fixture can use a
+previously cached root. A narrow fixture repair is underway independently of
+the frozen full suite; no attribution to historical #941 is implied.

@@ -1,0 +1,66 @@
+[
+  {
+    "name": "missing-entry-clear",
+    "command": [
+      "taskset",
+      "-c",
+      "16",
+      "/local/job39919092/venv_img/bin/python",
+      "-m",
+      "pytest",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative/test_missing_entry_clear.py",
+      "-k",
+      "test_helper_root_preserves_other_root_and_restores_paths",
+      "--confcutdir",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative",
+      "--rootdir",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative",
+      "-q",
+      "--tb=short"
+    ],
+    "exit": 1,
+    "seconds": 8.494524240493774
+  },
+  {
+    "name": "missing-exit-clear",
+    "command": [
+      "taskset",
+      "-c",
+      "16",
+      "/local/job39919092/venv_img/bin/python",
+      "-m",
+      "pytest",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative/test_missing_exit_clear.py",
+      "-k",
+      "test_helper_root_preserves_other_root_and_restores_paths",
+      "--confcutdir",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative",
+      "--rootdir",
+      "/local/job39919092/release-work/control/framework/validation-followup/1003/negative",
+      "-q",
+      "--tb=short"
+    ],
+    "exit": 1,
+    "seconds": 8.440544366836548
+  },
+  {
+    "name": "targeted",
+    "command": [
+      "taskset",
+      "-c",
+      "16-23",
+      "/local/job39919092/venv_img/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_gh866_stale_country_parquet_not_laundered.py",
+      "tests/test_gh970_no_json_make.py",
+      "-n",
+      "6",
+      "--dist=loadfile",
+      "-q",
+      "--tb=short"
+    ],
+    "exit": 0,
+    "seconds": 11.390072345733643
+  }
+]
