@@ -1,0 +1,91 @@
+#+title: Runtime landing issue dispositions and residual drafts
+
+* Fully resolved after their reviewed branches land
+- #810: remove the cwd-rooted dvc.api.open paths; missing-source errors remain
+  FileNotFoundError after the sanctioned World Bank fallback. df_data_grabber's
+  missing_ok controls columns only. The import-time credential copy below is
+  separate, and is not a reason to keep #810 open.
+- #712: CSV header bytes cannot route ordinary text into the Stata decoder.
+- #868: reducer reports persist/replay; the reviewed explicit-round gap is
+  now repaired by wave_folder and a failing-before cold/warm regression.
+- #970: cold JSON methods do not run make, and every country.py subprocess
+  call is guarded by the AST env check. #979's merged state is bookkeeping,
+  not proof that #970 source was landed; #982 contains the implementation.
+- #964/#968 and deferred #965: require native Windows conda execution on the
+  final head; Linux has equal cold digests with/without make. Do not close
+  them based solely on Linux evidence.
+
+* Retitle/narrow #699: Wire Peru 1990 tables after SAS XPORT reader repair
+The reader gap is fixed: get_dataframe dispatches XPORT magic to pandas.read_sas,
+which preserves every column in the three verified local files. Peru 1990 has
+36 SSP files among 39 DVC sidecars (the remainder are FORMAT.ZIP and two
+Documentation files); 33 SSP files were not verified by the October 14 census.
+The remaining task is to add Peru/1990 wave configurations, using the country's
+CONTENTS.org: 1990 is Metropolitan Lima only, EXPEND.WT is a real survey weight,
+CID in N00A is constant 1.0 and is not a cluster, and PANEL is a person-level
+1985–1990 link. Review the other files and instrument definitions before wiring
+any table. Do not revive the disproved SPSS/conversion/acquisition blocker.
+
+* New issue draft: Remove import-time _sync_legacy_dvc_creds writes into countries_root
+The library copies user-config credentials into countries_root()/.dvc/s3_creds
+at import and from _auto_unlock_s3. This violates the runtime read-only config
+tree invariant and serves no reader when user-config credentials exist:
+_build_dvcfs already passes config.s3_creds_path() to DVCFS.
+
+Coordinate these touch points in one follow-up:
+- lsms_library/__init__.py import-time call and data_access.py helper/callers.
+- tests/conftest.py aws_creds_available should resolve config.s3_creds_path()
+  (with an explicit legacy in-tree fallback only if policy still requires it).
+- tests/test_s3_unlock.py currently monkeypatches the removed symbol.
+- scripts/dvc_remote_reachability.py should use the reader's credential resolver.
+
+Acceptance: importing from a read-only installed package writes no credential
+file there; a user-config-only credential setup does not skip requires_s3 tests;
+reader access still works. CI manually writes in-tree credentials and would
+otherwise miss the user-config-only regression. No credentials belong in issue
+attachments. This remains deliberately separate from #810.
+
+* New issue draft: Keep unreadable binary files out of the text-reader tail
+get_dataframe's path-string retry calls pd.read_spss for unrelated formats;
+ReadstatError is outside that attempt's caught tuple and can obscure the real
+format diagnostic. Separately, an unreadable binary with a permissive encoding
+such as latin-1 can reach read_csv and return an empty single-column frame whose
+column name consists of binary header bytes. The null-read audit does not fire
+on zero rows. The current DTA follow-up closes this for claimed .dta files only
+(magic mismatch, or both Stata decoders failing), preserving the decoder cause.
+
+Investigate format-aware binary-versus-text admission and explicit error chains
+for other suffixes. Add failing-before tests for an unreadable non-DTA binary
+under default and latin-1 encodings and for the SPSS path-string retry. Preserve
+valid text, XPORT and legacy SPSS reads; do not blanket-catch programmer errors
+or turn failures into empty data. Do not duplicate #712, which fixes CSV-to-Stata
+misdispatch, or reopen #699's now-working XPORT path.
+
+* New issue draft: Isolate cached data_root across tests that set LSMS_DATA_DIR
+The reviewed tests/test_gh866_stale_country_parquet_not_laundered.py helper-noop
+test sets LSMS_DATA_DIR through monkeypatch without clearing the lru-cached
+paths.data_root. This can leave the temporary root cached for a later test file
+on the same xdist worker and produce order-dependent food-price failures. The
+file still has this spelling on origin/fix/framework-small-2 inspected during
+landing; that branch's separate fixture repairs do not remove this site.
+
+Acceptance: add a discriminating sequence using two roots and teardown, and
+choose either a reusable fixture or targeted clears with a defined test policy.
+Both data_root and countries_root environment overrides need isolation. The
+#970 synthetic fixture already clears both before and in finally. Do not cite
+warm parallel success as proof that cached process state was reset.
+
+* Retain as investigation candidates from the September review
+These were not reproduced during this runtime lane and should not be filed as
+newly proven defects without checking the historical report and duplicate issues:
+- Order-dependent GhanaLSS [total] failure (not observed here).
+- get_data_file handling of ../.. source paths; original #810 follow-up explicitly
+  deferred it. Narrow it to the original failing path before filing.
+- Global conftest root-cache policy belongs with the concrete #866 isolation issue,
+  not a second duplicate issue.
+
+* Reconciled obsolete claims
+- The missing --no-root CI issue is already fixed by development 24cd065b0;
+  test_no_editable_install passed on the prepared heads. Do not file again.
+- Review counts such as 36 requires_s3 test files describe the reviewed revision,
+  not a future invariant; no implementation decision relies on that count.
