@@ -404,16 +404,30 @@ The largest single loss is =cluster_features/2014-15=, which projects a
 household-grain frame onto =(t, v)= and destroys 42 of 3,617 rows
 across 4 conflicting clusters.
 
-** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12)
+** 2014-15 =household_roster=: =pid= repeats within a household (GH #871, 2026-09-12; FIXED by GH #679, 2026-09-24)
 
 The idiosyncrasy behind that =household_roster= entry, recorded because
 GH #871's corpus census had to look at it by hand: in 2014-15 the
-declared index =(t, i, pid)= is NOT unique -- 210 rows sit on a
-duplicated tuple, and the shape is a *blank line sharing a member
-number with a real one*.  Group =('2014-15','101008','1')= is two rows:
+declared index =(t, i, pid)= was NOT unique -- 210 rows sat on a
+duplicated tuple.  Group =('2014-15','101008','1')= was two rows:
 =(<NA>, NaN, <NA>, NaN)= and =(Masculin, 45.0, Chef de menage, 12.0)=.
 That is the #323 verdict verbatim -- the identifier is broken, not the
-reducer -- and it is NOT fixed here.
+reducer.
+
+CORRECTION (2026-09-24, GH #679).  This entry used to say the shape
+was "a *blank line sharing a member number with a real one*".  That
+describes 45 of the 210 colliding groups.  Measured on
+=ECVMA2_MS01P1.dta= (a line is "blank" when Sex, Age, Relationship and
+MonthsSpent are all missing): *165 of the 210 groups are two POPULATED
+people* -- e.g. =(GRAPPE 2, MENAGE 1, line 1)= is a 56-year-old in
+EXTENSION 0 and a 29-year-old in EXTENSION 2 -- and 45 are
+blank-vs-populated; none is blank-vs-blank.  The most-complete-row
+rule rescues the 45 (it serves the populated line) and silently drops
+a real person in each of the 165, so the entry understated the loss:
+what #871 changed was which row of a broken group is served, and the
+group was broken because =i= lacked EXTENSION.  The key is now fixed
+(next section); the (t, i, pid) index is unique in all four waves and
+this collapse no longer fires.
 
 What changed is what core serves.  Until #871 the collapse was
 =groupby().first()=, a per-column first-non-null that happened to
@@ -424,13 +438,155 @@ cell).  Core now serves the *most complete* observed row, so the head's
 row survives and is a row the survey actually recorded.  Same delivered
 values as before, for a defensible reason rather than by luck.
 
-Niger's other #871-visible cells are =assets/2014-15= (172 rows changed
+Niger's other #871-visible cells were =assets/2014-15= (172 rows changed
 under =nth(0)=, 0 under the landed rule), =shocks/2014-15=,
 =individual_education/2014-15= and =plot_inputs/{2011-12,2014-15}=; the
-last two are the only ones where the landed rule still changes a served
+last two are the only ones where the landed rule still changed a served
 row (11 + 2 rows on =Quantity=/=Purchased=, no new missings).  See
-=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  Fixing the
-=pid= key remains open under GH #614 / #637.
+=slurm_logs/gh871_grain_census/REPORT_most_complete.org=.  All of the
+2014-15 cells were the same missing EXTENSION level (see the next
+section); the 2011-12 =plot_inputs= cell is unrelated and still open
+under GH #614 / #637.
+
+** 2014-15: the household key is =(GRAPPE, MENAGE, EXTENSION)= (GH #679, 2026-09-24)
+
+ECVMA2 re-interviewed the 2011 households under a tracking rule
+(quoted under "Sampling universe" above), and its cover sheet carries
+the outcome per household in =EXTENSION=: 0 = found in place (3,478
+households), 1 = the whole household found after moving (77), 2 = a
+SPLIT-OFF, members who left the 2011 household and were interviewed as
+a household of their own (62).  So a =(GRAPPE, MENAGE)= is NOT a
+household: 3,617 households share 3,558 pairs, and 59 of them have
+their (GRAPPE, MENAGE) in common with another.  A pair carries the
+extension sets ={0}= 3,421, ={1}= 75, ={0, 2}= 57, ={1, 2}= 2, ={2}=
+3 -- never ={0, 1}=.
+
+Until 2026-09-24 every 2014-15 table built =i= from (GRAPPE, MENAGE)
+alone (the scripts said "EXTENSION omitted to match sample/roster", and
+=sample= omitted it too), so the 59 shadowed households were merged
+into their parents wherever a within-household key repeats: 210
+(t, i, pid) collisions in =household_roster= / =individual_education=
+/ =people_last7days=, 2,006 in =assets= (item codes), 46 in
+=crop_production= -- each 0 once EXTENSION is in the key.  The two
+figures first given here for =livestock= and =plot_inputs=, 280 and
+367, were two-column duplicate groups on ALL raw rows of the source
+files (41,200 livestock rows, species not owned included; 36,890 input
+rows, inputs not applied included), not table collisions.  On the rows
+the scripts keep (=AS4AQ05 == 1= owned, 6,758 rows; =AS02CQ03 == 1=
+applied, 8,179 rows) the two-column key collides on 17 and 50 groups,
+and both are 0 on (GRAPPE, MENAGE, EXTENSION).  That makes =livestock=
+clean after the fix but NOT =plot_inputs=: the served 2014-15 cell
+still collapses 35 destroyed rows / 29 conflicting groups (was 88 / 82
+before the key was fixed) -- the seed-slot collision described two
+paragraphs down, which is not an EXTENSION defect.  (Corrected
+2026-10-14 after the red-team review,
+=slurm_logs/backlog_fix_2026-09-24/verdicts/niger-followup.md=; every
+count re-measured.)  Every 2014-15 source file carries the column
+(checked one by one, including the welfare file =sample= reads).
+
+*What changed.*  Every =i:= in =2014-15/_/data_info.yml= is
+=[GRAPPE, MENAGE, EXTENSION]=, the five wave scripts pass all three,
+and =niger.i= appends the extension as one digit: ='1001'= became
+='10010'=, and the split-off =(2, 1, 2)= is ='20012'=.  *This re-keys
+every 2014-15 household id*, so the committed crosswalk
+(=_/panel_ids.json=, =_/updated_ids.json=) was regenerated with
+=make panel-ids=.
+
+*DECISION, named because it is one (GH #679): extensions 0 and 1 link
+to the 2011-12 parent; extension 2 -- the split-off -- is a NEW
+household and is not linked.*  Linking a split-off to its parent's
+2011-12 =hid= would make =id_walk= rename parent and split-off to the
+same id and re-merge them: the collision #679 removes, under another
+name.  Because a pair never carries both 0 and 1, linking both never
+merges two 2014-15 households.  A split-off's origin is recoverable
+from the key: the parent is the same (GRAPPE, MENAGE) with extension 0
+or 1.  Linked: 3,529 households (was 3,251 under the two-column key --
+the namespace guard below had to skip 286 households whose 2011-12
+=hid= was spelled like another 2014-15 id; with the longer key it skips
+5).  Unlinked: 88 = 62 split-offs + 21 ext-0 households with no
+2011-12 =hid= in the individual file + the 5 guard-skipped.
+
+*The re-key also DROPS five of the old 3,251 links* (measured
+2026-10-14 against the crosswalk at the merge-base, =242573697=: 3,246
+old links carry over with identical targets, 0 change target, the
+2011-12 / 2018-19 / 2021-22 maps are byte-identical).  Three go by the
+DECISION above: old keys =89005=, =95001=, =128011= -- pairs (89,5),
+(95,1), (128,11) -- are ext-2-ONLY on the cover sheet (EXTENSION set
+={2}=, no ext-0/1 sibling), i.e. split-offs whose parent was NOT
+re-interviewed.  For those three the collision argument does not bite
+(linking them could re-merge nothing), so delinking them is a choice,
+not a consequence: whether the sole surviving trace of a 2011 household
+should carry its 2011 =hid= is a panel-design call, taken here as "a
+split-off is a new household" uniformly, and reversible by adding ext 2
+to =LINKED_EXTENSIONS= for pairs with no ext-0/1 sibling.  Two go by
+the namespace guard: old keys =101010= and =201010= (ext-0 households
+(101,10) and (201,10)) reconstruct the 2011-12 hids =10110= and
+=20110=, which under the longer key are the ids of (1,11,0) and
+(2,11,0); the guard skips them so that =id_walk= cannot chain two
+2014-15 households onto one 2011-12 id.  The other three
+guard-skipped households (=10010=, =20010=, =20012= as prev_i) were
+skipped under the old key as well.
+
+*One namespace collision remains, and no guard can remove it.*  The
+2011-12 id is the digit string =grappe*100 + menage= and the 2014-15
+id is also all digits, so an UNLINKED 2014-15 id can equal a 2011-12
+=hid=: exactly one does, the split-off ='20012'= (g=2, m=1, e=2), which
+is also 2011-12 household (g=200, m=12).  In a cross-wave join on =i=
+those two rows look like one panel household.  The guard in
+=panel_ids.py= only removes LINKS; an unlinked id it cannot touch.  A
+non-digit separator in the 2014-15 id would remove the class; not done
+here, because it would re-key the wave a second time.
+
+*Cache.*  =niger.py= (the =i= docstring and the retired KEY BROKEN
+comment) is in every Niger table's hash, so all 18 tables re-warm once.
+
+*Measured on the cold rebuild that landed this (2026-09-24), served
+rows for 2014-15 before -> after:* The before figures were independently
+reproduced by the October 14 review with a cold build of development at
+=340e30f1e=, matching the September 24 snapshot. =sample= 3,558 -> 3,617;
+=household_roster= 22,506 -> 22,671 (+165: the populated people the
+collapse used to drop); =people_last7days= 26,369 -> 26,579 (+210);
+=assets= 17,070 -> 17,267; =plot_inputs= 8,071 -> 8,134; =livestock=
+4,998 -> 5,018; =individual_education= 2,821 -> 2,834; =crop_production=
+8,753 -> 8,799 (+46); =plot_labor= 15,803 -> 15,935; =shocks= 3,771 ->
+3,781; =housing= 3,558 -> 3,617; =food_security= 3,557 -> 3,616; and
+the derived =household_characteristics= 3,558 -> 3,616 (omitted from
+the first version of this list; derived at read time from the re-keyed
+roster, so it moved with it).  Every
+other 2014-15 cell serves the same row count as before the bundle.
+(The bundle's other row moves are in other waves and recorded under
+their own issues: the #865 sentinel drops in =crop_production= 2011-12
+and =plot_inputs= 2021-22, and the #833 fold in =food_acquired= 2021-22
+and the three derived food tables.)  The crosswalk holds 3,529 2014-15 ->
+2011-12 links and no linked value is itself a key.
+
+*Not everything in =plot_inputs= 2014-15 was the missing EXTENSION.*
+On the raw input file the full key (GRAPPE, MENAGE, EXTENSION,
+=AS02CQ02= input slot, crop, unit) is unique (0 duplicates; the
+two-column key had 100 rows on 50 keys).  The BUILT wave parquet still
+carries 39 duplicated =(t, i, input, crop, u)= groups (84 rows) after
+the fix, because the seven seed slots of =AS02CQ02= all harmonise to
+=input = 'Seed'=: a household that filled two seed slots with the same
+crop and unit (e.g. Sorgho, Tiya, 5 and 4) lands twice on one key.
+=_normalize_dataframe_index= then reports 35 destroyed rows / 29
+conflicting tuples for that cell.  That is a harmonisation-level
+collision on the input axis, not an identifier defect, and it is still
+open under GH #614 / #637 with the 2011-12 cell.
+
+*2011-12 has one household in the harvest module that is in no other
+file (found 2026-09-24 by
+=tests/test_niger_2014_15_extension_key.py::test_every_wave_keys_into_the_sample_universe[crop_production]=,
+which is RED on that cell and was never green there).*  =hid= 27010
+(grappe 270, menage 10) has two lines in =ecvmaas2e_p2.dta= (passage
+2, fields 1 and 2) and no line in the welfare file =ecvmamen_p1_en.dta=
+(3,968 households) or the roster =ecvmaind_p1p2_en.dta=; it is the only
+harvest =hid= absent from the welfare file, and it is served on two
+=crop_production= rows with no =v= (the =NullIndexKeyWarning= on
+=crop_production='s =v= level, 2 NaN rows, 2011-12, is this household).
+Not an EXTENSION or crosswalk artefact: the id is the survey's own,
+=updated_ids= has no 2011-12 entry, and the rows were served identically
+before the bundle.  Whether 27010 is a mis-keyed 2701 (grappe 27,
+menage 1, which does exist) is not adjudicated here.
 
 * Household Presence / MonthsSpent
 
@@ -694,6 +850,138 @@ Only the four =u= tables change data.  No other country's cache hash
 moves (measured across Uganda / Ethiopia / GhanaLSS =food_acquired=,
 =crop_production=, =plot_inputs=: 9 of 9 unchanged).
 
+* The VALUE sentinel: an all-nines "don't know" on a quantity or a sale value (GH #865, 2026-09-24)
+
+Distinct from the =u= sentinel above, and it must not be conflated with
+it: =Unknown= says the UNIT was not recorded; this section is about a
+recorded NUMBER that is a code.  The ECVMA harvest and sale modules
+write "ne sait pas" as an all-nines value with NO value label (the
+=.dta= value-label sets for these columns are empty), so
+=convert_categoricals= cannot see it and the number was served as a
+harvest of 999,999 units.  Site Q (#857) reported it -- "eleven Mil
+rows with Quantity 999999" -- and by contract never NaNs; this is the
+adjudication.
+
+The codes are NOT the same width across waves, and the sale value uses
+a wider one than the quantities.  Measured in the raw files
+(=get_dataframe(..., convert_categoricals=False)=):
+
+| wave    | file                 | column      | code    | rows | note                                                                      |
+|---------+----------------------+-------------+---------+------+---------------------------------------------------------------------------|
+| 2011-12 | ecvmaas2e_p2         | as02eq07a   | 999999  |   11 | all with unit code 99 =manquant=; mil 3, sorgho 3, niebe 3, riz paddy 2 |
+| 2011-12 | ecvmaas2e_p2         | as02eq12a   | 999999  |    3 | 2 with unit 99, 1 with unit 1 (kg)                                        |
+| 2011-12 | ecvmaas2e_p2         | as02eq13    | 9999999 |    2 | both hid 20607, which carries all three codes on the same line            |
+| 2014-15 | ECVMA2_AS2E1P2       | AS02EQ07A   | 9999    |   23 | all with unit code 99 =Manquant=; Mil 7, Niebe 7, Sorgho 4, ...           |
+| 2014-15 | ECVMA2_AS2E2P2       | AS02EQ12A   | 9999    |    7 | all with sold-unit code 99                                                |
+| 2014-15 | ECVMA2_AS2E2P2       | AS02EQ13    | 9999999 |    7 |                                                                           |
+| 2021-22 | s16b_me_ner2021      | s16bq03a    | 9999    |    1 | an applied inorganic fertiliser with no unit (grappe 315, menage 10)     |
+
+The issue's "eleven Mil rows" was wrong on the crop: the eleven rows
+span four crops.  Every quantity-sentinel row also carries the
+missing-unit code, i.e. the whole line is a don't-know line, which is
+why =u = 'Unknown'= and this sentinel co-occur without being the same
+thing.  2018-19 carries none of these codes on any of the three
+columns (max harvest 10,000 kg, max sale 6,080,000 FCFA), nor does
+2021-22's harvest / sale module.
+
+Fix: each WAVE script maps its own literal codes to NA through
+=niger._na_exact= -- =QTY_SENTINELS= / =VALUE_SENTINELS= at the top of
+=2011-12/_/crop_production.py=, =2014-15/_/crop_production.py= and
+=2021-22/_/plot_inputs.py= -- exactly as =_coerce_wage= (999999) and
+=_COMMUNITY_PRICE_SENTINELS= (9999 / 99999) already do for wages and
+community prices.  The literal value only, never a range; the code
+sits in the wave script rather than in =_finish_crop_production= so
+that a new code moves one wave's hash rather than all 18 Niger tables.
+
+*Not stripped, recorded as a candidate.*  =plot_inputs= 2011-12 and
+2014-15 carry =as02cq05a= / =AS02CQ05A= == 999 on 35 / 8 rows and
+=as02cq08a= / =AS02CQ08A= == 999 on 19 / 2 rows, and 999 is the column
+maximum in both waves.  That is the =_coerce_days= 999 pattern, but it
+is also a plausible quantity for a 3-digit field, and no value label
+says which; left as served until someone reads the input module's
+questionnaire page.
+
+Served effect (see the =crop_production= / =plot_inputs= rows below,
+measured on the cold rebuild that landed this): no served =Quantity=,
+=Quantity_sold= or =Value_sold= equals a listed code.  A harvest line
+that carried ONLY a sentinel becomes all-NA and is dropped by
+=_finalize_result='s =dropna(how='all')=; the two hid-20607 lines are
+the clearest case.  Served rows before -> after (pre-fix warm root vs
+cold rebuild, re-measured 2026-10-14): =crop_production= 2011-12 11,948
+-> 11,937 (the eleven sentinel-only lines); =plot_inputs= 2021-22
+12,433 -> 12,432; no other wave of either table moves under #865.
+Pinned by =tests/test_niger_value_sentinels.py=.
+
+* food_acquired: cross-wave label drift between the two EHCVM waves (GH #833, 2026-09-24)
+
+The 2018-19 and 2021-22 instruments spell several food items differently,
+and the served =j= carried the near-duplicates side by side (warm cache,
+rows): ='Chou'= 628 (2018-19) vs ='Choux'= 973 (2021-22); ='Aubergine,
+Courge/Courgette'= 1,156 (2018-19) vs ='Aubergine,'= 452 (2021-22);
+='Sucre (poudre ou morceaux)'= 4,883 (2018-19) vs ='Sucre poudre'= 5,462
++ ='Sucre morceaux'= 80 (2021-22).  Read against the 2021-22 household
+questionnaires (WB catalog 6276, vague 1 and vague 2), two of the three
+are not drift but an instrument SPLIT: 2021-22 lists ='93. Aubergine,'=
+AND ='94. Courge/Courgette'= where 2018-19 had one bundled item, and
+='134. Sucre poudre'= + ='135. Sucre morceaux'= where 2018-19 had
+='Sucre (poudre ou morceaux)'=.
+
+*DECISIONS, named* (all in the =harmonize_food= table of
+=categorical_mapping.org=; pinned by =tests/test_niger_food_label_drift.py=):
+- ='Choux'= -> ='Chou'=: one vegetable, plural spelling.  Folded.
+- Sucre 134 / 135 -> ='Sucre (poudre ou morceaux)'=: one commodity in two
+  forms; 2018-19's label already says it covers both and cannot be
+  split.  Folded.  (Alternative not taken: keep the 2021-22 split and
+  lose the cross-wave join.)  Served after the rebuild: 4,883 (2018-19)
+  and 5,537 (2021-22) -- not 5,542, because five households bought both
+  forms in the same unit and the fold merges those rows at the
+  =(t, v, i, j, u, s)= grain (an additive, lossless sum).
+- ='Aubergine,'= -> ='Aubergine'=, NOT folded into ='Aubergine,
+  Courge/Courgette'=: eggplant and courgette are different goods, and
+  the trailing comma is the 2018-19 bundle's truncation, not a name.
+  The crop rows (='Aubergine'=, ='aubergine'=) follow to ='Aubergine'=.
+  So 2018-19 serves the bundle (1,156 rows) and 2021-22 the two parts
+  (452 + 2,387 =Courge/Courgette=); a cross-wave comparison of either
+  vegetable has to pool the two 2021-22 items.
+
+*The wider split list, recorded and NOT folded* (2018-19 label ->
+2021-22 labels, as served):
+| 2018-19                                    | 2021-22                                              |
+|--------------------------------------------+------------------------------------------------------|
+| Piment frais                               | Piment frais; Piment séché                           |
+| Gingembre                                  | Gingembre frais; Gingembre moulu                     |
+| Café                                       | Café en poudre; Café soluble                         |
+| Pastèque, Melon                            | Pastèque; Melon                                      |
+| Vinaigre /moutarde                         | Vinaigre de citron; Autres vinaigres; Moutarde       |
+| Crabes, crevettes et autres fruits de mer  | Crevettes séchées                                    |
+| Huile d'arachide                           | Huile d'arachide "Segal"; Huile d'arachide raffinée  |
+Folding any of these would put two goods under one 2018-19 label; the
+cross-wave join is the consumer's to build, by pooling the 2021-22 parts.
+
+*Code 166 (468 rows, 2021-22) CANNOT be decoded and stays ='166'=.*
+Both 2021-22 questionnaires' product lists end at 165 ='Bières
+industrielles'=, the =.dta= value labels for =s07bq01= end there too,
+and the sibling EHCVM-2 files give 166 a country-specific label
+(Burkina Faso / Mali: ='Riz importé 3'=), so no inference names it.
+What the rows themselves say: 466 of the 468 are in =u = 'Sachet'=,
+median quantity 1 sachet, median last purchase (=s07bq08=) 150 FCFA --
+a small packaged good.  Left as the code rather than named by
+inference; it is the only numeric-looking =j= in the table.
+
+*Served rows the fold moves (2021-22, before -> after, measured
+2026-10-14 on the pre-fix warm root and the cold rebuild):*
+=food_acquired= 131,549 -> 131,544 (the five merged rows above; 239,882
+-> 239,877 over all waves), and the derived tables with it:
+=food_expenditures= 98,249 -> 98,231, =food_prices= 98,247 -> 98,244,
+=food_quantities= 131,549 -> 131,522.  All lossless consequences of
+summing the five =(t, v, i, j, u, s)= pairs at which the two 2021-22
+sugar labels meet (=Choux= and =Aubergine,= are renames with no 2021-22
+sibling, so they merge nothing); no other (table, wave) moves under
+#833.
+
+*Cache.*  =categorical_mapping.org= is a build input in every Niger
+table's hash: one Niger re-warm, shared with GH #679 / #824 / #811.
+
 * household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
 
 =s01_me_ner2018.dta= is Stata format 115 with no declared encoding, and its
@@ -785,22 +1073,87 @@ household unit value can never be compared with a surveyed community
 price in Niger.  =crop_production= is the only feature present in all
 four waves and is the sole bridge between the two eras.
 
-** =crop_production.u= is the HARVEST unit; the SOLD unit is not carried
+** =crop_production.u= is the HARVEST unit; the SOLD unit is =Unit_sold= (GH #824, 2026-09-24)
 
-The declared index is =(t, i, plot, crop, u)= where =u= comes from the
+The declared index is =(t, i, plot_id, crop, u)= where =u= comes from the
 harvest question (=as02eq07b= / =AS02EQ07B= / =s16cq12b= / =s16cq16b=).
-But =Value_sold / Quantity_sold= is a price per SOLD unit, and every
-wave records the sold unit in its OWN column that the feature drops:
-=as02eq12b= (2011-12), =AS02EQ12B= (2014-15 AS2E2), =s16cq16b= (2018-19),
-=s16dq05b= (2021-22 s16d).  Measured share of priced rows whose sold
-unit equals the row's harvest unit: 2011-12 98.8%, 2014-15 89.4%,
-2018-19 93.1%, 2021-22 63.0%.  A =Sac de 100 kg= sale price landing in a
-=Tiya= row is a ~40x error, so any per-unit use of =Value_sold /
-Quantity_sold= must first restrict to rows where the two agree (recipe in
-=slurm_logs/price_sources/Niger/analysis.py::_sold_unit_map=).  NOTE that
-rebuilding that key needs =id_walk=: the API's =i= is the panel-walked id,
-so a raw-side join misses (2014-15: 38 of 434 households matched before
-walking, 100% after).
+=Value_sold / Quantity_sold= is a price per SOLD unit, and every wave
+records the sold unit in its OWN column: =as02eq12b= (2011-12),
+=AS02EQ12B= (2014-15 AS2E2), =s16cq16b= (2018-19), =s16dq05b= (2021-22
+s16d).  Until 2026-09-24 the feature dropped it; it is now carried as the
+per-row column =Unit_sold= (canonical =data_info.yml=, =Unit_sold= note;
+the contract settled on Uganda): canonicalised through the same =u=
+table as the harvest unit, NA-bearing and never sentinel-filled
+(=_finish_crop_production= folds the table's =Unknown= back to NA -- a
+column has no NaN-key hazard, and NA says "no sale, or a sale whose unit
+the survey did not record").  A DISAGREEMENT between =Unit_sold= and =u=
+is a data-quality FLAG, not an identification: a =Sac de 100 kg= sale
+price landing in a =Tiya= row is a ~40x error, so any per-unit use of
+=Value_sold / Quantity_sold= must restrict to rows where the two agree,
+and report the count.
+
+*Measured share of priced rows whose sold unit equals the harvest unit*,
+on the served table after the cold rebuild of 2026-09-24.  Definition,
+because the number depends on it: a "priced" row has =Quantity_sold > 0=
+and =Value_sold > 0=; "knows both" additionally has =Unit_sold= non-null
+and =u != 'Unknown'=; both labels are compared AFTER the =u= table.
+
+| wave    | priced rows knowing both | agree |
+|---------+--------------------------+-------|
+| 2011-12 |                    1,293 | 98.7% |
+| 2014-15 |                      558 | 89.4% |
+| 2018-19 |                    3,226 | 92.3% |
+| 2021-22 |                    1,423 | 89.0% |
+
+CORRECTION.  This entry used to give 2021-22 as *63.0%*.  That was a
+spelling artefact: the s16d sold-unit labels are lower-case (='tiya'=,
+='sac de 100kg'=) where the s16c harvest labels are not, so compared raw
+they agree on 13.4% of the 1,818 de-duplicated sale rows and through the
+=u= table on 89.8% (the =u= table gained ='sac de 100kg'= for this; the
+other sold spellings were already there).  The old 98.8% / 93.1% for
+2011-12 / 2018-19 predate =Unit_sold= and came from a raw-side join
+(=slurm_logs/price_sources/Niger/analysis.py::_sold_unit_map=); under
+the definition above they are 98.7% / 92.3%, and the source of the
+0.1-0.8 point gap is not adjudicated.  Pinned by
+=tests/test_niger_sold_unit.py=.
+
+*The crop-level sale block (2014-15 AS2E2, 2021-22 s16d) has no plot.*
+It is summed over =(i, crop, Unit_sold)= -- never across units -- and
+attributed only to a crop grown on ONE plot AND sold in ONE unit (a
+second unit would duplicate the harvest row).  Measured: no
+(household, crop) sells in two units in either wave (0 pairs, both
+waves), so the unit key is a guard today and the grain it names.  A crop
+grown on several plots keeps =Quantity_sold= / =Value_sold= NaN (no
+fabricated split).
+
+*The 2021-22 s16d file REPEATS its crop-level lines, and the old script
+summed the repeats.*  s16d has no plot column, yet holds 12,232 rows for
+8,691 (household, crop) pairs: 2,633 pairs carry 2-8 rows (6,174 rows in
+all).  5,786 of those 6,174 rows are byte-identical to another row on
+all 47 columns, and EVERY one of the 1,320 multi-pair rows that carries
+a sale is; the 388 distinct lines within a pair carry no sale.  Summing
+them served a single sale 2-4x on 144 single-plot crops.  DECISION: a
+line identical to another on every column is the same record, not a
+second sale; exact duplicates are dropped (=duplicated(keep='first')=,
+3,329 rows) BEFORE the sum.  On the single-plot pairs =Value_sold=
+78,934,620 -> 73,206,995 FCFA and =Quantity_sold= 36,975 -> 32,420.5,
+1,409 pairs either way.  WHY the lines repeat (re-measured 2026-10-14,
+replacing the "one row per plot" explanation first offered with the
+fix): joined on (grappe, menage, crop), the s16d multiplicity equals
+the number of s16c HARVEST LINES for 100% of the 8,691 pairs -- all
+2,633 multi-row pairs, all 553 sale-bearing multi-row pairs, 0 pairs
+without an s16c match -- and equals the number of distinct (field,
+parcel) plots for only 1,729 of the 2,633 (65.7%), because a plot can
+carry a crop on more than one harvest line.  s16d is therefore the
+crop-level record replicated once per harvest line, a join artefact of
+the export, and dropping the exact duplicates is the removal of that
+artefact, not a judgement about second sales.  2014-15's AS2E2 is one
+row per (household, crop) -- 5,226 rows, 5,226 keys -- so its sum is a
+no-op.
+
+NOTE that rebuilding a raw-side sold-unit key needs =id_walk=: the API's
+=i= is the panel-walked id, so a raw-side join misses (2014-15: 38 of 434
+households matched before walking, 100% after).
 
 ** 2018-19 DOES ship a cluster-grain community price file, unwired
 

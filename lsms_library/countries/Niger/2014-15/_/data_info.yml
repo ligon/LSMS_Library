@@ -1,12 +1,22 @@
 Country: Niger
 Wave: 2014-15
 
+# HOUSEHOLD KEY (GH #679).  ECVMA2 identifies a household by
+# (GRAPPE, MENAGE, EXTENSION): EXTENSION 0 = the 2011 household, found in
+# place; 1 = the whole household, found after moving; 2 = a SPLIT-OFF --
+# members who left the 2011 household and were interviewed as a new one.
+# 59 of the 3,617 households share their (GRAPPE, MENAGE) with another, so
+# every `i:` below carries all three columns; niger.i renders them as
+# grappe + '0' + menage(2 digits) + extension, e.g. (2, 1, 2) -> '20012'.
+# Every 2014-15 source file carries EXTENSION (checked file by file).
+
 sample:
     file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta
     idxvars:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         v: GRAPPE
         weight: hhweight
@@ -32,6 +42,7 @@ household_roster:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         pid: MS01Q00
     myvars:
         Sex: MS01Q01
@@ -45,6 +56,7 @@ individual_education:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         pid: MS02Q00
     myvars:
         # GH #171: map raw attainment labels onto the canonical ordinal vocab
@@ -81,6 +93,7 @@ shocks:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         Shock: MS10Q01
     myvars:
         AffectedIncome:
@@ -142,6 +155,7 @@ food_security:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         Worried:
             - MS14Q01
@@ -190,6 +204,7 @@ assets:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
         j: MS07Q01
     myvars:
         Quantity: MS07Q03
@@ -203,6 +218,7 @@ housing:
         i:
             - GRAPPE
             - MENAGE
+            - EXTENSION
     myvars:
         Roof:
             - MS06Q11

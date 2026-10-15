@@ -16,7 +16,10 @@ def i(x):
     """Create hhid from grappe + menage with '0' separator + zero-padded menage.
 
     Detects which wave based on column case:
-    - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE) -> no prefix
+    - 2014-15 (ECVMA): uppercase columns (GRAPPE, MENAGE, EXTENSION) -> no
+      prefix; the third element is APPENDED as one digit, so (2, 1, 2) ->
+      '20012'.  Every 2014-15 table passes all three (GH #679): EXTENSION 0 =
+      the 2011 household found in place, 1 = moved whole, 2 = a split-off.
     - 2018-19/2021-22 (EHCVM): lowercase columns (grappe, menage) -> 'E_' prefix
 
     Uses '0' separator and zero-padded menage (2 digits) to prevent ID
@@ -531,7 +534,8 @@ def _crop_maps():
 
 def _finish_crop_production(df, t):
     """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
-    numeric columns, and guarantee the full schema column set."""
+    numeric columns, and guarantee the full schema column set (including the
+    NA-bearing ``Unit_sold`` column, GH #824)."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -546,6 +550,17 @@ def _finish_crop_production(df, t):
     df['t'] = t
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
+    # Unit_sold (GH #824): the unit the SALE was reported in, a per-row
+    # COLUMN beside the harvest unit `u` (which is the index level).  Every
+    # wave script passes it through the same `u` table as the harvest unit;
+    # unlike `u` it is NA-bearing, never sentinel-filled (canonical
+    # data_info.yml: a column has no NaN-key hazard, and NA says "no sale, or
+    # a sale whose unit the survey did not record", which no unit label can
+    # say) -- so the table's `Unknown` is folded back to NA here.
+    if 'Unit_sold' not in df.columns:
+        df['Unit_sold'] = pd.NA
+    df['Unit_sold'] = df['Unit_sold'].astype('string')
+    df['Unit_sold'] = df['Unit_sold'].where(df['Unit_sold'] != U_NA, pd.NA)
     # Drop placeholder rows with no crop recorded (a parcel listed but no
     # crop grown / reported on the line).  These carry no harvest data
     # (crop, Quantity, unit all NA) and are not item-level harvest records.
@@ -560,7 +575,8 @@ def _finish_crop_production(df, t):
     # groupby would have deleted.
     df = fill_missing_u(df)
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+            'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
+            'intercropped']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
     return df
@@ -881,6 +897,24 @@ def _coerce_wage(series, sentinel=999999):
     return s.where(s != sentinel, pd.NA)
 
 
+def _na_exact(series, codes):
+    """Numeric cell -> Float64 with each EXACT value in *codes* mapped to NA.
+
+    The ECVMA harvest / sale modules record "don't know" as an all-nines
+    value with no value label (GH #865: 2011-12 ``as02eq07a`` / ``as02eq12a``
+    999999 and ``as02eq13`` 9999999; 2014-15 ``AS02EQ07A`` / ``AS02EQ12A``
+    9999 and ``AS02EQ13`` 9999999; 2021-22 ``s16bq03a`` 9999).  The same
+    convention the wage (``_coerce_wage``, 999999) and community-price
+    (``_COMMUNITY_PRICE_SENTINELS``) helpers already honour.  Only the literal
+    codes are stripped -- never a range -- and the codes live in the WAVE
+    script that names the column, so a new one moves that wave's hash only.
+    """
+    s = pd.to_numeric(series, errors='coerce').astype('Float64')
+    for code in codes:
+        s = s.where(s != code, pd.NA)
+    return s
+
+
 def plot_labor_ehcvm(src, t):
     """Build plot_labor for one EHCVM wave (2018-19 / 2021-22) from its
     s16a parcel module.  EHCVM records family vs non-family (hired) plot
@@ -1192,31 +1226,21 @@ def _finish_people_last7days(df, t):
     # 2018-19 and 2021-22 -- 25,125 / 35,406 / 44,320 rows, ZERO duplicates,
     # this collapse is a no-op.
     #
-    # KEY BROKEN for 2014-15, and NOT fixable here.  ECVMA2 identifies a
-    # household by (GRAPPE, MENAGE, EXTENSION); `niger.i` builds `i` from
-    # (GRAPPE, MENAGE) only.  ECVMA2_MS01P1.dta holds 3,617 distinct
-    # (GRAPPE, MENAGE, EXTENSION) households but only 3,558 distinct
-    # (GRAPPE, MENAGE) -- so 59 households have no `i` of their own, and their
-    # members' line numbers (MS01Q00 = 1, 2, 3, ...) collide with the other
-    # household's.  Measured: 420 rows in 210 colliding (t, i, pid) groups, and
-    # EXTENSION differs in 210 of 210 (100%).  These are DIFFERENT REAL PEOPLE:
-    #
-    #   GRAPPE 2, MENAGE 1, line 1 -> EXTENSION 0: age 56, industry 316
-    #                                 EXTENSION 2: age 29, industry 321
-    #   GRAPPE 2, MENAGE 1, line 2 -> EXTENSION 0: age 11
-    #                                 EXTENSION 2: age 22
-    #
-    # `.first()` merges each pair into one person who was never enumerated.
-    #
-    # The defect is NOT local to this table.  Dropping EXTENSION is a wave-wide
-    # convention: 2014-15's `sample`, `household_roster` (same source file,
-    # same 210 collisions), `individual_education`, `livestock`,
-    # `crop_production`, `plot_inputs` and `plot_labor` all key on
-    # (GRAPPE, MENAGE).  Re-keying only people_last7days would break its join
-    # to sample() / household_roster and the panel_ids chain -- a regression,
-    # not a fix.  The correct fix is to add EXTENSION to `i` across the whole
-    # 2014-15 wave (and to re-derive panel_ids), which is its own change with
-    # its own verification.  Tracked on GH #637; do not "fix" it here.
+    # 2014-15 was KEY BROKEN until GH #679 (2026-09-24).  ECVMA2 identifies a
+    # household by (GRAPPE, MENAGE, EXTENSION); `i` used to be built from
+    # (GRAPPE, MENAGE) only, so the 59 households that share a
+    # (GRAPPE, MENAGE) with another (EXTENSION 2 = split-off, or 1 = moved)
+    # had no `i` of their own and their members' line numbers collided with
+    # the other household's -- 420 rows in 210 (t, i, pid) groups, EXTENSION
+    # differing in 210 of 210, and `.first()` merging each pair into one
+    # person who was never enumerated (GRAPPE 2, MENAGE 1, line 1: a 56-year-
+    # old in extension 0 and a 29-year-old in extension 2).  Every 2014-15
+    # table now keys on all three columns (2014-15/_/data_info.yml and the
+    # five wave scripts), and panel_ids.py links extensions 0 and 1 -- not the
+    # split-offs -- to the 2011-12 parent.  With the full key the
+    # (t, i, pid) index is unique in every wave and this collapse is a no-op
+    # everywhere; it stays as a guard against a stray duplicate in the
+    # 2014-15 m:1 labor->roster merge.
     df = (df.groupby(['t', 'i', 'pid'], dropna=False, as_index=False).first())
     df = df.set_index(['t', 'i', 'pid'])
     return df

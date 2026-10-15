@@ -2,7 +2,8 @@
 
 Single source file: s16c_me_ner2018.dta (agriculture crop/harvest module).
 One row per reported (field, parcel, crop) harvest record.  Harvest qty +
-unit (s16cq12a / s16cq12b), sold qty + unit (s16cq16a / s16cq16b), sale
+unit (s16cq12a / s16cq12b), sold qty + unit (s16cq16a / s16cq16b -> the
+``Unit_sold`` column, GH #824), sale
 value (s16cq17), and the intercrop flag (s16cq07) are ALL recorded at this
 plot-crop grain in 2018-19, so no cross-file join is needed.
 
@@ -44,6 +45,9 @@ df = pd.DataFrame({
     'Quantity':      src['s16cq12a'].values,
     'Quantity_sold': src['s16cq16a'].values,
     'Value_sold':    src['s16cq17'].values,
+    # The SOLD unit (s16cq16b), a second unit on the same line (GH #824);
+    # identical 9-label set to the harvest unit s16cq12b, same `u` table.
+    'Unit_sold':     _unit_labels(src['s16cq16b'], unit_map).values,
     'intercropped':  intercropped.values,
 })
 
