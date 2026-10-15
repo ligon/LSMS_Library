@@ -1,5 +1,12 @@
 #+title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
 
+* Update 19:10 PDT -- reviews complete, three PRs open
+- All 16 branches reviewed: 3 pass (970-json-make, ci-skips, burkina-2014), 12 pass-with-fixes, 1 FAIL (framework-small: 14 tests red via the #915 raise).  Summary + per-branch §6 items: =slurm_logs/backlog_review_2026-10-14/REVIEW_SUMMARY.org=; verdicts copied to =verdicts/=.
+- PRs open for the clean passes: #982 (#970, part of the re-warm bundle -- do NOT merge alone), #980 (ci-skips), #981 (burkina-2014).  #979 is a dead duplicate of #982 (scripting slip), closed.
+- Follow-up element =framework-small-2= DONE (job 39924156): suite 15 failed -> 0 failed (5595 passed), pushed =fix/framework-small-2= (22 commits incl. the base). Needs a re-review element before PR; report at /global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39924156/framework-small-2/REPORT.md.
+- Proposed next (needs @ligon's nod -- usage limit): two follow-up elements walking the 12 pass-with-fixes branches six each (mostly prose/test-wording; peru-panama has two newly red tests/test_sample.py cells; kinship-974 needs a development merge resolving tests/test_crop_kg_factor.py), then PRs; the re-warm bundle (810-followup, 868-followup, 970, readers-xport-sniff) merges in ONE window followed by a cold corpus re-warm.
+- Issue filed from a review: #978 (Nigeria W5 WB v02 geovariables); #841 narrowed to it.
+
 * State at pause
 Everything below runs headless and publishes to the mirror on its own; nothing needs this session alive except the ONE local agent (970-json-make, /local/job39919092/elements/970-json-make, pushes =fix/970-json-make= when done).  If the node is released before it finishes, re-run element 5 of =slurm_logs/backlog_fix_2026-10-14/run_local.sh= (or as a savio3 job via fix_array_savio3.sbatch) -- nothing else is lost.
 
