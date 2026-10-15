@@ -50,15 +50,36 @@ import shutil
 import warnings
 
 
+def _addoption_once(parser, *names, **kwargs):
+    """``parser.addoption`` that tolerates a second registration (GH #734).
+
+    Inside a git worktree the main checkout's ``lsms_library.pth`` puts the
+    main checkout on ``sys.path`` too, so pytest loads BOTH root
+    ``conftest.py`` files under the same module name and this hook runs
+    twice -- the second ``addoption`` raised ``ValueError: option names
+    {'--rebuild'} already added`` and no test could run from a worktree.
+    The option already exists with the same meaning, so the duplicate is a
+    no-op.  Only the duplicate-name ValueError is swallowed; the message is
+    checked so a genuine argparse error still propagates.
+    """
+    try:
+        parser.addoption(*names, **kwargs)
+    except ValueError as e:
+        if "already added" not in str(e):
+            raise
+
+
 def pytest_addoption(parser):
-    parser.addoption(
+    _addoption_once(
+        parser,
         "--rebuild",
         action="store_true",
         default=False,
         help="Soft cold-cache rebuilds (sets LSMS_NO_CACHE=1; does not "
              "delete script-path L2 wave parquets).",
     )
-    parser.addoption(
+    _addoption_once(
+        parser,
         "--rebuild-caches",
         action="store_true",
         default=False,
@@ -67,7 +88,8 @@ def pytest_addoption(parser):
              "LSMS_NO_CACHE=1.  Use this when a source-script fix has "
              "shipped but cached parquets predate it.",
     )
-    parser.addoption(
+    _addoption_once(
+        parser,
         "--no-purge",
         action="store_true",
         default=False,
