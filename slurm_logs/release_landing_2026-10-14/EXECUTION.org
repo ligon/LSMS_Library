@@ -117,3 +117,8 @@ already reviewed heads; the sole merge conflict is this append-only log.
 The earlier Windows dispatch38681713985 was cancelled after its native job
 succeeded, because its superseded unit job was still running without #980.
 Its job success is retained; the whole cancelled run is not called green.
+
+New draft release-page strict docs build initially found three repository-only
+relative links; changed them to explicit GitHub source links. Final strict
+MkDocs build passes. This check is after adding the new release page, separate
+from the earlier packaging/docs proof. No runtime source changed.
