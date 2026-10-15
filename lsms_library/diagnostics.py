@@ -1233,6 +1233,29 @@ def _check_ids_are_self_consistent(country) -> Check:
         return Check("ids_self_consistent", "fail", str(e))
 
 
+def _parquet_covers_waves(path, waves) -> tuple[bool, int, int]:
+    """``(covered, k, n)``: does the L2-country parquet at *path* carry a
+    ``lsms_cache_waves`` manifest (GH #891) covering all *n* declared
+    *waves*?  *k* is how many of them the manifest names.
+
+    ``covered`` is False when the file is absent, when it carries no
+    manifest (a pre-#891 build -- coverage must never be guessed), or when
+    any declared wave is missing from the manifest.  Footer-only read, ~1 ms.
+    """
+    waves = [str(w) for w in (waves or ())]
+    n = len(waves)
+    path = Path(path)
+    if not path.exists():
+        return False, 0, n
+    from .local_tools import read_parquet_cache_waves
+    manifest = read_parquet_cache_waves(path)
+    if manifest is None:
+        return False, 0, n
+    have = set(map(str, manifest))
+    k = sum(1 for w in waves if w in have)
+    return (n > 0 and k == n), k, n
+
+
 def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
     """Compute a household-level panel spine from scratch, with provenance.
 
@@ -1251,11 +1274,18 @@ def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
     available. **Callers should prefer :func:`_panel_spine` which
     memoises the result on the country object to avoid rebuilding
     across multiple checks in one report.**
+
+    The parquet is consulted FIRST (it is far cheaper than the API path),
+    but only when its ``lsms_cache_waves`` manifest (GH #891) says it was
+    built from every wave the country declares.  A one-wave parquet left by
+    ``household_roster(waves=['2016-17'])`` used to be trusted blind, so the
+    ``panel_ids_targets_exist`` check reported a 100% miss against a spine
+    that simply did not contain the other waves (GH #909).  A parquet with
+    no manifest (pre-#891) cannot prove its coverage and is skipped too.
     """
-    # Try the cached parquet first — much cheaper than the API path
-    # when a country has many waves or a flaky stage-layer configuration.
     parquet_path = data_root(country.name) / "var" / "household_roster.parquet"
-    if parquet_path.exists():
+    covered, k, n = _parquet_covers_waves(parquet_path, getattr(country, "waves", ()))
+    if covered:
         try:
             df = pd.read_parquet(parquet_path, engine="pyarrow")
             if "i" in df.index.names and "t" in df.index.names:
@@ -1264,7 +1294,7 @@ def _compute_panel_spine(country) -> tuple[pd.DataFrame | None, str]:
                     .drop_duplicates()
                     .set_index(["i", "t"])
                 )
-                return spine, "cached household_roster.parquet"
+                return spine, f"cached household_roster.parquet [{k} of {n} waves]"
         except (OSError, ArrowInvalid, KeyError):
             # Cache miss / corrupt parquet / missing 'i'|'t' columns ->
             # fall through to the API path.
@@ -1603,10 +1633,12 @@ def _check_panel_ids_targets_exist(country) -> Check:
                 or inconsist_rate > inconsist_threshold):
             return Check(
                 "panel_ids_targets_exist", "fail",
-                f"{missing_current}/{total} cur ({miss_rate_cur:.0%}), "
-                f"{missing_prev}/{total} prev ({miss_rate_prev:.0%}), "
+                f"{missing_current}/{total} current-wave targets MISSING "
+                f"({miss_rate_cur:.0%}), "
+                f"{missing_prev}/{total} previous-wave targets MISSING "
+                f"({miss_rate_prev:.0%}), "
                 f"{inconsistent}/{total} inconsistent ({inconsist_rate:.0%}) "
-                f"vs {provenance}; sample: {sample_missing}"
+                f"vs spine from {provenance}; sample: {sample_missing}"
             )
         if missing_current or missing_prev or inconsistent:
             return Check(
