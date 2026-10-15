@@ -78,6 +78,7 @@ pytestmark = [
         reason="needs S3 credentials to build Nigeria; the unit-tests job is "
                "deliberately data-free (see data-tests for the credentialed run)",
     ),
+    pytest.mark.requires_s3,
 ]
 
 # The GHS-Panel W1 design: 500 EAs x 10 households.  Independently confirmed by

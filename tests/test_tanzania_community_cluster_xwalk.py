@@ -16,6 +16,8 @@ import pytest
 import lsms_library as ll
 from lsms_library.diagnostics import is_this_feature_sane
 
+pytestmark = pytest.mark.requires_s3
+
 
 @pytest.fixture(scope="module")
 def tz():

@@ -218,6 +218,7 @@ def test_schema_version_is_a_real_lever(temp_data_dir, monkeypatch):
     assert after != before
 
 
+@pytest.mark.requires_s3
 @pytest.mark.skipif(
     os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"},
     reason="the trust-once read of a hashless parquet is exactly what "

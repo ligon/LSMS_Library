@@ -90,6 +90,7 @@ def china():
             os.environ['LSMS_NO_CACHE'] = old
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('table', sorted(DECLARED))
 def test_wave_source_index_is_unique(china, table):
     """The frame handed to _normalize_dataframe_index has a unique declared index.
@@ -109,6 +110,7 @@ def test_wave_source_index_is_unique(china, table):
     )
 
 
+@pytest.mark.requires_s3
 def test_cluster_features_is_village_grain_not_person_grain(china):
     """cluster_features must be extracted at village grain, not once per person.
 
@@ -128,6 +130,7 @@ def test_cluster_features_is_village_grain_not_person_grain(china):
     )
 
 
+@pytest.mark.requires_s3
 def test_cluster_features_idxvars_declare_no_household_i(china):
     """Config-level guard: `i` must not reappear in cluster_features idxvars."""
     info = china[WAVE].resources['cluster_features']
@@ -139,6 +142,7 @@ def test_cluster_features_idxvars_declare_no_household_i(china):
     )
 
 
+@pytest.mark.requires_s3
 def test_region_is_single_valued_within_village(china):
     """The invariant that made the old collapse *accidentally* lossless.
 
@@ -156,6 +160,7 @@ def test_region_is_single_valued_within_village(china):
     )
 
 
+@pytest.mark.requires_s3
 def test_no_323_collapse_warning_on_cold_build(china):
     """No table may reach the groupby().first() collapse.
 
@@ -173,6 +178,7 @@ def test_no_323_collapse_warning_on_cold_build(china):
     assert not offenders, f'#323 collapse warning(s) still fired: {offenders}'
 
 
+@pytest.mark.requires_s3
 def test_household_30132_duplicate_record_resolved(china):
     """hid 30132's roster is recorded TWICE, byte-identically, in S01A2.DTA.
 
@@ -190,6 +196,7 @@ def test_household_30132_duplicate_record_resolved(china):
     assert len(ed) == 3, f'hid 30132 should have 3 education rows, got {len(ed)}'
 
 
+@pytest.mark.requires_s3
 def test_household_10108_miskeyed_daughter_in_law_resolved(china):
     """hid 10108 files its daughter-in-law both as pid 4 and (mis-keyed) as pid 3.
 

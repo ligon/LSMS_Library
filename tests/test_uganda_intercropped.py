@@ -403,6 +403,7 @@ def test_season_b_frame_missing_is_na(uganda_module, in_2009_10_wave_dir):
     assert pd.isna(got.loc[("1000000000", "B")])
 
 
+@pytest.mark.requires_s3
 @needs_data
 @pytest.mark.parametrize("wave", sorted(CROP_STAND))
 def test_raw_the_two_seasons_genuinely_disagree(uganda_module, wave):
@@ -439,6 +440,7 @@ def test_raw_the_two_seasons_genuinely_disagree(uganda_module, wave):
 # the raw source: the wired column really is the crop-stand question
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @needs_data
 @pytest.mark.parametrize("season", ["A", "B"])
 @pytest.mark.parametrize("wave", sorted(CROP_STAND))
@@ -465,6 +467,7 @@ def test_raw_wired_column_is_value_labelled_pure_vs_mixed(uganda_module, wave, s
         f"{wave} {season}: {col} is a seed question -- GH #872")
 
 
+@pytest.mark.requires_s3
 @needs_data
 @pytest.mark.parametrize("season", ["A", "B"])
 @pytest.mark.parametrize("wave", sorted(CROP_STAND))

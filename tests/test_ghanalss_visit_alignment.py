@@ -249,6 +249,7 @@ def visits_by_wave_and_source(delivered):
     return out
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     """End-to-end. Skipped when the GhanaLSS cache is cold."""
@@ -302,6 +303,7 @@ class TestDelivered:
             f'consumption modules start at the 2nd visit.')
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestVisitTypeDelivered:
     """One integer type, all seven waves.  Skipped when the cache is cold."""

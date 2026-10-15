@@ -343,6 +343,7 @@ class TestRecordsRideOnAttrs:
             assert name not in r
 
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 class TestDelivered:
     """End-to-end. Skipped when the cache is cold."""

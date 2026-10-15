@@ -97,6 +97,7 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #  non-accepted unit codes (Layer-2 u-harmonization complete).
 
 
+@pytest.mark.requires_s3
 def test_clean_countries_have_no_u_code_leaks():
     import warnings
 

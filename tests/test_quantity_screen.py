@@ -526,6 +526,7 @@ def test_site_q_host_is_excluded_so_site_q_costs_no_invalidation():
 # The real corpus instance
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 def test_tanzania_2020_21_coconut_and_timber_rows_fire():
     """GH #857's own numbers, against the warm wave parquet.
 

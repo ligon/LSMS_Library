@@ -20,6 +20,8 @@ import pytest
 
 import lsms_library as ll
 
+pytestmark = pytest.mark.requires_s3
+
 ROUNDS_2008_15 = ["2008-09", "2010-11", "2012-13", "2014-15"]
 
 

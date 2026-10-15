@@ -103,6 +103,7 @@ def canonical_nutrients():
     return [s.strip() for s in labels['Preferred Label']]
 
 
+@pytest.mark.requires_s3
 def test_grain_is_household_wave(nutrition):
     """One row per household per wave, the grain Feature() assembles on.
 
@@ -127,6 +128,7 @@ def test_grain_is_household_wave(nutrition):
     assert len(flat) == len(n), 'joined index levels duplicated (i, t) rows'
 
 
+@pytest.mark.requires_s3
 def test_no_fourth_nutrient_vocabulary(nutrition, canonical_nutrients):
     """Every column is on Ethiopia's canonical Preferred Label axis (#563)."""
     _c, n = nutrition
@@ -135,6 +137,7 @@ def test_no_fourth_nutrient_vocabulary(nutrition, canonical_nutrients):
     assert 'Energy' in n.columns and 'Protein' in n.columns
 
 
+@pytest.mark.requires_s3
 def test_vitamin_k_omitted_not_zero_filled(nutrition):
     """The WAFCT has no phylloquinone; a zero would be a claim, not a datum."""
     _c, n = nutrition
@@ -144,12 +147,14 @@ def test_vitamin_k_omitted_not_zero_filled(nutrition):
         'Ghanaian foods contain none.')
 
 
+@pytest.mark.requires_s3
 def test_all_values_finite_and_nonnegative(nutrition):
     _c, n = nutrition
     assert n.notna().all().all(), 'nutrition must not carry NaN'
     assert (n >= 0).all().all(), 'a negative nutrient amount is impossible'
 
 
+@pytest.mark.requires_s3
 def test_value_only_waves_are_empty(nutrition):
     """1987-88 / 1988-89 are 100% u='Value': no physical quantity exists.
 
@@ -164,6 +169,7 @@ def test_value_only_waves_are_empty(nutrition):
             'rows here mean cedis are being served as kilograms')
 
 
+@pytest.mark.requires_s3
 def test_energy_not_absurd(nutrition):
     """THE regression net for the u='Value' kg-factor defect.
 
@@ -181,6 +187,7 @@ def test_energy_not_absurd(nutrition):
         f'{bad.to_dict()} -- this is the u=\'Value\' contamination, not a diet')
 
 
+@pytest.mark.requires_s3
 def test_energy_2016_17_measured(nutrition):
     """2016-17 is the only wave with physical quantities for purchases too.
 
@@ -210,6 +217,7 @@ def test_energy_2016_17_measured(nutrition):
         f'measured interval [{lo:,}, {hi:,}]')
 
 
+@pytest.mark.requires_s3
 def test_fct_coverage_of_mass(nutrition):
     """The share of kilograms reaching an FCT row, overall and for 2016-17."""
     import importlib.util

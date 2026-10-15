@@ -528,6 +528,7 @@ class TestFeatureEndToEnd:
 # Data-gated: the real corpus, when it is warm
 # ---------------------------------------------------------------------------
 
+@pytest.mark.requires_s3
 @pytest.mark.slow
 def test_warm_corpus_assembly_loses_no_rows():
     """Every country kept by `Feature('crop_production')` contributes exactly

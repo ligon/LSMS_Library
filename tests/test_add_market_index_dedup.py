@@ -25,6 +25,8 @@ import pytest
 
 import lsms_library as ll
 
+pytestmark = pytest.mark.requires_s3
+
 
 @pytest.fixture(scope="module")
 def uga_shocks_bare():
