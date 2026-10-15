@@ -651,11 +651,14 @@ def monetary_scale_breaks(df: pd.DataFrame, country: str, feature: str,
     Returns one record per ``(column, wave)``::
 
         {"column", "wave", "median", "n", "neighbours": [(wave, median, ratio)],
-         "ratio": <median ratio across neighbours>, "form": "pooled"|"per-item[k]"}
+         "ratio": <median ratio across neighbours>,
+         "neighbour_forms": {wave: "pooled"|"per-item[k]"},
+         "form": "pooled"|"per-item[k]"|"mixed"}
 
     ``median`` and the neighbours' ``median`` are always the POOLED per-wave
     medians (so the reader sees the levels); each neighbour's ``ratio`` is the
-    pair's ratio in the ``form`` stated, which may be the per-item form -- so
+    pair's ratio in ``neighbour_forms[wave]``. ``form`` is their common form,
+    or ``mixed`` when the neighbours differ. The ratio may be per-item -- so
     the two pooled medians printed side by side are not necessarily the inputs
     to the ratio beside them.
     """
@@ -741,7 +744,9 @@ def monetary_scale_breaks(df: pd.DataFrame, country: str, feature: str,
                 "n": summaries[w][2],
                 "neighbours": [(nb, m, r) for nb, m, r, _ in neigh],
                 "ratio": float(pd.Series([r for _, _, r, _ in neigh]).median()),
-                "form": neigh[0][3],
+                "neighbour_forms": {nb: form for nb, _, _, form in neigh},
+                "form": (neigh[0][3] if len({form for _, _, _, form in neigh}) == 1
+                         else "mixed"),
             })
     return out
 
@@ -750,7 +755,9 @@ def _scale_notes(breaks: list[dict]) -> dict[str, str]:
     """``{wave: "warn: scale_ratio[...]"}`` from :func:`monetary_scale_breaks`."""
     notes: dict[str, list[str]] = {}
     for b in breaks:
-        nbs = ", ".join(f"{nb}={m:,.0f}" for nb, m, _ in b["neighbours"])
+        nbs = ", ".join(
+            f"{nb}={m:,.0f} ({b['neighbour_forms'][nb]})"
+            for nb, m, _ in b["neighbours"])
         notes.setdefault(b["wave"], []).append(
             f"{b['column']} median {b['median']:,.0f} (n={b['n']}) is "
             f"{b['ratio']:.3g}x its neighbour(s) {nbs} ({b['form']}; GH #830)")

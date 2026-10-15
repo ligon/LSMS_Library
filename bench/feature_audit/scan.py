@@ -278,7 +278,9 @@ def _scale_findings(feature: str, country: str, df) -> list[Finding]:
         )]
     out = []
     for b in breaks:
-        nbs = ", ".join(f"{nb}={m:,.0f}" for nb, m, _ in b["neighbours"])
+        nbs = ", ".join(
+            f"{nb}={m:,.0f} ({b['neighbour_forms'][nb]})"
+            for nb, m, _ in b["neighbours"])
         out.append(Finding(
             phase="1a-sanity", feature=feature, country=country,
             check="scale", status="warn", severity="C", expected=False,
@@ -287,7 +289,8 @@ def _scale_findings(feature: str, country: str, df) -> list[Finding]:
                     f"{nbs} ({b['form']}; GH #830)"),
             metrics={"column": b["column"], "wave": b["wave"],
                      "median": b["median"], "n": b["n"], "ratio": b["ratio"],
-                     "neighbours": b["neighbours"], "form": b["form"]},
+                     "neighbours": b["neighbours"], "form": b["form"],
+                     "neighbour_forms": b["neighbour_forms"]},
         ))
     return out
 

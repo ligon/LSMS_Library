@@ -1009,3 +1009,20 @@ def test_scale_check_country_without_a_currency_entry_is_still_checked():
     assert cov.monetary_scale_breaks(_money_frame({"w1": 1.0, "w2": 1.2}),
                                      "NoSuchCountry", "crop_production",
                                      ["w1", "w2"]) == []
+
+
+def test_scale_check_reports_each_neighbours_ratio_form():
+    """The left pair shares three items; the right pair shares only one."""
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0})
+    keep = ((df.index.get_level_values("t") != "w3") |
+            (df.index.get_level_values("j") == "maize"))
+    df = df[keep]
+    breaks = cov.monetary_scale_breaks(df, "Uganda", "crop_production")
+    assert [b["wave"] for b in breaks] == ["w2"]
+    assert breaks[0]["form"] == "mixed"
+    assert breaks[0]["neighbour_forms"] == {"w1": "per-item[3]", "w3": "pooled"}
+    ratios = {w: ratio for w, _, ratio in breaks[0]["neighbours"]}
+    assert ratios == pytest.approx({"w1": 0.01, "w3": 0.02})
+    detail = cov._scale_notes(breaks)["w2"]
+    assert "w1=2,000 (per-item[3])" in detail
+    assert "w3=1,000 (pooled)" in detail

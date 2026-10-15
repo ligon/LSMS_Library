@@ -132,6 +132,25 @@ scale, C, D on another) leaves every wave agreeing with one neighbour, so
 nothing is reported; and a frame with exactly two comparable waves reports both,
 because with one neighbour each the grader cannot say which is wrong.
 
+A `sane` tier still does not establish item coverage or correct unit labels,
+and an unconfigured redenomination can be a persistent break that this test
+misses. Each neighbour's ratio form (`per-item[k]` or `pooled`) is carried in
+`neighbour_forms` and printed beside its median; the record's summary `form`
+is `mixed` if they differ. The displayed medians are always pooled levels.
+
+The approved first increment retains the fixed fivefold, warning-only
+threshold without CPI or elapsed-year adjustment. The independent October 14
+review found **four records across three of 87 warm monetary country-tables**:
+GhanaLSS `community_prices.Price` (1998-99, 5.56x), GhanaLSS
+`food_acquired.Price` (1991-92, 0.16x), and GhanaSPS
+`crop_production.Value_sold` (2009-10, 0.167x; 2017-18, 6.0x). The review
+attributes the two GhanaLSS records to inflation across a seven-year gap;
+the GhanaSPS instrument/level difference remains unadjudicated. These are
+triage notes, not four established errors. Persistent-break detection,
+`community_prices` comparison grain, and gap-aware tolerance remain #830
+follow-ups; the census and its provenance are in
+`.coder/ledger/830-grader-scale.md`.
+
 ## Adjudicating an `absent` cell
 
 `absent` alone says only *"the feature is not declared for this wave."* That
