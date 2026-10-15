@@ -1,0 +1,119 @@
+#+title: Red-team review summary -- 2026-10-14 fix branches (16 branches, arrays 39922500 / 39923111 / 39923207)
+
+Verdict files copied to =verdicts/<key>.md= (originals under /global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_review2_<job>/<key>/).
+
+* Verdicts
+| branch | verdict | headline | §6 items |
+|---|---|---|---|
+| fix/framework-small | fail | the branch turns 14 existing tests red (13 `tests/test_dvc_caching.py::TestDVCCaching::*` and `tests/test_countries_root_override.py::test_subprocess_override_routes_all_layers`, a | 5 |
+| fix/810-followup | pass-with-fixes | the follow-up commit is comment-only, every code claim I re-ran held (symptom reproduced on development and gone on the branch, 0/36 hashes moved by the follow-up, 36/36 by the who | 5 |
+| fix/831-followup | pass-with-fixes | every code and number claim in the report reproduces (hash cost Panama 5/5, Uganda 0/28, Malawi 0/26 against HEAD~1; three of the nine tests discriminate against the parent; the CL | 3 |
+| fix/868-followup | pass-with-fixes | every claimed number in the follow-up commit and report reproduces, served data is unchanged, the suite is clean apart from a failure the pending merge with development cures, and  | 4 |
+| fix/ghana-docs-encoding | pass-with-fixes | every served-data, config, test and cache claim reproduces exactly on a cold private build; the only defects are two one-word count slips in the new EHCVM prose. | 3 |
+| fix/grader-scale-830 | pass-with-fixes | the check does what #830 asked, every claimed number reproduces, it is read-path and never moves a tier, and the suite is green except for one pre-existing environment-dependent fl | 0 |
+| fix/kinship-974 | pass-with-fixes | the kinship.yml edit and the #931 pin are exactly what the adjudication prescribes and change no served value or cache hash, but the branch is 13 commits behind development and con | 3 |
+| fix/labels-relabel-787 | pass-with-fixes | the three code changes do what the commits say, every number reproduces, 0 of 170 cache hashes move against the merge-base and the full suite is green; the fixes needed are documen | 4 |
+| fix/niger-followup-2 | pass-with-fixes | every number in the two follow-up commits (4998ef4d2, b6feef578) reproduces exactly on a cold rebuild in my private root and on the raw files, the narrowed universe test is exact ( | 3 |
+| fix/nigeria-824-followup | pass-with-fixes | every data claim on the branch reproduces to the row (Mali/Nigeria kg N with and without the withdrawn alias, Unit_sold counts, agreement rates, the raw→built decomposition, the W1 | 4 |
+| fix/nigeria-w5-cluster | pass-with-fixes | the declaration is correct and every number reproduces cold, but the branch states in four places that Wave 5 "ships NO household geovariables file ... by source, not by omission", | 4 |
+| fix/peru-panama | pass-with-fixes | both fixes are correct and every claimed number reproduces on a cold private build, but the branch introduces two NEW red cells in `tests/test_sample.py` (Peru is newly parametrise | 5 |
+| fix/readers-xport-sniff | pass-with-fixes | the branch fixes #699 and #712 as claimed, changes nothing for any real `.dta` in the held corpus or for Peru 1994 cold-built, and every reproducible number in the report held; the | 3 |
+| fix/970-json-make | pass | the branch removes the only `make` shell-out the issue names, the Design-B cold crosswalk is byte-identical before and after, every claimed number reproduces, and the one suite fai | 2 |
+| fix/burkina-2014 | pass | the branch does what it says, every claimed number reproduces on a cold private-root rebuild, the 14 new tests all fail on origin/development and pass on the branch, the other 16 B | 3 |
+| fix/ci-skips | pass | every before/after number in the report and commits reproduces in my private root (0 of 4,617 per-test outcomes change credential-free, credentialed collection byte-identical, 56-f | 4 |
+
+* Follow-up items per branch (reviewer §6, verbatim-ish)
+
+** 810-followup -- pass-with-fixes
+- `lsms_library/local_tools.py` ~line 1404-1406: change "``grab_data`` and ``df_data_grabber(missing_ok=)`` catch that class" to "``grab_data`` catches that class (``country.py`` ``get_data``); ``df_data_grabber``'s ``missing_ok`` covers missing *columns* only and lets a missing file propagate". Comment-only; 0 hashes move.
+- `.claude/skills/add-wave/SKILL.md:223`: delete the sentence claiming older library functions still use `dvc.api.open`; none do.
+- File (do not fix here) **"Remove `_sync_legacy_dvc_creds`; it writes into `countries_root()` at import and serves no reader"** with this body: touch points `lsms_library/__init__.py:316-330` (import-time call), `lsms_library/data_access.py:801-917` (function) and `:883,:935` (callers in `_auto_unlock_s3`), `tests/conftest.py:37-74` (`aws_creds_available` → read `config.s3_creds_path()` with the in
+- Report-only corrections if the report is archived: "47 test files" → 36; candidate #5 (`ci.yml:96`) is already fixed on development by `24cd065b0`.
+- The three separate issues the 09-24 verdict named (data_root `lru_cache` poisoning in `test_gh866_*`, the GhanaLSS `[total]` order-dependent flake, the `../..` parse in `get_data_file`) remain unfiled candidates; the report lists them, as instructed.
+
+** 868-followup -- pass-with-fixes
+- `tests/test_gh868_reduce_to_agreed_ledger.py::test_na_branch_files_one_cells_blanked_report_under_the_named_cell`: add `assert 'dropped' not in rep and rep['collapsed_rows'] == rep['rows'] - rep['groups']` so the rename is pinned (today it passes on the pre-rename code).
+- `lsms_library/country.py` `_wave_grain_audit` + `build_transforms._cells_blanked_report`: stamp a `wave_folder` field from `build_context` (the folder the framework is building) and filter the wave stamp on it, leaving `wave` free to name the round; add the R8 fixture as a test. (Filtering on the frame's `t` values is not a fix: on the YAML path `t` is `Wave.year`, the folder, so the fixture would
+- `lsms_library/countries/Uganda/_/CONTENTS.org` (after merging with development): "11 groups" -> "12 (the twelfth is #848's 2018-19 season-B Condition_sold conflict)", "(4)" -> "(5)".
+- Merge note: state the corpus-wide, both-tier re-warm (item 5.1) and that `test_every_poetry_install_passes_no_root` is green on the merge.
+
+** kinship-974 -- pass-with-fixes
+- Merge/rebase `fix/kinship-974` onto development; resolve `tests/test_crop_kg_factor.py` by keeping development's `#848` comment + numbers and appending `test_crop_ladder_is_blind_to_declared_unit_kg` (verified resolution).
+- Fix the two docstrings: `lsms_library/countries/Senegal/2018-19/_/mapping.py` (`_fix_relationship`) and `lsms_library/countries/Niger/2018-19/_/mapping.py` -- replace "`Frere, Soeur`, the label the sibling EHCVM-1 waves serve" with the accented `Frère, Sœur` and note the ASCII key was deleted under #974.
+- Optionally correct ADJUDICATION.org row 3 prose ("both emitted") to match its own table, citing the 35-country scan.
+
+** niger-followup-2 -- pass-with-fixes
+- **REPORT / PR body: draft the residuals.** For #824: "Niger done (Unit_sold carried, crop-level sale keyed on it, s16d de-dup); remaining: Nigeria sa3q11b (95-97% agree) + any other country whose sale unit column is dropped." For #833: "Niger folds landed (Choux, Sucre 134/135, 'Aubergine,'); remaining: Malawi groundnut 5.0x, Uganda maize 3.33x milling folds, the other three countries, and the sev
+- `lsms_library/countries/Niger/_/CONTENTS.org` (#679 "served rows" paragraph): add one clause "before = origin/development @ 340e30f1e cold build (verified identical to the 2026-09-24 snapshot)" so the next reviewer does not have to rebuild development to trust the befores.
+- Optional: `lsms_library/countries/Niger/_/Makefile:26` -> `$(PYTHON) panel_ids.py` with `PYTHON ?= python`, so the documented `make panel-ids` recipe works without an activated venv.
+
+** nigeria-824-followup -- pass-with-fixes
+- `Nigeria/_/CONTENTS.org` §"DONE Unit_sold": say "93 / 66 positive-sale rows **that record both units**" (positive-sale rows dropped are 96 / 66), and define the "122 / 81 duplicate keys" count (keys duplicated in the frame holding ≥ 1 positive-sale row: 125 / 81; keys where both rows are positive-sale: 78 / 43).
+- Dispatcher / human: a comment on #824 with the Nigeria close and the residual (Niger, remaining declarers, `Unit_sold`-aware farmgate price), and two new issues from REPORT.md items 1–2 (dedup collapse; `sa3q16a/b`/`sa3q17`), cross-referenced from `nigeria.py:~526`.
+- Optional: `tests/test_nigeria_sold_unit.py::TestWiring::test_column_order_keeps_every_pre_existing_column` could assert `UNIT_SOLD in out.columns` explicitly so it discriminates (today it passes on development).
+- Separate PR for whoever owns `.github/workflows/ci.yml`: add `--no-root` at line 96.
+
+** nigeria-w5-cluster -- pass-with-fixes
+- `lsms_library/countries/Nigeria/2023-24/_/data_info.yml` (cluster_features comment) and `lsms_library/countries/Nigeria/_/CONTENTS.org` (heading "Wave 5 ships NO household geovariables file" and body): replace "ships NO ... BY SOURCE, not by omission" with: the v01 extract this repo acquired (SOURCE.org `NGA_2023_GHSP-W5_v01_M`, 106 files) has no geovariables file; WB catalog 6410 v02 (changed 202
+- `tests/test_nigeria_cluster_identity.py`: same correction in the `GEO_ROUNDS` comment and the new test's docstring ("retire this test when the v02 geovars file is wired as `df_geo` on `hhid`, as W4 does").
+- Report/PR body: correct the cache-cost sentence to "every Nigeria L2-country table re-warms (the country hash folds every wave's data_info.yml, declared or not); measured: assets, shocks, food_acquired, plot_features, household_roster, sample, community_prices, cluster_features all moved."
+- **File the residual issue** (draft): *"Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire `NGA_HouseholdGeovariables_Y5.dta` as cluster_features `df_geo`"* -- body: #841 declared cluster_features for 2023Q3/2024Q1 from the cover page only, so Latitude/Longitude are all-NaN there and Site B warns on every read; the repo's v01 extract (106 files) predates WB v02 (2026-09-16), which adds `N
+
+** 831-followup -- pass-with-fixes
+- Residual issue text (post as a comment on #831 or a new issue, and reference from the PR body): "Read policy for a sidecar-less file inside `countries_root()`: `local_tools.get_dataframe.local_file` (local_tools.py:1195-1214) serves it in preference to the DVC blob by design ('new data being prepped for dvc add'). Decide: (a) warn once per read naming the path, (b) refuse unless `LSMS_ALLOW_INTREE
+- `tests/test_gh831_cache_clear_intree_sources.py::test_the_real_tree_consults_git_and_excludes_its_tracked_csvs`: move the `tracked=None` assertions above the `pytest.skip` so the position rule is pinned on a no-git install too.
+- `lsms_library/cli.py` `_git_tracked_files` docstring: drop the hardcoded "11,695" (or say "thousands").
+
+** 970-json-make -- pass
+- File the two pre-existing defects the report describes but did not draft: (a) `tests/test_gh866_stale_country_parquet_not_laundered.py::test_the_helper_is_a_noop_on_an_absent_parquet` sets `LSMS_DATA_DIR` via `monkeypatch.setenv` without `data_root.cache_clear()`, leaking a tmp root to later files on its xdist worker (the agent saw it fail `test_food_prices_dtype.py`); (b) the general absence of a
+- Optional hardening of `_subprocess_calls_without_env` in `tests/test_build_subprocess_env.py` to resolve `import subprocess as <alias>`.
+
+** ghana-docs-encoding -- pass-with-fixes
+- `lsms_library/countries/Guinea-Bissau/_/CONTENTS.org`, line beginning "(Seven of nine regions get ~42-50 clusters": change to "Eight of nine regions get 42-50 clusters regardless of size (SAB, at 92, is the exception)".
+- `lsms_library/countries/Togo/_/CONTENTS.org`, sentence "Five of six regions get 72-98 clusters each regardless of size.": change to "All six regions get 72-98 clusters each regardless of size."
+- Optional, same files: GhanaSPS CONTENTS.org "17 in the 25-75% middle" -> "17 strictly between 25% and 75%" (20 if the bounds are inclusive).
+
+** grader-scale-830 -- pass-with-fixes
+
+
+** labels-relabel-787 -- pass-with-fixes
+- `CLAUDE.md`: add `LSMS_LABELS_STRICT` (and `LabelPassThroughWarning` / `attrs['labels_unmatched']`) to the `labels=` paragraph and beside the other `*_STRICT` levers, with the Malawi 32/147 measurement.
+- `docs/guide/label-selection.md`: replace the `.to_dict()` `rdict` snippet (§Design note 1) with the filtered dict comprehension; add the accepted-value surface and the numeric refusal.
+- GH #787 body: add the third residual item (`labels_unmatched` carrier in `feature._ATTRS_CARRIERS`) and a note that `Guatemala/_/categorical_mapping.org:75` and `Serbia/_/categorical_mapping.org:68` document a numeric `labels=` target that now refuses (hashed inputs; fix when those countries next re-warm).
+- Optional, `.claude/skills/add-feature/food-acquired/aggregate-labels/SKILL.md`: "4 of 16" -> GhanaLSS now curates `Aggregate Label` (5 countries), per the sweep.
+
+** peru-panama -- pass-with-fixes
+- `tests/test_sample.py`: apply `$STAGE/../../backlog_fix_39921399/peru-panama/test_sample_peru.patch` (add "Peru" to `NO_WEIGHT_COUNTRIES` with the REG01 `_weight_` reason). Verified: cell -> XFAIL.
+- `tests/test_sample.py::test_covers_all_waves`: add a per-country exemption `PARTIALLY_WIRED_SAMPLE = {"Peru": {"1985", "1990", "1991"}}` (unwired waves, with the reason) and subtract it from `expected_waves`. Do NOT switch the test to "waves whose `_/` dir exists": GhanaAHIES, Nigeria and Tanzania have `_`-less `wave_folder_map` round dirs that the test currently checks via `t` and would silently 
+- New `tests/test_panama_777.py` (cache-gated like `TestDelivered`): on `Country('Panama').food_acquired()` 1997, assert `Quantity` is all-NA on `u=='value'` rows and `(Quantity==7.7)&(u=='value')` count == 0; Expenditure sum 1997 == 356,079.56 +- 0.01. Fails on development (10,973).
+- New `tests/test_peru_700.py`: `set(sample.v) == set(cluster_features.v) == {i.split('-')[0]}` and `household_roster` carries `v` with 0 nulls. Fails on development (no `sample`).
+- `Panama/1997/_/food_acquired.py` comment + `Panama/_/CONTENTS.org`: "one stray 7.7 under unit 75" -> "two stray 7.7 rows, one under unit 75 and one with no unit code"; "obtained rows fall to the no-amount drop" -> "obtained rows are excluded by the `ga110a.notna()` filter when the canonical rows are built". Commit message cannot be amended post-push; CONTENTS.org carries the correction.
+
+** readers-xport-sniff -- pass-with-fixes
+- `lsms_library/local_tools.py` block comment and `tests/test_reader_sniff.py` docstring: "39 `.SSP`" -> "36 `.SSP` (39 DVC sidecars incl. `FORMAT.ZIP` and 2 under `Documentation/`)"; name all five surveys in the 67 (add Tajikistan 10, Timor-Leste 12). `lsms_library/countries/Peru/_/CONTENTS.org:938`: "the other 36 blobs" -> "the other 33 `.SSP` blobs". The GH #699 retitle draft likewise.
+- `lsms_library/local_tools.py` `read_file`: after the sniff, if `Path(fn).suffix.lower() == '.dta'` and `_is_stata_dta(head)` is false, raise `ValueError(f'{fn} has a .dta suffix but no Stata header')` (or at minimum warn) before the text readers; the `.dta` extension is a claim about content and the magic bytes contradict it. Then in `tests/test_reader_sniff.py` parametrise `test_a_truncated_dta_s
+- The drafted new issue ("`pd.read_spss` on the path-string retry raises uncaught `ReadstatError`") should also carry §5.2: with a permissive `encoding` the chain's text tail serves an empty one-column frame for any unreadable binary.
+
+** burkina-2014 -- pass
+- `lsms_library/transformations.py::_money_only_rows` docstring: one sentence naming the mis-bound-column exposure and that Site B is the independent guard.
+- Commit-message nit (cannot be fixed without rewriting history; note it in the PR body): "43,906 passage-1 rows were served 0" should read "44,125 (43,906 filled NaN + 219 clips)".
+- Rebase/merge development before opening the PR so the diff does not show the Region table and three test files as deletions.
+
+** ci-skips -- pass
+- `tests/test_cache_hash_invalidation.py`: `@pytest.mark.requires_s3` on `test_hashless_country_parquet_is_rebuilt_not_trusted` (saves ~100 s per credential-free run; it is the last net conversion).
+- `tests/test_locality_deprecation.py` and `tests/test_gh323_site4_dfs_merge.py`: mark the two network-waiting passers, or make them not reach DVC (each ~100 s).
+- `tests/test_conftest_net.py` (new): a `pytester`-based test that an unmarked data test under a credential-free environment is converted to a skip AND emits `UnmarkedS3TestWarning`, including under `-W error::UserWarning` -- the branch's one behavioural change currently has no test that would fail on development.
+- Root `conftest.py`: pre-import `lsms_library` on the controller (the report's measured mitigation) as part of the drafted xdist-race issue, not this PR.
+
+** framework-small -- fail
+- `tests/test_dvc_caching.py`, `tests/test_countries_root_override.py` (or `lsms_library/country.py:2000`): make the 14 tests and the #915 raise consistent -- preferred: in `mock_country_structure` set `LSMS_COUNTRIES_ROOT`/`countries_root.cache_clear()` to `tmp_path/"countries"` before `Country("TestCountry")`, and in `test_subprocess_override_routes_all_layers` create `ov/"Uganda"` (an empty dir i
+- `lsms_library/build_transforms.py:203`, `lsms_library/countries/Panama/{1997,2003,2008}/_/food_acquired.py`: "1 ULP" -> "a few ULP (<= 4 pinned by tests/test_gh905...)"; amend nothing else.
+- Either sweep the remaining `food_acquired` copies (GhanaSPS x3 + `ghanasps.py:837`, Cambodia 2019-20, Serbia 2007) with cold before/after `equals` checks, or add a `#905 residual` to the element report listing every surviving site (section 1, R5) so the issue stays open with exact remaining work.
+- `lsms_library/country.py` `_strip_string_values` docstring, commit-message-level wording, and `tests/test_categorical_mapping_resolution.py::test_gh694_numeric_values_survive_a_same_named_table` message: say "mixed object column"; keep the test as a guard.
+- Report corrections: "byte-identical" -> "data-identical (footer hash differs)"; drop the seeded-roster "no manifest" sentence or re-measure it.
+
+* Plan (scrum master)
+- =fix/framework-small=: FAIL -> follow-up element =framework-small-2= dispatched (job 39924156); re-review on its return.
+- The 12 pass-with-fixes branches: items are docs/prose/test-wording plus (peru-panama) two newly red cells in tests/test_sample.py and (kinship-974) a merge with development that conflicts in tests/test_crop_kg_factor.py.  Proposed: TWO follow-up elements, each walking six branches sequentially (clone, merge development, apply §6, run targeted tests, push), then PRs.
+- The 3 clean passes (970-json-make, ci-skips, burkina-2014) are PR-ready now.
+- Re-warm bundle, one merge window: fix/810-followup + fix/868-followup + fix/970-json-make + fix/readers-xport-sniff (all move every build fingerprint).  Everything else re-warms its own country only.
