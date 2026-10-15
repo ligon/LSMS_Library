@@ -8,7 +8,9 @@ on.  ``CROP_COLMAPS`` wired neither, so ``Value_sold / Quantity_sold`` was a
 price denominated in a unit the row did not carry while ``u`` advertised the
 harvest unit.  Measured on the built table (2026-09-10, isolated
 ``LSMS_DATA_DIR``): the two units differ on 3.9% of the 40,083 rows with a
-positive ``Quantity_sold`` that know both units, and on the 565 disagreeing
+positive ``Quantity_sold`` that know both units (41,162 rows since GH #848
+wired the 2018-20 season-B second condition slot, 2026-09-24; the share is
+unchanged), and on the 565 disagreeing
 priced rows whose two labels both name a weight in KILOGRAMS the two readings
 differ by a median factor of 50 -- >= 100x on 47.4% of them.  Same pathology Malawi closed in ``85947ff5``; different
 shape, because Uganda's sale is on the harvest row and needs no merge.
@@ -585,9 +587,14 @@ def test_built_wave_carries_a_populated_sold_unit(uganda_module, wave, filename,
 #: reproduce (the first counted non-sale rows, the second counted non-priced
 #: rows, the third was a transcription error).  Pinned here so canonical
 #: prose cannot drift from the table again.
-SALE_ROWS_KNOWING_BOTH = 40_083         # Quantity_sold > 0, u != Unknown, Unit_sold notna
-AGREEMENT_SHARE = 0.9606                # Unit_sold == u on those rows
-LARGEST_DISAGREEMENT_CELL = 162         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
+#:
+#: Moved 2026-09-24 by GH #848 (the 2018-20 season-B second condition slot,
+#: +2,725 rows, 1,079 of them sale rows knowing both units): 40,083 -> 41,162;
+#: 0.9606 -> 0.9614 (by wave-season still 92.0-98.0%, "3.9% disagree" holds);
+#: 162 -> 165.  2009-10 is untouched by #848 and its coverage did not move.
+SALE_ROWS_KNOWING_BOTH = 41_162         # Quantity_sold > 0, u != Unknown, Unit_sold notna
+AGREEMENT_SHARE = 0.9614                # Unit_sold == u on those rows
+LARGEST_DISAGREEMENT_CELL = 165         # PRICED rows, u='Sack (100 kgs)' Unit_sold='Kg'
 W2009_10_A_COVERAGE = 0.968             # Unit_sold non-null / sale rows
 
 

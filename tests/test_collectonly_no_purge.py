@@ -8,10 +8,13 @@ since the 2026-08-22 migration is a **shared** scratch path, not a private
 other sessions, and under ``--rebuild-caches`` it took every country rather
 than just Uganda.
 
-These tests pin the *trigger*, not the purge.  The purge is correct and is
-deliberately still exercised on a real run -- which is what the negative
-controls below assert, so a regression that simply disabled purging
-altogether would fail here rather than pass.
+These tests pin the *trigger*.  The default-mode Uganda purge they used to
+guard was RETIRED on 2026-09-22 (see conftest.pytest_configure): v0.8.0's
+content hash and GH #803 do both of its jobs, and it silently excluded Uganda
+from tests/test_table_structure.py.  The controls below now pin that a real
+run purges NOTHING by default -- and that ``--rebuild-caches``, an explicit
+request rather than a default, still purges everything.  A regression that
+re-added an unconditional purge would fail here rather than pass.
 """
 from __future__ import annotations
 
@@ -21,8 +24,10 @@ from pathlib import Path
 
 # NOT ``import conftest``.  That spelling resolves to the broken top-level
 # ``tests``/``conftest`` shipped by a dependency and aborts pytest COLLECTION in
-# CI (GH #680), while passing locally because ``lsms_library.pth`` puts the repo
-# root ahead of site-packages -- invisible exactly where the mistake is made.
+# CI (GH #680).  It used to pass LOCALLY because ``lsms_library.pth`` put the
+# repo root ahead of site-packages -- invisible exactly where the mistake is
+# made.  GH #957 removed that .pth, so the local/CI asymmetry is gone and the
+# spelling below is what makes this work anywhere.
 # ``tests/test_tests_package_not_shadowed.py`` enforces this, and caught this
 # file.  Prefer the object pytest itself already loaded; fall back to loading
 # the root conftest by path, which is identical in every import mode.
@@ -99,12 +104,19 @@ def test_collect_only_still_registers_markers(monkeypatch):
     assert "rebuild:" in names and "slow:" in names
 
 
-# --- negative controls: a real run MUST still purge ----------------------
-# Without these, deleting the purge entirely would make the tests above pass.
+# --- controls: what a real run may and may not purge ---------------------
+# The first of these was the inverse until 2026-09-22 (it asserted the Uganda
+# purge fired).  It is kept, inverted, rather than deleted: an unconditional
+# default purge is what silently excluded Uganda from
+# tests/test_table_structure.py, and this is the thing that would notice it
+# coming back.
 
-def test_real_run_still_purges_uganda(monkeypatch):
+def test_real_run_purges_nothing_by_default(monkeypatch):
     cfg, calls = _run(monkeypatch, collectonly=False)
-    assert calls == [("country", "Uganda")], f"expected the Uganda purge, got {calls}"
+    assert calls == [], (
+        "a default run must not purge anybody's cache -- the Uganda auto-purge "
+        f"was retired 2026-09-22 (see conftest.pytest_configure), got {calls}"
+    )
 
 
 def test_real_run_with_rebuild_caches_still_purges_everything(monkeypatch):
@@ -112,6 +124,8 @@ def test_real_run_with_rebuild_caches_still_purges_everything(monkeypatch):
     assert ("all", None) in calls, f"expected the full purge, got {calls}"
 
 
-def test_no_purge_flag_still_honoured_on_a_real_run(monkeypatch):
+def test_no_purge_flag_is_accepted_and_inert(monkeypatch):
+    # The flag now suppresses a purge that no longer happens.  It is kept
+    # accepted so existing invocations (handoffs, docs) do not start erroring.
     cfg, calls = _run(monkeypatch, collectonly=False, no_purge=True)
-    assert calls == [], f"--no-purge should suppress the purge, got {calls}"
+    assert calls == [], f"--no-purge must remain harmless, got {calls}"

@@ -1,0 +1,10 @@
+readers-xport-sniff Peru
+nigeria-w5-cluster Nigeria
+peru-panama Peru,Panama
+ghana-docs-encoding GhanaLSS,GhanaSPS,Guinea-Bissau
+framework-small Mali
+ci-skips -
+kinship-974 Senegal,Guinea-Bissau,EthiopiaRHS
+burkina-2014 Burkina_Faso
+labels-relabel-787 Uganda,Malawi,Tanzania
+grader-scale-830 Uganda

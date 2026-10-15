@@ -1,0 +1,77 @@
+index: ['t', 'i', 'j', 'u', 's'] cols: ['Quantity', 'Expenditure', 'Price'] rows: 355,571
+u=='---': 7359  mask catches: 0  u=='Unknown': 0  u=='Value': 0
+--- '---' rows partition: qty>0: 930  exp-only: 6429  neither: 0
+--- by source s:
+hq         False  True 
+s                      
+inkind      1494    131
+produced     216     84
+purchased   4719    715
+--- by wave t:
+hq       False  True 
+t                    
+2005-06   1249      0
+2009-10    622      0
+2010-11    808    397
+2011-12    773    439
+2013-14    782      6
+2015-16    695     13
+2018-19    789     58
+2019-20    711     17
+--- top items among '---' rows:
+hq                      False  True     n
+j                                        
+Restaurant (food)        4763     1  4764
+Other Foods              1090     0  1090
+Other Juice               484     0   484
+Other Tobacco               0   460   460
+Cigarettes                  0   337   337
+Other Fish (dried)         58     9    67
+Other Fish (fresh)         33    14    47
+Other Fruits                0     9     9
+Soda                        0     7     7
+Biscuits                    0     6     6
+Other Spices                0     6     6
+Other Alcoholic Drinks      0     5     5
+--- Quantity stats on '---' qty>0 rows:
+count     930.000000
+50%         4.000000
+mean       14.944731
+max      4500.000000
+Name: Quantity, dtype: float64
+
+=== A: as served today ('---')
+[dash] kg_factor_sources: {'survey_kg': 0, 'metric': 182550, 'item_unit': 59744, 'item_unit_tight': 718, 'unit': 112559, 'none': 0}
+[dash] rung of the relabelled rows:
+ KgFactorSource
+unit         7353
+item_unit       6 
+  kg_per_unit median: 0.06458333333333333
+
+=== B: the draft (qty->'Number of Units (General)', exp-only->'Value', Quantity left NaN)
+[draft] kg_factor_sources: {'survey_kg': 0, 'metric': 182550, 'item_unit': 59753, 'item_unit_tight': 718, 'unit': 106121, 'none': 6429}
+[draft] rung of the relabelled rows:
+ KgFactorSource
+none         6429
+unit          915
+item_unit      15 
+  kg_per_unit median: 0.13712060166532367
+
+=== C: draft + corpus convention (Value rows get Quantity=Expenditure)
+[draft+conv] kg_factor_sources: {'survey_kg': 0, 'metric': 182550, 'item_unit': 59753, 'item_unit_tight': 718, 'unit': 106121, 'none': 6429}
+[draft+conv] rung of the relabelled rows:
+ KgFactorSource
+none         6429
+unit          915
+item_unit      15 
+  kg_per_unit median: 0.13712060166532367
+
+=== D: first attempt (all '---' -> 'Unknown')
+[unknown] kg_factor_sources: {'survey_kg': 0, 'metric': 182550, 'item_unit': 59738, 'item_unit_tight': 718, 'unit': 105206, 'none': 7359}
+[unknown] rung of the relabelled rows:
+ KgFactorSource
+none    7359 
+  kg_per_unit median: nan
+B food_quantities rows: 349,057  rows u=Value: 0  u=Unknown: 0  u=NumUnits: 0  kg total: 1,243,036
+C food_quantities rows: 355,486  rows u=Value: 6429  u=Unknown: 0  u=NumUnits: 0  kg total: 1,243,036
+D food_quantities rows: 349,058  rows u=Value: 0  u=Unknown: 930  u=NumUnits: 0  kg total: 1,241,507

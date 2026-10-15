@@ -164,3 +164,34 @@ def test_grab_data_delegates_its_shell_out():
         "Wave.grab_data shells out directly again; route it through "
         "_build_wave_script_target() so it gets _script_subprocess_env()"
     )
+
+
+def test_pythonsafepath_is_stripped_from_the_child(monkeypatch):
+    """A build subprocess must NOT inherit PYTHONSAFEPATH.
+
+    Safe-path mode removes the script's own directory from ``sys.path``.  338
+    wave/country scripts under ``countries/`` import a sibling module by bare
+    name (``from ethiopia import Waves``), and that spelling resolves ONLY
+    through the script-dir entry -- so with it set, every script-path build
+    dies with ``ModuleNotFoundError: No module named 'ethiopia'``.
+
+    The controllers that spawn these children set it deliberately
+    (``bin/coverage_lib.sh``, ``bin/coverage_reseed_shard.sbatch``): it is what
+    makes ``PYTHONPATH`` authoritative for *them*, because ``python -c`` and
+    ``python -m`` otherwise put cwd at ``sys.path[0]`` and those jobs run with
+    cwd = the shared mirror, itself a checkout.  Right for a controller, wrong
+    for a build subprocess -- and this function is the boundary between them.
+
+    It would have failed SILENTLY: ``coverage_matrix`` grades any build
+    exception as a ``broken`` cell, so the job exits 0 and publishes a snapshot
+    in which every script-path cell has flipped to broken.
+    """
+    monkeypatch.setenv("PYTHONSAFEPATH", "1")
+    env = _script_subprocess_env()
+    assert "PYTHONSAFEPATH" not in env, (
+        "PYTHONSAFEPATH leaked into the build-subprocess environment; sibling "
+        "imports in countries/*/_/*.py resolve only via the script-dir entry "
+        "that it removes"
+    )
+    # and the child's import identity is still pinned without it
+    assert env["PYTHONPATH"].split(os.pathsep)[0] == str(_PACKAGE_PARENT)

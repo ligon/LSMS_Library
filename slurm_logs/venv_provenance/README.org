@@ -1,0 +1,61 @@
+#+TITLE: Venv provenance: what the warm caches were actually built under
+#+DATE: [2026-09-21]
+
+* Why this file exists
+The repository ships no lock file.
+=/poetry.lock= is gitignored (=.gitignore:37=), and =pyproject.toml= pins only open ranges (=pandas >=3.0=, =pyarrow >=21.0.0=).
+So the only record of the exact environment that produced the warm parquet corpus was the master venv itself, =~/mirrors/LSMS_Library/.venv.lustre=, which is unversioned and which any session can =pip install= into.
+
+=master_freeze_2026-09-21.txt= is that record, captured before anyone touches the master.
+It is the input to the lock decision, not the lock.
+
+* What was captured
+- Source :: =~/mirrors/LSMS_Library/.venv.lustre= (Python 3.11.6), the writable master behind =.venv.sqfs=.
+- Command :: =.venv.lustre/bin/python -m pip freeze=
+- Date :: 2026-09-21, from n0035.savio4.
+- Size :: 247 distributions.
+
+Master last written 2026-09-07 23:15; =.venv.sqfs= was imaged 2026-09-07 16:23, seven hours earlier.
+The image therefore lacks =dunamai= and =poetry-dynamic-versioning=, which were installed into the master after it.
+That gap affects cutting a wheel, not running the library.
+
+Key versions:
+
+| package | version |
+|---------+---------|
+| python  | 3.11.6  |
+| pandas  | 3.0.2   |
+| numpy   | 2.4.4   |
+| pyarrow | 23.0.1  |
+| scipy   | 1.17.1  |
+| dvc     | 3.67.1  |
+
+* What this does NOT record
+A freeze is not a lock.
+It records what happens to be installed, not what a resolver would choose from =pyproject.toml=, and it carries no hashes.
+Three specifics worth knowing before anyone treats the file as a specification:
+
+- The editable line is dynamic, not a version. :: =pip freeze= reports the editable install as =-e git+...@f27a82e2b...=, reading the mirror's git HEAD at freeze time.
+  The installed *code* is whatever the mirror's working tree holds now; only the recorded commit is fixed.
+- The dist-info version is frozen at install time and is wrong. :: The master's =lsms_library-0.6.1.post138.dev0+02074edb.dist-info= dates from commit =02074edb= (2026-04-12), 2060 commits before HEAD.
+  Since =lsms_library/__init__.py:123-129= reads =__version__= from =importlib.metadata=, every session using this venv reports =0.6.1.post138.dev0+02074edb= while HEAD is =v0.14.0-70-gf27a82e2b=.
+- The master carries a retired dependency. :: =lsms==0.4.13= is installed but was removed from =pyproject.toml= (see =CLAUDE.md=, "the =lsms= upstream dependency has been retired").
+  It is inert -- the imports were cleaned up in 2026-04 -- but it is drift between the master and the tracked spec.
+
+* Re-capturing
+#+begin_src sh
+~/mirrors/LSMS_Library/.venv.lustre/bin/python -m pip freeze \
+    > slurm_logs/venv_provenance/master_freeze_$(date +%F).txt
+#+end_src
+
+Takes about 20 seconds over Lustre; it walks the ~490 dist-info directories, not the venv's ~33k files.
+Do not run the master's interpreter for anything heavier -- see =SkunkWorks/savio_venv.md= for why the venv is mounted from a squashfs image instead of read off Lustre.
+
+* Where the lock decision goes from here
+Two honest options, and they produce different files:
+
+- Freeze as constraint. :: Pin a lock to exactly the versions above.
+  This records the environment the warm corpus was actually built under, and costs no cache rebuild.
+- Fresh resolve. :: Run =poetry lock= against the open ranges in =pyproject.toml=.
+  Cleaner, but it will move versions, and dependency versions are deliberately absent from =build_transforms_fingerprint=, so a move changes results with no cache invalidation.
+  It should be paired with a deliberate cold re-warm rather than done casually.

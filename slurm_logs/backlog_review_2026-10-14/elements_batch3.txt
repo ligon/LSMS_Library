@@ -1,0 +1,3 @@
+burkina-2014 fix/burkina-2014 Burkina_Faso
+framework-small fix/framework-small Mali
+ci-skips fix/ci-skips -

@@ -1,0 +1,9 @@
+810-dvc-open fix/810-dvc-open -
+868-reduce-agreed fix/868-reduce-agreed Uganda,Togo
+811-region-tables fix/811-region-tables Guinea-Bissau,Burkina_Faso,Senegal
+malawi-bundle fix/malawi-bundle Malawi
+nigeria-824 fix/nigeria-824 Nigeria
+831-cache-clear fix/831-cache-clear -
+848-uganda-condition2 fix/848-uganda-condition2 Uganda
+niger-followup fix/niger-followup Niger
+malawi-derivations fix/malawi-derivations Malawi

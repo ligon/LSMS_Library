@@ -1,0 +1,718 @@
+#+title: Design: a composition model for categorical mappings
+#+date: <2026-09-18 Thu>
+#+subtitle: roles, key namespaces, terminal decode, and declared commensurability
+Refs: GH #953 (two mechanisms, unreachable rung), #928 (=#+key:=, Status/Notes),
+#833 (folds that are not commensurable), #693 (example blocks parsed live),
+#832, #842, #847. Prior art: =slurm_logs/DESIGN_u_consolidation_2026-06-07.org=,
+=SkunkWorks/semantic_curation_proposal.org=.
+
+*Nothing here is implemented.* Every count below is reproducible from a read-only
+sweep of the 47 =.org= files that carry categorical tables (6 global, 34 country,
+7 wave; 45 contain at least one table; *312 tables*), parsed with the library's
+own =all_dfs_from_orgfile=.
+
+* -1. The briefed facts, checked
+
+| claim | verdict |
+|-------+---------|
+| =get_categorical_mapping(fn, tablename, dirs, ...)= walks =dirs=, first hit wins, "near =local_tools.py:1611= post-#955" | *Line number wrong on =development=*: it is =local_tools.py:1539=. #955 is unmerged. Behaviour claim holds. |
+| =fn= defaults to =categorical_mapping.org=, so a rung is a single FILE; it cannot read a directory | Holds (=local_tools.py:1539-1540=). |
+| Third rung =countries/_/= does not exist; the cascade has never reached a global table | Holds. |
+| =Country.categorical_mapping= loads *every* global =.org= as a base layer for every country; =for rel in ['./','../']= already makes =countries/_/= a first-hit fallback | Holds (=country.py:1977-2010=). Refines to: *5* live global tables, since =canonical_education_labels.org= and =canonical_housing_labels.org= declare none (the latter as of =07c9e697d=, today). |
+| =_merge_categorical_tables= (=country.py:385-395=) is the ONLY consumer of =_ADDITIVE_CATEGORICAL_TABLES=; nothing uses it to license summation | Holds --- swept =lsms_library/= and =tests/=; the only code reader is =country.py:391=, every other hit is a docstring, a country =.org= comment, or a test import. |
+| =_row_union_categorical= merges on =_categorical_key_column=, positional, never declared | Holds (=country.py:353-357=, =359-382=). *Addition*: there are *six* positional-key implementations, not four --- =local_tools.py:1539= (=idxvars='Code'=, a *different* default, serving the 8 of 71 =countries/= call sites that don't pass =idxvars== explicitly) and =util/orgtbl.py:65= (=source_column=None= -> first column). |
+| =Wave.categorical_mapping= uses a plain =dict.update=, so the wave rung is whole-table even for the four additive names | Holds (=country.py:1160-1168=; the =.update= is =:1167=). |
+
+* 0. What the 2026-06 design decided, what this keeps, what it reverses
+
+=DESIGN_u_consolidation_2026-06-07.org= is the design behind
+=_merge_categorical_tables= / =_ADDITIVE_CATEGORICAL_TABLES=. A reader should
+not have to diff two documents, so:
+
+*Kept, unchanged.*
+- Row identity for a union is the *source-label column*, and the union is
+  /rows/ while columns are /outer-joined/ (:113--117). Outer-joining
+  non-composing columns is the right default and this design keeps it; what it
+  adds is a name for /why/ a column does not compose (§1.3), so the outer join
+  stops being the only thing that happens to such a column.
+- The country row wins on a key collision; unreferenced global keys remain
+  (:114). Unchanged.
+- A small, explicit, auditable set of composable tables (:118). Kept in
+  substance and moved from a hardcoded frozenset into the files themselves
+  (§6).
+- "Delete identity-map rows that map a code to itself" and "Nigeria: add rows
+  for the ~32 codes still missing" (D4, :157--162 / :182). *This is model point
+  2.* The new model does not invent totality; it names the condition D4 already
+  demanded and makes it checkable.
+
+*Reversed, and here is the evidence.* D4 (:155--157) says:
+
+#+begin_quote
+=Code= remains a permitted source-column name where the survey is genuinely
+code-valued, e.g. Nigeria; the auto-mapper keys on the first non-=Preferred
+Label= column either way.
+#+end_quote
+
+The second clause is what fails. "Either way" is true of the /auto-mapper/ and
+false of the /merge/: =_row_union_categorical= (=country.py:359-382=) returns
+the country table wholesale when =gk != ck=. So the four countries whose =u= is
+=Code=-keyed --- *Malawi, Mali, Nigeria, Uganda* --- inherit *zero* rows from
+the global =Original Label=-keyed =u.org= that D2 created for them. Measured
+(#928 and re-measured here): =u= 9 aligned / 4 fallback.
+
+The consequence, measured on the warm =Malawi/var/food_acquired.parquet= after
+applying Malawi's own =#+name: u=:
+
+| served =u= spelling | rows |
+|---------------------+---------|
+| =Kilogramme=        | 108,830 |
+| =Kg=                |  35,808 |
+| =kg=                |   1,236 |
+| =Kilogram=          |     410 |
+| =Kgs=               |       1 |
+| *total*             | *146,285* |
+
+Five spellings of the kilogram. =lsms_library/categorical_mapping/u.org= holds
+exactly the rows that unify four of them (=Kgs= is a genuine gap in =u.org=:
+it has =kgs= and =KGS=, not =Kgs=) --- and cannot reach Malawi because Malawi's
+key column is called =Code=.
+
+So the reversal is narrower than "codes are forbidden at country level":
+
+#+begin_quote
+*A code-keyed table cannot be a /composing/ table. It is a decode stage
+/beneath/ a label-keyed fold.*
+#+end_quote
+
+Nigeria keeps its =Code=-keyed =u=. What changes is that it stops being a
+candidate for row-union with a label-keyed global table (which it never
+successfully was) and becomes an explicitly declared decode whose /output/ is
+what composes. Malawi's =01 -> Kilogramme= then meets the global
+=Kilogramme -> Kg= and the four spellings collapse with *no edit to Malawi's
+table rows at all*.
+
+*Not reversed, but corrected in emphasis.* The 2026-06 design calls the
+positional key a decision, and it is. This note does not call it an oversight.
+It observes that the decision has since acquired *six* independent
+implementations with *two different defaults*, which is what makes it
+unmaintainable rather than wrong:
+
+| site | what it does |
+|---|---|
+| =country.py:353= =_categorical_key_column= | first non-=Preferred Label= |
+| =country.py:2385= cluster_features market labels | same rule, re-derived |
+| =country.py:2880= =_build_replace_dict= | same rule, re-derived |
+| =country.py:3222= =harmonize_<method>= hook | same rule, re-derived |
+| =local_tools.py:1539= =get_categorical_mapping= | =idxvars='Code'= --- a *different* default |
+| =util/orgtbl.py:65= =add_or_update_column= | =source_column=None= -> first column |
+
+#928 counted four; the last two are new here. The =orgtbl= one matters for the
+migration (§7): the tool that would /run/ a migration also keys positionally.
+
+* 1. The model
+
+** 1.1 Three concepts, three words
+
+The brief is right that one word is doing three jobs. Stated precisely:
+
+- *inherits* --- a relation between two /levels/ (wave, country, global) holding
+  a table of the same name. Either the lower level *replaces* the upper, or it
+  *extends* it. This is the granularity question of #953.
+- *composes* --- a property of two /key columns/: they compose iff they draw on
+  the same namespace, so a row of one can override a row of the other. Two
+  label columns over the same survey vocabulary compose; a code column and a
+  label column do not, /whatever their headings say/.
+- *commensurable* --- a property of a /fold/: when a table maps n>1 source
+  values to one =Preferred Label=, are the values measured under those n source
+  labels safe to *add* (or to convert with one kg factor)? =Kg=+=Kilogramme=
+  yes; =Lb=+=Kg= no; =bidon de 5 litres=+=bidon de 200 litres= no.
+
+The third is asserted *by the fold itself*, not by any cross-level merge. It
+applies to a purely country-level table that the =_ADDITIVE_CATEGORICAL_TABLES=
+frozenset never touches, which is exactly why #833 is an open defect in five
+countries on the =j= axis with no mechanism watching it.
+
+** 1.2 Composable columns are label-keyed
+
+Measured over 312 tables, keys classified by /content/ (every non-blank key
+value numeric -> code; none numeric -> label; otherwise mixed):
+
+| key namespace | tables |
+|---------------+--------|
+| label         |    148 |
+| code          |    142 |
+| mixed         |     22 |
+
+Label-keyed is the composing namespace. A country's label key and the global
+table's label key name the same thing (a survey's own spelling of a unit, a
+school level, an asset) and a row of one legitimately overrides a row of the
+other. Two code keys do *not* compose across levels even though both are
+"codes": Nigeria's =1 = Kg= and Uganda's =1 = Kg= agree by coincidence, and
+nothing in the corpus guarantees the next pair will.
+
+*Therefore: only label-keyed tables compose, and only within one country's
+level stack or against the global level.* Measured, the global level is
+already almost there: of its *5 live tables* (the other two global files,
+=canonical_education_labels.org= and =canonical_housing_labels.org=, declare
+none), =u=, =harmonize_assets= and =harmonize_education= are all
+=Original Label=-keyed and =u_kg= keys on the canonical =Unit=. The single
+exception is =ehcvm_units=, which is =Code=-keyed --- and it is consumed
+exclusively by explicit =mappings: ['ehcvm_units','Code','Preferred Label']=
+list forms in three wave =data_info.yml= files, never by the merge. So no
+global table composes on a code namespace today; open decision 5 asks whether
+=ehcvm_units= should stay there.
+
+** 1.3 Additional columns do not compose; they are level-scoped
+
+The brief's point 1. Measured: *91 distinct headings*, *812 (table, heading)
+pairs*. Classified by role:
+
+| role | distinct headings | (table,heading) pairs |
+|------+-------------------+-----------------------|
+| =canonical= (=Preferred Label=)                  |  1 | 280 |
+| =key= (=Code=, =Original Label=, =Alternate Spelling=, =Text=, =Unit=, =Aggregate=, =GD Category=, =proizvod=) |  8 | 306 |
+| =label= (alternate output: =Aggregate Label=, =Label=, =Comparable Label=, =Nutrition Label=, =Aggregate (short)=) |  5 |  49 |
+| =wave-scoped= (=2019-20=, =Code_8h=, =Label_12B=, =Wave=, =File=, ...) --- *and this class is two things, see §1.6* | 52 | 134 |
+| =extra= (local evidence: =FCT ID=, =Basis=, =Note=, =Food=, =Species=, ...) | 25 |  43 |
+
+So: *14 headings carry 635 of 812 pairs* and are the only ones that need to
+mean the same thing at two levels. The 25 =extra= headings are level-local by
+construction and are exactly what outer-joining on merge (2026-06, :117)
+handles correctly. The model does not change what happens to them; it lets a
+file /say/ that is what they are. *The 52 wave-scoped headings are NOT all
+level-local, and §1.3b is that correction.*
+
+The =extra= tail also contains a legible cost of never having said so: the
+food-composition-table identifier is spelled *eight* ways in eight files ---
+=FCT ID= (3), =FCT Code=, =FCT code=, =FTC Code=, =FDC ID=, =Food Codes=,
+=FCT Label=, =FTC Label=. Under the model these stay level-local and their
+spelling stops mattering, because nothing tries to compose them.
+
+** 1.3b A wave-named column is usually a KEY, not a presence mark --- and the model has no spelling for it
+
+The =wave-scoped= class above is two different objects sharing one shape, and
+separating them is the one place the corpus refuses to fit the model as briefed.
+Measured over all 134 (table, heading) pairs in that class, by whether the
+column's non-blank values are drawn from {=x=, =X=, =yes=, =✓=, =1=, =*=}:
+
+| what the column holds | pairs | tables |
+|-----------------------+-------+--------|
+| a presence *mark*     |  *12* | 5 (*all Mali*) |
+| free strings --- i.e. *that wave's raw label* | *122* | *28*, in 14 countries |
+
+Uganda's =u= is the clearest instance:
+
+: | Code | Preferred Label | 2005-06        | 2009-10  | ... | 2019-20        |
+: |    1 | Kg              | Kilogram (kg)  | Kilogram | ... | Kilogram (kg)  |
+: |    0 | (blank)         |                |          | ... |                |
+
+That is *three* namespaces in one table --- an instrument =Code=, a canonical
+=Preferred Label=, and eight per-wave *label keys* --- and the positional rule
+picks the =Code=. GhanaLSS's =harmonize_food= is the same shape with the key
+column entirely absent from the =Code= slot (§3.1). The affected tables are the
+ones the =u= and =j= axes care most about: GhanaLSS =harmonize_food= (35 wave
+columns), Nigeria =harmonize_food= (8), Uganda =u= (8), GhanaLSS =nonfood_items=
+(6), Ethiopia / Malawi =harmonize_food= (5 each), Nigeria =u= (4), Tanzania =u=
+(3), Niger =u= (2), ...
+
+*Consequence for §1.3.* A per-wave key column *must not* be outer-joined across
+levels: it is blank for six of seven waves by construction, and unioning it
+against another level's table produces a column whose blanks and values are not
+distinguishable from real absences. Only Mali's 12 presence marks are safe to
+outer-join, and they are 12 of 134.
+
+*Consequence for the sentinel.* =#+key:= as a single column name cannot express
+"the column named after the wave being built". Two options, both cheap:
+
+- =#+key: {wave}= --- a template value the resolver substitutes with the wave
+  label at read time, falling back to =#+key:='s other value (or the positional
+  rule) when no such column exists. ~one branch in the resolver; expresses the
+  28 tables exactly.
+- Declare these tables *out of model*: =#+column: 2016-17 = wavekey= and no
+  cross-level composition for the table at all (whole-table override, i.e.
+  today's behaviour). Honest, zero new machinery, and gives up composing the
+  28 tables that most need it.
+
+*Recommend =#+key: {wave}=, and note it is inseparable from §7 open decision 1*:
+the 28 per-wave-key tables and the only country with intra-country multi-level
+tables (GhanaLSS) are the same population, so "does the wave rung extend or
+replace?" and "can the key be wave-templated?" are one decision.
+
+** 1.4 A code-keyed table is a terminal decode
+
+The brief's point 2, adopted, with one addition: the decode is a /stage/, not a
+/rung/. A code-keyed table is applied first and its output --- a label --- is
+then the input to the label-keyed fold. Formally, for a given axis in a given
+country:
+
+: served = fold_global( fold_country( decode_wave_or_country( raw ) ) )
+
+where =decode= is the identity when no code-keyed table is declared. Composition
+of functions, not union of rows. The condition that makes it well-formed is
+*totality*: every code the source emits must appear in the decode table, so no
+numeric code reaches a label-keyed stage.
+
+*Totality is nearly true, and its violations are cheap to name.* Two
+measurements.
+
+/Internal/ (does every code /in the table/ reach a non-blank label?): 142
+code-keyed tables, *8 violate*, *153 rows*:
+
+| country | table | unmapped codes |
+|---------+--------------------+----|
+| Uganda      | =u=                  | *143* |
+| Tanzania    | =harmonize_species=  | 3 |
+| EthiopiaRHS | =erhs_relation_1989= | 2 |
+| EthiopiaRHS | =erhs_sex=           | 2 |
+| EthiopiaRHS | =erhs_relation=      | 1 |
+| EthiopiaRHS | =harmonize_unit=     | 1 |
+| Malawi      | =harmonize_species=  | 1 |
+| EthiopiaRHS | =erhs_site_region_1989= | 5 rows whose target is itself numeric |
+
+Uganda's 143 are #928's =---= cells on =u=, i.e. one cell is 93% of the corpus
+violation. Separately, *2 identity-map rows* survive D4's "delete identity-map
+rows" instruction --- Burkina Faso =harmonize_food=, =11.0 -> 11.0= and
+=15.0 -> 15.0= --- and they are the only 2 rows corpus-wide whose
+=Preferred Label= is itself numeric.
+
+/External/ (does every code /the data emits/ appear in the table?), measured by
+applying each country's own =#+name: u= to the warm
+=var/food_acquired.parquet= and counting values that still begin with a digit.
+Restricted to the 12 countries that declare =#+name: u=:
+
+| country | food_acquired rows | code-like =u= rows | share | distinct |
+|---------+--------+-------+-------+----|
+| Togo         | 112,445 | *2,060* | 1.83% | 4 |
+| Malawi       | 971,531 | *3,894* | 0.40% | 59 |
+| Burkina Faso | 765,816 |    129  | 0.02% | 2 |
+| Nigeria      | 595,725 |      1  | 0.00% | 1 |
+| Benin, CotedIvoire, Ethiopia, Guinea-Bissau, Mali, Niger, Senegal, Tanzania | -- | *0* | -- | 0 |
+
+*8 of 12 are total; 4 are not.* Togo's four missing codes (659, 660, 662, 114)
+are the same gap D4 named in 2026-06 ("Togo: inherit metric units; add the
+missing code rows"). Three years on, totality is a real and unmet condition ---
+which is the argument for making it a /check/ rather than an /instruction/.
+
+** 1.5 Commensurability is asserted by the fold
+
+Measured over every table on the =u= or =j= axis that has a =Preferred Label=,
+counting each =Preferred Label= receiving n>1 source values:
+
+| axis | folds | all sources are spelling variants | all sources numeric (codes) | *distinct labels* |
+|------+-------+------+------+------|
+| =j=  | 778   | 174  | 149  | *455* |
+| =u=  | 223   |  28  |  18  | *177* |
+
+The /spelling/ column is machine-verifiable: after NFKD-stripping,
+case-folding, removing non-alphanumerics and a plural/=-mme= suffix, all
+sources normalise to one string. Those 202 folds are commensurable by
+construction and need no assertion.
+
+The *632 distinct-label folds* are the unguarded surface. #833 names five
+countries on =j=; the =u= axis is comparable in kind and concentrated
+differently: Senegal 55, Niger 41, Malawi 23, GhanaLSS =harmonize_price_unit=
+17, Ethiopia 13, Mali 11, Burkina Faso 10. Examples from Burkina's =u=, all
+folding to a single =Preferred Label= that then receives a single =u_kg=
+factor:
+
+- =Bidon= <- {=Bidon=, =bidon de 5 litres=, =bidon de 20 litres=, =bidon de 200 litres=} --- a *40x* spread
+- =Boîte= <- {=Boite=, =Boîte=, =Boîte de lait=, =Boîte de tomate=, =grosse boite de tomate=}
+- =Kg= <- {=Kg=, =kg=, =Avec os au Kg=, =Sans os au Kg=} --- commensurable as a mass, but it folds a /condition/ (with bone / without bone), the =crop_production= =condition= axis of #833
+
+A /machine-catchable subset/ exists and is small: folds whose source labels
+carry *conflicting explicit magnitudes*. Corpus-wide there are exactly *2* ---
+Burkina =Bidon= (5 / 20 / 200 L) and GhanaLSS =harmonize_price_unit= =Piece=
+(325 ml / 330 ml). Two is not a lot, and that is the point: the remaining 630
+are /not/ machine-decidable, so the only instrument available is a curator's
+signed assertion. That is what the sentinel is for.
+
+* 2. The sentinel vocabulary and its spelling
+
+** 2.1 Spelling: org keyword lines above the table
+
+#+begin_src org
+#+name: u
+#+key: Code
+#+keyspace: code
+#+fold: spelling
+#+column: Preferred Label = canonical
+#+column: 2018-19 = presence
+#+column: FCT ID = extra
+| Code | Preferred Label | 2018-19 | FCT ID |
+#+end_src
+
+All four keywords are *optional*; every one has a default that reproduces
+today's behaviour byte for byte.
+
+| keyword | values | default | answers |
+|---------+--------+---------+---------|
+| =#+key:=      | a column name | first non-=Preferred Label= column | which column is the key |
+| =#+keyspace:= | =label= \vert =code= \vert a named namespace | inferred from content | does this key *compose* |
+| =#+fold:=     | =spelling= \vert =asserted= \vert =none= | *undeclared* (no check --- today's behaviour) | is a many-to-one fold *commensurable* |
+| =#+column:=   | =<Name> = canonical\vert label\vert presence\vert extra\vert meta= | inferred per §1.3 | does this column compose |
+
+=#+key:= is #928's P1 *verbatim*; this design subsumes it rather than competing
+with it. #928's P2 (one resolver, all call sites) is the mechanism that reads
+all four. #928's P3 =Status= / =Notes= become =#+column: Status = meta= ---
+i.e. reservation is /declared/, which answers #928's own open question ("should
+=Status= / =Notes= be reserved names, or should reservation be declared?") in
+favour of declared. Nothing in #928 is deferred except P4's =pd.NA= collapse,
+which is orthogonal.
+
+** 2.2 Why a keyword line and not a header convention or a subdirectory
+
+*Verified, not assumed*: a file containing =#+key:=, =#+keyspace:=, =#+fold:=
+and =#+column:= lines between =#+name:= and the table parses today, with the
+keywords silently skipped and the table's columns unchanged
+(=local_tools.all_dfs_from_orgfile=; its "skip any extra =#+= lines" loop is
+=local_tools.py:3062ff=, and is also the #693 bug). So adoption is incremental
+with *zero breakage*: old code ignores the lines, new code honours them, no
+table must declare anything.
+
+*A header convention (=Code:key=, =FCT ID:extra=) is ruled out by count.* Column
+headings are referenced by literal string in *28* places in =lsms_library/*.py=
+and =util/*.py=, and in *177* =mappings: [table, key, value]= list entries in
+wave =data_info.yml= files (of 189 =mappings:= lines). Decorating the heading
+breaks every one of them and forces a lockstep migration of config and code.
+
+*A subdirectory or a new file is ruled out by the cache hasher.* The three
+sites that fold mapping files into a build fingerprint all use a
+*non-recursive* =glob("*.org")= --- =country.py:943-947= (wave: country =_/= and
+the global dir), =country.py:948-952= (the =parent_cmap= single-file fallback)
+and =country.py:3565= (country-level build inputs). A =categorical_mapping.d/=
+would be invisible to all three, so editing a table there would invalidate
+nothing: the #808 / #866 disease introduced deliberately. A keyword line lives
+inside an already-hashed =.org= and needs *no hasher change at all*. (If #953
+option 1 or @ligon's per-table-file proposal is taken later, the hasher edit is
+its cost, not this design's.)
+
+** 2.3 What each sentinel value means
+
+- =#+keyspace: label= --- the key holds survey spellings. *Composes* with any
+  other =label= keyspace for the same table name. This is the only value that
+  permits a cross-level row-union.
+- =#+keyspace: code= --- the key holds instrument codes. *Terminal*: never
+  unions with anything; applied as a decode stage before any fold (§1.4). Its
+  =Preferred Label= column must be total (checkable, §4.1).
+- =#+keyspace: <name>= --- an escape hatch for a shared code namespace that
+  genuinely /is/ shared (e.g. =ehcvm-2018=). Two tables compose iff they
+  declare the same name. Deliberately available and deliberately not used by
+  default; no corpus instance is proposed.
+- =#+fold: spelling= --- the curator asserts every many-to-one fold in this
+  table is a spelling variant. *Machine-verifiable* (§1.5), so this is a
+  cheap, falsifiable claim, not a rubber stamp. *Opt-in, never the default*:
+  making =spelling= the default would fail 632 folds on the day it lands, which
+  is open decision 3, not a table cell.
+- =#+fold: asserted= --- the curator asserts the folds are commensurable on
+  grounds a machine cannot check. Requires a =#+column: Notes = meta= column
+  populated for each non-spelling fold, on the =absent_verdicts.csv= precedent
+  ("an unevidenced negative is unfalsifiable"). This is where #833's five
+  countries land.
+- =#+fold: none= --- this table's values are never summed or unit-converted,
+  so commensurability is not a question (e.g. =relationship=, =region=).
+
+* 3. Resolution under the model
+
+For a table name =T= and an axis value =raw=, in country =C=, wave =W=:
+
+1. *Collect.* Gather every declaration of =T= at the three levels --- wave
+   =W/_/categorical_mapping.org=, country =C/_/categorical_mapping.org=, global
+   =lsms_library/categorical_mapping/*.org=. Read each one's sentinels.
+2. *Partition by stage.* Tables with =keyspace: code= are *decode* tables;
+   tables with =keyspace: label= are *fold* tables. A level may declare at most
+   one of each for a given name (two of the same stage at one level is an
+   error, per #953's comment 2 §3).
+3. *Decode (at most one fires).* Apply the *lowest* level's decode table ---
+   wave beats country; the global level holds no decode table. Whole-table
+   replace: a decode is the instrument's own codebook and a lower level's
+   codebook supersedes, it does not extend. *Totality is required* (§4.1); a
+   miss is reported, never silently passed through.
+4. *Fold (all levels compose).* Row-union the label-keyed tables, *lower level
+   wins on key collision*, non-key columns outer-joined --- =_row_union_categorical=
+   (2026-06, :113-117), with two changes, now applied to /every/ table whose
+   sentinels license it rather than to four hardcoded names. Global is the base
+   layer; country overrides it; wave overrides country.
+
+   - *The join key comes from =#+key:=, not from position, and the
+     =gk != ck= fallback (=country.py:372=) is replaced by a keyspace check.*
+     "Exactly =_row_union_categorical=" would not do: it unions only when the
+     two key column /names/ are equal, so Mali's =Code= column of labels could
+     never meet the global =Original Label=. Under the model the two sides join
+     on their respective declared keys --- renaming one on the way in --- and
+     the union is attempted iff both declare =keyspace: label=. A code-keyed
+     side is not a fallback; it is scheduled at step 3.
+   - *The wave rung changes behaviour.* =Wave.categorical_mapping=
+     (=country.py:1160-1168=) is a plain =dict.update= at =:1167=, i.e.
+     whole-table override for *every* name, including the four additive ones.
+     Under the model a wave's =keyspace: label= table row-unions over the
+     country's instead of replacing it. *Blast radius is GhanaLSS alone* --- it
+     is the only country in the corpus with a table declared at two levels
+     (§7 open decision 1) --- and the same four tables are implicated in §1.3b,
+     which is why those two questions are one decision.
+5. *Emit.* The =canonical= column (=Preferred Label=) is the served value,
+   unless a =labels== kwarg selects a =#+column: ... = label= alternate.
+
+*A code-keyed table meeting a label-keyed one* is therefore never a merge
+conflict and never a silent fallback. They are *different stages*. Malawi's
+=Code=-keyed =u= decodes =01 -> Kilogramme=; the global label-keyed =u.org=
+then folds =Kilogramme -> Kg=. Nothing about Malawi's rows changes; the
+=_row_union_categorical= "key columns don't agree -> return country table"
+branch (=country.py:372=) stops being reachable for that pair, because the
+pair is no longer asked to union.
+
+*The template already exists.* =Country._unit_kg_factors= (=country.py:2013ff=)
+already composes two stages --- raw label -> =Preferred Label= via =u=, then
+=Preferred Label= -> kilograms via =u_kg= --- and its docstring states the
+constraint the decode stage must respect: =conversion_to_kgs= sees the *raw*
+=u=, because the derived-food dispatch runs before
+=_apply_categorical_mappings= (GH #770). So the decode stage must be available
+to =_unit_kg_factors=, not only to the read-time mapper.
+
+*Cache cost of the two-stage read: zero.* =_finalize_result= and
+=_apply_categorical_mappings= are read-path; =_finalize_result= is already in
+=_build_registry._EXCLUDED_CALLABLES=. Adding a stage there moves no
+fingerprint. The cost is entirely in *editing the files* (§7).
+
+** 3.1 The one case where the positional key is provably wrong
+
+GhanaLSS's country =harmonize_food= has columns
+
+: Preferred Label | Aggregate Label | 1987-88 | ... | 2016-17 | FCT Code
+
+so "first column that is not =Preferred Label=" resolves the key to *=Aggregate
+Label=* --- an *output* column. The real keys are the seven per-wave columns,
+each naming that wave's raw label; the eight wave-level =harmonize_food= tables
+have the same shape. Nothing breaks today only because every consumer of this
+table names its columns explicitly (=glss_prices.py:116=,
+=country._relabel_j=). #928 measured "live tables with a non-conventional
+positional key: 0" and that remains true; this is the demonstration that
+*positional is not the same as correct*, it is the same as *unused*.
+
+* 4. What becomes checkable, and what each check costs
+
+Today none of these can be asked of a file, because the file states none of it.
+
+** 4.1 Totality --- =keyspace: code= implies every code reaches a label
+
+Two checks, both already written as one-off sweeps for this note:
+
+- /Internal/ --- no blank / NaN / numeric =Preferred Label= in a code-keyed
+  table. Pure config read, *no data*. Cost: the full 312-table parse ran in
+  well under a second. Current failures: *8 tables, 153 rows* (§1.4).
+- /External/ --- every code the source emits appears in the table. Needs one
+  warm parquet per (country, axis). Cost: the 19-country =food_acquired= sweep
+  above is a parquet index-level read, seconds. This is the reincarnation of
+  =diagnostics.food_acquired_u_code_leaks= (=diagnostics.py:611=), which
+  already exists and is not wired to any gate; the sentinel is what tells a
+  generic checker /which/ tables to run it on. Current failures: *4 of 12
+  countries, 6,084 rows*.
+
+** 4.2 Key compatibility --- two levels that claim to compose really do
+
+Today =_row_union_categorical= compares key column *names* and falls back
+silently when they differ. That comparison is both too strict and too loose.
+
+- *Too strict*: Mali's =u= key column is headed =Code= and contains *labels*
+  (=Avec os au Kg=, =Kilogramme=, =Bidon=). It could compose with the global
+  label-keyed =u.org= and does not, purely because of the heading. Same for
+  Mali's =harmonize_food=, =harmonize_input=, =harmonize_labor_source=,
+  =harmonize_industry= --- *5 tables in one file*.
+- *Too loose*: Azerbaijan's and Guyana's =harmonize_education= key columns are
+  headed =Original Label= and contain *codes*. The names agree, so the union
+  /fires/ --- silently unioning a code namespace with the global label
+  namespace. No collision is possible, so nothing warns, and the 37 global
+  rows can never match those two countries' data. *This is why the sentinel
+  must carry the key's TYPE, not only its NAME: #928's =#+key:= alone does not
+  catch it.*
+
+Under the model the check is: a union is attempted iff both sides declare
+=keyspace: label=; otherwise the code-keyed side is scheduled as a decode. A
+declared =keyspace= that disagrees with the content classifier is a hard
+error. Cost: config-only, the same sub-second parse. Current disagreements:
+*7 genuine* (Mali x5, Azerbaijan, Guyana).
+
+** 4.3 Commensurability --- =#+fold: spelling= is falsifiable
+
+Run the normaliser over every many-to-one fold. Cost: config-only, sub-second.
+Today it would pass 202 folds and *refuse 632*, which is the review queue, not
+a failure of the check. The two magnitude-conflicting folds (§1.5) are refused
+by a second, stricter regex check that a curator cannot talk past. #833's
+instances become a bounded, enumerable backlog with a place in the file to
+record the decision.
+
+** 4.4 What is NOT checkable and should not be claimed
+
+Whether =Groundnut= should include =Boiled groundnuts= (#833, Malawi) is a
+judgement about the instrument. The design gives it a *place to be recorded and
+a name to be cited*; it does not adjudicate it. Do not build a checker that
+pretends to.
+
+* 5. Migration, measured
+
+** 5.1 Column headings that must change
+
+*7 headings, in 3 files.* That is the whole of the "composable columns must be
+label-keyed" migration:
+
+| file | tables | change |
+|------+--------+--------|
+| =Mali/_/categorical_mapping.org= | =u=, =harmonize_food=, =harmonize_input=, =harmonize_labor_source=, =harmonize_industry= | heading =Code= -> =Original Label= (contents are already labels) |
+| =Azerbaijan/_/categorical_mapping.org= | =harmonize_education= | heading =Original Label= -> =Code= (contents are codes) |
+| =Guyana/_/categorical_mapping.org= | =harmonize_education= | same |
+
+The sweep reports 29 tables whose key heading disagrees with its content; *22
+of those are a single stray code row in an otherwise label-keyed table* ---
+Niger =harmonize_assets= =166 -> Other=, GhanaSPS =AreaUnit= =-999 -> Other=,
+Senegal =u= =1.0 -> NA=, Uganda =harmonize_education= four codes -> =Unknown=,
+the EHCVM =harmonize_input= / =harmonize_seed_crop= family. *Those are totality
+gaps to decode (§4.1), not headings to rename.* Do not report 29.
+
+Note also what is *not* on this list: the 122 per-wave key columns of §1.3b
+need no rename --- their headings are wave labels and must stay that way. What
+they need is a key spelling that can name them.
+
+Strictly, even the 7 are optional: =#+keyspace:= alone makes the composition
+correct without touching a heading. They are recommended because a column
+called =Code= holding labels will mislead the next reader, and because the
+rename is a two-minute text edit per file.
+
+** 5.2 Sentinel adoption
+
+*47 files, 312 tables.* If every table declares its sentinels: ~312 =#+key:= +
+~312 =#+keyspace:= lines, plus =#+fold:= on the ~40 tables on the =u= / =j=
+axes and =#+column:= only for the 25 =extra= and 52 =presence= headings that
+want documenting. But adoption is *incremental by design*: the inferred
+defaults are correct for 290 of 312 tables (the 22 mixed-key tables are the
+exceptions), so a staged migration can declare sentinels only where the
+inference is wrong or the claim is load-bearing --- the 12 =u= tables, the ~27
+=harmonize_food= / =harmonize_crop= tables, and the 8 totality violators ---
+which is *~47 tables in ~20 files*, not 312. Add the *28 per-wave-key tables*
+of §1.3b if =#+key: {wave}= is adopted --- those cannot be inferred and must be
+declared; they sit in 14 countries, so that is 14 country re-warms.
+
+** 5.3 The cache bill, stated
+
+- Editing *any* global =.org= = *full-corpus cold re-warm*. =gorg:<name>.org=
+  is in every wave's =_input_hash= for every country (=country.py:943-947=),
+  and =Wave.grab_data= folds =build_transforms_fingerprint=, so both L2 tiers
+  invalidate. Do the global edits *in one commit*.
+- Editing a country's =categorical_mapping.org= = *that country* re-warms.
+  Measured precedent: a prose-only GhanaLSS edit moved 17 of 119 table hashes
+  (#928). Batch per country; do not dribble.
+- =#+keyspace:= / =#+fold:= / =#+column:= lines are *inert to behaviour* until
+  the resolver reads them, but they are *not* inert to the hash, because the
+  whole file is hashed. So the sentinel-adoption pass and the resolver change
+  should land together, per country, or the re-warm is paid twice.
+
+** 5.4 The tool
+
+=util/orgtbl.py:65= =add_or_update_column= writes a complete map into a named
+column and preserves alignment. It is the right tool for the parts of a
+migration that /add/ a column. It *cannot rename a heading* and its
+=source_column= default is itself positional, so §5.1's seven renames are
+either a hand edit (3 files) or a new =rename_column= sibling. Say which before
+starting; do not discover it mid-pass.
+
+* 6. What to remove
+
+- *=_ADDITIVE_CATEGORICAL_TABLES= dissolves.* Verified: its only code reader is
+  =country.py:391= in =_merge_categorical_tables= (every other hit is a
+  docstring, a prose comment in a country =.org=, or a test). Under the model
+  the merge rule is derived --- a =keyspace: label= pair row-unions, a
+  =keyspace: code= table is a decode --- so the four-name allow-list has
+  nothing left to decide. Its *intent* survives verbatim (2026-06 :118: "small,
+  explicit, auditable"); what changes is that the declaration moves from a
+  frozenset in =country.py= to the file it describes, which is also what makes
+  a fifth table possible without a framework edit. =tests/test_categorical_merge.py=
+  and =tests/test_gh919_country_qualified_units.py= import the name and would
+  be rewritten against the sentinels.
+- *=_categorical_key_column= becomes a fallback*, not the rule: #928's P2
+  resolver order (explicit =idxvars== -> =#+key:= -> positional -> =None=),
+  with the two extra sites found here (=local_tools.py:1539=,
+  =util/orgtbl.py:65=) folded in --- six sites, one resolver. =get_categorical_mapping='s =idxvars='Code'=
+  default is the one that should go: 63 of 71 call sites under =countries/=
+  already pass =idxvars== explicitly, so the default serves 8 calls and
+  contradicts the other five sites' rule.
+- *The cascade's third rung retires* --- #953 option 3. Its own correction
+  comment already makes this the strongest option: mechanism 2 reaches the
+  global level for every table and has since #168, so teaching mechanism 1 a
+  directory would build a second path to the same six files with a different
+  merge rule. Under this design the global level's semantics are declared in
+  the files, and a build-time reader that ignored those declarations would be
+  a third semantics. Retire =dirs[2]= and raise a message that names mechanism 2.
+- *Not removed, and a prerequisite rather than part of this design*: #693
+  (=all_dfs_from_orgfile= must skip =#+begin_...= blocks). Note the corpus
+  instance was closed *this morning* by commit =07c9e697d=, which comma-escaped
+  the two illustrative =#+name:= lines in =canonical_housing_labels.org= ---
+  i.e. #693's fallback option (b), de-fang the file. *The parser bug itself is
+  still live*: re-verified here on a synthetic file, a =#+name:= table inside
+  =#+begin_example= parses to a live table. Any sentinel scheme that reads
+  keywords above a table inherits it --- and worse, it inherits it at a
+  keyword, so a =#+key:= line inside an example block would be read as
+  configuration for whatever table follows the block. Option (a) becomes a
+  prerequisite rather than a preference.
+
+* 7. Open decisions for @ligon
+
+1. *Does the wave rung extend or replace --- and can a key be wave-templated?
+   (One question, see §1.3b and §3 step 4.)* Options: (a)
+   whole-table replace, lowest level wins --- what §3 proposes, on the ground
+   that a codebook is the instrument's and a wave's instrument supersedes the
+   country's summary; (b) row-union like the fold stage. Consequence: only
+   GhanaLSS is affected --- it is the *only* country with any table declared at
+   two levels (=harmonize_food= x8, =harmonize_education= x4, =region= x5,
+   =relationship= x3). Under (a) GhanaLSS 1991-92's =Code=-keyed =relationship=
+   fully replaces the country's =Original Label=-keyed one, which is what
+   happens today. Under (b) they would have to be reconciled first.
+2. *Is =#+keyspace:= inferred-by-default or required?* Inferred is byte-compatible
+   and adoptable in 20 files (§5.2); required is honest but is a 312-table edit
+   and a full-corpus re-warm. Recommend inferred-with-a-hard-error-on-disagreement,
+   and required only for tables on the =u= / =j= axes.
+3. *=#+fold: asserted= without =Notes= --- warn or refuse?* The
+   =absent_verdicts.csv= precedent refuses. Refusing turns 632 folds into 632
+   blockers on the day it lands, so the honest sequencing is: refuse for the
+   =u= / =j= axes only, warn elsewhere. Needs a decision, because "warn
+   everywhere" is how #323 survived its first fix.
+4. *Do the 7 heading renames happen?* They are optional under
+   =#+keyspace:= (§5.1). Renaming costs 3 files and 3 country re-warms and
+   makes the files legible; not renaming leaves a column called =Code= holding
+   =Kilogramme= forever, documented by a keyword two lines above it.
+5. *Should the global level be permitted a code-keyed table at all?*
+   =ehcvm_units.org= is one today, consumed only by explicit =mappings:= list
+   forms in three wave =data_info.yml= files. Under §1.2 the global level holds
+   no decode table; either =ehcvm_units= is exempted as "not part of the
+   cascade" or it moves. Cheap either way; decide rather than inherit.
+6. *Where does =#+fold:= live for a table that exists at two levels?* Per-level
+   (each level asserts its own folds) or per-name (one assertion governs the
+   composed table)? Per-level is simpler and is what §3 assumes; per-name is
+   what a user of the composed result actually needs.
+
+* 8. Deliberately left out
+
+- *Adjudicating #833.* This design gives the =j=-axis folds a declaration and a
+  check; it does not decide whether Uganda's =Maize= Aggregate should split.
+  The 455 =j=-axis distinct-label folds are a queue, not a bug list.
+- *#928's P4* (the =pd.NA= ignorance collapse). Orthogonal, and its own
+  warning --- collapsing =Unknown= to =pd.NA= on a declared index level
+  re-creates #842/#847 --- stands untouched.
+- *Cross-country label harmonization.* Two countries' =Preferred Label= strings
+  matching does not make their categories equal
+  (=SkunkWorks/cross_country_label_harmonization.org=;
+  =semantic_curation_proposal.org= :49). =#+keyspace:= is about a /key/
+  namespace, never an output one. Nothing here licenses pooling Malawi's
+  =Groundnut= with Nigeria's.
+- *#953's file-layout question* (one file per level vs. one file per table,
+  =categorical_mapping/= vs =.d/=). The sentinels are layout-independent by
+  construction --- they sit above a =#+name:= table wherever it lives --- so
+  this design neither needs nor blocks that choice. Its cost (three hasher
+  edits at =country.py:943=, =:948=, =:3565=) belongs to that issue.
+- *A migration of the 32 =Code= \vert =Label= terminal decodes to
+  =Preferred Label=.* Explicitly rejected: =_build_replace_dict=
+  (=country.py:2880=) dispatches by table *name*, case-insensitively, so giving
+  GhanaLSS 1991-92's =#+name: rural=, =#+name: units= or =#+name: relationship=
+  a =Preferred Label= column would auto-apply them to the =Rural= / =u= /
+  =Relationship= columns with no other edit. Leaving them as =Label= and
+  declaring =#+column: Label = canonical= is *safer than renaming*, and that is
+  an argument for the sentinel rather than a limitation of it.
+- *Performance.* Every check proposed is a config parse (sub-second over 312
+  tables) or a parquet index read; none was measured as needing more.

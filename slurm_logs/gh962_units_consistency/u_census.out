@@ -1,0 +1,34 @@
+food_acquired	Benin	187930	0	{}	0
+food_acquired	Burkina_Faso	765816	0	{'unknown': 460331}	129
+food_acquired	Cambodia	38201	0	{'': 3010}	0
+food_acquired	CotedIvoire	296945	0	{}	0
+food_acquired	Ethiopia	326456	0	{'unknown': 603}	0
+food_acquired	EthiopiaRHS	54693	0	{'value': 174}	2359
+food_acquired	GhanaLSS	5338617	13380	{'none': 2508, 'value': 3550960}	0
+food_acquired	GhanaSPS	407929	13903	{'other': 5049}	0
+food_acquired	Guatemala	215982	0	{}	0
+food_acquired	Guinea-Bissau	126925	0	{}	0
+food_acquired	Malawi	971531	441	{'other': 894}	201047
+food_acquired	Mali	431046	0	{}	0
+food_acquired	Niger	239882	0	{'unknown': 8}	131541
+food_acquired	Nigeria	595725	0	{'none': 847}	594878
+food_acquired	Panama	571354	443	{'value': 17821}	5064
+food_acquired	Senegal	436576	21	{}	221166
+food_acquired	Serbia	200046	0	{'value': 3772}	0
+food_acquired	Tanzania	251730	0	{}	0
+food_acquired	Togo	112445	0	{}	2060
+crop_production	Benin	9056	1005	{}	0
+crop_production	Burkina_Faso	15593	546	{}	0
+crop_production	CotedIvoire	22223	6365	{}	0
+crop_production	Ethiopia	85519	0	{}	0
+crop_production	EthiopiaRHS	17523	0	{}	0
+crop_production	GhanaLSS	(no u)	0	0
+crop_production	GhanaSPS	25109	0	{'unknown': 249, 'other': 280}	24
+crop_production	Guinea-Bissau	10579	0	{}	0
+crop_production	Malawi	135078	8902	{}	69386
+crop_production	Mali	35060	1910	{}	0
+crop_production	Niger	47077	0	{'unknown': 5656}	0
+crop_production	Nigeria	62844	13138	{}	0
+crop_production	Senegal	8428	597	{}	0
+crop_production	Tanzania	14126	2395	{}	0
+crop_production	Togo	11565	606	{}	0

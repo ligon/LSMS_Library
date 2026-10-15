@@ -1,0 +1,299 @@
+* GH #813 adjudication: the unreached keys, and what #698/#804 need
+
+Recomputed on =github/development= at =3cf124ca3= with =bench/kinship_reach.py=
+(34 countries with data; Armenia and Nepal have none), warm cache:
+
+: kinship.yml keys: 473; reached: 343; UNREACHED: 130
+
+*130, not 131*, and the English base group is *31, not 32*.  The issue's
+figures were taken on an earlier base; the one key that moved is *not
+attributable from here*, because the full list the issue points at
+(=~/tmp/gh808/kinship_reach.log=) does not exist on this node.  The unreached
+SET is byte-identical before and after PR #954's source fixes -- that is the
+proof those fixes are targeted.
+
+** Overlap with PR #951: ZERO, and for a structural reason
+
+None of #951's 70 provably-unreachable (=.title()=-shadowed) keys is in this
+130.  =kinship_reach='s reach test is
+=k.strip().title() in seen or k in raw_seen=, so a shadowed key is credited as
+REACHED whenever its title-cased twin is emitted -- and all 70 are in exactly
+that state.  The two sets are disjoint by construction, not by luck.  After
+#951 lands the counts become *403 keys, 273 reached, 130 unreached*; #951
+changes the denominator and leaves this list untouched.
+
+** The table
+
+| # | grp | commit     | n | what they are | could a survey emit one? | recommendation |
+|---+-----+------------+---+---------------+--------------------------+----------------|
+| 1 | EN base | =6973b3a9= | 31 | bare English words: =Son=, =Daughter=, =Father=, =Mother=, =Grandson=, =Brother=, =Uncle=, =Husband=, =Wife=, =Stepson=, =Boarder=, =Guest=, =Domestic Worker=, ... | *Yes, plausibly.* Every corpus instrument spells the pair (=Son/Daughter=, =Father/Mother=) or the generic (=Child=, =Parent=), but a single-sex code is an ordinary instrument design and a new country could land on one tomorrow. | *KEEP as reference breadth.* 31 keys, all unambiguous, zero maintenance, and they are the only entries a new-country contributor can copy without inventing a tuple. Trimming buys nothing and removes the file's dictionary function. |
+| 2 | FR | =d1a983f3= | 81 | French variants: bare words (=Fils=, =Fille=, =Père=, =Mère=, =Frère=, =Sœur=, =Oncle=, =Tante=, =Domestique=, =Locataire=) and slash pairs (=Fils/Fille=, =Père/Mère=, =Beau-Père/Belle-Mère=) | *Not as spelled, by any EHCVM wave in the corpus.* See "the hypothesis is false" below. | *KEEP, as reference breadth -- same argument as row 1.* Each is an unambiguous French kinship term with a defensible tuple, and a francophone survey outside the EHCVM cohort could spell any of them. (The contrary case, for the record: 81 keys is 20% of the post-#951 file, written without checking a single instrument. If the file is ever cut for size, cut here first.) |
+| 3 | FR/ASCII | =424ac923= | 6 | =Conjoint (E)=, =Conjoint( E )=, =Pere, Mere=, =Frere, Soeur=, =Personne Non Apparentee Au Cm/Conjoint=, =Personne Non Apparentée Au Cm= | *No.* Each is an accent-stripped or re-spaced twin of a form that IS emitted: =Conjoint ( E )= (11,861), =Père, Mère= (2,197+), =Frère, Sœur= / =Frere, Soeur= (both emitted), =Personne Non Apparentée Au Cm/Conjoint= (10,863). | *DELETE.* These are guesses at mojibake/ASCII-fold variants, and GH #801 already removed the real artefact spellings at source. Keeping them re-opens the door #801 closed: a future encoding regression would resolve silently instead of warning. This is the one group I would delete without hesitation. |
+| 4 | ERHS | =22e0cab0= + =8ec0bab4= | 3 | =Other reative= (typo for "relative"), =Other unrelated=, =Tenant/Broader= (typo for "Boarder") | *No, and the typo is NOT a live mis-decode.* Checked: nothing in the repo outside =kinship.yml= contains the strings "reative" or "Broader". =22e0cab0= wired EthiopiaRHS 1999 with =converted_categoricals= LEFT UNSET, so =roster.tab='s embedded value labels -- carrying IFPRI's own typos -- reached kinship verbatim. The wave was later moved to the ERHS code-based recipe (=converted_categoricals: False= + =mappings: ['erhs_relation','Code','Preferred Label']=) and now serves =Other relative of head= (729), =Other unrelated person= (339), =Tenant/Boarder= (76). | *DELETE all three.* The decode path that produced them no longer exists. Note =Other reative= currently carries =[null, null, consanguineal]= (it was swept into the #698 policy while dead), so deleting it changes nothing. |
+| 5 | misc | =465ba297= | 3 | =Husband/Wife=, =Stepfather/Stepmother=, =Nurse, Assistant Girl= | *No config mentions any of the three* (grepped the whole =countries/= tree). =Husband/Wife= is plausible for a new country; the other two are not generic. | *KEEP =Husband/Wife=* (row-1 logic). *DELETE =Nurse, Assistant Girl=* -- an instrument-specific phrase from a survey we do not hold, so it is breadth for nobody. =Stepfather/Stepmother=: keep if row 1 is kept (it is the step twin of =Father/Mother=, which IS reached). |
+| 6 | TJK/GHA | =72eebdac= | 3 | =father/mother of husband=, =father/mother of wife=, =Househelp (Other Relative)= | *No, and the issue's note is off by a file.* Tajikistan 1999 serves =father/mother of the wife of head= (7 people) and =father/mother of the husband of head= (11) -- the long forms. The short forms appear ONLY in =Tajikistan/_/CONTENTS.org=, as narrative about the mapping GH #800 REMOVED. =Househelp (Other Relative)= is different: it is a live GhanaLSS *source* label, but =GhanaLSS/_/categorical_mapping.org= translates it to Preferred Label =Servant= before kinship sees it. | *DELETE the two Tajikistan near-misses* (dead spellings of a served pair; keeping them invites a future mapping to drift onto the wrong one -- which is exactly what #800 was). *KEEP =Househelp (Other Relative)=* as a documented no-op, or delete it with a note; it is the one key in the 130 whose non-reach is genuinely "translated before kinship". |
+| 7 | UGA | =50a99941= | 1 | =Son/Daughter Of Head Or Spouse= | *No -- it is a SPACING twin.* Uganda emits =Son / daughter of head or spouse= (17,411 people), which title-cases to =Son / Daughter Of Head Or Spouse= -- kinship.yml:137, a separate key. The unreached key is line 136. | *DELETE*, or fold into the canonicalisation rule the companion issue proposes. Same disposition as row 3: a spacing variant is not vocabulary. |
+| 8 | FR | =8ec0bab4= | 1 | =Autres Parents Du Cm= | *No.* The emitted form is always =.../Conjoint= (=Autres Parents Du Cm/Conjoint=, 24,126). The bare form asserts =[null,null,consanguineal]= where the =/Conjoint= form asserts =[null,null,null]= -- so if a wave ever did emit it, the file would disagree with itself by one affinity slot. | *DELETE.* |
+| 9 | FR | (blame line not resolved) | 1 | =Personne Non Apparentée Au Cm= -- the ACCENTED bare form; row 3's sixth key is the UNACCENTED twin | *No.* The emitted form is =Personne Non Apparentée Au Cm/Conjoint= (10,863). | *DELETE*, same reason as row 3. |
+
+*Totals: delete 15, keep 115.*  The delete list, spelled out so the arithmetic
+is checkable:
+
+| row | keys | n |
+|-----+------+---|
+| 3 | =Conjoint (E)=, =Conjoint( E )=, =Pere, Mere=, =Frere, Soeur=, =Personne Non Apparentee Au Cm/Conjoint=, =Personne Non Apparentée Au Cm= | 6 |
+| 4 | =Other reative=, =Other unrelated=, =Tenant/Broader= | 3 |
+| 5 | =Nurse, Assistant Girl= | 1 |
+| 6 | =father/mother of husband=, =father/mother of wife= | 2 |
+| 7 | =Son/Daughter Of Head Or Spouse= | 1 |
+| 8 | =Autres Parents Du Cm= | 1 |
+| 9 | =Personne Non Apparentée Au Cm= (the ACCENTED bare form; row 3's is the unaccented one) | 1 |
+|     | *total* | *15* |
+
+130 - 15 = *115 kept*.  Rows 2 and 5 are the only judgement calls.  **Nothing here is
+a served-data change**: an unreached key governs nobody by construction, which
+is why this whole list is worth less than the #698 item below.
+
+** The issue's EHCVM hypothesis is FALSE, measured
+
+#813 says the 81+8 French keys are "unreached because the EHCVM countries'
+categorical mappings now translate before kinship".  They do not.  Harvested at
+the =_expand_kinship= call site, every EHCVM country hands kinship the
+instrument's own French (or Portuguese) label verbatim:
+
+| country       | top labels reaching kinship                                          |
+|---------------+----------------------------------------------------------------------|
+| Senegal       | =Fils, Fille= 47,472; =Chef De Ménage= 14,276; =Conjoint ( E )= 11,861 |
+| Mali          | =Fils, Fille= 98,262; =Chef De Ménage= 24,939                         |
+| Burkina Faso  | =Fils ou fille= 36,541; =Chef de ménage= 21,037                       |
+| Benin / Togo  | =Fils, Fille=; =Chef de ménage=; =Conjoint ( e )=                     |
+| Guinea-Bissau | =Filho, Filha= 15,607; =Chefe do agregado familiar= 5,351 (Portuguese) |
+| Niger, CIV    | a MIX -- English on the pre-EHCVM waves, French on 2018-19 onward      |
+
+*The real reason is orthographic.*  Every EHCVM instrument spells a
+both-genders code with a COMMA (=Fils, Fille=; =Père, Mère=; =Frère, sœur=;
+=Petit fils, petite fille=).  The =d1a983f3= block guessed bare words and SLASH
+pairs.  So the keys are not dead because of a deliberate design change -- they
+are dead because nobody checked the instruments before writing 81 entries.
+That is a *different disposition*: it argues for trimming on grounds of
+"speculative and never validated", not "superseded by a translation layer".
+
+The hypothesis IS true for exactly one key in the 130, and in a country the
+issue does not mention: GhanaLSS translates =Househelp (Other Relative)= ->
+=Servant= in its =categorical_mapping.org= before kinship (row 6).
+
+* (a) GH #698 -- the "other relative" policy, prepared not taken
+
+** First, a correction: item 1 is largely ALREADY DONE on this base
+
+The brief cites three tuples in conflict:
+
+: Other relative of head or spouse   [0, 0, consanguineal]    (:282)
+: Other relative of head             [0, 2, consanguineal]    (:631)
+: Otro Pariente                      [null, null, null]
+
+*Neither of the first two exists any more.*  Measured on =3cf124ca3=:
+
+: "Other relative of head or spouse":  [null, null, null]     (kinship.yml:310)
+: "Other relative of head":            [null, null, consanguineal]  (:666)
+: "Otro Pariente":                     [null, null, null]     (:499)
+
+and =kinship.yml='s header now carries the policy in writing (decided
+2026-09-07, GH #698/#797):
+
+#+begin_quote
+"Other relative"-class labels -> [null, null, consanguineal]: a blood relative;
+generation and collateral distance unrecorded. ... "relative of head OR SPOUSE"
+labels -> [null, null, null] ... blood and marriage conflated, so affinity is
+unknown too.  Do not "repair" a null tuple by choosing a cell; the instrument
+did not.
+#+end_quote
+
+So the *stated* policy exists and is *consistently applied within the
+other-relative class*.  What remains is that it was never carried to the
+neighbouring classes that have the same defect.  That is the decision below,
+and it is bigger than the one #698 describes.
+
+** The census (warm corpus, people, all waves)
+
+*** A. "other relative", blood implied -- 74,339 people, POLICY ALREADY APPLIED
+
+All =[null, null, consanguineal]=, consistently, 25+ countries.  Largest cells:
+=Other relative= 37,296 (Albania, Azerbaijan, China, GhanaAHIES 20,088,
+GhanaLSS 13,858, GhanaSPS 1,729, Malawi, Serbia and Montenegro, Timor-Leste);
+=Other relatives= 9,030 (Iraq 3,893, Uganda 5,096, Cambodia); =Autre parent=
+7,614 (Burkina Faso 2014); =OTHER RELATIVE(SPECIFY)= 5,685 + =OTHER RELATIVE
+(SPECIFY)= 1,466 + =OTHER RELATIVE= 853 (Tanzania, Malawi); =OTHER RELATIVES=
+4,813 (Iraq 2012); =Other Relative= 2,398 (CotedIvoire, Ethiopia, Pakistan);
+=Other Relation (Specify)= 2,169 (Nigeria); =Other relative of head= 729
+(EthiopiaRHS); =13. Other Relative= 693 (Ethiopia); =Other family= 407 (South
+Africa 1993); =other relation= 160 (Serbia).
+
+*Nothing to decide.*  Recommendation: leave.
+
+*** B. "relative of head OR SPOUSE" -- 44,930 people, POLICY ALREADY APPLIED
+
+All =[null, null, null]=: =Autres Parents Du Cm/Conjoint= 24,126 (Mali, Niger,
+Senegal), =Autres Parents du CM/Conjoint= 11,400 (Benin, Burkina Faso,
+CotedIvoire, Togo), =Outros parentes do CAF/cônjuge= 9,132 (Guinea-Bissau),
+=Other relative of head or spouse= 272 (Niger 2011-12).  Plus =Otro pariente=
+884 (Peru 1994) / =otro pariente= 596 (Guatemala 2000), on the same rule but
+justified from ENNIV's own manual.
+
+*Nothing to decide.*  Recommendation: leave.
+
+*** C. SPECIFIC relation "of head or spouse" -- 35,314 people, THE OPEN QUESTION
+
+*This is the live decision, and it is 24x the Peru+Guatemala figure the brief
+quotes.*  The argument for extending the header's rule here: the instrument
+conflates the head's own relation with the spouse's, which is *the same
+conflation the header already rules on* for the other-relative members of this
+family -- only with a determinate Generation and Distance, so the honest tuple
+is a PARTIAL null rather than a full one.  A child of the spouse who is not the
+head's child is the head's *stepchild* (=step= is already an Affinity value); a
+parent of the spouse is a *parent-in-law*.
+
+*The contrary argument, which is not weak*: the modal person under these codes
+IS the joint child / shared parent, so =consanguineal= is the best guess and
+nulling 35,314 rows trades a mostly-right answer for no answer.  That is
+precisely the call #698 reserves for @ligon; the rows are below either way.
+Every one of these is served =consanguineal= today:
+
+| label | tuple | people | country |
+|-------+-------+--------+---------|
+| =Son / daughter of head or spouse= | =[-1, 0, consanguineal]= | 17,411 | Uganda 2018-19, 2019-20 |
+| =Child of the head / spouse= | =[-1, 0, consanguineal]= | 8,290 | Serbia and Montenegro 2002, 2003 |
+| =Parent Of Head Or Spouse= | =[1, 0, consanguineal]= | 3,161 | CotedIvoire 1985-89 |
+| =Sister/Brother of head or spouse= | =[0, 1, consanguineal]= | 2,008 | Uganda 2009-16 |
+| =Grandchild of the head / spouse= | =[-2, 0, consanguineal]= | 1,966 | Serbia and Montenegro |
+| =Parents of the head / spouse= | =[1, 0, consanguineal]= | 838 | Serbia and Montenegro |
+| =Parent of head or spouse= | =[1, 0, consanguineal]= | 721 | Uganda |
+| =sister/brother of head or spouse= | =[0, 1, consanguineal]= | 460 | Uganda 2005-06 |
+| =Sister / brother of head or spouse= | =[0, 1, consanguineal]= | 363 | Uganda 2018-20 |
+| =parent of head or spouse= | =[1, 0, consanguineal]= | 96 | Uganda 2005-06 |
+
+Two members of the same family are ALREADY determinate and need no change:
+=Personne (Non) Apparentée Au Cm/Conjoint= =[0,0,unrelated]= (14,847 people --
+unrelated to BOTH is a determinate claim) and =Son/daug. in law of the
+head/spouse= =[-1,0,affinal]= (1,144 -- an in-law of either is affinal either
+way).
+
+*** D. blood-∪-in-law in one code -- 1,318 people, the class #698 names
+
+Generation and distance determinate, affinity conflated between blood and
+marriage.  This is the class #698 names:
+
+| label | tuple | people | country |
+|-------+-------+--------+---------|
+| =brother/sister or brother/sister-in-law of head of household= | =[0, 1, consanguineal]= | 903 | Serbia 2007 |
+| =Padre/Suegro= | =[1, 0, consanguineal]= | 279 | Peru 1994 |
+| =Father/Mother/T-in-law/M-in-law= | =[1, 0, consanguineal]= | 136 | Guyana 1992 |
+
+Serbia's 903 is *larger than both labels #698 cites put together* and is not
+mentioned in that issue.
+
+*** E. residuals
+
+- =Bro/Sis/B-in-law/S-in-law/Other relative= =[0,1,consanguineal]=, *459*,
+  Guyana 1992 -- a TRIPLE conflation: it contains "other relative", so Distance
+  is not 1 either. Neither C nor D; the honest tuple is =[null,null,null]=.
+- =Servant/Employee/Other non-relative= =[0,0,servant]=, *81*, Guyana 1992 --
+  conflates servant with plain non-kin; =[0,0,null]= is not expressible in a
+  useful way (affinity is the only slot and =servant= vs =unrelated= is the
+  ambiguity), so this one is a judgement, not a null.
+- bare =Other= / =other= =[0,0,unrelated]=, *79*, Azerbaijan 1995, Kosovo 2000,
+  Malawi 2004-05, Timor-Leste, Uganda -- "Other" does not say "unrelated".
+  Small, but it is an unevidenced guess of exactly the kind the policy forbids.
+
+** What each candidate policy moves
+
+| policy | rows moved | which |
+|--------+------------+-------|
+| (i) null the conflated components only where BOTH are conflated (status quo) | 0 | already in force for A (74,339) and B (44,930) |
+| (ii) *partial null* =[G, D, null]= wherever exactly the affinity slot is conflated | *36,632* | C's 35,314 + D's 1,318 |
+| (ii'), C only | 35,314 | Uganda 20,959; Serbia and Montenegro 11,094; CotedIvoire 3,161 |
+| (ii''), D only (what #698 asks about) | 1,318 | Serbia 903; Peru 279; Guyana 136 |
+| (iii) full null =[null,null,null]= for the residual triple-conflation | 459 | Guyana =Bro/Sis/B-in-law/S-in-law/Other relative= |
+| (iv) keep a best guess everywhere | 0 | status quo for C, D, E |
+| (v) also re-null bare =Other= to =[0,0,null]= or drop the =unrelated= claim | 79 | Azerbaijan, Kosovo, Malawi, Timor-Leste, Uganda |
+
+*Maximum blast radius of a fully consistent policy: 37,170 people* (ii + iii +
+v), across 9 countries, all of them affinity-slot-only except Guyana's 459.
+No =Generation= or =Distance= value changes under any of these.
+
+** One correction to the brief, and it de-risks the decision
+
+#698's "nothing in the corpus uses a partial null yet" is *no longer true on
+this base*.  =Adopted/Foster/Stepchild: [-1, 0, null]= is a live key --
+GhanaLSS and GhanaSPS emit =Adopted/foster/stepchild= for *2,081* people
+(GhanaLSS 1,464; GhanaSPS 617), harvested at the =_expand_kinship= call site.  The shape is already expressible, already
+served, already survives =pd.array(..., Int64Dtype())=, and already fails to
+warn.  So policy (ii) is a *generalisation of an existing practice*, not a new
+mechanism -- which is the cheapest possible version of this decision.
+
+** Recorded, not repaired (per the brief)
+
+Peru's =Distance= is 0 or NA for every person: ENNIV 1994's ten codes are
+=Jefe=, =Conyuge=, =Hijo/a=, =Nieto/a=, =Yerno/Nuera=, =Padre/Suegro=, =Otro
+pariente=, =Trabajador domestico=, =Persona no pariente=, =Pensionista= -- no
+sibling and no cousin category at all.  Confirmed from the served frame, and
+the same holds for GhanaSPS (=Head=, =Spouse=, =Child=, =Grandchild=,
+=Parent=, =Child-in-law=, =Adopted/foster/stepchild=, =Other relative=,
+=Non-relative=, =Servant=) and Serbia and Montenegro.  That is the instrument,
+not the mapping.
+
+* (b) GH #804 -- the Tajikistan 1999 codebook IS obtainable from here
+
+*Answer: yes.*  =download/11687= is =tajbid.pdf=, titled *"Basic Information
+Living Standards Survey in the Republic of Tajikistan (TLSS)"*, classified
+=Document, Technical [doc/tec]= on WB catalog 279's related-materials page.
+Fetched from this node with the configured =microdata_api_key=:
+
+: GET https://microdata.worldbank.org/index.php/catalog/279/download/11687
+:   -> 200, application/octet-stream, 134,449 bytes, magic %PDF-1.2
+
+131 KB.  Nothing was saved to the repo and nothing large was downloaded.
+
+*Caveat on the route.*  =data_access.get_data_file()= will NOT fetch it: that
+chain is local -> DVCFileSystem -> =_find_stata_zip_url= (the survey's Stata
+data zip), and a related-materials PDF is not in it.  The catalog id also does
+not resolve through the JSON API -- =api/catalog/279= and
+=api/catalog/study/279= both return =400 IDNO-NOT-FOUND= (279 is a numeric
+=id=, not an =idno=).  The working route is the plain catalog download URL
+above, with the API key in the =X-API-KEY= header; the related-materials page
+(=/index.php/catalog/279/related-materials=, HTML) is where the download ids
+and titles come from.  So #804 is *unblocked but needs a small acquisition
+step*, not an existing library call.
+
+The same page also lists =11676= = =HH012007-00.pdf=, the TLSS household
+questionnaire already in =Tajikistan/1999/Documentation/= -- so the codebook
+sits beside a document the repo already holds, which is corroboration that
+=11687= is the right artefact.
+
+* Carried forward from PR #951's verification (for any future normalisation)
+
+1. *=str.title()= mangles apostrophes*: =Lodger's= -> =Lodger'S=, because
+   =str.title= treats =’='= as a word boundary.  So the "title-cased spelling"
+   of =Lodger/Lodger's relative= and =Servant or servant's relative= is a form
+   no contributor would write.  That is an argument against =.title()= as the
+   canonical form if option 2 (normalise at load) is ever taken up.
+2. *The mid-word =Ñ= in the two Peru/Guatemala keys is a SOURCE artefact*, not
+   something =.title()= produces: =Compañero.title()= and =CompaÑero.title()=
+   both give =Compañero=.  Both existing keys (=Esposo (A) O CompaÑero (A)=,
+   =CuÑado (A)=) carry an upstream ASCII-only case fold that left the non-ASCII
+   byte alone, so the sane canonical spelling is not a key at all.  *Re-spell
+   them, do not merely de-duplicate them* -- and note the served labels are
+   Guatemala's =esposo (a) o compaÑero (a)= (5,554 people) and =cuÑado (a)=
+   (126), so a re-spelling is a live data change, not a file edit.
+
+* One hygiene finding, free
+
+=kinship.yml= has *488 key lines for 473 distinct keys*: 11 keys are written
+twice and 2 three times (=Father/Mother=, =Sister/Brother=) -- 13 duplicated
+keys, 15 redundant lines.  YAML silently keeps the last.  *All 13 agree on
+their tuple*, so nothing is
+served wrongly today -- but =Sister/Brother Of Head Or Spouse= at lines 128 and
+138, and =Father/Mother= at 314/352/658, are a silent cliff waiting for the
+first edit that changes one copy.  Worth an assertion in
+=tests/test_kinship_yml_hygiene.py= (PR #951's new file) -- a duplicate-key
+check reading the file as text, since =yaml.safe_load= cannot see them.

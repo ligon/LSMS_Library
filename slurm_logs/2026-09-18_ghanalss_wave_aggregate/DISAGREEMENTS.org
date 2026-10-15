@@ -1,0 +1,373 @@
+#+title: GhanaLSS wave-level `Aggregate Label` vs the country table
+#+date: [2026-09-18 Fri]
+
+Reconciliation queue for the wave-level =Aggregate Label= columns, which
+nothing reads.  Join is the country table's =<wave>= column against the
+wave table's =Preferred Label=.  Generated read-only from committed config.
+
+* Summary
+
+| wave | wave rows | joined | agree | disagree |
+|------+-----------+--------+-------+----------|
+| 1987-88 | 61 | 61 | 42 | 19 |
+| 1988-89 | 61 | 61 | 42 | 19 |
+| 1991-92 | 122 | 122 | 73 | 49 |
+| 1998-99 | 117 | 117 | 70 | 47 |
+| 2005-06 | 180 | 131 | 84 | 47 |
+| 2012-13 | 183 | 133 | 87 | 46 |
+| 2016-17 | 502 | 337 | 157 | 180 |
+| *total* | | *962* | *555* | *407* |
+
+* 1987-88 -- 19 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Cabbage |  | Cabbage |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Coconut | Coconut | Coconut (fresh) |
+| Dove/pigeon | Dove/pigeon | Dove/Pigeon |
+| Eggplant |  | Eggplant |
+| Fish | Fish | Fish (fresh and frozen) |
+| Kenkey | Kenkey | Kenkey/Banku |
+| Macaroni/Spaghetti | Other Cereal | Macaroni/Spaghetti |
+| Milk |  | Milk (fresh) |
+| Milk product |  | Other Milk Products |
+| Okra |  | Okra |
+| Onion |  | Onion |
+| Other Leafy Vegetable |  | Other Leafy Vegetables |
+| Other Pulses |  | Other Pulses |
+| Other Vegetables |  | Other Vegetables |
+| Potato/Sweet Potato | Potato/Sweet Potato | Sweet Potato |
+| Spinach |  | Spinach |
+| Tomato (fresh) | Tomato | Tomato (fresh) |
+| Tomato (paste) | Tomato | Tomato (paste) |
+
+* 1988-89 -- 19 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Cabbage |  | Cabbage |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Coconut | Coconut | Coconut (fresh) |
+| Dove/pigeon | Dove/pigeon | Dove/Pigeon |
+| Eggplant |  | Eggplant |
+| Fish | Fish | Fish (fresh and frozen) |
+| Kenkey | Kenkey | Kenkey/Banku |
+| Macaroni/Spaghetti | Other Cereal | Macaroni/Spaghetti |
+| Milk |  | Milk (fresh) |
+| Milk product |  | Other Milk Products |
+| Okra |  | Okra |
+| Onion |  | Onion |
+| Other Leafy Vegetable |  | Other Leafy Vegetables |
+| Other Pulses |  | Other Pulses |
+| Other Vegetables |  | Other Vegetables |
+| Potato/Sweet Potato | Potato/Sweet Potato | Sweet Potato |
+| Spinach |  | Spinach |
+| Tomato (fresh) | Tomato | Tomato (fresh) |
+| Tomato (paste) | Tomato | Tomato (paste) |
+
+* 1991-92 -- 49 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Akpeteshie | Spirits | Akpeteshie |
+| Animals Fat | Oils, Fats | Animals Fat |
+| Baby Milk | Milk | Baby Milk |
+| Bambara Bean | Pulses, Nuts | Bambara Bean |
+| Beef (corned) | Beef | Beef (corned) |
+| Broad Bean | Pulses, Nuts | Broad Bean |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Chocolate Drink | Chocolate Drink | Chocolate |
+| Coconut | Pulses, Nuts | Coconut (fresh) |
+| Cowpea | Pulses, Nuts | Cowpea |
+| Crustaceans | Fish | Crustacean |
+| Dawadawa | Pulses, Nuts | Dawadawa |
+| Eggplant/Cucumber | Eggplant/Cucumber | Eggplant |
+| Fish (canned) | Fish | Fish (canned) |
+| Fish (dried) | Fish | Fish (dried) |
+| Fish (fresh and frozen) | Fish | Fish (fresh and frozen) |
+| Fish (fried) | Fish | Fish (fried) |
+| Fish (smoked) | Fish | Fish (smoked) |
+| Gin | Spirits | Gin |
+| Groundnut | Pulses, Nuts | Groundnut |
+| Guinea Corn | Guinea Corn | Millet/Sorghum |
+| Guinea corn/sorghum | Guinea corn/sorghum | Millet/Sorghum |
+| Kenkey | Kenkey | Kenkey/Banku |
+| Kola Nut | Pulses, Nuts | Kola Nut |
+| Maize (cob) | Maize | Maize (cob) |
+| Maize (flour/dough) | Maize | Maize (flour/dough) |
+| Margarine | Oils, Fats | Margarine |
+| Milk (fresh) | Milk | Milk (fresh) |
+| Milk (powder) | Milk | Milk (powder) |
+| Milk (tinned, unsweetened) | Milk | Milk (tinned, condensed/unsweetened) |
+| Millet | Millet | Millet/Sorghum |
+| Millet (flour) | Millet | Millet (flour) |
+| Oil (coconut) | Oils, Fats | Oil (coconut) |
+| Oil (groundnut) | Oils, Fats | Oil (groundnut) |
+| Oil (palm kernel) | Oils, Fats | Oil (palm kernel) |
+| Oil (red palm) | Oils, Fats | Oil (palm) |
+| Other Drink | Other Drink | Other Drinks |
+| Other Milk Products | Milk | Other Milk Products |
+| Other Oil Seeds | Pulses, Nuts | Other Oil Seeds |
+| Other Oils | Oils, Fats | Other Oils |
+| Other Pulses | Pulses, Nuts | Other Pulses |
+| Palm Nut | Pulses, Nuts | Palm Nut |
+| Pawpaw |  | Pawpaw |
+| Pepper (dry) | Pepper | Pepper (dried) |
+| Shea Butter | Oils, Fats | Shea Butter |
+| Small Bean | Pulses, Nuts | Small Bean |
+| Sorghum | Sorghum | Millet/Sorghum |
+| Tomato | Tomato | Tomato (fresh) |
+| Tomato Puree | Tomato Puree | Tomato (paste) |
+
+* 1998-99 -- 47 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Akpeteshie | Spirits | Akpeteshie |
+| Animals Fat | Oils, Fats | Animals Fat |
+| Baby Milk | Milk | Baby Milk |
+| Bambara Bean | Pulses, Nuts | Bambara Bean |
+| Broad Bean | Pulses, Nuts | Broad Bean |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Chocolate Drink | Chocolate Drink | Chocolate |
+| Coconut | Pulses, Nuts | Coconut (fresh) |
+| Cowpea | Pulses, Nuts | Cowpea |
+| Crustaceans | Fish | Crustacean |
+| Dawadawa | Pulses, Nuts | Dawadawa |
+| Eggplant/Cucumber | Eggplant/Cucumber | Eggplant |
+| Fish (canned) | Fish | Fish (canned) |
+| Fish (dried) | Fish | Fish (dried) |
+| Fish (fresh and frozen) | Fish | Fish (fresh and frozen) |
+| Fish (fried) | Fish | Fish (fried) |
+| Fish (smoked) | Fish | Fish (smoked) |
+| Gin | Spirits | Gin |
+| Groundnut | Pulses, Nuts | Groundnut |
+| Guinea Corn | Guinea Corn | Millet/Sorghum |
+| Guinea corn/sorghum | Guinea corn/sorghum | Millet/Sorghum |
+| Kenkey | Kenkey | Kenkey/Banku |
+| Kola Nut | Pulses, Nuts | Kola Nut |
+| Maize (cob) | Maize | Maize (cob) |
+| Maize (flour/dough) | Maize | Maize (flour/dough) |
+| Margarine | Oils, Fats | Margarine |
+| Milk (fresh) | Milk | Milk (fresh) |
+| Milk (powder) | Milk | Milk (powder) |
+| Milk (tinned, unsweetened) | Milk | Milk (tinned, condensed/unsweetened) |
+| Millet | Millet | Millet/Sorghum |
+| Millet (flour) | Millet | Millet (flour) |
+| Oil (coconut) | Oils, Fats | Oil (coconut) |
+| Oil (groundnut) | Oils, Fats | Oil (groundnut) |
+| Oil (palm kernel) | Oils, Fats | Oil (palm kernel) |
+| Oil (red palm) | Oils, Fats | Oil (palm) |
+| Other Drink | Other Drink | Other Drinks |
+| Other Milk Products | Milk | Other Milk Products |
+| Other Oil Seeds | Pulses, Nuts | Other Oil Seeds |
+| Other Oils | Oils, Fats | Other Oils |
+| Other Pulses | Pulses, Nuts | Other Pulses |
+| Palm Nut | Pulses, Nuts | Palm Nut |
+| Pawpaw |  | Pawpaw |
+| Pepper (dry) | Pepper | Pepper (dried) |
+| Shea Butter | Oils, Fats | Shea Butter |
+| Small Bean | Pulses, Nuts | Small Bean |
+| Sorghum | Sorghum | Millet/Sorghum |
+| Tomato | Tomato | Tomato (fresh) |
+
+* 2005-06 -- 45 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Akpeteshie | Spirits | Akpeteshie |
+| Bambara Bean | Pulses, Nuts | Bambara Bean |
+| Bean | Pulses, Nuts | Bean |
+| Beef (corned) | Corned Beef | Beef (corned) |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Cigarrette | Tobacco | Cigarette |
+| Coconut (fresh) | Coconut | Coconut (fresh) |
+| Cola Nut | Pulses, Nuts | Kola Nut |
+| Cowpea | Pulses, Nuts | Cowpea |
+| Crustaceans | Fish | Crustacean |
+| Fish (canned) | Fish | Fish (canned) |
+| Fish (dried) | Fish | Fish (dried) |
+| Fish (fresh and frozen) | Fish | Fish (fresh and frozen) |
+| Fish (fried) | Fish | Fish (fried) |
+| Fish (salted) | Fish | Fish (salted) |
+| Fish (smoked) | Fish | Fish (smoked) |
+| Groundnut | Pulses, Nuts | Groundnut |
+| Guinea corn/sorghum | Guinea corn/sorghum | Millet/Sorghum |
+| Ice Cream | Other Milk Products | Ice Cream |
+| Maize (cob) | Maize | Maize (cob) |
+| Maize (flour/dough) | Maize | Maize (flour/dough) |
+| Malt Drinks (bottle) | Malt Drinks (bottle) | Malt Drinks |
+| Milk (evaporated) | Milk | Milk (evaporated) |
+| Milk (fresh) | Milk | Milk (fresh) |
+| Milk (powdered) | Milk | Milk (powder) |
+| Milk (tinned, condensed) | Milk | Milk (tinned, condensed/unsweetened) |
+| Millet | Millet | Millet/Sorghum |
+| Millet (flour) | Millet | Millet (flour) |
+| Oil (coconut) | Oils, Fats | Oil (coconut) |
+| Oil (groundnut) | Oils, Fats | Oil (groundnut) |
+| Oil (palm kernel) | Oils, Fats | Oil (palm kernel) |
+| Oil (palm) | Oils, Fats | Oil (palm) |
+| Other Leafy Vegetable | Other Leafy Vegetable | Other Leafy Vegetables |
+| Other Oils | Oils, Fats | Other Oils |
+| Other Pulses | Pulses, Nuts | Other Pulses |
+| Other Spirits | Spirits | Other Spirits |
+| Palm Nut | Pulses, Nuts | Palm Nut |
+| Rice (imported) | Rice | Rice (imported) |
+| Schnapps | Spirits | Schnapps |
+| Shea Butter | Oils, Fats | Shea Butter |
+| Soybean | Pulses, Nuts | Soybean |
+| Sugar Bread | Bread | Sugar Bread |
+| Tomato (fresh) | Tomato | Tomato (fresh) |
+| Tomato (paste) | Tomato | Tomato (paste) |
+| Whisky | Spirits | Whisky |
+
+* 2012-13 -- 45 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Akpeteshie | Spirits | Akpeteshie |
+| Bambara Bean | Pulses, Nuts | Bambara Bean |
+| Bean | Pulses, Nuts | Bean |
+| Beef (corned) | Corned Beef | Beef (corned) |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Coconut (fresh) | Coconut | Coconut (fresh) |
+| Cola Nut | Pulses, Nuts | Kola Nut |
+| Cowpea | Pulses, Nuts | Cowpea |
+| Crustaceans | Fish | Crustacean |
+| Fish (canned) | Fish | Fish (canned) |
+| Fish (dried) | Fish | Fish (dried) |
+| Fish (fresh and frozen) | Fish | Fish (fresh and frozen) |
+| Fish (fried) | Fish | Fish (fried) |
+| Fish (salted) | Fish | Fish (salted) |
+| Fish (smoked) | Fish | Fish (smoked) |
+| Groundnut | Pulses, Nuts | Groundnut |
+| Guinea corn/sorghum | Guinea corn/sorghum | Millet/Sorghum |
+| Ice Cream | Other Milk Products | Ice Cream |
+| Maize (cob) | Maize | Maize (cob) |
+| Maize (flour/dough) | Maize | Maize (flour/dough) |
+| Malt Drinks (bottle) | Malt Drinks (bottle) | Malt Drinks |
+| Milk (evaporated) | Milk | Milk (evaporated) |
+| Milk (fresh) | Milk | Milk (fresh) |
+| Milk (powdered) | Milk | Milk (powder) |
+| Milk (tinned, condensed) | Milk | Milk (tinned, condensed/unsweetened) |
+| Millet | Millet | Millet/Sorghum |
+| Millet (flour) | Millet | Millet (flour) |
+| Oil (coconut) | Oils, Fats | Oil (coconut) |
+| Oil (groundnut) | Oils, Fats | Oil (groundnut) |
+| Oil (palm kernel) | Oils, Fats | Oil (palm kernel) |
+| Oil (palm) | Oils, Fats | Oil (palm) |
+| Other Leafy Vegetable | Other Leafy Vegetable | Other Leafy Vegetables |
+| Other Nut/Seed | Pulses, Nuts | Other Nuts/Seeds |
+| Other Oils | Oils, Fats | Other Oils |
+| Other Pulses | Pulses, Nuts | Other Pulses |
+| Other Spirits | Spirits | Other Spirits |
+| Palm Nut | Pulses, Nuts | Palm Nut |
+| Rice (imported) | Rice | Rice (imported) |
+| Schnapps | Spirits | Schnapps |
+| Shea Butter | Oils, Fats | Shea Butter |
+| Soybean | Pulses, Nuts | Soybean |
+| Sugar Bread | Bread | Sugar Bread |
+| Tomato (fresh) | Tomato | Tomato (fresh) |
+| Tomato (paste) | Tomato | Tomato (paste) |
+| Whisky | Spirits | Whisky |
+
+* 2016-17 -- 94 distinct disagreements
+
+| Preferred Label (wave) | wave Aggregate | country Aggregate |
+|------------------------+----------------+-------------------|
+| Agushie Seed | Pulses, Nuts | Agushie Seed |
+| Akpeteshie | Spirits | Akpeteshie |
+| Bambara Bean | Pulses, Nuts | Bambara Bean |
+| Beef (corned) | Corned Beef | Beef (corned) |
+| Beef (face) | Beef | Beef (face) |
+| Beef (leg) | Beef | Beef (leg) |
+| Beef (offal) | Beef | Beef (offal) |
+| Beef (steak) | Beef | Beef (steak) |
+| Bitters | Spirits | Bitters |
+| Cassava (dough) | Cassava | Cassava (dough) |
+| Cassava (dried) | Cassava | Cassava (dried) |
+| Chicken (breast) | Chicken | Chicken (breast) |
+| Chicken (frozen) | Chicken | Chicken (frozen) |
+| Chicken (gizzard) | Chicken | Chicken (gizzard) |
+| Chicken (live) | Chicken | Chicken (live) |
+| Chicken (thigh) | Chicken | Chicken (thigh) |
+| Chicken (wing) | Chicken | Chicken (wing) |
+| Cigarette | Tobacco | Cigarette |
+| Coconut (dried) | Coconut | Coconut (dried) |
+| Coconut (fresh) | Coconut | Coconut (fresh) |
+| Corflake | Other Cereal | Corflake |
+| Couscous | Other Cereal | Couscous |
+| Cowpea | Pulses, Nuts | Cowpea |
+| Crab | Fish | Crab |
+| Fish (canned) | Fish | Fish (canned) |
+| Fish (dried) | Fish | Fish (dried) |
+| Fish (fried) | Fish | Fish (fried) |
+| Fish (salted) | Fish | Fish (salted) |
+| Fish (smoked, river) | Fish | Fish (smoked, river) |
+| Fish (smoked, sea) | Fish | Fish (smoked, sea) |
+| Fried Plantian and Beans | Fried Plantian and Beans | Fried Plantain and Beans |
+| Gin | Spirits | Gin |
+| Groundnut | Pulses, Nuts | Groundnut |
+| Guinea corn/sorghum | Guinea corn/sorghum | Millet/Sorghum |
+| Guineafowl | Guineafowl | Guinea Fowl |
+| Herring (smoked) | Fish | Herring (smoked) |
+| Ice Cream | Other Milk Products | Ice Cream |
+| Instant Noodle | Other Cereal | Instant Noodle |
+| Kapla | Fish | Kapla |
+| Kola Nut | Pulses, Nuts | Kola Nut |
+| Macaroni | Other Cereal | Macaroni/Spaghetti |
+| Mackerel (processed) | Fish | Mackerel (processed) |
+| Maize (cob) | Maize | Maize (cob) |
+| Maize (flour/dough) | Maize | Maize (flour/dough) |
+| Maize (grain) | Maize | Maize (grain) |
+| Maizena | Other Cereal | Maizena |
+| Malt Drinks (bottle) | Malt Drinks (bottle) | Malt Drinks |
+| Malt Drinks (canned) | Malt Drinks (canned) | Malt Drinks |
+| Margarine | Oils, Fats | Margarine |
+| Milk (evaporated) | Milk | Milk (evaporated) |
+| Milk (fresh) | Milk | Milk (fresh) |
+| Milk (powdered) | Milk | Milk (powder) |
+| Milk (tinned, condensed) | Milk | Milk (tinned, condensed/unsweetened) |
+| Millet | Millet | Millet/Sorghum |
+| Millet (flour) | Millet | Millet (flour) |
+| Oil (coconut) | Oils, Fats | Oil (coconut) |
+| Oil (groundnut) | Oils, Fats | Oil (groundnut) |
+| Oil (palm kernel) | Oils, Fats | Oil (palm kernel) |
+| Oil (palm) | Oils, Fats | Oil (palm) |
+| Oil (vegetable) | Oils, Fats | Oil (vegetable) |
+| Other Leafy Vegetable | Other Leafy Vegetable | Other Leafy Vegetables |
+| Other Nut/Seed | Pulses, Nuts | Other Nuts/Seeds |
+| Other Oils | Oils, Fats | Other Oils |
+| Other Pulses | Pulses, Nuts | Other Pulses |
+| Other Spirits | Spirits | Other Spirits |
+| Palm Nut | Pulses, Nuts | Palm Nut |
+| Pepper (dried, red) | Pepper | Pepper (dried) |
+| Pepper (powder) | Pepper | Pepper (powder) |
+| Pork (feet) | Pork | Pork (feet) |
+| Pork (fillet) | Pork | Pork (fillet) |
+| Pork (rib) | Pork | Pork (rib) |
+| Pork (shoulder) | Pork | Pork (shoulder) |
+| Rice (imported) | Rice | Rice (imported) |
+| Rice (local) | Rice | Rice (local) |
+| Salmon (smoked) | Fish | Salmon (smoked) |
+| Sausage (beef) | Sausage | Sausage (beef) |
+| Sausage (chicken) | Sausage | Sausage (chicken) |
+| Sausage (pork) | Sausage | Sausage (pork) |
+| Schnapps | Spirits | Schnapps |
+| Shea Butter | Oils, Fats | Shea Butter |
+| Shrimp | Fish | Shrimp |
+| Snail | Fish | Snail |
+| Soybean | Pulses, Nuts | Soybean |
+| Spaghetti | Other Cereal | Macaroni/Spaghetti |
+| Sugar (cubed) | Sugar | Sugar (cubed/granulated) |
+| Sugar (granulated) | Sugar | Sugar (cubed/granulated) |
+| Sugar Bread | Bread | Sugar Bread |
+| Tilapia | Fish | Tilapia |
+| Tomato (fresh) | Tomato | Tomato (fresh) |
+| Tomato (paste) | Tomato | Tomato (paste) |
+| Tuna (processed) | Fish | Tuna (processed) |
+| Whisky | Spirits | Whisky |
+| White Oats | White Oats | White Oat |
+| Yoghurt | Other Milk Products | Yoghurt |
+

@@ -73,7 +73,7 @@ GLOBAL_ORG_REGISTRY: dict[str, tuple[str, set[str]]] = {
     "canonical_education_labels.org": ("documentation-of-record", set()),
     # Declares Roof/Floor, but only as placeholders inside a ``#+begin_example``
     # block; see ``test_canonical_housing_tables_are_example_placeholders``.
-    "canonical_housing_labels.org": ("documentation-of-record", {"Roof", "Floor"}),
+    "canonical_housing_labels.org": ("documentation-of-record", set()),
 }
 
 #: For ``documentation-of-record`` files, the test that reads them.
@@ -180,21 +180,28 @@ def test_canonical_education_labels_declares_no_tables():
 
 
 def test_canonical_housing_tables_are_example_placeholders():
-    """REPORT-ONLY pin of a live confusion (GH #953), not desired behaviour.
+    """``canonical_housing_labels.org`` declares NO live tables (GH #693 / #953).
 
-    ``canonical_housing_labels.org`` is a style guide, but its "Per-country
-    wiring" section shows the expected shape inside a ``#+begin_example``
-    block -- and the org-table reader walks straight over ``#+begin_example``.
-    So the ``#+name: Roof`` / ``#+name: Floor`` tables it injects into EVERY
-    country's ``categorical_mapping`` dict are the literal placeholders, not
-    the canonical vocabulary above them.  Inert in practice (no survey value
-    equals ``<local variant 1>``), but it is a documentation file reaching the
-    resolver, which is exactly the class of mistake this module exists for.
+    Its "Per-country wiring" section shows the expected shape of a country's
+    ``Roof`` / ``Floor`` tables inside a ``#+begin_example`` block -- and the
+    org-table reader walks straight over ``#+begin_example``, so until
+    07c9e697d those two placeholders (``<local variant 1>`` -> ``<canonical>``)
+    were injected into EVERY country's ``categorical_mapping`` dict.  Inert in
+    practice, but a documentation file reaching the resolver is exactly the
+    class of mistake this module exists for.  The fix escapes the illustrative
+    ``#+name:`` lines with org's comma escape (``,#+name:``), which the
+    parser's ``line.strip().startswith('#+name:')`` test does not match.
+
+    This test used to pin the confusion (report-only); it now pins the fix.
+    The example block must still SHOW the two tables to a human reader.
     """
-    tables = all_dfs_from_orgfile(GLOBAL_CM_DIR / "canonical_housing_labels.org")
-    roof = tables["Roof"]
-    assert list(roof.columns) == ["Alternate Spelling", "Preferred Label"]
-    assert "<local variant 1>" in set(roof["Alternate Spelling"])
+    path = GLOBAL_CM_DIR / "canonical_housing_labels.org"
+    assert all_dfs_from_orgfile(path) == {}, (
+        "canonical_housing_labels.org reaches the resolver again -- an "
+        "illustrative '#+name:' line lost its ',#+name:' escape (GH #693)")
+    text = path.read_text()
+    assert ",#+name: Roof" in text and ",#+name: Floor" in text, (
+        "the per-country wiring examples should still be shown, escaped")
 
 
 # --------------------------------------------------------------------------
