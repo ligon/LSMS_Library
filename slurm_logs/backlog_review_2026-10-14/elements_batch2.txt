@@ -1,0 +1,7 @@
+831-followup fix/831-followup -
+970-json-make fix/970-json-make Malawi,Nigeria
+peru-panama fix/peru-panama Peru,Panama
+labels-relabel-787 fix/labels-relabel-787 Uganda,Malawi,Tanzania
+ghana-docs-encoding fix/ghana-docs-encoding GhanaLSS,GhanaSPS,Guinea-Bissau
+grader-scale-830 fix/grader-scale-830 Uganda
+readers-xport-sniff fix/readers-xport-sniff Peru
