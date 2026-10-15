@@ -148,7 +148,7 @@ weight constant within cluster -- puts *66.5% of the variance of log
 cluster weight between the 6 =strata= (regions)*, with sample share over
 weighted population share from 0.54x (Lome commune, 1,034 households / 98
 clusters) through Plateaux 0.85, Maritime 0.89, Centrale 1.45, Kara 1.55 to
-1.90x (Savanes, 1,144 / 96).  Five of six regions get 72-98 clusters each
+1.90x (Savanes, 1,144 / 96).  All six regions get 72-98 clusters each
 regardless of size.  Treat the design as region-stratified for inference;
 no source consulted states the allocation rule.  (=sample.strata= is wired
 from the cover-page region code, =2018/_/data_info.yml:16=.)  The twin

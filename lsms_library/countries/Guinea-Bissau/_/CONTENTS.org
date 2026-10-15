@@ -256,8 +256,9 @@ values*, and the sample share over the weighted population share runs from
 | Quinara        |        498 |       42 |                               2.14 |
 | Bolama-Bijagos |        502 |       42 |                               3.24 |
 
-(Seven of nine regions get ~42-50 clusters regardless of size: an
-equal-ish allocation over regions, which over-samples the small ones.  The
+(Eight of nine regions get 42-50 clusters regardless of size; SAB, at 92,
+is the exception.  This roughly equal allocation over the other regions
+over-samples the small ones.  The
 ratio is invariant to the API's within-wave weight normalisation; the same
 script on the raw parquet weights gives the same numbers.)
 

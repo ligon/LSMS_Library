@@ -611,7 +611,7 @@ tables):
   households) have any of Q28-Q33 populated.
 - The missingness is a *recording convention, per EA*, not a person
   attribute: answer rates are bimodal (48 of 334 EAs at 0%, 128 at 100%, 17
-  in the 25-75% middle), and the share of RECORDED values that are non-zero
+  strictly between 25% and 75%; 20 including the endpoints), and the share of RECORDED values that are non-zero
   falls monotonically from 95.9% in the EAs that recorded almost nobody to
   4-6% in the EAs that recorded everybody.  Teams that wrote down few people
   wrote down the AWAY ones; teams that wrote everybody down wrote the zeros
