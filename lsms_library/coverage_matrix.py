@@ -231,7 +231,7 @@ def feature_vocabulary(path: Path | None = None) -> list[str]:
     path = Path(path) if path is not None else (
         Path(countries_root()).parent / "data_info.yml")
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             doc = yaml.safe_load(f) or {}
     except FileNotFoundError:
         return []

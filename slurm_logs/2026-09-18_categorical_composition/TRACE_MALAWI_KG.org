@@ -1,0 +1,131 @@
+#+title: The design tested against a real defect: Malawi's six kilograms
+#+date: [2026-09-18 Fri]
+
+Companion to =DESIGN.org= and =TWO_JOBS.org=.  @ligon asked what the proposed
+design would actually do about a concrete failure.  This traces one, and says
+where the design *does not* help.
+
+* The defect, measured
+
+=Malawi/var/food_acquired.parquet=, 971,531 rows, 707 distinct =u=.  The
+kilogram is served under *six* spellings across 123,259 rows, and the split
+runs *across waves*:
+
+| =t=     |    =Kg= | =Kgs= | =Kilogram= | =Kilogramme= | =Kkilogram= |   =kg= |
+|---------+---------+-------+------------+--------------+-------------+--------|
+| 2004-05 | *35,805* |     0 |          0 |            0 |           0 |      0 |
+| 2010-11 |       0 |     0 |          0 |            0 |           0 |     15 |
+| 2013-14 |       0 |     0 |          0 |     *11,467* |           0 |     44 |
+| 2016-17 |       3 |     1 |        383 |     *34,742* |           0 |  1,021 |
+| 2019-20 |       0 |     0 |         27 |     *39,594* |           1 |    156 |
+
+2004-05 is entirely =Kg=; 2019-20 is almost entirely =Kilogramme=.  =u= is a
+declared index level, so a panel grouped on =(j, u)= treats the 2004-05
+kilogram and the 2019-20 kilogram as different units.  Only *one* =(t,i,j)=
+group splits internally --- the damage is cross-wave comparability, which is
+what the =u= axis exists to provide.
+
+* Why it happens
+
+: global u.org  key column: 'Original Label'   (11 rows)
+: Malawi   u    key column: 'Code'             (170 rows)
+: _row_union_categorical -> 170 rows           (global DISCARDED)
+
+The global table maps =Kilogramme=, =Kg=, =kg= and =Kilogram= all to =Kg=.  It
+never reaches Malawi, because =_row_union_categorical= (=country.py:359-382=)
+returns the country table wholesale when the two key column *names* differ.
+Malawi's own table maps =01=/=01a=/=01b= -> =Kilogramme=, which handles the
+*coded* rows; the ~37,000 rows already spelled =Kg=/=kg=/=Kilogram= never went
+through a code table at all.
+
+* What the proposed design does
+
+Under =DESIGN.org= §1.4 and =TWO_JOBS.org=, the two tables stop being a merge
+conflict and become two *stages*:
+
+: Malawi  #+table: alias  #+key: Code            #+keyspace: code   -> DECODE
+: global  #+table: alias  #+key: Original Label  #+keyspace: label  -> FOLD
+
+and resolution is =fold_global(decode_country(raw))=:
+
+| raw =u= | decode (Malawi, code-keyed) | fold (global, label-keyed) | served |
+|---------+-----------------------------+----------------------------+--------|
+| =01=, =01a=, =01b= | -> =Kilogramme=     | -> =Kg=                    | =Kg=   |
+| =Kilogramme=       | no match (identity) | -> =Kg=                    | =Kg=   |
+| =Kg=, =kg=, =Kilogram= | no match (identity) | -> =Kg=                | =Kg=   |
+| =Kgs=              | no match            | *not in global table*      | =Kgs=  |
+| =Kkilogram=        | no match            | *not in global table*      | =Kkilogram= |
+
+*123,257 of 123,259 rows unify onto =Kg=.*  The cross-wave split closes, with
+*no edit to Malawi's 170 rows* --- the fix is that the global table is allowed
+to apply.  The remaining 2 rows are =Kgs= (1) and =Kkilogram= (1), which no
+table anywhere contains.
+
+*Note what carried the fix*: not the key *rename* (§5.1's seven headings), but
+the =#+keyspace:= declaration.  Renaming Malawi's =Code= column to
+=Original Label= would be *wrong* --- it holds codes.  The design's value here
+is saying the two tables are different *kinds*, not making them look alike.
+
+** What the checks would have caught, and when
+
+- *Key compatibility* (§4.2): today the union silently does not fire.  Under
+  the design a =code= table and a =label= table are never asked to union, so
+  there is nothing to fail silently --- the condition is structural, not a
+  check.
+- *External totality* (§4.1): the 2 stragglers surface as coverage gaps in the
+  *global* table, not in Malawi's.  =Kgs= is the interesting one: it is absent
+  from =u.org= yet present in =transformations.KNOWN_METRIC=, so the check
+  would report a real, fixable inconsistency between two tables that hold the
+  same knowledge.  =Kkilogram= is a typo and would be reported as an unmapped
+  value for a human to decide.
+
+* What the design does NOT fix, and it is the deeper half
+
+=transformations.KNOWN_METRIC= is a *hardcoded Python dict duplicating the
+global alias table* --- it is what keeps Malawi's kilograms correct today
+despite the index being fragmented (it matches case-insensitively, so five of
+the six spellings get a factor of 1; =Kkilogram= gets none and falls through to
+the price-ratio inference).
+
+*The duplication is not laziness; it is forced by pipeline ORDER*, and the
+design does not change the order.  =Country._unit_kg_factors= states it:
+
+#+begin_quote
+The kg factor is computed BEFORE the categorical mapping is applied --- the
+derived-food dispatch is =_aggregate_wave_data= -> =transform_fn= ->
+=_finalize_result=, so =conversion_to_kgs= sees the RAW =u= (GH #770 rejected
+a fix that assumed otherwise).
+#+end_quote
+
+So =conversion_to_kgs= runs *before* any alias table has been applied, and must
+therefore recognise raw spellings itself.  *Making =u= resolve correctly does
+not retire =KNOWN_METRIC=* --- after the design lands, the same knowledge is
+still maintained in two places, one in config and one in code, and they still
+disagree (=u.org= lacks =Kgs=; =KNOWN_METRIC= lacks =Kkilogram=; =u.org=
+normalises to =Kg= while =KNOWN_METRIC= only needs a factor).
+
+*This is a gap in DESIGN.org.*  The design separates alias from parameter
+tables (=TWO_JOBS.org=) but assumes both are consulted at read time.
+=conversion_to_kgs= is a third consumer that runs earlier and re-implements the
+alias stage in Python.  Either:
+
+1. the alias resolution is made available *before* the derived-food dispatch,
+   so =conversion_to_kgs= can consume the resolved =u= and =KNOWN_METRIC=
+   retires into =u.org= --- which is what #770 rejected, so it needs its own
+   argument and measurement; or
+2. =KNOWN_METRIC= is *generated from* =u.org= at import, so the duplication
+   becomes derived rather than parallel --- cheaper, ordering unchanged, and it
+   makes the two disagreements above impossible by construction.
+
+Recommend (2) as the bounded step and (1) as the question #770 left open.
+Neither is in =DESIGN.org= today.
+
+* Scorecard
+
+| | fixed by the design? |
+|---+---|
+| =u= fragmented across waves (123,257 rows) | *yes* --- code/label become stages, global applies |
+| the union silently not firing | *yes* --- structurally unreachable, not merely checked |
+| =Kgs= missing from =u.org= | *surfaced* by the totality check; a one-row edit |
+| =Kkilogram= typo (1 row, no kg factor) | *surfaced*; needs a human |
+| =KNOWN_METRIC= duplicating =u.org= | *no* --- forced by #770's ordering; needs its own decision |

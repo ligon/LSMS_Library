@@ -92,6 +92,27 @@ them.**
   (feature|country|kwargs|check + a pattern hash — the bare fingerprint is too
   coarse for `runtime_warning`-class findings and causes false dedup-skips).
 
+- **An open issue must describe exactly the remaining work (2026-10-14).** The
+  default branch is `master`; routine PRs merge into `development`, so `Closes
+  #N` fires only at the next `development -> master` release merge, and a
+  partial PR (written honestly as "Addresses #N") leaves the issue open with its
+  *original* text. After a few of those the open list no longer says what is
+  left -- #813/#945/#832/#953 each sat behind two or three merged PRs with no
+  reader able to tell. So every PR that resolves PART of an issue does one of
+  two things, in the same PR, never a third:
+  - **narrow** -- edit the issue's title/body to the residual, with a
+    "Resolved so far: PR #N (sha)" header, when the residual is the same kind
+    of work; or
+  - **split** -- `Closes #N` and open a residual issue, linked both ways, when
+    the residual is a different kind of work (a judgement call, a design
+    decision, another country).
+  Fix-agents cannot write to GitHub, so a fix brief must require the agent to
+  DRAFT the residual (title + body + tier) in its report, and the dispatcher
+  files it. In the triage record, a `dedup_status: partial` entry MUST carry
+  `residual_title` / `residual_body`; a partial without a drafted residual is
+  an incomplete record. Reconcile = close the resolved, file the residuals,
+  narrow the rest -- not "comment the partially-addressed" and move on.
+
 ## Gotchas seen in practice
 - **Stale local cache masquerades as a bug — but the v0.8.0 hash mostly handles
   it now.** `cluster_features` "duplicates" were once a stale `var/` parquet (the

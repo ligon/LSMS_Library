@@ -48,7 +48,6 @@ if [ "${COV_NO_RESUBMIT:-0}" != "1" ] && [ "$RETRY" = "0" ]; then
 fi
 [ "$expired" = "1" ] && { echo "expired; exiting."; exit 0; }
 
-if ! cov_provision_venv "$REPO"; then echo "venv failed"; exit 1; fi
 if ! cov_have_internet; then
     echo "no internet on $(hostname)."
     if [ "$RETRY" -lt 3 ] && [ "${COV_NO_RESUBMIT:-0}" != "1" ]; then
@@ -58,6 +57,9 @@ if ! cov_have_internet; then
 fi
 
 if ! cov_ensure_clone "$WD" "$BRANCH" "${COV_CLONE_SRC:-file://$REPO}"; then echo "clone failed"; exit 1; fi
+
+# venv AFTER the clone: the clone is the code root (GH #957).
+if ! cov_provision_venv "$REPO" "$WD"; then echo "venv failed"; exit 1; fi
 
 mkdir -p "$SHARDROOT/shards"; rm -f "$SHARDROOT/shards/"*.csv
 LSMS_COUNTRIES_ROOT="$WD/lsms_library/countries" \

@@ -71,11 +71,12 @@ def pytest_addoption(parser):
         "--no-purge",
         action="store_true",
         default=False,
-        help="Skip the default-mode Uganda cache auto-purge.  Use during "
-             "iterative diagnosis loops where the failures aren't Uganda-"
-             "extraction-related, to avoid the 5-15 min Uganda-rebuild "
-             "cost per run.  No effect when combined with --rebuild or "
-             "--rebuild-caches (those have their own cache semantics).",
+        help="NO-OP since 2026-09-22.  The default-mode Uganda auto-purge it "
+             "suppressed has been retired (v0.8.0's content hash and GH #803 "
+             "do both of its jobs, and it silently excluded Uganda from "
+             "tests/test_table_structure.py and hollowed out "
+             "tests/test_uganda_invariance.py).  Still accepted so existing "
+             "invocations keep working.  --rebuild-caches still purges.",
     )
 
 
@@ -125,19 +126,37 @@ def pytest_configure(config):
         # before merging to master / cutting a release.
         pass
     else:
-        # Always clear Uganda's parquet cache at session start.  v0.7.1
-        # added country-level ``v`` and ``District`` formatters to
-        # Uganda/_/uganda.py and a framework-level grain fix in
-        # ``Country.cluster_features()``; both run only at extraction
-        # time, so cached parquets predating those changes mask the
-        # fix and produce spurious test failures (float-stringified v,
-        # missing Region column, household-grain cluster_features).
-        # The cost of a fresh build is small (~5-10s for Uganda's
-        # tables) and runs in the master process before xdist workers
-        # spawn, so there's no race.  Tracked as part of GH #196 /
-        # #197 / #161.  A no-op on a clean tree.  Pass --no-purge to
-        # skip this step for iterative diagnosis only.
-        _purge_country_caches("Uganda")
+        # RETIRED 2026-09-22.  This branch used to run
+        # ``_purge_country_caches("Uganda")`` on every session.
+        #
+        # Its two jobs are both done by the library now:
+        #
+        #   1. "cached parquets predating an extraction-time change mask the
+        #      fix" (v0.7.1, GH #196/#197/#161) -- v0.8.0's content hash does
+        #      this for EVERY country automatically.  ``Country._table_cache_hash``
+        #      folds the country module, so editing ``Uganda/_/uganda.py`` moves
+        #      the hash and the parquet grades stale.  Measured 2026-09-22:
+        #      58feecca8a82 -> 745cc5a5f599 on a one-line edit.
+        #   2. deleting in-tree ``Uganda/var/*.parquet`` -- GH #803 made the
+        #      library refuse to read an in-tree parquet at all
+        #      (``InTreeParquetWarning``, country.py:645).  There are none.
+        #
+        # What it cost, which its own comment never stated and
+        # ``Uganda/_/CONTENTS.org`` recorded as a TODO on 2026-08-20: the purge
+        # runs in ``pytest_configure``, BEFORE collection, and
+        # ``tests/test_table_structure.py`` parametrizes over the
+        # ``var/<table>.parquet`` files that exist at collection time.  So
+        # Uganda -- 18 script-path tables, the most idiosyncratic country in the
+        # corpus -- was absent from that module on every run.  Worse,
+        # ``tests/test_uganda_invariance.py`` only READS parquets, so the purge
+        # left all 53 of its entries skipping unless some alphabetically earlier
+        # module happened to rebuild the table it pins.  A regression net whose
+        # coverage depends on test ordering is not a regression net.
+        #
+        # ``--rebuild-caches`` still purges everything: that is an explicit
+        # request, not a default.  ``--no-purge`` is kept as an accepted no-op
+        # so existing invocations do not start erroring.
+        pass
 
 
 def _purge_country_caches(country_name: str) -> None:

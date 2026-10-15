@@ -442,6 +442,34 @@ whole country.
 
 The invariant is pinned by =tests/test_guinea_bissau_cluster_features.py=.
 
+** =Region= and =strata= now share one spelling (GH #811, 2026-09-24)
+
+=cluster_features.Region= and =sample.strata= both read =s00q01= (the
+region label on the cover page), and the raw parquets hold identical
+lower-case values in both (=sab=, =bafata=, ..., =BOLAMA_BIJAGOS= -- the
+source itself is inconsistent: eight lower-case names and one upper-case
+with an underscore).  Until 2026-09-24 only =strata= was normalised,
+because =_/categorical_mapping.org= carried a =#+NAME: strata= table (since
+2026-04-09) and the framework's auto-applied mapping matches tables to
+columns BY NAME.  So =Region= was served raw and =strata= canonical, and a
+=strata= <-> =Region= join matched zero rows.
+
+Fixed with a =#+name: Region= table in the same file whose rows are the
+=strata= table's rows verbatim, plus identity rows -- so the canonical
+spelling is the one already in force for =strata= (=SAB= upper-case, the
+autonomous sector of Bissau; the other eight title-case;
+=Bolama-Bijagos= hyphenated).  Served, before -> after: 9 labels -> 9
+labels, 450 rows, index unique, the two vocabularies now identical.  The
+stored wave and country parquets keep the raw values (read-path mapping,
+as =strata= always was), and the projection above is untouched -- the
+mapping runs in =_finalize_result=, after the collapse, and the raw values
+are constant within grappe anyway.
+
+Cache: =_/categorical_mapping.org= is a build input (every =_/*.org= but
+=CONTENTS.org= is folded into the input hash), so the edit moved every
+Guinea-Bissau cache hash once.  One wave; small.  Pinned by
+=tests/test_guinea_bissau_cluster_features.py::test_region_and_strata_share_one_vocabulary=.
+
 ** Known gap: 11 clusters have no coordinates
 
 Latitude/Longitude are NaN for 11 of the 450 grappes -- the 5 grappes absent

@@ -1,3 +1,13 @@
+# The venv carries no editable install of this project (GH #957), and this
+# Makefile is a documented entry point in its own right ("make -C lsms_library
+# help").  Its recipes run `python3 -m lsms_library.*` and `python3
+# ../bench/feature_audit/scan.py`, both of which put THIS directory (or the
+# script's) at sys.path[0] -- never the repo root -- so without this they raise
+# ModuleNotFoundError.  Derived from MAKEFILE_LIST, not $(CURDIR), so it is
+# correct under `make -f` and `make -C` alike.
+REPO_ROOT := $(abspath $(dir $(firstword $(MAKEFILE_LIST)))/..)
+export PYTHONPATH := $(REPO_ROOT)$(if $(PYTHONPATH),:$(PYTHONPATH),)
+
 ##
 # LSMS_Library
 #

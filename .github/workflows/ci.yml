@@ -1,9 +1,27 @@
 name: CI
 
 on:
+  # Pushes run CI only on the integration branches.  `branches: ["**"]` ran
+  # every PR twice (one run for the push, one for the pull_request), which is
+  # the doubled `unit-tests` check on every PR before 2026-10-14.  PR branches
+  # are covered by the pull_request event below; the merge queue by merge_group.
   push:
-    branches: ["**"]
+    branches: [development, master, separate_data]
+    # Notes and ledgers do not need a 30-minute run.  Deliberately NOT applied
+    # to pull_request: a docs-only PR would then have no `unit-tests` check,
+    # and the ruleset that requires it would hold the PR forever.
+    paths-ignore:
+      - 'slurm_logs/**'
+      - '.coder/**'
+      - 'SkunkWorks/**'
+      - 'lectures/**'
+      - '**.org'
+      - '**.md'
   pull_request:
+  # The development merge queue (ruleset "development merge queue", 2026-10-14)
+  # tests each merge group once; without this trigger a queued PR never gets
+  # its required check and sits in the queue indefinitely.
+  merge_group:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
@@ -15,6 +33,22 @@ on:
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+# The venv carries no editable install of this project (GH #957): `poetry
+# install --no-root` below deliberately does not install it, so nothing puts
+# the repo on sys.path by itself.  Neither invocation style used in this
+# workflow does either -- `poetry run pytest` is a console script
+# (sys.path[0] = <venv>/bin) and the wave scripts under countries/ are script
+# runs (sys.path[0] = the script's own directory).  One workflow-level
+# PYTHONPATH covers every job and every step.
+#
+# PYTHONSAFEPATH is deliberately NOT set here, although the Savio controllers
+# do set it.  It removes the script's own directory from sys.path, and the
+# `poetry run make -j2` step below runs country wave scripts that import a
+# sibling module by bare name (`from uganda import ...`).  Safe-path mode is
+# right for a controller process and wrong for a build subprocess.
+env:
+  PYTHONPATH: ${{ github.workspace }}
 
 jobs:
   # Fast tests — no data access needed
@@ -28,7 +62,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Run tests
         env:
           LSMS_SKIP_AUTH: "1"
@@ -57,6 +91,70 @@ jobs:
           poetry run pytest -n auto --dist=loadfile
           --timeout=600 --timeout-method=thread
           --durations=25
+
+  # Windows reader smoke.  Nothing else in CI runs on Windows, so this is the
+  # only place its defaults are exercised: the cp1252 text encoding, no
+  # ``fork`` start method, no process groups, a case-insensitive checkout.
+  # Scope is the READER path (install, load every country's config, parse
+  # every data_info.yml) -- script-path ``make`` builds are not expected to
+  # work on Windows yet.  No secrets: nothing here reads microdata.
+  windows-smoke:
+    runs-on: windows-latest
+    # A hang (first seen: `import lsms_library; Country('Uganda')` sat for an
+    # hour) must not run to the 6-hour default.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install --no-root
+      # Separate from pytest so an import-time failure is attributed to the
+      # import, not lost inside test collection.
+      - name: Import + config smoke
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        # dump_traceback_later: if anything blocks, print every thread's
+        # stack after 120 s and exit, so a hang names its own location.
+        run: >-
+          poetry run python -c "import faulthandler, sys; faulthandler.dump_traceback_later(120, exit=True);
+          print(sys.version, sys.getfilesystemencoding(), __import__('locale').getpreferredencoding(), flush=True);
+          import lsms_library as ll; print('imported', ll.__file__, flush=True);
+          c = ll.Country('Uganda'); print('constructed', flush=True);
+          print(c.waves, flush=True); print(len(c.data_scheme), flush=True)"
+      - name: Collect tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+        run: >-
+          poetry run pytest --collect-only -q
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
+      - name: Run portability + config tests
+        env:
+          LSMS_SKIP_AUTH: "1"
+          # Deliberately OFF: UTF-8 mode would mask exactly the cp1252
+          # decoding this job exists to catch.
+          PYTHONUTF8: "0"
+          PYTHONUNBUFFERED: "1"
+          PYTHONFAULTHANDLER: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          LSMS_BUILD_WORKERS: "1"
+        run: >-
+          poetry run pytest -n auto --dist=loadfile
+          --timeout=600 --timeout-method=thread
+          tests/test_windows_portability.py
+          tests/test_schema_consistency.py
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
@@ -111,7 +209,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Verify DVC lockfiles
         id: check
         env:
@@ -143,7 +241,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Refresh lockfile hashes
         env:
           LSMS_SKIP_AUTH: "1"
@@ -200,7 +298,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Configure DVC credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
