@@ -78,5 +78,26 @@ policy. Do not close it through this change.
 
 ### Phase 3 — verification
 
-Pending focused negative control, fixed regressions, actual Makefile/private
-script replay, raw canonical comparison, invariance and cache-scope measurement.
+- `assets.py` — OK (§§2–5): direct concat plus unchanged `id_walk` produces
+  the exact existing raw canonical frame, including values, index, dtypes,
+  ordering and attrs, from eight real private wave inputs (116,808 rows).
+  Actual Makefile replay rebuilt all eight waves; each wave frame remained
+  equal. Both original raw duplicate/sanity checks pass when called on this
+  output. A following API rebuild exactly preserves the served frame,
+  including its 4,237 post-label duplicate keys.
+- Actual-script regressions — OK (§§4–5): all five fail against the old
+  script, all pass after the repair. Focused new, assets-additive and sibling
+  earnings-script tests: 31 passed, no skips. All-null inputs are retained;
+  the crosswalk test includes a transitive mapping to detect double use.
+- Coverage limitation: `uganda_baseline.json` contains zero assets entries,
+  so the existing invariance module supplies no assets check. No fixture was
+  changed; exact private before/after frame comparisons provide the evidence.
+- Cache scope — OK (§4): compared with base `7c6265de7`, all 28 Uganda
+  country-table hash calculations and 224 wave/table hash calculations move
+  (including names without a materialized wave table), because every country
+  `.py` input is hashed. GhanaSPS control: 13 country and 39 wave/table hashes
+  unchanged. This is Uganda-wide invalidation, not just assets. Script output
+  remains hashless; canonical rebuild stamps the hash and eight-wave manifest.
+- CONTENTS addendum — OK (§3): corrects the historical assets divergence while
+  preserving GH #788's open general policy question. No production path other
+  than the country compiler, source wave, schema, baseline or reducer changed.
