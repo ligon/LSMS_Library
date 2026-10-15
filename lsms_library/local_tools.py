@@ -371,7 +371,7 @@ def _ensure_dvc_pulled(fn) -> None:
             return  # no sidecar found at any interpretation; not DVC-tracked
 
         sidecar = abs_path.parent / f"{abs_path.name}.dvc"
-        with sidecar.open() as fh:
+        with sidecar.open(encoding="utf-8") as fh:
             sidecar_data = yaml.safe_load(fh)
         md5 = sidecar_data["outs"][0]["md5"]
         # Check both DVC 2.x and DVC 3.0 cache layouts.  DVC 3.x is
@@ -526,7 +526,7 @@ def _dvc_cache_path(fn) -> "Path | None":
             return None
 
         sidecar = abs_path.parent / f"{abs_path.name}.dvc"
-        with sidecar.open() as fh:
+        with sidecar.open(encoding="utf-8") as fh:
             md5 = yaml.safe_load(fh)["outs"][0]["md5"]
         for layout in (
             _DVC_CACHE_DIR / md5[:2] / md5[2:],                 # DVC 2.x
@@ -682,7 +682,7 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
             if not di_path.exists():
                 continue
             try:
-                data_info = yaml.safe_load(di_path.read_text())
+                data_info = yaml.safe_load(di_path.read_text(encoding="utf-8"))
             except (OSError, yaml.YAMLError):
                 continue
             if not isinstance(data_info, dict):
@@ -698,7 +698,7 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                 if not sidecar.exists():
                     continue  # untracked source — no DVC fetch needed
                 try:
-                    md5 = yaml.safe_load(sidecar.read_text())["outs"][0]["md5"]
+                    md5 = yaml.safe_load(sidecar.read_text(encoding="utf-8"))["outs"][0]["md5"]
                 except (KeyError, IndexError, TypeError, OSError, yaml.YAMLError):
                     continue
                 if md5 in seen_md5:
@@ -1191,7 +1191,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
     def local_file(fn):
     # Is the file local?
         try:
-            with open(fn) as f:
+            with open(fn, 'rb') as f:
                 pass
         except FileNotFoundError:
             return False
