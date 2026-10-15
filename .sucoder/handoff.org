@@ -2,9 +2,10 @@
 
 * Current execution -- Codex, job39919092
 The maintainer approved WORKPLAN.org and said to proceed. Twenty-one implementation
-PRs are merged to development, plus evidence PRs #997/#998/#1007. GitHub, local main
-and filesystem origin development are synchronized at36a923305 after independently reviewed PR1011 passed unit
-and Windows checks. Corpus/coverage evidence PR1007 is already merged.
+PRs are merged to development, plus evidence PRs #997/#998/#1007/#1012. GitHub, local main
+and filesystem origin development were synchronized at =729ff5123= after PR #1012
+passed unit and Windows checks. Corpus/coverage and Feature audit evidence
+are merged; this checkpoint adds only status corrections.
 #967 Uganda remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
 newly reproduced #1003 merged via PR1004 after independent review and CI.
 PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
@@ -46,8 +47,11 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   9d5bf200f was dispatched as run38697245468 after the exact ordered helper
   plus Ghana test selection passed19tests in112.26s, with zero Ghana builds.
   Test-only fix PR1011 merged as36a923305; it excludes held967. Current
-  integrationbf917d438 has an identical full tree to validated candidate9d5. The
-  diagnosed flag leak is #1010, distinct from #1003 and not a proved #941 cause.
+  integration =ea688bf51= includes merged evidence PR #1012. Production code, tests,
+  dependencies, build configuration and Feature harness match candidate =9d5bf200f=;
+  its full tree differs in documentation/evidence. Earlier integration =bf917d438=
+  had an identical full tree to =9d5bf200f=. The diagnosed flag leak is #1010, distinct
+  from #1003 and not a proved #941 cause.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
