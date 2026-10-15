@@ -1,0 +1,132 @@
+[
+  {
+    "branch": "feature/964-windows-script-builds",
+    "sha": "f9993cfe01713dea9fd356a769694b1ead6fa47e",
+    "status": "conflict",
+    "paths": [
+      "tests/test_build_subprocess_env.py"
+    ],
+    "error": ""
+  },
+  {
+    "branch": "fix/810-followup",
+    "sha": "0014e7332139732a64af296b862f7d1044af4d3c",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/831-followup",
+    "sha": "858c41b474bb38a803b920eed14718a7e0f89175",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/868-followup",
+    "sha": "9dfb8339455957739896730216493ba4453a9693",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/962-uganda-food-units",
+    "sha": "a2b44daa677a02c82b60e05016df45e194597e32",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/970-json-make",
+    "sha": "dd85a53a866ef0c0f9c08e39c921add8c3a72b2a",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/burkina-2014",
+    "sha": "650484236314f09d3f87fb1f329c481e75cb7eb0",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/ci-skips",
+    "sha": "9291b79deea8be7014b8c170f8cb3f7892a1d690",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/framework-small-2",
+    "sha": "fd3ebb1c5dfc68fb48f084fb1e3faa5ec8e57cfb",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/ghana-docs-encoding",
+    "sha": "3973e909468b9b33137c6bc3e561d934b252779f",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/grader-scale-830",
+    "sha": "73b06e97b1efa09bb0e1b7b394063356763159e4",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/kinship-974",
+    "sha": "1d77c6ff282cc8a2947cec235c05d4dbecc502d7",
+    "status": "conflict",
+    "paths": [
+      "tests/test_crop_kg_factor.py"
+    ],
+    "error": ""
+  },
+  {
+    "branch": "fix/labels-relabel-787",
+    "sha": "6922c077af5b1d1f386f081920586e407b5a6d2d",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/niger-followup-2",
+    "sha": "b6feef57812432d4ac89d7bd4f0669e933aabae4",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/nigeria-824-followup",
+    "sha": "eeb445ebf1d0b690bf71bc45bedb6c2215c7b53e",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/nigeria-w5-cluster",
+    "sha": "df3b211f682d3e27e798896e638d3adad98d748f",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/peru-panama",
+    "sha": "e887e163b511361caf1795fbc684b30e98627e71",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  },
+  {
+    "branch": "fix/readers-xport-sniff",
+    "sha": "77d2b9829cc96e165165d9cdabb59fe4bfa21809",
+    "status": "clean",
+    "paths": [],
+    "error": ""
+  }
+]
