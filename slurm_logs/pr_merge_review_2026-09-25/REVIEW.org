@@ -1,0 +1,181 @@
+#+title: Open PR consistency and merge-order review -- 2026-09-25
+#+author: Sue (GPT-6)
+
+* Recommendation
+
+Preferred order: #955, #951, #963, #952, #954, #966; #966 waits for green CI.
+Hold #965 for the two Windows reader blockers below.
+The first six have no hard dependency on one another: this order establishes the mapping guards, clears the kinship dictionary, groups the GhanaLSS rebuilds, then lands the remaining country changes.
+The exact order inside the independent groups is not required for correctness.
+No PR has been merged or modified by this review.
+
+| Order | PR | Reason / condition |
+|-------+----+--------------------|
+| 1 | [[https://github.com/ligon/LSMS_Library/pull/955][#955]] | Documents and tests the existing mapping resolution; does not implement #953's repair. |
+| 2 | [[https://github.com/ligon/LSMS_Library/pull/951][#951]] | Behaviour-preserving kinship cleanup; independent of #954. |
+| 3 | [[https://github.com/ligon/LSMS_Library/pull/963][#963]] | Fraction parser; correct the no-rebuild claim for current development. |
+| 4 | [[https://github.com/ligon/LSMS_Library/pull/952][#952]] | Country-tree helper imports; batch with #963 before rebuilding GhanaLSS. |
+| 5 | [[https://github.com/ligon/LSMS_Library/pull/954][#954]] | Country-source missing-value repairs; preserves served roster values. |
+| 6 | [[https://github.com/ligon/LSMS_Library/pull/966][#966]] | Malawi sale units and disclosed inferences; contingent on green CI. |
+| Hold | [[https://github.com/ligon/LSMS_Library/pull/965][#965]] | Fix installed dependencies and Wave.resources decoding, then revalidate Windows. |
+
+* Merge blockers in #965
+
+** P1: the ordinary Windows installation is not the environment that passed CI
+
+The current dependency floor is still =ligonlibrary>=0.2.0= (=pyproject.toml:26=).
+Live [[https://pypi.org/pypi/ligonlibrary/json][PyPI metadata]], checked at 2026-09-26T06:06:59Z, has version 0.2.2 and an unconditional =python-magic>=0.4.27= dependency; 0.2.3 has not been released.
+The PR records that importing this dependency hangs on Windows without the bundled libmagic DLL.
+=.github/workflows/ci.yml:81-89= manually uninstalls =python-magic= and installs =python-magic-bin= before the successful smoke test.
+=docs/getting-started.md:10-12= nevertheless promises native Windows reading after the ordinary pip installation.
+
+Release the upstream platform-specific dependency fix, raise the LSMS dependency floor, remove the temporary swap and rerun Windows CI on the declared installation.
+The existing Windows CI result is 333 passed and one skipped after the swap; no Windows host was available for this local review.
+This is a merge condition for the current support claim, not evidence of a Linux regression.
+
+** P1: Wave.resources is still unsafe under the Windows default encoding
+
+=lsms_library/country.py:836-843= opens wave =data_info.yml= without an explicit encoding.
+=Wave.grab_data= calls that reader at lines 1360-1363, before its fixed UTF-8 parser can help.
+The exemption =("country.py", "resources")= in =tests/test_windows_portability.py:57= matches both =Country.resources= and =Wave.resources=, but the corresponding ASCII guard at line 160 checks only country-level =*/_/data_info.yml=.
+
+With default decoding simulated as cp1252, =Country('Tajikistan')['2003'].resources=, =data_scheme=, =features= and =grab_data('sample')= fail with =UnicodeDecodeError= at byte 0x90, offset 1808.
+The UTF-8 control reads all six table declarations.
+The coordinator independently reproduced the =resources= failure; the reviewer also found 17 wave configs whose parsed values differ under cp1252.
+These are current shipped files, not a hypothetical future character.
+
+Set UTF-8 on =Wave.resources=, distinguish the classes in the exemption mechanism, and exercise actual wave APIs in the Windows tests.
+Accept the resulting rebuild: a source-only simulation of this one encoding correction changes all eight sampled build fingerprints.
+Preserving an incorrect ASCII exemption to avoid rebuilding would leave the advertised reader path broken.
+All source line anchors in this section refer to the combined review tree below.
+
+* Consistency findings
+
+** Mapping and country-module resolution
+
+#955 changes documentation and tests, not resolution behaviour.
+Its global-last, local-first model agrees with #952, which retains the reserved third cascade rung while selecting the country module from the config tree.
+All seven GhanaLSS helper-import probes resolve to the intended tree.
+The only shared files between PRs are =country.py= and =local_tools.py= in #955/#965; their combined edits preserve both the documentation and UTF-8 changes.
+#953 remains a separate repair; neither #952 nor #955 claims to wire the missing global cascade.
+
+** Kinship
+
+#951 removes 70 shadowed keys, all with equal retained twins.
+The real kinship resolver produces exactly equal frames and warnings over 1,751 labels/null variants before and after the dictionary change.
+It does not depend on #954 or on the categorical Org-table machinery documented in #955.
+
+Controlled cold builds with the old and new #954 source hooks retain 51,574 EthiopiaRHS and 129,650 Senegal roster rows.
+All served values, index labels and dtypes compare exactly after index sorting.
+Senegal row order differs, so the PR's byte-identity wording should be restricted to the measured data equivalence.
+The cache now has actual missing relationships instead of blank/'Nan' strings and loses the 15,201 unused Senegal preload rows earlier in the pipeline.
+This respects the documented survey exceptions and does not change the cp1252 relationship spelling repair.
+A useful follow-up is to retain direct source-hook/raw-cache regression tests: finalizer sentinel handling can hide recurrence from tests that check only served rosters.
+The blanket phrase "non-null values unchanged" also excludes synthetic falsy values 0, False and the empty string; none occurs as a nonmissing source relationship in the two Senegal files.
+
+** Fractions, Malawi and current-base cache reachability
+
+#963 and #966 are compatible.
+Across the saved 971,531-row Malawi food frame, all 637 native-unit labels produce the same old/new parser answers in both volume modes.
+All 971,028 derived quantity rows and 681,613 price rows are exactly unchanged by the fraction parser.
+#966's own label/alias-induced differences remain those recorded in its PR validation.
+
+The #963 no-rebuild claim is too broad on current =development=.
+Global tagged fingerprints stay unchanged, but GhanaLSS nutrition's script dependency reaches the parser through =food_quantities_from_acquired=.
+An exact-current-base probe applying only #963 in memory changes all 18 GhanaLSS scheme-key hashes and all seven food-acquired wave hashes.
+The import fingerprint machinery already exists on the base; #952 does not add it.
+Both #963 and #952 should land before the planned GhanaLSS rebuild; their relative code order is not a prerequisite.
+
+One nonblocking Malawi documentation inconsistency remains: =CONTENTS.org:1597-1598= says IHS2 lacks any unit-to-kg factors, while lines 1585-1587 describe its label-derived 50/90 kg factors.
+The intended distinction is absence of an official conversion table versus available explicit sack sizes; no extra data change is requested.
+
+Both GhanaLSS tests described as historical failures in #963 now pass on the combined tree (2 passed, 47 existing warnings, 500.67 seconds).
+The rebuilt 5,340,606-row food-acquired frame matches the prior pre-stack cached frame exactly; its 60 native-unit labels contain no fractions and have identical old/new parser outputs.
+This is current-base verification, not a reproduction of the older PR branch's historical environment.
+
+* Combined-tree verification
+
+Base =3cf124ca3886e08e98a3e10324270ea8ecdccda6=; immutable combined checkout =/local/job39263225/worktrees/pr-review-combined=.
+Synthetic local merge commit =ed84314790fe24d495b2fd03c3f17d5abddcd1af=, tree =463389d5b4101b08e4967235503fe716623d38ab=.
+The following PR heads were fetched and reviewed:
+
+| PR | Head |
+|----+------|
+| [[https://github.com/ligon/LSMS_Library/pull/951][#951]] | =a8c7496cd30b903322fdd54a4a8fb4c77fd57e09= |
+| [[https://github.com/ligon/LSMS_Library/pull/952][#952]] | =6efb964371393a22baec99f91f1b82a9c15d8d3b= |
+| [[https://github.com/ligon/LSMS_Library/pull/954][#954]] | =fff5bba1a4ea48478c1e4afdfb6ca38939928874= |
+| [[https://github.com/ligon/LSMS_Library/pull/955][#955]] | =dd18033b5e1fd9f62350714dcaf26453d2040595= |
+| [[https://github.com/ligon/LSMS_Library/pull/963][#963]] | =91118fd1a5be1462941258bd4c27763595cb5629= |
+| [[https://github.com/ligon/LSMS_Library/pull/965][#965]] | =b8243c91f6de9bbadbfbc33d652491ef1e7d144e= |
+| [[https://github.com/ligon/LSMS_Library/pull/966][#966]] | =a27aae6d6ea139f0c0b40a5ac0a2d4183d580893= |
+
+Forward order =955,951,954,952,963,966,965= and its complete reverse both merge cleanly and produce the same tree.
+The simulation used =git merge-tree --write-tree= and temporary =git commit-tree= objects, then a detached worktree; no real branch was merged or published by the simulation.
+
+- Mapping/registry/hash suite :: 132 passed, no skips, including the expected-checkout assertion.
+- Units/Malawi static suite :: 264 passed.
+- Windows/GhanaLSS Linux suite :: 462 passed; existing Windows CI was inspected separately, not rerun here.
+- Kinship/categorical/hash suite :: 92 passed; 17 additional country schema checks passed.
+- Source checks :: Seven GhanaLSS import probes, real-resolver kinship equivalence, paired cold roster builds and the full saved Malawi parser comparison described above.
+
+These are targeted selections, some overlapping, not a claim that the entire repository suite was run.
+The earlier #966 validation independently cold-built every Malawi API entry and passed 517 selected tests.
+
+The full current-base versus combined inventory covers 453 scheme keys in 38 countries, plus 38 global build fingerprints.
+Only four countries' keys change: EthiopiaRHS 14, GhanaLSS 18, Malawi 24, Senegal 18.
+The other 379 keys and all 38 global fingerprints are unchanged.
+Counts here mean YAML scheme keys, not public API methods or materialized parquet files.
+The corrected #965 reader would cause an additional broad rebuild; batch the final rebuild after the accepted changes land.
+
+* Reproduction and provenance
+
+All local execution used the existing Savio allocation, with pandas 3.0.6, pyarrow 25.0.1 and numpy 2.4.6 from =/local/job39263225/venv_img/bin/python=.
+Each worker used its own scratch/L2 root, shared only the existing L1 blobs, pinned eight distinct CPUs, and set BLAS/OMP/MKL threads and =LSMS_BUILD_WORKERS= to 1.
+No dependency installation, DVC CLI, shared-cache purge, product-code edit or GitHub write was made.
+
+The coordinator's mapping check was:
+
+#+begin_src sh :eval never-export :tangle no :exports code
+cd /local/job39263225/worktrees/pr-review-combined
+export PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries"
+export LSMS_EXPECTED_ROOT="$PWD"
+export LSMS_DATA_DIR=/local/job39263225/pr-consistency-review/integration/data
+export PATH=/local/job39263225/venv_img/bin:$PATH
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 PYTHONDONTWRITEBYTECODE=1
+unset PYTHONSAFEPATH
+python -m pytest -n 8 --dist=loadfile --no-purge -q -ra \
+  tests/test_categorical_mapping_resolution.py tests/test_global_u_org.py \
+  tests/test_housing_canon.py tests/test_gh645_to_parquet_null_coercion.py \
+  tests/test_build_transform_hash.py > mapping-tests.log 2>&1
+#+end_src
+
+Run the retained =hash_inventory.py <output.json>= from each checkout with the same import/root environment to repeat the full metadata-only cache census.
+The retained =cache_changes.json= and =dependency-and-encoding.json= record the aggregate hash changes and upstream dependency observation.
+The Windows failure can be reproduced without source data or a rebuild:
+
+#+begin_src python :eval never-export :tangle no :exports code
+import builtins
+from unittest.mock import patch
+import lsms_library as ll
+
+wave = ll.Country('Tajikistan')['2003']
+assert len(wave.resources) == 6  # normal UTF-8 host control
+real_open = builtins.open
+
+def windows_open(path, mode='r', *args, **kwargs):
+    if 'b' not in mode and 'encoding' not in kwargs:
+        kwargs['encoding'] = 'cp1252'
+    return real_open(path, mode, *args, **kwargs)
+
+with patch('lsms_library.country.open', windows_open, create=True):
+    wave.resources  # raises UnicodeDecodeError before the proposed correction
+#+end_src
+
+Detailed worker reports, source probes and logs are under =/local/job39263225/pr-consistency-review/{kinship,units,windows,integration}/= until the allocation ends.
+
+Final GitHub check: all seven PR heads remain unchanged and textually mergeable.
+#951, #952, #954, #955 and #963 have successful unit-test runs; #965 also has successful Windows smoke runs, subject to the blockers above.
+#966 unit-test runs remain in progress as of 2026-09-25 23:19 PDT; wait for their final result before merging it.
+
+-- Sue

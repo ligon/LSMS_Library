@@ -1,0 +1,161 @@
+{
+  "checked_utc": "2026-09-26T06:19:56.374797+00:00",
+  "base": "3cf124ca3886e08e98a3e10324270ea8ecdccda6",
+  "combined_tree": "463389d5b4101b08e4967235503fe716623d38ab",
+  "preferred_order": [
+    955,
+    951,
+    963,
+    952,
+    954,
+    966
+  ],
+  "hold": [
+    965
+  ],
+  "prs": [
+    {
+      "baseRefName": "development",
+      "headRefOid": "a27aae6d6ea139f0c0b40a5ac0a2d4183d580893",
+      "mergeable": "MERGEABLE",
+      "number": 966,
+      "title": "fix(Malawi): preserve sale units and disclose basis inferences",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "IN_PROGRESS",
+          "conclusion": ""
+        },
+        {
+          "name": "unit-tests",
+          "status": "IN_PROGRESS",
+          "conclusion": ""
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "b8243c91f6de9bbadbfbc33d652491ef1e7d144e",
+      "mergeable": "MERGEABLE",
+      "number": 965,
+      "title": "Windows: make the reader path work on native Windows",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "windows-smoke",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "windows-smoke",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "91118fd1a5be1462941258bd4c27763595cb5629",
+      "mergeable": "MERGEABLE",
+      "number": 963,
+      "title": "fix(units): _parse_explicit_metric reads a FRACTION, not the digits beside the unit",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "dd18033b5e1fd9f62350714dcaf26453d2040595",
+      "mergeable": "MERGEABLE",
+      "number": 955,
+      "title": "docs+tests: make the categorical-mapping resolution model durable (#953)",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "fff5bba1a4ea48478c1e4afdfb6ca38939928874",
+      "mergeable": "MERGEABLE",
+      "number": 954,
+      "title": "gh813: fix the two labels leaking into the kinship lookup, at source",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "6efb964371393a22baec99f91f1b82a9c15d8d3b",
+      "mergeable": "MERGEABLE",
+      "number": 952,
+      "title": "GhanaLSS: wave scripts import the country module relative to the script, not absolutely (#948)",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "baseRefName": "development",
+      "headRefOid": "a8c7496cd30b903322fdd54a4a8fb4c77fd57e09",
+      "mergeable": "MERGEABLE",
+      "number": 951,
+      "title": "kinship.yml: remove the 70 keys the lookup can never reach, and a test that keeps it at zero",
+      "checks": [
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "COMPLETED",
+          "conclusion": "SUCCESS"
+        }
+      ]
+    }
+  ]
+}

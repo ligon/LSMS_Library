@@ -1,0 +1,141 @@
+{
+  "changed_input_factors": 35,
+  "cells": [
+    {
+      "t": "2016-17",
+      "j": "Groundnut - Boiled (Vendor)",
+      "u": "Heap",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "before_factor": 0.125,
+      "kg_per_unit": 0.27906976744186046,
+      "alias_factor": 0.125,
+      "rows": 4,
+      "native_quantity": 7.0,
+      "before_kg": 0.875,
+      "after_kg": 1.9534883720930232
+    },
+    {
+      "t": "2016-17",
+      "j": "Groundnut - Boiled (Vendor)",
+      "u": "No 12 Plate",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "before_factor": 0.28125,
+      "kg_per_unit": 0.2670000046491623,
+      "alias_factor": 0.28125,
+      "rows": 28,
+      "native_quantity": 58.0,
+      "before_kg": 16.3125,
+      "after_kg": 15.486000269651413
+    },
+    {
+      "t": "2019-20",
+      "j": "Groundnut - Boiled (Vendor)",
+      "u": "Basin",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "before_factor": 0.375,
+      "kg_per_unit": 0.1451127819548872,
+      "alias_factor": 0.375,
+      "rows": 1,
+      "native_quantity": 1.0,
+      "before_kg": 0.375,
+      "after_kg": 0.1451127819548872
+    },
+    {
+      "t": "2019-20",
+      "j": "Groundnut - Boiled (Vendor)",
+      "u": "Heap",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "before_factor": 0.125,
+      "kg_per_unit": 0.27906976744186046,
+      "alias_factor": 0.125,
+      "rows": 1,
+      "native_quantity": 1.0,
+      "before_kg": 0.125,
+      "after_kg": 0.27906976744186046
+    },
+    {
+      "t": "2019-20",
+      "j": "Groundnut - Roasted (Vendor)",
+      "u": "Kilogramme",
+      "before_source": "unit",
+      "KgFactorSource": "metric",
+      "before_factor": 0.3240000009536743,
+      "kg_per_unit": 1.0,
+      "alias_factor": 1.0,
+      "rows": 1,
+      "native_quantity": 1.0,
+      "before_kg": 0.3240000009536743,
+      "after_kg": 1.0
+    }
+  ],
+  "source_counts_before": {
+    "survey_kg": 419998,
+    "metric": 253347,
+    "item_unit": 225619,
+    "unit": 70687,
+    "none": 991,
+    "item_unit_tight": 889
+  },
+  "source_counts_after": {
+    "survey_kg": 419998,
+    "metric": 253348,
+    "item_unit": 225580,
+    "unit": 70725,
+    "none": 991,
+    "item_unit_tight": 889
+  },
+  "alias_only_factor_changes": 1,
+  "item_split_factor_changes": 34,
+  "source_transitions": [
+    {
+      "t": "2016-17",
+      "j": "Groundnut - Boiled (Vendor)",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "rows": 37,
+      "magnitudes_changed": 32
+    },
+    {
+      "t": "2019-20",
+      "j": "Groundnut - Boiled (Vendor)",
+      "before_source": "item_unit",
+      "KgFactorSource": "unit",
+      "rows": 2,
+      "magnitudes_changed": 2
+    },
+    {
+      "t": "2019-20",
+      "j": "Groundnut - Roasted (Vendor)",
+      "before_source": "unit",
+      "KgFactorSource": "metric",
+      "rows": 1,
+      "magnitudes_changed": 1
+    }
+  ],
+  "served_replay": {
+    "baseline": {
+      "food_quantities": "exact_from_attributed_factors",
+      "food_prices": "exact_from_attributed_factors"
+    },
+    "final": {
+      "food_quantities": "exact_from_attributed_factors",
+      "food_prices": "exact_from_attributed_factors"
+    }
+  },
+  "artifact_sha256": {
+    "baseline": {
+      "food_acquired.pkl": "8d8a289ea77b458dd96ac0d98e9c365c15be731db53a1905f388ce0d0f5a36c0",
+      "food_quantities.pkl": "3627c1abbcf71e28e5f3f497ea295373fe18f8c25732542716030a4f06878228",
+      "food_prices.pkl": "a6d289dd15dfb801bf9e60f3ee44b7ed7c901ea1431fa5d065ff1870b22de808"
+    },
+    "final": {
+      "food_acquired.pkl": "c815f63d07cc539d95f783e4f564e747762e5e0a3e64bfc1b6231f19d9877dd4",
+      "food_quantities.pkl": "3532c8c1f7c0ad6235e54b035355b0af9f8b2c30c072b41a399f12f64483312e",
+      "food_prices.pkl": "f16fb6337b720b9a2fdc50be29562a6ac275da2dd1afda7c5022cb33db4dad12"
+    }
+  }
+}

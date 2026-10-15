@@ -1,0 +1,64 @@
+#+title: Backlog fix phase 2026-09-24: branches, verdicts, decisions
+#+date: [2026-09-24 Thu 05:10]
+
+Eight fix branches (nine elements) and eight red-team verdicts, all on =fc_jevons= / =savio4_htc=, one 8-core element each.
+Inputs: =briefs/=, =review_briefs/=; outputs: =reports/= (the fix agents' self-reports and commit lists), =verdicts/= (the reviewers' VERDICT.md).
+Nothing is merged; no PR is open; no GitHub write has been made.  Every branch is on the shared mirror only.
+
+* Verdicts
+| branch | issues | verdict | reviewer's headline | decision for @ligon |
+|--------+--------+---------+---------------------+---------------------|
+| fix/811-region-tables | #811 | pass | every figure reproduces cold; new test discriminates; cost is a full re-warm of GB+BF+SN (53 tables), not "one wave" | accept three editorial spellings (GB =SAB= upper; BF =Mouhoum= -> =Mouhoun=; SEN unaccented) |
+| fix/848-uganda-condition2 | #848 | pass | two independent cold builds reproduce; 2019-20 questionnaire says "up to 2 conditions"; four pinned baselines moved with numbers | none |
+| fix/810-dvc-open | #810 | pass-with-fixes | symptom reproduced/gone; suite green (2 pre-existing order flakes); one false comment about the WB fallback; missing sources now reach the WB API (bounded ~60 s offline) | land beside the #959 corpus re-warm |
+| fix/831-cache-clear | #831 | pass-with-fixes | hash-neutral, regression-free; =ls-files= empty-set misreports pip installs inside a user git repo; =check-ignore= rationale false; suffix set misses =.dat .dct .ssp .tab .xls .xlsx= | move =Panama/1997/Data/unittable.csv= under =_/= (vs allowlist) |
+| fix/malawi-bundle | #833 #839 | pass-with-fixes | every figure reproduces; 561 tests; two docstrings must be fixed BEFORE merge (else a second Malawi re-warm) | is =shell_not_applicable= a wildcard for shell-less crops? 464 sales / 40.8M MWK (Tobacco, Cotton) are suppressed as contradictions today |
+| fix/nigeria-824 | #824 #867 | pass-with-fixes | Unit_sold reproduces to the row; the #867 alias ALSO re-values 9,640 Mali plot_inputs rows (+122,434 kg N, +13.5%), undisclosed, no cache signal | sign the 0.20 N share for Mali "Other inorganic" and Nigeria W1-W3 "other (specify)" (+2.5%), or drop the alias and let #867 carry it |
+| fix/niger-followup (contains fix/niger-bundle) | #679 #865 #824 #811 #833 | pass-with-fixes | every served number reproduces on the reviewer's own cold rebuild of all 23 tables; three prose figures wrong; red test must name hid 27010; re-key drops five old links | ext-2-only split-offs (3 households: (89,5) (95,1) (128,11)) -- keep their 2011 id or not (panel-design call) |
+| fix/868-reduce-agreed | #868 | needs-human | correct on every path, served values unchanged, suite clean; but a CORPUS-WIDE re-warm of both tiers for a disclosure-only fix (formatter/replay helpers sit under the tagged collapse) | pay it now, ride it with #810/#959's re-warm, or ask for the read-path placement the reviewer sketched |
+
+* Rulings received
+- Malawi decision 1 (@ligon 2026-09-24): "shelled vs unshelled is really a missing data problem, decipherable by looking at prices perhaps."  Not wildcard-vs-contradiction: a missing basis is to be INFERRED from the unit price where it separates, as a registered derivation.  Diagnosis element =malawi-sale-basis-probe= (branch =fix/malawi-sale-basis-probe=, job 39200778, savio3_htc) measured it; report in =reports/malawi-sale-basis-probe.md=, scripts on the branch under =malawi_sale_basis/=.
+  Result: price identifies the basis for GROUNDNUT only (shelled/unshelled 1.6-2.2x per 50 kg bag, P(S>U) 0.78-0.94; leave-one-out recall ~80%).  Maize, Rice, Soyabean, Tobacco, Cotton: ratio ~1.0, P ~0.5 -- no separation.  The instrument asks S/U "for all applicable crops" with no crop list; Tobacco and Cotton have no shell, and their harvest rows are 86-100% not-applicable.
+  Of the 465-sale class (40.6M MWK): 307 have a stated S/U on the sale against a NOT-APPLICABLE harvest row; 158 the reverse.  The gated price derivation attaches 17 sales / 477,800 MWK (all Groundnut, all unshelled); 448 / 40.17M stay suppressed, all Tobacco (109 / 24.76M) and Cotton (57 / 2.04M) among them.
+  Contradictions (647): price sides with the SALE field 379:207 -- the more reliable field, not reliably enough for a rule.
+  Sharpened decision for @ligon: (a) implement the Groundnut price derivation (small, registered); (b) for crops where shelling does not apply, treat not-applicable AS the basis and attach (recovers ~166 sales / ~26.8M MWK of Tobacco+Cotton; the instrument's own wording supports it); (c) leave the 647 contradictions suppressed.
+
+- @ligon 2026-09-24, on the Malawi call: "this would be a derived value, see docs"; "the 647 contradictions could also sometimes produce a derived value, based on price".  Every non-exact attachment branch becomes a registered key (docs/guide/derivations.md, one key per branch); the remainder is a =rows: 0= deletion entry.  Implementation element =malawi-derivations= on =fix/malawi-bundle=.
+
+- Element =malawi-derivations= delivered (=fix/malawi-derivations=, 95449ffb9, job 39204616): six keys, per-wave table in =reports/malawi-derivations.md=; unresolved 1,112 / 64.1M MWK -> 345 / 13.8M; total Value_sold +50.3M.  Agent force-pushed its own branch once (disclosed).  Red-team verdict (job 39205842, =verdicts/malawi-derivations.md=): pass-with-fixes -- every number reproduces cold, ladder monotone, inputs join 100%, force-push confirmed to have moved only its own branch.  Fixes: prose misstates the margin rule (77 of 357 price-rung attachments sit in the outer quarter between the medians, correctly admitted, wrongly described); the delivered-row shortfall is mis-attributed to #869 when 11 of 27 are a PRE-EXISTING wave-script =first()= collapse (27 sales / 373,600 MWK composed away; own issue); rung 3 admits 296 of 410 sales on NO reference cell (13.3M MWK) vs 114 measured non-separating (25.4M) -- disclosed in the rule text but not in =validated_against=.
+  Decisions for @ligon: (i) decision 4 -- on the S/U-sale-vs-NA-harvest side the branch only ADMITS a sale whose price corroborates its answer (11 sales / 707,400 MWK refused, 4 with an unambiguous contrary price); add a key that overrules the sale's answer, as the contradiction rungs do?  (ii) rung 3 -- make "no reference cell" its own countable key, or report it in attrs?  (iii) confirm the margin tolerance (outer quarter between medians = unambiguous).
+  RULING (@ligon 2026-09-25): (i) ADD -- price overrules the sale's recorded S/U on that side, as its own key.  (ii) OWN KEY, per row (@ligon 2026-09-25: "yes, per row").  (iii) gate kept as validated; prose fixed.  Element =malawi-derivations-2= applied all three + the seven review items: =fix/malawi-derivations-2= (a2051b6ac, job 39226861; report =reports/malawi-derivations-2.md=).  Eight keys; overrule rung 4 sales / 157,000 MWK (all Groundnut 50 kg bag); no-reference 296 / 13.27M split out of not-applicable (114 / 25.42M measured); unresolved 341 / 13.65M with a per-ground partition in attrs; cold build reproduces every pin; 498 tests; no force-push.  Variety-collapse issue text in =issues_to_file.org=.
+  Malawi stack for PR: fix/malawi-bundle -> fix/malawi-derivations -> fix/malawi-derivations-2 (one Malawi re-warm, 21 tables).  Not yet re-reviewed as a stack.
+
+* Cross-cutting findings the reviewers surfaced (pre-existing; candidates for new issues)
+- BF =cluster_features= 2014 destroys 1,034 of 10,800 rows (94 =(t,v)= groups); both BF EHCVM waves drop their =df_geo= sub-df (=lat_dd_mod= not in columns).  Identical on development.
+- Nigeria country script =drop_duplicates(keep='first')=: 159 positive-sale rows discarded in W1/W2, 40 the only sale on their key; invisible to =grain_reports()=.
+- Nigeria W1/W2 also carry other-buyer sales (=sa3q16a/b=, =sa3q17=) that no table reads.
+- Niger: hid 27010 in the 2011-12 harvest module and in no roster/welfare file; assets served with duplicated =(i,t,j)=; plot_inputs seed-slot collisions.
+- =get_data_file= parses =grab_data='s =../Data/= candidate into =country='..'= ("No SOURCE.org found for ../.."); =paths.data_root= lru_cache poisoned by =monkeypatch.setenv= in =test_gh866_*=; order-dependent =test_ghanalss_aggregate[total]=.
+- =_sync_legacy_dvc_creds= is dead once no =dvc.api.open= caller remains (#810).
+
+- RULINGS (@ligon 2026-10-14, accepting the scrum master's recommendations on every open point):
+  - #811: accept the three editorial spellings (GB =SAB= upper; BF =Mouhoun=; SEN unaccented).  PR-ready.
+  - Nigeria #867 alias: do NOT sign the 0.20 N share for Mali "Other inorganic" / Nigeria W1-W3 "other (specify)"; drop the alias from =fix/nigeria-824= and let #867 carry it with its own disclosure.
+  - #831: move =Panama/1997/Data/unittable.csv= under =Panama/_/= rather than allowlist it.
+  - #868 bill: pay the corpus-wide re-warm, BUNDLED with #810 and #970 (one cold re-warm for the three).  Measured 2026-10-14: merging GitHub development through PR #965 moved 0/5 build fingerprints, so #965 does NOT already owe the re-warm; only Malawi (#966) and GhanaLSS (#952) hashes moved on the merge.
+  - Malawi: already ruled 2026-09-25 (above) and LANDED on GitHub as PR #966 (=fix/malawi-sale-units=, a rework of the =fix/malawi-bundle= -> =malawi-derivations-2= stack); the stack branches are superseded, not for PR.
+  - 2026-10-14 state: mirror development was merged with GitHub development (796386fa7; fork point 3cf124ca3, 54 vs 31 commits).  All seven remaining fix branches trial-merge clean onto it.
+
+* Proposed next steps
+1. @ligon answers the decision column (five decisions) and the #868 bill.
+2. One more fix array (same harness) applies the reviewers' mechanical follow-ups on the six pass-with-fixes branches, each from that branch: 810 (comment), 831 (five items), malawi (two docstrings + CONTENTS), nigeria (three prose items + Mali test pin), niger (four items incl. narrowing the red test), 868 (rename =dropped=, two docstrings) -- decisions applied where given.
+3. Push reviewed branches to GitHub from the mirror and open one PR per branch, verdict attached, for @ligon to merge.  811 and 848 are ready now.
+4. File the cross-cutting findings as issues (gh writes; needs the go-ahead).
+
+* Bill (session-end delta, skill protocol)
+=fc_jevons=: 95.8 core-hours over 25 Slurm jobs (17 agent elements + the two dead submissions 39198738 and 39199587, which cost ~7 x 5 min and 1 s).  Baseline at session start 44,927 of 1,500,000 SUs.
+Inference: about USD 209 across the 17 headless agents (per-element =cost= lines are in the slurm outputs).
+
+* Harness notes for the next dispatch
+- A headless turn ends on a text-only message; briefs now forbid backgrounding and the script salvages uncommitted work.  Cost before the fix: three lost reports, one lost set of tests (recreated).
+- =sbatch= flags go BEFORE the script path (39199587 died on line 14 for that).
+- Publish the briefs to the mirror BEFORE submitting (39198738 ran seven elements with no prompt).
+- Prefer =savio3_htc= next time when it has headroom (@ligon 2026-09-24); =savio4_htc= had 5,325 idle cores today and bills more per core-hour.

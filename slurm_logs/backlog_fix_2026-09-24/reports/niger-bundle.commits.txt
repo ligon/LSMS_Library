@@ -1,0 +1,5 @@
+d36054864 Niger harmonize_food: fold the cross-wave spellings of cabbage and sugar; clean 'Aubergine,'; code 166 stays (GH #833)
+b502bb28d Niger cluster_features.Region: add the lower-case 2018-19 spellings (GH #811)
+04c1efbf9 Niger crop_production: carry the SOLD unit, key the crop-level sale on it, drop s16d's repeated lines (GH #824)
+f231e6a6c Niger: map the unlabelled all-nines "don't know" codes to NA, exact value only (GH #865)
+d0ec4b32f Niger 2014-15: key households on (GRAPPE, MENAGE, EXTENSION) (GH #679)

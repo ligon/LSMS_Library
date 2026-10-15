@@ -42,7 +42,8 @@ import pandas as pd
 # Makefile runs it (`cd $(@D) && python food_acquired.py`) and which every
 # `../Data/...` read in this file already assumes.
 sys.path.append('../../_')
-from ghanalss import reduce_duplicate_food_rows
+from ghanalss import (reduce_duplicate_food_rows, derive_produced_farmgate_value,
+                      to_country_food_labels, reconcile_after_crosswalk)
 
 t = '1998-99'
 
@@ -212,7 +213,6 @@ assert not fa.index.duplicated().any(), (
 # the .sum()), and ONLY where BOTH factors exist -- a produced row missing
 # either keeps Expenditure NaN and carries NO key, so the labelled rows are
 # exactly the computed ones.
-from lsms_library.countries.GhanaLSS._.ghanalss import derive_produced_farmgate_value
 DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
 _prod = (fa.index.get_level_values('s') == 'produced')
 _both = (_prod
@@ -228,7 +228,6 @@ assert fa.loc[~_both, 'Derivation'].isna().all(), (
 
 # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
 # Pure rename; an unmapped label raises rather than passing through.
-from lsms_library.countries.GhanaLSS._.ghanalss import to_country_food_labels, reconcile_after_crosswalk
 fa = to_country_food_labels(fa, '1998-99')
 # guinea corn + sorghum are one crop on two 8h lines -> one j; reduce
 # here, on the canonical grain, not in core (Trap 9).
