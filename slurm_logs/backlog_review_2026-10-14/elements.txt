@@ -1,0 +1,6 @@
+810-followup fix/810-followup -
+nigeria-824-followup fix/nigeria-824-followup Nigeria,Mali
+868-followup fix/868-followup Uganda,Togo
+niger-followup-2 fix/niger-followup-2 Niger
+nigeria-w5-cluster fix/nigeria-w5-cluster Nigeria
+kinship-974 fix/kinship-974 Senegal,Guinea-Bissau,EthiopiaRHS
