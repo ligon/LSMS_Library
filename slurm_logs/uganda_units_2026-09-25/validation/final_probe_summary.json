@@ -1,0 +1,21 @@
+{
+  "oracle": {
+    "unique": {
+      "input_rows": 1728,
+      "output_rows": 2862,
+      "result": "PASS"
+    },
+    "duplicates": {
+      "input_rows": 1728,
+      "output_rows": 202,
+      "result": "PASS"
+    }
+  },
+  "dtype_checks": {
+    "float64": "PASS",
+    "Float64": "PASS",
+    "Int64": "PASS",
+    "object": "PASS",
+    "categorical_u": "PASS"
+  }
+}

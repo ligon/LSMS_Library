@@ -1,0 +1,17 @@
+wave,code,item,item_label,raw_label,rows,home_q_positive,home_x_positive,home_q_nonmissing,home_x_nonmissing,away_q_positive,away_x_positive,away_q_nonmissing,away_x_nonmissing,own_q_positive,own_x_positive,own_q_nonmissing,own_x_nonmissing,inkind_q_positive,inkind_x_positive,inkind_q_nonmissing,inkind_x_nonmissing
+2011-12,0,141,Beans (dry),,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0
+2011-12,0,158,Soda,,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2011-12,136,151,Soda,,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0
+2013-14,142092,142,Ground nuts (in shell),,2,0,0,0,0,0,0,0,0,2,2,2,2,0,0,0,0
+2015-16,123060,123,dry/smocked  fish,,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0
+2015-16,139093,139,Other Vegetables,,3,0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2
+2015-16,142090,142,Ground nuts (in shell),,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0
+2015-16,156087,156,Other Tobacco,,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0
+2015-16,156090,156,Other Tobacco,,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0
+2015-16,156096,156,Other Tobacco,,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0
+2015-16,181087,181,Cassava (dry),,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0
+2018-19,136,151,Soda*,,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1
+2018-19,136,152,Beer*,,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0
+2018-19,136,1603,Other juice Fresh in Restaurants,,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0
+2019-20,136,151,Soda*,,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0
+2019-20,136,175,Water,,3,2,2,2,2,1,1,1,1,0,0,0,0,0,0,0,0

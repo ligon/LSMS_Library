@@ -1,0 +1,345 @@
+{
+  "baseline_ref": "4c2223aa119381ebcd8aea05fc2f9d26c3026028",
+  "candidate_ref": "72f8bce34",
+  "import": "/local/job39263225/worktrees/uganda-food-units/lsms_library/__init__.py",
+  "proposal_sha256": "ce9383c471af1eea4d59461307ce9b60bb5db4cbe6d7b5ac829bac9982050e6b",
+  "source_sidecars": [
+    {
+      "path": "lsms_library/countries/Uganda/2005-06/Data/GSEC14A.dta.dvc",
+      "sha256": "4edef615ebdcf8d7b9e89f42724cac9ae2e1827e03da2034260889a7cb0daeb0"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2009-10/Data/GSEC15b.dta.dvc",
+      "sha256": "1a0cfdc30e10e09b4817db071562239c3d583863b0adf967235c0055bf6f2670"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2010-11/Data/GSEC15b.dta.dvc",
+      "sha256": "7b4df1f78442f29f57ff23ebc9356a511290bc7565ce760775af1c80d934b136"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2011-12/Data/GSEC15B.dta.dvc",
+      "sha256": "260983e556f11fd5d8078e8e99f276b6d166679a9abcc6c42ea37597edcc847a"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2013-14/Data/GSEC15B.dta.dvc",
+      "sha256": "3932d7ff0c4e4a3ea71189ac0f48afba3d747113f5a64f87417830d4e4b305b3"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2015-16/Data/gsec15b.dta.dvc",
+      "sha256": "1920d7e787372bf19791320f92856dacda65f85826be69b7973e3ed19e005559"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2018-19/Data/GSEC15B.dta.dvc",
+      "sha256": "b572a3591044ed4420a204b5b64a01a857500a825aa0872c9f02c02089be7c56"
+    },
+    {
+      "path": "lsms_library/countries/Uganda/2019-20/Data/HH/gsec15b.dta.dvc",
+      "sha256": "e8872d5078aeebc25d95b5c2366a2c85487d77b7011ce550efe2b998983acf7d"
+    }
+  ],
+  "classification": {
+    "baseline_blank_rows": 7359,
+    "raw_long_rows": 7359,
+    "matched_keys": 7359,
+    "unmatched_served_keys": 0,
+    "extra_raw_keys": 0,
+    "exact_quantity_expenditure_replay": true,
+    "category_counts": {
+      "missing_raw_unit": 7333,
+      "recorded_code_residual": 24,
+      "zero_code": 1,
+      "promoted_physical_code": 1
+    },
+    "physical_catalog_codes": 131,
+    "observed_physical_codes": [
+      123060.0
+    ],
+    "raw_wide_summary": [
+      {
+        "wave": "2005-06",
+        "selected_wide_rows": 1199,
+        "by_raw_category": {
+          "missing_raw_unit": 1199
+        }
+      },
+      {
+        "wave": "2009-10",
+        "selected_wide_rows": 600,
+        "by_raw_category": {
+          "missing_raw_unit": 600
+        }
+      },
+      {
+        "wave": "2010-11",
+        "selected_wide_rows": 1151,
+        "by_raw_category": {
+          "missing_raw_unit": 1151
+        }
+      },
+      {
+        "wave": "2011-12",
+        "selected_wide_rows": 1121,
+        "by_raw_category": {
+          "missing_raw_unit": 1115,
+          "recorded_code_residual": 4,
+          "zero_code": 2
+        }
+      },
+      {
+        "wave": "2013-14",
+        "selected_wide_rows": 780,
+        "by_raw_category": {
+          "missing_raw_unit": 778,
+          "recorded_code_residual": 2
+        }
+      },
+      {
+        "wave": "2015-16",
+        "selected_wide_rows": 670,
+        "by_raw_category": {
+          "missing_raw_unit": 659,
+          "recorded_code_residual": 10,
+          "promoted_physical_code": 1
+        }
+      },
+      {
+        "wave": "2018-19",
+        "selected_wide_rows": 793,
+        "by_raw_category": {
+          "missing_raw_unit": 790,
+          "recorded_code_residual": 3
+        }
+      },
+      {
+        "wave": "2019-20",
+        "selected_wide_rows": 689,
+        "by_raw_category": {
+          "missing_raw_unit": 684,
+          "recorded_code_residual": 5
+        }
+      }
+    ],
+    "identity_rule": "existing id_walk with baseline committed updated_ids.json",
+    "transitions": [
+      {
+        "raw_category": "missing_raw_unit",
+        "u": "Unknown",
+        "rows": 904
+      },
+      {
+        "raw_category": "missing_raw_unit",
+        "u": "Value",
+        "rows": 6429
+      },
+      {
+        "raw_category": "promoted_physical_code",
+        "u": "Fish Cut piece(Above 2  kg)",
+        "rows": 1
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "136",
+        "rows": 12
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "139093",
+        "rows": 3
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "142090",
+        "rows": 1
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "142092",
+        "rows": 2
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156087",
+        "rows": 3
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156090",
+        "rows": 1
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156096",
+        "rows": 1
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "181087",
+        "rows": 1
+      },
+      {
+        "raw_category": "zero_code",
+        "u": "Unknown",
+        "rows": 1
+      }
+    ],
+    "exact_transition_checks": true
+  },
+  "kg_attribution": {
+    "kg_delta": -849.2998505776974,
+    "attribution": [
+      {
+        "raw_category": "missing_raw_unit",
+        "u": "Unknown",
+        "rows": 904,
+        "kg_before": 890.3835416666666,
+        "kg_after": 0.0,
+        "kg_delta": -890.3835416666666
+      },
+      {
+        "raw_category": "missing_raw_unit",
+        "u": "Value",
+        "rows": 6429,
+        "kg_before": 0.0,
+        "kg_after": 0.0,
+        "kg_delta": 0.0
+      },
+      {
+        "raw_category": "promoted_physical_code",
+        "u": "Fish Cut piece(Above 2  kg)",
+        "rows": 1,
+        "kg_before": 0.2583333333333333,
+        "kg_after": 8.0,
+        "kg_delta": 7.741666666666667
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "136",
+        "rows": 12,
+        "kg_before": 2.777083333333333,
+        "kg_after": 24.56897926634769,
+        "kg_delta": 21.791895933014356
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "139093",
+        "rows": 3,
+        "kg_before": 1.4854166666666666,
+        "kg_after": 6.708333333333334,
+        "kg_delta": 5.222916666666667
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "142090",
+        "rows": 1,
+        "kg_before": 0.06458333333333333,
+        "kg_after": 0.8823529411764706,
+        "kg_delta": 0.8177696078431372
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "142092",
+        "rows": 2,
+        "kg_before": 0.19374999999999998,
+        "kg_after": 2.768817204301075,
+        "kg_delta": 2.575067204301075
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156087",
+        "rows": 3,
+        "kg_before": 0.38749999999999996,
+        "kg_after": 1.875000010477379,
+        "kg_delta": 1.487500010477379
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156090",
+        "rows": 1,
+        "kg_before": 0.4520833333333333,
+        "kg_after": 1.75,
+        "kg_delta": 1.2979166666666666
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "156096",
+        "rows": 1,
+        "kg_before": 0.03229166666666666,
+        "kg_after": 0.125,
+        "kg_delta": 0.09270833333333334
+      },
+      {
+        "raw_category": "recorded_code_residual",
+        "u": "181087",
+        "rows": 1,
+        "kg_before": 0.06458333333333333,
+        "kg_after": 0.25,
+        "kg_delta": 0.18541666666666667
+      },
+      {
+        "raw_category": "zero_code",
+        "u": "Unknown",
+        "rows": 1,
+        "kg_before": 0.12916666666666665,
+        "kg_after": 0.0,
+        "kg_delta": -0.12916666666666665
+      }
+    ]
+  },
+  "quantity_grains": {
+    "quantity_rows_delta": 6430,
+    "value_rows_added": 6429,
+    "unknown_rows_added": 905,
+    "kg_rows_delta": -904,
+    "unknown_rows_colliding_with_other_physical_inputs": 1,
+    "collision_summaries": [
+      {
+        "wave": "2013-14",
+        "food": "Bread",
+        "source": "purchased",
+        "other_native_unit": "Loaf (1kg)",
+        "other_native_quantity": 1.0,
+        "unknown_quantity": 1.0
+      }
+    ],
+    "nutrition_all_household_row_delta_sums": {
+      "Energy": -130397.30461617693,
+      "Protein": 6473.696401115103,
+      "Fiber": -140.38892314990497,
+      "Folate": 5568.604362434886,
+      "Calcium": -22014.764900458948,
+      "Carbohydrate": -38212.20224047751,
+      "Iron": -297.92761946968915,
+      "Niacin": 1235.289420939398,
+      "Riboflavin": 3.405331584470508,
+      "Thiamin": 3.829603556040034,
+      "Vitamin A": -4381.270833333334,
+      "Vitamin B-12": 456.47706947767153,
+      "Vitamin B-6": 27.66107843405838,
+      "Vitamin C": -601.0223958333329,
+      "Zinc": -259.2551333247837
+    }
+  },
+  "fct_source": {
+    "org_foods": 135,
+    "csv_foods": 137,
+    "matched_foods": 135,
+    "matched_nutrients": 15,
+    "cells": 2025,
+    "differing_cells": 0,
+    "max_abs_delta": 1.4210854715202004e-14,
+    "csv_labels_without_org_reconstruction": [
+      "Cooking Oil (refined)",
+      "Cooking Oil (unrefined)"
+    ],
+    "org_labels_without_csv": [],
+    "source_basis": "recorded Org per 100g, multiplied by 10 to per kg",
+    "tolerance_absolute": 1e-08
+  },
+  "limitations": [
+    "Survey records are reread through the library; numeric code identity is checked, not guessed from labels.",
+    "Physical versus residual catalog decisions are inputs from the versioned proposal, not independently re-adjudicated.",
+    "FCT check reconciles recorded Org inputs and CSV; original lab measurements and 24 USDA additions are not independently refetched.",
+    "Fish range endpoint remains the existing parser policy, not an independently measured mass.",
+    "No fixture regeneration, published-total matching, or Country cache rebuild is performed by this attribution driver."
+  ]
+}

@@ -793,22 +793,13 @@ here is not the full UNPS series.
 
 * Unit handling for =food_acquired=
 
-The =u= (unit) index level on =food_acquired= is canonical at
-parquet-write time via =harmonized_unit_labels()= in
-=lsms_library/countries/Uganda/_/uganda.py=.  It reads the =#+name: u=
-table in =_/categorical_mapping.org= via =get_categorical_mapping=
-(Tier 1 convention shared with Malawi, Mali, Nigeria, Senegal, Burkina
-Faso) and returns a =Code -> Preferred Label= dict where the canonical
-labels (=Kg=, =Gram=, =Litre=, =Akendo (Small)=, =Sack (120 kgs)=,
-...) are already in human-readable form.  =food_acquired()= renames
-the =u= index level through this map, so by the time the wave parquet
-is written the =u= index carries clean labels.
+The =u= (unit) index level on =food_acquired= is decoded at parquet-write time via =harmonized_unit_labels()= in =lsms_library/countries/Uganda/_/uganda.py=.
+It reads the =#+name: u= table in =_/categorical_mapping.org= via =get_categorical_mapping= (Tier 1 convention shared with Malawi, Mali, Nigeria, Senegal, Burkina Faso) and returns a =Code -> Preferred Label= dict.
+The preferred labels include native units (=Kg=, =Gram=, =Litre=, =Akendo (Small)=, =Sack (120 kgs)=, ...), the missing-unit sentinel =Unknown=, and the explicitly accepted code residuals below.
+=food_acquired()= renames the =u= index through this map; source-specific missing-unit handling then distinguishes =Unknown= from =Value= before the canonical parquet is written.
 
-The =u= table also retains the per-wave variant columns (=2005-06=,
-=2009-10=, ..., =2019-20=) that document the raw label appearing in
-each wave's questionnaire.  These extra columns are unused at runtime
-but preserve the cross-wave provenance previously captured in the
-retired =_/unitlabels.py= file.
+The =u= table also retains the per-wave variant columns (=2005-06=, =2009-10=, ..., =2019-20=) that document the raw unit labels in each wave's Stata metadata.
+These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
 
 The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
@@ -839,6 +830,33 @@ inferred factor is the anti-pattern GH #850 exists to remove.
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+** Recorded labels and accepted residuals (GH #962, 2026-09-25)
+
+The 143 previously blank Preferred Labels were not all missing units.
+Of these, 134 have source strings, all in the 2011-12 food module's Stata unit metadata; every string matches its recorded org-table column exactly, and the other seven wave codebooks omit these codes rather than corroborating them.
+Of the 134 strings, 131 name a measurement unit or size; the other three name only an item: =153001= (Other alcoholic drinks), =154001= (Other drinks), and =160001= (Other Juice).
+The earlier description of all 134 as physical units was therefore too broad.
+The catalog promotes the 131 measurement labels, reusing 111 existing canonical equivalents and retaining the recorded sizes and named forms of the other 20; all source-wave columns are unchanged.
+
+Only one promoted code occurs in the eight raw food modules: =123060=, =Cut piece(above 2kg)-Big=, on one 2015-16 purchased dry/smoked-fish row (quantity 4, expenditure 8,000).
+It now uses the existing preferred label =Fish Cut piece(Above 2  kg)=.
+The existing metric parser reads this lower-bound label as 2 kg per piece, hence 8 kg for this row; the legacy curated factor is 3 kg, and =tests/test_food_kg_inference.py= explicitly records that disagreement.
+This changes the decoded label, not the parser's range-endpoint policy or the reported quantity.
+The half- and quarter-packet labels require the fraction parser fixed in GH #963.
+
+Eight recorded codes have no unit label in any wave: =136=, =156087=, =139093=, =142092=, =156096=, =156090=, =181087=, and =142090=.
+They remain distinct numeric-string residuals, as do the three item-only codes above; none is replaced with an invented unit or the shared =Unknown= sentinel.
+The eight occur on 24 raw food rows; the three item-only codes occur on none.
+These are accepted code residuals under the food-unit skill, not a claim that their physical meaning is known or that the kg inference excludes them.
+Code =0= occurs on two raw rows and follows the agreed missing-unit policy; the codebooks themselves do not define it as a unit.
+The aggregate source counts, full mapping, and reproducible audit are in [[file:../../../../slurm_logs/uganda_units_2026-09-25/catalog/README.org][the catalog evidence]].
+
+Missing-unit handling is per acquisition source, before duplicate aggregation.
+A source with a reported quantity uses =Unknown=; one with expenditure but only zero or missing original quantities uses =Value= with =Quantity = Expenditure=.
+Negative quantities and cancelling home/away quantities are still reported quantities.
+A =Value= row has no canonical reported =Price=; raw wide market/farmgate observations remain available, and a unit value can still be computed from expenditure divided by quantity.
+The independent cold comparison in [[file:../../../../slurm_logs/uganda_units_2026-09-25/VALIDATION.org][the validation report]] measures the resulting factor provenance and downstream totals.
+
 ** =food_acquired= DROPS rows whose unit label is off the =u= table
 
 Recorded 2026-09-18 (GH #832); the behaviour itself is much older and was
@@ -865,6 +883,12 @@ Two things follow, and both are live caveats rather than settled design:
   0.22% of a wave (836 rows in 2019-20) and 698 purchased + 514 produced +
   79 in-kind across the panel, on codes 800-802, 996-999 and the keying
   slips =123060= / =142090= / =156087=.
+
+Those GH #832 counts are historical observations, not the current baseline.
+A cold build at =4c2223aa1= on 2026-09-25 drops 428 of 53,211 pre-canonical wide rows in 2018-19 (codes =996=, =997=, =998=, =999=) and 831 of 48,571 in 2019-20 (codes =800=, =801=, =802=, =996=, =997=, =998=, =999=).
+In that baseline, =123060=, =142090=, and =156087= already have catalog entries with blank Preferred Labels, so they decode to =---= and survive this off-map filter; their inclusion in the older dropped-code list does not describe the current path.
+GH #962 changes those catalog entries but leaves the warning/drop behavior for unlisted codes in place.
+See [[file:../../../../slurm_logs/uganda_units_2026-09-25/VALIDATION.org][the cold-build evidence]] for the current comparison.
 
 Until 2026-09-18 the warning said only "Dropping some unknown unit
 codes!", with the label set merely =print=ed -- so it could not be
