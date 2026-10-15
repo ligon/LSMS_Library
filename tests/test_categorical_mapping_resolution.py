@@ -429,7 +429,8 @@ def test_gh694_numeric_values_survive_a_same_named_table():
                        "x": [1.0, 2.0, 3.0, 4.0]})
     out = _apply({"Rural": _RURAL}, df)
     assert out["Rural"].tolist() == [0, 1, 1, 0], (
-        "an unguarded .str.strip() nulls every non-string value (GH #694)")
+        "an unguarded .str.strip() nulls every non-string value in a mixed "
+        "object column (GH #694)")
     assert out["Rural"].notna().all()
 
 

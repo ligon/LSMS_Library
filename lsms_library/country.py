@@ -425,9 +425,9 @@ def _strip_string_values(s: pd.Series) -> pd.Series:
     ``Series.str.strip()`` on an ``object`` column is not a no-op for the
     non-string entries: the ``.str`` accessor returns NaN for any element that
     is not a string, so a column that merely shares its name with a
-    categorical-mapping table -- ``Rural`` holding ``0``/``1``, a numeric
-    ``Region`` code -- had its numeric values NULLED before ``.replace`` ever
-    ran.  Whitespace-padded labels still need the strip so they match the
+    categorical-mapping table -- a mixed object column such as ``Rural``
+    holding ``0``/``1`` beside labels, or an object-dtype ``Region`` code --
+    had every non-string value NULLED before ``.replace`` ever ran.  Whitespace-padded labels still need the strip so they match the
     mapping's keys, so strip only where the value is a ``str``.
 
     String and categorical dtypes already hold only strings (or NA); they keep
