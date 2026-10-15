@@ -248,6 +248,33 @@ Data Scheme:
     u: str
     Quantity_sold: float
     Value_sold: float
+    # The unit the SALE was reported in (GH #824) -- A3 q11's own PROD. UNIT
+    # CODE (sa3q11b), asked beside the sold quantity -- and NOT the row's
+    # `u`, which is the HARVEST unit (q6b).  Canonicalised through the same
+    # size-agnostic `_canon_unit` as `u`.  Measured on the raw files over
+    # rows with a positive sale that record both units: the raw codes agree
+    # on 96.9% (2011Q1, n=3,548) / 95.3% (2013Q1, n=3,478); the served,
+    # size-collapsed labels agree on 97.7% / 96.3%, the difference being
+    # sales from a big sack of a harvest kept in a medium one, which the
+    # collapse cannot see (same collapse the KgFactor note below records).
+    #
+    # WHERE THEY DISAGREE THE ROW IS A FLAG, NOT AN IDENTIFICATION: the
+    # canonical rule (lsms_library/data_info.yml, measured on Uganda) is
+    # that a consumer forming a per-unit price must treat Unit_sold != u
+    # rows as ambiguous and report how many were excluded.  Not carrying
+    # the column was worse: Value_sold / Quantity_sold was filed under the
+    # harvest unit by assumption on every row.
+    #
+    # A plain NA-bearing string column, never an index level and never
+    # sentinel-filled.  `optional` for two reasons: only W1/W2 record a
+    # plot-grain sale at all (W3-W5's sale block is secta3ii at hh-crop
+    # grain with no plot linkage, GH #843, so Quantity_sold / Value_sold /
+    # Unit_sold are all legitimately NaN there); and a row with no sale has
+    # no sold unit, so the column is never fully populated.  No sold
+    # CONDITION column exists in the W1/W2 A3 files.
+    Unit_sold:
+      type: str
+      optional: true
     planting_month: str
     harvest_month: str
     intercropped: bool
