@@ -194,9 +194,12 @@ idx = ['t', 'i', 'j', 'u', 's']
 
 # Collapse duplicate (t,i,j,u,s) keys (same item/unit/source reported twice);
 # sum the quantities/expenditures, mean the per-unit price.
-out = out.groupby(idx, dropna=False).agg(Quantity=('Quantity', lambda s: s.sum(min_count=1)),
-                                          Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
-                                          Price=('Price', 'mean'))
+# Vectorised reducers, not per-group lambdas (GH #905): sum keeps min_count=1
+# so an all-NaN group stays NaN; the cython sum may differ from an in-order
+# Series.sum by 1 ULP.
+_g = out.groupby(idx, dropna=False)
+out = _g[['Quantity', 'Expenditure']].sum(min_count=1)
+out['Price'] = _g['Price'].mean()
 out = out.dropna(how='all')
 
 if __name__ == '__main__':
