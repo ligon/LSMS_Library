@@ -701,16 +701,19 @@ value-label bytes are Windows-1252: code 7 of =s01q02= is stored as
 =Fr\xe8re, s\x9cur= (0x9C is the oe ligature in cp1252).  =get_dataframe=
 reads the file through pandas =StataReader=, which decodes every pre-118
 file as Latin-1, so 0x9C came back as the C1 control U+009C and the wave
-served =Frere, S<U+009C>Ur= (318 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
+served =Frère, S<U+009C>Ur= (318 rows -- the =Ur= because the wave's =Relationship= formatter =.title()=-cases the label and =str.title= treats the control byte as a word break).  pyreadstat's default, or
 =encoding='cp1252'=, reads the same file correctly -- the defect is the
 reader's Latin-1 fallback, not the file (bytes and decoder matrix in
 =slurm_logs/gh797/fix_801/REPORT.org=, measured 2026-09-07).
 
 Fix (2026-09-07): =2018-19/_/mapping.py::_decode_cp1252= re-encodes the label as Latin-1 and decodes it
 as cp1252, and =_fix_relationship= re-title-cases the result; the =household_roster= hook applies it to =Relationship=
-only.  Served label is now =Frere, Soeur= with the ligature restored,
+only.  Served label is now =Frère, Sœur= with the ligature restored,
 identical to what the 2021-22 wave serves; kinship tuple [0, 1, consanguineal] unchanged; 318 rows changed,
-nothing else.  The C1-control spellings were deleted from
+nothing else.  Spelling corrected in this paragraph on 2026-10-14: the
+previous =Frere, Soeur= omitted both the accent and ligature despite the
+raw-byte evidence above. That unused ASCII kinship key is removed by GH #974;
+the delivered accented label is unchanged. The C1-control spellings were deleted from
 =lsms_library/categorical_mapping/kinship.yml= at the same time, so that
 file no longer carries the artefact and a regression would surface as an
 =Unknown relationship labels= warning instead of resolving silently.

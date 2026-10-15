@@ -1603,6 +1603,17 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     # run.  A `volume_as_mass=False` caller still drops the fluid spellings
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
+    #
+    # GH #931: only the FOOD callers pass `unit_kg` (`food_kg_factors`, via
+    # `Country.<food_prices|food_quantities>`).  `harvest_kg_factors` calls
+    # this function with `unit_kg` defaulted, and `_kg_factor_series` cannot
+    # pass it at all, so the crop ladder is blind to declared `u_kg` rows.
+    # That is deliberate for now: Ethiopia's external check on the WB shipped
+    # crop factors (`Quintal` == 100.0 where the library has no opinion;
+    # `test_quintal_is_exactly_100kg_on_every_newly_served_row`) depends on
+    # the crop ladder NOT holding a declared quintal.  Pinned by
+    # `tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg`;
+    # see the `harvest_kg_factors` docstring before threading `unit_kg` here.
     for key, kg in (unit_kg or {}).items():
         factors[str(key).lower()] = kg
 
@@ -3826,6 +3837,30 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``country`` are all optional.
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
+
+        There is deliberately NO ``unit_kg`` parameter here (GH #931).  The
+        FOOD ladder (:func:`food_kg_factors`) receives a country's declared
+        ``u_kg`` table through ``unit_kg`` -- composed by
+        ``Country._unit_kg_factors`` and passed only for ``food_prices`` /
+        ``food_quantities`` -- and lets it outrank :data:`KNOWN_METRIC`
+        (GH #919).  The CROP ladder never sees that table: its ``metric``
+        layer seeds :func:`_seeded_kg_factors` with ``unit_kg`` defaulted,
+        and ``inferred`` goes through :func:`_kg_factor_series`, which has no
+        ``unit_kg`` either.  So a unit a country declares in ``u_kg`` (say
+        ``Quintal: 100``) is served ``none`` here unless a ``KgFactor``
+        column, a *shipped_factors* table or :data:`KNOWN_METRIC` supplies
+        it.  The asymmetry is LOAD-BEARING, not an oversight: Ethiopia's only
+        EXTERNAL check on the World Bank's shipped factor table is that
+        ``Quintal`` comes back as exactly 100.0 on 13,924 rows the library
+        has NO independent opinion about
+        (``tests/test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``,
+        ``Ethiopia/_/CONTENTS.org`` "The real external check").  Teaching
+        this ladder to read ``u_kg`` would make that check a tautology, the
+        way the ``Kg``/``Gram`` overlap already is.  Whether the crop ladder
+        SHOULD read ``u_kg`` is an open decision (GH #931 item 2) that has to
+        land together with a re-expressed external check; the asymmetry
+        itself is pinned by
+        ``tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg``.
     min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
         ``N`` for the ``survey_median`` layer.  One number is applied to
         every group, but the groups are per country-wave, so a thin module
