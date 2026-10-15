@@ -159,6 +159,47 @@ Cluster counts after the fix (real clusters + moved singletons):
 | 2012-13 |           495 |              152 |
 | 2015-16 |           486 |              306 |
 | 2018-19 |           519 |              166 |
+| 2023-24 |           518 |              393 |
+
+The 2023-24 row: 518 real clusters is the BID's "518 EAs ... eligible for
+inclusion" (see [[*2023-24 (GHS-Panel Wave 5, catalog 6410)]]); 518 + 393 = 911
+distinct =v= per round, served identically by =sample= and =cluster_features=.
+Do not read the cover page's 719 distinct =(state, lga, ea)= tuples as a
+cluster count: 201 of them are =(state, lga, 0)= groups of movers.  The cover
+page's own =cluster= column (={lga}-{ea}=) is 1:1 with the composite key on
+the 518 real clusters; it has no state component and all movers share
+={lga}-0=, so it is a cross-check, not a key.
+
+*** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
+
+The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
+contains 106 files and no household geovariables file; the cover page
+=secta_plantingw5.dta= carries no lat/lon. This is an acquisition gap,
+not a claim that the survey did not collect coordinates. WB catalog 6410
+version =v02_M= (changed 2026-09-16) adds =NGA_HouseholdGeovariables_Y5.dta=
+(4,883 households, 55 variables) and =totcons_final.dta=, and revises
+=sect2b_harvestw5.dta= and =sect3d_harvestw5.dta=. Existing GH #978 tracks
+that refresh and the coordinate wiring; it needs no duplicate issue.  =cluster_features=
+for 2023-24 is therefore declared from the cover page alone (=df_key= +
+=df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
+fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
+=Longitude= are 100% NaN there pending the v02 acquisition.  The Site B
+null-content guard warns for exactly those two waves on every
+=cluster_features()= read; that is the known country-grain =optional:=
+mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
+=data_scheme.yml=, which would disarm W1--W4 as well.  A side effect of having
+no coordinates: the Site 2 household -> cluster collapse is lossless for W5
+(no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1).  Measured 2026-10-14
+on the cover page + geovariables of W2 / W3 / W4, per column, over the real
+(non-=moved=) composite clusters: =zone= / =state= / =sector= take more than
+one value in *0* clusters in every wave, while =Latitude= / =Longitude= do in
+5 / 24 / 50 clusters (the same 5 / 24 / 50 recorded in =data_scheme.yml=) --
+tracked households that kept their original real =ea= in the frame but now
+report different coordinates (NOT the =ea == 0= movers, which are singletons
+and cannot disagree with anyone).  The audit's larger "conflicting tuples"
+counts (70 / 78 / 129) include households with NO coordinate beside ones
+with one, which a whole-row comparison counts as a disagreement.  So the only
+columns that ever made this collapse lossy are exactly the two W5 lacks.
 
 ** Strata
 
@@ -819,14 +860,16 @@ Re-measured against =cluster_features().v= and =sample().v=, per round:
 | 2013Q1 |         496 |         494 (99.6%) | 494 (99.6%) |
 | 2016Q1 |         487 |         486 (99.8%) | 486 (99.8%) |
 | 2019Q1 |         517 |         517 (100%)  | 517 (100%)  |
-| 2024Q1 |         507 |           0 (0%)    | 507 (100%)  |
+| 2024Q1 |         507 |         507 (100%)  | 507 (100%)  |
 
 So the keyspace claim still holds -- =community_prices.v= joins households
 via their cluster -- but the count is per round, not a single 584, and it is
 not always 100%: three clusters (2 in 2013Q1, 1 in 2016Q1; 87 price rows)
-appear in the community file with no household-side cluster.  The 2024Q1
-zero is NOT a keyspace failure: =sample()= matches 507/507: it is that
-=cluster_features= is not declared for W5 at all (see the gap noted below).
+appear in the community file with no household-side cluster.  The 2024Q1 row
+used to read =0 (0%)= in the =cluster_features= column because the table was
+not declared for W5 at all; it is since GH #841 (declared without
+coordinates, see [[*Wave 5 ships NO household geovariables file (GH #841)]]),
+and all 27,318 2024Q1 price rows now join a =Region= / =District= / =Rural=.
 
 ** Item labels (j) -- the community-price arm of label unification
 

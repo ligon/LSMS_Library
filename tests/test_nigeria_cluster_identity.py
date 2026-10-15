@@ -91,11 +91,17 @@ ROUNDS = [
     ('2012Q3', '2013Q1'),   # 2012-13
     ('2015Q3', '2016Q1'),   # 2015-16
     ('2018Q3', '2019Q1'),   # 2018-19
-    ('2023Q3', '2024Q1'),   # 2023-24  (no cluster_features declared)
+    ('2023Q3', '2024Q1'),   # 2023-24
 ]
-# Waves that declare cluster_features (W5 does not).
-CF_ROUNDS = ROUNDS[:4]
+# Every wave declares cluster_features (W5 since GH #841).
+CF_ROUNDS = ROUNDS
 CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
+# Waves with acquired and wired household geovariables. W5 is still the
+# v01 extract: WB v02 supplies NGA_HouseholdGeovariables_Y5.dta, queued for
+# acquisition and wiring under GH #978. Its coordinates remain missing here.
+GEO_ROUNDS = ROUNDS[:4]
+GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
+NO_GEO_QUARTERS = [q for pair in ROUNDS[4:] for q in pair]
 
 # community_prices comes from the COMMUNITY questionnaire's Section C8, which is
 # administered in the post-harvest round only.  Verified structurally: across all
@@ -151,13 +157,28 @@ def test_cluster_features_index_is_unique(cf):
     assert dups == 0, f'{dups} duplicate (t, v) tuples in cluster_features'
 
 
-@pytest.mark.parametrize('t', CF_QUARTERS)
+@pytest.mark.parametrize('t', GEO_QUARTERS)
 def test_every_wave_has_coordinates_in_every_round(cf, t):
     """Lat/Lon were silently missing from 3 of the 4 waves that declare
     cluster_features -- and missing in both of each wave's quarters."""
     wave = cf.loc[t]
     assert wave['Latitude'].notna().any(), f'{t}: no Latitude at all'
     assert wave['Longitude'].notna().any(), f'{t}: no Longitude at all'
+
+
+@pytest.mark.parametrize('t', NO_GEO_QUARTERS)
+def test_w5_has_geography_but_no_coordinates_in_either_round(cf, t):
+    """GH #841: W5 declares cluster_features from the cover page alone.  Wave 5
+    v01 lacks the geovariables file supplied in WB v02 (GH #978), so
+    Latitude/Longitude remain all-NaN while Region/District/Rural are
+    populated. Retire this assertion and extend GEO_QUARTERS when the v02
+    file is acquired and wired as df_geo on hhid, as W4 does."""
+    wave = cf.loc[t]
+    assert len(wave) > 0, f'{t} missing from cluster_features'
+    for col in ['Region', 'District', 'Rural']:
+        assert wave[col].notna().all(), f'{t}: {col} has nulls'
+    assert wave['Latitude'].isna().all(), f'{t}: unexpected Latitude -- W5 geovars acquired?'
+    assert wave['Longitude'].isna().all(), f'{t}: unexpected Longitude -- W5 geovars acquired?'
 
 
 @pytest.mark.parametrize('t', ['2010Q3', '2011Q1'])
@@ -275,7 +296,7 @@ def test_sample_and_cluster_features_share_one_keyspace(nigeria, cf, sample):
     """sample.v is stamped onto every household table by _join_v_from_sample;
     it must resolve against cluster_features -- in BOTH rounds."""
     s = sample.reset_index()
-    s = s[s['t'].isin(CF_QUARTERS)]          # W5 declares no cluster_features
+    s = s[s['t'].isin(CF_QUARTERS)]          # every quarter, W5 included (GH #841)
     known = set(map(tuple, cf.reset_index()[['t', 'v']].drop_duplicates().values))
     got = set(map(tuple, s[['t', 'v']].dropna().drop_duplicates().values))
     orphans = got - known
