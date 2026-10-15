@@ -182,10 +182,18 @@ null-content guard warns for exactly those two waves on every
 =cluster_features()= read; that is the known country-grain =optional:=
 mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
 =data_scheme.yml=, which would disarm W1--W4 as well.  A side effect of having
-no coordinates: the Site 2 household -> cluster collapse is provably lossless
-for W5 (no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1), because
-lat/lon of movers were the only columns that disagreed within a composite
-cluster in W2--W4.
+no coordinates: the Site 2 household -> cluster collapse is lossless for W5
+(no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1).  Measured 2026-10-14
+on the cover page + geovariables of W2 / W3 / W4, per column, over the real
+(non-=moved=) composite clusters: =zone= / =state= / =sector= take more than
+one value in *0* clusters in every wave, while =Latitude= / =Longitude= do in
+5 / 24 / 50 clusters (the same 5 / 24 / 50 recorded in =data_scheme.yml=) --
+tracked households that kept their original real =ea= in the frame but now
+report different coordinates (NOT the =ea == 0= movers, which are singletons
+and cannot disagree with anyone).  The audit's larger "conflicting tuples"
+counts (70 / 78 / 129) include households with NO coordinate beside ones
+with one, which a whole-row comparison counts as a disagreement.  So the only
+columns that ever made this collapse lossy are exactly the two W5 lacks.
 
 ** Strata
 
