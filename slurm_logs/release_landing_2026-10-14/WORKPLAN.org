@@ -1,0 +1,282 @@
+#+title: Land the outstanding branches and release v0.15.0
+#+date: 2026-10-14
+#+startup: overview
+
+* Objective and completion criteria
+Land the reviewed fixes and all five outstanding PRs on =development=, validate
+their combined behaviour, then release from =master=. Proposed version:
+=v0.15.0= (latest published release is =v0.14.0=, 2026-09-17 UTC). Confirm the
+version against the final public changes before tagging; no static version bump.
+
+Every branch in the inventory must receive a disposition: landed, superseded
+with evidence, or explicitly retained with an owner/reason. Old rescue/WIP
+branches are not merge instructions. The initial release train is 18 active
+branches: the handoff's 16 (using =framework-small-2=) plus PRs #967 and #969.
+Add any genuinely unfinished historical fix discovered during reconciliation.
+
+Done means: the active fixes are merged; historical refs are accounted for;
+release gates below pass; GitHub Release and PyPI contain the intended version;
+an installation of the published wheel passes smoke checks; and the handoff
+records final SHAs, results, remaining issues, and cache status.
+
+This file is a workplan. Inventory and merge preflight are complete; no fixes,
+PR mutations, merges, cache clears, tags, or publication have been performed
+by this planning pass.
+
+* Evidence and corrections to the handoff
+- Local planning base: =a31257286=; GitHub development: =b021bae5d9=.
+  The two extra local commits only update =.sucoder/handoff.org=.
+- GitHub master: =1528fa937b=; latest release: =v0.14.0=.
+- =origin= is the filesystem mirror, NOT GitHub. Publish explicitly to
+  =https://github.com/ligon/LSMS_Library.git=, or configure a named GitHub
+  remote; a push to origin alone does not publish a branch or tag to GitHub.
+- [[file:snapshot.json][snapshot.json]] records the queried refs, open PRs/checks, and releases.
+  [[file:branches.tsv][branches.tsv]] covers 193 distinct ref versions / 184 branch names across
+  GitHub and the mirror. =git cherry= finds 34 patch-equivalent versions;
+  76 are ancestors of development, seven are contained by active successors,
+  four are integration refs, 18 are active, and 54 need historical review.
+  The last category is NOT 54 new fixes: squashed multi-commit PRs also land
+  there. Neither absence from ancestry nor a '+' patch is proof of omission.
+- [[file:merge-preflight.json][merge-preflight.json]]: 16 active branches merge cleanly individually.
+  Conflicts: #969 in =tests/test_build_subprocess_env.py=; =kinship-974= in
+  =tests/test_crop_kg_factor.py=. This is not a combined integration test.
+- Open PRs: [[https://github.com/ligon/LSMS_Library/pull/967][#967 Uganda units]],
+  [[https://github.com/ligon/LSMS_Library/pull/969][#969 Windows/no-make builds]],
+  [[https://github.com/ligon/LSMS_Library/pull/980][#980 CI skips]],
+  [[https://github.com/ligon/LSMS_Library/pull/981][#981 Burkina Faso]], and
+  [[https://github.com/ligon/LSMS_Library/pull/982][#982 JSON cache]].
+- #979 is recorded by GitHub as MERGED at =75a449744=, despite the handoff's
+  "closed duplicate" shorthand. That commit records the review summary;
+  #970's actual implementation remains on #982. Verify code containment,
+  not just PR state, when reconciling issue #970.
+- The four-branch global rebuild bundle must expand to FIVE: #969 also moves
+  both parquet tiers corpus-wide and already includes #968 and #965's nine
+  deferred encoding readers. Do not dispatch separate duplicate fixes.
+- The [[file:../backlog_review_2026-10-14/REVIEW_SUMMARY.org][review summary]] omits all five =grader-scale-830= follow-ups.
+  Use the [[file:../backlog_review_2026-10-14/verdicts/grader-scale-830.md][full verdict]]. =868-followup= and =readers-xport-sniff= also need code
+  changes, so the handoff's "mostly prose/test-wording" is insufficient as a brief.
+- GitHub's development ruleset requires only =unit-tests=, with no strict
+  up-to-date-base requirement. Windows and credentialed data success must be
+  checked explicitly. A green old head or a skipped job is not that evidence.
+
+* Phase 0 — settle scope and preserve the evidence
+- [X] Run =make api-audit=; read backlog/release skills, review summary, full
+  verdicts for the substantive blockers, and framework-small-2's report.
+- [X] Fetch mirror and GitHub refs; inventory all open PRs and branch tips;
+  perform read-only =git merge-tree= trials of the 18 active branches.
+- [ ] Reconcile the 54 historical ref versions in =branches.tsv=. For a
+  squashed PR, compare the combined PR patch and its merge commit, then inspect
+  any later branch tail. Preserve evidence for each final disposition.
+  Prioritise =fix/323-*=, the five =rescue/2026-07-21/*= rows still unmatched,
+  =feat/797-ghanalss-relationship-table=, =feat/parallel-wave-builds=,
+  =fix/837-cluster-key-residual=, and =fix/600-provenance-1to1=.
+- [ ] Record the old Uganda #962 drafts as superseded by #967 after comparing
+  their residual scripts/notes; explicitly exclude the PARKED value-count
+  proposal from implementation. Check the Malawi sale-basis probe against
+  merged #966 and the historical Ghana aggregate proposal against #940.
+- [ ] Archive external reports needed for review into this session directory
+  (including framework-small-2's REPORT and validation summaries). Do not rely
+  on a /local/job*/ path surviving a Slurm allocation.
+- [ ] Synchronize the two handoff-only development commits without replacing
+  newer remote work. Keep all subsequent fixes isolated from this checkout.
+
+Gate: no active branch missing from the landing table; every historical
+candidate has a named reconciliation task or a supported final disposition.
+No branch deletion is needed (the repository also has a No deletions ruleset).
+
+* Phase 1 — restore a usable validation path
+Land #980 first after checking its current diff and the review's remaining
+test/CI items. It enables manual data-tests and makes credential-free runs
+less expensive. Preserve =--no-root=, explicit checkout import paths, the
+single-PR-run policy, and the distinction between data tests and unit tests.
+
+- [ ] Add the missing regression for =UnmarkedS3TestWarning=, including
+  =-W error::UserWarning=. Verify the fixture actually exercises the warning.
+- [ ] Account for the remaining three credential-free network waiters named
+  by its verdict; use justified =requires_s3= markers or remove the unintended
+  network access. Do not blanket-skip tests to get a green run.
+- [ ] Prove how to run credentialed CI on a pre-release candidate. Attempt
+  =gh workflow run ci.yml --repo ligon/LSMS_Library --ref <candidate>= once
+  the candidate carries #980, and verify the run's =head_sha= and jobs.
+  Current master lacks =workflow_dispatch=. GitHub documents default-branch
+  requirements; if dispatch is unavailable, use the existing =separate_data=
+  push route only after checking its ownership/history, or land a minimal
+  trigger-only CI PR on master and merge master back. Do not wait until the
+  release to discover that this gate cannot run.
+  Reference: [[https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow][GitHub: manually running workflows]].
+- [ ] Enable a maintainer-triggered Windows script-build run on the candidate
+  in #969, preserving its secrets restrictions. Its existing =push=-only job
+  combined with development's new push filters would otherwise run only
+  AFTER landing. Require the Windows job to execute, not skip.
+
+Gate: unit and Windows smoke green on the reviewed #980 head, and an explicit
+pre-release route for both credentialed data and Windows build validation.
+
+* Phase 2 — finish the 18 active branches
+Use independent worktrees/clones and private L2 roots for fixes. The coordinator
+owns integration and GitHub writes. The table names the minimum landing work;
+each original verdict remains the detailed checklist. In every case, update
+the PR title/body to the final change, attach exact validation SHAs/results,
+and obtain an independent review of the final patch before merge.
+
+| Branch / PR | Remaining work and acceptance evidence | Cache scope / order |
+|-------------+---------------------------------------+---------------------|
+| fix/ci-skips / #980 | Phase 1, final regression coverage and justified marks; file CI residuals | None; first |
+| fix/framework-small-2 | Independent re-review of fixture isolation and teardown; verify #915 still raises correctly, #905 <=4 ULP contract, and #905 residual list. Existing report: 5595 passed, 1753 skipped; warm success does not resolve its cold Albania race | Panama; replaces framework-small |
+| fix/831-followup | Move no-git assertions before pytest.skip; correct hardcoded count; draft sidecar-less-source policy residual | Scope from measured hashes; before final warm |
+| fix/ghana-docs-encoding | Correct Guinea-Bissau eight-of-nine and Togo all-six counts; resolve GhanaSPS endpoint wording; retain measured encoding changes | Measure whole branch, not just doc follow-up |
+| fix/labels-relabel-787 | Document LSMS_LABELS_STRICT, warning/attrs, filtered map construction and numeric-target refusal; narrow #787, including attrs carrier and country-documentation residuals | Read path; full labels contract review |
+| fix/grader-scale-830 | Apply all five full-verdict items; decide fixed tolerance policy; record 4/87 census; fix/document per-neighbour form; preserve persistent-break residual | None; decision below |
+| fix/kinship-974 | Merge development; preserve #848 comment/numbers and append the independent ladder test in test_crop_kg_factor.py; correct accented sibling labels | No global rebuild |
+| fix/niger-followup-2 | Fix before-baseline citation and final residual drafts for #824/#833; reconcile already-landed Malawi work; targeted cold checks and review | Niger |
+| fix/nigeria-824-followup | Correct positive-sale and duplicate-key denominators; draft two remaining sale/dedup issues; reconcile the already-fixed CI --no-root item | Nigeria |
+| fix/nigeria-w5-cluster | Correct all v01-versus-v02 claims and cache-cost statement; link existing #978 rather than filing a duplicate; keep geography acquisition a separate residual | Every Nigeria table |
+| fix/peru-panama | Repair two sample expectations using documented unwired waves/absent weights; add discriminatory Panama quantity/expenditure and Peru cluster/roster joins; correct two stray 7.7 rows. Inspect exemptions against country documentation | Peru and Panama |
+| fix/burkina-2014 / #981 | Address review docstring/count correction; rewrite misleading current PR title around money-only quantity handling plus encoding/crosswalk repair; final cold comparison | Burkina_Faso |
+| fix/962-uganda-food-units / #967 | Update against development; reproduce independent units/kg/nutrition accounting; diagnose historical nutrition-manifest failure. No wholesale nutrition-baseline regeneration; any necessary fixture change must be independently derived and reviewed | Every Uganda table |
+| fix/810-followup | Correct missing-file/missing-column catch description and obsolete dvc.api.open prose; reconcile/file import-time credential-sync and test/cache residuals | GLOBAL bundle |
+| fix/868-followup | Implement wave_folder stamp/filter while preserving explicit round in wave; reproduce R8 with a tracked regression; make renamed collapsed_rows assertion discriminate; update Uganda 12-group/5-case prose | GLOBAL bundle |
+| fix/readers-xport-sniff | Make .dta suffix/magic disagreement loud before text fallback; test default and latin-1 encodings; correct 36 SSP/33 unverified counts and five surveys; draft SPSS/unreadable-binary residual | GLOBAL bundle |
+| fix/970-json-make / #982 | Preserve no-make JSON contract and fixture teardown; recheck after #969's UTF-8 JSON changes; reconcile residual filing and wrong-head #979 | GLOBAL bundle; no independent auto-merge |
+| feature/964-windows-script-builds / #969 | Resolve subprocess-env guard conflict; preserve #968 helper and fingerprint exclusion; re-review all nine encoding readers; rerun Linux with/without make and native Windows conda comparisons; update stale PR body to all three issues | GLOBAL bundle; overlaps 810/readers/970 |
+
+** Decision needed for grader-scale-830
+Recommended first increment: retain the fixed fivefold tolerance as a
+warning-only diagnostic, explicitly reporting the four observed Ghana flags;
+leave gap-aware/CPI-adjusted thresholds and persistent-break detection as named
+follow-ups. Two GhanaLSS flags are attributed to inflation in the review;
+the two GhanaSPS flags remain unadjudicated instrument/level differences.
+Accepting the diagnostic is not adjudicating those observations as errors.
+Record the maintainer's choice before landing this branch.
+
+** Execution lanes and shared-file ownership
+The work can run in four lanes if delegated: runtime/Windows bundle; country
+repairs; labels/kinship/framework fixtures; grader/docs/issue reconciliation.
+Only one lane edits a given branch. Serialize edits to =country.py=,
+=local_tools.py= and =.github/workflows/ci.yml= on the integration candidate.
+Follow the repository's worktree/HPC rules for any actual dispatch.
+
+For a country-scoped worker, the brief MUST start with reading its
+=countries/{C}/_/CONTENTS.org= including LOGBOOK/WAITING/TODO, naming the
+relevant idiosyncrasy and quoting contradictions. Read applicable feature
+skills and script docstrings before editing. Record new idiosyncrasies.
+
+* Phase 3 — integrate once, verify the combined candidate
+- [ ] Build a disposable integration branch from current development. Merge
+  the final reviewed heads, recording each SHA. Re-run merge trials after
+  shared-file changes; the initial 16 clean results are only a starting point.
+- [ ] Integrate the five global branches together: #969, #810, readers,
+  #868, #970. Suggested conflict-resolution order: #969 -> #810 -> readers
+  -> #868 -> #970. This order is a starting point, not a proved dependency.
+  Preserve UTF-8 opens, binary existence probes, sniff guards, the no-make
+  helper/env forwarding, JSON direct-read contract, and round-aware stamps.
+- [ ] Run focused regressions for these interactions, then the complete suite
+  with BLAS threads pinned, =LSMS_BUILD_WORKERS=1=, and
+  =-n <allocated budget> --dist=loadfile=. Write output to files.
+- [ ] Run the credentialed sequential cold selection named by #941, followed
+  by the credentialed data-tests workflow against the candidate. Investigate
+  any EHCVM Derivation/inkind loss. A warm parallel pass does not clear #941.
+- [ ] Validate installed-wheel behaviour from outside the checkout: package
+  data, import without Git, no-make wave fallback, and native Windows conda
+  script builds. Assert the installed package path; do not let PYTHONPATH
+  silently substitute this source checkout for the wheel.
+- [ ] Check independent data expectations, especially #967 Uganda nutrition,
+  Burkina money-only rows, Peru cluster identity, Panama quantities, and
+  Nigeria/Niger sale units. Review each changed expectation with before/after
+  evidence; retain every unchanged invariant.
+
+Gate: no unexplained regression, no worker crash accepted as a test result,
+no required data test accepted merely because it skipped, and independent
+review covers both the individual follow-ups and their combined effects.
+
+* Phase 4 — land and pay the shared rebuild once
+Land non-global branches after their review gates, with #980 first. Schedule
+the five global branches in one controlled merge window once ALL are ready.
+Use explicit reviewed head SHAs and observe required checks. Do not enable
+independent auto-merge on #982 or another bundle member. Keep shared-cache
+builders off intermediate development heads during the window.
+
+- [ ] Before the window, snapshot the reference revision, cache coverage,
+  data digests/row counts and freshness. An old warm parquet is not a baseline
+  merely because it exists. Separate package-data equality from footer hashes.
+- [ ] Merge the reviewed branches to development and reconcile mirror/GitHub
+  tips. Verify resulting content against the tested integration candidate;
+  re-run affected checks if conflict resolutions or code changed.
+- [ ] Rebuild the corpus against the FINAL combined development revision,
+  serially within each country and with bounded parallelism across countries.
+  Preserve L1 blobs. Prefer a fresh private L2 root sharing L1 for cold proof;
+  perform the shared-cache warm only after the final heads have landed.
+  Do not use assume_cache_fresh=True or a global LSMS_NO_CACHE loop as proof
+  of a complete warm; script-path caches have different bypass behaviour.
+- [ ] Enumerate every declared country/table, including noncanonical tables
+  and empty/unavailable cells. Record success/failure and expected wave
+  coverage; a scan of only canonical Feature tables is not a corpus census.
+- [ ] Reuse the deterministic Feature audit (read its README and relevant
+  skills): canonical/all-feature assembly and kwarg checks; classify new
+  findings against the recorded baseline rather than requiring old warnings
+  to disappear. Store coverage outputs here, without overwriting blessed or
+  committed coverage snapshots as a side effect.
+- [ ] Compare rebuilt values with the baseline. #969 itself should preserve
+  Linux values; the combined train intentionally changes selected countries.
+  Attribute every changed table to a reviewed correction, and every new
+  build failure or lost wave to an investigated cause.
+- [ ] Verify both parquet tiers' freshness/coverage and the absence of
+  in-tree generated parquets. Record elapsed time, resources and exclusions.
+
+Gate: one documented warm of the final release tree, every requested cell
+accounted for, and no unexplained data loss. Private branch verification can
+require additional scoped builds; "once" refers to the shared corpus warm.
+
+* Phase 5 — reconcile issues and prepare the release
+- [ ] Update each resolved issue with its actual merged PR/SHA. Narrow a
+  partial issue or split a different residual; a bare "partly fixed" comment
+  is insufficient. In particular, do not close #794, #824, #833, #787,
+  #830, #905, or #941 solely because one associated branch merged.
+- [ ] Reconcile existing #978 rather than duplicating Nigeria W5 acquisition;
+  retain the 12 DECISION issues unless separately decided. Previously
+  acknowledged source-acquisition gaps (#975/#976/#977) get explicit release
+  notes where relevant, not invented coverage.
+- [ ] Draft =docs/releases/v0.15.0.md= from the FINAL diff since v0.14.0,
+  including already-merged changes, not just this train. Cover user-visible
+  data corrections, Windows/conda and no-make behaviour, labels diagnostics,
+  current dependency changes, both-tier rebuild cost and known residuals.
+- [ ] Run =make api-audit STRICT=1=, docs build, and package-content/version
+  checks. Retain dynamic versioning's [project]/[tool.poetry] conventions.
+- [ ] Open development -> master release PR. List only verified fully
+  resolved issues, with one =Closes #N= keyword per issue. Include all gates,
+  exact final SHAs and evidence locations. Merge with a MERGE COMMIT, never
+  squash; preserve development/master ancestry.
+
+* Phase 6 — tag, publish, and verify the installed release
+- [ ] Verify master contains the approved candidate, required CI including
+  data-tests is green, the release notes are final, and the intended tag does
+  not already exist. Use a clean master checkout for tagging.
+- [ ] Run the repository's actual release target with pinned BLAS/build
+  threads and a budgeted worker count:
+  =make release v=0.15.0 PYTEST_WORKERS=<allocated budget>=.
+  Its implementation runs tests then creates an annotated tag; the local
+  Makefile comments describing a sanity build are stale. CI builds artifacts.
+- [ ] Push the tag explicitly to GitHub (origin here is only the mirror),
+  then publish the GitHub Release with =--repo ligon/LSMS_Library= and
+  =--notes-file docs/releases/v0.15.0.md=.
+- [ ] Observe =publish.yml= for that tag. If the release event produces no
+  run, use the documented workflow_dispatch fallback with =tag=v0.15.0=.
+  Verify the run's tag/commit, wheel and sdist versions, and successful PyPI
+  upload. Do not mistake a published GitHub page for a published package.
+- [ ] Install the version from PyPI into a clean environment outside the
+  repo; check =importlib.metadata.version('lsms_library')=, packaged configs,
+  data-free API smoke, and a small credentialed data call where available.
+- [ ] Synchronize master/development ancestry without force pushes; update
+  the handoff with release URL, publish run, final refs, cache results, and
+  final branch/issue dispositions. Keep retained historical branches intact.
+
+* Sources for execution
+- [[file:../../.claude/skills/backlog-workflow/SKILL.md][Backlog skill]] and [[file:../../.claude/skills/release/SKILL.md][release skill]].
+- [[file:../../CLAUDE.md][Repository conventions]], [[file:../../.coder/ledger/STANDING.md][standing prior-art baseline]], and per-task ledgers
+  for substantive changes; docs-only corrections need no new ledger.
+- [[file:../backlog_review_2026-10-14/verdicts/][Full October 14 verdicts]], [[file:../backlog_fix_2026-10-14/briefs/][first fix briefs]],
+  [[file:../backlog_fix2_2026-10-14/briefs/][second fix briefs]], and [[file:../backlog_fix3_2026-10-14/][framework-small follow-up brief]].
+- [[file:framework-small-2-report.md][Archived framework-small-2 report]]; original:
+  =/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39924156/framework-small-2/REPORT.md=.
+- #969's branch-local =slurm_logs/HANDOFF_2026-09-29_windows.org= (via git show).
+- [[file:../../bench/feature_audit/README.md][Feature audit harness]], [[file:../../.github/workflows/ci.yml][current CI]], [[file:../../.github/workflows/publish.yml][publishing workflow]], and [[file:../../Makefile][actual Makefile]].

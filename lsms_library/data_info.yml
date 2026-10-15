@@ -842,7 +842,8 @@ Columns:
         assumed: sold and harvest unit agree on 95-97% of Nigeria's sale
         rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
         2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
-        know both units; GH #824).  Tanzania records every sale in kilograms
+        know both units, GH #824; 41,162 rows and the same 96.1% since GH
+        #848, 2026-09-24).  Tanzania records every sale in kilograms
         and needs no such column.
 
         NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string
