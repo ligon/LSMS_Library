@@ -17,12 +17,6 @@ on:
       - 'lectures/**'
       - '**.org'
       - '**.md'
-  workflow_dispatch:
-    inputs:
-      run_windows_script_build:
-        description: Run credentialed Windows conda script builds on this ref
-        type: boolean
-        default: false
   pull_request:
   # The development merge queue (ruleset "development merge queue", 2026-10-14)
   # tests each merge group once; without this trigger a queued PR never gets
@@ -38,6 +32,11 @@ on:
   # later `schedule` run reported "data-tests skipped".  Dispatching on a
   # chosen ref runs the whole workflow, data-tests included (see its `if`).
   workflow_dispatch:
+    inputs:
+      run_windows_script_build:
+        description: Run credentialed Windows conda script builds on this ref
+        type: boolean
+        default: false
 
 # One live run per ref (push) or per PR (pull_request): a new push cancels the
 # run it supersedes instead of queueing beside it.  2026-09-07: fourteen
