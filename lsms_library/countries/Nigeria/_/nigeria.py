@@ -525,8 +525,11 @@ def crop_production_for_wave(t, frames, crop_labels):
     # survey recorded the crop on the plot but no harvest qty).
     out = out[out['i'].notna() & out['crop'].notna()]
 
-    # Dedup on the index grain (a handful of duplicate (i,plot,crop) rows
-    # exist in W1); keep the first non-null record.
+    # Existing first-row dedup at (t,i,plot_id,crop) grain. It discards
+    # positive sales on 96 W1 / 66 W2 rows, not just exact duplicates;
+    # see CONTENTS.org Unit_sold residual and release_landing_2026-10-14/
+    # nigeria824.org. Keep this behaviour pending source-grain adjudication.
+    # drop_duplicates keeps a whole row, including any nulls on that row.
     out = out.sort_values(['i', 'plot_id', 'crop'])
     out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'crop'], keep='first')
 

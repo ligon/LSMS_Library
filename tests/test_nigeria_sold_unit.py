@@ -222,6 +222,7 @@ class TestWiring:
         ng = _load_nigeria_module()
         fr = _synthetic_frame(["1. KILOGRAMS"], ["1. KILOGRAMS"], name_unit_sold=True)
         out = ng.crop_production_for_wave("2011Q1", [fr], {1010: "Maize"})
+        assert UNIT_SOLD in out.columns
         scheme = load_yaml(NIGERIA / "_" / "data_scheme.yml")["Data Scheme"][TABLE]
         declared = [k for k in scheme if k not in ("index", "materialize", "backend", "aggregation")]
         assert set(declared) <= set(out.columns), set(declared) - set(out.columns)

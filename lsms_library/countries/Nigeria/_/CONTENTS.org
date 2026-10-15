@@ -1032,7 +1032,7 @@ column, never an index level, never sentinel-filled.  Pinned by
   Built-table counts are lower than raw, and the red team (2026-10-14)
   decomposed the gap exactly: *0* positive-sale rows lose a crop label
   (the earlier "no resolved crop label" explanation was wrong); *93* W1 and
-  *66* W2 positive-sale rows are discarded by the country script's
+  *66* W2 positive-sale rows *that record both units* are discarded by the country script's
   =drop_duplicates(subset=[t,i,plot_id,crop], keep='first')= (3,548 -> 3,455;
   3,478 -> 3,412) -- of those 159 rows, 151 carry a *different*
   =Quantity_sold= than the row kept for their key and 40 are keys whose kept
@@ -1040,7 +1040,10 @@ column, never an index level, never sentinel-filled.  Pinned by
   unit code with no Stata value label (=u= '5.0'/'0.0', =Unit_sold= '50.0')
   that canonicalises to NA.  The dedup is a PRE-EXISTING silent grain
   collapse (it governed =Quantity_sold= / =Value_sold= before =Unit_sold=
-  existed) at 122 W1 / 81 W2 duplicate keys among positive-sale rows alone;
+  existed): 125 W1 / 81 W2 duplicated keys touch at least one positive-sale
+  row; 78 / 43 keys have multiple positive-sale rows. Counting all
+  positive-sale rows discarded gives 96 / 66 (the 93 / 66 above additionally
+  require both units);
   it sits in the country script, upstream of every core audit, so
   =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
   Non-null =Unit_sold= on the built table:
