@@ -1,4 +1,60 @@
-#+title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
+#+title: Handoff -- 2026-10-14 release landing IN PROGRESS
+
+* Current execution -- Codex, job39919092
+The maintainer approved WORKPLAN.org and said to proceed. Eighteen implementation
+PRs are merged to development, plus evidence PR #997. GitHub, local main and
+filesystem origin development are synchronized at1973242b4. Only #967 Uganda
+remains open. No release tag or publication yet; shared L2 is untouched.
+
+** Remaining decision, already asked
+Uganda CONTENTS explicitly says not to regenerate nutrition baseline until its
+direction is signed off. Exact historical replay and independent #967 accounting
+are complete; the proposed two-field shape/hash patch remains UNAPPLIED.
+The maintainer has been asked whether to accept the documented estimator and
+nominal-volume limitations for this release or hold for source review. A first
+report omitted the FCT row's specific yellow-variety study note; corrected full
+provenance supports the nonzero225 density as a specific override of the generic
+USDA starting note. No numeric correction is proposed from that ambiguity. Silence is
+not approval. See release_landing_2026-10-14/uganda-nutrition-history.org and
+uganda967.org on the integration branch / PR967. The -18.7% historical Energy
+change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
+
+** Validation and next work
+- Integration branch landing/release-v0.15.0 under release-work/integration
+  contains #967 plus all landed code and evidence. Runtime differences from
+  development are only the reviewed #967 country changes.
+- Native installed Windows conda job116251866840 passed on74c9398ec,
+  run38683117467. Linux credentialed full suite is still running in that run.
+- #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
+- Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
+  Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
+  final6c4c2fc13 passed both PR checks and focused credentialed/no-credential runs.
+- Runtime lane is rebuilding549declared pairs across38countries from empty
+  private L2 at release-work/runtime/data-corpus, frozen7fa05179. It will run
+  Feature phases1/2 on a separate physical copy. Shared cache is untouched.
+- After corpus root is quiescent, copy it into a fresh test root, run the full
+  credentialed suite on final integration, explain every failure/coverage gap.
+  Do not mutate a worktree under active tests. Preserve L1; no L2 symlinks.
+- Release notes/issue reconciliation are being prepared in landing/release-notes
+  and independently reviewed. Narrow partial issues; don't close umbrella work.
+- Once science and validation gates pass: land967, verify combined development,
+  warm/promote verified shared caches once, release PR development->master with
+  MERGE COMMIT, make release v=0.15.0, explicit GitHub tag push/release, observe
+  publish workflow/PyPI and test the published installation.
+
+** Operational facts
+Main repo /local/job39919092/mirrors/LSMS_Library; venv /local/job39919092/venv_img.
+GitHub is explicit https://github.com/ligon/LSMS_Library.git; origin is filesystem.
+Use core.hooksPath=/dev/null for commits/merges: local post-commit auto-pushes.
+Each worktree uses cwd+PYTHONPATH and LSMS_COUNTRIES_ROOT matching that tree.
+BLAS/OMP/MKL=1,LSMS_BUILD_WORKERS=1,pytest -n6 --dist=loadfile, logs to files.
+No rejected historical refs deleted. #600 was ported/reviewed/merged via992;
+#837 old reducers were measured and rejected (483cells would be blanked),
+with sources restored and documentation/evidence merged via997.
+Durable plan/evidence: slurm_logs/release_landing_2026-10-14/.
+
+* Previous handoff (historical, superseded by current execution)
+Historical title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
 
 * Update 19:10 PDT -- reviews complete, three PRs open
 - All 16 branches reviewed: 3 pass (970-json-make, ci-skips, burkina-2014), 12 pass-with-fixes, 1 FAIL (framework-small: 14 tests red via the #915 raise).  Summary + per-branch §6 items: =slurm_logs/backlog_review_2026-10-14/REVIEW_SUMMARY.org=; verdicts copied to =verdicts/=.
