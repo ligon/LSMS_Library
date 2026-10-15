@@ -68,7 +68,7 @@ using this mechanism there means moving that decode into a table (see
 | `labels='Aggregate'` (scalar) | the `j` index level, and **only** `j` | `Country._relabel_j`, on the finished frame |
 | `labels={'Rural': 'Settlement'}` (dict) | any column or index level, named explicitly | `Country._apply_categorical_mappings`, at the raw code |
 
-A scalar keeps its historical meaning byte for byte: it renames `j` from
+A scalar renames `j` from
 `Preferred Label` to `<variant> Label` and, for `food_expenditures` /
 `food_quantities`, re-aggregates. It never touches a column, even on a table
 that has a mapped one.
@@ -82,6 +82,32 @@ The key `'j'` in a dict is routed to the scalar behaviour, so
 `labels={'j': 'Aggregate'}` and `labels='Aggregate'` are one request and there
 is exactly one mechanism per face. The two compose:
 `labels={'j': 'Aggregate', 'Rural': 'Settlement'}`.
+
+## Scalar food-label contract (GH #787)
+
+`None`, `'Preferred'`, and `'Preferred Label'` return the original frame without
+reordering. Other strings resolve the suffixed `'<variant> Label'` first,
+then the bare column name; either spelling can be requested. Numeric target
+columns (including bool and nullable integer columns) raise
+`LabelUnavailableError`: codes are not a label vocabulary. String-typed code
+columns remain accepted. Feature applies its existing Contract B degradation
+to an unavailable or refused target.
+
+Blank keys and targets are excluded from the rename map. A non-null `j` not in
+that map remains unchanged, with `LabelPassThroughWarning` and
+`result.attrs['labels_unmatched']` carrying `labels`, `column`, `n_unmatched`,
+`n_values`, `rows`, `row_share`, and `examples`. For example, the reviewed Malawi
+`labels='2004-05'` call leaves 32 of 147 foods unrenamed on 42,206 rows (6.2%).
+Set `LSMS_LABELS_STRICT=1` (also `true` or `yes`) to raise
+`LabelPassThroughError` before renaming or summing. Null `j` is handled by the
+null-index audit instead. Fully covered crosswalks emit no pass-through report.
+
+The unmatched attrs survive Country reaggregation; multi-country Feature concat
+currently loses this structured report, although per-country warnings still
+fire. That carrier, conflicting mappings from one Preferred Label to several
+targets, and per-country curation remain open under #787. Reaggregation can sum
+an unmatched label into a target with the same spelling, so inspect the warning
+before using the result.
 
 ## Which decode path this extends — and which three it does not
 
@@ -207,8 +233,9 @@ Both proofs below are reproducible in about ten lines.*
 `_relabel_j` builds its rename dict like this (`country.py`):
 
 ```python
-rdict = (table[['Preferred Label', target]].dropna()
-         .set_index('Preferred Label')[target].to_dict())
+pairs = table[['Preferred Label', target]].dropna()
+rdict = {k: v for k, v in zip(pairs['Preferred Label'], pairs[target])
+         if str(k).strip() != '' and str(v).strip() != ''}
 ```
 
 That is sound for food, where the relation is **fine → coarse**: each item has
@@ -216,7 +243,7 @@ exactly one `Preferred Label`, so canonical → variant is a *function* and can 
 applied to the finished frame.
 
 A settlement ladder runs the other way — **coarse → fine**. `Preferred Label`
-has two distinct values against a seven-rung ladder, so `.to_dict()` is
+has two distinct values against a seven-rung ladder, so the dict comprehension is
 last-row-wins:
 
 ```python
@@ -238,8 +265,8 @@ site — by choosing **which label column that raw code resolves to**:
 
 Seven entries, information-preserving, because the key (`Code`) is unique.
 
-`_relabel_j` is therefore left exactly as it was. It is not a legacy path to be
-migrated; it is the correct mechanism for the other direction.
+`_relabel_j` therefore remains the finished-frame mechanism for food labels.
+Its #787 diagnostics do not recover raw-code detail after a coarse fold.
 
 ## 2. Why one hop of the plumbing is a ContextVar and not a parameter
 
