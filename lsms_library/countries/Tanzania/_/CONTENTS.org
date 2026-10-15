@@ -1823,6 +1823,19 @@ region code.  These are carried through as-is rather than repaired by guesswork.
 
 ** Known, NOT fixed here
 
+- *Historical #837 early projection rejected (2026-10-14).* Recovered WIP
+  =c8bf36d81= proposed =reduce_to_agreed(on_conflict='na')= after the 2019-20
+  and 2020-21 resident filters. Cold replay against development =452302adc=
+  reproduces 72 and 47 contested attribute cells, respectively; the proposal
+  turns precisely those 119 populated cells into NA and removes =i= before
+  core can measure the Site-2 loss. This contradicts the explicit decision in
+  =.coder/ledger/323-tanzania-key.md= §6.1: "The config does NOT collapse to
+  (t, v) itself". The existing household-grain regression fails on the WIP.
+  Keep the resident filter, source keys and signed GH #871 observed-row
+  selection; district harmonization and finer-grain interpretation remain
+  #837 residuals. No new blanking exception was adopted. See
+  =slurm_logs/release_landing_2026-10-14/cluster837.org=.
+
 - *2019-20 =sample.v= for the 326 split-off households.*  Those households are
   still assigned the =clusterid= the file stamps on them, which is not a
   sampling cluster --- and now that =cluster_features= no longer manufactures

@@ -1744,17 +1744,37 @@ Two further facts before anyone "fixes" this by adding the call:
    99.36% of =crop_production= rows (2018-19 = 97.7%, inside the 4.2% W4
    orphan rate recorded under "Household id emitted as i" above).
 
-** 2011-12 cluster conflicts are NOT the GPS ones
+** 2011-12 cluster conflicts are missing GPS versus recorded GPS (#837)
 
-"Household geovariables: four spellings across five waves" above records 0
-EAs with more than one distinct household coordinate in 2011-12.  That is
-still true, but the wave is *not* clean at the cluster grain: building
-=cluster_features= raises =GrainCollapseWarning= for 2011-12 destroying
-373 of 3,969 rows over 34 conflicting index tuples.  So in W1 the
-disagreement is in =Region= / =District= / =Rural=, not in the
-coordinates.  Full set measured 2026-09-08: 2011-12 373/3,969 (34 tuples),
-2013-14 454/5,262 (43), 2015-16 732/4,954 (72), 2021-22 1,240/4,959 (111
--- a quarter of the wave); 2018-19 clean.
+Correction from direct raw-source replay, 2026-10-14: this section previously
+inferred "the disagreement is in Region / District / Rural, not in the
+coordinates" from the absence of two distinct coordinates in an EA. That
+inference was false: the audit also counts an NA beside a recorded value.
+The cover page and geovariable file each have unique native household ids;
+their validated one-to-one left join gives 3,969 households in 333 EAs, with
+52 households absent from the geovariable file. All three administrative
+attributes agree within every EA. Exactly 34 EAs mix absent and recorded GPS,
+with zero pairs of distinct nonmissing coordinates. Those are the 34 groups
+and 373 rows reported by the whole-row loss audit.
+
+The same independent join across all five waves finds zero Region / District /
+Rural conflicts. Distinct nonmissing GPS conflicts affect 0 / 38 / 72 / 0 / 72
+EAs; mixed missing/recorded GPS affects 34 / 5 / 0 / 0 / 49. Adding Region and
+District to the EA key leaves every wave's cluster count unchanged. This
+distinguishes the observed missingness and shipped coordinate disagreement
+from the proposed cross-district EA-code collision; it does not certify every
+source coordinate or rule out miscoding within an administrative area.
+
+The existing Site-2 loss counts remain 373/3,969 (34 groups), 454/5,262 (43),
+732/4,954 (72), zero in 2018-19, and 1,240/4,959 (111). Current development
+already serves GPS for all 333 W1 EAs and 432/435 W5 EAs under the signed
+GH #871 most-complete-observed-row rule. Historical WIP =c8bf36d81= claiming
+to recover 34 W1 and 39 W5 fixes was therefore not ported: its early
+=reduce_to_agreed= projection would instead blank 364 currently populated GPS
+cells across W2/W3/W5 and remove household grain before the core loss audit.
+The source-grain scientific question remains #837; this review adopts no
+completion or blanking exception to the signed contract. See
+=slurm_logs/release_landing_2026-10-14/cluster837.org= and its raw-source JSON.
 
 ** cluster_features District is not a district, and Region is not harmonized
 

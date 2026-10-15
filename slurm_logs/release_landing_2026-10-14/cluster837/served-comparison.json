@@ -1,0 +1,82 @@
+{
+  "Ethiopia-2011-12": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "new_na_cells": 0
+  },
+  "Ethiopia-2013-14": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 38,
+      "Longitude": 38
+    },
+    "new_na_cells": 76
+  },
+  "Ethiopia-2015-16": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 72,
+      "Longitude": 72
+    },
+    "new_na_cells": 144
+  },
+  "Ethiopia-2018-19": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 0,
+      "Longitude": 0
+    },
+    "new_na_cells": 0
+  },
+  "Ethiopia-2021-22": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 0,
+      "District": 0,
+      "Rural": 0,
+      "Latitude": 72,
+      "Longitude": 72
+    },
+    "new_na_cells": 144
+  },
+  "Tanzania-2019-20": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 1,
+      "District": 35,
+      "Rural": 36
+    },
+    "new_na_cells": 72
+  },
+  "Tanzania-2020-21": {
+    "same_shape_index_columns": true,
+    "changes_are_only_nonnull_to_na": true,
+    "new_na_by_column": {
+      "Region": 2,
+      "District": 32,
+      "Rural": 13
+    },
+    "new_na_cells": 47
+  }
+}
