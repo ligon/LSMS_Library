@@ -1,3 +1,32 @@
+#+title: Handoff -- 2026-10-14 (Sue / Claude Fable 5.1), Savio job 39919092
+
+* State at 16:20 PDT: forks reconciled, CI slimmed, follow-up array in flight
+
+** Done this session (all on =development=, published to the mirror AND pushed to GitHub)
+- Mirror development and GitHub development had FORKED at =3cf124ca3= (54 vs 31 commits).  Merged as =796386fa7=; lock regenerated =fa9c8d605=; two semantic conflicts the clean merge hid were fixed after the full suite (3 failed / 6748 passed, =/local/job39919092/tmp/gate1/pytest_full.log=): =tests/test_categorical_mapping_resolution.py= now pins the #693 fix (=2fbea0d2b=), and the windows-smoke =poetry install= lacks =--no-root= (fixed on PR #973, not yet merged).
+- Cache cost of the merge, measured: 0/5 build fingerprints moved; only Malawi (#966) and GhanaLSS (#952) table hashes moved.  Much of the scratch corpus was already stale BEFORE the merge (Niger/Tanzania =var/= grade stale on the pre-merge tree too).
+- =git merge= fires =post-merge=, not =post-commit=: the sucoder publish hook SKIPS merge commits.  Push by hand after a merge.
+- Rulings from @ligon (2026-10-14) recorded in =slurm_logs/backlog_fix_2026-09-24/REVIEW_SUMMARY.org= ("RULINGS" block): #811 spellings accepted; drop the #867 alias from nigeria-824; Panama csv under =_/=; #868 re-warm paid once, bundled with #810 and #970.  Malawi stack is superseded by merged PR #966.
+- GitHub: PR #971 (#811), #972 (#848), #973 (ci.yml: single run per PR, docs-only pushes skipped, =merge_group= trigger, =--no-root=).  #973 has auto-merge armed.  Ruleset 25124452 "development: required checks" (=unit-tests= required, no delete/force; admin bypass).  =allow_auto_merge= enabled.  GitHub MERGE QUEUE is NOT available: the repo is user-owned, and the =merge_queue= rule fails validation on every shape (org-only feature).  Use =gh pr merge --auto --merge N=.
+
+** In flight
+- Slurm array =39919516= (savio3_htc, 6 elements, 6h cap): =slurm_logs/backlog_fix_2026-10-14/= (briefs, elements.txt, sbatch).  Outputs under =/global/scratch/fsa/fc_jevons/ligon/venv_validate/backlog_fix_39919516/<key>/= (REPORT.md, commits.txt, claude.err).  Each element merges origin/development into its base branch and pushes =fix/<key>= to the mirror.
+  Elements: 810-followup, 831-followup, nigeria-824-followup, niger-followup-2, 868-followup, 970-json-make.
+- CI on #973 and on the development push =2fbea0d2b=.
+
+** Next concrete actions
+1. When the array ends: read each REPORT.md; a red-team review array (reuse =backlog_fix_2026-09-24/review_array.sbatch= + review_briefs pattern) for the six branches, or at least for 970-json-make and nigeria-824-followup (data change).
+2. Open PRs for the six follow-up branches; bundle #810 + #868 + #970 in ONE merge window so the corpus re-warms once.  Then warm the shared cache cold (=slurm_logs= has the coverage_refresh sbatch).
+3. #967 (Uganda units) still needs human review; #969 (Windows script builds) has one windows-smoke failure of two.
+4. File the cross-cutting findings in =REVIEW_SUMMARY.org= as issues (gh writes; needs a go-ahead): BF cluster_features 2014 destruction + dropped df_geo; Nigeria drop_duplicates sale collapse + unread other-buyer columns; Niger hid 27010; data_root lru_cache poisoning in test_gh866; =../..= path parse in get_data_file.
+
+** Environment
+- Venv: =bash ~/mirrors/LSMS_Library/bin/savio_venv.sh mount= (mounts =.venv.sqfs= at =/local/job<ID>/venv_img=; it also repoints the MIRROR's =.venv= symlink, which is ignored).  Then =ln -sfn /local/job<ID>/venv_img .venv= in the clone and set =PYTHONPATH= to the clone.
+- Suite recipe that passed: =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 pytest -n 32 --dist=loadfile= -> 18 min on 40 cores.
+- Billed node; =sucoder release= when done.
+
+-- Sue
+
 #+title: Handoff -- 2026-09-26 (Sue / GPT-6), Savio job 39263225
 
 * Merges complete; Uganda corrections open as PR #967 (2026-09-26 00:39 PDT)
