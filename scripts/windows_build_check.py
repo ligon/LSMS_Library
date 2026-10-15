@@ -21,6 +21,25 @@ if os.environ.get("REQUIRE_CONDA_TOOLS") == "1":
 
 import pandas as pd
 import lsms_library as ll
+from pathlib import Path
+from lsms_library.paths import countries_root
+
+if os.environ.get("REQUIRE_INSTALLED_LIBRARY") == "1":
+    # A workflow-level PYTHONPATH can silently substitute its checkout for
+    # the wheel even from runner.temp. Verify code AND packaged config.
+    workspace = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+    package = Path(ll.__file__).resolve().parent
+    assert not package.is_relative_to(workspace), (
+        f"expected the installed library, imported checkout {package}")
+    import sysconfig
+    site_packages = Path(sysconfig.get_path("purelib")).resolve()
+    assert package.is_relative_to(site_packages), (
+        f"expected installed code under {site_packages}, imported {package}")
+    config = Path(countries_root()).resolve()
+    assert config == package / "countries", (
+        f"expected packaged configs under {package / 'countries'}, got {config}")
+    print("installed code and configs:", package, config)
+
 print("lsms_library:", ll.__file__, "| data_root:", ll.paths.data_root() if hasattr(ll, "paths") else "?")
 
 failed = False
@@ -35,7 +54,6 @@ for item in filter(None, os.environ.get("EXPECT", "").split(",")):
 # list if find mis-parses its pattern, which empties the country targets'
 # prerequisites.  Expand the installed Uganda Makefile and check.
 import subprocess
-from pathlib import Path
 mk_dir = Path(ll.__file__).parent / "countries" / "Uganda" / "_"
 if shutil.which("make") is None:
     print("MAKEVARS skipped: make not on PATH (the GH #968 no-make path)")

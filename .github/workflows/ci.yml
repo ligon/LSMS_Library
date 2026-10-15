@@ -98,12 +98,11 @@ jobs:
           --timeout=600 --timeout-method=thread
           --durations=25
 
-  # Windows reader smoke.  Nothing else in CI runs on Windows, so this is the
-  # only place its defaults are exercised: the cp1252 text encoding, no
-  # ``fork`` start method, no process groups, a case-insensitive checkout.
+  # Windows reader smoke exercises platform defaults: cp1252 text encoding,
+  # no ``fork`` start method, no process groups, a case-insensitive checkout.
   # Scope is the READER path (install, load every country's config, parse
-  # every data_info.yml) -- script-path ``make`` builds are not expected to
-  # work on Windows yet.  No secrets: nothing here reads microdata.
+  # every data_info.yml). The credentialed conda job below covers script
+  # builds. No secrets here: nothing in this job reads microdata.
   windows-smoke:
     runs-on: windows-latest
     # A hang (first seen: `import lsms_library; Country('Uganda')` sat for an
@@ -175,6 +174,10 @@ jobs:
   windows-script-build:
     runs-on: windows-latest
     timeout-minutes: 45
+    # This job checks the wheel installed by pip, including its configs.
+    # Override the workflow's checkout path for this job only.
+    env:
+      PYTHONPATH: ""
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && inputs.run_windows_script_build)
@@ -208,6 +211,7 @@ jobs:
         env:
           PROBE_STRIP: '\Git\,mingw64,chocolatey'
           REQUIRE_CONDA_TOOLS: "1"
+          REQUIRE_INSTALLED_LIBRARY: "1"
           EXPECT: "Uganda:shocks=14457:64a53fa7af55,Uganda:assets=116808:9202ed542a14"
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
