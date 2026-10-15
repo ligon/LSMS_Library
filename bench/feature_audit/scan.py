@@ -258,6 +258,40 @@ def _null_read_findings(feature: str, country: str) -> list[Finding]:
     return out
 
 
+def _scale_findings(feature: str, country: str, df) -> list[Finding]:
+    """GH #830: a wave whose monetary medians sit on another SCALE than its
+    neighbours'.  Same machinery the coverage grader attaches as a
+    ``warn: scale_ratio[...]`` note (``coverage_matrix.monetary_scale_breaks``);
+    here it is a structured ``scale`` finding so it clusters by column and wave
+    rather than being re-parsed out of the detail string.  Warn-only, severity
+    C: the per-slice sanity checks are shape checks and grade such a wave
+    `sane` (Uganda 2015-16 `Value_sold` / 100, GH #829).
+    """
+    try:
+        from lsms_library.coverage_matrix import monetary_scale_breaks
+        breaks = monetary_scale_breaks(df, country, feature)
+    except Exception as e:                              # noqa: BLE001
+        return [Finding(
+            phase="1a-sanity", feature=feature, country=country, check="scale",
+            status="error", severity="A", expected=False,
+            detail=f"scale check failed: {type(e).__name__}: {e}",
+        )]
+    out = []
+    for b in breaks:
+        nbs = ", ".join(f"{nb}={m:,.0f}" for nb, m, _ in b["neighbours"])
+        out.append(Finding(
+            phase="1a-sanity", feature=feature, country=country,
+            check="scale", status="warn", severity="C", expected=False,
+            detail=(f"{b['column']} median in wave {b['wave']} is {b['median']:,.0f} "
+                    f"(n={b['n']}), {b['ratio']:.3g}x its comparable neighbour(s) "
+                    f"{nbs} ({b['form']}; GH #830)"),
+            metrics={"column": b["column"], "wave": b["wave"],
+                     "median": b["median"], "n": b["n"], "ratio": b["ratio"],
+                     "neighbours": b["neighbours"], "form": b["form"]},
+        ))
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Phase 1a -- per-country sanity (no kwargs)
 # ---------------------------------------------------------------------------
@@ -302,6 +336,7 @@ def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int 
             return findings, name, None
 
         findings += _null_read_findings(feature, name)
+        findings += _scale_findings(feature, name, result)
 
         report = is_this_feature_sane(result, name, feature)
         for c in report.checks:

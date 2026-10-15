@@ -813,3 +813,184 @@ def test_a_country_script_for_an_UNDECLARED_feature_emits_no_phantom_broken_row(
     assert "broken" not in set(df["tier"].astype(str)), (
         "a country-level SCRIPT for a feature the country never declares must "
         "not be built, and so cannot be `broken`")
+
+
+# ---------------------------------------------------------------------------
+# GH #830: cross-wave scale check on monetary columns (warn-only)
+# ---------------------------------------------------------------------------
+# Every per-slice sanity check is a SHAPE check; Uganda 2015-16 shipped its crop
+# sale value divided by 100 (GH #829) and graded `sane`.  The grader now compares
+# each wave's monetary medians to its comparable neighbours' and attaches a
+# `warn: scale_ratio[...]` note.  It never changes a tier.
+def _money_frame(wave_levels: dict, *, n=60, items=("maize", "beans", "coffee"),
+                 col="Value_sold"):
+    """A (t, i, j) frame; ``wave_levels`` is {wave: scale multiplier}.
+
+    Each item has its own base price (so a per-item ratio is meaningful) and
+    every wave's values are the base times the wave's multiplier.
+    """
+    base = {j: 1000.0 * (k + 1) for k, j in enumerate(items)}
+    tuples, vals = [], []
+    for w, mult in wave_levels.items():
+        for j in items:
+            for i in range(n):
+                tuples.append((w, f"hh{i}", j))
+                vals.append(base[j] * mult * (0.8 + 0.4 * (i % 5) / 4))
+    idx = pd.MultiIndex.from_tuples(tuples, names=["t", "i", "j"])
+    return pd.DataFrame({col: vals, "Quantity": 1.0}, index=idx)
+
+
+def test_scale_check_flags_a_100x_wave_and_leaves_the_tier_alone():
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0})
+    breaks = cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                       ["w1", "w2", "w3"])
+    assert [b["wave"] for b in breaks] == ["w2"]
+    assert breaks[0]["column"] == "Value_sold"
+    assert breaks[0]["ratio"] == pytest.approx(0.01, rel=1e-6)
+    assert breaks[0]["form"].startswith("per-item")
+    assert {nb for nb, _, _ in breaks[0]["neighbours"]} == {"w1", "w3"}
+
+    co = _FakeCountry({"w1": ["crop_production"], "w2": ["crop_production"],
+                       "w3": ["crop_production"]})
+    cells = cov.grade_feature("Uganda", "crop_production", ["w1", "w2", "w3"], co,
+                              _env(df, _ok_report()), readiness=True)
+    by_wave = {c["wave"]: c for c in cells}
+    # The grade is NOT changed -- it reports.
+    assert {c["tier"] for c in cells} == {"sane"}
+    assert "warn: scale_ratio[Value_sold" in by_wave["w2"]["detail"]
+    assert "GH #830" in by_wave["w2"]["detail"]
+    assert "scale_ratio" not in by_wave["w1"]["detail"]
+    assert "scale_ratio" not in by_wave["w3"]["detail"]
+
+
+def test_scale_check_does_not_flag_a_1_2x_wave():
+    df = _money_frame({"w1": 1.0, "w2": 1.2, "w3": 1.5})
+    assert cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                     ["w1", "w2", "w3"]) == []
+    co = _FakeCountry({w: ["crop_production"] for w in ("w1", "w2", "w3")})
+    cells = cov.grade_feature("Uganda", "crop_production", ["w1", "w2", "w3"], co,
+                              _env(df, _ok_report()), readiness=True)
+    assert all("scale_ratio" not in c["detail"] for c in cells)
+
+
+def test_scale_check_two_wave_frame_flags_both_and_names_the_pair():
+    """With one neighbour each the grader cannot say WHICH wave is wrong."""
+    df = _money_frame({"w1": 1.0, "w2": 100.0})
+    breaks = cov.monetary_scale_breaks(df, "Uganda", "crop_production", ["w1", "w2"])
+    assert sorted(b["wave"] for b in breaks) == ["w1", "w2"]
+    r = {b["wave"]: b["ratio"] for b in breaks}
+    assert r["w1"] == pytest.approx(0.01, rel=1e-6)
+    assert r["w2"] == pytest.approx(100.0, rel=1e-6)
+
+
+def test_scale_check_skips_a_redenomination_boundary():
+    """GhanaLSS 2005-06 (GHC) vs 2012-13 (GHS): 1 GHS = 10,000 GHC.
+
+    The pair is incommensurable by `data_info.yml`'s `Currency: overrides`, so
+    it is not compared; the same 10,000x on two same-currency waves IS.
+    """
+    from lsms_library.currency import currency_for
+    assert currency_for("GhanaLSS", "2005-06") != currency_for("GhanaLSS", "2012-13")
+    df = _money_frame({"2005-06": 10_000.0, "2012-13": 1.0})
+    assert cov.monetary_scale_breaks(df, "GhanaLSS", "crop_production",
+                                     ["2005-06", "2012-13"]) == []
+    # Same shape, same currency on both sides -> reported.
+    assert currency_for("GhanaLSS", "2012-13") == currency_for("GhanaLSS", "2016-17")
+    df2 = _money_frame({"2012-13": 10_000.0, "2016-17": 1.0})
+    assert len(cov.monetary_scale_breaks(df2, "GhanaLSS", "crop_production",
+                                         ["2012-13", "2016-17"])) == 2
+
+
+def test_scale_check_ignores_non_monetary_columns_and_tables():
+    # Quantity is not monetary: a 100x jump in it is not this check's business.
+    df = _money_frame({"w1": 1.0, "w2": 1.0, "w3": 1.0})
+    t = df.index.get_level_values("t") == "w2"
+    df.loc[t, "Quantity"] = 100.0
+    assert cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                     ["w1", "w2", "w3"]) == []
+    # household_roster has no monetary column at all.
+    assert cov.monetary_scale_breaks(df.rename(columns={"Value_sold": "Age"}),
+                                     "Uganda", "household_roster",
+                                     ["w1", "w2", "w3"]) == []
+
+
+def test_scale_check_uses_the_monetary_registry_not_a_yaml_scan():
+    """`crop_production.Value_sold` carries NO `monetary: true` flag in
+    data_info.yml -- it is monetary only through `currency._DEFAULT_MONETARY`.
+    The #829 column must be in scope, so the registry is the source."""
+    from lsms_library.currency import _monetary_columns
+    assert "Value_sold" in _monetary_columns("crop_production", "Uganda")
+
+
+def test_scale_check_requires_support_and_tolerates_zeros_and_na():
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0}, n=5)   # 15 rows/wave < 30
+    assert cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                     ["w1", "w2", "w3"]) == []
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0}).astype({"Value_sold": "Float64"})
+    df.iloc[::7, 0] = pd.NA
+    df.iloc[1::7, 0] = 0.0
+    breaks = cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                       ["w1", "w2", "w3"])
+    assert [b["wave"] for b in breaks] == ["w2"]
+
+
+def test_scale_check_falls_back_to_pooled_without_a_j_level():
+    df = _money_frame({"w1": 1.0, "w2": 0.01, "w3": 1.0}).droplevel("j")
+    breaks = cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                       ["w1", "w2", "w3"])
+    assert [(b["wave"], b["form"]) for b in breaks] == [("w2", "pooled")]
+
+
+def test_scale_check_per_item_form_is_robust_to_an_item_mix_shift():
+    """w2 sells only the dear item (10x the cheap one): the POOLED median
+    jumps ~5x, every item's own median is unchanged.  Not a scale break."""
+    df = _money_frame({"w1": 1.0, "w2": 1.0, "w3": 1.0},
+                      items=("beans", "b2", "b3", "coffee"))
+    # make coffee 10x and drop the cheap items from w2
+    j = df.index.get_level_values("j"); t = df.index.get_level_values("t")
+    df.loc[j == "coffee", "Value_sold"] *= 10
+    df = df[~((t == "w2") & (j != "coffee"))]
+    # with the per-item form unavailable (one shared item) the pooled form fires
+    # -- that is the fallback's known cost; with >=3 shared items it does not.
+    pooled = cov.monetary_scale_breaks(df, "Uganda", "crop_production",
+                                       ["w1", "w2", "w3"])
+    assert [b["form"] for b in pooled] == ["pooled"]
+    df2 = _money_frame({"w1": 1.0, "w2": 1.0, "w3": 1.0},
+                       items=("beans", "b2", "b3", "coffee", "c2", "c3"))
+    j = df2.index.get_level_values("j"); t = df2.index.get_level_values("t")
+    df2.loc[j.isin(["coffee", "c2", "c3"]), "Value_sold"] *= 10
+    df2 = df2[~((t == "w2") & ~j.isin(["coffee", "c2", "c3"]))]
+    assert cov.monetary_scale_breaks(df2, "Uganda", "crop_production",
+                                     ["w1", "w2", "w3"]) == []
+
+
+def test_scale_check_failure_is_not_fatal_to_the_grade(monkeypatch):
+    def boom(*a, **k):
+        raise ValueError("synthetic")
+    monkeypatch.setattr(cov, "monetary_scale_breaks", boom)
+    df = _money_frame({"w1": 1.0, "w2": 0.01})
+    co = _FakeCountry({"w1": ["crop_production"], "w2": ["crop_production"]})
+    with pytest.warns(RuntimeWarning, match="monetary scale check failed"):
+        cells = cov.grade_feature("Uganda", "crop_production", ["w1", "w2"], co,
+                                  _env(df, _ok_report()), readiness=True)
+    assert {c["tier"] for c in cells} == {"sane"}
+
+
+@pytest.mark.requires_s3
+def test_scale_check_positive_control_uganda_2015_16_value_sold():
+    """GH #829 as the positive control: undo the wave script's x100 guard in
+    memory and the grader must name 2015-16; the served frame must be clean."""
+    import numpy as np
+    try:
+        u = ll.Country("Uganda")
+        df = u.crop_production()
+    except Exception as e:  # noqa: BLE001
+        pytest.skip(f"Uganda crop_production unavailable: {e}")
+    waves = list(u.waves)
+    assert cov.monetary_scale_breaks(df, "Uganda", "crop_production", waves) == []
+    d2 = df.copy()
+    m = np.asarray(d2.index.get_level_values("t").astype(str) == "2015-16")
+    d2.loc[m, "Value_sold"] = d2.loc[m, "Value_sold"] / 100
+    breaks = cov.monetary_scale_breaks(d2, "Uganda", "crop_production", waves)
+    assert [(b["column"], b["wave"]) for b in breaks] == [("Value_sold", "2015-16")]
+    assert breaks[0]["ratio"] < 1 / cov.SCALE_RATIO_TOLERANCE
