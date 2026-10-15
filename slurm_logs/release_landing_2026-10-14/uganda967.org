@@ -1,6 +1,63 @@
 #+title: Uganda #967 landing replay and historical nutrition gate
 
-* Status and scope
+* Maintainer approval and narrow fixture update [2026-10-15]
+After the before/after explanation and concrete nutrition-only patch, the
+maintainer explicitly replied:
+#+begin_quote
+Okay, thumbs up on #967
+#+end_quote
+The #967 nutrition direction hold is therefore lifted for this reviewed
+candidate. The original patch stored in =uganda967/nutrition-manifest-proposed.patch=
+is now applied: only =var/nutrition.parquet.shape= changes from =[23801, 15]=
+to =[23777, 15]= and its =content_hash= changes from =fc85...eee44= to
+=12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a=.
+Every other fixture field and entry remains unchanged from the merged branch.
+No baseline generator, nutrition code, factor policy or dependency was changed.
+The accepted target retains the documented nominal-volume, range-endpoint,
+residual-code and nutrient-provenance limitations; approval does not claim
+independent validation of every physical mass or the cited FCT paper.
+
+Merged current development =7c6265de78225efc953bcaed0144ebda982b8712= into
+=landing/uganda= at =6113823d80eaa3fa93220848304a005fd7e5fc17=, with hooks
+disabled and no conflicts. Before the fixture edit, runtime/country build
+configuration, tests, dependencies, workflows and the Feature harness were
+identical to reviewed integration =ea688bf51e33e22e3781db97a5123a9061cdc9e7=.
+All original #967 changes are preserved. Focused verification is recorded
+below; the historical measurements and earlier hold remain intact as dated
+evidence.
+
+** Focused approval verification
+Copied only Uganda from the completed independent cold corpus at =7fa05179=
+into a new private data root: 172 files, 27,670,130 bytes. Every copied SHA256
+matches and every regular-file inode differs; only =dvc-cache= links to the
+shared content-addressed L1. No Country/Feature API was called on the original
+corpus, and no source build or shared-L2 write was needed. Package, country
+config and private data-root identities were asserted.
+
+The existing =tests/test_uganda_invariance.py::_fingerprint= independently
+confirms all 53 manifest entries are present and match, including nutrition's
+23,777 x 15 shape and =12d25...50e3a= hash. The old nutrition entry fails exactly
+shape and hash on those same bytes. A whole-manifest comparison confirms that
+these are the ONLY two changed fields; every other entry, column, index name
+and dtype is retained. The historical #967 food fingerprints are unchanged.
+
+Focused checks, without new skips or weakened assertions:
+: pytest -n 6 --dist=loadfile --timeout=600 --timeout-method=thread --durations=10 -q -ra tests/test_962_unit_sentinel.py tests/test_food_kg_inference.py tests/test_uganda_invariance.py
+Result: *127 passed, zero skipped, zero failed, 16 warnings in 15.57 seconds*.
+This includes all 53 real-parquet baseline cases. CPU affinity was 8-15,
+BLAS/OMP/MKL threads 1, and =LSMS_BUILD_WORKERS=1=. The original corpus's
+172 files retain their digests, sizes, mtimes and device/inode identities
+afterward; every private L2 file also retains its bytes. No in-tree parquet
+was produced. This is a focused verification of an independently rebuilt
+candidate, not a new corpus rebuild or full-suite claim.
+
+Aggregate evidence is [[file:uganda967/approval-validation.json][approval-validation.json]].
+The private copy, fingerprints, source-preservation manifest, verification
+driver and pytest log are under
+=/local/job39919092/release-work/control/countries/uganda-approval/=. Final
+release landing, combined CI and shared-cache warming remain coordinator work.
+
+* Historical status and scope [2026-10-14]
 Merged development 452302adcfdbf3af538ef06375df1ac6c5aaa8a0 into #967;
 replayed code at ebf4eb4deba8ef95afa9279e33dd658cb9929915. No fixture changed
 in this landing follow-up. The original branch includes its previously reviewed
@@ -67,7 +124,7 @@ fabricated factors. Sixty retained vectors change. Incremental Energy delta:
 This arithmetic verification is not external validation of every density,
 unresolved unit or the earlier #850 revaluation.
 
-* Concrete proposed manifest change, NOT applied
+* Historical proposal, not applied at the 2026-10-14 checkpoint
 [[file:uganda967/nutrition-manifest-proposed.patch][Proposed patch]] changes ONLY
 nutrition shape and content_hash to the cold candidate values, retaining all
 other fields and entries. Applying it accepts the current regression target,

@@ -121,3 +121,16 @@ Final cold replay, selective food-fingerprint verification and publication
 status are recorded in `slurm_logs/uganda_units_2026-09-25/VALIDATION.org`.
 
 -- Sue
+
+### Release disposition — 2026-10-15
+
+After the complete before/after explanation and concrete nutrition-only patch,
+the maintainer explicitly approved: "Okay, thumbs up on #967". This supersedes
+the historical nutrition-entry hold in §4 only for the reviewed candidate:
+update `var/nutrition.parquet` shape to `[23777, 15]` and content hash to
+`12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a`.
+Reuse the existing `_fingerprint` and invariance tests against a physical copy
+of independently cold-built candidate data. Every other fixture field/entry
+and the runtime kg/nutrition policy remain unchanged; no baseline generator.
+Prior historical #850 accounting and documented physical/provenance limitations
+remain in force. The dated approval and checks are in `uganda967.org`.

@@ -3120,6 +3120,29 @@ recorded micrograms to the historical A delta. Nominal volume-as-mass and
 range-endpoint assumptions remain separate; no density, source table,
 mapping, factor policy or fixture was changed. *The baseline hold remains.*
 
+*Maintainer decision [2026-10-15]: the #967 nutrition direction hold is lifted.*
+After the before/after explanation and the concrete nutrition-only manifest
+proposal, the maintainer explicitly replied:
+#+begin_quote
+Okay, thumbs up on #967
+#+end_quote
+This approves the reviewed #967 candidate and the proposed two-field change
+in =tests/fixtures/uganda_baseline.json=: =var/nutrition.parquet= changes
+from 23,801 x 15 / =fc85...eee44= to 23,777 x 15 /
+=12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a=.
+Only =shape= and =content_hash= change; columns, index names, dtypes and
+every other manifest entry retain their reviewed values. The old hold and
+its investigations above are historical evidence, not outstanding approval
+requirements for this specific patch. See the dated approval and focused
+verification in [[file:../../../../slurm_logs/release_landing_2026-10-14/uganda967.org][the #967 landing record]].
+
+This accepts the documented regression target for this release. It does not
+change the runtime factor ladder, reinterpret a litre as a measured mass,
+choose new range endpoints, or independently verify the cited FCT paper.
+The recorded nominal-container, residual-code and nutrient-provenance limits
+remain; the curated conversion JSON still is not the API's kg-factor input.
+No baseline generator or wholesale fixture refresh was used.
+
 *Consequence, stated plainly*: =test_uganda_invariance.py= is NOT a
 reliable net for a change to a Uganda parquet's shape or content.  To
 verify a baseline entry, build the table explicitly and compare
