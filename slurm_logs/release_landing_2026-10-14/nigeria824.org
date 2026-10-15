@@ -56,3 +56,17 @@ Targeted sold-unit and no-editable-install files: 22 passed in 12.25 s
 (-n 6 --dist=loadfile, pinned BLAS/build workers). No skips.
 No in-tree parquet. Aggregate evidence: control/countries/nigeria824 in the
 release scratch; full original evidence remains in the reviewed verdict.
+
+* CI follow-up: raw source tests require credentials
+PR #994 run38682599590 exposed two metadata tests calling pyreadstat on
+=None= in the credential-free job. Mark only TestRawFiles =requires_s3=;
+remove its broad exception-to-skip paths so a credentialed source/decoder
+failure remains a failure. No production source change.
+
+A fresh worktree with empty LSMS_CONFIG_DIR, LSMS_SKIP_AUTH=1, no AWS env
+and empty AWS config paths:12 passed,6 skipped (four marked raw tests and
+two absent warm-table checks),8.94s. Normal credentialed config:16 passed,
+2 absent warm-table skips,10.28s; all four raw tests executed.
+An intermediate attempt with only S3 credentials but empty library config
+failed the explicit get_data_file permission gate, correctly staying red.
+Original cold table proof above covers the two warm-table assertions.
