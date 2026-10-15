@@ -55,9 +55,11 @@ separate residual-code inference +33.471191089. No selected factor changes on
 unchanged physical labels. Fish's 2 kg lower endpoint is the EXISTING parser
 convention, not a newly measured mass.
 
-Nutrition equals rebuilt kg quantities times unchanged FCT on BOTH revisions,
-with maximum matrix replay difference 0; a separate food-by-food sum agrees
-within 5.82e-11. It loses 24 household-wave rows (23 in 2010-11, one in
+Nutrition agrees with rebuilt kg quantities times unchanged FCT on BOTH
+revisions to maximum absolute matrix replay difference 2.9802322387695312e-08;
+a separate food-by-food sum agrees within 1.1641532182693481e-10. These are the
+fresh comparison.json measurements, not exact equality. It loses 24
+household-wave rows (23 in 2010-11, one in
 2011-12), all without a convertible physical quantity after correction:
 four previously had zero nutrient vectors, twenty had nonzero estimates from
 fabricated factors. Sixty retained vectors change. Incremental Energy delta:
