@@ -123,3 +123,29 @@ def test_wave_parquet_stores_canonical_rural():
         "-- the extraction mapping is missing, and the API-time spellings net "
         "is hiding it from every other test in this file"
     )
+
+
+def test_region_and_strata_share_one_vocabulary(cf):
+    """GH #811.  ``cluster_features.Region`` and ``sample.strata`` read the
+    SAME source variable (``s00q01``) and the raw parquets hold identical
+    lower-case values in both, but only ``strata`` had a table in
+    ``_/categorical_mapping.org`` -- so ``Region`` was served raw (``sab``,
+    ``bafata``, ..., ``BOLAMA_BIJAGOS``) while ``strata`` was served
+    normalised (``SAB``, ``Bafata``, ..., ``Bolama-Bijagos``), and a
+    ``strata`` <-> ``Region`` join matched zero rows.
+
+    The ``Region`` table mirrors the ``strata`` table row for row (upper-case
+    ``SAB``, not title case -- agreement is the point), so the two served
+    vocabularies must be identical.  The stored parquets keep the raw values;
+    this is a read-path mapping, like ``strata`` always was.
+    """
+    strata = Country("Guinea-Bissau").sample()["strata"]
+    region_vocab = set(cf["Region"].dropna())
+    strata_vocab = set(strata.dropna())
+    assert region_vocab == strata_vocab, (region_vocab, strata_vocab)
+    assert region_vocab == {
+        "SAB", "Bafata", "Biombo", "Cacheu", "Gabu", "Oio", "Quinara",
+        "Tombali", "Bolama-Bijagos",
+    }
+    # Nine regions, one spelling each -- the mapping regroups nothing.
+    assert cf["Region"].nunique() == 9
