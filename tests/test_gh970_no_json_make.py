@@ -85,7 +85,14 @@ def cold_private_root(tmp_path, monkeypatch):
     intree = Path(countries_root()) / COUNTRY / "_"
     assert not (intree / "panel_ids.json").exists(), "Malawi is Design B (#894)"
     assert not (intree / "panel_ids.parquet").exists(), "in-tree parquet (GH #803)"
-    return droot
+    try:
+        yield droot
+    finally:
+        # monkeypatch restores the env but not the lru_cache: without this a
+        # later test file on the same xdist worker would see data_root()
+        # pointing at this (deleted) tmp dir.
+        data_root.cache_clear()
+        countries_root.cache_clear()
 
 
 def _forbid_subprocess(monkeypatch):
