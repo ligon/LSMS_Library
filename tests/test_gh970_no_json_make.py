@@ -36,7 +36,7 @@ import pytest
 
 import lsms_library as ll
 from lsms_library import country as country_mod
-from lsms_library.paths import countries_root
+from lsms_library.paths import countries_root, data_root
 
 COUNTRY = "Malawi"
 
@@ -63,6 +63,13 @@ def cold_private_root(tmp_path, monkeypatch):
     monkeypatch.setenv("LSMS_BUILD_WORKERS", "1")
     monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
     monkeypatch.delenv("LSMS_BUILD_BACKEND", raising=False)
+    # ``data_root`` is lru_cached: a worker that has already resolved it for
+    # an earlier test file keeps the OLD root and the setenv above is inert
+    # (measured in the full suite: the test then read the real warm parquet
+    # and nothing landed under tmp_path).  Same pattern as the GH #803 tests.
+    data_root.cache_clear()
+    countries_root.cache_clear()
+    assert data_root() == droot, data_root()
 
     real_grab = country_mod.Wave.grab_data
 
