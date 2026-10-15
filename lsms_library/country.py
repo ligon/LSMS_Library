@@ -4545,20 +4545,17 @@ class Country:
                             return df
                         return df
 
-            try:
-                make_cmd = ["make", "-s"]
-                jobs_flag = _make_jobs_flag()
-                if jobs_flag:
-                    make_cmd.append(jobs_flag)
-                make_cmd.append(f"{method_name}.json")
-                subprocess.run(make_cmd, cwd=self.file_path / "_", check=True)
-            except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                logger.warning(f"Makefile build failed for {method_name}: {error}. Falling back to wave aggregation.")
-                result = load_from_waves(waves)
-            else:
-                result = run_make_target(method_name)
-                if result is None:
-                    raise _rebuild_failure_error(self.name, method_name)
+            # No cached candidate: derive the crosswalk from the waves.  This
+            # used to shell out to ``make -s <method>.json`` first, with the
+            # parent's environment (no ``_script_subprocess_env``) -- but the
+            # JSON is a committed SOURCE or a cache, never a Make product
+            # (GH #914: no country Makefile has a ``.json`` target), so the
+            # call could only fail and log a misleading "Makefile build
+            # failed" warning on every cold Design-B read (Malawi, Nigeria),
+            # or raise ``FileNotFoundError`` where ``make`` is absent
+            # (GH #964/#968).  Removed in GH #970; nothing here spawns a
+            # subprocess, so there is no ``make`` to gate on.
+            result = load_from_waves(waves)
 
             if isinstance(result, dict):
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
