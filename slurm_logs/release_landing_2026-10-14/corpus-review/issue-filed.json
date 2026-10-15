@@ -1,0 +1,9 @@
+{
+  "number": 1006,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1006",
+  "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
+  "body_sha256": "5a2b67e937f6f9e5c2492a149d99444d7a58b7a007d3bc9d97e6af8ad9cf15a5",
+  "evidence_commit": "e3009d914b450bfa6f7c8fecf4d5516e426ccb8d",
+  "status": "OPEN",
+  "scope": "Legacy derived-table test coverage; no production or scientific change"
+}

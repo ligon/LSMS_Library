@@ -1,0 +1,21 @@
+[
+  {
+    "path": "CotedIvoire/2018-19/_/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  },
+  {
+    "path": "CotedIvoire/var/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  },
+  {
+    "path": "Burkina_Faso/2018-19/_/food_acquired.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": false,
+    "sorted_frame_exact": false,
+    "comparison_detail": "DataFrame.index level [3] are different\n\nDataFrame.index level [3] values are different (1.00956 %)\n[left]:  Index(['Cube alimentaire', 'Feuilles de baobab', 'Feuilles locales',\n       'Gombo sec', 'Petit mil', 'Poisson s\u00e9ch\u00e9', 'Sel', 'Sorgho', 'Soumbala',\n       'Sucre',\n       ...\n       'P\u00e2te d'arachide', 'P\u00e2tes alimentaires', 'Riz import\u00e9', 'Salade', 'Sel',\n       'Soumbala', 'Sucre', 'Th\u00e9', 'Tomate fra\u00eeche', 'Viande de b\u00c5\u0093uf'],\n      dtype='str', name='j', length=138575)\n[right]: Index(['Cu"
+  }
+]

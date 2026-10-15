@@ -15,6 +15,12 @@ downloaded.  The =data_info.yml= and =data_scheme.yml= configs exist
 food_acquired, interview_date, assets) but all features return empty
 DataFrames because the source .dta files are missing.
 
+*Observed update, 2026-10-14:* the sentence above describes the earlier
+behavior. The completed declared-corpus run made all eleven current requests
+and each failed loudly with a missing-source or derived-table materialization
+error. These are unavailable tables, not successful empty builds. The NSO
+acquisition requirement and cross-section/panel distinctions below remain.
+
 ** Data sources
 The World Bank does NOT host Nepal microdata directly.  Both WB
 catalog pages redirect to the Nepal NSO.  Data must be obtained from

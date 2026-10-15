@@ -1824,6 +1824,16 @@ its script:
 =cache_freshness= grades a hashless parquet =legacy=, and =legacy= means
 *trust once, then stamp* -- its docstring says so explicitly
 ("trust-once-then-stamp migration of legacy / *script-written* parquets").
+*Policy update, 2026-10-14:* that description predates GH #809. The current
+L2-country read gate treats hashless country parquets as stale and rebuilds;
+script-written wave parquets have a different policy. The completed cold
+corpus still ended with hashless =var/fct.parquet= and =var/earnings.parquet=
+after nutrition/income builds rewrote sibling outputs. Both final frames
+matched their recorded baseline fingerprints, but hash/coverage metadata was
+absent. This preserves GH #788's authoritative-builder/sibling-write question;
+it does not justify stamping unverified content or changing the separately
+held nutrition baseline. The measurements below describe the earlier policy.
+
 Measured:
 
 : before API call: stamped = NO  | rows = 22447

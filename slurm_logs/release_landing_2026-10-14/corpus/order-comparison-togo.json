@@ -1,0 +1,14 @@
+[
+  {
+    "path": "Togo/2018/_/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  },
+  {
+    "path": "Togo/var/household_roster.parquet",
+    "index_exact": false,
+    "row_hash_multiset_equal": true,
+    "sorted_frame_exact": true
+  }
+]

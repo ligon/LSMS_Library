@@ -1,0 +1,147 @@
+[
+  {
+    "group": "mutating",
+    "counts": {
+      "passed_or_non_strict_xpass": 19
+    },
+    "pytest_summaries": [
+      "19 passed, 52 warnings in 329.58s (0:05:29)"
+    ],
+    "skip_reasons": {},
+    "failed_nodes": [],
+    "evidence": [
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/mutating.xml",
+        "bytes": 3348,
+        "sha256": "dffa9fb7039412ff6b4ac83ab6d2b1a0e69c7f4966fb4dc97ce7d44a4e4b9c6a"
+      },
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/mutating.log",
+        "bytes": 28922,
+        "sha256": "a7391549c91620901ca83752925441dd5f4e6cc11534d3df47d7a0c4e6752210"
+      }
+    ]
+  },
+  {
+    "group": "ordinary",
+    "counts": {
+      "skipped": 18,
+      "passed_or_non_strict_xpass": 15
+    },
+    "pytest_summaries": [
+      "15 passed, 18 skipped, 29 warnings in 26.44s"
+    ],
+    "skip_reasons": {
+      "Requires cached Uganda household_characteristics (data build needed)": 1,
+      "food_prices.parquet not in cache": 1,
+      "Uganda/household_characteristics not cached (requires data build)": 1,
+      "food_quantities.parquet not in cache": 1,
+      "Uganda/food_expenditures not cached (requires data build)": 2,
+      "Uganda/food_quantities not cached (requires data build)": 1,
+      "Requires cached Uganda household_characteristics and income (data build needed)": 1,
+      "no raw sample parquet to read (cold data root?)": 8,
+      "Uganda/food_prices not cached (requires data build)": 1,
+      "household_characteristics parquet not cached (requires data build)": 1
+    },
+    "failed_nodes": [],
+    "evidence": [
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/ordinary.xml",
+        "bytes": 8609,
+        "sha256": "29d760dd913201b3c1dfddfd50064ca630b6cb13cf47fc7f4fe211a224b9da0b"
+      },
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/ordinary.log",
+        "bytes": 29174,
+        "sha256": "05b637d3ceb82ef3fcb9ba9d73021429911821f6a3b237a75671e0a1af110e99"
+      }
+    ]
+  },
+  {
+    "group": "structural",
+    "counts": {
+      "passed_or_non_strict_xpass": 2352,
+      "skipped": 150,
+      "xfail": 5
+    },
+    "pytest_summaries": [
+      "2352 passed, 150 skipped, 5 xfailed in 125.41s (0:02:05)"
+    ],
+    "skip_reasons": {
+      "no cache for Armenia/household_roster at data_root()": 6,
+      "no cache for Burkina_Faso/panel_ids at data_root()": 6,
+      "no cache for Burkina_Faso/food_expenditures at data_root()": 4,
+      "no cache for Burkina_Faso/food_prices at data_root()": 4,
+      "no cache for Burkina_Faso/food_quantities at data_root()": 4,
+      "no cache for Ethiopia/panel_ids at data_root()": 6,
+      "no cache for EthiopiaRHS/panel_ids at data_root()": 4,
+      "no cache for GhanaLSS/panel_ids at data_root()": 4,
+      "no cache for Malawi/panel_ids at data_root()": 6,
+      "no cache for Malawi/food_expenditures at data_root()": 4,
+      "no cache for Malawi/food_prices at data_root()": 4,
+      "no cache for Mali/panel_ids at data_root()": 4,
+      "no cache for Nepal/sample at data_root()": 6,
+      "no cache for Nepal/cluster_features at data_root()": 6,
+      "no cache for Nepal/household_roster at data_root()": 6,
+      "no cache for Nepal/individual_education at data_root()": 6,
+      "no cache for Nepal/food_acquired at data_root()": 6,
+      "no cache for Nepal/interview_date at data_root()": 6,
+      "no cache for Nepal/assets at data_root()": 6,
+      "no cache for Niger/panel_ids at data_root()": 4,
+      "no cache for Nigeria/panel_ids at data_root()": 6,
+      "no cache for Peru/individual_education at data_root()": 6,
+      "no cache for Peru/food_acquired at data_root()": 6,
+      "no cache for Peru/interview_date at data_root()": 6,
+      "no cache for Senegal/panel_ids at data_root()": 4,
+      "no cache for Tanzania/food_expenditures at data_root()": 4,
+      "no cache for Tanzania/food_quantities at data_root()": 4,
+      "no cache for Tanzania/food_prices at data_root()": 4,
+      "no cache for Tanzania/panel_ids at data_root()": 4,
+      "no cache for Uganda/panel_ids at data_root()": 4,
+      "GH #602: Albania/plot_features ships unharmonized tenure labels: Tenure: 12358/16013 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'privatised' (12358); TenureSystem: 15961/16013 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'deed' (14809), 'sales_receipt' (419), 'none' (391), 'usufruct' (178), 'will' (140), +1 more": 1,
+      "GH #602: Cambodia/plot_features ships unharmonized tenure labels: Tenure: 2951/2951 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'BY INHERITANCE OF GIFT FROM RELATIVES' (1440), 'BOUGHT IT FROM A NON-RELATIVE' (628), 'GIVEN BY THE GOVERNMENT OR LOCAL AUTHORITY' (373), 'BOUGHT IT FROM A RELATIVE' (207), 'CLEARED LAND/OCCUPIED FOR FREE' (117), +4 more; TenureSystem: 2951/2951 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'PRIVATE' (2871), 'STATE PUBLIC' (45), 'STATE PRIVATE' (12), 'INDIGENOUS' (12), 'COMMON PROPERTY' (7), +1 more": 1,
+      "GH #602: Kosovo/plot_features ships unharmonized tenure labels: Tenure: 6469/6469 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Owned' (6419), 'Rented' (26), 'Borrowed' (24); TenureSystem: 50/50 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'No payment' (24), 'Rent' (24), 'Sharecropped' (2)": 1,
+      "GH #602: Tajikistan/plot_features ships unharmonized tenure labels: TenureSystem: 3683/3683 value(s) outside declared vocabulary ['community', 'cooperative', 'customary', 'freehold', 'granted_right_of_occupancy', 'leasehold', 'mailo', 'other_tenure_system', 'state']: 'CERTIFICATE' (2137), 'ACT (SEALED DOCUMENT)' (1196), 'NO DOCUMENTS' (238), 'SALES RECEIPT' (85), 'OTHER' (27)": 1,
+      "GH #602: Timor-Leste/plot_features ships unharmonized tenure labels: Tenure: 6308/6308 value(s) outside declared vocabulary ['communal', 'inherited', 'leased', 'other_tenure', 'owned', 'rented_in', 'rented_out', 'sharecropped_in', 'sharecropped_out', 'squatted', 'use_right']: 'Part owner' (5099), 'Owner' (874), 'Public land' (127), 'Private land' (115), 'Other' (52), +2 more": 1
+    },
+    "failed_nodes": [],
+    "evidence": [
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/structural.xml",
+        "bytes": 378143,
+        "sha256": "7c1f44b4d742229d4b48a67aab719222ee87136676faeb0aade434022d38dd09"
+      },
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/structural.log",
+        "bytes": 10870,
+        "sha256": "e1521f50282cd45bf073706ebb49aad9bf19ac2d33a73a8c7973bb23d4c394f8"
+      }
+    ]
+  },
+  {
+    "group": "uganda_baseline",
+    "counts": {
+      "passed_or_non_strict_xpass": 30,
+      "failure": 1
+    },
+    "pytest_summaries": [
+      "1 failed, 30 passed in 6.24s"
+    ],
+    "skip_reasons": {},
+    "failed_nodes": [
+      "tests.test_uganda_invariance::test_parquet_matches_baseline[var/nutrition.parquet]"
+    ],
+    "evidence": [
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/uganda_baseline.xml",
+        "bytes": 6250,
+        "sha256": "0a433a3cdd2d327372ce3f4128b60a32fef18933a93d6eff5648709e15b773ef"
+      },
+      {
+        "path": "/local/job39919092/release-work/logs/cache-coverage/uganda_baseline.log",
+        "bytes": 3834,
+        "sha256": "0024b772ae342f46295c8e28e35ea5e77729450ce658ebe04fa71a8fdbfa25ea"
+      }
+    ]
+  }
+]

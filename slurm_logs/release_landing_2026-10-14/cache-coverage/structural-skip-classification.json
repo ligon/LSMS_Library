@@ -1,0 +1,249 @@
+{
+  "counts": {
+    "documented source/wiring error": 66,
+    "JSON panel mapping": 52,
+    "derived nonpersistent DataFrame": 32
+  },
+  "cases": [
+    {
+      "country": "Armenia",
+      "table": "household_roster",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Burkina_Faso",
+      "table": "panel_ids",
+      "test_skips": 6,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Burkina_Faso",
+      "table": "food_expenditures",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Burkina_Faso",
+      "table": "food_prices",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Burkina_Faso",
+      "table": "food_quantities",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Ethiopia",
+      "table": "panel_ids",
+      "test_skips": 6,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "EthiopiaRHS",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "GhanaLSS",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Malawi",
+      "table": "panel_ids",
+      "test_skips": 6,
+      "corpus_status": "success",
+      "return_type": "RecursiveDict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Malawi",
+      "table": "food_expenditures",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Malawi",
+      "table": "food_prices",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Mali",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Nepal",
+      "table": "sample",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "cluster_features",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "household_roster",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "individual_education",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_acquired",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "interview_date",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Nepal",
+      "table": "assets",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Niger",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Nigeria",
+      "table": "panel_ids",
+      "test_skips": 6,
+      "corpus_status": "success",
+      "return_type": "RecursiveDict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Peru",
+      "table": "individual_education",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Peru",
+      "table": "food_acquired",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Peru",
+      "table": "interview_date",
+      "test_skips": 6,
+      "corpus_status": "error",
+      "return_type": "",
+      "category": "documented source/wiring error"
+    },
+    {
+      "country": "Senegal",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Tanzania",
+      "table": "food_expenditures",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Tanzania",
+      "table": "food_quantities",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Tanzania",
+      "table": "food_prices",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "DataFrame",
+      "category": "derived nonpersistent DataFrame"
+    },
+    {
+      "country": "Tanzania",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    },
+    {
+      "country": "Uganda",
+      "table": "panel_ids",
+      "test_skips": 4,
+      "corpus_status": "success",
+      "return_type": "dict",
+      "category": "JSON panel mapping"
+    }
+  ]
+}
