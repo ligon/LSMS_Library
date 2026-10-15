@@ -293,3 +293,89 @@ def test_feature_still_sums_the_passages_for_cross_country_work(burkina):
     assert 'visit' not in f.index.names
     wave = f.xs('2014', level='t')
     assert wave['Expenditure'].sum() == pytest.approx(WAVE_EXPENDITURE, rel=1e-9)
+
+
+# ---------------------------------------------------------------------------
+# 3. GH #864 -- a quantity the survey did not ask for is NaN, not 0.
+# ---------------------------------------------------------------------------
+#
+# `food_acquired_to_canonical` fills a null source quantity with 0 before
+# computing the purchased quantity, so every money-only row in this wave was
+# served as "bought none" -- 405,127 passage-2/3/4 rows (no quantity grid in
+# those files) plus the passage-1 items the grid was not administered for.
+# `food_prices` then divided by 0 and reported the wave as 64.8% unpriceable,
+# blaming a 0-as-missing sentinel.  The hook now restores the NaN.
+
+# Measured on the 2026-10-14 cold rebuild.  `qachat` is NEVER 0 where
+# `achat > 0` in passage 1 (0 of 140,908), so the 219 purchased zeros that
+# remain are the clipped `Produced >= Quantity` rows, not filled NaNs.
+P1_PURCHASED_NULL_QUANTITY = 43_906
+P1_PURCHASED_ZERO_QUANTITY = 219
+
+
+def test_the_hook_restores_nan_where_the_source_quantity_was_null():
+    """Config-only.  Two passage-1 rows with the same key: one answered, one
+    not.  The reshape fills the unanswered row's purchased quantity with 0;
+    the hook must put the NaN back and leave the answered row alone.  A
+    passage with NO quantity column (visit 2) comes back NaN throughout."""
+    import importlib.util
+
+    path = countries_root() / 'Burkina_Faso' / '2014' / '_' / 'mapping.py'
+    spec = importlib.util.spec_from_file_location('bf2014_mapping_nan', path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    idx = pd.MultiIndex.from_tuples(
+        [('2014', 'v1', 'h1', 'Maize', 'Kg'),      # answered
+         ('2014', 'v1', 'h1', 'Sel', None),        # p1, grid not administered
+         ('2014', 'v1', 'h1', 'Maize', None),      # p2, money only
+         ('2014', 'v1', 'h1', 'Oeufs', 'Kg')],     # p1, produced only
+        names=['t', 'v', 'i', 'j', 'u'])
+    df = pd.DataFrame({'Quantity': [2.0, None, None, 3.0],
+                       'Produced': [0.5, None, None, 3.0],
+                       'Expenditure': [100.0, 50.0, 70.0, None],
+                       'visit': [1, 1, 2, 1]}, index=idx)
+    out = mod.food_acquired(df)
+    q = out['Quantity']
+    assert q.xs(('Maize', 'Kg', 'purchased', 1), level=('j', 'u', 's', 'visit')).iloc[0] == 1.5
+    assert q.xs(('Maize', 'Kg', 'produced', 1), level=('j', 'u', 's', 'visit')).iloc[0] == 0.5
+    assert pd.isna(q.xs(('Sel', 'Unknown', 'purchased', 1),
+                        level=('j', 'u', 's', 'visit')).iloc[0])
+    assert pd.isna(q.xs(('Maize', 'Unknown', 'purchased', 2),
+                        level=('j', 'u', 's', 'visit')).iloc[0])
+    # Expenditure untouched, no row added or removed.
+    assert out['Expenditure'].sum() == 220.0
+    assert len(out) == 5
+
+
+@_data
+def test_money_only_passages_carry_nan_not_zero(delivered):
+    """Passages 2-4 field no quantity grid: every purchased row is NaN, none is
+    0.  Passage 1 keeps its reported quantities and its 219 clipped zeros."""
+    wave = delivered.xs('2014', level='t')
+    s = wave.index.get_level_values('s')
+    visit = wave.index.get_level_values('visit')
+    q = wave['Quantity']
+    for passage in (2, 3, 4):
+        part = q[(s == 'purchased') & (visit == passage)]
+        assert part.isna().all(), (passage, int(part.notna().sum()))
+        assert len(part) > 100_000
+    p1 = q[(s == 'purchased') & (visit == 1)]
+    assert int(p1.isna().sum()) == P1_PURCHASED_NULL_QUANTITY
+    assert int((p1 == 0).sum()) == P1_PURCHASED_ZERO_QUANTITY
+    assert (q[s == 'produced'] > 0).all()
+
+
+@_data
+def test_food_prices_tallies_the_money_only_passages_by_design(burkina):
+    """The warning must report the RESIDUAL loss, with the three money-only
+    passages tallied separately -- not a 64.8% figure pinned forever."""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        fp = burkina.food_prices(units='unitvalue')
+    tally = fp.attrs['price_rows_dropped']
+    assert tally['money_only'] == 139_798 + 136_913 + 128_416     # 405,127
+    assert tally['expected_gross'] - tally['expected'] == tally['money_only']
+    assert tally['lost_fraction'] < 0.2
+    # The GH #591 class is now only the clipped zeros, not the whole wave.
+    assert tally['inf'] == P1_PURCHASED_ZERO_QUANTITY

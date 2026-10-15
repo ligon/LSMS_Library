@@ -464,6 +464,16 @@ Converted from Python scripts to YAML =data_info.yml= entries for all three wave
 *** 2014 wave (EMC)
 The 2014 survey has 4 passages (=emc2014_p{1..4}_conso7jours_*.dta=).  Only passage 1 records food quantities (=qachat=), units (=uachat=), and auto-consumption quantities (=qautocons=).  Passages 2--4 record only monetary values: purchase expenditure (=achat=), auto-consumption value (=autocons=), and gifts (=cadeau=).  All 4 passages are included; =Quantity= and =Produced= are NaN for passages 2--4.
 
+CORRECTION (2026-10-14, GH #864).  "=Quantity= ... NaN for passages 2--4"
+described the SOURCE, not the served table: =food_acquired_to_canonical=
+fills a null quantity with 0 before computing the purchased quantity, so
+every passage-2/3/4 purchased row (405,127) and 43,906 passage-1 rows were
+SERVED with =Quantity = 0= -- "bought none" -- against a positive
+Expenditure.  =2014/_/mapping.py::_restore_missing_quantity= now puts the
+NaN back wherever the source quantity was null.  Produced rows for passages
+2--4 do not exist (=qautocons= is a passage-1 variable; the p2--p4
+=autocons= VALUE is still unread, see the 2026-10-14 section at the end).
+
 CORRECTION (2026-09-09).  This entry used to end "... and =u= are NaN for
 passages 2--4", and *"all 4 passages are included" was the intent, not the
 behaviour*: a NaN on the declared =u= index level is deleted by
@@ -676,6 +686,18 @@ file is unchanged since the measurement -- so a reader change here must land
 with a re-key *and* a re-measurement of the leak table, not either alone
 (GH #794).
 
+*RESOLVED 2026-10-14 (GH #794) -- and the cause was not the keys, it was the
+FILE.*  Rows 303/304 did not match because they were never LOADED:
+=df_from_orgfile= ends a table at the first line that does not begin with
+=|=, and an editor had turned the U+0085 inside the =Cube (Maggi,
+Jumbo,<U+0085>)= key (line 299) into a line break, so that row no longer
+ended in =|=, the next line began with =)=, and the four rows below the
+break (Cube, Feuilles, both beef spellings) were dead on arrival.  The
+parsed table had 291 rows; it has 294 now.  See the 2026-10-14 section at
+the end of this file for the re-measured leak table (47,137 + 16,610 -> 0)
+and for the one label no org key can carry.  The numbers below are the
+2026-09 measurement and are kept as history.
+
 *Most of the damage is absorbed by the crosswalk; only the uncovered rows
 leak.*  Measured on the raw reads:
 
@@ -886,8 +908,12 @@ pre-fix config).
 - *=food_expenditures= at =t='2014'= is a 28-day figure* while every other
   Burkina Faso wave is 7-day.  Nothing in the API says so yet; that is what
   GH #851 is about.
-- *=food_prices()= now warns that it dropped 64.8% of priceable rows* (449,842
-  of 693,987, up from 845 of 244,812).  *This is NOT the GH #591 defect the
+- *=food_prices()= used to warn that it dropped 64.8% of priceable rows* (449,842
+  of 693,987, up from 845 of 244,812).  SUPERSEDED 2026-10-14 (GH #864): the
+  money-only passages are now served with =Quantity = NaN= and tallied by
+  design (=money_only= 405,127); the warning reports the residual 15.9%.
+  See the 2026-10-14 section at the end of this file.  The paragraph below
+  is kept as the record of the intermediate state.  *This is NOT the GH #591 defect the
   warning's text guesses at* ("a 0-as-missing sentinel or a quantity variable
   mapped to the wrong survey question").  It is the module-coverage fact above:
   three of the four passages record expenditure and no quantity, so
@@ -1009,3 +1035,124 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-10-14 -- GH #864 (money-only passages served as Quantity 0) and GH #794 (the crosswalk that was never read)
+
+Fixed together because both live in the 2014 =food_acquired= build and one
+Burkina Faso re-warm pays for both.  Measurements are from cold builds in a
+private =LSMS_DATA_DIR= (dvc-cache symlinked in) before and after.
+
+** GH #864: a quantity the survey did not ask for is NaN, not 0
+
+*The served 0 was manufactured.*  =build_transforms.food_acquired_to_canonical=
+computes =purchased = (Quantity.fillna(0) - Produced.fillna(0)).clip(0)=, so a
+null source quantity becomes a purchased quantity of ZERO.  0 means "bought
+none"; here the quantity was NOT ASKED:
+
+| passage | purchased rows | source =qachat= | served Quantity, before | after          |
+|---------+----------------+-----------------+-------------------------+----------------|
+|       1 |        141,147 | 43,906 null     | 44,125 zeros            | 43,906 NaN + 219 zeros |
+|       2 |        139,798 | no column       | 139,798 zeros           | 139,798 NaN    |
+|       3 |        136,913 | no column       | 136,913 zeros           | 136,913 NaN    |
+|       4 |        128,416 | no column       | 128,416 zeros           | 128,416 NaN    |
+
+*Passage 1's nulls are ITEM-level, not scattered non-response.*  Among the
+140,908 p1 rows with =achat > 0=, 60 products appear; 45 have no null
+=qachat= at all, and the nulls sit on nine items at >= 99%: Sel 10,244 of
+10,259; Oignons (gousse, feuille) 7,668 of 7,672; Soumbala 7,138 of 7,190;
+Feuilles 4,821 of 4,821; Gombo 4,682 of 4,683; Pâte d'arachide 3,233 of
+3,236; Haricot 2,540 of 2,542; Beurre de Karité 1,774 of 1,774; Fruits
+1,099 of 1,099.  That is the quantity grid not being administered for those
+items -- a module-coverage fact at item grain, the same kind of fact as
+"only passage 1 fields the grid" at passage grain.  Whether the
+questionnaire skips the quantity question for them (C4) has NOT been
+checked; it is the open question behind the residual 15.9% below.
+
+*=qachat= is never 0 where =achat > 0=* (0 of 140,908 rows), so a served
+purchased 0 beside an expenditure could only be a filled null or a clipped
+row.  The 219 zeros that remain in p1 are the latter: =Produced >= Quantity=
+with money spent.  Note that =qachat= is literally « quantité achetée » and
+=qautocons= « quantité autoconsommée »; the reshape treats =qachat= as the
+TOTAL and subtracts =qautocons= from it, which is what produces those 219.
+Whether =qachat= is a total or a purchased quantity in this instrument is a
+questionnaire question, not adjudicated here.
+
+*What moved and what did not* (API, warm):
+
+|                                          | before      | after       |
+|------------------------------------------+-------------+-------------|
+| =food_acquired= rows                     | 765,816     | 765,816     |
+| 2014 Expenditure (CFA)                   | 342,110,515 | 342,110,515 |
+| 2014 Quantity total                      | 4,208,737.6 | 4,208,737.6 |
+| =food_expenditures= rows / 2014 CFA      | 377,563 / 342,110,515 | same |
+| =food_prices(kgvalue)= rows              | 234,282     | 234,282     |
+| ... dropped of expected                  | 449,431 of 683,713 (65.7%) | 44,304 of 278,586 (15.9%) |
+| ... =money_only= (by design)             | --          | 405,127     |
+| ... =inf= (Expenditure / 0)              | 255         | 219         |
+| =food_prices(unitvalue)= dropped         | 449,252 of 683,713, ALL =inf= | 44,125 of 278,586 (=inf= 219, =nan= 43,906) |
+| =food_quantities(kgs)= rows / 2014 kg    | 316,441 / 310,338 | 316,441 / 306,309 |
+
+The =food_quantities= kilograms moved (-1.3% in 2014, +0.02% / +0.05% in the
+EHCVM waves) for a reason unrelated to the NaN: the GH #794 repair below
+merged the beef and Cube labels, so the per-=(j, u)= kg-factor inference
+pools different rows.  No Quantity value changed.
+
+*The warning now says what the loss is.*  =transformations._drop_unpriceable=
+has a second by-design bucket beside =currency=: =money_only=, a
+=(t, visit, s)= group whose Quantity is null on EVERY row (>= 30 rows).  It
+is excluded from both sides of the loss fraction and named in the message.
+The residual 15.9% is p1's nine items above plus 219 clipped zeros, and it
+is reported, not suppressed.
+
+** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
+
+*Before* (warm cache, 2026-10-14) the served =j= carried:
+
+| wave    | label                                           | rows   | in crosswalk? |
+|---------+-------------------------------------------------+--------+---------------|
+| 2014    | =Cube (Maggi, Jumbo,<U+0085>)=                   | 38,982 | row 299, SPLIT by a newline |
+| 2014    | =Viandes de b<U+009C>ufs fraîches=               |  6,756 | row 304, below the split |
+| 2014    | =Feuilles (oseilles, baobab, boulvaka= (no close) | 16,610 | row 301, below the split -- and unmatchable, see below |
+| 2018-19 | =Viande de b<U+00C5><U+0093>uf=                  |  1,399 | row 303, below the split |
+
+The regex census (=[\x80-\x9f]|Ã|Å|Â=) sees 47,137 of these; the Feuilles
+rows are invisible to it because their trailing U+0085 is stripped
+downstream.  *After*: 0 rows match the regex; beef is ONE label in all three
+waves (=Viande de boeuf=: 6,756 / 1,399 / 665); =Cube alimentaire= 38,982
+in 2014; =Feuilles= 16,610.
+
+*The cause was the org FILE, not the keys* -- see the paragraph added to the
+"Encoding" section above.  =U+0085= is a Unicode line separator; the editor
+that saved the 2026-09 re-key turned the one inside the Cube key into a line
+break, and =df_from_orgfile= stops at the first line that does not start
+with =|=.  Fix: the row is one line again (with a literal NEL byte -- a
+maintenance comment above the table says so), and
+=tests/test_burkina_faso_food_labels.py= pins that every table line is a
+complete org row and that the four damage keys parse.
+
+*One label can never be keyed in the org file.*  =Feuilles (oseilles, baobab,
+boulvaka<U+0085>= ENDS in U+0085, which =str.strip()= treats as whitespace.
+The build-time dict is applied to the raw label WITH the byte (=format_id=
+strips the value only afterwards), while the org reader strips every cell,
+so the key loses it.  Measured with a probe dict: the raw label matches the
+=<U+0085>=-suffixed key and not the stripped one.  So that label is repaired
+by whole-value replacement in =2014/_/mapping.py::_J_FIX= -- the GH #801
+=_RELATIONSHIP_FIX= pattern -- and the dead org row was removed.
+
+*The decoders are a safety net, and today a no-op.*  =2014/_/mapping.py=
+now carries =_decode_mojibake= (latin-1 -> utf-8 round trip, the 2018-19
+class) and =_decode_cp1252= (the 2014 class), applied to =j= and =u= AFTER
+the build-time crosswalk, in that order -- cp1252 first would turn
+=b<U+00C5><U+0093>uf= into =b<U+00C5><U+201C>uf= and destroy the round trip.
+Measured on the rebuild they change 0 rows: the repaired crosswalk absorbs
+every damaged label.  They exist so a future uncovered label is served
+legible.  Strategy B (keys spelled as the reader's damage) is UNCHANGED for
+this country; if the decode is ever moved ahead of the dict, every damage
+key must be re-keyed in the same commit.  2018-19's hook was not touched:
+its one leaked label (row 303) matches now that the row is read.
+
+*Still open*: the two dead =encoding=='iso-8859-1'= wave scripts
+(=2018-19/_/food_acquired.py=, =2021-22/_/food_acquired.py=) and the legacy
+=2014/_/food_acquired.py= (reads passage 1 only, stamps =t='2013_Q4'=) are
+unreferenced on the API path and were left in place; the cohort migration
+(GH #794's human decision) is unaffected by this fix.

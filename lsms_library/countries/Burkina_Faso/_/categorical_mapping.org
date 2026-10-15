@@ -2,6 +2,33 @@
 
 * Food Items
 
+# READ BEFORE EDITING THIS TABLE (GH #794).  The org reader
+# (local_tools.df_from_orgfile) treats the FIRST line that does not begin
+# with "|" as the end of the table, silently.  Four rows at the bottom were
+# dead from 2026-09 until 2026-10-14 because an editor turned the U+0085
+# (cp1252 0x85, an ellipsis read as latin-1) INSIDE the "Cube (Maggi,
+# Jumbo,<U+0085>)" key into a line break: that row no longer ended in "|",
+# the next line began with ")", the table ended there, and the two beef rows
+# below it were never loaded -- 47,137 served rows carried a raw C1 label
+# while the keys meant to absorb them sat four lines too low.  Keep every
+# row on ONE line; tests/test_burkina_faso_food_labels.py pins the parse.
+#
+# Three keys are deliberately spelled with the DAMAGE the reader produces
+# (strategy B, see _/CONTENTS.org "Encoding"): "<U+008C>ufs",
+# "Cube (Maggi, Jumbo,<U+0085>)", "Viandes de b<U+009C>ufs fra\u00eeches"
+# (2014, cp1252 bytes read as latin-1) and "Viande de b<U+00C5><U+0093>uf"
+# (2018-19, UTF-8 read as latin-1).  The dict is applied to the RAW value
+# label at build time (data_info.yml `mappings:`), so a key must match what
+# the reader emits, not the clean French.  The U+0085 in the Cube key is a
+# literal NEL byte in this file -- many editors show it as a newline.
+#
+# One 2014 label CANNOT be keyed here: "Feuilles (oseilles, baobab,
+# boulvaka<U+0085>" ends in U+0085, which str.strip() removes -- the org
+# reader strips every cell, so the key loses it, while the dict sees the
+# raw label WITH it (format_id strips the value only afterwards).  That
+# label is repaired by whole-value replacement in 2014/_/mapping.py
+# (`_J_FIX`), the GH #801 pattern.
+
 #+NAME: harmonize_food
 | Original Label                                                                                       | Preferred Label                              |
 |------------------------------------------------------------------------------------------------------+----------------------------------------------|
@@ -296,10 +323,7 @@
 | ufs                                                                                                 | Oeufs                                        |
 | Canne Ã  sucre                                                                                       | Canne à sucre                                |
 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                                               | Chocolat à croquer, pâte à tartiner          |
-| Cube (Maggi, Jumbo,
-)                                                                                | Cube alimentaire                             |
-| Feuilles (oseilles, baobab, boulvaka
-                                                                | Feuilles                                     |
+| Cube (Maggi, Jumbo,)                                                                                | Cube alimentaire                             |
 | Viande de bÅuf                                                                                      | Viande de boeuf                              |
 | Viandes de bufs fraîches                                                                            | Viande de boeuf                              |
 

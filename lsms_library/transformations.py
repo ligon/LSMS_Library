@@ -166,6 +166,49 @@ def _as_float(s):
                                                       na_value=np.nan)
 
 
+#: Smallest group that may classify itself as money-only (GH #864).  A single
+#: expenditure row with a null Quantity is item non-response, not a module
+#: that fielded no quantity grid; the floor keeps a tiny group from laundering
+#: its own loss.  Any real money-only occasion is thousands of rows.
+MONEY_ONLY_MIN_GROUP = 30
+
+#: Index levels a money-only recall occasion is identified on, in order;
+#: whichever of them the frame carries are used.
+MONEY_ONLY_GROUP_LEVELS = ('t', 'visit', 's')
+
+
+def _money_only_rows(v, units, expected):
+    """Boolean mask of EXPECTED rows that sit in a money-only recall occasion.
+
+    A recall occasion is money-only when the survey recorded expenditure and
+    fielded no quantity grid, so ``Quantity`` is null on EVERY row of its
+    ``(t, visit, s)`` group (whichever of those levels the frame carries) --
+    Burkina Faso's EMC 2014 passages 2-4 are the live instance (GH #864).
+    Such rows cannot yield a unit value in any mode, so they are by design,
+    not loss.  The test is deliberately structural: a group with any
+    reported quantity keeps its null-Quantity rows as real, reportable loss,
+    and a group smaller than :data:`MONEY_ONLY_MIN_GROUP` never qualifies.
+
+    Only the ``*value`` modes are judged: in the ``*price`` modes
+    ``expected`` is a REPORTED price, and a reported price on a row with no
+    quantity is perfectly priceable.  Returns an all-False mask when the
+    frame has no ``Quantity`` column or none of the group levels.
+    """
+    n = len(v)
+    if units not in ('kgvalue', 'unitvalue') or 'Quantity' not in v.columns:
+        return np.zeros(n, dtype=bool)
+    levels = [lvl for lvl in MONEY_ONLY_GROUP_LEVELS
+              if lvl in (v.index.names or [])]
+    if not levels or n == 0:
+        return np.zeros(n, dtype=bool)
+    q_null = np.isnan(_as_float(v['Quantity']))
+    keys = [v.index.get_level_values(lvl) for lvl in levels]
+    grp = pd.Series(q_null).groupby(keys, dropna=False, observed=True)
+    all_null = grp.transform('all').to_numpy(dtype=bool)
+    big_enough = (grp.transform('size').to_numpy() >= MONEY_ONLY_MIN_GROUP)
+    return all_null & big_enough & q_null & np.asarray(expected, dtype=bool)
+
+
 def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     """Drop rows with a 0 / +-inf / NaN Price -- loudly (GH #591).
 
@@ -207,6 +250,21 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     no adjustment -- a currency row is perfectly priceable there
     (``Expenditure / Quantity``), so it stays in the denominator.
 
+    Money-only recall occasions are the second by-design bucket (GH #864)
+    ----------------------------------------------------------------------
+    Burkina Faso's EMC 2014 re-asks the 7-day food module in four quarterly
+    passages and fields the quantity grid in passage 1 ONLY: passages 2-4
+    record money and nothing else (405,127 served rows).  No unit value can
+    exist for them in any mode, and before this bucket they were 64.8% of
+    the country's "loss" -- a warning pinned there cannot report the next
+    real break in its own cell.  :func:`_money_only_rows` identifies them
+    STRUCTURALLY, as a ``(t, visit, s)`` group whose Quantity is null on
+    every row (``MONEY_ONLY_MIN_GROUP`` rows or more), so a null quantity
+    inside a group that does report quantities stays what it is -- real,
+    reportable loss.  Judged in the ``*value`` modes only; tallied as
+    ``money_only`` / ``money_only_expected``; excluded from ``lost`` and
+    ``expected`` exactly as ``currency`` is.  A row is never in both.
+
     Parameters
     ----------
     v : DataFrame
@@ -236,10 +294,23 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     # a threshold can usefully bite on.  In the unit* modes a currency row is
     # priceable (Expenditure / Quantity), so nothing is excluded there.
     if units in ('kgvalue', 'kgprice') and 'u' in (v.index.names or []):
-        by_design = _is_currency_denominated(
+        currency = _is_currency_denominated(
             v.index.get_level_values('u')) & expected
     else:
-        by_design = np.zeros(len(v), dtype=bool)
+        currency = np.zeros(len(v), dtype=bool)
+
+    # Money-only recall occasions are the SECOND by-design bucket (GH #864).
+    # A survey module that records expenditure and fields no quantity grid
+    # at all (Burkina Faso EMC 2014, passages 2-4: 405,127 rows) cannot
+    # produce a unit value in any mode, and counting those rows as loss pins
+    # the warning at ~65% forever -- the GH #770 failure in a second place.
+    # The classifier is STRUCTURAL, not per-row: a group (over whichever of
+    # `t`, `visit`, `s` the frame carries) in which Quantity is null on
+    # EVERY row is money-only by construction; a group with any reported
+    # quantity keeps its NaN rows as the real, reportable loss they are
+    # (item non-response, a quantity variable bound to nothing, ...).
+    money_only = _money_only_rows(v, units, expected) & ~currency
+    by_design = currency | money_only
     effective = expected & ~by_design
 
     lost = int((dropped & effective).sum())
@@ -253,8 +324,13 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
         'expected_gross': int(expected.sum()),
         # Dropped by design because the unit is currency-denominated; NOT
         # counted in `dropped_expected` / `lost_fraction`.
-        'currency': int((dropped & by_design).sum()),
-        'currency_expected': int(by_design.sum()),
+        'currency': int((dropped & currency).sum()),
+        'currency_expected': int(currency.sum()),
+        # Dropped by design because the recall occasion recorded money and
+        # fielded no quantity grid (GH #864); NOT counted in
+        # `dropped_expected` / `lost_fraction`.
+        'money_only': int((dropped & money_only).sum()),
+        'money_only_expected': int(money_only.sum()),
         'dropped_total': int(dropped.sum()),
         'dropped_expected': lost,
         'inf': int((is_inf & effective).sum()),
@@ -274,6 +350,15 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"the residual real loss."
             if tally['currency'] else ""
         )
+        money_only_note = (
+            f"  A further {tally['money_only']:,} row(s) were dropped because "
+            f"their recall occasion is MONEY-ONLY: every row of that "
+            f"(t, visit, s) group has a null Quantity, i.e. the survey "
+            f"recorded expenditure and fielded no quantity grid (Burkina "
+            f"Faso EMC 2014 passages 2-4, GH #864).  Those are BY DESIGN and "
+            f"EXCLUDED from the count and the fraction above."
+            if tally['money_only'] else ""
+        )
         warnings.warn(
             f"food_prices(units={units!r}): dropped {lost:,} of {n_expected:,} "
             f"priceable rows ({lost / n_expected:.1%}) because Price was "
@@ -285,7 +370,8 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"Quantity -- typically a 0-as-missing sentinel or a quantity "
             f"variable mapped to the wrong survey question (GH #591).  A NaN "
             f"Price means the quantity was missing OR the unit has no kg "
-            f"factor.{currency_note}  See GH #591, GH #770.",
+            f"factor.{currency_note}{money_only_note}  See GH #591, GH #770, "
+            f"GH #864.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )
