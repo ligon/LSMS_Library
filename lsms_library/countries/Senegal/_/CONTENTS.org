@@ -14,6 +14,30 @@ Brief table of contents and todo list.
 ** DONE household_characteristics.py
 ** DONE food_acquired.py
 
+* cluster_features -- =Region= case-normalised (GH #811, 2026-09-24)
+
+=cluster_features.Region= (=s00q01=) is served in 14 labels for 14
+regions, identical across 2018-19 and 2021-22: thirteen lower-case
+(=dakar=, =thies=, =sedhiou=, ...) beside one title-case =Saint-Louis=,
+the latter only because both waves' =data_info.yml= carry an inline
+=SAINT-LOUIS -> Saint-Louis= mapping.  No within-Senegal join was ever
+broken -- unlike Guinea-Bissau, where =Region= and =strata= disagreed.
+A =#+name: Region= table in =_/categorical_mapping.org= now title-cases
+the raw labels (no accents added: =Thies=, =Kedougou=, =Sedhiou= -- the
+source has none, and adding them would be a judgement beyond case), so a
+cross-country =Feature('cluster_features')= filter on a title-case name
+matches Senegal as it does the other EHCVM countries.  Cosmetic.
+
+Senegal's =sample= carries NO =strata= column (its two-file merge is
+cover page + weights), so the Guinea-Bissau "Region == strata" check has
+no analogue here.  The inline =SAINT-LOUIS= mapping is left in place.
+
+Served, read path: 14 -> 14 labels, 1,194 rows, per-wave counts
+unchanged.  Cache: =_/categorical_mapping.org= is a build input, so the
+edit moves every Senegal cache hash (two waves, seven script-path
+tables).  Not paid in the fixing branch; verified with
+=assume_cache_fresh=True=.
+
 * Household Presence / MonthsSpent
 
 The EHCVM questionnaire (used in the 2018-19 and 2021-22 waves) does
