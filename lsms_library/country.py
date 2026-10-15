@@ -431,7 +431,8 @@ def _strip_string_values(s: pd.Series) -> pd.Series:
     mapping's keys, so strip only where the value is a ``str``.
 
     String and categorical dtypes already hold only strings (or NA); they keep
-    the vectorised path, which also preserves their dtype.
+    the vectorised path, exactly as before (``.str.strip()`` returns a string
+    Series for a string dtype and an object Series for a categorical).
     """
     if s.dtype == object:
         return s.map(lambda v: v.strip() if isinstance(v, str) else v)
