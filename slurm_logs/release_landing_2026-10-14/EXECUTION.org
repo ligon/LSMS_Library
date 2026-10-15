@@ -134,3 +134,18 @@ Reconciled 18 existing issue scopes, preserving OPEN; filed residuals
 disposable-root negative control proved #1003's helper fixture can use a
 previously cached root. A narrow fixture repair is underway independently of
 the frozen full suite; no attribution to historical #941 is implied.
+
+PR1004 merged at47ce939af after both required checks passed. Main/GitHub/
+filesystem origin synchronized; integration reconciled the published history.
+Full local credentialed suite at frozenec1a59767 completed4951passed,2725skips,
+4xfails,1existing non-strictxpass,0failures in1581.30s. Archived counts identify
+2580cache-presence gaps and0credential skips; follow-up groups are in private
+control/full-suite/cache-gap-groups.json.
+
+Final validation source4f1f044bb is frozen at release-work/cache-coverage and
+pushed to release/v0.15.0-final-validation. ManualCI run38687547945 adds the
+reviewed1003 fixture andNigeria credential correction to the earlier74c
+candidate; no runtime changes (CONTENTS docs only in package diff). Native
+installedWindows need not repeat: its reviewed runtime source is identical.
+Older manualdata runs remain for evidence/comparison; no running worktree was
+mutated and no release/tag was published.

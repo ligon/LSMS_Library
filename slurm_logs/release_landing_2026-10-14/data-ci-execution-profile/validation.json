@@ -1,0 +1,30 @@
+{
+  "base": "47ce939afa1f253a5a76e0832620a3cbb6a4b817",
+  "package_file": "/local/job39919092/release-work/framework/data-ci-execution-profile/lsms_library/__init__.py",
+  "countries_root": "/local/job39919092/release-work/framework/data-ci-execution-profile/lsms_library/countries",
+  "workflow_parsed": true,
+  "only_intended_semantic_changes": true,
+  "data_tests_env": {
+    "LSMS_BUILD_WORKERS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "data_tests_command": "poetry run pytest --tb=short --timeout=600 --timeout-method=thread --durations=25",
+  "sequential_preserved": true,
+  "pytest_help_exit": 0,
+  "pytest_timeout_version": "2.4.0",
+  "pytest_version": "8.4.2",
+  "poetry_launcher": "/global/home/users/ligon/.local/bin/poetry",
+  "help_command": [
+    "/local/job39919092/venv_img/bin/python",
+    "-m",
+    "pytest",
+    "--help",
+    "--tb=short",
+    "--timeout=600",
+    "--timeout-method=thread",
+    "--durations=25"
+  ],
+  "changed_production_paths": []
+}
