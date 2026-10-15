@@ -1,11 +1,13 @@
 #+title: Handoff -- 2026-10-14 release landing IN PROGRESS
 
 * Current execution -- Codex, job39919092
-The maintainer approved WORKPLAN.org and said to proceed. Nineteen implementation
+The maintainer approved WORKPLAN.org and said to proceed. Twenty implementation
 PRs are merged to development, plus evidence PRs #997/#998. GitHub, local main
-and filesystem origin development are synchronized at47ce939af. #967 Uganda
+and filesystem origin development are synchronized at33189b532. #967 Uganda
 remains open; release PR #999 is DRAFT. The narrow test-isolation repair for
-newly reproduced #1003 merged via PR1004 after independent review and CI. No release tag or publication yet;
+newly reproduced #1003 merged via PR1004 after independent review and CI.
+PR1005 pins build/BLAS threads for credentialed CI and adds a per-test timeout,
+with no change to test selection or assertions. No release tag or publication yet;
 shared L2 is untouched.
 
 ** Remaining decision, already asked
@@ -30,23 +32,40 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   Final candidate4f1f044bb is pushed as release/v0.15.0-final-validation;
   manualCI38687547945 includes #1003 andNigeria marker fixes. Runtime source
   matches the earlier candidate; only tests/CONTENTS/evidence differ.
+  Its unit result is3276passed4407skipped and Windows smoke327passed1skipped.
+  Controlled-profile candidatecf1840e02 is pushed as
+  release/v0.15.0-controlled-validation; manualCI38688613005 has the same
+  unit/Windows counts and its credentialed job is running. All older data
+  runs remain for comparison; no result is inferred from elapsed time.
 - #941 local sequential EMPTY-L2 selection:451passed,0skipped,1311.84s.
 - Strict API audit/docs/wheel/sdist/installed smoke/no-Git sdist rebuild passed.
   Frozen unit3274passed4405skipped plus2Nigeria credential failures; corrected
   final6c4c2fc13 passed both PR checks and focused credentialed/no-credential runs.
-- Runtime lane is rebuilding549declared pairs across38countries from empty
-  private L2 at release-work/runtime/data-corpus, frozen7fa05179. It will run
-  Feature phases1/2 on a separate physical copy. Shared cache is untouched.
+- Runtime corpus is COMPLETE at frozen7fa05179:549unique declared requests
+  across38countries,530success,19documentederrors,0empty in4527.97s. Gaps:
+  Armenia2(no source),Nepal11(no acquired source),Peru6(unwired). Original
+  release-work/runtime/data-corpus is quiescent and preserved. Final country
+  caches:422fresh plus Uganda earnings/fct hashless after sibling script
+  rewrites (#788/#809); no restamping to hide this. Feature phases1/2 are
+  running over39features in a separate physical copy. Shared L2 is untouched.
 - Full credentialed suite at frozenec1a59767 COMPLETED:4951passed,2725skipped,
   4xfailed,1xpassed,0failures,1581.30s. Logs: release-work/logs/full-suite.log/xml.
   No credential skips;2580cache-presence skips remain for targeted follow-up
-  after corpus completion. Fifteen independent replication-dir tests lack the
+  against the completed corpus. Fifteen independent replication-dir tests lack the
   external project; never point them at the same cache under test. Fourxfails
   are source weight gaps; existing Pakistan#740 is the non-strict xpass.
 - Final-source cache-gap worktree is release-work/cache-coverage, branch
-  landing/cache-coverage. Copy the completed quiescent corpus physically into
-  a new private data root, set matching cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT and
-  LSMS_EXPECTED_ROOT, and run control/full-suite/cache-gap-groups.json cases.
+  landing/cache-coverage, frozen4f1f044bb. The quiescent corpus was physically
+  copied to release-work/cache-coverage-data:1519files,340885785bytes, all
+  file hashes identical and all regular-file inodes distinct; only L1 symlink
+  shared. Source/config/cache identity assertions passed. Prepared driver is
+  control/full-suite/run_cache_coverage.py; session41298 completed. Results:
+  structural2352passed150skipped5knownxfails; ordinary15passed18skipped;
+  Uganda baseline30passed1knownnutritionfailure; mutating19passed0skipped.
+  All2580original gap nodes verified present in2590follow-up executions;
+  ten additional helper/identity cases, no missing selection. Of the original
+  skips2406nowpass;168remaining skips are classified in cache-coverage.org.
+  The full follow-up is2416passed168skipped5knownxfails1failure, not green.
   Keep structural/ordinary reads separate from the10cache-poisoning cases;
   Uganda nutrition's known unapproved fixture remains a real held comparison.
   Preserve L1; no writable L2 symlinks or source edits during active tests.

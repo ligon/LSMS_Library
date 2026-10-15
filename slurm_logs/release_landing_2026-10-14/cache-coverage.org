@@ -1,0 +1,84 @@
+#+title: Follow-up of the full suite's absent-cache coverage
+#+date: 2026-10-14
+
+* Outcome and boundary
+The follow-up completed with 2,416 passed, 168 skipped, five pre-existing
+expected failures and ONE real failure: Uganda's explicitly held nutrition
+baseline. This is not a green suite. No assertion or baseline was weakened.
+
+The selection covers all 2,580 cache-presence skips recorded by the earlier
+full suite, plus ten additional checks: the complete GH866 file adds nine
+cases beyond its previously skipped cases, and one checkout-identity check
+was added. Total: 2,590 test executions. Of the original 2,580 skipped cases,
+2,406 now pass, 168 still skip for the classified reasons below, five expose
+existing tenure-label xfails, and one exposes the known nutrition mismatch.
+Do not add these counts to the full-suite total without accounting for overlap.
+
+| Group | Passed | Skipped | Xfailed | Failed | Pytest seconds |
+|-------+--------+---------+---------+--------+----------------|
+| Structural | 2352 | 150 | 5 | 0 | 125.41 |
+| Ordinary plus import identity | 15 | 18 | 0 | 0 | 26.44 |
+| Uganda baseline gaps | 30 | 0 | 0 | 1 | 6.24 |
+| Cache invalidation/helpers | 19 | 0 | 0 | 0 | 329.58 |
+
+* Source and cache isolation
+Frozen source: =4f1f044bb9b3079e7f427898f77627ad1503ec5e= in
+=/local/job39919092/release-work/cache-coverage=. Its runtime/build inputs
+match the completed corpus's =7fa05179c8519f44ea329ba6387f5d6d6441a8ea=;
+later changes are tests/documentation/CI. It includes the #1003 helper repair.
+
+After all 38 corpus workers exited, physically copied the preserved original
+to =/local/job39919092/release-work/cache-coverage-data=. All 1,519 files,
+340,885,785 bytes, have identical SHA-256 values and distinct regular-file
+inodes. The original manifest was identical before and after copying. Only
+the content-addressed L1 dvc-cache symlink is shared; no writable L2 file is
+shared with the corpus, Feature audit or production cache.
+
+The runner asserts checkout, countries root and data root. It uses normal
+credentials, matching cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT, LSMS_EXPECTED_ROOT,
+BUILD/BLAS/OMP/MKL=1 and CPU24-31. Structural/ordinary tests use six xdist
+workers with loadfile; baseline and mutating groups run serially in separate
+processes, after the read checks. All use a600second thread timeout. Logs go
+directly to files. No source tree was edited during execution.
+
+* Remaining skips and expected failures
+The 150 structural skips join exactly to the completed corpus inventory:
+
+- 66 checks cover documented unavailable or unwired source tables in Armenia,
+  Nepal and Peru. The corpus kept these as explicit errors.
+- 52 checks expect a parquet for panel mappings returned as dict/RecursiveDict.
+- 32 checks expect a persisted derived food table; the API derives and returns
+  a DataFrame without creating that country parquet.
+
+The 18 ordinary skips are independently reviewed:
+
+- Eight are two raw-weight checks each for China, Kazakhstan, Pakistan and
+  Peru. Sample parquets exist, but the configured output has no weight column;
+  the generic "cold data root?" skip message is misleading. This does not prove
+  upstream weights never existed; Pakistan's documented raising factors remain
+  a provenance question.
+- Ten use obsolete stored-derived-table preconditions: two food dtype tests,
+  two panel-attrition tests and six Uganda table tests. Current corpus calls
+  successfully return the derived outputs without those parquets. Some old
+  assertions also expect a default m index or obsolete wide columns; these
+  remain explicit coverage debt, not passing validation.
+
+The five structural xfails are the existing #602 tenure-vocabulary cases for
+Albania, Cambodia, Kosovo, Tajikistan and Timor-Leste. They were not added or
+expanded by this run.
+
+* Nutrition comparison remains held
+=var/nutrition.parquet= actually has shape23777x15; the unchanged historical
+fixture expects23801x15. The cold corpus independently reproduces candidate
+raw hash =12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a=.
+All 30 other formerly skipped Uganda entries pass. The proposed two-field
+shape/hash patch remains unapplied pending the explicit scientific decision
+required by Uganda CONTENTS. This failure was neither skipped nor xfailed.
+
+* Evidence
+Aggregate results, classifications, selected cases, runner and copy proof are
+in =cache-coverage/=. Raw log/XML payloads remain in private
+=/local/job39919092/release-work/logs/cache-coverage/= because diagnostic output
+can include survey identifiers. Their SHA-256 values and sizes are archived
+in the aggregate summary. The coordinator driver completed all groups even
+after pytest returned1 for nutrition; each actual pytest outcome is recorded.

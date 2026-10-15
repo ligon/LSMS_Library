@@ -1,7 +1,9 @@
 [
   {
+    "baseRefName": "development",
     "headRefName": "fix/962-uganda-food-units",
     "headRefOid": "059373913186fb7c018e272d6eda07a15f979cdd",
+    "isDraft": false,
     "mergeCommit": null,
     "mergedAt": null,
     "number": 967,
@@ -78,12 +80,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Uganda: preserve recorded food units and distinguish value-only acquisitions",
-    "url": "https://github.com/ligon/LSMS_Library/pull/967"
+    "title": "Uganda: preserve recorded food units and distinguish value-only acquisitions"
   },
   {
+    "baseRefName": "development",
     "headRefName": "feature/964-windows-script-builds",
     "headRefOid": "396fa215d3b2b9e1e7fdaf83361d932a32ccd449",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "77ccb51bad5c405dd8cc6421372e7c01889d214a"
     },
@@ -172,12 +175,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "build: support Windows conda, no-make wave scripts, and UTF-8 readers",
-    "url": "https://github.com/ligon/LSMS_Library/pull/969"
+    "title": "build: support Windows conda, no-make wave scripts, and UTF-8 readers"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/ci-skips",
     "headRefOid": "67d781318cf9bed8162aa6c6e189cb52bad99e57",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "d9942cf7e96daee7e799e07174d0da97613d890c"
     },
@@ -256,12 +260,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "ci: skip unavailable data early and enable manual credentialed validation",
-    "url": "https://github.com/ligon/LSMS_Library/pull/980"
+    "title": "ci: skip unavailable data early and enable manual credentialed validation"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/burkina-2014",
     "headRefOid": "45783af9e28276a84a89738fd3f8a9e9dfa43108",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "1ea13f2dbae66f9fbf6593c2734325e2402d22c1"
     },
@@ -340,12 +345,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Burkina Faso: preserve missing food quantities and repair label crosswalk parsing",
-    "url": "https://github.com/ligon/LSMS_Library/pull/981"
+    "title": "Burkina Faso: preserve missing food quantities and repair label crosswalk parsing"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/970-json-make",
     "headRefOid": "7c229350a7fe35913b0151498a67607cd16ace63",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "0f648c325042c0674c6d76df7468ce425088fbde"
     },
@@ -424,12 +430,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "country: read JSON caches directly without invoking make (#970)",
-    "url": "https://github.com/ligon/LSMS_Library/pull/982"
+    "title": "country: read JSON caches directly without invoking make (#970)"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/framework-small-2",
     "headRefOid": "1182af2d0592d653e2c3865ed7edb63ed556998f",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "fe4e34f777bbbae2a0b72e349757f26806990f81"
     },
@@ -508,12 +515,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "framework: validate country names, preserve values, and harden diagnostics",
-    "url": "https://github.com/ligon/LSMS_Library/pull/983"
+    "title": "framework: validate country names, preserve values, and harden diagnostics"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/831-followup",
     "headRefOid": "c38803d3cab5a647224b93b88593839d88e92cdb",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "c319a25d93709444ba01dbac47b9bbf23d97db62"
     },
@@ -592,12 +600,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "cache: report in-tree sources and preserve tracked configuration inputs",
-    "url": "https://github.com/ligon/LSMS_Library/pull/984"
+    "title": "cache: report in-tree sources and preserve tracked configuration inputs"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/ghana-docs-encoding",
     "headRefOid": "d831e5cb00269b22f3359aa06d01d081ed60f2c7",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "ed50943988d92a1ca337a9e84e8b3ae085118b1f"
     },
@@ -676,12 +685,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "labels: repair curated Ghana text and reconcile country documentation",
-    "url": "https://github.com/ligon/LSMS_Library/pull/985"
+    "title": "labels: repair curated Ghana text and reconcile country documentation"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/labels-relabel-787",
     "headRefOid": "8fa4d5daf0b7b9fdf95ecceacb9a1dedce51f24f",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "99995044246c81bcf884c31027c5a99546c9d647"
     },
@@ -760,12 +770,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "labels: report unmatched food labels and reject numeric targets",
-    "url": "https://github.com/ligon/LSMS_Library/pull/986"
+    "title": "labels: report unmatched food labels and reject numeric targets"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/grader-scale-830",
     "headRefOid": "1641e1fff3286bd75979849381af17ef4c9e167e",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "0398e536f79668371f374ff10f028dfba3ebdf37"
     },
@@ -844,12 +855,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "coverage: warn about monetary scale changes across waves",
-    "url": "https://github.com/ligon/LSMS_Library/pull/987"
+    "title": "coverage: warn about monetary scale changes across waves"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/kinship-974",
     "headRefOid": "8bb3d5aeb5d328e0108450d2bc36470fd003c4d0",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "331552b5c5ee219721b544cfbcda2c03adf13f13"
     },
@@ -928,12 +940,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "kinship: remove unreachable duplicate keys and pin crop-unit policy",
-    "url": "https://github.com/ligon/LSMS_Library/pull/988"
+    "title": "kinship: remove unreachable duplicate keys and pin crop-unit policy"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/810-followup",
     "headRefOid": "917fb4e0bdd6227c10e34abdf268531f4fef6ae8",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "220043fd1e6d9d768502cd175e12ebc1c77a84f0"
     },
@@ -1012,12 +1025,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "data: resolve raw inputs without cwd-rooted DVC access",
-    "url": "https://github.com/ligon/LSMS_Library/pull/989"
+    "title": "data: resolve raw inputs without cwd-rooted DVC access"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/readers-xport-sniff",
     "headRefOid": "6677925905c5865ff295d2cd455346bb1279dad1",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "010b84ba065dfece8467015abe206da964c3546b"
     },
@@ -1096,12 +1110,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "readers: sniff binary formats and reject malformed Stata input",
-    "url": "https://github.com/ligon/LSMS_Library/pull/990"
+    "title": "readers: sniff binary formats and reject malformed Stata input"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/868-followup",
     "headRefOid": "e7c494aed6fc680b7055467478b82a0c4a8cc01c",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "3f3c05456020aac9c1f4e72bc41dbd88252f24c6"
     },
@@ -1180,12 +1195,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "audit: retain grain-conflict reports through round-aware cache stamps",
-    "url": "https://github.com/ligon/LSMS_Library/pull/991"
+    "title": "audit: retain grain-conflict reports through round-aware cache stamps"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/600-provenance-landing",
     "headRefOid": "5d4925a323af99ad5b766cfc5e0510d7fb655cf8",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "7518eb09a13efd65fb5e9b1d0ee1d25a1d408f72"
     },
@@ -1264,12 +1280,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "provenance: represent multiple holdings, aliases, and derived catalog entries",
-    "url": "https://github.com/ligon/LSMS_Library/pull/992"
+    "title": "provenance: represent multiple holdings, aliases, and derived catalog entries"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/niger-followup-2",
     "headRefOid": "bb51df7e769dbddce367698a827fef5c2584e52a",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "f9d3cbbc2fd8982d072fe7f0259b34285826e30a"
     },
@@ -1348,12 +1365,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Niger: preserve household extension identity, sale units, and source missingness",
-    "url": "https://github.com/ligon/LSMS_Library/pull/993"
+    "title": "Niger: preserve household extension identity, sale units, and source missingness"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/nigeria-824-followup",
     "headRefOid": "6c4c2fc13d8ca7ae6593ba8062877f374a375d23",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "cfcb73b3a1998c88bb238daa7376f76c45a9ee96"
     },
@@ -1432,12 +1450,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Nigeria: expose reported W1/W2 crop sale units",
-    "url": "https://github.com/ligon/LSMS_Library/pull/994"
+    "title": "Nigeria: expose reported W1/W2 crop sale units"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/nigeria-w5-cluster",
     "headRefOid": "b3d035afec96f41e1bb02e59765114bebcc0b199",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "1f27c08036b3f0de84051f794f2c346017cfa85d"
     },
@@ -1516,12 +1535,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Nigeria W5: restore cluster identity and household-geovariable joins",
-    "url": "https://github.com/ligon/LSMS_Library/pull/995"
+    "title": "Nigeria W5: restore cluster identity and household-geovariable joins"
   },
   {
+    "baseRefName": "development",
     "headRefName": "fix/peru-panama",
     "headRefOid": "9fc6aa2e0efa0360f9d20489fef87f96acd5670b",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "ef0150faef3e792d5fda8f4e54dd4532647d758a"
     },
@@ -1600,12 +1620,13 @@
         "workflowName": "CI"
       }
     ],
-    "title": "Peru and Panama: preserve sample identity and money-only food rows",
-    "url": "https://github.com/ligon/LSMS_Library/pull/996"
+    "title": "Peru and Panama: preserve sample identity and money-only food rows"
   },
   {
+    "baseRefName": "development",
     "headRefName": "docs/release-landing-evidence",
     "headRefOid": "5cd2682de38d306df99d44afba742ef0c279bd56",
+    "isDraft": false,
     "mergeCommit": {
       "oid": "1973242b48ec62ab808bc8f6e0667054fbb0703f"
     },
@@ -1684,7 +1705,464 @@
         "workflowName": "CI"
       }
     ],
-    "title": "docs: record landing evidence and resolve historical branch dispositions",
-    "url": "https://github.com/ligon/LSMS_Library/pull/997"
+    "title": "docs: record landing evidence and resolve historical branch dispositions"
+  },
+  {
+    "baseRefName": "development",
+    "headRefName": "docs/v0.15.0-release-plan",
+    "headRefOid": "8d7a5e55914e700c69ae1a195f96cc2282b6ce64",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "4c60e696f67af3454810e30829509fac69c366b3"
+    },
+    "mergedAt": "2026-10-15T05:14:46Z",
+    "number": 998,
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:14:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259126760",
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T05:11:34Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:13:37Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259127103",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T05:11:34Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259127947",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259128171",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259128081",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259128347",
+        "name": "docs",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259128346",
+        "name": "data-tests",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:11:32Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38685448417/job/116259128671",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T05:11:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "docs: publish v0.15.0 landing plan and release evidence"
+  },
+  {
+    "baseRefName": "master",
+    "headRefName": "development",
+    "headRefOid": "33189b532c10db913cb7968ead42d0dc6d108bd4",
+    "isDraft": true,
+    "mergeCommit": null,
+    "mergedAt": null,
+    "number": 999,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:51:38Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269994522",
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T05:49:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:52:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269975868",
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T05:49:39Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:51:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269994243",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T05:49:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:51:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269975967",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T05:49:39Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269995893",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T05:49:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:56:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269975909",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T05:49:40Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269995483",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T05:49:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:55Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269975497",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T05:49:39Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269995816",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T05:49:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:37Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269977680",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T05:49:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116270029889",
+        "name": "docs",
+        "startedAt": "2026-10-15T05:49:49Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:37Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269976753",
+        "name": "docs",
+        "startedAt": "2026-10-15T05:49:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269996526",
+        "name": "data-tests",
+        "startedAt": "2026-10-15T05:49:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:37Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269976846",
+        "name": "data-tests",
+        "startedAt": "2026-10-15T05:49:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:41Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688894493/job/116269995832",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T05:49:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:49:38Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688888829/job/116269977930",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T05:49:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "Release v0.15.0"
+  },
+  {
+    "baseRefName": "development",
+    "headRefName": "fix/1003-release-helper-isolation",
+    "headRefOid": "449a57a4a29f8f766a85dee428e169f6dcbdd235",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "47ce939afa1f253a5a76e0832620a3cbb6a4b817"
+    },
+    "mergedAt": "2026-10-15T05:29:21Z",
+    "number": 1004,
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:27:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262946976",
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T05:24:59Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:27:07Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262946680",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T05:24:59Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948210",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948002",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948271",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948275",
+        "name": "docs",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948592",
+        "name": "data-tests",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:24:57Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38686656049/job/116262948386",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T05:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "test: isolate cache-helper roots before release validation"
+  },
+  {
+    "baseRefName": "development",
+    "headRefName": "ci/data-test-execution-controls",
+    "headRefOid": "6c5f0bdc9bccbf3f9ada4296eee6fd355dc71310",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "33189b532c10db913cb7968ead42d0dc6d108bd4"
+    },
+    "mergedAt": "2026-10-15T05:49:34Z",
+    "number": 1005,
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:48:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269089564",
+        "name": "unit-tests",
+        "startedAt": "2026-10-15T05:46:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:48:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269089808",
+        "name": "windows-smoke",
+        "startedAt": "2026-10-15T05:46:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090703",
+        "name": "windows-script-build",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090717",
+        "name": "dvc-remote-reachability",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090750",
+        "name": "dvc-lock-check",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090837",
+        "name": "docs",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090765",
+        "name": "data-tests",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T05:46:31Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/ligon/LSMS_Library/actions/runs/38688609190/job/116269090843",
+        "name": "refresh-dvc-locks",
+        "startedAt": "2026-10-15T05:46:32Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ],
+    "title": "ci: apply required worker limits and timeout to data tests"
   }
 ]

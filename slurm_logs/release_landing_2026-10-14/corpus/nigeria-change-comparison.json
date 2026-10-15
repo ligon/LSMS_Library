@@ -1,0 +1,12 @@
+[
+  {
+    "table": "crop_production",
+    "transformation": "drop only new Unit_sold column",
+    "exact_original_data_equal": true
+  },
+  {
+    "table": "cluster_features",
+    "transformation": "remove only two new W5 rounds",
+    "exact_original_data_equal": true
+  }
+]

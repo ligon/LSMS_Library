@@ -149,3 +149,26 @@ candidate; no runtime changes (CONTENTS docs only in package diff). Native
 installedWindows need not repeat: its reviewed runtime source is identical.
 Older manualdata runs remain for evidence/comparison; no running worktree was
 mutated and no release/tag was published.
+
+PR1005 merged at33189b532 after independent review and both PR checks.
+Main/GitHub/filesystem origin synchronized. It pins build and BLAS threads
+for the credentialed data job and adds a600second per-test thread timeout;
+test selection, assertions, sequential execution and make prerequisites remain.
+Controlled candidatecf1840e02 differs from4f1f044bb only in that CI profile
+among package/test/workflow paths. Manualrun38688613005 completed unit checks
+with3276passed4407skipped and Windows smoke327passed1skipped; its data job is
+still running. Older data jobs are retained for comparison. No timeout or
+deadlock causation is attributed to #941 without a completed diagnostic.
+
+The declared corpus completed at7fa05179:549unique requests,530success,
+19documentederrors (Armenia2,Nepal11,Peru6),0empty,38countries. Original
+private cache is quiescent; independent physical copies serve the Feature
+audit and gap tests. See corpus/REPORT.md and preserved file manifests.
+
+Cache-presence follow-up at frozen4f1f044bb completed:2416passed168skipped,
+5existing tenure xfails and1known held nutrition failure. XML node sets prove
+all2580original skips were selected, plus10helper/identity checks. All19
+cache invalidation/helper cases passed, with0skips. The remaining168skips
+are individually classified; coverage debt is retained, not called green.
+See cache-coverage.org and cache-coverage/selection-proof.json. No fixture
+change, shared-cache promotion, release tag or publication occurred.

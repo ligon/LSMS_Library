@@ -1,0 +1,17 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "16-23",
+    "/local/job39919092/release-work/framework/release-validation-env/bin/python",
+    "-m",
+    "mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/local/job39919092/release-work/control/release-docs-validation/site"
+  ],
+  "exit_code": 0,
+  "seconds": 4.047061204910278,
+  "log_sha256": "9d2f7e5a9da2e89afca7978e7744cefea6f3e71983d782a38c0940f7021ae70d"
+}

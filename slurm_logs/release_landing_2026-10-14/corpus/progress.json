@@ -1,0 +1,220 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "expected_pairs": 549,
+  "completed_pairs": 549,
+  "counts": {
+    "success": 530,
+    "error": 19
+  },
+  "completed_countries": [
+    "Albania",
+    "Armenia",
+    "Azerbaijan",
+    "Benin",
+    "Burkina_Faso",
+    "Cambodia",
+    "China",
+    "CotedIvoire",
+    "Ethiopia",
+    "EthiopiaRHS",
+    "GhanaAHIES",
+    "GhanaLSS",
+    "GhanaSPS",
+    "Guatemala",
+    "Guinea-Bissau",
+    "Guyana",
+    "India",
+    "Iraq",
+    "Kazakhstan",
+    "Kosovo",
+    "Liberia",
+    "Malawi",
+    "Mali",
+    "Nepal",
+    "Niger",
+    "Nigeria",
+    "Pakistan",
+    "Panama",
+    "Peru",
+    "Senegal",
+    "Serbia",
+    "Serbia and Montenegro",
+    "South Africa",
+    "Tajikistan",
+    "Tanzania",
+    "Timor-Leste",
+    "Togo",
+    "Uganda"
+  ],
+  "completed_country_count": 38,
+  "active": [],
+  "country_cache_grades": {
+    "fresh": 424,
+    "no_country_parquet": 125
+  },
+  "final_country_cache_grades": {
+    "fresh": 422,
+    "legacy": 2
+  },
+  "final_nonfresh": [
+    {
+      "country": "Uganda",
+      "file": "var/earnings.parquet",
+      "freshness": "legacy",
+      "country_read_policy": "stale",
+      "expected_hash": "97145d763972b4aee2b72835d4a4cb994eb1ff09084f488ccc945ce9bb49930d",
+      "stored_hash": null
+    },
+    {
+      "country": "Uganda",
+      "file": "var/fct.parquet",
+      "freshness": "legacy",
+      "country_read_policy": "stale",
+      "expected_hash": "74e5651a14ef8fc85fe4029505ab5d2e2122392f3e8170546fef2d432e36c4d7",
+      "stored_hash": null
+    }
+  ],
+  "wave_cache_grades": {
+    "legacy": 601,
+    "fresh": 582
+  },
+  "stale_wave_caches": [],
+  "country_manifest_gaps": [],
+  "country_manifest_absent": [],
+  "final_country_manifest_absent": [
+    {
+      "country": "Uganda",
+      "file": "var/earnings.parquet"
+    },
+    {
+      "country": "Uganda",
+      "file": "var/fct.parquet"
+    }
+  ],
+  "final_country_manifest_gaps": [],
+  "shared_country_cache_grades": {
+    "stale": 400
+  },
+  "snapshot_file_totals": {
+    "shared-baseline": 1365,
+    "private-final-cache": 1519
+  },
+  "non_success": [
+    {
+      "country": "Armenia",
+      "table": "household_roster",
+      "status": "error",
+      "error": "FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job39919092/release-work/runtime/corpus/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job39919092/release-work/runtime/corpus/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta'"
+    },
+    {
+      "country": "Armenia",
+      "table": "household_characteristics",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Armenia/household_characteristics: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Armenia/var/household_characteristics.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "sample",
+      "status": "error",
+      "error": "FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job39919092/release-work/runtime/corpus/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job39919092/release-work/runtime/corpus/lsms_library/countries/Nepal/1995-96/Data/../Data/c1_nlss_public.dta'"
+    },
+    {
+      "country": "Nepal",
+      "table": "cluster_features",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/cluster_features: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/cluster_features.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "household_roster",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/household_roster: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/household_roster.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "individual_education",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/individual_education: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/individual_education.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "food_acquired",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/food_acquired: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/food_acquired.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "interview_date",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/interview_date: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/interview_date.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "assets",
+      "status": "error",
+      "error": "FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job39919092/release-work/runtime/corpus/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job39919092/release-work/runtime/corpus/lsms_library/countries/Nepal/1995-96/Data/../Data/R1_Z06C_Durables.dta'"
+    },
+    {
+      "country": "Nepal",
+      "table": "food_expenditures",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/food_expenditures: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/food_expenditures.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "food_prices",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/food_prices: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/food_prices.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "food_quantities",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/food_quantities: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/food_quantities.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Nepal",
+      "table": "household_characteristics",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Nepal/household_characteristics: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Nepal/var/household_characteristics.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "individual_education",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/individual_education: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/individual_education.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "food_acquired",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/food_acquired: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/food_acquired.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "interview_date",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/interview_date: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/interview_date.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "food_expenditures",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/food_expenditures: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/food_expenditures.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "food_prices",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/food_prices: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/food_prices.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    },
+    {
+      "country": "Peru",
+      "table": "food_quantities",
+      "status": "error",
+      "error": "RuntimeError: Could not materialize Peru/food_quantities: no wave-level build succeeded and no cached parquet was found at /local/job39919092/release-work/runtime/data-corpus/Peru/var/food_quantities.parquet.\n\nCommon causes:\n  - installed via `pip install git+https://...` without the .dvc metadata needed to rebuild from source;\n  - LSMS_DATA_DIR points to an empty or stale cache location;\n  - DVC credentials are missing or misconfigured;\n  - the raw .dta source files have not been dvc-pulled.\n\nSee README.org for supported install and data-access patterns."
+    }
+  ],
+  "harness_issues": [],
+  "worktree_issues": []
+}

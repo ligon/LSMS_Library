@@ -1,0 +1,158 @@
+{
+  "source_sha": "7fa05179c8519f44ea329ba6387f5d6d6441a8ea",
+  "processes": [
+    {
+      "country": "Armenia",
+      "exit_code": 1
+    },
+    {
+      "country": "Azerbaijan",
+      "exit_code": 0
+    },
+    {
+      "country": "Albania",
+      "exit_code": 0
+    },
+    {
+      "country": "Benin",
+      "exit_code": 0
+    },
+    {
+      "country": "Cambodia",
+      "exit_code": 0
+    },
+    {
+      "country": "China",
+      "exit_code": 0
+    },
+    {
+      "country": "Burkina_Faso",
+      "exit_code": 0
+    },
+    {
+      "country": "CotedIvoire",
+      "exit_code": 0
+    },
+    {
+      "country": "EthiopiaRHS",
+      "exit_code": 0
+    },
+    {
+      "country": "GhanaAHIES",
+      "exit_code": 0
+    },
+    {
+      "country": "Ethiopia",
+      "exit_code": 0
+    },
+    {
+      "country": "GhanaSPS",
+      "exit_code": 0
+    },
+    {
+      "country": "Guatemala",
+      "exit_code": 0
+    },
+    {
+      "country": "Guinea-Bissau",
+      "exit_code": 0
+    },
+    {
+      "country": "Guyana",
+      "exit_code": 0
+    },
+    {
+      "country": "India",
+      "exit_code": 0
+    },
+    {
+      "country": "Iraq",
+      "exit_code": 0
+    },
+    {
+      "country": "Kazakhstan",
+      "exit_code": 0
+    },
+    {
+      "country": "Kosovo",
+      "exit_code": 0
+    },
+    {
+      "country": "Liberia",
+      "exit_code": 0
+    },
+    {
+      "country": "GhanaLSS",
+      "exit_code": 0
+    },
+    {
+      "country": "Mali",
+      "exit_code": 0
+    },
+    {
+      "country": "Nepal",
+      "exit_code": 1
+    },
+    {
+      "country": "Malawi",
+      "exit_code": 0
+    },
+    {
+      "country": "Niger",
+      "exit_code": 0
+    },
+    {
+      "country": "Pakistan",
+      "exit_code": 0
+    },
+    {
+      "country": "Panama",
+      "exit_code": 0
+    },
+    {
+      "country": "Peru",
+      "exit_code": 1
+    },
+    {
+      "country": "Nigeria",
+      "exit_code": 0
+    },
+    {
+      "country": "Serbia",
+      "exit_code": 0
+    },
+    {
+      "country": "Serbia and Montenegro",
+      "exit_code": 0
+    },
+    {
+      "country": "South Africa",
+      "exit_code": 0
+    },
+    {
+      "country": "Senegal",
+      "exit_code": 0
+    },
+    {
+      "country": "Tajikistan",
+      "exit_code": 0
+    },
+    {
+      "country": "Timor-Leste",
+      "exit_code": 0
+    },
+    {
+      "country": "Togo",
+      "exit_code": 0
+    },
+    {
+      "country": "Tanzania",
+      "exit_code": 0
+    },
+    {
+      "country": "Uganda",
+      "exit_code": 0
+    }
+  ],
+  "inventory_errors": []
+}
