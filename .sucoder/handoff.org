@@ -10,8 +10,11 @@ remains open. No release tag or publication yet; shared L2 is untouched.
 Uganda CONTENTS explicitly says not to regenerate nutrition baseline until its
 direction is signed off. Exact historical replay and independent #967 accounting
 are complete; the proposed two-field shape/hash patch remains UNAPPLIED.
-The maintainer has been asked whether to accept documented nominal-volume and
-FCT-source limitations for this release or hold for source review. Silence is
+The maintainer has been asked whether to accept the documented estimator and
+nominal-volume limitations for this release or hold for source review. A first
+report omitted the FCT row's specific yellow-variety study note; corrected full
+provenance supports the nonzero225 density as a specific override of the generic
+USDA starting note. No numeric correction is proposed from that ambiguity. Silence is
 not approval. See release_landing_2026-10-14/uganda-nutrition-history.org and
 uganda967.org on the integration branch / PR967. The -18.7% historical Energy
 change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
@@ -51,7 +54,7 @@ with sources restored and documentation/evidence merged via997.
 Durable plan/evidence: slurm_logs/release_landing_2026-10-14/.
 
 * Previous handoff (historical, superseded by current execution)
-#+title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
+Historical title: Handoff -- 2026-10-14 18:00 PDT (Sue / Claude Fable 5.1), Savio job 39919092 -- PAUSED at a usage limit
 
 * Update 19:10 PDT -- reviews complete, three PRs open
 - All 16 branches reviewed: 3 pass (970-json-make, ci-skips, burkina-2014), 12 pass-with-fixes, 1 FAIL (framework-small: 14 tests red via the #915 raise).  Summary + per-branch §6 items: =slurm_logs/backlog_review_2026-10-14/REVIEW_SUMMARY.org=; verdicts copied to =verdicts/=.
