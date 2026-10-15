@@ -66,6 +66,8 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
   ten additional helper/identity cases, no missing selection. Of the original
   skips2406nowpass;168remaining skips are classified in cache-coverage.org.
   The full follow-up is2416passed168skipped5knownxfails1failure, not green.
+  Newly exposed legacy derived-table test coverage debt is filed as #1006;
+  concrete scope and independent review are in corpus-review/.
   Keep structural/ordinary reads separate from the10cache-poisoning cases;
   Uganda nutrition's known unapproved fixture remains a real held comparison.
   Preserve L1; no writable L2 symlinks or source edits during active tests.

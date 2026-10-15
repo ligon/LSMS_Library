@@ -62,6 +62,7 @@ The 18 ordinary skips are independently reviewed:
   successfully return the derived outputs without those parquets. Some old
   assertions also expect a default m index or obsolete wide columns; these
   remain explicit coverage debt, not passing validation.
+  The independently reviewed follow-up is [[https://github.com/ligon/LSMS_Library/issues/1006][GH #1006]].
 
 The five structural xfails are the existing #602 tenure-vocabulary cases for
 Albania, Cambodia, Kosovo, Tajikistan and Timor-Leste. They were not added or
