@@ -385,6 +385,68 @@
 | verre                     | Verre           |
 | yoruba                    | Yorouba         |
 
+* Region
+
+GH #811 (sibling of the Guinea-Bissau case), 2026-09-24.
+=cluster_features.Region= carried *22 distinct strings for the 13
+regions* across the three waves, and nothing warned because within a wave
+the spellings are consistent -- only cross-wave pooling was wrong:
+
+- 2014 (EMC, =region=): unhyphenated, mixed case (=Centre Est=, =Centre
+  sud=, =Plateau central=, =Sud Ouest=, =Hauts Bassins=) and a singular
+  =Cascade=;
+- 2018-19 (EHCVM, =s00q01=): hyphenated (=Centre-Est=, =Plateau-Central=,
+  =Sud-Ouest=, =Cascades=) but =Hauts Bassins= unhyphenated;
+- 2021-22 (EHCVM, =s00q01=): fully hyphenated (=Hauts-Bassins=), and a
+  SOURCE TYPO =Boucle du Mouhoum= (both earlier waves and the region's
+  official name have =Mouhoun=).
+
+*Decision, not inheritance.*  Unlike Guinea-Bissau and Ethiopia there is
+no =strata= table to read the pairings off: 2014's =strate= is a bare
+1-26 code (Region x Milieu) and the EHCVM waves ship no strata variable
+at all (=_/CONTENTS.org=, "sample").  Every pair below is a case /
+hyphen / plural variant of one region name, so WHICH region is never in
+question; the Preferred Label is the 2021-22 spelling -- the fully
+hyphenated official form, and the one every wave agrees with modulo
+punctuation -- with =Mouhoum= corrected to =Mouhoun=.
+
+*It cannot change the collapse*: distinct Region per wave is already 13 /
+13 / 13, the region count, so no two rows of one wave differ only by
+spelling and the =(t, v)= projection's conflict set is untouched; the
+mapping runs post-collapse in =_finalize_result= regardless.  Served: 22
+labels -> 13 over 2,035 rows, each new count the sum of its variants.
+
+*Cache cost*: this file is a build input (folded into =Wave._input_hash=),
+so the edit moves every Burkina_Faso cache hash -- three waves, eleven
+script-path tables.  Not paid here; verified on the read path with
+=assume_cache_fresh=True=.
+
+#+name: Region
+| Alternate Spelling | Preferred Label   |
+|-------------------+-------------------|
+| Boucle du Mouhoun | Boucle du Mouhoun |
+| Boucle du Mouhoum | Boucle du Mouhoun |
+| Cascade           | Cascades          |
+| Cascades          | Cascades          |
+| Centre            | Centre            |
+| Centre Est        | Centre-Est        |
+| Centre-Est        | Centre-Est        |
+| Centre Nord       | Centre-Nord       |
+| Centre-Nord       | Centre-Nord       |
+| Centre Ouest      | Centre-Ouest      |
+| Centre-Ouest      | Centre-Ouest      |
+| Centre sud        | Centre-Sud        |
+| Centre-Sud        | Centre-Sud        |
+| Est               | Est               |
+| Hauts Bassins     | Hauts-Bassins     |
+| Hauts-Bassins     | Hauts-Bassins     |
+| Nord              | Nord              |
+| Plateau central   | Plateau-Central   |
+| Plateau-Central   | Plateau-Central   |
+| Sahel             | Sahel             |
+| Sud Ouest         | Sud-Ouest         |
+| Sud-Ouest         | Sud-Ouest         |
+
 #+name: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
