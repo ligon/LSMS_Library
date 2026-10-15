@@ -1072,11 +1072,18 @@ column, never an index level, never sentinel-filled.  Pinned by
   (1) Reach: =_normalise_input_label= appends " fertilizer", so Mali's
   =Other inorganic= (EACI slot, =Mali/_/categorical_mapping.org=
   =harmonize_input=) resolved too -- 9,640 rows, Mali kg N 906,362 ->
-  1,028,796 (*+13.5%*), undisclosed anywhere.  (2) Provenance: W1-W3
-  =s11dq3= is {1 npk, 2 urea, 3 composite manure, 4 other (specify)}; the
-  instrument does not call code 4 inorganic -- =categorical_mapping.org:758=
-  does.  Only W4/W5 carry a source column literally named "other
-  inorganic" (36 + 25 rows; 109 of the 170 rest on the relabel).  Ruling:
+  1,028,796 (*+13.5%*), undisclosed anywhere.  (2) Provenance: the
+  fertilizer-type value labels are {1 npk, 2 urea, 3 composite manure,
+  4 other (specify)} in W1 and W2 (=s11dq3=, red team) and in W3
+  (=secta11d_harvestw3.dta= =s11dq3= / =s11dq15= / =s11dq27=, re-measured
+  2026-10-14).  W3's question STEM reads "MAIN TYPE OF ... INORGANIC
+  FERTILIZER USED ON [PLOT]" while option 3 is manure, so whether code 4 is
+  inorganic is the stem's word against its own option list; the
+  =harmonize_input= relabel (=categorical_mapping.org:758=) resolves that in
+  favour of "Other Inorganic Fertilizer" for W1-W3.  Only W4/W5 carry a
+  source label literally reading "other inorganic" (36 + 25 rows; 109 of
+  the 170 rest on the relabel).  That ambiguity is exactly why the share is
+  a #867 decision and not a spelling alias.  Ruling:
   no nitrogen share for either label on this branch; =transformations.py=
   is byte-identical to =development= again (re-measured: Mali 906,361.8,
   Nigeria 173,672.0 kg N), and =tests/test_nigeria_sold_unit.py::

@@ -36,8 +36,8 @@ Four things are pinned, and they fail differently:
    ``_canon_unit``.
 
 Plus a GH #867 guard, inverted by ruling (@ligon, 2026-10-14): Nigeria's
-``Other Inorganic Fertilizer`` (W1-W3 instrument code "4. other (specify)",
-relabelled inorganic by ``categorical_mapping.org``) and Mali's ``Other
+``Other Inorganic Fertilizer`` (W1-W3 value label "4. other (specify)" beside
+"3. composite manure", relabelled inorganic by ``categorical_mapping.org``) and Mali's ``Other
 inorganic`` must NOT resolve to a nitrogen share here.  An earlier commit
 on this branch aliased them to the 0.20 class share as a "spelling fix";
 measured, that moved Mali's served kg N by +13.5% (9,640 rows, +122,434 kg)
