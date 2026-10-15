@@ -1,0 +1,185 @@
+{
+  "narrowed": [
+    {
+      "number": 787,
+      "url": "https://github.com/ligon/LSMS_Library/issues/787",
+      "title": "labels=: resolve ambiguous targets and preserve diagnostics through Feature",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "a9ad641f53ea0455851c51b4013afcbcb8a680d7b519a4618f114d670e0c4a30",
+      "after_body_sha256": "378c262b2220d59d07f87483b6c17f51150f42c6df47bba41542af239808d769",
+      "verified_at": "2026-10-15T05:13:36.518107+00:00"
+    },
+    {
+      "number": 794,
+      "url": "https://github.com/ligon/LSMS_Library/issues/794",
+      "title": "Finish Mali mojibake repair and decide strategy-B migration",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "ee2ceddd7da42fb82983c1cd43d6506b1aac1b0def97929ce0abf78e47134b0f",
+      "after_body_sha256": "ce6badd90bb0cc19dd8ae7620cf223c62f3457babf32841a29575047e8f2e6c1",
+      "verified_at": "2026-10-15T05:13:38.684614+00:00"
+    },
+    {
+      "number": 824,
+      "url": "https://github.com/ligon/LSMS_Library/issues/824",
+      "title": "Complete sold-unit audits and use Unit_sold in farmgate consumers",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "3ab06b1935a29e985003e3ae04f386a219b0130f18da1f4acd884eeba8e661a5",
+      "after_body_sha256": "4567677b4d6f76723e1776edee539db0d15acc1cdf03c1de31d1c41006ae99d0",
+      "verified_at": "2026-10-15T05:13:41.692371+00:00"
+    },
+    {
+      "number": 830,
+      "url": "https://github.com/ligon/LSMS_Library/issues/830",
+      "title": "Extend monetary scale diagnostics beyond isolated neighbor jumps",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "1ce6c7a072ae87e555467321a0262dcf2e2fc154caabeba06f7a136b54809b01",
+      "after_body_sha256": "022e291675a4db0ebd1b497eda40de0028866a90eccf058965d4319eed48ffb3",
+      "verified_at": "2026-10-15T05:13:44.048487+00:00"
+    },
+    {
+      "number": 833,
+      "url": "https://github.com/ligon/LSMS_Library/issues/833",
+      "title": "Resolve remaining raw/processed commodity folds after Malawi and Niger repairs",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "14f814f99c18f22c0e75e17aa2b9eaba722650fcd0529736e53e52dee737d4cb",
+      "after_body_sha256": "9bc73060756993cf9392fe99183d83ffdc446a1213cd92ea907cede6d5eb33fc",
+      "verified_at": "2026-10-15T05:13:46.422234+00:00"
+    },
+    {
+      "number": 837,
+      "url": "https://github.com/ligon/LSMS_Library/issues/837",
+      "title": "Resolve source-grain cluster disagreements without bypassing the signed audit",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "8cb2c0e83b8668f5d686cf0259364bb04d6cd030615aa03c22ae7d76c659836c",
+      "after_body_sha256": "205445d681e118d094c515150030124b22de6eac8edad89968003b01de00084c",
+      "verified_at": "2026-10-15T05:13:49.032639+00:00"
+    },
+    {
+      "number": 905,
+      "url": "https://github.com/ligon/LSMS_Library/issues/905",
+      "title": "Finish the vectorized min_count reducer sweep",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "35eb421e7c0245c3e034e010fc1941bc5346842be91b317322a3da078bcf7838",
+      "after_body_sha256": "7c70575b8e02eaa71cb952b4bf6f38e3f610980238cd2cfe2e6e0334f832909d",
+      "verified_at": "2026-10-15T05:13:51.456670+00:00"
+    },
+    {
+      "number": 941,
+      "url": "https://github.com/ligon/LSMS_Library/issues/941",
+      "title": "master data-tests: EHCVM food_acquired served WITHOUT Derivation / inkind rows in the sequential cold CI session (52 failures in test_ehcvm_7day.py); not reproducible cold locally",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "4bc194cce10a4fe90d173d992cd419fa626e1db78c0fd07fece6cc419563e8e8",
+      "after_body_sha256": "556157b68935c144d2fb258a03329e1af9ed5c4327716617b3d034110678b24e",
+      "verified_at": "2026-10-15T05:13:54.337081+00:00"
+    },
+    {
+      "number": 600,
+      "url": "https://github.com/ligon/LSMS_Library/issues/600",
+      "title": "Preserve existing provenance when a catalog backfill cannot resolve its source",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "73fc100ab4cff8c0bc9a0ea664ec97d432faa72508829eba5d73ce904c197abe",
+      "after_body_sha256": "c3a72923960d862ba0c30147bdc692e71caea196009ea2120137e00aba4ab65d",
+      "verified_at": "2026-10-15T05:13:56.636626+00:00"
+    },
+    {
+      "number": 699,
+      "url": "https://github.com/ligon/LSMS_Library/issues/699",
+      "title": "Wire Peru 1990 tables after the XPORT reader repair",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "2a90cf1b4a8ad6ca9be7b96ac7e01e649dd2091ced843eb1220df8eea09b3340",
+      "after_body_sha256": "8ffce568dbef9fcf30149b76c6b4772f146fd52a679da0e79d25bc21db90071e",
+      "verified_at": "2026-10-15T05:13:59.150070+00:00"
+    },
+    {
+      "number": 792,
+      "url": "https://github.com/ligon/LSMS_Library/issues/792",
+      "title": "Document the remaining sample-design gaps after closing the handle leak",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "e9c6b22840ec292b87f104a3e56411deaa016d4c0606881cf2e01beec4d3b70d",
+      "after_body_sha256": "dbe702d12ba3eb15884f0397f178dcaa4199ee1475edc074b1136b99813f63bb",
+      "verified_at": "2026-10-15T05:14:02.132940+00:00"
+    },
+    {
+      "number": 812,
+      "url": "https://github.com/ligon/LSMS_Library/issues/812",
+      "title": "Investigate remaining EHCVM allocation and strata gaps after Guinea-Bissau/Togo documentation fixes",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "a9e4350f64f2312896e4401ff1b17d3c8ac74e29d003355d357b9db36efe8029",
+      "after_body_sha256": "3575ad37e9fc0b1a16fe24574b77cd703f830d0492f72d05ddf9df2c7eeba38b",
+      "verified_at": "2026-10-15T05:14:04.340497+00:00"
+    },
+    {
+      "number": 831,
+      "url": "https://github.com/ligon/LSMS_Library/issues/831",
+      "title": "Decide sidecar-less in-tree source read policy",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "c7de158ee8dfaf610c7e71648a17c0a88f0394c76c12a955905cb305656bfc07",
+      "after_body_sha256": "c1279919e93f3b32fe0530ab95d384679ae98cc2608363fe30cfdd408da02e98",
+      "verified_at": "2026-10-15T05:14:06.751103+00:00"
+    },
+    {
+      "number": 864,
+      "url": "https://github.com/ligon/LSMS_Library/issues/864",
+      "title": "Resolve Burkina Faso 2014 quantity semantics and unread autoconsumption values",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "9c65bb062e5b8036bf2f19485ef9a932d5feaed255d528bf42054323650bee45",
+      "after_body_sha256": "b50575e87cd53e5d8beac125d910d168c23b74a4c25a4baca69c0b34bc6a7d91",
+      "verified_at": "2026-10-15T05:14:08.883428+00:00"
+    },
+    {
+      "number": 915,
+      "url": "https://github.com/ligon/LSMS_Library/issues/915",
+      "title": "Decide whether Country rejects existing unregistered directories",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "ff253cd898e44e6e0390489e49698b4191da4a36bdbbe5ebc2068d723ecaa46e",
+      "after_body_sha256": "f5fb1e161cfc95fc71df3b3a87d3406da2e19d825710ddf0191143c26273d075",
+      "verified_at": "2026-10-15T05:14:11.365096+00:00"
+    },
+    {
+      "number": 926,
+      "url": "https://github.com/ligon/LSMS_Library/issues/926",
+      "title": "Resolve remaining curated C1 keys and transcoding policy after GhanaLSS repair",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "adb94619964a49a39f74f58deda1fdc3f69790678f8f07ee1ed54c0ecee17982",
+      "after_body_sha256": "3362188264fc0f0c1e6db0a83d7179135f7fbbcefb59bf69b2875fc84b7b5949",
+      "verified_at": "2026-10-15T05:14:13.838670+00:00"
+    },
+    {
+      "number": 931,
+      "url": "https://github.com/ligon/LSMS_Library/issues/931",
+      "title": "Decide whether crop conversion should use declared unit_kg",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "96127d4647b15687892d5cc06dfd4f4227a190a2a9756595d4751829a5a3a353",
+      "after_body_sha256": "393bfe93d8235d2b7c811fcca7cc1863e0fb4f75e9fe4f94149f0f634957da10",
+      "verified_at": "2026-10-15T05:14:16.444755+00:00"
+    },
+    {
+      "number": 974,
+      "url": "https://github.com/ligon/LSMS_Library/issues/974",
+      "title": "kinship.yml: apply the #813/#945 adjudication -- canonicalise the reachable spelling variants",
+      "action": "narrow body/title; preserve OPEN",
+      "before_body_sha256": "64cad9f97ebf9d7e3fe6e4881d42e650c7fe7cfeb64e408149603d9963251b41",
+      "after_body_sha256": "e565c3a20fcff54c509e38c499131866b7f0cd0eee5cc004ffbd4cb999da9166",
+      "verified_at": "2026-10-15T05:14:18.753069+00:00"
+    }
+  ],
+  "created": [
+    {
+      "title": "Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1000"
+    },
+    {
+      "title": "Remove runtime credential writes into the installed countries tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1001"
+    },
+    {
+      "title": "Keep unreadable non-DTA binaries out of text fallback",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1002"
+    },
+    {
+      "title": "Isolate the GH866 helper tests from cached data-root state",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1003"
+    }
+  ],
+  "closures": "Reserved for release PR #999; no issues closed during reconciliation."
+}

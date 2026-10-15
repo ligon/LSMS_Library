@@ -2,9 +2,11 @@
 
 * Current execution -- Codex, job39919092
 The maintainer approved WORKPLAN.org and said to proceed. Eighteen implementation
-PRs are merged to development, plus evidence PR #997. GitHub, local main and
-filesystem origin development are synchronized at1973242b4. Only #967 Uganda
-remains open. No release tag or publication yet; shared L2 is untouched.
+PRs are merged to development, plus evidence PRs #997/#998. GitHub, local main
+and filesystem origin development are synchronized at4c60e696f. #967 Uganda
+remains open; release PR #999 is DRAFT. A narrow test-isolation repair for
+newly reproduced #1003 is in progress. No release tag or publication yet;
+shared L2 is untouched.
 
 ** Remaining decision, already asked
 Uganda CONTENTS explicitly says not to regenerate nutrition baseline until its
@@ -32,11 +34,20 @@ change is #850, already shipped BEFORE v0.14.0, not a new v0.15 delta.
 - Runtime lane is rebuilding549declared pairs across38countries from empty
   private L2 at release-work/runtime/data-corpus, frozen7fa05179. It will run
   Feature phases1/2 on a separate physical copy. Shared cache is untouched.
-- After corpus root is quiescent, copy it into a fresh test root, run the full
-  credentialed suite on final integration, explain every failure/coverage gap.
+- Full credentialed suite is running on frozenec1a59767 in release-work/full-suite,
+  private full-suite-data copied from the completed #941 root, CPU24-31/n6.
+  Logs: release-work/logs/full-suite.log/xml, session96369. After the corpus is
+  quiescent, copy its root for targeted cache-presence-only coverage gaps;
+  inspect the suite's skip reasons first. Explain every failure/coverage gap.
   Do not mutate a worktree under active tests. Preserve L1; no L2 symlinks.
-- Release notes/issue reconciliation are being prepared in landing/release-notes
-  and independently reviewed. Narrow partial issues; don't close umbrella work.
+- Release notes/issue reconciliation are independently reviewed and published
+  via998. Eighteen partial issue bodies/titles narrowed, all left OPEN; residuals
+  #1000FCT-note, #1001credential-copy, #1002binary-fallback, #1003test-root filed.
+  issue-reconciliation-applied.json records mutations. PR999 holds closures.
+- #1003 disposable probes confirm the absent-parquet helper can delete from a
+  previously cached root and leave its private root cached after teardown.
+  The JSON helper early-returns and does not poison the cache. Framework agent
+  owns a new isolated fixture-only repair; no attribution to #941 is established.
 - Once science and validation gates pass: land967, verify combined development,
   warm/promote verified shared caches once, release PR development->master with
   MERGE COMMIT, make release v=0.15.0, explicit GitHub tag push/release, observe

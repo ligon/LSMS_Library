@@ -1,5 +1,28 @@
-#+title: v0.15.0 issue reconciliation — draft, no external mutations
+#+title: v0.15.0 issue reconciliation — reviewed drafts and execution record
 #+date: 2026-10-14
+
+* Coordinator execution after the draft review
+PR #998 published these reviewed drafts and evidence, merged as =4c60e696f=.
+The coordinator narrowed 18 open issue bodies/titles after confirming that
+none had changed since the independent review; every issue remains OPEN.
+[[file:issue-reconciliation-applied.json][Verified mutation manifest]] records the URLs, before/after
+body hashes and timestamps. Private control snapshots preserve full bodies.
+
+New residuals filed: #1000 (Uganda FCT provenance-note reconciliation),
+#1001 (runtime credential copy), #1002 (non-DTA binary admission/diagnostics),
+and #1003 (the GH866 helper test's cached-root isolation). The first three
+remain follow-ups; #1003 has a narrow fixture repair in progress. Independent
+disposable-root probes confirmed that the absent-parquet helper can leave an
+old root cached after monkeypatch teardown and delete a synthetic sentinel in
+a previously cached root. The JSON helper returns before resolving data_root
+and does not itself poison the root cache. This does not establish #941's
+historical cause. No shared cache or survey data was used in the probe.
+
+Release PR #999 is DRAFT and carries the verified closure list, additionally
+#964/#968 after native Windows success and final source-inclusion verification.
+No issue was closed and no release/tag was published during reconciliation.
+The earlier draft sections below retain their original review-time wording;
+this execution record distinguishes proposed actions from completed ones.
 
 * Scope, frozen evidence and limits
 Reviewed =v0.14.0= (=1528fa937bcf87f146b3af9ebfdbe18b8f912750=) through
