@@ -91,3 +91,10 @@ development. Raw-source replay rejects the recovered reducers: they blank
 364 Ethiopia GPS and119 Tanzania administrative cells and violate the existing
 household-grain regression. Documentation/evidence only will land; issue837
 remains open for scientific/source questions.
+
+* Ref disposition snapshot after twelve implementation merges
+{"active-landing": 7, "integration-reference": 4, "landed": 94, "retained-archive": 6, "retained-rejected": 19, "superseded": 63}
+See landing-prs.json for live-state snapshot with exact head and merge SHAs.
+#837 original implementation is retained-rejected, with documentation/evidence
+landed through this review branch. Uganda history is now causally accounted
+for; its source assumptions and explicit fixture hold remain.
