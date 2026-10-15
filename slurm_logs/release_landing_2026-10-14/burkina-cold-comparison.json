@@ -1,0 +1,63 @@
+{
+  "baseline": "452302adcfdbf3af538ef06375df1ac6c5aaa8a0",
+  "rows_each": 765816,
+  "renames": {
+    "Cube (Maggi, Jumbo,\u0085)": "Cube alimentaire",
+    "Feuilles (oseilles, baobab, boulvaka": "Feuilles",
+    "Viandes de b\u009cufs fra\u00eeches": "Viande de boeuf",
+    "Viande de b\u00c5\u0093uf": "Viande de boeuf"
+  },
+  "exact_index_after_label_renames": true,
+  "other_columns_exact_per_row": true,
+  "changed_quantities_all_zero_to_null": 449033,
+  "passages": {
+    "base": {
+      "1": {
+        "purchased": 141147,
+        "null": 0,
+        "zero": 44125
+      },
+      "2": {
+        "purchased": 139798,
+        "null": 0,
+        "zero": 139798
+      },
+      "3": {
+        "purchased": 136913,
+        "null": 0,
+        "zero": 136913
+      },
+      "4": {
+        "purchased": 128416,
+        "null": 0,
+        "zero": 128416
+      },
+      "expenditure_2014": 342110515.0,
+      "quantity_2014": 4208737.600000024
+    },
+    "candidate": {
+      "1": {
+        "purchased": 141147,
+        "null": 43906,
+        "zero": 219
+      },
+      "2": {
+        "purchased": 139798,
+        "null": 139798,
+        "zero": 0
+      },
+      "3": {
+        "purchased": 136913,
+        "null": 136913,
+        "zero": 0
+      },
+      "4": {
+        "purchased": 128416,
+        "null": 128416,
+        "zero": 0
+      },
+      "expenditure_2014": 342110515.0,
+      "quantity_2014": 4208737.600000024
+    }
+  }
+}
