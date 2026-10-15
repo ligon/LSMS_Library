@@ -6478,7 +6478,9 @@ def _replay_grain_audit(reports: Any, country: str, table: str,
     the framework's ``build_context`` a stamped report's ``wave`` is the wave
     FOLDER (``Wave.year``), so a two-round folder (Nigeria PP/PH) must pass
     ``wave=`` explicitly to the reducer to name the round -- only a report
-    filed that way arrives here already naming it.  Replaying a wave stamp
+    filed that way arrives here already naming it. ``wave_folder`` keeps the
+    framework folder identity separate when selecting that wave stamp.
+    Replaying a wave stamp
     files it under ``(country, table)``, so
     the L2-country write that follows carries it forward: that is how a wave
     script's stamp reaches the country parquet without a second mechanism.
@@ -6524,8 +6526,9 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
     """The reports this process's build of one WAVE filed for ``(country,
     table)``, for stamping into that wave's L2 parquet (GH #868).
 
-    Filtered on the report's own ``wave`` and ``site`` rather than on a ledger
-    snapshot: the ledger de-duplicates identical reports, so a delta could
+    Filtered on the report's ``wave_folder`` (legacy fallback: ``wave``) and
+    ``site``, leaving ``wave`` free to name a round within that folder.
+    Not filtered on a ledger snapshot: the ledger de-duplicates identical reports, so a delta could
     miss a report an earlier call in the same process already filed.  A
     ``from_cache`` report is EXCLUDED, not carried: it was replayed from some
     earlier stamp, and this write is a cold rebuild of the wave -- what is
@@ -6534,7 +6537,7 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
     if wave is None:
         return None
     out = [r for r in _GRAIN_LEDGER.get((country, table), [])
-           if str(r.get("wave")) == str(wave)
+           if str(r.get("wave_folder", r.get("wave"))) == str(wave)
            and r.get("site") in _WAVE_BUILD_SITES
            and not r.get("from_cache")]
     return out or None

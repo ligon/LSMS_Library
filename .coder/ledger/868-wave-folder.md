@@ -37,3 +37,8 @@ season-B sold-condition conflict; existing CONTENTS.org records that fact.
 
 ## §6 Open questions
 None: approved release workplan explicitly chooses the wave_folder repair.
+
+## Phase 3 verification
+OK (§2–§5): the reducer, context precedence, footer writer and replay mechanism
+are reused. The new synthetic round test and collapsed_rows assertion both
+fail on b471342e7; the focused current suite passes (109 tests).

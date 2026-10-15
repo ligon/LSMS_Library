@@ -104,6 +104,8 @@ def test_na_branch_files_one_cells_blanked_report_under_the_named_cell():
     assert rep["levels"] == ["t", "v"]
     assert rep["conflicting_groups"] == 1 and rep["groups"] == 2
     assert rep["cells_blanked"] == 1
+    assert "dropped" not in rep
+    assert rep["collapsed_rows"] == rep["rows"] - rep["groups"] == 4
     assert rep["columns"] == {"Region": 1}          # the clean column is not accused
     assert rep["examples"] == ["('2018-19', '01')"]
     assert rep["wave"] == "2018-19"                  # from the frame's single t
@@ -335,7 +337,7 @@ def cluster_features(df):
 
 
 @pytest.fixture
-def testland(tmp_path, monkeypatch):
+def testland(tmp_path, monkeypatch, request):
     from lsms_library.paths import countries_root, data_root
 
     croot = tmp_path / "countries"
@@ -356,7 +358,10 @@ def testland(tmp_path, monkeypatch):
                  ).to_csv(c / "2020" / "Data" / "main.csv", index=False)
     (c / "_" / "data_scheme.yml").write_text(_SCHEME)
     (c / "2020" / "_" / "data_info.yml").write_text(_DATA_INFO)
-    (c / "2020" / "_" / "mapping.py").write_text(_HOOK)
+    hook = _HOOK
+    if getattr(request, "param", None):
+        hook = hook.replace("on_conflict='na'", "on_conflict='na', wave='2020Q3'")
+    (c / "2020" / "_" / "mapping.py").write_text(hook)
     try:
         yield C.Country("Testland")["2020"], data_root("Testland") / "2020" / "_" / "cluster_features.parquet"
     finally:
@@ -397,6 +402,37 @@ def test_grab_data_injects_the_cell_stamps_the_wave_parquet_and_replays_on_the_h
     assert "Testland/cluster_features/2020" in str(w.message)
     (rep,) = grain_reports("Testland", "cluster_features")
     assert rep["from_cache"] is True and rep["kind"] == "cells_blanked"
+
+
+@pytest.mark.parametrize("testland", ["explicit-round"], indirect=True)
+def test_explicit_round_survives_wave_folder_stamp_and_warm_replay(testland):
+    """R8: the frame carries folder t=2020, but the hook names round 2020Q3.
+
+    Filtering reports by wave (or by the frame's t) loses this finding.
+    A second build folder's report with the same round must stay excluded.
+    """
+    wave, wave_parquet = testland
+    with build_context("Testland", "cluster_features", "another-folder"):
+        _na_reduce(_conflicting(), wave="2020Q3")
+    with pytest.warns(GrainConflictWarning):
+        cold = wave.grab_data("cluster_features")
+    assert cold.index.get_level_values("t").unique().tolist() == ["2020"]
+    (stamped,) = lt.read_parquet_grain_audit(wave_parquet)
+    assert stamped["wave"] == "2020Q3"
+    assert stamped["wave_folder"] == "2020"
+    assert stamped["columns"] == {"Region": 1}
+
+    _GRAIN_LEDGER.clear()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        warm = wave.grab_data("cluster_features")
+    pd.testing.assert_frame_equal(warm, cold, check_dtype=False)
+    assert not any(issubclass(w.category, GrainConflictWarning) for w in caught)
+    (warning,) = [w for w in caught if issubclass(w.category, GrainCollapseWarning)]
+    assert "Testland/cluster_features/2020Q3" in str(warning.message)
+    (report,) = grain_reports("Testland", "cluster_features")
+    assert report["from_cache"] is True
+    assert report["wave"] == "2020Q3" and report["wave_folder"] == "2020"
 
 
 # --------------------------------------------------------------------------

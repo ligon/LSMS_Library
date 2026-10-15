@@ -425,7 +425,8 @@ def build_context(country: str | None = None, table: str | None = None,
     key the cache writer reads.  Explicit ``country=`` / ``table=`` / ``wave=``
     arguments on the reducer win over the context.
     """
-    token = _BUILD_CONTEXT.set({'country': country, 'table': table, 'wave': wave})
+    token = _BUILD_CONTEXT.set({'country': country, 'table': table, 'wave': wave,
+                                'wave_folder': wave})
     try:
         yield
     finally:
@@ -440,7 +441,8 @@ def _resolve_build_context(df: pd.DataFrame, country, table, wave) -> tuple:
     (``Wave.year``, what ``Wave.grab_data`` passes to ``build_context``), so a
     two-round folder (Nigeria PP/PH) must pass ``wave=`` explicitly to name
     the round -- the context wins over the frame's ``t`` and would file both
-    rounds under the folder name.
+    rounds under the folder name. ``wave_folder`` retains that build folder
+    independently, so naming a round cannot exclude its report from the stamp.
     """
     ctx = _BUILD_CONTEXT.get() or {}
     country = country if country is not None else ctx.get('country')
@@ -450,7 +452,8 @@ def _resolve_build_context(df: pd.DataFrame, country, table, wave) -> tuple:
         ts = df.index.get_level_values('t').dropna().unique()
         if len(ts) == 1:
             wave = str(ts[0])
-    return country, table, wave
+    wave_folder = ctx.get('wave_folder')
+    return country, table, wave, wave if wave_folder is None else wave_folder
 
 
 def _json_key(key) -> str:
@@ -463,7 +466,7 @@ def _json_key(key) -> str:
 
 
 def _cells_blanked_report(conflicts: pd.DataFrame, levels: list, n_rows: int,
-                          country, table, wave) -> dict:
+                          country, table, wave, wave_folder) -> dict:
     """The grain report for an ``on_conflict='na'`` reduction (GH #868).
 
     Its own ``kind`` -- ``cells_blanked`` -- with ``destroyed`` and
@@ -496,6 +499,7 @@ def _cells_blanked_report(conflicts: pd.DataFrame, levels: list, n_rows: int,
         'country': country,
         'table': table,
         'wave': wave,
+        'wave_folder': wave_folder,
     }
 
 
