@@ -1,0 +1,46 @@
+#+title: Credentialed integrated suite — 2026-10-14
+
+* Result and limits
+Frozen source =ec1a5976751dbb4423bb4a9bb43efb62a8bd8077=: 4,951 passed,
+2,725 skipped, four expected failures, one non-strict unexpected pass,
+998 warnings, zero failures/errors, 1,581.30 seconds. Exit zero.
+This includes the original #967 runtime changes and the unchanged historical
+nutrition fixture. The later #1003 helper-fixture repair is separately verified;
+it is not silently included in these counts.
+
+The skip audit finds 2,580 cache-presence cases (2,507 structural cases),
+15 missing independent replication-directory cases, and zero credential skips.
+Other skips describe missing schema declarations, documented unavailable
+microdata or inapplicable sample-design comparisons. The four expected failures
+are absent sample weights in China/Kazakhstan/Pakistan/Peru. The non-strict
+unexpected pass is the existing Pakistan wave-parquet proxy (#740), not a new
+assertion change. The replication directory's documented default and the
+checked alternate project location do not exist; it was not redirected to the
+same data being tested.
+
+Cache-presence skips are incomplete coverage, not passes. A targeted follow-up
+will use a physical copy of the completed corpus and final integration source.
+In particular =var/nutrition.parquet= was absent when the Uganda fixture test
+ran here; this suite does not override its known historical mismatch or its
+explicit scientific hold. The independently cold-built mismatch and proposed
+unapplied two-field patch remain documented in =uganda967.org=.
+
+* Environment and command
+Worktree =/local/job39919092/release-work/full-suite=; interpreter
+=/local/job39919092/venv_img/bin/python=. Cwd/PYTHONPATH and
+LSMS_COUNTRIES_ROOT asserted to that worktree; private LSMS_DATA_DIR is
+=/local/job39919092/release-work/full-suite-data=. It was a physical copy of
+the quiescent #941 private root, sharing only the immutable L1 DVC-cache link.
+Normal user configuration supplied credentials; no credentials are archived.
+BLAS/OMP/MKL and LSMS_BUILD_WORKERS are pinned to one. Shared L2 is untouched.
+
+#+begin_src sh
+taskset -c 24-31 /local/job39919092/venv_img/bin/python -m pytest \
+  -n 6 --dist=loadfile --timeout=600 --timeout-method=thread \
+  --durations=25 -ra -q \
+  --junitxml=/local/job39919092/release-work/logs/full-suite.xml
+#+end_src
+
+[[file:full-suite-counts.json][Aggregate counts and artifact hashes]] identify the private full log/JUnit files.
+Raw warnings may contain source identifiers, so those payloads remain private.
+No source was edited while this run was active.
