@@ -22,7 +22,11 @@ from .yaml_utils import load_yaml
 def _country_dirs() -> tuple[str, ...]:
     """Country directory names that carry a ``_/data_scheme.yml``.
 
-    These are exactly the strings accepted by :class:`lsms_library.Country`.
+    This is the REGISTERED list -- what :func:`countries` returns and what
+    :class:`lsms_library.Country` suggests near misses from.  It is narrower
+    than what ``Country()`` accepts: the constructor raises ``ValueError``
+    for a name with no directory at all, but still constructs for a directory
+    that lacks ``_/data_scheme.yml`` (staged data never wired up; GH #915).
     Uses ``pathlib`` (not shell globbing) so multi-word names like
     ``"South Africa"`` survive intact.
     """
@@ -69,7 +73,13 @@ def _all_features() -> tuple[str, ...]:
 
 
 def countries(feature: str | None = None) -> list[str]:
-    """List country names accepted by :class:`lsms_library.Country`.
+    """List the REGISTERED country names: directories under the config root
+    that carry a ``_/data_scheme.yml``.
+
+    Every name listed is accepted by :class:`lsms_library.Country`, and a name
+    with no directory raises ``ValueError`` there with the near misses from
+    this list.  The converse does not hold today: a directory without a
+    ``_/data_scheme.yml`` is omitted here but still constructs (GH #915).
 
     Parameters
     ----------

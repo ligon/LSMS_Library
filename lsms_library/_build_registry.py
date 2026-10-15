@@ -457,7 +457,11 @@ def framework_imports_fingerprint(paths: tuple) -> str:
     parts: list = []
     for path in paths:
         try:
-            tree = ast.parse(open(path, encoding="utf-8").read())
+            # GH #792: read via a closed handle -- the bare open() leaked a
+            # ResourceWarning per fingerprinted source (746 of 774 warnings
+            # on Feature("sample")).
+            with open(path, encoding="utf-8") as fh:
+                tree = ast.parse(fh.read())
         except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
             continue
         targets = []          # (module_name, attr)

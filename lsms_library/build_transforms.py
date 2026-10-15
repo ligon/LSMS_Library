@@ -195,19 +195,28 @@ def _finalize_canonical_food_acquired(out: pd.DataFrame,
 
     levels = list(index_levels)
     if dedupe:
-        aggs = {
-            'Quantity': ('Quantity', lambda s: s.sum(min_count=1)),
-            'Expenditure': ('Expenditure', lambda s: s.sum(min_count=1)),
-        }
+        # Vectorised (cython) reducers, not per-group Python lambdas (GH
+        # #905): ``agg(lambda s: s.sum(min_count=1))`` calls back into Python
+        # once per group and pandas deep-copies ``df.attrs`` on each call --
+        # the same cost GH #871 removed from the core collapse.  The cython
+        # sum is pairwise where ``Series.sum`` accumulates in order, so a
+        # group's total may land on a neighbouring double -- a few ULP, <= 4
+        # pinned by tests/test_gh905_vectorised_min_count_sum.py (max 2
+        # measured on a 363,682-row frame); the NA
+        # pattern (``min_count=1``: an all-NaN group stays NaN), dtypes and
+        # column order are unchanged.
+        g = out.groupby(levels, dropna=False)
+        # Exact per-row kg (GH #378) is a *quantity*, so it sums like
+        # Quantity -- this is what lets different-size rows of one
+        # (item, unit) collapse without losing the exact kg total.
+        summed = [c for c in ('Quantity', 'Expenditure', 'Quantity_kg')
+                  if c in out.columns]
+        res = g[summed].sum(min_count=1)
         if 'Price' in out.columns:
             # Price is per-unit, so it averages (not sums) across dup rows.
-            aggs['Price'] = ('Price', 'mean')
-        if 'Quantity_kg' in out.columns:
-            # Exact per-row kg (GH #378) is a *quantity*, so it sums like
-            # Quantity -- this is what lets different-size rows of one
-            # (item, unit) collapse without losing the exact kg total.
-            aggs['Quantity_kg'] = ('Quantity_kg', lambda s: s.sum(min_count=1))
-        out = out.groupby(levels, dropna=False).agg(**aggs)
+            res['Price'] = g['Price'].mean()
+        out = res[[c for c in ('Quantity', 'Expenditure', 'Price', 'Quantity_kg')
+                   if c in res.columns]]
     else:
         out = out.set_index(levels)
 

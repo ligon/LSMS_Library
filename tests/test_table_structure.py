@@ -121,38 +121,55 @@ def _load_all_schemes() -> dict[str, dict]:
 ALL_SCHEMES = _load_all_schemes()
 
 
-def _find_cached_parquets() -> list[tuple[str, str, Path]]:
-    """Find all (country, table, path) tuples for cached parquets at data_root."""
+def _expected_pairs() -> list[tuple[str, str, Path]]:
+    """Every (country, table, var-parquet path) the data_scheme files DECLARE.
+
+    GH #703: the parametrisation used to be built from the parquets that
+    happened to exist at collection time, so clearing a country's cache made
+    its tests VANISH (zero cases, green run) rather than skip.  Enumerating
+    the expected set and skipping per missing parquet inside the test turns
+    that silence into a skip with a reason.
+    """
     results = []
     for country, tables in ALL_SCHEMES.items():
         country_data = data_root(country)
         for table_name in tables:
-            # Check var/ (country-level aggregates)
-            var_pq = country_data / "var" / f"{table_name}.parquet"
-            if var_pq.exists():
-                results.append((country, table_name, var_pq))
+            results.append((country, table_name,
+                            country_data / "var" / f"{table_name}.parquet"))
     return results
 
 
-CACHED = _find_cached_parquets()
+EXPECTED = _expected_pairs()
+
+# What was on disk at COLLECTION time.  A parquet absent here is "no cache"
+# (skip with that reason); one present here but gone at execution time is
+# concurrent cache mutation (GH #330, see _read_or_skip).
+CACHED = [(c, t, p) for c, t, p in EXPECTED if p.exists()]
+_CACHED_KEYS = {(c, t) for c, t, _ in CACHED}
+MISSING = [(c, t) for c, t, _ in EXPECTED if (c, t) not in _CACHED_KEYS]
 
 
-@pytest.fixture(scope="module")
-def cached_parquets():
-    if not CACHED:
-        pytest.skip("No cached parquets found at data_root")
-    return CACHED
+def _cold_run_opted_in(config) -> bool:
+    """A run that EXPECTS an empty cache: an explicit rebuild flag, or the
+    no-microdata CI mode (``LSMS_SKIP_AUTH``), where nothing can be warm."""
+    for opt in ("--rebuild-caches", "--rebuild"):
+        try:
+            if config.getoption(opt):
+                return True
+        except ValueError:
+            pass
+    return os.getenv("LSMS_SKIP_AUTH", "").lower() in {"1", "true", "yes"}
 
 
-# ---------------------------------------------------------------------------
-# Parametrized tests over cached tables
-# ---------------------------------------------------------------------------
+def _read_or_skip(path, country: str | None = None,
+                  table: str | None = None) -> pd.DataFrame:
+    """Read a cached parquet, skipping with a reason when there is none.
 
-def _read_or_skip(path) -> pd.DataFrame:
-    """Read a cached parquet, tolerating concurrent cache mutation (GH #330).
+    A parquet that was already absent at collection time is a cold cell:
+    skip with ``no cache for {country}/{table}`` (GH #703).
 
-    ``CACHED`` is enumerated at *collection* time, but the file is read at
-    *execution* time.  Under the parallel suite (``-n N --dist=loadfile``) a
+    A parquet that WAS present is read tolerating concurrent cache mutation
+    (GH #330).  Under the parallel suite (``-n N --dist=loadfile``) a
     concurrent cache-mutating test (e.g. ``test_canonical_shape_via_cache_miss``
     unlinks shared ``var/*.parquet`` to force a rebuild) can delete or rewrite
     the file in between, producing a transient ``FileNotFoundError`` or a torn
@@ -164,6 +181,9 @@ def _read_or_skip(path) -> pd.DataFrame:
     is a no-op under the configured ``--dist=loadfile``.
     """
     from pyarrow.lib import ArrowInvalid
+
+    if country is not None and (country, table) not in _CACHED_KEYS:
+        pytest.skip(f"no cache for {country}/{table} at data_root()")
 
     for attempt in range(2):
         try:
@@ -178,21 +198,21 @@ def _read_or_skip(path) -> pd.DataFrame:
             )
 
 
-def _cached_ids():
-    return [f"{c}/{t}" for c, t, _ in CACHED]
+def _expected_ids():
+    return [f"{c}/{t}" for c, t, _ in EXPECTED]
 
 
 @pytest.mark.requires_s3
 @pytest.mark.parametrize(
     "country,table,path",
-    CACHED,
-    ids=_cached_ids(),
+    EXPECTED,
+    ids=_expected_ids(),
 )
 class TestTableStructure:
 
     def test_readable(self, country, table, path):
         """Parquet file can be read into a DataFrame."""
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0, f"{country}/{table} is empty"
 
@@ -203,7 +223,7 @@ class TestTableStructure:
         if not expected_idx:
             pytest.skip(f"{country}/{table} has no declared index")
 
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         actual_idx = list(df.index.names)
 
         # Check that declared levels are present (order may vary,
@@ -235,7 +255,7 @@ class TestTableStructure:
         # Columns declared optional in data_scheme.yml (genuinely unavailable data).
         optional_cols = spec.get("optional", set())
 
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         all_names = set(df.columns.tolist() + list(df.index.names))
 
         for col_name in expected_cols:
@@ -252,7 +272,7 @@ class TestTableStructure:
         """No non-optional column should be entirely null."""
         spec = ALL_SCHEMES[country][table]
         optional_cols = spec.get("optional", set())
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         for col in df.columns:
             if col in optional_cols:
                 continue  # genuinely absent data is allowed to be all-null
@@ -264,7 +284,7 @@ class TestTableStructure:
         """Index should be unique (no exact duplicate rows by index)."""
         # Known: some tables (e.g., shocks) have legitimate duplicate indices
         # from multiple shock types per household.  We flag >50% as likely errors.
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         if df.index.has_duplicates:
             dup_count = df.index.duplicated().sum()
             total = len(df)
@@ -282,8 +302,8 @@ class TestTableStructure:
 @pytest.mark.requires_s3
 @pytest.mark.parametrize(
     "country,table,path",
-    CACHED,
-    ids=_cached_ids(),
+    EXPECTED,
+    ids=_expected_ids(),
 )
 class TestFeatureSanity:
     def test_feature_is_sane(self, country, table, path):
@@ -291,7 +311,7 @@ class TestFeatureSanity:
         from lsms_library.diagnostics import is_this_feature_sane
         from tests.test_declared_spellings import KNOWN_UNHARMONIZED
 
-        df = _read_or_skip(path)
+        df = _read_or_skip(path, country, table)
         report = is_this_feature_sane(df, country, table)
         if not report.ok:
             # GH #602: five countries still ship raw, unharmonized plot_features
@@ -385,20 +405,43 @@ class TestHousingVDtype:
 
 class TestCachePopulation:
     @pytest.mark.requires_s3
-    def test_at_least_one_country_has_cached_data(self):
-        """Sanity check: at least one country has materialized tables."""
+    def test_at_least_one_country_has_cached_data(self, request):
+        """An EMPTY cache is a failure unless the run opted into cold mode.
+
+        GH #703: this used to skip, so a wholly cold checkout produced a
+        green run with zero structural coverage.  A cold run is legitimate
+        only when it says so: ``--rebuild-caches`` / ``--rebuild``, or the
+        no-microdata CI mode (``LSMS_SKIP_AUTH``).
+        """
         if len(CACHED) == 0:
-            pytest.skip(
-                "No cached parquets found at data_root(). "
-                "Run a build first to populate the cache."
+            if _cold_run_opted_in(request.config):
+                pytest.skip(
+                    "No cached parquets at data_root() and the run opted "
+                    "into cold mode; structural tests skipped with reasons."
+                )
+            pytest.fail(
+                f"No cached parquets found at {data_root()}: all "
+                f"{len(EXPECTED)} declared (country, table) pairs skipped, "
+                "so this module checked nothing.  Build first, or opt into a "
+                "cold run with --rebuild-caches / --rebuild (or LSMS_SKIP_AUTH=1 "
+                "where no microdata can exist)."
             )
 
     def test_cached_tables_summary(self):
-        """Report which countries/tables are cached (informational)."""
+        """Report which countries/tables are cached AND which declared pairs
+        were skipped for want of a cache (informational, GH #703)."""
         by_country: dict[str, list[str]] = {}
         for country, table, _ in CACHED:
             by_country.setdefault(country, []).append(table)
         for country in sorted(by_country):
             tables = sorted(by_country[country])
             print(f"  {country}: {len(tables)} tables — {', '.join(tables)}")
+        missing_by_country: dict[str, list[str]] = {}
+        for country, table in MISSING:
+            missing_by_country.setdefault(country, []).append(table)
+        print(f"  cached {len(CACHED)} of {len(EXPECTED)} declared pairs; "
+              f"{len(MISSING)} skipped for want of a cache:")
+        for country in sorted(missing_by_country):
+            tables = sorted(missing_by_country[country])
+            print(f"    {country}: {len(tables)} missing — {', '.join(tables)}")
         assert True  # Always passes; output is informational

@@ -193,9 +193,13 @@ with np.errstate(divide='ignore', invalid='ignore'):
 out.loc[~np.isfinite(out['Price']), 'Price'] = np.nan
 
 idx = ['t', 'i', 'j', 'u', 's']
-out = out.groupby(idx, dropna=False).agg(Quantity=('Quantity', lambda s: s.sum(min_count=1)),
-                                          Expenditure=('Expenditure', lambda s: s.sum(min_count=1)),
-                                          Price=('Price', 'mean'))
+# Vectorised reducers, not per-group lambdas (GH #905): sum keeps min_count=1
+# so an all-NaN group stays NaN; the cython sum may differ from an in-order
+# Series.sum by a few ULP (<= 4, pinned by
+# tests/test_gh905_vectorised_min_count_sum.py; max 2 measured).
+_g = out.groupby(idx, dropna=False)
+out = _g[['Quantity', 'Expenditure']].sum(min_count=1)
+out['Price'] = _g['Price'].mean()
 out = out.dropna(how='all')
 
 if __name__ == '__main__':

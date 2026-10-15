@@ -418,6 +418,58 @@ def _row_union_categorical(global_t: "pd.DataFrame",
     return combined.reset_index(drop=True)
 
 
+def _strip_string_values(s: pd.Series) -> pd.Series:
+    """Strip whitespace from the STRING values of *s*; leave every other value
+    untouched (GH #694).
+
+    ``Series.str.strip()`` on an ``object`` column is not a no-op for the
+    non-string entries: the ``.str`` accessor returns NaN for any element that
+    is not a string, so a column that merely shares its name with a
+    categorical-mapping table -- a mixed object column such as ``Rural``
+    holding ``0``/``1`` beside labels, or an object-dtype ``Region`` code --
+    had every non-string value NULLED before ``.replace`` ever ran.  Whitespace-padded labels still need the strip so they match the
+    mapping's keys, so strip only where the value is a ``str``.
+
+    String and categorical dtypes already hold only strings (or NA); they keep
+    the vectorised path, exactly as before (``.str.strip()`` returns a string
+    Series for a string dtype and an object Series for a categorical).
+    """
+    if s.dtype == object:
+        return s.map(lambda v: v.strip() if isinstance(v, str) else v)
+    if hasattr(s, "str"):
+        return s.str.strip()
+    return s
+
+
+def _no_such_country_message(country_name: str) -> str:
+    """The ``ValueError`` text for a name with no directory under
+    ``countries_root()`` (GH #915).
+
+    Names the near misses from the REGISTERED list (``catalog._country_dirs``,
+    the same list ``lsms_library.countries()`` returns), matched
+    case-insensitively so ``'ghanalss'`` offers ``'GhanaLSS'`` and ``'Ghana'``
+    offers both ``'GhanaLSS'`` and ``'GhanaSPS'``.  Before this the constructor
+    only *warned* -- once per call site, under Python's default filter -- and
+    the failure surfaced later as a ``FileNotFoundError`` naming an install
+    path the user never chose.
+    """
+    import difflib
+    from .catalog import _country_dirs   # lazy: catalog imports from here
+    registered = list(_country_dirs())
+    by_lower = {}
+    for n in registered:
+        by_lower.setdefault(n.lower(), n)
+    close_lower = difflib.get_close_matches(country_name.lower(),
+                                            list(by_lower), n=3, cutoff=0.6)
+    close = [by_lower[c] for c in close_lower]
+    msg = f"No such country {country_name!r}."
+    if close:
+        msg += f" Did you mean {' or '.join(map(repr, close))}?"
+    msg += (f" {len(registered)} are available; "
+            f"see lsms_library.countries().")
+    return msg
+
+
 def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
     """Merge global and per-country categorical tables.
 
@@ -1946,7 +1998,7 @@ class Country:
         if not country_dir.is_relative_to(countries_dir):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
         if not country_dir.is_dir():
-            warnings.warn(f"Country directory not found for {country_name!r}")
+            raise ValueError(_no_such_country_message(country_name))
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -3045,9 +3097,7 @@ class Country:
                 continue
             rdict = _dict_for(col, key, target)
             if rdict:
-                if hasattr(df[col], 'str'):
-                    df[col] = df[col].str.strip()
-                df[col] = df[col].replace(rdict)
+                df[col] = _strip_string_values(df[col]).replace(rdict)
 
         # Apply to index levels
         if isinstance(df.index, pd.MultiIndex):
