@@ -1,0 +1,16 @@
+{
+  "source_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "node": "tests/test_table_structure.py::TestFeatureSanity::test_feature_is_sane[Guyana/interview_date]",
+  "exit_code": 0,
+  "passed": 1,
+  "skipped": 0,
+  "failures": 0,
+  "seconds": 9.107820861041546,
+  "private_cache_files": 13,
+  "original_and_copy_preserved": true,
+  "original_skip_cause": "Guard catches either FileNotFoundError or ArrowInvalid; XML does not distinguish them. Concurrent cold-build interaction is plausible but not established.",
+  "country_documentation": "Household identity is ED-SN-HH; cluster identity is ED-SN. Materialize-make tables may use script fallback because no country Makefile is shipped.",
+  "scope": "Existing warm-cache sanity assertion only; no new scientific or cold-build claim.",
+  "log_sha256": "02971b43cfea0236b1b0427dad9a11a64491ff74c0fe4710031b177e7cfa67aa",
+  "junit_sha256": "83946895ed2dea259a665eb03dcbbe6e7f67f9bacc5373596ed900f57719519d"
+}

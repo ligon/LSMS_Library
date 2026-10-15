@@ -1,0 +1,46 @@
+{
+  "version": "0.15.0",
+  "tag_commit": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "published_wheel_sha256": "a19b458f2d2fce0bb67c192338ffb02fb745f78af3ba77b0d5db1c3395c0f9f0",
+  "package": "/local/job39919092/release-work/published-install-env/lib/python3.11/site-packages/lsms_library",
+  "countries_root": "/local/job39919092/release-work/published-install-env/lib/python3.11/site-packages/lsms_library/countries",
+  "data_root": "/local/job39919092/release-work/runtime/data-installed-release-smoke",
+  "installed_members_equal_published_wheel": 11751,
+  "prepared_copy_manifest_sha256": "d810c3bf71794ff7117f20ab445498433f1b5c57a5d304c57ee793e2685b99df",
+  "private_parquets_unchanged": 172,
+  "served": {
+    "shape": [
+      116808,
+      1
+    ],
+    "columns": [
+      "Value"
+    ],
+    "index_names": [
+      "i",
+      "t",
+      "j"
+    ],
+    "dtypes": {
+      "Value": "float64"
+    },
+    "content_hash": "ef853b421deca593f6e5286a7925317689561515a48bb629234f94202ebdf714"
+  },
+  "wave_rows": {
+    "2005-06": 22994,
+    "2009-10": 16306,
+    "2015-16": 15073,
+    "2011-12": 14846,
+    "2013-14": 14477,
+    "2010-11": 14394,
+    "2019-20": 9491,
+    "2018-19": 9227
+  },
+  "served_duplicate_keys": 4237,
+  "source_cache_hash": "b30d0fd4afbe78159cfceae8add20e94e912b9980c192c0bd93e0f9ed09cba1a",
+  "seconds": 0.6426914483308792,
+  "warning_counts": {},
+  "package_unchanged_excluding_bytecode": true,
+  "table_api_calls": 1,
+  "scope": "Installed published-wheel ordinary warm assets call on a separate prepared physical copy. Existing immutable L1 is available, but fresh/full cache preflight requires no rebuild. This is separate from credential-free empty-cache smoke. Original/final/shared L2 APIs were not used."
+}

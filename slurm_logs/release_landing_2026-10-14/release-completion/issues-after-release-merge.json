@@ -1,0 +1,259 @@
+{
+  "checked_utc": "2026-10-15T15:20:57.628186+00:00",
+  "master_sha": "cb44e3522a2426ba03431ca9a218cc63fe03f6c9",
+  "intended_complete": [
+    679,
+    693,
+    694,
+    700,
+    703,
+    712,
+    734,
+    777,
+    810,
+    841,
+    865,
+    868,
+    880,
+    909,
+    959,
+    970,
+    964,
+    968,
+    907,
+    1003,
+    1010
+  ],
+  "retained_residual": [
+    962,
+    788,
+    941,
+    798,
+    1000,
+    1001,
+    1002,
+    1006,
+    1008,
+    1009
+  ],
+  "all_expected_states_match": true,
+  "issues": [
+    {
+      "closedAt": "2026-10-15T15:19:33Z",
+      "number": 679,
+      "state": "CLOSED",
+      "title": "bug: Niger 2014-15 household id omits EXTENSION \u2014 59 households have no `i` of their own, 210 person-collisions",
+      "url": "https://github.com/ligon/LSMS_Library/issues/679"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:34Z",
+      "number": 693,
+      "state": "CLOSED",
+      "title": "A `#+begin_example` table in a global .org is parsed as a LIVE categorical mapping (canonical_housing_labels.org ships placeholder Roof/Floor)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/693"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:35Z",
+      "number": 694,
+      "state": "CLOSED",
+      "title": "_apply_categorical_mappings nulls non-string values via an unguarded .str.strip() on any column whose name matches a categorical table",
+      "url": "https://github.com/ligon/LSMS_Library/issues/694"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:35Z",
+      "number": 700,
+      "state": "CLOSED",
+      "title": "Peru: wire `sample` (v, Rural) for 1994 \u2014 and settle the v/i padding inconsistency",
+      "url": "https://github.com/ligon/LSMS_Library/issues/700"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:36Z",
+      "number": 703,
+      "state": "CLOSED",
+      "title": "test_table_structure.py: clearing a country's cache makes its tests VANISH, not fail \u2014 a green run is not a cold guarantee",
+      "url": "https://github.com/ligon/LSMS_Library/issues/703"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:36Z",
+      "number": 712,
+      "state": "CLOSED",
+      "title": "get_dataframe's Stata attempt catches only (ValueError, struct.error) \u2014 a CSV whose leading bytes look like a Stata header dies with an uncaught KeyError",
+      "url": "https://github.com/ligon/LSMS_Library/issues/712"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:37Z",
+      "number": 734,
+      "state": "CLOSED",
+      "title": "pytest cannot run inside a git worktree: lsms_library.pth hardcodes the main checkout, so conftest.py registers twice and dies with 'option names {--rebuild} already added'",
+      "url": "https://github.com/ligon/LSMS_Library/issues/734"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:38Z",
+      "number": 777,
+      "state": "CLOSED",
+      "title": "Panama 1997: 99.1% of u='Value' rows carry Quantity = 7.70, an undecoded missing-value sentinel served as data",
+      "url": "https://github.com/ligon/LSMS_Library/issues/777"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:38Z",
+      "number": 810,
+      "state": "CLOSED",
+      "title": "get_dataframe's last-resort dvc.api.open() resolves the DVC repo from CWD (7-minute sidecar walk from /tmp, trips on pytest fixtures)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/810"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:39Z",
+      "number": 841,
+      "state": "CLOSED",
+      "title": "Nigeria cluster_features undeclared for W5 while sample and community_prices ship it: 24,184 price rows have no geography",
+      "url": "https://github.com/ligon/LSMS_Library/issues/841"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:39Z",
+      "number": 865,
+      "state": "CLOSED",
+      "title": "Niger 2011-12: eleven Mil rows carry Quantity 999999 with u=Unknown -- an unstripped missing-value sentinel (sibling of #861)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/865"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:40Z",
+      "number": 868,
+      "state": "CLOSED",
+      "title": "reduce_to_agreed (build_transforms.py:422) only warnings.warn()s on a conflict: no grain report, no lsms_grain_audit stamp, so a warm read is silent and grain_reports() is empty",
+      "url": "https://github.com/ligon/LSMS_Library/issues/868"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:40Z",
+      "number": 880,
+      "state": "CLOSED",
+      "title": "GhanaSPS/_/CONTENTS.org still documents wave-1 `MonthsAway` as \"not wired\" and \"filling 0 would fabricate data\", contradicting the live config that wires it with NaN -> 0",
+      "url": "https://github.com/ligon/LSMS_Library/issues/880"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:41Z",
+      "number": 909,
+      "state": "CLOSED",
+      "title": "test_ghanalss_panel_consistency passes or fails on ambient cache coverage; _panel_spine trusts a partial cache and reports the miss as success-looking text",
+      "url": "https://github.com/ligon/LSMS_Library/issues/909"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:42Z",
+      "number": 959,
+      "state": "CLOSED",
+      "title": "No lock file is tracked (/poetry.lock is gitignored), so nothing records the environment the warm parquet corpus was built under",
+      "url": "https://github.com/ligon/LSMS_Library/issues/959"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:42Z",
+      "number": 970,
+      "state": "CLOSED",
+      "title": "load_json_cache shells out to 'make panel_ids.json' without _script_subprocess_env(); post-#914 the call can only fail",
+      "url": "https://github.com/ligon/LSMS_Library/issues/970"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:43Z",
+      "number": 964,
+      "state": "CLOSED",
+      "title": "Windows: build script-path (make) tables without make",
+      "url": "https://github.com/ligon/LSMS_Library/issues/964"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:43Z",
+      "number": 968,
+      "state": "CLOSED",
+      "title": "Script-path builds crash with FileNotFoundError when make is not installed (no fallback to the wave script)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/968"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:44Z",
+      "number": 907,
+      "state": "CLOSED",
+      "title": "80% of CI's skipped tests take the expensive skip path: 56 files reach a skip via a network timeout instead of a requires_s3 mark",
+      "url": "https://github.com/ligon/LSMS_Library/issues/907"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:32Z",
+      "number": 1003,
+      "state": "CLOSED",
+      "title": "Isolate the GH866 helper tests from cached data-root state",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1003"
+    },
+    {
+      "closedAt": "2026-10-15T15:19:33Z",
+      "number": 1010,
+      "state": "CLOSED",
+      "title": "Tests leak LSMS_NO_CACHE from collect-only controls into subsequent data builds",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1010"
+    },
+    {
+      "closedAt": null,
+      "number": 962,
+      "state": "OPEN",
+      "title": "Food-unit sentinel coverage after #967: reconcile residual-code kg semantics and guard missing-unit spellings",
+      "url": "https://github.com/ligon/LSMS_Library/issues/962"
+    },
+    {
+      "closedAt": null,
+      "number": 788,
+      "state": "OPEN",
+      "title": "DECISION: when a country script and the framework both build var/<table>.parquet, which is authoritative -- framework (delete concatenate-only scripts, as #808) or script (when materialize: make is declared)?",
+      "url": "https://github.com/ligon/LSMS_Library/issues/788"
+    },
+    {
+      "closedAt": null,
+      "number": 941,
+      "state": "OPEN",
+      "title": "master data-tests: EHCVM food_acquired served WITHOUT Derivation / inkind rows in the sequential cold CI session (52 failures in test_ehcvm_7day.py); not reproducible cold locally",
+      "url": "https://github.com/ligon/LSMS_Library/issues/941"
+    },
+    {
+      "closedAt": null,
+      "number": 798,
+      "state": "OPEN",
+      "title": "Mali/Tanzania interview_date: mixed timestamp formats drop four waves on warm reads",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798"
+    },
+    {
+      "closedAt": null,
+      "number": 1000,
+      "state": "OPEN",
+      "title": "Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1000"
+    },
+    {
+      "closedAt": null,
+      "number": 1001,
+      "state": "OPEN",
+      "title": "Remove runtime credential writes into the installed countries tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1001"
+    },
+    {
+      "closedAt": null,
+      "number": 1002,
+      "state": "OPEN",
+      "title": "Keep unreadable non-DTA binaries out of text fallback",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1002"
+    },
+    {
+      "closedAt": null,
+      "number": 1006,
+      "state": "OPEN",
+      "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1006"
+    },
+    {
+      "closedAt": null,
+      "number": 1008,
+      "state": "OPEN",
+      "title": "GhanaLSS Feature food assembly deletes rows with missing cluster or unit keys",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1008"
+    },
+    {
+      "closedAt": null,
+      "number": 1009,
+      "state": "OPEN",
+      "title": "Panama: Region-market food variants lack a geography lookup",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1009"
+    }
+  ]
+}

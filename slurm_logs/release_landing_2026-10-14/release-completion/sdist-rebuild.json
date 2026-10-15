@@ -1,0 +1,18 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "24-31",
+    "/local/job39919092/release-work/framework/release-validation-env/bin/python",
+    "-m",
+    "build",
+    "--wheel",
+    "--no-isolation",
+    "--outdir",
+    "/local/job39919092/release-work/control/final-release-docs/sdist-rebuild-dist"
+  ],
+  "cwd": "/local/job39919092/release-work/control/final-release-docs/sdist-unpacked/lsms_library-0.15.0",
+  "git_present": false,
+  "exit": 0,
+  "seconds": 13.610592603683472
+}
