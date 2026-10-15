@@ -21,7 +21,9 @@ records final SHAs, results, remaining issues, and cache status.
 
 Execution is underway under the maintainer's approval. See EXECUTION.org and
 the archived lane reports for reviewed heads, actual merges and validation.
-The private corpus rebuild is running; shared caches remain untouched.
+The private corpus rebuild completed: 530 of 549 declared requests succeeded;
+19 documented source/wiring gaps remain. Shared caches remain untouched.
+Feature and cache-presence follow-up checks use separate physical copies.
 The Uganda nutrition direction hold remains open; no release tag exists.
 
 * Evidence and corrections to the handoff
@@ -173,16 +175,20 @@ skills and script docstrings before editing. Record new idiosyncrasies.
   -> #868 -> #970. This order is a starting point, not a proved dependency.
   Preserve UTF-8 opens, binary existence probes, sniff guards, the no-make
   helper/env forwarding, JSON direct-read contract, and round-aware stamps.
-- [ ] Run focused regressions for these interactions, then the complete suite
+- [X] Run focused regressions for these interactions, then the complete suite
   with BLAS threads pinned, =LSMS_BUILD_WORKERS=1=, and
   =-n <allocated budget> --dist=loadfile=. Write output to files.
+  Full credentialed run: 4,951 passed, zero failures. Follow-up of all 2,580
+  cache-presence skips is complete, with the one held nutrition failure.
+  See full-suite.org and cache-coverage.org for counts and coverage limits.
 - [ ] Run the credentialed sequential cold selection named by #941, followed
   by the credentialed data-tests workflow against the candidate. Investigate
   any EHCVM Derivation/inkind loss. A warm parallel pass does not clear #941.
-- [ ] Validate installed-wheel behaviour from outside the checkout: package
+- [X] Validate installed-wheel behaviour from outside the checkout: package
   data, import without Git, no-make wave fallback, and native Windows conda
   script builds. Assert the installed package path; do not let PYTHONPATH
   silently substitute this source checkout for the wheel.
+  Completed at frozen74c9398ec; later changes affect tests/docs/CI only.
 - [ ] Check independent data expectations, especially #967 Uganda nutrition,
   Burkina money-only rows, Peru cluster identity, Panama quantities, and
   Nigeria/Niger sale units. Review each changed expectation with before/after

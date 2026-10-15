@@ -1,0 +1,103 @@
+[
+  {
+    "file": "REPORT.md",
+    "bytes": 6205,
+    "sha256": "ca37a6842ed553758a538f2e43c5023acb5d82c021e759a543670e7f4e2acc29"
+  },
+  {
+    "file": "FINDINGS.md",
+    "bytes": 19192,
+    "sha256": "51a7a68d1312219ebb45450569973401264eb35b61fee138a3b2bd27ede75ad4"
+  },
+  {
+    "file": "SCOPE_DEVIATIONS.md",
+    "bytes": 480,
+    "sha256": "8f88b34559514477f951654fa50cb190f6c3b40d6baa4edff7439b8b6f40c1b7"
+  },
+  {
+    "file": "country-summary.tsv",
+    "bytes": 1634,
+    "sha256": "4527dd11898975ed22e0f482ceb699ec1330e50855ce9fecc8a146a07822aeca",
+    "source_sha256": "5456778517e3868ed690bdd14960a9e602d8aca60b9c739ba0c7c1cb9c52ab95",
+    "source_bytes": 1673,
+    "normalization": "CRLF to LF only; parsed tabular records identical"
+  },
+  {
+    "file": "table-summary.tsv",
+    "bytes": 127980,
+    "sha256": "92c58061c95dd5aadb32f27b45c7359ea6f18e823b9d8be7f03ca2c947f74e73",
+    "source_sha256": "137f753369ead1396c1fc18b929c6dbd1079316e56d94597a82b64bb04123154",
+    "source_bytes": 128530,
+    "normalization": "CRLF to LF only; parsed tabular records identical"
+  },
+  {
+    "file": "progress.json",
+    "bytes": 14615,
+    "sha256": "7d472e58f10f330f6627d28e8cabed0d5dadd22dfb04870efdf1d7779c72849f"
+  },
+  {
+    "file": "completion.json",
+    "bytes": 2500,
+    "sha256": "40800554cf4ea89e63e1a5eec2397ac828f19875f54539d0bc6a1e9ae102345c"
+  },
+  {
+    "file": "snapshot-manifest.json",
+    "bytes": 374608,
+    "sha256": "020b769159940cc0976278a710253a322fcbc85a2ffce7669ed388bbc4e715d8"
+  },
+  {
+    "file": "cache-comparison.json",
+    "bytes": 69746,
+    "sha256": "9b911cf47eadb937e4b23b3b652aaaab686f95538c21057bf704f29473581907"
+  },
+  {
+    "file": "niger-reviewed-comparison.json",
+    "bytes": 1523,
+    "sha256": "4d0312783c378eeea363d6f788cdb381a8852f94d252501445999cec8d5cf813"
+  },
+  {
+    "file": "uganda-reviewed-comparison.json",
+    "bytes": 2899,
+    "sha256": "7843472935aaddefd3f7ec62ae02faa120ca7af69539f32c736eac548bc98d25"
+  },
+  {
+    "file": "order-comparison-togo.json",
+    "bytes": 310,
+    "sha256": "5cbaccb2c6e91f2bb3ac4d780552f2a730df2dadc9f661ebee22d5e3b4bfe117"
+  },
+  {
+    "file": "order-comparison-mali.json",
+    "bytes": 471,
+    "sha256": "680c934a52f2fbb0a8249d7707800f24af7ddc900258fb8610ac69717a42c0d6"
+  },
+  {
+    "file": "order-comparison.json",
+    "bytes": 1076,
+    "sha256": "bb89179b2a75ce8295b93b658224d6ac51936ed59fd379b2bd5f1d2fe8b5fbb3"
+  },
+  {
+    "file": "known-transform-comparison.json",
+    "bytes": 2952,
+    "sha256": "e6bf82bcbc0e1c503eac7c199d861b3f2daa5ba3a290f210d9d4abe3203f2a61"
+  },
+  {
+    "file": "tajikistan-area-comparison.json",
+    "bytes": 174,
+    "sha256": "9855bf175fd0bc924e8e52ede8ad88ccc6ace4239c31a0d531097b5181dcfbfb"
+  },
+  {
+    "file": "nigeria-change-comparison.json",
+    "bytes": 273,
+    "sha256": "066eb02be8e33b3ef9dd2a3d785108c393e726fa96d770c762f1f97605899362"
+  },
+  {
+    "file": "run_corpus.py",
+    "bytes": 12622,
+    "sha256": "efd52efa1eb57fe738b01d47bced4543837cc8348110a53e5648f8985efc3533"
+  },
+  {
+    "file": "run.sh",
+    "bytes": 628,
+    "sha256": "26a50b755727ca67d192239f78521a588fb5e48df5dabce930430a3d816831ab"
+  }
+]

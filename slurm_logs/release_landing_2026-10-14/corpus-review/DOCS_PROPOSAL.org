@@ -1,0 +1,55 @@
+#+title: Proposed country documentation additions — not applied
+
+* Tajikistan/_/CONTENTS.org — append
+** 2007 plot identity and area-unit provenance (GH #879)
+
+The 2007 land roster combines r1m12a1 (owned, 3,685 plots), r1m12a2
+(rented/borrowed in, 269), and r1m12a3 (rented/lent out, 20).  The source
+=plotcode= restarts within each subsection: 231 =(hhid, plotcode)= keys
+collide between owned and rented-in sections.  =2007/_/plot_features.py=
+therefore prefixes plot_id with tenure (=owned-1=, =rented_in-1=, ...),
+preserving 3,974 plots with unique =(t, i, plot_id)=.  Do not strip the tag.
+
+The source area is in sotka (=1/100 hectare=).  The script has served
+=Area = q3 / 100= in hectares since GH #879 (=dedb1c7a7=, before v0.14.0);
+=AreaUnit='sotka'= preserves the ORIGINAL survey unit, not the unit of
+served Area.  This follows =lsms_library/data_info.yml='s canonical contract.
+The country registry's comment "Area is in sotka (1/100 ha)" contradicts
+that implementation and must not be read as the served-unit contract.
+
+The October 2026 cold corpus reproduced 3,974 rows with Area total
+882.38 hectares; the prior shared country aggregate held total 88,238,
+while its wave parquet already matched the new country frame exactly by
+fingerprint.  This is evidence of an older stale aggregate, not a new
+conversion introduced by the v0.15.0 train.  The total is a validation
+checksum, not a nationally weighted land estimate.
+
+* Nepal/_/CONTENTS.org — append correction beside current-status paragraph
+The earlier sentence "all features return empty DataFrames" does not
+match the October 2026 declared-corpus run: all eleven declared requests
+failed loudly (missing raw sources or a derived-table materialization
+error).  They remain unavailable, not successful empty builds.  The NSO
+acquisition requirement and the declared cross-section/panel distinctions
+above remain unchanged.
+
+* Uganda/_/CONTENTS.org — append update beside the GH #788 history
+The "trust once, then stamp" passage above describes the policy before
+GH #809.  The current L2-country read gate treats a hashless country
+parquet as stale and rebuilds it; script-written wave parquets have a
+different policy.  The October 2026 corpus still ended with hashless
+=var/fct.parquet= and =var/earnings.parquet= after nutrition/income builds
+rewrote sibling outputs.  Both final frames matched their recorded
+baseline fingerprints, but their hash/coverage metadata was absent.
+This remains evidence for GH #788's authoritative-builder/sibling-write
+question, not permission to stamp unverified content or to revise the
+separately held nutrition baseline.
+
+* Pakistan/_/CONTENTS.org — append after universe/weights discussion
+The catalog's claim that raising factors were incorporated into distributed
+data, and the instruction "Use the supplied raising factors" above,
+are not implemented by the library's present sample table.  The October
+2026 corpus's 4,967-row sample has =v=, =Rural= and =strata= only, matching
+=1991/_/data_info.yml=.  This records a documentation/delivery gap, not a
+finding that weights never existed in upstream distributions.  Resolving
+it requires tracing the catalog claim to the actual release files or a
+source-supported explanation; no weight should be fabricated.

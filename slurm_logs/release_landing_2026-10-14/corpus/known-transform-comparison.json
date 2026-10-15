@@ -1,0 +1,98 @@
+[
+  {
+    "country": "Cambodia",
+    "path": "2019-20/_/plot_features.parquet",
+    "old_rows": 3005,
+    "new_rows": 3005,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1987-88/_/crop_production.parquet",
+    "old_rows": 16938,
+    "new_rows": 16938,
+    "transformation": "new plot_id is entirely Farm-level; compare all original columns",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1988-89/_/crop_production.parquet",
+    "old_rows": 20342,
+    "new_rows": 20342,
+    "transformation": "new plot_id is entirely Farm-level; compare all original columns",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1991-92/_/plot_features.parquet",
+    "old_rows": 5213,
+    "new_rows": 5213,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1998-99/_/plot_features.parquet",
+    "old_rows": 10570,
+    "new_rows": 10570,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2012-13/_/plot_features.parquet",
+    "old_rows": 28771,
+    "new_rows": 28771,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/community_prices.parquet",
+    "old_rows": 220908,
+    "new_rows": 220908,
+    "transformation": "documented C1 to ASCII transcription in j and Description",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/nonfood_expenditures.parquet",
+    "old_rows": 289917,
+    "new_rows": 289917,
+    "transformation": "documented C1 to ASCII transcription in j and Description",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/plot_features.parquet",
+    "old_rows": 17741,
+    "new_rows": 17741,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "var/community_prices.parquet",
+    "old_rows": 660168,
+    "new_rows": 660168,
+    "transformation": "documented C1 to ASCII transcription in j and Description",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "var/nonfood_expenditures.parquet",
+    "old_rows": 977193,
+    "new_rows": 977193,
+    "transformation": "documented C1 to ASCII transcription in j and Description",
+    "exact_after_transformation": true
+  },
+  {
+    "country": "Liberia",
+    "path": "2018-19/_/plot_features.parquet",
+    "old_rows": 2064,
+    "new_rows": 2064,
+    "transformation": "existing plot_features hook over old cache",
+    "exact_after_transformation": true
+  }
+]

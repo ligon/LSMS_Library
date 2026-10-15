@@ -1,0 +1,3061 @@
+[
+  {
+    "country": "Burkina_Faso",
+    "path": "2014/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      557822,
+      2
+    ],
+    "after_shape": [
+      557822,
+      2
+    ],
+    "before_hash": "ba6cc87fdca6a58a8ca619c9188ba8b8aae9e3ca5b64c43f16bc38f8d10f0cb1",
+    "after_hash": "939be727760586762f2c90bdfdfde70cd14e9d3c6abf659bdc8ec2ee581b8019",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Burkina_Faso",
+    "path": "2018-19/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      138575,
+      3
+    ],
+    "after_shape": [
+      138575,
+      3
+    ],
+    "before_hash": "c7797ee7a5d7200fa704882ae70d4b6651e110dafc71d3284109f3550a4443c2",
+    "after_hash": "e672b7a35aa2b9cb13d270f876556419b563ec4c0bb794f82207b470513e2138",
+    "before_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Burkina_Faso",
+    "path": "var/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      765816,
+      3
+    ],
+    "after_shape": [
+      765816,
+      3
+    ],
+    "before_hash": "580594a3b9baa8678be33697a044a95fd79c6f313cfbc7a60f8f387df8e33fa2",
+    "after_hash": "3680fc3ed32033473351b111bb740a5887ae1c8cfbd26ad012d148c893f74169",
+    "before_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Cambodia",
+    "path": "2019-20/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      3005,
+      6
+    ],
+    "after_shape": [
+      3005,
+      6
+    ],
+    "before_hash": "13be33af1ac5d34b78b4ce6ca24e614ca7e03655d2f64b007f95d88043c881c1",
+    "after_hash": "96d3ffeda0a860667723ea5ec780bc45a93ae1a18d33a714222e62a4416346c7",
+    "before_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "string",
+      "Irrigated": "string",
+      "LandUse": "string",
+      "Tenure": "string",
+      "TenureSystem": "string"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "string",
+      "Irrigated": "string",
+      "LandUse": "string",
+      "Tenure": "string",
+      "TenureSystem": "string"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        8420961.879999999,
+        9207.869390200001
+      ]
+    }
+  },
+  {
+    "country": "CotedIvoire",
+    "path": "2018-19/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      61116,
+      4
+    ],
+    "after_shape": [
+      61116,
+      4
+    ],
+    "before_hash": "f20e505e996c4e4f236f2c04777cd5126baf585778bc180f1f4abb71adfea955",
+    "after_hash": "3ef70ea1fe6012728ee6ed446d650c663ea7cecf567679250c3c6c802974a738",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "CotedIvoire",
+    "path": "var/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      111789,
+      4
+    ],
+    "after_shape": [
+      111789,
+      4
+    ],
+    "before_hash": "732d454d9fee7346d2bb380741b5fbe5e60351e23f917c52d857944dbe1aeb2f",
+    "after_hash": "4656f251454a1fe458977116eaa766d8aca118980989f944dabdcd7a2a8a0998",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1987-88/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      16938,
+      12
+    ],
+    "after_shape": [
+      16938,
+      13
+    ],
+    "before_hash": "670ece113b7280b65c18a074a76fb326531da51bd8f0e08e7096b1b081bc3ddf",
+    "after_hash": "4a2af930a45230fc2e6cf3ef1f1841f54546a5a4807da955ab3e27bc200f05cb",
+    "before_dtypes": {
+      "Area_ha": "float64",
+      "Derivation": "string",
+      "KgFactor": "float64",
+      "LossCause": "str",
+      "Quantity": "Float64",
+      "Quantity_sold": "float64",
+      "Unit_sold": "string",
+      "Value_given": "float64",
+      "Value_lost": "float64",
+      "Value_seed": "float64",
+      "Value_sold": "float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Area_ha": "float64",
+      "Derivation": "string",
+      "KgFactor": "float64",
+      "LossCause": "str",
+      "Quantity": "Float64",
+      "Quantity_sold": "float64",
+      "Unit_sold": "string",
+      "Value_given": "float64",
+      "Value_lost": "float64",
+      "Value_seed": "float64",
+      "Value_sold": "float64",
+      "intercropped": "boolean",
+      "plot_id": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1987-88/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1988-89/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      20342,
+      12
+    ],
+    "after_shape": [
+      20342,
+      13
+    ],
+    "before_hash": "766f8915c2305585f419bf3ff1148f6bf6b7d157851ed03ae50fda5e74f3dbf4",
+    "after_hash": "fcd155800e5c9ebdb5c8a15e0f663a15a564e0d33fa3c5f95fdbc569eafbf6bb",
+    "before_dtypes": {
+      "Area_ha": "float64",
+      "Derivation": "string",
+      "KgFactor": "float64",
+      "LossCause": "str",
+      "Quantity": "Float64",
+      "Quantity_sold": "float64",
+      "Unit_sold": "string",
+      "Value_given": "float64",
+      "Value_lost": "float64",
+      "Value_seed": "float64",
+      "Value_sold": "float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Area_ha": "float64",
+      "Derivation": "string",
+      "KgFactor": "float64",
+      "LossCause": "str",
+      "Quantity": "Float64",
+      "Quantity_sold": "float64",
+      "Unit_sold": "string",
+      "Value_given": "float64",
+      "Value_lost": "float64",
+      "Value_seed": "float64",
+      "Value_sold": "float64",
+      "intercropped": "boolean",
+      "plot_id": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1988-89/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1991-92/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      5213,
+      2
+    ],
+    "after_shape": [
+      5213,
+      2
+    ],
+    "before_hash": "08f74ba68b863d5148f125ff70de2ee9c83db73e6d96f73b5b6bb3039c28cfe7",
+    "after_hash": "a30aa1cae169bfbd34241b653a190172ef197916e8e30067940a2a8cc9408208",
+    "before_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        23565.4,
+        8872.7920745
+      ]
+    }
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "1998-99/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      10570,
+      2
+    ],
+    "after_shape": [
+      10570,
+      2
+    ],
+    "before_hash": "0005c5fa49529b6e62450512729a03bbf71ecfac8c38e13e31f2221eedadbdac",
+    "after_hash": "2cd83b8d7699868466be0b5dc91c659d81d08d8709174f72c4a012dfe5712822",
+    "before_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        37725.7,
+        14683.5358661
+      ]
+    }
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2012-13/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      28771,
+      3
+    ],
+    "after_shape": [
+      28771,
+      3
+    ],
+    "before_hash": "9a8642012ec36315687b8f8d1f5d386608cd927d85f758c30724344546c4a3c9",
+    "after_hash": "12ecfebdd34a3323c39b9d354db5e603105a52c20c21238553e297011db1c0a6",
+    "before_dtypes": {
+      "Area": "float32",
+      "AreaUnit": "str",
+      "Tenure": "str"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str",
+      "Tenure": "str"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        79894.09375,
+        31082.901520939544
+      ]
+    }
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/community_prices.parquet",
+    "kind": "changed",
+    "before_shape": [
+      220908,
+      3
+    ],
+    "after_shape": [
+      220908,
+      3
+    ],
+    "before_hash": "4f55d738eb0be797110beb58005224df35a515fd0485f6d95bbae7f59fe15ea1",
+    "after_hash": "cc8ad73ed2e1b22342b99ee76d8f8431c61184262f84fc1fe784503ad7420201",
+    "before_dtypes": {
+      "Description": "string",
+      "NumberOfUnits": "float64",
+      "Price": "float64"
+    },
+    "after_dtypes": {
+      "Description": "string",
+      "NumberOfUnits": "float64",
+      "Price": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/nonfood_expenditures.parquet",
+    "kind": "changed",
+    "before_shape": [
+      289917,
+      2
+    ],
+    "after_shape": [
+      289917,
+      2
+    ],
+    "before_hash": "71e7280ec2b2441079f46e75109e78aa60d00781840ed30a803c295b13b3776b",
+    "after_hash": "5c982e84b233d9c722b24deab728587c1f61fe4a25e8ca51a6f7c08313360c7d",
+    "before_dtypes": {
+      "Expenditure": "Float64",
+      "RecallWindow": "string"
+    },
+    "after_dtypes": {
+      "Expenditure": "Float64",
+      "RecallWindow": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "2016-17/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      17741,
+      3
+    ],
+    "after_shape": [
+      17741,
+      3
+    ],
+    "before_hash": "b4c846ab6fcec058edb25a5280ef2703d178dc3b360194112792c893ec274687",
+    "after_hash": "ec3f92ad03cef0ddb3d152f52ff0338dc8e002bdf955ec0d46b6e3ffc2be6350",
+    "before_dtypes": {
+      "Area": "float32",
+      "AreaUnit": "string",
+      "Tenure": "str"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "string",
+      "Tenure": "str"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        104118.703125,
+        41305.57251623728
+      ]
+    }
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "var/community_prices.parquet",
+    "kind": "changed",
+    "before_shape": [
+      660168,
+      3
+    ],
+    "after_shape": [
+      660168,
+      3
+    ],
+    "before_hash": "2a48e80cb4d56d1042b49ee3fee3a7d430bf81f1d3e4a8db85ce7e13cd02c47e",
+    "after_hash": "a2d67a42ca7c097cbad8d4a0fd887686078bf7bf8c559acb54e906845645a60b",
+    "before_dtypes": {
+      "Description": "string",
+      "NumberOfUnits": "Float64",
+      "Price": "float64"
+    },
+    "after_dtypes": {
+      "Description": "string",
+      "NumberOfUnits": "Float64",
+      "Price": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "GhanaLSS",
+    "path": "var/nonfood_expenditures.parquet",
+    "kind": "changed",
+    "before_shape": [
+      977193,
+      2
+    ],
+    "after_shape": [
+      977193,
+      2
+    ],
+    "before_hash": "c3626cdc01bd701ef76979da0655ab2803ae5f3c499d07d522cc554d1d07957a",
+    "after_hash": "66b1ba8e50a8566cf9977a52ee69b1feafcbbbcd4a889c8d35ae6e21a1bed55b",
+    "before_dtypes": {
+      "Expenditure": "Float64",
+      "RecallWindow": "string"
+    },
+    "after_dtypes": {
+      "Expenditure": "Float64",
+      "RecallWindow": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Guyana",
+    "path": "1992/_/cluster_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Guyana",
+    "path": "1992/_/household_roster.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Guyana",
+    "path": "1992/_/housing.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Guyana",
+    "path": "1992/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Guyana",
+    "path": "1992/_/sample.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Liberia",
+    "path": "2018-19/_/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      2064,
+      3
+    ],
+    "after_shape": [
+      2064,
+      3
+    ],
+    "before_hash": "ff0ec6cd4b2660eefb30d11bfb7528be4548c1d18ab934f4862bee7dfea67fc1",
+    "after_hash": "17c7991cb1efe061427254bc3b9bb2b12eeaa4d849c0937a024437953aa389e2",
+    "before_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "string",
+      "Tenure": "str"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "string",
+      "Tenure": "str"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        22914.5,
+        8544.589559
+      ]
+    }
+  },
+  {
+    "country": "Malawi",
+    "path": "2004-05/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2004-05/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2004-05/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2004-05/_/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/people_last7days.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/plot_inputs.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2010-11/_/subjective_well_being.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/food_security.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/people_last7days.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/plot_inputs.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2013-14/_/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/food_security.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/people_last7days.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/plot_inputs.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2016-17/_/subjective_well_being.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/food_security.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/people_last7days.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/plot_inputs.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "2019-20/_/subjective_well_being.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/food_security.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/people_last7days.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/plot_inputs.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/shocks.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Malawi",
+    "path": "var/subjective_well_being.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Mali",
+    "path": "2018-19/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      46014,
+      4
+    ],
+    "after_shape": [
+      46014,
+      4
+    ],
+    "before_hash": "228ba07558d61d7ed19830e4f386f836966ebba3351d367c104ebbd9956947f8",
+    "after_hash": "84fedd07c5613086e1fa16e58ac948a0e7331ec4a6fe8720f0d883d362f4fbd0",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Mali",
+    "path": "2021-22/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      43472,
+      3
+    ],
+    "after_shape": [
+      43472,
+      3
+    ],
+    "before_hash": "8655c69e9288da0a9ecdb77f49e6743beebdc50831bb85d185becbeb6546982b",
+    "after_hash": "c4521e411982ddb8e9f20db7b4fcef77940d46bc5a17fe6afec98244115d74b4",
+    "before_dtypes": {
+      "Age": "float64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Mali",
+    "path": "var/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      220732,
+      4
+    ],
+    "after_shape": [
+      220732,
+      4
+    ],
+    "before_hash": "94f6a5dbeb5e618e946b9c79800c18f32542d8a20a8f23f30db3702387b45395",
+    "after_hash": "7f6c63388d3b7343c6f8b991a0feb8d0f7c2ef5479e3fdd4fa8bdfe066988ee2",
+    "before_dtypes": {
+      "Age": "string",
+      "MonthsSpent": "string",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "after_dtypes": {
+      "Age": "string",
+      "MonthsSpent": "string",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2011-12/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      11983,
+      5
+    ],
+    "after_shape": [
+      11983,
+      6
+    ],
+    "before_hash": "968f31f6367ae44b275b05d25ad516207002e57d5c3c844730d89bc8c27a2760",
+    "after_hash": "f60d76c0816a0fc119feddb59bb07d313ea34b8862fd9dc804ad552e9a4371c6",
+    "before_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        11451137.5,
+        451148.5
+      ],
+      "Quantity_sold": [
+        3095830.0,
+        95833.0
+      ],
+      "Value_sold": [
+        62683588.0,
+        42683590.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "2011-12/_/plot_inputs.parquet",
+    "kind": "changed",
+    "before_shape": [
+      8538,
+      3
+    ],
+    "after_shape": [
+      8538,
+      3
+    ],
+    "before_hash": "baa8a5845f65fcbaba07a395b0bd4bbcd06937e48f895521b24c7392d29e53c9",
+    "after_hash": "4e7c42b0ea8bc1864850f4e08ed50627cc24e90f7256507fb9f73ff636ca00c3",
+    "before_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "after_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/assets.parquet",
+    "kind": "changed",
+    "before_shape": [
+      122978,
+      4
+    ],
+    "after_shape": [
+      122978,
+      4
+    ],
+    "before_hash": "afc1913dde0c67b47180896d44288f63cb4170828efe2c3f5ccfb076746acde0",
+    "after_hash": "02a731ee870a9d7bdabcd89d1bfcd70daa202e3bd05a1d2591d409d95bdcc5db",
+    "before_dtypes": {
+      "Age": "float64",
+      "Purchase Price": "float64",
+      "Quantity": "float64",
+      "Value": "float64"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "Purchase Price": "float64",
+      "Quantity": "float64",
+      "Value": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      9528,
+      5
+    ],
+    "after_shape": [
+      9528,
+      6
+    ],
+    "before_hash": "32b8744c80a3908be4148b66c1bc51e7e3721595a7448940ae566f0a459badb1",
+    "after_hash": "5236af7bf9eae237fba542ec04d43454c8855b366c5827e9cb66dcdfa4e66c95",
+    "before_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        524148.0,
+        294171.0
+      ],
+      "Quantity_sold": [
+        68682.0,
+        18830.0
+      ],
+      "Value_sold": [
+        127554630.0,
+        78485760.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/food_security.parquet",
+    "kind": "changed",
+    "before_shape": [
+      3617,
+      9
+    ],
+    "after_shape": [
+      3617,
+      9
+    ],
+    "before_hash": "a31fec50459291a4b504083fc454b95c2843158fe0f9501c52ee7adddf5f38a0",
+    "after_hash": "1c5c99a44d74cffdfa54979ffc2d084d65e12af73942c4f4624d2577031c7f80",
+    "before_dtypes": {
+      "AteLess": "boolean",
+      "FIES_score": "Int64",
+      "FewFoods": "boolean",
+      "HealthyDiet": "boolean",
+      "Hungry": "boolean",
+      "RanOut": "boolean",
+      "SkippedMeal": "boolean",
+      "WholeDay": "boolean",
+      "Worried": "boolean"
+    },
+    "after_dtypes": {
+      "AteLess": "boolean",
+      "FIES_score": "Int64",
+      "FewFoods": "boolean",
+      "HealthyDiet": "boolean",
+      "Hungry": "boolean",
+      "RanOut": "boolean",
+      "SkippedMeal": "boolean",
+      "WholeDay": "boolean",
+      "Worried": "boolean"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      26579,
+      4
+    ],
+    "after_shape": [
+      26579,
+      4
+    ],
+    "before_hash": "95d3b5c9728c1ac2407a87655d138d66a610c2ca0fbabdeb78984afc05f79ab4",
+    "after_hash": "3742416a9bfd57413cb9c5bc59b97b661787c0689f074db3d7bddd48bbb035a9",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/housing.parquet",
+    "kind": "changed",
+    "before_shape": [
+      3617,
+      2
+    ],
+    "after_shape": [
+      3617,
+      2
+    ],
+    "before_hash": "86ab0a82c1da5465529fb26a4fd439b24b843dcc161f0cf8bb4f82a99daad77c",
+    "after_hash": "5a0c4c1379cebae46520cad3d5db1528d1e1a9d6ec98a6cc6437d5075cfbd26b",
+    "before_dtypes": {
+      "Floor": "str",
+      "Roof": "str"
+    },
+    "after_dtypes": {
+      "Floor": "str",
+      "Roof": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/individual_education.parquet",
+    "kind": "changed",
+    "before_shape": [
+      26579,
+      1
+    ],
+    "after_shape": [
+      26579,
+      1
+    ],
+    "before_hash": "ccfb171a3c2c146fbfd214045b738fa70d034ce14d945419c3fe17763996c483",
+    "after_hash": "b41a003122d2f68f69a5a4b8f447e8337abc74724e469f2fc56d583cea2ea3b2",
+    "before_dtypes": {
+      "Educational Attainment": "str"
+    },
+    "after_dtypes": {
+      "Educational Attainment": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/livestock.parquet",
+    "kind": "changed",
+    "before_shape": [
+      4998,
+      3
+    ],
+    "after_shape": [
+      5018,
+      3
+    ],
+    "before_hash": "1d8a8d5e900482b57222ef3692273fa8f7ea6da63b39bc85acc749a969571790",
+    "after_hash": "5f50ba06f78c46aeb26f9a355a9110a8b1ef74ce8893ffa5b05bd3bbbd1fc76f",
+    "before_dtypes": {
+      "HeadAcquired": "Float64",
+      "HeadCount": "Float64",
+      "HeadSold": "Float64"
+    },
+    "after_dtypes": {
+      "HeadAcquired": "Float64",
+      "HeadCount": "Float64",
+      "HeadSold": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/people_last7days.parquet",
+    "kind": "changed",
+    "before_shape": [
+      26369,
+      8
+    ],
+    "after_shape": [
+      26579,
+      8
+    ],
+    "before_hash": "e950c8ae0916ccf4b32447138dec64c178f011caa4a044d598b2f6ee49978cf6",
+    "after_hash": "c3dec0d50c1cdc742814869e0d24a67659429bf57b663cc1f48c85200f94109e",
+    "before_dtypes": {
+      "Industry": "string",
+      "SB_hrs": "Float64",
+      "SOB_work": "boolean",
+      "farm_hrs": "Float64",
+      "farm_work": "boolean",
+      "wage_hrs": "Float64",
+      "wage_work": "boolean",
+      "working_age": "boolean"
+    },
+    "after_dtypes": {
+      "Industry": "string",
+      "SB_hrs": "Float64",
+      "SOB_work": "boolean",
+      "farm_hrs": "Float64",
+      "farm_work": "boolean",
+      "wage_hrs": "Float64",
+      "wage_work": "boolean",
+      "working_age": "boolean"
+    },
+    "numeric_sum_changes": {
+      "farm_hrs": [
+        115252.59615384616,
+        115916.88461538462
+      ],
+      "SB_hrs": [
+        27731.192307692305,
+        28164.115384615383
+      ],
+      "wage_hrs": [
+        78532.90384615384,
+        79580.09615384616
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/plot_inputs.parquet",
+    "kind": "changed",
+    "before_shape": [
+      8179,
+      3
+    ],
+    "after_shape": [
+      8179,
+      3
+    ],
+    "before_hash": "246e1db4c5d83abccb7c530ab9df7a99e3936de5c57d0d78033b78db0cfc6b37",
+    "after_hash": "b6106582dc62e03c8d7b95e2110a53f4ae7ffec53094138f969a1e11657d6932",
+    "before_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "after_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/plot_labor.parquet",
+    "kind": "changed",
+    "before_shape": [
+      15803,
+      2
+    ],
+    "after_shape": [
+      15935,
+      2
+    ],
+    "before_hash": "ab4693bfdcd20b6a0ea4df95b3f9b842e7a535ce794100447ee3ecd8467ccfde",
+    "after_hash": "3d3c91e2fcb06e95e25ff94c4614c0e6def61fef203496ff6451f3651219acba",
+    "before_dtypes": {
+      "PersonDays": "Float64",
+      "Wage": "Float64"
+    },
+    "after_dtypes": {
+      "PersonDays": "Float64",
+      "Wage": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/sample.parquet",
+    "kind": "changed",
+    "before_shape": [
+      3617,
+      4
+    ],
+    "after_shape": [
+      3617,
+      4
+    ],
+    "before_hash": "502d373ee7f4008ce04730a97c46d29d7a178f6fafd6be4798cb8e077f8c549f",
+    "after_hash": "73d8b796a71624ea30f982cb627552cd52c9db5f160ebc88eb725115fc4ccdff",
+    "before_dtypes": {
+      "Rural": "str",
+      "panel_weight": "float64",
+      "v": "int16",
+      "weight": "float64"
+    },
+    "after_dtypes": {
+      "Rural": "str",
+      "panel_weight": "float64",
+      "v": "int16",
+      "weight": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2014-15/_/shocks.parquet",
+    "kind": "changed",
+    "before_shape": [
+      72340,
+      7
+    ],
+    "after_shape": [
+      72340,
+      7
+    ],
+    "before_hash": "9b865cd3b50c2ece6d1f12cda26afd59a35a0043bff9a6910681e76df6cd5b2d",
+    "after_hash": "15a4c37ee1aa067317b6c0e3bf4859d87be0de58cd56c4635bbac4a3289a6f5d",
+    "before_dtypes": {
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string"
+    },
+    "after_dtypes": {
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2018-19/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      13719,
+      5
+    ],
+    "after_shape": [
+      13719,
+      6
+    ],
+    "before_hash": "42c217a84651c9e242116bfcc26567bc2520910487cc107ed07bd63d7b7312ae",
+    "after_hash": "c829fa4ed943248a4d316e08f5f593aff8d83d4b4d9a72f50880085778e3a26f",
+    "before_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2018-19/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      35406,
+      4
+    ],
+    "after_shape": [
+      35406,
+      4
+    ],
+    "before_hash": "43e4d726db4495441773496537671917676e8dc82c7a148015f5d2e5aaa30dc4",
+    "after_hash": "8a42728ad9c4e607a6a2b5d0f1bf66c7eba4c42e01478ddcebe58cc8133eb510",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2021-22/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      12933,
+      5
+    ],
+    "after_shape": [
+      12933,
+      6
+    ],
+    "before_hash": "feb3cc72b0a8c8f3c74bab0ade60dd98cb7805e90408a6ead6aa6b04beb862cf",
+    "after_hash": "88ffbd0764f814225ad69f0d98172228406260f2c307050ee1446132f1e6452e",
+    "before_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity_sold": [
+        48515.0,
+        36975.0
+      ],
+      "Value_sold": [
+        93333970.0,
+        78934620.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "2021-22/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      131549,
+      3
+    ],
+    "after_shape": [
+      131549,
+      3
+    ],
+    "before_hash": "5c015044015d262e1cd14af12e72365b66ac21015deb8bafdb0e2e7d37760cbf",
+    "after_hash": "ea142797decf3b5c3789ef64141b8d06b0b7679d73a45878e69b01139a45169b",
+    "before_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2021-22/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      44080,
+      4
+    ],
+    "after_shape": [
+      44080,
+      4
+    ],
+    "before_hash": "da07dadd11d1080b8c14a17e1d024c87f0374715f342e053b822aa628f7123ad",
+    "after_hash": "2ba30641af49d3e7b9d6a0c85a03fe6930e5d3a936d65b67e22d992a9f883f8d",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "str",
+      "Sex": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "2021-22/_/plot_inputs.parquet",
+    "kind": "changed",
+    "before_shape": [
+      12439,
+      3
+    ],
+    "after_shape": [
+      12439,
+      3
+    ],
+    "before_hash": "ad9fdffbfb3e0240fd0e165c6f8a6aeb73c0ad2dc50858706659ff441b091588",
+    "after_hash": "693359aa4dd2f1fcaa2f1cab66452fea4b1966f058b1b9de9ab1901ea2d76c7e",
+    "before_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "after_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        132546.89,
+        122547.89
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/assets.parquet",
+    "kind": "changed",
+    "before_shape": [
+      824619,
+      4
+    ],
+    "after_shape": [
+      826625,
+      4
+    ],
+    "before_hash": "a24ce6c0a6a66d095a5ace65f2be7009b80e5e8a8cbc3daba31cb42e2a9db139",
+    "after_hash": "11829e2880bb5e010d8bebe60518bb4f6cff1952601baeca6f0d5dcce7061254",
+    "before_dtypes": {
+      "Age": "float64",
+      "Purchase Price": "float64",
+      "Quantity": "float64",
+      "Value": "float64"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "Purchase Price": "float64",
+      "Quantity": "float64",
+      "Value": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        164289.0,
+        164640.0
+      ],
+      "Age": [
+        512262.0,
+        512717.0
+      ],
+      "Purchase Price": [
+        36399163378.0,
+        36414524128.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      47077,
+      5
+    ],
+    "after_shape": [
+      47123,
+      6
+    ],
+    "before_hash": "f989e1b2b7d65d6d2afbbaa44f713b499e2c60ab0aa986ab6faae66b0fd4ba84",
+    "after_hash": "2a35b432bdc99d8e04647fd8792a57e6eb956425698af0ce7afe9dd4212b7efa",
+    "before_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Float64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        12628626.25,
+        1400302.25
+      ],
+      "Quantity_sold": [
+        3318168.0999999996,
+        263524.1
+      ],
+      "Value_sold": [
+        521752573.0,
+        446503155.0
+      ],
+      "harvest_month": [
+        87710.0,
+        88170.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      239882,
+      3
+    ],
+    "after_shape": [
+      239877,
+      3
+    ],
+    "before_hash": "993f485216be16f222eb2ab7a22067526b98c49fff2dee4f6a6e72bbedc27a4b",
+    "after_hash": "acf02b11819275d9846531f58c456e1a756ef1b4e2cc02a90d5e44fafc64a275",
+    "before_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Derivation": "string",
+      "Expenditure": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        929591.9193182469,
+        929591.9193182468
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/food_security.parquet",
+    "kind": "changed",
+    "before_shape": [
+      16204,
+      9
+    ],
+    "after_shape": [
+      16263,
+      9
+    ],
+    "before_hash": "9638bb811947e252c36725d380eea053119dc51ea6a1dae97b169bd9ed892dda",
+    "after_hash": "cf847e87df555bd97bbda0e52e0564147c6752dedd4745225b1711c1b7a3905c",
+    "before_dtypes": {
+      "AteLess": "boolean",
+      "FIES_score": "Int64",
+      "FewFoods": "boolean",
+      "HealthyDiet": "boolean",
+      "Hungry": "boolean",
+      "RanOut": "boolean",
+      "SkippedMeal": "boolean",
+      "WholeDay": "boolean",
+      "Worried": "boolean"
+    },
+    "after_dtypes": {
+      "AteLess": "boolean",
+      "FIES_score": "Int64",
+      "FewFoods": "boolean",
+      "HealthyDiet": "boolean",
+      "Hungry": "boolean",
+      "RanOut": "boolean",
+      "SkippedMeal": "boolean",
+      "WholeDay": "boolean",
+      "Worried": "boolean"
+    },
+    "numeric_sum_changes": {
+      "FIES_score": [
+        50249.0,
+        50388.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      130980,
+      4
+    ],
+    "after_shape": [
+      131190,
+      4
+    ],
+    "before_hash": "0dfe3248d857261f4f9a1ae5b38abe255554ca34492cf88518df4d7a8ba924ed",
+    "after_hash": "69cbded4ac13eea48670c52ad49461cff358fc66552086e88b2c226adaabe2ec",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "float64",
+      "Relationship": "string",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {
+      "Age": [
+        2494028.09,
+        2497322.09
+      ],
+      "MonthsSpent": [
+        1415536.0,
+        1417412.0
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/housing.parquet",
+    "kind": "changed",
+    "before_shape": [
+      20172,
+      2
+    ],
+    "after_shape": [
+      20231,
+      2
+    ],
+    "before_hash": "4ef3c7d1de032dd67da9c173d3a0bf4aa6559cbe55ed8986fcb9cac1deadcc00",
+    "after_hash": "dcd0c6ff2ad3ee982a596d6a31abf1fa10473b0b8829ada4a150076911226e4c",
+    "before_dtypes": {
+      "Floor": "str",
+      "Roof": "str"
+    },
+    "after_dtypes": {
+      "Floor": "str",
+      "Roof": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "var/individual_education.parquet",
+    "kind": "changed",
+    "before_shape": [
+      125653,
+      1
+    ],
+    "after_shape": [
+      125863,
+      1
+    ],
+    "before_hash": "5e66f4b3f2e6c5ca3c8eb71d92beb437bf717f63567e7bc045803485bfa350c9",
+    "after_hash": "d294c6571bd44f967fe95ef9b33ac022e9b7305e515b760dcc0f6bcc14830a8a",
+    "before_dtypes": {
+      "Educational Attainment": "str"
+    },
+    "after_dtypes": {
+      "Educational Attainment": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "var/livestock.parquet",
+    "kind": "changed",
+    "before_shape": [
+      30210,
+      3
+    ],
+    "after_shape": [
+      30230,
+      3
+    ],
+    "before_hash": "19a0c46c6ad91c3639ba652faa78db040ceb3211afe64d159abff2887bb73658",
+    "after_hash": "e63d7bc4b62debb993d9e2db3907c158812701007798a43702a88d0d209a2851",
+    "before_dtypes": {
+      "HeadAcquired": "Float64",
+      "HeadCount": "Float64",
+      "HeadSold": "Float64"
+    },
+    "after_dtypes": {
+      "HeadAcquired": "Float64",
+      "HeadCount": "Float64",
+      "HeadSold": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "var/people_last7days.parquet",
+    "kind": "changed",
+    "before_shape": [
+      131220,
+      8
+    ],
+    "after_shape": [
+      131430,
+      8
+    ],
+    "before_hash": "c6712457b0e5a7a3bd17a29f61f4e18e44c98c58e06d250bd30c35644eeca40c",
+    "after_hash": "304be658847365f06e69087dece03c814ab80825a4ab4f28c7dc75707653de11",
+    "before_dtypes": {
+      "Industry": "string",
+      "SB_hrs": "Float64",
+      "SOB_work": "boolean",
+      "farm_hrs": "Float64",
+      "farm_work": "boolean",
+      "wage_hrs": "Float64",
+      "wage_work": "boolean",
+      "working_age": "boolean"
+    },
+    "after_dtypes": {
+      "Industry": "string",
+      "SB_hrs": "Float64",
+      "SOB_work": "boolean",
+      "farm_hrs": "Float64",
+      "farm_work": "boolean",
+      "wage_hrs": "Float64",
+      "wage_work": "boolean",
+      "working_age": "boolean"
+    },
+    "numeric_sum_changes": {
+      "farm_hrs": [
+        273879.9294871795,
+        274544.21794871794
+      ],
+      "SB_hrs": [
+        79683.02564102564,
+        80115.94871794872
+      ],
+      "wage_hrs": [
+        196430.40384615384,
+        197477.59615384616
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/plot_inputs.parquet",
+    "kind": "changed",
+    "before_shape": [
+      42367,
+      3
+    ],
+    "after_shape": [
+      42430,
+      3
+    ],
+    "before_hash": "14b4993a9d802e5faf7768466f03840a3d9cf20b4e88db4d080c3e41325aac41",
+    "after_hash": "8f8c104e5ab955077c02e5901f099f0c0061cc3e4235850f45a9a1b5d7a14a36",
+    "before_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "after_dtypes": {
+      "Purchased": "boolean",
+      "Quantity": "Float64",
+      "Quantity_purchased": "Float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        504784.55,
+        495498.55000000005
+      ],
+      "Quantity_purchased": [
+        112170.3,
+        112411.3
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/plot_labor.parquet",
+    "kind": "changed",
+    "before_shape": [
+      52909,
+      2
+    ],
+    "after_shape": [
+      53041,
+      2
+    ],
+    "before_hash": "c964da0e8ff828528c7a607ee122878c6eec7b4ec925c827ca734b7985df9c8c",
+    "after_hash": "5294d9cf91105412c93b965f3f99a69deb477b988dec376caab2ceef622d82b0",
+    "before_dtypes": {
+      "PersonDays": "Float64",
+      "Wage": "Float64"
+    },
+    "after_dtypes": {
+      "PersonDays": "Float64",
+      "Wage": "Float64"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Niger",
+    "path": "var/sample.parquet",
+    "kind": "changed",
+    "before_shape": [
+      20172,
+      5
+    ],
+    "after_shape": [
+      20231,
+      5
+    ],
+    "before_hash": "01e20d62571694726446cdccbb07c9518abee52fdc512bc4148fef32dbd1bbfe",
+    "after_hash": "4300fb2b0f246d5ad803dd04e5552ab1cbec7706f2d3ff88dd2e51b7a8ecc5f8",
+    "before_dtypes": {
+      "Rural": "str",
+      "panel_weight": "float64",
+      "strata": "string",
+      "v": "string",
+      "weight": "float64"
+    },
+    "after_dtypes": {
+      "Rural": "str",
+      "panel_weight": "float64",
+      "strata": "string",
+      "v": "string",
+      "weight": "float64"
+    },
+    "numeric_sum_changes": {
+      "weight": [
+        13039726.43066883,
+        13065784.114720345
+      ],
+      "panel_weight": [
+        13039726.43066883,
+        13065784.114720345
+      ]
+    }
+  },
+  {
+    "country": "Niger",
+    "path": "var/shocks.parquet",
+    "kind": "changed",
+    "before_shape": [
+      424764,
+      7
+    ],
+    "after_shape": [
+      425944,
+      7
+    ],
+    "before_hash": "215e4075a76f021cd4be44dc9991987a6f6ae51f5f0bb0d5b1c3d901a1b9a7c9",
+    "after_hash": "4af96ddd5b6288c8d9426ef3047a6a84b8e78c03f0ccb3209c8b02a0d25e61f1",
+    "before_dtypes": {
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string"
+    },
+    "after_dtypes": {
+      "AffectedAssets": "string",
+      "AffectedConsumption": "string",
+      "AffectedIncome": "string",
+      "AffectedProduction": "string",
+      "HowCoped0": "string",
+      "HowCoped1": "string",
+      "HowCoped2": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Nigeria",
+    "path": "2023Q3/_/cluster_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Nigeria",
+    "path": "2024Q1/_/cluster_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Nigeria",
+    "path": "var/cluster_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      5248,
+      5
+    ],
+    "after_shape": [
+      7070,
+      5
+    ],
+    "before_hash": "ba87de8420f492e3b4eb73cacf608e0067559b66c59d36a92e53b77eed990654",
+    "after_hash": "89ece3722e922ed8068d071272bb434af2c03794820c51f02ba22afc97747720",
+    "before_dtypes": {
+      "District": "string",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "string",
+      "Rural": "str"
+    },
+    "after_dtypes": {
+      "District": "string",
+      "Latitude": "float64",
+      "Longitude": "float64",
+      "Region": "string",
+      "Rural": "str"
+    },
+    "numeric_sum_changes": {
+      "Latitude": [
+        41711.79378304473,
+        41711.79378304474
+      ]
+    }
+  },
+  {
+    "country": "Nigeria",
+    "path": "var/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      62844,
+      9
+    ],
+    "after_shape": [
+      62844,
+      10
+    ],
+    "before_hash": "d6285b42d0fcf98a7066a596f91ec20b770e8a43c205f64031b6f3dd2a131340",
+    "after_hash": "03341571f2f30f08822f5dbeca98016179fea259146466ffa3097280e8a4f239",
+    "before_dtypes": {
+      "KgFactor": "float64",
+      "Quantity": "float64",
+      "Quantity_sold": "string",
+      "Value_sold": "string",
+      "harvest_month": "string",
+      "intercropped": "string",
+      "perennial": "bool",
+      "planting_month": "string",
+      "u": "string"
+    },
+    "after_dtypes": {
+      "KgFactor": "float64",
+      "Quantity": "float64",
+      "Quantity_sold": "string",
+      "Unit_sold": "string",
+      "Value_sold": "string",
+      "harvest_month": "string",
+      "intercropped": "string",
+      "perennial": "bool",
+      "planting_month": "string",
+      "u": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Panama",
+    "path": "1997/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      156154,
+      3
+    ],
+    "after_shape": [
+      155742,
+      3
+    ],
+    "before_hash": "a28871e74ccab51e835ff0691c692d003eed09fe12b33da196dcde8bdc48566a",
+    "after_hash": "140a981f095bf4655babcfa1cf2d3d74b45e03e3a6664fde311240379e5917bb",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        1114102.08,
+        1021494.28
+      ],
+      "Expenditure": [
+        356079.56,
+        356079.56000000006
+      ],
+      "Price": [
+        103721.95469146641,
+        97793.35105510277
+      ]
+    }
+  },
+  {
+    "country": "Panama",
+    "path": "var/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      571354,
+      3
+    ],
+    "after_shape": [
+      570942,
+      3
+    ],
+    "before_hash": "a31a8c4c1f97470639f7c6157fa8b14ef7378456bccc30c88a20bc8c54a46836",
+    "after_hash": "181b43fe1ddf2ed3962b238bc9d126f0159ee717b76402e34d6a6de24064aa59",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        97920665.66695598,
+        97828057.86695598
+      ],
+      "Price": [
+        316933.8597278006,
+        311005.256091437
+      ]
+    }
+  },
+  {
+    "country": "Peru",
+    "path": "1994/_/cluster_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      364,
+      2
+    ],
+    "after_shape": [
+      364,
+      2
+    ],
+    "before_hash": "26f84889db05be8e072a2fc0da19507b2ce2e1e6f8c9d3b87081c8be4acb62b8",
+    "after_hash": "316bdf20b405e4a2bc425ac6e1bf584cd4c40d21b48aa8af94cfef07f023d5e7",
+    "before_dtypes": {
+      "Region": "str",
+      "Rural": "str"
+    },
+    "after_dtypes": {
+      "Region": "str",
+      "Rural": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Peru",
+    "path": "1994/_/sample.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Peru",
+    "path": "var/cluster_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      364,
+      2
+    ],
+    "after_shape": [
+      364,
+      2
+    ],
+    "before_hash": "26f84889db05be8e072a2fc0da19507b2ce2e1e6f8c9d3b87081c8be4acb62b8",
+    "after_hash": "316bdf20b405e4a2bc425ac6e1bf584cd4c40d21b48aa8af94cfef07f023d5e7",
+    "before_dtypes": {
+      "Region": "str",
+      "Rural": "str"
+    },
+    "after_dtypes": {
+      "Region": "str",
+      "Rural": "str"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Peru",
+    "path": "var/sample.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Tajikistan",
+    "path": "var/plot_features.parquet",
+    "kind": "changed",
+    "before_shape": [
+      3974,
+      6
+    ],
+    "after_shape": [
+      3974,
+      6
+    ],
+    "before_hash": "4169e9e5f981d7b3d47792d6960477aba54245e7d98222a4b53b0a3ca65a1a83",
+    "after_hash": "bb1d0cee59aef2fdf5302040c5f5c1c8f390b43ab3672ee1e2a0e1f5bd734779",
+    "before_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str",
+      "Irrigated": "boolean",
+      "SoilType": "str",
+      "Tenure": "str",
+      "TenureSystem": "string"
+    },
+    "after_dtypes": {
+      "Area": "float64",
+      "AreaUnit": "str",
+      "Irrigated": "boolean",
+      "SoilType": "str",
+      "Tenure": "str",
+      "TenureSystem": "string"
+    },
+    "numeric_sum_changes": {
+      "Area": [
+        88238.0,
+        882.38
+      ]
+    }
+  },
+  {
+    "country": "Togo",
+    "path": "2018/_/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      27480,
+      4
+    ],
+    "after_shape": [
+      27480,
+      4
+    ],
+    "before_hash": "7f390ff9327d5def85aab0fad64694cb87c8af36fff63589ccb7c3e7326aff9f",
+    "after_hash": "73684e8580bfbc1fed33b374cf400a3d8ab81cbced6e9c3e169eb0ed35872933",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Togo",
+    "path": "var/household_roster.parquet",
+    "kind": "changed",
+    "before_shape": [
+      27480,
+      4
+    ],
+    "after_shape": [
+      27480,
+      4
+    ],
+    "before_hash": "615bf2d54d7aa6681d6664495dbf50a0d6f068657f8be1a75058bac9751e14d3",
+    "after_hash": "6a92e84e0713e8553c5f6879f7901af3e4b25ca4a45e8422c7918cdc3665cd6b",
+    "before_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "string"
+    },
+    "after_dtypes": {
+      "Age": "float64",
+      "MonthsSpent": "int64",
+      "Relationship": "str",
+      "Sex": "string"
+    },
+    "numeric_sum_changes": {}
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/food_acquired.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2005-06/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/food_acquired.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2009-10/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/food_acquired.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2010-11/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/food_acquired.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2011-12/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      50703,
+      3
+    ],
+    "after_shape": [
+      50703,
+      3
+    ],
+    "before_hash": "203f442b1c79c95326016709a91745878625d988cca732c1f568a6b4f076883b",
+    "after_hash": "ae1340b71d99d1e2f12577da0c2bff5359266aefc8e92130cdf9f9e4eba47058",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        173736.40633655575,
+        12941999.406336557
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2013-14/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      50108,
+      3
+    ],
+    "after_shape": [
+      50108,
+      3
+    ],
+    "before_hash": "24ab0e7290307e096f2c94dd1eb42030f22d2d5e3627e32881933edfcf731ebc",
+    "after_hash": "8d6d41eecada97b359c2eb299ec027b02825902fa525f6aa91d9898ffb88a01d",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        160182.1170034483,
+        13264781.117003448
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2015-16/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      14194,
+      8
+    ],
+    "after_shape": [
+      15616,
+      8
+    ],
+    "before_hash": "c10b874d05813057b31cabed86374a4f5daeaf08127e68371528a2dbfba10f94",
+    "after_hash": "7907f2916f5f23ed76a255145ceb4e1679e8cb4bb9d8fd6a101bf1e231dec414",
+    "before_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        1180031.6700000002,
+        1251490.92
+      ],
+      "Quantity_sold": [
+        1689027.7999999998,
+        1724132.85
+      ],
+      "Value_sold": [
+        1829539922.0,
+        1908719587.0
+      ],
+      "harvest_month": [
+        116269.0,
+        125548.0
+      ],
+      "KgFactor": [
+        958552.32,
+        1012549.07
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      53288,
+      3
+    ],
+    "after_shape": [
+      53288,
+      3
+    ],
+    "before_hash": "3daa0829974d300e9c84f9eb2aac2fcac34337c1e427236da1b30d07854c88b1",
+    "after_hash": "a625ea4f6673a456438a3ee11a70f9ebc90bac2fe56500b1c87e463d7b076101",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        184212.27,
+        12586912.27
+      ],
+      "Price": [
+        91044484.92857143,
+        91036484.92857143
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2018-19/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      15721,
+      8
+    ],
+    "after_shape": [
+      17024,
+      8
+    ],
+    "before_hash": "037b66838ec499719c58a669af7bad0b298071cf6808e3a23575f199f0c7a0cd",
+    "after_hash": "348aa6dc9a494bf51afb4d3efeac92b8d493fbc89f1700dea04c1773c5f42fc1",
+    "before_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        1175600.8,
+        1229781.9
+      ],
+      "Quantity_sold": [
+        968350.89,
+        996447.14
+      ],
+      "Value_sold": [
+        2213354309.0,
+        2304975848.0
+      ],
+      "harvest_month": [
+        132051.0,
+        140699.0
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      48144,
+      3
+    ],
+    "after_shape": [
+      48144,
+      3
+    ],
+    "before_hash": "c0072df2f036f41446f1a1e452657f9053f6fd29e700a3592807df2c7ff2691a",
+    "after_hash": "687ed720fc7a63dcc8ec410bb1aea55914eeac5dc4aa6bdb119d90c5e0590ae5",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        184622.88999999998,
+        13958524.89
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "2019-20/_/plot_labor.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/anthropometry.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/assets.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/crop_production.parquet",
+    "kind": "changed",
+    "before_shape": [
+      130606,
+      8
+    ],
+    "after_shape": [
+      133331,
+      8
+    ],
+    "before_hash": "0dfcea6ff8b0e96ce94037bf80cc2f3056c2948b7a42501e23969485efcfb6e6",
+    "after_hash": "f264d3f96a41480de3e95f1ea249606548c1046ada7eb44031b043a71af7f165",
+    "before_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "after_dtypes": {
+      "Condition_sold": "string",
+      "KgFactor": "Float64",
+      "Quantity": "Float64",
+      "Quantity_sold": "Float64",
+      "Unit_sold": "string",
+      "Value_sold": "Float64",
+      "harvest_month": "Int64",
+      "intercropped": "boolean"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        7309085.96000226,
+        7434726.310002261
+      ],
+      "Quantity_sold": [
+        18134251.40000188,
+        18197452.70000189
+      ],
+      "Value_sold": [
+        10709007434.04,
+        10879808638.04
+      ],
+      "harvest_month": [
+        556025.0,
+        573952.0
+      ],
+      "KgFactor": [
+        958552.32,
+        1012549.07
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "var/earnings.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/enterprise_income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/fct.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/food_acquired.parquet",
+    "kind": "changed",
+    "before_shape": [
+      355571,
+      3
+    ],
+    "after_shape": [
+      355571,
+      3
+    ],
+    "before_hash": "48c64d990d05afdaca6b2aa8bb188738dd50729d277c2e2cea257bac6146b900",
+    "after_hash": "0773d920072e366218cc7b2e193ec0aea03e0830529ee4f2618a90df6260f5f3",
+    "before_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "after_dtypes": {
+      "Expenditure": "float64",
+      "Price": "float64",
+      "Quantity": "float64"
+    },
+    "numeric_sum_changes": {
+      "Quantity": [
+        1329194.0293070392,
+        89190245.02930704
+      ],
+      "Price": [
+        526383603.71362925,
+        526293903.71362925
+      ]
+    }
+  },
+  {
+    "country": "Uganda",
+    "path": "var/income.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/individual_education.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/interview_date.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/livestock.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/months_food_inadequate.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/nutrition.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/plot_features.parquet",
+    "kind": "new"
+  },
+  {
+    "country": "Uganda",
+    "path": "var/plot_labor.parquet",
+    "kind": "new"
+  }
+]

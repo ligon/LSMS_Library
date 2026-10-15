@@ -1,0 +1,11 @@
+{
+  "private_path": "/local/job39919092/release-work/control/countries/corpus-review/issue-search.json",
+  "bytes": 291989,
+  "sha256": "1733638eeea0765377eb52f120267242ebd77578b940529d07fabb3d95af31d4",
+  "related_issues": [
+    907,
+    218,
+    246
+  ],
+  "interpretation": "Related issues do not own these three test-file defects; exact search results retained privately."
+}

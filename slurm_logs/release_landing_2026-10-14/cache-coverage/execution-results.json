@@ -1,0 +1,30 @@
+[
+  {
+    "group": "structural",
+    "source_sha": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+    "exit_code": 0,
+    "seconds": 127.02056670188904,
+    "log": "/local/job39919092/release-work/logs/cache-coverage/structural.log"
+  },
+  {
+    "group": "ordinary",
+    "source_sha": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+    "exit_code": 0,
+    "seconds": 28.62776255607605,
+    "log": "/local/job39919092/release-work/logs/cache-coverage/ordinary.log"
+  },
+  {
+    "group": "uganda_baseline",
+    "source_sha": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+    "exit_code": 1,
+    "seconds": 8.186214208602905,
+    "log": "/local/job39919092/release-work/logs/cache-coverage/uganda_baseline.log"
+  },
+  {
+    "group": "mutating",
+    "source_sha": "4f1f044bb9b3079e7f427898f77627ad1503ec5e",
+    "exit_code": 0,
+    "seconds": 331.62274956703186,
+    "log": "/local/job39919092/release-work/logs/cache-coverage/mutating.log"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "base": "33189b532c10db913cb7968ead42d0dc6d108bd4",
+  "tracked_diff_sha256": "68f924ba984d47a20f9f28a48ef5b1c3d34b39ba31a3ab83d00bd284657d541b",
+  "reviewed_files_sha256": {
+    "docs/releases/v0.15.0.md": "3fd611c7c8869d6edcd95f5b8d8040b17ac247cc4770dd376ceaf21a9f616c5d",
+    ".sucoder/handoff.org": "a2386b85478c2b83b13f8d63b68ec9909b3b23820d7822bed8b1b40f805a9f36",
+    "slurm_logs/release_landing_2026-10-14/WORKPLAN.org": "864ded9312e468391751cceb723122b9dc63d72639af52497fe9c2b29b239975",
+    "slurm_logs/release_landing_2026-10-14/EXECUTION.org": "a2441bdb36eb5e2f8d7cd8aebec600259cc065a210bdd20dbd8b6d67526f1adc",
+    "slurm_logs/release_landing_2026-10-14/cache-coverage.org": "d5db9a6eb51c7b1f02199c22ee971d1db6ff973ff88ae06d68f53fa4934815ee",
+    "lsms_library/countries/Nepal/_/CONTENTS.org": "3d6551358e74fdabe0ec02361e7b676e1aa8c01260117ddaa4904d5bf6f62640",
+    "lsms_library/countries/Pakistan/_/CONTENTS.org": "745a7165f31cc0f4170ccdeed44cc95cd578cebfb264145cad8a592c40f2cb9a",
+    "lsms_library/countries/Tajikistan/_/CONTENTS.org": "bf364e74a8f0ce79baab616c6a61b21a7a434e4c1c098cb2b9c7317b034521d9",
+    "lsms_library/countries/Uganda/_/CONTENTS.org": "0bb220cb90fb590bc1dd32ec5868f129ec3d9743f50f64a49aa56d51c561a176"
+  },
+  "workplan_correction_verified": true
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "path": "2005-06/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      40749,
+      3
+    ],
+    "fresh_content_hash": "b0d599bd640831db93b7830b3a11e009204020e72c8ec8462a8611e3996827a6"
+  },
+  {
+    "path": "2009-10/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      38107,
+      3
+    ],
+    "fresh_content_hash": "02578d8a11ce2dfa123f8e157d5de69f3d7c7c95ea9680212c4ac6414d95ebf4"
+  },
+  {
+    "path": "2010-11/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      35489,
+      3
+    ],
+    "fresh_content_hash": "9e41138989a57ea5cef7005fffdeabc140e2fe3d8e38f778bc86e87dc440d022"
+  },
+  {
+    "path": "2011-12/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      38983,
+      3
+    ],
+    "fresh_content_hash": "b82e51a0b9cdf402bdc50139e96ee6ba8927d8f1d11ef3527d1bffc5832f67a3"
+  },
+  {
+    "path": "2013-14/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      50703,
+      3
+    ],
+    "fresh_content_hash": "ae1340b71d99d1e2f12577da0c2bff5359266aefc8e92130cdf9f9e4eba47058"
+  },
+  {
+    "path": "2015-16/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      50108,
+      3
+    ],
+    "fresh_content_hash": "8d6d41eecada97b359c2eb299ec027b02825902fa525f6aa91d9898ffb88a01d"
+  },
+  {
+    "path": "2018-19/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      53288,
+      3
+    ],
+    "fresh_content_hash": "a625ea4f6673a456438a3ee11a70f9ebc90bac2fe56500b1c87e463d7b076101"
+  },
+  {
+    "path": "2019-20/_/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      48144,
+      3
+    ],
+    "fresh_content_hash": "687ed720fc7a63dcc8ec410bb1aea55914eeac5dc4aa6bdb119d90c5e0590ae5"
+  },
+  {
+    "path": "var/fct.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      15,
+      113
+    ],
+    "fresh_content_hash": "db9f7ab890482e8c25ab4490c6bcded689adbaee5eb994c90bbc4f001ca07d4c"
+  },
+  {
+    "path": "var/food_acquired.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      355571,
+      3
+    ],
+    "fresh_content_hash": "0773d920072e366218cc7b2e193ec0aea03e0830529ee4f2618a90df6260f5f3"
+  },
+  {
+    "path": "var/nutrition.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      23777,
+      15
+    ],
+    "fresh_content_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a"
+  },
+  {
+    "path": "var/sample.parquet",
+    "equal": true,
+    "different_fields": [],
+    "fresh_shape": [
+      24362,
+      6
+    ],
+    "fresh_content_hash": "d68ae382effa904a33e9cb08b8d155890ba34cefb595f5ca7e7d1d40ce4faa52"
+  }
+]
