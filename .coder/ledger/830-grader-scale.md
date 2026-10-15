@@ -43,8 +43,31 @@ changes. Read-path only.
 | statistic | new (`monetary_scale_breaks`) | nothing cross-wave exists; per-item median-of-ratios with pooled fallback; floor 30; tolerance 5 (stated) |
 | exposure | extend `detail`, new `scale` finding in scan.py | mirrors `null_content` |
 
-## §6 Open questions for the human
-- Tolerance 5 and the "all comparable neighbours" rule leave a PERSISTENT break (A,B vs C,D) unreported — accept, or add a second statistic (ratio to the country's leave-one-out median) as a residual?
+## §6 Decisions and remaining work
+- The approved release workplan accepts tolerance 5 as a warning-only first
+  increment. Keep ISO-code boundaries and the support floor unchanged; neither
+  gap-aware/CPI adjustment nor persistent-break detection is implemented here.
+- The full independent verdict at
+  `slurm_logs/backlog_review_2026-10-14/verdicts/grader-scale-830.md` reports a
+  read-only sweep over 87 warm monetary country-tables: four records, all Ghana.
+  GhanaLSS community_prices Price 1998-99: 5.56x vs 1991-92 (per-item[108]);
+  GhanaLSS food_acquired Price 1991-92: 0.16x vs 1998-99 (per-item[45]);
+  GhanaSPS crop_production Value_sold 2009-10: 0.167x vs 2017-18 and 2017-18:
+  6.0x vs 2009-10 (both per-item[16]). These are four records across three
+  cells, not four defective tables. The reviewer attributes the GhanaLSS pair
+  to GHC-era inflation; the GhanaSPS pair remains unadjudicated. This is cited
+  review evidence, not a new census by the release worker.
+- GhanaSPS CONTENTS.org, "Sales: three instruments, three grains, one honest
+  asymmetry": 2009-10 revenue is season-specific A83/A124 (cedis + pesewas/100);
+  2013-14 sales are absent by design (no plotid); 2017-18 sums nine buyer
+  channels' quantity × unit price. The level difference is a triage candidate,
+  not proof of a unit defect.
+- Extend record diagnostics with `neighbour_forms`, preserving the existing
+  three-value neighbour tuples. `form` is the common form or `mixed`; both
+  detail consumers must print each neighbour's own form. Reuse `_pair_ratio`,
+  without changing its statistic (§5), tolerance, or tiers (§4).
+- Persistent breaks, unconfigured redenominations, community_prices grain,
+  gap-aware tolerance, item coverage and unit mislabels remain residual work.
 
 ---
 ### Phase 3 — verification
