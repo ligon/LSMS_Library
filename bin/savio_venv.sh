@@ -155,7 +155,13 @@ cmd_update() {
     mksquashfs "$master" "$tmp" -comp gzip -noappend -no-progress -no-xattrs >/dev/null \
         || { rm -f "$tmp"; die "mksquashfs failed"; }
     # Keep the outgoing image as the rollback: hardlink BEFORE the rename, so
-    # there is no window in which $img is absent.
+    # there is no window in which $img is absent.  ONE generation is kept, so
+    # the previous .prev is dropped -- say so, naming it.  (2026-10-17: the
+    # first run of this replaced the 2026-09-07 pre-#957 image without a word;
+    # it was the only copy.  Copy .prev aside first if it matters.)
+    if [ -f "$img.prev" ] && [ "$(stat -c %i "$img.prev")" != "$(stat -c %i "$img")" ]; then
+        echo ">> dropping the older rollback $img.prev ($(du -h "$img.prev" | cut -f1), $(stat -c %y "$img.prev" | cut -d. -f1))"
+    fi
     if [ -f "$img" ]; then ln -f "$img" "$img.prev" || die "could not keep $img.prev"; fi
     mv -f "$tmp" "$img"        # atomic swap; running mounts keep the old inode until remount
     echo ">> done: $(du -h "$img" | cut -f1)  $img  (generation $gen; rollback: $img.prev)"
