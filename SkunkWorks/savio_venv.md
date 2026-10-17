@@ -77,7 +77,12 @@ until they re-mount; **new** `mount` calls pick up the new image.
 `mount` prints the generation it mounted and `bin/savio_venv.sh status` shows
 both the image's and this job's mount's.  `VENV_GENERATION` records the UTC
 build time, host, the checkout and commit it was built from, and the sha256 of
-`poetry.lock` and of `pip freeze`.
+that checkout's `poetry.lock` and of the master's `pip freeze`.  The lock hash
+records which lock was *present*, not that the master was installed from it:
+`update [pip-args]` mutates the master with pip and never checks the result
+against the lock.  `pip_freeze_sha256` is the field that identifies the closure.
+(The first stamped image, `20261017T230017Z`, calls the field
+`poetry_lock_sha256`.)
 
 Rollback: `mv SHARE/.venv.sqfs.prev SHARE/.venv.sqfs` (then re-mount).
 

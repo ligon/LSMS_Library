@@ -145,7 +145,7 @@ cmd_update() {
         echo "generation: $gen"
         echo "built_on: $(hostname) by ${USER:-?}"
         echo "built_from_repo: $REPO @ $(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo '?')"
-        echo "poetry_lock_sha256: ${lock_sha:-none}"
+        echo "repo_poetry_lock_sha256: ${lock_sha:-none}   # the lock in the building checkout, NOT proof the master was installed from it"
         echo "pip_freeze_sha256: $freeze_sha"
     } > "$master/$GEN_FILE"
     local tmp="$img.tmp.$$"
