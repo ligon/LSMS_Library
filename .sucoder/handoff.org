@@ -16,7 +16,8 @@
 - Mirror's dangling =.venv= symlink removed; =.venv.lustre/README_WHY_THIS_EXISTS.md=
   bannered SUPERSEDED (untracked).  =.venv.lock= in the mirror is untracked until
   #1017 merges (gitignore entry is on the branch).
-- Open question for @ligon: one-slot =.prev= vs generation-named rollbacks.
+- @ligon chose generation-named rollbacks: every replaced image kept as
+  =.venv.sqfs.gen-<G>=; the 2026-09-22 image is =.venv.sqfs.gen-20260922T073356Z-unstamped=.
 
 * Current execution -- 2026-10-15 v0.15.0 published and verified
 All 23 implementation PRs and the final evidence PR #1015 are merged. Release

@@ -31,7 +31,8 @@ node-local footprint, and nothing to survive the reaper.
 |------|------|-------|-----------|
 | `SHARE/.venv.lustre/` | canonical **master** venv on Lustre | global | yes — via `update` only |
 | `SHARE/.venv.sqfs` | read-only **image** built from the master (~230 MB, 1 inode) | global | no |
-| `SHARE/.venv.sqfs.prev` | the image `update` replaced — the rollback | global | no |
+| `SHARE/.venv.sqfs.gen-<generation>` | every image `update` has replaced — the rollbacks | global | no |
+| `SHARE/.venv.sqfs.prev` | hardlink to the newest rollback | global | no |
 | `/local/jobNNN/venv_img` | this job's **mount** of the image | per job | no (read-only) |
 | `<clone>/.venv` → the mount | convenience symlink | **per clone** | — |
 
@@ -69,8 +70,8 @@ carrying an editable install, (3) verifies the master imports `lsms_library`
 from the checkout the script lives in (`PYTHONPATH`, `PYTHONSAFEPATH`), (4)
 rewrites console-script shebangs to the self-locating form (below), (5) stamps
 `VENV_GENERATION` into the master, (6) `mksquashfs … -no-xattrs` to a temp file,
-(7) hardlinks the outgoing image to `.venv.sqfs.prev` and atomically `mv`s the
-new one over `.venv.sqfs`. Jobs already running keep their old mount (old inode)
+(7) hardlinks the outgoing image to `.venv.sqfs.gen-<its generation>` (and
+`.venv.sqfs.prev`), then atomically `mv`s the new one over `.venv.sqfs`. Jobs already running keep their old mount (old inode)
 until they re-mount; **new** `mount` calls pick up the new image.
 
 **Two nodes can therefore run different generations at once**, legitimately.
@@ -84,7 +85,19 @@ against the lock.  `pip_freeze_sha256` is the field that identifies the closure.
 (The first stamped image, `20261017T230017Z`, calls the field
 `poetry_lock_sha256`.)
 
-Rollback: `mv SHARE/.venv.sqfs.prev SHARE/.venv.sqfs` (then re-mount).
+**Every replaced image is kept**, named by its generation (@ligon,
+2026-10-17).  The rollback used to be a single `.prev` slot, and the first run
+of the new `update` silently dropped the 2026-09-07 pre-#957 image, the only
+copy of that closure.  An image built before the stamp existed is named by its
+mtime with an `-unstamped` suffix (`.venv.sqfs.gen-20260922T073356Z-unstamped`
+is the closure v0.15.0 was validated under).  `update` refuses to overwrite an
+existing rollback that is a different file.  Each is ~240 MB and updates are
+rare, so nothing prunes them automatically: `bin/savio_venv.sh status` lists
+them; delete by hand once a generation is truly unwanted.
+
+Rollback: `ln -f SHARE/.venv.sqfs.gen-<G> SHARE/.venv.sqfs.new && mv -f
+SHARE/.venv.sqfs.new SHARE/.venv.sqfs` (atomic; then re-mount).  `.venv.sqfs.prev`
+names the newest rollback.
 
 > For a dependency change that must reach `pyproject.toml`/`poetry.lock`, edit
 > those and `poetry install` into the master as usual, then run

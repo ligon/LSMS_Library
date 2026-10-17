@@ -5,7 +5,8 @@
 #   SHARE/.venv.lustre/  canonical WRITABLE venv on Lustre (master; gitignored)
 #   SHARE/.venv.sqfs     read-only single-file image built from the master
 #                        (gitignored, ~230 MB, ONE Lustre inode instead of ~33k)
-#   SHARE/.venv.sqfs.prev  the previous image, kept as a rollback by `update`
+#   SHARE/.venv.sqfs.gen-<generation>  every image `update` has replaced (rollbacks)
+#   SHARE/.venv.sqfs.prev  hardlink to the newest of those
 #   REPO/.venv -> mount  per-CLONE symlink to this job's squashfuse mount
 #
 # Two locations, deliberately distinct (GH #958 defect 1):
@@ -34,6 +35,20 @@ SQUASHFUSE="/usr/libexec/apptainer/bin/squashfuse_ll"   # apptainer-bundled (fus
 GEN_FILE="VENV_GENERATION"                              # stamped inside the image
 
 die() { echo "savio_venv: $*" >&2; exit 1; }
+
+# Generation id of an image file: its stamped VENV_GENERATION, or -- for an
+# image built before the stamp existed -- its mtime in the same UTC format,
+# suffixed so it cannot be mistaken for a stamp.
+image_generation() {
+    local img="$1" t g=""
+    t="$(mktemp -d "${TMPDIR:-/tmp}/savio_venv.XXXXXX")"
+    if unsquashfs -f -d "$t/x" "$img" "$GEN_FILE" >/dev/null 2>&1 && [ -f "$t/x/$GEN_FILE" ]; then
+        g="$(sed -n 's/^generation: *//p' "$t/x/$GEN_FILE" | head -1)"
+    fi
+    rm -rf "$t"
+    [ -n "$g" ] || g="$(date -u -d "@$(stat -c %Y "$img")" +%Y%m%dT%H%M%SZ)-unstamped"
+    printf '%s\n' "$g"
+}
 
 resolve_share() {
     if [ -n "${LSMS_VENV_SHARE:-}" ]; then
@@ -154,17 +169,22 @@ cmd_update() {
     # venv needs no xattrs) -- otherwise mksquashfs warns once per file.
     mksquashfs "$master" "$tmp" -comp gzip -noappend -no-progress -no-xattrs >/dev/null \
         || { rm -f "$tmp"; die "mksquashfs failed"; }
-    # Keep the outgoing image as the rollback: hardlink BEFORE the rename, so
-    # there is no window in which $img is absent.  ONE generation is kept, so
-    # the previous .prev is dropped -- say so, naming it.  (2026-10-17: the
-    # first run of this replaced the 2026-09-07 pre-#957 image without a word;
-    # it was the only copy.  Copy .prev aside first if it matters.)
-    if [ -f "$img.prev" ] && [ "$(stat -c %i "$img.prev")" != "$(stat -c %i "$img")" ]; then
-        echo ">> dropping the older rollback $img.prev ($(du -h "$img.prev" | cut -f1), $(stat -c %y "$img.prev" | cut -d. -f1))"
+    # Keep EVERY outgoing image, named by its generation (@ligon, 2026-10-17):
+    # a one-slot .prev silently dropped the 2026-09-07 pre-#957 image, the only
+    # copy.  ~240 MB each and updates are rare; prune by hand (see `status`).
+    # Hardlink BEFORE the rename, so there is no window in which $img is absent;
+    # .prev stays a hardlink to the newest rollback.
+    local rb=""
+    if [ -f "$img" ]; then
+        rb="$img.gen-$(image_generation "$img")"
+        if [ -e "$rb" ] && [ "$(stat -c %i "$rb")" != "$(stat -c %i "$img")" ]; then
+            rm -f "$tmp"; die "$rb already exists and is a different image -- refusing to overwrite a rollback"
+        fi
+        ln -f "$img" "$rb" || { rm -f "$tmp"; die "could not keep rollback $rb"; }
+        ln -f "$img" "$img.prev" || die "could not refresh $img.prev"
     fi
-    if [ -f "$img" ]; then ln -f "$img" "$img.prev" || die "could not keep $img.prev"; fi
     mv -f "$tmp" "$img"        # atomic swap; running mounts keep the old inode until remount
-    echo ">> done: $(du -h "$img" | cut -f1)  $img  (generation $gen; rollback: $img.prev)"
+    echo ">> done: $(du -h "$img" | cut -f1)  $img  (generation $gen; rollback: ${rb:-none})"
 }
 
 cmd_mount() {
@@ -238,6 +258,13 @@ cmd_status() {
     else
         echo "image: none"
     fi
+    local r any=0
+    for r in "$img".gen-*; do
+        [ -f "$r" ] || continue
+        [ "$any" = 1 ] || { echo "rollbacks (newest is also .venv.sqfs.prev):"; any=1; }
+        echo "  $(du -h "$r" | cut -f1)  $r"
+    done
+    [ "$any" = 1 ] || echo "rollbacks: none"
     if [ -n "${SLURM_JOB_ID:-}" ]; then
         local mnt="/local/job$SLURM_JOB_ID/venv_img"
         if [ -x "$mnt/bin/python" ]; then
