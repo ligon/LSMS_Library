@@ -6171,6 +6171,26 @@ def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
     A value that was a non-blank string before and is ``NaT`` after is
     COUNTED and reported with :class:`DatetimeCoercionWarning` -- never
     silently nulled.  The served value is still ``NaT`` (no guessing).
+
+    Two latent hazards of ``format='mixed'`` (no corpus instance; every stored
+    string column today is ISO year-first):
+
+    1. *Ambiguous day-first strings.*  Each value is read on its own,
+       month-first where it can be, so ``['13/01/2019', '05/01/2019']`` comes
+       back 13 Jan and **1 May** -- two conventions in one column, nothing
+       ``NaT``, no warning.  Whole-column inference read both day-first.
+       Pinned by ``tests/test_gh798_datetime_mixed.py::
+       test_ambiguous_dayfirst_is_read_per_value_KNOWN_RISK`` pending a
+       decision between ``mixed`` and per-wave inference.
+    2. *Mixed timezone offsets RAISE.*  An offset-aware value next to a naive
+       one (``'...T10:00:00+01:00'`` beside ``'... 10:00:00'``) makes
+       ``to_datetime(format='mixed')`` raise ``ValueError('Mixed timezones
+       detected')``; whole-column inference used to coerce the minority
+       spelling to ``NaT`` instead.  (Two *different* offsets raised under
+       both calls.)  Both enforcers catch ``ValueError`` and skip the column,
+       so it is served as its **unconverted strings**, with no
+       :class:`DatetimeCoercionWarning` -- this function never reaches its
+       count.
     """
     out = pd.to_datetime(s, errors='coerce', format='mixed')
     if pd.api.types.is_datetime64_any_dtype(s.dtype):
