@@ -306,7 +306,13 @@
 
   Note: the same code number can mean different things across waves
   (e.g., code 10 = "medium derica" in wave 2 but "bin/basket" in
-  waves 3-4).  The per-wave columns record the wave-specific meaning.
+  waves 3-4).  The per-wave columns record the wave-specific meaning,
+  and food_acquired DECODES FROM THEM (nigeria.food_unit_labels, GH
+  #607) -- the Preferred Label column is only the W3/W4 meaning and is
+  what the wave-blind automatic mapping would apply.  The 2010-11 column
+  holds BOTH W1 code spaces (post-planting 1-6; post-harvest 1-4 and the
+  sized 11-95), which do not collide.  W2 code 4 is centilitre per both
+  W2 .dta files (was recorded as ml).
 
   Harvest production units (GAP 1 / crop_production): the post-harvest
   crop module (secta3*) reports harvest quantity in its own per-wave

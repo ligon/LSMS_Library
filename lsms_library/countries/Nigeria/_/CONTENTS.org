@@ -94,6 +94,71 @@ Future enhancement (not yet wired): the W3/W4 data carry a per-row Kg/L
 conversion factor =s10bq2_cvn= (99.6% coverage) --- an exact Approach-B kg
 factor for =food_quantities=, independent of the unit label.
 
+** Unit codes collide ACROSS waves -- decoded per round (GH #607)
+
+The food-module unit code space is *not* stable across waves, and the
+framework's automatic categorical mapping keys on =Code= alone, so it served
+the =u= table's single Preferred Label (the W3/W4 meaning) to every wave.
+Since 2026-10-17 =nigeria.food_acquired_for_wave= decodes =u= itself, per
+round, from the =u= table's column for that round's wave (round -> wave by
+inverting =PP_QUARTER= / =PH_QUARTER=; both rounds of a wave dir read the
+same column).  A code the column marks =---= keeps its raw code.
+
+Per the rounds' own =.dta= value labels (the CSVs carry none):
+
+| code  | W1 PP (2010Q3) | W1 PH (2011Q1)            | W2 (both rounds) | W3/W4         |
+|-------+----------------+---------------------------+------------------+---------------|
+| 4     | millilitre     | millilitre                | *centilitre*     | centilitre    |
+| 5 / 6 | pieces / other | ---                       | mudu / olodo     | ---           |
+| 10    | ---            | ---                       | medium derica    | bin/basket    |
+| 11    | ---            | Sack/Bag Small (20 kg)    | small derica     | paint rubber  |
+| 14    | ---            | Sack/Bag Extra Large      | tiya             | tin           |
+| 21-95 | ---            | sized Basket/Basin/Bunch/Yam Tuber/Bundle/Wheelbarrow/Pick-up Van/Jerry Can | --- | W3 congo/mudu/derica/... |
+
+W1 therefore holds *two* code spaces in one wave dir (PP 1-6; PH 1-4 and
+11-95); they do not collide with each other (1-4 agree, PP has no 11+, PH has
+no 5/6, verified on the data), so one =2010-11= column serves both rounds.
+
+Served-label change, measured on a warm build (=food_acquired=, 595,725 rows):
+40,854 rows relabelled -- 2010Q3 28,370 (mudu->piece 13,213, olodo->other
+14,549, cl->ml 608), 2011Q1 4,317 (e.g. large mudu->Basin Small 987, paint
+rubber->Sack/Bag Small 691, cl->ml 664), 2012Q3 4,016 and 2013Q1 4,151
+(tin->tiya, paint rubber->small derica, bin/basket->medium derica).  W3/W4
+rounds are byte-identical.  The millilitre-served-as-centilitre rows (a 10x
+kg error) are 1,272 -> 0.
+
+*W2 code 4 is centilitre, and the table used to say otherwise.*  The
+=2012-13= column read =ml= for code 4 (corrected to =cl=); the GH #607 issue
+text repeated it ("code 4 -> cl where 2010-11/2012-13 mean ml", 15,208 rows).
+Both W2 =.dta= files label 4 ='centilitre (cl)'=, and the data agree: W2
+code-4 rows have median quantity 75 (the 75 cl bottle; W3's cl rows also
+median 75), W1's millilitre rows 365-600.  Of the 15,208, only W1's 1,272 were
+wrong.  (The W2 questionnaire PDF was not read -- no PDF reader on the node.)
+
+kg consequence (=food_quantities(units='kgs')=, kg rows): 2010Q3 212,735 ->
+191,607; 2011Q1 255,180 -> 261,125; 2012Q3 191,228 -> 189,720; 2013Q1 152,661
+-> 148,126; *2015Q3 137,884 -> 119,972; 2016Q1 129,791 -> 108,090* although
+W3's labels did not change: the inferred kg factor has no =t= axis (it is
+medianed across waves per =(j, u)=), so W1-PH basins served as =large mudu=
+and W2 tiya served as =tin= were contaminating W3's factors (e.g. Rice--local
+=tin= had 1,115 W2 rows beside W3's 6).  W4 moves by <=2 kg (survey =cvn=
+factors).
+
+*Open, not fixed here*: (a) W4's per-wave column gives size-less W4 codes
+(20 CONGO, 30 MUDU, 40 DERICA, 80 PIECE, 90 HEAP, ...) W3's =small ...=
+labels -- 48,305 (2018Q3) + 50,181 (2019Q1) rows -- while W4 records the
+size separately in =s7bq2c=/=s7bq9c=/=s10bq2c=/=s10bq9c=, which no build
+reads; W4 also differs *within* the wave by round (PH 40 =DERICA/TIN=, PP 40
+=DERICA=; PH 120 =SACHET=, PP 120 =PACKET/SACHET=).  (b) W1-PH labels state
+weights (=Sack/Bag: Small (20 kg)=) that the cleaned labels drop.
+
+*Correction to the GH #223 note above*: "Residual codes =131, 151, 152= (W3)
+have *no label even in the =.dta=*" holds for the post-HARVEST file only.
+=sect7b_plantingw3.dta= labels them =131. SACK/BAG MEDIUM=, =151. BASIN
+MEDIUM=, =152. BASIN LARGE= (and =161. BUNDLE MEDIUM=), and all 12 rows are
+in 2015Q3 (post-planting).  Left as =other specify (13x)= here (W3 out of
+scope for #607).
+
 * Sampling Design
 
 ** Overview
