@@ -107,10 +107,27 @@ The unmatched attrs survive Country reaggregation and the multi-country
 `result.attrs['labels_unmatched'] == {country: report}`, one entry per *kept*
 country that passed a `j` through; a fully matched country, and a country
 dropped under Contract B (listed in `attrs['labels_unavailable']`), contribute
-no entry. Measured: `Feature('food_prices')(['Malawi', 'Ethiopia'],
-labels='2004-05')` carries `{'Malawi': …}` (32 of 147 foods, 42,240 rows) and
-drops Ethiopia as unavailable. Conflicting mappings from one Preferred Label to
-several targets, and per-country curation, remain open under #787.
+no entry.
+
+This is a **shape change** for a `Feature` result that keeps only one country.
+Before #787 item 3, a concat of one frame preserved that frame's `attrs`, so
+such a result carried the *flat* Country report (`{'labels': …, 'n_unmatched':
+…, …}`). It now carries `{country: report}`, so code that read the flat keys
+off a `Feature` result must index by country first. What the carrier *fixes*
+is the case of two or more kept countries whose reports differ, including
+when one of them has no report: there the concat dropped `attrs` entirely
+and the report was lost. No real call we have measured exercises that case. `Feature('food_prices')(['Malawi', 'Ethiopia'],
+labels='2004-05')` keeps only Malawi, because Ethiopia is dropped as
+unavailable, so it carried the flat report before the fix as well (32 of 147
+foods, 42,240 rows); it now carries `{'Malawi': …}`. `Feature('food_prices')(
+['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')` matches every label in
+all three countries, so it carries no report before or after. The evidence for
+the fix is therefore the synthetic two-country tests in
+`tests/test_feature_attrs_carriers.py::TestLabelsUnmatchedSurvivesAssembly`.
+Those tests fail on the pre-fix `feature.py`.
+
+Conflicting mappings from one Preferred Label to several targets, and
+per-country curation, remain open under #787.
 Reaggregation can sum an unmatched label into a target with the same spelling,
 so inspect the warning before using the result.
 
