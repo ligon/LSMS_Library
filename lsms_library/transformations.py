@@ -12,6 +12,7 @@ import numpy as np
 from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
+from .errors import UnitsUnavailableError
 
 # Build-path transforms live in build_transforms.py (their output is baked
 # into the cached L2 parquet).  Re-exported here so the country build
@@ -3050,15 +3051,14 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
     if units in {'kgvalue', 'unitvalue'}:
         missing = [c for c in ('Expenditure', 'Quantity') if c not in df.columns]
         if missing:
-            raise ValueError(
-                f"food_prices(units={units!r}) requires {missing} on food_acquired"
-            )
+            raise UnitsUnavailableError(units=units, missing=missing)
     if units in {'kgprice', 'unitprice'}:
         if 'Price' not in df.columns:
-            # No reported Price column at all → empty frame with right schema.
-            empty = df.iloc[0:0].copy()
-            empty['Price'] = np.array([], dtype='float64')
-            return empty[['Price']]
+            # No reported Price column at all: the instrument records no unit
+            # price.  RAISE rather than return an empty frame (GH #828) -- an
+            # empty frame is the absence of the column dressed as the absence
+            # of rows, and Feature concatenated the empties silently.
+            raise UnitsUnavailableError(units=units, missing=['Price'])
 
     kgf = None
     if units == 'kgvalue':

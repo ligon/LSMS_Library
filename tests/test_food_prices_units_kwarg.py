@@ -90,11 +90,34 @@ def test_food_prices_unitprice_returns_reported_only(synthetic_food_acquired):
     assert out['Price'].iloc[0] == pytest.approx(30.0)
 
 
-def test_food_prices_unitprice_no_price_column_returns_empty(synthetic_food_acquired):
+@pytest.mark.parametrize('units', ['unitprice', 'kgprice'])
+def test_food_prices_price_mode_without_price_column_raises(
+        synthetic_food_acquired, units):
+    """GH #828: no ``Price`` column means the instrument records no unit
+    price.  That used to come back as an empty ``(0, 1)`` frame -- the absence
+    of the column dressed as the absence of rows -- and is now a typed error
+    naming the basis and the missing column (a ``ValueError`` subclass)."""
+    from lsms_library.errors import UnitsUnavailableError
     df = synthetic_food_acquired.drop(columns=['Price'])
-    out = food_prices_from_acquired(df, units='unitprice')
-    assert out.empty
-    assert list(out.columns) == ['Price']
+    with pytest.raises(UnitsUnavailableError, match="Price") as info:
+        food_prices_from_acquired(df, units=units)
+    assert isinstance(info.value, ValueError)
+    assert info.value.units == units
+    assert info.value.missing == ['Price']
+    assert info.value.country is None
+    named = info.value.for_country('Someland')
+    assert named.country == 'Someland' and 'Someland' in str(named)
+
+
+@pytest.mark.parametrize('units', ['kgvalue', 'unitvalue'])
+def test_food_prices_value_mode_without_expenditure_raises_typed(
+        synthetic_food_acquired, units):
+    """The ``*value`` modes already raised ``ValueError`` for a missing
+    ``Expenditure``; it is now the same typed error (still a ValueError)."""
+    from lsms_library.errors import UnitsUnavailableError
+    df = synthetic_food_acquired.drop(columns=['Expenditure'])
+    with pytest.raises(UnitsUnavailableError, match="Expenditure"):
+        food_prices_from_acquired(df, units=units)
 
 
 def test_food_prices_unitprice_does_not_fall_back_to_unitvalue(synthetic_food_acquired):
