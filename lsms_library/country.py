@@ -5483,9 +5483,12 @@ class Country:
                         # this country's food_acquired does not carry.  Never
                         # fall through to the legacy path (it cannot honour
                         # units=); name the country so Feature can degrade.
-                        # With units=None (the default basis) the pre-#828
-                        # legacy fall-through is kept unchanged.
-                        if units is not None:
+                        # Same strictness as the generic handler below: an
+                        # explicit units= / labels= dict / valuation= cannot
+                        # be honoured by the legacy path, so it re-raises.
+                        # Only a bare call (all three defaulted) keeps the
+                        # pre-#828 legacy fall-through.
+                        if units is not None or map_labels or valuation is not None:
                             raise exc.for_country(self.name) from exc
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
