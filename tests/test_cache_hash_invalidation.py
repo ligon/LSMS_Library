@@ -554,3 +554,50 @@ def test_inherited_mapping_edit_rebuilds_wave_cache(tmp_path, monkeypatch):
     assert lt.read_parquet_cache_hash(path) != old_hash
     assert lt.cache_freshness(path, wave._input_hash('individual_education')) == 'fresh'
     pd.testing.assert_frame_equal(wave.grab_data('individual_education'), rebuilt)
+
+
+def test_wave_hash_covers_categorical_mapping_directories(tmp_path, monkeypatch):
+    """GH #953: a level's categorical_mapping/ is a build input like its .org.
+
+    ``glob("*.org")`` does not descend, so without the directory parts an edit
+    to a split-out table would invalidate nothing.  An ABSENT or EMPTY
+    directory must move no hash -- that is what keeps the corpus warm.
+    """
+    root, package = _categorical_hash_sandbox(tmp_path, monkeypatch)
+    import lsms_library.country as cm
+    c = _hash_country('GhanaLSS')
+    wave = cm.Wave('1987-88', '1987-88', c)
+    _write_education_mapping(root / 'GhanaLSS' / '_' / 'categorical_mapping.org', 'Base')
+    base = wave._input_hash('individual_education')
+    for level in (root / 'GhanaLSS' / '1987-88' / '_', root / 'GhanaLSS' / '_'):
+        (level / 'categorical_mapping').mkdir()
+    assert wave._input_hash('individual_education') == base, "empty dir moved the hash"
+    seen = {base}
+    for level in (root / 'GhanaLSS' / '1987-88' / '_', root / 'GhanaLSS' / '_'):
+        f = level / 'categorical_mapping' / 'extra.org'
+        _write_education_mapping(f, 'Old')
+        h = wave._input_hash('individual_education')
+        assert h not in seen, f"adding {f} did not move the hash"
+        seen.add(h)
+        _write_education_mapping(f, 'New')
+        h2 = wave._input_hash('individual_education')
+        assert h2 not in seen, f"editing {f} did not move the hash"
+        seen.add(h2)
+        (level / 'categorical_mapping' / 'CONTENTS.org').write_text('docs')
+        assert wave._input_hash('individual_education') == h2, "CONTENTS.org hashed"
+
+
+def test_country_with_only_a_mapping_directory_does_not_fall_back(tmp_path, monkeypatch):
+    """The parent fallback is used only when the country LEVEL declares nothing."""
+    root, _ = _categorical_hash_sandbox(tmp_path, monkeypatch)
+    import lsms_library.country as cm
+    c = _hash_country('GhanaLSS')
+    wave = cm.Wave('1987-88', '1987-88', c)
+    _write_education_mapping(root / 'GhanaLSS' / '_' / 'categorical_mapping' / 'education.org', 'Dir')
+    parent = root / '_' / 'categorical_mapping.org'
+    _write_education_mapping(parent, 'Old fallback')
+    before = wave._input_hash('individual_education')
+    _write_education_mapping(parent, 'New fallback')
+    assert wave._input_hash('individual_education') == before
+    # ...and the read-time loader agrees: the country level is the directory.
+    assert c.categorical_mapping['education']['Label'].tolist() == ['Dir']
