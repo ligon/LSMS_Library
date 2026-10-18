@@ -27,6 +27,7 @@ Two halves, both config-only (no microdata, no cache):
 import ast
 import importlib.util
 import re
+import warnings
 from pathlib import Path
 from unittest.mock import mock_open
 
@@ -37,6 +38,7 @@ import pytest
 from lsms_library import local_tools
 from lsms_library.paths import countries_root
 from lsms_library.transformations import (
+    MissingLookingUnitWarning,
     FOOD_KG_MIN_BASELINE,
     FOOD_KG_MIN_REPORTS,
     U_UNKNOWN,
@@ -438,19 +440,43 @@ def test_accepted_residual_code_is_included_in_kilograms():
     assert unknown.xs(U_UNKNOWN, level='u')['Quantity'].eq(2.0).all()
 
 
-@pytest.mark.parametrize('spelling', ['None', 'N/A', 'NA', '---'])
-def test_unlisted_missing_unit_spelling_is_treated_as_a_unit(spelling):
-    """PINNED GAP, not policy: ``_U_SENTINELS`` is closed, so a new spelling
-    of "no unit" is a unit to the ladder and acquires a pooled price-ratio
-    factor.  This is why a spelling must be written as ``U_UNKNOWN`` -- and
-    why :func:`test_no_unclassified_missing_unit_spelling_is_minted` exists.
-    If one of these spellings is ever added to the sentinel set, move it to
-    the test above (that is a policy change needing its own accounting)."""
+@pytest.mark.parametrize('spelling', ['None', 'N/A', 'NA', '---', ' none '])
+def test_unlisted_missing_unit_spelling_keeps_its_factor_and_WARNS(spelling):
+    """REPORTED, not decided (@ligon 2026-10-18).  ``_U_SENTINELS`` is closed,
+    so a new spelling of "no unit" is still a unit to the ladder and keeps its
+    pooled price-ratio factor -- no served number moves -- but
+    :class:`MissingLookingUnitWarning` names it with its rows and kilograms.
+    What each raw label means is settled per country on questionnaire
+    evidence (GH #1042), never by widening the sentinel set here."""
     assert spelling.strip().lower() not in _U_SENTINELS
     df = _priced_population(spelling)
+    df.attrs['country'] = 'Fixtureland'
     probe = _probe_mask(df, spelling)
-    factors = food_kg_factors(df)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        factors = food_kg_factors(df)
     assert factors.loc[probe, 'KgFactorSource'].ne('none').all()
+    msgs = [x.message for x in w if isinstance(x.message, MissingLookingUnitWarning)]
+    assert len(msgs) == 1
+    m = msgs[0]
+    key = spelling.strip()
+    assert m.country == 'Fixtureland' and set(m.spellings) == {key}
+    assert m.spellings[key]['rows'] == int(probe.sum())
+    assert m.spellings[key]['kg'] > 0
+    assert factors.attrs['kg_factor_missing_looking'] == m.spellings
+
+
+@pytest.mark.parametrize('spelling', ['Tas', 'Kg', 'Value'] + _SENTINEL_SPELLINGS,
+                         ids=repr)
+def test_units_and_sentinels_do_not_warn(spelling):
+    """A genuine unit, a metric label, ``Value`` and every sentinel (served
+    ``none``) are not "missing-looking" -- the warning is only for the gap."""
+    df = _priced_population(spelling)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        factors = food_kg_factors(df)
+    assert not [x for x in w if isinstance(x.message, MissingLookingUnitWarning)]
+    assert factors.attrs['kg_factor_missing_looking'] == {}
 
 
 # --- static guard: no new missing-unit spelling is minted silently ---------

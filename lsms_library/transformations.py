@@ -128,6 +128,29 @@ class StatedVsInferredKgWarning(UserWarning):
     """
 
 
+class MissingLookingUnitWarning(UserWarning):
+    """A ``u`` spelling that LOOKS like "no unit" was given inferred kilograms.
+
+    ``_U_SENTINELS`` is closed on purpose: adding a spelling changes served
+    kilograms, and what a raw label means is a questionnaire question, not a
+    string-matching one (GH #962; @ligon 2026-10-18 chose to REPORT rather
+    than decide).  So a spelling such as ``None``, ``N/A`` or ``---`` that is
+    not a sentinel is still a unit to the ladder and still receives a
+    price-ratio factor -- and this warning names it, with its row count and
+    the kilograms it was given, so the per-country decision (remap to
+    ``U_UNKNOWN``, or record it as a genuine unit) is taken on evidence.
+
+    Carries ``country`` (from ``df.attrs``, may be ``None``) and ``spellings``
+    (``{spelling: {'rows': n, 'kg': x}}``).  The same counts ride on
+    ``attrs['kg_factor_missing_looking']`` of :func:`food_kg_factors`.
+    """
+
+    def __init__(self, message, *, country=None, spellings=None):
+        super().__init__(message)
+        self.country = country
+        self.spellings = dict(spellings or {})
+
+
 class UnitLabelCollisionWarning(UserWarning):
     """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
 
@@ -2206,6 +2229,30 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         'refused_to_unit': int((refused & (source == 'unit')).sum()),
         'refused_to_none': int((refused & (source == 'none')).sum()),
     }
+    # GH #962 (@ligon 2026-10-18): REPORT a missing-looking spelling that the
+    # ladder served kilograms; never change its factor here.
+    looks, raw_u = _missing_looking_unit_mask(df)
+    hit = looks & (source != 'none')
+    found = {}
+    if hit.any():
+        qty = (pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+               if 'Quantity' in df.columns else np.full(len(df), np.nan))
+        kg = qty * np.asarray(resolved, dtype=float)
+        for sp in sorted(set(raw_u[hit])):
+            m = hit & (raw_u == sp)
+            found[sp] = {'rows': int(m.sum()),
+                         'kg': float(np.nansum(kg[m]))}
+        country = df.attrs.get('country')
+        where = f"{country}: " if country else ""
+        desc = ', '.join(f"{sp!r} {v['rows']} rows / {v['kg']:,.0f} kg"
+                         for sp, v in found.items())
+        warnings.warn(MissingLookingUnitWarning(
+            f"{where}unit spelling(s) that read as 'no unit' but are not "
+            f"sentinels were given inferred kilograms: {desc}.  Check the "
+            f"questionnaire: remap to U_UNKNOWN if they mean no unit was "
+            f"recorded, or record them as genuine units in CONTENTS.org "
+            f"(GH #962).", country=country, spellings=found), stacklevel=3)
+    out.attrs['kg_factor_missing_looking'] = found
     return out
 
 
@@ -3474,6 +3521,28 @@ U_UNKNOWN = 'Unknown'
 #: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
 #: too, and is handled separately in :func:`_unit_sentinel_mask`.
 _U_SENTINELS = frozenset({U_UNKNOWN.lower(), 'manquant'})
+
+
+#: Lower-cased, stripped ``u`` spellings that READ as "no unit" but are not in
+#: :data:`_U_SENTINELS`.  Matching one does NOT change a factor; it makes
+#: :func:`food_kg_factors` warn (:class:`MissingLookingUnitWarning`).  A
+#: spelling made only of punctuation (``---``, ``.``, ``?``) matches too.
+_MISSING_LOOKING_UNITS = frozenset({
+    'none', 'n/a', 'na', 'nan', 'null', 'nil', 'missing', 'not applicable',
+    'not stated', 'not specified', 'unspecified', "don't know", 'dk'})
+
+
+def _missing_looking_unit_mask(df):
+    """Rows whose ``u`` reads as "no unit" yet is NOT a sentinel (GH #962)."""
+    u = _level_or_column(df, 'u')
+    if u is None:
+        return np.zeros(len(df), dtype=bool), np.array([], dtype=object)
+    col = pd.Series(u)
+    text = col.astype(str).str.strip().str.lower()
+    looks = (text.isin(_MISSING_LOOKING_UNITS)
+             | text.str.fullmatch(r'[-._?/ ]+').fillna(False))
+    looks &= ~text.isin(_U_SENTINELS) & col.notna()
+    return looks.to_numpy(dtype=bool), col.astype(str).str.strip().to_numpy()
 
 
 def _unit_sentinel_mask(df):
