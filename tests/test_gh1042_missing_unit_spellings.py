@@ -1,10 +1,12 @@
 """GH #1042: two served unit spellings that mean "no unit recorded".
 
 * GhanaLSS ``u='None'`` (GLSS4/5/6 Section 8H, own production).  Code 0 heads
-  the GLSS5/GLSS6 unit lists as ``None ....00`` -- the same "nothing" code that
-  heads the crop list -- and is the zero-fill on every non-consumer row; GLSS4's
-  printed list has no code 0 at all.  ``_/unit_labels.org`` now maps it to the
-  missing-unit sentinel.
+  the GLSS5 and GLSS6 8H unit lists as ``None 00`` and is the zero-fill on every
+  non-consumer row; neither of GLSS4's two (conflicting) printed 8H lists has a
+  code 0.  GLSS5 prints no count unit at all; GLSS6 adds ``Single 37``.
+  ``_/unit_labels.org`` maps it to the missing-unit sentinel, and own-produced
+  Chicken in 2005-06 / 2012-13 -- whose code-0 rows price like one bird -- is
+  then served on the count unit ``Single`` (``ghanalss.unrecorded_unit_to_count``).
 * Malawi ``u='N/A'`` (IHS4/IHS5 Module G).  Every such row is unit code 23
   ``OTHER (SPECIFY)`` with the specify text ``N/A``.  ``_clean_freetext_unit``
   now emits the sentinel instead of the free text.
