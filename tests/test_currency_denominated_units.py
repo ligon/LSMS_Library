@@ -443,7 +443,12 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: sugar, cocoa powder, macaroni, potato, gari) are distinct rows again, so
 #: every mode gains the rows the collapse had merged -- Expenditure per wave is
 #: unchanged (asserted in tests/test_ghanalss_food_label_canonical.py).
-GHANALSS_FOOD_PRICES_ROWS = 568_624
+#: Moved again 2026-10-18 by GH #1042: 568,624 -> 567,839 (-785).  Section 8H
+#: unit code 0 ('None', the instrument's "nothing" code) now maps to the
+#: missing-unit sentinel, so those own-production rows get no inferred kg and
+#: drop out of the kg-denominated modes only; unitvalue/unitprice (pinned in
+#: the next test) and food_acquired rows/Expenditure are unchanged.
+GHANALSS_FOOD_PRICES_ROWS = 567_839
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
