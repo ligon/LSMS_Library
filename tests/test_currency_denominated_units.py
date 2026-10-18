@@ -448,7 +448,12 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: missing-unit sentinel, so those own-production rows get no inferred kg and
 #: drop out of the kg-denominated modes only; unitvalue/unitprice (pinned in
 #: the next test) and food_acquired rows/Expenditure are unchanged.
-GHANALSS_FOOD_PRICES_ROWS = 567_839
+#: Moved again 2026-10-18 by the GH #1042 count-unit follow-up: 567,839 ->
+#: 568,027 (+188).  387 own-produced Chicken rows (2005-06 184, 2012-13 203)
+#: on unit code 0 price like one bird and are now served on 'Single', so they
+#: get the (Chicken, Single) item_unit factor (1.07 kg) and re-enter the kg
+#: modes as 188 (t, i, j) cells; kgprice 188,864 -> 189,052 likewise.
+GHANALSS_FOOD_PRICES_ROWS = 568_027
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 

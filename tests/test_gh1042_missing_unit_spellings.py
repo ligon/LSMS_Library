@@ -35,7 +35,9 @@ _MALAWI = countries_root() / 'Malawi' / '_' / 'malawi.py'
 
 #: Rows the remap moves, measured on the build at 3e3bd26ee (GH #1042).
 _EXPECTED = {
-    'GhanaLSS': ('None', {'1998-99': 88, '2005-06': 1450, '2012-13': 970}),
+    # 1,450 / 970 were the first pass; the count-unit follow-up serves the
+    # Chicken rows among them (2005-06 184, 2012-13 203) on 'Single'.
+    'GhanaLSS': ('None', {'1998-99': 88, '2005-06': 1266, '2012-13': 767}),
     # 24 / 19 were the first pass ('N/A' only); the code-23 rule adds
     # 2004-05 'Other' 892, 2010-11 'Other (Specify)' 17 + 'Unit' 8, 2013-14
     # 'Other (Specify)' 110, 2016-17 'Other (Specify)' 404 + 'Other' 1,
@@ -179,3 +181,70 @@ def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
             got = int(((u == 'Other (Specify)') & (t == wave)).sum())
             assert got == n, (wave, got)
         assert not ((u == 'Other (Specify)') & (t == '2019-20')).any()
+
+
+# ------------------------------------------- GhanaLSS count units (follow-up)
+def _ghanalss():
+    path = countries_root() / 'GhanaLSS' / '_' / 'ghanalss.py'
+    spec = importlib.util.spec_from_file_location('ghanalss_1042', path)
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:  # pragma: no cover - environment-dependent imports
+        pytest.skip(f'ghanalss.py not importable here: {exc}')
+    return mod
+
+
+def test_ghanalss_count_unit_scope_is_chicken_in_glss5_and_glss6_only():
+    """Eggs are deliberately NOT remapped: (Egg, Single) infers 0.50 kg/egg and
+    the ladder has no item-level refusal.  Widening this dict is a decision
+    that needs the kg check in CONTENTS.org repeated, not a one-line edit."""
+    g = _ghanalss()
+    assert g.COUNT_UNIT == 'Single'
+    assert g.UNRECORDED_UNIT_IS_COUNT == {'2005-06': ('Chicken',),
+                                         '2012-13': ('Chicken',)}
+
+
+def test_ghanalss_count_unit_relabel_is_scoped_and_lossless():
+    g = _ghanalss()
+    idx = pd.MultiIndex.from_tuples(
+        [('2005-06', 'h1', 'Chicken', U_UNKNOWN, 'produced', 0),
+         ('2005-06', 'h1', 'Egg', U_UNKNOWN, 'produced', 0),
+         ('2005-06', 'h2', 'Chicken', U_UNKNOWN, 'purchased', 0),
+         ('2005-06', 'h3', 'Chicken', 'Kilogram', 'produced', 0)],
+        names=['t', 'i', 'j', 'u', 's', 'visit'])
+    df = pd.DataFrame({'Quantity': [1.0, 2.0, 3.0, 4.0]}, index=idx)
+    out = g.unrecorded_unit_to_count(df, '2005-06')
+    assert out.index.get_level_values('u').tolist() == [
+        'Single', U_UNKNOWN, U_UNKNOWN, 'Kilogram']
+    assert out['Quantity'].tolist() == df['Quantity'].tolist()
+    # Not a wave in scope (GLSS4: no count unit served for chicken).
+    df98 = df.rename(index={'2005-06': '1998-99'}, level='t')
+    assert g.unrecorded_unit_to_count(df98, '1998-99').index.equals(df98.index)
+    # A collision with a genuine Single row raises rather than reaching core.
+    clash = pd.concat([df, pd.DataFrame(
+        {'Quantity': [9.0]}, index=pd.MultiIndex.from_tuples(
+            [('2005-06', 'h1', 'Chicken', 'Single', 'produced', 0)],
+            names=idx.names))])
+    with pytest.raises(AssertionError, match='collided'):
+        g.unrecorded_unit_to_count(clash, '2005-06')
+
+
+def test_ghanalss_chicken_count_rows_get_a_plausible_bird_weight():
+    """The task's own acceptance check: the kg the ladder serves the counted
+    chicken rows is a plausible bird (1-2.5 kg), measured 1.07 kg."""
+    if not (data_root() / 'GhanaLSS' / 'var' / 'food_acquired.parquet').exists():
+        pytest.skip('GhanaLSS food_acquired not cached')
+    import lsms_library as ll
+
+    fa = ll.Country('GhanaLSS').food_acquired()
+    lv = fa.index.get_level_values
+    t, j, u, s = lv('t'), lv('j').astype(str), lv('u').astype(str), lv('s')
+    prod = (j == 'Chicken') & (s == 'produced')
+    for wave, n_single in {'2005-06': 257, '2012-13': 2926}.items():
+        assert int((prod & (t == wave) & (u == 'Single')).sum()) == n_single
+        assert not (prod & (t == wave) & (u == U_UNKNOWN)).any(), wave
+    kgf = food_kg_factors(fa).loc[(j == 'Chicken') & (u == 'Single')]
+    assert set(kgf['KgFactorSource'].astype(str)) == {'item_unit'}
+    assert kgf['kg_per_unit'].between(1.0, 2.5).all(), kgf['kg_per_unit'].describe()
+

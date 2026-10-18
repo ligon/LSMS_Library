@@ -34,7 +34,8 @@ sys.path.append('../../_')
 # first hit, local_tools.py:1556).  `countries/_/` does not exist today, so the
 # rung currently resolves to nothing; it is reserved, not dead.
 sys.path.append('../../../_/')
-from ghanalss import derive_produced_farmgate_value, to_country_food_labels
+from ghanalss import (derive_produced_farmgate_value, to_country_food_labels,
+                      unrecorded_unit_to_count)
 from lsms_library.local_tools import (get_categorical_mapping, df_data_grabber,
                                        format_id, _to_numeric, to_parquet,
                                        get_dataframe, df_from_orgfile)
@@ -189,4 +190,7 @@ if __name__ == '__main__':
     # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
     # Pure rename; an unmapped label raises rather than passing through.
     fa = to_country_food_labels(fa, '2012-13')
+    # GH #1042: unit code 0 ('None' -> Unknown) on own-produced chicken prices
+    # like one bird -> the count unit 'Single' (ghanalss.UNRECORDED_UNIT_IS_COUNT).
+    fa = unrecorded_unit_to_count(fa, '2012-13')
     to_parquet(fa, 'food_acquired.parquet')

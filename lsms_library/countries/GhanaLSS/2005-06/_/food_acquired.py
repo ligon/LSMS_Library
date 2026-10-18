@@ -40,7 +40,8 @@ import mapping
 # script's own directory, which is where the Makefile runs it
 # (`cd $(@D) && python food_acquired.py`) and which every `../Data/...` read
 # in this file already assumes.
-from ghanalss import derive_produced_farmgate_value, to_country_food_labels
+from ghanalss import (derive_produced_farmgate_value, to_country_food_labels,
+                      unrecorded_unit_to_count)
 
 t = '2005-06'
 
@@ -246,4 +247,7 @@ assert fa.loc[~_both, 'Derivation'].isna().all(), (
 # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
 # Pure rename; an unmapped label raises rather than passing through.
 fa = to_country_food_labels(fa, '2005-06')
+# GH #1042: unit code 0 ('None' -> Unknown) on own-produced chicken prices
+# like one bird -> the count unit 'Single' (ghanalss.UNRECORDED_UNIT_IS_COUNT).
+fa = unrecorded_unit_to_count(fa, '2005-06')
 to_parquet(fa, 'food_acquired.parquet')
