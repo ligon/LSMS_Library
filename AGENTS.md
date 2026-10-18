@@ -352,44 +352,72 @@ Auto-unlock decrypts `s3_reader_creds.gpg` with an obfuscated passphrase at impo
 
 ### Categorical mappings resolve wave → country → global, global LAST (GH #953)
 
-**One direction, two mechanisms, and they differ only in granularity.** The
-order is always local-first — a wave overrides its country, a country overrides
-the shared table — which is what lets `foo` mean one thing to most countries
-while one country varies it locally.
+**One direction, one notion of a LEVEL, two mechanisms that differ only in
+granularity.** The order is always local-first — a wave overrides its country,
+a country overrides the shared table — which is what lets `foo` mean one thing
+to most countries while one country varies it locally.
+
+**A level has two spellings, and they are the same level** (@ligon,
+2026-10-17). A wave's `_/`, a country's `_/` and the package root
+(`lsms_library/`, the cross-country level) each hold tables in
+
+```
+<level>/categorical_mapping.org      one file, many #+name: tables
+<level>/categorical_mapping/*.org    a directory; any table in any file
+                                     (by convention one table per file)
+```
+
+either or both. Tables are matched by `#+name:`, never by filename (global
+`u_kg` lives in `u.org`). A table declared **twice in one level** — file and
+directory, or two directory files — raises `CategoricalMappingConflictError`
+naming both paths; it is never a precedence rule and never a fall-through to the
+level below. `lsms_library/categorical_mapping/` is simply the package root's
+directory spelling. One reader, `local_tools.categorical_mapping_files(level)`,
+serves both mechanisms and every hash site.
 
 - **The build-time cascade.** `local_tools.get_categorical_mapping(fn,
-  tablename, dirs)` walks `dirs` and returns the **first hit**
-  (`local_tools.py:1611`). Four GhanaLSS wave `mapping.py` modules spell the
-  rungs: `_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']`.
-- **The read-time merge.** `Country.categorical_mapping` (`country.py:1997`)
-  globs **every** `.org` in `lsms_library/categorical_mapping/`, keys the tables
-  by `#+name:`, and merges the country's own `categorical_mapping.org` over
-  them via `_merge_categorical_tables`.
+  tablename, dirs)` and `code_label_map` walk `dirs` and return the **first
+  hit**, then the cross-country level, **appended automatically and last**.
+  No caller could spell that rung: the third entry callers used to write
+  (`f'{path}/../../_/'`, and `'../../../_/'` in the old default `dirs`) was
+  `countries/_/`, which never existed. Those spellings are gone (GhanaLSS's
+  four wave `mapping.py` modules and the default), and
+  `tests/test_categorical_mapping_resolution.py` refuses both a table there and
+  the spelling's return.
+- **The read-time merge.** `Country.categorical_mapping` loads the
+  cross-country level, then the country level, merging via
+  `_merge_categorical_tables`; `Wave.categorical_mapping` overlays the wave
+  level with a plain `dict.update` (whole-table even for the additive names —
+  pinned report-only).
 
 | | cascade | merge |
 |---|---|---|
-| layout of the global rung | one `categorical_mapping.org` per LEVEL | one `<table>.org` per TABLE |
-| fall-through | **per table** — a file lacking `foo` raises `KeyError`, the loop catches it, resolution continues | n/a (all globals are loaded) |
-| override | **whole-table** — the first rung that has `foo` supplies *all* of it | **whole-table by default; per ROW** for the four names in `_ADDITIVE_CATEGORICAL_TABLES` (`u`, `u_kg`, `harmonize_assets`, `harmonize_education`) |
+| fall-through | **per table** — a level lacking `foo` is skipped | n/a (all globals are loaded) |
+| override | **whole-table** — the first level that has `foo` supplies *all* of it (kept, @ligon 2026-10-17) | **whole-table by default; per ROW** for the four names in `_ADDITIVE_CATEGORICAL_TABLES` (`u`, `u_kg`, `harmonize_assets`, `harmonize_education`) |
 
-The per-row half is the intent — `country.py` already says so: *"inherit-and-override,
-not re-list-everything."* Under whole-table override a country wanting one
-local variation of `foo` must re-list every global row.
+The cascade stays whole-table by decision: when the global rung was wired, the
+only table name a cascade call could newly reach was `u`, and its three callers
+(Uganda, Mali, Malawi 2013-14) all resolve at their own country level. Making
+the cascade row-additive would change those builds and first needs their
+`Code` key reconciled with global `u.org`'s `Original Label` key.
 
-**Two facts people keep getting wrong.**
+**Facts people get wrong.**
 
-1. **The cascade cannot read a directory of per-table files.** `fn` defaults to
-   `categorical_mapping.org` and each rung is the single file `d + fn`; of the
-   71 `get_categorical_mapping(` calls in `countries/**/*.py`, **zero** pass
-   `fn=`.
-   Its cross-country rung resolves to `lsms_library/countries/_/`, **which does
-   not exist** — so the third rung has never reached anything, for any table.
-   That is the open defect; #953 holds the repair and its options.
-2. **`_ADDITIVE_CATEGORICAL_TABLES` does not decide whether a global table is
-   inherited.** Every `#+name:` table in the global directory is loaded for
-   every country; the allow-list picks only the *merge rule*. (#953's body says
-   otherwise; the code and `tests/test_categorical_mapping_resolution.py` say
-   this.)
+1. **`_ADDITIVE_CATEGORICAL_TABLES` does not decide whether a global table is
+   inherited.** Every `#+name:` table at the cross-country level is loaded for
+   every country; the allow-list picks only the *merge rule*.
+2. **About 40 country/wave modules read `categorical_mapping.org` BY PATH**
+   (`df_from_orgfile('../../_/categorical_mapping.org', name=…)`), bypassing
+   both mechanisms. A table one of them reads must stay in the file; moved into
+   the directory it fails loudly (missing table), not silently. The same goes
+   for Makefiles that list `categorical_mapping.org` as a prerequisite: the
+   content hash covers a directory table, `make`'s mtime check does not.
+3. **Splitting a level's file is a cache event.** Every hash site
+   (`Wave._input_hash`, `Country._table_cache_hash`) includes
+   `categorical_mapping/*.org` via `_categorical_dir_hash_parts`, which appends
+   nothing for an absent directory — so adding the directory support moved no
+   hash by itself, but moving a table out of a file changes that level's
+   fingerprint and rebuilds it once.
 
 **Where a new SHARED table goes, and what makes it reachable.** Put it in
 `lsms_library/categorical_mapping/<table>.org` with a `#+name:` — and then wire
@@ -399,15 +427,18 @@ it, because dropping a file there is *not* wiring. Pick one mechanism:
 wave's `data_info.yml`), or `documentation-of-record` (a vocabulary guide read
 by a named test). Then register the file in `GLOBAL_ORG_REGISTRY` in
 `tests/test_categorical_mapping_resolution.py`, **which fails on any
-unregistered `.org` in that directory** and pins the order, the fall-through
-and both granularities. The six files today: `u.org`, `harmonize_assets.org`,
-`harmonize_education.org` (additive-merge), `ehcvm_units.org`
-(`mappings:` in Togo 2018 / Burkina 2018-19 / 2021-22 — `lsms_library/ehcvm.py`
-only *cites* it), `canonical_education_labels.org` (declares **no** tables at
-all) and `canonical_housing_labels.org` (documentation; its `Roof`/`Floor`
-tables are the `#+begin_example` placeholders, which the org reader does not
-skip, so every country inherits `<local variant 1> → <canonical>` — inert, and
-report-only under #953).
+unregistered `.org` in that directory** and pins the order, the fall-through,
+both granularities and the level rules. The six files today: `u.org`,
+`harmonize_assets.org`, `harmonize_education.org` (additive-merge),
+`ehcvm_units.org` (`mappings:` in Togo 2018 / Burkina 2018-19 / 2021-22 —
+`lsms_library/ehcvm.py` only *cites* it), `canonical_education_labels.org`
+(declares **no** tables at all) and `canonical_housing_labels.org`
+(documentation; its illustrative `Roof`/`Floor` tables are comma-escaped so the
+org reader does not load them, GH #693).
+
+**A country- or wave-local table** goes in that level's `categorical_mapping.org`
+or, if the file has grown unwieldy, in `<level>/categorical_mapping/<table>.org`.
+No wiring beyond what the table already needs.
 
 ## MonthsSpent / MonthsAway / WeeksAway (2026-04-15)
 

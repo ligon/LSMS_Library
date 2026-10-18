@@ -273,6 +273,8 @@ j:
 
 This tells the library: "look up the org table named `harmonize_food`, use the `Original Label` column as keys and `Preferred Label` column as values."
 
+**Where the table can live, and how it is found (GH #953).** Resolution is wave `_/` → country `_/` → cross-country (`lsms_library/categorical_mapping/`), first hit wins, whole table. At each level the table may sit in `categorical_mapping.org` **or** in `categorical_mapping/<table>.org` beside it — two spellings of one level, matched by `#+name:`. Split a file that has grown unwieldy into the directory if you like, but (a) declare each table **once** per level (a duplicate raises `CategoricalMappingConflictError`), and (b) do not move a table that a script reads **by path** (`df_from_orgfile('../../_/categorical_mapping.org', name=...)` — about 40 modules do), or that a Makefile lists as a prerequisite, without updating that reader. A shared table goes in `lsms_library/categorical_mapping/` and must be registered in `tests/test_categorical_mapping_resolution.py`; never in `countries/_/`. Full model: CLAUDE.md §"Categorical mappings resolve wave → country → global".
+
 **Resolved bugs (fixed 2026-03-19):**
 - Both `mapping:` and `mappings:` (plural) are now accepted in `data_info.yml`. Mali uses the plural form for categorical table references in `idxvars`.
 - Categorical mapping table lookups (e.g., `['harmonize_food', 'Original Label', 'Preferred Label']`) now work correctly for both `idxvars` and `myvars`. The `.loc` bug that treated column names as row labels has been fixed.

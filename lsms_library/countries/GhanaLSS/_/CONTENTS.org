@@ -2785,6 +2785,19 @@ stringifies the Code index via =format_id= (so keys are ='1'=), while wave
 mapping functions variously look up with =int(value)= or =str(value)=.  Both
 historical bugs were partly key-type mismatches.
 
+/2026-10-17 (GH #953, Sue):/ =1991-92/_/mapping.py='s private =_code_label_map=
+was the last hand-rolled copy of the cascade here; it now delegates to
+=local_tools.code_label_map= (keeping its int-keyed result), so all four wave
+=mapping.py= modules resolve levels the same way: wave =_/= -> country =_/= ->
+the cross-country level, which the resolver appends itself.  Their old third
+rung (=f'{path}/../../_/'= = =countries/_/=) never existed and is gone.  Each
+level may hold tables in =categorical_mapping.org= or
+=categorical_mapping/*.org=.  Measured: the module-level =region_dict=,
+=rural_dict= and =relationship_dict= are identical before and after in all four
+waves, and no shared table is named =region=, =rural= or =relationship=, so
+Trap 2's fall-through to ={}= is unchanged.  Cost: every GhanaLSS table's hash
+moves (the =mapping.py= files are build inputs), one rebuild.
+
 ** Trap 2: GLSS3's and GLSS4's relationship scheme is NOT GLSS1's
 
 The country-level GLSS1 code table in =_/categorical_mapping.org= (named

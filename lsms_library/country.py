@@ -36,6 +36,9 @@ from importlib.resources import files
 import importlib
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
+from .local_tools import (CATEGORICAL_MAPPING_DIR, CATEGORICAL_MAPPING_FILE,
+                          categorical_mapping_files,
+                          load_categorical_level)
 from .local_tools import (
     LSMS_CACHE_SCHEMA,
     cached_file_hash,
@@ -441,15 +444,17 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # at different times over different layouts and agree on direction (local
 # beats global) but not on granularity:
 #
-#   cascade  -- one ``categorical_mapping.org`` per LEVEL; first hit wins, so
-#               override is whole-table; fall-through is per table.  It cannot
-#               read a directory of per-table files, so the cross-country rung
-#               it names (``countries/_/``) is unreachable and absent.
-#   merge    -- one ``<table>.org`` per TABLE in
-#               ``lsms_library/categorical_mapping/``.  ``Country.
-#               categorical_mapping`` globs them ALL and merges the country
-#               file over them, whole-table by default; the names below are
-#               the exception, merged per ROW.
+#   cascade  -- first hit wins, so override is whole-table; fall-through is
+#               per table.  The cross-country level is appended LAST
+#               automatically (``local_tools.global_categorical_level``).
+#   merge    -- ``Country.categorical_mapping`` loads the cross-country level
+#               and merges the country level over it, whole-table by default;
+#               the names below are the exception, merged per ROW.
+#
+# Both read a LEVEL the same way (``local_tools.categorical_mapping_files``):
+# ``<level>/categorical_mapping.org`` and/or ``<level>/categorical_mapping/*.org``
+# are two spellings of one level, and a table declared twice in one level
+# raises ``CategoricalMappingConflictError``.
 #
 # So the allow-list does NOT decide whether a global table is inherited (every
 # ``#+name:`` table in that directory is); it decides only the merge rule.
@@ -551,6 +556,24 @@ def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
         else:
             merged[name] = ctab
     return merged
+
+
+def _categorical_dir_hash_parts(prefix: str, level: Path) -> list[str]:
+    """Hash parts for ``<level>/categorical_mapping/*.org`` (GH #953).
+
+    The directory spelling of a categorical-mapping level is as much a build
+    input as ``categorical_mapping.org``, but every hash site globs
+    ``level.glob("*.org")``, which does not descend -- so an edit in the
+    directory would invalidate nothing (the #808/#866 disease).  Returns
+    ``[]`` when the directory is absent: adding this to a hash site moves no
+    existing hash.
+    """
+    d = Path(level) / CATEGORICAL_MAPPING_DIR
+    if not d.is_dir():
+        return []
+    return [f"{prefix}:{CATEGORICAL_MAPPING_DIR}/{org.name}=" + (cached_file_hash(org) or "none")
+            for org in sorted(d.glob("*.org"))
+            if org.is_file() and org.name not in _ORG_HASH_SKIP]
 
 
 class DeprecatedFeatureError(AttributeError):
@@ -1092,6 +1115,11 @@ class Wave:
             if org.name in _ORG_HASH_SKIP:
                 continue
             parts.append(f"org:{org.name}=" + (cached_file_hash(org) or "none"))
+        # GH #953: a level's categorical_mapping/ directory is the same level
+        # as its categorical_mapping.org; glob("*.org") does not descend, so
+        # without this an edit there would invalidate nothing.  Appends
+        # nothing when the directory is absent, so existing hashes are stable.
+        parts += _categorical_dir_hash_parts("org", wave_dir)
 
         # Inherited mappings can be baked into YAML extraction or scripts
         # (GH #757; .coder/ledger/757-wave-categorical-inputs.md sections 2-5).
@@ -1103,11 +1131,18 @@ class Wave:
             for org in sorted(directory.glob("*.org")):
                 if org.name not in _ORG_HASH_SKIP:
                     parts.append(f"{prefix}:{org.name}=" + (cached_file_hash(org) or "none"))
-        if not (cdir / "categorical_mapping.org").exists():
-            # The parent is a fallback for this one file, not a second
+        parts += _categorical_dir_hash_parts("corg", cdir)
+        global_file = Path(str(files("lsms_library"))) / CATEGORICAL_MAPPING_FILE
+        if global_file.is_file():
+            parts.append("gorg:" + CATEGORICAL_MAPPING_FILE + "="
+                         + (cached_file_hash(global_file) or "none"))
+        if not categorical_mapping_files(cdir):
+            # The parent is a fallback for this one level, not a second
             # country build directory. An unused fallback must not invalidate.
-            fallback = self.country.file_path.parent / "_" / "categorical_mapping.org"
+            parent = self.country.file_path.parent / "_"
+            fallback = parent / CATEGORICAL_MAPPING_FILE
             parts.append("parent_cmap=" + (cached_file_hash(fallback) or "none"))
+            parts += _categorical_dir_hash_parts("parent_cmap", parent)
 
         data_info = _parse_data_info_cached(wave_dir / "data_info.yml", di_hash)
         block = data_info.get(table) if isinstance(data_info, dict) else None
@@ -1317,13 +1352,12 @@ class Wave:
         
     @property
     def categorical_mapping(self) -> dict[str, pd.DataFrame]:
-        org_fn = self.file_path / "_" / "categorical_mapping.org"
+        # The wave level: categorical_mapping.org and/or categorical_mapping/
+        # (GH #953).  Whole-table over the country's merged tables, even for
+        # _ADDITIVE_CATEGORICAL_TABLES -- pinned report-only, not changed here.
         dic = dict(self.country.categorical_mapping)
-        if not org_fn.exists():
-            return dic if dic else {}
-        else:
-            dic.update(all_dfs_from_orgfile(org_fn))
-            return dic
+        dic.update(load_categorical_level(self.file_path / "_"))
+        return dic
 
     @property
     def documentation_path(self) -> Path:
@@ -2147,23 +2181,22 @@ class Country:
         if '_categorical_mapping_cache' not in self.__dict__:
             # Load global mappings from lsms_library/categorical_mapping/*.org
             global_maps: dict[str, pd.DataFrame] = {}
-            global_cm_dir = files("lsms_library") / "categorical_mapping"
             try:
-                global_cm_path = Path(str(global_cm_dir))
-                for org_file in sorted(global_cm_path.glob("*.org")):
-                    try:
-                        global_maps.update(all_dfs_from_orgfile(org_file))
-                    except (ValueError, OSError, pd.errors.ParserError) as exc:
-                        logger.info("Skipping global categorical mapping %s: %s", org_file.name, exc)
+                global_maps = load_categorical_level(
+                    Path(str(files("lsms_library"))),
+                    on_unreadable=lambda path, exc: logger.info(
+                        "Skipping global categorical mapping %s: %s", path.name, exc))
             except (FileNotFoundError, OSError) as exc:
                 logger.info("Global categorical_mapping directory not accessible: %s", exc)
 
-            # Load per-country mappings (override global on name collision)
+            # Load per-country mappings (override global on name collision).
+            # A level is categorical_mapping.org and/or categorical_mapping/
+            # (GH #953); the first level that declares anything wins.
             country_maps: dict[str, pd.DataFrame] = {}
             for rel in ['./', '../']:
-                org_fn = Path(self.file_path / rel / "_" / "categorical_mapping.org")
-                if org_fn.exists():
-                    country_maps = all_dfs_from_orgfile(org_fn)
+                level = Path(self.file_path / rel / "_")
+                if categorical_mapping_files(level):
+                    country_maps = load_categorical_level(level)
                     break
 
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
@@ -3793,6 +3826,7 @@ class Country:
                 if org.name in _ORG_HASH_SKIP:
                     continue
                 country_parts.append(f"corg:{org.name}=" + (cached_file_hash(org) or "none"))
+            country_parts += _categorical_dir_hash_parts("corg", cdir)  # GH #953
             if any(not p.endswith("=none") for p in country_parts):
                 any_hash = True
             if not any_hash:

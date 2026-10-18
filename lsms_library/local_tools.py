@@ -1706,8 +1706,142 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
 
     return out
 
+# --------------------------------------------------------------------------
+# Categorical-mapping LEVELS (GH #953)
+# --------------------------------------------------------------------------
+#
+# A *level* is a directory: a wave's ``_/``, a country's ``_/``, or the
+# package root (the cross-country level).  A level holds its tables in either
+# or both of two spellings, which are equivalent:
+#
+#   <level>/categorical_mapping.org       one file, many ``#+name:`` tables
+#   <level>/categorical_mapping/*.org     a directory of files, any table in
+#                                         any file (conventionally one table
+#                                         per file, named after it)
+#
+# So a level whose file grows unwieldy can split it without changing how a
+# table is found, and the cross-country level -- ``lsms_library/
+# categorical_mapping/`` -- is an ordinary level rather than a special case.
+# A table declared TWICE within one level (file and directory, or two files
+# in the directory) is an error, not a precedence rule: see
+# :class:`CategoricalMappingConflictError`.
+
+CATEGORICAL_MAPPING_FILE = 'categorical_mapping.org'
+CATEGORICAL_MAPPING_DIR = 'categorical_mapping'
+#: Documentation, never a mapping table, wherever it sits.
+_CATEGORICAL_DOC_FILES = frozenset({'CONTENTS.org'})
+
+
+class CategoricalMappingConflictError(RuntimeError):
+    """One level declares the same table in more than one file (GH #953).
+
+    A ``RuntimeError`` rather than a ``KeyError``/``ValueError`` on purpose:
+    the cascade treats those as "not at this rung, try the next one", and a
+    conflict silently skipped would resolve the table from a LOWER level --
+    the wrong answer, with no signal.
+    """
+
+
+def global_categorical_level() -> Path:
+    """The cross-country level: the package root, whose
+    ``categorical_mapping/`` directory holds the shared tables."""
+    return Path(str(files('lsms_library')))
+
+
+def categorical_mapping_files(level: str | Path) -> list[Path]:
+    """The ``.org`` files that make up one level, file first, then the
+    directory in sorted order.  Empty when the level declares nothing."""
+    level = Path(level)
+    out: list[Path] = []
+    f = level / CATEGORICAL_MAPPING_FILE
+    if f.is_file():
+        out.append(f)
+    d = level / CATEGORICAL_MAPPING_DIR
+    if d.is_dir():
+        out.extend(p for p in sorted(d.glob('*.org'))
+                   if p.is_file() and p.name not in _CATEGORICAL_DOC_FILES)
+    return out
+
+
+def _org_declares_table(path: Path, tablename: str) -> bool:
+    """True iff :func:`df_from_orgfile` would find ``#+name: tablename`` in
+    *path* -- the same whole-line, case-insensitive test it uses."""
+    target = f'#+name: {tablename}'.lower()
+    with open(path, 'r', encoding='utf-8') as fh:
+        return any(line.strip().lower() == target for line in fh)
+
+
+def categorical_level_table_file(level: str | Path, tablename: str) -> Path | None:
+    """The one file in *level* that declares *tablename*, or ``None``.
+
+    Raises :class:`CategoricalMappingConflictError` when more than one file in
+    the level declares it, naming every one.
+    """
+    hits = [p for p in categorical_mapping_files(level)
+            if _org_declares_table(p, tablename)]
+    if len(hits) > 1:
+        raise CategoricalMappingConflictError(
+            f"Table {tablename!r} is declared {len(hits)} times in one "
+            f"categorical-mapping level ({Path(level)}): "
+            + ', '.join(str(h) for h in hits)
+            + ".  A level must declare a table once -- in "
+            f"{CATEGORICAL_MAPPING_FILE} OR in {CATEGORICAL_MAPPING_DIR}/, "
+            "not both (GH #953).")
+    return hits[0] if hits else None
+
+
+def load_categorical_level(level: str | Path, *, on_unreadable: Any = None
+                           ) -> dict[str, pd.DataFrame]:
+    """Every table one level declares, keyed by ``#+name:``.
+
+    The read-time counterpart of :func:`categorical_level_table_file`, with the
+    same conflict rule.  ``on_unreadable(path, exc)``, if given, is called for
+    a file the org reader cannot parse and that file is skipped (the
+    package-global level has always skipped such files); otherwise the parse
+    error propagates.
+    """
+    tables: dict[str, pd.DataFrame] = {}
+    source: dict[str, Path] = {}
+    for path in categorical_mapping_files(level):
+        try:
+            found = all_dfs_from_orgfile(path)
+        except (ValueError, OSError, pd.errors.ParserError) as exc:
+            if on_unreadable is None:
+                raise
+            on_unreadable(path, exc)
+            continue
+        for name, table in found.items():
+            key = name.lower()
+            if key in source:
+                raise CategoricalMappingConflictError(
+                    f"Table {name!r} is declared in both {source[key]} and "
+                    f"{path}, which are the same categorical-mapping level "
+                    f"({Path(level)}).  Declare it once (GH #953).")
+            source[key] = path
+            tables[name] = table
+    return tables
+
+
+def _categorical_rungs(dirs: list[str]) -> list[str]:
+    """``dirs`` with the cross-country level appended -- global LAST, always.
+
+    Appended rather than expected from the caller because no caller could
+    spell it: the third rung every wave module writes (``countries/_/``) is not
+    where the shared tables live, and never existed.  Deduplicated by real
+    path, so a caller that does name the package root is not searched twice.
+    """
+    out, seen = [], set()
+    for d in list(dirs) + [str(global_categorical_level())]:
+        key = os.path.realpath(d)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(d if d.endswith('/') else d + '/')
+    return out
+
+
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
-                            dirs: list[str] = ['./','../../_/','../../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
+                            dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
 
     **The resolution model** (GH #953).  ``dirs`` is walked in order and the
@@ -1728,31 +1862,33 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
       ALL of it.  A country wanting one local row of ``foo`` must re-list
       every other row; it cannot declare ``foo`` partially.
 
-    **This function cannot read a DIRECTORY of per-table mappings.**  Each
-    rung is the single file ``d + fn``, and ``fn`` defaults to
-    ``'categorical_mapping.org'`` -- of the 71 ``get_categorical_mapping(``
-    calls in ``countries/**/*.py``, zero pass an explicit ``fn=``.  So a rung
-    pointing at a directory of ``<tablename>.org`` files resolves nothing.
-    In particular the cross-country rung as spelled in the four GhanaLSS wave
-    ``mapping.py`` modules,
+    **A rung is a LEVEL, and a level has two spellings** (GH #953).  At each
+    directory ``d`` in ``dirs`` the table is looked for in
+    ``d/categorical_mapping.org`` *and* in any ``d/categorical_mapping/*.org``
+    (matched by ``#+name:``, so the file a table sits in does not matter).  A
+    level declaring the same table twice raises
+    :class:`CategoricalMappingConflictError` -- it is never skipped, because
+    skipping it would resolve the table from a lower level.
 
-        _dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+    **The cross-country level is appended automatically, LAST**:
+    :func:`global_categorical_level` (the package root, whose
+    ``categorical_mapping/`` holds ``u.org``, ``harmonize_assets.org``, ...).
+    Callers cannot spell it themselves: the third rung callers used to write
+    (``f'{path}/../../_/'``, and ``'../../../_/'`` in the old default
+    ``dirs``) was ``countries/_/``, which never existed and never held the
+    shared tables.  Those spellings were removed with this change; the
+    default ``dirs`` is now the cwd-relative wave and country levels.
 
-    names ``lsms_library/countries/_/``, **which does not exist**; the default
-    ``dirs`` here is a fifth, cwd-relative spelling of the same three rungs.
-    GH #953 holds the repair and its options are still open.
+    **Override stays WHOLE-TABLE here** (@ligon, 2026-10-17).  The read-time
+    merge, :meth:`lsms_library.country.Country.categorical_mapping`, row-unions
+    the names in ``lsms_library.country._ADDITIVE_CATEGORICAL_TABLES``; this
+    cascade does not.  Measured when the global rung was wired: the only table
+    name a cascade call can newly reach is ``u``, and its three callers
+    (Uganda, Mali, Malawi 2013-14) all resolve at their own country level, so
+    whole-table override changes nothing they receive.
 
-    **Where the cross-country tables actually live, and the OTHER mechanism
-    that reads them.**  ``lsms_library/categorical_mapping/*.org``, one file
-    per table, consumed at READ time by
-    :meth:`lsms_library.country.Country.categorical_mapping`, which globs
-    every ``.org`` there, keys tables by ``#+name:``, and merges the country's
-    own ``categorical_mapping.org`` over them.  Same direction (local wins)
-    and the same whole-table granularity by default -- except for the names in
-    ``lsms_library.country._ADDITIVE_CATEGORICAL_TABLES``, which are merged
-    **per row**, so a country inherits the global rows and overrides only the
-    keys it redeclares.  That is inherit-and-override rather than
-    re-list-everything, and it is the granularity the cascade lacks.
+    Only the default ``fn`` has levels.  An explicit ``fn`` (none of the
+    callers passes one) keeps the original single-file-per-rung behaviour.
 
     ``tests/test_categorical_mapping_resolution.py`` pins all of the above.
 
@@ -1772,10 +1908,19 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
         else:
             return cats[tablename]
 
-    for d in dirs:
+    levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
+    rungs = _categorical_rungs(dirs) if levels else dirs
+    exc: Exception = FileNotFoundError(f"no rungs to search: {dirs}")
+    for d in rungs:
         try:
             if d[-1]!="/": d+='/'
-            df = df_data_grabber(d+fn,idxvars,orgtbl=tablename,**kwargs)
+            if levels:
+                path = categorical_level_table_file(d, tablename)
+                if path is None:
+                    raise KeyError(f'No table {tablename} at level {d}.')
+            else:
+                path = d+fn
+            df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
             df = df.squeeze()
             if asdict:
                 return df.to_dict()
@@ -1784,7 +1929,8 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
         except (FileNotFoundError,KeyError) as error:
             exc = error
 
-    exc.add_note(f"No table {tablename} found in any file {fn} in directories {dirs}.")
+    where = (f"{fn} or {CATEGORICAL_MAPPING_DIR}/*.org" if levels else fn)
+    exc.add_note(f"No table {tablename} found in any file {where} in directories {rungs}.")
     raise exc
 
 
@@ -1817,14 +1963,26 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
     each numeric code, so a caller cannot get this wrong.  Non-numeric codes
     (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
 
-    Returns ``{}`` if no file in *dirs* carries the table -- callers that need
-    to distinguish "absent" from "empty" should check the directories first.
+    Returns ``{}`` if no level in *dirs* carries the table -- callers that
+    need to distinguish "absent" from "empty" should check the directories
+    first.  Levels are resolved exactly as in :func:`get_categorical_mapping`:
+    file or ``categorical_mapping/`` directory, the cross-country level
+    appended last, a within-level duplicate raising.
     """
-    for d in dirs:
+    levels = fn == CATEGORICAL_MAPPING_FILE
+    for d in (_categorical_rungs(dirs) if levels else dirs):
         if not d.endswith('/'):
             d += '/'
         try:
-            df = df_data_grabber(d + fn, idxvars, orgtbl=tablename,
+            if levels:
+                # A conflict raises CategoricalMappingConflictError, which is
+                # deliberately NOT caught here (GH #953).
+                path = categorical_level_table_file(d, tablename)
+                if path is None:
+                    continue
+            else:
+                path = d + fn
+            df = df_data_grabber(path, idxvars, orgtbl=tablename,
                                  **{value: value})
         except (FileNotFoundError, KeyError, ValueError):
             continue
