@@ -60,6 +60,18 @@ def test_bare_call_raises_before_resolution(tmp_path):
         get_categorical_mapping(tablename="nonesuch", dirs=[str(tmp_path) + "/"])
 
 
+def test_hint_follows_idxvars(level):
+    # The code_label_map hint only fits a Code -> Label table; any other key
+    # gets a hint naming that key, a non-str key a conditional one.
+    with pytest.raises(TypeError) as e:
+        get_categorical_mapping(tablename="region", dirs=level)
+    assert "code_label_map('region', dirs)." in str(e.value)
+    with pytest.raises(TypeError) as e:
+        get_categorical_mapping(tablename="region", dirs=level,
+                                idxvars={"Code": ("c", str)})
+    assert "If the table is keyed Code -> Label" in str(e.value)
+
+
 def test_explicit_value_column_unchanged(level):
     assert get_categorical_mapping(tablename="region", dirs=level,
                                    Label="Label") == {"1": "Western",
@@ -76,10 +88,13 @@ def test_code_label_map_is_the_alternative(level):
 
 def test_global_only_name_bare_raises(tmp_path):
     # 'u_kg' lives only in lsms_library/categorical_mapping/u.org; a local
-    # level without it falls through to the global rung (GH #953).
+    # level without it falls through to the global rung (GH #953).  It is
+    # keyed by 'Unit', so the bare call must name that key: with the default
+    # idxvars='Code' development failed with KeyError (the wrong reason),
+    # whereas with idxvars='Unit' it returned {} -- the real #953 symptom.
     dirs = [str(tmp_path) + "/"]
-    with pytest.raises(TypeError):
-        get_categorical_mapping(tablename="u_kg", dirs=dirs)
+    with pytest.raises(TypeError, match="idxvars='Unit'"):
+        get_categorical_mapping(tablename="u_kg", dirs=dirs, idxvars="Unit")
     got = get_categorical_mapping(tablename="u_kg", dirs=dirs,
                                   idxvars="Unit", Kg="Kg")
     assert len(got) > 0

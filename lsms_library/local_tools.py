@@ -1925,12 +1925,22 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             return cats[tablename]
 
     if tablename is not None and not set(kwargs) - _GRABBER_OPTIONS:
+        # The code_label_map hint fits only the key the caller named.
+        if idxvars == 'Code':
+            hint = (f"For a Code -> Label lookup use "
+                    f"code_label_map({tablename!r}, dirs).")
+        elif isinstance(idxvars, str):
+            hint = (f"For a single-column lookup keyed by {idxvars!r} use "
+                    f"code_label_map({tablename!r}, dirs, "
+                    f"idxvars={idxvars!r}, value=<value column>).")
+        else:
+            hint = (f"If the table is keyed Code -> Label, use "
+                    f"code_label_map({tablename!r}, dirs).")
         raise TypeError(
             f"get_categorical_mapping(tablename={tablename!r}) needs a value "
             f"column, e.g. **{{'Preferred Label': 'Preferred Label'}}; "
             f"without one it can only return an empty mapping (GH #674). "
-            f"For a Code -> Label lookup use "
-            f"code_label_map({tablename!r}, dirs).")
+            + hint)
 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
