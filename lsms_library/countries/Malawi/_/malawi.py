@@ -93,6 +93,14 @@ def _clean_freetext_unit(value):
     s = str(value).strip()
     if s.lower() in ('nan', ''):
         return pd.NA
+    # GH #1042: 'N/A' typed into the other-specify box is not a unit.  Every
+    # such row (IHS4/IHS5 Module G) carries unit code 23 = OTHER (SPECIFY), so
+    # no unit was recorded: emit the missing-unit sentinel, which the kg
+    # inference refuses.  Returning NA here would be wrong -- the caller falls
+    # back to the code-23 label 'Other (Specify)', which still gets kilograms.
+    if s.lower() == 'n/a':
+        from lsms_library.transformations import U_UNKNOWN
+        return U_UNKNOWN
     if re.fullmatch(r'[\d.,/]+', s):          # bare quantity, no unit -> NA
         return pd.NA
     # Drop a leading count of one only ('1 Basket' -> 'Basket').  Never a
