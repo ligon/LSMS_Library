@@ -904,8 +904,14 @@ DROP itself is unchanged.
 price" column for =s='purchased'= (=h14aq12= in 2005-06, =h15bq12= in
 2009-10 .. 2015-16; =CEB14a=/=14b=/=14c= per leg in 2018-19 and 2019-20) and
 its "farmgate price" column for =s='produced'= (=h14aq13=, =h15bq13=,
-=CEB15=), via =uganda.food_acquired_to_canonical=.  =s='inkind'= carries no
-=Price= in any wave.  A =u = 'Value'= row carries none either (see the unit
+=CEB15=), via =uganda.food_acquired_to_canonical=.  In 2018-19 and 2019-20
+the wave scripts declare no single =market= column, and =uganda.food_acquired=
+(=uganda.py=, ``df['market'] = df.filter(regex='^market').median(axis=1)``)
+builds it as the ROW MEDIAN of the three per-leg UBOS price fields -- home
+(=CEB14a=), away (=CEB14b=) and own-production (=CEB14c=) -- so the purchased
+=Price= of those two waves is a library fold of UBOS prices, one of which is
+asked of the own-production leg; it is not a library =value / quantity=.
+=s='inkind'= carries no =Price= in any wave.  A =u = 'Value'= row carries none either (see the unit
 section above).
 
 *These columns are not independently elicited prices.*  On almost every row
