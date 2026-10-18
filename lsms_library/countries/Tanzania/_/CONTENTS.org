@@ -1298,6 +1298,14 @@ df.index.name = 'Preferred Label'
 print(df_to_orgtbl(df))
 #+end_src
 
+*Superseded (GH #836, 2026-10-17) --- nothing reads this table.*  It was the
+item-label map of the retired country script =_/food_acquired.py=.  The live
+map is =#+name: harmonize_food= in =_/categorical_mapping.org= (applied in each
+wave script by =tanzania.food_acquired_to_canonical=), and that file IS in the
+cache hash.  Measured at retirement: the two tables carry the identical
+180 (wave, raw label) -> Preferred Label pairs.  Edit =harmonize_food=, not
+this copy; it is kept only as the output of the src block above.
+
 #+name: food_labels
 | Preferred Label          | 2008-15                                                  | 2019-20                                                  | 2020-21                                                  |
 |--------------------------+----------------------------------------------------------+----------------------------------------------------------+----------------------------------------------------------|
@@ -1482,27 +1490,36 @@ not match on a native-unit key.  Any consumer comparing the two tables at
 the fix that looks obvious (registering the sentinel) is the one the config
 already rules out.
 
-*** =CONTENTS.org= is a BUILD INPUT here --- and the cache hash cannot see it
+*** =CONTENTS.org= WAS a build input here --- RESOLVED by retiring the script (GH #836, 2026-10-17)
 
-=Tanzania/_/food_acquired.py= line 34 reads its item-label table out of *this
-file*:
+=Tanzania/_/food_acquired.py= used to read its item-label table out of *this
+file* (=df_from_orgfile('CONTENTS.org','food_labels')=), while =country.py='s
+=_ORG_HASH_SKIP = \{"CONTENTS.org"\}= excludes this file from
+=Wave._input_hash= / =Country._table_cache_hash= as documentation --- so an edit
+to the table could not invalidate the cache.
 
-: fl = df_from_orgfile('CONTENTS.org','food_labels')
+Resolved by *deleting the script*, not by moving the table, because the script
+was not on any working path (measured 2026-10-17 on a cold private root):
 
-Tanzania is the *only* country in the corpus that does this (checked across
-every =countries/*/_/*.py= and =countries/*/*/_/*.py=); everywhere else such a
-table lives in =food_items.org= or =categorical_mapping.org=.  But
-=country.py= defines =_ORG_HASH_SKIP = \{"CONTENTS.org"\}= --- CONTENTS.org is
-excluded from =Wave._input_hash= / =Country._table_cache_hash= *as
-documentation*.
+- *Default backend*: a sentinel =raise= planted at the top of the script never
+  fired; the framework builds =food_acquired= by concatenating the three wave
+  parquets, and the cold frame (251,730 rows) equals the warm one.
+- *=LSMS_BUILD_BACKEND=make=*: the script IS invoked, and it crashes on
+  unmodified code --- =AssertionError: Cannot concat indices that do not have
+  the same number of levels= --- because it still renames =UPHI= to =j= and
+  expects the pre-canonical =(j, t, i)= wave index, while the wave parquets are
+  canonical =(t, i, j, u, s)= (GH #169).  Its label rename targeted level =i=,
+  which is now the *household*, so even a running script would have relabelled
+  nothing.
+- *Its effect is already served*: each wave script maps item labels through
+  =harmonize_food= (=_/categorical_mapping.org=, hashed), whose 180
+  (wave, raw label) -> Preferred Label pairs are identical to =food_labels='s;
+  the 60 served =j= values are exactly the 60 Preferred Labels.
 
-So editing the =food_labels= table below changes what =food_acquired= builds
-and does *not* invalidate the L2 cache: the stale parquet keeps being served.
-The exclusion is right for prose (this note, for instance, is cache-neutral by
-design) and wrong for a build table that happens to live in the same file.
-Either move =food_labels= to =food_items.org= (which IS hashed) or clear the
-cache by hand after touching it.  Reported, not fixed --- the move changes
-=food_acquired='s build inputs and forces a corpus rebuild of the table.
+The =food_labels= table below is kept as history and marked superseded.  No
+Tanzania script reads =CONTENTS.org= any more.  (The catch-all
+=%.parquet: %.py CONTENTS.org tanzania.py= Makefile rule still names this file
+as an *mtime* prerequisite; that is make's business, not the cache hash's.)
 
 *** Test...
 #+begin_src python :results output
