@@ -18,6 +18,7 @@ env/
 .venv
 .venv.lustre/
 .venv.sqfs*
+.venv.lock
 *.sqfs
 
 # Make stamp dir

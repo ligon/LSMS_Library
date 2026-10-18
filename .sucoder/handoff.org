@@ -1,5 +1,24 @@
 #+title: Handoff -- v0.15.0 released 2026-10-15
 
+* Current -- 2026-10-17 venv per-clone fixes (Sue / Claude Opus 5.5, job 40083775, n0019.savio3)
+- Branch =fix/958-venv-per-clone= -> PR #1017 (base development); CI pending at writing.
+  Fixes #958 (all five defects) and #960 (docs).  #957 closed (done 2026-09-22).
+  #961 tracker: close when #1017 merges.  Default branch is master, so close
+  #958/#960/#961 BY HAND after the merge.
+- Venv recipe now: =bin/savio_venv.sh mount= FROM THE CLONE (finds the image via
+  origin), then =export PYTHONPATH=$PWD=.  =status= shows the generation.
+  The "Operational facts" below naming /local/job39919092 are dead.
+- Shared image re-imaged with approval: generation =20261017T230017Z=
+  (ligonlibrary 0.2.3, self-locating shebangs).  Rollback =.venv.sqfs.prev= is
+  the 2026-09-22 image (the v0.15.0 validation closure).  The 2026-09-07
+  pre-#957 image was LOST to the one-slot rollback; its closure is
+  slurm_logs/venv_provenance/master_freeze_2026-09-21.txt.
+- Mirror's dangling =.venv= symlink removed; =.venv.lustre/README_WHY_THIS_EXISTS.md=
+  bannered SUPERSEDED (untracked).  =.venv.lock= in the mirror is untracked until
+  #1017 merges (gitignore entry is on the branch).
+- @ligon chose generation-named rollbacks: every replaced image kept as
+  =.venv.sqfs.gen-<G>=; the 2026-09-22 image is =.venv.sqfs.gen-20260922T073356Z-unstamped=.
+
 * Current execution -- 2026-10-15 v0.15.0 published and verified
 All 23 implementation PRs and the final evidence PR #1015 are merged. Release
 PR #999 merged development into master with two-parent commit
