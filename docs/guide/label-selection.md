@@ -102,12 +102,17 @@ Set `LSMS_LABELS_STRICT=1` (also `true` or `yes`) to raise
 `LabelPassThroughError` before renaming or summing. Null `j` is handled by the
 null-index audit instead. Fully covered crosswalks emit no pass-through report.
 
-The unmatched attrs survive Country reaggregation; multi-country Feature concat
-currently loses this structured report, although per-country warnings still
-fire. That carrier, conflicting mappings from one Preferred Label to several
-targets, and per-country curation remain open under #787. Reaggregation can sum
-an unmatched label into a target with the same spelling, so inspect the warning
-before using the result.
+The unmatched attrs survive Country reaggregation and the multi-country
+`Feature` concat. On a `Feature` result the report is keyed by country,
+`result.attrs['labels_unmatched'] == {country: report}`, one entry per *kept*
+country that passed a `j` through; a fully matched country, and a country
+dropped under Contract B (listed in `attrs['labels_unavailable']`), contribute
+no entry. Measured: `Feature('food_prices')(['Malawi', 'Ethiopia'],
+labels='2004-05')` carries `{'Malawi': …}` (32 of 147 foods, 42,240 rows) and
+drops Ethiopia as unavailable. Conflicting mappings from one Preferred Label to
+several targets, and per-country curation, remain open under #787.
+Reaggregation can sum an unmatched label into a target with the same spelling,
+so inspect the warning before using the result.
 
 ## Which decode path this extends — and which three it does not
 

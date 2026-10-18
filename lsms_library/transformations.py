@@ -3005,7 +3005,35 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
           market price for ``s='purchased'``, farmgate for
           ``s='produced'``, imputed for ``s='inkind'``.
 
+        ``food_acquired.Price`` is **whatever the country's source
+        recorded** under that name -- not a guarantee of an elicited
+        price.  In some countries it is the statistics office's own
+        ``Expenditure / Quantity``: Uganda's UBOS "market" / "farmgate"
+        price columns agree with the row's own value / quantity on
+        94.4-99.9% of purchased and 95.3-99.99% of produced rows per wave
+        (measured 2026-10-17 on the served table; raw-file check and
+        per-wave numbers in ``countries/Uganda/_/CONTENTS.org``).  So
+        ``'unitprice'`` and ``'unitvalue'`` (likewise ``'kgprice'`` and
+        ``'kgvalue'``) are **not independent sources**: comparing them can
+        return an identity dressed as a validation.  Check the agreement
+        share for the country you hold before treating them as two
+        measurements (GH #845).  Same-day measurement on the other
+        ``Price``-bearing countries, provenance not established: Panama
+        100%, GhanaLSS 100% (produced rows only), Guatemala 97.7%, Serbia
+        88.5% of comparable rows.
+
         See ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
+
+    Raises
+    ------
+    UnitsUnavailableError
+        (a ``ValueError`` subclass) when the requested mode needs a column
+        ``food_acquired`` does not carry: ``Price`` for ``'kgprice'`` /
+        ``'unitprice'`` (the instrument records no unit price), or
+        ``Expenditure`` / ``Quantity`` for the ``*value`` modes.  Before
+        GH #828 the ``*price`` case returned an empty frame silently.
+        ``Country`` names the country on the error; ``Feature`` drops such
+        a country with one warning and ``attrs['units_unavailable']``.
 
     Returns
     -------
