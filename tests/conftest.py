@@ -85,7 +85,11 @@ def aws_creds_available() -> bool:
     """
     if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
-    for creds_file in (_lsms_config().s3_creds_path(), _LEGACY_INTREE_CREDS):
+    config = _lsms_config()
+    user_creds = config.s3_creds_path() if config is not None else None
+    for creds_file in (user_creds, _LEGACY_INTREE_CREDS):
+        if creds_file is None:
+            continue
         try:
             if creds_file.exists() and "aws_access_key_id" in creds_file.read_text():
                 return True
@@ -101,10 +105,17 @@ _LEGACY_INTREE_CREDS = (
 
 
 def _lsms_config():
-    """``lsms_library/config.py`` loaded by path (see ``aws_creds_available``)."""
+    """``lsms_library/config.py`` loaded by path (see ``aws_creds_available``).
+
+    ``None`` when this file is not inside a checkout -- ``test_conftest_net``
+    runs a COPY of it in a pytester tmp root, where neither the package nor
+    any credential file exists, and that copy must see no credentials.
+    """
     import importlib.util
 
     path = Path(__file__).parent.parent / "lsms_library" / "config.py"
+    if not path.is_file():
+        return None
     spec = importlib.util.spec_from_file_location("_conftest_lsms_config", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
