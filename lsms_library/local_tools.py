@@ -2515,9 +2515,11 @@ def read_parquet_build_drops(path: str | Path) -> list[dict] | None:
 
     Each entry is one sub-df the GH #515 fallback dropped: ``wave``, ``sub``,
     ``file`` (relative to the countries root), ``kind`` (``unavailable`` or
-    ``config``), ``error`` and ``missing_required`` (the REQUIRED declared
-    columns that sub-df alone would have supplied).  Footer-only read (~1 ms),
-    safe on the warm-read hot path.
+    ``config``), ``cause`` (``None``, ``missing-column`` or
+    ``no-such-source``), ``error``, and ``missing_required`` /
+    ``missing_optional`` (the declared columns that sub-df alone would have
+    supplied; ``missing_optional`` is absent from first-pass stamps).
+    Footer-only read (~1 ms), safe on the warm-read hot path.
     """
     try:
         import pyarrow.parquet as pq

@@ -7113,17 +7113,27 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
 # The record of what was dropped rides in the parquet (``lsms_build_drops``,
 # see ``local_tools.read_parquet_build_drops``), filed here during the build the
 # same way the grain audit is (``_GRAIN_LEDGER``; relayed across the
-# wave-parallel fork by ``_parallel_waves``).  A parquet is DEGRADED when a drop
-# cost a REQUIRED declared column -- an ``optional: true`` column is the
-# author's signed statement that it may be absent, so dropping it is not
-# degradation (Burkina Faso's df_geo, a config KeyError on an optional column,
-# would otherwise warn on every process forever).
+# wave-parallel fork by ``_parallel_waves``).  Each drop is classified by its
+# CAUSE (``_drop_record``): ``unavailable`` (the source exists -- a file or a
+# ``.dvc`` sidecar -- and could not be fetched) or ``config`` (a ``KeyError``:
+# the file lacks a column the YAML names; or a ``file:`` naming no file and no
+# sidecar: a typo'd path).  A parquet is DEGRADED when an ``unavailable`` drop
+# cost a declared column, required OR ``optional: true`` (675-b, @ligon
+# 2026-10-18: a transient fetch failure must not permanently cost an optional
+# column either).  A ``config`` drop is recorded and NEVER graded: it re-drops
+# identically on every rebuild, so a probe would find the file readable,
+# rebuild, drop again and trip the #920 repeat detector every process --
+# Burkina Faso's df_geo (#1050) is that shape, and is fixed at its source.  One
+# that costs a REQUIRED column never reaches a stamp: ``grab_data`` raises.
 #
 # Both read gates then ask ``_degraded_cache_verdict``: if the dropped source
-# can NOW be read (one probe per source per process), the parquet is a miss and
+# can NOW be fetched (one probe per source per process, fast tiers only --
+# local file, or sidecar + L1 blob; no WB download), the parquet is a miss and
 # the table rebuilds -- the heal; if it still cannot, the stored frame is served
-# with a ``DegradedCacheWarning`` naming the missing columns and the file -- a
-# permanently unavailable source costs one cheap probe per process, never a
+# with a ``DegradedCacheWarning`` naming the missing columns and the file.  A
+# permanently unavailable source costs one probe per process -- measured
+# ~1 s when it means a remote GET for an absent blob, milliseconds otherwise
+# (47-64 s when the probe ran the full ``get_dataframe`` chain) -- and never a
 # rebuild loop.  A key whose degraded parquet THIS process wrote is never
 # re-probed, so the build that just failed to fetch does not immediately
 # rebuild again (which would be a GH #920 ``repeat``).
