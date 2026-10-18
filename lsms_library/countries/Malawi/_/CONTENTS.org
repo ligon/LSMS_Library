@@ -2594,3 +2594,50 @@ IHS2 (2004-05) ships *no* unit-conversion table at all, so its =cfactor= is
 whatever the unit label itself says and nothing more; IHS3+ take =cfactor=
 *solely* from the region-keyed conversion table.  The two waves' =cfactor=
 columns mean different things and are produced by different code.
+
+* 2026-10-18 -- food_acquired =u='N/A'= is "no unit recorded" (GH #1042)
+
+*Decision.*  The other-specify text =N/A= is no longer served as a unit:
+=_clean_freetext_unit= (=malawi.py=) now returns the missing-unit sentinel
+=Unknown= (=transformations.U_UNKNOWN=) for it, so the kg inference refuses
+those rows.  It must NOT return =NA=: =handling_unusual_units= then falls
+back to the standard label of the code, which is =Other (Specify)= -- a
+label that still receives inferred kilograms.
+
+*Where the rows come from.*  IHS4 (2016-17) and IHS5 (2019-20) Module G,
+=hh_g0Xb_oth= = =N/A=, and *every* such row has unit code =23=.  Served
+rows: 2016-17 purchased 22 (=hh_g04b=: 20 cross-section + 2 panel) and
+produced 2 (=hh_g06b=); 2019-20 purchased 19 (=hh_g04b=: 14 + 5).  A further
+15 / 28 =N/A= rows sit on =hh_g03b= (total consumed), which is not a served
+source.  None of the 43 served =(t,i,j,s)= groups reports any other unit.
+Items: Buns/Scones 29, Salt 4, Sugar 3, single rows of beer, rabbit/mice,
+tea, ice lollies, eggs, restaurant meat, other.
+
+*Questionnaire (C4).*  The Module G "CODES FOR UNIT" list prints
+=OTHER (SPECIFY) 23= in both instruments
+(=2016-17/Documentation/fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf=,
+IHS4 p. 30-31: =KILOGRAMME 1 ... SATCHET/TUBE 22 OTHER (SPECIFY) 23=;
+=2019-20/Documentation/fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf=:
+=... SATCHET/TUBE LARGE 22C OTHER(SPECIFY) 23 TINA 25 ...=).  "Other,
+specify: N/A" records that no unit was given.
+
+*Before / after* (private cold rebuild, base 3e3bd26ee): see the commit
+message and =tests/test_gh1042_missing_unit_spellings.py=.
+| measure                                     | before      | after       |
+|---------------------------------------------+-------------+-------------|
+| =u='N/A'= rows (2016-17 / 2019-20)          | 24 / 19     | 0           |
+| =u='Unknown'= rows                          | 0           | 24 / 19     |
+| =food_acquired= rows; sum Expenditure       | 971,531; 281,093,686 | unchanged |
+| =food_quantities(units='kgs')= total kg     | 2,582,614.88 | 2,581,948.04 (-666.84) |
+| =kg_factor_sources= item_unit / unit / none | 225,580 / 70,725 / 991 | 225,565 / 70,711 / 1,020 |
+| =food_prices()= rows, =kgvalue=             | 681,613     | 681,587     |
+| =food_prices()= rows, =unitvalue=           | 681,614     | unchanged   |
+
+The 14 =N/A= rows with a shipped conversion-table factor keep it (=survey_kg=
+outranks the sentinel by design); the 29 that had an *inferred* factor
+(=item_unit= 15, =unit= 14) now fall to =none=.
+
+*Same class, NOT changed here.*  Code 23 with no usable specify text is
+served as =Other (Specify)= (6,563 rows) and =Other= (894 rows), and those
+still get inferred kilograms pooled across whatever the respondents meant.
+That is a larger decision (GH #1042 residual), not a spelling fix.

@@ -1998,6 +1998,74 @@ TODO below).
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+*** =u='None'= is "no unit recorded", not a unit (GH #1042, 2026-10-18)
+
+*Decision.*  The Section 8H own-production unit spelled =None= / =none=
+now maps to the missing-unit sentinel =Unknown=
+(=transformations.U_UNKNOWN=) in =_/unit_labels.org=, so the kg inference
+refuses it (=_unit_sentinel_mask=) and those rows are carried in their native
+unit.  The remap sits in the country table because that is where all three
+waves mint the label; an API-time =categorical_mapping.org= row would rename
+the served column *after* the kg factor was inferred.
+
+*Where the rows come from* (all =s='produced'=, 2,508 served rows, 798
+=(t,i,j)= groups; *none* of those groups reports any other unit):
+
+| wave    | variable | code | served rows | raw code-0 rows, consumer & qty > 0 |
+|---------+----------+------+-------------+-------------------------------------|
+| 1998-99 | =s8hq9=  | 0    |          88 |  36 (decoded by the wave's own =s8hq9= table, =0 None=) |
+| 2005-06 | =s8hq13= | 0    |       1,450 | 639 (value label =none=) |
+| 2012-13 | =s8hq9=  | 0    |         970 | 343 (value label =none=) |
+
+*Questionnaire (C4).*  GLSS4 Part B §8H (pp. 8.11-8.17,
+=1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=)
+prints its unit codes from =Pounds...1= to =Fingers...24= -- *there is no
+code 0*.  GLSS5 Part B (=2005-06/Documentation/G5QPartB.pdf=, 8H "SEE LIST
+OF UNIT CODES") and GLSS6 Part B (=2012-13/Documentation/QUESTIONNAIRES/GLSS6
+Part B Questionnaire.pdf=, 8H "UNIT CODES REFER TO PAGE 8.10") both open the
+list with =None ....00=, beside genuine count units (=singles=, =piece=,
+=fruit=, =nut=, =tubers=, =fingers=); the same =None ....00= heads the
+GLSS6 *crop* list and the processed-goods list, and §9 says "IF NONE PUT
+'00'".  It is the instrument's "nothing / not applicable" code.
+
+*Data.*  Code 0 is also the zero-fill on non-consumer rows: 374,626 of the
+375,782 2005-06 =s8hq1='no'= rows, and 978,825 of the 979,290 2012-13 rows
+whose =s8hq1= is not ='yes'= (60 of them blank), carry it -- almost all
+with no quantity at all.  The served =None= rows were nevertheless
+being given *inferred* kilograms -- 39,029 kg in total (=item_unit= 1,745
+rows, =unit= 653, =item_unit_tight= 110) -- and the factors are nonsense:
+Pepper 26 kg per "None" (110 rows, 28,773 kg = 74% of the total), Egg 1.2 kg
+per egg, and 653 rows on the cross-item pooled factor 0.679.
+
+*What it is not.*  For Chicken and Egg the =None= rows *price* like a single
+bird / egg (2005-06 Chicken median price 25,000 vs =Single= 30,000; 2012-13
+10 vs =Single= 12 / =Piece= 10; Egg =None= ~ =Single= in both waves), so an
+enumerator may have meant "counted, no container".  The instrument does not
+license that reading (it offers =singles=/=piece= for exactly that), so the
+rows are not relabelled to a count; anyone who wants that assumption can
+apply it to the =Unknown= rows explicitly.
+
+*Accounting* (private cold rebuild of GhanaLSS at 3e3bd26ee + this change):
+see the GH #1042 commit message and =tests/test_gh1042_missing_unit_spellings.py=.
+| measure                                     | before        | after         |
+|---------------------------------------------+---------------+---------------|
+| =u='None'= rows (1998-99 / 2005-06 / 2012-13) | 88 / 1,450 / 970 | 0           |
+| =u='Unknown'= rows                          | 0             | 88 / 1,450 / 970 |
+| =food_acquired= rows; sum Expenditure       | 5,340,606; 19,059,899,600.9 | unchanged |
+| =food_quantities(units='kgs')= total kg     | 11,079,155.43 | 11,040,126.57 (-39,028.86) |
+| =kg_factor_sources= item_unit / tight / unit / none | 1,011,668 / 70,443 / 606,596 / 3,565,404 | 1,009,923 / 70,333 / 605,943 / 3,567,912 |
+| =kg_factor_baseline_gate= rows_refused      | 428,373       | 428,173       |
+| =food_prices()= rows, =kgvalue= / =kgprice= | 568,624 / 189,649 | 567,839 / 188,864 |
+| =food_prices()= rows, =unitvalue= / =unitprice= | 1,676,093 / 189,656 | unchanged |
+| =nutrition._quantities()= (486,507 cells)   | 10,813,574.81 kg | identical, max abs diff 0 |
+
+*Not changed:* =nutrition.py='s =NON_PHYSICAL_UNITS= still names ='none'=;
+after the rename the rows arrive as =Unknown= and pass that filter, but they
+carry no kg factor and are dropped by its =u == 'kg'= mask, so the nutrient
+quantities are unchanged (measured above).  =community_prices= (the other
+=unit_labels.org= reader) has no =None= rows.  =u='All'= is a different
+question and is untouched.
+
 *** Test...
 #+begin_src python :results output
 import pandas as pd
