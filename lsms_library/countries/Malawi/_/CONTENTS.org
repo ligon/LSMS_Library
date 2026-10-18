@@ -2637,10 +2637,14 @@ The 14 =N/A= rows with a shipped conversion-table factor keep it (=survey_kg=
 outranks the sentinel by design); the 29 that had an *inferred* factor
 (=item_unit= 15, =unit= 14) now fall to =none=.
 
-*Same class, NOT changed here.*  Code 23 with no usable specify text is
-served as =Other (Specify)= (6,563 rows) and =Other= (894 rows), and those
-still get inferred kilograms pooled across whatever the respondents meant.
-That is a larger decision (GH #1042 residual), not a spelling fix.
+*Same class, NOT changed here.*  At this entry 7,457 rows were served as
+=Other (Specify)= (2010-11 5,439; 2013-14 118; 2016-17 994; 2019-20 12) and
+=Other= (2004-05 892 -- IHS2's code 20, a different code scheme; 2016-17 1;
+2019-20 1), all with inferred kilograms.  Not all of them are code 23: most
+of 2010-11's are IHS3 units the =u= table mis-decoded.  *Since resolved*
+by the two entries below: code 23 without a specification -> =Unknown=
+(1,445 rows), and the IHS3 decode (6,020 rows to their questionnaire
+labels or =Unknown=).  No Malawi wave serves =Other (Specify)= now.
 
 * 2026-10-18 -- food_acquired: OTHER (SPECIFY) with no specification is "no unit recorded" (GH #1042 follow-up)
 
@@ -2715,6 +2719,9 @@ conversion table keys on those codes.  2016-17 serves 590 more from an
 unlabelled code =21.0=; the IHS4 list prints no 12/13/16/17/21.  2013-14
 keeps 8.  The =u= table decodes =u= for every Malawi table at finalize, so
 correcting it is a separate, wave-aware change (GH #1042 residual).
+*Since resolved* in the next entry (IHS3 decode); what is left after it is
+the 5 implausible =90 kg Bag= rows (a decision), 13 suffixed raw codes
+(=16b=, =12a=, ...) and the =23A=/=23B= vs TINA ambiguity -- all named there.
 Other Malawi tables also serve =Other (Specify)= through their own unit
 vocabularies, not this code path: =crop_production= 2,409, =plot_inputs=
 6,522, =community_prices= 2,876 rows -- measured, unchanged.
