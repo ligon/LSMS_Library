@@ -161,6 +161,33 @@ The unwired legacy =2012-13/_/units.py= also said =4:'ml'=; it now says
 through =food_acquired_for_wave= fails loudly (=KeyError: '2023-24'= from
 =food_unit_labels=) until that column is added -- intended, not a bug.
 
+** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
+
+=food_acquired_for_wave= used to fill a NaN raw unit code with the literal
+='None'=.  The =u= table has no ='None'= key, so it could only mean "no unit
+recorded" -- but ='None'= is not in =transformations._U_SENTINELS=, so
+=food_kg_factors= treated it as a real unit and gave those rows pooled
+price-ratio kilograms.  It now writes =U_UNKNOWN= (='Unknown'=), assigned after
+the per-round decode; the =u= table has no ='Unknown'= =Code=, so the API-time
+mapping passes it through.  Measured on a private root (before = #607 branch
+tip 70d88ff1c, after = this change; Nigeria =food_acquired= rebuilt):
+
+| | before | after |
+|-+-+-|
+| rows =u='None'= (2010Q3/2011Q1/2012Q3/2013Q1/2015Q3/2016Q1) | 112/98/154/463/14/6 = 847 | 0 |
+| rows =u='Unknown'= | 0 | 847 (same split) |
+| their =KgFactorSource= | =unit= 466, =item_unit= 381 | =none= 847 |
+| their kg | 1,133.17 | 0 |
+| =food_quantities(units='kgs')= kg rows, total | 1,483,853.94 | 1,482,720.76 (-1,133.17) |
+| =kg_factor_sources= item_unit / unit / none | 123,061 / 55,162 / 12 | 122,680 / 54,696 / 859 |
+| =food_prices()= (kgvalue) rows | 481,613 | 481,191 (-422, the priced rows) |
+| =food_acquired= rows / Expenditure | 595,725 / 196,081,393.67 | unchanged |
+
+The 847 rows are kept (=food_quantities= carries them at their native quantity
+under =u='Unknown'=); only their kilograms and their kg-price go.  The unwired
+=individual_unit_values.py= scripts in 2012-13/2015-16/2018-19 still mint
+='None'=; nothing served reads them.
+
 *Open, not fixed here*: (a) W4's per-wave column gives size-less W4 codes
 (20 CONGO, 30 MUDU, 40 DERICA, 80 PIECE, 90 HEAP, ...) W3's =small ...=
 labels -- 48,305 (2018Q3) + 50,181 (2019Q1) rows -- while W4 records the
