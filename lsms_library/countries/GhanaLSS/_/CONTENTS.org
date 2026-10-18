@@ -2017,16 +2017,56 @@ the served column *after* the kg factor was inferred.
 | 2005-06 | =s8hq13= | 0    |       1,450 | 639 (value label =none=) |
 | 2012-13 | =s8hq9=  | 0    |         970 | 343 (value label =none=) |
 
-*Questionnaire (C4).*  GLSS4 Part B §8H (pp. 8.11-8.17,
-=1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=)
-prints its unit codes from =Pounds...1= to =Fingers...24= -- *there is no
-code 0*.  GLSS5 Part B (=2005-06/Documentation/G5QPartB.pdf=, 8H "SEE LIST
-OF UNIT CODES") and GLSS6 Part B (=2012-13/Documentation/QUESTIONNAIRES/GLSS6
-Part B Questionnaire.pdf=, 8H "UNIT CODES REFER TO PAGE 8.10") both open the
-list with =None ....00=, beside genuine count units (=singles=, =piece=,
-=fruit=, =nut=, =tubers=, =fingers=); the same =None ....00= heads the
-GLSS6 *crop* list and the processed-goods list, and §9 says "IF NONE PUT
-'00'".  It is the instrument's "nothing / not applicable" code.
+*Questionnaire (C4), wave by wave* (re-read 2026-10-18; corrects the first
+version of this entry, which wrongly put count units in GLSS5's list).  The
+three instruments do *not* share an 8H unit list:
+
+- *GLSS4 (1998-99)*, =1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=,
+  Part B §8H Q9 "ENTER UNIT THAT THE RESPONDENT CHOOSES".  It prints *two
+  different, conflicting* unit lists, and *neither has a code 0 / None*:
+  - p. 8.15 (PDF p. 72; pages 8.11-8.14 point their Q9 here): =Pounds 1,
+    Kilogram 2, Ton 3, Minibag 5, Maxibag 5, Sheet 6, Basket 7, Bowl 8,
+    American tin 9, Tree 10, Stick 11, Bundle 12, Barrel 13, Liter 14,
+    Gallon 16, Beer bottle 16, Bunch 17, Nut 18, Fruit 19, Log 20, Box 21,
+    Margarine Tin 22, Tubers 23, Fingers 24= -- misprinted as printed (5 and
+    16 each used twice, no 4 or 15);
+  - p. 8.17 (PDF p. 74; attached to the meat/poultry/fish page 8.16 and to
+    8.17 itself -- milk, drinks): =Pounds 1, Kilogram 2, Ton 3, Minibag 4,
+    Maxibag 5, Sheet 6, Basket 7, Bowl 8, American tin 9, Crate 10,
+    Single/Whole 11, Bundle 12, Barrel 13, Litre 14, Gallon 15, Beer Bottle 16,
+    Box 17=.
+  So codes 10, 11 and 17 mean different things depending on which list the
+  enumerator used, and *chicken and eggs (page 8.16) were coded on the list
+  that has =Single/Whole 11=*.  Neither list prints =All=, which the 1998-99
+  data decodes (2,180 Egg rows, 289 Chicken rows).  Not fixed here -- see
+  the GLSS4 dual-list residual in the GH #1042 report.
+- *GLSS5 (2005-06)*, =2005-06/Documentation/G5QPartB.pdf=, Part B §8H Q13
+  "SEE LIST OF UNIT CODES": =None 00, All 01, American tin 02, Barrel 03,
+  Basket 04, Beer bottle 05, Bowl 06, Box 07, Bunch 08, Bundle 09,
+  Fanta bottle 10, Fingers 11, Fruits 12, Gallon 13, Kilogram 14, Litre 15,
+  Log 16, Margarine tin 17, Maxi bag 18, Mini bag 19, Nut 20, Pounds 21,
+  Sheet 22, Stick 23, Tonne 24, Tubers 26= (no 25).  *There is no Single,
+  Piece, Dozen, Crate or Whole.*  =singles= exists only in the DATA, as the
+  unprinted value label 37 of =s8hq13= in =sec8h.dta=, one of twelve codes
+  the data add after the printed list (=25 tree=, then =27 balls, 28 bar,
+  29 bucket, 30 crate, 31 dozen, 32 loaf, 33 pair, 34 pieces, 35 pots, 36 set,
+  37 singles, 38 yards/meter=) -- post-codes, not options the enumerator was
+  shown.  8C/8D print near
+  copies (8C(1)/8D add =Tree 25= and drop =Margarine tin 17=).  How it was
+  read: the list is in the PDF text layer on printed pp. 8.11, 8.12, 8.14,
+  8.15 and 8.17; the text layer of 8.13 (oils) and *8.16 (eggs and snail)*
+  carries no list, so for those two pages this rests on the GH #1042 red
+  team's full read of the document, not on extracted text.
+- *GLSS6 (2012-13)*, =2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=,
+  §8H "UNIT CODES REFER TO PAGE 8.10"; the list on p. 8.10 (PDF p. 15) runs
+  =None 00 ... Yards 42= and *adds the count units* =Crate 13=, =Dozen 15=,
+  =Pieces 31=, =Single 37= (beside =Balls 03=, =Pair 30=, =Set 35=, ...).
+  The other list on that page (processed/transformed goods, =Cassava flour 01=
+  ...) has no None; the red team additionally read =None ....00= heading the
+  p. 8.4 crop list and "IF NONE PUT '00'" in §9A Q3 (not re-read here).
+
+So code 0 is the instrument's "nothing / not applicable" code in GLSS5 and
+GLSS6, and GLSS4 has no such code at all.
 
 *Data.*  Code 0 is also the zero-fill on non-consumer rows: 374,626 of the
 375,782 2005-06 =s8hq1='no'= rows, and 978,825 of the 979,290 2012-13 rows
@@ -2037,13 +2077,22 @@ rows, =unit= 653, =item_unit_tight= 110) -- and the factors are nonsense:
 Pepper 26 kg per "None" (110 rows, 28,773 kg = 74% of the total), Egg 1.2 kg
 per egg, and 653 rows on the cross-item pooled factor 0.679.
 
-*What it is not.*  For Chicken and Egg the =None= rows *price* like a single
-bird / egg (2005-06 Chicken median price 25,000 vs =Single= 30,000; 2012-13
-10 vs =Single= 12 / =Piece= 10; Egg =None= ~ =Single= in both waves), so an
-enumerator may have meant "counted, no container".  The instrument does not
-license that reading (it offers =singles=/=piece= for exactly that), so the
-rows are not relabelled to a count; anyone who wants that assumption can
-apply it to the =Unknown= rows explicitly.
+*What it is not -- and the evidence that actually holds.*  The first version
+of this entry argued that GLSS5 "offers singles/piece for exactly that", so a
+counted chicken would have been coded as one.  *That is false* (above): GLSS5
+prints no count unit at all, so an enumerator who counted birds or eggs had
+no code to record it.  What the data show instead is that, for Chicken and
+Egg, the unit label carries *no size information in any unit*: in 2005-06
+every Chicken unit prices like one bird (=All= 981 rows at a median 30,000;
+=Kilogram= 140 at 22,500; =None= 184 at 25,000; =Single= 73 at 30,000) and
+every Egg unit like one egg (=All= 1,690 at 1,000; =None= 200 at 1,200;
+=Single= 105 at 1,000; =Kilogram= 13 at 1,000); in 2012-13 Chicken =None=
+203 rows at 10 against =Single= 2,723 at 12, Egg =None= 26 at 0.4 against
+=Single= 3,056 at 0.4.  So =None= on these rows is plausibly "counted, with
+no code to say so".  The slice is 687 rows (27% of the 2,508) and 1,475 kg
+(3.8% of the 39,029 kg removed).  Serving them =Unknown= (no inferred kg) is
+the conservative default; the count-unit follow-up below acts on the price
+evidence where -- and only where -- the resulting kilograms are plausible.
 
 *Accounting* (private cold rebuild of GhanaLSS at 3e3bd26ee + this change):
 see the GH #1042 commit message and =tests/test_gh1042_missing_unit_spellings.py=.
