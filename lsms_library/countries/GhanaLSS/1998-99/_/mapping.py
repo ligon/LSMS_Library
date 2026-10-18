@@ -9,9 +9,10 @@ path = countries_root()/'GhanaLSS'/'1998-99'
 # wave -> country; the cross-country level is appended by the resolver (GH #953).
 _dirs = [f'{path}/_', f'{path}/../_/']
 
-# A bare tools.get_categorical_mapping(tablename=...) returns an EMPTY dict --
-# it passes no value column, so df_data_grabber drops the Label column and the
-# squeeze yields {}.  Every lookup then misses and silently produces pd.NA.
+# A bare tools.get_categorical_mapping(tablename=...) used to return an EMPTY
+# dict -- it passed no value column, so df_data_grabber dropped the Label column
+# and the squeeze yielded {}.  Every lookup then missed and silently produced
+# pd.NA.  Since GH #674 the bare form raises TypeError instead.
 # That is what left GLSS4 Region/Rural 100% NULL (and cluster_features with
 # both of its columns dead).  Use the shared helper, which passes Label='Label'
 # and keys the result by BOTH the string and the int form of each code.
