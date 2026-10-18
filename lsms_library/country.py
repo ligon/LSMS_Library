@@ -7308,11 +7308,13 @@ def _probe_source(rel: str) -> bool:
     FAST tiers only (``local_tools.source_fetchable_fast``): an untracked local
     file, or the DVC sidecar plus its L1 blob -- no ``DVCFS.open`` streaming
     and no World Bank download, and the file is not parsed.  Measured on a
-    first probe per process: 0.10 s for a sidecar whose blob is cached, and
-    milliseconds for a source with no sidecar; through ``get_dataframe`` (the
+    first probe per process: 0.01 s for a sidecar whose blob is cached; ~1 s
+    for a blob absent locally (one direct remote GET, whether it fetches or
+    finds nothing -- 1.10 s / 1.04 s; bounded by ``_ensure_dvc_pulled``'s
+    retry policy); milliseconds for a path with no sidecar (which a new build
+    classes ``config`` and never probes).  Through ``get_dataframe`` (the
     first-pass probe) an unfetchable source cost 47-64 s, falling through to
-    the WB download.  A blob absent locally costs one direct remote GET
-    (bounded by ``_ensure_dvc_pulled``'s retry policy).  The cost of the
+    the WB download.  The cost of the
     narrowing: a source reachable ONLY through the WB download does not
     auto-heal -- but with no sidecar and no file such a ``file:`` is classed
     ``config`` at build time (:func:`_drop_record`) and is never probed.

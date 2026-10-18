@@ -419,7 +419,8 @@ def test_hard_error_says_optional_true_is_country_wide(testland):
 def test_missing_file_stays_soft_even_for_a_required_column(testland, monkeypatch):
     """A file that is not AVAILABLE is not a config bug -- no YAML edit fixes
     it, and hard-failing would break every legitimate partial-data checkout.
-    Only the KeyError kind (file loaded, column absent) escalates."""
+    Only the config kinds escalate: a KeyError (file loaded, column absent)
+    and -- since GH #675 -- a ``file:`` naming no file and no sidecar."""
     from lsms_library import local_tools
 
     read = local_tools.get_dataframe
