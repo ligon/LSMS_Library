@@ -105,6 +105,38 @@ def test_enforcers_warn_with_country_and_table():
         ('X', 'interview_date', 'Int_t', 1)]
 
 
+
+@pytest.mark.parametrize('dtype', [object, 'string'])
+def test_ambiguous_dayfirst_is_read_per_value_KNOWN_RISK(dtype):
+    """KNOWN LATENT RISK, pinned -- awaiting @ligon's decision (GH #798).
+
+    ``format='mixed'`` reads each value on its own, month-first where it can.
+    A ``dd/mm/YYYY`` column whose days are all <= 12 except one is therefore
+    split across two conventions: ``13/01/2019`` can only be 13 January, but
+    ``05/01/2019`` is read as **1 May**, not 5 January.  Nothing becomes NaT,
+    so ``DatetimeCoercionWarning`` does not fire: the failure is silent.
+
+    The pre-#798 whole-column call inferred ``%d/%m/%Y`` and read both
+    day-first (asserted below, so the contrast is pinned too).  The
+    alternative under consideration -- single-format inference per wave
+    ``t`` -- fails LOUDLY instead: off-format values become NaT and warn.
+
+    No corpus column is affected today (every stored string is ISO
+    year-first).  This test pins TODAY'S behaviour so that whichever way the
+    decision goes -- keep ``mixed``, or infer per wave and rely on the
+    warning -- it has to be moved consciously, not drift.
+    """
+    s = pd.Series(['13/01/2019', '05/01/2019'], dtype=dtype)
+    out, warned = _record(_coerce_datetime_column, s, column='Int_t')
+    assert list(out) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-05-01')]
+    assert warned == []
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        old = pd.to_datetime(s, errors='coerce')
+    assert list(old) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-01-05')]
+
+
 # --- warm regression (needs the built corpus) --------------------------------
 
 WARM = {
