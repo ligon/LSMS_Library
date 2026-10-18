@@ -6,7 +6,8 @@ from collections import defaultdict
 from lsms_library.paths import countries_root
 
 path = countries_root()/'GhanaLSS'/'1987-88'
-_dirs = [f'{path}/_/', f'{path}/../_', f'{path}/../../_']
+# wave -> country; the cross-country level is appended by the resolver (GH #953).
+_dirs = [f'{path}/_/', f'{path}/../_']
 
 # A bare tools.get_categorical_mapping(tablename=...) returns an EMPTY dict --
 # it passes no value column, so df_data_grabber drops the Label column and the

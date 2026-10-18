@@ -1841,7 +1841,7 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
 
 
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
-                            dirs: list[str] = ['./','../../_/','../../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
+                            dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
 
     **The resolution model** (GH #953).  ``dirs`` is walked in order and the
@@ -1873,10 +1873,11 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     **The cross-country level is appended automatically, LAST**:
     :func:`global_categorical_level` (the package root, whose
     ``categorical_mapping/`` holds ``u.org``, ``harmonize_assets.org``, ...).
-    Callers cannot spell it themselves -- the third rung the wave modules
-    write, ``f'{path}/../../_/'`` (and the cwd-relative ``'../../../_/'`` in
-    the default ``dirs``), is ``countries/_/``, which does not exist and never
-    held the shared tables.  Those spellings are now redundant and harmless.
+    Callers cannot spell it themselves: the third rung callers used to write
+    (``f'{path}/../../_/'``, and ``'../../../_/'`` in the old default
+    ``dirs``) was ``countries/_/``, which never existed and never held the
+    shared tables.  Those spellings were removed with this change; the
+    default ``dirs`` is now the cwd-relative wave and country levels.
 
     **Override stays WHOLE-TABLE here** (@ligon, 2026-10-17).  The read-time
     merge, :meth:`lsms_library.country.Country.categorical_mapping`, row-unions

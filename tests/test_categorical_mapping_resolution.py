@@ -308,9 +308,10 @@ def test_cascade_override_is_whole_table(rungs):
         "to be whole-table (GH #953)")
 
 
-def test_default_dirs_is_a_cwd_relative_spelling_of_the_same_three_rungs():
+def test_default_dirs_are_the_cwd_relative_wave_and_country_levels():
     default = inspect.signature(get_categorical_mapping).parameters["dirs"].default
-    assert default == ['./', '../../_/', '../../../_/']
+    # The cross-country level is appended by the resolver, never spelled here.
+    assert default == ['./', '../../_/']
     assert inspect.signature(
         get_categorical_mapping).parameters["fn"].default == 'categorical_mapping.org'
 
@@ -318,11 +319,10 @@ def test_default_dirs_is_a_cwd_relative_spelling_of_the_same_three_rungs():
 def test_the_countries_underscore_rung_is_not_where_shared_tables_live():
     """``countries/_/`` -- the third rung the wave modules spell -- holds nothing.
 
-    The four GhanaLSS wave ``mapping.py`` modules (and the cwd-relative default
-    ``dirs``) name ``countries_root()/'_'``.  It never existed; the shared
-    tables live at the package root's level, which the cascade now appends on
-    its own (GH #953).  So that rung is redundant, and a table put there would
-    be a second home for shared tables -- refuse it.
+    Callers used to spell a third rung, ``countries_root()/'_'``; it never
+    existed, and the spellings were removed when the cascade began appending
+    the package root's level itself (GH #953).  A table put there would be a
+    second home for shared tables -- refuse it.
     """
     from lsms_library.local_tools import categorical_mapping_files
     rung = countries_root() / "_"
@@ -552,3 +552,14 @@ def test_gh694_index_branch_unchanged_and_attrs_kept():
     out = _apply({"Rural": _RURAL}, df)
     assert out.index.get_level_values("Rural").tolist() == ["Urban", "Rural"]
     assert out.attrs.get("id_converted") is True
+
+
+def test_no_caller_spells_the_countries_underscore_rung():
+    """The dead third rung must not creep back into a ``_dirs`` list (GH #953)."""
+    import re as _re
+    bad = []
+    for py in countries_root().rglob("*.py"):
+        for n, line in enumerate(py.read_text(encoding="utf-8").splitlines(), 1):
+            if _re.match(r"\s*_?dirs\s*=\s*\[", line) and "../../_" in line:
+                bad.append(f"{py.relative_to(countries_root())}:{n}")
+    assert not bad, bad

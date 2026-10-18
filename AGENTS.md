@@ -378,10 +378,12 @@ serves both mechanisms and every hash site.
 - **The build-time cascade.** `local_tools.get_categorical_mapping(fn,
   tablename, dirs)` and `code_label_map` walk `dirs` and return the **first
   hit**, then the cross-country level, **appended automatically and last**.
-  No caller could spell that rung: the third entry the wave modules write
-  (`f'{path}/../../_/'`, and the cwd-relative default `'../../../_/'`) is
-  `countries/_/`, which never existed. Those spellings are now redundant;
-  `tests/test_categorical_mapping_resolution.py` refuses a table put there.
+  No caller could spell that rung: the third entry callers used to write
+  (`f'{path}/../../_/'`, and `'../../../_/'` in the old default `dirs`) was
+  `countries/_/`, which never existed. Those spellings are gone (GhanaLSS's
+  four wave `mapping.py` modules and the default), and
+  `tests/test_categorical_mapping_resolution.py` refuses both a table there and
+  the spelling's return.
 - **The read-time merge.** `Country.categorical_mapping` loads the
   cross-country level, then the country level, merging via
   `_merge_categorical_tables`; `Wave.categorical_mapping` overlays the wave

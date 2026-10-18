@@ -10,38 +10,20 @@ path = countries_root()/'GhanaLSS'/'1991-92'
 def _code_label_map(tablename, dirs):
     '''Read a Code -> Label org table into a {int code: label} dict.
 
-    ``tools.get_categorical_mapping`` builds its result from ``idxvars='Code'``
-    with no myvars, so the framework's ``df_data_grabber`` drops every value
-    column and the squeeze returns an EMPTY dict (the GH #377 / #372 root
-    cause: region_dict resolved to {} and every Region/Birthplace came out
-    NA).  Here we pass ``Label`` as a myvar so the value column survives, then
-    return a code->label mapping keyed on the integer Code.
+    Delegates to ``tools.code_label_map`` (CONTENTS.org Trap 1: a bare
+    ``get_categorical_mapping`` returns an EMPTY dict), keeping this module's
+    int-keyed contract: non-numeric codes (e.g. the country table's '.' None
+    row) are skipped.  Used to be a private copy of the cascade that read only
+    ``categorical_mapping.org`` at each rung, so it could not see a level's
+    ``categorical_mapping/`` directory or the cross-country level (GH #953).
     '''
-    def _as_int(k):
-        # df_data_grabber stringifies the Code index via format_id; coerce back
-        # to int so lookups can use int(value).  Non-numeric codes (e.g. the
-        # country table's '.' None row) are skipped rather than aborting.
+    out = {}
+    for k, v in tools.code_label_map(tablename, dirs, dual_keys=False).items():
         try:
-            return int(k)
+            out[int(k)] = v
         except (ValueError, TypeError):
-            return None
-
-    for d in dirs:
-        if d[-1] != '/':
-            d += '/'
-        try:
-            df = tools.df_data_grabber(d + 'categorical_mapping.org', 'Code',
-                                       orgtbl=tablename, Label='Label')
-            s = df['Label']
-            out = {}
-            for k, v in s.to_dict().items():
-                code = _as_int(k)
-                if code is not None and pd.notna(v):
-                    out[code] = v
-            return out
-        except (FileNotFoundError, KeyError, ValueError):
             continue
-    return {}
+    return out
 
 # GLSS3 (1991-92) region codes live in the *wave-level* categorical_mapping.org
 # (1991-92/_/), because GLSS3 orders the two northern regions 9=Upper West,
@@ -50,7 +32,8 @@ def _code_label_map(tablename, dirs):
 # file defines it.  relationship is ALSO wave-level since 2026-09-07: GLSS3 uses
 # GLSS4's nine-code scheme, not GLSS1's fourteen, and falling through to the
 # country table mis-labelled codes 6-9 for 1,353 people (CONTENTS.org Trap 2).
-_dirs = [f'{path}/_', f'{path}/../_/', f'{path}/../../_/']
+# wave -> country; the cross-country level is appended by the resolver (GH #953).
+_dirs = [f'{path}/_', f'{path}/../_/']
 region_dict = _code_label_map('region', _dirs)
 rural_dict = _code_label_map('rural', _dirs)
 relationship_dict = _code_label_map('relationship', _dirs)
