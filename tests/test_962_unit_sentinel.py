@@ -18,9 +18,11 @@ Two halves, both config-only (no microdata, no cache):
     ``tests/test_u_code_leak.py`` header used to say the opposite;
   - ``_U_SENTINELS`` is a CLOSED vocabulary, so an unlisted spelling of "no
     unit" is treated as a unit (pinned, not endorsed), and a static sweep of
-    the country tree refuses any literal written into ``u`` by ``fillna``
-    that is neither a sentinel nor recorded, with evidence, in
-    :data:`MINTED_UNIT_SPELLINGS`.
+    the country tree refuses any literal a module writes into a unit
+    column (``fillna``, null ``replace``, ``where``/``mask``, or direct
+    assignment) that is neither classified nor recorded, with evidence, in
+    :data:`MINTED_UNIT_SPELLINGS`.  Raw survey labels and org/YAML mapping
+    tables are outside the sweep.
 """
 import ast
 import importlib.util
@@ -38,6 +40,7 @@ from lsms_library.transformations import (
     FOOD_KG_MIN_BASELINE,
     FOOD_KG_MIN_REPORTS,
     U_UNKNOWN,
+    _CURRENCY_DENOMINATED_UNITS,
     _U_SENTINELS,
     food_expenditures_from_acquired,
     food_kg_factors,
@@ -452,8 +455,28 @@ def test_unlisted_missing_unit_spelling_is_treated_as_a_unit(spelling):
 
 # --- static guard: no new missing-unit spelling is minted silently ---------
 
-#: Every literal a country module writes into a unit column via ``fillna``
-#: that is NOT a ``_U_SENTINELS`` spelling, keyed by
+#: Spellings a module may mint into a unit column with no ledger entry:
+#: ``_U_SENTINELS`` (served ``none``) and the currency-denominated sentinel
+#: ``'Value'`` (``transformations._CURRENCY_DENOMINATED_UNITS``, the
+#: lowercase twin of ``country._RESERVED_U_SENTINELS``'s ``'Value'``), which
+#: ``food_kg_factors`` also serves ``none``.  Neither can acquire a
+#: price-ratio factor.  ``'Kg'`` is deliberately NOT here: a ``'Kg'`` minted
+#: onto a row whose unit was never recorded fabricates kilograms, the worst
+#: outcome a minted spelling can have, so every ``'Kg'`` site is ledgered.
+_CLASSIFIED_SPELLINGS = _U_SENTINELS | _CURRENCY_DENOMINATED_UNITS
+
+@pytest.mark.parametrize('spelling', sorted(_CLASSIFIED_SPELLINGS) + ['Value'])
+def test_every_classified_spelling_gets_no_price_ratio_factor(spelling):
+    """The exemption from the ledger is EARNED: a classified spelling with
+    a full priced population is served ``none``, so minting it cannot
+    acquire kilograms."""
+    df = _priced_population(spelling)
+    probe = _probe_mask(df, spelling)
+    assert food_kg_factors(df).loc[probe, 'KgFactorSource'].eq('none').all()
+
+
+#: Every literal a country module mints into a unit column that is NOT in
+#: :data:`_CLASSIFIED_SPELLINGS`, keyed by
 #: ``(path relative to countries_root, spelling)``, with the evidence for it.
 #: A new entry is a CLAIM about what the spelling means; it needs evidence,
 #: and if it means "no unit was recorded" it is a sentinel leak to report,
@@ -478,13 +501,43 @@ MINTED_UNIT_SPELLINGS = {
         'so _unit_sentinel_mask does not see it.  Crop-side sentinel '
         'question, outside #962 food scope; reported as a residual.'),
     ('Ethiopia/_/ethiopia.py', 'Kg'): (
-        'crop_production sale unit: a real metric unit, not a missing-unit '
-        'spelling.  The site comments that W1/W2 sale quantities are kilos; '
+        'crop_production, two sites.  (a) harvest u (`out["u"] = "Kg"`): '
+        'the else-branch for a wave with no harvest unit column; the site '
+        'comments that W1 reports kilograms directly.  (b) sale unit '
+        '(fillna): the site comments that W1/W2 sale quantities are kilos; '
         'whether a NaN DECODED sale unit in a later wave is also kilos is '
         'UNVERIFIED (#962 inventory did not cover crop tables).'),
+    ('EthiopiaRHS/_/community_prices.py', 'Kg'): (
+        'community_prices (module constant U): the ERHS price instruments '
+        'record price per kilogram (module docstring: price1234_rev p_r1..'
+        'p_r4, rd6_kgpr_Mkt kg_pr6, price2009 price_r7).  A real unit, '
+        'stated by the source design, not a missing-unit spelling.'),
+    ('EthiopiaRHS/_/ethiopiarhs.py', 'Kg'): (
+        'crop_production: ERHS aggregates harvest to one kilogram Quantity '
+        'per (i, j) (crop_production docstring); u is the constant unit of '
+        'that column, not a fill for a missing unit.'),
+    ('Tanzania/_/food_quantities.py', 'Kg'): (
+        'Legacy script reached by no Makefile rule (the food_quantities '
+        'target runs food_prices_quantities_and_expenditures.py) and '
+        'derived food tables are computed at runtime.  Kg is set only after '
+        'a successful conversion_to_kgs.json lookup, i.e. a real '
+        'conversion, not a fill.'),
+    ('Tanzania/_/food_unitvalues.py', 'Kg'): (
+        'Legacy script, as food_quantities.py (read only by the equally '
+        'legacy food_expenditures.py; no Makefile rule).'),
 }
 
-_UNIT_TARGET = re.compile(r"\[['\"]u['\"]\]|unit", re.I)
+#: A unit column, by subscript key or receiver text: ``u`` itself, or any
+#: name containing ``unit`` -- EXCEPT area units (``AreaUnit``,
+#: ``area_unit``): plot area is converted to hectares by its own path and
+#: never reaches the kg ladder (``Hectares``/``hectares``/``sotka`` are
+#: minted there, all real).  The substring is deliberately loose
+#: (``unit_price`` would match); a false positive costs a ledger entry, a
+#: false negative is a silent leak.
+_UNIT_RECEIVER = re.compile(r"\[['\"]u['\"]\]|unit", re.I)
+_UNIT_KEY = re.compile(r"^u$|unit", re.I)
+_AREA = re.compile(r"area", re.I)
+_NULL_ATTRS = frozenset({'nan', 'NaN', 'NA', 'NaT'})
 
 
 def _string_constants(tree):
@@ -498,60 +551,199 @@ def _string_constants(tree):
     return out
 
 
+def _str_value(node, consts):
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.Name) and node.id in consts:
+        return consts[node.id]
+    return None   # a column/Series/computed value, not a minted spelling
+
+
+def _is_null(node):
+    if isinstance(node, ast.Constant) and node.value is None:
+        return True
+    if isinstance(node, ast.Attribute) and node.attr in _NULL_ATTRS:
+        return True
+    return isinstance(node, ast.Name) and node.id in {'nan', 'NA'}
+
+
+def _subscript_key(node):
+    """``X['u']`` -> ``'u'``; ``X.loc[mask, 'u']`` -> ``'u'``."""
+    key = node.slice
+    if isinstance(key, ast.Tuple) and key.elts:
+        key = key.elts[-1]
+    if isinstance(key, ast.Constant) and isinstance(key.value, str):
+        return key.value
+    return None
+
+
+def _is_unit_key(key):
+    return bool(key) and bool(_UNIT_KEY.search(key)) and not _AREA.search(key)
+
+
+def _unit_aliases(tree):
+    """Bare names bound to a unit column anywhere in the module
+    (``u = df['u']``), so ``u.fillna('N/A')`` is a unit receiver."""
+    names = set()
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
+                and isinstance(node.value, ast.Subscript)
+                and _is_unit_key(_subscript_key(node.value))):
+            names.add(node.targets[0].id)
+    return names
+
+
+def _is_unit_receiver(node, aliases):
+    if isinstance(node, ast.Name) and node.id in aliases:
+        return True
+    text = ast.unparse(node)
+    return bool(_UNIT_RECEIVER.search(text)) and not _AREA.search(text)
+
+
+def _minted_in_source(source):
+    """``(lineno, spelling, idiom)`` for every literal string the module
+    writes into a unit column.  Idioms covered:
+
+    * ``<unit>.fillna(<str>)`` / ``.fillna(value=<str>)``;
+    * ``<any>.fillna({<unit key>: <str>})``;
+    * ``<unit>.replace(<null>, <str>)`` and ``.replace({<null>: <str>})``;
+    * ``<unit>.where(cond, <str>)`` / ``.mask(cond, <str>)``;
+    * ``X[<unit key>] = <str>`` / ``X.loc[..., <unit key>] = <str>``;
+
+    where ``<str>`` is a literal or a module-level string constant and
+    ``<unit>`` is a unit-column expression or a bare name bound to one.
+    NOT covered: labels the survey itself recorded, org/YAML ``mapping:``
+    tables, ``np.where``/``map``/``apply`` and computed strings.  A guard,
+    not a proof; the inventory in each country's CONTENTS.org is the rest.
+    """
+    tree = ast.parse(source)
+    consts = _string_constants(tree)
+    aliases = _unit_aliases(tree)
+    found = []
+
+    def add(node, value, idiom):
+        if value is not None:
+            found.append((node.lineno, value, idiom))
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            value = _str_value(node.value, consts)
+            for target in node.targets:
+                if (isinstance(target, ast.Subscript)
+                        and _is_unit_key(_subscript_key(target))):
+                    add(node, value, 'assign')
+            continue
+        if not (isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)):
+            continue
+        attr, recv = node.func.attr, node.func.value
+        kw = {k.arg: k.value for k in node.keywords if k.arg}
+        if attr == 'fillna':
+            arg = node.args[0] if node.args else kw.get('value')
+            if isinstance(arg, ast.Dict):
+                for k, v in zip(arg.keys, arg.values):
+                    if k is not None and _is_unit_key(_str_value(k, consts)):
+                        add(node, _str_value(v, consts), 'fillna-dict')
+            elif arg is not None and _is_unit_receiver(recv, aliases):
+                add(node, _str_value(arg, consts), 'fillna')
+        elif attr == 'replace' and _is_unit_receiver(recv, aliases):
+            to = node.args[0] if node.args else kw.get('to_replace')
+            val = node.args[1] if len(node.args) > 1 else kw.get('value')
+            if isinstance(to, ast.Dict) and val is None:
+                for k, v in zip(to.keys, to.values):
+                    if k is not None and _is_null(k):
+                        add(node, _str_value(v, consts), 'replace-dict')
+            elif to is not None and val is not None and _is_null(to):
+                add(node, _str_value(val, consts), 'replace')
+        elif attr in ('where', 'mask') and _is_unit_receiver(recv, aliases):
+            other = node.args[1] if len(node.args) > 1 else kw.get('other')
+            if other is not None:
+                add(node, _str_value(other, consts), attr)
+    return found
+
+
 def _minted_unit_spellings():
-    """``(relpath, lineno, spelling)`` for every ``<unit expr>.fillna(<str>)``
-    in the country tree, resolving module-level string constants."""
+    """``(relpath, lineno, spelling)`` over every module in the country
+    tree (see :func:`_minted_in_source` for the idioms)."""
     root = countries_root()
     found = []
     for path in sorted(Path(root).rglob('*.py')):
         try:
-            tree = ast.parse(path.read_text(encoding='utf-8'))
+            source = path.read_text(encoding='utf-8')
+            sites = _minted_in_source(source)
         except (SyntaxError, UnicodeDecodeError):
             continue
-        consts = _string_constants(tree)
-        for node in ast.walk(tree):
-            if not (isinstance(node, ast.Call)
-                    and isinstance(node.func, ast.Attribute)
-                    and node.func.attr == 'fillna' and node.args):
-                continue
-            if not _UNIT_TARGET.search(ast.unparse(node.func.value)):
-                continue
-            arg = node.args[0]
-            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-                value = arg.value
-            elif isinstance(arg, ast.Name) and arg.id in consts:
-                value = consts[arg.id]
-            else:
-                continue   # a column/Series fill, not a minted spelling
-            found.append((path.relative_to(root).as_posix(), node.lineno, value))
+        rel = path.relative_to(root).as_posix()
+        found.extend((rel, line, value) for line, value, _ in sites)
     return found
+
+
+@pytest.mark.parametrize('snippet', [
+    "df['u'] = df['u'].fillna('ZZ')",
+    "df['u'] = df['u'].fillna(value='ZZ')",
+    "MISSING = 'ZZ'\ndf['u'] = df['u'].fillna(MISSING)",
+    "df = df.fillna({'u': 'ZZ'})",
+    "df = df.fillna(value={'unit': 'ZZ'})",
+    "df['u'] = df['u'].replace(np.nan, 'ZZ')",
+    "df['u'] = df['u'].replace(None, 'ZZ')",
+    "df['u'] = df['u'].replace({pd.NA: 'ZZ'})",
+    "df['u'] = df['u'].where(df['u'].notna(), 'ZZ')",
+    "df['u'] = df['u'].mask(df['u'].isna(), other='ZZ')",
+    "df.loc[df['u'].isna(), 'u'] = 'ZZ'",
+    "df['u'] = 'ZZ'",
+    "out['unit_code'] = 'ZZ'",
+    "u = df['u']\nu = u.fillna('ZZ')",
+    "s = df['u']\ns.fillna('ZZ')",
+])
+def test_the_sweep_catches_each_minting_idiom(snippet):
+    """Every idiom the sweep claims to cover is caught on a synthetic
+    module -- the red team's GH #962 mutation set, which the fillna-only
+    sweep caught two of."""
+    assert [v for _, v, _ in _minted_in_source(snippet)] == ['ZZ']
+
+
+@pytest.mark.parametrize('snippet', [
+    "df['u'] = df['u'].fillna(df['unit_label'])",   # a column, not a literal
+    "df['Price'] = df['Price'].fillna('ZZ')",       # not a unit column
+    "df['AreaUnit'] = 'Hectares'",                  # area unit, own path
+    "df['u'] = df['u'].replace('kgs', 'Kg')",       # recode, not a null fill
+])
+def test_the_sweep_ignores_what_is_not_a_minted_unit(snippet):
+    assert _minted_in_source(snippet) == []
 
 
 def test_the_sweep_sees_the_known_minting_sites():
     """The sweep is not vacuous: it finds the sentinel writers we know of
-    (Niger's ``U_NA``, the EHCVM ``Manquant`` plot_inputs fills) as well as
-    the ledgered non-sentinel ones."""
+    (Niger's ``U_NA``, the EHCVM ``Manquant`` plot_inputs fills, Uganda's
+    ``where``/``mask`` fills, the ``u='Value'`` assignments) as well as the
+    ledgered non-sentinel ones."""
     found = {(p, v) for p, _, v in _minted_unit_spellings()}
     assert ('Niger/_/niger.py', 'Unknown') in found
     assert ('Togo/2018/_/plot_inputs.py', 'Manquant') in found
+    assert ('Uganda/_/uganda.py', 'Unknown') in found
+    assert ('Uganda/_/uganda.py', 'Value') in found
+    assert ('Panama/1997/_/food_acquired.py', 'Value') in found
     assert set(MINTED_UNIT_SPELLINGS) <= found, (
         'stale MINTED_UNIT_SPELLINGS entries (the site no longer mints the '
         f'spelling -- delete them): {sorted(set(MINTED_UNIT_SPELLINGS) - found)}')
 
 
 def test_no_unclassified_missing_unit_spelling_is_minted():
-    """A module that fills a missing unit must use a ``_U_SENTINELS``
-    spelling (``transformations.U_UNKNOWN``).  Anything else acquires a
-    price-ratio factor silently (see the pinned gap above), so it must be
-    recorded in :data:`MINTED_UNIT_SPELLINGS` with evidence.  This does not
-    reject an unfamiliar LOCAL unit: only literals a module MINTS into a
-    unit column are checked, never labels the survey itself recorded."""
+    """A module that writes a missing unit must use a ``_U_SENTINELS``
+    spelling (``transformations.U_UNKNOWN``).  Anything else outside
+    :data:`_CLASSIFIED_SPELLINGS` can acquire a price-ratio factor silently
+    (see the pinned gap above), so it must be recorded in
+    :data:`MINTED_UNIT_SPELLINGS` with evidence.  This does not reject an
+    unfamiliar LOCAL unit: only literals a module MINTS into a unit column,
+    by the idioms :func:`_minted_in_source` lists, are checked -- never
+    labels the survey itself recorded, and never org/YAML mapping tables."""
     unclassified = [
-        f'{p}:{line} fills u with {v!r}'
+        f'{p}:{line} writes u = {v!r}'
         for p, line, v in _minted_unit_spellings()
-        if v.strip().lower() not in _U_SENTINELS
+        if v.strip().lower() not in _CLASSIFIED_SPELLINGS
         and (p, v) not in MINTED_UNIT_SPELLINGS]
     assert not unclassified, (
-        'unclassified missing-unit spelling(s); write U_UNKNOWN, or record '
-        'the spelling with evidence in MINTED_UNIT_SPELLINGS:\n  '
-        + '\n  '.join(unclassified))
+        'unclassified minted unit spelling(s); write U_UNKNOWN for a missing '
+        'unit, or record the spelling with evidence in '
+        'MINTED_UNIT_SPELLINGS:\n  ' + '\n  '.join(unclassified))
