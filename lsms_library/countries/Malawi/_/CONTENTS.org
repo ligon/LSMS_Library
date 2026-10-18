@@ -2641,3 +2641,80 @@ outranks the sentinel by design); the 29 that had an *inferred* factor
 served as =Other (Specify)= (6,563 rows) and =Other= (894 rows), and those
 still get inferred kilograms pooled across whatever the respondents meant.
 That is a larger decision (GH #1042 residual), not a spelling fix.
+
+* 2026-10-18 -- food_acquired: OTHER (SPECIFY) with no specification is "no unit recorded" (GH #1042 follow-up)
+
+*Ruling (@ligon, 2026-10-18).*  Unit code 23 =OTHER (SPECIFY)= whose
+specify text is absent or non-informative maps to the missing-unit sentinel
+=Unknown= (=transformations.U_UNKNOWN=), exactly as =N/A= does (entry above).
+A code-23 row whose text names a unit keeps that unit.
+
+*Implementation.*  =malawi.is_other_specify_code= (=23=, =23A=..=23F=, any
+case, =23.0=) and =malawi.other_specify_to_unknown(u, is_other, detail)=,
+called at every wave's label-fallback site: =handling_unusual_units=
+(2016-17, 2019-20), the 2010-11 and 2013-14 script loops, and 2004-05.
+=_clean_freetext_unit= now also blanks =other=, =others=, =other (specify)=,
+=specify=, =unit(s)= so they take that path.  The conversion-table factor
+(=cfactor_*=, keyed on the code) is not touched, so a row the survey's own
+table converts keeps its =survey_kg= kilograms.
+
+*The code is NOT 23 in every instrument.*  IHS2 (2004-05) Module I prints
+=... MILLILITRE . . . 19 OTHER (SPECIFY). 20= (=2004-05/Documentation/IHS-2
+HH questionnaire final draft.pdf=, the page before "page 21"); =sec_i.dta=
+labels it =Other=, and its 21/22/23 are =Teaspoon=/=Basin=/=Satchet/Tube=,
+not in the printed draft.  The 2004-05 script reads no specify text
+(=i0Xboth= is shipped but unused); of the 892 served code-20 rows 882 have
+none and 10 name a food rather than a unit (=Curry=, =Sweet Potato=,
+=Mfutso=, ...), so all 892 move (a decision, see the commit).  IHS3, IHPS,
+IHS4 and IHS5 all print =OTHER (SPECIFY) 23=.
+
+*Where the specify text is.*  2010-11 =hh_g0Xb_os=; 2016-17 / 2019-20
+=hh_g0Xb_oth=; *2013-14 ships none* (=HH_MOD_G1_13.dta= has only
+=hh_g0Xb=), so every 2013-14 code-23 row has no specification.  In 2016-17
+the blanks sit almost entirely in the *panel* file: code-23 rows with a
+positive quantity and blank text on the served sources (=04b/06b/07b=) are 6
+in =Cross_Sectional/hh_mod_g1.dta= and 400 in =Panel/hh_mod_g1_16.dta=.
+
+*Before / after* (private cold rebuild, before = branch head 9c4d131de):
+| measure                                              | before      | after       |
+|------------------------------------------------------+-------------+-------------|
+| rows moved to =Unknown=                              | --          | 1,445       |
+|   2004-05 =Other=                                    | 892         | 0           |
+|   2010-11 =Other (Specify)= (code 23) / =Unit=       | 17 / 8      | 0 / 0       |
+|   2013-14 =Other (Specify)=                          | 110         | 0           |
+|   2016-17 =Other (Specify)= (code 23) / =Other=      | 404 / 1     | 0 / 0       |
+|   2019-20 =Other (Specify)= / =Other=                | 12 / 1      | 0 / 0       |
+| =Unknown= rows by wave (incl. =N/A=)                 | 0/0/0/24/19 | 892/25/110/429/32 |
+| moved rows' =KgFactorSource=                         | unit 899, item_unit 527, item_unit_tight 14, survey_kg 5 | none 1,440, survey_kg 5 |
+| =food_acquired= rows; sum Expenditure                | 971,531; 281,093,686 | unchanged |
+| =food_quantities(units='kgs')= kg (=u='kg'= rows)    | 2,581,948.04 | 2,576,094.72 |
+| =kg_factor_sources= item_unit / item_unit_tight / unit / none | 225,565 / 889 / 70,711 / 1,020 | 225,023 / 875 / 69,827 / 2,460 |
+| =food_prices()= rows: kgvalue / unitvalue            | 681,587 / 681,614 | 680,690 / 681,614 |
+The moved rows carried 6,051.75 inferred kg; the 5 =survey_kg= rows keep
+23.02 kg.  Removing the moved rows from the pooled estimates re-prices 1,575
+other rows (net +175.41 kg, almost all on the remaining =Other (Specify)=
+rows below), so the kg total falls by 5,853.32, not 6,028.73.
+
+*Boundary.*  Code-23 rows with a positive quantity on a served source that
+KEEP their unit because the text names one: 10,278 (2010-11 1,817, 2016-17
+6,371, 2019-20 2,090).  Top spellings: =Grams= 934, =Packet= 872, =Plate=
+695, =Cup= 630, =Whole= 629, =Bottle= 513, =Heap= 449, =Whole Chicken= 413,
+=Kilogram= 387, =Satchet= 318.  Left alone: single letters (=B=, =G=, =Ms=),
+=Otherbucket= (1 row).
+
+*NOT fixed here -- most served =Other (Specify)= is not code 23.*  The =u=
+table's "sentinel codes" block (=categorical_mapping.org=, commit 9bf5c80d0:
+=00 03 12 13 16 17 21 49 69 76 79 99 500= -> =Other (Specify)=) contradicts
+the IHS3 Module G list (=2010-11/Documentation/IHS3.Household.Qx.FINAL.pdf=,
+Module G "CODES FOR UNIT", the page before p. 29: =90 KG. BAG . . . .3 ... BASKET (DENGU) (SHELLED). . . 12 ... (UNSHELLED) . . 13
+... CUP. . . . . . . 16 TIN. . . . . . . 17 ... BASIN. . . . . . 21 ... OTHER (SPECIFY). 23=).
+After this change 2010-11 still serves 5,422 rows as =Other (Specify)=
+(raw codes 16: 3,072, 21: 1,951, 17: 281, 12: 46, 13: 44, 00: 14, 03: 5,
+99: 4, 49/69/79/500: 5), of which 3,054 carry =survey_kg= factors the
+conversion table keys on those codes.  2016-17 serves 590 more from an
+unlabelled code =21.0=; the IHS4 list prints no 12/13/16/17/21.  2013-14
+keeps 8.  The =u= table decodes =u= for every Malawi table at finalize, so
+correcting it is a separate, wave-aware change (GH #1042 residual).
+Other Malawi tables also serve =Other (Specify)= through their own unit
+vocabularies, not this code path: =crop_production= 2,409, =plot_inputs=
+6,522, =community_prices= 2,876 rows -- measured, unchanged.
