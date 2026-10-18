@@ -50,6 +50,7 @@ from .local_tools import (
     read_parquet_grain_audit,
     read_parquet_cache_waves,
     read_parquet_build_drops,
+    source_tier,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -932,6 +933,18 @@ def _required_scheme_columns(scheme_entry: Any) -> list[str]:
     ]
 
 
+def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
+    """Columns a ``data_scheme.yml`` entry declares ``optional: true`` -- the
+    complement, within the declared columns, of :func:`_required_scheme_columns`
+    (same reading, so the two cannot drift)."""
+    if not isinstance(scheme_entry, dict):
+        return []
+    required = set(_required_scheme_columns(scheme_entry))
+    return [k for k in scheme_entry
+            if isinstance(k, str) and k not in _SCHEME_NON_COLUMN_KEYS
+            and k not in required]
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -1657,7 +1670,7 @@ class Wave:
                 # A dropped sub-df takes every column it was the sole supplier
                 # of with it.  Record the drops so the post-merge check below
                 # can tell whether that cost a REQUIRED declared column.
-                config_bugs: list[tuple[str, Any, Exception]] = []
+                config_bugs: list[tuple[str, Any, Exception, str]] = []
                 # GH #675: EVERY drop, with the columns that sub-df would have
                 # supplied, is recorded in the parquet this build writes -- the
                 # content hash cannot tell a degraded build from a complete one.
@@ -1749,26 +1762,38 @@ class Wave:
                         # Whether a config bug ACTUALLY costs a required column
                         # is judged after the merge -- a sibling sub-df may
                         # supply the same column, in which case the drop is free.
+                        #
+                        # GH #675 adds a third: a non-KeyError failure where the
+                        # `file:` names NO source -- no file on disk and no
+                        # `.dvc` sidecar.  That is a typo'd path, i.e. a CONFIG
+                        # bug like the KeyError, not an unavailable source, and
+                        # it is classified (and escalates) the same way.
                         sub_file = sub_data_info.get('file', i)
-                        if isinstance(exc, KeyError):
-                            config_bugs.append((i, sub_file, exc))
-                        sub_path = self.file_path / "Data" / str(sub_file)
-                        try:
-                            sub_rel = sub_path.relative_to(countries_root()).as_posix()
-                        except ValueError:
-                            sub_rel = str(sub_path)
-                        dropped.append({
-                            "wave": self.year, "sub": i, "file": sub_rel,
-                            "kind": "config" if isinstance(exc, KeyError) else "unavailable",
-                            "error": f"{type(exc).__name__}: {exc}"[:300],
-                            "supplies": [str(c) for c in
-                                         (sub_data_info.get('myvars') or {})],
-                        })
-                        warnings.warn(
-                            f"{self.name}/{request}: could not load "
-                            f"sub-df '{i}' (file: {sub_file}); "
-                            f"proceeding without it. ({exc})"
-                        )
+                        rec = _drop_record(
+                            self.year, i, exc,
+                            [self.file_path / "Data" / str(f)
+                             for f in sub_mapping_details if f != 'df_edit']
+                            or [self.file_path / "Data" / str(sub_file)],
+                            sub_data_info.get('myvars'))
+                        if rec["kind"] == "config":
+                            config_bugs.append((i, sub_file, exc, rec["cause"]))
+                        dropped.append(rec)
+                        if rec["cause"] == "no-such-source":
+                            warnings.warn(
+                                f"{self.name}/{request}: no such source for "
+                                f"sub-df '{i}': check the file: path "
+                                f"'{sub_file}' in this wave's data_info.yml -- "
+                                f"there is no file at {rec['file']} and no .dvc "
+                                f"sidecar beside it, so this is a config bug, "
+                                f"not an unavailable source; proceeding without "
+                                f"it (GH #675). ({exc})"
+                            )
+                        else:
+                            warnings.warn(
+                                f"{self.name}/{request}: could not load "
+                                f"sub-df '{i}' (file: {sub_file}); "
+                                f"proceeding without it. ({exc})"
+                            )
                 if not merge_dfs:
                     warnings.warn(f"No data loaded for {request} in {self.name}")
                     df = pd.DataFrame()
@@ -1824,18 +1849,33 @@ class Wave:
                 # 4 on PR #627; latent when written, not latent forever).
                 #
                 # A column a SIBLING sub-df also supplies likewise does not fire
-                # a false alarm.  Only the config-bug drops (KeyError) can
-                # escalate; an unavailable file stays soft.  Prose is not
-                # enforcement.
+                # a false alarm.  Only the config-bug drops (a KeyError, or --
+                # GH #675 -- a `file:` naming no source at all) can escalate;
+                # an unavailable file stays soft.  Prose is not enforcement.
                 if config_bugs and isinstance(df, pd.DataFrame):
                     have = set(map(str, df.columns)) | {
                         str(n) for n in df.index.names if n is not None}
                     missing = sorted(
                         set(self._required_scheme_columns(request)) - have)
                     if missing:
-                        names = ', '.join(
-                            f"'{n}' (file: {f})" for n, f, _ in config_bugs)
                         first_exc = config_bugs[0][2]
+                        no_source = [(n, f) for n, f, _, c in config_bugs
+                                     if c == "no-such-source"]
+                        if no_source:
+                            names = ', '.join(
+                                f"'{n}' (file: {f})" for n, f in no_source)
+                            raise RuntimeError(
+                                f"{self.name}/{request}: no such source for "
+                                f"sub-df(s) {names}: check the file: path in this "
+                                f"wave's data_info.yml -- no file exists there and "
+                                f"no .dvc sidecar beside it, so this is a config "
+                                f"bug, not an unavailable source.  Dropping the "
+                                f"sub-df would leave required declared column(s) "
+                                f"{missing} ENTIRELY ABSENT from '{request}' "
+                                f"(GH #675, #323/#515). First error: {first_exc!r}"
+                            ) from first_exc
+                        names = ', '.join(
+                            f"'{n}' (file: {f})" for n, f, _, _ in config_bugs)
                         raise RuntimeError(
                             f"{self.name}/{request}: sub-df(s) {names} loaded but "
                             f"do NOT carry the column(s) the YAML asks for, leaving "
@@ -1853,19 +1893,16 @@ class Wave:
                             f"this one (GH #323/#515). First error: {first_exc!r}"
                         ) from first_exc
 
-                # GH #675: file each drop with the REQUIRED columns it cost,
+                # GH #675: file each drop with the declared columns it cost,
                 # judged at the same moment as the guard above.  An
-                # unavailable-file drop that costs one is a DEGRADED build:
-                # stamped into the parquet so a warm read can tell.
+                # UNAVAILABLE-source drop that costs one (required or
+                # optional) is a DEGRADED build: stamped into the parquet so a
+                # warm read can tell.
                 if dropped:
-                    have = (set(map(str, df.columns)) | {
-                        str(n) for n in df.index.names if n is not None}
-                        if isinstance(df, pd.DataFrame) else set())
-                    required = set(self._required_scheme_columns(request))
-                    for rec in dropped:
-                        rec["missing_required"] = sorted(
-                            (required & set(rec.pop("supplies"))) - have)
-                        _file_build_drop(self.country.name, request, rec)
+                    _file_wave_drops(
+                        self.country.name, request, dropped, df,
+                        ((self.country.resources or {}).get('Data Scheme')
+                         or {}).get(request))
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -7101,18 +7138,22 @@ class DegradedCacheWarning(UserWarning):
     """A cached table is served WITHOUT a required column, because a source
     file could not be read when it was built and still cannot (GH #675).
 
-    ``country``, ``table``, ``missing`` (the required columns absent) and
-    ``files`` (the unavailable sources, relative to the countries root) say
-    what is wrong.  The table rebuilds by itself in the first process that
-    can read the file; ``lsms-library cache clear --country <C>`` forces it.
+    ``country``, ``table``, ``missing`` (the REQUIRED columns absent),
+    ``missing_optional`` (the ``optional: true`` columns absent -- graded too
+    since 675-b, when the cause was an unavailable source) and ``files`` (the
+    unavailable sources, relative to the countries root) say what is wrong.
+    The table rebuilds by itself in the first process that can fetch the file;
+    ``lsms-library cache clear --country <C>`` forces it.
     """
 
     def __init__(self, message: str, *, country: str, table: str,
-                 missing: tuple = (), files: tuple = ()):
+                 missing: tuple = (), files: tuple = (),
+                 missing_optional: tuple = ()):
         super().__init__(message)
         self.country = country
         self.table = table
         self.missing = missing
+        self.missing_optional = missing_optional
         self.files = files
 
 
@@ -7178,11 +7219,71 @@ def _stampable_build_drops(country: str, table: str) -> list[dict] | None:
     return out or None
 
 
+def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
+                 supplies: Any) -> dict[str, Any]:
+    """One dropped sub-df, classified (GH #675).
+
+    ``kind`` is ``config`` -- with ``cause`` ``missing-column`` (a ``KeyError``:
+    the file loaded but lacks a column the YAML names) or ``no-such-source``
+    (the ``file:`` names no file on disk AND no ``.dvc`` sidecar: a typo'd path)
+    -- or ``unavailable`` (the source exists, as a file or a sidecar, and could
+    not be fetched).  Only ``unavailable`` drops are ever graded degraded: a
+    config drop re-drops identically on every rebuild, so a probe would find
+    the file readable, rebuild, drop again and trip the GH #920 repeat
+    detector every process.  Config drops are fixed at their source (#1050).
+    """
+    norm = [Path(os.path.normpath(p)) for p in paths]
+    if isinstance(exc, KeyError):
+        kind, cause = "config", "missing-column"
+    elif not any(source_tier(p) for p in norm):
+        kind, cause = "config", "no-such-source"
+    else:
+        kind, cause = "unavailable", None
+    # Name the file that failed: the first with no source, else the first.
+    target = next((p for p in norm if source_tier(p) is None), norm[0])
+    try:
+        rel = target.relative_to(countries_root()).as_posix()
+    except ValueError:
+        rel = str(target)
+    return {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
+            "error": f"{type(exc).__name__}: {exc}"[:300],
+            "supplies": [str(c) for c in (supplies or {})]}
+
+
+def _file_wave_drops(country: str, table: str, dropped: list[dict],
+                     df: Any, scheme_entry: Any) -> None:
+    """File one wave build's drops with the DECLARED columns each cost --
+    ``missing_required`` and ``missing_optional`` -- judged against the frame
+    after ``derived:``/``drop:``/``df_edit``, the same moment as the #323/#515
+    guard.  A column a sibling sub-df supplies is not "missing"; a temporary
+    column the scheme does not declare is never counted."""
+    have = (set(map(str, df.columns)) | {
+        str(n) for n in df.index.names if n is not None}
+        if isinstance(df, pd.DataFrame) else set())
+    required = set(_required_scheme_columns(scheme_entry))
+    optional = set(_optional_scheme_columns(scheme_entry))
+    for rec in dropped:
+        supplies = set(rec.pop("supplies", []) or [])
+        rec["missing_required"] = sorted((required & supplies) - have)
+        rec["missing_optional"] = sorted((optional & supplies) - have)
+        _file_build_drop(country, table, rec)
+
+
+def _drop_missing(d: dict) -> list[str]:
+    """Declared columns one drop record cost, required first."""
+    return list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+
+
 def _degraded_drops(drops: Any) -> list[dict]:
-    """The drop records that cost a REQUIRED declared column."""
+    """The drop records that make a parquet DEGRADED: an ``unavailable``
+    source whose drop cost a declared column, required OR optional (675-b,
+    @ligon 2026-10-18).  A ``config`` drop is recorded and never graded (see
+    :func:`_drop_record`); one that cost a REQUIRED column cannot reach a stamp
+    at all -- ``grab_data`` raises first."""
     if not isinstance(drops, list):
         return []
-    return [d for d in drops if isinstance(d, dict) and d.get("missing_required")]
+    return [d for d in drops if isinstance(d, dict)
+            and d.get("kind") == "unavailable" and _drop_missing(d)]
 
 
 def _mark_degraded_written(key: tuple, drops: Any) -> None:
@@ -7192,13 +7293,21 @@ def _mark_degraded_written(key: tuple, drops: Any) -> None:
 
 
 def _probe_source(rel: str) -> bool:
-    """Can the source at ``rel`` (relative to the countries root) be read now?
+    """Can the source at ``rel`` (relative to the countries root) be fetched now?
 
-    The probe IS the operation that failed -- ``local_tools.get_dataframe``,
-    the same reader ``df_data_grabber`` uses, through its local -> DVC -> WB
-    chain -- so "readable" means what it meant to the build.  Memoised per
-    process.  Looked up on the module at call time so a test that simulates an
-    unavailable file by patching ``local_tools.get_dataframe`` patches both.
+    FAST tiers only (``local_tools.source_fetchable_fast``): an untracked local
+    file, or the DVC sidecar plus its L1 blob -- no ``DVCFS.open`` streaming
+    and no World Bank download, and the file is not parsed.  Measured on a
+    first probe per process: 0.10 s for a sidecar whose blob is cached, and
+    milliseconds for a source with no sidecar; through ``get_dataframe`` (the
+    first-pass probe) an unfetchable source cost 47-64 s, falling through to
+    the WB download.  A blob absent locally costs one direct remote GET
+    (bounded by ``_ensure_dvc_pulled``'s retry policy).  The cost of the
+    narrowing: a source reachable ONLY through the WB download does not
+    auto-heal -- but with no sidecar and no file such a ``file:`` is classed
+    ``config`` at build time (:func:`_drop_record`) and is never probed.
+    Memoised per process; looked up on the module at call time so a test can
+    patch the one seam.
     """
     if rel in _SOURCE_PROBES:
         return _SOURCE_PROBES[rel]
@@ -7207,9 +7316,8 @@ def _probe_source(rel: str) -> bool:
     if not path.is_absolute():
         path = countries_root() / rel
     try:
-        _lt.get_dataframe(path)
-        ok = True
-    except Exception:  # noqa: BLE001 -- any failure to read is "still unavailable"
+        ok = bool(_lt.source_fetchable_fast(path))
+    except Exception:  # noqa: BLE001 -- any failure to fetch is "still unavailable"
         ok = False
     _SOURCE_PROBES[rel] = ok
     return ok
@@ -7233,10 +7341,18 @@ def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
     if not healed:
         return "serve", None
     _DEGRADED_ATTEMPTED.add(key)
-    missing = sorted({c for d in degraded for c in d.get("missing_required") or []})
-    return "rebuild", (f"degraded: built without required column(s) {missing} "
+    return "rebuild", (f"degraded: built without {_describe_missing(degraded)} "
                        f"because {', '.join(healed)} could not be read; it can "
                        f"be read now (GH #675)")
+
+
+def _describe_missing(degraded: list[dict]) -> str:
+    """``required column(s) [...]`` and/or ``optional column(s) [...]``."""
+    req = sorted({c for d in degraded for c in d.get("missing_required") or []})
+    opt = sorted({c for d in degraded for c in d.get("missing_optional") or []})
+    parts = ([f"required column(s) {req}"] if req else []) + (
+        [f"optional column(s) {opt}"] if opt else [])
+    return " and ".join(parts)
 
 
 def _warn_degraded_serve(country: str, table: str, drops: Any,
@@ -7246,20 +7362,24 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
     if not degraded:
         return
     missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
+    missing_optional = tuple(sorted(
+        {c for d in degraded for c in d.get("missing_optional") or []}))
     files = tuple(sorted({str(d.get("file")) for d in degraded}))
     detail = "; ".join(
         f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({d.get('file')}) "
-        f"-> {d.get('missing_required')} [{d.get('error')}]" for d in degraded)
+        f"-> {_drop_missing(d)} [{d.get('error')}]" for d in degraded)
     where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
     warnings.warn(DegradedCacheWarning(
-        f"{where}: serving a cached table WITHOUT required declared column(s) "
-        f"{list(missing)}.  The build that wrote {path} could not read "
-        f"{', '.join(files)} and dropped it (the GH #515 optional-sub-df "
-        f"fallback), and that file still cannot be read in this process.  "
-        f"It will be rebuilt automatically by the first process that can "
-        f"read it; `lsms-library cache clear --country {country}` forces a "
-        f"rebuild now (GH #675).  Detail: {detail}",
-        country=country, table=table, missing=missing, files=files),
+        f"{where}: serving a cached table WITHOUT declared "
+        f"{_describe_missing(degraded)}.  The build that wrote {path} could "
+        f"not read {', '.join(files)} and dropped it (the GH #515 "
+        f"optional-sub-df fallback), and that file still cannot be fetched in "
+        f"this process.  It will be rebuilt automatically by the first process "
+        f"that can fetch it from disk or the DVC blob cache; `lsms-library "
+        f"cache clear --country {country}` forces a rebuild now (GH #675).  "
+        f"Detail: {detail}",
+        country=country, table=table, missing=missing, files=files,
+        missing_optional=missing_optional),
         stacklevel=3)
 
 

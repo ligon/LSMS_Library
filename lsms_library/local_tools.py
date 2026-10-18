@@ -539,6 +539,50 @@ def _dvc_cache_path(fn) -> "Path | None":
         return None
 
 
+def source_tier(path: str | Path) -> str | None:
+    """Where ``get_dataframe`` would find the source at absolute ``path``,
+    WITHOUT reading it: ``"dvc"`` (a ``.dvc`` sidecar sits beside it -- checked
+    first, because ``get_dataframe`` refuses a workspace copy of a tracked
+    file), ``"local"`` (an untracked file on disk), or ``None`` (neither; only
+    the World Bank download is left).
+
+    Two ``stat`` calls.  GH #675 uses it to tell a ``dfs:`` sub-df whose
+    ``file:`` names no source at all -- a CONFIG bug -- from one whose source
+    exists but could not be fetched.
+    """
+    p = Path(path)
+    try:
+        if (p.parent / f"{p.name}.dvc").exists():
+            return "dvc"
+        if p.is_file():
+            return "local"
+    except OSError:
+        pass
+    return None
+
+
+def source_fetchable_fast(path: str | Path) -> bool:
+    """Can the source at absolute ``path`` be read from the FAST tiers -- an
+    untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
+    blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+
+    Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
+    streaming fallback (a sidecar-tree walk) and no World Bank download.  This
+    is the GH #675 heal probe, run on a warm read once per degraded source per
+    process; through ``get_dataframe`` an unfetchable source cost 47-64 s
+    there (the WB fall-through).  Writes nothing into ``countries_root()``
+    (GH #831): the only possible write is the blob into ``_DVC_CACHE_DIR``,
+    exactly what a build's own read would do.  Does not parse the file.
+    """
+    tier = source_tier(path)
+    if tier == "local":
+        return True
+    if tier == "dvc":
+        _ensure_dvc_pulled(path)
+        return _dvc_cache_path(path) is not None
+    return False
+
+
 def _gc_stale_dvc_lock() -> None:
     """Best-effort cleanup of orphaned ``.dvc/tmp/*lock*`` files.
 

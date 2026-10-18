@@ -139,6 +139,15 @@ _EXCLUDED_CALLABLES = frozenset({
     # later edit to the mechanism would cold-rebuild the corpus.  (The probe
     # calls get_dataframe; excluding it keeps the walk from descending.)
     "lsms_library.local_tools.read_parquet_build_drops",
+    # The fast-tier probe seam and the build-time drop classifier (675 follow-
+    # up): availability checks and metadata, never frame content.
+    "lsms_library.local_tools.source_tier",
+    "lsms_library.local_tools.source_fetchable_fast",
+    "lsms_library.country._drop_record",
+    "lsms_library.country._file_wave_drops",
+    "lsms_library.country._optional_scheme_columns",
+    "lsms_library.country._drop_missing",
+    "lsms_library.country._describe_missing",
     "lsms_library.country._file_build_drop",
     "lsms_library.country._forget_wave_build_drops",
     "lsms_library.country._wave_build_drops",
