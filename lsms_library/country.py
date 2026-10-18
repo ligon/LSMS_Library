@@ -77,6 +77,7 @@ import importlib.util
 import hashlib
 import logging
 import os
+import re
 import warnings
 from pathlib import Path
 import shutil
@@ -6151,6 +6152,52 @@ class DatetimeCoercionWarning(RuntimeWarning):
         self.examples = examples
 
 
+class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
+    """Year-last numeric dates whose day/month order the data cannot settle.
+
+    ``01/05/2019`` is 1 May or 5 January.  :func:`_coerce_datetime_column`
+    reads a group of year-last values day-first only when some value has a
+    first field above 12 and none a second field above 12 (and month-first
+    the other way round); otherwise -- no evidence, or contradictory evidence
+    -- the group is served ``NaT`` and this warning names it.  ``reason`` is
+    ``'ambiguous'`` or ``'conflicting'``; ``wave`` is the ``t`` value, or
+    ``None`` when the column carried no ``t`` level.  (GH #798, @ligon
+    2026-10-18: a silent per-value guess was the one failure mode ruled out.)
+    """
+
+    def __init__(self, message: str, *, reason: str, wave=None, **kw):
+        super().__init__(message, **kw)
+        self.reason = reason
+        self.wave = wave
+
+
+# Year-last numeric dates: d/m/Y or m/d/Y, with -, / or . and an optional
+# time part.  Year-first strings are unambiguous and never match.
+_YEAR_LAST_DATE = re.compile(
+    r'^\s*(\d{1,2})[-/.](\d{1,2})[-/.](\d{4}|\d{2})(?:[ T].*)?$')
+
+
+def _to_datetime_mixed(s: pd.Series, *, where: str, dayfirst: bool = False,
+                       **meta) -> pd.Series:
+    """``to_datetime(format='mixed')``, but a mixed-timezone column WARNS.
+
+    pandas raises ``ValueError('Mixed timezones detected')`` when offset-aware
+    and naive values share a column.  The enforcers catch ``ValueError`` and
+    serve the column as unconverted strings; that is kept, but it is no
+    longer silent.
+    """
+    try:
+        return pd.to_datetime(s, errors='coerce', format='mixed',
+                              dayfirst=dayfirst)
+    except ValueError as exc:
+        if 'timezone' in str(exc).lower():
+            warnings.warn(DatetimeCoercionWarning(
+                f"{where}: mixes timezone-aware and naive (or differently "
+                f"offset) values; served as unconverted strings ({exc}).",
+                **meta), stacklevel=4)
+        raise
+
+
 def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
                             table: str | None = None,
                             column: str | None = None) -> pd.Series:
@@ -6172,39 +6219,75 @@ def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
     COUNTED and reported with :class:`DatetimeCoercionWarning` -- never
     silently nulled.  The served value is still ``NaT`` (no guessing).
 
-    Two latent hazards of ``format='mixed'`` (no corpus instance; every stored
-    string column today is ISO year-first):
+    Year-first strings (every stored string column in the corpus today) are
+    parsed per value.  Two cases are handled separately (@ligon 2026-10-18):
 
-    1. *Ambiguous day-first strings.*  Each value is read on its own,
-       month-first where it can be, so ``['13/01/2019', '05/01/2019']`` comes
-       back 13 Jan and **1 May** -- two conventions in one column, nothing
-       ``NaT``, no warning.  Whole-column inference read both day-first.
-       Pinned by ``tests/test_gh798_datetime_mixed.py::
-       test_ambiguous_dayfirst_is_read_per_value_KNOWN_RISK`` pending a
-       decision between ``mixed`` and per-wave inference.
-    2. *Mixed timezone offsets RAISE.*  An offset-aware value next to a naive
-       one (``'...T10:00:00+01:00'`` beside ``'... 10:00:00'``) makes
-       ``to_datetime(format='mixed')`` raise ``ValueError('Mixed timezones
-       detected')``; whole-column inference used to coerce the minority
-       spelling to ``NaT`` instead.  (Two *different* offsets raised under
-       both calls.)  Both enforcers catch ``ValueError`` and skip the column,
-       so it is served as its **unconverted strings**, with no
-       :class:`DatetimeCoercionWarning` -- this function never reaches its
-       count.
+    1. *Year-last numeric dates* (``d/m/Y`` or ``m/d/Y``).  Read on its own,
+       ``['13/01/2019', '05/01/2019']`` would come back 13 Jan and **1 May**
+       -- two conventions in one column, nothing ``NaT``, no warning.  So the
+       order is settled per wave ``t`` (whole column if there is no ``t``
+       level) from the data: day-first when some value's first field exceeds
+       12 and no second field does, month-first the other way round.  With
+       no such evidence, or with both, the group is served ``NaT`` and
+       :class:`DatetimeAmbiguityWarning` names it.  It is never guessed.
+    2. *Mixed timezone offsets.*  An offset-aware value next to a naive one
+       makes ``to_datetime(format='mixed')`` raise ``ValueError('Mixed
+       timezones detected')``.  The column is still served as its unconverted
+       strings (both enforcers catch ``ValueError``), but a
+       :class:`DatetimeCoercionWarning` now says so.
+
+    The durable fix for either is to parse the date at build time, in the
+    wave, where its format is known, and cache a ``datetime64`` column.
     """
-    out = pd.to_datetime(s, errors='coerce', format='mixed')
+    where = '/'.join(x for x in (country, table, column) if x) or 'datetime column'
+    meta = dict(country=country, table=table, column=column)
     if pd.api.types.is_datetime64_any_dtype(s.dtype):
-        return out
+        return pd.to_datetime(s, errors='coerce', format='mixed')
     was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
                     na_action='ignore').fillna(False).astype(bool)
-    lost = was_str & out.isna()
+    parts = s.where(was_str).astype(object).str.extract(_YEAR_LAST_DATE)
+    year_last = was_str & parts[0].notna()
+    out = _to_datetime_mixed(s.where(~year_last), where=where, **meta)
+    unresolved = pd.Series(False, index=s.index)
+    if year_last.any():
+        # Settle day/month order per wave where the column carries t: two
+        # waves may legitimately use different conventions.
+        a = pd.to_numeric(parts[0], errors='coerce')
+        b = pd.to_numeric(parts[1], errors='coerce')
+        if 't' in (s.index.names or []):
+            groups = s.index.get_level_values('t')
+        else:
+            groups = pd.Series(None, index=s.index, dtype=object)
+        keys = pd.Series(groups, index=s.index).where(year_last)
+        for wave in pd.unique(keys[year_last]):
+            m = year_last & ((keys == wave) if pd.notna(wave) else keys.isna())
+            day_ev, month_ev = bool((a[m] > 12).any()), bool((b[m] > 12).any())
+            if day_ev != month_ev:
+                out.loc[m] = _to_datetime_mixed(s[m], where=where,
+                                                dayfirst=day_ev, **meta)
+                continue
+            reason = 'conflicting' if day_ev else 'ambiguous'
+            unresolved |= m
+            examples = tuple(pd.unique(s[m].astype(str))[:3])
+            wtxt = f" in wave {wave}" if pd.notna(wave) else ""
+            why = ("some values are day-first and some month-first"
+                   if day_ev else
+                   "no value has a day or month above 12 to settle the order")
+            warnings.warn(DatetimeAmbiguityWarning(
+                f"{where}: {int(m.sum())} year-last date(s){wtxt} have an "
+                f"undecidable day/month order ({why}) and are served as NaT "
+                f"(e.g. {list(examples)}).  Parse them at build time, where "
+                f"the wave's format is known.",
+                reason=reason, wave=wave if pd.notna(wave) else None,
+                count=int(m.sum()), examples=examples, **meta),
+                stacklevel=3)
+    lost = was_str & out.isna() & ~unresolved
     n = int(lost.sum())
     if n:
         examples = tuple(pd.unique(s[lost].astype(str))[:3])
-        where = '/'.join(x for x in (country, table, column) if x)
         warnings.warn(
             DatetimeCoercionWarning(
-                f"{where or 'datetime column'}: {n} non-blank string value(s) "
+                f"{where}: {n} non-blank string value(s) "
                 f"did not parse as a datetime and are served as NaT "
                 f"(e.g. {list(examples)}).",
                 country=country, table=table, column=column, count=n,

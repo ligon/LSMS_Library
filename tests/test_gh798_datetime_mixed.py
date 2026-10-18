@@ -16,6 +16,7 @@ import pandas as pd
 import pytest
 
 from lsms_library.country import (
+    DatetimeAmbiguityWarning,
     DatetimeCoercionWarning,
     _coerce_datetime_column,
     _enforce_canonical_dtypes,
@@ -107,34 +108,84 @@ def test_enforcers_warn_with_country_and_table():
 
 
 @pytest.mark.parametrize('dtype', [object, 'string'])
-def test_ambiguous_dayfirst_is_read_per_value_KNOWN_RISK(dtype):
-    """KNOWN LATENT RISK, pinned -- awaiting @ligon's decision (GH #798).
+def test_year_last_dayfirst_is_settled_by_the_data(dtype):
+    """``13/01/2019`` can only be day-first, so the whole group is read so.
 
-    ``format='mixed'`` reads each value on its own, month-first where it can.
-    A ``dd/mm/YYYY`` column whose days are all <= 12 except one is therefore
-    split across two conventions: ``13/01/2019`` can only be 13 January, but
-    ``05/01/2019`` is read as **1 May**, not 5 January.  Nothing becomes NaT,
-    so ``DatetimeCoercionWarning`` does not fire: the failure is silent.
-
-    The pre-#798 whole-column call inferred ``%d/%m/%Y`` and read both
-    day-first (asserted below, so the contrast is pinned too).  The
-    alternative under consideration -- single-format inference per wave
-    ``t`` -- fails LOUDLY instead: off-format values become NaT and warn.
-
-    No corpus column is affected today (every stored string is ISO
-    year-first).  This test pins TODAY'S behaviour so that whichever way the
-    decision goes -- keep ``mixed``, or infer per wave and rely on the
-    warning -- it has to be moved consciously, not drift.
+    Under bare ``format='mixed'`` ``05/01/2019`` came back **1 May** next to
+    13 January -- two conventions, no NaT, no warning (the risk the red team
+    named; @ligon chose this guard on 2026-10-18).  The pre-#798 whole-column
+    call read both day-first, which is the contrast pinned at the end.
     """
     s = pd.Series(['13/01/2019', '05/01/2019'], dtype=dtype)
     out, warned = _record(_coerce_datetime_column, s, column='Int_t')
-    assert list(out) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-05-01')]
+    assert list(out) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-01-05')]
     assert warned == []
 
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         old = pd.to_datetime(s, errors='coerce')
     assert list(old) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-01-05')]
+
+
+@pytest.mark.parametrize('dtype', [object, 'string'])
+def test_year_last_monthfirst_is_settled_by_the_data(dtype):
+    s = pd.Series(['01/13/2019', '01/05/2019 10:30'], dtype=dtype)
+    out, warned = _record(_coerce_datetime_column, s, column='Int_t')
+    assert list(out) == [pd.Timestamp('2019-01-13'),
+                         pd.Timestamp('2019-01-05 10:30')]
+    assert warned == []
+
+
+@pytest.mark.parametrize('vals,reason', [
+    (['05/01/2019', '06/02/2019'], 'ambiguous'),     # no field above 12
+    (['13/01/2019', '01/13/2019'], 'conflicting'),   # evidence both ways
+])
+def test_undecidable_year_last_is_NaT_and_warns_never_guessed(vals, reason):
+    s = pd.Series(vals, dtype=object)
+    out, warned = _record(_coerce_datetime_column, s, country='X',
+                          table='interview_date', column='Int_t')
+    assert out.isna().all()
+    assert len(warned) == 1, warned          # one warning, not two
+    w = warned[0]
+    assert isinstance(w, DatetimeAmbiguityWarning)
+    assert (w.reason, w.count, w.wave) == (reason, 2, None)
+    assert 'X/interview_date/Int_t' in str(w)
+
+
+def test_year_last_order_is_settled_per_wave():
+    """Two waves may use opposite conventions; each is settled on its own."""
+    idx = pd.MultiIndex.from_tuples(
+        [('w1', 'a'), ('w1', 'b'), ('w2', 'c'), ('w2', 'd'), ('w3', 'e')],
+        names=['t', 'i'])
+    s = pd.Series(['13/01/2019', '05/01/2019', '01/13/2019', '01/05/2019',
+                   '03/04/2019'], index=idx, dtype=object)
+    out, warned = _record(_coerce_datetime_column, s, column='Int_t')
+    assert list(out[:4]) == [pd.Timestamp('2019-01-13'), pd.Timestamp('2019-01-05')] * 2
+    assert pd.isna(out.iloc[4])
+    assert [(type(w), w.reason, w.wave) for w in warned] == \
+        [(DatetimeAmbiguityWarning, 'ambiguous', 'w3')]
+
+
+def test_year_first_strings_never_reach_the_guard():
+    """Every stored string in the corpus is year-first; none may be touched."""
+    s = pd.Series(['2019-01-05', '2019/01/05', '2019-05-01 08:00:00'], dtype=object)
+    out, warned = _record(_coerce_datetime_column, s, column='Int_t')
+    assert list(out) == [pd.Timestamp('2019-01-05'), pd.Timestamp('2019-01-05'),
+                         pd.Timestamp('2019-05-01 08:00')]
+    assert warned == []
+
+
+def test_mixed_timezones_warn_and_are_served_unconverted():
+    df = pd.DataFrame({'Int_t': ['2021-08-17T10:00:00+01:00',
+                                 '2021-08-17 10:00:00']})
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        _enforce_declared_dtypes(df, {'Int_t': 'datetime'},
+                                 country='X', table='interview_date')
+    msgs = [x.message for x in w if isinstance(x.message, DatetimeCoercionWarning)]
+    assert len(msgs) == 1 and 'timezone' in str(msgs[0])
+    assert msgs[0].country == 'X' and msgs[0].column == 'Int_t'
+    assert list(df['Int_t']) == ['2021-08-17T10:00:00+01:00', '2021-08-17 10:00:00']
 
 
 # --- warm regression (needs the built corpus) --------------------------------
