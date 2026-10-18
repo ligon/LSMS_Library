@@ -8,6 +8,12 @@
 * Malawi ``u='N/A'`` (IHS4/IHS5 Module G).  Every such row is unit code 23
   ``OTHER (SPECIFY)`` with the specify text ``N/A``.  ``_clean_freetext_unit``
   now emits the sentinel instead of the free text.
+* Malawi code 23 ``OTHER (SPECIFY)`` with NO usable specify text (blank, a
+  bare number, ``OTHER``, ``UNIT``) -- ruling @ligon 2026-10-18.  Served as
+  ``Other (Specify)`` / ``Other`` / ``Unit`` before, now the sentinel.  A code-23
+  row whose text names a unit (``Packet``, ``Whole Chicken``, ``Grams``) keeps
+  it.  IHS2 (2004-05) prints the same answer as code 20 (label ``Other``) and
+  its script reads no specify text, so all of its ``Other`` rows move.
 
 The remap has to happen at BUILD time: the kg inference runs on the raw ``u``,
 so the delivered tier checks the property (no inferred kilograms on these
@@ -30,8 +36,22 @@ _MALAWI = countries_root() / 'Malawi' / '_' / 'malawi.py'
 #: Rows the remap moves, measured on the build at 3e3bd26ee (GH #1042).
 _EXPECTED = {
     'GhanaLSS': ('None', {'1998-99': 88, '2005-06': 1450, '2012-13': 970}),
-    'Malawi': ('N/A', {'2016-17': 24, '2019-20': 19}),
+    # 24 / 19 were the first pass ('N/A' only); the code-23 rule adds
+    # 2004-05 'Other' 892, 2010-11 'Other (Specify)' 17 + 'Unit' 8, 2013-14
+    # 'Other (Specify)' 110, 2016-17 'Other (Specify)' 404 + 'Other' 1,
+    # 2019-20 'Other (Specify)' 12 + 'Other' 1 (private cold rebuild,
+    # 2026-10-18).
+    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 25, '2013-14': 110,
+                       '2016-17': 429, '2019-20': 32}),
 }
+
+#: Malawi rows still served as 'Other (Specify)' after the code-23 rule.  They
+#: are NOT code 23: the country ``u`` table's sentinel block decodes IHS3 codes
+#: 16 (CUP), 17 (TIN), 21 (BASIN), 12/13 (BASKET), 03 (90 KG BAG) and
+#: off-instrument codes to 'Other (Specify)', and 2016-17's 590 are an
+#: unlabelled code 21 that IHS4 does not print.  GH #1042 residual -- whoever
+#: fixes that block moves these on purpose.
+_MALAWI_OTHER_SPECIFY_NOT_23 = {'2010-11': 5422, '2013-14': 8, '2016-17': 590}
 
 #: Rungs a missing-unit row may be served by: its own shipped factor, a metric
 #: label, or nothing.  Never an inferred (pooled) rung.
@@ -65,12 +85,67 @@ def test_malawi_na_specify_text_is_the_sentinel(text):
 
 
 def test_malawi_na_does_not_fall_back_to_other_specify():
-    """Blanking 'N/A' would fall back to the code-23 label, which gets kg."""
-    df = pd.DataFrame({'unitsdetail_bought': ['N/A', 'Basket', None],
-                       'units_bought': ['OTHER (SPECIFY)'] * 3})
+    """Blanking 'N/A' would fall back to the code-23 label, which gets kg.
+
+    Before the code-23 ruling the blank third row fell back to the label
+    'Other (Specify)'; it is now the sentinel too.  A blank on a NON-other
+    code still falls back to that code's label.
+    """
+    df = pd.DataFrame({'unitsdetail_bought': ['N/A', 'Basket', None, None],
+                       'units_bought': ['OTHER (SPECIFY)'] * 3 + ['PIECE']})
     out = _malawi().handling_unusual_units(df, suffixes=['bought'])
-    assert list(out['u_bought'][:2]) == [U_UNKNOWN, 'Basket']
-    assert out['u_bought'].iloc[2] != U_UNKNOWN
+    assert list(out['u_bought']) == [U_UNKNOWN, 'Basket', U_UNKNOWN, 'Piece']
+
+
+# ---------------------------------------------- code 23, both sides (config)
+@pytest.mark.parametrize('code,expected', [
+    ('23', True), ('23A', True), ('23b', True), ('23.0', True), (' 23 ', True),
+    ('2', False), ('22', False), ('230', False), ('21', False), (None, False),
+])
+def test_malawi_other_specify_code(code, expected):
+    assert bool(_malawi().is_other_specify_code([code]).iloc[0]) is expected
+
+
+@pytest.mark.parametrize('text', ['OTHER', 'Other', 'OTHER (SPECIFY)',
+                                  'others', 'UNIT', 'Units', '', '1/4', '0'])
+def test_malawi_non_informative_specify_text_is_blank(text):
+    assert pd.isna(_malawi()._clean_freetext_unit(text))
+
+
+def test_malawi_code23_boundary():
+    """Code 23 + no usable text -> sentinel; code 23 + a unit -> that unit;
+    any other code + no text -> the code's own label."""
+    df = pd.DataFrame({
+        'unitsdetail_bought': ['', 'OTHER', 'UNIT', '1/4', '1 PACKET',
+                               'WHOLE CHICKEN', 'GRAMS', None, ''],
+        'unitcode_bought': ['23', '23', '23', '23.0', '23', '23', '23A',
+                            '9', '10'],
+        'units_bought': ['OTHER (SPECIFY)'] * 7 + ['PIECE', 'HEAP'],
+    })
+    out = _malawi().handling_unusual_units(df, suffixes=['bought'])
+    assert list(out['u_bought']) == [
+        U_UNKNOWN, U_UNKNOWN, U_UNKNOWN, U_UNKNOWN,
+        'Packet', 'Whole Chicken', 'Grams', 'Piece', 'Heap']
+
+
+def test_malawi_other_specify_to_unknown_without_specify_text():
+    """2013-14 ships no specify text: every code-23 row is the sentinel."""
+    m = _malawi()
+    u = pd.Series(['Other (Specify)', 'Kilogramme', 'Other (Specify)'])
+    out = m.other_specify_to_unknown(
+        u, m.is_other_specify_code(['23', '01', '23B']).values)
+    assert list(out) == [U_UNKNOWN, 'Kilogramme', U_UNKNOWN]
+
+
+def test_malawi_wave_scripts_route_through_the_helper():
+    """Each fallback site (three scripts + handling_unusual_units) uses it."""
+    root = countries_root() / 'Malawi'
+    for wave in ('2004-05', '2010-11', '2013-14'):
+        src = (root / wave / '_' / 'food_acquired.py').read_text()
+        assert 'other_specify_to_unknown(' in src, wave
+    for wave in ('2016-17', '2019-20'):
+        src = (root / wave / '_' / 'food_acquired.py').read_text()
+        assert 'handling_unusual_units(' in src, wave
 
 
 # ------------------------------------------------------------ delivered tier
@@ -91,3 +166,16 @@ def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
 
     sources = food_kg_factors(fa).loc[(u == U_UNKNOWN), 'KgFactorSource']
     assert set(sources.astype(str)) <= _NON_INFERRED, sources.value_counts()
+
+    if country == 'Malawi':
+        # Code 23 with no specification is gone under every spelling it had.
+        for gone in ('Other', 'Unit'):
+            assert not (u == gone).any(), f'Malawi still serves u={gone!r}'
+        # The shipped conversion-table factor survives the relabel (5 code-23
+        # rows + the first pass's 14 'N/A' rows, all 2019-20).
+        assert int((sources.astype(str) == 'survey_kg').sum()) == 19
+        # What is left under 'Other (Specify)' is the residual, not code 23.
+        for wave, n in _MALAWI_OTHER_SPECIFY_NOT_23.items():
+            got = int(((u == 'Other (Specify)') & (t == wave)).sum())
+            assert got == n, (wave, got)
+        assert not ((u == 'Other (Specify)') & (t == '2019-20')).any()

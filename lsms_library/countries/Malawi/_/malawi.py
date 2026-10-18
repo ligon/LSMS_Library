@@ -101,6 +101,13 @@ def _clean_freetext_unit(value):
     if s.lower() == 'n/a':
         from lsms_library.transformations import U_UNKNOWN
         return U_UNKNOWN
+    # GH #1042 follow-up (2026-10-18): specify text that only restates the
+    # code ('OTHER', 'OTHER (SPECIFY)') or names no unit ('UNIT') carries no
+    # specification.  Return NA so the caller's fallback decides; for an
+    # OTHER (SPECIFY) code that fallback is the sentinel -- see
+    # other_specify_to_unknown.
+    if s.lower() in _NON_INFORMATIVE_SPECIFY:
+        return pd.NA
     if re.fullmatch(r'[\d.,/]+', s):          # bare quantity, no unit -> NA
         return pd.NA
     # Drop a leading count of one only ('1 Basket' -> 'Basket').  Never a
@@ -109,6 +116,56 @@ def _clean_freetext_unit(value):
     if (not s) or re.fullmatch(r'[\d.,/]+', s):
         return pd.NA
     return s.title()
+
+
+#: Other-specify texts that specify nothing (lower-cased, stripped).  Measured
+#: on every IHS3-IHS5 Module G row coded OTHER (SPECIFY) with a positive
+#: quantity: 'UNIT' 26 (2010-11), 'OTHER' 1 + 1 (2016-17, 2019-20); no
+#: 'other (specify)'/'others'/'specify' occurs, they are listed so the same
+#: answer cannot be served as a unit under a different spelling.
+_NON_INFORMATIVE_SPECIFY = frozenset({
+    'other', 'others', 'other (specify)', 'other(specify)', 'other specify',
+    'specify', 'unit', 'units',
+})
+
+
+def is_other_specify_code(code):
+    """Boolean Series: is this raw Module G unit code OTHER (SPECIFY)?
+
+    IHS3, IHPS 2013, IHS4 and IHS5 all print ``OTHER (SPECIFY) 23`` in the
+    Module G "CODES FOR UNIT" list; the data also carry sized variants
+    ``23A``..``23F`` (2013-14).  Codes arrive as strings, floats ('23.0') or
+    lower/upper case depending on the wave, so they are normalised first.
+    IHS2 (2004-05) numbers it 20 and has no code column here -- its script
+    tests the label instead.
+    """
+    c = pd.Series(code).astype('string').str.strip().str.upper()
+    c = c.str.replace(r'\.0$', '', regex=True)
+    return c.str.fullmatch(r'23[A-F]?').fillna(False).astype(bool)
+
+
+def other_specify_to_unknown(u, is_other, detail=None):
+    """Serve OTHER (SPECIFY) with no usable specification as ``U_UNKNOWN``.
+
+    Ruling (@ligon, 2026-10-18, GH #1042): unit code OTHER (SPECIFY) whose
+    specify text is absent or non-informative records that no unit was
+    given, so it gets the missing-unit sentinel -- which the kg inference
+    refuses -- instead of the code's label, under which unrelated items'
+    "units" were pooled into one inferred kilogram factor.
+
+    *detail* is the CLEANED specify text (:func:`_clean_freetext_unit`
+    output), aligned to *u*; where it holds a unit, *u* is left alone so a
+    real answer ('Packet', 'Whole Chicken', 'Grams') keeps its label.  Pass
+    ``detail=None`` for a wave that ships no specify text at all (2013-14):
+    every OTHER (SPECIFY) row then has no specification.  A conversion-table
+    factor keyed on the code (``cfactor_*``) is NOT touched here, so a row
+    the survey's own table converts keeps its ``survey_kg`` kilograms.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+    missing = pd.Series(is_other, index=u.index).astype(bool)
+    if detail is not None:
+        missing &= pd.Series(detail, index=u.index).isna().values
+    return u.mask(missing, U_UNKNOWN)
 
 
 _METRIC_KG = {  # unit token -> kg per 1 of that unit (volume at water density 1)
@@ -258,6 +315,17 @@ def handling_unusual_units(df, suffixes=None):
         # stays identical.
         df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(
             df[units_col].map(_titlecase_label))
+        # GH #1042: OTHER (SPECIFY) with no usable specify text is "no unit
+        # recorded", not the code's label.  Code first; the printed label is
+        # the fallback test where a wave has no code column.
+        code_col = f'unitcode_{suffix}'
+        if code_col in df.columns:
+            is_other = is_other_specify_code(df[code_col]).values
+        else:
+            is_other = (df[units_col].astype('string').str.strip().str.upper()
+                        == 'OTHER (SPECIFY)').fillna(False).values
+        df[u_col] = other_specify_to_unknown(
+            df[u_col], is_other, df[detail_col].replace('nan', pd.NA))
 
     return df
 

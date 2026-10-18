@@ -7,7 +7,9 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 import json
-from malawi import conversion_table_matching, food_acquired_to_canonical, normalize_food_label
+from malawi import (conversion_table_matching, food_acquired_to_canonical,
+                    normalize_food_label, is_other_specify_code,
+                    other_specify_to_unknown)
 
 wave = "2013-14"
 
@@ -84,6 +86,10 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
     df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
+    # GH #1042: this wave ships no other-specify text, so every code-23
+    # (OTHER (SPECIFY)) row has no specification -> missing-unit sentinel.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], is_other_specify_code(df[code_col]).values)
 
 df['t'] = wave
 df = df.reset_index()

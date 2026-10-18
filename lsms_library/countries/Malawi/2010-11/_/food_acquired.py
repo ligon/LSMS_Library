@@ -21,7 +21,8 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from malawi import (conversion_table_matching, food_acquired_to_canonical,
-                    normalize_food_label, _clean_freetext_unit)
+                    normalize_food_label, _clean_freetext_unit,
+                    is_other_specify_code, other_specify_to_unknown)
 
 wave = "2010-11"
 
@@ -108,6 +109,11 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
     # Keep native quantity + native unit; food_acquired_to_canonical computes
     # the summable Quantity_kg = quantity x cfactor (GH #378 / Malawi migration).
     df[u_col] = df[detail_col].replace('nan', pd.NA).fillna(df[code_col])
+    # GH #1042: code 23 = OTHER (SPECIFY) with no usable specify text is "no
+    # unit recorded" -> the missing-unit sentinel, not the code's label.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], is_other_specify_code(df[code_col]).values,
+        df[detail_col].replace('nan', pd.NA))
 
 df['t'] = wave
 df = df.reset_index()
