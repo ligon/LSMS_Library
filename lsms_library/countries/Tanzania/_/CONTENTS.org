@@ -1159,8 +1159,10 @@ deleted in GH #836.  It had already been off the API path since the
 canonical-index move (#169): the framework concatenates the three wave
 parquets and =_finalize_result= applies =id_walk=, so its rename of =UPHI=,
 its own =id_walk= and its blunt =~index.duplicated()= drop no longer run
-anywhere.  The 408,707 → 228,281 figures describe that retired path; they are
-kept as history, not as a description of today.
+anywhere.  The text above is kept as history.  Note, though, that the
+408,707 → 228,281 halving it attributes to line 65 matches the *wave-level*
+exact-duplicate drop measured below (408,891 → 228,377), not the ~33,000-row
+country-level collapse the same paragraphs describe.
 
 Measured 2026-10-17 (the GH #836 review checked the served frame cold == warm):
 
