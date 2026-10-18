@@ -121,6 +121,15 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.local_tools.cached_file_hash",
     "lsms_library.country.Wave._input_hash",          # the hash mechanism itself
     "lsms_library.country.Country._table_cache_hash",  # (would self-reference)
+    # The L2-country READ GATE (GH #908): grades the stored hash, checks the
+    # #891 coverage manifest and, on a hit, reads + row-selects the parquet an
+    # EARLIER build wrote.  It decides whether to serve; it writes nothing and
+    # determines no byte of any build output.  It was closure text inside the
+    # tagged _aggregate_wave_data until #908, so the exclusions above were
+    # defeated by where their caller lived and every gate edit cold-rebuilt
+    # the corpus.  Pinned by tests/test_build_transform_hash.py::
+    # test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint.
+    "lsms_library.country.Country._read_l2_country_cache",
     # _finalize_result is READ-path: re-applied on every read AFTER the cache,
     # so an edit surfaces regardless of cache freshness.  It is reached from the
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
