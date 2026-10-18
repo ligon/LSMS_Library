@@ -3557,12 +3557,13 @@ class Country:
 
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
-                _enforce_declared_dtypes(df, scheme_entry)
+                _enforce_declared_dtypes(df, scheme_entry, country=self.name,
+                                         table=method_name)
 
             # Enforce canonical dtypes from data_info.yml (wins over country-level
             # declarations; e.g. Albania's Age: float → Int64 per canonical schema)
             if method_name:
-                _enforce_canonical_dtypes(df, method_name)
+                _enforce_canonical_dtypes(df, method_name, country=self.name)
 
             # Defensive: drop any row where every non-index column is NaN.
             # Wave-level scripts can leak hollow rows (e.g. survey questionnaire
@@ -6130,7 +6131,71 @@ def _enforce_rejected_column_spellings(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> None:
+class DatetimeCoercionWarning(RuntimeWarning):
+    """A declared datetime column held strings that did not parse (GH #798).
+
+    Raised by :func:`_coerce_datetime_column` when values that were non-blank
+    strings before the cast come back ``NaT`` after it.  Carries ``country``,
+    ``table``, ``column``, ``count`` and ``examples`` as attributes so callers
+    and tests can target it precisely, the way ``GrainCollapseWarning`` does.
+    """
+
+    def __init__(self, message: str, *, country: str | None = None,
+                 table: str | None = None, column: str | None = None,
+                 count: int = 0, examples: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.column = column
+        self.count = count
+        self.examples = examples
+
+
+def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
+                            table: str | None = None,
+                            column: str | None = None) -> pd.Series:
+    """Parse a declared ``datetime`` column, element by element (GH #798).
+
+    ``pd.to_datetime(s, errors='coerce')`` infers ONE format from the first
+    parseable value and nulls every value written another way.  A warm
+    L2-country parquet concatenates waves before this cast runs, so a country
+    whose waves spell timestamps differently lost whole waves: Mali's EAC-I
+    ``YYYY-MM-DD HH:MM:SS`` next to EHCVM ``YYYY-MM-DD`` (24,939 -> 12,194
+    rows), Tanzania's UPD space-separated stamps next to 2019-20/2020-21 ISO
+    ``T`` stamps (22,427 -> 16,534) -- and ``dropna(how='all')`` then deleted
+    the rows.  ``format='mixed'`` parses each value on its own; on the warm
+    corpus it changes no value in any other country (all 27 ``interview_date``
+    parquets compared; columns already ``datetime64`` pass through, Liberia's
+    ``[ms]`` resolution included).
+
+    A value that was a non-blank string before and is ``NaT`` after is
+    COUNTED and reported with :class:`DatetimeCoercionWarning` -- never
+    silently nulled.  The served value is still ``NaT`` (no guessing).
+    """
+    out = pd.to_datetime(s, errors='coerce', format='mixed')
+    if pd.api.types.is_datetime64_any_dtype(s.dtype):
+        return out
+    was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
+                    na_action='ignore').fillna(False).astype(bool)
+    lost = was_str & out.isna()
+    n = int(lost.sum())
+    if n:
+        examples = tuple(pd.unique(s[lost].astype(str))[:3])
+        where = '/'.join(x for x in (country, table, column) if x)
+        warnings.warn(
+            DatetimeCoercionWarning(
+                f"{where or 'datetime column'}: {n} non-blank string value(s) "
+                f"did not parse as a datetime and are served as NaT "
+                f"(e.g. {list(examples)}).",
+                country=country, table=table, column=column, count=n,
+                examples=examples),
+            stacklevel=3)
+    return out
+
+
+def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any], *,
+                             country: str | None = None,
+                             table: str | None = None) -> None:
     """Cast DataFrame columns to the types declared in data_scheme.yml.
 
     Modifies *df* in place.  List declarations (e.g. ``[Male, Female]``)
@@ -6146,7 +6211,8 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
             elif isinstance(declared_type, str) and declared_type in _SCHEME_DTYPE_MAP:
                 target = _SCHEME_DTYPE_MAP[declared_type]
                 if target == 'to_datetime':
-                    df[col] = pd.to_datetime(df[col], errors='coerce')
+                    df[col] = _coerce_datetime_column(
+                        df[col], country=country, table=table, column=col)
                 elif target == pd.Int64Dtype():
                     # Round before casting so float values (e.g. 59.41 from
                     # age_handler) survive the safe-cast check.
@@ -6187,7 +6253,8 @@ def _load_canonical_dtypes() -> dict[str, dict[str, str]]:
     return result
 
 
-def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
+def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str, *,
+                              country: str | None = None) -> None:
     """Cast DataFrame columns to the types declared in data_info.yml Columns.
 
     Modifies *df* in place.  This runs after ``_enforce_declared_dtypes`` so
@@ -6208,7 +6275,8 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
         target = _SCHEME_DTYPE_MAP[type_decl]
         try:
             if target == 'to_datetime':
-                df[col] = pd.to_datetime(df[col], errors='coerce')
+                df[col] = _coerce_datetime_column(
+                    df[col], country=country, table=method_name, column=col)
             elif target == pd.Int64Dtype():
                 # Round before casting so that float ages like 59.41 (from
                 # age_handler's date-arithmetic path) survive the safe-cast

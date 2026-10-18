@@ -1862,7 +1862,20 @@ region code.  These are carried through as-is rather than repaired by guesswork.
   original-or-booster restriction, place-name case normalisation.
 - =tests/test_gh323_tanzania_cluster_key.py= :: 28 tests.
 
-* Known warm interview-date loss (GH #798, 2026-10-15)
+* Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
+
+*Resolved on branch =fix/798-datetime=.*  Both declared-datetime casts in
+=_finalize_result= now go through =country._coerce_datetime_column=, which
+parses with =format='mixed'= and emits a =DatetimeCoercionWarning=
+(country/table/column/count) for any non-blank string still served
+=NaT=.  Measured warm: =Country('Tanzania').interview_date()= 16,534 ->
+*22,427* rows over six waves (2019-20 1,184, 2020-21 4,709 restored),
+equal to the concatenated single-wave calls; the six genuinely null raw
+dates are still dropped and do not warn (they are null, not unparsed).
+Read-path only: 0 of 36 probed cache hashes moved.  The historical
+record below is kept as found; the single-wave workaround it describes
+is no longer needed.
+
 
 The four =2008-15/= UPD rounds store interview dates as space-separated
 timestamp strings in the raw country parquet; 2019-20 and 2020-21 store
