@@ -1188,5 +1188,10 @@ pooled factor.
 
 Separately, *float-stringified unit codes leak in later waves*: =31.0=
 (98 rows, post-1989 waves), =83.0= (1994b, 21), =95.0= (1994b/1995/1997, 57) are
-served as codes and receive =unit= / =item_unit= factors.  They are not on
-=tests/test_u_code_leak.py='s accepted ledger; not adjudicated here.
+served as codes and receive =unit= / =item_unit= factors.  A fourth, =37.0=
+(3 rows: 1994a 2, 1994b 1), is served =none= -- too few rows to clear the
+inference floors, so harmless today by the same accident as 1989's =0=, not
+by rule.  Measured on the fresh corpus (2026-10-17): =31.0= =unit= 82 /
+=item_unit= 16; =83.0= =item_unit= 21; =95.0= =unit= 57; =37.0= =none= 3.
+None of the four is on =tests/test_u_code_leak.py='s accepted ledger; not
+adjudicated here.
