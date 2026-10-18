@@ -144,6 +144,11 @@ and W2 tiya served as =tin= were contaminating W3's factors (e.g. Rice--local
 =tin= had 1,115 W2 rows beside W3's 6).  W4 moves by <=2 kg (survey =cvn=
 factors).
 
+*W5 (2023-24)* has no =food_acquired= script and no =2023-24= column in the
+=u= table.  =round_wave= already maps 2023Q3/2024Q1, so a future W5 build
+through =food_acquired_for_wave= fails loudly (=KeyError: '2023-24'= from
+=food_unit_labels=) until that column is added -- intended, not a bug.
+
 *Open, not fixed here*: (a) W4's per-wave column gives size-less W4 codes
 (20 CONGO, 30 MUDU, 40 DERICA, 80 PIECE, 90 HEAP, ...) W3's =small ...=
 labels -- 48,305 (2018Q3) + 50,181 (2019Q1) rows -- while W4 records the
