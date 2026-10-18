@@ -130,6 +130,7 @@ _EXCLUDED_CALLABLES = frozenset({
     # the corpus.  Pinned by tests/test_build_transform_hash.py::
     # test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint.
     "lsms_library.country.Country._read_l2_country_cache",
+    "lsms_library.country.Country._report_rebuild",
     # _finalize_result is READ-path: re-applied on every read AFTER the cache,
     # so an edit surfaces regardless of cache freshness.  It is reached from the
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build

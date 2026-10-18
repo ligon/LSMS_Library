@@ -3943,6 +3943,52 @@ class Country:
         out.attrs = dict(df.attrs)
         return out
 
+    def _report_rebuild(self, method_name: str, miss_reason: str | None,
+                        build_waves: list[str], cache_path: Path) -> None:
+        """Say why a table is being rebuilt from source (GH #920(a)).
+
+        Called once, at the top of the rebuild descent, so a git checkout and
+        a pip install signal identically (before this the only signal was the
+        pip-only "DVC unavailable" log line).  Rules in
+        :class:`CacheRebuildWarning`.  MECHANISM, not content: listed in
+        ``_build_registry._EXCLUDED_CALLABLES`` (GH #908), so editing it
+        moves no build fingerprint.
+        """
+        reason = miss_reason or "unknown"
+        if reason.startswith("LSMS_NO_CACHE"):
+            return  # requested, and expected on every call
+        key = (self.name, method_name)
+        now = frozenset(str(w) for w in build_waves)
+        try:
+            expected = self._table_cache_hash(method_name, list(self.waves))
+        except Exception:  # never let the signal break a build
+            expected = None
+        prev_hash, prev = _REBUILD_HISTORY.get(key, (None, None))
+        if prev is not None and prev_hash != expected:
+            prev = None  # inputs changed since: a new build, not a repeat
+        _REBUILD_HISTORY[key] = (expected, now if prev is None else (prev | now))
+        waves_txt = f"{len(now)} wave(s) ({', '.join(sorted(now))})"
+        if prev is not None and not now > prev:
+            # Coverage did not grow (GH #891 makes legitimate re-builds of a
+            # growing request union strictly larger), so the last rebuild did
+            # not stick.
+            msg = (f"{self.name}/{method_name} is being rebuilt from source "
+                   f"AGAIN in this process ({reason}); the previous rebuild "
+                   f"covered the same waves with the same inputs, so its parquet "
+                   f"was not written, was overwritten, or is not being read "
+                   f"back.  Check that {cache_path} is "
+                   f"writable and that its cache hash is stable between calls "
+                   f"(GH #920).  Rebuilding {waves_txt}.")
+            reason = f"repeat: {reason}"
+        elif reason.startswith(_QUIET_REBUILD_REASONS):
+            return
+        else:
+            msg = (f"Cache miss for {self.name}/{method_name} ({reason}): "
+                   f"FULL REBUILD from source of {waves_txt}, not a cache read.")
+        warnings.warn(CacheRebuildWarning(
+            msg, country=self.name, table=method_name, reason=reason,
+            waves=tuple(sorted(now))), stacklevel=4)
+
     def _read_l2_country_cache(self, method_name: str, cache_path: Path,
                                waves: list[str]) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
         """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
@@ -4836,6 +4882,7 @@ class Country:
             # gate (GH #908): the union's order is the build's cross-wave concat
             # order, so it is content, not mechanism.
             build_waves = list(waves) if covered is None else self._union_waves(waves, covered)
+            self._report_rebuild(method_name, miss_reason, build_waves, cache_path)
 
             # GH #866: everything below is the rebuild descent, so we have
             # already decided not to serve `cache_path` -- it graded STALE, or
@@ -6564,6 +6611,47 @@ def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
         raise LabelPassThroughError(msg)
     warnings.warn(msg, LabelPassThroughWarning, stacklevel=4)
     return report
+
+
+class CacheRebuildWarning(UserWarning):
+    """A table is being rebuilt from source for a reason the user did not ask for (GH #920(a)).
+
+    Emitted by :meth:`Country._report_rebuild` on BOTH install shapes (git
+    checkout and pip), once per rebuild descent:
+
+    - a miss that is expected stays quiet: ``no parquet`` (a first build, or
+      after ``cache clear``) and ``LSMS_NO_CACHE`` (the user asked);
+    - ``STALE`` (hash differs, or a hashless parquet, GH #809), ``coverage``
+      and ``read-error`` warn, naming the reason;
+    - a **repeat** warns whatever the reason: the same ``(country, table)``
+      rebuilt again in this process without its wave coverage growing, so the
+      previous rebuild's parquet was not written or is not being read back --
+      the "re-aggregates on every call" symptom #920 was filed for.  A
+      rebuild after the table's INPUTS changed (a config edit mid-session:
+      the expected hash moved) is not a repeat; it is graded by its reason.
+
+    ``reason`` is the gate's miss reason (``'repeat: ...'`` for a repeat);
+    ``country``, ``table`` and ``waves`` say what is rebuilt.  Filter it by
+    class: ``warnings.filterwarnings('ignore', category=CacheRebuildWarning)``.
+    (@ligon, 2026-10-18.)
+    """
+
+    def __init__(self, message: str, *, country: str, table: str,
+                 reason: str, waves: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.reason = reason
+        self.waves = waves
+
+
+# (country, table) -> (expected input hash, union of wave sets rebuilt) in
+# this process (GH #920(a) repeat detector).  Process-local by design: a
+# fresh process reading a parquet the last one wrote is the cache working.
+_REBUILD_HISTORY: dict[tuple[str, str], tuple[str | None, frozenset[str]]] = {}
+
+# Miss reasons that are expected and stay quiet (prefix match).
+_QUIET_REBUILD_REASONS = ("no parquet", "LSMS_NO_CACHE")
 
 
 class GrainCollapseWarning(RuntimeWarning):
