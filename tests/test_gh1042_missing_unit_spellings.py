@@ -16,6 +16,12 @@
   row whose text names a unit (``Packet``, ``Whole Chicken``, ``Grams``) keeps
   it.  IHS2 (2004-05) prints the same answer as code 20 (label ``Other``) and
   its script reads no specify text, so all of its ``Other`` rows move.
+* Malawi's ``u`` table used to park 13 codes on ``Other (Specify)``.  Six are
+  the IHS3 Module G list -- 90 KG. BAG 3, BASKET (DENGU) (SHELLED) 12 /
+  (UNSHELLED) 13, CUP 16, TIN 17, BASIN 21 -- and now decode to those labels
+  (2016-17's code 21 is BASIN by its own ``hh_g07b`` value label).  IHPS 2013
+  prints none of the six, so 2013-14 serves them as the sentinel; codes on no
+  instrument's list (00 49 69 76 79 99 500) are the sentinel everywhere.
 
 The remap has to happen at BUILD time: the kg inference runs on the raw ``u``,
 so the delivered tier checks the property (no inferred kilograms on these
@@ -45,17 +51,31 @@ _EXPECTED = {
     # 'Other (Specify)' 110, 2016-17 'Other (Specify)' 404 + 'Other' 1,
     # 2019-20 'Other (Specify)' 12 + 'Other' 1 (private cold rebuild,
     # 2026-10-18).
-    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 25, '2013-14': 110,
+    # The decode residual adds 2010-11 23 off-list codes (00 14, 99 4, 49 2,
+    # 69/79/500 1 each) and 2013-14 8 (03/12/13 6 not printed in IHPS 2013,
+    # 00 1, 76 1): 25 -> 48 and 110 -> 118.
+    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 48, '2013-14': 118,
                        '2016-17': 429, '2019-20': 32}),
 }
 
-#: Malawi rows still served as 'Other (Specify)' after the code-23 rule.  They
-#: are NOT code 23: the country ``u`` table's sentinel block decodes IHS3 codes
-#: 16 (CUP), 17 (TIN), 21 (BASIN), 12/13 (BASKET), 03 (90 KG BAG) and
-#: off-instrument codes to 'Other (Specify)', and 2016-17's 590 are an
-#: unlabelled code 21 that IHS4 does not print.  GH #1042 residual -- whoever
-#: fixes that block moves these on purpose.
-_MALAWI_OTHER_SPECIFY_NOT_23 = {'2010-11': 5422, '2013-14': 8, '2016-17': 590}
+#: Malawi rows the IHS3 decode serves under their questionnaire labels.  They
+#: were 'Other (Specify)' before (2010-11 5,422 incl. 23 off-list codes,
+#: 2013-14 8, 2016-17 590); now no wave serves 'Other (Specify)' at all.
+#: 2010-11 'Basin' 1,952 = 1,951 code 21 + 1 free-text row; 2016-17 'Basin'
+#: 748 = 590 unlabelled code 21 + 158 already labelled 'basin'.
+_MALAWI_IHS3_DECODE = {
+    ('2010-11', 'Cup'): 3072, ('2010-11', 'Tin'): 281,
+    ('2010-11', 'Basin'): 1952, ('2010-11', '90 kg Bag'): 5,
+    ('2010-11', 'Basket (Dengu) (Shelled)'): 46,
+    ('2010-11', 'Basket (Dengu) (Unshelled)'): 44,
+    ('2016-17', 'Basin'): 748,
+}
+
+#: The IHS3 codes the shared table decodes, and the codes on no list.
+_IHS3_CODES = {'03': '90 kg Bag', '12': 'Basket (Dengu) (Shelled)',
+               '13': 'Basket (Dengu) (Unshelled)', '16': 'Cup', '17': 'Tin',
+               '21': 'Basin'}
+_OFF_LIST_CODES = ('00', '49', '69', '76', '79', '99', '500')
 
 #: Rungs a missing-unit row may be served by: its own shipped factor, a metric
 #: label, or nothing.  Never an inferred (pooled) rung.
@@ -152,6 +172,29 @@ def test_malawi_wave_scripts_route_through_the_helper():
         assert 'handling_unusual_units(' in src, wave
 
 
+def _malawi_u_table():
+    path = countries_root() / 'Malawi' / '_' / 'categorical_mapping.org'
+    tab = df_from_orgfile(str(path), name='u')
+    return dict(zip(tab['Code'].astype(str), tab['Preferred Label'].astype(str)))
+
+
+def test_malawi_u_table_decodes_ihs3_codes_per_the_questionnaire():
+    table = _malawi_u_table()
+    for code, label in _IHS3_CODES.items():
+        assert table[code] == label, (code, table[code])
+    for code in _OFF_LIST_CODES:
+        assert table[code] == U_UNKNOWN, (code, table[code])
+    # 'Other (Specify)' is reached only through code 23 (and its suffixes).
+    other = sorted(c for c, lab in table.items() if lab == 'Other (Specify)')
+    assert other == ['23', '23a', '23b', '23c', '23d', '23e', '23f'], other
+
+
+def test_malawi_2013_14_does_not_decode_codes_ihps_does_not_print():
+    src = (countries_root() / 'Malawi' / '2013-14' / '_' / 'food_acquired.py').read_text()
+    assert "_IHPS13_UNPRINTED_CODES = ['03', '12', '13', '16', '17', '21']" in src
+    assert '.isin(_IHPS13_UNPRINTED_CODES)' in src
+
+
 # ------------------------------------------------------------ delivered tier
 @pytest.mark.parametrize('country', sorted(_EXPECTED))
 def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
@@ -178,11 +221,12 @@ def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
         # The shipped conversion-table factor survives the relabel (5 code-23
         # rows + the first pass's 14 'N/A' rows, all 2019-20).
         assert int((sources.astype(str) == 'survey_kg').sum()) == 19
-        # What is left under 'Other (Specify)' is the residual, not code 23.
-        for wave, n in _MALAWI_OTHER_SPECIFY_NOT_23.items():
-            got = int(((u == 'Other (Specify)') & (t == wave)).sum())
-            assert got == n, (wave, got)
-        assert not ((u == 'Other (Specify)') & (t == '2019-20')).any()
+        # No wave serves 'Other (Specify)' any more: code 23 without text is
+        # the sentinel, and the IHS3 codes carry their questionnaire labels.
+        assert not (u == 'Other (Specify)').any(), 'Malawi still serves Other (Specify)'
+        for (wave, label), n in _MALAWI_IHS3_DECODE.items():
+            got = int(((u == label) & (t == wave)).sum())
+            assert got == n, (wave, label, got)
 
 
 # ------------------------------------------- GhanaLSS count units (follow-up)
