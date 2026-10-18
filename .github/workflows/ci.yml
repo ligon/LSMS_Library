@@ -25,6 +25,11 @@ on:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
     - cron: '17 6 * * 1'
+    # Nightly data-tests on `development` (GH #932).  NOTE: GitHub runs a
+    # scheduled workflow from the DEFAULT branch's copy of this file (master),
+    # so this line takes effect only once it reaches master; the data-tests
+    # job checks out `development` explicitly for this event.
+    - cron: '41 10 * * *'
   # Manual trigger (GH #941).  `data-tests` otherwise runs only on a push to
   # master / separate_data, i.e. once per release -- so a failure there
   # (52 EHCVM failures on the v0.14.0 push, 2026-09-17) could not be
@@ -102,7 +107,30 @@ jobs:
         run: >-
           poetry run pytest -n auto --dist=loadfile
           --timeout=600 --timeout-method=thread
-          --durations=25
+          --durations=25 --junitxml=unit-tests.xml
+      # GH #932: say what this green check does NOT cover.  Every
+      # `requires_s3` test skips here (no credentials), so a pass verifies
+      # code, not data.  The data tests gate the merge queue and run nightly.
+      - name: State what this check did not verify
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import xml.etree.ElementTree as ET
+          try:
+              suites = ET.parse('unit-tests.xml').getroot()
+              suites = [suites] if suites.tag == 'testsuite' else list(suites)
+              tests = sum(int(x.get('tests', 0)) for x in suites)
+              skipped = sum(int(x.get('skipped', 0)) for x in suites)
+              line = (f"**{skipped:,} of {tests:,} tests were skipped** in this job "
+                      f"({skipped / max(tests, 1):.0%}), almost all `requires_s3` (no credentials).")
+          except Exception as exc:  # the summary must never fail the job
+              line = f"(could not read unit-tests.xml: {exc})"
+          print("### unit-tests does not verify data\n")
+          print(line)
+          print("A green `unit-tests` check verifies the code paths that need no microdata.")
+          print("The data tests (`data-tests`) run in the `development` merge queue, nightly")
+          print("on `development`, on release pushes, and on manual dispatch (GH #932).")
+          PY
 
   # Windows reader smoke exercises platform defaults: cp1252 text encoding,
   # no ``fork`` start method, no process groups, a case-insensitive checkout.
@@ -232,7 +260,8 @@ jobs:
   # integration branches; reader creds only.
   dvc-remote-reachability:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.ref == 'refs/heads/development' || github.ref == 'refs/heads/master'
+    # Only the WEEKLY cron: the nightly one (GH #932) is for data-tests.
+    if: github.event.schedule == '17 6 * * 1' || github.ref == 'refs/heads/development' || github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -367,14 +396,32 @@ jobs:
       OPENBLAS_NUM_THREADS: "1"
       OMP_NUM_THREADS: "1"
       MKL_NUM_THREADS: "1"
-    # Push to a release branch, or a manual `workflow_dispatch` on any ref
-    # (GH #941): the dispatch is the only way to re-run this job on a fix
-    # without a release.
+    # When this runs (GH #932, @ligon 2026-10-18):
+    #  - merge_group: every merge into `development` through the merge queue
+    #    is data-tested BEFORE it lands.  On pull_request events the job is
+    #    SKIPPED, and GitHub counts a skipped job as passing a required check,
+    #    so making `data-tests` required in the merge-queue ruleset gates the
+    #    queue without slowing PR pushes;
+    #  - the nightly schedule (`41 10 * * *`), against `development`: the
+    #    backstop for anything that bypassed the queue and for drift outside
+    #    the repo (S3 contents, WB downloads, dependency resolution);
+    #  - a push to a release branch, as before;
+    #  - a manual `workflow_dispatch` on any ref (GH #941).
+    # Before #932 only the last two applied, so every PR and every
+    # `development` push skipped ~240 `requires_s3` tests and reported green.
     if: >-
       github.event_name == 'workflow_dispatch'
+      || github.event_name == 'merge_group'
+      || github.event.schedule == '41 10 * * *'
       || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
+    # A hung data test must not hold the merge queue for the 6-hour default.
+    # The job takes ~57-63 min today (2026-10-15 runs).
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          # A scheduled run would otherwise test the default branch (master).
+          ref: ${{ github.event_name == 'schedule' && 'development' || '' }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
