@@ -1,9 +1,30 @@
-"""Uganda missing units retain quantity reports and carry value-only sources.
+"""GH #962: food-unit sentinels, accepted residual codes, and their kg contract.
 
-Exercise the country reader and canonicalizer with small raw frames, then
-the ordinary runtime derivations. No microdata or cached tables are needed.
+Two halves, both config-only (no microdata, no cache):
+
+* **Uganda** (GH #967): missing units retain quantity reports and value-only
+  acquisitions carry ``u='Value'``.  Exercises the country reader and
+  canonicalizer with small raw frames, then the ordinary runtime derivations.
+* **The framework contract**, on synthetic ``(t, i, j, u, s)`` frames:
+
+  - every spelling in :data:`transformations._U_SENTINELS` (and a NaN ``u``)
+    with enough priced rows to activate the price-ratio inference is served
+    ``KgFactorSource == 'none'``, while a real unit on the same priced
+    population IS inferred;
+  - an **accepted residual code** (a unit no source names, e.g. Uganda's
+    ``136``) is NOT a missing unit: it is served an inferred factor --
+    the u-pooled ``unit`` rung -- and so contributes to
+    ``food_quantities(units='kgs')``.  The units skill and the
+    ``tests/test_u_code_leak.py`` header used to say the opposite;
+  - ``_U_SENTINELS`` is a CLOSED vocabulary, so an unlisted spelling of "no
+    unit" is treated as a unit (pinned, not endorsed), and a static sweep of
+    the country tree refuses any literal written into ``u`` by ``fillna``
+    that is neither a sentinel nor recorded, with evidence, in
+    :data:`MINTED_UNIT_SPELLINGS`.
 """
+import ast
 import importlib.util
+import re
 from pathlib import Path
 from unittest.mock import mock_open
 
@@ -12,8 +33,12 @@ import pandas as pd
 import pytest
 
 from lsms_library import local_tools
+from lsms_library.paths import countries_root
 from lsms_library.transformations import (
+    FOOD_KG_MIN_BASELINE,
+    FOOD_KG_MIN_REPORTS,
     U_UNKNOWN,
+    _U_SENTINELS,
     food_expenditures_from_acquired,
     food_kg_factors,
     food_prices_from_acquired,
@@ -292,3 +317,241 @@ def test_categorical_mixed_units_and_sources_remain_separate(uganda):
     assert out.loc[('2020', 'cancel', 'rice', U_UNKNOWN, 'purchased')].tolist() == [0, 10, 100]
     assert out.xs('Value', level='u')['Price'].isna().all()
     pd.testing.assert_frame_equal(wide, before)
+
+
+
+# ---------------------------------------------------------------------------
+# The framework contract on synthetic frames (GH #962)
+# ---------------------------------------------------------------------------
+
+#: Enough households that every inferred rung clears its floor.
+_N = max(FOOD_KG_MIN_REPORTS, FOOD_KG_MIN_BASELINE) + 3
+_ITEMS = ('rice', 'maize', 'beans')
+
+
+def _canonical(rows):
+    df = pd.DataFrame(rows, columns=['t', 'i', 'j', 'u', 's',
+                                     'Quantity', 'Expenditure'])
+    return df.set_index(['t', 'i', 'j', 'u', 's'])
+
+
+def _priced_population(probe_unit, *, probe_items=_ITEMS, probe_households=_N):
+    """Kg rows at 100/kg, a ``Tas`` control at 300/Tas, and *probe_unit*.
+
+    Every household buys every item in kilograms (a live ``(t, j)``
+    baseline and a live per-household u-pooled ratio) and in ``Tas``; the
+    probe unit is priced identically to ``Tas``, so any rung that serves
+    ``Tas`` would serve it 3.0 kg/unit.  Whatever separates the two is the
+    sentinel rule and nothing else.
+    """
+    rows = []
+    for k in range(_N):
+        for j in _ITEMS:
+            rows.append(('2020', f'h{k}', j, 'Kg', 'purchased', 2.0, 200.0))
+            rows.append(('2020', f'h{k}', j, 'Tas', 'purchased', 2.0, 600.0))
+    for k in range(probe_households):
+        for j in probe_items:
+            rows.append(('2020', f'h{k}', j, probe_unit, 'purchased', 2.0, 600.0))
+    return _canonical(rows)
+
+
+def _probe_mask(df, probe_unit):
+    u = pd.Series(df.index.get_level_values('u'), dtype=object)
+    if pd.isna(probe_unit):
+        return u.isna().to_numpy()
+    return u.eq(probe_unit).to_numpy()
+
+
+_SENTINEL_SPELLINGS = sorted(_U_SENTINELS) + [U_UNKNOWN, 'MANQUANT',
+                                              '  UNKNOWN ', np.nan]
+
+
+@pytest.mark.parametrize('spelling', _SENTINEL_SPELLINGS, ids=repr)
+def test_sentinel_spelling_gets_no_price_ratio_factor(spelling):
+    df = _priced_population(spelling)
+    probe = _probe_mask(df, spelling)
+    assert probe.sum() == _N * len(_ITEMS) >= FOOD_KG_MIN_REPORTS
+    factors = food_kg_factors(df)
+    # The real-unit control on the SAME priced population is inferred, so
+    # the inference was live; the sentinel is refused by rule, not by luck.
+    control = factors.xs('Tas', level='u')
+    assert control['KgFactorSource'].isin(
+        ['item_unit', 'item_unit_tight', 'unit']).all()
+    assert np.allclose(control['kg_per_unit'], 3.0)
+    assert factors.loc[probe, 'KgFactorSource'].eq('none').all()
+    assert factors.loc[probe, 'kg_per_unit'].isna().all()
+
+
+def test_every_sentinel_spelling_is_exercised():
+    """Adding a spelling to ``_U_SENTINELS`` extends the test above; this
+    pins that the parametrisation is derived from the set, not copied."""
+    covered = {str(s).strip().lower() for s in _SENTINEL_SPELLINGS
+               if not pd.isna(s)}
+    assert set(_U_SENTINELS) <= covered
+
+
+def test_sentinel_rows_keep_survey_kilograms():
+    """``survey_kg`` outranks the sentinel rule: the survey's own kilograms
+    are not an inference from a pooled group."""
+    df = _priced_population(U_UNKNOWN).assign(Quantity_kg=np.nan)
+    probe = _probe_mask(df, U_UNKNOWN)
+    df.loc[probe, 'Quantity_kg'] = 5.0
+    factors = food_kg_factors(df)
+    assert factors.loc[probe, 'KgFactorSource'].eq('survey_kg').all()
+    assert np.allclose(factors.loc[probe, 'kg_per_unit'], 2.5)
+
+
+@pytest.mark.parametrize('code', ['136', '659', '254'])
+def test_accepted_residual_code_receives_the_unit_pooled_factor(code):
+    """An accepted residual is a unit nobody can name -- NOT a missing unit.
+
+    Shaped like Uganda's 24 rows: a rare code on an item with no baseline of
+    its own (so no ``(item, unit)`` cell), bought by households that also buy
+    in kilograms.  It is served the u-pooled ``unit`` rung, disclosed in
+    ``KgFactorSource``.
+    """
+    df = _priced_population(code, probe_items=('oil',), probe_households=3)
+    probe = _probe_mask(df, code)
+    factors = food_kg_factors(df)
+    assert factors.loc[probe, 'KgFactorSource'].eq('unit').all()
+    assert np.allclose(factors.loc[probe, 'kg_per_unit'], 3.0)
+    assert factors.attrs['kg_factor_sources']['unit'] == probe.sum()
+
+
+def test_accepted_residual_code_is_included_in_kilograms():
+    """...and therefore its kilograms ARE in ``food_quantities(units='kgs')``
+    -- the claim "only the kg aggregate excludes them" was never true."""
+    df = _priced_population('136', probe_items=('oil',), probe_households=3)
+    kgs = food_quantities_from_acquired(df)
+    assert '136' not in set(kgs.index.get_level_values('u'))
+    oil = kgs.xs('oil', level='j').xs('kg', level='u')['Quantity']
+    assert np.allclose(oil, 2.0 * 3.0)
+    # Contrast: the same rows spelled as the missing-unit sentinel carry no
+    # kilograms and are served in their native unit.
+    unknown = food_quantities_from_acquired(
+        _priced_population(U_UNKNOWN, probe_items=('oil',), probe_households=3))
+    assert 'oil' not in set(
+        unknown.xs('kg', level='u').index.get_level_values('j'))
+    assert unknown.xs(U_UNKNOWN, level='u')['Quantity'].eq(2.0).all()
+
+
+@pytest.mark.parametrize('spelling', ['None', 'N/A', 'NA', '---'])
+def test_unlisted_missing_unit_spelling_is_treated_as_a_unit(spelling):
+    """PINNED GAP, not policy: ``_U_SENTINELS`` is closed, so a new spelling
+    of "no unit" is a unit to the ladder and acquires a pooled price-ratio
+    factor.  This is why a spelling must be written as ``U_UNKNOWN`` -- and
+    why :func:`test_no_unclassified_missing_unit_spelling_is_minted` exists.
+    If one of these spellings is ever added to the sentinel set, move it to
+    the test above (that is a policy change needing its own accounting)."""
+    assert spelling.strip().lower() not in _U_SENTINELS
+    df = _priced_population(spelling)
+    probe = _probe_mask(df, spelling)
+    factors = food_kg_factors(df)
+    assert factors.loc[probe, 'KgFactorSource'].ne('none').all()
+
+
+# --- static guard: no new missing-unit spelling is minted silently ---------
+
+#: Every literal a country module writes into a unit column via ``fillna``
+#: that is NOT a ``_U_SENTINELS`` spelling, keyed by
+#: ``(path relative to countries_root, spelling)``, with the evidence for it.
+#: A new entry is a CLAIM about what the spelling means; it needs evidence,
+#: and if it means "no unit was recorded" it is a sentinel leak to report,
+#: not to file here quietly.
+MINTED_UNIT_SPELLINGS = {
+    ('Nigeria/_/nigeria.py', 'None'): (
+        'LIVE SENTINEL LEAK (GH #962 inventory, 2026-10-17): food_acquired_for_'
+        'wave fills a NaN raw unit code with "None" before the API-time label '
+        'map, so it can only mean "no unit recorded"; 847 served rows (422 '
+        'priced), all receive item_unit/unit factors, 1,133 kg of 1.545e6. '
+        'Reported as a residual; not fixed here (policy).'),
+    ('Nigeria/2012-13/_/individual_unit_values.py', 'None'): (
+        'Orphan script: individual_unit_values is in no data_scheme.yml or '
+        'Makefile, so nothing served reads it.'),
+    ('Nigeria/2015-16/_/individual_unit_values.py', 'None'): (
+        'Orphan script, as 2012-13.'),
+    ('Nigeria/2018-19/_/individual_unit_values.py', 'None'): (
+        'Orphan script, as 2012-13.'),
+    ('Ethiopia/_/ethiopia.py', 'Other (Specify)'): (
+        'crop_production (not food): a harvest quantity with an unrecorded '
+        'unit is tagged with the existing u-table value "Other (Specify)", '
+        'so _unit_sentinel_mask does not see it.  Crop-side sentinel '
+        'question, outside #962 food scope; reported as a residual.'),
+    ('Ethiopia/_/ethiopia.py', 'Kg'): (
+        'crop_production sale unit: a real metric unit, not a missing-unit '
+        'spelling.  The site comments that W1/W2 sale quantities are kilos; '
+        'whether a NaN DECODED sale unit in a later wave is also kilos is '
+        'UNVERIFIED (#962 inventory did not cover crop tables).'),
+}
+
+_UNIT_TARGET = re.compile(r"\[['\"]u['\"]\]|unit", re.I)
+
+
+def _string_constants(tree):
+    out = {'U_UNKNOWN': U_UNKNOWN}
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
+                and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str)):
+            out[node.targets[0].id] = node.value.value
+    return out
+
+
+def _minted_unit_spellings():
+    """``(relpath, lineno, spelling)`` for every ``<unit expr>.fillna(<str>)``
+    in the country tree, resolving module-level string constants."""
+    root = countries_root()
+    found = []
+    for path in sorted(Path(root).rglob('*.py')):
+        try:
+            tree = ast.parse(path.read_text(encoding='utf-8'))
+        except (SyntaxError, UnicodeDecodeError):
+            continue
+        consts = _string_constants(tree)
+        for node in ast.walk(tree):
+            if not (isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == 'fillna' and node.args):
+                continue
+            if not _UNIT_TARGET.search(ast.unparse(node.func.value)):
+                continue
+            arg = node.args[0]
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                value = arg.value
+            elif isinstance(arg, ast.Name) and arg.id in consts:
+                value = consts[arg.id]
+            else:
+                continue   # a column/Series fill, not a minted spelling
+            found.append((path.relative_to(root).as_posix(), node.lineno, value))
+    return found
+
+
+def test_the_sweep_sees_the_known_minting_sites():
+    """The sweep is not vacuous: it finds the sentinel writers we know of
+    (Niger's ``U_NA``, the EHCVM ``Manquant`` plot_inputs fills) as well as
+    the ledgered non-sentinel ones."""
+    found = {(p, v) for p, _, v in _minted_unit_spellings()}
+    assert ('Niger/_/niger.py', 'Unknown') in found
+    assert ('Togo/2018/_/plot_inputs.py', 'Manquant') in found
+    assert set(MINTED_UNIT_SPELLINGS) <= found, (
+        'stale MINTED_UNIT_SPELLINGS entries (the site no longer mints the '
+        f'spelling -- delete them): {sorted(set(MINTED_UNIT_SPELLINGS) - found)}')
+
+
+def test_no_unclassified_missing_unit_spelling_is_minted():
+    """A module that fills a missing unit must use a ``_U_SENTINELS``
+    spelling (``transformations.U_UNKNOWN``).  Anything else acquires a
+    price-ratio factor silently (see the pinned gap above), so it must be
+    recorded in :data:`MINTED_UNIT_SPELLINGS` with evidence.  This does not
+    reject an unfamiliar LOCAL unit: only literals a module MINTS into a
+    unit column are checked, never labels the survey itself recorded."""
+    unclassified = [
+        f'{p}:{line} fills u with {v!r}'
+        for p, line, v in _minted_unit_spellings()
+        if v.strip().lower() not in _U_SENTINELS
+        and (p, v) not in MINTED_UNIT_SPELLINGS]
+    assert not unclassified, (
+        'unclassified missing-unit spelling(s); write U_UNKNOWN, or record '
+        'the spelling with evidence in MINTED_UNIT_SPELLINGS:\n  '
+        + '\n  '.join(unclassified))

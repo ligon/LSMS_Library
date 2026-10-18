@@ -1172,3 +1172,21 @@ strings "reative" or "Broader".  The three keys were deleted from
 =kinship.yml= on 2026-10-14 (GH #974); =tests/test_kinship_yml_hygiene.py=
 pins them out, and a warm =household_roster()= read of this country emits no
 unknown-label warning without them (measured, 51,574 rows).
+
+* 1989 serves the source's missing-unit code =0= as the literal ='0'= (GH #962, 2026-10-17)
+
+The =harmonize_unit= note above says "Code 0 is the source's missing-unit
+sentinel -> empty label (dropped)".  That holds for the coded waves; 1989
+carries RAW unit codes, so its code 0 is served as =u = '0'= -- *14 rows*
+(13 purchased, 1 produced), not in =transformations._U_SENTINELS=.  Today
+they get =KgFactorSource = 'none'= only because 1989 has no kg-labelled rows
+to form a baseline: all 2,068 of 1989's rows are =none=, including code =1=
+(716 rows of =5=, 32 of =1=, ...), which the code table above says IS
+kilograms but which 1989 serves raw.  Harmless for the sentinel now, but by
+accident rather than by rule: a 1989 kg baseline would hand these rows a
+pooled factor.
+
+Separately, *float-stringified unit codes leak in later waves*: =31.0=
+(98 rows, post-1989 waves), =83.0= (1994b, 21), =95.0= (1994b/1995/1997, 57) are
+served as codes and receive =unit= / =item_unit= factors.  They are not on
+=tests/test_u_code_leak.py='s accepted ledger; not adjudicated here.
