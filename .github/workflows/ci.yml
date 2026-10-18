@@ -114,7 +114,7 @@ jobs:
       - name: State what this check did not verify
         if: always()
         run: |
-          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import xml.etree.ElementTree as ET
           try:
               suites = ET.parse('unit-tests.xml').getroot()
