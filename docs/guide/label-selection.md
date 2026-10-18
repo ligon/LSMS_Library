@@ -124,7 +124,8 @@ foods, 42,240 rows); it now carries `{'Malawi': …}`. `Feature('food_prices')(
 all three countries, so it carries no report before or after. The evidence for
 the fix is therefore the synthetic two-country tests in
 `tests/test_feature_attrs_carriers.py::TestLabelsUnmatchedSurvivesAssembly`.
-Those tests fail on the pre-fix `feature.py`.
+Four of its five tests fail on the pre-fix `feature.py`; the fifth,
+`test_no_labels_no_key`, is a control that passes either way.
 
 Conflicting mappings from one Preferred Label to several targets, and
 per-country curation, remain open under #787.
