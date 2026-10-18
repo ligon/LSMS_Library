@@ -131,6 +131,24 @@ _EXCLUDED_CALLABLES = frozenset({
     # test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint.
     "lsms_library.country.Country._read_l2_country_cache",
     "lsms_library.country.Country._report_rebuild",
+    # GH #675: the degraded-build record.  Filing a drop, grading a stamped
+    # parquet at either read gate, probing whether a dropped source is readable
+    # now, and the warning are all MECHANISM -- they decide whether to serve
+    # and what metadata to stamp, never a byte of frame content.  Reached from
+    # the tagged grab_data / _aggregate_wave_data; without these entries every
+    # later edit to the mechanism would cold-rebuild the corpus.  (The probe
+    # calls get_dataframe; excluding it keeps the walk from descending.)
+    "lsms_library.local_tools.read_parquet_build_drops",
+    "lsms_library.country._file_build_drop",
+    "lsms_library.country._forget_wave_build_drops",
+    "lsms_library.country._wave_build_drops",
+    "lsms_library.country._stampable_build_drops",
+    "lsms_library.country._degraded_drops",
+    "lsms_library.country._mark_degraded_written",
+    "lsms_library.country._probe_source",
+    "lsms_library.country._degraded_cache_verdict",
+    "lsms_library.country._warn_degraded_serve",
+    "lsms_library.country._replay_build_drops",
     # _finalize_result is READ-path: re-applied on every read AFTER the cache,
     # so an edit surfaces regardless of cache freshness.  It is reached from the
     # tagged orchestrator _aggregate_wave_data; excluding it keeps the build
@@ -223,7 +241,9 @@ _EXCLUDED_CALLABLES = frozenset({
 # some other tagged module would otherwise fold it under that module's prefix.
 _EXCLUDED_CONSTANTS = frozenset(
     {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
-     "_NULL_INDEX_LEDGER"})
+     "_NULL_INDEX_LEDGER",
+     # GH #675: process-local logs / memos, same argument.
+     "_BUILD_DROP_LEDGER", "_DEGRADED_ATTEMPTED", "_SOURCE_PROBES"})
 
 
 def _is_build_callable(obj) -> bool:

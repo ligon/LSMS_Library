@@ -49,6 +49,7 @@ from .local_tools import (
     stamp_parquet_hash,
     read_parquet_grain_audit,
     read_parquet_cache_waves,
+    read_parquet_build_drops,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -1555,7 +1556,15 @@ class Wave:
                 # load_dataframe_with_dvc).  Stale -> fall through and
                 # re-extract from source below.
                 expected_wave_hash = self._input_hash(request)
-                if cache_freshness(cache_path, expected_wave_hash) != "stale":
+                # GH #675: a wave parquet whose build dropped a sub-df it could
+                # not read -- costing a REQUIRED column -- is a miss once its
+                # source is readable again (heal); otherwise it is served, and
+                # warned, below.
+                wave_drops = read_parquet_build_drops(cache_path)
+                degraded_verdict, _ = _degraded_cache_verdict(
+                    wave_drops, (self.country.name, request, self.year))
+                if (cache_freshness(cache_path, expected_wave_hash) != "stale"
+                        and degraded_verdict != "rebuild"):
                     try:
                         df_cached = pd.read_parquet(cache_path)
                     except (OSError, ArrowInvalid):
@@ -1568,6 +1577,10 @@ class Wave:
                         # df_edit hook's reduce_to_agreed) can only be replayed
                         # from the stamp -- the hook did not run on this hit.
                         _replay_wave_stamp(cache_path, self.country.name, request, self.year)
+                        # GH #675: carry the drop record to the country stamp.
+                        _replay_build_drops(wave_drops, self.country.name, request)
+                        _warn_degraded_serve(self.country.name, request, wave_drops,
+                                             cache_path, wave=self.year)
                         return df_cached
 
         def check_adding_t(df):
@@ -1645,6 +1658,11 @@ class Wave:
                 # of with it.  Record the drops so the post-merge check below
                 # can tell whether that cost a REQUIRED declared column.
                 config_bugs: list[tuple[str, Any, Exception]] = []
+                # GH #675: EVERY drop, with the columns that sub-df would have
+                # supplied, is recorded in the parquet this build writes -- the
+                # content hash cannot tell a degraded build from a complete one.
+                dropped: list[dict[str, Any]] = []
+                _forget_wave_build_drops(self.country.name, request, self.year)
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
                 # `merge_how:` (GH #323) picks the join type for this block.
                 # Defaults to the historical 'outer', so every existing `dfs:`
@@ -1734,6 +1752,18 @@ class Wave:
                         sub_file = sub_data_info.get('file', i)
                         if isinstance(exc, KeyError):
                             config_bugs.append((i, sub_file, exc))
+                        sub_path = self.file_path / "Data" / str(sub_file)
+                        try:
+                            sub_rel = sub_path.relative_to(countries_root()).as_posix()
+                        except ValueError:
+                            sub_rel = str(sub_path)
+                        dropped.append({
+                            "wave": self.year, "sub": i, "file": sub_rel,
+                            "kind": "config" if isinstance(exc, KeyError) else "unavailable",
+                            "error": f"{type(exc).__name__}: {exc}"[:300],
+                            "supplies": [str(c) for c in
+                                         (sub_data_info.get('myvars') or {})],
+                        })
                         warnings.warn(
                             f"{self.name}/{request}: could not load "
                             f"sub-df '{i}' (file: {sub_file}); "
@@ -1822,6 +1852,20 @@ class Wave:
                             f"column in EVERY wave of {self.country.name}, not just "
                             f"this one (GH #323/#515). First error: {first_exc!r}"
                         ) from first_exc
+
+                # GH #675: file each drop with the REQUIRED columns it cost,
+                # judged at the same moment as the guard above.  An
+                # unavailable-file drop that costs one is a DEGRADED build:
+                # stamped into the parquet so a warm read can tell.
+                if dropped:
+                    have = (set(map(str, df.columns)) | {
+                        str(n) for n in df.index.names if n is not None}
+                        if isinstance(df, pd.DataFrame) else set())
+                    required = set(self._required_scheme_columns(request))
+                    for rec in dropped:
+                        rec["missing_required"] = sorted(
+                            (required & set(rec.pop("supplies"))) - have)
+                        _file_build_drop(self.country.name, request, rec)
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -1928,10 +1972,14 @@ class Wave:
                 # df_edit hook's reduce_to_agreed) with the wave parquet, so
                 # a country rebuild from warm wave parquets -- where the hook
                 # does not run -- still stamps them into the country parquet.
+                wave_drops = _wave_build_drops(self.country.name, request, self.year)
                 df = to_parquet(df, cache_path, absolute_path=True,
                                 cache_hash=self._input_hash(request),
                                 grain_audit=_wave_grain_audit(
-                                    self.country.name, request, self.year))
+                                    self.country.name, request, self.year),
+                                build_drops=wave_drops)
+                _mark_degraded_written(
+                    (self.country.name, request, self.year), wave_drops)
             except (OSError, ValueError, ArrowInvalid) as exc:
                 # Disk full / permission denied / parquet serialization
                 # failure -> warn and continue with the in-memory df.
@@ -4123,6 +4171,18 @@ class Country:
             # GH #479).
             return None, covered, reason
 
+        # GH #675: the hash covers the inputs the build DECLARED, not what it
+        # managed to read.  A parquet whose build dropped an unreadable sub-df
+        # that cost a REQUIRED column is graded here: a miss (rebuild) once
+        # the source is readable again, at most once per process; otherwise
+        # served with a DegradedCacheWarning after the read below.
+        build_drops = read_parquet_build_drops(cache_path)
+        verdict, degraded_reason = _degraded_cache_verdict(
+            build_drops, (self.name, method_name))
+        if verdict == "rebuild":
+            logger.debug(f"GH #675 cache MISS ({degraded_reason}): {method_name} at {cache_path}")
+            return None, covered, degraded_reason
+
         try:
             cached_df = get_dataframe(cache_path)
             cached_df = map_index(cached_df)
@@ -4136,6 +4196,8 @@ class Country:
                 read_parquet_grain_audit(cache_path),
                 self.name, method_name,
             )
+            # GH #675: still degraded and not healable now -- serve, loudly.
+            _warn_degraded_serve(self.name, method_name, build_drops, cache_path)
             # GH #809: there is deliberately NO trust-once-and-stamp
             # here any more.  A hashless country parquet is graded
             # `stale` above and never reaches this branch, so the
@@ -4847,6 +4909,8 @@ class Country:
             # a stale report from an earlier call in the same process can never be
             # re-stamped into a parquet it does not belong to.
             _GRAIN_LEDGER.pop((self.name, method_name), None)
+            # GH #675: likewise the dropped-sub-df record this load stamps.
+            _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
 
             # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
             # own method, excluded from the build fingerprint (GH #908): it
@@ -4922,10 +4986,13 @@ class Country:
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
+                            build_drops = _stampable_build_drops(self.name, method_name)
                             to_parquet(df, cache_path,
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                       cache_waves=build_waves)
+                                       cache_waves=build_waves,
+                                       build_drops=build_drops)
+                            _mark_degraded_written((self.name, method_name), build_drops)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
                             df = self._restrict_to_waves(df, waves)
                         return df
@@ -4970,10 +5037,13 @@ class Country:
                             combined_df = next(iter(non_empty_df.values()))
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
+                        build_drops = _stampable_build_drops(self.name, method_name)
                         to_parquet(combined_df, cache_path,
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                   cache_waves=build_waves)
+                                   cache_waves=build_waves,
+                                   build_drops=build_drops)
+                        _mark_degraded_written((self.name, method_name), build_drops)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
                         # GH #891: cache the union, serve the request.
                         return self._restrict_to_waves(combined_df, waves)
@@ -5109,9 +5179,12 @@ class Country:
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
+                    build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
-                               cache_waves=build_waves)
+                               cache_waves=build_waves,
+                               build_drops=build_drops)
+                    _mark_degraded_written((self.name, method_name), build_drops)
                     logger.debug(
                         f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
                     )
@@ -6985,6 +7058,219 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
            and r.get("site") in _WAVE_BUILD_SITES
            and not r.get("from_cache")]
     return out or None
+
+
+# ---------------------------------------------------------------------------
+# GH #675 -- a build degraded by an UNAVAILABLE source caches as fresh.
+#
+# The content hash covers the inputs a build DECLARED, not what it managed to
+# READ.  The GH #515 fallback in ``Wave.grab_data`` drops a secondary ``dfs:``
+# sub-df whose file cannot be fetched -- correctly: a partial-data checkout must
+# not hard-fail -- and the parquet is then written WITHOUT the columns that
+# sub-df alone supplied, under a perfectly valid hash.  Every later warm read
+# graded it ``fresh``, at BOTH tiers (the L2-wave parquet re-served the damage
+# even after the country parquet was deleted), so a transient fetch failure
+# became permanent.  CotedIvoire ``cluster_features`` lost Latitude/Longitude
+# that way.
+#
+# The record of what was dropped rides in the parquet (``lsms_build_drops``,
+# see ``local_tools.read_parquet_build_drops``), filed here during the build the
+# same way the grain audit is (``_GRAIN_LEDGER``; relayed across the
+# wave-parallel fork by ``_parallel_waves``).  A parquet is DEGRADED when a drop
+# cost a REQUIRED declared column -- an ``optional: true`` column is the
+# author's signed statement that it may be absent, so dropping it is not
+# degradation (Burkina Faso's df_geo, a config KeyError on an optional column,
+# would otherwise warn on every process forever).
+#
+# Both read gates then ask ``_degraded_cache_verdict``: if the dropped source
+# can NOW be read (one probe per source per process), the parquet is a miss and
+# the table rebuilds -- the heal; if it still cannot, the stored frame is served
+# with a ``DegradedCacheWarning`` naming the missing columns and the file -- a
+# permanently unavailable source costs one cheap probe per process, never a
+# rebuild loop.  A key whose degraded parquet THIS process wrote is never
+# re-probed, so the build that just failed to fetch does not immediately
+# rebuild again (which would be a GH #920 ``repeat``).
+#
+# All of this is MECHANISM: it decides whether to serve, and stamps metadata a
+# build already determined; no byte of frame content depends on it.  The
+# callables are in ``_build_registry._EXCLUDED_CALLABLES`` and the three
+# containers in ``_EXCLUDED_CONSTANTS``.
+# ---------------------------------------------------------------------------
+
+class DegradedCacheWarning(UserWarning):
+    """A cached table is served WITHOUT a required column, because a source
+    file could not be read when it was built and still cannot (GH #675).
+
+    ``country``, ``table``, ``missing`` (the required columns absent) and
+    ``files`` (the unavailable sources, relative to the countries root) say
+    what is wrong.  The table rebuilds by itself in the first process that
+    can read the file; ``lsms-library cache clear --country <C>`` forces it.
+    """
+
+    def __init__(self, message: str, *, country: str, table: str,
+                 missing: tuple = (), files: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.missing = missing
+        self.files = files
+
+
+# (country, table) -> drop records filed during this process's builds.
+_BUILD_DROP_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+# Cache keys -- (country, table) for L2-country, (country, table, wave) for
+# L2-wave -- whose degraded parquet this process has already WRITTEN or already
+# retried.  Never re-probed: one retry per key per process, at most.
+_DEGRADED_ATTEMPTED: set[tuple] = set()
+
+# source path (relative to countries_root) -> readable now?  One probe per
+# source per process.
+_SOURCE_PROBES: dict[str, bool] = {}
+
+
+def build_drop_reports(country: str | None = None, table: str | None = None) -> list[dict]:
+    """``dfs:`` sub-frames dropped by builds -- or replayed from the stamp of a
+    parquet served -- in this process (GH #675).  Twin of :func:`grain_reports`.
+    A record whose ``missing_required`` is non-empty marks a degraded build."""
+    out: list[dict[str, Any]] = []
+    for (c, t), reports in _BUILD_DROP_LEDGER.items():
+        if country is not None and c != country:
+            continue
+        if table is not None and t != table:
+            continue
+        out.extend(reports)
+    return out
+
+
+def _file_build_drop(country: str, table: str, report: dict[str, Any]) -> None:
+    """File one drop record for the cache writer (append unless identical)."""
+    existing = _BUILD_DROP_LEDGER.setdefault((country, table), [])
+    if report not in existing:
+        existing.append(report)
+
+
+def _forget_wave_build_drops(country: str, table: str, wave: str) -> None:
+    """Clear this wave's BUILD-filed records before it is rebuilt: what is true
+    of the wave now is what the build about to run files."""
+    key = (country, table)
+    if key in _BUILD_DROP_LEDGER:
+        _BUILD_DROP_LEDGER[key] = [
+            r for r in _BUILD_DROP_LEDGER[key]
+            if r.get("from_cache") or str(r.get("wave")) != str(wave)]
+
+
+def _wave_build_drops(country: str, table: str, wave: str) -> list[dict] | None:
+    """The records this process's build of one WAVE filed, for its L2-wave stamp."""
+    out = [r for r in _BUILD_DROP_LEDGER.get((country, table), [])
+           if str(r.get("wave")) == str(wave) and not r.get("from_cache")]
+    return out or None
+
+
+def _stampable_build_drops(country: str, table: str) -> list[dict] | None:
+    """Every record for ``(country, table)``, stripped of the process-local
+    ``from_cache`` flag, for an L2-country stamp."""
+    out: list[dict[str, Any]] = []
+    for r in _BUILD_DROP_LEDGER.get((country, table), []):
+        r = {k: v for k, v in r.items() if k != "from_cache"}
+        if r not in out:
+            out.append(r)
+    return out or None
+
+
+def _degraded_drops(drops: Any) -> list[dict]:
+    """The drop records that cost a REQUIRED declared column."""
+    if not isinstance(drops, list):
+        return []
+    return [d for d in drops if isinstance(d, dict) and d.get("missing_required")]
+
+
+def _mark_degraded_written(key: tuple, drops: Any) -> None:
+    """A degraded parquet was just written under ``key`` by THIS process."""
+    if _degraded_drops(drops):
+        _DEGRADED_ATTEMPTED.add(key)
+
+
+def _probe_source(rel: str) -> bool:
+    """Can the source at ``rel`` (relative to the countries root) be read now?
+
+    The probe IS the operation that failed -- ``local_tools.get_dataframe``,
+    the same reader ``df_data_grabber`` uses, through its local -> DVC -> WB
+    chain -- so "readable" means what it meant to the build.  Memoised per
+    process.  Looked up on the module at call time so a test that simulates an
+    unavailable file by patching ``local_tools.get_dataframe`` patches both.
+    """
+    if rel in _SOURCE_PROBES:
+        return _SOURCE_PROBES[rel]
+    from . import local_tools as _lt
+    path = Path(rel)
+    if not path.is_absolute():
+        path = countries_root() / rel
+    try:
+        _lt.get_dataframe(path)
+        ok = True
+    except Exception:  # noqa: BLE001 -- any failure to read is "still unavailable"
+        ok = False
+    _SOURCE_PROBES[rel] = ok
+    return ok
+
+
+def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
+    """Grade a parquet's drop record at a read gate (GH #675).
+
+    Returns ``("complete", None)`` when no drop cost a required column,
+    ``("rebuild", reason)`` when a dropped source is readable now and this key
+    has not been retried in this process (the caller treats the parquet as a
+    miss), else ``("serve", None)`` -- serve it, and warn.
+    """
+    degraded = _degraded_drops(drops)
+    if not degraded:
+        return "complete", None
+    if key in _DEGRADED_ATTEMPTED:
+        return "serve", None
+    healed = sorted({d.get("file") for d in degraded
+                     if d.get("file") and _probe_source(str(d["file"]))})
+    if not healed:
+        return "serve", None
+    _DEGRADED_ATTEMPTED.add(key)
+    missing = sorted({c for d in degraded for c in d.get("missing_required") or []})
+    return "rebuild", (f"degraded: built without required column(s) {missing} "
+                       f"because {', '.join(healed)} could not be read; it can "
+                       f"be read now (GH #675)")
+
+
+def _warn_degraded_serve(country: str, table: str, drops: Any,
+                         path: Path | str, wave: str | None = None) -> None:
+    """Say, loudly and specifically, that a degraded parquet is being served."""
+    degraded = _degraded_drops(drops)
+    if not degraded:
+        return
+    missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
+    files = tuple(sorted({str(d.get("file")) for d in degraded}))
+    detail = "; ".join(
+        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({d.get('file')}) "
+        f"-> {d.get('missing_required')} [{d.get('error')}]" for d in degraded)
+    where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
+    warnings.warn(DegradedCacheWarning(
+        f"{where}: serving a cached table WITHOUT required declared column(s) "
+        f"{list(missing)}.  The build that wrote {path} could not read "
+        f"{', '.join(files)} and dropped it (the GH #515 optional-sub-df "
+        f"fallback), and that file still cannot be read in this process.  "
+        f"It will be rebuilt automatically by the first process that can "
+        f"read it; `lsms-library cache clear --country {country}` forces a "
+        f"rebuild now (GH #675).  Detail: {detail}",
+        country=country, table=table, missing=missing, files=files),
+        stacklevel=3)
+
+
+def _replay_build_drops(drops: Any, country: str, table: str) -> None:
+    """File a served WAVE parquet's drop record, so the L2-country parquet
+    built from it carries it forward (the #868 replay, for drops)."""
+    if not isinstance(drops, list):
+        return
+    for d in drops:
+        if isinstance(d, dict):
+            _file_build_drop(country, table, {**d, "from_cache": True})
 
 
 # ---------------------------------------------------------------------------
