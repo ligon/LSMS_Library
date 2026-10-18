@@ -144,6 +144,18 @@ and W2 tiya served as =tin= were contaminating W3's factors (e.g. Rice--local
 =tin= had 1,115 W2 rows beside W3's 6).  W4 moves by <=2 kg (survey =cvn=
 factors).
 
+/Provenance of those kg figures./  Both columns were measured twice on
+fresh private roots built at the base commit (=origin/development= at
+3e3bd26ee): by the first-pass worker, and independently by the follow-up
+("before" = base code reading the warm base root; "after" = branch code,
+which rebuilds Nigeria).  The two agreed digit for digit.  The red team's
+root gave 2011Q1 255,213 -> 261,159 and 2015Q3 137,888 -> 119,976, which is
++33/+34 and +4/+4 on /both/ sides, so its deltas match these exactly; its
+baseline differed slightly from a fresh base build.  Treat the absolute
+levels as root-dependent to within ~0.01%, and the deltas as reproducible.
+The unwired legacy =2012-13/_/units.py= also said =4:'ml'=; it now says
+=cl=.
+
 *W5 (2023-24)* has no =food_acquired= script and no =2023-24= column in the
 =u= table.  =round_wave= already maps 2023Q3/2024Q1, so a future W5 build
 through =food_acquired_for_wave= fails loudly (=KeyError: '2023-24'= from
