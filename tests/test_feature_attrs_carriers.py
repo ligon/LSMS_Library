@@ -46,6 +46,7 @@ D = sys.modules["lsms_library.derivations"]
 F = sys.modules["lsms_library.feature"]
 P = sys.modules["lsms_library.population"]
 R = sys.modules["lsms_library.recall"]
+S = sys.modules["lsms_library.sampling"]
 
 
 # ---------------------------------------------------------------------------
@@ -56,9 +57,10 @@ class TestTheRegistry:
     """A carrier is data, not code -- that is the whole point of GH #873."""
 
     def test_every_carrier_is_registered(self):
-        # `labels_unmatched` added for GH #787 item 3.
+        # `labels_unmatched` added for GH #787 item 3; `sampling` for GH #793.
         assert [c.name for c in F._ATTRS_CARRIERS] == \
-            ["population", "recall", "derivations", "labels_unmatched"]
+            ["population", "recall", "derivations", "labels_unmatched",
+             "sampling"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -84,12 +86,13 @@ class TestTheRegistry:
             k for c in F._ATTRS_CARRIERS for k in c.keys}
         assert set(F._CARRIED_ATTRS_KEYS) == {
             P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
-            "labels_unmatched"}
+            "labels_unmatched", S.ATTRS_KEY, S.ATTRS_RESOLUTION_KEY}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
         `feature.py` must not grow a second, drifting copy of it."""
         assert F._ATTRS_CARRIERS[0].attach is P.merge_attrs
+        assert F._ATTRS_CARRIERS[4].attach is S.merge_attrs
         # recall / derivations return the union rather than writing it, so they
         # are wrapped -- but the wrapper closes over the module's own function.
         from lsms_library.country import merge_label_pass_through_reports

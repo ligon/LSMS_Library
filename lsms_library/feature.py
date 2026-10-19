@@ -27,6 +27,7 @@ from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .errors import LabelUnavailableError, UnitsUnavailableError
 from . import population as _population
+from . import sampling as _sampling
 # NOT `from . import recall` / `from . import derivations`: the package binds
 # PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
 # `recall_table`, `ll.derivations(...)` = `derivations_table`), and
@@ -128,6 +129,15 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         ("labels_unmatched",),
         _merge_into("labels_unmatched", _labels_merge_reports),
         per_country=True,
+    ),
+    # GH #793: how each wave's sample was DRAWN -- the sibling of population,
+    # keyed `{country: {wave: record}}` like it, and re-attached through the
+    # sampling module's own merge_attrs.  Registered in the same change that
+    # wrote the merge, so it is never a merge_attrs with no caller (#873).
+    _AttrsCarrier(
+        "sampling",
+        (_sampling.ATTRS_KEY, _sampling.ATTRS_RESOLUTION_KEY),
+        _sampling.merge_attrs,
     ),
 )
 

@@ -199,6 +199,8 @@ from .conversion import convert
 from . import local_tools as tools
 from . import population
 from .population import PopulationRecord, population_records
+from . import sampling
+from .sampling import SamplingRecord, sampling_records
 # *** THESE TWO LINES SHADOW A SUBMODULE NAME.  GH #883. ***
 #
 # `ll.recall` and `ll.derivations` are the public TABLE FUNCTIONS, chosen

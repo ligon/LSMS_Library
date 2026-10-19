@@ -70,6 +70,7 @@ from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
+from .sampling import attach as attach_sampling, sampling_records
 from .recall import attach as attach_recall, recall_records
 from .derivations import (attach as attach_derivations, records_for as _derivation_records_for,
                           call_inputs as _call_derivation_inputs,
@@ -2549,6 +2550,24 @@ class Country:
         """
         return population_records(self.name)
 
+    @property
+    def sampling(self) -> dict[str, "SamplingRecord"]:
+        """``{wave: SamplingRecord}`` -- how each wave's sample was DRAWN.
+
+        The sibling of :attr:`population` (what the sample REPRESENTS): stages,
+        PSU, stratification, selection, oversamples and panel role, per wave,
+        read from ``{country}/_/sampling.yml``; see
+        :mod:`lsms_library.sampling` (GH #793).
+
+        ``design_tag`` is an EDITORIAL reading and travels with ``source_type``
+        and ``confidence``; ``rec.documented`` is ``False`` for a record that
+        was inferred from data rather than read in a document.
+
+        Empty for a country nobody has curated -- an absence of information,
+        not a finding.
+        """
+        return sampling_records(self.name)
+
     def derivations(self, table: str | None = None) -> dict:
         """``{key: DerivationRecord}`` -- served numbers that are NOT survey answers.
 
@@ -3767,6 +3786,13 @@ class Country:
             # and it is in `_build_registry._EXCLUDED_CALLABLES`, so attaching
             # here costs no cache invalidation.  MEASURED, not assumed.
             attach_population(df, self.name)
+
+            # Attach how each wave's sample was DRAWN (GH #793) -- the sibling
+            # of the population record above, with the same placement for the
+            # same two reasons: `_finalize_result` re-runs on every read (warm
+            # cache included), and it is in `_build_registry._EXCLUDED_CALLABLES`,
+            # so attaching here costs no cache invalidation.  Metadata only.
+            attach_sampling(df, self.name)
 
             # Attach what reference period the food numbers COVER, per wave
             # (GH #851).  Same placement and the same two reasons as the

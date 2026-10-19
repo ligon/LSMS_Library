@@ -1,6 +1,13 @@
 # Sampling design record -- HOW this survey's sample was drawn.
 #
-#   *** DRAFT / EXEMPLAR (GH #793).  Uganda only.  Schema not yet frozen. ***
+#   *** EXEMPLAR (GH #793).  Vocabulary FROZEN as-is, @ligon 2026-10-18. ***
+#
+# Read by `lsms_library/sampling.py` (`Country('Uganda').sampling`, and
+# `df.attrs['sampling']` on every Uganda table).  Every field name and every
+# controlled value in this file IS the vocabulary: the loader refuses a field
+# or a `design_tag` / `source_type` / `confidence` / `documentation_status` /
+# `oversamples[].status` value it does not already use.  Widening it is a
+# decision, made in sampling.py, not by typing a new word here.
 #
 # Sibling of `population.yml`, and deliberately separate from it: that file
 # records what a sample REPRESENTS (its universe), this one records how it was
