@@ -68,9 +68,11 @@ def aws_creds_available() -> bool:
          actually handed, so a user-config-only setup runs these tests.
 
     The in-tree ``lsms_library/countries/.dvc/s3_creds`` is NOT consulted
-    (GH #1031).  The library neither writes nor reads it, so a file there
-    opened this gate on credentials ``DVCFileSystem`` never sees; CI now
-    writes (2), as a user has it.
+    (GH #1031).  ``DVCFileSystem`` never reads it (``local_tools._build_dvcfs``
+    overrides ``credentialpath``), so a file there opened this gate on
+    credentials the reader never sees; CI now writes (2), as a user has it.
+    ``data_access._check_remote_access`` still accepts it as a legacy
+    fallback (GH #1064).
 
     ``s3_creds_path`` is loaded from ``lsms_library/config.py`` BY FILE, not
     imported: ``import lsms_library.config`` runs the package ``__init__``

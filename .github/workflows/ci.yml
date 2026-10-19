@@ -422,7 +422,7 @@ jobs:
     #  - a push to a release branch, as before;
     #  - a manual `workflow_dispatch` on any ref (GH #941).
     # Before #932 only the last two applied, so every PR and every
-    # `development` push skipped ~240 `requires_s3` tests and reported green.
+    # `development` push skipped ~4,250 `requires_s3` tests and reported green.
     if: >-
       github.event_name == 'workflow_dispatch'
       || github.event_name == 'merge_group'
@@ -467,7 +467,7 @@ jobs:
           print("wrote", f)
           EOF
           test ! -e lsms_library/countries/.dvc/s3_creds
-      # Fail loudly rather than let ~240 `requires_s3` tests skip and report
+      # Fail loudly rather than let ~4,250 `requires_s3` tests skip and report
       # green, which is what a credential the gate cannot see would do.
       - name: Assert the requires_s3 gate is open
         run: >-

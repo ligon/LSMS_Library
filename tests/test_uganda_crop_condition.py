@@ -96,8 +96,8 @@ def _aws_creds_available() -> bool:
     so they must silent-skip there and run in ``data-tests``.
 
     Delegates to the shared resolver in ``tests/conftest.py`` (exported
-    ``AWS_*`` -> the user-config ``s3_creds`` -> the legacy in-tree
-    ``countries/.dvc/s3_creds``).  This used to check only the in-tree
+    ``AWS_*`` -> the user-config ``s3_creds``; the legacy in-tree
+    ``countries/.dvc/s3_creds`` is no longer consulted, GH #1031).  This used to check only the in-tree
     file, which the library stopped writing in GH #1001, so a fresh
     checkout with user-config credentials silently skipped here.  Loaded by
     path because both import spellings are broken (see

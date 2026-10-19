@@ -47,8 +47,10 @@ def _reader_creds_file() -> Path:
     ``<config dir>/s3_creds``), which is the file ``DVCFileSystem`` is
     handed.  ``config.py`` is loaded BY FILE: this script runs with only
     boto3 + pyyaml installed, and importing the package would run its auth
-    flow.  The in-tree ``.dvc/s3_creds`` is NOT a fallback (GH #1031): the
-    library neither writes nor reads it, and CI writes the user-config file.
+    flow.  The in-tree ``.dvc/s3_creds`` is NOT a fallback (GH #1031):
+    ``DVCFileSystem`` never reads it (``local_tools._build_dvcfs`` overrides
+    ``credentialpath``), and CI writes the user-config file.  The library's
+    own ``data_access._check_remote_access`` still accepts it (GH #1064).
     """
     import importlib.util
 
