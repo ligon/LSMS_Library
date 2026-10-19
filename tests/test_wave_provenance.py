@@ -859,3 +859,331 @@ class TestShippedRecordsSayWhatWeMeasured:
         prov = pv.read_provenance(_COUNTRIES_DIR, "Malawi", wave)
         assert prov.catalog_ids == ids
         assert prov.covers == []                   # held, not covered
+
+
+# ---------------------------------------------------------------------------
+# GH #600: a failed resolution leaves the record intact
+# ---------------------------------------------------------------------------
+#
+# Ruling (@ligon, 2026-10-18): on a failed resolution the backfill leaves the
+# existing record intact and writes a separate review artifact listing what it
+# could not resolve.  It never downgrades a recorded id to UNKNOWN.
+
+def _load_backfill():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "backfill_600", Path(__file__).resolve().parents[1]
+        / "scripts" / "backfill_wave_provenance.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.fixture()
+def bf(countries, monkeypatch):
+    """The backfill script, pointed at the temp tree, every dir a declared wave."""
+    mod = _load_backfill()
+    monkeypatch.setattr(mod, "countries_root", lambda: countries)
+    monkeypatch.setattr(
+        mod, "_declared_waves",
+        lambda c: {d.name for d in (countries / c).iterdir() if d.is_dir()})
+    return mod
+
+
+def _catalog(monkeypatch, bf, rows):
+    monkeypatch.setattr(bf, "_wb_catalog_search",
+                        lambda code, collection="lsms": list(rows))
+
+
+def _unresolved(review):
+    from lsms_library.local_tools import df_from_orgfile
+    df = df_from_orgfile(review, name="unresolved", to_numeric=False)
+    return {(r["Country"], r["Wave"]): r for r in df.to_dict("records")}
+
+
+def _snapshot(root):
+    return {p: p.read_bytes() for p in root.rglob("SOURCE.org")}
+
+
+TZA_UPD = (
+    "SOURCE\n\nhttps://microdata.worldbank.org/index.php/catalog/3814\n\n"
+    "#+CATALOG_ID: 3814\n"
+    "#+CATALOG_COVERS: 76, 1050, 2252, 2862\n"
+    "#+CATALOG_IDNO: TZA_2008-2014_NPS-UPD_v01_M\n"
+    "#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3814\n"
+    "#+PROVENANCE_SOURCE: worldbank\n"
+    "#+PROVENANCE_METHOD: source-url\n"
+    "#+PROVENANCE_VALIDATION: content-validated\n"
+    "#+PROVENANCE_RECORDED: 2026-07-12\n"
+    "#+PROVENANCE_NOTE: hand-recorded evidence for the covers line.\n")
+
+
+class TestFailedResolutionLeavesRecordIntact:
+
+    def test_catalog_outage_leaves_every_shipped_source_org_byte_identical(
+            self, countries, monkeypatch, tmp_path):
+        """THE regression, on a copy of every SOURCE.org we ship.
+
+        The catalog is made unreachable the way it really fails: a key is
+        configured and ``urlopen`` raises, so ``_wb_catalog_search`` logs and
+        returns ``[]``.  The base script rewrote all 130 files here and
+        downgraded 104 recorded WB ids to ``unknown``.  Not a dry run."""
+        import shutil
+        import urllib.error
+        import urllib.request
+        from lsms_library import config
+        from lsms_library.data_access import _COUNTRY_CATALOG
+        from lsms_library.paths import countries_root as real_root
+
+        shipped = real_root()
+        n = 0
+        for c in sorted(shipped.iterdir()):
+            if not c.is_dir() or c.name.startswith((".", "_")):
+                continue
+            for w in sorted(d.name for d in c.iterdir() if d.is_dir()):
+                if not w[:4].isdigit():
+                    continue
+                (countries / c.name / w).mkdir(parents=True)
+                src = pv.source_org_path(shipped, c.name, w)
+                if src.exists():
+                    dst = pv.source_org_path(countries, c.name, w)
+                    dst.parent.mkdir(parents=True)
+                    shutil.copy2(src, dst)
+                    n += 1
+        assert n > 100, "expected to copy the shipped SOURCE.org tree"
+
+        bf = _load_backfill()                   # real _declared_waves
+        monkeypatch.setattr(bf, "countries_root", lambda: countries)
+        monkeypatch.setattr(config, "microdata_api_key", lambda: "dummy")
+
+        def unreachable(*a, **k):
+            raise urllib.error.URLError("simulated catalog outage")
+        monkeypatch.setattr(urllib.request, "urlopen", unreachable)
+
+        before = _snapshot(countries)
+        review = tmp_path / "review" / "unresolved.org"
+        assert bf.main(["--review-file", str(review)]) == 0
+
+        assert _snapshot(countries) == before   # same files, same bytes
+
+        # Every stamped wave of a WB-catalogued country is listed, and no other.
+        expected = {
+            (c, w) for (c, w) in ((p.parts[-4], p.parts[-3]) for p in before)
+            if (spec := _COUNTRY_CATALOG.get(c)) is not None
+            and spec.discoverable and spec.code}
+        listed = _unresolved(review)
+        assert set(listed) == expected
+        assert len(expected) > 100
+        assert {r["Kind"] for r in listed.values()} \
+            == {"catalog-returned-nothing"}
+        downgradable = [k for k, r in listed.items()
+                        if r["Recorded source"] == "worldbank"]
+        assert len(downgradable) > 90           # recorded ids, still recorded
+
+        from lsms_library.local_tools import df_from_orgfile
+        q = df_from_orgfile(review, name="catalog_queries", to_numeric=False)
+        assert set(q["Rows returned"]) == {"0"}
+
+    def test_recorded_id_the_catalog_did_not_return_is_left_intact(
+            self, bf, countries, monkeypatch, tmp_path):
+        """A filtered-out id (the catalog answered, just not with this id).
+        The covers line, validation and note are hand-recorded and survive."""
+        _write_source(countries, "Tanzania", "2008-15", TZA_UPD)
+        _catalog(monkeypatch, bf, NGA_ROWS)     # non-empty, lacks 3814
+        before = _snapshot(countries)
+
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Tanzania", "--review-file", str(review)])
+
+        assert _snapshot(countries) == before
+        row = _unresolved(review)[("Tanzania", "2008-15")]
+        assert row["Kind"] == "id-not-in-catalog"
+        assert "3814" in row["Reason"]
+
+    def test_unmatched_wb_doi_is_left_intact(self, bf, countries, monkeypatch,
+                                             tmp_path):
+        legacy = "SOURCE\n\nhttps://doi.org/10.48529/q9zx-4b28\n"
+        _write_source(countries, "Albania", "2002", legacy)
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Albania", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Albania", "2002").read_text() \
+            == legacy
+        assert _unresolved(review)[("Albania", "2002")]["Kind"] \
+            == "doi-not-in-catalog"
+
+    def test_absent_override_id_does_not_fall_through_to_recorded_id(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Nigeria/2018-19's override exists because its recorded id (3827,
+        the LSS) is the WRONG survey.  If 3557 cannot be found, re-stamping
+        the recorded 3827 -- what the fall-through did -- re-asserts the error."""
+        legacy = ("SOURCE\n\n"
+                  "https://microdata.worldbank.org/index.php/catalog/3827\n")
+        _write_source(countries, "Nigeria", "2018-19", legacy)
+        _catalog(monkeypatch, bf, [r for r in NGA_ROWS if r["id"] != "3557"])
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Nigeria", "2018-19").read_text() \
+            == legacy
+        assert _unresolved(review)[("Nigeria", "2018-19")]["Kind"] \
+            == "override-id-not-in-catalog"
+
+    def test_no_evidence_writes_nothing_and_creates_nothing(
+            self, bf, countries, monkeypatch, tmp_path):
+        """An explicit 'unknown' carrying a human's reason stays as written,
+        and a declared wave with no SOURCE.org does not get one."""
+        explicit = pv.render_source_org(pv.WaveProvenance(
+            country="Nigeria", wave="2015-16", source=pv.SOURCE_UNKNOWN,
+            method="unresolved", recorded="2026-07-12",
+            note="Asked the NBS on 2026-07-01; awaiting reply."))
+        _write_source(countries, "Nigeria", "2015-16", explicit)
+        _mkwave(countries, "Nigeria", "2010-11")
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Nigeria", "2015-16").read_text() \
+            == explicit
+        assert not pv.source_org_path(countries, "Nigeria", "2010-11").exists()
+        rows = _unresolved(review)
+        assert rows[("Nigeria", "2015-16")]["Kind"] == "no-resolvable-evidence"
+        assert rows[("Nigeria", "2010-11")]["Kind"] == "no-resolvable-evidence"
+        assert rows[("Nigeria", "2010-11")]["SOURCE.org"] == "absent"
+
+    def test_country_without_a_catalog_entry_is_left_intact(
+            self, bf, countries, monkeypatch, tmp_path):
+        from lsms_library.data_access import _COUNTRY_CATALOG
+        monkeypatch.delitem(_COUNTRY_CATALOG, "Nigeria")
+        text = _wb("Nigeria", "2010-11", catalog_id="1002")
+        _write_source(countries, "Nigeria", "2010-11", text)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Nigeria", "2010-11").read_text() \
+            == text
+        assert _unresolved(review)[("Nigeria", "2010-11")]["Kind"] \
+            == "no-catalog-mapping"
+
+    def test_restamp_that_would_delete_a_line_is_refused(
+            self, bf, countries, monkeypatch, tmp_path):
+        """GhanaSPS/2017-18 carries five #+SECONDARY_SOURCE* lines (a second,
+        Dataverse vintage of ten files) that render_source_org cannot emit.
+        Its override 'succeeds', and the write would have deleted them."""
+        from lsms_library.paths import countries_root as real_root
+        shipped = pv.source_org_path(real_root(), "GhanaSPS", "2017-18")
+        text = shipped.read_text()
+        assert "#+SECONDARY_SOURCE:" in text
+        _write_source(countries, "GhanaSPS", "2017-18", text)
+        _catalog(monkeypatch, bf, GHA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "GhanaSPS", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "GhanaSPS", "2017-18") \
+            .read_text() == text
+        row = _unresolved(review)[("GhanaSPS", "2017-18")]
+        assert row["Kind"] == "restamp-would-delete"
+        assert "#+SECONDARY_SOURCE_FILES" in row["Reason"]
+
+    def test_dropped_by_write_names_what_a_catalog_regression_deletes(self):
+        """Peru/1994 records CATALOG_DOI; on 2026-10-19 the catalog returned no
+        DOI for entry 617.  A re-stamp must not delete the recorded one."""
+        bf = _load_backfill()
+        old = pv.render_source_org(pv.WaveProvenance(
+            country="Peru", wave="1994", source=pv.SOURCE_WORLDBANK,
+            catalog_id="617", doi="https://doi.org/10.48529/ntxg-ed63",
+            url="https://microdata.worldbank.org/index.php/catalog/617",
+            method="doi-lookup", recorded="2026-07-12"))
+        entry = {"id": "617", "idno": "PER_1994_ENNIV_v01_M", "title": "t",
+                 "year_start": 1994, "year_end": 1994, "doi": "",
+                 "repository": "lsms",
+                 "url": "https://microdata.worldbank.org/index.php/catalog/617"}
+        new = bf._from_entry("Peru", "1994", entry, "doi-lookup", "2026-10-19")
+        assert bf.dropped_by_write(old, new) == ["#+CATALOG_DOI"]
+        # An update is not a deletion: the same record with a new title is fine.
+        entry["doi"] = "https://doi.org/10.48529/ntxg-ed63"
+        new = bf._from_entry("Peru", "1994", entry, "doi-lookup", "2026-10-19")
+        assert bf.dropped_by_write(old, new) == []
+
+    @pytest.mark.parametrize("country,wave", [("KenyaLPS", "2007-2009"),
+                                              ("GhanaAHIES", "2022")])
+    def test_non_wb_country_keeps_its_hand_recorded_fields(
+            self, bf, countries, tmp_path, country, wave):
+        """The not-a-WB-dataset branch used to rebuild each record from
+        _COUNTRY_CATALOG's reason alone, deleting six lines from each of these
+        (Dataverse/NADA title, years, DOI or idno, validation, the note) with
+        no network involved.  Already-stamped: nothing to write."""
+        from lsms_library.paths import countries_root as real_root
+        text = pv.source_org_path(real_root(), country, wave).read_text()
+        _write_source(countries, country, wave, text)
+        review = tmp_path / "review.org"
+        bf.main(["--country", country, "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, country, wave).read_text() == text
+        assert _unresolved(review) == {}
+
+    def test_non_wb_country_with_a_recorded_wb_id_is_a_conflict(
+            self, bf, countries, tmp_path):
+        text = _wb("KenyaLPS", "2015", catalog_id="1234")
+        _write_source(countries, "KenyaLPS", "2015", text)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "KenyaLPS", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "KenyaLPS", "2015").read_text() \
+            == text
+        assert _unresolved(review)[("KenyaLPS", "2015")]["Kind"] \
+            == "recorded-id-not-discoverable"
+
+    def test_successful_restamp_still_writes_and_identical_is_not_rewritten(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Positive control: the guard must not freeze the tree.  A catalog
+        update is written; a record the catalog confirms is left byte-for-byte
+        alone (PROVENANCE_RECORDED is not bumped)."""
+        _write_source(countries, "Nigeria", "2010-11",
+                      "SOURCE\n\n"
+                      "https://microdata.worldbank.org/index.php/catalog/1002\n")
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        path = pv.source_org_path(countries, "Nigeria", "2010-11")
+        stamped = path.read_text()
+        prov = pv.parse_source_org(stamped, "Nigeria", "2010-11")
+        assert prov.idno == "NGA_2010_GHSP-W1_v03_M"
+        assert prov.method == "source-url"
+
+        path.write_text(stamped.replace(
+            f"#+PROVENANCE_RECORDED: {prov.recorded}",
+            "#+PROVENANCE_RECORDED: 2026-07-12"))
+        frozen = path.read_bytes()
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+        assert path.read_bytes() == frozen
+        assert _unresolved(review) == {}
+
+    def test_dry_run_writes_no_source_org_but_does_write_the_review(
+            self, bf, countries, monkeypatch, tmp_path):
+        _write_source(countries, "Nigeria", "2010-11",
+                      "SOURCE\n\n"
+                      "https://microdata.worldbank.org/index.php/catalog/1002\n")
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        before = _snapshot(countries)
+        review = tmp_path / "review.org"
+        bf.main(["--dry-run", "--country", "Nigeria",
+                 "--review-file", str(review)])
+        assert _snapshot(countries) == before
+        assert review.exists()
+
+    def test_review_artifact_is_refused_inside_countries_root(
+            self, bf, countries):
+        with pytest.raises(SystemExit, match="countries_root"):
+            bf.main(["--dry-run", "--review-file",
+                     str(countries / "Nigeria" / "review.org")])
+        assert not (countries / "Nigeria").exists()
+
+    def test_default_review_artifact_lives_outside_countries_root(self):
+        bf = _load_backfill()
+        from lsms_library.paths import countries_root as real_root
+        path = bf.review_path(None, real_root(), "2026-10-19T000000")
+        assert not path.resolve().is_relative_to(real_root().resolve())
+        assert path.name == "backfill_unresolved_2026-10-19T000000.org"
