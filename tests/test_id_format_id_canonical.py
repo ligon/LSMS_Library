@@ -98,8 +98,11 @@ _UGANDA_AGSEC_FEATURES = [
 def test_uganda_agsec_cached_ids_canonical(feature):
     """Cached Uganda AGSEC parquets carry canonical id levels (no builds)."""
     path = data_root("Uganda") / "var" / f"{feature}.parquet"
-    if not path.exists():
-        pytest.skip(f"{path} not cached")
-    df = pd.read_parquet(path, engine="pyarrow")
+    # The read is the check, not a prior exists(): a concurrent rebuild
+    # deletes var/ first (GH #866), so the file can vanish in between (GH #778).
+    try:
+        df = pd.read_parquet(path, engine="pyarrow")
+    except FileNotFoundError:
+        pytest.skip(f"{path} not cached (absent, or mid-rebuild)")
     chk = _check_ids_format_id_canonical(df)
     assert chk.status == "pass", f"Uganda {feature}: {chk.message}"
