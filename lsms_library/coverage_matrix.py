@@ -37,6 +37,10 @@ blocked                we WANT it, we KNOW where it is, and we CANNOT get it —
                        See :func:`load_blocked`.
 not-asked              adjudicated: the instrument genuinely never asked.
                        Closed.  *Requires evidence* (:func:`load_verdicts`).
+correctly-empty        adjudicated ``dropped``: declared and built, and empty
+                       because the instrument cannot support the feature for
+                       this wave (value without quantity).  Closed.  *Requires
+                       evidence* (GH #781).
 asked-not-distributed  adjudicated: the instrument DID ask, but the shipped
                        extract does not carry the variables.  An acquisition
                        problem, not a config one.  *Requires evidence.*
@@ -47,7 +51,9 @@ absent                 feature applies to the country but its source is not
 declared               source present for the wave; readiness not assessed
                        (coverage-only run)
 dropped                source declared for the wave but the wave is missing /
-                       empty in the built table (the silent-drop bug class)
+                       empty in the built table (the silent-drop bug class) --
+                       un-adjudicated, or adjudicated
+                       ``empty-pending-machinery``, which stays open
 broken                 the country-level build raised, or the feature is empty
 builds                 wave slice is non-empty but ``SanityReport.ok is False``
 sane                   wave slice is non-empty and ``SanityReport.ok is True``
@@ -79,23 +85,25 @@ import pandas as pd
 # Tier ladder
 # ---------------------------------------------------------------------------
 TIER_ORDER = [
-    "n/a", "not-asked", "asked-not-distributed", "blocked", "unconfigured",
-    "undeclared", "absent", "declared", "dropped", "broken", "builds", "sane",
-    "blessed",
+    "n/a", "not-asked", "correctly-empty", "asked-not-distributed", "blocked",
+    "unconfigured", "undeclared", "absent", "declared", "dropped", "broken",
+    "builds", "sane", "blessed",
 ]
 # Worst → best, for rolling several wave tiers up into one grid cell. The most
 # actionable (a real defect) sorts first so problems surface in the summary.
 #
 # ``absent`` (= an *un-adjudicated* gap) sorts as actionable, because it is the
 # live queue.  ``not-asked`` and ``asked-not-distributed`` are *adjudicated* and
-# sort with ``n/a`` at the quiet end: they are settled, not pending.
+# sort with ``n/a`` at the quiet end: they are settled, not pending.  So does
+# ``correctly-empty`` -- a ``dropped`` cell adjudicated empty by the instrument
+# (GH #781); an un-adjudicated ``dropped`` cell keeps its place near the top.
 # `blocked` sorts BELOW the actionable defects (nobody can close it by trying
 # harder) but ABOVE the settled tiers -- it is a gap we still WANT, and it must
 # never read as "nothing to see here".  That is precisely the mistake `n/a` made.
 ROLLUP_PRIORITY = [
     "broken", "dropped", "builds", "unconfigured", "undeclared", "absent",
     "declared", "sane", "blessed", "blocked", "asked-not-distributed",
-    "not-asked", "n/a",
+    "correctly-empty", "not-asked", "n/a",
 ]
 # ``undeclared`` sits beside ``unconfigured`` in both lists because it is the
 # same fact one level down: ``unconfigured`` = a country with microdata but no
@@ -136,13 +144,40 @@ COLUMNS = ["country", "feature", "wave", "tier", "coverage", "n_rows", "detail"]
 #
 # See ``docs/guide/coverage.md`` and
 # ``slurm_logs/DESIGN_coverage_discipline_2026-07-11.org``.
-ADJUDICATED_TIERS = {"not-asked", "asked-not-distributed"}
-VERDICTS = {"todo", "asked-not-distributed", "not-asked", "unsure"}
-# Verdicts that CLOSE a cell (change its tier away from plain ``absent``).
-# ``todo`` and ``unsure`` deliberately do not: they are still open work.
+#
+# ``dropped`` cells (GH #781) had the same problem one tier over: "declared for
+# the wave, empty in the build" is the silent-drop bug class, but it is ALSO the
+# honest result for a wave whose instrument cannot support the feature (GhanaLSS
+# GLSS1/2 elicit food purchases and home production by VALUE only, so
+# ``food_prices`` has no denominator).  One label was doing three jobs:
+#
+#   correctly-empty          the instrument does not support the feature for
+#                            this wave.  CLOSED -- and, like ``not-asked``,
+#                            refused without evidence.
+#   empty-pending-machinery  computable in principle from what the survey
+#                            recorded; the construction is not built yet.
+#                            STAYS ``dropped``, carrying its evidence.
+#   (no verdict)             the silent-drop bug the tier was named for.
+#
+# ONE file, ONE loader, ONE evidence rule; the cell's TIER says which half of
+# the vocabulary applies.  A verdict filed against a cell of the other tier is
+# INERT -- it cannot close the cell, and the cell's detail says so.  That is
+# what makes a ``correctly-empty`` close safe to leave in place: the day a
+# derivation populates the wave, the cell stops being ``dropped`` and the
+# verdict stops applying, with nobody having to remember to withdraw it.
+ADJUDICATED_TIERS = {"not-asked", "asked-not-distributed", "correctly-empty"}
+VERDICTS_BY_TIER = {
+    "absent": frozenset({"todo", "asked-not-distributed", "not-asked", "unsure"}),
+    "dropped": frozenset({"correctly-empty", "empty-pending-machinery"}),
+}
+VERDICTS = set().union(*VERDICTS_BY_TIER.values())
+# Verdicts that CLOSE a cell (change its tier away from plain ``absent`` /
+# ``dropped``).  ``todo``, ``unsure`` and ``empty-pending-machinery``
+# deliberately do not: they are still open work.
 _VERDICT_TO_TIER = {
     "not-asked": "not-asked",
     "asked-not-distributed": "asked-not-distributed",
+    "correctly-empty": "correctly-empty",
 }
 
 
@@ -174,7 +209,8 @@ def default_verdicts_path() -> Path:
 
 
 def load_verdicts(path: Path | None = None) -> dict[tuple[str, str, str], dict]:
-    """Adjudications of ``absent`` cells, keyed ``(country, feature, wave)``.
+    """Adjudications of ``absent`` and ``dropped`` cells, keyed
+    ``(country, feature, wave)``.
 
     CSV with header
     ``country,feature,wave,verdict,checks_run,evidence,adjudicated_by,date``
@@ -182,8 +218,13 @@ def load_verdicts(path: Path | None = None) -> dict[tuple[str, str, str], dict]:
 
     ``verdict`` must be one of :data:`VERDICTS`.  A row is IGNORED (with a
     warning) when its verdict is unknown, or when it claims a closing verdict
-    (``not-asked`` / ``asked-not-distributed``) with an **empty ``evidence``**
-    field.
+    (``not-asked`` / ``asked-not-distributed`` / ``correctly-empty``) with an
+    **empty ``evidence``** field.
+
+    The loader does not know a cell's tier, so it does not decide which verdicts
+    APPLY: :data:`VERDICTS_BY_TIER` does, at grading time (:func:`_absent_tier`
+    for ``absent`` / ``undeclared`` cells, :func:`_dropped_tier` for
+    ``dropped`` ones).  The evidence rule is the same for both halves.
 
     That last rule is the point of the whole mechanism.  A closing verdict is a
     permanent, unsupervised write: it removes a cell from the work queue with
@@ -250,15 +291,57 @@ def _absent_tier(country, feature, wave, verdicts, *,
     ``absent`` because they are still work, but carry their evidence forward so
     the next person does not re-derive it.
     """
+    return _adjudicate("absent", country, feature, wave, verdicts,
+                       default_tier=default_tier, default_detail=default_detail)
+
+
+def _dropped_tier(country, feature, wave, verdicts, *,
+                  default_detail: str) -> tuple[str, str]:
+    """Grade a declared-but-empty cell: ``(tier, detail)`` (GH #781).
+
+    The single place ``dropped`` is decided -- both of :func:`grade_feature`'s
+    empty branches (wave missing from the built ``t`` index; ``t`` present with
+    0 rows) come through here.  Without an adjudication the cell is ``dropped``,
+    the silent-drop bug class.  ``correctly-empty`` closes it; and
+    ``empty-pending-machinery`` leaves it ``dropped`` but carries its evidence
+    forward, ahead of the mechanical reason the cell is empty.
+    """
+    return _adjudicate("dropped", country, feature, wave, verdicts,
+                       default_tier="dropped", default_detail=default_detail)
+
+
+def _adjudicate(tier, country, feature, wave, verdicts, *,
+                default_tier: str, default_detail: str) -> tuple[str, str]:
+    """Apply the verdict on file for one cell whose un-adjudicated tier is
+    *tier* (``"absent"`` or ``"dropped"``).  Shared by :func:`_absent_tier`
+    and :func:`_dropped_tier` so the two halves cannot drift apart.
+
+    A verdict from the OTHER half of :data:`VERDICTS_BY_TIER` is inert: the cell
+    keeps *default_tier*, and the detail names the mismatch rather than hiding
+    it.  ``not-asked`` on a cell that is declared and builds empty, or
+    ``correctly-empty`` on a cell nobody declared, is a claim about a state the
+    cell is not in -- it must not close it, and it must not vanish either.
+    """
     v = verdicts.get((country, feature, str(wave) if wave is not None else ""))
     if not v:
         return default_tier, default_detail
     verdict = v.get("verdict", "")
+    if verdict not in VERDICTS_BY_TIER[tier]:
+        other = next((t for t, vs in VERDICTS_BY_TIER.items() if verdict in vs),
+                     "?")
+        return default_tier, (
+            f"{default_detail}; verdict {verdict!r} on file is INERT here -- it "
+            f"adjudicates `{other}` cells and this cell is `{default_tier}`")
     detail = f"{verdict}: {v.get('evidence', '')}".strip().rstrip(":")
-    # An un-closing verdict (`todo` / `unsure`) falls back to *this cell's own*
-    # open tier, not hard-coded `absent` -- otherwise filing `todo` against an
-    # `undeclared` cell would silently relabel it `absent`, i.e. claim the
-    # feature is declared somewhere for that country when it is not.
+    if tier == "dropped" and verdict not in _VERDICT_TO_TIER:
+        # Open (`empty-pending-machinery`): keep the mechanical reason too, so
+        # the cell still says HOW it is empty, not only why that is expected.
+        detail = f"{detail} [{default_detail}]"
+    # An un-closing verdict (`todo` / `unsure` / `empty-pending-machinery`)
+    # falls back to *this cell's own* open tier, not a hard-coded one --
+    # otherwise filing `todo` against an `undeclared` cell would silently
+    # relabel it `absent`, i.e. claim the feature is declared somewhere for
+    # that country when it is not.
     return _VERDICT_TO_TIER.get(verdict, default_tier), detail
 
 
@@ -817,6 +900,12 @@ def grade_feature(country_name, feature, waves, co, env, *,
         """The single place an un-declared cell is graded (see _absent_tier)."""
         return _absent_tier(country_name, feature, w, verdicts)
 
+    def _dropped(w, why):
+        """The single place a declared-but-empty cell is graded (_dropped_tier)."""
+        tier, detail = _dropped_tier(country_name, feature, w, verdicts,
+                                     default_detail=why)
+        return _cell(country_name, feature, w, tier, "declared", detail=detail)
+
     def _blocked_cell(w):
         """`blocked` if this wave's SOURCE is unobtainable, else None.
 
@@ -958,13 +1047,13 @@ def grade_feature(country_name, feature, waves, co, env, *,
                                detail=detail))
             continue
         if str(w) not in t_values:
-            cells.append(_cell(country_name, feature, w, "dropped", "declared",
-                               detail="declared for wave but absent from built t-index"))
+            cells.append(_dropped(
+                w, "declared for wave but absent from built t-index"))
             continue
         sl = df[t_level == str(w)]
         if len(sl) == 0:
-            cells.append(_cell(country_name, feature, w, "dropped", "declared",
-                               detail="declared, present in t-index but 0 rows"))
+            cells.append(_dropped(
+                w, "declared, present in t-index but 0 rows"))
             continue
         rep = env["is_this_feature_sane"](sl, country_name, feature,
                                           extra_optional=populated)

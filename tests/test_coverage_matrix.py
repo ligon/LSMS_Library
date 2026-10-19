@@ -438,6 +438,196 @@ def test_absent_stays_absent_with_no_verdicts():
 
 
 # ---------------------------------------------------------------------------
+# Dropped-cell verdicts (GH #781) -- the same file, keyed by the cell's TIER.
+# ---------------------------------------------------------------------------
+# `dropped` ("declared for the wave, empty in the build") was one label doing
+# three jobs: the silent-drop bug, a wave whose instrument cannot support the
+# feature (`correctly-empty`, closing), and a wave computable in principle
+# whose construction is not built (`empty-pending-machinery`, open).  Ruling
+# @ligon 2026-10-18.  Every test below fails on the pre-#781 grader, which
+# refused both verdicts as unknown and graded every such cell `dropped`.
+def _dropped_cell(verdicts, *, built=None):
+    """Grade `foo` for C: w1 builds, w2 is declared and (by default) empty."""
+    co = _FakeCountry({"w1": ["foo"], "w2": ["foo"], "w3": []})
+    cells = cov.grade_feature("C", "foo", ["w1", "w2", "w3"], co,
+                              _env(_df_with_t(built or {"w1": 3}), _ok_report()),
+                              readiness=True, verdicts=verdicts)
+    return {c["wave"]: c for c in cells}
+
+
+def test_correctly_empty_closes_a_dropped_cell(tmp_path):
+    p = _verdicts_file(tmp_path, [
+        "C,foo,w2,correctly-empty,C1;C4,"
+        "s12 asks AMOUNT spent only; no quantity column,sue,2026-10-19\n"])
+    cell = _dropped_cell(cov.load_verdicts(p))["w2"]
+    assert cell["tier"] == "correctly-empty"
+    assert cell["detail"].startswith("correctly-empty: s12 asks AMOUNT")
+
+
+def test_empty_pending_machinery_keeps_the_cell_dropped(tmp_path):
+    """Open work: still `dropped`, but now says WHY and still says HOW."""
+    p = _verdicts_file(tmp_path, [
+        "C,foo,w2,empty-pending-machinery,C1;C4,"
+        "Q and P recorded; Q x P derivation not wired,sue,2026-10-19\n"])
+    cell = _dropped_cell(cov.load_verdicts(p))["w2"]
+    assert cell["tier"] == "dropped"
+    assert "empty-pending-machinery: Q and P recorded" in cell["detail"]
+    assert "absent from built t-index" in cell["detail"]
+
+
+def test_correctly_empty_without_evidence_is_REFUSED(tmp_path):
+    """Inherits the `not-asked` rule: a closing verdict needs evidence."""
+    p = _verdicts_file(tmp_path, ["C,foo,w2,correctly-empty,C4,,sue,2026-10-19\n"])
+    with pytest.warns(UserWarning, match="REQUIRES"):
+        v = cov.load_verdicts(p)
+    assert v == {}
+    cell = _dropped_cell(v)["w2"]
+    assert cell["tier"] == "dropped"             # stays red.  good.
+    assert cell["detail"] == "declared for wave but absent from built t-index"
+
+
+def test_empty_pending_machinery_without_evidence_is_allowed(tmp_path):
+    """Only CLOSING verdicts need evidence; this one keeps the cell open."""
+    p = _verdicts_file(tmp_path, [
+        "C,foo,w2,empty-pending-machinery,C1,,sue,2026-10-19\n"])
+    v = cov.load_verdicts(p)
+    assert ("C", "foo", "w2") in v
+    assert _dropped_cell(v)["w2"]["tier"] == "dropped"
+
+
+@pytest.mark.parametrize("verdict", ["correctly-empty", "empty-pending-machinery"])
+def test_a_dropped_verdict_is_INERT_on_an_absent_cell(tmp_path, verdict):
+    """Keyed by tier: a `dropped` verdict cannot close a cell nobody declared.
+
+    `correctly-empty` on w3 (declared for no wave) would otherwise map
+    straight onto a closing tier via ``_VERDICT_TO_TIER``.
+    """
+    p = _verdicts_file(tmp_path, [
+        f"C,foo,w3,{verdict},C4,some evidence,sue,2026-10-19\n"])
+    cell = _dropped_cell(cov.load_verdicts(p))["w3"]
+    assert cell["tier"] == "absent"
+    assert "INERT" in cell["detail"] and verdict in cell["detail"]
+
+
+@pytest.mark.parametrize("verdict",
+                         ["not-asked", "asked-not-distributed", "todo", "unsure"])
+def test_an_absent_verdict_is_INERT_on_a_dropped_cell(tmp_path, verdict):
+    """The other direction.  Declare a feature for a wave once adjudicated
+    `not-asked`, and the build comes back empty: that cell is a live
+    `dropped` defect, and the stale `not-asked` must not hide it."""
+    p = _verdicts_file(tmp_path, [
+        f"C,foo,w2,{verdict},C4,some evidence,sue,2026-10-19\n"])
+    cell = _dropped_cell(cov.load_verdicts(p))["w2"]
+    assert cell["tier"] == "dropped"
+    assert "INERT" in cell["detail"] and verdict in cell["detail"]
+
+
+def test_a_dropped_verdict_cannot_close_an_undeclared_cell():
+    verdicts = {("C", "foo", ""): {"verdict": "correctly-empty",
+                                   "evidence": "x"}}
+    tier, detail = cov._absent_tier("C", "foo", None, verdicts,
+                                    default_tier="undeclared",
+                                    default_detail="not declared")
+    assert tier == "undeclared"
+    assert "INERT" in detail
+
+
+def test_correctly_empty_goes_inert_once_the_wave_builds(tmp_path):
+    """The property that makes a close safe to leave in place: when machinery
+    later populates the wave (GH #562 3b, say), the cell grades on its rows
+    and nobody has to remember to withdraw the verdict."""
+    p = _verdicts_file(tmp_path, [
+        "C,foo,w2,correctly-empty,C4,value only,sue,2026-10-19\n"])
+    cell = _dropped_cell(cov.load_verdicts(p), built={"w1": 3, "w2": 2})["w2"]
+    assert cell["tier"] == "sane"
+
+
+def test_verdict_vocabulary_is_partitioned_by_tier():
+    halves = list(cov.VERDICTS_BY_TIER.values())
+    assert set(cov.VERDICTS_BY_TIER) == {"absent", "dropped"}
+    assert not (halves[0] & halves[1]), "a verdict may adjudicate ONE tier"
+    assert cov.VERDICTS == set().union(*halves)
+    # every closing verdict lands on a tier the ladder, the roll-up and the
+    # adjudicated set all know -- a closing tier missing from one of them is
+    # the GH #797 drift (a tier the renderer cannot draw)
+    for closing in cov._VERDICT_TO_TIER.values():
+        assert closing in cov.TIER_ORDER
+        assert closing in cov.ROLLUP_PRIORITY
+        assert closing in cov.ADJUDICATED_TIERS
+    # and the quiet end: a closed `dropped` cell outranks nothing actionable
+    rank = cov.ROLLUP_PRIORITY.index
+    assert rank("correctly-empty") > rank("dropped")
+    assert rank("correctly-empty") > rank("absent")
+
+
+def test_the_committed_verdicts_file_loads_without_refusals():
+    """Every row in the git-tracked file is honoured: no unknown verdict, no
+    closing verdict without evidence (each would be silently ignored, with
+    only a warning to say so)."""
+    import warnings
+    path = cov.default_verdicts_path()
+    if not path.exists():
+        pytest.skip("no committed absent_verdicts.csv")
+    raw = pd.read_csv(path, dtype=str, keep_default_na=False)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        v = cov.load_verdicts(path)
+    assert len(v) == len(raw)
+
+
+#: The three GhanaLSS GLSS1-3 rows the #781 ruling authorises, and the verdict
+#: each one's evidence supports.  GLSS1/GLSS2 record food purchases and home
+#: production by VALUE only; GLSS3's purchases are value-only too, but its
+#: Section 8H records a quantity and a per-unit price for own produce -- so a
+#: price is computable there in principle, and that wave is NOT closed.
+GHANALSS_FOOD_PRICES_VERDICTS = {
+    "1987-88": "correctly-empty",
+    "1988-89": "correctly-empty",
+    "1991-92": "empty-pending-machinery",
+}
+
+
+def test_ghanalss_glss1_3_food_prices_verdicts_are_on_file_with_evidence():
+    v = cov.load_verdicts()
+    got = {w: v[("GhanaLSS", "food_prices", w)]
+           for w in GHANALSS_FOOD_PRICES_VERDICTS
+           if ("GhanaLSS", "food_prices", w) in v}
+    assert {w: r["verdict"] for w, r in got.items()} == GHANALSS_FOOD_PRICES_VERDICTS
+    for w, r in got.items():
+        assert r["checks_run"].strip(), w
+        assert len(r["evidence"]) > 200, f"{w}: evidence a reader cannot re-run"
+        assert "food_prices" in r["evidence"], w
+    for w, verdict in GHANALSS_FOOD_PRICES_VERDICTS.items():
+        tier, _ = cov._dropped_tier("GhanaLSS", "food_prices", w, v,
+                                    default_detail="x")
+        assert tier == ("correctly-empty" if verdict == "correctly-empty"
+                        else "dropped"), w
+
+
+@pytest.mark.requires_s3
+@pytest.mark.slow
+def test_ghanalss_food_prices_grades_against_its_verdicts():
+    """The verdicts match the BUILT table: the three adjudicated waves are the
+    waves `food_prices()` serves nothing for, the two value-only waves close,
+    GLSS3 stays in the queue, and the four priced waves are untouched.
+
+    If GLSS3's Section 8H gets its Q x P valuation (see GhanaLSS CONTENTS.org,
+    "1991-92 is deliberately NOT wired"), 1991-92 will grade `sane` and this
+    test will say so -- retire that verdict row in the same PR.
+    """
+    df = cov.build_matrix(["GhanaLSS"], ["food_prices"], readiness=True)
+    tiers = dict(zip(df["wave"].astype(str), df["tier"].astype(str)))
+    assert {w: tiers[w] for w in GHANALSS_FOOD_PRICES_VERDICTS} == {
+        "1987-88": "correctly-empty", "1988-89": "correctly-empty",
+        "1991-92": "dropped"}
+    assert "empty-pending-machinery" in df.loc[
+        df["wave"].astype(str) == "1991-92", "detail"].iloc[0]
+    assert {t for w, t in tiers.items()
+            if w not in GHANALSS_FOOD_PRICES_VERDICTS} <= {"sane", "blessed",
+                                                          "builds"}
+
+
+# ---------------------------------------------------------------------------
 # `unconfigured` + known-no-microdata (Defects 4 and 6)
 # ---------------------------------------------------------------------------
 def test_unconfigured_countries_finds_data_without_config(tmp_path):

@@ -31,7 +31,14 @@ why the glyph overlay, the hover text and the table view exist):
     acquisition   blue     blocked (deep) / asked-not-distributed (light)
     config-only   grey-blue declared (never in a readiness snapshot)
     safe          green    blessed (deep) / sane (light)
-    gap           neutral  absent (live queue) / not-asked (settled) / n/a
+    gap           neutral  absent (live queue) / not-asked, correctly-empty
+                           (settled) / n/a
+
+The gap family is recessive by design and fails the categorical checks on its
+own pairs (worst unsimulated OKLab dE x100: 6.6 light, 1.8 dark).
+``correctly-empty`` (GH #781) was stepped to sit no closer than that to any
+gap neighbour: worst 12.7 normal / 12.4 CVD light (vs ``not-asked``), 10.4 /
+10.1 dark (vs ``absent``).
 """
 from __future__ import annotations
 
@@ -46,14 +53,14 @@ from pathlib import Path
 # --- The ladder.  MUST equal lsms_library.coverage_matrix.{TIER_ORDER,ROLLUP_PRIORITY};
 # pinned by tests/test_docs_coverage_hook.py (the package is not importable here).
 TIER_ORDER = [
-    "n/a", "not-asked", "asked-not-distributed", "blocked", "unconfigured",
-    "undeclared", "absent", "declared", "dropped", "broken", "builds", "sane",
-    "blessed",
+    "n/a", "not-asked", "correctly-empty", "asked-not-distributed", "blocked",
+    "unconfigured", "undeclared", "absent", "declared", "dropped", "broken",
+    "builds", "sane", "blessed",
 ]
 ROLLUP_PRIORITY = [
     "broken", "dropped", "builds", "unconfigured", "undeclared", "absent",
     "declared", "sane", "blessed", "blocked", "asked-not-distributed",
-    "not-asked", "n/a",
+    "correctly-empty", "not-asked", "n/a",
 ]
 
 # Presentation.  Family -> the hue; tier -> the step.  Both themes are
@@ -65,7 +72,7 @@ FAMILY = {
     "blocked": "acquire", "asked-not-distributed": "acquire",
     "declared": "config",
     "sane": "safe", "blessed": "safe",
-    "absent": "gap", "not-asked": "gap", "n/a": "gap",
+    "absent": "gap", "not-asked": "gap", "correctly-empty": "gap", "n/a": "gap",
 }
 TIER_COLOR = {
     "light": {
@@ -75,7 +82,8 @@ TIER_COLOR = {
         "blocked": "#1a4a8e", "asked-not-distributed": "#5b93dd",
         "declared": "#9fb3c8",
         "blessed": "#137a2e", "sane": "#4fae52",
-        "absent": "#d9d5cd", "not-asked": "#b8c4c2", "n/a": "#ecebe6",
+        "absent": "#d9d5cd", "not-asked": "#b8c4c2", "correctly-empty": "#a39a86",
+        "n/a": "#ecebe6",
     },
     "dark": {
         "broken": "#d9524c", "dropped": "#e89aa8",
@@ -84,14 +92,15 @@ TIER_COLOR = {
         "blocked": "#2c5fae", "asked-not-distributed": "#4f8fe0",
         "declared": "#3d4a5a",
         "blessed": "#237a3e", "sane": "#57b45a",
-        "absent": "#3a3936", "not-asked": "#2f3a3a", "n/a": "#242422",
+        "absent": "#3a3936", "not-asked": "#2f3a3a", "correctly-empty": "#5a5446",
+        "n/a": "#242422",
     },
 }
 TIER_GLYPH = {
     "n/a": "·", "absent": "–", "declared": "?", "dropped": "✗!",
     "broken": "✗", "builds": "⚠", "sane": "✓", "blessed": "★",
     "not-asked": "∅", "asked-not-distributed": "⤓", "unconfigured": "⌀",
-    "blocked": "⛔", "undeclared": "⌀",
+    "blocked": "⛔", "undeclared": "⌀", "correctly-empty": "○",
 }
 TIER_HELP = {
     "blessed": "a human read the numbers and believes them",
@@ -106,12 +115,13 @@ TIER_HELP = {
     "blocked": "wanted, but the data channel is broken",
     "asked-not-distributed": "the instrument asked; the shipped extract lacks it",
     "not-asked": "adjudicated: the survey never asked",
+    "correctly-empty": "adjudicated: built empty because the instrument cannot support it",
     "n/a": "country-level feature; no per-wave grade",
 }
 # Legend order: safe first (the answer to "what can I use"), then what needs work.
 LEGEND_ORDER = ["blessed", "sane", "builds", "broken", "dropped", "undeclared",
                 "unconfigured", "asked-not-distributed", "blocked", "declared",
-                "absent", "not-asked", "n/a"]
+                "absent", "correctly-empty", "not-asked", "n/a"]
 
 # Column groups: the library's data domains, in the order an analyst meets them.
 FEATURE_GROUPS = [
