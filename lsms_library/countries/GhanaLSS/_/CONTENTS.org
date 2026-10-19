@@ -2154,7 +2154,8 @@ Maize (flour/dough).  2005-06's own test is weak (Maize (cob), Onion and Shea
 Butter also "pass" because their prices barely vary across any unit), which
 is why the kg check is the second gate and not a formality.
 
-*Why eggs are NOT done.*  The price evidence holds, but the ladder infers
+*Why eggs are NOT done* (superseded 2026-10-18: eggs are now relabelled AND
+declared no-kg -- next entry).  The price evidence holds, but the ladder infers
 =(Egg, Single)= at *0.501 kg per egg* (an egg is ~0.05-0.065 kg), because the
 egg =Kilogram= rows price at the per-egg price (1,000 cedis in 2005-06, 0.4 GHS
 in 2012-13): the =(t, Egg)= per-kg baseline is built from counts mislabelled
@@ -2190,6 +2191,86 @@ source loses 11% of its kilograms -- net, the country gains 541 kg on the
 remapped rows and loses 582 kg elsewhere.  1.07 kg is still a plausible
 dressed bird.  Pinned by =tests/test_gh1042_missing_unit_spellings.py=
 (=..._count_unit_*=, =..._chicken_count_rows_get_a_plausible_bird_weight=).
+
+*** Eggs and fresh coconut: count unit; eggs get NO inferred kilograms (GH #1042 rulings, @ligon 2026-10-18)
+
+*Rulings.*  (1a) Own-produced egg on unit code 0 -> =Single=, as chicken;
+(1b) an *item-level "no kg factor"*, so egg rows on a count unit keep their
+native count and get =KgFactorSource == 'none'=; (3) fresh coconut on unit
+code 0 -> =Single=; (6) the chicken cross-wave move is accepted and disclosed
+(below).  The "Why eggs are NOT done" paragraph of the entry above is
+superseded by this one.
+
+*Price evidence, re-measured* (cold build at 7b20e8c31, =s='produced'=,
+median =Expenditure/Quantity= of the code-0 =Unknown= rows vs the same wave's
+=Single= rows):
+| wave    | item            | Unknown rows @ median | Single rows @ median | in [0.5x, 2x] |
+|---------+-----------------+-----------------------+----------------------+---------------|
+| 2005-06 | Egg             | 200 @ 1,200           | 105 @ 1,000          | 0.94          |
+| 2012-13 | Egg             | 26 @ 0.40             | 3,056 @ 0.40         | 0.96          |
+| 2005-06 | Coconut (fresh) | 28 @ 1,000            | 12 @ 1,000           | 1.00          |
+| 2012-13 | Coconut (fresh) | 18 @ 0.40             | 310 @ 0.50           | 1.00          |
+Same waves and scope as chicken: 1998-99 serves no =Single= for egg or
+coconut (4 egg code-0 rows, no coconut), so there is nothing to pool with.
+No =(t,i,j,s,visit)= group holds both =Unknown= and =Single= for either item,
+so the relabel cannot collide (Trap 9).  =(Coconut (fresh), Single)= infers
+1.0 kg per coconut, before and after -- plausible.
+
+*The declaration.*  =_/no_kg_factor.yml= names =Egg= on every count unit it
+carries: =Single=, =Piece=, =Ball= (GLSS6 prints =Balls 03= beside =Pieces
+31=), =Pair=, =Dozen=, =Crate=.  Factors the ladder served them before, all
+implausible because the =(t, Egg)= per-kg baseline is built from egg
+=Kilogram= rows that price at the per-egg price: =Single= 0.5006 kg
+(13,888 rows), =Piece= 0.0012 (714), =Ball= 0.0012 (122), =Pair= 0.0825
+(u-pooled, 5), =Dozen= 0.024 (42), =Crate= 0.030 (1,636; a crate is 30
+eggs).  Not declared: =All= (12,928 rows, 1.0 kg -- GLSS's "all", not a
+count), containers (=Basket=, =Bowl=, ...) and =Heap=.  The mechanism is
+=transformations.food_kg_factors(no_kg=...)=, fed at read time by
+=Country._no_kg_factor_cells=; the rows are disclosed in
+=attrs['kg_factor_declared_none']=.
+
+*Before / after* (private cold rebuilds; before = 7b20e8c31):
+| measure                                       | before                      | after                       |
+|-----------------------------------------------+-----------------------------+-----------------------------|
+| =u='Unknown'= rows 1998-99 / 2005-06 / 2012-13 | 88 / 1,266 / 767            | 88 / 1,038 / 723            |
+| Egg =Single= 2005-06 / 2012-13 / 2016-17      | 105 / 3,056 / 10,727        | 305 / 3,082 / 10,727        |
+| Coconut (fresh) =Single= 2005-06 / 2012-13    | 12 / 310                    | 40 / 328                    |
+| =food_acquired= rows; sum Expenditure         | 5,340,606; 19,059,899,600.9 | unchanged; index unique     |
+| egg count-unit rows / their kg                | 16,407 / 32,881.51 (inferred) | 16,633 / 0 (=none=)       |
+| =kg_factor_declared_none= matched = refused   | --                          | 16,633                      |
+| =food_quantities(units='kgs')= total kg       | 11,040,085.37               | 11,007,391.86 (-32,693.51)  |
+| =kg_factor_sources= item_unit / unit / none   | 1,010,310 / 605,943 / 3,567,525 | 993,954 / 605,938 / 3,583,886 |
+| =kg_factor_baseline_gate= rows_refused        | 428,173                     | 428,168                     |
+| =food_prices()= =kgvalue= / =kgprice=         | 568,027 / 189,052           | 560,023 / 187,096           |
+| =food_prices()= =unitvalue= / =unitprice=     | 1,676,093 / 189,656         | unchanged                   |
+The kg fall is exactly the egg rows' inferred kilograms less the coconut
+rows' new 188.00 kg; no other row is re-priced (the declared rows still
+enter the estimators as evidence).  Eggs on other units keep their
+25,606.42 kg.
+
+*Not reached by the declaration:* =nutrition.py= calls
+=food_quantities_from_acquired= itself, without =no_kg= (and without
+=unit_kg=), so the =nutrition= table still weighs counted eggs at the old
+factors.  GH #1042 residual.
+
+*Why goat and other domestic poultry are NOT relabelled* (ruling 3): both
+pass the price test in 2012-13 (Goat 15 @ 50 vs 178 @ 60; Other Domestic
+Poultry 41 @ 15 vs 444 @ 14; all in band), but the =(item, Single)= factor
+the ladder would serve them is implausible -- Goat 4.54 kg (a goat is ~20-30
+kg), Other Domestic Poultry 0.79 kg (below a live bird) -- so a relabel would
+mint wrong kilograms where =Unknown= mints none.
+
+*Chicken: the cross-wave move, accepted and disclosed (ruling 6).*  The
+=(Chicken, Single)= factor is one number per =(j, u)= pooled across waves, so
+pooling the 387 relabelled 2005-06/2012-13 rows moved it 1.2 -> 1.0714 kg for
+*every* wave.  2016-17 was not relabelled, yet its 155 purchased =(Chicken,
+Single)= rows (194.5 birds) go 233.40 -> 208.39 kg (-10.7%; re-measured at
+this head -- the 1.2 is the factor measured before the chicken relabel).
+And the price test cannot distinguish =Single= from =Kilogram= for chicken
+(2005-06 medians: =Single= 30,000, =Kilogram= 22,500, the code-0 rows 25,000:
+one bird is about a kilogram), so the chicken relabel rests on the
+plausibility of the resulting kilograms and on the quantities (whole birds),
+not on price alone.
 
 *** Test...
 #+begin_src python :results output
