@@ -2051,8 +2051,12 @@ three instruments do *not* share an 8H unit list:
   the data add after the printed list (=25 tree=, then =27 balls, 28 bar,
   29 bucket, 30 crate, 31 dozen, 32 loaf, 33 pair, 34 pieces, 35 pots, 36 set,
   37 singles, 38 yards/meter=) -- post-codes, not options the enumerator was
-  shown.  8C/8D print near
-  copies (8C(1)/8D add =Tree 25= and drop =Margarine tin 17=).  How it was
+  shown.  8C(1), 8C(2) and 8D print
+  near copies (pp. 8.5-8.8, PDF pp. 11-14): they *add* =Tree 25=, spell
+  code 12 =Fruit= (8H: =Fruits=), and *keep* =Margarine tin 17= (corrected
+  2026-10-18; an earlier version said they drop it).  Only 8G's list
+  (p. 8.10, PDF p. 16) lacks =Margarine tin 17= -- it also omits =None 00= and
+  every code 15-23.  No Section 8 list prints a count unit.  How it was
   read: the list is in the PDF text layer on printed pp. 8.11, 8.12, 8.14,
   8.15 and 8.17; the text layer of 8.13 (oils) and *8.16 (eggs and snail)*
   carries no list, so for those two pages this rests on the GH #1042 red
@@ -5230,3 +5234,10 @@ served an inferred kg factor (=item_unit= 1,745, =unit= 653,
 *Not established* -- the questionnaires were not checked -- so it is recorded
 as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
 (already a sentinel: served =none=).
+
+*Superseded (GH #1042, 2026-10-18).*  Verified against the GLSS4/5/6
+questionnaires: =None= is code 0, the instrument's "nothing / not applicable"
+code, and is now served as =Unknown= with no inferred kilograms; the
+own-produced chicken, egg and fresh-coconut rows whose code 0 prices like
+one item are served on the count unit =Single=.  See the GH #1042 entries
+under the food_acquired section.

@@ -2730,9 +2730,10 @@ spellings as first counted, on that incomplete set (not recounted): =Grams=
 naming a FOOD rather than a unit keeps it as the unit and gets inferred kg in
 IHS3--IHS5 (=Mango= 49, =Coffee= 27, =Meal= 133 / =Meals= 68, =Scones=,
 =Buns=, =Rabbit=, =Nsima And Meat=, ...), whereas the 2004-05 script, which
-reads no text, sends its 10 food-named code-20 rows to =Unknown=.  Open;
-not changed here.  Left alone: single letters (=B=, =G=, =Ms=),
-=Otherbucket= (1 row).
+reads no text, sends its 10 food-named code-20 rows to =Unknown=.
+*Since resolved* (ruling 5, entry "rulings of 2026-10-18" below): a
+food-named code-23 text is now no specification -> =Unknown= (329 rows).
+Left alone: single letters (=B=, =G=, =Ms=), =Otherbucket= (1 row).
 
 *NOT fixed here -- most served =Other (Specify)= is not code 23.*  The =u=
 table's "sentinel codes" block (=categorical_mapping.org=, commit 9bf5c80d0:
@@ -2785,9 +2786,10 @@ pooled across all of those as one "unit".
   shorter list: 1 2 4 5 6 7 8 9 10 11 14 15 18 19 20 22 23 -- *no* 3, 12,
   13, 16, 17 or 21, and the word BASIN nowhere in IHS4.
 - But IHS4's *data* still use 21 = BASIN: the cross-section
-  =hh_mod_g1.dta= value-labels =hh_g07b= code 21 =basin= (158 rows), and
-  leaves the same code unlabelled (=21.0=) on =hh_g03b/04b/06b= and in the
-  panel file.  Unit values agree: maize ufa on code 21 prices at 4.6x its
+  =hh_mod_g1.dta= ships a string column =hh_g07b_label= that reads =basin=
+  on the 158 gifted rows with =hh_g07b= code 21 (corrected 2026-10-18: it is
+  that shipped label column, not a Stata value label), and nothing labels
+  the same code (=21.0=) on =hh_g03b/04b/06b= or in the panel file.  Unit values agree: maize ufa on code 21 prices at 4.6x its
   per-kg value (IHS3 basin factor for that item 2.10-3.81 kg).
 - IHPS 2016 BID (=2016-17/Documentation/Panel/ihps_2016_bid_updated_final.pdf=,
   annex "Food-Unit Combinations ... Non-Standard Units", pp. 43-48) puts
@@ -2835,9 +2837,11 @@ unit, 2,070 kg in all, and =food_kg_factors= itself warns ='90 kg bag':
 stated 90 kg, inferred 0.70=.  The same pattern (buns, sugar, cooking oil
 on 3/12/13) is what 2013-14 shows.  The decode serves what the enumerator
 recorded; whether a code whose every use contradicts it should be served
-as =Unknown= instead is a decision for a human (GH #1042 residual).  12/13
-are mixed: tubers and greens price like a basket, chips/salt/cooking oil
-do not.
+as =Unknown= instead is a decision for a human (GH #1042 residual).
+*Since decided* (ruling 2, entry "rulings of 2026-10-18" below): the 5 rows
+are =Unknown=.  12/13 are mixed: tubers and greens price like a basket,
+chips/salt/cooking oil do not -- not every use contradicts the label, so
+they keep it.
 
 *Not changed.*  Suffixed codes on no list or factor table, served as the
 raw code: 2010-11 =16b= 5, =16a= 2, =12a= 2, =21b= 2, =12b= 1, =03a= 1 (13
@@ -2846,3 +2850,66 @@ own-produced) stay the OTHER (SPECIFY) sentinel although the IHPS 2016 BID
 uses 23A-23F for TINA; IHPS 2013 prints no sub-codes.  The free-text
 spellings =Basket shelled= / =Basket unshelled= (from the other-specify
 text) are not merged with the new labels.
+
+* 2026-10-18 -- food_acquired: rulings of 2026-10-18 on the #1042 residuals (@ligon, GH #1042)
+
+*Rule (ruling 2).*  *A code whose every recorded use contradicts its
+printed label records no unit.*  IHS3 code 03 =90 KG. BAG= is on 5 served
+2010-11 rows (=hh_g04b= 4: 9 buns for 180 MWK, 9 mandazi for 30, 1 pork for
+900, 3 sugar for 510; =hh_g06b= 1: own maize flour) -- none a 90 kg bag -- so
+the 2010-11 script sends it to =Unknown= (=_IHS3_CONTRADICTED_CODES=, via
+=other_specify_to_unknown=, the mechanism 2013-14 uses for
+=_IHPS13_UNPRINTED_CODES=).  The wave ships the code *unpadded* (='3'=, while
+the shared =u= table keys ='03'=), so the test strips leading zeros.  Exact
+code only: =3A= (1 row) stays a raw suffixed code (ruling 4).  12/13 do not
+qualify (mixed uses, above).  *Not touched:* 2004-05 serves 6 rows as =90 kg
+bag= -- IHS2's own code scheme, outside this ruling.
+
+*Rule (ruling 5).*  In IHS3-IHS5, a code-23 (OTHER (SPECIFY)) specify text
+that names a FOOD rather than a unit is no specification -> =Unknown=, as
+2004-05 already does.  Test, not a list of answers
+(=malawi.names_a_food=): every content word of the text is a word of an
+item NAME in this country's =harmonize_food= table (Preferred Label and
+every wave's label, with parenthesised qualifiers and anything after
+' - ' removed, so 'Tomato sauce (bottle)' and 'Chicken - Whole' contribute
+no 'bottle'/'whole'), and no word is in the country's own unit tables (=u=,
+=harmonize_crop_unit=, =harmonize_price_unit=).  Size adjectives and joiners
+are ignored; =whole=, =full=, =half= are *not* ignored, because they say how
+much was counted.  One vocabulary supplement: =nsima=, =ndiwo= (the staple
+and relish are dishes, not items).
+
+Caught, served rows (all code 23): =Meal= 133, =Meals= 68, =Mango= 49,
+=Coffee= 27, =Mice= 15, =Chicken= 13, =Rabbit= 3, =Tea And Bread= 3, =Rice
+Meal= 2, and 1 each of =Cooked Mangoes=, =7Buns=, =Buns=, =Chibuku=, =4 Meals
+At 150=, =1Mlambe=, =Nsima And Meat=, =Meals Eaten At Restaurant=, =Pigeon=,
+=Nsima With Chicken=, =Nsima And Ndiwo=, =Scones=, =Small Chips=, =Tea=, =Tea &
+Buns=, =Two Bananas= -- 329 rows (2010-11 66, 2016-17 165, 2019-20 98).
+*Kept* (unit texts): =Grams=, =Packet=, =Plate=, =Cup=, =Whole=, =Bottle=,
+=Heap=, =Kilogram=, =Satchet=, =Cob=, =Head=, =Pieces Of Chicken=, =Plate Of
+Nsima=; and, *a decision*, =Whole Chicken= (364), =Whole Rabbit=, =Whole
+Dove=, =Full Guinea Fowl=, =Two Doves= -- a whole bird is a count unit, the
+same reading as GhanaLSS's =Single= for a counted chicken; =Chicken= alone
+says nothing about how much and is caught.  Not caught although food-like:
+=Nsiam And Beef= (typo), =Dish Of Nsima And Beef= ('dish' is no item word).
+
+*Before / after* (private cold rebuild; before = branch head 7b20e8c31 after
+merging base 2026-10-18b, after = this change):
+| measure                                     | before      | after       |
+|---------------------------------------------+-------------+-------------|
+| =Unknown= by wave (04-05/10-11/13-14/16-17/19-20) | 892/48/118/429/32 | 892/119/118/594/130 |
+| 2010-11 =90 kg Bag=                         | 5           | 0           |
+| moved rows' =KgFactorSource=                | metric 5, item_unit 55, unit 237, survey_kg 30, none 7 | none 304, survey_kg 30 |
+| =food_acquired= rows; sum Expenditure; index unique | 971,531; 281,093,686; yes | unchanged |
+| =food_quantities(units='kgs')= kg (=u='kg'= rows) | 2,578,024.14 | 2,574,982.10 (-3,042.04) |
+| =kg_factor_sources= metric / item_unit / unit / none | 253,353 / 225,350 / 69,549 / 2,491 | 253,348 / 225,295 / 69,312 / 2,788 |
+| =food_prices()= rows: kgvalue / unitvalue   | 680,676 / 681,614 | 680,400 / 681,614 |
+| =food_prices(units='kgprice' / 'unitprice')= | raise =UnitsUnavailableError= (no =Price=) | unchanged |
+The kg fall is exactly the moved rows' inferred kilograms (2,070.00 from the
+90 kg Bag label, 972.04 from food texts); the 30 rows with a shipped
+=survey_kg= factor keep their 7,091.07 kg.  No other row is re-priced.
+
+*Ruling 4 -- left as they are.*  The 13 rows under raw suffixed codes
+(2010-11 =16b= 5, =16a= 2, =12a= 2, =21b= 2, =12b= 1, =03a= 1) and the 2
+rows where =23A=/=23B= may mean TINA (2013-14, own-produced Chicken and
+Other poultry; served =Unknown= as OTHER (SPECIFY) with no text) stay as
+they are, recorded as a residual.

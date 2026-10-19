@@ -176,9 +176,12 @@ def other_specify_to_unknown(u, is_other, detail=None):
 _FOOD_TEXT_STOPWORDS = frozenset({
     'and', 'of', 'with', 'the', 'at', 'for', 'from', 'not', 'very', 'etc',
     'other', 'specify', 'own', 'eaten', 'one', 'two', 'three',
-    'big', 'small', 'large', 'medium', 'half', 'full', 'fresh', 'dried',
-    'cooked',
+    'big', 'small', 'large', 'medium', 'fresh', 'dried', 'cooked',
 })
+# NOT stopwords, deliberately: 'whole', 'full', 'half' say HOW MUCH of the
+# item was counted ('Whole Chicken', 'Full Guinea Fowl', 'Half Loaf'), so a
+# text carrying one is a count unit, not a bare food name.  Size adjectives
+# ('Small Chips') say no quantity and are ignored.
 #: Malawi staple-dish words that name food in specify texts ('Nsima And
 #: Meat') but are not words of any item label in ``harmonize_food`` (the
 #: staple is listed as maize ufa, relish has no item).  A vocabulary

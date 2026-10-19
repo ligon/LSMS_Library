@@ -54,8 +54,12 @@ _EXPECTED = {
     # The decode residual adds 2010-11 23 off-list codes (00 14, 99 4, 49 2,
     # 69/79/500 1 each) and 2013-14 8 (03/12/13 6 not printed in IHPS 2013,
     # 00 1, 76 1): 25 -> 48 and 110 -> 118.
-    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 48, '2013-14': 118,
-                       '2016-17': 429, '2019-20': 32}),
+    # Rulings of 2026-10-18 (cold rebuild at 7b20e8c31 + the change): code 03
+    # '90 kg Bag' adds 5 to 2010-11 (48 -> 53), and code-23 specify texts that
+    # name a food add 66 / 165 / 98 to 2010-11 / 2016-17 / 2019-20
+    # (53 -> 119, 429 -> 594, 32 -> 130).
+    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 119, '2013-14': 118,
+                       '2016-17': 594, '2019-20': 130}),
 }
 
 #: Malawi rows the IHS3 decode serves under their questionnaire labels.  They
@@ -65,7 +69,10 @@ _EXPECTED = {
 #: 748 = 590 unlabelled code 21 + 158 already labelled 'basin'.
 _MALAWI_IHS3_DECODE = {
     ('2010-11', 'Cup'): 3072, ('2010-11', 'Tin'): 281,
-    ('2010-11', 'Basin'): 1952, ('2010-11', '90 kg Bag'): 5,
+    ('2010-11', 'Basin'): 1952,
+    # Ruling 2 (2026-10-18): every use of code 03 contradicts its label, so
+    # it is the sentinel -- 5 -> 0.
+    ('2010-11', '90 kg Bag'): 0,
     ('2010-11', 'Basket (Dengu) (Shelled)'): 46,
     ('2010-11', 'Basket (Dengu) (Unshelled)'): 44,
     ('2016-17', 'Basin'): 748,
@@ -219,8 +226,12 @@ def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
         for gone in ('Other', 'Unit'):
             assert not (u == gone).any(), f'Malawi still serves u={gone!r}'
         # The shipped conversion-table factor survives the relabel (5 code-23
-        # rows + the first pass's 14 'N/A' rows, all 2019-20).
-        assert int((sources.astype(str) == 'survey_kg').sum()) == 19
+        # rows + the first pass's 14 'N/A' rows, all 2019-20; + 30 food-named
+        # code-23 rows, ruling 5: 19 -> 49).
+        assert int((sources.astype(str) == 'survey_kg').sum()) == 49
+        # Ruling 5: no served food-named specify text survives on IHS3-IHS5.
+        for gone in ('Mango', 'Coffee', 'Meal', 'Meals', 'Mice', 'Scones'):
+            assert not (u == gone).any(), f'Malawi still serves u={gone!r}'
         # No wave serves 'Other (Specify)' any more: code 23 without text is
         # the sentinel, and the IHS3 codes carry their questionnaire labels.
         assert not (u == 'Other (Specify)').any(), 'Malawi still serves Other (Specify)'
@@ -241,14 +252,17 @@ def _ghanalss():
     return mod
 
 
-def test_ghanalss_count_unit_scope_is_chicken_in_glss5_and_glss6_only():
-    """Eggs are deliberately NOT remapped: (Egg, Single) infers 0.50 kg/egg and
-    the ladder has no item-level refusal.  Widening this dict is a decision
-    that needs the kg check in CONTENTS.org repeated, not a one-line edit."""
+def test_ghanalss_count_unit_scope_is_glss5_and_glss6_chicken_egg_coconut():
+    """Rulings 1a/3 (@ligon 2026-10-18) add Egg (served with NO kilograms --
+    every egg count unit is in ``_/no_kg_factor.yml``) and Coconut (fresh).
+    Goat and Other Domestic Poultry pass the price test but their (item,
+    Single) kg is implausible, so they are deliberately absent.  Widening this
+    dict is a decision that needs the price and kg checks in CONTENTS.org
+    repeated, not a one-line edit."""
     g = _ghanalss()
     assert g.COUNT_UNIT == 'Single'
-    assert g.UNRECORDED_UNIT_IS_COUNT == {'2005-06': ('Chicken',),
-                                         '2012-13': ('Chicken',)}
+    items = ('Chicken', 'Egg', 'Coconut (fresh)')
+    assert g.UNRECORDED_UNIT_IS_COUNT == {'2005-06': items, '2012-13': items}
 
 
 def test_ghanalss_count_unit_relabel_is_scoped_and_lossless():
@@ -262,7 +276,7 @@ def test_ghanalss_count_unit_relabel_is_scoped_and_lossless():
     df = pd.DataFrame({'Quantity': [1.0, 2.0, 3.0, 4.0]}, index=idx)
     out = g.unrecorded_unit_to_count(df, '2005-06')
     assert out.index.get_level_values('u').tolist() == [
-        'Single', U_UNKNOWN, U_UNKNOWN, 'Kilogram']
+        'Single', 'Single', U_UNKNOWN, 'Kilogram']
     assert out['Quantity'].tolist() == df['Quantity'].tolist()
     # Not a wave in scope (GLSS4: no count unit served for chicken).
     df98 = df.rename(index={'2005-06': '1998-99'}, level='t')
@@ -294,3 +308,134 @@ def test_ghanalss_chicken_count_rows_get_a_plausible_bird_weight():
     assert set(kgf['KgFactorSource'].astype(str)) == {'item_unit'}
     assert kgf['kg_per_unit'].between(1.0, 2.5).all(), kgf['kg_per_unit'].describe()
 
+
+
+# ------------------------------------- rulings of 2026-10-18 (@ligon, #1042)
+@pytest.mark.parametrize('text', [
+    'Mango', 'Coffee', 'Meal', 'Meals', 'Scones', 'Buns', 'Rabbit', 'Mice',
+    'Chicken', 'Tea And Bread', 'Tea & Buns', 'Nsima And Meat', 'Rice Meal',
+    'Two Bananas', 'Cooked Mangoes', 'Meals Eaten At Restaurant'])
+def test_malawi_food_named_specify_text_is_a_food(text):
+    """Ruling 5: a code-23 specify text naming a FOOD specifies no unit."""
+    assert bool(_malawi().names_a_food([text]).iloc[0]) is True
+
+
+@pytest.mark.parametrize('text', [
+    'Grams', 'Packet', 'Plate', 'Cup', 'Whole', 'Bottle', 'Heap',
+    'Whole Chicken', 'Full Guinea Fowl', 'Half Loaf', 'Kilogram', 'Satchet',
+    'Cob', 'Head', 'Pieces Of Chicken', 'Plate Of Nsima', 'Small Bottle',
+    'Loaf (600G)', 'Tray', 'B', None])
+def test_malawi_unit_specify_text_is_not_a_food(text):
+    """...and the boundary: a text with any unit word, or a quantity word
+    ('Whole', 'Full', 'Half'), or any word that is not an item name, is a unit
+    text and keeps its label."""
+    assert bool(_malawi().names_a_food([text]).iloc[0]) is False
+
+
+def test_malawi_code23_food_text_goes_to_the_sentinel():
+    df = pd.DataFrame({
+        'unitsdetail_bought': ['MANGO', 'COFFEE', 'WHOLE CHICKEN', 'MEALS'],
+        'unitcode_bought': ['23', '23', '23', '9'],
+        'units_bought': ['OTHER (SPECIFY)'] * 3 + ['PIECE'],
+    })
+    out = _malawi().handling_unusual_units(df, suffixes=['bought'])
+    # Only code 23 is ruled on: a food-named text on another code is left be.
+    assert list(out['u_bought']) == [U_UNKNOWN, U_UNKNOWN, 'Whole Chicken',
+                                     'Meals']
+
+
+def test_malawi_2010_11_code_03_records_no_unit():
+    """Ruling 2: IHS3 code 03 '90 KG. BAG' -- every recorded use contradicts
+    the label -- is the sentinel.  The wave ships the code unpadded ('3')."""
+    src = (countries_root() / 'Malawi' / '2010-11' / '_' / 'food_acquired.py').read_text()
+    assert "_IHS3_CONTRADICTED_CODES = ['3']" in src
+    assert ".str.lstrip('0')" in src
+    assert '.isin(_IHS3_CONTRADICTED_CODES)' in src
+
+
+# ----------------------------------------- the item-level "no kg factor"
+def _no_kg_frame():
+    """Two waves, one household per row; (B, Single) has a kg baseline."""
+    rows = []
+    for t in ('w1', 'w2'):
+        for h in range(12):
+            rows.append((t, f'h{h}', 'B', 'Kilogram', 1.0, 10.0))
+            rows.append((t, f'h{h}', 'B', 'Single', 1.0, 5.0))
+            rows.append((t, f'h{h}', 'C', 'Kilogram', 2.0, 20.0))
+            rows.append((t, f'h{h}', 'C', 'Single', 1.0, 4.0))
+    df = pd.DataFrame(rows, columns=['t', 'i', 'j', 'u', 'Quantity', 'Expenditure'])
+    return df.set_index(['t', 'i', 'j', 'u'])
+
+
+def test_food_kg_factors_no_kg_refuses_inferred_kilograms_only():
+    df = _no_kg_frame()
+    base = food_kg_factors(df)
+    j = df.index.get_level_values('j')
+    u = df.index.get_level_values('u')
+    b_single = ((j == 'B') & (u == 'Single'))
+    assert base.loc[b_single, 'KgFactorSource'].isin(
+        ['item_unit', 'item_unit_tight', 'unit']).all()
+
+    out = food_kg_factors(df, no_kg=[('b', ' single ')])   # matched normalised
+    assert (out.loc[b_single, 'KgFactorSource'] == 'none').all()
+    assert out.loc[b_single, 'kg_per_unit'].isna().all()
+    # The metric rows of the same item, and every other item, are untouched.
+    assert (out.loc[~b_single, 'KgFactorSource']
+            == base.loc[~b_single, 'KgFactorSource']).all()
+    rep = out.attrs['kg_factor_declared_none']
+    n = int(b_single.sum())
+    assert rep['rows_matched'] == n and rep['rows_refused'] == n
+    assert rep['cells'] == {'b| single ': {'rows_matched': n, 'rows_refused': n}}
+    # The partition still partitions.
+    assert sum(out.attrs['kg_factor_sources'].values()) == len(df)
+
+    # unit=None declares every unit of the item; 'metric' still serves Kilogram.
+    whole = food_kg_factors(df, no_kg=[('B', None)])
+    assert (whole.loc[j == 'B', 'KgFactorSource']
+            .isin(['metric', 'none'])).all()
+    assert (whole.loc[(j == 'B') & (u == 'Kilogram'), 'KgFactorSource']
+            == 'metric').all()
+    assert whole.attrs['kg_factor_declared_none']['rows_refused'] == n
+
+    # No declaration: the attr is present and empty, nothing moves.
+    assert base.attrs['kg_factor_declared_none'] == {
+        'rows_matched': 0, 'rows_refused': 0, 'cells': {}}
+
+
+def test_no_kg_factor_yml_needs_a_reason(tmp_path, monkeypatch):
+    import types
+
+    import lsms_library.country as country_mod
+    from lsms_library.country import Country
+
+    d = tmp_path / 'Someland' / '_'
+    d.mkdir(parents=True)
+    monkeypatch.setattr(country_mod, 'countries_root', lambda: tmp_path)
+    stub = types.SimpleNamespace(name='Someland')
+    assert Country._no_kg_factor_cells(stub) == ()
+    (d / 'no_kg_factor.yml').write_text(
+        'no_kg_factor:\n  - item: Egg\n    units: [Single, Crate]\n'
+        '    reason: wrong baseline\n  - item: Fish\n    reason: x\n')
+    assert Country._no_kg_factor_cells(stub) == (
+        ('Egg', 'Single'), ('Egg', 'Crate'), ('Fish', None))
+    (d / 'no_kg_factor.yml').write_text('no_kg_factor:\n  - item: Egg\n')
+    with pytest.raises(ValueError, match='reason'):
+        Country._no_kg_factor_cells(stub)
+
+
+#: GhanaLSS egg count units declared no-kg (``_/no_kg_factor.yml``).  Before
+#: the declaration the ladder served (Egg, Single) 0.5006 kg on 13,888 rows
+#: (2005-06 105, 2012-13 3,056, 2016-17 10,727), Piece / Ball 0.0012, Pair
+#: 0.0825, Dozen 0.024, Crate 0.030 (cold build at 7b20e8c31).
+_GHANA_EGG_COUNT_UNITS = ('Single', 'Piece', 'Ball', 'Pair', 'Dozen', 'Crate')
+
+
+def test_ghanalss_declares_every_egg_count_unit_no_kg():
+    import yaml
+
+    doc = yaml.safe_load((countries_root() / 'GhanaLSS' / '_' /
+                          'no_kg_factor.yml').read_text())
+    (entry,) = doc['no_kg_factor']
+    assert entry['item'] == 'Egg'
+    assert tuple(entry['units']) == _GHANA_EGG_COUNT_UNITS
+    assert entry['reason'].strip()
