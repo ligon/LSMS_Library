@@ -2191,18 +2191,28 @@ household was served no date at all.  As a null it no longer ties.
 
 *Not substituted from other visits.*  The agriculture covers also carry an
 =InterviewDate= (W4 pp/ph/ls, W5 ls), and 2 of W4's 8 / 102 of W5's 107 are
-dated there -- but those date a different visit (post-planting Nov 2018,
-post-harvest Jan 2019, livestock Nov 2021), not the interview this table
-reports.  Those covers carry the placeholder too (W4 pp 276, ph 42, ls 276;
-W5 ls 50) but no table reads them.  A census of every column and index
-level of every warm Ethiopia table found =##N/A##= only in
-=interview_date=.
+dated there -- but those date a different visit (W4 post-planting and
+livestock Sep 2018 - Jan 2019, post-harvest Jan 2019; W5 livestock
+Oct - Dec 2021, mode October), not the interview this table reports.
+Those covers carry the placeholder too (W4 pp 276, ph 42, ls 276; W5 ls
+50) but no table reads them.  A census of every column and index level of
+every warm Ethiopia table found =##N/A##= only in =interview_date=.
+
+The placeholder also sits in raw columns that no Ethiopia table reads
+today: =sect4_hh_w4/w5= =s4q34a/c= (1 each), =sect4_pp_w5= =s4q01c= (2),
+=sect9a_pp_w4= =sccq05= (95), =sect8_3_ls_w4= =*_os= columns,
+=sect3_pp_w5= =s3q37_os=, =sect6a_hh_w5= =s6aq01_os= (2), and the
+=sect0{4,6,8}_com= =*_os= columns (red-team r1, 2026-10-18; 27 W5 blobs
+not in L1 were not scanned).  Wiring any of them needs the same
+=mapping:=; a numeric cast would instead hide the placeholder as a NaN that
+no parquet census can find.
 
 ** W5 dates the POST-HARVEST visit, for a third of the households
 
 =sect_cover_hh_w5.dta= (the household cover, 4,959 households) ships *no*
-interview date: its =saq19__Timestamp= and =saq21= are =**CONFIDENTIAL**=,
-and so is the post-planting cover's =InterviewDate=.  W5 therefore reads
+interview date: its =saq19__Timestamp= is =**CONFIDENTIAL**= (4,926 rows)
+or blank (33), its =saq21= is =**CONFIDENTIAL**= on all 4,959, and the
+post-planting cover's =InterviewDate= is =**CONFIDENTIAL**= on all 2,110.  W5 therefore reads
 the post-harvest agriculture cover, which is HOLDER-grain (1,596 rows,
 1,581 households; 13 households on more than one holder row -- the 10
 disagreeing ones are the =GrainCollapseWarning= every read emits).  So
