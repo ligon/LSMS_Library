@@ -210,9 +210,15 @@ def test_gh915_opt_in_accepts_exactly_the_non_hidden_directories():
     assert set(ll.countries()) <= accepted
 
 
-@pytest.fixture
-def synthetic_root(tmp_path, monkeypatch):
-    """A config tree holding every shape the predicate must tell apart."""
+@pytest.fixture(params=["absolute", "relative", "symlink"])
+def synthetic_root(request, tmp_path, monkeypatch):
+    """A config tree holding every shape the predicate must tell apart,
+    reached through each form ``LSMS_COUNTRIES_ROOT`` can take: an absolute
+    path, a path relative to the cwd, and a symlink to the tree.
+    ``countries_root()`` returns an override as given, and until the
+    traversal check compared resolved with resolved, the relative and
+    symlinked forms refused EVERY country while ``countries()`` listed them.
+    Yields the resolved tree, for file operations."""
     from lsms_library.catalog import _country_dirs
     root = (tmp_path / "countries").resolve()
     (root / "Alpha" / "_").mkdir(parents=True)
@@ -227,7 +233,15 @@ def synthetic_root(tmp_path, monkeypatch):
     (root / ".hidden" / "_").mkdir(parents=True)               # hidden, even with a scheme
     (root / ".hidden" / "_" / "data_scheme.yml").write_text("Data Scheme: {}\n")
     (root / "notes.txt").write_text("not a directory\n")
-    monkeypatch.setenv("LSMS_COUNTRIES_ROOT", str(root))
+    if request.param == "absolute":
+        override = str(root)
+    elif request.param == "relative":
+        monkeypatch.chdir(tmp_path)
+        override = "countries"
+    else:
+        (tmp_path / "link").symlink_to(root, target_is_directory=True)
+        override = str(tmp_path / "link")
+    monkeypatch.setenv("LSMS_COUNTRIES_ROOT", override)
     countries_root.cache_clear()
     _country_dirs.cache_clear()
     yield root
@@ -236,7 +250,8 @@ def synthetic_root(tmp_path, monkeypatch):
 
 
 _SHAPES = ["Alpha", "Bare", "Staged", "Sidecar", ".hidden", "notes.txt",
-           "Alpha/2020", "./Alpha", "Alpha/", "alpha", "Nope"]
+           "Alpha/2020", "Alpha/_", "./Alpha", "Alpha/", "alpha", "Nope",
+           "", ".", ".."]
 
 
 def test_gh915_synthetic_tree_accepted_set_equals_countries(synthetic_root):
@@ -250,6 +265,37 @@ def test_gh915_synthetic_tree_accepted_set_equals_countries(synthetic_root):
 def test_gh915_synthetic_tree_opt_in_set(synthetic_root):
     assert ({n for n in _SHAPES if _accepts(n, allow_unregistered=True)}
             == {"Alpha", "Bare", "Staged", "Sidecar"})
+
+
+def test_gh915_synthetic_tree_traversal_is_refused_under_every_root_form(synthetic_root):
+    for name in ["..", "../..", "../../etc"]:
+        with pytest.raises(ValueError, match="path traversal"):
+            ll.Country(name, allow_unregistered=True)
+
+
+def test_gh915_a_entry_symlinked_out_of_the_root_is_listed_but_refused(
+        synthetic_root, tmp_path):
+    """PINS CURRENT BEHAVIOUR; it decides nothing (#915-a, undecided by @ligon).
+
+    An entry that is a symlink to a registered directory OUTSIDE the root is
+    listed by countries() -- ``is_dir()`` follows the link -- but Country()
+    refuses it as path traversal, with or without the opt-in.  So "the
+    accepted set is exactly countries()" holds EXCEPT for such entries.  A
+    symlinked entry that stays inside the root is accepted like its target.
+    Decide #915-a and this test changes with it: (a) drops ``LinkOut`` from
+    countries(); (b) makes Country() accept it.  The ``LinkOut`` refusal is
+    not changed by resolving the root (it held before that too): this test
+    pins it, it does not fix it."""
+    outside = (tmp_path / "outside" / "Gamma").resolve()
+    (outside / "_").mkdir(parents=True)
+    (outside / "_" / "data_scheme.yml").write_text("Data Scheme: {}\n")
+    (synthetic_root / "LinkOut").symlink_to(outside, target_is_directory=True)
+    (synthetic_root / "LinkIn").symlink_to("Alpha", target_is_directory=True)
+    assert ll.countries() == ["Alpha", "LinkIn", "LinkOut"]
+    ll.Country("LinkIn")
+    for opt in (False, True):
+        with pytest.raises(ValueError, match="path traversal"):
+            ll.Country("LinkOut", allow_unregistered=opt)
 
 
 def test_gh915_refusal_is_read_from_disk_not_the_cached_list(synthetic_root):

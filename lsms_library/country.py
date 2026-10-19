@@ -2203,10 +2203,14 @@ class Country:
                  'fct', 'nutrition','name','_panel_ids_cache', 'panel_ids']
 
     def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False, allow_unregistered: bool = False) -> None:
-        # Validate country name: reject path traversal attempts
+        # Validate country name: reject path traversal attempts.  Compare
+        # resolved with resolved: countries_root() returns an override as
+        # given, so a relative or symlinked LSMS_COUNTRIES_ROOT used to refuse
+        # every country here while countries() listed them all (GH #915).  An
+        # ENTRY symlinked out of the root is still refused (#915-a, undecided).
         countries_dir = countries_root()
         country_dir = (countries_dir / country_name).resolve()
-        if not country_dir.is_relative_to(countries_dir):
+        if not country_dir.is_relative_to(countries_dir.resolve()):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
         # GH #915: accept exactly lsms_library.countries() -- the SAME
         # predicate (catalog._is_registered), read from the filesystem rather
