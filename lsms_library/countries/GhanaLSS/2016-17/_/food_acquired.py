@@ -118,6 +118,21 @@ def decode_unit_code_9b(code):
     return decode_unit(native) if native is not None else pd.NA
 
 
+def _blank_code(raw):
+    """True where a RAW unit code is blank: missing, or an empty string.
+
+    Only this case is the missing-unit sentinel (GH #1008; the #1041 rule).  A
+    code that is present but unlabelled (9B codes 75/77 are absent from
+    ``unit_9b``) or a label ``unit_labels.org`` does not map is a DECODE
+    failure: it stays NaN so the null-index audit (Site I) still reports it.
+    """
+    s = pd.Series(raw).reset_index(drop=True)
+    blank = s.isna()
+    if not pd.api.types.is_numeric_dtype(s.dtype):
+        blank = blank | s.astype('string').str.strip().eq('').fillna(False)
+    return blank.to_numpy(dtype=bool)
+
+
 def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
                   item_col, exp_stem=None, price_stem=None, unit_decoder=None):
     """Reshape one source module (one row per HH x item) into long form.
@@ -147,6 +162,10 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
     the two modules misaligned by one.  The calendar number is also what every
     wave's own Stata variable labels state, so the map is checkable against the
     source rather than inferred.
+
+    `u` is ``U_UNKNOWN`` exactly where the raw unit code (the column the
+    decoder reads) is blank -- see `_blank_code` -- and NaN where a code is
+    present but does not decode.
     """
     df_num = df_num.copy()
     i = pd.Series([hh_id(c, n) for c, n in zip(df_num['clust'], df_num['nh'])])
@@ -155,9 +174,12 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
     frames = []
     for v, calendar_visit in sorted(visits.items()):
         if unit_decoder is not None:
-            u_vals = df_num[unit_stem.format(v=v)].apply(unit_decoder).values
+            raw_u = df_num[unit_stem.format(v=v)]
+            u_vals = raw_u.apply(unit_decoder).values
         else:
-            u_vals = df_cat[unit_stem.format(v=v)].apply(decode_unit).values
+            raw_u = df_cat[unit_stem.format(v=v)]
+            u_vals = raw_u.apply(decode_unit).values
+        u_vals = np.where(_blank_code(raw_u), U_UNKNOWN, u_vals)
         cols = {'Quantity': _to_numeric(df_num[qty_stem.format(v=v)]).values,
                 'u': u_vals}
         if exp_stem is not None:
@@ -175,135 +197,159 @@ def _stack_visits(df_num, df_cat, visits, qty_stem, unit_stem, label_map,
     return out
 
 
-####################
-# Purchases (Section 9B) -> s='purchased'
-####################
-# Food codes (freqcd) stay numeric for the harmonize_food lookup, so read the
-# numeric view; read the categorical view of the full g7sec9b.dta (NOT _small,
-# which carries no value labels) only to decode the unit columns.
+# Food-code -> harmonized item maps (config reads only; no microdata).
+# Food codes (freqcd / foodcd) stay numeric for the harmonize_food lookup.
 purch_labels = get_categorical_mapping(
     tablename='harmonize_food',
     idxvars={'Code': ('Code_9b', format_id)}, **{'Label': 'Preferred Label'})
-
-# Read the 284 MB g7sec9b_small.dta (NOT the 3.2 GB full g7sec9b.dta): _small
-# lacks value labels, but units are now decoded from numeric s9bq*c codes via
-# the unit_9b org table (decode_unit_code_9b).  See #453 / #384.
-num9b = get_dataframe('../Data/g7sec9b_small.dta', convert_categoricals=False)
-# 9B q1..q6 are asked at the 2nd..7th visits ("amount spent by second visit"
-# .. "by seventh visit" in the GLSS4/5/6 labels for the same stems).
-fe = _stack_visits(num9b, None, {n: n + 1 for n in range(1, 7)},
-                   qty_stem='s9bq{v}b', unit_stem='s9bq{v}c',
-                   label_map=purch_labels, item_col='freqcd',
-                   exp_stem='s9bq{v}a', unit_decoder=decode_unit_code_9b)
-fe['s'] = 'purchased'
-
-
-####################
-# Home production (Section 8H) -> s='produced'
-####################
 prod_labels = get_categorical_mapping(
     tablename='harmonize_food',
     idxvars={'Code': ('Code_8h', format_id)}, **{'Label': 'Preferred Label'})
 
-num8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=False)
-cat8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=True)
-# Screener gate (GH #1008; ruling @ligon 2026-10-19): serve an 8H row only
-# where s8hq1 == 1 ("1. Yes", the household consumed this item from own
-# production), the questionnaire's own skip logic -- and what 1998-99,
-# 2005-06 and 2012-13 already do.  s8hq1 is asked per (household, item) row.
-# Applied BEFORE the visit stack, by position on both views (they are the
-# same source rows in the same order).  It removes 868,975 of 934,584 source
-# rows: 868,255 "2. No" and 720 blank.  None of the "No" rows carries a
-# quantity or a unit at any visit; 12,038 carry a price only, and each of
-# those is one constant per (visit, item) -- 11,934 at visit 2 (Cassava 2,
-# Tomato 3, Pepper 2, Okra 7) and 104 at visits 3..7 -- a fill, not an answer.
-# Of the 720 blank screeners, 39 rows (11 households) DO carry quantities;
-# they go too, as in the sibling waves.  Census and costs: _/CONTENTS.org.
-_screened = num8h['s8hq1'].eq(1).to_numpy()
-num8h = num8h[_screened].reset_index(drop=True)
-cat8h = cat8h[_screened].reset_index(drop=True)
-# 8H q3..q8 are the same six visits: this wave's own Stata labels read
-# "Quantity of own produced food consumed at 2nd visit" (s8hq3) through
-# "...now-7th visit" (s8hq8).  q1/q2 are screeners, not visits.
-hp = _stack_visits(num8h, cat8h, {n: n - 1 for n in range(3, 9)},
-                   qty_stem='s8hq{v}q', unit_stem='s8hq{v}u',
-                   label_map=prod_labels, item_col='foodcd',
-                   price_stem='s8hq{v}p')
-hp['s'] = 'produced'
 
-
-####################
-# Combine, harmonize, canonicalize
-####################
-df = pd.concat([fe, hp], ignore_index=True)
-
-# Drop rows whose food code did not harmonize (no '' / NA j leakage; D6).
-df = df[df['j'].notna() & (df['j'] != '')]
-
-# LCU-only convention: a monetary value with no physical quantity/unit -> u='Value'
-# with Quantity = Expenditure (food-acquired skill).  2016-17 records quantities,
-# so this is typically empty, but apply it where it occurs.
-if 'Expenditure' in df.columns:
-    value_only = df['Quantity'].isna() & df['u'].isna() & df['Expenditure'].notna()
-    df.loc[value_only, 'u'] = 'Value'
-    df.loc[value_only, 'Quantity'] = df.loc[value_only, 'Expenditure']
-
-# A row with NO unit code is served on the missing-unit sentinel U_UNKNOWN
-# ('Unknown'), never on a NaN `u` (GH #1008; the #1041 rule).  Census of the
-# 13,380 served rows this reaches: every one has a BLANK raw code (s9bq{n}c /
-# s8hq{n}u is missing) -- none is an unlabelled code or an unmapped label, so
-# there is nothing to decode.  12,958 are 8H produced rows (12,925 carry only a
-# selling price; 12,813 of those are the visit-2 per-item constant prices on
-# Cassava/Pepper/Tomato/Okra documented in CONTENTS.org), 422 are 9B purchases
-# with a quantity and an amount.  A NaN `u` was deleted by every downstream
-# groupby (Feature assembly, the derived food tables) while Country served it;
-# the sentinel keeps the row in both and the kg ladder serves it `none`.
-# AFTER the value-only rescue above, which tests `u.isna()`.
-df['u'] = df['u'].fillna(U_UNKNOWN)
-
-df['t'] = t
-
-# Sentinel guard: some Stata extracts use a huge value for missing numerics.
-num = df.select_dtypes(exclude=['object', 'category'])
-if len(num.columns):
-    na = num.max().max()
-    if pd.notna(na) and na > 1e99:
-        warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
-        df = df.replace(na, np.nan)
-
-idx = ['t', 'i', 'j', 'u', 's', 'visit']
-value_cols = [c for c in ['Quantity', 'Expenditure', 'Price'] if c in df.columns]
-
-# Collapse duplicate (t,i,j,u,s,visit) rows (multiple source records of the same
-# item/unit within a visit) by summing the amounts.
-df = df.groupby(idx, dropna=False)[value_cols].sum(min_count=1)
-
-df = df.dropna(how='all')
-
-# ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) --------
-# Section 8H reports a quantity and a farmgate price but never a total, so the
-# served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml, key
-# GhanaLSS::food_acquired::8h-farmgate; ledger .coder/ledger/ghanalss-produced-qp.md.
-#
-# Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3: core
-# SUMs the additive measures and re-derives Price, so a string must not reach
-# the .sum()), and ONLY where BOTH factors exist -- a produced row missing
-# either keeps Expenditure NaN and carries NO key, so the labelled rows are
-# exactly the computed ones.
 DERIVATION_8H = 'GhanaLSS::food_acquired::8h-farmgate'
-_prod = (df.index.get_level_values('s') == 'produced')
-_both = (_prod
-         & pd.to_numeric(df['Quantity'], errors='coerce').notna().to_numpy()
-         & pd.to_numeric(df['Price'], errors='coerce').notna().to_numpy())
-_kept = pd.to_numeric(df['Expenditure'], errors='coerce').to_numpy(dtype=float)
-_qp = derive_produced_farmgate_value(df['Quantity'], df['Price'])
-df['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
-df['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
-                                index=df.index, dtype='string')
-assert df.loc[~_both, 'Derivation'].isna().all(), (
-    'a row with no computed value carries the 8h-farmgate key')
+
+
+def screen_8h(num8h, cat8h):
+    """Keep the 8H rows whose screener ``s8hq1`` is 1 ("1. Yes").
+
+    GH #1008, ruling @ligon 2026-10-19: serve own produce only where the
+    screener says the household consumed this item from own production -- the
+    questionnaire's own skip logic, and what 1998-99, 2005-06 and 2012-13
+    already do.  ``s8hq1`` is asked per (household, item) row.  Applied BEFORE
+    the visit stack, by position on both views (they are the same source rows
+    in the same order).
+
+    It removes 868,975 of 934,584 source rows: 868,255 "2. No" and 720 blank.
+    None of the "No" rows carries a quantity or a unit at any visit; 12,038
+    carry a price only, and each is one constant per (visit, item) -- 11,934 at
+    visit 2 (Cassava 2, Tomato 3, Pepper 2, Okra 7) and 104 at visits 3..7 -- a
+    fill, not an answer.  Of the 720 blank screeners, 39 rows (11 households)
+    DO carry quantities; they go too, as in the sibling waves.  Census and
+    costs: ``_/CONTENTS.org``.
+    """
+    keep = num8h['s8hq1'].eq(1).to_numpy()
+    return (num8h[keep].reset_index(drop=True),
+            cat8h[keep].reset_index(drop=True))
+
+
+def build(num9b, num8h, cat8h):
+    """The canonical wave frame from the three source views.
+
+    ``num9b`` is ``g7sec9b_small.dta`` and ``num8h`` / ``cat8h`` are
+    ``g7sec8h.dta``, read with ``convert_categoricals=False`` / ``True``.  A
+    function, not module-level code, so the decode, the screener gate and the
+    sentinel can be tested on a synthetic frame without the 284 MB read
+    (``tests/test_gh1008_ghanalss_null_keys.py``).
+    """
+    ####################
+    # Purchases (Section 9B) -> s='purchased'
+    ####################
+    # 9B q1..q6 are asked at the 2nd..7th visits ("amount spent by second visit"
+    # .. "by seventh visit" in the GLSS4/5/6 labels for the same stems).
+    fe = _stack_visits(num9b, None, {n: n + 1 for n in range(1, 7)},
+                       qty_stem='s9bq{v}b', unit_stem='s9bq{v}c',
+                       label_map=purch_labels, item_col='freqcd',
+                       exp_stem='s9bq{v}a', unit_decoder=decode_unit_code_9b)
+    fe['s'] = 'purchased'
+
+    ####################
+    # Home production (Section 8H) -> s='produced'
+    ####################
+    num8h, cat8h = screen_8h(num8h, cat8h)
+    # 8H q3..q8 are the same six visits: this wave's own Stata labels read
+    # "Quantity of own produced food consumed at 2nd visit" (s8hq3) through
+    # "...now-7th visit" (s8hq8).  q1/q2 are screeners, not visits.
+    hp = _stack_visits(num8h, cat8h, {n: n - 1 for n in range(3, 9)},
+                       qty_stem='s8hq{v}q', unit_stem='s8hq{v}u',
+                       label_map=prod_labels, item_col='foodcd',
+                       price_stem='s8hq{v}p')
+    hp['s'] = 'produced'
+
+    ####################
+    # Combine, harmonize, canonicalize
+    ####################
+    df = pd.concat([fe, hp], ignore_index=True)
+
+    # Drop rows whose food code did not harmonize (no '' / NA j leakage; D6).
+    df = df[df['j'].notna() & (df['j'] != '')]
+
+    # LCU-only convention: a monetary value with no physical quantity/unit ->
+    # u='Value' with Quantity = Expenditure (food-acquired skill).  2016-17
+    # records quantities, so this is typically empty, but apply it where it
+    # occurs.  "No unit" is a blank code (U_UNKNOWN, written by _stack_visits)
+    # or a code that did not decode (NaN) -- the same rows this rescue reached
+    # when it tested `u.isna()` alone, before the sentinel moved upstream.
+    if 'Expenditure' in df.columns:
+        no_unit = df['u'].isna() | df['u'].eq(U_UNKNOWN).fillna(False)
+        value_only = df['Quantity'].isna() & no_unit & df['Expenditure'].notna()
+        df.loc[value_only, 'u'] = 'Value'
+        df.loc[value_only, 'Quantity'] = df.loc[value_only, 'Expenditure']
+
+    # A blank unit code is already the missing-unit sentinel U_UNKNOWN
+    # ('Unknown'), never a NaN `u` (GH #1008; the #1041 rule) -- written in
+    # _stack_visits from the RAW code, so a present-but-undecodable code stays
+    # NaN for the null-index audit to report.  Census of the served rows: every
+    # blank is a missing s9bq{n}c / s8hq{n}u; 422 are 9B purchases with a
+    # quantity and an amount, the rest 8H produced rows that survive the
+    # screener gate (mostly a selling price only; CONTENTS.org).  A NaN `u` is
+    # deleted by every downstream groupby (Feature assembly, the derived food
+    # tables) while Country serves it; the sentinel keeps the row in both and
+    # the kg ladder serves it `none`.
+
+    df['t'] = t
+
+    # Sentinel guard: some Stata extracts use a huge value for missing numerics.
+    num = df.select_dtypes(exclude=['object', 'category'])
+    if len(num.columns):
+        na = num.max().max()
+        if pd.notna(na) and na > 1e99:
+            warnings.warn(f"Large number used for missing?  Replacing {na} with NaN.")
+            df = df.replace(na, np.nan)
+
+    idx = ['t', 'i', 'j', 'u', 's', 'visit']
+    value_cols = [c for c in ['Quantity', 'Expenditure', 'Price'] if c in df.columns]
+
+    # Collapse duplicate (t,i,j,u,s,visit) rows (multiple source records of the
+    # same item/unit within a visit) by summing the amounts.
+    df = df.groupby(idx, dropna=False)[value_cols].sum(min_count=1)
+
+    df = df.dropna(how='all')
+
+    # ---- own-production value: DERIVED, not an answer (GH: 8h-farmgate) ----
+    # Section 8H reports a quantity and a farmgate price but never a total, so
+    # the served Expenditure is a CONSTRUCTION.  Registry: _/derivations.yml,
+    # key GhanaLSS::food_acquired::8h-farmgate; ledger
+    # .coder/ledger/ghanalss-produced-qp.md.
+    #
+    # Stamped AFTER the uniqueness assert (CLAUDE.md "Derived Values", step 3:
+    # core SUMs the additive measures and re-derives Price, so a string must not
+    # reach the .sum()), and ONLY where BOTH factors exist -- a produced row
+    # missing either keeps Expenditure NaN and carries NO key, so the labelled
+    # rows are exactly the computed ones.
+    _prod = (df.index.get_level_values('s') == 'produced')
+    _both = (_prod
+             & pd.to_numeric(df['Quantity'], errors='coerce').notna().to_numpy()
+             & pd.to_numeric(df['Price'], errors='coerce').notna().to_numpy())
+    _kept = pd.to_numeric(df['Expenditure'], errors='coerce').to_numpy(dtype=float)
+    _qp = derive_produced_farmgate_value(df['Quantity'], df['Price'])
+    df['Expenditure'] = pd.array(np.where(_both, _qp, _kept), dtype='Float64')
+    df['Derivation'] = pd.Series(np.where(_both, DERIVATION_8H, None),
+                                    index=df.index, dtype='string')
+    assert df.loc[~_both, 'Derivation'].isna().all(), (
+        'a row with no computed value carries the 8h-farmgate key')
+    return df
+
 
 if __name__ == '__main__':
+    # Read the 284 MB g7sec9b_small.dta (NOT the 3.2 GB full g7sec9b.dta):
+    # _small lacks value labels, but units are decoded from numeric s9bq*c codes
+    # via the unit_9b org table (decode_unit_code_9b).  See #453 / #384.
+    # g7sec8h.dta is read twice: numerically for codes and amounts, and
+    # categorically for its native unit label strings.
+    df = build(get_dataframe('../Data/g7sec9b_small.dta', convert_categoricals=False),
+               get_dataframe('../Data/g7sec8h.dta', convert_categoricals=False),
+               get_dataframe('../Data/g7sec8h.dta', convert_categoricals=True))
     # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
     # Pure rename; an unmapped label raises rather than passing through.
     df = to_country_food_labels(df, '2016-17')

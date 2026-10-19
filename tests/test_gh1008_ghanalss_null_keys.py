@@ -230,28 +230,154 @@ def test_ghanalss_glss12_cover_page_gaps_have_a_sample_row():
     assert not smp["v"].isna().any()
 
 
-def test_ghanalss_glss12_gap_recovery_reads_the_cluster_and_refuses_to_guess(monkeypatch):
-    """The hook READS ``CLUST`` and raises on a conflict or a broken id."""
+@pytest.mark.parametrize("wave, c", [("1987-88", 1001), ("1988-89", 2001)])
+def test_ghanalss_glss12_gap_recovery_reads_the_cluster_and_refuses_to_guess(monkeypatch, wave, c):
+    """The hook READS ``CLUST`` and raises on a conflict or a broken id.
+
+    Both waves carry their own copy of ``_cover_page_gaps`` (a ``ghanalss.py``
+    helper would stale all seven waves' caches, not two), so both are tested,
+    each on ids of its own round (GLSS1 clusters 1xxx, GLSS2 2xxx).
+    """
     import importlib.util
     from lsms_library.paths import countries_root
     import lsms_library.local_tools as tools
 
-    p = countries_root() / "GhanaLSS" / "1987-88" / "_" / "mapping.py"
-    spec = importlib.util.spec_from_file_location("_gh1008_mapping_8788", p)
+    p = countries_root() / "GhanaLSS" / wave / "_" / "mapping.py"
+    spec = importlib.util.spec_from_file_location(f"_gh1008_mapping_{wave}", p)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
 
-    frames = {"Y01A.DAT": pd.DataFrame({"HID": [100101.0, 100199.0], "CLUST": [1001.0, 1001.0]}),
-              "Y12A.DAT": pd.DataFrame({"HID": [100199.0], "CLUST": [1001.0]}),
+    cover, gap = c * 100 + 1, c * 100 + 99
+    frames = {"Y01A.DAT": pd.DataFrame({"HID": [float(cover), float(gap)], "CLUST": [float(c)] * 2}),
+              "Y12A.DAT": pd.DataFrame({"HID": [float(gap)], "CLUST": [float(c)]}),
               "Y12B.DAT": pd.DataFrame({"HID": [], "CLUST": []})}
     monkeypatch.setattr(tools, "get_dataframe", lambda fn, **kw: frames[fn.split("/")[-1]])
-    got = m._cover_page_gaps({"100101"})
-    assert got.to_dict("records") == [{"i": "100199", "v": "1001", "source": "Y01A.DAT,Y12A.DAT"}]
+    got = m._cover_page_gaps({str(cover)})
+    assert got.to_dict("records") == [{"i": str(gap), "v": str(c), "source": "Y01A.DAT,Y12A.DAT"}]
 
-    frames["Y12A.DAT"] = pd.DataFrame({"HID": [100199.0], "CLUST": [1002.0]})
+    frames["Y12A.DAT"] = pd.DataFrame({"HID": [float(gap)], "CLUST": [float(c + 1)]})
     with pytest.raises(ValueError, match="names clusters"):
-        m._cover_page_gaps({"100101"})
+        m._cover_page_gaps({str(cover)})
 
-    frames["Y12A.DAT"] = pd.DataFrame({"HID": [100299.0], "CLUST": [1003.0]})
+    frames["Y12A.DAT"] = pd.DataFrame({"HID": [float((c + 1) * 100 + 99)], "CLUST": [float(c + 2)]})
     with pytest.raises(ValueError, match="HID = CLUST"):
-        m._cover_page_gaps({"100101"})
+        m._cover_page_gaps({str(cover)})
+
+
+# ------------------------------------------- 2016-17 wave script, no cache
+@pytest.fixture
+def fa1617(monkeypatch):
+    """``2016-17/_/food_acquired.py`` loaded as a module, NOT run as __main__.
+
+    Its pipeline is ``build(num9b, num8h, cat8h)``, so a synthetic frame can be
+    pushed through the real decode, screener gate and sentinel with no
+    microdata and no cache.  Loading reads only config (org tables), relative
+    to the script's own directory, which is where the Makefile runs it.
+    """
+    import importlib.util
+    import sys
+    from lsms_library.paths import countries_root
+
+    d = countries_root() / "GhanaLSS" / "2016-17" / "_"
+    monkeypatch.chdir(d)
+    monkeypatch.setattr(sys, "path", list(sys.path))   # undo its sys.path.append
+    spec = importlib.util.spec_from_file_location("_gh1008_food_acquired_1617", d / "food_acquired.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def _frame(rows, cols):
+    return pd.DataFrame([{c: r.get(c, np.nan) for c in cols} for r in rows])
+
+
+def _synthetic_1617():
+    """A 9B and an 8H source frame, one row per (household, item).
+
+    9B ``freqcd`` 1 is Rice (local); 8H ``foodcd`` 10 is Cassava, 53 Okra.
+    Unit code 7 is Bowl in both modules; 9B code 75 has no ``unit_9b`` label
+    and 8H's "48. Mole" is a label ``unit_labels.org`` does not map -- both
+    decode FAILURES, not blanks.
+    """
+    c9 = ["clust", "nh", "freqcd"] + [f"s9bq{q}{k}" for q in range(1, 7) for k in "abc"]
+    num9b = _frame([
+        dict(clust=1, nh=1, freqcd=1,
+             s9bq1a=4.0, s9bq1b=2.0, s9bq1c=7.0,       # visit 2: Bowl
+             s9bq2a=3.0, s9bq2b=1.0,                    # visit 3: blank code
+             s9bq3a=5.0, s9bq3b=1.0, s9bq3c=75.0,      # visit 4: unlabelled code
+             s9bq4a=2.0),                               # visit 5: amount only
+        dict(clust=1, nh=2, freqcd=9999, s9bq1a=1.0, s9bq1b=1.0, s9bq1c=7.0),  # not food
+    ], c9)
+    c8 = ["clust", "nh", "foodcd", "s8hq1", "s8hq2"] + [f"s8hq{q}{k}" for q in range(3, 9) for k in "qup"]
+    rows8 = [
+        dict(clust=1, nh=1, foodcd=10, s8hq1=1, s8hq2=3,
+             s8hq3q=2.0, s8hq3u=7.0, s8hq3p=5.0,       # visit 2: Bowl
+             s8hq4q=1.0, s8hq4p=3.0,                    # visit 3: blank code
+             s8hq5q=1.0, s8hq5u=48.0),                  # visit 4: unmapped label
+        dict(clust=1, nh=1, foodcd=53, s8hq1=1, s8hq2=3, s8hq3p=7.0),   # Yes-row fill: kept
+        dict(clust=1, nh=2, foodcd=10, s8hq1=2, s8hq3p=2.0),            # "No" fill: gated
+        dict(clust=1, nh=3, foodcd=53, s8hq1=np.nan, s8hq2=1,           # blank screener: gated
+             s8hq4q=1.0, s8hq4u=7.0, s8hq4p=5.0),
+    ]
+    num8h = _frame(rows8, c8)
+    cat8h = num8h.copy()
+    labels = {7.0: "7. Bowl", 48.0: "48. Mole"}
+    for q in range(3, 9):
+        cat8h[f"s8hq{q}u"] = pd.Categorical(num8h[f"s8hq{q}u"].map(labels))
+    cat8h["s8hq1"] = pd.Categorical(num8h["s8hq1"].map({1: "1. Yes", 2: "2. No"}))
+    return num9b, num8h, cat8h
+
+
+def _row(df, *key):
+    return df.xs(("2016-17",) + key, level=["t", "i", "j", "u", "s", "visit"])
+
+
+def test_ghanalss_2016_17_screener_gate_keeps_only_yes(fa1617):
+    """Ruling (@ligon, 2026-10-19): 8H is served only where ``s8hq1 == 1``.
+
+    A "2. No" row goes, AND a blank screener goes -- the literal ruling and
+    what 1998-99 / 2005-06 / 2012-13 already do -- even where, as in 39 real
+    2016-17 rows, the blank-screener row carries a quantity.  ``s8hq1 != 2``
+    would keep those; flipping to it is a decision, so it must fail here.
+    """
+    num9b, num8h, cat8h = _synthetic_1617()
+    n, c = fa1617.screen_8h(num8h, cat8h)
+    assert list(n["nh"]) == [1, 1] and list(n["foodcd"]) == [10, 53]
+    # The two views stay aligned row for row (the units come from cat8h).
+    assert list(c["s8hq3u"].astype("string").fillna("")) == ["7. Bowl", ""]
+
+    out = fa1617.build(num9b, num8h, cat8h)
+    hh = set(out.index.get_level_values("i"))
+    assert "1/02" not in hh, "a screener-No row was served"
+    assert "1/03" not in hh, "a blank-screener row was served"
+    prod = out.xs("produced", level="s")
+    assert set(prod.index.get_level_values("i")) == {"1/01"}
+
+
+def test_ghanalss_2016_17_only_a_blank_code_is_unknown(fa1617):
+    """Verdict r1 §6.1: ``Unknown`` is a BLANK raw code, never a decode failure."""
+    from lsms_library.transformations import U_UNKNOWN
+
+    assert 75 not in fa1617._unit_code_9b, "pick a 9B code unit_9b does not label"
+    assert "Mole" not in fa1617._unit_map, "pick an 8H label unit_labels.org does not map"
+    num9b, num8h, cat8h = _synthetic_1617()
+    out = fa1617.build(num9b, num8h, cat8h)
+
+    # Blank raw code -> the sentinel, on both modules.
+    assert _row(out, "1/01", "Rice (local)", U_UNKNOWN, "purchased", 3)["Quantity"].iloc[0] == 1.0
+    assert _row(out, "1/01", "Cassava (fresh)", U_UNKNOWN, "produced", 3)["Price"].iloc[0] == 3.0
+    # A present code on a HARMONIZED item that does not decode stays NaN, so
+    # the null-index audit (Site I) still reports it.
+    u = out.index.get_level_values("u")
+    lv = out.index.to_frame(index=False)
+    bad = lv[pd.isna(u)]
+    assert sorted(map(tuple, bad[["j", "s", "visit"]].to_numpy().tolist())) == [
+        ("Cassava (fresh)", "produced", 4), ("Rice (local)", "purchased", 4)]
+    assert not (lv["u"].astype("string").eq(U_UNKNOWN).fillna(False) & lv["visit"].eq(4)).any()
+    # Decoded codes decode; an amount with no quantity and no unit is 'Value'.
+    assert _row(out, "1/01", "Rice (local)", "Bowl", "purchased", 2)["Expenditure"].iloc[0] == 4.0
+    v = _row(out, "1/01", "Rice (local)", "Value", "purchased", 5)
+    assert v["Quantity"].iloc[0] == 2.0 and v["Expenditure"].iloc[0] == 2.0
+    # A price-only fill on a screener-YES row is kept, on the sentinel.
+    okra = _row(out, "1/01", "Okra", U_UNKNOWN, "produced", 2)
+    assert pd.isna(okra["Quantity"].iloc[0]) and okra["Price"].iloc[0] == 7.0
