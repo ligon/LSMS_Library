@@ -25,6 +25,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from lsms_library.country import _categorical_key_column
 from lsms_library.local_tools import all_dfs_from_orgfile
 from lsms_library.paths import countries_root
 
@@ -96,8 +97,11 @@ def _preferred(table: pd.DataFrame) -> pd.Series:
 
 
 def _key_column(table: pd.DataFrame) -> str:
-    # Same rule as country._categorical_key_column: first non-Preferred column.
-    return [c for c in table.columns if c != "Preferred Label"][0]
+    # The one key resolver (GH #928): #+key: if declared, else the first
+    # column that is not reserved.
+    key = _categorical_key_column(table)
+    assert key is not None, list(table.columns)
+    return key
 
 
 def test_canon_parses_and_carries_727_labels():

@@ -419,6 +419,24 @@ the cascade row-additive would change those builds and first needs their
    hash by itself, but moving a table out of a file changes that level's
    fingerprint and rebuilds it once.
 
+**A table may NAME its key column: `#+key:` (GH #928).** A line
+`#+key: <column>` among the `#+` lines *after* a table's `#+name:` declares
+which column is the key; `all_dfs_from_orgfile` records it as
+`df.attrs[CATEGORICAL_KEY_ATTR]` and refuses a bad one at parse time
+(`CategoricalKeyDeclarationError`: not a column, a reserved column, declared
+twice, or a `#+key:` line above its `#+name:`). **One resolver,
+`country._categorical_key_column(table, idxvars=None, *, exclude=())`**, serves
+every read-time caller -- the merge, `_unit_kg_factors`, the auto-apply, the
+`_market_lookup` normalisation and the `harmonize_<method>` hook: explicit
+`idxvars` -> `#+key:` -> the first column that is neither reserved
+(`Preferred Label`, `Status`, `Notes`) nor excluded. Undeclared tables key
+exactly as before (census: 315 tables, 0 served mappings moved), so a
+declaration is optional insurance, not a fix -- declare one where a table
+carries both a code and a label column (Niger `u` is the first). Callers that
+name their key (`mappings: [table, key, value]`, `get_categorical_mapping` /
+`code_label_map`'s `idxvars`, `_relabel_j`) do not read `#+key:`. Declaring a
+key edits a level's `.org`, which is that level's cache event (fact 3 above).
+
 **Where a new SHARED table goes, and what makes it reachable.** Put it in
 `lsms_library/categorical_mapping/<table>.org` with a `#+name:` — and then wire
 it, because dropping a file there is *not* wiring. Pick one mechanism:

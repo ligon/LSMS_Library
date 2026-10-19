@@ -2079,6 +2079,11 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     Only the default ``fn`` has levels.  An explicit ``fn`` (none of the
     callers passes one) keeps the original single-file-per-rung behaviour.
 
+    **The key is ``idxvars``, never a table's ``#+key:``** (GH #928).  A
+    ``#+key:`` declaration is read by ``country._categorical_key_column``, the
+    resolver behind the read-time callers; this cascade keys on what its
+    caller names (default ``'Code'``), as it always has.
+
     ``tests/test_categorical_mapping_resolution.py`` pins all of the above.
 
     By default, searches for =tablename= in an orgfile
