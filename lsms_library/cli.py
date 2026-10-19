@@ -75,10 +75,14 @@ def _dump_yaml(data: OrderedDict, path: Path) -> None:
 #     and reads the blob (one UserWarning per read); costs disk, never
 #     correctness.  400 files / 1.31 GB in the 2026-09-08 sweep.
 #   * WITHOUT a sidecar: the reader's chain is local -> DVC -> WB, so the
-#     copy is SERVED in preference to the DVC blob, silently.  33 files in
-#     the same sweep, in ten ``countries/<wave>/`` dirs with the country
-#     segment missing.  This is the class the old cleanup one-liner
+#     copy used to be SERVED in preference to the DVC blob, silently.  33
+#     files in the same sweep, in ten ``countries/<wave>/`` dirs with the
+#     country segment missing.  This is the class the old cleanup one-liner
 #     (``-execdir test -e '{}.dvc' -delete``) cannot find by construction.
+#     Since the GH #831 read-policy ruling (option b) ``get_dataframe``
+#     REFUSES such a file (``InTreeSourceError``) unless the caller opts in
+#     (``LSMS_ALLOW_INTREE_SOURCES=1`` or the acquisition flow), so a stray
+#     now breaks the read loudly instead of shadowing the blob.
 #
 # ``cache clear`` cannot remove them (it does not own the config tree) but it
 # is where a user looks when data looks stale, so it names them -- exactly as
@@ -132,7 +136,7 @@ def _intree_source_files(
     are never reachable through a country name.  Returns::
 
         {"with_sidecar":  [Path, ...],   # refused by get_dataframe; disk only
-         "no_sidecar":    [Path, ...],   # SERVED over the DVC blob
+         "no_sidecar":    [Path, ...],   # refused by get_dataframe unless opted in
          "stray_dirs":    [Path, ...],   # digit-named dirs at the root
          "git_consulted": bool}
 
@@ -191,9 +195,9 @@ def _report_intree_source_files(root: Path, countries: Sequence[str]) -> None:
             print(f"  {p}")
     if found["no_sidecar"]:
         print(f"WARNING: {len(found['no_sidecar'])} in-tree source file(s) under "
-              f"{root} with NO .dvc sidecar (GH #831) -- get_dataframe SERVES "
-              f"these in preference to the DVC blob; delete each unless it is "
-              f"new data awaiting `dvc add`:")
+              f"{root} with NO .dvc sidecar (GH #831) -- get_dataframe REFUSES "
+              f"these (InTreeSourceError) unless LSMS_ALLOW_INTREE_SOURCES=1; "
+              f"delete each unless it is new data awaiting `dvc add`:")
         for p in found["no_sidecar"]:
             print(f"  {p}")
     if found["with_sidecar"]:
@@ -388,7 +392,8 @@ def cache_clear(
             print(f"  {p}")
 
     # GH #831: the same report for raw source files (.dta/.sav/.csv), in two
-    # classes -- a copy WITHOUT a sidecar is served over the DVC blob.
+    # classes -- a copy WITHOUT a sidecar is refused by get_dataframe unless
+    # opted in (it used to be served over the DVC blob).
     _report_intree_source_files(_countries_root(), target_countries)
 
 

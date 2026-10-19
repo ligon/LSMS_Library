@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import base64
 import configparser
+import functools
 import hashlib
 import json
 import logging
@@ -111,6 +112,25 @@ def _fetch_destination(path: Path, populate_cache: bool = False) -> Path:
     if populate_cache:
         return _COUNTRIES_DIR / path
     return data_root() / path
+
+
+def _acquisition(func):
+    """Run an ACQUISITION entry point inside
+    ``local_tools.allow_intree_sources()`` (GH #831).
+
+    ``get_dataframe`` refuses a sidecar-less source inside the config tree
+    unless the caller opts in.  ``add_wave`` / ``populate_and_push`` extract
+    into the config tree on purpose (``_fetch_destination(...,
+    populate_cache=True)``) and ``dvc add`` what landed, so anything read
+    during them is acquisition, not a stray -- they are the sanctioned
+    opt-in.  Lazy import: ``local_tools`` imports this module lazily too.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        from .local_tools import allow_intree_sources
+        with allow_intree_sources():
+            return func(*args, **kwargs)
+    return wrapper
 
 # ---------------------------------------------------------------------------
 # Country -> WB catalog registry
@@ -1510,6 +1530,7 @@ def unpushed_blobs(remote: str | None = None,
     return []
 
 
+@_acquisition
 def populate_and_push(country: str, wave: str,
                       remote: str | None = None) -> list[Path]:
     """Download all data files for a wave from WB and push to DVC cache.
@@ -1946,6 +1967,7 @@ def _get_console(verbose: bool):
         return None
 
 
+@_acquisition
 def add_wave(country: str, catalog_id: str,
              wave: str | None = None,
              confirm: bool = True,

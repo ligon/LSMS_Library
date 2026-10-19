@@ -60,6 +60,7 @@ from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import codecs
+import contextvars
 import struct
 import tempfile
 import numpy as np
@@ -835,7 +836,9 @@ def _is_polluted_workspace_copy(fn) -> bool:
     scratch data the user supplied directly, output from the
     WB-fallback auto-add path in ``data_access.get_data_file``, or any
     other legitimate non-tracked use.  Returns False in all of those
-    cases.
+    cases.  (Whether ``get_dataframe`` may READ such a file when it sits
+    inside ``countries_root()`` is a separate policy, GH #831 -- see
+    :func:`_refuse_intree_source`.)
     """
     try:
         p = Path(fn).resolve()
@@ -845,6 +848,87 @@ def _is_polluted_workspace_copy(fn) -> bool:
         # Path-resolution failure (loop, permission denied) -> not pollution.
         # TypeError / AttributeError signal a programmer bug and propagate.
         return False
+
+
+# Sidecar-less sources inside the config tree (GH #831).
+#
+# ``countries_root()`` holds reviewed config; raw data lives in the DVC cache
+# under ``data_root()``.  A raw file sitting in the config tree WITHOUT a
+# ``.dvc`` sidecar used to be served by ``get_dataframe`` at step one of its
+# local -> DVC -> WB chain -- so a stray copy (433 of them, 1.31 GB, before the
+# GH #917 write-side fix) silently shadowed the DVC blob, and nothing said so.
+# Ruling (@ligon, 2026-10-18), option (b): REFUSE it unless the caller opts
+# in.  Two opt-ins, both explicit:
+#
+# * the acquisition flow -- ``data_access.add_wave`` / ``populate_and_push``,
+#   which extract into the config tree on purpose and then ``dvc add`` what
+#   landed -- runs inside :func:`allow_intree_sources`;
+# * ``LSMS_ALLOW_INTREE_SOURCES=1`` (also ``true`` / ``yes``), for a maintainer
+#   reading freshly prepared data before ``dvc add``.
+#
+# Exempt by construction, exactly as ``cli._intree_source_files`` classifies:
+# anything under a ``_/`` component (config by definition -- the tracked
+# lookup tables, e.g. ``Uganda/_/fct_usda.csv``), and anything outside the
+# config tree (scratch files, tmp dirs, the ``data_root()`` cache).  A file
+# WITH a sidecar never reaches this check: ``local_file`` refuses that
+# workspace copy and reads the DVC blob instead.  Measured on a clean clone:
+# no file is refused (the only sidecar-less, non-``_/`` data-like files are
+# two tracked ``GhanaAHIES/2023/Documentation/*.tsv`` that nothing reads).
+_ALLOW_INTREE_SOURCES = contextvars.ContextVar('lsms_allow_intree_sources',
+                                               default=False)
+
+
+class InTreeSourceError(RuntimeError):
+    """``get_dataframe`` refused a sidecar-less source inside the config tree
+    (GH #831).  Not a ``FileNotFoundError``: the file IS there, and a build
+    must stop and say so rather than degrade as if it were unavailable."""
+
+
+@contextmanager
+def allow_intree_sources():
+    """Let ``get_dataframe`` read sidecar-less sources inside
+    ``countries_root()`` for the duration (GH #831).  The acquisition flow's
+    opt-in; ``LSMS_ALLOW_INTREE_SOURCES=1`` is the session-wide one."""
+    token = _ALLOW_INTREE_SOURCES.set(True)
+    try:
+        yield
+    finally:
+        _ALLOW_INTREE_SOURCES.reset(token)
+
+
+def _intree_sources_allowed() -> bool:
+    if _ALLOW_INTREE_SOURCES.get():
+        return True
+    flag = os.environ.get('LSMS_ALLOW_INTREE_SOURCES', '')
+    return flag.strip().lower() in {'1', 'true', 'yes'}
+
+
+def _refuse_intree_source(fn) -> None:
+    """Raise :class:`InTreeSourceError` if *fn* is an existing file inside
+    the config tree, outside any ``_/`` directory, with no ``.dvc`` sidecar
+    -- unless the caller opted in (see the block comment above)."""
+    try:
+        p = Path(fn).resolve()
+        if not p.is_file() or (p.parent / f"{p.name}.dvc").exists():
+            return
+        rel = None
+        for root in dict.fromkeys((countries_root(), _COUNTRIES_DIR)):
+            try:
+                rel = p.relative_to(Path(root).resolve())
+                break
+            except ValueError:
+                continue
+    except OSError:
+        return
+    if rel is None or '_' in rel.parts[:-1] or _intree_sources_allowed():
+        return
+    raise InTreeSourceError(
+        f"{p} is a raw source inside the config tree ({countries_root()}) with "
+        f"no .dvc sidecar, so it is not the DVC-tracked file and would shadow "
+        f"the DVC blob (GH #831).  If it is new data awaiting `dvc add`, opt in "
+        f"with LSMS_ALLOW_INTREE_SOURCES=1 (or read it inside "
+        f"lsms_library.local_tools.allow_intree_sources()); if it is a stray "
+        f"copy, delete it (`lsms-library cache clear` lists them).")
 
 
 def _to_numeric(x,coerce=False):
@@ -1598,6 +1682,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 stacklevel=3,
             )
             return False
+        # GH #831: a sidecar-less source inside the config tree is refused
+        # (raises) unless the caller opted in.
+        _refuse_intree_source(fn)
         return True
     
     def file_system_path(fn):
@@ -1877,6 +1964,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
         # every cold read.
         local_path = _try_get_data_file(fn)
+        if local_path is not None:
+            # ``get_data_file`` answers from the config tree first (step 1),
+            # so the same GH #831 policy applies to what it hands back.
+            _refuse_intree_source(local_path)
         if local_path is None:
             raise FileNotFoundError(
                 errno.ENOENT,

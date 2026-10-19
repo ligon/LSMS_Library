@@ -248,9 +248,13 @@ from S3.  The command also audits the config tree, which it does not own
 and never deletes from: it names any in-tree `*.parquet` (never read, GH
 #803) and any in-tree raw source file -- `.dta`, `.sav`, `.csv`, `.dat`,
 `.dct`, `.ssp`, `.tab`, `.xls`, `.xlsx` -- distinguishing a copy beside its
-`.dvc` sidecar (refused by `get_dataframe`, disk cost only) from one with
-no sidecar, which `get_dataframe` serves in preference to the DVC blob
-(GH #831).
+`.dvc` sidecar (refused by `get_dataframe`, which reads the DVC blob instead;
+disk cost only) from one with no sidecar, which `get_dataframe` also refuses,
+raising `InTreeSourceError`, unless the caller opts in with
+`LSMS_ALLOW_INTREE_SOURCES=1` or reads inside the acquisition flow
+(`add_wave` / `populate_and_push`, which run under
+`local_tools.allow_intree_sources()`) -- GH #831.  It used to be served in
+preference to the DVC blob, silently.
 
 To clear the L1 blob cache too (rarely needed):
 
