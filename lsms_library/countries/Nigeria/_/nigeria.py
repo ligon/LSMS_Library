@@ -983,18 +983,21 @@ def assemble_plot_inputs(t, parts):
     out['t'] = t
     out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
     out['input'] = out['input'].astype('string')
-    # `u` is never NaN (GH #1047, the #1041 ruling): a row whose unit is not
-    # recorded is U_UNKNOWN.  Filled HERE, after every per-channel collapse,
-    # never per channel: `_pick_channel` / `fert_rows_long_typed` decide
-    # "one unit -> sum, mixed -> keep the largest" on the NA-aware units, and
-    # a per-channel fill would turn a blank channel into a second "unit".
-    # Measured 2026-10-19 (served rows, 5,724 in all): 164 with a quantity
-    # and no unit (a blank code, or a code with no value label); 14 with a
-    # zero; 5,546 seed rows with NO quantity (W1-W3 "no seed used on this
-    # plot" or no channel answered; W4/W5 tree crops, whose planting
-    # quantity is not asked).  See CONTENTS.org.
+    # A row that records an AMOUNT and no unit is U_UNKNOWN (GH #1047, the
+    # #1041 ruling): 178 served rows, 164 with a quantity (a blank code, or
+    # a code with no value label) and 14 with a zero.  A row that records NO
+    # quantity in any channel keeps u = NA (dispatcher decision 2026-10-19):
+    # `u` is a COLUMN here, so no groupby can delete the row, and NA says
+    # "no amount, so no unit" where `Unknown` would claim an amount.  5,546
+    # seed rows (W1-W3 "no seed used on this plot" or no channel answered;
+    # W4/W5 tree crops, whose planting quantity is not asked).  Filled HERE,
+    # after every per-channel collapse, never per channel: `_pick_channel` /
+    # `fert_rows_long_typed` decide "one unit -> sum, mixed -> keep the
+    # largest" on the NA-aware units, and a per-channel fill would turn a
+    # blank channel into a second "unit".  See CONTENTS.org.
     from lsms_library.transformations import U_UNKNOWN
-    out['u'] = out['u'].astype('string').fillna(U_UNKNOWN)
+    out['u'] = out['u'].astype('string')
+    out.loc[out['u'].isna() & out['Quantity'].notna(), 'u'] = U_UNKNOWN
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
     out = out.sort_values(['i', 'plot_id', 'input', 'crop'])

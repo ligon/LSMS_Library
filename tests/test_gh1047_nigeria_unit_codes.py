@@ -1,6 +1,7 @@
 """Nigeria unit codes: a raw code is an integer string, and crop ``u`` is never NaN.
 
-GH #1047, two halves of one rule (a unit is always a real, greppable value):
+GH #1047, two halves of one rule (a recorded amount always carries a real,
+greppable unit value):
 
 1. ``nigeria.food_acquired_for_wave`` keeps a raw unit code that the wave's
    column of the ``u`` table does not list (GH #607).  The CSV unit columns
@@ -22,9 +23,12 @@ GH #1047, two halves of one rule (a unit is always a real, greppable value):
 3. ``plot_inputs`` served ``u = NaN`` on 6,742 rows.  1,018 of them were NOT
    missing: W4/W5 record input units the harvest canonicaliser does not know
    (``210. STEMS``, ``280. METRIC CUP``, ``260. SEEDLING/PLANT``,
-   ``21. TRACTORS``), now placed by ``_canon_input_unit``.  The other 5,724
-   record no unit and are ``U_UNKNOWN``, filled once AFTER the per-channel
-   collapse.
+   ``21. TRACTORS``), now placed by ``_canon_input_unit``.  Of the other
+   5,724, the 178 that record an amount (164 positive, 14 zero) and no unit
+   are ``U_UNKNOWN``, filled once AFTER the per-channel collapse; the 5,546
+   that record NO quantity in any channel keep ``u = NA`` (dispatcher
+   decision 2026-10-19 -- ``u`` is a column here, and ``Unknown`` would
+   claim an amount).
 
 Folding an unplaceable recorded LABEL into ``Unknown`` silently would be the
 same loss under the ruling's name, so ``_canon_units`` REPORTS it
@@ -200,7 +204,11 @@ def _seed_frames(rows):
     return df, dec
 
 
-def test_plot_inputs_unit_is_never_nan_and_is_filled_after_the_collapse():
+def test_plot_inputs_unit_is_nan_only_without_an_amount_and_is_filled_after_the_collapse():
+    """An AMOUNT with no unit is ``U_UNKNOWN`` (the #1041 ruling); a row that
+    records no quantity in any channel keeps ``u = NA`` (dispatcher decision
+    2026-10-19: ``u`` is a column here, and ``Unknown`` would claim an
+    amount the row does not have)."""
     nigeria = _nigeria_module()
     df, dec = _seed_frames([
         (2.0, '1. KILOGRAMS', np.nan, np.nan),     # one channel, Kg
@@ -208,6 +216,7 @@ def test_plot_inputs_unit_is_never_nan_and_is_filled_after_the_collapse():
         (np.nan, np.nan, np.nan, np.nan),          # nothing recorded
         (np.nan, np.nan, np.nan, '1. KILOGRAMS'),  # no qty; unit on channel 1
         (4.0, '210. STEMS', np.nan, np.nan),       # an input-only unit
+        (0.0, np.nan, np.nan, np.nan),             # a zero is an amount
     ])
     seeds = nigeria.seed_rows_for_wave(
         df, dec, 'hhid', 'plotid', 'cropcode',
@@ -215,14 +224,18 @@ def test_plot_inputs_unit_is_never_nan_and_is_filled_after_the_collapse():
         crop_labels={1010: 'Maize'})
     out = nigeria.assemble_plot_inputs('2018Q3', [seeds])
     u = out.reset_index().set_index('i')['u']
-    assert not out['u'].isna().any(), out['u'].tolist()
+    q = out.reset_index().set_index('i')['Quantity']
+    # NA only where there is no amount; never where there is one
+    assert out.loc[out['u'].isna(), 'Quantity'].isna().all(), out.to_dict()
     assert u['1'] == 'Kg'
     assert u['2'] == U_UNKNOWN
-    assert u['3'] == U_UNKNOWN
-    # a per-CHANNEL fill would hand row 4 channel 0's 'Unknown' instead
+    assert pd.isna(q['3']) and pd.isna(u['3']), (q['3'], u['3'])
+    # a per-CHANNEL fill would hand row 4 channel 0's 'Unknown' instead; a
+    # recorded unit on a row with no amount is kept as recorded
     assert u['4'] == 'Kg'
     assert u['5'] == 'Stem'
-    assert len(out) == 5
+    assert q['6'] == 0 and u['6'] == U_UNKNOWN, (q['6'], u['6'])
+    assert len(out) == 6
 
 
 def test_crop_frame_without_a_unit_column_is_unknown():
@@ -286,12 +299,23 @@ def test_no_crop_row_has_a_nan_unit(crop_production):
 @pytest.mark.requires_s3
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_no_plot_input_has_a_nan_unit(plot_inputs):
+    """``u`` is NA only on a row with no quantity (dispatcher decision
+    2026-10-19); a row with an amount and no unit is ``U_UNKNOWN``."""
     u = plot_inputs['u']
-    assert not u.isna().any(), int(u.isna().sum())
+    q = plot_inputs['Quantity']
+    # NA only where Quantity is NA -- an amount always carries a unit value
+    assert q[u.isna()].isna().all(), int((u.isna() & q.notna()).sum())
+    # and a row with no amount is never given Unknown
+    assert not ((u == U_UNKNOWN) & q.isna()).any(), int(
+        ((u == U_UNKNOWN) & q.isna()).sum())
+    # 5,546 no-quantity seed rows on the 2026-10-19 build; floor and ceiling
+    # catch a fill that over-fires (0) or a new class of NaN unit.
+    assert 5000 < u.isna().sum() < 6000, int(u.isna().sum())
     assert not u.astype(str).str.fullmatch(r'[\d.]+').any()
     # The input-only units are placed, not folded into Unknown.
     served = set(u.dropna())
     assert {'Stem', 'Metric Cup', 'Seedling/Plant', 'Tractor'} <= served, served
-    # 5,724 on the 2026-10-19 build.  The ceiling is what catches the four
-    # labels above falling back to Unknown (6,742 would be every former NaN).
-    assert 5000 < (u == U_UNKNOWN).sum() < 6500
+    # 178 on the 2026-10-19 build (164 with a quantity, 14 with a zero).  The
+    # ceiling is what catches the four labels above falling back to Unknown
+    # (1,018 more rows).
+    assert 100 < (u == U_UNKNOWN).sum() < 300, int((u == U_UNKNOWN).sum())
