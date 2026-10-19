@@ -125,13 +125,6 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         (_DERIVATIONS_ATTRS_KEY,),
         _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
     ),
-    # GH #851 Phase II: the `period=` conversion record, `{country: {...}}` on
-    # the Country frame (same shape as recall), so it needs no per-country wrap.
-    _AttrsCarrier(
-        "period",
-        (_PERIOD_ATTRS_KEY,),
-        _merge_into(_PERIOD_ATTRS_KEY, _period_merge_attrs),
-    ),
     # GH #787 item 3: the `labels=X` pass-through report.  Flat on the Country
     # frame (`country._audit_label_pass_through`), so it is keyed by country at
     # capture and served as `{country: report}` on the assembled frame.
@@ -140,6 +133,13 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         ("labels_unmatched",),
         _merge_into("labels_unmatched", _labels_merge_reports),
         per_country=True,
+    ),
+    # GH #851 Phase II: the `period=` conversion record, `{country: {...}}` on
+    # the Country frame (same shape as recall), so it needs no per-country wrap.
+    _AttrsCarrier(
+        "period",
+        (_PERIOD_ATTRS_KEY,),
+        _merge_into(_PERIOD_ATTRS_KEY, _period_merge_attrs),
     ),
 )
 

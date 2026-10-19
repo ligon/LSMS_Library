@@ -56,9 +56,11 @@ class TestTheRegistry:
     """A carrier is data, not code -- that is the whole point of GH #873."""
 
     def test_every_carrier_is_registered(self):
-        # `labels_unmatched` added for GH #787 item 3.
+        # `labels_unmatched` added for GH #787 item 3; `period` for GH #851
+        # Phase II (the `period=` conversion record).
         assert [c.name for c in F._ATTRS_CARRIERS] == \
-            ["population", "recall", "derivations", "labels_unmatched"]
+            ["population", "recall", "derivations", "labels_unmatched",
+             "period"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -84,7 +86,7 @@ class TestTheRegistry:
             k for c in F._ATTRS_CARRIERS for k in c.keys}
         assert set(F._CARRIED_ATTRS_KEYS) == {
             P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
-            "labels_unmatched"}
+            "labels_unmatched", R.PERIOD_ATTRS_KEY}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
@@ -96,7 +98,8 @@ class TestTheRegistry:
         for carrier, merge in ((F._ATTRS_CARRIERS[1], R.merge_attrs),
                                (F._ATTRS_CARRIERS[2], D.merge_attrs),
                                (F._ATTRS_CARRIERS[3],
-                                merge_label_pass_through_reports)):
+                                merge_label_pass_through_reports),
+                               (F._ATTRS_CARRIERS[4], R.merge_period_attrs)):
             closed_over = {c.cell_contents for c in carrier.attach.__closure__}
             assert merge in closed_over, \
                 f"{carrier.name} does not call its module's merge_attrs"
