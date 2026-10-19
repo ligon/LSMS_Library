@@ -65,8 +65,18 @@ def test_cache_freshness_itself_still_grades_hashless_as_legacy(tmp_path):
 
 
 def test_the_wave_tier_still_trusts_once_and_stamps():
-    """`Wave.grab_data` keeps the legacy branch; only the country gate changed."""
-    src = inspect.getsource(country_mod.Wave.grab_data)
+    """`Wave.grab_data` keeps the legacy branch; only the country gate changed.
+
+    GH #1040 moved the YAML-path L2-wave read gate out of the tagged
+    `grab_data` into `Wave._read_l2_wave_cache`.  Read the UNION, as
+    `_country_read_path_source` below does for #908 -- and require that
+    `grab_data` still calls the gate, so the union cannot be satisfied by a
+    helper nothing reaches.  (Delivered behaviour: tests/
+    test_gh1040_wave_read_gates.py::test_site1_legacy_is_trusted_once_and_stamped.)
+    """
+    grab = inspect.getsource(country_mod.Wave.grab_data)
+    assert "self._read_l2_wave_cache(" in grab, "grab_data no longer calls the wave gate"
+    src = grab + inspect.getsource(country_mod.Wave._read_l2_wave_cache)
     assert "stamp_parquet_hash" in src, (
         "the wave tier lost its trust-once-and-stamp; #809 is country-tier only"
     )

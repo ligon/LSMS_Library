@@ -1534,6 +1534,94 @@ class Wave:
             data_root(self.country.name) / self.wave_folder / "_" / f"{request}.parquet",
         ]
 
+    def _read_l2_wave_cache(self, request: str, cache_path: Path) -> pd.DataFrame | None:
+        """The YAML-path L2-wave READ GATE: the parquet at *cache_path*, or None.
+
+        ``None`` is every miss -- no parquet, ``LSMS_NO_CACHE`` set, a STALE
+        content hash, a degraded build whose dropped source is readable again
+        (GH #675), or a parquet that cannot be read -- and the caller then
+        extracts from source.  A hit is the parquet exactly as stored.
+
+        **MECHANISM, not content (GH #1040).**  Like the country tier's
+        :meth:`Country._read_l2_country_cache` (GH #908) this grades a parquet
+        an earlier build wrote and decides whether to serve it; it determines
+        no byte of what a build writes, so it is listed in
+        ``_build_registry._EXCLUDED_CALLABLES``.  It was closure text inside
+        the tagged ``grab_data`` until #1040, so every edit to it moved every
+        table's build fingerprint.  Anything that shapes a BUILD belongs in
+        ``grab_data``, not here.
+
+        Differs from the country gate on purpose: a hashless parquet grades
+        ``legacy`` and is trusted once and STAMPED here (GH #809 changed the
+        country tier only), and ``LSMS_NO_CACHE`` is read by truthiness.
+        """
+        if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
+            # v0.8.0 content-hash staleness for the YAML-path L2-wave
+            # parquet (same classification as L2-country; see
+            # Country._read_l2_country_cache).  Stale -> miss: the caller
+            # re-extracts from source.
+            expected_wave_hash = self._input_hash(request)
+            # GH #675: a wave parquet whose build dropped a sub-df it could
+            # not read -- costing a declared column -- is a miss once its
+            # source is readable again (heal); otherwise it is served, and
+            # warned, below.  Graded BEFORE freshness: a stale parquet still
+            # spends this key's one retry.
+            wave_drops = read_parquet_build_drops(cache_path)
+            degraded_verdict, _ = _degraded_cache_verdict(
+                wave_drops, (self.country.name, request, self.year))
+            if (cache_freshness(cache_path, expected_wave_hash) != "stale"
+                    and degraded_verdict != "rebuild"):
+                try:
+                    df_cached = pd.read_parquet(cache_path)
+                except (OSError, ArrowInvalid):
+                    df_cached = None
+                if df_cached is not None:
+                    if (expected_wave_hash is not None
+                            and read_parquet_cache_hash(cache_path) is None):
+                        stamp_parquet_hash(cache_path, expected_wave_hash)
+                    # GH #868: a report filed INSIDE this wave's build (a
+                    # df_edit hook's reduce_to_agreed) can only be replayed
+                    # from the stamp -- the hook did not run on this hit.
+                    _replay_wave_stamp(cache_path, self.country.name, request, self.year)
+                    # GH #675: carry the drop record to the country stamp.
+                    _replay_build_drops(wave_drops, self.country.name, request)
+                    # stacklevel=4 (_warn_degraded_serve -> this method ->
+                    # grab_data -> its caller) names the frame the pre-#1040
+                    # stacklevel=3 named from inside grab_data.
+                    _warn_degraded_serve(self.country.name, request, wave_drops,
+                                         cache_path, wave=self.year, stacklevel=4)
+                    return df_cached
+        return None
+
+    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> Path | None:
+        """The script-path READ GATE: the first existing, non-STALE candidate.
+
+        ``None`` sends ``grab_data`` to Make.  A hashless candidate grades
+        ``legacy`` and is selected -- the v0.8.0 upgrade path for parquets
+        under ``data_root`` and exactly why an in-tree file must never be a
+        candidate (GH #803) -- and it is NOT stamped: script-written wave
+        parquets are hashless by design, and stamping one merely read would
+        mask staleness and defeat Make's mtime check (v0.8.0 CRITICAL-2).
+        Skipping a STALE candidate makes a script/source edit force Make to
+        rebuild it.  Neither the GH #675 drop record nor ``LSMS_NO_CACHE`` is
+        consulted at this site.
+
+        **MECHANISM, not content (GH #1040)** -- see
+        :meth:`_read_l2_wave_cache`.  *candidates* is computed by the caller:
+        which paths are candidates is build logic and stays fingerprinted.
+        """
+        expected_wave_hash = self._input_hash(request)
+        for candidate in candidates:
+            if candidate.exists():
+                if cache_freshness(candidate, expected_wave_hash) == "stale":
+                    logger.debug(
+                        f"v0.8.0 wave cache STALE: {request} at {candidate}; "
+                        f"will rebuild via Make"
+                    )
+                    continue
+                return candidate
+        return None
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -1563,38 +1651,13 @@ class Wave:
         if data_info:
             cache_path = (data_root(self.country.name) / self.year / '_'
                           / f'{request}.parquet')
-            if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
-                # v0.8.0 content-hash staleness for the YAML-path L2-wave
-                # parquet (same classification as L2-country; see
-                # load_dataframe_with_dvc).  Stale -> fall through and
-                # re-extract from source below.
-                expected_wave_hash = self._input_hash(request)
-                # GH #675: a wave parquet whose build dropped a sub-df it could
-                # not read -- costing a REQUIRED column -- is a miss once its
-                # source is readable again (heal); otherwise it is served, and
-                # warned, below.
-                wave_drops = read_parquet_build_drops(cache_path)
-                degraded_verdict, _ = _degraded_cache_verdict(
-                    wave_drops, (self.country.name, request, self.year))
-                if (cache_freshness(cache_path, expected_wave_hash) != "stale"
-                        and degraded_verdict != "rebuild"):
-                    try:
-                        df_cached = pd.read_parquet(cache_path)
-                    except (OSError, ArrowInvalid):
-                        df_cached = None
-                    if df_cached is not None:
-                        if (expected_wave_hash is not None
-                                and read_parquet_cache_hash(cache_path) is None):
-                            stamp_parquet_hash(cache_path, expected_wave_hash)
-                        # GH #868: a report filed INSIDE this wave's build (a
-                        # df_edit hook's reduce_to_agreed) can only be replayed
-                        # from the stamp -- the hook did not run on this hit.
-                        _replay_wave_stamp(cache_path, self.country.name, request, self.year)
-                        # GH #675: carry the drop record to the country stamp.
-                        _replay_build_drops(wave_drops, self.country.name, request)
-                        _warn_degraded_serve(self.country.name, request, wave_drops,
-                                             cache_path, wave=self.year)
-                        return df_cached
+            # The L2-wave READ GATE lives in its own method, excluded from the
+            # build fingerprint (GH #1040): it decides WHETHER to serve the
+            # parquet an earlier build wrote, never what a build writes.  A
+            # hit is returned as stored -- no map_index, no t filter, no write.
+            df_cached = self._read_l2_wave_cache(request, cache_path)
+            if df_cached is not None:
+                return df_cached
 
         def check_adding_t(df):
             index_list = df.index.names
@@ -1928,26 +1991,11 @@ class Wave:
             if intree_artefact:
                 _warn_intree_parquet_artefact(make_target_intree, self.name, request)
 
-            # Check if the parquet already exists before invoking Make.
-            # v0.8.0: skip a candidate whose embedded hash is STALE so a
-            # script/source edit forces Make to rebuild it (closes the
-            # "stale L2-wave parquet shadows a source-script fix" gap
-            # documented in CLAUDE.md "Cache Behavior").  A hashless
-            # candidate grades ``legacy`` and is trusted: that is the v0.8.0
-            # upgrade path for parquets UNDER data_root, and it is exactly
-            # why an in-tree file must never be a candidate (GH #803).
-            expected_wave_hash = self._input_hash(request)
-            parquet_fn = None
-            for candidate in candidates:
-                if candidate.exists():
-                    if cache_freshness(candidate, expected_wave_hash) == "stale":
-                        logger.debug(
-                            f"v0.8.0 wave cache STALE: {request} at {candidate}; "
-                            f"will rebuild via Make"
-                        )
-                        continue
-                    parquet_fn = candidate
-                    break
+            # Check if the parquet already exists before invoking Make: the
+            # script-path READ GATE, in its own method and excluded from the
+            # build fingerprint (GH #1040).  Which paths are candidates is
+            # still decided here (_script_parquet_candidates is build logic).
+            parquet_fn = self._fresh_script_parquet(request, candidates)
 
             if parquet_fn is None:
                 makefile_path = self.file_path.parent /'_'/ "Makefile"
@@ -4165,7 +4213,9 @@ class Country:
         # from a legitimate build after the fact.
         #
         # Scoped to THIS call site deliberately.  The two wave-tier
-        # calls (`Wave.grab_data`, `run_make_target`) must keep their
+        # gates (`Wave._read_l2_wave_cache`, `Wave._fresh_script_parquet`,
+        # both reached from `Wave.grab_data` -- `run_make_target` grades
+        # nothing) must keep their
         # `legacy` grade: script-path L2-wave parquets are written
         # hashless BY DESIGN, so grading them stale would rebuild on
         # every read forever.  Those are handled by
@@ -4267,6 +4317,56 @@ class Country:
                 stacklevel=3,
             )
             return None, covered, f"read-error: {cache_read_error!r}"
+
+    def _read_assumed_fresh_cache(self, method_name: str,
+                                  waves: list[str]) -> pd.DataFrame | None:
+        """The ``assume_cache_fresh`` short-circuit: ``var/<table>.parquet``
+        served WITHOUT a hash check, or None to take the ordinary path.
+
+        A hit is returned pre-finalize, restricted to *waves* where the #891
+        manifest says it covers them; ``_aggregate_wave_data`` finalizes it.
+        Neither the content hash nor the GH #675 degraded grade is consulted
+        -- that is the contract (CLAUDE.md "Cache Behavior", limitation (c)).
+
+        **MECHANISM, not content (GH #1040).**  It decides whether to serve a
+        parquet some earlier build wrote and determines no byte of what a build
+        writes, so it is listed in ``_build_registry._EXCLUDED_CALLABLES``, like
+        :meth:`_read_l2_country_cache` (GH #908).  Until #1040 this was closure
+        text inside the tagged ``_aggregate_wave_data``.  (``map_index`` and
+        ``_restrict_to_waves`` stay fingerprinted through their build-path
+        call sites.)
+        """
+        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
+        if prefer_parquet_cache:
+            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            if parquet_path.exists():
+                # GH #892: this branch used to return the parquet whole,
+                # ignoring `waves` entirely -- a one-wave request was served
+                # every wave in the cache, silently.  Nothing downstream
+                # filters, so the restriction has to happen here.
+                #
+                # It went unnoticed because on the ORDINARY path the pre-#891
+                # hash folded in the requested wave set, so a subset request
+                # graded `stale` and rebuilt; the #891 defect was what masked
+                # this one.  Making the hash wave-independent removes that
+                # accidental guard, so the two must be fixed together.
+                #
+                # `assume_cache_fresh` skips the hash check by contract, so
+                # coverage rests on the manifest alone: absent it (a pre-#891
+                # parquet), fall through to the normal path rather than guess.
+                covered = read_parquet_cache_waves(parquet_path)
+                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    return self._restrict_to_waves(df_cached, waves)
+                if covered is None and set(waves) == set(self.waves):
+                    df_cached = get_dataframe(parquet_path)
+                    return map_index(df_cached)
+                logger.debug(
+                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
+                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
+                )
+        return None
 
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded
@@ -4478,38 +4578,11 @@ class Country:
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
 
-        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
-        if prefer_parquet_cache:
-            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
-            if parquet_path.exists():
-                # GH #892: this branch used to return the parquet whole,
-                # ignoring `waves` entirely -- a one-wave request was served
-                # every wave in the cache, silently.  Nothing downstream
-                # filters, so the restriction has to happen here.
-                #
-                # It went unnoticed because on the ORDINARY path the pre-#891
-                # hash folded in the requested wave set, so a subset request
-                # graded `stale` and rebuilt; the #891 defect was what masked
-                # this one.  Making the hash wave-independent removes that
-                # accidental guard, so the two must be fixed together.
-                #
-                # `assume_cache_fresh` skips the hash check by contract, so
-                # coverage rests on the manifest alone: absent it (a pre-#891
-                # parquet), fall through to the normal path rather than guess.
-                covered = read_parquet_cache_waves(parquet_path)
-                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    df_cached = get_dataframe(parquet_path)
-                    df_cached = map_index(df_cached)
-                    df_cached = self._restrict_to_waves(df_cached, waves)
-                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
-                if covered is None and set(waves) == set(self.waves):
-                    df_cached = get_dataframe(parquet_path)
-                    df_cached = map_index(df_cached)
-                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
-                logger.debug(
-                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
-                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
-                )
+        # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
+        # excluded from the build fingerprint (GH #1040).
+        df_cached = self._read_assumed_fresh_cache(method_name, waves)
+        if df_cached is not None:
+            return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
 
         if (
             not self._panel_ids_attempted
@@ -7368,8 +7441,14 @@ def _describe_missing(degraded: list[dict]) -> str:
 
 
 def _warn_degraded_serve(country: str, table: str, drops: Any,
-                         path: Path | str, wave: str | None = None) -> None:
-    """Say, loudly and specifically, that a degraded parquet is being served."""
+                         path: Path | str, wave: str | None = None,
+                         stacklevel: int = 3) -> None:
+    """Say, loudly and specifically, that a degraded parquet is being served.
+
+    *stacklevel* counts from this function: the default names the caller of
+    the read gate that called it (``Country._read_l2_country_cache`` ->
+    ``load_dataframe_with_dvc``); ``Wave._read_l2_wave_cache`` passes 4 so its
+    warning still names ``grab_data``'s caller (GH #1040)."""
     degraded = _degraded_drops(drops)
     if not degraded:
         return
@@ -7392,7 +7471,7 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
         f"Detail: {detail}",
         country=country, table=table, missing=missing, files=files,
         missing_optional=missing_optional),
-        stacklevel=3)
+        stacklevel=stacklevel)
 
 
 def _replay_build_drops(drops: Any, country: str, table: str) -> None:
