@@ -198,8 +198,9 @@ def test_index_unique_no_grain_warning_no_null_read(gsps_labor):
 @pytest.mark.requires_s3
 def test_v_is_joined_from_sample(gsps_labor):
     """plot_labor is in neither exclusion list of lsms_library/data_info.yml
-    (absent from index_info AND from `Join v from sample > skip_extra`), so
-    _join_v_from_sample() attaches v."""
+    (its `index_info` entry KEEPS `v` -- registered under GH #569 -- and it is
+    absent from `Join v from sample > skip_extra`), so _join_v_from_sample()
+    attaches v."""
     df, _, _ = gsps_labor
     assert "v" in df.columns
     assert df["v"].notna().all()
