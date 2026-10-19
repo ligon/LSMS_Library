@@ -1110,3 +1110,34 @@ visits across multiple vagues and =groupby.first()= also conflicts with
 this file's one-vague-per-grappe convention and the signed current
 reducer. That documentation tension is separate from the demonstrated
 datetime loss; it does not authorize a visit-key or reducer change.
+
+* 2026-10-18 -- =interview_date= parsed at build time (GH #1045 run 1)
+
+Every wave declares a =datetime:= spec for =Int_t= in its =data_info.yml=
+and the framework parses it at build time
+(=lsms_library/datetime_parse.py=); every parquet, wave and country, now
+stores =timestamp[us]= (the country parquet stored =large_string=, and the
+EAC-I wave parquets =timestamp[ms]=).
+- EAC-I 2014-15 / 2017-18: components =(s00q22y, s00q22m, s00q22j)= and
+  =(s0q21c, s0q21b, s0q21a)=, read as the numeric codes
+  (=converted_categoricals: False=; the labels read ='Année 2017'= /
+  ='Septembre'=, which the parser would also accept).  The 2014-15 =df_edit=
+  hook still ranks the two passages into =visit=, now on an already-parsed
+  column.
+- EHCVM 2018-19 / 2021-22: =s00q23a= is a Survey Solutions stamp
+  ='YYYY-MM-DDTHH:MM:SS'=, parsed with that =format=.  *=resolution: day=* is
+  declared because the date has always been served at midnight: the old
+  country-level =mali.py:Int_t= formatter took =.date()= (and treated
+  ='Manquant'= as missing -- now a declared sentinel; 0 occurrences).
+  *Serving the recorded time of day is an open decision*, not taken here --
+  Tanzania's NPS stamps do keep theirs.
+- Removed: =mali.py:Int_t= and =mali.py:interview_date(df)=, and the wave
+  =Int_t= formatters in 2014-15 / 2017-18.  The 2018-19 / 2021-22 wave-level
+  =interview_date(value)= pass-throughs (which shadowed the country hook as
+  the table's =df_edit=) are now harmless no-ops; left in place.
+
+Measured against a base-commit build in a separate data root: 24,939 rows,
+*0 differences*, cold and fresh-process warm.  The charter expected Mali to
+recover PR #1025 =NaT= / ambiguity rows; there were none to recover (the
+base build already served 0 =NaT=).  Every per-wave parse report is clean
+(=parsed= = n), so Mali emits no date warning.

@@ -1972,6 +1972,35 @@ On a separate complete warm-cache copy, concatenating ordinary
 22,427-row cold result without changing cache files. This is a bounded
 workaround for the verified cache/environment, not an all-wave fix.
 
+* 2026-10-18 -- =interview_date= parsed at build time (GH #1045 run 1)
+
+Every wave now parses =int_t= with the one build-time parser
+(=lsms_library/datetime_parse.py=) and stores =timestamp[us]= at both cache
+tiers (the country parquet stored =large_string= before).
+- =2008-15/_/interview_date.py= (script path, *one folder, four rounds*):
+  =assign_datetime= on =ha_18_3= (year, float) / =ha_18_2= (month *name*,
+  ='DECEMBER'=) / =ha_18_1= (day, float), run AFTER the asserted
+  =(r_hhid, round)= dedup so its counts are served households, not
+  replicated panel lines.  Reports are per *round* =t=, not per folder.  The
+  dedup assert now checks the raw components rather than the parsed date.
+  The script hands its report to =to_parquet(datetime_audit=...)=: it runs
+  in a =make= subprocess, so the stamp is the only way the report reaches a
+  warm read.
+- =2019-20= / =2020-21= (YAML path): =datetime: hh_a18=,
+  =format: '%Y-%m-%dT%H:%M:%S'=; the time of day is kept, as it always has
+  been served.  Their =_/interview_date.py= scripts were DEAD (the YAML block
+  wins in =grab_data=; one stripped the time with =.dt.date=) and are gone.
+
+*Contradiction with the #798 entry above, which says "the six genuinely
+null raw dates are still dropped".*  Parsed from the source components, the
+six are not all null: *4* are blank in every component, *1* is a recorded
+=2009/FEBRUARY/31= (2008-09; now =out_of_range=, still =NaT=, and reported
+on every read as a =DatetimeParseWarning=), and *1* records a year and month
+with no day (2010-11, =i=08010060090321=), which is now served as
+2010-11-01 with =Derivation= =::::date-day-imputed=.  Served rows 22,427 ->
+22,428; 0 value differences on the 22,427 common rows (measured against a
+base-commit build in a separate data root).
+
 * 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
 
 The three tables are computed at read time from =food_acquired= by
