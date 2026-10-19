@@ -97,7 +97,7 @@ class TestTheRegistry:
         """The union rule belongs to the module that defines the record.
         `feature.py` must not grow a second, drifting copy of it."""
         assert F._ATTRS_CARRIERS[0].attach is P.merge_attrs
-        assert F._ATTRS_CARRIERS[4].attach is S.merge_attrs
+        assert F._ATTRS_CARRIERS[5].attach is S.merge_attrs
         # recall / derivations return the union rather than writing it, so they
         # are wrapped -- but the wrapper closes over the module's own function.
         from lsms_library.country import merge_label_pass_through_reports
