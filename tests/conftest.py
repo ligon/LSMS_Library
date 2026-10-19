@@ -58,28 +58,68 @@ def aws_creds_available() -> bool:
 
     (Kept as a plain function rather than a fixture so it can be used at module
     scope in a ``pytest.mark.skipif``, which is where most callers need it.)
-    NOTE a subtlety that cost an hour to pin down: the in-tree
-    ``lsms_library/countries/.dvc/s3_creds`` is **not tracked in git** -- it is
-    WRITTEN AT IMPORT TIME by the auto-unlock in ``data_access``.  So it exists
-    on any machine that has imported the package with a valid WB API key, and
-    does NOT exist under ``LSMS_SKIP_AUTH=1`` (which is exactly what the CI
-    ``unit-tests`` job sets).  That is why this check reflects CI's real state
-    rather than merely the checkout's.  Testing this helper without also
-    setting ``LSMS_SKIP_AUTH=1`` will mislead you: a bare ``git worktree`` looks
-    credential-free until the first import creates the file.
+
+    Where it looks, in order (GH #1001):
+
+      1. exported ``AWS_ACCESS_KEY_ID`` + ``AWS_SECRET_ACCESS_KEY``;
+      2. the library's own reader-credentials file,
+         ``lsms_library.config.s3_creds_path()`` (``$LSMS_S3_CREDS`` ->
+         ``<config dir>/s3_creds``) -- the file ``DVCFileSystem`` is
+         actually handed, so a user-config-only setup runs these tests;
+      3. LEGACY: the in-tree ``lsms_library/countries/.dvc/s3_creds``.  The
+         library no longer writes it (it used to mirror (2) there at import
+         time, GH #1001), but CI's ``data-tests`` and reachability jobs
+         still create it by hand before anything imports the package, and
+         an older clone may still hold one.
+
+    ``s3_creds_path`` is loaded from ``lsms_library/config.py`` BY FILE, not
+    imported: ``import lsms_library.config`` runs the package ``__init__``
+    and its auth flow at collection time, which this check must not do.
+    ``config.py`` imports nothing from the package, so the by-file load is
+    the real resolver rather than a copy of it.
+
+    Under ``LSMS_SKIP_AUTH=1`` on a fresh runner (the CI ``unit-tests``
+    job) none of the three exists, so this still reflects CI's real state.
+    Note that on a developer machine the auto-unlock writes (2) on the first
+    ordinary import, so a checkout looks credential-free only until then.
     """
     if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
-    creds_file = (
-        Path(__file__).parent.parent
-        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
-    )
-    if creds_file.exists():
+    config = _lsms_config()
+    user_creds = config.s3_creds_path() if config is not None else None
+    for creds_file in (user_creds, _LEGACY_INTREE_CREDS):
+        if creds_file is None:
+            continue
         try:
-            return "aws_access_key_id" in creds_file.read_text()
+            if creds_file.exists() and "aws_access_key_id" in creds_file.read_text():
+                return True
         except OSError:
-            return False
+            continue
     return False
+
+
+#: The in-tree file only CI (and older clones) still create; see above.
+_LEGACY_INTREE_CREDS = (
+    Path(__file__).parent.parent / "lsms_library" / "countries" / ".dvc" / "s3_creds"
+)
+
+
+def _lsms_config():
+    """``lsms_library/config.py`` loaded by path (see ``aws_creds_available``).
+
+    ``None`` when this file is not inside a checkout -- ``test_conftest_net``
+    runs a COPY of it in a pytester tmp root, where neither the package nor
+    any credential file exists, and that copy must see no credentials.
+    """
+    import importlib.util
+
+    path = Path(__file__).parent.parent / "lsms_library" / "config.py"
+    if not path.is_file():
+        return None
+    spec = importlib.util.spec_from_file_location("_conftest_lsms_config", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 requires_s3 = pytest.mark.skipif(

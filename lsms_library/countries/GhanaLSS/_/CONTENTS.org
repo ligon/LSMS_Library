@@ -2938,13 +2938,19 @@ Still NOT wired (genuine blockers, not feature gaps to close cheaply):
 
 Read this before touching any =mapping.py= or any =Code | Label= table here.
 
-** Trap 1: a bare =get_categorical_mapping= returns an EMPTY dict, silently
+** Trap 1: a bare =get_categorical_mapping= returned an EMPTY dict, silently (raises =TypeError= since GH #674)
+
+/2026-10-17 (GH #674, Sue):/ the bare form now raises =TypeError= before any
+file is read, naming =code_label_map= as the alternative, so this trap can no
+longer ship a null column.  The history below is kept because it explains
+=code_label_map='s dual keys and the =assert ..., 'decoded to an EMPTY dict'=
+guards in this country's scripts.
 
 =local_tools.get_categorical_mapping(tablename=X)= called *without* a
-value-column keyword returns =\{\}=.  It passes =idxvars='Code'= and no myvars,
-so =df_data_grabber= drops the Label column and the =.squeeze()= yields
-nothing.  Nothing raises.  Every lookup then misses, returns =pd.NA=, and the
-column ships 100% null while the build reports success.
+value-column keyword used to return =\{\}=.  It passed =idxvars='Code'= and no
+myvars, so =df_data_grabber= dropped the Label column and the =.squeeze()=
+yielded nothing.  Nothing raised.  Every lookup then missed, returned =pd.NA=,
+and the column shipped 100% null while the build reported success.
 
 This has bitten GhanaLSS *three separate times*:
 
@@ -5210,3 +5216,17 @@ under the 1998-99 wave reducer are a separate upstream loss, not the
 cohort counted here.  Choosing a source-supported unit/cluster treatment
 or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
 this note changes neither identifiers nor measures.
+
+* =food_acquired.u = 'None'= -- meaning UNVERIFIED, served inferred kilograms (GH #962, 2026-10-17)
+
+=_/unit_labels.org= maps the raw labels =None= / =none= to the Preferred
+Label =None=.  Measured on a fresh corpus: *2,508 rows, all =s = produced=*
+(1998-99: 88, 2005-06: 1,450, 2012-13: 970), 2,475 priced, and every one is
+served an inferred kg factor (=item_unit= 1,745, =unit= 653,
+=item_unit_tight= 110): 3.90e4 kg of the country's 1.108e7 (0.35%).  If
+"None" is the respondent's "no unit" it is a missing-unit spelling that
+=transformations._U_SENTINELS= does not know (cf. Nigeria's library-minted
+='None'=); if it is a real answer ("none -- loose/unmeasured") it is a unit.
+*Not established* -- the questionnaires were not checked -- so it is recorded
+as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
+(already a sentinel: served =none=).

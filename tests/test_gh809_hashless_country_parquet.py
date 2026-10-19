@@ -76,8 +76,18 @@ def test_the_wave_tier_still_trusts_once_and_stamps():
 # The country tier no longer trusts, and no longer stamps
 # --------------------------------------------------------------------------
 
+def _country_read_path_source() -> str:
+    # GH #908 moved the L2-country read gate out of the tagged
+    # _aggregate_wave_data closure into Country._read_l2_country_cache (so an
+    # edit to it no longer cold-rebuilds the corpus).  Both pins below read the
+    # UNION of the two, so neither can be satisfied by the code simply having
+    # moved: the downgrade must exist in one of them, the stamp in neither.
+    return (inspect.getsource(country_mod.Country._aggregate_wave_data)
+            + inspect.getsource(country_mod.Country._read_l2_country_cache))
+
+
 def test_the_country_gate_converts_legacy_to_stale():
-    src = inspect.getsource(country_mod.Country._aggregate_wave_data)
+    src = _country_read_path_source()
     assert 'freshness == "legacy"' in src and 'freshness = "stale"' in src, (
         "the country-tier gate no longer downgrades a hashless parquet (GH #809)"
     )
@@ -85,7 +95,7 @@ def test_the_country_gate_converts_legacy_to_stale():
 
 def test_the_country_gate_never_stamps_a_parquet_it_served():
     """Stamping unverified content is what made the defect permanent."""
-    src = inspect.getsource(country_mod.Country._aggregate_wave_data)
+    src = _country_read_path_source()
     assert "stamp_parquet_hash" not in src, (
         "the country-tier read path stamps a hash onto a parquet it did not "
         "verify -- that is the laundering #809 is about"
@@ -96,16 +106,50 @@ def test_the_country_gate_never_stamps_a_parquet_it_served():
 # Delivered: a de-stamped parquet rebuilds ONCE, then serves
 # --------------------------------------------------------------------------
 
-def _warm(country: str, table: str) -> Path | None:
-    p = data_root() / country / "var" / f"{table}.parquet"
-    return p if p.exists() else None
+@pytest.fixture
+def private_country_root(tmp_path):
+    """A private ``LSMS_DATA_DIR`` holding a COPY of one country's warm cache.
+
+    The test below de-stamps ``var/<table>.parquet`` and forces a rebuild,
+    which (since GH #866) deletes the file first.  In the shared root that
+    window is visible to every other xdist worker reading the cell -- a
+    different file, so ``--dist=loadfile`` does not separate them (GH #778).
+    Copy the country's subtree into ``tmp_path``, symlink ``dvc-cache`` to the
+    real blob store, and flip the root with a before/finally
+    ``data_root.cache_clear()`` (the discipline of
+    ``test_gh866...::private_helper_root``).  Yields
+    ``isolate(country, table) -> Path``, skipping before any copy if cold.
+    """
+    shared = data_root()
+    root = tmp_path / "data"
+    root.mkdir()
+    with pytest.MonkeyPatch.context() as patch:
+        def isolate(country: str, table: str) -> Path:
+            src = shared / country / "var" / f"{table}.parquet"
+            if not src.exists():
+                pytest.skip(f"{country}/{table} not warm")
+            blobs = shared / "dvc-cache"
+            if blobs.exists() and not (root / "dvc-cache").exists():
+                (root / "dvc-cache").symlink_to(blobs.resolve(), target_is_directory=True)
+            shutil.copytree(shared / country, root / country, symlinks=True)
+            patch.setenv("LSMS_DATA_DIR", str(root))
+            data_root.cache_clear()
+            assert data_root() == root
+            return root / country / "var" / f"{table}.parquet"
+        try:
+            yield isolate
+        finally:
+            patch.undo()
+            data_root.cache_clear()
+            shutil.rmtree(root, ignore_errors=True)
 
 
 @pytest.mark.parametrize("country,table", [
     ("China", "cluster_features"),      # YAML path
     ("Cambodia", "food_acquired"),      # make path -- the class #809 names
 ])
-def test_a_destamped_parquet_rebuilds_once_and_does_not_loop(country, table):
+def test_a_destamped_parquet_rebuilds_once_and_does_not_loop(country, table,
+                                                              private_country_root):
     """The loop is the risk worth measuring, not the rebuild.
 
     If the rebuild descent wrote the country parquet hashless too, "hashless is
@@ -114,9 +158,7 @@ def test_a_destamped_parquet_rebuilds_once_and_does_not_loop(country, table):
     """
     import pyarrow.parquet as pq
 
-    p = _warm(country, table)
-    if p is None:
-        pytest.skip(f"{country}/{table} not warm")
+    p = private_country_root(country, table)
 
     ref = getattr(Country(country), table)()
     backup = p.with_suffix(".parquet.gh809bak")

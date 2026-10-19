@@ -1073,7 +1073,22 @@ made.  Aggregate proof and reproduction scripts are in the release
 =dtype-roundtrip= evidence bundle.  The separate =interview_date= wave/row
 coverage loss under GH #798 is not covered by this scalar-type exception.
 
-* Known warm interview-date loss (GH #798, 2026-10-15)
+* Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
+
+*Resolved on branch =fix/798-datetime=.*  Both declared-datetime casts in
+=_finalize_result= (=_enforce_declared_dtypes=, =_enforce_canonical_dtypes=)
+now go through one helper, =country._coerce_datetime_column=, which parses
+with =format='mixed'= (per value, not one inferred format) and emits a
+=DatetimeCoercionWarning= naming country/table/column/count for any
+non-blank string that still comes back =NaT=.  Measured warm on a full
+corpus copy: =Country('Mali').interview_date()= 12,194 -> *24,939* rows
+(2014-15 3,804, 2017-18 8,390, 2018-19 6,602, 2021-22 6,143), equal to the
+concatenated single-wave calls; no Mali value warns.  Read-path only:
+0 of 36 probed cache hashes moved.  The historical record below is kept
+as found.  The =data_scheme.yml= =interview_date= comment tension it
+names is still open (correcting it re-warms Mali) -- see the #798
+residual.
+
 
 Mali combines EAC-I (2014-15/2017-18) and EHCVM (2018-19/2021-22).
 The complete raw country =interview_date= cache stores EAC-I dates as

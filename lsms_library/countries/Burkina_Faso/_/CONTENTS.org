@@ -514,6 +514,21 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
 
+** TODO cluster_features -- served WITHOUT GPS: =df_geo= names columns its files lack (GH #1050)
+
+Measured 2026-10-18 (cold build, GH #675 follow-up): both 2014 and 2018-19
+drop their =df_geo= sub-df with =KeyError: 'lat_dd_mod not in columns'=.
+=grappe_gps_bfa2018.dta= carries =coordonnes_gps__Latitude= /
+=coordonnes_gps__Longitude= (the CotedIvoire spelling); =emc2014_agri_gps.dta=
+carries no lat/lon column at all (=V20=/=V22= unverified -- check the
+questionnaire).  =Latitude=/=Longitude= are =optional: true= in
+=data_scheme.yml=, so the #323/#515 guard does not raise and every warm
+=cluster_features= is served with =Region, District, Rural= only.  Since #675
+each parquet records the drop (=lsms_build_drops=, =kind: config=,
+=cause: missing-column=, =missing_optional: [Latitude, Longitude]=) and it is
+deliberately NOT graded degraded: a config drop re-drops on every rebuild.
+Fix at the source (the YAML), then reconsider =optional: true=.
+
 ** DONE cluster_features -- =Region= spelled 22 ways for 13 regions (GH #811, 2026-09-24)
 
 =cluster_features.Region= served 22 distinct strings for the 13 regions
@@ -1186,3 +1201,18 @@ its one leaked label (row 303) matches now that the row is read.
 =2014/_/food_acquired.py= (reads passage 1 only, stamps =t='2013_Q4'=) are
 unreferenced on the API path and were left in place; the cohort migration
 (GH #794's human decision) is unaffected by this fix.
+
+* 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
+
+The three tables are computed at read time from =food_acquired= by
+=Country._FOOD_DERIVED= (=transformations.food_*_from_acquired=); they are
+never written to =var/=.  The legacy country script
+=_/food_prices_quantities_and_expenditures.py= that used to claim them, and its
+grouped =&:= rule in =_/Makefile=, are deleted.  It was dead: run against the
+canonical =(t, i, j, u, s)= =food_acquired= it raised
+=KeyError: None of [Index(['total expenses'], ...)] are in the [columns]= before writing
+anything (the design doc =slurm_logs/DESIGN_218_food_legacy_retirement.org=
+recorded =KeyError('m')=; the column check now fails one step earlier).
+The script also grouped on an =m= (market) level, which no cached parquet carries any more (CLAUDE.md: =m= is added on demand), so it would have died there next.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
+
+Served tables before and after the removal are frame-equal (377,563 / 234,282 / 316,441 rows; waves 2014, 2018-19, 2021-22).
