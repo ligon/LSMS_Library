@@ -44,8 +44,10 @@ _MALAWI = countries_root() / 'Malawi' / '_' / 'malawi.py'
 #: Rows the remap moves, measured on the build at 3e3bd26ee (GH #1042).
 _EXPECTED = {
     # 1,450 / 970 were the first pass; the count-unit follow-up serves the
-    # Chicken rows among them (2005-06 184, 2012-13 203) on 'Single'.
-    'GhanaLSS': ('None', {'1998-99': 88, '2005-06': 1266, '2012-13': 767}),
+    # Chicken rows among them (2005-06 184, 2012-13 203) on 'Single', and the
+    # rulings of 2026-10-18 the Egg (200, 26) and Coconut (fresh) (28, 18)
+    # rows: 1,266 -> 1,038 and 767 -> 723.
+    'GhanaLSS': ('None', {'1998-99': 88, '2005-06': 1038, '2012-13': 723}),
     # 24 / 19 were the first pass ('N/A' only); the code-23 rule adds
     # 2004-05 'Other' 892, 2010-11 'Other (Specify)' 17 + 'Unit' 8, 2013-14
     # 'Other (Specify)' 110, 2016-17 'Other (Specify)' 404 + 'Other' 1,
@@ -292,7 +294,17 @@ def test_ghanalss_count_unit_relabel_is_scoped_and_lossless():
 
 def test_ghanalss_chicken_count_rows_get_a_plausible_bird_weight():
     """The task's own acceptance check: the kg the ladder serves the counted
-    chicken rows is a plausible bird (1-2.5 kg), measured 1.07 kg."""
+    chicken rows is a plausible bird (1-2.5 kg), measured 1.07 kg.
+
+    Disclosed cost (ruling 6, accepted @ligon 2026-10-18): the factor is
+    pooled across waves, so pooling the 387 relabelled rows moves it 1.2 ->
+    1.0714 kg for EVERY wave -- including 2016-17, which was not relabelled:
+    its 155 purchased (Chicken, Single) rows (194.5 birds) go 233.40 ->
+    208.39 kg (-10.7%), re-measured at the rulings head.  And the price test
+    cannot tell 'Single' from 'Kilogram' for chicken (2005-06 medians: Single
+    30,000, Kilogram 22,500, the code-0 rows 25,000 -- one bird is about a
+    kilogram), so the relabel rests on the plausibility of the resulting
+    kilograms and on the quantities (whole birds), not on the price alone."""
     if not (data_root() / 'GhanaLSS' / 'var' / 'food_acquired.parquet').exists():
         pytest.skip('GhanaLSS food_acquired not cached')
     import lsms_library as ll
@@ -439,3 +451,40 @@ def test_ghanalss_declares_every_egg_count_unit_no_kg():
     assert entry['item'] == 'Egg'
     assert tuple(entry['units']) == _GHANA_EGG_COUNT_UNITS
     assert entry['reason'].strip()
+
+
+def test_ghanalss_eggs_are_counted_and_get_no_inferred_kilograms():
+    """Rulings 1a/1b, delivered: own-produced code-0 eggs are on 'Single'
+    (2005-06 105 -> 305, 2012-13 3,056 -> 3,082), and NO egg row on a count
+    unit is given kilograms -- the 0.50 kg/egg (Egg, Single) factor is gone
+    from all 16,633 rows (13,888 + 226 Single, 714 Piece, 122 Ball, 5 Pair,
+    42 Dozen, 1,636 Crate).  Measured on a cold build at the rulings head."""
+    if not (data_root() / 'GhanaLSS' / 'var' / 'food_acquired.parquet').exists():
+        pytest.skip('GhanaLSS food_acquired not cached')
+    import lsms_library as ll
+
+    c = ll.Country('GhanaLSS')
+    fa = c.food_acquired()
+    lv = fa.index.get_level_values
+    t, j, u = lv('t'), lv('j').astype(str), lv('u').astype(str)
+    for wave, n in {'2005-06': 305, '2012-13': 3082, '2016-17': 10727}.items():
+        assert int(((j == 'Egg') & (u == 'Single') & (t == wave)).sum()) == n
+    for wave, n in {'2005-06': 40, '2012-13': 328}.items():
+        assert int(((j == 'Coconut (fresh)') & (u == 'Single')
+                    & (t == wave)).sum()) == n
+
+    q = c.food_quantities(units='kgs')
+    rep = q.attrs['kg_factor_declared_none']
+    assert rep['rows_matched'] == rep['rows_refused'] == 16633, rep
+    assert {k: v['rows_refused'] for k, v in rep['cells'].items()} == {
+        'Egg|Single': 14114, 'Egg|Piece': 714, 'Egg|Ball': 122,
+        'Egg|Pair': 5, 'Egg|Dozen': 42, 'Egg|Crate': 1636}
+    # The rows are carried in their native count unit, never converted.
+    qj = q.index.get_level_values('j').astype(str)
+    qu = q.index.get_level_values('u').astype(str)
+    assert int(((qj == 'Egg') & (qu == 'Single')).sum()) > 0
+    # ... so no per-kg price can be formed for them.
+    p = c.food_prices(units='kgvalue')
+    pj = p.index.get_level_values('j').astype(str)
+    pu = p.index.get_level_values('u').astype(str)
+    assert not ((pj == 'Egg') & pd.Index(pu).isin(_GHANA_EGG_COUNT_UNITS)).any()
