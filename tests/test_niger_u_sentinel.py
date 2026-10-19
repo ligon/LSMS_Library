@@ -90,7 +90,11 @@ EXPECTED_ROWS = {
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
     "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
     "plot_inputs": 42426,       # 42,364 before the bundle
-    "community_prices": 15423,
+    # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
+    # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
+    # 2014-15 6,500 -> 13,808.  Still 0 `Unknown` rows (below): the 795
+    # unit-less CS07 observations are dropped, not filled (CONTENTS.org).
+    "community_prices": 46177,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines

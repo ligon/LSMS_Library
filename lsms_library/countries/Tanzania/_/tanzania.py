@@ -2027,7 +2027,7 @@ def community_prices_for_wave(t, idf, colmap, item_labels=None):
     # and ZERO repeat a code -- the survey never prices the same item twice in
     # a cluster -- while 243 / 1,149 of them hold more than one distinct price
     # (cluster 01-06-47-85, 2020-21, "Millet & Sorghum (grain)" per Kg at both
-    # 2,000 and 16,000 TSh).  Until #840 a ``groupby(...).first()`` kept one
+    # 2,000 and 16,000 TSh).  Until #840 a groupby-first collapse kept one
     # and dropped the other.  That review concluded "no additional index level
     # is available that would not break the shared `j` vocabulary"; the
     # `variety` level is that level, and it leaves `j` untouched -- the code is
