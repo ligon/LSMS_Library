@@ -560,7 +560,7 @@ files are the R6 slice.
   for =food89.unitcode=: it recodes =q16_5d=, the unit of an in-kind loan
   in the 1994 R1 CREDIT section (the 2026-10-18 note said "price module";
   wrong).  But its source codes are the quintal-first short list that
-  1989's lists share on codes 1-5 and 8, so it can seed part of a 1989
+  1989's quintal-first lists share on codes 1-5 and 8, so it can seed part of a 1989
   decode after all -- verbatim RECODE line, coverage and gaps in the
   GH #1044 section.  (c) 1989 now serves code 0 as =Unknown=, not the raw
   ='0'=.  (d) "Code 0 ... (dropped)": no 1994+ file uses code 0; what the
@@ -1285,8 +1285,10 @@ Berhan entry of "1989 Survey Instruments by Village" (IFPRI notes, one page
 per village).  Its B section does not: it matches Dinki's.  So read "Debre
 Berhan" as likely, not established.
 
-It prints several unit-code lists ("Code 1").  They agree on codes 1-5, 7
-and 8 and diverge after that.  Page numbers are physical PDF pages:
+It prints several unit-code lists ("Code 1").  The quintal-first ones --
+E3.1, D8, D9, D10, and the 1994 R1 credit card below -- agree on codes 1-5,
+7 and 8 and diverge after that.  E3.2/E3.3 is a different list throughout.
+Page numbers are physical PDF pages:
 
 | code | E3.1, p.38: weekly food, cereals and pulses | E3.2 / E3.3, pp.39-40: weekly food, other foods | D8, p.32: bulk food purchases (D9 p.33, D10 p.34 where they differ) |
 |------+-------------------------------------------+------------------------------------------------+---------------------------------------------------------------------|
@@ -1389,7 +1391,8 @@ inferred identity, not a labelled one.
 Through =harmonize_unit= the recode reads 1 -> =100 kg=, 2 -> Dawla, 3 ->
 Kunna, 4 -> Akmada, 5 -> Ensira, 6 -> Chinet, 8 -> Tassa, 9 -> 31 (1994a's
 "OTHER"; =Codeunit1unit1234.SPS= then maps 31 to 95, Other).  So it *is* a
-crosswalk for 1989's codes 1-5 and 8, on which every 1989 list agrees.  It
+crosswalk for 1989's codes 1-5 and 8, on which every quintal-first 1989
+list agrees.  It
 covers 6 only under the D-section reading (Chinet; E3.1 says Gurzigne).  It
 is not complete:
 - it has no =(7=8)=, so Silicha (7 on every 1989 list but E3.2/E3.3) would
