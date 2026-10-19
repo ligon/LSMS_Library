@@ -150,7 +150,7 @@ directory directly under the config root that carries a `_/data_scheme.yml`
 |---|---|
 | a registered country, e.g. `'Uganda'` | nothing |
 | no such directory, e.g. `'Ghana'` (a typo, or a wrong case like `'uganda'`) | `ValueError: No such country 'Ghana'. Did you mean 'GhanaSPS' or 'GhanaLSS' ...?` |
-| not a single directory entry: `''`, `'./Uganda'`, `'Uganda/'`, `'Uganda/_'`, `'Uganda/2019-20'`, `'.dvc'`, a `Path` | `ValueError: No such country ...` |
+| not a single non-hidden directory entry: `''`, `'./Uganda'`, `'Uganda/'`, `'Uganda/_'`, `'Uganda/2019-20'`, `'.dvc'`, a `Path` | `ValueError: No such country ...` |
 | a directory without `_/data_scheme.yml`, e.g. `'Bulgaria'` | `UnregisteredCountryError` (from `lsms_library.errors`, a `ValueError` subclass) |
 | a path out of the root, e.g. `'../..'` | `ValueError: ... path traversal not allowed` |
 
