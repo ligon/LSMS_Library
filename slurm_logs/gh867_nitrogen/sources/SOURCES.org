@@ -1,0 +1,311 @@
+#+TITLE: GH #867 -- source excerpts for the cited N shares
+Retrieved 2026-10-19 by the #867 worker (Sue the Coder).  PDFs are not
+committed; their URL, size and SHA-256 are, and the text below is pypdf's
+extraction of the cited page, verbatim (layout lost).
+
+* IFDC & AFAP for AGRA, Assessment of Fertilizer Distribution Systems and Opportunities for Developing Fertilizer Blends: ETHIOPIA (June 2018)
+- URL :: https://agra.org/wp-content/uploads/2020/08/Ethiopia-Report_Assessment-of-Fertilizer-Distribution-Systems-and-Opportunities-for-Developing-Fertilizer-Blends.pdf
+- bytes :: 811,645
+- sha256 :: 612005f88136db93de7aa95490e2fc02cdce70af6756ec72bb83fded43c9c207
+- cited :: Table 1 (report p. 3, PDF p. 6) -- NPS 19-38-0+7S
+
+** PDF page 6
+#+begin_example
+Assessment of Fertilizer Distribution and Opportunities for Developing Fertilizer Blends in Ethiopia 3 
+Table 1. Fertilizers available in Ethiopia and volumes sold for the 2016-17 
+season, based on distribution 
+Fertilizer Formulation Description 
+Volume Sold (MT) 
+2016-17 Season 
+NP 19 38 0 + 7S NPS 238,191 
+NP 18.9 37.7 0 + 6.95S + 0.1B NPS with added B 377,527 
+NP 17.7 35.5 0 + 7.6S + 2.2Zn NPS with added Zn 12,652 
+NP 17.8:35.7+7.7S+2.2Zn +0.1B NPS with added Zn and B 63,455 
+DAP NP 18:46:0 DAP - 
+46:0:0 Urea 459,285 
+0:0:60 KCl or MOP 3,728 
+TOTAL   1,154,838 
+ 
+Omission trials conducted under the AMDe project (funded by USAID and designed by 
+IFDC) showed that in wheat, response was often obtained to S, Zn, B, and Cu where strict 
+interpretation of the soil analysis was not indicated. The implication is that using what are 
+considered critical levels could be misleading regarding actual response, and that yield 
+potential loss would result if soil analysis is used as a strict guide to address deficiencies, at 
+least using the deficiency criteria employed. One reason mo re research was not carried out 
+was poor funding and technical support for the Ethiopian Institute of Agricultural Research 
+(EIAR). EIAR is mandated to conduct this research, which could not be done by ATA due to 
+institutional mandates. 
+ATA did, however, e valuate 2 blended formulations and NPS 19:38:0 +7S at thousands of 
+sites. The blends did well relative to DAP, though applied at twice the rate, as they contained 
+K, S, and other micronutrients; thus, rates were doubled to maintain P equivalence. Blending 
+was initiated at a facility run by a farmer’s cooperative, as private operation of blending 
+facilities was not permitted by the government. Some errors ensued, probably the most 
+serious of which was the procurement of $10,000,000 worth of a boron (B) produ ct of the 
+wrong particle size, causing serious segregation in the bags, the result of which was no boron 
+at the top of the bag and likely toxic quantities at the bottom. Because distribution channels 
+were not well -established (now having to go through a bl ending unit rather than through 
+already channels established for DAP and urea), the blends were reaching few farmers.  
+To deal with this situation, the government formulated and procured 4 multi -nutrient 
+compounds (shown in Table 1), and these were distrib uted based strictly on mapping units. 
+All are NPS-based; that is, there are no compounds available in Ethiopia that do not contain 
+S. Sulfur, being a secondary nutrient, displaces about 20% of the fertilizer P in comparison to 
+DAP; this effectively means t hat to maintain the P application compared to DAP, rates must 
+be increased by 20%.
+#+end_example
+
+* IFDC & AFAP for AGRA, Assessment of Fertilizer Distribution Systems and Opportunities for Developing Fertilizer Blends: MALAWI (June 2018)
+- URL :: https://agra.org/wp-content/uploads/2020/08/Malawi-Report_Assessment-of-Fertilizer-Distribution-Systems-and-Opportunities-for-Developing-Fertilizer-Blends.pdf
+- bytes :: 896,609
+- sha256 :: d4942f449f0f7d792682d729ae3ee66590efca802bee605345452d981b8f98b0
+- cited :: Table 1 (report pp. 4-5, PDF pp. 6-7) -- Compound D 8:18:15+6S+0.1B; NPK 23:21:00+4S
+
+** PDF page 6
+#+begin_example
+Assessment of Fertilizer Distribution and Opportunities for Developing Fertilizer Blends in Malawi 4 
+Ltd. (Kenya), mos t of which indicated serious S, Zn, and B deficiencies and likely 
+deficiencies of Cu. 
+In sum, while it will not be known until available data are accumulated, considerable gaps 
+will likely be found in secondary (Ca, Mg, S) and micronutrient (Zn, B, Cu, M n and Fe) soil 
+analyses in particular. 
+Figure 1. Extent of soil pH and P constraints in Malawi 
+Source: information presented at the National Fertilizer Policy Validation Workshop, March 28, 2018. 
+Inventories of Fertilizers Available in the Markets 
+Table 1 is the most updated list of the main fertilizer straights, compounds, and blends 
+available in Malawi. Some additional multi -nutrient specialty products primarily targeted to 
+specific vegetables are supplied by ETG. 
+Table 1. Main fertilizer straights, compounds and blends available in Malawi. 
+Product name Trade name Target crops 
+Urea   All - purpose top dressing 
+Di-Ammonium Phosphate (DAP)   Used in Malawi for basal fertilizer blends 
+Calcium Ammonium Nitrate (CAN)   Maize,  wheat, barley,  sugarcane, flowers 
+coffee, tobacco, potato, pineapple, pea, paprika 
+Muriate of Potash (MOP)   Used in Malawi for basal fertilizer blends 
+Sulphate of Potash (SOP)   Used in Malawi for basal fertilizer blends
+#+end_example
+
+** PDF page 7
+#+begin_example
+Assessment of Fertilizer Distribution and Opportunities for Developing Fertilizer Blends in Malawi 5 
+Ammonium Sulphate (AS)   Flowers, rice, cotton, cassava, groundnut, 
+wheat; used in Malawi for basal fertilizer blends 
+Magnesuim Sulphate   Tomatoes, Irish potatoes, flowers, fruit trees 
+Zinc sulphate monohydrate 
+(granular) 
+  micronutrient source for multiple crops 
+Ulexite (slow-release granular B 
+product) 
+  micronutrient source for multiple crops 
+Micronutrient sprays containing Zn 
+and B 
+  micronutrient  source for multiple crops, used as 
+micronutrient coating for granular NPKs 
+NPK 06:18:06 Compound S Tobacco, vegetables 
+8:18:15+6S+0.1B Compound 
+D/Super D 
+Tobacco, paprika, flowers 
+NPK 10:24:20 + 6S + 0.1B Super D Tobacco 
+10:24:20+6S+0.1B   Tobacco 
+10:18:24+6S+0.1B   Tobacco 
+NPK 23:21:00 +4S   Maize, rice, Irish potatoes, vegetables 
+NPK 23:10:05 +6S+ 1Zn   Maize, rice, Irish potatoes, vegetables 
+NPK 25:05:05 and similar high-N   Tea 
+NPK 14:18:18 + 6S + 0.1B   Cotton 
+15:23:16 + 6S + 0.5Zn + 0.3B   Maize 
+6:20:24 + 3S + 0.5Zn   Soybean, groundnut 
+10:20:20 + 6S   Sweet potato 
+30:0:16   Maize topdress 
+Rationale for why Fertilizer Blended Products were 
+Developed 
+Fertilizers in Malawi are blended by Malawi Fertilizer Company (MFC), and both blended 
+and granulated by Optichem. ETG imports products primarily from Mozambique. Many 
+estates tender products directly through agents or indirectly through the two blenders. 
+The main rationale for product development are as follows: 
+1. To address specific commercial farmer requirements, based on a soil  test, crop, and yield 
+target. This mainly applies to estates and larger farms. 
+2. Based on government tenders for the Farm Input Subsidy Program (FISP). This is 
+currently 23:10:5 +6S +1Zn (supplied as a compound) and is intended for maize 
+production. 
+3. To meet general soil and crop -specific demands, without respect to  specific soil analysis, 
+but with regards to perceived widespread nutrient deficiencies. This includes formulations 
+for maize, soybeans, groundnuts, and sweet potato produced by MFC. For each of these 
+commodities, they are only producing and field -validating one blend, due to the lack of 
+soils information required to formulate blends better regionally. 
+Optichem has filler products based on clay which have had stability problems in the past, but 
+they have recently upgraded the quality of their filler product s. These fillers are used by both 
+Optichem and Malawi Fertilizer Company when responding to tenders that request a specific 
+formulation that is familiar to farmers or estates.
+#+end_example
+
+* IFDC, Fertilizer Statistics Overview MALAWI 2016-2021 (2022 Edition, draft 1)
+- URL :: https://api.hub.ifdc.org/server/api/core/bitstreams/8af8119b-247e-4b89-824c-d238d65563c3/content
+- bytes :: 741,175
+- sha256 :: 5cc6a6de9d64b1e12d8578ddfa189e55d825b4af2c45394b15b63972d707fde8
+- cited :: NPK import analysis -- Compound D 8-18-15
+
+** PDF page 7
+#+begin_example
+MALAWI
+NPK Import Analysis
+Comments
+• Blending companies import Urea, TSP, DAP, MAP and MOP to 
+blend different formulations of NPK for farmers in Malawi.
+• Blenders and other major fertilizer importing companies also 
+import finished NPK with various grades to sell directly to farmers.
+• NPK 8-18-15 + 6S + 0.1B + 0.1Zn (Compound D) and NPK 10-24-
+20 + 6S + 0.1B (Super D) are the most used NPK fertilizers in 
+Malawi.
+• Above table represents the breakdown of  NPK, NP, and NP 
+compounds that have been imported to Malawi.
+• On the average, XXX mt of NPKs are blended in the country.
+7
+HS Code Fertilizer Name 2016 2017 2018 2019 2020 2021 2022*
+3105200000 Total NPK 28,572  75,046    118,557  143,610  183,919  220,258  44,230  
+3105510000 Total NP 22,339  48,550    10,686    1             2,000      -        
+3105700000 Total NK 30         -          -          -          -          -          -        
+3105600000 Total PK -        -          -          -          -          -          -        
+Total (mt) 50,941 123,596 129,243 143,610 183,919 222,258 44,230 
+NPK, NP, PK and NK import 2016 2017 2018 2019 2020 2021 2022*
+NPK 13,079  58,227    81,918    63,348    67,415    131,673  24,135  
+NPK 23-10-5 + 6S + 1Zn 6,302    10,465    20,509    57,893    88,098    62,603    19,671  
+NPK 23-10-5 3,674      9,162      19,060    14,990    30         
+NPK 25-5-10 + TE 1,740    1,990      2,422      6,973      5,170      4,798      
+NPK 10-20-20 + 5S + 0.2B + 0.2Zn 75           120       
+NPK 10-26-26 3,566      
+NPK 23-10-5 + 6S 5,500      2,950      2,000      
+NP 23-21-0 + 4S 22,339  40,409    8,638      2,000      
+NPK 12-10-8 3           8             9             42           33           163         118       
+NPK 10-18-24 6,740    60           93           30           140         
+NPK 13-24-12 + 3S + 0.1Zn 120         
+NPK 10-24-20 + 6S + 0.1B 30         500         550         50           
+NPK foliar 13         19           82           79           62           40           30         
+NPK 19-19-19 + TE 20           
+NPK 6-20-24 + 6S + 0.2B + 0.2Zn 90           10           
+NPK 8-20-24 + 6S + 0.2B + 0.2Zn 355         1             30           10           
+NPK 24-10-20 + 6S + 0.1B 250         
+NPK 8-18-15 + 6S + 0.1B + 0.1Zn 30         246         881         151         65         
+NPK 18-5-18 + 2S + 0.1B + 0.1Zn 30           
+NP Compound 7,438      1,748      1             
+NPK 17-18-18 + 7S 2,270      
+NPK 10-20-10 2,200      
+NPK 8-20-24 390         
+NPK 12-24-12 + 5S + 0.1B 40           180         60         
+NPK 6-20-24 + 6S 50           
+NPK 13-26-13 + 8S 25           
+NPK 10-20-10 + 6S 24           
+NPK 23-10-5 + 3S + 2MgO + 0.3Zn 605       3,288      560         
+NPS 12-46-0 + 7S 703         
+NPK 25-5-8 655         
+NPK 15-9-20 + TE 237         
+NPK 18-6-24 30         
+NPK 25-5-10 2,840      
+NP 22-20-0 300         
+NK 16-0-16 30         
+Total (mt) 50,941 123,596 129,243 143,610 183,919 222,258 44,230
+#+end_example
+
+* IFDC, Fertilizer Statistics Overview MALAWI 2019-2023 (2024 Edition)
+- URL :: https://api.hub.ifdc.org/server/api/core/bitstreams/e73c6f0b-1730-4dad-927e-4c195aae6879/content
+- bytes :: 1,404,201
+- sha256 :: 9073c3e4fc8dc1caa30cb7f9db5e69539f6086fe1f05758058d31816314d3eda
+- cited :: p. 8 NPK Import Analysis -- Compound D 8-18-15
+
+** PDF page 8
+#+begin_example
+MALAWI
+NPK Import Analysis
+Comments
+• Blending companies in Malawi import Urea, TSP, DAP, MAP, and 
+MOP to create different NPK formulations tailored for the needs 
+of local farmers.
+• Blenders and other major fertilizer importing companies also 
+import finished NPK with various grades to sell directly to farmers.
+• Some of the most used NPK fertilizers in Malawi includes NPK 23-
+10-5 + 6S + 1Zn, NPK 8-18-15 + 6S + 0.1B + 0.1Zn (Compound 
+D) and NPK 10-24-20 + 6S + 0.1B (Super D).
+• In 2023, NPK 23-10-5 + 6S + 1Zn and NPK 27-6-6 accounted for 
+55% of all NPK compounds imported.
+8
+HS Code Fertilizer Name 2019 2020 2021 2022 2023
+3105200000 Total NPK 143,610  183,919  220,258  50,402    153,009  
+3105510000 Total NP 1             2,000      -          -          
+3105700000 Total NK -          -          -          -          -          
+3105600000 Total PK -          -          -          -          -          
+Total (MT) 143,610 183,919 222,258 50,402   153,009 
+NPK, NP, PK and NK import 2019 2020 2021 2022 2023
+NPK 23-10-5 + 6S + 1Zn 57,893      88,098      62,603      22,173      65,239      
+NPK 27-6-6 19,638      
+NPK 25-5-5 + 5S 370           4,529        
+NPK 25-5-10 + TE 6,973        5,170        4,798        
+NPK 23-10-5 9,162        19,060      14,990      30             
+Others 69,582      71,592      139,867    27,829      63,603      
+Total (MT) 143,610   183,919   222,258   50,402     153,009   
+0
+20,000
+40,000
+60,000
+80,000
+100,000
+120,000
+140,000
+160,000
+180,000
+200,000
+220,000
+240,000
+2019 2020 2021 2022 2023
+TOTAL NPK IMPORTS PER YEAR 
+Total NPK Total NP Total NK Total PK
+MT
+#+end_example
+
+* Government of Malawi, Fertilizer Regulations, 2003 (WIPO Lex MW022)
+- URL :: https://www.wipo.int/wipolex/en/text/496671
+- bytes (HTML page) :: 78,701
+- sha256 (HTML page) :: 538028149fa249aa3e358cb18b2ff0a0490c39d998d432a1443ef46e55ab6c6d
+- cited :: Schedule B, Part A, "Examples of Penalty Compilation", examples 2 ("D" compound 8-14-7-6.5S, 8% N) and 3 (23-21-0+4S, 23% N); printed p. 30
+#+begin_example
+Examples of Penalty Compilation
+1. Urea was guaranteed by the registrant as 46% N on a lot of one
+(1) tonne priced at 32,200 Kwacha per tonne. Upon analysis, the
+N content was found to be 45.0%, meaning there was a
+deficiency of 1.0% N (46.0 - 45.0). Penalty is computed as
+follows: 1.0 (deficiency) x 2 (penalty adjustment) x 700 Kwacha
+(plant nutrient value equals 32,200 Kwacha divided by
+46) x 1 (number of tonnes) = 1,400 Kwacha (penalty).
+2. A “D” compound (8-14-7-6.5S) fertilizer was guaranteed as 8%
+N, 14% P2O5, 7% K2O, and 6.5%S on a lot of 10 tonnes priced at
+38,000 Kwacha per tonne. Upon analysis, the plant nutrient
+contents were found to be 7.2% N, 12.5% P2O5, 7.5% K2O, and
+7.0% S, meaning there were deficiencies of 8.0 - 7.2 = 0.8% N
+and 14.0 - 12.5 = 1.5% P2O5. Although the K2O and S exceeded
+guarantee, no allowance is made for this excess to balance the
+deficiencies in N and P2O5. Penalty is computed as follows: 0.8
+(N deficiency) x 2 (penalty adjustment) x 1070 Kwacha [plant
+nutrient value equals 38,000 Kwacha divided by 35.5 (total plant
+nutrient units)] x 10 (number of tonnes) + 1.5 (P2O5
+deficiency) x 3 (penalty adjustment) x 1070 Kwacha (plant
+nutrient value) x 10 (number of tonnes) = 65,270 Kwacha.
+3. A 23-21-0 + 4S compound fertilizer was guaranteed as 23% N,
+21% P2O5, and 4% S on a lot of 100 tonnes priced at
+33,000 Kwacha per tonne. Upon analysis, the plant nutrient
+contents were found to be 23.2% N, 21.3% P2O5, and 3.0% S,
+meaning there was a deficiency of 4.0 – 3.0 = 1.0 S. A 4.0%
+guarantee of sulfur is deficient if the analysis is less than 3.6%
+(0.2% plus 5% of 4.0% = S). Penalty is computed as follows: 1.0
+(deficiency) x 3 (penalty adjustment) x 687.5 Kwacha (plant
+nutrient value equals 33,000 Kwacha divided by 48) x 100
+(number of tonnes) = 206,250 Kwacha.
+#+end_example
+
+* Not retrieved
+- IFDC (P. Fuentes), /Malawi Fertilizer Assessment/ (2013), said by a
+  search-engine summary to give Compound D as 7-14-7 -- which would explain
+  the WB panel's 0.07.  The UNFCCC host
+  (www4.unfccc.int/sites/napparties/Malawi/...) answered with a bot-check /
+  maintenance redirect on 2026-10-19, so the claim is UNVERIFIED and not
+  cited in the code.
+* World Bank LSMS-ISA harmonised panel (point of comparison, not a citation)
+Reference copy: /global/scratch/fsa/fc_jevons/ligon/reference/lsms-isa-harmonised/Reproduction_v2/Code/Cleaning_code/
+- ETH_ESS3.do:896, ETH_ESS4.do:918, ETH_ESS5.do:984 :: gen NPS_N_kg = NPS_kg*0.19
+- ETH_ESS4.do:919 :: egen nitrogen_kg = rowtotal(UREA_N_kg DAP_N_kg NPS_N_kg), missing  (inorganic only)
+- MWI_IHPS1.do:776 / :804 (same in IHPS2-4) :: gen nitrogen_kg1 = NPK_kg * 0.23  ("* Chitowe") / gen nitrogen_kg5 = D_kg * 0.07  ("*CD compound")

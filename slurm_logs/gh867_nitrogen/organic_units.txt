@@ -1,0 +1,42 @@
+Benin: organic rows=429 qty_notna=429 kg_convertible=230 qty==0:0 labels=['Organic compost', 'Organic manure']
+   units: {'Kg': np.int64(210), 'Charrette': np.int64(199), 'Tonne': np.int64(16), 'Gramme': np.int64(4)}
+   kg (convertible rows): 187281.1
+Burkina_Faso: organic rows=3,909 qty_notna=3,909 kg_convertible=88 qty==0:0 labels=['Organic compost', 'Organic manure']
+   units: {'Charrettée': np.int64(3821), 'Kg': np.int64(78), 'Tonne': np.int64(8), 'Gramme': np.int64(1), 'Litre': np.int64(1)}
+   kg (convertible rows): 174870.0
+CotedIvoire: organic rows=494 qty_notna=494 kg_convertible=346 qty==0:0 labels=['Organic compost', 'Organic manure']
+   units: {'Kg': np.int64(309), 'Charrette': np.int64(148), 'Tonne': np.int64(30), 'Litre': np.int64(6), 'Gramme': np.int64(1)}
+   kg (convertible rows): 386090.4
+Ethiopia: organic rows=34,207 qty_notna=0 kg_convertible=0 qty==0:0 labels=['Compost', 'Manure', 'Other Organic']
+   units: {}
+   kg (convertible rows): 0.0
+GhanaLSS: organic rows=443 qty_notna=443 kg_convertible=33 qty==0:0 labels=['Manure']
+   units: {'Basket': np.int64(228), 'Mini Bag': np.int64(46), 'Ton': np.int64(39), 'Maxi Bag': np.int64(34), 'Kg': np.int64(33), 'Gallon': np.int64(24), 'American Tin': np.int64(24), 'Bowl': np.int64(13)}
+   kg (convertible rows): 767.0
+Guinea-Bissau: organic rows=515 qty_notna=515 kg_convertible=0 qty==0:0 labels=['Adubos orgânicos - estrume animal', 'Adubos orgânicos - lixo doméstico']
+   units: {'Outras': np.int64(254), 'Quilograma': np.int64(133), 'Carroça': np.int64(103), 'Litro': np.int64(9), 'Grama': np.int64(9), 'Tonelada': np.int64(7)}
+   kg (convertible rows): 0.0
+Malawi: organic rows=11,075 qty_notna=11,075 kg_convertible=0 qty==0:11,075 labels=['Organic Fertilizer']
+   units: {}
+   kg (convertible rows): 0.0
+Mali: organic rows=15,010 qty_notna=15,010 kg_convertible=866 qty==0:267 labels=['Compost', 'Manure', 'Other organic']
+   units: {'Cart (donkey)': np.int64(10042), 'Cart (ox)': np.int64(1919), 'Sac': np.int64(1474), 'Kg': np.int64(866), 'Autre': np.int64(414)}
+   kg (convertible rows): 382535.0
+Nigeria: organic rows=4,149 qty_notna=4,149 kg_convertible=1,615 qty==0:0 labels=['Organic Fertilizer']
+   units: {'Sack/Bag': np.int64(2390), 'Kg': np.int64(1584), 'Wheelbarrow': np.int64(121), 'g': np.int64(31), 'Paint rubber': np.int64(6)}
+   kg (convertible rows): 3068694.7
+Niger: organic rows=7,515 qty_notna=7,511 kg_convertible=880 qty==0:18 labels=['Organic compost', 'Organic manure']
+   units: {'Charrette': np.int64(2436), 'Charrette bovine': np.int64(1879), 'Charrette asine': np.int64(1733), 'Sac de 50 kg': np.int64(505), 'Sac de 100 kg': np.int64(283), 'Sac': np.int64(280), 'Tas': np.int64(183), 'Tiya': np.int64(54)}
+   kg (convertible rows): 1638856.1
+Senegal: organic rows=1,675 qty_notna=1,671 kg_convertible=153 qty==0:0 labels=['Organic compost', 'Organic manure']
+   units: {'Charrette': np.int64(1371), 'Sac': np.int64(147), 'Kg': np.int64(126), 'Tonne': np.int64(23), 'Gramme': np.int64(4)}
+   kg (convertible rows): 273716.2
+Tanzania: organic rows=727 qty_notna=727 kg_convertible=727 qty==0:0 labels=['Organic Fertilizer']
+   units: {'Kg': np.int64(727)}
+   kg (convertible rows): 12223024.5
+Togo: organic rows=554 qty_notna=552 kg_convertible=300 qty==0:0 labels=['Organic compost', 'Organic manure']
+   units: {'Kg': np.int64(288), 'Charrette': np.int64(252), 'Gramme': np.int64(7), 'Tonne': np.int64(4), 'Litre': np.int64(1)}
+   kg (convertible rows): 109901.2
+Uganda: organic rows=3,966 qty_notna=3,937 kg_convertible=3,937 qty==0:1 labels=['Organic Fertilizer']
+   units: {'Kg': np.int64(3937)}
+   kg (convertible rows): 2704937.1

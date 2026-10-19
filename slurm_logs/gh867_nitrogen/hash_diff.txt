@@ -1,0 +1,6 @@
+GH #867 cache-cost probe (hash_probe_867.py), base 200e504a3 vs branch working tree
+no-op control (base, second run): probed cth=549 wih=2139 btf=40; moved 0 []
+branch: transformations.py + tests (e682ba8fa): probed cth=549 wih=2139 btf=40; moved 0 []
+branch: + CONTENTS.org entries + comment fix: probed cth=549 wih=2139 btf=40; moved 0 []
+cth = Country._table_cache_hash (every country x data_scheme table, all waves)
+wih = Wave._input_hash (every country x wave x table); btf = build_transforms_fingerprint (every table + None)

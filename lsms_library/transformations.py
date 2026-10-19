@@ -4869,12 +4869,13 @@ def total_hired_labor_days(plot_labor):
 #     Opportunities for Developing Fertilizer Blends: Malawi* (June 2018),
 #     Table 1 "Main fertilizer straights, compounds and blends available in
 #     Malawi" (report p. 5): "8:18:15+6S+0.1B  Compound D/Super D", repeated
-#     in IFDC's *Fertilizer Statistics Overview Malawi* 2016-2021 and
-#     2019-2023 editions (p. 8).  DIVERGES from the WB harmonised panel,
+#     in IFDC's *Fertilizer Statistics Overview Malawi* 2016-2021 (p. 7)
+#     and 2019-2023 (p. 8) editions.  DIVERGES from the WB harmonised panel,
 #     which uses 0.07 with no citation (MWI_IHPS1.do:804 and IHPS2-4,
 #     ``gen nitrogen_kg5 = D_kg * 0.07`` under ``*CD compound``); a 2013 IFDC
 #     "7-14-7" grade that would explain it could not be retrieved, so it is
 #     not cited here.  On Malawi's 726 D Compound rows the two differ by 1/8.
+#     Page text and SHA-256 of every source: slurm_logs/gh867_nitrogen/.
 #
 # ORGANIC INPUTS ARE REFUSED A SHARE, DELIBERATELY (GH #867, same ruling:
 # "Organic inputs (manure, compost, organic fertilizer) get a documented
