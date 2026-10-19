@@ -1593,6 +1593,47 @@ NEWLY-served rows (~64% of the newly-served kilograms), a factor the library
 infers for nothing, and the WB table gives exactly 100.0 for every crop in
 every wave -- which is what a quintal is.
 
+*Superseded 2026-10-19 by GH #931 -- read this before relying on the
+paragraph above.*  On @ligon's ruling (2026-10-18) =harvest_kg_factors= now
+READS the declared =u_kg= table, so the library is no longer without an
+opinion on the quintal: the global =categorical_mapping/u.org= declares
+=Quintal= = 100 kg, =Country('Ethiopia').crop_production()= carries it as
+=attrs['unit_kg'] == {'Ethiopia': {'quintal': 100.0}}=, and a bare
+=harvest_kg(cp)= now serves Ethiopia's 13,977 Quintal rows on =metric=
+instead of =none=.  The "rows the library has no opinion on" set therefore
+shrinks to 30,001 (all local containers), and comparing the WB table with
+the library on the quintal would compare two numbers that both say "100 kg".
+The check is now made against an *answer key neither side supplies* --
+=QUINTAL_KG = 100.0= in =tests/test_ethiopia_shipped_factors.py=, cited to the
+unit's definition (the metric quintal / centner) and to the survey's own
+report (CSA & World Bank, /ESS 2015/2016 Survey Report/,
+=2015-16/Documentation/9331_ethiopia_survey_report_web_final.pdf=, which
+states each yield in both units: "1,403 kilograms or 14 quintals", "650
+kilograms or 6.5 quintals" ...).  The WB shipped factor
+(=test_shipped_quintal_matches_the_external_answer_key=) and our own
+declaration (=test_the_declared_quintal_matches_the_external_answer_key=) are
+each checked against that key, never against each other.
+
+Measured on the warm build, before -> after GH #931:
+
+| split                       |     metric |       none | Harvest_kg (kg)               |
+|-----------------------------+------------+------------+-------------------------------|
+| no shipped table            | 26,548 -> 40,525 | 58,971 -> 44,994 | 1,905,712.51 -> 8,799,669.51  |
+| with =crop_conversion_factors()= | 7,768 -> 7,821 | 15,046 -> 14,993 | 12,685,707.32 -> 12,696,657.32 |
+
+=shipped= is unchanged at 62,705 (it outranks =metric=, so 13,924 Quintal
+rows stay =shipped= at the WB's 100.0).  The 53 Quintal rows the WB table
+does NOT cover -- a (crop, Quintal) cell missing from =Crop_CF=, 31 in
+2018-19 and 22 in 2021-22 -- now get 100 kg from the declaration (+10,950 kg).
+*2011-12 carries no Quintal row at all*, so W1 is untouched by this change
+too; its 653,661 kg stands.  Per wave without the shipped table: 2013-14
+625,076 -> 3,276,476; 2015-16 331,120 -> 2,137,217; 2018-19 103,685 ->
+1,445,145; 2021-22 192,170 -> 1,287,170.  Consequence worth knowing: the
+after/before ratio of the shipped table falls 6.66 -> 1.44 -- most of what
+the WB table used to ADD over the library was the quintal, which the library
+now converts itself.  =harvest_kg(cp, unit_kg={})= switches the declaration
+off and reproduces every pre-#931 number exactly (pinned).
+
 *The ~29,000 local-container rows have no numerical check at all*, and their
 factors vary with the crop by an order of magnitude (=Madaberia ... Medium=
 runs 10.35 to 95.00 across crops).  Their warrant is STRUCTURAL: the loader
@@ -2154,3 +2195,78 @@ inferred factor there.  *Six of the nine have been reproduced independently*
 (Ethiopia, Malawi, EthiopiaRHS, Nigeria, Tanzania, GhanaLSS -- all 0.0% bar
 Ethiopia); Niger and Mali were on a stale hash and Uganda was cold at the
 reviewer's second reading, so those three rest on this branch's run alone.  The numbers above are post-fix.
+
+* interview_date: the =##N/A##= placeholder, and what W5 dates (GH #1038, 2026-10-18)
+
+Only W4 and W5 declare =interview_date=; W1-W3 have no entry.
+
+** The placeholder
+
+=##N/A##= is the Survey Solutions export marker for an unrecorded
+timestamp.  It is in the source =.dta= files, not introduced by the build,
+and it used to be cached as a string that the declared-datetime cast
+rejected on every read (=DatetimeCoercionWarning=, 115 values, GH #798).
+Each wave's =data_info.yml= now maps it to null where the column is read.
+
+| wave    | source                                  | rows  | =##N/A##= rows (households) |
+|---------+-----------------------------------------+-------+-----------------------------|
+| 2018-19 | =sect_cover_hh_w4.dta= =InterviewStart= | 6,770 | 8 (8)                       |
+| 2021-22 | =sect_cover_ph_w5.dta= =InterviewDate=  | 1,596 | 112 (107)                   |
+
+*These are real, fully interviewed households; only the timestamp is
+missing.*  Every other cover field is populated on all 120 rows, and the
+households are in =sample=, =household_roster=, =food_acquired=,
+=housing=, =assets=, =shocks= (all 8 in W4; 104 of the 107 in W5 -- the
+other three are absent from the W5 household cover itself).  W4's 8
+cluster: 5 are in EA =070410088800810= (SNNP, 5 of its 10 households).
+W5's 107 span 27 EAs, 7 of them entirely undated (rows: Oromia 38, SNNP 32,
+Harar 28, Somali 5, Gambela 5, Amhara 2, Benishangul 1, Dire Dawa 1).
+
+Served, before -> after: 2018-19 6,762 -> 6,762; 2021-22 1,474 -> *1,475*;
+=DatetimeCoercionWarning= 115 -> 0.  The one recovered row is household
+=060105088801701096=, which sits on two holder rows of the post-harvest
+cover, one dated (2022-04-18 14:27:53) and one =##N/A##=.  The grain
+collapse serves the group's most complete row (GH #871), and a placeholder
+string counted as complete, so the tie went to the placeholder row and the
+household was served no date at all.  As a null it no longer ties.
+
+*Not substituted from other visits.*  The agriculture covers also carry an
+=InterviewDate= (W4 pp/ph/ls, W5 ls), and 2 of W4's 8 / 102 of W5's 107 are
+dated there -- but those date a different visit (W4 post-planting and
+livestock Sep 2018 - Jan 2019, post-harvest Jan 2019; W5 livestock
+Oct - Dec 2021, mode October), not the interview this table reports.
+Those covers carry the placeholder too (W4 pp 276, ph 42, ls 276; W5 ls
+50) but no table reads them.  A census of every column and index level of
+every warm Ethiopia table found =##N/A##= only in =interview_date=.
+
+The placeholder also sits in raw columns that no Ethiopia table reads
+today: =sect4_hh_w4/w5= =s4q34a/c= (1 each), =sect4_pp_w5= =s4q01c= (2),
+=sect9a_pp_w4= =sccq05= (95), =sect8_3_ls_w4= =*_os= columns,
+=sect3_pp_w5= =s3q37_os=, =sect6a_hh_w5= =s6aq01_os= (2), and the
+=sect0{4,6,8}_com= =*_os= columns (red-team r1, 2026-10-18; 27 W5 blobs
+not in L1 were not scanned).  Wiring any of them needs the same
+=mapping:=; a numeric cast would instead hide the placeholder as a NaN that
+no parquet census can find.
+
+** W5 dates the POST-HARVEST visit, for a third of the households
+
+=sect_cover_hh_w5.dta= (the household cover, 4,959 households) ships *no*
+interview date: its =saq19__Timestamp= is =**CONFIDENTIAL**= (4,926 rows)
+or blank (33), its =saq21= is =**CONFIDENTIAL**= on all 4,959, and the
+post-planting cover's =InterviewDate= is =**CONFIDENTIAL**= on all 2,110.  W5 therefore reads
+the post-harvest agriculture cover, which is HOLDER-grain (1,596 rows,
+1,581 households; 13 households on more than one holder row -- the 10
+disagreeing ones are the =GrainCollapseWarning= every read emits).  So
+W5's =interview_date= is the post-harvest visit (Mar-Jul 2022) for 1,475
+of 4,959 households, where W4's is the household-module interview for
+6,762 of 6,770.  The two waves are not measuring the same event.  One W5
+household (=040804088800112044=) is in the post-harvest cover but not the
+household cover, so it has no =v= (the =NullIndexKeyWarning=).
+
+** Out-of-window dates, served as recorded
+
+Both waves carry device-clock dates well outside fieldwork: W4 15 rows
+(13 in 2014-01, in EAs =030519088801304= and =031201088800105=; one
+2015-01-09; one 2018-10-09) against fieldwork May-Sep 2019; W5 18 rows
+(2014-01 9, 2014-04 2, 2014-07 7) against Mar-Jul 2022.  Not adjudicated
+and not nulled here.

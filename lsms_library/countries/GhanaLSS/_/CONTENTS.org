@@ -2011,6 +2011,342 @@ TODO below).
 
 For the cross-country canonical-=u= roadmap, see GH #223.
 
+*** =u='None'= is "no unit recorded", not a unit (GH #1042, 2026-10-18)
+
+*Decision.*  The Section 8H own-production unit spelled =None= / =none=
+now maps to the missing-unit sentinel =Unknown=
+(=transformations.U_UNKNOWN=) in =_/unit_labels.org=, so the kg inference
+refuses it (=_unit_sentinel_mask=) and those rows are carried in their native
+unit.  The remap sits in the country table because that is where all three
+waves mint the label; an API-time =categorical_mapping.org= row would rename
+the served column *after* the kg factor was inferred.
+
+*Where the rows come from* (all =s='produced'=, 2,508 served rows, 798
+=(t,i,j)= groups; *none* of those groups reports any other unit):
+
+| wave    | variable | code | served rows | raw code-0 rows, consumer & qty > 0 |
+|---------+----------+------+-------------+-------------------------------------|
+| 1998-99 | =s8hq9=  | 0    |          88 |  36 (decoded by the wave's own =s8hq9= table, =0 None=) |
+| 2005-06 | =s8hq13= | 0    |       1,450 | 639 (value label =none=) |
+| 2012-13 | =s8hq9=  | 0    |         970 | 343 (value label =none=) |
+
+*Questionnaire (C4), wave by wave* (re-read 2026-10-18; corrects the first
+version of this entry, which wrongly put count units in GLSS5's list).  The
+three instruments do *not* share an 8H unit list:
+
+- *GLSS4 (1998-99)*, =1998-99/Documentation/questionnaire/GHA_1998_GLSS_Household_Questionnaire_EN.pdf=,
+  Part B §8H Q9 "ENTER UNIT THAT THE RESPONDENT CHOOSES".  It prints *two
+  different, conflicting* unit lists, and *neither has a code 0 / None*:
+  - p. 8.15 (PDF p. 72; pages 8.11-8.14 point their Q9 here): =Pounds 1,
+    Kilogram 2, Ton 3, Minibag 5, Maxibag 5, Sheet 6, Basket 7, Bowl 8,
+    American tin 9, Tree 10, Stick 11, Bundle 12, Barrel 13, Liter 14,
+    Gallon 16, Beer bottle 16, Bunch 17, Nut 18, Fruit 19, Log 20, Box 21,
+    Margarine Tin 22, Tubers 23, Fingers 24= -- misprinted as printed (5 and
+    16 each used twice, no 4 or 15);
+  - p. 8.17 (PDF p. 74; attached to the meat/poultry/fish page 8.16 and to
+    8.17 itself -- milk, drinks): =Pounds 1, Kilogram 2, Ton 3, Minibag 4,
+    Maxibag 5, Sheet 6, Basket 7, Bowl 8, American tin 9, Crate 10,
+    Single/Whole 11, Bundle 12, Barrel 13, Litre 14, Gallon 15, Beer Bottle 16,
+    Box 17=.
+  So codes 10, 11 and 17 mean different things depending on which list the
+  enumerator used, and *chicken and eggs (page 8.16) were coded on the list
+  that has =Single/Whole 11=*.  Neither list prints =All=, which the 1998-99
+  data decodes (2,180 Egg rows, 289 Chicken rows).  Not fixed here -- see
+  the GLSS4 dual-list residual in the GH #1042 report.
+- *GLSS5 (2005-06)*, =2005-06/Documentation/G5QPartB.pdf=, Part B §8H Q13
+  "SEE LIST OF UNIT CODES": =None 00, All 01, American tin 02, Barrel 03,
+  Basket 04, Beer bottle 05, Bowl 06, Box 07, Bunch 08, Bundle 09,
+  Fanta bottle 10, Fingers 11, Fruits 12, Gallon 13, Kilogram 14, Litre 15,
+  Log 16, Margarine tin 17, Maxi bag 18, Mini bag 19, Nut 20, Pounds 21,
+  Sheet 22, Stick 23, Tonne 24, Tubers 26= (no 25).  *There is no Single,
+  Piece, Dozen, Crate or Whole.*  =singles= exists only in the DATA, as the
+  unprinted value label 37 of =s8hq13= in =sec8h.dta=, one of twelve codes
+  the data add after the printed list (=25 tree=, then =27 balls, 28 bar,
+  29 bucket, 30 crate, 31 dozen, 32 loaf, 33 pair, 34 pieces, 35 pots, 36 set,
+  37 singles, 38 yards/meter=) -- post-codes, not options the enumerator was
+  shown.  8C(1), 8C(2) and 8D print
+  near copies (pp. 8.5-8.8, PDF pp. 11-14): they *add* =Tree 25=, spell
+  code 12 =Fruit= (8H: =Fruits=), and *keep* =Margarine tin 17= (corrected
+  2026-10-18; an earlier version said they drop it).  Only 8G's list
+  (p. 8.10, PDF p. 16) lacks =Margarine tin 17= -- it also omits =None 00= and
+  every code 15-23.  No Section 8 list prints a count unit.  How it was
+  read: the list is in the PDF text layer on printed pp. 8.11, 8.12, 8.14,
+  8.15 and 8.17; the text layer of 8.13 (oils) and *8.16 (eggs and snail)*
+  carries no list, so for those two pages this rests on the GH #1042 red
+  team's full read of the document, not on extracted text.
+- *GLSS6 (2012-13)*, =2012-13/Documentation/QUESTIONNAIRES/GLSS6 Part B Questionnaire.pdf=,
+  §8H "UNIT CODES REFER TO PAGE 8.10"; the list on p. 8.10 (PDF p. 15) runs
+  =None 00 ... Yards 42= and *adds the count units* =Crate 13=, =Dozen 15=,
+  =Pieces 31=, =Single 37= (beside =Balls 03=, =Pair 30=, =Set 35=, ...).
+  The other list on that page (processed/transformed goods, =Cassava flour 01=
+  ...) has no None; the red team additionally read =None ....00= heading the
+  p. 8.4 crop list and "IF NONE PUT '00'" in §9A Q3 (not re-read here).
+
+So code 0 is the instrument's "nothing / not applicable" code in GLSS5 and
+GLSS6, and GLSS4 has no such code at all.
+
+*Data.*  Code 0 is also the zero-fill on non-consumer rows: 374,626 of the
+375,782 2005-06 =s8hq1='no'= rows, and 978,825 of the 979,290 2012-13 rows
+whose =s8hq1= is not ='yes'= (60 of them blank), carry it -- almost all
+with no quantity at all.  The served =None= rows were nevertheless
+being given *inferred* kilograms -- 39,029 kg in total (=item_unit= 1,745
+rows, =unit= 653, =item_unit_tight= 110) -- and the factors are nonsense:
+Pepper 26 kg per "None" (110 rows, 28,773 kg = 74% of the total), Egg 1.2 kg
+per egg, and 653 rows on the cross-item pooled factor 0.679.
+
+*What it is not -- and the evidence that actually holds.*  The first version
+of this entry argued that GLSS5 "offers singles/piece for exactly that", so a
+counted chicken would have been coded as one.  *That is false* (above): GLSS5
+prints no count unit at all, so an enumerator who counted birds or eggs had
+no code to record it.  What the data show instead is that, for Chicken and
+Egg, the unit label carries *no size information in any unit*: in 2005-06
+every Chicken unit prices like one bird (=All= 981 rows at a median 30,000;
+=Kilogram= 140 at 22,500; =None= 184 at 25,000; =Single= 73 at 30,000) and
+every Egg unit like one egg (=All= 1,690 at 1,000; =None= 200 at 1,200;
+=Single= 105 at 1,000; =Kilogram= 13 at 1,000); in 2012-13 Chicken =None=
+203 rows at 10 against =Single= 2,723 at 12, Egg =None= 26 at 0.4 against
+=Single= 3,056 at 0.4.  So =None= on these rows is plausibly "counted, with
+no code to say so".  The slice is 687 rows (27% of the 2,508) and 1,475 kg
+(3.8% of the 39,029 kg removed).  Serving them =Unknown= (no inferred kg) is
+the conservative default; the count-unit follow-up below acts on the price
+evidence where -- and only where -- the resulting kilograms are plausible.
+
+*Accounting* (private cold rebuild of GhanaLSS at 3e3bd26ee + this change):
+see the GH #1042 commit message and =tests/test_gh1042_missing_unit_spellings.py=.
+| measure                                     | before        | after         |
+|---------------------------------------------+---------------+---------------|
+| =u='None'= rows (1998-99 / 2005-06 / 2012-13) | 88 / 1,450 / 970 | 0           |
+| =u='Unknown'= rows                          | 0             | 88 / 1,450 / 970 |
+| =food_acquired= rows; sum Expenditure       | 5,340,606; 19,059,899,600.9 | unchanged |
+| =food_quantities(units='kgs')= total kg     | 11,079,155.43 | 11,040,126.57 (-39,028.86) |
+| =kg_factor_sources= item_unit / tight / unit / none | 1,011,668 / 70,443 / 606,596 / 3,565,404 | 1,009,923 / 70,333 / 605,943 / 3,567,912 |
+| =kg_factor_baseline_gate= rows_refused      | 428,373       | 428,173       |
+| =food_prices()= rows, =kgvalue= / =kgprice= | 568,624 / 189,649 | 567,839 / 188,864 |
+| =food_prices()= rows, =unitvalue= / =unitprice= | 1,676,093 / 189,656 | unchanged |
+| =nutrition._quantities()= (486,507 cells)   | 10,813,574.81 kg | identical, max abs diff 0 |
+
+*Not changed:* =nutrition.py='s =NON_PHYSICAL_UNITS= still names ='none'=;
+after the rename the rows arrive as =Unknown= and pass that filter, but they
+carry no kg factor and are dropped by its =u == 'kg'= mask, so the nutrient
+quantities are unchanged (measured above).  =community_prices= (the other
+=unit_labels.org= reader) has no =None= rows.  =u='All'= is a different
+question and is untouched.
+
+*** Count unit for own-produced chicken: unit code 0 -> =Single= (GH #1042 follow-up, @ligon 2026-10-18)
+
+*Decision.*  @ligon asked for count units for chicken and eggs.  Acted on
+where the evidence holds *and* the resulting kilograms are plausible, which
+is Chicken in 2005-06 and 2012-13 only.  =ghanalss.unrecorded_unit_to_count=
+(called in both wave =food_acquired.py= scripts right after
+=to_country_food_labels=, i.e. on the country =j= axis and the canonical =u=)
+relabels =s='produced'=, =u='Unknown'= rows of the items in
+=ghanalss.UNRECORDED_UNIT_IS_COUNT= to =Single= -- the spelling GLSS6 prints
+(=Single 37=) and GLSS5's data carries (value label 37), so they pool with
+the genuine count rows.  Pure relabel; the index stays unique (asserted --
+Trap 9).  It is a harmonisation of the unit *label*, like the
+=None -> Unknown= row in =unit_labels.org=, not a registered derivation.
+
+*Evidence, per (wave, item)* (=s='produced'=, branch head before this change;
+test: median price of the =None= rows against the same wave's =Single= rows,
+and the share of =None= rows within [0.5x, 2x] of that median):
+
+| wave    | item     | None rows @ median | Single rows @ median | in band | (item, Single) kg | done? |
+|---------+----------+--------------------+----------------------+---------+-------------------+-------|
+| 2005-06 | Chicken  | 184 @ 25,000       | 73 @ 30,000          | 0.98    | 1.2 -> 1.07       | yes   |
+| 2012-13 | Chicken  | 203 @ 10           | 2,723 @ 12           | 0.95    | 1.2 -> 1.07       | yes   |
+| 1998-99 | Chicken  | 8 @ 5,000          | none served          | --      | --                | no: nothing to pool with |
+| 2005-06 | Egg      | 200 @ 1,200        | 105 @ 1,000          | 0.94    | *0.50 per egg*    | no    |
+| 2012-13 | Egg      | 26 @ 0.4           | 3,056 @ 0.4          | 0.96    | *0.50 per egg*    | no    |
+| 2012-13 | Other Domestic Poultry | 41 @ 15 | 444 @ 14         | 1.00    | 0.79              | no: below a live bird |
+| 2012-13 | Goat     | 15 @ 50            | 178 @ 60             | 1.00    | 4.54              | no: a goat is ~20-30 kg |
+| 2005-06, 2012-13 | Coconut (fresh) | 28 @ 1,000; 18 @ 0.4 | 12 @ 1,000; 310 @ 0.5 | 1.00 | 1.0 | no: plausible, not asked for -- candidate |
+
+=None= is *not* a count in general: in 2012-13 its rows price at 10x the
+=Single= median for Maize (cob) and Okra, 5x for Eggplant and Pepper, 6x for
+Maize (flour/dough).  2005-06's own test is weak (Maize (cob), Onion and Shea
+Butter also "pass" because their prices barely vary across any unit), which
+is why the kg check is the second gate and not a formality.
+
+*Why eggs are NOT done* (superseded 2026-10-18: eggs are now relabelled AND
+declared no-kg -- next entry).  The price evidence holds, but the ladder infers
+=(Egg, Single)= at *0.501 kg per egg* (an egg is ~0.05-0.065 kg), because the
+egg =Kilogram= rows price at the per-egg price (1,000 cedis in 2005-06, 0.4 GHS
+in 2012-13): the =(t, Egg)= per-kg baseline is built from counts mislabelled
+as kilograms.  That is the same fault that gave the old =(Egg, None)= 1.2 kg
+and gives =(Egg, Piece)= 0.0012 kg.  The task's rule was "if the inferred factor
+is implausible, leave the rows at the count unit with =none= kg" -- but
+=food_kg_factors= has *no item-level refusal*: a row on =Single= reaches the
+=item_unit= rung, then the u-pooled =unit= rung, and never =none=.  So a
+remapped egg row would be served 0.50 kg, and the egg rows stay =Unknown=
+(still counted by =units='units'=).  Note the *genuine* =(Egg, Single)= rows
+already carry that factor (105 + 3,056 + 10,727 in 2005-06 / 2012-13 /
+2016-17, all =s=); not changed here.  GH #1042 residual.
+
+*Accounting* (private cold rebuild; before = branch head f0d1396b6):
+| measure                                       | before                     | after                      |
+|-----------------------------------------------+----------------------------+----------------------------|
+| =u='Unknown'= rows 1998-99 / 2005-06 / 2012-13 | 88 / 1,450 / 970           | 88 / 1,266 / 767           |
+| produced Chicken =Single= 2005-06 / 2012-13   | 73 / 2,723                 | 257 / 2,926                |
+| =food_acquired= rows; sum Expenditure         | 5,340,606; 19,059,899,600.9 | unchanged; index unique   |
+| =(Chicken, Single)= =kg_per_unit= (all waves)  | 1.2 (=item_unit=)          | 1.0714 (=item_unit=)       |
+| kg on the 387 remapped rows                   | 0 (=none=)                 | 233.6 + 307.6 = 541.2      |
+| kg on the genuine produced Chicken =Single= rows 2005-06 / 2012-13 | 245.2 / 4,957.0 | 218.9 / 4,425.9 |
+| =food_quantities(units='kgs')= total kg       | 11,040,126.57              | 11,040,085.37 (-41.20)     |
+| =kg_factor_sources= item_unit / none          | 1,009,923 / 3,567,912      | 1,010,310 / 3,567,525      |
+| =kg_factor_baseline_gate= rows_refused        | 428,173                    | unchanged                  |
+| =food_prices()= =kgvalue= / =kgprice=         | 567,839 / 188,864          | 568,027 / 189,052 (+188 =(t,i,j)= cells) |
+| =food_prices()= =unitvalue= / =unitprice=; =food_quantities(units='units')= rows | 1,676,093 / 189,656; 1,694,623 | unchanged |
+| =nutrition._quantities()=                     | 486,507 cells, 10,813,574.81 kg | 486,695 cells, 10,813,533.61 kg |
+
+Pooling the 387 rows (priced a little below the genuine =Single= rows) pulls
+the shared factor down 11%, so every =(Chicken, Single)= row in every wave and
+source loses 11% of its kilograms -- net, the country gains 541 kg on the
+remapped rows and loses 582 kg elsewhere.  1.07 kg is still a plausible
+dressed bird.  Pinned by =tests/test_gh1042_missing_unit_spellings.py=
+(=..._count_unit_*=, =..._chicken_count_rows_get_a_plausible_bird_weight=).
+
+*** Eggs and fresh coconut: count unit; eggs get NO inferred kilograms (GH #1042 rulings, @ligon 2026-10-18)
+
+*Rulings.*  (1a) Own-produced egg on unit code 0 -> =Single=, as chicken;
+(1b) an *item-level "no kg factor"*, so egg rows on a count unit keep their
+native count and get =KgFactorSource == 'none'=; (3) fresh coconut on unit
+code 0 -> =Single=; (6) the chicken cross-wave move is accepted and disclosed
+(below).  The "Why eggs are NOT done" paragraph of the entry above is
+superseded by this one.
+
+*Price evidence, re-measured* (cold build at 7b20e8c31, =s='produced'=,
+median =Expenditure/Quantity= of the code-0 =Unknown= rows vs the same wave's
+=Single= rows):
+| wave    | item            | Unknown rows @ median | Single rows @ median | in [0.5x, 2x] |
+|---------+-----------------+-----------------------+----------------------+---------------|
+| 2005-06 | Egg             | 200 @ 1,200           | 105 @ 1,000          | 0.94          |
+| 2012-13 | Egg             | 26 @ 0.40             | 3,056 @ 0.40         | 0.96          |
+| 2005-06 | Coconut (fresh) | 28 @ 1,000            | 12 @ 1,000           | 1.00          |
+| 2012-13 | Coconut (fresh) | 18 @ 0.40             | 310 @ 0.50           | 1.00          |
+Same waves and scope as chicken: 1998-99 serves no =Single= for egg or
+coconut (4 egg code-0 rows, no coconut), so there is nothing to pool with.
+No =(t,i,j,s,visit)= group holds both =Unknown= and =Single= for either item,
+so the relabel cannot collide (Trap 9).  =(Coconut (fresh), Single)= infers
+1.0 kg per coconut, before and after.  That is plausible *by coincidence*
+(red team r3, R7; re-measured 2026-10-19): it is the same counts-as-kg
+artefact as the eggs.  The =(t, Coconut (fresh))= baseline is the 2012-13
+=Kg= rows (49, served =metric=), which price at a median 0.5 per "kg" --
+the =Single= median, 0.5 -- so they are coconuts counted under a kilogram
+label, and the ratio of two per-coconut prices is 1.  2005-06 has no =Kg=
+coconut rows.  The same baseline serves =Fruit= 1.0 kg (1,017 rows, all
+waves) and =All= 0.6 kg (581 rows).  Not declared: the number happens to be
+a defensible coconut weight; recorded so nobody reads it as measured.
+
+*The declaration.*  =_/no_kg_factor.yml= names =Egg= on every count unit it
+carries: =Single=, =Piece=, =Ball= (GLSS6 prints =Balls 03= beside =Pieces
+31=), =Pair=, =Dozen=, =Crate=.  Factors the ladder served them before, all
+implausible because the =(t, Egg)= per-kg baseline is built from egg
+=Kilogram= rows that price at the per-egg price: =Single= 0.5006 kg
+(13,888 rows), =Piece= 0.0012 (714), =Ball= 0.0012 (122), =Pair= 0.0825
+(u-pooled, 5), =Dozen= 0.024 (42), =Crate= 0.030 (1,636; a crate is 30
+eggs).  Not declared: =All=, containers (=Basket=, =Bowl=, ...) and
+=Heap=.  The mechanism is
+=transformations.food_kg_factors(no_kg=...)=, fed at read time by
+=Country._no_kg_factor_cells=; the rows are disclosed in
+=attrs['kg_factor_declared_none']=.
+
+*=All= is an OPEN residual, not a settled exclusion* (red team r3, R2;
+re-measured at this head, 2026-10-19).  The first version of this entry
+excluded =All= as "GLSS's 'all', not a count".  The price evidence says
+otherwise: egg =All= rows price like ONE egg -- median =Expenditure /
+Quantity= 2005-06 1,000 against =Single= 1,000 and =Kg= 1,000; 2012-13 0.40
+against 0.40 and 0.40; 1998-99 200 against =Kg= 250 (no =Single= served
+there; 1991-92 has no expenditure) -- and =nutrition.py= itself classes
+=all= as non-physical (=NON_PHYSICAL_UNITS=).  So =All= is still served
+1.0 kg per unit from the very =(t, Egg)= baseline the declaration calls
+broken: *12,928 rows, 23,584.02 kg* (1991-92 8,932 rows / 4,602.80 kg;
+1998-99 2,180 / 11,437.12; 2005-06 1,690 / 6,885.10; 2012-13 126 /
+659.00), every row =item_unit= at exactly 1.0.  The smaller item-rung units
+behave the same way: =Nut= 146 rows / 493.00 kg, =Finger= 141 / 479.00,
+=Stick= 41 / 141.00, =Barrel= 14 / 41.00, all at 1.0 and pricing at 1,000
+per unit in 2005-06 (=Finger= 200 in 1998-99), and =Bunch= 13 / 154.00 at
+2.0 (priced 2,000).  In all, the item rung serves 24,899.95 of the
+25,606.42 egg kg still served.  Whether to extend the declaration (the
+simplest form is =item: Egg= with no =units=, i.e. every egg unit; =metric=
+would still serve =Kg= / =Pound= / =Gram= / =Liter= / =Milliliter=) or to
+rule that =All= is a measure is a decision for @ligon, not taken here.
+Also out of the mechanism's reach *by design*: the 288 egg =Kg= rows
+(518.70 kg) served by the =metric= rung although they price per egg -- a
+declaration refuses inferred factors only.
+
+*Before / after* (private cold rebuilds; before = 7b20e8c31):
+| measure                                       | before                      | after                       |
+|-----------------------------------------------+-----------------------------+-----------------------------|
+| =u='Unknown'= rows 1998-99 / 2005-06 / 2012-13 | 88 / 1,266 / 767            | 88 / 1,038 / 723            |
+| Egg =Single= 2005-06 / 2012-13 / 2016-17      | 105 / 3,056 / 10,727        | 305 / 3,082 / 10,727        |
+| Coconut (fresh) =Single= 2005-06 / 2012-13    | 12 / 310                    | 40 / 328                    |
+| =food_acquired= rows; sum Expenditure         | 5,340,606; 19,059,899,600.9 | unchanged; index unique     |
+| egg count-unit rows / their kg                | 16,407 / 32,881.51 (inferred) | 16,633 / 0 (=none=)       |
+| =kg_factor_declared_none= matched = refused   | --                          | 16,633                      |
+| =food_quantities(units='kgs')= total kg       | 11,040,085.37               | 11,007,391.86 (-32,693.51)  |
+| =kg_factor_sources= item_unit / unit / none   | 1,010,310 / 605,943 / 3,567,525 | 993,954 / 605,938 / 3,583,886 |
+| =kg_factor_baseline_gate= rows_refused        | 428,173                     | 428,168                     |
+| =food_prices()= =kgvalue= / =kgprice=         | 568,027 / 189,052           | 560,023 / 187,096           |
+| =food_prices()= =unitvalue= / =unitprice=     | 1,676,093 / 189,656         | unchanged                   |
+The kg fall is exactly the egg rows' inferred kilograms less the coconut
+rows' new 188.00 kg; no other row is re-priced (the declared rows still
+enter the estimators as evidence).  Eggs on other units keep their
+25,606.42 kg.
+
+*Not reached by the declaration -- an OPEN residual, and these rulings ADD
+egg kilograms to =nutrition=* (red team r3, R1).  =nutrition.py:_quantities=
+calls =food_quantities_from_acquired(fa, units='kgs')= itself, without
+=no_kg= (and without =unit_kg=), so the =nutrition= table still weighs every
+counted egg at the ladder's factors -- =(Egg, Single)= 0.5006 kg.  Before
+the egg relabel, the 226 own-produced code-0 egg rows were =Unknown= (no
+factor) and fell out at nutrition's =u == 'kg'= filter; as =Single= they are
+now weighed, and the 46 relabelled coconut rows likewise.  Measured
+2026-10-19 by running =_quantities= in each checkout against its own
+cold-built =food_acquired= (development =ddd79800c= is identical to
+7b20e8c31 for Egg and Coconut):
+| =nutrition._quantities()=  | 7b20e8c31 (before the rulings)  | rulings head =ad9df1e3b=   | change   |
+|----------------------------+---------------------------------+----------------------------+----------|
+| Egg 2005-06                | 98 cells, 1,335.66 kg           | 178 cells, 1,602.13 kg     | +266.47  |
+| Egg 2012-13                | 1,339 cells, 8,662.50 kg        | 1,349 cells, 8,746.10 kg   | +83.60   |
+| Egg 2016-17                | 5,948 cells, 24,508.93 kg       | unchanged                  | 0        |
+| Coconut (fresh) 2005-06 / 2012-13 | 1,897.97 / 2,598.75 kg   | 1,969.97 / 2,714.75 kg     | +72.00 / +116.00 |
+| all items                  | 486,695 cells, 10,813,533.61 kg | 486,793 cells, 10,814,071.68 kg | +538.07 |
+(Development: 486,507 cells, 10,813,574.81 kg; the step to 7b20e8c31 is the
+chicken relabel, measured in the entry above.)  The 2016-17 row is the
+larger point: =nutrition= serves 24,508.93 kg of egg there at 0.50 kg per
+egg, which =food_quantities()= no longer does.  Measured at this head, not
+applied: passing =no_kg=c._no_kg_factor_cells()= would take =nutrition= to
+479,663 cells / 10,780,840.09 kg (-33,231.59), Egg 2005-06 1,077.85 /
+2012-13 515.75 / 2016-17 31.97 kg; passing =unit_kg= (=quintal= 100) moves 0
+cells today.  Not done on this branch because =_/no_kg_factor.yml= would
+then become a *build* input of =var/nutrition.parquet=, and it is not hashed
+(=_BUILD_INPUT_SUFFIXES= has no =.yml=): an edit to the declaration would
+leave =nutrition= stale with no signal.  GH #1042 residual (drafted in the
+r3-fix report: route =_quantities= through =no_kg= and hash the =.yml= for
+that table).
+
+*Why goat and other domestic poultry are NOT relabelled* (ruling 3): both
+pass the price test in 2012-13 (Goat 15 @ 50 vs 178 @ 60; Other Domestic
+Poultry 41 @ 15 vs 444 @ 14; all in band) *and in 2005-06*, there on one or
+two =Single= rows only (Goat 14 @ 170,000 vs 1 @ 160,000, in band 1.00;
+Other Domestic Poultry 20 @ 30,000 vs 2 @ 45,000, 0.95 -- added 2026-10-19,
+red team r3, R8), but the =(item, Single)= factor
+the ladder would serve them is implausible -- Goat 4.54 kg (a goat is ~20-30
+kg), Other Domestic Poultry 0.79 kg (below a live bird) -- so a relabel would
+mint wrong kilograms where =Unknown= mints none.
+
+*Chicken: the cross-wave move, accepted and disclosed (ruling 6).*  The
+=(Chicken, Single)= factor is one number per =(j, u)= pooled across waves, so
+pooling the 387 relabelled 2005-06/2012-13 rows moved it 1.2 -> 1.0714 kg for
+*every* wave.  2016-17 was not relabelled, yet its 155 purchased =(Chicken,
+Single)= rows (194.5 birds) go 233.40 -> 208.39 kg (-10.7%; re-measured at
+this head -- the 1.2 is the factor measured before the chicken relabel).
+And the price test cannot distinguish =Single= from =Kilogram= for chicken
+(2005-06 medians: =Single= 30,000, =Kilogram= 22,500, the code-0 rows 25,000:
+one bird is about a kilogram), so the chicken relabel rests on the
+plausibility of the resulting kilograms and on the quantities (whole birds),
+not on price alone.
+
 *** Test...
 #+begin_src python :results output
 import pandas as pd
@@ -5054,3 +5390,10 @@ served an inferred kg factor (=item_unit= 1,745, =unit= 653,
 *Not established* -- the questionnaires were not checked -- so it is recorded
 as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
 (already a sentinel: served =none=).
+
+*Superseded (GH #1042, 2026-10-18).*  Verified against the GLSS4/5/6
+questionnaires: =None= is code 0, the instrument's "nothing / not applicable"
+code, and is now served as =Unknown= with no inferred kilograms; the
+own-produced chicken, egg and fresh-coconut rows whose code 0 prices like
+one item are served on the count unit =Single=.  See the GH #1042 entries
+under the food_acquired section.

@@ -68,8 +68,8 @@ The following tables are the assigned preferred labels for units from all rounds
 | Mini Bag        | Mini bag                      |
 | Mini Bag        | mini bag                      |
 | Minute          | Minutes                       |
-| None            | None                          |
-| None            | none                          |
+| Unknown         | None                          |
+| Unknown         | none                          |
 | Nut             | nut                           |
 | Nut             | Nut                           |
 | Other Unit      | Other unit                    |

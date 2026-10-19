@@ -61,9 +61,10 @@ from .currency import attach_currency, is_monetary_table
 # lsms_library/__init__.py imports it anyway.  The other `transformations`
 # imports in this file are function-local for historical reasons; this one is
 # on the hot read path (_finalize_result), so it is hoisted.
-from .transformations import validate_acquisition_source
+from .transformations import UNIT_KG_ATTRS_KEY, validate_acquisition_source
 from .build_transforms import build_context
-from .errors import LabelUnavailableError, UnitsUnavailableError
+from .errors import (LabelUnavailableError, UnitsUnavailableError,
+                     UnregisteredCountryError)
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
 from .null_index_audit import check_index_levels
@@ -516,8 +517,11 @@ def _strip_string_values(s: pd.Series) -> pd.Series:
 
 
 def _no_such_country_message(country_name: str) -> str:
-    """The ``ValueError`` text for a name with no directory under
-    ``countries_root()`` (GH #915).
+    """The ``ValueError`` text for a name that is not a country directory
+    entry under ``countries_root()`` -- no such directory, or a path that is
+    not a single non-hidden entry (``'Uganda/2019-20'``, ``'.dvc'``) (GH #915).
+    An entry that exists but lacks ``_/data_scheme.yml`` raises
+    :class:`~lsms_library.errors.UnregisteredCountryError` instead.
 
     Names the near misses from the REGISTERED list (``catalog._country_dirs``,
     the same list ``lsms_library.countries()`` returns), matched
@@ -533,7 +537,8 @@ def _no_such_country_message(country_name: str) -> str:
     by_lower = {}
     for n in registered:
         by_lower.setdefault(n.lower(), n)
-    close_lower = difflib.get_close_matches(country_name.lower(),
+    # str(): a non-str name (a Path) is refused too, as ValueError (GH #915).
+    close_lower = difflib.get_close_matches(str(country_name).lower(),
                                             list(by_lower), n=3, cutoff=0.6)
     close = [by_lower[c] for c in close_lower]
     msg = f"No such country {country_name!r}."
@@ -2136,8 +2141,15 @@ class Country:
     Parameters
     ----------
     country_name : str
-        Directory name under ``lsms_library/countries/``
-        (e.g. ``'Uganda'``, ``'Tanzania'``).
+        A REGISTERED country: a directory name under ``countries_root()``
+        (by default ``lsms_library/countries/``) that carries a
+        ``_/data_scheme.yml`` -- e.g. ``'Uganda'``, ``'Tanzania'``.  The
+        accepted names are exactly :func:`lsms_library.countries` (GH #915).
+        A name with no directory raises ``ValueError`` naming the near
+        misses; a directory without ``_/data_scheme.yml`` (staged microdata
+        not yet wired up, e.g. ``'Bulgaria'``) raises
+        :class:`~lsms_library.errors.UnregisteredCountryError`, a
+        ``ValueError`` subclass, unless *allow_unregistered* is set.
     preload_panel_ids : bool
         If True, compute panel ID mappings eagerly at construction time.
         Default is False (lazy).
@@ -2162,6 +2174,17 @@ class Country:
     trust_cache : bool
         Deprecated alias for ``assume_cache_fresh``.  Will be removed in
         v0.8.0.
+    allow_unregistered : bool
+        Opt-in for **acquisition and scaffold code** that works on a country
+        directory *being built*, before (or without) a ``_/data_scheme.yml``:
+        wave discovery (``data_access.discover_waves``), provenance stamping
+        (``scripts/backfill_wave_provenance.py``), cache maintenance
+        (``lsms-library cache clear``).  Relaxes only the
+        ``_/data_scheme.yml`` requirement: the name must still be a
+        non-hidden directory directly under ``countries_root()``.  Such a
+        ``Country`` declares no tables; ``waves`` falls back to the
+        ``Documentation/SOURCE.org`` scan.  Default ``False``; analysis code
+        should never need it.
 
     Examples
     --------
@@ -2179,14 +2202,26 @@ class Country:
                  'food_expenditures', 'food_quantities', 'food_prices',
                  'fct', 'nutrition','name','_panel_ids_cache', 'panel_ids']
 
-    def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False) -> None:
-        # Validate country name: reject path traversal attempts
+    def __init__(self, country_name: str, preload_panel_ids: bool = False, verbose: bool = False, assume_cache_fresh: bool = False, trust_cache: bool = False, allow_unregistered: bool = False) -> None:
+        # Validate country name: reject path traversal attempts.  Compare
+        # resolved with resolved: countries_root() returns an override as
+        # given, so a relative or symlinked LSMS_COUNTRIES_ROOT used to refuse
+        # every country here while countries() listed them all (GH #915).  An
+        # ENTRY symlinked out of the root is still refused (#915-a, undecided).
         countries_dir = countries_root()
         country_dir = (countries_dir / country_name).resolve()
-        if not country_dir.is_relative_to(countries_dir):
+        if not country_dir.is_relative_to(countries_dir.resolve()):
             raise ValueError(f"Invalid country name {country_name!r}: path traversal not allowed")
-        if not country_dir.is_dir():
+        # GH #915: accept exactly lsms_library.countries() -- the SAME
+        # predicate (catalog._is_registered), read from the filesystem rather
+        # than the lru_cached list.  A name that is not a directory entry
+        # directly under the root ('Ghana', 'Uganda/2019-20', '.dvc') is "no
+        # such country"; an entry without _/data_scheme.yml is unregistered.
+        from .catalog import _has_data_scheme, _is_country_entry   # lazy: catalog imports from here
+        if not _is_country_entry(countries_dir, country_name):
             raise ValueError(_no_such_country_message(country_name))
+        if not allow_unregistered and not _has_data_scheme(countries_dir, country_name):
+            raise UnregisteredCountryError(country_name, countries_dir / country_name)
         self.name = country_name
         self._panel_ids_cache = None
         self._updated_ids_cache = None
@@ -2317,6 +2352,12 @@ class Country:
         The canonical name is emitted as a key in its own right, so a country
         whose raw labels are already canonical (Ethiopia serves ``Quintal``)
         resolves without needing a ``u`` row for it.
+
+        Two consumers.  The FOOD ladder is handed this dict as ``unit_kg`` by
+        ``food_prices`` / ``food_quantities``; the CROP ladder
+        (``transformations.harvest_kg_factors``, GH #931) reads it off
+        ``crop_production.attrs['unit_kg']``, stamped as ``{country: dict}``
+        by ``_finalize_result``.
         """
         maps = self.categorical_mapping
         table = maps.get('u_kg')
@@ -2352,6 +2393,53 @@ class Country:
                     if key in canonical:
                         factors[str(raw).strip().lower()] = canonical[key]
         return factors
+
+    def _no_kg_factor_cells(self) -> tuple[tuple[str, str | None], ...]:
+        """Declared ``(item, unit)`` cells that get NO inferred kg (GH #1042).
+
+        Read from ``countries/{C}/_/no_kg_factor.yml`` at READ time and passed
+        to :func:`transformations.food_kg_factors` as ``no_kg=``.  A ``.yml``
+        sibling of ``data_scheme.yml`` is not a build input (``_input_hash`` /
+        ``_table_cache_hash`` glob ``_BUILD_INPUT_SUFFIXES`` plus ``*.org``),
+        so declaring a cell moves no cache hash -- like ``population.yml``.
+
+        Each entry needs ``item`` and a non-empty ``reason``; ``units`` is an
+        optional list (absent = every unit of the item).  An entry without a
+        reason is refused: a declaration that removes kilograms from served
+        rows must say why.  So is a ``units`` that is present but not a
+        non-empty list of non-empty strings (GH #1042 red team r3, R4): a
+        scalar ``units: Single`` used to be iterated character by character
+        and declare nothing, and ``units: []`` (or a bare ``units:``) declares
+        nothing where an absent key declares every unit.  A label that does
+        not occur in the frame is reported at use, by
+        :class:`~lsms_library.transformations.UnmatchedNoKgCellWarning`.
+        """
+        path = Path(countries_root()) / self.name / "_" / "no_kg_factor.yml"
+        if not path.exists():
+            return ()
+        with open(path, encoding="utf-8") as fh:
+            doc = yaml.safe_load(fh) or {}
+        entries = doc.get('no_kg_factor') or []
+        cells: list[tuple[str, str | None]] = []
+        for e in entries:
+            if not isinstance(e, dict) or not e.get('item') \
+                    or not str(e.get('reason') or '').strip():
+                raise ValueError(
+                    f"{path}: every no_kg_factor entry needs an `item` and a "
+                    f"`reason`; got {e!r}")
+            if 'units' not in e:
+                cells.append((str(e['item']), None))
+                continue
+            units = e['units']
+            if not (isinstance(units, list) and units
+                    and all(isinstance(u, str) and u.strip() for u in units)):
+                raise ValueError(
+                    f"{path}: no_kg_factor entry {e['item']!r}: `units` must be "
+                    f"absent (every unit of the item) or a non-empty list of "
+                    f"non-empty unit labels (quote a numeric label); got "
+                    f"{units!r}")
+            cells.extend((str(e['item']), u) for u in units)
+        return tuple(cells)
 
     @property
     def mapping(self) -> dict[str, Any]:
@@ -3711,6 +3799,25 @@ class Country:
             # Record the country so a later standalone convert() can recover it
             # (Feature output instead carries `country` in the index).
             df.attrs['country'] = self.name
+
+            # GH #931: the country's DECLARED unit masses, for the crop kg
+            # ladder (`transformations.harvest_kg_factors`), which is an
+            # analyst-called transform with no Country to ask.  Keyed by
+            # country so `Feature` can carry it per country
+            # (`feature._ATTRS_CARRIERS`).  A config read, and here for the
+            # population record's two reasons: this re-runs on every read, and
+            # `_finalize_result` is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # it costs no cache invalidation.  Metadata only.
+            if method_name == 'crop_production':
+                try:
+                    df.attrs[UNIT_KG_ATTRS_KEY] = {self.name: self._unit_kg_factors()}
+                except Exception as exc:
+                    warnings.warn(
+                        f"{self.name}: could not attach the declared unit "
+                        f"masses (attrs[{UNIT_KG_ATTRS_KEY!r}]; "
+                        f"{type(exc).__name__}: {exc}).  The table is "
+                        f"unaffected, but harvest_kg will apply no u_kg "
+                        f"declaration to it.")
 
             # Attach what this survey's documentation says the sample
             # REPRESENTS, per wave (GH #603/#601).  Metadata only: it adds
@@ -5700,6 +5807,9 @@ class Country:
                         # on the RAW label so the transform needs no knowledge of
                         # label harmonisation or of dispatch order.
                         transform_kwargs['unit_kg'] = self._unit_kg_factors()
+                        # GH #1042: declared (item, unit) cells that get no
+                        # inferred kg (``_/no_kg_factor.yml``).
+                        transform_kwargs['no_kg'] = self._no_kg_factor_cells()
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
                     if name == 'food_expenditures' and valuation is not None:

@@ -16,9 +16,11 @@ after import, the tree is byte-for-byte what it was before.
 Each case runs a fresh interpreter, because ``_COUNTRIES_DIR`` is an
 import-time snapshot of ``LSMS_COUNTRIES_ROOT``.  Everything the import
 might write -- config dir, data dir, countries root -- is a tmp path, so
-neither the developer's real credentials nor CI's in-tree
-``.dvc/s3_creds`` (which the ``data-tests`` job writes into the checkout)
-can mask the result: the real tree is never the countries root here.
+neither the developer's real credentials nor an older clone's in-tree
+``.dvc/s3_creds`` can mask the result: the real tree is never the
+countries root here.  (CI wrote that in-tree file by hand until GH #1031;
+it now writes the user-config path, and neither consumer below reads the
+in-tree one.)
 """
 from __future__ import annotations
 
@@ -54,7 +56,11 @@ def _countries_tree(root: Path) -> Path:
         if (REAL_DVC / name).exists():
             shutil.copy2(REAL_DVC / name, dvc / name)
     # DVC's Repo makes ``.dvc/tmp`` with exist_ok=True: a no-op on a
-    # read-only tree only if the directory is already there, as in a wheel.
+    # read-only tree only if the directory is already there.  A wheel does
+    # NOT ship it (0.15.0 carries no ``.dvc/tmp/``), and even with it a
+    # read-only tree fails the first READ at ``.dvc/tmp/btime`` -- the
+    # import cases below pass only because ``__init__`` swallows that
+    # OSError.  Measured and reported under GH #1032.
     (dvc / "tmp").mkdir()
     assert (dvc / "config").exists(), "the remote stanza needs .dvc/config"
     assert not (dvc / "s3_creds").exists()
@@ -67,10 +73,10 @@ def _snapshot(root: Path) -> dict[str, str]:
     Digests, never contents: a failing comparison must not print a
     credential into the test log.
 
-    ``.dvc/tmp/`` is excluded: it is DVC's own scratch directory (constructing
-    the ``DVCFileSystem`` drops a ``btime`` marker there on a writable tree,
-    and tolerates a read-only one).  That is a separate runtime write, not a
-    credential, and is reported as a residual of #1001 rather than pinned.
+    ``.dvc/tmp/`` is excluded: it is DVC's own scratch directory (building
+    the ``DVCFileSystem``'s repo drops a ``btime`` marker there on a writable
+    tree; ``Repo.tmp_dir`` has no config override).  That is a separate
+    runtime write, not a credential, and is GH #1032 rather than pinned.
     """
     out = {}
     for dirpath, dirnames, filenames in os.walk(root):
@@ -198,18 +204,74 @@ def _load_tests_conftest():
 def test_requires_s3_gate_reads_the_user_config_creds(tmp_path, monkeypatch, valid):
     """User-config-only credentials must not skip ``requires_s3`` tests.
 
-    The legacy in-tree path is pointed at nothing, so only the
-    ``config.s3_creds_path()`` lookup can make the gate open.
+    ``config.s3_creds_path()`` is the gate's only file lookup (GH #1031), so
+    the file named by ``LSMS_S3_CREDS`` decides it.
     """
     conftest = _load_tests_conftest()
     for var in ("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"):
         monkeypatch.delenv(var, raising=False)
-    monkeypatch.setattr(conftest, "_LEGACY_INTREE_CREDS", tmp_path / "absent")
     creds = tmp_path / "s3_creds"
     creds.write_text(FAKE_CREDS if valid else "[default]\n")
     monkeypatch.setenv("LSMS_S3_CREDS", str(creds))
 
     assert conftest.aws_creds_available() is valid
+
+
+def _fake_checkout(root: Path, rel: str) -> Path:
+    """A checkout-shaped tmp tree holding *rel* (a copy), the real
+    ``config.py``, and an in-tree ``countries/.dvc/s3_creds``.
+
+    The in-tree file is where CI used to write by hand; both consumers
+    resolved it relative to their OWN location, so the copy finds it exactly
+    as the original found the checkout's.
+    """
+    (root / rel).parent.mkdir(parents=True)
+    shutil.copy2(REPO / rel, root / rel)
+    (root / "lsms_library").mkdir(exist_ok=True)
+    shutil.copy2(REPO / "lsms_library" / "config.py", root / "lsms_library" / "config.py")
+    dvc = root / "lsms_library" / "countries" / ".dvc"
+    dvc.mkdir(parents=True)
+    (dvc / "s3_creds").write_text(FAKE_CREDS)
+    return root / rel
+
+
+def _load_by_file(path: Path, name: str):
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_intree_creds_do_not_open_the_requires_s3_gate(tmp_path, monkeypatch):
+    """GH #1031: the legacy in-tree rung is gone.
+
+    A file the library never reads must not open the gate, or the suite runs
+    data tests on credentials ``DVCFileSystem`` cannot see.
+    """
+    conftest = _load_by_file(_fake_checkout(tmp_path, "tests/conftest.py"),
+                             "_gh1031_conftest")
+    for var in ("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("LSMS_S3_CREDS", str(tmp_path / "absent"))
+
+    assert conftest.aws_creds_available() is False
+
+
+def test_reachability_script_reads_only_the_user_config_creds(tmp_path, monkeypatch):
+    """GH #1031: ``scripts/dvc_remote_reachability.py`` has no in-tree fallback."""
+    script = _load_by_file(
+        _fake_checkout(tmp_path, "scripts/dvc_remote_reachability.py"),
+        "_gh1031_reachability")
+    monkeypatch.setenv("LSMS_S3_CREDS", str(tmp_path / "absent"))
+    with pytest.raises(SystemExit, match="LSMS_S3_CREDS"):
+        script._reader_creds_file()
+
+    user = tmp_path / "user_s3_creds"
+    user.write_text(FAKE_CREDS)
+    monkeypatch.setenv("LSMS_S3_CREDS", str(user))
+    assert script._reader_creds_file() == user
 
 
 def test_cli_remote_reads_get_the_user_config_creds(tmp_path, monkeypatch):

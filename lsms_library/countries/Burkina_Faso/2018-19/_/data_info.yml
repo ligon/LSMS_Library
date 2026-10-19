@@ -123,12 +123,18 @@ cluster_features:
                     urbain: Urban
                     URBAIN: Urban
     df_geo:
+        # GH #1050: this used to ask for lat_dd_mod / lon_dd_mod, which the
+        # file does not carry; the KeyError was swallowed by the GH #515
+        # optional-sub-df fallback and every cluster was served without GPS.
+        # The file is one row per grappe (585 rows, 585 distinct grappes, the
+        # same 585 as s00_me), so the merge on v is many-to-one and the
+        # projection to (t, v) is lossless.  30 grappes ship no fix.
         file: grappe_gps_bfa2018.dta
         idxvars:
             v: grappe
         myvars:
-            Latitude: lat_dd_mod
-            Longitude: lon_dd_mod
+            Latitude: coordonnes_gps__Latitude
+            Longitude: coordonnes_gps__Longitude
     merge_on:
         - v
     final_index:

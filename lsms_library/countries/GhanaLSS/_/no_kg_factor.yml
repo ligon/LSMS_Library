@@ -1,0 +1,34 @@
+# Item-level "no kg factor" (GH #1042, @ligon 2026-10-18).
+#
+# Each entry names an (item, unit) cell whose price-ratio kilogram inference
+# is known to be wrong.  Rows on a declared cell get NO inferred kilograms:
+# they keep their native unit and quantity and are served
+# KgFactorSource == 'none' (the survey's own kilograms or a label's stated
+# metric content would still serve them; none of the cells below has either).
+#
+# Read at READ time by Country._no_kg_factor_cells() and passed to
+# transformations.food_kg_factors(no_kg=...).  A .yml sibling of
+# data_scheme.yml is NOT a build input, so editing this file moves no cache
+# hash.  Labels are the ones food_kg_factors sees: the country `j` axis and
+# the canonical `u` written by the wave scripts (before _finalize_result).
+#
+# Fields: item (required), units (list; absent = every unit of the item),
+# reason (required), evidence.  See CONTENTS.org, GH #1042 entries.
+
+no_kg_factor:
+  - item: Egg
+    units: [Single, Piece, Ball, Pair, Dozen, Crate]
+    reason: >-
+      The (t, Egg) per-kg baseline the item arm divides by is built from
+      egg 'Kilogram' rows that price at the PER-EGG price (2005-06 median
+      1,000 cedis on Kilogram 13 rows vs Single 105 rows at 1,000; 2012-13
+      0.4 GHS on both), i.e. counts mislabelled as kilograms.  The ladder
+      then serves (Egg, Single) 0.50 kg per egg, Piece and Ball 0.0012 kg,
+      Pair 0.082 kg, Dozen 0.024 kg, Crate (30 eggs) 0.030 kg; an egg weighs
+      ~0.05-0.065 kg.  No count unit of egg gets a defensible kilogram from
+      that baseline, so none is minted.  'Ball' is a count unit (GLSS6 8H
+      prints 'Balls 03' beside 'Pieces 31').
+    evidence: >-
+      CONTENTS.org, "Count unit for own-produced chicken" and "Eggs and
+      fresh coconut: count unit; eggs get NO inferred kilograms" (GH #1042).  Container and
+      non-count units ('All', 'Basket', 'Heap', ...) are not declared here.

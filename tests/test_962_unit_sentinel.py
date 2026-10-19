@@ -508,6 +508,15 @@ def test_every_classified_spelling_gets_no_price_ratio_factor(spelling):
 #: and if it means "no unit was recorded" it is a sentinel leak to report,
 #: not to file here quietly.
 MINTED_UNIT_SPELLINGS = {
+    ('GhanaLSS/_/ghanalss.py', 'Single'): (
+        'GH #1042 (@ligon 2026-10-18): unrecorded_unit_to_count relabels '
+        'own-produced Chicken / Egg / Coconut (fresh) rows whose 8H unit code '
+        '0 (None -> Unknown) prices like one counted item (2005-06, 2012-13; '
+        'median within 0.8x-1.2x of the same wave\'s Single rows, >= 94% '
+        'within [0.5x, 2x]) to the count unit GLSS6 prints as "Single 37" and '
+        'GLSS5 carries as data value label 37.  A real unit, not a '
+        'missing-unit spelling; eggs on it get no inferred kg '
+        '(GhanaLSS/_/no_kg_factor.yml).  Evidence: GhanaLSS/_/CONTENTS.org.'),
     ('Nigeria/2012-13/_/individual_unit_values.py', 'None'): (
         'Orphan script: individual_unit_values is in no data_scheme.yml or '
         'Makefile, so nothing served reads it.'),
