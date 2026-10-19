@@ -359,8 +359,7 @@
 | Viande d'autres oiseaux                                                                              | Viande d'autres oiseaux                      | x       | ---     | ---     |
 | Viande d'autres volailles domestiques                                                                | Viande d'autres volailles domestiques        | ---     | x       | x       |
 | Viande de b?uf                                                                                       | Viande de bœuf                               | x       | ---     | ---     |
-| Viande de buf                                                                                       | Viande de bœuf                               | ---     | x       | ---     |
-| Viande de bœuf                                                                                       | Viande de bœuf                               | ---     | ---     | x       |
+| Viande de bœuf                                                                                       | Viande de bœuf                               | ---     | x       | x       |
 | Viande de chameau                                                                                    | Viande de chameau                            | x       | x       | x       |
 | Viande de chèvre                                                                                     | Viande de chèvre                             | x       | x       | x       |
 | Viande de mouton                                                                                     | Viande de mouton                             | x       | x       | x       |
@@ -371,8 +370,7 @@
 | Vinaigre de citron                                                                                   | Vinaigre de citron                           | ---     | ---     | x       |
 | Yaourt                                                                                               | Yaourt                                       | x       | ---     | ---     |
 | Zaban                                                                                                | Zaban                                        | x       | ---     | ---     |
-| ufs                                                                                                 | Œufs                                         | ---     | x       | ---     |
-| Œufs                                                                                                 | Œufs                                         | ---     | ---     | x       |
+| Œufs                                                                                                 | Œufs                                         | ---     | x       | x       |
 |------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------|
 | # crop_production (GAP 1) crops — EACI 2014-15 & 2017-18 harvest/perennial; food crops REUSE the consumed-food |                                              |         |         |         |
 | Mil                                                                                                  | Mil                                          | x       | ---     | ---     |

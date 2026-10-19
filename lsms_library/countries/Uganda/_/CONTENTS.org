@@ -3536,3 +3536,17 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* Encoding: cp1252 labels decoded at the reader (GH #805, 2026-10-19)
+
+Several pre-118 Uganda files write cp1252 bytes that pandas read as latin-1:
+=GSEC16.dta= (2010-11) =df_SHOCKRECOVERY= "... skipped days without eating,
+etc<U+0085>)", =AGSEC5A/B= "Green harvested <U+0096> with shell/cob ...",
+=GSEC15b.dta= (2009-10) "Fish <U+0096>whole (1-2kg)", =Don<U+0092>t know=.
+=get_dataframe= now re-decodes them.  Served movement, measured before /
+after: =shocks= =HowCoped0/1/2= 862 / 756 / 394 cells "etc<U+0085>)" ->
+"etc…)" (rows 14,457 unchanged); =crop_production=, =food_acquired=,
+=livestock= and the rest of the measured tables are identical (the AGSEC5
+condition and the GSEC15b units are decoded on numeric codes).  The =u=
+table's 2009-10 wave-label column, which recorded the raw =Fish <U+0096>...=
+spellings, was re-keyed to the en dash (inert: =u= is keyed on =Code=).

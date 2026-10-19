@@ -87,6 +87,7 @@
 # 'Original Label', 'Preferred Label').
 
 
+#+key: Original Label
 #+name: u
 | Original Label        | Preferred Label  | Code | 2018-19          | 2021-22               |
 |-----------------------+------------------+------+------------------+-----------------------|
@@ -953,8 +954,7 @@
 | cube (maggi)                                                                              | Cube alimentaire (Maggi, Jumbo, )                                                    |
 | Viande de bœuf                                                                            | Viande de bœuf                                                                       |
 | viande de boeuf                                                                           | Viande de bœuf                                                                       |
-| Viande de buf                                                                            | Viande de bœuf                                                                       |
-| viande de buf                                                                            | Viande de bœuf                                                                       |
+| viande de bœuf                                                                            | Viande de bœuf                                                                       |
 | Viande mouton                                                                             | Viande de mouton                                                                     |
 | viande mouton                                                                             | Viande de mouton                                                                     |
 | Viande de chèvre                                                                          | Viande de chèvre                                                                     |
