@@ -1,16 +1,22 @@
 """Burkina Faso ``food_acquired`` labels: the crosswalk must PARSE, and the
 served ``j`` must carry no encoding damage (GH #794).
 
-THE DEFECT.  ``Burkina_Faso/_/categorical_mapping.org`` keys ``harmonize_food``
-on the damage the reader produces for four cp1252 / double-encoded value labels
-(strategy B, see ``_/CONTENTS.org``).  One key -- ``Cube (Maggi, Jumbo,<U+0085>)``
--- contains U+0085, a Unicode line separator, and an editor turned it into a
-line break.  ``local_tools.df_from_orgfile`` ends a table at the FIRST line
+THE DEFECT.  ``Burkina_Faso/_/categorical_mapping.org`` used to key
+``harmonize_food`` on the damage the reader produced for four cp1252 /
+double-encoded value labels (strategy B, see ``_/CONTENTS.org``).  One key --
+``Cube (Maggi, Jumbo,<U+0085>)`` -- contained U+0085, a Unicode line separator,
+and an editor turned it into a line break.  ``local_tools.df_from_orgfile`` ends a table at the FIRST line
 that does not begin with ``|``, so the table stopped there and the four rows
 below it (Cube, Feuilles, both beef spellings) were never loaded: 47,137
 served rows carried a raw C1 label and beef was served as THREE ``j`` values.
 Nothing warned -- an org row that is never read looks exactly like one that
 is.
+
+Since GH #805 the reader re-decodes the 2014 cp1252 labels itself, so the
+three cp1252 keys are spelled clean (and the Feuilles label, which no key
+could carry while it ended in U+0085, is a crosswalk row); only the 2018-19
+UTF-8 double encoding is still keyed on its damage, because #805 leaves that
+class alone.
 
 The config-only tests pin the parse so the truncation class cannot recur
 silently; the data tests pin what the user sees.
@@ -26,15 +32,19 @@ from lsms_library.paths import countries_root
 
 ORG = countries_root() / 'Burkina_Faso' / '_' / 'categorical_mapping.org'
 
-# The damage spellings the reader emits, exactly as the crosswalk must key
-# them (U+008C / U+009C / U+0085 are cp1252 bytes read as latin-1; the 2018-19
-# beef is UTF-8 read as latin-1).
-DAMAGE_KEYS = {
-    '\u008cufs': 'Oeufs',
-    'Cube (Maggi, Jumbo,\u0085)': 'Cube alimentaire',
+# The spellings the reader emits, exactly as the crosswalk must key them.
+# The 2014 cp1252 labels arrive decoded since GH #805 (they used to carry
+# U+008C / U+0085 / U+009C); the 2018-19 beef is still UTF-8 read as latin-1.
+READER_KEYS = {
+    '\u0152ufs': 'Oeufs',
+    'Cube (Maggi, Jumbo,\u2026)': 'Cube alimentaire',
     'Viande de bÅ\u0093uf': 'Viande de boeuf',
-    'Viandes de b\u009cufs fraîches': 'Viande de boeuf',
+    'Viandes de b\u0153ufs fraîches': 'Viande de boeuf',
+    'Feuilles (oseilles, baobab, boulvaka\u2026': 'Feuilles',
 }
+#: The pre-#805 damage keys: no reader emits them any more.
+RETIRED_KEYS = ('\u008cufs', 'Cube (Maggi, Jumbo,\u0085)',
+                'Viandes de b\u009cufs fraîches')
 
 MOJIBAKE = re.compile(r'[\x80-\x9f]|Ã|Å|Â')
 
@@ -68,33 +78,39 @@ def test_every_crosswalk_line_is_a_complete_org_row():
     assert not bad, bad
 
 
-def test_the_crosswalk_parses_to_completion_with_the_damage_keys():
-    """The reader's own view: all four damage-keyed rows load and map to the
-    Preferred Label the table intends."""
+def test_the_crosswalk_parses_to_completion_with_the_reader_keys():
+    """The reader's own view: every key the reader emits for these labels
+    loads and maps to the Preferred Label the table intends, and no retired
+    damage key is left behind to shadow nothing."""
     t = df_from_orgfile(ORG, name='harmonize_food')
     d = t.set_index('Original Label')['Preferred Label'].to_dict()
-    for key, preferred in DAMAGE_KEYS.items():
+    for key, preferred in READER_KEYS.items():
         assert d.get(key) == preferred, (repr(key), d.get(key))
+    for key in RETIRED_KEYS:
+        assert key not in d, repr(key)
     # No key may be a stripped fragment of a split row.
     assert ')' not in d and 'Cube (Maggi, Jumbo,' not in d
 
 
-def test_the_cube_key_still_holds_its_nel_byte():
-    """The failure mode, stated as a byte: the Cube key contains a literal
-    U+0085 and the row is one line.  An editor that 'normalises' it to a
-    newline turns this red before it turns the served data brown."""
+def test_the_cube_key_is_one_line_and_holds_no_nel_byte():
+    """The failure mode, stated as a byte: the Cube key used to contain a
+    literal U+0085 (a line separator an editor turned into a newline).  Since
+    GH #805 it holds the U+2026 ellipsis the file means, and the row is one
+    line."""
     hits = [s for s in _table_lines() if 'Cube (Maggi, Jumbo,' in s]
     assert len(hits) == 1, hits
-    assert '\u0085' in hits[0]
+    assert '\u0085' not in hits[0]
+    assert '\u2026' in hits[0]
     assert hits[0].rstrip().endswith('|')
 
 
-def test_the_2014_hook_repairs_what_the_crosswalk_cannot_reach():
-    """``Feuilles (oseilles, baobab, boulvaka<U+0085>`` ENDS in U+0085; the org
-    reader strips every cell so no key can carry it, while the build-time dict
-    sees the raw label with it.  The hook's whole-value ``_J_FIX`` is the only
-    route, and the cp1252 / double-encoding decoders are a safety net that
-    must leave clean French alone."""
+def test_the_2014_hook_is_a_double_encoding_safety_net_only():
+    """The 2014 hook used to carry a whole-value ``_J_FIX`` (for the
+    Feuilles label, which ended in U+0085 and so could not be keyed) and a
+    cp1252 decoder.  Both are retired with GH #805: the reader decodes the
+    cp1252 class and the Feuilles label is a crosswalk row.  What remains is
+    the UTF-8 double-encoding safety net, which must leave clean French --
+    and a cp1252 label it no longer owns -- alone."""
     import importlib.util
 
     path = countries_root() / 'Burkina_Faso' / '2014' / '_' / 'mapping.py'
@@ -102,9 +118,7 @@ def test_the_2014_hook_repairs_what_the_crosswalk_cannot_reach():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
 
-    assert mod._repair_label('Feuilles (oseilles, baobab, boulvaka') == 'Feuilles'
-    assert mod._repair_label('Viandes de b\u009cufs fraîches') == \
-        'Viandes de bœufs fraîches'
+    assert not hasattr(mod, '_J_FIX') and not hasattr(mod, '_decode_cp1252')
     assert mod._repair_label('Viande de bÅ\u0093uf') == 'Viande de bœuf'
     for clean in ('Viande séchée', 'Semoule de maïs',
                   'Cube alimentaire', 'Kg', 'Unknown'):

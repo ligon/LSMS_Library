@@ -1740,6 +1740,44 @@ modal =['i','t','v','plot','crop','u']= — alongside Ethiopia, EthiopiaRHS,
 Mali, Nigeria and Tanzania.  Adding =condition= cannot and does not change
 the set of countries Feature keeps.
 
+* Kinship: the "of head or spouse" codes carry no Affinity (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+The roster's relationship question (Section 2 Q4) words its parent and
+sibling codes -- and, from 2018-19, its CHILD code -- as relations "of head
+or spouse" (the tracking rule quoted under "Persons excluded from tracking"
+calls codes 1-7 "the household head and individuals related to them such as
+spouse, biological children, parents of the head or spouse, etc.").  A
+parent, sibling or child of the SPOUSE is the head's parent-in-law,
+sibling-in-law or stepchild; the code does not say which.  Served since
+2026-10-19 (measured, warm corpus):
+
+| served label (spellings vary by wave)  | tuple         | people | waves             |
+|----------------------------------------+---------------+--------+-------------------|
+| =Son / daughter of head or spouse=      | [-1, 0, null] | 17,411 | 2018-19, 2019-20  |
+| =Sister/Brother of head or spouse=      | [0, 1, null]  |  2,468 | 2005-06 .. 2015-16 |
+| =Sister / brother of head or spouse=    | [0, 1, null]  |    363 | 2018-19, 2019-20  |
+| =Parent of head or spouse=              | [1, 0, null]  |    817 | every wave        |
+
+All four were =consanguineal= before (21,059 people, 14.6% of the roster).
+
+*The child code DRIFTS, and the drift is the instrument's.*  2005-06 ..
+2011-12 serve =Son/daughter=, 2013-14 and 2015-16 =Son/daughter of head=
+(both [-1, 0, consanguineal]), 2018-19 and 2019-20 =Son / daughter of head
+or spouse=.  2005-06 also carried a separate =step child= code (133 people);
+no later wave does.  So Uganda's children are =consanguineal= through
+2015-16 and Affinity-NA in the last two waves: a filter on
+=Affinity == 'consanguineal'= silently drops every 2018-20 child.  Do not
+"repair" it by filing the 2018-20 code consanguineal -- its wording admits the
+spouse's children, which is exactly what the ruling says not to guess.
+
 * Known Issues
 ** DONE =earnings= shipped a dense phantom panel, and the column was named =earnings= (GH #772)
 
@@ -3498,3 +3536,17 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* Encoding: cp1252 labels decoded at the reader (GH #805, 2026-10-19)
+
+Several pre-118 Uganda files write cp1252 bytes that pandas read as latin-1:
+=GSEC16.dta= (2010-11) =df_SHOCKRECOVERY= "... skipped days without eating,
+etc<U+0085>)", =AGSEC5A/B= "Green harvested <U+0096> with shell/cob ...",
+=GSEC15b.dta= (2009-10) "Fish <U+0096>whole (1-2kg)", =Don<U+0092>t know=.
+=get_dataframe= now re-decodes them.  Served movement, measured before /
+after: =shocks= =HowCoped0/1/2= 862 / 756 / 394 cells "etc<U+0085>)" ->
+"etc…)" (rows 14,457 unchanged); =crop_production=, =food_acquired=,
+=livestock= and the rest of the measured tables are identical (the AGSEC5
+condition and the GSEC15b units are decoded on numeric codes).  The =u=
+table's 2009-10 wave-label column, which recorded the raw =Fish <U+0096>...=
+spellings, was re-keyed to the en dash (inert: =u= is keyed on =Code=).

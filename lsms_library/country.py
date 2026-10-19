@@ -36,7 +36,9 @@ from importlib.resources import files
 import importlib
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
-from .local_tools import (CATEGORICAL_MAPPING_DIR, CATEGORICAL_MAPPING_FILE,
+from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
+                          CATEGORICAL_MAPPING_FILE,
+                          CATEGORICAL_RESERVED_COLUMNS,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -49,6 +51,7 @@ from .local_tools import (
     stamp_parquet_hash,
     read_parquet_grain_audit,
     read_parquet_cache_waves,
+    read_parquet_datetime_audit,
     read_parquet_build_drops,
     source_tier,
     _collect_file_paths_from_block,
@@ -67,6 +70,13 @@ from .errors import (LabelUnavailableError, UnitsUnavailableError,
                      UnregisteredCountryError)
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from . import datetime_parse as _datetime_parse
+from .datetime_parse import (
+    DatetimeCoercionWarning, DatetimeAmbiguityWarning, DatetimeParseWarning,  # noqa: F401  (re-exported)
+    DatetimeParseError, DatetimeStringAtReadWarning, datetime_reports,       # noqa: F401
+    _DATETIME_LEDGER, _YEAR_LAST_DATE, apply_datetime_specs, is_datetime_spec,
+    replay_datetime_audit, spec_source_vars, wave_datetime_audit,
+)
 from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
@@ -85,6 +95,7 @@ import warnings
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 import json
 from dataclasses import dataclass
 from functools import lru_cache
@@ -465,32 +476,112 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
-def _categorical_key_column(table: "pd.DataFrame") -> str | None:
-    """The source-label column of a categorical table (first non-Preferred)."""
-    cols = [c for c in table.columns if c != "Preferred Label"]
+def _categorical_key_column(table: "pd.DataFrame", idxvars: str | None = None,
+                            *, exclude=()) -> str | None:
+    """The KEY column of a categorical table -- the one resolver (GH #928).
+
+    Every read-time caller that turns a categorical table into a
+    ``key -> label`` lookup asks this function which column is the key: the
+    global/country row merge (:func:`_row_union_categorical`),
+    :meth:`Country._unit_kg_factors`, the auto-apply-by-name in
+    :meth:`Country._apply_categorical_mappings`, the ``cluster_features``
+    market-label normalisation in :meth:`Country._market_lookup`, and the
+    ``harmonize_<method>`` hook in :meth:`Country._finalize_result`.  Before
+    #928 the last three each re-derived it inline.
+
+    Resolution, first rung that answers wins:
+
+    1. ``idxvars`` -- an explicit caller choice (the house spelling, as in
+       ``get_categorical_mapping`` / ``code_label_map``).
+    2. the table's ``#+key:`` declaration, which ``all_dfs_from_orgfile``
+       records as ``table.attrs[CATEGORICAL_KEY_ATTR]``.
+    3. the first column that is neither reserved
+       (:data:`~lsms_library.local_tools.CATEGORICAL_RESERVED_COLUMNS`:
+       ``Preferred Label``, ``Status``, ``Notes``) nor in *exclude* -- the
+       historical positional rule, so an undeclared table keys exactly as it
+       always did, and adding a ``Status`` or ``Notes`` column re-keys
+       nothing.
+
+    *exclude* names the caller's VALUE column when it is not ``Preferred
+    Label`` (a ``labels=`` target), so a table cannot key on its own target.
+    A rung-1/2 answer that is in *exclude* returns ``None`` -- the caller's
+    "no key column" path -- never a silent fall to the positional rule.  A
+    declared or explicit key that is not a column of *table* raises
+    ``KeyError``: the table is malformed, which is loud by design.
+    """
+    excluded = set(exclude)
+    for chosen in (idxvars, table.attrs.get(CATEGORICAL_KEY_ATTR)):
+        if chosen is None:
+            continue
+        if chosen not in table.columns:
+            raise KeyError(
+                f"categorical key {chosen!r} is not a column of the table "
+                f"(columns: {list(table.columns)})")
+        return None if chosen in excluded else chosen
+    cols = [c for c in table.columns
+            if c not in CATEGORICAL_RESERVED_COLUMNS and c not in excluded]
     return cols[0] if cols else None
 
 
+class CategoricalKeyMismatchWarning(UserWarning):
+    """A ``#+key:`` declaration cut a country table off from its global rows.
+
+    Raised by :func:`_row_union_categorical` when an additive-merge table's
+    country and cross-country key columns differ AND either side declares its
+    key, so the merge falls back to the country table wholesale and serves
+    none of the global rows (GH #928, red team r1 F2).  An UNDECLARED mismatch
+    stays silent: it is the pre-existing positional behaviour (#832 -- Malawi,
+    Mali, Nigeria and Uganda ``u`` today), and a declaration is the point at
+    which someone has made a statement the merge then silently overrides.
+    """
+
+
 def _row_union_categorical(global_t: "pd.DataFrame",
-                           country_t: "pd.DataFrame") -> "pd.DataFrame":
+                           country_t: "pd.DataFrame", *,
+                           name: str | None = None,
+                           country: str | None = None) -> "pd.DataFrame":
     """Row-union a global and a country categorical table; country row wins.
 
-    Identity is the source-label key column (first non-``Preferred Label``
+    Identity is the key column of each side, as :func:`_categorical_key_column`
+    resolves it (a ``#+key:`` declaration, else the first non-reserved
     column).  Country rows override global rows with the same key; new
     country keys are added; global keys absent from the country table are
     kept.  Columns are outer-unioned (e.g. per-wave columns), with country
     values winning on overlap.  Falls back to the country table wholesale
-    when the two key columns don't agree (can't align).
+    when the two key columns don't agree (can't align) -- and, when either
+    side DECLARES its key, says so with :class:`CategoricalKeyMismatchWarning`
+    naming *name*, both keys and the global rows not inherited.
     """
     gk = _categorical_key_column(global_t)
     ck = _categorical_key_column(country_t)
     if gk is None or ck is None or gk != ck:
+        declared = [side for side, t in (("country", country_t),
+                                         ("cross-country", global_t))
+                    if CATEGORICAL_KEY_ATTR in t.attrs]
+        if declared:
+            where = f" on {country!r}" if country else ""
+            warnings.warn(
+                f"categorical table {name or '?'!r}{where}: the country table "
+                f"keys on {ck!r} but the cross-country table keys on {gk!r} "
+                f"(#+key: declared on the {' and '.join(declared)} side), so "
+                f"the additive merge cannot align rows and serves the country "
+                f"table wholesale -- {len(global_t)} cross-country row(s) are "
+                f"NOT inherited.  Key both sides on the same column to inherit "
+                f"them (GH #928).",
+                CategoricalKeyMismatchWarning, stacklevel=2)
         return country_t
     # country first + keep='first' => country rows win on key collision;
     # concat outer-joins columns (NaN-filled), so wave columns survive.
     combined = pd.concat([country_t, global_t], ignore_index=True, sort=False)
     combined = combined.drop_duplicates(subset=[ck], keep="first")
-    return combined.reset_index(drop=True)
+    combined = combined.reset_index(drop=True)
+    # concat keeps attrs only when both inputs agree, so a declaration on one
+    # side is dropped here; re-attach it, or the merged table would fall back
+    # to the positional rule and could re-key.
+    if (CATEGORICAL_KEY_ATTR in global_t.attrs
+            or CATEGORICAL_KEY_ATTR in country_t.attrs):
+        combined.attrs[CATEGORICAL_KEY_ATTR] = ck
+    return combined
 
 
 def _strip_string_values(s: pd.Series) -> pd.Series:
@@ -549,18 +640,21 @@ def _no_such_country_message(country_name: str) -> str:
     return msg
 
 
-def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
+def _merge_categorical_tables(global_maps: dict, country_maps: dict, *,
+                              country: str | None = None) -> dict:
     """Merge global and per-country categorical tables.
 
     Default is full-table override (country replaces global by name).  For
     names in :data:`_ADDITIVE_CATEGORICAL_TABLES`, the two are row-unioned
     (see :func:`_row_union_categorical`) when both exist, so the country
     inherits global rows and overrides only the keys it redeclares.
+    *country* only names the country in a key-mismatch warning.
     """
     merged = dict(global_maps)
     for name, ctab in country_maps.items():
         if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
-            merged[name] = _row_union_categorical(merged[name], ctab)
+            merged[name] = _row_union_categorical(merged[name], ctab,
+                                                  name=name, country=country)
         else:
             merged[name] = ctab
     return merged
@@ -949,6 +1043,26 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
     return [k for k in scheme_entry
             if isinstance(k, str) and k not in _SCHEME_NON_COLUMN_KEYS
             and k not in required]
+
+
+def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
+    """A 0-row frame with a table's DECLARED shape (GH #1039).
+
+    The declared index levels (``str``, as a built index's are) as its index
+    and every declared column, required and ``optional: true``, as an object
+    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
+    a request whose waves all lack the table on the make backend's no-builder
+    route: 0 rows, as the default backend serves from a warm cache, shaped so
+    that ``Country._assert_built_required_columns`` reads it as a well-formed
+    empty table rather than as a build that lost its columns.
+    """
+    entry = scheme_entry if isinstance(scheme_entry, dict) else None
+    levels = _declared_index_levels(entry)
+    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
+               if c not in levels]
+    empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
+                          for c in levels + columns})
+    return empty.set_index(levels) if levels else empty
 
 
 class Wave:
@@ -1344,6 +1458,20 @@ class Wave:
         myvars = data_info.get('myvars')
         final_mapping = dict()
         final_mapping['df_edit'] = formatting_functions.get(request)
+        # GH #1045: a dict-valued myvar with a `datetime:` key is a declarative
+        # calendar spec.  Its source columns are extracted under temporary
+        # names and parsed by grab_data (apply_datetime_specs) before the df_edit
+        # hook runs.
+        datetime_specs = {key: value for key, value in (myvars or {}).items()
+                          if is_datetime_spec(value)}
+        myvars = {key: value for key, value in (myvars or {}).items()
+                  if key not in datetime_specs}
+        for key, spec in datetime_specs.items():
+            myvars.update(spec_source_vars(key, spec))
+        if datetime_specs:
+            # Only when present: callers that unpack the mapping as
+            # ``{file: ...}`` (ehcvm's raw-input lookup) must not see a new key.
+            final_mapping['datetime_specs'] = datetime_specs
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
@@ -1358,6 +1486,14 @@ class Wave:
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
                     for key, val in overrides.items():
+                        if key in datetime_specs or is_datetime_spec(val):
+                            # GH #1045: the spec's temporary source columns
+                            # were expanded once for every file; a per-file
+                            # override would be silently dropped.
+                            raise ValueError(
+                                f"{request}: a per-file override of the datetime "
+                                f"spec {key!r} ({file_name}) is not supported; "
+                                f"give every file the same source variables")
                         if key == 't':
                             idxvars_override[key] = (idxvars_updated[key][0], lambda x, val=val: val)
                         elif key in idxvars:
@@ -1540,6 +1676,97 @@ class Wave:
             data_root(self.country.name) / self.wave_folder / "_" / f"{request}.parquet",
         ]
 
+    def _read_l2_wave_cache(self, request: str, cache_path: Path) -> pd.DataFrame | None:
+        """The YAML-path L2-wave READ GATE: the parquet at *cache_path*, or None.
+
+        ``None`` is every miss -- no parquet, ``LSMS_NO_CACHE`` set, a STALE
+        content hash, a degraded build whose dropped source is readable again
+        (GH #675), or a parquet that cannot be read -- and the caller then
+        extracts from source.  A hit is the parquet exactly as stored.
+
+        **MECHANISM, not content (GH #1040).**  Like the country tier's
+        :meth:`Country._read_l2_country_cache` (GH #908) this grades a parquet
+        an earlier build wrote and decides whether to serve it; it determines
+        no byte of what a build writes, so it is listed in
+        ``_build_registry._EXCLUDED_CALLABLES``.  It was closure text inside
+        the tagged ``grab_data`` until #1040, so every edit to it moved every
+        table's build fingerprint.  Anything that shapes a BUILD belongs in
+        ``grab_data``, not here.
+
+        Differs from the country gate on purpose: a hashless parquet grades
+        ``legacy`` and is trusted once and STAMPED here (GH #809 changed the
+        country tier only).  Differs as FOUND, not by ruling: ``LSMS_NO_CACHE``
+        is read by truthiness here (``"0"`` bypasses) but as ``{1,true,yes}``
+        at the country gate -- pinned in tests/test_gh1040_wave_read_gates.py
+        and left for a decision, not harmonised by #1040.
+        """
+        if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
+            # v0.8.0 content-hash staleness for the YAML-path L2-wave
+            # parquet (same classification as L2-country; see
+            # Country._read_l2_country_cache).  Stale -> miss: the caller
+            # re-extracts from source.
+            expected_wave_hash = self._input_hash(request)
+            # GH #675: a wave parquet whose build dropped a sub-df it could
+            # not read -- costing a declared column -- is a miss once its
+            # source is readable again (heal); otherwise it is served, and
+            # warned, below.  Graded BEFORE freshness: a stale parquet still
+            # spends this key's one retry.
+            wave_drops = read_parquet_build_drops(cache_path)
+            degraded_verdict, _ = _degraded_cache_verdict(
+                wave_drops, (self.country.name, request, self.year))
+            if (cache_freshness(cache_path, expected_wave_hash) != "stale"
+                    and degraded_verdict != "rebuild"):
+                try:
+                    df_cached = pd.read_parquet(cache_path)
+                except (OSError, ArrowInvalid):
+                    df_cached = None
+                if df_cached is not None:
+                    if (expected_wave_hash is not None
+                            and read_parquet_cache_hash(cache_path) is None):
+                        stamp_parquet_hash(cache_path, expected_wave_hash)
+                    # GH #868: a report filed INSIDE this wave's build (a
+                    # df_edit hook's reduce_to_agreed) can only be replayed
+                    # from the stamp -- the hook did not run on this hit.
+                    _replay_wave_stamp(cache_path, self.country.name, request, self.year)
+                    # GH #675: carry the drop record to the country stamp.
+                    _replay_build_drops(wave_drops, self.country.name, request)
+                    # stacklevel=4 (_warn_degraded_serve -> this method ->
+                    # grab_data -> its caller) names the frame the pre-#1040
+                    # stacklevel=3 named from inside grab_data.
+                    _warn_degraded_serve(self.country.name, request, wave_drops,
+                                         cache_path, wave=self.year, stacklevel=4)
+                    return df_cached
+        return None
+
+    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> Path | None:
+        """The script-path READ GATE: the first existing, non-STALE candidate.
+
+        ``None`` sends ``grab_data`` to Make.  A hashless candidate grades
+        ``legacy`` and is selected -- the v0.8.0 upgrade path for parquets
+        under ``data_root`` and exactly why an in-tree file must never be a
+        candidate (GH #803) -- and it is NOT stamped: script-written wave
+        parquets are hashless by design, and stamping one merely read would
+        mask staleness and defeat Make's mtime check (v0.8.0 CRITICAL-2).
+        Skipping a STALE candidate makes a script/source edit force Make to
+        rebuild it.  Neither the GH #675 drop record nor ``LSMS_NO_CACHE`` is
+        consulted at this site.
+
+        **MECHANISM, not content (GH #1040)** -- see
+        :meth:`_read_l2_wave_cache`.  *candidates* is computed by the caller:
+        which paths are candidates is build logic and stays fingerprinted.
+        """
+        expected_wave_hash = self._input_hash(request)
+        for candidate in candidates:
+            if candidate.exists():
+                if cache_freshness(candidate, expected_wave_hash) == "stale":
+                    logger.debug(
+                        f"v0.8.0 wave cache STALE: {request} at {candidate}; "
+                        f"will rebuild via Make"
+                    )
+                    continue
+                return candidate
+        return None
+
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str) -> pd.DataFrame:
         '''
@@ -1569,38 +1796,13 @@ class Wave:
         if data_info:
             cache_path = (data_root(self.country.name) / self.year / '_'
                           / f'{request}.parquet')
-            if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
-                # v0.8.0 content-hash staleness for the YAML-path L2-wave
-                # parquet (same classification as L2-country; see
-                # load_dataframe_with_dvc).  Stale -> fall through and
-                # re-extract from source below.
-                expected_wave_hash = self._input_hash(request)
-                # GH #675: a wave parquet whose build dropped a sub-df it could
-                # not read -- costing a REQUIRED column -- is a miss once its
-                # source is readable again (heal); otherwise it is served, and
-                # warned, below.
-                wave_drops = read_parquet_build_drops(cache_path)
-                degraded_verdict, _ = _degraded_cache_verdict(
-                    wave_drops, (self.country.name, request, self.year))
-                if (cache_freshness(cache_path, expected_wave_hash) != "stale"
-                        and degraded_verdict != "rebuild"):
-                    try:
-                        df_cached = pd.read_parquet(cache_path)
-                    except (OSError, ArrowInvalid):
-                        df_cached = None
-                    if df_cached is not None:
-                        if (expected_wave_hash is not None
-                                and read_parquet_cache_hash(cache_path) is None):
-                            stamp_parquet_hash(cache_path, expected_wave_hash)
-                        # GH #868: a report filed INSIDE this wave's build (a
-                        # df_edit hook's reduce_to_agreed) can only be replayed
-                        # from the stamp -- the hook did not run on this hit.
-                        _replay_wave_stamp(cache_path, self.country.name, request, self.year)
-                        # GH #675: carry the drop record to the country stamp.
-                        _replay_build_drops(wave_drops, self.country.name, request)
-                        _warn_degraded_serve(self.country.name, request, wave_drops,
-                                             cache_path, wave=self.year)
-                        return df_cached
+            # The L2-wave READ GATE lives in its own method, excluded from the
+            # build fingerprint (GH #1040): it decides WHETHER to serve the
+            # parquet an earlier build wrote, never what a build writes.  A
+            # hit is returned as stored -- no map_index, no t filter, no write.
+            df_cached = self._read_l2_wave_cache(request, cache_path)
+            if df_cached is not None:
+                return df_cached
 
         def check_adding_t(df):
             index_list = df.index.names
@@ -1614,6 +1816,7 @@ class Wave:
         def get_data(data_info_dic, mapping_info):
             convert_cat = (data_info_dic.get('converted_categoricals') is None)
             df_edit_function = mapping_info.pop('df_edit')
+            datetime_specs = mapping_info.pop('datetime_specs', None)
             # When multiple files are listed, allow missing columns (filled with NaN)
             multiple_files = len(mapping_info) > 1
             dfs = []
@@ -1659,6 +1862,11 @@ class Wave:
                         df = df.replace(na, np.nan)
                 dfs.append(df)
             df = pd.concat(dfs, axis=0, sort=False)
+            # GH #1045: parse declared calendar columns HERE, in the wave, where
+            # the source's format is known -- and before the df_edit hook, which
+            # may rank or compare them (Mali 2014-15 builds `visit` from Int_t).
+            df = apply_datetime_specs(df, datetime_specs, country=self.country.name,
+                                      table=request, wave=self.year)
 
             if df_edit_function:
                 # GH #868: name the cell for a reducer the hook calls, so its
@@ -1934,26 +2142,11 @@ class Wave:
             if intree_artefact:
                 _warn_intree_parquet_artefact(make_target_intree, self.name, request)
 
-            # Check if the parquet already exists before invoking Make.
-            # v0.8.0: skip a candidate whose embedded hash is STALE so a
-            # script/source edit forces Make to rebuild it (closes the
-            # "stale L2-wave parquet shadows a source-script fix" gap
-            # documented in CLAUDE.md "Cache Behavior").  A hashless
-            # candidate grades ``legacy`` and is trusted: that is the v0.8.0
-            # upgrade path for parquets UNDER data_root, and it is exactly
-            # why an in-tree file must never be a candidate (GH #803).
-            expected_wave_hash = self._input_hash(request)
-            parquet_fn = None
-            for candidate in candidates:
-                if candidate.exists():
-                    if cache_freshness(candidate, expected_wave_hash) == "stale":
-                        logger.debug(
-                            f"v0.8.0 wave cache STALE: {request} at {candidate}; "
-                            f"will rebuild via Make"
-                        )
-                        continue
-                    parquet_fn = candidate
-                    break
+            # Check if the parquet already exists before invoking Make: the
+            # script-path READ GATE, in its own method and excluded from the
+            # build fingerprint (GH #1040).  Which paths are candidates is
+            # still decided here (_script_parquet_candidates is build logic).
+            parquet_fn = self._fresh_script_parquet(request, candidates)
 
             if parquet_fn is None:
                 makefile_path = self.file_path.parent /'_'/ "Makefile"
@@ -2019,6 +2212,8 @@ class Wave:
                 df = to_parquet(df, cache_path, absolute_path=True,
                                 cache_hash=self._input_hash(request),
                                 grain_audit=_wave_grain_audit(
+                                    self.country.name, request, self.year),
+                                datetime_audit=wave_datetime_audit(
                                     self.country.name, request, self.year),
                                 build_drops=wave_drops)
                 _mark_degraded_written(
@@ -2321,7 +2516,7 @@ class Country:
                     break
 
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
-                global_maps, country_maps)
+                global_maps, country_maps, country=self.name)
         return self.__dict__['_categorical_mapping_cache']
 
     def _unit_kg_factors(self) -> dict[str, float]:
@@ -2813,9 +3008,9 @@ class Country:
             if key is not None:
                 table = cat_maps[key]
                 if "Preferred Label" in table.columns:
-                    source_cols = [c for c in table.columns if c != "Preferred Label"]
-                    if source_cols:
-                        rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+                    source = _categorical_key_column(table)
+                    if source is not None:
+                        rdict = table.set_index(source)["Preferred Label"].to_dict()
                         cf[column] = cf[column].replace(rdict)
 
         if column not in cf.columns:
@@ -3237,8 +3432,9 @@ class Country:
         For each column or index level in *df*, check whether
         ``self.categorical_mapping`` contains a table with the same name
         (case-insensitive).  If the table has a ``Preferred Label``
-        column, build a replacement dictionary from the first other
-        column → ``Preferred Label`` and apply it.
+        column, build a replacement dictionary from its key column
+        (:func:`_categorical_key_column`: the table's ``#+key:``, else the
+        first non-reserved column) → ``Preferred Label`` and apply it.
 
         ``protect_u_sentinels`` (GH #361): when True, the country
         ``#+name: u`` table is not allowed to remap the framework's reserved
@@ -3299,19 +3495,20 @@ class Country:
                                 target: str = "Preferred Label") -> dict | None:
             if "Preferred Label" not in table.columns:
                 return None
-            # The key column is "the first column that is neither the canonical
-            # label nor the requested variant".  Excluding *target* is a
-            # provable no-op when target IS 'Preferred Label' (the default
-            # path); it matters only for a multi-label table whose variant
-            # column precedes its code column, where keying on the target
-            # would map every value to itself.  NOTE: the ordering itself is
-            # load-bearing and unguarded -- see the test
-            # ``test_source_cols_ordering_is_the_key_column``.
-            source_cols = [c for c in table.columns
-                           if c not in ("Preferred Label", target)]
-            if not source_cols:
+            # The key column comes from the one resolver (GH #928): the
+            # table's ``#+key:`` if it declares one, else "the first column
+            # that is neither reserved nor the requested variant".  Excluding
+            # *target* is a provable no-op when target IS 'Preferred Label'
+            # (the default path); it matters only for a multi-label table
+            # whose variant column precedes its code column, where keying on
+            # the target would map every value to itself.  NOTE: for an
+            # UNDECLARED table the ordering is still load-bearing -- see the
+            # test ``test_source_cols_ordering_is_the_key_column``; a
+            # ``#+key:`` line is what takes it out of play.
+            source = _categorical_key_column(table, exclude=(target,))
+            if source is None:
                 return None
-            rdict = table.set_index(source_cols[0])[target].to_dict()
+            rdict = table.set_index(source)[target].to_dict()
             # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
             # data that arrives as float-strings ('1.0') -- the documented
             # "format_id is applied to idxvars but not myvars" gotcha, which
@@ -3717,9 +3914,9 @@ class Country:
                     and 'j' in df.index.names):
                 ha_table = self.categorical_mapping.get(f'harmonize_{method_name}')
                 if ha_table is not None and 'Preferred Label' in ha_table.columns:
-                    src_cols = [c for c in ha_table.columns if c != 'Preferred Label']
-                    if src_cols:
-                        rdict = ha_table.set_index(src_cols[0])['Preferred Label'].to_dict()
+                    source = _categorical_key_column(ha_table)
+                    if source is not None:
+                        rdict = ha_table.set_index(source)['Preferred Label'].to_dict()
                         df = df.rename(index=rdict, level='j')
 
             # Normalise variant spellings to canonical forms
@@ -4274,7 +4471,9 @@ class Country:
         # from a legitimate build after the fact.
         #
         # Scoped to THIS call site deliberately.  The two wave-tier
-        # calls (`Wave.grab_data`, `run_make_target`) must keep their
+        # gates (`Wave._read_l2_wave_cache`, `Wave._fresh_script_parquet`,
+        # both reached from `Wave.grab_data` -- `run_make_target` grades
+        # nothing) must keep their
         # `legacy` grade: script-path L2-wave parquets are written
         # hashless BY DESIGN, so grading them stale would rebuild on
         # every read forever.  Those are handled by
@@ -4342,6 +4541,13 @@ class Country:
                 read_parquet_grain_audit(cache_path),
                 self.name, method_name,
             )
+            # GH #1045: the date-parse report, by the same argument -- filtered
+            # to the waves served, so a 2019-20 request is not told (or, under
+            # LSMS_DATE_STRICT, failed) about a 2008-09 defect.
+            replay_datetime_audit(
+                read_parquet_datetime_audit(cache_path),
+                self.name, method_name, waves=waves,
+            )
             # GH #675: still degraded and not healable now -- serve, loudly.
             _warn_degraded_serve(self.name, method_name, build_drops, cache_path)
             # GH #809: there is deliberately NO trust-once-and-stamp
@@ -4376,6 +4582,70 @@ class Country:
                 stacklevel=3,
             )
             return None, covered, f"read-error: {cache_read_error!r}"
+
+    def _read_assumed_fresh_cache(self, method_name: str,
+                                  waves: list[str]) -> pd.DataFrame | None:
+        """The ``assume_cache_fresh`` short-circuit: ``var/<table>.parquet``
+        served WITHOUT a hash check, or None to take the ordinary path.
+
+        A hit is returned pre-finalize, restricted to *waves* where the #891
+        manifest says it covers them; ``_aggregate_wave_data`` finalizes it.
+        Neither the content hash nor the GH #675 degraded grade is consulted
+        -- that is the contract (CLAUDE.md "Cache Behavior", limitation (c)).
+
+        **MECHANISM, not content (GH #1040).**  It decides whether to serve a
+        parquet some earlier build wrote and determines no byte of what a build
+        writes, so it is listed in ``_build_registry._EXCLUDED_CALLABLES``, like
+        :meth:`_read_l2_country_cache` (GH #908).  Until #1040 this was closure
+        text inside the tagged ``_aggregate_wave_data``.  (``map_index`` and
+        ``_restrict_to_waves`` stay fingerprinted through their build-path
+        call sites.)
+        """
+        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
+        if prefer_parquet_cache:
+            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            if parquet_path.exists():
+                # GH #892: this branch used to return the parquet whole,
+                # ignoring `waves` entirely -- a one-wave request was served
+                # every wave in the cache, silently.  Nothing downstream
+                # filters, so the restriction has to happen here.
+                #
+                # It went unnoticed because on the ORDINARY path the pre-#891
+                # hash folded in the requested wave set, so a subset request
+                # graded `stale` and rebuilt; the #891 defect was what masked
+                # this one.  Making the hash wave-independent removes that
+                # accidental guard, so the two must be fixed together.
+                #
+                # `assume_cache_fresh` skips the hash check by contract, so
+                # coverage rests on the manifest alone: absent it (a pre-#891
+                # parquet), fall through to the normal path rather than guess.
+                covered = read_parquet_cache_waves(parquet_path)
+
+                def _replay_dates():
+                    # GH #1045: this short-circuit serves the parquet too, so
+                    # it replays the build-time date-parse report like every
+                    # other warm read.  (The grain audit is not replayed here;
+                    # that is a separate, pre-existing gap.)
+                    _DATETIME_LEDGER.pop((self.name, method_name), None)
+                    replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
+                                          self.name, method_name, waves=waves)
+
+                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    df_cached = self._restrict_to_waves(df_cached, waves)
+                    _replay_dates()
+                    return df_cached
+                if covered is None and set(waves) == set(self.waves):
+                    df_cached = get_dataframe(parquet_path)
+                    df_cached = map_index(df_cached)
+                    _replay_dates()
+                    return df_cached
+                logger.debug(
+                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
+                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
+                )
+        return None
 
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded
@@ -4561,6 +4831,90 @@ class Country:
         return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
                    for w in waves)
 
+    def _has_country_builder(self, method_name: str) -> bool:
+        """Can the COUNTRY level build ``method_name``?  GH #1039.
+
+        True when the country ships a ``_/{table}.py`` script (``try_script``
+        runs it; the ``%.parquet: %.py`` catch-alls match it too), or when its
+        ``_/Makefile`` has a rule for ``$(VAR_DIR)/{table}.parquet``.  Asked
+        only under ``LSMS_BUILD_BACKEND=make``, for a ``materialize: make``
+        table: that route used to go straight to ``run_make_target`` at the
+        country level, so a table with wave scripts and NO country rule --
+        Tanzania ``food_acquired`` since #836 deleted its dead concatenator,
+        and 71 more cells measured on 2026-10-19 -- could not be built at all
+        (``Could not materialize``, or an empty frame where the country has no
+        Makefile), and on a warm root it served whatever ``var/{table}.parquet``
+        was lying there, because make answers "nothing to be done" for an
+        existing target it has no rule for.  When this returns False the
+        caller builds from the waves instead (@ligon's ruling on #1039: the
+        framework is authoritative, #788).
+
+        **Rule presence is asked of make, not parsed out of the Makefile.**
+        Grouped targets (Uganda ``nutrition.parquet fct.parquet: ...``),
+        pattern rules and ``$(VAR_DIR)`` expansion all defeat a regex.  The
+        probe is ``make -n`` for the target under a FRESH EMPTY root, so an
+        existing parquet can never answer for the rule (#866's measurement
+        method), with ``LC_ALL=C`` so the message is parseable.  Only GNU
+        make's own "No rule to make target '<the probe target>'" counts as
+        absence; a missing PREREQUISITE ("..., needed by ...") means the rule
+        exists, and any other failure or timeout keeps the legacy route, so a
+        country rule that exists and is broken still fails loudly rather than
+        being silently replaced by the waves.  Without ``make`` on PATH only
+        the script can build at the country level.
+
+        Excluded from the build fingerprint
+        (``_build_registry._EXCLUDED_CALLABLES``): it selects a builder and
+        determines no byte of any hashed parquet.  The from-waves route it
+        selects is NOT cache-free -- its YAML waves read, write and hash-stamp
+        L2-wave parquets through ``Wave.grab_data`` (measured, GhanaSPS
+        ``crop_production``, red team r1) -- but those bytes are exactly what
+        the default backend builds and are fingerprinted where that code
+        lives, and the make backend writes no L2-country parquet.
+        """
+        country_dir = self.file_path / "_"
+        if (country_dir / f"{method_name}.py").exists():
+            return True
+
+        def absent(why: str) -> bool:
+            logger.info(
+                f"GH #1039: {self.name}/{method_name} is `materialize: make` "
+                f"but has no country-level builder ({why}, no "
+                f"_/{method_name}.py); building it from its waves (the "
+                f"framework is authoritative, #788).")
+            return False
+
+        if not (country_dir / "Makefile").exists():
+            return absent("no _/Makefile")
+        env = _script_subprocess_env()
+        if not shutil.which("make", path=env.get("PATH")):
+            return absent("make is not on PATH")
+        env.update(LC_ALL="C", LANGUAGE="C")
+        with tempfile.TemporaryDirectory(prefix="lsms_rule_probe_") as tmp:
+            # ``COUNTRY`` in every country Makefile is the basename of ``..``,
+            # so the probe spells the target with the directory name.
+            var_dir = Path(tmp) / self.file_path.name / "var"
+            target = var_dir / f"{method_name}.parquet"
+            env["LSMS_DATA_DIR"] = tmp
+            cmd = ["make", "-n", f"LSMS_DATA_ROOT={tmp}", f"VAR_DIR={var_dir}",
+                   str(target)]
+            try:
+                probe = subprocess.run(cmd, cwd=country_dir, env=env,
+                                       capture_output=True, text=True,
+                                       timeout=120)
+            except (OSError, subprocess.SubprocessError) as error:
+                logger.debug(f"GH #1039 rule probe failed for "
+                             f"{self.name}/{method_name}: {error!r}")
+                return True
+        if probe.returncode == 0:
+            return True
+        no_rule = [line for line in probe.stderr.splitlines()
+                   if "No rule to make target" in line]
+        if no_rule and not any("needed by" in line for line in no_rule) \
+                and any(str(target) in line for line in no_rule):
+            return absent("no Make rule for $(VAR_DIR)/"
+                          f"{method_name}.parquet")
+        return True
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -4587,38 +4941,11 @@ class Country:
             if isinstance(backend_value, str):
                 materialize_backend = backend_value.lower()
 
-        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
-        if prefer_parquet_cache:
-            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
-            if parquet_path.exists():
-                # GH #892: this branch used to return the parquet whole,
-                # ignoring `waves` entirely -- a one-wave request was served
-                # every wave in the cache, silently.  Nothing downstream
-                # filters, so the restriction has to happen here.
-                #
-                # It went unnoticed because on the ORDINARY path the pre-#891
-                # hash folded in the requested wave set, so a subset request
-                # graded `stale` and rebuilt; the #891 defect was what masked
-                # this one.  Making the hash wave-independent removes that
-                # accidental guard, so the two must be fixed together.
-                #
-                # `assume_cache_fresh` skips the hash check by contract, so
-                # coverage rests on the manifest alone: absent it (a pre-#891
-                # parquet), fall through to the normal path rather than guess.
-                covered = read_parquet_cache_waves(parquet_path)
-                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    df_cached = get_dataframe(parquet_path)
-                    df_cached = map_index(df_cached)
-                    df_cached = self._restrict_to_waves(df_cached, waves)
-                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
-                if covered is None and set(waves) == set(self.waves):
-                    df_cached = get_dataframe(parquet_path)
-                    df_cached = map_index(df_cached)
-                    return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
-                logger.debug(
-                    f"assume_cache_fresh short-circuit SKIPPED (coverage): "
-                    f"{method_name} covers {covered}; request needs {sorted(waves)}"
-                )
+        # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
+        # excluded from the build fingerprint (GH #1040).
+        df_cached = self._read_assumed_fresh_cache(method_name, waves)
+        if df_cached is not None:
+            return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
 
         if (
             not self._panel_ids_attempted
@@ -4833,7 +5160,7 @@ class Country:
             df_local = map_index(df_local)
             return df_local
 
-        def load_from_waves(waves, *, evict_country_cache=False):
+        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -4970,6 +5297,22 @@ class Country:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
 
+            # GH #1039 (red team r1): the make backend came here because
+            # `_has_country_builder` found NO country-level rule or script, so
+            # the country fallback below has nothing to run.  It could only
+            # fail or -- make answering "nothing to be done" for an existing
+            # target it has no rule for -- hand back whatever
+            # `var/<t>.parquet` holds, unrestricted to the request: measured,
+            # Senegal `livestock(waves=['2021-22'])` served 9,404 rows of
+            # 2018-19.  So it is not asked.  A request for every wave that
+            # produced nothing is a failed build, as on the default backend;
+            # a strict subset whose waves lack the table is a correct EMPTY
+            # answer, the 0 rows the default backend serves from a warm cache.
+            if not country_builder:
+                if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+                    raise _rebuild_failure_error(self.name, method_name)
+                return _empty_declared_frame(scheme_entry)
+
             # GH #866: no wave produced rows, so the country-level
             # make/script fallback is about to run -- and `try_make` would
             # otherwise be handed the very parquet the read gate refused, call
@@ -5057,6 +5400,8 @@ class Country:
             _GRAIN_LEDGER.pop((self.name, method_name), None)
             # GH #675: likewise the dropped-sub-df record this load stamps.
             _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
+            # GH #1045: likewise the date-parse report this load stamps.
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
 
             # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
             # own method, excluded from the build fingerprint (GH #908): it
@@ -5137,6 +5482,7 @@ class Country:
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                        cache_waves=build_waves,
+                                       datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                        build_drops=build_drops)
                             _mark_degraded_written((self.name, method_name), build_drops)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -5188,6 +5534,7 @@ class Country:
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                    cache_waves=build_waves,
+                                   datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                    build_drops=build_drops)
                         _mark_degraded_written((self.name, method_name), build_drops)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -5231,6 +5578,10 @@ class Country:
                             _replay_grain_audit(
                                 read_parquet_grain_audit(cache_path),
                                 self.name, method_name,
+                            )
+                            replay_datetime_audit(
+                                read_parquet_datetime_audit(cache_path),
+                                self.name, method_name, waves=waves,
                             )
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
                             cached_df = self._augment_index_from_related_tables(
@@ -5328,7 +5679,9 @@ class Country:
                     build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
+                               grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                cache_waves=build_waves,
+                               datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                build_drops=build_drops)
                     _mark_degraded_written((self.name, method_name), build_drops)
                     logger.debug(
@@ -5361,8 +5714,18 @@ class Country:
             try:
                 if use_dvc:
                     df = load_with_dvc_cache(method_name)
-                elif has_data_scheme_entry and not prefer_make_backend:
-                    df = load_from_waves(waves)
+                # GH #1039: a `materialize: make` table whose country level
+                # has no rule and no script is built from its waves, exactly
+                # as the default backend builds it -- not handed to a country
+                # make target that cannot exist (and that, on a warm root,
+                # answered with whatever `var/<t>.parquet` was lying there).
+                # With `prefer_make_backend` this branch is reached only when
+                # the predicate found no builder, so `load_from_waves` is told
+                # not to fall back to one either.
+                elif has_data_scheme_entry and not (
+                        prefer_make_backend
+                        and self._has_country_builder(method_name)):
+                    df = load_from_waves(waves, country_builder=not prefer_make_backend)
                 else:
                     df = run_make_target(method_name)
                     if df is None:
@@ -6496,49 +6859,10 @@ def _enforce_rejected_column_spellings(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-class DatetimeCoercionWarning(RuntimeWarning):
-    """A declared datetime column held strings that did not parse (GH #798).
-
-    Raised by :func:`_coerce_datetime_column` when values that were non-blank
-    strings before the cast come back ``NaT`` after it.  Carries ``country``,
-    ``table``, ``column``, ``count`` and ``examples`` as attributes so callers
-    and tests can target it precisely, the way ``GrainCollapseWarning`` does.
-    """
-
-    def __init__(self, message: str, *, country: str | None = None,
-                 table: str | None = None, column: str | None = None,
-                 count: int = 0, examples: tuple = ()):
-        super().__init__(message)
-        self.country = country
-        self.table = table
-        self.column = column
-        self.count = count
-        self.examples = examples
-
-
-class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
-    """Year-last numeric dates whose day/month order the data cannot settle.
-
-    ``01/05/2019`` is 1 May or 5 January.  :func:`_coerce_datetime_column`
-    reads a group of year-last values day-first only when some value has a
-    first field above 12 and none a second field above 12 (and month-first
-    the other way round); otherwise -- no evidence, or contradictory evidence
-    -- the group is served ``NaT`` and this warning names it.  ``reason`` is
-    ``'ambiguous'`` or ``'conflicting'``; ``wave`` is the ``t`` value, or
-    ``None`` when the column carried no ``t`` level.  (GH #798, @ligon
-    2026-10-18: a silent per-value guess was the one failure mode ruled out.)
-    """
-
-    def __init__(self, message: str, *, reason: str, wave=None, **kw):
-        super().__init__(message, **kw)
-        self.reason = reason
-        self.wave = wave
-
-
-# Year-last numeric dates: d/m/Y or m/d/Y, with -, / or . and an optional
-# time part.  Year-first strings are unambiguous and never match.
-_YEAR_LAST_DATE = re.compile(
-    r'^\s*(\d{1,2})[-/.](\d{1,2})[-/.](\d{4}|\d{2})(?:[ T].*)?$')
+# GH #1045: ``DatetimeCoercionWarning`` / ``DatetimeAmbiguityWarning`` and the
+# year-last regex moved to ``datetime_parse`` (the build-time parser shares the
+# evidence rule); imported above, so ``country.DatetimeCoercionWarning`` still
+# resolves.
 
 
 def _to_datetime_mixed(s: pd.Series, *, where: str, dayfirst: bool = False,
@@ -6606,9 +6930,24 @@ def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
     where = '/'.join(x for x in (country, table, column) if x) or 'datetime column'
     meta = dict(country=country, table=table, column=column)
     if pd.api.types.is_datetime64_any_dtype(s.dtype):
-        return pd.to_datetime(s, errors='coerce', format='mixed')
+        # GH #1045: a column parsed at build time arrives as datetime64 and is
+        # served exactly as the parquet stores it -- no re-parse, no
+        # resolution change.
+        return s
     was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
                     na_action='ignore').fillna(False).astype(bool)
+    if _datetime_parse.READ_CAST_WARNS_ON_STRINGS and bool(was_str.any()):
+        # GH #1045 work queue: a string reaching the read-time cast is a wave
+        # that does not parse its dates at build time yet.  OFF until the
+        # string-storing countries are migrated (datetime_parse docstring).
+        n_str = int(was_str.sum())
+        warnings.warn(DatetimeStringAtReadWarning(
+            f"{where}: the read-time cast received {n_str} string value(s) "
+            f"(e.g. {list(pd.unique(s[was_str].astype(str))[:3])}); declared "
+            f"datetime columns should be parsed at build time with "
+            f"local_tools.parse_datetime (GH #1045).",
+            count=n_str, examples=tuple(pd.unique(s[was_str].astype(str))[:3]),
+            **meta), stacklevel=3)
     parts = s.where(was_str).astype(object).str.extract(_YEAR_LAST_DATE)
     year_last = was_str & parts[0].notna()
     out = _to_datetime_mixed(s.where(~year_last), where=where, **meta)
@@ -7395,6 +7734,9 @@ def _replay_wave_stamp(path: Path | str, country: str, table: str, wave: str | N
     other frame.  Footer-only read, ~1 ms.
     """
     _replay_grain_audit(read_parquet_grain_audit(path), country, table, wave=wave)
+    # GH #1045: the build-time date-parse report rides in the same parquet.
+    replay_datetime_audit(read_parquet_datetime_audit(path), country, table, wave=wave,
+                          waves=None if wave is None else [wave])
 
 
 # Sites whose report is filed INSIDE a wave's build stage -- i.e. from within
@@ -7699,8 +8041,14 @@ def _describe_missing(degraded: list[dict]) -> str:
 
 
 def _warn_degraded_serve(country: str, table: str, drops: Any,
-                         path: Path | str, wave: str | None = None) -> None:
-    """Say, loudly and specifically, that a degraded parquet is being served."""
+                         path: Path | str, wave: str | None = None,
+                         stacklevel: int = 3) -> None:
+    """Say, loudly and specifically, that a degraded parquet is being served.
+
+    *stacklevel* counts from this function: the default names the caller of
+    the read gate that called it (``Country._read_l2_country_cache`` ->
+    ``load_dataframe_with_dvc``); ``Wave._read_l2_wave_cache`` passes 4 so its
+    warning still names ``grab_data``'s caller (GH #1040)."""
     degraded = _degraded_drops(drops)
     if not degraded:
         return
@@ -7723,7 +8071,7 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
         f"Detail: {detail}",
         country=country, table=table, missing=missing, files=files,
         missing_optional=missing_optional),
-        stacklevel=3)
+        stacklevel=stacklevel)
 
 
 def _replay_build_drops(drops: Any, country: str, table: str) -> None:

@@ -152,48 +152,25 @@ def _restore_missing_quantity(wide, canonical):
 
 
 # ---------------------------------------------------------------------------
-# Encoding repair for the 2014 `conso7jours` value labels (GH #794 / #805)
+# Encoding safety net for the `food_acquired` labels (GH #794 / #805)
 # ---------------------------------------------------------------------------
 #
 # `emc2014_p{1..4}_conso7jours_16032015.dta` write their value labels in
-# cp1252 and the reader decodes pre-118 files as latin-1, so four of the
-# `product` labels reach us with a C1 control where cp1252 has a printable
-# character: 0x85 (ellipsis), 0x8C / 0x9C (OE / oe ligature).  THE CROSSWALK
-# RUNS FIRST: `data_info.yml` maps `j` through `harmonize_food` on the RAW
-# label inside df_data_grabber, before this hook sees the frame, and that
-# table is keyed on the damage (strategy B, `_/CONTENTS.org` "Encoding";
-# the parent `_/categorical_mapping.org` says which keys and why).  So the
-# decoders below are a SAFETY NET for a label the crosswalk did not absorb:
-# they run after the mapping and only change a string that still carries a
-# C1 control (`_decode_cp1252`) or a UTF-8-as-latin-1 double encoding
-# (`_decode_mojibake`, the 2018-19 class; a clean label round-trips
-# unchanged).  Measured on the 2026-10-14 rebuild they change 0 rows -- the
-# repaired crosswalk does the work -- and they exist so that a future
-# uncovered label is served legible rather than as a control character.
-# If the decode is ever moved AHEAD of the crosswalk, every damage-keyed
-# row must be re-keyed in the same commit.
+# cp1252.  Since GH #805 the reader re-decodes them (``get_dataframe`` ->
+# ``local_tools._redecode_cp1252``), so the `product` labels arrive clean --
+# ``\u0152ufs``, ``Cube (Maggi, Jumbo,\u2026)``, ``Feuilles (oseilles,
+# baobab, boulvaka\u2026`` -- and the parent `_/categorical_mapping.org`
+# keys them clean.  This hook used to carry a wave-level ``_decode_cp1252``
+# and a whole-value ``_J_FIX`` for the Feuilles label (whose U+0085 the org
+# reader stripped from any key); both are retired with #805.
 #
-# `_J_FIX` is the one label the crosswalk structurally cannot reach:
-# "Feuilles (oseilles, baobab, boulvaka\x85" ENDS in the 0x85 byte, and the
-# org reader strips every cell (U+0085 is whitespace to str.strip), so no
-# key can carry it, while the dict is applied before format_id strips the
-# value.  Whole-value replacement to the Preferred Label the crosswalk
-# intends, exactly as `_RELATIONSHIP_FIX` does for the roster (GH #801).
-# Never a substring.
-_J_FIX = {'Feuilles (oseilles, baobab, boulvaka': 'Feuilles'}
-
-
-def _decode_cp1252(value):
-    """Re-decode a label the reader took as latin-1 but the file wrote as
-    cp1252 (GH #801; mirrors ``Niger/2018-19/_/mapping.py``).  Changes only a
-    string carrying a C1 control (U+0080-U+009F); returns anything else, and
-    the five undecodable cp1252 holes, unchanged."""
-    if not isinstance(value, str) or not any('\x80' <= ch <= '\x9f' for ch in value):
-        return value
-    try:
-        return value.encode('latin-1').decode('cp1252')
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        return value
+# THE CROSSWALK RUNS FIRST: `data_info.yml` maps `j` through `harmonize_food`
+# on the raw label inside df_data_grabber, before this hook sees the frame.
+# What remains below is a SAFETY NET for a label the crosswalk did not
+# absorb: a UTF-8-as-latin-1 double encoding (`_decode_mojibake`, the 2018-19
+# class -- a clean label round-trips unchanged; #805 deliberately leaves
+# that class alone).  It exists so that a future uncovered label is served
+# legible rather than as mojibake.
 
 
 def _decode_mojibake(value):
@@ -211,13 +188,7 @@ def _decode_mojibake(value):
 def _repair_label(value):
     if not isinstance(value, str):
         return value
-    value = _J_FIX.get(value, value)
-    # Double-encoding FIRST: the latin-1 -> utf-8 round trip succeeds only
-    # on a genuine UTF-8-read-as-latin-1 string (a lone C1 byte is an
-    # invalid UTF-8 continuation and falls through unchanged).  cp1252
-    # first would turn `b\xc5\x93uf` into `b\xc5\u201cuf` -- the 0x93 is a
-    # curly quote in cp1252 -- and destroy the round trip.
-    return _decode_cp1252(_decode_mojibake(value))
+    return _decode_mojibake(value)
 
 
 def _repair_index_labels(df, levels=('j', 'u')):
@@ -275,8 +246,8 @@ def food_acquired(df):
       ``Unknown`` ``u`` fill is taken BEFORE the reshape so the wide and
       long frames share one key.
     * :func:`_repair_index_labels` -- the GH #794 safety net on ``j`` / ``u``
-      (whole-value ``_J_FIX``, then cp1252, then double-encoding), after the
-      build-time crosswalk has already absorbed the keyed damage.
+      (a UTF-8 double encoding; the cp1252 class is repaired by the reader
+      since GH #805), after the build-time crosswalk.
     """
     if 'visit' not in df.columns:
         # Defensive: a caller (or a future config edit) that does not stamp the

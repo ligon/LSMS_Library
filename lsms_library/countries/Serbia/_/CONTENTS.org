@@ -309,6 +309,36 @@ The DVC-managed =household_roster= pipeline (=dvc.yaml=) may work
 independently since it uses the CLI materializer, but the legacy
 Makefile pipeline for food and other features is non-functional.
 
+* Kinship: 2007's =srodstvo= codes (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+The 2007 relationship variable (=srodstvo=, =individual.dta=) has eight
+served codes.  Four name a relation "of head of household/spouse, partner" or
+fold the in-law into the blood code, so since 2026-10-19 they carry no
+Affinity:
+
+| served label                                                   | tuple         | people |
+|----------------------------------------------------------------+---------------+--------|
+| =child of head of household/spouse, partner=                    | [-1, 0, null] |  5,103 |
+| =grandson/daughter of head of household/spouse, partner=        | [-2, 0, null] |  1,454 |
+| =brother/sister or brother/sister-in-law of head of household=  | [0, 1, null]  |    903 |
+| =parent of head of household/spouse, partner=                   | [1, 0, null]  |    593 |
+
+8,053 people (46.3% of the roster), all =consanguineal= before.  Every
+child, grandchild, parent and sibling in this wave is therefore Affinity-NA;
+only =head of household=, =spouse, partner=, =other relation= ([null, null,
+consanguineal], 160) and =unrelated= (49) carry one.  That is the
+instrument, not a gap in the mapping.  These keys sat under a
+"(Tajikistan)" heading in =kinship.yml= until 2026-10-19; the census found
+them in Serbia 2007 only, and none in Tajikistan.
+
 * Known data issues
 - Makefile :: FIXED (2026-06-08).  The generic rule's =panama.py=
   prerequisite (copy-paste error from Panama) now reads =serbia.py=, and
@@ -535,3 +565,37 @@ Serbia's do not: =Quantity= is NaN and the money is in =Expenditure= alone.
 quantity is synthesised here, because that would be a data change rather than
 a relabel.  Anyone building Step 2 of #770 (recovering the =1/price= factor
 from a price source) must handle both shapes.
+
+* Encoding: the 2007 =.dta= files are cp1250 (GH #805, 2026-10-19)
+
+The 2007 files are format 113, which pandas reads as latin-1, but their text
+is Windows Central-European *cp1250*.  cp1250 and cp1252 put the same
+characters on the C1 code points this wave uses -- =Š Ž š ž= (0x8A 0x8E 0x9A
+0x9E), =…= (0x85), =–= (0x96) -- so since GH #805 the reader's cp1252
+re-decode serves them correctly.  13 files are decoded (census:
+=slurm_logs/gh805_cp1252/census_2026-10-19_c1_files.tsv=), e.g.:
+
+- municipality names =opstname= / =opsname= in =household=, =domacinstva=,
+  =enumeration_district=, =popisni_krug=, =data_for_imputting_rents=,
+  =imputirana_renta=: =Ni<U+009A>= -> =Niš=, =Kanji<U+009E>a= -> =Kanjiža=
+  (1,101 cells in =household.dta=).  Those names spell =č ć đ= as plain ASCII
+  (=Cacak=, =Arandelovac=), so after the decode they are complete.
+- =m5_1_diary= / =m5_1_dnevnik= =nsifra=: the trailing =…= of
+  =Ostalo ju`no vo}e, banane, ananas, kivi …= (2,716 rows).  That string
+  MIXES the two encodings: =`= (ž) and =}= (ć) are the ASCII YUSCII
+  substitutes recorded under "food_items.org" above (that note names only
+  ='|'= = đ), and the ellipsis is a cp1250 byte.  #805 touches only the
+  ellipsis; the YUSCII letters are ASCII and unchanged, and
+  =food_acquired= still keys on the numeric =proizvod=.
+- =individual= / =lica= value labels: =….. legs or feet=, =…. back or neck=.
+
+*Not repaired*: the cp1250 letters ABOVE 0x9F are the same bytes as latin-1
+letters, so the reader (which only touches C1) serves =č= as =è=, =ć= as
+=æ=, =Č= as =È= and =Đ= as =Ð=.  Measured over every held 2007 file through
+=get_dataframe=, these occur ONLY in =section3_ed.dta= =p3_1= (community
+project free text, 26 cells): =Musaèa= (Musača), =Roæeviæi= (Roćevići),
+=Èesma= (Česma), =Ðerdap= (Đerdap).  No Serbia table reads =p3_1=,
+=opstname=, =opsname= or =nsifra=, and every Serbia table rebuilt cold on
+both sides (the #805 fix report and its r1 red team) was identical before
+and after #805.  Completing it needs a per-file =encoding: cp1250= declaration
+(residual #805-a, shared with =Serbia and Montenegro=, which is cp1250 too).

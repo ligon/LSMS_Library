@@ -192,7 +192,7 @@ def test_cache_clear_prints_both_classes(tmp_path, monkeypatch):
     assert result.exit_code == 0, result.output
     out = result.output
     assert "NO .dvc sidecar" in out and str(dangerous) in out and str(orphan) in out
-    assert "SERVES" in out
+    assert "REFUSES" in out and "LSMS_ALLOW_INTREE_SOURCES=1" in out   # read policy, GH #831 (b)
     assert "workspace copy" in out and str(refused) in out
     assert "no country segment" in out and str(root / "2015-16") in out
     # the two classes are separate blocks, dangerous first

@@ -404,6 +404,13 @@ def _ledgers() -> tuple[dict, dict]:
     return _GRAIN_LEDGER, _NULL_READ_LEDGER
 
 
+def _datetime_ledger() -> dict:
+    # GH #1045: the build-time date-parse ledger, relayed like the two above
+    # so a wave parsed in a worker still reaches the parent's country stamp.
+    from .datetime_parse import _DATETIME_LEDGER
+    return _DATETIME_LEDGER
+
+
 def _drop_ledger() -> dict:
     # GH #675: the dropped-sub-df record a wave's build files must reach the
     # parent's L2-country stamp exactly as the grain reports do; lost at the
@@ -472,11 +479,12 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     """Run one wave's build stage, capturing everything the serial path would
     have left behind in-process: warnings, ledger entries, or an exception."""
     grain, null = _ledgers()
+    dates = _datetime_ledger()
     drops = _drop_ledger()
-    g0, n0 = _snapshot(grain), _snapshot(null)
+    g0, n0, t0 = _snapshot(grain), _snapshot(null), _snapshot(dates)
     payload: dict[str, Any] = {"wave": wave, "has_table": False, "result": None,
-                               "warnings": [], "grain": [], "null": [], "drops": [],
-                               "error": None}
+                               "warnings": [], "grain": [], "null": [], "datetime": [],
+                               "drops": [], "error": None}
     d0 = {k: list(v) for k, v in drops.items()}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
@@ -489,6 +497,7 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     payload["warnings"] = [_pack_warning(m) for m in caught]
     payload["grain"] = _delta(grain, g0)
     payload["null"] = _delta(null, n0)
+    payload["datetime"] = _delta(dates, t0)
     # Not ``_delta``: ``_forget_wave_build_drops`` may REWRITE a key's list
     # inside the build, so diff by content, not by length.
     payload["drops"] = [(k, r) for k, v in drops.items() for r in v
@@ -556,6 +565,7 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
     grain, null = _ledgers()
     _file_reports(grain, payload["grain"])
     _file_reports(null, payload["null"])
+    _file_reports(_datetime_ledger(), payload.get("datetime", []))
     _file_reports(_drop_ledger(), payload.get("drops", []))
     err = payload.get("error")
     if err is not None:
