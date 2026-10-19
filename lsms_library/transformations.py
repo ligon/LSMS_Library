@@ -1718,16 +1718,13 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
     #
-    # GH #931: only the FOOD callers pass `unit_kg` (`food_kg_factors`, via
-    # `Country.<food_prices|food_quantities>`).  `harvest_kg_factors` calls
-    # this function with `unit_kg` defaulted, and `_kg_factor_series` cannot
-    # pass it at all, so the crop ladder is blind to declared `u_kg` rows.
-    # That is deliberate for now: Ethiopia's external check on the WB shipped
-    # crop factors (`Quintal` == 100.0 where the library has no opinion;
-    # `test_quintal_is_exactly_100kg_on_every_newly_served_row`) depends on
-    # the crop ladder NOT holding a declared quintal.  Pinned by
-    # `tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg`;
-    # see the `harvest_kg_factors` docstring before threading `unit_kg` here.
+    # GH #931 (@ligon, 2026-10-18): the CROP ladder reads the same declaration,
+    # but not through this argument.  `harvest_kg_factors` can be handed a
+    # pooled `Feature` frame, whose rows need one country's table each, so it
+    # resolves the declaration per row (`_declared_kg_factors`) and lays it
+    # over this function's output with the precedence it would have had here.
+    # `tests/test_crop_kg_factor.py::test_crop_declared_overlay_equals_food_seeding`
+    # pins that the two routes give the same number for the same unit.
     for key, kg in (unit_kg or {}).items():
         factors[str(key).lower()] = kg
 
@@ -3963,9 +3960,110 @@ def _shipped_factor_lookup(df, shipped_factors):
     return out, out_source, matched
 
 
+#: ``df.attrs`` key of a frame's DECLARED unit masses (GH #931).  Shape
+#: ``{country: {u label, lower-cased: kg}}`` -- keyed by country, as the
+#: ``population`` / ``recall`` / ``derivations`` records are, so a pooled
+#: ``Feature`` frame's record is the plain union of its countries' records
+#: (``feature._ATTRS_CARRIERS``) and each row can be served its OWN country's
+#: table.  Written by ``Country._finalize_result`` on ``crop_production`` from
+#: ``Country._unit_kg_factors`` -- the country's merged ``u`` and ``u_kg``
+#: categorical tables, the same composition the food ladder is handed -- and
+#: read by :func:`harvest_kg_factors` when its ``unit_kg`` is left ``None``.
+UNIT_KG_ATTRS_KEY = 'unit_kg'
+
+
+def merge_unit_kg_attrs(frames):
+    """Union the ``unit_kg`` attrs of several frames, for ``Feature()`` assembly.
+
+    ``attrs`` survive a ``concat`` only when every input agrees, and the
+    countries of a ``Feature`` frame carry different records by design, so the
+    record dies at assembly unless it is re-attached (``CLAUDE.md``, "Panel ID
+    Transitive Chains and the ``attrs`` Flag").  Each element may be a frame or
+    the bare ``attrs`` mapping captured from one, as for ``recall``.
+    """
+    out = {}
+    for f in frames:
+        got = (getattr(f, 'attrs', f) or {}).get(UNIT_KG_ATTRS_KEY)
+        if isinstance(got, Mapping):
+            for country, table in got.items():
+                if isinstance(table, Mapping):
+                    out.setdefault(str(country), {}).update(table)
+    return out
+
+
+def _declared_kg_factors(df, unit_kg):
+    """Per-row kg-per-unit from a DECLARED unit-mass table (GH #931).
+
+    *unit_kg* is either ``{u label: kg}`` (one table, applied to every row) or
+    ``{country: {u label: kg}}`` (the ``attrs`` record; each row is served its
+    own country's table, read off a ``country`` level or column, else off
+    ``df.attrs['country']``, else the record's only entry).  ``None`` reads
+    the record from ``df.attrs``; an empty mapping declares nothing.  Labels
+    match case-insensitively, exactly as the ``metric`` seeds do.
+
+    Returns ``(values, origin)``: a float ndarray aligned POSITIONALLY to *df*
+    (NaN where nothing is declared, or the declaration is not finite and > 0),
+    and where the table came from -- ``'argument'``, ``'attrs'`` or ``None``.
+
+    A record with several countries and no way to tell which row is whose is
+    REFUSED with a warning and serves nothing: guessing would hand one
+    country's quintal to another's, which is the error ``u_kg`` exists to stop
+    (GH #919: 100 kg in Ethiopia, 100 lb in Central America).
+    """
+    origin = 'argument'
+    if unit_kg is None:
+        unit_kg = df.attrs.get(UNIT_KG_ATTRS_KEY)
+        origin = 'attrs' if unit_kg is not None else None
+    out = np.full(len(df), np.nan)
+    if not unit_kg:
+        return out, origin
+    if not isinstance(unit_kg, Mapping):
+        raise TypeError(
+            "unit_kg must be a mapping {u label: kg} or {country: {u label: "
+            f"kg}}; got {type(unit_kg).__name__}")
+    nested = [isinstance(v, Mapping) for v in unit_kg.values()]
+    if any(nested) and not all(nested):
+        raise ValueError(
+            "unit_kg mixes {u label: kg} entries with {country: {...}} "
+            "entries; pass one shape or the other")
+
+    def lowered(table):
+        return {str(k).lower(): v for k, v in table.items()}
+
+    units = pd.Series(_level_or_column(df, 'u')).astype(str).str.lower()
+    if not all(nested):
+        return _valid_factor(units.map(lowered(unit_kg))), origin
+
+    tables = {str(c): lowered(t) for c, t in unit_kg.items()}
+    countries = _level_or_column(df, 'country')
+    if countries is None:
+        country = df.attrs.get('country')
+        if country is not None and str(country) in tables:
+            table = tables[str(country)]
+        elif len(tables) == 1:
+            table = next(iter(tables.values()))
+        else:
+            warnings.warn(
+                f"harvest_kg_factors: the declared unit_kg record names "
+                f"{sorted(tables)} but the frame has no 'country' level or "
+                f"column and no attrs['country'] among them, so no row can be "
+                f"matched to its country's table and NONE is applied.  Keep "
+                f"the 'country' level, or pass unit_kg= for the one country.",
+                stacklevel=3)
+            return out, origin
+        return _valid_factor(units.map(table)), origin
+
+    country_of = pd.Series(countries).astype(str)
+    for country, table in tables.items():
+        rows = (country_of == country).to_numpy()
+        if rows.any():
+            out[rows] = _as_float(units[rows].map(table))
+    return _valid_factor(out), origin
+
+
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
                        min_reports=SURVEY_MEDIAN_MIN_REPORTS,
-                       shipped_factors=None):
+                       shipped_factors=None, unit_kg=None):
     """Per-row kg-per-unit factor for ``crop_production``, and its PROVENANCE.
 
     The factor half of :func:`harvest_kg`, exposed on its own so the layers
@@ -4004,13 +4102,22 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         within the same country-wave, where at least *min_reports* rows
         report one; falling back to ``u`` alone.  The survey's own weights
         filling the survey's own gaps -- see :func:`_survey_median_factors`.
+    ``metric``
+        A factor that is READ, never estimated: the country's DECLARED unit
+        mass (``u_kg``, see *unit_kg* below), else :data:`KNOWN_METRIC`, else
+        a label that states its own content (``Sack (50 kgs)``).  A
+        declaration outranks :data:`KNOWN_METRIC` here exactly as it does on
+        the food ladder (GH #919), because it is the only layer a country can
+        override.  Split out of ``inferred`` in GH #929; a row it serves has
+        the same ``kg_per_unit`` it would have under ``inferred``.
     ``inferred``
         The shared unit→kg machinery, unchanged: :func:`_kg_factor_series`
         → :func:`_get_kg_factors` (hand-coded metric tokens, the
-        explicit-metric label parser, then price-ratio inference).  This is
-        the ONLY layer that acts on a frame with no ``KgFactor`` column, so
-        such a frame gets exactly the factors it got before this function
-        existed.
+        explicit-metric label parser, then price-ratio inference), with the
+        declared masses laid over it at the seeds' precedence.  This is the
+        ONLY layer that acts on a frame with no ``KgFactor`` column, so such a
+        frame gets exactly the factors it got before this function existed
+        -- apart from the declared units, which is the point of GH #931.
     ``none``
         No layer produced a usable factor.  Counted, not hidden: these rows
         contribute nothing to ``Harvest_kg``.
@@ -4024,30 +4131,34 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``country`` are all optional.
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
+    unit_kg : mapping, optional
+        The country's DECLARED unit masses -- where a country ships a
+        conversion table, it is used (GH #931, @ligon 2026-10-18).  Either
+        ``{u label: kg}`` for every row, or ``{country: {u label: kg}}``, each
+        row then served its own country's table.  Left ``None`` (the default)
+        it is read from ``crop_production.attrs['unit_kg']``, which
+        ``Country(...).crop_production()`` stamps from the country's merged
+        ``u`` and ``u_kg`` categorical tables (``Country._unit_kg_factors``,
+        the same composition ``food_prices`` / ``food_quantities`` hand the
+        food ladder) and which ``Feature('crop_production')`` carries per
+        country.  So ``harvest_kg(ll.Country('Ethiopia').crop_production())``
+        serves a ``Quintal`` at the 100 kg the global ``u_kg`` declares, where
+        it used to serve it ``none``.  Pass ``{}`` to declare nothing.
 
-        There is deliberately NO ``unit_kg`` parameter here (GH #931).  The
-        FOOD ladder (:func:`food_kg_factors`) receives a country's declared
-        ``u_kg`` table through ``unit_kg`` -- composed by
-        ``Country._unit_kg_factors`` and passed only for ``food_prices`` /
-        ``food_quantities`` -- and lets it outrank :data:`KNOWN_METRIC`
-        (GH #919).  The CROP ladder never sees that table: its ``metric``
-        layer seeds :func:`_seeded_kg_factors` with ``unit_kg`` defaulted,
-        and ``inferred`` goes through :func:`_kg_factor_series`, which has no
-        ``unit_kg`` either.  So a unit a country declares in ``u_kg`` (say
-        ``Quintal: 100``) is served ``none`` here unless a ``KgFactor``
-        column, a *shipped_factors* table or :data:`KNOWN_METRIC` supplies
-        it.  The asymmetry is LOAD-BEARING, not an oversight: Ethiopia's only
-        EXTERNAL check on the World Bank's shipped factor table is that
-        ``Quintal`` comes back as exactly 100.0 on 13,924 rows the library
-        has NO independent opinion about
-        (``tests/test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``,
-        ``Ethiopia/_/CONTENTS.org`` "The real external check").  Teaching
-        this ladder to read ``u_kg`` would make that check a tautology, the
-        way the ``Kg``/``Gram`` overlap already is.  Whether the crop ladder
-        SHOULD read ``u_kg`` is an open decision (GH #931 item 2) that has to
-        land together with a re-expressed external check; the asymmetry
-        itself is pinned by
-        ``tests/test_crop_kg_factor.py::test_crop_ladder_is_blind_to_declared_unit_kg``.
+        The declaration lands in the ``metric`` layer (below ``reported``,
+        ``shipped`` and ``survey_median``), outranks :data:`KNOWN_METRIC` and
+        the label parser there, and never reaches a row whose ``u`` records
+        no unit.  A frame that has LOST its ``attrs`` -- a ``merge`` with a
+        frame whose ``attrs`` differ, for instance -- carries no record and
+        gets no declared factor: count ``attrs['kg_factor_sources']
+        ['declared']``, or pass *unit_kg* explicitly.
+
+        This used to be withheld on purpose: Ethiopia's external check on the
+        World Bank's shipped table was phrased as "rows the library has no
+        opinion on", and a declared quintal would have turned it into a
+        comparison of the WB table with the library's own ``u_kg``.  That
+        check is now made against an answer key neither side supplies
+        (``tests/test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key``).
     min_reports : int, default :data:`SURVEY_MEDIAN_MIN_REPORTS`
         ``N`` for the ``survey_median`` layer.  One number is applied to
         every group, but the groups are per country-wave, so a thin module
@@ -4110,8 +4221,13 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``KgFactorSource``
             one of :data:`KG_FACTOR_LAYERS`.
         ``kg_reported`` / ``kg_shipped`` / ``kg_survey_median`` /
-        ``kg_inferred``
+        ``kg_metric`` / ``kg_inferred``
             what each layer offered for that row, whether or not it won.
+        ``kg_declared``
+            what the DECLARED table (*unit_kg*) offered for the row, NaN where
+            it declares nothing for that unit.  Already inside ``kg_metric``
+            and ``kg_inferred`` with precedence; kept apart so the declaration
+            can be audited on its own.
             ``kg_reported`` and ``kg_shipped`` are POST-screen, so a rejected
             value reads NaN here and ``kg_reported_rejected`` /
             ``kg_shipped_rejected`` is True; the raw value is untouched in the
@@ -4127,26 +4243,33 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             normalises both ``None`` and ``pd.NA`` to NaN in an object
             column.
 
-        Two tallies ride on ``.attrs``:
+        Three tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
-            ``{layer: n_rows}`` over the INPUT rows.  The five layers of
+            ``{layer: n_rows}`` over the INPUT rows.  The layers of
             :data:`KG_FACTOR_LAYERS` partition the frame and sum to
             ``len(crop_production)`` -- ``shipped`` included, and therefore
-            present as ``0`` when no table is passed.  Three further keys ride
+            present as ``0`` when no table is passed.  Four further keys ride
             OUTSIDE that partition, since a row they count is still served by
-            one of the five: ``reported_implausible`` and
+            those layers: ``reported_implausible`` and
             ``shipped_implausible`` count rows whose offered factor the screen
             REJECTED, and ``shipped_matched`` counts rows the shipped table
             supplied a finite factor for at all -- a JOIN diagnostic taken
             before the sentinel, the screen and the rank, and the right number
-            to check when a table looks like it did nothing.  POOLED: on a
+            to check when a table looks like it did nothing.  ``declared``
+            counts rows the *unit_kg* table offered a factor for, whether or
+            not a higher layer won.  POOLED: on a
             cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
             the per-row frame answers the real question with one
             ``groupby('country')``.
+        ``kg_factor_declared_from``
+            where the declared table came from: ``'attrs'`` (the frame's own
+            ``unit_kg`` record), ``'argument'`` (*unit_kg* passed), or
+            ``None`` -- no declaration reached this call, so ``declared`` is 0
+            for want of a table rather than for want of a declared unit.
         ``kg_factor_disagreement``
             For ``reported_vs_shipped``, ``reported_vs_survey_median`` and
             ``reported_vs_inferred``:
@@ -4213,6 +4336,21 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
     sentinel = _unit_sentinel_mask(df)
 
+    # GH #931: the country's DECLARED unit masses (`u_kg`), laid over the read
+    # seeds with the precedence `_seeded_kg_factors(unit_kg=...)` gives them on
+    # the food ladder -- a declaration outranks KNOWN_METRIC and the label
+    # parser.  Per ROW rather than threaded through `_seeded_kg_factors`,
+    # because a pooled `Feature` frame needs a different table for each
+    # country's rows.  Laid over BOTH `metric` and `inferred_arr`, so the
+    # invariant below (the seeds sit inside `inferred_arr` with precedence, and
+    # `resolved` reads `inferred_arr`) still holds.  A row that recorded no
+    # unit is not given one, as for the shipped layer.
+    declared, declared_from = _declared_kg_factors(df, unit_kg)
+    declared = np.where(sentinel, np.nan, declared)
+    decl_ok = ~np.isnan(declared)
+    metric = np.where(decl_ok, declared, metric)
+    inferred_arr = np.where(decl_ok, declared, inferred_arr)
+
     if shipped_factors is None:
         shipped = np.full(len(df), np.nan)
         shipped_rejected = np.zeros(len(df), dtype=bool)
@@ -4274,6 +4412,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
          'kg_shipped_rejected': shipped_rejected,
          'kg_shipped_source': shipped_source,
          'kg_metric': metric,
+         'kg_declared': declared,
          'kg_survey_median': survey_median,
          'kg_inferred': inferred_arr},
         index=df.index)
@@ -4295,7 +4434,15 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # 0 for a table that matched nothing at all.  Only this one separates a
     # mis-keyed table from a table that was simply outranked.
     counts['shipped_matched'] = shipped_matched
+    # GH #931.  Outside the partition, like `shipped_matched`: a declared row is
+    # still SERVED by one of the five (`metric` unless a higher layer won).
+    counts['declared'] = int(decl_ok.sum())
     out.attrs['kg_factor_sources'] = counts
+    # Kept OUT of the counts so every value there stays an int.  It is what
+    # tells "this country declares nothing for these units" ('attrs', with
+    # `declared` 0) apart from "no declaration reached this call" (None) --
+    # e.g. a frame whose attrs a merge discarded.
+    out.attrs['kg_factor_declared_from'] = declared_from
     # A row with no unit recorded is excluded from the audit as well: there
     # is nothing for its reported factor to be compared against, since no
     # per-unit factor -- inferred or median -- can exist for a non-unit.
@@ -4331,7 +4478,8 @@ def _disagreement(reference, other,
 
 
 def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
-               min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
+               min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
+               unit_kg=None):
     """Total harvested kilograms per (t, i, plot_id, j) from ``crop_production``.
 
     MECHANICAL reduction (GAP 1 → WB ``Plotcrop``/``Plot`` ``harvest_kg``).
@@ -4387,6 +4535,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
             harvest_kg(
                 cp,
                 shipped_factors=ethiopia.crop_conversion_factors(...))
+    unit_kg : mapping, optional
+        The country's DECLARED unit masses, forwarded to
+        :func:`harvest_kg_factors` (GH #931).  Left ``None`` it is read from
+        ``crop_production.attrs['unit_kg']``, which ``Country`` and
+        ``Feature`` frames carry; pass ``{}`` to declare nothing.
     carry_native : bool, default False
         When False (default, matching the WB construct), rows whose ``u``
         has no known kg factor contribute NOTHING to the sum — ``Harvest_kg``
@@ -4422,18 +4575,21 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     *lower bound* on the WB figure for plots dominated by non-metric
     containers; magnitudes agree on metric-reported plots.
 
-    Closing that gap is a per-country job in three forms, none of them a
+    Closing that gap is a per-country job in four forms, none of them a
     change to this transform: extend the country's ``u``-table
-    (``harvest_units``); wire the instrument's own conversion factor into
-    the optional ``KgFactor`` column, which the ``reported`` and
-    ``survey_median`` layers above then consume; or -- where the survey ships
-    a conversion TABLE rather than a per-row factor -- load that table and
-    pass it as *shipped_factors*.  The third is the one Ethiopia and Malawi
-    need (GH #852, #854): their tables are keyed on crop x unit x region, so
-    they can never be a per-row column, and the de-duplication and region
-    resolution they require are decisions that belong at the call site rather
-    than baked into a parquet.  The second reaches rows the
-    first cannot -- Uganda's 2018-19 season-A harvest side ships a
+    (``harvest_units``); declare a unit whose mass is FIXED -- a standard
+    container, or a regional unit like the quintal -- in the country's
+    ``u_kg`` table, which this ladder reads since GH #931; wire the
+    instrument's own conversion factor into the optional ``KgFactor``
+    column, which the ``reported`` and ``survey_median`` layers above then
+    consume; or -- where the survey ships a conversion TABLE rather than a
+    per-row factor -- load that table and pass it as *shipped_factors*.  The
+    last is the one Ethiopia and Malawi need (GH #852, #854): their tables
+    are keyed on crop x unit x region, so they can never be a per-row column
+    or a ``u_kg`` row, and the de-duplication and region resolution they
+    require are decisions that belong at the call site rather than baked
+    into a parquet.  Wiring ``KgFactor`` reaches rows no unit table can --
+    Uganda's 2018-19 season-A harvest side ships a
     100%-populated ``a5aq6d`` conversion factor and NO harvest-unit code at
     all, so its 7 153 rows sit at ``u='Unknown'`` and no unit table can ever
     convert them.
@@ -4454,7 +4610,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     qty = pd.to_numeric(df['Quantity'], errors='coerce')
     factors = harvest_kg_factors(df, volume_as_mass=volume_as_mass,
                                  min_reports=min_reports,
-                                 shipped_factors=shipped_factors)
+                                 shipped_factors=shipped_factors,
+                                 unit_kg=unit_kg)
     kg_per_unit = factors['kg_per_unit']
     kg = qty * kg_per_unit
     if carry_native:
@@ -4508,7 +4665,8 @@ def _parcel_from_feature_plot(plot_id):
 
 def yield_kg(crop_production, plot_features, *, area_col='Area',
              volume_as_mass=True, on='parcel',
-             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None):
+             min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
+             unit_kg=None):
     """Harvested kilograms per unit plot area (WB ``yield_kg``).
 
     MECHANICAL reduction (GAP 1).  Sums :func:`harvest_kg` and plot area to a
@@ -4537,6 +4695,10 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         it (`.coder/ledger/harvest-kg-shipped-factors.md` section 6 Q1/Q3)::
 
             yield_kg(cp, pf, shipped_factors=ethiopia.crop_conversion_factors())
+    unit_kg : mapping, optional
+        Forwarded to :func:`harvest_kg` (GH #931).  Unlike *shipped_factors*
+        it needs no passing: left ``None`` it is read from
+        ``crop_production.attrs['unit_kg']``.
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
@@ -4573,7 +4735,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
 
     hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
                     min_reports=min_reports,
-                    shipped_factors=shipped_factors).reset_index()
+                    shipped_factors=shipped_factors,
+                    unit_kg=unit_kg).reset_index()
     hk_key = _resolve_plot_level(hk.columns)
     if hk_key is None:
         raise ValueError(

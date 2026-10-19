@@ -61,7 +61,7 @@ from .currency import attach_currency, is_monetary_table
 # lsms_library/__init__.py imports it anyway.  The other `transformations`
 # imports in this file are function-local for historical reasons; this one is
 # on the hot read path (_finalize_result), so it is hoisted.
-from .transformations import validate_acquisition_source
+from .transformations import UNIT_KG_ATTRS_KEY, validate_acquisition_source
 from .build_transforms import build_context
 from .errors import LabelUnavailableError, UnitsUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
@@ -2317,6 +2317,12 @@ class Country:
         The canonical name is emitted as a key in its own right, so a country
         whose raw labels are already canonical (Ethiopia serves ``Quintal``)
         resolves without needing a ``u`` row for it.
+
+        Two consumers.  The FOOD ladder is handed this dict as ``unit_kg`` by
+        ``food_prices`` / ``food_quantities``; the CROP ladder
+        (``transformations.harvest_kg_factors``, GH #931) reads it off
+        ``crop_production.attrs['unit_kg']``, stamped as ``{country: dict}``
+        by ``_finalize_result``.
         """
         maps = self.categorical_mapping
         table = maps.get('u_kg')
@@ -3711,6 +3717,25 @@ class Country:
             # Record the country so a later standalone convert() can recover it
             # (Feature output instead carries `country` in the index).
             df.attrs['country'] = self.name
+
+            # GH #931: the country's DECLARED unit masses, for the crop kg
+            # ladder (`transformations.harvest_kg_factors`), which is an
+            # analyst-called transform with no Country to ask.  Keyed by
+            # country so `Feature` can carry it per country
+            # (`feature._ATTRS_CARRIERS`).  A config read, and here for the
+            # population record's two reasons: this re-runs on every read, and
+            # `_finalize_result` is in `_build_registry._EXCLUDED_CALLABLES`, so
+            # it costs no cache invalidation.  Metadata only.
+            if method_name == 'crop_production':
+                try:
+                    df.attrs[UNIT_KG_ATTRS_KEY] = {self.name: self._unit_kg_factors()}
+                except Exception as exc:
+                    warnings.warn(
+                        f"{self.name}: could not attach the declared unit "
+                        f"masses (attrs[{UNIT_KG_ATTRS_KEY!r}]; "
+                        f"{type(exc).__name__}: {exc}).  The table is "
+                        f"unaffected, but harvest_kg will apply no u_kg "
+                        f"declaration to it.")
 
             # Attach what this survey's documentation says the sample
             # REPRESENTS, per wave (GH #603/#601).  Metadata only: it adds
