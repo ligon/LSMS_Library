@@ -411,6 +411,14 @@ def _datetime_ledger() -> dict:
     return _DATETIME_LEDGER
 
 
+def _drop_ledger() -> dict:
+    # GH #675: the dropped-sub-df record a wave's build files must reach the
+    # parent's L2-country stamp exactly as the grain reports do; lost at the
+    # fork, the degraded country parquet would again grade fresh.
+    from .country import _BUILD_DROP_LEDGER
+    return _BUILD_DROP_LEDGER
+
+
 def _snapshot(ledger: dict) -> dict:
     return {k: len(v) for k, v in ledger.items()}
 
@@ -472,10 +480,12 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     have left behind in-process: warnings, ledger entries, or an exception."""
     grain, null = _ledgers()
     dates = _datetime_ledger()
-    g0, n0, d0 = _snapshot(grain), _snapshot(null), _snapshot(dates)
+    drops = _drop_ledger()
+    g0, n0, t0 = _snapshot(grain), _snapshot(null), _snapshot(dates)
     payload: dict[str, Any] = {"wave": wave, "has_table": False, "result": None,
                                "warnings": [], "grain": [], "null": [], "datetime": [],
-                               "error": None}
+                               "drops": [], "error": None}
+    d0 = {k: list(v) for k, v in drops.items()}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
@@ -487,7 +497,11 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     payload["warnings"] = [_pack_warning(m) for m in caught]
     payload["grain"] = _delta(grain, g0)
     payload["null"] = _delta(null, n0)
-    payload["datetime"] = _delta(dates, d0)
+    payload["datetime"] = _delta(dates, t0)
+    # Not ``_delta``: ``_forget_wave_build_drops`` may REWRITE a key's list
+    # inside the build, so diff by content, not by length.
+    payload["drops"] = [(k, r) for k, v in drops.items() for r in v
+                        if r not in d0.get(k, [])]
     return payload
 
 
@@ -552,6 +566,7 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
     _file_reports(grain, payload["grain"])
     _file_reports(null, payload["null"])
     _file_reports(_datetime_ledger(), payload.get("datetime", []))
+    _file_reports(_drop_ledger(), payload.get("drops", []))
     err = payload.get("error")
     if err is not None:
         exc, type_name, text, tb = err

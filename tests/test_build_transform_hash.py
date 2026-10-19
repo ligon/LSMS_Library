@@ -539,3 +539,80 @@ def test_framework_fingerprint_failure_respects_strict_warnings(monkeypatch, gat
         else:
             # Country hashing already catches all errors and returns None.
             assert c._table_cache_hash('household_roster', c.waves) is None
+
+
+# ---------------------------------------------------------------------------
+# GH #908: the L2-country READ GATE is mechanism, not content
+# ---------------------------------------------------------------------------
+
+# ~35 (country, table) cells across seven countries and both build paths.
+_GATE_PROBE_CELLS = [
+    (c, t)
+    for c in ("Albania", "Uganda", "Nigeria", "Malawi", "GhanaLSS", "Niger", "Tanzania")
+    for t in ("household_roster", "sample", "food_acquired", "cluster_features", "housing")
+]
+
+
+def _gate_probe_hashes():
+    import warnings as _w
+    R.clear_caches()
+    btf = {t: R.build_transforms_fingerprint(t)
+           for t in sorted({t for _q, (_f, ts) in R._BUILD_TRANSFORMS.items() for t in (ts or ())}
+                           | {t for _c, t in _GATE_PROBE_CELLS})}
+    tch = {}
+    with _w.catch_warnings():
+        _w.simplefilter("ignore")
+        for c, t in _GATE_PROBE_CELLS:
+            co = lsms_library.country.Country(c, preload_panel_ids=False)
+            if t in co.data_scheme:
+                tch[(c, t)] = co._table_cache_hash(t, co.waves)
+    return btf, tch
+
+
+def _probe_edit(monkeypatch, target):
+    import inspect
+    real = inspect.getsource
+    monkeypatch.setattr(inspect, "getsource",
+                        lambda o: real(o) + "\n_redteam_probe = 1\n"
+                        if inspect.unwrap(o) is target else real(o))
+
+
+def test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint():
+    """GH #908, structurally: no fingerprint part is the read gate's source.
+
+    Until #908 the gate was closure text inside the tagged
+    ``_aggregate_wave_data``, so a logic edit to it moved every table's
+    fingerprint.  Asserted structurally (as the null_read_audit pin is) so it
+    keeps its meaning after any legitimate hash change elsewhere."""
+    qn = "lsms_library.country.Country._read_l2_country_cache"
+    assert qn in R._EXCLUDED_CALLABLES
+    leaked = [p.split("=")[0] for p in _all_parts() if p.split("=")[0] == qn]
+    assert not leaked, f"read gate leaked into the build fingerprint: {leaked}"
+
+
+def test_editing_the_read_gate_moves_no_hash(monkeypatch):
+    """GH #908, measured: a no-op edit to the extracted gate moves 0 of the
+    ``build_transforms_fingerprint`` values and 0 of ~35 probed
+    ``Country._table_cache_hash`` values.  Positive control: the identical
+    probe on ``Country._union_waves`` -- kept in the closure on purpose, its
+    order is the build's cross-wave concat order -- DOES move them, so the
+    probe is capable of detecting a leak."""
+    btf0, tch0 = _gate_probe_hashes()
+    assert len(tch0) >= 30, f"probe too small: {len(tch0)} cells"
+
+    _probe_edit(monkeypatch, lsms_library.country.Country._read_l2_country_cache)
+    btf1, tch1 = _gate_probe_hashes()
+    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+    assert not moved_btf and not moved_tch, (
+        f"editing the read gate moved {len(moved_btf)}/{len(btf0)} fingerprints "
+        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+
+    monkeypatch.undo()
+    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
+    btf2, tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a closure callable"
+    assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
+    monkeypatch.undo()
+    R.clear_caches()

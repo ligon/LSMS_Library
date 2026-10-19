@@ -50,6 +50,8 @@ from .local_tools import (
     read_parquet_grain_audit,
     read_parquet_cache_waves,
     read_parquet_datetime_audit,
+    read_parquet_build_drops,
+    source_tier,
     _collect_file_paths_from_block,
 )
 from .paths import data_root, countries_root
@@ -940,6 +942,18 @@ def _required_scheme_columns(scheme_entry: Any) -> list[str]:
     ]
 
 
+def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
+    """Columns a ``data_scheme.yml`` entry declares ``optional: true`` -- the
+    complement, within the declared columns, of :func:`_required_scheme_columns`
+    (same reading, so the two cannot drift)."""
+    if not isinstance(scheme_entry, dict):
+        return []
+    required = set(_required_scheme_columns(scheme_entry))
+    return [k for k in scheme_entry
+            if isinstance(k, str) and k not in _SCHEME_NON_COLUMN_KEYS
+            and k not in required]
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -1586,7 +1600,15 @@ class Wave:
                 # load_dataframe_with_dvc).  Stale -> fall through and
                 # re-extract from source below.
                 expected_wave_hash = self._input_hash(request)
-                if cache_freshness(cache_path, expected_wave_hash) != "stale":
+                # GH #675: a wave parquet whose build dropped a sub-df it could
+                # not read -- costing a REQUIRED column -- is a miss once its
+                # source is readable again (heal); otherwise it is served, and
+                # warned, below.
+                wave_drops = read_parquet_build_drops(cache_path)
+                degraded_verdict, _ = _degraded_cache_verdict(
+                    wave_drops, (self.country.name, request, self.year))
+                if (cache_freshness(cache_path, expected_wave_hash) != "stale"
+                        and degraded_verdict != "rebuild"):
                     try:
                         df_cached = pd.read_parquet(cache_path)
                     except (OSError, ArrowInvalid):
@@ -1599,6 +1621,10 @@ class Wave:
                         # df_edit hook's reduce_to_agreed) can only be replayed
                         # from the stamp -- the hook did not run on this hit.
                         _replay_wave_stamp(cache_path, self.country.name, request, self.year)
+                        # GH #675: carry the drop record to the country stamp.
+                        _replay_build_drops(wave_drops, self.country.name, request)
+                        _warn_degraded_serve(self.country.name, request, wave_drops,
+                                             cache_path, wave=self.year)
                         return df_cached
 
         def check_adding_t(df):
@@ -1681,7 +1707,12 @@ class Wave:
                 # A dropped sub-df takes every column it was the sole supplier
                 # of with it.  Record the drops so the post-merge check below
                 # can tell whether that cost a REQUIRED declared column.
-                config_bugs: list[tuple[str, Any, Exception]] = []
+                config_bugs: list[tuple[str, Any, Exception, str]] = []
+                # GH #675: EVERY drop, with the columns that sub-df would have
+                # supplied, is recorded in the parquet this build writes -- the
+                # content hash cannot tell a degraded build from a complete one.
+                dropped: list[dict[str, Any]] = []
+                _forget_wave_build_drops(self.country.name, request, self.year)
                 merge_on =list(set('t').union(data_info.get('merge_on')))#a list
                 # `merge_how:` (GH #323) picks the join type for this block.
                 # Defaults to the historical 'outer', so every existing `dfs:`
@@ -1768,14 +1799,38 @@ class Wave:
                         # Whether a config bug ACTUALLY costs a required column
                         # is judged after the merge -- a sibling sub-df may
                         # supply the same column, in which case the drop is free.
+                        #
+                        # GH #675 adds a third: a non-KeyError failure where the
+                        # `file:` names NO source -- no file on disk and no
+                        # `.dvc` sidecar.  That is a typo'd path, i.e. a CONFIG
+                        # bug like the KeyError, not an unavailable source, and
+                        # it is classified (and escalates) the same way.
                         sub_file = sub_data_info.get('file', i)
-                        if isinstance(exc, KeyError):
-                            config_bugs.append((i, sub_file, exc))
-                        warnings.warn(
-                            f"{self.name}/{request}: could not load "
-                            f"sub-df '{i}' (file: {sub_file}); "
-                            f"proceeding without it. ({exc})"
-                        )
+                        rec = _drop_record(
+                            self.year, i, exc,
+                            [self.file_path / "Data" / str(f)
+                             for f in sub_mapping_details if f != 'df_edit']
+                            or [self.file_path / "Data" / str(sub_file)],
+                            sub_data_info.get('myvars'))
+                        if rec["kind"] == "config":
+                            config_bugs.append((i, sub_file, exc, rec["cause"]))
+                        dropped.append(rec)
+                        if rec["cause"] == "no-such-source":
+                            warnings.warn(
+                                f"{self.name}/{request}: no such source for "
+                                f"sub-df '{i}': check the file: path "
+                                f"'{sub_file}' in this wave's data_info.yml -- "
+                                f"there is no file at {rec['file']} and no .dvc "
+                                f"sidecar beside it, so this is a config bug, "
+                                f"not an unavailable source; proceeding without "
+                                f"it (GH #675). ({exc})"
+                            )
+                        else:
+                            warnings.warn(
+                                f"{self.name}/{request}: could not load "
+                                f"sub-df '{i}' (file: {sub_file}); "
+                                f"proceeding without it. ({exc})"
+                            )
                 if not merge_dfs:
                     warnings.warn(f"No data loaded for {request} in {self.name}")
                     df = pd.DataFrame()
@@ -1831,18 +1886,33 @@ class Wave:
                 # 4 on PR #627; latent when written, not latent forever).
                 #
                 # A column a SIBLING sub-df also supplies likewise does not fire
-                # a false alarm.  Only the config-bug drops (KeyError) can
-                # escalate; an unavailable file stays soft.  Prose is not
-                # enforcement.
+                # a false alarm.  Only the config-bug drops (a KeyError, or --
+                # GH #675 -- a `file:` naming no source at all) can escalate;
+                # an unavailable file stays soft.  Prose is not enforcement.
                 if config_bugs and isinstance(df, pd.DataFrame):
                     have = set(map(str, df.columns)) | {
                         str(n) for n in df.index.names if n is not None}
                     missing = sorted(
                         set(self._required_scheme_columns(request)) - have)
                     if missing:
-                        names = ', '.join(
-                            f"'{n}' (file: {f})" for n, f, _ in config_bugs)
                         first_exc = config_bugs[0][2]
+                        no_source = [(n, f) for n, f, _, c in config_bugs
+                                     if c == "no-such-source"]
+                        if no_source:
+                            names = ', '.join(
+                                f"'{n}' (file: {f})" for n, f in no_source)
+                            raise RuntimeError(
+                                f"{self.name}/{request}: no such source for "
+                                f"sub-df(s) {names}: check the file: path in this "
+                                f"wave's data_info.yml -- no file exists there and "
+                                f"no .dvc sidecar beside it, so this is a config "
+                                f"bug, not an unavailable source.  Dropping the "
+                                f"sub-df would leave required declared column(s) "
+                                f"{missing} ENTIRELY ABSENT from '{request}' "
+                                f"(GH #675, #323/#515). First error: {first_exc!r}"
+                            ) from first_exc
+                        names = ', '.join(
+                            f"'{n}' (file: {f})" for n, f, _, _ in config_bugs)
                         raise RuntimeError(
                             f"{self.name}/{request}: sub-df(s) {names} loaded but "
                             f"do NOT carry the column(s) the YAML asks for, leaving "
@@ -1859,6 +1929,17 @@ class Wave:
                             f"column in EVERY wave of {self.country.name}, not just "
                             f"this one (GH #323/#515). First error: {first_exc!r}"
                         ) from first_exc
+
+                # GH #675: file each drop with the declared columns it cost,
+                # judged at the same moment as the guard above.  An
+                # UNAVAILABLE-source drop that costs one (required or
+                # optional) is a DEGRADED build: stamped into the parquet so a
+                # warm read can tell.
+                if dropped:
+                    _file_wave_drops(
+                        self.country.name, request, dropped, df,
+                        ((self.country.resources or {}).get('Data Scheme')
+                         or {}).get(request))
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -1965,12 +2046,16 @@ class Wave:
                 # df_edit hook's reduce_to_agreed) with the wave parquet, so
                 # a country rebuild from warm wave parquets -- where the hook
                 # does not run -- still stamps them into the country parquet.
+                wave_drops = _wave_build_drops(self.country.name, request, self.year)
                 df = to_parquet(df, cache_path, absolute_path=True,
                                 cache_hash=self._input_hash(request),
                                 grain_audit=_wave_grain_audit(
                                     self.country.name, request, self.year),
                                 datetime_audit=wave_datetime_audit(
-                                    self.country.name, request, self.year))
+                                    self.country.name, request, self.year),
+                                build_drops=wave_drops)
+                _mark_degraded_written(
+                    (self.country.name, request, self.year), wave_drops)
             except (OSError, ValueError, ArrowInvalid) as exc:
                 # Disk full / permission denied / parquet serialization
                 # failure -> warn and continue with the in-memory df.
@@ -3983,6 +4068,253 @@ class Country:
         out.attrs = dict(df.attrs)
         return out
 
+    def _report_rebuild(self, method_name: str, miss_reason: str | None,
+                        build_waves: list[str], cache_path: Path) -> None:
+        """Say why a table is being rebuilt from source (GH #920(a)).
+
+        Called once, at the top of the rebuild descent, so a git checkout and
+        a pip install signal identically (before this the only signal was the
+        pip-only "DVC unavailable" log line).  Rules in
+        :class:`CacheRebuildWarning`.  MECHANISM, not content: listed in
+        ``_build_registry._EXCLUDED_CALLABLES`` (GH #908), so editing it
+        moves no build fingerprint.
+        """
+        reason = miss_reason or "unknown"
+        if reason.startswith("LSMS_NO_CACHE"):
+            return  # requested, and expected on every call
+        key = (self.name, method_name)
+        now = frozenset(str(w) for w in build_waves)
+        try:
+            expected = self._table_cache_hash(method_name, list(self.waves))
+        except Exception:  # never let the signal break a build
+            expected = None
+        prev_hash, prev = _REBUILD_HISTORY.get(key, (None, None))
+        if prev is not None and prev_hash != expected:
+            prev = None  # inputs changed since: a new build, not a repeat
+        _REBUILD_HISTORY[key] = (expected, now if prev is None else (prev | now))
+        waves_txt = f"{len(now)} wave(s) ({', '.join(sorted(now))})"
+        if prev is not None and not now > prev:
+            # Coverage did not grow (GH #891 makes legitimate re-builds of a
+            # growing request union strictly larger), so the last rebuild did
+            # not stick.
+            msg = (f"{self.name}/{method_name} is being rebuilt from source "
+                   f"AGAIN in this process ({reason}); the previous rebuild "
+                   f"covered the same waves with the same inputs, so its parquet "
+                   f"was not written, was overwritten, or is not being read "
+                   f"back.  Check that {cache_path} is "
+                   f"writable and that its cache hash is stable between calls "
+                   f"(GH #920).  Rebuilding {waves_txt}.")
+            reason = f"repeat: {reason}"
+        elif reason.startswith(_QUIET_REBUILD_REASONS):
+            return
+        else:
+            msg = (f"Cache miss for {self.name}/{method_name} ({reason}): "
+                   f"FULL REBUILD from source of {waves_txt}, not a cache read.")
+        warnings.warn(CacheRebuildWarning(
+            msg, country=self.name, table=method_name, reason=reason,
+            waves=tuple(sorted(now))), stacklevel=4)
+
+    def _read_l2_country_cache(self, method_name: str, cache_path: Path,
+                               waves: list[str]) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
+        """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
+
+        Returns ``(df, covered, miss_reason)``:
+
+        - a HIT is ``(df, covered, None)`` -- *df* is the parquet, replayed and
+          restricted to *waves*, ready for ``_finalize_result``;
+        - a MISS is ``(None, covered, reason)``.  *reason* names the miss for
+          the user-visible fallback warning (GH #920(a)): one of
+          ``"no parquet"``, ``"LSMS_NO_CACHE"``, ``"STALE: ..."``,
+          ``"coverage: ..."`` or ``"read-error: ..."``.
+
+        *covered* is the wave coverage the gate established for the parquet
+        (``None`` when it was never consulted or is unknown).  The caller turns
+        it into the rebuild's wave set with ``_union_waves`` (GH #891).  That
+        union is deliberately NOT computed here: its ORDER is the cross-wave
+        concat order of the build, so it shapes build content and must stay in
+        the fingerprinted closure (GH #908 -- only mechanism moves).
+
+        **MECHANISM, not content (GH #908).**  This method grades freshness,
+        checks coverage and decides whether to serve a parquet some earlier
+        build already wrote; it determines no byte of what a build writes.  It
+        is therefore listed in ``_build_registry._EXCLUDED_CALLABLES``, like the
+        primitives it calls (``cache_freshness``, ``_table_cache_hash``).  Until
+        #908 this text was closure source inside the tagged
+        ``_aggregate_wave_data``, so any edit to the gate moved every table's
+        fingerprint and cold-rebuilt the corpus.  Keep it that way: anything
+        that shapes what a BUILD produces belongs in the tagged closure, not
+        here.  (The warm serve's ``map_index`` / ``_restrict_to_waves`` calls
+        are read-path; both functions remain fingerprinted through their
+        build-path call sites.)
+        """
+        cache_exists = cache_path.exists()
+
+        # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
+        # at cache_path AND is not stale, read it and return without
+        # consulting DVC, the stage layer, or the wave loaders.
+        #
+        # v0.8.0 content-hash staleness: the parquet carries an
+        # embedded ``lsms_cache_hash`` (see local_tools.to_parquet);
+        # we recompute the expected hash from this country's per-wave
+        # inputs and compare.  Classifications:
+        #   - unverifiable (no computable hash) -> read (v0.7.0 behavior)
+        #   - fresh        -> read
+        #   - legacy       -> graded stale at this tier (GH #809, below)
+        #   - stale        -> fall through and rebuild from source
+        # Editing a wave's data_info.yml / wave module / _/<table>.py
+        # script or a source .dta (via its DVC sidecar md5) flips the
+        # hash and forces a rebuild.  ``assume_cache_fresh`` /
+        # ``LSMS_NO_CACHE`` short-circuit this (handled elsewhere).
+        #
+        # This gate fixes the write-only-cache bug at the
+        # `if not stage_infos:` branch of load_dataframe_with_dvc (which
+        # wrote a parquet but never read it back) AND closes the same gap
+        # for the outer exception handler that catches DvcException, which
+        # also writes through `load_from_waves`.  See
+        # SkunkWorks/dvc_object_management.org for the full design and
+        # bench/results/ for empirical confirmation.  The returned
+        # DataFrame is intentionally pre-finalize: `_aggregate_wave_data`
+        # calls `_finalize_result` on it before returning to the user, so
+        # kinship expansion, spelling normalization, and the
+        # `_join_v_from_sample` augmentation still apply.
+        if not cache_exists:
+            return None, None, "no parquet"
+        if os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}:
+            return None, None, "LSMS_NO_CACHE"
+
+        cache_expected_hash = self._table_cache_hash(method_name, waves)
+        freshness = cache_freshness(cache_path, cache_expected_hash)
+        stale_reason = "STALE: stored content hash differs from the current inputs"
+        # GH #809: at the COUNTRY tier, no hash means no evidence --
+        # rebuild rather than trust-once-and-stamp.
+        #
+        # `legacy` was built for the v0.8.0 migration: a parquet that
+        # PREDATES stamping is trusted once and re-stamped so the next
+        # read is guarded.  A country-level `var/<table>.parquet` that a
+        # `make` recipe wrote moments ago is not a legacy artefact -- it
+        # is a build output that skipped the stamp, because a country
+        # script's `to_parquet('../var/x.parquet')` passes no
+        # `cache_hash=`.  Grading it `legacy` let a script that
+        # disagrees with the framework become the served truth and then
+        # made that permanent: the re-stamp writes the CURRENT expected
+        # hash onto unverified content, so every later read grades
+        # `fresh` and the evidence that anything was ever wrong is gone.
+        # That is #808's instance (GhanaLSS `change_id`'s `_0` panel-id
+        # convention beating `updated_ids`) and the reason a census of
+        # hashless parquets finds nothing: laundering is indistinguishable
+        # from a legitimate build after the fact.
+        #
+        # Scoped to THIS call site deliberately.  The two wave-tier
+        # calls (`Wave.grab_data`, `run_make_target`) must keep their
+        # `legacy` grade: script-path L2-wave parquets are written
+        # hashless BY DESIGN, so grading them stale would rebuild on
+        # every read forever.  Those are handled by
+        # `_evict_hashless_wave_caches` before each rebuild descent
+        # (GH #479) -- a different mechanism for a different tier.
+        #
+        # Measured before landing: 0 of 376 warm country-level
+        # parquets are hashless, so the immediate re-warm is nil; and a
+        # deliberately de-stamped parquet rebuilds ONCE and then serves
+        # from a stamped cache -- verified on a YAML-path table (China
+        # `cluster_features`: 0.4s then 0.0s) and on the make-path class
+        # the issue names (Cambodia `food_acquired`: 6.7s then 0.3s,
+        # 0.2s), content identical to the pre-strip frame in both.
+        if freshness == "legacy":
+            freshness = "stale"
+            stale_reason = "STALE: parquet carries no cache hash (GH #809)"
+        # GH #891: a non-stale parquet is still only usable if it was
+        # built from a superset of the requested waves.  Unknown
+        # coverage (a pre-#891 parquet with no hash to corroborate it)
+        # is treated as "covers a full-waves request only".
+        covered = self._cache_covers_waves(cache_path, waves, freshness)
+        if covered is None:
+            coverage_ok = {str(w) for w in waves} == {str(w) for w in self.waves}
+        else:
+            coverage_ok = {str(w) for w in waves} <= {str(w) for w in covered}
+        if freshness == "stale" or not coverage_ok:
+            if freshness == "stale":
+                reason = stale_reason
+            else:
+                built = covered if covered is not None else "unknown waves (no manifest)"
+                reason = (f"coverage: parquet was built from {built}, "
+                          f"request needs {sorted(map(str, waves))}")
+            logger.debug(
+                f"v0.8.0 cache MISS ({reason}): {method_name} at {cache_path}; "
+                f"covers {covered}, request needs {sorted(waves)}"
+            )
+            # Eviction of hashless (script-written) wave parquets happens
+            # once, just before the rebuild descent, so it also covers the
+            # country-parquet-absent and LSMS_NO_CACHE paths (residual F1,
+            # GH #479).
+            return None, covered, reason
+
+        # GH #675: the hash covers the inputs the build DECLARED, not what it
+        # managed to read.  A parquet whose build dropped an unreadable sub-df
+        # that cost a REQUIRED column is graded here: a miss (rebuild) once
+        # the source is readable again, at most once per process; otherwise
+        # served with a DegradedCacheWarning after the read below.
+        build_drops = read_parquet_build_drops(cache_path)
+        verdict, degraded_reason = _degraded_cache_verdict(
+            build_drops, (self.name, method_name))
+        if verdict == "rebuild":
+            logger.debug(f"GH #675 cache MISS ({degraded_reason}): {method_name} at {cache_path}")
+            return None, covered, degraded_reason
+
+        try:
+            cached_df = get_dataframe(cache_path)
+            cached_df = map_index(cached_df)
+            # GH #323: this parquet was written POST-collapse, so its
+            # index is unique and _normalize_dataframe_index can never
+            # re-detect the loss.  Replay what the cold build that
+            # produced it recorded -- otherwise the warning is a
+            # cold-build-only event and the loss is invisible on every
+            # warm read, which is exactly how #323 survived its first fix.
+            _replay_grain_audit(
+                read_parquet_grain_audit(cache_path),
+                self.name, method_name,
+            )
+            # GH #1045: the date-parse report, by the same argument -- filtered
+            # to the waves served, so a 2019-20 request is not told (or, under
+            # LSMS_DATE_STRICT, failed) about a 2008-09 defect.
+            replay_datetime_audit(
+                read_parquet_datetime_audit(cache_path),
+                self.name, method_name, waves=waves,
+            )
+            # GH #675: still degraded and not healable now -- serve, loudly.
+            _warn_degraded_serve(self.name, method_name, build_drops, cache_path)
+            # GH #809: there is deliberately NO trust-once-and-stamp
+            # here any more.  A hashless country parquet is graded
+            # `stale` above and never reaches this branch, so the
+            # only parquets served from here are ones whose stored
+            # hash we checked (`fresh`) or whose inputs we could not
+            # enumerate (`unverifiable`, which stamps nothing
+            # precisely because it has nothing to assert).  Stamping
+            # the current expected hash onto unverified content is
+            # what made the defect permanent rather than transient.
+            logger.debug(
+                f"v0.8.0 cache read ({freshness}): {method_name} "
+                f"from {cache_path}"
+            )
+            # GH #891/#892: the parquet may cover MORE waves than
+            # were asked for.  Requested-wave semantics are enforced
+            # here, on the serve path -- nothing downstream filters.
+            return self._restrict_to_waves(cached_df, waves), covered, None
+        except (OSError, ArrowInvalid) as cache_read_error:
+            # Stale / corrupted cache parquet -> rebuild from source.
+            # Surface to the user (not just debug log) so a silent
+            # cache-miss isn't mistaken for a healthy build.
+            # Programmer bugs (TypeError, AttributeError) propagate.
+            # stacklevel=3 (this method -> load_dataframe_with_dvc ->
+            # _aggregate_wave_data) names the same frame the pre-#908
+            # stacklevel=2 did from inside the closure.
+            warnings.warn(
+                f"v0.7.0 cache read failed for {method_name} "
+                f"({cache_read_error!r}); rebuilding from source",
+                category=UserWarning,
+                stacklevel=3,
+            )
+            return None, covered, f"read-error: {cache_read_error!r}"
+
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded
         hash (i.e. written by a ``_/{table}.py`` script, which can't
@@ -4666,6 +4998,25 @@ class Country:
             Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
             """
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+
+            # GH #323: start this table's grain ledger clean.  It is repopulated
+            # either by the cold build (the collapse audit) or by replaying the
+            # stamp on a warm read -- so `grain_reports()` describes THIS load, and
+            # a stale report from an earlier call in the same process can never be
+            # re-stamped into a parquet it does not belong to.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+            # GH #675: likewise the dropped-sub-df record this load stamps.
+            _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
+            # GH #1045: likewise the date-parse report this load stamps.
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
+
+            # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
+            # own method, excluded from the build fingerprint (GH #908): it
+            # decides WHETHER to serve the parquet, never what a build writes.
+            cached_df, covered, miss_reason = self._read_l2_country_cache(
+                method_name, cache_path, waves)
+            if miss_reason is None:
+                return cached_df
             cache_exists = cache_path.exists()
 
             # GH #891: single-wave and all-wave requests share this one path, so
@@ -4676,168 +5027,24 @@ class Country:
             # wave is built at most once and alternating subsets converge.
             # Rebuilding just the requested waves would shrink coverage to each
             # request in turn and reproduce the reported thrash for alternating
-            # DISTINCT subsets.
+            # DISTINCT subsets.  Union even when the parquet is STALE: its data
+            # is out of date but its COVERAGE is still the right thing to
+            # rebuild, or a one-wave request against a stale all-waves cache
+            # would shrink coverage and make the next all-waves request rebuild
+            # again -- the thrash, one step removed.
             #
-            # Under LSMS_NO_CACHE the manifest is not consulted and this stays
-            # the requested set: that lever means "rebuild what I asked for",
-            # and silently building the country's other waves would be a
-            # surprising cost on a debugging path.  It can shrink a warm
-            # parquet's coverage, which the next ordinary request then rebuilds
-            # once -- accepted, and bounded to that one rebuild.
-            build_waves = list(waves)
-
-            # GH #323: start this table's grain ledger clean.  It is repopulated
-            # either by the cold build (the collapse audit) or by replaying the
-            # stamp on a warm read -- so `grain_reports()` describes THIS load, and
-            # a stale report from an earlier call in the same process can never be
-            # re-stamped into a parquet it does not belong to.
-            _GRAIN_LEDGER.pop((self.name, method_name), None)
-            _DATETIME_LEDGER.pop((self.name, method_name), None)   # GH #1045, same rule
-
-            # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
-            # at cache_path AND is not stale, read it and return without
-            # consulting DVC, the stage layer, or the wave loaders.
+            # Under LSMS_NO_CACHE the manifest is not consulted (covered is
+            # None) and this stays the requested set: that lever means "rebuild
+            # what I asked for", and silently building the country's other waves
+            # would be a surprising cost on a debugging path.  It can shrink a
+            # warm parquet's coverage, which the next ordinary request then
+            # rebuilds once -- accepted, and bounded to that one rebuild.
             #
-            # v0.8.0 content-hash staleness: the parquet carries an
-            # embedded ``lsms_cache_hash`` (see local_tools.to_parquet);
-            # we recompute the expected hash from this country's per-wave
-            # inputs and compare.  Classifications:
-            #   - unverifiable (no computable hash) -> read (v0.7.0 behavior)
-            #   - fresh        -> read
-            #   - legacy       -> read + trust-once re-stamp (migration)
-            #   - stale        -> fall through and rebuild from source
-            # Editing a wave's data_info.yml / wave module / _/<table>.py
-            # script or a source .dta (via its DVC sidecar md5) flips the
-            # hash and forces a rebuild.  ``assume_cache_fresh`` /
-            # ``LSMS_NO_CACHE`` short-circuit this (handled elsewhere).
-            #
-            # This block fixes the write-only-cache bug at the
-            # `if not stage_infos:` branch below (which wrote a parquet
-            # but never read it back) AND closes the same gap for the
-            # outer exception handler that catches DvcException, which
-            # also writes through `load_from_waves` after the v0.7.0
-            # cache-write fix in the `except` block at the bottom of
-            # this function.  See SkunkWorks/dvc_object_management.org
-            # for the full design and bench/results/ for empirical
-            # confirmation.  The returned DataFrame is intentionally
-            # pre-finalize: `_aggregate_wave_data` calls
-            # `_finalize_result` on it before returning to the user, so
-            # kinship expansion, spelling normalization, and the
-            # `_join_v_from_sample` augmentation still apply.
-            no_cache = os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
-            cache_expected_hash = None
-            if cache_exists and not no_cache:
-                cache_expected_hash = self._table_cache_hash(method_name, waves)
-                freshness = cache_freshness(cache_path, cache_expected_hash)
-                # GH #809: at the COUNTRY tier, no hash means no evidence --
-                # rebuild rather than trust-once-and-stamp.
-                #
-                # `legacy` was built for the v0.8.0 migration: a parquet that
-                # PREDATES stamping is trusted once and re-stamped so the next
-                # read is guarded.  A country-level `var/<table>.parquet` that a
-                # `make` recipe wrote moments ago is not a legacy artefact -- it
-                # is a build output that skipped the stamp, because a country
-                # script's `to_parquet('../var/x.parquet')` passes no
-                # `cache_hash=`.  Grading it `legacy` let a script that
-                # disagrees with the framework become the served truth and then
-                # made that permanent: the re-stamp writes the CURRENT expected
-                # hash onto unverified content, so every later read grades
-                # `fresh` and the evidence that anything was ever wrong is gone.
-                # That is #808's instance (GhanaLSS `change_id`'s `_0` panel-id
-                # convention beating `updated_ids`) and the reason a census of
-                # hashless parquets finds nothing: laundering is indistinguishable
-                # from a legitimate build after the fact.
-                #
-                # Scoped to THIS call site deliberately.  The two wave-tier
-                # calls (`Wave.grab_data`, `run_make_target`) must keep their
-                # `legacy` grade: script-path L2-wave parquets are written
-                # hashless BY DESIGN, so grading them stale would rebuild on
-                # every read forever.  Those are handled by
-                # `_evict_hashless_wave_caches` before each rebuild descent
-                # (GH #479) -- a different mechanism for a different tier.
-                #
-                # Measured before landing: 0 of 376 warm country-level
-                # parquets are hashless, so the immediate re-warm is nil; and a
-                # deliberately de-stamped parquet rebuilds ONCE and then serves
-                # from a stamped cache -- verified on a YAML-path table (China
-                # `cluster_features`: 0.4s then 0.0s) and on the make-path class
-                # the issue names (Cambodia `food_acquired`: 6.7s then 0.3s,
-                # 0.2s), content identical to the pre-strip frame in both.
-                if freshness == "legacy":
-                    freshness = "stale"
-                # GH #891: a non-stale parquet is still only usable if it was
-                # built from a superset of the requested waves.  Unknown
-                # coverage (a pre-#891 parquet with no hash to corroborate it)
-                # is treated as "covers a full-waves request only".
-                covered = self._cache_covers_waves(cache_path, waves, freshness)
-                if covered is None:
-                    coverage_ok = {str(w) for w in waves} == {str(w) for w in self.waves}
-                else:
-                    coverage_ok = {str(w) for w in waves} <= {str(w) for w in covered}
-                    # Union even when the parquet is STALE: its data is out of
-                    # date but its COVERAGE is still the right thing to rebuild,
-                    # or a one-wave request against a stale all-waves cache
-                    # would shrink coverage and make the next all-waves request
-                    # rebuild again -- the thrash, one step removed.
-                    build_waves = self._union_waves(waves, covered)
-                if freshness == "stale" or not coverage_ok:
-                    reason = "STALE" if freshness == "stale" else "coverage"
-                    logger.debug(
-                        f"v0.8.0 cache MISS ({reason}): {method_name} at {cache_path}; "
-                        f"covers {covered}, request needs {sorted(waves)}; "
-                        f"rebuilding {sorted(build_waves)}"
-                    )
-                    # Eviction of hashless (script-written) wave parquets now
-                    # happens once, just before the rebuild descent below, so
-                    # it also covers the country-parquet-absent and
-                    # LSMS_NO_CACHE paths (residual F1, GH #479).
-                else:
-                    try:
-                        cached_df = get_dataframe(cache_path)
-                        cached_df = map_index(cached_df)
-                        # GH #323: this parquet was written POST-collapse, so its
-                        # index is unique and _normalize_dataframe_index below can
-                        # never re-detect the loss.  Replay what the cold build that
-                        # produced it recorded -- otherwise the warning is a
-                        # cold-build-only event and the loss is invisible on every
-                        # warm read, which is exactly how #323 survived its first fix.
-                        _replay_grain_audit(
-                            read_parquet_grain_audit(cache_path),
-                            self.name, method_name,
-                        )
-                        # GH #1045: the date-parse report, by the same argument.
-                        replay_datetime_audit(
-                            read_parquet_datetime_audit(cache_path),
-                            self.name, method_name, waves=waves,
-                        )
-                        # GH #809: there is deliberately NO trust-once-and-stamp
-                        # here any more.  A hashless country parquet is graded
-                        # `stale` above and never reaches this branch, so the
-                        # only parquets served from here are ones whose stored
-                        # hash we checked (`fresh`) or whose inputs we could not
-                        # enumerate (`unverifiable`, which stamps nothing
-                        # precisely because it has nothing to assert).  Stamping
-                        # the current expected hash onto unverified content is
-                        # what made the defect permanent rather than transient.
-                        logger.debug(
-                            f"v0.8.0 cache read ({freshness}): {method_name} "
-                            f"from {cache_path}"
-                        )
-                        # GH #891/#892: the parquet may cover MORE waves than
-                        # were asked for.  Requested-wave semantics are enforced
-                        # here, on the serve path -- nothing downstream filters.
-                        return self._restrict_to_waves(cached_df, waves)
-                    except (OSError, ArrowInvalid) as cache_read_error:
-                        # Stale / corrupted cache parquet -> rebuild from source.
-                        # Surface to the user (not just debug log) so a silent
-                        # cache-miss isn't mistaken for a healthy build.
-                        # Programmer bugs (TypeError, AttributeError) propagate.
-                        warnings.warn(
-                            f"v0.7.0 cache read failed for {method_name} "
-                            f"({cache_read_error!r}); rebuilding from source",
-                            category=UserWarning,
-                            stacklevel=2,
-                        )
+            # Computed HERE, in the fingerprinted closure, not in the excluded
+            # gate (GH #908): the union's order is the build's cross-wave concat
+            # order, so it is content, not mechanism.
+            build_waves = list(waves) if covered is None else self._union_waves(waves, covered)
+            self._report_rebuild(method_name, miss_reason, build_waves, cache_path)
 
             # GH #866: everything below is the rebuild descent, so we have
             # already decided not to serve `cache_path` -- it graded STALE, or
@@ -4877,11 +5084,14 @@ class Country:
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
+                            build_drops = _stampable_build_drops(self.name, method_name)
                             to_parquet(df, cache_path,
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                        cache_waves=build_waves,
-                                       datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)))
+                                       datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
+                                       build_drops=build_drops)
+                            _mark_degraded_written((self.name, method_name), build_drops)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
                             df = self._restrict_to_waves(df, waves)
                         return df
@@ -4926,11 +5136,14 @@ class Country:
                             combined_df = next(iter(non_empty_df.values()))
                         combined_df = _enforce_rejected_column_spellings(combined_df)
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
+                        build_drops = _stampable_build_drops(self.name, method_name)
                         to_parquet(combined_df, cache_path,
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                    cache_waves=build_waves,
-                                   datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)))
+                                   datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
+                                   build_drops=build_drops)
+                        _mark_degraded_written((self.name, method_name), build_drops)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
                         # GH #891: cache the union, serve the request.
                         return self._restrict_to_waves(combined_df, waves)
@@ -5047,7 +5260,18 @@ class Country:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
-                logger.warning(f"DVC unavailable for {method_name}: {e}. Falling back to manual aggregation.")
+                # GH #920(a): this line is the only signal a pip-install user
+                # gets that the call is about to be expensive, so it says WHY
+                # the cache was not served and that what follows is a full
+                # rebuild from source -- not a cache read under another name.
+                # The pre-#920 prefix is kept verbatim so it stays greppable.
+                logger.warning(
+                    f"DVC unavailable for {method_name}: {e}. Falling back to "
+                    f"manual aggregation. Cache miss for {self.name}/{method_name} "
+                    f"({miss_reason}), so this is a FULL REBUILD from source of "
+                    f"{len(build_waves)} wave(s) ({', '.join(map(str, build_waves))}), "
+                    f"not a cache read."
+                )
                 # v0.7.0: write the rebuild result to cache_path so the
                 # next call hits the top-of-function cache read above.
                 # Mirrors the `if not stage_infos:` branch that already
@@ -5059,10 +5283,13 @@ class Country:
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
+                    build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
                                cache_waves=build_waves,
-                               datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)))
+                               datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
+                               build_drops=build_drops)
+                    _mark_degraded_written((self.name, method_name), build_drops)
                     logger.debug(
                         f"v0.7.0 cache write (DVC fallback): {method_name} to {cache_path}"
                     )
@@ -6759,6 +6986,47 @@ def merge_label_pass_through_reports(sources) -> dict:
     return merged
 
 
+class CacheRebuildWarning(UserWarning):
+    """A table is being rebuilt from source for a reason the user did not ask for (GH #920(a)).
+
+    Emitted by :meth:`Country._report_rebuild` on BOTH install shapes (git
+    checkout and pip), once per rebuild descent:
+
+    - a miss that is expected stays quiet: ``no parquet`` (a first build, or
+      after ``cache clear``) and ``LSMS_NO_CACHE`` (the user asked);
+    - ``STALE`` (hash differs, or a hashless parquet, GH #809), ``coverage``
+      and ``read-error`` warn, naming the reason;
+    - a **repeat** warns whatever the reason: the same ``(country, table)``
+      rebuilt again in this process without its wave coverage growing, so the
+      previous rebuild's parquet was not written or is not being read back --
+      the "re-aggregates on every call" symptom #920 was filed for.  A
+      rebuild after the table's INPUTS changed (a config edit mid-session:
+      the expected hash moved) is not a repeat; it is graded by its reason.
+
+    ``reason`` is the gate's miss reason (``'repeat: ...'`` for a repeat);
+    ``country``, ``table`` and ``waves`` say what is rebuilt.  Filter it by
+    class: ``warnings.filterwarnings('ignore', category=CacheRebuildWarning)``.
+    (@ligon, 2026-10-18.)
+    """
+
+    def __init__(self, message: str, *, country: str, table: str,
+                 reason: str, waves: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.reason = reason
+        self.waves = waves
+
+
+# (country, table) -> (expected input hash, union of wave sets rebuilt) in
+# this process (GH #920(a) repeat detector).  Process-local by design: a
+# fresh process reading a parquet the last one wrote is the cache working.
+_REBUILD_HISTORY: dict[tuple[str, str], tuple[str | None, frozenset[str]]] = {}
+
+# Miss reasons that are expected and stay quiet (prefix match).
+_QUIET_REBUILD_REASONS = ("no parquet", "LSMS_NO_CACHE")
+
+
 class GrainCollapseWarning(RuntimeWarning):
     """A declared index was non-unique; collapsing it destroyed rows (GH #323).
 
@@ -7093,6 +7361,314 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
            and r.get("site") in _WAVE_BUILD_SITES
            and not r.get("from_cache")]
     return out or None
+
+
+# ---------------------------------------------------------------------------
+# GH #675 -- a build degraded by an UNAVAILABLE source caches as fresh.
+#
+# The content hash covers the inputs a build DECLARED, not what it managed to
+# READ.  The GH #515 fallback in ``Wave.grab_data`` drops a secondary ``dfs:``
+# sub-df whose file cannot be fetched -- correctly: a partial-data checkout must
+# not hard-fail -- and the parquet is then written WITHOUT the columns that
+# sub-df alone supplied, under a perfectly valid hash.  Every later warm read
+# graded it ``fresh``, at BOTH tiers (the L2-wave parquet re-served the damage
+# even after the country parquet was deleted), so a transient fetch failure
+# became permanent.  CotedIvoire ``cluster_features`` lost Latitude/Longitude
+# that way.
+#
+# The record of what was dropped rides in the parquet (``lsms_build_drops``,
+# see ``local_tools.read_parquet_build_drops``), filed here during the build the
+# same way the grain audit is (``_GRAIN_LEDGER``; relayed across the
+# wave-parallel fork by ``_parallel_waves``).  Each drop is classified by its
+# CAUSE (``_drop_record``): ``unavailable`` (the source exists -- a file or a
+# ``.dvc`` sidecar -- and could not be fetched) or ``config`` (a ``KeyError``:
+# the file lacks a column the YAML names; or a ``file:`` naming no file and no
+# sidecar: a typo'd path).  A parquet is DEGRADED when an ``unavailable`` drop
+# cost a declared column, required OR ``optional: true`` (675-b, @ligon
+# 2026-10-18: a transient fetch failure must not permanently cost an optional
+# column either).  A ``config`` drop is recorded and NEVER graded: it re-drops
+# identically on every rebuild, so a probe would find the file readable,
+# rebuild, drop again and trip the #920 repeat detector every process --
+# Burkina Faso's df_geo (#1050) is that shape, and is fixed at its source.  One
+# that costs a REQUIRED column never reaches a stamp: ``grab_data`` raises.
+#
+# Both read gates then ask ``_degraded_cache_verdict``: if the dropped source
+# can NOW be fetched (one probe per source per process, fast tiers only --
+# local file, or sidecar + L1 blob; no WB download), the parquet is a miss and
+# the table rebuilds -- the heal; if it still cannot, the stored frame is served
+# with a ``DegradedCacheWarning`` naming the missing columns and the file.  A
+# permanently unavailable source costs one probe per process -- measured
+# ~1 s when it means a remote GET for an absent blob, milliseconds otherwise
+# (47-64 s when the probe ran the full ``get_dataframe`` chain) -- and never a
+# rebuild loop.  A key whose degraded parquet THIS process wrote is never
+# re-probed, so the build that just failed to fetch does not immediately
+# rebuild again (which would be a GH #920 ``repeat``).
+#
+# All of this is MECHANISM: it decides whether to serve, and stamps metadata a
+# build already determined; no byte of frame content depends on it.  The
+# callables are in ``_build_registry._EXCLUDED_CALLABLES`` and the three
+# containers in ``_EXCLUDED_CONSTANTS``.
+# ---------------------------------------------------------------------------
+
+class DegradedCacheWarning(UserWarning):
+    """A cached table is served WITHOUT a required column, because a source
+    file could not be read when it was built and still cannot (GH #675).
+
+    ``country``, ``table``, ``missing`` (the REQUIRED columns absent),
+    ``missing_optional`` (the ``optional: true`` columns absent -- graded too
+    since 675-b, when the cause was an unavailable source) and ``files`` (the
+    unavailable sources, relative to the countries root) say what is wrong.
+    The table rebuilds by itself in the first process that can fetch the file;
+    ``lsms-library cache clear --country <C>`` forces it.
+    """
+
+    def __init__(self, message: str, *, country: str, table: str,
+                 missing: tuple = (), files: tuple = (),
+                 missing_optional: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.missing = missing
+        self.missing_optional = missing_optional
+        self.files = files
+
+
+# (country, table) -> drop records filed during this process's builds.
+_BUILD_DROP_LEDGER: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+# Cache keys -- (country, table) for L2-country, (country, table, wave) for
+# L2-wave -- whose degraded parquet this process has already WRITTEN or already
+# retried.  Never re-probed: one retry per key per process, at most.
+_DEGRADED_ATTEMPTED: set[tuple] = set()
+
+# source path (relative to countries_root) -> readable now?  One probe per
+# source per process.
+_SOURCE_PROBES: dict[str, bool] = {}
+
+
+def build_drop_reports(country: str | None = None, table: str | None = None) -> list[dict]:
+    """``dfs:`` sub-frames dropped by builds -- or replayed from the stamp of a
+    parquet served -- in this process (GH #675).  Twin of :func:`grain_reports`.
+    A record whose ``missing_required`` is non-empty marks a degraded build."""
+    out: list[dict[str, Any]] = []
+    for (c, t), reports in _BUILD_DROP_LEDGER.items():
+        if country is not None and c != country:
+            continue
+        if table is not None and t != table:
+            continue
+        out.extend(reports)
+    return out
+
+
+def _file_build_drop(country: str, table: str, report: dict[str, Any]) -> None:
+    """File one drop record for the cache writer (append unless identical)."""
+    existing = _BUILD_DROP_LEDGER.setdefault((country, table), [])
+    if report not in existing:
+        existing.append(report)
+
+
+def _forget_wave_build_drops(country: str, table: str, wave: str) -> None:
+    """Clear this wave's BUILD-filed records before it is rebuilt: what is true
+    of the wave now is what the build about to run files."""
+    key = (country, table)
+    if key in _BUILD_DROP_LEDGER:
+        _BUILD_DROP_LEDGER[key] = [
+            r for r in _BUILD_DROP_LEDGER[key]
+            if r.get("from_cache") or str(r.get("wave")) != str(wave)]
+
+
+def _wave_build_drops(country: str, table: str, wave: str) -> list[dict] | None:
+    """The records this process's build of one WAVE filed, for its L2-wave stamp."""
+    out = [r for r in _BUILD_DROP_LEDGER.get((country, table), [])
+           if str(r.get("wave")) == str(wave) and not r.get("from_cache")]
+    return out or None
+
+
+def _stampable_build_drops(country: str, table: str) -> list[dict] | None:
+    """Every record for ``(country, table)``, stripped of the process-local
+    ``from_cache`` flag, for an L2-country stamp."""
+    out: list[dict[str, Any]] = []
+    for r in _BUILD_DROP_LEDGER.get((country, table), []):
+        r = {k: v for k, v in r.items() if k != "from_cache"}
+        if r not in out:
+            out.append(r)
+    return out or None
+
+
+def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
+                 supplies: Any) -> dict[str, Any]:
+    """One dropped sub-df, classified (GH #675).
+
+    ``kind`` is ``config`` -- with ``cause`` ``missing-column`` (a ``KeyError``:
+    the file loaded but lacks a column the YAML names) or ``no-such-source``
+    (the ``file:`` names no file on disk AND no ``.dvc`` sidecar: a typo'd path)
+    -- or ``unavailable`` (the source exists, as a file or a sidecar, and could
+    not be fetched).  Only ``unavailable`` drops are ever graded degraded: a
+    config drop re-drops identically on every rebuild, so a probe would find
+    the file readable, rebuild, drop again and trip the GH #920 repeat
+    detector every process.  Config drops are fixed at their source (#1050).
+    """
+    norm = [Path(os.path.normpath(p)) for p in paths]
+    if isinstance(exc, KeyError):
+        kind, cause = "config", "missing-column"
+    elif not any(source_tier(p) for p in norm):
+        kind, cause = "config", "no-such-source"
+    else:
+        kind, cause = "unavailable", None
+    # Name the file that failed: the first with no source, else the first.
+    target = next((p for p in norm if source_tier(p) is None), norm[0])
+    try:
+        rel = target.relative_to(countries_root()).as_posix()
+    except ValueError:
+        rel = str(target)
+    return {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
+            "error": f"{type(exc).__name__}: {exc}"[:300],
+            "supplies": [str(c) for c in (supplies or {})]}
+
+
+def _file_wave_drops(country: str, table: str, dropped: list[dict],
+                     df: Any, scheme_entry: Any) -> None:
+    """File one wave build's drops with the DECLARED columns each cost --
+    ``missing_required`` and ``missing_optional`` -- judged against the frame
+    after ``derived:``/``drop:``/``df_edit``, the same moment as the #323/#515
+    guard.  A column a sibling sub-df supplies is not "missing"; a temporary
+    column the scheme does not declare is never counted."""
+    have = (set(map(str, df.columns)) | {
+        str(n) for n in df.index.names if n is not None}
+        if isinstance(df, pd.DataFrame) else set())
+    required = set(_required_scheme_columns(scheme_entry))
+    optional = set(_optional_scheme_columns(scheme_entry))
+    for rec in dropped:
+        supplies = set(rec.pop("supplies", []) or [])
+        rec["missing_required"] = sorted((required & supplies) - have)
+        rec["missing_optional"] = sorted((optional & supplies) - have)
+        _file_build_drop(country, table, rec)
+
+
+def _drop_missing(d: dict) -> list[str]:
+    """Declared columns one drop record cost, required first."""
+    return list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+
+
+def _degraded_drops(drops: Any) -> list[dict]:
+    """The drop records that make a parquet DEGRADED: an ``unavailable``
+    source whose drop cost a declared column, required OR optional (675-b,
+    @ligon 2026-10-18).  A ``config`` drop is recorded and never graded (see
+    :func:`_drop_record`); one that cost a REQUIRED column cannot reach a stamp
+    at all -- ``grab_data`` raises first."""
+    if not isinstance(drops, list):
+        return []
+    return [d for d in drops if isinstance(d, dict)
+            and d.get("kind") == "unavailable" and _drop_missing(d)]
+
+
+def _mark_degraded_written(key: tuple, drops: Any) -> None:
+    """A degraded parquet was just written under ``key`` by THIS process."""
+    if _degraded_drops(drops):
+        _DEGRADED_ATTEMPTED.add(key)
+
+
+def _probe_source(rel: str) -> bool:
+    """Can the source at ``rel`` (relative to the countries root) be fetched now?
+
+    FAST tiers only (``local_tools.source_fetchable_fast``): an untracked local
+    file, or the DVC sidecar plus its L1 blob -- no ``DVCFS.open`` streaming
+    and no World Bank download, and the file is not parsed.  Measured on a
+    first probe per process: 0.01 s for a sidecar whose blob is cached; ~1 s
+    for a blob absent locally (one direct remote GET, whether it fetches or
+    finds nothing -- 1.10 s / 1.04 s; bounded by ``_ensure_dvc_pulled``'s
+    retry policy); milliseconds for a path with no sidecar (which a new build
+    classes ``config`` and never probes).  Through ``get_dataframe`` (the
+    first-pass probe) an unfetchable source cost 47-64 s, falling through to
+    the WB download.  The cost of the
+    narrowing: a source reachable ONLY through the WB download does not
+    auto-heal -- but with no sidecar and no file such a ``file:`` is classed
+    ``config`` at build time (:func:`_drop_record`) and is never probed.
+    Memoised per process; looked up on the module at call time so a test can
+    patch the one seam.
+    """
+    if rel in _SOURCE_PROBES:
+        return _SOURCE_PROBES[rel]
+    from . import local_tools as _lt
+    path = Path(rel)
+    if not path.is_absolute():
+        path = countries_root() / rel
+    try:
+        ok = bool(_lt.source_fetchable_fast(path))
+    except Exception:  # noqa: BLE001 -- any failure to fetch is "still unavailable"
+        ok = False
+    _SOURCE_PROBES[rel] = ok
+    return ok
+
+
+def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
+    """Grade a parquet's drop record at a read gate (GH #675).
+
+    Returns ``("complete", None)`` when no drop cost a required column,
+    ``("rebuild", reason)`` when a dropped source is readable now and this key
+    has not been retried in this process (the caller treats the parquet as a
+    miss), else ``("serve", None)`` -- serve it, and warn.
+    """
+    degraded = _degraded_drops(drops)
+    if not degraded:
+        return "complete", None
+    if key in _DEGRADED_ATTEMPTED:
+        return "serve", None
+    healed = sorted({d.get("file") for d in degraded
+                     if d.get("file") and _probe_source(str(d["file"]))})
+    if not healed:
+        return "serve", None
+    _DEGRADED_ATTEMPTED.add(key)
+    return "rebuild", (f"degraded: built without {_describe_missing(degraded)} "
+                       f"because {', '.join(healed)} could not be read; it can "
+                       f"be read now (GH #675)")
+
+
+def _describe_missing(degraded: list[dict]) -> str:
+    """``required column(s) [...]`` and/or ``optional column(s) [...]``."""
+    req = sorted({c for d in degraded for c in d.get("missing_required") or []})
+    opt = sorted({c for d in degraded for c in d.get("missing_optional") or []})
+    parts = ([f"required column(s) {req}"] if req else []) + (
+        [f"optional column(s) {opt}"] if opt else [])
+    return " and ".join(parts)
+
+
+def _warn_degraded_serve(country: str, table: str, drops: Any,
+                         path: Path | str, wave: str | None = None) -> None:
+    """Say, loudly and specifically, that a degraded parquet is being served."""
+    degraded = _degraded_drops(drops)
+    if not degraded:
+        return
+    missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
+    missing_optional = tuple(sorted(
+        {c for d in degraded for c in d.get("missing_optional") or []}))
+    files = tuple(sorted({str(d.get("file")) for d in degraded}))
+    detail = "; ".join(
+        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({d.get('file')}) "
+        f"-> {_drop_missing(d)} [{d.get('error')}]" for d in degraded)
+    where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
+    warnings.warn(DegradedCacheWarning(
+        f"{where}: serving a cached table WITHOUT declared "
+        f"{_describe_missing(degraded)}.  The build that wrote {path} could "
+        f"not read {', '.join(files)} and dropped it (the GH #515 "
+        f"optional-sub-df fallback), and that file still cannot be fetched in "
+        f"this process.  It will be rebuilt automatically by the first process "
+        f"that can fetch it from disk or the DVC blob cache; `lsms-library "
+        f"cache clear --country {country}` forces a rebuild now (GH #675).  "
+        f"Detail: {detail}",
+        country=country, table=table, missing=missing, files=files,
+        missing_optional=missing_optional),
+        stacklevel=3)
+
+
+def _replay_build_drops(drops: Any, country: str, table: str) -> None:
+    """File a served WAVE parquet's drop record, so the L2-country parquet
+    built from it carries it forward (the #868 replay, for drops)."""
+    if not isinstance(drops, list):
+        return
+    for d in drops:
+        if isinstance(d, dict):
+            _file_build_drop(country, table, {**d, "from_cache": True})
 
 
 # ---------------------------------------------------------------------------

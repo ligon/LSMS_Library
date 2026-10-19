@@ -59,6 +59,7 @@ from __future__ import annotations
 from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
+import codecs
 import struct
 import tempfile
 import numpy as np
@@ -540,6 +541,50 @@ def _dvc_cache_path(fn) -> "Path | None":
         return None
     except (OSError, yaml.YAMLError, KeyError, IndexError, TypeError):
         return None
+
+
+def source_tier(path: str | Path) -> str | None:
+    """Where ``get_dataframe`` would find the source at absolute ``path``,
+    WITHOUT reading it: ``"dvc"`` (a ``.dvc`` sidecar sits beside it -- checked
+    first, because ``get_dataframe`` refuses a workspace copy of a tracked
+    file), ``"local"`` (an untracked file on disk), or ``None`` (neither; only
+    the World Bank download is left).
+
+    Two ``stat`` calls.  GH #675 uses it to tell a ``dfs:`` sub-df whose
+    ``file:`` names no source at all -- a CONFIG bug -- from one whose source
+    exists but could not be fetched.
+    """
+    p = Path(path)
+    try:
+        if (p.parent / f"{p.name}.dvc").exists():
+            return "dvc"
+        if p.is_file():
+            return "local"
+    except OSError:
+        pass
+    return None
+
+
+def source_fetchable_fast(path: str | Path) -> bool:
+    """Can the source at absolute ``path`` be read from the FAST tiers -- an
+    untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
+    blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+
+    Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
+    streaming fallback (a sidecar-tree walk) and no World Bank download.  This
+    is the GH #675 heal probe, run on a warm read once per degraded source per
+    process; through ``get_dataframe`` an unfetchable source cost 47-64 s
+    there (the WB fall-through).  Writes nothing into ``countries_root()``
+    (GH #831): the only possible write is the blob into ``_DVC_CACHE_DIR``,
+    exactly what a build's own read would do.  Does not parse the file.
+    """
+    tier = source_tier(path)
+    if tier == "local":
+        return True
+    if tier == "dvc":
+        _ensure_dvc_pulled(path)
+        return _dvc_cache_path(path) is not None
+    return False
 
 
 def _gc_stale_dvc_lock() -> None:
@@ -1286,6 +1331,62 @@ def _is_stata_dta(head: bytes) -> bool:
             and head[2] == 1)
 
 
+# SPSS and the text tail (GH #1002).  Two more admissions, same principle as
+# the Stata sniff: a reader is tried only on a file that claims its format.
+#
+# * SPSS system files open with ``$FL2`` (``.sav``) or ``$FL3`` (compressed
+#   ``.zsav``).  The path-string retry used to hand EVERY file to
+#   ``pd.read_spss``, whose ``ReadstatError`` is not in that ``except`` -- so
+#   a file that was never SPSS escaped as "Unable to read from file" and the
+#   chain's own failure was discarded.
+# * ``read_csv`` / ``read_fwf`` under a permissive encoding (``latin-1``
+#   decodes every byte) turn any binary file into a frame -- an empty
+#   ``(0, 1)`` one, its column named after the header bytes.  A head that
+#   decodes to C0 control characters (NUL above all) is not text, and the
+#   text readers are not tried on it.
+
+#: Suffixes that claim SPSS content, whatever the first bytes say.
+_SPSS_SUFFIXES = frozenset({'.sav', '.zsav'})
+
+#: C0 control characters that occur in genuine text files (tab, newlines,
+#: vertical tab, form feed, and the DOS end-of-file ``^Z``).
+_TEXT_CONTROLS = frozenset('\t\n\r\x0b\x0c\x1a')
+
+
+def _is_spss(head: bytes, fn) -> bool:
+    """True when *fn*'s suffix or *head*'s magic claims an SPSS system file.
+
+    The magics are ``$FL2`` (``.sav``) and ``$FL3`` (``.zsav``), written
+    inline: a tuple of ``bytes`` is not a serialisable build constant
+    (``_build_registry._ser``), and inline they are fingerprinted with this
+    function's source.
+    """
+    return (Path(fn).suffix.lower() in _SPSS_SUFFIXES
+            or head[:4] in (b'$FL2', b'$FL3'))
+
+
+def _is_binary_head(head: bytes, encoding: str | None) -> bool:
+    """True when *head* is not text under *encoding* (default UTF-8).
+
+    Not text: it fails to decode, or decodes to a C0 control character
+    other than ordinary whitespace.  Decoding is incremental so a multibyte
+    character cut by the sniff window is not mistaken for an error.  An
+    empty head (unsniffable stream) and an unknown encoding answer False,
+    leaving the text readers to behave -- and fail -- exactly as before.
+    """
+    if not head:
+        return False
+    try:
+        decoder = codecs.getincrementaldecoder(encoding or 'utf-8')()
+    except LookupError:
+        return False
+    try:
+        text = decoder.decode(head, final=False)
+    except UnicodeDecodeError:
+        return True
+    return any(ch < ' ' and ch not in _TEXT_CONTROLS for ch in text)
+
+
 def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
     """Read a SAS Transport (XPORT) file through ``pandas.read_sas``.
 
@@ -1408,36 +1509,45 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         if _is_sas_xport(head):
             return _read_sas_xport(f, fn, encoding)
 
-        if isinstance(f,str):
-            try:
-                return pd.read_spss(f,convert_categoricals=convert_categoricals)
-            except (pd.errors.ParserError, UnicodeDecodeError, TypeError):
-                pass
+        # The failure the final error is chained to (GH #1002): the reader
+        # whose format the sniff claimed, else the last reader that failed.
+        failure = None
 
-            # pyreadstat fallback for SAV/SPSS files that pd.read_spss can't handle
-            try:
-                df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
-                return df_pr
-            except (ValueError, pyreadstat.ReadstatError, OSError,
-                    NotImplementedError):
-                # Format-fallback: parser/IO errors mean "try next reader".
-                # Programmer bugs (TypeError, AttributeError) propagate.
-                pass
-        elif Path(fn).suffix.lower() == '.sav':
-            # SAV file accessed as a stream (e.g. via DVC); pyreadstat needs a path
-            try:
-                return _pyreadstat_via_tempfile(
-                    pyreadstat.read_sav, f, '.sav',
-                    apply_value_formats=convert_categoricals, encoding=encoding)
-            except (ValueError, pyreadstat.ReadstatError, OSError,
-                    NotImplementedError):
-                # Format-fallback: parser/IO errors mean "try next reader".
-                pass
+        # SPSS -- only for a ``.sav`` / ``.zsav`` suffix or ``$FL2``/``$FL3``
+        # magic (GH #1002).  Like a claimed ``.dta``, a claimed SPSS file
+        # whose SPSS readers all fail is a broken SPSS file: it raises with
+        # the reader's error as cause rather than reaching the text readers.
+        if _is_spss(head, fn):
+            if isinstance(f, str):
+                try:
+                    return pd.read_spss(f,convert_categoricals=convert_categoricals)
+                except (pd.errors.ParserError, UnicodeDecodeError, TypeError):
+                    pass
+
+                # pyreadstat fallback for SAV/SPSS files that pd.read_spss can't handle
+                try:
+                    df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                    return df_pr
+                except (ValueError, pyreadstat.ReadstatError, OSError,
+                        NotImplementedError) as exc:
+                    # Parser/IO errors only; programmer bugs (TypeError,
+                    # AttributeError) propagate.
+                    raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
+            else:
+                # SPSS accessed as a stream (e.g. via DVC); pyreadstat needs a path
+                try:
+                    return _pyreadstat_via_tempfile(
+                        pyreadstat.read_sav, f,
+                        Path(fn).suffix.lower() if Path(fn).suffix.lower() in _SPSS_SUFFIXES else '.sav',
+                        apply_value_formats=convert_categoricals, encoding=encoding)
+                except (ValueError, pyreadstat.ReadstatError, OSError,
+                        NotImplementedError) as exc:
+                    raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
 
         try:
             return pd.read_parquet(f, engine='pyarrow')
-        except (ArrowInvalid,):
-            pass
+        except (ArrowInvalid,) as exc:
+            failure = exc
 
         # Stata -- only when the header says so (GH #712).  Handed a file
         # that is NOT Stata, ``StataReader`` reads a garbage header and dies
@@ -1448,8 +1558,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 f.seek(0)
                 return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
-            except (ValueError, struct.error):
-                pass
+            except (ValueError, struct.error) as exc:
+                failure = exc
 
             try:
                 # pyreadstat handles older Stata formats that pandas StataReader cannot.
@@ -1466,42 +1576,77 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 # become CSV under a permissive encoding such as latin-1.
                 if Path(fn).suffix.lower() == '.dta':
                     raise ValueError(f'{fn} has a Stata header but cannot be decoded') from exc
-                # Other suffixes retain the existing format fallback.
-                pass
+                # Other suffixes retain the existing format fallback --
+                # which the text gate below now closes for a binary head.
+                failure = exc
+            sniffed_failure = failure
+        else:
+            sniffed_failure = None
 
-        try:
-            f.seek(0)
-            return pd.read_csv(f,encoding=encoding)
-        except (pd.errors.ParserError, UnicodeDecodeError):
-            pass
+        # Text readers only for a head that is text (GH #1002).  The binary
+        # readers between them (Excel, Feather) are tried either way.
+        binary = _is_binary_head(head, encoding)
+
+        if not binary:
+            try:
+                f.seek(0)
+                return pd.read_csv(f,encoding=encoding)
+            except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+                failure = exc
 
         try:
             f.seek(0)
             return pd.read_excel(f)
-        except (pd.errors.ParserError, UnicodeDecodeError, ValueError):
-            pass
+        except (pd.errors.ParserError, UnicodeDecodeError, ValueError) as exc:
+            failure = exc
 
         try:
             f.seek(0)
             return pd.read_feather(f)
-        except (pd.errors.ParserError, UnicodeDecodeError,ArrowInvalid) as e:
-            pass
+        except (pd.errors.ParserError, UnicodeDecodeError,ArrowInvalid) as exc:
+            failure = exc
 
+        if not binary:
+            try:
+                f.seek(0)
+                return pd.read_fwf(f)
+            except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+                failure = exc
+
+        if binary:
+            raise ValueError(
+                f"{fn}: no binary reader accepted this file and its header "
+                f"{head[:8]!r} is binary, not text under encoding "
+                f"{encoding or 'utf-8'!r}; refusing the text readers "
+                f"(GH #1002)") from (sniffed_failure or failure)
+        raise ValueError(f"Unknown file type for {fn}.") from (sniffed_failure or failure)
+
+    def retry_with_path(first, path):
+        """The path-string retry, for SPSS only (GH #1002).
+
+        ``pd.read_spss`` wants a filename, so a claimed SPSS file whose
+        stream read failed is retried by path.  Nothing else is: every other
+        reader in the chain takes the stream, and the retry used to hand
+        every file to ``pd.read_spss``, replacing the chain's own failure
+        with an unrelated ``ReadstatError``.  If the retry fails too, the
+        stream failure is kept as its explicit ``__cause__``.
+        """
+        if not _is_spss(_sniff_head(str(path)), fn):
+            raise first
         try:
-            f.seek(0)
-            return pd.read_fwf(f)
-        except (pd.errors.ParserError, UnicodeDecodeError):
-            pass
-
-
-        raise ValueError(f"Unknown file type for {fn}.")
+            return read_file(str(path), convert_categoricals=convert_categoricals,
+                             encoding=encoding)
+        except Exception as second:
+            if second.__cause__ is None and second is not first:
+                second.__cause__ = first
+            raise
 
     if local_file(fn):
         try:
             with open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except (TypeError,ValueError): # Needs filename?
-            df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        except (TypeError,ValueError) as first: # Needs filename?
+            df = retry_with_path(first, fn)
     elif file_system_path(fn):
         # Layer-1 (raw .dta blob) caching.  After ``_ensure_dvc_pulled``
         # populates the cache, we open the cache file *directly* rather
@@ -1520,18 +1665,16 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 with open(cache_path, mode='rb') as f:
                     df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            except (TypeError, ValueError):  # Reader needs a filename, not a stream
-                df = read_file(str(cache_path),
-                               convert_categoricals=convert_categoricals,
-                               encoding=encoding)
+            except (TypeError, ValueError) as first:  # Reader needs a filename, not a stream
+                df = retry_with_path(first, cache_path)
         else:
             # No usable cache file (sidecar missing/corrupt or fetch failed).
             # Fall back to ``DVCFS.open`` for streaming.  Slow but correct.
             try:
                 with DVCFS.open(fn, mode='rb') as f:
                     df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            except TypeError:  # Needs filename?
-                df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
+            except TypeError as first:  # Needs filename?
+                df = retry_with_path(first, fn)
 
     else:
         # Neither local nor DVC-tracked at ``countries_root()``:
@@ -1843,6 +1986,11 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
     return out
 
 
+# ``df_data_grabber``'s own keyword options.  Every OTHER keyword reaching it
+# names a value column (a myvar); see get_categorical_mapping (GH #674).
+_GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
+
+
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
                             dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
@@ -1899,8 +2047,19 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     'categorical_mapping.org'. But if fn is a path to a dta file instead,
     returns categories for tablename from the stata file.
 
-    A bare ``get_categorical_mapping(tablename=...)`` returns an EMPTY dict --
-    no value column is passed.  Prefer :func:`code_label_map`.
+    **A value column is REQUIRED for an org table** (GH #674).  The value
+    columns are the keyword arguments other than ``df_data_grabber``'s own
+    options (``convert_categoricals``, ``encoding``, ``missing_ok``) -- e.g.
+    ``**{'Preferred Label': 'Preferred Label'}``.  A bare
+    ``get_categorical_mapping(tablename=...)`` used to return an EMPTY dict
+    (or an empty frame with ``asdict=False``), silently: ``df_data_grabber``
+    got ``idxvars`` and no myvars, so every column but the key was dropped and
+    every later lookup missed.  That is GhanaLSS "Trap 1"
+    (``GhanaLSS/_/CONTENTS.org``), which shipped 100%-null columns three
+    times.  It now raises :class:`TypeError` before any file is read, for
+    either ``asdict``; :func:`code_label_map` is the ``Code -> Label`` lookup
+    most bare callers wanted.  The ``.dta`` form needs no value column and is
+    unaffected.
     """
     ext = Path(fn).suffix
 
@@ -1910,6 +2069,24 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             return cats
         else:
             return cats[tablename]
+
+    if tablename is not None and not set(kwargs) - _GRABBER_OPTIONS:
+        # The code_label_map hint fits only the key the caller named.
+        if idxvars == 'Code':
+            hint = (f"For a Code -> Label lookup use "
+                    f"code_label_map({tablename!r}, dirs).")
+        elif isinstance(idxvars, str):
+            hint = (f"For a single-column lookup keyed by {idxvars!r} use "
+                    f"code_label_map({tablename!r}, dirs, "
+                    f"idxvars={idxvars!r}, value=<value column>).")
+        else:
+            hint = (f"If the table is keyed Code -> Label, use "
+                    f"code_label_map({tablename!r}, dirs).")
+        raise TypeError(
+            f"get_categorical_mapping(tablename={tablename!r}) needs a value "
+            f"column, e.g. **{{'Preferred Label': 'Preferred Label'}}; "
+            f"without one it can only return an empty mapping (GH #674). "
+            + hint)
 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
@@ -1924,7 +2101,9 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             else:
                 path = d+fn
             df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
-            df = df.squeeze()
+            # Columns only: a one-row table must stay a Series/frame, not
+            # collapse to a scalar (GH #674).
+            df = df.squeeze(axis=1)
             if asdict:
                 return df.to_dict()
             else:
@@ -1946,9 +2125,10 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
 
     **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
     and, unless the caller supplies a value column as a keyword, no myvars --
-    so ``df_data_grabber`` drops the Label column and the squeeze returns an
-    *empty dict*.  Every lookup against it then misses and silently yields
-    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+    so ``df_data_grabber`` dropped the Label column and the squeeze returned an
+    *empty dict*.  Every lookup against it then missed and silently yielded
+    ``pd.NA``; the column simply came out 100% null.  Since GH #674 that bare
+    call raises ``TypeError`` pointing here.
 
     That failure mode has bitten GhanaLSS three separate times:
 
@@ -2268,6 +2448,23 @@ _CACHE_WAVES_KEY = b"lsms_cache_waves"
 # lesson).  Replayed by ``datetime_parse.replay_datetime_audit``.
 _DATETIME_AUDIT_KEY = b"lsms_datetime_audit"
 
+# GH #675.  Schema-metadata key under which a build records the ``dfs:``
+# sub-frames it DROPPED (the GH #515 fallback), alongside the content hash and
+# by the same argument (rotates atomically with the data; cannot desync;
+# removed by ``cache clear``).
+#
+# WHY THIS EXISTS -- the content hash covers the inputs a build DECLARED, not
+# what it managed to READ.  A secondary sub-df whose file could not be fetched
+# is dropped softly (that is #515's whole point: a partial-data checkout must
+# not hard-fail), so the parquet is written without the columns that sub-df
+# alone supplied -- under a perfectly valid hash, which every later warm read
+# grades ``fresh``.  CotedIvoire ``cluster_features`` was served without
+# Latitude/Longitude that way.  This key is the evidence the hash cannot carry;
+# ``Country._read_l2_country_cache`` and ``Wave.grab_data`` grade a parquet
+# whose drops cost a REQUIRED column ``degraded``.  See
+# ``country._degraded_cache_verdict``.
+_BUILD_DROPS_KEY = b"lsms_build_drops"
+
 # Extensions treated as survey source data when scanning script-path
 # tables for literal file references.
 _DATA_SUFFIXES = (".dta", ".csv", ".tab", ".dat", ".sav", ".txt", ".xlsx",
@@ -2478,6 +2675,39 @@ def read_parquet_cache_waves(path: str | Path) -> list[str] | None:
     return [str(w) for w in waves]
 
 
+def read_parquet_build_drops(path: str | Path) -> list[dict] | None:
+    """Return the dropped-sub-df record embedded in an L2 parquet (GH #675),
+    or ``None`` when the build that wrote it dropped nothing.
+
+    Each entry is one sub-df the GH #515 fallback dropped: ``wave``, ``sub``,
+    ``file`` (relative to the countries root), ``kind`` (``unavailable`` or
+    ``config``), ``cause`` (``None``, ``missing-column`` or
+    ``no-such-source``), ``error``, and ``missing_required`` /
+    ``missing_optional`` (the declared columns that sub-df alone would have
+    supplied; ``missing_optional`` is absent from first-pass stamps).
+    Footer-only read (~1 ms), safe on the warm-read hot path.
+    """
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except Exception:
+        return None
+    if not md:
+        return None
+    raw = md.get(_BUILD_DROPS_KEY)
+    if raw is None:
+        return None
+    if isinstance(raw, (bytes, bytearray)):
+        raw = raw.decode()
+    try:
+        drops = json.loads(raw)
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(drops, list):
+        return None
+    return [d for d in drops if isinstance(d, dict)] or None
+
+
 def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     """Classify an L2 parquet against the expected content hash.
 
@@ -2533,7 +2763,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, datetime_audit: list[dict] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, datetime_audit: list[dict] | None = None, build_drops: list[dict] | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -2574,6 +2804,10 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         ``datetime_reports(country, table)`` here: it runs in a ``make``
         subprocess, so the stamp it writes is the only way its report reaches
         the parent and every later warm read.
+    build_drops : list[dict] | None, default None
+        If given, embed the ``dfs:`` sub-frames this build DROPPED under
+        ``lsms_build_drops`` (GH #675), so a warm read can tell a degraded
+        build from a complete one.  See :func:`read_parquet_build_drops`.
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -2623,7 +2857,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves or datetime_audit:
+    if cache_hash is not None or grain_audit or cache_waves or datetime_audit or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -2641,6 +2875,9 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         if datetime_audit:
             # GH #1045: the build-time date-parse report rides with the data.
             md[_DATETIME_AUDIT_KEY] = json.dumps(datetime_audit, default=str).encode()
+        if build_drops:
+            # GH #675: carry what the build could NOT read with what it wrote.
+            md[_BUILD_DROPS_KEY] = json.dumps(build_drops, default=str).encode()
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, fn)
     else:
