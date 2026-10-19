@@ -374,4 +374,13 @@ pre-118 files as latin-1, so they are served as C1 controls and Latin-1
 letters.  The #805 reader re-decode refuses them (several bytes are cp1252
 holes, a cp1252 writer cannot emit them), so they are served exactly as
 before; a correct read needs a per-file =encoding: cp866= declaration.
-Same code page in Kyrgyz Republic 1996-98 (=SECT_*.DTA=, =ANTHFL9*.DTA=).
+Same code page in Kyrgyz Republic 1996-98 (=SECT_*.DTA=, =COMM96.DTA=,
+=ANTHFL97.DTA=, =ANTHFL98.DTA=: Russian names and answers, =Наргиза=,
+=РАБОТЫ НЕТ=) -- with ONE exception, corrected 2026-10-19 (it said
+=ANTHFL9*.DTA=): 1996 =ANTHFL96.DTA= =name= is NOT cp866.  40 of its 47
+C1-bearing strings decode under cp866 to box-drawing characters
+(=ä\xc7ì...= -> =ф╟ьъГ╔=), and no Python code page yields names (cp1251 /
+kz1048 give letters but not words: =дЗмкѓЙ=).  Its encoding is unidentified,
+so a per-file =encoding: cp866= declaration must not cover that column.
+The file is refused by the reader either way (14 symbol-between-letters
+candidates), so it is served as read.
