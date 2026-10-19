@@ -169,7 +169,10 @@ def _cover_page_gaps(cover_households):
     refuse rather than guess -- a household naming two clusters across the
     sources, or one whose id does not begin with its ``CLUST``, raises.  The
     second is the GLSS1/GLSS2 id structure, ``HID = CLUST * 100 + NH``, which
-    holds on 100% of rows of every file carrying both columns.
+    holds on 100% of rows of every file where ``CLUST`` is the cluster code --
+    all three sources here.  (Not every file's ``CLUST`` is: ``HEAD.DAT``
+    carries a sequential 1..N index under that name, 1988-89 ``HHCOMM.DAT``
+    GLSS1 household ids, and ``ZSCOREH.DAT``'s is blank.)
 
     Deliberately NOT the union of every household file: the labour module
     ``Y05B1.DAT`` alone names households of a cluster (2198) that has no cover,
