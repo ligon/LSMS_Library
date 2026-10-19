@@ -152,6 +152,28 @@ class MissingLookingUnitWarning(UserWarning):
         self.spellings = dict(spellings or {})
 
 
+class UnmatchedNoKgCellWarning(UserWarning):
+    """A declared "no kg factor" cell matched no row of the frame (GH #1042).
+
+    A ``no_kg=`` cell (``countries/{C}/_/no_kg_factor.yml``) refuses inferred
+    kilograms to the rows it matches, and a cell that matches nothing refuses
+    nothing -- so a misspelt item (``Eggs`` for ``Egg``) or unit used to be
+    accepted silently, its only trace ``rows_matched: 0`` inside
+    ``attrs['kg_factor_declared_none']`` (red team r3, R4).  This warning
+    names such cells.  It also fires, correctly, when the frame simply holds
+    no rows of the cell -- a call restricted to waves that lack it -- so read
+    it against the waves you asked for before editing the declaration.
+
+    Carries ``country`` (from ``df.attrs``, may be ``None``) and ``cells``
+    (the unmatched ``(item, unit)`` pairs, ``unit=None`` meaning every unit).
+    """
+
+    def __init__(self, message, *, country=None, cells=()):
+        super().__init__(message)
+        self.country = country
+        self.cells = tuple(cells)
+
+
 class UnitLabelCollisionWarning(UserWarning):
     """Two ``u`` spellings that differ only in case got DIFFERENT kg factors.
 
@@ -1984,7 +2006,9 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         GH #770).  The declared rows still enter the estimators as evidence:
         this refuses to SERVE a factor, it does not re-estimate anyone
         else's.  A country declares its cells in ``_/no_kg_factor.yml``
-        (read at read time by ``Country._no_kg_factor_cells``).
+        (read at read time by ``Country._no_kg_factor_cells``).  A declared
+        cell that matches no row emits :class:`UnmatchedNoKgCellWarning`
+        (a misspelt label, or a frame without such rows).
 
     Returns
     -------
@@ -2219,7 +2243,22 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # counts and (Egg, Single) comes out at 0.50 kg per egg.  A declared cell
     # is treated exactly like a sentinel row: it keeps ``survey_kg`` and
     # ``metric``, and loses every INFERRED candidate.
+    no_kg = tuple((item, unit) for item, unit in (no_kg or ()))
     declared, declared_cells = _declared_no_kg_mask(df, no_kg, item_col)
+    unmatched = [c for c in dict.fromkeys(no_kg)
+                 if c not in declared_cells or not declared_cells[c].any()]
+    if unmatched:
+        country = df.attrs.get('country')
+        where = f"{country}: " if country else ""
+        desc = ', '.join(f"{item!r}/{'every unit' if unit is None else repr(unit)}"
+                         for item, unit in unmatched)
+        warnings.warn(UnmatchedNoKgCellWarning(
+            f"{where}{len(unmatched)} declared no-kg-factor cell(s) match no "
+            f"row of this frame: {desc}.  A misspelt item or unit declares "
+            f"nothing; check _/no_kg_factor.yml against the frame's '{item_col}' "
+            f"and 'u' labels as the wave scripts write them.  A frame "
+            f"restricted to waves without such rows also lands here "
+            f"(GH #1042).", country=country, cells=unmatched), stacklevel=3)
     would_infer = declared & (~np.isnan(kg_item) | ~np.isnan(kg_unit))
     if declared.any():
         kg_item = np.where(declared, np.nan, kg_item)

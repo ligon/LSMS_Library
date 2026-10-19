@@ -2365,7 +2365,13 @@ class Country:
         Each entry needs ``item`` and a non-empty ``reason``; ``units`` is an
         optional list (absent = every unit of the item).  An entry without a
         reason is refused: a declaration that removes kilograms from served
-        rows must say why.
+        rows must say why.  So is a ``units`` that is present but not a
+        non-empty list of non-empty strings (GH #1042 red team r3, R4): a
+        scalar ``units: Single`` used to be iterated character by character
+        and declare nothing, and ``units: []`` (or a bare ``units:``) declares
+        nothing where an absent key declares every unit.  A label that does
+        not occur in the frame is reported at use, by
+        :class:`~lsms_library.transformations.UnmatchedNoKgCellWarning`.
         """
         path = Path(countries_root()) / self.name / "_" / "no_kg_factor.yml"
         if not path.exists():
@@ -2380,11 +2386,18 @@ class Country:
                 raise ValueError(
                     f"{path}: every no_kg_factor entry needs an `item` and a "
                     f"`reason`; got {e!r}")
-            units = e.get('units')
-            if units is None:
+            if 'units' not in e:
                 cells.append((str(e['item']), None))
-            else:
-                cells.extend((str(e['item']), str(u)) for u in units)
+                continue
+            units = e['units']
+            if not (isinstance(units, list) and units
+                    and all(isinstance(u, str) and u.strip() for u in units)):
+                raise ValueError(
+                    f"{path}: no_kg_factor entry {e['item']!r}: `units` must be "
+                    f"absent (every unit of the item) or a non-empty list of "
+                    f"non-empty unit labels (quote a numeric label); got "
+                    f"{units!r}")
+            cells.extend((str(e['item']), u) for u in units)
         return tuple(cells)
 
     @property

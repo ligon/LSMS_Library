@@ -30,6 +30,7 @@ rows), not just the label.  Evidence: both countries' ``_/CONTENTS.org``.
 from __future__ import annotations
 
 import importlib.util
+import warnings
 from pathlib import Path
 
 import pandas as pd
@@ -37,7 +38,8 @@ import pytest
 
 from lsms_library.local_tools import df_from_orgfile
 from lsms_library.paths import countries_root, data_root
-from lsms_library.transformations import U_UNKNOWN, food_kg_factors
+from lsms_library.transformations import (U_UNKNOWN, UnmatchedNoKgCellWarning,
+                                         food_kg_factors)
 
 _MALAWI = countries_root() / 'Malawi' / '_' / 'malawi.py'
 
@@ -388,7 +390,10 @@ def test_food_kg_factors_no_kg_refuses_inferred_kilograms_only():
     assert base.loc[b_single, 'KgFactorSource'].isin(
         ['item_unit', 'item_unit_tight', 'unit']).all()
 
-    out = food_kg_factors(df, no_kg=[('b', ' single ')])   # matched normalised
+    with warnings.catch_warnings():
+        # A declaration that matches must not be reported as unmatched.
+        warnings.simplefilter('error', UnmatchedNoKgCellWarning)
+        out = food_kg_factors(df, no_kg=[('b', ' single ')])   # matched normalised
     assert (out.loc[b_single, 'KgFactorSource'] == 'none').all()
     assert out.loc[b_single, 'kg_per_unit'].isna().all()
     # The metric rows of the same item, and every other item, are untouched.
@@ -433,6 +438,39 @@ def test_no_kg_factor_yml_needs_a_reason(tmp_path, monkeypatch):
     (d / 'no_kg_factor.yml').write_text('no_kg_factor:\n  - item: Egg\n')
     with pytest.raises(ValueError, match='reason'):
         Country._no_kg_factor_cells(stub)
+
+    # `units` present must be a non-empty list of non-empty strings (red team
+    # r3, R4).  A scalar used to be iterated character by character -- 'Single'
+    # declared ('Egg','S'), ('Egg','i'), ... and matched nothing -- and an
+    # empty list declared nothing where an absent key declares every unit.
+    for bad in ('units: Single', 'units: []', 'units:', "units: ['']",
+                "units: [Single, '  ']", 'units: [37]', 'units: {Single: 1}'):
+        (d / 'no_kg_factor.yml').write_text(
+            f'no_kg_factor:\n  - item: Egg\n    {bad}\n    reason: x\n')
+        with pytest.raises(ValueError, match='`units` must be'):
+            Country._no_kg_factor_cells(stub)
+
+    # A misspelt item (or unit) cannot be refused here -- the file does not
+    # know the frame -- so it is accepted and reported where it is used.
+    (d / 'no_kg_factor.yml').write_text(
+        'no_kg_factor:\n  - item: Bb\n    units: [Single]\n    reason: x\n'
+        '  - item: B\n    units: [Singel]\n    reason: x\n'
+        '  - item: B\n    units: [Single]\n    reason: x\n')
+    cells = Country._no_kg_factor_cells(stub)
+    assert cells == (('Bb', 'Single'), ('B', 'Singel'), ('B', 'Single'))
+    df = _no_kg_frame()
+    df.attrs['country'] = 'Someland'
+    with pytest.warns(UnmatchedNoKgCellWarning) as rec:
+        out = food_kg_factors(df, no_kg=cells)
+    (w,) = [r.message for r in rec
+            if isinstance(r.message, UnmatchedNoKgCellWarning)]
+    assert w.country == 'Someland'
+    assert w.cells == (('Bb', 'Single'), ('B', 'Singel'))
+    assert "'Bb'/'Single'" in str(w) and "'B'/'Singel'" in str(w)
+    cells_rep = out.attrs['kg_factor_declared_none']['cells']
+    assert cells_rep['Bb|Single']['rows_matched'] == 0
+    assert cells_rep['B|Singel']['rows_matched'] == 0
+    assert cells_rep['B|Single']['rows_matched'] > 0   # the good cell still acts
 
 
 #: GhanaLSS egg count units declared no-kg (``_/no_kg_factor.yml``).  Before
