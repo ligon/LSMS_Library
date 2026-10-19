@@ -426,9 +426,9 @@ Data Scheme:
     # in a field passage (2011-12 has two), with up to three within-
     # questionnaire price observations.  Until #840 the grain was (t, v, j, u)
     # and ONE row per cell was kept -- post-harvest first, then questionnaire
-    # order -- and 15,423 rows were served of what is now 46,177 (2011-12
-    # 8,923 -> 32,369, after the lossless exact-duplicate drop below; 2014-15
-    # 6,500 -> 13,808).
+    # order -- and 15,423 rows were served of what is now 46,043 (2011-12
+    # 8,923 -> 32,352, 2014-15 6,500 -> 13,691, after the lossless
+    # duplicate-entry drops below).
     # Nothing is averaged and, now, nothing is selected.
     #   variety -- the cs07q02 variety CODE as a string ('7011' = product 701,
     #          variety 1).  The code, not the label: the codes agree across all
@@ -437,10 +437,14 @@ Data Scheme:
     #   visit -- the field passage: 2011-12 ecvmacoms07_p1 = 1, _p2 = 2;
     #          2014-15 is one passage (1).
     #   obs -- the observation slot 1 / 2 / 3.  A second source record for the
-    #          same (grappe, variety) is slot + 3, the GhanaLSS `obs`
-    #          precedent: 2014-15 grappe 212's second questionnaire, and the 22
-    #          non-identical rows of 2011-12 p2's re-shipped grappe blocks
-    #          (13,478 of that block's rows are byte-identical and dropped).
+    #          same (grappe, variety) is a duplicate ENTRY of one questionnaire,
+    #          not a second reading: 2011-12 p2 re-ships 150 grappe blocks
+    #          (13,478 of 13,500 rows byte-identical), and 2014-15 grappe 212's
+    #          two questionnaires agree on the obs-1 Price in 67 of 67.  A slot
+    #          of a second record that repeats a served row in every column
+    #          but obs is dropped (134 rows; lossless).  The 30 that repeat
+    #          nothing are slot + 3, the GhanaLSS `obs` precedent -- their
+    #          representation is an open maintainer decision (CONTENTS.org).
     #   v   -- the community questionnaire's grappe (EA), formatted into the
     #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
     #          community_prices.v == sample().v for the same cluster and the

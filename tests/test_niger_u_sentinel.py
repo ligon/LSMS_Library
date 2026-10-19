@@ -92,9 +92,12 @@ EXPECTED_ROWS = {
     "plot_inputs": 42426,       # 42,364 before the bundle
     # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
     # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
-    # 2014-15 6,500 -> 13,808.  Still 0 `Unknown` rows (below): the 795
-    # unit-less CS07 observations are dropped, not filled (CONTENTS.org).
-    "community_prices": 46177,
+    # 2014-15 6,500 -> 13,808; then 46,177 -> 46,043 when the red team showed
+    # 134 of the obs 4-6 rows were duplicate ENTRIES repeating a served row
+    # (2011-12 32,369 -> 32,352, 2014-15 13,808 -> 13,691).  Still 0 `Unknown`
+    # rows (below): the 795 unit-less CS07 observations are dropped, not
+    # filled (CONTENTS.org).
+    "community_prices": 46043,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines

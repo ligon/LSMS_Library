@@ -13,9 +13,11 @@ observations is a (price, quantity, UNIT) triple with its OWN unit column:
 Both passages are read, and every recorded price is served (GH #840) —
 none selected, none averaged: `variety` is the cs07q02 variety code, `visit`
 the passage (p1 = 1, p2 = 2), `obs` the observation slot 1 / 2 / 3.
-Passage 2 re-ships 150 of its 232 grappes as a second block: 13,478 of those
-rows are byte-identical and dropped (lossless); the 22 that differ are kept as
-obs 4-6.  Rows with no usable price, or a missing-marker unit ('produit
+Passage 2 re-ships 150 of its 232 grappes as a second block -- a duplicate
+ENTRY, not a second reading: 13,478 of its 13,500 rows are byte-identical and
+dropped, and of the 22 that differ, every melted slot that repeats a served
+row is dropped too (17 rows; both drops lossless).  The 15 slots that repeat
+nothing are served as obs 4-6 (niger.py::_community_price_triples).  Rows with no usable price, or a missing-marker unit ('produit
 absent' / 'manquant' -> 'Unknown' since GH #842), are dropped.  Measured: 795 price-bearing
 observations in this wave (218 passage 1, 577 passage 2) carry no unit value
 at all, and none of them carries a usable Quantity either -- neither a unit

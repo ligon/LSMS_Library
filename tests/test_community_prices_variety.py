@@ -24,10 +24,18 @@ MEASURED NUMBERS (private cold rebuild, 2026-10-19, on the commit that
 introduced them).  Served rows before -> after:
 
     Mali      2014-15    23,646 -> 40,218
-    Niger     2011-12     8,923 -> 32,369
-              2014-15     6,500 -> 13,808
+    Niger     2011-12     8,923 -> 32,352   (32,369 before the r1 fix below)
+              2014-15     6,500 -> 13,691   (13,808 before the r1 fix below)
     Tanzania  2019-20     2,769 ->  3,076
               2020-21    13,062 -> 14,623
+
+Niger's second source records are duplicate ENTRIES of one questionnaire
+(2011-12 passage 2 re-ships 150 grappes; 2014-15 grappe 212 has two
+``numquest``), not second readings.  The first cut enumerated every one of
+their slots as ``obs`` 4-6, so 134 served rows (2011-12 17, 2014-15 117)
+repeated an already-served row in every column but ``obs`` (red team r1);
+``_community_price_triples`` now drops those, and the 30 slots that repeat
+nothing stay as ``obs`` 4-6.
 
 The number of (t, v, j, u) CELLS is unchanged in every wave -- the old table
 is a projection of the new one, and every row it served is one of the new
@@ -68,7 +76,8 @@ BUILDERS = {
 # cell counts the pre-#840 tables served -- which the new tables must keep.
 EXPECTED_ROWS = {
     "Mali": {"2014-15": 40218},
-    "Niger": {"2011-12": 32369, "2014-15": 13808},
+    # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117).
+    "Niger": {"2011-12": 32352, "2014-15": 13691},
     "Tanzania": {"2019-20": 3076, "2020-21": 14623},
 }
 EXPECTED_CELLS = {
@@ -189,6 +198,95 @@ class TestAssembly:
             assert pd.api.types.is_integer_dtype(out.index.get_level_values(lvl)), lvl
 
 
+@pytest.fixture(scope="module")
+def niger_module():
+    """``Niger/_/niger.py``, imported the way the wave scripts import it (no
+    data read at import)."""
+    import sys
+    sys.path.insert(0, str(countries_root() / "Niger" / "_"))
+    try:
+        import niger
+    finally:
+        sys.path.pop(0)
+    return niger
+
+
+class TestNigerDuplicateEntries:
+    """``_community_price_triples`` on synthetic CS07 grids (2014-15 layout:
+    one unit column shared by three (price, quantity) slots).
+
+    A second source record for one (grappe, variety) is a duplicate ENTRY of
+    the questionnaire (red team r1): a slot of it that repeats a served row is
+    dropped, a slot that repeats nothing is served as ``obs = slot + 3``."""
+
+    TRIPLES = [("cs07q04", "cs07q05", "cs07q03"),
+               ("cs07q06", "cs07q07", "cs07q03"),
+               ("cs07q08", "cs07q09", "cs07q03")]
+
+    @staticmethod
+    def _grids(records):
+        codes = pd.DataFrame(records, columns=[
+            "grappe", "numquest", "cs07q01", "cs07q02", "cs07q03",
+            "cs07q04", "cs07q05", "cs07q06", "cs07q07", "cs07q08", "cs07q09"])
+        labels = codes.copy()
+        labels["cs07q01"] = "Mil"
+        labels["cs07q02"] = "mil vendu au kilo"
+        labels["cs07q03"] = labels["cs07q03"].map({1: "Kg", 2: "Gramme"})
+        return labels, codes
+
+    def _triples(self, niger, records):
+        labels, codes = self._grids(records)
+        out = niger._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg", "Gramme": "Gramme"},
+            self.TRIPLES, codes=codes)
+        return out.set_index("obs")[["u", "Price", "Quantity"]]
+
+    def test_a_repeated_slot_is_dropped_and_a_new_one_kept(self, niger_module):
+        nan = float("nan")
+        out = self._triples(niger_module, [
+            # numquest 1: slots 1, 2 priced, slot 3 empty
+            (212, 1, 701, 7011, 1, 100.0, 2.0, 150.0, 3.0, nan, nan),
+            # numquest 2: slot 1 repeats, slot 2 disagrees, slot 3 is new
+            (212, 2, 701, 7011, 1, 100.0, 2.0, 175.0, 3.0, 200.0, 4.0),
+        ])
+        assert sorted(out.index) == [1, 2, 5, 6]
+        assert out.loc[5, "Price"] == 175.0 and out.loc[6, "Price"] == 200.0
+
+    def test_a_conflicting_unit_is_not_a_repeat(self, niger_module):
+        # Same Price and Quantity under another unit code: one of the two is a
+        # keying error and nothing here can say which, so both are served.
+        nan = float("nan")
+        out = self._triples(niger_module, [
+            (61, 1, 701, 7011, 2, 250.0, 192.0, nan, nan, nan, nan),
+            (61, 2, 701, 7011, 1, 250.0, 192.0, nan, nan, nan, nan),
+        ])
+        assert out["u"].to_dict() == {1: "Gramme", 4: "Kg"}
+
+    def test_a_byte_identical_row_does_not_count_as_a_record(self, niger_module):
+        # 2011-12 p2 re-ships whole grappe blocks.  The byte-identical copy is
+        # dropped before ranking, so a genuinely different record after it is
+        # the SECOND record (obs 4-6), not the third (obs 7-9).
+        nan = float("nan")
+        out = self._triples(niger_module, [
+            (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
+            (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
+            (53, 1, 701, 7011, 1, 125.0, 2.0, nan, nan, nan, nan),
+        ])
+        assert sorted(out.index) == [1, 4]
+
+    def test_the_tail_accepts_the_result(self, niger_module):
+        nan = float("nan")
+        labels, codes = self._grids([
+            (212, 1, 701, 7011, 1, 100.0, 2.0, 150.0, 3.0, nan, nan),
+            (212, 2, 701, 7011, 1, 100.0, 2.0, 175.0, 3.0, 200.0, 4.0),
+        ])
+        long = niger_module._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"}, self.TRIPLES, codes=codes)
+        out = niger_module._finish_community_prices(long, "2014-15")
+        assert out.index.is_unique and len(out) == 4
+        assert "slot" not in out.columns
+
+
 def _build(country):
     import lsms_library as ll
     try:
@@ -257,6 +355,21 @@ class TestBuilt:
         obs = df.index.get_level_values("obs")
         assert set(obs) <= {1, 2, 3, 4, 5, 6}
         late = df[obs > 3]
-        assert late.groupby(level="t").size().to_dict() == {"2011-12": 32, "2014-15": 132}
+        # {2011-12: 32, 2014-15: 132} before the r1 duplicate-entry drop: 134
+        # of those 164 rows repeated a served row (the test below).
+        assert late.groupby(level="t").size().to_dict() == {"2011-12": 15, "2014-15": 15}
         # 2014-15's second records are one grappe's second questionnaire.
         assert set(late.xs("2014-15", level="t").index.get_level_values("v")) == {"212"}
+
+    def test_niger_no_second_record_repeats_a_served_row(self):
+        # Red team r1: a second source record is a duplicate ENTRY, so a slot
+        # of it that matches a first-record row in every served column is a
+        # copy, not a reading -- serving it double-weights that price in any
+        # cluster mean, median or count.  134 such rows before the fix.
+        x = _build("Niger").reset_index()
+        x["slot"] = (x["obs"] - 1) % 3 + 1
+        content = ["t", "v", "j", "u", "variety", "visit", "slot",
+                   "Price", "Quantity", "Description"]
+        first = pd.MultiIndex.from_frame(x.loc[x["obs"] <= 3, content])
+        later = pd.MultiIndex.from_frame(x.loc[x["obs"] > 3, content])
+        assert int(later.isin(first).sum()) == 0

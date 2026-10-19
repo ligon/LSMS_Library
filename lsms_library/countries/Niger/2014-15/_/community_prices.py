@@ -12,7 +12,10 @@ Source: comprixcs07.dta — the community price questionnaire, section CS07
 
 Every recorded price is served (GH #840) — none selected, none averaged.  This
 is a single-passage wave (visit = 1).  Grappe 212 carries two questionnaires
-(numquest 1 and 2); the second one's observations are obs 4-6.  Rows with no
+(numquest 1 and 2) -- a duplicate ENTRY: they agree on the obs-1 Price of all
+67 varieties both price.  A slot of the second that repeats a served row is
+dropped (117 rows, lossless); the 15 that repeat nothing are obs 4-6
+(niger.py::_community_price_triples).  Rows with no
 usable price, or a missing-marker unit ('produit absent'/'manquant' ->
 'Unknown' since GH #842), are dropped.  This wave has NO price-bearing
 observation with a missing unit (measured: 0 of 13,840); the 795 that do are

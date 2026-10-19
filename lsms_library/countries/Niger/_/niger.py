@@ -1277,12 +1277,15 @@ def _finish_people_last7days(df, t):
 #   visit   -- the field passage (2011-12: ecvmacoms07_p1 = 1, _p2 = 2;
 #              2014-15 is a single passage, 1).
 #   obs     -- the CS07 observation slot 1-3 (the form's 1st/2nd/3rd
-#              relevé).  A SECOND source record for the same (grappe,
-#              variety) in one file is enumerated as slot + 3, the GhanaLSS
-#              `obs` precedent: 2014-15 grappe 212 carries two questionnaires
-#              (numquest 1 and 2; the second numquest's records are slots
-#              4-6), and 2011-12 passage 2 re-ships 150 of its 232 grappes
-#              (see _community_price_triples).
+#              relevé).  Two files carry a SECOND source record for some
+#              (grappe, variety), and both are duplicate ENTRIES of one
+#              questionnaire, not second readings: 2011-12 passage 2 ships
+#              150 of its 232 grappes twice, and 2014-15 grappe 212 has two
+#              questionnaires (numquest 1, 2) that agree on the obs-1 Price
+#              of all 67 varieties both price.  A second record's slot that
+#              repeats a served row is dropped (lossless); the 30 slots
+#              that DISAGREE with the first record are kept as slot + 3,
+#              the GhanaLSS `obs` precedent (see _community_price_triples).
 # NOTHING IS SELECTED.  Until GH #840 one row per (t, v, j, u) was kept --
 # post-harvest passage first, then questionnaire order -- and this comment's
 # own `obs` sentence below was not true of the code.
@@ -1363,6 +1366,12 @@ _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
 # "amount reported, unit not recorded".  See CONTENTS.org "The `u` sentinel".
 _COMMUNITY_MISSING_UNITS = {U_NA}
 
+# Every served column of a community_prices row except the manufactured `obs`
+# (`slot` stands in for the form's own slot): the content-equality key of
+# _community_price_triples' duplicate-entry drop.
+_COMMUNITY_PRICE_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot',
+                            'Price', 'Quantity', 'Description']
+
 
 def _community_price_triples(df, item_map, unit_map, triples, passage=1,
                              codes=None):
@@ -1379,15 +1388,41 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     keyspace; `j` via harmonize_food; `u` via the u table; `visit` is
     `passage` (the field visit: 1 = post-planting, 2 = post-harvest).
 
-    Two source idiosyncrasies are handled here, both measured (GH #840):
+    A SECOND SOURCE RECORD for one (grappe, variety) is a duplicate ENTRY of
+    the same questionnaire, not a second reading (GH #840, red team r1).  Two
+    files carry them, both measured on the raw grids:
 
-    * EXACT DUPLICATE ROWS are dropped first -- lossless.  2011-12 passage 2
-      ships 150 of its 232 grappes twice: 13,478 rows identical in every
-      column.
-    * A second record for the same (grappe, variety) that is NOT identical is
-      kept, as observation slots 4-6 (`obs = k + 3 * rank`, rank in
-      (numquest, file order)): the 22 such rows of 2011-12 passage 2, and
-      2014-15 grappe 212, which carries two questionnaires (numquest 1, 2).
+    * 2011-12 passage 2 (ecvmacoms07_p2) ships 150 of its 232 grappes as two
+      contiguous 90-row blocks.  13,478 of the second block's 13,500 rows are
+      byte-identical to the first; the other 22 differ in one to nine cells
+      (a unit code 2 vs 7, a 0 vs 1 quantity, a 9999 sentinel on one side, a
+      reading entered one slot over, a `cs07q02l` label).
+    * 2014-15 grappe 212 carries two questionnaires (numquest 1, 2).  They
+      agree on the obs-1 Price of all 67 varieties both price, on the obs-1
+      Quantity of 63 and on the unit of 64.
+
+    So two drops, both lossless, in this order:
+
+    1. a wide row byte-identical to an earlier one (the 13,478) is dropped
+       BEFORE the melt -- that is what keeps `rank` (below) a count of
+       distinct records;
+    2. AFTER the melt and the no-price filters, a row identical in EVERY
+       served column to a row already served -- (v, j, u, variety, visit,
+       slot, Price, Quantity, Description); only the manufactured `obs`
+       differs -- is dropped.  This is the step byte-identity cannot do:
+       `numquest` (grappe 212) and a re-keyed label (2011-12 grappe 52) make
+       the wide rows differ while every price they carry is a repeat.  134
+       rows go here (2011-12 17, 2014-15 117).  It is the #323 lossless
+       de-dup class, not a selection: the dropped row is a copy, and which
+       copy keeps the lower `obs` is fixed (the first record's).
+
+    What remains of a second record is the 30 slots that repeat NO served
+    row -- served as observation slots 4-6 (`obs = slot + 3 *
+    rank`, rank in (numquest, file order)), the GhanaLSS convention for a
+    second source record of one cell.  How those 30 should be represented is
+    an open maintainer decision (CONTENTS.org).  This drop is deliberately
+    HERE and not in _finish_community_prices: that tail is the builder GH
+    #840 says selects nothing, and a test greps it for `drop_duplicates`.
 
     Rows with no usable price (NA / 0 / sentinel) or a missing-marker unit are
     dropped here so they never reach the index."""
@@ -1426,7 +1461,7 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
         piece = pd.DataFrame({
             'v': v.values, 'j': j.values, 'u': u.values,
             'variety': variety.values, 'visit': passage,
-            'obs': (slot + 3 * rank).values,
+            'obs': (slot + 3 * rank).values, 'slot': slot,
             'Description': description.values,
             'Price': price.values, 'Quantity': qty.values,
         })
@@ -1437,6 +1472,15 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     for sv in _COMMUNITY_PRICE_SENTINELS:
         out = out[out['Price'] != sv]
     out = out[~out['u'].isin(_COMMUNITY_MISSING_UNITS)]
+    # A second record's slot that repeats a served row in every served column
+    # is a duplicate entry, not an observation (docstring, step 2).  After the
+    # price filters, so a second record that prices a slot the first left
+    # empty is kept.  Lowest `obs` first: the first record's row is the one
+    # that stays.
+    out = (out.sort_values('obs', kind='stable')
+              .drop_duplicates(_COMMUNITY_PRICE_CONTENT, keep='first')
+              .drop(columns='slot')
+              .sort_index())
     return out
 
 
@@ -1455,7 +1499,8 @@ def _finish_community_prices(df, t):
     other varieties, other passages and other observation slots of the same
     cell, by row order.  A duplicate key is now an error: the instrument
     records one price per (cluster, variety, passage, slot), and
-    _community_price_triples has already enumerated any second record."""
+    _community_price_triples has already dropped a second source record's
+    repeats and enumerated what remains of it as obs 4-6."""
     df = df.copy()
     for col in ['Price', 'Quantity']:
         if col not in df.columns:
