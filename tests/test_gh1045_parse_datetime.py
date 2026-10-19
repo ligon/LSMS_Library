@@ -28,8 +28,9 @@ from lsms_library import datetime_parse as DP
 from lsms_library import local_tools as lt
 from lsms_library.calendars import ethiopian_to_gregorian
 from lsms_library.datetime_parse import (
-    CALENDAR_TABLES, CALENDAR_TYPES, DERIVATION_KEYS, DatetimeCoercionWarning,
-    DatetimeParseError, DatetimeParseWarning, DatetimeSpecError,
+    CALENDAR_TABLES, CALENDAR_TYPES, DERIVATION_NAMES, DatetimeCoercionWarning,
+    DatetimeParseError, DatetimeParseWarning, DatetimeSpecError, DatetimeWarning,
+    derivation_key,
     DatetimeStringAtReadWarning, assign_datetime, datetime_reports,
     parse_datetime, spec_source_vars)
 
@@ -51,7 +52,7 @@ def _parse(data, **kw):
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         res = parse_datetime(data, **kw)
-    return res, [w for w in caught if issubclass(w.category, DatetimeCoercionWarning)]
+    return res, [w for w in caught if issubclass(w.category, DatetimeWarning)]
 
 
 def _one(res):
@@ -85,18 +86,21 @@ class TestInputKinds:
                                        pd.Timestamp("2014-08-05")]
 
     def test_partial_year_month_is_day_one_and_keyed(self):
-        res, w = _parse(pd.DataFrame({"y": [2010, 2010], "m": [11, 11], "d": [np.nan, 4]}))
+        res, w = _parse(pd.DataFrame({"y": [2010, 2010], "m": [11, 11], "d": [np.nan, 4]}),
+                        table="interview_date")
         assert res.values.tolist() == [pd.Timestamp("2010-11-01"), pd.Timestamp("2010-11-04")]
-        assert res.derivation.tolist()[0] == DERIVATION_KEYS["imputed_day"] == "::::date-day-imputed"
+        assert res.derivation.tolist()[0] == derivation_key("imputed_day", "interview_date") \
+            == "::interview_date::date-day-imputed"
         assert pd.isna(res.derivation.iloc[1])
         rep = _one(res)
         assert rep["imputed_day"] == 1 and rep["parsed"] == 2
         assert not w, "a registered derivation is disclosed by its key, not a warning"
 
     def test_year_only_is_january_first_and_keyed(self):
-        res, _ = _parse(pd.DataFrame({"y": [2010], "m": [np.nan], "d": [np.nan]}))
+        res, _ = _parse(pd.DataFrame({"y": [2010], "m": [np.nan], "d": [np.nan]}),
+                        table="interview_date")
         assert res.values.iloc[0] == pd.Timestamp("2010-01-01")
-        assert res.derivation.iloc[0] == "::::date-month-day-imputed"
+        assert res.derivation.iloc[0] == "::interview_date::date-month-day-imputed"
         assert _one(res)["imputed_month"] == 1
 
     def test_day_without_month_is_incomplete_not_padded(self):
@@ -265,7 +269,11 @@ class TestLever:
     def test_default_warns_with_the_family_class(self):
         _, w = _parse(pd.Series(["garbage"]))
         assert w and issubclass(w[0].category, DatetimeParseWarning)
-        assert issubclass(DatetimeParseWarning, DatetimeCoercionWarning)
+        # Siblings under one base: the build-time report is not a read-time
+        # coercion failure, and a filter on the latter (#798) must not see it.
+        assert issubclass(DatetimeParseWarning, DatetimeWarning)
+        assert issubclass(DatetimeCoercionWarning, DatetimeWarning)
+        assert not issubclass(DatetimeParseWarning, DatetimeCoercionWarning)
         assert w[0].message.report["unparsed"] == 1
 
     def test_strict_raises(self, monkeypatch):
@@ -298,29 +306,37 @@ class TestLever:
 # ---------------------------------------------------------------------------
 
 class TestPartialDateDerivation:
-    def test_registered_and_loadable(self):
+    def test_registered_for_every_calendar_table_and_loadable(self):
         from lsms_library.derivations import framework_records, records_for
         recs = framework_records()
-        for key in DERIVATION_KEYS.values():
-            assert key in recs, key
-            r = recs[key]
-            assert r.country is None and r.table is None
-            assert "modelling-choice" in r.bases
-            assert callable(r.resolve("function")) and callable(r.resolve("inputs"))
-            assert key in records_for("Tanzania", "interview_date")
+        for table in CALENDAR_TABLES:
+            for which in DERIVATION_NAMES:
+                key = derivation_key(which, table)
+                assert key in recs, key
+                r = recs[key]
+                assert r.country is None and r.table == table
+                assert "modelling-choice" in r.bases
+                assert callable(r.resolve("function")) and callable(r.resolve("inputs"))
+                assert key in records_for("Tanzania", table)
+
+    def test_not_attached_to_other_tables(self):
+        """An empty table slot would list both keys, at rows 0, on every table."""
+        from lsms_library.derivations import records_for
+        assert not [k for k in records_for("Uganda", "food_acquired") if "date-" in k]
 
     def test_listed_by_ll_derivations(self):
         import lsms_library as ll
         listed = ll.derivations()
-        for key in DERIVATION_KEYS.values():
-            assert key in listed.index
+        for table in CALENDAR_TABLES:
+            for which in DERIVATION_NAMES:
+                assert derivation_key(which, table) in listed.index
 
     def test_every_padded_date_carries_the_key(self):
         df = pd.DataFrame(index=pd.RangeIndex(4))
         out = assign_datetime(df, "Int_t", pd.DataFrame({"y": [2010, 2010, 2010, 2010],
                                                          "m": [11, 11, np.nan, 5],
                                                          "d": [np.nan, 4, np.nan, np.nan]}),
-                              calendar="gregorian")
+                              calendar="gregorian", table="interview_date")
         padded = out["Int_t"].dt.day.eq(1) & out.index.isin([0, 2, 3])
         assert padded.sum() == 3
         assert out.loc[padded, "Derivation"].notna().all()
@@ -330,12 +346,13 @@ class TestPartialDateDerivation:
         from lsms_library.derivations import MULTI_SEP, summary_for_frame
         df = pd.DataFrame({"Derivation": ["Mali::interview_date::visit-x", pd.NA]})
         out = assign_datetime(df, "Int_t", pd.DataFrame({"y": [2014, 2014], "m": [3, 4]}),
-                              calendar="gregorian")
+                              calendar="gregorian", table="interview_date")
+        key = "::interview_date::date-day-imputed"
         assert out.loc[0, "Derivation"] == MULTI_SEP.join(
-            sorted(["Mali::interview_date::visit-x", "::::date-day-imputed"]))
-        assert out.loc[1, "Derivation"] == "::::date-day-imputed"
+            sorted(["Mali::interview_date::visit-x", key]))
+        assert out.loc[1, "Derivation"] == key
         summary = summary_for_frame(out, "Mali", "interview_date")
-        assert summary["::::date-day-imputed"]["rows"] == 2
+        assert summary[key]["rows"] == 2 and summary[key]["columns"] == ["Int_t"]
         assert summary["Mali::interview_date::visit-x"]["rows"] == 1
 
     def test_inputs_callable_lists_the_padding_reports(self):
@@ -511,9 +528,9 @@ raw = pd.DataFrame({"t": ["2020"] * 3, "i": ["h1", "h2", "h3"],
 df = assign_datetime(raw.drop(columns=["y", "m", "d"]), "Int_t", raw[["y", "m", "d"]],
                      calendar="gregorian", sentinels=[9999], country="{country}",
                      table="interview_date", wave_folder="2020")
-out = Path(os.environ["LSMS_DATA_DIR"]) / "{country}" / "2020" / "_" / "interview_date.parquet"
-out.parent.mkdir(parents=True, exist_ok=True)
-to_parquet(df, out, absolute_path=True,
+# Relative, exactly as Tanzania 2008-15/_/interview_date.py writes: the
+# redirect to data_root() is what the real script relies on (GH #803).
+to_parquet(df, "interview_date.parquet",
            datetime_audit=datetime_reports("{country}", "interview_date"))
 """
 
@@ -523,7 +540,10 @@ import lsms_library as ll
 from lsms_library.datetime_parse import datetime_reports, DatetimeParseWarning
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
-    df = ll.Country(sys.argv[1]).interview_date()
+    if len(sys.argv) > 2:      # wave level: the L2-wave / script parquet read
+        df = ll.Country(sys.argv[1])[sys.argv[2]].grab_data("interview_date")
+    else:
+        df = ll.Country(sys.argv[1]).interview_date()
 print(json.dumps({
     "rows": len(df), "dtype": str(df["Int_t"].dtype),
     "warned": [str(w.message) for w in caught if issubclass(w.category, DatetimeParseWarning)],
@@ -543,8 +563,8 @@ def _env(tmp_path):
     return env
 
 
-def _probe(tmp_path, country):
-    r = subprocess.run([sys.executable, "-c", _PROBE, country], env=_env(tmp_path),
+def _probe(tmp_path, country, *extra):
+    r = subprocess.run([sys.executable, "-c", _PROBE, country, *extra], env=_env(tmp_path),
                        cwd=str(tmp_path), capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stderr[-3000:]
     return json.loads(r.stdout.strip().splitlines()[-1])
@@ -589,11 +609,21 @@ def test_the_report_is_stamped_and_replayed_in_a_fresh_process(tmp_path, route):
         import pyarrow.parquet as pq
         assert str(pq.read_schema(p).field("Int_t").type) == "timestamp[us]", p
 
+    parquets = [data / "2020" / "_" / "interview_date.parquet", data / "var" / "interview_date.parquet"]
+    stamp = {p: p.stat().st_mtime_ns for p in parquets}
+
     warm = _probe(tmp_path, name)                    # process 2: warm read only
-    assert warm["warned"] and "replayed" in warm["warned"][0]
+    assert {p: p.stat().st_mtime_ns for p in parquets} == stamp, "the read was not warm"
+    assert [m for m in warm["warned"] if "replayed" in m]
     (wrep,) = [r for r in warm["reports"] if r["sentinel"]]
     assert wrep["from_cache"] is True
     assert {k: wrep[k] for k in PARTITION} == {k: rep[k] for k in PARTITION}
+
+    wave = _probe(tmp_path, name, "2020")            # process 3: the WAVE stamp
+    assert {p: p.stat().st_mtime_ns for p in parquets} == stamp
+    assert [m for m in wave["warned"] if "replayed" in m]
+    (vrep,) = [r for r in wave["reports"] if r["sentinel"]]
+    assert vrep["from_cache"] is True and vrep["sentinel"] == 1
     assert not list((tmp_path / "countries").rglob("*.parquet")), "GH #803: nothing in-tree"
 
 
@@ -633,3 +663,96 @@ def test_assume_cache_fresh_also_replays(tmp_path):
     assert r.returncode == 0, r.stderr[-3000:]
     out = json.loads(r.stdout.strip().splitlines()[-1])
     assert out["warned"] and [rep for rep in out["reports"] if rep["sentinel"] == 1]
+
+
+# ---------------------------------------------------------------------------
+# 9. Red-team / review round 2 (each a defect found and fixed)
+# ---------------------------------------------------------------------------
+
+class TestRound2:
+    def test_empty_input_with_a_multiindex(self):
+        idx = pd.MultiIndex.from_tuples([], names=["t", "i"])
+        res = parse_datetime(pd.Series([], index=idx, dtype=object), calendar="gregorian")
+        assert len(res.values) == 0 and res.values.dtype == "datetime64[us]" and res.reports == []
+
+    def test_absurd_stata_values_are_out_of_range_not_a_crash(self):
+        res, _ = _parse(pd.Series([1e8, -1e9, 21900.0]), stata="td")
+        rep = _one(res)
+        assert rep["out_of_range"] == 2 and res.values.iloc[2] == pd.Timestamp("2019-12-17")
+
+    def test_year_bound_applies_to_strings_and_datetime64(self):
+        res, _ = _parse(pd.Series(["9999-12-31", "1700-01-01", "2014-08-05"]))
+        assert _one(res)["out_of_range"] == 2
+        res, _ = _parse(pd.Series(pd.to_datetime(["1700-01-01", "2014-08-05"])))
+        assert _one(res)["out_of_range"] == 1
+
+    def test_two_digit_year_is_ambiguous_not_guessed(self):
+        res, w = _parse(pd.Series(["13/01/19", "05/01/19"]))
+        assert res.values.isna().all() and _one(res)["ambiguous"] == 2 and w
+
+    @pytest.mark.parametrize("kind,cols", [("month", ["y"]), ("year", ["m"]), ("date", ["m", "d"])])
+    def test_a_kind_without_its_component_is_refused(self, kind, cols):
+        with pytest.raises(DatetimeSpecError, match="needs a"):
+            parse_datetime(pd.DataFrame({c: [1] for c in cols}), calendar="gregorian", kind=kind)
+
+    def test_assign_datetime_refuses_a_misaligned_index(self):
+        df = pd.DataFrame(index=pd.Index(["a", "b"]))
+        data = pd.DataFrame({"y": [2014, 2015], "m": [1, 1], "d": [1, 1]}, index=["b", "a"])
+        with pytest.raises(ValueError, match="same order"):
+            assign_datetime(df, "Int_t", data, calendar="gregorian")
+
+    def test_assign_datetime_keeps_a_duplicated_index_row_for_row(self):
+        idx = pd.Index(["h1", "h1", "h2"])
+        data = pd.DataFrame({"y": [2014, 2014, 2015], "m": [7, 12, 1], "d": [2, np.nan, 3]}, index=idx)
+        out = assign_datetime(pd.DataFrame(index=idx), "Int_t", data, calendar="gregorian",
+                              table="interview_date")
+        assert out["Int_t"].tolist() == [pd.Timestamp("2014-07-02"), pd.Timestamp("2014-12-01"),
+                                         pd.Timestamp("2015-01-03")]
+        assert out["Derivation"].isna().tolist() == [True, False, True]
+
+    def test_replay_is_filtered_to_the_waves_served(self):
+        reports = [{"wave": "2008-09", "n": 1, "parsed": 0, "out_of_range": 1},
+                   {"wave": "2019-20", "n": 1, "parsed": 1}]
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            DP.replay_datetime_audit(reports, "X", "interview_date", waves=["2019-20"])
+        assert [r["wave"] for r in datetime_reports("X", "interview_date")] == ["2019-20"]
+        assert not [w for w in caught if issubclass(w.category, DatetimeParseWarning)]
+
+    def test_strict_reaches_through_the_currency_conversion(self, monkeypatch):
+        """conversion._interview_dates swallowed every exception and fell back to
+        wave-nominal dates; under LSMS_DATE_STRICT that must be fatal."""
+        import lsms_library
+        from lsms_library import conversion
+
+        class Boom:
+            def __init__(self, *a, **k):
+                self.data_scheme = ["interview_date"]
+
+            def interview_date(self):
+                raise DatetimeParseError("strict")
+
+        monkeypatch.setattr(lsms_library, "Country", Boom)
+        with pytest.raises(DatetimeParseError):
+            conversion._interview_dates("X")
+
+    def test_column_mapping_adds_no_key_when_no_spec(self):
+        """ehcvm's raw-input lookup unpacks the mapping as one file."""
+        w = C.Country("Togo")["2018"]
+        mapping = w.column_mapping("food_acquired", w.resources["food_acquired"])
+        assert "datetime_specs" not in mapping
+
+    def test_column_mapping_carries_the_spec_when_present(self):
+        w = C.Country("Mali")["2018-19"]
+        mapping = w.column_mapping("interview_date", w.resources["interview_date"])
+        assert set(mapping["datetime_specs"]) == {"Int_t"}
+        (fname,) = [k for k in mapping if k not in ("df_edit", "datetime_specs")]
+        assert mapping[fname]["myvars"] == {"Int_t\x1f": "s00q23a"}
+
+    def test_a_per_file_override_of_a_spec_is_refused(self):
+        w = C.Country("Mali")["2014-15"]
+        info = dict(w.resources["interview_date"])
+        info["file"] = ["EACICONTROLE_p1.dta",
+                        {"EACICONTROLE_p2.dta": {"Int_t": {"datetime": "x", "calendar": "gregorian"}}}]
+        with pytest.raises(ValueError, match="per-file override"):
+            w.column_mapping("interview_date", info)

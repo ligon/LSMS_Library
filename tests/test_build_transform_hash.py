@@ -50,6 +50,14 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.country.Wave.cluster_features",
     "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
+    # GH #1045: the build-time calendar parser, tagged for exactly the tables
+    # that carry a calendar column (datetime_parse.CALENDAR_TABLES) and
+    # excluded from recursion so grab_data does not fold it into every table.
+    "lsms_library.datetime_parse.parse_datetime",
+    "lsms_library.datetime_parse.assign_datetime",
+    "lsms_library.datetime_parse.spec_source_vars",
+    "lsms_library.datetime_parse.apply_datetime_specs",
+    "lsms_library.datetime_parse.is_datetime_spec",
 }
 
 

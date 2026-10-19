@@ -45,7 +45,7 @@ df = df[~df.index.duplicated(keep='first')]
 # GH #1045: one build-time parser, run AFTER the dedup so its counts are
 # served households, not replicated panel lines.  Reports are per ROUND (the frame's `t`
 # level), not per folder: one folder, four rounds.  A month and year with no
-# day is served as the 1st and keyed `::::date-day-imputed` (a registered
+# day is served as the 1st and keyed `::interview_date::date-day-imputed` (a registered
 # derivation, lsms_library/derivations.yml) -- it used to be NaT, and the
 # all-null row was then deleted.
 #

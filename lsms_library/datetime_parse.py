@@ -38,8 +38,8 @@ This module is the right place: the wave, at build time, with the format known.
 
 PARTIAL DATES ARE A DERIVATION, NOT A PARSER OPTION (@ligon, 2026-10-18).  A
 year-month is served as the first of the month and carries
-``::::date-day-imputed`` in the ``Derivation`` column; a year-only value is
-served as 1 January and carries ``::::date-month-day-imputed``.  Both are
+``::<table>::date-day-imputed`` in the ``Derivation`` column; a year-only value
+is served as 1 January and carries ``::<table>::date-month-day-imputed``.  Both are
 registered in ``lsms_library/derivations.yml`` (basis ``modelling-choice``).
 :func:`assign_datetime` writes the key, joining it with a key the row already
 carries (``MULTI_SEP``).
@@ -69,7 +69,8 @@ import pandas as pd
 from ._build_registry import build_transform
 
 __all__ = [
-    "CALENDARS", "KINDS", "CALENDAR_TABLES", "COMPONENTS", "DERIVATION_KEYS",
+    "CALENDARS", "KINDS", "CALENDAR_TABLES", "COMPONENTS", "DERIVATION_NAMES",
+    "derivation_key", "DatetimeWarning",
     "DatetimeCoercionWarning", "DatetimeAmbiguityWarning", "DatetimeParseWarning",
     "DatetimeStringAtReadWarning", "DatetimeParseError", "DatetimeSpecError",
     "ParsedDatetime", "parse_datetime", "assign_datetime",
@@ -90,11 +91,20 @@ COMPONENTS = ("y", "m", "d", "H", "M", "S")
 #: ``type`` values in ``data_info.yml`` that make a column a calendar column.
 CALENDAR_TYPES = frozenset({"datetime", "date", "timestamp", "month", "year"})
 
-#: Registry keys of the two partial-date derivations (framework level).
-DERIVATION_KEYS = {
-    "imputed_day": "::::date-day-imputed",
-    "imputed_month": "::::date-month-day-imputed",
+#: Names of the two partial-date derivations.  The registry KEY is
+#: ``::<table>::<name>`` (framework level, scoped to the table: an empty table
+#: slot would attach the entry to every table in the corpus), and
+#: ``lsms_library/derivations.yml`` registers both names for every table in
+#: :data:`CALENDAR_TABLES` -- pinned by a test.
+DERIVATION_NAMES = {
+    "imputed_day": "date-day-imputed",
+    "imputed_month": "date-month-day-imputed",
 }
+
+
+def derivation_key(which: str, table: str | None) -> str:
+    """``'::<table>::<name>'`` for ``which`` in :data:`DERIVATION_NAMES`."""
+    return f"::{table or ''}::{DERIVATION_NAMES[which]}"
 
 #: Ordered outcome categories.  The first seven partition the input; the last
 #: three are subsets of ``parsed``.
@@ -125,12 +135,15 @@ READ_CAST_WARNS_ON_STRINGS = False
 # are re-exported from there unchanged.
 # ---------------------------------------------------------------------------
 
-class DatetimeCoercionWarning(RuntimeWarning):
-    """A declared datetime column held values that did not parse (GH #798).
+class DatetimeWarning(RuntimeWarning):
+    """Base of the date-warning family (GH #1045).
 
-    Carries ``country``, ``table``, ``column``, ``count`` and ``examples`` as
-    attributes so callers and tests can target it precisely, the way
-    ``GrainCollapseWarning`` does.  Base of the GH #1045 family.
+    Two siblings under it, because they are two different events:
+    :class:`DatetimeCoercionWarning` is the READ-TIME cast reporting what it
+    could not parse (GH #798), :class:`DatetimeParseWarning` is the BUILD-TIME
+    parse report (replayed warm).  Carries ``country``, ``table``, ``column``,
+    ``count`` and ``examples`` as attributes so callers and tests can target it
+    precisely, the way ``GrainCollapseWarning`` does.
     """
 
     def __init__(self, message: str, *, country: str | None = None,
@@ -142,6 +155,11 @@ class DatetimeCoercionWarning(RuntimeWarning):
         self.column = column
         self.count = count
         self.examples = examples
+
+
+class DatetimeCoercionWarning(DatetimeWarning):
+    """The READ-TIME cast of a declared datetime column held values that did
+    not parse (GH #798); see ``country._coerce_datetime_column``."""
 
 
 class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
@@ -162,7 +180,7 @@ class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
         self.wave = wave
 
 
-class DatetimeParseWarning(DatetimeCoercionWarning):
+class DatetimeParseWarning(DatetimeWarning):
     """A build-time parse report (GH #1045) with something to say.
 
     ``report`` is the report dict (see :func:`parse_datetime`); ``wave`` its
@@ -290,18 +308,25 @@ def _clear_datetime_reports() -> None:
 
 
 def replay_datetime_audit(reports: Any, country: str, table: str,
-                          wave: str | None = None) -> None:
+                          wave: str | None = None, waves=None) -> None:
     """Re-file and re-emit reports stamped into a parquet by its cold build.
 
     THE LINE THAT MAKES BUILD-TIME PARSING SAFE: without it the report is a
     cold-build-only event, and since practically all reads are warm the signal
     would disappear for everyone who did not do the build (#323).  ``wave``
-    fills a report that names none and never overrides one.
+    fills a report that names none and never overrides one.  ``waves``, when
+    given, keeps only reports about those waves (or naming none): a reader
+    served one wave must not be told -- or, under ``LSMS_DATE_STRICT``, fail --
+    about another (a multi-round folder's parquet carries every round's).
     """
     if not isinstance(reports, list):
         return
+    keep = None if waves is None else {str(w) for w in waves}
     for report in reports:
         if not isinstance(report, dict):
+            continue
+        if keep is not None and report.get("wave") is not None \
+                and str(report.get("wave")) not in keep:
             continue
         report = {**report, "country": country, "table": table, "from_cache": True}
         if wave is not None and report.get("wave") is None:
@@ -455,10 +480,27 @@ def _groups(index: pd.Index, wave) -> pd.Series:
     return pd.Series([wave] * len(index), index=index, dtype=object)
 
 
-def _examples(raw: pd.Series, mask: pd.Series) -> list[str]:
+def _examples(raw, mask: pd.Series) -> list[str]:
+    """Up to three distinct raw values under ``mask``.  ``raw`` is the input
+    Series or components DataFrame (components joined with '/'); only the
+    masked rows are stringified, so a 1M-row parse pays for a handful."""
     if not mask.any():
         return []
-    return [str(v) for v in pd.unique(raw[mask].astype(str))[:3]]
+    sub = raw[mask.to_numpy()]
+    out: list[str] = []
+    for start in range(0, len(sub), 64):
+        chunk = sub.iloc[start:start + 64]
+        if isinstance(chunk, pd.DataFrame):
+            vals = ["/".join("" if _blank(v) else str(v) for v in row)
+                    for row in chunk.astype(object).itertuples(index=False)]
+        else:
+            vals = ["" if _blank(v) else str(v) for v in chunk.astype(object)]
+        for v in vals:
+            if v not in out:
+                out.append(v)
+                if len(out) == 3:
+                    return out
+    return out
 
 
 class ParsedDatetime(NamedTuple):
@@ -484,8 +526,10 @@ def _check_spec(calendar, kind, components, stata, spss, fmt):
         bad = sorted(set(components) - set(COMPONENTS))
         if bad:
             raise DatetimeSpecError(f"parse_datetime: unknown component(s) {bad}; allowed {COMPONENTS}")
-        if kind == "date" and "y" not in components:
-            raise DatetimeSpecError("parse_datetime: a components date needs a `y` component")
+        need = {"date": "y", "month": "m", "year": "y"}[kind]
+        if need not in components:
+            raise DatetimeSpecError(
+                f"parse_datetime: a components {kind} needs a `{need}` component")
     if calendar == "ethiopian" and (stata or spss or fmt):
         raise DatetimeSpecError(
             "parse_datetime: stata/spss/format values are Gregorian encodings; "
@@ -517,8 +561,8 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
     window as ``outside_window`` and KEEPS them.
 
     Partial components: ``y`` and ``m`` with no ``d`` -> the first of the month,
-    keyed ``::::date-day-imputed``; ``y`` alone -> 1 January, keyed
-    ``::::date-month-day-imputed``; any other gap (a ``d`` without an ``m``) is
+    keyed ``::<table>::date-day-imputed``; ``y`` alone -> 1 January, keyed
+    ``::<table>::date-month-day-imputed``; any other gap (a ``d`` without an ``m``) is
     ``incomplete``.  Out-of-range components (month 13, day 32, 30 February,
     a year outside 1800-2100) are ``out_of_range`` -- counted, never rolled.
 
@@ -537,6 +581,9 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
         raise DatetimeSpecError(f"parse_datetime: resolution must be 'us' or 'day', got {resolution!r}")
     index = data.index
     n = len(index)
+    if n == 0:
+        empty = pd.Series([], index=index, dtype="datetime64[us]" if kind == "date" else "Int64")
+        return ParsedDatetime(empty, pd.Series([], index=index, dtype=object), [])
     cat = pd.Series("parsed", index=index, dtype=object)
     imputed = pd.Series(pd.NA, index=index, dtype=object)
     nums, strs = _norm_sentinels(sentinels)
@@ -544,8 +591,7 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
     examples: dict[str, pd.Series] = {}
 
     if components is not None:
-        raw = data.astype(object).where(data.notna(), "").astype(str).agg("/".join, axis=1) \
-            if n else pd.Series([], dtype=object)
+        raw = data
         comp: dict[str, pd.Series] = {}
         present: dict[str, pd.Series] = {}
         sent_any = pd.Series(False, index=index)
@@ -632,7 +678,7 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
         s = data
         if isinstance(s.dtype, pd.CategoricalDtype):
             s = s.astype(object)
-        raw = s.astype(object).astype(str).where(s.notna(), "")
+        raw = s
         sent = _is_sentinel(s, nums, strs)
         if pd.api.types.is_numeric_dtype(s.dtype) or pd.api.types.is_datetime64_any_dtype(s.dtype):
             blank = s.isna()
@@ -659,12 +705,21 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
         elif stata or spss:
             v = pd.to_numeric(s.where(live), errors="coerce")
             cat[live & v.isna()] = "unparsed"
+            # Convert to seconds since 1960-01-01 and bound it BEFORE pandas
+            # sees it: an absurd value (Stata day 1e8) must be counted
+            # out_of_range, not raise OutOfBoundsDatetime for the column.
             if stata == "td":
-                values = pd.to_datetime(v, unit="D", origin="1960-01-01", errors="coerce")
+                secs = v * 86400.0
             elif stata == "tc":
-                values = pd.to_datetime(v, unit="ms", origin="1960-01-01", errors="coerce")
+                secs = v / 1000.0
             else:   # SPSS: seconds since 14 Oct 1582
-                values = pd.to_datetime(v - 12219379200.0, unit="s", origin="unix", errors="coerce")
+                secs = v - (pd.Timestamp("1960-01-01") - pd.Timestamp("1582-10-14")).total_seconds()
+            lo_s = (pd.Timestamp(f"{_YEAR_RANGE[0]}-01-01") - pd.Timestamp("1960-01-01")).total_seconds()
+            hi_s = (pd.Timestamp(f"{_YEAR_RANGE[1] + 1}-01-01") - pd.Timestamp("1960-01-01")).total_seconds()
+            bad = v.notna() & ~((secs >= lo_s) & (secs < hi_s))
+            cat[live & bad] = "out_of_range"
+            secs = secs.where(~bad)
+            values = pd.Timestamp("1960-01-01") + pd.to_timedelta(secs.round(6), unit="s")
         else:
             txt = s.where(live).map(lambda x: str(x).strip(), na_action="ignore")
             if format is not None:
@@ -672,7 +727,12 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
             else:
                 parts = txt.astype(object).str.extract(_YEAR_LAST_DATE)
                 year_last = live & parts[0].notna()
-                values = _mixed(txt.where(~year_last))
+                # A two-digit year needs a century, and guessing one is the
+                # kind of silent choice this module refuses: give a format=.
+                two_digit = year_last & (parts[2].str.len() == 2)
+                cat[two_digit] = "ambiguous"
+                year_last = year_last & ~two_digit
+                values = _mixed(txt.where(~year_last & (cat == "parsed")))
                 if year_last.any():
                     a = pd.to_numeric(parts[0], errors="coerce")
                     b = pd.to_numeric(parts[1], errors="coerce")
@@ -688,6 +748,11 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
 
     if kind == "date":
         values = pd.to_datetime(values, errors="coerce").astype("datetime64[us]")
+        # The plausible-year bound applies to every input kind, not only to
+        # components: '9999-12-31' is a sentinel spelled as a date.
+        yr = values.dt.year
+        cat[(cat == "parsed") & values.notna() & ((yr < _YEAR_RANGE[0]) | (yr > _YEAR_RANGE[1]))] = "out_of_range"
+        imputed[cat != "parsed"] = pd.NA
         if resolution == "day":
             values = values.dt.floor("D")
         values = values.where(cat == "parsed")
@@ -704,7 +769,7 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
         outside = outside.fillna(False).astype(bool)
 
     derivation = pd.Series(
-        [DERIVATION_KEYS[k] if isinstance(k, str) and c == "parsed" else pd.NA
+        [derivation_key(k, table) if isinstance(k, str) and c == "parsed" else pd.NA
          for k, c in zip(imputed.tolist(), cat.tolist())], index=index, dtype=object)
 
     reports = []
@@ -731,7 +796,7 @@ def parse_datetime(data, *, calendar: str | None = None, kind: str = "date",
             rep[k] = int((msk & (imputed == k)).sum())
         rep["outside_window"] = int((msk & outside).sum())
         if rep["outside_window"]:
-            exs["outside_window"] = _examples(values.astype(str), msk & outside)
+            exs["outside_window"] = _examples(values, msk & outside)
         if exs:
             rep["examples"] = exs
         reports.append(rep)
@@ -766,13 +831,17 @@ def assign_datetime(df: pd.DataFrame, column: str, data, **kw) -> pd.DataFrame:
     the partial-date ``Derivation`` key, joined (``MULTI_SEP``, sorted) with a
     key the row already carries.  Returns a new frame; ``df`` is not mutated."""
     from .derivations import COLUMN, union_keys
+    if not data.index.equals(df.index):
+        raise ValueError(
+            f"assign_datetime({column!r}): `data` must carry exactly df's index, "
+            "in the same order -- values are assigned by position, so a "
+            "reordered index would put one row's date on another row.")
     res = parse_datetime(data, column=column, **kw)
     out = df.copy()
     out[column] = res.values.array
     keyed = res.derivation.notna()
     if keyed.any():
-        new = res.derivation.reindex(out.index) if not res.derivation.index.equals(out.index) \
-            else res.derivation
+        new = res.derivation
         if COLUMN in out.columns:
             old = out[COLUMN].astype(object)
             merged = [union_keys([o, k]) if pd.notna(k) else o

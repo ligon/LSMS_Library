@@ -12,10 +12,12 @@
 #
 # The first framework-level instances are the two partial-date paddings of the
 # build-time calendar parser (GH #1045, decision 3): a padded day is a
-# CONSTRUCTION, not a parser option.  Both apply to every table (empty table
-# slot) because any calendar column can be partial.
+# CONSTRUCTION, not a parser option.  Keyed per TABLE (`::<table>::<name>`), not
+# with an empty table slot: an empty slot attaches the entry -- at rows 0 -- to
+# every table in the corpus.  Every table in datetime_parse.CALENDAR_TABLES
+# must carry both entries (pinned by tests/test_gh1045_parse_datetime.py).
 
-::::date-day-imputed:
+::interview_date::date-day-imputed:
   columns: [Int_t]
   rule: >-
     A date whose source records a year and a month but no day (the day
@@ -37,7 +39,7 @@
       basis: modelling-choice
       evidence: "GH #1045 decision 3 (@ligon, 2026-10-18): partial dates are a registered derivation, not a parser option"
 
-::::date-month-day-imputed:
+::interview_date::date-month-day-imputed:
   columns: [Int_t]
   rule: >-
     A date whose source records a year but neither a month nor a day is served

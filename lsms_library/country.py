@@ -1343,7 +1343,10 @@ class Wave:
                   if key not in datetime_specs}
         for key, spec in datetime_specs.items():
             myvars.update(spec_source_vars(key, spec))
-        final_mapping['datetime_specs'] = datetime_specs
+        if datetime_specs:
+            # Only when present: callers that unpack the mapping as
+            # ``{file: ...}`` (ehcvm's raw-input lookup) must not see a new key.
+            final_mapping['datetime_specs'] = datetime_specs
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
@@ -1358,6 +1361,14 @@ class Wave:
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
                     for key, val in overrides.items():
+                        if key in datetime_specs or is_datetime_spec(val):
+                            # GH #1045: the spec's temporary source columns
+                            # were expanded once for every file; a per-file
+                            # override would be silently dropped.
+                            raise ValueError(
+                                f"{request}: a per-file override of the datetime "
+                                f"spec {key!r} ({file_name}) is not supported; "
+                                f"give every file the same source variables")
                         if key == 't':
                             idxvars_override[key] = (idxvars_updated[key][0], lambda x, val=val: val)
                         elif key in idxvars:
@@ -4209,7 +4220,7 @@ class Country:
                     # that is a separate, pre-existing gap.)
                     _DATETIME_LEDGER.pop((self.name, method_name), None)
                     replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
-                                          self.name, method_name)
+                                          self.name, method_name, waves=waves)
 
                 if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
                     df_cached = get_dataframe(parquet_path)
@@ -4797,7 +4808,7 @@ class Country:
                         # GH #1045: the date-parse report, by the same argument.
                         replay_datetime_audit(
                             read_parquet_datetime_audit(cache_path),
-                            self.name, method_name,
+                            self.name, method_name, waves=waves,
                         )
                         # GH #809: there is deliberately NO trust-once-and-stamp
                         # here any more.  A hashless country parquet is graded
@@ -4964,7 +4975,7 @@ class Country:
                             )
                             replay_datetime_audit(
                                 read_parquet_datetime_audit(cache_path),
-                                self.name, method_name,
+                                self.name, method_name, waves=waves,
                             )
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
                             cached_df = self._augment_index_from_related_tables(
@@ -7049,7 +7060,8 @@ def _replay_wave_stamp(path: Path | str, country: str, table: str, wave: str | N
     """
     _replay_grain_audit(read_parquet_grain_audit(path), country, table, wave=wave)
     # GH #1045: the build-time date-parse report rides in the same parquet.
-    replay_datetime_audit(read_parquet_datetime_audit(path), country, table, wave=wave)
+    replay_datetime_audit(read_parquet_datetime_audit(path), country, table, wave=wave,
+                          waves=None if wave is None else [wave])
 
 
 # Sites whose report is filed INSIDE a wave's build stage -- i.e. from within
