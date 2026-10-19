@@ -1,8 +1,9 @@
 """Concatenate wave-level community_prices for Niger (GAP C, item-level).
 
 Each wave's ``Niger/<wave>/_/community_prices.py`` writes a parquet indexed by
-``(t, v, j, u, obs)`` carrying the REPORTED community-questionnaire surveyed
-price (and the native price-per-quantity basis).  This script concatenates the
+``(t, v, j, u, variety, visit, obs)`` (GH #840) carrying the REPORTED
+community-questionnaire surveyed price (and the native price-per-quantity
+basis), one row per recorded price.  This script concatenates the
 waves that HAVE an EA-level community price module: only the two ECVMA waves
 (2011-12, 2014-15).  The EHCVM waves (2018-19, 2021-22) ship no cluster-level
 community price questionnaire — their region/market price survey
@@ -36,5 +37,7 @@ for t in WAVES:
 assert pieces, 'community_prices: no wave-level parquets found'
 
 p = pd.concat(pieces)
+assert p.index.is_unique, \
+    'community_prices: (t, v, j, u, variety, visit, obs) not unique after concat'
 
 to_parquet(p, '../var/community_prices.parquet')

@@ -1258,7 +1258,8 @@ def _finish_people_last7days(df, t):
 # any median / mean across clusters, or a community->household price join, is a
 # TRANSFORMATION over these rows, never a column here.
 #
-# GRAIN = (t, v, j, u).  This is a CLUSTER-level feature: `v` is the community
+# GRAIN = (t, v, j, u, variety, visit, obs) -- one row per SURVEY-RECORDED
+# price (GH #840).  This is a CLUSTER-level feature: `v` is the community
 # questionnaire's `grappe` (EA), formatted into the SAME v keyspace as
 # sample() (`v: grappe`/`v: GRAPPE` there), so community_prices.v == sample().v
 # for the same cluster and the surveyed price joins households.  There is NO
@@ -1266,6 +1267,25 @@ def _finish_people_last7days(df, t):
 # the index (not framework-joined).  `j` is on the SHARED harmonize_food
 # Preferred Labels (so a priced food joins food_acquired consumption and the
 # GAP-1 crop_production harvest); `u` on the shared `u` table.
+#   variety -- the cs07q02 variety CODE as a string ('7011' = product 701,
+#              variety 1).  CS07 prices 90 varieties of 45 products, and the
+#              variety often carries the unit basis ("mais blanc vendu en sac
+#              de 100 kg" vs "mais blanc vendu a la tia").  The code, not the
+#              label: the codes are identical in all three files while the
+#              labels change case (2011-12 p1 vs p2) and drop their product
+#              prefix (2014-15).  The file's own label is `Description`.
+#   visit   -- the field passage (2011-12: ecvmacoms07_p1 = 1, _p2 = 2;
+#              2014-15 is a single passage, 1).
+#   obs     -- the CS07 observation slot 1-3 (the form's 1st/2nd/3rd
+#              relevé).  A SECOND source record for the same (grappe,
+#              variety) in one file is enumerated as slot + 3, the GhanaLSS
+#              `obs` precedent: 2014-15 grappe 212 carries two questionnaires
+#              (numquest 1 and 2; the second numquest's records are slots
+#              4-6), and 2011-12 passage 2 re-ships 150 of its 232 grappes
+#              (see _community_price_triples).
+# NOTHING IS SELECTED.  Until GH #840 one row per (t, v, j, u) was kept --
+# post-harvest passage first, then questionnaire order -- and this comment's
+# own `obs` sentence below was not true of the code.
 #
 # WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
 # module.  The EHCVM waves (2018-19, 2021-22) replaced it with a separate
@@ -1344,24 +1364,57 @@ _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
 _COMMUNITY_MISSING_UNITS = {U_NA}
 
 
-def _community_price_triples(df, item_map, unit_map, triples, passage=1):
-    """Reshape a wide CS07 community-price frame into long (v, j, u, passage,
-    Price, Quantity) rows.
+def _community_price_triples(df, item_map, unit_map, triples, passage=1,
+                             codes=None):
+    """Reshape a wide CS07 community-price frame into long (v, j, u, variety,
+    visit, obs, Description, Price, Quantity) rows -- one per recorded price.
 
     `triples` is a list of (price_col, qty_col, unit_col) — the unit_col may be
     a single shared column repeated across triples (2014-15) or per-triple
     (2011-12).  The instrument records up to three within-questionnaire price
-    observations; each becomes a candidate row, and one reported price per
-    (t, v, j, u) is selected downstream in _finish_community_prices (NOT
-    averaged).  `v` is the grappe formatted into the sample() keyspace; `j` via
-    harmonize_food; `u` via the u table.  `passage` (the field visit: 1=post-
-    planting, 2=post-harvest) tags the rows for the post-harvest-first
-    selection.  Rows with no usable price (NA / 0 / sentinel) or a
-    missing-marker unit are dropped here so they never reach the index."""
+    observations; the k-th triple is observation slot `obs = k`.  `codes` is
+    the SAME file read with convert_categoricals=False (same rows, same
+    order): it supplies the cs07q02 variety CODE, and it is what the exact-
+    duplicate test runs on.  `v` is the grappe formatted into the sample()
+    keyspace; `j` via harmonize_food; `u` via the u table; `visit` is
+    `passage` (the field visit: 1 = post-planting, 2 = post-harvest).
+
+    Two source idiosyncrasies are handled here, both measured (GH #840):
+
+    * EXACT DUPLICATE ROWS are dropped first -- lossless.  2011-12 passage 2
+      ships 150 of its 232 grappes twice: 13,478 rows identical in every
+      column.
+    * A second record for the same (grappe, variety) that is NOT identical is
+      kept, as observation slots 4-6 (`obs = k + 3 * rank`, rank in
+      (numquest, file order)): the 22 such rows of 2011-12 passage 2, and
+      2014-15 grappe 212, which carries two questionnaires (numquest 1, 2).
+
+    Rows with no usable price (NA / 0 / sentinel) or a missing-marker unit are
+    dropped here so they never reach the index."""
+    if codes is None:
+        raise ValueError("_community_price_triples: pass `codes`, the same CS07 "
+                         "file read with convert_categoricals=False (GH #840)")
+    if len(codes) != len(df):
+        raise ValueError("_community_price_triples: `codes` and `df` differ in "
+                         "length; they must be the same file in the same order")
+    df = df.reset_index(drop=True)
+    codes = codes.reset_index(drop=True)
+    keep = ~codes.duplicated(keep='first')
+    df, codes = df[keep], codes[keep]
+
+    # Rank of a record among the file's records for its (grappe, variety):
+    # 0 for the first, 1 for a second questionnaire / re-entry, ...
+    order = (codes.sort_values('numquest', kind='stable').index
+             if 'numquest' in codes.columns else codes.index)
+    rank = (codes.loc[order].groupby(['grappe', 'cs07q02'], dropna=False)
+                 .cumcount().reindex(codes.index))
+
     v = df['grappe'].apply(tools.format_id).astype('string')
     j = _item_labels(df['cs07q01'].astype(str).str.strip(), item_map)
+    variety = pd.to_numeric(codes['cs07q02']).astype('Int64').astype('string')
+    description = df['cs07q02'].astype('string').str.strip()
     pieces = []
-    for pcol, qcol, ucol in triples:
+    for slot, (pcol, qcol, ucol) in enumerate(triples, start=1):
         price = pd.to_numeric(df[pcol], errors='coerce').astype('Float64')
         qty = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
         # Quantity 0 / 9999 / 99999 are "no answer" markers, not a measured
@@ -1372,8 +1425,10 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1):
         u = _unit_labels(df[ucol].astype(str).str.strip(), unit_map)
         piece = pd.DataFrame({
             'v': v.values, 'j': j.values, 'u': u.values,
+            'variety': variety.values, 'visit': passage,
+            'obs': (slot + 3 * rank).values,
+            'Description': description.values,
             'Price': price.values, 'Quantity': qty.values,
-            'passage': passage,
         })
         pieces.append(piece)
     out = pd.concat(pieces, ignore_index=True)
@@ -1385,21 +1440,22 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1):
     return out
 
 
+COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
+
+
 def _finish_community_prices(df, t):
     """Common tail for the wave-level community_prices scripts: tag t, coerce
-    numeric columns, drop rows missing any index key, SELECT one reported price
-    per (t, v, j, u), and build the (t, v, j, u) index.
+    numeric columns, drop rows missing any index key, and build the
+    (t, v, j, u, variety, visit, obs) index -- one row per survey-recorded
+    price.
 
-    The CS07 instrument records up to three within-questionnaire price
-    observations (2011-12 across two field passages too) per (cluster, item,
-    unit).  Mirroring the Mali EACI community_prices reference, ONE reported
-    observation is selected per (t, v, j, u) — post-harvest (passage 2) before
-    post-planting (passage 1), then questionnaire order via a stable sort — so
-    the result is a clean, item-level (t, v, j, u) grain carrying a genuinely
-    REPORTED price (NOT an across-observation mean — averaging is a
-    transformation).  This matches every sibling community_prices feature
-    (Mali / Malawi / Tanzania / Ethiopia / Nigeria), which all use (t, v, j, u)
-    with one reported price per cell."""
+    NO ROW IS SELECTED (GH #840; @ligon 2026-10-18).  Until #840 this kept ONE
+    observation per (t, v, j, u) -- post-harvest (passage 2) before
+    post-planting (passage 1), then questionnaire order -- and so discarded
+    other varieties, other passages and other observation slots of the same
+    cell, by row order.  A duplicate key is now an error: the instrument
+    records one price per (cluster, variety, passage, slot), and
+    _community_price_triples has already enumerated any second record."""
     df = df.copy()
     for col in ['Price', 'Quantity']:
         if col not in df.columns:
@@ -1409,8 +1465,10 @@ def _finish_community_prices(df, t):
     df['v'] = df['v'].astype('string')
     df['j'] = df['j'].astype('string')
     df['u'] = df['u'].astype('string')
-    if 'passage' not in df.columns:
-        df['passage'] = 1
+    df['variety'] = df['variety'].astype('string')
+    df['visit'] = pd.to_numeric(df['visit']).astype('int64')
+    df['obs'] = pd.to_numeric(df['obs']).astype('int64')
+    df['Description'] = df['Description'].astype('string')
     # Every index level must be non-null (the framework drops NaN-key rows).
     #
     # DELIBERATELY A DROP, NOT A `fill_missing_u` (GH #842).  Measured on the
@@ -1419,25 +1477,27 @@ def _finish_community_prices(df, t):
     # NO unit column value at all.  `community_prices.Price` is defined as the
     # price for `Quantity` units of `u`, so such a row has no basis to be a
     # price OF anything -- unlike a crop line, where the reported harvest
-    # Quantity is still a fact worth serving with an `Unknown` unit.  The
-    # served row count is therefore unchanged by #842 (15,423), and the drop
-    # is now counted here instead of being invisible.  Revisiting it is a
-    # data decision, not a sentinel decision.
+    # Quantity is still a fact worth serving with an `Unknown` unit.
+    # Revisiting it is a data decision, not a sentinel decision.  (The 795 is
+    # the pre-#840 count, taken before 2011-12 p2's duplicated grappe blocks
+    # were removed; it is a count of source rows, not of served rows.)
     df = df[df['v'].notna() & df['j'].notna() & df['u'].notna()]
-    # Select one observation per (t, v, j, u): post-harvest (passage 2) before
-    # post-planting (passage 1), then questionnaire order (stable sort).
-    df = df.reset_index(drop=True)
-    df['_porder'] = df['passage'].map({2: 0, 1: 1}).fillna(2).astype(int)
-    df = df.sort_values(['t', 'v', 'j', 'u', '_porder'], kind='stable')
-    df = df.drop_duplicates(subset=['t', 'v', 'j', 'u'], keep='first')
+    assert df['variety'].notna().all(), \
+        f"community_prices {t}: a priced row has no cs07q02 variety code"
+    dup = df.duplicated(COMMUNITY_PRICES_INDEX, keep=False)
+    assert not dup.any(), (
+        f"community_prices {t}: {int(dup.sum())} rows share a "
+        f"{tuple(COMMUNITY_PRICES_INDEX)} key -- a broken key, not a cell to "
+        "select from (GH #840)")
     # Redundant i==v level (positioned before j) so the framework's map_index
     # does not swap j->i for an i-less index; _normalize_dataframe_index then
-    # drops the undeclared i, leaving the canonical (t,v,j,u) grain.  Mirrors
-    # the Mali/Malawi/Tanzania/Ethiopia community_prices shim.
+    # drops the undeclared i, leaving the declared grain.  Mirrors the
+    # Mali/Malawi/Tanzania/Ethiopia community_prices shim.
     df['i'] = df['v']
-    keep = ['t', 'v', 'i', 'j', 'u', 'Price', 'Quantity']
+    keep = ['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs',
+            'Price', 'Quantity', 'Description']
     df = df[keep]
-    df = df.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
+    df = df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs']).sort_index()
     return df
 
 

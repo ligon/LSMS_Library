@@ -110,9 +110,9 @@ Index Info:
     # prices a (product, VARIETY) pair, in a field VISIT, as one of several
     # within-form OBSERVATIONS; `(t, v, j, u)` names none of the three, so
     # Mali, Niger and Tanzania each kept one row per key and dropped the rest
-    # (Mali 40,218 priced rows -> 23,646 served; Niger 2011-12 32,352 ->
-    # 8,923 and 2014-15 13,808 -> 6,500; Tanzania 17,699 -> 15,831), by row
-    # order or by a passage preference, silently.  Ruling (@ligon,
+    # (served rows before -> after #840: Mali 23,646 -> 40,218; Niger
+    # 15,423 -> 46,177; Tanzania 15,831 -> 17,699), by row order or by a
+    # passage preference, silently.  Ruling (@ligon,
     # 2026-10-18): add the level, so no row is selected -- the #871 "core
     # selects nothing silently" principle applied to the wave scripts.
     #   variety -- the instrument's own priced line, finer than `j`: Mali

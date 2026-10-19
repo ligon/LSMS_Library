@@ -10,19 +10,20 @@ observations is a (price, quantity, UNIT) triple with its OWN unit column:
   (cs07q06, cs07q07, cs07q08)  observation 2
   (cs07q09, cs07q10, cs07q11)  observation 3
 
-Both passages are read; one REPORTED price is selected per (t, v, j, u) —
-post-harvest (passage 2) before post-planting (passage 1), then questionnaire
-order — mirroring the Mali EACI community_prices reference (no averaging:
-a mean across observations / passages is a transformation).  Rows with no
-usable price, or a missing-marker unit ('produit absent' / 'manquant' ->
-'Unknown' since GH #842), are dropped.  Measured: 795 price-bearing
+Both passages are read, and every recorded price is served (GH #840) —
+none selected, none averaged: `variety` is the cs07q02 variety code, `visit`
+the passage (p1 = 1, p2 = 2), `obs` the observation slot 1 / 2 / 3.
+Passage 2 re-ships 150 of its 232 grappes as a second block: 13,478 of those
+rows are byte-identical and dropped (lossless); the 22 that differ are kept as
+obs 4-6.  Rows with no usable price, or a missing-marker unit ('produit
+absent' / 'manquant' -> 'Unknown' since GH #842), are dropped.  Measured: 795 price-bearing
 observations in this wave (218 passage 1, 577 passage 2) carry no unit value
 at all, and none of them carries a usable Quantity either -- neither a unit
 nor a weight, so no basis to be a price OF anything.  See
 niger.py::_finish_community_prices.
 
 CLUSTER-level feature (no household i): `v` is declared in the index, NOT
-framework-joined.  Index = (t, v, j, u).
+framework-joined.  Index = (t, v, j, u, variety, visit, obs).
 """
 import sys
 
@@ -48,8 +49,10 @@ triples = [
 pieces = []
 for fn, passage in [('ecvmacoms07_p1.dta', 1), ('ecvmacoms07_p2.dta', 2)]:
     src = get_dataframe(base + fn, convert_categoricals=True)
+    # Same file, raw codes: the cs07q02 variety CODE (GH #840).
+    codes = get_dataframe(base + fn, convert_categoricals=False)
     pieces.append(_community_price_triples(src, item_map, unit_map, triples,
-                                           passage=passage))
+                                           passage=passage, codes=codes))
 
 df = pd.concat(pieces, ignore_index=True)
 df = _finish_community_prices(df, '2011-12')

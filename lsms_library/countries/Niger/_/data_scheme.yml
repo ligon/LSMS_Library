@@ -419,15 +419,28 @@ Data Scheme:
     # community->household price join, is a TRANSFORMATION over these rows,
     # never a column here.
     #
-    # GRAIN (t, v, j, u) -- a CLUSTER-level feature, NOT household-level.  One
-    # REPORTED price per cell: the CS07 instrument records up to three within-
-    # questionnaire price observations (2011-12 across two field passages too)
-    # per (cluster, item, unit); ONE is selected -- post-harvest (passage 2)
-    # before post-planting (passage 1), then questionnaire order -- mirroring
-    # the Mali EACI community_prices reference.  This is a genuinely REPORTED
-    # price, NOT an across-observation mean (averaging is a transformation), and
-    # matches every sibling community_prices (Mali/Malawi/Tanzania/Ethiopia/
-    # Nigeria), which all use (t, v, j, u) with one reported price per cell.
+    # GRAIN (t, v, j, u, variety, visit, obs) -- a CLUSTER-level feature, NOT
+    # household-level, ONE ROW PER SURVEY-RECORDED PRICE (GH #840).  The CS07
+    # instrument prices a product VARIETY (cs07q02: 90 varieties of 45
+    # products, e.g. "mais blanc vendu en sac de 100 kg" vs "... a la tia"),
+    # in a field passage (2011-12 has two), with up to three within-
+    # questionnaire price observations.  Until #840 the grain was (t, v, j, u)
+    # and ONE row per cell was kept -- post-harvest first, then questionnaire
+    # order -- and 15,423 rows were served of what is now 46,177 (2011-12
+    # 8,923 -> 32,369, after the lossless exact-duplicate drop below; 2014-15
+    # 6,500 -> 13,808).
+    # Nothing is averaged and, now, nothing is selected.
+    #   variety -- the cs07q02 variety CODE as a string ('7011' = product 701,
+    #          variety 1).  The code, not the label: the codes agree across all
+    #          three files, the labels change case and drop their product
+    #          prefix.  The file's own label is Description.
+    #   visit -- the field passage: 2011-12 ecvmacoms07_p1 = 1, _p2 = 2;
+    #          2014-15 is one passage (1).
+    #   obs -- the observation slot 1 / 2 / 3.  A second source record for the
+    #          same (grappe, variety) is slot + 3, the GhanaLSS `obs`
+    #          precedent: 2014-15 grappe 212's second questionnaire, and the 22
+    #          non-identical rows of 2011-12 p2's re-shipped grappe blocks
+    #          (13,478 of that block's rows are byte-identical and dropped).
     #   v   -- the community questionnaire's grappe (EA), formatted into the
     #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
     #          community_prices.v == sample().v for the same cluster and the
@@ -461,9 +474,12 @@ Data Scheme:
     # The EHCVM waves (2018-19, 2021-22) replaced the community price module
     # with a separate region/market-level price survey (ehcvm_prix: region ×
     # milieu × point_de_vente, NO grappe -- not the EA grain; and ehcvm_nsu, a
-    # region/strata p50/mu MEDIAN -- a forbidden imputation), and 2018-19 ships
-    # no community price file at all.  Those two waves are silently absent (the
-    # concatenator skips a wave with no parquet), NOT faked.
+    # region/strata p50/mu MEDIAN -- a forbidden imputation).  [The claim that
+    # stood here, "2018-19 ships no community price file at all", is FALSE:
+    # s05_co_ner2018.dta is a grappe-grain price module, unwired -- see
+    # CONTENTS.org "2018-19 DOES ship a cluster-grain community price file".]
+    # Those two waves are silently absent (the concatenator skips a wave with
+    # no parquet), NOT faked.
     #
     # COLUMNS (reported, item-level):
     #   Price    -- the surveyed price recorded for `Quantity` units of the item
@@ -472,7 +488,11 @@ Data Scheme:
     #   Quantity -- the measured quantity Price was recorded for, in unit `u`
     #               (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  The
     #               per-kg unit value Price/Quantity (×kg-factor) is a transform.
-    index: (t, v, j, u)
+    #   Description -- the cs07q02 variety label of that file.
+    index: (t, v, j, u, variety, visit, obs)
     Price: float
     Quantity: float
+    Description:
+      type: str
+      optional: true
     materialize: make
