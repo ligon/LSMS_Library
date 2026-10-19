@@ -195,9 +195,15 @@ def test_w3_rounds_are_served(built):
 
 
 @pytest.mark.requires_s3
-def test_every_wave_parquet_is_written_on_i():
+def test_every_wave_parquet_is_written_on_i(built):
     """Structural, on what the wave scripts WROTE: the served frame alone
-    cannot tell, because ``map_index``'s legacy j->i swap rescued ``j``."""
+    cannot tell, because ``map_index``'s legacy j->i swap rescued ``j``.
+
+    Requests ``built`` for its side effect, not its value: on a root built
+    before this branch the country table is stale, so the fixture's read
+    evicts the hashless wave parquets and re-runs the wave scripts.  Without
+    it the test read whatever wave parquets were on disk -- run alone on a
+    pre-branch root it failed on the OLD scripts' ``['j', 't']``."""
     from lsms_library.paths import data_root
     parquets = sorted(data_root(COUNTRY).glob('*/_/interview_date.parquet'))
     waves = {p.parent.parent.name for p in parquets}
