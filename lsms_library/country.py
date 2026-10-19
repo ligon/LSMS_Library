@@ -36,7 +36,9 @@ from importlib.resources import files
 import importlib
 from collections import defaultdict
 from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
-from .local_tools import (CATEGORICAL_MAPPING_DIR, CATEGORICAL_MAPPING_FILE,
+from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
+                          CATEGORICAL_MAPPING_FILE,
+                          CATEGORICAL_RESERVED_COLUMNS,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -473,32 +475,112 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
 
-def _categorical_key_column(table: "pd.DataFrame") -> str | None:
-    """The source-label column of a categorical table (first non-Preferred)."""
-    cols = [c for c in table.columns if c != "Preferred Label"]
+def _categorical_key_column(table: "pd.DataFrame", idxvars: str | None = None,
+                            *, exclude=()) -> str | None:
+    """The KEY column of a categorical table -- the one resolver (GH #928).
+
+    Every read-time caller that turns a categorical table into a
+    ``key -> label`` lookup asks this function which column is the key: the
+    global/country row merge (:func:`_row_union_categorical`),
+    :meth:`Country._unit_kg_factors`, the auto-apply-by-name in
+    :meth:`Country._apply_categorical_mappings`, the ``cluster_features``
+    market-label normalisation in :meth:`Country._market_lookup`, and the
+    ``harmonize_<method>`` hook in :meth:`Country._finalize_result`.  Before
+    #928 the last three each re-derived it inline.
+
+    Resolution, first rung that answers wins:
+
+    1. ``idxvars`` -- an explicit caller choice (the house spelling, as in
+       ``get_categorical_mapping`` / ``code_label_map``).
+    2. the table's ``#+key:`` declaration, which ``all_dfs_from_orgfile``
+       records as ``table.attrs[CATEGORICAL_KEY_ATTR]``.
+    3. the first column that is neither reserved
+       (:data:`~lsms_library.local_tools.CATEGORICAL_RESERVED_COLUMNS`:
+       ``Preferred Label``, ``Status``, ``Notes``) nor in *exclude* -- the
+       historical positional rule, so an undeclared table keys exactly as it
+       always did, and adding a ``Status`` or ``Notes`` column re-keys
+       nothing.
+
+    *exclude* names the caller's VALUE column when it is not ``Preferred
+    Label`` (a ``labels=`` target), so a table cannot key on its own target.
+    A rung-1/2 answer that is in *exclude* returns ``None`` -- the caller's
+    "no key column" path -- never a silent fall to the positional rule.  A
+    declared or explicit key that is not a column of *table* raises
+    ``KeyError``: the table is malformed, which is loud by design.
+    """
+    excluded = set(exclude)
+    for chosen in (idxvars, table.attrs.get(CATEGORICAL_KEY_ATTR)):
+        if chosen is None:
+            continue
+        if chosen not in table.columns:
+            raise KeyError(
+                f"categorical key {chosen!r} is not a column of the table "
+                f"(columns: {list(table.columns)})")
+        return None if chosen in excluded else chosen
+    cols = [c for c in table.columns
+            if c not in CATEGORICAL_RESERVED_COLUMNS and c not in excluded]
     return cols[0] if cols else None
 
 
+class CategoricalKeyMismatchWarning(UserWarning):
+    """A ``#+key:`` declaration cut a country table off from its global rows.
+
+    Raised by :func:`_row_union_categorical` when an additive-merge table's
+    country and cross-country key columns differ AND either side declares its
+    key, so the merge falls back to the country table wholesale and serves
+    none of the global rows (GH #928, red team r1 F2).  An UNDECLARED mismatch
+    stays silent: it is the pre-existing positional behaviour (#832 -- Malawi,
+    Mali, Nigeria and Uganda ``u`` today), and a declaration is the point at
+    which someone has made a statement the merge then silently overrides.
+    """
+
+
 def _row_union_categorical(global_t: "pd.DataFrame",
-                           country_t: "pd.DataFrame") -> "pd.DataFrame":
+                           country_t: "pd.DataFrame", *,
+                           name: str | None = None,
+                           country: str | None = None) -> "pd.DataFrame":
     """Row-union a global and a country categorical table; country row wins.
 
-    Identity is the source-label key column (first non-``Preferred Label``
+    Identity is the key column of each side, as :func:`_categorical_key_column`
+    resolves it (a ``#+key:`` declaration, else the first non-reserved
     column).  Country rows override global rows with the same key; new
     country keys are added; global keys absent from the country table are
     kept.  Columns are outer-unioned (e.g. per-wave columns), with country
     values winning on overlap.  Falls back to the country table wholesale
-    when the two key columns don't agree (can't align).
+    when the two key columns don't agree (can't align) -- and, when either
+    side DECLARES its key, says so with :class:`CategoricalKeyMismatchWarning`
+    naming *name*, both keys and the global rows not inherited.
     """
     gk = _categorical_key_column(global_t)
     ck = _categorical_key_column(country_t)
     if gk is None or ck is None or gk != ck:
+        declared = [side for side, t in (("country", country_t),
+                                         ("cross-country", global_t))
+                    if CATEGORICAL_KEY_ATTR in t.attrs]
+        if declared:
+            where = f" on {country!r}" if country else ""
+            warnings.warn(
+                f"categorical table {name or '?'!r}{where}: the country table "
+                f"keys on {ck!r} but the cross-country table keys on {gk!r} "
+                f"(#+key: declared on the {' and '.join(declared)} side), so "
+                f"the additive merge cannot align rows and serves the country "
+                f"table wholesale -- {len(global_t)} cross-country row(s) are "
+                f"NOT inherited.  Key both sides on the same column to inherit "
+                f"them (GH #928).",
+                CategoricalKeyMismatchWarning, stacklevel=2)
         return country_t
     # country first + keep='first' => country rows win on key collision;
     # concat outer-joins columns (NaN-filled), so wave columns survive.
     combined = pd.concat([country_t, global_t], ignore_index=True, sort=False)
     combined = combined.drop_duplicates(subset=[ck], keep="first")
-    return combined.reset_index(drop=True)
+    combined = combined.reset_index(drop=True)
+    # concat keeps attrs only when both inputs agree, so a declaration on one
+    # side is dropped here; re-attach it, or the merged table would fall back
+    # to the positional rule and could re-key.
+    if (CATEGORICAL_KEY_ATTR in global_t.attrs
+            or CATEGORICAL_KEY_ATTR in country_t.attrs):
+        combined.attrs[CATEGORICAL_KEY_ATTR] = ck
+    return combined
 
 
 def _strip_string_values(s: pd.Series) -> pd.Series:
@@ -557,18 +639,21 @@ def _no_such_country_message(country_name: str) -> str:
     return msg
 
 
-def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
+def _merge_categorical_tables(global_maps: dict, country_maps: dict, *,
+                              country: str | None = None) -> dict:
     """Merge global and per-country categorical tables.
 
     Default is full-table override (country replaces global by name).  For
     names in :data:`_ADDITIVE_CATEGORICAL_TABLES`, the two are row-unioned
     (see :func:`_row_union_categorical`) when both exist, so the country
     inherits global rows and overrides only the keys it redeclares.
+    *country* only names the country in a key-mismatch warning.
     """
     merged = dict(global_maps)
     for name, ctab in country_maps.items():
         if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
-            merged[name] = _row_union_categorical(merged[name], ctab)
+            merged[name] = _row_union_categorical(merged[name], ctab,
+                                                  name=name, country=country)
         else:
             merged[name] = ctab
     return merged
@@ -2410,7 +2495,7 @@ class Country:
                     break
 
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
-                global_maps, country_maps)
+                global_maps, country_maps, country=self.name)
         return self.__dict__['_categorical_mapping_cache']
 
     def _unit_kg_factors(self) -> dict[str, float]:
@@ -2902,9 +2987,9 @@ class Country:
             if key is not None:
                 table = cat_maps[key]
                 if "Preferred Label" in table.columns:
-                    source_cols = [c for c in table.columns if c != "Preferred Label"]
-                    if source_cols:
-                        rdict = table.set_index(source_cols[0])["Preferred Label"].to_dict()
+                    source = _categorical_key_column(table)
+                    if source is not None:
+                        rdict = table.set_index(source)["Preferred Label"].to_dict()
                         cf[column] = cf[column].replace(rdict)
 
         if column not in cf.columns:
@@ -3326,8 +3411,9 @@ class Country:
         For each column or index level in *df*, check whether
         ``self.categorical_mapping`` contains a table with the same name
         (case-insensitive).  If the table has a ``Preferred Label``
-        column, build a replacement dictionary from the first other
-        column → ``Preferred Label`` and apply it.
+        column, build a replacement dictionary from its key column
+        (:func:`_categorical_key_column`: the table's ``#+key:``, else the
+        first non-reserved column) → ``Preferred Label`` and apply it.
 
         ``protect_u_sentinels`` (GH #361): when True, the country
         ``#+name: u`` table is not allowed to remap the framework's reserved
@@ -3388,19 +3474,20 @@ class Country:
                                 target: str = "Preferred Label") -> dict | None:
             if "Preferred Label" not in table.columns:
                 return None
-            # The key column is "the first column that is neither the canonical
-            # label nor the requested variant".  Excluding *target* is a
-            # provable no-op when target IS 'Preferred Label' (the default
-            # path); it matters only for a multi-label table whose variant
-            # column precedes its code column, where keying on the target
-            # would map every value to itself.  NOTE: the ordering itself is
-            # load-bearing and unguarded -- see the test
-            # ``test_source_cols_ordering_is_the_key_column``.
-            source_cols = [c for c in table.columns
-                           if c not in ("Preferred Label", target)]
-            if not source_cols:
+            # The key column comes from the one resolver (GH #928): the
+            # table's ``#+key:`` if it declares one, else "the first column
+            # that is neither reserved nor the requested variant".  Excluding
+            # *target* is a provable no-op when target IS 'Preferred Label'
+            # (the default path); it matters only for a multi-label table
+            # whose variant column precedes its code column, where keying on
+            # the target would map every value to itself.  NOTE: for an
+            # UNDECLARED table the ordering is still load-bearing -- see the
+            # test ``test_source_cols_ordering_is_the_key_column``; a
+            # ``#+key:`` line is what takes it out of play.
+            source = _categorical_key_column(table, exclude=(target,))
+            if source is None:
                 return None
-            rdict = table.set_index(source_cols[0])[target].to_dict()
+            rdict = table.set_index(source)[target].to_dict()
             # Numeric-code tables (e.g. a `Code` column 1, 2, 3) don't match
             # data that arrives as float-strings ('1.0') -- the documented
             # "format_id is applied to idxvars but not myvars" gotcha, which
@@ -3806,9 +3893,9 @@ class Country:
                     and 'j' in df.index.names):
                 ha_table = self.categorical_mapping.get(f'harmonize_{method_name}')
                 if ha_table is not None and 'Preferred Label' in ha_table.columns:
-                    src_cols = [c for c in ha_table.columns if c != 'Preferred Label']
-                    if src_cols:
-                        rdict = ha_table.set_index(src_cols[0])['Preferred Label'].to_dict()
+                    source = _categorical_key_column(ha_table)
+                    if source is not None:
+                        rdict = ha_table.set_index(source)['Preferred Label'].to_dict()
                         df = df.rename(index=rdict, level='j')
 
             # Normalise variant spellings to canonical forms

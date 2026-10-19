@@ -634,6 +634,22 @@ missing-unit sentinel below runs through, so this is not a cosmetic
 staleness: a reader who believed the old sentence would look for the
 relabel in the wrong place.
 
+*The =u= table's KEY is declared, not positional (GH #928, 2026-10-19).*
+The table carries both =Original Label= (the key) and a =Code= column
+beside it, so which one is the key is a real choice -- the only
+dual-column =u= table in the corpus that keys on the label.  It now says
+so with =#+key: Original Label= on the line ABOVE its =#+name: u= (below
+it, Org would attach the name to the keyword and leave the table unnamed),
+which the
+read-time callers (=_apply_categorical_mappings=, the global =u.org=
+merge, =_unit_kg_factors=) honour through
+=country._categorical_key_column=.  The build-time readers in =niger.py=
+already pass =idxvars='Original Label'= explicitly, so the declaration
+pins the existing choice and moved no served mapping (census:
+=slurm_logs/gh928_key_resolver/=).  Do not move =Code= in front of
+=Original Label= expecting the declaration to be cosmetic: it is what
+keeps a reordered table keyed correctly.
+
 The 2018-19 wave required a per-wave mojibake fix in
 =2018-19/_/mapping.py=; the 2021-22 wave does not (its .dta value
 labels are already correctly UTF-8 / Latin-1 round-trippable):

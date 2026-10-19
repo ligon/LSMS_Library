@@ -1176,3 +1176,51 @@ Measured against a base-commit build in a separate data root: 24,939 rows,
 recover PR #1025 =NaT= / ambiguity rows; there were none to recover (the
 base build already served 0 =NaT=).  Every per-wave parse report is clean
 (=parsed= = n), so Mali emits no date warning.
+
+* The =u= table is keyed at BUILD time in 2014-15 and at READ time elsewhere (GH #928, 2026-10-19)
+
+Mali's =#+name: u= table (=categorical_mapping.org=) is
+=| Code | Preferred Label | 2014-15 | 2018-19 | 2021-22 |=, and its =Code=
+column holds raw French unit *labels* (=Kilogramme=, =Tas=, =Sac moyen= ...),
+not numeric codes.  It is read two ways:
+
+- *2014-15 (EAC-I) canonicalises =u= at BUILD time*:
+  =2014-15/_/mapping.py:_unit_canonicalizer= reads the file by path and
+  =.replace()=s the three acquisition streams' units before the melt.
+- *The EHCVM waves get the read-time auto-apply by name* of the merged
+  =Country.categorical_mapping['u']=.
+
+Both now take the key column from the one resolver,
+=country._categorical_key_column= (=#+key:= if declared, else the first
+column that is neither =Preferred Label= nor a reserved curation column).
+Until the GH #928 red team (r1, F1) the build-time reader re-derived the key
+positionally -- the last such copy in the package -- so a =#+key:= on this
+table, or a =Status=/=Notes= column placed before =Code=, would have keyed
+build and read differently.  Routing it changed nothing served: cold
+=food_acquired()= before vs after, 431,046 rows, =assert_frame_equal=
+exact; 2014-15 slice 122,085 rows, 16 distinct =u=.
+
+*The build and read tables coincide only because of a fallback.*  Global
+=categorical_mapping/u.org= keys on =Original Label=; Mali's table keys on
+=Code=, so the additive merge cannot align rows and serves Mali's table
+wholesale (#832; Malawi, Nigeria and Uganda =u= the same).  If Mali were
+re-keyed to =Original Label= the read-time table would gain the global rows
+and the build-time canonicaliser, which reads the country file only, would
+not -- re-check that pairing before re-keying.  Declaring =#+key: Code= on
+this table keeps the fallback and now emits =CategoricalKeyMismatchWarning=.
+
+Two further facts about this table, both pre-existing and unchanged:
+
+- The five =| # crop_production harvest units ... |= style rows are parsed as
+  DATA rows (keys beginning ='# '=, empty =Preferred Label=).  Harmless to the
+  =.replace()= (no unit label equals them); #928's migration item 4.
+- *1,534 served 2014-15 =food_acquired= rows carry =u = 'unit'=*, a
+  spelling no source file holds (=s13q03b/04b/05b= in =EACIALI_p1/p2.dta=
+  have no =unit= value).  It is minted by =local_tools.map_index=, which
+  =Wave.grab_data= applies and which renames a missing =u= to ='unit'=: the
+  purchased stream keeps expenditure-only rows, and the raw files hold
+  exactly 1,912 rows with a positive =s13q03c=, no quantity and no unit --
+  the cold L2-wave parquet holds exactly 1,912 =u = 'unit'= rows, which the
+  =(t, v, i, j, u, s)= collapse (passage dropped) sums to 1,534.  That minted
+  spelling is the class the #1041 ruling forbids (a missing unit is
+  =U_UNKNOWN=, ='Unknown'=); drafted as its own issue, not fixed here.

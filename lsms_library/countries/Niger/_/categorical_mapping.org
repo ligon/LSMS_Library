@@ -87,6 +87,7 @@
 # 'Original Label', 'Preferred Label').
 
 
+#+key: Original Label
 #+name: u
 | Original Label        | Preferred Label  | Code | 2018-19          | 2021-22               |
 |-----------------------+------------------+------+------------------+-----------------------|
