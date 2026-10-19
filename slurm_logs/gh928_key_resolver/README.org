@@ -88,3 +88,11 @@ So the parser accepts =#+key:= only in the run of =#+= lines directly above
 =#+name:= and refuses it below, with the reason.  The DESIGN.org composition
 keywords (=#+keyspace:=, =#+fold:=, =#+column:=) are shown below =#+name:= too
 and inherit the same hazard.
+
+* Tests
+
+- =tests/test_categorical_key_resolver.py=: 40 passed (fails on the base at import).
+- Full suite, final tree, recipe =-n 7 --dist=loadfile=: =7639 passed, 277 skipped,
+  9 xfailed, 1 xpassed in 1503.68s=, 0 failed.  The XPASS
+  (=test_pakistan_cluster_features.py::test_extraction_is_cluster_grain=, a
+  non-strict existence proxy) is identical with base code on the base root.
