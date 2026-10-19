@@ -11,6 +11,8 @@ narrowings the corpus census forced (``local_tools`` block comment above
 ``_C1_RE``):
 
 * a UTF-8 double encoding (``b\\xc5\\x93uf``) is never re-decoded;
+* a UTF-8 double encoding TRUNCATED by the Stata string width (Nigeria
+  2018-19 ``S2AQ10``) is not re-decoded either;
 * the decision is per FILE: one hole byte, or one cp1252 symbol between two
   letters (the DOS code-page signature), and nothing in the file changes.
 
@@ -119,6 +121,50 @@ def test_a_refusing_label_in_an_unused_value_label_still_refuses(tmp_path):
     assert list(_read(p)["s"]) == ["Don\x92t know", "ok"]
 
 
+#: Nigeria 2018-19 ``sect2_harvestw4.dta``, value label ``S2AQ10`` code 6 (3,755
+#: rows): a UTF-8 double encoding TRUNCATED by the Stata string width -- the
+#: closing quote's ``\xe2\x80\x99`` lost its last byte.  The latin-1 -> UTF-8
+#: round trip fails on it, which is all the first version of the predicate
+#: asked, so the file was re-decoded to ``â€˜O LEVELâ€`` (r1 red team, §5.2).
+NIGERIA_S2AQ10_6 = ("6. SENIOR SECONDARY SCHOOL CERTIFICATE (SSS) /  "
+                    "\xe2\x80\x98O LEVEL\xe2\x80")
+
+
+def test_truncated_double_encoding_is_not_a_candidate():
+    assert not lt._cp1252_candidate(NIGERIA_S2AQ10_6)
+    assert not lt._cp1252_candidate("bÅ\x93uf")              # intact double, as before
+    # The test needs a COMPLETE multibyte sequence before the cut, so an
+    # accented cp1252 letter before a C1 symbol stays a candidate ...
+    assert lt._cp1252_candidate("caf\xe9\x85")               # café…
+    assert lt._cp1252_candidate("l\x92\xe9t\xe9\x85")          # l’été…
+    assert lt._cp1252_candidate("Frère, s\x9cur")
+    # ... and so does a cp866 word holding a UTF-8 lead followed by a C1 byte.
+    # The broader rule ("a lead + C1 continuation anywhere") dropped 40 of the
+    # 47 candidates of Kyrgyz 1996 ``ANTHFL96.DTA`` (``name``) and flipped
+    # that refused file to decoded.
+    assert lt._cp1252_candidate("P\xef\x83")                  # cp866 PяГ
+    assert lt._cp1252_candidate("\xe4\xc7\xec\xea\x83\xc9")      # cp866, invalid continuation
+
+
+def test_truncated_double_does_not_decide_or_join_the_file_verdict():
+    assert lt._cp1252_redecode_map({NIGERIA_S2AQ10_6}) == {}
+    assert lt._cp1252_redecode_map({NIGERIA_S2AQ10_6, "Men\x92s haircut"}) == {
+        "Men\x92s haircut": "Men’s haircut"}
+
+
+def test_truncated_double_label_is_served_untouched(tmp_path):
+    """Through ``get_dataframe``, frame and ``categories_only``: the truncated
+    label is served as read; a genuine cp1252 string in the same file is still
+    decoded."""
+    raw = pd.DataFrame({"v": [6, 1], "s": ["Men\x92s haircut", "ok"]})
+    labels = {"v": {1: "1. NONE", 6: NIGERIA_S2AQ10_6}}
+    p = _write(tmp_path / "k.dta", raw, value_labels=labels)
+    df = _read(p)
+    assert list(df["v"].astype(str)) == [NIGERIA_S2AQ10_6, "1. NONE"]
+    assert list(df["s"]) == ["Men’s haircut", "ok"]
+    assert _read(p, categories_only=True)["v"][6] == NIGERIA_S2AQ10_6
+
+
 # ---------------------------------------------------------------------------
 # The gates
 # ---------------------------------------------------------------------------
@@ -186,6 +232,13 @@ def test_ehcvm1_roster_label_is_served_decoded(rel):
     vals = set(_real(rel, "s01q02").dropna().astype(str))
     assert "Frère, sœur" in vals
     assert not any(lt._C1_RE.search(v) for v in vals)
+
+
+@pytest.mark.requires_s3
+def test_nigeria_truncated_double_label_is_untouched():
+    vals = set(_real("Nigeria/2018-19/Data/sect2_harvestw4.dta", "s2aq10").dropna().astype(str))
+    assert NIGERIA_S2AQ10_6 in vals
+    assert not any("â€" in v for v in vals)
 
 
 @pytest.mark.requires_s3

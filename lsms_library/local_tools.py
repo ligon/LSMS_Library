@@ -1448,7 +1448,19 @@ def _stata_release(head: bytes) -> int | None:
 #   ``_decode_mojibake`` hooks and the mojibake-keyed crosswalks depend on
 #   (``Senegal/_/CONTENTS.org``, "the ``u`` crosswalk is keyed on MOJIBAKE").
 #   A string whose latin-1 bytes are valid UTF-8 is therefore never a
-#   candidate, whatever else is in the file.
+#   candidate, whatever else is in the file -- and nor is one TRUNCATED
+#   mid-sequence by the Stata string width: valid UTF-8 up to an incomplete
+#   final sequence, after at least one complete multibyte sequence (Nigeria
+#   2018-19 ``sect2_harvestw4`` label ``S2AQ10`` code 6, ``...\xe2\x80\x98O
+#   LEVEL\xe2\x80``, which the round trip alone admitted and decoded to
+#   ``â€˜O LEVELâ€``).  The broader test "a UTF-8 lead followed by a C1
+#   continuation byte, anywhere" was measured and rejected: cp866 lower-case
+#   Cyrillic is 0xE0-0xEF and upper-case 0x80-0x9F, so a mixed-case word
+#   (``\xe1\x80`` = сА) matches it, and dropping such strings from the
+#   candidate set flipped Kyrgyz 1996 ``ANTHFL96.DTA`` from refused to
+#   decoded.  The truncation test also excludes one cp866 string in that
+#   file (``è¢\x83ç`` = швГч, a valid three-byte sequence then a lone lead);
+#   the file stays refused on its 46 other candidates.
 # * A DOS code page.  Kyrgyz Republic 1996-98 and Kazakhstan 1996 are cp866
 #   Cyrillic (``\x8d\x85\x92`` = НЕТ); Albania 2002-05 is cp437/cp850
 #   (``KOR\x80E`` = KORÇE, and ``Albania/2004/_/cluster_features.py`` keys on
@@ -1488,15 +1500,20 @@ _CP1252_WORD_INTERNAL = frozenset('ŠŒŽšœžŸ'
 
 def _cp1252_candidate(s) -> bool:
     """True for a str carrying a C1 code point that is not a UTF-8 double
-    encoding (and is latin-1 encodable, i.e. came out of a latin-1 decode)."""
+    encoding -- intact, or truncated at the end of the string (see the block
+    comment) -- and is latin-1 encodable, i.e. came out of a latin-1 decode."""
     if not isinstance(s, str) or not _C1_RE.search(s):
         return False
     try:
-        s.encode('latin-1').decode('utf-8')
+        b = s.encode('latin-1')
+        b.decode('utf-8')
     except UnicodeEncodeError:
         return False
-    except UnicodeDecodeError:
-        return True
+    except UnicodeDecodeError as exc:
+        # Truncated double: valid UTF-8 up to an incomplete final sequence,
+        # with at least one complete multibyte sequence before the cut.
+        return not (exc.reason == 'unexpected end of data'
+                    and max(b[:exc.start], default=0) >= 0x80)
     return False
 
 
