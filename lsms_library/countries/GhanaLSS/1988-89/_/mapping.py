@@ -145,6 +145,58 @@ def Int_t(value):
 Visits = range(1,7)
 
 
+#: Household-defining modules whose own ``CLUST`` column recovers the cluster
+#: of a household that the cover page ``Y00A.DAT`` (the ``sample`` source)
+#: omits: the roster and the two Section 12 food modules (GH #1008).
+_COVER_GAP_SOURCES = ('Y01A.DAT', 'Y12A.DAT', 'Y12B.DAT')
+
+
+def _cover_page_gaps(cover_households):
+    """Households a roster/food module records but ``Y00A.DAT`` omits (GH #1008).
+
+    Returns a frame with columns ``i``, ``v`` (formatted by this module's own
+    ``i()`` / ``v()``) and ``source`` (the module files naming the household),
+    one row per household absent from ``cover_households``.
+
+    The cluster is READ, not inferred: every one of these modules carries
+    ``CLUST`` on the household's own rows.  Two checks make the recovery
+    refuse rather than guess -- a household naming two clusters across the
+    sources, or one whose id does not begin with its ``CLUST``, raises.  The
+    second is the GLSS1/GLSS2 id structure, ``HID = CLUST * 100 + NH``, which
+    holds on 100% of rows of every file carrying both columns.
+
+    Deliberately NOT the union of every household file: the labour module
+    ``Y05B1.DAT`` alone names households of a cluster (2198) that has no cover,
+    roster or food record anywhere in GLSS2, and ``Y05E1.DAT`` / ``Y16*.DAT``
+    name a GLSS1 household (112516) the same way.  A one-module appearance
+    cannot be told from a mis-keyed id, so those stay out.  See
+    ``_/CONTENTS.org`` ("Four interviewed households are missing from the
+    cover page").
+    """
+    found = {}
+    for fn in _COVER_GAP_SOURCES:
+        d = tools.get_dataframe(str(path / 'Data' / fn))
+        pairs = d[['HID', 'CLUST']].drop_duplicates()
+        for hid, clust in zip(pairs['HID'], pairs['CLUST']):
+            h, c = i(hid), v(clust)
+            if h is None or c is None or h in cover_households:
+                continue
+            rec = found.setdefault(h, {'v': set(), 'source': []})
+            rec['v'].add(c)
+            rec['source'].append(fn)
+    rows = []
+    for h, rec in sorted(found.items()):
+        if len(rec['v']) != 1:
+            raise ValueError(f'household {h} names clusters {sorted(rec["v"])} '
+                             f'across {rec["source"]}')
+        (c,) = rec['v']
+        if not (h.startswith(c) and len(h) == len(c) + 2):
+            raise ValueError(f'household {h} does not carry its cluster {c} '
+                             f'as HID = CLUST * 100 + NH')
+        rows.append({'i': h, 'v': c, 'source': ','.join(sorted(set(rec['source'])))})
+    return pd.DataFrame(rows, columns=['i', 'v', 'source'])
+
+
 def sample(df):
     """Broadcast the cluster's Appendix I `Rural` onto its households.
 
@@ -175,6 +227,21 @@ def sample(df):
     attrs = _c.appendix_i_cluster_attributes('yr2', 2000)
 
     out = df.copy()
+
+    # ---- Households the cover page omits (GH #1008) ------------------------
+    # Y00A.DAT has no record for two households that the roster and/or the
+    # food modules DO record, with CLUST on their own rows (this wave: 220629
+    # in cluster 2206, 269433 in 2694).  Without a `sample` row their v-join
+    # returned NaN, and Feature assembly deleted their food rows as null-key
+    # rows.  Each is the 32nd household of a two-workload cluster whose cover
+    # lists 31.  Appended with the cluster their own records give; `Rural` and
+    # the weights below then treat them like every other household.
+    gaps = _cover_page_gaps(set(out.index.get_level_values('i')))
+    if len(gaps):
+        wave = out.index.get_level_values('t')[0]
+        extra = gaps[['i', 'v']].assign(t=wave).set_index(list(out.index.names))
+        out = pd.concat([out, extra[['v']]])
+        assert out.index.is_unique, 'cover-page gap duplicates a cover household'
     out['Rural'] = out['v'].astype(str).map(attrs['Rural'])
 
     # ---- Sampling weights (GH #713; @ligon, 2026-08-22) -------------------
