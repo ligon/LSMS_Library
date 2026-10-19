@@ -359,3 +359,32 @@ the population living in group quarters, institutions and temporary housing
 units, as well as the homeless population").  That the 2002-2003 documentation
 does not say so is a silence in this documentation, and must not be filled in
 from the 2007 wave of a different country entry.
+
+* Kinship: every blood code is "of the head / spouse" (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+The 2002 and 2003 rosters serve eight relationship labels.  Three blood codes
+name a relation "of the head / spouse" -- a child of the spouse alone is the
+head's stepchild, a parent of the spouse a parent-in-law -- so since
+2026-10-19 they carry no Affinity:
+
+| served label                       | tuple         | 2002  | 2003  |
+|------------------------------------+---------------+-------+-------|
+| =Child of the head / spouse=        | [-1, 0, null] | 5,949 | 2,341 |
+| =Grandchild of the head / spouse=   | [-2, 0, null] | 1,322 |   644 |
+| =Parents of the head / spouse=      | [1, 0, null]  |   611 |   227 |
+
+11,094 people (40.0% of the roster), all =consanguineal= before.
+=Son/daug. in law of the head/spouse= keeps [-1, 0, affinal]: an in-law of
+the head OR of the spouse is affinal either way.
+
+*Degeneracy that is the instrument, not a bug*: there is no sibling, uncle,
+nephew or cousin code at all, so =Distance= is 0 for every person except
+=Other relative= (434, Distance NA).  Do not "fix" it.
