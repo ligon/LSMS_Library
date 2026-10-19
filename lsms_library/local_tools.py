@@ -540,6 +540,50 @@ def _dvc_cache_path(fn) -> "Path | None":
         return None
 
 
+def source_tier(path: str | Path) -> str | None:
+    """Where ``get_dataframe`` would find the source at absolute ``path``,
+    WITHOUT reading it: ``"dvc"`` (a ``.dvc`` sidecar sits beside it -- checked
+    first, because ``get_dataframe`` refuses a workspace copy of a tracked
+    file), ``"local"`` (an untracked file on disk), or ``None`` (neither; only
+    the World Bank download is left).
+
+    Two ``stat`` calls.  GH #675 uses it to tell a ``dfs:`` sub-df whose
+    ``file:`` names no source at all -- a CONFIG bug -- from one whose source
+    exists but could not be fetched.
+    """
+    p = Path(path)
+    try:
+        if (p.parent / f"{p.name}.dvc").exists():
+            return "dvc"
+        if p.is_file():
+            return "local"
+    except OSError:
+        pass
+    return None
+
+
+def source_fetchable_fast(path: str | Path) -> bool:
+    """Can the source at absolute ``path`` be read from the FAST tiers -- an
+    untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
+    blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+
+    Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
+    streaming fallback (a sidecar-tree walk) and no World Bank download.  This
+    is the GH #675 heal probe, run on a warm read once per degraded source per
+    process; through ``get_dataframe`` an unfetchable source cost 47-64 s
+    there (the WB fall-through).  Writes nothing into ``countries_root()``
+    (GH #831): the only possible write is the blob into ``_DVC_CACHE_DIR``,
+    exactly what a build's own read would do.  Does not parse the file.
+    """
+    tier = source_tier(path)
+    if tier == "local":
+        return True
+    if tier == "dvc":
+        _ensure_dvc_pulled(path)
+        return _dvc_cache_path(path) is not None
+    return False
+
+
 def _gc_stale_dvc_lock() -> None:
     """Best-effort cleanup of orphaned ``.dvc/tmp/*lock*`` files.
 
@@ -2393,6 +2437,23 @@ _GRAIN_AUDIT_KEY = b"lsms_grain_audit"
 # and reintroduce the rebuild loop in a narrower case.
 _CACHE_WAVES_KEY = b"lsms_cache_waves"
 
+# GH #675.  Schema-metadata key under which a build records the ``dfs:``
+# sub-frames it DROPPED (the GH #515 fallback), alongside the content hash and
+# by the same argument (rotates atomically with the data; cannot desync;
+# removed by ``cache clear``).
+#
+# WHY THIS EXISTS -- the content hash covers the inputs a build DECLARED, not
+# what it managed to READ.  A secondary sub-df whose file could not be fetched
+# is dropped softly (that is #515's whole point: a partial-data checkout must
+# not hard-fail), so the parquet is written without the columns that sub-df
+# alone supplied -- under a perfectly valid hash, which every later warm read
+# grades ``fresh``.  CotedIvoire ``cluster_features`` was served without
+# Latitude/Longitude that way.  This key is the evidence the hash cannot carry;
+# ``Country._read_l2_country_cache`` and ``Wave.grab_data`` grade a parquet
+# whose drops cost a REQUIRED column ``degraded``.  See
+# ``country._degraded_cache_verdict``.
+_BUILD_DROPS_KEY = b"lsms_build_drops"
+
 # Extensions treated as survey source data when scanning script-path
 # tables for literal file references.
 _DATA_SUFFIXES = (".dta", ".csv", ".tab", ".dat", ".sav", ".txt", ".xlsx",
@@ -2584,6 +2645,39 @@ def read_parquet_cache_waves(path: str | Path) -> list[str] | None:
     return [str(w) for w in waves]
 
 
+def read_parquet_build_drops(path: str | Path) -> list[dict] | None:
+    """Return the dropped-sub-df record embedded in an L2 parquet (GH #675),
+    or ``None`` when the build that wrote it dropped nothing.
+
+    Each entry is one sub-df the GH #515 fallback dropped: ``wave``, ``sub``,
+    ``file`` (relative to the countries root), ``kind`` (``unavailable`` or
+    ``config``), ``cause`` (``None``, ``missing-column`` or
+    ``no-such-source``), ``error``, and ``missing_required`` /
+    ``missing_optional`` (the declared columns that sub-df alone would have
+    supplied; ``missing_optional`` is absent from first-pass stamps).
+    Footer-only read (~1 ms), safe on the warm-read hot path.
+    """
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except Exception:
+        return None
+    if not md:
+        return None
+    raw = md.get(_BUILD_DROPS_KEY)
+    if raw is None:
+        return None
+    if isinstance(raw, (bytes, bytearray)):
+        raw = raw.decode()
+    try:
+        drops = json.loads(raw)
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(drops, list):
+        return None
+    return [d for d in drops if isinstance(d, dict)] or None
+
+
 def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     """Classify an L2 parquet against the expected content hash.
 
@@ -2639,7 +2733,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, build_drops: list[dict] | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -2674,6 +2768,10 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         from, which is what lets a later request for a subset of them be
         served from this file instead of rebuilding.  See
         :func:`read_parquet_cache_waves`.
+    build_drops : list[dict] | None, default None
+        If given, embed the ``dfs:`` sub-frames this build DROPPED under
+        ``lsms_build_drops`` (GH #675), so a warm read can tell a degraded
+        build from a complete one.  See :func:`read_parquet_build_drops`.
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -2723,7 +2821,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves:
+    if cache_hash is not None or grain_audit or cache_waves or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -2738,6 +2836,9 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
+        if build_drops:
+            # GH #675: carry what the build could NOT read with what it wrote.
+            md[_BUILD_DROPS_KEY] = json.dumps(build_drops, default=str).encode()
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, fn)
     else:
