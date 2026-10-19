@@ -202,8 +202,9 @@ through =food_acquired_for_wave= fails loudly (=KeyError: '2023-24'= from
 labels -- 48,305 (2018Q3) + 50,181 (2019Q1) rows -- while W4 records the
 size separately in =s7bq2c=/=s7bq9c=/=s10bq2c=/=s10bq9c=, which no build
 reads; W4 also differs *within* the wave by round (PH 40 =DERICA/TIN=, PP 40
-=DERICA=; PH 120 =SACHET=, PP 120 =PACKET/SACHET=).  (b) W1-PH labels state
-weights (=Sack/Bag: Small (20 kg)=) that the cleaned labels drop.
+=DERICA=; PH 120 =SACHET=, PP 120 =PACKET/SACHET=).  (b) /Resolved by GH
+#1035 (2026-10-19), see below/: W1-PH labels state weights
+(=Sack/Bag: Small (20 kg)=) that the cleaned labels used to drop.
 
 *Correction to the GH #223 note above*: "Residual codes =131, 151, 152= (W3)
 have *no label even in the =.dta=*" holds for the post-HARVEST file only.
@@ -238,6 +239,84 @@ The 847 rows are kept (=food_quantities= carries them at their native quantity
 under =u='Unknown'=); only their kilograms and their kg-price go.  The unwired
 =individual_unit_values.py= scripts in 2012-13/2015-16/2018-19 still mint
 ='None'=; nothing served reads them.
+
+** W1 post-harvest units keep the weight the survey states (GH #1035, 2026-10-19)
+
+/Ruling (@ligon, 2026-10-18)/: keep the survey-stated weight in the unit
+label, so =transformations._parse_explicit_metric= uses it.
+
+*The idiosyncrasy.*  W1-PH's food module (=sect10b_harvestw1=) prints only
+codes 1-4 (Kg, g, l, ml) on the questionnaire, but its =.dta= value-label set
+=SP10BQ2B= carries the *agriculture* production-unit card -- the same 33
+sized codes 11-95 as the harvest unit =sa3q6b= (beside 1-4) -- and every sized
+code states a weight: code 11 =Sack/Bag: Small (20 kg)= ... code 83
+=Pick-up Van: Big (2,500 kg)=, codes 91-95 =Jerry can, Keg, Rubber of Palm
+oil: Small(10 Lt.)= ... =Drum (200 Lt.)=.
+Three labels are truncated at Stata's 60 characters (=61 Bundle ...: Small (1=,
+=62 ...: Medium (=, =63 ...: Big (40=).  *The W1 release also ships the
+survey's own conversion file =2010-11/Data/w1agnsconversion.csv=*
+(=cropname, agcropid, nscode, conversion=; 2,111 rows): its value is constant
+across crops for every sized =nscode= and equals the label weight, which is
+where the three Bundle weights (15 / 25 / 40 kg) come from.  It is wired to
+nothing (nor are its siblings =2012-13/Data/w2agnsconversion.csv=,
+=food_conv_w2pp.csv= / =food_conv_w2ph.csv=, =2015-16/Data/food_conv_w3=,
+=ag_conv_w3=).
+
+*What changed.*  Only the =2010-11= column of =categorical_mapping.org=
+=#+name: u= (and, for the W1-only codes 22-24, 32-34, 53, 63, 73-74, 83, 93-95,
+its Preferred Label, which equals the column): =Sack/Bag Small= ->
+=Sack/Bag Small (20 kg)=, ..., =Jerry Can Drum= -> =Jerry Can Drum (200 l)=.
+Spellings: =kg= for mass; =l= (this table's litre label) for the jerry cans,
+which are a VOLUME, so =volume_as_mass=False= still declines them; no
+thousands separator, because =_parse_explicit_metric('... (1,500 kg)')= is
+500.  Colliding codes keep their W3/W4 Preferred Label (#607).
+
+*Census -- the defect is W1-PH only (food).*  Codes carrying a weight in the
+unit columns each build READS, rows with a quantity: 2011Q1 =s10bq3b= 2,617,
+=s10bq5b= 1,062, =s10bq6b= 130; every other round 0.  W1-PP's label set is
+the six simple codes; W2's sixteen are weightless; W3's =s10bq2b= / =s7bq2b=
+carry =190-193 JERRY CAN/RUBBER 10-50 LITRES=, which no row of either
+round uses (the per-source label sets do not list them); W4
+states sizes in separate SIZE variables (=s7bq2c= / =s10bq9c=, set =LABB=,
+e.g. =11. 50 KG=) and every W4 source is served the survey's =*_cvn= factor
+(=survey_kg=).
+
+Measured on private roots (before = =backlog/base-2026-10-19= 92631d56b in its
+own root, after = this change; Nigeria rebuilt in both):
+
+| | before | after |
+|-+-+-|
+| 2011Q1 rows on a sized code (purchased / produced / in-kind) | 2,617 / 1,062 / 130 = 3,809 | same rows, relabelled |
+| their =KgFactorSource= | =item_unit= 2,733, =unit= 1,067, =none= 9 | =metric= 3,809 |
+| their kg (purchased / produced / in-kind) | 20,302.7 / 17,243.6 / 925.2 = 38,471.5 | 55,401.7 / 38,833.9 / 2,240.7 = 96,476.3 |
+| =kg_factor_sources= metric / item_unit / unit / none | 250,905 / 122,680 / 54,696 / 859 | 254,714 / 119,947 / 53,629 / 850 |
+| =kg_factor_baseline_gate= rows refused | 42,560 | 42,221 |
+| =food_quantities(units='kgs')= kg, 2011Q1 | 261,088.89 | 319,093.74 (+58,004.85, +22.2%) |
+| =food_quantities(units='kgs')= kg, total | 1,482,720.76 | 1,540,725.62 |
+| every other round's kg | | byte-identical |
+| =food_prices= rows, kgvalue / unitvalue | 481,191 / 481,613 | unchanged; 2,574 kgvalue cells (all 2011Q1) change value, median after/before 0.267 |
+| =food_acquired= rows / Expenditure / Quantity | 595,725 / 196,081,393.67 | unchanged (only =u= spellings) |
+| =crop_production=, =harvest_kg= | | unchanged (crop =u= is =_canon_unit='s base label) |
+
+*The stated weight is the survey's number, and for a minority of rows it is
+not believable* -- recorded here because it is where the kilograms moved, not
+as a reason to undo the ruling.  The card is the HARVEST-container card.  On
+the 2,574 priced purchased rows, the stated weight implies a Naira/kg whose
+ratio to the same item's own =Kg=-row median is 0.016 / 0.05 / 0.44 / 1.2 /
+3.3 at p10/25/50/75/90.  71% of these rows record a FRACTION of a container
+(median quantity 0.06 of a =Sack/Bag Small=, 0.2 of a =Basin Small=), and
+those price close to the item's =Kg= rows -- consistent with the respondent
+reading the card.  But the 746 rows priced below a tenth of the item's =Kg=
+price carry 39,651 of the 46,600 purchased kg: =Leaves (Cocoyam, Spinach,
+etc.)= on =Bundle Small (15 kg)= (146 rows, median ratio 0.027), =Beef= and
+=Fish--frozen= on =Basin Small (10 kg)= (0.034, 0.041), =Plantains= on
+=Bunch Small (5 kg)= (0.084), =Fresh Pepper= on =Sack/Bag Small (20 kg)=
+(0.019).  A bundle of spinach is not the card's 15 kg bundle of millet.  The
+price-ratio factors these rows had before were consistent with price by
+construction and inconsistent with the survey; the stated ones are the
+reverse.  The produced and in-kind rows (40,000 kg of the 96,476) carry no
+price to check.  No mechanism today refuses a =metric= factor for an
+(item, unit) cell (=no_kg_factor.yml= removes only inferred rungs).
 
 * Sampling Design
 
