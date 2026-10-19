@@ -1939,6 +1939,11 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
     return out
 
 
+# ``df_data_grabber``'s own keyword options.  Every OTHER keyword reaching it
+# names a value column (a myvar); see get_categorical_mapping (GH #674).
+_GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
+
+
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
                             dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
@@ -1995,8 +2000,19 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     'categorical_mapping.org'. But if fn is a path to a dta file instead,
     returns categories for tablename from the stata file.
 
-    A bare ``get_categorical_mapping(tablename=...)`` returns an EMPTY dict --
-    no value column is passed.  Prefer :func:`code_label_map`.
+    **A value column is REQUIRED for an org table** (GH #674).  The value
+    columns are the keyword arguments other than ``df_data_grabber``'s own
+    options (``convert_categoricals``, ``encoding``, ``missing_ok``) -- e.g.
+    ``**{'Preferred Label': 'Preferred Label'}``.  A bare
+    ``get_categorical_mapping(tablename=...)`` used to return an EMPTY dict
+    (or an empty frame with ``asdict=False``), silently: ``df_data_grabber``
+    got ``idxvars`` and no myvars, so every column but the key was dropped and
+    every later lookup missed.  That is GhanaLSS "Trap 1"
+    (``GhanaLSS/_/CONTENTS.org``), which shipped 100%-null columns three
+    times.  It now raises :class:`TypeError` before any file is read, for
+    either ``asdict``; :func:`code_label_map` is the ``Code -> Label`` lookup
+    most bare callers wanted.  The ``.dta`` form needs no value column and is
+    unaffected.
     """
     ext = Path(fn).suffix
 
@@ -2006,6 +2022,24 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             return cats
         else:
             return cats[tablename]
+
+    if tablename is not None and not set(kwargs) - _GRABBER_OPTIONS:
+        # The code_label_map hint fits only the key the caller named.
+        if idxvars == 'Code':
+            hint = (f"For a Code -> Label lookup use "
+                    f"code_label_map({tablename!r}, dirs).")
+        elif isinstance(idxvars, str):
+            hint = (f"For a single-column lookup keyed by {idxvars!r} use "
+                    f"code_label_map({tablename!r}, dirs, "
+                    f"idxvars={idxvars!r}, value=<value column>).")
+        else:
+            hint = (f"If the table is keyed Code -> Label, use "
+                    f"code_label_map({tablename!r}, dirs).")
+        raise TypeError(
+            f"get_categorical_mapping(tablename={tablename!r}) needs a value "
+            f"column, e.g. **{{'Preferred Label': 'Preferred Label'}}; "
+            f"without one it can only return an empty mapping (GH #674). "
+            + hint)
 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
@@ -2020,7 +2054,9 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             else:
                 path = d+fn
             df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
-            df = df.squeeze()
+            # Columns only: a one-row table must stay a Series/frame, not
+            # collapse to a scalar (GH #674).
+            df = df.squeeze(axis=1)
             if asdict:
                 return df.to_dict()
             else:
@@ -2042,9 +2078,10 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
 
     **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
     and, unless the caller supplies a value column as a keyword, no myvars --
-    so ``df_data_grabber`` drops the Label column and the squeeze returns an
-    *empty dict*.  Every lookup against it then misses and silently yields
-    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+    so ``df_data_grabber`` dropped the Label column and the squeeze returned an
+    *empty dict*.  Every lookup against it then missed and silently yielded
+    ``pd.NA``; the column simply came out 100% null.  Since GH #674 that bare
+    call raises ``TypeError`` pointing here.
 
     That failure mode has bitten GhanaLSS three separate times:
 
