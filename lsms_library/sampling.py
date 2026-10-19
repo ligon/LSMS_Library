@@ -660,11 +660,23 @@ def sampling_records(country: str) -> dict[str, SamplingRecord]:
 # ---------------------------------------------------------------------------
 
 def _wave_labels(df) -> list[str] | None:
-    """The distinct ``t`` values of *df*, or ``None`` when it has no ``t``."""
+    """The distinct ``t`` values of *df*, or ``None`` when it has no ``t``.
+
+    Population's reader, plus one fast path: on a ``MultiIndex`` the labels
+    are read off the level's CODES rather than by materialising the level --
+    measured on GhanaLSS ``food_acquired`` (5.3M rows), 0.9 s per call the
+    slow way, which this runs on every read of every table of a curated
+    country.
+    """
     try:
         names = list(df.index.names)
     except AttributeError:
         return None
+    if isinstance(df.index, pd.MultiIndex) and "t" in names:
+        n = names.index("t")
+        codes = np.asarray(df.index.codes[n])
+        used = np.unique(codes[codes >= 0])
+        return sorted({str(df.index.levels[n][c]) for c in used})
     values = None
     if "t" in names:
         try:
@@ -860,15 +872,7 @@ def outermost_call(fn):
 
 
 def _frame_waves(df) -> set[str] | None:
-    """Distinct ``t`` values, read off the MultiIndex codes when possible
-    (no materialisation of a multi-million-row level)."""
-    idx = df.index
-    names = list(idx.names)
-    if isinstance(idx, pd.MultiIndex) and "t" in names:
-        n = names.index("t")
-        codes = np.asarray(idx.codes[n])
-        used = np.unique(codes[codes >= 0])
-        return {str(idx.levels[n][c]) for c in used}
+    """Distinct ``t`` values as a set (see :func:`_wave_labels`)."""
     labels = _wave_labels(df)
     return None if labels is None else set(labels)
 
