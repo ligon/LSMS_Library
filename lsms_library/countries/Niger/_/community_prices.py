@@ -1,13 +1,16 @@
 """Concatenate wave-level community_prices for Niger (GAP C, item-level).
 
 Each wave's ``Niger/<wave>/_/community_prices.py`` writes a parquet indexed by
-``(t, v, j, u, obs)`` carrying the REPORTED community-questionnaire surveyed
-price (and the native price-per-quantity basis).  This script concatenates the
-waves that HAVE an EA-level community price module: only the two ECVMA waves
-(2011-12, 2014-15).  The EHCVM waves (2018-19, 2021-22) ship no cluster-level
-community price questionnaire — their region/market price survey
-(ehcvm_prix, not at the grappe grain) and the ehcvm_nsu median are NOT this
-feature — so they have no wave script / parquet and are silently skipped here.
+``(t, v, j, u, variety, visit, obs)`` (GH #840) carrying the REPORTED
+community-questionnaire surveyed price (and the native price-per-quantity
+basis), one row per recorded price.  This script concatenates the
+waves WIRED with an EA-level community price module: only the two ECVMA waves
+(2011-12, 2014-15).  2021-22's region/market price survey (ehcvm_prix, not at
+the grappe grain) and the ehcvm_nsu median are NOT this feature.  [2018-19 is
+NOT without one, as this docstring used to say: s05_co_ner2018.dta is a
+grappe-grain price module, unwired -- CONTENTS.org "2018-19 DOES ship a
+cluster-grain community price file".]  Waves with no wave script / parquet
+are silently skipped here.
 
 ``v`` is the community questionnaire's EA (grappe) formatted into the sample()
 v keyspace; it IS in the index (cluster-level feature, no household i), so the
@@ -36,5 +39,7 @@ for t in WAVES:
 assert pieces, 'community_prices: no wave-level parquets found'
 
 p = pd.concat(pieces)
+assert p.index.is_unique, \
+    'community_prices: (t, v, j, u, variety, visit, obs) not unique after concat'
 
 to_parquet(p, '../var/community_prices.parquet')
