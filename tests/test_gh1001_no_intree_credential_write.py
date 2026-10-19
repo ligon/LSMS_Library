@@ -56,7 +56,11 @@ def _countries_tree(root: Path) -> Path:
         if (REAL_DVC / name).exists():
             shutil.copy2(REAL_DVC / name, dvc / name)
     # DVC's Repo makes ``.dvc/tmp`` with exist_ok=True: a no-op on a
-    # read-only tree only if the directory is already there, as in a wheel.
+    # read-only tree only if the directory is already there.  A wheel does
+    # NOT ship it (0.15.0 carries no ``.dvc/tmp/``), and even with it a
+    # read-only tree fails the first READ at ``.dvc/tmp/btime`` -- the
+    # import cases below pass only because ``__init__`` swallows that
+    # OSError.  Measured and reported under GH #1032.
     (dvc / "tmp").mkdir()
     assert (dvc / "config").exists(), "the remote stanza needs .dvc/config"
     assert not (dvc / "s3_creds").exists()
@@ -69,10 +73,10 @@ def _snapshot(root: Path) -> dict[str, str]:
     Digests, never contents: a failing comparison must not print a
     credential into the test log.
 
-    ``.dvc/tmp/`` is excluded: it is DVC's own scratch directory (constructing
-    the ``DVCFileSystem`` drops a ``btime`` marker there on a writable tree,
-    and tolerates a read-only one).  That is a separate runtime write, not a
-    credential, and is reported as a residual of #1001 rather than pinned.
+    ``.dvc/tmp/`` is excluded: it is DVC's own scratch directory (building
+    the ``DVCFileSystem``'s repo drops a ``btime`` marker there on a writable
+    tree; ``Repo.tmp_dir`` has no config override).  That is a separate
+    runtime write, not a credential, and is GH #1032 rather than pinned.
     """
     out = {}
     for dirpath, dirnames, filenames in os.walk(root):
