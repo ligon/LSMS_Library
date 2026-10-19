@@ -275,7 +275,8 @@ def food_acquired(df):
         # item, is coded 14 in 49 of its 59 unit-coded rows: on the D-section
         # lists that is Litres, and it is on no E3 list.  That favours one
         # unified data-entry scheme over per-page coding without proving it,
-        # and code 21 is on no food list held.  So ``u`` carries the raw unit
+        # and code 21 is on no consumption list held (its only printed 21 is
+        # the I-Questionnaire grain-unit list's 'Other').  So ``u`` carries the raw unit
         # *code* here -- a unit token on the unit axis, NOT a food label
         # (#347), and NOT a 1994+ label.
         #

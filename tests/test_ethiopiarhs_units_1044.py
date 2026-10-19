@@ -15,7 +15,8 @@ Three leaks in the unit axis ``u`` of ``EthiopiaRHS.food_acquired``:
 
 * **1994a-1997, missing units.**  A row that carries an item and a quantity or
   value but no unit used to be DROPPED (212 served rows, 492.65 Birr; 214 /
-  494.4 before two exact double-punches are removed).  Under #1041 a missing
+  494.4 before two rows equal on the melted grain (i,j,u,s,Quantity,
+  Expenditure) are removed by ``_drop_double_punched``).  Under #1041 a missing
   unit is ``U_UNKNOWN``, never a silent drop, and the kg ladder serves it
   ``none``.
 
@@ -170,7 +171,9 @@ class TestBuilt:
 
     def test_missing_units_after_1989_are_unknown_not_dropped(self, fa, idx):
         """GH #1044 residual c, measured 2026-10-19: 214 measured rows had a
-        NaN unit (494.4 Birr); 2 are exact double-punches, so 212 are served."""
+        NaN unit (494.4 Birr); 2 are equal on the melted grain (i,j,u,s,
+        Quantity,Expenditure) and removed by ``_drop_double_punched``, so 212
+        are served."""
         unk = (idx['u'] == U_UNKNOWN).to_numpy()
         rows = idx.loc[unk, 't'].value_counts().to_dict()
         assert rows == {'1989': 14, '1994a': 78, '1994b': 37, '1995': 79,

@@ -1239,9 +1239,17 @@ the next section.)
   'Unknown'= (=U_UNKNOWN=); it used to be dropped.  No 1994+ file uses the
   missing-unit code 0 (=harmonize_unit= maps it to a blank, which would also
   become =Unknown=); what arrives is a NaN unit.  The source has 214 such rows,
-  494.4 Birr.  2 of them are exact double-punches that =_drop_double_punched=
-  removes (1995 =8_60= Berbere purchased 4.0 / 1.75 Birr; 1997 =17_31= Onion
-  in-kind 1.0), so *212 rows, 492.65 Birr* are now served.  By wave: 1994a 78
+  494.4 Birr.  2 of them are equal on the melted grain
+  =(i,j,u,s,Quantity,Expenditure)=, which =_drop_double_punched= removes, so
+  *212 rows, 492.65 Birr* are now served.  Only one is a source double-punch:
+  1995 =8_60= Berbere purchased 4.0 / 1.75 Birr (=food3.dta= rows 5795/5796,
+  identical in every column).  The other, 1997 =17_31= Onion in-kind 1.0
+  (=food4.dta= rows 1837/1838), is two source lines that DIFFER on their
+  purchased leg (1.0 for 1.0 Birr vs 2.0 for 2.0 Birr, served summed as 3.0 /
+  3.0) and coincide only on their unit-less in-kind 1.0 leg -- so the
+  per-leg rule sums one leg of the pair and de-duplicates the other.  Whether
+  such a pair is a double-punch at all is open (1 row, Quantity 1.0, 0 Birr;
+  red-team r2, 2026-10-19).  By wave: 1994a 78
   / 139.30, 1994b 37 / 114.55, 1995 79 / 232.30, 1997 18 / 6.50.  By source:
   purchased 158, produced 38, in-kind 16.  The kg ladder serves all of them
   =none=.
@@ -1282,12 +1290,16 @@ it is was inferred, not read.*  On 2026-10-18 the cover's hand-heading was
 read as "...BERHAN"; a re-reading on 2026-10-19 found the cover cropped and
 the name illegible.  Its C, D (D8-D10) and E (E1-E3) sections match the Debre
 Berhan entry of "1989 Survey Instruments by Village" (IFPRI notes, one page
-per village).  Its B section does not: it matches Dinki's.  So read "Debre
+per village).  Its B section does not: it is closer to Dinki's (B1
+Households Assets, B2 Livestock, B3a/B3b recall) and matches neither.  So read "Debre
 Berhan" as likely, not established.
 
-It prints several unit-code lists ("Code 1").  The quintal-first ones --
-E3.1, D8, D9, D10, and the 1994 R1 credit card below -- agree on codes 1-5,
-7 and 8 and diverge after that.  E3.2/E3.3 is a different list throughout.
+It prints several unit-code lists ("Code 1").  The quintal-first lists
+E3.1, D8, D9, D10, C.1-C7 and D2 (and the 1994 R1 credit card below) agree
+on codes 1-5, 7 and 8 and diverge after that.  The short lists on pp.4/7/8
+(=4 Other=) and the I-Questionnaire's p.15 grain list (=4 Kilogramme, 5
+Tassa, 21 Other=) do not, and E3.2/E3.3 is a different list throughout.
+D10 prints a 19-code list but its grid has no quantity or unit column.
 Page numbers are physical PDF pages:
 
 | code | E3.1, p.38: weekly food, cereals and pulses | E3.2 / E3.3, pp.39-40: weekly food, other foods | D8, p.32: bulk food purchases (D9 p.33, D10 p.34 where they differ) |
@@ -1344,8 +1356,11 @@ The data's weekly =unitcode= takes the values 0-9, 13, 14, 15, 17 and 21
     mostly coffee (82), salt (70) and fenugreek (56).
 
   Not settled by it:
-  - 15 = Kilogrammes has no price test.  Tea has no kg-unit purchase in any
-    1994+ wave, and the other two code-15 rows point opposite ways: salt at
+  - 15 = Kilogrammes has no usable price test.  Tea's only 1994+ kg-unit
+    purchases are two 1994a rows (6.0 kg for 1.0 Birr, 1.0 kg for 1.5 Birr),
+    9x apart and implausible for tea, against 1989 tea at code 15 priced at a
+    median 1.75 Birr/unit (25 purchases); and the other two code-15 rows
+    point opposite ways: salt at
     2.0 Birr per unit against 1.25 Birr/kg in 1994a, spaghetti at 1.2 against
     4.0.
   - Code 17's five purchases (chilli, fruit, carrot, biscuits) fit neither
@@ -1354,9 +1369,11 @@ The data's weekly =unitcode= takes the values 0-9, 13, 14, 15, 17 and 21
   - Code 13 on chickpeas, lentils and linseed would be "Packets".
 
 Under either reading, code 21 (10 rows, all site 6: maize 7, cassava 2,
-sweet potato 1) is on no food list.  The only 21 printed anywhere in the
-instrument is "21 Other" on the I-Questionnaire's Ox Seed Project list
-(p.15).
+sweet potato 1) is on no consumption or purchase list.  The only 21
+printed anywhere in the instrument is "21 Other" on the I-Questionnaire's
+Ox Seed Project list (p.15) -- the unit list for "How much grain did this
+household receive per month?" -- which matters because the code-21 rows are
+site-6 maize.
 
 *Code 1 is a quintal, not a kilogram* -- on every reading:
 1. the instrument: every list that can apply to a cereal reads =1 =
