@@ -40,6 +40,8 @@ from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
 # `country` is imported by `__init__` before this module, so this is not a cycle.
 from .country import merge_label_pass_through_reports as _labels_merge_reports
+from .transformations import UNIT_KG_ATTRS_KEY as _UNIT_KG_ATTRS_KEY
+from .transformations import merge_unit_kg_attrs as _unit_kg_merge_attrs
 
 
 # ---------------------------------------------------------------------------
@@ -128,6 +130,15 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         ("labels_unmatched",),
         _merge_into("labels_unmatched", _labels_merge_reports),
         per_country=True,
+    ),
+    # GH #931: each country's DECLARED unit masses (`u_kg`), already keyed
+    # `{country: {u: kg}}` on `crop_production`, so `harvest_kg` on a pooled
+    # frame serves every row its own country's table.  Without this the record
+    # died at the concat and `Feature('crop_production')` went blind to it.
+    _AttrsCarrier(
+        "unit_kg",
+        (_UNIT_KG_ATTRS_KEY,),
+        _merge_into(_UNIT_KG_ATTRS_KEY, _unit_kg_merge_attrs),
     ),
 )
 
