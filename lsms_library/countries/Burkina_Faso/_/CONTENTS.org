@@ -514,7 +514,12 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
 
-** TODO cluster_features -- served WITHOUT GPS: =df_geo= names columns its files lack (GH #1050)
+** DONE cluster_features -- served WITHOUT GPS: =df_geo= names columns its files lack (GH #1050)
+
+/Resolved 2026-10-18 -- see the DONE entry "GPS by wave: 2018-19 wired, 2014
+and 2021-22 ship none" below.  2018-19 now reads the CotedIvoire spelling;
+2014's =V20=/=V22= record whether a parcel was GPS-measured and its GPS
+area in hectares, not a position.  The measurement as first recorded:/
 
 Measured 2026-10-18 (cold build, GH #675 follow-up): both 2014 and 2018-19
 drop their =df_geo= sub-df with =KeyError: 'lat_dd_mod not in columns'=.
@@ -599,9 +604,14 @@ Measured:
   Cascades 9.9-10.8 N / 5.4-3.8 W, Est 0.2 W-2.0 E, ...).
 - *Grappes 237 (Urban) and 240 (Rural)*, both Centre-Sud / Zoundwéogo,
   carry the IDENTICAL fix -- 11.44 N, 0.75 W, accuracy 7.59, timestamp
-  =2019-05-02T11:02:37= -- at two-decimal precision, where every other fix
-  carries six or more.  One reading entered for two grappes, or a rounded
+  =2019-05-02T11:02:37=, at two-decimal precision.  They are the only
+  DUPLICATED fix -- one reading entered for two grappes, or a rounded
   hand-entered point.  Served as recorded; not adjudicated.
+- *Low-precision fixes are not unique to 237/240.*  Minimum decimals per
+  fix across the 555: 1 dp 1, 2 dp 6, 4 dp 1, 5 dp 1, 6 dp 7, 7 dp 110,
+  8 dp 429.  Grappe 216 is at 1 dp (~11 km); 218, 226, 350 and 365 are at
+  2 dp (~1 km), like 237/240; all are vague 2.  No precision or accuracy
+  column is served, so a user computing distances should know.
 - *Grappe 298* has 11 households in vague 1 and one in vague 2
   (=s00_me_bfa2018.dta=) -- a one-household exception to the EHCVM rule that
   each grappe is visited in one vague.  Harmless here (=v: grappe=; the GPS
@@ -655,10 +665,13 @@ pins that the flag stays only while some wave maps no coordinate.
 *Also seen, not fixed.*  =District= is spelled inconsistently across waves
 -- the =Region= problem (GH #811) one level down: 96 distinct strings pooled
 for 45 provinces.  Of the 53 shared 2018-19/2021-22 grappes whose District
-differs, 41 are accents/case only (=Séno=/=Seno=, =Balé=/=Bale=,
-=Bazèga=/=Bazega=, =KOssi=/=Kossi=, =Koulpelgo=/=Koulpélogo=,
-=Kourweogo=/=Kourwéogo=) and 12 name a neighbouring province
-(=Kompienga=/=Gourma=, =Poni=/=Noumbiel=, =Séno=/=Yagha=).
+differs, 41 differ only in accents/case (=Séno=/=Seno=, =Balé=/=Bale=,
+=Bazèga=/=Bazega=, =KOssi=/=Kossi=, =Kourweogo=/=Kourwéogo=), 9 are
+=Koulpelgo=/=Koulpélogo= (one province, a letter dropped -- a spelling
+variant), and 3 name a different province (=Séno=/=Yagha=,
+=Poni=/=Noumbiel=, =Kompienga=/=Gourma=, one grappe each).  The 50
+spelling variants are a =District= categorical-mapping table; the 3 are a
+cross-wave identity question (red-team r1, 2026-10-18).
 
 *Also seen, not fixed: 2014's grain warning is a SOURCE property.*  The
 pre-existing 2014 =cluster_features= report (1,034 of 10,800 rows, 94
