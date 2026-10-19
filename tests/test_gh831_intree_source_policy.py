@@ -18,6 +18,8 @@ microdata, no network.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -146,7 +148,7 @@ def test_acquisition_entry_points_run_inside_the_opt_in(croot, monkeypatch):
     assert [p.name for p in pushed] == ["raw.csv"]
     # The opt-in does not leak out of the call.
     assert not lt._intree_sources_allowed()
-    assert da._fetch_destination(pd.io.common.Path("Foo/2020/Data/raw.csv"),
+    assert da._fetch_destination(Path("Foo/2020/Data/raw.csv"),
                                  populate_cache=True) == croot / "Foo/2020/Data/raw.csv"
     assert da.add_wave.__wrapped__.__name__ == "add_wave"
 
