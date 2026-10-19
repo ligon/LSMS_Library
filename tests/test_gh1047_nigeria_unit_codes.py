@@ -127,6 +127,8 @@ def test_crop_frame_without_a_unit_column_is_unknown():
     nigeria = _nigeria_module()
     fr = _crop_frame([1.0, 2.0], ['1. KILOGRAMS', '2. GRAMS'], with_unit=False)
     out = nigeria.crop_production_for_wave('2019Q1', [fr], {1010: 'Maize'})
+    # notna first: `NA == 'Unknown'` is NA, which `.all()` skips
+    assert out['u'].notna().all(), out['u'].tolist()
     assert (out['u'] == U_UNKNOWN).all(), out['u'].tolist()
 
 
