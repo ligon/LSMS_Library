@@ -1201,3 +1201,18 @@ its one leaked label (row 303) matches now that the row is read.
 =2014/_/food_acquired.py= (reads passage 1 only, stamps =t='2013_Q4'=) are
 unreferenced on the API path and were left in place; the cohort migration
 (GH #794's human decision) is unaffected by this fix.
+
+* 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
+
+The three tables are computed at read time from =food_acquired= by
+=Country._FOOD_DERIVED= (=transformations.food_*_from_acquired=); they are
+never written to =var/=.  The legacy country script
+=_/food_prices_quantities_and_expenditures.py= that used to claim them, and its
+grouped =&:= rule in =_/Makefile=, are deleted.  It was dead: run against the
+canonical =(t, i, j, u, s)= =food_acquired= it raised
+=KeyError: None of [Index(['total expenses'], ...)] are in the [columns]= before writing
+anything (the design doc =slurm_logs/DESIGN_218_food_legacy_retirement.org=
+recorded =KeyError('m')=; the column check now fails one step earlier).
+The script also grouped on an =m= (market) level, which no cached parquet carries any more (CLAUDE.md: =m= is added on demand), so it would have died there next.  Removing the =!make= registrations does not change dispatch: =Country.data_scheme= auto-surfaces the three tables from =food_acquired=, and the derivation was already tried first.
+
+Served tables before and after the removal are frame-equal (377,563 / 234,282 / 316,441 rows; waves 2014, 2018-19, 2021-22).

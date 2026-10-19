@@ -712,3 +712,18 @@ warned about above.
 *Latent elsewhere*: =Niger/2018-19/_/mapping.py= carries the identical
 =if value:= formatter.  Niger's =s01q02= has no nulls, so it emits no ='Nan'=
 today; left alone deliberately, so the GH #813 fix stays provably targeted.
+
+* 2026-10-17 -- =food_expenditures= / =food_prices= / =food_quantities= are derived (GH #218)
+
+The three tables are computed at read time from =food_acquired= by
+=Country._FOOD_DERIVED= (=transformations.food_*_from_acquired=); they are
+never written to =var/=.  The legacy country script
+=_/food_prices_quantities_and_expenditures.py= that used to claim them, and its
+grouped =&:= rule in =_/Makefile=, are deleted.  It was dead: run against the
+canonical =(t, i, j, u, s)= =food_acquired= it raised
+=KeyError: None of [Index(['last expenditure'], ...)] are in the [columns]= before writing
+anything (the design doc =slurm_logs/DESIGN_218_food_legacy_retirement.org=
+recorded =KeyError('m')=; the column check now fails one step earlier).
+Senegal never registered the three tables in =data_scheme.yml=, so only the script and its =Makefile= rule went.  Noted while measuring, NOT fixed here: two 2018-19 =food_prices= rows (item =Autres tisanes et infusions=, units =Bouteille de 25 cl= / =Bouteille de 33 cl=, households 112008 and 17011) carry =Price= of 1.8e22 and 1.5e22 FCFA, so the column's sum is 3.2e22 -- a source/unit defect for its own issue.
+
+Served tables before and after the removal are frame-equal (319,638 / 319,730 / 436,348 rows; waves 2018-19, 2021-22).

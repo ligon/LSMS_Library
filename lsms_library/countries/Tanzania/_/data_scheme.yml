@@ -115,9 +115,6 @@ Data Scheme:
     Quantity: float
     Expenditure: float
     materialize: make
-  food_expenditures: !make
-  food_quantities: !make
-  food_prices: !make
   panel_ids: !make
 
   assets:

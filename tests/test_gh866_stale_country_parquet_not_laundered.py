@@ -125,7 +125,9 @@ def test_the_rebuild_failure_is_still_raised_not_swallowed():
 
 @pytest.fixture
 def private_helper_root(tmp_path):
-    """Scope only synthetic helpers; delivered tests retain their warm roots.
+    """Scope only synthetic helpers; the delivered poison test uses
+    ``private_country_root`` (below), a warm COPY, so it never mutates the
+    shared root either (GH #778).
 
     Reuse the before/finally discipline from the GH970 fixture (ledger #1003
     §§2–4). Restoring an environment variable does not clear its cached paths.
@@ -201,9 +203,49 @@ def _warm(country: str, table: str) -> Path | None:
     return p if p.exists() else None
 
 
+@pytest.fixture
+def private_country_root(tmp_path):
+    """A private ``LSMS_DATA_DIR`` holding a COPY of one country's warm cache.
+
+    The poison test below writes a 5-row slice into ``var/<table>.parquet``.
+    Done in the shared root, every other xdist worker that reads that cell raw
+    or with ``assume_cache_fresh=True`` -- a different file, so
+    ``--dist=loadfile`` does not separate them -- is served the poison
+    (GH #778: Nigeria ``crop_production``, raw readers 12/315 wrong).  So copy
+    the country's subtree into ``tmp_path``, symlink ``dvc-cache`` to the real
+    blob store (L1 is read-only here), and flip the root with the same
+    before/finally ``data_root.cache_clear()`` discipline as
+    ``private_helper_root``.  Yields ``isolate(country, table) -> Path``, the
+    private parquet, skipping before any copy if the shared cell is cold.
+    """
+    shared = data_root()
+    root = tmp_path / "data"
+    root.mkdir()
+    with pytest.MonkeyPatch.context() as patch:
+        def isolate(country: str, table: str) -> Path:
+            src = shared / country / "var" / f"{table}.parquet"
+            if not src.exists():
+                pytest.skip(f"{country}/{table} not warm")
+            blobs = shared / "dvc-cache"
+            if blobs.exists() and not (root / "dvc-cache").exists():
+                (root / "dvc-cache").symlink_to(blobs.resolve(), target_is_directory=True)
+            shutil.copytree(shared / country, root / country, symlinks=True)
+            patch.setenv("LSMS_DATA_DIR", str(root))
+            data_root.cache_clear()
+            assert data_root() == root
+            return root / country / "var" / f"{table}.parquet"
+        try:
+            yield isolate
+        finally:
+            patch.undo()
+            data_root.cache_clear()
+            shutil.rmtree(root, ignore_errors=True)
+
+
 @pytest.mark.parametrize("country,table", SURFACE,
                          ids=[f"{c}/{t}" for c, t in SURFACE])
-def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table):
+def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table,
+                                                          private_country_root):
     """The repro, inverted.
 
     Poison the CONTENT as well as the hash, so a row count alone cannot pass:
@@ -214,9 +256,7 @@ def test_a_poisoned_country_parquet_is_REBUILT_not_served(country, table):
     """
     import pyarrow.parquet as pq
 
-    p = _warm(country, table)
-    if p is None:
-        pytest.skip(f"{country}/{table} not warm")
+    p = private_country_root(country, table)
 
     ref = getattr(Country(country), table)()
     backup = p.with_suffix(".parquet.gh866bak")

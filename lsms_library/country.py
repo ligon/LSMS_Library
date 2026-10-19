@@ -63,7 +63,7 @@ from .currency import attach_currency, is_monetary_table
 # on the hot read path (_finalize_result), so it is hoisted.
 from .transformations import validate_acquisition_source
 from .build_transforms import build_context
-from .errors import LabelUnavailableError
+from .errors import LabelUnavailableError, UnitsUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
 from .null_index_audit import check_index_levels
@@ -79,6 +79,7 @@ import importlib.util
 import hashlib
 import logging
 import os
+import re
 import warnings
 from pathlib import Path
 import shutil
@@ -92,7 +93,7 @@ from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from pyarrow.lib import ArrowInvalid
 from datetime import datetime
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Mapping
 from contextlib import contextmanager, redirect_stdout
 from contextvars import ContextVar
 
@@ -3642,12 +3643,13 @@ class Country:
 
             # Enforce declared dtypes from data_scheme.yml
             if isinstance(scheme_entry, dict):
-                _enforce_declared_dtypes(df, scheme_entry)
+                _enforce_declared_dtypes(df, scheme_entry, country=self.name,
+                                         table=method_name)
 
             # Enforce canonical dtypes from data_info.yml (wins over country-level
             # declarations; e.g. Albania's Age: float → Int64 per canonical schema)
             if method_name:
-                _enforce_canonical_dtypes(df, method_name)
+                _enforce_canonical_dtypes(df, method_name, country=self.name)
 
             # Defensive: drop any row where every non-index column is NaN.
             # Wave-level scripts can leak hollow rows (e.g. survey questionnaire
@@ -5702,6 +5704,22 @@ class Country:
                             derived = self._finalize_result(derived, scheme_entry, name,
                                                             currency=currency,
                                                             labels=map_labels)
+                    except UnitsUnavailableError as exc:
+                        # GH #828: the requested units= basis needs a column
+                        # this country's food_acquired does not carry.  Never
+                        # fall through to the legacy path (it cannot honour
+                        # units=); name the country so Feature can degrade.
+                        # Same strictness as the generic handler below: an
+                        # explicit units= / labels= dict / valuation= cannot
+                        # be honoured by the legacy path, so it re-raises.
+                        # Only a bare call (all three defaulted) keeps the
+                        # pre-#828 legacy fall-through.
+                        if units is not None or map_labels or valuation is not None:
+                            raise exc.for_country(self.name) from exc
+                        logger.info(
+                            "Deriving %s from food_acquired failed (%s); "
+                            "falling back to legacy aggregation", name, exc)
+                        derived = None
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if units is not None or map_labels or valuation is not None:
                             # Caller explicitly asked for canonical units= /
@@ -5873,7 +5891,21 @@ class Country:
                         "    ``'unitvalue'`` (Expenditure / Quantity, per native\n"
                         "    u; gives 1 = Kwacha-per-Kwacha for u='Value' rows),\n"
                         "    ``'kgprice'`` (reported Price × kg_factor),\n"
-                        "    ``'unitprice'`` (reported Price as-is).  See\n"
+                        "    ``'unitprice'`` (reported Price as-is).\n"
+                        "    ``food_acquired.Price`` is whatever the source\n"
+                        "    recorded; in some countries (Uganda, measured:\n"
+                        "    94-99.9% of rows per wave) it is the statistics\n"
+                        "    office's own Expenditure / Quantity, so\n"
+                        "    ``'unitprice'`` and ``'unitvalue'`` are NOT\n"
+                        "    independent sources (GH #845).  Raises\n"
+                        "    ``UnitsUnavailableError`` (a ``ValueError``\n"
+                        "    subclass) naming the country and the missing\n"
+                        "    column when ``food_acquired`` cannot serve the\n"
+                        "    mode -- no ``Price`` for the ``*price`` modes\n"
+                        "    (15 of 20 countries with a ``food_acquired``,\n"
+                        "    2026-10-17); ``Feature`` drops such countries\n"
+                        "    with one warning and\n"
+                        "    ``attrs['units_unavailable']`` (GH #828).  See\n"
                         "    :func:`lsms_library.transformations.food_prices_from_acquired`\n"
                         "    and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.\n"
                     )
@@ -6354,7 +6386,173 @@ def _enforce_rejected_column_spellings(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> None:
+class DatetimeCoercionWarning(RuntimeWarning):
+    """A declared datetime column held strings that did not parse (GH #798).
+
+    Raised by :func:`_coerce_datetime_column` when values that were non-blank
+    strings before the cast come back ``NaT`` after it.  Carries ``country``,
+    ``table``, ``column``, ``count`` and ``examples`` as attributes so callers
+    and tests can target it precisely, the way ``GrainCollapseWarning`` does.
+    """
+
+    def __init__(self, message: str, *, country: str | None = None,
+                 table: str | None = None, column: str | None = None,
+                 count: int = 0, examples: tuple = ()):
+        super().__init__(message)
+        self.country = country
+        self.table = table
+        self.column = column
+        self.count = count
+        self.examples = examples
+
+
+class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
+    """Year-last numeric dates whose day/month order the data cannot settle.
+
+    ``01/05/2019`` is 1 May or 5 January.  :func:`_coerce_datetime_column`
+    reads a group of year-last values day-first only when some value has a
+    first field above 12 and none a second field above 12 (and month-first
+    the other way round); otherwise -- no evidence, or contradictory evidence
+    -- the group is served ``NaT`` and this warning names it.  ``reason`` is
+    ``'ambiguous'`` or ``'conflicting'``; ``wave`` is the ``t`` value, or
+    ``None`` when the column carried no ``t`` level.  (GH #798, @ligon
+    2026-10-18: a silent per-value guess was the one failure mode ruled out.)
+    """
+
+    def __init__(self, message: str, *, reason: str, wave=None, **kw):
+        super().__init__(message, **kw)
+        self.reason = reason
+        self.wave = wave
+
+
+# Year-last numeric dates: d/m/Y or m/d/Y, with -, / or . and an optional
+# time part.  Year-first strings are unambiguous and never match.
+_YEAR_LAST_DATE = re.compile(
+    r'^\s*(\d{1,2})[-/.](\d{1,2})[-/.](\d{4}|\d{2})(?:[ T].*)?$')
+
+
+def _to_datetime_mixed(s: pd.Series, *, where: str, dayfirst: bool = False,
+                       **meta) -> pd.Series:
+    """``to_datetime(format='mixed')``, but a mixed-timezone column WARNS.
+
+    pandas raises ``ValueError('Mixed timezones detected')`` when offset-aware
+    and naive values share a column.  The enforcers catch ``ValueError`` and
+    serve the column as unconverted strings; that is kept, but it is no
+    longer silent.
+    """
+    try:
+        return pd.to_datetime(s, errors='coerce', format='mixed',
+                              dayfirst=dayfirst)
+    except ValueError as exc:
+        if 'timezone' in str(exc).lower():
+            warnings.warn(DatetimeCoercionWarning(
+                f"{where}: mixes timezone-aware and naive (or differently "
+                f"offset) values; served as unconverted strings ({exc}).",
+                **meta), stacklevel=4)
+        raise
+
+
+def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
+                            table: str | None = None,
+                            column: str | None = None) -> pd.Series:
+    """Parse a declared ``datetime`` column, element by element (GH #798).
+
+    ``pd.to_datetime(s, errors='coerce')`` infers ONE format from the first
+    parseable value and nulls every value written another way.  A warm
+    L2-country parquet concatenates waves before this cast runs, so a country
+    whose waves spell timestamps differently lost whole waves: Mali's EAC-I
+    ``YYYY-MM-DD HH:MM:SS`` next to EHCVM ``YYYY-MM-DD`` (24,939 -> 12,194
+    rows), Tanzania's UPD space-separated stamps next to 2019-20/2020-21 ISO
+    ``T`` stamps (22,427 -> 16,534) -- and ``dropna(how='all')`` then deleted
+    the rows.  ``format='mixed'`` parses each value on its own; on the warm
+    corpus it changes no value in any other country (all 27 ``interview_date``
+    parquets compared; columns already ``datetime64`` pass through, Liberia's
+    ``[ms]`` resolution included).
+
+    A value that was a non-blank string before and is ``NaT`` after is
+    COUNTED and reported with :class:`DatetimeCoercionWarning` -- never
+    silently nulled.  The served value is still ``NaT`` (no guessing).
+
+    Year-first strings (every stored string column in the corpus today) are
+    parsed per value.  Two cases are handled separately (@ligon 2026-10-18):
+
+    1. *Year-last numeric dates* (``d/m/Y`` or ``m/d/Y``).  Read on its own,
+       ``['13/01/2019', '05/01/2019']`` would come back 13 Jan and **1 May**
+       -- two conventions in one column, nothing ``NaT``, no warning.  So the
+       order is settled per wave ``t`` (whole column if there is no ``t``
+       level) from the data: day-first when some value's first field exceeds
+       12 and no second field does, month-first the other way round.  With
+       no such evidence, or with both, the group is served ``NaT`` and
+       :class:`DatetimeAmbiguityWarning` names it.  It is never guessed.
+    2. *Mixed timezone offsets.*  An offset-aware value next to a naive one
+       makes ``to_datetime(format='mixed')`` raise ``ValueError('Mixed
+       timezones detected')``.  The column is still served as its unconverted
+       strings (both enforcers catch ``ValueError``), but a
+       :class:`DatetimeCoercionWarning` now says so.
+
+    The durable fix for either is to parse the date at build time, in the
+    wave, where its format is known, and cache a ``datetime64`` column.
+    """
+    where = '/'.join(x for x in (country, table, column) if x) or 'datetime column'
+    meta = dict(country=country, table=table, column=column)
+    if pd.api.types.is_datetime64_any_dtype(s.dtype):
+        return pd.to_datetime(s, errors='coerce', format='mixed')
+    was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
+                    na_action='ignore').fillna(False).astype(bool)
+    parts = s.where(was_str).astype(object).str.extract(_YEAR_LAST_DATE)
+    year_last = was_str & parts[0].notna()
+    out = _to_datetime_mixed(s.where(~year_last), where=where, **meta)
+    unresolved = pd.Series(False, index=s.index)
+    if year_last.any():
+        # Settle day/month order per wave where the column carries t: two
+        # waves may legitimately use different conventions.
+        a = pd.to_numeric(parts[0], errors='coerce')
+        b = pd.to_numeric(parts[1], errors='coerce')
+        if 't' in (s.index.names or []):
+            groups = s.index.get_level_values('t')
+        else:
+            groups = pd.Series(None, index=s.index, dtype=object)
+        keys = pd.Series(groups, index=s.index).where(year_last)
+        for wave in pd.unique(keys[year_last]):
+            m = year_last & ((keys == wave) if pd.notna(wave) else keys.isna())
+            day_ev, month_ev = bool((a[m] > 12).any()), bool((b[m] > 12).any())
+            if day_ev != month_ev:
+                out.loc[m] = _to_datetime_mixed(s[m], where=where,
+                                                dayfirst=day_ev, **meta)
+                continue
+            reason = 'conflicting' if day_ev else 'ambiguous'
+            unresolved |= m
+            examples = tuple(pd.unique(s[m].astype(str))[:3])
+            wtxt = f" in wave {wave}" if pd.notna(wave) else ""
+            why = ("some values are day-first and some month-first"
+                   if day_ev else
+                   "no value has a day or month above 12 to settle the order")
+            warnings.warn(DatetimeAmbiguityWarning(
+                f"{where}: {int(m.sum())} year-last date(s){wtxt} have an "
+                f"undecidable day/month order ({why}) and are served as NaT "
+                f"(e.g. {list(examples)}).  Parse them at build time, where "
+                f"the wave's format is known.",
+                reason=reason, wave=wave if pd.notna(wave) else None,
+                count=int(m.sum()), examples=examples, **meta),
+                stacklevel=3)
+    lost = was_str & out.isna() & ~unresolved
+    n = int(lost.sum())
+    if n:
+        examples = tuple(pd.unique(s[lost].astype(str))[:3])
+        warnings.warn(
+            DatetimeCoercionWarning(
+                f"{where}: {n} non-blank string value(s) "
+                f"did not parse as a datetime and are served as NaT "
+                f"(e.g. {list(examples)}).",
+                country=country, table=table, column=column, count=n,
+                examples=examples),
+            stacklevel=3)
+    return out
+
+
+def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any], *,
+                             country: str | None = None,
+                             table: str | None = None) -> None:
     """Cast DataFrame columns to the types declared in data_scheme.yml.
 
     Modifies *df* in place.  List declarations (e.g. ``[Male, Female]``)
@@ -6370,7 +6568,8 @@ def _enforce_declared_dtypes(df: pd.DataFrame, scheme_entry: dict[str, Any]) -> 
             elif isinstance(declared_type, str) and declared_type in _SCHEME_DTYPE_MAP:
                 target = _SCHEME_DTYPE_MAP[declared_type]
                 if target == 'to_datetime':
-                    df[col] = pd.to_datetime(df[col], errors='coerce')
+                    df[col] = _coerce_datetime_column(
+                        df[col], country=country, table=table, column=col)
                 elif target == pd.Int64Dtype():
                     # Round before casting so float values (e.g. 59.41 from
                     # age_handler) survive the safe-cast check.
@@ -6411,7 +6610,8 @@ def _load_canonical_dtypes() -> dict[str, dict[str, str]]:
     return result
 
 
-def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
+def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str, *,
+                              country: str | None = None) -> None:
     """Cast DataFrame columns to the types declared in data_info.yml Columns.
 
     Modifies *df* in place.  This runs after ``_enforce_declared_dtypes`` so
@@ -6432,7 +6632,8 @@ def _enforce_canonical_dtypes(df: pd.DataFrame, method_name: str) -> None:
         target = _SCHEME_DTYPE_MAP[type_decl]
         try:
             if target == 'to_datetime':
-                df[col] = pd.to_datetime(df[col], errors='coerce')
+                df[col] = _coerce_datetime_column(
+                    df[col], country=country, table=method_name, column=col)
             elif target == pd.Int64Dtype():
                 # Round before casting so that float ages like 59.41 (from
                 # age_handler's date-arithmetic path) survive the safe-cast
@@ -6721,6 +6922,26 @@ def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
         raise LabelPassThroughError(msg)
     warnings.warn(msg, LabelPassThroughWarning, stacklevel=4)
     return report
+
+
+def merge_label_pass_through_reports(sources) -> dict:
+    """Union the per-country ``labels_unmatched`` reports for ``Feature()``.
+
+    The Country-level report (:func:`_audit_label_pass_through`) is FLAT --
+    one country, one dict -- so ``Feature`` keys it by country at capture
+    time and hands this function ``[{'labels_unmatched': {country: report}},
+    ...]`` (bare ``attrs`` mappings or frames carrying them).  The result is
+    ``{country: report}`` for every kept country that passed ``j`` values
+    through unrenamed; a country with nothing unmatched contributes nothing,
+    so an all-matched assembly carries no key at all (GH #787, item 3).
+    """
+    merged: dict = {}
+    for src in sources:
+        attrs = getattr(src, 'attrs', src) or {}
+        per_country = attrs.get('labels_unmatched')
+        if isinstance(per_country, Mapping):
+            merged.update(per_country)
+    return merged
 
 
 class CacheRebuildWarning(UserWarning):
