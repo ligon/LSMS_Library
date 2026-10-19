@@ -7,9 +7,12 @@ quarterly 7-day passages), Guatemala and Panama **15**.  Pooling GhanaLSS with
 Ethiopia therefore compares a 30-day figure with a 7-day one, and nothing said
 so.  GH #851.
 
-*This module surfaces facts.  It transforms nothing.*  There is deliberately no
-``period=`` kwarg, no scaling and no annualisation -- see "What this refuses to
-do" below, which is a design position with evidence behind it, not an omission.
+*This module surfaces facts.*  Phase I transformed nothing.  Phase II (GH #851,
+ruling 2026-10-18) adds exactly one conversion, :func:`to_period`, behind
+``food_expenditures(period=...)`` / ``food_quantities(period=...)``: it divides
+by the instrument's DECLARED exposure, a constant per wave, and refuses any
+wave whose window is not established.  It is still not the division "What this
+refuses to do" below refutes -- that one divides by the REALISED interval.
 
 Shape and cardinality
 ---------------------
@@ -58,7 +61,10 @@ what the manual says, and the consumer should be able to see which they have.
 
 What this refuses to do, and why
 --------------------------------
-No ``period=``, no rate, no annualisation.  The obvious move -- divide by the
+No rate computed from the survey's own dates.  (``period=`` divides by the
+declared ``recall_days * n_asks`` instead -- see :func:`to_period`; the
+paragraphs below are why it must never be "improved" to use measured days.)
+The obvious move -- divide by the
 elapsed days -- is **refuted on this corpus**: measured within household on
 GhanaLSS 1998-99, doubling the realised interval from 5 to 10 days moves reported
 spend by +1.2% where proportionality predicts +100% (elasticity 0.018; item
@@ -89,6 +95,10 @@ __all__ = [
     "RecallRecord", "recall_records", "records_for_frame", "attach",
     "merge_attrs",
     "BASIS_LADDER", "VARIATION_AXES", "ASK_COUNT_BASES",
+    # Phase II (GH #851): the one conversion the record licenses.
+    "PERIOD_ATTRS_KEY", "PERIOD_DAYS", "PERIOD_TABLES",
+    "period_days", "period_refusal", "unavailable_reason", "to_period",
+    "merge_period_attrs",
 ]
 
 #: ``df.attrs`` key holding ``{country: {wave: RecallRecord}}``.
@@ -414,4 +424,237 @@ def merge_attrs(frames) -> dict[str, dict[str, RecallRecord]]:
         if isinstance(got, dict):
             for c, recs in got.items():
                 out.setdefault(c, {}).update(recs)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Phase II: ``period=`` -- the one conversion the record licenses (GH #851)
+# ---------------------------------------------------------------------------
+#
+# Ruling (@ligon, 2026-10-18): ship ``period=`` on ``food_expenditures`` /
+# ``food_quantities`` under Contract B -- a typed raise from ``Country()``, a
+# degrade plus warning from ``Feature()`` -- and refuse it on ``food_prices``.
+#
+# What it does is one division per wave: the derived tables sum ``visit``
+# away, so a row's value covers the cell's TOTAL exposure, ``recall_days *
+# n_asks`` (30 days for GLSS7's six five-day asks, 28 for Burkina Faso 2014's
+# four 7-day passages, 7 for a single 7-day ask), and
+#
+#     value_in_period = value * PERIOD_DAYS[period] / total_exposure_days
+#
+# That is NOT the division the module docstring refutes.  The refuted move
+# divides by the REALISED interval between visits, which injects fieldwork
+# tempo (elasticity 0.018 on GLSS4); this divides by the DECLARED exposure of
+# the instrument, a constant per wave, so it rescales every household of a
+# wave by the same factor and cannot reorder them.  Charter §6
+# (``.coder/charter-recall-windows.md``) records why the ask-order bias does
+# not gate it: the arithmetic is correct GIVEN the total, and whether the
+# total estimates consumption is a measurement question ``food_expenditures``
+# already carries.  What the conversion does NOT do is equalise that bias --
+# a single-ask 7-day survey is entirely first-ask, GhanaLSS's 30 days spread
+# one first-ask premium (1.84x unaided / 1.17x diary-assisted) over six asks.
+# Said in ``docs/guide/recall.md`` beside the kwarg; not a reason to withhold.
+
+#: ``df.attrs`` key holding ``{country: {...conversion record...}}``.
+PERIOD_ATTRS_KEY = "period"
+
+#: Accepted ``period=`` values and their length in days.  Closed: one
+#: spelling per period.  ``month`` and ``year`` use the Julian year
+#: (365.25 days), the convention the only prior in-repo conversion stated
+#: (``Togo/_/data_scheme.yml``, ``Expenditure * 365.25 / days``).
+PERIOD_DAYS: dict[str, float] = {
+    "day": 1.0,
+    "week": 7.0,
+    "month": 365.25 / 12,
+    "year": 365.25,
+}
+
+#: The tables ``period=`` is defined on, and the FLOW columns it scales.
+#: Deliberately excludes ``food_prices`` (a price is a rate per unit, not a
+#: flow over time; see :func:`period_refusal`) and ``food_acquired`` (its
+#: ``visit`` level is not summed, so a row covers ONE ask, not the cell's
+#: exposure -- a different denominator, and not in Phase II's scope).
+PERIOD_TABLES: dict[str, tuple[str, ...]] = {
+    "food_expenditures": ("Expenditure",),
+    "food_quantities": ("Quantity",),
+}
+
+
+def period_days(period: str) -> float:
+    """Length of *period* in days; ``ValueError`` on anything else."""
+    try:
+        return PERIOD_DAYS[period]
+    except (KeyError, TypeError):
+        raise ValueError(
+            f"period= must be one of {list(PERIOD_DAYS)} (or None for the "
+            f"window the survey recorded); got {period!r}") from None
+
+
+def period_refusal(table: str) -> str:
+    """The ``TypeError`` message for ``period=`` on a table that refuses it.
+
+    One message for ``Country`` and ``Feature`` so the two cannot drift.
+    ``food_prices`` gets its own sentence, because it is the table someone
+    will add ``period=`` to "for symmetry" unless the refusal says why.
+    """
+    head = (f"{table}() got an unexpected keyword argument 'period'; only "
+            f"{sorted(PERIOD_TABLES)} accept it.")
+    if table == "food_prices":
+        return (head + "  A price is a rate per unit of the good, not a "
+                "flow over time: it has no reference period to convert, and "
+                "rescaling it by a recall window would change its meaning, "
+                "not its period (GH #851).")
+    if table == "food_acquired":
+        return (head + "  food_acquired keeps the `visit` level, so a row "
+                "covers ONE ask rather than the cell's total exposure; derive "
+                "food_expenditures / food_quantities, which sum it away.")
+    return head
+
+
+def unavailable_reason(rec: RecallRecord | None) -> str | None:
+    """Why *rec* does not establish a window ``period=`` may divide by.
+
+    ``None`` means it does: ``total_exposure_days`` is known and rests on a
+    rung stronger than a guess.  The order is the order a reader needs:
+
+    1. no record at all -- the wave was never entered in ``recall.yml``;
+    2. ``within_wave_variation`` -- there is no single window to divide by
+       (GhanaLSS 1991-92 by stratum, Nigeria 2018Q3/2019Q1 by source), so
+       no per-wave factor is correct for every row;
+    3. a WEAK rung (``not-recorded``, ``filename``) -- ``not-recorded``
+       carries no number by construction, and a ``filename`` window is a
+       guess the record itself tells consumers to discount;
+    4. a recorded rung whose ``recall_days`` or ``n_asks`` is blank.
+
+    ``config-comment`` cells DO convert: the ruling counted them, and the
+    rung rides on ``attrs['period']`` so a consumer can discount them.
+    """
+    if rec is None:
+        return "no recall record for this wave"
+    if rec.within_wave_variation:
+        return (f"the window varies within the wave "
+                f"(within_wave_variation={rec.within_wave_variation!r}), so "
+                f"no single factor is right for every row")
+    if not rec.is_strong:
+        if rec.basis == "not-recorded":
+            return "basis='not-recorded' -- nobody has read the questionnaire"
+        return (f"basis={rec.basis!r} -- a guess, not evidence of the "
+                f"window")
+    missing = [f for f in ("recall_days", "n_asks") if getattr(rec, f) is None]
+    if missing:
+        return f"{' and '.join(missing)} not established (basis={rec.basis!r})"
+    return None
+
+
+def to_period(df, country: str, period: str, *, table: str,
+              records: dict[str, RecallRecord] | None = None):
+    """Rescale a derived food table from each wave's recorded window to *period*.
+
+    Each row's flow column (``Expenditure`` / ``Quantity``, per
+    :data:`PERIOD_TABLES`) is multiplied by ``PERIOD_DAYS[period] /
+    total_exposure_days`` of its own wave ``t``.  Linear and per-``t``, so it
+    commutes with the ``labels=`` re-aggregation, ``market=`` and
+    ``numeraire=`` post-steps; the caller applies it before them.
+
+    Strict, by contract: if ANY wave in *df* has no established window
+    (:func:`unavailable_reason`), nothing is converted and
+    :class:`~lsms_library.errors.PeriodUnavailableError` is raised naming
+    every such wave and the convertible ones.  Converting the known waves and
+    leaving the rest unscaled would return one column on two clocks; filling
+    the unknown ones with NA would read as zero under ``sum()`` (GH #828).
+    ``Feature`` degrades over the error at the wave grain.
+
+    Returns a COPY carrying ``attrs[PERIOD_ATTRS_KEY] = {country: {...}}``:
+    the target, its length in days, the scaled columns and, per wave, the
+    exposure, factor, ``recall_days``, ``n_asks`` and both rungs -- so a
+    ``config-comment`` window is visibly weaker than a ``questionnaire`` one
+    on the frame itself.  Plain dicts and numbers only (``df.to_parquet``
+    serialises ``attrs`` with a bare ``json.dumps``).
+
+    *records* defaults to :func:`recall_records` for *country*; tests pass
+    their own.
+    """
+    import pandas as pd
+
+    from .errors import PeriodUnavailableError
+
+    target = period_days(period)
+    if table not in PERIOD_TABLES:
+        raise TypeError(period_refusal(table))
+    cols = [c for c in PERIOD_TABLES[table] if c in df.columns]
+    if not cols:
+        raise ValueError(
+            f"{country}: {table}(period={period!r}) found none of the flow "
+            f"columns {list(PERIOD_TABLES[table])} to rescale; got "
+            f"{list(df.columns)}")
+    names = list(df.index.names or [])
+    if "t" not in names:
+        raise ValueError(
+            f"{country}: {table}(period={period!r}) needs a `t` index level "
+            f"to look each row's window up by wave; got {names}")
+    if records is None:
+        records = recall_records(country)
+
+    # ``t`` as python ``str`` (``pd.NA`` where null): record keys are strings,
+    # and a categorical or nullable-string level must look up the same way.
+    t_str = (df.index.get_level_values("t").astype("string")
+             .to_numpy(dtype=object, na_value=pd.NA))
+    factors: dict[str, float] = {}
+    unavailable: dict[str, str] = {}
+    for w in pd.unique(t_str):
+        if w is None or w is pd.NA:
+            unavailable["<NA>"] = "the row's wave `t` is missing (NaN key)"
+            continue
+        rec = records.get(str(w))
+        why = unavailable_reason(rec)
+        if why is not None:
+            unavailable[str(w)] = why
+        else:
+            factors[str(w)] = target / rec.total_exposure_days
+    if unavailable:
+        raise PeriodUnavailableError(
+            country=country, period=period, table=table,
+            unavailable=unavailable, convertible=factors)
+
+    out = df.copy()
+    factor = pd.Series(t_str).map(factors).to_numpy(dtype=float)
+    for c in cols:
+        out[c] = out[c] * factor
+    out.attrs = dict(df.attrs)
+    record = {
+        "period": period,
+        "period_days": target,
+        "columns": cols,
+        "waves": {
+            w: {
+                "exposure_days": float(records[w].total_exposure_days),
+                "factor": factors[w],
+                "recall_days": float(records[w].recall_days),
+                "n_asks": int(records[w].n_asks),
+                "basis": records[w].basis,
+                "ask_count_basis": records[w].ask_count_basis,
+            }
+            for w in sorted(factors)
+        },
+    }
+    existing = out.attrs.get(PERIOD_ATTRS_KEY)
+    merged = dict(existing) if isinstance(existing, dict) else {}
+    merged[country] = record
+    out.attrs[PERIOD_ATTRS_KEY] = merged
+    return out
+
+
+def merge_period_attrs(frames) -> dict[str, dict[str, Any]]:
+    """Union the ``period`` attrs of several frames, for ``Feature()`` assembly.
+
+    The twin of :func:`merge_attrs`, for the same reason: the cross-country
+    ``concat`` disagrees by design (one record per country) and lands in the
+    ``{}`` case, so ``feature._ATTRS_CARRIERS`` re-attaches this.  Elements
+    may be frames or captured ``attrs`` mappings.
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for f in frames:
+        got = (getattr(f, "attrs", f) or {}).get(PERIOD_ATTRS_KEY)
+        if isinstance(got, dict):
+            out.update(got)
     return out
