@@ -76,8 +76,18 @@ def test_the_wave_tier_still_trusts_once_and_stamps():
 # The country tier no longer trusts, and no longer stamps
 # --------------------------------------------------------------------------
 
+def _country_read_path_source() -> str:
+    # GH #908 moved the L2-country read gate out of the tagged
+    # _aggregate_wave_data closure into Country._read_l2_country_cache (so an
+    # edit to it no longer cold-rebuilds the corpus).  Both pins below read the
+    # UNION of the two, so neither can be satisfied by the code simply having
+    # moved: the downgrade must exist in one of them, the stamp in neither.
+    return (inspect.getsource(country_mod.Country._aggregate_wave_data)
+            + inspect.getsource(country_mod.Country._read_l2_country_cache))
+
+
 def test_the_country_gate_converts_legacy_to_stale():
-    src = inspect.getsource(country_mod.Country._aggregate_wave_data)
+    src = _country_read_path_source()
     assert 'freshness == "legacy"' in src and 'freshness = "stale"' in src, (
         "the country-tier gate no longer downgrades a hashless parquet (GH #809)"
     )
@@ -85,7 +95,7 @@ def test_the_country_gate_converts_legacy_to_stale():
 
 def test_the_country_gate_never_stamps_a_parquet_it_served():
     """Stamping unverified content is what made the defect permanent."""
-    src = inspect.getsource(country_mod.Country._aggregate_wave_data)
+    src = _country_read_path_source()
     assert "stamp_parquet_hash" not in src, (
         "the country-tier read path stamps a hash onto a parquet it did not "
         "verify -- that is the laundering #809 is about"

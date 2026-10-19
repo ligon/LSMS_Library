@@ -122,8 +122,9 @@ labelsd = get_categorical_mapping(tablename='harmonize_food',
                                   idxvars={'Code':('Code_8h',format_id)},
                                   **{'Label':'Preferred Label'})
 # GH #348: pass the value column ('Label') so the Code->Label dict is built.
-# A bare get_categorical_mapping(tablename='units') yields an EMPTY dict (no
-# value column requested -> df_data_grabber returns a column-less frame), so
+# A bare get_categorical_mapping(tablename='units') yielded an EMPTY dict (no
+# value column requested -> df_data_grabber returned a column-less frame; since
+# GH #674 the bare form raises TypeError instead), so
 # the wave-level unit decode was silently dead and raw s8hq13 codes
 # (1/7/8/9/12/14/16/17/18/19/22/23/25) leaked into food_acquired's u.
 unitsd = get_categorical_mapping(tablename='units', Label='Label')
