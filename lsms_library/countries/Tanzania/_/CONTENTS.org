@@ -1803,13 +1803,21 @@ tracking line (=UPHI=): 1,565 of the 7,082 lines present in both round 2 and
 round 3 change =clusterid=, but they collapse to only *83* distinct
 (round-2, round-3) id pairs, *81 of which differ in the last digit only*
 (=17113001 -> 17113000=, =17302007 -> 17302008=); just one of the 409 round-2
-clusters maps to more than one round-3 cluster.  No renumbered round-2 id
-occurs in round 3 and no new round-3 id occurs in round 2.  The affected
+clusters maps to more than one round-3 cluster.  Apart from that one round-2
+cluster, which splits (=7124001=: some of its lines keep the id in round 3,
+the rest go to =10207004=, which already exists in round 2), no renumbered
+round-2 id occurs in round 3 and no new round-3 id occurs in round 2; through
+the API, which sees linked households only, both counts are 0.  The affected
 clusters are in region codes 17--21 and 51--55 (Zanzibar).  Through the API
 (=Country('Tanzania').sample()=, which reads =clusterid= verbatim): 591 of the
 2,904 households linked across 2010-11 -> 2012-13 change =v=, in 82 one-to-one
 pairs.  At round 4 (2014-15) the change is partly undone: 12 of the 82 return
-to their round-2 id (58 households) and 6 keep the round-3 id.
+to their round-2 id (58 households).  6 of the 82 round-3 ids still occur in
+2014-15, but no linked household keeps one; the other non-reverting
+households (10, in 8 clusters) move to new-format ids (11 or 12 characters,
+the 2014-15 refresh layout).  (Corrected 2026-10-19 after red team r1 R3; this
+paragraph used to say "6 keep the round-3 id", and that no renumbered id
+occurred on the other side at all.)
 
 So the 20% of linked households whose =v= changes at 2010-11 -> 2012-13 are
 *not movers*.  Two existing readings say they are, and both are contradicted:

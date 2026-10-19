@@ -39,11 +39,12 @@ Sampling:
         UPD4 round 3 RENUMBERS 82 of the 409 clusters, whole clusters at a
         time, 81 of them in the last digit only (17113001 -> 17113000).
         Measured 2026-10-19: 591 of 2,904 linked households change `v`, in
-        82 one-to-one cluster pairs; no renumbered round-2 id occurs in round
-        3 and no new round-3 id occurs in round 2.  Confirmed in the raw
-        upd4_hh_a.dta (1,565 of 7,082 tracking lines; 83 distinct pairs; one
-        of 409 round-2 clusters maps to more than one round-3 cluster), so it
-        is the survey file, not our script.  This is NOT mover tracking, which
+        82 one-to-one cluster pairs.  Confirmed in the raw upd4_hh_a.dta
+        (1,565 of 7,082 tracking lines; 83 distinct pairs; one of 409 round-2
+        clusters, 7124001, maps to more than one round-3 cluster), so it is the
+        survey file, not our script.  Apart from the one round-2 cluster that
+        splits, no renumbered round-2 id occurs in round 3 (raw: 1 and 1, both
+        that cluster; through the API: 0 and 0).  This is NOT mover tracking, which
         DESIGN.org §2 (and 2008-15/_/sample.py) read it as; see CONTENTS.org.
         Partial: the other 327 clusters keep their id.
       source_type: derived-from-data
@@ -58,10 +59,12 @@ Sampling:
       cluster_id_note: |-
         Partial, and partly the round-3 renumbering undone: of the 82
         clusters renumbered in round 3, 12 return to their round-2 id here
-        (58 households) and 6 keep the round-3 id.  Measured: 413 of 556
-        linked households keep `v`; a further 35 link to refresh-sample
-        cluster ids, a linkage that is itself unverified because rounds 3 and
-        4 reuse 1,857 r_hhid strings.  This wave pools the Extended Panel
+        (58 households).  6 of the 82 round-3 ids still occur in 2014-15, but
+        no linked household keeps one; the other non-reverting households
+        (10, in 8 clusters) move to new-format ids.  Measured: 413 of 556
+        linked households (521 with `v` on both sides) keep `v`; a further 35
+        link to refresh-sample cluster ids, a linkage that is itself
+        unverified because rounds 3 and 4 reuse 1,857 r_hhid strings.  This wave pools the Extended Panel
         (tracked) with a newly drawn Refresh sample.
       source_type: derived-from-data
       confidence: medium
@@ -76,8 +79,9 @@ Sampling:
         NPS-SDD writes `clusterid` in its own 9-character RR D WWW EEE layout
         (the 2008-15 extended panel uses 8-character RR D WW EEE), so the
         tracked Extended-Panel households keep none of their `v`: 0 of 907
-        linked households.  NOT a bijection -- over 337 cluster pairs, 131
-        cluster ids map to more than one id on the other side, because
+        linked households (849 with `v` on both sides).  NOT a bijection --
+        over the 310 cluster pairs those 849 form, 131 cluster ids map to more
+        than one id on the other side, because
         tracked households genuinely moved -- so no crosswalk is recoverable
         here even in principle.
       source_type: derived-from-data
