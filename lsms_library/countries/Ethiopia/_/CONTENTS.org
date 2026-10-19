@@ -1353,8 +1353,14 @@ documented refusal.  What that means for this country:
     NPS+Zn and NPS+Zn+B at 17.7-18.9% N, and NPS+B was the largest seller
     in 2016-17.  The ESS has ONE NPS question per wave (=pp_s3q20a_*= in W3,
     =s3q23*= in W4/W5), so the label =NPS= here cannot say which of the
-    four a household applied; 0.19 is the flagship grade (the 2016-17
-    volume-weighted mean of the four is 18.8%).
+    four a household applied; 0.19 is the base grade (plain NPS), and NPS+B
+    at 18.9% was the largest seller by volume (377,527 t against plain
+    NPS's 238,191 t in 2016-17).  IFDC's /Fertilizer Statistics Overview
+    Ethiopia 2010-2022/ (2023 Edition, p. 12; IMPORT volumes) has NPS+B
+    above plain NPS in every year 2017-2022, plain NPS at 14-25% of the four
+    grades.  The volume-weighted mean N of the four is 18.8% in 2016-17 and
+    18.7-18.9% in each year 2017-2022, so 0.19 is at most ~1.4% (relative)
+    high.
   - *Served =nitrogen_kg= moved* (5,264 NPS rows matched; total 445,471.0 ->
     500,847.2 kg N).  Per wave, and the W5 jump is the "NPS displaces DAP"
     drift recorded above:

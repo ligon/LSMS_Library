@@ -3,6 +3,13 @@ Retrieved 2026-10-19 by the #867 worker (Sue the Coder).  PDFs are not
 committed; their URL, size and SHA-256 are, and the text below is pypdf's
 extraction of the cited page, verbatim (layout lost).
 
+After red team r1 (same day) the WIPO entry was retitled and re-paged (it is
+IFDC's PROPOSED regulations, and the page is 31, not 30), its PDF was hashed
+(only the HTML rendering had been), and four entries were added: the
+Ministry of Agriculture's Guide (the non-IFDC source for 8% N), FAO & GoM
+2018 (the published 7-14-7), IFDC's Ethiopia overview (the NPS "base grade"
+wording), and the other countries' Compound D grades.
+
 * IFDC & AFAP for AGRA, Assessment of Fertilizer Distribution Systems and Opportunities for Developing Fertilizer Blends: ETHIOPIA (June 2018)
 - URL :: https://agra.org/wp-content/uploads/2020/08/Ethiopia-Report_Assessment-of-Fertilizer-Distribution-Systems-and-Opportunities-for-Developing-Fertilizer-Blends.pdf
 - bytes :: 811,645
@@ -258,11 +265,64 @@ Total NPK Total NP Total NK Total PK
 MT
 #+end_example
 
-* Government of Malawi, Fertilizer Regulations, 2003 (WIPO Lex MW022)
-- URL :: https://www.wipo.int/wipolex/en/text/496671
-- bytes (HTML page) :: 78,701
-- sha256 (HTML page) :: 538028149fa249aa3e358cb18b2ff0a0490c39d998d432a1443ef46e55ab6c6d
-- cited :: Schedule B, Part A, "Examples of Penalty Compilation", examples 2 ("D" compound 8-14-7-6.5S, 8% N) and 3 (23-21-0+4S, 23% N); printed p. 30
+* IFDC with DARS / Ministry of Agriculture, for the Government of Malawi, Proposed Fertilizer Regulations, 2003 (Appendix C, under the Proposed Fertilizer Act, 2003; WIPO Lex MW022)
+Retitled after red team r1 (2026-10-19).  This entry was first headed
+"Government of Malawi, Fertilizer Regulations, 2003", which is what WIPO's
+page title and the PDF's own =/Title= metadata say ("Fertilizer
+Regulations, 2003"; the PDF's =/Subject= is "MW022EN: Trademarks,
+Industrial Property, Enforcement").  The document's cover says otherwise:
+it is a DRAFT prepared by IFDC for the Government (PDF p. 1, below), and
+WIPO files it as "Other Texts" (details page: =Type of Text= "Other Texts",
+=Adopted: September 1, 2003=).  The 8-14-7 grade is a worked PENALTY
+EXAMPLE, not a schedule of registered grades.  There is no "Part A":
+example 2 sits under Schedule B, lettered section "A. Investigational
+Allowances--Penalty Rates".
+- URL (PDF) :: https://wipolex-res.wipo.int/edocs/lexdocs/laws/en/mw/mw022en.pdf
+  (unsigned, it redirects to the details page, which serves a time-limited
+  signed link; the PDF was fetched through that link on 2026-10-19)
+- bytes (PDF) :: 109,050
+- sha256 (PDF) :: d5d6870e7a08fc8ca46dcc33d19fbd0e05c6febbf74ab6a230edb8c9ad8afc43
+  (26 pages; identical to the copy the interrupted r1-fix run fetched)
+- URL (details page) :: https://www.wipo.int/wipolex/en/legislation/details/9358
+- URL (HTML rendering) :: https://www.wipo.int/wipolex/en/text/496671
+- bytes (HTML rendering) :: 78,701
+- sha256 (HTML rendering) :: 538028149fa249aa3e358cb18b2ff0a0490c39d998d432a1443ef46e55ab6c6d
+- cited :: Schedule B "Penalties for Deviation From Guaranteed Analysis", A. "Investigational Allowances--Penalty Rates", "Examples of Penalty Compilation", examples 2 ("D" compound 8-14-7-6.5S, 8% N) and 3 (23-21-0+4S, 23% N); printed p. 31 (PDF p. 23).  The heading is at the foot of PDF p. 22 (footer "30"); both examples are on PDF p. 23 (footer "31").  An earlier version of this entry said p. 30.
+
+** PDF page 1 (cover; blank lines removed)
+#+begin_example
+Appendix C
+Proposed Fertilizer Regulations, 2003
+Under
+Proposed Fertilizer Act, 2003
+Prepared by
+IFDC – An International Center for Soil Fertility and Agricultural Development
+P O Box 2040
+Muscle Shoals, Alabama 35662, USA
+In collaboration With
+Department of Agricultural Research Services
+Ministry of Agriculture (MOA)
+Lilongwe, Malawi
+For the
+Government of Malawi
+September, 2003
+9
+#+end_example
+The trailing "9" is a printed page number: Appendix C appears to have been
+cut from a longer IFDC report.
+
+** PDF page 22, foot (printed "30")
+#+begin_example
+SCHEDULE B
+Penalties for Deviation From Guaranteed Analysis
+A. Investigational Allowances—Penalty Rates
+#+end_example
+
+** PDF page 23 (printed "31"), as rendered by WIPO's HTML page
+The PDF's pypdf extraction of this page is the same text with broken
+words ("fertili zer", "P 2O5"); the cleaner HTML rendering is kept.  The
+page then continues "B. Actual Value—Penalty Rates" and ends with footer
+"31".
 #+begin_example
 Examples of Penalty Compilation
 1. Urea was guaranteed by the registrant as 46% N on a lot of one
@@ -297,13 +357,181 @@ nutrient value equals 33,000 Kwacha divided by 48) x 100
 (number of tonnes) = 206,250 Kwacha.
 #+end_example
 
+* Ministry of Agriculture (Malawi), Guide to Agriculture Production and Natural Resources Management in Malawi (Revised in 2020)
+Added after red team r1 (2026-10-19): the one Malawi source for Compound D's
+8% N that is not IFDC's.
+- PROVENANCE IS WEAK -- read this first.  The Ministry-linked copy (MaDiPHS
+  CKAN record =ckan.madiphs.org=, dataset =1fe32544-...=, pointing at Google
+  Drive file =1UReRrbiooGTiS90tDBkk42wH1z8CnCWx=) answered every route with
+  a sign-in page or HTTP 401.  The PDF hashed below is a THIRD-PARTY copy:
+  =683670253= in its filename is a Scribd document id, its Producer is
+  iLovePDF (ModDate 2023-07-18; CreationDate 2021-03-15, InDesign).  Its
+  page numbering may differ from the Ministry's original, so the PRINTED
+  page (232) is the one to cite.
+- URL :: https://www.mojaacademy.com/s/683670253-Guide-to-Agriculture-Production-in-Malawi-2021.pdf
+  (redirects to static1.squarespace.com/static/66b1783952c89a655355b2cd/t/6864277065e99a0df3e5b671/1751394163805/683670253-Guide-to-Agriculture-Production-in-Malawi-2021.pdf)
+- bytes :: 3,732,966
+- sha256 :: c93b3addb45854e9602af240d3fc2c509ab4baf421bd78e7484a29592636fbee
+- cited :: Table 54, printed p. 232 (PDF p. 254 of this copy, of 448) -- Compound D 8-18-15 +4S +0.1B; Super D 10.5-24-20 +6S +0.15B
+
+** PDF pages 1, 3, 4 (cover, title, imprint)
+#+begin_example
+MINISTRY OF AGRICULTURE
+Guide to Agriculture Production
+and Natural Resources Management  in Malawi
+#+end_example
+#+begin_example
+Guide to Agriculture Production
+and Natural Resources Management
+in Malawi
+Revised in 2020
+#+end_example
+#+begin_example
+Published by
+Agriculture Communication Branch,
+Department of Agriculture Extension Services
+Ministry of Agriculture
+P .O. Box 30145
+Lilongwe, MALAWI
+Printed with financial support from
+Food and Agriculture Organization of the United Nations (FAO)
+ISBN999-34-00-9
+#+end_example
+
+** PDF page 254 (printed 232)
+#+begin_example
+Guide to Agriculture Production                      Tobacco
+232
+Table 54: Some commonly used fertilizers in tobacco and their nutrient composition
+Fertilizer
+Type
+Nitrogen % P2O5 % K2O% Sulphur % Boron %
+Compound A 2 18 15 4 0.1
+Compound B 4 18 15 4 0.1
+Compound C 6 18 15 4 0.1
+Compound D 8 18 15 4 0.1
+Compound S 6 18 6
+Super B 5.33 24 20 6 0.15
+Super C 8 24 20 6 0.15
+Super D 10.5 24 20 6 0.15
+Calcium Ammo-
+nium Nitrate
+(CAN)
+27 - - - -
+Nitrate of soda 16 - - - -
+Ammonium
+Nitrate
+34.5 - - - -
+Urea 46 - - - -
+#+end_example
+Table 54 has no row for 23:21:0+4S.  The guide describes it in prose
+(PDF p. 93, printed 71, §2.6.2.4 "i) 23:21:0+4S ... used as a basal
+dressing which has replaced 20:20:0"); in this guide "Chitowe" is the
+local name for sesame, not the fertilizer.
+
+* FAO & Government of Malawi (Omuto, C.T. & Vargas, R.), Soil nutrient loss assessment in Malawi, Technical Report (2018)
+Added after red team r1 (2026-10-19): the only Malawi document found that
+gives Compound D a 7% grade, i.e. the most likely published form of the WB
+panel's 0.07.
+- URL :: https://www.fao.org/3/CA2666EN/ca2666en.pdf
+  (redirects to https://openknowledge.fao.org/server/api/core/bitstreams/95650e64-06d4-4b3e-8039-12a2a52d7a01/content;
+  repository handle 20.500.14283/ca2666en)
+- bytes :: 6,866,029
+- sha256 :: bc81e9189aa582a1883d690843b7df98f805ef36ac86576b235c4250b3359099
+  (three downloads identical; the repository's stored MD5, a2d84f8e..., does
+  not match the bytes it serves, 783d3214..., at the same size)
+- citation :: "Omuto CT and Vargas RR. 2018. Soil nutrient loss assessment in Malawi. Technical Report. FAO, UNEP and UNDP . 64 pp" (PDF p. 4); ISBN 978-92-5-131142-4 (FAO); published by FAO, the UNDP-UNEP Poverty-Environment Initiative and the Ministry of Agriculture, Irrigation and Water Development, Malawi (PDF p. 3)
+- cited :: executive summary, printed p. IX (PDF p. 11) -- Compound D 7-14-7
+
+** PDF pages 10-11 (printed VIII-IX; the sentence crosses the page break)
+#+begin_example
+nutrient levels. Consequently, inorganic fertilizer application has been widely campaigned
+for and backed with adequate agricultural policies. According to the Government of Malawi
+(GoM), there are about 25 types and brands of fertilizers used in the country. The most
+#+end_example
+#+begin_example
+IX
+popular ones are: Urea, CAN, Ammonium Sulphate, 23:21:0+4S (also known as Chitowe),
+and Compound D (a local term that refers to an NPK blend of 7-14-7). The application rates
+#+end_example
+The sentence carries NO footnote; it attributes the list to "the
+Government of Malawi (GoM)" and "7-14-7" appears nowhere else in the
+report.  Red team r1 connected it to footnote 34 (IFDC 2013); the pages
+below show that footnote 34 is attached to a sentence about crop yields.
+So IFDC 2013 as the origin of 7-14-7 (and of the WB's 0.07) is UNVERIFIED.
+
+** PDF page 27 (printed 11) -- footnote 34
+#+begin_example
+(Table 2.3). The yields of these crops are reported to have stagnated at less than 50% of the
+actual attainable yields, leading to declining per-capita food production as the population
+grows (IFDC, 201334). For example, on average, smallholder farmers produce about 2 t/ha of
+#+end_example
+#+begin_example
+34  IFDC. 2013. Malawi fertilizer assessment: In support of The African Fertilizer and Agribusiness partnership
+(AFAP), www.Ifdc.org
+#+end_example
+("201334" is "2013" followed by superscript 34.)
+
+** PDF page 28 (printed 12) -- the body-text statement, footnote 38
+#+begin_example
+are Urea, 23:21:0+4S, CAN, and Compound D. Urea and 23:21:0+4S are commonly applied to
+maize while CAN and Compound D are used in tobacco crops (GoM38). The fertilizer subsidy
+#+end_example
+#+begin_example
+38   GoM. The National Fertilizer Strategy. Unpublished and Undated Report.
+#+end_example
+
+* IFDC, Fertilizer Statistics Overview ETHIOPIA 2010 - 2022 (2023 Edition)
+Added after red team r1 (2026-10-19), for the NPS comment's "base grade"
+wording (verdict 6.4).  These are IMPORT volumes ("Fertilizer Import /
+Apparent Consumption"), not sales.  The PDF's =/Title= metadata reads
+"FERTILIZER STATISTICS OVERVIEW NIGERIA 2015 - 2019" (a template
+leftover); the content is Ethiopia.
+- URL :: https://api.hub.ifdc.org/server/api/core/bitstreams/f8c2398b-bdf6-4f48-9d21-dbe9e7aa5d8e/content
+  (item https://hub.ifdc.org/handle/20.500.14297/3217)
+- bytes :: 749,450
+- sha256 :: 41f6c8ea9d79e883a9e98ce0e66aad809f02bad26f4dd3551a7a6d72a5f72227
+- cited :: PDF p. 12 "Summary of Fertilizer Statistics", NPS-family rows 2017-2022
+
+** PDF page 12
+#+begin_example
+HS Code Fertilizer Name 2017 2018 2019 2020 2021 2022
+3105510000 NPS 19-38-0 + 7S 138,102    150,000       100,000       354,567       139,258       218,894
+3105510000 NPSB 18.9-37.7-0 + 6.95S + 0.1B 385,600    447,576       574,025       960,000       555,988       823,658
+3105510000 NPSZn 17.7-35.5-0 + 7.6S + 2.2Zn -           -              50,000         11,713         -              -
+3105510000 NPSZnB 17.8-35.7-0 + 7.7S + 2.2Zn + 0.1B 104,430    50,000         -              68,959         71,848         -
+#+end_example
+Computed from these rows (and AGRA Ethiopia Table 1 above for 2016-17):
+
+| year    | volume-weighted N of the four | plain NPS share of the four | NPSB > NPS |
+|---------+-------------------------------+-----------------------------+------------|
+| 2016-17 | 18.81% (AGRA, sales)          | 34.4%                       | yes        |
+| 2017    | 18.74%                        | 22.0%                       | yes        |
+| 2018    | 18.84%                        | 23.2%                       | yes        |
+| 2019    | 18.83%                        | 13.8%                       | yes        |
+| 2020    | 18.86%                        | 25.4%                       | yes        |
+| 2021    | 18.82%                        | 18.2%                       | yes        |
+| 2022    | 18.92%                        | 21.0%                       | yes        |
+
+The 2024 Edition (2010-2023; https://api.hub.ifdc.org/server/api/core/bitstreams/935046b1-8852-47a1-91bb-1d7c8e37516f/content,
+1,472,647 bytes, sha256 01fe539163a67f70a33533f4fad871c11df9d59d798c59018c6ee76324efdaf5)
+carries identical 2017-2022 values.
+
+* Other countries' Compound D (context for the two divergent harmonisations; not a Malawi citation)
+Web pages, quoted 2026-10-19; not hashed.
+- Zimbabwe, 7-14-7 (= the WB panel's 0.07) :: FAO tender notice 2025/FRZIM/FRZIM/131764, published 09-Apr-2025, https://www.ungm.org/Public/Notice/263865 -- "Supply and delivery of 1000 Metric tonnes of Inorganic fertilizers (Calcium Ammonium Nitrate and Compound D ( NPK 7:14:7)"
+- Zambia, 10-20-10 (= EPAR's 0.10) :: Argus Media, "One Acre Fund seeks fertilizers for Zambia", 06/07/20, https://www.argusmedia.com/en/news/2120487-one-acre-fund-seeks-fertilizers-for-zambia -- "has issued a tender to buy urea and 10-20-10+6.5S (compound D)"
+- EPAR (point of comparison) :: /global/scratch/fsa/fc_jevons/ligon/reference/epar/LSMS-Agricultural-Indicators-Code/Malawi IHS/Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:2204 "5   D COMPOUND - 10-20-10", :2208 =gen n_kg = qty * (0.23*(itemcode==1) + ... + 0.10*(itemcode==5))= (same label in W2:1726, W3:2366, W4:2164)
+
 * Not retrieved
 - IFDC (P. Fuentes), /Malawi Fertilizer Assessment/ (2013), said by a
-  search-engine summary to give Compound D as 7-14-7 -- which would explain
-  the WB panel's 0.07.  The UNFCCC host
+  search-engine summary to give Compound D as 7-14-7.  The UNFCCC host
   (www4.unfccc.int/sites/napparties/Malawi/...) answered with a bot-check /
-  maintenance redirect on 2026-10-19, so the claim is UNVERIFIED and not
-  cited in the code.
+  maintenance redirect on 2026-10-19.  FAO & GoM 2018 (above) cites this
+  report (fn 34) but for crop yields; its own 7-14-7 sentence (p. IX)
+  names only "the Government of Malawi".  So whether IFDC 2013 states
+  7-14-7 is still UNVERIFIED, and the code cites the FAO/GoM sentence, not
+  IFDC 2013.
 * World Bank LSMS-ISA harmonised panel (point of comparison, not a citation)
 Reference copy: /global/scratch/fsa/fc_jevons/ligon/reference/lsms-isa-harmonised/Reproduction_v2/Code/Cleaning_code/
 - ETH_ESS3.do:896, ETH_ESS4.do:918, ETH_ESS5.do:984 :: gen NPS_N_kg = NPS_kg*0.19

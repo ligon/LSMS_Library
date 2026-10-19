@@ -5021,27 +5021,62 @@ def total_hired_labor_days(plot_labor):
 #     Developing Fertilizer Blends: Ethiopia* (June 2018), Table 1
 #     "Fertilizers available in Ethiopia and volumes sold for the 2016-17
 #     season" (report p. 3): "NP 19 38 0 + 7S  NPS".  The same table lists
-#     the boron / zinc variants at 17.7-18.9% N (NPS+B 18.9 is the largest
-#     seller); the ESS has one NPS question, so 0.19 is the flagship grade,
-#     not a per-bag figure (the 2016-17 volume-weighted mean of the four is
-#     18.8%).  Agrees with the WB harmonised panel (ETH_ESS3.do:896,
-#     ETH_ESS4.do:918, ETH_ESS5.do:984: ``NPS_kg*0.19``).
+#     the boron / zinc variants at 17.7-18.9% N.  The ESS has one NPS
+#     question, so 0.19 is the base grade (plain NPS), not a per-bag
+#     figure: NPS+B at 18.9% was the largest seller by volume (377,527 t
+#     against plain NPS's 238,191 t in 2016-17), and it out-imports plain
+#     NPS in every year 2017-2022 in IFDC's *Fertilizer Statistics Overview
+#     Ethiopia 2010-2022* (2023 Edition, p. 12), where plain NPS is 14-25%
+#     of the four grades' volume.  The volume-weighted mean N of the four is
+#     18.8% in 2016-17 and 18.7-18.9% in each of 2017-2022, so 0.19 is at
+#     most ~1.4% (relative) high.  Agrees with the WB harmonised panel
+#     (ETH_ESS3.do:896, ETH_ESS4.do:918, ETH_ESS5.do:984: ``NPS_kg*0.19``).
 #   - D Compound 8% N (Malawi ``D Compound Fertilizer``, Module D type code
-#     5).  Two publishers, twenty years apart, give a different P/K grade
-#     and the SAME N: Government of Malawi, *Fertilizer Regulations, 2003*
-#     (WIPO Lex MW022), Schedule B, Part A, Examples of Penalty Compilation,
-#     example 2 (printed p. 30): 'A "D" compound (8-14-7-6.5S) fertilizer
-#     was guaranteed as 8% N, 14% P2O5, 7% K2O, and 6.5%S'; and IFDC & AFAP
-#     for AGRA, *Assessment of Fertilizer Distribution Systems and
-#     Opportunities for Developing Fertilizer Blends: Malawi* (June 2018),
-#     Table 1 "Main fertilizer straights, compounds and blends available in
-#     Malawi" (report p. 5): "8:18:15+6S+0.1B  Compound D/Super D", repeated
-#     in IFDC's *Fertilizer Statistics Overview Malawi* 2016-2021 (p. 7)
-#     and 2019-2023 (p. 8) editions.  DIVERGES from the WB harmonised panel,
-#     which uses 0.07 with no citation (MWI_IHPS1.do:804 and IHPS2-4,
-#     ``gen nitrogen_kg5 = D_kg * 0.07`` under ``*CD compound``); a 2013 IFDC
-#     "7-14-7" grade that would explain it could not be retrieved, so it is
-#     not cited here.  On Malawi's 726 D Compound rows the two differ by 1/8.
+#     5; the IHS has no separate Super D code).  The Malawi documents below
+#     give 8% N while the P/K/S grade drifts; the one exception is named
+#     after them.
+#       * IFDC with the Department of Agricultural Research Services,
+#         Ministry of Agriculture, for the Government of Malawi, *Proposed
+#         Fertilizer Regulations, 2003* (Appendix C, under the Proposed
+#         Fertilizer Act, 2003; September 2003; WIPO Lex MW022, "Other
+#         Texts").  A DRAFT prepared by IFDC, not enacted regulations, and
+#         the grade is a worked penalty example, not a schedule of
+#         registered grades: Schedule B, A. "Investigational Allowances --
+#         Penalty Rates", Examples of Penalty Compilation, example 2,
+#         printed p. 31 (PDF p. 23): 'A "D" compound (8-14-7-6.5S)
+#         fertilizer was guaranteed as 8% N, 14% P2O5, 7% K2O, and 6.5%S'.
+#       * IFDC & AFAP for AGRA, *Assessment of Fertilizer Distribution
+#         Systems and Opportunities for Developing Fertilizer Blends:
+#         Malawi* (June 2018), Table 1 "Main fertilizer straights, compounds
+#         and blends available in Malawi" (report p. 5): "8:18:15+6S+0.1B
+#         Compound D/Super D", whose next row is "NPK 10:24:20 + 6S + 0.1B
+#         Super D" -- a different product at ~10% N, which is why a ``Super
+#         D`` label gets no share here.  IFDC's *Fertilizer Statistics
+#         Overview Malawi* names both: 8-18-15+6S+0.1B+0.1Zn "(Compound D)"
+#         and 10-24-20+6S+0.1B "(Super D)", in the 2016-2021 edition (2022
+#         Edition, draft 1), p. 7, and the 2019-2023 (2024 Edition), p. 8.
+#       * Independent of IFDC: Ministry of Agriculture, *Guide to
+#         Agriculture Production and Natural Resources Management in
+#         Malawi* (revised 2020), Table 54 "Some commonly used fertilizers
+#         in tobacco and their nutrient composition", printed p. 232 (PDF
+#         p. 254 of the copy hashed): "Compound D 8 18 15 4 0.1" (N, P2O5,
+#         K2O, S, B %), beside "Super D 10.5 24 20 6 0.15".
+#     DIVERGES from both other harmonisations of these files.  The WB panel
+#     uses 0.07 with no citation (MWI_IHPS1.do:804 and IHPS2-4, ``gen
+#     nitrogen_kg5 = D_kg * 0.07`` under ``*CD compound``).  A 7% grade IS
+#     in print for Malawi: FAO & GoM (Omuto & Vargas), *Soil nutrient loss
+#     assessment in Malawi* (2018), p. IX: "Compound D (a local term that
+#     refers to an NPK blend of 7-14-7)", attributed to "the Government of
+#     Malawi (GoM)" with no source note.  7-14-7 is Zimbabwe's Compound D
+#     grade.  The report cites IFDC's 2013 *Malawi fertilizer assessment*
+#     (fn 34) for crop yields, not for this grade, so IFDC 2013 as the
+#     origin of the WB's 0.07 is unverified.  EPAR uses 0.10
+#     (EPAR_UW_Malawi_IHS_W1.do:2204-2208, "D COMPOUND - 10-20-10",
+#     ``0.10*(itemcode==5)``), which is Zambia's Compound D grade.  So 0.08
+#     is the grade the Malawi documents give, and 0.07 / 0.10 are other
+#     countries' grades.  On Malawi's 726 D Compound rows 0.08 and 0.07
+#     differ by 1/8.  Any Super D a household recorded under code 5 would
+#     make 0.08 slightly low; that cannot be measured.
 #     Page text and SHA-256 of every source: slurm_logs/gh867_nitrogen/.
 #
 # ORGANIC INPUTS ARE REFUSED A SHARE, DELIBERATELY (GH #867, same ruling:
@@ -5135,7 +5170,8 @@ _NITROGEN_CONTENT = {
     'other fertilizer': 0.0,
     # country-specific blends, cited above (GH #867)
     'nps': 0.19,          # Ethiopia, 19-38-0+7S (IFDC/AFAP 2018 Table 1)
-    'd compound': 0.08,   # Malawi, 8% N (Fertilizer Regulations 2003; IFDC)
+    'd compound': 0.08,   # Malawi, 8% N (IFDC proposed regs 2003;
+                          # IFDC/AFAP 2018; MoA Guide 2020)
 }
 
 
@@ -5348,7 +5384,8 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     ``NPS`` (0.19, grade 19-38-0+7S) and Malawi's ``D Compound Fertilizer``
     (0.08) carry CITED shares -- publisher, document and table are in the
     comment above :data:`_NITROGEN_CONTENT`; D Compound's 0.08 diverges
-    from the WB panel's uncited 0.07.  Organic inputs (manure, compost,
+    from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
+    Zambia's Compound D grades).  Organic inputs (manure, compost,
     organic fertilizer, in every corpus language) are REFUSED a share:
     they stay unmatched, are counted on ``refused_organic_*``, and are
     named in the warning as a refusal, not a gap.

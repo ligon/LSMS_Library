@@ -2969,26 +2969,56 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
 =transformations.nitrogen_kg= does with them:
 
   - *=D Compound Fertilizer= = 0.08 kg N / kg* (ruling @ligon 2026-10-18:
-    a CITED share).  Two publishers, twenty years apart, agree on the N and
-    not on the P/K: Government of Malawi, /Fertilizer Regulations, 2003/
-    (WIPO Lex MW022), Schedule B, Part A, penalty example 2, printed p. 30
-    ('A "D" compound (8-14-7-6.5S) fertilizer was guaranteed as 8% N');
-    IFDC & AFAP for AGRA, /Assessment of Fertilizer Distribution Systems and
-    Opportunities for Developing Fertilizer Blends: Malawi/ (June 2018),
-    Table 1, report p. 5 (=8:18:15+6S+0.1B= "Compound D/Super D", tobacco,
-    paprika, flowers).  *The WB harmonised panel uses 0.07*
-    (=MWI_IHPS1.do:804= and IHPS2-4, uncited); on the 65,298.5 kg of D
-    Compound product the two give 5,223.9 vs 4,570.9 kg N.  Served
+    a CITED share).  The Malawi documents agree on the N and not on the
+    P/K/S:
+    - IFDC with the Department of Agricultural Research Services, Ministry
+      of Agriculture, for the Government of Malawi, /Proposed Fertilizer
+      Regulations, 2003/ (Appendix C, under the Proposed Fertilizer Act,
+      2003; WIPO Lex MW022, "Other Texts") -- an IFDC-prepared DRAFT, and
+      the grade is a worked penalty example, not a registered-grade
+      schedule: Schedule B, A. "Investigational Allowances -- Penalty
+      Rates", example 2, printed p. 31 (PDF p. 23) ('A "D" compound
+      (8-14-7-6.5S) fertilizer was guaranteed as 8% N').
+    - IFDC & AFAP for AGRA, /Assessment of Fertilizer Distribution Systems
+      and Opportunities for Developing Fertilizer Blends: Malawi/ (June
+      2018), Table 1, report p. 5 (=8:18:15+6S+0.1B= "Compound D/Super D",
+      tobacco, paprika, flowers) -- and the next row is =NPK 10:24:20 + 6S
+      + 0.1B= "Super D", a different product at ~10% N.  IFDC's /Fertilizer
+      Statistics Overview Malawi/ (2022 Edition draft 1, p. 7; 2024
+      Edition, p. 8) names 8-18-15+6S+0.1B+0.1Zn "Compound D" beside
+      10-24-20 "Super D".
+    - Independent of IFDC: Ministry of Agriculture, /Guide to Agriculture
+      Production and Natural Resources Management in Malawi/ (revised
+      2020), Table 54 (tobacco fertilizers), printed p. 232 (PDF p. 254):
+      "Compound D 8 18 15 4 0.1", beside "Super D 10.5 24 20 6 0.15".
+    *Idiosyncrasy: the IHS has no Super D code.*  IHS3 =ag_d39a= carries six
+    labels (=23:21:0+4S/CHITOWE=, =dap=, =can=, =urea=, =D COMPOUND=,
+    =OTHER FERTILIZER (SPECIFY)=), so a household's Super D lands under code
+    5 or 6; any under 5 makes 0.08 slightly low, unmeasurably.
+    *The WB harmonised panel uses 0.07* (=MWI_IHPS1.do:804= and IHPS2-4,
+    uncited); a 7% grade is in print for Malawi only in FAO & GoM (Omuto &
+    Vargas), /Soil nutrient loss assessment in Malawi/ (2018), p. IX
+    ("Compound D (a local term that refers to an NPK blend of 7-14-7)"),
+    attributed to the Government of Malawi with no source note -- and
+    7-14-7 is Zimbabwe's Compound D grade.  That report cites IFDC's 2013
+    /Malawi fertilizer assessment/ (fn 34), but for crop yields, not for
+    the grade.  *EPAR uses 0.10* (=EPAR_UW_Malawi_IHS_W1.do:2204-2208=,
+    "D COMPOUND - 10-20-10"), Zambia's Compound D grade.  On the 65,298.5
+    kg of D Compound product 0.08 and 0.07 give 5,223.9 vs 4,570.9 kg N.  Served
     =nitrogen_kg= moved 835,011.9 -> 840,235.8 kg N (726 rows; 33,113 ->
     33,466 plots); per wave 2010-11 48,956.4 -> 49,195.1, 2013-14 187,342.9
     -> 188,848.4, 2016-17 333,857.4 -> 334,896.5, 2019-20 264,855.3 ->
     267,295.8.
   - *=NPK Fertilizer= is served at the shared map's 0.17 (NPK 17-17-17), and
     that is probably wrong for this country -- NOT changed here.*  Malawi's
-    basal NPK is the 23:21:0+4S blend ("Chitowe"): the same Regulations'
-    penalty example 3 is "A 23-21-0 + 4S compound ... guaranteed as 23% N",
-    IFDC/AFAP 2018 Table 1 lists =NPK 23:21:00 +4S= for maize, and the WB
-    panel credits its NPK block at 0.23.  On 1,600,479 kg of NPK product,
+    basal NPK is the 23:21:0+4S blend ("Chitowe"), and the survey says so
+    itself: the IHS3 source label of type code 1 is =23:21:0+4S/CHITOWE=
+    (=ag_d39a=, 7,717 of 11,364 slot-1 rows), which =harmonize_input= serves
+    as =NPK Fertilizer=.  The same proposed Regulations' penalty example 3
+    (printed p. 31) is "A 23-21-0 + 4S compound ... guaranteed as 23% N",
+    IFDC/AFAP 2018 Table 1 lists =NPK 23:21:00 +4S= for maize, FAO & GoM
+    2018 p. IX has "23:21:0+4S (also known as Chitowe)", and both the WB
+    panel and EPAR credit code 1 at 0.23.  On 1,600,479 kg of NPK product,
     0.17 gives 272,081.4 kg N and 0.23 would give 368,110.2.  The map has no
     country axis, so this is a design decision, drafted as a new issue.
   - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same

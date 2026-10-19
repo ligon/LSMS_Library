@@ -14,14 +14,24 @@ The citations, repeated here because the ruling asks for them in the test:
   p. 3: ``NP 19 38 0 + 7S  NPS``.  Agrees with the WB harmonised panel
   (``ETH_ESS3.do:896`` / ``ETH_ESS4.do:918`` / ``ETH_ESS5.do:984``,
   ``NPS_kg*0.19``).
-* **D Compound = 0.08 kg N / kg** -- Government of Malawi, *Fertilizer
-  Regulations, 2003* (WIPO Lex MW022), Schedule B, Part A, Examples of
-  Penalty Compilation, example 2, printed p. 30: 'A "D" compound
-  (8-14-7-6.5S) fertilizer was guaranteed as 8% N'; and IFDC & AFAP for
-  AGRA, *Assessment ... Malawi* (June 2018), Table 1 "Main fertilizer
-  straights, compounds and blends available in Malawi", report p. 5:
-  ``8:18:15+6S+0.1B  Compound D/Super D``.  The WB panel's 0.07
-  (``MWI_IHPS1.do:804``) is uncited and is NOT what this map serves.
+* **D Compound = 0.08 kg N / kg** -- IFDC with DARS / Ministry of
+  Agriculture, for the Government of Malawi, *Proposed Fertilizer
+  Regulations, 2003* (a draft; WIPO Lex MW022, "Other Texts"), Schedule B,
+  A. "Investigational Allowances -- Penalty Rates", Examples of Penalty
+  Compilation, example 2, printed p. 31 (PDF p. 23): 'A "D" compound
+  (8-14-7-6.5S) fertilizer was guaranteed as 8% N'; IFDC & AFAP for AGRA,
+  *Assessment ... Malawi* (June 2018), Table 1 "Main fertilizer straights,
+  compounds and blends available in Malawi", report p. 5:
+  ``8:18:15+6S+0.1B  Compound D/Super D``, whose next row is ``NPK
+  10:24:20 + 6S + 0.1B  Super D`` (a different product, ~10% N); and,
+  independent of IFDC, the Ministry of Agriculture's *Guide to
+  Agriculture Production and Natural Resources Management in Malawi*
+  (revised 2020), Table 54, printed p. 232 (PDF p. 254):
+  ``Compound D 8 18 15 4 0.1``.  The WB panel's 0.07 (``MWI_IHPS1.do:804``)
+  is uncited and is NOT what this map serves; it matches the 7-14-7 that
+  FAO & GoM, *Soil nutrient loss assessment in Malawi* (2018), p. IX,
+  gives with no source (Zimbabwe's Compound D grade).  EPAR's 0.10 is
+  Zambia's 10-20-10.
 * **Organic: no share.**  Refused, by ruling; the measured reasons are in
   the comment above ``_NITROGEN_CONTENT``.
 
@@ -78,11 +88,13 @@ def test_nps_carries_the_cited_19_percent_share():
 
 
 def test_d_compound_carries_the_cited_8_percent_share():
-    """Malawi ``D Compound Fertilizer`` (Module D type code 5): 8% N per the
-    Malawi Fertilizer Regulations 2003, Schedule B Part A example 2 (p. 30),
-    and IFDC/AFAP for AGRA 2018 Malawi assessment, Table 1 (p. 5).  Reached
+    """Malawi ``D Compound Fertilizer`` (Module D type code 5): 8% N per
+    IFDC's *Proposed* Fertilizer Regulations 2003 for the Government of
+    Malawi, Schedule B penalty example 2 (printed p. 31), IFDC/AFAP for AGRA
+    2018 Malawi assessment, Table 1 (p. 5), and the Ministry of
+    Agriculture's Guide (revised 2020), Table 54 (printed p. 232).  Reached
     through the strip rule (``... fertilizer`` -> ``d compound``).  NOT the
-    WB panel's uncited 0.07."""
+    WB panel's uncited 0.07 nor EPAR's 0.10."""
     assert T._NITROGEN_CONTENT['d compound'] == 0.08
     out, _ = _run([('2019-20', 'hh1', 'p1', 'D Compound Fertilizer', 'x',
                     'Kg', 100.0)])
