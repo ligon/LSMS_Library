@@ -109,16 +109,8 @@ def food_acquired(df):
     return out
 
 
-def Int_t(value):
-    '''
-    Formatting interview date
-    ''' 
-    # date = f'{value[0]}-{value[1]}-{value[2]}'
-    date = f'{int(value.iloc[0])}-{int(value.iloc[1])}-{int(value.iloc[2])}'
-    return pd.to_datetime(date, format='%Y-%m-%d', errors='coerce').date()
-
 def interview_date(df):
+    # Int_t arrives already parsed (GH #1045: `datetime:` spec in data_info.yml).
     df['visit'] = df.groupby(level='i')['Int_t'].rank(method='first').astype(int).astype(str)
     df = df.set_index('visit', append=True)
-    df['Int_t'] = pd.to_datetime(df['Int_t'])
     return df

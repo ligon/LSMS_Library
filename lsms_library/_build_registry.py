@@ -239,6 +239,35 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library._parallel_waves.build_workers",
     "lsms_library._parallel_waves.worker_make_jobs",
     "lsms_library._parallel_waves.group_waves_by_target",
+    "lsms_library._parallel_waves._datetime_ledger",
+    # GH #1045, the build-time calendar parser.  TWO different reasons share
+    # this block, and the difference matters:
+    #
+    # (a) The PARSER entry points DO determine content.  They are excluded
+    #     from RECURSION only: each is also tagged
+    #     ``@build_transform(tables=datetime_parse.CALENDAR_TABLES)``, and
+    #     ``build_transforms_fingerprint`` folds a tagged ROOT directly from
+    #     ``_BUILD_TRANSFORMS`` without consulting this set -- so they are
+    #     versioned for exactly the tables that carry a calendar column.
+    #     Without the exclusion, the ALL-scoped ``Wave.grab_data`` (which calls
+    #     ``apply_datetime_specs``) and ``Wave.column_mapping`` (which calls
+    #     ``spec_source_vars``) would recurse into them and fold the parser into
+    #     EVERY table, so a parser edit would re-warm the corpus (decision 1,
+    #     #1045).  Pinned by tests/test_gh1045_parse_datetime.py, which also
+    #     pins that every table using a spec or a script call is on the list.
+    "lsms_library.datetime_parse.parse_datetime",
+    "lsms_library.datetime_parse.assign_datetime",
+    "lsms_library.datetime_parse.spec_source_vars",
+    "lsms_library.datetime_parse.apply_datetime_specs",
+    "lsms_library.datetime_parse.is_datetime_spec",
+    # (b) Pure REPORTING, like the null-read audit: replay / per-wave filter of
+    #     the parse report and its footer reader.  Return nothing that reaches
+    #     a parquet.
+    "lsms_library.datetime_parse.replay_datetime_audit",
+    "lsms_library.datetime_parse.wave_datetime_audit",
+    "lsms_library.datetime_parse.datetime_reports",
+    "lsms_library.local_tools.read_parquet_datetime_audit",
+    "lsms_library.country._replay_wave_stamp",  # wave-tier replay of the grain + date stamps: reporting only (#1045 r1 F3)
 })
 
 
@@ -263,6 +292,8 @@ _EXCLUDED_CALLABLES = frozenset({
 _EXCLUDED_CONSTANTS = frozenset(
     {"_GRAIN_LEDGER", "_NULL_READ_LEDGER", "_QUANTITY_LEDGER",
      "_NULL_INDEX_LEDGER",
+     # GH #1045: the build-time date-parse log, same argument.
+     "_DATETIME_LEDGER",
      # GH #675: process-local logs / memos, same argument.
      "_BUILD_DROP_LEDGER", "_DEGRADED_ATTEMPTED", "_SOURCE_PROBES"})
 

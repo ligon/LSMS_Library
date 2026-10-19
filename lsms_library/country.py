@@ -49,6 +49,7 @@ from .local_tools import (
     stamp_parquet_hash,
     read_parquet_grain_audit,
     read_parquet_cache_waves,
+    read_parquet_datetime_audit,
     read_parquet_build_drops,
     source_tier,
     _collect_file_paths_from_block,
@@ -67,6 +68,13 @@ from .errors import (LabelUnavailableError, UnitsUnavailableError,
                      UnregisteredCountryError)
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
+from . import datetime_parse as _datetime_parse
+from .datetime_parse import (
+    DatetimeCoercionWarning, DatetimeAmbiguityWarning, DatetimeParseWarning,  # noqa: F401  (re-exported)
+    DatetimeParseError, DatetimeStringAtReadWarning, datetime_reports,       # noqa: F401
+    _DATETIME_LEDGER, _YEAR_LAST_DATE, apply_datetime_specs, is_datetime_spec,
+    replay_datetime_audit, spec_source_vars, wave_datetime_audit,
+)
 from .null_index_audit import check_index_levels
 from .quantity_audit import check_quantities
 from . import _parallel_waves
@@ -1344,6 +1352,20 @@ class Wave:
         myvars = data_info.get('myvars')
         final_mapping = dict()
         final_mapping['df_edit'] = formatting_functions.get(request)
+        # GH #1045: a dict-valued myvar with a `datetime:` key is a declarative
+        # calendar spec.  Its source columns are extracted under temporary
+        # names and parsed by grab_data (apply_datetime_specs) before the df_edit
+        # hook runs.
+        datetime_specs = {key: value for key, value in (myvars or {}).items()
+                          if is_datetime_spec(value)}
+        myvars = {key: value for key, value in (myvars or {}).items()
+                  if key not in datetime_specs}
+        for key, spec in datetime_specs.items():
+            myvars.update(spec_source_vars(key, spec))
+        if datetime_specs:
+            # Only when present: callers that unpack the mapping as
+            # ``{file: ...}`` (ehcvm's raw-input lookup) must not see a new key.
+            final_mapping['datetime_specs'] = datetime_specs
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
@@ -1358,6 +1380,14 @@ class Wave:
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
                     for key, val in overrides.items():
+                        if key in datetime_specs or is_datetime_spec(val):
+                            # GH #1045: the spec's temporary source columns
+                            # were expanded once for every file; a per-file
+                            # override would be silently dropped.
+                            raise ValueError(
+                                f"{request}: a per-file override of the datetime "
+                                f"spec {key!r} ({file_name}) is not supported; "
+                                f"give every file the same source variables")
                         if key == 't':
                             idxvars_override[key] = (idxvars_updated[key][0], lambda x, val=val: val)
                         elif key in idxvars:
@@ -1680,6 +1710,7 @@ class Wave:
         def get_data(data_info_dic, mapping_info):
             convert_cat = (data_info_dic.get('converted_categoricals') is None)
             df_edit_function = mapping_info.pop('df_edit')
+            datetime_specs = mapping_info.pop('datetime_specs', None)
             # When multiple files are listed, allow missing columns (filled with NaN)
             multiple_files = len(mapping_info) > 1
             dfs = []
@@ -1725,6 +1756,11 @@ class Wave:
                         df = df.replace(na, np.nan)
                 dfs.append(df)
             df = pd.concat(dfs, axis=0, sort=False)
+            # GH #1045: parse declared calendar columns HERE, in the wave, where
+            # the source's format is known -- and before the df_edit hook, which
+            # may rank or compare them (Mali 2014-15 builds `visit` from Int_t).
+            df = apply_datetime_specs(df, datetime_specs, country=self.country.name,
+                                      table=request, wave=self.year)
 
             if df_edit_function:
                 # GH #868: name the cell for a reducer the hook calls, so its
@@ -2070,6 +2106,8 @@ class Wave:
                 df = to_parquet(df, cache_path, absolute_path=True,
                                 cache_hash=self._input_hash(request),
                                 grain_audit=_wave_grain_audit(
+                                    self.country.name, request, self.year),
+                                datetime_audit=wave_datetime_audit(
                                     self.country.name, request, self.year),
                                 build_drops=wave_drops)
                 _mark_degraded_written(
@@ -4395,6 +4433,13 @@ class Country:
                 read_parquet_grain_audit(cache_path),
                 self.name, method_name,
             )
+            # GH #1045: the date-parse report, by the same argument -- filtered
+            # to the waves served, so a 2019-20 request is not told (or, under
+            # LSMS_DATE_STRICT, failed) about a 2008-09 defect.
+            replay_datetime_audit(
+                read_parquet_datetime_audit(cache_path),
+                self.name, method_name, waves=waves,
+            )
             # GH #675: still degraded and not healable now -- serve, loudly.
             _warn_degraded_serve(self.name, method_name, build_drops, cache_path)
             # GH #809: there is deliberately NO trust-once-and-stamp
@@ -4467,13 +4512,27 @@ class Country:
                 # coverage rests on the manifest alone: absent it (a pre-#891
                 # parquet), fall through to the normal path rather than guess.
                 covered = read_parquet_cache_waves(parquet_path)
+
+                def _replay_dates():
+                    # GH #1045: this short-circuit serves the parquet too, so
+                    # it replays the build-time date-parse report like every
+                    # other warm read.  (The grain audit is not replayed here;
+                    # that is a separate, pre-existing gap.)
+                    _DATETIME_LEDGER.pop((self.name, method_name), None)
+                    replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
+                                          self.name, method_name, waves=waves)
+
                 if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
                     df_cached = get_dataframe(parquet_path)
                     df_cached = map_index(df_cached)
-                    return self._restrict_to_waves(df_cached, waves)
+                    df_cached = self._restrict_to_waves(df_cached, waves)
+                    _replay_dates()
+                    return df_cached
                 if covered is None and set(waves) == set(self.waves):
                     df_cached = get_dataframe(parquet_path)
-                    return map_index(df_cached)
+                    df_cached = map_index(df_cached)
+                    _replay_dates()
+                    return df_cached
                 logger.debug(
                     f"assume_cache_fresh short-circuit SKIPPED (coverage): "
                     f"{method_name} covers {covered}; request needs {sorted(waves)}"
@@ -5133,6 +5192,8 @@ class Country:
             _GRAIN_LEDGER.pop((self.name, method_name), None)
             # GH #675: likewise the dropped-sub-df record this load stamps.
             _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
+            # GH #1045: likewise the date-parse report this load stamps.
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
 
             # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
             # own method, excluded from the build fingerprint (GH #908): it
@@ -5213,6 +5274,7 @@ class Country:
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                        cache_waves=build_waves,
+                                       datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                        build_drops=build_drops)
                             _mark_degraded_written((self.name, method_name), build_drops)
                             logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -5264,6 +5326,7 @@ class Country:
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                    cache_waves=build_waves,
+                                   datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                    build_drops=build_drops)
                         _mark_degraded_written((self.name, method_name), build_drops)
                         logger.debug(f"Writing {method_name} to cache {cache_path}")
@@ -5307,6 +5370,10 @@ class Country:
                             _replay_grain_audit(
                                 read_parquet_grain_audit(cache_path),
                                 self.name, method_name,
+                            )
+                            replay_datetime_audit(
+                                read_parquet_datetime_audit(cache_path),
+                                self.name, method_name, waves=waves,
                             )
                             wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
                             cached_df = self._augment_index_from_related_tables(
@@ -5404,7 +5471,9 @@ class Country:
                     build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
+                               grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                cache_waves=build_waves,
+                               datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                build_drops=build_drops)
                     _mark_degraded_written((self.name, method_name), build_drops)
                     logger.debug(
@@ -6572,49 +6641,10 @@ def _enforce_rejected_column_spellings(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-class DatetimeCoercionWarning(RuntimeWarning):
-    """A declared datetime column held strings that did not parse (GH #798).
-
-    Raised by :func:`_coerce_datetime_column` when values that were non-blank
-    strings before the cast come back ``NaT`` after it.  Carries ``country``,
-    ``table``, ``column``, ``count`` and ``examples`` as attributes so callers
-    and tests can target it precisely, the way ``GrainCollapseWarning`` does.
-    """
-
-    def __init__(self, message: str, *, country: str | None = None,
-                 table: str | None = None, column: str | None = None,
-                 count: int = 0, examples: tuple = ()):
-        super().__init__(message)
-        self.country = country
-        self.table = table
-        self.column = column
-        self.count = count
-        self.examples = examples
-
-
-class DatetimeAmbiguityWarning(DatetimeCoercionWarning):
-    """Year-last numeric dates whose day/month order the data cannot settle.
-
-    ``01/05/2019`` is 1 May or 5 January.  :func:`_coerce_datetime_column`
-    reads a group of year-last values day-first only when some value has a
-    first field above 12 and none a second field above 12 (and month-first
-    the other way round); otherwise -- no evidence, or contradictory evidence
-    -- the group is served ``NaT`` and this warning names it.  ``reason`` is
-    ``'ambiguous'`` or ``'conflicting'``; ``wave`` is the ``t`` value, or
-    ``None`` when the column carried no ``t`` level.  (GH #798, @ligon
-    2026-10-18: a silent per-value guess was the one failure mode ruled out.)
-    """
-
-    def __init__(self, message: str, *, reason: str, wave=None, **kw):
-        super().__init__(message, **kw)
-        self.reason = reason
-        self.wave = wave
-
-
-# Year-last numeric dates: d/m/Y or m/d/Y, with -, / or . and an optional
-# time part.  Year-first strings are unambiguous and never match.
-_YEAR_LAST_DATE = re.compile(
-    r'^\s*(\d{1,2})[-/.](\d{1,2})[-/.](\d{4}|\d{2})(?:[ T].*)?$')
+# GH #1045: ``DatetimeCoercionWarning`` / ``DatetimeAmbiguityWarning`` and the
+# year-last regex moved to ``datetime_parse`` (the build-time parser shares the
+# evidence rule); imported above, so ``country.DatetimeCoercionWarning`` still
+# resolves.
 
 
 def _to_datetime_mixed(s: pd.Series, *, where: str, dayfirst: bool = False,
@@ -6682,9 +6712,24 @@ def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
     where = '/'.join(x for x in (country, table, column) if x) or 'datetime column'
     meta = dict(country=country, table=table, column=column)
     if pd.api.types.is_datetime64_any_dtype(s.dtype):
-        return pd.to_datetime(s, errors='coerce', format='mixed')
+        # GH #1045: a column parsed at build time arrives as datetime64 and is
+        # served exactly as the parquet stores it -- no re-parse, no
+        # resolution change.
+        return s
     was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
                     na_action='ignore').fillna(False).astype(bool)
+    if _datetime_parse.READ_CAST_WARNS_ON_STRINGS and bool(was_str.any()):
+        # GH #1045 work queue: a string reaching the read-time cast is a wave
+        # that does not parse its dates at build time yet.  OFF until the
+        # string-storing countries are migrated (datetime_parse docstring).
+        n_str = int(was_str.sum())
+        warnings.warn(DatetimeStringAtReadWarning(
+            f"{where}: the read-time cast received {n_str} string value(s) "
+            f"(e.g. {list(pd.unique(s[was_str].astype(str))[:3])}); declared "
+            f"datetime columns should be parsed at build time with "
+            f"local_tools.parse_datetime (GH #1045).",
+            count=n_str, examples=tuple(pd.unique(s[was_str].astype(str))[:3]),
+            **meta), stacklevel=3)
     parts = s.where(was_str).astype(object).str.extract(_YEAR_LAST_DATE)
     year_last = was_str & parts[0].notna()
     out = _to_datetime_mixed(s.where(~year_last), where=where, **meta)
@@ -7471,6 +7516,9 @@ def _replay_wave_stamp(path: Path | str, country: str, table: str, wave: str | N
     other frame.  Footer-only read, ~1 ms.
     """
     _replay_grain_audit(read_parquet_grain_audit(path), country, table, wave=wave)
+    # GH #1045: the build-time date-parse report rides in the same parquet.
+    replay_datetime_audit(read_parquet_datetime_audit(path), country, table, wave=wave,
+                          waves=None if wave is None else [wave])
 
 
 # Sites whose report is filed INSIDE a wave's build stage -- i.e. from within
