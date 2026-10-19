@@ -17,16 +17,18 @@
 
 no_kg_factor:
   - item: Egg
-    units: [Single, Piece, Pair, Dozen, Crate]
+    units: [Single, Piece, Ball, Pair, Dozen, Crate]
     reason: >-
       The (t, Egg) per-kg baseline the item arm divides by is built from
       egg 'Kilogram' rows that price at the PER-EGG price (2005-06 median
       1,000 cedis on Kilogram 13 rows vs Single 105 rows at 1,000; 2012-13
       0.4 GHS on both), i.e. counts mislabelled as kilograms.  The ladder
-      then serves (Egg, Single) at 0.50 kg per egg and (Egg, Piece) at
-      0.0012 kg; an egg weighs ~0.05-0.065 kg.  No count unit of egg can
-      get a defensible kilogram from that baseline, so none is minted.
+      then serves (Egg, Single) 0.50 kg per egg, Piece and Ball 0.0012 kg,
+      Pair 0.082 kg, Dozen 0.024 kg, Crate (30 eggs) 0.030 kg; an egg weighs
+      ~0.05-0.065 kg.  No count unit of egg gets a defensible kilogram from
+      that baseline, so none is minted.  'Ball' is a count unit (GLSS6 8H
+      prints 'Balls 03' beside 'Pieces 31').
     evidence: >-
       CONTENTS.org, "Count unit for own-produced chicken" and "Eggs: count
       unit and no inferred kilograms" (GH #1042).  Container and
-      non-count units ('All', 'Ball', 'Basket', ...) are not declared here.
+      non-count units ('All', 'Basket', 'Heap', ...) are not declared here.

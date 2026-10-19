@@ -247,7 +247,8 @@ assert fa.loc[~_both, 'Derivation'].isna().all(), (
 # Lcp: the wave vocabulary -> the COUNTRY harmonize_food axis.
 # Pure rename; an unmapped label raises rather than passing through.
 fa = to_country_food_labels(fa, '2005-06')
-# GH #1042: unit code 0 ('None' -> Unknown) on own-produced chicken prices
-# like one bird -> the count unit 'Single' (ghanalss.UNRECORDED_UNIT_IS_COUNT).
+# GH #1042: unit code 0 ('None' -> Unknown) on own-produced chicken, egg and
+# fresh coconut prices like one item -> the count unit 'Single'
+# (ghanalss.UNRECORDED_UNIT_IS_COUNT).
 fa = unrecorded_unit_to_count(fa, '2005-06')
 to_parquet(fa, 'food_acquired.parquet')
