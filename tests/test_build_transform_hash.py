@@ -590,34 +590,6 @@ def test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint():
     assert not leaked, f"read gate leaked into the build fingerprint: {leaked}"
 
 
-def test_editing_the_read_gate_moves_no_hash(monkeypatch):
-    """GH #908, measured: a no-op edit to the extracted gate moves 0 of the
-    ``build_transforms_fingerprint`` values and 0 of ~35 probed
-    ``Country._table_cache_hash`` values.  Positive control: the identical
-    probe on ``Country._union_waves`` -- kept in the closure on purpose, its
-    order is the build's cross-wave concat order -- DOES move them, so the
-    probe is capable of detecting a leak."""
-    btf0, tch0 = _gate_probe_hashes()
-    assert len(tch0) >= 30, f"probe too small: {len(tch0)} cells"
-
-    _probe_edit(monkeypatch, lsms_library.country.Country._read_l2_country_cache)
-    btf1, tch1 = _gate_probe_hashes()
-    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
-    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
-    assert not moved_btf and not moved_tch, (
-        f"editing the read gate moved {len(moved_btf)}/{len(btf0)} fingerprints "
-        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
-
-    monkeypatch.undo()
-    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
-    btf2, tch2 = _gate_probe_hashes()
-    assert any(btf0[t] != btf2[t] for t in btf0), \
-        "positive control failed: the probe cannot see an edit to a closure callable"
-    assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
-    monkeypatch.undo()
-    R.clear_caches()
-
-
 # ---------------------------------------------------------------------------
 # GH #1045 r1 F3: the WAVE-tier stamp replay is reporting, like the gate
 # ---------------------------------------------------------------------------
@@ -651,3 +623,32 @@ def test_editing_the_wave_stamp_replay_moves_no_hash(monkeypatch):
         "positive control failed: the probe cannot see an edit to a closure callable"
     monkeypatch.undo()
     R.clear_caches()
+
+
+def test_editing_the_read_gate_moves_no_hash(monkeypatch):
+    """GH #908, measured: a no-op edit to the extracted gate moves 0 of the
+    ``build_transforms_fingerprint`` values and 0 of ~35 probed
+    ``Country._table_cache_hash`` values.  Positive control: the identical
+    probe on ``Country._union_waves`` -- kept in the closure on purpose, its
+    order is the build's cross-wave concat order -- DOES move them, so the
+    probe is capable of detecting a leak."""
+    btf0, tch0 = _gate_probe_hashes()
+    assert len(tch0) >= 30, f"probe too small: {len(tch0)} cells"
+
+    _probe_edit(monkeypatch, lsms_library.country.Country._read_l2_country_cache)
+    btf1, tch1 = _gate_probe_hashes()
+    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+    assert not moved_btf and not moved_tch, (
+        f"editing the read gate moved {len(moved_btf)}/{len(btf0)} fingerprints "
+        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+
+    monkeypatch.undo()
+    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
+    btf2, tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a closure callable"
+    assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
+    monkeypatch.undo()
+    R.clear_caches()
+
