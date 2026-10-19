@@ -13,10 +13,12 @@ GH #1047, two halves of one rule (a unit is always a real, greppable value):
    table.)
 2. ``nigeria.crop_production_for_wave`` served ``u = NaN`` on 13,138 rows
    (3,053 / 3,009 / 1,694 / 3,467 / 1,915 in 2011Q1 / 2013Q1 / 2016Q1 /
-   2019Q1 / 2024Q1).  A blank raw unit code is now ``U_UNKNOWN`` -- the
-   GH #1041 ruling, applied to the crop side -- and a code the canonicaliser
-   cannot place keeps its raw code through ``format_id`` (2011Q1's
-   unlabelled ``5`` and ``0``), the #607 rule.  No row is dropped.
+   2019Q1 / 2024Q1).  Every unit ``_canon_unit`` cannot place is now
+   ``U_UNKNOWN`` -- the GH #1041 ruling, applied to the crop side.  That
+   includes 2011Q1's 12 rows whose code (5, 0) has no value label: unlike an
+   unlisted FOOD code they do not keep the raw code, because crop ``u`` is a
+   label space and the API-time ``u`` table is keyed on food codes -- a kept
+   ``'5'`` was measured served as ``'mudu'`` (11 rows).  No row is dropped.
 
 Two tiers: synthetic-frame tests of the functions (no microdata), and a
 cache-gated guardrail on the BUILT tables.
@@ -94,7 +96,7 @@ def _crop_frame(raw_units, decoded_units, *, with_unit=True):
     return fr
 
 
-def test_crop_unit_blank_is_unknown_and_unlabelled_code_is_kept():
+def test_crop_unit_blank_or_unplaceable_is_unknown():
     nigeria = _nigeria_module()
     fr = _crop_frame([1.0, np.nan, 5.0, 0.0],
                      ['1. KILOGRAMS', np.nan, '5.0', '0.0'])
@@ -102,10 +104,23 @@ def test_crop_unit_blank_is_unknown_and_unlabelled_code_is_kept():
     u = out.reset_index().set_index('i')['u']
     assert u['1'] == 'Kg'                       # labelled: canonicalised
     assert u['2'] == U_UNKNOWN                  # blank: no unit recorded
-    assert u['3'] == '5'                        # unlabelled: raw code kept
-    assert u['4'] == '0'
+    assert u['3'] == U_UNKNOWN                  # unlabelled code: not placed
+    assert u['4'] == U_UNKNOWN
     assert not out['u'].isna().any()
     assert len(out) == 4                        # nothing dropped
+
+
+def test_a_raw_crop_code_would_be_relabelled_as_a_food_unit():
+    """Why an unplaceable crop code is NOT kept raw: the country's ``u`` table
+    is applied to crop_production's ``u`` column at API time, keyed on FOOD
+    unit codes, so a raw ``'5'`` would be served as that table's Preferred
+    Label for 5 (``mudu``, the W2 food meaning).  If this ever stops holding,
+    the decision in ``crop_production_for_wave`` can be revisited."""
+    from lsms_library.local_tools import df_from_orgfile
+    tab = df_from_orgfile(str(NIGERIA_PY.parent / 'categorical_mapping.org'), name='u')
+    codes = dict(zip(tab['Code'].astype(int), tab['Preferred Label']))
+    assert codes.get(5) == 'mudu'
+    assert U_UNKNOWN not in set(tab['Code'].astype(str))
 
 
 def test_crop_frame_without_a_unit_column_is_unknown():
@@ -153,5 +168,7 @@ def test_no_crop_row_has_a_nan_unit(crop_production):
          else crop_production.index.get_level_values('u').to_series())
     assert not u.isna().any(), int(u.isna().sum())
     assert not u.astype(str).str.match(FLOAT_STRING.pattern).any()
-    # 13,086 on the 2026-10-18 build; a floor, not a pin.
+    # no raw code in the label space (a bare '5' is relabelled 'mudu')
+    assert not u.astype(str).str.fullmatch(r'\d+').any()
+    # 13,138 on the 2026-10-18 build; a floor, not a pin.
     assert (u == U_UNKNOWN).sum() > 10000

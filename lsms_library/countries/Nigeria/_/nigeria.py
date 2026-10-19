@@ -437,20 +437,18 @@ def crop_production_for_wave(t, frames, crop_labels):
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
                              if fr.get('qty') in df.columns else pd.NA)
-        # `u` is never NaN (GH #1047, the crop side of #1041).  A unit the
-        # canonicaliser cannot place falls back, positionally, to the RAW
-        # code read through `format_id` (the #607 rule: a code with no label
-        # keeps its raw code -- W1-PH's unlabelled 5 / 0); a BLANK raw code,
-        # or a frame naming no unit column, means no unit was recorded and is
-        # the missing-unit sentinel U_UNKNOWN.  NaN on `u` used to be served
-        # on 13,138 rows (nearly all with no harvest quantity) and fell out of
-        # every groupby on `u`.
+        # `u` is never NaN (GH #1047, the crop side of #1041): a unit
+        # `_canon_unit` cannot place is the missing-unit sentinel U_UNKNOWN.
+        # That is a blank raw code (13,126 rows, nearly all with no harvest
+        # quantity), a frame naming no unit column, and the 12 W1-PH rows
+        # whose code (5, 0) has no value label.  Those 12 do NOT keep their
+        # raw code, as an unlisted FOOD code does (#607): crop `u` is a LABEL
+        # space, and the API-time `u` table is keyed on food codes, so a raw
+        # '5' would be served as the W2 food unit 'mudu'.  NaN used to be
+        # served on 13,138 rows and fell out of every groupby on `u`.
         from lsms_library.transformations import U_UNKNOWN
         if fr.get('unit') in dec.columns:
             u = dec[fr['unit']].map(_canon_unit).astype('string')
-            if fr['unit'] in df.columns:
-                code = df[fr['unit']].map(format_id).astype('string')
-                u = u.where(u.notna(), code.values)
             piece['u'] = u.fillna(U_UNKNOWN).values
         else:
             piece['u'] = pd.Series(U_UNKNOWN, index=df.index, dtype='string').values
