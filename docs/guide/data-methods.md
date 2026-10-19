@@ -196,9 +196,11 @@ labels : str or dict, optional
 period : {'day', 'week', 'month', 'year'}, optional
     Rescale each wave from the window its survey recorded
     to this one (``month`` = 365.25/12 days, ``year`` =
-    365.25): value x period_days / total_exposure_days,
-    where exposure is ``recall_days * n_asks`` from
-    ``ll.recall()``.  Default ``None`` returns the recorded
+    365.25): value x period_days / exposure_days, where
+    exposure is ``recall_days * n_asks`` from
+    ``ll.recall()`` -- or the column's own count where the
+    record has ``n_asks_by_column`` (Burkina Faso 2014
+    quantities: 1 ask of 4).  Default ``None`` returns the recorded
     window unchanged.  Raises ``PeriodUnavailableError``
     (a ``ValueError``) naming every wave whose window is
     not established -- not recorded, a weak rung, or

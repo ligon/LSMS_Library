@@ -2,9 +2,11 @@
 
 `food_expenditures` returns a number whose reference period used to be recorded
 nowhere. Most of the corpus is **7 days asked once**; GhanaLSS delivers **30
-days** (six five-day asks), Burkina Faso 2014 **28** (four quarterly 7-day
-passages), Guatemala and Panama **15**. Pooling GhanaLSS with Ethiopia compared
-a 30-day figure with a 7-day one, and nothing said so. GH #851.
+days** (six five-day asks), Burkina Faso 2014 **28** of spending (four quarterly
+7-day passages) but **7** of quantity (only passage 1 fields the quantity grid),
+Mali 2014-15 **14** (two EACI passages of one panel, summed), Guatemala and
+Panama **15**. Pooling GhanaLSS with Ethiopia compared a 30-day figure with a
+7-day one, and nothing said so. GH #851.
 
 Two phases:
 
@@ -31,10 +33,13 @@ own:
 |---|---|
 | `recall_days` | length of ONE ask |
 | `n_asks` | how many times the module is asked — **asks, not interviewer visits** (GLSS7 fields seven visits and asks food at six) |
+| `n_asks_by_column` | optional `{column: n}` for a flow column asked a different number of times than the module — Burkina Faso 2014 is `{Quantity: 1}` against `n_asks: 4`. It may name only `Expenditure` or `Quantity` and needs the evidence the count does |
 | `within_wave_variation` | the axis the window varies on *inside* the wave (`stratum`, `by-s`, …); when set, both numbers are null |
 | `basis` | the evidence rung: `questionnaire` > `variable-label` > `config-comment` > `filename` > `not-recorded` |
 
-`total_exposure_days = recall_days * n_asks` is a property, not a stored field.
+`total_exposure_days = recall_days * n_asks` is a property, not a stored field;
+`rec.exposure_days(column)` is the same with the column's `n_asks_by_column`
+override, when it has one.
 The records live in `countries/{C}/_/recall.yml`, generated from the evidence
 base `.coder/coverage/food_recall.csv` by `scripts/promote_recall_records.py`;
 edit the CSV, not the YAML. The record rides through `Feature()` (GH #873).
@@ -62,28 +67,32 @@ ll.Feature('food_expenditures')(period='month')
 conversion stated (`Togo/_/data_scheme.yml`). Anything else is a `ValueError`
 naming the list.
 
-**The conversion.** The derived tables sum `visit` away, so a row covers its
-cell's whole exposure. Each row's flow column — `Expenditure` on
+**The conversion.** The derived tables sum `visit` away, so a row covers every
+ask of its column in the wave. Each row's flow column — `Expenditure` on
 `food_expenditures`, `Quantity` on `food_quantities` — is rescaled by its own
 wave's record:
 
 ```
-value_in_period = value * period_days / (recall_days * n_asks)
+value_in_period = value * period_days / (recall_days * n_asks_for(column))
 ```
 
-It is linear and per-`t`, so it commutes with the `labels=` re-aggregation,
-`market=` and `numeraire=`; the library applies it first. Nothing else in the
-frame changes — index, row count, other columns. The conversion is recorded on
-`df.attrs['period']`:
+where `n_asks_for(column)` is the column's `n_asks_by_column` entry if it has
+one, else `n_asks`. It is linear and per-`t`, so it commutes with the `labels=`
+re-aggregation, `market=` and `numeraire=`; `Country` applies it first. Nothing
+else in the frame changes — index, row count, other columns. The conversion is
+recorded on `df.attrs['period']`:
 
 ```python
 out = ll.Country('GhanaLSS').food_expenditures(waves=['2016-17'], period='year')
 out.attrs['period']['GhanaLSS']
 # {'period': 'year', 'period_days': 365.25, 'columns': ['Expenditure'],
 #  'waves': {'2016-17': {'exposure_days': 30.0, 'factor': 12.175,
-#            'recall_days': 5.0, 'n_asks': 6, 'basis': 'questionnaire',
-#            'ask_count_basis': 'measured'}}}
+#            'recall_days': 5.0, 'n_asks': 6, 'n_asks_source': 'n_asks',
+#            'basis': 'questionnaire', 'ask_count_basis': 'measured'}}}
 ```
+
+`n_asks_source` is `'n_asks_by_column'` where the column's own count was used
+(Burkina Faso 2014's `food_quantities`).
 
 **Read `basis` before trusting a converted number.** `config-comment` means a
 maintainer asserted the window in repo prose; it converts (the ruling counted
@@ -142,45 +151,59 @@ drops whole countries. The window is a property of the `(country, wave)` cell,
 not of the country: dropping by country would discard GhanaLSS's six
 convertible waves for its one stratified wave — exactly the cells `period=`
 exists to compare — and would keep 17 of the 32 convertible cells instead of
-32. A degraded country is re-called with `waves=` set to its convertible waves;
-on the full corpus that costs 150 s against 111 s for the unconverted call.
+32.
 
-Two consequences of the re-call, both properties of any `waves=` subset rather
-than of `period=`:
+**How a degraded country is converted: a slice of the unconverted read.**
+`Feature` reads the country's table again *without* `period=` — the very frame
+an unconverted `Feature` call gets — keeps the rows of the convertible waves,
+and applies the same conversion to them. So for every kept row:
 
-- **The kept rows equal `Country(c).<table>(waves=convertible, period=p)`** —
-  the same call the error tells a single-country user to make — not the
-  all-waves table sliced afterwards. For `food_expenditures` and for
-  `food_quantities(units='units')` those are identical. For
-  `food_quantities(units='kgs')` they differ slightly, because the inferred kg
-  factors pool across the waves requested (GH #850: "`t` lives inside the
-  estimator"). Measured on Nigeria's six convertible waves: 18,659 of 425,547
-  rows (4.4%) get a different factor, total 1,017,505.51 → 1,017,240.96 kg
-  (−0.026%).
-- **Under `LSMS_NO_CACHE`** the wave manifest is not consulted, so the subset
-  re-call rebuilds `food_acquired` for the subset — a second cold build — and,
-  as for any subset request in that mode, can shrink the coverage of a warm
-  parquet (CLAUDE.md, "Wave coverage is carried by a manifest"); the next
-  ordinary request rebuilds once.
+```
+Feature(t)(period=p, **kw) row  ==  Feature(t)(**kw) row  x  its wave's factor
+```
+
+exactly — bit-for-bit, measured on Mali and Burkina Faso (`food_quantities`,
+default `units='kgs'`), Uganda (`units='kgs'`, `labels='Aggregate'`,
+`market='Region'`), GhanaLSS and Nigeria (`food_expenditures` with
+`labels='Aggregate'`, `market='Region'`; `food_quantities` with `units='kgs'`,
+`labels='Aggregate'`), and pinned by `TestDeliveredFeature`. The second read
+costs time: 146 s against 104 s for the unconverted
+`Feature('food_expenditures')()` on the full corpus.
+
+*Why not re-call the country with `waves=` its convertible waves* (the first
+version): `food_quantities(units='kgs')` infers kg factors by pooling over the
+waves *requested* (GH #850), so a wave subset moved numbers that have nothing to
+do with `period=` — Mali 2014-15 +2.90% kg (49,312 of 108,711 rows changed),
+Burkina Faso 2014 +0.73%, Uganda 2019-20 44% of rows (red team r1, R3). A slice
+of the unconverted read moves none. The per-wave `attrs` records (`population`,
+`recall`, `derivations`) are re-attached for the slice, so they describe the
+rows served; `labels_unmatched` still reports the whole read.
+
+`Country(c).<table>(waves=e.convertible, period=p)` — the escape hatch the
+error names — remains a *subset request*: under `units='kgs'` its rows can
+differ from the `Feature` rows for the same waves, for the GH #850 reason
+above.
 
 ## Coverage today: **32 of 67** cells convert
 
-Measured 2026-10-19 on a warm corpus at `ddd79800c`:
+Measured 2026-10-19 on a warm corpus (red-team r1 fixes applied):
 `Feature('food_expenditures')(period='year')` keeps 32 of 67 cells —
 **3,405,677 of 6,146,931 rows** (55.4%) — and every kept cell's total is its
-unconverted total times exactly `365.25 / exposure`. (Over `food_acquired`, the
-same 32 cells are 7,489,800 of 11,926,972 rows.)
+unconverted total times exactly `365.25 / exposure`, using each column's own
+exposure. `Feature('food_quantities')(units='units', period='year')` keeps the
+same 32 cells, 3,937,370 of 7,796,095 rows, on the same check. (Over
+`food_acquired`, the same 32 cells are 7,489,800 of 11,926,972 rows.)
 
 | country | waves | exposure | asks x days | basis |
 |---|---|---|---|---|
-| Burkina_Faso | 2014 | 28 | 4 x 7 (quarterly passages) | config-comment |
+| Burkina_Faso | 2014 | `Expenditure` 28, `Quantity` 7 | spending 4 x 7 (quarterly passages); quantity 1 x 7 — only passage 1 fields the quantity grid (`n_asks_by_column: {Quantity: 1}`) | config-comment |
 | Ethiopia | 2011-12, 2013-14, 2015-16, 2018-19, 2021-22 | 7 | 1 x 7 | questionnaire |
 | GhanaLSS | 1987-88, 1988-89 | 14 | 1 x 14 (12A; 12B is derived onto the same fortnight) | questionnaire |
 | GhanaLSS | 1998-99, 2012-13 | 30 | 6 x 5 | config-comment |
 | GhanaLSS | 2005-06 | 30 | 10 x 3 | questionnaire |
 | GhanaLSS | 2016-17 | 30 | 6 x 5 | questionnaire |
 | Guatemala | 2000 | 15 | 1 x 15 | variable-label |
-| Mali | 2014-15 | 7 | 1 x 7 | variable-label |
+| Mali | 2014-15 | 14 | 2 x 7 — the module is asked at both EACI passages of one panel and the build sums them (`ask_count_basis: measured`) | variable-label |
 | Nigeria | 2010Q3, 2011Q1, 2012Q3, 2013Q1, 2015Q3, 2016Q1 | 7 | 1 x 7 | config-comment |
 | Panama | 1997, 2003, 2008 | 15 | 1 x 15 | config-comment |
 | Serbia | 2007 | 7 | 1 x 7 | config-comment |
@@ -209,7 +232,38 @@ this page's bold count drifts from the live records again.
 
 The not-recorded half is the work queue: reading one questionnaire per series
 and recording it in `food_recall.csv` converts its cells with no code change
-(`.coder/HANDOFF_recall_research.md` ranks the series by leverage).
+(`.coder/HANDOFF_recall_research.md` ranks the series by leverage) — once the
+cell's *delivery* is also classified (next section).
+
+## The exposure is what the sources deliver, and a test checks it
+
+A record that miscounts the asks feeding a column serves a wrong number with
+full confidence. Red team r1 (2026-10-19) found two such cells among the 32,
+both certified by the first cut of `period=`:
+
+- **Burkina Faso 2014 `food_quantities`, 4x too low.** One per-wave exposure
+  (4 x 7 = 28) divided a quantity that only passage 1 asks
+  (`Burkina_Faso/_/CONTENTS.org`). `food_quantities(units='units',
+  period='week')` was 1,052,184.4; it is now 4,208,737.6, the passage-1 sum.
+  Fixed by `n_asks_by_column: {Quantity: 1}`; `food_expenditures` is unchanged
+  at 28 days.
+- **Mali 2014-15, 2x too high on both tables.** The record said one ask; the
+  build reads `EACIALI_p1` and `EACIALI_p2` — the same 3,804 households — and
+  sums them (`Mali/_/CONTENTS.org`). `food_expenditures(period='week')` was
+  5,652,532,205; it is now 2,826,266,102.5.
+
+`tests/test_recall_period.py::TestDeliveredExposure*` now checks every
+convertible cell, by delivery class:
+
+| class | cells | check |
+|---|---|---|
+| `visit-level` — the country declares `visit` in `food_acquired`'s index | Burkina_Faso 2014; GhanaLSS 1987-88, 1988-89, 1998-99, 2005-06, 2012-13, 2016-17 | **generic**: per flow column, the visits carrying a value must equal `n_asks_for(column)` |
+| `declared-visit` — a YAML wave naming a `visit` idxvar or several source files, its `visit` dropped by a hook | Mali 2014-15 (2 files), Togo 2018 (`vague`, a sample split) | **generic for the YAML path**: the most distinct visits any household has in the declared sources; with no data, several files must mean that many asks |
+| `one-ask-by-inspection` — a script-path wave with no `visit` level | the other 23 | **table-driven**: listed by hand with the source the script reads, pinned to `n_asks == 1` |
+
+A convertible cell in no class fails the suite, so a record promoted from
+`not-recorded` cannot convert until someone has said how its asks are
+delivered. Against the r1 records the check fails on exactly R1 and R2.
 
 ## What `period=` does not do
 
@@ -228,8 +282,9 @@ and recording it in `food_recall.csv` converts its cells with no code change
   question `food_expenditures` already carries unconverted (charter §6,
   `.coder/charter-recall-windows.md`).
 - **It does not adjust for a household that missed an ask.** `n_asks` is the
-  schedule's count (`ask_count_basis` says whether it was measured from the
-  delivered `visit` level or declared); a household interviewed at fewer visits
+  schedule's count (`ask_count_basis` says whether it was measured -- from the
+  delivered `visit` level, or for Mali 2014-15 from the households the two
+  passage files share -- or declared); a household interviewed at fewer visits
   is divided by the full exposure.
 - **It does not convert a window that varies within the wave.** GLSS3's
   stratum-varying window needs a per-row carrier and is out of Phase II's
@@ -241,10 +296,12 @@ and recording it in `food_recall.csv` converts its cells with no code change
 
 ## Cache cost
 
-None. The derived food tables are computed at read time and never written to a
-parquet, and nothing added here is reachable from a build fingerprint. Measured
-by stash-probe on 10 countries: **0 of 292** hashes moved (12
-`build_transforms_fingerprint`, 205 `Country._table_cache_hash`, 75
+`period=` itself: none. The derived food tables are computed at read time and
+never written to a parquet, and nothing added here is reachable from a build
+fingerprint. Measured by stash-probe on 10 countries: **0 of 292** hashes moved
+(12 `build_transforms_fingerprint`, 205 `Country._table_cache_hash`, 75
 `Wave._input_hash`); a positive control (a no-op line in the
 `@build_transform`-tagged `df_data_grabber`) moved all 292. `period=None`
-returns byte-identical frames.
+returns byte-identical frames. The r1 fixes add one cost that is not
+`period=`'s: correcting the false docstring in `Mali/2014-15/_/mapping.py`
+moves every Mali table's hash (one Mali re-warm; no served number changes).

@@ -81,8 +81,9 @@ class PeriodUnavailableError(ValueError):
     The third member of the Contract B family, after
     :class:`LabelUnavailableError` and :class:`UnitsUnavailableError`:
     ``Country`` raises, ``Feature`` catches it *specifically* and degrades --
-    at the grain of the WAVE, not the country: it re-calls the country with
-    ``waves=convertible`` and drops only the unknown cells, with one
+    at the grain of the WAVE, not the country: it reads the country's table
+    without ``period=``, converts the rows of the ``convertible`` waves and
+    drops only the unknown cells, with one
     aggregated warning and ``df.attrs['period_unavailable']``.  Subclasses
     :class:`ValueError` for the same reason ``UnitsUnavailableError`` does.
 
