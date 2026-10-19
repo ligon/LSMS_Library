@@ -19,6 +19,17 @@ GH #1047, two halves of one rule (a unit is always a real, greppable value):
    unlisted FOOD code they do not keep the raw code, because crop ``u`` is a
    label space and the API-time ``u`` table is keyed on food codes -- a kept
    ``'5'`` was measured served as ``'mudu'`` (11 rows).  No row is dropped.
+3. ``plot_inputs`` served ``u = NaN`` on 6,742 rows.  1,018 of them were NOT
+   missing: W4/W5 record input units the harvest canonicaliser does not know
+   (``210. STEMS``, ``280. METRIC CUP``, ``260. SEEDLING/PLANT``,
+   ``21. TRACTORS``), now placed by ``_canon_input_unit``.  The other 5,724
+   record no unit and are ``U_UNKNOWN``, filled once AFTER the per-channel
+   collapse.
+
+Folding an unplaceable recorded LABEL into ``Unknown`` silently would be the
+same loss under the ruling's name, so ``_canon_units`` REPORTS it
+(``UnplacedUnitLabelWarning``); a blank or a bare unlabelled code stays
+silent.
 
 Two tiers: synthetic-frame tests of the functions (no microdata), and a
 cache-gated guardrail on the BUILT tables.
@@ -123,6 +134,97 @@ def test_a_raw_crop_code_would_be_relabelled_as_a_food_unit():
     assert U_UNKNOWN not in set(tab['Code'].astype(str))
 
 
+def test_an_unplaceable_unit_label_is_reported_not_silently_unknown():
+    """The D3 failure mode: a recorded LABEL the canonicaliser does not know
+    must be NAMED.  Blanks and bare unlabelled codes are missing units and
+    stay silent."""
+    nigeria = _nigeria_module()
+    fr = _crop_frame([1.0, np.nan, 5.0, 99.0],
+                     ['1. KILOGRAMS', np.nan, '5.0', '99. CALABASH'])
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning, match='99. CALABASH') as rec:
+        out = nigeria.crop_production_for_wave('2011Q1', [fr], {1010: 'Maize'})
+    msgs = [str(w.message) for w in rec
+            if issubclass(w.category, nigeria.UnplacedUnitLabelWarning)]
+    assert len(msgs) == 1 and "'99. CALABASH': 1" in msgs[0], msgs
+    assert '5.0' not in msgs[0]                 # an unlabelled code is silent
+    u = out.reset_index().set_index('i')['u']
+    assert u['4'] == U_UNKNOWN                  # still served, never NaN
+    assert len(out) == 4
+
+
+def test_missing_units_raise_no_report():
+    import warnings
+    nigeria = _nigeria_module()
+    labels = pd.Series(['1. KILOGRAMS', np.nan, '', '5.0', '0', '210. STEMS'])
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', nigeria.UnplacedUnitLabelWarning)
+        out = nigeria._canon_units(labels, canon=nigeria._canon_input_unit)
+    assert out.tolist()[0] == 'Kg' and out.tolist()[-1] == 'Stem'
+    assert out.iloc[1:5].isna().all()
+
+
+@pytest.mark.parametrize('label, expected', [
+    ('210. STEMS', 'Stem'),
+    ('260. SEEDLING/PLANT', 'Seedling/Plant'),
+    ('280. METRIC CUP', 'Metric Cup'),
+    ('21. TRACTORS', 'Tractor'),
+])
+def test_input_only_units_are_placed_and_kept_out_of_canon_unit(label, expected):
+    """Placed for plot_inputs; NOT added to ``_canon_unit``, which
+    crop_production and community_prices also use."""
+    nigeria = _nigeria_module()
+    assert nigeria._canon_input_unit(label) == expected
+    assert pd.isna(nigeria._canon_unit(label))
+
+
+def test_metric_cup_is_the_u_tables_own_label():
+    """280 is the W4 codebook's 'Metric Cup', already a Preferred Label."""
+    from lsms_library.local_tools import df_from_orgfile
+    tab = df_from_orgfile(str(NIGERIA_PY.parent / 'categorical_mapping.org'), name='u')
+    codes = dict(zip(tab['Code'].astype(int), tab['Preferred Label']))
+    assert codes.get(280) == 'Metric Cup'
+
+
+def _seed_frames(rows):
+    """rows: (qty0, unit0, qty1, unit1) per plot-crop, two acquisition channels."""
+    df = pd.DataFrame({
+        'hhid': [f'{k + 1}' for k in range(len(rows))],
+        'plotid': ['1'] * len(rows),
+        'cropcode': [1010] * len(rows),
+        'q0': [r[0] for r in rows], 'u0': [np.nan] * len(rows),
+        'q1': [r[2] for r in rows], 'u1': [np.nan] * len(rows),
+    })
+    dec = df.copy()
+    dec['u0'] = [r[1] for r in rows]
+    dec['u1'] = [r[3] for r in rows]
+    return df, dec
+
+
+def test_plot_inputs_unit_is_never_nan_and_is_filled_after_the_collapse():
+    nigeria = _nigeria_module()
+    df, dec = _seed_frames([
+        (2.0, '1. KILOGRAMS', np.nan, np.nan),     # one channel, Kg
+        (3.0, np.nan, np.nan, np.nan),             # a quantity, no unit
+        (np.nan, np.nan, np.nan, np.nan),          # nothing recorded
+        (np.nan, np.nan, np.nan, '1. KILOGRAMS'),  # no qty; unit on channel 1
+        (4.0, '210. STEMS', np.nan, np.nan),       # an input-only unit
+    ])
+    seeds = nigeria.seed_rows_for_wave(
+        df, dec, 'hhid', 'plotid', 'cropcode',
+        channels=[dict(qty='q0', unit='u0'), dict(qty='q1', unit='u1')],
+        crop_labels={1010: 'Maize'})
+    out = nigeria.assemble_plot_inputs('2018Q3', [seeds])
+    u = out.reset_index().set_index('i')['u']
+    assert not out['u'].isna().any(), out['u'].tolist()
+    assert u['1'] == 'Kg'
+    assert u['2'] == U_UNKNOWN
+    assert u['3'] == U_UNKNOWN
+    # a per-CHANNEL fill would hand row 4 channel 0's 'Unknown' instead
+    assert u['4'] == 'Kg'
+    assert u['5'] == 'Stem'
+    assert len(out) == 5
+
+
 def test_crop_frame_without_a_unit_column_is_unknown():
     nigeria = _nigeria_module()
     fr = _crop_frame([1.0, 2.0], ['1. KILOGRAMS', '2. GRAMS'], with_unit=False)
@@ -155,6 +257,11 @@ def crop_production():
     return _built('crop_production')
 
 
+@pytest.fixture(scope='module')
+def plot_inputs():
+    return _built('plot_inputs')
+
+
 @pytest.mark.requires_s3
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_no_food_unit_is_float_stringified(food_acquired):
@@ -172,5 +279,19 @@ def test_no_crop_row_has_a_nan_unit(crop_production):
     assert not u.astype(str).str.match(FLOAT_STRING.pattern).any()
     # no raw code in the label space (a bare '5' is relabelled 'mudu')
     assert not u.astype(str).str.fullmatch(r'\d+').any()
-    # 13,138 on the 2026-10-18 build; a floor, not a pin.
-    assert (u == U_UNKNOWN).sum() > 10000
+    # 13,138 on the 2026-10-18 build; a floor and a ceiling, not a pin.
+    assert 10000 < (u == U_UNKNOWN).sum() < 14000
+
+
+@pytest.mark.requires_s3
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_no_plot_input_has_a_nan_unit(plot_inputs):
+    u = plot_inputs['u']
+    assert not u.isna().any(), int(u.isna().sum())
+    assert not u.astype(str).str.fullmatch(r'[\d.]+').any()
+    # The input-only units are placed, not folded into Unknown.
+    served = set(u.dropna())
+    assert {'Stem', 'Metric Cup', 'Seedling/Plant', 'Tractor'} <= served, served
+    # 5,724 on the 2026-10-19 build.  The ceiling is what catches the four
+    # labels above falling back to Unknown (6,742 would be every former NaN).
+    assert 5000 < (u == U_UNKNOWN).sum() < 6500

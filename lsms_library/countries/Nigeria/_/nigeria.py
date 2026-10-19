@@ -350,10 +350,10 @@ def _canon_unit(s):
 
 
 # Units only the plot_inputs modules record (GH #1047), which `_canon_unit`
-# (built for HARVEST units) does not know.  Measured 2026-10-19: W4/W5 seed
-# '210. STEMS' (415 + 470 rows), W4 seed '280. METRIC CUP' (95) and
-# '260. SEEDLING/PLANT' (23), W5 organic fertilizer '21. TRACTORS' (16) --
-# 1,019 rows with a quantity, all served u = NaN before.  280 is the W4
+# (built for HARVEST units) does not know.  Measured 2026-10-19, served
+# rows: W4/W5 seed '210. STEMS' (415 + 470), W4 seed '280. METRIC CUP' (94)
+# and '260. SEEDLING/PLANT' (23), W5 organic fertilizer '21. TRACTORS' (16)
+# -- 1,018 rows with a quantity, all served u = NaN before.  280 is the W4
 # codebook's own 'Metric Cup' (the `u` table's code 280).  Kept OUT of
 # `_canon_unit` so crop_production / community_prices cannot move.
 _INPUT_UNIT_LABELS = (
@@ -988,11 +988,11 @@ def assemble_plot_inputs(t, parts):
     # never per channel: `_pick_channel` / `fert_rows_long_typed` decide
     # "one unit -> sum, mixed -> keep the largest" on the NA-aware units, and
     # a per-channel fill would turn a blank channel into a second "unit".
-    # Measured 2026-10-19 (served rows): 165 rows with a quantity and no
-    # unit (blank code, or a code with no value label); the rest carry NO
-    # quantity at all -- 5,546 seed rows (W1-W3 "no seed used on this plot",
-    # or no channel answered; W4/W5 tree crops, whose planting quantity is
-    # not asked) and 14 with a zero.  See CONTENTS.org.
+    # Measured 2026-10-19 (served rows, 5,724 in all): 164 with a quantity
+    # and no unit (a blank code, or a code with no value label); 14 with a
+    # zero; 5,546 seed rows with NO quantity (W1-W3 "no seed used on this
+    # plot" or no channel answered; W4/W5 tree crops, whose planting
+    # quantity is not asked).  See CONTENTS.org.
     from lsms_library.transformations import U_UNKNOWN
     out['u'] = out['u'].astype('string').fillna(U_UNKNOWN)
     # Dedup on the index grain (defensive: a handful of duplicate
