@@ -349,10 +349,21 @@ Data Scheme:
   community_prices:
     # Item-level community / market food prices (parity-loop GAP C -- OURS-ONLY,
     # the maintainer-priority gap; the WB panel surveys no community prices).
-    # Natural grain (t, v, j, u) -- one row per (community cluster v, harmonized
-    # food item j, native unit u) -- from the COMMUNITY price questionnaire
-    # (CM_SEC_F_ID / cm_sec_f_id), carrying ONLY the REPORTED village-market
-    # unit price.  This is the community-price arm of label unification: j is
+    # Natural grain (t, v, j, u, variety) -- one row per (community cluster v,
+    # harmonized food item j, native unit u, SOURCE item code variety) -- from
+    # the COMMUNITY price questionnaire (CM_SEC_F_ID / cm_sec_f_id), carrying
+    # ONLY the REPORTED village-market unit price.
+    #   variety : the community-price item code (item_id, '1'..'52') as a
+    #           string, GH #840.  j deliberately LUMPS codes (6 MILLET + 7
+    #           SORGHUM -> "Millet & Sorghum (grain)"; 16 COCOYAMS + 17 YAMS;
+    #           25-27 carrots/tomatoes/onions -> "Vegetables (fresh)"), and the
+    #           lumped codes carry different prices, so until #840 a
+    #           groupby().first() kept one and dropped the rest: 15,831 served
+    #           of 17,699 (2019-20 2,769 of 3,076; 2020-21 13,062 of 14,623).
+    #           The survey prices each code once per cluster, so
+    #           (t, v, j, u, variety) is unique and nothing is selected.  The
+    #           code's label (the file's own spelling: upper-case in 2019-20,
+    #           partly lower-case and English in 2020-21) is Description.  This is the community-price arm of label unification: j is
     # the canonical Preferred Label from harmonize_community_price, which REUSES
     # the harmonize_food / harmonize_crop Preferred Labels for every priced
     # food, so a community_prices "Maize (grain)" row lines up with the
@@ -382,8 +393,11 @@ Data Scheme:
     # rows) and 2020-21 (NPS Y5 Refresh Panel; 488 communities, ~14.8k priced
     # rows).  2008-15 has no community questionnaire source on disk (the
     # multi-round panel release retained only the household upd4_hh_* modules).
-    index: (t, v, j, u)
+    index: (t, v, j, u, variety)
     Price: float
+    Description:
+      type: str
+      optional: true
     materialize: make
 
   community_cluster_xwalk:
