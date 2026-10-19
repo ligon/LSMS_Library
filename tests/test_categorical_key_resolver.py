@@ -1,10 +1,14 @@
 """GH #928 P1 + P2: a categorical table can NAME its key, and one resolver reads it.
 
-P1 -- ``#+key: <column>`` on the ``#+`` lines after a table's ``#+name:``.
-``all_dfs_from_orgfile`` records it as ``df.attrs[CATEGORICAL_KEY_ATTR]`` and
-validates it at parse time (``CategoricalKeyDeclarationError``, a
-``RuntimeError`` so neither the cascade's ``KeyError`` fall-through nor the
-global level's ``ValueError`` skip can swallow it).
+P1 -- ``#+key: <column>`` in the run of ``#+`` lines directly ABOVE a table's
+``#+name:``.  ``all_dfs_from_orgfile`` records it as
+``df.attrs[CATEGORICAL_KEY_ATTR]`` and validates it at parse time
+(``CategoricalKeyDeclarationError``, a ``RuntimeError`` so neither the
+cascade's ``KeyError`` fall-through nor the global level's ``ValueError`` skip
+can swallow it).  BELOW ``#+name:`` it is refused: Org attaches ``#+name:`` to
+the next element, so a ``#+key:`` line there unnames the table in Emacs
+(measured with Emacs 29.1: ``org-babel-ref-resolve`` -> "Reference not
+found").
 
 P2 -- ``country._categorical_key_column(table, idxvars=None, *, exclude=())`` is
 the one resolver: explicit ``idxvars`` -> ``#+key:`` -> first column that is
@@ -47,11 +51,11 @@ def _org(tmp_path, body, name="categorical_mapping.org"):
 
 
 # A table whose code column is LAST, so the positional rule keys it wrongly.
-# ``{key}`` is a keyword line; ``#+caption:`` stands in for "no declaration",
-# because a blank line there would end the table.
+# ``{key}`` is the keyword line above ``#+name:``; ``#+caption:`` stands in for
+# "no declaration".
 _REORDERED = """
-    #+name: Rural
     {key}
+    #+name: Rural
     | Preferred Label | Settlement Label | Code |
     |-----------------+------------------+------|
     | Urban           | City             |    1 |
@@ -96,20 +100,22 @@ def test_keyspace_is_not_mistaken_for_key(tmp_path):
     ("#+key: Cod", "not one of its columns"),
     ("#+key:", "not one of its columns"),
     ("#+key: Preferred Label", "reserved"),
-    ("#+key: Code\n    #+key: Settlement Label", "twice"),
+    ("#+key: Code\n    #+key: Settlement Label", "two #\\+key: lines"),
 ])
 def test_bad_declaration_raises_at_parse_time(tmp_path, decl, needle):
     path = _org(tmp_path, _REORDERED.format(key=decl))
     with pytest.raises(CategoricalKeyDeclarationError, match=needle) as ei:
         all_dfs_from_orgfile(path)
-    assert str(path) in str(ei.value) and "'Rural'" in str(ei.value)
+    assert str(path) in str(ei.value)
+    if not needle.startswith("two"):
+        assert "'Rural'" in str(ei.value)
 
 
 @pytest.mark.parametrize("reserved", sorted(CATEGORICAL_RESERVED_COLUMNS - {"Preferred Label"}))
 def test_a_reserved_column_cannot_be_declared_the_key(tmp_path, reserved):
     body = f"""
-        #+name: Rural
         #+key: {reserved}
+        #+name: Rural
         | Code | Preferred Label | {reserved} |
         |    1 | Urban           | x          |
         """
@@ -117,15 +123,49 @@ def test_a_reserved_column_cannot_be_declared_the_key(tmp_path, reserved):
         all_dfs_from_orgfile(_org(tmp_path, body))
 
 
-def test_key_line_before_name_is_refused_not_ignored(tmp_path):
+def test_key_line_below_name_is_refused_not_ignored(tmp_path):
+    """Below ``#+name:`` the line would unname the table in Org, so it is
+    refused with the reason, never silently honoured or skipped."""
     body = """
-        #+key: Code
         #+name: Rural
+        #+key: Code
         | Code | Preferred Label |
         |    1 | Urban           |
         """
-    with pytest.raises(CategoricalKeyDeclarationError, match="AFTER"):
+    with pytest.raises(CategoricalKeyDeclarationError, match="BELOW") as ei:
         all_dfs_from_orgfile(_org(tmp_path, body))
+    assert "'Rural'" in str(ei.value) and "line above" in str(ei.value)
+
+
+@pytest.mark.parametrize("body", [
+    # a blank line between the key and the name
+    "#+key: Code\n\n#+name: Rural\n| Code | Preferred Label |\n|    1 | Urban |\n",
+    # prose between them
+    "#+key: Code\nSome prose.\n#+name: Rural\n| Code | Preferred Label |\n",
+    # no #+name: at all
+    "| Code | Preferred Label |\n\n#+key: Code\n",
+])
+def test_orphan_key_line_is_refused(tmp_path, body):
+    (tmp_path / "o.org").write_text(body, encoding="utf-8")
+    with pytest.raises(CategoricalKeyDeclarationError, match="not attached"):
+        all_dfs_from_orgfile(tmp_path / "o.org")
+
+
+def test_key_attaches_across_a_contiguous_run_of_keyword_lines(tmp_path):
+    body = _REORDERED.format(key="#+KEY: Code\n    #+caption: settlement tiers")
+    assert all_dfs_from_orgfile(_org(tmp_path, body))["Rural"].attrs[
+        CATEGORICAL_KEY_ATTR] == "Code"
+
+
+def test_key_does_not_leak_to_the_next_table(tmp_path):
+    body = _REORDERED.format(key="#+key: Code") + textwrap.dedent("""
+        #+name: Sex
+        | Code | Preferred Label |
+        |    1 | M               |
+        """)
+    tables = all_dfs_from_orgfile(_org(tmp_path, body))
+    assert tables["Rural"].attrs[CATEGORICAL_KEY_ATTR] == "Code"
+    assert CATEGORICAL_KEY_ATTR not in tables["Sex"].attrs
 
 
 def test_declaration_error_is_not_a_keyerror_or_valueerror():

@@ -1889,12 +1889,16 @@ class CategoricalMappingConflictError(RuntimeError):
 # The KEY column of a categorical table (GH #928, P1)
 # --------------------------------------------------------------------------
 #
-# A table may NAME its key column with an org keyword line between its
-# ``#+name:`` line and the table:
+# A table may NAME its key column with an org keyword line directly ABOVE
+# its ``#+name:`` line:
 #
-#     #+name: u
 #     #+key: Original Label
+#     #+name: u
 #     | Original Label | Preferred Label | Code | ...
+#
+# Above, not below: Org attaches ``#+name:`` to the next element, so a
+# ``#+key:`` line between ``#+name:`` and the table would unname the table
+# in Emacs (see :func:`all_dfs_from_orgfile`).
 #
 # :func:`all_dfs_from_orgfile` records the declaration on the parsed frame as
 # ``df.attrs[CATEGORICAL_KEY_ATTR]``; ``country._categorical_key_column`` is
@@ -1917,7 +1921,8 @@ class CategoricalKeyDeclarationError(RuntimeError):
     """A ``#+key:`` line that cannot be honoured (GH #928).
 
     Raised at PARSE time, naming the file and table: a key naming no column,
-    a reserved column, a second ``#+key:`` for one table, or a ``#+key:`` line
+    a reserved column, a second ``#+key:`` for one table, a ``#+key:`` line
+    BELOW its ``#+name:`` (it unnames the table in Org), or a ``#+key:`` line
     not attached to any ``#+name:``.  A ``RuntimeError`` for the same reason
     as :class:`CategoricalMappingConflictError`: ``load_categorical_level``
     skips a global file that raises ``ValueError``, and the cascade treats a
@@ -3732,36 +3737,46 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
     Returns:
         dict: {table_name: DataFrame}
 
-    A ``#+key: <column>`` line among the ``#+`` lines that follow a table's
-    ``#+name:`` declares that table's key column (GH #928); it is recorded as
-    ``df.attrs[CATEGORICAL_KEY_ATTR]`` and validated here, so a mistake raises
-    :class:`CategoricalKeyDeclarationError` naming the file and table.  Every
-    other ``#+`` line is skipped, as before.
+    A ``#+key: <column>`` line in the run of ``#+`` lines directly ABOVE a
+    table's ``#+name:`` declares that table's key column (GH #928); it is
+    recorded as ``df.attrs[CATEGORICAL_KEY_ATTR]`` and validated here, so a
+    mistake raises :class:`CategoricalKeyDeclarationError` naming the file
+    and table.  Every other ``#+`` line is skipped, as before.
+
+    **Above, never below** ``#+name:``.  Org attaches ``#+name:`` to the
+    element that FOLLOWS it, and ``#+key:`` is not an Org affiliated keyword,
+    so a ``#+key:`` line between ``#+name:`` and the table becomes that
+    element: measured with Emacs 29.1 (``org-element``), the table is left
+    unnamed and ``org-babel-ref-resolve`` reports "Reference not found".
+    Above ``#+name:`` the table keeps its name.  The below-placement is
+    therefore refused rather than ignored.
     """
     with open(orgfn, 'r', encoding=encoding) as f:
         contents = f.readlines()
 
     tables = {}
+    # (column, 1-based line) of a #+key: still waiting for its #+name:
+    pending = None
     i = 0
     while i < len(contents):
         line = contents[i].strip()
 
         if line.lower().startswith('#+name:'):
             table_name = line.split(':', 1)[1].strip()
+            key = pending[0] if pending is not None else None
+            pending = None
             i += 1
-            key = None
-            # Skip any extra #+ lines, keeping a #+key: declaration
+            # Skip any extra #+ lines
             while i < len(contents) and contents[i].strip().startswith('#+'):
-                kw = contents[i].strip()
-                if kw.lower().startswith(_ORG_KEY_KEYWORD):
-                    if key is not None:
-                        raise CategoricalKeyDeclarationError(
-                            f"Table {table_name!r} in {orgfn} declares "
-                            f"#+key: twice ({key!r}, then "
-                            f"{kw.split(':', 1)[1].strip()!r}).")
-                    key = kw.split(':', 1)[1].strip()
+                if contents[i].strip().lower().startswith(_ORG_KEY_KEYWORD):
+                    raise CategoricalKeyDeclarationError(
+                        f"{orgfn}:{i + 1}: the #+key: for table "
+                        f"{table_name!r} sits BELOW its #+name: line.  Put it "
+                        f"on the line above #+name: -- Org attaches #+name: "
+                        f"to the next element, so a #+key: line between them "
+                        f"unnames the table (Babel :var cannot find it).")
                 i += 1
-
+            
             # Start reading table
             table_lines = []
             header = None
@@ -3803,12 +3818,24 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
 
             tables[table_name] = df
         elif line.lower().startswith(_ORG_KEY_KEYWORD):
-            # Only reachable when no #+name: precedes it in the same keyword
-            # block -- a declaration that would otherwise be ignored.
-            raise CategoricalKeyDeclarationError(
-                f"{orgfn}:{i + 1}: {line!r} is not attached to a table; a "
-                f"#+key: line goes AFTER the table's #+name: line.")
+            value = line.split(':', 1)[1].strip()
+            if pending is not None:
+                raise CategoricalKeyDeclarationError(
+                    f"{orgfn}:{i + 1}: two #+key: lines above one #+name: "
+                    f"({pending[0]!r} at line {pending[1]}, then {value!r}).")
+            pending = (value, i + 1)
+            i += 1
         else:
+            if pending is not None and not line.startswith('#+'):
+                raise CategoricalKeyDeclarationError(
+                    f"{orgfn}:{pending[1]}: #+key: {pending[0]!r} is not "
+                    f"attached to a table; it must sit in the run of #+ lines "
+                    f"directly above a #+name: line, with nothing else "
+                    f"between.")
             i += 1
 
+    if pending is not None:
+        raise CategoricalKeyDeclarationError(
+            f"{orgfn}:{pending[1]}: #+key: {pending[0]!r} is not attached to "
+            f"a table (no #+name: follows it).")
     return tables

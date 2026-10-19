@@ -87,8 +87,8 @@
 # 'Original Label', 'Preferred Label').
 
 
-#+name: u
 #+key: Original Label
+#+name: u
 | Original Label        | Preferred Label  | Code | 2018-19          | 2021-22               |
 |-----------------------+------------------+------+------------------+-----------------------|
 | 102. Alvéole          | Alvéole          | 102  | Alvéole          | 102. Alvéole          |

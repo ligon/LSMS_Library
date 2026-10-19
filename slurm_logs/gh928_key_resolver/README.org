@@ -1,0 +1,90 @@
+#+title: GH #928 P1 + P2 --- =#+key:= and one categorical key resolver: measurements
+#+date: [2026-10-19 Mon]
+
+Evidence behind branch =fix/928-key-resolver= (base =ddd79800c=). Ruling
+(@ligon, 2026-10-18): P1 (=#+key:=) and P2 (one key resolver) as the first
+increment; P3 (=Status= / =Notes= vocabulary) and P4 (ignorance registry +
+=pd.NA= collapse) deferred.
+
+* Scripts
+
+| script             | what it measures                                                                 | needs data? |
+|--------------------+----------------------------------------------------------------------------------+-------------|
+| =census.py=        | per table, per level and per served view: each caller's key column + a hash of what it serves | no |
+| =summarise.py=     | one census: headline counts; two censuses: every field that moved                | no          |
+| =hash_probe.py=    | =build_transforms_fingerprint=, =Country._table_cache_hash=, =Wave._input_hash= | no          |
+| =hash_diff.py=     | moved / probed, per hash kind                                                     | no          |
+| =closure_parts.py= | every build-closure part as ={name: sha}=, to attribute a fingerprint move        | no          |
+| =served_e2e.py=    | 23 warm API reads, =assume_cache_fresh=True=, digested (rows, index, dtypes, CSV sha) | warm root |
+
+#+begin_src sh
+  # BEFORE: a worktree of the base; AFTER: this branch.  Same commands in each.
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/census.py OUT.json
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/summarise.py BEFORE.json AFTER.json
+  PYTHONSAFEPATH=1 PYTHONPATH=$PWD .venv/bin/python slurm_logs/gh928_key_resolver/hash_probe.py OUT.json
+#+end_src
+
+* Census of the base (every =#+name:= table, every level)
+
+| tables / levels                       | 315 / 42 (global, 39 countries' =_/=, GhanaLSS waves)           |
+| served views (country + wave)         | 580                                                              |
+| positional key names                  | =Code= 144, =Original Label= 82, =Alternate Spelling= 64, =Aggregate Label= 8, =Wave= 5, =Code_2005-06= 2, 10 others x1 |
+| tables declaring =#+key:=             | 0                                                                |
+| tables with a =Status= / =Notes= column | 0                                                              |
+| merge / market / hook / auto-apply disagree (default target) | *0* --- they were four copies of one expression |
+
+The only place two callers key a table differently is the degenerate
+=labels={T: <its own key column>}= request: the selection path excludes the
+target and keys on the next column (or none, raising =KeyError=).  That is the
+designed target-exclusion rule, not a disagreement, and it is unchanged.
+
+Pre-existing and unchanged: 4 raw tables whose positional key column holds a
+NaN crash =_augment_numeric_code_keys= (=int(nan)=) on the default path ---
+Ethiopia =harmonize_food=, GhanaLSS =nonfood_items= / =nonfood_items_9b=,
+Tanzania =harmonize_input=.  None is reachable by the auto-apply (no frame
+column or level carries those names).
+
+* After (this branch, base -> branch)
+
+| census, code change only           | 315 raw + 580 served tables: *0 field moves*; =_unit_kg_factors= 0 of 39 moved |
+| census, + Niger =#+key: Original Label= (above =#+name: u=) | 3 field moves, all Niger =u=: =declared_key= None -> =Original Label=; the degenerate =labels={'u': 'Original'}= goes from =ValueError= ("cannot convert float NaN to integer") to the explicit =KeyError= "no key column left" |
+| served data, 23 warm reads, 6 countries | *23 of 23 byte-identical* (Niger food_acquired / food_quantities / food_prices / crop_production / assets / housing / food_expenditures(market='Region'); Uganda, Malawi, Tanzania, Mali, Nigeria) |
+| cold build, Niger =food_acquired= and =crop_production= | identical to a cold build on the base (rows, index, dtypes, CSV sha) |
+
+* Cache cost --- corpus-invalidating
+
+| hash                           | moved / probed |
+|--------------------------------+----------------|
+| =build_transforms_fingerprint= | 7 / 7          |
+| =Country._table_cache_hash=    | 97 / 97 (12 countries) |
+| =Wave._input_hash=             | 35 / 35        |
+| no-op control (comment in =all_dfs_from_orgfile=) | 0 / 139 |
+
+Attribution (=closure_parts.py=, base vs branch): three callables change ---
+=local_tools.all_dfs_from_orgfile=, =country._categorical_key_column=,
+=country._row_union_categorical= --- and five constants are added
+(=CATEGORICAL_KEY_ATTR=, =CATEGORICAL_RESERVED_COLUMNS= in both modules,
+=_ORG_KEY_KEYWORD=).  The three re-routed read-path sites
+(=_apply_categorical_mappings=, =_market_lookup=, =_finalize_result=) are
+outside the closure and move nothing.  Every table of every country moves
+through =all_dfs_from_orgfile= alone, so no placement of P1 avoids it.
+
+* Placement: ABOVE =#+name:=, never below (a result that contradicts the issue text)
+
+The issue (and =slurm_logs/2026-09-18_categorical_composition/DESIGN.org=)
+put =#+key:= between =#+name:= and the table, verified only against the
+library's own parser.  In Org itself that placement breaks the table's name:
+=#+key:= is not an Org affiliated keyword, so =#+name:= attaches to the
+keyword line and the table is left unnamed.  Measured with Emacs 29.1
+(=emacs --batch -Q=, =org-element-parse-buffer= + =org-babel-ref-resolve=):
+
+| placement                      | org-element sees                  | =org-babel-ref-resolve "u"= |
+|--------------------------------+-----------------------------------+-----------------------------|
+| =#+name: u= / =#+key: Code= / table | keyword name="u"; table name=nil | (error "Reference not found") |
+| =#+key: Code= / =#+name: u= / table | keyword name=nil; table name="u" | the table                   |
+| =#+name: w= / =#+attr_lsms: :key Code= / table | table name="w", attr_lsms (":key Code") | the table |
+
+So the parser accepts =#+key:= only in the run of =#+= lines directly above
+=#+name:= and refuses it below, with the reason.  The DESIGN.org composition
+keywords (=#+keyspace:=, =#+fold:=, =#+column:=) are shown below =#+name:= too
+and inherit the same hazard.

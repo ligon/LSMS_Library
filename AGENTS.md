@@ -420,11 +420,14 @@ the cascade row-additive would change those builds and first needs their
    fingerprint and rebuilds it once.
 
 **A table may NAME its key column: `#+key:` (GH #928).** A line
-`#+key: <column>` among the `#+` lines *after* a table's `#+name:` declares
-which column is the key; `all_dfs_from_orgfile` records it as
+`#+key: <column>` directly *above* a table's `#+name:` declares which column
+is the key; `all_dfs_from_orgfile` records it as
 `df.attrs[CATEGORICAL_KEY_ATTR]` and refuses a bad one at parse time
 (`CategoricalKeyDeclarationError`: not a column, a reserved column, declared
-twice, or a `#+key:` line above its `#+name:`). **One resolver,
+twice, orphaned, or placed *below* `#+name:`). **Above, never below**: Org
+attaches `#+name:` to the next element and `#+key:` is not an affiliated
+keyword, so between `#+name:` and the table it unnames the table in Emacs
+(measured, Emacs 29.1: `org-babel-ref-resolve` -> "Reference not found"). **One resolver,
 `country._categorical_key_column(table, idxvars=None, *, exclude=())`**, serves
 every read-time caller -- the merge, `_unit_kg_factors`, the auto-apply, the
 `_market_lookup` normalisation and the `harmonize_<method>` hook: explicit
