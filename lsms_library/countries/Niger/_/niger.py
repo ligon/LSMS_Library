@@ -1284,8 +1284,8 @@ def _finish_people_last7days(df, t):
 #              questionnaires (numquest 1, 2) that agree on the obs-1 Price
 #              of all 67 varieties both price.  A second record's slot that
 #              repeats a served row is dropped (lossless); the 30 slots
-#              that DISAGREE with the first record are kept as slot + 3,
-#              the GhanaLSS `obs` precedent (see _community_price_triples).
+#              that repeat no served row are kept as slot + 3, the
+#              GhanaLSS `obs` precedent (see _community_price_triples).
 # NOTHING IS SELECTED.  Until GH #840 one row per (t, v, j, u) was kept --
 # post-harvest passage first, then questionnaire order -- and this comment's
 # own `obs` sentence below was not true of the code.
