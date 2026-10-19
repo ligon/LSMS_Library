@@ -461,7 +461,13 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: Piece 418, Ball 69, Dozen 30, Pair 1).  Own-produced fresh coconut on unit
 #: code 0 is now 'Single' (1.0 kg): +8 cells.  kgprice 189,052 -> 187,096;
 #: unitvalue/unitprice and food_acquired rows/Expenditure are unchanged.
-GHANALSS_FOOD_PRICES_ROWS = 560_023
+#: Moved again 2026-10-19 by the GH #1008 screener gate: 560,023 -> 559,980
+#: (-43).  2016-17 Section 8H is now served only where its screener
+#: ``s8hq1 == 1`` (ruling @ligon 2026-10-19); 39 blank-screener source rows
+#: that DO carry quantities with units (109 served rows, 11 households) go
+#: with the "No" fills, and those carried kg factors.  kgprice 187,096 ->
+#: 187,053 (-43) likewise.
+GHANALSS_FOOD_PRICES_ROWS = 559_980
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
@@ -567,9 +573,15 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     # (+12,957 produced reported prices, 12,813 of them the visit-2 per-item
     # fills recorded in GhanaLSS/_/CONTENTS.org); 1,694,623 -> 1,695,046
     # (+423).  Every added row is 2016-17 u='Unknown'.
-    assert len(c.food_prices(units='unitvalue')) == 1_676_514
-    assert len(c.food_prices(units='unitprice')) == 202_613
-    assert len(c.food_quantities(units='units')) == 1_695_046
+    # GH #1008 screener gate (ruling @ligon 2026-10-19) moves all three back
+    # down, by REMOVING 2016-17 Section 8H rows whose screener s8hq1 is not 1:
+    # 1,676,514 -> 1,676,470 (-44); 202,613 -> 190,514 (-12,099: 12,055
+    # u='Unknown' price-only fills -- 11,948 at visit 2, 107 at visits 3..7 --
+    # plus 44 cells of the 39 blank-screener rows with quantities);
+    # 1,695,046 -> 1,695,001 (-45).  No row is added.
+    assert len(c.food_prices(units='unitvalue')) == 1_676_470
+    assert len(c.food_prices(units='unitprice')) == 190_514
+    assert len(c.food_quantities(units='units')) == 1_695_001
 
 
 @pytest.mark.requires_s3

@@ -15,6 +15,9 @@ one step, and before this fix the GhanaLSS cohort could not be told apart:
 The ruling (@ligon, 2026-10-18) keeps the core policy and fixes the index
 country-side: "core never fixes the index".  On the base the cohort was 13,472
 rows -- 2016-17 ``u`` NaN 13,380, 1987-88 ``v`` NaN 54, 1988-89 ``v`` NaN 38.
+A second ruling (@ligon, 2026-10-19, after red-team r1) gates 2016-17's
+Section 8H on its screener ``s8hq1 == 1``: 12,055 of the 13,380 were
+price-only fills on rows the screener skips.
 
 ===========================================  =================================
 claim                                        test
@@ -25,16 +28,23 @@ additive conservation over the retained      ``test_additive_conservation_*``
 rows, kept apart from the visit reduction
 a sentinel ``u`` brings a row back into      ``test_sentinel_u_rejoins_the_sum``
 the sum; a null ``v`` is still deleted
-2016-17: no NaN ``u``; 13,380 ``Unknown``,   ``test_ghanalss_2016_17_*``
-all served ``none`` by the kg ladder         (cache-gated)
+2016-17: no NaN ``u``; 1,325 ``Unknown``,    ``test_ghanalss_2016_17_*``
+all served ``none`` by the kg ladder; the    (cache-gated)
+screener-skipped fills are gone
+2016-17 wave script on a synthetic frame:    ``test_ghanalss_2016_17_*``
+8H served only where ``s8hq1 == 1``; only a  (no cache, no microdata)
+BLANK raw unit code is ``Unknown``
 GLSS1/2: the four cover-page gaps have a     ``test_ghanalss_glss12_*``
-``sample`` row and a ``v``                   (cache-gated)
+``sample`` row and a ``v``; both waves'      (cache-gated / synthetic)
+recovery hooks read ``CLUST`` and refuse
+to guess
 ===========================================  =================================
 
 The synthetic tests pin the FRAMEWORK behaviour the fix relies on (they pass on
 the base as well -- that is the point: D2 is unchanged).  The cache-gated tests
 pin the COUNTRY fix and fail on the base (``200e504a3``): 13,380 NaN ``u``, and
-no ``sample`` row for 104838 / 114519 / 220629 / 269433.
+no ``sample`` row for 104838 / 114519 / 220629 / 269433.  The synthetic
+wave-script tests need ``build()`` / ``screen_8h()`` and fail before them.
 """
 from __future__ import annotations
 
@@ -184,11 +194,39 @@ def test_ghanalss_2016_17_unit_is_never_null(ghana_food):
     w = np.asarray(t == "2016-17")
     assert int(pd.isna(u[w]).sum()) == 0
     unknown = w & np.asarray(pd.Series(u).astype("string").eq(U_UNKNOWN).fillna(False))
-    # 12,958 produced (12,925 price-only) + 422 purchased, as censused.
-    assert int(unknown.sum()) == 13380
-    assert int((unknown & np.asarray(s == "produced")).sum()) == 12958
+    # After the screener gate: 903 produced (870 price-only) + 422 purchased.
+    # Before it (r1): 12,958 produced (12,925 price-only) + 422 purchased.
+    assert int(unknown.sum()) == 1325
+    assert int((unknown & np.asarray(s == "produced")).sum()) == 903
     sub = ghana_food[unknown]
-    assert int((sub["Quantity"].isna() & sub["Price"].notna()).sum()) == 12925
+    assert int((sub["Quantity"].isna() & sub["Price"].notna()).sum()) == 870
+
+
+#: The visit-2 per-item constant "prices" of Section 8H (CONTENTS.org).
+FILLS = {("Cassava", 2.0), ("Tomato (fresh)", 3.0), ("Pepper", 2.0), ("Okra", 7.0)}
+
+
+def test_ghanalss_2016_17_screener_skipped_fills_are_not_served(ghana_food):
+    """Ruling (@ligon, 2026-10-19): 8H only where ``s8hq1 == 1``.
+
+    Of the 12,813 visit-2 fills, 11,934 sat on "No" rows and 14 on blank
+    screeners; the 865 on "Yes" rows stay.  The 104 + 3 later-visit fills go
+    too.  So the 2016-17 produced side loses exactly 12,164 rows
+    (151,721 -> 139,557): 12,055 price-only ``Unknown`` fills and the 109
+    rows of the 39 blank-screener records that carried quantities.
+    """
+    lv = ghana_food.index.get_level_values
+    w = np.asarray(lv("t") == "2016-17")
+    prod = w & np.asarray(lv("s") == "produced")
+    assert int(prod.sum()) == 139557
+    unknown = prod & np.asarray(pd.Series(lv("u")).astype("string").eq(U_UNKNOWN).fillna(False))
+    sub = ghana_food[unknown]
+    price_only = (sub["Quantity"].isna() & sub["Price"].notna()).to_numpy()
+    keys = zip(sub.index.get_level_values("j")[price_only],
+               sub.index.get_level_values("visit")[price_only],
+               sub["Price"].to_numpy(dtype=float, na_value=np.nan)[price_only])
+    fills = sum(1 for j, visit, p in keys if int(visit) == 2 and (str(j), p) in FILLS)
+    assert fills == 865
 
 
 def test_ghanalss_2016_17_unknown_rows_get_no_inferred_kilograms(ghana_food):
