@@ -5403,7 +5403,7 @@ does not decode stays NaN, so the null-index audit (Site I) still reports it.
 =fillna(U_UNKNOWN)= after decoding, which would have laundered any decode
 failure into =Unknown=.  No served row was affected -- the raw 9B file's
 2,624 unlabelled codes (75: 2,261; 77: 363) and 53 unmapped labels (=Mole=
-48, =Ounce= 2, =Drum=, =Ampoule=, =Plot=, red-team r1's census) all sit on
+48, =Ounce= 2, =Drum=, =Ampoule=, =Plot=; red-team r1's census, re-measured) all sit on
 items =Code_9b= does not harmonize -- but the next harmonized one would
 have been silently relabelled.)  The =Value= rescue tests "no unit" as
 =u.isna() | u == 'Unknown'=, i.e. the same rows it reached before.  The kg
@@ -5497,10 +5497,14 @@ Taken as ruled; =test_ghanalss_2016_17_screener_gate_keeps_only_yes= pins
 the spelling, so a flip is a deliberate edit (and a second GhanaLSS
 re-warm).
 
-*What stays on =u='Unknown'=*: the 865 visit-2 fills on screener-"Yes" rows
-(a "constant = fill" rule would be a judgement, not the questionnaire's), the
-422 blank-unit purchases, and the few genuine blank-unit produced rows.
-Served-row accounting: /Accounting/ below.
+*What stays on =u='Unknown'=* (1,325 served rows): 422 blank-unit
+purchases (quantity + amount) and 903 produced rows -- the 865 visit-2 fills
+on screener-"Yes" rows (Cassava 100, Tomato 143, Pepper 307, Okra 315; a
+"constant = fill" rule would be a judgement, not the questionnaire's, and
+these rows report real consumption at other visits), 5 later-visit
+price-only rows (Yam at 3 and at 5, visit 3; Maize flour at 3 x3, visit 5)
+and 33 rows with a quantity (32 with a price).  Served-row accounting:
+/Accounting, the 8H screener gate/ below.
 
 **** GLSS1/GLSS2: four interviewed households are missing from the cover page
 
@@ -5604,6 +5608,37 @@ is 1.0 either way; not resolved here (GH #1008 residual).
 GhanaLSS food assembly is deleted any more; the remaining reduction
 (5,340,606 -> 1,718,320) is visit aggregation alone, and =math.fsum= is
 conserved across it.
+
+**** Accounting, the 8H screener gate (private cold rebuilds; before = the table above's "after", re-measured at =64790d3b1=; after = the gate + the narrowed sentinel)
+
+Every number in the "before" column reproduced the table above exactly.  The
+narrowed sentinel moves nothing on its own (no served unit code fails to
+decode); every movement below is the gate.
+
+| measure                                                    | before            | after             | change    |
+|------------------------------------------------------------+-------------------+-------------------+-----------|
+| =food_acquired= rows (Country)                             | 5,340,606         | 5,328,442         | -12,164   |
+| ... 2016-17 =produced=                                     | 151,721           | 139,557           | -12,164   |
+| ... of which =u='Unknown'= price-only fills                | 12,925            | 870               | -12,055   |
+| ... of which blank-screener rows with a quantity           | 109               | 0                 | -109      |
+| 2016-17 =u= NaN / =Unknown= (produced + purchased)         | 0 / 13,380 (12,958 + 422) | 0 / 1,325 (903 + 422) | |
+| visit-2 fills served (Cassava 2 / Tomato 3 / Pepper 2 / Okra 7) | 12,813       | 865 (100 / 143 / 307 / 315) | -11,948 |
+| =food_acquired= sums Q / E                                 | 15,658,040,288.26 / 19,059,899,600.91 | 15,658,040,003.26 / 19,059,898,591.86 | -285.0 / -1,009.05 |
+| =Feature('food_acquired')(['GhanaLSS'])= rows              | 1,718,320         | 1,706,220         | -12,100   |
+| =Feature= rows with Q, E, Price all NA                     | 23,269 (2016-17 12,926) | 11,214 (2016-17 871) | -12,055 |
+| =Feature= =nan_key_rows= / sums                            | none; = Country   | none; = Country   |           |
+| =kg_factor_sources= (=food_prices= / =food_quantities=)    | item_unit 993,954; unit 605,938; none 3,583,886 | 993,881; 605,903; 3,571,830 | -73; -35; -12,056 |
+| =food_prices()= rows: =kgvalue= / =kgprice=                | 560,023 / 187,096 | 559,980 / 187,053 | -43 / -43 |
+| =food_prices()= rows: =unitvalue= / =unitprice=            | 1,676,514 / 202,613 | 1,676,470 / 190,514 | -44 / -12,099 |
+| =food_quantities(units='kgs')= rows; kilograms             | 1,623,676; 11,007,391.86 | 1,623,637; 11,007,314.38 | -39; -77.48 |
+| =food_quantities(units='units')= rows                      | 1,695,046         | 1,695,001         | -45       |
+| =food_expenditures()= rows; total (=basis='purchased'=)    | 1,406,099; 15,637,502,177.88 | unchanged | 0 |
+| =nutrition= rows; Energy                                   | 34,798; 18,256,924,922.06 | 34,798; 18,256,809,497.31 | 0; -115,424.75 |
+
+=nutrition='s column sums all move by under 0.01% (Carbohydrate *rises*
+106,442: removing 39 rows of evidence re-estimates a few =(t, j, u)= kg
+factors that other rows use).  =sample=, =household_roster= and every
+other wave are untouched.
 
 *Still open, and NOT this issue*: 1991-92 =household_roster= has 142 rows
 (29 households) with a NaN =v=.  Same class, different file, measured but
