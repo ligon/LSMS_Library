@@ -564,8 +564,8 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     # every derived-table groupby deleted; they are now u='Unknown' (no kg
     # factor, so kgvalue/kgprice and GHANALSS_FOOD_PRICES_ROWS do not move).
     # 1,676,093 -> 1,676,514 (+421 purchased E/Q); 189,656 -> 202,613
-    # (+12,957 produced reported prices, 12,827 of them the visit-2 per-item
-    # constants recorded in GhanaLSS/_/CONTENTS.org); 1,694,623 -> 1,695,046
+    # (+12,957 produced reported prices, 12,813 of them the visit-2 per-item
+    # fills recorded in GhanaLSS/_/CONTENTS.org); 1,694,623 -> 1,695,046
     # (+423).  Every added row is 2016-17 u='Unknown'.
     assert len(c.food_prices(units='unitvalue')) == 1_676_514
     assert len(c.food_prices(units='unitprice')) == 202_613
