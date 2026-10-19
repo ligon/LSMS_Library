@@ -96,3 +96,79 @@ and inherit the same hazard.
   9 xfailed, 1 xpassed in 1503.68s=, 0 failed.  The XPASS
   (=test_pakistan_cluster_features.py::test_extraction_is_cluster_grain=, a
   non-strict existence proxy) is identical with base code on the base root.
+
+* Red team r1 follow-up (2026-10-19): F1 routed + guarded, F2 warns
+
+Verdict: =pass-with-fixes= (=backlog_review_local_40139031_1019/928-key-resolver-r1/VERDICT.md=).
+
+** F1 --- the fifth positional key-pick, routed
+
+=Mali/2014-15/_/mapping.py:_unit_canonicalizer= now asks
+=country._categorical_key_column= (lazy import, Uganda's precedent).  The
+=except (OSError, ValueError)= is not widened, so a bad declaration escapes.
+
+| cold =Country('Mali').food_acquired()=, two empty roots | before (=55147a6bc=) | after |
+|---------------------------------------------------------+---------------------+-------|
+| rows x cols                                              | 431,046 x 3         | identical (=assert_frame_equal=, exact) |
+| 2014-15 rows / distinct =u= / row-hash                   | 122,085 / 16 / =7871c7d132349996= | identical |
+| =_unit_canonicalizer()= entries                          | 74                  | identical |
+
+Scripts: =cold_mali.py=, =compare_mali.py=; output =r1_compare_mali.txt=.
+
+** F1 --- the structural guard
+
+=tests/test_categorical_key_resolver.py::test_no_positional_key_pick_survives_in_the_package=
+parses (=ast=, never imports) all 779 =.py= files under the package and the
+config tree.  Rule A: a comprehension filtered by =!= 'Preferred Label'= /
+=not in (... 'Preferred Label' ...)= / =not in CATEGORICAL_RESERVED_COLUMNS=,
+indexed =[0]= directly, through =next()=, or through its bound name anywhere
+in the scope.  Rule B: =.columns[0]= / =.iloc[:, 0]= on a name bound from a
+categorical-table reader.  Exempt: the resolver itself.  =guard_history.py=
+runs the same function over =git show= of each tree (=r1_guard_history.txt=):
+
+| tree | hits |
+|------+------|
+| base =ddd79800c= | 4: Mali =mapping.py:43=; =country.py= =_market_lookup=, =_build_replace_dict=, =_finalize_result= |
+| =55147a6bc= (r0 head) | 1: Mali =mapping.py:43= |
+| r1 | 0 |
+
+Every other candidate an =rg= sweep turns up, and why it is not a key-pick:
+
+| site | what it is |
+|------+------------|
+| =country.py= =_resolve_target= / =_relabel_j= =available = [...]= (x3) | error-message listings, never indexed |
+| =Tanzania/_/tanzania.py:377=, =Malawi/_/malawi.py:383= | column ENUMERATORS: every non-skip column is a raw-label source.  Not a key choice, so not flagged; but a =Status=/=Notes= column would be ingested as raw labels --- a P3 hazard, in the P3 residual (=r1_enumerators.txt= lists every enumeration over a mapping table; these two are the only skip-list ones) |
+| Panama / Uganda =nutrition.py=, Guatemala =fct.py= =.columns[0]= | food-composition CSV / Google-sheet frames, not categorical tables |
+| GhanaSPS =ghanasps.py:831=, =transformations.py:5424= =.iloc[:, 0]= | a bfilled unit frame; an rCSI frame |
+| Nigeria/Ethiopia/Malawi/Uganda =next((c for c in candidates ...))= | file-path candidates |
+
+** F2 --- a declaration that cuts off global inheritance is loud
+
+=_row_union_categorical= still serves the country table wholesale when the
+two keys differ; when EITHER side declares =#+key:= it now emits
+=CategoricalKeyMismatchWarning= (a =UserWarning=) naming the table, the
+country, both keys and the global rows not inherited.  Undeclared mismatches
+stay silent (=f2_census.py=, =r1_f2_census.json=):
+
+| census over 38 countries' =Country(c).categorical_mapping= | |
+|---+---|
+| =CategoricalKeyMismatchWarning= fired | *0* |
+| tables declaring =#+key:= (country / global) | 1 (Niger =u=, aligned) / 0 |
+| additive merges aligned | 45 |
+| additive merges falling back, undeclared (silent, #832) | 4: Malawi, Mali, Nigeria, Uganda =u= (=Code= vs =Original Label=) |
+
+** Cache cost of r1 (=hash_probe_full.py= / =hash_diff_by.py=, all 38 countries)
+
+| step | =build_transforms_fingerprint= | =Country._table_cache_hash= | =Wave._input_hash= |
+|------+------+------+------|
+| base -> r0 head (=55147a6bc=) | 10/10 | 538/538 | 494/494 |
+| r0 head -> F1 | 0/10 | 23/538 (Mali 23/23) | 5/494 (Mali 2014-15 x 5) |
+| F1 -> F2 | 10/10 | 538/538 | 494/494 |
+| no-op control (comment in =_row_union_categorical=) | 0/10 | 0/538 | 0/494 |
+| base -> r1 | 10/10 | 538/538 | 494/494 |
+
+F2's move is attributed by =closure_parts.py= to =Country.categorical_mapping=,
+=_merge_categorical_tables= and =_row_union_categorical= (all already in the
+build closure).  Nothing moves that r0 had not already moved against the
+base: one corpus re-warm, in the bundle.  9 Peru =_input_hash= values are
+=None= on every tree and are not counted.
