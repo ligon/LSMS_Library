@@ -88,6 +88,7 @@
 
 
 #+name: u
+#+key: Original Label
 | Original Label        | Preferred Label  | Code | 2018-19          | 2021-22               |
 |-----------------------+------------------+------+------------------+-----------------------|
 | 102. Alvéole          | Alvéole          | 102  | Alvéole          | 102. Alvéole          |
