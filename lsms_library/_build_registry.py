@@ -173,10 +173,12 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.country.Country._is_script_path",
     # GH #1039: the make-backend ROUTING predicate -- does the country level
     # have a rule or script for this table, or must it be built from its
-    # waves?  Called only under LSMS_BUILD_BACKEND=make, which stamps no
-    # cache (no L2 write follows it), so no hashed parquet is ever built
-    # through it; it picks a builder, never a byte of a frame.  Without this
-    # entry a re-worded log line in it would move every table's hash.
+    # waves?  It SELECTS a builder and determines no byte of any hashed
+    # parquet: on the from-waves route the wave frames, and the L2-wave
+    # parquets `grab_data` writes and hash-stamps, are byte-for-byte what the
+    # default backend builds (that code is fingerprinted where it lives), and
+    # the make backend writes no L2-country parquet.  Without this entry a
+    # re-worded log line in it would move every table's hash.
     "lsms_library.country.Country._has_country_builder",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not

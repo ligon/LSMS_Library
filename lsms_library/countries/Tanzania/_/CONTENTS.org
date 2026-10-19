@@ -1579,9 +1579,12 @@ catch-all above makes them reachable: when deriving =food_expenditures= /
 =food_quantities= from =food_acquired= fails, =Country= falls back to legacy
 aggregation, =run_make_target= asks make for the in-tree name
 =Tanzania/_/food_expenditures.parquet=, and the catch-all runs the script (on
-BOTH backends, measured).  Each crashes at its first read
-(=../2008-09/_/food_unitvalues.parquet= -- no such wave folder; =2008-09= lives
-in =2008-15/=), so today nothing is written.  If one ever ran, its
+BOTH backends, measured).  Each crashes at its first read, so today nothing is
+written: =food_unitvalues.py= and =food_quantities.py= first read
+=../2008-09/_/food_unitvalues.parquet= and =../2008-09/_/food_quantities.parquet=
+(no such wave folder; =2008-09= lives in =2008-15/=), and =food_expenditures.py=
+first reads the bare =food_unitvalues.parquet= -- the in-tree output its
+sibling would have written (line 6; measured traceback, red team r1).  If one ever ran, its
 =to_parquet(x, 'food_expenditures.parquet')= from =_/= matches none of
 =_resolve_data_path='s patterns and would write *in-tree* (the GH #803 class);
 they are the only three of ~620 =to_parquet= call sites in the corpus with that

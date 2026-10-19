@@ -4487,10 +4487,13 @@ class Country:
         the script can build at the country level.
 
         Excluded from the build fingerprint
-        (``_build_registry._EXCLUDED_CALLABLES``): it is called only under the
-        make backend, after which no L2 parquet is written or stamped, so no
-        hashed cache is ever built through it; it picks a builder and
-        determines no byte of any frame.
+        (``_build_registry._EXCLUDED_CALLABLES``): it selects a builder and
+        determines no byte of any hashed parquet.  The from-waves route it
+        selects is NOT cache-free -- its YAML waves read, write and hash-stamp
+        L2-wave parquets through ``Wave.grab_data`` (measured, GhanaSPS
+        ``crop_production``, red team r1) -- but those bytes are exactly what
+        the default backend builds and are fingerprinted where that code
+        lives, and the make backend writes no L2-country parquet.
         """
         country_dir = self.file_path / "_"
         if (country_dir / f"{method_name}.py").exists():
