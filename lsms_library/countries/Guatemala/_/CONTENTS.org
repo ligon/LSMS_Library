@@ -629,7 +629,7 @@ no grandparent, uncle/aunt, nephew/niece or cousin code, so the served
 decomposition is narrow BY CONSTRUCTION -- measured 2026-10-19:
 
 - =Distance= is 0 (36,703), 1 (472: =hermano (a)= and =cuÑado (a)=) or NA
-  (596, =otro pariente=, [null, null, null] -- the ENNIV manual's definition,
+  (596, =otro pariente=, [null, null, null] -- a tuple shared with Peru's ENNIV key `Otro Pariente`,
   see =kinship.yml= and GH #698).  Never 2.
 - =Generation= runs -2 .. +1 only (plus the 596 NA).
 

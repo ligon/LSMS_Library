@@ -156,8 +156,8 @@ def test_dtypes_survive_the_partial_nulls():
 # "X of head or spouse" in English, French and Portuguese: a relation word,
 # then the head, then "or"/"/" and the spouse.
 _HEAD_OR_SPOUSE = re.compile(
-    r"\b(of|du|do|au|com o)\b.*\b(head|cm|caf)\b.*(\bor\b|/|\bou\b)\s*"
-    r"(du |à la |the )?(spouse|conjoint|cônjuge)",
+    r"\b(of|du|do|au|com o)\b.*\b(head|hoh|household head|cm|caf)\b.*(\bor\b|/|\bou\b)\s*"
+    r"(du |à la |the )?(spouse|partner|conjoint|cônjuge)",
     re.IGNORECASE,
 )
 _INLAW = re.compile(r"in[- ]?law|inlaw|in-l\b|suegr|yerno|nuera|cuñad|beau|belle", re.IGNORECASE)
