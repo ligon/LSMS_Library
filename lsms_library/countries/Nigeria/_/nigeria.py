@@ -2446,7 +2446,8 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         tail (GH #251).
     """
     from lsms_library.local_tools import get_dataframe
-    from lsms_library.transformations import _finalize_canonical_food_acquired
+    from lsms_library.transformations import (
+        U_UNKNOWN, _finalize_canonical_food_acquired)
 
     df = get_dataframe(fn)
 
@@ -2468,8 +2469,8 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         # 11..95 are sized sacks/basins/bunches -- while the framework's
         # automatic mapping keys on `Code` alone and applies the single
         # Preferred Label column to every wave.  A code the wave's column
-        # does not list keeps its raw code (it is never folded into
-        # 'None', which means "no unit recorded").
+        # does not list keeps its raw code (it is never folded into the
+        # missing-unit sentinel, which means "no unit recorded").
         u = df[spec['unit']].map(unit_codes)
         u = u.where(u.notna(), df[spec['unit']])
         piece = pd.DataFrame({
@@ -2489,7 +2490,15 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         pieces.append(piece)
 
     out = pd.concat(pieces, ignore_index=True)
-    out['u'] = out['u'].fillna('None')
+    # A blank raw unit code means NO UNIT WAS RECORDED.  Write the library's
+    # missing-unit sentinel, not a made-up label: ``food_kg_factors``
+    # recognises U_UNKNOWN (``_U_SENTINELS``) and serves those rows
+    # ``KgFactorSource == 'none'``, whereas the old literal 'None' was
+    # treated as a real unit and given pooled price-ratio kilograms
+    # (847 rows, 1,133 kg; GH #1041).  The value is assigned AFTER the
+    # per-round decode above, and the `u` table has no 'Unknown' Code, so
+    # the API-time categorical mapping passes it through unchanged.
+    out['u'] = out['u'].fillna(U_UNKNOWN)
 
     return _finalize_canonical_food_acquired(out)
 

@@ -74,6 +74,10 @@ pass: =no_float_stringified_index= only inspects id levels.)
 
 *** =u = 'None'= is a missing-unit spelling the kg ladder does not know (GH #962)
 
+/Resolved 2026-10-18 by GH #1041 (PR #1046): the fill is now =U_UNKNOWN=, so
+the kg ladder serves these rows =none=; see the GH #1041 section below.  Kept
+as the record of the #962 measurement./
+
 =nigeria.food_acquired_for_wave= ends with =out['u'].fillna('None')=, on the
 RAW unit code and before the API-time code->label map, so a served
 =u = 'None'= can only mean "no unit code recorded".  It is not in
@@ -86,8 +90,8 @@ rows* in every wave 2010Q3--2016Q1 (2013Q1 purchased 397 of them), 590 with
 =food_quantities(units='kgs')=) rest on pooled factors for rows with no unit.
 Small (0.07%), but a fabricated weight all the same.  Not fixed under #962
 (the fix -- =U_UNKNOWN= here -- moves served data and needs its own
-accounting); =tests/test_962_unit_sentinel.py::MINTED_UNIT_SPELLINGS= records
-the site.  The three =individual_unit_values.py= wave scripts mint the same
+accounting); =tests/test_962_unit_sentinel.py::MINTED_UNIT_SPELLINGS= recorded
+the site until #1041 retired it.  The three =individual_unit_values.py= wave scripts mint the same
 spelling but are in no =data_scheme.yml= or =Makefile=.
 
 * food_acquired unit codes (GH #223 Layer 2)
@@ -193,6 +197,33 @@ have *no label even in the =.dta=*" holds for the post-HARVEST file only.
 MEDIUM=, =152. BASIN LARGE= (and =161. BUNDLE MEDIUM=), and all 12 rows are
 in 2015Q3 (post-planting).  Left as =other specify (13x)= here (W3 out of
 scope for #607).
+
+** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
+
+=food_acquired_for_wave= used to fill a NaN raw unit code with the literal
+='None'=.  The =u= table has no ='None'= key, so it could only mean "no unit
+recorded" -- but ='None'= is not in =transformations._U_SENTINELS=, so
+=food_kg_factors= treated it as a real unit and gave those rows pooled
+price-ratio kilograms.  It now writes =U_UNKNOWN= (='Unknown'=), assigned after
+the per-round decode; the =u= table has no ='Unknown'= =Code=, so the API-time
+mapping passes it through.  Measured on a private root (before = #607 branch
+tip 70d88ff1c, after = this change; Nigeria =food_acquired= rebuilt):
+
+| | before | after |
+|-+-+-|
+| rows =u='None'= (2010Q3/2011Q1/2012Q3/2013Q1/2015Q3/2016Q1) | 112/98/154/463/14/6 = 847 | 0 |
+| rows =u='Unknown'= | 0 | 847 (same split) |
+| their =KgFactorSource= | =unit= 466, =item_unit= 381 | =none= 847 |
+| their kg | 1,133.17 | 0 |
+| =food_quantities(units='kgs')= kg rows, total | 1,483,853.94 | 1,482,720.76 (-1,133.17) |
+| =kg_factor_sources= item_unit / unit / none | 123,061 / 55,162 / 12 | 122,680 / 54,696 / 859 |
+| =food_prices()= (kgvalue) rows | 481,613 | 481,191 (-422, the priced rows) |
+| =food_acquired= rows / Expenditure | 595,725 / 196,081,393.67 | unchanged |
+
+The 847 rows are kept (=food_quantities= carries them at their native quantity
+under =u='Unknown'=); only their kilograms and their kg-price go.  The unwired
+=individual_unit_values.py= scripts in 2012-13/2015-16/2018-19 still mint
+='None'=; nothing served reads them.
 
 * Sampling Design
 
