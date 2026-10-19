@@ -154,7 +154,10 @@ def test_no_cp1252_damage_in_any_table_cell():
         text = _read(f)
         if not C1.search(text):
             continue
-        for lineno, line in enumerate(text.splitlines(), start=1):
+        # split('\n'), NOT splitlines(): U+0085 -- the very cp1252 ellipsis
+        # this hunts -- is a line boundary to splitlines(), which would cut
+        # the offending cell in two and hide it (Burkina's pre-#805 Cube key).
+        for lineno, line in enumerate(text.split("\n"), start=1):
             if not line.strip().startswith("|") or not C1.search(line):
                 continue
             for cell in line.strip().strip("|").split("|"):
@@ -171,7 +174,7 @@ def test_double_encoding_exemption_is_not_vacuous():
     rule and this exemption should go): Burkina_Faso keys its 2018-19 beef on
     the UTF-8 double encoding, and that row is C1-bearing by construction."""
     text = (countries_root() / "Burkina_Faso/_/categorical_mapping.org").read_text(encoding="utf-8")
-    cells = [c.strip() for line in text.splitlines() if line.strip().startswith("|")
+    cells = [c.strip() for line in text.split("\n") if line.strip().startswith("|")
              for c in line.strip().strip("|").split("|")]
     double = [c for c in cells if C1.search(c) and _is_double_encoding(c)]
     assert double == ["Viande de b\u00c5\u0093uf"], double
