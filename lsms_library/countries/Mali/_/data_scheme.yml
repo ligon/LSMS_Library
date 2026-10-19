@@ -362,7 +362,8 @@ Data Scheme:
     # NO ROW IS SELECTED (GH #840, @ligon 2026-10-18).  Until #840 the grain
     # was (t, v, j, u) and one reported price per cell was kept (post-harvest
     # passage first, then questionnaire order): 23,646 of 40,218 priced rows,
-    # with 5,439 of the dropped cells disagreeing on Price.  No obs level: only
+    # with 7,614 of the cells it reduced holding more than one distinct Price
+    # (9,308 on Price or Quantity).  No obs level: only
     # relevé 3 is read (s04q09-s04q11); relevés 1 / 2 are a recorded coverage
     # gap, and would be `obs` when wired.
     #
