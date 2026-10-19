@@ -600,6 +600,17 @@ A feature can build cleanly, pass every sanity check, and still be quietly wrong
 
 Before closing a cell, run the four checks (see `docs/guide/coverage.md`). The two that are most often skipped and most often wrong: **C2 (sibling-wave differential) is necessary but NEVER sufficient** — module vocabularies change completely between waves; and **C4 (the questionnaire) is mandatory**, because *absence in the shipped `.dta` is not absence in the instrument*. Only the questionnaire separates `not-asked` from `asked-not-distributed`.
 
+### Adjudicating `dropped` cells (GH #781)
+
+`dropped` ("declared for the wave, empty in the build") is the silent-drop bug class — and also the honest result for a wave whose instrument cannot support the feature (GhanaLSS GLSS1/2 record food by **value** only, so `food_prices` has no denominator). Same file, same loader, same evidence rule; the cell's **tier** says which half of the vocabulary applies (`coverage_matrix.VERDICTS_BY_TIER`):
+
+| verdict | meaning | closes the cell? |
+|---|---|---|
+| `correctly-empty` | the instrument does not support the feature for this wave | **yes** → tier `correctly-empty`; **evidence required**, C4 mandatory |
+| `empty-pending-machinery` | computable in principle from what the survey recorded; construction not built | no — stays `dropped`, carries its evidence |
+
+A verdict filed against a cell of the **other** tier is inert (it cannot close the cell; the detail says so), and a `correctly-empty` close stops applying by itself the day the wave builds rows. **A cell empty only in the default mode while another mode serves real values is not `correctly-empty`** — GhanaLSS 1991-92 `food_prices` is `empty-pending-machinery` because `units='kgprice'` serves 28,754 rows from GLSS3's Section 8H price. Checks D1/D2/C4: `docs/guide/coverage.md` § "Adjudicating a `dropped` cell".
+
 ## Derived Tables
 
 `household_characteristics`, `food_expenditures`, `food_prices`, and `food_quantities` are **auto-derived at runtime** via `_ROSTER_DERIVED` and `_FOOD_DERIVED` in `country.py` (source transforms live in `transformations.py`). **Do NOT register them in `data_scheme.yml`** — `Country.data_scheme` auto-surfaces them when the source table (`food_acquired` or `household_roster`) is present. A `!derived` YAML tag was considered and rejected (2026-04-18): it would create a migration burden with no gain over the hardcoded dicts + auto-discovery.

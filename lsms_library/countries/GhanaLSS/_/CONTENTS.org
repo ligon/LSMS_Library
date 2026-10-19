@@ -2449,6 +2449,36 @@ empty"* -- that gap is *GH #781*.  Until #781 gives it a word, this entry is
 the record: the six cells are empty *on purpose*, and re-grading them back
 to =sane= by restoring a constant would be a regression, not a fix.
 
+*Update 2026-10-19 (GH #781): the word exists, and it is THREE cells now,
+not six.*  PR #916's =8h-farmgate= valuation priced 1998-99, 2005-06 and
+2012-13 (=food_prices()= serves 1998-99 / 2005-06 / 2012-13 / 2016-17),
+so only GLSS1-3 are still =dropped=.  They are adjudicated in
+=.coder/coverage/absent_verdicts.csv=, and they do *not* get the same
+verdict:
+
+| wave    | verdict                   | why                                                                                                   |
+|---------+---------------------------+-------------------------------------------------------------------------------------------------------|
+| 1987-88 | =correctly-empty=         | 12A/12B ask amounts only; 100% =u='Value'=; every mode empty but =unitvalue=, which is identically 1.0 |
+| 1988-89 | =correctly-empty=         | same form (see below)                                                                                 |
+| 1991-92 | =empty-pending-machinery= | 8H records a quantity and a per-unit price; =food_prices(units='kgprice')= already serves 28,754 rows  |
+
+1991-92 is *not* correctly empty: only the default =kgvalue= mode is
+empty, and only because 8H is "deliberately NOT wired" (the farmgate
+section above).  It stays in the queue until that decision is taken.  The
+counts quoted there have since drifted: today 80,277 of 287,712 produced
+rows carry both factors and =All= is 94,039 rows (were 80,282 / 286,922 /
+93,349).
+
+*Two facts found doing it.*  (1) GLSS1's and GLSS2's questionnaire PDFs
+have no text layer, but they *can* be read: =pypdf= extracts each page as
+an image, and the page is legible (that is how C4 ran for these two
+verdicts).  The =food_security= 1987-88 / 1988-89 =unsure= rows in that
+file say C4 "could not run" because the scans cannot be *searched*; they
+could be re-checked by reading the 78 pages.  (2) =GHA_1988_GLSS_Household_Questionnaire_EN.pdf=
+is a different file from GLSS1's but its Section 12 pages are the *same
+scans*: the images extracted from PDF p.66 and p.68 are byte-identical to
+GLSS1's.  GLSS2 fielded GLSS1's form, at least for Section 12.
+
 *NaN is interim, not terminal.*  The kg factor for =u='Value'= exists and
 equals =1/price=; it just varies over =(j, t, m)=, which a per-label
 constant cannot represent.  Recovering it from a price source (=community_prices=

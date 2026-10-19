@@ -33,13 +33,14 @@ re-implements the sanity checks.
 | `n/a` | No per-wave readiness applies — a feature with **no wave axis at all** (`panel_ids`, `updated_ids`), or a built table with no `t` index level. Note this is *not* the same as "built by a country-level script"; see [below](#country-level-tables-are-still-graded-per-wave). |
 | `absent` | The feature applies to the country, but its source is **not declared for this wave**. An expected gap, not a defect. |
 | `declared` | Source present for the wave; readiness not assessed (a coverage-only run). |
-| `dropped` | Source **declared** for the wave but the wave is **missing/empty** in the built table — a silent-drop hazard. |
+| `dropped` | Source **declared** for the wave but the wave is **missing/empty** in the built table — a silent-drop hazard, until [adjudicated](#adjudicating-a-dropped-cell). |
 | `broken` | The country-level build raised, or the whole feature is empty. |
 | `builds` | The wave slice is non-empty but fails a sanity check (`SanityReport.ok is False`). |
 | `sane` | The wave slice is non-empty and passes every sanity check (warnings allowed). |
 | `blessed` | `sane` **and** listed in the git-tracked blessing file `.coder/coverage/blessed.csv`. |
 | `not-asked` | Adjudicated: the survey instrument genuinely never asked. Closed. |
 | `asked-not-distributed` | Adjudicated: the instrument **did** ask, but the shipped extract does not carry the variables. An *acquisition* problem. |
+| `correctly-empty` | Adjudicated `dropped`: declared and built, and empty because the instrument cannot support the feature for this wave. Closed. |
 
 ### Country-level tables are still graded per wave
 
@@ -253,6 +254,64 @@ the verdict `unsure` — silence is never evidence.
    can separate `not-asked` from `asked-not-distributed`, and those route to
    completely different queues.
 
+## Adjudicating a `dropped` cell
+
+`dropped` means *"declared for this wave, empty in the build"* — the
+silent-drop bug class. But a wave whose instrument **cannot support** the
+feature produces exactly the same shape, and so does a wave whose data supports
+it but whose construction nobody has written yet. Until GH #781 one label did
+all three jobs, so a deliberate fix (GH #770 stopped inventing a constant
+"price" for value-only waves) read as six new defects with no way to say
+otherwise.
+
+| verdict | meaning | closes the cell? |
+|---|---|---|
+| `correctly-empty` | the instrument does not support the feature for this wave (value without quantity; a module that asks a different question) | **yes** → tier `correctly-empty` |
+| `empty-pending-machinery` | computable in principle from what the survey recorded; the construction is not built yet | no — stays `dropped`, carrying its evidence |
+| *(none)* | the silent-drop bug the tier was named for | no — a defect |
+
+**Same file, keyed by tier.** These verdicts go in
+`.coder/coverage/absent_verdicts.csv` beside the `absent` ones — one file, one
+loader, one evidence rule. Which half of the vocabulary applies is decided by
+the cell's tier when it is graded, not by the file: `todo` / `unsure` /
+`not-asked` / `asked-not-distributed` adjudicate `absent` and `undeclared`
+cells; `correctly-empty` / `empty-pending-machinery` adjudicate `dropped`
+cells. A verdict filed against a cell of the other tier is **inert**: it does
+not close the cell, and the cell's detail says so. (A stale `not-asked` on a
+wave someone later declared, and which builds empty, must not hide a live
+defect.)
+
+**Evidence is required**, exactly as for `not-asked`: `load_verdicts()`
+refuses a `correctly-empty` row with an empty `evidence` field. The checks:
+
+1. **D1 — the built source table.** Measure, for the wave, what the feature
+   needs and where it is populated (for `food_prices`: a physical quantity, or
+   a reported unit price; `u='Value'` rows have neither — their `Quantity` *is*
+   the expenditure).
+2. **D2 — every mode of the feature.** The matrix grades the default call. A
+   cell empty only in the default mode while another mode serves real values is
+   **not** `correctly-empty`: the instrument supports the feature.
+3. **C4 — the questionnaire. Mandatory before `correctly-empty`**, for the
+   same reason as above: the shipped data cannot tell you what the instrument
+   asked. If the PDF has no text layer, read the page images; if no check can
+   be run, close nothing — the cell is already in the queue, so there is no
+   `unsure` for this half.
+
+**A close goes inert by itself.** A `correctly-empty` verdict applies only
+while the cell is `dropped`. If a later change populates the wave (a
+registered derivation, an imputation layer), the cell grades on its rows and
+the verdict stops applying — nobody has to remember to withdraw it.
+
+Worked example — GhanaLSS `food_prices`:
+
+| wave | verdict | why |
+|---|---|---|
+| 1987-88, 1988-89 | `correctly-empty` | Section 12A asks *"How much have they spent?"* and 12B *"How much would it cost to buy the amount they ate?"* — amounts only. Every `food_acquired` row is `u='Value'`; every `food_prices` mode is empty except `unitvalue`, which is identically 1.0. |
+| 1991-92 | `empty-pending-machinery` | Purchases are value-only, but Section 8H records a quantity and a per-unit sale price for own produce, and `food_prices(units='kgprice')` already serves 28,754 rows. Only the default `kgvalue` mode is empty, because the 8H farmgate valuation was deliberately not extended to GLSS3. |
+
+A feature that is empty in **every** wave grades `broken`, not `dropped`, and
+is not adjudicable here.
+
 ## Capability: adjudicate at acquisition, not by archaeology
 
 Probing an `absent` cell is expensive, and it is usually rediscovering something
@@ -449,7 +508,8 @@ the segment's colour is that wave's tier. Colour carries the state -- there is
 no text in the cells -- so read it with the legend: greens are safe, amber
 builds with a failing check, reds are defects, magenta is work not started,
 blues are acquisition problems, greys are gaps (light = the live `absent`
-queue, blue-grey = adjudicated `not-asked`). Hover a cell for the wave-by-wave
+queue, blue-grey = adjudicated `not-asked`, khaki = adjudicated
+`correctly-empty`). Hover a cell for the wave-by-wave
 reading; the table view underneath is the same data as text.
 
 <!-- COVERAGE_MATRIX -->
