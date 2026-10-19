@@ -496,7 +496,14 @@ def test_ghanalss_eggs_are_counted_and_get_no_inferred_kilograms():
     (2005-06 105 -> 305, 2012-13 3,056 -> 3,082), and NO egg row on a count
     unit is given kilograms -- the 0.50 kg/egg (Egg, Single) factor is gone
     from all 16,633 rows (13,888 + 226 Single, 714 Piece, 122 Ball, 5 Pair,
-    42 Dozen, 1,636 Crate).  Measured on a cold build at the rulings head."""
+    42 Dozen, 1,636 Crate).  Measured on a cold build at the rulings head.
+
+    GH #1008 (ruling @ligon 2026-10-19) gates 2016-17 Section 8H on its
+    screener ``s8hq1 == 1``; one of the 39 blank-screener source rows it
+    removes is an own-produced egg on 'Single', so 2016-17 (Egg, Single)
+    10,727 -> 10,726 and the declared-none egg rows 16,633 -> 16,632
+    (Egg|Single 14,114 -> 14,113).  Cold private rebuild, before = r1 head
+    64790d3b1, after = the gate."""
     if not (data_root() / 'GhanaLSS' / 'var' / 'food_acquired.parquet').exists():
         pytest.skip('GhanaLSS food_acquired not cached')
     import lsms_library as ll
@@ -505,7 +512,7 @@ def test_ghanalss_eggs_are_counted_and_get_no_inferred_kilograms():
     fa = c.food_acquired()
     lv = fa.index.get_level_values
     t, j, u = lv('t'), lv('j').astype(str), lv('u').astype(str)
-    for wave, n in {'2005-06': 305, '2012-13': 3082, '2016-17': 10727}.items():
+    for wave, n in {'2005-06': 305, '2012-13': 3082, '2016-17': 10726}.items():
         assert int(((j == 'Egg') & (u == 'Single') & (t == wave)).sum()) == n
     for wave, n in {'2005-06': 40, '2012-13': 328}.items():
         assert int(((j == 'Coconut (fresh)') & (u == 'Single')
@@ -513,9 +520,9 @@ def test_ghanalss_eggs_are_counted_and_get_no_inferred_kilograms():
 
     q = c.food_quantities(units='kgs')
     rep = q.attrs['kg_factor_declared_none']
-    assert rep['rows_matched'] == rep['rows_refused'] == 16633, rep
+    assert rep['rows_matched'] == rep['rows_refused'] == 16632, rep
     assert {k: v['rows_refused'] for k, v in rep['cells'].items()} == {
-        'Egg|Single': 14114, 'Egg|Piece': 714, 'Egg|Ball': 122,
+        'Egg|Single': 14113, 'Egg|Piece': 714, 'Egg|Ball': 122,
         'Egg|Pair': 5, 'Egg|Dozen': 42, 'Egg|Crate': 1636}
     # The rows are carried in their native count unit, never converted.
     qj = q.index.get_level_values('j').astype(str)

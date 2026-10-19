@@ -5634,6 +5634,7 @@ decode); every movement below is the gate.
 | =food_quantities(units='units')= rows                      | 1,695,046         | 1,695,001         | -45       |
 | =food_expenditures()= rows; total (=basis='purchased'=)    | 1,406,099; 15,637,502,177.88 | unchanged | 0 |
 | =nutrition= rows; Energy                                   | 34,798; 18,256,924,922.06 | 34,798; 18,256,809,497.31 | 0; -115,424.75 |
+| =no_kg_factor.yml= egg rows declared =none= (GH #1042)     | 16,633 (Egg/Single 14,114) | 16,632 (14,113) | -1 |
 
 =nutrition='s column sums all move by under 0.01% (Carbohydrate *rises*
 106,442: removing 39 rows of evidence re-estimates a few =(t, j, u)= kg
