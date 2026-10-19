@@ -2785,11 +2785,20 @@ pooled across all of those as one "unit".
   (=2016-17/...household_questionnaire.pdf=, pp. 30-36) print an identical
   shorter list: 1 2 4 5 6 7 8 9 10 11 14 15 18 19 20 22 23 -- *no* 3, 12,
   13, 16, 17 or 21, and the word BASIN nowhere in IHS4.
-- But IHS4's *data* still use 21 = BASIN: the cross-section
-  =hh_mod_g1.dta= ships a string column =hh_g07b_label= that reads =basin=
-  on the 158 gifted rows with =hh_g07b= code 21 (corrected 2026-10-18: it is
-  that shipped label column, not a Stata value label), and nothing labels
-  the same code (=21.0=) on =hh_g03b/04b/06b= or in the panel file.  Unit values agree: maize ufa on code 21 prices at 4.6x its
+- But IHS4's *data* still use 21 = BASIN, by a Stata *value label*:
+  in the cross-section =hh_mod_g1.dta= (read with
+  =pyreadstat.read_dta(..., metadataonly=True)=, 2026-10-19) =hh_g07b= is a
+  string variable with no value labels (it holds the code as text, ='21'=);
+  its int8 companion =hh_g07b_label= carries the value-label set =hh_g07b=,
+  which labels 21 =basin= (beside 23 =OTHER (SPECIFY)= and about forty other
+  codes).  The companions =hh_g03b/04b/06b_label= carry sets
+  =hh_g03b/04b/06b= that label 23 and a similar vocabulary but have *no*
+  entry for 21, so code 21 reads as the bare number (=21.0=) there:
+  720 / 217 / 274 rows, against 158 gifted rows labelled =basin=.  The panel
+  file =Panel/hh_mod_g1_16.dta= labels 21 in none of the four sets.  (A
+  2026-10-18 edit called =hh_g07b_label= "a string column ... not a Stata
+  value label"; that was wrong -- GH #1042 red team r3, R3.)  Unit values
+  agree: maize ufa on code 21 prices at 4.6x its
   per-kg value (IHS3 basin factor for that item 2.10-3.81 kg).
 - IHPS 2016 BID (=2016-17/Documentation/Panel/ihps_2016_bid_updated_final.pdf=,
   annex "Food-Unit Combinations ... Non-Standard Units", pp. 43-48) puts
@@ -2886,11 +2895,35 @@ At 150=, =1Mlambe=, =Nsima And Meat=, =Meals Eaten At Restaurant=, =Pigeon=,
 Buns=, =Two Bananas= -- 329 rows (2010-11 66, 2016-17 165, 2019-20 98).
 *Kept* (unit texts): =Grams=, =Packet=, =Plate=, =Cup=, =Whole=, =Bottle=,
 =Heap=, =Kilogram=, =Satchet=, =Cob=, =Head=, =Pieces Of Chicken=, =Plate Of
-Nsima=; and, *a decision*, =Whole Chicken= (364), =Whole Rabbit=, =Whole
-Dove=, =Full Guinea Fowl=, =Two Doves= -- a whole bird is a count unit, the
+Nsima=; and, *a decision*, =Whole Chicken= (364), =Whole Rabbit= (2),
+=Whole Dove= (3), =Full Guinea Fowl= (1) -- a whole bird is a count unit, the
 same reading as GhanaLSS's =Single= for a counted chicken; =Chicken= alone
-says nothing about how much and is caught.  Not caught although food-like:
-=Nsiam And Beef= (typo), =Dish Of Nsima And Beef= ('dish' is no item word).
+says nothing about how much and is caught.  =Two Doves= (1 row, 2010-11) is
+kept too, but by *vocabulary*, not by that reading (corrected 2026-10-19,
+GH #1042 red team r3, R6): =two= is a number word the test drops, and
+=doves= is no item word -- the item =Other poultry - guinea fowl, doves,
+etc.= contributes only the words before =' - '= -- whereas =Two Bananas= is
+caught because =bananas= is one.  (=Two Doves= is served =none= either way.)
+
+Not caught although food-like (red team r3 list, re-measured at this head;
+1 row each, served with the text as the unit).  Each has one content word
+that is no item word, so the test -- by design -- keeps it:
+| text                      | wave    | the non-item word          | served            |
+|---------------------------+---------+----------------------------+-------------------|
+| =Nsiam And Beef=          | 2010-11 | =nsiam= (typo)             | =unit=, 1.43 kg   |
+| =Dish Of Nsima And Beef=  | 2010-11 | =dish=                     | =unit=, 0.95 kg   |
+| =Meals At Work=           | 2019-20 | =work= (twin of the caught =Meals Eaten At Restaurant=) | =unit=, 14.29 kg |
+| =Tea And Snacks=          | 2019-20 | =snacks= (twin of the caught =Tea And Bread=) | =unit=, 1.48 kg |
+| =Standard Bread=          | 2019-20 | =standard=                 | =unit=, 5.33 kg   |
+| =Carlsberg Beer=          | 2010-11 | =carlsberg= (a parenthesised qualifier of the item name, dropped by design) | =unit=, 31.20 kg |
+| =Spice Leaves=            | 2019-20 | =spice= (the item word is =spices=) | =survey_kg=, 0.65 kg |
+| =Hall Fruit=              | 2019-20 | =hall=                     | =unit=, 0.15 kg   |
+| =Whole Cabbage=           | 2010-11 | =whole= (a quantity word, deliberately kept) | =unit=, 0.23 kg |
+| =Small Nsima Pkate=       | 2019-20 | =pkate= (a typo of /plate/, a unit) | =survey_kg=, 0.10 kg |
+| =Bottles Of Pure Water=   | 2019-20 | =bottles=, =pure=          | =unit=, 1.50 kg   |
+The last three carry a unit or a quantity word and are rightly kept; the
+first eight are food names the test misses.  Left as they are: 57.31 kg in
+all, and the ruling names a rule, not a list.
 
 *Before / after* (private cold rebuild; before = branch head 7b20e8c31 after
 merging base 2026-10-18b, after = this change):
@@ -2907,6 +2940,19 @@ merging base 2026-10-18b, after = this change):
 The kg fall is exactly the moved rows' inferred kilograms (2,070.00 from the
 90 kg Bag label, 972.04 from food texts); the 30 rows with a shipped
 =survey_kg= factor keep their 7,091.07 kg.  No other row is re-priced.
+
+*Residual, not benign (GH #1042 red team r3, R5; a decision for @ligon).*
+29 of those 30 are 2019-20 =Mango= rows -- 645 mangoes served 7,088.55 kg
+at a shipped *10.99 kg per mango* (40 mangoes -> 439.6 kg) -- and 1 is
+=Pigeon= (2 birds at 1.26, 2.52 kg).  The factor is
+=ihs_foodconversion_factor_2020.dta='s, merged on =(item, region, unit
+code)= (=2019-20/_/food_acquired.py:57-69=) on the *raw* code, which for
+these rows is 23: so 10.99 is that table's factor for "Mango, OTHER
+(SPECIFY)", and a row served as "no unit recorded" carries a kilogram
+figure for an unnamed unit.  Not a regression (served kg did not change
+under ruling 5).  Measured at this head: 49 =Unknown= rows carry a
+=survey_kg= factor, 7,143.49 kg (the other 19 -- Buns/Scones 15, Maize ufa
+2, Eggs 1, Chicken 1, all 2019-20 -- were =Unknown= before ruling 5).
 
 *Ruling 4 -- left as they are.*  The 13 rows under raw suffixed codes
 (2010-11 =16b= 5, =16a= 2, =12a= 2, =21b= 2, =12b= 1, =03a= 1) and the 2
