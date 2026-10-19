@@ -896,6 +896,93 @@ def test_date_and_drop_stamps_coexist_at_every_gate(tmp_path, write):
     assert not list((tmp_path / "countries").rglob("*.parquet")), "GH #803: nothing in-tree"
 
 
+# ---------------------------------------------------------------------------
+# 10b. GH #1066: the grain audit is stamped at BOTH L2-country writes.  The
+#      DVC-fallback write (a tree with no DVC repo: pip install, a bare
+#      LSMS_COUNTRIES_ROOT) passed every stamp but `grain_audit=`, so a grain
+#      loss warned on the cold build and was silent on every warm read -- the
+#      #323 "the signal survives the cache" invariant, broken on one route.
+# ---------------------------------------------------------------------------
+
+_GRAIN_SCHEME = """\
+Waves: ['2020']
+Data Scheme:
+  housing:
+    index: (t, i)
+    Roof: str
+"""
+
+_GRAIN_INFO = """\
+housing:
+  file: cover.csv
+  idxvars:
+    i: hid
+  myvars:
+    Roof: roof
+"""
+
+# Household h1 appears twice with DISAGREEING roofs: a destructive collapse.
+_GRAIN_ROWS = {"hid": ["h1", "h1", "h2"], "roof": ["Grass", "Iron", "Tile"]}
+
+_GRAIN_PROBE = """\
+import json, warnings, sys
+import lsms_library as ll
+import lsms_library.country as C
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    df = ll.Country(sys.argv[1]).housing()
+print(json.dumps({
+    "served": sorted(map(list, df.reset_index()[["t", "i", "Roof"]].astype(str).values)),
+    "warned": [str(w.message) for w in caught if issubclass(w.category, C.GrainCollapseWarning)],
+    "reports": C.grain_reports(sys.argv[1], "housing")}, default=str))
+"""
+
+
+def _grain_probe(tmp_path, country):
+    r = subprocess.run([sys.executable, "-c", _GRAIN_PROBE, country], env=_env(tmp_path),
+                       cwd=str(tmp_path), capture_output=True, text=True, timeout=600)
+    assert r.returncode == 0, r.stderr[-3000:]
+    out = json.loads(r.stdout.strip().splitlines()[-1])
+    out["_stderr"] = r.stderr
+    return out
+
+
+@pytest.mark.parametrize("write", WRITES)
+def test_grain_audit_is_stamped_and_replayed_at_both_l2_country_writes(tmp_path, write):
+    name = "Grainland"
+    _make_country(tmp_path, name, _GRAIN_SCHEME, info=_GRAIN_INFO, write=write)
+    pd.DataFrame(_GRAIN_ROWS).to_csv(tmp_path / "countries" / name / "2020" / "Data" / "cover.csv",
+                                     index=False)
+
+    cold = _grain_probe(tmp_path, name)                       # process 1: cold build
+    assert ("DVC unavailable for housing" in cold["_stderr"]) == (write == "dvc-fallback"), (
+        write, cold["_stderr"][-2000:])
+    (msg,) = cold["warned"]
+    assert "Grainland/housing/2020" in msg and "DESTROYED 1 of 3" in msg, msg
+    (rep,) = cold["reports"]
+    assert (rep["destroyed"], rep["rows"], rep["wave"]) == (1, 3, "2020") and not rep.get("from_cache")
+
+    # The direct pin on the write site: the country parquet carries the audit.
+    var_pq = tmp_path / "data" / name / "var" / "housing.parquet"
+    assert {"lsms_cache_hash", "lsms_cache_waves", "lsms_grain_audit"} <= _keys(var_pq), (
+        write, sorted(_keys(var_pq)))
+    (stamped,) = lt.read_parquet_grain_audit(var_pq)
+    assert (stamped["destroyed"], stamped["rows"]) == (1, 3)
+
+    stamp = var_pq.stat().st_mtime_ns
+    warm = _grain_probe(tmp_path, name)                       # process 2: warm read only
+    assert var_pq.stat().st_mtime_ns == stamp, "the read was not warm"
+    assert "DVC unavailable for housing" not in warm["_stderr"]
+    assert warm["served"] == cold["served"] and len(warm["served"]) == 2
+    (wmsg,) = warm["warned"]
+    assert "Grainland/housing/2020" in wmsg and "DESTROYED 1 of 3" in wmsg, wmsg
+    (wrep,) = warm["reports"]
+    assert wrep["from_cache"] is True
+    assert {k: wrep[k] for k in ("rows", "dropped", "destroyed", "conflicting_groups", "wave")} \
+        == {k: rep[k] for k in ("rows", "dropped", "destroyed", "conflicting_groups", "wave")}
+    assert not list((tmp_path / "countries").rglob("*.parquet")), "GH #803: nothing in-tree"
+
+
 def test_a_forked_wave_relays_all_three_ledgers():
     """_parallel_waves relays the grain, date-parse and drop ledgers together:
     each reaches the parent's L2-country stamp."""

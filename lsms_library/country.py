@@ -5286,6 +5286,7 @@ class Country:
                     build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
+                               grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                cache_waves=build_waves,
                                datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                build_drops=build_drops)
