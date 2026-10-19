@@ -186,13 +186,15 @@ above.
 
 ## Coverage today: **32 of 67** cells convert
 
-Measured 2026-10-19 on a warm corpus (red-team r1 fixes applied):
-`Feature('food_expenditures')(period='year')` keeps 32 of 67 cells —
-**3,405,677 of 6,146,931 rows** (55.4%) — and every kept cell's total is its
-unconverted total times exactly `365.25 / exposure`, using each column's own
-exposure. `Feature('food_quantities')(units='units', period='year')` keeps the
-same 32 cells, 3,937,370 of 7,796,095 rows, on the same check. (Over
-`food_acquired`, the same 32 cells are 7,489,800 of 11,926,972 rows.)
+Measured 2026-10-19 on a warm corpus (red-team r1 fixes applied, on
+`development` at `2f3104c5f`): `Feature('food_expenditures')(period='year')`
+keeps 32 of 67 cells — **3,405,677 of 6,147,074 rows** (55.4%) — and every
+kept cell's total is its unconverted total times exactly `365.25 / exposure`,
+using each column's own exposure, with the kept cell's rows unchanged.
+`Feature('food_quantities')(units='units', period='year')` keeps the same 32
+cells, 3,937,370 of 7,796,201 rows, on the same check. (Over `food_acquired`,
+summed per country from `Country(c).food_acquired()`, the same 32 cells are
+7,489,800 of 11,927,184 rows.)
 
 | country | waves | exposure | asks x days | basis |
 |---|---|---|---|---|
