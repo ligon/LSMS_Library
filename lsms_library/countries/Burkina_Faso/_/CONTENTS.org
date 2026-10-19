@@ -543,6 +543,113 @@ Cache: =_/categorical_mapping.org= is a build input, so the edit moves
 every Burkina_Faso cache hash -- three waves, eleven script-path tables.
 Not paid in the fixing branch; verified with =assume_cache_fresh=True=.
 
+** DONE cluster_features -- GPS by wave: 2018-19 wired, 2014 and 2021-22 ship none (GH #1050, 2026-10-18)
+
+| Wave    | Source of the cluster fix                    | Columns                                          | Clusters with GPS, before -> after |
+|---------+----------------------------------------------+--------------------------------------------------+------------------------------------|
+| 2014    | -- none shipped --                           | --                                               | 0 / 900 -> 0 / 900                 |
+| 2018-19 | =grappe_gps_bfa2018.dta= (one row per grappe) | =coordonnes_gps__Latitude= / =__Longitude=       | 0 / 585 -> *555 / 585*             |
+| 2021-22 | -- none usable (see below) --                | --                                               | 0 / 550 -> 0 / 550                 |
+
+*What was wrong.*  Both the 2014 and the 2018-19 =df_geo= asked for
+=lat_dd_mod= / =lon_dd_mod= -- the LSMS-ISA offset-file spelling, which no
+Burkina Faso file carries.  The =KeyError= was swallowed by the GH #515
+optional-sub-df fallback, and because =Latitude= / =Longitude= are
+=optional: true= in =data_scheme.yml= the GH #323/#515 required-column guard
+did not fire: every Burkina Faso cluster was served with no GPS, behind a
+warning (=could not load sub-df 'df_geo'=) printed only on a cold build.  The
+same trap as Niger 2011-12 (=Niger/_/CONTENTS.org=, "Cluster coordinates").
+
+*2018-19 -- the fix.*  =Latitude: coordonnes_gps__Latitude=,
+=Longitude: coordonnes_gps__Longitude= (the CotedIvoire 2018-19 spelling).
+The variable label is « COORDONNEES GPS DU VILLAGE OU DU QUARTIER »: a point
+for the village or quarter; nothing in the file says whether it is displaced.
+Measured:
+- 585 rows, 585 distinct =grappe=, no null key, and the *same* 585 grappes
+  as =s00_me_bfa2018.dta= (0 orphans either way) -- so the merge on =v= is
+  many-to-one, =outer= / =left= / =inner= give the same frame, and
+  =merge_how= is left at its default.  One fix per grappe by construction, so
+  there is nothing to reconcile: no duplicate, no conflict.
+- The projection of the household-grain merge onto =(t, v)= (GH #323 Site 2)
+  is lossless for 2018-19 -- the coordinate is a grappe constant -- and
+  emits no grain report.  2014's pre-existing report is unchanged (1,034 of
+  10,800 rows destroyed over 94 conflicting =zd=; Region/District/Rural, not
+  GPS), and the served Region/District/Rural are frame-equal before/after in
+  all three waves.
+- 30 grappes ship no fix (timestamp =##N/A##=; 25 in vague 2, 5 in vague 1;
+  Est 12, Nord 6, Centre 5, Centre-Sud 3, Sud-Ouest 3, Centre-Est 1; 15
+  Urban, 15 Rural).  Served as NaN.
+- All 555 fixes lie inside Burkina Faso (lat 9.87-14.51 N, lon 5.43 W-2.00 E)
+  and each region's points fall where the region is (Sahel 13.2-14.5 N,
+  Cascades 9.9-10.8 N / 5.4-3.8 W, Est 0.2 W-2.0 E, ...).
+- *Grappes 237 (Urban) and 240 (Rural)*, both Centre-Sud / Zoundwéogo,
+  carry the IDENTICAL fix -- 11.44 N, 0.75 W, accuracy 7.59, timestamp
+  =2019-05-02T11:02:37= -- at two-decimal precision, where every other fix
+  carries six or more.  One reading entered for two grappes, or a rounded
+  hand-entered point.  Served as recorded; not adjudicated.
+- *Grappe 298* has 11 households in vague 1 and one in vague 2
+  (=s00_me_bfa2018.dta=) -- a one-household exception to the EHCVM rule that
+  each grappe is visited in one vague.  Harmless here (=v: grappe=; the GPS
+  file says vague 1).
+
+*2014 -- the distribution ships no coordinate; =df_geo= removed.*
+- =emc2014_agri_gps.dta= (3,978 parcel rows: =zd=, =menage=, =V00= field
+  no., =V02= parcel no., the =A*= cover variables, =V20=, =V22=) is the
+  parcel GPS-*area* file.  Its labels, verbatim: =V20= « La parcelle
+  a-t-elle été mesurée par le GPS? » ={1: Oui, 2: Non}=; =V22= « Quelle est
+  la supercifie de la parcelle (en hectare) selon les mesures GPS? »
+  (0.01-999.99; 999.99 is a sentinel).  An area, not a position.  The same
+  two variables are in =emc2014_agri_caracteristiques_parcelles.dta=.
+- A metadata sweep of all 48 files held -- which are exactly the 48 the WB
+  catalog lists for =BFA_2014_EMC_v01_M= (catalog 2538, =data_files= API,
+  2026-10-18) -- finds no latitude, longitude or coordinate variable in any
+  of them, and the release has no offsets / geovariables file.
+- =Questionnaire_EMC_2014_Passage_1.pdf= (24 pp.) records location only as
+  « A1. REGION A2. PROVINCE A3. MILIEU [...] A4. ZD A5. MENAGE » (p. 1) and
+  mentions GPS nowhere; =Report.pdf= (90 pp.) mentions GPS nowhere either.
+  *Limit*: the agriculture-module questionnaire (where =V20=/=V22= were
+  asked) is not held in this repo.  So this is "in no held document and in
+  no distributed file", not a C4 (questionnaire) finding for that module.
+- The block keeps its =dfs: [df_main]= form rather than being flattened, so
+  2014 goes through exactly the one-sub-df branch of =Wave.grab_data= it
+  went through while =df_geo= was being dropped.
+
+*2021-22 -- no usable cluster GPS.*
+- No grappe-level GPS file is distributed: the WB catalog lists 55 files for
+  =BFA_2021_EHCVM-P_v04_M=, and the two not held (=calorie_conversion_wa_2021=,
+  =ehcvm_prix_bfa2021=) are not geographic.
+- =s00_me_bfa2021.dta= carries =GPS__Latitude= / =GPS__Longitude= /
+  =__Accuracy= / =__Altitude= / =__Timestamp= (« Coordonnées GPS du
+  ménage ») -- *0 of 3,227 populated*.  (Mali and Senegal 2021-22 map the
+  same variables.)  Not mapped: an all-empty column adds nothing, and it is
+  household grain besides.
+- The 550 grappes are a subset of 2018-19's 585 (EHCVM-2 tracked households
+  within their EA; see "THE THING TO KNOW" above); Region agrees 550/550, and
+  527 of them have a 2018-19 fix.  Serving that fix for 2021-22 would be a
+  cross-wave construction -- a registered derivation, not a config mapping --
+  and is not done.
+- =s16a_me_bfa2021.dta= DOES carry parcel coordinates (=s16aq46__latitude= /
+  =__longitude=, 4,180 of 8,467 parcels, inside the country).  Parcel grain,
+  not a cluster location; see the correction under =plot_features=.
+
+*=optional: true= stays.*  Two of three waves have no cluster GPS, and the
+flag is country-grain; dropping it would make Site B report a genuine
+absence in 2014 and 2021-22 on every read.  =tests/test_burkina_faso_cluster_gps.py=
+pins that the flag stays only while some wave maps no coordinate.
+
+*Also seen, not fixed.*  =District= is spelled inconsistently across waves
+-- the =Region= problem (GH #811) one level down: 96 distinct strings pooled
+for 45 provinces.  Of the 53 shared 2018-19/2021-22 grappes whose District
+differs, 41 are accents/case only (=Séno=/=Seno=, =Balé=/=Bale=,
+=Bazèga=/=Bazega=, =KOssi=/=Kossi=, =Koulpelgo=/=Koulpélogo=,
+=Kourweogo=/=Kourwéogo=) and 12 name a neighbouring province
+(=Kompienga=/=Gourma=, =Poni=/=Noumbiel=, =Séno=/=Yagha=).
+
+*Cache*: both wave =data_info.yml= files are build inputs, so all 24
+Burkina_Faso =Country._table_cache_hash= values move; the 2021-22 wave
+hashes, every other country and every =build_transforms_fingerprint= are
+unchanged.
+
 ** DONE household_roster
 *** 2014 wave (EMC): Relationship code 6 ships a literal "?" (GH #801)
 =emc2014_p1_individu_27022015.dta= (Stata format 113, Latin-1 labels)
@@ -607,6 +714,14 @@ uses a different instrument and is out of scope.
 - Placeholder rows (no field/parcel number) for non-farming households
   are dropped.  Latitude / Longitude deferred (no decimal-degree parcel
   GPS in EHCVM s16a).
+
+CORRECTION (2026-10-18, GH #1050).  "no decimal-degree parcel GPS in EHCVM
+s16a" holds for 2018-19 only.  =s16a_me_bfa2021.dta= carries
+=s16aq45= « La parcelle [...] a-t-elle été mesurée par GPS? » and
+=s16aq46__latitude= / =s16aq46__longitude= « Coordonnées GPS de la parcelle »,
+populated for 4,180 of 8,467 parcels (lat 9.85-13.99, lon -5.35-0.35).
+=s16a_me_bfa2018.dta= has =s16aq45= and the area =s16aq47= but no =s16aq46=.
+The 2021-22 parcel coordinates are not wired into =plot_features=.
 
 * =2018-19= / =2021-22= =food_acquired.py= are DEAD CODE, and their =encoding== is a trap
 
