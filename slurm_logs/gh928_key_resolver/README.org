@@ -172,3 +172,12 @@ F2's move is attributed by =closure_parts.py= to =Country.categorical_mapping=,
 build closure).  Nothing moves that r0 had not already moved against the
 base: one corpus re-warm, in the bundle.  9 Peru =_input_hash= values are
 =None= on every tree and are not counted.
+
+** Tests (r1 final tree)
+
+- =tests/test_categorical_key_resolver.py=: 56 passed (40 before r1; +12 guard, +4 F2).
+- Full suite, recipe =-n 6 --dist=loadfile --timeout=3000=, BLAS pinned,
+  =LSMS_BUILD_WORKERS=1=, private root (every table cold):
+  =7655 passed, 277 skipped, 9 xfailed, 1 xpassed, 1195 warnings in 1715.21s (0:28:35)=,
+  0 failed.  +16 passed against r0's 7639 = the 16 new tests.  The XPASS is
+  the same non-strict Pakistan existence proxy as on the base.
