@@ -1432,19 +1432,16 @@ Dropping them would change the table's grain, not its unit vocabulary, so
 they are kept; whether they belong in =plot_inputs= at all is a decision,
 drafted as a residual (2026-10-19).
 
-*They are served =u = NA=, not =Unknown=* (dispatcher decision, 2026-10-19,
-after red team r2 §5.2; the r1fix build had given them =Unknown=, 5,724 rows
-in all).  Per wave: 2010Q3 1,639 / 2012Q3 1,229 / 2015Q3 1,100 / 2018Q3
-1,086 / 2023Q3 492, all =Seed=, =Quantity= NA on every one.  The grounds:
+*=Country()= serves them =u = NA=, not =Unknown=* (dispatcher decision,
+2026-10-19, after red team r2 §5.2; the r1fix build had given them
+=Unknown=, 5,724 rows in all).  Per wave: 2010Q3 1,639 / 2012Q3 1,229 /
+2015Q3 1,100 / 2018Q3 1,086 / 2023Q3 492, all =Seed=, =Quantity= NA on every
+one.  The grounds, as recorded then:
 - =u= is a *column* here, so the =groupby(dropna=True)= deletion that is the
-  whole stated reason for the =u= sentinel cannot fire; =plot_inputs= has no
-  =index_info= entry, and =feature._missing_level_sentinels('plot_inputs')=
-  is ={}=, so =Feature()= does not fill it either (measured: =Feature= serves
-  the same 5,546 NA and 178 =Unknown=).  *Revisit if GH #569 registers a
-  =plot_inputs= =index_info= with =u= as a level*: =data_info.yml='s =u= note
-  already lists =plot_inputs= among the tables where =u= is "a DECLARED index
-  level", which is not true of Nigeria's =data_scheme.yml=, and a sentinel
-  fill at =Feature()= time would then follow.
+  whole stated reason for the =u= sentinel cannot fire on the =Country()=
+  frame.  (The rest of this bullet -- "=Feature()= does not fill it either"
+  -- stopped being true when GH #569 registered =plot_inputs=; see the next
+  paragraph.)
 - =data_info.yml='s rule is conditioned on a survey that "records an amount
   and no unit"; these rows record no amount.  Its =Unit_sold= paragraph
   states the column case: "a column, has no such hazard, and NA says
@@ -1452,14 +1449,48 @@ in all).  Per wave: 2010Q3 1,639 / 2012Q3 1,229 / 2015Q3 1,100 / 2018Q3
 - the canonical CONSUMER RULE ("exclude =Unknown= ... and REPORT how many
   rows you excluded") would otherwise report 5,724 unknown-unit rows where
   178 carry an amount.
-- Ethiopia, GhanaLSS, Mali and Tanzania (column-=u= countries) serve NA on
-  their no-quantity rows; Uganda gives its 43,220 no-quantity column rows
-  =Unknown= (red team r2's measurement, not re-run here).  The two
-  conventions coexist across countries.
-=crop_production= is different in kind: =Feature()= promotes crop =u= into
-the index and fills =Unknown= anyway, so there the build-time sentinel only
-matches the read path.  So *=u= is NA only where =Quantity= is NA*; the
-converse does not hold -- 90 rows with no quantity carry a RECORDED unit
+- In =Country()=, Ethiopia, GhanaLSS, Mali and Tanzania (column-=u=
+  countries) serve NA on their no-quantity rows; Uganda gives its 43,220
+  no-quantity column rows =Unknown=.  The two conventions coexist across
+  countries.  (Measured 2026-10-19, warm: =Country()= =u= NA is Ethiopia
+  37,370 and GhanaLSS 8,763, all with no quantity; Mali 42,089 and Tanzania
+  408, of which 41,807 and 389 DO carry a quantity -- the literal #1041
+  case, not this one.)
+
+*=Feature()= serves them =u = 'Unknown'=* (GH #569, 2026-10-19).  #569
+registers =plot_inputs= in =Index Info= as =(t, v, i, plot_id, input, j, u,
+season)= with =missing_level_sentinels: u: Unknown=, so =Feature()= promotes
+Nigeria's =u= column into the index and fills its nulls with the sentinel.
+Measured on the warm corpus: =Feature('plot_inputs')= serves Nigeria 96,620
+rows (= =Country()=), *0* =u= NA and *5,724* =u = 'Unknown'= -- the 5,546
+no-quantity rows above plus the 178 build-time =Unknown= rows.  This follows
+@ligon's #1041 ruling (2026-10-18: a missing unit is =U_UNKNOWN=, never NaN;
+"apply the same rule to any missing unit you meet") and *reverses the #1037
+dispatcher call above on the =Feature()= path*.  The fill is also forced
+mechanically once =u= is canonical: =u= has to be (Malawi and the EHCVM
+seven key rows on it), and a NaN on a canonical index level is a deferred
+deletion.  Nothing else moves: =Feature= rows equal =Country()= rows, the
+index is unique, =seed_kg= (4,888 rows, 1,380,982.0075) and =nitrogen_kg=
+(4,359 rows, 173,671.9922) are identical on the two frames, and none of the
+5,724 =Unknown= rows acquires a kg factor.  The third ground above is the
+price, and it is now paid on =Feature= frames: the CONSUMER RULE counts
+these 5,546 no-amount rows as unknown-unit rows.
+
+*The remaining inconsistency is =Country()=.*  It still serves NA on the
+same 5,546 rows, so =Country('Nigeria').plot_inputs()= and
+=Feature('plot_inputs')= disagree on =u=, and the =Country()= NA contradicts
+the #1041 ruling.  Fixing it is a country-level build change -- fill in
+=assemble_plot_inputs=, or drop the no-quantity rows (the residual above) --
+which moves Nigeria's =plot_inputs= hash and costs a re-warm.  It is left to
+a separate issue and not done here.
+
+=crop_production= now matches =plot_inputs= on the =Feature()= path: in
+both, =Feature()= promotes =u= into the index and fills =Unknown=.  They
+differ only at build time: crop =u= is filled =Unknown= in the build
+(#1047), so its =Country()= frame already agrees with =Feature()=, while
+=plot_inputs= is not filled in the build.  So, in =Country()=, *=u= is NA
+only where =Quantity= is NA*; the converse does not hold -- 90 rows with no
+quantity carry a RECORDED unit
 (=Kg= 68, =other specify= 5, =Milk cup= 5, =Tiya= 5, =g= 4, =Bundle= 2,
 =Mudu= 1) and keep it as recorded.  =Unknown= is now served on 178 rows (164
 with a positive quantity, 14 with a zero).  Nothing else moves: rows per =t=
