@@ -207,6 +207,21 @@ prod_labels = get_categorical_mapping(
 
 num8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=False)
 cat8h = get_dataframe('../Data/g7sec8h.dta', convert_categoricals=True)
+# Screener gate (GH #1008; ruling @ligon 2026-10-19): serve an 8H row only
+# where s8hq1 == 1 ("1. Yes", the household consumed this item from own
+# production), the questionnaire's own skip logic -- and what 1998-99,
+# 2005-06 and 2012-13 already do.  s8hq1 is asked per (household, item) row.
+# Applied BEFORE the visit stack, by position on both views (they are the
+# same source rows in the same order).  It removes 868,975 of 934,584 source
+# rows: 868,255 "2. No" and 720 blank.  None of the "No" rows carries a
+# quantity or a unit at any visit; 12,038 carry a price only, and each of
+# those is one constant per (visit, item) -- 11,934 at visit 2 (Cassava 2,
+# Tomato 3, Pepper 2, Okra 7) and 104 at visits 3..7 -- a fill, not an answer.
+# Of the 720 blank screeners, 39 rows (11 households) DO carry quantities;
+# they go too, as in the sibling waves.  Census and costs: _/CONTENTS.org.
+_screened = num8h['s8hq1'].eq(1).to_numpy()
+num8h = num8h[_screened].reset_index(drop=True)
+cat8h = cat8h[_screened].reset_index(drop=True)
 # 8H q3..q8 are the same six visits: this wave's own Stata labels read
 # "Quantity of own produced food consumed at 2nd visit" (s8hq3) through
 # "...now-7th visit" (s8hq8).  q1/q2 are screeners, not visits.
