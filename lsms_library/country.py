@@ -2353,6 +2353,40 @@ class Country:
                         factors[str(raw).strip().lower()] = canonical[key]
         return factors
 
+    def _no_kg_factor_cells(self) -> tuple[tuple[str, str | None], ...]:
+        """Declared ``(item, unit)`` cells that get NO inferred kg (GH #1042).
+
+        Read from ``countries/{C}/_/no_kg_factor.yml`` at READ time and passed
+        to :func:`transformations.food_kg_factors` as ``no_kg=``.  A ``.yml``
+        sibling of ``data_scheme.yml`` is not a build input (``_input_hash`` /
+        ``_table_cache_hash`` glob ``_BUILD_INPUT_SUFFIXES`` plus ``*.org``),
+        so declaring a cell moves no cache hash -- like ``population.yml``.
+
+        Each entry needs ``item`` and a non-empty ``reason``; ``units`` is an
+        optional list (absent = every unit of the item).  An entry without a
+        reason is refused: a declaration that removes kilograms from served
+        rows must say why.
+        """
+        path = Path(countries_root()) / self.name / "_" / "no_kg_factor.yml"
+        if not path.exists():
+            return ()
+        with open(path) as fh:
+            doc = yaml.safe_load(fh) or {}
+        entries = doc.get('no_kg_factor') or []
+        cells: list[tuple[str, str | None]] = []
+        for e in entries:
+            if not isinstance(e, dict) or not e.get('item') \
+                    or not str(e.get('reason') or '').strip():
+                raise ValueError(
+                    f"{path}: every no_kg_factor entry needs an `item` and a "
+                    f"`reason`; got {e!r}")
+            units = e.get('units')
+            if units is None:
+                cells.append((str(e['item']), None))
+            else:
+                cells.extend((str(e['item']), str(u)) for u in units)
+        return tuple(cells)
+
     @property
     def mapping(self) -> dict[str, Any]:
         return {**self.categorical_mapping, **self.formatting_functions}
@@ -5690,6 +5724,9 @@ class Country:
                         # on the RAW label so the transform needs no knowledge of
                         # label harmonisation or of dispatch order.
                         transform_kwargs['unit_kg'] = self._unit_kg_factors()
+                        # GH #1042: declared (item, unit) cells that get no
+                        # inferred kg (``_/no_kg_factor.yml``).
+                        transform_kwargs['no_kg'] = self._no_kg_factor_cells()
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
                     if name == 'food_expenditures' and valuation is not None:

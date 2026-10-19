@@ -1906,12 +1906,44 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
+def _declared_no_kg_mask(df, no_kg, item_col='j'):
+    """Rows of *df* on a declared "no kg factor" cell (GH #1042).
+
+    *no_kg* is an iterable of ``(item, unit)`` pairs, ``unit=None`` meaning
+    every unit of the item.  Returns the boolean row mask and a dict
+    ``{(item, unit): row mask}`` for the per-cell report.  Labels are matched
+    on :func:`_normalise_join_key`, the key the item arm itself joins on.
+    """
+    mask = np.zeros(len(df), dtype=bool)
+    cells = {}
+    if not no_kg:
+        return mask, cells
+    idx_names = list(df.index.names or [])
+    if item_col in idx_names:
+        items = df.index.get_level_values(item_col)
+    elif item_col in df.columns:
+        items = df[item_col]
+    else:
+        return mask, cells
+    raw_u = (df.index.get_level_values('u') if 'u' in idx_names else df['u'])
+    items = _normalise_join_key(items)
+    units = _normalise_join_key(raw_u)
+    for item, unit in no_kg:
+        m = items == str(item).strip().lower()
+        if unit is not None:
+            m = m & (units == str(unit).strip().lower())
+        cells[(item, unit)] = m
+        mask |= m
+    return mask, cells
+
+
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                     tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
-                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD):
+                    baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD,
+                    no_kg=None):
     """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
 
     The food twin of :func:`harvest_kg_factors`, and deliberately the same
@@ -1940,6 +1972,19 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         partition.
     volume_as_mass, min_reports, min_baseline, min_baseline_tight, tight_tolerance
         Passed through; see :func:`conversion_to_kgs`.
+    no_kg : iterable of ``(item, unit)`` pairs, optional
+        Declared cells for which NO INFERRED kilogram is minted (GH #1042):
+        matching rows lose the ``item_unit`` / ``item_unit_tight`` / ``unit``
+        candidates and are served ``none`` -- carried in their native unit --
+        unless the survey's own kilograms (``survey_kg``) or the label's
+        stated metric content (``metric``) serve them, exactly as for a
+        missing-unit sentinel.  ``unit=None`` declares every unit of the
+        item.  Matched on stripped, lower-cased labels as this function sees
+        them (the frame BEFORE ``_finalize_result``'s categorical mapping,
+        GH #770).  The declared rows still enter the estimators as evidence:
+        this refuses to SERVE a factor, it does not re-estimate anyone
+        else's.  A country declares its cells in ``_/no_kg_factor.yml``
+        (read at read time by ``Country._no_kg_factor_cells``).
 
     Returns
     -------
@@ -1953,6 +1998,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         the dispersion gate cost their own ``(item, unit)`` factor and where
         they landed instead (``rows_refused == refused_to_unit +
         refused_to_none``).  Only the first partitions the frame.
+        ``attrs['kg_factor_declared_none']`` reports the *no_kg* declaration:
+        ``rows_matched`` (rows on a declared cell) and ``rows_refused`` (of
+        those, rows an inferred rung WOULD have served and that are now
+        ``none``), per cell in ``cells``.
 
     Notes
     -----
@@ -2163,6 +2212,23 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         kg_wave_spread = np.where(_sentinel, np.nan, kg_wave_spread)
         refused = refused & ~_sentinel
 
+    # GH #1042 (@ligon 2026-10-18): an item-level "no kg factor".  Some
+    # (item, unit) cells have a price-ratio inference that is known to be
+    # wrong -- GhanaLSS eggs: the egg 'Kilogram' rows price at the per-egg
+    # price, so the (t, Egg) per-kg baseline is built from mislabelled
+    # counts and (Egg, Single) comes out at 0.50 kg per egg.  A declared cell
+    # is treated exactly like a sentinel row: it keeps ``survey_kg`` and
+    # ``metric``, and loses every INFERRED candidate.
+    declared, declared_cells = _declared_no_kg_mask(df, no_kg, item_col)
+    would_infer = declared & (~np.isnan(kg_item) | ~np.isnan(kg_unit))
+    if declared.any():
+        kg_item = np.where(declared, np.nan, kg_item)
+        kg_unit = np.where(declared, np.nan, kg_unit)
+        kg_tight = kg_tight & ~declared
+        kg_waves = np.where(declared, np.nan, kg_waves)
+        kg_wave_spread = np.where(declared, np.nan, kg_wave_spread)
+        refused = refused & ~declared
+
     kg_survey = np.full(len(df), np.nan)
     from_survey = np.zeros(len(df), dtype=bool)
     if 'Quantity_kg' in df.columns:
@@ -2224,6 +2290,19 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # invariant a reader will check.
     refused = refused & np.isnan(kg_survey) & np.isnan(kg_metric)
     out['baseline_refused_spread'] = refused
+    # A diagnostic beside the partition (the rows are counted in ``none`` --
+    # or ``survey_kg`` / ``metric`` -- above), so a reader can see WHY a
+    # declared row has no kilograms.
+    declared_refused = would_infer & (source == 'none')
+    out.attrs['kg_factor_declared_none'] = {
+        'rows_matched': int(declared.sum()),
+        'rows_refused': int(declared_refused.sum()),
+        'cells': {
+            f"{item}|{unit if unit is not None else '*'}": {
+                'rows_matched': int(m.sum()),
+                'rows_refused': int((m & declared_refused).sum())}
+            for (item, unit), m in declared_cells.items()},
+    }
     out.attrs['kg_factor_baseline_gate'] = {
         'baseline_max_spread': baseline_max_spread,
         'rows_refused': int(refused.sum()),
@@ -2897,7 +2976,8 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
     return x
 
 
-def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None):
+def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None,
+                                  no_kg=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -2972,7 +3052,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -3009,10 +3090,13 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         kgf.attrs['kg_factor_wave_spread'])
     out.attrs['kg_factor_baseline_gate'] = dict(
         kgf.attrs['kg_factor_baseline_gate'])
+    out.attrs['kg_factor_declared_none'] = dict(
+        kgf.attrs['kg_factor_declared_none'])
     return out
 
 
-def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None):
+def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None,
+                              no_kg=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -3137,7 +3221,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
 
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -3153,7 +3238,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
@@ -3210,6 +3296,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             kgf.attrs['kg_factor_wave_spread'])
         v.attrs['kg_factor_baseline_gate'] = dict(
             kgf.attrs['kg_factor_baseline_gate'])
+        v.attrs['kg_factor_declared_none'] = dict(
+            kgf.attrs['kg_factor_declared_none'])
     return v
 
 

@@ -164,8 +164,103 @@ def other_specify_to_unknown(u, is_other, detail=None):
     from lsms_library.transformations import U_UNKNOWN
     missing = pd.Series(is_other, index=u.index).astype(bool)
     if detail is not None:
-        missing &= pd.Series(detail, index=u.index).isna().values
+        d = pd.Series(detail, index=u.index)
+        # GH #1042 ruling 5 (@ligon 2026-10-18): a specify text that names a
+        # FOOD ('Mango', 'Coffee', 'Meals') specifies no unit either.
+        missing &= (d.isna() | names_a_food(d)).values
     return u.mask(missing, U_UNKNOWN)
+
+
+#: Words too generic to decide anything: they occur in item names and unit
+#: texts alike ('Small Bottle', 'Fresh Beans'), or are joiners.
+_FOOD_TEXT_STOPWORDS = frozenset({
+    'and', 'of', 'with', 'the', 'at', 'for', 'from', 'not', 'very', 'etc',
+    'other', 'specify', 'own', 'eaten', 'one', 'two', 'three',
+    'big', 'small', 'large', 'medium', 'half', 'full', 'fresh', 'dried',
+    'cooked',
+})
+#: Malawi staple-dish words that name food in specify texts ('Nsima And
+#: Meat') but are not words of any item label in ``harmonize_food`` (the
+#: staple is listed as maize ufa, relish has no item).  A vocabulary
+#: supplement, not a list of answers.
+_FOOD_WORDS_NOT_IN_ITEM_TABLE = frozenset({'nsima', 'ndiwo'})
+
+
+def _text_words(text):
+    return [w for w in re.findall(r'[a-z]+', str(text).lower())
+            if len(w) >= 3 and w not in _FOOD_TEXT_STOPWORDS]
+
+
+def _word_forms(w):
+    forms = {w}
+    if w.endswith('es'):
+        forms.add(w[:-2])
+    if w.endswith('s'):
+        forms.add(w[:-1])
+    return forms
+
+
+_FOOD_TEXT_VOCAB = None
+
+
+def _food_text_vocab():
+    """(food words, unit words) for :func:`names_a_food`, read once.
+
+    Food words: the words of every item NAME in this country's
+    ``harmonize_food`` table (Preferred Label and every wave's label), with
+    parenthesised qualifiers and anything after ' - ' removed -- so the
+    descriptors in 'Tomato sauce (bottle)' or 'Chicken - Whole' are not food
+    words.  Unit words: the words of this country's own unit tables (``u``,
+    ``harmonize_crop_unit``, ``harmonize_price_unit``); a text containing
+    one is a unit text whatever else it says.
+    """
+    global _FOOD_TEXT_VOCAB
+    if _FOOD_TEXT_VOCAB is None:
+        from pathlib import Path
+        from lsms_library.local_tools import df_from_orgfile
+        org = Path(__file__).resolve().parent / 'categorical_mapping.org'
+        hf = df_from_orgfile(str(org), name='harmonize_food')
+        food = set(_FOOD_WORDS_NOT_IN_ITEM_TABLE)
+        for col in hf.columns:
+            if col in ('GD Category', 'Aggregate Label', 'Aggregate (short)'):
+                continue
+            for v in hf[col].dropna():
+                name = re.sub(r'\([^)]*\)', '', str(v)).split(' - ')[0]
+                if name.strip() in ('', '---'):
+                    continue
+                food.update(_text_words(name))
+        unit = set()
+        for tbl in ('u', 'harmonize_crop_unit', 'harmonize_price_unit'):
+            t = df_from_orgfile(str(org), name=tbl)
+            for col in t.columns:
+                for v in t[col].dropna():
+                    unit.update(_text_words(v))
+        _FOOD_TEXT_VOCAB = (frozenset(food), frozenset(unit))
+    return _FOOD_TEXT_VOCAB
+
+
+def names_a_food(text):
+    """Boolean Series: does this other-specify text name a FOOD, not a unit?
+
+    True iff the text has at least one content word, EVERY content word is a
+    word of an item name in this country's food table (singular or plural),
+    and NONE is a word of its unit tables -- see :func:`_food_text_vocab`.
+    So 'Mango', 'Coffee', 'Meals', 'Tea And Bread', 'Nsima And Meat' are
+    food; 'Whole Chicken' ('whole' is no item name), 'Plate', 'Bottle',
+    'Packet', 'Grams' are not.  NA is not a food.
+    """
+    food, unit = _food_text_vocab()
+    s = pd.Series(text)
+
+    def one(x):
+        if pd.isna(x):
+            return False
+        ws = _text_words(x)
+        return (bool(ws)
+                and all(_word_forms(w) & food for w in ws)
+                and not any(_word_forms(w) & unit for w in ws))
+
+    return s.map(one).astype(bool)
 
 
 _METRIC_KG = {  # unit token -> kg per 1 of that unit (volume at water density 1)
