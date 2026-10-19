@@ -1848,15 +1848,21 @@ woff = ["brotli (>=1.0.1) ; platform_python_implementation == \"CPython\"", "bro
 
 [[package]]
 name = "fooddatacentral"
-version = "1.0.12"
+version = "1.0.13"
 description = "Python module to obtain information from the USDA's Food Data Central data project."
 optional = false
-python-versions = "*"
+python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "fooddatacentral-1.0.12-py3-none-any.whl", hash = "sha256:8a749b81283583b8df8c3a19ff7cc0ad4c19dd331dfc299c79c4bef328cffdcc"},
-    {file = "fooddatacentral-1.0.12.tar.gz", hash = "sha256:95f2782c11761f47eb3be2fa7ca928b18efd9864717661b5c170179ad2febdeb"},
+    {file = "fooddatacentral-1.0.13-py3-none-any.whl", hash = "sha256:31ea8e74715ae43995ff0ac26d379d5e485bcd1caf2280750926442c781cac7f"},
+    {file = "fooddatacentral-1.0.13.tar.gz", hash = "sha256:9e6e3c9fe9090d222be430d8947840876114ae90b74158062d076f6ffbcdd0e5"},
 ]
+
+[package.dependencies]
+numpy = ">=1.20"
+pandas = ">=1.0"
+pint = ">=0.17"
+requests = ">=2.20"
 
 [[package]]
 name = "frozenlist"
@@ -6730,4 +6736,4 @@ type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11, <4.0"
-content-hash = "1f06256fad45b727aee13c5c267e973a54f76888f7a1c8a26fb1c821e0492644"
+content-hash = "ff68c38741f1b1d61a62712db3cc711a0c26811e07148000441da086ce54c538"
