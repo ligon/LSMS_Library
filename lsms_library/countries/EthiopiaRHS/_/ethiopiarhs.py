@@ -40,10 +40,11 @@ waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 # than spelled 'Birr', GH #770 -- ...) and the
 # raw in-data unit *code* for 1989 (still a unit token, not a food
 # label).  A 1994+ code the table does not list is served as its
-# integer code ('31', not '31.0'); 1989's code 0 is U_UNKNOWN.  1989's
-# codes are NOT the 1994+ scheme -- its own instrument numbers units
-# per questionnaire page, and its code 1 is a quintal, not a kilogram
-# (GH #1044; see `food_acquired` and _/CONTENTS.org).  An EARLIER design appended the food label
+# integer code ('31', not '31.0'); a missing unit (1989's code 0, or
+# a NaN unit on a measured 1994+ row) is U_UNKNOWN.  1989's codes are
+# NOT the 1994+ scheme -- its own instrument prints several unit lists,
+# and its code 1 is a quintal, not a kilogram (GH #1044; see
+# `food_acquired` and _/CONTENTS.org).  An EARLIER design appended the food label
 # to non-metric units ("Chinet [Butter]") to coax the framework's
 # price-ratio kg inference into a per-good factor; that polluted the
 # unit axis with ITEM NAMES (e.g. '0 [Butter]', '5 [Teff]') and is the
@@ -212,7 +213,9 @@ def food_acquired(df):
 
     Output: index (i, j, u, s), columns [Quantity, Expenditure];
     s in {purchased, produced, inkind}.  The framework prepends `t`
-    (check_adding_t) and joins `v` from sample() at API time.
+    (check_adding_t) and joins `v` from sample() at API time.  A
+    measured row whose unit is missing is served ``u = U_UNKNOWN``
+    (#1041; GH #1044), not dropped.
 
     Pass-through path (1989): food89.dta is already long -- one row
     per (hh, item) with a single `source` code, mapped to `s` in the
@@ -260,26 +263,34 @@ def food_acquired(df):
                                                .str.strip() != '')]
         # 1989 unitcode carries no value labels in food89.dta, and
         # harmonize_unit is deliberately NOT applied: it is the 1994+
-        # scheme, and 1989's is a different one.  The 1989 instrument
-        # (ERHS_hhquestionnaire_1989.pdf, Debre Berhan, section E3)
-        # numbers units PER PAGE -- E3.1 (cereals, pulses): 1=Quintal,
+        # scheme, and 1989's is a different one.  The one 1989 instrument
+        # held (ERHS_hhquestionnaire_1989.pdf) prints several unit lists.
+        # The weekly-food page for cereals/pulses, E3.1, reads 1=Quintal,
         # 2=Dawla, 3=Kunna, 4=Akmada, 5=Ensira, 6=Gurzigne, 7=Silicha,
-        # 8=Tassa, 9=Other; E3.2/E3.3: 1=Packets, ..., 7=Kilogrammes,
-        # ..., 13=Ensira -- and the data use codes (14, 15, 17, 21) on
-        # neither list, so other villages' instruments differ again.  So
-        # ``u`` carries the raw unit *code* here -- a unit token on the
-        # unit axis, NOT a food label (#347), and NOT a 1994+ label.
+        # 8=Tassa, 9=Other; E3.2/E3.3 (other foods) are a different list,
+        # 1=Packets, ..., 6=Litres, 7=Kilogrammes, ..., 13=Ensira; and D8
+        # (bulk food purchases), D9 and D10 run to 18-19 codes -- 1-5, 7, 8
+        # as E3.1, 6=Chinet, 9=Sini, ..., 14=Litres, 15=Kilogrammes.  WHICH
+        # list the data were entered on is not known.  Cooking oil, an E3.2
+        # item, is coded 14 in 49 of its 59 unit-coded rows: on the D-section
+        # lists that is Litres, and it is on no E3 list.  That favours one
+        # unified data-entry scheme over per-page coding without proving it,
+        # and code 21 is on no food list held.  So ``u`` carries the raw unit
+        # *code* here -- a unit token on the unit axis, NOT a food label
+        # (#347), and NOT a 1994+ label.
         #
-        # In particular code 1 is NOT kilograms (GH #1044): its 32 rows
-        # are site-1 barley/wheat/sorghum, Quantity 0.125-0.5, and the
-        # 9 purchases price at a median 52 Birr/unit -- 1994a barley is
-        # 1.10 Birr/kg and 100-130 Birr per quintal in 1994b/1997.  It
-        # is the E3.1 quintal.  Decoding it alone would give 1989 a kg
-        # baseline and let the price-ratio inference hand factors to the
-        # other raw codes, whose meaning varies by page and village.
+        # In particular code 1 is NOT kilograms (GH #1044).  All 32 of its
+        # rows are site-1 cereals (barley/wheat/sorghum), and every list
+        # that can apply to a cereal reads 1=Quintal.  Quantity runs
+        # 0.125-0.5.  The 9 purchases (7 barley, 1 wheat, 1 sorghum) price
+        # at a median 52 Birr/unit; 1994a barley is 1.10 Birr/kg, and
+        # 100-130 Birr per quintal in 1994b/1997.  Decoding code 1 alone
+        # would give 1989 a kg baseline, and the price-ratio inference would
+        # then hand factors to the other raw codes, whose meaning is not
+        # settled.
         #
         # Code 0 is on no list: it is the missing-unit sentinel (14 rows,
-        # 13 purchased + 1 produced; 9 are value-only purchases with
+        # 13 purchased + 1 produced; 8 are value-only purchases with
         # Quantity 0).  #1041: a missing unit is U_UNKNOWN, never a
         # minted spelling -- so the kg ladder serves it ``none`` by rule,
         # not because 1989 happens to have no baseline.  (format_id, auto-
@@ -319,22 +330,25 @@ def food_acquired(df):
         frames.append(sub)
     out = pd.concat(frames, ignore_index=True)
     # Drop rows with no household id (i is pd.NA when the HH-number
-    # key was missing in the source -- see `i` above) and rows with
-    # no unit (a unit is required to place the quantity on the u axis).
+    # key was missing in the source -- see `i` above).
     # ``u`` is the harmonize_unit Preferred Label (e.g. 'kg', 'Chinet',
     # and 'Value' for the currency code 30 -- the canonical
     # currency-denominated sentinel, NOT the currency's name 'Birr',
-    # GH #770); the source missing-unit sentinel 0 maps to '' via
-    # harmonize_unit (#347) and is dropped here.  Each row's ``u`` is a
-    # clean unit token -- no food label appended (the framework's
-    # price-ratio inference recovers per-good factors on its own).
-    # (No 1994+ file actually uses code 0.  What this drops is a NaN unit
-    # on a measured row: 214 rows, 494.4 Birr across 1994a-1997, measured
-    # for GH #1044.  #1041 would serve them U_UNKNOWN; that adds rows, so
-    # it is left for its own change -- see _/CONTENTS.org.)
+    # GH #770).  Each row's ``u`` is a clean unit token -- no food label
+    # appended (the framework's price-ratio inference recovers per-good
+    # factors on its own).
+    #
+    # A measured row with NO unit is served ``u = U_UNKNOWN``, not
+    # dropped (#1041: a missing/blank unit is 'Unknown', never a minted
+    # spelling and never a silent drop; the kg ladder serves it ``none``).
+    # No 1994+ file uses the missing-unit code 0 (harmonize_unit maps it
+    # to a blank, #347); what arrives is a NaN unit on a row that carries
+    # an item and a quantity or value -- 214 rows, 494.4 Birr across
+    # 1994a-1997 before the double-punch drop below (GH #1044, residual c).
+    # These rows used to be deleted here.
     out['u'] = out['u'].astype('string').str.strip()
     out = out[out['i'].notna()]
-    out = out[out['u'].notna() & (out['u'] != '')]
+    out.loc[out['u'].isna() | (out['u'] == ''), 'u'] = U_UNKNOWN
     # Drop rows with no FOOD id.  `j` is an index level, so a NaN here cannot be
     # placed on the item axis at all.  The 1989 path above already filters j;
     # this path did not, leaking 11 NaN-j rows (1995) that pandas then deleted

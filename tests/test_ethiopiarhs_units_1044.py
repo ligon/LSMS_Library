@@ -1,25 +1,37 @@
-"""EthiopiaRHS food units (GH #1044): float-stringified codes, and 1989.
+"""EthiopiaRHS food units (GH #1044): float-stringified codes, missing units,
+and 1989.
 
-Two leaks in the unit axis ``u`` of ``EthiopiaRHS.food_acquired``:
+Three leaks in the unit axis ``u`` of ``EthiopiaRHS.food_acquired``:
 
-* **1994a-1997.**  The q36 unit columns are MYVARS, so ``format_id`` is never
-  auto-applied (CLAUDE.md: "format_id is auto-applied to idxvars but NOT to
-  myvars").  ``harmonize_unit`` decodes a listed code and passes an unlisted
-  one through as the raw float, which was stringified ``'31.0'``.  Four codes
-  are unlisted -- 31, 37, 83, 95 -- and they are unlisted in the SOURCE too:
-  31 is ``OTHER`` in the 1994a/1994b/1995 value labels, 95 is ``Other`` in
-  1997's, and 37 / 83 carry no label in any wave's file.  So they are served
-  as integer codes (``'31'``), the table's pass-through convention, and keep
-  the #962 accepted-residual kg rung.
+* **1994a-1997, unlisted codes.**  The q36 unit columns are MYVARS, so
+  ``format_id`` is never auto-applied (CLAUDE.md: "format_id is auto-applied to
+  idxvars but NOT to myvars").  ``harmonize_unit`` decodes a listed code and
+  passes an unlisted one through as the raw float, which was stringified
+  ``'31.0'``.  Four codes are unlisted -- 31, 37, 83, 95 -- and they are
+  unlisted in the SOURCE too: 31 is ``OTHER`` in the 1994a/1994b/1995 value
+  labels, 95 is ``Other`` in 1997's, and 37 / 83 carry no label in any wave's
+  file.  So they are served as integer codes (``'31'``), the table's
+  pass-through convention, and keep the #962 accepted-residual kg rung.
+
+* **1994a-1997, missing units.**  A row that carries an item and a quantity or
+  value but no unit used to be DROPPED (212 served rows, 492.65 Birr; 214 /
+  494.4 before two exact double-punches are removed).  Under #1041 a missing
+  unit is ``U_UNKNOWN``, never a silent drop, and the kg ladder serves it
+  ``none``.
 
 * **1989.**  ``food89.dta`` carries no unit value labels and its scheme is NOT
-  the 1994+ one: the 1989 instrument (Debre Berhan, section E3) numbers units
-  per questionnaire page -- E3.1 ``1 = Quintal ... 9 = Other``, E3.2/E3.3
-  ``1 = Packets ... 7 = Kilogrammes ... 13 = Ensira``.  Code 0 is on no list
-  and is the missing-unit sentinel -> ``U_UNKNOWN`` (#1041).  Code 1 stays
-  raw: it is a QUINTAL, not a kilogram (its 9 purchases price at a median 52
-  Birr/unit; 1994a barley is 1.10 Birr/kg), so decoding it through
-  ``harmonize_unit`` (``| 1 | kg |``) would mint kilograms onto quintal rows.
+  the 1994+ one.  The one 1989 instrument held prints several unit lists:
+  the cereal/pulse page E3.1 ``1 = Quintal ... 9 = Other``; the other weekly
+  food pages E3.2/E3.3 ``1 = Packets ... 7 = Kilogrammes ... 13 = Ensira``;
+  and the D8/D9/D10 lists, 18-19 codes with ``14 = Litres``,
+  ``15 = Kilogrammes``.  Which list the data were entered on is not settled
+  (cooking oil, an E3.2 item, is coded 14 in 49 of its 59 unit-coded rows).
+  Code 0 is on no list and is the missing-unit sentinel -> ``U_UNKNOWN``
+  (#1041).  Code 1 stays raw.  It is a QUINTAL on every list that can apply to
+  its rows (all cereals), not a kilogram: its 9 purchases (7 barley, 1 wheat,
+  1 sorghum) price at a median 52 Birr/unit, and 1994a barley is 1.10 Birr/kg.
+  So decoding it through ``harmonize_unit`` (``| 1 | kg |``) would mint
+  kilograms onto quintal rows.
 
 The first block is config-only; ``TestBuilt`` reads the built table.
 """
@@ -66,8 +78,32 @@ def test_unlisted_codes_are_served_as_integer_codes():
     out = _erhs().food_acquired(
         _wide([31.0, 37.0, 83.0, 95.0] + labels + ['', np.nan]))
     u = out.index.get_level_values('u')
-    assert sorted(u) == sorted(list(UNLISTED) + labels)
+    # the blank and the NaN unit are the two missing-unit rows (#1041)
+    assert sorted(u) == sorted(list(UNLISTED) + labels + [U_UNKNOWN] * 2)
     assert not [x for x in u if FLOAT_CODE.match(x)], list(u)
+
+
+def test_missing_unit_on_a_measured_row_is_unknown_not_dropped():
+    """#1041 in the 1994+ wide path: a row with an item and a quantity or a
+    value but no unit is served ``U_UNKNOWN``.  It used to be dropped (GH
+    #1044, residual c).  Rows with no measurement, no household or no item
+    are still dropped -- a unit sentinel cannot place those."""
+    df = pd.DataFrame({
+        'i': ['a', 'b', 'c', 'd', None, 'f'],
+        'j': ['Teff', 'Teff', 'Salt', 'Salt', 'Teff', None],
+        'q_purch': [2.0, 0.0, np.nan, np.nan, 1.0, 1.0],
+        'u_purch': [np.nan, np.nan, np.nan, 'kg', np.nan, np.nan],
+        'e_purch': [3.0, 1.5, np.nan, np.nan, 1.0, 1.0],
+        'q_prod': [np.nan, np.nan, 4.0, np.nan, np.nan, np.nan],
+        'u_prod': [np.nan, np.nan, '', np.nan, np.nan, np.nan],
+        'q_inkind': [np.nan] * 6, 'u_inkind': [np.nan] * 6,
+    }).set_index(['i', 'j'])
+    out = _erhs().food_acquired(df).reset_index()
+    got = sorted(zip(out['i'], out['u'], out['s']))
+    assert got == [('a', U_UNKNOWN, 'purchased'),   # quantity + value
+                   ('b', U_UNKNOWN, 'purchased'),   # value only
+                   ('c', U_UNKNOWN, 'produced')]    # blank unit code
+    assert out['Expenditure'].sum() == 4.5
 
 
 def test_the_four_codes_really_are_unlisted():
@@ -131,6 +167,18 @@ class TestBuilt:
         # code 1 is the quintal: still raw, and never kilograms
         assert (w89['u'] == '1').sum() == 32
         assert not w89['u'].str.lower().isin(['kg', '100 kg']).any()
+
+    def test_missing_units_after_1989_are_unknown_not_dropped(self, fa, idx):
+        """GH #1044 residual c, measured 2026-10-19: 214 measured rows had a
+        NaN unit (494.4 Birr); 2 are exact double-punches, so 212 are served."""
+        unk = (idx['u'] == U_UNKNOWN).to_numpy()
+        rows = idx.loc[unk, 't'].value_counts().to_dict()
+        assert rows == {'1989': 14, '1994a': 78, '1994b': 37, '1995': 79,
+                        '1997': 18}
+        birr = fa.loc[unk, 'Expenditure'].groupby(idx.loc[unk, 't'].values).sum()
+        assert birr.round(2).to_dict() == {
+            '1989': 17.85, '1994a': 139.3, '1994b': 114.55, '1995': 232.3,
+            '1997': 6.5}
 
     def test_unknown_rows_get_no_kg_factor_by_rule(self, fa, idx):
         src = food_kg_factors(fa)['KgFactorSource'].to_numpy()
