@@ -123,10 +123,11 @@ def test_only_the_bottom_layers_act_without_reports():
     substantive claim -- nothing in this fixture is guessed.
     """
     f = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False))
+    # `declared` (GH #931) is 0: a bare frame carries no `unit_kg` record.
     assert f.attrs["kg_factor_sources"] == {
         "reported": 0, "shipped": 0, "survey_median": 0, "metric": 2,
         "inferred": 0, "none": 2, "reported_implausible": 0,
-        "shipped_implausible": 0, "shipped_matched": 0}
+        "shipped_implausible": 0, "shipped_matched": 0, "declared": 0}
 
 
 def test_returned_frame_carries_only_harvest_kg():
@@ -327,7 +328,8 @@ def test_the_screen_count_rides_beside_a_partition_that_still_sums():
     assert counts == {"reported": 1, "shipped": 0, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 2,
                       "reported_implausible": 1,
-                      "shipped_implausible": 0, "shipped_matched": 0}
+                      "shipped_implausible": 0, "shipped_matched": 0,
+                      "declared": 0}
 
 
 def test_screen_is_inert_without_a_kgfactor_column():
@@ -417,16 +419,19 @@ def test_provenance_counts_sum_to_the_input_row_count():
     ]
     df = _frame(rows)
     counts = harvest_kg_factors(df).attrs["kg_factor_sources"]
-    # The four SERVING layers partition the frame; `reported_implausible` is a
-    # screen count that rides alongside and is deliberately outside it.
+    # The SERVING layers partition the frame; `reported_implausible` is a
+    # screen count that rides alongside and is deliberately outside it, as is
+    # `declared` (GH #931: rows the declared u_kg table offered a factor for).
     assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
                                                    "shipped_implausible",
-                                                   "shipped_matched"}
+                                                   "shipped_matched",
+                                                   "declared"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     assert counts == {"reported": 2, "shipped": 0, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 1,
                       "reported_implausible": 0,
-                      "shipped_implausible": 0, "shipped_matched": 0}
+                      "shipped_implausible": 0, "shipped_matched": 0,
+                      "declared": 0}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # Two rows survive the sum: the zero-Quantity row drops despite being
     # counted `reported`, and the `none` row has no factor to apply.
@@ -488,7 +493,8 @@ def test_companion_exposes_every_layer_for_auditing():
     assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_reported",
                                "kg_reported_rejected", "kg_shipped",
                                "kg_shipped_rejected", "kg_shipped_source",
-                               "kg_metric", "kg_survey_median", "kg_inferred"]
+                               "kg_metric", "kg_declared", "kg_survey_median",
+                               "kg_inferred"]
     by_unit = f.groupby(f.index.get_level_values("u"))[
         ["kg_reported", "kg_inferred"]].median()
     assert by_unit.loc[POUND, "kg_reported"] == 2.0
@@ -578,7 +584,13 @@ def test_uganda_harvest_kg_baseline():
         "reported": 14_972, "shipped": 0, "survey_median": 555,
         "metric": 88_190, "inferred": 0, "none": 29_614,
         "reported_implausible": 102, "shipped_implausible": 0,
-        "shipped_matched": 0}
+        "shipped_matched": 0, "declared": 0}
+    # GH #931 (2026-10-19): `declared` joins the dict and NO NUMBER MOVES.
+    # Uganda's own `u` table maps nothing to a unit the merged `u_kg` declares
+    # (only `Quintal`, globally), so the crop ladder now READS the declaration
+    # and finds nothing in it for this country -- measured 0 of 133,331 rows
+    # whose kg_per_unit differs, before vs after.
+    assert res.attrs["kg_factor_declared_from"] == "attrs"
     # GH #929: all 86,978 moved from `inferred` to `metric` and NOTHING else
     # changed -- same Harvest_kg sum, same row counts.  Uganda's crop factors,
     # like Ethiopia's, are entirely READ; the price-ratio inference serves this
@@ -604,52 +616,188 @@ def test_uganda_harvest_kg_baseline():
 
 
 # ---------------------------------------------------------------------------
-# GH #931: the crop ladder does NOT read a country's declared `u_kg` table
+# GH #931: the crop ladder READS a country's declared `u_kg` table
 # ---------------------------------------------------------------------------
+#
+# Ruling (@ligon, 2026-10-18): "harvest_kg_factors reads the declared u_kg
+# (where a country ships a conversion table, use it)."  Until then this section
+# pinned the opposite -- the crop ladder was blind to `u_kg` -- because
+# Ethiopia's external check on the WB shipped table was phrased as "rows the
+# library has no opinion on" and a declared quintal would have made it compare
+# the WB table with the library's own `u_kg`.  That check is re-expressed in
+# the same change against a cited answer key
+# (`test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key`).
+#
+# `quintal` is the unit throughout because GH #919 keeps it out of
+# KNOWN_METRIC and out of the explicit-metric parser, so a declaration is the
+# ONLY way it can resolve: any `metric` value below came from the declaration.
 
-def test_crop_ladder_is_blind_to_declared_unit_kg():
-    """A declared ``u_kg`` factor reaches the FOOD ladder and not this one.
+QUINTAL_ROWS = [
+    ("2019-20", "h1", "h1-1-1", "Teff", "quintal", "dried", "A", 3.0, np.nan),
+    ("2019-20", "h1", "h1-1-1", "Maize", KNOWN_UNIT, "dried", "A", 40.0, np.nan),
+]
 
-    ``harvest_kg_factors`` takes no ``unit_kg`` and threads none into
-    ``_seeded_kg_factors`` / ``_kg_factor_series``; the same unit the seeded
-    dict WOULD resolve when handed a declaration is served ``none`` here.
-    ``quintal`` is the unit because GH #919 keeps it out of ``KNOWN_METRIC``
-    and out of the explicit-metric parser, so the ONLY way it could resolve
-    is through a declaration.
 
-    This pins an ASYMMETRY that is load-bearing (GH #931): Ethiopia's single
-    external check on the World Bank's shipped crop factor table is that
-    ``Quintal`` is exactly 100.0 on the rows the library holds no opinion on
-    (``test_ethiopia_shipped_factors.py::test_quintal_is_exactly_100kg_on_every_newly_served_row``).
-    If the crop ladder starts reading ``u_kg``, that check becomes the
-    tautology its own docstring disowns for ``Kg``/``Gram`` -- so this test
-    going red is the signal to re-express the external check in the SAME
-    change, not to delete the assertion.
-    """
+def _quintal_source(f):
+    q = f.xs("quintal", level="u")
+    return q["KgFactorSource"].tolist(), q["kg_per_unit"].tolist()
+
+
+def test_crop_ladder_reads_a_declared_unit_kg():
+    """Handed a declaration, the quintal is served at it, on `metric`."""
     import inspect
     from lsms_library.transformations import _seeded_kg_factors
 
-    assert "unit_kg" not in inspect.signature(harvest_kg_factors).parameters, (
-        "GH #931: harvest_kg_factors grew a unit_kg parameter; re-express the "
-        "Ethiopia quintal check in the same change and update this pin")
+    for fn in (harvest_kg_factors, harvest_kg):
+        assert inspect.signature(fn).parameters["unit_kg"].default is None
+
+    df = _frame(QUINTAL_ROWS, with_kgfactor=False)
+    assert "quintal" not in _seeded_kg_factors(df)        # not a seed
+
+    f = harvest_kg_factors(df, unit_kg={"Quintal": 100.0})  # case-insensitive
+    assert _quintal_source(f) == (["metric"], [100.0])
+    assert f["kg_declared"].iloc[0] == 100.0
+    assert np.isnan(f["kg_declared"].iloc[1])     # `kg` is a seed, not declared
+    assert f.attrs["kg_factor_sources"]["metric"] == 2
+    assert f.attrs["kg_factor_sources"]["none"] == 0
+    assert f.attrs["kg_factor_sources"]["declared"] == 1
+    assert f.attrs["kg_factor_declared_from"] == "argument"
+    res = harvest_kg(df, unit_kg={"quintal": 100.0})
+    assert res["Harvest_kg"].sum() == pytest.approx(3 * 100.0 + 40.0)
+
+
+def test_a_frame_with_no_declaration_is_served_none_and_says_why():
+    """No record, no argument: the quintal is `none`, and the attrs say it
+    was for want of a TABLE (`declared_from` None), not of a declared unit."""
+    f = harvest_kg_factors(_frame(QUINTAL_ROWS, with_kgfactor=False))
+    assert _quintal_source(f)[0] == ["none"]
+    assert f.attrs["kg_factor_sources"]["declared"] == 0
+    assert f.attrs["kg_factor_declared_from"] is None
+
+
+def test_the_declaration_is_read_from_attrs_by_default():
+    """The shape `Country._finalize_result` stamps on `crop_production`."""
+    from lsms_library.transformations import UNIT_KG_ATTRS_KEY
+
+    df = _frame(QUINTAL_ROWS, with_kgfactor=False)
+    df.attrs[UNIT_KG_ATTRS_KEY] = {"Someland": {"quintal": 100.0}}
+    df.attrs["country"] = "Someland"
+    f = harvest_kg_factors(df)
+    assert _quintal_source(f) == (["metric"], [100.0])
+    assert f.attrs["kg_factor_declared_from"] == "attrs"
+    # `harvest_kg` copies the frame; the record must survive the copy.
+    assert harvest_kg(df)["Harvest_kg"].sum() == pytest.approx(340.0)
+
+
+def test_an_explicit_argument_beats_the_record_and_empty_declares_nothing():
+    """`unit_kg={}` is "declare nothing", NOT "fall back to attrs" -- tested
+    with `is None`, never by truthiness."""
+    from lsms_library.transformations import UNIT_KG_ATTRS_KEY
+
+    df = _frame(QUINTAL_ROWS, with_kgfactor=False)
+    df.attrs[UNIT_KG_ATTRS_KEY] = {"Someland": {"quintal": 100.0}}
+    assert _quintal_source(harvest_kg_factors(df, unit_kg={"quintal": 45.36})
+                           ) == (["metric"], [45.36])
+    off = harvest_kg_factors(df, unit_kg={})
+    assert _quintal_source(off)[0] == ["none"]
+    assert off.attrs["kg_factor_declared_from"] == "argument"
+
+
+def test_a_declaration_outranks_known_metric_as_on_the_food_ladder():
+    """GH #919: the declared layer is the only one a country can override, so
+    it beats KNOWN_METRIC (`pound` 0.453592) -- here a hypothetical regional
+    pound -- exactly as `_seeded_kg_factors(unit_kg=...)` does for food."""
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", POUND, "dried", "A", 2.0,
+             np.nan)]
+    f = harvest_kg_factors(_frame(rows, with_kgfactor=False),
+                           unit_kg={"pound": 0.46})
+    assert f["kg_per_unit"].tolist() == [0.46]
+    assert f["kg_metric"].tolist() == [0.46]
+    assert f["kg_inferred"].tolist() == [0.46]
+    assert f["KgFactorSource"].tolist() == ["metric"]
+
+
+def test_crop_declared_overlay_equals_food_seeding():
+    """The crop ladder lays the declaration over the seeds PER ROW (a pooled
+    `Feature` frame needs one table per country); the food ladder threads it
+    into `_seeded_kg_factors`.  Same declaration, same frame -> the same
+    number for every row, including a declared override of KNOWN_METRIC, a
+    label the parser reads, and a unit nobody knows."""
+    from lsms_library.transformations import _seeded_kg_factors
 
     rows = [
-        ("2019-20", "h1", "h1-1-1", "Teff", "quintal", "dried", "A", 3.0, np.nan),
-        ("2019-20", "h1", "h1-1-1", "Maize", KNOWN_UNIT, "dried", "A", 40.0, np.nan),
+        ("2019-20", "h1", "h1-1-1", "Teff", "Quintal", "dried", "A", 1.0, np.nan),
+        ("2019-20", "h2", "h2-1-1", "Maize", KNOWN_UNIT, "dried", "A", 1.0, np.nan),
+        ("2019-20", "h3", "h3-1-1", "Maize", "Sack (50 kgs)", "dried", "A", 1.0, np.nan),
+        ("2019-20", "h4", "h4-1-1", "Maize", POUND, "dried", "A", 1.0, np.nan),
+        ("2019-20", "h5", "h5-1-1", "Maize", "basket", "dried", "A", 1.0, np.nan),
+        ("2019-20", "h6", "h6-1-1", "Maize", "Sack (50 kgs)", "dried", "A", 1.0, np.nan),
     ]
     df = _frame(rows, with_kgfactor=False)
-    declared = {"quintal": 100.0}
+    declared = {"quintal": 100.0, "pound": 0.46, "sack (50 kgs)": 49.0}
+    seeds = _seeded_kg_factors(df, unit_kg=declared)
+    units = df.index.get_level_values("u").astype(str).str.lower()
+    want = np.array([seeds.get(u, np.nan) for u in units], dtype=float)
+    got = harvest_kg_factors(df, unit_kg=declared)["kg_per_unit"].to_numpy()
+    np.testing.assert_array_equal(got, want)
+    assert np.isnan(got[4])                      # 'basket': nobody knows
 
-    # The declaration WOULD resolve the unit if it were threaded through...
-    assert "quintal" not in _seeded_kg_factors(df)
-    assert _seeded_kg_factors(df, unit_kg=declared)["quintal"] == 100.0
 
-    # ...and the crop ladder never threads it: the row is `none`, not 100 kg.
+def test_a_declaration_never_reaches_a_row_with_no_unit():
+    """U_UNKNOWN is the absence of a unit (GH #1041 ruling); a table keyed on
+    units has nothing to say about it, even if someone declares the spelling."""
+    rows = [("2019-20", "h1", "h1-1-1", "Maize", U_UNKNOWN, "dried", "A", 2.0,
+             np.nan)]
+    f = harvest_kg_factors(_frame(rows, with_kgfactor=False),
+                           unit_kg={U_UNKNOWN: 50.0})
+    assert f["KgFactorSource"].tolist() == ["none"]
+    assert np.isnan(f["kg_declared"]).all()
+    assert f.attrs["kg_factor_sources"]["declared"] == 0
+
+
+def test_a_declaration_ranks_below_the_rows_own_reported_factor():
+    """`metric` sits where it always has: the enumerator's number wins, and
+    the declaration is still visible for the audit."""
+    rows = [("2019-20", "h1", "h1-1-1", "Teff", "quintal", "dried", "A", 1.0,
+             80.0)]
+    f = harvest_kg_factors(_frame(rows), unit_kg={"quintal": 100.0})
+    assert f["KgFactorSource"].tolist() == ["reported"]
+    assert f["kg_per_unit"].tolist() == [80.0]
+    assert f["kg_declared"].tolist() == [100.0]
+    assert f.attrs["kg_factor_sources"]["declared"] == 1
+
+
+def test_a_multi_country_record_with_no_country_axis_is_refused_loudly():
+    """Guessing would hand one country's quintal to another (100 kg vs 100 lb,
+    GH #919).  With no `country` level and no `attrs['country']` among the
+    record's keys, NOTHING is applied and a warning says so; with one, that
+    country's table is used."""
+    from lsms_library.transformations import UNIT_KG_ATTRS_KEY
+
+    df = _frame(QUINTAL_ROWS, with_kgfactor=False)
+    df.attrs[UNIT_KG_ATTRS_KEY] = {"Ethiopia": {"quintal": 100.0},
+                                   "Guatemala": {"quintal": 45.36}}
+    with pytest.warns(UserWarning, match="no 'country' level"):
+        f = harvest_kg_factors(df)
+    assert _quintal_source(f)[0] == ["none"]
+
+    df.attrs["country"] = "Guatemala"
+    assert _quintal_source(harvest_kg_factors(df)) == (["metric"], [45.36])
+
+
+def test_a_country_level_serves_each_row_its_own_table():
+    """The `Feature` shape: a `country` level and a record keyed by it."""
+    from lsms_library.transformations import UNIT_KG_ATTRS_KEY
+
+    rows = [("2019-20", "h1", "h1-1-1", "Teff", "quintal", "dried", "A", 1.0,
+             np.nan)] * 2
+    df = _frame(rows, with_kgfactor=False)
+    df = pd.concat({"Ethiopia": df.iloc[[0]], "Guatemala": df.iloc[[1]],
+                    "Malawi": df.iloc[[0]]}, names=["country"])
+    df.attrs[UNIT_KG_ATTRS_KEY] = {"Ethiopia": {"quintal": 100.0},
+                                   "Guatemala": {"quintal": 45.36}}
     f = harvest_kg_factors(df)
-    q = f.xs("quintal", level="u")
-    assert q["KgFactorSource"].tolist() == ["none"], (
-        "GH #931: the crop ladder served a declared u_kg factor; Ethiopia's "
-        "Quintal == 100.0 external check is now a tautology -- re-express it")
-    assert np.isnan(q["kg_per_unit"]).all()
-    assert f.attrs["kg_factor_sources"]["none"] == 1
-    assert f.attrs["kg_factor_sources"]["metric"] == 1
+    got = dict(zip(f.index.get_level_values("country"), f["kg_per_unit"]))
+    assert got["Ethiopia"] == 100.0 and got["Guatemala"] == 45.36
+    assert np.isnan(got["Malawi"])          # declares nothing -> nothing
+    assert f.attrs["kg_factor_sources"]["declared"] == 2

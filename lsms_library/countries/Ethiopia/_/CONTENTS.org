@@ -1606,6 +1606,47 @@ NEWLY-served rows (~64% of the newly-served kilograms), a factor the library
 infers for nothing, and the WB table gives exactly 100.0 for every crop in
 every wave -- which is what a quintal is.
 
+*Superseded 2026-10-19 by GH #931 -- read this before relying on the
+paragraph above.*  On @ligon's ruling (2026-10-18) =harvest_kg_factors= now
+READS the declared =u_kg= table, so the library is no longer without an
+opinion on the quintal: the global =categorical_mapping/u.org= declares
+=Quintal= = 100 kg, =Country('Ethiopia').crop_production()= carries it as
+=attrs['unit_kg'] == {'Ethiopia': {'quintal': 100.0}}=, and a bare
+=harvest_kg(cp)= now serves Ethiopia's 13,977 Quintal rows on =metric=
+instead of =none=.  The "rows the library has no opinion on" set therefore
+shrinks to 30,001 (all local containers), and comparing the WB table with
+the library on the quintal would compare two numbers that both say "100 kg".
+The check is now made against an *answer key neither side supplies* --
+=QUINTAL_KG = 100.0= in =tests/test_ethiopia_shipped_factors.py=, cited to the
+unit's definition (the metric quintal / centner) and to the survey's own
+report (CSA & World Bank, /ESS 2015/2016 Survey Report/,
+=2015-16/Documentation/9331_ethiopia_survey_report_web_final.pdf=, which
+states each yield in both units: "1,403 kilograms or 14 quintals", "650
+kilograms or 6.5 quintals" ...).  The WB shipped factor
+(=test_shipped_quintal_matches_the_external_answer_key=) and our own
+declaration (=test_the_declared_quintal_matches_the_external_answer_key=) are
+each checked against that key, never against each other.
+
+Measured on the warm build, before -> after GH #931:
+
+| split                       |     metric |       none | Harvest_kg (kg)               |
+|-----------------------------+------------+------------+-------------------------------|
+| no shipped table            | 26,548 -> 40,525 | 58,971 -> 44,994 | 1,905,712.51 -> 8,799,669.51  |
+| with =crop_conversion_factors()= | 7,768 -> 7,821 | 15,046 -> 14,993 | 12,685,707.32 -> 12,696,657.32 |
+
+=shipped= is unchanged at 62,705 (it outranks =metric=, so 13,924 Quintal
+rows stay =shipped= at the WB's 100.0).  The 53 Quintal rows the WB table
+does NOT cover -- a (crop, Quintal) cell missing from =Crop_CF=, 31 in
+2018-19 and 22 in 2021-22 -- now get 100 kg from the declaration (+10,950 kg).
+*2011-12 carries no Quintal row at all*, so W1 is untouched by this change
+too; its 653,661 kg stands.  Per wave without the shipped table: 2013-14
+625,076 -> 3,276,476; 2015-16 331,120 -> 2,137,217; 2018-19 103,685 ->
+1,445,145; 2021-22 192,170 -> 1,287,170.  Consequence worth knowing: the
+after/before ratio of the shipped table falls 6.66 -> 1.44 -- most of what
+the WB table used to ADD over the library was the quintal, which the library
+now converts itself.  =harvest_kg(cp, unit_kg={})= switches the declaration
+off and reproduces every pre-#931 number exactly (pinned).
+
 *The ~29,000 local-container rows have no numerical check at all*, and their
 factors vary with the crop by an order of magnitude (=Madaberia ... Medium=
 runs 10.35 to 95.00 across crops).  Their warrant is STRUCTURAL: the loader

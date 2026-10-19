@@ -72,6 +72,20 @@ one row each out of ~600k.  65 and 103 are *item* codes ("65. FRUITS: CANNED",
 label --- the same treatment as the residual codes noted below.  (Sanity checks
 pass: =no_float_stringified_index= only inspects id levels.)
 
+/GH #1047 (2026-10-18): the kept raw code is now read through =format_id=./
+The CSV unit columns are float, so the one such code that reaches the served
+table was =u = '65.0'= (2015Q3 =purchased=, 1 row); it is now ='65'=.  Census
+of every WIRED source unit column against its wave's =u= column: exactly two
+unlisted codes, 65 (2015Q3 =s7bq3b=) and 58 (2012Q3 =s7bq7b=, on a row with
+no quantity, so =_finalize_canonical_food_acquired= never keeps it).  103 sits
+in W3 =q5b=, which no source reads.  Every other =food_acquired= row is
+byte-identical, and =food_quantities(units='kgs')= is unchanged
+(1,482,720.76 kg).  A latent hazard worth knowing: the API-time =u= mapping
+registers ='5'= and ='5.0'= alike (=_augment_numeric_code_keys=), so an
+unlisted code that IS in the table's =Code= column (say a W3 =5=, which the
+=2015-16= column marks =---=) would be served the Preferred Label anyway ---
+the #607 cross-wave error, by another route.  No such code occurs today.
+
 *** =u = 'None'= is a missing-unit spelling the kg ladder does not know (GH #962)
 
 /Resolved 2026-10-18 by GH #1041 (PR #1046): the fill is now =U_UNKNOWN=, so
@@ -1045,6 +1059,29 @@ via _canon_unit.  W3-W5 record the unit per row; W1/W2 carry NO unit column
 fixed C8 unit (_W1W2_PRICE_UNIT).  All 30 units used already exist in `u`
 (no extension needed).
 
+/Correction, measured 2026-10-19 (GH #1047 r1fix, not fixed here)./  "All 30
+units used" is true of the SERVED units only.  W4/W5 C8 record units
+=_canon_unit= cannot place -- =240. BOTTLE/CAN=, =330. WHOLE ANIMAL=,
+=200. LOAF=, =290. WRAP=, =280. METRIC CUP=, =320. SLICE=, =310. CRATE=,
+=270. CUBE=, and in W4 only =301. TEA SPOON= / =302. TABLE SPOON= (13 rows;
+W5 records 8 of the 10 labels) -- on 5,850 (W4) and 6,013 (W5) source rows,
+every one priced.  Those whose SIZE codes a metric quantity are rescued as
+=g= / =cl= (below; 3,368 W4, 3,267 W5, nearly all =BOTTLE/CAN=); the rest
+-- exactly *2,482 (W4) and 2,746 (W5)* priced rows, counted with the
+library's own =_c8_size_metric_grams= (2026-10-19, r2fix) -- reach
+=community_prices_for_wave='s =out['u'].notna()= filter and are DROPPED
+silently.  Each is its own =(v, j, u)= cell (none collides with a served
+one), so 5,228 SERVED rows are lost: =2019Q1= serves 29,275 rows and would
+serve 31,757, =2024Q1= 27,318 and 30,064.  W4 dropped by label: WHOLE
+ANIMAL 793, LOAF 513, WRAP 503, METRIC CUP 240, SLICE 175, CRATE 133, CUBE
+112, TABLE SPOON 12, TEA SPOON 1; W5: WRAP 894, WHOLE ANIMAL 636, LOAF 500,
+METRIC CUP 316, SLICE 203, CUBE 139, CRATE 56, BOTTLE/CAN 2.  The units are
+recorded, not missing: the =#1041= ruling's
+=U_UNKNOWN= is the wrong fix; teaching the canonicaliser is the right one
+(most already have a =u= Preferred Label: Loaf 200, Bottle/Can 240, Cube
+270, Metric Cup 280, Wrap 290, Crate 310, Slice 320, Whole Animal 330, Tea
+Spoon 301, Table Spoon 302).  Drafted as a residual.
+
 *** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 
 Found 2026-09-08 while comparing =community_prices= against the household
@@ -1332,6 +1369,134 @@ rows* and both the "reported purchase price" and "own-consumption
 valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
 =Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
 than its sales data, and is recorded here as a gap rather than guessed at.
+* crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
+
+=u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
+=crop_production_for_wave= used to serve NaN wherever =_canon_unit= returned
+NA: 13,138 rows (2011Q1 3,053 / 2013Q1 3,009 / 2016Q1 1,694 / 2019Q1 3,467 /
+2024Q1 1,915).  Census on the raw files: all but 12 have a *blank* raw unit
+code, and almost all of those also have no harvest quantity (2011Q1: 51 blank-
+unit rows carry a positive quantity, 2013Q1 1, 2016Q1 4, W4/W5 0).  The other
+12 are 2011Q1 codes with no value label (=5.0= x11, =0.0= x1).  Since
+2026-10-18 every such row is =U_UNKNOWN= (='Unknown'=), the #1041 ruling on
+the crop side; no row is dropped and nothing else in the table changes
+(byte-identical after =fillna('Unknown')=).
+
+*Why the 12 unlabelled codes do not keep their raw code, as an unlisted food
+code does (#607).*  Crop =u= is a LABEL space (=_canon_unit='s base labels),
+and the API-time automatic mapping applies the country's =u= table --- keyed
+on FOOD unit codes --- to this column too.  Measured: a kept ='5'= was served
+as ='mudu'= (code 5's Preferred Label, the W2 food meaning), 11 rows.
+
+What it does and does not move: =Feature('crop_production')= already filled
+the NaN with ='Unknown'= (=missing_level_sentinels=, when it promotes the =u=
+column into the index), so =Country(...)= and =Feature(...)= now agree.  Site I
+(=null_index_reports=) never saw these rows --- it audits declared index
+LEVELS, and =u= is a column --- so its Nigeria =crop_production= report is
+the same before and after (=v=, 86 NaN in 2013Q1, the v-join's own
+sparsity).  Site Q's 2011Q1 report is the same four Maize rows (1,800 / 500 /
+200 / 200 against a p90 of 1.2), now printed =u=Unknown= instead of =u=nan=.
+
+/2026-10-19: an unplaceable LABEL is now REPORTED./  =_canon_unit= returns
+NA for a blank, a bare unlabelled code AND any text it does not recognise, so
+"every NA is =Unknown=" would fold a recorded unit away silently.  The crop
+builder now maps through =_canon_units=, which raises an
+=UnplacedUnitLabelWarning= naming each non-numeric label it cannot place
+(the row is still served =Unknown=).  No crop label triggers it today;
+=plot_inputs= had 1,018 rows that would have (next section).
+
+* plot_inputs: =u= is NaN only where no amount is recorded, and four units only the input modules use (GH #1047)
+
+=plot_inputs= carries =u= as a column (index =(t, i, plot_id, input, crop)=)
+and served =u = NaN= on 6,742 of 96,620 rows (2010Q3 1,736 / 2012Q3 1,288 /
+2015Q3 1,122 / 2018Q3 1,618 / 2023Q3 978).  Census by cause, 2026-10-19
+(served rows; the raw-grain census, 6,784 rows before the module dedup, is
+the cause attribution):
+
+| cause | served rows | what is served now |
+|-+-+-|
+| a recorded LABEL =_canon_unit= did not know: W4/W5 seed =210. STEMS= (415 + 470), W4 seed =280. METRIC CUP= (94), =260. SEEDLING/PLANT= (23), W5 organic fertilizer =21. TRACTORS= (16) | 1,018 | =Stem= / =Metric Cup= / =Seedling/Plant= / =Tractor= |
+| a quantity, blank unit code (W1--W3 seeds, pesticide, herbicide, W3 organic fertilizer) | 158 | =Unknown= |
+| a quantity, a code with no value label (W1 herbicide 8; W2 seed 16, 82 x2, 83; W3 pesticide 5) | 6 | =Unknown= |
+| a zero quantity, no unit (W1 10, W2 4 seed rows) | 14 | =Unknown= |
+| NO quantity in any channel, no unit (seed rows only) | 5,546 | NA (=Quantity= NA too) |
+
+*The 1,018 are not missing units*, so they are not given =Unknown=:
+=_canon_input_unit= (=nigeria.py=) extends =_canon_unit= with these four.
+=280= is the W4 codebook's own =Metric Cup= (the =u= table's code 280, a W4
+food unit too); =Stem=, =Seedling/Plant= and =Tractor= (a tractor load, the
+sibling of =Wheelbarrow= / =Pick-up=) are not registered in the =u= table
+(neither is =Unknown=); they pass the API-time mapping unchanged (measured).
+They are kept OUT of =_canon_unit= so =crop_production= and
+=community_prices= cannot move (both measured byte-identical).  None has a
+kg factor, so =transformations.seed_kg= / =nitrogen_kg= are byte-identical.
+
+*Why a bare code is =Unknown=, not kept raw*: the API-time =u= table is keyed
+on FOOD codes and would relabel it -- measured =8= -> =paint rubber=, =16= ->
+=piece=, =82= -> =large piece=, =83= -> =Pick-up Van Big=, =5= -> =mudu=.
+
+*The 5,546 no-quantity rows are not inputs at all*, and that contradicts
+=data_scheme.yml= ("Every row carries a REPORTED quantity (an item), never a
+bare any-use flag").  =seed_rows_for_wave= emits a row for every plot-crop in
+the seed module, and =_pick_channel= keeps one with no quantity "so the row
+exists".  By source (raw grain, the 5,600 seed rows with no or a zero
+quantity): W1--W3 the household said it used *no* seed
+on the plot (=s11eq3 = no=: 847 / 840 / 934), or said yes but answered no
+channel's quantity (474 / 288 / 161), or left =s11eq3= blank (345 / 117 /
+14); W4/W5 every one is a *tree crop* (=s11fq0= / =s11fq2 = 2. TREE CROP=,
+1,088 / 492), whose planting quantity the questionnaire does not ask.
+Dropping them would change the table's grain, not its unit vocabulary, so
+they are kept; whether they belong in =plot_inputs= at all is a decision,
+drafted as a residual (2026-10-19).
+
+*They are served =u = NA=, not =Unknown=* (dispatcher decision, 2026-10-19,
+after red team r2 §5.2; the r1fix build had given them =Unknown=, 5,724 rows
+in all).  Per wave: 2010Q3 1,639 / 2012Q3 1,229 / 2015Q3 1,100 / 2018Q3
+1,086 / 2023Q3 492, all =Seed=, =Quantity= NA on every one.  The grounds:
+- =u= is a *column* here, so the =groupby(dropna=True)= deletion that is the
+  whole stated reason for the =u= sentinel cannot fire; =plot_inputs= has no
+  =index_info= entry, and =feature._missing_level_sentinels('plot_inputs')=
+  is ={}=, so =Feature()= does not fill it either (measured: =Feature= serves
+  the same 5,546 NA and 178 =Unknown=).  *Revisit if GH #569 registers a
+  =plot_inputs= =index_info= with =u= as a level*: =data_info.yml='s =u= note
+  already lists =plot_inputs= among the tables where =u= is "a DECLARED index
+  level", which is not true of Nigeria's =data_scheme.yml=, and a sentinel
+  fill at =Feature()= time would then follow.
+- =data_info.yml='s rule is conditioned on a survey that "records an amount
+  and no unit"; these rows record no amount.  Its =Unit_sold= paragraph
+  states the column case: "a column, has no such hazard, and NA says
+  something a category cannot".
+- the canonical CONSUMER RULE ("exclude =Unknown= ... and REPORT how many
+  rows you excluded") would otherwise report 5,724 unknown-unit rows where
+  178 carry an amount.
+- Ethiopia, GhanaLSS, Mali and Tanzania (column-=u= countries) serve NA on
+  their no-quantity rows; Uganda gives its 43,220 no-quantity column rows
+  =Unknown= (red team r2's measurement, not re-run here).  The two
+  conventions coexist across countries.
+=crop_production= is different in kind: =Feature()= promotes crop =u= into
+the index and fills =Unknown= anyway, so there the build-time sentinel only
+matches the read path.  So *=u= is NA only where =Quantity= is NA*; the
+converse does not hold -- 90 rows with no quantity carry a RECORDED unit
+(=Kg= 68, =other specify= 5, =Milk cup= 5, =Tiya= 5, =g= 4, =Bundle= 2,
+=Mudu= 1) and keep it as recorded.  =Unknown= is now served on 178 rows (164
+with a positive quantity, 14 with a zero).  Nothing else moves: rows per =t=
+x =input=, the index and every other column are identical, and so are
+=seed_kg= (4,888 rows, 1,380,982.0075) and =nitrogen_kg= (4,359 rows,
+173,671.9922).
+
+*Filled once, after the collapse.*  =U_UNKNOWN= is assigned in
+=assemble_plot_inputs=, where =Quantity= is not NA, never per acquisition
+channel: =_pick_channel= and
+=fert_rows_long_typed= decide "one unit -> sum, mixed -> keep the largest" on
+the NA-aware units, and a per-channel fill would make a blank channel a
+second "unit".  Every other column of the table is byte-identical, and so are
+=null_index_reports()= (empty) and =grain_reports()= (none).
+
+*Pre-existing, not changed*: on 7 raw seed rows (W1 4, W2 2, W3 1) a positive
+channel with NO unit is summed into another channel's unit, because
+=_pick_channel= drops the NA unit before testing "one unit" (1,109 + 91 + 2
+native units so added).  Drafted as a residual.
+
 * crop_production: the per-row Kg/L conversion factor (=KgFactor=, GH #859)
 
 Added 2026-09-09.  The GHS-Panel harvest form asks a *Kg/L conversion factor*
@@ -1556,6 +1721,119 @@ fully exposed --- =crop_production=, =plot_inputs=, =livestock=, =plot_labor=,
 =people_last7days= --- and the other 19 are exposed to the weaker form of the
 same failure, since no rule lists =_/nigeria.py= or =_/data_scheme.yml= as a
 prerequisite even though both are in the cache hash.
+
+* interview_date: each wave records the date differently (GH #1037)
+
+The cover page (=secta_{planting,harvest}wN=) is the source in every wave,
+but the date is stored three ways:
+
+| wave | variables | as read by =df_data_grabber= |
+|-+-+-|
+| W1, W2 | =saq13d/m/y= | numeric day / month / year |
+| W3 | =saq13d/m/y= (+ =saq13= =ddmmyyyy= text, PH only) | *month is the Stata LABEL* (='9. SEPTEMBER'=) under the default read; the script reads codes (=convert_categoricals=False=) since 2026-10-19 |
+| W4 | =InterviewStart= | =datetime64[ms]=, time of day included |
+
+*W4 (fixed 2026-10-18).*  The script stored =pd.to_datetime(x).date= without
+the call --- the text of a bound method --- so every W4 row parsed to NaT at
+read time and =dropna(how='all')= deleted both rounds.  It now stores the
+timestamp itself (=datetime64=; the time of day is kept, which W1-W3 cannot
+supply).  Served rows 2018Q3 0 -> 5,224, 2019Q1 0 -> 5,012; the 52 rows whose
+=InterviewStart= is blank at source are dropped like every wave's blank
+dates; =DatetimeCoercionWarning= 10,288 -> none.
+
+*All four scripts used to write the household id as =j=* (the canonical item
+level) and were served =(t, i)= only through =local_tools.map_index='s legacy
+j->i swap.  They now write =i=, as =data_scheme.yml= declares; W1/W2's served
+rows are byte-identical.
+
+The country-level =_/interview_date.py= only concatenates the four wave
+parquets, which the framework also does --- a GH #788 retirement candidate,
+not touched here.
+
+** DONE W3 (2015Q3 / 2016Q1) served NO rows: its month arrived as label text
+   CLOSED: [2026-10-19]
+
+=saq13m= carries Stata value labels in W3 (only), so a label-decoding read
+handed =pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')= the
+text ='9. SEPTEMBER'=; every W3 row was NaT and =dropna(how='all')= deleted
+both rounds.  =2015-16/_/interview_date.py= now reads the cover pages with
+=convert_categoricals=False=: the month is the stored integer code, read at
+the point it is read (the label's leading integer equals the code on
+4,675/4,675 PP and 4,592/4,592 PH rows).  Served, cold build, base
+=ddd79800c= -> this fix:
+
+| =t= | before | after | not served, and why |
+|-+-+-+-|
+| 2015Q3 | 0 | 4,672 of 4,696 | 23 blank d/m/y; 1 impossible date (hhid 100030: 31 Sep 2015) |
+| 2016Q1 | 0 | 4,590 of 4,592 | 1 blank day (30123, =saq13= ='**032016'=); 1 impossible (280130: 30 Feb 2016 -- =saq13= ='30022016'= records the same) |
+
+W1/W2's 19,446 rows are byte-identical.  GH #1037's "9,494 genuine nulls"
+were these 9,288 W3 rows plus 206 blank W1/W2 dates; only the 206 and W3's
+26 are genuine.
+
+*Cross-check, PH only.*  The PH file also ships =saq13= as =ddmmyyyy= text.
+It agrees with the d/m/y triple on 4,587 of the 4,590 rows where both parse;
+the triple is served (it is what W1/W2 serve).  The three disagreements:
+hhid 40015 (=saq13= ='23042016'=, triple 23 Feb 2016) and 50003 / 50005
+(=saq13= ='26030216'=, a year typo in the text; triple 26 Mar 2016).
+
+** The 20 post-planting interviews dated March/April 2016 are PH-ONLY households
+
+2015Q3 (PP) is fielded Aug--Nov 2015, yet 20 PP rows are dated 2016-03-04 ..
+2016-04-28.  They are *exactly* the 20 households with =phonly_hh = 1= ("HH
+ONLY INTERVIEWED IN PH PHASE, SEE BASIC INFO DOC PAGE 32"): 10 in Borno, 9 in
+Kaduna, 1 in Delta, every one with =tracked_obs = 0=.  Each PP date lies -1 to
++7 days from the same household's PH date: the planting cover page was filled
+at the post-harvest visit.  They are served under =t = '2015Q3'= with that
+2016 date, as recorded.  Not changed; whether a PH-only household should
+carry a PP-round row at all is a decision (drafted as a residual under GH
+#1037, 2026-10-19).
+
+** W4 =InterviewStart= time of day is probably NOT local Nigerian time
+
+W4 is the only wave with a time of day (CAPI timestamp, minutes non-zero on
+98% of rows).  W1--W3 record a paper start hour (=saq14ah=), which is local.
+Measured 2026-10-19 on the raw cover pages:
+
+| round | modal start hours | hours 0--6 | hour >= 19 |
+|-+-+-+-|
+| W1--W3, =saq14ah= (all six rounds) | 9--10 | at most 81 of ~4,800 (2012Q3) | 2--35 per round |
+| 2018Q3, =InterviewStart= | 4--8 (6: 647, 5: 626) | 2,284 of 5,224 | 6 |
+| 2019Q1, =InterviewStart= | 3--5 (4: 775) | 3,136 of 5,012 | 6 |
+
+The W4 distribution is the paper one shifted about five hours earlier, and
+PH sits an hour earlier than PP.  That fits a device or server clock on US
+Eastern time (PP 2018-07-18 .. 11-04 falls wholly in EDT, WAT-5 h; PH
+2019-01-07 .. 04-16 mostly in EST, WAT-6 h).  It is a fit, not a proof: no
+other W4 field records a clock to check against.  If it holds, the ~12 rows
+with a served hour >= 19 (and PH rows >= 18) are local early-morning
+interviews whose DATE is one day early.  *The time of day is KEPT* (no
+=.dt.normalize()=) pending @ligon's time-of-day decision under GH #1045; do
+not normalise it here.
+
+** Households that were NOT interviewed still carry a date
+
+Every wave's cover page records the visit, interviewed or not.  Rows SERVED
+with a date whose response status says the household was not interviewed
+(measured 2026-10-19; W1--W3 =saq22a= / W1-PH =sq1= / W2-PH =saq1=, codes
+3 not at home, 4 refused, 5 not located, 6 moved away, 7 other; W4
+=interview_result= 4 unable to identify, 5 moved, 6 long-term unavailable, 7
+refused):
+
+| =t= | status code: served rows | total |
+|-+-+-|
+| 2010Q3 | 3: 1, 4: 2 | 3 |
+| 2011Q1 | 3: 1, 4: 5, 6: 9, 7: 2 | 17 |
+| 2012Q3 | 3: 2, 4: 14, 5: 1, 6: 24, 7: 39 | 80 |
+| 2013Q1 | 3: 3, 4: 7, 5: 1, 6: 15, 7: 11 | 37 |
+| 2015Q3 | 3: 1, 4: 24, 5: 5, 6: 11, 7: 26 | 67 |
+| 2016Q1 | 4: 11, 7: 1 | 12 |
+| 2018Q3 | 4: 94, 6: 55, 7: 22 | 171 |
+| 2019Q1 | 4: 6, 6: 12, 7: 14 | 32 |
+
+So =interview_date= is a *visit* date, not an interview date, for 419 rows
+(216 W1--W3, 203 W4).  Not filtered: whether it should be is a semantics
+decision, drafted as a residual (tier DECISION, 2026-10-19).
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 

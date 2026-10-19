@@ -36,6 +36,7 @@ import lsms_library.derivations
 import lsms_library.feature
 import lsms_library.population
 import lsms_library.recall
+import lsms_library.transformations
 from lsms_library.population import PopulationHeterogeneityWarning
 
 # `lsms_library.recall` and `.derivations` are SHADOWED on the package by
@@ -47,6 +48,7 @@ F = sys.modules["lsms_library.feature"]
 P = sys.modules["lsms_library.population"]
 R = sys.modules["lsms_library.recall"]
 S = sys.modules["lsms_library.sampling"]
+T = sys.modules["lsms_library.transformations"]
 
 
 # ---------------------------------------------------------------------------
@@ -57,10 +59,11 @@ class TestTheRegistry:
     """A carrier is data, not code -- that is the whole point of GH #873."""
 
     def test_every_carrier_is_registered(self):
-        # `labels_unmatched` added for GH #787 item 3; `sampling` for GH #793.
+        # `labels_unmatched` added for GH #787 item 3; `unit_kg` for GH #931;
+        # `sampling` for GH #793.
         assert [c.name for c in F._ATTRS_CARRIERS] == \
             ["population", "recall", "derivations", "labels_unmatched",
-             "sampling"]
+             "unit_kg", "sampling"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -77,6 +80,7 @@ class TestTheRegistry:
         assert F._ATTRS_CARRIERS[3].keys == ("labels_unmatched",)
         assert F._ATTRS_CARRIERS[1].keys == (R.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[2].keys == (D.ATTRS_KEY,)
+        assert F._ATTRS_CARRIERS[4].keys == (T.UNIT_KG_ATTRS_KEY,)
 
     def test_the_captured_keys_are_exactly_the_carriers_keys(self):
         """The capture at the top of the country loop and the re-attach after
@@ -86,7 +90,8 @@ class TestTheRegistry:
             k for c in F._ATTRS_CARRIERS for k in c.keys}
         assert set(F._CARRIED_ATTRS_KEYS) == {
             P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
-            "labels_unmatched", S.ATTRS_KEY, S.ATTRS_RESOLUTION_KEY}
+            "labels_unmatched", T.UNIT_KG_ATTRS_KEY, S.ATTRS_KEY,
+            S.ATTRS_RESOLUTION_KEY}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
@@ -99,7 +104,8 @@ class TestTheRegistry:
         for carrier, merge in ((F._ATTRS_CARRIERS[1], R.merge_attrs),
                                (F._ATTRS_CARRIERS[2], D.merge_attrs),
                                (F._ATTRS_CARRIERS[3],
-                                merge_label_pass_through_reports)):
+                                merge_label_pass_through_reports),
+                               (F._ATTRS_CARRIERS[4], T.merge_unit_kg_attrs)):
             closed_over = {c.cell_contents for c in carrier.attach.__closure__}
             assert merge in closed_over, \
                 f"{carrier.name} does not call its module's merge_attrs"
@@ -109,6 +115,14 @@ class TestTheRegistry:
         df = pd.DataFrame({"x": [1]})
         F._merge_into("whatever", lambda sources: {})(df, [])
         assert "whatever" not in df.attrs
+
+    def test_unit_kg_merge_accepts_a_bare_attrs_mapping(self):
+        """Same two shapes for the GH #931 record."""
+        payload = {T.UNIT_KG_ATTRS_KEY: {"Someland": {"quintal": 100.0}}}
+        frame = pd.DataFrame({"x": [1]})
+        frame.attrs = dict(payload)
+        assert T.merge_unit_kg_attrs([payload]) == \
+            T.merge_unit_kg_attrs([frame]) == {"Someland": {"quintal": 100.0}}
 
     @pytest.mark.parametrize("mod", [R, D])
     def test_merge_attrs_accepts_a_bare_attrs_mapping(self, mod):
@@ -446,6 +460,68 @@ class TestUnitsUnavailableDegrades:
         assert "units_unavailable" not in out.attrs
         assert set(out.index.get_level_values("country")) == {"Liberia",
                                                              "Togo"}
+
+
+# ---------------------------------------------------------------------------
+# GH #931: the declared unit masses survive assembly, per country
+# ---------------------------------------------------------------------------
+
+class _CropCountry:
+    """Fake ``crop_production``: one quintal row per country, each country
+    declaring its OWN quintal -- the GH #919 case (100 kg as the metric
+    centner, 45.36 kg as 100 lb).  The record is the shape
+    ``Country._finalize_result`` stamps."""
+
+    QUINTAL_KG = {"Liberia": 100.0, "Benin": 45.36}
+
+    def __init__(self, name):
+        self.name = name
+
+    def crop_production(self, **kwargs):
+        idx = pd.MultiIndex.from_tuples(
+            [("2018-19", "c1", f"{self.name}-h1", "p1", "Maize", "Quintal"),
+             ("2018-19", "c1", f"{self.name}-h2", "p1", "Maize", "Kg")],
+            names=["t", "v", "i", "plot_id", "j", "u"])
+        df = pd.DataFrame({"Quantity": [2.0, 10.0]}, index=idx)
+        df.attrs[T.UNIT_KG_ATTRS_KEY] = {
+            self.name: {"quintal": self.QUINTAL_KG[self.name]}}
+        return df
+
+
+@pytest.fixture
+def crop_feature(monkeypatch):
+    import lsms_library as ll
+    monkeypatch.setattr(ll, "Country", lambda name, **kw: _CropCountry(name))
+    f = F.Feature("crop_production")
+    object.__setattr__(f, "_countries", ["Liberia", "Benin"])
+    return f
+
+
+class TestUnitKgSurvivesAssembly:
+    """Without the carrier the two countries' records disagree, the concat
+    hands back ``{}``, and ``harvest_kg`` on a ``Feature`` frame applies no
+    declaration at all -- silently, which is the state GH #931 ends."""
+
+    def test_both_countries_tables_arrive_keyed(self, crop_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = crop_feature(["Liberia", "Benin"], currency=None)
+        assert out.attrs[T.UNIT_KG_ATTRS_KEY] == {
+            "Liberia": {"quintal": 100.0}, "Benin": {"quintal": 45.36}}
+
+    def test_each_row_is_served_its_own_countrys_quintal(self, crop_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = crop_feature(["Liberia", "Benin"], currency=None)
+            f = T.harvest_kg_factors(out)
+        country = f.index.get_level_values("country")
+        u = f.index.get_level_values("u")
+        quintal = f[u == "Quintal"]
+        got = dict(zip(country[u == "Quintal"], quintal["kg_per_unit"]))
+        assert got == {"Liberia": 100.0, "Benin": 45.36}
+        assert set(quintal["KgFactorSource"]) == {"metric"}
+        assert f.attrs["kg_factor_sources"]["declared"] == 2
+        assert f.attrs["kg_factor_declared_from"] == "attrs"
 
 
 # ---------------------------------------------------------------------------
