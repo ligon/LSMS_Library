@@ -928,3 +928,89 @@ def test_a_forked_wave_relays_all_three_ledgers():
         for m, n in ((C, "_GRAIN_LEDGER"), (DP, "_DATETIME_LEDGER"), (C, "_BUILD_DROP_LEDGER")):
             getattr(m, n).clear()
             getattr(m, n).update(saved[n])
+
+
+# ---------------------------------------------------------------------------
+# 11. Real data, cache-gated (r1 F1): the PRODUCTION L2-country write stamps
+#     the report, and a fresh-process warm read replays exactly it.
+# ---------------------------------------------------------------------------
+
+# Every wave's report is stamped; Tanzania's 2008-09 report is the one that
+# warns (a recorded 2009/FEBRUARY/31, `out_of_range`, served NaT -- see
+# Tanzania/_/CONTENTS.org, 2026-10-18); every Mali report is clean.
+REAL_WAVES = {
+    "Mali": ["2014-15", "2017-18", "2018-19", "2021-22"],
+    "Tanzania": ["2008-09", "2010-11", "2012-13", "2014-15", "2019-20", "2020-21"],
+}
+REAL_WARNS = {"Mali": [], "Tanzania": ["2008-09"]}
+
+_REAL_PROBE = """\
+import json, sys, warnings
+import lsms_library as ll
+from lsms_library.datetime_parse import DatetimeWarning, datetime_reports
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    df = ll.Country(sys.argv[1]).interview_date()
+dated = [w.message for w in caught if issubclass(w.category, DatetimeWarning)]
+print(json.dumps({
+    "pkg": ll.__file__, "rows": len(df),
+    "dated": [{"cls": type(m).__name__, "report": getattr(m, "report", None),
+               "msg": str(m)} for m in dated],
+    "reports": datetime_reports(sys.argv[1], "interview_date")}, default=str))
+"""
+
+
+def _real_probe(country):
+    """One fresh process reading the REAL corpus (this checkout's code, the
+    session's data root).  ``PYTHONSAFEPATH`` is dropped so a ``make``
+    subprocess's wave script can import its sibling by bare name."""
+    env = dict(os.environ)
+    for k in ("LSMS_NO_CACHE", "LSMS_DATE_STRICT", "PYTHONSAFEPATH"):
+        env.pop(k, None)
+    env["PYTHONPATH"] = str(REPO) + os.pathsep + env.get("PYTHONPATH", "")
+    r = subprocess.run([sys.executable, "-c", _REAL_PROBE, country], env=env, cwd=str(REPO),
+                       capture_output=True, text=True, timeout=1800)
+    assert r.returncode == 0, r.stderr[-3000:]
+    out = json.loads(r.stdout.strip().splitlines()[-1])
+    assert Path(out["pkg"]).resolve().is_relative_to(REPO), out["pkg"]
+    return out
+
+
+@pytest.mark.parametrize("country", sorted(REAL_WAVES))
+def test_real_l2_country_stamp_is_written_and_replayed_warm(country):
+    from lsms_library.paths import data_root
+
+    var_pq = data_root() / country / "var" / "interview_date.parquet"
+    if not var_pq.exists():
+        pytest.skip(f"{country} interview_date not cached here")
+
+    # Process 1: an ordinary read.  If the parquet predates this code it is
+    # stale and is rebuilt -- through load_dataframe_with_dvc's no-stage
+    # write, the one a checkout with a DVC repo takes.  (That write lives in
+    # the fingerprinted _aggregate_wave_data, so dropping its stamp moves the
+    # hash and forces this rebuild on any root, warm or not.)
+    _real_probe(country)
+
+    # The footer the production write left.
+    stamped = lt.read_parquet_datetime_audit(var_pq)
+    assert stamped, f"{var_pq} carries no lsms_datetime_audit"
+    assert sorted(r["wave"] for r in stamped) == REAL_WAVES[country]
+    assert sorted(r["wave"] for r in stamped if DP._warn_worthy(r)) == REAL_WARNS[country]
+    for r in stamped:
+        assert sum(int(r.get(k) or 0) for k in PARTITION) == r["n"], r
+    if country == "Tanzania":
+        (feb31,) = [r for r in stamped if r["wave"] == "2008-09"]
+        assert feb31["out_of_range"] == 1
+
+    # Process 2: a fresh-process WARM read replays exactly the stamp -- one
+    # warning per warn-worthy wave, of the build-time sibling class, and no
+    # read-time DatetimeCoercionWarning (the cast passes datetime64 through).
+    warm = _real_probe(country)
+    assert warm["reports"] and all(r["from_cache"] for r in warm["reports"]), \
+        "the second read was not served from the cache"
+    assert sorted(r["wave"] for r in warm["reports"]) == REAL_WAVES[country]
+    assert [d["cls"] for d in warm["dated"]] == ["DatetimeParseWarning"] * len(REAL_WARNS[country])
+    assert [d["report"]["wave"] for d in warm["dated"]] == REAL_WARNS[country]
+    assert all("replayed" in d["msg"] for d in warm["dated"])
+    if country == "Tanzania":
+        assert warm["dated"][0]["report"]["out_of_range"] == 1
