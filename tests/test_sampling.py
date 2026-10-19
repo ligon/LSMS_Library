@@ -327,6 +327,36 @@ class TestWaveResolution:
         S.attach(object(), "Uganda")
         S.attach(pd.DataFrame(), "Uganda")
 
+    # Red team r1 (GH #793): GhanaLSS leaves its first wave uncurated by design
+    # (no preceding boundary), so judging "is this a wave label?" by the
+    # records alone sent a one-wave 1987-88 frame down the all-waves fallback.
+    GHANA_WAVES = ["1987-88", "1988-89", "1991-92", "1998-99", "2005-06",
+                   "2012-13", "2016-17"]
+
+    def _ghana_frame(self, t, known_waves):
+        df = pd.DataFrame({"t": [t], "i": ["1"], "x": [1]}).set_index(["t", "i"])
+        S.attach(df, "GhanaLSS", known_waves=known_waves)
+        return df
+
+    def test_an_uncurated_KNOWN_wave_resolves_exact_with_a_placeholder(self):
+        df = self._ghana_frame("1987-88", self.GHANA_WAVES)
+        recs = df.attrs[S.ATTRS_KEY]["GhanaLSS"]
+        assert df.attrs[S.ATTRS_RESOLUTION_KEY]["GhanaLSS"] == "exact"
+        assert sorted(recs) == ["1987-88"]
+        assert recs["1987-88"].design_tag == S.UNRECORDED_TAG == "unrecorded"
+
+    def test_a_t_that_is_no_known_wave_still_falls_back_loudly(self):
+        df = self._ghana_frame("1999", self.GHANA_WAVES)
+        assert df.attrs[S.ATTRS_RESOLUTION_KEY]["GhanaLSS"] == \
+            "all-waves (no t value matched a wave label)"
+        assert set(df.attrs[S.ATTRS_KEY]["GhanaLSS"]) == \
+            set(sampling_records("GhanaLSS"))
+
+    def test_without_known_waves_the_records_alone_decide(self):
+        """The keyword is opt-in; ``None`` keeps the records-only reading."""
+        df = self._ghana_frame("1987-88", None)
+        assert df.attrs[S.ATTRS_RESOLUTION_KEY]["GhanaLSS"].startswith("all-waves")
+
 
 # ---------------------------------------------------------------------------
 # 6. Feature carries it, and nothing is changed
@@ -407,6 +437,23 @@ def test_the_record_arrives_on_a_built_uganda_table():
     recs = s.attrs[S.ATTRS_KEY]["Uganda"]
     assert set(recs) == {"2009-10", "2010-11"}
     assert recs["2009-10"] == sampling_records("Uganda")["2009-10"]
+
+
+@pytest.mark.requires_s3
+def test_a_first_wave_frame_carries_only_its_own_placeholder():
+    """Red team r1 (GH #793): before the fix this frame carried 1988-89 ..
+    2016-17 under ``'all-waves (no t value matched a wave label)'``, though
+    1987-88 IS a wave label.  ``Country._finalize_result`` now passes
+    ``known_waves=self.waves``."""
+    import lsms_library as ll
+    try:
+        s = ll.Country("GhanaLSS").sample(waves=["1987-88"])
+    except Exception as e:                        # pragma: no cover
+        pytest.skip(f"GhanaLSS sample not buildable here: {e}")
+    assert s.attrs[S.ATTRS_RESOLUTION_KEY]["GhanaLSS"] == "exact"
+    recs = s.attrs[S.ATTRS_KEY]["GhanaLSS"]
+    assert sorted(recs) == ["1987-88"]
+    assert recs["1987-88"].design_tag == "unrecorded"
 
 
 # ===========================================================================

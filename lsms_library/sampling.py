@@ -656,7 +656,8 @@ def sampling_records(country: str) -> dict[str, SamplingRecord]:
 
 
 # ---------------------------------------------------------------------------
-# attaching to frames -- population's shape, verbatim
+# attaching to frames -- population's shape, plus `known_waves` (see
+# records_for_frame for why the two differ)
 # ---------------------------------------------------------------------------
 
 def _wave_labels(df) -> list[str] | None:
@@ -693,21 +694,41 @@ def _wave_labels(df) -> list[str] | None:
         return None
 
 
-def records_for_frame(df, country: str) -> tuple[dict[str, SamplingRecord], str]:
+def records_for_frame(df, country: str, *,
+                      known_waves: Iterable[str] | None = None,
+                      ) -> tuple[dict[str, SamplingRecord], str]:
     """``({wave: record}, resolution)`` for the waves *df* actually contains.
 
-    Same contract as :func:`population.records_for_frame`: ``exact`` with an
-    ``unrecorded`` placeholder for any ``t`` the country did not curate,
-    ``all-waves (no t axis)`` for a frame with no ``t``, and ``all-waves (no t
-    value matched a wave label)`` when nothing matched -- an over-broad answer
-    that announces itself beats a silent empty one.
+    ``exact`` with an ``unrecorded`` placeholder for any ``t`` the country did
+    not curate, ``all-waves (no t axis)`` for a frame with no ``t``, and ``all-waves
+    (no t value matched a wave label)`` when nothing matched -- an over-broad
+    answer that announces itself beats a silent empty one.
+
+    *known_waves* (keyword-only; ``Country._finalize_result`` passes
+    ``self.waves``) is what "a wave label" means, and it is where this differs
+    from :func:`population.records_for_frame`.  Population curates every wave,
+    so a ``t`` that matches no record genuinely is not a wave label there.
+    Here most countries leave their FIRST wave uncurated by design (it has no
+    preceding boundary for ``panel:`` to describe), so judging "matched" by the
+    records alone sent a one-wave frame of that first wave down the fallback --
+    attaching every OTHER wave's record and calling a real wave label
+    unmatched (red team r1, GH #793: ``Country('GhanaLSS').sample(waves=
+    ['1987-88'])`` carried 1988-89 .. 2016-17).  With *known_waves*, the
+    fallback fires only when no ``t`` is a known wave; otherwise the answer is
+    ``exact``, with ``unrecorded`` placeholders.  ``None`` keeps the
+    records-only reading.
     """
     recs = sampling_records(country)
     labels = _wave_labels(df)
     if labels is None:
         return dict(recs), "all-waves (no t axis)"
     matched = {t: recs[t] for t in labels if t in recs}
-    if not matched and recs:
+    if known_waves is None:
+        is_wave_label = bool(matched)
+    else:
+        known = {str(w) for w in known_waves}
+        is_wave_label = any(t in known for t in labels)
+    if not is_wave_label and recs:
         return dict(recs), "all-waves (no t value matched a wave label)"
     for t in labels:
         if t not in matched:
@@ -715,14 +736,16 @@ def records_for_frame(df, country: str) -> tuple[dict[str, SamplingRecord], str]
     return matched, "exact"
 
 
-def attach(df, country: str) -> None:
+def attach(df, country: str, *,
+           known_waves: Iterable[str] | None = None) -> None:
     """Attach *country*'s sampling record to ``df.attrs``, in place.
 
     ``df.attrs['sampling'] == {country: {wave: SamplingRecord}}`` and
     ``df.attrs['sampling_resolution'] == {country: 'exact'}`` -- identical from
     ``Country(...)`` and ``Feature(...)``.  A country with no ``sampling.yml``
     gets nothing attached: absence is silence, exactly like population's
-    ``{}``.
+    ``{}``.  Pass *known_waves* (the country's ``Country.waves``) so a frame of
+    an uncurated wave resolves ``exact``; see :func:`records_for_frame`.
 
     Never raises.  This runs inside ``Country._finalize_result``, on every
     read of every table.
@@ -730,7 +753,7 @@ def attach(df, country: str) -> None:
     try:
         if not sampling_records(country):
             return
-        recs, how = records_for_frame(df, country)
+        recs, how = records_for_frame(df, country, known_waves=known_waves)
         if not recs:
             return
         existing = dict(df.attrs.get(ATTRS_KEY) or {})

@@ -4050,7 +4050,11 @@ class Country:
             # same two reasons: `_finalize_result` re-runs on every read (warm
             # cache included), and it is in `_build_registry._EXCLUDED_CALLABLES`,
             # so attaching here costs no cache invalidation.  Metadata only.
-            attach_sampling(df, self.name)
+            # `known_waves`: most curated countries leave their first wave
+            # uncurated, and a one-wave frame of it must resolve `exact` (an
+            # `unrecorded` placeholder), not fall back to every other wave's
+            # record (red team r1, GH #793).
+            attach_sampling(df, self.name, known_waves=self.waves)
 
             # Attach what reference period the food numbers COVER, per wave
             # (GH #851).  Same placement and the same two reasons as the
