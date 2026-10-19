@@ -343,11 +343,16 @@ with no food-label tagging.  (Corrected 2026-09-09: this said "groups
 by item within each unit", which was FALSE when written -- the
 grouping was ``['t','i']`` and ``i`` is the household, so one factor
 served the whole country.  GH #850 put the item axis in.)  Code 0 is the
-source's missing-unit sentinel -> empty label (dropped downstream,
-à la Uganda's ``0 | ---``).  1989 unitcode is a different,
-in-data-unlabelled scheme not mapped through this table -> 1989
-``u`` carries the raw unit code (still a unit token, no metric
-distinction) pending Codeunit1.SPS.
+source's missing-unit sentinel -> empty label.  The ``food_acquired``
+hook serves an empty or missing unit on a measured row as ``Unknown``
+(``U_UNKNOWN``, #1041), never drops it; no 1994+ file actually uses
+code 0 -- its missing units arrive as NaN (GH #1044).  1989 unitcode is
+a different, in-data-unlabelled scheme NOT mapped through this table:
+its code 1 is a quintal, not ``kg``, and which of the 1989
+instrument's several unit lists the data were entered on is open.  So
+1989 ``u`` carries the raw unit code (still a unit token), except code
+0, served ``Unknown``.  ``Codeunit1.SPS`` is a 1994 recode that covers
+only 1989's codes 1-5 and 8 -- see CONTENTS.org, GH #1044.
 
 #+NAME: harmonize_unit
 | Code | Preferred Label |

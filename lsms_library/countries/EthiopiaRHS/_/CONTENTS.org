@@ -552,6 +552,22 @@ files are the R6 slice.
   in-data-unlabelled -> 1989 =u= carries the raw unit *code* (a unit
   token, no metric distinction; Codeunit1.SPS in Documentation could
   seed this -- follow-up).
+  (Corrected 2026-10-18, GH #1044, and revised 2026-10-19 -- claims in this
+  entry are wrong or stale, and are kept above rather than rewritten.
+  (a) "stable across 1994+" does not hold for 1994a: its own value labels
+  give different units for codes 40/76/80/81/82/85/86, and this table
+  follows 1997's.  (b) Codeunit1.SPS was written for a 1994 variable, not
+  for =food89.unitcode=: it recodes =q16_5d=, the unit of an in-kind loan
+  in the 1994 R1 CREDIT section (the 2026-10-18 note said "price module";
+  wrong).  But its source codes are the quintal-first short list that
+  1989's quintal-first lists share on codes 1-5 and 8, so it can seed part of a 1989
+  decode after all -- verbatim RECODE line, coverage and gaps in the
+  GH #1044 section.  (c) 1989 now serves code 0 as =Unknown=, not the raw
+  ='0'=.  (d) "Code 0 ... (dropped)": no 1994+ file uses code 0; what the
+  hook dropped was a NaN unit on a measured row, and since 2026-10-19
+  (#1041) that row is served =Unknown=, not dropped.  The 1989 instrument's
+  code lists, the evidence and the measurements are in the GH #1044
+  section at the end of this file.)
   *GH #347 (fixed):* an earlier version appended the food label to
   non-metric units ("Chinet [Butter]") to coax a per-good kg factor;
   that polluted the =u= axis with ITEM NAMES (e.g. =0 [Butter]=,
@@ -598,7 +614,10 @@ files are the R6 slice.
   framework-joined v + the allowed index_levels_match_scheme warn).
   Refine =harmonize_food= residual (unlabelled source codes) + variant
   split/merge; 1989 named geography + 1989 metric-unit distinction
-  (Codeunit1.SPS); cross-era 1989-vs-1994+ region reconciliation;
+  (Codeunit1.SPS covers 1989's codes 1-5 and 8 only, and which of the
+  1989 instrument's unit lists the data were entered on is open -- see
+  GH #1044 for the test to run first);
+  cross-era 1989-vs-1994+ region reconciliation;
   sourcing constructed ERHS weights; optional validation of inferred kg
   factors vs ERHS =conv_*.tab=; validation of derived tables vs docs;
   R6/R7 area_output PAs 21-23 (extra Debre-Birhan sub-sites not in the
@@ -1195,3 +1214,287 @@ by rule.  Measured on the fresh corpus (2026-10-17): =31.0= =unit= 82 /
 =item_unit= 16; =83.0= =item_unit= 21; =95.0= =unit= 57; =37.0= =none= 3.
 None of the four is on =tests/test_u_code_leak.py='s accepted ledger; not
 adjudicated here.
+
+(Corrected 2026-10-18, GH #1044.  "code =1= ..., which the code table above
+says IS kilograms" is WRONG for 1989.  The code table is the 1994+ scheme;
+1989 has its own, and in it code 1 is a *quintal* -- the 1989 instrument's
+cereal page reads =1 = Quintal=, and the 9 code-1 purchases (7 barley, 1
+wheat, 1 sorghum) price at a median 52 Birr per unit against 1.10 Birr/kg for
+1994a barley.  Both halves of this entry are now fixed or adjudicated -- see
+the next section.)
+
+* GH #1044 (2026-10-18, revised 2026-10-19): unit codes after 1989, missing units, and 1989's own unit scheme
+
+** What changed
+- *1994a-1997, unlisted codes*: the four float codes are served as integer
+  codes ='31'=, ='37'=, ='83'=, ='95'=.  The q36 unit columns are MYVARS, so
+  =format_id= is never auto-applied to them; =harmonize_unit= decodes a listed
+  code and passes an unlisted one through as the raw float (=f.get(x, x)=),
+  which the hook used to stringify.  =ethiopiarhs.food_acquired= now runs
+  =format_id= on the decoded column right after the read.  1989's =u= is an
+  IDXVAR (=u: unitcode=), which is why it always arrived as ='0'=, never
+  ='0.0'=.
+- *1994a-1997, missing units* (2026-10-19, the #1041 ruling): a row that
+  carries an item and a quantity or value but NO unit is served =u =
+  'Unknown'= (=U_UNKNOWN=); it used to be dropped.  No 1994+ file uses the
+  missing-unit code 0 (=harmonize_unit= maps it to a blank, which would also
+  become =Unknown=); what arrives is a NaN unit.  The source has 214 such rows,
+  494.4 Birr.  2 of them are equal on the melted grain
+  =(i,j,u,s,Quantity,Expenditure)=, which =_drop_double_punched= removes, so
+  *212 rows, 492.65 Birr* are now served.  Only one is a source double-punch:
+  1995 =8_60= Berbere purchased 4.0 / 1.75 Birr (=food3.dta= rows 5795/5796,
+  identical in every column).  The other, 1997 =17_31= Onion in-kind 1.0
+  (=food4.dta= rows 1837/1838), is two source lines that DIFFER on their
+  purchased leg (1.0 for 1.0 Birr vs 2.0 for 2.0 Birr, served summed as 3.0 /
+  3.0) and coincide only on their unit-less in-kind 1.0 leg -- so the
+  per-leg rule sums one leg of the pair and de-duplicates the other.  Whether
+  such a pair is a double-punch at all is open (1 row, Quantity 1.0, 0 Birr;
+  red-team r2, 2026-10-19).  By wave: 1994a 78
+  / 139.30, 1994b 37 / 114.55, 1995 79 / 232.30, 1997 18 / 6.50.  By source:
+  purchased 158, produced 38, in-kind 16.  The kg ladder serves all of them
+  =none=.
+- *1989*: code 0 is served as =U_UNKNOWN= (='Unknown'=, #1041).  14 rows, 13
+  purchased + 1 produced, kept (not dropped); 8 are value-only purchases with
+  Quantity 0.  Every other 1989 code stays raw.  1989 has no NaN-unit row to
+  serve: all 328 of =food89='s NaN-unit rows are =mrg_bulk = 2= rows.  Those
+  carry only the D8 bulk-purchase fields (=amount80=, =exp80=, ...), with no
+  weekly quantity, value or source, so the =s= filter drops them.
+
+** The four codes are not in the table, and the source agrees
+None of 31/37/83/95 is a =harmonize_unit= row, so they are served as codes,
+the table's pass-through convention -- no label was added.  What the source
+files say (=pyreadstat= value labels of =q36_2b/3b/4b=):
+
+| code | 1994a   | 1994b   | 1995    | 1997    | served rows      |
+|------+---------+---------+---------+---------+------------------|
+|   31 | =OTHER= | =Other= | =Other= | (none)  | 98 (95/1/2/0)    |
+|   37 | (none)  | (none)  | (none)  | (none)  | 3 (2/1/0/0)      |
+|   83 | (none)  | (none)  | (none)  | (none)  | 21 (0/21/0/0)    |
+|   95 | (none)  | (none)  | (none)  | =Other= | 57 (0/43/5/9)    |
+
+So 31 and 95 are the source's own catch-all "Other" (its specify text is not
+shipped), and 37/83 carry no label anywhere.  =Codeunit1unit1234.SPS= --
+IFPRI's recode of round-1 unit codes into the unified =unit1234= scheme --
+maps =31=95=, i.e. R1's "Other" is unified 95 "Other".  Deliberately NOT
+relabelled to ='Other'=: that pools two waves' catch-alls into one inferred
+=(j, u)= cell, a semantic choice the issue did not ask for.  Under #962 the
+four are accepted residuals and keep their inferred factor; their rungs are
+unchanged by this fix (=31= unit 82 / item_unit 16; =83= item_unit 21; =95=
+unit 57; =37= none 3).
+
+** 1989's unit scheme is the 1989 instrument's, not this table's -- and which of its lists applies is open
+=food89.dta= has no unit value labels (=unitcode= is labelled only "Unit
+measure(local) of quantity consumed last week").  One 1989 instrument is
+archived: =1989/Documentation/ERHS_hhquestionnaire_1989.pdf=, a scan.  *Whose
+it is was inferred, not read.*  On 2026-10-18 the cover's hand-heading was
+read as "...BERHAN"; a re-reading on 2026-10-19 found the cover cropped and
+the name illegible.  Its C, D (D8-D10) and E (E1-E3) sections match the Debre
+Berhan entry of "1989 Survey Instruments by Village" (IFPRI notes, one page
+per village).  Its B section does not: it is closer to Dinki's (B1
+Households Assets, B2 Livestock, B3a/B3b recall) and matches neither.  So read "Debre
+Berhan" as likely, not established.
+
+It prints several unit-code lists ("Code 1").  The quintal-first lists
+E3.1, D8, D9, D10, C.1-C7 and D2 (and the 1994 R1 credit card below) agree
+on codes 1-5, 7 and 8 and diverge after that.  The short lists on pp.4/7/8
+(=4 Other=) and the I-Questionnaire's p.15 grain list (=4 Kilogramme, 5
+Tassa, 21 Other=) do not, and E3.2/E3.3 is a different list throughout.
+D10 prints a 19-code list but its grid has no quantity or unit column.
+Page numbers are physical PDF pages:
+
+| code | E3.1, p.38: weekly food, cereals and pulses | E3.2 / E3.3, pp.39-40: weekly food, other foods | D8, p.32: bulk food purchases (D9 p.33, D10 p.34 where they differ) |
+|------+-------------------------------------------+------------------------------------------------+---------------------------------------------------------------------|
+|    1 | Quintal                                   | Packets                                        | Quintal                                                             |
+|    2 | Dawla                                     | Bags                                           | Dawla                                                               |
+|    3 | Kunna                                     | Bundles                                        | Kunna                                                               |
+|    4 | Akmada                                    | Pieces                                         | Akmada                                                              |
+|    5 | Ensira                                    | Bars                                           | Ensira                                                              |
+|    6 | Gurzigne                                  | Litres                                         | Chinet                                                              |
+|    7 | Silicha                                   | Kilogrammes                                    | Silicha                                                             |
+|    8 | Tassa                                     | Box                                            | Tassa                                                               |
+|    9 | Other                                     | Leaves                                         | Sini                                                                |
+|   10 |                                           | Bottles                                        | Esir                                                                |
+|   11 |                                           | Gan                                            | Pieces                                                              |
+|   12 |                                           | Gembo                                          | Bottles                                                             |
+|   13 |                                           | Ensira                                         | Packets                                                             |
+|   14 |                                           |                                                | Litres                                                              |
+|   15 |                                           |                                                | Kilogrammes                                                         |
+|   16 |                                           |                                                | Gurzigne (D9: Box)                                                  |
+|   17 |                                           |                                                | Boxes (D9: Birr)                                                    |
+|   18 |                                           |                                                | Other (D10: Birr)                                                   |
+|   19 |                                           |                                                | (D10 only: Other)                                                   |
+
+D8 is the bulk-purchase grid ("Since Start of Kiremt 1980 / 1979-1980":
+Amount, Code 1, Cost).  It lists only cereals and horse beans, and it is
+what =food89='s =amount80= / =unitbulk= / =exp80= / =amount79= / =exp79=
+carry.  D9 covers household consumables (tobacco, kerosene, soap, ...) and
+D10 non-food expenditure.  The acquisition list on E3 (Code 2) is =1
+Purchased, 2 Own Production, 3 Gift, 4 Loan, 5 Aid, 6 Barter, 7 Other=, which
+is what =1989/_/data_info.yml='s =source= mapping assumes, now with a
+citation.
+
+The data's weekly =unitcode= takes the values 0-9, 13, 14, 15, 17 and 21
+(plus one 0.5).  Two readings compete, and neither is established:
+
+- *Per-page coding.*  Each row's code is read on the list printed for its
+  item's page.  At the other villages it would be read on their own
+  instruments, none of which is held.  That the other villages' consumption
+  modules differed is documented: the village notes put them in other
+  sections (Dinki E3; Adele Keke and Gara Godo E1; Korodegaga and Doma A17).
+  Milk, cassava and sweet potato, all in the data at other sites, are on no
+  E3 page of the held instrument.  Whether their *unit* lists differed is not
+  documented.
+- *One unified data-entry scheme on the D-section list* (1 Quintal ... 14
+  Litres, 15 Kilogrammes, ...).  Codes 14, 15 and 17 exceed every E3 list
+  (they stop at 9 and 13) but are on the D lists.  For it:
+  - Cooking oil, an E3.2 item where litres are 6, is coded 14 in 49 of its 59
+    unit-coded rows (29 of 32 at site 1).  At code 14 it prices at a median
+    6.0 Birr per unit, against 8.0 Birr/litre in 1994a.  Milk at 14 prices at
+    1.24 Birr per unit, against 1.0 Birr/litre in 1994a.
+  - Tea, an E3.2 item, is coded 15 in 25 of its 33 rows, all at site 7.
+  - Code 9 (Sini, a cup, on the D lists; Leaves on E3.2; Other on E3.1) is
+    mostly coffee (82), salt (70) and fenugreek (56).
+
+  Not settled by it:
+  - 15 = Kilogrammes has no usable price test.  Tea's only 1994+ kg-unit
+    purchases are two 1994a rows (6.0 kg for 1.0 Birr, 1.0 kg for 1.5 Birr),
+    9x apart and implausible for tea, against 1989 tea at code 15 priced at a
+    median 1.75 Birr/unit (25 purchases); and the other two code-15 rows
+    point opposite ways: salt at
+    2.0 Birr per unit against 1.25 Birr/kg in 1994a, spaghetti at 1.2 against
+    4.0.
+  - Code 17's five purchases (chilli, fruit, carrot, biscuits) fit neither
+    D8's "Boxes" nor D9's "Birr".  Value differs from quantity on all five, so
+    they are not Birr-denominated.
+  - Code 13 on chickpeas, lentils and linseed would be "Packets".
+
+Under either reading, code 21 (10 rows, all site 6: maize 7, cassava 2,
+sweet potato 1) is on no consumption or purchase list.  The only 21
+printed anywhere in the instrument is "21 Other" on the I-Questionnaire's
+Ox Seed Project list (p.15) -- the unit list for "How much grain did this
+household receive per month?" -- which matters because the code-21 rows are
+site-6 maize.
+
+*Code 1 is a quintal, not a kilogram* -- on every reading:
+1. the instrument: every list that can apply to a cereal reads =1 =
+   Quintal= (E3.1, D8, and the 1994 R1 credit card below).  Kilograms are 7
+   on E3.2/E3.3 and 15 on the D lists, never 1;
+2. the rows: all 32 are site 1, on barley (30), wheat (1) and sorghum (1),
+   all cereals.  Quantity runs 0.125-0.5 (median 0.25);
+3. the prices: the 9 code-1 purchases (7 barley, 1 wheat, 1 sorghum) price
+   at a median 52 Birr/unit, range 48-80.  The median over the 7 barley rows
+   alone is also 52.  1994a barley in =kg= is 1.10 Birr/kg; in =100 kg= it
+   is 130 (1994b) and 100 (1997);
+4. the bulk-purchase grid in the same file: at site 1, =exp80 / amount80=
+   is a median 0.53 Birr per unit (123 rows; 0.55 over the 59 rows of the
+   code-1 households).  If =amount80= is in kilograms, as its label "Amount
+   (kgs) of grain purchased" says, that is about 53 Birr per quintal.  This
+   leg is only as good as that label: the unlabelled =unitbulk= beside it is
+   4 on all 123 rows, which D8 reads as Akmada.
+
+*=Codeunit1.SPS= is a 1994 recode, but it encodes the short list 1989
+shares.*  Verbatim:
+: RECODE
+:   q16_5d  (1=2)  (2=4)  (3=5)  (4=9)  (5=22)  (6=3)  (8=24)  (9=31)  (10=10)
+:   (34=34) .
+=q16_5d= is in no held file (not =food1.dta=, =price1234_rev.tab=,
+=food89.dta=).  The instrument's variable naming puts =q36_*= at Part III,
+Section 6.  By the same pattern =q16_5d= is Part I, Section 6 (Credit),
+question 5, column d of the 1994 R1 questionnaire: the unit of an in-kind
+loan.  Its card (1994a instrument, p.17) reads =1 QUINTAL, 2 DAWLA, 3 KUNNA,
+4 AKMADA, 5 ENSIRA, 6 CHINET, 7 SILICHA, 8 TASSA=.  That is the variable's
+inferred identity, not a labelled one.
+
+Through =harmonize_unit= the recode reads 1 -> =100 kg=, 2 -> Dawla, 3 ->
+Kunna, 4 -> Akmada, 5 -> Ensira, 6 -> Chinet, 8 -> Tassa, 9 -> 31 (1994a's
+"OTHER"; =Codeunit1unit1234.SPS= then maps 31 to 95, Other).  So it *is* a
+crosswalk for 1989's codes 1-5 and 8, on which every quintal-first 1989
+list agrees.  It
+covers 6 only under the D-section reading (Chinet; E3.1 says Gurzigne).  It
+is not complete:
+- it has no =(7=8)=, so Silicha (7 on every 1989 list but E3.2/E3.3) would
+  land on unified 7, Kurbet;
+- its =(9=31)= is E3.1's "Other", not the D lists' "Sini";
+- =(10=10)= matches the D lists' Esir but is not on the credit card, and
+  =(34=34)= has no printed source.
+
+Decoding code 1 through =harmonize_unit= (=| 1 | kg |=) would have minted
+kilograms onto quintal rows.  Decoding it *correctly* (to =100 kg=) is also
+not done.  It would hand 1989 its first kg baseline (barley), and the
+price-ratio inference would then infer factors for the other raw codes,
+whose meaning is not settled.  Under the per-page reading, for instance, it
+would pool barley's =5= (E3.1: Ensira) with salt's =5= (E3.3: Bars).
+1989's =u= stays raw until the scheme can be decoded as a whole.
+=KgFactorSource= is =none= for all 2,068 1989 rows, before and after; the 14
+=Unknown= rows are now =none= by rule.
+
+** Measured, before -> after
+*2026-10-18 change* (unlisted codes, 1989 code 0), fresh rebuild of the base
+vs. this change:
+- =food_acquired=: 54,693 rows and Expenditure 235,361.46 both sides, by wave
+  identical (1989 2,068 / 1994a 12,971 / 1994b 13,333 / 1995 11,956 / 1997
+  14,365).  The full =(t, u)= count table differs only in the ten relabelled
+  cells above (293 cells both sides).
+- =food_kg_factors= =kg_factor_sources=: unchanged -- metric 12,430,
+  item_unit 25,837, item_unit_tight 249, unit 13,645, none 2,532.
+- =food_quantities(units='kgs')=: 54,445 rows, 216,819.76 kg, unchanged.
+- =food_prices()=: =kgvalue= 35,625 rows, =unitvalue= 37,817 rows, both
+  unchanged; =kgprice= / =unitprice= raise =UnitsUnavailableError= (no
+  =Price= column) both sides.
+
+*2026-10-19 change* (missing 1994+ units -> =Unknown=), cold rebuild at the
+branch head vs. this change, in separate data roots:
+- =food_acquired=: 54,693 -> 54,905 rows (+212); Expenditure 235,361.46 ->
+  235,854.11 (+492.65).  1989 is unchanged; 1994a 12,971 -> 13,049; 1994b
+  13,333 -> 13,370; 1995 11,956 -> 12,035; 1997 14,365 -> 14,383.  =(t, u)=
+  cells 293 -> 297: one new =Unknown= cell per 1994+ wave.
+- =kg_factor_sources=: none 2,532 -> 2,744 (+212); every other rung
+  unchanged.
+- =food_quantities(units='kgs')=: 54,445 -> 54,551 rows; the kg total
+  (216,819.76) is unchanged.  =Unknown= rows 6 -> 112, carried in their
+  native quantity under the carry rule, so the all-rows total moves
+  233,339.96 -> 234,637.03.
+- =food_prices()=: =kgvalue= 35,625, unchanged; =unitvalue= 37,817 -> 37,860
+  (the =Unknown= rows: 3 -> 46).
+- =food_expenditures()=: 37,259 -> 37,402 rows; 231,449.97 -> 231,942.62.
+- =grain_reports()= and =null_read_reports()= are empty both sides.
+  =null_index_reports()= is identical: the pre-existing NaN =v= keys only.
+
+*Cache*: all 18 EthiopiaRHS =Country._table_cache_hash= values move, and all
+144 EthiopiaRHS =Wave._input_hash= values (8 waves x 18 tables).  The
+country module and =categorical_mapping.org= are in every table's input
+hash.  0 of 148 move in Ethiopia, Uganda, Malawi, GhanaLSS, Niger and
+Nigeria, and 0 of 8 =build_transforms_fingerprint= values.  Measured against
+both the base and the branch head; a re-run of the same state moves 0 of 318.
+That is one EthiopiaRHS re-warm, ~40 s.  This file (=CONTENTS.org=) is
+excluded from hashing.
+
+** Not fixed here (residuals)
+- *1994a uses the round-1 unit scheme, served under 1997's names.*  1994a's
+  own labels for 40/76/80/81/82/85/86 are MENELIK / SIFET / FOLLE / JEBENA /
+  WEKET / SALE / TCHIBIT; =harmonize_unit= (rows 40-103 follow 1997) serves
+  them as Big mada / Small tomato can / Gebete/Buchu / Jemb / Efigne / Temene
+  / Gembo -- 238 1994a rows carrying a measurement (82: 149, 40: 54, 76: 24, 86: 7, 85: 2,
+  80: 1, 81: 1).  =Codeunit1unit1234.SPS= is IFPRI's own R1 -> unified
+  crosswalk and agrees with 1994a's labels where they overlap (32->51
+  Melekia, 33->53 Bekolo, 34->52 Guchiye, 78->69 Bilkat, 81->68
+  Kettle/Jebena/Pot, 82->79 Woket, 85->91 Sale); the code distributions
+  agree too (1994a's top codes 34/39/82 vs 43/51/52/56 in 1994b-1997).
+  1994b and 1995 label only 1-31 in their files; their 40+ distribution
+  matches 1997's, but which scheme they follow is not stated anywhere held.
+  (The 1994a household instrument prints no unit code above 31 at all: its
+  food section uses the 31-code list =1 KILOGRAMMES ... 30 BIRR, 31 OTHER=.)
+- *1989's raw codes are undecoded.*  The cheap step comes first: test the
+  unified D-section reading code by code against item and price, as done
+  above for codes 1 and 14.  Compare each code's per-unit price with
+  1994a's per-kg or per-litre price for the same item.
+  - Where the reading holds, decode through =Codeunit1.SPS='s mapping for
+    1-5 and 8, and for 6 (Chinet) if the D reading of 6 holds.  Map 7
+    (Silicha) to unified 8 by hand, since the SPS leaves it on 7 = Kurbet.
+    Decode 14 / 15 to =litre= / =kg= only if their prices hold.
+  - Decode the wave as a whole, never a metric code alone (see above).
+  - Codes 13, 17 and 21 stay open on either reading.
+  - Only if the unified reading fails do the other villages' instruments
+    (not held) become necessary.
+  - Also confirm the site -> village key, which this file records as
+    unverified.

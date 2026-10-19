@@ -256,6 +256,20 @@
 # unit -- they add a heaping qualifier the survey asks about, and folding a
 # size/shape-qualified label onto its stem is the OPPOSITE defect (GH #832,
 # "Granularity is not spelling").
+#
+# GH #1042 (2026-10-18): the 13 codes 9bf5c80d0 parked on 'Other (Specify)'
+# are decoded per instrument instead.  03 / 12 / 13 / 16 / 17 / 21 are the
+# IHS3 (2010-11) Module G "CODES FOR UNIT" list -- 90 KG. BAG 3, BASKET
+# (DENGU) (SHELLED) 12, (UNSHELLED) 13, CUP 16, TIN 17, BASIN 21 -- and the
+# IHS3 conversion-factor report names 16/17/21 the same way (Cup, Tin,
+# Basin), as do the ihs3_conversions.csv factors keyed on them.  2016-17's
+# code 21 is BASIN by its own data: hh_g07b value-labels 21 'basin' in the
+# cross-section file (hh_g03b/04b/06b leave it unlabelled, '21.0').  IHPS
+# 2013 prints none of these six codes, so 2013-14's script sends them to
+# the sentinel BEFORE this table is consulted.  00 / 49 / 69 / 76 / 79 /
+# 99 / 500 are on no instrument's list: no unit was recorded -> 'Unknown'
+# (transformations.U_UNKNOWN), which the kg inference refuses.
+# See Malawi/_/CONTENTS.org, 2026-10-18 (decode residual).
 #+name: u
 | Code | Preferred Label | hh_g03b_label |
 |------+-----------------+---------------|
@@ -416,19 +430,19 @@
 | C12 | Ox-Cart |  |
 | K16 | Cup |  |
 | K17 | Tin |  |
-| 00 | Other (Specify) |  |
-| 03 | Other (Specify) |  |
-| 12 | Other (Specify) |  |
-| 13 | Other (Specify) |  |
-| 16 | Other (Specify) |  |
-| 17 | Other (Specify) |  |
-| 21 | Other (Specify) |  |
-| 49 | Other (Specify) |  |
-| 69 | Other (Specify) |  |
-| 76 | Other (Specify) |  |
-| 79 | Other (Specify) |  |
-| 99 | Other (Specify) |  |
-| 500 | Other (Specify) |  |
+| 03 | 90 kg Bag |  |
+| 12 | Basket (Dengu) (Shelled) |  |
+| 13 | Basket (Dengu) (Unshelled) |  |
+| 16 | Cup |  |
+| 17 | Tin |  |
+| 21 | Basin |  |
+| 00 | Unknown |  |
+| 49 | Unknown |  |
+| 69 | Unknown |  |
+| 76 | Unknown |  |
+| 79 | Unknown |  |
+| 99 | Unknown |  |
+| 500 | Unknown |  |
 | Kilogram | Kilogramme |  |
 | Kkilogram | Kilogramme |  |
 

@@ -90,6 +90,17 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #   Malawi   217 -> 19 (#382/#391/#399/#383; 19 residual ACCEPTED*)
 #   GhanaLSS  13 -> 0  (#348; 1991-92 units dict was empty -- fixed value-col
 #                       + float->str code lookup; all codes now decode)
+#   EthiopiaRHS        (#1044; float codes 31.0/37.0/83.0/95.0 -> '31'/'37'/
+#                       '83'/'95', residual ACCEPTED*: absent from
+#                       harmonize_unit, and the source names 31 (1994a-1995)
+#                       and 95 (1997) only as "Other", 37/83 not at all.
+#                       NOT accepted: 1989's 13 raw codes ('1','3',...,'21')
+#                       -- undecoded: which of the held 1989 instrument's
+#                       unit lists the data were entered on is open (code 1
+#                       is a quintal on every one that can apply); tracked
+#                       in EthiopiaRHS/_/CONTENTS.org.  1989 code 0 and a
+#                       NaN unit on a measured 1994a-1997 row are now
+#                       U_UNKNOWN, not leaks.)
 # *ACCEPTED = item-specific / data-entry codes with no label in ANY source
 #  (questionnaire scheme differs from the data coding); documented per-country
 #  and left as codes -- they still yield valid food_expenditures + unitvalue.
@@ -101,7 +112,8 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #  NaN u, transformations._U_SENTINELS and ``Value`` get ``none``.  Pinned by
 #  tests/test_962_unit_sentinel.py::test_accepted_residual_code_*.
 #  No food_acquired country now leaks non-accepted unit codes (Layer-2
-#  u-harmonization complete).
+#  u-harmonization complete) -- EXCEPT EthiopiaRHS 1989's raw scheme above,
+#  which is undecoded, not accepted.
 
 
 @pytest.mark.requires_s3
