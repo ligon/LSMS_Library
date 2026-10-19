@@ -1110,3 +1110,57 @@ visits across multiple vagues and =groupby.first()= also conflicts with
 this file's one-vague-per-grappe convention and the signed current
 reducer. That documentation tension is separate from the demonstrated
 datetime loss; it does not authorize a visit-key or reducer change.
+
+* 2026-10-19 -- =food_acquired= 2014-15: the food module is asked at BOTH EACI passages, and the build SUMS them (GH #851)
+
+*Read this before using any 2014-15 food number as a 7-day figure.*
+
+** The idiosyncrasy
+
+EACI 2014 visits the same households twice -- passage 1 (=EACIALI_p1.dta=,
+interviews mostly July-August 2014) and passage 2 (=EACIALI_p2.dta=, mostly
+December 2014) -- and Section 13's 7-day food module ("A consomme le produit
+au cours des 7 derniers jours", =s13q02=) is asked at *both*.  Measured
+2026-10-19 through =get_dataframe=: each file has 479,304 rows, and the *same
+3,804 =(grappe, menage)= households* appear in both (3,804 in p1, 3,804 in
+p2, 3,804 in both; none in only one).  The two passages are *repeat 7-day
+recalls of one panel*, not a sample split.
+
+=2014-15/_/data_info.yml= reads both files with =visit: passage=, and
+=2014-15/_/mapping.py::food_acquired= drops =visit= before setting the
+canonical =(t, v, i, j, u, s)= index.  The two passages then collide on one
+tuple and =_ADDITIVE_MEASURE_COLUMNS= *sums* them, silently (the additive
+collapse is lossless and does not warn).  Served 2014-15 equals p1 + p2
+exactly, on every stream:
+
+| stream     | column           |   passage 1   |   passage 2   |        served |
+|------------+------------------+---------------+---------------+---------------|
+| purchased  | =s13q03c= (FCFA) | 2,980,757,701 | 2,671,774,504 | 5,652,532,205 |
+| purchased  | =s13q03a= (qty)  |     9,110,807 |     2,492,010 |    11,602,817 |
+| produced   | =s13q04a= (qty)  |       680,002 |       618,978 |     1,298,981 |
+| inkind     | =s13q05a= (qty)  |       139,495 |       244,001 |       383,496 |
+
+So a served 2014-15 =food_acquired= / =food_expenditures= / =food_quantities=
+row covers *2 x 7 = 14 days* of exposure, where 2018-19 and 2021-22 (EHCVM,
+asked once) cover 7.
+
+** What used to say otherwise
+
+- =mapping.py::food_acquired='s docstring said =visit= "is a sample split,
+  not a repeated measure" (the EHCVM =vague= analogy).  False for EACI 2014:
+  the same 3,804 households are in both passages.  Corrected 2026-10-19; the
+  behaviour (drop =visit=, let the collapse sum) is unchanged, so no served
+  number moved.  The edit re-warms Mali (=mapping.py= is in every 2014-15
+  table's input hash).
+- =.coder/coverage/food_recall.csv= recorded =n_visits = 1=, so
+  =_/recall.yml= said =n_asks: 1= and =food_expenditures(period='week')=
+  served the 14-day total as a week (GH #851 red team r1, finding R2).  The
+  row now says =n_visits = 2= (=ask_count_basis: measured=, from the
+  household overlap above); =period='week'= halves the served total.
+
+** Not changed here, and why
+
+=visit= is still dropped.  Keeping it (as Burkina Faso 2014 and GhanaLSS do)
+would let =Country('Mali').food_acquired()= show the two passages separately,
+but it changes the table's index shape, and the derived tables sum it away
+regardless.  Open work, not a defect of the totals.

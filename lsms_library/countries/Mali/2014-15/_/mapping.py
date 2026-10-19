@@ -63,9 +63,13 @@ def food_acquired(df):
     an Expenditure (value); produced / in-kind are quantity-only (NaN
     Expenditure), matching the EHCVM canonical contract.
 
-    ``visit`` (passage) is dropped: as with the EHCVM ``vague`` it is a
-    sample split, not a repeated measure, so it must not enter the
-    canonical index.
+    ``visit`` (passage) is dropped, and that SUMS the two passages.
+    Unlike the EHCVM ``vague`` it is NOT a sample split: the same 3,804
+    households are in EACIALI_p1 and EACIALI_p2, each asked the 7-day
+    module, so the two passages collide on one canonical tuple and the
+    additive collapse adds them -- a served 2014-15 row covers 2 x 7 = 14
+    days.  ``Mali/_/recall.yml`` records ``n_asks: 2`` for this wave (GH
+    #851); see ``Mali/_/CONTENTS.org``.
     '''
     work = df.reset_index()
     if 'visit' in work.columns:
