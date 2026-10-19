@@ -25,7 +25,7 @@ Recall:
     recall_days: 7
     n_asks: 2
     recall_verbatim: 'A consomme le produit au cours des 7 derniers jours'
-    evidence: 'lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label); lsms_library/countries/Mali/2014-15/_/data_info.yml:133 (food_acquired reads EACIALI_p1.dta and EACIALI_p2.dta); both files hold the same 3,804 (grappe, menage) households, measured 2026-10-19; lsms_library/countries/Mali/_/CONTENTS.org:1114'
+    evidence: 'lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label); lsms_library/countries/Mali/2014-15/_/data_info.yml:133 (food_acquired reads EACIALI_p1.dta and EACIALI_p2.dta); both files hold the same 3,804 (grappe, menage) households, measured 2026-10-19; lsms_library/countries/Mali/_/CONTENTS.org:1149 (''the food module is asked at BOTH EACI passages'')'
     notes: 'The 7-day module is asked at BOTH EACI passages of one panel (p1 mostly Jul-Aug 2014, p2 mostly Dec 2014), and the build SUMS them: mapping.py drops visit and the additive collapse adds the two recalls.  Served 2014-15 purchased Expenditure 5,652,532,205 = p1 2,980,757,701 + p2 2,671,774,504 (s13q03c), exactly.  n_visits was 1 until GH #851 red team r1 (R2), 2026-10-19.'
     n_items_delivered: 122
   '2018-19':

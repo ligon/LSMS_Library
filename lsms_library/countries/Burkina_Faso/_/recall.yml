@@ -27,7 +27,7 @@ Recall:
     n_asks_by_column:
       Quantity: 1
     recall_verbatim: 'consommation des 7 derniers jours (per passage)'
-    evidence: 'lsms_library/build_transforms.py:557; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:844 (quantity grid in passage 1 only)'
+    evidence: 'lsms_library/build_transforms.py:700 (add_visit_level: ''Motivating case (GH #323)''); lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:982 (''Passage 1 is the only one with a quantity grid'')'
     notes: 'non-food module ran in only 3 of 4 passages (21d).  Quantity is asked at passage 1 ONLY (qachat/uachat/qautocons are passage-1 variables; passages 2-4 record money only), so n_asks_by_column Quantity=1: food_quantities covers 7 days, food_expenditures 28.  Measured on the delivered food_acquired (2026-10-19): Quantity non-null at visit 1 only (108,659 rows; 0 at visits 2-4), Expenditure at all four visits.  GH #851 red team r1, R1.'
     n_items_delivered: 55
   '2018-19':
