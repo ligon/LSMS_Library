@@ -1465,9 +1465,10 @@ def _stata_release(head: bytes) -> int | None:
 # letters land there) -- where the cp1252 LETTERS (Š Œ Ž š œ ž Ÿ) and the
 # apostrophes and dashes (’ ‘ – —) are word-internal in real text (``Men’s``,
 # ``Kruševac``, ``CAPENTRY—FURNITURE``).  (b) is a stated tolerance, not a
-# discovered boundary: on the held corpus it refuses exactly the Albania /
-# Panama / Kyrgyz / Kazakhstan files (35 of them) and nothing else.  A refused
-# file is served exactly as before.
+# discovered boundary.  On the held corpus (a) and (b) together refuse
+# exactly the Albania / Panama / Kyrgyz / Kazakhstan files -- 58 of the 227
+# pre-118 files holding a candidate -- and nothing else; the other 169 are
+# re-decoded.  A refused file is served exactly as before.
 #
 # Scope gates, both deliberate: only a format < 118 head (pandas chose latin-1
 # there; a format-118 file is UTF-8 and a C1 code point in it is damage
