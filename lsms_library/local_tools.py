@@ -1328,6 +1328,170 @@ def _is_stata_dta(head: bytes) -> bool:
             and head[2] == 1)
 
 
+def _stata_release(head: bytes) -> int | None:
+    """The Stata format release a sniffed ``.dta`` head declares, or None.
+
+    Old format: the first byte.  XML format (117+): the digits inside
+    ``<release>...</release>``, which sits well inside ``_SNIFF_BYTES``.
+    """
+    if head.startswith(_STATA_XML_MAGIC):
+        m = re.search(rb'<release>(\d+)</release>', head)
+        return int(m.group(1)) if m else None
+    if head and head[0] in _STATA_OLD_RELEASES:
+        return head[0]
+    return None
+
+
+# cp1252 text read as latin-1 (GH #805).
+#
+# ``pandas.io.stata.StataReader`` decodes every ``.dta`` below format 118 as
+# latin-1, with no per-file override on ``get_dataframe``'s path (``from_dta``
+# has none).  Many of those files are Windows-1252: the EHCVM-1 2018-19
+# ``s01_me_*`` rosters write ``Frere, s<0x9C>ur`` (0x9C is the oe ligature in
+# cp1252), and latin-1 serves it as the C1 control U+009C.  latin-1 and cp1252
+# agree on every byte outside 0x80-0x9F, so re-decoding a string that carries
+# a C1 code point changes that string only, and a file without one is served
+# byte-identically.
+#
+# THE C1 SIGNATURE IS NECESSARY, NOT SUFFICIENT.  Measured over every held
+# ``.dta`` (4,911 blobs, 309 carrying a C1 code point in a value label or a
+# str column), three other things produce it, and cp1252 is wrong for each:
+#
+# * A UTF-8 double encoding: UTF-8 bytes read as latin-1, where the C1 code
+#   point is a UTF-8 continuation byte -- ``b\xc5\x93uf`` for ``bœuf``
+#   (Burkina 2018-19, Cambodia, Nigeria 2023-24, Tajikistan 2009).  Decoding
+#   0x93 as a cp1252 curly quote destroys the latin-1 -> UTF-8 round trip the
+#   ``_decode_mojibake`` hooks and the mojibake-keyed crosswalks depend on
+#   (``Senegal/_/CONTENTS.org``, "the ``u`` crosswalk is keyed on MOJIBAKE").
+#   A string whose latin-1 bytes are valid UTF-8 is therefore never a
+#   candidate, whatever else is in the file.
+# * A DOS code page.  Kyrgyz Republic 1996-98 and Kazakhstan 1996 are cp866
+#   Cyrillic (``\x8d\x85\x92`` = НЕТ); Albania 2002-05 is cp437/cp850
+#   (``KOR\x80E`` = KORÇE, and ``Albania/2004/_/cluster_features.py`` keys on
+#   that ``\x80``); Panama 1997 is cp850 (``dom\x82sticos``).  cp1252 would
+#   turn visible damage into plausible-looking damage (``KOR€E``,
+#   ``dom‚sticos``).
+#
+# So the decision is per FILE -- one file, one writer, one code page -- over
+# every candidate string in it (value labels as well as str columns).  A file
+# is re-decoded only if (a) no candidate contains one of the five bytes cp1252
+# leaves undefined (0x81 0x8D 0x8F 0x90 0x9D: a cp1252 writer cannot emit
+# them), and (b) no candidate puts a cp1252 SYMBOL between two letters --
+# ``€`` ``‚`` ``„`` ``…`` ``†`` ``‡`` ``ˆ`` ``‰`` ``•`` ``ƒ`` (DOS accented
+# letters land there) -- where the cp1252 LETTERS (Š Œ Ž š œ ž Ÿ) and the
+# apostrophes and dashes (’ ‘ – —) are word-internal in real text (``Men’s``,
+# ``Kruševac``, ``CAPENTRY—FURNITURE``).  (b) is a stated tolerance, not a
+# discovered boundary: on the held corpus it refuses exactly the Albania /
+# Panama / Kyrgyz / Kazakhstan files (35 of them) and nothing else.  A refused
+# file is served exactly as before.
+#
+# Scope gates, both deliberate: only a format < 118 head (pandas chose latin-1
+# there; a format-118 file is UTF-8 and a C1 code point in it is damage
+# upstream of the file -- Mali 2017-18, GhanaSPS 2013-14), and only when the
+# caller passed no ``encoding=`` (a declared encoding is an explicit override,
+# and ``from_dta`` already applies it to value labels).
+_C1_RE = re.compile('[\x80-\x9f]')
+_CP1252_HOLES = frozenset('\x81\x8d\x8f\x90\x9d')
+_CP1252_C1 = {chr(b): bytes([b]).decode('cp1252')
+              for b in range(0x80, 0xa0) if chr(b) not in _CP1252_HOLES}
+_CP1252_TRANSLATION = str.maketrans(_CP1252_C1)
+#: cp1252 C1 decodes that are legitimately word-internal: the letters
+#: (ƒ excluded -- the florin sign, and a DOS ``â``) and apostrophes / dashes.
+_CP1252_WORD_INTERNAL = frozenset('ŠŒŽšœžŸ'
+                                  '’‘–—')
+
+
+def _cp1252_candidate(s) -> bool:
+    """True for a str carrying a C1 code point that is not a UTF-8 double
+    encoding (and is latin-1 encodable, i.e. came out of a latin-1 decode)."""
+    if not isinstance(s, str) or not _C1_RE.search(s):
+        return False
+    try:
+        s.encode('latin-1').decode('utf-8')
+    except UnicodeEncodeError:
+        return False
+    except UnicodeDecodeError:
+        return True
+    return False
+
+
+def _cp1252_plausible(s: str) -> bool:
+    """False when *s* holds a cp1252 hole byte, or a C1 code point whose cp1252
+    decode is a symbol sitting between two letters (see the block comment)."""
+    for i, ch in enumerate(s):
+        if ch in _CP1252_HOLES:
+            return False
+        decoded = _CP1252_C1.get(ch)
+        if decoded is None or decoded in _CP1252_WORD_INTERNAL:
+            continue
+        before = s[i - 1] if i else ' '
+        after = s[i + 1] if i + 1 < len(s) else ' '
+        if before.isalpha() and after.isalpha():
+            return False
+    return True
+
+
+def _cp1252_redecode_map(strings) -> dict[str, str]:
+    """``{latin-1 string: cp1252 string}`` for a file's *strings*, or ``{}``
+    when the file has no candidate or is refused as a whole (see above)."""
+    candidates = {s for s in strings if _cp1252_candidate(s)}
+    if not candidates or not all(_cp1252_plausible(s) for s in candidates):
+        return {}
+    return {s: s.translate(_CP1252_TRANSLATION) for s in candidates}
+
+
+def _redecode_cp1252(out, f):
+    """Re-decode the cp1252 strings of a pre-118 ``.dta`` read (GH #805).
+
+    *out* is what ``from_dta`` returned: a DataFrame (value labels already
+    substituted into their columns) or, under ``categories_only``, a
+    ``{var: {code: label}}`` dict.  *f* is the stream or path it was read
+    from; the file's full value-label table is re-read from it only when
+    *out* holds a candidate string, so a file without one costs a scan of its
+    string columns' distinct values and nothing more.  Returns *out*
+    unchanged, by identity, when nothing is re-decoded; never adds, drops or
+    reorders a row or a column, and keeps every dtype.
+    """
+    hit_cols = {}
+    if isinstance(out, dict):
+        found = {lab for labels in out.values() for lab in labels.values()
+                 if _cp1252_candidate(lab)}
+    else:
+        for c in out.columns:
+            if out[c].dtype == object or pd.api.types.is_string_dtype(out[c]):
+                hits = [v for v in out[c].unique() if _cp1252_candidate(v)]
+                if hits:
+                    hit_cols[c] = hits
+        found = {v for hits in hit_cols.values() for v in hits}
+    if not found:
+        return out
+
+    # The verdict is per file: add the labels nothing in *out* uses.
+    try:
+        if not isinstance(f, (str, Path)):
+            f.seek(0)
+        with pd.io.stata.StataReader(f) as reader:
+            labels = reader.value_labels()
+        found.update(lab for m in labels.values() for lab in m.values())
+    except (ValueError, struct.error, OSError):
+        pass
+    mapping = _cp1252_redecode_map(found)
+    if not mapping:
+        return out
+
+    if isinstance(out, dict):
+        return {var: {code: mapping.get(lab, lab) if isinstance(lab, str) else lab
+                      for code, lab in labels.items()}
+                for var, labels in out.items()}
+    out = out.copy(deep=False)
+    for c, hits in hit_cols.items():
+        col = out[c].copy()
+        hit = col.isin(hits)
+        col[hit] = col[hit].map(mapping)
+        out[c] = col
+    return out
+
+
 # SPSS and the text tail (GH #1002).  Two more admissions, same principle as
 # the Stata sniff: a reader is tried only on a file that claims its format.
 #
@@ -1554,9 +1718,16 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         if _is_stata_dta(head):
             try:
                 f.seek(0)
-                return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+                out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
                 failure = exc
+            else:
+                # GH #805: pandas decoded this file as latin-1; re-decode its
+                # cp1252 strings (see the block comment above _C1_RE).
+                release = _stata_release(head)
+                if encoding is None and release is not None and release < 118:
+                    out = _redecode_cp1252(out, f)
+                return out
 
             try:
                 # pyreadstat handles older Stata formats that pandas StataReader cannot.
