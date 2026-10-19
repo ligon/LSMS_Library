@@ -6,7 +6,7 @@ from lsms_library.local_tools import df_data_grabber, to_parquet
 
 
 ##Planting 2015Q3
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                 t=('sector', lambda x: "2015Q3"))
 myvars = dict(year='saq13y',
                 month='saq13m',
@@ -17,7 +17,7 @@ df_1=df_1.drop(columns=['year','month','day'])
 
 
 ##Harvest(2016Q1)
-idxvars = dict(j='hhid',
+idxvars = dict(i='hhid',
                 t=('sector', lambda x: "2016Q1"))
 myvars = dict(year='saq13y',
                 month='saq13m',
