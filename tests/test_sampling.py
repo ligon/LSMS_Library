@@ -721,7 +721,7 @@ class TestShippedDeclarations:
         ("Tanzania", "2012-13", "wave-scoped"),      # UPD4 round-3 renumbering
         ("Tanzania", "2019-20", "wave-scoped"),      # NPS-SDD layout
         ("Uganda", "2009-10", "mixed"),              # @lat,lon bins
-        ("Uganda", "2011-12", "unobservable"),       # OUR rendering defect: held
+        ("Uganda", "2011-12", "wave-scoped"),        # two renderings of `comm`
         ("Uganda", "2013-14", "redefined"),          # EA -> parish
         ("Nigeria", "2012Q3", "stable"),             # movers are singletons
     ])
@@ -734,12 +734,20 @@ class TestShippedDeclarations:
         assert r.household_continuity == "refresh"
         assert r.cluster_id_continuity == "unobservable"
 
-    def test_a_library_defect_is_never_declared_a_survey_renumbering(self):
-        """Uganda 2010-11 -> 2011-12 measures 0% but is our rendering, so it
-        must not be `wave-scoped` (DESIGN.org §3.3, Q5)."""
+    def test_a_verified_linkage_is_never_declared_unobservable(self):
+        """Uganda 2010-11 -> 2011-12: 2,510 households link and 0 keep `v`,
+        because the survey files render `comm` two ways and the library serves
+        both un-harmonised -- a harmonisation gap, not a redraw.  The linkage
+        IS verified, so `unobservable` ("no verified linkage") is wrong
+        whatever the warning policy: `wave-scoped` until the Uganda `comm`
+        rendering issue harmonises it, then `stable` (dispatcher call on red
+        team r1 H1, 2026-10-19; this test replaced one pinning the reverse)."""
         r = sampling_records("Uganda")["2011-12"]
-        assert r.cluster_id_continuity not in S.INCOMPARABLE_CLUSTER_IDS
-        assert "rendering" in r["panel"]["cluster_id_note"]
+        assert r.cluster_id_continuity == "wave-scoped"
+        assert r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
+        note = " ".join(r["panel"]["cluster_id_note"].split())
+        assert "two renderings" in note and "not a redraw" in note
+        assert "rendering issue" in note and "becomes `stable`" in note
 
 
 @pytest.mark.requires_s3
@@ -779,6 +787,22 @@ class TestTheReproduction:
             without = self._fresh().household_roster(waves=["1987-88", "1988-89"])
         assert S.ATTRS_KEY in with_rec.attrs and S.ATTRS_KEY not in without.attrs
         pd.testing.assert_frame_equal(with_rec, without)
+
+    def test_uganda_warns_across_the_comm_rendering_boundary(self):
+        """H1 (red team r1): `sample(waves=['2010-11', '2011-12'])` keeps `v`
+        for 0 of 2,510 linked households and used to be SILENT (2011-12 was
+        `unobservable`); it now warns once, naming that boundary."""
+        S._clear_sampling_reports()
+        s, caught = warns(lambda: self._fresh("Uganda").sample(
+            waves=["2010-11", "2011-12"]))
+        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
+        msg = str(caught[0].message)
+        assert "2010-11 -> 2011-12: cluster_id_continuity=wave-scoped" in msg
+        assert "Same EA, two ids" in msg
+        idx = s.reset_index()[["i", "t", "v"]].dropna()
+        wide = idx.pivot_table(index="i", columns="t", values="v",
+                               aggfunc="first").dropna()
+        assert (wide["2010-11"] == wide["2011-12"]).sum() == 0   # still served
 
     def test_strict_mode_refuses_the_reproduction(self, monkeypatch):
         monkeypatch.setenv("LSMS_CLUSTER_STRICT", "1")

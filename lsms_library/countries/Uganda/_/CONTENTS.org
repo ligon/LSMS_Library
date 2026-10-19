@@ -67,16 +67,25 @@ boundary -- recorded per boundary in =Uganda/_/sampling.yml='s =panel:=
 blocks, which drive the =ClusterIdentityWarning= on any =Country('Uganda')=
 frame carrying =v= across them:
 
-1. *Two renderings of =comm= (a LIBRARY defect).*  =comm= is served 8-digit in
-   2005-06 and 2011-12 but 7-digit in 2009-10 and 2010-11 (uniform widths).
-   Across 2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked
-   households keep =v=: for 272 of the 322 cluster pairs the 8-digit form is
-   the 7-digit form with one digit inserted at position 3 (=1020001 ->
-   10210001=); the other 50 are district recodes.  2005-06 and 2011-12 share
-   321 of their 322 / 321 =v= verbatim.  Not a survey fact, so it is NOT
-   declared =wave-scoped=: 2011-12 is =unobservable= (provisional) until the
-   rendering is fixed, which needs the 322-pair table, not a digit rule.
-   Filed separately (DESIGN.org Q5, ruling 2026-10-18).
+1. *Two renderings of =comm= (a harmonisation gap, not a redraw).*  Across
+   2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked households keep
+   =v=.  The survey files carry two renderings of the same EA code (int32
+   8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11); the
+   library serves both un-harmonised, so the 0% is a harmonisation gap, not a
+   redraw.  For 272 of the 322 cluster pairs the 8-digit form is the 7-digit
+   form with one digit inserted at position 3 (=1020001 -> 10210001=); the
+   other 50 also re-code the district field.  2005-06 and 2011-12 share 321 of
+   their 322 / 321 =v= verbatim.  The linkage is verified, so 2011-12 is
+   declared =wave-scoped= (=unobservable= means "no verified linkage", which
+   is false here) and a frame carrying =v= across 2010-11 -> 2011-12 warns.
+   It becomes =stable= once the rendering is harmonised, which needs the
+   322-pair table, not a digit rule: the Uganda =comm= rendering issue (to be
+   filed; DESIGN.org Q5, ruling 2026-10-18).  /History:/ first declared
+   =unobservable= (provisional) on 2026-10-19, on the reading that this was a
+   library defect rather than a survey fact; reversed the same day (dispatcher
+   call on red team r1 H1, @ligon informed), because the raw =GSEC1.dta= files
+   themselves carry both renderings (measured via =get_dataframe=: int32
+   8-digit in 2005-06 and 2011-12, 7-character string in 2009-10 and 2010-11).
 2. *Synthetic =@lat,lon= bins in 2009-10* (see the next-but-one subsection):
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.

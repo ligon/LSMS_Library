@@ -145,9 +145,11 @@ Sampling:
         339 of this wave's 656 `v` values are synthetic 0.05-degree GPS bins
         ('@lat,lon'), not clusters: movers and split-offs whose `comm` is blank get a
         `coalesce_coord_bin` label (CONTENTS.org, "Hybrid v in 2009-10").  The rest
-        are the 2005-06 frame EA, but `comm` is rendered 7-digit here and 8-digit in
-        2005-06 -- a library rendering defect, not a survey fact, filed on its own
-        (DESIGN.org Q5).  Measured: 0 of 2,607 linked households keep `v`.
+        are the 2005-06 frame EA, but the survey files render `comm` as a 7-character
+        string here and as an int32 8-digit code in 2005-06, and the library serves
+        both un-harmonised -- a harmonisation gap, not a redraw (the Uganda `comm`
+        rendering issue, to be filed; DESIGN.org Q5).  Measured: 0 of 2,607 linked
+        households keep `v`.
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -249,19 +251,26 @@ Sampling:
       role: panel
       rotation: null
       household_continuity: panel
-      cluster_id_continuity: unobservable
+      cluster_id_continuity: wave-scoped
       cluster_id_note: |-
-        PROVISIONAL, and not a survey fact: both waves map `v: comm`, but 2010-11
-        renders it 7-digit and 2011-12 8-digit, so 0 of 2,510 linked households keep
-        `v` -- 272 of the 322 cluster pairs differ only by one digit inserted at
-        position 3 and 50 are district recodes.  That is a library rendering defect
-        (DESIGN.org §2.3a), filed as its own issue (DESIGN.org Q5, ruling
-        2026-10-18); declaring it `wave-scoped` would record our bug as the survey's
-        design, so it stays `unobservable` (no warning) until the rendering is fixed.
+        Same EA, two ids: 0 of 2,510 linked households keep `v` across 2010-11 ->
+        2011-12, though both waves map `v: comm`.  The survey files carry two
+        renderings of the same EA code (int32 8-digit in 2005-06/2011-12,
+        7-character string in 2009-10/2010-11); the library serves both
+        un-harmonised, so the 0% is a harmonisation gap, not a redraw.  For 272 of
+        the 322 cluster pairs the 8-digit form is the 7-digit form with one digit
+        inserted at position 3 (1020001 -> 10210001); the other 50 also re-code the
+        district field, and the region digit and EA serial survive in all 322.  So
+        the `v` values differ only by that rendering -- the Uganda `comm` rendering
+        issue (to be filed; DESIGN.org Q5, ruling 2026-10-18) -- and this boundary
+        becomes `stable` once it is harmonised.  `wave-scoped`, not `unobservable`,
+        because the linkage IS verified (2,510 households) and `unobservable` means
+        "no verified linkage" (dispatcher call on red team r1 H1, 2026-10-19,
+        @ligon informed; reversible).
       source_type: derived-from-data
-      confidence: low
-      source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      confidence: high
+      source_file: 'lsms_library/countries/Uganda/2011-12/Data/GSEC1.dta'
+      locator: '`comm` dtype and width in each wave''s Data/GSEC1.dta, read via get_dataframe on 2026-10-19: 2005-06 int32 8-digit (3,123), 2009-10 7-char str (2,410, plus 565 blank), 2010-11 7-char str (2,716), 2011-12 int32 8-digit (2,850); served `v` re-measured through Country("Uganda").sample(); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.3a'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
