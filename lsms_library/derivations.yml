@@ -10,6 +10,49 @@
 # documented in lsms_library/derivations.py; the design is
 # SkunkWorks/derived_values.org.
 #
-# Empty for now: the first instance (GhanaLSS::food_acquired::12b-fortnight)
-# is a country-level entry.  Framework-level instances are a follow-on.
-{}
+# The first framework-level instances are the two partial-date paddings of the
+# build-time calendar parser (GH #1045, decision 3): a padded day is a
+# CONSTRUCTION, not a parser option.  Keyed per TABLE (`::<table>::<name>`), not
+# with an empty table slot: an empty slot attaches the entry -- at rows 0 -- to
+# every table in the corpus.  Every table in datetime_parse.CALENDAR_TABLES
+# must carry both entries (pinned by tests/test_gh1045_parse_datetime.py).
+
+::interview_date::date-day-imputed:
+  columns: [Int_t]
+  rule: >-
+    A date whose source records a year and a month but no day (the day
+    component blank) is served as the FIRST of that month.  Only a blank day
+    is padded: a day equal to a declared sentinel ("don't know") is served
+    NaT and counted as `sentinel`, and an out-of-range day (32, 30 February)
+    is served NaT and counted as `out_of_range`.
+  function: lsms_library.datetime_parse:parse_datetime
+  inputs: lsms_library.datetime_parse:partial_date_inputs
+  raw_variables:
+    - the y and m component variables named in the column's `datetime:` spec
+      (data_info.yml) or in the wave script's parse_datetime call, per wave --
+      e.g. Tanzania 2008-15 upd4_hh_a.ha_18_3 / ha_18_2 (day ha_18_1 blank)
+  assumptions:
+    - text: >-
+        the day of the month is unknown and the first is a placeholder, not an
+        estimate; a user who needs month resolution should truncate, and one
+        who needs the day must treat these rows as missing it
+      basis: modelling-choice
+      evidence: "GH #1045 decision 3 (@ligon, 2026-10-18): partial dates are a registered derivation, not a parser option"
+
+::interview_date::date-month-day-imputed:
+  columns: [Int_t]
+  rule: >-
+    A date whose source records a year but neither a month nor a day is served
+    as 1 January of that year.  A day without a month is NOT padded: it is
+    served NaT and counted as `incomplete`.
+  function: lsms_library.datetime_parse:parse_datetime
+  inputs: lsms_library.datetime_parse:partial_date_inputs
+  raw_variables:
+    - the y component variable named in the column's `datetime:` spec
+      (data_info.yml) or in the wave script's parse_datetime call, per wave
+  assumptions:
+    - text: >-
+        the month and day are unknown and 1 January is a placeholder, not an
+        estimate
+      basis: modelling-choice
+      evidence: "GH #1045 decision 3 (@ligon, 2026-10-18)"

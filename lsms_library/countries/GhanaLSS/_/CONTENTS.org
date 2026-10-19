@@ -3040,6 +3040,24 @@ mixed encoding is also why this is not the 2012-13 code-262 artefact noted
 under the food vocabulary (a Mac-Roman NBSP read as latin-1): different
 file, different source charset, same symptom class.
 
+*Correction, 2026-10-19 (GH #805): =g7sec9a.dta= is format 117, not 118.*
+Its header reads =<stata_dta><header><release>117</release>= (the same for
+=g7sec9b.dta=, =g7price.dta= and the other GLSS7 files the #805 census
+touched), and pandas decodes every format below 118 as latin-1 -- it does
+not try UTF-8 first, so "each string that fails UTF-8 is decoded per-string
+as latin-1" above describes the right symptom through the wrong mechanism.
+The consequence is the opposite of the paragraph above: the #805 reader
+rule DOES cover this file.  =get_dataframe= now re-decodes its cp1252
+strings (=Women\x92s= -> =Women’s=, =\x96= -> =–=, =\x94= -> =”=);
+across the 15 GLSS7 files it changes 390,554 served cells and leaves every
+non-C1 cell byte-identical.  The repaired config keeps its ASCII
+transcription (='=, =-=, ="=), and nothing served moves: =nonfood_expenditures=
+decodes on the numeric item code and =community_prices= builds its labels
+from the config, so both are identical before and after (977,193 and
+660,168 rows).  A re-derivation of =nonfood_items= from the raw read would
+now see the typographic characters, not C1 controls -- still not the
+config's ASCII spelling, so transcribe deliberately.
+
 ** 2005-06 is in OLD cedi, and the served numbers look 1000x wrong until you look
 
 Median row: 2005-06 *60,000*, 2012-13 *23*, 2016-17 *35*.  That is the July

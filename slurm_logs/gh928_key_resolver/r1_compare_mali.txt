@@ -1,0 +1,24 @@
+unit_map identical: True 74
+food_acquired frame-identical (assert_frame_equal check_exact): (431046, 3)
+before 2014-15 rows 122085 u NaN 0 sha 7871c7d132349996
+after 2014-15 rows 122085 u NaN 0 sha 7871c7d132349996
+2014-15 u value_counts (after):
+u
+Kg            37041
+Tas           27066
+Unité         14205
+Autre         11339
+Sachet         7836
+Litre          6773
+Paquet         6154
+Boite          5682
+Gramme         2120
+unit           1534
+Bidon           789
+Verre           611
+Centilitre      351
+Sac petit       240
+Sac moyen       208
+Sac large       136
+attrs equal: True | dtypes equal: True | index dtypes: True
+warnings equal: True 2
