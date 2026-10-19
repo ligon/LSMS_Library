@@ -619,3 +619,17 @@ def test_a_clear_ledger_then_a_warm_wave_hit_replays(tmp_path, monkeypatch):
         assert rep["from_cache"] is True and rep["sentinel"] == 1
     finally:
         countries_root.cache_clear(); data_root.cache_clear()
+
+
+def test_assume_cache_fresh_also_replays(tmp_path):
+    """The `assume_cache_fresh=True` short-circuit serves the country parquet
+    without the hash gate; it must still replay the date-parse report."""
+    _make_country(tmp_path, "DatelandFresh", _YAML_SCHEME, info=_YAML_INFO)
+    _probe(tmp_path, "DatelandFresh")                                # build
+    code = _PROBE.replace("ll.Country(sys.argv[1])",
+                          "ll.Country(sys.argv[1], assume_cache_fresh=True)")
+    r = subprocess.run([sys.executable, "-c", code, "DatelandFresh"], env=_env(tmp_path),
+                       cwd=str(tmp_path), capture_output=True, text=True, timeout=600)
+    assert r.returncode == 0, r.stderr[-3000:]
+    out = json.loads(r.stdout.strip().splitlines()[-1])
+    assert out["warned"] and [rep for rep in out["reports"] if rep["sentinel"] == 1]
