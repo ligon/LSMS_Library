@@ -36,8 +36,12 @@ food_acquired_parquet := $(food_acquired:.py=.parquet)
 ../%/_/food_acquired.parquet: $(food_acquired)
 	(cd $(@D) && python food_acquired.py)
 
-$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet) $(VAR_DIR)/cluster_features.parquet
-	python food_acquired.py
+# No country-level rule for $(VAR_DIR)/food_acquired.parquet (GH #836):
+# the framework concatenates the canonical (t, i, j, u, s) wave parquets
+# built by the rule above (ruling on #788 -- the framework is authoritative).
+# The retired _/food_acquired.py could no longer run (it expected the
+# pre-canonical (j, t, i) wave index) and was never reached on the default
+# backend.
 
 shocks = $(shell find $(rounds) -name shocks.py)
 shocks_parquet := $(shocks:.py=.parquet)
