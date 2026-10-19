@@ -91,6 +91,9 @@ import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, countries_root
 from .null_read_audit import check_read
+# GH #1045: the build-time calendar parser, re-exported so wave scripts import
+# it from local_tools beside df_data_grabber / to_parquet.
+from .datetime_parse import parse_datetime, assign_datetime, datetime_reports  # noqa: F401
 from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
@@ -2257,6 +2260,14 @@ _GRAIN_AUDIT_KEY = b"lsms_grain_audit"
 # and reintroduce the rebuild loop in a narrower case.
 _CACHE_WAVES_KEY = b"lsms_cache_waves"
 
+# GH #1045.  Schema-metadata key under which the build-time DATE-PARSE report
+# (``datetime_parse.parse_datetime``) is embedded, beside the grain audit and by
+# the same argument: the parse runs once, at the cold build, so without the
+# stamp a warm read -- practically every read -- would never hear about a
+# sentinel, an out-of-range component or an ambiguous day/month order (#323's
+# lesson).  Replayed by ``datetime_parse.replay_datetime_audit``.
+_DATETIME_AUDIT_KEY = b"lsms_datetime_audit"
+
 # Extensions treated as survey source data when scanning script-path
 # tables for literal file references.
 _DATA_SUFFIXES = (".dta", ".csv", ".tab", ".dat", ".sav", ".txt", ".xlsx",
@@ -2414,6 +2425,25 @@ def read_parquet_grain_audit(path: str | Path) -> list[dict] | None:
     return reports if isinstance(reports, list) else None
 
 
+def read_parquet_datetime_audit(path: str | Path) -> list[dict] | None:
+    """Return the date-parse report embedded in an L2 parquet (GH #1045), or
+    ``None`` when it carries none.  Footer-only read (~1 ms), like
+    :func:`read_parquet_grain_audit`."""
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except Exception:
+        return None
+    raw = (md or {}).get(_DATETIME_AUDIT_KEY)
+    if raw is None:
+        return None
+    try:
+        reports = json.loads(raw.decode() if isinstance(raw, (bytes, bytearray)) else raw)
+    except (ValueError, TypeError):
+        return None
+    return reports if isinstance(reports, list) else None
+
+
 def read_parquet_cache_waves(path: str | Path) -> list[str] | None:
     """Return the wave-coverage manifest embedded in an L2-country parquet
     (GH #891), or ``None`` when the parquet carries no stamp (written by a
@@ -2503,7 +2533,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, datetime_audit: list[dict] | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -2538,6 +2568,12 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         from, which is what lets a later request for a subset of them be
         served from this file instead of rebuilding.  See
         :func:`read_parquet_cache_waves`.
+    datetime_audit : list[dict] | None, default None
+        If given, embed this date-parse report under ``lsms_datetime_audit``
+        (GH #1045).  A wave SCRIPT passes
+        ``datetime_reports(country, table)`` here: it runs in a ``make``
+        subprocess, so the stamp it writes is the only way its report reaches
+        the parent and every later warm read.
     """
     if not absolute_path:
         fn = _resolve_data_path(fn)
@@ -2587,7 +2623,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves:
+    if cache_hash is not None or grain_audit or cache_waves or datetime_audit:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -2602,6 +2638,9 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
+        if datetime_audit:
+            # GH #1045: the build-time date-parse report rides with the data.
+            md[_DATETIME_AUDIT_KEY] = json.dumps(datetime_audit, default=str).encode()
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, fn)
     else:

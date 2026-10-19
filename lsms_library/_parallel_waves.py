@@ -404,6 +404,13 @@ def _ledgers() -> tuple[dict, dict]:
     return _GRAIN_LEDGER, _NULL_READ_LEDGER
 
 
+def _datetime_ledger() -> dict:
+    # GH #1045: the build-time date-parse ledger, relayed like the two above
+    # so a wave parsed in a worker still reaches the parent's country stamp.
+    from .datetime_parse import _DATETIME_LEDGER
+    return _DATETIME_LEDGER
+
+
 def _snapshot(ledger: dict) -> dict:
     return {k: len(v) for k, v in ledger.items()}
 
@@ -464,9 +471,11 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     """Run one wave's build stage, capturing everything the serial path would
     have left behind in-process: warnings, ledger entries, or an exception."""
     grain, null = _ledgers()
-    g0, n0 = _snapshot(grain), _snapshot(null)
+    dates = _datetime_ledger()
+    g0, n0, d0 = _snapshot(grain), _snapshot(null), _snapshot(dates)
     payload: dict[str, Any] = {"wave": wave, "has_table": False, "result": None,
-                               "warnings": [], "grain": [], "null": [], "error": None}
+                               "warnings": [], "grain": [], "null": [], "datetime": [],
+                               "error": None}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
@@ -478,6 +487,7 @@ def _build_captured(build_one: Callable[[str], tuple[bool, Any]], wave: str) -> 
     payload["warnings"] = [_pack_warning(m) for m in caught]
     payload["grain"] = _delta(grain, g0)
     payload["null"] = _delta(null, n0)
+    payload["datetime"] = _delta(dates, d0)
     return payload
 
 
@@ -541,6 +551,7 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
     grain, null = _ledgers()
     _file_reports(grain, payload["grain"])
     _file_reports(null, payload["null"])
+    _file_reports(_datetime_ledger(), payload.get("datetime", []))
     err = payload.get("error")
     if err is not None:
         exc, type_name, text, tb = err
