@@ -95,10 +95,12 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #                       harmonize_unit, and the source names 31 (1994a-1995)
 #                       and 95 (1997) only as "Other", 37/83 not at all.
 #                       NOT accepted: 1989's 13 raw codes ('1','3',...,'21')
-#                       -- decodable in principle from the 1989 instrument's
-#                       per-village, per-page lists, only one of which is
-#                       held; tracked in EthiopiaRHS/_/CONTENTS.org.  1989
-#                       code 0 is now U_UNKNOWN, not a leak.)
+#                       -- undecoded: which of the held 1989 instrument's
+#                       unit lists the data were entered on is open (code 1
+#                       is a quintal on every one that can apply); tracked
+#                       in EthiopiaRHS/_/CONTENTS.org.  1989 code 0 and a
+#                       NaN unit on a measured 1994a-1997 row are now
+#                       U_UNKNOWN, not leaks.)
 # *ACCEPTED = item-specific / data-entry codes with no label in ANY source
 #  (questionnaire scheme differs from the data coding); documented per-country
 #  and left as codes -- they still yield valid food_expenditures + unitvalue.
