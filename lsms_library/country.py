@@ -537,7 +537,8 @@ def _no_such_country_message(country_name: str) -> str:
     by_lower = {}
     for n in registered:
         by_lower.setdefault(n.lower(), n)
-    close_lower = difflib.get_close_matches(country_name.lower(),
+    # str(): a non-str name (a Path) is refused too, as ValueError (GH #915).
+    close_lower = difflib.get_close_matches(str(country_name).lower(),
                                             list(by_lower), n=3, cutoff=0.6)
     close = [by_lower[c] for c in close_lower]
     msg = f"No such country {country_name!r}."

@@ -181,6 +181,15 @@ def test_gh915_dot_dvc_and_files_are_refused_even_with_the_opt_in():
             assert not isinstance(ei.value, UnregisteredCountryError)
 
 
+def test_gh915_a_non_str_name_is_refused_as_value_error():
+    """countries() is a list of str; a Path naming a registered directory is
+    not one of them, and must fail as ValueError, not AttributeError from the
+    message builder."""
+    from pathlib import Path
+    with pytest.raises(ValueError, match="No such country"):
+        ll.Country(Path("Uganda"))
+
+
 def test_gh915_opt_in_constructs_a_tableless_country():
     unreg = _unregistered_dirs()
     if not unreg:
