@@ -92,9 +92,16 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 #                       + float->str code lookup; all codes now decode)
 # *ACCEPTED = item-specific / data-entry codes with no label in ANY source
 #  (questionnaire scheme differs from the data coding); documented per-country
-#  and left as codes -- they still yield valid food_expenditures + unitvalue,
-#  only the kg aggregate excludes them.  No food_acquired country now leaks
-#  non-accepted unit codes (Layer-2 u-harmonization complete).
+#  and left as codes -- they still yield valid food_expenditures + unitvalue.
+#  They are NOT excluded from kg (GH #962 -- this header used to say "only the
+#  kg aggregate excludes them", which was never the runtime behaviour): an
+#  accepted code is a unit we cannot name, so food_kg_factors gives it an
+#  inferred factor (usually the u-pooled ``unit`` rung) and discloses that in
+#  KgFactorSource; Uganda's eight codes, 24 rows, are all ``unit``.  Only a
+#  NaN u, transformations._U_SENTINELS and ``Value`` get ``none``.  Pinned by
+#  tests/test_962_unit_sentinel.py::test_accepted_residual_code_*.
+#  No food_acquired country now leaks non-accepted unit codes (Layer-2
+#  u-harmonization complete).
 
 
 @pytest.mark.requires_s3
