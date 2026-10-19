@@ -743,6 +743,35 @@ prices 25 FCFA per "Unite" in one variety and 1,300-1,350 FCFA per "Paquet" in
 another.  These are exactly the items whose household-vs-community gap is
 largest (Piment ratio 0.11, Cube alimentaire 0.16, Concentre de tomate 0.18).
 
+*RESOLVED 2026-10-19 (GH #840, ruling @ligon 2026-10-18: add the level, select
+nothing).*  =community_prices= is now indexed =(t, v, j, u, variety, visit)=:
+=variety= is the s04q02 CODE as a string (=5451= = product 545, variety 1) and
+=visit= the passage (1 = EACIS04_p1 post-planting, 2 = EACIS04_p2
+post-harvest); the s04q02 label is a new =Description= column.  Served rows
+23,646 -> 40,218 -- every priced relevé-3 row of both passages.  The number of
+(t, v, j, u) cells is unchanged (23,646); 11,334 of them now hold more than
+one price and 7,614 more than one distinct price.  The old table is a
+projection of the new one: per cell, the highest =visit=, then the lowest
+=variety= code, reproduces it on 23,646 of 23,646 cells.  Two facts that
+decided the encoding:
+
+- *The variety CODE, not the label.*  s04q02 is an int16 with value labels,
+  and the labels DIFFER between the two passage files in their quote
+  character only (p1 =Boîte de 60g de marque "Aicha"=, p2 =... 'Aicha'=; four
+  codes: 5451, 5452, 5453, 6102).  p2 also prices two varieties p1 does not
+  (6013, 6014: Sucre en poudre).  Codes are product-prefixed in every row of
+  both files (=code // 10 == s04q01 code=), so =variety= is unique within =j=.
+- *The passage is a second collapsed axis, not only variety.*  With variety
+  alone the key still held 9,229 two-passage groups, 5,439 of them with
+  different prices: the old post-harvest-first rule discarded the
+  post-planting price, i.e. the lean-season one.  Hence =visit=.
+
+=mali.py='s pre-#840 comment called the colliding prices "near-identical
+(median max/min ratio ~1.13)"; the tomato-paste instance above (125 vs 600
+FCFA for the 60 g and 220 g Aicha tins) is the counter-example, and the
+comment is gone.  Still NOT read: relevés 1 and 2 (the section above) -- when
+they are, they belong on an =obs= level, which is why this table has none.
+
 ** =community_prices.Quantity= is a WEIGHT IN KG, not a count of units
 
 Column 4.04/4.07/4.10 is headed "Poids (KG)".  So =Quantity= is the lot's weight

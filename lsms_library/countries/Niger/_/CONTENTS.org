@@ -1193,6 +1193,53 @@ entered a gram weight against a container unit code: 111 of 15,423 rows
 whole 2014-15 =Dogondoutchi / Niebe / Tiya= cell to 0.22 FCFA per bowl
 (=Price=600, Quantity=2687=, i.e. 2.687 kg = one tia).
 
+** =community_prices= serves every recorded price: variety, visit, obs (GH #840, 2026-10-19)
+
+Until #840 the grain was =(t, v, j, u)= and =_finish_community_prices= kept ONE
+row per cell -- passage 2 first, then row order -- so it discarded other
+VARIETIES of the product (CS07 prices 90 =cs07q02= varieties of 45 =cs07q01=
+products, e.g. "mais blanc vendu en sac de 100 kg" vs "... a la tia"), the
+other PASSAGE (2011-12 has two), and the other OBSERVATION slots (CS07 has
+three).  Ruling @ligon 2026-10-18: add the level, select nothing.  The index is
+now =(t, v, j, u, variety, visit, obs)=; served rows 15,423 -> 46,177 (2011-12
+8,923 -> 32,369, of which 13,073 visit 1 and 19,296 visit 2; 2014-15
+6,500 -> 13,808).  The (t, v, j, u) cell count is unchanged (15,423): every old
+row is one of the new rows for its cell, 10,655 cells now hold more than one
+price and 6,666 more than one distinct price.  The old row-order choice is
+reproduced by (visit desc, slot, FILE ROW) on 15,423 of 15,423 cells; the
+served table orders varieties by code instead, which differs from file order
+in 803 cells, all 2014-15 (=comprixcs07.dta= is not sorted by variety).
+
+Source idiosyncrasies found doing it -- record them, they will bite again:
+
+- *=variety= is the CODE, because the labels are not stable.*  The =cs07q02=
+  codes are identical in all three files (=7011= = product 701, variety 1),
+  but the labels change CASE between 2011-12 p1 and p2 ("Maïs blanc ..." vs
+  "maïs blanc ...") and DROP THE PRODUCT PREFIX in 2014-15 (code =1011= is
+  =Alumettes vendues en boîte de marque "rainday"= in 2011-12 p1 and
+  =vendues en boîte de marque "rainday"= in 2014-15).
+  The file's own label is =Description= (up to 3 spellings per code).
+- *2011-12 p2 (=ecvmacoms07_p2.dta=) ships 150 of its 232 grappes TWICE.*  The
+  file has 34,380 rows for 232 grappes x 90 varieties; 13,478 of the repeated
+  block's rows are byte-identical to the first block and are dropped
+  (lossless).  The 22 that differ are kept as a second record (=obs= 4-6).
+- *2014-15 grappe 212 carries two questionnaires* (=numquest= 1 and 2; every
+  other grappe has one).  Its second questionnaire's observations are =obs=
+  4-6 -- the GhanaLSS =obs= convention for a second source record of one cell.
+  132 such rows in 2014-15 and 32 in 2011-12.
+- *The 9999 quantity sentinel arrives as float32 =9999.9=, which
+  =_COMMUNITY_PRICE_SENTINELS= (=9999.0=, =99999.0=) does not catch*: 76 served
+  2014-15 rows carry =Quantity = 9999.900391=.  NOT fixed here (it changes
+  =Quantity=, which #840 does not touch); residual drafted with #840.
+- *=cs07q01= "Riz" decodes to =j = 'Autre Riz local'=* for BOTH its varieties,
+  "Riz thailandais vendu en vrac au kilo" (=7031=) and "Riz local vendu en vrac
+  au kilo" (=7032=).  The =variety= level now tells them apart; the =j= label
+  itself is a =harmonize_food= decision, not touched.
+
+The measurement table under "What changed, measured (cold rebuild,
+2026-09-09)" above keeps its 15,423 -- it is the #842 measurement and stands as
+such.
+
 * 2026-09-10 -- the plot axis is now spelled =plot_id=, not =plot=
 
 @ligon's decision: =plot_id= is the canonical plot-axis level name EVERYWHERE.
