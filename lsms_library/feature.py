@@ -25,7 +25,7 @@ from importlib.resources import files
 from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
-from .errors import LabelUnavailableError, UnitsUnavailableError
+from .errors import LabelUnavailableError, UnitsUnavailableError, PeriodUnavailableError
 from . import population as _population
 # NOT `from . import recall` / `from . import derivations`: the package binds
 # PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
@@ -36,6 +36,11 @@ from . import population as _population
 # `__init__`'s import order ever changed.  Name the symbols instead.
 from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
 from .recall import merge_attrs as _recall_merge_attrs
+from .recall import PERIOD_ATTRS_KEY as _PERIOD_ATTRS_KEY
+from .recall import PERIOD_TABLES as _PERIOD_TABLES
+from .recall import merge_period_attrs as _period_merge_attrs
+from .recall import period_days as _period_days
+from .recall import period_refusal as _period_refusal
 from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
 # `country` is imported by `__init__` before this module, so this is not a cycle.
@@ -119,6 +124,13 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         "derivations",
         (_DERIVATIONS_ATTRS_KEY,),
         _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
+    ),
+    # GH #851 Phase II: the `period=` conversion record, `{country: {...}}` on
+    # the Country frame (same shape as recall), so it needs no per-country wrap.
+    _AttrsCarrier(
+        "period",
+        (_PERIOD_ATTRS_KEY,),
+        _merge_into(_PERIOD_ATTRS_KEY, _period_merge_attrs),
     ),
     # GH #787 item 3: the `labels=X` pass-through report.  Flat on the Country
     # frame (`country._audit_label_pass_through`), so it is keyed by country at
@@ -967,6 +979,17 @@ class Feature:
                     f"Unknown numeraire {numeraire!r}; available: {conversion_targets()}"
                 )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
+        # period= (GH #851 Phase II) is refused UP FRONT on a table that does
+        # not take it.  Forwarding-by-signature would otherwise hand it to
+        # every country's generated method, each would raise TypeError, and
+        # the broad per-country catch below would turn one refusal into N
+        # "Failed to load" warnings and an empty frame -- which is not a
+        # refusal.  Same message as Country's, from recall.period_refusal.
+        period = kwargs.get("period")
+        if period is not None:
+            if self.table_name not in _PERIOD_TABLES:
+                raise TypeError(_period_refusal(self.table_name))
+            _period_days(period)
         # Reject an unknown / mistyped table name with a helpful error instead of
         # silently returning an empty DataFrame (e.g. Feature('food_expenditure')).
         if not self.countries:
@@ -1017,6 +1040,10 @@ class Feature:
         # lacks the column the requested basis needs (Price for the *price
         # modes) -- dropped, reported once, never concatenated as empties.
         units_unavailable: list[str] = []
+        # Same contract for period= (GH #851), at the WAVE grain: {country:
+        # [waves whose recall window is not established]}.  A country whose
+        # other waves convert is KEPT, restricted to those waves.
+        period_unavailable: dict[str, list[str]] = {}
 
         # The metadata records each country's frame arrived with: population
         # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
@@ -1049,7 +1076,22 @@ class Feature:
                             f"{self.table_name}: {name}'s method does not accept "
                             f"{key!r}; ignored for this country"
                         )
-                df = method(**call_kwargs)
+                try:
+                    df = method(**call_kwargs)
+                except PeriodUnavailableError as e:
+                    # Contract B for period= (GH #851), degraded at the grain
+                    # of the WAVE rather than the country (the labels= /
+                    # units= precedent): the window is a property of the
+                    # (country, wave) cell, and dropping whole countries would
+                    # discard GhanaLSS's six convertible waves for its one
+                    # stratified wave -- the very cells the kwarg exists to
+                    # compare.  Re-call with the convertible waves; drop the
+                    # country only when none converts.  The re-call is served
+                    # from the warm L2-country parquet, filtered (#891).
+                    period_unavailable[name] = sorted(e.unavailable)
+                    if not e.convertible:
+                        continue
+                    df = method(**{**call_kwargs, "waves": list(e.convertible)})
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
@@ -1081,6 +1123,13 @@ class Feature:
                 # Same Contract B for units= (GH #828).  Record which column
                 # was missing so the aggregated warning can say so.
                 units_unavailable.append((name, tuple(e.missing)))
+                continue
+            except PeriodUnavailableError as e:
+                # Only reachable if the convertible-waves re-call above raised
+                # again -- which would mean the record changed between the two
+                # calls.  Drop the country; never serve an unscaled frame.
+                period_unavailable[name] = sorted(
+                    set(period_unavailable.get(name, [])) | set(e.unavailable))
                 continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
@@ -1123,9 +1172,33 @@ class Feature:
             result.attrs['units_unavailable'] = names
             return result
 
+        def _mark_period_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            """Contract B for ``period=`` (GH #851): one aggregated warning +
+            ``df.attrs['period_unavailable'] = {country: [waves]}`` naming the
+            (country, wave) cells dropped because their recall window is not
+            established.  A country listed here may still be IN the result,
+            restricted to its convertible waves."""
+            if not period_unavailable:
+                return result
+            n_cells = sum(len(w) for w in period_unavailable.values())
+            warnings.warn(
+                f"{self.table_name}: period={period!r} unavailable for "
+                f"{n_cells} (country, wave) cell(s) {period_unavailable} -- "
+                f"their recall window is not recorded, rests on a guess, or "
+                f"varies within the wave -- and they were dropped from the "
+                f"assembly; the countries' other waves were kept, converted "
+                f"(kept {n_kept} country(ies)).  See ll.recall() for each "
+                f"cell's record, or pass a country subset to silence this."
+            )
+            result.attrs['period_unavailable'] = {
+                c: list(w) for c, w in period_unavailable.items()}
+            return result
+
         def _mark_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
-            return _mark_units_unavailable(
-                _mark_labels_unavailable(result, n_kept), n_kept)
+            return _mark_period_unavailable(
+                _mark_units_unavailable(
+                    _mark_labels_unavailable(result, n_kept), n_kept),
+                n_kept)
 
         if not frames:
             return _mark_unavailable(pd.DataFrame(), 0)

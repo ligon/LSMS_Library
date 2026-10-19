@@ -5583,7 +5583,7 @@ class Country:
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
                        units=None, volume_as_mass=True, currency=None, numeraire=None,
-                       basis=None, valuation=None):
+                       basis=None, valuation=None, period=None):
                 # `labels` has two faces; see _split_labels_arg.  `j_labels` is
                 # the historical scalar (food's fine->coarse rename of the `j`
                 # level); `map_labels` is the {target: variant} selection
@@ -5633,6 +5633,16 @@ class Country:
                             "basis='purchased' drops the very rows valuation= "
                             "exists to value, so it would silently do nothing."
                         )
+                if period is not None:
+                    # GH #851 Phase II.  Refused EARLY, like basis=: the
+                    # derive path's broad except would otherwise swallow it.
+                    # food_prices gets its own sentence (a price is not a
+                    # flow); the message lives in recall.py so Feature's
+                    # up-front refusal says the same thing.
+                    from .recall import PERIOD_TABLES, period_days, period_refusal
+                    if name not in PERIOD_TABLES:
+                        raise TypeError(period_refusal(name))
+                    period_days(period)
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
                     raise TypeError(
@@ -5714,14 +5724,16 @@ class Country:
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
                         # pre-#828 legacy fall-through.
-                        if units is not None or map_labels or valuation is not None:
+                        if (units is not None or map_labels or valuation is not None
+                                or period is not None):
                             raise exc.for_country(self.name) from exc
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
                             "falling back to legacy aggregation", name, exc)
                         derived = None
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels or valuation is not None:
+                        if (units is not None or map_labels or valuation is not None
+                                or period is not None):
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
                             # fall-through path can't honour any of them, so
@@ -5744,6 +5756,16 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
+                        if period is not None:
+                            # GH #851 Phase II.  Outside the except for the
+                            # same reason as the relabel: a PeriodUnavailable-
+                            # Error (a ValueError) must reach the caller, never
+                            # fall through to the legacy path, which cannot
+                            # honour period=.  Linear and per-t, so applying it
+                            # BEFORE the relabel re-sum, market= and
+                            # numeraire= is exact.
+                            from .recall import to_period
+                            derived = to_period(derived, self.name, period, table=name)
                         # BELT-AND-BRACES, and the reason matters because a
                         # wrong one is exactly the failure CLAUDE.md corrects
                         # for _join_v_from_sample.  Measured 2026-09-09: the
@@ -5827,6 +5849,16 @@ class Country:
                     result = self._aggregate_wave_data(waves, name, currency=currency)
                 _assert_label_targets_present(result, map_labels,
                                               country=self.name, table=name)
+                if (period is not None and isinstance(result, pd.DataFrame)
+                        and not result.empty):
+                    # Only a food-derived table reaches here with period= set
+                    # (validated above), and only when the derivation from
+                    # food_acquired produced nothing.  The record describes
+                    # the country's food module whichever path built the
+                    # table, so the same strict conversion applies; an
+                    # unscaled legacy frame is never returned under period=.
+                    from .recall import to_period
+                    result = to_period(result, self.name, period, table=name)
                 # Apply relabeling to any table with a j index level
                 if (isinstance(result, pd.DataFrame) and not result.empty
                         and 'j' in (result.index.names or [])):
@@ -5930,6 +5962,25 @@ class Country:
                     "    factor map and from the explicit-metric label parser;\n"
                     "    their kg conversion (if any) then comes purely from\n"
                     "    data-driven price-ratio inference.  See GH #231.\n"
+                )
+            if name in {'food_expenditures', 'food_quantities'}:
+                doc_parts.append(
+                    "period : {'day', 'week', 'month', 'year'}, optional\n"
+                    "    Rescale each wave from the window its survey recorded\n"
+                    "    to this one (``month`` = 365.25/12 days, ``year`` =\n"
+                    "    365.25): value x period_days / total_exposure_days,\n"
+                    "    where exposure is ``recall_days * n_asks`` from\n"
+                    "    ``ll.recall()``.  Default ``None`` returns the recorded\n"
+                    "    window unchanged.  Raises ``PeriodUnavailableError``\n"
+                    "    (a ``ValueError``) naming every wave whose window is\n"
+                    "    not established -- not recorded, a weak rung, or\n"
+                    "    varying within the wave -- and the waves that do\n"
+                    "    convert (pass them as ``waves=``); ``Feature`` drops\n"
+                    "    only the unknown waves, with one warning and\n"
+                    "    ``attrs['period_unavailable']``.  The conversion is\n"
+                    "    recorded on ``attrs['period']``.  GH #851; see\n"
+                    "    ``docs/guide/recall.md``.  ``food_prices`` refuses it:\n"
+                    "    a price is not a flow.\n"
                 )
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
