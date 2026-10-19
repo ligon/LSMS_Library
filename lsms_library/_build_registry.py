@@ -131,6 +131,18 @@ _EXCLUDED_CALLABLES = frozenset({
     # test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint.
     "lsms_library.country.Country._read_l2_country_cache",
     "lsms_library.country.Country._report_rebuild",
+    # The WAVE-tier read gates (GH #1040), the same argument one tier down:
+    # the YAML-path L2-wave read and the script-path candidate check (both
+    # closure text inside the tagged Wave.grab_data until #1040), and the
+    # assume_cache_fresh serve (inside _aggregate_wave_data).  Each grades or
+    # selects a parquet an EARLIER build wrote; none determines a byte of
+    # what a build writes.  Which paths are candidates stays fingerprinted
+    # (Wave._script_parquet_candidates, called from grab_data).  Pinned by
+    # tests/test_build_transform_hash.py::
+    # test_editing_a_wave_read_gate_moves_no_hash.
+    "lsms_library.country.Wave._read_l2_wave_cache",
+    "lsms_library.country.Wave._fresh_script_parquet",
+    "lsms_library.country.Country._read_assumed_fresh_cache",
     # GH #675: the degraded-build record.  Filing a drop, grading a stamped
     # parquet at either read gate, probing whether a dropped source is readable
     # now, and the warning are all MECHANISM -- they decide whether to serve

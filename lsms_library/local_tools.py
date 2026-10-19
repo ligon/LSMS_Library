@@ -994,6 +994,19 @@ class DatLayoutError(ValueError):
     """
 
 
+class ParquetFormatError(ValueError):
+    """A ``.parquet``-suffixed file that is not a readable Parquet file (GH #1070).
+
+    Raised by ``get_dataframe`` rather than handing the file to the text
+    readers, as a ``.dta`` without a Stata header already is: ``read_csv``
+    turned a garbage cache parquet into an empty frame and a text one into
+    rows, which ``assume_cache_fresh`` then served as the table.  A
+    ``ValueError``, deliberately NOT a ``pyarrow`` ``ArrowInvalid``: whether a
+    cache gate rebuilds or raises on a corrupt parquet is GH #1071's decision,
+    so no ``except ArrowInvalid`` handler is silently widened to catch it.
+    """
+
+
 def _parse_dct(text: str) -> "tuple[list[str], list[tuple[int, int]]] | None":
     """Parse an LSMS ``.DCT`` ASCII data dictionary.
 
@@ -1499,6 +1512,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         head = _sniff_head(f)
         if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
             raise ValueError(f'{fn} has a .dta suffix but no Stata header')
+        # GH #1070: likewise a ``.parquet``.  Its CSV fallback served a
+        # garbage cache parquet as an empty frame, and a text one as rows.
+        if Path(fn).suffix.lower() == '.parquet' and not head.startswith(b'PAR1'):
+            raise ParquetFormatError(f'{fn} has a .parquet suffix but no Parquet header')
 
         # SAS Transport (XPORT) -- Peru 1990 ``.SSP`` (GH #699).  Before the
         # SPSS attempt: ``pd.read_spss`` on a path raises ``ReadstatError``
@@ -1544,6 +1561,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             return pd.read_parquet(f, engine='pyarrow')
         except (ArrowInvalid,) as exc:
+            if Path(fn).suffix.lower() == '.parquet':
+                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
             failure = exc
 
         # Stata -- only when the header says so (GH #712).  Handed a file
