@@ -61,7 +61,7 @@ from .currency import attach_currency, is_monetary_table
 # on the hot read path (_finalize_result), so it is hoisted.
 from .transformations import validate_acquisition_source
 from .build_transforms import build_context
-from .errors import LabelUnavailableError
+from .errors import LabelUnavailableError, UnitsUnavailableError
 from ._build_registry import build_transform, build_transforms_fingerprint, framework_imports_fingerprint
 from .null_read_audit import check_declared_columns
 from .null_index_audit import check_index_levels
@@ -91,7 +91,7 @@ from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
 from pyarrow.lib import ArrowInvalid
 from datetime import datetime
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Mapping
 from contextlib import contextmanager, redirect_stdout
 from contextvars import ContextVar
 
@@ -5480,6 +5480,22 @@ class Country:
                             derived = self._finalize_result(derived, scheme_entry, name,
                                                             currency=currency,
                                                             labels=map_labels)
+                    except UnitsUnavailableError as exc:
+                        # GH #828: the requested units= basis needs a column
+                        # this country's food_acquired does not carry.  Never
+                        # fall through to the legacy path (it cannot honour
+                        # units=); name the country so Feature can degrade.
+                        # Same strictness as the generic handler below: an
+                        # explicit units= / labels= dict / valuation= cannot
+                        # be honoured by the legacy path, so it re-raises.
+                        # Only a bare call (all three defaulted) keeps the
+                        # pre-#828 legacy fall-through.
+                        if units is not None or map_labels or valuation is not None:
+                            raise exc.for_country(self.name) from exc
+                        logger.info(
+                            "Deriving %s from food_acquired failed (%s); "
+                            "falling back to legacy aggregation", name, exc)
+                        derived = None
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if units is not None or map_labels or valuation is not None:
                             # Caller explicitly asked for canonical units= /
@@ -5651,7 +5667,21 @@ class Country:
                         "    ``'unitvalue'`` (Expenditure / Quantity, per native\n"
                         "    u; gives 1 = Kwacha-per-Kwacha for u='Value' rows),\n"
                         "    ``'kgprice'`` (reported Price × kg_factor),\n"
-                        "    ``'unitprice'`` (reported Price as-is).  See\n"
+                        "    ``'unitprice'`` (reported Price as-is).\n"
+                        "    ``food_acquired.Price`` is whatever the source\n"
+                        "    recorded; in some countries (Uganda, measured:\n"
+                        "    94-99.9% of rows per wave) it is the statistics\n"
+                        "    office's own Expenditure / Quantity, so\n"
+                        "    ``'unitprice'`` and ``'unitvalue'`` are NOT\n"
+                        "    independent sources (GH #845).  Raises\n"
+                        "    ``UnitsUnavailableError`` (a ``ValueError``\n"
+                        "    subclass) naming the country and the missing\n"
+                        "    column when ``food_acquired`` cannot serve the\n"
+                        "    mode -- no ``Price`` for the ``*price`` modes\n"
+                        "    (15 of 20 countries with a ``food_acquired``,\n"
+                        "    2026-10-17); ``Feature`` drops such countries\n"
+                        "    with one warning and\n"
+                        "    ``attrs['units_unavailable']`` (GH #828).  See\n"
                         "    :func:`lsms_library.transformations.food_prices_from_acquired`\n"
                         "    and ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.\n"
                     )
@@ -6668,6 +6698,26 @@ def _audit_label_pass_through(j_values, rdict: dict, *, country: str,
         raise LabelPassThroughError(msg)
     warnings.warn(msg, LabelPassThroughWarning, stacklevel=4)
     return report
+
+
+def merge_label_pass_through_reports(sources) -> dict:
+    """Union the per-country ``labels_unmatched`` reports for ``Feature()``.
+
+    The Country-level report (:func:`_audit_label_pass_through`) is FLAT --
+    one country, one dict -- so ``Feature`` keys it by country at capture
+    time and hands this function ``[{'labels_unmatched': {country: report}},
+    ...]`` (bare ``attrs`` mappings or frames carrying them).  The result is
+    ``{country: report}`` for every kept country that passed ``j`` values
+    through unrenamed; a country with nothing unmatched contributes nothing,
+    so an all-matched assembly carries no key at all (GH #787, item 3).
+    """
+    merged: dict = {}
+    for src in sources:
+        attrs = getattr(src, 'attrs', src) or {}
+        per_country = attrs.get('labels_unmatched')
+        if isinstance(per_country, Mapping):
+            merged.update(per_country)
+    return merged
 
 
 class GrainCollapseWarning(RuntimeWarning):
