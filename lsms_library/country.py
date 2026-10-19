@@ -947,6 +947,26 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
             and k not in required]
 
 
+def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
+    """A 0-row frame with a table's DECLARED shape (GH #1039).
+
+    The declared index levels (``str``, as a built index's are) as its index
+    and every declared column, required and ``optional: true``, as an object
+    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
+    a request whose waves all lack the table on the make backend's no-builder
+    route: 0 rows, as the default backend serves from a warm cache, shaped so
+    that ``Country._assert_built_required_columns`` reads it as a well-formed
+    empty table rather than as a build that lost its columns.
+    """
+    entry = scheme_entry if isinstance(scheme_entry, dict) else None
+    levels = _declared_index_levels(entry)
+    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
+               if c not in levels]
+    empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
+                          for c in levels + columns})
+    return empty.set_index(levels) if levels else empty
+
+
 class Wave:
     """A single survey wave within a country.
 
@@ -4811,7 +4831,7 @@ class Country:
             df_local = map_index(df_local)
             return df_local
 
-        def load_from_waves(waves, *, evict_country_cache=False):
+        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -4947,6 +4967,22 @@ class Country:
                 if len(non_empty_df) > 1:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
+
+            # GH #1039 (red team r1): the make backend came here because
+            # `_has_country_builder` found NO country-level rule or script, so
+            # the country fallback below has nothing to run.  It could only
+            # fail or -- make answering "nothing to be done" for an existing
+            # target it has no rule for -- hand back whatever
+            # `var/<t>.parquet` holds, unrestricted to the request: measured,
+            # Senegal `livestock(waves=['2021-22'])` served 9,404 rows of
+            # 2018-19.  So it is not asked.  A request for every wave that
+            # produced nothing is a failed build, as on the default backend;
+            # a strict subset whose waves lack the table is a correct EMPTY
+            # answer, the 0 rows the default backend serves from a warm cache.
+            if not country_builder:
+                if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+                    raise _rebuild_failure_error(self.name, method_name)
+                return _empty_declared_frame(scheme_entry)
 
             # GH #866: no wave produced rows, so the country-level
             # make/script fallback is about to run -- and `try_make` would
@@ -5344,10 +5380,13 @@ class Country:
                 # as the default backend builds it -- not handed to a country
                 # make target that cannot exist (and that, on a warm root,
                 # answered with whatever `var/<t>.parquet` was lying there).
+                # With `prefer_make_backend` this branch is reached only when
+                # the predicate found no builder, so `load_from_waves` is told
+                # not to fall back to one either.
                 elif has_data_scheme_entry and not (
                         prefer_make_backend
                         and self._has_country_builder(method_name)):
-                    df = load_from_waves(waves)
+                    df = load_from_waves(waves, country_builder=not prefer_make_backend)
                 else:
                     df = run_make_target(method_name)
                     if df is None:

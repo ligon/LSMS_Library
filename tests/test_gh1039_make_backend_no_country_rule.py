@@ -220,6 +220,106 @@ def test_no_country_rule_does_not_serve_a_warm_var_parquet(fakeland):
 
 
 # ---------------------------------------------------------------------------
+# No wave produced rows: the no-builder route never asks the country fallback
+# (red team r1, verdict 6.4)
+# ---------------------------------------------------------------------------
+
+BARREN = "2002"   # a second wave that does not carry the table
+
+_SCHEME_TWO_WAVES = _SCHEME.replace(f"Waves: ['{WAVE}']", f"Waves: ['{WAVE}', '{BARREN}']")
+
+
+@pytest.fixture
+def fakeland2(fakeland):
+    """Fakeland with a second wave, ``2002``, that lacks the table -- the
+    shape of Senegal ``livestock`` (2018-19 has it, 2021-22 does not)."""
+    (fakeland.country_dir / "_" / "data_scheme.yml").write_text(_SCHEME_TWO_WAVES)
+    (fakeland.country_dir / BARREN / "_").mkdir(parents=True)
+    return fakeland
+
+
+def _barren(c: C.Country) -> pd.DataFrame:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return c.build_me(waves=[BARREN])
+
+
+def _assert_empty_and_shaped(df: pd.DataFrame) -> None:
+    assert len(df) == 0, f"served {len(df)} rows for a wave that lacks the table: {_x(df)}"
+    assert "x" in df.columns
+    assert {"t", "i"} <= set(df.index.names)
+
+
+@needs_make
+@pytest.mark.parametrize("backend", ["make", "dvc"])
+def test_barren_subset_is_empty_on_both_backends(fakeland2, monkeypatch, backend):
+    """Senegal ``livestock(waves=['2021-22'])`` under the make backend served
+    the whole ``var/`` -- 9,404 rows of 2018-19 -- because the country
+    fallback asked make for a target it has no rule for.  The default backend
+    serves 0.  Both must serve 0; the make backend must not touch ``var/``.
+
+    (The default backend's 0 is reached a different way here: the planted
+    hashless parquet grades stale, the barren subset falls through to the
+    country fallback, and ``_restrict_to_waves`` filters what make hands
+    back -- CLAUDE.md's "accidentally correct" #866 case.  Only the make side
+    is this fix.)"""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build()
+    fakeland2.plant_var()
+    before = fakeland2.var.stat()
+    _assert_empty_and_shaped(_barren(c))
+    if backend == "make":
+        after = fakeland2.var.stat()
+        assert (before.st_mtime_ns, before.st_size) == (after.st_mtime_ns, after.st_size)
+
+
+def test_barren_subset_is_empty_without_a_makefile(fakeland2):
+    """The 5 barren cells in countries with no ``_/Makefile`` (Albania x4,
+    Tajikistan): before, ``Could not materialize ... no cached parquet was
+    found`` -- false when ``var/`` exists, and not what the default backend
+    serves (0 rows)."""
+    c = fakeland2.build(makefile=None)
+    fakeland2.plant_var()
+    _assert_empty_and_shaped(_barren(c))
+
+
+@needs_make
+def test_full_request_with_no_wave_rows_still_fails_loudly(fakeland2):
+    """A request for EVERY wave that produced nothing is a failed build, as on
+    the default backend -- not an empty frame, and not the planted
+    ``var/``."""
+    (fakeland2.country_dir / WAVE / "_" / f"{TABLE}.py").unlink()
+    c = fakeland2.build()
+    fakeland2.plant_var()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        with pytest.raises(RuntimeError, match=f"Could not materialize {COUNTRY}/{TABLE}"):
+            c.build_me()
+    assert fakeland2.var.exists(), "the make backend deleted var/"
+
+
+@needs_make
+def test_barren_subset_with_a_country_builder_keeps_the_legacy_fallback(fakeland2):
+    """Only the NO-builder route is cut off from the country fallback.  A
+    country script still answers a barren subset exactly as before (whether
+    it should is #1039-a's business)."""
+    c = fakeland2.build(country_script=_COUNTRY_SCRIPT)
+    assert _x(_barren(c)) == COUNTRY_X
+
+
+def test_empty_declared_frame_has_the_declared_shape():
+    entry = {"index": "(t, v, i)", "x": "float", "y": {"type": "str", "optional": True},
+             "materialize": "make"}
+    df = C._empty_declared_frame(entry)
+    assert len(df) == 0
+    assert list(df.index.names) == ["t", "v", "i"]
+    assert list(df.columns) == ["x", "y"]
+    assert all(str(df.index.get_level_values(n).dtype) == "str" for n in df.index.names)
+    assert list(C._empty_declared_frame({"x": "float"}).columns) == ["x"]
+    assert C._empty_declared_frame(None).empty
+
+
+# ---------------------------------------------------------------------------
 # A country builder that EXISTS keeps the legacy route
 # ---------------------------------------------------------------------------
 
