@@ -111,7 +111,7 @@ Index Info:
     # within-form OBSERVATIONS; `(t, v, j, u)` names none of the three, so
     # Mali, Niger and Tanzania each kept one row per key and dropped the rest
     # (served rows before -> after #840: Mali 23,646 -> 40,218; Niger
-    # 15,423 -> 46,177; Tanzania 15,831 -> 17,699), by row order or by a
+    # 15,423 -> 46,043; Tanzania 15,831 -> 17,699), by row order or by a
     # passage preference, silently.  Ruling (@ligon,
     # 2026-10-18): add the level, so no row is selected -- the #871 "core
     # selects nothing silently" principle applied to the wave scripts.
@@ -131,6 +131,10 @@ Index Info:
     #              slot (Niger CS07 records three; GhanaLSS three vendors), with
     #              a second source record for the same cell enumerated as slot
     #              + 3 -- GhanaLSS's precedent, which already carried `obs`.
+    #              A second record's slot that only REPEATS a served row is a
+    #              duplicate entry and is not served (Niger: 134 rows).  What
+    #              a disagreeing second record should be (obs 4-6, a `record`
+    #              level, a flag) is open (Niger CONTENTS.org).
     # Registering this shape is also what lets GhanaLSS -- the one country
     # that never dropped a row -- into `Feature('community_prices')`: under
     # the modal rule its `obs` level made it the excluded minority.
@@ -188,6 +192,11 @@ Index Info:
   #   obs      -- `1`, the form's slot for a single source record (GhanaLSS's
   #               own definition).  Integers, so the assembled level stays
   #               integer-typed alongside GhanaLSS's and Niger's native `obs`.
+  #               Mali's `obs = 1` is this sentinel standing on a RELEVE-3
+  #               reading: Mali reads only the third of its three relevés
+  #               (s04q09-s04q11; Mali CONTENTS.org).  When relevés 1-2 are
+  #               wired Mali gains a native `obs` and that reading becomes
+  #               `obs = 3` -- a served value that will move.
   missing_level_sentinels:
     crop_production:
       u: Unknown
