@@ -567,10 +567,42 @@ def _probe(tmp_path, country, *extra):
     r = subprocess.run([sys.executable, "-c", _PROBE, country, *extra], env=_env(tmp_path),
                        cwd=str(tmp_path), capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stderr[-3000:]
-    return json.loads(r.stdout.strip().splitlines()[-1])
+    out = json.loads(r.stdout.strip().splitlines()[-1])
+    out["_stderr"] = r.stderr
+    return out
 
 
-def _make_country(tmp_path, name, scheme, info=None, makefile=None, script=None):
+# The two L2-country write sites a cold build can take (r1 F1).  A real
+# checkout has a DVC repo at countries_root(), so `Repo()` opens and the build
+# takes the NO-STAGE write (`if not stage_infos:` in load_dataframe_with_dvc);
+# a tree without one (pip install, a bare LSMS_COUNTRIES_ROOT) raises
+# NotDvcRepoError and takes the DVC-FALLBACK write.  The fixtures used to take
+# only the latter, so dropping a stamp at the production write left every
+# synthetic test green.  The no-stage fixture carries the SHIPPED `.dvc/config`
+# (its remote stanza is required: `local_tools._build_dvcfs` adds credentials to
+# `ligonresearch_s3` whenever a `.dvc/config` exists, and DVC refuses a remote
+# without a url) plus `no_scm`, since the tmp tree is not in git.  No dvc.yaml,
+# so no stage resolves; every source is a local file, so nothing is fetched.
+WRITES = ("no-stage", "dvc-fallback")
+_SHIPPED_DVC_CONFIG = REPO / "lsms_library" / "countries" / ".dvc" / "config"
+_FALLBACK_MARK = "DVC unavailable for interview_date"
+
+
+def _assert_write(cold, write):
+    """The cold build took the write route the test names."""
+    assert (_FALLBACK_MARK in cold["_stderr"]) == (write == "dvc-fallback"), (
+        write, cold["_stderr"][-2000:])
+
+
+def _make_country(tmp_path, name, scheme, info=None, makefile=None, script=None,
+                  write="dvc-fallback"):
+    assert write in WRITES, write
+    if write == "no-stage":
+        shipped = _SHIPPED_DVC_CONFIG.read_text()
+        assert shipped.startswith("[core]\n"), "shipped .dvc/config changed shape"
+        dvc = tmp_path / "countries" / ".dvc"
+        dvc.mkdir(parents=True, exist_ok=True)
+        (dvc / "config").write_text(shipped.replace("[core]\n", "[core]\n    no_scm = true\n", 1))
     c = tmp_path / "countries" / name
     (c / "_").mkdir(parents=True)
     (c / "2020" / "_").mkdir(parents=True)
@@ -588,15 +620,18 @@ def _make_country(tmp_path, name, scheme, info=None, makefile=None, script=None)
     return c
 
 
+@pytest.mark.parametrize("write", WRITES)
 @pytest.mark.parametrize("route", ["yaml", "script"])
-def test_the_report_is_stamped_and_replayed_in_a_fresh_process(tmp_path, route):
+def test_the_report_is_stamped_and_replayed_in_a_fresh_process(tmp_path, route, write):
     name = f"Dateland{route.capitalize()}"
     if route == "yaml":
-        _make_country(tmp_path, name, _YAML_SCHEME, info=_YAML_INFO)
+        _make_country(tmp_path, name, _YAML_SCHEME, info=_YAML_INFO, write=write)
     else:
-        _make_country(tmp_path, name, _SCRIPT_SCHEME, makefile=_MAKEFILE, script=_SCRIPT)
+        _make_country(tmp_path, name, _SCRIPT_SCHEME, makefile=_MAKEFILE, script=_SCRIPT,
+                      write=write)
 
     cold = _probe(tmp_path, name)                    # process 1: builds
+    _assert_write(cold, write)
     assert cold["rows"] == 2 and cold["dtype"] == "datetime64[us]"
     assert cold["warned"], "the cold build must warn about the sentinel"
     (rep,) = [r for r in cold["reports"] if r["sentinel"]]
@@ -814,10 +849,11 @@ def _keys(path):
     return {k.decode() for k in (pq.read_schema(path).metadata or {}) if k.startswith(b"lsms_")}
 
 
-def test_date_and_drop_stamps_coexist_at_every_gate(tmp_path):
+@pytest.mark.parametrize("write", WRITES)
+def test_date_and_drop_stamps_coexist_at_every_gate(tmp_path, write):
     name = "DatelandDrops"
-    _make_country(tmp_path, name, _YAML_SCHEME, info=_YAML_INFO)
-    _probe(tmp_path, name)                                    # process 1: cold build
+    _make_country(tmp_path, name, _YAML_SCHEME, info=_YAML_INFO, write=write)
+    _assert_write(_probe(tmp_path, name), write)              # process 1: cold build
     data = tmp_path / "data" / name
     wave_pq = data / "2020" / "_" / "interview_date.parquet"
     var_pq = data / "var" / "interview_date.parquet"
