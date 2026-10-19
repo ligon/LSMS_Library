@@ -1,0 +1,310 @@
+rel	release	verdict	n_candidates	c1_cells	decoded_cells	decoded_labels	refuse	decoded_chars
+Albania/2002/Data/c_price_cl.dta	113	decode	2	1152	1152	2		’
+Albania/2002/Data/price_list_cl1.dta	113	decode	2	1152	1152	2		’
+Albania/2002/Data/weights.dta	113	refuse	2	336	0	0	{"symbol-between-letters": 2}	
+Albania/2003/Data/w1_hh_all.dta	113	refuse	4	456	0	0	{"symbol-between-letters": 4}	
+Albania/2003/Data/w1_hh_basic.dta	113	refuse	4	456	0	0	{"symbol-between-letters": 4}	
+Albania/2003/Data/w1_hh_farm.dta	113	refuse	4	456	0	0	{"symbol-between-letters": 4}	
+Albania/2003/Data/w2_ind_all.dta	113	refuse	1	2	0	0	{"symbol-between-letters": 1}	
+Albania/2004/Data/w3_hh_all.dta	113	refuse	2	73	0	0	{"symbol-between-letters": 2}	
+Albania/2004/Data/w3_hh_basic.dta	113	refuse	2	73	0	0	{"symbol-between-letters": 2}	
+Albania/2004/Data/w3_ind_allx.dta	113	refuse	2	11	0	0	{"symbol-between-letters": 2}	
+Albania/2004/Data/w3_roster_all.dta	113	refuse	2	4	0	0	{"symbol-between-letters": 2}	
+Albania/2005/Data/agric/agriculture_hhlevel.dta	113	refuse	2	60	0	0	{"symbol-between-letters": 2}	
+Albania/2005/Data/identification_cl.dta	113	refuse	6	424	0	0	{"symbol-between-letters": 4}	
+Albania/2005/Data/labourC_cl.dta	113	refuse	2	247	0	0	{"symbol-between-letters": 2}	
+Albania/2005/Data/migrationA_cl.dta	113	refuse	2	1694	0	0	{"symbol-between-letters": 2}	
+Albania/2005/Data/migrationC_cl.dta	113	refuse	2	180	0	0	{"symbol-between-letters": 2}	
+Benin/2018-19/Data/ehcvm_conso_ben2018.dta	115	decode	2	4157	4157	2		Œœ
+Benin/2018-19/Data/ehcvm_individu_ben2018.dta	115	decode	3	1099	1099	3		œ
+Benin/2018-19/Data/s01_me_ben2018.dta	115	decode	2	983	983	3		œ
+Benin/2018-19/Data/s04_me_ben2018.dta	115	decode	8	2724	2724	14		œ’…
+Benin/2018-19/Data/s11_me_ben2018.dta	115	decode	1	140	140	1		…
+Burkina_Faso/2014/Data/emc2014_p1_conso3mois_16032015.dta	113	decode	18	15789	15789	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p1_conso7jours_16032015.dta	113	decode	18	20928	20928	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p1_emploi_27022015.dta	113	decode	5	2681	2681	7		œ’
+Burkina_Faso/2014/Data/emc2014_p1_prix_27022015.dta	113	decode	10	1054	1054	20		Œœ…
+Burkina_Faso/2014/Data/emc2014_p2_conso3mois_16032015.dta	113	decode	18	13200	13200	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p2_conso7jours_16032015.dta	113	decode	18	21440	21440	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p2_conso7nonalimjours_17032015.dta	113	decode	18	0	0	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p2_emploi_27022015.dta	113	decode	38	51118	51118	76		–’…
+Burkina_Faso/2014/Data/emc2014_p2_prix_27022015.dta	113	decode	1	87	87	0		œ
+Burkina_Faso/2014/Data/emc2014_p3_conso3mois_16032015.dta	113	decode	18	21298	21298	32		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p3_conso7jours_16032015.dta	113	decode	18	43966	43966	36		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p3_conso7nonalimjours_16032015.dta	113	decode	18	0	0	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p3_prix_27022015.dta	113	decode	1	77	77	0		œ
+Burkina_Faso/2014/Data/emc2014_p4_conso3mois_10032015.dta	113	decode	18	19420	19420	32		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_conso3mois_16032015.dta	113	decode	18	19472	19472	32		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_conso7jours_10032015.dta	113	decode	18	41212	41212	36		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_conso7jours_16032015.dta	113	decode	18	41316	41316	36		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_conso7nonalimjours_10032015.dta	113	decode	18	0	0	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_conso7nonalimjours_16032015.dta	113	decode	18	0	0	18		Œœ’…
+Burkina_Faso/2014/Data/emc2014_p4_prix_27022015.dta	113	decode	1	80	80	0		œ
+Burkina_Faso/2018-19/Data/s07b_me_bfa2018.dta	118	gated-118	0	1394	0	0		
+Burkina_Faso/2018-19/Data/s09f_me_bfa2018.dta	115	decode	1	365	365	1		œ
+Burkina_Faso/2018-19/Data/s10_2_me_bfa2018.dta	115	decode	4	1307	1307	4		’…
+Burkina_Faso/2018-19/Data/s11_me_bfa2018.dta	115	decode	1	10	10	1		…
+Burkina_Faso/2018-19/Data/s13a_2_me_bfa2018.dta	115	decode	1	253	253	1		…
+Burkina_Faso/2018-19/Data/s13b_2_me_bfa2018.dta	115	decode	1	96	96	1		…
+Burkina_Faso/2018-19/Data/s16a_me_bfa2018.dta	115	decode	1	1	1	0		œ
+Burkina_Faso/2018-19/Data/s16c_me_bfa2018.dta	115	decode	1	2	2	0		œ
+Cambodia/2019-20/Data/hh_sec_11.dta	117	no-candidate	0	94	0	0		
+Cambodia/2019-20/Data/hh_sec_13a.dta	117	no-candidate	0	1194	0	0		
+Cambodia/2019-20/Data/hh_sec_14.dta	117	no-candidate	0	0	0	0		
+Cambodia/2019-20/Data/hh_sec_2.dta	117	no-candidate	0	1814	0	0		
+Cambodia/2019-20/Data/hh_sec_4.dta	117	no-candidate	0	4	0	0		
+Cambodia/2019-20/Data/hh_sec_5.dta	117	no-candidate	0	1512	0	0		
+Cambodia/2019-20/Data/hh_sec_6.dta	117	no-candidate	0	4536	0	0		
+Cambodia/2019-20/Data/hh_sec_7b.dta	117	no-candidate	0	86	0	0		
+CotedIvoire/2018-19/Data/Menage/ehcvm_individu_CIV2018.dta	115	decode	3	3230	3230	3		œ
+CotedIvoire/2018-19/Data/Menage/s07b_me_CIV2018.dta	118	gated-118	0	8341	0	0		
+Ethiopia/2013-14/Data/sect12_ph_w2.dta	113	no-candidate	0	1	0	0		
+Ethiopia/2013-14/Data/sect3_hh_w2.dta	113	decode	1	6	6	0		’
+Ethiopia/2015-16/Data/WQT Data without processed data.dta	115	no-candidate	0	392	0	0		
+Ethiopia/2018-19/Data/sect04_com_w4.dta	118	gated-118	0	1	0	0		
+Ethiopia/2018-19/Data/sect05_com_w4.dta	118	gated-118	0	5	0	0		
+Ethiopia/2018-19/Data/sect06_com_w4.dta	118	gated-118	0	13	0	0		
+Ethiopia/2018-19/Data/sect07_com_w4.dta	118	gated-118	0	11	0	0		
+Ethiopia/2018-19/Data/sect08_com_w4.dta	118	gated-118	0	3	0	0		
+Ethiopia/2018-19/Data/sect10_ph_w4.dta	118	gated-118	0	131	0	0		
+Ethiopia/2018-19/Data/sect11_ph_w4.dta	118	gated-118	0	97	0	0		
+Ethiopia/2018-19/Data/sect11b2_hh_w4.dta	118	gated-118	0	3	0	0		
+Ethiopia/2018-19/Data/sect12b1_hh_w4.dta	118	gated-118	0	4	0	0		
+Ethiopia/2018-19/Data/sect14_hh_w4.dta	118	gated-118	0	3	0	0		
+Ethiopia/2018-19/Data/sect2_pp_w4.dta	118	gated-118	0	11	0	0		
+Ethiopia/2018-19/Data/sect3_hh_w4.dta	118	gated-118	0	2027	0	0		
+Ethiopia/2018-19/Data/sect4_hh_w4.dta	118	gated-118	0	28	0	0		
+Ethiopia/2018-19/Data/sect4_pp_w4.dta	118	gated-118	0	330	0	0		
+Ethiopia/2018-19/Data/sect5_pp_w4.dta	118	gated-118	0	96	0	0		
+Ethiopia/2018-19/Data/sect5b2_hh_w4.dta	118	gated-118	0	20	0	0		
+Ethiopia/2018-19/Data/sect7_pp_w4.dta	118	gated-118	0	110	0	0		
+Ethiopia/2018-19/Data/sect8_3_ls_w4.dta	118	gated-118	0	24	0	0		
+Ethiopia/2018-19/Data/sect8_hh_w4.dta	118	gated-118	0	1932	0	0		
+Ethiopia/2018-19/Data/sect9_ph_w4.dta	118	gated-118	0	131	0	0		
+Ethiopia/2018-19/Data/sect9a_pp_w4.dta	118	gated-118	0	138	0	0		
+GhanaLSS/2012-13/Data/PARTA/SEC4hs.dta	113	decode	1	4	4	2		’
+GhanaLSS/2016-17/Data/g7price.dta	117	decode	3	340	340	0		’
+GhanaLSS/2016-17/Data/g7sec10a.dta	117	decode	1	1	1	0		‘
+GhanaLSS/2016-17/Data/g7sec10b.dta	117	decode	1	1	1	0		‘
+GhanaLSS/2016-17/Data/g7sec10c.dta	117	decode	1	9	9	0		‘
+GhanaLSS/2016-17/Data/g7sec10e.dta	117	decode	1	1	1	0		‘
+GhanaLSS/2016-17/Data/g7sec10e1.dta	117	decode	1	11	11	0		‘
+GhanaLSS/2016-17/Data/g7sec10f.dta	117	decode	1	20	20	0		‘
+GhanaLSS/2016-17/Data/g7sec10g.dta	117	decode	1	17	17	0		‘
+GhanaLSS/2016-17/Data/g7sec10h.dta	117	decode	1	1	1	0		‘
+GhanaLSS/2016-17/Data/g7sec1_5.dta	115	decode	1	1	1	0		—
+GhanaLSS/2016-17/Data/g7sec2.dta	117	decode	1	1	1	0		—
+GhanaLSS/2016-17/Data/g7sec6q10.dta	117	decode	1	1	1	0		‘
+GhanaLSS/2016-17/Data/g7sec9a.dta	117	decode	27	390140	390140	0		–’”
+GhanaLSS/2016-17/Data/g7sec9b.dta	117	decode	5	5	5	0		œ€
+GhanaLSS/2016-17/Data/g7sec9b_small.dta	114	decode	5	5	5	0		œ€
+GhanaSPS/2009-10/Data/S10AIII.dta	113	decode	2	14	14	4		’
+GhanaSPS/2009-10/Data/S6C.dta	113	decode	1	152	152	1		’
+GhanaSPS/2013-14/Data/01b2_preroster.dta	118	gated-118	1	13	0	0		
+GhanaSPS/2013-14/Data/01d_background.dta	118	gated-118	1	12	0	0		
+GhanaSPS/2013-14/Data/01fi_generaleducation.dta	118	gated-118	1	83	0	0		
+GhanaSPS/2013-14/Data/01gi_immigration.dta	118	gated-118	1	9	0	0		
+GhanaSPS/2013-14/Data/01gii_migrationhistory.dta	118	gated-118	1	41	0	0		
+GhanaSPS/2013-14/Data/02a_nr_relatives_questions.dta	118	gated-118	1	31	0	0		
+GhanaSPS/2013-14/Data/02b_nr_spouses_questions.dta	118	gated-118	1	1	0	0		
+GhanaSPS/2013-14/Data/03biii_outtransfersquestions.dta	118	gated-118	1	1	0	0		
+GhanaSPS/2013-14/Data/03biv_intransfersquestions.dta	118	gated-118	1	2	0	0		
+Guatemala/2000/Data/ECOM01.DTA	105	decode	10	58	58	21		–
+Guinea-Bissau/2018-19/Data/ehcvm_conso_gnb2018.dta	115	decode	2	2599	2599	2		Œœ
+Iraq/2012/Data/2012ihses05_education.dta	113	decode	2	12681	12681	3		’…
+Kazakhstan/1996/Data/KZ96CHD.dta	113	refuse	2	3	0	0	{"hole": 2}	
+Kazakhstan/1996/Data/KZ96EDU_PUF.dta	113	refuse	1	1	0	0	{"hole": 1}	
+Kazakhstan/1996/Data/KZ96HLT.dta	113	refuse	31	45	0	0	{"hole": 25}	
+Kazakhstan/1996/Data/KZ96OCC_PUF.dta	113	refuse	342	570	0	0	{"hole": 218}	
+Kyrgyz Republic/1996/Data/ANTHFL96.DTA	104	refuse	46	65	0	0	{"symbol-between-letters": 14}	
+Kyrgyz Republic/1996/Data/COMM96.DTA	104	refuse	122	160	0	0	{"hole": 122}	
+Kyrgyz Republic/1996/Data/SECT1A_B.DTA	104	refuse	2787	7910	0	0	{"hole": 1419}	
+Kyrgyz Republic/1996/Data/SECT1_C.DTA	104	refuse	108	115	0	0	{"hole": 41}	
+Kyrgyz Republic/1996/Data/SECT3A_C.DTA	104	refuse	2585	3944	0	0	{"hole": 1304}	
+Kyrgyz Republic/1996/Data/SECT4A_D.DTA	104	refuse	2585	3944	0	0	{"hole": 1304}	
+Kyrgyz Republic/1996/Data/SECT5A_K.DTA	104	refuse	2585	3944	0	0	{"hole": 1304}	
+Kyrgyz Republic/1996/Data/SECT_06.DTA	104	refuse	2585	3944	0	0	{"hole": 1304}	
+Kyrgyz Republic/1996/Data/SECT_07.DTA	104	refuse	835	1531	0	0	{"hole": 411}	
+Kyrgyz Republic/1996/Data/SECT_08.DTA	104	refuse	2585	3945	0	0	{"hole": 1304}	
+Kyrgyz Republic/1996/Data/SECT_10.DTA	104	refuse	84	100	0	0	{"hole": 59}	
+Kyrgyz Republic/1997/Data/ANTHFL97.DTA	105	refuse	3495	6790	0	0	{"hole": 1684}	
+Kyrgyz Republic/1997/Data/SECT00B.DTA	105	refuse	3663	7531	0	0	{"hole": 1710}	
+Kyrgyz Republic/1997/Data/SECT01AB.DTA	105	refuse	3539	6785	0	0	{"hole": 1714}	
+Kyrgyz Republic/1997/Data/SECT01C.DTA	105	refuse	202	1987	0	0	{"hole": 89}	
+Kyrgyz Republic/1997/Data/SECT08.DTA	105	refuse	1966	13692	0	0	{"hole": 971}	
+Kyrgyz Republic/1997/Data/SECT5D_I.DTA	105	refuse	3663	7531	0	0	{"hole": 1710}	
+Kyrgyz Republic/1998/Data/ANTHFL98.DTA	105	refuse	5129	11363	0	0	{"hole": 2393, "symbol-between-letters": 1}	
+Kyrgyz Republic/1998/Data/SECT_00.DTA	105	refuse	7150	11505	0	0	{"hole": 3199, "symbol-between-letters": 1}	
+Kyrgyz Republic/1998/Data/SECT_01A.DTA	105	refuse	5400	11380	0	0	{"hole": 2465, "symbol-between-letters": 1}	
+Kyrgyz Republic/1998/Data/SECT_01C.DTA	105	refuse	425	531	0	0	{"hole": 139}	
+Kyrgyz Republic/1998/Data/SECT_07.DTA	105	refuse	2133	28907	0	0	{"hole": 875, "symbol-between-letters": 1}	
+Kyrgyz Republic/1998/Data/SECT_08.DTA	105	refuse	2742	6027	0	0	{"hole": 1319}	
+Kyrgyz Republic/1998/Data/SECT_09A.DTA	105	refuse	1167	14427	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09C.DTA	105	refuse	1167	19236	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09D.DTA	105	refuse	1167	24045	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09E.DTA	105	refuse	1167	20839	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09F.DTA	105	refuse	1167	32060	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09G.DTA	105	refuse	1167	16030	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09H.DTA	105	refuse	1167	22442	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_09J.DTA	105	refuse	1167	17633	0	0	{"hole": 457}	
+Kyrgyz Republic/1998/Data/SECT_11A.DTA	105	refuse	1413	104438	0	0	{"hole": 565}	
+Kyrgyz Republic/1998/Data/SECT_11B.DTA	105	refuse	221	1142	0	0	{"hole": 100}	
+Kyrgyz Republic/1998/Data/SECT_12A.DTA	105	refuse	1410	28686	0	0	{"hole": 571}	
+Kyrgyz Republic/1998/Data/SECT_12B.DTA	105	refuse	1410	65568	0	0	{"hole": 571}	
+Kyrgyz Republic/1998/Data/SECT_12D.DTA	105	refuse	1410	55323	0	0	{"hole": 571}	
+Kyrgyz Republic/1998/Data/SECT_12E.DTA	105	refuse	1410	2049	0	0	{"hole": 571}	
+Kyrgyz Republic/1998/Data/SECT_12F.DTA	105	refuse	1410	26637	0	0	{"hole": 571}	
+Liberia/2018-19/Data/Community/comm_sect6a_public.dta	117	no-candidate	0	68	0	0		
+Malawi/2004-05/Data/sec_e.dta	113	decode	2	0	0	2		’
+Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_t1.dta	113	decode	1	8716	8716	1		…
+Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_t2.dta	113	decode	1	2662	2662	1		…
+Malawi/2010-11/Data/Full_Sample/Household/hh_mod_g1.dta	113	decode	2	24542	24542	2		–
+Malawi/2010-11/Data/Panel/Agriculture/ag_mod_t1.dta	113	decode	1	1854	1854	1		…
+Malawi/2010-11/Data/Panel/Agriculture/ag_mod_t2.dta	113	decode	1	2662	2662	1		…
+Malawi/2010-11/Data/Panel/Household/hh_mod_g1.dta	113	decode	2	6492	6492	2		–
+Malawi/2013-14/Data/AG_MOD_T1_13.dta	114	decode	1	6941	6941	1		…
+Malawi/2013-14/Data/HH_MOD_G1_13.dta	113	decode	2	8000	8000	2		–
+Malawi/2016-17/Data/Panel/ag_mod_g_16.dta	115	no-candidate	0	1	0	0		
+Malawi/2016-17/Data/Panel/ag_mod_m_16.dta	115	no-candidate	0	0	0	0		
+Malawi/2016-17/Data/Panel/com_cg_16.dta	115	no-candidate	0	1	0	0		
+Malawi/2016-17/Data/Panel/com_mod_cg_16.dta	115	no-candidate	0	1	0	0		
+Mali/2014-15/Data/EACIALI_p1.dta	113	decode	2	7608	7608	0		Œœ
+Mali/2014-15/Data/EACIALI_p2.dta	113	decode	2	7608	7608	0		Œœ
+Mali/2014-15/Data/EACIIND_p1.dta	113	decode	1	239	239	4		œ
+Mali/2014-15/Data/EACIIND_p2.dta	113	decode	1	162	162	1		œ
+Mali/2014-15/Data/EACIS01_p1.dta	113	no-candidate	0	30	0	0		
+Mali/2014-15/Data/EACIS03_p1.dta	113	no-candidate	0	80	0	0		
+Mali/2014-15/Data/EACIS04_p1.dta	113	decode	1	779	779	0		œ
+Mali/2014-15/Data/EACIS04_p2.dta	113	decode	1	2715	2715	0		œ
+Mali/2014-15/Data/EACIS4A_p2.dta	113	decode	1	2067	2067	0		œ
+Mali/2017-18/Data/eaci17_s05bp1.dta	118	gated-118	13	61	0	0		
+Mali/2017-18/Data/eaci17_s07c2p2.dta	118	gated-118	4	1143	0	0		
+Mali/2018-19/Data/s05_co_mli2018.dta	115	decode	1	1602	1602	1		œ
+Mali/2018-19/Data/s06_me_mli2018.dta	118	gated-118	1	1	0	0		
+Mali/2018-19/Data/s07b_me_mli2018.dta	115	decode	2	4409	4409	2		Œœ
+Mali/2018-19/Data/s09f_me_mli2018.dta	115	decode	1	586	586	1		œ
+Mali/2018-19/Data/s13a_2_me_mli2018.dta	115	decode	1	225	225	1		…
+Mali/2018-19/Data/s13b_2_me_mli2018.dta	115	decode	1	25	25	1		…
+Mali/2018-19/Data/s18_3_me_mli2018.dta	115	decode	9	2016	2016	9		’
+Mali/2018-19/Data/s18_4_me_mli2018.dta	115	decode	9	2016	2016	9		’
+Mali/2021-22/Data/calorie_conversion_wa_2021.dta	118	gated-118	1	1	0	0		
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvma6mo_p1.dta	113	decode	1	3968	3968	1		œ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaali_p1.dta	113	decode	3	15872	15872	2		Œœ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaali_p2.dta	113	decode	3	15872	15872	2		Œœ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas07_p2.dta	113	decode	14	63472	63472	9		’
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas08_p2.dta	113	decode	13	51571	51571	7		’
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas08_p2_en.dta	113	decode	6	23802	23802	0		’
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas4a_p2.dta	113	decode	2	15084	15084	4		œ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta	113	decode	8	4160	4160	5		œ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta	113	decode	9	6112	6112	5		œ
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2.dta	113	decode	41	11363	11363	81		œ–’…
+Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaind_p1p2_en.dta	113	decode	39	10836	10836	78		–’…
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/COMPRIXC07P2.dta	113	decode	3	880	880	0		œ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/COMPRIXC08P2.dta	113	decode	2	0	0	2		Œœ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS4AP2.dta	113	decode	1	28840	28840	14		œ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS04P1.dta	113	decode	7	7170	7170	29		œ–’…
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS12P1.dta	113	decode	2	7234	7234	2		Œœ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS12P2.dta	113	decode	2	6286	6286	2		Œœ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS15P1.dta	113	decode	6	292	292	30		–’…
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs03a.dta	113	decode	1	244	244	0		’
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta	113	decode	3	976	976	0		œ
+Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs08.dta	113	decode	2	8	8	2		Œœ
+Niger/2018-19/Data/ehcvm_individu_ner2018.dta	115	decode	3	473	473	3		œ
+Niger/2018-19/Data/s01_me_ner2018.dta	115	decode	2	461	461	3		œ
+Niger/2018-19/Data/s02_co_ner2018.dta	115	decode	1	442	442	1		’…
+Niger/2018-19/Data/s04_me_ner2018.dta	115	decode	12	1653	1653	25		œ’…
+Niger/2018-19/Data/s11_me_ner2018.dta	115	decode	1	9	9	1		…
+Nigeria/2018-19/Data/sect11l1_plantingw4.dta	115	no-candidate	0	191	0	0		
+Nigeria/2018-19/Data/sect11l2_plantingw4.dta	115	no-candidate	0	3785	0	0		
+Nigeria/2018-19/Data/sect2_harvestw4.dta	115	no-candidate	0	3755	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Agriculture/secta12_harvestw5.dta	117	no-candidate	0	151	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Agriculture/secta5b_harvestw5.dta	117	no-candidate	0	3383	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect12_harvestw5.dta	117	no-candidate	0	436	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect1_harvestw5.dta	117	no-candidate	0	1	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect2_harvestw5.dta	117	no-candidate	0	4184	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect4a_harvestw5.dta	117	no-candidate	0	77	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect8b_harvestw5.dta	117	no-candidate	0	11	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect8d_harvestw5.dta	117	no-candidate	0	1	0	0		
+Nigeria/2023-24/Data/Post Harvest Wave 5/Household/sect9_harvestw5.dta	117	no-candidate	0	280	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Agriculture/sect11a1_plantingw5.dta	117	no-candidate	0	1	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Agriculture/sect11f_plantingw5.dta	117	no-candidate	0	28	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Agriculture/sect11l1_plantingw5.dta	117	no-candidate	0	14	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Agriculture/sect11l2_plantingw5.dta	117	no-candidate	0	3659	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Community/sectc6_plantingw5.dta	117	no-candidate	0	1	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect1_plantingw5.dta	117	no-candidate	0	3	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect1a_plantingw5.dta	117	no-candidate	0	2	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect1b_plantingw5.dta	117	no-candidate	0	2	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect4a_plantingw5.dta	117	no-candidate	0	146	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect4b_plantingw5.dta	117	no-candidate	0	2	0	0		
+Nigeria/2023-24/Data/Post Planting Wave 5/Household/sect8_plantingw5.dta	117	no-candidate	0	1	0	0		
+Panama/1997/Data/COMUN1.DTA	104	refuse	20	24	0	0	{"symbol-between-letters": 17}	
+Panama/1997/Data/COMUN2.DTA	104	refuse	16	20	0	0	{"symbol-between-letters": 13}	
+Senegal/2018-19/Data/ehcvm_conso_sen2018.dta	115	decode	3	5074	5074	3		Œœ’
+Senegal/2018-19/Data/ehcvm_individu_sen2018.dta	115	decode	5	8905	8905	5		œ’
+Senegal/2018-19/Data/s00_me_sen2018.dta	115	decode	2	540	540	2		’
+Senegal/2018-19/Data/s01_me_sen2018.dta	115	decode	2	3569	3569	3		œ
+Senegal/2018-19/Data/s04_me_sen2018.dta	115	decode	10	4575	4575	18		œ’…
+Senegal/2018-19/Data/s05_co_sen2018.dta	115	decode	1	825	825	1		œ
+Senegal/2018-19/Data/s11_me_sen2018.dta	115	decode	1	82	82	1		…
+Serbia and Montenegro/2002/Data/2002 1 demography.dta	113	decode	6	9180	9180	6		Ššž
+Serbia and Montenegro/2002/Data/2002 4 health.dta	113	decode	1	65	65	1		š
+Serbia and Montenegro/2002/Data/2002 5 non-food consumption.dta	113	decode	5	1650	1650	5		Ššž
+Serbia and Montenegro/2002/Data/2002 incomeconsumption.dta	113	decode	1	1156	1156	1		Š
+Serbia and Montenegro/2003/Data/2003 1 demography.dta	113	decode	1	1831	1831	1		Š
+Serbia and Montenegro/2003/Data/2003 incomeconsumption.dta	113	decode	1	505	505	1		Š
+Serbia/2007/Data/data_for_imputting_rents.dta	113	decode	6	122	122	0		Ššž
+Serbia/2007/Data/domacinstva.dta	113	decode	29	1101	1101	0		ŠšŽž
+Serbia/2007/Data/enumeration_district.dta	113	decode	29	99	99	0		ŠšŽž
+Serbia/2007/Data/household.dta	113	decode	29	1101	1101	0		ŠšŽž
+Serbia/2007/Data/imputirana_renta.dta	113	decode	6	122	122	0		Ššž
+Serbia/2007/Data/individual.dta	113	decode	3	2554	2554	5		…
+Serbia/2007/Data/lica.dta	113	decode	2	2418	2418	4		…
+Serbia/2007/Data/m5_1_diary.dta	113	decode	1	2716	2716	0		…
+Serbia/2007/Data/m5_1_dnevnik.dta	113	decode	1	2716	2716	0		…
+Serbia/2007/Data/m5_2_ne_hrana.dta	113	decode	1	60	60	0		–
+Serbia/2007/Data/m5_2_nonfoodconsumption.dta	113	decode	1	60	60	0		–
+Serbia/2007/Data/popisni_krug.dta	113	decode	29	99	99	0		ŠšŽž
+Serbia/2007/Data/section3_ed.dta	113	decode	16	17	17	0		ŠšŽž
+Tajikistan/2007/Data/r1m12d.dta	113	decode	1	41	41	1		’
+Tajikistan/2007/Data/r1m13.dta	113	decode	1	4644	4644	1		…
+Tajikistan/2009/Data/m11.dta	113	no-candidate	0	1503	0	0		
+Tajikistan/2009/Data/m2b.dta	113	no-candidate	0	0	0	0		
+Tajikistan/2009/Data/m2c.dta	114	no-candidate	0	0	0	0		
+Tanzania/2008-15/Data/upd4_hh_b.dta	117	no-candidate	0	186	0	0		
+Tanzania/2019-20/Data/AG_SEC_4A.dta	115	no-candidate	0	1	0	0		
+Tanzania/2019-20/Data/HH_SEC_A.dta	115	no-candidate	0	9	0	0		
+Togo/2018/Data1/ehcvm_individu_tgo2018.dta	115	decode	3	743	743	3		œ
+Togo/2018/Data1/s00_me_tgo2018.dta	115	decode	1	35	35	1		’
+Togo/2018/Data1/s01_me_tgo2018.dta	115	decode	2	700	700	3		œ
+Togo/2018/Data1/s04_me_tgo2018.dta	115	decode	8	1380	1380	14		œ’…
+Togo/2018/Data1/s09f_me_tgo2018.dta	115	decode	1	272	272	1		œ
+Togo/2018/Data1/s11_me_tgo2018.dta	115	decode	1	25	25	1		…
+Togo/2018/Data1/s16c_me_tgo2018.dta	115	decode	1	2	2	1		…
+Uganda/2009-10/Data/GSEC15b.dta	115	decode	4	126	126	4		–
+Uganda/2009-10/Data/GSEC9A.dta	113	decode	1	75	75	1		’
+Uganda/2010-11/Data/GSEC12.dta	113	decode	2	292	292	2		’
+Uganda/2010-11/Data/GSEC16.dta	113	decode	1	617	617	1		…
+Uganda/2010-11/Data/GSEC4.dta	113	decode	1	0	0	1		’
+Uganda/2010-11/Data/GSEC6.dta	113	decode	2	251	251	7		’
+Uganda/2010-11/Data/GSEC8.dta	113	decode	1	501	501	2		’
+Uganda/2010-11/Data/GSEC9A.dta	113	decode	1	69	69	1		’
+Uganda/2011-12/Data/AGSEC5A.dta	115	decode	19	10378	10378	19		–
+Uganda/2011-12/Data/AGSEC5B.dta	115	decode	23	8986	8986	23		–
+Uganda/2011-12/Data/GSEC12.dta	115	decode	2	273	273	2		’
+Uganda/2011-12/Data/GSEC16.dta	115	decode	1	373	373	1		…
+Uganda/2011-12/Data/GSEC4.dta	114	decode	1	2	2	1		’
+Uganda/2011-12/Data/GSEC6A.dta	115	decode	2	208	208	7		’
+Uganda/2011-12/Data/GSEC8.dta	115	decode	1	549	549	2		’
+Uganda/2011-12/Data/GSEC9A.dta	114	decode	1	125	125	1		’
+Uganda/2013-14/Data/AGSEC5A.dta	113	decode	19	11966	11966	38		–
+Uganda/2013-14/Data/AGSEC5B.dta	113	decode	19	11655	11655	38		–
+Uganda/2013-14/Data/GSEC16.dta	113	decode	1	662	662	3		…
+Uganda/2013-14/Data/GSEC2.dta	113	decode	1	0	0	1		–
+Uganda/2013-14/Data/GSEC4.dta	113	decode	1	1	1	1		’
+Uganda/2013-14/Data/GSEC6_1.dta	113	decode	2	178	178	12		’
+Uganda/2013-14/Data/GSEC8_1.dta	113	decode	7	856	856	3		œ’…
+Uganda/2013-14/Data/GSEC9_1.dta	113	decode	1	53	53	1		’
+Uganda/2013-14/Data/gsec12.dta	113	decode	2	265	265	2		’
+Uganda/2015-16/Data/AGSEC2A.dta	113	no-candidate	0	6	0	0		
+Uganda/2015-16/Data/AGSEC5A.dta	113	decode	19	14518	14518	38		–
+Uganda/2015-16/Data/GSEC16.dta	115	decode	1	367	367	1		…

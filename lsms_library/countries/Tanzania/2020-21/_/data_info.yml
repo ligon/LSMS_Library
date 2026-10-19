@@ -106,7 +106,12 @@ interview_date:
     idxvars:
         i: y5_hhid
     myvars:
-        int_t: hh_a18
+        # GH #1045: hh_a18 is a Survey Solutions start stamp,
+        # 'YYYY-MM-DDTHH:MM:SS'; the time of day has always been served.
+        int_t:
+            datetime: hh_a18
+            format: '%Y-%m-%dT%H:%M:%S'
+            calendar: gregorian
 
 housing:
     file: hh_sec_i.dta
