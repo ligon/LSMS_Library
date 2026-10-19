@@ -1,0 +1,78 @@
+# Prior-Art Ledger — GH #1045 run 1: one build-time parser for every calendar quantity
+
+> Per-task ledger. Inherits `STANDING.md` (§0 baseline: `get_dataframe` /
+> `to_parquet` are the only IO, cache hashes are content-addressed, `attrs`
+> survive only when every input agrees). Charter: `.coder/charter-1045-date-parser.md`.
+> Inventory (phase 0): `.coder/ledger/1045-calendar-inventory.org`.
+
+**Search tier used:** ripgrep + git (floor). GitNexus MCP failed to connect
+this session; every blast radius below is an `rg` call-site sweep.
+
+## §1 Task, restated
+A declared calendar column (today: `interview_date.Int_t` / `Interview start` /
+`Interview end`, the only `datetime` declarations in `data_info.yml` and in any
+country `data_scheme.yml`) is built ad hoc per wave and then GUESSED into a
+datetime by the read-time cast in `_finalize_result` after the waves are
+concatenated. Run 1 adds one build-time parser (`parse_datetime`) with a
+declarative `data_info.yml` spec (`calendar:` required), a per-wave parse
+report that is stamped into the L2-wave and L2-country parquets and replayed on
+warm reads (own lever `LSMS_DATE_STRICT`), a registered derivation for padded
+partial dates, and migrates the Mali and Tanzania `interview_date` waves to it.
+The read-time cast becomes a pass-through for `datetime64` input.
+
+## §2 Existing machinery (this task's area)
+
+| symbol | path:line | what it does | tested? | reuse / extend / new |
+|---|---|---|---|---|
+| `_coerce_datetime_column` | `country.py:6231` | read-time cast: per-value `format='mixed'`; year-last d/m order settled per `t` from evidence, else `NaT` + warning | `tests/test_gh798_datetime.py` (PR #1025) | **extend**: pass-through for datetime64 (already), add OFF-by-default string warning |
+| `DatetimeCoercionWarning`, `DatetimeAmbiguityWarning` | `country.py:6165,6185` | warning family with `country/table/column/count/examples` (+`reason`,`wave`) | same | **reuse / move** to the parser module, re-exported from `country` so `country.DatetimeCoercionWarning` still resolves |
+| `_YEAR_LAST_DATE` | `country.py:6206` | regex for `d/m/Y` or `m/d/Y` | same | **reuse** the evidence rule (moved with the classes) |
+| `_to_datetime_mixed` | `country.py:6211` | `format='mixed'`, warns on mixed tz | same | reuse as the no-format string fallback idea; parser has its own per-value path |
+| `calendars.ethiopian_to_gregorian` / `parse_ethiopian_month` | `calendars.py` | Ethiopian (y,m,d) -> Gregorian `date`; month names -> 1..13 | `tests/test_calendars.py` | **reuse** for `calendar: ethiopian` |
+| `null_read_audit` lever/report/ledger | `null_read_audit.py:116-480` | `_read_strict()`, `NullReadError/Warning`, `_NULL_READ_LEDGER`, `null_read_reports()`, `_clear_*` | `tests/test_null_read_guard.py` | **reuse the pattern** (own lever `LSMS_DATE_STRICT`, own ledger) |
+| `_GRAIN_AUDIT_KEY`, `read_parquet_grain_audit`, `to_parquet(grain_audit=)` | `local_tools.py:2238,2384,2506` | stamp a report list in parquet schema metadata; footer-only read | grain tests | **extend**: sibling key `lsms_datetime_audit`, `to_parquet(datetime_audit=)` |
+| `_replay_grain_audit`, `_replay_wave_stamp`, `_wave_grain_audit`, `_GRAIN_LEDGER.pop` | `country.py:6977,7012,7035,4644` | replay a stamp on warm read; wave-stamp replay at all three wave read sites; per-wave filter for the wave write | grain tests (#868) | **extend** each with the datetime twin |
+| `_parallel_waves._ledgers/_delta/relay` | `_parallel_waves.py:399-560` | relay worker ledgers to the parent | `tests/test_parallel_waves.py` | **extend**: third ledger |
+| `build_transform(tables=)` / `build_transforms_fingerprint` | `_build_registry.py:62,425` | scoped fingerprint folding; root entry points folded per table; callees recursed by `_closure_parts` | `tests/test_build_transform_hash.py` | **reuse**; plus an `_EXCLUDED_CALLABLES` entry so the ALL-scoped `grab_data` does not pull the parser into every table (see §4) |
+| `derivations.py` loader, `MULTI_SEP`, `union_keys`, `summary_for_frame`, `lsms_library/derivations.yml` | `derivations.py:115,169,590` | registry, row key column `Derivation`, `'a+b'` multi-key | `tests/test_derivations.py` | **reuse**: framework entries (empty country slot) |
+| `df_data_grabber` / `Wave.column_mapping` | `local_tools.py:1589`, `country.py:1230` | YAML `myvars` -> columns; list-valued myvar + formatter = row-wise construction (`Mali/2014-15/_/mapping.py:112`) | integration | **extend** `column_mapping`/`grab_data` with a dict-valued `datetime:` spec |
+| `melt_visit_intervals` | `local_tools.py` | EHCVM visit start/end melt, stamps visit derivation key | EHCVM tests | untouched in run 1 (not a pilot country path) |
+
+## §3 Definitions & conventions in force
+- `interview_date` columns `Int_t`, `Interview start`, `Interview end`: `type: datetime`, `Derivation` optional — `lsms_library/data_info.yml:389-420`.
+- Declared-type map `'datetime'|'date'|'timestamp' -> 'to_datetime'` — `country.py:5843`.
+- Derivation key `country::table::name`, empty slot = all; two keys on a row joined `+` sorted — `derivations.py:142,169`; bases vocabulary incl. `modelling-choice` — `derivations.py:119`.
+- Strict-lever spelling `{1,true,yes}` — `null_read_audit.py:143`.
+- Rulings: `U_UNKNOWN` for missing unit (#1041) — not touched; float-stringified codes normalised at read (`format_id` class) — the parser normalises `'2014.0'`-style components numerically at the point of read.
+
+## §4 Invariants & assumptions (landmines)
+- **The fingerprint walks callees.** `Wave.grab_data` is `@build_transform()` (all tables) and `_closure_parts` recurses into every lsms_library callable it names. A parser called from `grab_data` would therefore be folded into EVERY table — defeating decision 1 — unless excluded from recursion. Root entry points are folded from `_BUILD_TRANSFORMS` directly (no `_is_build_callable` check), so `parse_datetime` in `_EXCLUDED_CALLABLES` **and** tagged `tables=['interview_date']` is folded for exactly that table. Scripts reach it through `framework_imports_fingerprint`, which also skips excluded callables — harmless, because a script-path `interview_date` gets the parser through its btf anyway.
+- **The wiring sites are hashed.** `Wave.grab_data`, `to_parquet`, `_aggregate_wave_data`, `_replay_wave_stamp`, `_replay_grain_audit`, `_wave_grain_audit` are all in every table's closure (`_EXCLUDED_CALLABLES` does not list them). Any edit there — including adding the datetime stamp/replay — moves every table's hash once. This is a ONE-TIME corpus invalidation for the wiring, distinct from the scoped cost of a later parser edit. Must be measured and stated, not paid (dispatcher ruling).
+- **A build-time report must outlive the cold build** (#323): the parquet a warm read serves was written by a process that may be gone; stamp at the L2-wave (YAML path, `grab_data`), at the L2-country write, and in the script subprocess (`to_parquet` in `make`), replay at every warm read site.
+- **Script subprocess has no framework context**: the precedent (`build_transforms.reduce_to_agreed` docstring) is that the script hands the ledger to `to_parquet`. Here `to_parquet` collects the process ledger itself, matched by table = parquet stem.
+- **`to_parquet` stringifies object columns** — a column of `datetime.date` objects becomes `large_string` (`local_tools.py:2575`). That, not the sources, is why Mali 2014-15/2017-18 and Tanzania 2008-15/2019-20 store strings. A `datetime64` column survives.
+- **Tanzania `2008-15/` is one folder, four rounds** via `round` -> `t`; the script dedups on `(r_hhid, round)` with an assert (`Tanzania/2008-15/_/interview_date.py`); reports must be per round `t`, not per folder.
+- **Mali EAC-I waves (2014-15/2017-18) have two passages**; `_normalize_dataframe_index` collapses `visit` (`Mali/_/data_scheme.yml:70-83`); parsing must happen before that and not change which row is selected (most-complete-row: a NaT vs a date changes completeness!).
+- `_finalize_result` is read-path and excluded (`_build_registry.py:127`): editing `_coerce_datetime_column` moves no hash.
+- pandas 3: `pd.NA` for missing ints (`Int64`), `datetime64[us]` resolution declared.
+
+## §5 Reuse decision
+
+| quantity | decision | reason |
+|---|---|---|
+| warning classes | reuse (move to `datetime_parse`, re-export) | one family; tests import from `country` |
+| year-last evidence rule | reuse logic | same contract as PR #1025, now applied per wave at build time |
+| Ethiopian conversion | reuse `calendars` | tested |
+| strict lever + ledger + accessor | new (own lever, copy of the `null_read_audit` pattern) | decision 5: own concern |
+| stamp key + reader | extend local_tools (sibling of grain audit) | same atomic-with-data argument |
+| replay | extend `_replay_wave_stamp` + country warm reads | one replay site per read site, like #868 |
+| padded partial dates | reuse derivations registry (framework entries) | decision 3 |
+| parser | **new** `lsms_library/datetime_parse.py`, re-exported from `local_tools` | nothing parses components/stata/SPSS/strings with sentinels + report today; a module of its own keeps the scoped tag and the exclusion in one place |
+
+## §6 Open questions for the human
+- Wiring cost is corpus-wide once (§4). Merge with the held corpus group (#1019/#1024/#1027/#675) or accept a second re-warm — @ligon at merge time (charter §5).
+- Fieldwork `window:` not declared for the pilot: no window source was read in this run (questionnaire/BID dates); the mechanism is tested on synthetic data.
+
+---
+### Phase 3 — verification
+(filled at task end; see the report)
