@@ -2491,7 +2491,10 @@ do is name where the two years differ.  PDF p.3: "In 1988-89 the household,
 community and price questionnaires were repeated"; p.4 flags Sections
 0B/0C ("only available for 1988-89") and 17A-C (cognitive tests, 1988-89
 only), and no Section 12 exception; p.8 describes 12A/12B as amounts.  D1
-agrees: 1988-89 has exactly 1987-88's value-only shape.
+agrees: 1988-89 has exactly 1987-88's value-only shape.  The same caveat
+applies to fact (1): reading those 78 pages re-checks *GLSS1's* form, so
+for the 1988-89 =food_security= row it reaches GLSS2 only through the
+BID's "repeated" and its list of year-specific sections.
 
 *NaN is interim, not terminal.*  The kg factor for =u='Value'= exists and
 equals =1/price=; it just varies over =(j, t, m)=, which a per-label
