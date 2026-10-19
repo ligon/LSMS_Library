@@ -53,6 +53,26 @@
 #       (EHCVM "autres parents du CM ou du conjoint", "of head or spouse",
 #       Peru "Otro pariente"): blood and marriage conflated, so affinity is
 #       unknown too; 45,993 people in 7 countries.
+#   AFFINITY-ONLY conflations              -> [G, D, null]
+#       (GH #698, ruled 2026-10-18 -- the same rule, carried to the labels
+#       whose Generation and Distance ARE determinate.)  Two label forms:
+#       "X of head or spouse" (Uganda "Son / daughter of head or spouse",
+#       Serbia and Montenegro "Child of the head / spouse", Serbia 2007
+#       "child of head of household/spouse, partner", CotedIvoire "Parent of
+#       head or spouse") -- a child of the spouse alone is the head's
+#       STEPchild, a parent of the spouse a parent-in-law; and "X or
+#       X-in-law" (Peru "Padre/Suegro", Guyana "Father/Mother/T-in-law/
+#       M-in-law", Serbia 2007 "brother/sister or brother/sister-in-law").
+#       Both served "consanguineal" -- the modal guess, written as a fact --
+#       until 2026-10-19: 13 keys, 43,782 people in 6 countries.  Guyana's
+#       "Bro/Sis/B-in-law/S-in-law/Other relative" also folds in "other
+#       relative", so it is [null, null, null] (459 people).
+#       NOT conflated, and kept: an in-law "of the head/spouse" (affinal
+#       either way), a person unrelated to head AND spouse, the spouse's
+#       parent alone ("Father/Mother Of The Wife Of Head").  An English
+#       gendered in-law pair ("Father/Mother-in-law") is a pair of in-laws,
+#       not a blood-or-in-law code.  tests/test_kinship_affinity_conflation.py
+#       guards both forms structurally.
 # Do not "repair" a null tuple by choosing a cell; the instrument did not.
 
 # --- Lineal consanguineal ---
@@ -154,8 +174,11 @@ Nephew/Niece:                [-1, 1, consanguineal]
 Other Relatives:             [null, null, consanguineal]
 Other (Specify):             [0, 0, unrelated]
 Other:                       [0, 0, unrelated]
-Parent Of Head Or Spouse:    [1, 0, consanguineal]
-Sister/Brother Of Head Or Spouse: [0, 1, consanguineal]
+# "X of head OR SPOUSE" (Uganda roster Section 2 Q4; CotedIvoire 1985-89 REL 6):
+# generation and distance determinate, blood vs marriage not -- [G, D, null]
+# (GH #698, ruled 2026-10-18; consanguineal until 2026-10-19).
+Parent Of Head Or Spouse:    [1, 0, null]
+Sister/Brother Of Head Or Spouse: [0, 1, null]
 Brother/Sister:              [0, 1, consanguineal]
 Son/Daughter-In-Law:         [-1, 0, affinal]
 Son-In-Law/Daughter-In-Law:  [-1, 0, affinal]   # Nigeria 2023-24 GHS-Panel s1q3
@@ -163,8 +186,8 @@ Father/Mother-In-Law:        [1, 0, affinal]
 Brother/Sister-In-Law:       [0, 1, affinal]
 Head Of Household:           [0, 0, consanguineal]
 Son/Daughter Of Head:        [-1, 0, consanguineal]
-Son / Daughter Of Head Or Spouse: [-1, 0, consanguineal]
-Sister / Brother Of Head Or Spouse: [0, 1, consanguineal]
+Son / Daughter Of Head Or Spouse: [-1, 0, null]
+Sister / Brother Of Head Or Spouse: [0, 1, null]
 Nephew / Niece:              [-1, 1, consanguineal]
 Non Relative:                [0, 0, unrelated]
 
@@ -428,12 +451,15 @@ Adopted/Stepchild:               [-1, 0, step]
 "Other Non-Relative Including Boarder": [0, 0, guest]
 
 # --- Guyana variants ---
+# Codes 7 and 8 of RLL (Guyana/1992/_/data_info.yml) are one survey code for a
+# blood relation AND its in-law: [1, 0, null] (GH #698).  Code 8 also folds in
+# "other relative", so generation and distance are unknown as well.
 Spouse Of Hoh:                           [0, 0, affinal]
 Married Child:                           [-1, 0, consanguineal]
 Spouse Of Married Child:                 [-1, 0, affinal]
 Unmarried Child:                         [-1, 0, consanguineal]
-"Father/Mother/T-In-Law/M-In-Law":       [1, 0, consanguineal]
-"Bro/Sis/B-In-Law/S-In-Law/Other Relative": [0, 1, consanguineal]
+"Father/Mother/T-In-Law/M-In-Law":       [1, 0, null]
+"Bro/Sis/B-In-Law/S-In-Law/Other Relative": [null, null, null]
 "Servant/Employee/Other Non-Relative":   [0, 0, servant]
 
 # --- Pakistan variants ---
@@ -490,9 +516,11 @@ Other Not Related:               [0, 0, unrelated]
 # Peru/_/categorical_mapping.org.  Keys are title-cased because
 # _expand_kinship tries `.str.title()` before the raw label.
 # 'Padre/Suegro' (code 6) CONFLATES parent and parent-in-law in a single
-# survey code; it is filed [1, 0, consanguineal], the same treatment given to
-# Guyana's 'Father/Mother/T-In-Law/M-In-Law' above.  The conflation is in the
-# instrument, not in this file.
+# survey code: one generation up, lineal, blood OR marriage.  It is filed
+# [1, 0, null] -- Affinity unknown, the same treatment given to Guyana's
+# 'Father/Mother/T-In-Law/M-In-Law' above (GH #698, ruled 2026-10-18; both
+# were [1, 0, consanguineal] until 2026-10-19, 279 Peruvian people).  The
+# conflation is in the instrument, not in this file.
 # 'Otro pariente' (code 7) title-cases to 'Otro Pariente', defined above (and
 # shared with Guatemala ENCOVI) as an explicit UNKNOWN [null, null, null] --
 # the manual's own definition of code 7 spans three generations, three
@@ -503,7 +531,7 @@ Other Not Related:               [0, 0, unrelated]
 "Hijo/A":                                [-1, 0, consanguineal]
 "Yerno/Nuera":                           [-1, 0, affinal]
 "Nieto/A":                               [-2, 0, consanguineal]
-"Padre/Suegro":                          [1, 0, consanguineal]
+"Padre/Suegro":                          [1, 0, null]
 "Trabajador Domestico":                  [0, 0, servant]
 "Pensionista":                           [0, 0, guest]
 "Persona No Pariente":                   [0, 0, unrelated]
@@ -583,23 +611,29 @@ Partner:                                 [0, 0, affinal]
 Spouse/Partner:                          [0, 0, affinal]
 "spouse -partner":                       [0, 0, affinal]
 
-# --- "of head of household" patterns (Tajikistan) ---
-"brother/sister or brother/sister-in-law of head of household": [0, 1, consanguineal]
-"child of head of household/spouse, partner":                   [-1, 0, consanguineal]
-"grandson/daughter of head of household/spouse, partner":       [-2, 0, consanguineal]
-"parent of head of household/spouse, partner":                  [1, 0, consanguineal]
+# --- "of head of household" patterns (Serbia 2007 LSMS, srodstvo) ---
+# Headed "(Tajikistan)" until 2026-10-19; the census of the warm corpus finds
+# every one of these labels in Serbia 2007 and none in Tajikistan.  The
+# "/spouse, partner" and "or ... -in-law" codes conflate Affinity only:
+# [G, D, null] (GH #698).
+"brother/sister or brother/sister-in-law of head of household": [0, 1, null]
+"child of head of household/spouse, partner":                   [-1, 0, null]
+"grandson/daughter of head of household/spouse, partner":       [-2, 0, null]
+"parent of head of household/spouse, partner":                  [1, 0, null]
 "spouse, partner":                                              [0, 0, affinal]
 "other relation":                                               [null, null, consanguineal]
 unrelated:                                                      [0, 0, unrelated]
 
 # --- Serbia and Montenegro (2003 long-phrase labels) ---
 # Title-case form (after .title()) is the primary lookup; raw form added as fallback.
+# "... of the head / spouse" conflates Affinity only: [G, D, null] (GH #698);
+# "Son/daug. in law of the head/spouse" is affinal either way and keeps it.
 "Head Of The Household":                 [0, 0, consanguineal]
-"Child Of The Head / Spouse":            [-1, 0, consanguineal]
-"Grandchild Of The Head / Spouse":       [-2, 0, consanguineal]
+"Child Of The Head / Spouse":            [-1, 0, null]
+"Grandchild Of The Head / Spouse":       [-2, 0, null]
 "Husband/Wife, Spouse":                  [0, 0, affinal]
 "Son/Daug. In Law Of The Head/Spouse":   [-1, 0, affinal]
-"Parents Of The Head / Spouse":          [1, 0, consanguineal]
+"Parents Of The Head / Spouse":          [1, 0, null]
 
 # --- Ethiopian Rural Household Survey (ERHS) q11_1b labels (GH #271) ---
 # Additive: Head, Grandchild, Grandparent, Niece/Nephew, Uncle/Aunt,
@@ -631,10 +665,15 @@ unrelated:                                                      [0, 0, unrelated
 #                        W3 'Adopted, foster/stepchild'
 #   parent-in-law        W2 'Parent or parent-in-law'      (W1/W3 use 'Parent/Parent-in-Law')
 #   child-in-law         W2 'Son or daughter in-law'       (W1/W3 use 'Son/Daughter-in-law')
-# Tuples follow the existing composite precedents in this file:
-#   "Adopted / Foster/ Step Child" -> [-1, 0, step]
-#   "Parent/Parent-In-Law"         -> [1, 0, consanguineal]
-#   "Son/Daughter-in-law"          -> [-1, 0, affinal]
+# None of those spellings reaches this file: GhanaSPS/_/categorical_mapping.org
+# (and GhanaLSS's, for GLSS5-7's 'Parent/Parentlaw') relabels them onto the
+# shared Ghana vocabulary first, so kinship sees 'Parent', 'Child-in-law' and
+# the one key below.  NOTE (GH #698, 2026-10-19): the parent-OR-parent-in-law
+# code is therefore served 'Parent' -> [1, 0, consanguineal], although under
+# the AFFINITY-ONLY rule in the header it is a blood-or-in-law code and should
+# be [1, 0, null].  Fixing it means a new Ghana Preferred Label (a vocabulary
+# decision, and a build-input edit for both Ghana countries), not a key here;
+# it was left for its own issue rather than done silently.
 "Adopted/Foster/Stepchild":      [-1, 0, null]   # Ghana shared label: adoptive/foster/step undetermined (GH #797, 2026-09-07)
 
 # --- GhanaAHIES (GSS AHIES 2022-2024, s1aq2x value labels; 2026-09-17) ---
