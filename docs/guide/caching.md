@@ -33,7 +33,7 @@ The library maintains three independent caches, all rooted under
 
 | Tier | Path | Content | Populated by | Read by |
 |---|---|---|---|---|
-| **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc` (hash-gated since v0.8.0) |
+| **L2-country (parquet)** | `~/.local/share/lsms_library/{Country}/var/{table}.parquet` | Per-country, per-table harmonized output (waves concatenated, ready for analysis) | `Country.{table}()` after building from waves | The v0.7.0 top-of-function cache read in `load_dataframe_with_dvc`, delegated since GH #908 to the read gate `Country._read_l2_country_cache` (hash-gated since v0.8.0) |
 | **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls; `run_make_target` for script-path tables |
 | **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` downloads the blob **directly from S3** (sidecar md5 + the active DVC remote's fsspec backend) on first read, bypassing the DVC CLI / `Repo.fetch` (v0.7.3) | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
 
@@ -44,7 +44,8 @@ environment variable moves them together. On a shared cluster, set
 ### How they interact
 
 The fast path on warm reads is L2-country alone: the v0.7.0 top-of-function
-read in `load_dataframe_with_dvc` returns the per-country aggregated
+read in `load_dataframe_with_dvc` (the read gate `Country._read_l2_country_cache`,
+since GH #908) returns the per-country aggregated
 parquet without ever touching the lower tiers. All-warm calls finish
 in ~0.5 s regardless of how many raw files the country has.
 
@@ -85,8 +86,10 @@ rebuilds (Uganda `cluster_features`: 408 s → 0.02 s per wave).
 ## Cross-Session Behavior
 
 As of v0.7.0, the library reads `{data_root}/{Country}/var/{table}.parquet`
-at the top of `load_dataframe_with_dvc` when the file exists **and its
-embedded content hash is fresh (or absent)** — the v0.8.0 staleness check
+at the top of `load_dataframe_with_dvc` -- via the read gate
+`Country._read_l2_country_cache` since GH #908 -- when the file exists **and its
+embedded content hash is fresh (or unverifiable; a hashless country parquet is
+graded stale since GH #809)** — the v0.8.0 staleness check
 described next; before v0.8.0 this read was unconditional. Every country
 benefits from this; there is no longer a special-case for the seven
 DVC-stage countries.

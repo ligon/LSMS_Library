@@ -422,9 +422,10 @@ and both work -- but *the single space after the colon is mandatory*, and
 nothing may follow the table name on that line.  A miss raises =KeyError=
 (GH #461) rather than silently returning the file's *first* table, which is
 the behaviour that once labelled every crop with a unit.  Note also that a
-bare =get_categorical_mapping(tablename=...)= with no value column returns
-an *empty dict* and every lookup then silently yields =pd.NA=; prefer
-=code_label_map= (GH #372 / #377 / #348).
+bare =get_categorical_mapping(tablename=...)= with no value column used to
+return an *empty dict*, so every lookup silently yielded =pd.NA= (GH #372 /
+#377 / #348); since GH #674 it raises =TypeError= instead.  Prefer
+=code_label_map=.
 
 ** Cross-EHCVM: this lifts to all eight countries, and none of them is wired
 
