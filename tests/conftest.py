@@ -65,12 +65,14 @@ def aws_creds_available() -> bool:
       2. the library's own reader-credentials file,
          ``lsms_library.config.s3_creds_path()`` (``$LSMS_S3_CREDS`` ->
          ``<config dir>/s3_creds``) -- the file ``DVCFileSystem`` is
-         actually handed, so a user-config-only setup runs these tests;
-      3. LEGACY: the in-tree ``lsms_library/countries/.dvc/s3_creds``.  The
-         library no longer writes it (it used to mirror (2) there at import
-         time, GH #1001), but CI's ``data-tests`` and reachability jobs
-         still create it by hand before anything imports the package, and
-         an older clone may still hold one.
+         actually handed, so a user-config-only setup runs these tests.
+
+    The in-tree ``lsms_library/countries/.dvc/s3_creds`` is NOT consulted
+    (GH #1031).  ``DVCFileSystem`` never reads it (``local_tools._build_dvcfs``
+    overrides ``credentialpath``), so a file there opened this gate on
+    credentials the reader never sees; CI now writes (2), as a user has it.
+    ``data_access._check_remote_access`` still accepts it as a legacy
+    fallback (GH #1064).
 
     ``s3_creds_path`` is loaded from ``lsms_library/config.py`` BY FILE, not
     imported: ``import lsms_library.config`` runs the package ``__init__``
@@ -79,29 +81,20 @@ def aws_creds_available() -> bool:
     the real resolver rather than a copy of it.
 
     Under ``LSMS_SKIP_AUTH=1`` on a fresh runner (the CI ``unit-tests``
-    job) none of the three exists, so this still reflects CI's real state.
+    job) neither exists, so this still reflects CI's real state.
     Note that on a developer machine the auto-unlock writes (2) on the first
     ordinary import, so a checkout looks credential-free only until then.
     """
     if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
     config = _lsms_config()
-    user_creds = config.s3_creds_path() if config is not None else None
-    for creds_file in (user_creds, _LEGACY_INTREE_CREDS):
-        if creds_file is None:
-            continue
-        try:
-            if creds_file.exists() and "aws_access_key_id" in creds_file.read_text():
-                return True
-        except OSError:
-            continue
-    return False
-
-
-#: The in-tree file only CI (and older clones) still create; see above.
-_LEGACY_INTREE_CREDS = (
-    Path(__file__).parent.parent / "lsms_library" / "countries" / ".dvc" / "s3_creds"
-)
+    if config is None:
+        return False
+    creds_file = config.s3_creds_path()
+    try:
+        return creds_file.exists() and "aws_access_key_id" in creds_file.read_text()
+    except OSError:
+        return False
 
 
 def _lsms_config():

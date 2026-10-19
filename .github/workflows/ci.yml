@@ -269,16 +269,30 @@ jobs:
           python-version: '3.11'
       - name: Install boto3 + pyyaml (the script needs nothing else)
         run: pip install boto3 pyyaml
-      - name: Configure DVC credentials
+      # GH #1031: the reader credentials go to the USER-CONFIG path
+      # (`config.s3_creds_path()`), as in the Windows job -- never into the
+      # countries tree, which the script no longer reads.  `config.py` is
+      # loaded BY FILE because this job installs only boto3 + pyyaml, and
+      # importing the package would pull in dvc and pandas.  The script
+      # resolves the path with the same loader and the same interpreter.
+      - name: Configure S3 read credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
         run: |
-          cat > lsms_library/countries/.dvc/s3_creds <<EOF
-          [default]
-          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+          python - <<'EOF'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("cfg", "lsms_library/config.py")
+          cfg = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(cfg)
+          f, e = cfg.s3_creds_path(), os.environ
+          f.parent.mkdir(parents=True, exist_ok=True)
+          f.write_text("[default]\naws_access_key_id = " + e["AWS_ACCESS_KEY_ID"]
+                       + "\naws_secret_access_key = " + e["AWS_SECRET_ACCESS_KEY"] + "\n")
+          f.chmod(0o600)
+          print("wrote", f)
           EOF
+          test ! -e lsms_library/countries/.dvc/s3_creds
       - name: Sweep the remote
         run: python scripts/dvc_remote_reachability.py --out dvc_remote_missing.tsv
       - name: Upload the missing-blob report
@@ -408,7 +422,7 @@ jobs:
     #  - a push to a release branch, as before;
     #  - a manual `workflow_dispatch` on any ref (GH #941).
     # Before #932 only the last two applied, so every PR and every
-    # `development` push skipped ~240 `requires_s3` tests and reported green.
+    # `development` push skipped ~4,250 `requires_s3` tests and reported green.
     if: >-
       github.event_name == 'workflow_dispatch'
       || github.event_name == 'merge_group'
@@ -429,16 +443,38 @@ jobs:
         run: pip install poetry
       - name: Install dependencies
         run: poetry install --no-root
-      - name: Configure DVC credentials
+      # GH #1031: the USER-CONFIG path (`config.s3_creds_path()`), as in the
+      # Windows job, so this run exercises what a user has: no
+      # `countries/.dvc/s3_creds`.  Resolved under `poetry run`, i.e. by the
+      # interpreter (and platformdirs) the library and the `requires_s3` gate
+      # in tests/conftest.py use.  `config.py` is loaded BY FILE so writing
+      # the file does not run the package's import-time auth flow.
+      - name: Configure S3 read credentials
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
         run: |
-          cat > lsms_library/countries/.dvc/s3_creds <<EOF
-          [default]
-          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+          poetry run python - <<'EOF'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("cfg", "lsms_library/config.py")
+          cfg = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(cfg)
+          f, e = cfg.s3_creds_path(), os.environ
+          f.parent.mkdir(parents=True, exist_ok=True)
+          f.write_text("[default]\naws_access_key_id = " + e["AWS_ACCESS_KEY_ID"]
+                       + "\naws_secret_access_key = " + e["AWS_SECRET_ACCESS_KEY"] + "\n")
+          f.chmod(0o600)
+          print("wrote", f)
           EOF
+          test ! -e lsms_library/countries/.dvc/s3_creds
+      # Fail loudly rather than let ~4,250 `requires_s3` tests skip and report
+      # green, which is what a credential the gate cannot see would do.
+      - name: Assert the requires_s3 gate is open
+        run: >-
+          poetry run python -c "import importlib.util as u;
+          s = u.spec_from_file_location('c', 'tests/conftest.py'); m = u.module_from_spec(s);
+          s.loader.exec_module(m);
+          assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
       - name: Build Uganda tables
         run: |
           cd lsms_library/countries/Uganda/_
