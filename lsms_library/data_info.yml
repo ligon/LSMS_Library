@@ -106,6 +106,35 @@ Index Info:
     # was Uganda's spelling and is now an ALIAS.  See
     # `.coder/ledger/crop-production-plot-id.md`.
     crop_production: (t, v, i, plot_id, j, u, condition, season)
+    # GH #840.  ONE ROW PER SURVEY-RECORDED PRICE.  A community price form
+    # prices a (product, VARIETY) pair, in a field VISIT, as one of several
+    # within-form OBSERVATIONS; `(t, v, j, u)` names none of the three, so
+    # Mali, Niger and Tanzania each kept one row per key and dropped the rest
+    # (Mali 40,218 priced rows -> 23,646 served; Niger 2011-12 32,352 ->
+    # 8,923 and 2014-15 13,808 -> 6,500; Tanzania 17,699 -> 15,831), by row
+    # order or by a passage preference, silently.  Ruling (@ligon,
+    # 2026-10-18): add the level, so no row is selected -- the #871 "core
+    # selects nothing silently" principle applied to the wave scripts.
+    #   variety -- the instrument's own priced line, finer than `j`: Mali
+    #              s04q02, Niger cs07q02 (the sale-form variety, which often
+    #              carries the unit basis: "mais blanc vendu en sac de
+    #              100 kg" vs "... a la tia"), Tanzania's community-price
+    #              item code (which `j` deliberately lumps: MILLET + SORGHUM
+    #              -> "Millet & Sorghum (grain)").  The SOURCE CODE, as a
+    #              string -- stable across waves and passages where the value
+    #              labels are not (case, quoting, truncation); the label rides
+    #              in the `Description` column.
+    #   visit   -- the field passage the price was recorded in (the Single
+    #              Index `visit`: Mali 2014-15 and Niger 2011-12 price in
+    #              both the post-planting (1) and post-harvest (2) passage).
+    #   obs     -- the observation within (variety, visit): the form's reading
+    #              slot (Niger CS07 records three; GhanaLSS three vendors), with
+    #              a second source record for the same cell enumerated as slot
+    #              + 3 -- GhanaLSS's precedent, which already carried `obs`.
+    # Registering this shape is also what lets GhanaLSS -- the one country
+    # that never dropped a row -- into `Feature('community_prices')`: under
+    # the modal rule its `obs` level made it the excluded minority.
+    community_prices: (t, v, j, u, variety, visit, obs)
 
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
@@ -147,11 +176,27 @@ Index Info:
   #   condition-- `unknown_condition` is the value `Columns: crop_production:
   #               condition` already defines ("a real value, never NA").
   #   season   -- `unknown_season`, new here, same argument.
+  #
+  # community_prices (GH #840):
+  #   variety  -- `unknown_variety`, the condition/season spelling: the
+  #               country's form names no variety finer than `j`.
+  #   visit    -- `1`.  Not a placeholder: "a single-recall wave is visit = 1"
+  #               (the Single Index note above).  GhanaLSS is the one
+  #               caveat -- its repeat visits are already folded into
+  #               `obs > 3`, so its fabricated `visit = 1` means "one visit
+  #               axis, folded", not "visited once".
+  #   obs      -- `1`, the form's slot for a single source record (GhanaLSS's
+  #               own definition).  Integers, so the assembled level stays
+  #               integer-typed alongside GhanaLSS's and Niger's native `obs`.
   missing_level_sentinels:
     crop_production:
       u: Unknown
       condition: unknown_condition
       season: unknown_season
+    community_prices:
+      variety: unknown_variety
+      visit: 1
+      obs: 1
 
   # Features whose reduced-index countries get their MISSING canonical levels
   # FABRICATED as NaN (so all countries share the full canonical shape and are
