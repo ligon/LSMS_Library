@@ -5021,3 +5021,17 @@ under the 1998-99 wave reducer are a separate upstream loss, not the
 cohort counted here.  Choosing a source-supported unit/cluster treatment
 or changing assembly's null-key policy requires its own reviewed fix ([[https://github.com/ligon/LSMS_Library/issues/1008][GH #1008]]);
 this note changes neither identifiers nor measures.
+
+* =food_acquired.u = 'None'= -- meaning UNVERIFIED, served inferred kilograms (GH #962, 2026-10-17)
+
+=_/unit_labels.org= maps the raw labels =None= / =none= to the Preferred
+Label =None=.  Measured on a fresh corpus: *2,508 rows, all =s = produced=*
+(1998-99: 88, 2005-06: 1,450, 2012-13: 970), 2,475 priced, and every one is
+served an inferred kg factor (=item_unit= 1,745, =unit= 653,
+=item_unit_tight= 110): 3.90e4 kg of the country's 1.108e7 (0.35%).  If
+"None" is the respondent's "no unit" it is a missing-unit spelling that
+=transformations._U_SENTINELS= does not know (cf. Nigeria's library-minted
+='None'=); if it is a real answer ("none -- loose/unmeasured") it is a unit.
+*Not established* -- the questionnaires were not checked -- so it is recorded
+as unverified and left untouched.  Separately, 13,380 rows carry a NaN =u=
+(already a sentinel: served =none=).

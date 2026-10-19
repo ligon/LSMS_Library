@@ -2594,3 +2594,16 @@ IHS2 (2004-05) ships *no* unit-conversion table at all, so its =cfactor= is
 whatever the unit label itself says and nothing more; IHS3+ take =cfactor=
 *solely* from the region-keyed conversion table.  The two waves' =cfactor=
 columns mean different things and are produced by different code.
+
+* =food_acquired.u = 'N/A'= -- meaning UNVERIFIED, served inferred kilograms (GH #962, 2026-10-17)
+
+No file in Malawi's config emits ='N/A'=, so it arrives as a raw =.dta=
+value label.  Measured on a fresh corpus: *43 rows* (2016-17: 24, 2019-20:
+19), 40 priced; =KgFactorSource= =survey_kg= 14, =item_unit= 15, =unit= 14
+-- 696 kg of 2.583e6 (0.03%).  If it means "no unit" it is a missing-unit
+spelling outside =transformations._U_SENTINELS= and its 29 inferred factors
+are fabricated; the source label set was not checked, so it is recorded as
+unverified.  (441 rows with a NaN =u= are already sentinel-handled.)  Note
+also that =tests/test_u_code_leak.py='s ledger says "Malawi 217 -> 19 (19
+residual ACCEPTED)", but the served =u= axis now holds *no* numeric-string
+codes at all (638 distinct labels, measured 2026-10-17).
