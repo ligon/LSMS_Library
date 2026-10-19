@@ -951,8 +951,14 @@ pre-fix config).
   the =Country= level.  Same for the derived tables: =food_expenditures= /
   =food_quantities= sum over =visit=, =food_prices= takes the median.
 - *=food_expenditures= at =t='2014'= is a 28-day figure* while every other
-  Burkina Faso wave is 7-day.  Nothing in the API says so yet; that is what
-  GH #851 is about.
+  Burkina Faso wave is 7-day -- *but =food_quantities= at =t='2014'= is a
+  7-day figure*, because only passage 1 fields the quantity grid (above).
+  Since GH #851 the API says so: =_/recall.yml= records =n_asks: 4= with
+  =n_asks_by_column: {Quantity: 1}=, and =period='week'= multiplies 2014
+  spending by 7/28 and 2014 quantities by 7/7.  The first cut of =period=
+  divided both by 28 and served the quantities 4x too low (red team r1,
+  2026-10-19); =tests/test_recall_period.py= now checks each column's ask
+  count against the visits that deliver it.
 - *=food_prices()= used to warn that it dropped 64.8% of priceable rows* (449,842
   of 693,987, up from 845 of 244,812).  SUPERSEDED 2026-10-14 (GH #864): the
   money-only passages are now served with =Quantity = NaN= and tallied by
