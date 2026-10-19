@@ -437,10 +437,23 @@ def crop_production_for_wave(t, frames, crop_labels):
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
                              if fr.get('qty') in df.columns else pd.NA)
+        # `u` is never NaN (GH #1047, the crop side of #1041).  A unit the
+        # canonicaliser cannot place falls back, positionally, to the RAW
+        # code read through `format_id` (the #607 rule: a code with no label
+        # keeps its raw code -- W1-PH's unlabelled 5 / 0); a BLANK raw code,
+        # or a frame naming no unit column, means no unit was recorded and is
+        # the missing-unit sentinel U_UNKNOWN.  NaN on `u` used to be served
+        # on 13,138 rows (nearly all with no harvest quantity) and fell out of
+        # every groupby on `u`.
+        from lsms_library.transformations import U_UNKNOWN
         if fr.get('unit') in dec.columns:
-            piece['u'] = dec[fr['unit']].map(_canon_unit).astype('string').values
+            u = dec[fr['unit']].map(_canon_unit).astype('string')
+            if fr['unit'] in df.columns:
+                code = df[fr['unit']].map(format_id).astype('string')
+                u = u.where(u.notna(), code.values)
+            piece['u'] = u.fillna(U_UNKNOWN).values
         else:
-            piece['u'] = pd.Series(pd.NA, index=df.index, dtype='string').values
+            piece['u'] = pd.Series(U_UNKNOWN, index=df.index, dtype='string').values
 
         # SURVEY-REPORTED kilograms per ONE unit of THIS row's `u` -- the
         # GHS-Panel "Kg/L conversion factor" column (`*_conv`), asked beside
@@ -2470,9 +2483,11 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         # automatic mapping keys on `Code` alone and applies the single
         # Preferred Label column to every wave.  A code the wave's column
         # does not list keeps its raw code (it is never folded into the
-        # missing-unit sentinel, which means "no unit recorded").
+        # missing-unit sentinel, which means "no unit recorded").  The raw
+        # code is read through `format_id`: the CSV columns are float, so
+        # an unlisted 65 would otherwise be served as '65.0' (GH #1047).
         u = df[spec['unit']].map(unit_codes)
-        u = u.where(u.notna(), df[spec['unit']])
+        u = u.where(u.notna(), df[spec['unit']].map(format_id))
         piece = pd.DataFrame({
             't': t,
             'i': i.values,
