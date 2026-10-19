@@ -344,6 +344,10 @@ def testland(tmp_path, monkeypatch, request):
     monkeypatch.setenv("LSMS_COUNTRIES_ROOT", str(croot))
     monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.delenv("LSMS_NO_CACHE", raising=False)   # the L2-wave cache must be live
+    # The synthetic country's raw files sit in the config tree with no .dvc
+    # sidecar -- new data awaiting `dvc add`, which GH #831 refuses unless
+    # the caller opts in.  This fixture IS that case.
+    monkeypatch.setenv("LSMS_ALLOW_INTREE_SOURCES", "1")
     countries_root.cache_clear()
     data_root.cache_clear()
 

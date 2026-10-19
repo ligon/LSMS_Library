@@ -71,7 +71,7 @@ The returned DataFrame prepends a `country` index level.
      ```
      For **config**-only edits (`countries/{C}/_/...` — YAML/scripts/`.org`, the common case), `LSMS_COUNTRIES_ROOT=<worktree>/lsms_library/countries` is the cleaner lever: the live package reads the worktree's config tree (GH #436) and library-code identity stops mattering.  A fresh in-worktree venv is **not** needed for either case.
 
-     **The same trap has a WRITE side (GH #803).**  `to_parquet` -> `_resolve_data_path` redirects a wave script's `foo.parquet` to `data_root()` only when the *script's file* is under the imported package's `countries_root()`.  Run a wave script (directly, or via `make`) from a worktree/checkout that is not the imported package and the parquet lands **in-tree**, next to the script -- gitignored, hashless, invisible to `cache clear`.  Until #803 those files were read in preference to running the script.  `LSMS_COUNTRIES_ROOT=<that checkout>/lsms_library/countries` (or `PYTHONPATH` to the same checkout) makes the redirect fire; `find lsms_library/countries -name '*.parquet'` should always be empty, and `lsms-library cache clear` now says so when it is not -- and since GH #831 it also names any in-tree raw source file (`.dta/.sav/.csv/.dat/.dct/.ssp/.tab/.xls/.xlsx`), a sidecar-less one first because `get_dataframe` serves it in preference to the DVC blob.
+     **The same trap has a WRITE side (GH #803).**  `to_parquet` -> `_resolve_data_path` redirects a wave script's `foo.parquet` to `data_root()` only when the *script's file* is under the imported package's `countries_root()`.  Run a wave script (directly, or via `make`) from a worktree/checkout that is not the imported package and the parquet lands **in-tree**, next to the script -- gitignored, hashless, invisible to `cache clear`.  Until #803 those files were read in preference to running the script.  `LSMS_COUNTRIES_ROOT=<that checkout>/lsms_library/countries` (or `PYTHONPATH` to the same checkout) makes the redirect fire; `find lsms_library/countries -name '*.parquet'` should always be empty, and `lsms-library cache clear` now says so when it is not -- and since GH #831 it also names any in-tree raw source file (`.dta/.sav/.csv/.dat/.dct/.ssp/.tab/.xls/.xlsx`), a sidecar-less one first; since the GH #831 read-policy ruling `get_dataframe` REFUSES such a file (`InTreeSourceError`, a `RuntimeError`) unless `LSMS_ALLOW_INTREE_SOURCES=1` is set or the read happens inside the acquisition flow (`add_wave` / `populate_and_push`, run under `local_tools.allow_intree_sources()`).
   3b. **Run the suite the way the Makefile does**: `-n $(nproc) --dist=loadfile` (`PYTEST_ARGS`, `Makefile:25`) **plus `LSMS_BUILD_WORKERS=1`**.  Bare `pytest -n 40` (the default `--dist=load`) scatters one file's tests across workers, so several workers build the same table at once; on 2026-09-11 that left three xdist workers blocked in `futex` behind `_parallel_waves` children that had inherited DVC's sqlite handle across `fork`, and two more runs lost a worker to "node down: keyboard-interrupt".  The same suite under the Makefile recipe: 5,666 passed in 566 s, no worker lost.  `HANDOFF_2026-09-10.org:63` records the earlier form of this (`-n 24` -> 17 spurious fork/thread-exhaustion failures; `-n 16` + `LSMS_BUILD_WORKERS=2` clean).  And write pytest output to a file, never through `| grep | tail`: an orphaned xdist worker keeps the pipe open and the summary never arrives.
 
      **Pin the BLAS thread count too — the worker count alone is not enough.**  Each xdist worker imports numpy/scipy, and OpenBLAS sizes its pool from `nproc`, *not* from the worker count.  So `-n $(nproc)` on a 32-core node asks for 32 x 32 = 1,024 threads and the kernel refuses:
@@ -260,7 +260,7 @@ is the point — each was found separately and fixed separately:
 |---|---|---|
 | **#803** (fixed) | a wave script run from the wrong checkout wrote its parquet in-tree | the reader *preferred* it to re-running the script; hashless, so it graded `legacy` and was re-stamped fresh |
 | **#914** (fixed) | a Make rule regenerated the committed `panel_ids.json` | `PermissionError` on any shared install, from three layers inside a `make` subprocess |
-| **#831** (read path fixed) | `get_data_file` materialised **every** fetched raw file there — the DVC branch wrote the blob to `_COUNTRIES_DIR / path`, the WB branch extracted zips there | 433 stray copies / 1.31 GB; 33 with no `.dvc` sidecar **silently shadow the DVC blob**, since the read chain is local → DVC → WB and the stray wins at step one |
+| **#831** (write path fixed #917; read policy: refused unless opted in) | `get_data_file` materialised **every** fetched raw file there — the DVC branch wrote the blob to `_COUNTRIES_DIR / path`, the WB branch extracted zips there | 433 stray copies / 1.31 GB; 33 with no `.dvc` sidecar **used to silently shadow the DVC blob** (local → DVC → WB, the stray winning at step one); `get_dataframe` now refuses them unless opted in |
 
 They share one user-visible symptom, which is why fixing them one at a time
 kept feeling like whack-a-mole: **on a shared install the package directory is
@@ -276,10 +276,12 @@ reached from nowhere else, and `data_access._fetch_destination` is the single
 function that decides — route any new fetch through it rather than composing
 `_COUNTRIES_DIR / path` yourself.
 
-Cache cost of the #831 fix: **none**. No `data_access` symbol reaches any
-build fingerprint (measured with a no-op probe inside `get_data_file`: all
-three probed `build_transforms_fingerprint` values byte-identical). Contrast
-`get_dataframe`, where any edit moves 37/37.
+Cache cost of the #831 write-path fix (#917): **none**. No `data_access`
+symbol reaches any build fingerprint (measured with a no-op probe inside
+`get_data_file`: all three probed `build_transforms_fingerprint` values
+byte-identical). Contrast `get_dataframe`, where any edit moves 37/37 — which
+is why the #831 read policy, which lives in `get_dataframe`, is a corpus-wide
+re-warm (bundled with #805).
 
 **Still live, and a *different* invariant — don't conflate them.** #809: a
 hashless `var/<table>.parquet` written by a `make` recipe grades `legacy` at

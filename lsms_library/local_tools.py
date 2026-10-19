@@ -60,6 +60,7 @@ from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import codecs
+import contextvars
 import struct
 import tempfile
 import numpy as np
@@ -838,7 +839,9 @@ def _is_polluted_workspace_copy(fn) -> bool:
     scratch data the user supplied directly, output from the
     WB-fallback auto-add path in ``data_access.get_data_file``, or any
     other legitimate non-tracked use.  Returns False in all of those
-    cases.
+    cases.  (Whether ``get_dataframe`` may READ such a file when it sits
+    inside ``countries_root()`` is a separate policy, GH #831 -- see
+    :func:`_refuse_intree_source`.)
     """
     try:
         p = Path(fn).resolve()
@@ -848,6 +851,87 @@ def _is_polluted_workspace_copy(fn) -> bool:
         # Path-resolution failure (loop, permission denied) -> not pollution.
         # TypeError / AttributeError signal a programmer bug and propagate.
         return False
+
+
+# Sidecar-less sources inside the config tree (GH #831).
+#
+# ``countries_root()`` holds reviewed config; raw data lives in the DVC cache
+# under ``data_root()``.  A raw file sitting in the config tree WITHOUT a
+# ``.dvc`` sidecar used to be served by ``get_dataframe`` at step one of its
+# local -> DVC -> WB chain -- so a stray copy (433 of them, 1.31 GB, before the
+# GH #917 write-side fix) silently shadowed the DVC blob, and nothing said so.
+# Ruling (@ligon, 2026-10-18), option (b): REFUSE it unless the caller opts
+# in.  Two opt-ins, both explicit:
+#
+# * the acquisition flow -- ``data_access.add_wave`` / ``populate_and_push``,
+#   which extract into the config tree on purpose and then ``dvc add`` what
+#   landed -- runs inside :func:`allow_intree_sources`;
+# * ``LSMS_ALLOW_INTREE_SOURCES=1`` (also ``true`` / ``yes``), for a maintainer
+#   reading freshly prepared data before ``dvc add``.
+#
+# Exempt by construction, exactly as ``cli._intree_source_files`` classifies:
+# anything under a ``_/`` component (config by definition -- the tracked
+# lookup tables, e.g. ``Uganda/_/fct_usda.csv``), and anything outside the
+# config tree (scratch files, tmp dirs, the ``data_root()`` cache).  A file
+# WITH a sidecar never reaches this check: ``local_file`` refuses that
+# workspace copy and reads the DVC blob instead.  Measured on a clean clone:
+# no file is refused (the only sidecar-less, non-``_/`` data-like files are
+# two tracked ``GhanaAHIES/2023/Documentation/*.tsv`` that nothing reads).
+_ALLOW_INTREE_SOURCES = contextvars.ContextVar('lsms_allow_intree_sources',
+                                               default=False)
+
+
+class InTreeSourceError(RuntimeError):
+    """``get_dataframe`` refused a sidecar-less source inside the config tree
+    (GH #831).  Not a ``FileNotFoundError``: the file IS there, and a build
+    must stop and say so rather than degrade as if it were unavailable."""
+
+
+@contextmanager
+def allow_intree_sources():
+    """Let ``get_dataframe`` read sidecar-less sources inside
+    ``countries_root()`` for the duration (GH #831).  The acquisition flow's
+    opt-in; ``LSMS_ALLOW_INTREE_SOURCES=1`` is the session-wide one."""
+    token = _ALLOW_INTREE_SOURCES.set(True)
+    try:
+        yield
+    finally:
+        _ALLOW_INTREE_SOURCES.reset(token)
+
+
+def _intree_sources_allowed() -> bool:
+    if _ALLOW_INTREE_SOURCES.get():
+        return True
+    flag = os.environ.get('LSMS_ALLOW_INTREE_SOURCES', '')
+    return flag.strip().lower() in {'1', 'true', 'yes'}
+
+
+def _refuse_intree_source(fn) -> None:
+    """Raise :class:`InTreeSourceError` if *fn* is an existing file inside
+    the config tree, outside any ``_/`` directory, with no ``.dvc`` sidecar
+    -- unless the caller opted in (see the block comment above)."""
+    try:
+        p = Path(fn).resolve()
+        if not p.is_file() or (p.parent / f"{p.name}.dvc").exists():
+            return
+        rel = None
+        for root in dict.fromkeys((countries_root(), _COUNTRIES_DIR)):
+            try:
+                rel = p.relative_to(Path(root).resolve())
+                break
+            except ValueError:
+                continue
+    except OSError:
+        return
+    if rel is None or '_' in rel.parts[:-1] or _intree_sources_allowed():
+        return
+    raise InTreeSourceError(
+        f"{p} is a raw source inside the config tree ({countries_root()}) with "
+        f"no .dvc sidecar, so it is not the DVC-tracked file and would shadow "
+        f"the DVC blob (GH #831).  If it is new data awaiting `dvc add`, opt in "
+        f"with LSMS_ALLOW_INTREE_SOURCES=1 (or read it inside "
+        f"lsms_library.local_tools.allow_intree_sources()); if it is a stray "
+        f"copy, delete it (`lsms-library cache clear` lists them).")
 
 
 def _to_numeric(x,coerce=False):
@@ -1344,6 +1428,189 @@ def _is_stata_dta(head: bytes) -> bool:
             and head[2] == 1)
 
 
+def _stata_release(head: bytes) -> int | None:
+    """The Stata format release a sniffed ``.dta`` head declares, or None.
+
+    Old format: the first byte.  XML format (117+): the digits inside
+    ``<release>...</release>``, which sits well inside ``_SNIFF_BYTES``.
+    """
+    if head.startswith(_STATA_XML_MAGIC):
+        m = re.search(rb'<release>(\d+)</release>', head)
+        return int(m.group(1)) if m else None
+    if head and head[0] in _STATA_OLD_RELEASES:
+        return head[0]
+    return None
+
+
+# cp1252 text read as latin-1 (GH #805).
+#
+# ``pandas.io.stata.StataReader`` decodes every ``.dta`` below format 118 as
+# latin-1, with no per-file override on ``get_dataframe``'s path (``from_dta``
+# has none).  Many of those files are Windows-1252: the EHCVM-1 2018-19
+# ``s01_me_*`` rosters write ``Frere, s<0x9C>ur`` (0x9C is the oe ligature in
+# cp1252), and latin-1 serves it as the C1 control U+009C.  latin-1 and cp1252
+# agree on every byte outside 0x80-0x9F, so re-decoding a string that carries
+# a C1 code point changes that string only, and a file without one is served
+# byte-identically.
+#
+# THE C1 SIGNATURE IS NECESSARY, NOT SUFFICIENT.  Measured over every held
+# ``.dta`` (4,911 blobs, 309 carrying a C1 code point in a value label or a
+# str column), three other things produce it, and cp1252 is wrong for each:
+#
+# * A UTF-8 double encoding: UTF-8 bytes read as latin-1, where the C1 code
+#   point is a UTF-8 continuation byte -- ``b\xc5\x93uf`` for ``bœuf``
+#   (Burkina 2018-19, Cambodia, Nigeria 2023-24, Tajikistan 2009).  Decoding
+#   0x93 as a cp1252 curly quote destroys the latin-1 -> UTF-8 round trip the
+#   ``_decode_mojibake`` hooks and the mojibake-keyed crosswalks depend on
+#   (``Senegal/_/CONTENTS.org``, "the ``u`` crosswalk is keyed on MOJIBAKE").
+#   A string whose latin-1 bytes are valid UTF-8 is therefore never a
+#   candidate, whatever else is in the file -- and nor is one TRUNCATED
+#   mid-sequence by the Stata string width: valid UTF-8 up to an incomplete
+#   final sequence, after at least one complete multibyte sequence (Nigeria
+#   2018-19 ``sect2_harvestw4`` label ``S2AQ10`` code 6, ``...\xe2\x80\x98O
+#   LEVEL\xe2\x80``, which the round trip alone admitted and decoded to
+#   ``â€˜O LEVELâ€``).  The broader test "a UTF-8 lead followed by a C1
+#   continuation byte, anywhere" was measured and rejected: cp866 lower-case
+#   Cyrillic is 0xE0-0xEF and upper-case 0x80-0x9F, so a mixed-case word
+#   (``\xe1\x80`` = сА) matches it, and dropping such strings from the
+#   candidate set flipped Kyrgyz 1996 ``ANTHFL96.DTA`` from refused to
+#   decoded.  The truncation test also excludes one cp866 string in that
+#   file (``è¢\x83ç`` = швГч, a valid three-byte sequence then a lone lead);
+#   the file stays refused on its 46 other candidates.
+# * A DOS code page.  Kyrgyz Republic 1996-98 and Kazakhstan 1996 are cp866
+#   Cyrillic (``\x8d\x85\x92`` = НЕТ); Albania 2002-05 is cp437/cp850
+#   (``KOR\x80E`` = KORÇE, and ``Albania/2004/_/cluster_features.py`` keys on
+#   that ``\x80``); Panama 1997 is cp850 (``dom\x82sticos``).  cp1252 would
+#   turn visible damage into plausible-looking damage (``KOR€E``,
+#   ``dom‚sticos``).
+#
+# So the decision is per FILE -- one file, one writer, one code page -- over
+# every candidate string in it (value labels as well as str columns).  A file
+# is re-decoded only if (a) no candidate contains one of the five bytes cp1252
+# leaves undefined (0x81 0x8D 0x8F 0x90 0x9D: a cp1252 writer cannot emit
+# them), and (b) no candidate puts a cp1252 SYMBOL between two letters --
+# ``€`` ``‚`` ``„`` ``…`` ``†`` ``‡`` ``ˆ`` ``‰`` ``•`` ``ƒ`` (DOS accented
+# letters land there) -- where the cp1252 LETTERS (Š Œ Ž š œ ž Ÿ) and the
+# apostrophes and dashes (’ ‘ – —) are word-internal in real text (``Men’s``,
+# ``Kruševac``, ``CAPENTRY—FURNITURE``).  (b) is a stated tolerance, not a
+# discovered boundary.  On the held corpus (a) and (b) together refuse
+# exactly the Albania / Panama / Kyrgyz / Kazakhstan files -- 58 of the 226
+# pre-118 files holding a candidate -- and nothing else; the other 168 are
+# re-decoded (census and its re-run tool: ``slurm_logs/gh805_cp1252/``).
+# A refused file is served exactly as before.
+#
+# Scope gates, both deliberate: only a format < 118 head (pandas chose latin-1
+# there; a format-118 file is UTF-8 and a C1 code point in it is damage
+# upstream of the file -- Mali 2017-18, GhanaSPS 2013-14), and only when the
+# caller passed no ``encoding=`` (a declared encoding is an explicit override,
+# and ``from_dta`` already applies it to value labels).
+_C1_RE = re.compile('[\x80-\x9f]')
+_CP1252_HOLES = frozenset('\x81\x8d\x8f\x90\x9d')
+_CP1252_C1 = {chr(b): bytes([b]).decode('cp1252')
+              for b in range(0x80, 0xa0) if chr(b) not in _CP1252_HOLES}
+_CP1252_TRANSLATION = str.maketrans(_CP1252_C1)
+#: cp1252 C1 decodes that are legitimately word-internal: the letters
+#: (ƒ excluded -- the florin sign, and a DOS ``â``) and apostrophes / dashes.
+_CP1252_WORD_INTERNAL = frozenset('ŠŒŽšœžŸ'
+                                  '’‘–—')
+
+
+def _cp1252_candidate(s) -> bool:
+    """True for a str carrying a C1 code point that is not a UTF-8 double
+    encoding -- intact, or truncated at the end of the string (see the block
+    comment) -- and is latin-1 encodable, i.e. came out of a latin-1 decode."""
+    if not isinstance(s, str) or not _C1_RE.search(s):
+        return False
+    try:
+        b = s.encode('latin-1')
+        b.decode('utf-8')
+    except UnicodeEncodeError:
+        return False
+    except UnicodeDecodeError as exc:
+        # Truncated double: valid UTF-8 up to an incomplete final sequence,
+        # with at least one complete multibyte sequence before the cut.
+        return not (exc.reason == 'unexpected end of data'
+                    and max(b[:exc.start], default=0) >= 0x80)
+    return False
+
+
+def _cp1252_plausible(s: str) -> bool:
+    """False when *s* holds a cp1252 hole byte, or a C1 code point whose cp1252
+    decode is a symbol sitting between two letters (see the block comment)."""
+    for i, ch in enumerate(s):
+        if ch in _CP1252_HOLES:
+            return False
+        decoded = _CP1252_C1.get(ch)
+        if decoded is None or decoded in _CP1252_WORD_INTERNAL:
+            continue
+        before = s[i - 1] if i else ' '
+        after = s[i + 1] if i + 1 < len(s) else ' '
+        if before.isalpha() and after.isalpha():
+            return False
+    return True
+
+
+def _cp1252_redecode_map(strings) -> dict[str, str]:
+    """``{latin-1 string: cp1252 string}`` for a file's *strings*, or ``{}``
+    when the file has no candidate or is refused as a whole (see above)."""
+    candidates = {s for s in strings if _cp1252_candidate(s)}
+    if not candidates or not all(_cp1252_plausible(s) for s in candidates):
+        return {}
+    return {s: s.translate(_CP1252_TRANSLATION) for s in candidates}
+
+
+def _redecode_cp1252(out, f):
+    """Re-decode the cp1252 strings of a pre-118 ``.dta`` read (GH #805).
+
+    *out* is what ``from_dta`` returned: a DataFrame (value labels already
+    substituted into their columns) or, under ``categories_only``, a
+    ``{var: {code: label}}`` dict.  *f* is the stream or path it was read
+    from; the file's full value-label table is re-read from it only when
+    *out* holds a candidate string, so a file without one costs a scan of its
+    string columns' distinct values and nothing more.  Returns *out*
+    unchanged, by identity, when nothing is re-decoded; never adds, drops or
+    reorders a row or a column, and keeps every dtype.
+    """
+    hit_cols = {}
+    if isinstance(out, dict):
+        found = {lab for labels in out.values() for lab in labels.values()
+                 if _cp1252_candidate(lab)}
+    else:
+        for c in out.columns:
+            if out[c].dtype == object or pd.api.types.is_string_dtype(out[c]):
+                hits = [v for v in out[c].unique() if _cp1252_candidate(v)]
+                if hits:
+                    hit_cols[c] = hits
+        found = {v for hits in hit_cols.values() for v in hits}
+    if not found:
+        return out
+
+    # The verdict is per file: add the labels nothing in *out* uses.
+    try:
+        if not isinstance(f, (str, Path)):
+            f.seek(0)
+        with pd.io.stata.StataReader(f) as reader:
+            labels = reader.value_labels()
+        found.update(lab for m in labels.values() for lab in m.values())
+    except (ValueError, struct.error, OSError):
+        pass
+    mapping = _cp1252_redecode_map(found)
+    if not mapping:
+        return out
+
+    if isinstance(out, dict):
+        return {var: {code: mapping.get(lab, lab) if isinstance(lab, str) else lab
+                      for code, lab in labels.items()}
+                for var, labels in out.items()}
+    out = out.copy(deep=False)
+    for c, hits in hit_cols.items():
+        col = out[c].copy()
+        hit = col.isin(hits)
+        col[hit] = col[hit].map(mapping)
+        out[c] = col
+    return out
+
+
 # SPSS and the text tail (GH #1002).  Two more admissions, same principle as
 # the Stata sniff: a reader is tried only on a file that claims its format.
 #
@@ -1436,9 +1703,11 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # tool, etc.), not a legitimate fast path.  Refuse to use it so
         # the read goes through the DVC cache (under ``data_root()``)
         # via ``file_system_path`` -> ``_ensure_dvc_pulled`` ->
-        # ``DVCFS.open``.  Files without a sister sidecar are fine
-        # (new data being prepped for ``dvc add``, user scratch data,
-        # WB-fallback downloads).
+        # ``DVCFS.open``.  Files without a sister sidecar are allowed
+        # OUTSIDE the config tree (user scratch data, WB-fallback
+        # downloads under ``data_root()``); inside ``countries_root()``
+        # they are refused unless opted in (GH #831,
+        # ``_refuse_intree_source``).
         if _is_polluted_workspace_copy(fn):
             warnings.warn(
                 f"Refusing workspace copy of DVC-tracked file {fn} "
@@ -1450,6 +1719,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 stacklevel=3,
             )
             return False
+        # GH #831: a sidecar-less source inside the config tree is refused
+        # (raises) unless the caller opted in.
+        _refuse_intree_source(fn)
         return True
     
     def file_system_path(fn):
@@ -1576,9 +1848,16 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         if _is_stata_dta(head):
             try:
                 f.seek(0)
-                return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+                out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
                 failure = exc
+            else:
+                # GH #805: pandas decoded this file as latin-1; re-decode its
+                # cp1252 strings (see the block comment above _C1_RE).
+                release = _stata_release(head)
+                if encoding is None and release is not None and release < 118:
+                    out = _redecode_cp1252(out, f)
+                return out
 
             try:
                 # pyreadstat handles older Stata formats that pandas StataReader cannot.
@@ -1728,6 +2007,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
         # every cold read.
         local_path = _try_get_data_file(fn)
+        if local_path is not None:
+            # ``get_data_file`` answers from the config tree first (step 1),
+            # so the same GH #831 policy applies to what it hands back.
+            _refuse_intree_source(local_path)
         if local_path is None:
             raise FileNotFoundError(
                 errno.ENOENT,

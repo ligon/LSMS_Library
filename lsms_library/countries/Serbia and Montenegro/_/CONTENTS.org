@@ -359,3 +359,15 @@ the population living in group quarters, institutions and temporary housing
 units, as well as the homeless population").  That the 2002-2003 documentation
 does not say so is a silence in this documentation, and must not be filled in
 from the 2007 wave of a different country entry.
+
+* Encoding: =Šumadija= (GH #805, 2026-10-19)
+
+The 2002 / 2003 files are Central-European cp1250, read as latin-1 by
+pandas (pre-118).  cp1250 and cp1252 share the code points of =Š Ž š ž=
+(0x8A 0x8E 0x9A 0x9E), so the #805 reader re-decode repairs those:
+=<U+008A>umadija and Pomoravlje= -> =Šumadija and Pomoravlje= in
+=cluster_features.Region= (109 + 53 rows, 2002 / 2003) and =sample.strata=
+(1,661 rows).  It does NOT repair the cp1250 letters that sit above 0x9F
+(=č= = 0xE8 is served as =è=: =Južno-baèki okrug= in the =okrug= value
+labels, which no table serves).  That needs a per-file =encoding: cp1250=
+declaration.

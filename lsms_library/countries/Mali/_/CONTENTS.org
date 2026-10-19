@@ -453,6 +453,26 @@ nothing else touched.  The seven artefact keys (=Chef de m=, =Fr=, =p=,
 carries them, so a regression surfaces as an =Unknown relationship
 labels= warning instead of resolving silently.  See GH #801 / #797.
 
+** food_acquired 2018-19: two food labels served with a C1 control until GH #805 (2026-10-19)
+
+The 2018-19 EHCVM-1 food files are Stata format 115 and Windows-1252; the
+reader decoded them as latin-1, so beef and eggs were served as =Viande de
+b<U+009C>uf= (3,453 rows) and =<U+008C>ufs= (994 rows) -- 4,447 rows whose
+=j= matched neither the 2014-15 nor the 2021-22 spelling of the same food.
+=harmonize_food= carried those two damage spellings as keys (flagged
+=2018-19=), but the served labels were raw, so the keys were not what
+made 2018-19 consistent.  Since GH #805 =get_dataframe= re-decodes a
+pre-118 file's cp1252 strings and the wave serves =Viande de bœuf= /
+=Œufs=, the labels 2021-22 serves; distinct =j= in =food_acquired= 244 ->
+242, rows unchanged (431,046).  The two damage rows were folded into the
+clean rows below them (their =2018-19= flag moved onto the clean row).
+
+Different from the roster defect above: those labels are TRUNCATED in the
+file and no decoder recovers them; these are complete cp1252 bytes.  Note
+also =EACIALI_p{1,2}.dta= (2014-15) carry the same two cp1252 strings in the
+str column =s13q01l=, now decoded too; the wave keys =j= on the labelled
+code =s13q01=, not on that column, so nothing served moves there.
+
 * cluster_features (GH #323 site 4 / GH #627)
 
 ** 2021-22 was the worst =dfs:= cartesian in the corpus — fixed
