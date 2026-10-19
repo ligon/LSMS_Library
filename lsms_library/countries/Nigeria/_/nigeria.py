@@ -661,7 +661,8 @@ def _seed_unit_label(unit_series, unit_dec, where=''):
     """Canonical unit label for a seed-quantity unit column.  `unit_dec`
     is the decoded-label Series (convert_categoricals=True); fall back to
     pd.NA where the unit is blank/junk (served U_UNKNOWN by
-    `assemble_plot_inputs`).  An unplaceable LABEL is named, not folded
+    `assemble_plot_inputs` where the row records an amount, NA where it
+    records none).  An unplaceable LABEL is named, not folded
     silently (`_canon_units`)."""
     if unit_dec is not None:
         return _canon_units(unit_dec, canon=_canon_input_unit, where=where)
