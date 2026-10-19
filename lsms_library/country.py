@@ -1553,7 +1553,10 @@ class Wave:
 
         Differs from the country gate on purpose: a hashless parquet grades
         ``legacy`` and is trusted once and STAMPED here (GH #809 changed the
-        country tier only), and ``LSMS_NO_CACHE`` is read by truthiness.
+        country tier only).  Differs as FOUND, not by ruling: ``LSMS_NO_CACHE``
+        is read by truthiness here (``"0"`` bypasses) but as ``{1,true,yes}``
+        at the country gate -- pinned in tests/test_gh1040_wave_read_gates.py
+        and left for a decision, not harmonised by #1040.
         """
         if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
             # v0.8.0 content-hash staleness for the YAML-path L2-wave
