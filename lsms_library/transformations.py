@@ -4561,7 +4561,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         a ``reported`` row whose ``Quantity`` is 0 or NaN is counted
         ``reported`` and still drops out of the sum below.
         ``result.attrs['kg_factor_disagreement']`` carries the layer-pair
-        audit described in :func:`harvest_kg_factors`.
+        audit described in :func:`harvest_kg_factors`, and
+        ``result.attrs['kg_factor_declared_from']`` where the declared
+        ``u_kg`` table came from (GH #931).
 
     Notes
     -----
@@ -4632,6 +4634,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
     res.attrs['kg_factor_disagreement'] = factors.attrs[
         'kg_factor_disagreement']
+    res.attrs['kg_factor_declared_from'] = factors.attrs[
+        'kg_factor_declared_from']
     return res
 
 
