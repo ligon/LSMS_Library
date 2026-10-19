@@ -371,7 +371,9 @@ either or both. Tables are matched by `#+name:`, never by filename (global
 `u_kg` lives in `u.org`). A table declared **twice in one level** — file and
 directory, or two directory files — raises `CategoricalMappingConflictError`
 naming both paths; it is never a precedence rule and never a fall-through to the
-level below. `lsms_library/categorical_mapping/` is simply the package root's
+level below.  A table declared at a level with **zero data rows** raises
+`EmptyCategoricalTableError` (GH #1036): it never falls through to a lower
+level either -- delete the `#+name:` line to inherit, or fill the table. `lsms_library/categorical_mapping/` is simply the package root's
 directory spelling. One reader, `local_tools.categorical_mapping_files(level)`,
 serves both mechanisms and every hash site.
 
