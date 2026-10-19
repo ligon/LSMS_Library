@@ -5012,6 +5012,95 @@ def total_hired_labor_days(plot_labor):
 #   Urea 46% N; CAN (calcium ammonium nitrate) 26%; SA / sulphate of ammonia
 #   21%; DAP (di-ammonium phosphate) 18%; NPK 17-17-17 ≈ 17%; TSP/SSP/MOP
 #   carry no nitrogen.
+#
+# Two country-specific BLENDS carry a cited share (GH #867, ruling @ligon
+# 2026-10-18: "NPS and Malawi D Compound get CITED N shares"):
+#   - NPS 19% N (Ethiopia ``NPS``; the ESS asks for it from W3 2015-16, and
+#     by W5 it has displaced DAP).  Grade 19-38-0+7S: IFDC & AFAP for AGRA,
+#     *Assessment of Fertilizer Distribution Systems and Opportunities for
+#     Developing Fertilizer Blends: Ethiopia* (June 2018), Table 1
+#     "Fertilizers available in Ethiopia and volumes sold for the 2016-17
+#     season" (report p. 3): "NP 19 38 0 + 7S  NPS".  The same table lists
+#     the boron / zinc variants at 17.7-18.9% N.  The ESS has one NPS
+#     question, so 0.19 is the base grade (plain NPS), not a per-bag
+#     figure: NPS+B at 18.9% was the largest seller by volume (377,527 t
+#     against plain NPS's 238,191 t in 2016-17), and it out-imports plain
+#     NPS in every year 2017-2022 in IFDC's *Fertilizer Statistics Overview
+#     Ethiopia 2010-2022* (2023 Edition, p. 12), where plain NPS is 14-25%
+#     of the four grades' volume.  The volume-weighted mean N of the four is
+#     18.8% in 2016-17 and 18.7-18.9% in each of 2017-2022, so 0.19 is at
+#     most ~1.4% (relative) high.  Agrees with the WB harmonised panel
+#     (ETH_ESS3.do:896, ETH_ESS4.do:918, ETH_ESS5.do:984: ``NPS_kg*0.19``).
+#   - D Compound 8% N (Malawi ``D Compound Fertilizer``, Module D type code
+#     5; the IHS has no separate Super D code).  The Malawi documents below
+#     give 8% N while the P/K/S grade drifts; the one exception is named
+#     after them.
+#       * IFDC with the Department of Agricultural Research Services,
+#         Ministry of Agriculture, for the Government of Malawi, *Proposed
+#         Fertilizer Regulations, 2003* (Appendix C, under the Proposed
+#         Fertilizer Act, 2003; September 2003; WIPO Lex MW022, "Other
+#         Texts").  A DRAFT prepared by IFDC, not enacted regulations, and
+#         the grade is a worked penalty example, not a schedule of
+#         registered grades: Schedule B, A. "Investigational Allowances --
+#         Penalty Rates", Examples of Penalty Compilation, example 2,
+#         printed p. 31 (PDF p. 23): 'A "D" compound (8-14-7-6.5S)
+#         fertilizer was guaranteed as 8% N, 14% P2O5, 7% K2O, and 6.5%S'.
+#       * IFDC & AFAP for AGRA, *Assessment of Fertilizer Distribution
+#         Systems and Opportunities for Developing Fertilizer Blends:
+#         Malawi* (June 2018), Table 1 "Main fertilizer straights, compounds
+#         and blends available in Malawi" (report p. 5): "8:18:15+6S+0.1B
+#         Compound D/Super D", whose next row is "NPK 10:24:20 + 6S + 0.1B
+#         Super D" -- a different product at ~10% N, which is why a ``Super
+#         D`` label gets no share here.  IFDC's *Fertilizer Statistics
+#         Overview Malawi* names both: 8-18-15+6S+0.1B+0.1Zn "(Compound D)"
+#         and 10-24-20+6S+0.1B "(Super D)", in the 2016-2021 edition (2022
+#         Edition, draft 1), p. 7, and the 2019-2023 (2024 Edition), p. 8.
+#       * Independent of IFDC: Ministry of Agriculture, *Guide to
+#         Agriculture Production and Natural Resources Management in
+#         Malawi* (revised 2020), Table 54 "Some commonly used fertilizers
+#         in tobacco and their nutrient composition", printed p. 232 (PDF
+#         p. 254 of the copy hashed): "Compound D 8 18 15 4 0.1" (N, P2O5,
+#         K2O, S, B %), beside "Super D 10.5 24 20 6 0.15".
+#     DIVERGES from both other harmonisations of these files.  The WB panel
+#     uses 0.07 with no citation (MWI_IHPS1.do:804 and IHPS2-4, ``gen
+#     nitrogen_kg5 = D_kg * 0.07`` under ``*CD compound``).  A 7% grade IS
+#     in print for Malawi: FAO & GoM (Omuto & Vargas), *Soil nutrient loss
+#     assessment in Malawi* (2018), p. IX: "Compound D (a local term that
+#     refers to an NPK blend of 7-14-7)", attributed to "the Government of
+#     Malawi (GoM)" with no source note.  7-14-7 is Zimbabwe's Compound D
+#     grade.  The report cites IFDC's 2013 *Malawi fertilizer assessment*
+#     (fn 34) for crop yields, not for this grade, so IFDC 2013 as the
+#     origin of the WB's 0.07 is unverified.  EPAR uses 0.10
+#     (EPAR_UW_Malawi_IHS_W1.do:2204-2208, "D COMPOUND - 10-20-10",
+#     ``0.10*(itemcode==5)``), which is Zambia's Compound D grade.  So 0.08
+#     is the grade the Malawi documents give, and 0.07 / 0.10 are other
+#     countries' grades.  On Malawi's 726 D Compound rows 0.08 and 0.07
+#     differ by 1/8.  Any Super D a household recorded under code 5 would
+#     make 0.08 slightly low; that cannot be measured.
+#     Page text and SHA-256 of every source: slurm_logs/gh867_nitrogen/.
+#
+# ORGANIC INPUTS ARE REFUSED A SHARE, DELIBERATELY (GH #867, same ruling:
+# "Organic inputs (manure, compost, organic fertilizer) get a documented
+# refusal: they stay unmatched and loud").  Manure and compost DO carry
+# nitrogen, so a share of 0.0 would be as much an invented number as any
+# other, and no instrument in the corpus records what a nominal share would
+# need -- the animal, the feedstock, the moisture, the storage.  Measured
+# over the 14 warm ``plot_inputs`` tables (2026-10-19), the refusal is not
+# free in either direction: Ethiopia's 34,207 organic rows carry no
+# quantity at all (an ``Applied`` dummy only), Malawi's 11,075 serve a
+# unitless 0.0, most EHCVM / Mali / Niger quantities are in carts and
+# sacks; but Tanzania (12.2M kg), Nigeria (3.07M), Uganda (2.70M) and Niger
+# (1.64M) report kg-convertible organic quantities so large that even the
+# 0.5% N the issue floated (itself uncited) would be the dominant term of
+# the country's total (Tanzania's inorganic N is 19,476 kg; 0.5% of 12.2M
+# kg is 61,115).  The WB ``nitrogen_kg`` this
+# reproduces is inorganic N (ETH_ESS4.do:919 sums UREA / DAP / NPS only).
+# So no organic key may enter this map -- :data:`_ORGANIC_INPUT_PATTERN`
+# names the vocabulary, :func:`nitrogen_kg` counts those rows separately on
+# ``attrs['nitrogen_input_match']['refused_organic_labels']`` and names them
+# in :class:`NutrientCoverageWarning`, and a test refuses an organic key.
+# A caller who has a share for their own sample can still pass one through
+# ``nitrogen_content=``.
 class NutrientCoverageWarning(UserWarning):
     """A fertilizer input label resolved to NO nitrogen share.
 
@@ -5029,8 +5118,11 @@ class NutrientCoverageWarning(UserWarning):
 
     Fires for an unmatched label that *names itself* a fertilizer input --
     the corpus's own vocabulary, :data:`_FERTILIZER_LABEL_HINTS`
-    (fertilizer / fertiliser / manure / compost, plus the Portuguese
-    ``adubo`` and French ``engrais``) -- and NOT for ``Seed`` / ``Pesticide``
+    (fertilizer / fertiliser / manure / compost / organic, plus the
+    Portuguese ``adubo`` and French ``engrais``), and for every label
+    :data:`_ORGANIC_INPUT_PATTERN` classes as organic -- the documented
+    refusal (GH #867) is named apart from a fertilizer nobody has keyed --
+    and NOT for ``Seed`` / ``Pesticide``
     / ``Herbicide``, which are correctly outside a nitrogen map and are the
     bulk of the rows (Malawi ``Seed`` alone is 112,296).  A warning nobody
     reads is how the original defect survived, so the firehose form is
@@ -5076,7 +5168,22 @@ _NITROGEN_CONTENT = {
     'ssp': 0.0,
     'mop': 0.0,
     'other fertilizer': 0.0,
+    # country-specific blends, cited above (GH #867)
+    'nps': 0.19,          # Ethiopia, 19-38-0+7S (IFDC/AFAP 2018 Table 1)
+    'd compound': 0.08,   # Malawi, 8% N (IFDC proposed regs 2003;
+                          # IFDC/AFAP 2018; MoA Guide 2020)
 }
+
+
+# The ORGANIC-input vocabulary refused a share above (GH #867).  Matches
+# English ``Organic Fertilizer`` / ``Organic manure`` / ``Other Organic`` /
+# ``Manure`` / ``Compost``, Portuguese ``Adubos orgânicos - estrume animal``
+# and French ``fumier`` -- and NOT ``Other inorganic`` (Mali) or
+# ``inorgânicos``: the leading ``\b`` refuses an ``organ`` that follows
+# ``in``.  Used to CLASSIFY an unmatched label for the tally and the warning;
+# it never assigns a share.
+_ORGANIC_INPUT_PATTERN = re.compile(
+    r'\b(?:org[aâ]ni|manure|compost|estrume|fumier)', re.IGNORECASE)
 
 
 # Word stems that mark an input label as a FERTILIZER in the corpus's own
@@ -5085,8 +5192,19 @@ _NITROGEN_CONTENT = {
 # / ``Adubos inorganicos - ureia``) and French.  Used ONLY to decide whether
 # an unmatched label is worth warning about; it never affects a nutrient
 # share, so a stem missing from this tuple costs a warning, never a number.
+# The organic REFUSAL is named through :data:`_ORGANIC_INPUT_PATTERN`,
+# independently of these stems (``_warn_nitrogen_coverage`` names every
+# refused label), so Ethiopia's ``Other Organic`` (2,651 rows) and Mali's
+# ``Other organic`` (1,189) -- unnamed before GH #867, no stem matched them
+# -- are loud whether or not ``organic`` is here.  What the ``organic`` stem
+# itself adds, as a SUBSTRING test, is the labels the pattern deliberately
+# does NOT class as organic: Mali's ``Other inorganic`` (9,640 rows, 1,694
+# with a positive quantity), an "other" fertilizer slot whose product the
+# instrument does not name and which carries no share by ruling (@ligon
+# 2026-10-14).  The warning now names it as a gap, as it already named
+# Nigeria's ``Other Inorganic Fertilizer``.
 _FERTILIZER_LABEL_HINTS = ('fertilizer', 'fertiliser', 'manure', 'compost',
-                           'adubo', 'engrais')
+                           'organic', 'adubo', 'engrais')
 
 
 def _normalise_input_label(label):
@@ -5105,9 +5223,10 @@ def _normalise_input_label(label):
     then with a trailing ``' fertilizer'`` / ``' fertiliser'`` REMOVED, then
     with ``' fertilizer'`` ADDED.  Exactness is preserved -- no substring or
     fuzzy matching -- so ``Organic Fertilizer`` still resolves to nothing
-    (``organic`` is not a key, and asserting a nominal N share for manure
-    would be inventing a number), and ``D Compound Fertilizer`` and
-    Ethiopia's ``NPS`` likewise stay unmatched and get named in the warning.
+    (``organic`` is not a key, and the organic refusal above is deliberate,
+    GH #867), while ``D Compound Fertilizer`` resolves through the strip rule
+    to ``d compound`` and Ethiopia's ``NPS`` to ``nps`` -- both keyed with
+    cited shares since GH #867.  ``Super D Compound`` or ``NPSB`` would not.
 
     Measured over the 11 warm ``plot_inputs`` tables (2026-09-09): the strip
     rule is what Malawi needs (53,210 rows across NPK / Urea / CAN / DAP
@@ -5131,7 +5250,12 @@ def _nitrogen_shares(labels, content):
 
     Returns ``(share_series, tally)``.  ``tally`` mirrors
     ``harvest_kg_factors``'s ``shipped_matched``: a JOIN diagnostic, taken
-    before anything else can hide it.
+    before anything else can hide it.  ``refused_organic_labels`` /
+    ``refused_organic_rows`` are the SUBSET of the unmatched labels that
+    :data:`_ORGANIC_INPUT_PATTERN` classes as organic -- the documented
+    refusal (GH #867), as distinct from a fertilizer nobody has keyed yet.
+    They stay inside ``unmatched_*``: the partition is still matched +
+    unmatched.
     """
     resolved = {}
     for label in pd.unique(pd.Series(labels).astype(str)):
@@ -5143,6 +5267,8 @@ def _nitrogen_shares(labels, content):
     counts = pd.Series(labels).astype(str).value_counts()
     unmatched = {str(k): int(v) for k, v in counts.items()
                  if str(k) not in resolved}
+    refused = {k: v for k, v in unmatched.items()
+               if _ORGANIC_INPUT_PATTERN.search(k)}
     tally = {
         'matched_rows': int(sum(v for k, v in counts.items()
                                 if str(k) in resolved)),
@@ -5150,26 +5276,42 @@ def _nitrogen_shares(labels, content):
         'matched_labels': sorted(resolved),
         'unmatched_labels': dict(sorted(unmatched.items(),
                                         key=lambda kv: -kv[1])),
+        'refused_organic_rows': int(sum(refused.values())),
+        'refused_organic_labels': dict(sorted(refused.items(),
+                                              key=lambda kv: -kv[1])),
     }
     return share, tally
 
 
 def _warn_nitrogen_coverage(tally, total_mass, n_rows):
     """Emit :class:`NutrientCoverageWarning` where coverage failed."""
+    # An organic label refused a share (GH #867) is always named, whatever
+    # the stems say: the ruling is that the refusal stays LOUD.
+    refused = tally.get('refused_organic_labels', {})
     suspicious = {k: v for k, v in tally['unmatched_labels'].items()
-                  if any(h in k.lower() for h in _FERTILIZER_LABEL_HINTS)}
+                  if k in refused
+                  or any(h in k.lower() for h in _FERTILIZER_LABEL_HINTS)}
     zero_mass = (n_rows == 0) or not (total_mass > 0)
     if not suspicious and not zero_mass:
         return
-    named = ', '.join(f"{k!r} ({v:,} rows)" for k, v in
-                      list(suspicious.items())[:8]) or 'none'
+    # A fertilizer nobody has keyed (a GAP) and an organic input refused a
+    # share by ruling are different findings; name them apart so the gap is
+    # not lost among the refusals.
+    gaps = {k: v for k, v in suspicious.items() if k not in refused}
+    organic = {k: v for k, v in suspicious.items() if k in refused}
+
+    def _name(d):
+        return ', '.join(f"{k!r} ({v:,} rows)" for k, v in
+                         list(d.items())[:8]) or 'none'
+    named = (f"no share keyed (a gap): {_name(gaps)}; organic, refused a "
+             f"share by policy (GH #867): {_name(organic)}")
     if zero_mass:
         warnings.warn(
             "nitrogen_kg resolved a nitrogen share for "
             f"{tally['matched_rows']:,} row(s) but the result is "
             f"{'empty' if n_rows == 0 else 'identically zero'} -- every "
             "fertilizer label either went unmatched or carries a nominal "
-            f"share of 0. Unmatched fertilizer-shaped labels: {named}. "
+            f"share of 0. Unmatched fertilizer-shaped labels -- {named}. "
             "This has the right SHAPE and no content: len() > 0, finite and "
             ">= 0 all pass on a column of zeros. Check "
             "attrs['nitrogen_input_match'] and pass nitrogen_content= with "
@@ -5178,12 +5320,13 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
     else:
         warnings.warn(
             f"nitrogen_kg: fertilizer-shaped input label(s) resolved to NO "
-            f"nitrogen share and contribute nothing to the total: {named}. "
-            "That may be correct (organic manure and compost carry no "
-            "nominal share in _NITROGEN_CONTENT, deliberately -- asserting "
-            "one would invent a number) but it is not visible in the "
-            "returned frame. Full tally on "
-            "attrs['nitrogen_input_match'].",
+            f"nitrogen share and contribute nothing to the total -- "
+            f"{named}. The organic refusal is deliberate -- manure and "
+            "compost carry nitrogen, but no instrument records what a "
+            "nominal share would need, and a 0.0 would assert one as surely "
+            "as any other number -- yet it is not visible in the returned "
+            "frame. Full tally on attrs['nitrogen_input_match'] "
+            "(refused_organic_labels separates the two).",
             NutrientCoverageWarning, stacklevel=3)
 
 
@@ -5214,7 +5357,9 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
         fertilizer at all are absent.  ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
-        (label -> row count, descending).
+        (label -> row count, descending), and ``refused_organic_rows`` /
+        ``refused_organic_labels``, the organic subset of the unmatched
+        labels (refused a share by policy, GH #867).
 
     Notes
     -----
@@ -5232,9 +5377,18 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True):
     A label that still resolves to nothing and *names itself* a fertilizer
     input now raises :class:`NutrientCoverageWarning`; the full tally rides
     on ``attrs`` either way.  Matching stays EXACT after normalisation: no
-    substring or fuzzy match, so ``Organic Fertilizer``, ``D Compound
-    Fertilizer`` and Ethiopia's ``NPS`` stay unmatched and get named rather
-    than being assigned an invented nominal share.
+    substring or fuzzy match, so ``Organic Fertilizer`` stays unmatched and
+    gets named rather than being assigned an invented nominal share.
+
+    **Blends and organics (GH #867, ruling @ligon 2026-10-18).**  Ethiopia's
+    ``NPS`` (0.19, grade 19-38-0+7S) and Malawi's ``D Compound Fertilizer``
+    (0.08) carry CITED shares -- publisher, document and table are in the
+    comment above :data:`_NITROGEN_CONTENT`; D Compound's 0.08 diverges
+    from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
+    Zambia's Compound D grades).  Organic inputs (manure, compost,
+    organic fertilizer, in every corpus language) are REFUSED a share:
+    they stay unmatched, are counted on ``refused_organic_*``, and are
+    named in the warning as a refusal, not a gap.
     Divergence from WB: the WB code keys N-share off the *product* a survey
     records (urea 0.46, DAP 0.18, NPK 0.17, …).  The UNPS questionnaire (and
     therefore our ``plot_inputs.input``) records only nutrient *class*, so we
@@ -6526,10 +6680,11 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
           rows, same unit conversion, N-share forced to 1.0.  Output column
           ``Fertilizer_kg_per_ha``.  Note this covers the INORGANIC
           vocabulary only: ``_NITROGEN_CONTENT``'s keys are the nutrient
-          classes (nitrate / phosphate / potash / mixed) and the product
-          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) -- manure and
-          other organic inputs carry no key and contribute nothing to
-          either basis.
+          classes (nitrate / phosphate / potash / mixed), the product
+          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and two cited
+          blends (Ethiopia NPS, Malawi D Compound; GH #867) -- manure and
+          other organic inputs are refused a key (GH #867) and contribute
+          nothing to either basis.
     area_col : str, default 'Area'
         Plot-area column in ``plot_features``.
     volume_as_mass : bool, default True
