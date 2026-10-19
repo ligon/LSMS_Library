@@ -4855,7 +4855,7 @@ def total_hired_labor_days(plot_labor):
 #     "Fertilizers available in Ethiopia and volumes sold for the 2016-17
 #     season" (report p. 3): "NP 19 38 0 + 7S  NPS".  The same table lists
 #     the boron / zinc variants at 17.7-18.9% N (NPS+B 18.9 is the largest
-#     seller); the ESS records only "NPS", so 0.19 is the flagship grade,
+#     seller); the ESS has one NPS question, so 0.19 is the flagship grade,
 #     not a per-bag figure (the 2016-17 volume-weighted mean of the four is
 #     18.8%).  Agrees with the WB harmonised panel (ETH_ESS3.do:896,
 #     ETH_ESS4.do:918, ETH_ESS5.do:984: ``NPS_kg*0.19``).
@@ -4989,13 +4989,17 @@ _ORGANIC_INPUT_PATTERN = re.compile(
 # / ``Adubos inorganicos - ureia``) and French.  Used ONLY to decide whether
 # an unmatched label is worth warning about; it never affects a nutrient
 # share, so a stem missing from this tuple costs a warning, never a number.
-# ``organic`` (GH #867) is a SUBSTRING test on purpose: it makes Ethiopia's
-# ``Other Organic`` (2,651 rows) and Mali's ``Other organic`` (1,189) loud,
-# which the ruling requires and which no other stem caught, and it also
-# names Mali's ``Other inorganic`` (9,640 rows, 1,694 with a positive
-# quantity) -- an "other" fertilizer slot whose product the instrument does
-# not name, which carries no share by ruling (@ligon 2026-10-14), and which
-# the warning had never named.
+# The organic REFUSAL is named through :data:`_ORGANIC_INPUT_PATTERN`,
+# independently of these stems (``_warn_nitrogen_coverage`` names every
+# refused label), so Ethiopia's ``Other Organic`` (2,651 rows) and Mali's
+# ``Other organic`` (1,189) -- unnamed before GH #867, no stem matched them
+# -- are loud whether or not ``organic`` is here.  What the ``organic`` stem
+# itself adds, as a SUBSTRING test, is the labels the pattern deliberately
+# does NOT class as organic: Mali's ``Other inorganic`` (9,640 rows, 1,694
+# with a positive quantity), an "other" fertilizer slot whose product the
+# instrument does not name and which carries no share by ruling (@ligon
+# 2026-10-14).  The warning now names it as a gap, as it already named
+# Nigeria's ``Other Inorganic Fertilizer``.
 _FERTILIZER_LABEL_HINTS = ('fertilizer', 'fertiliser', 'manure', 'compost',
                            'organic', 'adubo', 'engrais')
 
