@@ -364,3 +364,14 @@ is an ISA/EHCVM-specific module.  Kazakhstan LSMS 1996 carries no such roster.  
 this round by full variable-label inspection of the source =.dta= files:
 the only adverse-event content is community-level (=KOMMU= droughts/calamities, keyed by =oblast= not household) or livestock-loss stock-accounting (=AGR2= =w25=); no household-level shock roster with coping.  Not implementable from current data; revisit only if a coping roster
 is later identified.  Tracked in GitHub issue #352.
+
+* Encoding: the 1996 files are DOS cp866 Cyrillic (GH #805, 2026-10-19)
+
+String columns of the 1996 =.dta= files (e.g. =KZ96CHD.dta= =cd005_t=,
+=KZ96EDU_PUF.dta= =bw006_t=) hold Russian in the DOS code page cp866
+(=\x93 \x90\x8e\x84\x88\x92\x85\x8b\x85\x89= = =У РОДИТЕЛЕЙ=).  pandas decodes
+pre-118 files as latin-1, so they are served as C1 controls and Latin-1
+letters.  The #805 reader re-decode refuses them (several bytes are cp1252
+holes, a cp1252 writer cannot emit them), so they are served exactly as
+before; a correct read needs a per-file =encoding: cp866= declaration.
+Same code page in Kyrgyz Republic 1996-98 (=SECT_*.DTA=, =ANTHFL9*.DTA=).
