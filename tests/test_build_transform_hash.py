@@ -340,6 +340,41 @@ def test_excluded_callables_are_write_or_hash_only():
         assert not bad, f"excluded {qn} contains content-mutating ops {bad} -> unsafe to exclude"
 
 
+# ---------------------------------------------------------------------------
+# GH #1045 r1 F3: the WAVE-tier stamp replay is reporting, like the gate
+# ---------------------------------------------------------------------------
+
+def test_editing_the_wave_stamp_replay_moves_no_hash(monkeypatch):
+    """``country._replay_wave_stamp`` replays a wave parquet's grain and date
+    stamps at every wave-tier read; it writes nothing a build serves.  Before
+    the exclusion a no-op edit to it alone moved every hash (measured on the
+    whole corpus: btf 39/39, ``_table_cache_hash`` 549/549, ``_input_hash``
+    2,109/2,139).  Structural and measured, as for the #908 gate above;
+    positive control ``_union_waves``."""
+    qn = "lsms_library.country._replay_wave_stamp"
+    assert qn in R._EXCLUDED_CALLABLES
+    R.clear_caches()
+    leaked = [p.split("=")[0] for p in _all_parts() if p.split("=")[0] == qn]
+    assert not leaked, f"wave-stamp replay leaked into the build fingerprint: {leaked}"
+
+    btf0, tch0 = _gate_probe_hashes()
+    _probe_edit(monkeypatch, lsms_library.country._replay_wave_stamp)
+    btf1, tch1 = _gate_probe_hashes()
+    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+    assert not moved_btf and not moved_tch, (
+        f"editing _replay_wave_stamp moved {len(moved_btf)}/{len(btf0)} fingerprints "
+        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+
+    monkeypatch.undo()
+    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
+    btf2, _tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a closure callable"
+    monkeypatch.undo()
+    R.clear_caches()
+
+
 def test_df_data_grabber_is_versioned():
     """Red-team #6 positive-coverage: the core extraction transform's SOURCE
     must be a folded closure part (so editing it invalidates)."""
@@ -590,41 +625,6 @@ def test_l2_country_read_gate_is_not_folded_into_any_build_fingerprint():
     assert not leaked, f"read gate leaked into the build fingerprint: {leaked}"
 
 
-# ---------------------------------------------------------------------------
-# GH #1045 r1 F3: the WAVE-tier stamp replay is reporting, like the gate
-# ---------------------------------------------------------------------------
-
-def test_editing_the_wave_stamp_replay_moves_no_hash(monkeypatch):
-    """``country._replay_wave_stamp`` replays a wave parquet's grain and date
-    stamps at every wave-tier read; it writes nothing a build serves.  Before
-    the exclusion a no-op edit to it alone moved every hash (measured on the
-    whole corpus: btf 39/39, ``_table_cache_hash`` 549/549, ``_input_hash``
-    2,109/2,139).  Structural and measured, as for the #908 gate above;
-    positive control ``_union_waves``."""
-    qn = "lsms_library.country._replay_wave_stamp"
-    assert qn in R._EXCLUDED_CALLABLES
-    R.clear_caches()
-    leaked = [p.split("=")[0] for p in _all_parts() if p.split("=")[0] == qn]
-    assert not leaked, f"wave-stamp replay leaked into the build fingerprint: {leaked}"
-
-    btf0, tch0 = _gate_probe_hashes()
-    _probe_edit(monkeypatch, lsms_library.country._replay_wave_stamp)
-    btf1, tch1 = _gate_probe_hashes()
-    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
-    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
-    assert not moved_btf and not moved_tch, (
-        f"editing _replay_wave_stamp moved {len(moved_btf)}/{len(btf0)} fingerprints "
-        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
-
-    monkeypatch.undo()
-    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
-    btf2, _tch2 = _gate_probe_hashes()
-    assert any(btf0[t] != btf2[t] for t in btf0), \
-        "positive control failed: the probe cannot see an edit to a closure callable"
-    monkeypatch.undo()
-    R.clear_caches()
-
-
 def test_editing_the_read_gate_moves_no_hash(monkeypatch):
     """GH #908, measured: a no-op edit to the extracted gate moves 0 of the
     ``build_transforms_fingerprint`` values and 0 of ~35 probed
@@ -651,4 +651,3 @@ def test_editing_the_read_gate_moves_no_hash(monkeypatch):
     assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
     monkeypatch.undo()
     R.clear_caches()
-
