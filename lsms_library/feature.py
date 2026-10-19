@@ -25,7 +25,7 @@ from importlib.resources import files
 from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
-from .errors import LabelUnavailableError
+from .errors import LabelUnavailableError, UnitsUnavailableError
 from . import population as _population
 # NOT `from . import recall` / `from . import derivations`: the package binds
 # PUBLIC CALLABLES over both submodule names (`ll.recall(...)` from
@@ -38,6 +38,8 @@ from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
 from .recall import merge_attrs as _recall_merge_attrs
 from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
+# `country` is imported by `__init__` before this module, so this is not a cycle.
+from .country import merge_label_pass_through_reports as _labels_merge_reports
 
 
 # ---------------------------------------------------------------------------
@@ -74,10 +76,17 @@ class _AttrsCarrier(NamedTuple):
         ``attrs`` sub-mappings for the KEPT countries only, in target order.
         This is the carrier module's OWN ``merge_attrs`` -- the union rule
         belongs to the module that defines the record, never here.
+    ``per_country``
+        ``False`` (the default) when the Country-level record is already keyed
+        ``{country: ...}`` (population, recall, derivations).  ``True`` when it
+        is FLAT -- one country, one record, no country name in it -- as
+        ``labels_unmatched`` is (GH #787): the capture then wraps each value as
+        ``{country: value}`` so the merge can be a plain union keyed by country.
     """
     name: str
     keys: tuple[str, ...]
     attach: Callable[[pd.DataFrame, list[Mapping[str, Any]]], None]
+    per_country: bool = False
 
 
 def _merge_into(key: str, merge: Callable[[Any], dict]) -> Callable[..., None]:
@@ -110,6 +119,15 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         "derivations",
         (_DERIVATIONS_ATTRS_KEY,),
         _merge_into(_DERIVATIONS_ATTRS_KEY, _derivations_merge_attrs),
+    ),
+    # GH #787 item 3: the `labels=X` pass-through report.  Flat on the Country
+    # frame (`country._audit_label_pass_through`), so it is keyed by country at
+    # capture and served as `{country: report}` on the assembled frame.
+    _AttrsCarrier(
+        "labels_unmatched",
+        ("labels_unmatched",),
+        _merge_into("labels_unmatched", _labels_merge_reports),
+        per_country=True,
     ),
 )
 
@@ -995,6 +1013,10 @@ class Feature:
         # curated column).  Accumulated and reported ONCE after the loop, with a
         # df.attrs marker -- distinct from genuine per-country build failures.
         labels_unavailable: list[str] = []
+        # Same contract for units= (GH #828): countries whose food_acquired
+        # lacks the column the requested basis needs (Price for the *price
+        # modes) -- dropped, reported once, never concatenated as empties.
+        units_unavailable: list[str] = []
 
         # The metadata records each country's frame arrived with: population
         # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
@@ -1034,7 +1056,9 @@ class Feature:
                     )
                     continue
                 captured_attrs[name] = {
-                    k: df.attrs[k] for k in _CARRIED_ATTRS_KEYS
+                    k: ({name: df.attrs[k]} if carrier.per_country
+                        else df.attrs[k])
+                    for carrier in _ATTRS_CARRIERS for k in carrier.keys
                     if k in df.attrs
                 }
                 # Coerce toward the canonical shape so one country's stray
@@ -1052,6 +1076,11 @@ class Feature:
                 # Country curates no such label column -> degrade, don't conflate
                 # with a build failure.  Reported once after the loop (Contract B).
                 labels_unavailable.append(name)
+                continue
+            except UnitsUnavailableError as e:
+                # Same Contract B for units= (GH #828).  Record which column
+                # was missing so the aggregated warning can say so.
+                units_unavailable.append((name, tuple(e.missing)))
                 continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
@@ -1075,8 +1104,31 @@ class Feature:
             result.attrs['labels_unavailable'] = list(labels_unavailable)
             return result
 
+        def _mark_units_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            """Contract B for ``units=`` (GH #828): one aggregated warning + a
+            ``df.attrs['units_unavailable']`` marker naming the countries whose
+            ``food_acquired`` lacks the column the requested basis needs."""
+            if not units_unavailable:
+                return result
+            names = [n for n, _ in units_unavailable]
+            missing = sorted({c for _, cols in units_unavailable for c in cols})
+            warnings.warn(
+                f"{self.table_name}: units={kwargs.get('units')!r} unavailable "
+                f"for {len(names)} country(ies) {names} -- their food_acquired "
+                f"carries no {missing} column (the survey does not record it), "
+                f"so they were dropped from the assembly (kept {n_kept}). "
+                f"Use a units= mode whose inputs they carry, or pass a country "
+                f"subset to silence this."
+            )
+            result.attrs['units_unavailable'] = names
+            return result
+
+        def _mark_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            return _mark_units_unavailable(
+                _mark_labels_unavailable(result, n_kept), n_kept)
+
         if not frames:
-            return _mark_labels_unavailable(pd.DataFrame(), 0)
+            return _mark_unavailable(pd.DataFrame(), 0)
 
         # pandas cannot stack frames whose index DEPTH/NAMES differ into a named
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
@@ -1194,4 +1246,4 @@ class Feature:
                 f"unnamed object index; per-country index names differ: {shapes}"
             )
 
-        return _mark_labels_unavailable(result, n_kept)
+        return _mark_unavailable(result, n_kept)

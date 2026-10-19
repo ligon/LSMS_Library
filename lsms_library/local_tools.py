@@ -59,6 +59,7 @@ from __future__ import annotations
 from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
+import codecs
 import struct
 import tempfile
 import numpy as np
@@ -1327,6 +1328,62 @@ def _is_stata_dta(head: bytes) -> bool:
             and head[2] == 1)
 
 
+# SPSS and the text tail (GH #1002).  Two more admissions, same principle as
+# the Stata sniff: a reader is tried only on a file that claims its format.
+#
+# * SPSS system files open with ``$FL2`` (``.sav``) or ``$FL3`` (compressed
+#   ``.zsav``).  The path-string retry used to hand EVERY file to
+#   ``pd.read_spss``, whose ``ReadstatError`` is not in that ``except`` -- so
+#   a file that was never SPSS escaped as "Unable to read from file" and the
+#   chain's own failure was discarded.
+# * ``read_csv`` / ``read_fwf`` under a permissive encoding (``latin-1``
+#   decodes every byte) turn any binary file into a frame -- an empty
+#   ``(0, 1)`` one, its column named after the header bytes.  A head that
+#   decodes to C0 control characters (NUL above all) is not text, and the
+#   text readers are not tried on it.
+
+#: Suffixes that claim SPSS content, whatever the first bytes say.
+_SPSS_SUFFIXES = frozenset({'.sav', '.zsav'})
+
+#: C0 control characters that occur in genuine text files (tab, newlines,
+#: vertical tab, form feed, and the DOS end-of-file ``^Z``).
+_TEXT_CONTROLS = frozenset('\t\n\r\x0b\x0c\x1a')
+
+
+def _is_spss(head: bytes, fn) -> bool:
+    """True when *fn*'s suffix or *head*'s magic claims an SPSS system file.
+
+    The magics are ``$FL2`` (``.sav``) and ``$FL3`` (``.zsav``), written
+    inline: a tuple of ``bytes`` is not a serialisable build constant
+    (``_build_registry._ser``), and inline they are fingerprinted with this
+    function's source.
+    """
+    return (Path(fn).suffix.lower() in _SPSS_SUFFIXES
+            or head[:4] in (b'$FL2', b'$FL3'))
+
+
+def _is_binary_head(head: bytes, encoding: str | None) -> bool:
+    """True when *head* is not text under *encoding* (default UTF-8).
+
+    Not text: it fails to decode, or decodes to a C0 control character
+    other than ordinary whitespace.  Decoding is incremental so a multibyte
+    character cut by the sniff window is not mistaken for an error.  An
+    empty head (unsniffable stream) and an unknown encoding answer False,
+    leaving the text readers to behave -- and fail -- exactly as before.
+    """
+    if not head:
+        return False
+    try:
+        decoder = codecs.getincrementaldecoder(encoding or 'utf-8')()
+    except LookupError:
+        return False
+    try:
+        text = decoder.decode(head, final=False)
+    except UnicodeDecodeError:
+        return True
+    return any(ch < ' ' and ch not in _TEXT_CONTROLS for ch in text)
+
+
 def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
     """Read a SAS Transport (XPORT) file through ``pandas.read_sas``.
 
@@ -1449,36 +1506,45 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         if _is_sas_xport(head):
             return _read_sas_xport(f, fn, encoding)
 
-        if isinstance(f,str):
-            try:
-                return pd.read_spss(f,convert_categoricals=convert_categoricals)
-            except (pd.errors.ParserError, UnicodeDecodeError, TypeError):
-                pass
+        # The failure the final error is chained to (GH #1002): the reader
+        # whose format the sniff claimed, else the last reader that failed.
+        failure = None
 
-            # pyreadstat fallback for SAV/SPSS files that pd.read_spss can't handle
-            try:
-                df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
-                return df_pr
-            except (ValueError, pyreadstat.ReadstatError, OSError,
-                    NotImplementedError):
-                # Format-fallback: parser/IO errors mean "try next reader".
-                # Programmer bugs (TypeError, AttributeError) propagate.
-                pass
-        elif Path(fn).suffix.lower() == '.sav':
-            # SAV file accessed as a stream (e.g. via DVC); pyreadstat needs a path
-            try:
-                return _pyreadstat_via_tempfile(
-                    pyreadstat.read_sav, f, '.sav',
-                    apply_value_formats=convert_categoricals, encoding=encoding)
-            except (ValueError, pyreadstat.ReadstatError, OSError,
-                    NotImplementedError):
-                # Format-fallback: parser/IO errors mean "try next reader".
-                pass
+        # SPSS -- only for a ``.sav`` / ``.zsav`` suffix or ``$FL2``/``$FL3``
+        # magic (GH #1002).  Like a claimed ``.dta``, a claimed SPSS file
+        # whose SPSS readers all fail is a broken SPSS file: it raises with
+        # the reader's error as cause rather than reaching the text readers.
+        if _is_spss(head, fn):
+            if isinstance(f, str):
+                try:
+                    return pd.read_spss(f,convert_categoricals=convert_categoricals)
+                except (pd.errors.ParserError, UnicodeDecodeError, TypeError):
+                    pass
+
+                # pyreadstat fallback for SAV/SPSS files that pd.read_spss can't handle
+                try:
+                    df_pr, meta = pyreadstat.read_sav(f, apply_value_formats=convert_categoricals, encoding=encoding)
+                    return df_pr
+                except (ValueError, pyreadstat.ReadstatError, OSError,
+                        NotImplementedError) as exc:
+                    # Parser/IO errors only; programmer bugs (TypeError,
+                    # AttributeError) propagate.
+                    raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
+            else:
+                # SPSS accessed as a stream (e.g. via DVC); pyreadstat needs a path
+                try:
+                    return _pyreadstat_via_tempfile(
+                        pyreadstat.read_sav, f,
+                        Path(fn).suffix.lower() if Path(fn).suffix.lower() in _SPSS_SUFFIXES else '.sav',
+                        apply_value_formats=convert_categoricals, encoding=encoding)
+                except (ValueError, pyreadstat.ReadstatError, OSError,
+                        NotImplementedError) as exc:
+                    raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
 
         try:
             return pd.read_parquet(f, engine='pyarrow')
-        except (ArrowInvalid,):
-            pass
+        except (ArrowInvalid,) as exc:
+            failure = exc
 
         # Stata -- only when the header says so (GH #712).  Handed a file
         # that is NOT Stata, ``StataReader`` reads a garbage header and dies
@@ -1489,8 +1555,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 f.seek(0)
                 return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
-            except (ValueError, struct.error):
-                pass
+            except (ValueError, struct.error) as exc:
+                failure = exc
 
             try:
                 # pyreadstat handles older Stata formats that pandas StataReader cannot.
@@ -1507,42 +1573,77 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 # become CSV under a permissive encoding such as latin-1.
                 if Path(fn).suffix.lower() == '.dta':
                     raise ValueError(f'{fn} has a Stata header but cannot be decoded') from exc
-                # Other suffixes retain the existing format fallback.
-                pass
+                # Other suffixes retain the existing format fallback --
+                # which the text gate below now closes for a binary head.
+                failure = exc
+            sniffed_failure = failure
+        else:
+            sniffed_failure = None
 
-        try:
-            f.seek(0)
-            return pd.read_csv(f,encoding=encoding)
-        except (pd.errors.ParserError, UnicodeDecodeError):
-            pass
+        # Text readers only for a head that is text (GH #1002).  The binary
+        # readers between them (Excel, Feather) are tried either way.
+        binary = _is_binary_head(head, encoding)
+
+        if not binary:
+            try:
+                f.seek(0)
+                return pd.read_csv(f,encoding=encoding)
+            except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+                failure = exc
 
         try:
             f.seek(0)
             return pd.read_excel(f)
-        except (pd.errors.ParserError, UnicodeDecodeError, ValueError):
-            pass
+        except (pd.errors.ParserError, UnicodeDecodeError, ValueError) as exc:
+            failure = exc
 
         try:
             f.seek(0)
             return pd.read_feather(f)
-        except (pd.errors.ParserError, UnicodeDecodeError,ArrowInvalid) as e:
-            pass
+        except (pd.errors.ParserError, UnicodeDecodeError,ArrowInvalid) as exc:
+            failure = exc
 
+        if not binary:
+            try:
+                f.seek(0)
+                return pd.read_fwf(f)
+            except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+                failure = exc
+
+        if binary:
+            raise ValueError(
+                f"{fn}: no binary reader accepted this file and its header "
+                f"{head[:8]!r} is binary, not text under encoding "
+                f"{encoding or 'utf-8'!r}; refusing the text readers "
+                f"(GH #1002)") from (sniffed_failure or failure)
+        raise ValueError(f"Unknown file type for {fn}.") from (sniffed_failure or failure)
+
+    def retry_with_path(first, path):
+        """The path-string retry, for SPSS only (GH #1002).
+
+        ``pd.read_spss`` wants a filename, so a claimed SPSS file whose
+        stream read failed is retried by path.  Nothing else is: every other
+        reader in the chain takes the stream, and the retry used to hand
+        every file to ``pd.read_spss``, replacing the chain's own failure
+        with an unrelated ``ReadstatError``.  If the retry fails too, the
+        stream failure is kept as its explicit ``__cause__``.
+        """
+        if not _is_spss(_sniff_head(str(path)), fn):
+            raise first
         try:
-            f.seek(0)
-            return pd.read_fwf(f)
-        except (pd.errors.ParserError, UnicodeDecodeError):
-            pass
-
-
-        raise ValueError(f"Unknown file type for {fn}.")
+            return read_file(str(path), convert_categoricals=convert_categoricals,
+                             encoding=encoding)
+        except Exception as second:
+            if second.__cause__ is None and second is not first:
+                second.__cause__ = first
+            raise
 
     if local_file(fn):
         try:
             with open(fn,mode='rb') as f:
                 df = read_file(f,convert_categoricals=convert_categoricals,encoding=encoding)
-        except (TypeError,ValueError): # Needs filename?
-            df = read_file(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        except (TypeError,ValueError) as first: # Needs filename?
+            df = retry_with_path(first, fn)
     elif file_system_path(fn):
         # Layer-1 (raw .dta blob) caching.  After ``_ensure_dvc_pulled``
         # populates the cache, we open the cache file *directly* rather
@@ -1561,18 +1662,16 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
             try:
                 with open(cache_path, mode='rb') as f:
                     df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            except (TypeError, ValueError):  # Reader needs a filename, not a stream
-                df = read_file(str(cache_path),
-                               convert_categoricals=convert_categoricals,
-                               encoding=encoding)
+            except (TypeError, ValueError) as first:  # Reader needs a filename, not a stream
+                df = retry_with_path(first, cache_path)
         else:
             # No usable cache file (sidecar missing/corrupt or fetch failed).
             # Fall back to ``DVCFS.open`` for streaming.  Slow but correct.
             try:
                 with DVCFS.open(fn, mode='rb') as f:
                     df = read_file(f, convert_categoricals=convert_categoricals, encoding=encoding)
-            except TypeError:  # Needs filename?
-                df = read_file(fn, convert_categoricals=convert_categoricals, encoding=encoding)
+            except TypeError as first:  # Needs filename?
+                df = retry_with_path(first, fn)
 
     else:
         # Neither local nor DVC-tracked at ``countries_root()``:
@@ -1884,6 +1983,11 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
     return out
 
 
+# ``df_data_grabber``'s own keyword options.  Every OTHER keyword reaching it
+# names a value column (a myvar); see get_categorical_mapping (GH #674).
+_GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
+
+
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
                             dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
@@ -1940,8 +2044,19 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     'categorical_mapping.org'. But if fn is a path to a dta file instead,
     returns categories for tablename from the stata file.
 
-    A bare ``get_categorical_mapping(tablename=...)`` returns an EMPTY dict --
-    no value column is passed.  Prefer :func:`code_label_map`.
+    **A value column is REQUIRED for an org table** (GH #674).  The value
+    columns are the keyword arguments other than ``df_data_grabber``'s own
+    options (``convert_categoricals``, ``encoding``, ``missing_ok``) -- e.g.
+    ``**{'Preferred Label': 'Preferred Label'}``.  A bare
+    ``get_categorical_mapping(tablename=...)`` used to return an EMPTY dict
+    (or an empty frame with ``asdict=False``), silently: ``df_data_grabber``
+    got ``idxvars`` and no myvars, so every column but the key was dropped and
+    every later lookup missed.  That is GhanaLSS "Trap 1"
+    (``GhanaLSS/_/CONTENTS.org``), which shipped 100%-null columns three
+    times.  It now raises :class:`TypeError` before any file is read, for
+    either ``asdict``; :func:`code_label_map` is the ``Code -> Label`` lookup
+    most bare callers wanted.  The ``.dta`` form needs no value column and is
+    unaffected.
     """
     ext = Path(fn).suffix
 
@@ -1951,6 +2066,24 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             return cats
         else:
             return cats[tablename]
+
+    if tablename is not None and not set(kwargs) - _GRABBER_OPTIONS:
+        # The code_label_map hint fits only the key the caller named.
+        if idxvars == 'Code':
+            hint = (f"For a Code -> Label lookup use "
+                    f"code_label_map({tablename!r}, dirs).")
+        elif isinstance(idxvars, str):
+            hint = (f"For a single-column lookup keyed by {idxvars!r} use "
+                    f"code_label_map({tablename!r}, dirs, "
+                    f"idxvars={idxvars!r}, value=<value column>).")
+        else:
+            hint = (f"If the table is keyed Code -> Label, use "
+                    f"code_label_map({tablename!r}, dirs).")
+        raise TypeError(
+            f"get_categorical_mapping(tablename={tablename!r}) needs a value "
+            f"column, e.g. **{{'Preferred Label': 'Preferred Label'}}; "
+            f"without one it can only return an empty mapping (GH #674). "
+            + hint)
 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
@@ -1965,7 +2098,9 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
             else:
                 path = d+fn
             df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
-            df = df.squeeze()
+            # Columns only: a one-row table must stay a Series/frame, not
+            # collapse to a scalar (GH #674).
+            df = df.squeeze(axis=1)
             if asdict:
                 return df.to_dict()
             else:
@@ -1987,9 +2122,10 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
 
     **Why this exists.**  ``get_categorical_mapping`` passes ``idxvars='Code'``
     and, unless the caller supplies a value column as a keyword, no myvars --
-    so ``df_data_grabber`` drops the Label column and the squeeze returns an
-    *empty dict*.  Every lookup against it then misses and silently yields
-    ``pd.NA``.  Nothing raises; the column simply comes out 100% null.
+    so ``df_data_grabber`` dropped the Label column and the squeeze returned an
+    *empty dict*.  Every lookup against it then missed and silently yielded
+    ``pd.NA``; the column simply came out 100% null.  Since GH #674 that bare
+    call raises ``TypeError`` pointing here.
 
     That failure mode has bitten GhanaLSS three separate times:
 

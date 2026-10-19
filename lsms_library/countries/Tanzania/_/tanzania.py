@@ -494,40 +494,6 @@ def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
     return g.sum()
 
 
-def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
-
-    food_items = harmonized_food_labels()
-
-    df = get_dataframe(fn, convert_categoricals=True)
-
-    # Unit labels from Stata value labels (need a stream, not a DataFrame)
-    with DVCFS.open(fn) as dta:
-        sr = pd.io.stata.StataReader(dta)
-        try:
-            unitlabels = sr.value_labels()[units]
-        except KeyError:
-            foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
-            unitlabels = sr.value_labels()[key]
-
-    if food_items is not None:
-        df = df.replace({item: food_items})
-    df = df.rename(columns={HHID: 'HHID', item: 'itmcd', farmgate: 'farmgate',
-                             market: 'market', units: 'units'})
-    try:
-        df['itmcd'] = df['itmcd'].astype(float)
-        df = df.loc[~np.isnan(df['itmcd'])]
-        df['itmcd'] = df['itmcd'].astype(int)
-    except (ValueError, TypeError):
-        pass
-    prices = df.loc[:, ['HHID', 'itmcd', 'farmgate', 'market', 'units']].set_index(['HHID', 'itmcd'])
-    prices = prices.replace({'units': unitlabels})
-    prices.units = prices.units.astype(str)
-
-    pd.Series(unitlabels).to_csv('unitlabels.csv')
-
-    return prices
-
 def food_expenditures(fn='',purchased=None,away=None,produced=None,given=None,item='item',HHID='HHID'):
     food_items = harmonized_food_labels()
 
@@ -571,14 +537,6 @@ def age_sex_composition(fn,sex='sex',sex_converter=None,age='age',
 
     return df
 
-def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Label',value='Preferred Label'):
-    unitlabels = pd.read_csv(fn)
-    unitlabels.columns = [s.strip() for s in unitlabels.columns]
-    unitlabels = unitlabels[[key,value]].dropna()
-    unitlabels = unitlabels.set_index(key)
-    return unitlabels.squeeze().str.strip().to_dict()
-
-    
 def food_acquired(fn,myvars):
     df = get_dataframe(fn)
     df = df.loc[:,list(myvars.values())].rename(columns={v:k for k,v in myvars.items()})
@@ -746,7 +704,7 @@ def food_acquired_to_canonical(df):
     # Route the canonical item axis (j) through harmonize_food so it carries
     # the shared Preferred Label rather than the raw UPPERCASE survey label
     # (GH #443).  This is the SAME {raw label -> Preferred Label} resolver
-    # used by prices_and_units / food_expenditures / food_quantities and by
+    # used by food_expenditures / food_quantities and by
     # crop_production, so food_acquired.j now joins crop_production.j.  Items
     # with no harmonize_food entry keep their raw label (no fabrication); the
     # row count is unchanged -- only the j *labels* change.
