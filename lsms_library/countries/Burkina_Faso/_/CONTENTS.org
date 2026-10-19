@@ -645,6 +645,16 @@ differs, 41 are accents/case only (=Séno=/=Seno=, =Balé=/=Bale=,
 =Kourweogo=/=Kourwéogo=) and 12 name a neighbouring province
 (=Kompienga=/=Gourma=, =Poni=/=Noumbiel=, =Séno=/=Yagha=).
 
+*Also seen, not fixed: 2014's grain warning is a SOURCE property.*  The
+pre-existing 2014 =cluster_features= report (1,034 of 10,800 rows, 94
+conflicting =zd=) is =province= varying within the =zd= -- =region= and
+=milieu= never do.  =emc2014_welfare.dta= shows the same variation (93
+grappes) and agrees with =emc2014_p1_logement_27022015.dta= household for
+household (10,411 matched, 0 disagree), so it is not a config error.  Some of
+the provinces named lie outside the zd's region (zd 16, Boucle du Mouhoun:
+BANWA, KOSSI and LOROUM -- Loroum is in Nord), which reads as a miscoded
+province rather than an EA straddling a boundary.
+
 *Cache*: both wave =data_info.yml= files are build inputs, so all 24
 Burkina_Faso =Country._table_cache_hash= values move; the 2021-22 wave
 hashes, every other country and every =build_transforms_fingerprint= are
