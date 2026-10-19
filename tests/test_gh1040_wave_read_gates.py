@@ -473,18 +473,46 @@ def test_site3_ignores_the_hash_and_the_degraded_grade(acf, monkeypatch):
 
 def test_site3_read_error(acf):
     """A file that cannot be parsed has no readable manifest.  A subset request
-    falls through.  A FULL request is served -- and what is served is an EMPTY
-    frame, with no error: ``get_dataframe`` does not raise on a non-parquet
-    ``.parquet`` but parses its bytes as a CSV header.  Pinned as found (GH
-    #1040 changes no behaviour); it is a defect in its own right, unlike
-    site 1 where a read error falls through to a rebuild."""
+    falls through.  A FULL request RAISES ``ParquetFormatError`` naming the
+    file, and nothing is finalized (GH #1070).
+
+    Until #1070 this pinned the defect as found: ``get_dataframe`` parsed the
+    non-parquet ``.parquet`` as a CSV header and the full request was served
+    an EMPTY frame, with no error.  Raise, not rebuild: ``assume_cache_fresh``
+    is the caller's statement that the parquet is good, and whether a corrupt
+    one should fall through instead is GH #1071's decision."""
     make, path, _, finalized = acf
     c = make()
     _garbage(path)
     with pytest.raises(_FellThrough):
         c._aggregate_wave_data([c.waves[-1]], CF_TABLE)
-    got = c._aggregate_wave_data(list(c.waves), CF_TABLE)
-    assert isinstance(got, pd.DataFrame) and got.empty and len(finalized) == 1
+    with pytest.raises(LT.ParquetFormatError, match="no Parquet header") as info:
+        c._aggregate_wave_data(list(c.waves), CF_TABLE)
+    assert str(path) in str(info.value)
+    assert finalized == []
+
+
+def test_country_gate_read_error_is_graded_before_it_is_read(root):
+    """GH #1070, for comparison with site 3: the ordinary L2-country gate never
+    READS a non-parquet ``.parquet`` -- it has no readable hash, so it grades
+    ``stale`` (GH #809) and the caller rebuilds."""
+    c = C.Country(CF_COUNTRY, preload_panel_ids=False)
+    path = _garbage(root / CF_COUNTRY / "var" / f"{CF_TABLE}.parquet")
+    df, _, reason = c._read_l2_country_cache(CF_TABLE, path, list(c.waves))
+    assert df is None and reason.startswith("STALE"), reason
+
+
+def test_country_gate_unverifiable_read_error_raises(root, monkeypatch):
+    """Only when the expected hash cannot be computed (``unverifiable``) does
+    the country gate read the file.  GH #1070: it now RAISES
+    ``ParquetFormatError`` -- not an ``OSError``/``ArrowInvalid``, so the
+    gate's rebuild handler does not catch it.  Before #1070 the gate served
+    the CSV parse of the garbage, an EMPTY frame, as the table."""
+    c = C.Country(CF_COUNTRY, preload_panel_ids=False)
+    monkeypatch.setattr(C.Country, "_table_cache_hash", lambda self, *a, **k: None)
+    path = _garbage(root / CF_COUNTRY / "var" / f"{CF_TABLE}.parquet")
+    with pytest.raises(LT.ParquetFormatError, match="no Parquet header"):
+        c._read_l2_country_cache(CF_TABLE, path, list(c.waves))
 
 
 def test_site3_json_methods_never_short_circuit(acf, root):
