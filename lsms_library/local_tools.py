@@ -1669,9 +1669,11 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # tool, etc.), not a legitimate fast path.  Refuse to use it so
         # the read goes through the DVC cache (under ``data_root()``)
         # via ``file_system_path`` -> ``_ensure_dvc_pulled`` ->
-        # ``DVCFS.open``.  Files without a sister sidecar are fine
-        # (new data being prepped for ``dvc add``, user scratch data,
-        # WB-fallback downloads).
+        # ``DVCFS.open``.  Files without a sister sidecar are allowed
+        # OUTSIDE the config tree (user scratch data, WB-fallback
+        # downloads under ``data_root()``); inside ``countries_root()``
+        # they are refused unless opted in (GH #831,
+        # ``_refuse_intree_source``).
         if _is_polluted_workspace_copy(fn):
             warnings.warn(
                 f"Refusing workspace copy of DVC-tracked file {fn} "

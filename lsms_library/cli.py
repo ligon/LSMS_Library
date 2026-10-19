@@ -196,7 +196,9 @@ def _report_intree_source_files(root: Path, countries: Sequence[str]) -> None:
     if found["no_sidecar"]:
         print(f"WARNING: {len(found['no_sidecar'])} in-tree source file(s) under "
               f"{root} with NO .dvc sidecar (GH #831) -- get_dataframe REFUSES "
-              f"these (InTreeSourceError) unless LSMS_ALLOW_INTREE_SOURCES=1; "
+              f"these (InTreeSourceError) unless LSMS_ALLOW_INTREE_SOURCES=1 "
+              f"or the read runs inside the acquisition flow (add_wave / "
+              f"populate_and_push, under local_tools.allow_intree_sources()); "
               f"delete each unless it is new data awaiting `dvc add`:")
         for p in found["no_sidecar"]:
             print(f"  {p}")
