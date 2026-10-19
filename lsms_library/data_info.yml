@@ -67,14 +67,13 @@ Index Info:
     # collapsing to a single object-tuple Index.  livestock is homogeneous
     # across countries; people_last7days is (t,v,i,pid) for all but Uganda
     # (reduced to (t,v,i) -- handled as a reduced-index country).  The other
-    # two plot-level ag features (plot_labor/plot_inputs) are still NOT here:
-    # their per-country index NAMES diverge (plot vs plot_id, crop vs j) and
-    # need harmonizing before registration -- GH #569.  The plot axis half of
-    # that divergence is settled: `plot_id` is the canonical spelling
-    # EVERYWHERE (@ligon, 2026-09-10) -- it is what all 23 `plot_features`
-    # countries already declare -- and `plot` is the alias.  crop_production is
-    # registered below; the name divergence is now handled DECLARATIVELY by
-    # `level_aliases`, so the same treatment generalises to the other two.
+    # plot-level ag features (crop_production, plot_labor, plot_inputs) are
+    # registered at the end of this block; their per-country NAME divergence
+    # (plot vs plot_id, crop vs j) is handled DECLARATIVELY by `level_aliases`
+    # and their missing levels by `missing_level_sentinels` -- GH #569.
+    # `plot_id` is the canonical plot-axis spelling EVERYWHERE (@ligon,
+    # 2026-09-10) -- it is what all 23 `plot_features` countries already
+    # declare -- and `plot` is the alias.
     livestock: (t, i, animal)
     people_last7days: (t, v, i, pid)
     # GH #817: `nonfood_expenditures` shipped in two shapes -- Togo long
@@ -106,6 +105,32 @@ Index Info:
     # was Uganda's spelling and is now an ALIAS.  See
     # `.coder/ledger/crop-production-plot-id.md`.
     crop_production: (t, v, i, plot_id, j, u, condition, season)
+    # GH #569 (ruling @ligon, 2026-10-18): "`plot_labor` keeps `stage` and
+    # `worker` as index levels, with a sentinel where a country lacks them."
+    # Twelve of the fifteen declaring countries emit (t, i, plot_id, source);
+    # GhanaLSS adds `stage` + `worker`, GhanaSPS `season` + `stage`, Uganda
+    # `season`.  Before registration the MODAL shape won and all three were
+    # EXCLUDED from Feature('plot_labor') (265,806 rows); registering without
+    # `stage` would instead have collapsed GhanaSPS's per-stage rows (60,607 in
+    # the Sept. 2026 review) and without `season` Uganda's two seasons.
+    # `season` is kept for the same reason as `stage`/`worker` and sits last,
+    # as it does on crop_production.  `v` is KEPT for the reason given on
+    # crop_production above: plot_labor is household-grain and is v-joined
+    # today, so a `v`-less registration would strip `v` from every
+    # Country(...).plot_labor() frame.
+    plot_labor: (t, v, i, plot_id, stage, source, worker, season)
+    # GH #569 (same ruling): "The seven EHCVM `plot_inputs` tables with no plot
+    # level are registered with a household-grain sentinel on `plot_id`
+    # through `missing_level_sentinels`, not excluded."  Benin, Burkina_Faso,
+    # CotedIvoire, Guinea-Bissau, Niger, Senegal and Togo declare
+    # (t, i, input, crop, u) -- EHCVM records inputs at the HOUSEHOLD x input
+    # grain (their data_scheme.yml GRAIN NOTEs).  The other seven carry
+    # `plot_id`; Ethiopia / GhanaLSS / Uganda spell the crop axis `j`, the rest
+    # `crop` (aliased below); six of them carry `u` as a COLUMN (promoted
+    # below); only Uganda carries `season`.  `u` and `season` are canonical
+    # because Malawi and the EHCVM seven key rows on `u`, and Uganda on
+    # `season` -- dropping either would collapse distinct reported line-items.
+    plot_inputs: (t, v, i, plot_id, input, j, u, season)
 
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
@@ -122,9 +147,22 @@ Index Info:
   # `crop_production` keys plots `{hhid}-{parcel}-{plot}` while its
   # `plot_features` keys them `{parcel}_{suffix}`, which is exactly what
   # `transformations._parcel_from_crop_plot` exists for.
+  #
+  # plot_inputs: `crop` -> `j` is the SAME pair as crop_production's, and it
+  # was checked rather than assumed (GH #569, 2026-10-19): within each country
+  # the plot_inputs `crop` labels are the country's crop_production crop
+  # labels -- Mali 42 of 42 shared, Malawi 26/26, Tanzania 20/20, Nigeria 72 of
+  # 74 -- apart from the "not crop-specific" marker and a few catch-alls.
+  # What the rename does NOT do is harmonize that marker: it is spelled
+  # `(not crop-specific)` (EHCVM), `Whole Plot` (Ethiopia), `Farm-level`
+  # (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN (Malawi, Mali, Tanzania).
+  # plot_labor needs no alias: every country already spells `plot_id` and
+  # `source`.
   level_aliases:
     crop_production:
       plot: plot_id
+      crop: j
+    plot_inputs:
       crop: j
 
   # Per-feature SENTINEL for a canonical index level a country does not carry.
@@ -147,10 +185,41 @@ Index Info:
   #   condition-- `unknown_condition` is the value `Columns: crop_production:
   #               condition` already defines ("a real value, never NA").
   #   season   -- `unknown_season`, new here, same argument.
+  #
+  # plot_labor / plot_inputs (GH #569).  Two KINDS of sentinel, and they must
+  # not be merged (GhanaLSS/_/CONTENTS.org, "The Farm-level convention"):
+  #
+  #   * EPISTEMIC -- the axis exists for the record but was not fielded.
+  #     `u: Unknown` (the corpus-wide missing-unit sentinel) and
+  #     `season: unknown_season` (the crop_production spelling, reused so the
+  #     plot tables share one value on the shared axis).
+  #   * STRUCTURAL -- the survey does not resolve the axis: the quantity is not
+  #     attributable to one plot / stage / worker type, it is the total over
+  #     them.  `Farm-level` is the in-force spelling (@ligon, 2026-09-16):
+  #     GhanaLSS already writes it on exactly these levels -- `plot_id` in both
+  #     tables, `stage` and `worker` on plot_labor's Q46 exchange total -- and
+  #     its CONTENTS.org names the EHCVM plot_inputs as the table still to be
+  #     aligned to it.  Using it here keeps ONE spelling of "not resolved" in a
+  #     Feature() frame rather than minting `unknown_stage` / `household`.
+  #
+  # plot_inputs `plot_id: Farm-level` is the ruling's "household-grain
+  # sentinel": EHCVM's input roster is per household x input, so the row is
+  # the household's farm, NOT an observed plot.  Filter `plot_id !=
+  # 'Farm-level'` for plot-resolved records only.  plot_labor `stage` /
+  # `worker: Farm-level` marks a plot's labour served as the total over every
+  # stage / worker type (13 of 15 countries for `stage`, 14 for `worker`).
   missing_level_sentinels:
     crop_production:
       u: Unknown
       condition: unknown_condition
+      season: unknown_season
+    plot_labor:
+      stage: Farm-level
+      worker: Farm-level
+      season: unknown_season
+    plot_inputs:
+      plot_id: Farm-level
+      u: Unknown
       season: unknown_season
 
   # Features whose reduced-index countries get their MISSING canonical levels

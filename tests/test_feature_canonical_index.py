@@ -73,11 +73,30 @@ class TestDeclarations:
 
     def test_sentinel_levels_are_canonical_levels(self):
         """A sentinel for a level the canonical index does not declare would
-        never fire, and would read as a promise the assembly does not keep."""
-        for table, sentinels in (("crop_production",
-                                  _missing_level_sentinels("crop_production")),):
+        never fire, and would read as a promise the assembly does not keep.
+        Checked for EVERY table that declares sentinels (GH #569 added
+        plot_labor / plot_inputs), not only the first one."""
+        from lsms_library.feature import _index_info_section
+        tables = sorted(_index_info_section().get("missing_level_sentinels") or {})
+        assert {"crop_production", "plot_labor", "plot_inputs"} <= set(tables)
+        for table in tables:
             canonical = set(_canonical_index_levels(table))
+            assert canonical, f"{table}: sentinels declared but not registered"
+            sentinels = _missing_level_sentinels(table)
             assert set(sentinels) <= canonical, table
+            for lvl, value in sentinels.items():
+                assert isinstance(value, str) and value and pd.notna(value), (
+                    f"{table}.{lvl}: a NULL index key is deleted by the next "
+                    f"groupby (CLAUDE.md 'Grain Collapse' 3b)")
+
+    def test_alias_targets_are_canonical_levels(self):
+        """An alias whose target is not canonical renames a level into one
+        the assembly then drops as an 'extra' -- the opposite of its purpose."""
+        from lsms_library.feature import _index_info_section
+        for table in sorted(_index_info_section().get("level_aliases") or {}):
+            canonical = set(_canonical_index_levels(table))
+            targets = set(_level_aliases(table).values())
+            assert targets <= canonical, (table, targets - canonical)
 
     def test_crop_production_does_not_use_the_pd_NA_fabrication(self):
         """#506's `fabricate_missing_levels` fills with pd.NA; the sentinel
@@ -372,7 +391,7 @@ class TestPromotionCollision:
     def test_unregistered_feature_is_untouched(self):
         """No index_info entry -> canonical_levels is [] -> nothing happens."""
         df = _frame(["i", "t", "plot_id", "crop"], [("h1", "2011", "p1", "Maize")])
-        out = _harmonize_country_frame(df, [], "X", "plot_labor", False,
+        out = _harmonize_country_frame(df, [], "X", "an_unregistered_table", False,
                                        aliases={}, sentinels={})
         assert list(out.index.names) == ["i", "t", "plot_id", "crop"]
 
@@ -465,6 +484,12 @@ class _FakeCountry:
         self.name = name
 
     def crop_production(self, currency=None, **kwargs):
+        return self._FRAMES[self.name].copy()
+
+    def plot_labor(self, currency=None, **kwargs):
+        return self._FRAMES[self.name].copy()
+
+    def plot_inputs(self, currency=None, **kwargs):
         return self._FRAMES[self.name].copy()
 
 
@@ -574,3 +599,304 @@ def test_unnamed_index_is_left_alone():
         df, CANONICAL, _missing_level_sentinels("crop_production"),
         "X", "crop_production")
     assert out is df
+
+
+# ---------------------------------------------------------------------------
+# plot_labor / plot_inputs (GH #569, ruling @ligon 2026-10-18)
+# ---------------------------------------------------------------------------
+#
+# "(1) `plot_labor` keeps `stage` and `worker` as index levels, with a sentinel
+# where a country lacks them.  (2) The seven EHCVM `plot_inputs` tables with no
+# plot level are registered with a household-grain sentinel on `plot_id`
+# through `missing_level_sentinels`, not excluded."
+#
+# Before registration both tables fell through to the MODAL shape filter:
+# Feature('plot_labor') excluded GhanaLSS, GhanaSPS and Uganda (265,806 rows),
+# Feature('plot_inputs') kept only the seven EHCVM countries and excluded the
+# other seven (676,635 rows), measured warm 2026-10-19.
+
+PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season"]
+PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season"]
+
+# The real per-country index shapes, as `Country(c).<table>()` serves them
+# (measured warm on the corpus, 2026-10-19).  Countries listed together share a
+# shape.  `u_column` marks the six plot_inputs countries that carry `u` as a
+# COLUMN, which the assembly promotes.
+LABOR_SHAPES = {
+    # Benin, Burkina_Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Malawi, Mali,
+    # Niger, Nigeria, Senegal, Tanzania, Togo
+    "Benin":    ["i", "t", "v", "plot_id", "source"],
+    "GhanaLSS": ["i", "t", "v", "plot_id", "stage", "source", "worker"],
+    "GhanaSPS": ["i", "t", "v", "plot_id", "season", "stage", "source"],
+    "Uganda":   ["i", "t", "v", "plot_id", "source", "season"],
+}
+INPUT_SHAPES = {
+    # the seven EHCVM countries: no plot level at all
+    "Benin":    (["i", "t", "v", "input", "crop", "u"], False),
+    # Ethiopia, GhanaLSS
+    "Ethiopia": (["i", "t", "v", "plot_id", "input", "j"], True),
+    "Malawi":   (["i", "t", "v", "plot_id", "input", "crop", "u"], False),
+    # Mali, Nigeria, Tanzania
+    "Mali":     (["i", "t", "v", "plot_id", "input", "crop"], True),
+    "Uganda":   (["i", "t", "v", "plot_id", "input", "j", "season"], True),
+}
+
+
+class TestPlotTableDeclarations:
+    def test_plot_labor_is_registered_with_stage_and_worker(self):
+        assert _canonical_index_levels("plot_labor") == PLOT_LABOR
+
+    def test_plot_inputs_is_registered_with_plot_id(self):
+        assert _canonical_index_levels("plot_inputs") == PLOT_INPUTS
+
+    @pytest.mark.parametrize("table", ["plot_labor", "plot_inputs"])
+    def test_canonical_index_keeps_v(self, table):
+        """Both tables are household-grain and v-joined today (neither was in
+        index_info nor in `skip_extra`).  `_compute_no_v_join` exempts a table
+        whose canonical index omits `v`, so a v-less registration would strip
+        `v` from every Country(...) frame of that table."""
+        from lsms_library.country import _no_v_join_tables
+        assert "v" in _canonical_index_levels(table)
+        assert table not in _no_v_join_tables()
+
+    def test_aliases(self):
+        assert _level_aliases("plot_inputs") == {"crop": "j"}
+        # every plot_labor country already spells plot_id / source
+        assert _level_aliases("plot_labor") == {}
+
+    def test_sentinels(self):
+        assert _missing_level_sentinels("plot_labor") == {
+            "stage": "Farm-level", "worker": "Farm-level",
+            "season": "unknown_season"}
+        assert _missing_level_sentinels("plot_inputs") == {
+            "plot_id": "Farm-level", "u": "Unknown",
+            "season": "unknown_season"}
+
+    def test_shared_axes_share_one_sentinel_spelling(self):
+        """`season` and `u` are the same axes crop_production carries; a
+        second spelling of 'not recorded' on a shared axis would make the plot
+        tables unjoinable with crop_production on it."""
+        crop = _missing_level_sentinels("crop_production")
+        for table in ("plot_labor", "plot_inputs"):
+            s = _missing_level_sentinels(table)
+            for lvl in set(s) & set(crop):
+                assert s[lvl] == crop[lvl], (table, lvl)
+
+    def test_structural_sentinel_is_not_the_epistemic_one(self):
+        """GhanaLSS/_/CONTENTS.org: `Farm-level` (the axis is not resolved --
+        the quantity is the total over it) and `Unknown` (the axis exists but
+        was not fielded) "must not be merged"."""
+        structural = {("plot_labor", "stage"), ("plot_labor", "worker"),
+                      ("plot_inputs", "plot_id")}
+        for table, lvl in structural:
+            assert _missing_level_sentinels(table)[lvl] == "Farm-level"
+        assert _missing_level_sentinels("plot_inputs")["u"] == "Unknown"
+
+    @pytest.mark.parametrize("table", ["plot_labor", "plot_inputs"])
+    def test_does_not_use_the_pd_NA_fabrication(self, table):
+        assert _fabricates_missing_levels(table) is False
+
+
+def _harmonize(df, table, country="X"):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return _harmonize_country_frame(
+            df, _canonical_index_levels(table), country, table, False,
+            aliases=_level_aliases(table),
+            sentinels=_missing_level_sentinels(table))
+
+
+class TestPlotLaborHarmonize:
+    @pytest.mark.parametrize("country", sorted(LABOR_SHAPES))
+    def test_every_real_shape_reaches_the_canonical_index(self, country):
+        names = LABOR_SHAPES[country]
+        df = _frame(names, [tuple(f"x{k}" for k in range(len(names)))],
+                    PersonDays=[3.0])
+        out = _harmonize(df, "plot_labor", country)
+        assert list(out.index.names) == PLOT_LABOR
+        assert len(out) == 1
+        flat = out.index.to_frame(index=False)
+        assert flat.notna().all().all()
+        for lvl, sentinel in _missing_level_sentinels("plot_labor").items():
+            if lvl not in names:
+                assert flat[lvl].tolist() == [sentinel], lvl
+
+    @pytest.mark.parametrize("names,level,values", [
+        # GhanaSPS: two rows differing ONLY on stage -- the 60,607-row point
+        (LABOR_SHAPES["GhanaSPS"], "stage", ("planting", "harvesting")),
+        # GhanaSPS: two rows differing only on season
+        (LABOR_SHAPES["GhanaSPS"], "season", ("major", "minor")),
+        # GhanaLSS: two rows differing only on worker
+        (LABOR_SHAPES["GhanaLSS"], "worker", ("male", "female")),
+        # Uganda: two rows differing only on season
+        (LABOR_SHAPES["Uganda"], "season", ("A", "B")),
+    ])
+    def test_rows_differing_only_on_a_kept_level_are_not_collapsed(
+            self, names, level, values):
+        from lsms_library.country import grain_reports
+        before = len(grain_reports())
+        base = {n: f"{n}0" for n in names}
+        rows = [tuple(v if n == level else base[n] for n in names)
+                for v in values]
+        df = _frame(names, rows, PersonDays=[2.0, 5.0])
+        out = _harmonize(df, "plot_labor")
+        assert len(out) == 2 and out.index.is_unique
+        assert sorted(out.index.get_level_values(level)) == sorted(values)
+        assert out["PersonDays"].sum() == 7.0
+        assert len(grain_reports()) == before
+
+
+class TestPlotInputsHarmonize:
+    @pytest.mark.parametrize("country", sorted(INPUT_SHAPES))
+    def test_every_real_shape_reaches_the_canonical_index(self, country):
+        names, u_column = INPUT_SHAPES[country]
+        cols = {"Quantity": [4.0]}
+        if u_column:
+            cols["u"] = ["Kg"]
+        df = _frame(names, [tuple(f"x{k}" for k in range(len(names)))], **cols)
+        out = _harmonize(df, "plot_inputs", country)
+        assert list(out.index.names) == PLOT_INPUTS
+        assert len(out) == 1
+        assert out.index.to_frame(index=False).notna().all().all()
+        if u_column:
+            assert out.index.get_level_values("u").tolist() == ["Kg"]
+            assert "u" not in out.columns
+
+    def test_ehcvm_household_records_get_the_farm_level_plot_sentinel(self):
+        """The ruling's household-grain sentinel: an EHCVM row is the
+        household's farm, never an observed plot, and it says so on `plot_id`
+        rather than carrying a NULL (deleted by the next groupby) or a
+        fabricated plot number."""
+        names = INPUT_SHAPES["Benin"][0]
+        df = _frame(names,
+                    [("h1", "2018-19", "c1", "Seed", "Maïs en grain", "Kg"),
+                     ("h1", "2018-19", "c1", "Urea", "(not crop-specific)", "Kg"),
+                     ("h2", "2018-19", "c1", "Seed", "Sorgho", "Kg")],
+                    Quantity=[10.0, 50.0, 7.0])
+        out = _harmonize(df, "plot_inputs", "Benin")
+        assert len(out) == 3 and out.index.is_unique
+        plot = out.index.get_level_values("plot_id")
+        assert plot.notna().all()
+        assert set(plot) == {"Farm-level"}
+        # the crop axis is renamed, not re-valued
+        assert sorted(out.index.get_level_values("j")) == sorted(
+            ["Maïs en grain", "(not crop-specific)", "Sorgho"])
+        assert out["Quantity"].sum() == 67.0
+
+    def test_u_column_nulls_become_unknown_not_NA(self):
+        """GhanaLSS / Ethiopia / Mali / Nigeria / Tanzania carry `u` as a
+        column with nulls (8,763 / 37,370 / 42,089 / 6,742 / 408 rows)."""
+        names = INPUT_SHAPES["Mali"][0]
+        df = _frame(names,
+                    [("h1", "2017-18", "c1", "1_1", "Seed", "Mil"),
+                     ("h1", "2017-18", "c1", "1_1", "Urea", "Mil")],
+                    Quantity=[1.0, 2.0], u=["Kg", None])
+        out = _harmonize(df, "plot_inputs", "Mali")
+        assert len(out) == 2
+        assert sorted(out.index.get_level_values("u")) == ["Kg", "Unknown"]
+
+    @pytest.mark.parametrize("names,level,values", [
+        # Malawi / EHCVM: one (input, crop) reported in two units
+        (INPUT_SHAPES["Malawi"][0], "u", ("Kilogramme", "Gram")),
+        # Uganda: one per-crop seed row in each season
+        (INPUT_SHAPES["Uganda"][0], "season", ("A", "B")),
+    ])
+    def test_rows_differing_only_on_a_kept_level_are_not_collapsed(
+            self, names, level, values):
+        from lsms_library.country import grain_reports
+        before = len(grain_reports())
+        base = {n: f"{n}0" for n in names}
+        rows = [tuple(v if n == level else base[n] for n in names)
+                for v in values]
+        cols = {"Quantity": [1.0, 3.0]}
+        if "u" not in names:
+            cols["u"] = ["Kg", "Kg"]
+        df = _frame(names, rows, **cols)
+        out = _harmonize(df, "plot_inputs")
+        assert len(out) == 2 and out.index.is_unique
+        assert sorted(out.index.get_level_values(level)) == sorted(values)
+        assert len(grain_reports()) == before
+
+
+class TestPlotTablesEndToEnd:
+    @pytest.mark.parametrize("table,shapes", [
+        ("plot_labor", {c: (n, False) for c, n in LABOR_SHAPES.items()}),
+        ("plot_inputs", INPUT_SHAPES),
+    ])
+    def test_every_corpus_shape_is_kept(self, monkeypatch, table, shapes):
+        """Before GH #569 the modal shape won: plot_labor kept 1 of these 4
+        shapes and plot_inputs 1 of 5."""
+        import lsms_library
+
+        frames = {}
+        for name, (names, u_column) in shapes.items():
+            df = _frame(names, [tuple(f"{name}{k}" for k in range(len(names)))])
+            if u_column:
+                df["u"] = "Kg"
+            frames[name] = df
+        _FakeCountry._FRAMES = frames
+        monkeypatch.setattr(lsms_library, "Country", _FakeCountry)
+
+        canonical = _canonical_index_levels(table)
+        seen = set()
+        for perm in itertools.permutations(shapes):
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                out = Feature(table)(list(perm), currency=None)
+            assert list(out.index.names) == ["country"] + canonical
+            assert len(out) == len(shapes)
+            assert out.index.is_unique
+            seen.add(frozenset(out.index.get_level_values("country").unique()))
+        assert seen == {frozenset(shapes)}
+        report = out.attrs["canonical_alignment"]
+        assert "promotion_collisions" not in report
+
+
+def _warm_assembly(table):
+    """Country() frame shape per warm country, and the Feature() assembly."""
+    import lsms_library as ll
+    from lsms_library.country import grain_reports
+
+    built: dict[str, tuple[int, set[str]]] = {}
+    for name in ll.Feature(table).countries:
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                df = getattr(ll.Country(name, trust_cache=True), table)()
+        except Exception:
+            continue
+        if isinstance(df, pd.DataFrame) and not df.empty:
+            built[name] = (len(df), set(df.index.names) | set(df.columns))
+    if len(built) < 3:
+        pytest.skip(f"fewer than three {table} caches are warm")
+    before = len(grain_reports())
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = ll.Feature(table, trust_cache=True)(sorted(built))
+    return built, out, len(grain_reports()) - before
+
+
+@pytest.mark.requires_s3
+@pytest.mark.slow
+@pytest.mark.parametrize("table", ["plot_labor", "plot_inputs"])
+def test_warm_corpus_plot_table_assembly_keeps_every_country_and_row(table):
+    """Every warm country is KEPT and contributes exactly the rows
+    Country(name).<table>() returns; nothing collapses; a level a country does
+    not carry at all arrives as its declared sentinel on every row."""
+    built, out, n_grain = _warm_assembly(table)
+    canonical = _canonical_index_levels(table)
+    assert list(out.index.names)[: len(canonical) + 1] == ["country"] + canonical
+    assert out.index.is_unique
+    per_country = out.index.get_level_values("country").value_counts().to_dict()
+    assert set(per_country) == set(built), sorted(set(built) - set(per_country))
+    for name, n in per_country.items():
+        assert n == built[name][0], (
+            f"{name}: Feature() returned {n} rows, Country() returned {built[name][0]}")
+    assert n_grain == 0, "the assembly collapsed a grain"
+    flat = out.index.to_frame(index=False)
+    sentinels = _missing_level_sentinels(table)
+    for name, (_, carried) in built.items():
+        sub = flat[flat["country"] == name]
+        for lvl, sentinel in sentinels.items():
+            if lvl not in carried:
+                assert (sub[lvl] == sentinel).all(), (name, lvl)
