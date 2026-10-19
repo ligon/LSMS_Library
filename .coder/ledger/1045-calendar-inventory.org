@@ -1,0 +1,791 @@
+#+TITLE: GH #1045 Phase 0 -- inventory of every calendar quantity in the corpus
+#+DATE: 2026-10-18
+#+AUTHOR: Phase-0 inventory agent (run 1 of #1045; charter =.coder/charter-1045-date-parser.md= §1 bullet 1, §2 box 1)
+
+* Method & coverage
+
+Clone: =/local/job40083775/elements1017/1045-date-parser/clone= at =bd643dc9d=
+(branch =fix/1045-date-parser=).  Data root: =$LSMS_DATA_DIR= =
+=/local/job40083775/elements1017/1045-date-parser/data= (private root).
+
+*Caveat on stored types.*  The private data root was warmed at an older commit
+(staging re-warm at =3e3bd26ee=); 9 countries' tables are stale relative to
+=bd643dc9d= (Mali and Tanzania among them, per the charter §3).  Mali's and
+Tanzania's =var/interview_date.parquet= carry an mtime of 2026-10-18 19:25, i.e.
+something rebuilt them in this root shortly before this sweep.  Stored types
+below come from *schema footers only* (=pyarrow.parquet.read_schema=, no data
+read); they are informative about the build that wrote them, not proof of what
+the current code would write.
+
+Sweeps run, in order:
+
+1. *Config / script sweep* with =rg= over
+   =lsms_library/countries/*/*/_/data_info.yml=, =countries/*/_/*.py=,
+   =countries/*/*/_/*.py=, =countries/*/_/data_scheme.yml= and
+   =lsms_library/data_info.yml=, for =to_datetime=, =datetime=, =Timestamp=,
+   =date=, =Int_t=, =interview=, =harvest_month=, =planting_month=, =month=,
+   =year=, =Year=, =Onset=, =birth=, =dob=, =DAY=, =%B=, =%d=, =%m=, =%Y=,
+   =strptime=, =calendars=, =ethiopian=, =age_handler=.
+   - =rg -o 'to_datetime' lsms_library/countries | wc -l= -> *87*;
+     =rg -l ... | wc -l= -> *52 files* (measured at 19:28 on the then-clean
+     tree; re-measured with =git grep -o -n to_datetime 266d6ac97 -- lsms_library/countries=
+     -> 87 / 52).  *The issue's figure (87 calls in 52 files) is confirmed
+     exactly.*  Of the 87, *9 are in comments/docstrings* and *10 more in dead
+     or shadowed code*, leaving *68 live call sites* -- per-file breakdown in
+     the appendix "to_datetime call sites".  The 87 counts =countries/= only:
+     library-side parse sites that Phase 1 must also absorb are
+     =local_tools.melt_visit_intervals= (=lsms_library/local_tools.py:3214-3215=,
+     the EHCVM parse) and =local_tools.age_handler= (=:3326=, =:3330=, =:3358=;
+     Kind 5), plus the read-time =_coerce_datetime_column= (PR #1025).
+   - Interview-date blocks extracted per wave with a block-reader script
+     (=/tmp/inv1045/blocks.py=, top-level YAML key -> indented body with line
+     numbers) for =interview_date=, =household_roster=, =crop_production=,
+     =shocks=.
+2. *Served-parquet census* (schema footers only): every
+   =$LSMS_DATA_DIR/{C}/var/*.parquet= (L2-country) *and* every
+   =$LSMS_DATA_DIR/{C}/{wave}/_/*.parquet= (L2-wave), flagging any column of
+   arrow type timestamp/date, or whose name matches
+   =date|month|year|onset|birth|dob|int_t|interview|day= (case-insensitive).
+   114 L2-country hits (incl. durations), 143 L2-wave hits (durations filtered).
+   The presence/absence of =lsms_cache_hash= in a wave parquet's footer was
+   used to tell YAML-path (hash) from script-path (hashless) wave builds.
+3. *Census cross-check* against the 2026-10-18 table in #1045 -- see the
+   section of that name.  All 5 census rows reproduced exactly from this root.
+4. *Source name sweep* (bounded) -- see the section of that name.
+5. A supplementary footer scan of every L2-country column name for French /
+   Spanish / other date words (=fecha|mes|año|annee|mois|jour|dia|period|when|since|built|acquir|quarter|_yr=)
+   found nothing beyond durations (=HeadAcquired=, =*PerWeek=) and =season=
+   labels.
+
+*Line-number anchor -- read this first.*  Every =path:line= in this file
+refers to commit *=266d6ac97=* (for =lsms_library/= byte-identical to the
+charter commit =bd643dc9d=).  Below, "HEAD" always means =266d6ac97=.
+*The branch moved while this inventory was being written*: a concurrent
+Phase-1 agent working in the same clone committed =f89aa2f24= ("build-time
+calendar parser (datetime_parse), stamp/replay wiring, Mali interview_date
+migrated") and =3710fc8a1= ("Tanzania interview_date migrated"), touching
+=lsms_library/local_tools.py= (+41 lines), =country.py=, =_build_registry.py=,
+=_parallel_waves.py=, new =lsms_library/datetime_parse.py=, and Mali's and
+Tanzania's =interview_date= config.  So:
+- read cited lines with =git show 266d6ac97:<path>=;
+- *the Mali (1b) and Tanzania (1c) sections describe the PRE-migration
+  construction* -- they are the "before" baseline for the pilot's
+  served-dates-identical check, not a description of the current branch tip;
+- the stored types come from parquets built before either commit.
+- measured at 19:55: between =266d6ac97= and the tip =6fb6c5237= the *only*
+  =countries/= files changed are Mali's (=2014-15=, =2017-18=, =2018-19=,
+  =2021-22= =data_info.yml=, two wave =mapping.py=, =mali.py=) and Tanzania's
+  (=2008-15/_/interview_date.py=; =2019-20= / =2020-21= =data_info.yml=; the
+  two shadowed =interview_date.py= scripts *deleted*), so every other
+  =countries/= citation holds at the tip as well.  =to_datetime= at the tip:
+  77 occurrences (87 at =266d6ac97=).
+
+Calendar column convention used below (the brief forbids inferring Ethiopian vs
+Gregorian from values):
+- =gregorian [cite]= -- a questionnaire / CONTENTS.org / code comment says so;
+  the citation is given.
+- =ethiopian [cite]= -- likewise.
+- =unknown= -- no citation found.  Where the country has no known non-Gregorian
+  civil calendar this is written =unknown (no cite; non-ET)=: it is *very
+  probably* Gregorian, but nothing in the repo says so, and Nepal (Bikram
+  Sambat) shows the presumption is not free.  A Phase-2 spec author must still
+  find the citation before writing =calendar: gregorian=.
+
+Abbreviation: =C/= = =lsms_library/countries/=.  =DI= = that wave's
+=_/data_info.yml=.  "YAML" = built by =Wave.grab_data= from =DI= (formatter =
+the function of the myvar's name in the wave =mapping.py= or country module,
+or an explicit =mapping:=); "script" = wave =_/{table}.py= writing via
+=to_parquet= (hashless wave parquet).
+
+* Summary (work queue for Phases 2-4)
+
+Row counts (one row per country x wave x quantity unless noted):
+
+| kind | section | rows | served today |
+|------+---------+------+--------------|
+| 1. full dates / datetimes | 1a =interview_date= (all countries) | 65 (63 served waves in 27 countries + Nepal, Peru declared-only) | yes |
+| | 1b / 1c Mali, Tanzania pilot detail | 4 + 3 (repeat 1a rows in full) | yes |
+| | 1d other full dates (intermediate / unserved) | 4 | no |
+| 2. year-months | Kind 2 | 7 (Nigeria =crop_production= x5 waves, Uganda shock start x2 groups) + =shocks.Onset= note | Nigeria only, as ='YYYY-MM'= strings |
+| 3. month-of-year | Kind 3 | 24 (13 countries' =crop_production= months; Nigeria's are in Kind 2) | yes (6 EHCVM columns 100% null) |
+| 4. years | Kind 4 | 8 (Uganda =shocks.Year= x4 groups, Albania =shocks.Years=, Malawi unwired =plant_y=, 2 hard-coded-year pointers) | Uganda, Albania |
+| 5. dates of birth | Kind 5 | 26 (25 (country, wave) DOB reads + Ethiopia 2015-16 unwired) | no (only =Age=) |
+| -- Ethiopian-calendar evidence | | 7 | |
+| 6. other | 6a / 6b | 14 + 8 | GhanaAHIES / Nigeria =t= quarter labels; EthiopiaRHS livestock (EC year in a name); =MonthsInadequate= counts |
+| source sweep, unwired columns | step 4 | 8 | no |
+
+=to_datetime= in =countries/=: *87 occurrences in 52 files (confirmed)*; 78
+executable, 68 in live code (appendix).
+
+Findings that change the Phase-2/3 plan (each detailed in its section):
+1. *Every string-typed served date traces to one of two mechanisms*: a
+   formatter returning =datetime.date= (Mali =mali.py:85=, Nigeria 2018-19
+   =interview_date.py:12,23=, Timor-Leste =mapping.py:25= / =:21=) or a raw
+   ISO string kept with no formatter (Ethiopia W4/W5, Tanzania 2019-20/2020-21
+   =hh_a18=).  One string wave is enough to turn the whole L2-country column
+   into =large_string=.  The #798 loss counts are *exactly* the minority string
+   form in each country (Mali 12,745 ='YYYY-MM-DD'=; Tanzania 5,893
+   ='YYYY-MM-DDTHH:MM:SS'=).
+2. *Mali 2018-19/2021-22*: a =household_roster= myvar named =interview_date=
+   forced a pass-through formatter of the same name, which silently disables
+   the =interview_date= table's df_edit hook in those waves (1b).  Mali also
+   serves only visit-1 start of the six EHCVM visit timestamps (source sweep)
+   and drops EACI passage 2 at the (t, v, i) collapse.
+3. *=crop_production= "months" are three different kinds*: month-of-year
+   integers (Ethiopia -- converted from the Ethiopian calendar by a lossy fixed
+   relabel, Malawi, Mali, Tanzania, Uganda, Niger 2014-15), *year-month strings*
+   (Nigeria ='YYYY-MM'=), and *sets of months* (GhanaSPS ='08 11'=, 6,356 cells).
+   Six of the seven EHCVM =harvest_month= columns are 100% null (not in the
+   instrument); Niger's is harvest *start* month where others use end month.
+4. *Uganda =shocks.Year= 2009-10..2011-12 is imputed*, not reported
+   (=shock_yr()=); =shocks.Onset= is a month count computed from two
+   day-padded year-months (31 negatives); Albania =shocks.Years= is a
+   comma-joined *set* of years.
+5. *DOB*: in Uganda (7 waves) and Nigeria (5) the day/month of birth are read
+   but cannot affect =Age= (no interview date reaches =age_handler=);
+   =age_handler= imputes a missing day as *15*, not 1; Ethiopia 2013-14 is the
+   only conversion through =lsms_library.calendars=; Ethiopia 2015-16's DOB is
+   unwired and its calendar is documented both ways.
+6. *Calendar is uncited almost everywhere* (=unknown=): no questionnaire was
+   read in this pass.  Ethiopia W4/W5 interview dates stay open (charter §5).
+
+* Kind 1 -- full dates and datetimes
+
+** 1a. =interview_date= (served)
+
+Canonical declaration: =lsms_library/data_info.yml:389-421= (=Int_t=,
+=Interview start=, =Interview end=, all =type: datetime=, none required);
+=Column Name Rewrites= =int_t: Int_t= at =lsms_library/data_info.yml:1137=
+(so =int_t= in a wave parquet is served as =Int_t=).  Per-country declarations
+are =Int_t: datetime= (or =Interview start/end: datetime= for EHCVM) in each
+country's =_/data_scheme.yml= =interview_date:= block (e.g. Mali :81-83,
+Tanzania :104-106, Ethiopia :91-93, Nigeria :198-200, Timor-Leste :37-39,
+Liberia :19-21; Uganda's is =!make= at :61 with no types), *except Peru
+(:187-195) and Nepal (:53-55), which declare =Int_t: str=*.
+
+Stored type = L2-wave footer / L2-country footer.  =ts= = =timestamp[us]=,
+=ts[ms]= = =timestamp[ms]=, =str= = =large_string=.
+
+| country | wave | table.column | source file : var(s) | current construction (path:line) | calendar | stored type (wave / country) |
+|---------+------+--------------+----------------------+----------------------------------+----------+------------------------------|
+| Albania | 2002 | interview_date.Int_t (+visit 2 =int_t_v2=) | =metadata_cl.dta= : =m0_q08y/m/d=, =m0_q08y2/m2/d2= | YAML =[y,m,d]= list, =mapping: albania_date_ymd= (=C/Albania/2002/_/data_info.yml:87-96=) -> =C/Albania/_/albania.py:100-148= (=to_datetime(f"{y:04d}-{m:02d}-{d:02d}", format="%Y-%m-%d", errors='coerce')= at :142; month-name branch :146 no format); melted to =visit= by df_edit hook =albania.py:151=.  NB =C/Albania/2002/_/mapping.py:16-21= =Int_t= (=str(int(v))= =%Y%m%d= of =m0_date=) is *not reached* by this block (myvar is lowercase =int_t= with explicit mapping) -- apparently dead | unknown (no cite; non-ET) | ts / ts |
+| Albania | 2004 | interview_date.Int_t | =w3_hh_basic.dta= : =m0_q04y/m/d= | YAML =[y,m,d]= + =mapping: albania_date_ymd= (=C/Albania/2004/_/data_info.yml:68-72=) -> =albania.py:100=.  =C/Albania/2004/_/mapping.py:5-10= =Int_t= =str(int(v))= =%Y%m%d= apparently dead (as 2002) | unknown (no cite; non-ET) | ts / ts |
+| Albania | 2005 | interview_date.Int_t | =identification_cl.dta= : =m0_q8y/m/d= | YAML =[y,m,d]= + =mapping: albania_date_ymd= (=C/Albania/2005/_/data_info.yml:110-114=) -> =albania.py:100=.  =C/Albania/2005/_/mapping.py:6-11= apparently dead | unknown (no cite; non-ET) | ts / ts |
+| Azerbaijan | 1995 | interview_date.Int_t | =A00.dta= : =dayint, moint, yrint= | YAML =[d,m,y]= list (=C/Azerbaijan/1995/_/data_info.yml:115-118=) -> formatter =C/Azerbaijan/1995/_/mapping.py:11-26= (2-digit year +1900; =pd.Timestamp(year,month,day)= :23) | gregorian [code: =Azerbaijan/1995/_/mapping.py:14= "95 -> 1995"] | ts / ts |
+| Benin | 2018-19 | interview_date.Interview start / Interview end (3 visits) | =s00_me_ben2018.dta= : =s00q23a/b, s00q24a/b, s00q25a/b= | YAML scalar per myvar, no formatter (=C/Benin/2018-19/_/data_info.yml:296-301=); *source values are ISO-8601 strings* (='2019-06-12T17:17:07'=, measured in the source sweep for Benin, Senegal 2018-19 and Mali 2018-19/2021-22); melted by =C/Benin/_/benin.py:174= -> =local_tools.melt_visit_intervals= (=lsms_library/local_tools.py:3152=, HEAD), which parses them at =:3214-3215= =pd.to_datetime(flat[s], errors='coerce')= (*no format*) -- the EHCVM parse site, shared by all 7 EHCVM countries below | unknown (no cite; non-ET) | ts / ts |
+| Burkina_Faso | 2018-19 | interview_date.Interview start / end | =s00_me_bfa2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Burkina_Faso/2018-19/_/data_info.yml:295-300=); hook =C/Burkina_Faso/_/burkina_faso.py:257= | unknown (no cite; non-ET) | ts / ts |
+| Burkina_Faso | 2021-22 | interview_date.Interview start / end | =s00_me_bfa2021.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Burkina_Faso/2021-22/_/data_info.yml:273-278=); hook =burkina_faso.py:257= | unknown (no cite; non-ET) | ts / ts |
+| Cambodia | 2019-20 | interview_date.Int_t | =hh_sec_1.dta= : =intvw_day, intvw_month, intvw_year= (STRING dtype per docstring :4-5) | script =C/Cambodia/2019-20/_/interview_date.py:26= =to_datetime(dict(year,month,day), ...)= after int cast :23 | unknown (no cite; non-ET) | ts (hashless) / ts |
+| CotedIvoire | 2018-19 | interview_date.Interview start / end | =Menage/s00_me_CIV2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/CotedIvoire/2018-19/_/data_info.yml:360-365=); hook =C/CotedIvoire/_/cotedivoire.py:86= | unknown (no cite; non-ET) | ts / ts |
+| Ethiopia | 2018-19 | interview_date.Int_t (=int_t=) | =sect_cover_hh_w4.dta= : =InterviewStart= | YAML scalar, *no formatter anywhere* -- raw source string kept as is (=C/Ethiopia/2018-19/_/data_info.yml:196=); cast only at read time by =_coerce_datetime_column= | *unknown* -- no cite in =Ethiopia/_/CONTENTS.org= (grep for calendar/interview: nothing on interview-date calendar); CAPI system timestamp is plausibly Gregorian but *unverified*; charter §5 flags this | str / str |
+| Ethiopia | 2021-22 | interview_date.Int_t (=int_t=) | =sect_cover_ph_w5.dta= : =InterviewDate= | YAML scalar, raw string (=C/Ethiopia/2021-22/_/data_info.yml:206=).  #1038: 115 rows ='##N/A##'= | *unknown* (as above) | str / str |
+| GhanaLSS | 1987-88 | interview_date.Int_t (+=Int_t_v2=) | =Y00A.DAT= : =DAY1, MO1, YR1=; =DAY2, MO2, YR2= | YAML =[d,m,y]= list (=C/GhanaLSS/1987-88/_/data_info.yml:46-55=) -> =C/GhanaLSS/1987-88/_/mapping.py:131-149= (=to_datetime(f"{y}-{m}-{d}", format='%Y-%m-%d', errors='coerce')= :149); melted by =C/GhanaLSS/_/ghanalss.py:14-36= (=melt_visit_intervals=) | gregorian [code: =GhanaLSS/1987-88/_/mapping.py:134= "87, 88 -> 1987, 1988"] (weak) | ts / ts |
+| GhanaLSS | 1988-89 | interview_date.Int_t (+v2) | =Y00A.DAT= : =DAY1..YR2= | YAML (=C/GhanaLSS/1988-89/_/data_info.yml:46-55=) -> =C/GhanaLSS/1988-89/_/mapping.py:125-143= (:143) | gregorian [code: =GhanaLSS/1988-89/_/mapping.py:128= "88, 89 -> 1988, 1989"] (weak) | ts / ts |
+| GhanaLSS | 1991-92 | interview_date.Int_t (+=Int_t_v2..v11=) | =S0A.DTA= : =dd, mm, yy=; =S0B.DTA= : =vd2..vd11, vm2..vm11, vy2..vy11= | YAML =dfs:= merge (=C/GhanaLSS/1991-92/_/data_info.yml:115-191=) -> =C/GhanaLSS/1991-92/_/mapping.py:106-118= (=format='%Y-%m-%d'= :118); 2-digit year +1900 :114-115 | gregorian [code: =GhanaLSS/1991-92/_/mapping.py:108-109= "91, 92 -> 1991, 1992"] (weak) | ts / ts |
+| GhanaLSS | 1998-99 | interview_date.Int_t (+visit, Derivation) | =SEC0A.DTA= : =dd, mm, yy=; inference sources =SEC0B.DTA, SEC0C.DTA= (=C/GhanaLSS/1998-99/_/data_info.yml:103-118=) | YAML -> =C/GhanaLSS/1998-99/_/mapping.py:88-100= (=format='%Y-%m-%d'= :100); then =ghanalss.py:27-33= routes to =C/GhanaLSS/_/visit_dates.py:196= =build_visit_dates= (=to_datetime([...])= :54 over the wave =Int_t= parser per triplet; final =to_datetime(result['Int_t'])= :162); visit assignment is a registered derivation | unknown (no cite; non-ET) | ts / ts |
+| GhanaLSS | 2005-06 | interview_date.Int_t (+visit, Derivation) | =parta/sec0.dta= : =ddate, mdate, ydate=; inference =partb/secb0..2.dta= | YAML (=C/GhanaLSS/2005-06/_/data_info.yml:60-69=) -> =C/GhanaLSS/2005-06/_/mapping.py:67-75= (:75) -> =visit_dates.py= as 1998-99 | unknown (no cite; non-ET) | ts / ts |
+| GhanaLSS | 2012-13 | interview_date.Int_t | =PARTA/SEC0.dta= : =ddate, mdate, ydate= | YAML (=C/GhanaLSS/2012-13/_/data_info.yml:46-49=) -> =C/GhanaLSS/2012-13/_/mapping.py:13-21= (:21) | unknown (no cite; non-ET) | ts / ts |
+| GhanaLSS | 2016-17 | interview_date.Int_t | =g7sec0.dta= : =ddate, mdate, ydate= | YAML (=C/GhanaLSS/2016-17/_/data_info.yml:58-61=) -> =C/GhanaLSS/2016-17/_/mapping.py:13-23= (=to_datetime(s, errors='coerce')= *no format* :23) | unknown (no cite; non-ET) | ts / ts |
+| Guinea-Bissau | 2018-19 | interview_date.Interview start / end | =s00_me_gnb2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Guinea-Bissau/2018-19/_/data_info.yml:345-350=); hook =C/Guinea-Bissau/_/guinea-bissau.py:14= | unknown (no cite; non-ET) | ts / ts |
+| Guyana | 1992 | interview_date.Int_t | =COVERN.dta= : =DDE, MDE, YDE= | script =C/Guyana/1992/_/interview_date.py:26-30= (2-digit year +1900 :27; =to_datetime(dict(...))= no =errors= :28) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| India | 1997-98 | interview_date.Int_t | =SECT00.DTA= : =intdate, intmonth, intyear= | script =C/India/1997-98/_/interview_date.py:21-22= (=+1900=; =to_datetime(df[['year','month','day']], errors='coerce')=) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Iraq | 2006-07 | interview_date.Int_t | =2007ihses00_cover_page.dta= : =q0035d, q0035m, q0035y= | script =C/Iraq/2006-07/_/interview_date.py:15= (=to_datetime(df[['year','month','day']])=, *no* =errors== -- raises on a bad row) | unknown (no cite; non-ET; Iraq could in principle record Hijri -- not checked) | ts (hashless) / ts |
+| Iraq | 2012 | interview_date.Int_t | =2012ihses00_cover_page.dta= : =q00_35_1d/m/y= | script =C/Iraq/2012/_/interview_date.py:16= (no =errors==) | unknown (as above) | ts (hashless) / ts |
+| Kosovo | 2000 | interview_date.Int_t | =ID.dta= : =s0i_q22a= (day), =s0i_q22b= (month); year hardcoded 2000 | script =C/Kosovo/2000/_/interview_date.py:23-26= (=to_datetime(dict(year=2000, month, day))=); comment :6 says =s0i_dat0/1= are CSPro machine timestamps, deliberately not used (#475) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Liberia | 2018-19 | interview_date.Int_t | =Household/sect1_public.dta= : =interview_date1= (follow-up visits =interview_date2= (127 non-null) / =interview_date3= (35) *unwired*, comment =:128=) | YAML scalar, no formatter (=C/Liberia/2018-19/_/data_info.yml:135=); arrives as =datetime64= from the =.dta= (Stata date, measured) | unknown (no cite; non-ET) | ts[ms] / ts[ms] *(only =ms= country)* |
+| Malawi | 2004-05 | interview_date.Int_t | =sec_a.dta= : =a14c, a14b, a14a= (y,m,d) | YAML =[y,m,d]= + =mapping: malawi_date_ymd= (=C/Malawi/2004-05/_/data_info.yml:49-53=) -> =C/Malawi/_/malawi.py:264-287= (='%d %B %Y'=-style string =to_datetime(f"{d} {month} {y}", errors='coerce')= :287, *no format*); hook =malawi.py:290= melts visits | unknown (no cite; non-ET) | ts / ts |
+| Malawi | 2010-11 | interview_date.Int_t (+=int_t_v2=) | =Full_Sample/Household/hh_mod_a_filt.dta= : =hh_a23_1, hh_a23_2= | YAML scalars, no formatter (=C/Malawi/2010-11/_/data_info.yml:68-69=); hook =malawi.py:290= | unknown (no cite; non-ET) | ts[ms] / ts |
+| Malawi | 2013-14 | interview_date.Int_t (+v2) | =HH_MOD_A_FILT_13.dta= : =hh_a23a_3/2/1=, =hh_a37a_3/2/1= | YAML =[y,m,d]= + =mapping: malawi_date_ymd= (=C/Malawi/2013-14/_/data_info.yml:31-47=) -> =malawi.py:264= | unknown (no cite; non-ET) | ts / ts |
+| Malawi | 2016-17 | interview_date.Int_t (+v2) | =Cross_Sectional/hh_mod_a_filt.dta= : =interviewDate=; =Panel/hh_mod_a_filt_16.dta= : =interviewdate_v1, interviewdate_v2= | YAML scalars, per-file column override (=C/Malawi/2016-17/_/data_info.yml:27-46=); no formatter; hook =malawi.py:290= | unknown (no cite; non-ET) | ts / ts |
+| Malawi | 2019-20 | interview_date.Int_t (+v2) | =Cross_Sectional/hh_mod_a_filt.dta= : =interviewDate=; =Panel/hh_mod_a_filt_19.dta= : =interviewdate_v1/_v2= | as 2016-17 (=C/Malawi/2019-20/_/data_info.yml:27-46=) | unknown (no cite; non-ET) | ts / ts |
+| Mali | 2014-15 | interview_date.Int_t | =EACICONTROLE_p1/p2.dta= : =s00q22y, s00q22m, s00q22j= | YAML =[y,m,d]= -> =C/Mali/2014-15/_/mapping.py:112-118= (=.date()=); hook =:120-124= (full detail 1b) | unknown (no cite; non-ET) | ts[ms] / *str* |
+| Mali | 2017-18 | interview_date.Int_t | =eaci17_s00p1/p2.dta= : =s0q21c, s0q21b, s0q21a= | YAML =[y,m,d]= -> =C/Mali/2017-18/_/mapping.py:9-15=; hook =C/Mali/_/mali.py:86-88= (1b) | unknown (no cite; non-ET) | ts[ms] / *str* |
+| Mali | 2018-19 | interview_date.Int_t | =s00_me_mli2018.dta= : =s00q23a= | YAML scalar -> =C/Mali/_/mali.py:78-85= (=.date()=); hook shadowed by pass-through =C/Mali/2018-19/_/mapping.py:92= (1b) | unknown (no cite; non-ET) | *str* / *str* |
+| Mali | 2021-22 | interview_date.Int_t | =s00_me_mli2021.dta= : =s00q23a= | YAML scalar -> =mali.py:78-85=; pass-through =C/Mali/2021-22/_/mapping.py:73= (1b) | unknown (no cite; non-ET) | *str* / *str* |
+| Nepal | (no data) | interview_date.Int_t declared =str= | none (no microdata) | =C/Nepal/_/data_scheme.yml:53-55= declares =Int_t: str=; no wave config | *unknown -- Nepal's official calendar is Bikram Sambat*; must be established before any spec | unserved |
+| Niger | 2018-19 | interview_date.Interview start / end | =s00_me_ner2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Niger/2018-19/_/data_info.yml:301-306=); hook =C/Niger/_/niger.py:1444= | unknown (no cite; non-ET) | ts / ts |
+| Niger | 2021-22 | interview_date.Interview start / end | =s00_me_ner2021.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Niger/2021-22/_/data_info.yml:294-299=); hook =niger.py:1444= | unknown (no cite; non-ET) | ts / ts |
+| Nigeria | 2010-11 | interview_date.Int_t (=int_t=, PP + PH rounds) | =Post Harvest Wave 1/Household/secta_harvestw1.dta= and =Post Planting Wave 1/Household/secta_plantingw1.dta= : =saq13y, saq13m, saq13d= | script =C/Nigeria/2010-11/_/interview_date.py:15,25= (=to_datetime(df[['year','month','day']], errors='coerce')=) | unknown (no cite; non-ET) | ts (hashless) / *str* |
+| Nigeria | 2012-13 | interview_date.Int_t (PP+PH) | =Post Harvest Wave 2/.../secta_harvestw2.dta=, =Post Planting Wave 2/.../secta_plantingw2.dta= : =saq13y/m/d= | script =C/Nigeria/2012-13/_/interview_date.py:15,25= | unknown (no cite; non-ET) | ts (hashless) / *str* |
+| Nigeria | 2015-16 | interview_date.Int_t (PP+PH) | =secta_plantingw3.dta=, =secta_harvestw3.dta= : =saq13y/m/d= | script =C/Nigeria/2015-16/_/interview_date.py:15,28= | unknown (no cite; non-ET) | ts[ms] (hashless) / *str* |
+| Nigeria | 2018-19 | interview_date.Int_t (PP+PH) | =secta_plantingw4.dta=, =secta_harvestw4.dta= : =InterviewStart= | script =C/Nigeria/2018-19/_/interview_date.py:12,23= (=lambda x: pd.to_datetime(x).date= -> *a =datetime.date= object*, stored as string; this is #1037, 10,236 rows) | unknown (no cite; non-ET) | *str* (hashless) / *str* |
+| Pakistan | 1991 | interview_date.Int_t | =F00A.DTA= : =dayi1, moi1, yri1= | script =C/Pakistan/1991/_/interview_date.py:23-26= (=+1900=, =to_datetime(dict(...))=) | gregorian [code: =Pakistan/1991/_/interview_date.py:6= "91 ... 1991"] (weak: a code comment) | ts (hashless) / ts |
+| Peru | (none wired) | interview_date.Int_t declared =str= | =1994 REG01.DTA= : =a17= (day), =a18= (month); year 1994 (per comment) | not built: =C/Peru/_/data_scheme.yml:187-195= declares =Int_t: str= and documents the traps (=a17= mixed padding; =a18=8 for 248 HH vs dictionary "MES 05:07"); no wave =interview_date= block | unknown (no cite; non-ET) | unserved |
+| Senegal | 2018-19 | interview_date.Interview start / end | =s00_me_sen2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Senegal/2018-19/_/data_info.yml:311-316=); hook =C/Senegal/_/senegal.py:251= | unknown (no cite; non-ET) | ts / ts |
+| Senegal | 2021-22 | interview_date.Interview start / end | =s00_me_sen2021.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Senegal/2021-22/_/data_info.yml:291-296=); hook =senegal.py:251= | unknown (no cite; non-ET) | ts / ts |
+| Serbia | 2007 | interview_date.Int_t | =domacinstva.dta= : =dana, mesa, goda= (d,m,y) | YAML =[d,m,y]= list (=C/Serbia/2007/_/data_info.yml:111-114=) -> =C/Serbia/2007/_/mapping.py:50-58= (=pd.Timestamp(year,month,day)= :56) | unknown (no cite; non-ET) | ts / ts |
+| South Africa | 1993 | interview_date.Int_t | =S4_HDEF.dta= : =year1, month1, day1= | YAML =[y,m,d]= list (=C/South Africa/1993/_/data_info.yml:237-240=) -> =C/South Africa/1993/_/mapping.py:5-17= (=1900+y=, =pd.Timestamp= :15) | gregorian [code: =South Africa/1993/_/mapping.py:8= "93 -> 1993"] (weak) | ts / ts |
+| Tajikistan | 1999 | interview_date.Int_t | =SSEC1.DTA= (person-level) : =date_day, date_mth, date_yr= | script =C/Tajikistan/1999/_/interview_date.py:25-28= (=+1900=, =to_datetime(dict(...))=) | gregorian [code: :7 "99 -> 1999"] (weak) | ts (hashless) / ts |
+| Tajikistan | 2003 | interview_date.Int_t | =interview.dta= : =day_in, month_in=; *year hardcoded 2003* | script =C/Tajikistan/2003/_/interview_date.py:21-22= | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Tajikistan | 2007 | interview_date.Int_t | =r1m0.dta= : =dateday, datemont=; *year hardcoded 2007* | script =C/Tajikistan/2007/_/interview_date.py:22-23= | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Tajikistan | 2009 | interview_date.Int_t | =m0.dta= : =HH4_D, HH4_M=; =HH4_Y= all blank (docstring :5-7) so *year hardcoded 2009* | script =C/Tajikistan/2009/_/interview_date.py:23-24= | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Tanzania | 2008-15 | interview_date.Int_t | =upd4_hh_a.dta= : =ha_18_3, ha_18_2= (month name), =ha_18_1= | script =C/Tanzania/2008-15/_/interview_date.py:35= (1c) | unknown (no cite; non-ET) | ts (hashless) / *str* |
+| Tanzania | 2019-20 | interview_date.Int_t | =HH_SEC_A.dta= : =hh_a18= | YAML scalar, raw ISO string (=C/Tanzania/2019-20/_/data_info.yml:125=) (1c) | unknown (no cite; non-ET) | *str* / *str* |
+| Tanzania | 2020-21 | interview_date.Int_t | =hh_sec_a.dta= : =hh_a18= | YAML scalar, raw ISO string (=C/Tanzania/2020-21/_/data_info.yml:109=) (1c) | unknown (no cite; non-ET) | *str* / *str* |
+| Timor-Leste | 2001 | interview_date.Int_t | =S00.DTA= : =s00_vis1= (six-digit =DDMMYY= integer) | YAML scalar (=C/Timor-Leste/2001/_/data_info.yml:33=) -> =C/Timor-Leste/2001/_/mapping.py:5-27= (=f"{int(v):06d}"= split; 2-digit year pivot <=30 -> 20xx; =pd.Timestamp(...).date()= :25 -> *=datetime.date=, stored as string*) | gregorian [code: =Timor-Leste/2001/_/mapping.py:9-10= "260901 = 26 September 2001"] (weak) | *str* / *str* |
+| Timor-Leste | 2007-08 | interview_date.Int_t | =basicvars.dta= : =intday, intmonth, intyear= | YAML =[d,m,y]= list (=C/Timor-Leste/2007-08/_/data_info.yml:35-38=) -> =C/Timor-Leste/2007-08/_/mapping.py:5-23= (=pd.Timestamp(...).date()= :21 -> *string*) | gregorian [code: =mapping.py:9-10= "intyear 2007-2008"] (weak) | *str* / *str* |
+| Togo | 2018 | interview_date.Interview start / end | =Data1/s00_me_tgo2018.dta= : =s00q23a/b..s00q25a/b= | YAML scalars (=C/Togo/2018/_/data_info.yml:301-306=); hook =C/Togo/_/togo.py:306= | unknown (no cite; non-ET) | ts / ts |
+| Uganda | 2005-06 | interview_date.Int_t | =GSEC1.dta= : =h1bq2a, h1bq2b, h1bq2c= (d,m,y) | script =C/Uganda/2005-06/_/interview_date.py:19= (=to_datetime(dict(year,month,day))=, no =errors==) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2009-10 | interview_date.Int_t | =GSEC1.dta= : =h1bq2a/b/c= | script =C/Uganda/2009-10/_/interview_date.py:19= | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2010-11 | interview_date.Int_t | =GSEC1.dta= : =day, month, year= | script =C/Uganda/2010-11/_/interview_date.py:20= (=errors='coerce'=) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2011-12 | interview_date.Int_t | =GSEC1.dta= : =day, month, year= | script =C/Uganda/2011-12/_/interview_date.py:19= (=errors='coerce'=) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2013-14 | interview_date.Int_t | =GSEC1.dta= : =year, month, day= | script =C/Uganda/2013-14/_/interview_date.py:13= (no =errors==) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2015-16 | interview_date.Int_t | =gsec1.dta= : =year, month, day= | script =C/Uganda/2015-16/_/interview_date.py:15= (no =errors==) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2018-19 | interview_date.Int_t | =GSEC1.dta= : =year, month, day= | script =C/Uganda/2018-19/_/interview_date.py:15= (no =errors==) | unknown (no cite; non-ET) | ts (hashless) / ts |
+| Uganda | 2019-20 | interview_date.Int_t | =Data1/HH/gsec1.dta= : =year, month, day= | script =C/Uganda/2019-20/_/interview_date.py:15= (no =errors==) | unknown (no cite; non-ET) | ts (hashless) / ts |
+
+Notes on 1a:
+- *Uganda =interview_date= is =!make=* (=C/Uganda/_/data_scheme.yml:61=); its
+  wave parquets also carry a spurious =j= column (=large_string=), as do
+  Nigeria's (L2-wave footers) -- not a calendar issue, but the parquet shape
+  the Phase-2 migration will meet.
+- *Mixed resolution inside a country*: Malawi 2010-11 wave parquet is
+  =timestamp[ms]= while its other four waves are =[us]=; Mali 2014-15/2017-18
+  are =[ms]=; Nigeria 2015-16 is =[ms]=.  The L2-country concat then
+  promotes (Malawi -> =[us]=) or, where any wave is a string, the whole
+  column becomes =large_string= (Mali, Nigeria, Tanzania).
+- *Why the 5 string countries are strings* (traced, not guessed):
+  =datetime.date= objects returned by a formatter -- Mali =mali.py:85=,
+  Nigeria 2018-19 =interview_date.py:12,23=, Timor-Leste both waves
+  (=mapping.py:25=, =:21=) -- or a raw string source kept with no formatter --
+  Ethiopia W4/W5, Tanzania 2019-20/2020-21 (=hh_a18=).  One string wave is
+  enough to make the whole L2-country column a string.
+
+** 1b. Pilot detail: Mali =interview_date= (every wave)
+
+Declared =C/Mali/_/data_scheme.yml:81-83= (=index: (t, v, i)=, =Int_t: datetime=);
+the comment block at =:70-80= records that EAC-I passages collapse
+destructively (passage 2 not served).  Values profiled from the private-root
+parquets (=pd.read_parquet=, not the API):
+
+| wave | source file : var(s) | construction (path:line) | sentinel / quirks | calendar | L2-wave rows / type | rows in L2-country / served string form |
+|------+----------------------+--------------------------+-------------------+----------+---------------------+-----------------------------------------|
+| 2014-15 (EACI) | =EACICONTROLE_p1.dta=, =EACICONTROLE_p2.dta= (two passages) : =s00q22y, s00q22m, s00q22j= (y, m, jour) | YAML =[y,m,d]= list, =converted_categoricals: False= (=C/Mali/2014-15/_/data_info.yml:147-151=) -> wave formatter =C/Mali/2014-15/_/mapping.py:112-118= (=f'{int(y)}-{int(m)}-{int(d)}'=, =to_datetime(..., format='%Y-%m-%d', errors='coerce').date()= -- an =int()= of a NaN component raises rather than coerces); wave df_edit hook =C/Mali/2014-15/_/mapping.py:120-124= *derives =visit= by ranking the household's dates* (=rank(method='first')=) and re-casts =to_datetime= | =visit= is a construction from date order, not a source passage id | unknown (no cite; non-ET) | 7,608 / =timestamp[ms]=, 0 NaT, 2014-07-02..2015-03-09 | 3,804 (passage 1 only, after the (t,v,i) collapse) / ='YYYY-MM-DD HH:MM:SS'= |
+| 2017-18 (EACI) | =eaci17_s00p1.dta=, =eaci17_s00p2.dta= : =s0q21c, s0q21b, s0q21a= (y, m, d by the formatter's order); =visit= from =passage= | YAML =[y,m,d]= (=C/Mali/2017-18/_/data_info.yml:191-195=) -> =C/Mali/2017-18/_/mapping.py:9-15= (same as 2014-15, =.date()= :15); *no wave hook*, so the country hook =C/Mali/_/mali.py:86-88= (=pd.to_datetime(df['Int_t'])=) applies | -- | unknown (no cite; non-ET) | 16,780 / =timestamp[ms]=, 0 NaT, 2017-08-12..2018-02-27 | 8,390 / ='YYYY-MM-DD HH:MM:SS'= |
+| 2018-19 (EHCVM) | =s00_me_mli2018.dta= : =s00q23a= (EHCVM visit-start datetime -- the *same* variable the other 7 EHCVM countries serve as =Interview start=) | YAML scalar (=C/Mali/2018-19/_/data_info.yml:363=) -> *country* formatter =C/Mali/_/mali.py:78-85= (sentinel ='Manquant'= -> =NA= :82; =to_datetime(value, errors='coerce').date()= :85 -- *drops the time of day and returns =datetime.date=*); the wave defines =interview_date(value)= as a *pass-through* (=C/Mali/2018-19/_/mapping.py:92-98=) which also shadows the country df hook =mali.py:86= -> the =date= objects are never re-cast and are written as strings | name collision: =interview_date= is *both* a =household_roster= myvar (=C/Mali/2018-19/_/data_info.yml:176=) and the table's df_edit hook name; the pass-through exists for the former and disables the latter | unknown (no cite; non-ET) | 6,602 / *=large_string=* ='YYYY-MM-DD'= | 6,602 / ='YYYY-MM-DD'= |
+| 2021-22 (EHCVM) | =s00_me_mli2021.dta= : =s00q23a= | as 2018-19: =C/Mali/2021-22/_/data_info.yml:266= -> =mali.py:78-85=; pass-through =C/Mali/2021-22/_/mapping.py:73-78= | same name collision (=C/Mali/2021-22/_/data_info.yml:183=) | unknown (no cite; non-ET) | 6,143 / *=large_string=* ='YYYY-MM-DD'= | 6,143 / ='YYYY-MM-DD'= |
+
+*Measured: the L2-country column mixes two string forms* -- 12,194 rows
+='YYYY-MM-DD 00:00:00'= (EACI) and *12,745* rows ='YYYY-MM-DD'= (EHCVM).
+12,745 is exactly the count #798 reports as nulled by whole-column inference:
+the #798 loss was the minority string form, i.e. it is caused by
+=datetime.date= objects meeting =Timestamp= objects in one concat.  Total
+24,939 = the post-#1025 served count quoted in =C/Mali/_/CONTENTS.org:1084=.
+Unserved Mali calendar quantity: passage-2 interview dates of both EACI waves
+(3,804 + 8,390 rows in the wave parquets, dropped at the (t, v, i) collapse --
+=data_scheme.yml:70-80=).
+
+** 1c. Pilot detail: Tanzania =interview_date= (every wave)
+
+Declared =C/Tanzania/_/data_scheme.yml:104-106= (=index: (t, i)=, =Int_t: datetime=;
+*no* =materialize: make=, so the table is YAML where a wave declares it and
+falls back to the wave script otherwise).
+
+| wave (logical t) | source file : var(s) | construction (path:line) | quirks | calendar | L2-wave rows / type | L2-country rows / string form |
+|------------------+----------------------+--------------------------+--------+----------+---------------------+-------------------------------|
+| 2008-15 folder (t = 2008-09, 2010-11, 2012-13, 2014-15 via =round_match=) | =upd4_hh_a.dta= (Uniform Panel Dataset) : =ha_18_3= (year), =ha_18_2= (month *name*, e.g. ='JANUARY'=), =ha_18_1= (day); =round= -> t | *script* =C/Tanzania/2008-15/_/interview_date.py=: year/day =pd.to_numeric(errors='coerce')= :19-21; month-name dict :26-29 (=None -> pd.NA=); =pd.to_datetime(df[['year','month','day']], errors='coerce')= :35; emits lowercase =int_t= :30-35 (canonicalised by =lsms_library/data_info.yml:1137=); dedup asserted :53-57 | 6 NaT after coerce; month arrives as an English month name | unknown (no cite; non-ET) | 16,540 / =timestamp[us]= (hashless = script path), 6 NaT, 2008-09-07..2016-02-04 | 16,534 non-null / ='YYYY-MM-DD HH:MM:SS'= |
+| 2019-20 | =HH_SEC_A.dta= : =hh_a18= (household start timestamp) | *YAML* scalar, no formatter in any Tanzania module (=C/Tanzania/2019-20/_/data_info.yml:125=) -> raw ISO string kept as is.  The wave script =C/Tanzania/2019-20/_/interview_date.py:13-14= (=to_datetime= then =.dt.date=) is *shadowed* by the YAML declaration: the wave parquet carries =lsms_cache_hash= and column =int_t= (the script would write =date=) | source string carries time of day (='YYYY-MM-DDTHH:MM:SS'=) | unknown (no cite; non-ET) | 1,184 / *=large_string=* | 1,184 / ='YYYY-MM-DDTHH:MM:SS'= |
+| 2020-21 | =hh_sec_a.dta= : =hh_a18= | YAML scalar (=C/Tanzania/2020-21/_/data_info.yml:109=); script =C/Tanzania/2020-21/_/interview_date.py:14-15= shadowed likewise | as 2019-20 | unknown (no cite; non-ET) | 4,709 / *=large_string=* | 4,709 / ='YYYY-MM-DDTHH:MM:SS'= |
+
+*Measured: two string forms in one column* -- 16,534 ='YYYY-MM-DD 00:00:00'=
+(the script wave, a =Timestamp= stringified at concat) and *5,893*
+='YYYY-MM-DDTHH:MM:SS'= (the YAML waves) = exactly #798's Tanzania loss count.
+Same mechanism as Mali: one wave typed, others string, concat -> string.
+Unserved Tanzania calendar quantities that read the same source:
+=C/Tanzania/_/tanzania.py:2175= (=pd.to_datetime(h['hh_a18'], errors='coerce')=,
+household dates per cluster) and =:2187= (=pd.to_datetime(cm['cm_start'],
+errors='coerce')=, community start date) inside the =community_cluster_xwalk=
+builder (window match, =CONTENTS.org:826-895=) -- see Kind 1d.
+
+** 1d. Other full dates (unserved or intermediate) -- found by this agent's sweep
+
+(The parallel "everything else" sweep is merged in Kind 6 below.)
+
+| country | wave | table.column | source file : var(s) | current construction (path:line) | calendar | stored type |
+|---------+------+--------------+----------------------+----------------------------------+----------+-------------|
+| Tanzania | 2019-20, 2020-21 | unserved -- household start date per cluster, consumed by the =community_cluster_xwalk= builder (date-window match) | =HH_SEC_A.dta= / =hh_sec_a.dta= : =hh_a18= | =C/Tanzania/_/tanzania.py:2175= =pd.to_datetime(h['hh_a18'], errors='coerce')= (no format; ISO 'T' strings) | unknown (no cite; non-ET) | not stored (only =n_candidates= etc. reach =community_cluster_xwalk=) |
+| Tanzania | 2019-20, 2020-21 | unserved -- community interview start date, same builder | community cover =cm_a= : =cm_start= | =C/Tanzania/_/tanzania.py:2187= =pd.to_datetime(cm['cm_start'], errors='coerce')= | unknown (no cite; non-ET) | not stored |
+| Uganda | 2009-10 .. 2019-20 (7 waves) | unserved -- interview *year-month* =end_date= used to compute =shocks.Onset= | =GSEC1.dta= : =h1bq2c, h1bq2b= (2009-10) / =year, month= (2010-11+) | =C/Uganda/2009-10/_/shocks.py:24=, =2010-11/_/shocks.py:23=, =2011-12/_/shocks.py:24=, =2013-14/_/shocks.py:23=, =2015-16/_/shocks.py:25=, =2018-19/_/shocks.py:27=, =2019-20/_/shocks.py:23=: =to_datetime(date[['year','month']].assign(DAY=1))= -- *day padded to 1* ("round the interview date to 1st of the month") | unknown (no cite; non-ET) | not stored (only Onset) |
+| GhanaLSS | 1998-99, 2005-06 | unserved inputs to the registered visit-assignment derivation (=SEC0B/SEC0C=, =partb/secb0..2=) | see 1a | =C/GhanaLSS/_/visit_dates.py:40-62= (re-uses the wave =Int_t= parser per triplet; "Original components stay untouched, including impossible dates" :52) | unknown (no cite; non-ET) | not stored (only the assigned =Int_t=) |
+
+* Kind 2 -- year-months (partial dates: year + month, no day)
+
+| country | wave | table.column | source file : var(s) | current construction (path:line) | calendar | stored type (wave / country) |
+|---------+------+--------------+----------------------+----------------------------------+----------+------------------------------|
+| Nigeria | 2015-16 (t=2016Q1) | *crop_production.harvest_month* -- named a month but served as ='YYYY-MM'= | =2015-16/Data/secta3i_harvestw3.dta= (=C/Nigeria/_/crop_production.py:153=) : =sa3iq6c1= (month), =sa3iq6c2= (year) | =C/Nigeria/_/crop_production.py:162= spec -> =C/Nigeria/_/nigeria.py:490-493= -> =_month_str= =nigeria.py:352-366= (string concat =f"{y}-{m:02d}"=, month validated 1-12, NA if year missing) | unknown (no cite; non-ET) | country: =large_string= (9,121 non-null in t=2016Q1) |
+| Nigeria | 2015-16 | crop_production.planting_month | none wired (spec has no =plant_m=) | =nigeria.py:486-489= -> all NA | -- | =large_string=, 0 non-null |
+| Nigeria | 2018-19 (t=2019Q1) | crop_production.planting_month / harvest_month (='YYYY-MM'=) | annual =2018-19/Data/secta3i_harvestw4.dta= (=crop_production.py:169=): =sa3iq4a1/sa3iq4a2= (plant m/y), =sa3iq6c1/sa3iq6c2= (harvest m/y); perennial =secta3iii_harvestw4.dta= (=:181=): =sa3iiiq8a/b=, =sa3iiiq12a/b= | =C/Nigeria/_/crop_production.py:178-179,187-188= -> =_month_str= | unknown (no cite; non-ET) | =large_string= (plant 11,587 / harvest 10,173 non-null) |
+| Nigeria | 2023-24 (t=2024Q1) | crop_production.planting_month / harvest_month (='YYYY-MM'=) | annual =Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta= (=crop_production.py:195=): =sa3iq5a/b=, =sa3iq14a/b=; perennial =secta3iii_harvestw5.dta= (=:204=): =sa3iiiq18a/b=, =sa3iiiq22a/b= | =C/Nigeria/_/crop_production.py:201-202,210-211= -> =_month_str= | unknown (no cite; non-ET) | =large_string= (plant 8,517 / harvest 7,175) |
+| Nigeria | 2010-11, 2012-13 (t=2011Q1, 2013Q1) | crop_production.planting_month / harvest_month | none wired | -- all NA | -- | =large_string=, 0 non-null |
+| Uganda | 2009-10, 2010-11, 2011-12 | unserved -- shock start year-month =start_date= (input to Onset) | =GSEC16.dta= : month =h16q02a= (month *name*) + year =shock_year= *imputed* by =shock_yr()= | month name -> number: =C/Uganda/2009-10/_/shocks.py:23= (=to_datetime(h16q02a.str[:3], format='%b').dt.month=), =2010-11/_/shocks.py:22=, =2011-12/_/shocks.py:23= (=format='%B'=); year imputed =2009-10/_/shocks.py:29-54= (=2010-11:28=, =2011-12:28=); =to_datetime(...[['year','month']].assign(DAY=1))= at =2009-10:57=, =2010-11:56=, =2011-12:55= -- *day padded to 1* | unknown (no cite; non-ET) | not stored |
+| Uganda | 2013-14, 2015-16, 2018-19, 2019-20 | unserved -- shock start year-month | =GSEC16.dta= : =h16q2y= + =h16q02a= (2013-14, 2015-16); =s16q02y= + =s16q02a= (2018-19, 2019-20) | =format='%B'= month name at =2013-14/_/shocks.py:21=, =2015-16/_/shocks.py:22=, =2018-19/_/shocks.py:25=, =2019-20/_/shocks.py:21=; =assign(DAY=1)= at =2013-14:22=, =2015-16:24=, =2018-19:26=, =2019-20:22= | unknown (no cite; non-ET) | not stored |
+
+Derived from year-months, served (a duration, but computed from two calendar
+quantities, so it moves when they do): *=Uganda shocks.Onset=* =
+=(end_date.to_period('M') - start_date.to_period('M')).n= -- months from
+shock start to interview month (=2013-14/_/shocks.py:26=; =2009-10:58=,
+=2010-11:57=, =2011-12:56=, =2015-16:28=, =2018-19:30=, =2019-20:26=); 2005-06
+writes =np.nan= (=2005-06/_/shocks.py:70=).  Served =Float64= (L2-country),
+=int64= in 7 wave parquets, =double= in 2005-06.  Range -1..93 (31 rows *negative*:
+a shock that starts after the interview month).  *It is not a calendar point*;
+listed here because the #1045 census groups it with =shocks.Year=.
+
+* Kind 3 -- month-of-year (a month number 1-12, not a date)
+
+=crop_production= has *no* canonical declaration of =harvest_month= /
+=planting_month= in =lsms_library/data_info.yml= (Columns block starts :613;
+neither name appears in the file).  Per-country declarations: =int= Mali
+(=data_scheme.yml:177-178=), Malawi (:266-267), Ethiopia (:179-180), Uganda
+(:229); =float= Tanzania (:183) and Niger (:203); =type: float, optional: true=
+for Benin (:214), Burkina_Faso (:209), CotedIvoire (:186), Guinea-Bissau (:168),
+Senegal (:176), Togo (:171); =str= GhanaSPS (:601) and Nigeria (:278-279).
+Stored types are from the L2-country footer; non-null counts from the column.
+
+| country | wave | table.column | source file : var(s) | current construction (path:line) | calendar | stored type / non-null |
+|---------+------+--------------+----------------------+----------------------------------+----------+------------------------|
+| Benin | 2018-19 | crop_production.harvest_month | *none* -- "not recorded in the EHCVM s16c module" (comment =C/Senegal/2018-19/_/crop_production.py:75=) | =C/Benin/2018-19/_/crop_production.py:69-71= (column absent -> =pd.NA=, =to_numeric(...).astype('Float64')=) | n/a (nothing read) | =double= (=Float64=), *0 of 9,056* |
+| Burkina_Faso | 2018-19 | crop_production.harvest_month | none (EHCVM s16c) | =C/Burkina_Faso/2018-19/_/crop_production.py:59-61= | n/a | =double=, 0 of 15,593 |
+| CotedIvoire | 2018-19 | crop_production.harvest_month | none (EHCVM s16c) | =C/CotedIvoire/2018-19/_/crop_production.py:72-74= | n/a | =double=, 0 of 22,223 |
+| Guinea-Bissau | 2018-19 | crop_production.harvest_month | none (EHCVM s16c) | =C/Guinea-Bissau/2018-19/_/crop_production.py:97-99= | n/a | =double=, 0 of 10,579 |
+| Senegal | 2018-19 | crop_production.harvest_month | none -- comment =C/Senegal/2018-19/_/crop_production.py:75= | =:77-79= | n/a | =double=, 0 of 8,428 |
+| Togo | 2018 | crop_production.harvest_month | none (EHCVM s16c) | =C/Togo/2018/_/crop_production.py:71-73= | n/a | =double=, 0 of 11,565 |
+| Niger | 2011-12, 2018-19, 2021-22 | crop_production.harvest_month | none | =C/Niger/_/niger.py:544-546= (absent -> NA, =Float64=) | n/a | =double=, 0 |
+| Niger | 2014-15 | crop_production.harvest_month (= harvest *start* month, unlike the end month used elsewhere) | =ECVMA2_AS2E1P2.dta= : =AS02EQ06A= (start); =AS02EQ06B= (end) -- named in the docstring (:5) but *not wired* | =C/Niger/2014-15/_/crop_production.py:55= (=to_numeric(errors='coerce')=; "0 / >12 -> NaN" :54), then =niger.py:546= =Float64= | unknown (no cite; non-ET) | =double=, 8,799 of 47,123 (all in 2014-15) |
+| Ethiopia | 2011-12 | crop_production.harvest_month (harvest-*end* month) / planting_month | PH =ph_s9q13_b= ("harvest-end month"); PP =pp_s4q12_a= | spec =C/Ethiopia/2011-12/_/crop_production.py:33,37= -> =C/Ethiopia/_/ethiopia.py:1673= / =:1711= =_greg_month= (=ethiopia.py:1316-1327=: fixed map =_ETH_MONTH_TO_GREG= {1:9, 13:9, 2:10, ... 12:8}) | *ethiopian month code -> Gregorian month by a fixed relabel* [cite =ethiopia.py:1316-1318=: "ESS records the local-calendar month; this deterministic relabel (the same recode the WB do-files apply)"].  *Lossy*: each Ethiopian month straddles two Gregorian months (=calendars.py= header: Tahsas ~Dec 10-Jan 8 -> 12); Pagume (13) -> 9 | =int64= (=Int64=); harvest 3,968 / planting 6,171 |
+| Ethiopia | 2013-14 | harvest_month / planting_month | =ph_s9q07_b= / =pp_s4q12_a= | =C/Ethiopia/2013-14/_/crop_production.py:33,35= -> =_greg_month= | ethiopian -> gregorian relabel (as above) | =int64=; 26,078 / 20,105 |
+| Ethiopia | 2015-16 | harvest_month / planting_month | =ph_s9q07_b= / =pp_s4q12_a= | =C/Ethiopia/2015-16/_/crop_production.py:33,35= | as above | =int64=; 25,920 / 14,570 |
+| Ethiopia | 2018-19 | harvest_month / planting_month | =s9q08b= / =s4q13a= | =C/Ethiopia/2018-19/_/crop_production.py:33,35= | as above | =int64=; 10,220 / 10,171 |
+| Ethiopia | 2021-22 | harvest_month / planting_month | =s9q08b= / =s4q13a= | =C/Ethiopia/2021-22/_/crop_production.py:32,34= | as above | =int64=; 11,602 / 7,475 |
+| GhanaSPS | 2009-10 | crop_production.harvest_month -- a *PROXY*: the ending month of the plot's major/minor season (docstring =C/GhanaSPS/2009-10/_/crop_production.py:43-45=) | =S4AIX1.dta= : =s4aix_289ii= (=:77=) | =month_string([v])= =C/GhanaSPS/2009-10/_/crop_production.py:161=, =.astype('string')= :176; =month_string= at =C/GhanaSPS/_/ghanasps.py:773-794= (zero-padded ='08'=) | unknown (no cite; non-ET) | =large_string=; 10,896 |
+| GhanaSPS | 2013-14 | crop_production.harvest_month -- *a SET of months*, space-joined (='08 11'=) | =harvestmonths1..6= ("s04n_06 - Months harvested", month NAMES; =C/GhanaSPS/2013-14/_/data_info.yml:335,367=) | =ghanasps.py:866-868= (=_m*= columns -> =month_string=), union on dedup =ghanasps.py:807-808=, =astype('string')= :889 | unknown (no cite; non-ET) | =large_string=; 6,885 |
+| GhanaSPS | 2017-18 | crop_production.harvest_month (set of months) | =harvestmonths= (one space-separated string ='10 11'=; =C/GhanaSPS/2017-18/_/data_info.yml:458=) | =ghanasps.py:869-870= | unknown (no cite; non-ET) | =large_string=; 6,428.  Corpus-wide 6,356 of 24,209 non-null GhanaSPS cells hold >= 2 months (contain a space) |
+| Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | crop_production.planting_month / harvest_month | =ag_mod_g=: =ag_g05a= (plant month), =ag_g12b= (harvest month); =ag_mod_p= (perennial): =ag_p06c= (harvest month) | specs =C/Malawi/2010-11/_/crop_production.py:40,44=, =2013-14:40,44=, =2016-17:47,51=, =2019-20:42,46= -> =C/Malawi/_/malawi.py:1078-1087= =_month= (=to_numeric=, 1-12 else NA) | unknown (no cite; non-ET) | =int64=; harvest 133,334 / planting 111,783 of 135,078 |
+| Mali | 2014-15 | planting_month / harvest_month | cultivation =s1cq11b=; harvest =s3aq07b= | =C/Mali/2014-15/_/crop_production.py:55,71= -> =C/Mali/_/mali.py:367-368= =_month_num= (=mali.py:328-341=: numeric code *or French month name* via =_FR_MONTHS=; sentinels ='Manquant','Manqant','NSP','99'=) | unknown (no cite; non-ET) | =int64=; harvest 9,421 / planting 9,336 |
+| Mali | 2017-18 | planting_month / harvest_month | =s11cq14b= / =s7fq12b= | =C/Mali/2017-18/_/crop_production.py:66,105= -> =mali.py:367-368= | unknown (no cite; non-ET) | =int64=; 23,278 / 24,211 |
+| Tanzania | 2019-20, 2020-21 | crop_production.harvest_month (harvest-*end* month) | =AG_SEC_4A=: =ag4a_24_2=; =AG_SEC_6A=: =ag6a_07_4=; =AG_SEC_6B=: =ag6b_07_4= | =C/Tanzania/2019-20/_/crop_production.py:31-37=, =2020-21:27-33= -> =C/Tanzania/_/tanzania.py:1202= =_months_to_int= (=:1132-1135=); reduced with ='max'= on collapse (=:1273=).  planting_month "ABSENT in NPS" (=tanzania.py:1163=) | unknown (no cite; non-ET) | =int64= though *declared =float=* (=data_scheme.yml:183=); 2,400 / 8,947 |
+| Uganda | 2009-10, 2010-11 | crop_production.harvest_month | none (=month: None= at =C/Uganda/_/uganda.py:1821,1826,1846,1851=) | =uganda.py:1480= all NA | n/a | =int64=, 0 |
+| Uganda | 2011-12, 2013-14, 2015-16 | crop_production.harvest_month | =AGSEC5A=: =a5aq6f=; =AGSEC5B=: =a5bq6f= (=uganda.py:1877,1889,1901,1907,1919,1925=) | =uganda.py:1476-1478= (=_to_int_code=, 1-12 else NA), =astype('Int64')= :1551 | unknown (no cite; non-ET) | =int64=; 11,368 / 15,694 / 8,087 |
+| Uganda | 2018-19, 2019-20 | crop_production.harvest_month | =s5aq06f_1=, =s5bq06f_1=, =s5bq06f_2= (2018-19 =uganda.py:1937,1946,1963=); =s5aq06f_1/_2=, =s5bq06f_1/_2= (2019-20 =:1976-1996=) | as above | unknown (no cite; non-ET) | =int64=; 15,597 / 17,013 |
+| Uganda | all | crop_production.planting_month | "wired but" not served (=uganda.py:1331,1376-1377=) | -- | -- | not in the parquet |
+
+Also month-of-year, served or consumed elsewhere: =Uganda shocks= month
+=h16q02a= / =s16q02a= (a month *name*, parsed with =format='%B'= / ='%b'=;
+consumed, not served -- see Kind 2).  Others from the parallel sweep: Kind 6.
+
+* Kind 4 -- years (calendar year, alone)
+
+| country | wave | table.column | source file : var(s) | current construction (path:line) | calendar | stored type (wave / country) |
+|---------+------+--------------+----------------------+----------------------------------+----------+------------------------------|
+| Uganda | 2005-06 | shocks.Year (reported) | =GSEC16.dta= : =h16q5= | =C/Uganda/2005-06/_/shocks.py:69= (copied as is) | unknown (no cite; non-ET) | =double= / =double= (=Float64=) |
+| Uganda | 2009-10, 2010-11, 2011-12 | shocks.Year -- *IMPUTED, not reported*: derived by =shock_yr()= from shock month + duration =h16q02b= + interview year-month, with the script's own "assumptions" | =GSEC16.dta= : =h16q02a=, =h16q02b=; =GSEC1.dta= interview y/m | =C/Uganda/2009-10/_/shocks.py:29-54= (=2010-11/_/shocks.py:28-54=, =2011-12/_/shocks.py:28-54=), served at =:63= / =:62= / =:61=; =astype Int64= | unknown (no cite; non-ET) | =int64= / =double= |
+| Uganda | 2013-14, 2015-16 | shocks.Year (reported) | =GSEC16.dta= : =h16q2y= | =C/Uganda/2013-14/_/shocks.py:30=, =2015-16/_/shocks.py:32= | unknown (no cite; non-ET) | =int64= / =double= |
+| Uganda | 2018-19, 2019-20 | shocks.Year (reported) | =GSEC16.dta= / =HH/gsec16.dta= : =s16q02y= | =C/Uganda/2018-19/_/shocks.py:35= (with typo fix =replace(20018, 2018)= and drop of year =1= at :15); =2019-20/_/shocks.py:31= | unknown (no cite; non-ET) | =int64= / =double= |
+| Albania | 2012 | shocks.Years -- *a SET of years*, comma-joined (='2008,2009,2010,2011,2012'=) | =Modul_6D_Shocks to the household.sav= : Yes/No flags =M6D_2008..M6D_2012= (docstring =C/Albania/2012/_/shocks.py:8-14=) | =years_string= =C/Albania/2012/_/shocks.py:58-68= (=astype('string')=); declared =Years: str= (=C/Albania/_/data_scheme.yml:135=) | unknown (no cite; non-ET) | =large_string= / =large_string=; 1,532 rows, 546 multi-year |
+| Malawi | 2010-11 .. 2019-20 | *unwired*: planting year =ag_g05b= (seasonal) and =ag_p04= (perennial, apparently year planted) are *passed* to the builder but never read | =ag_mod_g=, =ag_mod_p= | passed at =C/Malawi/_/malawi.py:1976,1979= and the wave specs (=plant_y='ag_g05b'=); signature =malawi.py:1037= accepts =plant_y= and the body never uses it | unknown | not stored |
+| Tajikistan | 2003, 2007, 2009 | (component of interview_date) year *hardcoded* in script, no source year | -- | see 1a | -- | -- |
+| Kosovo | 2000 | (component of interview_date) year hardcoded 2000 | -- | see 1a | -- | -- |
+
+Canonical declarations: none for =shocks.Year= / =Onset= / =Years= in
+=lsms_library/data_info.yml= (=Columns: shocks= at :374 declares only bool/str
+columns); Uganda's =shocks= is =!make= (=C/Uganda/_/data_scheme.yml:40=) with no
+column types.
+
+* Kind 5 -- dates of birth (consumed by =age_handler=, never served)
+
+Source: parallel read-only sweep (Explore subagent, dispatched by this
+agent), spot-checked here against =lsms_library/local_tools.py= and Ethiopia
+2015-16.  =(F)= = =C/<country>/<wave>/_/=.  *=lsms_library/local_tools.py=
+line numbers in this file are at =266d6ac97= (byte-identical to =bd643dc9d=).  The working tree of =local_tools.py= was
+being edited concurrently by the Phase-1 parser agent during this sweep (+41
+lines), so working-tree line numbers are shifted -- use
+=git show 266d6ac97:lsms_library/local_tools.py=.*
+
+The DOB itself is never served; the served quantity is =household_roster.Age=
+(and, for 8 EHCVM =people_last7days= scripts, =working_age= from the year of
+birth alone).
+
+| country | wave | served column | source file : DOB var(s) (age-reference interview var) | current construction (path:line) | calendar |
+|---------+------+---------------+-------------------------------------------------------+----------------------------------+----------|
+| Benin | 2018-19 | household_roster.Age via =age_handler=; people_last7days.working_age (birth year only) | =s01_me_ben2018.dta= : =s01q03a= (day), =s01q03b= (month, French name), =s01q03c= (year); age =s01q04a=; ref =s00_me_ben2018.dta:s00q23a= | =(F)data_info.yml:86-90,104=; =(F)mapping.py:63= =Age()= (month_map :83-87; age<0 -> None :179); =age_handler(age,d,m,y, interview_date, interview_year=2018)= :180-181; =(F)people_last7days.py:59-63= age = 2018 - year (1900..2018), read :128 | unknown (no cite; non-ET) |
+| Burkina_Faso | 2018-19 | Age; working_age | =s01_me_bfa2018.dta= : =s01q03a/b/c=; =s01q04a=; ref =s00q23a= | =(F)data_info.yml:56-60,74=; =(F)mapping.py:85= =Age()= (day 9999 -> None :105-106; month_map :100/:108, ='Ne sait pas'= -> None); call :124-125; =(F)people_last7days.py:53-57=, read :122 | unknown (no cite; non-ET) |
+| Burkina_Faso | 2021-22 | Age | =s01_me_bfa2021.dta= : =s01q03a/b/c=; =s01q04a=; ref =s00q23a= | =(F)data_info.yml:53-57,71=; =(F)mapping.py:108= =Age()= (month_map :127-131); call :149-150 | unknown (no cite; non-ET) |
+| CotedIvoire | 2018-19 | Age; working_age | =Menage/s01_me_CIV2018.dta= : =s01q03a/b/c= (integer month per =mapping.py:159-160=); ref =s00q23a= | =(F)data_info.yml:89-93,107=; =(F)mapping.py:155= pass-through; call :187-188; =(F)people_last7days.py:58-62=, read :129 | unknown (no cite; non-ET) |
+| Guinea-Bissau | 2018-19 | Age; working_age | =s01_me_gnb2018.dta= : =s01q03a/b/c= (month in *Portuguese*); ref =s00q23a= | =(F)data_info.yml:167-171,188=; =(F)mapping.py:202-206= =_MONTH_MAP_PT=, =Age()= :209; age==9999 :248, day==9999 :251 -> None; call :254-255; =(F)people_last7days.py:68-72=, read :138 | unknown (no cite; non-ET) |
+| Mali | 2018-19 | Age | =s01_me_mli2018.dta= : =s01q03a/b/c= (month labels *truncated in the file*: ='f'=, ='Ao'=, ='d'=); ref =s00q23a= | =(F)data_info.yml:158-162,176=; =(F)mapping.py:74= pass-through (docstring :77 wrongly says integer month); =_MONTH_MAP= :101-105; d/m/y >= 9999 masked :153-157; call :159-164; on =ValueError= a year-only retry :167-171 | unknown (no cite; non-ET) |
+| Mali | 2021-22 | Age | =s01_me_mli2021.dta= : =s01q03a/b/c=; ref =s00q23a= | =(F)data_info.yml:169-173,183=; =(F)mapping.py:91-95= =_MONTH_MAP=, =Age()= :98 (month :113-117); >= 9999 -> None :132/:134/:137; call :138-139 | unknown (no cite; non-ET) |
+| Niger | 2018-19 | Age; working_age | =s01_me_ner2018.dta= : =s01q03a/b/c=; ref =s00q23a= | =(F)data_info.yml:116-120,135=; =(F)mapping.py:326= =Age()= (month_map :341-351, strings only; 9999 left to =is_valid= :329-330; age >= 9999 :384); call :385-392; =(F)people_last7days.py:24-26= -> =C/Niger/_/niger.py:1104-1105= (=dob_year_col='s01q03c'=), :1141-1145 | unknown (no cite; non-ET) |
+| Niger | 2021-22 | Age; working_age | =s01_me_ner2021.dta= : =s01q03a/b/c= (='.'= strings; numeric month per :224); ref =s00q23a= | =(F)data_info.yml:74-78,93=; =(F)mapping.py:124= pass-through; =to_numeric(errors='coerce')= :235-238; call :243-250; =people_last7days.py:25-29= -> =niger.py:1141-1145= | unknown (no cite; non-ET) |
+| Senegal | 2018-19 | Age; working_age | =s01_me_sen2018.dta= : =s01q03a/b/c=; ref =s00q23a= | =(F)data_info.yml:79-83,98=; =(F)mapping.py:58= =Age()= (month_map :62-66); call :236-239 (sentinels left to =age_handler=, :224-228); =people_last7days.py:64-68=, read :137 | unknown (no cite; non-ET) |
+| Senegal | 2021-22 | Age | =s01_me_sen2021.dta= : =s01q03a/b/c=; ref =s00q23a= | =(F)data_info.yml:67-71,86=; =(F)mapping.py:58,62-66=; call :213-216 | unknown (no cite; non-ET) |
+| Togo | 2018 | Age; working_age | =Data1/s01_me_tgo2018.dta= : =s01q03a/b/c=; ref =s00q23a= | =(F)data_info.yml:89-93,107=; =(F)mapping.py:121= (month_map :142-146; docstrings :125-128 vs :234 disagree on month encoding); age<0 :240; call :241-242; =people_last7days.py:69-73=, read :137 | unknown (no cite; non-ET) |
+| Uganda | 2009-10 | Age -- *day and month cannot affect it* (no interview date passed) | =GSEC2.dta= : =h2q9a= (day), =h2q9b= (month), =h2q9c= (year); age =h2q8=; *no interview date* | =(F)data_info.yml:14-18=; =(F)mapping.py:38= =Age()= -> =C/Uganda/_/_age_helpers.py:105-121= (day 99 -> None :63; month DK/English names :68-89; year 9999 or outside 1900..2100 :100); =household_roster= :43-45 -> =_age_helpers.py:132-138= =age_handler(age,d,m,y, interview_year=2009)= (=(F)mapping.py:20=) | unknown (no cite; non-ET) |
+| Uganda | 2010-11 | Age (as 2009-10) | =GSEC2.dta= : =h2q9a/b/c= | =(F)data_info.yml:14-18=; =(F)mapping.py:28,32-33=, year 2010 :25 | unknown (no cite; non-ET) |
+| Uganda | 2011-12 | Age (as 2009-10) | =GSEC2.dta= : =h2q9a/b/c= | =(F)data_info.yml:14-18=; =(F)mapping.py:24,28-29=, year 2011 :21 | unknown (no cite; non-ET) |
+| Uganda | 2013-14 | Age (as 2009-10) | =GSEC2.dta= : =h2q9a/b/c= | =(F)data_info.yml:18-22= (comment :12-17); =(F)mapping.py:23,28-30=, year 2013 :20 | unknown (no cite; non-ET) |
+| Uganda | 2015-16 | Age (as 2009-10) | =gsec2.dta= : =h2q9a/b/c= | =(F)data_info.yml:14-18=; =(F)mapping.py:21,25-26=, year 2015 :18 | unknown (no cite; non-ET) |
+| Uganda | 2018-19 | Age (as 2009-10) | =GSEC2.dta= : =h2q9a/b/c= (English month) | =(F)data_info.yml:15-19=; =(F)mapping.py:29,33-34=, year 2018 :26 | unknown (no cite; non-ET) |
+| Uganda | 2019-20 | Age (as 2009-10) | =HH/gsec2.dta= : =h2q9a/b/c= (English month) | =(F)data_info.yml:15-19=; =(F)mapping.py:29,33-34=, year 2019 :26 | unknown (no cite; non-ET) |
+| Nigeria | 2010-11 | Age -- *day/month cannot affect it* (no interview date passed) | PP =sect1_plantingw1.dta= : =s1q5_day/_month/_year=; PH =sect1_harvestw1.dta= : =s1q6_*=; age =s1q4= | =(F)household_roster.py:48-50,71-73,90-94= -> =C/Nigeria/_/_age_helpers.py= (=_clean_day= 1..31 :57-58; =_clean_month= ='N. NAME'= / name / int :61-90; =_clean_year= 1900..2030 :93-95); call :133-135 with =interview_year=2010= only | unknown (no cite; non-ET) |
+| Nigeria | 2012-13 | Age (as 2010-11) | PP =sect1_plantingw2.dta= : =s1q7_*=; PH =sect1_harvestw2.dta= : =s1q6_*= | =(F)household_roster.py:45-47,69-71,84-88= (2012) | unknown (no cite; non-ET) |
+| Nigeria | 2015-16 | Age (as 2010-11) | PP =sect1_plantingw3.dta= : =s1q7_*=; PH =sect1_harvestw3.dta= : =s1q6_*= | =(F)household_roster.py:45-47,65-67,76-80= (2015) | unknown (no cite; non-ET) |
+| Nigeria | 2018-19 | Age (as 2010-11) | PP =sect1_plantingw4.dta= : *year only* =s1q7_year=; PH =sect1_harvestw4.dta= : =s1q6_*= | =(F)household_roster.py:45,63-65,78-82= (2018) | unknown (no cite; non-ET) |
+| Nigeria | 2023-24 | Age (as 2010-11) | =sect1_plantingw5.dta=, =sect1_harvestw5.dta= : =s1q10= (month), =s1q11= (year) -- =s1q11= "calculated from age + interview" (=:18=), i.e. *derived, not reported* | =(F)household_roster.py:58-59,80-81,96-100=, =day_col=None= | unknown (no cite; non-ET) |
+| Ethiopia | 2013-14 | Age -- DOB-derived fractional age is live | =sect1_hh_w2.dta= : =hh_s1q04g_1= (day), =hh_s1q04g_2= (*Amharic* month name), =hh_s1q04g_3= (*2-digit Ethiopian* year); also =hh_s1q04_a/_b=, =hh_s1q04h=; reference a *synthetic* ='07/01/2013'= (=(F)mapping.py:136=) | =(F)data_info.yml:93-99=; =(F)mapping.py:44= =Age()=: =disambiguate_two_digit_eth_year= :60-64 (=lsms_library/calendars.py:174=), =parse_ethiopian_month= :65 (=calendars.py:79=), day 1..30 (1..6 Pagume) :66-71, =ethiopian_to_gregorian= :76 (=calendars.py:161=), invalid day -> *day=1* :79-81; call :142-147 with =format_interv='%m/%d/%Y'= | *ethiopian -> converted to gregorian* [=(F)data_info.yml:87-88=; =(F)mapping.py:8-11=; =C/Ethiopia/_/_age_helpers.py:18-22=] |
+| Ethiopia | 2015-16 | *unwired*: Age uses =hh_s1q04a/b= (years / months) only | =sect1_hh_w3.dta= : =hh_s1q04g_*= (DOB triplet) *read nowhere* | =C/Ethiopia/2015-16/_/data_info.yml:85-100= (comment: year Ethiopian, month English Gregorian; "the precision improvement is not safe to apply"; GH #178) | *CONFLICTING CITES -- not resolved here*: =C/Ethiopia/2015-16/_/data_info.yml:89-91= and =C/Ethiopia/2015-16/_/mapping.py:4-7= say the year is Ethiopian, month Gregorian; =C/Ethiopia/_/_age_helpers.py:23-26= says the whole DOB is Gregorian |
+
+=age_handler= itself (=lsms_library/local_tools.py=, HEAD lines) -- a
+*library-side parse site outside the 87 =to_datetime= count*:
+- Signature =:3247=; =interview_yr = int(interview_year)= =:3266= (so
+  =interview_year= is effectively required); =is_valid= accepts 0 <= v < 2100
+  =:3269-3285= (rejects 9999 and negative sentinels; would *accept a 2-digit
+  year*).
+- Interview date: =[y,m,d]= list -> ='%m/%d/%Y'= string =:3316-3319=; =[y,m]=
+  -> *day 15* =:3321=; =[y]= -> year only =:3324=;
+  =pd.to_datetime(interview_date, format=format_interv)= =:3326=, or with *no
+  format* =:3330=.  Skipped entirely when =interview_date is None= (=:3313=).
+- DOB: a single =dob= column via =pd.to_datetime(dob, format=format_dob)=
+  =:3358= (no production caller uses =dob=/=format_dob=; =age_handler_wrapper=
+  =:3404= is called only from tests); d/m/y -> =_safe_dob= -> =date(y,m,d)=
+  =:3335-3361=, impossible day -> *day 15* =:3353=; month+year, no day -> *day
+  15* =:3364=.  Year only -> =interview_yr - y=, clamped 0..120 =:3392-3400=.
+  *There is no day=1 or mid-year default in =age_handler=; its partial-date
+  imputation is day 15* -- which differs from the day=1 convention used
+  everywhere else (Uganda shocks =assign(DAY=1)=, Ethiopia 2013-14 invalid-day
+  fallback, the #1045 design's "first of the month").
+- Combination =:3372= (=if final_interview_date and final_date_of_birth=), age
+  = days/365.25 =:3373=; DOB age preferred when within 1 year of the reported
+  age =:3380-3387=, else =int(age)= =:3391=.
+- *Consequence*: for Uganda (7 waves) and Nigeria (5 waves) no interview date
+  is passed, so =:3372= is always False and the DOB day/month are read,
+  sentinel-cleaned and then *cannot influence =Age=*; only the birth year
+  matters, and only when the reported age is missing/implausible.  Comments
+  claiming fractional DOB ages there (=C/Nigeria/_/_age_helpers.py:15-18=,
+  each Nigeria =household_roster.py:3-5=) are contradicted by the code.
+  Verified at HEAD: =C/Uganda/_/_age_helpers.py:124-140= and
+  =C/Nigeria/_/_age_helpers.py:98-135= call =age_handler(age, d, m, y,
+  interview_year=...)= with no =interview_date=; =local_tools.py:3313=, =:3372=.
+- Dead duplicate: =C/Niger/_/niger.py:142= =age_handler(df, ...)= has no
+  callers; parses =pd.to_datetime(f'{m}/{d}/{y}', format='%m/%d/%Y',
+  errors='coerce')= =:183= and =pd.to_datetime(df[dob], format=format_dob)= =:162=.
+
+DOB present in source but not read (unwired): GhanaSPS 2009-10
+=sid_3i/s1d_3ii/s1d_3iii= (deliberately omitted, =C/GhanaSPS/2009-10/_/data_info.yml:54-60=);
+Peru 1994 =b04d/b04m/b04a= (=C/Peru/1994/_/data_info.yml:211=); GhanaAHIES
+=s1aq3a/b/c= (=C/GhanaAHIES/_/CONTENTS.org:257=); Kazakhstan 1996 =dob= in
+KZ96REL (=C/Kazakhstan/_/CONTENTS.org:339=); Ethiopia 2015-16 (above).
+No DOB read at all: Ethiopia 2011-12, 2018-19, 2021-22; every EthiopiaRHS wave
+(age in years).  Documentation inconsistency: =C/Senegal/_/CONTENTS.org:685=
+calls =s01q03a= the "DOB year"; the code treats it as the day.
+
+* Ethiopian-calendar evidence, per wave
+
+| country | wave | quantity | evidence (path:line) | converted? |
+|---------+------+----------+----------------------+------------|
+| Ethiopia | 2011-12, 2013-14, 2015-16, 2018-19, 2021-22 | =crop_production.planting_month= / =harvest_month= (month codes) | =C/Ethiopia/_/ethiopia.py:1316-1318= ("ESS records the local-calendar month ... the same recode the WB do-files apply") | *Yes, by a fixed lossy month relabel* =_ETH_MONTH_TO_GREG= (=ethiopia.py:1320-1327=, used :1673, :1711), *not* via =lsms_library.calendars=; codes 1 and 13 both -> 9 |
+| Ethiopia | 2013-14 | DOB (=hh_s1q04g_1/2/3=) | =C/Ethiopia/2013-14/_/data_info.yml:87-88=; =C/Ethiopia/2013-14/_/mapping.py:8-11=; =C/Ethiopia/_/_age_helpers.py:18-22= | *Yes*, via =lsms_library.calendars= (=mapping.py:27-31,76=) -- the *only* importer of =calendars= in the corpus |
+| Ethiopia | 2015-16 | DOB (=hh_s1q04g_*=) | conflicting: =2015-16/_/data_info.yml:89-91= & =2015-16/_/mapping.py:4-7= (year Ethiopian, month Gregorian) vs =_age_helpers.py:23-26= (Gregorian) | *Not read at all* -- an Ethiopian-calendar (by two of three cites) date that is not converted because it is not used |
+| Ethiopia | 2018-19, 2021-22 | =interview_date.Int_t= (=InterviewStart=, =InterviewDate=) | *none found* (=Ethiopia/_/CONTENTS.org= has no calendar statement on interview dates) | Not converted; served as raw strings; calendar *unknown* -- open per charter §5 |
+| Ethiopia | 2011-12, 2018-19, 2021-22 | DOB | no DOB read | -- |
+| EthiopiaRHS | 1999 (and the 1989 livestock-history files per CONTENTS) | =livestock.HerdValue= / =TLU= served from =lvsval80= / =lsu80= -- an *Ethiopian-calendar reference year encoded in the variable NAME* (EC 1980 ~ Gregorian 1987/88) | =C/EthiopiaRHS/1999/_/data_info.yml:170-178,203-204=; =C/EthiopiaRHS/_/CONTENTS.org:153-157= ("EC year suffixes run 77..81 = Gregorian 1984/85..1988/89") | Not converted (it is a choice of column, not a value); the served year is implicit -- note =:176-178=: for =din= EC-81 is better populated, so =din= is served its second-to-last year |
+| EthiopiaRHS | all | DOB / interview dates | none read (age in years only) | -- |
+
+=lsms_library/calendars.py= (header =:1-40=): Ethiopian is the only
+non-Gregorian calendar implemented ("Other calendars (Hijri, Coptic) can be
+added on demand").  Nepal (Bikram Sambat) has no microdata; Iraq (Hijri)
+interview dates were not checked against a questionnaire.
+
+* Kind 6 -- other calendar quantities (other tables, helpers)
+
+Source: parallel read-only sweep (Explore subagent dispatched by this agent;
+its line numbers for =countries/= are at HEAD; library lines re-verified here
+at HEAD for =country.py= and =conversion.py=).  Everything not in
+=interview_date= / DOB / =crop_production= months / =shocks=.
+
+** 6a. Calendar quantities read (or available) outside the four tables
+
+| country | wave | table.column served (or unserved) | source file : var(s) | current construction (path:line) | kind | calendar |
+|---------+------+-----------------------------------+----------------------+----------------------------------+------+----------|
+| Tanzania | 2019-20, 2020-21 | unserved -- =community_cluster_xwalk= date-window matcher (output columns =C/Tanzania/_/tanzania.py:2055= carry no date) | =HH_SEC_A.dta= / =hh_sec_a.dta= : =hh_a18= (read at =C/Tanzania/{2019-20,2020-21}/_/community_cluster_xwalk.py:26=) | =pd.to_datetime(h['hh_a18'], errors='coerce')= =tanzania.py:2175=; per-cluster min/max =:2181=; window =_XWALK_WINDOW_DAYS= ={14,7}= =:2064=; test =:2208= | date (timestamp) | unknown (=C/Tanzania/_/CONTENTS.org:892-893= "real timestamps") |
+| Tanzania | 2019-20, 2020-21 | unserved (same matcher) | =CM_SEC_A.dta= / =cm_sec_a.dta= : =cm_start= (=community_cluster_xwalk.py:25=) | =pd.to_datetime(cm['cm_start'], errors='coerce')= =tanzania.py:2187= | date (timestamp) | unknown |
+| GhanaLSS | 1987-88, 1988-89 | unserved -- sort key ordering repeat price records into =community_prices.obs=, then dropped (=C/GhanaLSS/_/glss_prices.py:90= =COLUMNS=) | =PRICE.DAT= : =YRINT=, =MOINT= | =pd.to_numeric= =glss_prices.py:283-284=; =assemble(..., sort_keys=['yr','mo'])= =:283-295=; dropped =:215-225= | year-month as two numeric parts | unknown (=1987-88/_/community_prices.py:9-11=; =1988-89/_/community_prices.py:7-10=) |
+| GhanaLSS | 1991-92 | unserved -- sort key for =obs= | =Prices/G3PRICE.DTA= : =time= ("the survey month, 1-12", =1991-92/_/community_prices.py:7=) | =time_col='time'= =1991-92/_/community_prices.py:34= -> =pd.to_numeric= =glss_prices.py:316-317=; =sort_keys=['month']= =:320= | month-of-year | unknown |
+| GhanaLSS | 1998-99, 2012-13 | nothing read | G4PRICE (no month); =price_sec0= date "not needed" | =1998-99/_/community_prices.py:21= (=time_col=None=, month const 0); =2012-13/_/community_prices.py:11= | -- | -- |
+| GhanaAHIES | 2022, 2023, 2024 | *index =t= of every table* (sample, household_roster, housing, food_security, cluster_features, anthropometry, people_last7days, individual_education) | person x quarter / household x quarter =.dta= : =quarter= (shipped as ='YYYYQn'=) | =df['quarter'].astype(str)= =C/GhanaAHIES/_/ghanaahies.py:54,65=; =sample.py= (2022:61 / 2023:69 / 2024:54); =wave_quarters= =:142-144=, =assert_quarters= =:147-152=; =wave_year()= from folder =:113-119=; hard-coded =QUARTERS= =2023/_/sample.py:50=, =housing.py:106=, =food_security.py:35= | year-quarter (label) | unknown (=C/GhanaAHIES/_/CONTENTS.org:19,26= "2022Q1 to 2024Q4") |
+| Nigeria | all | *index =t=*: PP quarter (plot_features, plot_inputs, livestock, food_coping, people_last7days W1-4); PH quarter (crop_production, plot_labor, community_prices, anthropometry, people_last7days W5) | none -- constants | =PP_QUARTER= =C/Nigeria/_/nigeria.py:149-155=, =PH_QUARTER= =:163-169=; =round_wave= =:2376-2384= | year-quarter (label) | unknown |
+| EthiopiaRHS | 1999 (data really 1989, per the comment) | =livestock.HerdValue=, =livestock.TLU= -- reference year exists only in the variable *name* | ={ars,deb,dink,gam,har,sid,wol}lvs5.tab= : =lvsval80=, =lsu80= | suffix =80= hard-coded =C/EthiopiaRHS/1999/_/data_info.yml:203-204=; =din='s later EC-81 skipped (=:176-178=); SPSS =_date= stamps cited, never read (=:94=) | year (in a name) | *ethiopian* (=EthiopiaRHS/1999/_/data_info.yml:120,170-171=) -- not converted |
+| Malawi | 2010-11, 2013-14, 2016-17, 2019-20 | unserved -- passed, never read | =ag_mod_g= : =ag_g05b=; =ag_mod_p= : =ag_p04= (both as =plant_y=) | =_harvest_block= accepts =plant_y= (=C/Malawi/_/malawi.py:1036-1037=), uses only =plant_m=/=harv_m= (=:1078-1087=); call sites =2010-11/_/crop_production.py:40,43=, =2013-14:40,43=, =2016-17:47,50=, =2019-20:42,45=, =malawi.py:1976,1979= | year (planting) | unknown |
+| Malawi | -- | dead constant | -- | =_MONTH_CODES= =malawi.py:960-962= | month-of-year | -- |
+| Guyana | 1992 | unserved -- docstring says "read but not carried", loop never reads it | =DRBLS.dta= : =yriNN= (year of purchase) | =C/Guyana/_/assets.py:9-10= vs =:101-108=; values quoted =:122-124= | year (acquired) | unknown |
+| Guyana | 1992 | unserved -- comment only | =HHCHAR.dta= : =bldg2= ("year of construction") | =C/Guyana/1992/_/data_info.yml:165= | year (built) | unknown |
+| Kazakhstan | 1996 | unserved | =KZ96HSG_PUF.dta= : =b37_NN_3= ("what year did you get it?") | "(not emitted)" =C/Kazakhstan/1996/_/assets.py:10= | year (acquired) | unknown |
+| Peru | 1990, 1991, 1994 | unserved -- prose justifying =Currency= overrides | 1991 =N00A.moi=; 1994 =REG01.a18= | months copied into a comment =lsms_library/data_info.yml:1196-1210=; =a18= cited for interview_date =C/Peru/_/data_scheme.yml:188-193= | month-of-year | unknown |
+
+** 6b. =months_food_inadequate= -- month-of-year batteries reduced to a count
+
+*No month name or code is turned into a number here; every wave reduces the
+month battery to =MonthsInadequate= (=Int64= count), and WHICH months were
+marked is discarded.*  Not a calendar point once served, but the sources are
+month-of-year sets.
+
+| country | wave | source : vars | construction (path:line) | source encoding | calendar |
+|---------+------+---------------+--------------------------+-----------------+----------|
+| Uganda | 2009-10 | =GSEC17= : =h17q10= (string of letters) | =count_months=: distinct letters in A-L, =C/Uganda/2009-10/_/months_food_inadequate.py:19-24,27= | month letters | gregorian-named (=:7-8= "A=Jan .. L=Dec") |
+| Uganda | 2011-12, 2013-14, 2015-16 | =GSEC17B= / =GSEC17_2= / =gsec17_2= (long): =h17q10a= Yes/No, =h17q10b= month *name* | sums =h17q10a= (=:25-26= per wave); =h17q10b= never read | month names | unknown (=:7-8=) |
+| India | 1997-98 | =SECT08A= : =v08a02a..l= | =notna().sum(axis=1)= =C/India/1997-98/_/months_food_inadequate.py:20,26= | 12 positional indicators | gregorian-named (=:8= "January..December") |
+| Burkina_Faso | 2014 | =emc2014_p3= : =SA5A..SA5L= Oui/Non | count of ='oui'= =C/Burkina_Faso/2014/_/months_food_inadequate.py:32,39-44= | 12 indicators | gregorian-named (=:11-12= "Juillet 2013 .. Juillet 2014" -- a 13-month span for 12 flags; letter-to-month unresolved) |
+| Malawi | 2010-11 .. 2019-20 | =hh_mod_h= : =hh_h05a_01..hh_h05b_15= (2010-11) / =hh_h05a..hh_h05y= (='X'=) | =_months_inadequate_columns= =C/Malawi/_/malawi.py:2611-2621=; count ='X'=, gated on H04==1, =clip(upper=12)= =:2659-2667= | 25-cell month calendar, positional | unknown (=C/Malawi/_/data_scheme.yml:172-176=) |
+| Timor-Leste | 2001, 2007-08 | =s13c13= / =q13b13= (count); monthly items =s13c01..12= / =q13b01..12= *not read* | =2001:30=, =2007-08:29= (=:14=, =:15= for the unread items) | count + unread month items | n/a |
+| Liberia | 2018-19 | =sect16a= : =S16_2= | count as reported =:29-31= | count | n/a |
+| Uganda | 2010-11 | =GSEC17A= has no which-months item | -- | -- | -- |
+
+** 6c. Library-side calendar parse / consume sites (outside =countries/=)
+
+- =lsms_library/conversion.py:59-74= =_parse_date=: the =Date= column of
+  =conversion_factors.org= (=YYYY=, =YYYY-MM= or =YYYY-MM-DD= -> period-start
+  Timestamp; docstring =:20-22= "ISO-8601"); =_wave_to_year= =:90-94= and the
+  =_query_dates= fallback =:130-140= (first 4-digit year of the wave label ->
+  Jan 1).  *=_interview_dates= =:97-128= CONSUMES =interview_date.Int_t=* -- a
+  downstream reader the Phase-2 dtype change must keep working.
+- =lsms_library/country.py:5837-5846= =_SCHEME_DTYPE_MAP= (=datetime= / =date=
+  / =timestamp= -> =to_datetime=), =:6206= =_YEAR_LAST_DATE=, =:6231=
+  =_coerce_datetime_column= (PR #1025) -- the read-time cast; today only
+  =interview_date= columns reach it (nothing else is declared =datetime=).
+- =lsms_library/local_tools.py:3152-3215= =melt_visit_intervals= (EHCVM
+  parse at =:3214-3215=) and =age_handler= (Kind 5).
+- =lsms_library/calendars.py= -- sole consumer =C/Ethiopia/2013-14/_/mapping.py:27=.
+- Not calendar data: =provenance.py:304,318= =CATALOG_YEARS= (catalog
+  metadata); ordinal -> wave-label maps (Tanzania =round= ->
+  =tanzania.py:544-548=; EthiopiaRHS =R_TO_T= =C/EthiopiaRHS/_/community_prices.py:32=;
+  Burkina 2014 =visit_p1..p4= =C/Burkina_Faso/2014/_/mapping.py:41-58=).
+
+** 6d. Declarations
+
+No =datetime=, =date= or calendar-named column is declared in any
+=data_scheme.yml= outside =interview_date= (and the =crop_production= month
+columns / =shocks.Years= listed in Kinds 3-4).  Near-misses are durations
+(=MonthsInadequate: int= Uganda :81, Timor-Leste :48, Liberia :77, Malawi
+:178, Burkina :179, India :69; =Days: int=; =Age_months: float=; GhanaLSS
+=WeeksPerYear: float= :497).
+
+** 6e. Ambiguous (possibly a year, possibly a duration) -- unresolved
+
+- *Nepal =assets.Age=* <- =r1_durbl_yr= (=C/Nepal/1995-96/_/data_info.yml:33=),
+  =r2_durbl_yr= (=2003-04:33=): =_yr= could be year acquired or years since;
+  no repo documentation.
+- =assets.Age= elsewhere: documented years-since in Albania =m3c_q03=
+  (=C/Albania/2002/_/assets.py:6=) and Guatemala =p14a03=
+  (=C/Guatemala/2000/_/data_info.yml:160=); *not checked*: EHCVM =s12q07=,
+  Malawi =hh_l04=, Nigeria =s5q3=, Niger =ms07q04/MS07Q04=, BF2014 =pm3=,
+  Kosovo =s10e_02=, Tanzania =hh_m02=, Nepal 2010-11 =v06_07=, Malawi
+  2004-05 =m04a=.
+- Togo =s07bq06= "when was the last time you bought" (recency code, =C/Togo/_/derivations.yml:36=;
+  legacy =C/Togo/2018/_/food_expenditures.py:20= only).
+- Uganda =s4q07a= 'Current Year Attending' (=C/Uganda/2018-19/_/education_expenses.py:25=)
+  -- probably a school grade, not a calendar year.
+
+Searched and found nothing (per the sweep): dwelling year built/occupied
+(beyond Guyana =bldg2=), year of migration/arrival, year a job started, year
+school completed, livestock acquisition/birth dates, planting/harvest *dates*
+(only months), community/market survey dates outside GhanaLSS, anthropometry
+measurement dates.
+
+* Source name sweep (step 4; bounded, best effort)
+
+*What was done.*  40 source files (cap) declared in the =interview_date=,
+=household_roster=, =crop_production= and =shocks= blocks of wave
+=data_info.yml= (193 declared file references in those four blocks, by
+=/tmp/inv1045/files.py=), plus 3 cover/roster files re-run singly.  Each
+was read with =lsms_library.local_tools.get_dataframe(abs_path,
+convert_categoricals=False)= in its own subprocess with cwd = that wave's
+=_/= (=PYTHONSAFEPATH=1 PYTHONPATH=<clone>=, 6 in parallel, 300 s timeout).
+Flagged: any column whose *name* matches the calendar vocabulary, any
+=datetime64= column, and any string column where > 90% of sampled values
+look like =d/m/y= or ISO dates.  "Wired" = the column name occurs in that
+wave's =data_info.yml= or any wave/country =_/*.py= (a comment counts, so
+"wired" over-states; corrected by hand below).  *0 files failed, 0 timeouts*;
+=find lsms_library/countries -newer <start>= was empty afterwards (nothing
+written into the config tree).
+
+Files read (43): shocks -- Benin, Burkina_Faso 2018-19 & 2021-22,
+CotedIvoire, Guinea-Bissau, Mali 2014-15/2017-18/2018-19/2021-22, Niger
+2011-12/2014-15/2018-19, Senegal 2018-19, Togo 2018, Ethiopia 2011-12 &
+2018-19, Malawi 2010-11 & 2019-20, Nigeria 2010-11 & 2018-19, Liberia, Iraq
+2012, Tanzania 2019-20 & 2020-21; interview cover -- Ethiopia W4 & W5,
+Tanzania 2019-20 & 2020-21, Mali 2014-15 (=EACICONTROLE_p1=) / 2018-19 /
+2021-22, Malawi 2016-17 Panel, Liberia, Timor-Leste 2001, Benin 2018-19,
+Senegal 2018-19; roster -- Mali 2018-19, Tanzania 2019-20, Ethiopia 2018-19,
+Malawi 2019-20, Uganda 2019-20; crop -- GhanaSPS 2017-18
+=04n_harvestquestions.dta=.
+
+*Limitation, stated*: =get_dataframe= returns no variable labels, so a
+*coded* name (=s14q05=, =hh_s1q04g_1=) is invisible to a name match unless
+its values look like dates.  All 24 shocks files and 4 of 5 roster files
+produced *no* hit for exactly that reason; their year/month-of-shock
+questions (if any) are *not* inventoried here.  A label sweep (pyreadstat
+metadata or the questionnaire) is the follow-up.
+
+*Unwired calendar columns found* (column present, populated, read by no
+table):
+
+| country | wave | source file | unwired column(s) | dtype / example | note |
+|---------+------+-------------+-------------------+-----------------+------|
+| Mali | 2018-19 | =s00_me_mli2018.dta= | =s00q24a=, =s00q25a= (visit 2/3 start), =s00q23b=, =s00q24b=, =s00q25b= (visit 1-3 end) | ISO string ='2018-11-15T07:31:15'=, 6,602 non-null each | Mali serves only =s00q23a= as =Int_t=; the 7 other EHCVM countries serve all six as =Interview start/end= |
+| Mali | 2021-22 | =s00_me_mli2021.dta= | =s00q24a, s00q25a, s00q23b, s00q24b, s00q25b= | ISO string, 6,143 non-null | as 2018-19 |
+| Tanzania | 2019-20 | =HH_SEC_A.dta= | =Int_End= (interview end); =int_month_code= (interview month) | ISO string ='2019-09-28T18:05:17'=; float =9.0= | only =hh_a18= (start) is served |
+| Tanzania | 2020-21 | =hh_sec_a.dta= | =Int_End= (only a *commented-out* line references it, =C/Tanzania/2020-21/_/interview_date.py:9=); =int_month_code=, =int_month_code2= (month), =int_month_year= (=10= -- a 2-digit year? unverified) | ISO string; =int8= | as 2019-20 |
+| Liberia | 2018-19 | =Household/sect1_public.dta= | =interview_date2= (127), =interview_date3= (35) | =datetime64= | follow-up visit dates; only =interview_date1= served (=data_info.yml:128= comment) |
+| Malawi | 2016-17 | =Panel/hh_mod_a_filt_16.dta= | =consumption_date= | date string ='2016-05-15'=, 2,508 non-null | a reference date for the consumption module |
+| Ethiopia | 2021-22 | =sect_cover_ph_w5.dta= | =saq19__Timestamp= | string, all ='**CONFIDENTIAL**'= | redacted in the public release -- nothing to wire |
+| GhanaSPS | 2017-18 | =04n_harvestquestions.dta= | =harvestmonths_1..harvestmonths_12= (12 month-indicator dummies) | =int8= 0/1 | the served =harvest_month= reads the string =harvestmonths= instead; the dummies are a second encoding of the same set |
+
+Wired calendar columns confirmed with their source representation (feeds
+Kind 1a): Ethiopia W4 =InterviewStart= and W5 =InterviewDate= are ISO strings
+with a time (='2019-06-19T09:15:28'=); Tanzania =hh_a18= ISO strings;
+Malawi 2016-17 =interviewdate_v1/_v2= date strings; Liberia
+=interview_date1= =datetime64=; Timor-Leste 2001 =s00_vis1= not flagged (an
+integer =DDMMYY=, as documented); Mali 2014-15 =EACICONTROLE_p1= components
+not flagged (coded names).
+
+
+* Census cross-check (the 2026-10-18 table in #1045)
+
+Re-measured from this root's L2-country footers (=/tmp/inv1045/census.tsv=);
+every census count reproduces exactly.
+
+| census row (#1045) | census claim | measured here | where it appears in this inventory |
+|--------------------+--------------+---------------+------------------------------------|
+| =interview_date.Int_t= | =timestamp[us]= 14; =large_string= 5 (Ethiopia, Mali, Nigeria, Tanzania, Timor-Leste); =timestamp[ms]= 1 (Liberia) | =ts[us]=: Albania, Azerbaijan, Cambodia, GhanaLSS, Guyana, India, Iraq, Kosovo, Malawi, Pakistan, Serbia, South Africa, Tajikistan, Uganda (14); =large_string=: Ethiopia, Mali, Nigeria, Tanzania, Timor-Leste (5); =ts[ms]=: Liberia (1) -- *matches* | Kind 1a, one row per (country, wave) for all 20; Mali and Tanzania in full at 1b / 1c |
+| =interview_date.Interview start= / =end= | =timestamp[us]=, EHCVM, 7 countries | =ts[us]=: Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo (7) -- *matches* (Mali is EHCVM in 2018-19/2021-22 but serves =s00q23a= as =Int_t=, string) | Kind 1a, rows for all 7 (10 waves) |
+| =crop_production.harvest_month= | =double= 7 (EHCVM); =int64= 5; =large_string= 2 (GhanaSPS, Nigeria) | =double=: Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, Niger, Senegal, Togo (7); =int64=: Ethiopia, Malawi, Mali, Tanzania, Uganda (5); =large_string=: GhanaSPS, Nigeria (2) -- *matches*.  NEW: *6 of the 7 =double= columns are 100% null* (only Niger 2014-15 has values) | Kind 3 (13 countries); *Nigeria's is a year-month string ='YYYY-MM'=*, listed under Kind 2; GhanaSPS's is a space-joined *set* of months |
+| =crop_production.planting_month= | =int64= 3; =large_string= 1 (Nigeria) | =int64=: Ethiopia, Malawi, Mali (3); =large_string=: Nigeria (1) -- *matches* | Kind 3 (Ethiopia, Malawi, Mali); Nigeria under Kind 2 (='YYYY-MM'=) |
+| =shocks.Year= / =Years= / =Onset= | =double= (Uganda); =large_string= (Albania); =double= (Uganda) | Uganda =Year= =double=, =Onset= =double=; Albania =Years= =large_string= -- *matches* | Kind 4 (Year, Years); =Onset= at the foot of Kind 2 (a month-count derived from two year-months, *not* a calendar point) and in "Excluded: durations" |
+
+Columns the census did not list but this census found (L2-country): none of
+timestamp/date type beyond the three =interview_date= columns.  Name-matched
+non-calendar columns, for completeness: =GhanaLSS household_roster.Birthplace=
+(a place), =Tanzania community_cluster_xwalk.n_candidates= (a count), =visit=
+(an ordinal visit/passage index, Albania/EHCVM/GhanaLSS/Malawi/BF
+=food_acquired=) -- not calendar quantities.
+
+* Excluded: durations (and other near-misses)
+
+Out of scope per #1045 (counts with units, not calendar points).  Served, from
+the L2-country census: =MonthsAway= (Albania, China, Ethiopia, GhanaLSS,
+GhanaSPS, Iraq, Malawi, Pakistan, Peru, Tajikistan, Tanzania), =MonthsSpent=
+(Benin, Burkina_Faso, CotedIvoire, Guinea-Bissau, India, Kazakhstan, Liberia,
+*Mali (stored =large_string=!)*, Niger, Senegal, Serbia, Serbia and
+Montenegro, Togo, Uganda), =food_coping.Days=, =months_food_inadequate.MonthsInadequate=,
+=anthropometry.Age_months=, =labor.WeeksPerYear/DaysPerWeek= (GhanaLSS),
+=employment.Cash_per_day= (India).
+
+Ambiguous -- flag for the Phase-3 author:
+- *=Uganda shocks.Onset=* -- a duration (months from shock start to interview
+  month) but *computed from two year-months with day padded to 1*, so it
+  depends on calendar parsing (Kind 2).  31 rows negative.  Not a calendar
+  point; do not give it a datetime type.
+- *=Uganda shocks.Duration=* (=h16q02b= / =h16q6=) -- months; a duration, but
+  it is an *input* to the imputed =shocks.Year= in 2009-10..2011-12 (Kind 4).
+- *=visit=* (index level; Albania, EHCVM, GhanaLSS, Malawi, Mali, BF
+  =food_acquired=) -- an ordinal contact number, not a date.  In Mali 2014-15
+  it is *derived from the rank of the household's interview dates*
+  (=C/Mali/2014-15/_/mapping.py:121=), so it is calendar-derived.
+- *Nigeria wave labels =t= = ='2011Q1'..'2024Q1'= / PP quarters*
+  (=C/Nigeria/_/nigeria.py:149-169= =PP_QUARTER= / =PH_QUARTER=) -- year-quarter
+  *labels* on the =t= axis; categorical, not served as a date.  Likewise
+  GhanaAHIES quarters (see Kind 6 if the parallel sweep lists them).
+- =season= labels -- categorical, out of scope per #1045.
+
+* Not swept / coverage limits
+
+- *No questionnaire PDF was read in this pass.*  The charter (§3) routes PDFs
+  through subagents and none was dispatched for questionnaires; the DOB
+  subagent reports that the local =Documentation/*.pdf= files are =.dvc=
+  pointers only.  This is why the calendar column is =unknown= almost
+  everywhere: only code comments / CONTENTS.org were available as citations.
+  *Still open, as charter §5 requires of Phase 0*: the calendar of Ethiopia's
+  interview dates (W4 =InterviewStart=, W5 =InterviewDate=; served as strings).
+  The artifact that closes it is the ESS W4/W5 household questionnaire cover
+  page (or the Survey Solutions export metadata); it must not be settled from
+  the values.  Likewise unresolved: Ethiopia 2015-16 DOB (conflicting cites,
+  Kind 5); Iraq (Hijri possible, unchecked); Nepal (Bikram Sambat; no data).
+- *Source name sweep capped* at 43 of the 193 file references declared in the
+  four blocks; no labels are available through =get_dataframe=, so coded
+  variable names are invisible unless their *values* look like dates.  In
+  particular the year/month-of-shock questions of the 24 shocks modules read
+  (and the 11 not read) are *not* inventoried; only Uganda (=shocks.py=
+  scripts) and Albania serve shock years today.  Source files of script-path
+  =crop_production= builders were not read except GhanaSPS 2017-18.
+- *Stored types* are from schema footers of a root warmed at an older commit
+  (=3e3bd26ee=; 9 countries stale -- which nine was not established here).
+  Values were profiled only for Mali/Tanzania =interview_date=, the
+  =crop_production= month columns and =shocks= Year/Years/Onset.
+- *Build-path claims verified indirectly*: "YAML vs script" was read from the
+  presence of =lsms_library/countries= wave scripts plus the =lsms_cache_hash=
+  key in each L2-wave footer (hashless = script path), not by tracing
+  =Wave.grab_data= dispatch.  The claims "Albania wave =mapping.py= =Int_t= is
+  dead" and "Tanzania 2019-20/2020-21 =interview_date.py= are shadowed" rest
+  on that evidence (column name =int_t= vs the script's =date=; hash present)
+  and on the myvar spelling, not on a run.
+- *EHCVM source representation* (ISO strings) measured for Benin, Senegal
+  2018-19 and Mali 2018-19/2021-22 only; assumed (not measured) for Burkina
+  Faso, CotedIvoire, Guinea-Bissau, Niger, Togo, Senegal 2021-22.
+- Durations were not audited beyond the census list.
+
+* Appendix: =to_datetime= call sites at =266d6ac97= (=git grep -n -o to_datetime 266d6ac97 -- lsms_library/countries=)
+
+| file (=266d6ac97=) | occurrences | line numbers (=c= = comment/docstring, =xN= = N on one line) | covered in |
+|-------------+-------------+-----------------------------------------------------------+------------|
+| =C/Albania/2002/_/mapping.py= | 1 | 21 | Kind 1a |
+| =C/Albania/2004/_/mapping.py= | 1 | 10 | Kind 1a |
+| =C/Albania/2005/_/mapping.py= | 1 | 11 | Kind 1a |
+| =C/Albania/_/albania.py= | 4 | 112c, 137c, 142, 146 | Kind 1a |
+| =C/Cambodia/2019-20/_/interview_date.py= | 2 | 5c, 26 | Kind 1a (+1c Tanzania) |
+| =C/GhanaLSS/1987-88/_/mapping.py= | 1 | 149 | Kind 1a |
+| =C/GhanaLSS/1988-89/_/mapping.py= | 1 | 143 | Kind 1a |
+| =C/GhanaLSS/1991-92/_/mapping.py= | 1 | 118 | Kind 1a |
+| =C/GhanaLSS/1998-99/_/mapping.py= | 1 | 100 | Kind 1a |
+| =C/GhanaLSS/2005-06/_/mapping.py= | 1 | 75 | Kind 1a |
+| =C/GhanaLSS/2012-13/_/mapping.py= | 1 | 21 | Kind 1a |
+| =C/GhanaLSS/2016-17/_/mapping.py= | 1 | 23 | Kind 1a |
+| =C/GhanaLSS/_/visit_dates.py= | 2 | 54, 162 | Kind 1a, 1d |
+| =C/Guyana/1992/_/interview_date.py= | 1 | 28 | Kind 1a (+1c Tanzania) |
+| =C/India/1997-98/_/interview_date.py= | 1 | 22 | Kind 1a (+1c Tanzania) |
+| =C/Iraq/2006-07/_/interview_date.py= | 1 | 15 | Kind 1a (+1c Tanzania) |
+| =C/Iraq/2012/_/interview_date.py= | 1 | 16 | Kind 1a (+1c Tanzania) |
+| =C/Kosovo/2000/_/interview_date.py= | 1 | 23 | Kind 1a (+1c Tanzania) |
+| =C/Malawi/_/malawi.py= | 2 | 276c, 287 | Kind 1a |
+| =C/Mali/2014-15/_/mapping.py= | 2 | 118, 123 | Kind 1b |
+| =C/Mali/2017-18/_/mapping.py= | 1 | 15 | Kind 1b |
+| =C/Mali/_/mali.py= | 2 | 85, 87 | Kind 1b |
+| =C/Niger/_/niger.py= | 5 | 148c, 151c, 160, 162, 183 | Kind 5 (dead age_handler duplicate) |
+| =C/Nigeria/2010-11/_/interview_date.py= | 2 | 15, 25 | Kind 1a (+1c Tanzania) |
+| =C/Nigeria/2012-13/_/interview_date.py= | 2 | 15, 25 | Kind 1a (+1c Tanzania) |
+| =C/Nigeria/2015-16/_/interview_date.py= | 2 | 15, 28 | Kind 1a (+1c Tanzania) |
+| =C/Nigeria/2018-19/_/interview_date.py= | 2 | 12, 23 | Kind 1a (+1c Tanzania) |
+| =C/Pakistan/1991/_/interview_date.py= | 1 | 25 | Kind 1a (+1c Tanzania) |
+| =C/Tajikistan/1999/_/interview_date.py= | 1 | 27 | Kind 1a (+1c Tanzania) |
+| =C/Tajikistan/2003/_/interview_date.py= | 1 | 21 | Kind 1a (+1c Tanzania) |
+| =C/Tajikistan/2007/_/interview_date.py= | 1 | 22 | Kind 1a (+1c Tanzania) |
+| =C/Tajikistan/2009/_/interview_date.py= | 1 | 23 | Kind 1a (+1c Tanzania) |
+| =C/Tanzania/2008-15/_/interview_date.py= | 1 | 35 | Kind 1a (+1c Tanzania) |
+| =C/Tanzania/2019-20/_/interview_date.py= | 2 | 13, 14 | Kind 1a (+1c Tanzania) |
+| =C/Tanzania/2020-21/_/interview_date.py= | 2 | 14, 15 | Kind 1a (+1c Tanzania) |
+| =C/Tanzania/_/tanzania.py= | 2 | 2175, 2187 | Kind 1c, 1d |
+| =C/Uganda/2005-06/_/interview_date.py= | 2 | 15c, 19 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2005-06/_/shocks.py= | 1 | 24c | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2009-10/_/interview_date.py= | 2 | 15c, 19 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2009-10/_/shocks.py= | 3 | 23, 24, 57 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2010-11/_/interview_date.py= | 1 | 20 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2010-11/_/shocks.py= | 3 | 22, 23, 56 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2011-12/_/interview_date.py= | 1 | 19 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2011-12/_/shocks.py= | 3 | 23, 24, 55 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2013-14/_/interview_date.py= | 1 | 13 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2013-14/_/shocks.py= | 3 | 21, 22, 23 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2015-16/_/interview_date.py= | 1 | 15 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2015-16/_/shocks.py= | 3 | 22, 24, 25 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2018-19/_/interview_date.py= | 1 | 15 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2018-19/_/shocks.py= | 3 | 25, 26, 27 | Kind 2 (shock / interview year-month), Kind 4 |
+| =C/Uganda/2019-20/_/interview_date.py= | 1 | 15 | Kind 1a (+1c Tanzania) |
+| =C/Uganda/2019-20/_/shocks.py= | 3 | 21, 22, 23 | Kind 2 (shock / interview year-month), Kind 4 |
+| *total, 52 files* | *87* | executable: *78* (9 in comments/docstrings); of those, 10 are in dead or shadowed code (Albania wave =mapping.py= x3 -- apparently dead, see 1a, Niger =niger.py:160,162,183=, Tanzania 2019-20/2020-21 =interview_date.py= x4), leaving *68 live call sites* | |
+

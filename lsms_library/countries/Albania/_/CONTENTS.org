@@ -660,6 +660,14 @@ Region corrected on 6 clusters: 16 (DURRES -> SHKODER), 223 (ELBASAN -> GRAMSH),
 259 (FIER -> MALLAKASTER), 280 (TIRANE -> SKRAPAR), 297 (KOLONJE -> KORCE), 344
 (SARANDE -> TEPELENE).  The source district names are mojibake -- Korce appears as
 both ~KORCE~ and ~KOR\x80E~ (a mis-decoded C-cedilla) -- and are normalized.
+(The ~\x80~ is the DOS code page's C-cedilla -- cp437/cp850 0x80 = Ç; the
+2002-05 files that carry it (~weights.dta~, ~w1_hh_*~, ~w3_hh_*~,
+~identification_cl.dta~, ...) are DOS-encoded, so cp1252 would turn it into
+~KOR€E~.  The GH #805 reader re-decode refuses those files whole -- a cp1252
+symbol between two letters -- so they are served exactly as before and
+~_norm_district~'s ~\x80~ key still matches.  Only ~c_price_cl.dta~ /
+~price_list_cl1.dta~ (2002, genuinely cp1252: ~Men\x92s haircut~) are
+re-decoded; nothing reads them.)
 
 ** The 995 / 999 sentinels are not clusters
 

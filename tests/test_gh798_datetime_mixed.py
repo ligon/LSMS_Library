@@ -193,7 +193,11 @@ def test_mixed_timezones_warn_and_are_served_unconverted():
 WARM = {
     'Mali': (24939, {'2014-15': 3804, '2017-18': 8390,
                      '2018-19': 6602, '2021-22': 6143}),
-    'Tanzania': (22427, {'2008-09': 3263, '2010-11': 3923, '2012-13': 5010,
+    # GH #1045: 22,427 -> 22,428.  The build-time parser serves 2010-11
+    # household 08010060090321 (year + month recorded, day blank) as
+    # 2010-11-01 with Derivation ::interview_date::date-day-imputed; it used to
+    # be NaT and was then deleted.  No other value moved.
+    'Tanzania': (22428, {'2008-09': 3263, '2010-11': 3924, '2012-13': 5010,
                          '2014-15': 4338, '2019-20': 1184, '2020-21': 4709}),
 }
 

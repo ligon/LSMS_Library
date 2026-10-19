@@ -121,6 +121,12 @@ def _interview_dates(country: str) -> dict:
         return {(str(r.i), str(r.t)): pd.Timestamp(getattr(r, datecol))
                 for r in flat.itertuples()}
     except Exception as exc:  # noqa: BLE001 -- best-effort; fall back to wave dates
+        from .datetime_parse import DatetimeParseError
+        if isinstance(exc, DatetimeParseError):
+            # GH #1045: LSMS_DATE_STRICT asked for a date-parse finding to be
+            # FATAL; falling back to wave-nominal dates would quietly change
+            # this conversion's numbers instead.
+            raise
         logger_msg = f"interview_date unavailable for {country!r} ({exc}); " \
                      "falling back to wave-nominal dates"
         warnings.warn(logger_msg)

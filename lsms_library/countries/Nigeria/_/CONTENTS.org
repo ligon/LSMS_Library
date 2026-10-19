@@ -1925,3 +1925,30 @@ unchanged.
   ={parcel}_{suffix}=; =transformations.yield_kg= / =fertilizer_rate= still
   need =on='parcel'= to bridge them.  Renaming the level changed nothing
   about that.
+
+* Encoding: UTF-8 double encodings, one of them TRUNCATED (GH #805, 2026-10-19)
+
+Nigeria's =.dta= are format 115 (W4) and 117 (W5), so pandas reads their
+text as latin-1.  Every C1 code point in the held Nigeria files (23 files,
+W4 and W5) is a UTF-8 *double encoding* -- UTF-8 bytes read as latin-1, the
+C1 code point being a UTF-8 continuation byte (=â\x80\x98= for =‘=) -- not
+cp1252 text.  So the #805 reader re-decode leaves every Nigeria file as read
+(census verdict =no-candidate=,
+=slurm_logs/gh805_cp1252/census_2026-10-19_c1_files.tsv=).
+
+*One of them is cut short.*  2018-19 =sect2_harvestw4.dta= (the
+post-harvest, =2019Q1=, education section), value label =S2AQ10= code 6
+(3,755 rows), reads
+
+: 6. SENIOR SECONDARY SCHOOL CERTIFICATE (SSS) /  â\x80\x98O LEVELâ\x80
+
+The closing quote's three UTF-8 bytes (=\xe2\x80\x99=) lost their last byte
+to the Stata string width, so the label is not valid UTF-8 and a plain
+"latin-1 bytes round-trip as UTF-8" test does NOT recognise it as a double
+encoding.  The first #805 predicate decoded it to =â€˜O LEVELâ€=; the
+reader now refuses a string that is valid UTF-8 up to an incomplete final
+sequence (after a complete one) and serves this label as read, which is what
+development served.  Nothing served moves: =individual_education= reads
+=s2aq9= of this file, never =s2aq10=.  To recover the text, a consumer can
+=s.encode('latin-1').decode('utf-8', errors='ignore')= -- which yields
+=... /  ‘O LEVEL=, the closing quote being genuinely gone.

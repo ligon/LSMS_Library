@@ -1103,3 +1103,15 @@ section above). Neither provinces, study domains nor fieldwork regions should
 be silently substituted for one another. The retained =panama.regional_data=
 helper does not register a live Region table.
 The missing lookup is tracked in [[https://github.com/ligon/LSMS_Library/issues/1009][GH #1009]].
+
+* Encoding: the 1997 community files are DOS cp850 (GH #805, 2026-10-19)
+
+=1997/Data/COMUN1.DTA= / =COMUN2.DTA= (Stata format 104) store Spanish in the
+DOS code page cp850: =dom\x82sticos= (0x82 = é), =CA\xa5A= (0xA5 = Ñ),
+=Construcci\xa2n= (0xA2 = ó).  pandas reads every pre-118 file as latin-1, so
+they are served as =dom<U+0082>sticos=, =CA¥A=, =Construcci¢n=.  The #805
+reader re-decode (cp1252 for a pre-118 file's C1 strings) deliberately
+REFUSES these files -- a cp1252 decode would give =dom‚sticos=, a symbol
+between two letters -- so they are served exactly as before.  Nothing in
+the library reads them today.  A correct decode needs a per-file
+=encoding: cp850= declaration, which does not exist yet.
