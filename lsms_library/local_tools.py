@@ -1885,6 +1885,47 @@ class CategoricalMappingConflictError(RuntimeError):
     """
 
 
+# --------------------------------------------------------------------------
+# The KEY column of a categorical table (GH #928, P1)
+# --------------------------------------------------------------------------
+#
+# A table may NAME its key column with an org keyword line between its
+# ``#+name:`` line and the table:
+#
+#     #+name: u
+#     #+key: Original Label
+#     | Original Label | Preferred Label | Code | ...
+#
+# :func:`all_dfs_from_orgfile` records the declaration on the parsed frame as
+# ``df.attrs[CATEGORICAL_KEY_ATTR]``; ``country._categorical_key_column`` is
+# the one resolver every read-time caller asks.  Optional: an undeclared table
+# keys on its first column that is not reserved, exactly as before.
+
+#: ``df.attrs`` slot holding a table's declared ``#+key:`` column.
+CATEGORICAL_KEY_ATTR = 'categorical_key'
+
+#: Columns that are never a categorical table's KEY -- neither by declaration
+#: nor by position.  ``Preferred Label`` is the canonical VALUE column;
+#: ``Status`` and ``Notes`` are reserved for curation metadata (GH #928 P3),
+#: so adding either column to a table re-keys nothing.
+CATEGORICAL_RESERVED_COLUMNS = frozenset({'Preferred Label', 'Status', 'Notes'})
+
+_ORG_KEY_KEYWORD = '#+key:'
+
+
+class CategoricalKeyDeclarationError(RuntimeError):
+    """A ``#+key:`` line that cannot be honoured (GH #928).
+
+    Raised at PARSE time, naming the file and table: a key naming no column,
+    a reserved column, a second ``#+key:`` for one table, or a ``#+key:`` line
+    not attached to any ``#+name:``.  A ``RuntimeError`` for the same reason
+    as :class:`CategoricalMappingConflictError`: ``load_categorical_level``
+    skips a global file that raises ``ValueError``, and the cascade treats a
+    ``KeyError`` as "not at this rung" -- either would turn a mistyped
+    declaration into a silently re-keyed table.
+    """
+
+
 def global_categorical_level() -> Path:
     """The cross-country level: the package root, whose
     ``categorical_mapping/`` directory holds the shared tables."""
@@ -3685,6 +3726,12 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
     
     Returns:
         dict: {table_name: DataFrame}
+
+    A ``#+key: <column>`` line among the ``#+`` lines that follow a table's
+    ``#+name:`` declares that table's key column (GH #928); it is recorded as
+    ``df.attrs[CATEGORICAL_KEY_ATTR]`` and validated here, so a mistake raises
+    :class:`CategoricalKeyDeclarationError` naming the file and table.  Every
+    other ``#+`` line is skipped, as before.
     """
     with open(orgfn, 'r', encoding=encoding) as f:
         contents = f.readlines()
@@ -3693,14 +3740,23 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
     i = 0
     while i < len(contents):
         line = contents[i].strip()
-        
+
         if line.lower().startswith('#+name:'):
             table_name = line.split(':', 1)[1].strip()
             i += 1
-            # Skip any extra #+ lines
+            key = None
+            # Skip any extra #+ lines, keeping a #+key: declaration
             while i < len(contents) and contents[i].strip().startswith('#+'):
+                kw = contents[i].strip()
+                if kw.lower().startswith(_ORG_KEY_KEYWORD):
+                    if key is not None:
+                        raise CategoricalKeyDeclarationError(
+                            f"Table {table_name!r} in {orgfn} declares "
+                            f"#+key: twice ({key!r}, then "
+                            f"{kw.split(':', 1)[1].strip()!r}).")
+                    key = kw.split(':', 1)[1].strip()
                 i += 1
-            
+
             # Start reading table
             table_lines = []
             header = None
@@ -3725,7 +3781,28 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
             if to_numeric:
                 df = df.apply(_to_numeric)
 
+            if key is not None and set_columns:
+                if not key or not header or key not in header:
+                    raise CategoricalKeyDeclarationError(
+                        f"Table {table_name!r} in {orgfn} declares "
+                        f"#+key: {key!r}, which is not one of its columns "
+                        f"{header}.")
+                if key in CATEGORICAL_RESERVED_COLUMNS:
+                    raise CategoricalKeyDeclarationError(
+                        f"Table {table_name!r} in {orgfn} declares "
+                        f"#+key: {key!r}, a reserved column "
+                        f"({sorted(CATEGORICAL_RESERVED_COLUMNS)}) that is "
+                        f"never a key.")
+                # Last, so no frame operation above can drop it.
+                df.attrs[CATEGORICAL_KEY_ATTR] = key
+
             tables[table_name] = df
+        elif line.lower().startswith(_ORG_KEY_KEYWORD):
+            # Only reachable when no #+name: precedes it in the same keyword
+            # block -- a declaration that would otherwise be ignored.
+            raise CategoricalKeyDeclarationError(
+                f"{orgfn}:{i + 1}: {line!r} is not attached to a table; a "
+                f"#+key: line goes AFTER the table's #+name: line.")
         else:
             i += 1
 
