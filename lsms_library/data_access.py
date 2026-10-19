@@ -465,7 +465,7 @@ def _sweep_orphaned_locks(dvc_dir: Path, before: set[Path]) -> None:
             logger.warning("could not remove orphaned lock %s: %s", q, exc)
 
 
-def _run_dvc(cmd, *, cwd, timeout) -> subprocess.CompletedProcess:
+def _run_dvc(cmd, *, cwd, timeout, env=None) -> subprocess.CompletedProcess:
     """``subprocess.run`` for dvc, but a timeout does not leave a lock behind.
 
     The write is NOT made atomic -- no wrapper can make an external process\'s
@@ -477,7 +477,7 @@ def _run_dvc(cmd, *, cwd, timeout) -> subprocess.CompletedProcess:
     before = _dvc_lock_files(dvc_dir)
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, text=True,
-                            start_new_session=True)
+                            start_new_session=True, env=env)
     try:
         out, err = proc.communicate(timeout=timeout)
         return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
@@ -545,7 +545,8 @@ def _dvc_timeout(default: int = 1800) -> int:
 
 
 def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
-                             base_delay: float = 4.0) -> subprocess.CompletedProcess:
+                             base_delay: float = 4.0,
+                             env=None) -> subprocess.CompletedProcess:
     """Run a ``dvc`` CLI command, retrying only on DVC lock contention.
 
     Returns the final :class:`subprocess.CompletedProcess`.  A non-zero exit
@@ -558,7 +559,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
     thundering herd of writers waking together.
     """
     sub = cmd[1] if len(cmd) > 1 else "dvc"
-    result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
+    result = _run_dvc(cmd, cwd=cwd, timeout=timeout, env=env)
     for attempt in range(1, retries + 1):
         if result.returncode == 0:
             return result
@@ -569,7 +570,7 @@ def _run_dvc_with_lock_retry(cmd, *, cwd, timeout, retries: int = 5,
         logger.warning("dvc %s: lock contention (attempt %d/%d); retrying in %.1fs",
                        sub, attempt, retries, delay)
         time.sleep(delay)
-        result = _run_dvc(cmd, cwd=cwd, timeout=timeout)
+        result = _run_dvc(cmd, cwd=cwd, timeout=timeout, env=env)
     return result
 
 
@@ -799,65 +800,30 @@ def _gpg_decrypt(gpg_file: Path, passphrase: str) -> str | None:
     return None
 
 
-def _sync_legacy_dvc_creds(dvc_dir: Path | None = None) -> bool:
-    """Mirror user-config ``s3_creds`` into the in-tree ``.dvc/s3_creds``.
+def _reader_credentials_env() -> dict[str, str] | None:
+    """Subprocess env pointing a ``dvc`` CLI READ at the user-config creds.
 
-    Legacy wave scripts in ``lsms_library/countries/{country}/{wave}/_/*.py``
-    call ``dvc.api.open(fn, mode='rb')`` directly.  These calls do not
-    pass a ``credentialpath`` override, so DVC resolves the relative
-    ``credentialpath = s3_creds`` from ``.dvc/config`` against the DVC
-    directory itself --- i.e. ``lsms_library/countries/.dvc/s3_creds``.
+    ``.dvc/config`` pins ``credentialpath = s3_creds``, which the ``dvc`` CLI
+    resolves *in-tree* (``countries_root()/.dvc/s3_creds``).  The library no
+    longer writes that file (GH #1001: ``countries_root()`` is read-only at
+    runtime), so a CLI read of the remote -- ``unpushed_blobs``'s
+    ``dvc status --cloud`` -- is handed the user-config file instead.
+    ``dvc_s3`` applies ``credentialpath`` with
+    ``os.environ.setdefault("AWS_SHARED_CREDENTIALS_FILE", ...)``, so a
+    variable already present in the child's environment wins.
 
-    The v0.7.0 user-config migration moved credential storage to
-    :func:`config.s3_creds_path` (``~/.config/lsms_library/s3_creds``)
-    so the package can install into read-only site-packages, and
-    :class:`DVCFileSystem` constructions in ``local_tools`` override
-    ``credentialpath`` to point there.  But ``dvc.api.open()`` does
-    not benefit from that override --- on a fresh clone, the in-tree
-    ``s3_creds`` is missing (gitignored) and legacy scripts hit
-    ``NoCredentialsError``.
-
-    This helper bridges the gap by copying the user-config credentials
-    into the in-tree ``.dvc/s3_creds`` location whenever the in-tree
-    file is missing or stale.  Idempotent and safe to call repeatedly.
-
-    Returns ``True`` if the in-tree mirror is in sync (either already
-    matched or was just written), ``False`` otherwise (no source creds,
-    write failed, or read-only DVC dir).
+    Returns ``None`` (inherit the environment unchanged) when the user has
+    already exported ``AWS_SHARED_CREDENTIALS_FILE`` or has no user-config
+    creds.  Deliberately NOT used for ``dvc push``: there the writer creds
+    arrive through the very ``credentialpath`` this would pre-empt (see
+    :func:`_s3_writer_credentialpath`).
     """
-    if dvc_dir is None:
-        dvc_dir = _COUNTRIES_DIR / ".dvc"
-
-    user_creds = config.s3_creds_path()
-    if not (user_creds.exists() and user_creds.stat().st_size > 0):
-        return False
-
-    if not dvc_dir.exists():
-        return False
-
-    legacy_creds = dvc_dir / "s3_creds"
-    try:
-        user_text = user_creds.read_text(encoding="utf-8")
-    except OSError as exc:
-        logger.debug("Could not read user-config s3_creds: %s", exc)
-        return False
-
-    # Skip the write if the legacy file already matches.
-    if legacy_creds.exists():
-        try:
-            if legacy_creds.read_text(encoding="utf-8") == user_text:
-                return True
-        except OSError:
-            pass  # fall through to overwrite
-
-    try:
-        legacy_creds.write_text(user_text, encoding="utf-8")
-    except OSError as exc:
-        logger.debug("Could not mirror s3_creds to %s: %s", legacy_creds, exc)
-        return False
-
-    logger.debug("Mirrored s3_creds to legacy in-tree path %s", legacy_creds)
-    return True
+    if os.environ.get("AWS_SHARED_CREDENTIALS_FILE"):
+        return None
+    creds = config.s3_creds_path()
+    if not (creds.exists() and creds.stat().st_size > 0):
+        return None
+    return {**os.environ, "AWS_SHARED_CREDENTIALS_FILE": str(creds)}
 
 
 def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
@@ -867,9 +833,11 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     key validation is the real access gate; the obfuscated passphrase
     just keeps the value from being trivially discoverable via grep.
 
-    Always attempts to mirror the resulting creds into the legacy
-    in-tree ``.dvc/s3_creds`` path (see :func:`_sync_legacy_dvc_creds`)
-    so that legacy ``dvc.api.open()`` call sites still work.
+    Writes to :func:`config.s3_creds_path` only.  *dvc_dir* is READ (for
+    the encrypted files) and never written: ``countries_root()`` is
+    read-only at runtime (GH #1001).  The reader hands that path to
+    ``DVCFileSystem`` itself (``local_tools._build_dvcfs``), so no in-tree
+    ``.dvc/s3_creds`` copy is needed.
 
     Returns ``True`` if ``s3_creds`` was written (or already exists).
     """
@@ -879,9 +847,6 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     creds_file = config.s3_creds_path()
     creds_file.parent.mkdir(parents=True, exist_ok=True)
     if creds_file.exists() and creds_file.stat().st_size > 0:
-        # User-config creds already in place; still ensure the legacy
-        # in-tree mirror is populated for `dvc.api.open()` callers.
-        _sync_legacy_dvc_creds(dvc_dir)
         return True
 
     enc_file = dvc_dir / "s3_reader_creds.enc"
@@ -931,9 +896,6 @@ def _auto_unlock_s3(dvc_dir: Path | None = None) -> bool:
     except OSError as exc:
         logger.warning("Could not write s3_creds: %s", exc)
         return False
-
-    # Mirror into the legacy in-tree path so `dvc.api.open()` works.
-    _sync_legacy_dvc_creds(dvc_dir)
 
     logger.info("Auto-unlocked S3 read credentials via WB API key.")
     return True
@@ -1532,6 +1494,7 @@ def unpushed_blobs(remote: str | None = None,
         cmd += [str(t) for t in targets]
     result = _run_dvc_with_lock_retry(
         cmd, cwd=str(_COUNTRIES_DIR), timeout=_dvc_timeout(),
+        env=_reader_credentials_env(),
     )
     out = (result.stdout or "").strip()
     if not out:
