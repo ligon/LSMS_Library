@@ -62,22 +62,21 @@ SENTINEL = 99999
 def _aws_creds_available() -> bool:
     """True iff DVC could perform an S3 pull right now.
 
-    (Mirrors the identical helper in ``tests/test_uganda_crop_condition.py``
-    et al.; duplication is the house pattern until a shared ``conftest.py``
-    lands.)
+    Delegates to the shared resolver in ``tests/conftest.py`` (exported
+    ``AWS_*`` -> the user-config ``s3_creds`` -> the legacy in-tree
+    ``countries/.dvc/s3_creds``).  This used to check only the in-tree
+    file, which the library stopped writing in GH #1001, so a fresh
+    checkout with user-config credentials silently skipped here.  Loaded by
+    path because both import spellings are broken (see
+    ``tests/test_tests_package_not_shadowed.py``).
     """
-    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
-        return True
-    creds_file = (
-        Path(__file__).parent.parent
-        / "lsms_library" / "countries" / ".dvc" / "s3_creds"
-    )
-    if creds_file.exists():
-        try:
-            return "aws_access_key_id" in creds_file.read_text()
-        except OSError:
-            return False
-    return False
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_shared_conftest", Path(__file__).with_name("conftest.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.aws_creds_available()
 
 
 @pytest.fixture(scope="module")

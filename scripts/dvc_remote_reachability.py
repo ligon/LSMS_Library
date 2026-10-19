@@ -40,6 +40,29 @@ DVC_DIR = COUNTRIES / ".dvc"
 _KEY_RE = re.compile(r"([0-9a-f]{2})/([0-9a-f]{30}(?:\.dir)?)$")
 
 
+def _reader_creds_file(credentialpath: str) -> Path:
+    """The reader's credentials file, resolved the way the library resolves it.
+
+    ``lsms_library.config.s3_creds_path()`` first (``$LSMS_S3_CREDS`` ->
+    ``<config dir>/s3_creds``), which is the file ``DVCFileSystem`` is handed;
+    the library no longer mirrors it into the tree (GH #1001).  ``config.py``
+    is loaded BY FILE: this script runs with only boto3 + pyyaml installed,
+    and importing the package would run its auth flow.  Falls back to the
+    legacy in-tree ``<.dvc>/<credentialpath>``, which CI's reachability job
+    writes by hand.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_reachability_lsms_config", REPO / "lsms_library" / "config.py")
+    cfg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cfg)
+    user = cfg.s3_creds_path()
+    if user.exists() and user.stat().st_size > 0:
+        return user
+    return DVC_DIR / credentialpath
+
+
 def _remote_from_config() -> tuple[str, str, dict[str, str]]:
     cp = configparser.ConfigParser()
     cp.read(DVC_DIR / "config")
@@ -55,7 +78,7 @@ def _remote_from_config() -> tuple[str, str, dict[str, str]]:
     assert url.startswith("s3://"), url
     bucket, _, prefix = url[len("s3://"):].partition("/")
     creds = configparser.ConfigParser()
-    creds.read(DVC_DIR / sect.get("credentialpath", "s3_creds"))
+    creds.read(_reader_creds_file(sect.get("credentialpath", "s3_creds")))
     conf = configparser.ConfigParser()
     conf.read(DVC_DIR / sect.get("configpath", "s3_config"))
     kw = {

@@ -76,10 +76,13 @@ class TestAutoUnlockWithoutGpg:
 
     @pytest.fixture
     def isolated_creds(self, tmp_path, monkeypatch):
-        """Point s3_creds at a temp file so we never touch the real one."""
+        """Point s3_creds at a temp file so we never touch the real one.
+
+        (``_auto_unlock_s3`` writes nothing else: the in-tree mirror it used
+        to make was removed in GH #1001.)
+        """
         target = tmp_path / "s3_creds"
         monkeypatch.setattr(da.config, "s3_creds_path", lambda: target)
-        monkeypatch.setattr(da, "_sync_legacy_dvc_creds", lambda *a, **k: True)
         return target
 
     def test_unlock_succeeds_with_gpg_unavailable(self, isolated_creds, monkeypatch):

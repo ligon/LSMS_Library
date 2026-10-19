@@ -27,10 +27,18 @@
 # adjudication (slurm_logs/2026-09-18_kinship_813/ADJUDICATION.org, GH #813
 # / #974) deleted 15 such keys; the bare and slash-joined English and French
 # vocabulary that remains unreached is kept deliberately, as reference
-# breadth for a new country.  Which spelling of a REACHED variant group is
-# canonical is still an open decision (GH #945): the lookup is exact-match
-# (``label.strip().title()``, then the raw stripped label), so every spelling
-# a survey emits must stay a key until the lookup itself normalises.
+# breadth for a new country.
+#
+# ONE KEY PER LOOKUP FORM (GH #974).  The lookup is ``label.strip().title()``
+# then the raw stripped label -- exact match, nothing else folded.  Spellings
+# that share a ``.strip().title()`` form are ONE key, written in that form
+# (it answers every one of them on the first lookup); four such groups were
+# folded on 2026-10-17.  The title form is whatever ``str.title()`` yields,
+# artefacts included ("Lodger/Lodger'S Relative", "Cuñado (A)"): do not
+# "correct" it, or the first lookup stops matching.  Spellings that differ in
+# whitespace or punctuation ("Brother / sister-in-law" vs "brother
+# /sister-in-law") are DIFFERENT lookup forms and must each stay a key until
+# the lookup itself normalises more than case (GH #945 option 2).
 #
 # Partial and full NULL tuples are DELIBERATE, not gaps (GH #698, #797;
 # decided 2026-09-07).  A component the instrument does not determine is
@@ -316,8 +324,11 @@ Enfant Adoptif:          [-1, 0, consanguineal]
 "Sister/Brother":                    [0, 1, consanguineal]
 "Step Son/Daughter":                 [-1, 0, step]
 "Step Son / Daughter":               [-1, 0, step]
-"LODGER/LODGER'S RELATIVE":         [0, 0, guest]
-"SERVANT OR SERVANT'S RELATIVE":    [0, 0, servant]
+# Malawi emits both "LODGER/LODGER'S RELATIVE" and "Lodger/Lodger's relative"
+# (likewise SERVANT...); both fold onto the .title() form below.  The "'S" is
+# what str.title() produces -- it is the lookup's spelling, not a typo.
+"Lodger/Lodger'S Relative":         [0, 0, guest]
+"Servant Or Servant'S Relative":    [0, 0, servant]
 "Live-In Servant":                   [0, 0, servant]
 "Other Non-Relative (Specify)":      [0, 0, unrelated]
 "Other Non-Relatives (Specify)":     [0, 0, unrelated]
@@ -437,14 +448,14 @@ Other Not Related:               [0, 0, unrelated]
 
 # --- Spanish variants (Guatemala ENCOVI) ---
 "Jefe (A)":                              [0, 0, consanguineal]
-"Esposo (A) O CompaÑero (A)":           [0, 0, affinal]
+"Esposo (A) O Compañero (A)":           [0, 0, affinal]   # source: "esposo (a) o compaÑero (a)"
 "Hijo (A)":                              [-1, 0, consanguineal]
 "Padre - Madre":                         [1, 0, consanguineal]
 "Hermano (A)":                           [0, 1, consanguineal]
 "Nieto (A)":                             [-2, 0, consanguineal]
 "Suegro (A)":                            [1, 0, affinal]
 "Yerno - Nuera":                         [-1, 0, affinal]
-"CuÑado (A)":                           [0, 1, affinal]
+"Cuñado (A)":                           [0, 1, affinal]   # source: "cuÑado (a)"
 # "Otro Pariente" is UNDETERMINED by the instruments that use it, and is
 # recorded as an explicit unknown rather than a guess.  Peru ENNIV 1994's
 # enumerator manual (Peru/1994/Documentation/m-encues.pdf, "Pregunta No 1:
@@ -559,8 +570,6 @@ Father/month-in-Law:                     [1, 0, affinal]   # same typo without n
 "child - adopted child":                 [-1, 0, consanguineal]
 "Father / Mother":                       [1, 0, consanguineal]
 "father - mother":                       [1, 0, consanguineal]
-"Lodger/Lodger's relative":              [0, 0, guest]
-"Servant or servant's relative":         [0, 0, servant]
 "grandfather /mother":                   [2, 0, consanguineal]
 "Househelp (Other Relative)":            [0, 0, servant]
 "Niece / Nephew":                        [-1, 1, consanguineal]
@@ -582,11 +591,6 @@ Spouse/Partner:                          [0, 0, affinal]
 "spouse, partner":                                              [0, 0, affinal]
 "other relation":                                               [null, null, consanguineal]
 unrelated:                                                      [0, 0, unrelated]
-
-# --- Spanish lowercase variants (Guatemala ENCOVI) ---
-# Lowercase ñ / Ñ encoding variants of labels already present in the Spanish section.
-"cuÑado (a)":                            [0, 1, affinal]
-"esposo (a) o compaÑero (a)":           [0, 0, affinal]
 
 # --- Serbia and Montenegro (2003 long-phrase labels) ---
 # Title-case form (after .title()) is the primary lookup; raw form added as fallback.
