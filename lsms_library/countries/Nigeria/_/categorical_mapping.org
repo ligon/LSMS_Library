@@ -314,6 +314,22 @@
   sized 11-95), which do not collide.  W2 code 4 is centilitre per both
   W2 .dta files (was recorded as ml).
 
+  The W1 post-harvest sized codes 11-95 KEEP THE WEIGHT THE SURVEY STATES
+  (GH #1035, ruling @ligon 2026-10-18): =sect10b_harvestw1.dta= labels them
+  =Sack/Bag: Small (20 kg)=, =Basin: Small (10 kg)=, ..., so the 2010-11
+  column reads =Sack/Bag Small (20 kg)= and
+  =transformations._parse_explicit_metric= serves those rows the stated
+  kilograms (rung =metric=) instead of a price-ratio estimate.  Spellings:
+  =kg= for mass, =l= (this table's litre label) for the palm-oil jerry cans
+  -- a VOLUME, so =volume_as_mass=False= still declines them -- and no
+  thousands separator (=1500 kg=: the parser would read =1,500 kg= as 500).
+  The =.dta= truncates the three Bundle labels at 60 characters
+  (=...: Small (1=, =...: Medium (=, =...: Big (40=); their 15 / 25 / 40 kg
+  are from the survey's own =w1agnsconversion.csv= (=nscode= 61/62/63,
+  constant across all 112 crops), which carries the label weight for every
+  other sized code too.  Where the code is W1-only (22-24, 32-34, 53, 63,
+  73-74, 83, 93-95) the Preferred Label carries the same spelling.
+
   Harvest production units (GAP 1 / crop_production): the post-harvest
   crop module (secta3*) reports harvest quantity in its own per-wave
   production-unit-code scheme (which collides on Code with the food
@@ -340,35 +356,35 @@
 |    8 | paint rubber                 | ---                          | paint rubber                 | ---                          | ---                          |
 |    9 | large derica                 | ---                          | large derica                 | ---                          | ---                          |
 |   10 | bin/basket                   | ---                          | medium derica                | bin/basket                   | bin/basket                   |
-|   11 | paint rubber                 | Sack/Bag Small               | small derica                 | paint rubber                 | paint rubber                 |
-|   12 | milk cup                     | Sack/Bag Medium              | milk cup                     | milk cup                     | milk cup                     |
-|   13 | cigarette cup                | Sack/Bag Big/Large           | cigarette cup                | cigarette cup                | cigarette cup                |
-|   14 | tin                          | Sack/Bag Extra Large         | tiya                         | tin                          | tin                          |
+|   11 | paint rubber                 | Sack/Bag Small (20 kg)       | small derica                 | paint rubber                 | paint rubber                 |
+|   12 | milk cup                     | Sack/Bag Medium (50 kg)      | milk cup                     | milk cup                     | milk cup                     |
+|   13 | cigarette cup                | Sack/Bag Big/Large (100 kg)  | cigarette cup                | cigarette cup                | cigarette cup                |
+|   14 | tin                          | Sack/Bag Extra Large (120 kg) | tiya                         | tin                          | tin                          |
 |   15 | kobiowu                      | ---                          | kobiowu                      | ---                          | ---                          |
 |   16 | piece                        | ---                          | piece                        | ---                          | ---                          |
 |   20 | small congo                  | ---                          | ---                          | small congo                  | small congo                  |
-|   21 | large congo                  | Basket Small                 | ---                          | large congo                  | large congo                  |
+|   21 | large congo                  | Basket Small (15 kg)         | ---                          | large congo                  | large congo                  |
 |   30 | small mudu                   | ---                          | ---                          | small mudu                   | small mudu                   |
-|   31 | large mudu                   | Basin Small                  | ---                          | large mudu                   | large mudu                   |
+|   31 | large mudu                   | Basin Small (10 kg)          | ---                          | large mudu                   | large mudu                   |
 |   40 | small derica                 | ---                          | ---                          | small derica                 | small derica                 |
-|   41 | medium derica                | Bunch Small                  | ---                          | medium derica                | medium derica                |
-|   42 | large derica                 | Bunch Medium                 | ---                          | large derica                 | large derica                 |
-|   43 | very large derica            | Bunch Big                    | ---                          | very large derica            | very large derica            |
+|   41 | medium derica                | Bunch Small (5 kg)           | ---                          | medium derica                | medium derica                |
+|   42 | large derica                 | Bunch Medium (8 kg)          | ---                          | large derica                 | large derica                 |
+|   43 | very large derica            | Bunch Big (15 kg)            | ---                          | very large derica            | very large derica            |
 |   50 | small tiya                   | ---                          | ---                          | small tiya                   | small tiya                   |
-|   51 | medium tiya                  | Yam Tuber Small              | ---                          | medium tiya                  | medium tiya                  |
-|   52 | large tiya                   | Yam Tuber Medium             | ---                          | large tiya                   | large tiya                   |
+|   51 | medium tiya                  | Yam Tuber Small (3 kg)       | ---                          | medium tiya                  | medium tiya                  |
+|   52 | large tiya                   | Yam Tuber Medium (5 kg)      | ---                          | large tiya                   | large tiya                   |
 |   60 | small kobiowu                | ---                          | ---                          | small kobiowu                | small kobiowu                |
-|   61 | medium kobiowu               | Bundle Small                 | ---                          | medium kobiowu               | medium kobiowu               |
-|   62 | large kobiowu                | Bundle Medium                | ---                          | large kobiowu                | large kobiowu                |
+|   61 | medium kobiowu               | Bundle Small (15 kg)         | ---                          | medium kobiowu               | medium kobiowu               |
+|   62 | large kobiowu                | Bundle Medium (25 kg)        | ---                          | large kobiowu                | large kobiowu                |
 |   70 | small bowl                   | ---                          | ---                          | small bowl                   | small bowl                   |
-|   71 | medium bowl                  | Wheelbarrow Small            | ---                          | medium bowl                  | medium bowl                  |
-|   72 | large bowl                   | Wheelbarrow Medium           | ---                          | large bowl                   | large bowl                   |
+|   71 | medium bowl                  | Wheelbarrow Small (60 kg)    | ---                          | medium bowl                  | medium bowl                  |
+|   72 | large bowl                   | Wheelbarrow Medium (85 kg)   | ---                          | large bowl                   | large bowl                   |
 |   80 | small piece                  | ---                          | ---                          | small piece                  | small piece                  |
-|   81 | medium piece                 | Pick-up Van Small            | ---                          | medium piece                 | medium piece                 |
-|   82 | large piece                  | Pick-up Van Medium           | ---                          | large piece                  | large piece                  |
+|   81 | medium piece                 | Pick-up Van Small (1500 kg)  | ---                          | medium piece                 | medium piece                 |
+|   82 | large piece                  | Pick-up Van Medium (2000 kg) | ---                          | large piece                  | large piece                  |
 |   90 | small heap                   | ---                          | ---                          | small heap                   | small heap                   |
-|   91 | medium heap                  | Jerry Can Small              | ---                          | medium heap                  | medium heap                  |
-|   92 | large heap                   | Jerry Can Medium             | ---                          | large heap                   | large heap                   |
+|   91 | medium heap                  | Jerry Can Small (10 l)       | ---                          | medium heap                  | medium heap                  |
+|   92 | large heap                   | Jerry Can Medium (20 l)      | ---                          | large heap                   | large heap                   |
 |  100 | small bunch                  | ---                          | ---                          | small bunch                  | small bunch                  |
 |  101 | medium bunch                 | ---                          | ---                          | medium bunch                 | medium bunch                 |
 |  102 | large bunch                  | ---                          | ---                          | large bunch                  | large bunch                  |
@@ -379,20 +395,20 @@
 |  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
 |  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
 |  900 | other specify                | ---                          | ---                          | other specify                | other specify                |
-| 22 | Basket Medium | Basket Medium | --- | --- | --- |
-| 23 | Basket Big | Basket Big | --- | --- | --- |
-| 32 | Basin Medium | Basin Medium | --- | --- | --- |
-| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- |
-| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- |
-| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- |
-| 63 | Bundle Big | Bundle Big | --- | --- | --- |
-| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- |
-| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- |
-| 24 | Basket Extra Large | Basket Extra Large | --- | --- | --- |
-| 73 | Wheelbarrow Big/Large | Wheelbarrow Big/Large | --- | --- | --- |
-| 74 | Wheelbarrow Extra Large | Wheelbarrow Extra Large | --- | --- | --- |
-| 83 | Pick-up Van Big | Pick-up Van Big | --- | --- | --- |
-| 95 | Jerry Can Drum | Jerry Can Drum | --- | --- | --- |
+| 22 | Basket Medium (30 kg) | Basket Medium (30 kg) | --- | --- | --- |
+| 23 | Basket Big (50 kg) | Basket Big (50 kg) | --- | --- | --- |
+| 32 | Basin Medium (25 kg) | Basin Medium (25 kg) | --- | --- | --- |
+| 33 | Basin Big/Large (40 kg) | Basin Big/Large (40 kg) | --- | --- | --- |
+| 34 | Basin Extra Large (75 kg) | Basin Extra Large (75 kg) | --- | --- | --- |
+| 53 | Yam Tuber Big/Large (8 kg) | Yam Tuber Big/Large (8 kg) | --- | --- | --- |
+| 63 | Bundle Big (40 kg) | Bundle Big (40 kg) | --- | --- | --- |
+| 93 | Jerry Can Big (25 l) | Jerry Can Big (25 l) | --- | --- | --- |
+| 94 | Jerry Can Large (50 l) | Jerry Can Large (50 l) | --- | --- | --- |
+| 24 | Basket Extra Large (75 kg) | Basket Extra Large (75 kg) | --- | --- | --- |
+| 73 | Wheelbarrow Big/Large (110 kg) | Wheelbarrow Big/Large (110 kg) | --- | --- | --- |
+| 74 | Wheelbarrow Extra Large (150 kg) | Wheelbarrow Extra Large (150 kg) | --- | --- | --- |
+| 83 | Pick-up Van Big (2500 kg) | Pick-up Van Big (2500 kg) | --- | --- | --- |
+| 95 | Jerry Can Drum (200 l) | Jerry Can Drum (200 l) | --- | --- | --- |
 | 125 | Packet | --- | --- | --- | Packet |
 | 130 | Sack/Bag | --- | --- | --- | Sack/Bag |
 | 140 | Basket | --- | --- | --- | Basket |

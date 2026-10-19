@@ -70,9 +70,12 @@ DTA_FACTS = {
     # W1 post-planting sect7b_plantingw1.dta: 1 kilogram .. 6 other
     '2010Q3': {4: 'ml', 5: 'piece', 6: 'other'},
     # W1 post-harvest sect10b_harvestw1.dta: SP10BQ2B, 1-4 then sized units
-    '2011Q1': {4: 'ml', 11: 'Sack/Bag Small', 21: 'Basket Small',
-               31: 'Basin Small', 41: 'Bunch Small', 51: 'Yam Tuber Small',
-               61: 'Bundle Small', 91: 'Jerry Can Small'},
+    # that state their weight ('Sack/Bag: Small (20 kg)'), kept since GH #1035
+    # (tests/test_gh1035_nigeria_w1_stated_weights.py).
+    '2011Q1': {4: 'ml', 11: 'Sack/Bag Small (20 kg)',
+               21: 'Basket Small (15 kg)', 31: 'Basin Small (10 kg)',
+               41: 'Bunch Small (5 kg)', 51: 'Yam Tuber Small (3 kg)',
+               61: 'Bundle Small (15 kg)', 91: 'Jerry Can Small (10 l)'},
     # W2 both rounds: 4 'centilitre (cl)', 10/11 derica, 14 tiya
     '2012Q3': {4: 'cl', 5: 'mudu', 6: 'olodo', 10: 'medium derica',
                11: 'small derica', 14: 'tiya'},
