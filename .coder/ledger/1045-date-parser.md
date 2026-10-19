@@ -74,5 +74,13 @@ The read-time cast becomes a pass-through for `datetime64` input.
 - Fieldwork `window:` not declared for the pilot: no window source was read in this run (questionnaire/BID dates); the mechanism is tested on synthetic data.
 
 ---
-### Phase 3 — verification
-(filled at task end; see the report)
+### Phase 3 — verification (run 1, at `837032c8c`)
+- `DatetimeCoercionWarning` / `DatetimeAmbiguityWarning` / `_YEAR_LAST_DATE` — OK (anchored on §2, §5): moved to `datetime_parse`, re-exported from `country`; `country.DatetimeCoercionWarning is datetime_parse.DatetimeCoercionWarning` (test). A new base `DatetimeWarning` puts the build-time `DatetimeParseWarning` beside, not under, the read-time class.
+- `parse_datetime` year-last rule — OK (§2): same evidence rule as `_coerce_datetime_column` (PR #1025), applied per wave `t` at build time; the read-time copy is untouched for un-migrated countries (`test_pr1025_contract_unchanged_for_unmigrated_strings`). Not a REINVENTION: the read path is the thing being retired, and it stays only as the fallback.
+- Ethiopian dates — OK (§2): `calendars.ethiopian_to_gregorian` / `parse_ethiopian_month`, no new arithmetic.
+- Lever / ledger / accessor — OK (§2, §5): the `null_read_audit` pattern, own lever `LSMS_DATE_STRICT`, `_DATETIME_LEDGER` in `_EXCLUDED_CONSTANTS`.
+- Stamp key + reader + `to_parquet(datetime_audit=)` — OK (§2): sibling of `lsms_grain_audit`; replay at every read site the grain stamp replays at, plus the `assume_cache_fresh` short-circuit (which the grain stamp does not — pre-existing gap, residual).
+- Scoped tag — OK (§4 landmine 1): tagged roots + `_EXCLUDED_CALLABLES`; measured: a no-op parser edit moves `build_transforms_fingerprint` for exactly `interview_date`; `grab_data`'s closure contains no `datetime_parse` part.
+- Wiring cost — as predicted in §4 landmine 2: every verifiable hash moves once (btf 39/39, cth 549/549, wih 2,109/2,139).
+- Partial-date derivation — OK (§2): framework entries, keyed per table (`::interview_date::...`); an empty table slot was tried first and CONTRADICTED `derivations.summary_for_frame`'s rows-0 listing (it attached to every table; caught by `test_derivations::TestAttach` and `test_malawi_sale_basis::TestDelivered`).
+- `column_mapping` — CONTRADICTION found and fixed: always adding a `datetime_specs` key broke `ehcvm.py`'s single-file unpack of the mapping (code review); the key is now added only when a spec exists.
