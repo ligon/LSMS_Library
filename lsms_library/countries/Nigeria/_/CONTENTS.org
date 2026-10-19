@@ -282,7 +282,8 @@ e.g. =11. 50 KG=) and every W4 source is served the survey's =*_cvn= factor
 (=survey_kg=).
 
 Measured on private roots (before = =backlog/base-2026-10-19= 92631d56b in its
-own root, after = this change; Nigeria rebuilt in both):
+own root, after = this change; Nigeria rebuilt in both; re-measured cold at
+base 2f3104c5f, every number identical):
 
 | | before | after |
 |-+-+-|
@@ -297,6 +298,7 @@ own root, after = this change; Nigeria rebuilt in both):
 | =food_prices= rows, kgvalue / unitvalue | 481,191 / 481,613 | unchanged; 2,574 kgvalue cells (all 2011Q1) change value, median after/before 0.267 |
 | =food_acquired= rows / Expenditure / Quantity | 595,725 / 196,081,393.67 | unchanged (only =u= spellings) |
 | =crop_production=, =harvest_kg= | | unchanged (crop =u= is =_canon_unit='s base label) |
+| =StatedVsInferredKgWarning= on =food_kg_factors= | 1 label (=ml=), 77 (item, unit) cells | 18 labels (=ml= + 17 of the new W1 spellings), 155 cells |
 
 *The stated weight is the survey's number, and for a minority of rows it is
 not believable* -- recorded here because it is where the kilograms moved, not
@@ -317,6 +319,26 @@ construction and inconsistent with the survey; the stated ones are the
 reverse.  The produced and in-kind rows (40,000 kg of the 96,476) carry no
 price to check.  No mechanism today refuses a =metric= factor for an
 (item, unit) cell (=no_kg_factor.yml= removes only inferred rungs).
+
+The library already says so on every read: =food_kg_factors='s
+=StatedVsInferredKgWarning= (the item-keyed inference contradicts a label's
+own stated size by more than 1.5x) named only =ml= before this change and now
+also names 17 of the W1 spellings -- e.g. =sack/bag small (20 kg)= inferred
+3.29, =basket big (50 kg)= 0.67, =wheelbarrow small (60 kg)= 0.95,
+=bundle small (15 kg)= 1.17, =jerry can small (10 l)= 4.17 -- on 78 new
+(item, unit) cells.  That warning is the intended signal for exactly this
+disagreement; it is not a regression.
+
+*The crop side is the same card and is NOT changed here.*  =secta3_harvestw1=
+=sa3q6b= uses the same 33 sized codes: 3,196 raw rows (3,194 with a positive
+quantity) state about 5.29M kg at the card weight (=w1agnsconversion.csv=; the
+jerry cans at 1 l = 1 kg) -- more than the 4.89M kg =harvest_kg= serves for
+the whole of 2011Q1.  =_canon_unit= folds them to the size-agnostic base label
+(=Sack/Bag=, =Basket=, ...), so the 3,092 served 2011Q1 =crop_production= rows
+on those labels get =KgFactorSource= =none=.  Restoring the size on the crop
+=u= axis is the deferred decision recorded under =community_prices= and the
+=survey_median= caveat below; a per-row factor column (the W4/W5 =reported=
+rung) would not need it.  Left as a residual of GH #1035.
 
 * Sampling Design
 
