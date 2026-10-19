@@ -84,6 +84,7 @@ import warnings
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 import json
 from dataclasses import dataclass
 from functools import lru_cache
@@ -4454,6 +4455,87 @@ class Country:
         return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
                    for w in waves)
 
+    def _has_country_builder(self, method_name: str) -> bool:
+        """Can the COUNTRY level build ``method_name``?  GH #1039.
+
+        True when the country ships a ``_/{table}.py`` script (``try_script``
+        runs it; the ``%.parquet: %.py`` catch-alls match it too), or when its
+        ``_/Makefile`` has a rule for ``$(VAR_DIR)/{table}.parquet``.  Asked
+        only under ``LSMS_BUILD_BACKEND=make``, for a ``materialize: make``
+        table: that route used to go straight to ``run_make_target`` at the
+        country level, so a table with wave scripts and NO country rule --
+        Tanzania ``food_acquired`` since #836 deleted its dead concatenator,
+        and 71 more cells measured on 2026-10-19 -- could not be built at all
+        (``Could not materialize``, or an empty frame where the country has no
+        Makefile), and on a warm root it served whatever ``var/{table}.parquet``
+        was lying there, because make answers "nothing to be done" for an
+        existing target it has no rule for.  When this returns False the
+        caller builds from the waves instead (@ligon's ruling on #1039: the
+        framework is authoritative, #788).
+
+        **Rule presence is asked of make, not parsed out of the Makefile.**
+        Grouped targets (Uganda ``nutrition.parquet fct.parquet: ...``),
+        pattern rules and ``$(VAR_DIR)`` expansion all defeat a regex.  The
+        probe is ``make -n`` for the target under a FRESH EMPTY root, so an
+        existing parquet can never answer for the rule (#866's measurement
+        method), with ``LC_ALL=C`` so the message is parseable.  Only GNU
+        make's own "No rule to make target '<the probe target>'" counts as
+        absence; a missing PREREQUISITE ("..., needed by ...") means the rule
+        exists, and any other failure or timeout keeps the legacy route, so a
+        country rule that exists and is broken still fails loudly rather than
+        being silently replaced by the waves.  Without ``make`` on PATH only
+        the script can build at the country level.
+
+        Excluded from the build fingerprint
+        (``_build_registry._EXCLUDED_CALLABLES``): it is called only under the
+        make backend, after which no L2 parquet is written or stamped, so no
+        hashed cache is ever built through it; it picks a builder and
+        determines no byte of any frame.
+        """
+        country_dir = self.file_path / "_"
+        if (country_dir / f"{method_name}.py").exists():
+            return True
+
+        def absent(why: str) -> bool:
+            logger.info(
+                f"GH #1039: {self.name}/{method_name} is `materialize: make` "
+                f"but has no country-level builder ({why}, no "
+                f"_/{method_name}.py); building it from its waves (the "
+                f"framework is authoritative, #788).")
+            return False
+
+        if not (country_dir / "Makefile").exists():
+            return absent("no _/Makefile")
+        env = _script_subprocess_env()
+        if not shutil.which("make", path=env.get("PATH")):
+            return absent("make is not on PATH")
+        env.update(LC_ALL="C", LANGUAGE="C")
+        with tempfile.TemporaryDirectory(prefix="lsms_rule_probe_") as tmp:
+            # ``COUNTRY`` in every country Makefile is the basename of ``..``,
+            # so the probe spells the target with the directory name.
+            var_dir = Path(tmp) / self.file_path.name / "var"
+            target = var_dir / f"{method_name}.parquet"
+            env["LSMS_DATA_DIR"] = tmp
+            cmd = ["make", "-n", f"LSMS_DATA_ROOT={tmp}", f"VAR_DIR={var_dir}",
+                   str(target)]
+            try:
+                probe = subprocess.run(cmd, cwd=country_dir, env=env,
+                                       capture_output=True, text=True,
+                                       timeout=120)
+            except (OSError, subprocess.SubprocessError) as error:
+                logger.debug(f"GH #1039 rule probe failed for "
+                             f"{self.name}/{method_name}: {error!r}")
+                return True
+        if probe.returncode == 0:
+            return True
+        no_rule = [line for line in probe.stderr.splitlines()
+                   if "No rule to make target" in line]
+        if no_rule and not any("needed by" in line for line in no_rule) \
+                and any(str(target) in line for line in no_rule):
+            return absent("no Make rule for $(VAR_DIR)/"
+                          f"{method_name}.parquet")
+        return True
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -5254,7 +5336,14 @@ class Country:
             try:
                 if use_dvc:
                     df = load_with_dvc_cache(method_name)
-                elif has_data_scheme_entry and not prefer_make_backend:
+                # GH #1039: a `materialize: make` table whose country level
+                # has no rule and no script is built from its waves, exactly
+                # as the default backend builds it -- not handed to a country
+                # make target that cannot exist (and that, on a warm root,
+                # answered with whatever `var/<t>.parquet` was lying there).
+                elif has_data_scheme_entry and not (
+                        prefer_make_backend
+                        and self._has_country_builder(method_name)):
                     df = load_from_waves(waves)
                 else:
                     df = run_make_target(method_name)

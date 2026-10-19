@@ -171,6 +171,13 @@ _EXCLUDED_CALLABLES = frozenset({
     # fix would otherwise have moved every table's hash a second time.
     "lsms_library.country.Country._assert_built_required_columns",
     "lsms_library.country.Country._is_script_path",
+    # GH #1039: the make-backend ROUTING predicate -- does the country level
+    # have a rule or script for this table, or must it be built from its
+    # waves?  Called only under LSMS_BUILD_BACKEND=make, which stamps no
+    # cache (no L2 write follows it), so no hashed parquet is ever built
+    # through it; it picks a builder, never a byte of a frame.  Without this
+    # entry a re-worded log line in it would move every table's hash.
+    "lsms_library.country.Country._has_country_builder",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile
