@@ -1042,6 +1042,21 @@ via _canon_unit.  W3-W5 record the unit per row; W1/W2 carry NO unit column
 fixed C8 unit (_W1W2_PRICE_UNIT).  All 30 units used already exist in `u`
 (no extension needed).
 
+/Correction, measured 2026-10-19 (GH #1047 r1fix, not fixed here)./  "All 30
+units used" is true of the SERVED units only.  W4/W5 C8 record units
+=_canon_unit= cannot place -- =240. BOTTLE/CAN=, =330. WHOLE ANIMAL=,
+=200. LOAF=, =290. WRAP=, =280. METRIC CUP=, =320. SLICE=, =310. CRATE=,
+=270. CUBE=, =301./302. TEA/TABLE SPOON= -- on 5,850 (W4) and 6,013 (W5)
+priced source rows.  Those whose SIZE codes a metric quantity are rescued as
+=g= / =cl= (below); the rest -- about 2,482 (W4) and 2,746 (W5) priced rows,
+counted at the source-row grain before the =(t, v, j, u)= collapse -- reach
+=community_prices_for_wave='s =out['u'].notna()= filter and are DROPPED
+silently.  The units are recorded, not missing: the =#1041= ruling's
+=U_UNKNOWN= is the wrong fix; teaching the canonicaliser is the right one
+(most already have a =u= Preferred Label: Loaf 200, Bottle/Can 240, Cube
+270, Metric Cup 280, Wrap 290, Crate 310, Slice 320, Whole Animal 330, Tea
+Spoon 301, Table Spoon 302).  Drafted as a residual.
+
 *** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 
 Found 2026-09-08 while comparing =community_prices= against the household
