@@ -552,6 +552,15 @@ files are the R6 slice.
   in-data-unlabelled -> 1989 =u= carries the raw unit *code* (a unit
   token, no metric distinction; Codeunit1.SPS in Documentation could
   seed this -- follow-up).
+  (Corrected 2026-10-18, GH #1044 -- three claims in this entry are wrong
+  or stale, and are kept above rather than rewritten.  (a) "stable across
+  1994+" does not hold for 1994a: its own value labels give different
+  units for codes 40/76/80/81/82/85/86, and this table follows 1997's.
+  (b) Codeunit1.SPS cannot seed 1989: it recodes =q16_5d=, a 1994 R1
+  price-module variable, not =food89.unitcode=.  (c) 1989 now serves code
+  0 as =Unknown=, not the raw ='0'=.  The 1989 instrument's own code lists,
+  the evidence, and the measurements are in the GH #1044 section at the
+  end of this file.)
   *GH #347 (fixed):* an earlier version appended the food label to
   non-metric units ("Chinet [Butter]") to coax a per-good kg factor;
   that polluted the =u= axis with ITEM NAMES (e.g. =0 [Butter]=,
@@ -598,7 +607,9 @@ files are the R6 slice.
   framework-joined v + the allowed index_levels_match_scheme warn).
   Refine =harmonize_food= residual (unlabelled source codes) + variant
   split/merge; 1989 named geography + 1989 metric-unit distinction
-  (Codeunit1.SPS); cross-era 1989-vs-1994+ region reconciliation;
+  (Codeunit1.SPS -- wrong lead, see GH #1044: decoding 1989's units
+  needs the per-village, per-page code lists of the 1989 instrument);
+  cross-era 1989-vs-1994+ region reconciliation;
   sourcing constructed ERHS weights; optional validation of inferred kg
   factors vs ERHS =conv_*.tab=; validation of derived tables vs docs;
   R6/R7 area_output PAs 21-23 (extra Debre-Birhan sub-sites not in the
@@ -1195,3 +1206,130 @@ by rule.  Measured on the fresh corpus (2026-10-17): =31.0= =unit= 82 /
 =item_unit= 16; =83.0= =item_unit= 21; =95.0= =unit= 57; =37.0= =none= 3.
 None of the four is on =tests/test_u_code_leak.py='s accepted ledger; not
 adjudicated here.
+
+(Corrected 2026-10-18, GH #1044.  "code =1= ..., which the code table above
+says IS kilograms" is WRONG for 1989.  The code table is the 1994+ scheme;
+1989 has its own, and in it code 1 is a *quintal* -- the 1989 instrument's
+cereal page reads =1 = Quintal=, and the 32 code-1 rows price at a median 52
+Birr per unit against 1.10 Birr/kg for 1994a barley.  Both halves of this
+entry are now fixed or adjudicated -- see the next section.)
+
+* GH #1044 (2026-10-18): unit codes after 1989, and 1989's own unit scheme
+
+** What changed
+- *1994a-1997*: the four float codes are served as integer codes ='31'=,
+  ='37'=, ='83'=, ='95'=.  The q36 unit columns are MYVARS, so =format_id= is
+  never auto-applied to them; =harmonize_unit= decodes a listed code and
+  passes an unlisted one through as the raw float (=f.get(x, x)=), which the
+  hook used to stringify.  =ethiopiarhs.food_acquired= now runs =format_id=
+  on the decoded column right after the read.  1989's =u= is an IDXVAR
+  (=u: unitcode=), which is why it always arrived as ='0'=, never ='0.0'=.
+- *1989*: code 0 is served as =U_UNKNOWN= (='Unknown'=, #1041).  14 rows, 13
+  purchased + 1 produced, kept (not dropped); 9 are value-only purchases with
+  Quantity 0.  Every other 1989 code stays raw.
+
+** The four codes are not in the table, and the source agrees
+None of 31/37/83/95 is a =harmonize_unit= row, so they are served as codes,
+the table's pass-through convention -- no label was added.  What the source
+files say (=pyreadstat= value labels of =q36_2b/3b/4b=):
+
+| code | 1994a   | 1994b   | 1995    | 1997    | served rows      |
+|------+---------+---------+---------+---------+------------------|
+|   31 | =OTHER= | =Other= | =Other= | (none)  | 98 (95/1/2/0)    |
+|   37 | (none)  | (none)  | (none)  | (none)  | 3 (2/1/0/0)      |
+|   83 | (none)  | (none)  | (none)  | (none)  | 21 (0/21/0/0)    |
+|   95 | (none)  | (none)  | (none)  | =Other= | 57 (0/43/5/9)    |
+
+So 31 and 95 are the source's own catch-all "Other" (its specify text is not
+shipped), and 37/83 carry no label anywhere.  =Codeunit1unit1234.SPS= --
+IFPRI's recode of round-1 unit codes into the unified =unit1234= scheme --
+maps =31=95=, i.e. R1's "Other" is unified 95 "Other".  Deliberately NOT
+relabelled to ='Other'=: that pools two waves' catch-alls into one inferred
+=(j, u)= cell, a semantic choice the issue did not ask for.  Under #962 the
+four are accepted residuals and keep their inferred factor; their rungs are
+unchanged by this fix (=31= unit 82 / item_unit 16; =83= item_unit 21; =95=
+unit 57; =37= none 3).
+
+** 1989's unit scheme is the 1989 instrument's, not this table's
+=food89.dta= has no unit value labels.  The archived instrument
+(=1989/Documentation/ERHS_hhquestionnaire_1989.pdf=, a scan; its cover is
+hand-headed "...BERHAN", so it is *Debre Berhan's*) prints a Code 1 (unit) list on each
+page of section E3 "Weekly Food Consumption", and the lists DIFFER BY PAGE:
+
+| code | E3.1 (cereals, pulses) | E3.2 / E3.3 (other foods) |
+|------+------------------------+---------------------------|
+|    1 | Quintal                | Packets                   |
+|    2 | Dawla                  | Bags                      |
+|    3 | Kunna                  | Bundles                   |
+|    4 | Akmada                 | Pieces                    |
+|    5 | Ensira                 | Bars                      |
+|    6 | Gurzigne               | Litres                    |
+|    7 | Silicha                | Kilogrammes               |
+|    8 | Tassa                  | Box                       |
+|    9 | Other                  | Leaves                    |
+|   10 |                        | Bottles                   |
+|   11 |                        | Gan                       |
+|   12 |                        | Gembo                     |
+|   13 |                        | Ensira                    |
+
+Code 2 (acquisition) is =1 Purchased, 2 Own Production, 3 Gift, 4 Loan, 5
+Aid, 6 Barter, 7 Other= -- which is what =1989/_/data_info.yml='s =source=
+mapping assumes, now with a citation.  The data also carry codes 14, 15, 17
+and 21, on neither list: the other six villages' instruments (not in the
+archive; see "Contents of the 1989 Survey Instruments by Village", which
+gives each village its own questionnaire layout) number units differently
+again.  A row's unit therefore depends on its *village and item page*, and
+only one village's lists are held.
+
+*Code 1 is a quintal, not a kilogram* -- three independent legs:
+1. the instrument: =1 = Quintal= on E3.1; kilograms is code 7 on E3.2/E3.3
+   and does not exist on E3.1;
+2. the rows: all 32 are site 1, on barley (30), wheat (1) and sorghum (1) --
+   E3.1 items -- with Quantity 0.125-0.5 (median 0.25);
+3. the prices: the 9 code-1 barley purchases price at a median 52 Birr/unit.
+   1994a barley in =kg= is 1.10 Birr/kg; in =100 kg= it is 130 (1994b) and
+   100 (1997).
+
+Decoding code 1 through =harmonize_unit= (=| 1 | kg |=) would have minted
+kilograms onto quintal rows.  Decoding it *correctly* (to =100 kg=) is also
+not done: it would hand 1989 its first kg baseline (barley), and the
+price-ratio inference would then infer factors for the other raw codes --
+whose meaning varies by page and village -- pooling, for instance, barley's
+=5= (E3.1: Ensira) with salt's =5= (E3.3: Bars).  1989's =u= stays raw until
+the whole scheme can be decoded.  =KgFactorSource= is =none= for all 2,068
+1989 rows, before and after; the 14 =Unknown= rows are now =none= by rule.
+
+** Measured, before -> after (fresh rebuild of the base, vs. this change)
+- =food_acquired=: 54,693 rows and Expenditure 235,361.46 both sides, by wave
+  identical (1989 2,068 / 1994a 12,971 / 1994b 13,333 / 1995 11,956 / 1997
+  14,365).  The full =(t, u)= count table differs only in the ten relabelled
+  cells above (293 cells both sides).
+- =food_kg_factors= =kg_factor_sources=: unchanged -- metric 12,430,
+  item_unit 25,837, item_unit_tight 249, unit 13,645, none 2,532.
+- =food_quantities(units='kgs')=: 54,445 rows, 216,819.76 kg, unchanged.
+- =food_prices()=: =kgvalue= 35,625 rows, =unitvalue= 37,817 rows, both
+  unchanged; =kgprice= / =unitprice= raise =UnitsUnavailableError= (no
+  =Price= column) both sides.
+- Cache: all 18 EthiopiaRHS =Country._table_cache_hash= values move (the
+  country module is in every table's input hash); 0 of 79 probed in
+  Ethiopia/Uganda/Malawi, 0 of 5 =build_transforms_fingerprint= values.  A
+  full EthiopiaRHS re-warm is ~40 s.
+
+** Not fixed here (residuals)
+- *1994a uses the round-1 unit scheme, served under 1997's names.*  1994a's
+  own labels for 40/76/80/81/82/85/86 are MENELIK / SIFET / FOLLE / JEBENA /
+  WEKET / SALE / TCHIBIT; =harmonize_unit= (rows 40-103 follow 1997) serves
+  them as Big mada / Small tomato can / Gebete/Buchu / Jemb / Efigne / Temene
+  / Gembo -- 238 1994a rows carrying a measurement (82: 149, 40: 54, 76: 24, 86: 7, 85: 2,
+  80: 1, 81: 1).  =Codeunit1unit1234.SPS= is IFPRI's own R1 -> unified
+  crosswalk and agrees with 1994a's labels where they overlap (32->51
+  Melekia, 33->53 Bekolo, 34->52 Guchiye, 78->69 Bilkat, 81->68
+  Kettle/Jebena/Pot, 82->79 Woket, 85->91 Sale); the code distributions
+  agree too (1994a's top codes 34/39/82 vs 43/51/52/56 in 1994b-1997).
+  1994b and 1995 label only 1-31 in their files; their 40+ distribution
+  matches 1997's, but which scheme they follow is not stated anywhere held.
+- *214 measured rows with a NaN unit are dropped in 1994a-1997* (1994a 78,
+  1994b 37, 1995 80, 1997 19; 494.4 Birr).  #1041 would serve them
+  =Unknown=; that adds rows and Expenditure, so it is its own change.
+- *1989's raw codes* need the per-village, per-page lists to decode (see
+  above); until then they stay raw and the wave has no kg.
