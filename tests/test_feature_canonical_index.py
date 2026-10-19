@@ -792,7 +792,7 @@ class TestPlotInputsHarmonize:
 
     def test_u_column_nulls_become_unknown_not_NA(self):
         """GhanaLSS / Ethiopia / Mali / Nigeria / Tanzania carry `u` as a
-        column with nulls (8,763 / 37,370 / 42,089 / 6,742 / 408 rows)."""
+        column with nulls (8,763 / 37,370 / 42,089 / 5,546 / 408 rows)."""
         names = INPUT_SHAPES["Mali"][0]
         df = _frame(names,
                     [("h1", "2017-18", "c1", "1_1", "Seed", "Mil"),
@@ -860,26 +860,40 @@ class TestPlotTablesEndToEnd:
 
 
 def _warm_assembly(table):
-    """Country() frame shape per warm country, and the Feature() assembly."""
+    """Country() frame shape per warm country, and the Feature() assembly.
+
+    A country is WARM when its L2-country parquet exists; only cold countries
+    are skipped.  A warm country whose read raises fails the test by name --
+    it used to be dropped silently, so "keeps every country" held for as long
+    as three others were warm.  Reads are the default, hash-checked ones (no
+    trust flag): the frames are what a user is served, a stale parquet is
+    rebuilt rather than trusted, and on a fresh cache the check costs ms.
+    """
     import lsms_library as ll
     from lsms_library.country import grain_reports
+    from lsms_library.paths import data_root
 
     built: dict[str, tuple[int, set[str]]] = {}
+    raised: dict[str, str] = {}
     for name in ll.Feature(table).countries:
+        if not (data_root() / name / "var" / f"{table}.parquet").exists():
+            continue
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                df = getattr(ll.Country(name, trust_cache=True), table)()
-        except Exception:
+                df = getattr(ll.Country(name), table)()
+        except Exception as exc:
+            raised[name] = f"{type(exc).__name__}: {exc}"[:300]
             continue
         if isinstance(df, pd.DataFrame) and not df.empty:
             built[name] = (len(df), set(df.index.names) | set(df.columns))
+    assert not raised, f"warm {table} countries raised: {raised}"
     if len(built) < 3:
         pytest.skip(f"fewer than three {table} caches are warm")
     before = len(grain_reports())
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        out = ll.Feature(table, trust_cache=True)(sorted(built))
+        out = ll.Feature(table)(sorted(built))
     return built, out, len(grain_reports()) - before
 
 

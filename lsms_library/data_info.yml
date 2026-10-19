@@ -182,10 +182,19 @@ Index Info:
   # `transformations._parcel_from_crop_plot` exists for.
   #
   # plot_inputs: `crop` -> `j` is the SAME pair as crop_production's, and it
-  # was checked rather than assumed (GH #569, 2026-10-19): within each country
-  # the plot_inputs `crop` labels are the country's crop_production crop
-  # labels -- Mali 42 of 42 shared, Malawi 26/26, Tanzania 20/20, Nigeria 72 of
-  # 74 -- apart from the "not crop-specific" marker and a few catch-alls.
+  # was checked rather than assumed (GH #569, 2026-10-19), per country, on the
+  # warm corpus.  In SIX countries the plot_inputs `crop` labels are that
+  # country's crop_production labels, spelled the same way: Mali 42 of 42
+  # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/43, Benin
+  # 8/11 (counts include the "not crop-specific" marker).  The misses are the
+  # marker, catch-alls (Benin `Autre tubercule` / `Autre céréale`) and crops
+  # crop_production does not record at all (Niger's seven are real crops --
+  # `Carotte`, `Igname`, `Jaxatu`, ...; Nigeria `Date palm`), never the same
+  # crop spelled twice.  That claim is NOT true everywhere: Burkina_Faso (5 of
+  # 9) and Senegal (6 of 10) spell two crops differently in the two tables --
+  # plot_inputs `Maïs en grain` (2,274 / 735 rows) and `Niébé/Haricots secs`
+  # (2,156 / 460) where crop_production has `Maïs` and `Niébé` -- so on those
+  # two countries the shared axis name does not yet mean a shared vocabulary.
   # What the rename does NOT do is harmonize that marker: it is spelled
   # `(not crop-specific)` (EHCVM), `Whole Plot` (Ethiopia), `Farm-level`
   # (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN (Malawi, Mali, Tanzania).
@@ -227,8 +236,9 @@ Index Info:
   #     `season: unknown_season` (the crop_production spelling, reused so the
   #     plot tables share one value on the shared axis).
   #   * STRUCTURAL -- the survey does not resolve the axis: the quantity is not
-  #     attributable to one plot / stage / worker type, it is the total over
-  #     them.  `Farm-level` is the in-force spelling (@ligon, 2026-09-16):
+  #     attributable to one plot / stage / worker type.  It is "not resolved
+  #     on this axis", which is NOT a claim that it covers every value of the
+  #     axis.  `Farm-level` is the in-force spelling (@ligon, 2026-09-16):
   #     GhanaLSS already writes it on exactly these levels -- `plot_id` in both
   #     tables, `stage` and `worker` on plot_labor's Q46 exchange total -- and
   #     its CONTENTS.org names the EHCVM plot_inputs as the table still to be
@@ -239,8 +249,13 @@ Index Info:
   # sentinel": EHCVM's input roster is per household x input, so the row is
   # the household's farm, NOT an observed plot.  Filter `plot_id !=
   # 'Farm-level'` for plot-resolved records only.  plot_labor `stage` /
-  # `worker: Farm-level` marks a plot's labour served as the total over every
-  # stage / worker type (13 of 15 countries for `stage`, 14 for `worker`).
+  # `worker: Farm-level` marks a plot's labour as NOT RESOLVED on that axis
+  # (13 of 15 countries for `stage`, 14 for `worker`) -- not as the total over
+  # every stage / worker type.  The two differ: Nigeria's plot_labor is the
+  # post-harvest labour roster alone (Nigeria/_/data_scheme.yml, plot_labor:
+  # "PP-round plot labor (sect11c1_planting{wN}) is NOT folded in"), so its
+  # `stage: Farm-level` rows cover only what that roster asks about.  Read the
+  # country's data_scheme.yml for what an unresolved row does cover.
   # community_prices (GH #840):
   #   variety  -- `unknown_variety`, the condition/season spelling: the
   #               country's form names no variety finer than `j`.
