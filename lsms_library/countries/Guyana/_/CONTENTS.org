@@ -619,6 +619,37 @@ of =gy92info.pdf= on 2026-07-21 and match.
 - Nothing in this section was derived from the =.dta= files.  Every claim is the
   documentation's claim.
 
+* Kinship: RLL codes 7 and 8 conflate blood and marriage (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+=RLL= is decoded by the inline =mapping:= in =1992/_/data_info.yml= (nine
+codes).  Two of them are one survey code for a blood relation AND its in-law:
+
+| code | label                                      | tuple              | people | before                 |
+|------+--------------------------------------------+--------------------+--------+------------------------|
+|    7 | =Father/Mother/T-in-law/M-in-law=           | [1, 0, null]       |    136 | [1, 0, consanguineal]  |
+|    8 | =Bro/Sis/B-in-law/S-in-law/Other relative=  | [null, null, null] |    459 | [0, 1, consanguineal]  |
+
+Code 8 is a TRIPLE conflation: it also folds in "other relative", so its
+generation and distance are as unknown as its affinity -- the ruling names it
+("the Guyana triple becomes [null, null, null]").  It is the only code in the
+corpus whose =Generation= / =Distance= moved under GH #698.  ("T-in-law" is
+the code list's spelling; F-in-law is presumably meant.)
+
+*Degeneracy that is the instrument*: code 8 was Guyana's only collateral
+code, so =Distance= is now 0 for every person except those 459 (NA), and every
+person one generation up (code 7, 136) has Affinity NA.  Code 9,
+=Servant/Employee/Other non-relative= ([0, 0, servant], 81), conflates a
+servant with plain non-kin; it is a different conflation from the one ruled
+on and was left as it was.
+
 * Known data issues
 
 ** shocks — not available (2026-06-06)
