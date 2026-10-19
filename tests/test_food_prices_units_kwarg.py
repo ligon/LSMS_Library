@@ -90,11 +90,34 @@ def test_food_prices_unitprice_returns_reported_only(synthetic_food_acquired):
     assert out['Price'].iloc[0] == pytest.approx(30.0)
 
 
-def test_food_prices_unitprice_no_price_column_returns_empty(synthetic_food_acquired):
+@pytest.mark.parametrize('units', ['unitprice', 'kgprice'])
+def test_food_prices_price_mode_without_price_column_raises(
+        synthetic_food_acquired, units):
+    """GH #828: no ``Price`` column means the instrument records no unit
+    price.  That used to come back as an empty ``(0, 1)`` frame -- the absence
+    of the column dressed as the absence of rows -- and is now a typed error
+    naming the basis and the missing column (a ``ValueError`` subclass)."""
+    from lsms_library.errors import UnitsUnavailableError
     df = synthetic_food_acquired.drop(columns=['Price'])
-    out = food_prices_from_acquired(df, units='unitprice')
-    assert out.empty
-    assert list(out.columns) == ['Price']
+    with pytest.raises(UnitsUnavailableError, match="Price") as info:
+        food_prices_from_acquired(df, units=units)
+    assert isinstance(info.value, ValueError)
+    assert info.value.units == units
+    assert info.value.missing == ['Price']
+    assert info.value.country is None
+    named = info.value.for_country('Someland')
+    assert named.country == 'Someland' and 'Someland' in str(named)
+
+
+@pytest.mark.parametrize('units', ['kgvalue', 'unitvalue'])
+def test_food_prices_value_mode_without_expenditure_raises_typed(
+        synthetic_food_acquired, units):
+    """The ``*value`` modes already raised ``ValueError`` for a missing
+    ``Expenditure``; it is now the same typed error (still a ValueError)."""
+    from lsms_library.errors import UnitsUnavailableError
+    df = synthetic_food_acquired.drop(columns=['Expenditure'])
+    with pytest.raises(UnitsUnavailableError, match="Expenditure"):
+        food_prices_from_acquired(df, units=units)
 
 
 def test_food_prices_unitprice_does_not_fall_back_to_unitvalue(synthetic_food_acquired):
@@ -211,3 +234,73 @@ def test_food_quantities_units_without_u_index():
     out = food_quantities_from_acquired(df)
     assert 'Quantity' in out.columns
     assert len(out) == 2
+
+
+# ----- Country-level re-raise / fall-through (GH #828) ---------------------
+#
+# The transform-level tests above stop at food_prices_from_acquired.  These
+# exercise the `except UnitsUnavailableError` branch in the generated
+# Country.food_prices method: it must NAME the country and re-raise whenever
+# the caller asked for something the legacy path cannot honour (units=, a
+# labels= dict), and fall through to the legacy aggregation only on a bare
+# call.  _aggregate_wave_data is monkeypatched, so no data is read.
+
+_LEGACY_SENTINEL = pd.DataFrame({'Price': [1.0]},
+                                index=pd.Index(['legacy'], name='i'))
+
+
+@pytest.fixture
+def country_without(monkeypatch, synthetic_food_acquired):
+    """Return ``make(drop)``: a ``Country('Malawi')`` whose food_acquired lacks
+    the columns in *drop*; any other table (the legacy food_prices
+    aggregation) comes back as ``_LEGACY_SENTINEL``."""
+    import lsms_library as ll
+    from lsms_library.country import Country
+
+    def make(drop):
+        fa = synthetic_food_acquired.drop(columns=drop)
+
+        def fake_aggregate(self, waves, table, *args, **kwargs):
+            if table == 'food_acquired':
+                return fa.copy()
+            return _LEGACY_SENTINEL.copy()
+
+        monkeypatch.setattr(Country, '_aggregate_wave_data', fake_aggregate)
+        monkeypatch.setattr(Country, '_unit_kg_factors', lambda self: {})
+        c = ll.Country('Malawi')
+        assert 'food_acquired' in c.data_scheme
+        return c
+
+    return make
+
+
+@pytest.mark.parametrize('units', ['unitprice', 'kgprice'])
+def test_country_food_prices_names_the_country(country_without, units):
+    from lsms_library.errors import UnitsUnavailableError
+    c = country_without(['Price'])
+    with pytest.raises(UnitsUnavailableError) as info:
+        c.food_prices(units=units)
+    assert info.value.country == 'Malawi'
+    assert info.value.units == units
+    assert info.value.missing == ['Price']
+    assert str(info.value).startswith('Malawi: ')
+
+
+def test_country_food_prices_bare_call_falls_through(country_without):
+    """units=None (default kgvalue) on a food_acquired with no Expenditure:
+    the pre-#828 legacy fall-through is kept for a bare call."""
+    c = country_without(['Expenditure'])
+    out = c.food_prices()
+    pd.testing.assert_frame_equal(out, _LEGACY_SENTINEL)
+
+
+def test_country_food_prices_labels_dict_does_not_fall_through(country_without):
+    """A labels= dict cannot be honoured by the legacy path, so the refusal
+    re-raises even with units=None -- the strictness the generic
+    ``except ValueError`` handler already had before #828."""
+    from lsms_library.errors import UnitsUnavailableError
+    c = country_without(['Expenditure'])
+    with pytest.raises(UnitsUnavailableError) as info:
+        c.food_prices(labels={'Rural': 'Settlement'})
+    assert info.value.country == 'Malawi'
+    assert info.value.missing == ['Expenditure']

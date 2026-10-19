@@ -898,6 +898,60 @@ a DIFFERENT set.  The warning now names the row count, the frame size and
 every offending label with its own count, and is built per call.  The
 DROP itself is unchanged.
 
+* =food_acquired.Price= is UBOS's own Expenditure / Quantity (GH #845)
+
+*Provenance.*  =Price= on =food_acquired= comes from the survey's "market
+price" column for =s='purchased'= (=h14aq12= in 2005-06, =h15bq12= in
+2009-10 .. 2015-16; =CEB14a=/=14b=/=14c= per leg in 2018-19 and 2019-20) and
+its "farmgate price" column for =s='produced'= (=h14aq13=, =h15bq13=,
+=CEB15=), via =uganda.food_acquired_to_canonical=.  In 2018-19 and 2019-20
+the wave scripts declare no single =market= column, and =uganda.food_acquired=
+(=uganda.py=, ``df['market'] = df.filter(regex='^market').median(axis=1)``)
+builds it as the ROW MEDIAN of the three per-leg UBOS price fields -- home
+(=CEB14a=), away (=CEB14b=) and own-production (=CEB14c=) -- so the purchased
+=Price= of those two waves is a library fold of UBOS prices, one of which is
+asked of the own-production leg; it is not a library =value / quantity=.
+=s='inkind'= carries no =Price= in any wave.  A =u = 'Value'= row carries none either (see the unit
+section above).
+
+*These columns are not independently elicited prices.*  On almost every row
+they equal the row's own value divided by its own quantity, i.e. UBOS
+back-calculated them.  So =food_prices(units='unitprice')= and
+=units='unitvalue'= (and =kgprice= / =kgvalue=) are the SAME measurement
+under two names for Uganda: a comparison of the two returns a median log gap
+of exactly 0.000 and looks like a validation when it is an identity.  The
+price-source comparison of 2026-09-08 had to drop the reported-price source
+for Uganda on this evidence (=slurm_logs/price_sources/Uganda/REPORT.org= §2).
+
+Re-measured 2026-10-17 on a fresh build at =3e3bd26ee= (relative tolerance
+1e-6, rows where both the price and value/quantity are positive and finite):
+
+| wave    | raw: market vs (q5+q7)/(q4+q6), % differing (n) | raw: farmgate vs q9/q8, % differing (n) | API purchased, % agreeing (n) | API produced, % agreeing (n) |
+|---------+-------------------------------------------------+-----------------------------------------+-------------------------------+------------------------------|
+| 2005-06 | 1.72 (28,401)                                   | 1.36 (8,514)                            | 98.28 (28,401)                | 98.64 (8,514)                |
+| 2009-10 | 5.62 (25,974)                                   | 2.65 (9,003)                            | 94.38 (25,974)                | 97.35 (9,003)                |
+| 2010-11 | 1.09 (24,697)                                   | 3.50 (7,950)                            | 98.91 (24,697)                | 96.50 (7,950)                |
+| 2011-12 | 5.21 (26,030)                                   | 4.75 (10,245)                           | 94.79 (26,030)                | 95.25 (10,245)               |
+| 2013-14 | 1.51 (34,211)                                   | 1.01 (12,752)                           | 98.49 (34,209)                | 98.99 (12,752)               |
+| 2015-16 | 0.06 (34,057)                                   | 0.09 (12,233)                           | 99.94 (34,057)                | 99.91 (12,233)               |
+| 2018-19 | 0.03 (34,992) [home leg: =CEB14a= vs =CEB07/CEB06=] | 0.01 (12,658)                        | 99.92 (35,982)                | 99.99 (12,379)               |
+| 2019-20 | 0.04 (31,846) [home leg]                        | 0.03 (11,496)                           | 99.91 (32,109)                | 99.96 (11,267)               |
+
+Median log(price / unit value) is 0.000 in every wave, both sources, raw and
+served.  The raw columns are the GH #845 recipe (=h15bq12= against
+=(h15bq5+h15bq7)/(h15bq4+h15bq6)=, read through =get_dataframe=); the
+2005-06 and 2009-10 .. 2015-16 numbers reproduce the issue's
+1.72 / 5.62 / 1.09 / 5.21 / 1.51 / 0.06 exactly.  The 2018-19 / 2019-20 raw
+check uses the home leg only (the instrument asks a price per leg); the API
+columns use the served =Price= against the served =Expenditure / Quantity=.
+The residual few percent in 2009-10 / 2011-12 is not the home/away fold
+(GH #845: among differing rows only 0.2-0.8% have both legs populated) and
+has not been explained.
+
+*How to use it.*  Treat =unitprice= as a copy of =unitvalue= for Uganda.
+Where the two DO differ, the difference is the interesting thing (a keying
+slip in one of three fields), not a second opinion on the price.
+
 * =people_last7days= counts MEMBERS, not visitors
 
 The question ("how many people were present in the last 7 days?") is

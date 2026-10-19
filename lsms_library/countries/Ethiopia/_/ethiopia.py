@@ -18,15 +18,6 @@ Waves = {'2011-12':(),
          }
 
 
-def harmonized_unit_labels(fn='../../_/unitlabels.csv',key='Code',value='Preferred Label'):
-    unitlabels = pd.read_csv(fn)
-    unitlabels.columns = [s.strip() for s in unitlabels.columns]
-    unitlabels = unitlabels[[key,value]].dropna()
-    unitlabels = unitlabels.set_index(key)
-
-    return unitlabels.squeeze().str.strip().to_dict()
-
-
 def _read_food_label_table(fn):
     """Load the harmonized-food label table as a wide DataFrame.
 
@@ -207,40 +198,6 @@ def _household_roster_from_file(fn, sex='sex', age='age', HHID='HHID',
         g = df[valvars].groupby('HHID')
     return g.sum()
 
-
-def prices_and_units(fn='',units='units',item='item',HHID='HHID',market='market',farmgate='farmgate'):
-
-    food_items = harmonized_food_labels(fn='../../_/categorical_mapping.org')
-
-    df = get_dataframe(fn, convert_categoricals=True)
-
-    # Unit labels from Stata value labels (need a stream, not a DataFrame)
-    with DVCFS.open(fn) as dta:
-        sr = pd.io.stata.StataReader(dta)
-        try:
-            unitlabels = sr.value_labels()[units]
-        except KeyError:
-            foo = sr.value_labels()
-            key = [k for k,v in foo.items() if 'Kilogram' in [u[:8] for l,u in v.items()]][0]
-            unitlabels = sr.value_labels()[key]
-
-    df = df.rename(columns={HHID: 'HHID', item: 'itmcd', farmgate: 'farmgate',
-                             market: 'market', units: 'units'})
-    if food_items is not None:
-        df = df.replace({'itmcd': food_items})
-    try:
-        df['itmcd'] = df['itmcd'].astype(float)
-        df = df.loc[~np.isnan(df['itmcd'])]
-        df['itmcd'] = df['itmcd'].astype(int)
-    except (ValueError, TypeError):
-        pass
-    prices = df.loc[:, ['HHID', 'itmcd', 'farmgate', 'market', 'units']].set_index(['HHID', 'itmcd'])
-    prices = prices.replace({'units': unitlabels})
-    prices.units = prices.units.astype(str)
-
-    pd.Series(unitlabels).to_csv('unitlabels.csv')
-
-    return prices
 
 def food_acquired(fn, myvars):
     """Reshape Ethiopia's food_acquired into the canonical (t, i, j, u, s) form.

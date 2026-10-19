@@ -66,11 +66,18 @@ Data Scheme:
     index: (t, v, i, j, u, s)
     Quantity: float
     Expenditure: float
-  # EHCVM visits each household across multiple vagues/passages, each with
-  # its own date.  The canonical interview_date is one date per household
-  # (t, v, i); _normalize_dataframe_index drops the undeclared `visit` level
-  # and collapses the duplicate rows via groupby.first(), keeping the first
-  # visit's date.  (GH #325)
+  # One date per household (t, v, i); the wave builds carry an undeclared
+  # `visit` level, which _normalize_dataframe_index drops (GH #325).
+  # - EAC-I (2014-15, 2017-18) fields TWO passages per household, each with
+  #   its own date, so the collapse is DESTRUCTIVE and GrainCollapseWarning
+  #   reports it: 3,746 of 3,804 households (2014-15) and 8,390 of 8,390
+  #   (2017-18) have two distinct dates.  Core selects the most complete row
+  #   (GH #871), so the served date is passage 1's (2014-15: 3,798 of 3,804;
+  #   the other 6 have no passage-1 date).  Passage 2 is not served.
+  # - EHCVM (2018-19, 2021-22) visits each household in exactly one vague
+  #   (`visit` is 1 or 2), so (t, v, i) is already unique and nothing is lost.
+  # Measured 2026-10-18 (GH #798).  Serving both passages would need `visit`
+  # in the declared index -- a decision, not done here.
   interview_date:
     index: (t, v, i)
     Int_t: datetime

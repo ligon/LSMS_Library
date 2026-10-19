@@ -2373,6 +2373,44 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 # `s` for W4 should be aware the purchased row is a 30-day purchase, not a
 # 7-day consumption flow.
 
+def round_wave(t):
+    """Wave folder (``'2012-13'``) of a PP/PH round label (``'2012Q3'``).
+
+    Every Nigeria wave directory holds two rounds with distinct ``t``; this
+    inverts :data:`PP_QUARTER` / :data:`PH_QUARTER`.  Raises ``KeyError``
+    for a label that is neither.
+    """
+    rounds = {r: w for d in (PP_QUARTER, PH_QUARTER) for w, r in d.items()}
+    return rounds[t]
+
+
+def food_unit_labels(t):
+    """``{raw code: label}`` for the food-module unit codes of round ``t``.
+
+    Read from the per-wave column of the ``u`` table in
+    ``categorical_mapping.org`` (the column named by :func:`round_wave`),
+    NOT from its Preferred Label column, which records only the W3/W4
+    meaning of a colliding code (GH #607).  Keys are registered as int,
+    int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the CSV
+    sources arrive as floats.  Codes the wave's column marks ``---`` are
+    absent, so the caller can keep their raw code.
+    """
+    from lsms_library.local_tools import df_from_orgfile
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
+                          name='u')
+    wave = round_wave(t)
+    out = {}
+    for code, lab in zip(tab['Code'], tab[wave]):
+        if pd.isna(lab) or str(lab).strip() in ('', '---'):
+            continue
+        c = int(float(code))
+        lab = str(lab).strip()
+        out.update({c: lab, float(c): lab, str(c): lab, f'{c}.0': lab})
+    return out
+
+
 def food_acquired_for_wave(fn, t, sources, expenditure,
                            item='item_cd', hhid='hhid'):
     """Canonical (t, i, j, u, s) food_acquired rows for one Nigeria round.
@@ -2408,11 +2446,13 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         tail (GH #251).
     """
     from lsms_library.local_tools import get_dataframe
-    from lsms_library.transformations import _finalize_canonical_food_acquired
+    from lsms_library.transformations import (
+        U_UNKNOWN, _finalize_canonical_food_acquired)
 
     df = get_dataframe(fn)
 
     food_labels = harmonized_food_labels()
+    unit_codes = food_unit_labels(t)
 
     i = df[hhid].astype(int).astype(str)
     j = df[item].replace(food_labels)
@@ -2421,12 +2461,18 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
     pieces = []
     for s, spec in sources.items():
         q = pd.to_numeric(df[spec['quantity']], errors='coerce')
-        # `u` is stored as the RAW unit code; the framework's automatic
-        # categorical mapping resolves it to the `u` table's Preferred
-        # Label at API time (do NOT pre-resolve here -- that is what every
-        # other Nigeria wave has always done and what the cached parquets
-        # hold).
-        u = df[spec['unit']]
+        # `u` is DECODED HERE, per round, from the `u` table's column for
+        # this round's wave (GH #607).  Unit codes collide ACROSS waves --
+        # 4 is ml in W1 but cl from W2 on, 5/6 are piece/other in W1-PP
+        # but mudu/olodo in W2, 10/11/14 are W2's medium/small derica and
+        # tiya but bin/basket, paint rubber and tin from W3 on, and W1-PH's
+        # 11..95 are sized sacks/basins/bunches -- while the framework's
+        # automatic mapping keys on `Code` alone and applies the single
+        # Preferred Label column to every wave.  A code the wave's column
+        # does not list keeps its raw code (it is never folded into the
+        # missing-unit sentinel, which means "no unit recorded").
+        u = df[spec['unit']].map(unit_codes)
+        u = u.where(u.notna(), df[spec['unit']])
         piece = pd.DataFrame({
             't': t,
             'i': i.values,
@@ -2444,7 +2490,15 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         pieces.append(piece)
 
     out = pd.concat(pieces, ignore_index=True)
-    out['u'] = out['u'].fillna('None')
+    # A blank raw unit code means NO UNIT WAS RECORDED.  Write the library's
+    # missing-unit sentinel, not a made-up label: ``food_kg_factors``
+    # recognises U_UNKNOWN (``_U_SENTINELS``) and serves those rows
+    # ``KgFactorSource == 'none'``, whereas the old literal 'None' was
+    # treated as a real unit and given pooled price-ratio kilograms
+    # (847 rows, 1,133 kg; GH #1041).  The value is assigned AFTER the
+    # per-round decode above, and the `u` table has no 'Unknown' Code, so
+    # the API-time categorical mapping passes it through unchanged.
+    out['u'] = out['u'].fillna(U_UNKNOWN)
 
     return _finalize_canonical_food_acquired(out)
 

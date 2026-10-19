@@ -12,6 +12,7 @@ import numpy as np
 from pandas import concat, get_dummies, MultiIndex
 from cfe.df_utils import use_indices
 from .local_tools import format_id
+from .errors import UnitsUnavailableError
 
 # Build-path transforms live in build_transforms.py (their output is baked
 # into the cached L2 parquet).  Re-exported here so the country build
@@ -126,6 +127,29 @@ class StatedVsInferredKgWarning(UserWarning):
     (``warnings.simplefilter('error', StatedVsInferredKgWarning)``)
     independently of the library's other warnings.
     """
+
+
+class MissingLookingUnitWarning(UserWarning):
+    """A ``u`` spelling that LOOKS like "no unit" was given inferred kilograms.
+
+    ``_U_SENTINELS`` is closed on purpose: adding a spelling changes served
+    kilograms, and what a raw label means is a questionnaire question, not a
+    string-matching one (GH #962; @ligon 2026-10-18 chose to REPORT rather
+    than decide).  So a spelling such as ``None``, ``N/A`` or ``---`` that is
+    not a sentinel is still a unit to the ladder and still receives a
+    price-ratio factor -- and this warning names it, with its row count and
+    the kilograms it was given, so the per-country decision (remap to
+    ``U_UNKNOWN``, or record it as a genuine unit) is taken on evidence.
+
+    Carries ``country`` (from ``df.attrs``, may be ``None``) and ``spellings``
+    (``{spelling: {'rows': n, 'kg': x}}``).  The same counts ride on
+    ``attrs['kg_factor_missing_looking']`` of :func:`food_kg_factors`.
+    """
+
+    def __init__(self, message, *, country=None, spellings=None):
+        super().__init__(message)
+        self.country = country
+        self.spellings = dict(spellings or {})
 
 
 class UnitLabelCollisionWarning(UserWarning):
@@ -2206,6 +2230,30 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         'refused_to_unit': int((refused & (source == 'unit')).sum()),
         'refused_to_none': int((refused & (source == 'none')).sum()),
     }
+    # GH #962 (@ligon 2026-10-18): REPORT a missing-looking spelling that the
+    # ladder served kilograms; never change its factor here.
+    looks, raw_u = _missing_looking_unit_mask(df)
+    hit = looks & (source != 'none')
+    found = {}
+    if hit.any():
+        qty = (pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+               if 'Quantity' in df.columns else np.full(len(df), np.nan))
+        kg = qty * np.asarray(resolved, dtype=float)
+        for sp in sorted(set(raw_u[hit])):
+            m = hit & (raw_u == sp)
+            found[sp] = {'rows': int(m.sum()),
+                         'kg': float(np.nansum(kg[m]))}
+        country = df.attrs.get('country')
+        where = f"{country}: " if country else ""
+        desc = ', '.join(f"{sp!r} {v['rows']} rows / {v['kg']:,.0f} kg"
+                         for sp, v in found.items())
+        warnings.warn(MissingLookingUnitWarning(
+            f"{where}unit spelling(s) that read as 'no unit' but are not "
+            f"sentinels were given inferred kilograms: {desc}.  Check the "
+            f"questionnaire: remap to U_UNKNOWN if they mean no unit was "
+            f"recorded, or record them as genuine units in CONTENTS.org "
+            f"(GH #962).", country=country, spellings=found), stacklevel=3)
+    out.attrs['kg_factor_missing_looking'] = found
     return out
 
 
@@ -3004,7 +3052,35 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
           market price for ``s='purchased'``, farmgate for
           ``s='produced'``, imputed for ``s='inkind'``.
 
+        ``food_acquired.Price`` is **whatever the country's source
+        recorded** under that name -- not a guarantee of an elicited
+        price.  In some countries it is the statistics office's own
+        ``Expenditure / Quantity``: Uganda's UBOS "market" / "farmgate"
+        price columns agree with the row's own value / quantity on
+        94.4-99.9% of purchased and 95.3-99.99% of produced rows per wave
+        (measured 2026-10-17 on the served table; raw-file check and
+        per-wave numbers in ``countries/Uganda/_/CONTENTS.org``).  So
+        ``'unitprice'`` and ``'unitvalue'`` (likewise ``'kgprice'`` and
+        ``'kgvalue'``) are **not independent sources**: comparing them can
+        return an identity dressed as a validation.  Check the agreement
+        share for the country you hold before treating them as two
+        measurements (GH #845).  Same-day measurement on the other
+        ``Price``-bearing countries, provenance not established: Panama
+        100%, GhanaLSS 100% (produced rows only), Guatemala 97.7%, Serbia
+        88.5% of comparable rows.
+
         See ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
+
+    Raises
+    ------
+    UnitsUnavailableError
+        (a ``ValueError`` subclass) when the requested mode needs a column
+        ``food_acquired`` does not carry: ``Price`` for ``'kgprice'`` /
+        ``'unitprice'`` (the instrument records no unit price), or
+        ``Expenditure`` / ``Quantity`` for the ``*value`` modes.  Before
+        GH #828 the ``*price`` case returned an empty frame silently.
+        ``Country`` names the country on the error; ``Feature`` drops such
+        a country with one warning and ``attrs['units_unavailable']``.
 
     Returns
     -------
@@ -3050,15 +3126,14 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
     if units in {'kgvalue', 'unitvalue'}:
         missing = [c for c in ('Expenditure', 'Quantity') if c not in df.columns]
         if missing:
-            raise ValueError(
-                f"food_prices(units={units!r}) requires {missing} on food_acquired"
-            )
+            raise UnitsUnavailableError(units=units, missing=missing)
     if units in {'kgprice', 'unitprice'}:
         if 'Price' not in df.columns:
-            # No reported Price column at all → empty frame with right schema.
-            empty = df.iloc[0:0].copy()
-            empty['Price'] = np.array([], dtype='float64')
-            return empty[['Price']]
+            # No reported Price column at all: the instrument records no unit
+            # price.  RAISE rather than return an empty frame (GH #828) -- an
+            # empty frame is the absence of the column dressed as the absence
+            # of rows, and Feature concatenated the empties silently.
+            raise UnitsUnavailableError(units=units, missing=['Price'])
 
     kgf = None
     if units == 'kgvalue':
@@ -3474,6 +3549,28 @@ U_UNKNOWN = 'Unknown'
 #: Every live spelling of "no unit recorded", lower-cased.  A NaN ``u`` counts
 #: too, and is handled separately in :func:`_unit_sentinel_mask`.
 _U_SENTINELS = frozenset({U_UNKNOWN.lower(), 'manquant'})
+
+
+#: Lower-cased, stripped ``u`` spellings that READ as "no unit" but are not in
+#: :data:`_U_SENTINELS`.  Matching one does NOT change a factor; it makes
+#: :func:`food_kg_factors` warn (:class:`MissingLookingUnitWarning`).  A
+#: spelling made only of punctuation (``---``, ``.``, ``?``) matches too.
+_MISSING_LOOKING_UNITS = frozenset({
+    'none', 'n/a', 'na', 'nan', 'null', 'nil', 'missing', 'not applicable',
+    'not stated', 'not specified', 'unspecified', "don't know", 'dk'})
+
+
+def _missing_looking_unit_mask(df):
+    """Rows whose ``u`` reads as "no unit" yet is NOT a sentinel (GH #962)."""
+    u = _level_or_column(df, 'u')
+    if u is None:
+        return np.zeros(len(df), dtype=bool), np.array([], dtype=object)
+    col = pd.Series(u)
+    text = col.astype(str).str.strip().str.lower()
+    looks = (text.isin(_MISSING_LOOKING_UNITS)
+             | text.str.fullmatch(r'[-._?/ ]+').fillna(False))
+    looks &= ~text.isin(_U_SENTINELS) & col.notna()
+    return looks.to_numpy(dtype=bool), col.astype(str).str.strip().to_numpy()
 
 
 def _unit_sentinel_mask(df):

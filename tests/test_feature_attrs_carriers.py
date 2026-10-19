@@ -55,9 +55,10 @@ R = sys.modules["lsms_library.recall"]
 class TestTheRegistry:
     """A carrier is data, not code -- that is the whole point of GH #873."""
 
-    def test_all_three_carriers_are_registered(self):
+    def test_every_carrier_is_registered(self):
+        # `labels_unmatched` added for GH #787 item 3.
         assert [c.name for c in F._ATTRS_CARRIERS] == \
-            ["population", "recall", "derivations"]
+            ["population", "recall", "derivations", "labels_unmatched"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -71,6 +72,7 @@ class TestTheRegistry:
         assert callable(ll.derivations)
         for carrier in F._ATTRS_CARRIERS[1:]:
             assert callable(carrier.attach)
+        assert F._ATTRS_CARRIERS[3].keys == ("labels_unmatched",)
         assert F._ATTRS_CARRIERS[1].keys == (R.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[2].keys == (D.ATTRS_KEY,)
 
@@ -81,7 +83,8 @@ class TestTheRegistry:
         assert set(F._CARRIED_ATTRS_KEYS) == {
             k for c in F._ATTRS_CARRIERS for k in c.keys}
         assert set(F._CARRIED_ATTRS_KEYS) == {
-            P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY}
+            P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
+            "labels_unmatched"}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
@@ -89,8 +92,11 @@ class TestTheRegistry:
         assert F._ATTRS_CARRIERS[0].attach is P.merge_attrs
         # recall / derivations return the union rather than writing it, so they
         # are wrapped -- but the wrapper closes over the module's own function.
+        from lsms_library.country import merge_label_pass_through_reports
         for carrier, merge in ((F._ATTRS_CARRIERS[1], R.merge_attrs),
-                               (F._ATTRS_CARRIERS[2], D.merge_attrs)):
+                               (F._ATTRS_CARRIERS[2], D.merge_attrs),
+                               (F._ATTRS_CARRIERS[3],
+                                merge_label_pass_through_reports)):
             closed_over = {c.cell_contents for c in carrier.attach.__closure__}
             assert merge in closed_over, \
                 f"{carrier.name} does not call its module's merge_attrs"
@@ -291,6 +297,152 @@ class TestEveryCarrierSurvivesAssembly:
         assert [m for m in (str(w.message) for w in caught)
                 if "could not attach the recall record" in m], \
             "a failed carrier must be LOUD"
+
+
+# ---------------------------------------------------------------------------
+# labels_unmatched (GH #787 item 3) and units_unavailable (GH #828)
+# ---------------------------------------------------------------------------
+
+def _report(n):
+    """A Country-level ``labels_unmatched`` report: FLAT, no country in it."""
+    return {"labels": "Aggregate", "column": "Aggregate", "n_unmatched": n,
+            "n_values": 10, "rows": 2 * n, "row_share": n / 10,
+            "examples": [f"food{k}" for k in range(n)]}
+
+
+class _FoodCountry:
+    """Fake country whose ``food_prices`` behaves like the real one on the two
+    read-path contracts: ``labels=`` (pass-through report, or Contract-B
+    refusal) and ``units=`` (Contract-B refusal when ``Price`` is absent).
+
+    The signature names ``labels`` and ``units`` on purpose: ``Feature`` only
+    forwards a kwarg the country's method accepts (``_method_parameters``).
+    """
+
+    #: name -> unmatched count (0 = fully matched, None = LabelUnavailable)
+    UNMATCHED = {"Liberia": 3, "Benin": 0, "Togo": None}
+    #: countries whose food_acquired carries no Price
+    NO_PRICE = {"Togo"}
+
+    def __init__(self, name):
+        self.name = name
+
+    def food_prices(self, labels=None, units=None, **kwargs):
+        from lsms_library.errors import (LabelUnavailableError,
+                                         UnitsUnavailableError)
+        if units in {"unitprice", "kgprice"} and self.name in self.NO_PRICE:
+            raise UnitsUnavailableError(
+                units=units, missing=["Price"]).for_country(self.name)
+        n = self.UNMATCHED[self.name]
+        if labels is not None and n is None:
+            raise LabelUnavailableError(f"{self.name}: no {labels!r} column")
+        idx = pd.MultiIndex.from_tuples(
+            [("2018", "c1", "h1", "Rice", "Kg", "purchased"),
+             ("2018", "c1", "h2", "Rice", "Kg", "purchased")],
+            names=["t", "v", "i", "j", "u", "s"])
+        df = pd.DataFrame({"Price": [1.0, 2.0]}, index=idx)
+        if labels is not None and n:
+            df.attrs["labels_unmatched"] = _report(n)
+        return df
+
+
+@pytest.fixture
+def food_feature(monkeypatch):
+    import lsms_library as ll
+    monkeypatch.setattr(ll, "Country", lambda name, **kw: _FoodCountry(name))
+    f = F.Feature("food_prices")
+    object.__setattr__(f, "_countries", ["Liberia", "Benin", "Togo"])
+    return f
+
+
+class TestLabelsUnmatchedSurvivesAssembly:
+    """GH #787 item 3: the per-country pass-through report used to die at the
+    cross-country concat (two countries' reports differ, so `attrs` -> `{}`)."""
+
+    def test_two_countries_one_unmatched_carries_that_entry_keyed(
+            self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia", "Benin"], labels="Aggregate",
+                               currency=None)
+        assert set(out.index.get_level_values("country")) == {"Liberia",
+                                                             "Benin"}
+        # Keyed by country at the Feature level; Benin matched everything and
+        # so contributes no entry -- "no record" is not "an empty record".
+        assert out.attrs["labels_unmatched"] == {"Liberia": _report(3)}
+
+    def test_both_unmatched_both_carried(self, food_feature, monkeypatch):
+        monkeypatch.setitem(_FoodCountry.UNMATCHED, "Benin", 5)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia", "Benin"], labels="Aggregate",
+                               currency=None)
+        assert out.attrs["labels_unmatched"] == {"Liberia": _report(3),
+                                                 "Benin": _report(5)}
+
+    def test_a_contract_B_dropped_country_carries_none(self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia", "Benin", "Togo"],
+                               labels="Aggregate", currency=None)
+        assert out.attrs["labels_unavailable"] == ["Togo"]
+        assert "Togo" not in out.attrs["labels_unmatched"]
+        assert set(out.attrs["labels_unmatched"]) == {"Liberia"}
+
+    def test_a_single_country_is_keyed_too(self, food_feature):
+        """A one-frame concat PRESERVES attrs, so the flat Country report
+        would leak through un-keyed if the re-attach did not overwrite it."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia"], labels="Aggregate", currency=None)
+        assert out.attrs["labels_unmatched"] == {"Liberia": _report(3)}
+
+    def test_no_labels_no_key(self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia", "Benin"], currency=None)
+        assert "labels_unmatched" not in out.attrs
+
+
+class TestUnitsUnavailableDegrades:
+    """GH #828: a country whose food_acquired has no `Price` used to return an
+    empty frame under `units='unitprice'|'kgprice'`, and Feature concatenated
+    the empties silently.  It now degrades like `labels=` (Contract B)."""
+
+    @pytest.mark.parametrize("units", ["unitprice", "kgprice"])
+    def test_dropped_with_one_warning_and_an_attrs_marker(self, food_feature,
+                                                          units):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            out = food_feature(["Liberia", "Benin", "Togo"], units=units,
+                               currency=None)
+        assert set(out.index.get_level_values("country")) == {"Liberia",
+                                                             "Benin"}
+        assert out.attrs["units_unavailable"] == ["Togo"]
+        msgs = [str(w.message) for w in caught
+                if "unavailable" in str(w.message)]
+        assert len(msgs) == 1, msgs
+        assert "Togo" in msgs[0] and "Price" in msgs[0] and units in msgs[0]
+        assert not [m for m in (str(w.message) for w in caught)
+                    if m.startswith("Failed to load")], \
+            "a units= refusal must not be reported as a build failure"
+
+    def test_every_country_dropped_returns_empty_with_the_marker(
+            self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], units="unitprice", currency=None)
+        assert out.empty
+        assert out.attrs["units_unavailable"] == ["Togo"]
+
+    def test_a_mode_whose_inputs_exist_drops_nobody(self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Liberia", "Togo"], units="unitvalue",
+                               currency=None)
+        assert "units_unavailable" not in out.attrs
+        assert set(out.index.get_level_values("country")) == {"Liberia",
+                                                             "Togo"}
 
 
 # ---------------------------------------------------------------------------
