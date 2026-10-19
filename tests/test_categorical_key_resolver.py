@@ -24,14 +24,17 @@ corpus half (every served mapping unchanged) is measured by
 """
 from __future__ import annotations
 
+import ast
 import inspect
 import re
 import textwrap
+from pathlib import Path
 from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 
+import lsms_library
 from lsms_library import country as country_mod
 from lsms_library.country import (Country, _categorical_key_column,
                                   _merge_categorical_tables,
@@ -42,6 +45,7 @@ from lsms_library.local_tools import (CATEGORICAL_KEY_ATTR,
                                       CategoricalMappingConflictError,
                                       all_dfs_from_orgfile, df_from_orgfile,
                                       load_categorical_level)
+from lsms_library.paths import countries_root
 
 
 def _org(tmp_path, body, name="categorical_mapping.org"):
@@ -405,3 +409,294 @@ def test_every_caller_routes_through_the_resolver(fn):
 def test_conflict_error_class_is_unchanged():
     """The two level errors stay distinct classes."""
     assert not issubclass(CategoricalKeyDeclarationError, CategoricalMappingConflictError)
+
+
+# --------------------------------------------------------------------------
+# P2: no positional key-pick survives ANYWHERE in the package (red team r1, F1)
+# --------------------------------------------------------------------------
+#
+# ``test_every_caller_routes_through_the_resolver`` names five functions, so it
+# could not see a sixth: ``Mali/2014-15/_/mapping.py:_unit_canonicalizer`` was a
+# copy of the positional expression at BUILD time, and its ``[0]`` sat two
+# lines below the comprehension (behind an ``if not src: return {}``), where
+# ``_INLINE_PICK``'s one-line lookahead does not reach.  This sweep is
+# structural (``ast``, never an import -- a country module runs data reads at
+# import) over every ``.py`` under the package and the config tree.
+#
+# It flags two idioms:
+#
+# * **A -- "exclude ``Preferred Label``, take the first".**  A comprehension
+#   (or generator) filtered by ``!= 'Preferred Label'`` / ``not in (...,
+#   'Preferred Label', ...)`` / ``not in CATEGORICAL_RESERVED_COLUMNS``, whose
+#   result is indexed ``[0]`` -- directly, through ``next(...)``, or through a
+#   name it was bound to anywhere in the same scope.
+# * **B -- a positional column on a mapping table.**  ``.columns[...][0]`` or
+#   ``.iloc[:, 0]`` on a name bound (in the same scope) from
+#   ``all_dfs_from_orgfile`` / ``df_from_orgfile`` / ``get_categorical_mapping``
+#   / ``load_categorical_level`` / ``.categorical_mapping``, or from a
+#   subscript, ``.get()`` or ``.items()``/``.values()`` loop over one.
+#
+# NOT flagged, deliberately: an enumeration of the non-key columns that is
+# never indexed -- the ``available = [c for c in table.columns if c !=
+# 'Preferred Label']`` error-message listings in ``country.py``, and the
+# by-path readers ``Tanzania/_/tanzania.py:harmonized_food_labels`` and
+# ``Malawi/_/malawi.py`` (``harmonize_food``), which treat EVERY non-skip column
+# as a raw-label source rather than choosing one key.  Those readers would
+# ingest a future ``Status``/``Notes`` column as raw labels -- a P3 hazard (the
+# reserved vocabulary), recorded in the #928 P3 residual, not a key-pick.
+#
+# The one exemption is the resolver itself, which IS the positional rule.
+
+_RESOLVER_EXEMPT = {("country.py", "_categorical_key_column")}
+_MAPPING_SOURCES = {"all_dfs_from_orgfile", "df_from_orgfile",
+                    "get_categorical_mapping", "load_categorical_level"}
+
+
+def _is_zero(node) -> bool:
+    return isinstance(node, ast.Constant) and node.value == 0 and type(node.value) is int
+
+
+def _excludes_preferred_label(cond) -> bool:
+    for n in ast.walk(cond):
+        if not isinstance(n, ast.Compare):
+            continue
+        if not any(isinstance(op, (ast.NotEq, ast.NotIn)) for op in n.ops):
+            continue
+        for side in [n.left, *n.comparators]:
+            for m in ast.walk(side):
+                if isinstance(m, ast.Constant) and m.value == "Preferred Label":
+                    return True
+                if (isinstance(m, ast.Name) and m.id == "CATEGORICAL_RESERVED_COLUMNS") or (
+                        isinstance(m, ast.Attribute) and m.attr == "CATEGORICAL_RESERVED_COLUMNS"):
+                    return True
+    return False
+
+
+def _is_pl_comprehension(node) -> bool:
+    return isinstance(node, (ast.ListComp, ast.GeneratorExp)) and any(
+        _excludes_preferred_label(cond)
+        for gen in node.generators for cond in gen.ifs)
+
+
+def _call_name(call) -> str | None:
+    f = call.func
+    return f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else None
+
+
+def _names_in(target):
+    return {n.id for n in ast.walk(target) if isinstance(n, ast.Name)}
+
+
+_FRAME_PRESERVING = {"get", "copy", "dropna", "fillna", "astype", "rename",
+                     "reset_index", "replace"}
+
+
+def _mapping_tainted(scope) -> set:
+    """Names bound, in *scope*, to a categorical-mapping table (or a dict of
+    them).  Taint follows a subscript, ``.loc``, ``.get()``/``.copy()``-style
+    method and a bare alias -- never an arbitrary function call, whose result
+    is some other frame."""
+    tainted: set = set()
+
+    def is_mapping(v) -> bool:
+        if isinstance(v, ast.Name):
+            return v.id in tainted
+        if isinstance(v, ast.Attribute):
+            return v.attr == "categorical_mapping" or (
+                v.attr in ("loc", "iloc") and is_mapping(v.value))
+        if isinstance(v, ast.Subscript):
+            return is_mapping(v.value)
+        if isinstance(v, ast.Call):
+            if _call_name(v) in _MAPPING_SOURCES:
+                return True
+            return (isinstance(v.func, ast.Attribute)
+                    and v.func.attr in _FRAME_PRESERVING
+                    and is_mapping(v.func.value))
+        return False
+
+    changed = True
+    while changed:
+        changed = False
+        for n in _walk_scope(scope):
+            new = set()
+            if isinstance(n, (ast.Assign, ast.AnnAssign)) and n.value is not None:
+                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
+                if is_mapping(n.value):
+                    new = set().union(*(_names_in(t) for t in targets))
+            elif (isinstance(n, ast.For) and isinstance(n.iter, ast.Call)
+                  and isinstance(n.iter.func, ast.Attribute)
+                  and n.iter.func.attr in ("items", "values")
+                  and is_mapping(n.iter.func.value)):
+                new = _names_in(n.target)
+            if new - tainted:
+                tainted |= new
+                changed = True
+    return tainted
+
+
+def _walk_scope(scope):
+    """``ast.walk`` that does not descend into a nested function or class
+    (they are scopes of their own), so a module-level sweep never sees a
+    function body and the resolver's exemption cannot be bypassed."""
+    todo = list(ast.iter_child_nodes(scope))
+    while todo:
+        n = todo.pop()
+        yield n
+        if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            todo.extend(ast.iter_child_nodes(n))
+
+
+def _scopes(tree):
+    yield tree, "<module>"
+    for n in ast.walk(tree):
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            yield n, n.name
+
+
+def _positional_key_picks(source: str, relname: str = "<src>") -> list:
+    """``(relname, lineno, rule, scope)`` for every positional key-pick."""
+    tree = ast.parse(source)
+    hits = set()
+    for scope, scope_name in _scopes(tree):
+        if (Path(relname).name, scope_name) in _RESOLVER_EXEMPT:
+            continue
+        # Rule A
+        bound = {}
+        for n in _walk_scope(scope):
+            if isinstance(n, ast.Assign) and _is_pl_comprehension(n.value):
+                for t in n.targets:
+                    if isinstance(t, ast.Name):
+                        bound[t.id] = n.lineno
+        for n in _walk_scope(scope):
+            if isinstance(n, ast.Subscript) and _is_zero(n.slice):
+                if _is_pl_comprehension(n.value):
+                    hits.add((relname, n.lineno, "A", scope_name))
+                elif isinstance(n.value, ast.Name) and n.value.id in bound:
+                    hits.add((relname, bound[n.value.id], "A", scope_name))
+            if (isinstance(n, ast.Call) and _call_name(n) == "next" and n.args
+                    and _is_pl_comprehension(n.args[0])):
+                hits.add((relname, n.lineno, "A", scope_name))
+        # Rule B
+        tainted = _mapping_tainted(scope)
+        if not tainted:
+            continue
+        for n in _walk_scope(scope):
+            if not isinstance(n, ast.Subscript):
+                continue
+            sl = n.slice
+            if (isinstance(n.value, ast.Attribute) and n.value.attr == "iloc"
+                    and isinstance(n.value.value, ast.Name) and n.value.value.id in tainted
+                    and isinstance(sl, ast.Tuple) and len(sl.elts) == 2
+                    and _is_zero(sl.elts[1])):
+                hits.add((relname, n.lineno, "B", scope_name))
+            elif _is_zero(sl) and any(
+                    isinstance(m, ast.Attribute) and m.attr == "columns"
+                    and isinstance(m.value, ast.Name) and m.value.id in tainted
+                    for m in ast.walk(n.value)):
+                hits.add((relname, n.lineno, "B", scope_name))
+    return sorted(hits)
+
+
+def _package_sources():
+    pkg = Path(lsms_library.__file__).resolve().parent
+    roots = [pkg, Path(countries_root()).resolve()]
+    seen = set()
+    for root in roots:
+        for p in sorted(root.rglob("*.py")):
+            rp = p.resolve()
+            if "__pycache__" in rp.parts or rp in seen:
+                continue
+            seen.add(rp)
+            try:
+                rel = rp.relative_to(pkg)
+            except ValueError:
+                rel = Path("countries") / rp.relative_to(roots[1])
+            yield rp, str(rel)
+
+
+_GUARD_POSITIVES = {
+    "the Mali 2014-15 canonicalizer before r1": """
+def _unit_canonicalizer():
+    tables = all_dfs_from_orgfile(org, to_numeric=False)
+    tbl = tables.get('u')
+    src = [c for c in tbl.columns if c != 'Preferred Label']
+    if not src:
+        return {}
+    return tbl.set_index(src[0])['Preferred Label'].to_dict()
+""",
+    "the pre-#928 inline site": """
+def f(table):
+    source_cols = [c for c in table.columns if c not in ('Preferred Label', 'Status')]
+    return table.set_index(source_cols[0])
+""",
+    "inline [0] on the comprehension": """
+def f(t):
+    return [c for c in t.columns if c != 'Preferred Label'][0]
+""",
+    "next() over a generator": """
+def f(t):
+    return next(c for c in t.columns if c not in CATEGORICAL_RESERVED_COLUMNS)
+""",
+    ".columns[0] on a mapping table": """
+def f(self):
+    t = self.categorical_mapping['u']
+    return t.set_index(t.columns[0])
+""",
+    "list(.columns)[0] through a loop": """
+def f(path):
+    for name, t in all_dfs_from_orgfile(path).items():
+        k = list(t.columns)[0]
+""",
+    ".iloc[:, 0] on a by-path table": """
+def f():
+    hf = df_from_orgfile('../_/categorical_mapping.org', name='u')
+    return dict(zip(hf.iloc[:, 0], hf['Preferred Label']))
+""",
+}
+
+_GUARD_NEGATIVES = {
+    "an error-message enumeration": """
+def f(table):
+    available = [c for c in table.columns if c != 'Preferred Label']
+    raise KeyError(f'available: {available}')
+""",
+    "a column enumerator (Tanzania harmonized_food_labels)": """
+def harmonized_food_labels(fn, name):
+    hf = df_from_orgfile(fn, name=name)
+    wave_cols = [c for c in hf.columns if c not in ('Code', 'Preferred Label', 'FTC Label')]
+    for col in wave_cols:
+        pass
+""",
+    ".columns[0] on a frame that is not a mapping table": """
+fct = pd.read_csv('fct.csv')
+fct = fct.set_index(fct.columns[0])
+""",
+    "the resolver call": """
+def f(tbl):
+    return tbl.set_index(_categorical_key_column(tbl))
+""",
+}
+
+
+@pytest.mark.parametrize("label", sorted(_GUARD_POSITIVES))
+def test_positional_key_pick_guard_catches(label):
+    assert _positional_key_picks(_GUARD_POSITIVES[label]), label
+
+
+@pytest.mark.parametrize("label", sorted(_GUARD_NEGATIVES))
+def test_positional_key_pick_guard_ignores(label):
+    assert _positional_key_picks(_GUARD_NEGATIVES[label]) == [], label
+
+
+def test_no_positional_key_pick_survives_in_the_package():
+    """Every ``.py`` under ``lsms_library/`` and the config tree: a
+    categorical table's key comes from ``country._categorical_key_column``."""
+    hits, n = [], 0
+    for path, rel in _package_sources():
+        n += 1
+        hits += _positional_key_picks(path.read_text(encoding="utf-8"), rel)
+    assert n > 500, f"swept only {n} files -- is the package tree where expected?"
+    assert hits == [], (
+        "positional key-pick(s) on a categorical table -- route each through "
+        "country._categorical_key_column (GH #928):\n"
+        + "\n".join(f"  {r}:{ln} [{rule}] in {s}" for r, ln, rule, s in hits))
