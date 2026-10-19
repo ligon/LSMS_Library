@@ -171,15 +171,24 @@ class TestCoverage:
 
 
 class TestNoTransformation:
-    """Phase I ships facts.  It must not have grown a transformation."""
+    """The per-table transforms stay window-free.
+
+    Phase I shipped facts only.  Phase II (#851, ruling 2026-10-18) added
+    ``period=`` -- but on the generated ``Country`` method, as a post-step
+    (``recall.to_period``) dividing by the DECLARED exposure; see
+    ``tests/test_recall_period.py``.  The transforms themselves must still not
+    take it: a window is a property of the (country, wave) record, not of the
+    derivation, and ``food_prices`` must have no door for it at all.
+    """
 
     def test_no_period_kwarg_appeared(self):
-        """`period=` is deferred and gated on the ask-order bias (#851).
+        """No transform grows ``period=`` (#851).
 
         Reported spend does not respond to the realised interval (elasticity
-        0.018 on GLSS4), so a rate would inject fieldwork tempo rather than
-        normalise.  If someone adds `period=`, this test should be deleted
-        deliberately, with that evidence answered.
+        0.018 on GLSS4), so a rate built from the survey's dates would inject
+        fieldwork tempo rather than normalise -- the reason the conversion
+        lives beside the record, where the only denominator on offer is the
+        declared ``recall_days * n_asks``.
         """
         import inspect
         from lsms_library import transformations as T

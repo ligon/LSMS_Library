@@ -1490,6 +1490,19 @@ the design factors 365/30 = 12.2 and 365/14 = 26.1.  Recorded in GH #851; the
 library does not yet carry the window, so the caller cannot make this
 adjustment from the API.
 
+/Phase II of GH #851 (2026-10-19) does not change that for this wave./
+=food_expenditures(period=...)= / =food_quantities(period=...)= rescale every
+other GhanaLSS wave by its recorded exposure (14 days for 1987-88 / 1988-89,
+30 for the four later waves), but *refuse 1991-92* with
+=PeriodUnavailableError= -- its record carries =within_wave_variation:
+stratum= and no number, because no single per-wave factor is right for both
+strata.  A =Feature(...)(period=...)= call keeps GhanaLSS's other six waves and
+lists =1991-92= under =attrs['period_unavailable']=.  Converting it needs the
+window on each ROW, stamped by the wave script from the household's stratum
+(read from the cover page, never inferred from the number of visits a
+household happens to have -- that conflates the protocol with non-response);
+filed as its own issue.  See =docs/guide/recall.md=.
+
 The diary was *urban only* (p.6): "A dairy of daily consumption and expenditure
 will be used to support the urban interviews."  Rural expenditure in GLSS3 is
 unaided 2-day recall; urban is diary-assisted 3-day.  Elicitation mode differs
