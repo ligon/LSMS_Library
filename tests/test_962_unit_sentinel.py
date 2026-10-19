@@ -508,12 +508,6 @@ def test_every_classified_spelling_gets_no_price_ratio_factor(spelling):
 #: and if it means "no unit was recorded" it is a sentinel leak to report,
 #: not to file here quietly.
 MINTED_UNIT_SPELLINGS = {
-    ('Nigeria/_/nigeria.py', 'None'): (
-        'LIVE SENTINEL LEAK (GH #962 inventory, 2026-10-17): food_acquired_for_'
-        'wave fills a NaN raw unit code with "None" before the API-time label '
-        'map, so it can only mean "no unit recorded"; 847 served rows (422 '
-        'priced), all receive item_unit/unit factors, 1,133 kg of 1.545e6. '
-        'Reported as a residual; not fixed here (policy).'),
     ('Nigeria/2012-13/_/individual_unit_values.py', 'None'): (
         'Orphan script: individual_unit_values is in no data_scheme.yml or '
         'Makefile, so nothing served reads it.'),

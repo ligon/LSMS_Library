@@ -74,6 +74,10 @@ pass: =no_float_stringified_index= only inspects id levels.)
 
 *** =u = 'None'= is a missing-unit spelling the kg ladder does not know (GH #962)
 
+/Resolved 2026-10-18 by GH #1041 (PR #1046): the fill is now =U_UNKNOWN=, so
+the kg ladder serves these rows =none=; see the GH #1041 section below.  Kept
+as the record of the #962 measurement./
+
 =nigeria.food_acquired_for_wave= ends with =out['u'].fillna('None')=, on the
 RAW unit code and before the API-time code->label map, so a served
 =u = 'None'= can only mean "no unit code recorded".  It is not in
@@ -86,8 +90,8 @@ rows* in every wave 2010Q3--2016Q1 (2013Q1 purchased 397 of them), 590 with
 =food_quantities(units='kgs')=) rest on pooled factors for rows with no unit.
 Small (0.07%), but a fabricated weight all the same.  Not fixed under #962
 (the fix -- =U_UNKNOWN= here -- moves served data and needs its own
-accounting); =tests/test_962_unit_sentinel.py::MINTED_UNIT_SPELLINGS= records
-the site.  The three =individual_unit_values.py= wave scripts mint the same
+accounting); =tests/test_962_unit_sentinel.py::MINTED_UNIT_SPELLINGS= recorded
+the site until #1041 retired it.  The three =individual_unit_values.py= wave scripts mint the same
 spelling but are in no =data_scheme.yml= or =Makefile=.
 
 * food_acquired unit codes (GH #223 Layer 2)
