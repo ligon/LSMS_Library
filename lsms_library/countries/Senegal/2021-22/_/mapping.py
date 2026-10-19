@@ -92,8 +92,7 @@ def Relationship(value):
     guaranteed a non-null string.
 
     A missing answer is ``pd.NA``.  Non-null values are title-cased exactly
-    as before (the cp1252 repair in ``_fix_relationship``, GH #801, depends
-    on that spelling), and ``pd.isna`` leaves nothing else changed.
+    as before, and ``pd.isna`` leaves nothing else changed.
     '''
     if pd.isna(value):
         return pd.NA

@@ -13,21 +13,19 @@
 # while the keys meant to absorb them sat four lines too low.  Keep every
 # row on ONE line; tests/test_burkina_faso_food_labels.py pins the parse.
 #
-# Three keys are deliberately spelled with the DAMAGE the reader produces
-# (strategy B, see _/CONTENTS.org "Encoding"): "<U+008C>ufs",
-# "Cube (Maggi, Jumbo,<U+0085>)", "Viandes de b<U+009C>ufs fra\u00eeches"
-# (2014, cp1252 bytes read as latin-1) and "Viande de b<U+00C5><U+0093>uf"
-# (2018-19, UTF-8 read as latin-1).  The dict is applied to the RAW value
-# label at build time (data_info.yml `mappings:`), so a key must match what
-# the reader emits, not the clean French.  The U+0085 in the Cube key is a
-# literal NEL byte in this file -- many editors show it as a newline.
-#
-# One 2014 label CANNOT be keyed here: "Feuilles (oseilles, baobab,
-# boulvaka<U+0085>" ends in U+0085, which str.strip() removes -- the org
-# reader strips every cell, so the key loses it, while the dict sees the
-# raw label WITH it (format_id strips the value only afterwards).  That
-# label is repaired by whole-value replacement in 2014/_/mapping.py
-# (`_J_FIX`), the GH #801 pattern.
+# The dict is applied to the RAW value label at build time (data_info.yml
+# `mappings:`), so a key must match what the reader emits, not the clean
+# French.  Since GH #805 the reader re-decodes the 2014 cp1252 labels
+# itself, so "Oeufs" (with the ligature), "Cube (Maggi, Jumbo,...)" (with the
+# U+2026 ellipsis) and "Viandes de boeufs fraiches" (with the ligature) are
+# keyed CLEAN; they used to carry the C1 control the latin-1 read left
+# (U+008C / U+0085 / U+009C).  "Feuilles (oseilles, baobab, boulvaka..."
+# is keyed here too: its U+0085 used to be stripped from the key by the org
+# reader (whitespace to str.strip), so 2014/_/mapping.py repaired it by
+# whole-value replacement (`_J_FIX`, retired); U+2026 is not whitespace.
+# ONE key still spells damage, deliberately: "Viande de b<U+00C5><U+0093>uf"
+# (2018-19, UTF-8 bytes read as latin-1 -- a double encoding, which #805
+# does not touch).
 
 #+NAME: harmonize_food
 | Original Label                                                                                       | Preferred Label                              |
@@ -320,12 +318,13 @@
 | semoule de blé                                                                                       | Semoule de blé                               |
 | semoule de maïs                                                                                      | Semoule de maïs                              |
 | semoule de mil                                                                                       | Semoule de mil                               |
-| ufs                                                                                                 | Oeufs                                        |
+| Œufs                                                                                                 | Oeufs                                        |
 | Canne Ã  sucre                                                                                       | Canne à sucre                                |
 | Chocolat Ã  croquer, pÃ¢te Ã  tartiner                                                               | Chocolat à croquer, pâte à tartiner          |
-| Cube (Maggi, Jumbo,)                                                                                | Cube alimentaire                             |
+| Cube (Maggi, Jumbo,…)                                                                                | Cube alimentaire                             |
 | Viande de bÅuf                                                                                      | Viande de boeuf                              |
-| Viandes de bufs fraîches                                                                            | Viande de boeuf                              |
+| Viandes de bœufs fraîches                                                                            | Viande de boeuf                              |
+| Feuilles (oseilles, baobab, boulvaka…                                                                | Feuilles                                     |
 
 * Food Units
 

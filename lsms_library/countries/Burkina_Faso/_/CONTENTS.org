@@ -868,6 +868,8 @@ table below reports as served unmapped (1,397 + 1,901 rows), and the crosswalk
 file is unchanged since the measurement -- so a reader change here must land
 with a re-key *and* a re-measurement of the leak table, not either alone
 (GH #794).
+(It did, 2026-10-19: GH #805 -- see "Strategy B retired for the cp1252
+class" under the GH #794 section below.)
 
 *RESOLVED 2026-10-14 (GH #794) -- and the cause was not the keys, it was the
 FILE.*  Rows 303/304 did not match because they were never LOADED:
@@ -1333,6 +1335,24 @@ legible.  Strategy B (keys spelled as the reader's damage) is UNCHANGED for
 this country; if the decode is ever moved ahead of the dict, every damage
 key must be re-keyed in the same commit.  2018-19's hook was not touched:
 its one leaked label (row 303) matches now that the row is read.
+
+*Strategy B retired for the cp1252 class, 2026-10-19 (GH #805).*  The
+reader now re-decodes the cp1252 strings of a pre-118 =.dta=
+(=local_tools._redecode_cp1252=), so the 2014 =product= labels arrive clean
+and the crosswalk keys them clean, in the same commit as the reader change,
+as the paragraph above required: =<U+008C>ufs= -> =Œufs=, =Cube (Maggi,
+Jumbo,<U+0085>)= -> =Cube (Maggi, Jumbo,…)= (no NEL byte left in the file),
+=Viandes de b<U+009C>ufs fraîches= -> =Viandes de bœufs fraîches=.  The
+Feuilles label is now keyable -- its tail is U+2026, which =str.strip()=
+keeps -- so it is a crosswalk row (=Feuilles (oseilles, baobab, boulvaka…=
+-> =Feuilles=) and =_J_FIX= is retired, as is the wave's =_decode_cp1252=;
+=_decode_mojibake= stays.  =Viande de b<U+00C5><U+0093>uf= (2018-19,
+=s07b_me_bfa2018.dta=, format 118, UTF-8 read as latin-1) is a double
+encoding and is deliberately NOT re-keyed: the reader leaves that class
+alone.  Measured: the served =food_acquired= is the same multiset of
+765,816 rows before and after (same =j= on every row; only the row order of
+the rebuild differs), i.e. the re-keyed crosswalk plus the Feuilles row
+reproduce the old damage keys plus =_J_FIX= exactly.
 
 *Still open*: the two dead =encoding=='iso-8859-1'= wave scripts
 (=2018-19/_/food_acquired.py=, =2021-22/_/food_acquired.py=) and the legacy

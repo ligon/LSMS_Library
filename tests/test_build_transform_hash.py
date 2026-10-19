@@ -50,6 +50,14 @@ EXPECTED_ENTRY_POINTS = {
     "lsms_library.country.Wave.cluster_features",
     "lsms_library.country.Country._aggregate_wave_data",
     "lsms_library.local_tools.df_data_grabber",
+    # GH #1045: the build-time calendar parser, tagged for exactly the tables
+    # that carry a calendar column (datetime_parse.CALENDAR_TABLES) and
+    # excluded from recursion so grab_data does not fold it into every table.
+    "lsms_library.datetime_parse.parse_datetime",
+    "lsms_library.datetime_parse.assign_datetime",
+    "lsms_library.datetime_parse.spec_source_vars",
+    "lsms_library.datetime_parse.apply_datetime_specs",
+    "lsms_library.datetime_parse.is_datetime_spec",
 }
 
 
@@ -332,6 +340,41 @@ def test_excluded_callables_are_write_or_hash_only():
         assert not bad, f"excluded {qn} contains content-mutating ops {bad} -> unsafe to exclude"
 
 
+# ---------------------------------------------------------------------------
+# GH #1045 r1 F3: the WAVE-tier stamp replay is reporting, like the gate
+# ---------------------------------------------------------------------------
+
+def test_editing_the_wave_stamp_replay_moves_no_hash(monkeypatch):
+    """``country._replay_wave_stamp`` replays a wave parquet's grain and date
+    stamps at every wave-tier read; it writes nothing a build serves.  Before
+    the exclusion a no-op edit to it alone moved every hash (measured on the
+    whole corpus: btf 39/39, ``_table_cache_hash`` 549/549, ``_input_hash``
+    2,109/2,139).  Structural and measured, as for the #908 gate above;
+    positive control ``_union_waves``."""
+    qn = "lsms_library.country._replay_wave_stamp"
+    assert qn in R._EXCLUDED_CALLABLES
+    R.clear_caches()
+    leaked = [p.split("=")[0] for p in _all_parts() if p.split("=")[0] == qn]
+    assert not leaked, f"wave-stamp replay leaked into the build fingerprint: {leaked}"
+
+    btf0, tch0 = _gate_probe_hashes()
+    _probe_edit(monkeypatch, lsms_library.country._replay_wave_stamp)
+    btf1, tch1 = _gate_probe_hashes()
+    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+    assert not moved_btf and not moved_tch, (
+        f"editing _replay_wave_stamp moved {len(moved_btf)}/{len(btf0)} fingerprints "
+        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+
+    monkeypatch.undo()
+    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
+    btf2, _tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a closure callable"
+    monkeypatch.undo()
+    R.clear_caches()
+
+
 def test_df_data_grabber_is_versioned():
     """Red-team #6 positive-coverage: the core extraction transform's SOURCE
     must be a folded closure part (so editing it invalidates)."""
@@ -605,6 +648,71 @@ def test_editing_the_read_gate_moves_no_hash(monkeypatch):
     btf2, tch2 = _gate_probe_hashes()
     assert any(btf0[t] != btf2[t] for t in btf0), \
         "positive control failed: the probe cannot see an edit to a closure callable"
+    assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
+    monkeypatch.undo()
+    R.clear_caches()
+
+
+# ---------------------------------------------------------------------------
+# GH #1040: the WAVE-tier read gates are mechanism too
+# ---------------------------------------------------------------------------
+
+_WAVE_GATES = (
+    "lsms_library.country.Wave._read_l2_wave_cache",       # YAML-path L2-wave read
+    "lsms_library.country.Wave._fresh_script_parquet",     # script-path candidate check
+    "lsms_library.country.Country._read_assumed_fresh_cache",  # assume_cache_fresh serve
+)
+
+
+def _gate_fn(qn):
+    obj = lsms_library
+    for part in qn.split(".")[1:]:
+        obj = getattr(obj, part)
+    return obj
+
+
+def test_wave_read_gates_are_not_folded_into_any_build_fingerprint():
+    """GH #1040, structurally: each wave-tier gate is excluded and is no
+    fingerprint part, and the build code still CALLS it (an excluded helper
+    nothing reaches would pass the first two checks vacuously)."""
+    import inspect
+    names = {p.split("=")[0] for p in _all_parts()}
+    for qn in _WAVE_GATES:
+        assert qn in R._EXCLUDED_CALLABLES, qn
+        assert qn not in names, f"wave read gate leaked into the build fingerprint: {qn}"
+    grab = inspect.getsource(lsms_library.country.Wave.grab_data)
+    assert "self._read_l2_wave_cache(" in grab and "self._fresh_script_parquet(" in grab
+    agg = inspect.getsource(lsms_library.country.Country._aggregate_wave_data)
+    assert "self._read_assumed_fresh_cache(" in agg
+
+
+def test_editing_a_wave_read_gate_moves_no_hash(monkeypatch):
+    """GH #1040, measured: a no-op edit to EACH wave-tier gate moves 0 of the
+    ``build_transforms_fingerprint`` values and 0 of ~35 probed
+    ``Country._table_cache_hash`` values.
+
+    Positive control: the identical edit to ``Wave._script_parquet_candidates``
+    -- which stays fingerprinted (it decides which paths are candidates) and
+    is reached exactly as the two Wave gates are, through ``self.<method>``
+    resolution from the tagged ``grab_data`` -- DOES move them.  So a gate
+    whose exclusion entry named the wrong qualname would be seen to leak."""
+    btf0, tch0 = _gate_probe_hashes()
+    assert len(tch0) >= 30, f"probe too small: {len(tch0)} cells"
+
+    for qn in _WAVE_GATES:
+        _probe_edit(monkeypatch, _gate_fn(qn))
+        btf1, tch1 = _gate_probe_hashes()
+        moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+        moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+        assert not moved_btf and not moved_tch, (
+            f"editing {qn} moved {len(moved_btf)}/{len(btf0)} fingerprints "
+            f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+        monkeypatch.undo()
+
+    _probe_edit(monkeypatch, lsms_library.country.Wave._script_parquet_candidates)
+    btf2, tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a Wave method"
     assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
     monkeypatch.undo()
     R.clear_caches()

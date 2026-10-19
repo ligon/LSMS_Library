@@ -102,8 +102,11 @@ def test_the_eviction_precedes_the_country_fallback():
 def test_exactly_the_country_tier_call_sites_pass_the_flag():
     """Pins the call-site table.  `load_dataframe_with_dvc` is the only place
     that has decided not to serve `var/<t>.parquet`; the JSON tier targets
-    `_/<t>.json`, and LSMS_BUILD_BACKEND=make is documented as a *bypass* of
-    the parquet tiers, not an invalidation of them."""
+    `_/<t>.json`, and LSMS_BUILD_BACKEND=make writes no L2-country parquet, so
+    deleting one there would destroy a valid default-backend cache and
+    replace it with nothing.  (GH #1039's no-builder route passes
+    `country_builder=` on an existing line instead: it never asks the
+    country fallback at all, so there is nothing to evict.)"""
     calls = [ln for ln in SOURCE.splitlines() if "load_from_waves(" in ln
              and "def load_from_waves(" not in ln]
     passing = [ln for ln in calls if "evict_country_cache=" in ln]

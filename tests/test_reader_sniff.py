@@ -38,9 +38,11 @@ import pandas as pd
 import pyreadstat
 import pytest
 
-from lsms_library.local_tools import (_dvc_cache_path, _is_sas_xport,
-                                      _is_stata_dta, _sniff_head,
-                                      get_dataframe)
+from pyarrow.lib import ArrowInvalid
+
+from lsms_library.local_tools import (ParquetFormatError, _dvc_cache_path,
+                                      _is_sas_xport, _is_stata_dta,
+                                      _sniff_head, get_dataframe)
 
 XPORT_MAGIC = b'HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!'
 
@@ -236,6 +238,59 @@ def test_a_corrupt_header_dta_is_not_a_garbage_frame(tmp_path, encoding):
     assert not _is_stata_dta(_sniff_head(str(fn)))
     with pytest.raises(ValueError, match="has a .dta suffix but no Stata header"):
         get_dataframe(str(fn), encoding=encoding)
+
+
+# ---------------------------------------------------------------------------
+# #1070 -- a .parquet suffix refuses the text readers, as .dta does
+# ---------------------------------------------------------------------------
+
+def _parquet_bytes(tmp_path):
+    src = tmp_path / 'src.parquet'
+    pd.DataFrame({'hhid': np.arange(200), 'val': np.linspace(0, 1, 200)}).to_parquet(src)
+    return src.read_bytes()
+
+
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+@pytest.mark.parametrize("raw", [
+    b'this is not a parquet file',   # was served as an EMPTY frame
+    b'hhid,val\n1,0.5\n2,1.5\n',     # was served as two ROWS
+    bytes([255, 254, 253, 0]) * 16,  # was a bare ValueError
+    b'',                             # was EmptyDataError
+], ids=['garbage-text', 'csv-text', 'binary', 'empty'])
+def test_a_parquet_suffix_without_parquet_magic_is_refused(tmp_path, raw, encoding):
+    fn = tmp_path / 'var.parquet'
+    fn.write_bytes(raw)
+    with pytest.raises(ParquetFormatError, match="has a .parquet suffix but no Parquet header") as info:
+        get_dataframe(str(fn), encoding=encoding)
+    assert str(fn) in str(info.value)
+    assert isinstance(info.value, ValueError)
+
+
+@pytest.mark.parametrize("encoding", [None, "latin-1"])
+def test_a_truncated_parquet_fails_loudly_with_the_arrow_cause(tmp_path, encoding):
+    """Genuine ``PAR1`` header, footer gone: only pyarrow can tell, and its
+    failure is kept as the cause rather than handed to the text readers."""
+    raw = _parquet_bytes(tmp_path)
+    fn = tmp_path / 'truncated.parquet'
+    fn.write_bytes(raw[:len(raw) // 2])
+    with pytest.raises(ParquetFormatError, match="has a Parquet header but cannot be decoded") as info:
+        get_dataframe(str(fn), encoding=encoding)
+    assert isinstance(info.value.__cause__, ArrowInvalid), repr(info.value.__cause__)
+
+
+def test_a_real_parquet_still_reads(tmp_path):
+    fn = tmp_path / 'real.parquet'
+    fn.write_bytes(_parquet_bytes(tmp_path))
+    got = get_dataframe(str(fn))
+    assert list(got.columns) == ['hhid', 'val'] and len(got) == 200
+
+
+def test_parquet_content_under_another_suffix_still_reads(tmp_path):
+    """The refusal is keyed on the ``.parquet`` suffix; dispatch by content
+    is unchanged for every other name."""
+    fn = tmp_path / 'table.bin'
+    fn.write_bytes(_parquet_bytes(tmp_path))
+    assert len(get_dataframe(str(fn))) == 200
 
 
 # ---------------------------------------------------------------------------

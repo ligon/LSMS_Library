@@ -1,0 +1,38 @@
+{
+ "countries": 38,
+ "warnings_fired": [],
+ "declared_tables": [
+  [
+   "Niger",
+   "u",
+   "Original Label"
+  ]
+ ],
+ "additive_aligned": 45,
+ "additive_fallbacks_undeclared": [
+  [
+   "Malawi",
+   "u",
+   "Code",
+   "Original Label"
+  ],
+  [
+   "Mali",
+   "u",
+   "Code",
+   "Original Label"
+  ],
+  [
+   "Nigeria",
+   "u",
+   "Code",
+   "Original Label"
+  ],
+  [
+   "Uganda",
+   "u",
+   "Code",
+   "Original Label"
+  ]
+ ]
+}

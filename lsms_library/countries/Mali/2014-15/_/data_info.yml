@@ -144,10 +144,10 @@ interview_date:
             - grappe
             - menage
     myvars:
+        # GH #1045: parsed at build time from its (y, m, d) components.
         Int_t:
-            - s00q22y
-            - s00q22m
-            - s00q22j
+            datetime: {y: s00q22y, m: s00q22m, d: s00q22j}
+            calendar: gregorian
     converted_categoricals: False
 
 shocks:

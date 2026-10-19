@@ -515,6 +515,15 @@ nothing else.  The C1-control spellings were deleted from
 file no longer carries the artefact and a regression would surface as an
 =Unknown relationship labels= warning instead of resolving silently.
 
+*Moved to the reader, 2026-10-19 (GH #805).*  =get_dataframe= now re-decodes
+the cp1252 strings of a pre-118 =.dta= itself (value labels and str columns;
+=local_tools._redecode_cp1252=), so this label arrives as =Frère, sœur= and
+the wave-level =_decode_cp1252= is retired.  Measured: the served
+=household_roster= is identical before and after (27,480 rows), i.e. the reader
+reproduces the hook exactly.  The decision is per file and refuses DOS code
+pages and UTF-8 double encodings; see the block comment above =_C1_RE= in
+=local_tools.py=.
+
 Same defect and same fix in Niger 2018-19, Senegal 2018-19 and Benin 2018-19 (all format-115 cp1252 EHCVM-1
 roster files).  See GH #801 and the #797 vocabulary sweep
 (=slurm_logs/gh797/vocab_sweep/REPORT.org= section 2.4).

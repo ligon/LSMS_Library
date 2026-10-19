@@ -60,6 +60,7 @@ from ._build_registry import build_transform
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import codecs
+import contextvars
 import struct
 import tempfile
 import numpy as np
@@ -92,6 +93,9 @@ import inspect
 from typing import Any
 from .paths import data_root, var_path, wave_data_path, countries_root
 from .null_read_audit import check_read
+# GH #1045: the build-time calendar parser, re-exported so wave scripts import
+# it from local_tools beside df_data_grabber / to_parquet.
+from .datetime_parse import parse_datetime, assign_datetime, datetime_reports  # noqa: F401
 from .config import s3_creds_path as _s3_creds_path
 
 # Initialize DVC filesystem once and reuse it.
@@ -835,7 +839,9 @@ def _is_polluted_workspace_copy(fn) -> bool:
     scratch data the user supplied directly, output from the
     WB-fallback auto-add path in ``data_access.get_data_file``, or any
     other legitimate non-tracked use.  Returns False in all of those
-    cases.
+    cases.  (Whether ``get_dataframe`` may READ such a file when it sits
+    inside ``countries_root()`` is a separate policy, GH #831 -- see
+    :func:`_refuse_intree_source`.)
     """
     try:
         p = Path(fn).resolve()
@@ -845,6 +851,87 @@ def _is_polluted_workspace_copy(fn) -> bool:
         # Path-resolution failure (loop, permission denied) -> not pollution.
         # TypeError / AttributeError signal a programmer bug and propagate.
         return False
+
+
+# Sidecar-less sources inside the config tree (GH #831).
+#
+# ``countries_root()`` holds reviewed config; raw data lives in the DVC cache
+# under ``data_root()``.  A raw file sitting in the config tree WITHOUT a
+# ``.dvc`` sidecar used to be served by ``get_dataframe`` at step one of its
+# local -> DVC -> WB chain -- so a stray copy (433 of them, 1.31 GB, before the
+# GH #917 write-side fix) silently shadowed the DVC blob, and nothing said so.
+# Ruling (@ligon, 2026-10-18), option (b): REFUSE it unless the caller opts
+# in.  Two opt-ins, both explicit:
+#
+# * the acquisition flow -- ``data_access.add_wave`` / ``populate_and_push``,
+#   which extract into the config tree on purpose and then ``dvc add`` what
+#   landed -- runs inside :func:`allow_intree_sources`;
+# * ``LSMS_ALLOW_INTREE_SOURCES=1`` (also ``true`` / ``yes``), for a maintainer
+#   reading freshly prepared data before ``dvc add``.
+#
+# Exempt by construction, exactly as ``cli._intree_source_files`` classifies:
+# anything under a ``_/`` component (config by definition -- the tracked
+# lookup tables, e.g. ``Uganda/_/fct_usda.csv``), and anything outside the
+# config tree (scratch files, tmp dirs, the ``data_root()`` cache).  A file
+# WITH a sidecar never reaches this check: ``local_file`` refuses that
+# workspace copy and reads the DVC blob instead.  Measured on a clean clone:
+# no file is refused (the only sidecar-less, non-``_/`` data-like files are
+# two tracked ``GhanaAHIES/2023/Documentation/*.tsv`` that nothing reads).
+_ALLOW_INTREE_SOURCES = contextvars.ContextVar('lsms_allow_intree_sources',
+                                               default=False)
+
+
+class InTreeSourceError(RuntimeError):
+    """``get_dataframe`` refused a sidecar-less source inside the config tree
+    (GH #831).  Not a ``FileNotFoundError``: the file IS there, and a build
+    must stop and say so rather than degrade as if it were unavailable."""
+
+
+@contextmanager
+def allow_intree_sources():
+    """Let ``get_dataframe`` read sidecar-less sources inside
+    ``countries_root()`` for the duration (GH #831).  The acquisition flow's
+    opt-in; ``LSMS_ALLOW_INTREE_SOURCES=1`` is the session-wide one."""
+    token = _ALLOW_INTREE_SOURCES.set(True)
+    try:
+        yield
+    finally:
+        _ALLOW_INTREE_SOURCES.reset(token)
+
+
+def _intree_sources_allowed() -> bool:
+    if _ALLOW_INTREE_SOURCES.get():
+        return True
+    flag = os.environ.get('LSMS_ALLOW_INTREE_SOURCES', '')
+    return flag.strip().lower() in {'1', 'true', 'yes'}
+
+
+def _refuse_intree_source(fn) -> None:
+    """Raise :class:`InTreeSourceError` if *fn* is an existing file inside
+    the config tree, outside any ``_/`` directory, with no ``.dvc`` sidecar
+    -- unless the caller opted in (see the block comment above)."""
+    try:
+        p = Path(fn).resolve()
+        if not p.is_file() or (p.parent / f"{p.name}.dvc").exists():
+            return
+        rel = None
+        for root in dict.fromkeys((countries_root(), _COUNTRIES_DIR)):
+            try:
+                rel = p.relative_to(Path(root).resolve())
+                break
+            except ValueError:
+                continue
+    except OSError:
+        return
+    if rel is None or '_' in rel.parts[:-1] or _intree_sources_allowed():
+        return
+    raise InTreeSourceError(
+        f"{p} is a raw source inside the config tree ({countries_root()}) with "
+        f"no .dvc sidecar, so it is not the DVC-tracked file and would shadow "
+        f"the DVC blob (GH #831).  If it is new data awaiting `dvc add`, opt in "
+        f"with LSMS_ALLOW_INTREE_SOURCES=1 (or read it inside "
+        f"lsms_library.local_tools.allow_intree_sources()); if it is a stray "
+        f"copy, delete it (`lsms-library cache clear` lists them).")
 
 
 def _to_numeric(x,coerce=False):
@@ -991,6 +1078,19 @@ class DatLayoutError(ValueError):
     Raised rather than guessed at: both candidate parses (fixed-width and
     comma-delimited) fail silently on the wrong file, returning a
     plausibly-shaped frame full of garbage.
+    """
+
+
+class ParquetFormatError(ValueError):
+    """A ``.parquet``-suffixed file that is not a readable Parquet file (GH #1070).
+
+    Raised by ``get_dataframe`` rather than handing the file to the text
+    readers, as a ``.dta`` without a Stata header already is: ``read_csv``
+    turned a garbage cache parquet into an empty frame and a text one into
+    rows, which ``assume_cache_fresh`` then served as the table.  A
+    ``ValueError``, deliberately NOT a ``pyarrow`` ``ArrowInvalid``: whether a
+    cache gate rebuilds or raises on a corrupt parquet is GH #1071's decision,
+    so no ``except ArrowInvalid`` handler is silently widened to catch it.
     """
 
 
@@ -1328,6 +1428,189 @@ def _is_stata_dta(head: bytes) -> bool:
             and head[2] == 1)
 
 
+def _stata_release(head: bytes) -> int | None:
+    """The Stata format release a sniffed ``.dta`` head declares, or None.
+
+    Old format: the first byte.  XML format (117+): the digits inside
+    ``<release>...</release>``, which sits well inside ``_SNIFF_BYTES``.
+    """
+    if head.startswith(_STATA_XML_MAGIC):
+        m = re.search(rb'<release>(\d+)</release>', head)
+        return int(m.group(1)) if m else None
+    if head and head[0] in _STATA_OLD_RELEASES:
+        return head[0]
+    return None
+
+
+# cp1252 text read as latin-1 (GH #805).
+#
+# ``pandas.io.stata.StataReader`` decodes every ``.dta`` below format 118 as
+# latin-1, with no per-file override on ``get_dataframe``'s path (``from_dta``
+# has none).  Many of those files are Windows-1252: the EHCVM-1 2018-19
+# ``s01_me_*`` rosters write ``Frere, s<0x9C>ur`` (0x9C is the oe ligature in
+# cp1252), and latin-1 serves it as the C1 control U+009C.  latin-1 and cp1252
+# agree on every byte outside 0x80-0x9F, so re-decoding a string that carries
+# a C1 code point changes that string only, and a file without one is served
+# byte-identically.
+#
+# THE C1 SIGNATURE IS NECESSARY, NOT SUFFICIENT.  Measured over every held
+# ``.dta`` (4,911 blobs, 309 carrying a C1 code point in a value label or a
+# str column), three other things produce it, and cp1252 is wrong for each:
+#
+# * A UTF-8 double encoding: UTF-8 bytes read as latin-1, where the C1 code
+#   point is a UTF-8 continuation byte -- ``b\xc5\x93uf`` for ``bœuf``
+#   (Burkina 2018-19, Cambodia, Nigeria 2023-24, Tajikistan 2009).  Decoding
+#   0x93 as a cp1252 curly quote destroys the latin-1 -> UTF-8 round trip the
+#   ``_decode_mojibake`` hooks and the mojibake-keyed crosswalks depend on
+#   (``Senegal/_/CONTENTS.org``, "the ``u`` crosswalk is keyed on MOJIBAKE").
+#   A string whose latin-1 bytes are valid UTF-8 is therefore never a
+#   candidate, whatever else is in the file -- and nor is one TRUNCATED
+#   mid-sequence by the Stata string width: valid UTF-8 up to an incomplete
+#   final sequence, after at least one complete multibyte sequence (Nigeria
+#   2018-19 ``sect2_harvestw4`` label ``S2AQ10`` code 6, ``...\xe2\x80\x98O
+#   LEVEL\xe2\x80``, which the round trip alone admitted and decoded to
+#   ``â€˜O LEVELâ€``).  The broader test "a UTF-8 lead followed by a C1
+#   continuation byte, anywhere" was measured and rejected: cp866 lower-case
+#   Cyrillic is 0xE0-0xEF and upper-case 0x80-0x9F, so a mixed-case word
+#   (``\xe1\x80`` = сА) matches it, and dropping such strings from the
+#   candidate set flipped Kyrgyz 1996 ``ANTHFL96.DTA`` from refused to
+#   decoded.  The truncation test also excludes one cp866 string in that
+#   file (``è¢\x83ç`` = швГч, a valid three-byte sequence then a lone lead);
+#   the file stays refused on its 46 other candidates.
+# * A DOS code page.  Kyrgyz Republic 1996-98 and Kazakhstan 1996 are cp866
+#   Cyrillic (``\x8d\x85\x92`` = НЕТ); Albania 2002-05 is cp437/cp850
+#   (``KOR\x80E`` = KORÇE, and ``Albania/2004/_/cluster_features.py`` keys on
+#   that ``\x80``); Panama 1997 is cp850 (``dom\x82sticos``).  cp1252 would
+#   turn visible damage into plausible-looking damage (``KOR€E``,
+#   ``dom‚sticos``).
+#
+# So the decision is per FILE -- one file, one writer, one code page -- over
+# every candidate string in it (value labels as well as str columns).  A file
+# is re-decoded only if (a) no candidate contains one of the five bytes cp1252
+# leaves undefined (0x81 0x8D 0x8F 0x90 0x9D: a cp1252 writer cannot emit
+# them), and (b) no candidate puts a cp1252 SYMBOL between two letters --
+# ``€`` ``‚`` ``„`` ``…`` ``†`` ``‡`` ``ˆ`` ``‰`` ``•`` ``ƒ`` (DOS accented
+# letters land there) -- where the cp1252 LETTERS (Š Œ Ž š œ ž Ÿ) and the
+# apostrophes and dashes (’ ‘ – —) are word-internal in real text (``Men’s``,
+# ``Kruševac``, ``CAPENTRY—FURNITURE``).  (b) is a stated tolerance, not a
+# discovered boundary.  On the held corpus (a) and (b) together refuse
+# exactly the Albania / Panama / Kyrgyz / Kazakhstan files -- 58 of the 226
+# pre-118 files holding a candidate -- and nothing else; the other 168 are
+# re-decoded (census and its re-run tool: ``slurm_logs/gh805_cp1252/``).
+# A refused file is served exactly as before.
+#
+# Scope gates, both deliberate: only a format < 118 head (pandas chose latin-1
+# there; a format-118 file is UTF-8 and a C1 code point in it is damage
+# upstream of the file -- Mali 2017-18, GhanaSPS 2013-14), and only when the
+# caller passed no ``encoding=`` (a declared encoding is an explicit override,
+# and ``from_dta`` already applies it to value labels).
+_C1_RE = re.compile('[\x80-\x9f]')
+_CP1252_HOLES = frozenset('\x81\x8d\x8f\x90\x9d')
+_CP1252_C1 = {chr(b): bytes([b]).decode('cp1252')
+              for b in range(0x80, 0xa0) if chr(b) not in _CP1252_HOLES}
+_CP1252_TRANSLATION = str.maketrans(_CP1252_C1)
+#: cp1252 C1 decodes that are legitimately word-internal: the letters
+#: (ƒ excluded -- the florin sign, and a DOS ``â``) and apostrophes / dashes.
+_CP1252_WORD_INTERNAL = frozenset('ŠŒŽšœžŸ'
+                                  '’‘–—')
+
+
+def _cp1252_candidate(s) -> bool:
+    """True for a str carrying a C1 code point that is not a UTF-8 double
+    encoding -- intact, or truncated at the end of the string (see the block
+    comment) -- and is latin-1 encodable, i.e. came out of a latin-1 decode."""
+    if not isinstance(s, str) or not _C1_RE.search(s):
+        return False
+    try:
+        b = s.encode('latin-1')
+        b.decode('utf-8')
+    except UnicodeEncodeError:
+        return False
+    except UnicodeDecodeError as exc:
+        # Truncated double: valid UTF-8 up to an incomplete final sequence,
+        # with at least one complete multibyte sequence before the cut.
+        return not (exc.reason == 'unexpected end of data'
+                    and max(b[:exc.start], default=0) >= 0x80)
+    return False
+
+
+def _cp1252_plausible(s: str) -> bool:
+    """False when *s* holds a cp1252 hole byte, or a C1 code point whose cp1252
+    decode is a symbol sitting between two letters (see the block comment)."""
+    for i, ch in enumerate(s):
+        if ch in _CP1252_HOLES:
+            return False
+        decoded = _CP1252_C1.get(ch)
+        if decoded is None or decoded in _CP1252_WORD_INTERNAL:
+            continue
+        before = s[i - 1] if i else ' '
+        after = s[i + 1] if i + 1 < len(s) else ' '
+        if before.isalpha() and after.isalpha():
+            return False
+    return True
+
+
+def _cp1252_redecode_map(strings) -> dict[str, str]:
+    """``{latin-1 string: cp1252 string}`` for a file's *strings*, or ``{}``
+    when the file has no candidate or is refused as a whole (see above)."""
+    candidates = {s for s in strings if _cp1252_candidate(s)}
+    if not candidates or not all(_cp1252_plausible(s) for s in candidates):
+        return {}
+    return {s: s.translate(_CP1252_TRANSLATION) for s in candidates}
+
+
+def _redecode_cp1252(out, f):
+    """Re-decode the cp1252 strings of a pre-118 ``.dta`` read (GH #805).
+
+    *out* is what ``from_dta`` returned: a DataFrame (value labels already
+    substituted into their columns) or, under ``categories_only``, a
+    ``{var: {code: label}}`` dict.  *f* is the stream or path it was read
+    from; the file's full value-label table is re-read from it only when
+    *out* holds a candidate string, so a file without one costs a scan of its
+    string columns' distinct values and nothing more.  Returns *out*
+    unchanged, by identity, when nothing is re-decoded; never adds, drops or
+    reorders a row or a column, and keeps every dtype.
+    """
+    hit_cols = {}
+    if isinstance(out, dict):
+        found = {lab for labels in out.values() for lab in labels.values()
+                 if _cp1252_candidate(lab)}
+    else:
+        for c in out.columns:
+            if out[c].dtype == object or pd.api.types.is_string_dtype(out[c]):
+                hits = [v for v in out[c].unique() if _cp1252_candidate(v)]
+                if hits:
+                    hit_cols[c] = hits
+        found = {v for hits in hit_cols.values() for v in hits}
+    if not found:
+        return out
+
+    # The verdict is per file: add the labels nothing in *out* uses.
+    try:
+        if not isinstance(f, (str, Path)):
+            f.seek(0)
+        with pd.io.stata.StataReader(f) as reader:
+            labels = reader.value_labels()
+        found.update(lab for m in labels.values() for lab in m.values())
+    except (ValueError, struct.error, OSError):
+        pass
+    mapping = _cp1252_redecode_map(found)
+    if not mapping:
+        return out
+
+    if isinstance(out, dict):
+        return {var: {code: mapping.get(lab, lab) if isinstance(lab, str) else lab
+                      for code, lab in labels.items()}
+                for var, labels in out.items()}
+    out = out.copy(deep=False)
+    for c, hits in hit_cols.items():
+        col = out[c].copy()
+        hit = col.isin(hits)
+        col[hit] = col[hit].map(mapping)
+        out[c] = col
+    return out
+
+
 # SPSS and the text tail (GH #1002).  Two more admissions, same principle as
 # the Stata sniff: a reader is tried only on a file that claims its format.
 #
@@ -1420,9 +1703,11 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # tool, etc.), not a legitimate fast path.  Refuse to use it so
         # the read goes through the DVC cache (under ``data_root()``)
         # via ``file_system_path`` -> ``_ensure_dvc_pulled`` ->
-        # ``DVCFS.open``.  Files without a sister sidecar are fine
-        # (new data being prepped for ``dvc add``, user scratch data,
-        # WB-fallback downloads).
+        # ``DVCFS.open``.  Files without a sister sidecar are allowed
+        # OUTSIDE the config tree (user scratch data, WB-fallback
+        # downloads under ``data_root()``); inside ``countries_root()``
+        # they are refused unless opted in (GH #831,
+        # ``_refuse_intree_source``).
         if _is_polluted_workspace_copy(fn):
             warnings.warn(
                 f"Refusing workspace copy of DVC-tracked file {fn} "
@@ -1434,6 +1719,9 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 stacklevel=3,
             )
             return False
+        # GH #831: a sidecar-less source inside the config tree is refused
+        # (raises) unless the caller opted in.
+        _refuse_intree_source(fn)
         return True
     
     def file_system_path(fn):
@@ -1499,6 +1787,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         head = _sniff_head(f)
         if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
             raise ValueError(f'{fn} has a .dta suffix but no Stata header')
+        # GH #1070: likewise a ``.parquet``.  Its CSV fallback served a
+        # garbage cache parquet as an empty frame, and a text one as rows.
+        if Path(fn).suffix.lower() == '.parquet' and not head.startswith(b'PAR1'):
+            raise ParquetFormatError(f'{fn} has a .parquet suffix but no Parquet header')
 
         # SAS Transport (XPORT) -- Peru 1990 ``.SSP`` (GH #699).  Before the
         # SPSS attempt: ``pd.read_spss`` on a path raises ``ReadstatError``
@@ -1544,6 +1836,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         try:
             return pd.read_parquet(f, engine='pyarrow')
         except (ArrowInvalid,) as exc:
+            if Path(fn).suffix.lower() == '.parquet':
+                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
             failure = exc
 
         # Stata -- only when the header says so (GH #712).  Handed a file
@@ -1554,9 +1848,16 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         if _is_stata_dta(head):
             try:
                 f.seek(0)
-                return from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
+                out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
                 failure = exc
+            else:
+                # GH #805: pandas decoded this file as latin-1; re-decode its
+                # cp1252 strings (see the block comment above _C1_RE).
+                release = _stata_release(head)
+                if encoding is None and release is not None and release < 118:
+                    out = _redecode_cp1252(out, f)
+                return out
 
             try:
                 # pyreadstat handles older Stata formats that pandas StataReader cannot.
@@ -1706,6 +2007,10 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # Nepal and Armenia (WB ``SOURCE.org``, no microdata) pay it on
         # every cold read.
         local_path = _try_get_data_file(fn)
+        if local_path is not None:
+            # ``get_data_file`` answers from the config tree first (step 1),
+            # so the same GH #831 policy applies to what it hands back.
+            _refuse_intree_source(local_path)
         if local_path is None:
             raise FileNotFoundError(
                 errno.ENOENT,
@@ -1885,6 +2190,72 @@ class CategoricalMappingConflictError(RuntimeError):
     """
 
 
+# --------------------------------------------------------------------------
+# The KEY column of a categorical table (GH #928, P1)
+# --------------------------------------------------------------------------
+#
+# A table may NAME its key column with an org keyword line directly ABOVE
+# its ``#+name:`` line:
+#
+#     #+key: Original Label
+#     #+name: u
+#     | Original Label | Preferred Label | Code | ...
+#
+# Above, not below: Org attaches ``#+name:`` to the next element, so a
+# ``#+key:`` line between ``#+name:`` and the table would unname the table
+# in Emacs (see :func:`all_dfs_from_orgfile`).
+#
+# :func:`all_dfs_from_orgfile` records the declaration on the parsed frame as
+# ``df.attrs[CATEGORICAL_KEY_ATTR]``; ``country._categorical_key_column`` is
+# the one resolver every read-time caller asks.  Optional: an undeclared table
+# keys on its first column that is not reserved, exactly as before.
+
+#: ``df.attrs`` slot holding a table's declared ``#+key:`` column.
+CATEGORICAL_KEY_ATTR = 'categorical_key'
+
+#: Columns that are never a categorical table's KEY -- neither by declaration
+#: nor by position.  ``Preferred Label`` is the canonical VALUE column;
+#: ``Status`` and ``Notes`` are reserved for curation metadata (GH #928 P3),
+#: so adding either column to a table re-keys nothing.
+CATEGORICAL_RESERVED_COLUMNS = frozenset({'Preferred Label', 'Status', 'Notes'})
+
+_ORG_KEY_KEYWORD = '#+key:'
+
+
+class CategoricalKeyDeclarationError(RuntimeError):
+    """A ``#+key:`` line that cannot be honoured (GH #928).
+
+    Raised at PARSE time, naming the file and table: a key naming no column,
+    a reserved column, a second ``#+key:`` for one table, a ``#+key:`` line
+    BELOW its ``#+name:`` (it unnames the table in Org), or a ``#+key:`` line
+    not attached to any ``#+name:``.  A ``RuntimeError`` for the same reason
+    as :class:`CategoricalMappingConflictError`: ``load_categorical_level``
+    skips a global file that raises ``ValueError``, and the cascade treats a
+    ``KeyError`` as "not at this rung" -- either would turn a mistyped
+    declaration into a silently re-keyed table.
+    """
+
+
+class EmptyCategoricalTableError(RuntimeError):
+    """A level DECLARES a categorical table but it has no data rows (GH #1036).
+
+    ``#+name: foo`` followed by a header only (or by no table at all) used to
+    be indistinguishable from a level that never mentions ``foo``:
+    ``df_data_grabber`` raises ``KeyError`` for a zero-row table, the cascade
+    caught it as "not at this rung", and resolution continued -- to the
+    country's table, or to the cross-country one.  The caller got a table the
+    level it declared ``foo`` in had overridden, with no signal: the #674
+    class of silent resolution, breaking #953's whole-table override.
+
+    A ``RuntimeError`` and NOT a ``KeyError`` / ``ValueError`` / ``LookupError``,
+    for the same reason as :class:`CategoricalMappingConflictError`: the rung
+    loops of :func:`get_categorical_mapping` and :func:`code_label_map` catch
+    those as "absent here", and this error must escape them.  An empty table
+    is a declaration the author must finish (fill the table) or retract
+    (delete the ``#+name:`` line, which inherits the lower level's table).
+    """
+
+
 def global_categorical_level() -> Path:
     """The cross-country level: the package root, whose
     ``categorical_mapping/`` directory holds the shared tables."""
@@ -1983,6 +2354,61 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
     return out
 
 
+def _raise_if_declared_empty(path: str | Path, tablename: str, rung: str,
+                             later_rungs: list[str], levels: bool, fn: str,
+                             cause: BaseException,
+                             encoding: str | None = None) -> None:
+    """Raise :class:`EmptyCategoricalTableError` if *path* declares
+    *tablename* and the table has zero data rows (GH #1036); else return.
+
+    Called only on the error path of a rung (``df_data_grabber`` raised), so
+    a successful resolution reads nothing extra.  Emptiness is judged by
+    re-reading with :func:`df_from_orgfile` -- the parser whose zero-row frame
+    made ``df_data_grabber`` raise -- so the two cannot drift.  That parser
+    raises ``IndexError`` instead when the declaration runs into end-of-file
+    (a ``#+name:`` or header line that is the file's last line); every such
+    path has read no data row, so it counts as empty too.  A declared table
+    WITH rows that merely lacks the requested column is left to the caller's
+    loop, unchanged.
+    """
+    p = Path(path)
+    try:
+        if not p.is_file() or not _org_declares_table(p, tablename):
+            return
+    except (OSError, UnicodeDecodeError):
+        return                          # cannot judge: leave the caller's path
+    try:
+        nrows = df_from_orgfile(p, name=tablename, encoding=encoding).shape[0]
+    except IndexError:
+        nrows = 0
+    if nrows != 0:
+        return
+    # Name what the empty table would have let through (declaration scan
+    # only -- nothing lower is parsed).
+    shadowed = None
+    for d in later_rungs:
+        try:
+            if levels:
+                hit = categorical_level_table_file(d, tablename)
+            else:
+                cand = Path(d) / fn
+                hit = cand if cand.is_file() and _org_declares_table(cand, tablename) else None
+        except (OSError, UnicodeDecodeError, CategoricalMappingConflictError):
+            continue
+        if hit is not None:
+            shadowed = hit
+            break
+    before = (f"it would have resolved silently from {shadowed}"
+              if shadowed is not None
+              else "it would have been reported as absent")
+    raise EmptyCategoricalTableError(
+        f"Categorical table {tablename!r} is declared in {p} (level {rung}) "
+        f"but has no data rows.  Until GH #1036 an empty table fell through "
+        f"to the next level as if undeclared -- here {before}.  Fill the "
+        f"table, or delete its '#+name: {tablename}' line to inherit the "
+        f"lower level's table.") from cause
+
+
 # ``df_data_grabber``'s own keyword options.  Every OTHER keyword reaching it
 # names a value column (a myvar); see get_categorical_mapping (GH #674).
 _GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
@@ -2009,6 +2435,16 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     - override is **whole-table**.  The first rung that HAS ``foo`` supplies
       ALL of it.  A country wanting one local row of ``foo`` must re-list
       every other row; it cannot declare ``foo`` partially.
+
+    **A declared EMPTY table is not an absent one** (GH #1036).  A rung that
+    declares ``#+name: foo`` but gives it no data rows (header only, or no
+    table at all) raises :class:`EmptyCategoricalTableError` -- a
+    ``RuntimeError``, so the rung loop does not catch it -- instead of
+    falling through to a lower level, which would hand the caller the very
+    table that level's declaration overrides.  To inherit, delete the
+    ``#+name:`` line; to disable a mapping, say so in code.  (A declared,
+    NON-empty table that lacks the requested value column still raises
+    ``KeyError`` and falls through; that is unchanged.)
 
     **A rung is a LEVEL, and a level has two spellings** (GH #953).  At each
     directory ``d`` in ``dirs`` the table is looked for in
@@ -2037,6 +2473,11 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
 
     Only the default ``fn`` has levels.  An explicit ``fn`` (none of the
     callers passes one) keeps the original single-file-per-rung behaviour.
+
+    **The key is ``idxvars``, never a table's ``#+key:``** (GH #928).  A
+    ``#+key:`` declaration is read by ``country._categorical_key_column``, the
+    resolver behind the read-time callers; this cascade keys on what its
+    caller names (default ``'Code'``), as it always has.
 
     ``tests/test_categorical_mapping_resolution.py`` pins all of the above.
 
@@ -2088,7 +2529,7 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
     exc: Exception = FileNotFoundError(f"no rungs to search: {dirs}")
-    for d in rungs:
+    for k, d in enumerate(rungs):
         try:
             if d[-1]!="/": d+='/'
             if levels:
@@ -2097,7 +2538,17 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
                     raise KeyError(f'No table {tablename} at level {d}.')
             else:
                 path = d+fn
-            df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
+            try:
+                df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
+            except (KeyError, IndexError) as error:
+                # A DECLARED zero-row table is not an absent one (GH #1036):
+                # raise past this loop's KeyError handler instead of falling
+                # through to a lower level.  Anything else re-raises as before.
+                if tablename is not None:
+                    _raise_if_declared_empty(path, tablename, d, rungs[k+1:],
+                                             levels, fn, error,
+                                             encoding=kwargs.get('encoding'))
+                raise
             # Columns only: a one-row table must stay a Series/frame, not
             # collapse to a scalar (GH #674).
             df = df.squeeze(axis=1)
@@ -2143,14 +2594,17 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
     each numeric code, so a caller cannot get this wrong.  Non-numeric codes
     (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
 
-    Returns ``{}`` if no level in *dirs* carries the table -- callers that
-    need to distinguish "absent" from "empty" should check the directories
-    first.  Levels are resolved exactly as in :func:`get_categorical_mapping`:
-    file or ``categorical_mapping/`` directory, the cross-country level
-    appended last, a within-level duplicate raising.
+    Returns ``{}`` if no level in *dirs* carries the table.  A level that
+    DECLARES the table with zero data rows is not "absent": it raises
+    :class:`EmptyCategoricalTableError` rather than falling through or
+    returning ``{}`` (GH #1036).  Levels are resolved exactly as in
+    :func:`get_categorical_mapping`: file or ``categorical_mapping/``
+    directory, the cross-country level appended last, a within-level
+    duplicate raising.
     """
     levels = fn == CATEGORICAL_MAPPING_FILE
-    for d in (_categorical_rungs(dirs) if levels else dirs):
+    rungs = _categorical_rungs(dirs) if levels else list(dirs)
+    for k, d in enumerate(rungs):
         if not d.endswith('/'):
             d += '/'
         try:
@@ -2162,8 +2616,16 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
                     continue
             else:
                 path = d + fn
-            df = df_data_grabber(path, idxvars, orgtbl=tablename,
-                                 **{value: value})
+            try:
+                df = df_data_grabber(path, idxvars, orgtbl=tablename,
+                                     **{value: value})
+            except (KeyError, IndexError) as error:
+                # GH #1036: a declared zero-row table raises
+                # EmptyCategoricalTableError (a RuntimeError, so the handler
+                # below does not swallow it) rather than falling through.
+                _raise_if_declared_empty(path, tablename, d, rungs[k+1:],
+                                         levels, fn, error)
+                raise
         except (FileNotFoundError, KeyError, ValueError):
             continue
         out: dict[Any, Any] = {}
@@ -2437,6 +2899,14 @@ _GRAIN_AUDIT_KEY = b"lsms_grain_audit"
 # and reintroduce the rebuild loop in a narrower case.
 _CACHE_WAVES_KEY = b"lsms_cache_waves"
 
+# GH #1045.  Schema-metadata key under which the build-time DATE-PARSE report
+# (``datetime_parse.parse_datetime``) is embedded, beside the grain audit and by
+# the same argument: the parse runs once, at the cold build, so without the
+# stamp a warm read -- practically every read -- would never hear about a
+# sentinel, an out-of-range component or an ambiguous day/month order (#323's
+# lesson).  Replayed by ``datetime_parse.replay_datetime_audit``.
+_DATETIME_AUDIT_KEY = b"lsms_datetime_audit"
+
 # GH #675.  Schema-metadata key under which a build records the ``dfs:``
 # sub-frames it DROPPED (the GH #515 fallback), alongside the content hash and
 # by the same argument (rotates atomically with the data; cannot desync;
@@ -2611,6 +3081,25 @@ def read_parquet_grain_audit(path: str | Path) -> list[dict] | None:
     return reports if isinstance(reports, list) else None
 
 
+def read_parquet_datetime_audit(path: str | Path) -> list[dict] | None:
+    """Return the date-parse report embedded in an L2 parquet (GH #1045), or
+    ``None`` when it carries none.  Footer-only read (~1 ms), like
+    :func:`read_parquet_grain_audit`."""
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata
+    except Exception:
+        return None
+    raw = (md or {}).get(_DATETIME_AUDIT_KEY)
+    if raw is None:
+        return None
+    try:
+        reports = json.loads(raw.decode() if isinstance(raw, (bytes, bytearray)) else raw)
+    except (ValueError, TypeError):
+        return None
+    return reports if isinstance(reports, list) else None
+
+
 def read_parquet_cache_waves(path: str | Path) -> list[str] | None:
     """Return the wave-coverage manifest embedded in an L2-country parquet
     (GH #891), or ``None`` when the parquet carries no stamp (written by a
@@ -2733,7 +3222,7 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         return False
 
 
-def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, build_drops: list[dict] | None = None) -> pd.DataFrame:
+def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_path: bool = False, cache_hash: str | None = None, grain_audit: list[dict] | None = None, cache_waves: list[str] | None = None, datetime_audit: list[dict] | None = None, build_drops: list[dict] | None = None) -> pd.DataFrame:
     """
     Write df to parquet file fn.
 
@@ -2768,6 +3257,12 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         from, which is what lets a later request for a subset of them be
         served from this file instead of rebuilding.  See
         :func:`read_parquet_cache_waves`.
+    datetime_audit : list[dict] | None, default None
+        If given, embed this date-parse report under ``lsms_datetime_audit``
+        (GH #1045).  A wave SCRIPT passes
+        ``datetime_reports(country, table)`` here: it runs in a ``make``
+        subprocess, so the stamp it writes is the only way its report reaches
+        the parent and every later warm read.
     build_drops : list[dict] | None, default None
         If given, embed the ``dfs:`` sub-frames this build DROPPED under
         ``lsms_build_drops`` (GH #675), so a warm read can tell a degraded
@@ -2821,7 +3316,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves or build_drops:
+    if cache_hash is not None or grain_audit or cache_waves or datetime_audit or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -2836,6 +3331,9 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
+        if datetime_audit:
+            # GH #1045: the build-time date-parse report rides with the data.
+            md[_DATETIME_AUDIT_KEY] = json.dumps(datetime_audit, default=str).encode()
         if build_drops:
             # GH #675: carry what the build could NOT read with what it wrote.
             md[_BUILD_DROPS_KEY] = json.dumps(build_drops, default=str).encode()
@@ -3685,20 +4183,45 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
     
     Returns:
         dict: {table_name: DataFrame}
+
+    A ``#+key: <column>`` line in the run of ``#+`` lines directly ABOVE a
+    table's ``#+name:`` declares that table's key column (GH #928); it is
+    recorded as ``df.attrs[CATEGORICAL_KEY_ATTR]`` and validated here, so a
+    mistake raises :class:`CategoricalKeyDeclarationError` naming the file
+    and table.  Every other ``#+`` line is skipped, as before.
+
+    **Above, never below** ``#+name:``.  Org attaches ``#+name:`` to the
+    element that FOLLOWS it, and ``#+key:`` is not an Org affiliated keyword,
+    so a ``#+key:`` line between ``#+name:`` and the table becomes that
+    element: measured with Emacs 29.1 (``org-element``), the table is left
+    unnamed and ``org-babel-ref-resolve`` reports "Reference not found".
+    Above ``#+name:`` the table keeps its name.  The below-placement is
+    therefore refused rather than ignored.
     """
     with open(orgfn, 'r', encoding=encoding) as f:
         contents = f.readlines()
 
     tables = {}
+    # (column, 1-based line) of a #+key: still waiting for its #+name:
+    pending = None
     i = 0
     while i < len(contents):
         line = contents[i].strip()
-        
+
         if line.lower().startswith('#+name:'):
             table_name = line.split(':', 1)[1].strip()
+            key = pending[0] if pending is not None else None
+            pending = None
             i += 1
             # Skip any extra #+ lines
             while i < len(contents) and contents[i].strip().startswith('#+'):
+                if contents[i].strip().lower().startswith(_ORG_KEY_KEYWORD):
+                    raise CategoricalKeyDeclarationError(
+                        f"{orgfn}:{i + 1}: the #+key: for table "
+                        f"{table_name!r} sits BELOW its #+name: line.  Put it "
+                        f"on the line above #+name: -- Org attaches #+name: "
+                        f"to the next element, so a #+key: line between them "
+                        f"unnames the table (Babel :var cannot find it).")
                 i += 1
             
             # Start reading table
@@ -3725,8 +4248,41 @@ def all_dfs_from_orgfile(orgfn: str | Path, set_columns: bool = True, to_numeric
             if to_numeric:
                 df = df.apply(_to_numeric)
 
+            if key is not None and set_columns:
+                if not key or not header or key not in header:
+                    raise CategoricalKeyDeclarationError(
+                        f"Table {table_name!r} in {orgfn} declares "
+                        f"#+key: {key!r}, which is not one of its columns "
+                        f"{header}.")
+                if key in CATEGORICAL_RESERVED_COLUMNS:
+                    raise CategoricalKeyDeclarationError(
+                        f"Table {table_name!r} in {orgfn} declares "
+                        f"#+key: {key!r}, a reserved column "
+                        f"({sorted(CATEGORICAL_RESERVED_COLUMNS)}) that is "
+                        f"never a key.")
+                # Last, so no frame operation above can drop it.
+                df.attrs[CATEGORICAL_KEY_ATTR] = key
+
             tables[table_name] = df
+        elif line.lower().startswith(_ORG_KEY_KEYWORD):
+            value = line.split(':', 1)[1].strip()
+            if pending is not None:
+                raise CategoricalKeyDeclarationError(
+                    f"{orgfn}:{i + 1}: two #+key: lines above one #+name: "
+                    f"({pending[0]!r} at line {pending[1]}, then {value!r}).")
+            pending = (value, i + 1)
+            i += 1
         else:
+            if pending is not None and not line.startswith('#+'):
+                raise CategoricalKeyDeclarationError(
+                    f"{orgfn}:{pending[1]}: #+key: {pending[0]!r} is not "
+                    f"attached to a table; it must sit in the run of #+ lines "
+                    f"directly above a #+name: line, with nothing else "
+                    f"between.")
             i += 1
 
+    if pending is not None:
+        raise CategoricalKeyDeclarationError(
+            f"{orgfn}:{pending[1]}: #+key: {pending[0]!r} is not attached to "
+            f"a table (no #+name: follows it).")
     return tables

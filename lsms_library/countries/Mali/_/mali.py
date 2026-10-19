@@ -75,17 +75,10 @@ def MonthsSpent(value):
         return pd.NA
     return min(max(n, 0), 12)
 
-def Int_t(value):
-    '''
-    Formatting interview date
-    '''
-    if pd.isna(value) or value == 'Manquant':
-        return pd.NA
-    else:
-        return pd.to_datetime(value, errors='coerce').date()
-def interview_date(df):
-    df['Int_t'] = pd.to_datetime(df['Int_t'])
-    return df
+# GH #1045: the country-level ``Int_t`` formatter and ``interview_date(df)``
+# hook are gone -- every wave declares a ``datetime:`` spec for Int_t in its
+# data_info.yml and the framework parses it at build time
+# (lsms_library.datetime_parse).
 
 
 # ---------------------------------------------------------------------------
