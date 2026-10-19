@@ -13,6 +13,7 @@ from typing import List, Optional, Sequence
 import typer
 import yaml
 
+from .catalog import _is_registered
 from .country import Country, _log_issue
 from .local_tools import _is_polluted_workspace_copy, to_parquet
 from .paths import countries_root
@@ -233,6 +234,13 @@ def _collect_dvc_status(target: str, cwd: Path) -> dict:
 
 
 def _available_country_dirs() -> List[str]:
+    """Every non-hidden directory under the config root, registered or not.
+
+    The tree-maintenance set (``cache clear --all``, ``refresh-dvc-locks``):
+    staged directories with no ``_/data_scheme.yml`` still hold files those
+    commands must see.  Commands that list or load COUNTRIES use
+    :func:`_registered_country_dirs` instead (GH #915).
+    """
     country_dirs_root = _countries_root()
     names = [
         path.name
@@ -240,6 +248,27 @@ def _available_country_dirs() -> List[str]:
         if path.is_dir() and not path.name.startswith(".")
     ]
     return sorted(names)
+
+
+def _registered_country_dirs() -> List[str]:
+    """The names ``Country()`` accepts: ``lsms_library.countries()``, read
+    from this CLI's root through the same predicate (GH #915)."""
+    root = _countries_root()
+    entries = os.listdir(root)
+    return sorted(n for n in entries if _is_registered(root, n, entries))
+
+
+def _country_or_exit(name: str, **kwargs) -> Country:
+    """``Country(name, preload_panel_ids=False, **kwargs)`` for a ``--country``
+    option, or the refusal printed to stderr and exit 1 -- the message, not a
+    traceback.  Catches what ``Country()`` raises for a name it does not accept
+    (no such country, an unregistered directory, path traversal: all
+    ``ValueError``, GH #915); nothing past construction is guarded."""
+    try:
+        return Country(name, preload_panel_ids=False, **kwargs)
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1)
 
 
 def _print_list(items: Sequence[str], as_csv: bool) -> None:
@@ -302,10 +331,15 @@ def cache_list(
     country: Optional[str] = typer.Option(None, "--country", help="Country name to inspect."),
 ) -> None:
     """List cached datasets."""
-    countries = [country] if country else _available_country_dirs()
-    countries = [c for c in countries if (_countries_root() / c).exists()]
-    for name in countries:
-        country_obj = Country(name, preload_panel_ids=False)
+    if country:
+        # One directory's cache is maintenance, like `cache clear --country`:
+        # a staged directory with no _/data_scheme.yml is listed (GH #915).
+        country_objs = [_country_or_exit(country, allow_unregistered=True)]
+    else:
+        country_objs = (Country(name, preload_panel_ids=False)
+                        for name in _registered_country_dirs())
+    for country_obj in country_objs:
+        name = country_obj.name
         datasets = country_obj.cached_datasets()
         if datasets:
             print(f"{name}: {', '.join(sorted(datasets))}")
@@ -359,7 +393,9 @@ def cache_clear(
 
     any_output = False
     for name in target_countries:
-        country_obj = Country(name, preload_panel_ids=False)
+        # Cache maintenance walks the whole tree, staged dirs included, so its
+        # in-tree reports below still cover them: the scaffold opt-in (GH #915).
+        country_obj = Country(name, preload_panel_ids=False, allow_unregistered=True)
         methods = list(dict.fromkeys(method)) if method else None
         files = country_obj.clear_cache(methods=methods, waves=wave or None, dry_run=dry_run)
         if files:
@@ -758,9 +794,9 @@ def refresh_dvc_locks(
 
 @app.command()
 def countries(as_csv: bool = typer.Option(False, "--as-csv", help="Emit comma-separated list.")) -> None:
-    """List supported countries."""
+    """List supported countries (``lsms_library.countries()``)."""
 
-    _print_list(_available_country_dirs(), as_csv)
+    _print_list(_registered_country_dirs(), as_csv)
 
 
 @app.command()
@@ -786,12 +822,12 @@ def waves(
 
     if all_countries:
         pairs = []
-        for name in _available_country_dirs():
+        for name in _registered_country_dirs():
             waves = Country(name, preload_panel_ids=False).waves
             pairs.extend(f"{name},{wave}" for wave in waves)
         _print_list(pairs, as_csv)
     else:
-        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        country_obj = _country_or_exit(country)  # type: ignore[arg-type]
         _print_list(country_obj.waves, as_csv)
 
 
@@ -818,14 +854,14 @@ def tables(
 
     if all_countries:
         pairs = []
-        for name in _available_country_dirs():
+        for name in _registered_country_dirs():
             tables = Country(name, preload_panel_ids=False).data_scheme
             if not tables:
                 _log_issue(name, "tables", None, ValueError("No tables defined in data scheme"))
             pairs.extend(f"{name},{table}" for table in tables)
         _print_list(pairs, as_csv)
     else:
-        country_obj = Country(country, preload_panel_ids=False)  # type: ignore[arg-type]
+        country_obj = _country_or_exit(country)  # type: ignore[arg-type]
         tables = country_obj.data_scheme
         if not tables:
             _log_issue(country, "tables", None, ValueError("No tables defined in data scheme"))

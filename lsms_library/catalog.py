@@ -12,31 +12,74 @@ optionally filterable by the other axis.
 """
 from __future__ import annotations
 
+import os
 from functools import lru_cache
+from pathlib import Path
 
 from .paths import countries_root
 from .yaml_utils import load_yaml
+
+
+def _is_country_entry(root: Path, name, entries=None) -> bool:
+    """Is *name* a non-hidden directory entry directly under *root*?
+
+    The set ``Country(name, allow_unregistered=True)`` accepts.  Exact by
+    construction: *name* must be a single path component that appears
+    verbatim in ``os.listdir(root)``, so ``'Uganda/2019-20'``, ``'./Uganda'``,
+    ``'Uganda/'`` and -- on a case-insensitive filesystem -- ``'uganda'`` are
+    not entries even though a directory resolves for each.  *entries* is
+    ``os.listdir(root)`` when the caller already holds it.
+    """
+    if not isinstance(name, str) or not name or name.startswith("."):
+        return False
+    if Path(name).name != name:
+        return False
+    if entries is None:
+        try:
+            entries = os.listdir(root)
+        except OSError:
+            return False
+    return name in entries and (root / name).is_dir()
+
+
+def _has_data_scheme(root: Path, name: str) -> bool:
+    """Does country entry *name* carry a ``_/data_scheme.yml``?"""
+    return (root / name / "_" / "data_scheme.yml").exists()
+
+
+def _is_registered(root: Path, name, entries=None) -> bool:
+    """THE registration predicate (GH #915): a country entry under *root*
+    whose directory carries a ``_/data_scheme.yml``.
+
+    One composition, so the two readings cannot drift: :func:`_country_dirs`
+    (hence :func:`countries`) lists exactly the names it admits, and
+    :class:`lsms_library.Country` applies the same two halves in turn --
+    :func:`_is_country_entry`, then :func:`_has_data_scheme` unless the caller
+    opts in with ``allow_unregistered=True``.
+    """
+    return _is_country_entry(root, name, entries) and _has_data_scheme(root, name)
 
 
 @lru_cache(maxsize=1)
 def _country_dirs() -> tuple[str, ...]:
     """Country directory names that carry a ``_/data_scheme.yml``.
 
-    This is the REGISTERED list -- what :func:`countries` returns and what
-    :class:`lsms_library.Country` suggests near misses from.  It is narrower
-    than what ``Country()`` accepts: the constructor raises ``ValueError``
-    for a name with no directory at all, but still constructs for a directory
-    that lacks ``_/data_scheme.yml`` (staged data never wired up; GH #915).
-    Uses ``pathlib`` (not shell globbing) so multi-word names like
-    ``"South Africa"`` survive intact.
+    This is the REGISTERED list -- what :func:`countries` returns, what
+    :class:`lsms_library.Country` suggests near misses from, and exactly the
+    set of names ``Country()`` accepts (GH #915, @ligon 2026-10-18): both read
+    :func:`_is_registered`.  A directory without ``_/data_scheme.yml`` (staged
+    microdata never wired up) is refused with
+    :class:`~lsms_library.errors.UnregisteredCountryError` unless the caller
+    passes ``allow_unregistered=True``.  Uses ``pathlib`` (not shell globbing)
+    so multi-word names like ``"South Africa"`` survive intact.
+
+    Cached for the process; call ``_country_dirs.cache_clear()`` after
+    changing ``countries_root()`` (e.g. in tests).  ``Country()`` itself
+    checks the filesystem, not this cache.
     """
-    out: list[str] = []
-    for p in sorted(countries_root().iterdir()):
-        if not p.is_dir() or p.name.startswith("."):
-            continue
-        if (p / "_" / "data_scheme.yml").exists():
-            out.append(p.name)
-    return tuple(out)
+    root = countries_root()
+    entries = os.listdir(root)
+    return tuple(n for n in sorted(entries) if _is_registered(root, n, entries))
 
 
 def _declared_tables(country: str) -> set[str]:
@@ -76,10 +119,13 @@ def countries(feature: str | None = None) -> list[str]:
     """List the REGISTERED country names: directories under the config root
     that carry a ``_/data_scheme.yml``.
 
-    Every name listed is accepted by :class:`lsms_library.Country`, and a name
-    with no directory raises ``ValueError`` there with the near misses from
-    this list.  The converse does not hold today: a directory without a
-    ``_/data_scheme.yml`` is omitted here but still constructs (GH #915).
+    This is exactly the set of names :class:`lsms_library.Country` accepts
+    (GH #915).  A name with no directory raises ``ValueError`` there, with the
+    near misses from this list; a directory that exists but has no
+    ``_/data_scheme.yml`` raises
+    :class:`~lsms_library.errors.UnregisteredCountryError` (a ``ValueError``)
+    -- unless the caller passes ``allow_unregistered=True``, the documented
+    opt-in for acquisition / scaffold code working on a directory being built.
 
     Parameters
     ----------

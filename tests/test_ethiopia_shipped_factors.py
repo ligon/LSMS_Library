@@ -42,6 +42,27 @@ from lsms_library.transformations import (
     yield_kg,
 )
 
+#: The EXTERNAL answer key for Ethiopia's quintal, stated here as a literal and
+#: read from nowhere in the library (GH #931, @ligon 2026-10-18).  The quintal
+#: Ethiopia uses is the metric quintal (the centner): 100 kg.  Sources:
+#:
+#: * the unit's definition -- the metric quintal is 100 kg, and it is the unit
+#:   in which Ethiopian grain production and grain prices are quoted
+#:   (https://en.wikipedia.org/wiki/Quintal, metric quintal and its present
+#:   use in Ethiopia; contrast the Spanish/Central American quintal of 100 lb,
+#:   the reason GH #919 moved the quintal out of KNOWN_METRIC);
+#: * the survey's own published report, independent of both the WB factor
+#:   file and our ``u.org``: CSA & World Bank, *Ethiopia Socioeconomic Survey
+#:   (ESS) 2015/2016, Survey Report* (``Ethiopia/2015-16/Documentation/
+#:   9331_ethiopia_survey_report_web_final.pdf``, the self-reported-yield
+#:   paragraph beside Table 4.6), which states each yield in both units:
+#:   "wheat yields were 1,403 kilograms or 14 quintals per hectare, sorghum
+#:   yields were 833 kilograms or 8.4 quintals ..., barley yields were 1,012
+#:   kilograms or 10.1 quintals ..., and teff yields were 650 kilograms or 6.5
+#:   quintals" -- 100.2 / 99.2 / 100.2 / 100.0 kg per quintal to the report's
+#:   own rounding (maize, "1,760 kilograms or 17.8 quintals", is 98.9).
+QUINTAL_KG = 100.0
+
 
 @pytest.fixture(scope="module")
 def ethiopia():
@@ -308,6 +329,26 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     Measured 2026-09-09 on a cold isolated build.  Update these numbers in the
     same PR as any deliberate change; do not loosen the assertions.
 
+    2026-10-19, GH #931 -- NUMBERS MOVED, deliberately (@ligon ruling
+    2026-10-18: ``harvest_kg_factors`` reads the declared ``u_kg``).  The
+    library now holds an opinion on ``Quintal`` -- 100 kg, from the global
+    ``u_kg`` table, stamped on this frame as ``attrs['unit_kg']`` -- so the
+    13,977 Quintal rows leave ``none`` for ``metric`` in the ``before`` split
+    (``metric`` 26,548 -> 40,525, ``none`` 58,971 -> 44,994, ``declared``
+    13,977).  In the ``after`` split ``shipped`` still OUTRANKS ``metric``, so
+    13,924 of them stay ``shipped`` at the WB's 100.0; the other 53 -- Quintal
+    rows whose (crop, unit) cell the WB table lacks, 31 in 2018-19 and 22 in
+    2021-22 -- move ``none`` -> ``metric`` (``metric`` 7,768 -> 7,821,
+    ``none`` 15,046 -> 14,993).  Totals: ``before`` 1,905,712.51 ->
+    8,799,669.51 kg, ``after`` 12,685,707.32 -> 12,696,657.32 kg (+10,950,
+    the 53 rows), so the after/before ratio falls 6.657 -> 1.443: most of what
+    the shipped table used to ADD was the quintal, which the library now
+    converts on its own.  The old ``> 6 *`` assertion is replaced by the
+    pinned totals and ratio, not loosened.  2011-12 carries NO Quintal row, so
+    W1 is untouched in both splits.  And with the declaration switched off
+    (``unit_kg={}``) every pre-#931 number below is reproduced exactly --
+    pinned, so the move is provably the declared layer and nothing else.
+
     2026-09-14, GH #919: the ``before`` split moves by ONE row AGAIN,
     26,547 -> 26,548 ``inferred`` and 58,972 -> 58,971 ``none`` -- the same
     mechanism as the #850 note below, for the same reason.  ``f7c1eb380``
@@ -320,8 +361,10 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     the metric centner (100 kg) in Ethiopia, 100 *pounds* (45.36 kg) in Central
     America -- and it moved 13,977 rows off the ``shipped`` rung onto
     ``metric``, taking with them the one non-tautological external check this
-    file has (see ``test_quintal_is_exactly_100kg_on_every_newly_served_row``
-    and ``Ethiopia/_/CONTENTS.org``).  ``quintal`` now lives in
+    file had (then ``test_quintal_is_exactly_100kg_on_every_newly_served_row``,
+    re-expressed under GH #931 as
+    ``test_shipped_quintal_matches_the_external_answer_key``; see
+    ``Ethiopia/_/CONTENTS.org``).  ``quintal`` now lives in
     ``categorical_mapping/u.org``'s ``u_kg`` table, where a country can
     override it; Ethiopia inherits 100 kg from the global default, the shipped
     rung reclaims its rows, and the newly-served count returns to 43,384.
@@ -360,12 +403,17 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     # Ethiopia asks NO per-row conversion factor, so `reported` is
     # structurally empty and `reported_vs_shipped` can never be populated.
     assert "KgFactor" not in cp.columns
+    # GH #931: the declaration the crop ladder now reads by default.
+    assert cp.attrs["unit_kg"] == {"Ethiopia": {"quintal": QUINTAL_KG}}
 
+    shipped = _load(ethiopia)
     before = harvest_kg(cp)
-    after = harvest_kg(cp, shipped_factors=_load(ethiopia))
+    after = harvest_kg(cp, shipped_factors=shipped)
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
+    assert before.attrs["kg_factor_declared_from"] == "attrs"
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["metric"] == 26_548 and b["none"] == 58_971
+    assert b["metric"] == 40_525 and b["none"] == 44_994
+    assert b["declared"] == a["declared"] == 13_977
     # 2026-09-18, GH #832: `shipped` / `shipped_matched` 62,164 -> 62,705 and
     # `none` 15,587 -> 15,046, both by the SAME 541 rows.  Those are 2015-16
     # Zorba/Akara harvest rows whose unit label carried the double-encoded
@@ -377,7 +425,7 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     # 12,680,617.28 -> 12,685,707.32; the ratio asserted below rises
     # 6.654 -> 6.657, so `> 6 *` still holds as written.
     assert a["shipped"] == 62_705 and a["shipped_matched"] == 62_705
-    assert a["metric"] == 7_768 and a["none"] == 15_046
+    assert a["metric"] == 7_821 and a["none"] == 14_993
     # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
     # as its own assertion rather than folded into the counts above: if the
     # price-ratio inference ever starts serving this country, that is a fact
@@ -386,58 +434,115 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     assert a["shipped_implausible"] == 0
     assert sum(a[k] for k in ("reported", "shipped", "survey_median",
                               "metric", "inferred", "none")) == len(cp)
-    # 2011-12 ships no factor file and must be UNTOUCHED.
+    # 2011-12 ships no factor file and must be UNTOUCHED -- and, carrying no
+    # Quintal row, it is untouched by GH #931 as well.
     bt = before.groupby(level="t")["Harvest_kg"].sum()
     at = after.groupby(level="t")["Harvest_kg"].sum()
     assert float(bt["2011-12"]) == pytest.approx(float(at["2011-12"]))
-    assert float(at.sum()) > 6 * float(bt.sum())
+    assert float(bt["2011-12"]) == pytest.approx(653_661.0)
+    assert float(bt.sum()) == pytest.approx(8_799_669.50962, rel=1e-9)
+    assert float(at.sum()) == pytest.approx(12_696_657.323532, rel=1e-9)
+    assert float(at.sum()) / float(bt.sum()) == pytest.approx(1.4429, abs=1e-4)
+
+    # The declaration switched OFF reproduces every pre-#931 number, so the
+    # move above is the declared layer and nothing else.
+    blind_b = harvest_kg(cp, unit_kg={})
+    blind_a = harvest_kg(cp, shipped_factors=shipped, unit_kg={})
+    ob, oa = (blind_b.attrs["kg_factor_sources"],
+              blind_a.attrs["kg_factor_sources"])
+    assert ob["metric"] == 26_548 and ob["none"] == 58_971
+    assert oa["metric"] == 7_768 and oa["none"] == 15_046
+    assert ob["declared"] == oa["declared"] == 0
+    assert float(blind_b["Harvest_kg"].sum()) == pytest.approx(
+        1_905_712.50962, rel=1e-9)
+    assert float(blind_a["Harvest_kg"].sum()) == pytest.approx(
+        12_685_707.323532, rel=1e-9)
+    assert float(blind_a["Harvest_kg"].sum()) > 6 * float(
+        blind_b["Harvest_kg"].sum())
+
+
+def test_the_declared_quintal_matches_the_external_answer_key():
+    """Our OWN declaration, checked against the same cited key -- config only.
+
+    Since GH #931 the crop ladder reads ``u_kg``, so the library's quintal is
+    served on every Ethiopian Quintal row the WB table does not cover.  It is
+    checked against :data:`QUINTAL_KG`, never against the WB table, so a wrong
+    edit to ``u.org`` fails here and cannot hide behind agreement with it.
+    """
+    import lsms_library as ll
+
+    assert ll.Country("Ethiopia")._unit_kg_factors()["quintal"] == QUINTAL_KG
 
 
 @pytest.mark.requires_s3
-def test_quintal_is_exactly_100kg_on_every_newly_served_row(ethiopia):
-    """The one EXTERNAL agreement the shipped table can be checked against.
+def test_shipped_quintal_matches_the_external_answer_key(ethiopia):
+    """The WB table's quintal, checked against an answer key NEITHER side supplies.
 
-    An earlier version of this test compared the shipped factor to the
-    library's INFERRED one on the 18,780 rows carrying both, found a median
-    ratio of 1.0000, and called that evidence the join was keyed right.  It
-    is not: the red-team measured that overlap and it is **100% metric** --
-    ``Kg`` 18,677 and ``Gram`` 103.  Both sides are quoting the definition of
-    a kilogram, so the ratio is 1.0000 by construction, and a ``j`` mis-key
-    would leave it at 1.0000 too (``Kg`` is crop-independent).  That test
-    pinned a tautology.
+    History.  An earlier version of this test compared the shipped factor to
+    the library's INFERRED one on the 18,780 rows carrying both, found a
+    median ratio of 1.0000, and called that evidence the join was keyed
+    right.  It is not: that overlap was **100% metric** -- ``Kg`` 18,677 and
+    ``Gram`` 103 -- so both sides quoted the definition of a kilogram, and a
+    ``j`` mis-key would leave it at 1.0000 too.  It was replaced by
+    "``Quintal`` == 100.0 on the rows the library has NO opinion about" --
+    external because the library then served the quintal ``none``.
 
-    ``Quintal`` is the real check.  It is 13,924 of the 43,925 NEWLY-SERVED
-    rows (~64% of the newly-served kilograms), the library infers **no**
-    factor for it, and the WB table says exactly 100.0 for every crop in
-    every wave -- which is what a quintal is.  External, not definitional.
+    GH #931 (@ligon, 2026-10-18) ended that: the crop ladder reads the
+    declared ``u_kg``, so the library now holds 100 kg for a quintal, the
+    Quintal rows leave the "no opinion" set (43,925 -> 30,001), and the
+    overlap becomes Kg / Gram / Quintal.  Comparing the WB table with the
+    library there would compare two numbers that both say "a quintal is
+    100 kg" and could not tell a wrong one from a right one.
 
-    WHAT STILL HAS NO NUMERICAL CHECK, stated so nobody thinks it does: the
-    ~29,000 local-container rows (Madaberia / Joniya / Kunna / Kerchat...),
-    whose factor varies with the crop by an order of magnitude.  Their
-    warrant is STRUCTURAL -- the loader decodes ``j`` and ``u`` through the
-    SAME ``_eth_crop_label_map`` / ``_clean_unit_label`` that
-    ``crop_production_for_wave`` uses, so a ``j`` mis-key would have to be a
-    fault in a shared map, which would equally corrupt ``crop_production.j``
-    itself.  That argument, not a ratio, is the reason to believe the join.
+    So the check is now made against :data:`QUINTAL_KG` -- a literal in this
+    file, with its sources cited above it -- and the TWO parties are each
+    checked against it, never against each other: the WB shipped factor here,
+    and our own declaration in
+    :func:`test_the_declared_quintal_matches_the_external_answer_key`.  The
+    shipped table still SERVES those rows (``shipped`` outranks ``metric``),
+    so a wrong WB factor would reach the user, and this fails on it.
+
+    WHAT STILL HAS NO NUMERICAL CHECK, unchanged: the ~30,000
+    local-container rows (Madaberia / Joniya / Kunna / Kerchat...), whose
+    factor varies with the crop by an order of magnitude.  Their warrant is
+    STRUCTURAL -- the loader decodes ``j`` and ``u`` through the SAME
+    ``_eth_crop_label_map`` / ``_clean_unit_label`` that
+    ``crop_production_for_wave`` uses.  Nor does the quintal check a ``j``
+    key: it is 100 kg for every crop.
     """
     import lsms_library as ll
     from lsms_library.transformations import harvest_kg_factors
 
     cp = ll.Country("Ethiopia").crop_production()
     fa = harvest_kg_factors(cp, shipped_factors=_load(ethiopia))
-    newly = fa["kg_shipped"].notna() & fa["kg_inferred"].isna()
-    # 2026-09-18, GH #832: 43,384 -> 43,925.  The +541 are 2015-16
-    # Zorba/Akara rows whose mojibake unit label now matches the shipped
-    # table (see the sibling before/after test).  `Quintal` is untouched at
-    # 13,924, which is why the two counts are pinned separately.
-    assert int(newly.sum()) == 43_925
     u = fa.index.get_level_values("u")
-    quintal = newly & (u == "Quintal")
-    assert int(quintal.sum()) == 13_924
-    assert set(fa.loc[quintal, "kg_shipped"].astype(float)) == {100.0}
-    # And the overlap really is metric-only, so the old claim stays dead.
+    t = fa.index.get_level_values("t")
+    quintal = u == "Quintal"
+    assert int(quintal.sum()) == 13_977
+
+    # (a) the WB table, against the key: every Quintal row it serves.
+    shipped_q = quintal & fa["kg_shipped"].notna()
+    assert int(shipped_q.sum()) == 13_924
+    assert set(fa.loc[shipped_q, "kg_shipped"].astype(float)) == {QUINTAL_KG}
+    assert set(fa.loc[shipped_q, "KgFactorSource"]) == {"shipped"}
+    assert set(fa.loc[shipped_q, "kg_per_unit"].astype(float)) == {QUINTAL_KG}
+
+    # (b) the 53 Quintal rows the WB table does NOT cover are served by our
+    # declaration -- which (c) is the key's value on every Quintal row.
+    unshipped_q = quintal & fa["kg_shipped"].isna()
+    assert pd.Series(t[unshipped_q]).value_counts().to_dict() == {
+        "2018-19": 31, "2021-22": 22}
+    assert set(fa.loc[unshipped_q, "KgFactorSource"]) == {"metric"}
+    assert set(fa.loc[quintal, "kg_declared"].astype(float)) == {QUINTAL_KG}
+
+    # The "no library opinion" set the old check used, re-measured: the
+    # quintal has left it, which is exactly why it is no longer the check.
+    newly = (fa["kg_shipped"].notna() & fa["kg_metric"].isna()
+             & fa["kg_inferred"].isna())
+    assert int(newly.sum()) == 30_001
+    assert "Quintal" not in set(u[newly])
     overlap = fa["kg_shipped"].notna() & fa["kg_inferred"].notna()
-    assert set(pd.Series(u[overlap]).unique()) == {"Kg", "Gram"}
+    assert set(pd.Series(u[overlap]).unique()) == {"Kg", "Gram", "Quintal"}
 
 
 @pytest.mark.requires_s3

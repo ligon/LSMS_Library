@@ -85,7 +85,14 @@ class TestDeclarations:
             sentinels = _missing_level_sentinels(table)
             assert set(sentinels) <= canonical, table
             for lvl, value in sentinels.items():
-                assert isinstance(value, str) and value and pd.notna(value), (
+                # A real, non-null scalar.  Strings must be non-empty; an int
+                # is allowed where the level is an integer code (GH #840:
+                # community_prices `visit: 1`, `obs: 1`, matching the integer
+                # visit / observation codes the declaring countries emit).
+                assert (value is not None and pd.notna(value)
+                        and not isinstance(value, bool)
+                        and isinstance(value, (str, int))
+                        and (not isinstance(value, str) or value)), (
                     f"{table}.{lvl}: a NULL index key is deleted by the next "
                     f"groupby (CLAUDE.md 'Grain Collapse' 3b)")
 

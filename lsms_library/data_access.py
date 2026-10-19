@@ -1770,7 +1770,9 @@ def _logical_wave_labels(country: str) -> set[str]:
         return set()
     try:
         from .country import Country
-        waves = set(Country(country).waves)
+        # Acquisition: discovery runs on directories not yet wired up (all
+        # ten unregistered dirs are in _COUNTRY_CATALOG), so opt in (GH #915).
+        waves = set(Country(country, allow_unregistered=True).waves)
     except (ImportError, OSError, KeyError, ValueError, AttributeError) as exc:
         logger.debug("Could not read logical waves for %s: %s", country, exc)
         return set()
