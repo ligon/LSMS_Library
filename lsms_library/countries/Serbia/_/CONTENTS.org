@@ -309,6 +309,36 @@ The DVC-managed =household_roster= pipeline (=dvc.yaml=) may work
 independently since it uses the CLI materializer, but the legacy
 Makefile pipeline for food and other features is non-functional.
 
+* Kinship: 2007's =srodstvo= codes (GH #698)
+
+Ruling (@ligon, 2026-10-18, GH #698): "'X of head or spouse' and 'X or
+X-in-law' labels become [G, D, null], Affinity only" -- the 2026-09-07
+null-component rule (=categorical_mapping/kinship.yml= header) carried to
+labels whose generation and collateral distance ARE determinate.  Kinship
+is expanded at READ time, so the change moved no cache hash and no
+=household_characteristics= number (it reads Sex/Age/residence only;
+measured byte-identical before/after).
+
+The 2007 relationship variable (=srodstvo=, =individual.dta=) has eight
+served codes.  Four name a relation "of head of household/spouse, partner" or
+fold the in-law into the blood code, so since 2026-10-19 they carry no
+Affinity:
+
+| served label                                                   | tuple         | people |
+|----------------------------------------------------------------+---------------+--------|
+| =child of head of household/spouse, partner=                    | [-1, 0, null] |  5,103 |
+| =grandson/daughter of head of household/spouse, partner=        | [-2, 0, null] |  1,454 |
+| =brother/sister or brother/sister-in-law of head of household=  | [0, 1, null]  |    903 |
+| =parent of head of household/spouse, partner=                   | [1, 0, null]  |    593 |
+
+8,053 people (46.3% of the roster), all =consanguineal= before.  Every
+child, grandchild, parent and sibling in this wave is therefore Affinity-NA;
+only =head of household=, =spouse, partner=, =other relation= ([null, null,
+consanguineal], 160) and =unrelated= (49) carry one.  That is the
+instrument, not a gap in the mapping.  These keys sat under a
+"(Tajikistan)" heading in =kinship.yml= until 2026-10-19; the census found
+them in Serbia 2007 only, and none in Tajikistan.
+
 * Known data issues
 - Makefile :: FIXED (2026-06-08).  The generic rule's =panama.py=
   prerequisite (copy-paste error from Panama) now reads =serbia.py=, and

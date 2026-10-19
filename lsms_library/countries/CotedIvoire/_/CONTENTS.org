@@ -117,14 +117,25 @@ REL codes (F01A / SEC01A):
 |    3 | Son/Daughter               | [-1, 0, consanguineal]     |
 |    4 | Son/Daughter-In-Law        | [-1, 0, affinal]           |
 |    5 | Grandchild                 | [-2, 0, consanguineal]     |
-|    6 | Parent Of Head Or Spouse   | [1, 0, consanguineal]      |
+|    6 | Parent Of Head Or Spouse   | [1, 0, null]               |
 |    7 | Sibling                    | [0, 1, consanguineal]      |
-|    8 | Other Relative             | [0, 0, consanguineal]      |
+|    8 | Other Relative             | [null, null, consanguineal] |
 |    9 | Visitor                    | [0, 0, guest]              |
 |   10 | Foster Child               | [-1, 0, foster]            |
 |   11 | Servant                    | [0, 0, servant]            |
 |   12 | Nephew/Niece               | [-1, 1, consanguineal]     |
-|   13 | Other Relative             | [0, 0, consanguineal]      |
+|   13 | Other Relative             | [null, null, consanguineal] |
+
+Tuples as SERVED, corrected 2026-10-19.  Two rows of this table were stale:
+=Other Relative= (codes 8 and 13) has been [null, null, consanguineal] -- a
+blood relative of unrecorded generation and distance -- since 2026-09-07
+(GH #698/#797; it used to sit on Head's cell), and the table was never
+updated.  Code 6, =Parent Of Head Or Spouse=, is [1, 0, null] since
+2026-10-19: a parent of the SPOUSE is a parent-in-law, and the code does not
+say which, so Affinity is unknown (GH #698, @ligon 2026-10-18).  3,161 people
+across 1985-86 .. 1988-89 (1,086 / 888 / 669 / 518), all =consanguineal=
+before.  Read-time only: no cache hash and no =household_characteristics=
+number moved (measured).
 
 ** What Is NOT Available for 1985-89
 
