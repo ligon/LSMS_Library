@@ -2959,3 +2959,53 @@ under ruling 5).  Measured at this head: 49 =Unknown= rows carry a
 rows where =23A=/=23B= may mean TINA (2013-14, own-produced Chicken and
 Other poultry; served =Unknown= as OTHER (SPECIFY) with no text) stay as
 they are, recorded as a residual.
+
+* 2026-10-19 -- plot_inputs: fertilizer nitrogen shares (GH #867)
+
+=plot_inputs.input= comes from =harmonize_input= in =categorical_mapping.org=:
+Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
+=CAN=, =Urea=, =D Compound=, =Other=, each written =... Fertilizer=), and code
+20 is a synthetic =Organic Fertilizer= for the =ag_d36= used? flag.  What
+=transformations.nitrogen_kg= does with them:
+
+  - *=D Compound Fertilizer= = 0.08 kg N / kg* (ruling @ligon 2026-10-18:
+    a CITED share).  Two publishers, twenty years apart, agree on the N and
+    not on the P/K: Government of Malawi, /Fertilizer Regulations, 2003/
+    (WIPO Lex MW022), Schedule B, Part A, penalty example 2, printed p. 30
+    ('A "D" compound (8-14-7-6.5S) fertilizer was guaranteed as 8% N');
+    IFDC & AFAP for AGRA, /Assessment of Fertilizer Distribution Systems and
+    Opportunities for Developing Fertilizer Blends: Malawi/ (June 2018),
+    Table 1, report p. 5 (=8:18:15+6S+0.1B= "Compound D/Super D", tobacco,
+    paprika, flowers).  *The WB harmonised panel uses 0.07*
+    (=MWI_IHPS1.do:804= and IHPS2-4, uncited); on the 65,298.5 kg of D
+    Compound product the two give 5,223.9 vs 4,570.9 kg N.  Served
+    =nitrogen_kg= moved 835,011.9 -> 840,235.8 kg N (726 rows; 33,113 ->
+    33,466 plots); per wave 2010-11 48,956.4 -> 49,195.1, 2013-14 187,342.9
+    -> 188,848.4, 2016-17 333,857.4 -> 334,896.5, 2019-20 264,855.3 ->
+    267,295.8.
+  - *=NPK Fertilizer= is served at the shared map's 0.17 (NPK 17-17-17), and
+    that is probably wrong for this country -- NOT changed here.*  Malawi's
+    basal NPK is the 23:21:0+4S blend ("Chitowe"): the same Regulations'
+    penalty example 3 is "A 23-21-0 + 4S compound ... guaranteed as 23% N",
+    IFDC/AFAP 2018 Table 1 lists =NPK 23:21:00 +4S= for maize, and the WB
+    panel credits its NPK block at 0.23.  On 1,600,479 kg of NPK product,
+    0.17 gives 272,081.4 kg N and 0.23 would give 368,110.2.  The map has no
+    country axis, so this is a design decision, drafted as a new issue.
+  - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same
+    ruling, and is named in =NutrientCoverageWarning= as a refusal.  *The
+    served =Quantity= of those rows is 0.0, not NA.*  =_organic_block= writes
+    NA by design (Module D records no organic quantity), but
+    =assemble_plot_inputs= consolidates duplicate lines with
+    =agg({'Quantity': 'sum'})=, and an all-NA group sums to 0.0 (the
+    neighbouring =Quantity_purchased= aggregation already uses
+    =min_count=1=).  So 11,075 rows report a measured zero that the survey
+    never recorded.  No =nitrogen_kg= number depends on it (organic rows get
+    no share), but it is a fabricated value; residual, not fixed here,
+    because editing =malawi.py= moves every Malawi cache hash.
+  - *=fertilizer_rate(Malawi)= depends on =on=.*  The default =on='parcel'=
+    gives 11,622 plots (median 0.10 kg N/ha), =on='plot'= 33,402 (median
+    26.25).  The 2016-17 / 2019-20 garden-plot keys (=RG01_R01=) are cut to
+    the garden (=RG01=) on the =plot_features= side only.  This contradicts
+    =fertilizer_rate='s docstring, which says the parcel step is a measured
+    no-op on Malawi.  Measured 2026-10-19 with the #867 shares (before
+    them the default gave 11,551 plots); the mismatch itself predates #867.
