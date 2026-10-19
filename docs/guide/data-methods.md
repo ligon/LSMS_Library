@@ -193,6 +193,22 @@ labels : str or dict, optional
     ``Feature`` degrades over both.  A plain ``KeyError`` means
     the mapping table is MALFORMED (no ``Preferred Label``, or
     no key column left), which stays loud.
+period : {'day', 'week', 'month', 'year'}, optional
+    Rescale each wave from the window its survey recorded
+    to this one (``month`` = 365.25/12 days, ``year`` =
+    365.25): value x period_days / total_exposure_days,
+    where exposure is ``recall_days * n_asks`` from
+    ``ll.recall()``.  Default ``None`` returns the recorded
+    window unchanged.  Raises ``PeriodUnavailableError``
+    (a ``ValueError``) naming every wave whose window is
+    not established -- not recorded, a weak rung, or
+    varying within the wave -- and the waves that do
+    convert (pass them as ``waves=``); ``Feature`` drops
+    only the unknown waves, with one warning and
+    ``attrs['period_unavailable']``.  The conversion is
+    recorded on ``attrs['period']``.  GH #851; see
+    ``docs/guide/recall.md``.  ``food_prices`` refuses it:
+    a price is not a flow.
 currency : {'index', 'column'}, optional
     Attach the ISO 4217 currency code (resolved per wave,
     e.g. UGX, NGN, XOF; GhanaLSS 2005-06 -> GHC vs 2016-17
