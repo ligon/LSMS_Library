@@ -616,3 +616,38 @@ def test_editing_the_read_gate_moves_no_hash(monkeypatch):
     assert all(tch0[k] != tch2[k] for k in tch0 if tch0[k] is not None)
     monkeypatch.undo()
     R.clear_caches()
+
+
+# ---------------------------------------------------------------------------
+# GH #1045 r1 F3: the WAVE-tier stamp replay is reporting, like the gate
+# ---------------------------------------------------------------------------
+
+def test_editing_the_wave_stamp_replay_moves_no_hash(monkeypatch):
+    """``country._replay_wave_stamp`` replays a wave parquet's grain and date
+    stamps at every wave-tier read; it writes nothing a build serves.  Before
+    the exclusion a no-op edit to it alone moved every hash (measured on the
+    whole corpus: btf 39/39, ``_table_cache_hash`` 549/549, ``_input_hash``
+    2,109/2,139).  Structural and measured, as for the #908 gate above;
+    positive control ``_union_waves``."""
+    qn = "lsms_library.country._replay_wave_stamp"
+    assert qn in R._EXCLUDED_CALLABLES
+    R.clear_caches()
+    leaked = [p.split("=")[0] for p in _all_parts() if p.split("=")[0] == qn]
+    assert not leaked, f"wave-stamp replay leaked into the build fingerprint: {leaked}"
+
+    btf0, tch0 = _gate_probe_hashes()
+    _probe_edit(monkeypatch, lsms_library.country._replay_wave_stamp)
+    btf1, tch1 = _gate_probe_hashes()
+    moved_btf = [t for t in btf0 if btf0[t] != btf1[t]]
+    moved_tch = [k for k in tch0 if tch0[k] != tch1[k]]
+    assert not moved_btf and not moved_tch, (
+        f"editing _replay_wave_stamp moved {len(moved_btf)}/{len(btf0)} fingerprints "
+        f"and {len(moved_tch)}/{len(tch0)} table hashes: {moved_btf} {moved_tch[:5]}")
+
+    monkeypatch.undo()
+    _probe_edit(monkeypatch, lsms_library.country.Country._union_waves)
+    btf2, _tch2 = _gate_probe_hashes()
+    assert any(btf0[t] != btf2[t] for t in btf0), \
+        "positive control failed: the probe cannot see an edit to a closure callable"
+    monkeypatch.undo()
+    R.clear_caches()

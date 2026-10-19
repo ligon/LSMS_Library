@@ -255,6 +255,7 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.datetime_parse.wave_datetime_audit",
     "lsms_library.datetime_parse.datetime_reports",
     "lsms_library.local_tools.read_parquet_datetime_audit",
+    "lsms_library.country._replay_wave_stamp",  # wave-tier replay of the grain + date stamps: reporting only (#1045 r1 F3)
 })
 
 
