@@ -424,9 +424,16 @@ class TestCountry:
 class _PeriodCountry:
     """A Country whose food_expenditures goes through the REAL to_period over
     hand-built records, and honours ``waves=`` -- so the Feature plumbing
-    (catch, re-call, warning, marker, carrier) is exercised end to end."""
+    (catch, second read, slice, warning, marker, carrier) is exercised end
+    to end.
+
+    ``POOLED`` makes every value depend on the wave set REQUESTED, the way
+    ``food_quantities(units='kgs')`` does through its pooled kg inference
+    (GH #850) -- the property that made a ``waves=`` re-call move
+    non-period numbers (red team r1, R3)."""
 
     WAVES = {"Alpha": ["w7", "w30"], "Beta": ["w7", "wvar"], "Gamma": ["wnr"]}
+    POOLED = False
     calls: list = []
 
     def __init__(self, name):
@@ -436,7 +443,8 @@ class _PeriodCountry:
         type(self).calls.append((self.name, waves, period))
         present = [w for w in self.WAVES[self.name]
                    if waves is None or w in waves]
-        df = frame(present, values=[210.0] * len(present))
+        value = 210.0 * (len(present) if self.POOLED else 1)
+        df = frame(present, values=[value] * len(present))
         if period is not None:
             df = R.to_period(df, self.name, period, table="food_expenditures",
                              records=RECORDS)
@@ -452,7 +460,11 @@ class _PeriodCountry:
 def feature(monkeypatch):
     import lsms_library as ll
     _PeriodCountry.calls = []
+    monkeypatch.setattr(_PeriodCountry, "POOLED", False)
     monkeypatch.setattr(ll, "Country", lambda name, **kw: _PeriodCountry(name))
+    # Feature converts the degraded slice itself, through the real
+    # to_period, which looks records up by country name at call time.
+    monkeypatch.setattr(R, "recall_records", lambda country: RECORDS)
 
     def make(table="food_expenditures"):
         f = F.Feature(table)
@@ -491,10 +503,40 @@ class TestFeature:
                        ("Alpha", "w7"): pytest.approx(30.0),
                        ("Beta", "w7"): pytest.approx(30.0)}
 
-    def test_the_re_call_asks_for_exactly_the_convertible_waves(self, feature):
+    def test_the_second_read_is_the_unconverted_table_not_a_wave_subset(
+            self, feature):
+        """Red team r1, R3: re-calling with ``waves=convertible`` moved
+        non-period numbers wherever a value depends on the requested wave
+        set.  The degrade now reads the table as an unconverted Feature
+        would -- same waves, no period -- and slices."""
         _call(feature(), ["Beta"], period="week")
         assert _PeriodCountry.calls == [("Beta", None, "week"),
-                                        ("Beta", ["w7"], "week")]
+                                        ("Beta", None, None)]
+
+    def test_kept_rows_are_the_unconverted_rows_times_the_factor(
+            self, feature, monkeypatch):
+        """Under a POOLED estimator (the kg-inference case) the old re-call
+        served Beta's w7 at 210 x 1 / 7 = 30 per day; the unconverted
+        Feature row is 210 x 2 = 420, so the right answer is 60."""
+        monkeypatch.setattr(_PeriodCountry, "POOLED", True)
+        base, _ = _call(feature(), ["Alpha", "Beta"])
+        out, _ = _call(feature(), ["Alpha", "Beta"], period="day")
+        kept = base.loc[out.index]
+        factor = np.where(out.index.get_level_values("t") == "w7", 1 / 7, 1 / 30)
+        np.testing.assert_array_equal(out["Expenditure"].to_numpy(),
+                                      kept["Expenditure"].to_numpy() * factor)
+        got = out["Expenditure"].groupby(["country", "t"]).sum()
+        assert got[("Beta", "w7")] == 420.0 / 7
+
+    def test_the_warning_says_which_countries_were_dropped_whole(self, feature):
+        _, msgs = _call(feature(), ["Alpha", "Beta", "Gamma"], period="day")
+        (msg,) = [m for m in msgs if "period=" in m]
+        assert "['Beta'] kept their other waves" in msg
+        assert "['Gamma'] had no convertible wave and were dropped whole" in msg
+
+    def test_the_slice_carries_records_for_the_rows_served(self, feature):
+        out, _ = _call(feature(), ["Beta"], period="day")
+        assert set(out.attrs["recall"]["Beta"]) == {"w7"}
 
     def test_the_period_record_survives_the_concat(self, feature):
         out, _ = _call(feature(), ["Alpha", "Beta"], period="month")

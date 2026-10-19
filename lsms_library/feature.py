@@ -41,6 +41,9 @@ from .recall import PERIOD_TABLES as _PERIOD_TABLES
 from .recall import merge_period_attrs as _period_merge_attrs
 from .recall import period_days as _period_days
 from .recall import period_refusal as _period_refusal
+from .recall import to_period as _to_period
+from .recall import attach as _recall_attach
+from .derivations import attach as _derivations_attach
 from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
 # `country` is imported by `__init__` before this module, so this is not a cycle.
@@ -142,6 +145,44 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         _merge_into(_PERIOD_ATTRS_KEY, _period_merge_attrs),
     ),
 )
+
+def _convert_convertible_waves(df: pd.DataFrame, country: str, table: str,
+                               period: str, convertible) -> pd.DataFrame:
+    """The ``period=`` wave-grain degrade (GH #851): convert a SLICE.
+
+    *df* is the country's table read WITHOUT ``period=`` -- byte-for-byte the
+    frame an unconverted ``Feature`` call gets.  Keep the rows whose wave is
+    in *convertible* and apply :func:`recall.to_period` to them, so every
+    kept row is that unconverted row times its wave's factor, exactly.
+
+    Why not re-call the country with ``waves=convertible`` (the first
+    version, red team r1, R3): ``food_quantities``' default ``units='kgs'``
+    infers kg factors by pooling over the REQUESTED waves (GH #850), so a
+    wave subset moved non-period numbers -- Mali 2014-15 +2.90% kg, Burkina
+    Faso 2014 +0.73%, Uganda 2019-20 44% of rows.  A slice moves none.
+
+    Exact because ``to_period`` is linear and per-``t``: the post-steps the
+    slice has already been through -- the ``labels=`` re-sum (within a
+    ``t``), ``market=`` (a re-key that keeps ``t``), ``numeraire=``
+    (a per-row divide) -- commute with a per-``t`` multiplication.
+    ``Country`` applies the same conversion BEFORE them; the two orders agree
+    to rounding (the re-sum adds the same terms in the same order either way,
+    so in practice bit-for-bit -- pinned by ``TestDeliveredFeature``).
+
+    The per-wave ``attrs`` records are re-attached for the slice, each by its
+    own module, so they describe the rows served rather than the rows read:
+    ``population`` and ``recall`` by ``t``, ``derivations`` recounted from the
+    slice's ``Derivation`` column.  ``labels_unmatched`` (GH #787) is NOT
+    recomputed -- it still reports the whole country's read.
+    """
+    t = df.index.get_level_values("t").astype("string")
+    sliced = df.loc[t.isin([str(w) for w in convertible])]
+    sliced.attrs = dict(df.attrs)
+    _population.attach(sliced, country)
+    _recall_attach(sliced, country)
+    _derivations_attach(sliced, country, table)
+    return _to_period(sliced, country, period, table=table)
+
 
 #: Every ``attrs`` key any carrier owns -- what the per-country capture keeps.
 _CARRIED_ATTRS_KEYS: tuple[str, ...] = tuple(
@@ -1042,8 +1083,10 @@ class Feature:
         units_unavailable: list[str] = []
         # Same contract for period= (GH #851), at the WAVE grain: {country:
         # [waves whose recall window is not established]}.  A country whose
-        # other waves convert is KEPT, restricted to those waves.
+        # other waves convert is KEPT, restricted to those waves;
+        # `period_dropped` names the countries none of whose waves convert.
         period_unavailable: dict[str, list[str]] = {}
+        period_dropped: list[str] = []
 
         # The metadata records each country's frame arrived with: population
         # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
@@ -1085,13 +1128,18 @@ class Feature:
                     # (country, wave) cell, and dropping whole countries would
                     # discard GhanaLSS's six convertible waves for its one
                     # stratified wave -- the very cells the kwarg exists to
-                    # compare.  Re-call with the convertible waves; drop the
-                    # country only when none converts.  The re-call is served
-                    # from the warm L2-country parquet, filtered (#891).
+                    # compare.  Read the table WITHOUT period=, keep the
+                    # convertible waves' rows and convert those
+                    # (_convert_convertible_waves says why not re-call with
+                    # waves=).  Drop the country only when none converts.
                     period_unavailable[name] = sorted(e.unavailable)
                     if not e.convertible:
+                        period_dropped.append(name)
                         continue
-                    df = method(**{**call_kwargs, "waves": list(e.convertible)})
+                    df = method(**{k: v for k, v in call_kwargs.items()
+                                   if k != "period"})
+                    df = _convert_convertible_waves(
+                        df, name, self.table_name, period, e.convertible)
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
@@ -1125,11 +1173,14 @@ class Feature:
                 units_unavailable.append((name, tuple(e.missing)))
                 continue
             except PeriodUnavailableError as e:
-                # Only reachable if the convertible-waves re-call above raised
-                # again -- which would mean the record changed between the two
-                # calls.  Drop the country; never serve an unscaled frame.
+                # Only reachable if converting the convertible slice above
+                # raised again -- which would mean the record changed between
+                # the two reads.  Drop the country; never serve an unscaled
+                # frame.
                 period_unavailable[name] = sorted(
                     set(period_unavailable.get(name, [])) | set(e.unavailable))
+                if name not in period_dropped:
+                    period_dropped.append(name)
                 continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
@@ -1181,14 +1232,21 @@ class Feature:
             if not period_unavailable:
                 return result
             n_cells = sum(len(w) for w in period_unavailable.values())
+            restricted = [c for c in period_unavailable if c not in period_dropped]
+            fates = []
+            if restricted:
+                fates.append(f"{restricted} kept their other waves, converted")
+            if period_dropped:
+                fates.append(f"{period_dropped} had no convertible wave and "
+                             f"were dropped whole")
             warnings.warn(
                 f"{self.table_name}: period={period!r} unavailable for "
                 f"{n_cells} (country, wave) cell(s) {period_unavailable} -- "
                 f"their recall window is not recorded, rests on a guess, or "
-                f"varies within the wave -- and they were dropped from the "
-                f"assembly; the countries' other waves were kept, converted "
-                f"(kept {n_kept} country(ies)).  See ll.recall() for each "
-                f"cell's record, or pass a country subset to silence this."
+                f"varies within the wave -- and those cells were dropped from "
+                f"the assembly; {'; '.join(fates)} (kept {n_kept} "
+                f"country(ies)).  See ll.recall() for each cell's record, or "
+                f"pass a country subset to silence this."
             )
             result.attrs['period_unavailable'] = {
                 c: list(w) for c, w in period_unavailable.items()}
