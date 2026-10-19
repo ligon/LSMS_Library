@@ -109,7 +109,9 @@ declarative `data_info.yml` spec with `calendar:` required (no default);
       Makefile recipe.
 - [ ] **Docs**: CLAUDE.md/AGENTS.md section ("Dates") with the measurements;
       Mali and Tanzania CONTENTS.org updated; #1045 residual drafted.
-- [ ] Reviewed and accepted by @ligon (judgement call).
+- [x] Reviewed and accepted by @ligon (judgement call). -- @ligon, 2026-10-19:
+      run 1 accepted (relayed in session; recorded on #1045). The r1 red-team's
+      five design questions (verdict §5) remain with @ligon.
 
 ## §3 Constraints & assumptions
 - **Budget:** one engine run on the savio3 node (≤ ~6 h wall); ≤ 3
