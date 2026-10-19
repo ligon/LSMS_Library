@@ -1885,6 +1885,26 @@ class CategoricalMappingConflictError(RuntimeError):
     """
 
 
+class EmptyCategoricalTableError(RuntimeError):
+    """A level DECLARES a categorical table but it has no data rows (GH #1036).
+
+    ``#+name: foo`` followed by a header only (or by no table at all) used to
+    be indistinguishable from a level that never mentions ``foo``:
+    ``df_data_grabber`` raises ``KeyError`` for a zero-row table, the cascade
+    caught it as "not at this rung", and resolution continued -- to the
+    country's table, or to the cross-country one.  The caller got a table the
+    level it declared ``foo`` in had overridden, with no signal: the #674
+    class of silent resolution, breaking #953's whole-table override.
+
+    A ``RuntimeError`` and NOT a ``KeyError`` / ``ValueError`` / ``LookupError``,
+    for the same reason as :class:`CategoricalMappingConflictError`: the rung
+    loops of :func:`get_categorical_mapping` and :func:`code_label_map` catch
+    those as "absent here", and this error must escape them.  An empty table
+    is a declaration the author must finish (fill the table) or retract
+    (delete the ``#+name:`` line, which inherits the lower level's table).
+    """
+
+
 def global_categorical_level() -> Path:
     """The cross-country level: the package root, whose
     ``categorical_mapping/`` directory holds the shared tables."""
@@ -1983,6 +2003,61 @@ def _categorical_rungs(dirs: list[str]) -> list[str]:
     return out
 
 
+def _raise_if_declared_empty(path: str | Path, tablename: str, rung: str,
+                             later_rungs: list[str], levels: bool, fn: str,
+                             cause: BaseException,
+                             encoding: str | None = None) -> None:
+    """Raise :class:`EmptyCategoricalTableError` if *path* declares
+    *tablename* and the table has zero data rows (GH #1036); else return.
+
+    Called only on the error path of a rung (``df_data_grabber`` raised), so
+    a successful resolution reads nothing extra.  Emptiness is judged by
+    re-reading with :func:`df_from_orgfile` -- the parser whose zero-row frame
+    made ``df_data_grabber`` raise -- so the two cannot drift.  That parser
+    raises ``IndexError`` instead when the declaration runs into end-of-file
+    (a ``#+name:`` or header line that is the file's last line); every such
+    path has read no data row, so it counts as empty too.  A declared table
+    WITH rows that merely lacks the requested column is left to the caller's
+    loop, unchanged.
+    """
+    p = Path(path)
+    try:
+        if not p.is_file() or not _org_declares_table(p, tablename):
+            return
+    except (OSError, UnicodeDecodeError):
+        return                          # cannot judge: leave the caller's path
+    try:
+        nrows = df_from_orgfile(p, name=tablename, encoding=encoding).shape[0]
+    except IndexError:
+        nrows = 0
+    if nrows != 0:
+        return
+    # Name what the empty table would have let through (declaration scan
+    # only -- nothing lower is parsed).
+    shadowed = None
+    for d in later_rungs:
+        try:
+            if levels:
+                hit = categorical_level_table_file(d, tablename)
+            else:
+                cand = Path(d) / fn
+                hit = cand if cand.is_file() and _org_declares_table(cand, tablename) else None
+        except (OSError, UnicodeDecodeError, CategoricalMappingConflictError):
+            continue
+        if hit is not None:
+            shadowed = hit
+            break
+    before = (f"it would have resolved silently from {shadowed}"
+              if shadowed is not None
+              else "it would have been reported as absent")
+    raise EmptyCategoricalTableError(
+        f"Categorical table {tablename!r} is declared in {p} (level {rung}) "
+        f"but has no data rows.  Until GH #1036 an empty table fell through "
+        f"to the next level as if undeclared -- here {before}.  Fill the "
+        f"table, or delete its '#+name: {tablename}' line to inherit the "
+        f"lower level's table.") from cause
+
+
 # ``df_data_grabber``'s own keyword options.  Every OTHER keyword reaching it
 # names a value column (a myvar); see get_categorical_mapping (GH #674).
 _GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
@@ -2009,6 +2084,16 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     - override is **whole-table**.  The first rung that HAS ``foo`` supplies
       ALL of it.  A country wanting one local row of ``foo`` must re-list
       every other row; it cannot declare ``foo`` partially.
+
+    **A declared EMPTY table is not an absent one** (GH #1036).  A rung that
+    declares ``#+name: foo`` but gives it no data rows (header only, or no
+    table at all) raises :class:`EmptyCategoricalTableError` -- a
+    ``RuntimeError``, so the rung loop does not catch it -- instead of
+    falling through to a lower level, which would hand the caller the very
+    table that level's declaration overrides.  To inherit, delete the
+    ``#+name:`` line; to disable a mapping, say so in code.  (A declared,
+    NON-empty table that lacks the requested value column still raises
+    ``KeyError`` and falls through; that is unchanged.)
 
     **A rung is a LEVEL, and a level has two spellings** (GH #953).  At each
     directory ``d`` in ``dirs`` the table is looked for in
@@ -2088,7 +2173,7 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     levels = fn == CATEGORICAL_MAPPING_FILE and tablename is not None
     rungs = _categorical_rungs(dirs) if levels else dirs
     exc: Exception = FileNotFoundError(f"no rungs to search: {dirs}")
-    for d in rungs:
+    for k, d in enumerate(rungs):
         try:
             if d[-1]!="/": d+='/'
             if levels:
@@ -2097,7 +2182,17 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
                     raise KeyError(f'No table {tablename} at level {d}.')
             else:
                 path = d+fn
-            df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
+            try:
+                df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
+            except (KeyError, IndexError) as error:
+                # A DECLARED zero-row table is not an absent one (GH #1036):
+                # raise past this loop's KeyError handler instead of falling
+                # through to a lower level.  Anything else re-raises as before.
+                if tablename is not None:
+                    _raise_if_declared_empty(path, tablename, d, rungs[k+1:],
+                                             levels, fn, error,
+                                             encoding=kwargs.get('encoding'))
+                raise
             # Columns only: a one-row table must stay a Series/frame, not
             # collapse to a scalar (GH #674).
             df = df.squeeze(axis=1)
@@ -2143,14 +2238,17 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
     each numeric code, so a caller cannot get this wrong.  Non-numeric codes
     (e.g. a table's ``.`` -> ``None`` row) are kept under their string key.
 
-    Returns ``{}`` if no level in *dirs* carries the table -- callers that
-    need to distinguish "absent" from "empty" should check the directories
-    first.  Levels are resolved exactly as in :func:`get_categorical_mapping`:
-    file or ``categorical_mapping/`` directory, the cross-country level
-    appended last, a within-level duplicate raising.
+    Returns ``{}`` if no level in *dirs* carries the table.  A level that
+    DECLARES the table with zero data rows is not "absent": it raises
+    :class:`EmptyCategoricalTableError` rather than falling through or
+    returning ``{}`` (GH #1036).  Levels are resolved exactly as in
+    :func:`get_categorical_mapping`: file or ``categorical_mapping/``
+    directory, the cross-country level appended last, a within-level
+    duplicate raising.
     """
     levels = fn == CATEGORICAL_MAPPING_FILE
-    for d in (_categorical_rungs(dirs) if levels else dirs):
+    rungs = _categorical_rungs(dirs) if levels else list(dirs)
+    for k, d in enumerate(rungs):
         if not d.endswith('/'):
             d += '/'
         try:
@@ -2162,8 +2260,16 @@ def code_label_map(tablename: str, dirs: list[str], value: str = 'Label',
                     continue
             else:
                 path = d + fn
-            df = df_data_grabber(path, idxvars, orgtbl=tablename,
-                                 **{value: value})
+            try:
+                df = df_data_grabber(path, idxvars, orgtbl=tablename,
+                                     **{value: value})
+            except (KeyError, IndexError) as error:
+                # GH #1036: a declared zero-row table raises
+                # EmptyCategoricalTableError (a RuntimeError, so the handler
+                # below does not swallow it) rather than falling through.
+                _raise_if_declared_empty(path, tablename, d, rungs[k+1:],
+                                         levels, fn, error)
+                raise
         except (FileNotFoundError, KeyError, ValueError):
             continue
         out: dict[Any, Any] = {}
