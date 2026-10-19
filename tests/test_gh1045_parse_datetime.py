@@ -756,3 +756,139 @@ class TestRound2:
                         {"EACICONTROLE_p2.dta": {"Int_t": {"datetime": "x", "calendar": "gregorian"}}}]
         with pytest.raises(ValueError, match="per-file override"):
             w.column_mapping("interview_date", info)
+
+
+# ---------------------------------------------------------------------------
+# 10. Coexistence with GH #675 (lsms_build_drops) and GH #908 (the extracted
+#     L2-country read gate), after the 2026-10-18 corpus merge.  Two stamps on
+#     one parquet, each written where it was written before and each replayed
+#     at every gate that replayed it before.
+# ---------------------------------------------------------------------------
+
+_DROP = {"wave": "2020", "sub": "df_geo", "file": "DatelandDrops/2020/Data/geo.csv",
+         "kind": "unavailable", "error": "FileNotFoundError: simulated",
+         "missing_required": [], "missing_optional": ["Latitude"]}
+
+# A fresh process in which the dropped source still cannot be fetched (the
+# GH #675 probe answers False), so a degraded parquet is SERVED and warned.
+_PROBE_BOTH = """\
+import json, warnings, sys
+import lsms_library as ll
+import lsms_library.country as C
+from lsms_library.datetime_parse import datetime_reports, DatetimeParseWarning
+C._probe_source = lambda rel: False
+kw = {"assume_cache_fresh": True} if sys.argv[2] == "fresh" else {}
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    df = ll.Country(sys.argv[1], **kw).interview_date()
+print(json.dumps({
+    "rows": len(df),
+    "dates": [str(w.message) for w in caught if issubclass(w.category, DatetimeParseWarning)],
+    "degraded": [str(w.message) for w in caught if issubclass(w.category, C.DegradedCacheWarning)],
+    "reports": datetime_reports(sys.argv[1], "interview_date"),
+    "drops": C.build_drop_reports(sys.argv[1], "interview_date")}, default=str))
+"""
+
+
+def _probe_both(tmp_path, country, mode="ordinary"):
+    r = subprocess.run([sys.executable, "-c", _PROBE_BOTH, country, mode], env=_env(tmp_path),
+                       cwd=str(tmp_path), capture_output=True, text=True, timeout=600)
+    assert r.returncode == 0, r.stderr[-3000:]
+    return json.loads(r.stdout.strip().splitlines()[-1])
+
+
+def _add_drop_stamp(path):
+    """Add an lsms_build_drops stamp, keeping every other key byte for byte."""
+    import pyarrow.parquet as pq
+    table = pq.read_table(path)
+    md = dict(table.schema.metadata or {})
+    keep = {k: v for k, v in md.items() if k.startswith(b"lsms_")}
+    md[b"lsms_build_drops"] = json.dumps([_DROP]).encode()
+    pq.write_table(table.replace_schema_metadata(md), path)
+    after = pq.read_schema(path).metadata
+    assert all(after[k] == v for k, v in keep.items())
+
+
+def _keys(path):
+    import pyarrow.parquet as pq
+    return {k.decode() for k in (pq.read_schema(path).metadata or {}) if k.startswith(b"lsms_")}
+
+
+def test_date_and_drop_stamps_coexist_at_every_gate(tmp_path):
+    name = "DatelandDrops"
+    _make_country(tmp_path, name, _YAML_SCHEME, info=_YAML_INFO)
+    _probe(tmp_path, name)                                    # process 1: cold build
+    data = tmp_path / "data" / name
+    wave_pq = data / "2020" / "_" / "interview_date.parquet"
+    var_pq = data / "var" / "interview_date.parquet"
+    assert {"lsms_cache_hash", "lsms_datetime_audit"} <= _keys(wave_pq)
+    assert {"lsms_cache_hash", "lsms_cache_waves", "lsms_datetime_audit"} <= _keys(var_pq)
+    for p in (wave_pq, var_pq):
+        _add_drop_stamp(p)
+
+    # (a) the L2-country gate, Country._read_l2_country_cache (GH #908):
+    # served warm, and BOTH reports replayed.
+    stamp = {p: p.stat().st_mtime_ns for p in (wave_pq, var_pq)}
+    out = _probe_both(tmp_path, name)
+    assert {p: p.stat().st_mtime_ns for p in stamp} == stamp, "the read was not warm"
+    assert out["rows"] == 2
+    assert [m for m in out["dates"] if "replayed" in m]
+    assert [r for r in out["reports"] if r["sentinel"] == 1 and r["from_cache"]]
+    assert out["degraded"] and "optional column(s) ['Latitude']" in out["degraded"][0]
+
+    # (b) the L2-wave gate in Wave.grab_data: with the country parquet gone,
+    # the wave parquet is served (not rebuilt), both stamps replay, and the
+    # country parquet rebuilt from it carries BOTH forward.
+    var_pq.unlink()
+    out = _probe_both(tmp_path, name)
+    assert wave_pq.stat().st_mtime_ns == stamp[wave_pq], "the wave parquet was rebuilt"
+    assert [m for m in out["dates"] if "replayed" in m]
+    assert out["degraded"]
+    assert [d for d in out["drops"] if d["file"] == _DROP["file"]]
+    assert {"lsms_cache_hash", "lsms_cache_waves", "lsms_datetime_audit",
+            "lsms_build_drops"} <= _keys(var_pq)
+    (carried,) = lt.read_parquet_build_drops(var_pq)
+    assert {k: carried[k] for k in _DROP} == _DROP
+    (dated,) = [r for r in lt.read_parquet_datetime_audit(var_pq) if r["sentinel"]]
+    assert dated["sentinel"] == 1 and dated["wave"] == "2020"
+
+    # (c) the assume_cache_fresh serve replays the date report.  (It replays
+    # neither the grain audit nor the drop record -- pre-existing gaps of
+    # those mechanisms, not pinned here.)
+    out = _probe_both(tmp_path, name, "fresh")
+    assert [m for m in out["dates"] if "replayed" in m]
+    assert not list((tmp_path / "countries").rglob("*.parquet")), "GH #803: nothing in-tree"
+
+
+def test_a_forked_wave_relays_all_three_ledgers():
+    """_parallel_waves relays the grain, date-parse and drop ledgers together:
+    each reaches the parent's L2-country stamp."""
+    from lsms_library import _parallel_waves as PW
+    key = ("X", "interview_date")
+    grain = {"country": "X", "table": "interview_date", "wave": "w1", "site": "test"}
+    date = {"country": "X", "table": "interview_date", "wave": "w1", "sentinel": 1}
+    drop = {**_DROP, "wave": "w1", "file": "X/w1/Data/geo.csv"}
+
+    def build_one(w):
+        C._GRAIN_LEDGER.setdefault(key, []).append(grain)
+        DP._file_datetime_report(date)
+        C._file_build_drop(*key, drop)
+        return True, None
+
+    saved = {n: dict(getattr(m, n)) for m, n in ((C, "_GRAIN_LEDGER"), (DP, "_DATETIME_LEDGER"),
+                                                  (C, "_BUILD_DROP_LEDGER"))}
+    try:
+        for m, n in ((C, "_GRAIN_LEDGER"), (DP, "_DATETIME_LEDGER"), (C, "_BUILD_DROP_LEDGER")):
+            getattr(m, n).pop(key, None)
+        payload = PW._build_captured(build_one, "w1")
+        assert payload["grain"] and payload["datetime"] and payload["drops"]
+        for m, n in ((C, "_GRAIN_LEDGER"), (DP, "_DATETIME_LEDGER"), (C, "_BUILD_DROP_LEDGER")):
+            getattr(m, n).pop(key, None)            # the parent never saw the filings
+        PW.relay(payload, country="X", table="interview_date")
+        assert C._GRAIN_LEDGER.get(key) == [grain]
+        assert datetime_reports("X", "interview_date") == [date]
+        assert C.build_drop_reports("X", "interview_date") == [drop]
+    finally:
+        for m, n in ((C, "_GRAIN_LEDGER"), (DP, "_DATETIME_LEDGER"), (C, "_BUILD_DROP_LEDGER")):
+            getattr(m, n).clear()
+            getattr(m, n).update(saved[n])
