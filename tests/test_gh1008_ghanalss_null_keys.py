@@ -302,6 +302,37 @@ def test_ghanalss_glss12_gap_recovery_reads_the_cluster_and_refuses_to_guess(mon
         m._cover_page_gaps({str(cover)})
 
 
+@pytest.mark.parametrize("wave, c", [("1987-88", 1048), ("1988-89", 2206)])
+def test_ghanalss_glss12_sample_hook_appends_the_gap(monkeypatch, wave, c):
+    """The ``sample`` df_edit hook itself, no cache: the gap gets a row, ``v``
+    from its own ``CLUST``, its cluster's Appendix I ``Rural`` and weight 1.0.
+
+    Clusters 1048 / 2206 are two of the real gap clusters (104838, 220629).
+    """
+    import importlib.util
+    from lsms_library.paths import countries_root
+    import lsms_library.local_tools as tools
+
+    p = countries_root() / "GhanaLSS" / wave / "_" / "mapping.py"
+    spec = importlib.util.spec_from_file_location(f"_gh1008_sample_{wave}", p)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+
+    cover, gap = str(c * 100 + 1), str(c * 100 + 99)
+    frames = {"Y01A.DAT": pd.DataFrame({"HID": [float(cover), float(gap)], "CLUST": [float(c)] * 2}),
+              "Y12A.DAT": pd.DataFrame({"HID": [float(gap)], "CLUST": [float(c)]}),
+              "Y12B.DAT": pd.DataFrame({"HID": [], "CLUST": []})}
+    monkeypatch.setattr(tools, "get_dataframe", lambda fn, **kw: frames[fn.split("/")[-1]])
+    df = pd.DataFrame({"v": [str(c)]},
+                      index=pd.MultiIndex.from_tuples([(cover, wave)], names=["i", "t"]))
+    out = m.sample(df)
+    assert out.index.is_unique and len(out) == 2
+    got = out.xs((gap, wave))
+    assert got["v"] == str(c)
+    assert pd.notna(got["Rural"]) and got["Rural"] == out.xs((cover, wave))["Rural"]
+    assert got["weight"] == 1.0 and got["panel_weight"] == 1.0
+
+
 # ------------------------------------------- 2016-17 wave script, no cache
 @pytest.fixture
 def fa1617(monkeypatch):
