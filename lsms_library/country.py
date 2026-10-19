@@ -95,6 +95,7 @@ import warnings
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 import json
 from dataclasses import dataclass
 from functools import lru_cache
@@ -1042,6 +1043,26 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
     return [k for k in scheme_entry
             if isinstance(k, str) and k not in _SCHEME_NON_COLUMN_KEYS
             and k not in required]
+
+
+def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
+    """A 0-row frame with a table's DECLARED shape (GH #1039).
+
+    The declared index levels (``str``, as a built index's are) as its index
+    and every declared column, required and ``optional: true``, as an object
+    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
+    a request whose waves all lack the table on the make backend's no-builder
+    route: 0 rows, as the default backend serves from a warm cache, shaped so
+    that ``Country._assert_built_required_columns`` reads it as a well-formed
+    empty table rather than as a build that lost its columns.
+    """
+    entry = scheme_entry if isinstance(scheme_entry, dict) else None
+    levels = _declared_index_levels(entry)
+    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
+               if c not in levels]
+    empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
+                          for c in levels + columns})
+    return empty.set_index(levels) if levels else empty
 
 
 class Wave:
@@ -4810,6 +4831,90 @@ class Country:
         return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
                    for w in waves)
 
+    def _has_country_builder(self, method_name: str) -> bool:
+        """Can the COUNTRY level build ``method_name``?  GH #1039.
+
+        True when the country ships a ``_/{table}.py`` script (``try_script``
+        runs it; the ``%.parquet: %.py`` catch-alls match it too), or when its
+        ``_/Makefile`` has a rule for ``$(VAR_DIR)/{table}.parquet``.  Asked
+        only under ``LSMS_BUILD_BACKEND=make``, for a ``materialize: make``
+        table: that route used to go straight to ``run_make_target`` at the
+        country level, so a table with wave scripts and NO country rule --
+        Tanzania ``food_acquired`` since #836 deleted its dead concatenator,
+        and 71 more cells measured on 2026-10-19 -- could not be built at all
+        (``Could not materialize``, or an empty frame where the country has no
+        Makefile), and on a warm root it served whatever ``var/{table}.parquet``
+        was lying there, because make answers "nothing to be done" for an
+        existing target it has no rule for.  When this returns False the
+        caller builds from the waves instead (@ligon's ruling on #1039: the
+        framework is authoritative, #788).
+
+        **Rule presence is asked of make, not parsed out of the Makefile.**
+        Grouped targets (Uganda ``nutrition.parquet fct.parquet: ...``),
+        pattern rules and ``$(VAR_DIR)`` expansion all defeat a regex.  The
+        probe is ``make -n`` for the target under a FRESH EMPTY root, so an
+        existing parquet can never answer for the rule (#866's measurement
+        method), with ``LC_ALL=C`` so the message is parseable.  Only GNU
+        make's own "No rule to make target '<the probe target>'" counts as
+        absence; a missing PREREQUISITE ("..., needed by ...") means the rule
+        exists, and any other failure or timeout keeps the legacy route, so a
+        country rule that exists and is broken still fails loudly rather than
+        being silently replaced by the waves.  Without ``make`` on PATH only
+        the script can build at the country level.
+
+        Excluded from the build fingerprint
+        (``_build_registry._EXCLUDED_CALLABLES``): it selects a builder and
+        determines no byte of any hashed parquet.  The from-waves route it
+        selects is NOT cache-free -- its YAML waves read, write and hash-stamp
+        L2-wave parquets through ``Wave.grab_data`` (measured, GhanaSPS
+        ``crop_production``, red team r1) -- but those bytes are exactly what
+        the default backend builds and are fingerprinted where that code
+        lives, and the make backend writes no L2-country parquet.
+        """
+        country_dir = self.file_path / "_"
+        if (country_dir / f"{method_name}.py").exists():
+            return True
+
+        def absent(why: str) -> bool:
+            logger.info(
+                f"GH #1039: {self.name}/{method_name} is `materialize: make` "
+                f"but has no country-level builder ({why}, no "
+                f"_/{method_name}.py); building it from its waves (the "
+                f"framework is authoritative, #788).")
+            return False
+
+        if not (country_dir / "Makefile").exists():
+            return absent("no _/Makefile")
+        env = _script_subprocess_env()
+        if not shutil.which("make", path=env.get("PATH")):
+            return absent("make is not on PATH")
+        env.update(LC_ALL="C", LANGUAGE="C")
+        with tempfile.TemporaryDirectory(prefix="lsms_rule_probe_") as tmp:
+            # ``COUNTRY`` in every country Makefile is the basename of ``..``,
+            # so the probe spells the target with the directory name.
+            var_dir = Path(tmp) / self.file_path.name / "var"
+            target = var_dir / f"{method_name}.parquet"
+            env["LSMS_DATA_DIR"] = tmp
+            cmd = ["make", "-n", f"LSMS_DATA_ROOT={tmp}", f"VAR_DIR={var_dir}",
+                   str(target)]
+            try:
+                probe = subprocess.run(cmd, cwd=country_dir, env=env,
+                                       capture_output=True, text=True,
+                                       timeout=120)
+            except (OSError, subprocess.SubprocessError) as error:
+                logger.debug(f"GH #1039 rule probe failed for "
+                             f"{self.name}/{method_name}: {error!r}")
+                return True
+        if probe.returncode == 0:
+            return True
+        no_rule = [line for line in probe.stderr.splitlines()
+                   if "No rule to make target" in line]
+        if no_rule and not any("needed by" in line for line in no_rule) \
+                and any(str(target) in line for line in no_rule):
+            return absent("no Make rule for $(VAR_DIR)/"
+                          f"{method_name}.parquet")
+        return True
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
@@ -5055,7 +5160,7 @@ class Country:
             df_local = map_index(df_local)
             return df_local
 
-        def load_from_waves(waves, *, evict_country_cache=False):
+        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -5191,6 +5296,22 @@ class Country:
                 if len(non_empty_df) > 1:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
+
+            # GH #1039 (red team r1): the make backend came here because
+            # `_has_country_builder` found NO country-level rule or script, so
+            # the country fallback below has nothing to run.  It could only
+            # fail or -- make answering "nothing to be done" for an existing
+            # target it has no rule for -- hand back whatever
+            # `var/<t>.parquet` holds, unrestricted to the request: measured,
+            # Senegal `livestock(waves=['2021-22'])` served 9,404 rows of
+            # 2018-19.  So it is not asked.  A request for every wave that
+            # produced nothing is a failed build, as on the default backend;
+            # a strict subset whose waves lack the table is a correct EMPTY
+            # answer, the 0 rows the default backend serves from a warm cache.
+            if not country_builder:
+                if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+                    raise _rebuild_failure_error(self.name, method_name)
+                return _empty_declared_frame(scheme_entry)
 
             # GH #866: no wave produced rows, so the country-level
             # make/script fallback is about to run -- and `try_make` would
@@ -5593,8 +5714,18 @@ class Country:
             try:
                 if use_dvc:
                     df = load_with_dvc_cache(method_name)
-                elif has_data_scheme_entry and not prefer_make_backend:
-                    df = load_from_waves(waves)
+                # GH #1039: a `materialize: make` table whose country level
+                # has no rule and no script is built from its waves, exactly
+                # as the default backend builds it -- not handed to a country
+                # make target that cannot exist (and that, on a warm root,
+                # answered with whatever `var/<t>.parquet` was lying there).
+                # With `prefer_make_backend` this branch is reached only when
+                # the predicate found no builder, so `load_from_waves` is told
+                # not to fall back to one either.
+                elif has_data_scheme_entry and not (
+                        prefer_make_backend
+                        and self._has_country_builder(method_name)):
+                    df = load_from_waves(waves, country_builder=not prefer_make_backend)
                 else:
                     df = run_make_target(method_name)
                     if df is None:

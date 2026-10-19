@@ -1587,6 +1587,33 @@ Tanzania script reads =CONTENTS.org= any more.  (The catch-all
 =%.parquet: %.py CONTENTS.org tanzania.py= Makefile rule still names this file
 as an *mtime* prerequisite; that is make's business, not the cache hash's.)
 
+*Update (GH #1039, 2026-10-19).*  With the script gone there was no country
+rule at all, so =LSMS_BUILD_BACKEND=make= raised =Could not materialize
+Tanzania/food_acquired= cold, and on a warm root served whatever
+=var/food_acquired.parquet= held (a planted 5-row file came back as the
+"rebuild").  The make backend now builds a =materialize: make= table with no
+country rule and no =_/<table>.py= from its waves, exactly as the default
+backend does: measured cold, 251,730 rows, =assert_frame_equal= to the default
+backend's served frame; =var/= is not written.
+
+*Still in this directory, and dead:* =_/food_expenditures.py=,
+=_/food_quantities.py= and =_/food_unitvalues.py= (from the 2020 "Great
+rearrangement").  No Make rule names them and no table declares them, but the
+catch-all above makes them reachable: when deriving =food_expenditures= /
+=food_quantities= from =food_acquired= fails, =Country= falls back to legacy
+aggregation, =run_make_target= asks make for the in-tree name
+=Tanzania/_/food_expenditures.parquet=, and the catch-all runs the script (on
+BOTH backends, measured).  Each crashes at its first read, so today nothing is
+written: =food_unitvalues.py= and =food_quantities.py= first read
+=../2008-09/_/food_unitvalues.parquet= and =../2008-09/_/food_quantities.parquet=
+(no such wave folder; =2008-09= lives in =2008-15/=), and =food_expenditures.py=
+first reads the bare =food_unitvalues.parquet= -- the in-tree output its
+sibling would have written (line 6; measured traceback, red team r1).  If one ever ran, its
+=to_parquet(x, 'food_expenditures.parquet')= from =_/= matches none of
+=_resolve_data_path='s patterns and would write *in-tree* (the GH #803 class);
+they are the only three of ~620 =to_parquet= call sites in the corpus with that
+spelling.  Retiring them is a separate change (#788 ruling).
+
 *** Test...
 #+begin_src python :results output
 import pandas as pd
