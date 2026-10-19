@@ -28,6 +28,7 @@ import ast
 import inspect
 import re
 import textwrap
+import warnings
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -36,7 +37,8 @@ import pytest
 
 import lsms_library
 from lsms_library import country as country_mod
-from lsms_library.country import (Country, _categorical_key_column,
+from lsms_library.country import (CategoricalKeyMismatchWarning, Country,
+                                  _categorical_key_column,
                                   _merge_categorical_tables,
                                   _row_union_categorical)
 from lsms_library.local_tools import (CATEGORICAL_KEY_ATTR,
@@ -370,6 +372,84 @@ def test_merge_carries_a_one_sided_declaration_through_the_concat():
     ctry.attrs[CATEGORICAL_KEY_ATTR] = "Original Label"
     out = _merge_categorical_tables({"u": glob}, {"u": ctry})["u"]
     assert out.attrs[CATEGORICAL_KEY_ATTR] == "Original Label"
+
+
+# --------------------------------------------------------------------------
+# P2: a declaration that cuts a country off from the global rows is LOUD
+# (red team r1, F2)
+# --------------------------------------------------------------------------
+
+def _global_u():
+    """The real cross-country ``u`` table (``categorical_mapping/u.org``),
+    keyed positionally on ``Original Label``."""
+    pkg = Path(lsms_library.__file__).resolve().parent
+    return load_categorical_level(pkg)["u"]
+
+
+_COUNTRY_U_BY_CODE = """
+    {key}
+    #+name: u
+    | Original Label | Code | Preferred Label |
+    |----------------+------+-----------------|
+    | Kilogramme     |    1 | Kg              |
+    """
+
+
+def test_declared_key_mismatch_warns_and_names_what_is_lost(tmp_path):
+    """A country ``u`` declaring ``#+key: Code`` over the global ``u.org``
+    (keyed on ``Original Label``): the merge still falls back to the country
+    table wholesale -- unchanged -- but now says so, naming the table, both
+    keys and the global rows it did not inherit."""
+    glob = _global_u()
+    assert _categorical_key_column(glob) == "Original Label"
+    ctry = all_dfs_from_orgfile(_org(tmp_path, _COUNTRY_U_BY_CODE.format(
+        key="#+key: Code")))["u"]
+    with pytest.warns(CategoricalKeyMismatchWarning) as rec:
+        out = _merge_categorical_tables({"u": glob}, {"u": ctry},
+                                        country="Fixtureland")["u"]
+    assert out is ctry                     # behaviour unchanged: wholesale
+    assert len(rec) == 1
+    msg = str(rec[0].message)
+    for needle in ("'u'", "'Fixtureland'", "'Code'", "'Original Label'",
+                   "country side", f"{len(glob)} cross-country row(s) are NOT inherited"):
+        assert needle in msg, (needle, msg)
+    assert issubclass(CategoricalKeyMismatchWarning, UserWarning)
+
+
+def test_declared_key_mismatch_warns_from_the_global_side_too():
+    glob = _global_u().copy()
+    glob.attrs[CATEGORICAL_KEY_ATTR] = "Original Label"
+    ctry = pd.DataFrame({"Code": [1], "Preferred Label": ["Kg"]})
+    with pytest.warns(CategoricalKeyMismatchWarning, match="cross-country side"):
+        assert _row_union_categorical(glob, ctry, name="u") is ctry
+
+
+def test_undeclared_key_mismatch_stays_silent(tmp_path):
+    """The #832 fallback (Malawi, Mali, Nigeria, Uganda ``u`` -- positional
+    ``Code`` against global ``Original Label``) is pre-existing and nobody
+    declared anything; it must not start warning."""
+    ctry = all_dfs_from_orgfile(_org(tmp_path, """
+        #+name: u
+        | Code | Original Label | Preferred Label |
+        |------+----------------+-----------------|
+        |    1 | Kilogramme     | Kg              |
+        """))["u"]
+    assert _categorical_key_column(ctry) == "Code"
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", CategoricalKeyMismatchWarning)
+        assert _merge_categorical_tables({"u": _global_u()}, {"u": ctry})["u"] is ctry
+
+
+def test_aligned_declaration_stays_silent_and_inherits(tmp_path):
+    """Niger's shape: the country declares the key the global table already
+    uses, so the rows align and the global rows are inherited."""
+    glob = _global_u()
+    ctry = all_dfs_from_orgfile(_org(tmp_path, _COUNTRY_U_BY_CODE.format(
+        key="#+key: Original Label")))["u"]
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", CategoricalKeyMismatchWarning)
+        out = _merge_categorical_tables({"u": glob}, {"u": ctry})["u"]
+    assert len(out) == len(set(glob["Original Label"]) | {"Kilogramme"})
 
 
 def test_undeclared_merge_carries_no_attr():

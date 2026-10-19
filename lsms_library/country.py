@@ -513,8 +513,23 @@ def _categorical_key_column(table: "pd.DataFrame", idxvars: str | None = None,
     return cols[0] if cols else None
 
 
+class CategoricalKeyMismatchWarning(UserWarning):
+    """A ``#+key:`` declaration cut a country table off from its global rows.
+
+    Raised by :func:`_row_union_categorical` when an additive-merge table's
+    country and cross-country key columns differ AND either side declares its
+    key, so the merge falls back to the country table wholesale and serves
+    none of the global rows (GH #928, red team r1 F2).  An UNDECLARED mismatch
+    stays silent: it is the pre-existing positional behaviour (#832 -- Malawi,
+    Mali, Nigeria and Uganda ``u`` today), and a declaration is the point at
+    which someone has made a statement the merge then silently overrides.
+    """
+
+
 def _row_union_categorical(global_t: "pd.DataFrame",
-                           country_t: "pd.DataFrame") -> "pd.DataFrame":
+                           country_t: "pd.DataFrame", *,
+                           name: str | None = None,
+                           country: str | None = None) -> "pd.DataFrame":
     """Row-union a global and a country categorical table; country row wins.
 
     Identity is the key column of each side, as :func:`_categorical_key_column`
@@ -523,11 +538,27 @@ def _row_union_categorical(global_t: "pd.DataFrame",
     country keys are added; global keys absent from the country table are
     kept.  Columns are outer-unioned (e.g. per-wave columns), with country
     values winning on overlap.  Falls back to the country table wholesale
-    when the two key columns don't agree (can't align).
+    when the two key columns don't agree (can't align) -- and, when either
+    side DECLARES its key, says so with :class:`CategoricalKeyMismatchWarning`
+    naming *name*, both keys and the global rows not inherited.
     """
     gk = _categorical_key_column(global_t)
     ck = _categorical_key_column(country_t)
     if gk is None or ck is None or gk != ck:
+        declared = [side for side, t in (("country", country_t),
+                                         ("cross-country", global_t))
+                    if CATEGORICAL_KEY_ATTR in t.attrs]
+        if declared:
+            where = f" on {country!r}" if country else ""
+            warnings.warn(
+                f"categorical table {name or '?'!r}{where}: the country table "
+                f"keys on {ck!r} but the cross-country table keys on {gk!r} "
+                f"(#+key: declared on the {' and '.join(declared)} side), so "
+                f"the additive merge cannot align rows and serves the country "
+                f"table wholesale -- {len(global_t)} cross-country row(s) are "
+                f"NOT inherited.  Key both sides on the same column to inherit "
+                f"them (GH #928).",
+                CategoricalKeyMismatchWarning, stacklevel=2)
         return country_t
     # country first + keep='first' => country rows win on key collision;
     # concat outer-joins columns (NaN-filled), so wave columns survive.
@@ -595,18 +626,21 @@ def _no_such_country_message(country_name: str) -> str:
     return msg
 
 
-def _merge_categorical_tables(global_maps: dict, country_maps: dict) -> dict:
+def _merge_categorical_tables(global_maps: dict, country_maps: dict, *,
+                              country: str | None = None) -> dict:
     """Merge global and per-country categorical tables.
 
     Default is full-table override (country replaces global by name).  For
     names in :data:`_ADDITIVE_CATEGORICAL_TABLES`, the two are row-unioned
     (see :func:`_row_union_categorical`) when both exist, so the country
     inherits global rows and overrides only the keys it redeclares.
+    *country* only names the country in a key-mismatch warning.
     """
     merged = dict(global_maps)
     for name, ctab in country_maps.items():
         if name in _ADDITIVE_CATEGORICAL_TABLES and name in merged:
-            merged[name] = _row_union_categorical(merged[name], ctab)
+            merged[name] = _row_union_categorical(merged[name], ctab,
+                                                  name=name, country=country)
         else:
             merged[name] = ctab
     return merged
@@ -2337,7 +2371,7 @@ class Country:
                     break
 
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
-                global_maps, country_maps)
+                global_maps, country_maps, country=self.name)
         return self.__dict__['_categorical_mapping_cache']
 
     def _unit_kg_factors(self) -> dict[str, float]:

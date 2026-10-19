@@ -439,6 +439,12 @@ carries both a code and a label column (Niger `u` is the first). Callers that
 name their key (`mappings: [table, key, value]`, `get_categorical_mapping` /
 `code_label_map`'s `idxvars`, `_relabel_j`) do not read `#+key:`. Declaring a
 key edits a level's `.org`, which is that level's cache event (fact 3 above).
+An additive merge aligns rows on each side's resolved key, so where the
+country and cross-country keys differ it serves the country table wholesale
+and inherits **no** global row -- silently when neither side declares (Malawi,
+Mali, Nigeria, Uganda `u`: #832), but with a `CategoricalKeyMismatchWarning`
+naming the table, both keys and the global rows lost when either side does
+(census: fires on no country today).
 
 **Where a new SHARED table goes, and what makes it reachable.** Put it in
 `lsms_library/categorical_mapping/<table>.org` with a `#+name:` — and then wire
