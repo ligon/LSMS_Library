@@ -1935,7 +1935,7 @@ _COMMUNITY_PRICE_UNIT_LABELS = {
     1: 'Kg', 2: 'Gram', 3: 'Litre', 4: 'Millilitre', 5: 'Piece',
 }
 
-COMMUNITY_PRICES_COLUMNS = ['Price']
+COMMUNITY_PRICES_COLUMNS = ['Price', 'Description']
 
 
 def _community_price_codes(tablename='harmonize_community_price'):
@@ -1947,7 +1947,7 @@ def _community_price_codes(tablename='harmonize_community_price'):
     return _plot_harmonized_codes(tablename)
 
 
-def community_prices_for_wave(t, idf, colmap):
+def community_prices_for_wave(t, idf, colmap, item_labels=None):
     """Build canonical ``community_prices`` for one Tanzania NPS wave.
 
     Parameters
@@ -1962,11 +1962,16 @@ def community_prices_for_wave(t, idf, colmap):
         unit    -- native unit column          (cm_f061)
         qty     -- reported quantity basis      (cm_f062)
         price   -- reported price for that qty  (cm_f063)
+    item_labels : pd.Series, optional
+        the same file's ``item_id`` VALUE LABELS (convert_categoricals=True),
+        row-aligned with ``idf``; served as ``Description``.
 
     Returns
     -------
-    pd.DataFrame indexed by (t, v, j, u) with column COMMUNITY_PRICES_COLUMNS
-    (['Price'] -- reported unit price, currency per one native unit u).
+    pd.DataFrame indexed by (t, v, j, u, variety) with columns
+    COMMUNITY_PRICES_COLUMNS (``Price`` -- reported unit price, currency per
+    one native unit u; ``Description`` -- the questionnaire's own item label).
+    ``variety`` is the SOURCE community-price item code (GH #840).
     """
     c = colmap
     code_map = _community_price_codes()
@@ -1977,11 +1982,24 @@ def community_prices_for_wave(t, idf, colmap):
 
     unit_code = pd.to_numeric(idf[c['unit']], errors='coerce').astype('Int64')
 
+    if item_labels is None:
+        description = pd.Series(pd.NA, index=idf.index, dtype='string')
+    else:
+        if len(item_labels) != len(idf):
+            raise ValueError("community_prices_for_wave: item_labels is not "
+                             "row-aligned with idf")
+        description = pd.Series(item_labels.values, index=idf.index).astype('string').str.strip()
+
     out = pd.DataFrame({
         'v': idf[c['cluster']].astype('string').str.strip(),
         'j': code.map(code_map).astype('string'),
         # Native unit CODE -> canonical Preferred Label.
         'u': unit_code.map(_COMMUNITY_PRICE_UNIT_LABELS).astype('string'),
+        # The SOURCE item code, as a string (GH #840): finer than j, which
+        # deliberately lumps codes (6 MILLET + 7 SORGHUM -> "Millet & Sorghum
+        # (grain)").
+        'variety': code.astype('string'),
+        'Description': description,
         'Price': price,
         '_qty': qty,
     })
@@ -2000,55 +2018,41 @@ def community_prices_for_wave(t, idf, colmap):
 
     out['t'] = t
 
-    # ~10% of (t, v, j, u) tuples carry >1 source item code that the shared
-    # label deliberately MERGES (e.g. MILLET (GRAIN) + SORGHUM (GRAIN) -> the
-    # one harmonize_food label "Millet & Sorghum (grain)", exactly as
-    # food_acquired lumps them).  Keep-first: a genuine REPORTED price per cell
-    # (consistent with the sibling community_prices features), not a computed
-    # mean over the label-lumped rows.  [The paragraph that used to stand here
-    # said the collision was resolved by the MEAN; the code has always taken
-    # the first.  Corrected under GH #637 -- doc only, no behaviour change.]
-    #
-    # GH #637 key-soundness review.  (t, v, j, u) IS the declared grain of this
-    # feature, and the collisions are EXACTLY the intended label lump, checked
-    # rather than assumed: of 261 colliding groups in 2019-20 and 1,281 in
-    # 2020-21, 261 / 1,281 span more than one SOURCE ITEM CODE and ZERO repeat
-    # a code.  So the survey never prices the same item twice in a cluster, and
-    # no additional index level is available that would not break the shared
-    # `j` vocabulary this feature exists to join on.
-    #
-    # What the collapse DOES do is resolve genuine disagreement arbitrarily:
-    # 243 of the 261 (2019-20) and 1,149 of the 1,281 (2020-21) groups hold
-    # more than one distinct observed price, e.g. cluster 01-06-47-85 in
-    # 2020-21 reports "Millet & Sorghum (grain)" per Kg at both 2,000 and
-    # 16,000 TSh -- .first() keeps 2,000 and the other observation disappears.
-    # That is the GH #323 "arbitrary resolution of two OBSERVED values"
-    # discussion, explicitly NOT the GH #637 completion question, and per #323
-    # D1 the answer may not be a reducer.  Left for a maintainer decision;
-    # recorded here rather than half-fixed.
-    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False)
-              [['Price']].first())
+    # GH #840 -- NO ROW IS SELECTED.  ~10% of (t, v, j, u) tuples carry more
+    # than one SOURCE ITEM CODE that the shared label deliberately MERGES (e.g.
+    # MILLET (GRAIN) + SORGHUM (GRAIN) -> the one harmonize_food label "Millet &
+    # Sorghum (grain)", exactly as food_acquired lumps them).  The GH #637
+    # key-soundness review measured it: of 261 colliding (t, v, j, u) groups in
+    # 2019-20 and 1,281 in 2020-21, every one spans more than one source code
+    # and ZERO repeat a code -- the survey never prices the same item twice in
+    # a cluster -- while 243 / 1,149 of them hold more than one distinct price
+    # (cluster 01-06-47-85, 2020-21, "Millet & Sorghum (grain)" per Kg at both
+    # 2,000 and 16,000 TSh).  Until #840 a ``groupby(...).first()`` kept one
+    # and dropped the other.  That review concluded "no additional index level
+    # is available that would not break the shared `j` vocabulary"; the
+    # `variety` level is that level, and it leaves `j` untouched -- the code is
+    # finer than j, so (t, v, j, u, variety) is unique and j still joins
+    # food_acquired / crop_production.  Ruling: @ligon, 2026-10-18 (#840).
+    dup = out.duplicated(['t', 'v', 'j', 'u', 'variety'], keep=False)
+    assert not dup.any(), (
+        f"community_prices {t}: {int(dup.sum())} rows share a "
+        "(t, v, j, u, variety) key -- the survey prices an item once per "
+        "cluster, so this is a broken key, not a cell to select from (GH #840)")
 
-    # community_prices is a CLUSTER table -- there is no household i, the
-    # natural grain is (t, v, j, u).  But the framework's
-    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # community_prices is a CLUSTER table -- there is no household i.  But the
+    # framework's local_tools.map_index() (run on EVERY read path) swaps
     # j -> i whenever a `j` index level is present and an `i` level is NOT.
-    # That swap would rename our item level `j` to `i`, drop `j`, and collapse
-    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
-    # framework, carry a redundant `i` level (set equal to the cluster v)
-    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
-    # does NOT swap, and the framework's _normalize_dataframe_index drops the
-    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
-    # canonical (t, v, j, u) grain.  v already in the index means
-    # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
-    # (Same framework-compatibility shim Malawi/Ethiopia/Mali community_prices
-    # use -- see Malawi assemble_community_prices.)
+    # Carry a redundant `i` level (set equal to the cluster v) positioned
+    # BEFORE `j`: map_index then does NOT swap, and the framework's
+    # _normalize_dataframe_index drops the undeclared `i` level, leaving the
+    # declared grain.  v already in the index means _join_v_from_sample is
+    # skipped; the spurious i==v never reaches the API.  (Same
+    # framework-compatibility shim Malawi/Ethiopia/Mali community_prices use --
+    # see Malawi assemble_community_prices.)
     out['i'] = out['v']
-    out = out.set_index(['t', 'v', 'i', 'j', 'u'])
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'variety']).sort_index()
 
     out = out[COMMUNITY_PRICES_COLUMNS]
-    assert out.reset_index().duplicated(['t', 'v', 'j', 'u']).sum() == 0, \
-        f"community_prices {t}: (t,v,j,u) not unique"
     return out
 
 
