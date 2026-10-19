@@ -26,14 +26,19 @@ Two assertions, deliberately not a whole-corpus ban on C1 in `.org` files:
    which a C1 reached a served label, and this pins the whole repair rather
    than the served column alone.
 
-Known C1 cells that the scoped assertion does NOT cover, on purpose (they
-are KEY columns, matched against the raw data, so the byte is load-bearing
-until the raw read is re-keyed under GH #794 strategy B / GH #805):
-Mali `harmonize_food` `Code` (2 cells), Niger `harmonize_food` `Original
-Label` (2), Burkina_Faso `harmonize_food` `Original Label` (3); Uganda's `u`
-table carries 4 in wave-label columns (inert -- `u` is keyed on `Code`), and
-`Togo/2018/_/notes.org` is prose.  These are named here as a comment, not
-consulted as an allowlist: when they are re-keyed, widen assertion 1.
+3. (GH #805, widening 1 as this docstring asked.)  No cell of ANY table in
+   those files -- key columns included -- carries a cp1252-class C1 code
+   point.  The reader re-decodes cp1252 strings of pre-118 `.dta` files
+   since #805, so a key spelled with that damage now matches nothing; the
+   C1-keyed rows it re-keyed were Mali `harmonize_food` `Code` (2 cells),
+   Niger `harmonize_food` `Original Label` (2), Burkina_Faso `harmonize_food`
+   `Original Label` (3) and Uganda's `u` wave-label column (4, inert -- `u`
+   is keyed on `Code`).  A C1 code point is admitted only INSIDE a UTF-8
+   double encoding (UTF-8 bytes read as latin-1, e.g. ``b\xc5\x93uf``),
+   which #805 deliberately leaves alone and which is still load-bearing as
+   a key (Burkina_Faso's 2018-19 beef row; `Togo/2018/_/notes.org`
+   documents the same spelling).  That is a rule about the CLASS of the
+   string, not an allowlist of cells.
 """
 from __future__ import annotations
 
@@ -129,3 +134,44 @@ def test_scanner_sees_the_known_tables():
     text = (countries_root() / GHANALSS_FILES[1]).read_text(encoding="utf-8")
     cells = [c for _, c in _preferred_label_cells(text)]
     assert "Women's polyester skirt" in cells          # harmonize_price_item code 309
+
+
+def _is_double_encoding(s: str) -> bool:
+    """True when *s* is UTF-8 bytes read as latin-1 -- the one class whose C1
+    code points are a UTF-8 continuation byte rather than cp1252 damage."""
+    try:
+        return s.encode("latin-1").decode("utf-8") != s
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return False
+
+
+def test_no_cp1252_damage_in_any_table_cell():
+    """GH #805: key columns too.  Every C1-bearing cell of every org table row
+    must be a UTF-8 double encoding; a cp1252-class C1 (what the latin-1 read
+    of a cp1252 file used to emit) is now unreachable as a key."""
+    offenders = []
+    for f in _curated_org_files():
+        text = _read(f)
+        if not C1.search(text):
+            continue
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            if not line.strip().startswith("|") or not C1.search(line):
+                continue
+            for cell in line.strip().strip("|").split("|"):
+                cell = cell.strip()
+                if C1.search(cell) and not _is_double_encoding(cell):
+                    offenders.append(f"{f.relative_to(countries_root().parent)}:{lineno}: {cell!r}")
+    assert not offenders, (
+        "cp1252-class C1 code points in a curated org table (re-key to the "
+        "decoded spelling the reader now emits, GH #805):\n  " + "\n  ".join(offenders))
+
+
+def test_double_encoding_exemption_is_not_vacuous():
+    """The exemption must still be needed (or the widening above is the whole
+    rule and this exemption should go): Burkina_Faso keys its 2018-19 beef on
+    the UTF-8 double encoding, and that row is C1-bearing by construction."""
+    text = (countries_root() / "Burkina_Faso/_/categorical_mapping.org").read_text(encoding="utf-8")
+    cells = [c.strip() for line in text.splitlines() if line.strip().startswith("|")
+             for c in line.strip().strip("|").split("|")]
+    double = [c for c in cells if C1.search(c) and _is_double_encoding(c)]
+    assert double == ["Viande de b\u00c5\u0093uf"], double
