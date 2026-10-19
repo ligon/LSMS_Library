@@ -1478,9 +1478,10 @@ def _stata_release(head: bytes) -> int | None:
 # apostrophes and dashes (’ ‘ – —) are word-internal in real text (``Men’s``,
 # ``Kruševac``, ``CAPENTRY—FURNITURE``).  (b) is a stated tolerance, not a
 # discovered boundary.  On the held corpus (a) and (b) together refuse
-# exactly the Albania / Panama / Kyrgyz / Kazakhstan files -- 58 of the 227
-# pre-118 files holding a candidate -- and nothing else; the other 169 are
-# re-decoded.  A refused file is served exactly as before.
+# exactly the Albania / Panama / Kyrgyz / Kazakhstan files -- 58 of the 226
+# pre-118 files holding a candidate -- and nothing else; the other 168 are
+# re-decoded (census and its re-run tool: ``slurm_logs/gh805_cp1252/``).
+# A refused file is served exactly as before.
 #
 # Scope gates, both deliberate: only a format < 118 head (pandas chose latin-1
 # there; a format-118 file is UTF-8 and a C1 code point in it is damage

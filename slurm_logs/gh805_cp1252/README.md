@@ -11,7 +11,7 @@ staging store AFTER the bundle re-warm has fetched what is missing.
 |---|---|
 | `census_l1.py` | every held `.dta`: read the blob as the reader does, apply the LIVE predicate (imported from `local_tools`, so it judges with the code on `PYTHONPATH`), record a verdict (`clean` / `gated-118` / `no-candidate` / `decode` / `refuse` / `error`) and per-file counts |
 | `frames_l1.py` | every C1-bearing file of a census, read through `get_dataframe` itself; hashes the served frame, so two code versions can be compared frame by frame |
-| `census_2026-10-19.md` | summary of the run at `45692e06a`, with its comparison against `b7b6de11e` (before the truncated-double tightening) |
+| `census_2026-10-19.md` | summary of the run at `45692e06a`, with its comparison against `b7b6de11e` (before the truncated-double tightening). The path in its "Compared with `../work/census_head.jsonl`" heading is that `b7b6de11e` run, on the worker's node-local disk; it is not committed |
 | `census_2026-10-19_c1_files.tsv` | one row per C1-bearing file (309): verdict, candidates, C1 cells, decoded cells and labels, refusal reasons, decoded characters |
 
 ## Re-running it over the staging store (after the re-warm)
