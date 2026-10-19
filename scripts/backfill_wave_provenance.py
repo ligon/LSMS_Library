@@ -6,11 +6,12 @@ Bank catalog entry (or which non-WB source) it actually holds, so that
 ``discover_waves()`` can match on identity rather than on a wave label
 reconstructed from a year range.  See :mod:`lsms_library.provenance`.
 
-Resolution is evidence-based.  A wave is only marked resolved when the
-evidence is conclusive; otherwise it is recorded as ``unknown``.  **We never
-guess.**  In particular a wave with no ``SOURCE.org`` is *not* resolved by
-matching its directory name against a catalog year range -- that heuristic is
-exactly the bug this work exists to remove.
+Resolution is evidence-based.  A wave is only stamped when the evidence is
+conclusive; otherwise nothing is written and the wave is listed in the review
+artifact (below).  **We never guess.**  In particular a wave with no
+``SOURCE.org`` is *not* resolved by matching its directory name against a
+catalog year range -- that heuristic is exactly the bug this work exists to
+remove.
 
 Resolution ladder
 -----------------
@@ -48,19 +49,38 @@ record, so there is nothing to write by accident.  A wave is unresolved when:
   cannot tell them apart, so the whole country is left alone;
 * it records no evidence the ladder can use (step 5), or its country has no
   ``_COUNTRY_CATALOG`` entry;
-* it records a WB id although its country is marked not-a-WB-dataset;
+* it records a WB id although its country is marked not-a-WB-dataset, or it
+  is an explicit ``unknown`` carrying a note in such a country -- a human's
+  "we do not know, because ..." is theirs to settle, not a config flag's;
 * the record the ladder *would* write drops something the file already holds
   -- an id, a ``covers`` entry, a ``#+KEY:`` line, the preserved prose.  The
-  backfill may add to and update a record; it may not delete from one.
+  backfill may add to and update a record; it may not delete from one;
+* the catalog now reports a **different release** of the entry the file
+  records -- a changed (not newly added) ``#+CATALOG_IDNO:`` or
+  ``#+CATALOG_DOI:`` under the same catalog id (kind ``release-changed``).
+  Those keys describe the release whose files the directory HOLDS
+  (:mod:`lsms_library.provenance`: "which source dataset a wave directory
+  actually holds"); the catalog reports its LATEST.  Stamping the latest
+  would make the record lie about what is on disk -- ``Nigeria/2023-24``
+  holds ``NGA_2023_GHSP-W5_v01_M`` (106 files, no household geovariables;
+  ``Nigeria/_/CONTENTS.org``) while the catalog has moved to ``v02_M``.  An
+  override that *corrects* the id is exempt: a different entry has a
+  different idno by construction.
 
 The review artifact is an org file, written **outside** ``countries_root()``
 (the config tree is read-only at runtime; see CLAUDE.md), by default to
 ``platformdirs.user_cache_path("lsms_library")/provenance_review/``; override
 with ``--review-file``.  It is written on every run, ``--dry-run`` included,
-so a missing file never needs interpreting.  Two named tables:
-``catalog_queries`` (rows the catalog returned per country -- zero means the
-country was not checked at all) and ``unresolved`` (one row per wave left
-intact: what the file records, and why it could not be resolved).
+and from a ``finally`` -- so a run that dies part-way still says what it
+wrote before it died, and a missing file never needs interpreting.  Three
+named tables: ``catalog_queries`` (rows the catalog returned per country --
+zero means the country was not checked at all), ``unresolved`` (one row per
+wave left intact: what the file records, and why it could not be resolved)
+and ``changed`` (one row per value a successful re-stamp writes -- or, under
+``--dry-run``, would write -- with the old and the new value).
+
+The exit status is non-zero when every country queried returned no rows: that
+is an outage, a missing key or a filter, not a clean run.
 
 A record whose content would not change is not rewritten either, so
 ``#+PROVENANCE_RECORDED:`` stays the date the record's content was last
@@ -91,6 +111,7 @@ from lsms_library.data_access import (
 from lsms_library.paths import countries_root
 from lsms_library.provenance import (
     SOURCE_EXTERNAL,
+    SOURCE_UNKNOWN,
     SOURCE_WORLDBANK,
     VALIDATION_CATALOG_ONLY,
     VALIDATION_CONTENT,
@@ -420,11 +441,26 @@ def resolve(country: str, wave: str, root: Path,
 
     # --- 3. A non-WB host ---------------------------------------------------
     if url and existing.source == SOURCE_EXTERNAL:
+        # Built from the existing record, like _resolve_not_wb: the catalog has
+        # nothing to say about an external wave, so every value already
+        # recorded is a human's (or an earlier run's) and is carried through.
+        # The method and note are templates only for a legacy bare-URL file.
+        # They used to be templates always, so a hand-edited #+PROVENANCE_NOTE
+        # or #+PROVENANCE_METHOD was overwritten -- dropped_by_write checks
+        # that a key survives, not its value (GH #600, red team r1 H1).
         host = url.split("//")[-1].split("/")[0]
+        method = (existing.method
+                  if existing.method not in (None, "legacy-source-url")
+                  else "external-source")
         return WaveProvenance(
             country=country, wave=wave, source=SOURCE_EXTERNAL,
-            url=url, method="external-source", recorded=today, notes=keep,
-            note=f"Obtained from {host}, not the World Bank Microdata Library.",
+            idno=existing.idno, title=existing.title, years=existing.years,
+            repository=existing.repository, doi=existing.doi, url=url,
+            method=method, validation=existing.validation, recorded=today,
+            note=(existing.note or f"Obtained from {host}, not the World "
+                                   "Bank Microdata Library."),
+            superseded_url=existing.superseded_url, notes=keep,
+            extra=dict(existing.extra),
         ), "external"
 
     # --- 5. Unresolved -----------------------------------------------------
@@ -459,6 +495,19 @@ def _resolve_not_wb(country: str, wave: str, root: Path, reason: str | None,
             f"SOURCE.org records WB catalog id(s) "
             f"{', '.join(existing.catalog_ids)}, but _COUNTRY_CATALOG marks "
             f"{country} not a World Bank dataset.")
+    if existing.source == SOURCE_UNKNOWN and existing.note:
+        # An explicit 'unknown' with a reason is a human saying "we do not
+        # know where this came from, because ...".  Relabelling it 'external'
+        # on the strength of a country-level config flag would either replace
+        # that reason with the flag's (what this branch used to do, red team
+        # r1 H2) or leave it explaining a record it no longer describes.  A
+        # bare 'unknown' -- no reason given -- is still resolved below.
+        raise Unresolved(
+            "explicit-unknown",
+            f"SOURCE.org records provenance 'unknown' with a note "
+            f"({existing.note!r}); _COUNTRY_CATALOG marks {country} not a "
+            "World Bank dataset.  Settle by hand: stamp it external, or "
+            "keep the unknown.")
     stamped = (existing.source == SOURCE_EXTERNAL
                and existing.method not in (None, "legacy-source-url"))
     method = existing.method if stamped else "not-a-wb-dataset"
@@ -511,6 +560,89 @@ def dropped_by_write(old_text: str, new: WaveProvenance) -> list[str]:
     return lost
 
 
+def _doi_key(doi: str | None) -> str | None:
+    """A DOI reduced to its bare suffix, as ``_build_catalog_index`` keys it,
+    so ``https://doi.org/10.48529/x`` and ``10.48529/x`` are the same DOI."""
+    if not doi:
+        return None
+    return doi.split("doi.org/")[-1].strip().rstrip("/") or None
+
+
+def release_changed(old_text: str, new: WaveProvenance) -> list[str]:
+    """Release keys writing *new* over *old_text* would change, as ``old -> new``.
+
+    ``#+CATALOG_IDNO:`` and ``#+CATALOG_DOI:`` name a *release* of a catalog
+    entry, and the record means the release this directory HOLDS.  The catalog
+    reports only its latest, so when the two disagree under the same catalog
+    id the catalog has moved on and the files on disk have not -- unless a
+    human says otherwise, which is a decision this script cannot take.
+
+    Only a CHANGE counts: a key the file lacks may be added (that is what a
+    first stamp does), and a key the new record lacks is ``dropped_by_write``'s
+    business.  Not applied when the primary catalog id itself changes -- the
+    one case is an override correcting a wrongly recorded entry (Nigeria/
+    2018-19, 3827 -> 3557), where a different entry has a different idno by
+    construction.  An override re-run whose id already matches IS checked.
+    """
+    old = parse_source_org(old_text, new.country, new.wave)
+    back = parse_source_org(render_source_org(new), new.country, new.wave)
+    if old.catalog_id != back.catalog_id:
+        return []
+    changed: list[str] = []
+    if old.idno and back.idno and old.idno.strip() != back.idno.strip():
+        changed.append(f"CATALOG_IDNO {old.idno} -> {back.idno}")
+    old_doi, new_doi = _doi_key(old.doi), _doi_key(back.doi)
+    if old_doi and new_doi and old_doi != new_doi:
+        changed.append(f"CATALOG_DOI {old.doi} -> {back.doi}")
+    return changed
+
+
+# Field of WaveProvenance -> the SOURCE.org key that carries it, for the
+# ``changed`` table.  ``catalog_id`` is omitted: it is ``catalog_ids[0]``.
+_FIELD_KEYS = (
+    ("source", "PROVENANCE_SOURCE"), ("catalog_ids", "CATALOG_ID"),
+    ("covers", "CATALOG_COVERS"), ("idno", "CATALOG_IDNO"),
+    ("title", "CATALOG_TITLE"), ("years", "CATALOG_YEARS"),
+    ("repository", "CATALOG_REPOSITORY"), ("doi", "CATALOG_DOI"),
+    ("url", "CATALOG_URL"), ("method", "PROVENANCE_METHOD"),
+    ("validation", "PROVENANCE_VALIDATION"),
+    ("superseded_url", "PROVENANCE_SUPERSEDED_URL"),
+    ("note", "PROVENANCE_NOTE"), ("notes", "(preserved notes)"),
+)
+
+
+def changed_by_write(old_text: str | None,
+                     new: WaveProvenance) -> list[tuple[str, str | None,
+                                                         str | None]]:
+    """``(key, old, new)`` for every value writing *new* would change.
+
+    Compared as parsed records -- what is on disk now against what would be
+    on disk after the write -- excluding ``#+PROVENANCE_RECORDED:``.  With no
+    existing file (*old_text* None) every value written is listed as new.
+    """
+    back = parse_source_org(render_source_org(new), new.country, new.wave)
+    old = (parse_source_org(old_text, new.country, new.wave)
+           if old_text is not None else None)
+
+    def show(v) -> str | None:
+        if isinstance(v, list):
+            return ", ".join(v) or None
+        return v or None
+
+    out: list[tuple[str, str | None, str | None]] = []
+    for attr, key in _FIELD_KEYS:
+        a = show(getattr(old, attr)) if old is not None else None
+        b = show(getattr(back, attr))
+        if a != b:
+            out.append((key, a, b))
+    old_extra = old.extra if old is not None else {}
+    for key in sorted(set(old_extra) | set(back.extra)):
+        a, b = old_extra.get(key) or None, back.extra.get(key) or None
+        if a != b:
+            out.append((key, a, b))
+    return out
+
+
 def unchanged_by_write(old_text: str, new: WaveProvenance) -> bool:
     """Would writing *new* change nothing but ``#+PROVENANCE_RECORDED:``?
 
@@ -549,13 +681,16 @@ def _cell(value) -> str:
     return text.replace("|", r"\vert{}")
 
 
-def write_review(path: Path, unresolved: list[dict], queries: list[dict], *,
-                 root: Path, dry_run: bool, argv: list[str],
-                 when: str) -> Path:
-    """Write the review artifact: what this run left intact, and why."""
+def write_review(path: Path, unresolved: list[dict], queries: list[dict],
+                 changed: list[dict], *, root: Path, dry_run: bool,
+                 argv: list[str], when: str,
+                 aborted: str | None = None) -> Path:
+    """Write the review artifact: what this run left intact, and why -- and
+    every value it changed (or, dry, would have changed)."""
     q_cols = ("Country", "Code", "Rows returned")
     u_cols = ("Country", "Wave", "Kind", "Recorded source",
               "Recorded CATALOG_ID", "Recorded method", "SOURCE.org", "Reason")
+    c_cols = ("Country", "Wave", "SOURCE.org", "Key", "Old", "New")
 
     def table(name: str, cols: tuple[str, ...], rows: list[dict]) -> list[str]:
         return ([f"#+name: {name}", "| " + " | ".join(cols) + " |",
@@ -563,26 +698,45 @@ def write_review(path: Path, unresolved: list[dict], queries: list[dict], *,
                 + ["| " + " | ".join(_cell(r[c]) for c in cols) + " |"
                    for r in rows])
 
+    verb = "would change" if dry_run else "changed"
     lines = [
-        "#+TITLE: Provenance backfill -- waves left unresolved",
+        "#+TITLE: Provenance backfill -- what was left intact, and what changed",
         f"#+DATE: {when}",
         "",
         f"Run: =backfill_wave_provenance.py {' '.join(argv)}= "
         f"({'dry run' if dry_run else 'write'}), countries_root() = {root}",
         "",
+    ]
+    if aborted:
+        lines += [
+            f"*THIS RUN DID NOT FINISH*: it raised {aborted}.  The tables below",
+            "cover only the waves reached before that; every later wave was",
+            "not checked.  The =changed= table is what was written before it.",
+            "",
+        ]
+    lines += [
         "Every wave in the =unresolved= table was LEFT INTACT: its SOURCE.org,",
         "if it has one, was not written (GH #600).  Settle each by hand, or",
         "re-run once the catalog answers; never re-stamp one as =unknown=.",
         "A country with 0 rows in =catalog_queries= was not checked at all.",
+        f"The =changed= table lists every value this run {verb}, old and new.",
         "",
         "* Catalog queries",
         *table("catalog_queries", q_cols, queries),
         "",
         f"* Unresolved waves ({len(unresolved)})",
         *table("unresolved", u_cols, unresolved),
+        "",
+        f"* Values {verb} ({len({(r['Country'], r['Wave']) for r in changed})}"
+        " SOURCE.org)",
+        *table("changed", c_cols, changed),
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Atomic: a reader never sees half an artifact, and a failed write never
+    # truncates the previous one at the same path.
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    tmp.replace(path)
     return path
 
 
@@ -618,6 +772,7 @@ def main(argv: list[str] | None = None) -> int:
     rows: list[tuple[str, str, str, str]] = []
     unresolved: list[dict] = []
     queries: list[dict] = []
+    changed: list[dict] = []
 
     def leave_intact(country: str, wave: str, u: Unresolved) -> None:
         existing = read_provenance(root, country, wave)
@@ -646,11 +801,26 @@ def main(argv: list[str] | None = None) -> int:
                     f"Resolved ({outcome}), but the record written would "
                     f"delete {', '.join(lost)} from SOURCE.org."))
                 return
+            moved = release_changed(old, prov)
+            if moved:
+                leave_intact(country, wave, Unresolved(
+                    "release-changed",
+                    f"Resolved ({outcome}), but the catalog now reports a "
+                    f"different release than SOURCE.org records: "
+                    f"{'; '.join(moved)}.  The record names the release "
+                    "these files ARE; check which one is on disk before "
+                    "re-stamping."))
+                return
             if unchanged_by_write(old, prov):
                 actions["unchanged"] += 1
                 counts[outcome] += 1
                 rows.append((country, wave, outcome, "unchanged"))
                 return
+        for key, was, now_ in changed_by_write(old, prov):
+            changed.append({"Country": country, "Wave": wave,
+                            "SOURCE.org": ("updated" if old is not None
+                                           else "created"),
+                            "Key": key, "Old": was, "New": now_})
         if not args.dry_run:
             write_provenance(root, prov)
         actions["written"] += 1
@@ -659,11 +829,11 @@ def main(argv: list[str] | None = None) -> int:
                   if prov.catalog_id else (prov.note or "")[:52])
         rows.append((country, wave, outcome, detail))
 
-    for country in countries:
+    def run_country(country: str) -> None:
         spec = _COUNTRY_CATALOG.get(country)
         waves = _wave_dirs(root, country)
         if not waves:
-            continue
+            return
 
         declared = _declared_waves(country)
 
@@ -676,7 +846,7 @@ def main(argv: list[str] | None = None) -> int:
             rows.append((country, wave, "skipped",
                          "not a declared wave; stamping would create one"))
         if not waves:
-            continue
+            return
 
         if spec is None:
             for wave in waves:
@@ -685,7 +855,7 @@ def main(argv: list[str] | None = None) -> int:
                     f"{country} has no entry in _COUNTRY_CATALOG "
                     "(data_access.py), so there is no catalog to resolve "
                     "against."))
-            continue
+            return
 
         if not spec.discoverable or not spec.code:
             # Explicitly non-WB (e.g. EthiopiaRHS, KenyaLPS).  Record what we
@@ -698,7 +868,7 @@ def main(argv: list[str] | None = None) -> int:
                     leave_intact(country, wave, u)
                     continue
                 stamp(country, wave, prov, outcome)
-            continue
+            return
 
         by_id, by_doi = _build_catalog_index(spec.code)
         queries.append({"Country": country, "Code": spec.code,
@@ -713,7 +883,7 @@ def main(argv: list[str] | None = None) -> int:
                     f"The WB catalog search for {spec.code} returned no rows "
                     "(unreachable, no API key, or filtered), so nothing was "
                     "checked."))
-            continue
+            return
 
         for wave in waves:
             try:
@@ -724,8 +894,19 @@ def main(argv: list[str] | None = None) -> int:
                 continue
             stamp(country, wave, prov, outcome)
 
-    write_review(review, unresolved, queries, root=root,
-                 dry_run=args.dry_run, argv=argv, when=now.isoformat())
+    aborted: str | None = None
+    try:
+        for country in countries:
+            run_country(country)
+    except BaseException as exc:             # noqa: BLE001 - re-raised
+        aborted = f"{type(exc).__name__}: {exc}"
+        raise
+    finally:
+        # Written whatever happens: a run that dies part-way must still
+        # say what it wrote before it died (red team r1, R13).
+        write_review(review, unresolved, queries, changed, root=root,
+                     dry_run=args.dry_run, argv=argv,
+                     when=now.isoformat(), aborted=aborted)
 
     # --- Report -------------------------------------------------------------
     width = max((len(f"{c}/{w}") for c, w, _, _ in rows), default=20)
@@ -750,6 +931,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  skipped           : {counts['skipped']}  "
           "(not declared waves; stamping would create one -- see _may_write)")
     print(f"\nReview artifact: {review}")
+    if queries and not any(q["Rows returned"] for q in queries):
+        # Every country asked returned nothing: an outage, a missing key or a
+        # filter -- not a clean run, whatever the counts above say.
+        print("\nERROR: the WB catalog returned no rows for any of the "
+              f"{len(queries)} countries queried; nothing was checked "
+              "against it.", file=sys.stderr)
+        return 1
     return 0
 
 

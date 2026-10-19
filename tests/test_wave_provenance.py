@@ -962,7 +962,9 @@ class TestFailedResolutionLeavesRecordIntact:
 
         before = _snapshot(countries)
         review = tmp_path / "review" / "unresolved.org"
-        assert bf.main(["--review-file", str(review)]) == 0
+        # Non-zero: every country queried returned nothing, which is an
+        # outage, not a clean run (it used to exit 0 here).
+        assert bf.main(["--review-file", str(review)]) == 1
 
         assert _snapshot(countries) == before   # same files, same bytes
 
@@ -1187,3 +1189,339 @@ class TestFailedResolutionLeavesRecordIntact:
         path = bf.review_path(None, real_root(), "2026-10-19T000000")
         assert not path.resolve().is_relative_to(real_root().resolve())
         assert path.name == "backfill_unresolved_2026-10-19T000000.org"
+
+
+# ---------------------------------------------------------------------------
+# GH #600 follow-up (red team r1): a SUCCESSFUL re-stamp may not overwrite a
+# recorded fact either -- a release we do not hold, a hand-edited note
+# ---------------------------------------------------------------------------
+
+def _shipped(country, wave):
+    from lsms_library.paths import countries_root as real_root
+    return pv.source_org_path(real_root(), country, wave).read_text()
+
+
+def _changed(review):
+    """The ``changed`` table as ``(country, wave, key, old, new)``; an empty
+    cell (``---``) is ``None``."""
+    import pandas as pd
+    from lsms_library.local_tools import df_from_orgfile
+    df = df_from_orgfile(review, name="changed", to_numeric=False)
+    return [tuple(None if pd.isna(r[c]) else r[c]
+                  for c in ("Country", "Wave", "Key", "Old", "New"))
+            for r in df.to_dict("records")]
+
+
+# Catalog 6410 as the shipped Nigeria/2023-24 record describes it (v01_M) ...
+NGA_W5 = {"id": "6410", "idno": "NGA_2023_GHSP-W5_v01_M",
+          "title": "General Household Survey, Panel 2023-2024",
+          "year_start": 2023, "year_end": 2024, "repository": "lsms",
+          "doi": "https://doi.org/10.48529/zd5s-tj25",
+          "url": "https://microdata.worldbank.org/index.php/catalog/6410"}
+# ... and as the live catalog reports it since 2026-09-16 (v02_M, new DOI).
+NGA_W5_V02 = dict(NGA_W5, idno="NGA_2023_GHSP-W5_v02_M",
+                  doi="https://doi.org/10.48529/90ec-pv69")
+
+# Catalog 6161 as the shipped Ethiopia/2021-22 record describes it (no DOI).
+ETH_W5 = {"id": "6161", "idno": "ETH_2021_ESPS-W5_v02_M",
+          "title": "Socio-Economic Panel Survey 2021-2022",
+          "year_start": 2021, "year_end": 2022, "repository": "lsms",
+          "doi": "",
+          "url": "https://microdata.worldbank.org/index.php/catalog/6161"}
+
+
+class TestReleaseChangeIsNotAReStamp:
+    """``CATALOG_IDNO`` / ``CATALOG_DOI`` name the release a directory HOLDS.
+
+    The catalog reports its latest.  Nigeria/2023-24 holds v01_M -- 106
+    files, no household geovariables (``Nigeria/_/CONTENTS.org``, "Wave 5
+    geovariables await acquisition of WB v02") -- and the catalog moved to
+    v02_M on 2026-09-16.  A re-stamp would have recorded v02_M over v01_M
+    files.  Now it is refused and listed, and the file is untouched."""
+
+    def test_nigeria_w5_v02_in_the_catalog_leaves_v01_record_intact(
+            self, bf, countries, monkeypatch, tmp_path):
+        text = _shipped("Nigeria", "2023-24")
+        assert "NGA_2023_GHSP-W5_v01_M" in text
+        _write_source(countries, "Nigeria", "2023-24", text)
+        _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5_V02])
+        review = tmp_path / "review.org"
+        assert bf.main(["--country", "Nigeria",
+                        "--review-file", str(review)]) == 0   # write mode
+
+        assert pv.source_org_path(countries, "Nigeria", "2023-24") \
+            .read_bytes() == text.encode()
+        row = _unresolved(review)[("Nigeria", "2023-24")]
+        assert row["Kind"] == "release-changed"
+        for s in ("NGA_2023_GHSP-W5_v01_M -> NGA_2023_GHSP-W5_v02_M",
+                  "zd5s-tj25", "90ec-pv69"):
+            assert s in row["Reason"]
+        assert _changed(review) == []
+
+    def test_the_release_on_record_is_still_confirmed_unchanged(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Control: the same row at the release we hold -> nothing to do."""
+        text = _shipped("Nigeria", "2023-24")
+        _write_source(countries, "Nigeria", "2023-24", text)
+        _catalog(monkeypatch, bf, NGA_ROWS + [NGA_W5])
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Nigeria", "2023-24") \
+            .read_text() == text
+        assert _unresolved(review) == {}
+        assert _changed(review) == []
+
+    def test_ethiopia_w5_idno_change_is_refused(
+            self, bf, countries, monkeypatch, tmp_path):
+        """The held tree is <= v02 (``Data/eth_plotgeovariables_y5.dta``; v03
+        renamed it ``Pub_ETH_PlotGeovariables_Y5.dta``)."""
+        text = _shipped("Ethiopia", "2021-22")
+        _write_source(countries, "Ethiopia", "2021-22", text)
+        _catalog(monkeypatch, bf, [dict(ETH_W5,
+                                        idno="ETH_2021_ESPS-W5_v03_M")])
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Ethiopia", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Ethiopia", "2021-22") \
+            .read_text() == text
+        row = _unresolved(review)[("Ethiopia", "2021-22")]
+        assert row["Kind"] == "release-changed"
+        assert "ETH_2021_ESPS-W5_v02_M -> ETH_2021_ESPS-W5_v03_M" \
+            in row["Reason"]
+
+    def test_a_newly_added_doi_is_an_addition_not_a_release_change(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Only a CHANGE is refused.  Ethiopia/2021-22 records no DOI; the
+        catalog supplying one at the SAME idno is written, and listed."""
+        _write_source(countries, "Ethiopia", "2021-22",
+                      _shipped("Ethiopia", "2021-22"))
+        doi = "https://doi.org/10.48529/xxxx-yyyy"
+        _catalog(monkeypatch, bf, [dict(ETH_W5, doi=doi)])
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Ethiopia", "--review-file", str(review)])
+
+        prov = pv.read_provenance(countries, "Ethiopia", "2021-22")
+        assert prov.doi == doi
+        assert prov.idno == "ETH_2021_ESPS-W5_v02_M"
+        assert _unresolved(review) == {}
+        assert _changed(review) == [
+            ("Ethiopia", "2021-22", "CATALOG_DOI", None, doi)]
+
+    def test_a_doi_spelled_differently_is_not_a_change(self):
+        bf = _load_backfill()
+        old = pv.render_source_org(pv.WaveProvenance(
+            country="Nigeria", wave="2023-24", source=pv.SOURCE_WORLDBANK,
+            catalog_id="6410", doi="https://doi.org/10.48529/zd5s-tj25",
+            url=NGA_W5["url"]))
+        new = bf._from_entry("Nigeria", "2023-24",
+                             dict(NGA_W5, doi="10.48529/zd5s-tj25/"),
+                             "source-url", "2026-10-19")
+        assert bf.release_changed(old, new) == []
+
+    def test_an_override_rerun_at_the_same_id_is_checked_too(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Nigeria/2018-19's override already resolved to 3557 (v03_M).  A
+        re-run whose catalog row is a newer release is a release change like
+        any other -- the override exemption is for CORRECTING an id."""
+        text = _shipped("Nigeria", "2018-19")
+        assert "NGA_2018_GHSP-W4_v03_M" in text
+        _write_source(countries, "Nigeria", "2018-19", text)
+        rows = [dict(r, idno="NGA_2018_GHSP-W4_v04_M",
+                     doi="https://doi.org/10.48529/1hgw-dq47")
+                if r["id"] == "3557" else r for r in NGA_ROWS]
+        _catalog(monkeypatch, bf, rows)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "Nigeria", "2018-19") \
+            .read_text() == text
+        assert _unresolved(review)[("Nigeria", "2018-19")]["Kind"] \
+            == "release-changed"
+
+
+class TestOverrideCorrectionThroughMain:
+    """The positive branch of the ``manual-override`` exemption, end to end.
+
+    Without it a mutant that drops the exemption in ``dropped_by_write``
+    passes every other test, and leaves the known-wrong 3827 forever
+    (red team r1, R11)."""
+
+    LEGACY = ("SOURCE\n\n"
+              "https://microdata.worldbank.org/index.php/catalog/3827\n")
+
+    def test_legacy_3827_is_corrected_to_3557(self, bf, countries,
+                                              monkeypatch, tmp_path):
+        _write_source(countries, "Nigeria", "2018-19", self.LEGACY)
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        assert bf.main(["--country", "Nigeria",
+                        "--review-file", str(review)]) == 0
+
+        text = pv.source_org_path(countries, "Nigeria", "2018-19").read_text()
+        assert "#+CATALOG_ID: 3557\n" in text
+        assert ("#+PROVENANCE_SUPERSEDED_URL: "
+                "https://microdata.worldbank.org/index.php/catalog/3827\n") \
+            in text
+        prov = pv.parse_source_org(text, "Nigeria", "2018-19")
+        assert prov.catalog_ids == ["3557"]
+        assert prov.method == "manual-override"
+        assert prov.idno == "NGA_2018_GHSP-W4_v03_M"
+        assert _unresolved(review) == {}
+        assert ("Nigeria", "2018-19", "CATALOG_ID", "3827", "3557") \
+            in _changed(review)
+
+    def test_a_stamped_wrong_entry_is_corrected_idno_and_all(
+            self, bf, countries, monkeypatch, tmp_path):
+        """A record already STAMPED with the wrong entry carries that entry's
+        idno.  Correcting the id changes the idno by construction; that is
+        the correction, not a release change."""
+        lss = next(r for r in NGA_ROWS if r["id"] == "3827")
+        wrong = pv.render_source_org(bf._from_entry(
+            "Nigeria", "2018-19", lss, "source-url", "2026-07-12"))
+        assert "NGA_2018_LSS_v01_M" in wrong
+        _write_source(countries, "Nigeria", "2018-19", wrong)
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        prov = pv.read_provenance(countries, "Nigeria", "2018-19")
+        assert prov.catalog_ids == ["3557"]
+        assert prov.idno == "NGA_2018_GHSP-W4_v03_M"
+        assert prov.superseded_url.endswith("/catalog/3827")
+        assert _unresolved(review) == {}
+
+
+class TestRecordedValuesSurviveASuccessfulReStamp:
+    """``dropped_by_write`` checks that a KEY survives, not its value; the
+    two template-built paths could overwrite a hand edit (red team r1 H1/H2)."""
+
+    def test_h1_hand_edited_external_note_and_method_are_kept(
+            self, bf, countries, monkeypatch, tmp_path):
+        text = _shipped("GhanaLSS", "1998-99")
+        assert "#+PROVENANCE_METHOD: external-source" in text
+        edited = (text
+                  .replace("#+PROVENANCE_METHOD: external-source",
+                           "#+PROVENANCE_METHOD: content-inspection")
+                  .replace("#+PROVENANCE_NOTE: Obtained from "
+                           "www2.statsghana.gov.gh, not the World Bank "
+                           "Microdata Library.",
+                           "#+PROVENANCE_NOTE: GLSS4, GSS NADA catalog 14; "
+                           "file list checked against the NADA page by hand.")
+                  .replace("#+PROVENANCE_RECORDED: 2026-07-12",
+                           "#+PROVENANCE_RECORDED: 2026-07-12\n"
+                           "#+PROVENANCE_VALIDATION: content-validated"))
+        assert edited.count("\n") == text.count("\n") + 1
+        _write_source(countries, "GhanaLSS", "1998-99", edited)
+        _catalog(monkeypatch, bf, GHA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "GhanaLSS", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "GhanaLSS", "1998-99") \
+            .read_text() == edited
+        assert _unresolved(review) == {}
+        assert _changed(review) == []
+
+    def test_shipped_external_record_is_unchanged(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Control: the shipped (template-note) record is confirmed as is."""
+        text = _shipped("GhanaLSS", "1998-99")
+        _write_source(countries, "GhanaLSS", "1998-99", text)
+        _catalog(monkeypatch, bf, GHA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "GhanaLSS", "--review-file", str(review)])
+        assert pv.source_org_path(countries, "GhanaLSS", "1998-99") \
+            .read_text() == text
+
+    def test_legacy_external_url_still_gets_the_template_note(
+            self, bf, countries, monkeypatch, tmp_path):
+        """Control: a bare legacy URL has no note to keep; it is stamped."""
+        _write_source(countries, "GhanaLSS", "1998-99",
+                      "SOURCE\n\nhttps://www2.statsghana.gov.gh/nada/"
+                      "index.php/catalog/14/get_microdata\n")
+        _catalog(monkeypatch, bf, GHA_ROWS)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "GhanaLSS", "--review-file", str(review)])
+        prov = pv.read_provenance(countries, "GhanaLSS", "1998-99")
+        assert prov.method == "external-source"
+        assert prov.note == ("Obtained from www2.statsghana.gov.gh, not the "
+                             "World Bank Microdata Library.")
+
+    def test_h2_explicit_unknown_with_a_note_in_a_non_wb_country(
+            self, bf, countries, tmp_path):
+        explicit = pv.render_source_org(pv.WaveProvenance(
+            country="KenyaLPS", wave="2015", source=pv.SOURCE_UNKNOWN,
+            method="unresolved", recorded="2026-07-12",
+            note="Round 4 files arrived by email from IPA; origin unconfirmed."))
+        _write_source(countries, "KenyaLPS", "2015", explicit)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "KenyaLPS", "--review-file", str(review)])
+
+        assert pv.source_org_path(countries, "KenyaLPS", "2015").read_text() \
+            == explicit
+        row = _unresolved(review)[("KenyaLPS", "2015")]
+        assert row["Kind"] == "explicit-unknown"
+        assert "origin unconfirmed" in row["Reason"]
+
+    def test_bare_unknown_in_a_non_wb_country_is_still_resolved(
+            self, bf, countries, tmp_path):
+        """Control: an 'unknown' with no reason given is the config's to
+        settle, and is stamped external with the config's reason."""
+        from lsms_library.data_access import _COUNTRY_CATALOG
+        bare = pv.render_source_org(pv.WaveProvenance(
+            country="KenyaLPS", wave="2015", source=pv.SOURCE_UNKNOWN,
+            method="unresolved", recorded="2026-07-12"))
+        _write_source(countries, "KenyaLPS", "2015", bare)
+        review = tmp_path / "review.org"
+        bf.main(["--country", "KenyaLPS", "--review-file", str(review)])
+
+        prov = pv.read_provenance(countries, "KenyaLPS", "2015")
+        assert prov.source == pv.SOURCE_EXTERNAL
+        assert prov.note == _COUNTRY_CATALOG["KenyaLPS"].reason
+        assert ("KenyaLPS", "2015", "PROVENANCE_SOURCE", "unknown",
+                "external") in _changed(review)
+
+
+class TestReviewArtifactIsWrittenWhateverHappens:
+
+    def test_a_run_that_dies_part_way_still_lists_what_it_wrote(
+            self, bf, countries, monkeypatch, tmp_path):
+        for w, cid in (("2010-11", "1002"), ("2018-19", "3557")):
+            _write_source(countries, "Nigeria", w,
+                          "SOURCE\n\nhttps://microdata.worldbank.org/"
+                          f"index.php/catalog/{cid}\n")
+        _catalog(monkeypatch, bf, NGA_ROWS)
+        real = bf.resolve
+
+        def dies_on_the_second(country, wave, *a, **k):
+            if wave == "2018-19":
+                raise RuntimeError("simulated crash")
+            return real(country, wave, *a, **k)
+        monkeypatch.setattr(bf, "resolve", dies_on_the_second)
+
+        review = tmp_path / "review.org"
+        with pytest.raises(RuntimeError, match="simulated crash"):
+            bf.main(["--country", "Nigeria", "--review-file", str(review)])
+
+        text = review.read_text()
+        assert "DID NOT FINISH" in text and "simulated crash" in text
+        written = {(c, w) for c, w, *_ in _changed(review)}
+        assert written == {("Nigeria", "2010-11")}
+        assert pv.read_provenance(countries, "Nigeria", "2010-11").idno \
+            == "NGA_2010_GHSP-W1_v03_M"           # it really was written
+
+    def test_exit_status_is_zero_when_any_queried_country_answered(
+            self, bf, countries, monkeypatch, tmp_path):
+        _write_source(countries, "Nigeria", "2010-11",
+                      _wb("Nigeria", "2010-11", catalog_id="1002"))
+        _write_source(countries, "Uganda", "2005-06",
+                      _wb("Uganda", "2005-06", catalog_id="1001"))
+        monkeypatch.setattr(
+            bf, "_wb_catalog_search",
+            lambda code, collection="lsms": list(NGA_ROWS) if code == "NGA"
+            else [])
+        review = tmp_path / "review.org"
+        assert bf.main(["--country", "Nigeria", "--country", "Uganda",
+                        "--review-file", str(review)]) == 0
+        assert _unresolved(review)[("Uganda", "2005-06")]["Kind"] \
+            == "catalog-returned-nothing"
