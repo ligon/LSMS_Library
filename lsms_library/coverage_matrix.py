@@ -255,7 +255,9 @@ def load_verdicts(path: Path | None = None) -> dict[tuple[str, str, str], dict]:
                 stacklevel=2,
             )
             continue
-        out[key] = dict(r)
+        # Store the spelling that was validated: a padded " correctly-empty "
+        # must not pass here and then grade INERT in `_adjudicate`.
+        out[key] = {**dict(r), "verdict": verdict}
     return out
 
 

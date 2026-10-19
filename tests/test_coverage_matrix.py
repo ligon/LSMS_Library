@@ -486,6 +486,17 @@ def test_correctly_empty_without_evidence_is_REFUSED(tmp_path):
     assert cell["detail"] == "declared for wave but absent from built t-index"
 
 
+def test_a_padded_verdict_is_stored_stripped_and_closes(tmp_path):
+    """Validation strips the verdict; grading must see the same spelling, or a
+    padded `correctly-empty` passes the loader and then grades INERT."""
+    p = _verdicts_file(tmp_path, [
+        "C,foo,w2, correctly-empty ,C4,some evidence,sue,2026-10-19\n"])
+    v = cov.load_verdicts(p)
+    assert v[("C", "foo", "w2")]["verdict"] == "correctly-empty"
+    cell = _dropped_cell(v)["w2"]
+    assert cell["tier"] == "correctly-empty" and "INERT" not in cell["detail"]
+
+
 def test_empty_pending_machinery_without_evidence_is_allowed(tmp_path):
     """Only CLOSING verdicts need evidence; this one keeps the cell open."""
     p = _verdicts_file(tmp_path, [
