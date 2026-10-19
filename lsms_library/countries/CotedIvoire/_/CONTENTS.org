@@ -35,6 +35,17 @@ yet DVC-tracked in this repository:
 These files are downloaded via the WB NADA API on demand when =get_dataframe()= is called.
 To add them to DVC: run =lsms_library.data_access.push_to_cache_batch()= after downloading.
 
+*Correction, 2026-10-18 (GH #675):* the list above is stale for
+=grappe_gps_CIV2018.dta=.  It now carries a =.dvc= sidecar
+(=2018-19/Data/Menage/grappe_gps_CIV2018.dta.dvc=; =_/data_scheme.yml= dates
+the change to 2026-07-13), and =Latitude= / =Longitude= of =cluster_features=
+are REQUIRED again.  It is the one file of =cluster_features='s =df_geo=
+sub-df, so if it cannot be fetched the GH #515 fallback drops it and the
+table loses both columns.  Before GH #675 such a build cached under a valid
+content hash and was served without them forever (the workstation failure
+behind #675: =['Region', 'Rural']= only).  The parquet now records the drop
+(=lsms_build_drops=) and is rebuilt once the file is readable again.
+
 ** Sampling Design
 
 The EHCVM 2018-19 is a single-round cross-sectional survey (not a panel). There are
