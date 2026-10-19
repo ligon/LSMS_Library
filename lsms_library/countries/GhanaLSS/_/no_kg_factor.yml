@@ -29,6 +29,6 @@ no_kg_factor:
       that baseline, so none is minted.  'Ball' is a count unit (GLSS6 8H
       prints 'Balls 03' beside 'Pieces 31').
     evidence: >-
-      CONTENTS.org, "Count unit for own-produced chicken" and "Eggs: count
-      unit and no inferred kilograms" (GH #1042).  Container and
+      CONTENTS.org, "Count unit for own-produced chicken" and "Eggs and
+      fresh coconut: count unit; eggs get NO inferred kilograms" (GH #1042).  Container and
       non-count units ('All', 'Basket', 'Heap', ...) are not declared here.
