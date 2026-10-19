@@ -3039,3 +3039,25 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     =fertilizer_rate='s docstring, which says the parcel step is a measured
     no-op on Malawi.  Measured 2026-10-19 with the #867 shares (before
     them the default gave 11,551 plots); the mismatch itself predates #867.
+  - *The applied-fertilizer UNIT is probably misread -- found while
+    drafting the #867 residuals, NOT changed here.*  =_MWI_FERT_UNIT_LABELS=
+    (=malawi.py=) reads the applied-amount unit (=ag_d39e= / =ag_d39j=)
+    with the acquired-amount code set (=ag_d39c=: 1 = gram, 2 = kilogram,
+    ...), so code 1 is served as =u = 'Gram'=.  But in the IHS3 and IHPS
+    2013 =.dta= the applied unit carries NO value labels (it reads as
+    float64 even with =convert_categoricals=True=), while the labelled
+    acquired unit is overwhelmingly =kilogram= (IHS3 7,329 vs 253 =gram=;
+    2013-14 2,296 vs 162).  IHS3 slot 1 has 5,098 code-1 rows with median
+    quantity 50, and codes 1-4 have medians of 30-50 in both waves --
+    which reads like kilograms or 50 kg bags, not grams.  EPAR
+    (=EPAR_UW_Malawi_IHS_W1.do:2123=, =ren ag_d39d qtyinorg1 //already in
+    kgs=, unit set to kg unconditionally) and the WB panel both treat the
+    applied amount as kg.  Measured 2026-10-19 on the served
+    =plot_inputs=: 13,302 inorganic-fertilizer rows are =u = 'Gram'=
+    (median 50) and carry 203.8 kg N.  Read as kg they would carry
+    203,843.6 kg N, against Malawi's 840,235.8 total.  A further 17,044
+    rows have a NULL =u=: applied codes outside the map (0, 8-12; IHS3 code
+    12 alone is 4,764 slot-1 rows), a blank code, and slot 2 in 2016-17 /
+    2019-20, whose unit column is not read (=unit2=None=).  Under the
+    #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
+    residual.
