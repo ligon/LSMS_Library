@@ -1396,22 +1396,28 @@ class TestRecordedValuesSurviveASuccessfulReStamp:
     """``dropped_by_write`` checks that a KEY survives, not its value; the
     two template-built paths could overwrite a hand edit (red team r1 H1/H2)."""
 
-    def test_h1_hand_edited_external_note_and_method_are_kept(
-            self, bf, countries, monkeypatch, tmp_path):
+    GHA_NOTE = ("#+PROVENANCE_NOTE: Obtained from www2.statsghana.gov.gh, "
+                "not the World Bank Microdata Library.")
+    H1_EDITS = {
+        # r1 H1: the template note was WRITTEN over a hand edit.
+        "note": (GHA_NOTE, "#+PROVENANCE_NOTE: GLSS4, GSS NADA catalog 14; "
+                           "file list checked against the NADA page by hand."),
+        # ... and so was a hand-set method.
+        "method": ("#+PROVENANCE_METHOD: external-source",
+                   "#+PROVENANCE_METHOD: content-inspection"),
+        # A validation line was not carried at all (refused as a deletion).
+        "validation": ("#+PROVENANCE_RECORDED: 2026-07-12",
+                       "#+PROVENANCE_RECORDED: 2026-07-12\n"
+                       "#+PROVENANCE_VALIDATION: content-validated"),
+    }
+
+    @pytest.mark.parametrize("edit", sorted(H1_EDITS))
+    def test_h1_hand_edited_external_record_stays_byte_identical(
+            self, bf, countries, monkeypatch, tmp_path, edit):
         text = _shipped("GhanaLSS", "1998-99")
-        assert "#+PROVENANCE_METHOD: external-source" in text
-        edited = (text
-                  .replace("#+PROVENANCE_METHOD: external-source",
-                           "#+PROVENANCE_METHOD: content-inspection")
-                  .replace("#+PROVENANCE_NOTE: Obtained from "
-                           "www2.statsghana.gov.gh, not the World Bank "
-                           "Microdata Library.",
-                           "#+PROVENANCE_NOTE: GLSS4, GSS NADA catalog 14; "
-                           "file list checked against the NADA page by hand.")
-                  .replace("#+PROVENANCE_RECORDED: 2026-07-12",
-                           "#+PROVENANCE_RECORDED: 2026-07-12\n"
-                           "#+PROVENANCE_VALIDATION: content-validated"))
-        assert edited.count("\n") == text.count("\n") + 1
+        old, new = self.H1_EDITS[edit]
+        assert text.count(old) == 1
+        edited = text.replace(old, new)
         _write_source(countries, "GhanaLSS", "1998-99", edited)
         _catalog(monkeypatch, bf, GHA_ROWS)
         review = tmp_path / "review.org"
