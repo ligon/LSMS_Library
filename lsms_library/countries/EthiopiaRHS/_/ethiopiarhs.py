@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 import lsms_library.local_tools as tools
-from lsms_library.transformations import S_VALUES
+from lsms_library.transformations import S_VALUES, U_UNKNOWN
 
 
 # Explicit `waves` list (consumed by Country.waves, country.py:1054-1073).
@@ -38,8 +38,12 @@ waves = ['1989', '1994a', '1994b', '1995', '1997', '1999', '2004', '2009']
 # (1->kg, 2->"100 kg", 3->Chinet, 19->litre, 30->Value -- the
 # currency code, canonicalised onto the framework sentinel rather
 # than spelled 'Birr', GH #770 -- ...) and the
-# raw in-data unit *code* for 1989 (an unlabelled scheme; still a unit
-# token, not a food label).  An EARLIER design appended the food label
+# raw in-data unit *code* for 1989 (still a unit token, not a food
+# label).  A 1994+ code the table does not list is served as its
+# integer code ('31', not '31.0'); 1989's code 0 is U_UNKNOWN.  1989's
+# codes are NOT the 1994+ scheme -- its own instrument numbers units
+# per questionnaire page, and its code 1 is a quintal, not a kilogram
+# (GH #1044; see `food_acquired` and _/CONTENTS.org).  An EARLIER design appended the food label
 # to non-metric units ("Chinet [Butter]") to coax the framework's
 # price-ratio kg inference into a per-good factor; that polluted the
 # unit axis with ITEM NAMES (e.g. '0 [Butter]', '5 [Teff]') and is the
@@ -215,8 +219,10 @@ def food_acquired(df):
     wave's data_info.yml, so the frame arrives canonical (no q_/u_/e_
     triplet columns).  Detect that (no 'q_purch'), keep only canonical
     s values (drops the NaN/5/6/7 source rows that have no clean
-    purchased/produced/inkind meaning), drop unidentifiable rows, and
-    return as-is.
+    purchased/produced/inkind meaning), drop unidentifiable rows, serve
+    the missing-unit code 0 as ``U_UNKNOWN`` (GH #1044), and return
+    as-is.  Every other 1989 unit code stays raw: it is not the 1994+
+    ``harmonize_unit`` scheme (1989's code 1 is a quintal).
 
     The canonical set is :data:`lsms_library.transformations.S_VALUES` --
     imported, never re-spelled.  This filter used to carry its own narrower
@@ -252,13 +258,36 @@ def food_acquired(df):
             if k in flat.columns:
                 flat = flat[flat[k].notna() & (flat[k].astype('string')
                                                .str.strip() != '')]
-        # 1989 unitcode is an in-data-unlabelled scheme (harmonize_unit
-        # not applied), so ``u`` carries the raw unit *code* here -- a
-        # unit token on the unit axis, NOT a food label (#347).  1989
-        # metric units are therefore not distinguished (documented;
-        # would need Codeunit1.SPS).
+        # 1989 unitcode carries no value labels in food89.dta, and
+        # harmonize_unit is deliberately NOT applied: it is the 1994+
+        # scheme, and 1989's is a different one.  The 1989 instrument
+        # (ERHS_hhquestionnaire_1989.pdf, Debre Berhan, section E3)
+        # numbers units PER PAGE -- E3.1 (cereals, pulses): 1=Quintal,
+        # 2=Dawla, 3=Kunna, 4=Akmada, 5=Ensira, 6=Gurzigne, 7=Silicha,
+        # 8=Tassa, 9=Other; E3.2/E3.3: 1=Packets, ..., 7=Kilogrammes,
+        # ..., 13=Ensira -- and the data use codes (14, 15, 17, 21) on
+        # neither list, so other villages' instruments differ again.  So
+        # ``u`` carries the raw unit *code* here -- a unit token on the
+        # unit axis, NOT a food label (#347), and NOT a 1994+ label.
+        #
+        # In particular code 1 is NOT kilograms (GH #1044): its 32 rows
+        # are site-1 barley/wheat/sorghum, Quantity 0.125-0.5, and the
+        # 9 purchases price at a median 52 Birr/unit -- 1994a barley is
+        # 1.10 Birr/kg and 100-130 Birr per quintal in 1994b/1997.  It
+        # is the E3.1 quintal.  Decoding it alone would give 1989 a kg
+        # baseline and let the price-ratio inference hand factors to the
+        # other raw codes, whose meaning varies by page and village.
+        #
+        # Code 0 is on no list: it is the missing-unit sentinel (14 rows,
+        # 13 purchased + 1 produced; 9 are value-only purchases with
+        # Quantity 0).  #1041: a missing unit is U_UNKNOWN, never a
+        # minted spelling -- so the kg ladder serves it ``none`` by rule,
+        # not because 1989 happens to have no baseline.  (format_id, auto-
+        # applied to this idxvar, also truncates the one 0.5 entry to
+        # '0'; that row has no acquisition source and is dropped above.)
         if 'u' in flat.columns:
             flat['u'] = flat['u'].astype('string').str.strip()
+            flat.loc[flat['u'] == '0', 'u'] = U_UNKNOWN
         flat = _drop_double_punched(flat)
         return flat.set_index(idx)
 
@@ -271,7 +300,14 @@ def food_acquired(df):
         sub = pd.DataFrame({
             'i': w['i'].values,
             'j': w['j'].values,
-            'u': w[u].astype('string').str.strip(),
+            # The unit columns are MYVARS, so format_id is not auto-applied
+            # (CLAUDE.md, "format_id ... NOT to myvars").  harmonize_unit
+            # decodes a listed code to its label and passes an unlisted one
+            # through as the raw float -- 31.0, 37.0, 83.0, 95.0 -- which
+            # used to be stringified '31.0' (GH #1044).  format_id here,
+            # immediately after the read, serves an unlisted code as its
+            # integer code '31' and leaves every label untouched.
+            'u': w[u].map(tools.format_id),
             's': s,
             'Quantity': pd.to_numeric(w[q], errors='coerce'),
             'Expenditure': (pd.to_numeric(w[e], errors='coerce')
@@ -292,6 +328,10 @@ def food_acquired(df):
     # harmonize_unit (#347) and is dropped here.  Each row's ``u`` is a
     # clean unit token -- no food label appended (the framework's
     # price-ratio inference recovers per-good factors on its own).
+    # (No 1994+ file actually uses code 0.  What this drops is a NaN unit
+    # on a measured row: 214 rows, 494.4 Birr across 1994a-1997, measured
+    # for GH #1044.  #1041 would serve them U_UNKNOWN; that adds rows, so
+    # it is left for its own change -- see _/CONTENTS.org.)
     out['u'] = out['u'].astype('string').str.strip()
     out = out[out['i'].notna()]
     out = out[out['u'].notna() & (out['u'] != '')]
